@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.avaje</groupId>
+    <artifactId>avaje-javaparent</artifactId>
+    <version>1.1</version>
+  </parent>
+  
+	<groupId>org.avaje.ebeanorm</groupId>
+	<artifactId>avaje-ebeanorm-spring</artifactId>
+	<name>avaje-ebeanorm-spring</name>
+	<version>3.1.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<description>Support for Spring transactions and IOC setup of Ebean server config</description>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>	
+		<spring.framework.version>3.0.0.RELEASE</spring.framework.version>
+		<ebean.version>3.1.1</ebean.version>
+	</properties>
+	
+    <url>http://www.avaje.org</url>
+	
+	<licenses>
+		<license>
+			<name>LGPL version 2.1 or later</name>
+			<url>http://www.gnu.org/licenses/lgpl-2.1.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
+  <scm>
+    <connection>scm:git:https://github.com/rbygrave/avaje-ebeanorm-spring.git</connection>
+    <developerConnection>scm:git:https://github.com/rbygrave/avaje-ebeanorm-spring.git</developerConnection>
+    <url>https://github.com/rbygrave/avaje-ebeanorm-spring.git</url>
+  </scm>
+  
+	<dependencies>
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.avaje</groupId>
+			<artifactId>ebean</artifactId>
+			<version>${ebean.version}</version>
+		</dependency>
+		
+		<!-- Spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.framework.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>${spring.framework.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring.framework.version}</version>
+			<scope>provided</scope>
+		</dependency>	
+
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.framework.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.xbean</groupId>
+			<artifactId>xbean-spring</artifactId>
+			<version>3.5</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.2.128</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.10.0-M6</version>
+            <scope>provided</scope>
+        </dependency> 
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.avaje.ebeanorm</groupId>
+				<artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
+				<version>${ebean.version}</version>
+				<executions>
+					<execution>
+						<id>main</id>
+						<phase>process-test-classes</phase>
+						<configuration>
+							<packages>com.avaje.ebean.**</packages>
+							<transformArgs>debug=1</transformArgs>
+						</configuration>
+						<goals>
+							<goal>enhance</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

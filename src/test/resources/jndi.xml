@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<bean id="jndi"
+		class="org.apache.xbean.spring.jndi.DefaultContext">
+		<property name="entries">
+			<map>
+				<entry key="java:comp/env/jdbc/ebeantest">
+					<bean
+						class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
+						destroy-method="close" singleton="false">
+						<property name="driverClassName"
+							value="org.h2.Driver" />
+						<property name="url" value="jdbc:h2:mem:tests;DB_CLOSE_DELAY=-1" />
+						<property name="username" value="ebean" />
+						<property name="password" value="ebean" />
+						<property name="autoCommit" value="false" />
+						<property name="suppressClose" value="true" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+</beans>

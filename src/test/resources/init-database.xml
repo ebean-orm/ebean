@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	                    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+	                    http://www.springframework.org/schema/context
+           				http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<import resource="classpath:default-ebean-server.xml"/>
+
+	<!-- Transaktionen via Annotation use Springs @Transactional -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<context:annotation-config />
+
+	<!-- The real DataSource  -->
+	<bean id="dataSource"
+		class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/jdbc/ebeantest" />
+	</bean>
+
+	<!--  Transaction Manager -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<bean id="serverConfig" parent="defaultEbeanServerConfig">
+		<property name="name" value="test"/>
+		<property name="classes">
+			<list>
+				<value>com.avaje.ebean.springsupport.User</value>
+				<value>com.avaje.ebean.springsupport.Role</value>
+				<value>com.avaje.ebean.springsupport.Account</value>
+			</list>
+		</property>
+		<property name="dataSource" ref="dataSource"/>
+
+		<property name="ddlGenerate" value="true"/>
+		<property name="ddlRun" value="true"/>
+	</bean>
+
+	<!-- Ebean server -->
+	<bean id="ebeanServer" class="com.avaje.ebean.springsupport.factory.EbeanServerFactoryBean">
+		<property name="serverConfig" ref="serverConfig"/>
+	</bean>
+
+	<bean id="userService" class="com.avaje.ebean.springsupport.UserServiceImpl">
+		<property name="ebeanServer" ref="ebeanServer"/>
+	</bean>
+</beans>
