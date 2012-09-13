@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Premain-Class: com.avaje.ebean.enhance.agent.Transformer
+

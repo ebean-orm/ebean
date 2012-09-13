@@ -1,0 +1,16 @@
+<!ELEMENT ebean (table | iudextender | findextender | datasource | primarykeys | property)* >
+  <!ELEMENT table EMPTY >
+    <!ATTLIST table name CDATA #REQUIRED>
+  <!ELEMENT iudextender EMPTY >
+    <!ATTLIST iudextender classname CDATA #REQUIRED>
+  <!ELEMENT findextender EMPTY >
+    <!ATTLIST findextender classname CDATA #REQUIRED>
+  <!ELEMENT datasource EMPTY >
+    <!ATTLIST datasource name CDATA #REQUIRED>
+  <!ELEMENT primarykeys EMPTY >
+    <!ATTLIST primarykeys keys CDATA #REQUIRED>
+  <!ELEMENT property EMPTY >
+    <!ATTLIST property name CDATA #REQUIRED
+                     datatype CDATA #REQUIRED
+                     deploydatatype CDATA #IMPLIED
+                     deployname CDATA #IMPLIED >

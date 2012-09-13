@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="1.0" xmlns="http://java.sun.com/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_1_0.xsd">
+
+<package>com.avaje.tests.model.basic</package>
+
+<entity class="com.avaje.tests.model.basic.Order">	
+	<named-query name="top.open">
+		<query>
+			find order 
+			join customer (name)
+			join customer.billingAddress (*)
+			join details
+			join details.product (sku, name)
+			order by customer.name asc
+			limit 10
+		</query>
+	</named-query>
+	<named-query name="top.open">
+		<query>
+			find order 
+			join customer (name)
+			join customer.billingAddress (*)
+			join details
+			join details.product (sku, name)
+			order by customer.name asc
+			limit 10
+		</query>
+	</named-query>
+</entity>
+
+<named-native-query name="find.order">
+	<query>
+		select * from o_order where id = :id
+	</query>
+</named-native-query>
+
+
+</entity-mappings>

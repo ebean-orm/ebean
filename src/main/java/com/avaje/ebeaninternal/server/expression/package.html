@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<TITLE>Collection objects for lazy loading</TITLE>
+</HEAD>
+<Body BGCOLOR="#ffffff">
+Expressions for building WHERE clauses.
+
+<p>
+You will most likely use expressions directly off the ExpressionList.
+</p>
+<pre class="code">
+  Query&lt;Order&gt; query = Ebean.createQuery(Order.class)
+    .where()
+      .like(&quot;customer.name&quot;,&quot;rob%&quot;)
+      .gt(&quot;orderDate&quot;,lastWeek);
+    
+  List&lt;Order&gt; orderList = query.findList();
+  ...
+</pre>
+<p>
+In the code above the LIKE and GREATER THAN Expressions are added to the where clause.
+The way this works is that where() returns an ExpressionList which has methods on
+it to create the standard expressions (EQUAL TO, LIKE etc).
+</p>
+<p>
+I expect most people to add their expressions in this way. The Expr expression factory
+object also has the ability to create the standard expressions.
+</p>
+<p>
+You can build your own Expression objects by implementing the Expression interface. 
+</p>
+
+
+</Body>
+</HTML>

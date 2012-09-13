@@ -1,0 +1,21 @@
+div#banner{
+	background:url("../images/logo-bg.jpg") repeat scroll 0 0 transparent;
+	border-bottom:1px solid #777777;
+}
+table.codeAnnotation {
+	width:100%;
+}
+table.codeAnnotation td {
+	width:50%;
+	vertical-align:top;
+}
+table.codeAnnotation td.code {
+	font-size: 80%;
+}
+table pre {
+	font-size: 80%;
+}
+
+div.section dl dd {
+	padding-bottom:.5em;
+}

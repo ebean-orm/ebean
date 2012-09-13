@@ -1,0 +1,8 @@
+Creating EBean based application via Maven
+
+  A the easiest way to create a maven project for an ebean application with the proper dependiences is to issue the following command:
+
+  mvn archetype:create -DarchetypeGroupId=org.avaje \\\
+  \ \ \ \ -DarchetypeArtifactId=ebean-archetype-quickstart \\\
+  \ \ \ \ -DarchetypeVersion=2.5 \\\
+  \ \ \ \ -DgroupId=com.mycompany -DartifactId=testproj 

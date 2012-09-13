@@ -1,0 +1,39 @@
+package com.avaje.tests.basic.type;
+
+import java.util.Currency;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import junit.framework.TestCase;
+
+import org.junit.Assert;
+
+import com.avaje.ebean.Ebean;
+import com.avaje.tests.model.basic.ESomeType;
+
+public class TestExtraScalarTypes extends TestCase {
+
+    public void test() {
+        
+        Locale locale = Locale.getDefault();
+        Currency currency = Currency.getInstance(locale);
+        TimeZone tz = TimeZone.getDefault();
+        
+        ESomeType e = new ESomeType();
+        e.setLocale(locale);
+        e.setTimeZone(tz);
+        e.setCurrency(currency);
+        
+        Ebean.save(e);
+        
+        ESomeType e2 = Ebean.find(ESomeType.class)
+            .setAutofetch(false)
+            .setId(e.getId())
+            .findUnique();
+        
+        Assert.assertNotNull(e2.getCurrency());
+        Assert.assertNotNull(e2.getLocale());
+        Assert.assertNotNull(e2.getTimeZone());
+    }
+    
+}
