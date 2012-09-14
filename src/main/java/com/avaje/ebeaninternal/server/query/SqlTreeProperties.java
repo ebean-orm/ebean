@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.avaje.ebeaninternal.server.query;
 
 import java.util.ArrayList;

@@ -1,10 +1,3 @@
-/**
- * Imilia Interactive Mobile Applications GmbH
- * Copyright (c) 2009 - all rights reserved
- *
- * Created on: Jun 29, 2009
- * Created by: emcgreal
- */
 package com.avaje.ebeaninternal.server.ddl;
 
 import java.io.StringWriter;

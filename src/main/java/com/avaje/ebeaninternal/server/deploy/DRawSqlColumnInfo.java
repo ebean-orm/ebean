@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.avaje.ebeaninternal.server.deploy;
 
 public class DRawSqlColumnInfo {
