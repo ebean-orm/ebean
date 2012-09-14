@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -202,6 +203,11 @@ public class DataSourcePool implements DataSource {
         } catch (SQLException ex) {
             throw new DataSourceException(ex);
         }
+    }
+
+    @Override
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+      return logger;
     }
 
     /**
