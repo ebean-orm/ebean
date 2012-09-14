@@ -61,13 +61,13 @@
     <dependency>
       <groupId>org.avaje.ebeanorm</groupId>
       <artifactId>avaje-ebeanorm-api</artifactId>
-      <version>[3.1,4)</version>
+      <version>[3.1.1]</version>
     </dependency>
 
     <dependency>
       <groupId>org.avaje.ebeanorm</groupId>
       <artifactId>avaje-ebeanorm-agent</artifactId>
-      <version>[3.1,4)</version>
+      <version>[3.1.1]</version>
     </dependency>
 
     <dependency>
@@ -128,7 +128,7 @@
       <plugin>
         <groupId>org.avaje.ebeanorm</groupId>
         <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
-        <version>3.1.1-SNAPSHOT</version>
+        <version>3.1.1</version>
         <executions>
           <execution>
             <id>main</id>
