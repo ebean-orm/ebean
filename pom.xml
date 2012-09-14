@@ -85,14 +85,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-plugin-api</artifactId>
-      <version>2.2.1</version>
-      <type>jar</type>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>1.3.153</version>
@@ -129,32 +121,25 @@
 
   </dependencies>
 
-  <!-- Enhance the test classes -->
+
+  <!-- Enhance the meta beans -->
   <build>
-
     <plugins>
-
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.7</version>
+        <groupId>org.avaje.ebeanorm</groupId>
+        <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
+        <version>3.1.1-SNAPSHOT</version>
         <executions>
-
           <execution>
-            <id>enhance-test-classes</id>
+            <id>main</id>
             <phase>process-test-classes</phase>
             <configuration>
-              <tasks>
-                <property name="compile_classpath" refid="maven.compile.classpath" />
-                <echo message="Ebean enhancing test classes debug level -----------------------------------" />
-                <echo message="Classpath: ${compile_classpath}" />
-                <taskdef name="ebeanEnhance" classname="com.avaje.ebean.enhance.ant.AntEnhanceTask" classpath="${compile_classpath}" />
-                <ebeanEnhance classSource="${project.build.testOutputDirectory}" packages="com.avaje.tests.**" transformArgs="debug=1" />
-              </tasks>
-              <encoding>UTF-8</encoding>
+              <classSource>target/test-classes</classSource>
+              <packages>com.avaje.tests.**</packages>
+              <transformArgs>debug=1</transformArgs>
             </configuration>
             <goals>
-              <goal>run</goal>
+              <goal>enhance</goal>
             </goals>
           </execution>
         </executions>
@@ -175,38 +160,8 @@
         </configuration>
       </plugin>
 
-
     </plugins>
 
-    <pluginManagement>
-      <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <versionRange>[1.7,)</versionRange>
-                    <goals>
-                      <goal>run</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 
 </project>
