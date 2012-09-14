@@ -51,18 +51,36 @@
       <artifactId>spring-core</artifactId>
       <version>${spring.framework.version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+       </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-aspects</artifactId>
       <version>${spring.framework.version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+       </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
       <version>${spring.framework.version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+       </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Test dependencies -->
@@ -71,6 +89,18 @@
       <artifactId>spring-test</artifactId>
       <version>${spring.framework.version}</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+       </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>[1.6.2]</version>
     </dependency>
 
     <dependency>
@@ -85,6 +115,12 @@
       <artifactId>xbean-spring</artifactId>
       <version>3.5</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+       </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -107,8 +143,9 @@
             <id>main</id>
             <phase>process-test-classes</phase>
             <configuration>
+              <classSource>target/test-classes</classSource>
               <packages>com.avaje.ebean.**</packages>
-              <transformArgs>debug=1</transformArgs>
+              <transformArgs>debug=9</transformArgs>
             </configuration>
             <goals>
               <goal>enhance</goal>
