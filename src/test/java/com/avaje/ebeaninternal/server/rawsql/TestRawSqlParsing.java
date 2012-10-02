@@ -3,8 +3,8 @@ package com.avaje.ebeaninternal.server.rawsql;
 import junit.framework.TestCase;
 
 import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.RawSql.Sql;
+import com.avaje.ebean.RawSqlBuilder;
 
 public class TestRawSqlParsing extends TestCase {
 

@@ -1,9 +1,9 @@
 package com.avaje.tests.rawsql;
 
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlUpdate;
-
-import junit.framework.TestCase;
 
 public class TestInsertSqlLogging extends TestCase {
 

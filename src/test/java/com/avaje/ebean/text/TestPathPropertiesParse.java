@@ -2,8 +2,6 @@ package com.avaje.ebean.text;
 
 import junit.framework.TestCase;
 
-import com.avaje.ebean.text.PathProperties;
-
 public class TestPathPropertiesParse extends TestCase {
 
     public void test() {

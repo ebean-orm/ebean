@@ -6,11 +6,11 @@ import java.util.List;
 
 import com.avaje.ebean.CallableSql;
 import com.avaje.ebeaninternal.api.BindParams;
+import com.avaje.ebeaninternal.api.BindParams.Param;
 import com.avaje.ebeaninternal.api.SpiCallableSql;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
-import com.avaje.ebeaninternal.api.BindParams.Param;
 import com.avaje.ebeaninternal.server.persist.PersistExecute;
 
 /**

@@ -1,11 +1,11 @@
 package com.avaje.tests.inheritance;
 
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.TIntChild;
 import com.avaje.tests.model.basic.TIntRoot;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 public class TestIntInherit extends TestCase {
 

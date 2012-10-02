@@ -20,8 +20,8 @@ import com.avaje.ebean.bean.SerializeControl;
 import com.avaje.ebean.common.BeanList;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
-import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.Order.Status;
+import com.avaje.tests.model.basic.OrderDetail;
 
 public class TestSerialization extends TestCase {
 

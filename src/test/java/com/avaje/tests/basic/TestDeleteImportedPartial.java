@@ -1,12 +1,12 @@
 package com.avaje.tests.basic;
 
+import junit.framework.TestCase;
+
 import org.junit.Assert;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.PFile;
 import com.avaje.tests.model.basic.PFileContent;
-
-import junit.framework.TestCase;
 
 public class TestDeleteImportedPartial extends TestCase {
  

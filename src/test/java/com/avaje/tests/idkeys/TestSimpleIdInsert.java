@@ -4,8 +4,6 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import com.avaje.ebean.Ebean;
-//import com.avaje.ebean.LogLevel;
-//import com.avaje.ebean.Transaction;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.tests.model.basic.ESimple;
 

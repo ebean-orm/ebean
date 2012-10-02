@@ -1,12 +1,12 @@
 package com.avaje.ebeaninternal.server.text.json;
 
+import com.avaje.ebean.text.json.JsonElement;
 import com.avaje.ebean.text.json.JsonElementArray;
 import com.avaje.ebean.text.json.JsonElementBoolean;
 import com.avaje.ebean.text.json.JsonElementNull;
 import com.avaje.ebean.text.json.JsonElementNumber;
 import com.avaje.ebean.text.json.JsonElementObject;
 import com.avaje.ebean.text.json.JsonElementString;
-import com.avaje.ebean.text.json.JsonElement;
 
 
 

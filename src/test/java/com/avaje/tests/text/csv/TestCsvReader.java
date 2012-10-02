@@ -1,14 +1,15 @@
 package com.avaje.tests.text.csv;
 
+import java.io.File;
+import java.io.FileReader;
+import java.util.Locale;
+
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
-import junit.framework.TestCase;
-
-import java.io.File;
-import java.io.FileReader;
-import java.util.Locale;
 
 public class TestCsvReader extends TestCase {
 

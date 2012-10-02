@@ -1,7 +1,7 @@
 package com.avaje.tests.compositekeys.db;
 
-import javax.persistence.Embeddable;
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
 
 @Embeddable
 public class ItemKey

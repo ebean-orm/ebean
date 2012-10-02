@@ -2,10 +2,10 @@ package com.avaje.ebean;
 
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import com.avaje.ebean.RawSql.ColumnMapping;
 import com.avaje.ebean.RawSql.ColumnMapping.Column;
-
-import junit.framework.TestCase;
 
 public class TestRawSqlColumnParsing extends TestCase {
 

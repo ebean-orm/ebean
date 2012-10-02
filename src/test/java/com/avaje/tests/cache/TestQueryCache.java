@@ -2,9 +2,9 @@ package com.avaje.tests.cache;
 
 import java.util.List;
 
-import org.junit.Assert;
-
 import junit.framework.TestCase;
+
+import org.junit.Assert;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.BeanCollection;

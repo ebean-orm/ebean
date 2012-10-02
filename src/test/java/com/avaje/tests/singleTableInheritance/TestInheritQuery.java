@@ -1,14 +1,15 @@
 package com.avaje.tests.singleTableInheritance;
 
+import java.util.List;
+
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.singleTableInheritance.model.PalletLocation;
 import com.avaje.tests.singleTableInheritance.model.PalletLocationExternal;
 import com.avaje.tests.singleTableInheritance.model.Zone;
 import com.avaje.tests.singleTableInheritance.model.ZoneExternal;
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
-import java.util.List;
 
 public class TestInheritQuery extends TestCase {
 

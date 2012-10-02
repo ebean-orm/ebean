@@ -1,12 +1,12 @@
 package com.avaje.tests.inheritance;
 
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.AttributeHolder;
 import com.avaje.tests.model.basic.ListAttribute;
 import com.avaje.tests.model.basic.ListAttributeValue;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 public class TestSkippable extends TestCase {
 

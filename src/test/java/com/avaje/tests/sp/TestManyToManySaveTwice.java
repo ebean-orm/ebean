@@ -3,12 +3,12 @@ package com.avaje.tests.sp;
 import java.util.LinkedList;
 import java.util.List;
 
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.sp.model.car.Car;
 import com.avaje.tests.sp.model.car.Wheel;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 public class TestManyToManySaveTwice extends TestCase {
 

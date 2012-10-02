@@ -1,11 +1,11 @@
 package com.avaje.tests.autofetch;
 
+import java.util.List;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
-
-import java.util.List;
 
 public class MainAutoQueryTune1 {
 

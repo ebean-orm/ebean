@@ -1,11 +1,11 @@
 package com.avaje.tests.query;
 
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.ResetBasicData;
-
-import junit.framework.TestCase;
 
 public class TestWhereRawClause extends TestCase {
 

@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.server.transaction.TransactionLogBuffer;
-import com.avaje.ebeaninternal.server.transaction.TransactionLogWriter;
 import com.avaje.ebeaninternal.server.transaction.TransactionLogBuffer.LogEntry;
+import com.avaje.ebeaninternal.server.transaction.TransactionLogWriter;
 
 /**
  * A transactionLogger that uses a java.util.logging.Logger.

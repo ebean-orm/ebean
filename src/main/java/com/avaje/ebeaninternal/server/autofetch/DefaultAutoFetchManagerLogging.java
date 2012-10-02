@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.autofetch;
 
 import java.util.logging.Level;
-
 import java.util.logging.Logger;
 
 import com.avaje.ebean.config.AutofetchConfig;

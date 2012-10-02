@@ -1,7 +1,7 @@
 package com.avaje.tests.singleTableInheritance.model;
 
-import javax.persistence.Entity;
 import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("EXT")

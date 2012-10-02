@@ -10,9 +10,9 @@ import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
+import com.avaje.tests.model.basic.Order.Status;
 import com.avaje.tests.model.basic.OrderAggregate;
 import com.avaje.tests.model.basic.ResetBasicData;
-import com.avaje.tests.model.basic.Order.Status;
 
 public class TestRawSqlOrmWrapper3 extends TestCase {
 

@@ -8,8 +8,8 @@ import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
-import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.GlobalProperties;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.resource.ResourceManager;
 

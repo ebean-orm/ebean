@@ -1,7 +1,8 @@
 package com.avaje.tests.compositekeys.db;
 
-import javax.persistence.Embeddable;
 import java.util.Date;
+
+import javax.persistence.Embeddable;
 
 @Embeddable
 public class AuditInfo

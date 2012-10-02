@@ -1,11 +1,11 @@
 package com.avaje.tests.basic;
 
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.PersistentFile;
 import com.avaje.tests.model.basic.PersistentFileContent;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 public class TestSaveDeleteOneToOne extends TestCase {
 

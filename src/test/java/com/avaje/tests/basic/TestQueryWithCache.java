@@ -3,17 +3,13 @@ package com.avaje.tests.basic;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Query;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.tests.model.basic.Country;
-import com.avaje.tests.model.basic.Customer;
-import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 
 public class TestQueryWithCache extends TestCase {

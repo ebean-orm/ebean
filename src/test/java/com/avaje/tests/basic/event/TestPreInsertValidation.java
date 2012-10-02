@@ -1,10 +1,10 @@
 package com.avaje.tests.basic.event;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.tests.model.basic.TWithPreInsert;
-
 import junit.framework.Assert;
 import junit.framework.TestCase;
+
+import com.avaje.ebean.Ebean;
+import com.avaje.tests.model.basic.TWithPreInsert;
 
 public class TestPreInsertValidation extends TestCase {
 

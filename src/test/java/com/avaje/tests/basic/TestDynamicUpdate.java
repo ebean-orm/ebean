@@ -1,10 +1,11 @@
 package com.avaje.tests.basic;
 
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.LogLevel;
 import com.avaje.tests.model.embedded.EMain;
-import junit.framework.TestCase;
 
 public class TestDynamicUpdate extends TestCase {
 

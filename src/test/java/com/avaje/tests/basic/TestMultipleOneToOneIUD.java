@@ -1,11 +1,11 @@
 package com.avaje.tests.basic;
 
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.OCar;
 import com.avaje.tests.model.basic.OEngine;
 import com.avaje.tests.model.basic.OGearBox;
-
-import junit.framework.TestCase;
 
 public class TestMultipleOneToOneIUD extends TestCase {
 

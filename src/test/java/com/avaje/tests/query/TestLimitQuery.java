@@ -1,14 +1,15 @@
 package com.avaje.tests.query;
 
+import java.util.List;
+
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Junction;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
-import junit.framework.TestCase;
-
-import java.util.List;
 
 public class TestLimitQuery extends TestCase {
 

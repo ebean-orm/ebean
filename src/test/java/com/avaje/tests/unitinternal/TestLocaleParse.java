@@ -2,10 +2,10 @@ package com.avaje.tests.unitinternal;
 
 import java.util.Locale;
 
-import com.avaje.ebeaninternal.server.type.ScalarTypeLocale;
-
 import junit.framework.Assert;
 import junit.framework.TestCase;
+
+import com.avaje.ebeaninternal.server.type.ScalarTypeLocale;
 
 public class TestLocaleParse extends TestCase {
 

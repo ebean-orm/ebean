@@ -2,9 +2,9 @@ package com.avaje.tests.basic;
 
 import javax.persistence.PersistenceException;
 
-import org.junit.Assert;
-
 import junit.framework.TestCase;
+
+import org.junit.Assert;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.config.GlobalProperties;

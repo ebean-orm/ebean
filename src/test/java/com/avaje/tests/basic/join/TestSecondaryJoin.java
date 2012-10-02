@@ -6,8 +6,8 @@ import junit.framework.TestCase;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Order;
-import com.avaje.tests.model.basic.ResetBasicData;
 import com.avaje.tests.model.basic.Order.Status;
+import com.avaje.tests.model.basic.ResetBasicData;
 
 public class TestSecondaryJoin extends TestCase {
 

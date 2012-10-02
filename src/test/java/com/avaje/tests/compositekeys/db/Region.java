@@ -1,7 +1,13 @@
 package com.avaje.tests.compositekeys.db;
 
-import javax.persistence.*;
 import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.OneToMany;
+import javax.persistence.Version;
 
 @Entity
 public class Region

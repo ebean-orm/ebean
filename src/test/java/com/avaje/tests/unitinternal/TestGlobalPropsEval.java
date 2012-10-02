@@ -1,9 +1,9 @@
 package com.avaje.tests.unitinternal;
 
-import com.avaje.ebean.config.GlobalProperties;
-
 import junit.framework.Assert;
 import junit.framework.TestCase;
+
+import com.avaje.ebean.config.GlobalProperties;
 
 public class TestGlobalPropsEval extends TestCase {
 

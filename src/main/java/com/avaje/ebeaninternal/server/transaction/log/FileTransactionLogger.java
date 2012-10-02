@@ -13,8 +13,8 @@ import java.util.logging.Logger;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebeaninternal.server.transaction.TransactionLogBuffer;
-import com.avaje.ebeaninternal.server.transaction.TransactionLogWriter;
 import com.avaje.ebeaninternal.server.transaction.TransactionLogBuffer.LogEntry;
+import com.avaje.ebeaninternal.server.transaction.TransactionLogWriter;
 
 /**
  * Default transaction logger implementation.

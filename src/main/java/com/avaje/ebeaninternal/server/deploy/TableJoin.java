@@ -1,14 +1,14 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import java.sql.SQLException;
+import java.util.LinkedHashMap;
+
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
-
-import java.sql.SQLException;
-import java.util.LinkedHashMap;
 
 /**
  * Represents a join to another table.

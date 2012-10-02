@@ -3,9 +3,9 @@ package com.avaje.tests.text.json;
 import java.sql.Date;
 import java.sql.Timestamp;
 
-import org.junit.Assert;
-
 import junit.framework.TestCase;
+
+import org.junit.Assert;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.config.GlobalProperties;

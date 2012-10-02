@@ -8,10 +8,6 @@ import junit.framework.TestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebeaninternal.server.expression.DefaultExpressionFactory;
-import com.avaje.ebeaninternal.server.querydefn.DefaultOrmQuery;
-import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
-import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetailParser;
-import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 import com.avaje.tests.model.basic.Order;
 
 

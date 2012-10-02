@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.lib.sql;
 
-import com.avaje.ebeaninternal.jdbc.ConnectionDelegator;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -15,6 +13,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.avaje.ebeaninternal.jdbc.ConnectionDelegator;
 
 /**
  * Is a connection that belongs to a DataSourcePool.

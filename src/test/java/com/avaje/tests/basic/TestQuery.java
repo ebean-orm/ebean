@@ -1,11 +1,12 @@
 package com.avaje.tests.basic;
 
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 public class TestQuery extends TestCase
 {

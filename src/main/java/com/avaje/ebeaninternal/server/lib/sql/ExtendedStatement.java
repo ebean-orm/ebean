@@ -1,12 +1,12 @@
 package com.avaje.ebeaninternal.server.lib.sql;
 
-import com.avaje.ebeaninternal.jdbc.PreparedStatementDelegator;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+
+import com.avaje.ebeaninternal.jdbc.PreparedStatementDelegator;
 
 /**
  * Implements the Statement methods for ExtendedPreparedStatement.

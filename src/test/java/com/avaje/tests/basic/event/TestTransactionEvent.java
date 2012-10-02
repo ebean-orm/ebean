@@ -1,9 +1,10 @@
 package com.avaje.tests.basic.event;
 
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Transaction;
 import com.avaje.tests.model.basic.TWithPreInsert;
-import junit.framework.TestCase;
 
 public class TestTransactionEvent extends TestCase {
 

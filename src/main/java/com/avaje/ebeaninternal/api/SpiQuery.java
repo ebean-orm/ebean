@@ -1,5 +1,8 @@
 package com.avaje.ebeaninternal.api;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.Query;
@@ -17,9 +20,6 @@ import com.avaje.ebeaninternal.server.query.CancelableQuery;
 import com.avaje.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Object Relational query - Internal extension to Query object.

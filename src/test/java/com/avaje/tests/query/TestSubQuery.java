@@ -1,5 +1,10 @@
 package com.avaje.tests.query;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.TestCase;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.CKeyParent;
@@ -7,10 +12,6 @@ import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 import com.avaje.tests.model.basic.Vehicle;
 import com.avaje.tests.model.basic.VehicleDriver;
-import junit.framework.TestCase;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TestSubQuery extends TestCase {
 

@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebean.config.Encryptor;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.EncryptKeyManager;
+import com.avaje.ebean.config.Encryptor;
 
 public class DataEncryptSupport {
 
