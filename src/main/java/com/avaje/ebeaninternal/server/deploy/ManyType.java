@@ -21,15 +21,9 @@ public class ManyType {
     
     private final Underlying underlying;
     
-    private final CollectionTypeConverter typeConverter;
 
-    private ManyType(Underlying underlying) {
-        this(underlying, null);
-    }
-
-    public ManyType(Underlying underlying, CollectionTypeConverter typeConverter) {
+    public ManyType(Underlying underlying) {
         this.underlying = underlying;
-        this.typeConverter = typeConverter;
         switch (underlying) {
         case LIST:
             queryType = SpiQuery.Type.LIST;
@@ -56,13 +50,6 @@ public class ManyType {
      */
     public Underlying getUnderlying() {
         return underlying;
-    }
-
-    /**
-     * Return the type converter if there is one.
-     */
-    public CollectionTypeConverter getTypeConverter() {
-        return typeConverter;
     }
     
 }

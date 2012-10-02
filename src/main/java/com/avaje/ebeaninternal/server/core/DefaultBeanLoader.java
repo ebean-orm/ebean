@@ -202,7 +202,7 @@ public class DefaultBeanLoader {
     BeanDescriptor<?> parentDesc = server.getBeanDescriptor(parentBean.getClass());
     BeanPropertyAssocMany<?> many = (BeanPropertyAssocMany<?>) parentDesc.getBeanProperty(propertyName);
 
-    Object currentValue = many.getValueUnderlying(parentBean);
+    Object currentValue = many.getValue(parentBean);
     if (currentValue instanceof BeanCollection<?>) {
       beanCollection = (BeanCollection<?>) currentValue;
       filterMany = beanCollection.getFilterMany();

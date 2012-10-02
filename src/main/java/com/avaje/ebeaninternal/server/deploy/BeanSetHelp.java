@@ -121,7 +121,7 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
 		
 		BeanSet<?> newBeanSet = (BeanSet<?>)bc;
 		
-		Set<?> current = (Set<?>)many.getValueUnderlying(parentBean);
+		Set<?> current = (Set<?>)many.getValue(parentBean);
 		
 		newBeanSet.setModifyListening(many.getModifyListenMode());
 		if (current == null){

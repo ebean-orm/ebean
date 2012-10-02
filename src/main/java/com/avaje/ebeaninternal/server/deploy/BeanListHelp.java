@@ -114,7 +114,7 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
 
     BeanList<?> newBeanList = (BeanList<?>) bc;
 
-    List<?> currentList = (List<?>) many.getValueUnderlying(parentBean);
+    List<?> currentList = (List<?>) many.getValue(parentBean);
 
     newBeanList.setModifyListening(many.getModifyListenMode());
 

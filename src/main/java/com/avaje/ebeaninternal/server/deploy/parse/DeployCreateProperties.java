@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
 
-import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.deploy.DetermineManyType;
 import com.avaje.ebeaninternal.server.deploy.ManyType;
@@ -23,7 +22,6 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertySimpleCollection;
 import com.avaje.ebeaninternal.server.type.CtCompoundType;
-import com.avaje.ebeaninternal.server.type.ScalaOptionTypeConverter;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
@@ -38,33 +36,14 @@ import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
 public class DeployCreateProperties {
 
 	private static final Logger logger = Logger.getLogger(DeployCreateProperties.class.getName());
-
-	private final Class<?> scalaOptionClass;
-	/**
-	 * Use to wrap and unwrap Scala Option.
-	 */
-    @SuppressWarnings("rawtypes")
-    private final ScalarTypeConverter scalaOptionTypeConverter;
-    
-    private final DetermineManyType determineManyType;
+  
+  private final DetermineManyType determineManyType;
 
 	private final TypeManager typeManager;
 	
-    @SuppressWarnings("rawtypes")
     public DeployCreateProperties(TypeManager typeManager) {
     	this.typeManager = typeManager;
-    	
-    	Class<?> tmpOptionClass = DetectScala.getScalaOptionClass();
-
-        if (tmpOptionClass == null){
-            scalaOptionClass = null;
-            scalaOptionTypeConverter = null;
-        } else {
-            scalaOptionClass = tmpOptionClass;
-            scalaOptionTypeConverter = new ScalaOptionTypeConverter();
-        }
-        
-        this.determineManyType = new DetermineManyType(tmpOptionClass != null);
+      this.determineManyType = new DetermineManyType();
     }
     
     /**
@@ -293,12 +272,6 @@ public class DeployCreateProperties {
         
         Class<?> propertyType = field.getType();
         Class<?> innerType = propertyType;
-        ScalarTypeConverter<?, ?> typeConverter = null;
-        
-        if (propertyType.equals(scalaOptionClass)){
-            innerType = determineTargetType(field);
-            typeConverter = scalaOptionTypeConverter;
-        }
         
         // check for Collection type (list, set or map)
         ManyType manyType = determineManyType.getManyType(propertyType);
@@ -318,17 +291,17 @@ public class DeployCreateProperties {
         } 
         
         if (innerType.isEnum() || innerType.isPrimitive()){
-            return new DeployBeanProperty(desc, propertyType, null, typeConverter);
+            return new DeployBeanProperty(desc, propertyType, null, null);
         }
         
         ScalarType<?> scalarType = typeManager.getScalarType(innerType);
         if (scalarType != null) {
-            return new DeployBeanProperty(desc, propertyType, scalarType, typeConverter);
+            return new DeployBeanProperty(desc, propertyType, scalarType, null);
         }
         
         CtCompoundType<?> compoundType = typeManager.getCompoundType(innerType);
         if (compoundType != null) {
-            return new DeployBeanPropertyCompound(desc, propertyType, compoundType, typeConverter);
+            return new DeployBeanPropertyCompound(desc, propertyType, compoundType, null);
         }
      
         if (!isTransientField(field)){
@@ -340,13 +313,13 @@ public class DeployCreateProperties {
                         typeManager.recursiveCreateScalarDataReader(innerType);
                         compoundType = typeManager.getCompoundType(innerType);
                         if (compoundType != null) {
-                            return new DeployBeanPropertyCompound(desc, propertyType, compoundType, typeConverter);
+                            return new DeployBeanPropertyCompound(desc, propertyType, compoundType, null);
                         }
                         
                     } else {
                         // use reflection to support simple immutable value objects
                         scalarType = typeManager.recursiveCreateScalarTypes(innerType);
-                        return new DeployBeanProperty(desc, propertyType, scalarType, typeConverter);
+                        return new DeployBeanProperty(desc, propertyType, scalarType, null);
                     }
                 }
             } catch (Exception e){

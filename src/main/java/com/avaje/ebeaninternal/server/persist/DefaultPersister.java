@@ -729,8 +729,8 @@ public final class DefaultPersister implements Persister {
 			this.updateNullProperties = false;
 		}
 
-		private Object getValueUnderlying() {
-			return many.getValueUnderlying(parentBean);
+		private Object getValue() {
+			return many.getValue(parentBean);
 		}
 
 		private boolean isModifyListenMode() {
@@ -794,7 +794,7 @@ public final class DefaultPersister implements Persister {
 
 	private void removeAssocManyPrivateOwned(SaveManyPropRequest saveMany) {
 
-		Object details = saveMany.getValueUnderlying();
+		Object details = saveMany.getValue();
 
 		// check that the list is not null and if it is a BeanCollection
 		// check that is has been populated (don't trigger lazy loading)
@@ -822,7 +822,7 @@ public final class DefaultPersister implements Persister {
 
 		BeanPropertyAssocMany<?> prop = saveMany.getMany();
 
-		Object details = saveMany.getValueUnderlying();
+		Object details = saveMany.getValue();
 
 		// check that the list is not null and if it is a BeanCollection
 		// check that is has been populated (don't trigger lazy loading)
@@ -989,7 +989,7 @@ public final class DefaultPersister implements Persister {
 	private void saveAssocManyIntersection(SaveManyPropRequest saveManyPropRequest, boolean deleteMissingChildren) {
 
 		BeanPropertyAssocMany<?> prop = saveManyPropRequest.getMany();
-		Object value = prop.getValueUnderlying(saveManyPropRequest.getParentBean());
+		Object value = prop.getValue(saveManyPropRequest.getParentBean());
 		if (value == null) {
 			return;
 		}
@@ -1126,7 +1126,7 @@ public final class DefaultPersister implements Persister {
 
 				if (ModifyListenMode.REMOVALS.equals(manys[i].getModifyListenMode())) {
 					// PrivateOwned ...
-					Object details = manys[i].getValueUnderlying(parentBean);
+					Object details = manys[i].getValue(parentBean);
 					if (details instanceof BeanCollection<?>) {
 						Set<?> modifyRemovals = ((BeanCollection<?>) details).getModifyRemovals();
 						if (modifyRemovals != null && !modifyRemovals.isEmpty()) {

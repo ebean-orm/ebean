@@ -149,7 +149,7 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
 	public void refresh(BeanCollection<?> bc, Object parentBean) {
 
 		BeanMap<?, ?> newBeanMap = (BeanMap<?, ?>) bc;
-		Map<?, ?> current = (Map<?, ?>) many.getValueUnderlying(parentBean);
+		Map<?, ?> current = (Map<?, ?>) many.getValue(parentBean);
 
 		newBeanMap.setModifyListening(many.getModifyListenMode());
 		if (current == null) {
