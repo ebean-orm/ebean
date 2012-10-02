@@ -719,6 +719,10 @@ public final class DefaultPersister implements Persister {
 			this.deleteMissingChildren = false;
 			this.updateNullProperties = false;
 		}
+		
+		public boolean isSaveIntersection() {
+		  return t.isSaveAssocManyIntersection(many.getIntersectionTableJoin().getTable(), many.getBeanDescriptor().getName());
+		}
 
 		private Object getValue() {
 			return many.getValue(parentBean);
@@ -764,14 +768,19 @@ public final class DefaultPersister implements Persister {
 	private void saveMany(SaveManyPropRequest saveMany) {
 
 		if (saveMany.getMany().isManyToMany()) {
-			// save the beans that are in the manyToMany
+			
+		  // check if we can save the m2m intersection in this direction
+		  boolean saveIntersectionFromThisDirection = saveMany.isSaveIntersection();
 			if (saveMany.isCascade()) {
 				// Need explicit Cascade to save the beans on other side
 				saveAssocManyDetails(saveMany, false, saveMany.isUpdateNullProperties());
 			}
 			// for ManyToMany save the 'relationship' via inserts/deletes
 			// into/from the intersection table
-			saveAssocManyIntersection(saveMany, saveMany.isDeleteMissingChildren());
+			if (saveIntersectionFromThisDirection) {
+			  // only allowed on one direction of a m2m based on beanName
+			  saveAssocManyIntersection(saveMany, saveMany.isDeleteMissingChildren());
+			}
 		} else {
 			if (saveMany.isCascade()) {
 				saveAssocManyDetails(saveMany, saveMany.isDeleteMissingChildren(), saveMany.isUpdateNullProperties());

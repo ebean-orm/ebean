@@ -26,5 +26,4 @@ public class Attribute extends BasicDomain{
 		this.attributeHolder = attributeHolder;
 	}
 	
-	
 }

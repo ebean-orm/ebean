@@ -117,6 +117,7 @@ public class JdbcTransaction implements SpiTransaction {
 
   HashSet<Object> persistingBeans = new HashSet<Object>();
   HashSet<Integer> deletingBeansHash;
+  HashMap<String,String> m2mIntersectionSave;
 
   TransactionLogBuffer logBuffer;
 
@@ -221,6 +222,30 @@ public class JdbcTransaction implements SpiTransaction {
    */
   public boolean isRegisteredBean(Object bean) {
     return !persistingBeans.add(bean);
+  }
+
+  /**
+   * Return true if the m2m intersection save is allowed from a given bean direction.
+   * This is to stop m2m intersection management via both directions of a m2m.
+   */
+  @Override
+  public boolean isSaveAssocManyIntersection(String intersectionTable, String beanName) {
+    if (m2mIntersectionSave == null) {
+      // first attempt so yes allow this m2m intersection direction 
+      m2mIntersectionSave = new HashMap<String, String>();
+      m2mIntersectionSave.put(intersectionTable, beanName);
+      return true;
+    }
+    String existingBean = m2mIntersectionSave.get(intersectionTable);
+    if (existingBean == null) {
+      // first time into this intersection table so allow
+      m2mIntersectionSave.put(intersectionTable, beanName);
+      return true;
+    } 
+    
+    // only allow if save coming from the same bean type 
+    // to stop saves coming from both directions of m2m 
+    return existingBean.equals(beanName);
   }
 
   /**

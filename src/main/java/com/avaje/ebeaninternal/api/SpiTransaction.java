@@ -181,4 +181,9 @@ public interface SpiTransaction extends Transaction {
 	 * </p>
 	 */
 	public Connection getInternalConnection();
+
+	/**
+	 * Return true if the manyToMany intersection should be persisted for this particular relationship direction.
+	 */
+  public boolean isSaveAssocManyIntersection(String intersectionTable, String beanName);
 }
