@@ -1307,7 +1307,7 @@ public class BeanProperty implements ElPropertyValue {
     }
 
     public void jsonRead(ReadJsonContext ctx, Object bean) {
-        if(jsonDeserialize){
+        if(!jsonDeserialize){
             return;
         }
     	String jsonValue;
