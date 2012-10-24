@@ -754,7 +754,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
 
     public void jsonWrite(WriteJsonContext ctx, Object bean) {
-        
+        if(!this.jsonSerialize){
+            return;
+        }
         Boolean include = ctx.includeMany(name);
         if (Boolean.FALSE.equals(include)){
             return;
@@ -769,7 +771,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
     
     public void jsonRead(ReadJsonContext ctx, Object bean){
-          
+        if(!this.jsonDeserialize){
+            return;
+        }
         if (!ctx.readArrayBegin()) {
             // the array is null
             return;
