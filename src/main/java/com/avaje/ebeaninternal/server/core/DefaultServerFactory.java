@@ -244,7 +244,7 @@ public class DefaultServerFactory implements BootupEbeanManager {
 
         if (sleepMillis > 0) {
           Timer t = new Timer("EbeanCacheWarmer", true);
-          t.schedule(new CacheWarmer(sleepMillis, server), sleepMillis);
+          t.schedule(new CacheWarmer(server), sleepMillis);
         }
       }
 
@@ -495,23 +495,13 @@ public class DefaultServerFactory implements BootupEbeanManager {
 
   private static class CacheWarmer extends TimerTask {
 
-    private static final Logger log = Logger.getLogger(CacheWarmer.class.getName());
-
-    private final long sleepMillis;
     private final EbeanServer server;
 
-    CacheWarmer(long sleepMillis, EbeanServer server) {
-      this.sleepMillis = sleepMillis;
+    CacheWarmer(EbeanServer server) {
       this.server = server;
     }
 
     public void run() {
-      try {
-        Thread.sleep(sleepMillis);
-      } catch (InterruptedException e) {
-        String msg = "Error while sleeping prior to cache warming";
-        log.log(Level.SEVERE, msg, e);
-      }
       server.runCacheWarming();
     }
 
