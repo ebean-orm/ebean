@@ -35,11 +35,7 @@ public class DdlGenerator {
 
 	private final DatabasePlatform dbPlatform;
 
-	private PrintStream out = System.out;
-
 	private int summaryLength = 80;
-
-	private boolean debug = true;
 
 	private boolean generateDdl;
 	private boolean runDdl;
@@ -218,13 +214,11 @@ public class DdlGenerator {
 		try {
 			Connection connection = t.getConnection();
 
-			out.println("runScript");
-			out.flush();
+			logger.info("Running DDL");
 
 			runStatements(expectErrors, statements, connection);
 
-			out.println("... end of script");
-			out.flush();
+            logger.info("Running DDL Complete");
 
 			t.commit();
 
@@ -263,19 +257,15 @@ public class DdlGenerator {
 				stmt = stmt.substring(0, stmt.length()-1);
 			}
 
-			if (debug) {
-				out.println("executing "+oneOf+" "+ getSummary(stmt));
-				out.flush();
-			}
+            logger.log(Level.FINER, "executing "+oneOf+" "+ getSummary(stmt));
 
 			pstmt = c.prepareStatement(stmt);
 			pstmt.execute();
 
 		} catch (Exception e) {
 			if (expectErrors){
-				out.println(" ... ignoring error executing "+getSummary(stmt)+"  error: "+e.getMessage());
+				logger.info(" ... ignoring error executing "+getSummary(stmt)+"  error: "+e.getMessage());
 				e.printStackTrace();
-				out.flush();
 			} else {
 				String msg = "Error executing stmt[" + stmt+"] error["+e.getMessage()+"]";
 				throw new RuntimeException(msg, e);
