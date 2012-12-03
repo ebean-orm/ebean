@@ -1140,6 +1140,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	}
 
 	public DefaultOrmQuery<T> setId(Object id) {
+		if (id == null) {
+			throw new NullPointerException("The id is null");
+		}
 		this.id = id;
 		return this;
 	}
