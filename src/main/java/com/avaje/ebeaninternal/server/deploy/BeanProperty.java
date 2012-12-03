@@ -17,6 +17,7 @@ import javax.naming.directory.BasicAttribute;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.InvalidValue;
+import com.avaje.ebean.annotation.Expose;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
@@ -270,6 +271,10 @@ public class BeanProperty implements ElPropertyValue {
 
     int deployOrder;
 
+    final boolean jsonSerialize;
+
+    final boolean jsonDeserialize;
+
     public BeanProperty(DeployBeanProperty deploy) {
         this(null, null, deploy);
     }
@@ -349,6 +354,10 @@ public class BeanProperty implements ElPropertyValue {
         EntityType et = descriptor == null ? null : descriptor.getEntityType();
         this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), false, null);
         this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), dbEncrypted, dbColumn);
+
+        Expose expose = deploy.getField().getAnnotation(Expose.class);
+        this.jsonSerialize = expose==null || expose.serialize();
+        this.jsonDeserialize = expose==null || expose.deserialize();
     }
 
     private String tableAliasIntern(BeanDescriptor<?> descriptor, String s, boolean dbEncrypted, String dbColumn) {
@@ -431,6 +440,9 @@ public class BeanProperty implements ElPropertyValue {
 
         this.elPlaceHolder = override.replace(source.elPlaceHolder, source.dbColumn);
         this.elPlaceHolderEncrypted = override.replace(source.elPlaceHolderEncrypted, source.dbColumn);
+
+        this.jsonSerialize = source.jsonSerialize;
+        this.jsonDeserialize = source.jsonDeserialize;
     }
 
     /**
@@ -1283,7 +1295,9 @@ public class BeanProperty implements ElPropertyValue {
 
     @SuppressWarnings("unchecked")
     public void jsonWrite(WriteJsonContext ctx, Object bean) {
-
+        if(!jsonSerialize){
+            return;
+        }
         Object value = getValueIntercept(bean);
         if (value == null) {
             ctx.appendNull(name);
@@ -1293,7 +1307,9 @@ public class BeanProperty implements ElPropertyValue {
     }
 
     public void jsonRead(ReadJsonContext ctx, Object bean) {
-
+        if(!jsonDeserialize){
+            return;
+        }
     	String jsonValue;
     	try {
         	jsonValue = ctx.readScalarValue();
