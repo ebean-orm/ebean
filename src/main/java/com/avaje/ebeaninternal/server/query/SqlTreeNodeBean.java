@@ -174,6 +174,46 @@ public class SqlTreeNodeBean implements SqlTreeNode {
            }
 	}
 	
+    private boolean isLoadContextBeanNeeded(Mode queryMode, Object contextBean) {
+        // if explicitly set loadContextBean to true, then reload
+        if(queryMode.isLoadContextBean()) {
+            return true;
+        }
+        
+        // if contextBean is not EntityBean (I doubt this will happen), then don't reload
+        if(!(contextBean instanceof EntityBean)) {
+            return true;
+        }
+        
+        EntityBean cb = (EntityBean) contextBean;
+        
+        // always reload if contextBean is reference
+        if(cb._ebean_getIntercept().isReference()) {
+            return true;
+        }
+        
+        // when localBean is partial object
+        if(partialObject) {
+            // don't reload if localBean is partial object but contextBean is not
+            if(cb._ebean_intercept().getLoadedProps()==null) {
+                return false;
+            }
+            
+            // when both localBean and contextBean are partial objects
+            if(cb._ebean_getIntercept().getLoadedProps().containsAll(includedProps)) {
+                // don't reload if contextBean has all the properties which are included for localBean
+                return false;
+            } else {
+                // otherwise reload, need to add the loadedProps of context bean to the incluededProps of localBean
+                includedProps.addAll(cb._ebean_getIntercept().getLoadedProps());
+                return true;
+            }
+        }
+        
+        // return false by default
+        return false;
+    }
+	
 	/**
 	 * read the properties from the resultSet.
 	 */
@@ -230,7 +270,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
                     contextBean = localBean;                    				    
 				} else {
 					// bean already exists in persistenceContext
-					if (queryMode.isLoadContextBean()){
+					if (isLoadContextBeanNeeded(queryMode, contextBean)){
 						// refresh it anyway (lazy loading for example)
 						localBean = contextBean;
 						if (localBean instanceof EntityBean){
