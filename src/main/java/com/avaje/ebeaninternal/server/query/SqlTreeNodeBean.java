@@ -180,7 +180,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
             return true;
         }
         
-        // if contextBean is not EntityBean (I doubt this will happen), then don't reload
+        // if contextBean is not EntityBean (I doubt this will happen), then reload
         if(!(contextBean instanceof EntityBean)) {
             return true;
         }
@@ -208,6 +208,12 @@ public class SqlTreeNodeBean implements SqlTreeNode {
                 includedProps.addAll(cb._ebean_getIntercept().getLoadedProps());
                 return true;
             }
+        }
+        
+        // when localBean is not partial object
+        if(cb._ebean_getIntercept().getLoadedProps()!=null) {
+            // reload if contextBean is partial object
+            return true;
         }
         
         // return false by default
