@@ -55,7 +55,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 	/**
 	 * The hash of the partialProps (calculate once).
 	 */
-	final int partialHash;
+	int partialHash;
 	
 	final BeanProperty[] properties;
 	
@@ -79,7 +79,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 	
 	final String prefix;
 	
-	final Set<String> includedProps;
+	Set<String> includedProps;
 
 	final Map<String,String> pathMap;
 	
@@ -200,12 +200,15 @@ public class SqlTreeNodeBean implements SqlTreeNode {
             }
             
             // when both localBean and contextBean are partial objects
-            if(cb._ebean_getIntercept().getLoadedProps().containsAll(includedProps)) {
+            if(cb._ebean_getIntercept().getLoadedProps().containsAll(partialProps)) {
                 // don't reload if contextBean has all the properties which are included for localBean
                 return false;
             } else {
                 // otherwise reload, need to add the loadedProps of context bean to the incluededProps of localBean
-                includedProps.addAll(cb._ebean_getIntercept().getLoadedProps());
+                partialProps.addAll(cb._ebean_getIntercept().getLoadedProps());
+                // recalculate partialHash and includedProps
+                partialHash = partialProps.hashCode();
+                includedProps = LoadedPropertiesCache.get(partialHash, partialProps, desc);
                 return true;
             }
         }
