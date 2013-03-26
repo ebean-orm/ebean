@@ -147,6 +147,11 @@ public class AnnotationClass extends AnnotationParser {
 		if (cacheStrategy != null){
 			readCacheStrategy(cacheStrategy);
 		}
+		
+		EntityConcurrencyMode entityConcurrencyMode = cls.getAnnotation(EntityConcurrencyMode.class);
+        if (entityConcurrencyMode!=null) {
+            descriptor.setConcurrencyMode(entityConcurrencyMode.value());
+        }
 	}
 
 	private void readCacheStrategy(CacheStrategy cacheStrategy){
