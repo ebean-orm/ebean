@@ -55,7 +55,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 	/**
 	 * The hash of the partialProps (calculate once).
 	 */
-	final int partialHash;
+	int partialHash;
 	
 	final BeanProperty[] properties;
 	
@@ -79,7 +79,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 	
 	final String prefix;
 	
-	final Set<String> includedProps;
+	Set<String> includedProps;
 
 	final Map<String,String> pathMap;
 	
@@ -174,6 +174,55 @@ public class SqlTreeNodeBean implements SqlTreeNode {
            }
 	}
 	
+    private boolean isLoadContextBeanNeeded(Mode queryMode, Object contextBean) {
+        // if explicitly set loadContextBean to true, then reload
+        if(queryMode.isLoadContextBean()) {
+            return true;
+        }
+        
+        // if contextBean is not EntityBean (I doubt this will happen), then reload
+        if(!(contextBean instanceof EntityBean)) {
+            return true;
+        }
+        
+        EntityBean cb = (EntityBean) contextBean;
+        
+        // always reload if contextBean is reference
+        if(cb._ebean_getIntercept().isReference()) {
+            return true;
+        }
+        
+        // when localBean is partial object
+        if(partialObject) {
+            // don't reload if localBean is partial object but contextBean is not
+            if(cb._ebean_intercept().getLoadedProps()==null) {
+                return false;
+            }
+            
+            // when both localBean and contextBean are partial objects
+            if(cb._ebean_getIntercept().getLoadedProps().containsAll(partialProps)) {
+                // don't reload if contextBean has all the properties which are included for localBean
+                return false;
+            } else {
+                // otherwise reload, need to add the loadedProps of context bean to the incluededProps of localBean
+                partialProps.addAll(cb._ebean_getIntercept().getLoadedProps());
+                // recalculate partialHash and includedProps
+                partialHash = partialProps.hashCode();
+                includedProps = LoadedPropertiesCache.get(partialHash, partialProps, desc);
+                return true;
+            }
+        }
+        
+        // when localBean is not partial object
+        if(cb._ebean_getIntercept().getLoadedProps()!=null) {
+            // reload if contextBean is partial object
+            return true;
+        }
+        
+        // return false by default
+        return false;
+    }
+	
 	/**
 	 * read the properties from the resultSet.
 	 */
@@ -230,7 +279,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
                     contextBean = localBean;                    				    
 				} else {
 					// bean already exists in persistenceContext
-					if (queryMode.isLoadContextBean()){
+					if (isLoadContextBeanNeeded(queryMode, contextBean)){
 						// refresh it anyway (lazy loading for example)
 						localBean = contextBean;
 						if (localBean instanceof EntityBean){
