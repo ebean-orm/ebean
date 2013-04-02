@@ -17,7 +17,6 @@ import javax.naming.directory.BasicAttribute;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.InvalidValue;
-import com.avaje.ebean.annotation.Expose;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
@@ -355,9 +354,8 @@ public class BeanProperty implements ElPropertyValue {
         this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), false, null);
         this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), dbEncrypted, dbColumn);
 
-        Expose expose = deploy.getField().getAnnotation(Expose.class);
-        this.jsonSerialize = expose==null || expose.serialize();
-        this.jsonDeserialize = expose==null || expose.deserialize();
+        this.jsonSerialize = deploy.isExposeSerialize();
+        this.jsonDeserialize = deploy.isExposeDeserialize();
     }
 
     private String tableAliasIntern(BeanDescriptor<?> descriptor, String s, boolean dbEncrypted, String dbColumn) {

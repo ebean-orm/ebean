@@ -4,8 +4,8 @@ import java.util.Set;
 
 import javax.naming.ldap.LdapName;
 
+import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.core.ConcurrencyMode;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanManager;
 

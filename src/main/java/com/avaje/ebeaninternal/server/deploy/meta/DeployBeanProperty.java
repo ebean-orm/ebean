@@ -105,6 +105,9 @@ public class DeployBeanProperty {
     private boolean isTransient;
 
     private boolean localEncrypted;
+    
+    private boolean exposeSerialize = true;
+    private boolean exposeDeserialize = true;
 
     private boolean dbEncrypted;
     private DbEncryptFunction dbEncryptFunction;
@@ -294,6 +297,22 @@ public class DeployBeanProperty {
         }
 
         return dbLength;
+    }
+
+    public boolean isExposeSerialize() {
+      return exposeSerialize;
+    }
+
+    public void setExposeSerialize(boolean exposeSerialize) {
+      this.exposeSerialize = exposeSerialize;
+    }
+
+    public boolean isExposeDeserialize() {
+      return exposeDeserialize;
+    }
+
+    public void setExposeDeserialize(boolean exposeDeserialize) {
+      this.exposeDeserialize = exposeDeserialize;
     }
 
     /**

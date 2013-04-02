@@ -8,6 +8,7 @@ import javax.persistence.OptimisticLockException;
 
 import com.avaje.ebean.InvalidValue;
 import com.avaje.ebean.ValidationException;
+import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.event.BeanPersistController;

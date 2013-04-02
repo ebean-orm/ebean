@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.avaje.ebean.Query.UseIndex;
 import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.EntityConcurrencyMode;
 import com.avaje.ebean.annotation.LdapDomain;
 import com.avaje.ebean.annotation.NamedUpdate;
 import com.avaje.ebean.annotation.NamedUpdates;
@@ -150,7 +151,7 @@ public class AnnotationClass extends AnnotationParser {
 		
 		EntityConcurrencyMode entityConcurrencyMode = cls.getAnnotation(EntityConcurrencyMode.class);
         if (entityConcurrencyMode!=null) {
-            descriptor.setConcurrencyMode(entityConcurrencyMode.value());
+            //descriptor.setConcurrencyMode(entityConcurrencyMode.value());
         }
 	}
 

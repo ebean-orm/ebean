@@ -1,5 +1,7 @@
 package com.avaje.tests.basic;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -11,11 +13,13 @@ import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlFutureList;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
+import com.avaje.ebean.Transaction;
 import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 import com.avaje.tests.model.basic.TOne;
+import com.mysql.jdbc.PreparedStatement;
 
 public class MainFutureList {
 
@@ -24,6 +28,33 @@ public class MainFutureList {
 		checkFutureRowCount(true);
 		//testSqlQueryFuture();
 		//testOrmFuture();
+	}
+	
+	public void executeDDL(EbeanServer server, String ddl) {
+	  
+	  Transaction t  = server.createTransaction();
+	  try {
+	    Connection connection = t.getConnection()
+	        ;
+	    
+	    
+	  } finally {
+	    t.end();
+	  }
+	  
+	}
+	
+	private void executeStmt(Connection c, String ddl) throws SQLException {
+	  java.sql.PreparedStatement pstmt = null;
+	  try {
+	    pstmt = c.prepareStatement(ddl);
+	    pstmt.execute();
+	    
+	  } finally {
+	    if (pstmt != null) {
+	      pstmt.close();
+	    }
+	  }
 	}
 	
 	private static EbeanServer createEbeanServer(boolean primary) {

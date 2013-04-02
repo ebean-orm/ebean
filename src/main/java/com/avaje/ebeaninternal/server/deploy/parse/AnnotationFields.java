@@ -27,6 +27,7 @@ import javax.persistence.Version;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.EmbeddedColumns;
 import com.avaje.ebean.annotation.Encrypted;
+import com.avaje.ebean.annotation.Expose;
 import com.avaje.ebean.annotation.Formula;
 import com.avaje.ebean.annotation.LdapAttribute;
 import com.avaje.ebean.annotation.LdapId;
@@ -136,6 +137,12 @@ public class AnnotationFields extends AnnotationParser {
 		if (column != null) {
 			readColumn(column, prop);
 		} 
+		Expose expose = get(prop, Expose.class);
+		if (expose != null) {
+		  prop.setExposeSerialize(expose.serialize());
+		  prop.setExposeDeserialize(expose.deserialize());
+		}
+		
 		LdapAttribute ldapAttribute = get(prop, LdapAttribute.class);
         if (ldapAttribute != null) {
             // read ldap specific property settings

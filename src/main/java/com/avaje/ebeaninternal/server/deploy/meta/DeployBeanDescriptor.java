@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.avaje.ebean.Query.UseIndex;
+import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
@@ -25,7 +26,6 @@ import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.meta.MetaAutoFetchStatistic;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
-import com.avaje.ebeaninternal.server.core.ConcurrencyMode;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistController;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistListener;

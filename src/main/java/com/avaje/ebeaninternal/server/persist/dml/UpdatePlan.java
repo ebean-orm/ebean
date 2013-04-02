@@ -3,8 +3,8 @@ package com.avaje.ebeaninternal.server.persist.dml;
 import java.sql.SQLException;
 import java.util.Set;
 
+import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
-import com.avaje.ebeaninternal.server.core.ConcurrencyMode;
 import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
 
 /**
