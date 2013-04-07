@@ -227,7 +227,8 @@ public class DefaultServerFactory implements BootupEbeanManager {
       server.registerMBeans(mbeanServer, uniqueServerId);
 
       // generate and run DDL if required
-      executeDDL(server, online);
+      // if there are any other tasks requiring action in their plugins, do them as well
+      server.executePlugins(online);
 
       // initialise prior to registering with clusterManager
       server.initialise();

@@ -22,18 +22,19 @@ import com.avaje.ebean.Transaction;
 import com.avaje.ebean.config.NamingConvention;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebeaninternal.api.SpiEbeanPlugin;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 
 /**
  * Controls the generation of DDL and potentially runs the resulting scripts.
  */
-public class DdlGenerator {
+public class DdlGenerator implements SpiEbeanPlugin {
 
-    private static final Logger logger = Logger.getLogger(DdlGenerator.class.getName());
+  private static final Logger logger = Logger.getLogger(DdlGenerator.class.getName());
     
-	private final SpiEbeanServer server;
+	private SpiEbeanServer server;
 
-	private final DatabasePlatform dbPlatform;
+	private DatabasePlatform dbPlatform;
 
 	private int summaryLength = 80;
 
@@ -45,7 +46,7 @@ public class DdlGenerator {
 
 	private NamingConvention namingConvention;
 
-	public DdlGenerator(SpiEbeanServer server, DatabasePlatform dbPlatform, ServerConfig serverConfig) {
+	public void setup(SpiEbeanServer server, DatabasePlatform dbPlatform, ServerConfig serverConfig) {
 		this.server = server;
 		this.dbPlatform = dbPlatform;
 		this.generateDdl = serverConfig.isDdlGenerate();
