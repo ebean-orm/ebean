@@ -10,7 +10,6 @@ import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
-import com.avaje.ebean.annotation.LdapAttribute;
 import com.avaje.ebean.annotation.PrivateOwned;
 import com.avaje.ebean.annotation.Where;
 import com.avaje.ebean.bean.BeanCollection.ModifyListenMode;
@@ -108,11 +107,6 @@ public class AnnotationAssocManys extends AnnotationParser {
 				prop.getTableJoin().addJoinColumn(true, joinTable.joinColumns(), beanTable);
 			}
 		}
-        LdapAttribute ldapAttribute = get(prop, LdapAttribute.class);
-        if (ldapAttribute != null) {
-            // read ldap specific property settings
-            readLdapAttribute(ldapAttribute, prop);
-        }
 
 		if (prop.getMappedBy() != null){
 			// the join is derived by reversing the join information

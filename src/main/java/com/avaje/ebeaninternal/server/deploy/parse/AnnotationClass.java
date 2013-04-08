@@ -12,7 +12,6 @@ import javax.xml.bind.annotation.XmlType;
 import com.avaje.ebean.Query.UseIndex;
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.EntityConcurrencyMode;
-import com.avaje.ebean.annotation.LdapDomain;
 import com.avaje.ebean.annotation.NamedUpdate;
 import com.avaje.ebean.annotation.NamedUpdates;
 import com.avaje.ebean.annotation.UpdateMode;
@@ -54,14 +53,6 @@ public class AnnotationClass extends AnnotationParser {
             descriptor.setBaseTable(tableName);
 		}
 	}
-    
-	private String[] parseLdapObjectclasses(String objectclasses) {
-	    
-	    if (objectclasses == null || objectclasses.length() == 0){
-	        return null;
-	    } 
-	    return objectclasses.split(",");
-	}
 	
 	private boolean isXmlElement(Class<?> cls) {
 	    XmlRootElement rootElement = cls.getAnnotation(XmlRootElement.class);
@@ -76,14 +67,6 @@ public class AnnotationClass extends AnnotationParser {
 	}
 	
 	private void read(Class<?> cls) {
-
-        LdapDomain ldapDomain = cls.getAnnotation(LdapDomain.class);
-        if (ldapDomain != null) {
-            descriptor.setName(cls.getSimpleName());
-            descriptor.setEntityType(EntityType.LDAP);
-            descriptor.setLdapBaseDn(ldapDomain.baseDn());
-            descriptor.setLdapObjectclasses(parseLdapObjectclasses(ldapDomain.objectclass()));
-        }
 	        
 		Entity entity = cls.getAnnotation(Entity.class);
 		if (entity != null){

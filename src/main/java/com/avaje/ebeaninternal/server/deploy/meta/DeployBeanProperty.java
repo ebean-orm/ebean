@@ -19,7 +19,6 @@ import com.avaje.ebean.annotation.UpdatedTimestamp;
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
-import com.avaje.ebean.config.ldap.LdapAttributeAdapter;
 import com.avaje.ebean.validation.factory.Validator;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
@@ -91,8 +90,6 @@ public class DeployBeanProperty {
 
     private boolean unique;
 
-    private LdapAttributeAdapter ldapAttributeAdapter;
-    
     /**
      * The length or precision of the DB column.
      */
@@ -590,20 +587,6 @@ public class DeployBeanProperty {
      */
     public void setUnique(boolean unique) {
         this.unique = unique;
-    }
-
-    /**
-     * Return the LdapAttributeAdapter.
-     */
-    public LdapAttributeAdapter getLdapAttributeAdapter() {
-        return ldapAttributeAdapter;
-    }
-
-    /**
-     * Set the LdapAttributeAdapter.
-     */
-    public void setLdapAttributeAdapter(LdapAttributeAdapter ldapAttributeAdapter) {
-        this.ldapAttributeAdapter = ldapAttributeAdapter;
     }
 
     /**

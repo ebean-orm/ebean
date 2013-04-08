@@ -15,11 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.naming.InvalidNameException;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.BasicAttribute;
-import javax.naming.directory.BasicAttributes;
-import javax.naming.ldap.LdapName;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.InvalidValue;
@@ -66,7 +61,6 @@ import com.avaje.ebeaninternal.server.el.ElComparatorProperty;
 import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
-import com.avaje.ebeaninternal.server.ldap.LdapPersistenceException;
 import com.avaje.ebeaninternal.server.persist.DmlUtil;
 import com.avaje.ebeaninternal.server.query.CQueryPlan;
 import com.avaje.ebeaninternal.server.query.SplitName;
@@ -124,9 +118,6 @@ public class BeanDescriptor<T> {
    * The database sequence name (optional).
    */
   private final String sequenceName;
-
-  private final String ldapBaseDn;
-  private final String[] ldapObjectclasses;
 
   /**
    * SQL used to return last inserted id. Used for Identity columns where
@@ -422,8 +413,6 @@ public class BeanDescriptor<T> {
 
     this.idType = deploy.getIdType();
     this.idGenerator = deploy.getIdGenerator();
-    this.ldapBaseDn = deploy.getLdapBaseDn();
-    this.ldapObjectclasses = deploy.getLdapObjectclasses();
     this.sequenceName = deploy.getSequenceName();
     this.selectLastInsertedId = deploy.getSelectLastInsertedId();
     this.lazyFetchIncludes = InternString.intern(deploy.getLazyFetchIncludes());
@@ -715,55 +704,6 @@ public class BeanDescriptor<T> {
 
   protected boolean isDynamicSubclass() {
     return !beanType.equals(factoryType);
-  }
-
-  /**
-   * Set the LDAP objectClasses to the attributes.
-   */
-  public void setLdapObjectClasses(Attributes attributes) {
-
-    if (ldapObjectclasses != null) {
-      BasicAttribute ocAttrs = new BasicAttribute("objectclass");
-      for (int i = 0; i < ldapObjectclasses.length; i++) {
-        ocAttrs.add(ldapObjectclasses[i]);
-      }
-      attributes.put(ocAttrs);
-    }
-  }
-
-  /**
-   * Creates Attributes with the objectclass.
-   */
-  public Attributes createAttributes() {
-
-    Attributes attrs = new BasicAttributes(true);
-    setLdapObjectClasses(attrs);
-    return attrs;
-  }
-
-  public String getLdapBaseDn() {
-    return ldapBaseDn;
-  }
-
-  public LdapName createLdapNameById(Object id) throws InvalidNameException {
-
-    LdapName baseDn = new LdapName(ldapBaseDn);
-    idBinder.createLdapNameById(baseDn, id);
-    return baseDn;
-  }
-
-  public LdapName createLdapName(Object bean) {
-
-    try {
-      LdapName name = new LdapName(ldapBaseDn);
-      if (bean != null) {
-        idBinder.createLdapNameByBean(name, bean);
-      }
-      return name;
-
-    } catch (InvalidNameException e) {
-      throw new LdapPersistenceException(e);
-    }
   }
 
   public SqlUpdate deleteById(Object id, List<Object> idList) {

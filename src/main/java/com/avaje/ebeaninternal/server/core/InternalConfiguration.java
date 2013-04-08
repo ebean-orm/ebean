@@ -7,8 +7,6 @@ import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.ExternalTransactionManager;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebean.config.ldap.LdapConfig;
-import com.avaje.ebean.config.ldap.LdapContextFactory;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebean.text.json.JsonValueAdapter;
 import com.avaje.ebeaninternal.api.ClassUtil;
@@ -177,12 +175,8 @@ public class InternalConfiguration {
   }
 
   public Persister createPersister(SpiEbeanServer server) {
-    LdapContextFactory ldapCtxFactory = null;
-    LdapConfig ldapConfig = serverConfig.getLdapConfig();
-    if (ldapConfig != null) {
-      ldapCtxFactory = ldapConfig.getContextFactory();
-    }
-    return new DefaultPersister(server, serverConfig.isValidateOnSave(), binder, beanDescriptorManager, pstmtBatch, ldapCtxFactory);
+    
+    return new DefaultPersister(server, serverConfig.isValidateOnSave(), binder, beanDescriptorManager, pstmtBatch);
   }
 
   public PstmtBatch getPstmtBatch() {

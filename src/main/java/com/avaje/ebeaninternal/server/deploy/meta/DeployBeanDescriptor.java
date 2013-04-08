@@ -97,10 +97,6 @@ public class DeployBeanDescriptor<T> {
    */
   private String sequenceName;
 
-  private String ldapBaseDn;
-
-  private String[] ldapObjectclasses;
-
   /**
    * Used with Identity columns but no getGeneratedKeys support.
    */
@@ -417,22 +413,6 @@ public class DeployBeanDescriptor<T> {
    */
   public void setConcurrencyMode(ConcurrencyMode concurrencyMode) {
     this.concurrencyMode = concurrencyMode;
-  }
-
-  public String getLdapBaseDn() {
-    return ldapBaseDn;
-  }
-
-  public void setLdapBaseDn(String ldapBaseDn) {
-    this.ldapBaseDn = ldapBaseDn;
-  }
-
-  public String[] getLdapObjectclasses() {
-    return ldapObjectclasses;
-  }
-
-  public void setLdapObjectclasses(String[] ldapObjectclasses) {
-    this.ldapObjectclasses = ldapObjectclasses;
   }
 
   public boolean isUpdateChangesOnly() {

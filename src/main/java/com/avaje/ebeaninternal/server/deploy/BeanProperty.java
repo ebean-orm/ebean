@@ -11,9 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.BasicAttribute;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.InvalidValue;
@@ -21,7 +18,6 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.DbType;
-import com.avaje.ebean.config.ldap.LdapAttributeAdapter;
 import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
 import com.avaje.ebean.text.TextException;
@@ -32,7 +28,6 @@ import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
-import com.avaje.ebeaninternal.server.ldap.LdapPersistenceException;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectGetter;
@@ -233,11 +228,6 @@ public class BeanProperty implements ElPropertyValue {
     @SuppressWarnings("rawtypes")
     final ScalarType scalarType;
 
-    /**
-     * For LDAP attributes that have custom conversion.
-     */
-    final LdapAttributeAdapter ldapAttributeAdapter;
-
     final Validator[] validators;
 
     final boolean hasLocalValidators;
@@ -343,7 +333,6 @@ public class BeanProperty implements ElPropertyValue {
         this.defaultValue = deploy.getDefaultValue();
         this.dbType = deploy.getDbType();
         this.scalarType = deploy.getScalarType();
-        this.ldapAttributeAdapter = deploy.getLdapAttributeAdapter();
         this.lob = isLobType(dbType);
         this.propertyType = deploy.getPropertyType();
         this.field = deploy.getField();
@@ -429,7 +418,6 @@ public class BeanProperty implements ElPropertyValue {
         this.defaultValue = source.getDefaultValue();
         this.dbType = source.getDbType();
         this.scalarType = source.scalarType;
-        this.ldapAttributeAdapter = source.ldapAttributeAdapter;
         this.lob = isLobType(dbType);
         this.propertyType = source.getPropertyType();
         this.field = source.getField();
@@ -763,35 +751,6 @@ public class BeanProperty implements ElPropertyValue {
      */
     public boolean isLocal() {
         return local;
-    }
-
-    public Attribute createAttribute(Object bean) {
-        Object v = getValue(bean);
-        if (v == null) {
-            return null;
-        }
-        if (ldapAttributeAdapter != null) {
-            return ldapAttributeAdapter.createAttribute(v);
-        }
-        Object ldapValue = scalarType.toJdbcType(v);
-        return new BasicAttribute(dbColumn, ldapValue);
-    }
-
-    public void setAttributeValue(Object bean, Attribute attr) {
-        try {
-            if (attr != null) {
-                Object beanValue;
-                if (ldapAttributeAdapter != null) {
-                    beanValue = ldapAttributeAdapter.readAttribute(attr);
-                } else {
-                    beanValue = scalarType.toBeanType(attr.get());
-                }
-
-                setValue(bean, beanValue);
-            }
-        } catch (NamingException e) {
-            throw new LdapPersistenceException(e);
-        }
     }
 
     /**

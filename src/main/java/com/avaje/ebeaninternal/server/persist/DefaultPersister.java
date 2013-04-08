@@ -21,7 +21,6 @@ import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollection.ModifyListenMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
-import com.avaje.ebean.config.ldap.LdapContextFactory;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.SpiUpdate;
@@ -41,8 +40,6 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.IntersectionRow;
 import com.avaje.ebeaninternal.server.deploy.ManyType;
-import com.avaje.ebeaninternal.server.ldap.DefaultLdapPersister;
-import com.avaje.ebeaninternal.server.ldap.LdapPersistBeanRequest;
 
 /**
  * Persister implementation using DML.
@@ -69,8 +66,6 @@ public final class DefaultPersister implements Persister {
 	 */
 	private final PersistExecute persistExecute;
 
-	private final DefaultLdapPersister ldapPersister;
-
 	private final SpiEbeanServer server;
 
 	private final BeanDescriptorManager beanDescriptorManager;
@@ -79,16 +74,14 @@ public final class DefaultPersister implements Persister {
 	private final boolean defaultDeleteMissingChildren;
 
 	public DefaultPersister(SpiEbeanServer server, boolean validate,
-	        Binder binder, BeanDescriptorManager descMgr, PstmtBatch pstmtBatch, LdapContextFactory contextFactory) {
+	        Binder binder, BeanDescriptorManager descMgr, PstmtBatch pstmtBatch) {
 
 		this.server = server;
 		this.beanDescriptorManager = descMgr;
-
 		this.persistExecute = new DefaultPersistExecute(validate, binder, pstmtBatch);
-		this.ldapPersister = new DefaultLdapPersister(contextFactory);
-		
-        this.defaultUpdateNullProperties = server.isDefaultUpdateNullProperties();
-        this.defaultDeleteMissingChildren = server.isDefaultDeleteMissingChildren();
+
+    this.defaultUpdateNullProperties = server.isDefaultUpdateNullProperties();
+    this.defaultDeleteMissingChildren = server.isDefaultDeleteMissingChildren();
 	}
 
 	/**
@@ -238,16 +231,9 @@ public final class DefaultPersister implements Persister {
 			}
 		}
 
-		PersistRequestBean<?> req;
-		if (descriptor.isLdapEntityType()) {
-			req = new LdapPersistBeanRequest(server, bean, parentBean, mgr, ldapPersister, updateProps, mode);
-
-		} else {
-			// special constructor for force 'stateless' Update mode ...
-			req = new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, updateProps, mode);
-			req.setStatelessUpdate(true, deleteMissingChildren, updateNullProperties);
-		}
-
+		PersistRequestBean<?> req = new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, updateProps, mode);
+	  req.setStatelessUpdate(true, deleteMissingChildren, updateNullProperties);
+		
 		try {
 			req.initTransIfRequired();
 			update(req);
@@ -1349,9 +1335,6 @@ public final class DefaultPersister implements Persister {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private PersistRequestBean<?> createRequest(Object bean, Transaction t, Object parentBean, BeanManager<?> mgr) {
 
-		if (mgr.isLdapEntityType()) {
-			return new LdapPersistBeanRequest(server, bean, parentBean, mgr, ldapPersister);
-		}
 		return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute);
 	}
 

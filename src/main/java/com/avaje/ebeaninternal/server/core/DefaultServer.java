@@ -10,11 +10,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.ServiceLoader;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanServer;
@@ -58,7 +58,6 @@ import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.EncryptKeyManager;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebean.config.ldap.LdapConfig;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.text.csv.CsvReader;
@@ -68,8 +67,8 @@ import com.avaje.ebeaninternal.api.LoadBeanRequest;
 import com.avaje.ebeaninternal.api.LoadManyRequest;
 import com.avaje.ebeaninternal.api.ScopeTrans;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiEbeanPlugin;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.api.SpiQuery.Type;
@@ -88,10 +87,6 @@ import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.el.ElFilter;
 import com.avaje.ebeaninternal.server.jmx.MAdminAutofetch;
-import com.avaje.ebeaninternal.server.ldap.DefaultLdapOrmQuery;
-import com.avaje.ebeaninternal.server.ldap.LdapOrmQueryEngine;
-import com.avaje.ebeaninternal.server.ldap.LdapOrmQueryRequest;
-import com.avaje.ebeaninternal.server.ldap.expression.LdapExpressionFactory;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
 import com.avaje.ebeaninternal.server.loadcontext.DLoadContext;
 import com.avaje.ebeaninternal.server.query.CQuery;
@@ -158,8 +153,6 @@ public final class DefaultServer implements SpiEbeanServer {
   private final boolean vanillaMode;
   private final boolean vanillaRefMode;
 
-  private final LdapOrmQueryEngine ldapQueryEngine;
-
   /**
    * Handles the save, delete, updateSql CallableSql.
    */
@@ -181,8 +174,6 @@ public final class DefaultServer implements SpiEbeanServer {
 
   @Deprecated
   private DdlGenerator ddlGenerator;
-
-  private final ExpressionFactory ldapExpressionFactory = new LdapExpressionFactory();
 
   private final ExpressionFactory expressionFactory;
 
@@ -265,13 +256,6 @@ public final class DefaultServer implements SpiEbeanServer {
 
     this.beanLoader = new DefaultBeanLoader(this, config.getDebugLazyLoad());
     this.jsonContext = config.createJsonContext(this);
-
-    LdapConfig ldapConfig = config.getServerConfig().getLdapConfig();
-    if (ldapConfig == null) {
-      this.ldapQueryEngine = null;
-    } else {
-      this.ldapQueryEngine = new LdapOrmQueryEngine(ldapConfig.isVanillaMode(), ldapConfig.getContextFactory());
-    }
 
     loadAndInitializePlugins(config);
 
@@ -1036,9 +1020,6 @@ public final class DefaultServer implements SpiEbeanServer {
       DeployNamedQuery defaultSqlSelect = desc.getNamedQuery("default");
       return new DefaultOrmQuery<T>(beanType, this, expressionFactory, defaultSqlSelect);
 
-    case LDAP:
-      return new DefaultLdapOrmQuery<T>(beanType, this, ldapExpressionFactory, query);
-
     default:
       return new DefaultOrmQuery<T>(beanType, this, expressionFactory, query);
     }
@@ -1127,10 +1108,6 @@ public final class DefaultServer implements SpiEbeanServer {
   }
 
   public <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> query, Transaction t) {
-
-    if (desc.isLdapEntityType()) {
-      return new LdapOrmQueryRequest<T>(query, desc, ldapQueryEngine);
-    }
 
     if (desc.isAutoFetchTunable() && !query.isSqlSelect()) {
       // its a tunable query

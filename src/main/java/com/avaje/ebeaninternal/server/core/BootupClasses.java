@@ -13,7 +13,6 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.avaje.ebean.annotation.LdapDomain;
 import com.avaje.ebean.config.CompoundType;
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.ServerConfig;
@@ -406,10 +405,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
             return true;
         }
         ann = cls.getAnnotation(Table.class);
-        if (ann != null) {
-            return true;
-        }
-        ann = cls.getAnnotation(LdapDomain.class);
         if (ann != null) {
             return true;
         }
