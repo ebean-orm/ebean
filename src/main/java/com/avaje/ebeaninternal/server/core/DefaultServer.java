@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.ServiceLoader;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanServer;
@@ -68,6 +69,7 @@ import com.avaje.ebeaninternal.api.LoadManyRequest;
 import com.avaje.ebeaninternal.api.ScopeTrans;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.api.SpiEbeanPlugin;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.api.SpiQuery.Type;
@@ -177,7 +179,8 @@ public final class DefaultServer implements SpiEbeanServer {
 
   private final CQueryEngine cqueryEngine;
 
-  private final DdlGenerator ddlGenerator;
+  @Deprecated
+  private DdlGenerator ddlGenerator;
 
   private final ExpressionFactory ldapExpressionFactory = new LdapExpressionFactory();
 
@@ -212,6 +215,12 @@ public final class DefaultServer implements SpiEbeanServer {
    * JDBC driver specific handling for JDBC batch execution.
    */
   private PstmtBatch pstmtBatch;
+
+
+  /**
+   * holds plugins (e.g. ddl generator) detected by the service loader
+   */
+  private List<SpiEbeanPlugin> ebeanPlugins;
 
   /**
    * Create the DefaultServer.
@@ -254,7 +263,6 @@ public final class DefaultServer implements SpiEbeanServer {
     this.autoFetchManager = config.createAutoFetchManager(this);
     this.adminAutofetch = new MAdminAutofetch(autoFetchManager);
 
-    this.ddlGenerator = new DdlGenerator(this, config.getDatabasePlatform(), config.getServerConfig());
     this.beanLoader = new DefaultBeanLoader(this, config.getDebugLazyLoad());
     this.jsonContext = config.createJsonContext(this);
 
@@ -265,7 +273,38 @@ public final class DefaultServer implements SpiEbeanServer {
       this.ldapQueryEngine = new LdapOrmQueryEngine(ldapConfig.isVanillaMode(), ldapConfig.getContextFactory());
     }
 
+    loadAndInitializePlugins(config);
+
     ShutdownManager.register(new Shutdown());
+  }
+
+  protected void loadAndInitializePlugins(InternalConfiguration config) {
+    List<SpiEbeanPlugin> spiPlugins = new ArrayList<SpiEbeanPlugin>();
+
+    final Iterator<SpiEbeanPlugin> plugins = ServiceLoader.load(SpiEbeanPlugin.class).iterator();
+
+    while (plugins.hasNext()) {
+      SpiEbeanPlugin plugin = plugins.next();
+
+      spiPlugins.add(plugin);
+
+      plugin.setup(this, this.getDatabasePlatform(), config.getServerConfig());
+
+      if (plugin instanceof DdlGenerator) // backwards compatible
+        ddlGenerator = (DdlGenerator)plugin;
+    }
+
+    ebeanPlugins = Collections.unmodifiableList(spiPlugins);
+  }
+
+  public List<SpiEbeanPlugin> getSpiEbeanPlugins() {
+    return ebeanPlugins;
+  }
+
+  public void executePlugins(boolean online) {
+    for(SpiEbeanPlugin plugin : ebeanPlugins) {
+      plugin.execute(online);
+    }
   }
 
   public boolean isDefaultDeleteMissingChildren() {
