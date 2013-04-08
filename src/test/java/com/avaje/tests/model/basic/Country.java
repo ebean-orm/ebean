@@ -3,10 +3,10 @@ package com.avaje.tests.model.basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.CacheTuning;
-import com.avaje.ebean.validation.Length;
 
 /**
  * Country entity bean.
@@ -18,10 +18,10 @@ import com.avaje.ebean.validation.Length;
 public class Country {
 
     @Id
-    @Length(max=2)
+    @Size(max=2)
     String code;
 
-    @Length(max=60)
+    @Size(max=60)
     String name;
     
     public String toString() {

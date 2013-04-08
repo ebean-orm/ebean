@@ -19,12 +19,12 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlType;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.Formula;
 import com.avaje.ebean.annotation.Where;
-import com.avaje.ebean.validation.NotNull;
 
 /**
  * Order entity bean.

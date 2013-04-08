@@ -9,7 +9,6 @@ import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Expression;
-import com.avaje.ebean.InvalidValue;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
@@ -312,18 +311,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
 	public void add(BeanCollection<?> collection, Object bean) {
 		help.add(collection, bean);
-	}
-
-	@Override
-	public InvalidValue validateCascade(Object manyValue) {
-
-		ArrayList<InvalidValue> errs = help.validate(manyValue);
-
-		if (errs == null){
-			return null;
-		} else {
-			return new InvalidValue("recurse.many", targetDescriptor.getFullName(), manyValue, InvalidValue.toArray(errs));
-		}
 	}
 
 	/**

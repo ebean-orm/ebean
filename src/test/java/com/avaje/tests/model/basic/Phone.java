@@ -11,8 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import com.avaje.ebean.validation.NotNull;
+import javax.validation.constraints.NotNull;
 
 @Entity(name = "Phone")
 @Table(name = "PHONES")

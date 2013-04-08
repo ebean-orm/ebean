@@ -7,13 +7,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.PersistenceException;
 
-import com.avaje.ebean.InvalidValue;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
@@ -21,7 +19,6 @@ import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
 import com.avaje.ebean.text.TextException;
-import com.avaje.ebean.validation.factory.Validator;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
@@ -228,10 +225,6 @@ public class BeanProperty implements ElPropertyValue {
     @SuppressWarnings("rawtypes")
     final ScalarType scalarType;
 
-    final Validator[] validators;
-
-    final boolean hasLocalValidators;
-
     boolean cascadeValidate;
 
     /**
@@ -336,9 +329,7 @@ public class BeanProperty implements ElPropertyValue {
         this.lob = isLobType(dbType);
         this.propertyType = deploy.getPropertyType();
         this.field = deploy.getField();
-        this.validators = deploy.getValidators();
-        this.hasLocalValidators = (validators.length > 0);
-
+        
         EntityType et = descriptor == null ? null : descriptor.getEntityType();
         this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), false, null);
         this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), dbEncrypted, dbColumn);
@@ -421,9 +412,7 @@ public class BeanProperty implements ElPropertyValue {
         this.lob = isLobType(dbType);
         this.propertyType = source.getPropertyType();
         this.field = source.getField();
-        this.validators = source.getValidators();
-        this.hasLocalValidators = validators.length > 0;
-
+        
         this.elPlaceHolder = override.replace(source.elPlaceHolder, source.dbColumn);
         this.elPlaceHolderEncrypted = override.replace(source.elPlaceHolderEncrypted, source.dbColumn);
 
@@ -650,20 +639,8 @@ public class BeanProperty implements ElPropertyValue {
         return scalarType.readData(dataInput);
     }
 
-    Validator[] getValidators() {
-        return validators;
-    }
-
     public boolean isCascadeValidate() {
         return cascadeValidate;
-    }
-
-    public boolean hasLocalValidators() {
-        return hasLocalValidators;
-    }
-
-    public boolean hasValidationRules(boolean cascade) {
-        return hasLocalValidators || (cascade && cascadeValidate);
     }
 
     /**
@@ -675,50 +652,6 @@ public class BeanProperty implements ElPropertyValue {
      */
     public boolean isValueLoaded(Object value) {
         return true;
-    }
-
-    /**
-     * Cascade the validation to the associated bean or collection.
-     */
-    public InvalidValue validateCascade(Object value) {
-        return null;
-    }
-
-    /**
-     * Validate the property with the given value.
-     * 
-     * @param cascade
-     *            if true cascade for assoc beans and collections.
-     * @param value
-     *            the value to validate
-     * @return the list of errors that occurred.
-     */
-    public final List<InvalidValue> validate(boolean cascade, Object value) {
-
-        if (!isValueLoaded(value)) {
-            return null;
-        }
-
-        ArrayList<InvalidValue> list = null;
-        for (int i = 0; i < validators.length; i++) {
-            if (!validators[i].isValid(value)) {
-                if (list == null) {
-                    list = new ArrayList<InvalidValue>();
-                }
-                Validator v = validators[i];
-                list.add(new InvalidValue(v.getKey(), v.getAttributes(), descriptor.getFullName(), name, value));
-            }
-        }
-
-        if (list == null && cascade && cascadeValidate) {
-            // cascade the validation for assoc beans
-            InvalidValue recursive = validateCascade(value);
-            if (recursive != null) {
-                return InvalidValue.toList(recursive);
-
-            }
-        }
-        return list;
     }
 
     public BeanProperty getBeanProperty() {

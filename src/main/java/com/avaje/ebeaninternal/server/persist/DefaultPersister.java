@@ -73,12 +73,11 @@ public final class DefaultPersister implements Persister {
 	private final boolean defaultUpdateNullProperties;
 	private final boolean defaultDeleteMissingChildren;
 
-	public DefaultPersister(SpiEbeanServer server, boolean validate,
-	        Binder binder, BeanDescriptorManager descMgr, PstmtBatch pstmtBatch) {
+	public DefaultPersister(SpiEbeanServer server, Binder binder, BeanDescriptorManager descMgr, PstmtBatch pstmtBatch) {
 
 		this.server = server;
 		this.beanDescriptorManager = descMgr;
-		this.persistExecute = new DefaultPersistExecute(validate, binder, pstmtBatch);
+		this.persistExecute = new DefaultPersistExecute(binder, pstmtBatch);
 
     this.defaultUpdateNullProperties = server.isDefaultUpdateNullProperties();
     this.defaultDeleteMissingChildren = server.isDefaultDeleteMissingChildren();

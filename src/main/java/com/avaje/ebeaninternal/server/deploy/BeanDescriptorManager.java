@@ -31,8 +31,6 @@ import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.event.BeanFinder;
-import com.avaje.ebean.validation.factory.LengthValidatorFactory;
-import com.avaje.ebean.validation.factory.NotNullValidatorFactory;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
@@ -1052,8 +1050,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       setConcurrencyMode(desc);
     }
 
-    autoAddValidators(desc);
-
     // generate the byte code
     createByteCode(desc);
   }
@@ -1140,35 +1136,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // use Code generation or Standard reflection to support
     // getter and setter methods
     setBeanReflect(deploy);
-  }
-
-  /**
-   * Add Length and NotNull validators based on Column annotation etc.
-   */
-  private void autoAddValidators(DeployBeanDescriptor<?> deployDesc) {
-
-    for (DeployBeanProperty prop : deployDesc.propertiesBase()) {
-      autoAddValidators(prop);
-    }
-  }
-
-  /**
-   * Add Length and NotNull validators based on Column annotation etc.
-   */
-  private void autoAddValidators(DeployBeanProperty prop) {
-
-    if (String.class.equals(prop.getPropertyType()) && prop.getDbLength() > 0) {
-      // check if the property already has the LengthValidator
-      if (!prop.containsValidatorType(LengthValidatorFactory.LengthValidator.class)) {
-        prop.addValidator(LengthValidatorFactory.create(0, prop.getDbLength()));
-      }
-    }
-    if (!prop.isNullable() && !prop.isId() && !prop.isGenerated()) {
-      // check if the property already has the NotNullValidator
-      if (!prop.containsValidatorType(NotNullValidatorFactory.NotNullValidator.class)) {
-        prop.addValidator(NotNullValidatorFactory.NOT_NULL);
-      }
-    }
   }
 
   /**

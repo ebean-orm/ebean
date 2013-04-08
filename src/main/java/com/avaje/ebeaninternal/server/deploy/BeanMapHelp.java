@@ -1,13 +1,11 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.InvalidValue;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.BeanCollection;
@@ -119,26 +117,6 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
 	public BeanCollection<T> createReference(Object parentBean, String propertyName) {
 
 		return new BeanMap(loader, parentBean, propertyName);
-	}
-
-	public ArrayList<InvalidValue> validate(Object manyValue) {
-
-		ArrayList<InvalidValue> errs = null;
-
-		Map<?, ?> m = (Map<?, ?>) manyValue;
-		Iterator<?> it = m.values().iterator();
-		while (it.hasNext()) {
-			Object detailBean = (Object) it.next();
-			InvalidValue invalid = targetDescriptor.validate(true, detailBean);
-			if (invalid != null) {
-				if (errs == null) {
-					errs = new ArrayList<InvalidValue>();
-				}
-				errs.add(invalid);
-			}
-		}
-
-		return errs;
 	}
 
 	public void refresh(EbeanServer server, Query<?> query, Transaction t, Object parentBean) {

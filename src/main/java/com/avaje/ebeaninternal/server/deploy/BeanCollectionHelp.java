@@ -1,10 +1,8 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.InvalidValue;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.BeanCollection;
@@ -49,11 +47,6 @@ public interface BeanCollectionHelp<T> {
 	 * Create a lazy loading proxy for a List Set or Map.
 	 */
 	public BeanCollection<T> createReference(Object parentBean, String propertyName);
-
-	/**
-	 * Validate the List Set or Map.
-	 */
-	public ArrayList<InvalidValue> validate(Object manyValue);
 
 	/**
 	 * Refresh the List Set or Map.

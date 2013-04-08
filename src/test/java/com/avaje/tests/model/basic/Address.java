@@ -8,8 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
-
-import com.avaje.ebean.validation.Length;
+import javax.validation.constraints.Size;
 
 /**
  * Address entity bean.
@@ -21,15 +20,15 @@ public class Address {
     @Id
     Short id;
     
-    @Length(max=100)
+    @Size(max=100)
     @Column(name="line_1")
     String line1;
 
-    @Length(max=100)
+    @Size(max=100)
     @Column(name="line_2")
     String line2;
 
-    @Length(max=100)
+    @Size(max=100)
     String city;
 
     Timestamp cretime;

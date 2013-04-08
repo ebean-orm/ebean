@@ -2,8 +2,7 @@ package com.avaje.tests.model.basic;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-
-import com.avaje.ebean.validation.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class TWithPreInsert {
@@ -11,7 +10,7 @@ public class TWithPreInsert {
 	@Id
 	private Integer id;
 	
-	@NotEmpty
+	@NotNull
 	private String name;
 	
 	private String title;

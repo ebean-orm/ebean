@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.InvalidValue;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.BeanCollection;
@@ -84,24 +83,6 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
   public BeanCollection<T> createReference(Object parentBean, String propertyName) {
 
     return new BeanList<T>(loader, parentBean, propertyName);
-  }
-
-  public ArrayList<InvalidValue> validate(Object manyValue) {
-
-    ArrayList<InvalidValue> errs = null;
-
-    List<?> l = (List<?>) manyValue;
-    for (int i = 0; i < l.size(); i++) {
-      Object detailBean = l.get(i);
-      InvalidValue invalid = targetDescriptor.validate(true, detailBean);
-      if (invalid != null) {
-        if (errs == null) {
-          errs = new ArrayList<InvalidValue>();
-        }
-        errs.add(invalid);
-      }
-    }
-    return errs;
   }
 
   public void refresh(EbeanServer server, Query<?> query, Transaction t, Object parentBean) {

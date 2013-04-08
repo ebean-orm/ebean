@@ -3,10 +3,7 @@ package com.avaje.ebeaninternal.server.deploy.meta;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EmbeddedId;
@@ -19,7 +16,6 @@ import com.avaje.ebean.annotation.UpdatedTimestamp;
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
-import com.avaje.ebean.validation.factory.Validator;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
@@ -211,8 +207,6 @@ public class DeployBeanProperty {
      */
     private GeneratedProperty generatedProperty;
 
-    private List<Validator> validators = new ArrayList<Validator>();
-
     private final DeployBeanDescriptor<?> desc;
 
     private boolean undirectionalShadow;
@@ -402,39 +396,6 @@ public class DeployBeanProperty {
             return "check (" + dbColumn + " in " + etype.getContraintInValues() + ")";
         }
         return null;
-    }
-
-    /**
-     * Add a validator to this property.
-     */
-    public void addValidator(Validator validator) {
-        validators.add(validator);
-    }
-
-    /**
-     * Return true if the property contains a validator of a given type.
-     * <p>
-     * Used to detect if a validator has already been assigned when trying to
-     * automatically add validators such as Length and NotNull.
-     * </p>
-     */
-    public boolean containsValidatorType(Class<?> type) {
-
-        Iterator<Validator> it = validators.iterator();
-        while (it.hasNext()) {
-            Validator validator = (Validator) it.next();
-            if (validator.getClass().equals(type)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Return the validators for this property.
-     */
-    public Validator[] getValidators() {
-        return validators.toArray(new Validator[validators.size()]);
     }
 
     /**

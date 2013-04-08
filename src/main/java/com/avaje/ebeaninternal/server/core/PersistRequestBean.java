@@ -6,8 +6,6 @@ import java.util.Set;
 
 import javax.persistence.OptimisticLockException;
 
-import com.avaje.ebean.InvalidValue;
-import com.avaje.ebean.ValidationException;
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
@@ -450,17 +448,6 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 */
 	public EntityBeanIntercept getEntityBeanIntercept() {
 		return intercept;
-	}
-
-	/**
-	 * Validate the bean. This is not recursive and only runs the 'local'
-	 * validation rules.
-	 */
-	public void validate() {
-		InvalidValue errs = beanDescriptor.validate(false, bean);
-		if (errs != null) {
-			throw new ValidationException(errs);
-		}
 	}
 
 	/**

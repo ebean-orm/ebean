@@ -32,7 +32,6 @@ import com.avaje.ebean.Filter;
 import com.avaje.ebean.FutureIds;
 import com.avaje.ebean.FutureList;
 import com.avaje.ebean.FutureRowCount;
-import com.avaje.ebean.InvalidValue;
 import com.avaje.ebean.PagingList;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.QueryIterator;
@@ -118,11 +117,6 @@ import com.avaje.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 public final class DefaultServer implements SpiEbeanServer {
 
   private static final Logger logger = Logger.getLogger(DefaultServer.class.getName());
-
-  /**
-   * Used when no errors are found validating a property.
-   */
-  private static final InvalidValue[] EMPTY_INVALID_VALUES = new InvalidValue[0];
 
   private final String serverName;
 
@@ -519,35 +513,6 @@ public final class DefaultServer implements SpiEbeanServer {
   public void loadBean(EntityBeanIntercept ebi) {
 
     beanLoader.loadBean(ebi);
-  }
-
-  public InvalidValue validate(Object bean) {
-    if (bean == null) {
-      return null;
-    }
-    BeanDescriptor<?> beanDescriptor = getBeanDescriptor(bean.getClass());
-    return beanDescriptor.validate(true, bean);
-  }
-
-  public InvalidValue[] validate(Object bean, String propertyName, Object value) {
-    if (bean == null) {
-      return null;
-    }
-    BeanDescriptor<?> beanDescriptor = getBeanDescriptor(bean.getClass());
-    BeanProperty prop = beanDescriptor.getBeanProperty(propertyName);
-    if (prop == null) {
-      String msg = "property " + propertyName + " was not found?";
-      throw new PersistenceException(msg);
-    }
-    if (value == null) {
-      value = prop.getValue(bean);
-    }
-    List<InvalidValue> errors = prop.validate(true, value);
-    if (errors == null) {
-      return EMPTY_INVALID_VALUES;
-    } else {
-      return InvalidValue.toArray(errors);
-    }
   }
 
   public Map<String, ValuePair> diff(Object a, Object b) {

@@ -1,12 +1,10 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.InvalidValue;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.BeanCollection;
@@ -90,25 +88,6 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
 	public BeanCollection<T> createReference(Object parentBean, String propertyName) {
 		
 		return new BeanSet<T>(loader, parentBean, propertyName);
-	}
-	
-	public ArrayList<InvalidValue> validate(Object manyValue) {
-		
-		ArrayList<InvalidValue> errs = null;
-		
-		Set<?> set = (Set<?>)manyValue;
-		Iterator<?> i = set.iterator();
-		while (i.hasNext()) {
-			Object detailBean = i.next();
-			InvalidValue invalid = targetDescriptor.validate(true, detailBean);
-			if (invalid != null){
-				if (errs == null){
-					errs = new ArrayList<InvalidValue>();
-				}
-				errs.add(invalid);
-			}
-		}
-		return errs;
 	}
 
 	public void refresh(EbeanServer server, Query<?> query, Transaction t, Object parentBean) {

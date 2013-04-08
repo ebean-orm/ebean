@@ -15,11 +15,11 @@ import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 import com.avaje.ebean.annotation.EmbeddedColumns;
 import com.avaje.ebean.annotation.Where;
 import com.avaje.ebean.config.NamingConvention;
-import com.avaje.ebean.validation.NotNull;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.BeanTable;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;

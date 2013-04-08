@@ -1,8 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import java.lang.annotation.Annotation;
 import java.sql.Types;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.persistence.EnumType;
@@ -17,7 +15,6 @@ import com.avaje.ebean.config.NamingConvention;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebean.validation.factory.Validator;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.type.DataEncryptSupport;
@@ -50,8 +47,6 @@ public class DeployUtil {
 
 	private final TypeManager typeManager;
 
-	private final ValidatorFactoryManager validatorFactoryManager;
-
 	private final String manyToManyAlias;
 
 	private final DatabasePlatform dbPlatform;
@@ -75,8 +70,6 @@ public class DeployUtil {
 		
 		// this alias is used for ManyToMany lazy loading queries
 		this.manyToManyAlias = "zzzzzz";
-
-		this.validatorFactoryManager = new ValidatorFactoryManager();
 	}
 	
 	public TypeManager getTypeManager() {
@@ -117,18 +110,6 @@ public class DeployUtil {
 	 */
 	public String getManyToManyAlias() {
 		return manyToManyAlias;
-	}
-
-	public void createValidator(DeployBeanProperty prop, Annotation ann) {
-		try {
-			Validator validator = validatorFactoryManager.create(ann, prop.getPropertyType());
-			if (validator != null){
-				prop.addValidator(validator);
-			}
-		} catch (Exception e){
-			String msg = "Error creating a validator on "+prop.getFullBeanName();
-			logger.log(Level.SEVERE, msg, e);
-		}
 	}
 
 	public ScalarType<?> setEnumScalarType(Enumerated enumerated, DeployBeanProperty prop) {

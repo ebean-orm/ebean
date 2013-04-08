@@ -8,7 +8,6 @@ import java.util.List;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.InvalidValue;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
@@ -269,13 +268,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
             return ((EntityBean) value)._ebean_getIntercept().isLoaded();
         }
         return true;
-    }
-
-    @Override
-    public InvalidValue validateCascade(Object value) {
-
-        BeanDescriptor<?> target = getTargetDescriptor();
-        return target.validate(true, value);
     }
 
     private boolean hasChangedEmbedded(Object bean, Object oldValues) {

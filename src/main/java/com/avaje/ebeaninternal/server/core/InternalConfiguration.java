@@ -176,7 +176,7 @@ public class InternalConfiguration {
 
   public Persister createPersister(SpiEbeanServer server) {
     
-    return new DefaultPersister(server, serverConfig.isValidateOnSave(), binder, beanDescriptorManager, pstmtBatch);
+    return new DefaultPersister(server, binder, beanDescriptorManager, pstmtBatch);
   }
 
   public PstmtBatch getPstmtBatch() {

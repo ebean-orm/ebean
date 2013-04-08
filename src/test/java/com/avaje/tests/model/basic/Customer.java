@@ -11,11 +11,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import com.avaje.ebean.annotation.EnumMapping;
 import com.avaje.ebean.annotation.Where;
-import com.avaje.ebean.validation.Length;
-import com.avaje.ebean.validation.NotNull;
 
 /**
  * Customer entity bean.
@@ -46,11 +46,11 @@ public class Customer extends BasicDomain {
     Status status;
     
     @NotNull
-    @Length(max=40)
+    @Size(max=40)
     //@Column(length=39,nullable=false)
     String name;
     
-    @Length(max=100)
+    @Size(max=100)
     String smallnote;
 
     Date anniversary;

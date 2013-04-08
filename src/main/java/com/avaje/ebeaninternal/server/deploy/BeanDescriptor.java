@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
-import com.avaje.ebean.InvalidValue;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Query.UseIndex;
 import com.avaje.ebean.SqlUpdate;
@@ -38,7 +37,6 @@ import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
-import com.avaje.ebean.validation.factory.Validator;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
@@ -304,28 +302,6 @@ public class BeanDescriptor<T> {
   private final Map<String, DeployNamedUpdate> namedUpdates;
 
   /**
-   * Has local validation rules.
-   */
-  private final boolean hasLocalValidation;
-
-  /**
-   * Has local or recursive validation rules.
-   */
-  private final boolean hasCascadeValidation;
-
-  /**
-   * Properties with local validation rules.
-   */
-  private final BeanProperty[] propertiesValidationLocal;
-
-  /**
-   * Properties with local or cascade validation rules.
-   */
-  private final BeanProperty[] propertiesValidationCascade;
-
-  private final Validator[] beanValidators;
-
-  /**
    * Flag used to determine if saves can be skipped.
    */
   private boolean saveRecurseSkippable;
@@ -483,13 +459,7 @@ public class BeanDescriptor<T> {
     // Check if there are no cascade delete associated beans (also subject to
     // change in initialiseOther()).
     deleteRecurseSkippable = (0 == (propertiesOneExportedDelete.length + propertiesOneImportedDelete.length + propertiesManyDelete.length));
-
-    this.propertiesValidationLocal = listHelper.getPropertiesWithValidators(false);
-    this.propertiesValidationCascade = listHelper.getPropertiesWithValidators(true);
-    this.beanValidators = listHelper.getBeanValidators();
-    this.hasLocalValidation = (propertiesValidationLocal.length > 0 || beanValidators.length > 0);
-    this.hasCascadeValidation = (propertiesValidationCascade.length > 0 || beanValidators.length > 0);
-
+    
     // object used to handle Id values
     this.idBinder = owner.createIdBinder(propertiesId);
   }
@@ -1258,88 +1228,6 @@ public class BeanDescriptor<T> {
    */
   public boolean isDeleteRecurseSkippable() {
     return deleteRecurseSkippable;
-  }
-
-  /**
-   * Return true if this type has local validation rules.
-   */
-  public boolean hasLocalValidation() {
-    return hasLocalValidation;
-  }
-
-  /**
-   * Return true if this type has local or cascading validation rules.
-   */
-  public boolean hasCascadeValidation() {
-    return hasCascadeValidation;
-  }
-
-  public InvalidValue validate(boolean cascade, Object bean) {
-
-    if (!hasCascadeValidation) {
-      // no validation rules at all on this bean
-      return null;
-    }
-
-    List<InvalidValue> errList = null;
-
-    Set<String> loadedProps = null;
-    if (bean instanceof EntityBean) {
-      EntityBeanIntercept ebi = ((EntityBean) bean)._ebean_getIntercept();
-      loadedProps = ebi.getLoadedProps();
-    }
-    if (loadedProps != null) {
-      // validate just the loaded properties
-      Iterator<String> propIt = loadedProps.iterator();
-      while (propIt.hasNext()) {
-        String propName = (String) propIt.next();
-        BeanProperty property = getBeanProperty(propName);
-
-        // check if we should fire validation on this property
-        if (property != null && property.hasValidationRules(cascade)) {
-          Object value = property.getValue(bean);
-          List<InvalidValue> errs = property.validate(cascade, value);
-          if (errs != null) {
-            if (errList == null) {
-              errList = new ArrayList<InvalidValue>();
-            }
-            errList.addAll(errs);
-          }
-        }
-      }
-    } else {
-      // get appropriate list of properties with validation rules
-      BeanProperty[] props = cascade ? propertiesValidationCascade : propertiesValidationLocal;
-
-      // validate all the properties
-      for (int i = 0; i < props.length; i++) {
-        BeanProperty prop = props[i];
-        Object value = prop.getValue(bean);
-        List<InvalidValue> errs = prop.validate(cascade, value);
-        if (errs != null) {
-          if (errList == null) {
-            errList = new ArrayList<InvalidValue>();
-          }
-          errList.addAll(errs);
-        }
-      }
-    }
-
-    for (int i = 0; i < beanValidators.length; i++) {
-      if (!beanValidators[i].isValid(bean)) {
-        if (errList == null) {
-          errList = new ArrayList<InvalidValue>();
-        }
-        Validator v = beanValidators[i];
-        errList.add(new InvalidValue(v.getKey(), v.getAttributes(), getFullName(), null, bean));
-      }
-    }
-
-    if (errList == null) {
-      return null;
-    }
-
-    return new InvalidValue(null, getFullName(), bean, InvalidValue.toArray(errList));
   }
 
   /**

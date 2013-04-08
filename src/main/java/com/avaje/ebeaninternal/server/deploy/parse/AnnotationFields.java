@@ -1,8 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.sql.Types;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,6 +20,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.EmbeddedColumns;
@@ -36,11 +35,6 @@ import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.IdType;
-import com.avaje.ebean.validation.Length;
-import com.avaje.ebean.validation.NotNull;
-import com.avaje.ebean.validation.Pattern;
-import com.avaje.ebean.validation.Patterns;
-import com.avaje.ebean.validation.ValidatorMeta;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
@@ -92,7 +86,6 @@ public class AnnotationFields extends AnnotationParser {
         readField(prop);
       }
 
-      readValidations(prop);
     }
   }
 
@@ -214,11 +207,11 @@ public class AnnotationFields extends AnnotationParser {
       prop.setNullable(false);
     }
 
-    Length length = get(prop, Length.class);
-    if (length != null) {
-      if (length.max() < Integer.MAX_VALUE) {
+    Size size = get(prop, Size.class);
+    if (size != null) {
+      if (size.max() < Integer.MAX_VALUE) {
         // explicitly specify a version column
-        prop.setDbLength(length.max());
+        prop.setDbLength(size.max());
       }
     }
 
@@ -460,41 +453,4 @@ public class AnnotationFields extends AnnotationParser {
     }
   }
 
-  private void readValidations(DeployBeanProperty prop) {
-
-    Field field = prop.getField();
-    if (field != null) {
-      Annotation[] fieldAnnotations = field.getAnnotations();
-      for (int i = 0; i < fieldAnnotations.length; i++) {
-        readValidations(prop, fieldAnnotations[i]);
-      }
-    }
-
-    Method readMethod = prop.getReadMethod();
-    if (readMethod != null) {
-      Annotation[] methAnnotations = readMethod.getAnnotations();
-      for (int i = 0; i < methAnnotations.length; i++) {
-        readValidations(prop, methAnnotations[i]);
-      }
-    }
-  }
-
-  private void readValidations(DeployBeanProperty prop, Annotation ann) {
-    Class<?> type = ann.annotationType();
-    if (type.equals(Patterns.class)) {
-      // treating this as a special case for now...
-      Patterns patterns = (Patterns) ann;
-      Pattern[] patternsArray = patterns.patterns();
-      for (int i = 0; i < patternsArray.length; i++) {
-        util.createValidator(prop, patternsArray[i]);
-      }
-
-    } else {
-
-      ValidatorMeta meta = type.getAnnotation(ValidatorMeta.class);
-      if (meta != null) {
-        util.createValidator(prop, ann);
-      }
-    }
-  }
 }

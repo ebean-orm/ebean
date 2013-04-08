@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.avaje.ebean.bean.BeanCollection.ModifyListenMode;
-import com.avaje.ebean.validation.factory.Validator;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorMap;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -155,23 +154,6 @@ public class DeployBeanPropertyLists {
 
     public BeanProperty getFirstVersion() {
         return derivedFirstVersionProp;
-    }
-
-    public BeanProperty[] getPropertiesWithValidators(boolean recurse) {
-
-        ArrayList<BeanProperty> list = new ArrayList<BeanProperty>();
-        Iterator<BeanProperty> it = propertyMap.values().iterator();
-        while (it.hasNext()) {
-            BeanProperty property = (BeanProperty) it.next();
-            if (property.hasValidationRules(recurse)) {
-                list.add(property);
-            }
-        }
-        return list.toArray(new BeanProperty[list.size()]);
-    }
-
-    public Validator[] getBeanValidators() {
-        return new Validator[0];
     }
 
     public LinkedHashMap<String, BeanProperty> getPropertyMap() {
