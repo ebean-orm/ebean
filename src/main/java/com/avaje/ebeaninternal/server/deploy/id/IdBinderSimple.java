@@ -163,7 +163,9 @@ public final class IdBinderSimple implements IdBinder {
     }
 
     public void bindId(DataBind dataBind, Object value) throws SQLException {
-		value = idProperty.toBeanType(value);
+		if( !value.getClass().equals(expectedType) ){
+			value = scalarType.toBeanType(value);
+		}
 		idProperty.bind(dataBind, value);
 	}
 	
