@@ -3,10 +3,10 @@ package com.avaje.ebeaninternal.server.lib;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.api.Monitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Daemon based ScheduleThreadPool.
@@ -18,7 +18,7 @@ import com.avaje.ebeaninternal.api.Monitor;
  */
 public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor {
 
-    private static final Logger logger = Logger.getLogger(DaemonScheduleThreadPool.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(DaemonScheduleThreadPool.class);
 
     private final Monitor monitor = new Monitor();
 
@@ -46,11 +46,11 @@ public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor 
     public void shutdown() {
         synchronized (monitor) {
             if (super.isShutdown()) {
-                logger.fine("... DaemonScheduleThreadPool already shut down");
+                logger.debug("... DaemonScheduleThreadPool already shut down");
                 return;
             }
             try {
-                logger.fine("DaemonScheduleThreadPool shutting down...");
+                logger.debug("DaemonScheduleThreadPool shutting down...");
                 super.shutdown();
                 if (!super.awaitTermination(shutdownWaitSeconds, TimeUnit.SECONDS)) {
                     logger.info("ScheduleService shut down timeout exceeded. Terminating running threads.");
@@ -59,7 +59,7 @@ public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor 
 
             } catch (Exception e) {
                 String msg = "Error during shutdown";
-                logger.log(Level.SEVERE, msg, e);
+                logger.error(msg, e);
                 e.printStackTrace();
             }
         }

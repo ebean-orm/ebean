@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.ddl;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.config.dbplatform.DbDdlSyntax;
 import com.avaje.ebean.config.dbplatform.DbType;
@@ -14,13 +13,15 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
 import com.avaje.ebeaninternal.server.deploy.CompoundUniqueContraint;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.parse.SqlReservedWords;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used to generated the create table DDL script.
  */
 public class CreateTableVisitor extends AbstractBeanVisitor {
 	
-	protected static final Logger logger = Logger.getLogger(CreateTableVisitor.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(CreateTableVisitor.class);
 	
 	final DdlGenContext ctx;
 	
@@ -78,7 +79,7 @@ public class CreateTableVisitor extends AbstractBeanVisitor {
 		}
 		
 		if (SqlReservedWords.isKeyword(table)) {
-			logger.warning("Table name ["+table+"] is a suspected SQL reserved word for bean "+descriptor.getFullName());
+			logger.warn("Table name ["+table+"] is a suspected SQL reserved word for bean "+descriptor.getFullName());
 		}
 
 		ctx.write(tableName);		
@@ -102,7 +103,7 @@ public class CreateTableVisitor extends AbstractBeanVisitor {
 
 		if (SqlReservedWords.isKeyword(columnName)) {
 			String propName = p == null ? "(Unknown)" : p.getFullBeanName();
-			logger.warning("Column name ["+columnName+"] is a suspected SQL reserved word for property "+propName);
+			logger.warn("Column name ["+columnName+"] is a suspected SQL reserved word for property "+propName);
 		}
 
 		ctx.write("  ").write(columnName, columnNameWidth).write(" ");

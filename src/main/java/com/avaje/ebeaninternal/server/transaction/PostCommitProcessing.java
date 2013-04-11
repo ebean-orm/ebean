@@ -2,8 +2,6 @@ package com.avaje.ebeaninternal.server.transaction;
 
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
@@ -13,6 +11,8 @@ import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Performs post commit processing using a background thread.
@@ -22,7 +22,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
  */
 public final class PostCommitProcessing {
 
-  private static final Logger logger = Logger.getLogger(PostCommitProcessing.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(PostCommitProcessing.class);
 
   private final ClusterManager clusterManager;
 
@@ -87,7 +87,7 @@ public final class PostCommitProcessing {
   public void notifyCluster() {
     if (remoteTransactionEvent != null && !remoteTransactionEvent.isEmpty()) {
       // send the interesting events to the cluster
-      if (manager.getClusterDebugLevel() > 0 || logger.isLoggable(Level.FINE)) {
+      if (manager.getClusterDebugLevel() > 0 || logger.isDebugEnabled()) {
         logger.info("Cluster Send: " + remoteTransactionEvent.toString());
       }
 

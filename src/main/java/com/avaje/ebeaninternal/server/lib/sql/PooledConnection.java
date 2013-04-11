@@ -11,10 +11,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.jdbc.ConnectionDelegator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Is a connection that belongs to a DataSourcePool.
@@ -37,7 +37,7 @@ import com.avaje.ebeaninternal.jdbc.ConnectionDelegator;
 public class PooledConnection extends ConnectionDelegator
 {
 
-	private static final Logger logger = Logger.getLogger(PooledConnection.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(PooledConnection.class);
 
 	private static String IDLE_CONNECTION_ACCESSED_ERROR = "Pooled Connection has been accessed whilst idle in the pool, via method: ";
 
@@ -263,13 +263,13 @@ public class PooledConnection extends ConnectionDelegator
 		try {
 			if (connection.isClosed()) {
 				msg = "Closing Connection[" + getName() + "] that is already closed?";
-				logger.log(Level.SEVERE, msg);
+				logger.error(msg);
 				return;
 			}
 		} catch (SQLException ex) {
 			if (logErrors) {
 				msg = "Error when fully closing connection [" + getName() + "]";
-				logger.log(Level.SEVERE, msg, ex);
+				logger.error(msg, ex);
 			}
 		}
 
@@ -282,7 +282,7 @@ public class PooledConnection extends ConnectionDelegator
 
 		} catch (SQLException ex) {
 			if (logErrors) {
-				logger.log(Level.WARNING, "Error when closing connection Statements", ex);
+				logger.warn("Error when closing connection Statements", ex);
 			}
 		}
 
@@ -292,7 +292,7 @@ public class PooledConnection extends ConnectionDelegator
 		} catch (SQLException ex) {
 			if (logErrors) {
 				msg = "Error when fully closing connection [" + getName() + "]";
-				logger.log(Level.SEVERE, msg, ex);
+				logger.error(msg, ex);
 			}
 		}
 	}
@@ -358,7 +358,7 @@ public class PooledConnection extends ConnectionDelegator
 					pstmt.closeDestroy();
 
 				} catch (SQLException e) {
-					logger.log(Level.SEVERE, "Error closing Pstmt", e);
+					logger.error("Error closing Pstmt", e);
 				}
 			}
 		}
@@ -535,11 +535,11 @@ public class PooledConnection extends ConnectionDelegator
 			if (connection != null && !connection.isClosed()) {
 				// connect leak?
 				String msg = "Closing Connection[" + getName() + "] on finalize().";
-				logger.warning(msg);
+				logger.warn(msg);
 				closeConnectionFully(false);
 			}
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, null, e);
+			logger.error(null, e);
 		}
 		super.finalize();
 	}
@@ -580,8 +580,8 @@ public class PooledConnection extends ConnectionDelegator
 	 */
 	protected void setLastStatement(String lastStatement) {
 		this.lastStatement = lastStatement;
-		if (logger.isLoggable(Level.FINER)) {
-			logger.finer(".setLastStatement[" + lastStatement + "]");
+		if (logger.isTraceEnabled()) {
+			logger.trace(".setLastStatement[" + lastStatement + "]");
 		}
 	}
 

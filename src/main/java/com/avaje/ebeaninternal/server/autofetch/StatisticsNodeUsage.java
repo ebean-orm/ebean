@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.bean.NodeUsageCollector;
 import com.avaje.ebean.meta.MetaAutoFetchStatistic.NodeUsageStats;
@@ -14,6 +13,8 @@ import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.query.SplitName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Collects usages statistics for a given node in the object graph.
@@ -22,7 +23,7 @@ public class StatisticsNodeUsage implements Serializable {
 
 	private static final long serialVersionUID = -1663951463963779547L;
 
-	private static final Logger logger = Logger.getLogger(StatisticsNodeUsage.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(StatisticsNodeUsage.class);
 
 	private final String monitor = new String();
 	
@@ -59,7 +60,7 @@ public class StatisticsNodeUsage implements Serializable {
 				ElPropertyValue elGetValue = rootDesc.getElGetValue(path);
 				if (elGetValue == null){
 					desc = null;
-					logger.warning("Autofetch: Can't find join for path["+path+"] for "+rootDesc.getName());
+					logger.warn("Autofetch: Can't find join for path["+path+"] for "+rootDesc.getName());
 					
 				} else {
 					BeanProperty beanProperty = elGetValue.getBeanProperty();
@@ -72,7 +73,7 @@ public class StatisticsNodeUsage implements Serializable {
 			for (String propName : aggregateUsed) {
                 BeanProperty beanProp = desc.getBeanPropertyFromPath(propName);
                 if (beanProp == null){
-                    logger.warning("Autofetch: Can't find property["+propName+"] for "+desc.getName());
+                    logger.warn("Autofetch: Can't find property["+propName+"] for "+desc.getName());
                     
                 } else {
                     if (beanProp instanceof BeanPropertyAssoc<?>){

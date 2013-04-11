@@ -5,11 +5,11 @@ import java.io.InterruptedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.server.lib.thread.ThreadPool;
 import com.avaje.ebeaninternal.server.lib.thread.ThreadPoolManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Serverside multithreaded socket listener. Accepts connections and dispatches
@@ -26,7 +26,7 @@ import com.avaje.ebeaninternal.server.lib.thread.ThreadPoolManager;
  */
 class SocketClusterListener implements Runnable {
 
-	private static final Logger logger = Logger.getLogger(SocketClusterListener.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(SocketClusterListener.class);
 	
     /**
      * The port the SocketListener uses.
@@ -118,7 +118,7 @@ class SocketClusterListener implements Runnable {
             listenerThread.interrupt();
             serverListenSocket.close();
         } catch (IOException e) {
-        	logger.log(Level.SEVERE, null, e);
+        	logger.error(null, e);
         }
     }
     
@@ -146,17 +146,17 @@ class SocketClusterListener implements Runnable {
                     logger.info(msg);
 
                 } else {
-                	logger.log(Level.SEVERE, null, e);
+                	logger.error(null, e);
                 }
 
             } catch (InterruptedIOException e) {
                 // this will happen when the server is very quiet.
                 // that is, no requests
-                logger.fine("Possibly expected due to accept timeout?" + e.getMessage());
+                logger.debug("Possibly expected due to accept timeout?" + e.getMessage());
 
             } catch (IOException e) {
                 // log it and continue in the loop...
-            	logger.log(Level.SEVERE, null, e);
+            	logger.error(null, e);
             }
         }
     }

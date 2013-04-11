@@ -2,8 +2,6 @@ package com.avaje.ebeaninternal.server.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -23,6 +21,8 @@ import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper to handle lazy loading and refreshing of beans.
@@ -31,7 +31,7 @@ import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
  */
 public class DefaultBeanLoader {
 
-  private static final Logger logger = Logger.getLogger(DefaultBeanLoader.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(DefaultBeanLoader.class);
 
   private final DebugLazyLoad debugLazyLoad;
 
@@ -146,8 +146,8 @@ public class DefaultBeanLoader {
     for (int i = 0; i < batch.size(); i++) {
       BeanCollection<?> bc = batch.get(i);
       if (bc.checkEmptyLazyLoad()) {
-        if (logger.isLoggable(Level.FINE)) {
-          logger.fine("BeanCollection after load was empty. Owner:" + batch.get(i).getOwnerBean());
+        if (logger.isDebugEnabled()) {
+          logger.debug("BeanCollection after load was empty. Owner:" + batch.get(i).getOwnerBean());
         }
       } else if (loadRequest.isLoadCache()) {
         Object parentId = desc.getId(bc.getOwnerBean());
@@ -271,8 +271,8 @@ public class DefaultBeanLoader {
 
     if (beanCollection != null) {
       if (beanCollection.checkEmptyLazyLoad()) {
-        if (logger.isLoggable(Level.FINE)) {
-          logger.fine("BeanCollection after load was empty. Owner:" + beanCollection.getOwnerBean());
+        if (logger.isDebugEnabled()) {
+          logger.debug("BeanCollection after load was empty. Owner:" + beanCollection.getOwnerBean());
         }
       } else if (useManyIdCache) {
         parentDesc.cachePutMany(many, beanCollection, parentId);

@@ -1,10 +1,11 @@
 package com.avaje.ebeaninternal.server.lib.thread;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This is a pool of threads which can be assigned work.
@@ -16,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class ThreadPool {
 
-	private static final Logger logger = Logger.getLogger(ThreadPool.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(ThreadPool.class);
 	
     /**
      * The max idle time used to trim idle threads from the pool.
@@ -334,7 +335,7 @@ public class ThreadPool {
 
 
             } catch (InterruptedException e) {
-            	logger.log(Level.SEVERE, null, e);
+            	logger.error(null, e);
             }
         }
     }
@@ -441,8 +442,8 @@ public class ThreadPool {
             PooledThread bgw = new PooledThread(this, threadName, isDaemon, threadPriority);
             bgw.start();
             
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("ThreadPool grow created [" + threadName + "] size[" + size() + "]");
+            if (logger.isDebugEnabled()) {
+                logger.debug("ThreadPool grow created [" + threadName + "] size[" + size() + "]");
             }
             if (andReturn) {
                 return bgw;

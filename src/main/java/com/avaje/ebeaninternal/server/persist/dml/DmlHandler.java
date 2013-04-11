@@ -6,8 +6,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.OptimisticLockException;
 
@@ -19,6 +17,8 @@ import com.avaje.ebeaninternal.server.persist.BatchedPstmt;
 import com.avaje.ebeaninternal.server.persist.BatchedPstmtHolder;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableRequest;
 import com.avaje.ebeaninternal.server.type.DataBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -26,7 +26,7 @@ import com.avaje.ebeaninternal.server.type.DataBind;
  */
 public abstract class DmlHandler implements PersistHandler, BindableRequest {
 
-    protected static final Logger logger = Logger.getLogger(DmlHandler.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(DmlHandler.class);
 	
 	/**
 	 * The originating request.
@@ -125,7 +125,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
 			    dataBind.close();
 			}
 		} catch (SQLException ex) {
-        	logger.log(Level.SEVERE, null, ex);
+        	logger.error(null, ex);
 		}
 	}
 

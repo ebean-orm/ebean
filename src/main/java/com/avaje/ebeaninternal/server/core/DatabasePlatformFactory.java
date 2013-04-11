@@ -3,8 +3,6 @@ package com.avaje.ebeaninternal.server.core;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
@@ -21,6 +19,8 @@ import com.avaje.ebean.config.dbplatform.Oracle9Platform;
 import com.avaje.ebean.config.dbplatform.PostgresPlatform;
 import com.avaje.ebean.config.dbplatform.SQLitePlatform;
 import com.avaje.ebean.config.dbplatform.SqlAnywherePlatform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Create a DatabasePlatform from the configuration.
@@ -31,7 +31,7 @@ import com.avaje.ebean.config.dbplatform.SqlAnywherePlatform;
  */
 public class DatabasePlatformFactory {
 
-  private static final Logger logger = Logger.getLogger(DatabasePlatformFactory.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(DatabasePlatformFactory.class);
 
   /**
    * Create the appropriate database specific platform.
@@ -117,7 +117,7 @@ public class DatabasePlatformFactory {
           conn.close();
         }
       } catch (SQLException ex) {
-        logger.log(Level.SEVERE, null, ex);
+        logger.error(null, ex);
       }
     }
   }

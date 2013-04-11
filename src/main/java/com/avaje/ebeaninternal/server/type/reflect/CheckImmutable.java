@@ -1,14 +1,17 @@
 package com.avaje.ebeaninternal.server.type.reflect;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.logging.Logger;
+
 
 public class CheckImmutable {
 
-    private static Logger logger = Logger.getLogger(CheckImmutable.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(CheckImmutable.class);
     
     private final KnownImmutable knownImmutable; 
 
@@ -44,7 +47,7 @@ public class CheckImmutable {
             }
         }
         
-        logger.fine("checkImmutable "+cls+" constructor "+chosen);
+        logger.debug("checkImmutable "+cls+" constructor "+chosen);
         
         return maxLength > 1;
     }

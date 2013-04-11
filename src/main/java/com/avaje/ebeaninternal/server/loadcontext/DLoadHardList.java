@@ -1,13 +1,14 @@
 package com.avaje.ebeaninternal.server.loadcontext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class DLoadHardList<T> implements DLoadList<T> {
 
-	private static final Logger logger = Logger.getLogger(DLoadHardList.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DLoadHardList.class);
 
 	protected final ArrayList<T> list = new ArrayList<T>();
 
@@ -29,7 +30,7 @@ public class DLoadHardList<T> implements DLoadList<T> {
 		synchronized (this) {
 			T object = list.get(position);
 			if (object == null) {
-				logger.log(Level.WARNING, "removeEntry found no Object for position[" + position + "]");				
+				logger.warn("removeEntry found no Object for position[" + position + "]");
 			} else {
 				// just set the entry to null
 				list.set(position, null);

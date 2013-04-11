@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -40,6 +38,8 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.IntersectionRow;
 import com.avaje.ebeaninternal.server.deploy.ManyType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Persister implementation using DML.
@@ -59,7 +59,7 @@ import com.avaje.ebeaninternal.server.deploy.ManyType;
  */
 public final class DefaultPersister implements Persister {
 
-	private static final Logger logger = Logger.getLogger(DefaultPersister.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DefaultPersister.class);
 
 	/**
 	 * Actually does the persisting work.
@@ -403,8 +403,8 @@ public final class DefaultPersister implements Persister {
 	
 			} else {
 				// skip validation on unchanged bean
-				if (logger.isLoggable(Level.FINE)) {
-					logger.fine(Message.msg("persist.update.skipped", request.getBean()));
+				if (logger.isDebugEnabled()) {
+					logger.debug(Message.msg("persist.update.skipped", request.getBean()));
 				}
 			}
 	
@@ -426,8 +426,8 @@ public final class DefaultPersister implements Persister {
 		if (req.isRegisteredForDeleteBean()) {
 			// skip deleting bean. Used where cascade is on
 			// both sides of a relationship
-			if (logger.isLoggable(Level.FINE)) {
-				logger.fine("skipping delete on alreadyRegistered " + bean);
+			if (logger.isDebugEnabled()) {
+				logger.debug("skipping delete on alreadyRegistered " + bean);
 			}
 			return;
 		}
@@ -1022,7 +1022,7 @@ public final class DefaultPersister implements Persister {
 					if (t.isLogSummary()) {
 						t.logInternal(m);
 					}
-					logger.log(Level.WARNING, m);
+					logger.warn(m);
 
 				} else {
 					if (!prop.hasImportedId(otherBean)) {

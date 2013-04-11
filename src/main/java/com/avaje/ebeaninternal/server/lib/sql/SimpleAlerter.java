@@ -1,13 +1,12 @@
 package com.avaje.ebeaninternal.server.lib.sql;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.server.lib.util.MailEvent;
 import com.avaje.ebeaninternal.server.lib.util.MailListener;
 import com.avaje.ebeaninternal.server.lib.util.MailMessage;
 import com.avaje.ebeaninternal.server.lib.util.MailSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simple smtp email alert that sends a email message
@@ -21,7 +20,7 @@ import com.avaje.ebeaninternal.server.lib.util.MailSender;
  */
 public class SimpleAlerter implements DataSourceAlertListener, MailListener {
 
-	private static final Logger logger = Logger.getLogger(SimpleAlerter.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(SimpleAlerter.class);
 	
     //boolean sendInBackGround = true;
 	
@@ -37,7 +36,7 @@ public class SimpleAlerter implements DataSourceAlertListener, MailListener {
     public void handleEvent(MailEvent event) {
         Throwable e =  event.getError();
         if (e != null){
-        	logger.log(Level.SEVERE, null, e);
+        	logger.error(null, e);
         }
     }
     

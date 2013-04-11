@@ -1,11 +1,11 @@
 package com.avaje.ebeaninternal.server.transaction.log;
 
-import java.util.logging.Logger;
-
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.server.transaction.TransactionLogBuffer;
 import com.avaje.ebeaninternal.server.transaction.TransactionLogWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wraps a FileTransactionLogger to provide delayed initialisation.
@@ -21,7 +21,7 @@ import com.avaje.ebeaninternal.server.transaction.TransactionLogWriter;
  */
 public class FileTransactionLoggerWrapper implements TransactionLogWriter {
 
-    private static final Logger logger = Logger.getLogger(FileTransactionLoggerWrapper.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(FileTransactionLoggerWrapper.class);
 
     private final String serverName;
     private final String dir;

@@ -3,8 +3,6 @@ package com.avaje.ebeaninternal.server.ldap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -16,10 +14,12 @@ import javax.naming.ldap.LdapName;
 
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LdapOrmQueryExecute<T> {
 
-    private static final Logger logger = Logger.getLogger(LdapOrmQueryExecute.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(LdapOrmQueryExecute.class);
     
     private final SpiQuery<?> query;
 
@@ -95,7 +95,7 @@ public class LdapOrmQueryExecute<T> {
                 debugQuery += " select:"+Arrays.toString(selectProps);
             }
 
-            if (logger.isLoggable(Level.INFO)){
+            if (logger.isInfoEnabled()){
                 logger.info("Ldap Query  Name:"+dn+" filterExpr:"+filterExpr);
             }
                

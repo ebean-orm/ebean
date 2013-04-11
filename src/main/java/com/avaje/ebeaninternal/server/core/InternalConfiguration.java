@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.util.logging.Logger;
-
 import com.avaje.ebean.ExpressionFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.ExternalTransactionManager;
@@ -39,6 +37,8 @@ import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 import com.avaje.ebeaninternal.server.transaction.TransactionScopeManager;
 import com.avaje.ebeaninternal.server.type.DefaultTypeManager;
 import com.avaje.ebeaninternal.server.type.TypeManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used to extend the ServerConfig with additional objects used to configure and
@@ -48,7 +48,7 @@ import com.avaje.ebeaninternal.server.type.TypeManager;
  */
 public class InternalConfiguration {
 
-  private static final Logger logger = Logger.getLogger(InternalConfiguration.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(InternalConfiguration.class);
 
   private final ServerConfig serverConfig;
 

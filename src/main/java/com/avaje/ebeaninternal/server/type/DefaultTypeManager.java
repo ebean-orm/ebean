@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -47,6 +45,8 @@ import com.avaje.ebeaninternal.server.type.reflect.KnownImmutable;
 import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundType;
 import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundTypeProperty;
 import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedTypeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of TypeManager.
@@ -56,7 +56,7 @@ import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedTypeBuilder;
  */
 public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
-  private static final Logger logger = Logger.getLogger(DefaultTypeManager.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(DefaultTypeManager.class);
 
   private final ConcurrentHashMap<Class<?>, CtCompoundType<?>> compoundTypeMap;
 
@@ -171,7 +171,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private ScalarType<?> register(ScalarType<?> st) {
     add(st);
-    logger.fine("Registering ScalarType for " + st.getType() + " implemented using reflection");
+    logger.debug("Registering ScalarType for " + st.getType() + " implemented using reflection");
     return st;
   }
 
@@ -221,10 +221,10 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   }
 
   protected void logAdd(ScalarType<?> scalarType) {
-    if (logger.isLoggable(Level.FINE)) {
+    if (logger.isDebugEnabled()) {
       String msg = "ScalarType register [" + scalarType.getClass().getName() + "]";
       msg += " for [" + scalarType.getType().getName() + "]";
-      logger.fine(msg);
+      logger.debug(msg);
     }
   }
 
@@ -472,7 +472,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
       } catch (Exception e) {
         String msg = "Error loading ScalarType [" + cls.getName() + "]";
-        logger.log(Level.SEVERE, msg, e);
+        logger.error(msg, e);
       }
     }
   }
@@ -502,13 +502,13 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
         ScalarTypeConverter converter = (ScalarTypeConverter) cls.newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, converter);
 
-        logger.fine("Register ScalarTypeWrapper from " + logicalType + " -> " + persistType + " using:" + cls);
+        logger.debug("Register ScalarTypeWrapper from " + logicalType + " -> " + persistType + " using:" + cls);
 
         add(stw);
 
       } catch (Exception e) {
         String msg = "Error loading ScalarType [" + cls.getName() + "]";
-        logger.log(Level.SEVERE, msg, e);
+        logger.error(msg, e);
       }
     }
 
@@ -566,7 +566,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     CtCompoundType ctType = new CtCompoundType(compoundTypeClass, compoundType, dataReaders);
 
-    logger.fine("Registering CompoundType " + compoundTypeClass + " " + info);
+    logger.debug("Registering CompoundType " + compoundTypeClass + " " + info);
     compoundTypeMap.put(compoundTypeClass, ctType);
 
     return ctType;
@@ -600,7 +600,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     // detect if Joda classes are in the classpath
     if (ClassUtil.isPresent("org.joda.time.LocalDateTime", this.getClass())) {
       // Joda classes are in the classpath so register the types
-      logger.fine("Registering Joda data types");
+      logger.debug("Registering Joda data types");
       typeMap.put(LocalDateTime.class, new ScalarTypeJodaLocalDateTime());
       typeMap.put(LocalDate.class, new ScalarTypeJodaLocalDate());
       typeMap.put(LocalTime.class, new ScalarTypeJodaLocalTime());

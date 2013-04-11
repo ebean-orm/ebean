@@ -6,8 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -41,6 +39,8 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An object that represents a SqlSelect statement.
@@ -56,7 +56,7 @@ import com.avaje.ebeaninternal.server.type.DataReader;
  */
 public class CQuery<T> implements DbReadContext, CancelableQuery {
 
-	private static final Logger logger = Logger.getLogger(CQuery.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(CQuery.class);
 
 	private static final int GLOBAL_ROW_LIMIT = 1000000;
 
@@ -400,7 +400,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 	            dataReader = null;
 			}
 		} catch (SQLException e) {
-			logger.log(Level.SEVERE, null, e);
+			logger.error(null, e);
 		}
 		try {
 			if (pstmt != null) {
@@ -408,7 +408,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 				pstmt = null;
 			}
 		} catch (SQLException e) {
-			logger.log(Level.SEVERE, null, e);
+			logger.error(null, e);
 		}
 	}
 	
@@ -654,7 +654,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     		queryPlan.executionTime(loadedBeanCount, executionTimeMicros);
     		
         } catch (Exception e){ 
-            logger.log(Level.SEVERE, null, e);
+            logger.error(null, e);
         }
     }
 	

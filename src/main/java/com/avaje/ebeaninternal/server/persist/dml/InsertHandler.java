@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Level;
 
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -21,11 +20,14 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.persist.DmlUtil;
 import com.avaje.ebeaninternal.server.type.DataBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Insert bean handler.
  */
 public class InsertHandler extends DmlHandler {
+  private static final Logger logger = LoggerFactory.getLogger(InsertHandler.class);
 
   /**
    * The associated InsertMeta data.
@@ -186,7 +188,7 @@ public class InsertHandler extends DmlHandler {
         rset.close();
       } catch (SQLException ex) {
         String msg = "Error closing rset for returning generatedKeys?";
-        logger.log(Level.WARNING, msg, ex);
+        logger.warn(msg, ex);
       }
     }
   }
@@ -219,7 +221,7 @@ public class InsertHandler extends DmlHandler {
         }
       } catch (SQLException ex) {
         String msg = "Error closing rset for fetchGeneratedKeyUsingSelect?";
-        logger.log(Level.WARNING, msg, ex);
+        logger.warn(msg, ex);
       }
       try {
         if (stmt != null) {
@@ -227,7 +229,7 @@ public class InsertHandler extends DmlHandler {
         }
       } catch (SQLException ex) {
         String msg = "Error closing stmt for fetchGeneratedKeyUsingSelect?";
-        logger.log(Level.WARNING, msg, ex);
+        logger.warn(msg, ex);
       }
     }
   }

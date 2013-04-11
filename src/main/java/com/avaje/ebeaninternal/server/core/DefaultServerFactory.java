@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
@@ -57,13 +55,15 @@ import com.avaje.ebeaninternal.server.lib.sql.DataSourceGlobalManager;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
 import com.avaje.ebeaninternal.server.lib.thread.ThreadPool;
 import com.avaje.ebeaninternal.server.lib.thread.ThreadPoolManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default Server side implementation of ServerFactory.
  */
 public class DefaultServerFactory implements BootupEbeanManager {
 
-  private static final Logger logger = Logger.getLogger(DefaultServerFactory.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(DefaultServerFactory.class);
 
   private final ClusterManager clusterManager;
 
@@ -194,7 +194,7 @@ public class DefaultServerFactory implements BootupEbeanManager {
         }
         if (pstmtBatch == null) {
           // We can not support JDBC batching with Oracle
-          logger.warning("Can not support JDBC batching with Oracle without a PstmtDelegate");
+          logger.warn("Can not support JDBC batching with Oracle without a PstmtDelegate");
           serverConfig.setPersistBatching(false);
         }
       }
@@ -475,7 +475,7 @@ public class DefaultServerFactory implements BootupEbeanManager {
 
       if (c.getAutoCommit()) {
         String m = "DataSource [" + serverConfig.getName() + "] has autoCommit defaulting to true!";
-        logger.warning(m);
+        logger.warn(m);
       }
 
       return true;
@@ -488,7 +488,7 @@ public class DefaultServerFactory implements BootupEbeanManager {
         try {
           c.close();
         } catch (SQLException ex) {
-          logger.log(Level.SEVERE, null, ex);
+          logger.error(null, ex);
         }
       }
     }

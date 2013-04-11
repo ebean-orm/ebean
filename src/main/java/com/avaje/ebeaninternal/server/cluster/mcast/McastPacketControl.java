@@ -4,11 +4,11 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.server.cluster.Packet;
 import com.avaje.ebeaninternal.server.cluster.PacketMessages;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helps co-ordinate Packet information between the McastListener and the
@@ -18,7 +18,7 @@ import com.avaje.ebeaninternal.server.cluster.PacketMessages;
  */
 public class McastPacketControl {
 
-    private static final Logger logger = Logger.getLogger(McastPacketControl.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(McastPacketControl.class);
 
     private final String localSenderHostPort;
 
@@ -53,8 +53,8 @@ public class McastPacketControl {
         packetMessages.read(dataInput);
         List<Message> messages = packetMessages.getMessages();
 
-        if (logger.isLoggable(Level.FINER)) {
-            logger.finer("INCOMING Messages " + messages);
+        if (logger.isTraceEnabled()) {
+            logger.trace("INCOMING Messages " + messages);
         }
         // messages are for all nodes in the cluster so
         // we need to filter looking for messages pertaining
@@ -77,8 +77,8 @@ public class McastPacketControl {
                 } else if (message instanceof MessageResend) {
                     resend = (MessageResend) message;
                 } else {
-                    logger.log(Level.SEVERE, "Expecting a MessageAck or MessageResend but got a "
-                            + message.getClass().getName());
+                    logger.error("Expecting a MessageAck or MessageResend but got a "
+                      + message.getClass().getName());
                 }
             }
         }

@@ -9,8 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -26,13 +24,15 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Factory for SqlTree.
  */
 public class SqlTreeBuilder {
 
-    private static final Logger logger = Logger.getLogger(SqlTreeBuilder.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SqlTreeBuilder.class);
 
     private final SpiQuery<?> query;
 
@@ -322,7 +322,7 @@ public class SqlTreeBuilder {
 
         BeanProperty p = desc.findBeanProperty(propName);
         if (p == null) {
-            logger.log(Level.SEVERE, "property [" + propName + "]not found on " + desc + " for query - excluding it.");
+            logger.error("property [" + propName + "]not found on " + desc + " for query - excluding it.");
 
         }
 		else if (p instanceof BeanPropertyAssoc<?> && p.isEmbedded()) {
@@ -356,7 +356,7 @@ public class SqlTreeBuilder {
                 BeanProperty p = desc.findBeanProperty(baseName);
                 if (p == null) {
                     String m = "property [" + propName + "] not found on " + desc + " for query - excluding it.";
-                    logger.log(Level.SEVERE, m);
+                    logger.error(m);
 
                 } else if (p.isEmbedded()) {
                     // add the embedded bean (and effectively 
@@ -369,7 +369,7 @@ public class SqlTreeBuilder {
                 } else {
                     String m = "property [" + p.getFullBeanName()
                             + "] expected to be an embedded bean for query - excluding it.";
-                    logger.log(Level.SEVERE, m);
+                    logger.error(m);
                 }
             }
 
@@ -378,8 +378,8 @@ public class SqlTreeBuilder {
             // sub class hierarchy if required
             BeanProperty p = desc.findBeanProperty(propName);
             if (p == null) {
-                logger.log(Level.SEVERE, "property [" + propName + "] not found on " + desc
-                        + " for query - excluding it.");
+                logger.error("property [" + propName + "] not found on " + desc
+                  + " for query - excluding it.");
 
             } else if (p.isId()) {
                 // do not bother to include id for normal queries as the
@@ -474,9 +474,9 @@ public class SqlTreeBuilder {
 
             if (manyProperty != null) {
                 // only one many associated allowed to be included in fetch
-                if (logger.isLoggable(Level.FINE)) {
+                if (logger.isDebugEnabled()) {
                     String msg = "Not joining [" + propName + "] as already joined to a Many[" + manyProperty + "].";
-                    logger.fine(msg);
+                    logger.debug(msg);
                 }
                 return false;
             }

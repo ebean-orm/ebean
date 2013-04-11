@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -25,13 +23,15 @@ import com.avaje.ebeaninternal.server.jmx.MAdminLogging;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Perform native sql fetches.
  */
 public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 
-	private static final Logger logger = Logger.getLogger(DefaultRelationalQueryEngine.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DefaultRelationalQueryEngine.class);
 
 	private final int defaultMaxRows;
 
@@ -75,7 +75,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 			
 			synchronized (query) {
 				if (query.isCancelled()){
-					logger.finest("Query already cancelled");
+					logger.trace("Query already cancelled");
 					return null;
 				}
 				
@@ -182,7 +182,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 			}
 			
 			if (query.isCancelled()){
-				logger.fine("Query was cancelled during execution rows:"+loadRowCount);
+				logger.debug("Query was cancelled during execution rows:"+loadRowCount);
 			}
 			
 			return beanColl;
@@ -198,14 +198,14 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 						rset.close();
 					}
 				} catch (SQLException e) {
-					logger.log(Level.SEVERE, null, e);
+					logger.error(null, e);
 				}
 				try {
 					if (pstmt != null) {
 						pstmt.close();
 					}
 				} catch (SQLException e) {
-					logger.log(Level.SEVERE, null, e);
+					logger.error(null, e);
 				}
 			} 
 		}

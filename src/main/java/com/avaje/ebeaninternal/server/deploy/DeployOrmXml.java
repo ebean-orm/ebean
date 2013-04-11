@@ -5,13 +5,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.server.lib.resource.ResourceContent;
 import com.avaje.ebeaninternal.server.lib.resource.ResourceSource;
 import com.avaje.ebeaninternal.server.lib.util.Dnode;
 import com.avaje.ebeaninternal.server.lib.util.DnodeReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controls the creation and caching of BeanManager's, BeanDescriptors,
@@ -22,8 +22,7 @@ import com.avaje.ebeaninternal.server.lib.util.DnodeReader;
  */
 public class DeployOrmXml {
 
-	private static final Logger logger = Logger.getLogger(DeployOrmXml.class.getName());
-
+	private static final Logger logger = LoggerFactory.getLogger(DeployOrmXml.class);
 
 	private final HashMap<String, DNativeQuery> nativeQueryCache;
 
@@ -127,7 +126,7 @@ public class DeployOrmXml {
 				return false;
 			}
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, "error reading orm xml deployment " + ormXmlName, e);
+			logger.error("error reading orm xml deployment " + ormXmlName, e);
 			return false;
 		}
 	}

@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -17,6 +15,8 @@ import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.cluster.Packet;
 import com.avaje.ebeaninternal.server.cluster.PacketWriter;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Overall Manager of the Multicast Cluster communication for this instance.
@@ -38,7 +38,7 @@ import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
  */
 public class McastClusterManager implements ClusterBroadcast, Runnable {
 
-    private static final Logger logger = Logger.getLogger(McastClusterManager.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(McastClusterManager.class);
 
     private ClusterManager clusterManager;
 
@@ -316,7 +316,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
                         // no members online so trim the entire outgoing packets cache
                         int trimmedCount = outgoingPacketsCache.trimAll();
                         if (trimmedCount > 0){
-                            logger.fine("Cluster has no other members. Trimmed "+trimmedCount);
+                            logger.debug("Cluster has no other members. Trimmed "+trimmedCount);
                         }
                         
                     } else if (minAckedFromListener > minAcked){
@@ -358,7 +358,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
                 }
             } catch (Exception e){
                 String msg = "Error with Cluster Mcast Manager thread";
-                logger.log(Level.SEVERE, msg, e);
+                logger.error(msg, e);
             }
         }
     }
@@ -384,7 +384,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
                 Packet packet = outgoingPacketsCache.getPacket(resendPacketId);
                 if (packet == null){
                     String msg = "Cluster unable to resend packet["+resendPacketId+"] as it is no longer in the outgoingPacketsCache";
-                    logger.log(Level.SEVERE, msg);
+                    logger.error(msg);
                 } else {
                     int resendCount = packet.incrementResendCount();
                     if (resendCount <= maxResendOutgoing) {
@@ -392,7 +392,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
                     } else {                        
                         String msg = "Cluster maxResendOutgoing ["+maxResendOutgoing+"] hit for packet "+resendPacketId
                             +". We will not try to send it anymore, removing it from the outgoingPacketsCache.";
-                        logger.log(Level.SEVERE, msg);
+                        logger.error(msg);
                         outgoingPacketsCache.remove(packet);
                     }
                 }
@@ -409,7 +409,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
              totalBytesResent += localSender.sendPacket(packet);
         } catch (IOException e) {
             String msg = "Error trying to resend packet "+packet.getPacketId();
-            logger.log(Level.SEVERE, msg, e);
+            logger.error(msg, e);
         }        
     }
         
@@ -531,7 +531,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
                 
             } catch (IOException e) {
                 String msg = "Error sending Messages " + messages;
-                logger.log(Level.SEVERE, msg, e);
+                logger.error(msg, e);
                 return false;
             }
         }
@@ -569,7 +569,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
                 }
             } catch (IOException e) {
                 String msg = "Error sending RemoteTransactionEvent " + remoteTransEvent;
-                logger.log(Level.SEVERE, msg, e);
+                logger.error( msg, e);
             }
         }
     }

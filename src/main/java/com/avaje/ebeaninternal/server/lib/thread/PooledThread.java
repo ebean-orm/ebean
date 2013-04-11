@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.server.lib.thread;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A thread that belongs to a ThreadPool. It will return to the Threadpool when
@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  */
 public class PooledThread implements Runnable {
 
-	private static final Logger logger = Logger.getLogger(PooledThread.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(PooledThread.class);
 	
     /**
      * Create the PooledThread.
@@ -89,7 +89,7 @@ public class PooledThread implements Runnable {
                 work.getRunnable().run();
 
             } catch (Throwable ex) {
-				logger.log(Level.SEVERE, null, ex);
+				logger.error(null, ex);
 
                 if (wasInterrupted) {
                     this.isStopping = true;
@@ -99,7 +99,7 @@ public class PooledThread implements Runnable {
                         thread.interrupt();
                     } catch (Exception e){
                     	String msg = "Error interrupting PooledThead["+name+"]";
-        				logger.log(Level.SEVERE, msg, e);
+        				logger.error(msg, e);
                     }
                     return;
                 }

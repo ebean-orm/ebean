@@ -1,5 +1,8 @@
 package com.avaje.ebeaninternal.server.type.reflect;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -8,12 +11,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ImmutableMetaFactory {
 
-    private static final Logger logger = Logger.getLogger(ImmutableMetaFactory.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ImmutableMetaFactory.class);
     
     public ImmutableMeta createImmutableMeta(Class<?> cls) {
         
@@ -40,10 +41,10 @@ public class ImmutableMetaFactory {
         
         String msg = "Was unable to use reflection to find a constructor and appropriate getters for" +
                     "immutable type "+cls+".  The errors while looking for the getter methods follow:";
-        logger.severe(msg);
+        logger.error(msg);
         
         for (RuntimeException runtimeException : errors) {
-            logger.log(Level.SEVERE, "Error with "+cls, runtimeException);
+            logger.error("Error with " + cls, runtimeException);
         }
 
         msg = "Unable to use reflection to build ImmutableMeta for " + cls

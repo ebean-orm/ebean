@@ -3,8 +3,6 @@ package com.avaje.ebeaninternal.server.autofetch;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -12,12 +10,13 @@ import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.resource.ResourceManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AutoFetchManagerFactory {
 
-	private static final Logger logger = Logger.getLogger(AutoFetchManagerFactory.class.getName());
-	
-	
+	private static final Logger logger = LoggerFactory.getLogger(AutoFetchManagerFactory.class);
+
 	public static AutoFetchManager create(SpiEbeanServer server, ServerConfig serverConfig, ResourceManager resourceManager) {
 		
 		AutoFetchManagerFactory me = new AutoFetchManagerFactory();
@@ -68,7 +67,7 @@ public class AutoFetchManagerFactory {
 			return profListener;
 
 		} catch (Exception ex) {
-			logger.log(Level.SEVERE, "Error loading autofetch file "+autoFetchFile.getAbsolutePath(), ex);
+			logger.error("Error loading autofetch file "+autoFetchFile.getAbsolutePath(), ex);
 			return null;
 		}
 	}

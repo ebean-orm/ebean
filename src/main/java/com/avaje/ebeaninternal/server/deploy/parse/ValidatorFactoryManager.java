@@ -3,16 +3,16 @@ package com.avaje.ebeaninternal.server.deploy.parse;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.validation.ValidatorMeta;
 import com.avaje.ebean.validation.factory.Validator;
 import com.avaje.ebean.validation.factory.ValidatorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ValidatorFactoryManager {
 
-	static final Logger logger = Logger.getLogger(ValidatorFactoryManager.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(ValidatorFactoryManager.class);
 
 	Map<Class<?>, ValidatorFactory> factoryMap;
 
@@ -43,7 +43,7 @@ public class ValidatorFactoryManager {
 
 		} catch (Exception e) {
 			String msg = "Error creating ValidatorFactory " + factoryClass.getName();
-			logger.log(Level.SEVERE, msg, e);
+			logger.error(msg, e);
 			return null;
 		}
 	}

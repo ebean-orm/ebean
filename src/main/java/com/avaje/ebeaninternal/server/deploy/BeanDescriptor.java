@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -73,13 +71,15 @@ import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.util.SortByClause;
 import com.avaje.ebeaninternal.util.SortByClause.Property;
 import com.avaje.ebeaninternal.util.SortByClauseParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Describes Beans including their deployment information.
  */
 public class BeanDescriptor<T> {
 
-  private static final Logger logger = Logger.getLogger(BeanDescriptor.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(BeanDescriptor.class);
 
   private final ConcurrentHashMap<Integer, SpiUpdatePlan> updatePlanCache = new ConcurrentHashMap<Integer, SpiUpdatePlan>();
 
@@ -581,8 +581,8 @@ public class BeanDescriptor<T> {
    */
   public void initialiseId() {
 
-    if (logger.isLoggable(Level.FINER)) {
-      logger.finer("BeanDescriptor initialise " + fullName);
+    if (logger.isTraceEnabled()) {
+      logger.trace("BeanDescriptor initialise " + fullName);
     }
 
     if (inheritInfo != null) {
@@ -774,7 +774,7 @@ public class BeanDescriptor<T> {
       query.setReadOnly(true);
       query.setLoadBeanCache(true);
       List<T> list = query.findList();
-      if (logger.isLoggable(Level.INFO)) {
+      if (logger.isInfoEnabled()) {
         String msg = "Loaded " + beanType + " cache with [" + list.size() + "] beans";
         logger.info(msg);
       }

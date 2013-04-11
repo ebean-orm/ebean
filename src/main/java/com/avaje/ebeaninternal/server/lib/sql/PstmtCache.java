@@ -1,17 +1,18 @@
 package com.avaje.ebeaninternal.server.lib.sql;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A LRU based cache for PreparedStatements.
  */
 public class PstmtCache extends LinkedHashMap<String, ExtendedPreparedStatement> {
 
-	private static final Logger logger = Logger.getLogger(PstmtCache.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(PstmtCache.class);
 	
     static final long serialVersionUID = -3096406924865550697L;
 
@@ -154,7 +155,7 @@ public class PstmtCache extends LinkedHashMap<String, ExtendedPreparedStatement>
 			ExtendedPreparedStatement pstmt = eldest.getValue();
 			pstmt.closeDestroy();
 		} catch (SQLException e) {
-			logger.log(Level.SEVERE, "Error closing ExtendedPreparedStatement", e);
+			logger.error("Error closing ExtendedPreparedStatement", e);
 		}
 		return true;		
 	}

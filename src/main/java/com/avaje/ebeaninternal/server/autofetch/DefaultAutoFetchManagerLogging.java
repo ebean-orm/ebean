@@ -1,14 +1,15 @@
 package com.avaje.ebeaninternal.server.autofetch;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.avaje.ebean.config.AutofetchConfig;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.server.lib.BackgroundThread;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.ebeaninternal.server.transaction.log.SimpleLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.logging.Level;
 
 /**
  * Handles the logging aspects for the DefaultAutoFetchListener.
@@ -19,7 +20,7 @@ import com.avaje.ebeaninternal.server.transaction.log.SimpleLogger;
  */
 public class DefaultAutoFetchManagerLogging {
 
-	private static final Logger logger = Logger.getLogger(DefaultAutoFetchManagerLogging.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DefaultAutoFetchManagerLogging.class);
 
 	private final SimpleLogger fileLogger;
 
@@ -60,12 +61,27 @@ public class DefaultAutoFetchManagerLogging {
 		}
 	}
 
+  private void logFile(String msg, Throwable e) {
+    if (useFileLogger) {
+      String errMsg = e == null ? "" : e.getMessage();
+      fileLogger.log("\"Error\",\"" + msg+" "+errMsg+"\",,,,");
+    }
+  }
+
+
+  public void logInfo(String msg, Throwable e) {
+    logFile(msg, e);
+    logger.info(msg, e);
+  }
+
+  public void logError(String msg, Throwable e) {
+    logFile(msg, e);
+    logger.error(msg, e);
+  }
+
+  @Deprecated
 	public void logError(Level level, String msg, Throwable e) {
-		if (useFileLogger) {
-			String errMsg = e == null ? "" : e.getMessage();
-			fileLogger.log("\"Error\",\"" + msg+" "+errMsg+"\",,,,");
-		}
-		logger.log(level, msg, e);
+    logError(msg, e);
 	}
 
 	public void logToJavaLogger(String msg) {
@@ -79,7 +95,7 @@ public class DefaultAutoFetchManagerLogging {
 		if (useFileLogger) {
 			fileLogger.log(msg);
 		}
-		logger.fine(msg);
+		logger.debug(msg);
 	}
 
 	public void logChanged(TunedQueryInfo tunedFetch, OrmQueryDetail newQueryDetail) {
@@ -89,7 +105,7 @@ public class DefaultAutoFetchManagerLogging {
 		if (useFileLogger) {
 			fileLogger.log(msg);
 		} else {
-			logger.fine(msg);
+			logger.debug(msg);
 		}
 	}
 
@@ -100,7 +116,7 @@ public class DefaultAutoFetchManagerLogging {
 		if (useFileLogger) {
 			fileLogger.log(msg);
 		} else {
-			logger.fine(msg);
+			logger.debug(msg);
 		}
 	}
 
