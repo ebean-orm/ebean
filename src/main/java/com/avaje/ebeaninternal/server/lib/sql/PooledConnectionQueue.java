@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PooledConnectionQueue {
 
-    private static final Logger logger = Logger.getLogger(PooledConnectionQueue.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(PooledConnectionQueue.class);
     
     private static final TimeUnit MILLIS_TIME_UNIT = TimeUnit.MILLISECONDS;
 
@@ -203,7 +203,7 @@ public class PooledConnectionQueue {
         lock.lock();
         try {            
             if (!busyList.remove(c)) {
-                logger.log(Level.SEVERE, "Connection [" + c + "] not found in BusyList? ");
+                logger.error("Connection [" + c + "] not found in BusyList? ");
             }
             if (c.getCreationTime() <= lastResetTime) {
                 c.closeConnectionFully(false);
@@ -339,7 +339,7 @@ public class PooledConnectionQueue {
         
             if (!busyList.isEmpty()) {
                 String msg = "A potential connection leak was detected.  Busy connections: "+ busyList.size();
-                logger.warning(msg);
+                logger.warn(msg);
                 
                 dumpBusyConnectionInformation();
                 closeBusyConnections(0);
@@ -493,7 +493,7 @@ public class PooledConnectionQueue {
                     + pc.getName() + "] lastUsed[" + luDate + "] createdBy[" + methodLine
                     + "] lastStmt[" + pc.getLastStatement() + "]";
 
-            logger.warning(msg);
+            logger.warn(msg);
             logStackElement(pc, "Possible Leaked Connection: ");
             
             System.out.println("CLOSING BUSY CONNECTION ??? "+pc);
@@ -501,7 +501,7 @@ public class PooledConnectionQueue {
 
         } catch (SQLException ex) {
             // this should never actually happen
-            logger.log(Level.SEVERE, null, ex);
+            logger.error(null, ex);
         }
     }
     
@@ -510,7 +510,7 @@ public class PooledConnectionQueue {
         if (stackTrace != null){
             String s = Arrays.toString(stackTrace);
             String msg = prefix+" name["+pc.getName()+"] stackTrace: "+s;
-            logger.warning(msg);
+            logger.warn(msg);
             // also send to syserr ... as the loggers get turned 
             // off early in JVM shutdown
             System.err.println(msg);

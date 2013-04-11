@@ -2,8 +2,6 @@ package com.avaje.ebeaninternal.server.persist;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -15,13 +13,15 @@ import com.avaje.ebeaninternal.server.core.PersistRequestUpdateSql.SqlType;
 import com.avaje.ebeaninternal.server.core.PstmtBatch;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Executes the UpdateSql requests.
  */
 public class ExeUpdateSql {
 
-	private static final Logger logger = Logger.getLogger(ExeUpdateSql.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(ExeUpdateSql.class);
 	
     private final Binder binder;
     
@@ -80,7 +80,7 @@ public class ExeUpdateSql {
                 try {
                 	pstmt.close();
                 } catch (SQLException e) {
-                	logger.log(Level.SEVERE, null, e);
+                	logger.error(null, e);
                 }
             }
         }

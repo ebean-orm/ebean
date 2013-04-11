@@ -2,14 +2,14 @@ package com.avaje.ebeaninternal.server.persist;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controls the batch ordering of persist requests.
@@ -27,7 +27,7 @@ import com.avaje.ebeaninternal.server.core.PersistRequestBean;
  */
 public final class BatchControl {
 
-  private static final Logger logger = Logger.getLogger(BatchControl.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(BatchControl.class);
     
   /**
    * Used to sort queue entries by depth.
@@ -167,8 +167,8 @@ public final class BatchControl {
     if (persistList == null) {
       // special case where the same bean instance has been added
       // to the batch more than once
-      if (logger.isLoggable(Level.FINE)) {
-        logger.fine("Bean instance already in this batch: " + request.getBean());
+      if (logger.isDebugEnabled()) {
+        logger.debug("Bean instance already in this batch: " + request.getBean());
       }
       return -1;
     }

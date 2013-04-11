@@ -2,8 +2,6 @@ package com.avaje.ebeaninternal.server.ldap;
 
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.naming.Name;
 import javax.naming.NamingException;
@@ -15,10 +13,12 @@ import javax.naming.directory.DirContext;
 import com.avaje.ebean.config.ldap.LdapContextFactory;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultLdapPersister {
 
-    private static final Logger logger = Logger.getLogger(DefaultLdapPersister.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(DefaultLdapPersister.class);
 
     private final LdapContextFactory contextFactory;
 
@@ -48,8 +48,8 @@ public class DefaultLdapPersister {
         Name name = request.createLdapName();
         Attributes attrs = createAttributes(request, false, request.getLoadedProperties());
 
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Ldap Insert Name:" + name + " Attrs:" + attrs);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Ldap Insert Name:" + name + " Attrs:" + attrs);
         }
         try {
             dc.bind(name, null, attrs);
@@ -65,8 +65,8 @@ public class DefaultLdapPersister {
         DirContext dc = contextFactory.createContext();
         Name name = request.createLdapName();
 
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Ldap Delete Name:" + name);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Ldap Delete Name:" + name);
         }
 
         try {
@@ -91,8 +91,8 @@ public class DefaultLdapPersister {
         DirContext dc = contextFactory.createContext();
         Attributes attrs = createAttributes(request, true, updatedProperties);
 
-        if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Ldap Update Name:" + name + " Attrs:" + attrs);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Ldap Update Name:" + name + " Attrs:" + attrs);
         }
 
         try {

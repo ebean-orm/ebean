@@ -16,11 +16,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.api.ClassUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Can search the class path for classes using a ClassPathSearchMatcher. A
@@ -32,7 +32,7 @@ import com.avaje.ebeaninternal.api.ClassUtil;
  */
 public class ClassPathSearch {
 
-	private static final Logger logger = Logger.getLogger(ClassPathSearch.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(ClassPathSearch.class);
 
 	ClassLoader classLoader;
 
@@ -72,11 +72,11 @@ public class ClassPathSearch {
 				
 			if (classPaths == null || classPaths.length == 0){
 				String msg = "ClassPath is EMPTY using ClassPathReader ["+classPathReader+"]";
-				logger.warning(msg);
+				logger.warn(msg);
 			}
 			
 			boolean debug = GlobalProperties.getBoolean("ebean.debug.classpath", false);
-			if (debug || logger.isLoggable(Level.FINER)) {
+			if (debug || logger.isTraceEnabled()) {
 				String msg = "Classpath " + Arrays.toString(classPaths);
 				logger.info(msg);
 			}
@@ -180,7 +180,7 @@ public class ClassPathSearch {
 				// this is not expected
 				String msg = "Error: expected classPath entry ["+classPath.getAbsolutePath()
 				+"] to be a directory or a .jar file but it is not either of those?";
-				logger.log(Level.SEVERE, msg);
+				logger.error(msg);
 			}
 
 			searchFiles(files, jarFileName);
@@ -199,7 +199,7 @@ public class ClassPathSearch {
 		if (matchList.isEmpty()){
 			String msg = "No Entities found in ClassPath using ClassPathReader ["
 				+classPathReader+"] Classpath Searched[" + Arrays.toString(classPaths)+"]";
-			logger.warning(msg);
+			logger.warn(msg);
 		}
 
 		return matchList;
@@ -267,12 +267,12 @@ public class ClassPathSearch {
 
 				} catch (ClassNotFoundException e) {
 					// expected to get this hence finer
-					logger.finer("Error searching classpath" + e.getMessage());
+					logger.trace("Error searching classpath" + e.getMessage());
 					continue;
 
 				} catch (NoClassDefFoundError e) {
 					// expected to get this hence finer
-					logger.finer("Error searching classpath: " + e.getMessage());
+					logger.trace("Error searching classpath: " + e.getMessage());
 					continue;
 				}
 			}

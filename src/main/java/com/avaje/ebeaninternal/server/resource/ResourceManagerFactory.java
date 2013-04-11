@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.resource;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletContext;
 
@@ -12,6 +11,8 @@ import com.avaje.ebeaninternal.server.lib.resource.FileResourceSource;
 import com.avaje.ebeaninternal.server.lib.resource.ResourceSource;
 import com.avaje.ebeaninternal.server.lib.resource.UrlResourceSource;
 import com.avaje.ebeaninternal.server.lib.util.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates a ResourceManager for a server depending on the avaje.properties.
@@ -22,7 +23,7 @@ import com.avaje.ebeaninternal.server.lib.util.NotFoundException;
  */
 public class ResourceManagerFactory {
 
-	private static final Logger logger = Logger.getLogger(ResourceManagerFactory.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(ResourceManagerFactory.class);
 
 	/**
 	 * Construct with the properties for a server.

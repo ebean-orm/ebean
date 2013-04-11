@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -15,13 +13,15 @@ import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.type.DataBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Executes the select row count query.
  */
 public class CQueryRowCount {
 
-	private static final Logger logger = Logger.getLogger(CQueryRowCount.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(CQueryRowCount.class);
 
 	/**
 	 * The overall find request wrapper object.
@@ -157,7 +157,7 @@ public class CQueryRowCount {
 				rset = null;
 			}
 		} catch (SQLException e) {
-			logger.log(Level.SEVERE, null, e);
+			logger.error(null, e);
 		}
 		try {
 			if (pstmt != null) {
@@ -165,7 +165,7 @@ public class CQueryRowCount {
 				pstmt = null;
 			}
 		} catch (SQLException e) {
-			logger.log(Level.SEVERE, null, e);
+			logger.error(null, e);
 		}
 	}
 

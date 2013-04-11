@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.api;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wraps the caller and context class loaders.
@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  */
 class ClassLoadContext {
 
-    private static final Logger logger = Logger.getLogger(ClassLoadContext.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ClassLoadContext.class);
     
     private final ClassLoader callerLoader;
 
@@ -67,35 +67,35 @@ class ClassLoadContext {
     public ClassLoader getDefault(boolean preferContext) {
         
         if (contextLoader == null){
-            if (logger.isLoggable(Level.FINE)){
-                logger.fine("No Context ClassLoader, using "+callerLoader.getClass().getName());
+            if (logger.isDebugEnabled()){
+                logger.debug("No Context ClassLoader, using "+callerLoader.getClass().getName());
             }
             return callerLoader;
         }
         if (contextLoader == callerLoader){
-            if (logger.isLoggable(Level.FINE)){
-                logger.fine("Context and Caller ClassLoader's same instance of "+contextLoader.getClass().getName());
+          if (logger.isDebugEnabled()){
+                logger.debug("Context and Caller ClassLoader's same instance of "+contextLoader.getClass().getName());
             }
             return callerLoader;
         }
         
         if (isChild(contextLoader, callerLoader)) {
-            if (logger.isLoggable(Level.FINE)){
-                logger.info("Caller ClassLoader "+callerLoader.getClass().getName()
+          if (logger.isDebugEnabled()){
+                logger.debug("Caller ClassLoader "+callerLoader.getClass().getName()
                         +" child of ContextLoader "+contextLoader.getClass().getName());
             }
             return callerLoader;
             
         } else if (isChild(callerLoader, contextLoader)) {
-            if (logger.isLoggable(Level.FINE)){
-                logger.info("Context ClassLoader "+contextLoader.getClass().getName()
+          if (logger.isDebugEnabled()){
+                logger.debug("Context ClassLoader "+contextLoader.getClass().getName()
                         +" child of Caller ClassLoader "+callerLoader.getClass().getName());
             }
             return contextLoader;
             
         } else {            
             // ambiguous case, perhaps both null
-            logger.info("Ambiguous ClassLoader choice preferContext:"+preferContext
+            logger.debug("Ambiguous ClassLoader choice preferContext:"+preferContext
                     +" Context:"+contextLoader.getClass().getName()+" Caller:"+callerLoader.getClass().getName());
             ambiguous = true;
             return preferContext ? contextLoader : callerLoader;

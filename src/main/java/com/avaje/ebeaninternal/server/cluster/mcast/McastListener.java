@@ -27,13 +27,13 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.cluster.Packet;
 import com.avaje.ebeaninternal.server.cluster.PacketTransactionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Listens for Incoming packets.
@@ -42,7 +42,7 @@ import com.avaje.ebeaninternal.server.cluster.PacketTransactionEvent;
  */
 public class McastListener implements Runnable {
 
-    private static final Logger logger = Logger.getLogger(McastListener.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(McastListener.class);
 
     private final McastClusterManager owner;
     
@@ -141,7 +141,7 @@ public class McastListener implements Runnable {
         if (!shutdownComplete){
             String msg = "WARNING: Shutdown of McastListener did not complete?";
             System.err.println(msg);
-            logger.warning(msg);
+            logger.warn(msg);
         }
         
         try {
@@ -150,7 +150,7 @@ public class McastListener implements Runnable {
             // send to syserr in case logging already shutdown 
             e.printStackTrace();
             String msg = "Error leaving Multicast group";
-            logger.log(Level.INFO, msg, e);
+            logger.info(msg, e);
         }
         try {
             sock.close();
@@ -158,7 +158,7 @@ public class McastListener implements Runnable {
             // send to syserr in case logging already shutdown 
             e.printStackTrace();
             String msg = "Error closing Multicast socket";
-            logger.log(Level.INFO, msg, e);
+            logger.info(msg, e);
         }
     }
     
@@ -173,7 +173,7 @@ public class McastListener implements Runnable {
                 String senderHostPort = senderAddr.getAddress().getHostAddress()+":"+senderAddr.getPort();                    
                 
                 if (senderHostPort.equals(localSenderHostPort)){
-                    if (debugIgnore || logger.isLoggable(Level.FINE)){
+                    if (debugIgnore || logger.isDebugEnabled()){
                         logger.info("Ignoring message as sent by localSender: "+localSenderHostPort);
                     }
                 } else {
@@ -195,11 +195,11 @@ public class McastListener implements Runnable {
                     boolean processThisPacket = ackMsg || packetControl.isProcessPacket(senderHostPort, header.getPacketId());
                     
                     if (!processThisPacket){
-                        if (debugIgnore || logger.isLoggable(Level.FINE)){
+                        if (debugIgnore || logger.isDebugEnabled()){
                             logger.info("Already processed packet: "+header.getPacketId()+" type:"+header.getPacketType()+" len:"+data.length);
                         }
                     } else {
-                        if (logger.isLoggable(Level.FINER)){
+                        if (logger.isTraceEnabled()){
                             logger.info("Incoming packet:"+header.getPacketId()+" type:"+header.getPacketType()+" len:"+data.length);
                         }    
                         processPacket(senderHostPort, header, dataInput);                            
@@ -207,13 +207,13 @@ public class McastListener implements Runnable {
                 }
                 
             } catch (java.net.SocketTimeoutException e) {
-                if (logger.isLoggable(Level.FINE)) {
-                    logger.log(Level.FINE, "timeout", e);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("timeout", e);
                 }
                 packetControl.onListenerTimeout();
                 
             } catch (IOException e) {
-                logger.log(Level.INFO, "error ?", e);  
+                logger.info("error ?", e);
             } 
         }
         
@@ -239,13 +239,13 @@ public class McastListener implements Runnable {
                 
             default:
                 String msg = "Unknown Packet type:" + header.getPacketType();
-                logger.log(Level.SEVERE, msg);
+                logger.error(msg);
                 break;
             }
         } catch (IOException e) {
             // need to ask to get this packet resent...
             String msg = "Error reading Packet " + header.getPacketId() + " type:" + header.getPacketType();
-            logger.log(Level.SEVERE, msg, e);
+            logger.error(msg, e);
         }
     }
     

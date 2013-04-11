@@ -1,9 +1,10 @@
 package com.avaje.ebeaninternal.server.cluster.socket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This parses and dispatches a request to the appropriate handler.
@@ -15,11 +16,11 @@ import java.util.logging.Logger;
  */
 class RequestProcessor implements Runnable {
 
-	private static final Logger logger = Logger.getLogger(RequestProcessor.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(RequestProcessor.class);
 	
-    private final Socket clientSocket;
+  private final Socket clientSocket;
     
-    private final SocketClusterBroadcast owner;
+  private final SocketClusterBroadcast owner;
     
     /**
 	 *  Create including the Listener (used to lookup the Request Handler) and
@@ -49,9 +50,9 @@ class RequestProcessor implements Runnable {
 			sc.disconnect();
 			
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, null, e);
+			logger.error(null, e);
 		} catch (ClassNotFoundException e) {
-            logger.log(Level.SEVERE, null, e);
+            logger.error(null, e);
         }
 	}
 

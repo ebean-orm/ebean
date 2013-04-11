@@ -1,8 +1,6 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -11,6 +9,8 @@ import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.persist.BeanPersister;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Bean persister that uses the Handler and Meta objects.
@@ -23,7 +23,7 @@ import com.avaje.ebeaninternal.server.persist.BeanPersister;
  */
 public final class DmlBeanPersister implements BeanPersister {
 
-	private static final Logger logger = Logger.getLogger(DmlBeanPersister.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DmlBeanPersister.class);
 
 	private final UpdateMeta updateMeta;
 
@@ -101,7 +101,7 @@ public final class DmlBeanPersister implements BeanPersister {
 				try {
 					handler.close();
 				} catch (SQLException e) {
-					logger.log(Level.SEVERE, null, e);
+					logger.error(null, e);
 				}
 			}
 		}

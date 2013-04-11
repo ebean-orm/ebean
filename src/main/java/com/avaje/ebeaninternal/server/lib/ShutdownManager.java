@@ -5,14 +5,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.common.BootupEbeanManager;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourceGlobalManager;
 import com.avaje.ebeaninternal.server.lib.thread.ThreadPoolManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the shutdown of the Runtime.
@@ -22,7 +22,7 @@ import com.avaje.ebeaninternal.server.lib.thread.ThreadPoolManager;
  */
 public final class ShutdownManager {
 
-	private static final Logger logger = Logger.getLogger(BackgroundThread.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(ShutdownManager.class);
 
 	static final Vector<Runnable> runnables = new Vector<Runnable>();
 
@@ -122,7 +122,7 @@ public final class ShutdownManager {
 				try {
 					throw new RuntimeException("debug.shutdown.why=true ...");
 				} catch(Throwable e){
-					logger.log(Level.WARNING, "Stacktrace showing why shutdown was fired", e);
+					logger.warn("Stacktrace showing why shutdown was fired", e);
 				}
 			}
 			
@@ -140,7 +140,7 @@ public final class ShutdownManager {
 				    Runnable r = (Runnable)ClassUtil.newInstance(shutdownRunner);
 					r.run();
 				} catch (Exception e) {
-					logger.log(Level.SEVERE, null, e);
+					logger.error(null, e);
 				}
 			}
 
@@ -152,7 +152,7 @@ public final class ShutdownManager {
 					Runnable r = (Runnable) e.nextElement();
 					r.run();
 				} catch (Exception ex) {
-					logger.log(Level.SEVERE, null, ex);
+					logger.error(null, ex);
 					ex.printStackTrace();
 				}
 			}
@@ -178,7 +178,7 @@ public final class ShutdownManager {
 				System.err.println(msg);
 				ex.printStackTrace();
 				try {
-					logger.log(Level.SEVERE, null, ex);
+					logger.error(null, ex);
 				} catch (Exception exc) {
 					String ms = "Error Logging error to the Log. It may be shutting down.";
 					System.err.println(ms);
@@ -195,9 +195,9 @@ public final class ShutdownManager {
 	        Driver driver = drivers.nextElement();
 	        try {
 	            DriverManager.deregisterDriver(driver);
-	            logger.log(Level.INFO, String.format("Deregistering jdbc driver: %s", driver));
+	            logger.info(String.format("Deregistering jdbc driver: %s", driver));
 	        } catch (SQLException e) {
-	        	logger.log(Level.SEVERE, String.format("Error deregistering driver %s", driver), e);
+	        	logger.error(String.format("Error deregistering driver %s", driver), e);
 	        }
 	    }
 	}

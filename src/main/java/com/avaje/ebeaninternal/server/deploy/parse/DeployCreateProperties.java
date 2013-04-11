@@ -6,8 +6,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
@@ -25,6 +23,8 @@ import com.avaje.ebeaninternal.server.type.CtCompoundType;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Create the properties for a bean.
@@ -35,7 +35,7 @@ import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
  */
 public class DeployCreateProperties {
 
-	private static final Logger logger = Logger.getLogger(DeployCreateProperties.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DeployCreateProperties.class);
   
   private final DetermineManyType determineManyType;
 
@@ -62,11 +62,11 @@ public class DeployCreateProperties {
 			if (prop.isTransient()){
 				if (prop.getWriteMethod() == null || prop.getReadMethod() == null){
 		    		// Typically a helper method ... this is expected
-		    		logger.finest("... transient: "+prop.getFullBeanName());					
+		    		logger.trace("... transient: "+prop.getFullBeanName());
 				} else {
 					// dubious, possible error...
 		            String msg = Message.msg("deploy.property.nofield", desc.getFullName(), prop.getName());
-		            logger.warning(msg);
+		            logger.warn(msg);
 				}
 			}
 		}
@@ -112,7 +112,7 @@ public class DeployCreateProperties {
             	
             	} else if (Modifier.isTransient(field.getModifiers())) {
             		// not interested in transient fields
-            		logger.finer("Skipping transient field "+field.getName()+" in "+beanType.getName());
+            		logger.trace("Skipping transient field "+field.getName()+" in "+beanType.getName());
 
             	} else if (ignoreFieldByName(field.getName())) {
             		// not interested this field (ebean or aspectJ field)
@@ -142,7 +142,7 @@ public class DeployCreateProperties {
 		                	} else {
 		                		String msg = "Huh??? property "+prop.getFullBeanName()+" being defined twice";
 		                		msg += " but replaced property was not transient? This is not expected?";
-		                		logger.warning(msg);
+		                		logger.warn(msg);
 		                	}
 		                }
 	                }
@@ -191,7 +191,7 @@ public class DeployCreateProperties {
     		char c = name.charAt(2);
     		if (Character.isUpperCase(c)){
     			String msg = "trimming off 'is' from boolean field name "+name+" in class "+beanType.getName();
-    			logger.log(Level.INFO, msg);
+    			logger.info(msg);
     			
     			return name.substring(2);
     		}
@@ -285,7 +285,7 @@ public class DeployCreateProperties {
             		// not supporting this field (generic type used)
             		return null;
             	}
-        		logger.warning("Could not find parameter type (via reflection) on "+desc.getFullName()+" "+field.getName());
+        		logger.warn("Could not find parameter type (via reflection) on "+desc.getFullName()+" "+field.getName());
             }
             return createManyType(desc, targetType, manyType);
         } 
@@ -323,7 +323,7 @@ public class DeployCreateProperties {
                     }
                 }
             } catch (Exception e){
-                logger.log(Level.SEVERE, "Error with "+desc+" field:"+field.getName(), e);
+                logger.error("Error with " + desc + " field:" + field.getName(), e);
             }
         }
         

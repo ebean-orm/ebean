@@ -1,13 +1,14 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the assignment/registration of BeanPersistListener with their
@@ -15,7 +16,7 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
  */
 public class PersistListenerManager {
 
-	private static final Logger logger = Logger.getLogger(PersistListenerManager.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(PersistListenerManager.class);
 
 	private final List<BeanPersistListener<?>> list;
 
@@ -36,7 +37,7 @@ public class PersistListenerManager {
 		for (int i = 0; i < list.size(); i++) {
 			BeanPersistListener<?> c = list.get(i);
 			if (isRegisterFor(deployDesc.getBeanType(), c)) {
-				logger.fine("BeanPersistListener on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
+				logger.debug("BeanPersistListener on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
 				deployDesc.addPersistListener((BeanPersistListener<T>) c);
 			}
 		}

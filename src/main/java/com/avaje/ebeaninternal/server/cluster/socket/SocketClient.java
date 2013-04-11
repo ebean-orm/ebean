@@ -1,12 +1,13 @@
 package com.avaje.ebeaninternal.server.cluster.socket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
  */
 class SocketClient {
 
-    private static final Logger logger = Logger.getLogger(SocketClient.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SocketClient.class);
     
     private final InetSocketAddress address;
     
@@ -88,7 +89,7 @@ class SocketClient {
                 socket.close();
             } catch (IOException e) {
                 String msg = "Error disconnecting from Cluster member "+hostPort;
-                logger.log(Level.INFO, msg, e);
+                logger.info(msg, e);
             }
             
             os = null;

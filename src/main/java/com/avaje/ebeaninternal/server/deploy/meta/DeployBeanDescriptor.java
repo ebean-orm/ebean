@@ -12,8 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.Query.UseIndex;
 import com.avaje.ebean.annotation.ConcurrencyMode;
@@ -36,6 +34,8 @@ import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.reflect.BeanReflect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Describes Beans including their deployment information.
@@ -56,7 +56,7 @@ public class DeployBeanDescriptor<T> {
 
   private static final String I_SCALAOBJECT = "scala.ScalaObject";
 
-  private static final Logger logger = Logger.getLogger(DeployBeanDescriptor.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(DeployBeanDescriptor.class);
 
   private static final String META_BEAN_PREFIX = MetaAutoFetchStatistic.class.getName().substring(0, 20);
 
@@ -266,7 +266,7 @@ public class DeployBeanDescriptor<T> {
         if (!"".equals(m)) {
           m += ". Should it be transient?";
           String msg = "Bean property " + getFullName() + "." + prop.getName() + " has " + m;
-          logger.log(Level.SEVERE, msg);
+          logger.error(msg);
           missingMethods = true;
         }
       }

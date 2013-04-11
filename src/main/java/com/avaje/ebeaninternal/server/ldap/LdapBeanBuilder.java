@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.ldap;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -14,10 +13,12 @@ import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LdapBeanBuilder<T> {
 
-    private static final Logger logger = Logger.getLogger(LdapBeanBuilder.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(LdapBeanBuilder.class);
     
     private final BeanDescriptor<T> beanDescriptor;
     

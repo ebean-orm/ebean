@@ -13,8 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -24,13 +22,15 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.SpiEbeanPlugin;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controls the generation of DDL and potentially runs the resulting scripts.
  */
 public class DdlGenerator implements SpiEbeanPlugin {
 
-  private static final Logger logger = Logger.getLogger(DdlGenerator.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(DdlGenerator.class);
     
 	private SpiEbeanServer server;
 
@@ -258,7 +258,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
 				stmt = stmt.substring(0, stmt.length()-1);
 			}
 
-            logger.log(Level.FINER, "executing "+oneOf+" "+ getSummary(stmt));
+            logger.trace("executing "+oneOf+" "+ getSummary(stmt));
 
 			pstmt = c.prepareStatement(stmt);
 			pstmt.execute();
@@ -276,7 +276,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
 		        try {
 		            pstmt.close();
 		        } catch (SQLException e){
-		            logger.log(Level.SEVERE, "Error closing pstmt", e);
+		            logger.error("Error closing pstmt", e);
 		        }
 		    }
 		}

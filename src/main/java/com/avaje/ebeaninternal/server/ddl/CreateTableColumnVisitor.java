@@ -1,8 +1,6 @@
 package com.avaje.ebeaninternal.server.ddl;
 
 import java.sql.Types;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.config.dbplatform.DbDdlSyntax;
 import com.avaje.ebean.config.dbplatform.IdType;
@@ -14,13 +12,15 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.deploy.TableJoinColumn;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used as part of CreateTableVisitor to generated the create table DDL script.
  */
 public class CreateTableColumnVisitor extends BaseTablePropertyVisitor {
 
-    private static final Logger logger = Logger.getLogger(CreateTableColumnVisitor.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(CreateTableColumnVisitor.class);
     
 	private final DdlGenContext ctx;
 
@@ -213,7 +213,7 @@ public class CreateTableColumnVisitor extends BaseTablePropertyVisitor {
     		    }
 		    } catch (Exception e){
 		        String msg = "Error determining identity on property "+p.getFullBeanName();
-		        logger.log(Level.SEVERE, msg, e);
+		        logger.error(msg, e);
 		    }
 		}
 		return false;

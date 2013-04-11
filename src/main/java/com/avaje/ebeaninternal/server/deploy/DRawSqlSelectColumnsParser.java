@@ -2,19 +2,19 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.config.NamingConvention;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Parses columnMapping (select clause) mapping columns to bean properties.
  */
 public final class DRawSqlSelectColumnsParser {
 
-	private static Logger logger = Logger.getLogger(DRawSqlSelectColumnsParser.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DRawSqlSelectColumnsParser.class);
 
 	/**
 	 * Description of how the match was made.
@@ -113,13 +113,13 @@ public final class DRawSqlSelectColumnsParser {
 			String msg = "Error in " + parent.getErrName() + ". ";
 			msg += "No matching bean property for column[" + colName + "] columnLabel[" + colLabel
 					+ "] idx[" + columnIndex + "] using search[" + searchColumn + "] found?";
-			logger.log(Level.SEVERE, msg);
+			logger.error(msg);
 
 		} else {
 			
 			
 			String msg = null;
-			if (debug || logger.isLoggable(Level.FINE)) {
+			if (debug || logger.isDebugEnabled()) {
 				msg = "ColumnMapping ... idx[" + columnIndex + "] match column[" + colName
 						+ "] label[" + colLabel + "] to property[" + prop + "]"
 						+ matchDescription;
@@ -127,8 +127,8 @@ public final class DRawSqlSelectColumnsParser {
 			if (debug) {
 				parent.debug(msg);
 			}
-			if (logger.isLoggable(Level.FINE)) {
-				logger.fine(msg);
+			if (logger.isDebugEnabled()) {
+				logger.debug(msg);
 			}
 
 			DRawSqlColumnInfo info = new DRawSqlColumnInfo(colName, colLabel, prop.getName(), prop.isScalar());
@@ -150,7 +150,7 @@ public final class DRawSqlSelectColumnsParser {
 
 		String msg = "sql-select trimming quoted identifier from[" 
 					+ columnLabel + "] to[" + result+ "]";
-		logger.fine(msg);
+		logger.debug(msg);
 
 		return result;
 	}

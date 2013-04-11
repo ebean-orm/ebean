@@ -1,9 +1,10 @@
 package com.avaje.ebeaninternal.server.lib;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A general background thread that runs registered tasks periodically.
@@ -26,9 +27,9 @@ import java.util.logging.Logger;
  */
 public final class BackgroundThread {
 
-	private static final Logger logger = Logger.getLogger(BackgroundThread.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(BackgroundThread.class);
 
-    private static final BackgroundThread me = new BackgroundThread();
+  private static final BackgroundThread me = new BackgroundThread();
 
 	/**
 	 * The list of Runnable tasks.
@@ -154,7 +155,7 @@ public final class BackgroundThread {
 					}
 
 				} catch (InterruptedException e) {
-					logger.log(Level.SEVERE, null, e);
+					logger.error(null, e);
 				}
 			}
 
@@ -180,10 +181,10 @@ public final class BackgroundThread {
 						Runnable runable = bgr.getRunnable();
 						if (bgr.runNow(startTime)){
 							bgr.runStart();
-							if (logger.isLoggable(Level.FINER)) {
+							if (logger.isTraceEnabled()) {
 								String msg = count + " BGRunnable running ["
 										+ runable.getClass().getName() + "]";
-								logger.finer(msg);
+								logger.trace(msg);
 							}
 	
 							runable.run();

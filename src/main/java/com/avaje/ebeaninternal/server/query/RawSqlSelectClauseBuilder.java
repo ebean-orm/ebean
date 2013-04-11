@@ -1,8 +1,5 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
@@ -16,6 +13,8 @@ import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.DeployParser;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Factory for SqlSelectClause based on raw sql.
@@ -26,7 +25,7 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
  */
 public class RawSqlSelectClauseBuilder {
 
-    private static final Logger logger = Logger.getLogger(RawSqlSelectClauseBuilder.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(RawSqlSelectClauseBuilder.class);
 
     private final Binder binder;
 
@@ -92,7 +91,7 @@ public class RawSqlSelectClauseBuilder {
         } catch (Exception e) {
 
             String msg = "Error with " + desc.getFullName() + " query:\r" + sql;
-            logger.log(Level.SEVERE, msg);
+            logger.error(msg);
             throw new PersistenceException(e);
         }
     }

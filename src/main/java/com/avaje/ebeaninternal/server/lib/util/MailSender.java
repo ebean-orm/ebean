@@ -1,5 +1,8 @@
 package com.avaje.ebeaninternal.server.lib.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,15 +11,13 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Sends simple MailMessages via smtp. 
  */
 public class MailSender implements Runnable {
     
-	private static final Logger logger = Logger.getLogger(MailSender.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(MailSender.class);
 	
     int traceLevel = 0;
     
@@ -86,7 +87,7 @@ public class MailSender implements Runnable {
                 MailEvent event = new MailEvent(message, ex);
                 listener.handleEvent(event);
             } else {
-            	logger.log(Level.SEVERE, null, ex);
+            	logger.error(null, ex);
             }
         }
     }
@@ -115,7 +116,7 @@ public class MailSender implements Runnable {
             in = new BufferedReader(new InputStreamReader(sserver.getInputStream()));
             String sintro = readln();
             if (!sintro.startsWith("220")) { // 220
-            	logger.fine("SmtpSender: intro==" + sintro);
+            	logger.debug("SmtpSender: intro==" + sintro);
                 return;
             }
 
@@ -138,7 +139,7 @@ public class MailSender implements Runnable {
                 if (line.startsWith("3"))
                     break; // ready to send
                 if (!line.startsWith("2")) {
-                    logger.fine("SmtpSender.send reponse to DATA: " + line);
+                    logger.debug("SmtpSender.send reponse to DATA: " + line);
                     return;
                 }
             }
@@ -173,7 +174,7 @@ public class MailSender implements Runnable {
 
     private void writeln(String s) throws IOException {
         if (traceLevel > 2){
-            logger.fine("From client: " + s);
+            logger.debug("From client: " + s);
         }
         out.write(s + "\r\n");
         out.flush();
@@ -182,7 +183,7 @@ public class MailSender implements Runnable {
     private String readln() throws IOException {
         String line = in.readLine();
         if (traceLevel > 1){
-            logger.fine("From server: " + line);
+            logger.debug("From server: " + line);
         }
         return line;
     }

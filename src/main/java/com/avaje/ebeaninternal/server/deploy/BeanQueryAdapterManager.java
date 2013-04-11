@@ -1,18 +1,19 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation for creating BeanControllers.
  */
 public class BeanQueryAdapterManager {
 
-	private static final Logger logger = Logger.getLogger(BeanQueryAdapterManager.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(BeanQueryAdapterManager.class);
 
     private final List<BeanQueryAdapter> list;
     
@@ -33,7 +34,7 @@ public class BeanQueryAdapterManager {
 		for (int i = 0; i < list.size(); i++) {
 			BeanQueryAdapter c = list.get(i);
 			if (c.isRegisterFor(deployDesc.getBeanType())){
-				logger.fine("BeanQueryAdapter on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
+				logger.debug("BeanQueryAdapter on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
 				deployDesc.addQueryAdapter(c);
 			}
 		}		

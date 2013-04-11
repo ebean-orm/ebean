@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
@@ -23,6 +21,8 @@ import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages transactions.
@@ -33,7 +33,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
  */
 public class TransactionManager {
 
-	private static final Logger logger = Logger.getLogger(TransactionManager.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
 	
 	/**
 	 * The behaviour desired when ending a query only transaction.
@@ -217,7 +217,7 @@ public class TransactionManager {
 					c.close();
 				}
 			} catch (SQLException ex) {
-				logger.log(Level.SEVERE, "closing connection", ex);
+				logger.error("closing connection", ex);
 			}
 		}
 	}
@@ -326,7 +326,7 @@ public class TransactionManager {
 		      c.close();
 		    }
 		  } catch (SQLException e) {
-		    logger.log(Level.SEVERE,"Error closing failed connection", e);
+		    logger.error("Error closing failed connection", e);
 		  }
 			throw new PersistenceException(ex);
 		}
@@ -359,7 +359,7 @@ public class TransactionManager {
           c.close();
         }
       } catch (SQLException e) {
-        logger.log(Level.SEVERE,"Error closing failed connection", e);
+        logger.error("Error closing failed connection", e);
       }
       throw ex;
       
@@ -396,7 +396,7 @@ public class TransactionManager {
 			log(transaction.getLogBuffer());
 		} catch (Exception ex) {
 			String m = "Potentially Transaction Log incomplete due to error:";
-			logger.log(Level.SEVERE, m, ex);
+			logger.error(m, ex);
 		}
 	}
 
@@ -427,7 +427,7 @@ public class TransactionManager {
 			
 		} catch (Exception ex) {
 			String m = "Potentially Transaction Log incomplete due to error:";
-			logger.log(Level.SEVERE, m, ex);
+			logger.error(m, ex);
 		}
 	}
 		
@@ -482,7 +482,7 @@ public class TransactionManager {
 			}
 		} catch (Exception ex) {
 			String m = "NotifyOfCommit failed. Cache/Lucene potentially not notified.";
-			logger.log(Level.SEVERE, m, ex);
+			logger.error(m, ex);
 		}
 	}
 	
@@ -515,7 +515,7 @@ public class TransactionManager {
      */
 	public void remoteTransactionEvent(RemoteTransactionEvent remoteEvent) {
         
-        if (clusterDebugLevel > 0 || logger.isLoggable(Level.FINE)){
+        if (clusterDebugLevel > 0 || logger.isDebugEnabled()){
             logger.info("Cluster Received: "+remoteEvent.toString());
         }
 

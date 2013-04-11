@@ -1,13 +1,12 @@
 package com.avaje.ebeaninternal.server.transaction.log;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.server.transaction.TransactionLogBuffer;
 import com.avaje.ebeaninternal.server.transaction.TransactionLogBuffer.LogEntry;
 import com.avaje.ebeaninternal.server.transaction.TransactionLogWriter;
+import java.util.logging.Logger;
 
 /**
  * A transactionLogger that uses a java.util.logging.Logger.
@@ -17,9 +16,8 @@ import com.avaje.ebeaninternal.server.transaction.TransactionLogWriter;
  * @author rbygrave
  */
 public class JuliTransactionLogger implements TransactionLogWriter {
+  private static final Logger logger = Logger.getLogger(JuliTransactionLogger.class.getName());
 
-	private static Logger logger = Logger.getLogger(JuliTransactionLogger.class.getName());
-	
 	public void log(TransactionLogBuffer logBuffer) {
      
 	    String txnId = logBuffer.getTransactionId();
@@ -41,7 +39,7 @@ public class JuliTransactionLogger implements TransactionLogWriter {
 			message = "Trans["+txnId+"] "+message;
 		}
 		
-		logger.log(Level.INFO, message);
+		logger.info(message);
 	}
 
 	

@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.FutureTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.bean.BeanCollection;
@@ -28,13 +26,15 @@ import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
 import com.avaje.ebeaninternal.server.type.RsetDataReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Executes the select row count query.
  */
 public class CQueryFetchIds {
 
-	private static final Logger logger = Logger.getLogger(CQueryFetchIds.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(CQueryFetchIds.class);
 
 	/**
 	 * The overall find request wrapper object.
@@ -236,7 +236,7 @@ public class CQueryFetchIds {
 			    dataReader = null;
 			}
 		} catch (SQLException e) {
-			logger.log(Level.SEVERE, null, e);
+			logger.error(null, e);
 		}
 		try {
 			if (pstmt != null) {
@@ -244,7 +244,7 @@ public class CQueryFetchIds {
 				pstmt = null;
 			}
 		} catch (SQLException e) {
-			logger.log(Level.SEVERE, null, e);
+			logger.error(null, e);
 		}
 	}
 

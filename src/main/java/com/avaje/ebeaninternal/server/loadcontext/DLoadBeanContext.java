@@ -2,8 +2,6 @@ package com.avaje.ebeaninternal.server.loadcontext;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.bean.BeanLoader;
 import com.avaje.ebean.bean.EntityBean;
@@ -17,6 +15,8 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of LoadBeanContext.
@@ -24,7 +24,7 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
  */
 public class DLoadBeanContext implements LoadBeanContext, BeanLoader {
 
-	private static final Logger logger = Logger.getLogger(DLoadBeanContext.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DLoadBeanContext.class);
 	
 	protected final DLoadContext parent;
 
@@ -129,8 +129,8 @@ public class DLoadBeanContext implements LoadBeanContext, BeanLoader {
 	  }
     // we loaded the bean from cache
     weakList.removeEntry(position);
-    if (logger.isLoggable(Level.FINEST)) {
-      logger.log(Level.FINEST, "Loading path:" + fullPath + " - bean loaded from L2 cache, position[" + position + "]");
+    if (logger.isTraceEnabled()) {
+      logger.trace("Loading path:" + fullPath + " - bean loaded from L2 cache, position[" + position + "]");
     }
     return true;
 	}
@@ -160,7 +160,7 @@ public class DLoadBeanContext implements LoadBeanContext, BeanLoader {
     try {
       batch = weakList.getLoadBatch(position, batchSize);
     } catch (IllegalStateException e) {
-      logger.log(Level.SEVERE, "type["+desc.getFullName()+"] fullPath[" + fullPath + "] batchSize["+batchSize+"]", e);
+      logger.error("type[" + desc.getFullName() + "] fullPath[" + fullPath + "] batchSize[" + batchSize + "]", e);
     }
     
     if (hitCache && batchSize > 1) {
@@ -169,14 +169,14 @@ public class DLoadBeanContext implements LoadBeanContext, BeanLoader {
       batch = loadBeanCheckBatch(batch);
     }
 
-    if (logger.isLoggable(Level.FINER)) {
+    if (logger.isTraceEnabled()) {
       for (int i = 0; i < batch.size(); i++) {
         
         EntityBeanIntercept entityBeanIntercept = batch.get(i);
         EntityBean owner = entityBeanIntercept.getOwner();
         Object id = desc.getId(owner);
         
-        logger.finer("LoadBean type["+owner.getClass().getName()+"] fullPath["+fullPath+"] id["+id+"] batchIndex["+i+"] beanLoaderIndex["+entityBeanIntercept.getBeanLoaderIndex()+"]");
+        logger.trace("LoadBean type["+owner.getClass().getName()+"] fullPath["+fullPath+"] id["+id+"] batchIndex["+i+"] beanLoaderIndex["+entityBeanIntercept.getBeanLoaderIndex()+"]");
       }
     }
     
@@ -204,8 +204,8 @@ public class DLoadBeanContext implements LoadBeanContext, BeanLoader {
           actualLoadBatch.add(batchToCheck.get(i));
         } else {
           loadedFromCache++;
-          if (logger.isLoggable(Level.FINEST)) {
-            logger.log(Level.FINEST, "Loading path:" + fullPath + " - bean loaded from L2 cache(batch)");
+          if (logger.isTraceEnabled()) {
+            logger.trace( "Loading path:" + fullPath + " - bean loaded from L2 cache(batch)");
           }
         } 
       }
@@ -231,16 +231,16 @@ public class DLoadBeanContext implements LoadBeanContext, BeanLoader {
         List<EntityBeanIntercept> batch = weakList.getNextBatch(requestedBatchSize);
         if (batch.size() == 0) {
           // there are no beans to load
-          if (logger.isLoggable(Level.FINEST)) {
-            logger.log(Level.FINEST, "Loading path:" + fullPath + " - no more beans to load");
+          if (logger.isTraceEnabled()) {
+            logger.trace("Loading path:" + fullPath + " - no more beans to load");
           }
           return;
         }
         boolean loadCache = false;
         LoadBeanRequest req = new LoadBeanRequest(this, batch, parentRequest.getTransaction(), requestedBatchSize, false, null, loadCache);
 
-        if (logger.isLoggable(Level.FINEST)) {
-          logger.log(Level.FINEST, "Loading path:" + fullPath + " - secondary query batch load [" + batch.size() + "] beans");
+        if (logger.isTraceEnabled()) {
+          logger.trace("Loading path:" + fullPath + " - secondary query batch load [" + batch.size() + "] beans");
         }
 
         parent.getEbeanServer().loadBean(req);

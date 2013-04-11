@@ -1,8 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -16,13 +14,15 @@ import com.avaje.ebeaninternal.server.deploy.id.ImportedIdSimple;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base for properties mapped to an associated bean, list, set or map.
  */
 public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
-	private static final Logger logger = Logger.getLogger(BeanPropertyAssoc.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(BeanPropertyAssoc.class);
 
 	/**
 	 * The descriptor of the target. This MUST be initialised after construction
@@ -326,7 +326,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 				// simple single scalar id
 				if (cols.length != 1){
 					String msg = "No Imported Id column for ["+props[0]+"] in table ["+join.getTable()+"]";
-					logger.log(Level.SEVERE, msg);
+					logger.error(msg);
 					return null;
 				} else {
 					return createImportedScalar(owner, cols[0], props, others);

@@ -1,8 +1,5 @@
 package com.avaje.ebeaninternal.server.transaction;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceException;
@@ -20,6 +17,8 @@ import javax.transaction.UserTransaction;
 import com.avaje.ebean.LogLevel;
 import com.avaje.ebean.config.ExternalTransactionManager;
 import com.avaje.ebeaninternal.api.SpiTransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Hook into external JTA transaction manager.
@@ -28,7 +27,7 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
  */
 public class JtaTransactionManager implements ExternalTransactionManager {
 
-    private final static Logger logger = Logger.getLogger(JtaTransactionManager.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(JtaTransactionManager.class);
 
     private static final String EBEAN_TXN_RESOURCE = "EBEAN_TXN_RESOURCE";
     
@@ -106,15 +105,15 @@ public class JtaTransactionManager implements ExternalTransactionManager {
         if (currentEbeanTransaction != null){
             // NOT expecting this so log WARNING
             String msg = "JTA Transaction - no current txn BUT using current Ebean one "+currentEbeanTransaction.getId();
-            logger.log(Level.WARNING, msg);
+            logger.warn(msg);
             return currentEbeanTransaction;
         } 
         
         UserTransaction ut = getUserTransaction();
         if (ut == null){
             // no current JTA transaction
-            if (logger.isLoggable(Level.FINE)){
-                logger.fine("JTA Transaction - no current txn");
+            if (logger.isDebugEnabled()){
+                logger.debug("JTA Transaction - no current txn");
             }
             return null;
         }
@@ -203,8 +202,8 @@ public class JtaTransactionManager implements ExternalTransactionManager {
             
             switch (status) {
             case Status.STATUS_COMMITTED:
-                if (logger.isLoggable(Level.FINE)){
-                    logger.fine("Jta Txn ["+transaction.getId()+"] committed");                    
+                if (logger.isDebugEnabled()){
+                    logger.debug("Jta Txn ["+transaction.getId()+"] committed");
                 }
                 transactionManager.notifyOfCommit(transaction);
                 // Remove this transaction object as it is completed
@@ -212,8 +211,8 @@ public class JtaTransactionManager implements ExternalTransactionManager {
                 break;
                 
             case Status.STATUS_ROLLEDBACK:
-                if (logger.isLoggable(Level.FINE)){
-                    logger.fine("Jta Txn ["+transaction.getId()+"] rollback");                    
+                if (logger.isDebugEnabled()){
+                    logger.debug("Jta Txn ["+transaction.getId()+"] rollback");
                 }
                 transactionManager.notifyOfRollback(transaction, null);
                 // Remove this transaction object as it is completed
@@ -221,7 +220,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
                 break;
                 
             default:
-                logger.fine("Jta Txn ["+transaction.getId()+"] status:"+status);                    
+                logger.debug("Jta Txn ["+transaction.getId()+"] status:"+status);
             }
             
         }

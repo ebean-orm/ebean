@@ -8,8 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
@@ -21,13 +19,15 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager.OnQueryOnly;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JDBC Connection based transaction.
  */
 public class JdbcTransaction implements SpiTransaction {
 
-  private static final Logger logger = Logger.getLogger(JdbcTransaction.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(JdbcTransaction.class);
 
   private static final String illegalStateMessage = "Transaction is Inactive";
 
@@ -517,7 +517,7 @@ public class JdbcTransaction implements SpiTransaction {
         connection.setReadOnly(false);
       }
     } catch (SQLException e) {
-      logger.log(Level.SEVERE, "Error setting to readOnly?", e);
+      logger.error("Error setting to readOnly?", e);
     }
     try {
       if (this.autoCommit) {
@@ -525,14 +525,14 @@ public class JdbcTransaction implements SpiTransaction {
         connection.setAutoCommit(true);
       }
     } catch (SQLException e) {
-      logger.log(Level.SEVERE, "Error setting to readOnly?", e);
+      logger.error("Error setting to readOnly?", e);
     }
     try {
       connection.close();
     } catch (Exception ex) {
       // the connection pool will automatically remove the
       // connection if it does not pass the test
-      logger.log(Level.SEVERE, "Error closing connection", ex);
+      logger.error("Error closing connection", ex);
     }
     connection = null;
     active = false;
@@ -581,7 +581,7 @@ public class JdbcTransaction implements SpiTransaction {
       }
     } catch (SQLException e) {
       String m = "Error when ending a query only transaction via " + onQueryOnly;
-      logger.log(Level.SEVERE, m, e);
+      logger.error(m, e);
     }
   }
 

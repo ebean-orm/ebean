@@ -1,11 +1,13 @@
 package com.avaje.ebeaninternal.server.cluster.mcast;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 /**
  * For Incoming Packets remembers the packets we have received and processed.
@@ -89,7 +91,7 @@ public class IncomingPacketsProcessed {
      */
     public static class GotAllPoint {
 
-        private static final Logger logger = Logger.getLogger(GotAllPoint.class.getName());
+        private static final Logger logger = LoggerFactory.getLogger(GotAllPoint.class);
         
         private final String memberKey;
         private final int maxResendIncoming;
@@ -196,7 +198,7 @@ public class IncomingPacketsProcessed {
                 int i = resendCount.intValue() + 1;
                 if (i > maxResendIncoming){
                     // we are going to give up trying to get this packet now
-                    logger.warning("Exceeded maxResendIncoming["+maxResendIncoming+"] for packet["+packetId+"]. Giving up on requesting it.");
+                    logger.warn("Exceeded maxResendIncoming["+maxResendIncoming+"] for packet["+packetId+"]. Giving up on requesting it.");
                     resendCountMap.remove(packetId);
                     outOfOrderList.add(packetId);
                     return false;

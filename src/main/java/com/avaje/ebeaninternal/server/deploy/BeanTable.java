@@ -1,13 +1,12 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanTable;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -21,7 +20,7 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
  */
 public class BeanTable {
 
-	private static final Logger logger = Logger.getLogger(BeanTable.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(BeanTable.class);
 	
     private final Class<?> beanType;
 
@@ -106,7 +105,7 @@ public class BeanTable {
 	    			// just to copy the column name rather than prefix with the foreignKeyPrefix. 
     				// I think that with complex keys this is the more common approach.
 	    			String msg = "On table["+baseTable+"] foreign key column ["+lc+"]";
-	    			logger.log(Level.FINE, msg);
+	    			logger.debug(msg);
 	    			fk = lc;
     			}
     		} 

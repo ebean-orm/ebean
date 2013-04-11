@@ -2,10 +2,10 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Build a map of logical to physical names for use in Orm Updates.
@@ -13,7 +13,7 @@ import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
  */
 public class DeployUpdateMapFactory {
 
-	private static final Logger logger = Logger.getLogger(DeployUpdateMapFactory.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DeployUpdateMapFactory.class);
 	
 	/**
 	 * Build a map of logical to physical names for use in Orm Updates for a given descriptor.
@@ -43,7 +43,7 @@ public class DeployUpdateMapFactory {
 			ImportedId importedId = assocOne.getImportedId();
 			if (importedId == null){
 				String m = descriptor.getFullName()+" importedId is null for associated: "+assocOne.getFullBeanName();
-				logger.log(Level.SEVERE, m);
+				logger.error(m);
 				
 			} else if (importedId.isScalar()){
 				deployMap.put(importedId.getLogicalName(), importedId.getDbColumn());

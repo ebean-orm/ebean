@@ -1,11 +1,12 @@
 package com.avaje.ebeaninternal.server.transaction.log;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -21,7 +22,7 @@ import javax.persistence.PersistenceException;
  */
 public class SimpleLogger {
 
-	private static final Logger logger = Logger.getLogger(SimpleLogger.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(SimpleLogger.class);
 	
 	/**
 	 * Used to print stack trace.
@@ -294,7 +295,7 @@ public class SimpleLogger {
 		} else {
 			if (!f.mkdirs()) {
 				String msg = "Failed to create transaction logs directory "+dir;
-				logger.log(Level.SEVERE, msg);
+				logger.error(msg);
 			} 
 		}
 		return dir;
