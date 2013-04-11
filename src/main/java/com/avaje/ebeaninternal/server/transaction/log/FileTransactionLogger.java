@@ -7,14 +7,14 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebeaninternal.server.transaction.TransactionLogBuffer;
 import com.avaje.ebeaninternal.server.transaction.TransactionLogBuffer.LogEntry;
 import com.avaje.ebeaninternal.server.transaction.TransactionLogWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default transaction logger implementation.
@@ -30,7 +30,7 @@ import com.avaje.ebeaninternal.server.transaction.TransactionLogWriter;
  */
 public class FileTransactionLogger implements Runnable, TransactionLogWriter {
 
-  private static final Logger logger = Logger.getLogger(FileTransactionLogger.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(FileTransactionLogger.class);
 
   /**
    * Used to print stack trace.
@@ -158,17 +158,17 @@ public class FileTransactionLogger implements Runnable, TransactionLogWriter {
       try {
         // wait max 20 seconds
         logWriterThread.wait(20000);
-        logger.fine("Shutdown LogBufferWriter " + threadName + " shutdownComplete:" + shutdownComplete);
+        logger.debug("Shutdown LogBufferWriter " + threadName + " shutdownComplete:" + shutdownComplete);
 
       } catch (InterruptedException e) {
-        logger.fine("InterruptedException:" + e);
+        logger.debug("InterruptedException:" + e);
       }
     }
 
     if (!shutdownComplete) {
       String m = "WARNING: Shutdown of LogBufferWriter " + threadName + " not completed.";
       System.err.println(m);
-      logger.warning(m);
+      logger.warn(m);
     }
 
   }
@@ -186,7 +186,7 @@ public class FileTransactionLogger implements Runnable, TransactionLogWriter {
         try {
           Thread.sleep(20);
         } catch (InterruptedException e) {
-          logger.log(Level.INFO, "Interrupted TxnLogBufferWriter", e);
+          logger.info("Interrupted TxnLogBufferWriter", e);
         }
       }
       synchronized (queueMonitor) {
@@ -345,7 +345,7 @@ public class FileTransactionLogger implements Runnable, TransactionLogWriter {
 
     } catch (IOException e) {
       e.printStackTrace();
-      logger.log(Level.SEVERE, "Error switch log file", e);
+      logger.error("Error switch log file", e);
     }
   }
 
@@ -373,7 +373,7 @@ public class FileTransactionLogger implements Runnable, TransactionLogWriter {
     } else {
       if (!f.mkdirs()) {
         String msg = "Failed to create transaction logs directory " + dir;
-        logger.log(Level.SEVERE, msg);
+        logger.error(msg);
       }
     }
     return dir;

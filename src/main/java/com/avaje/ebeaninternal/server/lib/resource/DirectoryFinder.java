@@ -1,8 +1,9 @@
 package com.avaje.ebeaninternal.server.lib.resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Helper object used to find directories typically from the current working
@@ -10,7 +11,7 @@ import java.util.logging.Logger;
  */
 public class DirectoryFinder {
 
-	private static final Logger logger = Logger.getLogger(DirectoryFinder.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DirectoryFinder.class);
 	
 	/**
 	 * Find a directory by search through subdirectories.
@@ -98,8 +99,8 @@ public class DirectoryFinder {
 			return true;
 		}
 		File sub = new File(f, matchSub);
-		if (logger.isLoggable(Level.FINEST)){
-			logger.finest("search; " + f.getPath());
+		if (logger.isTraceEnabled()){
+			logger.trace("search; " + f.getPath());
 		}
 		return sub.exists();
 

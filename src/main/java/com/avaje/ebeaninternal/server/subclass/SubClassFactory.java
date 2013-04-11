@@ -2,14 +2,14 @@ package com.avaje.ebeaninternal.server.subclass;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.enhance.agent.ClassPathClassBytesReader;
 import com.avaje.ebean.enhance.agent.EnhanceConstants;
 import com.avaje.ebean.enhance.agent.EnhanceContext;
 import com.avaje.ebean.enhance.asm.ClassReader;
 import com.avaje.ebean.enhance.asm.ClassWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates Classes that implement EntityBean for a given normal bean Class.
@@ -21,7 +21,7 @@ import com.avaje.ebean.enhance.asm.ClassWriter;
  */
 public class SubClassFactory extends ClassLoader implements EnhanceConstants, GenSuffix {
    
-	private static final Logger logger = Logger.getLogger(SubClassFactory.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(SubClassFactory.class);
 	
 	private static final int CLASS_WRITER_FLAGS = ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS;
 
@@ -68,12 +68,12 @@ public class SubClassFactory extends ClassLoader implements EnhanceConstants, Ge
             
         } catch (IOException ex){
         	String m = "Error creating subclass for ["+clsName+"]";
-        	logger.log(Level.SEVERE, m, ex);
+        	logger.error(m, ex);
             throw ex;
             
         } catch (Throwable ex){
         	String m = "Error creating subclass for ["+clsName+"]";
-        	logger.log(Level.SEVERE, m, ex);
+        	logger.error(m, ex);
         	throw new RuntimeException(ex);
         }
     }

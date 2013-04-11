@@ -1,17 +1,17 @@
 package com.avaje.ebeaninternal.server.ddl;
 
-import java.util.logging.Logger;
-
 import com.avaje.ebean.config.dbplatform.DbDdlSyntax;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used to generate the drop table DDL script.
  */
 public class DropSequenceVisitor implements BeanVisitor {
 
-	private static final Logger logger = Logger.getLogger(DropSequenceVisitor.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DropSequenceVisitor.class);
 	
 	private final DdlGenContext ctx;
 	
@@ -37,7 +37,7 @@ public class DropSequenceVisitor implements BeanVisitor {
 				// Hopefully a generic test case
 				String msg = "Not dropping sequence "+descriptor.getSequenceName()+" on Bean "+descriptor.getName()
 					+" as DatabasePlatform does not support sequences";
-				logger.finer(msg);
+				logger.trace(msg);
 				return false;
 			} 
 			

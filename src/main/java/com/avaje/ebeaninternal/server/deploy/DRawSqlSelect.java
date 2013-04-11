@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -16,13 +14,15 @@ import com.avaje.ebeaninternal.server.query.SqlTree;
 import com.avaje.ebeaninternal.server.query.SqlTreeNode;
 import com.avaje.ebeaninternal.server.query.SqlTreeNodeRoot;
 import com.avaje.ebeaninternal.server.query.SqlTreeProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a SqlSelect raw sql query.
  */
 public class DRawSqlSelect {
 
-	private static final Logger logger = Logger.getLogger(DRawSqlSelect.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DRawSqlSelect.class);
 
 	private final BeanDescriptor<?> desc;
 	
@@ -152,7 +152,7 @@ public class DRawSqlSelect {
 				String m = "Mapping for " + desc.getFullName();
 				m += " query["+name+"] column[" + columnInfo + "] index[" + i;
 				m += "] not matched to bean property?";
-				logger.log(Level.SEVERE, m);
+				logger.error(m);
 			}
 		}
 

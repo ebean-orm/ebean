@@ -12,8 +12,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
 import com.avaje.ebean.config.GlobalProperties;
@@ -22,6 +20,8 @@ import com.avaje.ebeaninternal.server.lib.util.Dnode;
 import com.avaje.ebeaninternal.server.lib.util.DnodeReader;
 import com.avaje.ebeaninternal.server.util.ClassPathReader;
 import com.avaje.ebeaninternal.server.util.DefaultClassPathReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used to read the orm.xml and ebean-orm.xml configuration files.
@@ -30,7 +30,7 @@ import com.avaje.ebeaninternal.server.util.DefaultClassPathReader;
  */
 public class XmlConfigLoader {
 
-    private static final Logger logger = Logger.getLogger(XmlConfigLoader.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(XmlConfigLoader.class);
     
     private final ClassPathReader classPathReader;
 
@@ -93,7 +93,7 @@ public class XmlConfigLoader {
                 } else {
                     // this is not expected
                     String msg = "Not a Jar or Directory? " + classPath.getAbsolutePath();
-                    logger.log(Level.SEVERE, msg);
+                    logger.error(msg);
                 }
 
             } catch (UnsupportedEncodingException e) {

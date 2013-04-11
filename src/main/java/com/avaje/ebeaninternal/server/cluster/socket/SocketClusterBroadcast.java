@@ -5,8 +5,6 @@ import java.io.InterruptedIOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -18,13 +16,15 @@ import com.avaje.ebeaninternal.server.cluster.DataHolder;
 import com.avaje.ebeaninternal.server.cluster.SerialiseTransactionHelper;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Broadcast messages across the cluster using sockets. 
  */
 public class SocketClusterBroadcast implements ClusterBroadcast {
 
-	private static final Logger logger = Logger.getLogger(SocketClusterBroadcast.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(SocketClusterBroadcast.class);
 	
 	private final SocketClient local;
     
@@ -133,11 +133,11 @@ public class SocketClusterBroadcast implements ClusterBroadcast {
             client.send(msg);
             
         } catch (Exception ex){
-            logger.log(Level.SEVERE, "Error sending message", ex);
+            logger.error("Error sending message", ex);
             try {
                 client.reconnect();
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "Error trying to reconnect", ex);
+                logger.error("Error trying to reconnect", ex);
             }
         }
     }
@@ -154,7 +154,7 @@ public class SocketClusterBroadcast implements ClusterBroadcast {
             broadcast(msg);
     	} catch (Exception e){
     	    String msg = "Error sending RemoteTransactionEvent "+remoteTransEvent+" to cluster members.";
-    	    logger.log(Level.SEVERE, msg, e);
+    	    logger.error(msg, e);
     	}
     }
 
@@ -204,11 +204,11 @@ public class SocketClusterBroadcast implements ClusterBroadcast {
             }
         } catch (InterruptedIOException e) {
             String msg = "Timeout waiting for message";
-            logger.log(Level.INFO, msg, e);
+            logger.info(msg, e);
             try {
                 request.disconnect();
             } catch (IOException ex){
-                logger.log(Level.INFO, "Error disconnecting after timeout", ex);    
+                logger.info("Error disconnecting after timeout", ex);
             }
             return true;
         }

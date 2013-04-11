@@ -1,11 +1,11 @@
 package com.avaje.ebeaninternal.server.jmx;
 
-import java.util.logging.Logger;
-
 import com.avaje.ebean.AdminAutofetch;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.config.AutofetchMode;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the AutoFetchControl.
@@ -16,7 +16,7 @@ import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
  */
 public class MAdminAutofetch implements MAdminAutofetchMBean, AdminAutofetch {
 
-	final Logger logger = Logger.getLogger(MAdminAutofetch.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(MAdminAutofetch.class);
 
 	final AutoFetchManager autoFetchManager;
 

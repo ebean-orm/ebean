@@ -6,10 +6,10 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.server.cluster.Packet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handles the sending of Packets via DatagramPacket.
@@ -18,7 +18,7 @@ import com.avaje.ebeaninternal.server.cluster.Packet;
  */
 public class McastSender {
 
-    private static final Logger logger = Logger.getLogger(McastSender.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(McastSender.class);
 
     private final int port;
 
@@ -86,12 +86,12 @@ public class McastSender {
 
         byte[] pktBytes = packet.getBytes();
 
-        if (logger.isLoggable(Level.FINE)){
-            logger.fine("OUTGOING packet: " + packet.getPacketId() + " size:" + pktBytes.length);
+        if (logger.isDebugEnabled()){
+            logger.debug("OUTGOING packet: " + packet.getPacketId() + " size:" + pktBytes.length);
         }
 
         if (pktBytes.length > 65507){
-            logger.warning("OUTGOING packet: " + packet.getPacketId() + " size:" + pktBytes.length
+            logger.warn("OUTGOING packet: " + packet.getPacketId() + " size:" + pktBytes.length
                     +" likely to be truncated using UDP with a MAXIMUM length of 65507");
         }
         

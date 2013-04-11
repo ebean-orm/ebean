@@ -1,11 +1,11 @@
 package com.avaje.ebeaninternal.server.query;
 
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebeaninternal.api.SpiTransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Continue the fetch using a Background thread. The client knows when this has
@@ -13,7 +13,7 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
  */
 public class BackgroundFetch implements Callable<Integer> {
 
-	private static final Logger logger = Logger.getLogger(BackgroundFetch.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(BackgroundFetch.class);
 	
 	private final CQuery<?> cquery;
     
@@ -38,14 +38,14 @@ public class BackgroundFetch implements Callable<Integer> {
         	return bc.size();
             
         } catch (Exception e) {
-        	logger.log(Level.SEVERE, null, e);
+        	logger.error(null, e);
         	return Integer.valueOf(0);
         	
         } finally {
             try {
             	cquery.close();
             } catch (Exception e) {
-            	logger.log(Level.SEVERE, null, e);
+            	logger.error(null, e);
             }
             try {
             	// we must have our own transaction for background fetching
@@ -53,7 +53,7 @@ public class BackgroundFetch implements Callable<Integer> {
             	// connection back into the connection pool.
             	transaction.rollback();
             } catch (Exception e) {
-            	logger.log(Level.SEVERE, null, e);
+            	logger.error(null, e);
             }
         }
 

@@ -4,13 +4,14 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.enhance.agent.EnhanceConstants;
 import com.avaje.ebeaninternal.api.ClassUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates and caches the dynamically generated subclasses.
@@ -21,7 +22,7 @@ import com.avaje.ebeaninternal.api.ClassUtil;
  */
 public class SubClassManager implements EnhanceConstants {
 
-    private static final Logger logger = Logger.getLogger(SubClassManager.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(SubClassManager.class);
 
 	private final ConcurrentHashMap<String,Class<?>> clzMap;
 

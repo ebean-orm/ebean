@@ -3,8 +3,6 @@ package com.avaje.ebeaninternal.server.query;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.BindParams.OrderedList;
@@ -19,6 +17,8 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
 import com.avaje.ebeaninternal.util.DefaultExpressionRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Compile Query Predicates.
@@ -33,7 +33,7 @@ import com.avaje.ebeaninternal.util.DefaultExpressionRequest;
  */
 public class CQueryPredicates {
 
-  private static final Logger logger = Logger.getLogger(CQueryPredicates.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(CQueryPredicates.class);
 
   private final Binder binder;
 
@@ -455,7 +455,7 @@ public class CQueryPredicates {
         msg += " must come before the many property [" + manyProp.getName() + "] in the orderBy.";
         msg += " Ebean has automatically modified the orderBy clause to do this.";
 
-        logger.log(Level.WARNING, msg);
+        logger.warn(msg);
       }
 
       // the id needs to come before the manyPropName

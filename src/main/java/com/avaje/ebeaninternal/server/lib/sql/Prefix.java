@@ -1,14 +1,16 @@
 package com.avaje.ebeaninternal.server.lib.sql;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Random;
-import java.util.logging.Logger;
 
 /**
  * Security mechanisim.
  */
 public class Prefix {
 
-	private static final Logger logger = Logger.getLogger(Prefix.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(Prefix.class);
 	
 	private static final int[] oa = { 50, 12, 4, 6, 8, 10, 7, 23, 45, 23, 6, 9, 12, 2, 8, 34 };
 

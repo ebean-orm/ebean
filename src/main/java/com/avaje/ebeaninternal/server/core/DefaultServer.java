@@ -13,9 +13,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.FutureTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import java.util.ServiceLoader;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -110,13 +108,15 @@ import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 import com.avaje.ebeaninternal.server.transaction.TransactionScopeManager;
 import com.avaje.ebeaninternal.util.ParamTypeHelper;
 import com.avaje.ebeaninternal.util.ParamTypeHelper.TypeInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The default server side implementation of EbeanServer.
  */
 public final class DefaultServer implements SpiEbeanServer {
 
-  private static final Logger logger = Logger.getLogger(DefaultServer.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(DefaultServer.class);
 
   private final String serverName;
 
@@ -365,7 +365,7 @@ public final class DefaultServer implements SpiEbeanServer {
       autofethcName = new ObjectName(mbeanName + ",key=AutoFetch");
     } catch (Exception e) {
       String msg = "Failed to register the JMX beans for Ebean server [" + serverName + "].";
-      logger.log(Level.SEVERE, msg, e);
+      logger.error(msg, e);
       return;
     }
 
@@ -376,7 +376,7 @@ public final class DefaultServer implements SpiEbeanServer {
     } catch (InstanceAlreadyExistsException e) {
       // tomcat webapp reloading
       String msg = "JMX beans for Ebean server [" + serverName + "] already registered. Will try unregister/register" + e.getMessage();
-      logger.log(Level.WARNING, msg);
+      logger.warn(msg);
       try {
         mbeanServer.unregisterMBean(adminName);
         mbeanServer.unregisterMBean(autofethcName);
@@ -386,11 +386,11 @@ public final class DefaultServer implements SpiEbeanServer {
 
       } catch (Exception ae) {
         String amsg = "Unable to unregister/register the JMX beans for Ebean server [" + serverName + "].";
-        logger.log(Level.SEVERE, amsg, ae);
+        logger.error(amsg, ae);
       }
     } catch (Exception e) {
       String msg = "Error registering MBean[" + mbeanName + "]";
-      logger.log(Level.SEVERE, msg, e);
+      logger.error(msg, e);
     }
   }
 
@@ -403,7 +403,7 @@ public final class DefaultServer implements SpiEbeanServer {
         }
       } catch (Exception e) {
         String msg = "Error unregistering Ebean " + mbeanName;
-        logger.log(Level.SEVERE, msg, e);
+        logger.error(msg, e);
       }
 
       // shutdown services
@@ -1088,8 +1088,8 @@ public final class DefaultServer implements SpiEbeanServer {
     if (query.selectAllForLazyLoadProperty()) {
       // we need to select all properties to ensure the lazy load property
       // was included (was not included by default or via autofetch).
-      if (logger.isLoggable(Level.FINE)) {
-        logger.log(Level.FINE, "Using selectAllForLazyLoadProperty");
+      if (logger.isDebugEnabled()) {
+        logger.debug("Using selectAllForLazyLoadProperty");
       }
     }
 
@@ -1733,7 +1733,7 @@ public final class DefaultServer implements SpiEbeanServer {
       if (loadedProps != null && !loadedProps.contains(propertyName)) {
         // skip as property is not actually loaded in this partially
         // loaded bean
-        logger.fine("Skip saveAssociation as property " + propertyName + " is not loaded");
+        logger.debug("Skip saveAssociation as property " + propertyName + " is not loaded");
         return;
       }
     }

@@ -5,14 +5,14 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.server.lib.BackgroundRunnable;
 import com.avaje.ebeaninternal.server.lib.BackgroundThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -20,7 +20,7 @@ import com.avaje.ebeaninternal.server.lib.BackgroundThread;
  */
 public class DataSourceManager implements DataSourceNotify {
 	
-	private static final Logger logger = Logger.getLogger(DataSourceManager.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DataSourceManager.class);
 	
     /**
      * An alerter that notifies when the database has problems.
@@ -76,7 +76,7 @@ public class DataSourceManager implements DataSourceNotify {
 	        BackgroundThread.add(dbChecker);
             		    
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, null, e);
+			logger.error(null, e);
 		}
 	}
 
@@ -153,7 +153,7 @@ public class DataSourceManager implements DataSourceNotify {
 					ds.shutdown();
 				} catch (DataSourceException e) {
 					// should never be thrown as the DataSources are all created...
-					logger.log(Level.SEVERE, null, e);
+					logger.error(null, e);
 				}
             }
 			if (deregisterDriver){

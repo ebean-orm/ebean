@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.subclass;
 
-import java.util.logging.Logger;
-
 import com.avaje.ebean.enhance.agent.AlreadyEnhancedException;
 import com.avaje.ebean.enhance.agent.ClassMeta;
 import com.avaje.ebean.enhance.agent.EnhanceConstants;
@@ -22,10 +20,12 @@ import com.avaje.ebean.enhance.asm.ClassVisitor;
 import com.avaje.ebean.enhance.asm.FieldVisitor;
 import com.avaje.ebean.enhance.asm.MethodVisitor;
 import com.avaje.ebean.enhance.asm.Opcodes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SubClassClassAdpater extends ClassAdapter implements EnhanceConstants {
 
-	static final Logger logger = Logger.getLogger(SubClassClassAdpater.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(SubClassClassAdpater.class);
 		
 	final EnhanceContext enhanceContext;
 	

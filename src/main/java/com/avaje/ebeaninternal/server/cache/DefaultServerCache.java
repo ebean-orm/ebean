@@ -8,14 +8,14 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.cache.ServerCacheStatistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -27,7 +27,7 @@ import com.avaje.ebean.cache.ServerCacheStatistics;
  */
 public class DefaultServerCache implements ServerCache {
 
-	private static final Logger logger = Logger.getLogger(DefaultServerCache.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DefaultServerCache.class);
 
 	private static final CacheEntryComparator comparator = new CacheEntryComparator();
 		
@@ -281,8 +281,8 @@ public class DefaultServerCache implements ServerCache {
 
 			long startTime = System.currentTimeMillis();
 			
-			if (logger.isLoggable(Level.FINER)){
-				logger.finer("trimming cache " + name);
+			if (logger.isTraceEnabled()){
+				logger.trace("trimming cache " + name);
 			}
 			
 			int trimmedByIdle = 0;
@@ -327,8 +327,8 @@ public class DefaultServerCache implements ServerCache {
 			
 			long exeTime = System.currentTimeMillis() - startTime;
 			
-			if (logger.isLoggable(Level.FINE)){
-				logger.fine("Executed trim of cache " + name + " in ["+exeTime
+			if (logger.isDebugEnabled()){
+				logger.debug("Executed trim of cache " + name + " in ["+exeTime
 					+"]millis  idle[" + trimmedByIdle + "] timeToLive[" 
 					+ trimmedByTTL + "] accessTime["
 					+ trimmedByLRU + "]");

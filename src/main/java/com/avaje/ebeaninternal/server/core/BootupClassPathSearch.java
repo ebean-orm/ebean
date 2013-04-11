@@ -2,17 +2,18 @@ package com.avaje.ebeaninternal.server.core;
 
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.server.util.ClassPathSearch;
 import com.avaje.ebeaninternal.server.util.ClassPathSearchFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Searches for interesting classes such as Entities, Embedded and ScalarTypes.
  */
 public class BootupClassPathSearch {
 
-	private static final Logger logger = Logger.getLogger(BootupClassPathSearch.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(BootupClassPathSearch.class);
 
 	private final Object monitor = new Object();
 

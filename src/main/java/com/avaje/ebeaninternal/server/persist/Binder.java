@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -15,13 +14,15 @@ import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.TypeManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Binds bean values to a PreparedStatement.
  */
 public class Binder {
 
-	private static final Logger logger = Logger.getLogger(Binder.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(Binder.class);
 
 	//private final Calendar calendar;
 
@@ -141,7 +142,7 @@ public class Binder {
 			}
 
 		} catch (SQLException ex) {
-			logger.warning(Message.msg("fetch.bind.error", "" + (dataBind.currentPos() - 1), value));
+			logger.warn(Message.msg("fetch.bind.error", "" + (dataBind.currentPos() - 1), value));
 			throw ex;
 		}
 	}

@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 
 import javax.persistence.PersistenceException;
 
@@ -180,7 +179,7 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 
 		} catch (Exception e) {
 			String msg = "Error serializing autofetch file";
-			logging.logError(Level.SEVERE, msg, e);
+			logging.logError(msg, e);
 		}
 	}
 
@@ -304,7 +303,7 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 			Thread.sleep(waitMillis);
 		} catch (InterruptedException e) {
 			String msg = "Error while sleeping after System.gc() request.";
-			logging.logError(Level.SEVERE, msg, e);
+			logging.logError(msg, e);
 			return msg;
 		}
 		return updateTunedQueryInfo();
@@ -420,7 +419,7 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
             // expected after renaming/moving an entity bean
             String msg = e.toString()+" updating autoFetch tuned query for " + beanType
                 +". It isLikely this bean has been renamed or moved";
-            logging.logError(Level.INFO, msg, null);
+            logging.logInfo(msg, null);
             statisticsMap.remove(statistics.getOrigin().getKey());
         }
 	}

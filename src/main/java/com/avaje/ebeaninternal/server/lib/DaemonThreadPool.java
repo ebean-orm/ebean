@@ -4,10 +4,10 @@ package com.avaje.ebeaninternal.server.lib;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.api.Monitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Thread Pool based on Daemon threads.
@@ -16,7 +16,7 @@ import com.avaje.ebeaninternal.api.Monitor;
  */
 public final class DaemonThreadPool extends ThreadPoolExecutor {
 
-    private static final Logger logger = Logger.getLogger(DaemonThreadPool.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(DaemonThreadPool.class);
 
     private final Monitor monitor = new Monitor();
     
@@ -54,11 +54,11 @@ public final class DaemonThreadPool extends ThreadPoolExecutor {
     public void shutdown() {
         synchronized (monitor) {
             if (super.isShutdown()) {
-                logger.fine("... DaemonThreadPool["+namePrefix+"] already shut down");
+                logger.debug("... DaemonThreadPool["+namePrefix+"] already shut down");
                 return;
             }
             try {
-                logger.fine("DaemonThreadPool["+namePrefix+"] shutting down...");
+                logger.debug("DaemonThreadPool["+namePrefix+"] shutting down...");
                 super.shutdown();
                 if (!super.awaitTermination(shutdownWaitSeconds, TimeUnit.SECONDS)) {
                     logger.info("DaemonThreadPool["+namePrefix+"] shut down timeout exceeded. Terminating running threads.");
@@ -67,7 +67,7 @@ public final class DaemonThreadPool extends ThreadPoolExecutor {
 
             } catch (Exception e) {
                 String msg = "Error during shutdown of DaemonThreadPool["+namePrefix+"]";
-                logger.log(Level.SEVERE, msg, e);
+                logger.error(msg, e);
                 e.printStackTrace();
             }
         }

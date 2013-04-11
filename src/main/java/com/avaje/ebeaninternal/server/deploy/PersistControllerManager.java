@@ -1,18 +1,19 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation for creating BeanControllers.
  */
 public class PersistControllerManager {
 
-	private static final Logger logger = Logger.getLogger(PersistControllerManager.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(PersistControllerManager.class);
 
     private final List<BeanPersistController> list;
     
@@ -33,7 +34,7 @@ public class PersistControllerManager {
 		for (int i = 0; i < list.size(); i++) {
 			BeanPersistController c = list.get(i);
 			if (c.isRegisterFor(deployDesc.getBeanType())){
-				logger.fine("BeanPersistController on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
+				logger.debug("BeanPersistController on[" + deployDesc.getFullName() + "] " + c.getClass().getName());
 				deployDesc.addPersistController(c);
 			}
 		}		

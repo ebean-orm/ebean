@@ -1,9 +1,11 @@
 package com.avaje.ebeaninternal.server.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URLClassLoader;
-import java.util.logging.Logger;
 
 /**
  * Default implementation for getting the classPath from the classLoader.
@@ -13,7 +15,7 @@ import java.util.logging.Logger;
  */
 public class DefaultClassPathReader implements ClassPathReader {
 
-	private static final Logger logger = Logger.getLogger(DefaultClassPathReader.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DefaultClassPathReader.class);
 
 	public Object[] readPath(ClassLoader classLoader)  {
 
@@ -56,7 +58,7 @@ public class DefaultClassPathReader implements ClassPathReader {
 		logger.info(imsg);
 		
 		String msg = "Using java.class.path system property to search for entity beans";
-		logger.warning(msg);
+		logger.warn(msg);
 		
 		return System.getProperty("java.class.path", "").split(File.pathSeparator);
 	}

@@ -2,8 +2,6 @@ package com.avaje.ebeaninternal.server.persist;
 
 import java.sql.CallableStatement;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -14,13 +12,15 @@ import com.avaje.ebeaninternal.server.core.PersistRequestCallableSql;
 import com.avaje.ebeaninternal.server.core.PstmtBatch;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handles the execution of CallableSql requests.
  */
 public class ExeCallableSql {
 
-	private static final Logger logger = Logger.getLogger(ExeCallableSql.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(ExeCallableSql.class);
 	
     private final Binder binder;
     
@@ -68,7 +68,7 @@ public class ExeCallableSql {
                 try {
                 	cstmt.close();
                 } catch (SQLException e) {
-                	logger.log(Level.SEVERE, null, e);
+                	logger.error(null, e);
                 }
             }
         }

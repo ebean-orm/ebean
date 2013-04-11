@@ -1,8 +1,6 @@
 package com.avaje.ebeaninternal.server.cluster;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.config.GlobalProperties;
@@ -10,13 +8,15 @@ import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.server.cluster.mcast.McastClusterManager;
 import com.avaje.ebeaninternal.server.cluster.socket.SocketClusterBroadcast;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the cluster service.
  */
 public class ClusterManager {
 
-  private static final Logger logger = Logger.getLogger(ClusterManager.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(ClusterManager.class);
 
   private final ConcurrentHashMap<String, EbeanServer> serverMap = new ConcurrentHashMap<String, EbeanServer>();
 
@@ -49,7 +49,7 @@ public class ClusterManager {
 
       } catch (Exception e) {
         String msg = "Error initialising ClusterManager type [" + clusterType + "]";
-        logger.log(Level.SEVERE, msg, e);
+        logger.error(msg, e);
         throw new RuntimeException(e);
       }
     }

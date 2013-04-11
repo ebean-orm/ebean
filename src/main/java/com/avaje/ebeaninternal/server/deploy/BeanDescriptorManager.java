@@ -10,8 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
@@ -65,13 +63,15 @@ import com.avaje.ebeaninternal.server.reflect.EnhanceBeanReflectFactory;
 import com.avaje.ebeaninternal.server.subclass.SubClassManager;
 import com.avaje.ebeaninternal.server.subclass.SubClassUtil;
 import com.avaje.ebeaninternal.server.type.TypeManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Creates BeanDescriptors.
  */
 public class BeanDescriptorManager implements BeanDescriptorMap {
 
-  private static final Logger logger = Logger.getLogger(BeanDescriptorManager.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(BeanDescriptorManager.class);
 
   private static final BeanDescComparator beanDescComparator = new BeanDescComparator();
 
@@ -274,7 +274,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       deplyInfoMap = null;
     } catch (RuntimeException e) {
       String msg = "Error in deployment";
-      logger.log(Level.SEVERE, msg, e);
+      logger.error(msg, e);
       throw e;
     }
   }
@@ -410,7 +410,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     if (GlobalProperties.getBoolean("ebean.strict", true)) {
       throw new PersistenceException(msg, source);
     } else {
-      logger.log(Level.SEVERE, msg, source);
+      logger.error(msg, source);
     }
   }
 
@@ -459,8 +459,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     int lc = persistListenerManager.getRegisterCount();
     int fc = beanFinderManager.createBeanFinders(bootupClasses.getBeanFinders());
 
-    logger
-        .fine("BeanPersistControllers[" + cc + "] BeanFinders[" + fc + "] BeanPersistListeners[" + lc + "] BeanQueryAdapters[" + qa + "]");
+    logger.debug("BeanPersistControllers[" + cc + "] BeanFinders[" + fc + "] BeanPersistListeners[" + lc + "] BeanQueryAdapters[" + qa + "]");
   }
 
   /**
@@ -480,7 +479,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         String subclassEntityNames = subclassedEntities.toString();
 
         String m = "Mixing enhanced and subclassed entities. Subclassed classes:" + subclassEntityNames;
-        logger.warning(m);
+        logger.warn(m);
       }
     }
   }
@@ -507,9 +506,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     ArrayList<Class<?>> embeddedClasses = bootupClasses.getEmbeddables();
     for (int i = 0; i < embeddedClasses.size(); i++) {
       Class<?> cls = embeddedClasses.get(i);
-      if (logger.isLoggable(Level.FINER)) {
+      if (logger.isTraceEnabled()) {
         String msg = "load deployinfo for embeddable:" + cls.getName();
-        logger.finer(msg);
+        logger.trace(msg);
       }
       BeanDescriptor<?> embDesc = createEmbedded(cls);
       registerBeanDescriptor(embDesc);
@@ -764,7 +763,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
             String m = "Implicitly found mappedBy for " + targetDesc + "." + prop;
             m += " by searching for [" + searchName + "] against " + matchSet;
-            logger.fine(m);
+            logger.debug(m);
 
             return true;
           }
@@ -1000,7 +999,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     BeanFinder<T> beanFinder = beanFinderManager.getBeanFinder(beanType);
     if (beanFinder != null) {
       descriptor.setBeanFinder(beanFinder);
-      logger.fine("BeanFinder on[" + descriptor.getFullName() + "] " + beanFinder.getClass().getName());
+      logger.debug("BeanFinder on[" + descriptor.getFullName() + "] " + beanFinder.getClass().getName());
     }
   }
 
@@ -1065,7 +1064,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         // using BeanFinder so perhaps valid without an id
       } else {
         // expecting an id property
-        logger.warning(Message.msg("deploy.nouid", desc.getFullName()));
+        logger.warn(Message.msg("deploy.nouid", desc.getFullName()));
       }
       return null;
     }
@@ -1109,7 +1108,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     String seqName = desc.getIdGeneratorName();
     if (seqName != null) {
-      logger.fine("explicit sequence " + seqName + " on " + desc.getFullName());
+      logger.debug("explicit sequence " + seqName + " on " + desc.getFullName());
     } else {
       String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
       // use namingConvention to define sequence name
@@ -1266,13 +1265,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       String name = (String) namedQueryXml.getAttribute("name");
       Dnode query = namedQueryXml.find("query");
       if (query == null) {
-        logger.warning("orm.xml " + deployDesc.getFullName() + " named-query missing query element?");
+        logger.warn("orm.xml " + deployDesc.getFullName() + " named-query missing query element?");
 
       } else {
         String oql = query.getNodeContent();
         // TODO: QueryHints not read from xml yet
         if (name == null || oql == null) {
-          logger.warning("orm.xml " + deployDesc.getFullName() + " named-query has no query content?");
+          logger.warn("orm.xml " + deployDesc.getFullName() + " named-query has no query content?");
         } else {
           // add the named query
           DeployNamedQuery q = new DeployNamedQuery(name, oql, null);
@@ -1408,10 +1407,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         testBean = beanClass.newInstance();
       } catch (InstantiationException e) {
         // expected when no default constructor
-        logger.fine("no default constructor on " + beanClass + " e:" + e);
+        logger.debug("no default constructor on " + beanClass + " e:" + e);
       } catch (IllegalAccessException e) {
         // expected when no default constructor
-        logger.fine("no default constructor on " + beanClass + " e:" + e);
+        logger.debug("no default constructor on " + beanClass + " e:" + e);
       }
       if (testBean instanceof EntityBean == false) {
         checkSubclass(desc, beanClass);

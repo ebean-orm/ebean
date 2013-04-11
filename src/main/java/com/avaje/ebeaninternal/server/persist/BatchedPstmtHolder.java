@@ -1,11 +1,12 @@
 package com.avaje.ebeaninternal.server.persist;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
@@ -19,7 +20,7 @@ import javax.persistence.PersistenceException;
  */
 public class BatchedPstmtHolder {
 
-	private static final Logger logger = Logger.getLogger(BatchedPstmtHolder.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(BatchedPstmtHolder.class);
 	
 	/**
 	 * A Map of the statements using a String key. This is used so that the same
@@ -101,7 +102,7 @@ public class BatchedPstmtHolder {
 			} catch (SQLException ex) {
 	    		SQLException next = ex.getNextException();
 	    		while(next != null) {
-	    			logger.log(Level.SEVERE, "Next Exception during batch execution", next);
+	    			logger.error("Next Exception during batch execution", next);
 	    			next = next.getNextException();
 	    		}
 				
@@ -109,7 +110,7 @@ public class BatchedPstmtHolder {
 					firstError = ex;
 					errorSql = bs.getSql();
 				} else {
-		        	logger.log(Level.SEVERE, null, ex);
+		        	logger.error(null, ex);
 				}
 				isError = true;
 
@@ -118,7 +119,7 @@ public class BatchedPstmtHolder {
 					bs.close();
 				} catch (SQLException ex) {
 					// error closing PreparedStatement
-		        	logger.log(Level.SEVERE, null, ex);
+		        	logger.error(null, ex);
 				}
 			}
 		}

@@ -1,8 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
 import java.sql.Types;
-import java.util.logging.Logger;
-
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.PersistenceException;
@@ -22,13 +20,15 @@ import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.ScalarTypeEnumStandard;
 import com.avaje.ebeaninternal.server.type.SimpleAesEncryptor;
 import com.avaje.ebeaninternal.server.type.TypeManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility object to help processing deployment information.
  */
 public class DeployUtil {
 
-	private static final Logger logger = Logger.getLogger(DeployUtil.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DeployUtil.class);
 
 
 
@@ -193,7 +193,7 @@ public class DeployUtil {
 
 		} else {
 			// this is ok...
-			logger.finest("... transient property "+msg);
+			logger.trace("... transient property "+msg);
 			return null;
 		}
 	}

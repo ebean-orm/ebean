@@ -4,8 +4,6 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
@@ -24,6 +22,8 @@ import com.avaje.ebean.event.ServerConfigStartup;
 import com.avaje.ebean.event.TransactionEventListener;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.util.ClassPathSearchMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Interesting classes for a EbeanServer such as Embeddable, Entity,
@@ -31,7 +31,7 @@ import com.avaje.ebeaninternal.server.util.ClassPathSearchMatcher;
  */
 public class BootupClasses implements ClassPathSearchMatcher {
 
-    private static final Logger logger = Logger.getLogger(BootupClasses.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(BootupClasses.class);
 
     private ArrayList<Class<?>> xmlBeanList = new ArrayList<Class<?>>();
 
@@ -116,7 +116,7 @@ public class BootupClasses implements ClassPathSearchMatcher {
             	
             } catch (Exception e) {
                 String msg = "Error creating BeanQueryAdapter " + cls;
-                logger.log(Level.SEVERE, msg, e);
+                logger.error(msg, e);
             }
         }
     }
@@ -186,7 +186,7 @@ public class BootupClasses implements ClassPathSearchMatcher {
                 queryAdapterInstances.add(newInstance);
             } catch (Exception e) {
                 String msg = "Error creating BeanQueryAdapter " + cls;
-                logger.log(Level.SEVERE, msg, e);
+                logger.error(msg, e);
             }
         }
 
@@ -202,7 +202,7 @@ public class BootupClasses implements ClassPathSearchMatcher {
                 persistListenerInstances.add(newInstance);
             } catch (Exception e) {
                 String msg = "Error creating BeanPersistController " + cls;
-                logger.log(Level.SEVERE, msg, e);
+                logger.error(msg, e);
             }
         }
 
@@ -218,7 +218,7 @@ public class BootupClasses implements ClassPathSearchMatcher {
                 persistControllerInstances.add(newInstance);
             } catch (Exception e) {
                 String msg = "Error creating BeanPersistController " + cls;
-                logger.log(Level.SEVERE, msg, e);
+                logger.error(msg, e);
             }
         }
 
@@ -234,7 +234,7 @@ public class BootupClasses implements ClassPathSearchMatcher {
                 transactionEventListenerInstances.add(newInstance);
             } catch (Exception e) {
                 String msg = "Error creating TransactionEventListener " + cls;
-                logger.log(Level.SEVERE, msg, e);
+                logger.error(msg, e);
             }
         }
 

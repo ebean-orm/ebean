@@ -4,13 +4,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Continue the fetch using a Background thread. The client knows when this has
@@ -18,7 +18,7 @@ import com.avaje.ebeaninternal.server.deploy.DbReadContext;
  */
 public class BackgroundIdFetch implements Callable<Integer> {
 
-	private static final Logger logger = Logger.getLogger(BackgroundIdFetch.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(BackgroundIdFetch.class);
 	
 	private final ResultSet rset;
     
@@ -61,21 +61,21 @@ public class BackgroundIdFetch implements Callable<Integer> {
 				rowsRead++;				
 			}
         	
-        	if (logger.isLoggable(Level.INFO)){
+        	if (logger.isInfoEnabled()){
         		logger.info("BG FetchIds read:"+rowsRead+" total:"+(startSize+rowsRead));
         	}
         	
         	return rowsRead;
             
         } catch (Exception e) {
-        	logger.log(Level.SEVERE, null, e);
+        	logger.error(null, e);
         	return 0;
         	
         } finally {
             try {
             	close();
             } catch (Exception e) {
-            	logger.log(Level.SEVERE, null, e);
+            	logger.error(null, e);
             }
             try {
             	// we must have our own transaction for background fetching
@@ -83,7 +83,7 @@ public class BackgroundIdFetch implements Callable<Integer> {
             	// connection back into the connection pool.
             	transaction.rollback();
             } catch (Exception e) {
-            	logger.log(Level.SEVERE, null, e);
+            	logger.error(null, e);
             }
         }
 
@@ -95,14 +95,14 @@ public class BackgroundIdFetch implements Callable<Integer> {
 				rset.close();
 			}
 		} catch (SQLException e) {
-			logger.log(Level.SEVERE, null, e);
+			logger.error(null, e);
 		}
 		try {
 			if (pstmt != null) {
 				pstmt.close();
 			}
 		} catch (SQLException e) {
-			logger.log(Level.SEVERE, null, e);
+			logger.error(null, e);
 		}
 	}
 

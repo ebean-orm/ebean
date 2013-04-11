@@ -1,13 +1,13 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.util.logging.Logger;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Listens for webserver server starting and stopping events.
@@ -19,7 +19,7 @@ import com.avaje.ebeaninternal.server.lib.ShutdownManager;
  */
 public class ServletContextListener implements javax.servlet.ServletContextListener {
 
-    private static final Logger logger = Logger.getLogger(ServletContextListener.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ServletContextListener.class);
 
     /**
      * The servlet container is stopping.

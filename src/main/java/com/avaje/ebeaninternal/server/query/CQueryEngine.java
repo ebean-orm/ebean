@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.query;
 
 import java.sql.SQLException;
 import java.util.concurrent.FutureTask;
-import java.util.logging.Logger;
 
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.QueryIterator;
@@ -15,13 +14,15 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.jmx.MAdminLogging;
 import com.avaje.ebeaninternal.server.persist.Binder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handles the Object Relational fetching.
  */
 public class CQueryEngine {
 
-  private static final Logger logger = Logger.getLogger(CQueryEngine.class.getName());
+  private static final Logger logger = LoggerFactory.getLogger(CQueryEngine.class);
 
   private final CQueryBuilder queryBuilder;
 
@@ -66,7 +67,7 @@ public class CQueryEngine {
 
       if (!list.isFetchingInBackground() && request.getQuery().isFutureFetch()) {
         // end the transaction for futureFindIds (it had it's own one)
-        logger.fine("Future findIds completed!");
+        logger.debug("Future findIds completed!");
         request.getTransaction().end();
       }
 
@@ -100,7 +101,7 @@ public class CQueryEngine {
       }
 
       if (request.getQuery().isFutureFetch()) {
-        logger.fine("Future findRowCount completed!");
+        logger.debug("Future findRowCount completed!");
         request.getTransaction().end();
       }
 
@@ -132,7 +133,7 @@ public class CQueryEngine {
 
       if (!cquery.prepareBindExecuteQuery()) {
         // query has been cancelled already
-        logger.finest("Future fetch already cancelled");
+        logger.trace("Future fetch already cancelled");
         return null;
       }
 
@@ -173,7 +174,7 @@ public class CQueryEngine {
 
       if (!cquery.prepareBindExecuteQuery()) {
         // query has been cancelled already
-        logger.finest("Future fetch already cancelled");
+        logger.trace("Future fetch already cancelled");
         return null;
       }
 
@@ -221,7 +222,7 @@ public class CQueryEngine {
         if (request.getQuery().isFutureFetch()) {
           // end the transaction for futureFindIds
           // as it had it's own transaction
-          logger.fine("Future fetch completed!");
+          logger.debug("Future fetch completed!");
           request.getTransaction().end();
         }
       }

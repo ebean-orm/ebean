@@ -1,14 +1,15 @@
 package com.avaje.ebeaninternal.server.loadcontext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class DLoadWeakList<T> implements DLoadList<T> {
 
-	private static final Logger logger = Logger.getLogger(DLoadWeakList.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DLoadWeakList.class);
 
 	protected final ArrayList<WeakReference<T>> list = new ArrayList<WeakReference<T>>();
 
@@ -30,13 +31,13 @@ public class DLoadWeakList<T> implements DLoadList<T> {
 		synchronized (this) {
 			WeakReference<T> wref = list.get(position);
 			if (wref == null) {
-				logger.log(Level.WARNING, "removeEntry found no WeakReference for position[" + position + "]");
+				logger.warn("removeEntry found no WeakReference for position[" + position + "]");
 			} else {
 				// just set the entry to null
 				list.set(position, null);
 				T object = wref.get();
 				if (object == null) {
-					logger.log(Level.WARNING, "removeEntry found no Object held by WeakReference for position[" + position + "]");
+					logger.warn("removeEntry found no Object held by WeakReference for position[" + position + "]");
 				}
 			}
 		    if (position == removedFromTop) {
@@ -98,7 +99,7 @@ public class DLoadWeakList<T> implements DLoadList<T> {
 	    if (wref != null) {
 	    	T object = wref.get();
 	    	if (object == null) {
-	    		logger.log(Level.WARNING, "Bean is null from weak reference");
+	    		logger.warn("Bean is null from weak reference");
 	    	} else {
 	    		found = true;
 	    		batch.add(object);

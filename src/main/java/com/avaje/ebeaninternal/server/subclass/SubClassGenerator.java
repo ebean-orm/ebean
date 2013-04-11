@@ -106,9 +106,9 @@ public class SubClassGenerator {// extends ClassAdapter implements Opcodes, GenC
 //        String methodKey = name + ":" + desc;
 //
 //        if (hasSuperClass){
-//        	if (logger.isLoggable(Level.FINER)){
+//        	if (logger.isTraceEnabled()){
 //        		String msg = "existing methods "+info.getClassName()+" "+methodKey;
-//        		logger.finer(msg);
+//        		logger.trace(msg);
 //        	}
 //        }
 //        
@@ -186,7 +186,7 @@ public class SubClassGenerator {// extends ClassAdapter implements Opcodes, GenC
 //        		} else {
 //	        		String m = "Can not generate equals for ["+info.getClassName();
 //	        		m += "]. Concatinated id?";
-//	        		logger.warning(m);
+//	        		logger.warn(m);
 //        		}
 //        	} else {
 //        		        	
@@ -245,7 +245,7 @@ public class SubClassGenerator {// extends ClassAdapter implements Opcodes, GenC
 //		} else {
 //			String m = "Can not generate equals for ["+info.getClassName();
 //    		m += "] due to type of id property: "+idGetterDesc;
-//    		logger.warning(m);
+//    		logger.warn(m);
 //    		return false;
 //		}
 //    }

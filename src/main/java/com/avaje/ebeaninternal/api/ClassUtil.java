@@ -1,7 +1,8 @@
 package com.avaje.ebeaninternal.api;
 
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper to find classes taking into account the context class loader.
@@ -10,7 +11,7 @@ import java.util.logging.Logger;
  */
 public class ClassUtil {
     
-    private static final Logger logger = Logger.getLogger(ClassUtil.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ClassUtil.class);
 
     private static boolean preferContext = true;
 

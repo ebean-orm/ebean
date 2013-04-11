@@ -11,14 +11,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 
 import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebeaninternal.api.ClassUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A robust DataSource.
@@ -36,7 +36,7 @@ import com.avaje.ebeaninternal.api.ClassUtil;
  */
 public class DataSourcePool implements DataSource {
 
-    private static final Logger logger = Logger.getLogger(DataSourcePool.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(DataSourcePool.class);
 
     /**
      * The name given to this dataSource.
@@ -206,8 +206,8 @@ public class DataSourcePool implements DataSource {
     }
 
     @Override
-    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-      return logger;
+    public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
+      throw new SQLFeatureNotSupportedException("We do not support java.util.logging");
     }
 
     /**
@@ -293,7 +293,7 @@ public class DataSourcePool implements DataSource {
         if (!inWarningMode) {
             // send an Error to the event log...
             inWarningMode = true;
-            logger.warning(msg);
+            logger.warn(msg);
             if (notify != null) {
                 String subject = "DataSourcePool [" + name + "] warning";
                 notify.notifyWarning(subject, msg);
@@ -305,7 +305,7 @@ public class DataSourcePool implements DataSource {
 
         if (!dataSourceDownAlertSent) {
             String msg = "FATAL: DataSourcePool [" + name + "] is down!!!";
-            logger.log(Level.SEVERE, msg, ex);
+            logger.error(msg, ex);
             if (notify != null) {
                 notify.notifyDataSourceDown(name);
             }
@@ -321,14 +321,14 @@ public class DataSourcePool implements DataSource {
     private void notifyDataSourceIsUp() {
         if (dataSourceDownAlertSent) {
             String msg = "RESOLVED FATAL: DataSourcePool [" + name + "] is back up!";
-            logger.log(Level.SEVERE, msg);
+            logger.error(msg);
             if (notify != null) {
                 notify.notifyDataSourceUp(name);
             }
             dataSourceDownAlertSent = false;
 
         } else if (!dataSourceUp) {
-            logger.log(Level.WARNING, "DataSourcePool [" + name + "] is back up!");
+            logger.warn("DataSourcePool [" + name + "] is back up!");
         }
 
         if (!dataSourceUp) {
@@ -362,7 +362,7 @@ public class DataSourcePool implements DataSource {
                     conn.close();
                 }
             } catch (SQLException ex) {
-                logger.log(Level.WARNING, "Can't close connection in checkDataSource!");
+                logger.warn("Can't close connection in checkDataSource!");
             }
         }
     }
@@ -487,14 +487,14 @@ public class DataSourcePool implements DataSource {
                     rset.close();
                 }
             } catch (SQLException e) {
-                logger.log(Level.SEVERE, null, e);
+                logger.error(null, e);
             }
             try {
                 if (stmt != null) {
                     stmt.close();
                 }
             } catch (SQLException e) {
-                logger.log(Level.SEVERE, null, e);
+                logger.error(null, e);
             }
         }
     }
@@ -515,7 +515,7 @@ public class DataSourcePool implements DataSource {
 
         } catch (Exception e) {
             String desc = "heartbeatsql test failed on connection[" + conn.getName() + "]";
-            logger.warning(desc);
+            logger.warn(desc);
             return false;
         }
     }
@@ -806,10 +806,10 @@ public class DataSourcePool implements DataSource {
 	    try {
 	    	DriverManager.deregisterDriver(DriverManager.getDriver(this.databaseUrl));
 	    	String msg = "Deregistered the JDBC driver "+this.databaseDriver;
-	    	logger.log(Level.FINE, msg);
+	    	logger.debug(msg);
 	    } catch (SQLException e) {
 	    	String msg = "Error trying to deregister the JDBC driver "+this.databaseDriver;
-	    	logger.log(Level.WARNING, msg, e);
+	    	logger.warn(msg, e);
 	    }
     }    
 
