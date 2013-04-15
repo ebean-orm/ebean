@@ -1,6 +1,8 @@
+*.autofetch
 *.sql
 .classpath
 .project
 .settings/
 target/
 logs/
+log/
