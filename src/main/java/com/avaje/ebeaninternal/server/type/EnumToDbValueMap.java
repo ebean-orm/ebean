@@ -68,7 +68,7 @@ public abstract class EnumToDbValueMap<T> {
 	public Iterator<Object> beanValues() {
 		return valueMap.values().iterator();
 	}
-	
+
 	/**
 	 * Bind using the correct database type.
 	 */
@@ -111,7 +111,7 @@ public abstract class EnumToDbValueMap<T> {
 		}
 		T dbValue = keyMap.get(beanValue);
 		if (dbValue == null && !allowNulls) {
-			String msg = "DB value for " + beanValue + " not found in " + valueMap;
+			String msg = "DB value for " + beanValue + " not found in " + keyMap;
 			throw new IllegalArgumentException(msg);
 		}
 		return dbValue;
