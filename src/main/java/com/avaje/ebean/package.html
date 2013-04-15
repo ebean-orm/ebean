@@ -1,0 +1,87 @@
+<HTML>
+<HEAD>
+	<TITLE>Ebean core API</TITLE>
+</HEAD>
+<Body BGCOLOR="#ffffff">
+Core API (see <a href="Ebean.html">Ebean</a> and <a href="EbeanServer.html">EbeanServer</a>).
+
+<h3>Ebean</h3>
+<p>
+Provides the main API for fetching and persisting beans with eBean.
+</p>
+
+<pre class="code">
+	// EXAMPLE 1: Simple fetch
+	//========================
+
+	// fetch order 10
+	Order order = Ebean.find(Order.class, 10);
+
+
+
+	// EXAMPLE 2: Fetch an Object with associations
+	//=============================================
+	
+	// fetch Customer 7 including their billing and shipping addresses
+	Customer customer = 
+		Ebean.find(Customer.class)
+			.setId(7)
+			.fetch("billingAddress")
+			.fetch("shippingAddress")
+			.findUnique();	
+	
+	Address billAddr = customer.getBillingAddress();
+	Address shipAddr = customer.getShippingAddress();
+
+
+
+
+	// EXAMPLE 3: Create and save an Order
+	//=====================================
+	
+	// get a Customer reference so we don't hit the database
+	Customer custRef = Ebean.getReference(Customer.class, 7);
+
+	// create a new Order object
+	Order newOrder = new Order();
+	newOrder.setStatus(Order.Status.NEW);
+	newOrder.setCustomer(custRef);
+	
+	ArrayList orderLines = new ArrayList();
+	newOrder.setLines(orderLines);
+	...
+
+	// add a line to the order
+	Product prodRef = Ebean.getReference(Product.class, 41);
+	OrderLine line = new OrderLine();
+	line.setProduct(prodRef);
+	line.setQuantity(10);
+	orderLines.add(line);
+	...
+
+	// save the order and its lines in a single transaction
+	// NB: assumes CascadeType.PERSIST is set on the order lines association
+	Ebean.save(newOrder);
+
+
+
+	// EXAMPLE 4: Use another database
+	//=================================
+
+	// Get access to the Human Resources EbeanServer/Database
+	EbeanServer hrServer = Ebean.getServer(&quot;HR&quot;);
+                                        
+                                  
+	// fetch contact 3 from the HR database
+	Contact contact = hrServer.find(Contact.class, 3);
+                                        
+	contact.setStatus(Contact.Status.INACTIVE);
+	...
+                                        
+	// save the contact back to the HR database
+	hrServer.save(contact); 
+	
+</pre>
+
+</Body>
+</HTML>
