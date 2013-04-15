@@ -100,7 +100,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
 
 		if (transaction.isLogSummary()) {
 			String m = description + " table[" + tableName + "] rows["+ rowCount + "] bind[" + bindLog + "]";
-			transaction.logInternal(m);
+			transaction.logSummary(m);
 		}
 
 		if (updateSql.isAutoTableMod()) {

@@ -13,14 +13,16 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.FutureTask;
-import java.util.ServiceLoader;
+
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.persistence.PersistenceException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.AdminAutofetch;
-import com.avaje.ebean.AdminLogging;
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.CallableSql;
@@ -108,8 +110,6 @@ import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 import com.avaje.ebeaninternal.server.transaction.TransactionScopeManager;
 import com.avaje.ebeaninternal.util.ParamTypeHelper;
 import com.avaje.ebeaninternal.util.ParamTypeHelper.TypeInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The default server side implementation of EbeanServer.
@@ -121,8 +121,6 @@ public final class DefaultServer implements SpiEbeanServer {
   private final String serverName;
 
   private final DatabasePlatform databasePlatform;
-
-  private final AdminLogging adminLogging;
 
   private final AdminAutofetch adminAutofetch;
 
@@ -224,7 +222,6 @@ public final class DefaultServer implements SpiEbeanServer {
     this.queryBatchSize = config.getServerConfig().getQueryBatchSize();
     this.cqueryEngine = config.getCQueryEngine();
     this.expressionFactory = config.getExpressionFactory();
-    this.adminLogging = config.getLogControl();
     this.encryptKeyManager = config.getServerConfig().getEncryptKeyManager();
 
     this.beanDescriptorManager = config.getBeanDescriptorManager();
@@ -321,10 +318,6 @@ public final class DefaultServer implements SpiEbeanServer {
     return ddlGenerator;
   }
 
-  public AdminLogging getAdminLogging() {
-    return adminLogging;
-  }
-
   public AdminAutofetch getAdminAutofetch() {
     return adminAutofetch;
   }
@@ -358,11 +351,9 @@ public final class DefaultServer implements SpiEbeanServer {
     this.mbeanServer = mbeanServer;
     this.mbeanName = "Ebean:server=" + serverName + uniqueServerId;
 
-    ObjectName adminName;
-    ObjectName autofethcName;
+    ObjectName autofetchName;
     try {
-      adminName = new ObjectName(mbeanName + ",function=Logging");
-      autofethcName = new ObjectName(mbeanName + ",key=AutoFetch");
+      autofetchName = new ObjectName(mbeanName + ",key=AutoFetch");
     } catch (Exception e) {
       String msg = "Failed to register the JMX beans for Ebean server [" + serverName + "].";
       logger.error(msg, e);
@@ -370,19 +361,15 @@ public final class DefaultServer implements SpiEbeanServer {
     }
 
     try {
-      mbeanServer.registerMBean(adminLogging, adminName);
-      mbeanServer.registerMBean(adminAutofetch, autofethcName);
+      mbeanServer.registerMBean(adminAutofetch, autofetchName);
 
     } catch (InstanceAlreadyExistsException e) {
       // tomcat webapp reloading
       String msg = "JMX beans for Ebean server [" + serverName + "] already registered. Will try unregister/register" + e.getMessage();
       logger.warn(msg);
       try {
-        mbeanServer.unregisterMBean(adminName);
-        mbeanServer.unregisterMBean(autofethcName);
-        // re-register
-        mbeanServer.registerMBean(adminLogging, adminName);
-        mbeanServer.registerMBean(adminAutofetch, autofethcName);
+        mbeanServer.unregisterMBean(autofetchName);
+        mbeanServer.registerMBean(adminAutofetch, autofetchName);
 
       } catch (Exception ae) {
         String amsg = "Unable to unregister/register the JMX beans for Ebean server [" + serverName + "].";
@@ -398,7 +385,6 @@ public final class DefaultServer implements SpiEbeanServer {
     public void run() {
       try {
         if (mbeanServer != null) {
-          mbeanServer.unregisterMBean(new ObjectName(mbeanName + ",function=Logging"));
           mbeanServer.unregisterMBean(new ObjectName(mbeanName + ",key=AutoFetch"));
         }
       } catch (Exception e) {
@@ -672,16 +658,6 @@ public final class DefaultServer implements SpiEbeanServer {
   public Transaction createTransaction(TxIsolation isolation) {
 
     return transactionManager.createTransaction(true, isolation.getLevel());
-  }
-
-  /**
-   * Log a comment to the transaction log (of the current transaction).
-   */
-  public void logComment(String msg) {
-    Transaction t = transactionScopeManager.get();
-    if (t != null) {
-      t.log(msg);
-    }
   }
 
   public <T> T execute(TxCallable<T> c) {

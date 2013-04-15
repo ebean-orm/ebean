@@ -21,7 +21,7 @@ public class TestLogTransLogOnError extends TestCase {
         
         Transaction t  = Ebean.beginTransaction();
         try {
-            t.log("--- hello");
+            //t.log("--- hello");
             Ebean.find(Customer.class).findList();
             Ebean.find(Order.class).where().gt("id", 1).findList();
             
@@ -31,7 +31,7 @@ public class TestLogTransLogOnError extends TestCase {
             
             //Ebean.save(newBean);
             
-            t.log("--- next query should error");
+            //t.log("--- next query should error");
             List<Customer> list = Ebean.find(Customer.class)
                 .where().eq("id", "NotAnInt!!")
                 .findList();
@@ -55,7 +55,7 @@ public class TestLogTransLogOnError extends TestCase {
         
         Transaction t  = Ebean.beginTransaction();
         try {
-            t.log("--- hello testPersistError");
+            //t.log("--- hello testPersistError");
             Ebean.find(Customer.class).findList();
             
             EBasicVer newBean = new EBasicVer();
@@ -65,7 +65,7 @@ public class TestLogTransLogOnError extends TestCase {
                     +"dfjksdjflsjdflsjdflksjdfkjd fsjdfkjsdkfjsdkfjskdjfskjdf sjdf sdjflksjdfkjsdlfkjsdkfjs ");
             newBean.setName("aName");
             
-            t.log("--- next insert should error");
+            //t.log("--- next insert should error");
             Ebean.save(newBean);
                         
             // never get here

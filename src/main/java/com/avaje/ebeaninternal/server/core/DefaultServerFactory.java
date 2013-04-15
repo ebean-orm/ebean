@@ -342,14 +342,6 @@ public class DefaultServerFactory implements BootupEbeanManager {
   }
 
   /**
-   * Execute the DDL if required.
-   */
-  private void executeDDL(SpiEbeanServer server, boolean online) {
-
-    server.getDdlGenerator().execute(online);
-  }
-
-  /**
    * Set the naming convention to underscore if it has not already been set.
    */
   private void setNamingConvention(ServerConfig config) {

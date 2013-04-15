@@ -60,7 +60,6 @@ public class CQueryBuilderRawSql implements Constants {
         StringBuilder sb = new StringBuilder();
         sb.append(sql.getPreFrom());
         sb.append(" ");
-        sb.append(NEW_LINE);
         
         String s = sql.getPreWhere();
         BindParams bindParams = request.getQuery().getBindParams();
@@ -95,11 +94,10 @@ public class CQueryBuilderRawSql implements Constants {
         }
 
         if (!isEmpty(dynamicWhere)) {
-            sb.append(NEW_LINE);            
             if (sql.isAndWhereExpr()) {
-                sb.append("and ");
+                sb.append(" and ");
             } else {
-                sb.append("where ");
+                sb.append(" where ");
             }
             sb.append(dynamicWhere);
             sb.append(" ");
@@ -107,7 +105,6 @@ public class CQueryBuilderRawSql implements Constants {
 
         String preHaving = sql.getPreHaving();
         if (!isEmpty(preHaving)) {
-            sb.append(NEW_LINE);
             sb.append(preHaving);
             sb.append(" ");
         }
@@ -115,7 +112,6 @@ public class CQueryBuilderRawSql implements Constants {
         String dbHaving = predicates.getDbHaving();
         if (!isEmpty(dbHaving)) {
             sb.append(" ");
-            sb.append(NEW_LINE);
             if (sql.isAndHavingExpr()) {
                 sb.append("and ");
             } else {
@@ -126,7 +122,6 @@ public class CQueryBuilderRawSql implements Constants {
         }
 
         if (!isEmpty(orderBy)) {
-            sb.append(NEW_LINE);
             sb.append(" order by ").append(orderBy);
         }
 

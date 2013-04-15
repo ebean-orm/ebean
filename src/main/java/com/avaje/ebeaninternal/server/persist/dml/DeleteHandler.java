@@ -36,23 +36,14 @@ public class DeleteHandler extends DmlHandler {
 		PreparedStatement pstmt;
 		if (isBatch) {
 			pstmt = getPstmt(t, sql, persistRequest, false);
-
 		} else {
-			logSql(sql);
 			pstmt = getPstmt(t, sql, false);
 		}
 		dataBind = new DataBind(pstmt);
-
-		bindLogAppend("Binding Delete [");
-		bindLogAppend(meta.getTableName());
-		bindLogAppend("] where[");
 		
 		meta.bind(persistRequest, this);
 		
-		bindLogAppend("]");
-		
-		// log the binding to transaction log if requested
-		logBinding();
+		logSql(sql);
 	}
 
 	/**

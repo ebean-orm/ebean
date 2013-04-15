@@ -576,13 +576,13 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 		String name = beanDescriptor.getName();
 		switch (type) {
 		case INSERT:
-			transaction.logInternal("Inserted [" + name + "] [" + idValue + "]");
+			transaction.logSummary("Inserted [" + name + "] [" + idValue + "]");
 			break;
 		case UPDATE:
-			transaction.logInternal("Updated [" + name + "] [" + idValue + "]");
+			transaction.logSummary("Updated [" + name + "] [" + idValue + "]");
 			break;
 		case DELETE:
-			transaction.logInternal("Deleted [" + name + "] [" + idValue + "]");
+			transaction.logSummary("Deleted [" + name + "] [" + idValue + "]");
 			break;
 		default:
 			break;

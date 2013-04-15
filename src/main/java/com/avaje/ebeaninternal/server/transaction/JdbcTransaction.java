@@ -5,12 +5,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.LogLevel;
 import com.avaje.ebean.bean.PersistenceContext;
@@ -19,8 +22,6 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager.OnQueryOnly;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * JDBC Connection based transaction.
@@ -28,6 +29,8 @@ import org.slf4j.LoggerFactory;
 public class JdbcTransaction implements SpiTransaction {
 
   private static final Logger logger = LoggerFactory.getLogger(JdbcTransaction.class);
+
+  private static final Object PLACEHOLDER = new Object();
 
   private static final String illegalStateMessage = "Transaction is Inactive";
 
@@ -110,20 +113,18 @@ public class JdbcTransaction implements SpiTransaction {
 
   Boolean batchFlushOnMixed;
 
+  String logPrefix;
+  
   /**
    * The depth used by batch processing to help the ordering of statements.
    */
   int depth = 0;
 
-  HashSet<Object> persistingBeans = new HashSet<Object>();
+  IdentityHashMap<Object,Object> persistingBeans;
   HashSet<Integer> deletingBeansHash;
   HashMap<String,String> m2mIntersectionSave;
-
-  TransactionLogBuffer logBuffer;
-
   HashMap<Integer, List<DerivedRelationshipData>> derivedRelMap;
-
-  private final Map<String, Object> userObjects = new ConcurrentHashMap<String, Object>();
+  Map<String, Object> userObjects;
 
   /**
    * Create a new JdbcTransaction.
@@ -132,6 +133,7 @@ public class JdbcTransaction implements SpiTransaction {
     try {
       this.active = true;
       this.id = id;
+      this.logPrefix = deriveLogPrefix(id,null);
       this.explicit = explicit;
       this.logLevel = logLevel;
       this.manager = manager;
@@ -143,15 +145,34 @@ public class JdbcTransaction implements SpiTransaction {
       this.onQueryOnly = manager == null ? OnQueryOnly.ROLLBACK : manager.getOnQueryOnly();
       this.persistenceContext = new DefaultPersistenceContext();
 
-      this.logBuffer = new TransactionLogBuffer(50, id);
-
     } catch (Exception e) {
       throw new PersistenceException(e);
     }
   }
 
+  private static String deriveLogPrefix(String id, String label) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("txn[");
+    if (id != null) {
+      sb.append(id);
+    }
+    sb.append("] ");
+    if (label != null) {
+      sb.append("label[").append(label).append("] ");
+    }
+    return sb.toString();
+  }
+  
+  public void setLabel(String label) {
+    this.logPrefix = deriveLogPrefix(id,label);
+  }
+  
+  public String getLogPrefix() {
+    return logPrefix;
+  }
+  
   public String toString() {
-    return "Trans[" + id + "]";
+    return logPrefix;
   }
 
   public List<DerivedRelationshipData> getDerivedRelationship(Object bean) {
@@ -215,13 +236,16 @@ public class JdbcTransaction implements SpiTransaction {
   public void unregisterBean(Object bean) {
     persistingBeans.remove(bean);
   }
-
+ 
   /**
    * Return true if this is a bean that has already been saved. This will
    * register the bean if it is not already.
    */
   public boolean isRegisteredBean(Object bean) {
-    return !persistingBeans.add(bean);
+    if (persistingBeans == null) {
+      persistingBeans = new IdentityHashMap<Object,Object>();
+    }
+    return (persistingBeans.put(bean,PLACEHOLDER) != null);
   }
 
   /**
@@ -447,11 +471,11 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   public boolean isLogSql() {
-    return logLevel.ordinal() >= LogLevel.SQL.ordinal();
+    return TransactionManager.SQL_LOGGER.isDebugEnabled();
   }
 
   public boolean isLogSummary() {
-    return logLevel.ordinal() >= LogLevel.SUMMARY.ordinal();
+    return TransactionManager.SUM_LOGGER.isDebugEnabled();
   }
 
   public LogLevel getLogLevel() {
@@ -461,28 +485,13 @@ public class JdbcTransaction implements SpiTransaction {
   public void setLogLevel(LogLevel logLevel) {
     this.logLevel = logLevel;
   }
-
-  /**
-   * Log a message to the transaction log - for PUBLIC use.
-   */
-  public void log(String msg) {
-    if (isLogSummary()) {
-      logInternal(msg);
-    }
+  
+  public void logSql(String msg) {
+    TransactionManager.SQL_LOGGER.trace(logPrefix+msg);
   }
-
-  /**
-   * Log a message to the transaction log - for Ebean INTERNAL use. The LogLevel
-   * should be explicitly checked before calling this method.
-   */
-  public void logInternal(String msg) {
-    if (manager != null) {
-      if (logBuffer.add(msg)) {
-        // buffer full so flush it
-        manager.log(logBuffer);
-        logBuffer = logBuffer.newBuffer();
-      }
-    }
+  
+  public void logSummary(String msg) {
+    TransactionManager.SUM_LOGGER.debug(logPrefix+msg);
   }
 
   /**
@@ -536,10 +545,6 @@ public class JdbcTransaction implements SpiTransaction {
     }
     connection = null;
     active = false;
-  }
-
-  public TransactionLogBuffer getLogBuffer() {
-    return logBuffer;
   }
 
   /**
@@ -682,10 +687,16 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   public void putUserObject(String name, Object value) {
+    if (userObjects == null) {
+      userObjects = new HashMap<String,Object>();
+    }
     userObjects.put(name, value);
   }
 
   public Object getUserObject(String name) {
+    if (userObjects == null) {
+      return null;
+    }
     return userObjects.get(name);
   }
 

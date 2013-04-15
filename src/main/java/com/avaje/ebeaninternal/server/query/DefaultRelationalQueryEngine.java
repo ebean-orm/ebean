@@ -9,6 +9,9 @@ import java.util.ArrayList;
 
 import javax.persistence.PersistenceException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.SqlQueryListener;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.bean.BeanCollection;
@@ -19,12 +22,10 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.core.RelationalQueryEngine;
 import com.avaje.ebeaninternal.server.core.RelationalQueryRequest;
-import com.avaje.ebeaninternal.server.jmx.MAdminLogging;
 import com.avaje.ebeaninternal.server.persist.Binder;
+import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Perform native sql fetches.
@@ -39,7 +40,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 	
 	private final String dbTrueValue;
 
-	public DefaultRelationalQueryEngine(MAdminLogging logControl, Binder binder, String dbTrueValue) {
+	public DefaultRelationalQueryEngine(Binder binder, String dbTrueValue) {
 		this.binder = binder;
 		this.defaultMaxRows = GlobalProperties.getInt("nativesql.defaultmaxrows",100000);
 		this.dbTrueValue = dbTrueValue == null ? "true" : dbTrueValue;
@@ -94,9 +95,11 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 				}
 	
 				if (request.isLogSql()) {
-					String sOut = sql.replace(Constants.NEW_LINE, ' ');
-					sOut = sOut.replace(Constants.CARRIAGE_RETURN, ' ');
-					t.logInternal(sOut);
+				  String logSql = sql;
+				  if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
+				    logSql += "; --bind("+bindLog+")";
+				  }
+					t.logSql(logSql);
 				}
 	
 				rset = pstmt.executeQuery();
@@ -178,7 +181,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 				String msg = "SqlQuery  rows[" + loadRowCount + "] time[" + exeTime + "] bind["
 						+ bindLog + "] finished[" + beanColl.isFinishedFetch() + "]";
 
-				t.logInternal(msg);
+				t.logSummary(msg);
 			}
 			
 			if (query.isCancelled()){

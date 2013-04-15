@@ -498,7 +498,7 @@ public final class DefaultPersister implements Persister {
 				if (idList != null) {
 					q.where().idIn(idList);
 					if (t.isLogSummary()) {
-						t.logInternal("-- DeleteById of " + descriptor.getName() + " ids[" + idList + "] requires fetch of foreign key values");
+						t.logSummary("-- DeleteById of " + descriptor.getName() + " ids[" + idList + "] requires fetch of foreign key values");
 					}
 					List<?> beanList = server.findList(q, t);
 					deleteList(beanList, t);
@@ -507,7 +507,7 @@ public final class DefaultPersister implements Persister {
 				} else {
 					q.where().idEq(id);
 					if (t.isLogSummary()) {
-						t.logInternal("-- DeleteById of " + descriptor.getName() + " id[" + id + "] requires fetch of foreign key values");
+						t.logSummary("-- DeleteById of " + descriptor.getName() + " id[" + id + "] requires fetch of foreign key values");
 					}
 					Object bean = server.findUnique(q, t);
 					if (bean == null) {
@@ -555,7 +555,7 @@ public final class DefaultPersister implements Persister {
 		for (int i = 0; i < manys.length; i++) {
 			SqlUpdate sqlDelete = manys[i].deleteByParentId(id, idList);
 			if (t.isLogSummary()) {
-				t.logInternal("-- Deleting intersection table entries: " + manys[i].getFullBeanName());
+				t.logSummary("-- Deleting intersection table entries: " + manys[i].getFullBeanName());
 			}
 			executeSqlUpdate(sqlDelete, t);
 		}
@@ -563,7 +563,7 @@ public final class DefaultPersister implements Persister {
 		// delete the bean(s)
 		SqlUpdate deleteById = descriptor.deleteById(id, idList);
 		if (t.isLogSummary()) {
-			t.logInternal("-- Deleting " + descriptor.getName() + " Ids" + idList);
+			t.logSummary("-- Deleting " + descriptor.getName() + " Ids" + idList);
 		}
 
 		// use Id's to update L2 cache rather than Bulk table event
@@ -1020,7 +1020,7 @@ public final class DefaultPersister implements Persister {
 				if (deletions != null && deletions.remove(otherBean)) {
 					String m = "Inserting and Deleting same object? " + otherBean;
 					if (t.isLogSummary()) {
-						t.logInternal(m);
+						t.logSummary(m);
 					}
 					logger.warn(m);
 

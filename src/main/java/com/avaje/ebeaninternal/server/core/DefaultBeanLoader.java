@@ -5,6 +5,9 @@ import java.util.List;
 
 import javax.persistence.EntityNotFoundException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.BeanCollection;
@@ -21,8 +24,6 @@ import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Helper to handle lazy loading and refreshing of beans.
@@ -164,21 +165,6 @@ public class DefaultBeanLoader {
     ObjectGraphNode node = ctx == null ? null : ctx.getObjectGraphNode();
 
     loadManyInternal(parentBean, propertyName, null, false, node, onlyIds);
-
-    if (server.getAdminLogging().isDebugLazyLoad()) {
-
-      Class<?> cls = parentBean.getClass();
-      BeanDescriptor<?> desc = server.getBeanDescriptor(cls);
-      BeanPropertyAssocMany<?> many = (BeanPropertyAssocMany<?>) desc.getBeanProperty(propertyName);
-
-      StackTraceElement cause = debugLazyLoad.getStackTraceElement(cls);
-
-      String msg = "debug.lazyLoad " + many.getManyType() + " [" + desc + "][" + propertyName + "]";
-      if (cause != null) {
-        msg += " at: " + cause;
-      }
-      System.err.println(msg);
-    }
   }
 
 	public void refreshMany(Object parentBean, String propertyName, Transaction t) {

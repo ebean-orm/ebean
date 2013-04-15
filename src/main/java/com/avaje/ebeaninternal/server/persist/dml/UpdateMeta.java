@@ -74,12 +74,8 @@ public final class UpdateMeta {
 
     Object bean = persist.getBean();
 
-    bind.bindLogAppend(" set[");
-    // bind.setCheckDelta(true);
     updatePlan.bindSet(bind, bean);
-    // bind.setCheckDelta(false);
 
-    bind.bindLogAppend("] where[");
     id.dmlBind(bind, false, bean);
 
     switch (persist.getConcurrencyMode()) {

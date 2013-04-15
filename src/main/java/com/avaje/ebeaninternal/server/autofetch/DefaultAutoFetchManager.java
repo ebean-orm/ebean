@@ -69,8 +69,6 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 	private transient boolean queryTuningAddVersion;
 
 	private transient AutofetchMode mode;
-
-	private transient boolean useFileLogging;
 	
 	/**
 	 * Server that owns this Profile Listener.
@@ -95,7 +93,6 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 
 		AutofetchConfig autofetchConfig = serverConfig.getAutofetchConfig();
 		
-		useFileLogging = autofetchConfig.isUseFileLogging();
 		queryTuning = autofetchConfig.isQueryTuning();
 		queryTuningAddVersion = autofetchConfig.isQueryTuningAddVersion();
 		profiling = autofetchConfig.isProfiling();
@@ -116,7 +113,7 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 			String msg = "AutoFetch queryTuning[" + queryTuning + "] profiling[" + profiling
 					+ "] mode[" + mode + "]  profiling rate[" + profilingRate
 					+ "] min[" + profilingMin + "] base[" + profilingBase + "]";
-			logging.logToJavaLogger(msg);
+			logging.logInfo(msg, null);
 		}
 	}
 
@@ -272,10 +269,10 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 	 * </p>
 	 */
 	public void shutdown() {
-		if (useFileLogging) {
+		//if (useFileLogging) {
 		    collectUsageViaGC(-1);
 		    serialize();
-		}
+		//}
 	}
 
 	/**

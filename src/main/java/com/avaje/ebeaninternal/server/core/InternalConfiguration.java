@@ -1,5 +1,8 @@
 package com.avaje.ebeaninternal.server.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.ExpressionFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.ExternalTransactionManager;
@@ -19,7 +22,6 @@ import com.avaje.ebeaninternal.server.deploy.parse.DeployCreateProperties;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployInherit;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployUtil;
 import com.avaje.ebeaninternal.server.expression.DefaultExpressionFactory;
-import com.avaje.ebeaninternal.server.jmx.MAdminLogging;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.persist.DefaultPersister;
 import com.avaje.ebeaninternal.server.query.CQueryEngine;
@@ -37,8 +39,6 @@ import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 import com.avaje.ebeaninternal.server.transaction.TransactionScopeManager;
 import com.avaje.ebeaninternal.server.type.DefaultTypeManager;
 import com.avaje.ebeaninternal.server.type.TypeManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Used to extend the ServerConfig with additional objects used to configure and
@@ -72,8 +72,6 @@ public class InternalConfiguration {
 
   private final BeanDescriptorManager beanDescriptorManager;
 
-  private final MAdminLogging logControl;
-
   private final DebugLazyLoad debugLazyLoad;
 
   private final TransactionManager transactionManager;
@@ -94,8 +92,9 @@ public class InternalConfiguration {
 
   private final XmlConfig xmlConfig;
 
-  public InternalConfiguration(XmlConfig xmlConfig, ClusterManager clusterManager, ServerCacheManager cacheManager,
-      SpiBackgroundExecutor backgroundExecutor, ServerConfig serverConfig, BootupClasses bootupClasses, PstmtBatch pstmtBatch) {
+  public InternalConfiguration(XmlConfig xmlConfig, ClusterManager clusterManager,
+      ServerCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
+      ServerConfig serverConfig, BootupClasses bootupClasses, PstmtBatch pstmtBatch) {
 
     this.xmlConfig = xmlConfig;
     this.pstmtBatch = pstmtBatch;
@@ -123,20 +122,21 @@ public class InternalConfiguration {
 
     this.debugLazyLoad = new DebugLazyLoad(serverConfig.isDebugLazyLoad());
 
-    this.transactionManager = new TransactionManager(clusterManager, backgroundExecutor, serverConfig, beanDescriptorManager,
-        this.getBootupClasses());
+    this.transactionManager = new TransactionManager(clusterManager, backgroundExecutor,
+        serverConfig, beanDescriptorManager, this.getBootupClasses());
 
-    this.logControl = new MAdminLogging(serverConfig, transactionManager);
+    this.cQueryEngine = new CQueryEngine(serverConfig.getDatabasePlatform(), binder,
+        backgroundExecutor);
 
-    this.cQueryEngine = new CQueryEngine(serverConfig.getDatabasePlatform(), logControl, binder, backgroundExecutor);
-
-    ExternalTransactionManager externalTransactionManager = serverConfig.getExternalTransactionManager();
+    ExternalTransactionManager externalTransactionManager = serverConfig
+        .getExternalTransactionManager();
     if (externalTransactionManager == null && serverConfig.isUseJtaTransactionManager()) {
       externalTransactionManager = new JtaTransactionManager();
     }
     if (externalTransactionManager != null) {
       externalTransactionManager.setTransactionManager(transactionManager);
-      this.transactionScopeManager = new ExternalTransactionScopeManager(transactionManager, externalTransactionManager);
+      this.transactionScopeManager = new ExternalTransactionScopeManager(transactionManager,
+          externalTransactionManager);
       logger.info("Using Transaction Manager [" + externalTransactionManager.getClass() + "]");
     } else {
       this.transactionScopeManager = new DefaultTransactionScopeManager(transactionManager);
@@ -167,7 +167,7 @@ public class InternalConfiguration {
   }
 
   public RelationalQueryEngine createRelationalQueryEngine() {
-    return new DefaultRelationalQueryEngine(logControl, binder, serverConfig.getDatabaseBooleanTrue());
+    return new DefaultRelationalQueryEngine(binder, serverConfig.getDatabaseBooleanTrue());
   }
 
   public OrmQueryEngine createOrmQueryEngine() {
@@ -175,7 +175,7 @@ public class InternalConfiguration {
   }
 
   public Persister createPersister(SpiEbeanServer server) {
-    
+
     return new DefaultPersister(server, binder, beanDescriptorManager, pstmtBatch);
   }
 
@@ -237,10 +237,6 @@ public class InternalConfiguration {
 
   public DeployUtil getDeployUtil() {
     return deployUtil;
-  }
-
-  public MAdminLogging getLogControl() {
-    return logControl;
   }
 
   public TransactionManager getTransactionManager() {

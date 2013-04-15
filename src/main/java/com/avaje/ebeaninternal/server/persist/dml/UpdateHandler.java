@@ -52,23 +52,16 @@ public class UpdateHandler extends DmlHandler {
 		PreparedStatement pstmt;
 		if (isBatch) {
 			pstmt = getPstmt(t, sql, persistRequest, false);
-
 		} else {
-			logSql(sql);
 			pstmt = getPstmt(t, sql, false);
 		}
 		dataBind = new DataBind(pstmt);
-
-		bindLogAppend("Binding Update [");
-		bindLogAppend(meta.getTableName());
-		bindLogAppend("] ");
 		
 		meta.bind(persistRequest, this, updatePlan);
 		
 		setUpdateGenValues();
 		
-		bindLogAppend("]");
-		logBinding();
+		logSql(sql);
 	}
 
 	@Override

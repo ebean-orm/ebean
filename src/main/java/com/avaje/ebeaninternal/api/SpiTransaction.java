@@ -6,7 +6,6 @@ import java.util.List;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
-import com.avaje.ebeaninternal.server.transaction.TransactionLogBuffer;
 
 /**
  * Extends Transaction with additional API required on server.
@@ -16,6 +15,11 @@ import com.avaje.ebeaninternal.server.transaction.TransactionLogBuffer;
  */
 public interface SpiTransaction extends Transaction {
 
+  /**
+   * Return the string prefix with the transactin id and label used in logging.
+   */
+  public String getLogPrefix();
+  
 	/**
 	 * Return true if generated SQL and Bind values should be logged to the
 	 * transaction log.
@@ -29,15 +33,14 @@ public interface SpiTransaction extends Transaction {
 	public boolean isLogSummary();
 
 	/**
-	 * Log a comment to the transaction log for Ebean INTERNAL use. There should
-	 * always be an external LogLevel check prior to calling this method.
+	 * Log a message to the SQL logger.
 	 */
-	public void logInternal(String msg);
+	public void logSql(String msg);
 
 	/**
-	 * Return the buffer containing transaction log messages.
+	 * Log a message to the SUMMARY logger.
 	 */
-	public TransactionLogBuffer getLogBuffer();
+	public void logSummary(String msg);
 
 	/**
 	 * Register a "Derived Relationship" (that requires an additional update).

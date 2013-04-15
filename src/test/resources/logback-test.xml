@@ -8,7 +8,6 @@
         </encoder>
     </appender>
 
-  <!--
     <appender name="APPLICATION" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>log/ebean.log</File>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -22,12 +21,16 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    -->
 
     <root level="WARN">
-        <!--<appender-ref ref="APPLICATION"/>-->
+        <appender-ref ref="APPLICATION"/>
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="nz.ac.auckland" level="DEBUG"/>
+    <logger name="com.avaje.ebean" level="INFO"/>
+    <logger name="org.avaje.ebean" level="INFO"/>
+    <logger name="org.avaje.ebean.SQL" level="TRACE"/>
+    <logger name="org.avaje.ebean.TXN" level="TRACE"/>
+    <logger name="org.avaje.ebean.SUM" level="TRACE"/>
+    
 </configuration>

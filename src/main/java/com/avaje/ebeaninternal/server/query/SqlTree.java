@@ -13,160 +13,158 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
  */
 public class SqlTree {
 
-    private SqlTreeNode rootNode;
+  private SqlTreeNode rootNode;
 
-    
-    /**
-     * Property if resultSet contains master and detail rows.
-     */
-    private BeanPropertyAssocMany<?> manyProperty;
-    private String manyPropertyName;
-    private ElPropertyValue manyPropEl;
+  /**
+   * Property if resultSet contains master and detail rows.
+   */
+  private BeanPropertyAssocMany<?> manyProperty;
+  private String manyPropertyName;
+  private ElPropertyValue manyPropEl;
 
-    private Set<String> includes;
+  private Set<String> includes;
 
-    /**
-     * Summary of the select being generated.
-     */
-    private String summary;
+  /**
+   * Summary of the select being generated.
+   */
+  private String summary;
 
-    private String selectSql;
+  private String selectSql;
 
-    private String fromSql;
+  private String fromSql;
 
-    /**
-     * Encrypted Properties require additional binding. 
-     */
-    private BeanProperty[] encryptedProps;
-    
-    /**
-     * Where clause for inheritance.
-     */
-    private String inheritanceWhereSql;
+  /**
+   * Encrypted Properties require additional binding.
+   */
+  private BeanProperty[] encryptedProps;
 
-    
-    /**
-     * Create the SqlSelectClause.
-     */
-    public SqlTree() {
-    }
-    
-    public List<String> buildSelectExpressionChain() {
-        ArrayList<String> list = new ArrayList<String>();
-        rootNode.buildSelectExpressionChain(list);
-        return list;
-    }
-    
-	/**
-     * Return the includes. Associated beans lists etc.
-     */
-    public Set<String> getIncludes() {
-        return includes;
-    }
-    
-    /**
-     * Set the association includes (Ones and Many's).
-     */
-    public void setIncludes(Set<String> includes) {
-		this.includes = includes;
-	}
-    
-    /**
-     * Set the manyProperty used for this query.
-     */
-	public void setManyProperty(BeanPropertyAssocMany<?> manyProperty, String manyPropertyName, ElPropertyValue manyPropEl) {
-		this.manyProperty = manyProperty;
-		this.manyPropertyName = manyPropertyName;
-		this.manyPropEl = manyPropEl;
-	}
+  /**
+   * Where clause for inheritance.
+   */
+  private String inheritanceWhereSql;
 
-    /**
-     * Return the String for the actual SQL.
-     */
-    public String getSelectSql() {
-        return selectSql;
-    }
+  /**
+   * Create the SqlSelectClause.
+   */
+  public SqlTree() {
+  }
 
-    /**
-     * Set the select sql clause.
-     */
-	public void setSelectSql(String selectSql) {
-		this.selectSql = selectSql;
-	}
+  public List<String> buildSelectExpressionChain() {
+    ArrayList<String> list = new ArrayList<String>();
+    rootNode.buildSelectExpressionChain(list);
+    return list;
+  }
 
-	
-	public String getFromSql() {
-		return fromSql;
-	}
+  /**
+   * Return the includes. Associated beans lists etc.
+   */
+  public Set<String> getIncludes() {
+    return includes;
+  }
 
-	public void setFromSql(String fromSql) {
-		this.fromSql = fromSql;
-	}
-	
-	/**
-	 * Return the where clause for inheritance.
-	 */
-	public String getInheritanceWhereSql() {
-		return inheritanceWhereSql;
-	}
+  /**
+   * Set the association includes (Ones and Many's).
+   */
+  public void setIncludes(Set<String> includes) {
+    this.includes = includes;
+  }
 
-	/**
-	 * Set where clause(s) for inheritance.
-	 */
-	public void setInheritanceWhereSql(String whereSql) {
-		this.inheritanceWhereSql = whereSql;
-	}
+  /**
+   * Set the manyProperty used for this query.
+   */
+  public void setManyProperty(BeanPropertyAssocMany<?> manyProperty, String manyPropertyName,
+      ElPropertyValue manyPropEl) {
+    this.manyProperty = manyProperty;
+    this.manyPropertyName = manyPropertyName;
+    this.manyPropEl = manyPropEl;
+  }
 
-	/**
-	 * Set the summary description of the query.
-	 */
-	public void setSummary(String summary) {
-		this.summary = summary;
-	}
+  /**
+   * Return the String for the actual SQL.
+   */
+  public String getSelectSql() {
+    return selectSql;
+  }
 
-    /**
-     * Return a summary of the select clause.
-     */
-    public String getSummary() {
-        return summary;
-    }
-    
-    public SqlTreeNode getRootNode() {
-    	return rootNode;
-    }
-    
-    public void setRootNode(SqlTreeNode rootNode) {
-		this.rootNode = rootNode;
-	}
+  /**
+   * Set the select sql clause.
+   */
+  public void setSelectSql(String selectSql) {
+    this.selectSql = selectSql;
+  }
 
-    /**
-     * Return the property that is associated with the many. There can only be
-     * one per SqlSelect. This can be null.
-     */
-    public BeanPropertyAssocMany<?> getManyProperty() {
-        return manyProperty;
-    }
+  public String getFromSql() {
+    return fromSql;
+  }
 
-    public String getManyPropertyName() {
-        return manyPropertyName;
-    }
+  public void setFromSql(String fromSql) {
+    this.fromSql = fromSql;
+  }
 
-    public ElPropertyValue getManyPropertyEl() {
-        return manyPropEl;
-    }
+  /**
+   * Return the where clause for inheritance.
+   */
+  public String getInheritanceWhereSql() {
+    return inheritanceWhereSql;
+  }
 
-    /**
-     * Return true if this query includes a Many association.
-     */
-    public boolean isManyIncluded() {
-        return (manyProperty != null);
-    }
+  /**
+   * Set where clause(s) for inheritance.
+   */
+  public void setInheritanceWhereSql(String whereSql) {
+    this.inheritanceWhereSql = whereSql;
+  }
 
-    public BeanProperty[] getEncryptedProps() {
-        return encryptedProps;
-    }
+  /**
+   * Set the summary description of the query.
+   */
+  public void setSummary(String summary) {
+    this.summary = summary;
+  }
 
-    public void setEncryptedProps(BeanProperty[] encryptedProps) {
-        this.encryptedProps = encryptedProps;
-    }
+  /**
+   * Return a summary of the select clause.
+   */
+  public String getSummary() {
+    return summary;
+  }
+
+  public SqlTreeNode getRootNode() {
+    return rootNode;
+  }
+
+  public void setRootNode(SqlTreeNode rootNode) {
+    this.rootNode = rootNode;
+  }
+
+  /**
+   * Return the property that is associated with the many. There can only be one
+   * per SqlSelect. This can be null.
+   */
+  public BeanPropertyAssocMany<?> getManyProperty() {
+    return manyProperty;
+  }
+
+  public String getManyPropertyName() {
+    return manyPropertyName;
+  }
+
+  public ElPropertyValue getManyPropertyEl() {
+    return manyPropEl;
+  }
+
+  /**
+   * Return true if this query includes a Many association.
+   */
+  public boolean isManyIncluded() {
+    return (manyProperty != null);
+  }
+
+  public BeanProperty[] getEncryptedProps() {
+    return encryptedProps;
+  }
+
+  public void setEncryptedProps(BeanProperty[] encryptedProps) {
+    this.encryptedProps = encryptedProps;
+  }
 }

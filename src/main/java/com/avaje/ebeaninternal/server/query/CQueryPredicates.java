@@ -151,7 +151,7 @@ public class CQueryPredicates {
         Object bindValue = whereExprBindValues.get(i);
         binder.bindObject(dataBind, bindValue);
         if (i > 0 || idValue != null) {
-          bindLog.append(", ");
+          bindLog.append(",");
         }
         bindLog.append(bindValue);
       }
@@ -163,7 +163,7 @@ public class CQueryPredicates {
         Object bindValue = filterManyExprBindValues.get(i);
         binder.bindObject(dataBind, bindValue);
         if (i > 0 || idValue != null) {
-          bindLog.append(", ");
+          bindLog.append(",");
         }
         bindLog.append(bindValue);
       }
@@ -182,7 +182,7 @@ public class CQueryPredicates {
         Object bindValue = havingExprBindValues.get(i);
         binder.bindObject(dataBind, bindValue);
         if (i > 0) {
-          bindLog.append(", ");
+          bindLog.append(",");
         }
         bindLog.append(bindValue);
       }
@@ -215,10 +215,8 @@ public class CQueryPredicates {
       boolean hasRaw = !"".equals(whereRawSql);
       if (hasRaw && parseRaw) {
         // parse with encrypted property awareness. This means that if we have
-        // an
-        // encrypted property we will insert special named parameter place
-        // holders
-        // for binding the encryption key values
+        // an encrypted property we will insert special named parameter place
+        // holders for binding the encryption key values
         parser.setEncrypted(true);
         whereRawSql = parser.parse(whereRawSql);
         parser.setEncrypted(false);
@@ -259,7 +257,6 @@ public class CQueryPredicates {
   public void prepare(boolean buildSql) {
 
     DeployParser deployParser = request.createDeployParser();
-
     prepare(buildSql, true, deployParser);
   }
 

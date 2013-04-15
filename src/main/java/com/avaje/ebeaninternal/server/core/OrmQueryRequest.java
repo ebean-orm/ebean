@@ -403,7 +403,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   public void logSql(String sql) {
     if (transaction.isLogSql()) {
-      transaction.logInternal(sql);
+      transaction.logSql(sql);
     }
   }
 

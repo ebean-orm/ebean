@@ -8,9 +8,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.LogLevel;
-import com.avaje.ebean.TxIsolation;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.event.TransactionEventListener;
@@ -21,8 +23,6 @@ import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Manages transactions.
@@ -35,6 +35,12 @@ public class TransactionManager {
 
 	private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
 	
+  public static final Logger SQL_LOGGER = LoggerFactory.getLogger("org.avaje.ebean.SQL");
+  
+  public static final Logger SUM_LOGGER = LoggerFactory.getLogger("org.avaje.ebean.SUM");
+  
+  public static final Logger TXN_LOGGER = LoggerFactory.getLogger("org.avaje.ebean.TXN");
+  
 	/**
 	 * The behaviour desired when ending a query only transaction.
 	 */
@@ -59,11 +65,6 @@ public class TransactionManager {
 	private final BeanDescriptorManager beanDescriptorManager;
 	
 	private LogLevel logLevel;
-	
-	/**
-	 * The logger.
-	 */
-	private final TransactionLogManager transLogger;
 	
 	/**
 	 * Prefix for transaction id's (logging).
@@ -92,7 +93,7 @@ public class TransactionManager {
 			
 	private final ClusterManager clusterManager;
 	
-	private final int commitDebugLevel;
+	//private final int commitDebugLevel;
 
 	private final String serverName;
 	
@@ -118,7 +119,6 @@ public class TransactionManager {
 		this.serverName = config.getName();
 		
 		this.logLevel = config.getLoggingLevel();
-		this.transLogger = new TransactionLogManager(config);
 		this.backgroundExecutor = backgroundExecutor;		
 		this.dataSource = config.getDataSource();
 		this.bulkEventListenerMap = new BulkEventListenerMap(config.getBulkTableEventListeners());
@@ -127,7 +127,6 @@ public class TransactionManager {
     this.transactionEventListeners = transactionEventListeners.toArray(new TransactionEventListener[transactionEventListeners.size()]);
 		
     // log some transaction events using a java util logger
-    this.commitDebugLevel = GlobalProperties.getInt("ebean.commit.debuglevel", 0);
     this.clusterDebugLevel = GlobalProperties.getInt("ebean.cluster.debuglevel", 0);
 		
 		this.defaultBatchMode = config.isPersistBatching();
@@ -140,7 +139,7 @@ public class TransactionManager {
 	}
 	
 	public void shutdown() {
-	    transLogger.shutdown();
+	  // Nothing to do
 	}
 	
 	public BeanDescriptorManager getBeanDescriptorManager() {
@@ -252,19 +251,6 @@ public class TransactionManager {
 	}
 
 	/**
-	 * Return the TransactionLogger used by this TransactionManager.
-	 */
-	public TransactionLogManager getLogger() {
-		return transLogger;
-	}
-
-	public void log(TransactionLogBuffer logBuffer){
-	    if (!logBuffer.isEmpty()){
-	        transLogger.log(logBuffer);
-	    }
-	}
-
-	/**
 	 * Wrap the externally supplied Connection.
 	 */
 	public SpiTransaction wrapExternalConnection(Connection c) {
@@ -307,15 +293,6 @@ public class TransactionManager {
 			if (isolationLevel > -1) {
 				c.setTransactionIsolation(isolationLevel);
 			}
-
-			if (commitDebugLevel >= 3){
-				String msg = "Transaction ["+t.getId()+"] begin";
-				if (isolationLevel > -1){
-					TxIsolation txi = TxIsolation.fromLevel(isolationLevel);
-					msg += " isolationLevel["+txi+"]";
-				}
-				logger.info(msg);
-			}
 			
 			return t;
 
@@ -345,10 +322,6 @@ public class TransactionManager {
 			if (defaultBatchMode){
 				t.setBatchMode(true);
 			}
-
-			if (commitDebugLevel >= 3){
-				logger.info("Transaction ["+t.getId()+"] begin - queryOnly");
-			}
 			
 			return t;
 			
@@ -375,61 +348,30 @@ public class TransactionManager {
 	public void notifyOfRollback(SpiTransaction transaction, Throwable cause) {
 		
 		try {
-      for (TransactionEventListener listener : transactionEventListeners) {
+		  if (TXN_LOGGER.isInfoEnabled()) {
+		    String msg = transaction.getLogPrefix()+"Rollback";
+        if (cause != null){
+          msg += " error: "+formatThrowable(cause);
+        }
+        TXN_LOGGER.info(msg);
+      }
+		 
+		  for (TransactionEventListener listener : transactionEventListeners) {
         listener.postTransactionRollback(transaction, cause);
       }
 
-			if (transaction.isLogSummary() || commitDebugLevel >= 1) {
-				String msg = "Rollback";
-				if (cause != null){
-					msg += " error: "+formatThrowable(cause);
-				}
-				if (transaction.isLogSummary()) {
-					transaction.logInternal(msg);
-				}
-				
-				if (commitDebugLevel >= 1){
-					logger.info("Transaction ["+transaction.getId()+"] "+msg);
-				}
-			}
-			
-			log(transaction.getLogBuffer());
 		} catch (Exception ex) {
-			String m = "Potentially Transaction Log incomplete due to error:";
-			logger.error(m, ex);
+			logger.error("Error while notifying TransactionEventListener of rollback event", ex);
 		}
 	}
 
-	/**
-	 * Query only transaction in read committed isolation.
-	 */
-	public void notifyOfQueryOnly(boolean onCommit, SpiTransaction transaction, Throwable cause) {
-		
-		try {
-            if (commitDebugLevel >= 2){
-    			String msg;
-    			if (onCommit){
-    				msg = "Commit queryOnly";
-    			
-    			} else {
-    				msg = "Rollback queryOnly";
-    				if (cause != null){
-    					msg += " error: "+formatThrowable(cause);
-    				}		
-    			}
-    			if (transaction.isLogSummary()) {
-    				transaction.logInternal(msg);
-    			}
-                logger.info("Transaction ["+transaction.getId()+"] "+msg);
-            }
-            
-			log(transaction.getLogBuffer());
-			
-		} catch (Exception ex) {
-			String m = "Potentially Transaction Log incomplete due to error:";
-			logger.error(m, ex);
-		}
-	}
+  /**
+   * Query only transaction in read committed isolation.
+   */
+  public void notifyOfQueryOnly(boolean onCommit, SpiTransaction transaction, Throwable cause) {
+
+    // Nothing that interesting here
+  }
 		
 	private String formatThrowable(Throwable e){
 		if (e == null){
@@ -461,11 +403,16 @@ public class TransactionManager {
 	public void notifyOfCommit(SpiTransaction transaction) {
 
 		try {
-		    
-      log(transaction.getLogBuffer());
 
-      PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction,
-          transaction.getEvent());
+      if (transaction.isExplicit()) {
+        if (TXN_LOGGER.isInfoEnabled()) {
+          TXN_LOGGER.info(transaction.getLogPrefix()+"Commit");
+        }
+      } else if (TXN_LOGGER.isDebugEnabled()) {
+        TXN_LOGGER.debug(transaction.getLogPrefix()+"Commit");        
+      }
+      
+      PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction, transaction.getEvent());
 
       postCommit.notifyLocalCacheIndex();
       postCommit.notifyCluster();
@@ -476,10 +423,7 @@ public class TransactionManager {
       for (TransactionEventListener listener : transactionEventListeners) {
         listener.postTransactionCommit(transaction);
       }
-
-      if (commitDebugLevel >= 1) {
-        logger.info("Transaction ["+transaction.getId()+"] commit");
-			}
+      
 		} catch (Exception ex) {
 			String m = "NotifyOfCommit failed. Cache/Lucene potentially not notified.";
 			logger.error(m, ex);

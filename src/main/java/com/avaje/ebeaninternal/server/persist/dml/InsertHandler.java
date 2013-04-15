@@ -101,22 +101,15 @@ public class InsertHandler extends DmlHandler {
     PreparedStatement pstmt;
     if (isBatch) {
       pstmt = getPstmt(t, sql, persistRequest, useGeneratedKeys);
-
     } else {
-      logSql(sql);
       pstmt = getPstmt(t, sql, useGeneratedKeys);
     }
     dataBind = new DataBind(pstmt);
 
-    bindLogAppend("Binding Insert [");
-    bindLogAppend(desc.getBaseTable());
-    bindLogAppend("]  set[");
-
     // bind the bean property values
     meta.bind(this, bean, withId);
 
-    bindLogAppend("]");
-    logBinding();
+    logSql(sql);
   }
 
   /**

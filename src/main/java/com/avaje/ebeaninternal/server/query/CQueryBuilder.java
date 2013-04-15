@@ -319,8 +319,7 @@ public class CQueryBuilder implements Constants {
       sb.append(select.getSelectSql());
     }
 
-    sb.append(" ").append(NEW_LINE);
-    sb.append("from ");
+    sb.append(" from ");
 
     // build the from clause potentially with joins
     // required only for the predicates
@@ -330,7 +329,7 @@ public class CQueryBuilder implements Constants {
 
     boolean hasWhere = false;
     if (inheritanceWhere.length() > 0) {
-      sb.append(" ").append(NEW_LINE).append("where");
+      sb.append(" where");
       sb.append(inheritanceWhere);
       hasWhere = true;
     }
@@ -339,7 +338,7 @@ public class CQueryBuilder implements Constants {
       if (hasWhere) {
         sb.append(" and ");
       } else {
-        sb.append(NEW_LINE).append("where ");
+        sb.append(" where ");
       }
 
       BeanDescriptor<?> desc = request.getBeanDescriptor();
@@ -356,9 +355,9 @@ public class CQueryBuilder implements Constants {
     if (!isEmpty(dbWhere)) {
       if (!hasWhere) {
         hasWhere = true;
-        sb.append(" ").append(NEW_LINE).append("where ");
+        sb.append(" where ");
       } else {
-        sb.append("and ");
+        sb.append(" and ");
       }
       sb.append(dbWhere);
     }
@@ -366,7 +365,7 @@ public class CQueryBuilder implements Constants {
     String dbFilterMany = predicates.getDbFilterMany();
     if (!isEmpty(dbFilterMany)) {
       if (!hasWhere) {
-        sb.append(" ").append(NEW_LINE).append("where ");
+        sb.append(" where ");
       } else {
         sb.append("and ");
       }
@@ -375,8 +374,7 @@ public class CQueryBuilder implements Constants {
 
     String dbOrderBy = predicates.getDbOrderBy();
     if (dbOrderBy != null) {
-      sb.append(" ").append(NEW_LINE);
-      sb.append("order by ").append(dbOrderBy);
+      sb.append(" order by ").append(dbOrderBy);
     }
 
     if (useSqlLimiter) {

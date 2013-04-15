@@ -30,18 +30,11 @@ public class OutgoingPacketsAcked {
 
     private boolean resetGotAllMin() {
         
-        long tempMin;
-        if (recievedByMap.isEmpty()){
-            //System.out.println("       --  -- -- -- "+recievedByMap.isEmpty());
-            tempMin = Long.MAX_VALUE;
-        } else {
-            tempMin = Long.MAX_VALUE;
-        }
+        long tempMin = Long.MAX_VALUE;
         
         for (GroupMemberAck groupMemAck : recievedByMap.values()) {
             long memberMin = groupMemAck.getGotAllPacketId();
-            if (memberMin < tempMin){
-                //System.out.println("                                -- new tmpMin "+memberMin);
+            if (memberMin < tempMin) {
                 tempMin = memberMin;
             }
         }
@@ -62,24 +55,19 @@ public class OutgoingPacketsAcked {
             
             GroupMemberAck groupMemberAck = recievedByMap.get(groupMember);
             if (groupMemberAck == null) {
-                //System.out.println("                               -- new groupMemberAck");
                 groupMemberAck = new GroupMemberAck();
                 groupMemberAck.setIfBigger(ack.getGotAllPacketId());
                 recievedByMap.put(groupMember, groupMemberAck);
                 checkMin = true;
             } else {
                 checkMin = groupMemberAck.getGotAllPacketId() == minimumGotAllPacketId; 
-                //System.out.println("                               -- existing groupMemberAck, checkMin:"+checkMin+" "+groupMemberAck.getGotAllPacketId());
                 groupMemberAck.setIfBigger(ack.getGotAllPacketId());
             }
             
             boolean minChanged = false;
             
-            //System.out.println("               -- checkMin:"+checkMin+" minimumGotAllPacketId:"+minimumGotAllPacketId);
-            if (checkMin || minimumGotAllPacketId == 0){
-                
+            if (checkMin || minimumGotAllPacketId == 0){                
                 minChanged = resetGotAllMin();
-                //System.out.println("               -- minChanged:"+minChanged+" minimumGotAllPacketId:"+minimumGotAllPacketId);
             }
             
             return minChanged ? minimumGotAllPacketId : 0;

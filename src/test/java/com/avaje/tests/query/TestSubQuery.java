@@ -66,7 +66,7 @@ public class TestSubQuery extends TestCase {
 		
 		String sql = pq.getGeneratedSql();
 
-		String golden = "(t0.one_key) in (select t0.one_key  from ckey_parent t0) ";
+		String golden = "(t0.one_key) in (select t0.one_key from ckey_parent t0) ";
 		
 		if (sql.indexOf(golden) < 0)
 		{
@@ -131,7 +131,7 @@ public class TestSubQuery extends TestCase {
 
 		// TODO: If, after bugfixing, the system still join against vehicle I do not know now, in our case, it is not necessary if not
 		// using it in the where clause
-		String golden = "(t0.id) in (select t0.vehicle_id  from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id )";
+		String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id )";
 		if (sql.indexOf(golden) < 0)
 		{
 			System.out.println("failed sql:"+sql);
@@ -164,7 +164,7 @@ public class TestSubQuery extends TestCase {
 		String sql = pq.getGeneratedSql();
 		System.err.println(sql);
 
-		String golden = "(t0.id) in (select t0.vehicle_id  from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id   where t1.license_number = ? )";
+		String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id  where t1.license_number = ? )";
 		if (sql.indexOf(golden) < 0)
 		{
 			System.out.println("failed sql:"+sql);
@@ -195,7 +195,7 @@ public class TestSubQuery extends TestCase {
 		String sql = pq.getGeneratedSql();
 		System.err.println(sql);
 
-		String golden = "(t0.id) in (select t0.vehicle_id  from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id )";
+		String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id )";
 		// OR without join
 		// String golden = "(t0.id) in (select t0.vehicle_id  from vehicle_driver t0)";
 		if (sql.indexOf(golden) < 0)

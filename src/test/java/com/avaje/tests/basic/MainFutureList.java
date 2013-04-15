@@ -19,7 +19,6 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 import com.avaje.tests.model.basic.TOne;
-import com.mysql.jdbc.PreparedStatement;
 
 public class MainFutureList {
 

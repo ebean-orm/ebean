@@ -3,6 +3,9 @@ package com.avaje.ebeaninternal.server.query;
 import java.sql.SQLException;
 import java.util.concurrent.FutureTask;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.bean.BeanCollection;
@@ -12,10 +15,8 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
-import com.avaje.ebeaninternal.server.jmx.MAdminLogging;
 import com.avaje.ebeaninternal.server.persist.Binder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 
 /**
  * Handles the Object Relational fetching.
@@ -26,15 +27,12 @@ public class CQueryEngine {
 
   private final CQueryBuilder queryBuilder;
 
-  private final MAdminLogging logControl;
-
   private final BackgroundExecutor backgroundExecutor;
 
   private final int defaultSecondaryQueryBatchSize = 100;
 
-  public CQueryEngine(DatabasePlatform dbPlatform, MAdminLogging logControl, Binder binder, BackgroundExecutor backgroundExecutor) {
+  public CQueryEngine(DatabasePlatform dbPlatform, Binder binder, BackgroundExecutor backgroundExecutor) {
 
-    this.logControl = logControl;
     this.backgroundExecutor = backgroundExecutor;
     this.queryBuilder = new CQueryBuilder(backgroundExecutor, dbPlatform, binder);
   }
@@ -51,18 +49,19 @@ public class CQueryEngine {
     CQueryFetchIds rcQuery = queryBuilder.buildFetchIdsQuery(request);
     try {
 
-      String sql = rcQuery.getGeneratedSql();
-      sql = sql.replace(Constants.NEW_LINE, ' ');
-
-      if (logControl.isDebugGeneratedSql()) {
-        System.out.println(sql);
-      }
-      request.logSql(sql);
-
+      
       BeanIdList list = rcQuery.findIds();
 
+      if (request.isLogSql()) {
+        String logSql = rcQuery.getGeneratedSql();
+        if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
+          logSql += "; --bind("+rcQuery.getBindLog()+")";
+        }
+        request.logSql(logSql);
+      }
+
       if (request.isLogSummary()) {
-        request.getTransaction().logInternal(rcQuery.getSummary());
+        request.getTransaction().logSummary(rcQuery.getSummary());
       }
 
       if (!list.isFetchingInBackground() && request.getQuery().isFutureFetch()) {
@@ -85,19 +84,19 @@ public class CQueryEngine {
 
     CQueryRowCount rcQuery = queryBuilder.buildRowCountQuery(request);
     try {
-
-      String sql = rcQuery.getGeneratedSql();
-      sql = sql.replace(Constants.NEW_LINE, ' ');
-
-      if (logControl.isDebugGeneratedSql()) {
-        System.out.println(sql);
-      }
-      request.logSql(sql);
-
+     
       int rowCount = rcQuery.findRowCount();
 
+      if (request.isLogSql()) {
+        String logSql = rcQuery.getGeneratedSql();
+        if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
+          logSql += "; --bind("+rcQuery.getBindLog()+")";
+        }
+        request.logSql(logSql);
+      }
+
       if (request.isLogSummary()) {
-        request.getTransaction().logInternal(rcQuery.getSummary());
+        request.getTransaction().logSummary(rcQuery.getSummary());
       }
 
       if (request.getQuery().isFutureFetch()) {
@@ -123,18 +122,14 @@ public class CQueryEngine {
 
     try {
 
-      if (logControl.isDebugGeneratedSql()) {
-        logSqlToConsole(cquery);
-      }
-
-      if (request.isLogSql()) {
-        logSql(cquery);
-      }
-
       if (!cquery.prepareBindExecuteQuery()) {
         // query has been cancelled already
         logger.trace("Future fetch already cancelled");
         return null;
+      }
+
+      if (request.isLogSql()) {
+        logSql(cquery);
       }
 
       int iterateBufferSize = request.getSecondaryQueriesMinBatchSize(defaultSecondaryQueryBatchSize);
@@ -164,18 +159,14 @@ public class CQueryEngine {
     request.setCancelableQuery(cquery);
 
     try {
-
-      if (logControl.isDebugGeneratedSql()) {
-        logSqlToConsole(cquery);
-      }
-      if (request.isLogSql()) {
-        logSql(cquery);
-      }
-
       if (!cquery.prepareBindExecuteQuery()) {
         // query has been cancelled already
         logger.trace("Future fetch already cancelled");
         return null;
+      }
+      
+      if (request.isLogSql()) {
+        logSql(cquery);
       }
 
       BeanCollection<T> beanCollection = cquery.readCollection();
@@ -208,10 +199,8 @@ public class CQueryEngine {
       return beanCollection;
 
     } catch (SQLException e) {
-      throw cquery.createPersistenceException(e);// request, e,
-                                                 // cquery.getBindLog(),
-                                                 // cquery.getGeneratedSql());
-
+      throw cquery.createPersistenceException(e);
+      
     } finally {
       if (useBackgroundToContinueFetch) {
         // left closing resources to BackgroundFetch...
@@ -239,14 +228,11 @@ public class CQueryEngine {
     CQuery<T> cquery = queryBuilder.buildQuery(request);
 
     try {
-      if (logControl.isDebugGeneratedSql()) {
-        logSqlToConsole(cquery);
-      }
+      cquery.prepareBindExecuteQuery();
+
       if (request.isLogSql()) {
         logSql(cquery);
       }
-
-      cquery.prepareBindExecuteQuery();
 
       if (cquery.readBean()) {
         bean = cquery.getLoadedBean();
@@ -269,45 +255,15 @@ public class CQueryEngine {
   }
 
   /**
-   * Log the generated SQL to the console.
-   */
-  private void logSqlToConsole(CQuery<?> cquery) {
-
-    SpiQuery<?> query = cquery.getQueryRequest().getQuery();
-    String loadMode = query.getLoadMode();
-    String loadDesc = query.getLoadDescription();
-
-    String sql = cquery.getGeneratedSql();
-    String summary = cquery.getSummary();
-
-    StringBuilder sb = new StringBuilder(1000);
-    sb.append("<sql ");
-    if (query.isAutofetchTuned()) {
-      sb.append("tuned='true' ");
-    }
-    if (loadMode != null) {
-      sb.append("mode='").append(loadMode).append("' ");
-    }
-    sb.append("summary='").append(summary);
-    if (loadDesc != null) {
-      sb.append("' load='").append(loadDesc);
-    }
-    sb.append("' >");
-    sb.append(Constants.NEW_LINE);
-    sb.append(sql);
-    sb.append(Constants.NEW_LINE).append("</sql>");
-
-    System.out.println(sb.toString());
-  }
-
-  /**
    * Log the generated SQL to the transaction log.
    */
   private void logSql(CQuery<?> query) {
 
     String sql = query.getGeneratedSql();
-    sql = sql.replace(Constants.NEW_LINE, ' ');
-    query.getTransaction().logInternal(sql);
+    if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
+      sql += "; --bind("+query.getBindLog()+")"; 
+    }
+    query.getTransaction().logSql(sql);
   }
 
   /**
@@ -349,7 +305,7 @@ public class CQueryEngine {
     msg.append("] rows[").append(q.getLoadedRowDetail());
     msg.append("] bind[").append(q.getBindLog()).append("]");
 
-    q.getTransaction().logInternal(msg.toString());
+    q.getTransaction().logSummary(msg.toString());
   }
 
   /**
@@ -394,6 +350,6 @@ public class CQueryEngine {
     msg.append("] predicates[").append(q.getLogWhereSql());
     msg.append("] bind[").append(q.getBindLog()).append("]");
 
-    q.getTransaction().logInternal(msg.toString());
+    q.getTransaction().logSummary(msg.toString());
   }
 }

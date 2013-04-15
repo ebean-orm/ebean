@@ -54,7 +54,7 @@ public class PstmtFactory {
 		}
 
 		if (logSql){
-		    t.logInternal(sql);
+		    t.logSql(sql);
 		}
 		
 		Connection conn = t.getInternalConnection();
@@ -83,7 +83,7 @@ public class PstmtFactory {
 		}
 		
 		if (logSql){
-		    t.logInternal(sql);
+		    t.logSql(sql);
 		}
 
 		Connection conn = t.getInternalConnection();
