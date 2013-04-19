@@ -338,8 +338,7 @@ public class PooledConnectionQueue {
             closeFreeConnections(true);
         
             if (!busyList.isEmpty()) {
-                String msg = "A potential connection leak was detected.  Busy connections: "+ busyList.size();
-                logger.warn(msg);
+                logger.warn("A potential connection leak was detected.  Busy connections: "+ busyList.size());
                 
                 dumpBusyConnectionInformation();
                 closeBusyConnections(0);

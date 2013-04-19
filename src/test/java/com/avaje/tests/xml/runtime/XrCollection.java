@@ -59,14 +59,14 @@ public class XrCollection extends XrNode implements XoiNode {
         Object parentBean = ctx.getBean();
         
         // create a List/Set/Map to hold the details
-        Object details = manyProp.createEmpty(ctx.isVanillaMode());
+        Object details = manyProp.createEmpty(false);
         
         // Wrapper used to add to the collection
         BeanCollectionAdd bcAdd = manyProp.getBeanCollectionAdd(details, mapKey);
         
         Node detailNode = nextElement(node.getFirstChild());
         do {
-            Object detailBean = targetDescriptor.createBean(ctx.isVanillaMode());
+            Object detailBean = targetDescriptor.createBean();
             ctx.setBean(detailBean);
             
             for (int i = 0; i < childNodes.length; i++) {

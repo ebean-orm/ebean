@@ -1,6 +1,5 @@
 package com.avaje.ebean.common;
 
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,7 +10,6 @@ import java.util.ListIterator;
 
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
-import com.avaje.ebean.bean.SerializeControl;
 
 /**
  * List capable of lazy loading.
@@ -44,20 +42,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
    */
   public BeanList(BeanCollectionLoader loader, Object ownerBean, String propertyName) {
     super(loader, ownerBean, propertyName);
-  }
-
-  Object readResolve() throws ObjectStreamException {
-    if (SerializeControl.isVanillaCollections()) {
-      return list;
-    }
-    return this;
-  }
-
-  Object writeReplace() throws ObjectStreamException {
-    if (SerializeControl.isVanillaCollections()) {
-      return list;
-    }
-    return this;
   }
 
   @SuppressWarnings("unchecked")

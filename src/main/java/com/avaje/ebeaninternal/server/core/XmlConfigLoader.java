@@ -87,9 +87,9 @@ public class XmlConfigLoader {
                 if (classPath.isDirectory()) {
                     checkDir(searchFor, xmlList, classPath);
 
-                } else if (classPath.getName().endsWith(".jar")) {
+                } else if (classPath.getName().endsWith(".jar") || classPath.getName().endsWith(".war")) {
                     checkJar(searchFor, xmlList, classPath);
-
+                  
                 } else {
                     // this is not expected
                     String msg = "Not a Jar or Directory? " + classPath.getAbsolutePath();

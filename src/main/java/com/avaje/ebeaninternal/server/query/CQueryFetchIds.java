@@ -263,10 +263,6 @@ public class CQueryFetchIds {
             return dataReader;
         }
 
-        public boolean isVanillaMode() {
-            return false;
-        }
-
 		public Boolean isReadOnly() {
 			return Boolean.FALSE;
 		}

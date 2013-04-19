@@ -39,8 +39,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
   private final SpiQuery<T> query;
 
-  private final boolean vanillaMode;
-
   private final BeanFinder<T> finder;
 
   private final LoadContext graphContext;
@@ -74,7 +72,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     this.finder = beanDescriptor.getBeanFinder();
     this.queryEngine = queryEngine;
     this.query = query;
-    this.vanillaMode = query.isVanillaMode(server.isVanillaMode());
     this.readOnly = query.isReadOnly();
 
     this.graphContext = new DLoadContext(ebeanServer, beanDescriptor, readOnly, query);
@@ -226,11 +223,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public boolean isFindById() {
     return query.getType() == Type.BEAN;
   }
-
-  public boolean isVanillaMode() {
-    return vanillaMode;
-  }
-
+  
   /**
    * Execute the query as findById.
    */
@@ -269,8 +262,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   @SuppressWarnings("unchecked")
   public List<T> findList() {
-    BeanCollection<T> bc = queryEngine.findMany(this);
-    return (List<T>) (vanillaMode ? bc.getActualCollection() : bc);
+    return (List<T>) queryEngine.findMany(this);
   }
 
   /**
@@ -278,8 +270,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   @SuppressWarnings("unchecked")
   public Set<?> findSet() {
-    BeanCollection<T> bc = queryEngine.findMany(this);
-    return (Set<T>) (vanillaMode ? bc.getActualCollection() : bc);
+    return (Set<T>)queryEngine.findMany(this);
   }
 
   /**
@@ -296,8 +287,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
         throw new PersistenceException(msg);
       }
     }
-    BeanCollection<T> bc = queryEngine.findMany(this);
-    return (Map<?, ?>) (vanillaMode ? bc.getActualCollection() : bc);
+    return (Map<?, ?>) queryEngine.findMany(this);
   }
 
   public SpiQuery.Type getQueryType() {
@@ -377,14 +367,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
     // TODO: Sort out returning BeanCollection from L2 cache
     return null;
-
-    // BeanCollection<T> bc = beanDescriptor.queryCacheGet(cacheKey);
-    // if (bc != null && Boolean.FALSE.equals(query.isReadOnly())) {
-    // // Explicit readOnly=false for query cache
-    // CopyContext ctx = new CopyContext(vanillaMode, false);
-    // return new CopyBeanCollection<T>(bc, beanDescriptor, ctx, 5).copy();
-    // }
-    // return bc;
   }
 
   public void putToQueryCache(BeanCollection<T> queryResult) {

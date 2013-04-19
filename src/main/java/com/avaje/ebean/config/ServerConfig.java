@@ -5,10 +5,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.LogLevel;
-import com.avaje.ebean.Query;
 import com.avaje.ebean.annotation.Encrypted;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
@@ -213,24 +211,6 @@ public class ServerConfig {
   private ServerCacheFactory serverCacheFactory;
 
   private ServerCacheManager serverCacheManager;
-
-  /**
-   * Set this to true when by default vanilla objects should be returned from
-   * queries rather than dynamic subclasses etc. Only relevant when not using
-   * enhancement (using dynamic subclasses).
-   */
-  private boolean vanillaMode;
-
-  /**
-   * Controls whether the {@link EbeanServer#getReference(Class, Object)} method
-   * returns vanilla objects or not.
-   */
-  private boolean vanillaRefMode;
-
-  /**
-   * Set to false to require enhancement to be used. Defaults to true.
-   */
-  private boolean allowSubclassing = true;
 
   /**
    * Construct a Server Configuration for programmatically creating an
@@ -464,56 +444,6 @@ public class ServerConfig {
    */
   public void setServerCacheManager(ServerCacheManager serverCacheManager) {
     this.serverCacheManager = serverCacheManager;
-  }
-
-  /**
-   * Return true if by default queries should return 'vanilla' objects rather
-   * than dynamic subclasses.
-   * <p>
-   * This setting is not relevant when using enhancement (only when using
-   * dynamic subclasses).
-   * </p>
-   */
-  public boolean isVanillaMode() {
-    return vanillaMode;
-  }
-
-  /**
-   * Set this to true if by default queries should return 'vanilla' objects
-   * rather than dynamic subclasses.
-   * <p>
-   * This setting is not relevant when using enhancement (only when using
-   * dynamic subclasses).
-   * </p>
-   * <p>
-   * Alternatively you can set this on a specific query via
-   * {@link Query#setVanillaMode(boolean)}.
-   * </p>
-   * 
-   * @see #setVanillaRefMode(boolean)
-   * @see Query#setVanillaMode(boolean)
-   */
-  public void setVanillaMode(boolean vanillaMode) {
-    this.vanillaMode = vanillaMode;
-  }
-
-  /**
-   * Returns true if {@link EbeanServer#getReference(Class, Object)} should
-   * return vanilla objects or not.
-   * 
-   * @see #setVanillaMode(boolean)
-   * @see Query#setVanillaMode(boolean)
-   */
-  public boolean isVanillaRefMode() {
-    return vanillaRefMode;
-  }
-
-  /**
-   * Set this to true if you want
-   * {@link EbeanServer#getReference(Class, Object)} to return vanilla objects.
-   */
-  public void setVanillaRefMode(boolean vanillaRefMode) {
-    this.vanillaRefMode = vanillaRefMode;
   }
 
   /**
@@ -1152,20 +1082,6 @@ public class ServerConfig {
   }
 
   /**
-   * Set to false to require enhancement to be used. Defaults to true.
-   */
-  public void setAllowSubclassing(boolean allowSubclassing) {
-    this.allowSubclassing = allowSubclassing;
-  }
-
-  /**
-   * Returns whether this config supports subclassed entities.
-   */
-  public boolean isAllowSubclassing() {
-    return allowSubclassing;
-  }
-
-  /**
    * Returns the resource directory.
    */
   public String getResourceDirectory() {
@@ -1421,9 +1337,6 @@ public class ServerConfig {
       packages = getSearchJarsPackages(packagesProp);
     }
 
-    allowSubclassing = p.getBoolean("allowSubclassing", true);
-    vanillaMode = p.getBoolean("vanillaMode", false);
-    vanillaRefMode = p.getBoolean("vanillaRefMode", false);
     updateChangesOnly = p.getBoolean("updateChangesOnly", true);
 
     boolean batchMode = p.getBoolean("batch.mode", false);

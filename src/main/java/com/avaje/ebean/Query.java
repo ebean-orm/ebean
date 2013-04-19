@@ -1,7 +1,5 @@
 package com.avaje.ebean;
 
-import com.avaje.ebean.config.ServerConfig;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -958,23 +956,6 @@ public interface Query<T> extends Serializable {
    * Set whether this query uses DISTINCT.
    */
   public Query<T> setDistinct(boolean isDistinct);
-
-  /**
-   * Set this to true and the beans and collections returned will be plain
-   * classes rather than Ebean generated dynamic subclasses etc.
-   * <p>
-   * This is *ONLY* relevant when you are not using enhancement (and using
-   * dynamic subclasses instead).
-   * </p>
-   * <p>
-   * Alternatively you can globally set the mode using ebean.vanillaMode=true in
-   * ebean.properties or {@link ServerConfig#setVanillaMode(boolean)}.
-   * </p>
-   * 
-   * @see ServerConfig#setVanillaMode(boolean)
-   * @see ServerConfig#setVanillaRefMode(boolean)
-   */
-  public Query<T> setVanillaMode(boolean vanillaMode);
 
   /**
    * Return the first row value.

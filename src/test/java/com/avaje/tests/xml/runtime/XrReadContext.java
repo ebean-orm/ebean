@@ -2,8 +2,6 @@ package com.avaje.tests.xml.runtime;
 
 public class XrReadContext {
 
-    private boolean vanillaMode;
-    
     private Object bean;
     
     public XrReadContext(Object bean) {
@@ -17,13 +15,4 @@ public class XrReadContext {
     public void setBean(Object bean) {
         this.bean = bean;
     }
-
-    public boolean isVanillaMode() {
-        return vanillaMode;
-    }
-
-    public void setVanillaMode(boolean vanillaMode) {
-        this.vanillaMode = vanillaMode;
-    }
-
 }

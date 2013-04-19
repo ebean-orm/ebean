@@ -253,8 +253,6 @@ public class PooledConnection extends ConnectionDelegator
 	 */
 	public void closeConnectionFully(boolean logErrors) {
 
-		//pool.removeConnection(this);
-
 		String msg = "Closing Connection[" + getName() + "]" + " psReuse[" + pstmtHitCounter
 				+ "] psCreate[" + pstmtMissCounter + "] psSize[" + pstmtCache.size() + "]";
 
@@ -262,14 +260,12 @@ public class PooledConnection extends ConnectionDelegator
 
 		try {
 			if (connection.isClosed()) {
-				msg = "Closing Connection[" + getName() + "] that is already closed?";
-				logger.error(msg);
+				logger.warn("Closing Connection[" + getName() + "] that is already closed?");
 				return;
 			}
 		} catch (SQLException ex) {
 			if (logErrors) {
-				msg = "Error when fully closing connection [" + getName() + "]";
-				logger.error(msg, ex);
+				logger.error("Error when fully closing connection [" + getName() + "]", ex);
 			}
 		}
 
@@ -288,11 +284,9 @@ public class PooledConnection extends ConnectionDelegator
 
 		try {
 			connection.close();
-
 		} catch (SQLException ex) {
 			if (logErrors) {
-				msg = "Error when fully closing connection [" + getName() + "]";
-				logger.error(msg, ex);
+				logger.error("Error when fully closing connection [" + getName() + "]", ex);
 			}
 		}
 	}

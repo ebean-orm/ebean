@@ -238,7 +238,7 @@ public final class IdBinderEmbedded implements IdBinder {
             String msg = "Failed to split ["+idTermValue+"] using | for id.";
             throw new PersistenceException(msg);
         }
-        Object embId = idDesc.createVanillaBean();
+        Object embId = idDesc.createBean();
         for (int i = 0; i < props.length; i++) {
             Object v = props[i].getScalarType().parse(split[i]);
             props[i].setValue(embId, v);
@@ -299,7 +299,7 @@ public final class IdBinderEmbedded implements IdBinder {
     
     public Object readData(DataInput dataInput) throws IOException {
         
-        Object embId = idDesc.createVanillaBean();
+        Object embId = idDesc.createBean();
         boolean notNull = true;
 
         for (int i = 0; i < props.length; i++) {
@@ -332,7 +332,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
     public Object read(DbReadContext ctx) throws SQLException {
 
-        Object embId = idDesc.createVanillaBean();
+        Object embId = idDesc.createBean();
         boolean notNull = true;
 
         for (int i = 0; i < props.length; i++) {

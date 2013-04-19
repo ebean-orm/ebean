@@ -13,35 +13,25 @@ import com.avaje.ebeaninternal.server.type.DataReader;
  */
 public interface DbReadContext {
 	
-    /**
-     * Return the state of the object graph.
-     */
-    public Boolean isReadOnly();
+  /**
+   * Return the state of the object graph.
+   */
+  public Boolean isReadOnly();
+  
+  /**
+   * Propagate the state to the bean.
+   */
+  public void propagateState(Object e);
     
-    /**
-     * Propagate the state to the bean.
-     */
-    public void propagateState(Object e);
-    
-    /**
-     * Return the DataReader.
-     */
-    public DataReader getDataReader();
-    
-    /**
-     * Return true if vanilla objects should be returned.
-     */
-    public boolean isVanillaMode();
-	
+  /**
+   * Return the DataReader.
+   */
+  public DataReader getDataReader();
+ 	
 	/**
 	 * Return true if the query is using supplied SQL rather than generated SQL.
 	 */
 	public boolean isRawSql();
-
-//	/**
-//	 * Return the reference options for a given bean property.
-//	 */
-//	public ReferenceOptions getReferenceOptionsFor(BeanPropertyAssocOne<?> beanProperty);
 	
 	/**
 	 * Set the JoinNode - used by proxy/reference beans for profiling.

@@ -72,8 +72,8 @@ public class MetaFactory {
     embeddedFact.create(allList, desc, DmlMode.WHERE, false);
     assocOneFact.create(allList, desc, DmlMode.WHERE);
 
-    Bindable setBindable = new BindableList(setList);
-    Bindable allBindable = new BindableList(allList);
+    BindableList setBindable = new BindableList(setList);
+    BindableList allBindable = new BindableList(allList);
 
     return new UpdateMeta(emptyStringAsNull, desc, setBindable, id, ver, allBindable);
   }

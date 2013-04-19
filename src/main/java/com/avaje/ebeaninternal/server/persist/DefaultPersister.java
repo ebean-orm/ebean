@@ -70,8 +70,8 @@ public final class DefaultPersister implements Persister {
 
 	private final BeanDescriptorManager beanDescriptorManager;
 
-	private final boolean defaultUpdateNullProperties;
-	private final boolean defaultDeleteMissingChildren;
+//	private final boolean defaultUpdateNullProperties;
+//	private final boolean defaultDeleteMissingChildren;
 
 	public DefaultPersister(SpiEbeanServer server, Binder binder, BeanDescriptorManager descMgr, PstmtBatch pstmtBatch) {
 
@@ -79,8 +79,8 @@ public final class DefaultPersister implements Persister {
 		this.beanDescriptorManager = descMgr;
 		this.persistExecute = new DefaultPersistExecute(binder, pstmtBatch);
 
-    this.defaultUpdateNullProperties = server.isDefaultUpdateNullProperties();
-    this.defaultDeleteMissingChildren = server.isDefaultDeleteMissingChildren();
+//    this.defaultUpdateNullProperties = server.isDefaultUpdateNullProperties();
+//    this.defaultDeleteMissingChildren = server.isDefaultDeleteMissingChildren();
 	}
 
 	/**
@@ -271,8 +271,7 @@ public final class DefaultPersister implements Persister {
 		}
 
 		if (bean instanceof EntityBean == false) {
-			saveVanillaRecurse(bean, t, parentBean);
-			return;
+			throw new IllegalArgumentException("This bean is of type ["+bean.getClass()+"] is not enhanced?");
 		}
 
 		PersistRequestBean<?> req = createRequest(bean, t, parentBean);
@@ -310,42 +309,6 @@ public final class DefaultPersister implements Persister {
 			} else {
 				insert(request);
 			}
-		}
-	}
-
-	/**
-	 * Determine if this is an Insert or update for the 'vanilla' bean.
-	 */
-	private void saveVanillaRecurse(Object bean, Transaction t, Object parentBean) {
-
-		BeanManager<?> mgr = getBeanManager(bean);
-		if (mgr == null) {
-			throw new RuntimeException("No Mgr found for " + bean + " " + bean.getClass());
-		}
-		// use the version property to determine insert or update
-		if (mgr.getBeanDescriptor().isVanillaInsert(bean)) {
-			saveVanillaInsert(bean, t, parentBean, mgr);
-
-		} else {
-			// update non-null properties (no partial object knowledge with vanilla bean)
-			forceUpdateStateless(bean, t, parentBean, mgr, null, defaultDeleteMissingChildren, defaultUpdateNullProperties);
-		}
-	}
-
-	/**
-	 * Perform insert on non-enhanced bean (effectively same as enhanced bean).
-	 */
-	private void saveVanillaInsert(Object bean, Transaction t, Object parentBean, BeanManager<?> mgr) {
-
-		PersistRequestBean<?> req = createRequest(bean, t, parentBean, mgr);
-		try {
-			req.initTransIfRequired();
-			insert(req);
-			req.commitTransIfRequired();
-
-		} catch (RuntimeException ex) {
-			req.rollbackTransIfRequired();
-			throw ex;
 		}
 	}
 

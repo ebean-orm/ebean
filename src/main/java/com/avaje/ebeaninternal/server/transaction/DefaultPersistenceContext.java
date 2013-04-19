@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.Monitor;
-import com.avaje.ebeaninternal.server.subclass.SubClassUtil;
 
 /**
  * Default implementation of PersistenceContext.
@@ -120,9 +119,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
    
     private ClassContext getClassContext(Class<?> beanType) {
 
-    	// strip off $$EntityBean.. suffix...
-    	String clsName = SubClassUtil.getSuperClassName(beanType.getName());
-    	
+    	String clsName = beanType.getName();    	
     	ClassContext classMap = typeCache.get(clsName);
         if (classMap == null) {            
             classMap = new ClassContext();

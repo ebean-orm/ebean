@@ -33,11 +33,6 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
 	 * Return true if UpdateNullProperties defaults to true for stateless updates.
 	 */
 	public boolean isDefaultUpdateNullProperties();
-
-    /**
-     * Return true if vanilla beans should be returned by queries by default.
-     */
-    public boolean isVanillaMode();
     
 	/**
 	 * Return the DatabasePlatform for this server.

@@ -294,6 +294,10 @@ public class TransactionManager {
 				c.setTransactionIsolation(isolationLevel);
 			}
 			
+			if (explicit && TXN_LOGGER.isTraceEnabled()) {
+			  TXN_LOGGER.trace(t.getLogPrefix()+"Begin");
+			}
+			
 			return t;
 
 		} catch (SQLException ex) {
@@ -371,6 +375,9 @@ public class TransactionManager {
   public void notifyOfQueryOnly(boolean onCommit, SpiTransaction transaction, Throwable cause) {
 
     // Nothing that interesting here
+    if (TXN_LOGGER.isTraceEnabled()) {
+      TXN_LOGGER.trace(transaction.getLogPrefix()+"Commit - query only");
+    }
   }
 		
 	private String formatThrowable(Throwable e){

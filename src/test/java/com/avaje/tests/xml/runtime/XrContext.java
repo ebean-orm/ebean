@@ -40,7 +40,7 @@ public class XrContext implements OxmContext {
         
         XoiNode xoiNode = getXoiNode(node.getNodeName());
         
-        Object bean = xoiNode.createBean(false);
+        Object bean = xoiNode.createBean();
         
         XrReadContext ctx = new XrReadContext(bean);
                 

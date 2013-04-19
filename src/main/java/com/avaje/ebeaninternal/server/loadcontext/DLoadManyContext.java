@@ -126,7 +126,7 @@ public class DLoadManyContext implements LoadManyContext, BeanCollectionLoader {
 		    	Object ownerBean = bc.getOwnerBean();
 		    	BeanDescriptor<? extends Object> parentDesc = desc.getBeanDescriptor(ownerBean.getClass());
 		    	Object parentId = parentDesc.getId(ownerBean);
-		    	if (parentDesc.cacheLoadMany(property, bc, parentId, parent.isReadOnly(), false)) {
+		    	if (parentDesc.cacheLoadMany(property, bc, parentId, parent.isReadOnly())) {
 		    		// we loaded the bean from cache
 		    		weakList.removeEntry(position);
 		    		return;	    			    		

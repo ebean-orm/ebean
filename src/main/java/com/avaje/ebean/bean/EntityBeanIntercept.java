@@ -3,7 +3,6 @@ package com.avaje.ebean.bean;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -534,27 +533,6 @@ public final class EntityBeanIntercept implements Serializable {
     if (nodeUsageCollector != null) {
       nodeUsageCollector.setModified();
     }
-  }
-
-  /**
-   * This is ONLY used for subclass entity beans.
-   * <p>
-   * This is not used when entity bean classes are enhanced via javaagent or ant
-   * etc - only when a subclass is generated.
-   * </p>
-   * Returns a Serializable instance that is either the 'byte code generated'
-   * object or a 'Vanilla' copy of this bean depending on
-   * SerializeControl.isVanillaBeans().
-   */
-  public Object writeReplaceIntercept() throws ObjectStreamException {
-
-    if (!SerializeControl.isVanillaBeans()) {
-      return owner;
-    }
-
-    // creates a plain vanilla object and
-    // copies the values from the owner
-    return owner._ebean_createCopy();
   }
 
   /**

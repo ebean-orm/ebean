@@ -10,7 +10,6 @@ import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployInheritInfo;
 import com.avaje.ebeaninternal.server.query.SqlTreeProperties;
-import com.avaje.ebeaninternal.server.subclass.SubClassUtil;
 
 /**
  * Represents a node in the Inheritance tree. Holds information regarding Super
@@ -224,8 +223,8 @@ public class InheritInfo {
 	/**
 	 * Create an EntityBean for this type.
 	 */
-	public Object createBean(boolean vanillaMode) {
-		return descriptor.createBean(vanillaMode);
+	public Object createBean() {
+		return descriptor.createBean();
 	}
 	
 	/**
@@ -284,8 +283,7 @@ public class InheritInfo {
 	 * Return the InheritInfo for the given bean type.
 	 */
     private InheritInfo getTypeByClass(Class<?> beanType) {
-        String clsName = SubClassUtil.getSuperClassName(beanType.getName());
-        return typeMap.get(clsName);
+        return typeMap.get(beanType.getName());
     }
 
 	private void registerWithRoot(InheritInfo info) {
@@ -293,8 +291,7 @@ public class InheritInfo {
 			String stringDiscValue = info.getDiscriminatorStringValue();
 			discMap.put(stringDiscValue, info);
 		}
-        String clsName = SubClassUtil.getSuperClassName(info.getType().getName());
-		typeMap.put(clsName, info);
+		typeMap.put(info.getType().getName(), info);
 	}
 
 	/**

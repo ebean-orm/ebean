@@ -523,11 +523,6 @@ public interface SpiQuery<T> extends Query<T> {
     public boolean isDistinct();
 
     /**
-     * Return true if this query should build and return vanilla objects.
-     */
-    public boolean isVanillaMode(boolean serverDefaultVanillaMode);
-
-    /**
      * Set default select clauses where none have been explicitly defined.
      */
     public void setDefaultSelectClause();

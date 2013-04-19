@@ -1,6 +1,5 @@
 package com.avaje.ebean.common;
 
-import java.io.ObjectStreamException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -9,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.avaje.ebean.bean.BeanCollectionLoader;
-import com.avaje.ebean.bean.SerializeControl;
 
 /**
  * Map capable of lazy loading.
@@ -37,20 +35,6 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   public BeanMap(BeanCollectionLoader ebeanServer, Object ownerBean, String propertyName) {
     super(ebeanServer, ownerBean, propertyName);
-  }
-
-  Object readResolve() throws ObjectStreamException {
-    if (SerializeControl.isVanillaCollections()) {
-      return map;
-    }
-    return this;
-  }
-
-  Object writeReplace() throws ObjectStreamException {
-    if (SerializeControl.isVanillaCollections()) {
-      return map;
-    }
-    return this;
   }
 
   public void internalAdd(Object bean) {

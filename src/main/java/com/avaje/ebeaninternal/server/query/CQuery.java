@@ -317,13 +317,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return queryMode;
   }
 
-  /**
-   * Return true if we want to return vanilla (not enhanced) objects.
-   */
-  public boolean isVanillaMode() {
-    return request.isVanillaMode();
-  }
-
   public CQueryPredicates getPredicates() {
     return predicates;
   }
@@ -586,11 +579,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       currentDetailCollection = manyPropertyEl.elGetValue(loadedBean);
     } else {
       // create a new collection to populate and assign to the bean
-      currentDetailCollection = manyProperty.createEmpty(request.isVanillaMode());
+      currentDetailCollection = manyProperty.createEmpty(false);
       manyPropertyEl.elSetValue(loadedBean, currentDetailCollection, false, false);
     }
 
-    if (filterMany != null && !request.isVanillaMode()) {
+    if (filterMany != null) {
       // remember the for use with a refresh
       ((BeanCollection<?>) currentDetailCollection).setFilterMany(filterMany);
     }

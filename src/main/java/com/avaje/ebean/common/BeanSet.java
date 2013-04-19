@@ -1,6 +1,5 @@
 package com.avaje.ebean.common;
 
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
@@ -9,7 +8,6 @@ import java.util.Set;
 
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
-import com.avaje.ebean.bean.SerializeControl;
 
 /**
  * Set capable of lazy loading.
@@ -38,20 +36,6 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   public BeanSet(BeanCollectionLoader loader, Object ownerBean, String propertyName) {
     super(loader, ownerBean, propertyName);
-  }
-
-  Object readResolve() throws ObjectStreamException {
-    if (SerializeControl.isVanillaCollections()) {
-      return set;
-    }
-    return this;
-  }
-
-  Object writeReplace() throws ObjectStreamException {
-    if (SerializeControl.isVanillaCollections()) {
-      return set;
-    }
-    return this;
   }
 
   @SuppressWarnings("unchecked")

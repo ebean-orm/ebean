@@ -24,12 +24,12 @@ public class TestStatelessUpdate extends TestCase {
 		server.save(e);
 				
 		
-		EBasic updateName = new EBasic();
-		updateName.setId(e.getId());
-		updateName.setName("justName");
-		
-		
-		server.update(updateName, null, null, false, false);
+//		EBasic updateName = new EBasic();
+//		updateName.setId(e.getId());
+//		updateName.setName("justName");
+//		
+//		
+//		server.update(updateName, null, null, false, false);
 		
 		EBasic updateAll = new EBasic();
 		updateAll.setId(e.getId());

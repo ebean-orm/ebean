@@ -61,8 +61,8 @@ public class XrNode extends XrBase implements XoiNode {
         return nodeName;
     }
     
-    public Object createBean(boolean vanillaMode) {
-        return beanDescriptor.createBean(vanillaMode);
+    public Object createBean() {
+        return beanDescriptor.createBean();
     }
     
     public String getNodeName() {
@@ -74,7 +74,7 @@ public class XrNode extends XrBase implements XoiNode {
         Object parentBean = null;
         if (assocBeanValue){
             parentBean = ctx.getBean();
-            Object childBean = beanDescriptor.createBean(ctx.isVanillaMode());
+            Object childBean = beanDescriptor.createBean();
             setObjectValue(parentBean, childBean);
         
             ctx.setBean(childBean);

@@ -70,11 +70,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.avaje.ebeanorm</groupId>
-      <artifactId>avaje-ebeanorm-agent</artifactId>
-      <version>[3.1.1]</version>
-    </dependency>
 
     <dependency>
       <groupId>joda-time</groupId>
@@ -141,10 +136,22 @@
       <plugin>
         <groupId>org.avaje.ebeanorm</groupId>
         <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
-        <version>3.1.1</version>
+        <version>3.2.1</version>
         <executions>
-          <execution>
+           <execution>
             <id>main</id>
+            <phase>process-classes</phase>
+            <configuration>
+              <classSource>target/classes</classSource>
+              <packages>com.avaje.ebean.meta.**</packages>
+              <transformArgs>debug=1</transformArgs>
+            </configuration>
+            <goals>
+              <goal>enhance</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>test</id>
             <phase>process-test-classes</phase>
             <configuration>
               <classSource>target/test-classes</classSource>

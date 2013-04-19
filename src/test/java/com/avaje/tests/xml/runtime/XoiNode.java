@@ -9,7 +9,7 @@ public interface XoiNode {
 
     public String getNodeName();
     
-    public Object createBean(boolean vanillaMode);
+    public Object createBean();
 
     public void writeNode(XrOutputDocument out, Node node, Object bean) throws IOException;
 

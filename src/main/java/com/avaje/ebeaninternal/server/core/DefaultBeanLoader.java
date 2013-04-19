@@ -34,13 +34,10 @@ public class DefaultBeanLoader {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultBeanLoader.class);
 
-  private final DebugLazyLoad debugLazyLoad;
-
   private final DefaultServer server;
 
-  protected DefaultBeanLoader(DefaultServer server, DebugLazyLoad debugLazyLoad) {
+  protected DefaultBeanLoader(DefaultServer server) {
     this.server = server;
-    this.debugLazyLoad = debugLazyLoad;
   }
 
 	  /**
@@ -173,17 +170,13 @@ public class DefaultBeanLoader {
 
 	private void loadManyInternal(Object parentBean, String propertyName, Transaction t, boolean refresh, ObjectGraphNode node, boolean onlyIds) {
 
-    boolean vanilla = (parentBean instanceof EntityBean == false);
-
     EntityBeanIntercept ebi = null;
     PersistenceContext pc = null;
     BeanCollection<?> beanCollection = null;
     ExpressionList<?> filterMany = null;
 
-    if (!vanilla) {
-      ebi = ((EntityBean) parentBean)._ebean_getIntercept();
-      pc = ebi.getPersistenceContext();
-    }
+    ebi = ((EntityBean) parentBean)._ebean_getIntercept();
+    pc = ebi.getPersistenceContext();
 
     BeanDescriptor<?> parentDesc = server.getBeanDescriptor(parentBean.getClass());
     BeanPropertyAssocMany<?> many = (BeanPropertyAssocMany<?>) parentDesc.getBeanProperty(propertyName);
@@ -201,13 +194,13 @@ public class DefaultBeanLoader {
       pc.put(parentId, parentBean);
     }
 
-    boolean useManyIdCache = !vanilla && beanCollection != null && parentDesc.cacheIsUseManyId();
+    boolean useManyIdCache = beanCollection != null && parentDesc.cacheIsUseManyId();
     if (useManyIdCache) {
       Boolean readOnly = null;
       if (ebi != null && ebi.isReadOnly()) {
         readOnly = Boolean.TRUE;
       }
-      if (parentDesc.cacheLoadMany(many, beanCollection, parentId, readOnly, false)) {
+      if (parentDesc.cacheLoadMany(many, beanCollection, parentId, readOnly)) {
         return;
       }
     }
@@ -216,7 +209,7 @@ public class DefaultBeanLoader {
 
     if (refresh) {
       // populate a new collection
-      Object emptyCollection = many.createEmpty(vanilla);
+      Object emptyCollection = many.createEmpty(false);
       many.setValue(parentBean, emptyCollection);
       query.setLoadDescription("+refresh", null);
     } else {
@@ -245,7 +238,6 @@ public class DefaultBeanLoader {
     query.setMode(Mode.LAZYLOAD_MANY);
     query.setLazyLoadManyPath(many.getName());
     query.setPersistenceContext(pc);
-    query.setVanillaMode(vanilla);
 
     if (ebi != null) {
       if (ebi.isReadOnly()) {
@@ -370,15 +362,9 @@ public class DefaultBeanLoader {
 
   private void refreshBeanInternal(Object bean, SpiQuery.Mode mode) {
 
-    boolean vanilla = (bean instanceof EntityBean == false);
-
-    EntityBeanIntercept ebi = null;
-    PersistenceContext pc = null;
-
-    if (!vanilla) {
-      ebi = ((EntityBean) bean)._ebean_getIntercept();
-      pc = ebi.getPersistenceContext();
-    }
+    
+    EntityBeanIntercept ebi = ((EntityBean) bean)._ebean_getIntercept();;
+    PersistenceContext pc = ebi.getPersistenceContext();
 
     BeanDescriptor<?> desc = server.getBeanDescriptor(bean.getClass());
     Object id = desc.getId(bean);
@@ -429,7 +415,6 @@ public class DefaultBeanLoader {
     if (mode.equals(SpiQuery.Mode.REFRESH_BEAN)) {
       query.setUseCache(false);
     }
-    query.setVanillaMode(vanilla);
 
     if (ebi != null && ebi.isReadOnly()) {
       query.setReadOnly(true);

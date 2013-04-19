@@ -128,11 +128,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	private String lazyLoadProperty;
 	
     private String lazyLoadManyPath;
-
-	/**
-	 * Set to true when we want to return vanilla (not enhanced) objects.
-	 */
-	private Boolean vanillaMode;
 	
 	/**
 	 * Set to true if you want a DISTINCT query.
@@ -447,7 +442,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 		copy.timeout = timeout;
 		copy.mapKey = mapKey;
 		copy.id = id;
-		copy.vanillaMode = vanillaMode;
 		copy.loadBeanCache = loadBeanCache;
 		copy.useBeanCache = useBeanCache;
 		copy.useQueryCache = useQueryCache;
@@ -776,20 +770,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 		return maxRows > 0 || firstRow > 0;
 	}
 
-	
-	public boolean isVanillaMode(boolean defaultVanillaMode) {
-        if (vanillaMode != null) {
-            return vanillaMode.booleanValue();
-        }
-        return defaultVanillaMode;
-    }
-
-    public DefaultOrmQuery<T> setVanillaMode(boolean vanillaMode) {
-        this.vanillaMode = vanillaMode;
-        return this;
-    }
-
-    public Boolean isReadOnly() {
+  public Boolean isReadOnly() {
 		return readOnly;
 	}
 

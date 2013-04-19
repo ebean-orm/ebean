@@ -936,7 +936,7 @@ public class BeanDescriptor<T> {
     }
   }
 
-  public boolean cacheLoadMany(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId, Boolean readOnly, boolean vanilla) {
+  public boolean cacheLoadMany(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId, Boolean readOnly) {
     
     CachedManyIds ids = cacheGetCachedManyIds(parentId, many.getName());
     if (ids == null) {
@@ -953,7 +953,7 @@ public class BeanDescriptor<T> {
     bc.checkEmptyLazyLoad();
     for (int i = 0; i < idList.size(); i++) {
       Object id = idList.get(i);
-      Object refBean = targetDescriptor.createReference(vanilla, readOnly, id, null);
+      Object refBean = targetDescriptor.createReference(readOnly, id, null);
       EntityBeanIntercept refEbi = ((EntityBean) refBean)._ebean_getIntercept();
     
       many.add(bc, refBean);
@@ -999,22 +999,22 @@ public class BeanDescriptor<T> {
    * Return a bean from the bean cache.
    */
   @SuppressWarnings("unchecked")
-  public T cacheGetBean(Object id, boolean vanilla, Boolean readOnly) {
+  public T cacheGetBean(Object id, Boolean readOnly) {
 
     CachedBeanData d = (CachedBeanData) getBeanCache().get(id);
     if (d == null) {
       return null;
     }
-    if (cacheSharableBeans && !vanilla && !Boolean.FALSE.equals(readOnly)) {
+    if (cacheSharableBeans && !Boolean.FALSE.equals(readOnly)) {
       Object bean = d.getSharableBean();
       if (bean != null) {
         return (T) bean;
       }
     }
 
-    T bean = (T) createBean(vanilla);
+    T bean = (T) createBean();
     convertSetId(id, bean);
-    if (!vanilla && Boolean.TRUE.equals(readOnly)) {
+    if (Boolean.TRUE.equals(readOnly)) {
       ((EntityBean) bean)._ebean_getIntercept().setReadOnly(true);
     }
 
@@ -1306,20 +1306,10 @@ public class BeanDescriptor<T> {
   }
 
   /**
-   * Create an EntityBean or "Vanilla" bean depending on the flag.
+   * Create an EntityBean.
    */
-  public Object createBean(boolean vanillaMode) {
-    return vanillaMode ? createVanillaBean() : createEntityBean();
-  }
-
-  /**
-   * Create a plain vanilla object.
-   * <p>
-   * Used for EmbeddedId Bean construction.
-   * </p>
-   */
-  public Object createVanillaBean() {
-    return beanReflect.createVanillaBean();
+  public Object createBean() {
+    return createEntityBean();
   }
 
   /**
@@ -1341,9 +1331,9 @@ public class BeanDescriptor<T> {
    * Create a reference bean based on the id.
    */
   @SuppressWarnings("unchecked")
-  public T createReference(boolean vanillaMode, Boolean readOnly, Object id, Object parent) {
+  public T createReference(Boolean readOnly, Object id, Object parent) {
 
-    if (cacheSharableBeans && !vanillaMode && !Boolean.FALSE.equals(readOnly)) {
+    if (cacheSharableBeans && !Boolean.FALSE.equals(readOnly)) {
       CachedBeanData d = (CachedBeanData) getBeanCache().get(id);
       if (d != null) {
         Object shareableBean = d.getSharableBean();
@@ -1353,25 +1343,23 @@ public class BeanDescriptor<T> {
       }
     }
     try {
-      Object bean = createBean(vanillaMode);
+      Object bean = createBean();
 
       convertSetId(id, bean);
 
-      if (!vanillaMode) {
-        EntityBean eb = (EntityBean) bean;
+      EntityBean eb = (EntityBean) bean;
 
-        EntityBeanIntercept ebi = eb._ebean_getIntercept();
-        ebi.setBeanLoaderByServerName(ebeanServer.getName());
+      EntityBeanIntercept ebi = eb._ebean_getIntercept();
+      ebi.setBeanLoaderByServerName(ebeanServer.getName());
 
-        if (parent != null) {
-          // Special case for a OneToOne ... parent
-          // needs to be added to context prior to query
-          ebi.setParentBean(parent);
-        }
-
-        // Note: not creating proxies for many's...
-        ebi.setReference();
+      if (parent != null) {
+        // Special case for a OneToOne ... parent
+        // needs to be added to context prior to query
+        ebi.setParentBean(parent);
       }
+
+      // Note: not creating proxies for many's...
+      ebi.setReference();
 
       return (T) bean;
 
@@ -2207,17 +2195,6 @@ public class BeanDescriptor<T> {
    */
   public BeanProperty firstVersionProperty() {
     return propertyFirstVersion;
-  }
-
-  /**
-   * Return true if this an Insert (rather than Update) on a non-enhanced bean.
-   */
-  public boolean isVanillaInsert(Object bean) {
-    if (propertyFirstVersion == null) {
-      return true;
-    }
-    Object versionValue = propertyFirstVersion.getValue(bean);
-    return DmlUtil.isNullOrZero(versionValue);
   }
 
   /**

@@ -1,8 +1,5 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -139,13 +136,6 @@ public final class DefaultServer implements SpiEbeanServer {
   private final boolean defaultUpdateNullProperties;
 
   /**
-   * Set to true if vanilla objects should be returned by default from queries
-   * (with dynamic subclassing).
-   */
-  private final boolean vanillaMode;
-  private final boolean vanillaRefMode;
-
-  /**
    * Handles the save, delete, updateSql CallableSql.
    */
   private final Persister persister;
@@ -210,9 +200,6 @@ public final class DefaultServer implements SpiEbeanServer {
    */
   public DefaultServer(InternalConfiguration config, ServerCacheManager cache) {
 
-    this.vanillaMode = config.getServerConfig().isVanillaMode();
-    this.vanillaRefMode = config.getServerConfig().isVanillaRefMode();
-
     this.serverCacheManager = cache;
     this.pstmtBatch = config.getPstmtBatch();
     this.databasePlatform = config.getDatabasePlatform();
@@ -245,7 +232,7 @@ public final class DefaultServer implements SpiEbeanServer {
     this.autoFetchManager = config.createAutoFetchManager(this);
     this.adminAutofetch = new MAdminAutofetch(autoFetchManager);
 
-    this.beanLoader = new DefaultBeanLoader(this, config.getDebugLazyLoad());
+    this.beanLoader = new DefaultBeanLoader(this);
     this.jsonContext = config.createJsonContext(this);
 
     loadAndInitializePlugins(config);
@@ -288,10 +275,6 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public boolean isDefaultUpdateNullProperties() {
     return defaultUpdateNullProperties;
-  }
-
-  public boolean isVanillaMode() {
-    return vanillaMode;
   }
 
   public int getLazyLoadBatchSize() {
@@ -410,8 +393,7 @@ public final class DefaultServer implements SpiEbeanServer {
     if (bean instanceof EntityBean) {
       return new DefaultBeanState((EntityBean) bean);
     }
-    // if using "subclassing" (not enhancement) this will
-    // return null for 'vanilla' instances (not subclassed)
+    // Not an entity bean
     return null;
   }
 
@@ -563,15 +545,6 @@ public final class DefaultServer implements SpiEbeanServer {
     return (T) desc.createEntityBean();
   }
 
-  public ObjectInputStream createProxyObjectInputStream(InputStream is) {
-
-    try {
-      return new ProxyBeanObjectInputStream(is, this);
-    } catch (IOException e) {
-      throw new PersistenceException(e);
-    }
-  }
-
   /**
    * Return a Reference bean.
    * <p>
@@ -629,7 +602,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
       } else {
         // use the default reference options
-        ref = desc.createReference(vanillaRefMode, null, id, null);
+        ref = desc.createReference(null, id, null);
       }
 
       if (ctx != null && (ref instanceof EntityBean)) {
@@ -1139,25 +1112,20 @@ public final class DefaultServer implements SpiEbeanServer {
       return null;
     }
 
-    // boolean readOnly = beanDescriptor.calculateReadOnly(query.isReadOnly());
-    boolean vanilla = query.isVanillaMode(vanillaMode);
-    Object cachedBean = beanDescriptor.cacheGetBean(query.getId(), vanilla, query.isReadOnly());
+    Object cachedBean = beanDescriptor.cacheGetBean(query.getId(), query.isReadOnly());
     if (cachedBean != null) {
       if (context == null) {
         context = new DefaultPersistenceContext();
 
       }
       context.put(query.getId(), cachedBean);
-      if (!vanilla) {
 
-        DLoadContext loadContext = new DLoadContext(this, beanDescriptor, query.isReadOnly(), false, null, false);
-        loadContext.setPersistenceContext(context);
+      DLoadContext loadContext = new DLoadContext(this, beanDescriptor, query.isReadOnly(), false, null, false);
+      loadContext.setPersistenceContext(context);
 
-        EntityBeanIntercept ebi = ((EntityBean) cachedBean)._ebean_getIntercept();
-        ebi.setPersistenceContext(context);
-        loadContext.register(null, ebi);
-
-      }
+      EntityBeanIntercept ebi = ((EntityBean) cachedBean)._ebean_getIntercept();
+      ebi.setPersistenceContext(context);
+      loadContext.register(null, ebi);
     }
 
     return (T) cachedBean;

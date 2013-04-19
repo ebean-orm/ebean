@@ -14,6 +14,9 @@ import java.util.Set;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
@@ -60,11 +63,7 @@ import com.avaje.ebeaninternal.server.reflect.BeanReflectFactory;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectGetter;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectSetter;
 import com.avaje.ebeaninternal.server.reflect.EnhanceBeanReflectFactory;
-import com.avaje.ebeaninternal.server.subclass.SubClassManager;
-import com.avaje.ebeaninternal.server.subclass.SubClassUtil;
 import com.avaje.ebeaninternal.server.type.TypeManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Creates BeanDescriptors.
@@ -97,8 +96,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final PersistListenerManager persistListenerManager;
 
   private final BeanQueryAdapterManager beanQueryAdapterManager;
-
-  private final SubClassManager subClassManager;
 
   private final NamingConvention namingConvention;
 
@@ -153,8 +150,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final XmlConfig xmlConfig;
 
-  private final boolean allowSubclassing;
-
   /**
    * Create for a given database dbConfig.
    */
@@ -172,7 +167,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     this.bootupClasses = config.getBootupClasses();
     this.createProperties = config.getDeployCreateProperties();
-    this.subClassManager = config.getSubClassManager();
     this.typeManager = config.getTypeManager();
     this.namingConvention = config.getServerConfig().getNamingConvention();
     this.dbIdentity = config.getDatabasePlatform().getDbIdentity();
@@ -192,7 +186,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     this.reflectFactory = createReflectionFactory();
     this.transientProperties = new TransientProperties();
-    this.allowSubclassing = config.getServerConfig().isAllowSubclassing();
   }
 
   public BeanDescriptor<?> getBeanDescriptorById(String descriptorId) {
@@ -201,17 +194,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   @SuppressWarnings("unchecked")
   public <T> BeanDescriptor<T> getBeanDescriptor(Class<T> entityType) {
-
-    // remove $$EntityBean stuff
-    String className = SubClassUtil.getSuperClassName(entityType.getName());
-    return (BeanDescriptor<T>) descMap.get(className);
+    return (BeanDescriptor<T>) descMap.get(entityType.getName());
   }
 
   @SuppressWarnings("unchecked")
   public <T> BeanDescriptor<T> getBeanDescriptor(String entityClassName) {
-
-    // remove $$EntityBean stuff
-    entityClassName = SubClassUtil.getSuperClassName(entityClassName);
     return (BeanDescriptor<T>) descMap.get(entityClassName);
   }
 
@@ -440,8 +427,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   public BeanManager<?> getBeanManager(String beanClassName) {
-
-    beanClassName = SubClassUtil.getSuperClassName(beanClassName);
     return beanManagerMap.get(beanClassName);
   }
 
@@ -1462,13 +1447,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       desc.setFactoryType(beanClass);
       
     } else {
-      if (!allowSubclassing) {
-        throw new PersistenceException("This configuration does not allow entity subclassing [" + beanClass + "]");
-      }
-      subclassClassCount++;      
-      Class<?> subClass = subClassManager.resolve(beanClass.getName());
-      desc.setFactoryType(subClass);
-      subclassedEntities.add(desc.getName());
+      throw new PersistenceException("Entity type "+beanClass+" is not an enhanced entity bean. Subclassing is not longer supported in Ebean");
     }
   }
 

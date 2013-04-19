@@ -25,7 +25,7 @@ public final class UpdateMeta {
 
   private final String sqlNone;
 
-  private final Bindable set;
+  private final BindableList set;
   private final BindableId id;
   private final Bindable version;
   private final Bindable all;
@@ -37,7 +37,7 @@ public final class UpdateMeta {
 
   private final boolean emptyStringAsNull;
 
-  public UpdateMeta(boolean emptyStringAsNull, BeanDescriptor<?> desc, Bindable set, BindableId id, Bindable version, Bindable all) {
+  public UpdateMeta(boolean emptyStringAsNull, BeanDescriptor<?> desc, BindableList set, BindableId id, Bindable version, Bindable all) {
     this.emptyStringAsNull = emptyStringAsNull;
     this.tableName = desc.getBaseTable();
     this.set = set;
@@ -154,7 +154,12 @@ public final class UpdateMeta {
 
     // build a bindableList that only contains the changed properties
     List<Bindable> list = new ArrayList<Bindable>();
-    set.addChanged(persistRequest, list);
+    if (updatedProps == null) {
+      // update all the properties
+      set.addAll(list);
+    } else {
+      set.addChanged(persistRequest, list);  
+    }
     BindableList bindableList = new BindableList(list);
 
     // build the SQL for this update statement

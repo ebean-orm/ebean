@@ -54,11 +54,6 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	protected final boolean isDirty;
 
 	/**
-	 * True if this is a vanilla bean.
-	 */
-	protected final boolean vanilla;
-
-	/**
 	 * The bean being persisted.
 	 */
 	protected final T bean;
@@ -113,8 +108,6 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 		this.concurrencyMode = concurrencyMode;
 		this.loadedProps = updateProps;
 		this.changedProps = updateProps;
-
-		this.vanilla = true;
 		this.isDirty = true;
 		this.oldValues = bean;
 		if (bean instanceof EntityBean) {
@@ -137,41 +130,24 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 
 		this.controller = beanDescriptor.getPersistController();
 		this.concurrencyMode = beanDescriptor.getConcurrencyMode();
-
-		if (bean instanceof EntityBean) {
-			this.intercept = ((EntityBean) bean)._ebean_getIntercept();
-			if (intercept.isReference()) {
-				// allowed to delete reference objects
-				// with no concurrency checking
-				this.concurrencyMode = ConcurrencyMode.NONE;
-			}
-			// this is ok to not use isNewOrDirty() as used for updates only
-			this.isDirty = intercept.isDirty();
-			if (!isDirty) {
-				this.changedProps = intercept.getChangedProps();
-			} else {
-				// merge changed properties on the bean with changed embedded beans
-				Set<String> beanChangedProps = intercept.getChangedProps();
-				Set<String> dirtyEmbedded = beanDescriptor.getDirtyEmbeddedProperties(bean);
-				this.changedProps = mergeChangedProperties(beanChangedProps, dirtyEmbedded);
-			}
-			this.loadedProps = intercept.getLoadedProps();
-			this.oldValues = (T) intercept.getOldValues();
-			this.vanilla = false;
-
-		} else {
-			// have to assume the vanilla bean is dirty
-			this.vanilla = true;
-			this.isDirty = true;
-			this.loadedProps = null;
-			this.changedProps = null;
-			this.intercept = null;
-
-			// degrade concurrency checking to none for vanilla bean
-			if (concurrencyMode.equals(ConcurrencyMode.ALL)) {
-				this.concurrencyMode = ConcurrencyMode.NONE;
-			}
+		this.intercept = ((EntityBean) bean)._ebean_getIntercept();
+		if (intercept.isReference()) {
+			// allowed to delete reference objects
+			// with no concurrency checking
+			this.concurrencyMode = ConcurrencyMode.NONE;
 		}
+		// this is ok to not use isNewOrDirty() as used for updates only
+		this.isDirty = intercept.isDirty();
+		if (!isDirty) {
+			this.changedProps = intercept.getChangedProps();
+		} else {
+			// merge changed properties on the bean with changed embedded beans
+			Set<String> beanChangedProps = intercept.getChangedProps();
+			Set<String> dirtyEmbedded = beanDescriptor.getDirtyEmbeddedProperties(bean);
+			this.changedProps = mergeChangedProperties(beanChangedProps, dirtyEmbedded);
+		}
+		this.loadedProps = intercept.getLoadedProps();
+		this.oldValues = (T) intercept.getOldValues();
 	}
 
 	/**
@@ -632,7 +608,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 * </p>
 	 */
 	public boolean isDynamicUpdateSql() {
-		return !vanilla && beanDescriptor.isUpdateChangesOnly() || (loadedProps != null);
+		return beanDescriptor.isUpdateChangesOnly() || (loadedProps != null);
 	}
 
 	/**
@@ -666,7 +642,9 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 * update.
 	 */
 	public boolean hasChanged(BeanProperty prop) {
-
+	  if (changedProps == null) {
+	    return false;
+	  }
 		return changedProps.contains(prop.getName());
 	}
 

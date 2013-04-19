@@ -196,7 +196,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
         localType = null;
         localDesc = desc;
       } else {
-        localBean = localInfo.createBean(ctx.isVanillaMode());
+        localBean = localInfo.createBean();
         localType = localInfo.getType();
         localIdBinder = localInfo.getIdBinder();
         localDesc = localInfo.getBeanDescriptor();
@@ -205,7 +205,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     } else {
       localType = null;
       localDesc = desc;
-      localBean = desc.createBean(ctx.isVanillaMode());
+      localBean = desc.createBean();
       localIdBinder = idBinder;
     }
 
@@ -295,11 +295,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     } else if (localBean != null) {
 
       ctx.setCurrentPrefix(prefix, pathMap);
-      if (!ctx.isVanillaMode()) {
-        // only create lazy loading collection proxies
-        // when not in vanilla mode
-        createListProxies(localDesc, ctx, localBean);
-      }
+      createListProxies(localDesc, ctx, localBean);
 
       localDesc.postLoad(localBean, includedProps);
 

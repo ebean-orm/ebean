@@ -29,7 +29,6 @@ import com.avaje.ebeaninternal.server.query.DefaultOrmQueryEngine;
 import com.avaje.ebeaninternal.server.query.DefaultRelationalQueryEngine;
 import com.avaje.ebeaninternal.server.resource.ResourceManager;
 import com.avaje.ebeaninternal.server.resource.ResourceManagerFactory;
-import com.avaje.ebeaninternal.server.subclass.SubClassManager;
 import com.avaje.ebeaninternal.server.text.json.DJsonContext;
 import com.avaje.ebeaninternal.server.text.json.DefaultJsonValueAdapter;
 import com.avaje.ebeaninternal.server.transaction.DefaultTransactionScopeManager;
@@ -53,8 +52,6 @@ public class InternalConfiguration {
   private final ServerConfig serverConfig;
 
   private final BootupClasses bootupClasses;
-
-  private final SubClassManager subClassManager;
 
   private final DeployInherit deployInherit;
 
@@ -104,8 +101,6 @@ public class InternalConfiguration {
     this.serverConfig = serverConfig;
     this.bootupClasses = bootupClasses;
     this.expressionFactory = new DefaultExpressionFactory();
-
-    this.subClassManager = new SubClassManager(serverConfig);
 
     this.typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
     this.binder = new Binder(typeManager);
@@ -213,10 +208,6 @@ public class InternalConfiguration {
 
   public BeanDescriptorManager getBeanDescriptorManager() {
     return beanDescriptorManager;
-  }
-
-  public SubClassManager getSubClassManager() {
-    return subClassManager;
   }
 
   public DeployInherit getDeployInherit() {
