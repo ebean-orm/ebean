@@ -35,7 +35,6 @@ import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.IdType;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
@@ -48,9 +47,6 @@ import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.ScalarTypeBytesBase;
 import com.avaje.ebeaninternal.server.type.ScalarTypeBytesEncrypted;
 import com.avaje.ebeaninternal.server.type.ScalarTypeEncryptedWrapper;
-import com.avaje.ebeaninternal.server.type.ScalarTypeLdapBoolean;
-import com.avaje.ebeaninternal.server.type.ScalarTypeLdapDate;
-import com.avaje.ebeaninternal.server.type.ScalarTypeLdapTimestamp;
 
 /**
  * Read the field level deployment annotations.
@@ -69,7 +65,7 @@ public class AnnotationFields extends AnnotationParser {
 
     if (GlobalProperties.getBoolean("ebean.lobEagerFetch", false)) {
       defaultLobFetchType = FetchType.EAGER;
-    }
+    }    
   }
 
   /**
@@ -135,16 +131,10 @@ public class AnnotationFields extends AnnotationParser {
     }
 
     if (prop.getDbColumn() == null) {
-      if (EntityType.LDAP.equals(descriptor.getEntityType())) {
-        // just use matching for now. Could consider an LdapNamingConvention
-        // later.
-        prop.setDbColumn(prop.getName());
-      } else {
-        // No @Column annotation or @Column.name() not set
-        // Use the NamingConvention to set the DB column name
-        String dbColumn = namingConvention.getColumnFromProperty(beanType, prop.getName());
-        prop.setDbColumn(dbColumn);
-      }
+      // No @Column annotation or @Column.name() not set
+      // Use the NamingConvention to set the DB column name
+      String dbColumn = namingConvention.getColumnFromProperty(beanType, prop.getName());
+      prop.setDbColumn(dbColumn);
     }
 
     GeneratedValue gen = get(prop, GeneratedValue.class);
@@ -201,17 +191,19 @@ public class AnnotationFields extends AnnotationParser {
       generatedPropFactory.setUpdateTimestamp(prop);
     }
 
-    NotNull notNull = get(prop, NotNull.class);
-    if (notNull != null) {
-      // explicitly specify a version column
-      prop.setNullable(false);
-    }
-
-    Size size = get(prop, Size.class);
-    if (size != null) {
-      if (size.max() < Integer.MAX_VALUE) {
+    if (validationAnnotations) {
+      NotNull notNull = get(prop, NotNull.class);
+      if (notNull != null) {
         // explicitly specify a version column
-        prop.setDbLength(size.max());
+        prop.setNullable(false);
+      }
+  
+      Size size = get(prop, Size.class);
+      if (size != null) {
+        if (size.max() < Integer.MAX_VALUE) {
+          // explicitly specify a version column
+          prop.setDbLength(size.max());
+        }
       }
     }
 
@@ -261,35 +253,6 @@ public class AnnotationFields extends AnnotationParser {
       }
     }
 
-    if (EntityType.LDAP.equals(descriptor.getEntityType())) {
-      adjustTypesForLdap(prop);
-    }
-  }
-
-  private static final ScalarTypeLdapBoolean LDAP_BOOLEAN_SCALARTYPE = new ScalarTypeLdapBoolean();
-
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  private void adjustTypesForLdap(DeployBeanProperty prop) {
-
-    Class<?> pt = prop.getPropertyType();
-    if (boolean.class.equals(pt) || Boolean.class.equals(pt)) {
-      prop.setScalarType(LDAP_BOOLEAN_SCALARTYPE);
-
-    } else {
-      ScalarType<?> sqlScalarType = prop.getScalarType();
-      int sqlType = sqlScalarType.getJdbcType();
-      if (sqlType == Types.TIMESTAMP) {
-        // Use LDAP Timestamp String format
-        prop.setScalarType(new ScalarTypeLdapTimestamp(sqlScalarType));
-
-      } else if (sqlType == Types.DATE) {
-        // Use LDAP Timestamp String format
-        prop.setScalarType(new ScalarTypeLdapDate(sqlScalarType));
-
-      } else {
-        // Just using string parsing for all other types
-      }
-    }
   }
 
   private void setEncryption(DeployBeanProperty prop, boolean dbEncString, int dbLen) {

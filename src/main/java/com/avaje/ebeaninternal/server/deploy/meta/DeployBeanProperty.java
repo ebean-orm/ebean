@@ -603,8 +603,6 @@ public class DeployBeanProperty {
     public String getElPlaceHolder(EntityType et) {
         if (sqlFormulaSelect != null) {
             return sqlFormulaSelect;
-        } else if (EntityType.LDAP.equals(et)){
-            return getDbColumn();
         } else {
             if (secondaryTableJoinPrefix != null){
                 return "${"+secondaryTableJoinPrefix+"}"+getDbColumn();

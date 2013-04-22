@@ -97,11 +97,13 @@ public class AnnotationAssocOnes extends AnnotationParser {
             prop.setExtraWhere(where.clause());
         }
 
-        NotNull notNull = get(prop, NotNull.class);
-        if (notNull != null) {
-            prop.setNullable(false);
-            // overrides optional attribute of ManyToOne etc
-            prop.getTableJoin().setType(TableJoin.JOIN);
+        if (validationAnnotations) {
+          NotNull notNull = get(prop, NotNull.class);
+          if (notNull != null) {
+              prop.setNullable(false);
+              // overrides optional attribute of ManyToOne etc
+              prop.getTableJoin().setType(TableJoin.JOIN);
+          }
         }
 
         // check for manually defined joins

@@ -16,11 +16,22 @@ public abstract class AnnotationParser extends AnnotationBase {
 
   protected final Class<?> beanType;
 
+  protected boolean validationAnnotations;
+  
   public AnnotationParser(DeployBeanInfo<?> info) {
     super(info.getUtil());
     this.info = info;
     this.beanType = info.getDescriptor().getBeanType();
     this.descriptor = info.getDescriptor();
+    
+    try {
+      Class.forName("javax.validation.constraints.NotNull");
+      validationAnnotations = true;
+    } catch (ClassNotFoundException e) {
+      // javax.validation not in the classpath so don't 
+      // check for NotNull and Size 
+      validationAnnotations = false;
+    }
   }
 
   /**

@@ -92,7 +92,7 @@ public class BeanDescriptor<T> {
   private final ConcurrentHashMap<String, BeanFkeyProperty> fkeyMap = new ConcurrentHashMap<String, BeanFkeyProperty>();
 
   public enum EntityType {
-    ORM, EMBEDDED, SQL, META, LDAP, XMLELEMENT
+    ORM, EMBEDDED, SQL, META, XMLELEMENT
   }
 
   /**
@@ -1948,13 +1948,6 @@ public class BeanDescriptor<T> {
    */
   public boolean isSqlSelectBased() {
     return EntityType.SQL.equals(entityType);
-  }
-
-  /**
-   * Return true if this an LDAP object.
-   */
-  public boolean isLdapEntityType() {
-    return EntityType.LDAP.equals(entityType);
   }
 
   /**
