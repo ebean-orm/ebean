@@ -3,10 +3,18 @@ package com.avaje.ebeaninternal.server.type;
 import java.io.IOException;
 
 import com.avaje.ebean.text.TextException;
+import com.avaje.ebean.util.StringHelper;
 import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
 
 public class EscapeJson {
 
+  /**
+   * Unescape the JSON escaped slash character.
+   */
+  public static String unescapeSlash(String value) {
+    return StringHelper.replaceString(value, "\\/","/");
+  }
+  
 	/**
 	 * Escape and quote the string value.
 	 */
