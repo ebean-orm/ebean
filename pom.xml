@@ -36,9 +36,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:https://github.com/ebean-orm/avaje-ebeanorm-server.git</connection>
-    <developerConnection>scm:git:https://github.com/ebean-orm/avaje-ebeanorm-server.git</developerConnection>
-    <url>https://github.com/ebean-orm/avaje-ebeanorm-server.git</url>
+    <connection>scm:git:https://github.com/ebean-orm/avaje-ebeanorm.git</connection>
+    <developerConnection>scm:git:https://github.com/ebean-orm/avaje-ebeanorm.git</developerConnection>
+    <url>https://github.com/ebean-orm/avaje-ebeanorm.git</url>
   </scm>
 
   <dependencies>
@@ -56,12 +56,12 @@
       <scope>provided</scope>
     </dependency>
 
-	<dependency>
+    <dependency>
       <groupId>javax.validation</groupId>
-	  <artifactId>validation-api</artifactId>
-	  <version>1.0.0.GA</version>
+      <artifactId>validation-api</artifactId>
+      <version>1.0.0.GA</version>
       <scope>provided</scope>
-	</dependency>
+    </dependency>
 
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -69,7 +69,6 @@
       <version>2.4</version>
       <scope>provided</scope>
     </dependency>
-
 
     <dependency>
       <groupId>joda-time</groupId>
