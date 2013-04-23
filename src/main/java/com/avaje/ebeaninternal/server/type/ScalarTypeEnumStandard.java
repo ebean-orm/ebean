@@ -51,7 +51,7 @@ public class ScalarTypeEnumStandard {
 				if (i > 0){
 					sb.append(",");
 				}
-				sb.append("'").append(e.toString()).append("'");
+				sb.append("'").append(e.name()).append("'");
 			}
 			sb.append(")");
 			
@@ -79,7 +79,7 @@ public class ScalarTypeEnumStandard {
 			if (value == null){
 				b.setNull(Types.VARCHAR);
 			} else {
-				b.setString(value.toString());
+				b.setString(format(value));
 			}
 		}
 	
@@ -89,7 +89,7 @@ public class ScalarTypeEnumStandard {
 			if (string == null){
 				return null;
 			} else {
-				return Enum.valueOf(enumType, string);
+				return parse(string);
 			}
 		}
 		
@@ -100,8 +100,7 @@ public class ScalarTypeEnumStandard {
 			if (beanValue == null) {
 				return null;
 			}
-			Enum<?> e = (Enum<?>)beanValue;
-			return e.toString();
+			return ((Enum<?>)beanValue).toString();
 		}
 	
 		public Object toBeanType(Object dbValue) {
@@ -115,7 +114,7 @@ public class ScalarTypeEnumStandard {
 	}
 	
 	@SuppressWarnings({"rawtypes","unchecked"})
-    public static class OrdinalEnum extends EnumBase implements ScalarTypeEnum {
+  public static class OrdinalEnum extends EnumBase implements ScalarTypeEnum {
 
 		private final Object[] enumArray;
 				
@@ -152,8 +151,7 @@ public class ScalarTypeEnumStandard {
 			if (value == null){
 				b.setNull(Types.INTEGER);
 			} else {
-				Enum<?> e = (Enum<?>)value;
-				b.setInt(e.ordinal());
+				b.setInt(((Enum<?>)value).ordinal());
 			}
 		}
 	      
@@ -172,18 +170,17 @@ public class ScalarTypeEnumStandard {
 		}
 		
 		/**
-		 * Convert the Boolean value to the db value.
+		 * Convert the Enum value to the db value.
 		 */
 		public Object toJdbcType(Object beanValue) {
 			if (beanValue == null) {
 				return null;
 			}
-			Enum e = (Enum)beanValue;
-			return e.ordinal();
+			return ((Enum<?>)beanValue).ordinal();
 		}
 	
 		/**
-		 * Convert the db value to the Boolean value.
+		 * Convert the db value to the Enum value.
 		 */
 		public Object toBeanType(Object dbValue) {
 			if (dbValue == null) {
@@ -211,11 +208,11 @@ public class ScalarTypeEnumStandard {
         }
         
         public String format(Object t) {
-            return t.toString();
+            return ((Enum<?>)t).name();
         }
 
         public String formatValue(Object t) {
-            return t.toString();
+            return ((Enum<?>)t).name();
         }
         
         public Object parse(String value) { 
@@ -237,7 +234,7 @@ public class ScalarTypeEnumStandard {
 
         @Override
         public String jsonToString(Object value, JsonValueAdapter ctx) {
-            return EscapeJson.escapeQuote(value.toString());
+            return EscapeJson.escapeQuote(format(value));
         }
 
         public Object readData(DataInput dataInput) throws IOException {
