@@ -2337,24 +2337,31 @@ public class BeanDescriptor<T> {
       return jsonReadObject(ctx, path);
 
     } else {
-      // read the discriminator value to determine the correct sub type
+
+      // check for the discriminator value to determine the correct sub type
       String discColumn = inheritInfo.getRoot().getDiscriminatorColumn();
 
       if (!ctx.readKeyNext()) {
         String msg = "Error reading inheritance discriminator - expected [" + discColumn + "] but no json key?";
         throw new TextException(msg);
       }
-      String propName = ctx.getTokenKey();
-
-      if (!propName.equalsIgnoreCase(discColumn)) {
-        String msg = "Error reading inheritance discriminator - expected [" + discColumn + "] but read [" + propName + "]";
-        throw new TextException(msg);
-      }
-
-      String discValue = ctx.readScalarValue();
-      if (!ctx.readValueNext()) {
-        String msg = "Error reading inheritance discriminator [" + discColumn + "]. Expected more json name values?";
-        throw new TextException(msg);
+      
+      String propName = ctx.getTokenKey();      
+      String discValue;
+      if (propName.equalsIgnoreCase(discColumn)) {
+        discValue = ctx.readScalarValue(); 
+        if (!ctx.readValueNext()) {
+          // Expected to read a comma to setup for reading the real properties of the bean 
+          String msg = "Error reading inheritance discriminator [" + discColumn + "]. Expected more json name values?";
+          throw new TextException(msg);
+        }
+        
+      } else {
+        // Assume that the we are just reading using this bean type
+        // Push the token key back so that it is re-read as it is one 
+        // of the real properties of the bean itself
+        ctx.pushTokenKey();
+        discValue = inheritInfo.getDiscriminatorStringValue();
       }
 
       // determine the sub type for this particular json object

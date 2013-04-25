@@ -8,9 +8,17 @@ public class ReadBasicJsonContext implements ReadJsonInterface {
     
     private char tokenStart;
     private String tokenKey;
+    private boolean pushedTokenKey;
     
     public ReadBasicJsonContext(ReadJsonSource src) {
         this.src = src;
+    }
+
+    /**
+     * Push the current token key back onto the 'stack'.
+     */
+    public void pushTokenKey() {
+      pushedTokenKey = true;
     }
     
     public char getToken() {
@@ -84,7 +92,13 @@ public class ReadBasicJsonContext implements ReadJsonInterface {
     }
     
     public void readNextToken() {
-        
+      
+      if (pushedTokenKey) {
+        // Do nothing 
+        pushedTokenKey = false;
+        return;
+      }
+      
         ignoreWhiteSpace();
         
         tokenStart = src.nextChar("EOF finding next token");
