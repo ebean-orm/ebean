@@ -68,6 +68,8 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 
 	private transient boolean queryTuningAddVersion;
 
+	private transient boolean garbageCollectionOnShutdown;
+	
 	private transient AutofetchMode mode;
 	
 	/**
@@ -93,6 +95,7 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 
 		AutofetchConfig autofetchConfig = serverConfig.getAutofetchConfig();
 		
+		garbageCollectionOnShutdown = autofetchConfig.isGarbageCollectionOnShutdown();
 		queryTuning = autofetchConfig.isQueryTuning();
 		queryTuningAddVersion = autofetchConfig.isQueryTuningAddVersion();
 		profiling = autofetchConfig.isProfiling();
@@ -269,10 +272,10 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 	 * </p>
 	 */
 	public void shutdown() {
-		//if (useFileLogging) {
+		if (garbageCollectionOnShutdown) {
 		    collectUsageViaGC(-1);
 		    serialize();
-		//}
+		}
 	}
 
 	/**

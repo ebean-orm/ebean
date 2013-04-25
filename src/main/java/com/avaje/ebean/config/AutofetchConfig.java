@@ -24,6 +24,8 @@ public class AutofetchConfig {
   private int profileUpdateFrequency = 60;
 
   private int garbageCollectionWait = 100;
+  
+  private boolean garbageCollectionOnShutdown;
 
   public AutofetchConfig() {
   }
@@ -207,6 +209,28 @@ public class AutofetchConfig {
     this.garbageCollectionWait = garbageCollectionWait;
   }
 
+  
+  /**
+   * Return true if GC should be trigger on shutdown.
+   * <p>
+   * Autofetch profiling information is collected as part of garbage collection. 
+   * </p>
+   */
+  public boolean isGarbageCollectionOnShutdown() {
+    return garbageCollectionOnShutdown;
+  }
+
+  /**
+   * Set to true if you want GC to trigger on shutdown.
+   * <p>
+   *  This would be done if you want to try and collect Autofetch profiling information
+   *  on shutdown.
+   * </p>
+   */
+  public void setGarbageCollectionOnShutdown(boolean garbageCollectionOnShutdown) {
+    this.garbageCollectionOnShutdown = garbageCollectionOnShutdown;
+  }
+
   /**
    * Load the settings from the properties file.
    */
@@ -215,10 +239,10 @@ public class AutofetchConfig {
     logDirectory = p.get("autofetch.logDirectory", null);
     queryTuning = p.getBoolean("autofetch.querytuning", false);
     queryTuningAddVersion = p.getBoolean("autofetch.queryTuningAddVersion", false);
-
+    garbageCollectionOnShutdown = p.getBoolean("autofetch.garbageCollectionOnShutdown", false);
+    
     profiling = p.getBoolean("autofetch.profiling", false);
-    mode = p
-        .getEnum(AutofetchMode.class, "autofetch.implicitmode", AutofetchMode.DEFAULT_ONIFEMPTY);
+    mode = p.getEnum(AutofetchMode.class, "autofetch.implicitmode", AutofetchMode.DEFAULT_ONIFEMPTY);
 
     profilingMin = p.getInt("autofetch.profiling.min", 1);
     profilingBase = p.getInt("autofetch.profiling.base", 10);
