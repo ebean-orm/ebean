@@ -32,6 +32,9 @@ import javax.management.MBeanServerFactory;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
@@ -51,12 +54,10 @@ import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.jdbc.OraclePstmtBatch;
 import com.avaje.ebeaninternal.server.jdbc.StandardPstmtDelegate;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
-import com.avaje.ebeaninternal.server.lib.sql.DataSourceGlobalManager;
+import com.avaje.ebeaninternal.server.lib.sql.DataSourceAlert;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
+import com.avaje.ebeaninternal.server.lib.sql.SimpleDataSourceAlert;
 import com.avaje.ebeaninternal.server.lib.thread.ThreadPool;
-import com.avaje.ebeaninternal.server.lib.thread.ThreadPoolManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default Server side implementation of ServerFactory.
@@ -128,31 +129,24 @@ public class DefaultServerFactory implements BootupEbeanManager {
 
     String namePrefix = "Ebean-" + serverConfig.getName();
 
-    // the size of the pool for executing periodic tasks (such as cache
-    // flushing)
+    // the size of the pool for executing periodic tasks (such as cache flushing)
     int schedulePoolSize = GlobalProperties.getInt("backgroundExecutor.schedulePoolsize", 1);
 
     // the side of the main pool for immediate background task execution
-    int minPoolSize = GlobalProperties.getInt("backgroundExecutor.minPoolSize", 1);
+    int minPoolSize = GlobalProperties.getInt("backgroundExecutor.minPoolSize", 0);
     int poolSize = GlobalProperties.getInt("backgroundExecutor.poolsize", 20);
     int maxPoolSize = GlobalProperties.getInt("backgroundExecutor.maxPoolSize", poolSize);
 
-    int idleSecs = GlobalProperties.getInt("backgroundExecutor.idlesecs", 60);
+    int idleSecs = GlobalProperties.getInt("backgroundExecutor.idlesecs", 120);
     int shutdownSecs = GlobalProperties.getInt("backgroundExecutor.shutdownSecs", 30);
 
     boolean useTrad = GlobalProperties.getBoolean("backgroundExecutor.traditional", true);
-
     if (useTrad) {
-      // this pool will use Idle seconds between min and max so I think it is
-      // better
-      // as it will let the thread count float between the min and max
-      ThreadPool pool = ThreadPoolManager.getThreadPool(namePrefix);
-      pool.setMinSize(minPoolSize);
-      pool.setMaxSize(maxPoolSize);
-      pool.setMaxIdleTime(idleSecs * 1000);
+      // this pool will use Idle seconds to maintain the thread count between min and max
+      ThreadPool pool = new ThreadPool(namePrefix, true, null, minPoolSize, maxPoolSize, idleSecs*1000);
       return new TraditionalBackgroundExecutor(pool, schedulePoolSize, shutdownSecs, namePrefix);
     } else {
-      return new DefaultBackgroundExecutor(poolSize, schedulePoolSize, idleSecs, shutdownSecs, namePrefix);
+      return new DefaultBackgroundExecutor(schedulePoolSize, maxPoolSize, idleSecs, shutdownSecs, namePrefix);
     }
   }
 
@@ -422,7 +416,8 @@ public class DefaultServerFactory implements BootupEbeanManager {
       dsConfig.setHeartbeatSql(heartbeatSql);
     }
 
-    return DataSourceGlobalManager.getDataSource(config.getName(), dsConfig);
+    DataSourceAlert notify = new SimpleDataSourceAlert();
+    return new DataSourcePool(notify, config.getName(), dsConfig);
   }
 
   /**

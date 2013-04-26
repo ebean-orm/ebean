@@ -46,7 +46,7 @@ public class DataSourcePool implements DataSource {
     /**
      * Used to notify of changes to the DataSource status.
      */
-    private final DataSourceNotify notify;
+    private final DataSourceAlert notify;
 
     /**
      * Optional listener that can be notified when connections are got from and
@@ -73,6 +73,8 @@ public class DataSourcePool implements DataSource {
      * The sql used to test a connection.
      */
     private final String heartbeatsql;
+    
+    private final int heartbeatFreqSecs;
 
     /**
      * The transaction isolation level as per java.sql.Connection.
@@ -154,7 +156,9 @@ public class DataSourcePool implements DataSource {
      */
     private long leakTimeMinutes;
 
-    public DataSourcePool(DataSourceNotify notify, String name, DataSourceConfig params) {
+    private final Runnable heartbeatRunnable = new HeartBeatRunnable();
+    
+    public DataSourcePool(DataSourceAlert notify, String name, DataSourceConfig params) {
 
         this.notify = notify;
         this.name = name;
@@ -175,7 +179,8 @@ public class DataSourcePool implements DataSource {
         this.maxConnections = params.getMaxConnections();
         this.waitTimeoutMillis = params.getWaitTimeoutMillis();
         this.heartbeatsql = params.getHeartbeatSql();
-
+        this.heartbeatFreqSecs = params.getHeartbeatFreqSecs();
+        
         queue = new PooledConnectionQueue(this);
 
         String un = params.getUsername();
@@ -204,7 +209,15 @@ public class DataSourcePool implements DataSource {
             throw new DataSourceException(ex);
         }
     }
+    
+    class HeartBeatRunnable implements Runnable {
+      @Override
+      public void run() {
+        checkDataSource();
+      }
+    }
 
+    
     @Override
     public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
       throw new SQLFeatureNotSupportedException("We do not support java.util.logging");
@@ -296,7 +309,7 @@ public class DataSourcePool implements DataSource {
             logger.warn(msg);
             if (notify != null) {
                 String subject = "DataSourcePool [" + name + "] warning";
-                notify.notifyWarning(subject, msg);
+                notify.dataSourceWarning(subject, msg);
             }
         }
     }
@@ -304,10 +317,9 @@ public class DataSourcePool implements DataSource {
     private void notifyDataSourceIsDown(SQLException ex) {
 
         if (!dataSourceDownAlertSent) {
-            String msg = "FATAL: DataSourcePool [" + name + "] is down!!!";
-            logger.error(msg, ex);
+            logger.error("FATAL: DataSourcePool [" + name + "] is down!!!", ex);
             if (notify != null) {
-                notify.notifyDataSourceDown(name);
+                notify.dataSourceDown(name);
             }
             dataSourceDownAlertSent = true;
 
@@ -320,15 +332,14 @@ public class DataSourcePool implements DataSource {
 
     private void notifyDataSourceIsUp() {
         if (dataSourceDownAlertSent) {
-            String msg = "RESOLVED FATAL: DataSourcePool [" + name + "] is back up!";
-            logger.error(msg);
+            logger.error("RESOLVED FATAL: DataSourcePool [" + name + "] is back up!");
             if (notify != null) {
-                notify.notifyDataSourceUp(name);
+                notify.dataSourceUp(name);
             }
             dataSourceDownAlertSent = false;
 
         } else if (!dataSourceUp) {
-            logger.warn("DataSourcePool [" + name + "] is back up!");
+            logger.info("DataSourcePool [" + name + "] is back up!");
         }
 
         if (!dataSourceUp) {
@@ -336,14 +347,36 @@ public class DataSourcePool implements DataSource {
             reset();
         }
     }
+    
+    
+    /**
+     * Return the heartbeat frequency in seconds.
+     * <p>
+     * This is the frequency that the heartbeat runnable should be run.
+     * </p>
+     */
+    public int getHeartbeatFreqSecs() {
+      return heartbeatFreqSecs;
+    }
+
+    /**
+     * Returns the Runnable used to check the dataSource using a heartbeat query.
+     */
+    public Runnable getHeartbeatRunnable() {
+      return heartbeatRunnable;
+    }
 
     /**
      * Check the dataSource is up. Trim connections.
+     * <p>
+     * This is called by the HeartbeatRunnable which should be scheduled to 
+     * run periodically (every heartbeatFreqSecs seconds actually).
+     * </p>
      */
-    protected void checkDataSource() {
+    public void checkDataSource() {
         Connection conn = null;
         try {
-            // test to see if we can create a new connection...
+            // Get a connection from the pool and test it
             conn = getConnection();
             testConnection(conn);
 
@@ -356,6 +389,7 @@ public class DataSourcePool implements DataSource {
 
         } catch (SQLException ex) {
             notifyDataSourceIsDown(ex);
+            
         } finally {
             try {
                 if (conn != null) {
@@ -506,7 +540,7 @@ public class DataSourcePool implements DataSource {
     protected boolean validateConnection(PooledConnection conn) {
         try {
             if (heartbeatsql == null) {
-                logger.info("Can not test connection as heartbeatsql is not set");
+                logger.debug("Can not test connection as heartbeatsql is not set");
                 return false;
             }
 
@@ -514,8 +548,7 @@ public class DataSourcePool implements DataSource {
             return true;
 
         } catch (Exception e) {
-            String desc = "heartbeatsql test failed on connection[" + conn.getName() + "]";
-            logger.warn(desc);
+            logger.warn("heartbeatsql test failed on connection[" + conn.getName() + "]");
             return false;
         }
     }
@@ -582,7 +615,7 @@ public class DataSourcePool implements DataSource {
      * Grow the pool by creating a new connection. The connection can either be
      * added to the available list, or returned.
      * <p>
-     * This method is protected by synchronisation in calling methods.
+     * This method is protected by synchronization in calling methods.
      * </p>
      */
     protected PooledConnection createConnectionForQueue(int connId) throws SQLException {
@@ -661,7 +694,7 @@ public class DataSourcePool implements DataSource {
         String msg = "Just testing if alert message is sent successfully.";
 
         if (notify != null) {
-            notify.notifyWarning(subject, msg);
+            notify.dataSourceWarning(subject, msg);
         }
     }
 
@@ -674,8 +707,11 @@ public class DataSourcePool implements DataSource {
      * Connections are not waited on, as that would hang the server.
      * </p>
      */
-    public void shutdown() {
+    public void shutdown(boolean deregisterDriver) {
         queue.shutdown();
+        if (deregisterDriver){
+          deregisterDriver();
+        }
     }
 
     /**
@@ -804,12 +840,10 @@ public class DataSourcePool implements DataSource {
      */
 	public void deregisterDriver() {
 	    try {
+	      logger.debug("Deregistered the JDBC driver "+this.databaseDriver);
 	    	DriverManager.deregisterDriver(DriverManager.getDriver(this.databaseUrl));
-	    	String msg = "Deregistered the JDBC driver "+this.databaseDriver;
-	    	logger.debug(msg);
 	    } catch (SQLException e) {
-	    	String msg = "Error trying to deregister the JDBC driver "+this.databaseDriver;
-	    	logger.warn(msg, e);
+	    	logger.warn("Error trying to deregister the JDBC driver "+this.databaseDriver, e);
 	    }
     }    
 

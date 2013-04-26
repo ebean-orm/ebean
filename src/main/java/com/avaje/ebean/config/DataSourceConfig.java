@@ -33,7 +33,9 @@ public class DataSourceConfig {
   private int isolationLevel = Transaction.READ_COMMITTED;
 
   private String heartbeatSql;
-
+  
+  private int heartbeatFreqSecs = 30;
+  
   private boolean captureStackTrace;
 
   private int maxStackTraceSize = 5;
@@ -43,6 +45,7 @@ public class DataSourceConfig {
   private int maxInactiveTimeSecs = 900;
 
   private int pstmtCacheSize = 20;
+  
   private int cstmtCacheSize = 20;
 
   private int waitTimeoutMillis = 1000;
@@ -171,6 +174,25 @@ public class DataSourceConfig {
    */
   public void setHeartbeatSql(String heartbeatSql) {
     this.heartbeatSql = heartbeatSql;
+  }
+
+  
+  /**
+   * Return the heartbeat frequency in seconds.
+   * <p>
+   * This is the expected frequency in which the DataSource should be checked to
+   * make sure it is healthy and trim idle connections.
+   * </p>
+   */
+  public int getHeartbeatFreqSecs() {
+    return heartbeatFreqSecs;
+  }
+
+  /**
+   * Set the expected heartbeat frequency in seconds.
+   */
+  public void setHeartbeatFreqSecs(int heartbeatFreqSecs) {
+    this.heartbeatFreqSecs = heartbeatFreqSecs;
   }
 
   /**

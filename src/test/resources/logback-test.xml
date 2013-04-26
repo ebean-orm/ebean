@@ -33,6 +33,8 @@
     <logger name="org.avaje.ebean.TXN" level="TRACE"/>
     <logger name="org.avaje.ebean.SUM" level="TRACE"/>
     <logger name="com.avaje.tests" level="DEBUG"/>
+    
+    <logger name="com.avaje.ebeaninternal.server.lib" level="DEBUG"/>
     <logger name="com.avaje.ebeaninternal.server.lib.sql" level="TRACE"/>
     <logger name="com.avaje.ebeaninternal.server.transaction" level="TRACE"/>
     

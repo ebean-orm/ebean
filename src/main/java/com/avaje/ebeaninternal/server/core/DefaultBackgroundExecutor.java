@@ -28,8 +28,8 @@ public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 	 *            the time in seconds allowed for the pool to shutdown nicely.
 	 *            After this the pool is forced to shutdown.
 	 */
-	public DefaultBackgroundExecutor(int mainPoolSize, int schedulePoolSize, long keepAliveSecs,int shutdownWaitSeconds, String namePrefix) {
-		this.pool = new DaemonThreadPool(mainPoolSize, keepAliveSecs, shutdownWaitSeconds, namePrefix);
+	public DefaultBackgroundExecutor(int schedulePoolSize, int corePoolSize, long keepAliveSecs,int shutdownWaitSeconds, String namePrefix) {
+		this.pool = new DaemonThreadPool(corePoolSize, keepAliveSecs, shutdownWaitSeconds, namePrefix);
 		this.schedulePool = new DaemonScheduleThreadPool(schedulePoolSize, shutdownWaitSeconds, namePrefix+"-periodic-");
 	}
 

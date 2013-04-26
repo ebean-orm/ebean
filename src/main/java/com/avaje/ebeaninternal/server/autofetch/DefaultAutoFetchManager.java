@@ -92,7 +92,7 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 	public void setOwner(SpiEbeanServer server, ServerConfig serverConfig) {
 		this.server = server;
 		this.logging = new DefaultAutoFetchManagerLogging(serverConfig, this);
-
+		
 		AutofetchConfig autofetchConfig = serverConfig.getAutofetchConfig();
 		
 		garbageCollectionOnShutdown = autofetchConfig.isGarbageCollectionOnShutdown();
@@ -104,7 +104,6 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 
 		setProfilingRate(autofetchConfig.getProfilingRate());
 				
-
 		defaultGarbageCollectionWait = (long) autofetchConfig.getGarbageCollectionWait();
 
 		// determine the mode to use when Query.setAutoFetch() was
@@ -117,6 +116,9 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 					+ "] mode[" + mode + "]  profiling rate[" + profilingRate
 					+ "] min[" + profilingMin + "] base[" + profilingBase + "]";
 			logging.logInfo(msg, null);
+
+			// Register a periodic update of the profiling informations
+	    this.logging.init(server);
 		}
 	}
 

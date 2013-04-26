@@ -1,12 +1,13 @@
 package com.avaje.ebeaninternal.server.autofetch;
 
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avaje.ebean.config.AutofetchConfig;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebeaninternal.server.lib.BackgroundThread;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 
 /**
@@ -24,16 +25,17 @@ public class DefaultAutoFetchManagerLogging {
 
 	private final boolean traceUsageCollection;
 
+	private final int updateFreqInSecs;
+	
 	public DefaultAutoFetchManagerLogging(ServerConfig serverConfig, DefaultAutoFetchManager profileListener) {
 
 		this.manager = profileListener;
-
-		AutofetchConfig autofetchConfig = serverConfig.getAutofetchConfig();
-
-		traceUsageCollection = GlobalProperties.getBoolean("ebean.autofetch.traceUsageCollection", false);
-		
-		int updateFreqInSecs = autofetchConfig.getProfileUpdateFrequency();
-		BackgroundThread.add(updateFreqInSecs, new UpdateProfile());
+		this.traceUsageCollection = GlobalProperties.getBoolean("ebean.autofetch.traceUsageCollection", false);
+		this.updateFreqInSecs = serverConfig.getAutofetchConfig().getProfileUpdateFrequency();		
+	}
+	
+	public void init(SpiEbeanServer ebeanServer) {
+	  ebeanServer.getBackgroundExecutor().executePeriodically(new UpdateProfile(), updateFreqInSecs, TimeUnit.SECONDS);
 	}
 
 	private final class UpdateProfile implements Runnable {

@@ -6,10 +6,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
-import com.avaje.ebeaninternal.server.lib.thread.ThreadPool;
-import com.avaje.ebeaninternal.server.lib.thread.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.avaje.ebeaninternal.server.lib.thread.ThreadPool;
 
 /**
  * Serverside multithreaded socket listener. Accepts connections and dispatches
@@ -70,7 +70,7 @@ class SocketClusterListener implements Runnable {
      */
     public SocketClusterListener(SocketClusterBroadcast owner, int port) {
         this.owner = owner;
-        this.threadPool = ThreadPoolManager.getThreadPool("EbeanClusterMember");
+        this.threadPool = ThreadPool.createThreadPool("EbeanCluster");
         this.port = port;
         
         try {
@@ -118,8 +118,10 @@ class SocketClusterListener implements Runnable {
             listenerThread.interrupt();
             serverListenSocket.close();
         } catch (IOException e) {
-        	logger.error(null, e);
+        	logger.error("Error shutting down listener", e);
         }
+        
+        threadPool.shutdown();
     }
     
     /**

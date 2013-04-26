@@ -8,20 +8,20 @@ package com.avaje.ebeaninternal.server.lib.sql;
  * when these events occur on the DataSource.
  * </p>
  */
-public interface DataSourceNotify {
+public interface DataSourceAlert {
 
 	/**
 	 * Send an alert to say the dataSource is back up.
 	 */
-	public void notifyDataSourceUp(String dataSourceName);
+	public void dataSourceUp(String dataSourceName);
 
 	/**
 	 * Send an alert to say the dataSource is down.
 	 */
-	public void notifyDataSourceDown(String dataSourceName);
+	public void dataSourceDown(String dataSourceName);
 
 	/**
 	 * Send an alert to say the dataSource is getting close to its max size.
 	 */
-	public void notifyWarning(String subject, String msg);
+	public void dataSourceWarning(String subject, String msg);
 }

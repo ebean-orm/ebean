@@ -273,7 +273,7 @@ public class PooledConnectionQueue {
                     int busySize = registerBusyConnection(c);
                     
                     String msg = "DataSourcePool [" + name + "] grow; id["+c.getName()+"] busy["+busySize+"] max["+maxSize+"]";
-                    logger.info(msg);
+                    logger.debug(msg);
                     
                     checkForWarningSize();
                     return c;
@@ -333,7 +333,7 @@ public class PooledConnectionQueue {
         try {
             doingShutdown = true;
             Status status = createStatus();
-            logger.info("DataSourcePool [" + name + "] shutdown: "+status);
+            logger.debug("DataSourcePool [" + name + "] shutdown: "+status);
             
             closeFreeConnections(true);
         
@@ -422,7 +422,7 @@ public class PooledConnectionQueue {
             freeList.setShallowCopy(freeListCopy);
 
             String msg = "DataSourcePool [" + name + "] trimmed [" + trimedCount + "] inactive connections. New size[" + totalConnections() + "]";
-            logger.info(msg);
+            logger.debug(msg);
         }
         return trimedCount;
     }
@@ -436,7 +436,7 @@ public class PooledConnectionQueue {
         try {
             while (!freeList.isEmpty()) {
                 PooledConnection c = freeList.remove();
-                logger.info("PSTMT Statistics: "+c.getStatistics());
+                logger.debug("PSTMT Statistics: "+c.getStatistics());
                 c.closeConnectionFully(logErrors);
             }
         } finally {

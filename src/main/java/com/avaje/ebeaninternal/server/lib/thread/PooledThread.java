@@ -9,251 +9,270 @@ import org.slf4j.LoggerFactory;
  */
 public class PooledThread implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(PooledThread.class);
-	
-    /**
-     * Create the PooledThread.
-     */
-    protected PooledThread(ThreadPool threadPool, String name, boolean isDaemon,
-            Integer threadPriority) {
+  private static final Logger logger = LoggerFactory.getLogger(PooledThread.class);
 
-        this.name = name;
-        this.threadPool = threadPool;
-        this.lastUsedTime = System.currentTimeMillis();
+  /**
+   * Flag to indicate that the thread was interrupted.
+   */
+  private boolean wasInterrupted;
 
-        thread = new Thread(this, name);
-        thread.setDaemon(isDaemon);
+  /**
+   * The time the thread was last used.
+   */
+  private long lastUsedTime;
 
-        if (threadPriority != null) {
-            thread.setPriority(threadPriority.intValue());
-        }
-        //thread.start();
+  /**
+   * The work to run
+   */
+  private Work work;
+
+  /**
+   * Set to indicate the thread is stopping.
+   */
+  private boolean isStopping;
+
+  /**
+   * Set when the thread has stopped.
+   */
+  private boolean isStopped;
+  /**
+   * The background thread.
+   */
+  private Thread thread;
+
+  /**
+   * The pool this worker belongs to.
+   */
+  private ThreadPool threadPool;
+
+  /**
+   * The name of the Thread
+   */
+  private String name;
+
+  /**
+   * The thread synchronization object.
+   */
+  private Object threadMonitor = new Object();
+
+  /**
+   * The monitor for work notification.
+   */
+  private Object workMonitor = new Object();
+
+  /**
+   * Total number of work performed.
+   */
+  private int totalWorkCount;
+
+  /**
+   * Total work execution time.
+   */
+  private long totalWorkExecutionTime;
+  
+  /**
+   * Create the PooledThread.
+   */
+  protected PooledThread(ThreadPool threadPool, String name, boolean isDaemon, Integer threadPriority) {
+
+    this.name = name;
+    this.threadPool = threadPool;
+    this.lastUsedTime = System.currentTimeMillis();
+
+    thread = new Thread(this, name);
+    thread.setDaemon(isDaemon);
+
+    if (threadPriority != null) {
+      thread.setPriority(threadPriority.intValue());
     }
-    
-    protected void start() {
-    	thread.start();
+  }
+
+  public String toString() {
+    return name;
+  }
+
+  protected void start() {
+    thread.start();
+  }
+
+  /**
+   * Assign work to this thread. The thread will notify the listener when it has
+   * finished the work.
+   */
+  public boolean assignWork(Work work) {
+    synchronized (workMonitor) {
+      this.work = work;
+      workMonitor.notifyAll();
     }
-    
-    /**
-     * Assign work to this thread. The thread will notify the listener when it
-     * has finished the work.
-     */
-    public boolean assignWork(Work work) {
-        synchronized (workMonitor) {
-            this.work = work;
-            workMonitor.notifyAll();
-        }
-        return true;
-    }
+    return true;
+  }
 
-    /**
-     * process any assigned work until stopped or interrupted.
-     */
-    public void run() {
-        // process assigned work until we receive a shutdown signal
-        synchronized (workMonitor) {
-            while (!isStopping) {
-                try {
-                    if (work == null) {
-                        workMonitor.wait();
-                    }
-                } catch (InterruptedException e) {
-                }
-                doTheWork();
-            }
-        }
-        
-        // Tell stop() we have shut ourselves down successfully
-        synchronized (threadMonitor) {
-            threadMonitor.notifyAll();
-        }
-        //Log.debug("PooledThread [" + getName() + "] finished ");
-        isStopped = true;
-    }
-
-    /**
-     * Actually do the work and gather the appropriate measures.
-     */
-    private void doTheWork() {
-        if (isStopping){
-            return;
-        }
-
-        long startTime = System.currentTimeMillis();
-        if (work == null) {
-            // probably shutting down the thread
-
-        } else {
-            try {
-                work.setStartTime(startTime);
-                work.getRunnable().run();
-
-            } catch (Throwable ex) {
-				logger.error(null, ex);
-
-                if (wasInterrupted) {
-                    this.isStopping = true;
-                    threadPool.removeThread(this);
-                    logger.info("PooledThread [" + name + "] removed due to interrupt");
-                    try {
-                        thread.interrupt();
-                    } catch (Exception e){
-                    	String msg = "Error interrupting PooledThead["+name+"]";
-        				logger.error(msg, e);
-                    }
-                    return;
-                }
-            }
-        }
-        lastUsedTime = System.currentTimeMillis();
-        totalWorkCount++;
-        totalWorkExecutionTime = totalWorkExecutionTime + lastUsedTime - startTime;
-        this.work = null;
-        threadPool.returnThread(this);
-
-    }
-
-    /**
-     * Try to interrupt the thread.
-     * <p>
-     * If the Thread was interrupted then it will be removed from the pool.
-     * </p>
-     */
-    public void interrupt() {
-
-        // set a flag so doTheWork knows that it was interrupted 
-        // and removes rather than returns
-        wasInterrupted = true;
+  /**
+   * process any assigned work until stopped or interrupted.
+   */
+  public void run() {
+    // process assigned work until we receive a shutdown signal
+    synchronized (workMonitor) {
+      while (!isStopping) {
         try {
-            thread.interrupt();
-            
-        } catch (SecurityException ex) {
-            wasInterrupted = false;
-            throw ex;
+          if (work == null) {
+            workMonitor.wait();
+          }
+        } catch (InterruptedException e) {
         }
+        doTheWork();
+      }
     }
-    
-    /**
-     * Returns true if the thread has finished.
-     */
-    public boolean isStopped() {
-        return isStopped;
+
+    // Tell stop() we have shut ourselves down successfully
+    synchronized (threadMonitor) {
+      threadMonitor.notifyAll();
     }
-    
-    /**
-     * Stop the thread relatively nicely. It will wait a maximum of 10 seconds
-     * for it to complete any existing work.
-     */
-    protected void stop() {
-        isStopping = true;
+    if (logger.isTraceEnabled()) {
+      logger.trace("PooledThread [" + getName() + "] finished ");
+    }
+    isStopped = true;
+  }
+
+  /**
+   * Actually do the work and gather the appropriate measures.
+   */
+  private void doTheWork() {
+    if (isStopping) {
+      return;
+    }
+
+    long startTime = System.currentTimeMillis();
+    if (work == null) {
+      // probably shutting down the thread
+
+    } else {
+      try {
+        if (logger.isTraceEnabled()) {
+          logger.trace("start work "+work);
+        }
         
-        synchronized (threadMonitor) {
-            
-            assignWork(null);
-            //trace("stop assigned null work...");
-            try {
-                threadMonitor.wait(10000);
-            } catch (InterruptedException e) {
-                ;
-            }
-            
+        work.setStartTime(startTime);
+        work.getRunnable().run();
+
+        if (logger.isTraceEnabled()) {
+          logger.trace("finished work "+work);
         }
+        
+      } catch (Throwable ex) {
+        logger.error(null, ex);
 
-        thread = null;
-        threadPool.removeThread(this);
+        if (wasInterrupted) {
+          this.isStopping = true;
+          threadPool.removeThread(this);
+          if (logger.isInfoEnabled()) {
+            logger.info("PooledThread [" + name + "] removed due to interrupt");
+          }
+          try {
+            thread.interrupt();
+          } catch (Exception e) {
+            logger.error("Error interrupting PooledThead[" + name + "]", e);
+          }
+          return;
+        }
+      }
+    }
+    lastUsedTime = System.currentTimeMillis();
+    totalWorkCount++;
+    totalWorkExecutionTime = totalWorkExecutionTime + lastUsedTime - startTime;
+    this.work = null;
+    threadPool.returnThread(this);
+
+  }
+
+  /**
+   * Try to interrupt the thread.
+   * <p>
+   * If the Thread was interrupted then it will be removed from the pool.
+   * </p>
+   */
+  public void interrupt() {
+
+    // set a flag so doTheWork knows that it was interrupted
+    // and removes rather than returns
+    wasInterrupted = true;
+    try {
+      if (logger.isTraceEnabled()) {
+        logger.trace("interrupt()");
+      }
+      thread.interrupt();
+
+    } catch (SecurityException ex) {
+      wasInterrupted = false;
+      throw ex;
+    }
+  }
+
+  /**
+   * Returns true if the thread has finished.
+   */
+  public boolean isStopped() {
+    return isStopped;
+  }
+
+  /**
+   * Stop the thread relatively nicely. It will wait a maximum of 10 seconds for
+   * it to complete any existing work.
+   */
+  protected void stop() {
+    isStopping = true;
+
+    synchronized (threadMonitor) {
+
+      assignWork(null);
+      if (logger.isTraceEnabled()) {
+        logger.trace("stopping thread ["+name+"]");
+      }
+      try {
+        threadMonitor.wait(10000);
+      } catch (InterruptedException e) {
+        ;
+      }
+
     }
 
-    /**
-     * return the name of the thread.
-     */
-    public String getName() {
-        return name;
-    }
-    /**
-     * Returns the currently executing work, otherwise null.
-     */
-    public Work getWork() {
-        return work;
-    }
+    thread = null;
+    threadPool.removeThread(this);
+  }
 
-    /**
-     * The total number of jobs this thread has run.
-     */
-    public int getTotalWorkCount() {
-        return totalWorkCount;
-    }
+  /**
+   * return the name of the thread.
+   */
+  public String getName() {
+    return name;
+  }
 
-    /**
-     * The total time for performing all assigned work.
-     */
-    public long getTotalWorkExecutionTime() {
-        return totalWorkExecutionTime;
-    }
-    
-    /**
-     * Returns the time this thread was last used.
-     */
-    public long getLastUsedTime() {
-        return lastUsedTime;
-    }
+  /**
+   * Returns the currently executing work, otherwise null.
+   */
+  public Work getWork() {
+    return work;
+  }
 
-    /**
-     * Flag to indicate that the thread was interrupted.
-     */
-    private boolean wasInterrupted = false;
+  /**
+   * The total number of jobs this thread has run.
+   */
+  public int getTotalWorkCount() {
+    return totalWorkCount;
+  }
 
-    /**
-     * The time the thread was last used.
-     */
-    private long lastUsedTime;
+  /**
+   * The total time for performing all assigned work.
+   */
+  public long getTotalWorkExecutionTime() {
+    return totalWorkExecutionTime;
+  }
 
-    /**
-     * The work to run
-     */
-    private Work work = null;
-
-    /**
-     * Set to indicate the thread is stopping.
-     */
-    private boolean isStopping = false;
-
-    /**
-     * Set when the thread has stopped.
-     */
-    private boolean isStopped = false;
-    /**
-     * The background thread.
-     */
-    private Thread thread = null;
-
-    /**
-     * The pool this worker belongs to.
-     */
-    private ThreadPool threadPool;
-
-    /**
-     * The name of the Thread
-     */
-    private String name = null;
-
-    /**
-     * The thread synchronization object.
-     */
-    private Object threadMonitor = new Object();
-
-    /**
-     * The monitor for work notification.
-     */
-    private Object workMonitor = new Object();
-
-    /**
-     * Total number of work performed.
-     */
-    private int totalWorkCount = 0;
-
-    /**
-     * Total work execution time.
-     */
-    private long totalWorkExecutionTime = 0;
+  /**
+   * Returns the time this thread was last used.
+   */
+  public long getLastUsedTime() {
+    return lastUsedTime;
+  }
 
 }

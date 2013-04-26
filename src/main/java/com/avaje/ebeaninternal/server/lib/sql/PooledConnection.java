@@ -256,11 +256,13 @@ public class PooledConnection extends ConnectionDelegator
 		String msg = "Closing Connection[" + getName() + "]" + " psReuse[" + pstmtHitCounter
 				+ "] psCreate[" + pstmtMissCounter + "] psSize[" + pstmtCache.size() + "]";
 
-		logger.info(msg);
+		logger.debug(msg);
 
 		try {
 			if (connection.isClosed()) {
-				logger.warn("Closing Connection[" + getName() + "] that is already closed?");
+			  // Typically the JDBC Driver has its own JVM shutdown hook and already 
+			  // closed the connections in our DataSource pool so making this DEBUG level
+				logger.debug("Closing Connection[" + getName() + "] that is already closed?");
 				return;
 			}
 		} catch (SQLException ex) {

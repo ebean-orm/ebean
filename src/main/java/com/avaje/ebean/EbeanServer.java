@@ -84,6 +84,23 @@ import com.avaje.ebean.text.json.JsonContext;
 public interface EbeanServer {
 
   /**
+   * Shutdown the EbeanServer.
+   * <p>
+   * If the under underlying DataSource is the EbeanORM implementation then you
+   * also have the option of shutting down the DataSource and deregistering the
+   * JDBC driver.
+   * </p>
+   * 
+   * @param shutdownDataSource
+   *          if true then shutdown the underlying DataSource if it is the EbeanORM
+   *          DataSource implementation.
+   * @param deregisterDriver
+   *          if true then deregister the JDBC driver if it is the EbeanORM
+   *          DataSource implementation.
+   */
+  public void shutdown(boolean shutdownDataSource, boolean deregisterDriver);
+  
+  /**
    * Return the AdminAutofetch which is used to control and configure the
    * Autofetch service at runtime.
    */

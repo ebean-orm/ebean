@@ -23,164 +23,168 @@ import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
  * Service Provider extension to EbeanServer.
  */
 public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionLoader {
+  
+  /**
+   * For internal use, shutdown of the server invoked by JVM Shutdown.
+   */
+  public void shutdownManaged();
 
-	/**
-	 * Return true if DeleteMissingChildren defaults to true for stateless updates.
-	 */
-    public boolean isDefaultDeleteMissingChildren();
+  /**
+   * Return true if DeleteMissingChildren defaults to true for stateless
+   * updates.
+   */
+  public boolean isDefaultDeleteMissingChildren();
 
-	/**
-	 * Return true if UpdateNullProperties defaults to true for stateless updates.
-	 */
-	public boolean isDefaultUpdateNullProperties();
-    
-	/**
-	 * Return the DatabasePlatform for this server.
-	 */
-	public DatabasePlatform getDatabasePlatform();
-	
-	/**
-	 * Return a JDBC driver specific handler for batching.
-	 * <p>
-	 * Required for Oracle specific batch handling.
-	 * </p>
-	 */
-	public PstmtBatch getPstmtBatch();
-	
-	/**
-	 * Create an object to represent the current CallStack.
-	 * <p>
-	 * Typically used to identify the origin of queries for Autofetch
-	 * and object graph costing.
-	 * </p>
-	 */
-	public CallStack createCallStack();
-	
-	/**
-	 * Return the DDL generator.
-	 */
-	public DdlGenerator getDdlGenerator();
+  /**
+   * Return true if UpdateNullProperties defaults to true for stateless updates.
+   */
+  public boolean isDefaultUpdateNullProperties();
 
-	/**
-	 * Return the AutoFetchListener.
-	 */
-	public AutoFetchManager getAutoFetchManager();
+  /**
+   * Return the DatabasePlatform for this server.
+   */
+  public DatabasePlatform getDatabasePlatform();
 
-	/**
-	 * Clear the query execution statistics.
-	 */
-	public void clearQueryStatistics();
+  /**
+   * Return a JDBC driver specific handler for batching.
+   * <p>
+   * Required for Oracle specific batch handling.
+   * </p>
+   */
+  public PstmtBatch getPstmtBatch();
 
-	/**
-	 * Return all the descriptors.
-	 */
-	public List<BeanDescriptor<?>> getBeanDescriptors();
+  /**
+   * Create an object to represent the current CallStack.
+   * <p>
+   * Typically used to identify the origin of queries for Autofetch and object
+   * graph costing.
+   * </p>
+   */
+  public CallStack createCallStack();
 
-	/**
-	 * Return the BeanDescriptor for a given type of bean.
-	 */
-	public <T> BeanDescriptor<T> getBeanDescriptor(Class<T> type);
+  /**
+   * Return the DDL generator.
+   */
+  public DdlGenerator getDdlGenerator();
 
-    /**
-     * Return BeanDescriptor using it's unique id.
-     */
-    public BeanDescriptor<?> getBeanDescriptorById(String descriptorId);
+  /**
+   * Return the AutoFetchListener.
+   */
+  public AutoFetchManager getAutoFetchManager();
 
-    /**
-     * Return BeanDescriptors mapped to this table.
-     */
-    public List<BeanDescriptor<?>> getBeanDescriptors(String tableName);
+  /**
+   * Clear the query execution statistics.
+   */
+  public void clearQueryStatistics();
 
-	/**
-	 * Process committed changes from another framework.
-	 * <p>
-	 * This notifies this instance of the framework that beans have been
-	 * committed externally to it. Either by another framework or clustered
-	 * server. It uses this to maintain its cache and text indexes
-	 * appropriately.
-	 * </p>
-	 */
-	public void externalModification(TransactionEventTable event);
+  /**
+   * Return all the descriptors.
+   */
+  public List<BeanDescriptor<?>> getBeanDescriptors();
 
-	/**
-	 * Create a ServerTransaction.
-	 * <p>
-	 * To specify to use the default transaction isolation use a value of -1.
-	 * </p>
-	 */
-	public SpiTransaction createServerTransaction(boolean isExplicit, int isolationLevel);
+  /**
+   * Return the BeanDescriptor for a given type of bean.
+   */
+  public <T> BeanDescriptor<T> getBeanDescriptor(Class<T> type);
 
-	/**
-	 * Return the current transaction or null if there is no current
-	 * transaction.
-	 */
-	public SpiTransaction getCurrentServerTransaction();
+  /**
+   * Return BeanDescriptor using it's unique id.
+   */
+  public BeanDescriptor<?> getBeanDescriptorById(String descriptorId);
 
-	/**
-	 * Create a ScopeTrans for a method for the given scope definition.
-	 */
-	public ScopeTrans createScopeTrans(TxScope txScope);
+  /**
+   * Return BeanDescriptors mapped to this table.
+   */
+  public List<BeanDescriptor<?>> getBeanDescriptors(String tableName);
 
-	/**
-	 * Create a ServerTransaction for query purposes.
-	 */
-	public SpiTransaction createQueryTransaction();
+  /**
+   * Process committed changes from another framework.
+   * <p>
+   * This notifies this instance of the framework that beans have been committed
+   * externally to it. Either by another framework or clustered server. It uses
+   * this to maintain its cache and text indexes appropriately.
+   * </p>
+   */
+  public void externalModification(TransactionEventTable event);
 
-	/**
-	 * An event from another server in the cluster used to notify local
-	 * BeanListeners of remote inserts updates and deletes.
-	 */
-    public void remoteTransactionEvent(RemoteTransactionEvent event);
+  /**
+   * Create a ServerTransaction.
+   * <p>
+   * To specify to use the default transaction isolation use a value of -1.
+   * </p>
+   */
+  public SpiTransaction createServerTransaction(boolean isExplicit, int isolationLevel);
 
-	
-	/**
-	 * Create a query request object.
-	 */
-	public <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> q, Transaction t);
+  /**
+   * Return the current transaction or null if there is no current transaction.
+   */
+  public SpiTransaction getCurrentServerTransaction();
 
-	/**
-	 * Compile a query.
-	 */
-	public <T> CQuery<T> compileQuery(Query<T> query, Transaction t);
+  /**
+   * Create a ScopeTrans for a method for the given scope definition.
+   */
+  public ScopeTrans createScopeTrans(TxScope txScope);
 
-	/**
-	 * Return the queryEngine for this server.
-	 */
-	public CQueryEngine getQueryEngine();
+  /**
+   * Create a ServerTransaction for query purposes.
+   */
+  public SpiTransaction createQueryTransaction();
 
-	/**
-	 * Execute the findId's query but without copying the query.
-	 * <p>
-	 * Used so that the list of Id's can be made accessible to client code
-	 * before the query has finished (if executing in a background thread).
-	 * </p>
-	 */
-	public <T> List<Object> findIdsWithCopy(Query<T> query, Transaction t);
+  /**
+   * An event from another server in the cluster used to notify local
+   * BeanListeners of remote inserts updates and deletes.
+   */
+  public void remoteTransactionEvent(RemoteTransactionEvent event);
 
-	/**
-	 * Execute the findRowCount query but without copying the query.
-	 */
-    public <T> int findRowCountWithCopy(Query<T> query, Transaction t);
+  /**
+   * Create a query request object.
+   */
+  public <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> q,
+      Transaction t);
 
-	/**
-	 * Load a batch of Associated One Beans.
-	 */
-	public void loadBean(LoadBeanRequest loadRequest);
+  /**
+   * Compile a query.
+   */
+  public <T> CQuery<T> compileQuery(Query<T> query, Transaction t);
 
-	/**
-	 * Lazy load a batch of Many's.
-	 */
-	public void loadMany(LoadManyRequest loadRequest);
+  /**
+   * Return the queryEngine for this server.
+   */
+  public CQueryEngine getQueryEngine();
 
-	/**
-	 * Return the default batch size for lazy loading.
-	 */
-	public int getLazyLoadBatchSize();
-	
-    /**
-     * Return true if the type is known as an Entity or Xml type
-     * or a List Set or Map of known bean types.
-     */
-    public boolean isSupportedType(java.lang.reflect.Type genericType);
+  /**
+   * Execute the findId's query but without copying the query.
+   * <p>
+   * Used so that the list of Id's can be made accessible to client code before
+   * the query has finished (if executing in a background thread).
+   * </p>
+   */
+  public <T> List<Object> findIdsWithCopy(Query<T> query, Transaction t);
+
+  /**
+   * Execute the findRowCount query but without copying the query.
+   */
+  public <T> int findRowCountWithCopy(Query<T> query, Transaction t);
+
+  /**
+   * Load a batch of Associated One Beans.
+   */
+  public void loadBean(LoadBeanRequest loadRequest);
+
+  /**
+   * Lazy load a batch of Many's.
+   */
+  public void loadMany(LoadManyRequest loadRequest);
+
+  /**
+   * Return the default batch size for lazy loading.
+   */
+  public int getLazyLoadBatchSize();
+
+  /**
+   * Return true if the type is known as an Entity or Xml type or a List Set or
+   * Map of known bean types.
+   */
+  public boolean isSupportedType(java.lang.reflect.Type genericType);
 
 }

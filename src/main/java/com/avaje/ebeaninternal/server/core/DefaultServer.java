@@ -178,6 +178,11 @@ public final class DefaultServer implements SpiEbeanServer {
   private MBeanServer mbeanServer;
 
   /**
+   * Flag set when the server has shutdown.
+   */
+  private boolean shutdown;
+  
+  /**
    * The default batch size for lazy loading beans or collections.
    */
   private int lazyLoadBatchSize;
@@ -236,24 +241,26 @@ public final class DefaultServer implements SpiEbeanServer {
     this.jsonContext = config.createJsonContext(this);
 
     loadAndInitializePlugins(config);
-
-    ShutdownManager.register(new Shutdown());
+    
+    // Register with the JVM Shutdown hook
+    ShutdownManager.registerEbeanServer(this);
   }
 
   protected void loadAndInitializePlugins(InternalConfiguration config) {
+    
     List<SpiEbeanPlugin> spiPlugins = new ArrayList<SpiEbeanPlugin>();
 
     final Iterator<SpiEbeanPlugin> plugins = ServiceLoader.load(SpiEbeanPlugin.class).iterator();
 
     while (plugins.hasNext()) {
       SpiEbeanPlugin plugin = plugins.next();
-
       spiPlugins.add(plugin);
-
       plugin.setup(this, this.getDatabasePlatform(), config.getServerConfig());
 
-      if (plugin instanceof DdlGenerator) // backwards compatible
+      if (plugin instanceof DdlGenerator) {
+        // backwards compatible
         ddlGenerator = (DdlGenerator)plugin;
+      } 
     }
 
     ebeanPlugins = Collections.unmodifiableList(spiPlugins);
@@ -364,24 +371,53 @@ public final class DefaultServer implements SpiEbeanServer {
     }
   }
 
-  private final class Shutdown implements Runnable {
-    public void run() {
-      try {
-        if (mbeanServer != null) {
-          mbeanServer.unregisterMBean(new ObjectName(mbeanName + ",key=AutoFetch"));
-        }
-      } catch (Exception e) {
-        String msg = "Error unregistering Ebean " + mbeanName;
-        logger.error(msg, e);
-      }
-
-      // shutdown services
-      transactionManager.shutdown();
-      autoFetchManager.shutdown();
-      backgroundExecutor.shutdown();
+  /**
+   * Shutting down via JVM Shutdown hook.
+   */
+  public void shutdownManaged() {
+    synchronized (this) {
+      shutdownInternal(true, false);
     }
   }
 
+  /**
+   * Shutting down manually.
+   */
+  public void shutdown(boolean shutdownDataSource, boolean deregisterDriver) {
+    synchronized (this) {
+      // Unregister from JVM Shutdown hook
+      ShutdownManager.unregisterEbeanServer(this);
+      shutdownInternal(shutdownDataSource, deregisterDriver);
+    }
+  }
+
+  /**
+   * Shutdown the services like threads and DataSource.
+   */
+  private void shutdownInternal(boolean shutdownDataSource, boolean deregisterDriver) {
+
+    logger.debug("Shutting down EbeanServer " + getName());
+    if (shutdown) {
+      // Already shutdown
+      return;
+    }
+    try {
+      if (mbeanServer != null) {
+        mbeanServer.unregisterMBean(new ObjectName(mbeanName + ",key=AutoFetch"));
+      }
+    } catch (Exception e) {
+      logger.error("Error unregistering Ebean " + mbeanName, e);
+    }
+
+    // shutdown autofetch profile collection
+    autoFetchManager.shutdown();
+    // shutdown background threads
+    backgroundExecutor.shutdown();
+    // shutdown DataSource (if its an Ebean one)
+    transactionManager.shutdown(shutdownDataSource, deregisterDriver);
+    shutdown = true;
+  }
+  
   /**
    * Return the server name.
    */

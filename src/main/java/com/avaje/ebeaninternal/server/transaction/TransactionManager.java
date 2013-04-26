@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.transaction;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.persistence.PersistenceException;
@@ -23,6 +24,7 @@ import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
+import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
 
 /**
  * Manages transactions.
@@ -136,10 +138,21 @@ public class TransactionManager {
 		
 		String value = GlobalProperties.get("transaction.onqueryonly", "ROLLBACK").toUpperCase().trim();
 		this.onQueryOnly = getOnQueryOnly(value, dataSource);
+		
+		initialiseHeartbeat();
 	}
 	
-	public void shutdown() {
-	  // Nothing to do
+	private void initialiseHeartbeat() {
+	  if (dataSource instanceof DataSourcePool) {
+	    DataSourcePool ds = (DataSourcePool)dataSource;
+	    backgroundExecutor.executePeriodically(ds.getHeartbeatRunnable(), ds.getHeartbeatFreqSecs(), TimeUnit.SECONDS);
+	  }
+	}
+	
+	public void shutdown(boolean shutdownDataSource, boolean deregisterDriver) {
+	  if (shutdownDataSource && (dataSource instanceof DataSourcePool)) {
+	    ((DataSourcePool)dataSource).shutdown(deregisterDriver);
+	  }	  
 	}
 	
 	public BeanDescriptorManager getBeanDescriptorManager() {

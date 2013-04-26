@@ -2,6 +2,9 @@ package com.avaje.ebeaninternal.server.core;
 
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.server.lib.DaemonScheduleThreadPool;
 import com.avaje.ebeaninternal.server.lib.thread.ThreadPool;
@@ -13,6 +16,8 @@ import com.avaje.ebeaninternal.server.lib.thread.ThreadPool;
  */
 public class TraditionalBackgroundExecutor implements SpiBackgroundExecutor {
 
+  private static Logger logger = LoggerFactory.getLogger(TraditionalBackgroundExecutor.class);
+  
 	private final ThreadPool pool;
 	
 	private final DaemonScheduleThreadPool schedulePool;
@@ -33,11 +38,17 @@ public class TraditionalBackgroundExecutor implements SpiBackgroundExecutor {
 	}
 
 	public void executePeriodically(Runnable r, long delay, TimeUnit unit) {
+	  if (logger.isDebugEnabled()) {
+	    logger.debug("Registering for executePeriodically {} delay:{} {}",r, delay, unit);
+	  }
 		schedulePool.scheduleWithFixedDelay(r, delay, delay, unit);
 	}
 
 	public void shutdown() {
-		// the pool is shutdown automatically by the ThreadPoolManager
+	  if (logger.isDebugEnabled()) {
+	    logger.debug("Shutting down");
+	  }
+	  pool.shutdown();
 		schedulePool.shutdown();
 	}
 	

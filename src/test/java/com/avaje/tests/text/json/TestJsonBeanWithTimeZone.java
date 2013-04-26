@@ -2,14 +2,20 @@ package com.avaje.tests.text.json;
 
 import java.util.TimeZone;
 
+import junit.framework.TestCase;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.tests.model.basic.BeanWithTimeZone;
 
-import junit.framework.TestCase;
-
 public class TestJsonBeanWithTimeZone extends TestCase {
 
+  private static final Logger logger = LoggerFactory.getLogger(TestJsonBeanWithTimeZone.class);
+  
   public void testSimple() {
     
     TimeZone defaultTimeZone = TimeZone.getDefault();
@@ -37,6 +43,10 @@ public class TestJsonBeanWithTimeZone extends TestCase {
 
     assertEquals(bean.getTimezone(), bean3.getTimezone());
 
+   // EbeanServer server = Ebean.getServer(null);
+   //server.shutdown();
+   //logger.info("shudown server manually, JVM shutdown hook fires next");
+    
   }
   
 }
