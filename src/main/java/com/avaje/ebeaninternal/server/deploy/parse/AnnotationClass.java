@@ -28,187 +28,159 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
  */
 public class AnnotationClass extends AnnotationParser {
 
-	public AnnotationClass(DeployBeanInfo<?> info) {
-		super(info);
-	}
+  public AnnotationClass(DeployBeanInfo<?> info) {
+    super(info);
+  }
 
-	/**
-	 * Read the class level deployment annotations.
-	 */
-	public void parse() {
-		read(descriptor.getBeanType());
-		setTableName();
-	}
+  /**
+   * Read the class level deployment annotations.
+   */
+  public void parse() {
+    read(descriptor.getBeanType());
+    setTableName();
+  }
 
-	/**
-	 * Set the table name if it has not already been set.
-	 */
-	private void setTableName() {
-		
-		if (descriptor.isBaseTableType()) {
+  /**
+   * Set the table name if it has not already been set.
+   */
+  private void setTableName() {
 
-			// default the TableName using NamingConvention.
-			TableName tableName = namingConvention.getTableName(descriptor.getBeanType());
-			
-            descriptor.setBaseTable(tableName);
-		}
-	}
-	
-	private boolean isXmlElement(Class<?> cls) {
-	    XmlRootElement rootElement = cls.getAnnotation(XmlRootElement.class);
-	    if (rootElement != null){
-	        return true;
-	    }
-	    XmlType xmlType = cls.getAnnotation(XmlType.class);
-        if (xmlType != null){
-            return true;
+    if (descriptor.isBaseTableType()) {
+
+      // default the TableName using NamingConvention.
+      TableName tableName = namingConvention.getTableName(descriptor.getBeanType());
+
+      descriptor.setBaseTable(tableName);
+    }
+  }
+
+  private boolean isXmlElement(Class<?> cls) {
+    XmlRootElement rootElement = cls.getAnnotation(XmlRootElement.class);
+    if (rootElement != null) {
+      return true;
+    }
+    XmlType xmlType = cls.getAnnotation(XmlType.class);
+    if (xmlType != null) {
+      return true;
+    }
+    return false;
+  }
+
+  private void read(Class<?> cls) {
+
+    Entity entity = cls.getAnnotation(Entity.class);
+    if (entity != null) {
+      // checkDefaultConstructor();
+      if (entity.name().equals("")) {
+        descriptor.setName(cls.getSimpleName());
+
+      } else {
+        descriptor.setName(entity.name());
+      }
+    } else if (isXmlElement(cls)) {
+      descriptor.setName(cls.getSimpleName());
+      descriptor.setEntityType(EntityType.XMLELEMENT);
+    }
+
+    Embeddable embeddable = cls.getAnnotation(Embeddable.class);
+    if (embeddable != null) {
+      descriptor.setEntityType(EntityType.EMBEDDED);
+      descriptor.setName("Embeddable:" + cls.getSimpleName());
+    }
+
+    UniqueConstraint uc = cls.getAnnotation(UniqueConstraint.class);
+    if (uc != null) {
+      descriptor.addCompoundUniqueConstraint(new CompoundUniqueContraint(uc.columnNames()));
+    }
+
+    Table table = cls.getAnnotation(Table.class);
+    if (table != null) {
+      UniqueConstraint[] uniqueConstraints = table.uniqueConstraints();
+      if (uniqueConstraints != null) {
+        for (UniqueConstraint c : uniqueConstraints) {
+          descriptor.addCompoundUniqueConstraint(new CompoundUniqueContraint(c.columnNames()));
         }
-        return false;
-	}
-	
-	private void read(Class<?> cls) {
-	        
-		Entity entity = cls.getAnnotation(Entity.class);
-		if (entity != null){
-			//checkDefaultConstructor();
-			if (entity.name().equals("")) {
-				descriptor.setName(cls.getSimpleName());
+      }
+    }
 
-			} else {
-				descriptor.setName(entity.name());
-			}
-		} else if (isXmlElement(cls)) {
-		    descriptor.setName(cls.getSimpleName());
-		    descriptor.setEntityType(EntityType.XMLELEMENT);
-		}
+    UpdateMode updateMode = cls.getAnnotation(UpdateMode.class);
+    if (updateMode != null) {
+      descriptor.setUpdateChangesOnly(updateMode.updateChangesOnly());
+    }
 
-		Embeddable embeddable = cls.getAnnotation(Embeddable.class);
-		if (embeddable != null){
-		    descriptor.setEntityType(EntityType.EMBEDDED);
-			descriptor.setName("Embeddable:"+cls.getSimpleName());
-		}
-		
-		UniqueConstraint uc = cls.getAnnotation(UniqueConstraint.class);
-		if (uc != null){
-		    descriptor.addCompoundUniqueConstraint(new CompoundUniqueContraint(uc.columnNames()));
-		}
-		
-		Table table = cls.getAnnotation(Table.class);
-        if (table != null){
-            UniqueConstraint[] uniqueConstraints = table.uniqueConstraints();
-            if (uniqueConstraints != null){
-                for (UniqueConstraint c : uniqueConstraints) {
-                    descriptor.addCompoundUniqueConstraint(new CompoundUniqueContraint(c.columnNames()));                    
-                }
-            }
-        }
+    NamedQueries namedQueries = cls.getAnnotation(NamedQueries.class);
+    if (namedQueries != null) {
+      readNamedQueries(namedQueries);
+    }
+    NamedQuery namedQuery = cls.getAnnotation(NamedQuery.class);
+    if (namedQuery != null) {
+      readNamedQuery(namedQuery);
+    }
 
-		UpdateMode updateMode = cls.getAnnotation(UpdateMode.class);
-		if (updateMode != null){
-			descriptor.setUpdateChangesOnly(updateMode.updateChangesOnly());
-		}
+    NamedUpdates namedUpdates = cls.getAnnotation(NamedUpdates.class);
+    if (namedUpdates != null) {
+      readNamedUpdates(namedUpdates);
+    }
 
-		NamedQueries namedQueries = cls.getAnnotation(NamedQueries.class);
-		if (namedQueries != null){
-			readNamedQueries(namedQueries);
-		}
-		NamedQuery namedQuery = cls.getAnnotation(NamedQuery.class);
-		if (namedQuery != null){
-			readNamedQuery(namedQuery);
-		}
+    NamedUpdate namedUpdate = cls.getAnnotation(NamedUpdate.class);
+    if (namedUpdate != null) {
+      readNamedUpdate(namedUpdate);
+    }
 
-		NamedUpdates namedUpdates = cls.getAnnotation(NamedUpdates.class);
-		if (namedUpdates != null){
-			readNamedUpdates(namedUpdates);
-		}
+    CacheStrategy cacheStrategy = cls.getAnnotation(CacheStrategy.class);
+    if (cacheStrategy != null) {
+      readCacheStrategy(cacheStrategy);
+    }
 
-		NamedUpdate namedUpdate = cls.getAnnotation(NamedUpdate.class);
-		if (namedUpdate != null){
-			readNamedUpdate(namedUpdate);
-		}
-		
-		CacheStrategy cacheStrategy = cls.getAnnotation(CacheStrategy.class);
-		if (cacheStrategy != null){
-			readCacheStrategy(cacheStrategy);
-		}
-		
-		EntityConcurrencyMode entityConcurrencyMode = cls.getAnnotation(EntityConcurrencyMode.class);
-        if (entityConcurrencyMode!=null) {
-            //descriptor.setConcurrencyMode(entityConcurrencyMode.value());
-        }
-	}
+    EntityConcurrencyMode entityConcurrencyMode = cls.getAnnotation(EntityConcurrencyMode.class);
+    if (entityConcurrencyMode != null) {
+      descriptor.setConcurrencyMode(entityConcurrencyMode.value());
+    }
+  }
 
-	private void readCacheStrategy(CacheStrategy cacheStrategy){
-		
-		CacheOptions cacheOptions = descriptor.getCacheOptions();
-		cacheOptions.setUseCache(cacheStrategy.useBeanCache());
-		cacheOptions.setReadOnly(cacheStrategy.readOnly());
-		cacheOptions.setWarmingQuery(cacheStrategy.warmingQuery());
-		if (cacheStrategy.naturalKey().length() > 0){
-			String propName = cacheStrategy.naturalKey().trim();
-			DeployBeanProperty beanProperty = descriptor.getBeanProperty(propName);
-			if (beanProperty != null){
-				beanProperty.setNaturalKey(true);
-				cacheOptions.setNaturalKey(propName);
-			}
-		}
-		
-		if (!UseIndex.DEFAULT.equals(cacheStrategy.useIndex())){
-		    // a specific text index strategy has been defined
-	      descriptor.setUseIndex(cacheStrategy.useIndex());
-		}
-	}
-	
-	private void readNamedQueries(NamedQueries namedQueries) {
-		NamedQuery[] queries = namedQueries.value();
-		for (int i = 0; i < queries.length; i++) {
-			readNamedQuery(queries[i]);
-		}
-	}
+  private void readCacheStrategy(CacheStrategy cacheStrategy) {
 
-	private void readNamedQuery(NamedQuery namedQuery) {
-		DeployNamedQuery q = new DeployNamedQuery(namedQuery);
-		descriptor.add(q);
-	}
+    CacheOptions cacheOptions = descriptor.getCacheOptions();
+    cacheOptions.setUseCache(cacheStrategy.useBeanCache());
+    cacheOptions.setReadOnly(cacheStrategy.readOnly());
+    cacheOptions.setWarmingQuery(cacheStrategy.warmingQuery());
+    if (cacheStrategy.naturalKey().length() > 0) {
+      String propName = cacheStrategy.naturalKey().trim();
+      DeployBeanProperty beanProperty = descriptor.getBeanProperty(propName);
+      if (beanProperty != null) {
+        beanProperty.setNaturalKey(true);
+        cacheOptions.setNaturalKey(propName);
+      }
+    }
 
-	private void readNamedUpdates(NamedUpdates updates) {
-		NamedUpdate[] updateArray = updates.value();
-		for (int i = 0; i < updateArray.length; i++) {
-			readNamedUpdate(updateArray[i]);
-		}
-	}
+    if (!UseIndex.DEFAULT.equals(cacheStrategy.useIndex())) {
+      // a specific text index strategy has been defined
+      descriptor.setUseIndex(cacheStrategy.useIndex());
+    }
+  }
 
-	private void readNamedUpdate(NamedUpdate update) {
-		DeployNamedUpdate upd = new DeployNamedUpdate(update);
-		descriptor.add(upd);
-	}
+  private void readNamedQueries(NamedQueries namedQueries) {
+    NamedQuery[] queries = namedQueries.value();
+    for (int i = 0; i < queries.length; i++) {
+      readNamedQuery(queries[i]);
+    }
+  }
 
-//	/**
-//	 * Check to see if the Entity bean has a default constructor.
-//	 * <p>
-//	 * If it does not then it is expected that this entity bean has an
-//	 * associated BeanFinder.
-//	 * </p>
-//	 */
-//	private void checkDefaultConstructor() {
-//
-//		Class<?> beanType = descriptor.getBeanType();
-//
-//		Constructor<?> defaultConstructor;
-//		try {
-//			defaultConstructor = beanType.getConstructor((Class[]) null);
-//			if (defaultConstructor == null) {
-//				String m = "No default constructor on "+beanType;
-//				throw new PersistenceException(m);
-//			}
-//		} catch (SecurityException e) {
-//			String m = "Error checking for default constructor on "+beanType;
-//			throw new PersistenceException(m, e);
-//
-//		} catch (NoSuchMethodException e) {
-//			String m = "No default constructor on "+beanType;
-//			throw new PersistenceException(m);
-//		}
-//	}
+  private void readNamedQuery(NamedQuery namedQuery) {
+    DeployNamedQuery q = new DeployNamedQuery(namedQuery);
+    descriptor.add(q);
+  }
+
+  private void readNamedUpdates(NamedUpdates updates) {
+    NamedUpdate[] updateArray = updates.value();
+    for (int i = 0; i < updateArray.length; i++) {
+      readNamedUpdate(updateArray[i]);
+    }
+  }
+
+  private void readNamedUpdate(NamedUpdate update) {
+    DeployNamedUpdate upd = new DeployNamedUpdate(update);
+    descriptor.add(upd);
+  }
 
 }
