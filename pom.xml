@@ -85,6 +85,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.avaje</groupId>
+      <artifactId>avaje-agentloader</artifactId>
+      <version>1.1.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>1.3.153</version>

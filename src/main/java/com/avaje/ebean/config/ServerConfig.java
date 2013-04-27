@@ -6,7 +6,6 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import com.avaje.ebean.EbeanServerFactory;
-import com.avaje.ebean.LogLevel;
 import com.avaje.ebean.annotation.Encrypted;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
@@ -161,11 +160,6 @@ public class ServerConfig {
    * The directory transaction logs go (when loggingToJavaLogger is false).
    */
   private String loggingDirectory = "logs";
-
-  /**
-   * The overall transaction logging level.
-   */
-  private LogLevel loggingLevel = LogLevel.NONE;
 
   /**
    * Used to unwrap PreparedStatements to perform JDBC Driver specific functions
@@ -817,26 +811,6 @@ public class ServerConfig {
   }
 
   /**
-   * Return the default transaction logging level.
-   * <p>
-   * The logging level can be changed on a per transaction basis.
-   * </p>
-   */
-  public LogLevel getLoggingLevel() {
-    return loggingLevel;
-  }
-
-  /**
-   * Set the default transaction logging level.
-   * <p>
-   * The logging level can be changed on a per transaction basis.
-   * </p>
-   */
-  public void setLoggingLevel(LogLevel logLevel) {
-    this.loggingLevel = logLevel;
-  }
-
-  /**
    * Return the directory where transaction logs go.
    */
   public String getLoggingDirectory() {
@@ -1359,8 +1333,6 @@ public class ServerConfig {
     debugSql = p.getBoolean("debug.sql", false);
     debugLazyLoad = p.getBoolean("debug.lazyload", false);
 
-    loggingLevel = getLogLevelValue(p);
-
     String s = p.get("useJuliTransactionLogger", null);
     s = p.get("loggingToJavaLogger", s);
     loggingToJavaLogger = "true".equalsIgnoreCase(s);
@@ -1369,17 +1341,6 @@ public class ServerConfig {
     loggingDirectory = p.get("logging.directory", s);
 
     classes = getClasses(p);
-  }
-
-  private LogLevel getLogLevelValue(PropertySource p) {
-    // logging.level preferred but others parameters will work
-    String logValue = p.get("logging", "NONE");
-    logValue = p.get("log.level", logValue);
-    logValue = p.get("logging.level", logValue);
-    if (logValue.trim().equalsIgnoreCase("ALL")) {
-      logValue = "SQL";
-    }
-    return Enum.valueOf(LogLevel.class, logValue.toUpperCase());
   }
 
   private NamingConvention createNamingConvention(PropertySource p) {

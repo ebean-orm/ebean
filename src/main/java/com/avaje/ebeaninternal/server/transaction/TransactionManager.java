@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.BackgroundExecutor;
-import com.avaje.ebean.LogLevel;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.event.TransactionEventListener;
@@ -66,8 +65,6 @@ public class TransactionManager {
     
 	private final BeanDescriptorManager beanDescriptorManager;
 	
-	private LogLevel logLevel;
-	
 	/**
 	 * Prefix for transaction id's (logging).
 	 */
@@ -118,9 +115,7 @@ public class TransactionManager {
 		
 		this.beanDescriptorManager = descMgr;
 		this.clusterManager = clusterManager;
-		this.serverName = config.getName();
-		
-		this.logLevel = config.getLoggingLevel();
+		this.serverName = config.getName();		
 		this.backgroundExecutor = backgroundExecutor;		
 		this.dataSource = config.getDataSource();
 		this.bulkEventListenerMap = new BulkEventListenerMap(config.getBulkTableEventListeners());
@@ -162,20 +157,6 @@ public class TransactionManager {
 	public BulkEventListenerMap getBulkEventListenerMap() {
     	return bulkEventListenerMap;
     }
-
-	/**
-	 * Return the logging level for transactions.
-	 */
-	public LogLevel getTransactionLogLevel(){
-		return logLevel;
-	}
-	
-	/**
-	 * Set the log level for transactions.
-	 */
-	public void setTransactionLogLevel(LogLevel logLevel){
-		this.logLevel = logLevel;
-	}
 	
 	/**
 	 * Return the behaviour to use when a query only transaction is committed.
@@ -276,7 +257,7 @@ public class TransactionManager {
 	 */
 	public SpiTransaction wrapExternalConnection(String id, Connection c) {
 
-		ExternalJdbcTransaction t = new ExternalJdbcTransaction(id, true, logLevel, c, this);
+		ExternalJdbcTransaction t = new ExternalJdbcTransaction(id, true, c, this);
 
 		// set the default batch mode. This can be on for
 		// jdbc drivers that support getGeneratedKeys
@@ -296,7 +277,7 @@ public class TransactionManager {
 		  c = dataSource.getConnection();
 		  long id = transactionCounter.incrementAndGet();
 
-			JdbcTransaction t = new JdbcTransaction(prefix + id, explicit, logLevel, c, this);
+			JdbcTransaction t = new JdbcTransaction(prefix + id, explicit, c, this);
 
 			// set the default batch mode. This can be on for
 			// jdbc drivers that support getGeneratedKeys
@@ -332,7 +313,7 @@ public class TransactionManager {
       c = dataSource.getConnection();
 		  long id = transactionCounter.incrementAndGet();
 
-			JdbcTransaction t = new JdbcTransaction(prefix + id, false, logLevel, c, this);
+			JdbcTransaction t = new JdbcTransaction(prefix + id, false, c, this);
 			
 			// set the default batch mode. Can be true for
 			// jdbc drivers that support getGeneratedKeys

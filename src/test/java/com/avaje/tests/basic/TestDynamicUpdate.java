@@ -4,7 +4,6 @@ import junit.framework.TestCase;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.LogLevel;
 import com.avaje.tests.model.embedded.EMain;
 
 public class TestDynamicUpdate extends TestCase {
@@ -27,9 +26,7 @@ public class TestDynamicUpdate extends TestCase {
 		b2.getEmbeddable().setDescription("ABC");
 		server.save(b2);
 
-		//server.getAdminLogging().setLogLevel(LogLevel.SQL);
-		
-		server.beginTransaction().setLogLevel(LogLevel.SQL);
+		server.beginTransaction();
 		try {
     		EMain b3 = server.find(EMain.class, b.getId());
     		assertEquals("ABC", b3.getEmbeddable().getDescription());

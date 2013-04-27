@@ -7,8 +7,6 @@ import javax.sql.DataSource;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
-import com.avaje.ebean.LogLevel;
-
 /**
  * Jta based transaction.
  */
@@ -26,8 +24,8 @@ public class JtaTransaction extends JdbcTransaction {
     /**
      * Create the JtaTransaction.
      */
-    public JtaTransaction(String id, boolean explicit, LogLevel logLevel, UserTransaction utx, DataSource ds, TransactionManager manager) {
-        super(id, explicit, logLevel, null, manager);
+    public JtaTransaction(String id, boolean explicit, UserTransaction utx, DataSource ds, TransactionManager manager) {
+        super(id, explicit, null, manager);
         userTransaction = utx;
         dataSource = ds;
 

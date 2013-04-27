@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.core;
 import java.sql.Connection;
 
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.LogLevel;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 
@@ -115,13 +114,13 @@ public abstract class BeanRequest {
      * Return true if SQL should be logged for this transaction.
      */
     public boolean isLogSql() {
-        return transaction.getLogLevel().ordinal() >= LogLevel.SQL.ordinal();
+        return transaction.isLogSql();
     }
     
     /**
      * Return true if SUMMARY information should be logged for this transaction.
      */
     public boolean isLogSummary() {
-        return transaction.getLogLevel().ordinal() >= LogLevel.SUMMARY.ordinal();
+        return transaction.isLogSummary();
     }
 }

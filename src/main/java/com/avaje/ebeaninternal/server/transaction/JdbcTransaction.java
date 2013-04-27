@@ -15,7 +15,6 @@ import javax.persistence.RollbackException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avaje.ebean.LogLevel;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -98,8 +97,6 @@ public class JdbcTransaction implements SpiTransaction {
 
   boolean localReadOnly;
 
-  LogLevel logLevel;
-
   /**
    * Set to true if using batch processing.
    */
@@ -129,13 +126,12 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * Create a new JdbcTransaction.
    */
-  public JdbcTransaction(String id, boolean explicit, LogLevel logLevel, Connection connection, TransactionManager manager) {
+  public JdbcTransaction(String id, boolean explicit, Connection connection, TransactionManager manager) {
     try {
       this.active = true;
       this.id = id;
       this.logPrefix = deriveLogPrefix(id,null);
       this.explicit = explicit;
-      this.logLevel = logLevel;
       this.manager = manager;
       this.connection = connection;
       this.autoCommit = connection.getAutoCommit();
@@ -456,11 +452,7 @@ public class JdbcTransaction implements SpiTransaction {
    * Set whether transaction logging is on for this transaction.
    */
   public void setLoggingOn(boolean loggingOn) {
-    if (loggingOn) {
-      logLevel = LogLevel.SQL;
-    } else {
-      logLevel = LogLevel.NONE;
-    }
+    
   }
 
   /**
@@ -476,14 +468,6 @@ public class JdbcTransaction implements SpiTransaction {
 
   public boolean isLogSummary() {
     return TransactionManager.SUM_LOGGER.isDebugEnabled();
-  }
-
-  public LogLevel getLogLevel() {
-    return logLevel;
-  }
-
-  public void setLogLevel(LogLevel logLevel) {
-    this.logLevel = logLevel;
   }
   
   public void logSql(String msg) {

@@ -14,11 +14,11 @@ import javax.transaction.SystemException;
 import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
 
-import com.avaje.ebean.LogLevel;
-import com.avaje.ebean.config.ExternalTransactionManager;
-import com.avaje.ebeaninternal.api.SpiTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.avaje.ebean.config.ExternalTransactionManager;
+import com.avaje.ebeaninternal.api.SpiTransaction;
 
 /**
  * Hook into external JTA transaction manager.
@@ -122,7 +122,7 @@ public class JtaTransactionManager implements ExternalTransactionManager {
     
         // "wrap" it in a Ebean specific JtaTransaction
         String txnId = String.valueOf(System.currentTimeMillis());
-        JtaTransaction newTrans = new JtaTransaction(txnId, true, LogLevel.NONE, ut, dataSource, transactionManager);
+        JtaTransaction newTrans = new JtaTransaction(txnId, true, ut, dataSource, transactionManager);
 
         // create and register transaction listener
         JtaTxnListener txnListener = createJtaTxnListener(newTrans);
