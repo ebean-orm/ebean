@@ -29,9 +29,9 @@
 		<property name="name" value="test"/>
 		<property name="classes">
 			<list>
-				<value>com.avaje.ebean.springsupport.User</value>
-				<value>com.avaje.ebean.springsupport.Role</value>
-				<value>com.avaje.ebean.springsupport.Account</value>
+				<value>com.avaje.test.springsupport.User</value>
+				<value>com.avaje.test.springsupport.Role</value>
+				<value>com.avaje.test.springsupport.Account</value>
 			</list>
 		</property>
 		<property name="dataSource" ref="dataSource"/>
@@ -45,7 +45,7 @@
 		<property name="serverConfig" ref="serverConfig"/>
 	</bean>
 
-	<bean id="userService" class="com.avaje.ebean.springsupport.UserServiceImpl">
+	<bean id="userService" class="com.avaje.test.springsupport.UserServiceImpl">
 		<property name="ebeanServer" ref="ebeanServer"/>
 	</bean>
 </beans>

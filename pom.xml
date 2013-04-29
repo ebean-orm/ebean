@@ -4,20 +4,20 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>avaje-javaparent</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
   </parent>
 
   <groupId>org.avaje.ebeanorm</groupId>
   <artifactId>avaje-ebeanorm-spring</artifactId>
   <name>avaje-ebeanorm-spring</name>
-  <version>3.1.2-SNAPSHOT</version>
+  <version>3.2.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <description>Support for Spring transactions and IOC setup of Ebean server config</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring.framework.version>3.0.0.RELEASE</spring.framework.version>
-    <ebean.mavenenhancer.version>3.1.1</ebean.mavenenhancer.version>
+    <ebean.mavenenhancer.version>3.2.1</ebean.mavenenhancer.version>
   </properties>
 
   <url>http://www.avaje.org</url>
@@ -31,9 +31,9 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:https://github.com/rbygrave/avaje-ebeanorm-spring.git</connection>
-    <developerConnection>scm:git:https://github.com/rbygrave/avaje-ebeanorm-spring.git</developerConnection>
-    <url>https://github.com/rbygrave/avaje-ebeanorm-spring.git</url>
+    <connection>scm:git:https://github.com/avaje-ebeanorm/avaje-ebeanorm-spring.git</connection>
+    <developerConnection>scm:git:https://github.com/avaje-ebeanorm/avaje-ebeanorm-spring.git</developerConnection>
+    <url>https://github.com/avaje-ebeanorm/avaje-ebeanorm-spring.git</url>
   </scm>
 
   <dependencies>
@@ -41,7 +41,14 @@
     <dependency>
       <groupId>org.avaje.ebeanorm</groupId>
       <artifactId>avaje-ebeanorm</artifactId>
-      <version>[3,4)</version>
+      <version>[3.2,4)</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.avaje.ebeanorm</groupId>
+      <artifactId>avaje-ebeanorm-agent</artifactId>
+      <version>3.2.1</version>
+      <scope>test</scope>
     </dependency>
 
     <!-- Spring -->
@@ -143,7 +150,7 @@
             <phase>process-test-classes</phase>
             <configuration>
               <classSource>target/test-classes</classSource>
-              <packages>com.avaje.ebean.**</packages>
+              <packages>com.avaje.**</packages>
               <transformArgs>debug=9</transformArgs>
             </configuration>
             <goals>

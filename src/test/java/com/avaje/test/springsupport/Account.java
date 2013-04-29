@@ -17,30 +17,31 @@
  * along with Ebean; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-
-package com.avaje.ebean.springsupport;
-
-import java.util.HashSet;
-import java.util.Set;
+package com.avaje.test.springsupport;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 
 /**
- * The Class Role.
+ * The Class Account.
  * @since 18.05.2009
  * @author E Mc Greal
  */
 @Entity
-public class Role {
-	@Id
-	long oid;
+public class Account {
 
-	@ManyToMany
-	private Set<User> users = new HashSet<User>();
+	/** The oid. */
+	@Id
+	private long oid;
+
+	/** The user. */
+	@OneToOne
+	private User user;
 
 	/**
+	 * Gets the oid.
+	 *
 	 * @return the oid
 	 */
 	public long getOid() {
@@ -48,6 +49,8 @@ public class Role {
 	}
 
 	/**
+	 * Sets the oid.
+	 *
 	 * @param oid the oid to set
 	 */
 	public void setOid(long oid) {
@@ -55,19 +58,20 @@ public class Role {
 	}
 
 	/**
-	 * @return the users
+	 * Gets the user.
+	 *
+	 * @return the user
 	 */
-	public Set<User> getUsers() {
-		return users;
+	public User getUser() {
+		return user;
 	}
 
 	/**
-	 * @param users the users to set
+	 * Sets the user.
+	 *
+	 * @param user the user to set
 	 */
-	public void setUsers(Set<User> users) {
-		this.users = users;
+	public void setUser(User user) {
+		this.user = user;
 	}
-
-
-
 }

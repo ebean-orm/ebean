@@ -18,7 +18,7 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-package com.avaje.ebean.springsupport;
+package com.avaje.test.springsupport;
 
 import java.util.HashSet;
 import java.util.Set;
