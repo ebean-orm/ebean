@@ -2,17 +2,18 @@ package com.avaje.tests.basic;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Contact;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestLazyLoadEmptyOneToMany extends TestCase {
+public class TestLazyLoadEmptyOneToMany extends BaseTestCase {
 
+  @Test
   public void test() {
 
     ResetBasicData.reset();

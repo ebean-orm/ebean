@@ -3,8 +3,10 @@ package com.avaje.tests.basic;
 import java.util.List;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.tests.model.basic.Order;
@@ -12,12 +14,13 @@ import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.Product;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestSharedInstancePropagation extends TestCase {
+public class TestSharedInstancePropagation extends BaseTestCase {
 
 	
 	/**
 	 * Test that the sharedInstance status is propagated on lazy loading.
 	 */
+  @Test
 	public void testSharedListNavigate() {
 
 		ResetBasicData.reset();

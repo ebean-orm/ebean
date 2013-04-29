@@ -1,28 +1,31 @@
 package com.avaje.ebean.text;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class TestPathPropertiesParse extends TestCase {
+import com.avaje.ebean.BaseTestCase;
 
-    public void test() {
-        
-        PathProperties s0 = PathProperties.parse("(id,name)");
+public class TestPathPropertiesParse extends BaseTestCase {
 
-        assertEquals(1,s0.getPaths().size());
-        assertTrue(s0.get(null).contains("id"));
-        assertTrue(s0.get(null).contains("name"));
-        assertFalse(s0.get(null).contains("status"));
-        
-        PathProperties s1 = PathProperties.parse(":(id,name,shipAddr(*))");
-        assertEquals(2,s1.getPaths().size());
-        assertEquals(3,s1.get(null).size());
-        assertTrue(s1.get(null).contains("id"));
-        assertTrue(s1.get(null).contains("name"));
-        assertTrue(s1.get(null).contains("shipAddr"));
-        assertTrue(s1.get("shipAddr").contains("*"));
-        assertEquals(1,s1.get("shipAddr").size());
+  @Test
+  public void test() {
 
+    PathProperties s0 = PathProperties.parse("(id,name)");
 
-    }
-    
+    Assert.assertEquals(1, s0.getPaths().size());
+    Assert.assertTrue(s0.get(null).contains("id"));
+    Assert.assertTrue(s0.get(null).contains("name"));
+    Assert.assertFalse(s0.get(null).contains("status"));
+
+    PathProperties s1 = PathProperties.parse(":(id,name,shipAddr(*))");
+    Assert.assertEquals(2, s1.getPaths().size());
+    Assert.assertEquals(3, s1.get(null).size());
+    Assert.assertTrue(s1.get(null).contains("id"));
+    Assert.assertTrue(s1.get(null).contains("name"));
+    Assert.assertTrue(s1.get(null).contains("shipAddr"));
+    Assert.assertTrue(s1.get("shipAddr").contains("*"));
+    Assert.assertEquals(1, s1.get("shipAddr").size());
+
+  }
+
 }

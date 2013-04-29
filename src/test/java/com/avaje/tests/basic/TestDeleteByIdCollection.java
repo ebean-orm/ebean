@@ -3,15 +3,18 @@ package com.avaje.tests.basic;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestDeleteByIdCollection extends TestCase {
+public class TestDeleteByIdCollection extends BaseTestCase {
 
+  @Test
     public void test() {
         
         ResetBasicData.reset();
@@ -25,8 +28,8 @@ public class TestDeleteByIdCollection extends TestCase {
         Customer c0Back = Ebean.find(Customer.class, c0.getId());
         Customer c1Back = Ebean.find(Customer.class, ""+c1.getId());
 
-        assertNotNull(c0Back);
-        assertNotNull(c1Back);
+        Assert.assertNotNull(c0Back);
+        Assert.assertNotNull(c1Back);
         
         List<String> ids = new ArrayList<String>();
         // also test id type conversion
@@ -39,8 +42,8 @@ public class TestDeleteByIdCollection extends TestCase {
         c0Back = Ebean.find(Customer.class, c0.getId());
         c1Back = Ebean.find(Customer.class, ""+c1.getId());
         
-        assertNull(c0Back);
-        assertNull(c1Back);
+        Assert.assertNull(c0Back);
+        Assert.assertNull(c1Back);
     }
     
     public void testDelByStatement() {
@@ -53,8 +56,8 @@ public class TestDeleteByIdCollection extends TestCase {
         Order o0Back = Ebean.find(Order.class, order0.getId());
         Order o1Back = Ebean.find(Order.class, order1.getId());
         
-        assertNotNull(o0Back);
-        assertNotNull(o1Back);
+        Assert.assertNotNull(o0Back);
+        Assert.assertNotNull(o1Back);
         
 
         List<Object> ids = new ArrayList<Object>();
@@ -67,8 +70,8 @@ public class TestDeleteByIdCollection extends TestCase {
         o0Back = Ebean.find(Order.class, order0.getId());
         o1Back = Ebean.find(Order.class, order1.getId());
         
-        assertNull(o0Back);
-        assertNull(o1Back);
+        Assert.assertNull(o0Back);
+        Assert.assertNull(o1Back);
     }
     
 }

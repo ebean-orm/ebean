@@ -1,38 +1,36 @@
 package com.avaje.tests.basic;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.PFile;
 import com.avaje.tests.model.basic.PFileContent;
 
-public class TestDeleteImportedPartial extends TestCase {
- 
-    public void test() {
-    
+public class TestDeleteImportedPartial extends BaseTestCase {
 
-        PFile persistentFile = new PFile("test.txt", new PFileContent("test".getBytes()));
+  @Test
+  public void test() {
 
-        Ebean.save(persistentFile);
-        Integer id = persistentFile.getId();
-        Integer contentId = persistentFile.getFileContent().getId();
+    PFile persistentFile = new PFile("test.txt", new PFileContent("test".getBytes()));
 
-        PFile partialPfile = Ebean.find(PFile.class)
-            .select("id")
-            .where().idEq(persistentFile.getId())
-            .findUnique();
-        
-        // should delete file and fileContent
-        Ebean.delete(partialPfile);
-        System.out.println("finished delete");
+    Ebean.save(persistentFile);
+    Integer id = persistentFile.getId();
+    Integer contentId = persistentFile.getFileContent().getId();
 
-        PFile file1 = Ebean.find(PFile.class, id);
-        PFileContent content1 = Ebean.find(PFileContent.class, contentId);
+    PFile partialPfile = Ebean.find(PFile.class).select("id").where().idEq(persistentFile.getId())
+        .findUnique();
 
-        Assert.assertNull(file1);
-        Assert.assertNull(content1);        
-        
-    }
+    // should delete file and fileContent
+    Ebean.delete(partialPfile);
+    System.out.println("finished delete");
+
+    PFile file1 = Ebean.find(PFile.class, id);
+    PFileContent content1 = Ebean.find(PFileContent.class, contentId);
+
+    Assert.assertNull(file1);
+    Assert.assertNull(content1);
+
+  }
 }

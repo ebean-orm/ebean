@@ -5,13 +5,16 @@ import java.util.UUID;
 import javax.persistence.EntityNotFoundException;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.UUOne;
 
-public class TestLazyLoadNonExistantBean extends TestCase {
+public class TestLazyLoadNonExistantBean extends BaseTestCase {
 
+  @Test
   public void testSimple() {
 
     UUID uuid = UUID.randomUUID();

@@ -5,8 +5,10 @@ package com.avaje.tests.basic;
 import java.util.List;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.PersistenceContext;
@@ -14,9 +16,9 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestWeakPersistenceContext extends TestCase {
+public class TestWeakPersistenceContext extends BaseTestCase {
 
-	
+	@Test
 	public void testOne() {
 		
 		PersistenceContext ctx = inner();

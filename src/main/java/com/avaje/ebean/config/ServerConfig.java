@@ -139,27 +139,12 @@ public class ServerConfig {
 
   private boolean ddlRun;
 
-  private boolean debugSql;
-
-  private boolean debugLazyLoad;
-
   private boolean useJtaTransactionManager;
 
   /**
    * The external transaction manager (like Spring).
    */
   private ExternalTransactionManager externalTransactionManager;
-
-  /**
-   * Set to true to log using java.util.logging and otherwise uses ebean
-   * transaction loggers.
-   */
-  private boolean loggingToJavaLogger;
-
-  /**
-   * The directory transaction logs go (when loggingToJavaLogger is false).
-   */
-  private String loggingDirectory = "logs";
 
   /**
    * Used to unwrap PreparedStatements to perform JDBC Driver specific functions
@@ -775,119 +760,6 @@ public class ServerConfig {
   }
 
   /**
-   * Return true to get the generated SQL queries output to the console.
-   * <p>
-   * To get the SQL and bind variables for insert update delete statements you
-   * should use transaction logging.
-   * </p>
-   */
-  public boolean isDebugSql() {
-    return debugSql;
-  }
-
-  /**
-   * Set to true to get the generated SQL queries output to the console.
-   * <p>
-   * To get the SQL and bind variables for insert update delete statements you
-   * should use transaction logging.
-   * </p>
-   */
-  public void setDebugSql(boolean debugSql) {
-    this.debugSql = debugSql;
-  }
-
-  /**
-   * Return true if there is debug logging on lazy loading events.
-   */
-  public boolean isDebugLazyLoad() {
-    return debugLazyLoad;
-  }
-
-  /**
-   * Set to true to get debug logging on lazy loading events.
-   */
-  public void setDebugLazyLoad(boolean debugLazyLoad) {
-    this.debugLazyLoad = debugLazyLoad;
-  }
-
-  /**
-   * Return the directory where transaction logs go.
-   */
-  public String getLoggingDirectory() {
-    return loggingDirectory;
-  }
-
-  /**
-   * Return the transaction log directory substituting any expressions such as
-   * ${catalina.base} etc.
-   */
-  public String getLoggingDirectoryWithEval() {
-    return GlobalProperties.evaluateExpressions(loggingDirectory);
-  }
-
-  /**
-   * Set the directory that the transaction logs go in.
-   * <p>
-   * This will not be used if the transaction logging is going to java util
-   * logging (via {@link #setLoggingToJavaLogger(boolean)}).
-   * </p>
-   * <p>
-   * This can contain expressions like ${catalina.base} with environment
-   * variables, java system properties and entries in ebean.properties.
-   * </p>
-   * <p>
-   * e.g. ${catalina.base}/logs/trans
-   * </p>
-   * 
-   * @param loggingDirectory
-   *          the transaction log directory
-   */
-  public void setLoggingDirectory(String loggingDirectory) {
-    this.loggingDirectory = loggingDirectory;
-  }
-
-  /**
-   * Return true if you want to use a java.util.logging.Logger to log
-   * transaction statements, bind values etc.
-   * <p>
-   * If this is false then the default transaction logger is used which logs the
-   * transaction details to separate transaction log files.
-   * </p>
-   */
-  @Deprecated
-  public boolean isLoggingToJavaLogger() {
-    return loggingToJavaLogger;
-  }
-
-  /**
-   * Set this to true if you want transaction logging to use a
-   * java.util.logging.Logger to log the statements and bind variables etc
-   * rather than the default one which creates separate transaction log files.
-   */
-  @Deprecated
-  public void setLoggingToJavaLogger(boolean transactionLogToJavaLogger) {
-    this.loggingToJavaLogger = transactionLogToJavaLogger;
-  }
-
-  /**
-   * Deprecated - please use isTransactionLogToJavaLogger();
-   * 
-   * @deprecated
-   */
-  public boolean isUseJuliTransactionLogger() {
-    return isLoggingToJavaLogger();
-  }
-
-  /**
-   * Deprecated - please use setTransactionLogToJavaLogger();
-   * 
-   * @deprecated
-   */
-  public void setUseJuliTransactionLogger(boolean transactionLogToJavaLogger) {
-    setLoggingToJavaLogger(transactionLogToJavaLogger);
-  }
-
-  /**
    * Set to true to run the DDL generation on startup.
    */
   public void setDdlGenerate(boolean ddlGenerate) {
@@ -1330,15 +1202,6 @@ public class ServerConfig {
 
     ddlGenerate = p.getBoolean("ddl.generate", false);
     ddlRun = p.getBoolean("ddl.run", false);
-    debugSql = p.getBoolean("debug.sql", false);
-    debugLazyLoad = p.getBoolean("debug.lazyload", false);
-
-    String s = p.get("useJuliTransactionLogger", null);
-    s = p.get("loggingToJavaLogger", s);
-    loggingToJavaLogger = "true".equalsIgnoreCase(s);
-
-    s = p.get("log.directory", "logs");
-    loggingDirectory = p.get("logging.directory", s);
 
     classes = getClasses(p);
   }

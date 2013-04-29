@@ -4,17 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Transaction;
 import com.avaje.tests.model.basic.UTDetail;
 import com.avaje.tests.model.basic.UTMaster;
 
-public class TestBatchInsertSimple extends TestCase {
+public class TestBatchInsertSimple extends BaseTestCase {
 
   Random random = new Random();
 
+  @Test
   public void testSimpleJdbcBatching() {
 
     int numOfMasters = 10;// 2 + random.nextInt(8);
@@ -28,11 +30,11 @@ public class TestBatchInsertSimple extends TestCase {
     try {
       transaction.setBatchMode(true);
       transaction.setBatchSize(4);
-      //transaction.setLogLevel(LogLevel.SUMMARY);
-      //transaction.setBatchGetGeneratedKeys(false);
+      // transaction.setLogLevel(LogLevel.SUMMARY);
+      // transaction.setBatchGetGeneratedKeys(false);
 
       Ebean.save(masters);
-      
+
       transaction.commit();
 
     } finally {
@@ -52,7 +54,7 @@ public class TestBatchInsertSimple extends TestCase {
       int qty = 1 + random.nextInt(99);
       double amount = random.nextDouble();
 
-      details.add(createDetail(masterPos+"-"+i, qty, amount));
+      details.add(createDetail(masterPos + "-" + i, qty, amount));
     }
     master.setDetails(details);
     return master;
@@ -71,8 +73,8 @@ public class TestBatchInsertSimple extends TestCase {
     detail.setQty(Integer.valueOf(qty));
     detail.setAmount(Double.valueOf(amount));
 
-    //System.out.println("-- "+detail);
-    
+    // System.out.println("-- "+detail);
+
     return detail;
   }
 

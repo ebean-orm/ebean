@@ -2,16 +2,17 @@ package com.avaje.tests.batchload;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Contact;
 import com.avaje.tests.model.basic.Customer;
 
-public class TestBasicNavOnEmpty extends TestCase {
+public class TestBasicNavOnEmpty extends BaseTestCase {
 
+  @Test
 	public void test() {
 		
 		Customer c = new Customer();

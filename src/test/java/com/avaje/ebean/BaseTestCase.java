@@ -1,13 +1,18 @@
 package com.avaje.ebean;
 
 import org.avaje.agentloader.AgentLoader;
+import org.junit.BeforeClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import junit.framework.TestCase;
-
-public class BaseTestCase extends TestCase {
+public class BaseTestCase {
   
-  static {
-    AgentLoader.loadAgentFromClasspath("avaje-ebeanorm-agent","debug=1");
+  protected static Logger logger = LoggerFactory.getLogger(BaseTestCase.class);
+  
+  @BeforeClass
+  public static void preStart() {
+    logger.debug("... preStart");
+    AgentLoader.loadAgentFromClasspath("avaje-ebeanorm-agent","debug=0");
   }
 
 }

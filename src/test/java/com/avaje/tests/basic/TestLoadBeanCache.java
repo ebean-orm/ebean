@@ -3,14 +3,17 @@ package com.avaje.tests.basic;
 import java.util.Map;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Country;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestLoadBeanCache extends TestCase {
+public class TestLoadBeanCache extends BaseTestCase {
 
+  @Test
 	public void testLoad() {
 		
 		ResetBasicData.reset();

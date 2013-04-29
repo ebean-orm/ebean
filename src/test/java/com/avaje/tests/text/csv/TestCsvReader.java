@@ -4,45 +4,44 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Locale;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestCsvReader extends TestCase {
+public class TestCsvReader extends BaseTestCase {
 
-	public void test() {
+  @Test
+  public void test() {
 
-		ResetBasicData.reset();
-		
-		try {
-			File f = new File("src/test/resources/test1.csv");
+    ResetBasicData.reset();
 
-			FileReader reader = new FileReader(f);
+    try {
+      File f = new File("src/test/resources/test1.csv");
 
-			
-			CsvReader<Customer> csvReader = Ebean.createCsvReader(Customer.class);
+      FileReader reader = new FileReader(f);
 
-			csvReader.setPersistBatchSize(2);
-			
-			csvReader.addIgnore();
-			//csvReader.addProperty("id");
-			csvReader.addProperty("status");
-			csvReader.addProperty("name");
-			csvReader.addDateTime("anniversary", "dd-MMM-yyyy", Locale.GERMAN);
-			csvReader.addProperty("billingAddress.line1");
-			csvReader.addProperty("billingAddress.city");
-			csvReader.addReference("billingAddress.country.code");
+      CsvReader<Customer> csvReader = Ebean.createCsvReader(Customer.class);
 
-			
-			csvReader.process(reader);
-			
-			
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+      csvReader.setPersistBatchSize(2);
+
+      csvReader.addIgnore();
+      // csvReader.addProperty("id");
+      csvReader.addProperty("status");
+      csvReader.addProperty("name");
+      csvReader.addDateTime("anniversary", "dd-MMM-yyyy", Locale.GERMAN);
+      csvReader.addProperty("billingAddress.line1");
+      csvReader.addProperty("billingAddress.city");
+      csvReader.addReference("billingAddress.country.code");
+
+      csvReader.process(reader);
+
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
 
 }

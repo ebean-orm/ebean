@@ -1,14 +1,15 @@
 package com.avaje.tests.basic;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestBatchLazyMany extends TestCase {
+public class TestBatchLazyMany extends BaseTestCase {
 
-	
+  @Test
 	public void testMe() {
 		
 		ResetBasicData.reset();

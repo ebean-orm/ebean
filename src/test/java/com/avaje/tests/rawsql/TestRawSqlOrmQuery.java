@@ -2,8 +2,10 @@ package com.avaje.tests.rawsql;
 
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.Page;
@@ -14,8 +16,9 @@ import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestRawSqlOrmQuery extends TestCase {
+public class TestRawSqlOrmQuery extends BaseTestCase {
 
+  @Test
     public void test() {
 
         ResetBasicData.reset();
@@ -35,9 +38,10 @@ public class TestRawSqlOrmQuery extends TestCase {
         query.filterMany("contacts").gt("lastName", "b");
         
         List<Customer> list = query.findList();
-        assertNotNull(list);
+        Assert.assertNotNull(list);
     }
     
+  @Test
     public void testPaging() {
       
       ResetBasicData.reset();

@@ -1,33 +1,34 @@
 package com.avaje.tests.basic;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.PFile;
 import com.avaje.tests.model.basic.PFileContent;
 
-public class TestDeleteOneToOneMultiple extends TestCase {
-    
-    public void testCreateDeletePersistentFile() {
+public class TestDeleteOneToOneMultiple extends BaseTestCase {
 
-        PFile persistentFile = new PFile("test.txt", new PFileContent("test".getBytes()));
+  @Test
+  public void testCreateDeletePersistentFile() {
 
-        Ebean.save(persistentFile);
-        Integer id = persistentFile.getId();
-        Integer contentId = persistentFile.getFileContent().getId();
+    PFile persistentFile = new PFile("test.txt", new PFileContent("test".getBytes()));
 
-        // should delete file and fileContent
-        Ebean.delete(PFile.class, id);
-        System.out.println("finished delete");
+    Ebean.save(persistentFile);
+    Integer id = persistentFile.getId();
+    Integer contentId = persistentFile.getFileContent().getId();
 
-        PFile file1 = Ebean.find(PFile.class, id);
-        PFileContent content1 = Ebean.find(PFileContent.class, contentId);
+    // should delete file and fileContent
+    Ebean.delete(PFile.class, id);
+    System.out.println("finished delete");
 
-        Assert.assertNull(file1);
-        Assert.assertNull(content1);
+    PFile file1 = Ebean.find(PFile.class, id);
+    PFileContent content1 = Ebean.find(PFileContent.class, contentId);
 
-    }
+    Assert.assertNull(file1);
+    Assert.assertNull(content1);
+
+  }
 
 }

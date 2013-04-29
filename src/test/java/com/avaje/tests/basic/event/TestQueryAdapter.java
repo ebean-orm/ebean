@@ -1,15 +1,18 @@
 package com.avaje.tests.basic.event;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.ResetBasicData;
 import com.avaje.tests.model.basic.TOne;
 
-public class TestQueryAdapter extends TestCase {
+public class TestQueryAdapter extends BaseTestCase {
 
+  @Test
 	public void testSimple() {
 		
 		ResetBasicData.reset();

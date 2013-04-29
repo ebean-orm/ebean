@@ -2,16 +2,17 @@ package com.avaje.tests.basic;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.TMapSuperEntity;
 
-public class TestMappedSuper extends TestCase {
+public class TestMappedSuper extends BaseTestCase {
 
+  @Test
 	public void test() {
 		
 		TMapSuperEntity e = new TMapSuperEntity();

@@ -1,14 +1,15 @@
 package com.avaje.tests.basic;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.TMapSuperEntity;
 
-public class TestDeletePartialNoVersion extends TestCase {
+public class TestDeletePartialNoVersion extends BaseTestCase {
 
+  @Test
 	public void testNoVersion() {
 		
 		TMapSuperEntity e = new TMapSuperEntity();

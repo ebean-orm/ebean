@@ -1,15 +1,18 @@
 package com.avaje.tests.query;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Customer;
 
-public class TestConnectionCloseOnSqlerr extends TestCase {
+public class TestConnectionCloseOnSqlerr extends BaseTestCase {
 
   static boolean runManuallyNow = true;
 
+  @Test
   public void test() {
 
     if (runManuallyNow) {
@@ -19,12 +22,13 @@ public class TestConnectionCloseOnSqlerr extends TestCase {
     try {
       for (int i = 0; i < 100; i++) {
         try {
-          Query<Customer> q0 = Ebean.find(Customer.class).where().icontains("namexxx", "Rob").query();
+          Query<Customer> q0 = Ebean.find(Customer.class).where().icontains("namexxx", "Rob")
+              .query();
 
           q0.findList();
         } catch (Exception e) {
           if (e.getMessage().contains("Unsuccessfully waited")) {
-            fail("No connections found while only one thread is running. (after " + i + " queries)");
+            Assert.fail("No connections found while only one thread is running. (after " + i + " queries)");
           } else {
             e.printStackTrace();
           }
@@ -37,6 +41,7 @@ public class TestConnectionCloseOnSqlerr extends TestCase {
 
   }
 
+  @Test
   public void testTransactional() {
 
     if (runManuallyNow) {
@@ -47,13 +52,14 @@ public class TestConnectionCloseOnSqlerr extends TestCase {
       for (int i = 0; i < 100; i++) {
         try {
           Ebean.beginTransaction();
-          Query<Customer> q0 = Ebean.find(Customer.class).where().icontains("namexxx", "Rob").query();
+          Query<Customer> q0 = Ebean.find(Customer.class).where().icontains("namexxx", "Rob")
+              .query();
 
           q0.findList();
           Ebean.commitTransaction();
         } catch (Exception e) {
           if (e.getMessage().contains("Unsuccessfully waited")) {
-            fail("No connections found while only one thread is running. (after " + i + " queries)");
+            Assert.fail("No connections found while only one thread is running. (after " + i + " queries)");
           } else {
             e.printStackTrace();
           }

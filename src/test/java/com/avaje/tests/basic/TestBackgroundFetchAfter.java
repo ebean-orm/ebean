@@ -1,16 +1,19 @@
 package com.avaje.tests.basic;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestBackgroundFetchAfter extends TestCase {
+public class TestBackgroundFetchAfter extends BaseTestCase {
 	
+  @Test
 	public void testWrtJoin() {
 		
 		ResetBasicData.reset();

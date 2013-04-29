@@ -5,8 +5,10 @@ import java.util.Date;
 import java.util.List;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Address;
@@ -15,7 +17,7 @@ import com.avaje.tests.model.basic.Trip;
 import com.avaje.tests.model.basic.Vehicle;
 import com.avaje.tests.model.basic.VehicleDriver;
 
-public class TestJoinInheritance extends TestCase {
+public class TestJoinInheritance extends BaseTestCase {
 
 	
 	/**
@@ -32,6 +34,7 @@ public class TestJoinInheritance extends TestCase {
 	 * column was not being skipped - but the query reads happily - only the data is 
 	 * then wrong in the address object. 
 	 */
+  @Test
 	public void testJoinHierarchyAssocOne() {
 		
 		Ebean.createUpdate(Vehicle.class, "delete from vehicle");

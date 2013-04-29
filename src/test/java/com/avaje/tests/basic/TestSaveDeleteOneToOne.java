@@ -1,14 +1,17 @@
 package com.avaje.tests.basic;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.PersistentFile;
 import com.avaje.tests.model.basic.PersistentFileContent;
 
-public class TestSaveDeleteOneToOne extends TestCase {
+public class TestSaveDeleteOneToOne extends BaseTestCase {
 
+  @Test
 	public void testCreateDeletePersistentFile() {
 		PersistentFile persistentFile = new PersistentFile("test.txt",
 				new PersistentFileContent("test".getBytes()));
@@ -17,6 +20,7 @@ public class TestSaveDeleteOneToOne extends TestCase {
 		Ebean.delete(persistentFile);
 	}
 
+  @Test
 	public void testCreateLoadDeletePersistentFile() {
 		PersistentFile persistentFile = new PersistentFile("test.txt",
 				new PersistentFileContent("test".getBytes()));

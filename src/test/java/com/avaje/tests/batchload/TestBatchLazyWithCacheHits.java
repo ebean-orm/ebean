@@ -5,14 +5,16 @@ import java.util.List;
 import java.util.UUID;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.tests.model.basic.UUOne;
 
-public class TestBatchLazyWithCacheHits extends TestCase {
+public class TestBatchLazyWithCacheHits extends BaseTestCase {
 
   private UUOne insert(String name) {
     UUOne one = new UUOne();
@@ -21,7 +23,8 @@ public class TestBatchLazyWithCacheHits extends TestCase {
     Ebean.save(one);
     return one;
   }
-  
+
+  @Test
   public void testOnCacheHit() {
 
     GlobalProperties.put("ebean.lazyLoadBatchSize", "5");

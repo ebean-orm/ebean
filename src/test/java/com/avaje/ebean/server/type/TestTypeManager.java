@@ -2,10 +2,10 @@ package com.avaje.ebean.server.type;
 
 import java.sql.Types;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.H2Platform;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
@@ -18,35 +18,36 @@ import com.avaje.tests.model.ivo.CMoney;
 import com.avaje.tests.model.ivo.ExhangeCMoneyRate;
 import com.avaje.tests.model.ivo.Money;
 
-public class TestTypeManager extends TestCase {
+public class TestTypeManager extends BaseTestCase {
 
-    public void test() {
-        
-        ServerConfig serverConfig = new ServerConfig();
-        serverConfig.setDatabasePlatform(new H2Platform());
-        
-        BootupClasses bootupClasses = new BootupClasses();
-        
-        DefaultTypeManager typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
-    
-        CheckImmutableResponse checkImmutable = typeManager.checkImmutable(Money.class);
-        Assert.assertTrue(checkImmutable.isImmutable());
+  @Test
+  public void test() {
 
-        checkImmutable = typeManager.checkImmutable(CMoney.class);        
-        Assert.assertTrue(checkImmutable.isImmutable());
+    ServerConfig serverConfig = new ServerConfig();
+    serverConfig.setDatabasePlatform(new H2Platform());
 
-        ScalarDataReader<?> dataReader = typeManager.recursiveCreateScalarDataReader(ExhangeCMoneyRate.class);
-        Assert.assertTrue(dataReader instanceof CtCompoundType<?>);
+    BootupClasses bootupClasses = new BootupClasses();
 
-        dataReader = typeManager.recursiveCreateScalarDataReader(CMoney.class);
-        Assert.assertTrue(dataReader instanceof CtCompoundType<?>);
+    DefaultTypeManager typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
 
-        ScalarType<?> scalarType = typeManager.recursiveCreateScalarTypes(Money.class);
-        Assert.assertTrue(scalarType.getJdbcType() == Types.DECIMAL);
-        Assert.assertTrue(!scalarType.isJdbcNative());
-        Assert.assertEquals(Money.class, scalarType.getType());
-        
-        
-    }
-    
+    CheckImmutableResponse checkImmutable = typeManager.checkImmutable(Money.class);
+    Assert.assertTrue(checkImmutable.isImmutable());
+
+    checkImmutable = typeManager.checkImmutable(CMoney.class);
+    Assert.assertTrue(checkImmutable.isImmutable());
+
+    ScalarDataReader<?> dataReader = typeManager
+        .recursiveCreateScalarDataReader(ExhangeCMoneyRate.class);
+    Assert.assertTrue(dataReader instanceof CtCompoundType<?>);
+
+    dataReader = typeManager.recursiveCreateScalarDataReader(CMoney.class);
+    Assert.assertTrue(dataReader instanceof CtCompoundType<?>);
+
+    ScalarType<?> scalarType = typeManager.recursiveCreateScalarTypes(Money.class);
+    Assert.assertTrue(scalarType.getJdbcType() == Types.DECIMAL);
+    Assert.assertTrue(!scalarType.isJdbcNative());
+    Assert.assertEquals(Money.class, scalarType.getType());
+
+  }
+
 }

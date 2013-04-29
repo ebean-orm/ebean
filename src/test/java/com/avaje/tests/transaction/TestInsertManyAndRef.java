@@ -3,52 +3,54 @@ package com.avaje.tests.transaction;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.BBookmark;
 import com.avaje.tests.model.basic.BBookmarkUser;
 
-public class TestInsertManyAndRef extends TestCase {
+public class TestInsertManyAndRef extends BaseTestCase {
 
-	public void testMe() {
+  @Test
+  public void testMe() {
 
-//		ResetBasicData.reset();
-//
-//		Customer u = new Customer();
-//		u.setName("Mr Test");
-//
-//		final List<Order> bookmarks = new ArrayList<Order>();
-//		final Order b1 = new Order();
-//		b1.setCustomer(u);
-//		b1.setStatus(Status.NEW);
-//
-//		final Order b2 = new Order();
-//		b2.setStatus(Status.NEW);
-//		b2.setCustomer(u);
-//
-//		bookmarks.add(b1);
-//		bookmarks.add(b2);
-//
-//		Ebean.save(bookmarks);
-		
-		 final BBookmarkUser u = new BBookmarkUser();
-	       u.setEmailAddress("test@test.com");
-	       u.setName("Mr Test");
-	       u.setPassword("password");
+    // ResetBasicData.reset();
+    //
+    // Customer u = new Customer();
+    // u.setName("Mr Test");
+    //
+    // final List<Order> bookmarks = new ArrayList<Order>();
+    // final Order b1 = new Order();
+    // b1.setCustomer(u);
+    // b1.setStatus(Status.NEW);
+    //
+    // final Order b2 = new Order();
+    // b2.setStatus(Status.NEW);
+    // b2.setCustomer(u);
+    //
+    // bookmarks.add(b1);
+    // bookmarks.add(b2);
+    //
+    // Ebean.save(bookmarks);
 
-	       final List<BBookmark> bookmarks = new ArrayList<BBookmark>();
-	       final BBookmark b1 = new BBookmark();
-	       b1.setBookmarkReference("Acts 2:7-20");
-	       b1.setUser(u);
+    final BBookmarkUser u = new BBookmarkUser();
+    u.setEmailAddress("test@test.com");
+    u.setName("Mr Test");
+    u.setPassword("password");
 
-	       final BBookmark b2 = new BBookmark();
-	       b2.setBookmarkReference("Acts 7:1-20");
-	       b2.setUser(u);
+    final List<BBookmark> bookmarks = new ArrayList<BBookmark>();
+    final BBookmark b1 = new BBookmark();
+    b1.setBookmarkReference("Acts 2:7-20");
+    b1.setUser(u);
 
-	       bookmarks.add(b1);
-	       bookmarks.add(b2);
+    final BBookmark b2 = new BBookmark();
+    b2.setBookmarkReference("Acts 7:1-20");
+    b2.setUser(u);
 
-	       Ebean.save(bookmarks);
-	}
+    bookmarks.add(b1);
+    bookmarks.add(b2);
+
+    Ebean.save(bookmarks);
+  }
 }

@@ -1,16 +1,19 @@
 package com.avaje.tests.basic;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestQueryParse extends TestCase {
+public class TestQueryParse extends BaseTestCase {
 
+  @Test
 	public void test() {
 		//GlobalProperties.put("ebean.ddl.generate", "false");
 		//GlobalProperties.put("ebean.ddl.run", "false");

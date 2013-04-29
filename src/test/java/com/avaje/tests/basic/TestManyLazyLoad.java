@@ -4,16 +4,18 @@ import java.sql.Date;
 import java.util.List;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestManyLazyLoad extends TestCase {
+public class TestManyLazyLoad extends BaseTestCase {
 
-	
+	@Test
 	public void testLazyLoadRef() {
 	
 		ResetBasicData.reset();

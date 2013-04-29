@@ -4,10 +4,11 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.NoIdEntityType;
 
-public class TestNoIdEntityType {
+public class TestNoIdEntityType extends BaseTestCase {
 
   @Test
   public void testFindById() {

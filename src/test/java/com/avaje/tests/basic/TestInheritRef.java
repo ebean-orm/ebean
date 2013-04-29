@@ -3,16 +3,18 @@ package com.avaje.tests.basic;
 import java.util.List;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Car;
 import com.avaje.tests.model.basic.Truck;
 import com.avaje.tests.model.basic.Vehicle;
 
-public class TestInheritRef extends TestCase {
+public class TestInheritRef extends BaseTestCase {
 
-	
+	@Test
 	public void testAssocOne() {
 		
 		Ebean.createUpdate(Vehicle.class, "delete from vehicle");

@@ -1,13 +1,14 @@
 package com.avaje.tests.basic;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.TUuidEntity;
 
-public class TestUuidInsert extends TestCase {
+public class TestUuidInsert extends BaseTestCase {
 
-	
+	@Test
 	public void test() {
 		
 		TUuidEntity e = new TUuidEntity();

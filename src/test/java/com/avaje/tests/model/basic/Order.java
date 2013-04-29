@@ -34,7 +34,7 @@ import com.avaje.ebean.annotation.Where;
 public class Order implements Serializable {
     
 	private static final long serialVersionUID = 1L;
-
+	
 	@XmlType(name="status")
 	public enum Status {
 		NEW,

@@ -1,41 +1,44 @@
 package com.avaje.tests.basic.one2one;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 
-public class TestOne2OneBookingInvoice extends TestCase {
-	
-	public void test() {
-		Booking b = new Booking();
+public class TestOne2OneBookingInvoice extends BaseTestCase {
 
-		Invoice ai = new Invoice();
-		Invoice ci = new Invoice();
+  @Test
+  public void test() {
+    Booking b = new Booking();
 
-		ai.setBooking(b);
-		ci.setBooking(b);
+    Invoice ai = new Invoice();
+    Invoice ci = new Invoice();
 
-		b.setAgentInvoice(ai);
-		b.setClientInvoice(ci);
+    ai.setBooking(b);
+    ci.setBooking(b);
 
-		Ebean.save(b);
-		
-		Booking b1 = Ebean.find(Booking.class, b.getId());
-		
-		Invoice ai1 = b1.getAgentInvoice();
-		Assert.assertNotNull(ai1);
-		
-		Booking b2 = ai1.getBooking();
-		Assert.assertNotNull(b2);
-		Assert.assertEquals(b1.getId(), b2.getId());
-		Assert.assertSame(b1, b2);
-		
-		Invoice ci1 = b1.getClientInvoice();
-		Booking b3 = ci1.getBooking();
-		Assert.assertNotNull(b3);
-		Assert.assertEquals(b1.getId(), b2.getId());
-		Assert.assertSame(b1, b2);
-		
-	}
+    b.setAgentInvoice(ai);
+    b.setClientInvoice(ci);
+
+    Ebean.save(b);
+
+    Booking b1 = Ebean.find(Booking.class, b.getId());
+
+    Invoice ai1 = b1.getAgentInvoice();
+    Assert.assertNotNull(ai1);
+
+    Booking b2 = ai1.getBooking();
+    Assert.assertNotNull(b2);
+    Assert.assertEquals(b1.getId(), b2.getId());
+    Assert.assertSame(b1, b2);
+
+    Invoice ci1 = b1.getClientInvoice();
+    Booking b3 = ci1.getBooking();
+    Assert.assertNotNull(b3);
+    Assert.assertEquals(b1.getId(), b2.getId());
+    Assert.assertSame(b1, b2);
+
+  }
 }

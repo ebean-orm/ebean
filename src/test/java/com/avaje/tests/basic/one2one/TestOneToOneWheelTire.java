@@ -1,19 +1,21 @@
 package com.avaje.tests.basic.one2one;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 
-public class TestOneToOneWheelTire extends TestCase {
+public class TestOneToOneWheelTire extends BaseTestCase {
 
-	public void test() {
-		
-	     Wheel w = new Wheel(); 
-	     Tire t = new Tire(); 
-	     t.setWheel(w); 
-	     w.setTire(t); 
-	     
-	     Ebean.save(t);
-	}
-	
+  @Test
+  public void test() {
+
+    Wheel w = new Wheel();
+    Tire t = new Tire();
+    t.setWheel(w);
+    w.setTire(t);
+
+    Ebean.save(t);
+  }
+
 }

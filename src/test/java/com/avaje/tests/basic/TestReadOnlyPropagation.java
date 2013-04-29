@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.ListIterator;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.tests.model.basic.Address;
@@ -15,8 +17,9 @@ import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestReadOnlyPropagation extends TestCase {
+public class TestReadOnlyPropagation extends BaseTestCase {
 
+  @Test
 	public void testReadOnly() {
 		
 		ResetBasicData.reset();

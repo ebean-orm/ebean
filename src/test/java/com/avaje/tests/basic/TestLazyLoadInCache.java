@@ -4,17 +4,19 @@ import java.util.Map;
 import java.util.Set;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Address;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestLazyLoadInCache extends TestCase {
+public class TestLazyLoadInCache extends BaseTestCase {
 
-	
+	@Test
 	public void testLoadInCache() {
 		
 		ResetBasicData.reset();

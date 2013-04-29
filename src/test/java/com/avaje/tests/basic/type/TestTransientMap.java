@@ -1,20 +1,22 @@
 package com.avaje.tests.basic.type;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.config.GlobalProperties;
 
-public class TestTransientMap extends TestCase {
+public class TestTransientMap extends BaseTestCase {
 
-	public void testMe() {
-		
-		GlobalProperties.put("classes", BSimpleWithGen.class.toString());
-        
-		BSimpleWithGen b = new BSimpleWithGen();
-		b.setName("blah");
-		
-		Ebean.save(b);
-		
-	}
+  @Test
+  public void testMe() {
+
+    GlobalProperties.put("classes", BSimpleWithGen.class.toString());
+
+    BSimpleWithGen b = new BSimpleWithGen();
+    b.setName("blah");
+
+    Ebean.save(b);
+
+  }
 }

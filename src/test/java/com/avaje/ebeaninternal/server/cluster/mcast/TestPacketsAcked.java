@@ -1,28 +1,32 @@
 package com.avaje.ebeaninternal.server.cluster.mcast;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class TestPacketsAcked extends TestCase {
+import com.avaje.ebean.BaseTestCase;
 
-    public void test() {
-        
-        OutgoingPacketsAcked packetsAcked = new OutgoingPacketsAcked();
-        
-        assertEquals(0l,packetsAcked.getMinimumGotAllPacketId());
-        
-        long receivedAck = packetsAcked.receivedAck("A", new MessageAck("A", 1020l));
-        assertEquals(1020l,packetsAcked.getMinimumGotAllPacketId());
-        assertEquals(1020l,receivedAck);
+public class TestPacketsAcked extends BaseTestCase {
 
-        receivedAck = packetsAcked.receivedAck("B", new MessageAck("B", 1030l));
-        assertEquals(1020l,packetsAcked.getMinimumGotAllPacketId());
-        assertEquals(0l,receivedAck);
+  @Test
+  public void test() {
 
-        receivedAck = packetsAcked.receivedAck("C", new MessageAck("C", 1025l));
-        assertEquals(0l,receivedAck);
-        
-        receivedAck = packetsAcked.receivedAck("A", new MessageAck("A", 1040l));
-        assertEquals(1025l,receivedAck);
+    OutgoingPacketsAcked packetsAcked = new OutgoingPacketsAcked();
 
-    }
+    Assert.assertEquals(0l, packetsAcked.getMinimumGotAllPacketId());
+
+    long receivedAck = packetsAcked.receivedAck("A", new MessageAck("A", 1020l));
+    Assert.assertEquals(1020l, packetsAcked.getMinimumGotAllPacketId());
+    Assert.assertEquals(1020l, receivedAck);
+
+    receivedAck = packetsAcked.receivedAck("B", new MessageAck("B", 1030l));
+    Assert.assertEquals(1020l, packetsAcked.getMinimumGotAllPacketId());
+    Assert.assertEquals(0l, receivedAck);
+
+    receivedAck = packetsAcked.receivedAck("C", new MessageAck("C", 1025l));
+    Assert.assertEquals(0l, receivedAck);
+
+    receivedAck = packetsAcked.receivedAck("A", new MessageAck("A", 1040l));
+    Assert.assertEquals(1025l, receivedAck);
+
+  }
 }

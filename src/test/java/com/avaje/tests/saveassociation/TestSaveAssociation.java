@@ -1,35 +1,33 @@
 package com.avaje.tests.saveassociation;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.TSDetail;
 import com.avaje.tests.model.basic.TSMaster;
 
-public class TestSaveAssociation extends TestCase {
+public class TestSaveAssociation extends BaseTestCase {
 
-    public void test() {
-        
-        TSMaster m0 = new TSMaster();
-        m0.setName("master1");
+  @Test
+  public void test() {
 
-        Ebean.save(m0);
+    TSMaster m0 = new TSMaster();
+    m0.setName("master1");
 
-        m0.addDetail(new TSDetail("master1 detail1"));
-        m0.addDetail(new TSDetail("master1 detail2"));
-        
-        Ebean.saveAssociation(m0, "details");
-        
-        
-        TSMaster m0Check = Ebean.find(TSMaster.class)
-            .fetch("details")
-            .where().idEq(m0.getId())
-            .findUnique();
-        
-        Assert.assertEquals(2, m0Check.getDetails().size());
-        
-    }
-    
+    Ebean.save(m0);
+
+    m0.addDetail(new TSDetail("master1 detail1"));
+    m0.addDetail(new TSDetail("master1 detail2"));
+
+    Ebean.saveAssociation(m0, "details");
+
+    TSMaster m0Check = Ebean.find(TSMaster.class).fetch("details").where().idEq(m0.getId())
+        .findUnique();
+
+    Assert.assertEquals(2, m0Check.getDetails().size());
+
+  }
+
 }

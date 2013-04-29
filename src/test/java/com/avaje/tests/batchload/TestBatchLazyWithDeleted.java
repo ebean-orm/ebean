@@ -6,15 +6,18 @@ import java.util.UUID;
 import javax.persistence.EntityNotFoundException;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.tests.model.basic.UUOne;
 import com.avaje.tests.model.basic.UUTwo;
 
-public class TestBatchLazyWithDeleted extends TestCase {
+public class TestBatchLazyWithDeleted extends BaseTestCase {
 
+  @Test
   public void testOnDeleted() {
 
     UUOne oneA = new UUOne();

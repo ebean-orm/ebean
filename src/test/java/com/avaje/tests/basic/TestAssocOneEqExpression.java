@@ -1,8 +1,10 @@
 package com.avaje.tests.basic;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Address;
@@ -10,8 +12,9 @@ import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestAssocOneEqExpression extends TestCase {
+public class TestAssocOneEqExpression extends BaseTestCase {
 
+  @Test
 	public void test() {
 		
 		ResetBasicData.reset();

@@ -1,13 +1,16 @@
 package com.avaje.tests.basic;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.tests.model.embedded.EMain;
 
-public class TestDynamicUpdate extends TestCase {
+public class TestDynamicUpdate extends BaseTestCase {
 
+  @Test
 	public void testUpdate() {
 
 		// insert
@@ -18,7 +21,7 @@ public class TestDynamicUpdate extends TestCase {
 		EbeanServer server = Ebean.getServer(null);
 		server.save(b);
 
-		assertNotNull(b.getId());
+		Assert.assertNotNull(b.getId());
 
 		// reload object und update the name
 		EMain b2 = server.find(EMain.class, b.getId());
@@ -29,7 +32,7 @@ public class TestDynamicUpdate extends TestCase {
 		server.beginTransaction();
 		try {
     		EMain b3 = server.find(EMain.class, b.getId());
-    		assertEquals("ABC", b3.getEmbeddable().getDescription());
+    		Assert.assertEquals("ABC", b3.getEmbeddable().getDescription());
 		} finally {
 		    server.endTransaction();
 		}
@@ -39,6 +42,6 @@ public class TestDynamicUpdate extends TestCase {
 		server.save(b4);
 
 		EMain b5 = server.find(EMain.class, b.getId());
-		assertEquals("123", b5.getEmbeddable().getDescription());
+		Assert.assertEquals("123", b5.getEmbeddable().getDescription());
 	}
 }

@@ -3,24 +3,30 @@ package com.avaje.tests.basic;
 import java.util.List;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestLimitQuery extends TestCase {
 
+public class TestLimitQuery extends BaseTestCase {
+
+  @Test
 	public void testNothing() {
 		
 	}
 
+  @Test
 	public void testLimitWithMany() {
 		rob();
 		rob();
 	}
+  
 	private void rob() {
 		ResetBasicData.reset();
 		

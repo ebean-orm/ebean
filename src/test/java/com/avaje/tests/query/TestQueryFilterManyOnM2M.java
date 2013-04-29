@@ -1,20 +1,18 @@
 package com.avaje.tests.query;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.MUser;
 
-public class TestQueryFilterManyOnM2M extends TestCase {
+public class TestQueryFilterManyOnM2M extends BaseTestCase {
 
-    public void test() {
-        
-        Ebean.find(MUser.class)
-            .fetch("roles")
-            .filterMany("roles").ilike("roleName","Jim%")
-            .findList();
-        
-        
-    }
-    
+  @Test
+  public void test() {
+
+    Ebean.find(MUser.class).fetch("roles").filterMany("roles").ilike("roleName", "Jim%").findList();
+
+  }
+
 }

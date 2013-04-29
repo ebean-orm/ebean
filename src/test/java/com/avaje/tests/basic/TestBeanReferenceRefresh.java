@@ -1,16 +1,18 @@
 package com.avaje.tests.basic;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.Order.Status;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestBeanReferenceRefresh extends TestCase {
+public class TestBeanReferenceRefresh extends BaseTestCase {
 
-	
+  @Test
 	public void testMe() {
 		
 		ResetBasicData.reset();

@@ -1,17 +1,19 @@
 package com.avaje.tests.query;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 
-public class TestQueryLimitOffsetSimple extends TestCase {
+public class TestQueryLimitOffsetSimple extends BaseTestCase {
 
 	/**
 	 * Test the syntax of the limit offset clause.
 	 */
+  @Test
 	public void testMe() {
 		
 		ResetBasicData.reset();

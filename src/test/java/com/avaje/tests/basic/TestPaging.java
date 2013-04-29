@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Random;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Page;
@@ -13,7 +15,7 @@ import com.avaje.ebean.PagingList;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.TOne;
 
-public class TestPaging extends TestCase {
+public class TestPaging extends BaseTestCase {
 
 	
 	private void loadData() {
@@ -41,6 +43,7 @@ public class TestPaging extends TestCase {
 		
 	}
 	
+	@Test
 	public void test() throws Exception {
 
 		loadData();

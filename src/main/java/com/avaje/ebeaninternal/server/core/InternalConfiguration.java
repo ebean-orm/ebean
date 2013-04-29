@@ -69,8 +69,6 @@ public class InternalConfiguration {
 
   private final BeanDescriptorManager beanDescriptorManager;
 
-  private final DebugLazyLoad debugLazyLoad;
-
   private final TransactionManager transactionManager;
 
   private final TransactionScopeManager transactionScopeManager;
@@ -115,23 +113,18 @@ public class InternalConfiguration {
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     beanDescriptorManager.deploy();
 
-    this.debugLazyLoad = new DebugLazyLoad(serverConfig.isDebugLazyLoad());
-
     this.transactionManager = new TransactionManager(clusterManager, backgroundExecutor,
         serverConfig, beanDescriptorManager, this.getBootupClasses());
 
-    this.cQueryEngine = new CQueryEngine(serverConfig.getDatabasePlatform(), binder,
-        backgroundExecutor);
+    this.cQueryEngine = new CQueryEngine(serverConfig.getDatabasePlatform(), binder, backgroundExecutor);
 
-    ExternalTransactionManager externalTransactionManager = serverConfig
-        .getExternalTransactionManager();
+    ExternalTransactionManager externalTransactionManager = serverConfig.getExternalTransactionManager();
     if (externalTransactionManager == null && serverConfig.isUseJtaTransactionManager()) {
       externalTransactionManager = new JtaTransactionManager();
     }
     if (externalTransactionManager != null) {
       externalTransactionManager.setTransactionManager(transactionManager);
-      this.transactionScopeManager = new ExternalTransactionScopeManager(transactionManager,
-          externalTransactionManager);
+      this.transactionScopeManager = new ExternalTransactionScopeManager(transactionManager, externalTransactionManager);
       logger.info("Using Transaction Manager [" + externalTransactionManager.getClass() + "]");
     } else {
       this.transactionScopeManager = new DefaultTransactionScopeManager(transactionManager);
@@ -170,7 +163,6 @@ public class InternalConfiguration {
   }
 
   public Persister createPersister(SpiEbeanServer server) {
-
     return new DefaultPersister(server, binder, beanDescriptorManager, pstmtBatch);
   }
 
@@ -244,10 +236,6 @@ public class InternalConfiguration {
 
   public ClusterManager getClusterManager() {
     return clusterManager;
-  }
-
-  public DebugLazyLoad getDebugLazyLoad() {
-    return debugLazyLoad;
   }
 
   public SpiBackgroundExecutor getBackgroundExecutor() {

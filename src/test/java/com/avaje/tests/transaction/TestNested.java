@@ -1,36 +1,38 @@
 package com.avaje.tests.transaction;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.TxRunnable;
 
-public class TestNested extends TestCase {
+public class TestNested extends BaseTestCase {
 
-	
-	public void test() {
-		
-		try {
-			Ebean.execute(new TxRunnable() {
-				public void run() {
-					
-					willFail();
-				}
-			});
-		} catch (RuntimeException e){
-			Assert.assertEquals(e.getMessage(), "test rollback");
-		}
-	}
-	
-	private void willFail() {
-		Ebean.execute(new TxRunnable() {
-			public void run() {
-				
-				String msg = "test rollback";
-				throw new RuntimeException(msg);
+  @Test
+  public void test() {
 
-			}
-		});
-	}
+    try {
+      Ebean.execute(new TxRunnable() {
+        public void run() {
+
+          willFail();
+        }
+      });
+    } catch (RuntimeException e) {
+      Assert.assertEquals(e.getMessage(), "test rollback");
+    }
+  }
+
+  private void willFail() {
+    Ebean.execute(new TxRunnable() {
+      public void run() {
+
+        String msg = "test rollback";
+        throw new RuntimeException(msg);
+
+      }
+    });
+  }
 }
