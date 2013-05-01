@@ -22,9 +22,15 @@ public class SQLitePlatform extends DatabasePlatform {
 
     dbTypeMap.put(Types.BIT, new DbType("int default 0"));
     dbTypeMap.put(Types.BOOLEAN, new DbType("int default 0"));
-
+    dbTypeMap.put(Types.BIGINT, new DbType("integer"));
+    dbTypeMap.put(Types.SMALLINT, new DbType("integer"));
+    
     dbDdlSyntax.setInlinePrimaryKeyConstraint(true);
-    dbDdlSyntax.setIdentity("AUTOINCREMENT");
+    
+    // AutoIncrement goes the primary key declaration
+    dbDdlSyntax.setIdentity("");
+    dbDdlSyntax.setIdentitySuffix("AUTOINCREMENT");
+
     dbDdlSyntax.setDisableReferentialIntegrity("PRAGMA foreign_keys = OFF");
     dbDdlSyntax.setEnableReferentialIntegrity("PRAGMA foreign_keys = ON");
   }

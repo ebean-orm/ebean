@@ -18,9 +18,10 @@ public class DbDdlSyntax {
   private String dropTableCascade;
   private String dropIfExists;
 
-  private String newLine = "\r\n";
+  private String newLine = "\n";
 
   private String identity = "auto_increment";
+  private String identitySuffix = "";
 
   private String pkPrefix = "pk_";
 
@@ -54,6 +55,24 @@ public class DbDdlSyntax {
    */
   public void setIdentity(String identity) {
     this.identity = identity;
+  }
+
+  /**
+   * Typically returns empty string but for SQLite and perhaps others
+   * the Identity/AutoIncrement clause comes after the primary key clause.
+   */
+  public String getIdentitySuffix() {
+    return identitySuffix;
+  }
+
+  /**
+   * Set the identity clause that would appear after the primary key clause.
+   * <p>
+   * Only used for SQLite at this stage.
+   * </p>
+   */
+  public void setIdentitySuffix(String identitySuffix) {
+    this.identitySuffix = identitySuffix;
   }
 
   /**

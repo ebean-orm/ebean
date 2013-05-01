@@ -21,136 +21,130 @@ import org.slf4j.LoggerFactory;
 public class CreateTableColumnVisitor extends BaseTablePropertyVisitor {
 
   private static final Logger logger = LoggerFactory.getLogger(CreateTableColumnVisitor.class);
-    
-	private final DdlGenContext ctx;
 
-	private final DbDdlSyntax ddl;
+  private final DdlGenContext ctx;
 
-	private final CreateTableVisitor parent;
+  private final DbDdlSyntax ddl;
 
-	public CreateTableColumnVisitor(CreateTableVisitor parent, DdlGenContext ctx) {
-		this.parent = parent;
-		this.ctx = ctx;
-		this.ddl = ctx.getDdlSyntax();
-	}
+  private final CreateTableVisitor parent;
 
+  public CreateTableColumnVisitor(CreateTableVisitor parent, DdlGenContext ctx) {
+    this.parent = parent;
+    this.ctx = ctx;
+    this.ddl = ctx.getDdlSyntax();
+  }
 	
-	@Override
-	public void visitMany(BeanPropertyAssocMany<?> p) {
-		if (p.isManyToMany()){
-			if (p.getMappedBy() != null) {
-				// only create on other 'owning' side
-				
-			} else {
-				TableJoin intersectionTableJoin = p.getIntersectionTableJoin();
-				
-				// check if the intersection table has already been created
-				String intTable = intersectionTableJoin.getTable();
-				if (ctx.isProcessIntersectionTable(intTable)){
-					// build the create table and fkey constraints 
-					// putting the DDL into ctx for later output as we are 
-					// in the middle of rendering the create table DDL
-					new CreateIntersectionTable(ctx, p).build();
-				}
-			}
-		}
-	}
+  @Override
+  public void visitMany(BeanPropertyAssocMany<?> p) {
+    if (p.isManyToMany()) {
+      if (p.getMappedBy() != null) {
+        // only create on other 'owning' side
 
-	
-	public void visitCompoundScalar(BeanPropertyCompound compound, BeanProperty p) {
-        visitScalar(p);
-    }
+      } else {
+        TableJoin intersectionTableJoin = p.getIntersectionTableJoin();
 
-
-    public void visitCompound(BeanPropertyCompound p) {
-        // do nothing
-    }
-
-
-    @Override
-	public void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded) {
-
-		visitScalar(p);
-	}
-
-    private StringBuilder createUniqueConstraintBuffer(String table, String column) {
-        
-        String uqConstraintName = "uq_"+ table+ "_"+column;
-        
-        if (uqConstraintName.length() > ddl.getMaxConstraintNameLength()){
-            uqConstraintName = uqConstraintName.substring(0, ddl.getMaxConstraintNameLength());
+        // check if the intersection table has already been created
+        String intTable = intersectionTableJoin.getTable();
+        if (ctx.isProcessIntersectionTable(intTable)) {
+          // build the create table and fkey constraints
+          // putting the DDL into ctx for later output as we are
+          // in the middle of rendering the create table DDL
+          new CreateIntersectionTable(ctx, p).build();
         }
-        
-        uqConstraintName = ctx.removeQuotes(uqConstraintName);
-        uqConstraintName = StringHelper.replaceString(uqConstraintName, " ", "_");
-        
-        StringBuilder constraintExpr = new StringBuilder();
-        constraintExpr.append("constraint ")
-            .append(uqConstraintName)
-            .append(" unique (");
-        
-        return constraintExpr;
+      }
     }
-    
-	@Override
-	public void visitOneImported(BeanPropertyAssocOne<?> p) {
+  }
+	
+  public void visitCompoundScalar(BeanPropertyCompound compound, BeanProperty p) {
+    visitScalar(p);
+  }
 
-		ImportedId importedId = p.getImportedId();
+  public void visitCompound(BeanPropertyCompound p) {
+    // do nothing
+  }
 
-		TableJoinColumn[] columns = p.getTableJoin().columns();
-		if (columns.length == 0){
-			String msg = "No join columns for "+p.getFullBeanName();
-			throw new RuntimeException(msg);
-		}
-		
-		StringBuilder constraintExpr = createUniqueConstraintBuffer(p.getBeanDescriptor().getBaseTable(), columns[0].getLocalDbColumn());
-		
-		for (int i = 0; i < columns.length; i++) {
-			
-			String dbCol = columns[i].getLocalDbColumn();
+  @Override
+  public void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded) {
 
-			if (i > 0){
-				constraintExpr.append(", ");
-			}
-			constraintExpr.append(dbCol);
-			
-			if (parent.isDbColumnWritten(dbCol)) {
-				continue;
-			}
-			
-			parent.writeColumnName(dbCol, p);
+    visitScalar(p);
+  }
 
-			BeanProperty importedProperty = importedId.findMatchImport(dbCol);
-			if (importedProperty != null) {
+  private StringBuilder createUniqueConstraintBuffer(String table, String column) {
 
-				String columnDefn = ctx.getColumnDefn(importedProperty);
-				ctx.write(columnDefn);
+    String uqConstraintName = "uq_" + table + "_" + column;
 
-			} else {
-				throw new RuntimeException("Imported BeanProperty not found?");
-			}
+    if (uqConstraintName.length() > ddl.getMaxConstraintNameLength()) {
+      uqConstraintName = uqConstraintName.substring(0, ddl.getMaxConstraintNameLength());
+    }
 
-			if (!p.isNullable()) {
-				ctx.write(" not null");
-			}
-			ctx.write(",").writeNewLine();
-		}
-		constraintExpr.append(")");
-		
-		if (p.isOneToOne()){
-			if (ddl.isAddOneToOneUniqueContraint()){
-				parent.addUniqueConstraint( constraintExpr.toString());
-			}
-		}
-		
-	}
+    uqConstraintName = ctx.removeQuotes(uqConstraintName);
+    uqConstraintName = StringHelper.replaceString(uqConstraintName, " ", "_");
+
+    StringBuilder constraintExpr = new StringBuilder();
+    constraintExpr.append("constraint ").append(uqConstraintName).append(" unique (");
+
+    return constraintExpr;
+  }
+
+  @Override
+  public void visitOneImported(BeanPropertyAssocOne<?> p) {
+
+    ImportedId importedId = p.getImportedId();
+
+    TableJoinColumn[] columns = p.getTableJoin().columns();
+    if (columns.length == 0) {
+      String msg = "No join columns for " + p.getFullBeanName();
+      throw new RuntimeException(msg);
+    }
+
+    StringBuilder constraintExpr = createUniqueConstraintBuffer(p.getBeanDescriptor().getBaseTable(), columns[0].getLocalDbColumn());
+
+    for (int i = 0; i < columns.length; i++) {
+
+      String dbCol = columns[i].getLocalDbColumn();
+
+      if (i > 0) {
+        constraintExpr.append(", ");
+      }
+      constraintExpr.append(dbCol);
+
+      if (parent.isDbColumnWritten(dbCol)) {
+        continue;
+      }
+
+      parent.writeColumnName(dbCol, p);
+
+      BeanProperty importedProperty = importedId.findMatchImport(dbCol);
+      if (importedProperty != null) {
+
+        String columnDefn = ctx.getColumnDefn(importedProperty);
+        ctx.write(columnDefn);
+
+      } else {
+        throw new RuntimeException("Imported BeanProperty not found?");
+      }
+
+      if (!p.isNullable()) {
+        ctx.write(" not null");
+      }
+      ctx.write(",").writeNewLine();
+    }
+    constraintExpr.append(")");
+
+    if (p.isOneToOne()) {
+      if (ddl.isAddOneToOneUniqueContraint()) {
+        parent.addUniqueConstraint(constraintExpr.toString());
+      }
+    }
+
+  }
 
 	@Override
 	public void visitScalar(BeanProperty p) {
 
-        if (p.isSecondaryTable()) {
-            return;
-        }
+    if (p.isSecondaryTable()) {
+      return;
+    }
 
 		if (parent.isDbColumnWritten(p.getDbColumn())) {
 			return;
@@ -161,7 +155,8 @@ public class CreateTableColumnVisitor extends BaseTablePropertyVisitor {
 		String columnDefn = ctx.getColumnDefn(p);
 		ctx.write(columnDefn);
 
-		if (isIdentity(p)) {
+		boolean identity = isIdentity(p); 
+		if (identity) {
 			writeIdentity();
 		}
 
@@ -172,23 +167,25 @@ public class CreateTableColumnVisitor extends BaseTablePropertyVisitor {
 			ctx.write(" not null");
 		}
 
-		if (p.isUnique() && !p.isId()){
-		    parent.addUniqueConstraint(createUniqueConstraint(p));
-		}
+		if (identity) {
+      writeIdentitySuffix();
+    }
+		
+    if (p.isUnique() && !p.isId()) {
+      parent.addUniqueConstraint(createUniqueConstraint(p));
+    }
 
 		parent.addCheckConstraint(p);
-
 		ctx.write(",").writeNewLine();
 	}
 
-	private String createUniqueConstraint(BeanProperty p) {
-	    
-	    StringBuilder expr = createUniqueConstraintBuffer(p.getBeanDescriptor().getBaseTable(), p.getDbColumn());
-	    
-	    expr.append(p.getDbColumn()).append(")");
-        
-        return expr.toString();
-	}
+  private String createUniqueConstraint(BeanProperty p) {
+
+    StringBuilder expr = createUniqueConstraintBuffer(p.getBeanDescriptor().getBaseTable(), p.getDbColumn());
+
+    expr.append(p.getDbColumn()).append(")");
+    return expr.toString();
+  }
 	
 	protected void writeIdentity() {
 		String identity = ddl.getIdentity();
@@ -197,27 +194,33 @@ public class CreateTableColumnVisitor extends BaseTablePropertyVisitor {
 		}
 	}
 
-	protected boolean isIdentity(BeanProperty p) {
-		
-		if (p.isId()) {
-		    try {
-    		    IdType idType = p.getBeanDescriptor().getIdType();       
-    
-    		    if (idType.equals(IdType.IDENTITY)){
-    		    
-        			int jdbcType = p.getScalarType().getJdbcType();
-        			if (jdbcType == Types.INTEGER || jdbcType == Types.BIGINT || jdbcType == Types.SMALLINT) {
-        
-        				return true;
-        			}
-    		    }
-		    } catch (Exception e){
-		        String msg = "Error determining identity on property "+p.getFullBeanName();
-		        logger.error(msg, e);
-		    }
-		}
-		return false;
-	}
+  protected void writeIdentitySuffix() {
+    String identity = ddl.getIdentitySuffix();
+    if (identity != null && identity.length() > 0) {
+      ctx.write(" ").write(identity);
+    }
+  }
+   
+  protected boolean isIdentity(BeanProperty p) {
 
+    if (p.isId()) {
+      try {
+        IdType idType = p.getBeanDescriptor().getIdType();
+
+        if (idType.equals(IdType.IDENTITY)) {
+
+          int jdbcType = p.getScalarType().getJdbcType();
+          if (jdbcType == Types.INTEGER || jdbcType == Types.BIGINT || jdbcType == Types.SMALLINT) {
+
+            return true;
+          }
+        }
+      } catch (Exception e) {
+        String msg = "Error determining identity on property " + p.getFullBeanName();
+        logger.error(msg, e);
+      }
+    }
+    return false;
+  }
 
 }
