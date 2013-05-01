@@ -6,7 +6,6 @@ import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.EntityNotFoundException;
@@ -23,7 +22,7 @@ import com.avaje.ebean.Ebean;
  */
 public final class EntityBeanIntercept implements Serializable {
 
-  private static final long serialVersionUID = -3664031775464862648L;
+  private static final long serialVersionUID = -3664031775464862649L;
 
   private transient NodeUsageCollector nodeUsageCollector;
 
@@ -85,14 +84,14 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Used when a bean is partially filled.
    */
-  private volatile Set<String> loadedProps;
+  private volatile boolean[] loadedProps;
 
   /**
    * Set of changed properties.
    */
-  private HashSet<String> changedProps;
+  private boolean[] changedProps;
 
-  private String lazyLoadProperty;
+  private int lazyLoadProperty;
 
   /**
    * Create a intercept with a given entity.
@@ -344,7 +343,7 @@ public final class EntityBeanIntercept implements Serializable {
     this.oldValues = null;
     this.intercepting = true;
     this.owner._ebean_setEmbeddedLoaded();
-    this.lazyLoadProperty = null;
+    this.lazyLoadProperty = -1;
     this.changedProps = null;
   }
 
@@ -355,7 +354,7 @@ public final class EntityBeanIntercept implements Serializable {
   public void setLoadedLazy() {
     this.loaded = true;
     this.intercepting = true;
-    this.lazyLoadProperty = null;
+    this.lazyLoadProperty = -1;
   }
 
   /**
@@ -430,35 +429,48 @@ public final class EntityBeanIntercept implements Serializable {
    * @param loadedPropertyNames
    *          the names of the loaded properties
    */
+//  public void setLoadedProps(boolean[] loadedPropertyNames) {
+//    this.loadedProps = loadedPropertyNames;
+//  }
+  
   public void setLoadedProps(Set<String> loadedPropertyNames) {
-    this.loadedProps = loadedPropertyNames;
   }
-
+  
   /**
    * Return the set of property names for a partially loaded bean.
    */
+//  public boolean[] getLoadedProps() {
+//    return loadedProps;
+//  }
   public Set<String> getLoadedProps() {
-    return loadedProps;
+    return null;
   }
 
   /**
    * Return the set of property names for changed properties.
    */
-  public Set<String> getChangedProps() {
+  public boolean[] getChanged() {
     return changedProps;
+  }
+  
+  public Set<String> getChangedProps() {
+    return null;
   }
 
   /**
    * Return the property read or write that triggered the lazy load.
    */
+//  public int getLazyLoadProperty() {
+//    return lazyLoadProperty;
+//  }
   public String getLazyLoadProperty() {
-    return lazyLoadProperty;
+    return null;
   }
 
   /**
    * Load the bean when it is a reference.
    */
-  protected void loadBean(String loadProperty) {
+  protected void loadBean(int loadProperty) {
 
     synchronized (this) {
       if (beanLoader == null) {
@@ -484,9 +496,9 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Invoke the lazy loading. This method is synchronised externally.
    */
-  private void loadBeanInternal(String loadProperty, BeanLoader loader) {
+  private void loadBeanInternal(int loadProperty, BeanLoader loader) {
 
-    if (loaded && (loadedProps == null || loadedProps.contains(loadProperty))) {
+    if (loaded && (loadedProps == null || loadedProps[loadProperty])) {
       // race condition where multiple threads calling preGetter concurrently
       return;
     }
@@ -501,12 +513,12 @@ public final class EntityBeanIntercept implements Serializable {
       throw new EntityNotFoundException("Bean has been deleted - lazy loading failed");
     }
 
-    if (lazyLoadProperty == null) {
+    if (lazyLoadProperty == -1) {
 
       lazyLoadProperty = loadProperty;
 
       if (nodeUsageCollector != null) {
-        nodeUsageCollector.setLoadProperty(lazyLoadProperty);
+        nodeUsageCollector.setLoadProperty(getProperty(lazyLoadProperty));
       }
 
       loader.loadBean(this);
@@ -567,26 +579,26 @@ public final class EntityBeanIntercept implements Serializable {
     }
     return obj1.equals(obj2);
   }
-
+  
   /**
    * Method that is called prior to a getter method on the actual entity.
    * <p>
    * This checks if the bean is a reference and should be loaded.
    * </p>
    */
-  public void preGetter(String propertyName) {
+  public void preGetter(int propertyIndex) {
     if (!intercepting) {
       return;
     }
 
     if (!loaded) {
-      loadBean(propertyName);
-    } else if (loadedProps != null && !loadedProps.contains(propertyName)) {
-      loadBean(propertyName);
+      loadBean(propertyIndex);
+    } else if (loadedProps != null && !loadedProps[propertyIndex]) {
+      loadBean(propertyIndex);
     }
 
     if (nodeUsageCollector != null && loaded) {
-      nodeUsageCollector.addUsed(propertyName);
+      nodeUsageCollector.addUsed(getProperty(propertyIndex));
     }
   }
 
@@ -619,18 +631,48 @@ public final class EntityBeanIntercept implements Serializable {
    * OneToMany and ManyToMany don't have any interception so just check for
    * PropertyChangeSupport.
    */
-  public PropertyChangeEvent preSetterMany(boolean interceptField, String propertyName,
+  public PropertyChangeEvent preSetterMany(boolean interceptField, int propertyIndex,
       Object oldValue, Object newValue) {
 
     // skip setter interception on many's
     if (pcs != null) {
-      return new PropertyChangeEvent(owner, propertyName, oldValue, newValue);
+      return new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
     } else {
       return null;
     }
   }
+  
+  public String getProperty(int propertyIndex) {
+    return owner._ebean_getPropertyName(propertyIndex);
+  }
+  
+  public int getPropertyLength() {
+    return owner._ebean_getPropertyNames().length;
+  }
 
-  private final void addDirty(String propertyName) {
+  private final void changedProperty(int propertyIndex, boolean setDirty) {
+
+    if (changedProps == null) {
+      changedProps = new boolean[owner._ebean_getPropertyNames().length];
+    }
+    changedProps[propertyIndex] = true;
+
+    if (!setDirty || !intercepting) {
+      return;
+    }
+    if (readOnly) {
+      throw new IllegalStateException("This bean is readOnly");
+    }
+
+    if (loaded) {
+      if (oldValues == null) {
+        // first time this bean is being made dirty
+        createOldValues();
+      }
+    }
+  }
+
+  private final void addDirty(int propertyIndex) {
 
     if (!intercepting) {
       return;
@@ -645,27 +687,26 @@ public final class EntityBeanIntercept implements Serializable {
         createOldValues();
       }
       if (changedProps == null) {
-        changedProps = new HashSet<String>();
+        changedProps = new boolean[getPropertyLength()];
       }
-      changedProps.add(propertyName);
+      changedProps[propertyIndex] = true;
     }
   }
 
+  
   /**
    * Check to see if the values are not equal. If they are not equal then create
    * the old values for use with ConcurrencyMode.ALL.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, String propertyName, Object oldValue,
-      Object newValue) {
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
 
-    boolean changed = !areEqual(oldValue, newValue);
-
-    if (intercept && changed) {
-      addDirty(propertyName);
-    }
-
-    if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, propertyName, oldValue, newValue);
+    // If state 'new' then mark property as changed
+    // Else state is 'update', check for change
+    if (!areEqual(oldValue, newValue)) {
+      changedProperty(propertyIndex, intercept);
+      if (pcs != null) {
+        return new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
+      }
     }
 
     return null;
@@ -674,17 +715,17 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Check for primitive boolean.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, String propertyName, boolean oldValue,
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, boolean oldValue,
       boolean newValue) {
 
     boolean changed = oldValue != newValue;
 
     if (intercept && changed) {
-      addDirty(propertyName);
+      addDirty(propertyIndex);
     }
 
     if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, propertyName, Boolean.valueOf(oldValue),
+      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Boolean.valueOf(oldValue),
           Boolean.valueOf(newValue));
     }
 
@@ -694,17 +735,17 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Check for primitive int.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, String propertyName, int oldValue,
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, int oldValue,
       int newValue) {
 
     boolean changed = oldValue != newValue;
 
     if (intercept && changed) {
-      addDirty(propertyName);
+      addDirty(propertyIndex);
     }
 
     if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, propertyName, Integer.valueOf(oldValue),
+      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Integer.valueOf(oldValue),
           Integer.valueOf(newValue));
     }
     return null;
@@ -713,17 +754,17 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * long.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, String propertyName, long oldValue,
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, long oldValue,
       long newValue) {
 
     boolean changed = oldValue != newValue;
 
     if (intercept && changed) {
-      addDirty(propertyName);
+      addDirty(propertyIndex);
     }
 
     if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, propertyName, Long.valueOf(oldValue),
+      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Long.valueOf(oldValue),
           Long.valueOf(newValue));
     }
     return null;
@@ -732,17 +773,17 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * double.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, String propertyName, double oldValue,
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, double oldValue,
       double newValue) {
 
     boolean changed = oldValue != newValue;
 
     if (intercept && changed) {
-      addDirty(propertyName);
+      addDirty(propertyIndex);
     }
 
     if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, propertyName, Double.valueOf(oldValue),
+      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Double.valueOf(oldValue),
           Double.valueOf(newValue));
     }
     return null;
@@ -751,17 +792,17 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * float.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, String propertyName, float oldValue,
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, float oldValue,
       float newValue) {
 
     boolean changed = oldValue != newValue;
 
     if (intercept && changed) {
-      addDirty(propertyName);
+      addDirty(propertyIndex);
     }
 
     if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, propertyName, Float.valueOf(oldValue),
+      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Float.valueOf(oldValue),
           Float.valueOf(newValue));
     }
     return null;
@@ -770,17 +811,17 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * short.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, String propertyName, short oldValue,
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, short oldValue,
       short newValue) {
 
     boolean changed = oldValue != newValue;
 
     if (intercept && changed) {
-      addDirty(propertyName);
+      addDirty(propertyIndex);
     }
 
     if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, propertyName, Short.valueOf(oldValue),
+      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Short.valueOf(oldValue),
           Short.valueOf(newValue));
     }
     return null;
@@ -789,17 +830,17 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * char.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, String propertyName, char oldValue,
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, char oldValue,
       char newValue) {
 
     boolean changed = oldValue != newValue;
 
     if (intercept && changed) {
-      addDirty(propertyName);
+      addDirty(propertyIndex);
     }
 
     if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, propertyName, Character.valueOf(oldValue),
+      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Character.valueOf(oldValue),
           Character.valueOf(newValue));
     }
     return null;
@@ -808,17 +849,17 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * char.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, String propertyName, byte oldValue,
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, byte oldValue,
       byte newValue) {
 
     boolean changed = oldValue != newValue;
 
     if (intercept && changed) {
-      addDirty(propertyName);
+      addDirty(propertyIndex);
     }
 
     if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, propertyName, Byte.valueOf(oldValue),
+      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Byte.valueOf(oldValue),
           Byte.valueOf(newValue));
     }
     return null;
@@ -827,17 +868,17 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * char[].
    */
-  public PropertyChangeEvent preSetter(boolean intercept, String propertyName, char[] oldValue,
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, char[] oldValue,
       char[] newValue) {
 
     boolean changed = !areEqualChars(oldValue, newValue);
 
     if (intercept && changed) {
-      addDirty(propertyName);
+      addDirty(propertyIndex);
     }
 
     if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, propertyName, oldValue, newValue);
+      return new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
     }
     return null;
   }
@@ -845,17 +886,17 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * byte[].
    */
-  public PropertyChangeEvent preSetter(boolean intercept, String propertyName, byte[] oldValue,
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, byte[] oldValue,
       byte[] newValue) {
 
     boolean changed = !areEqualBytes(oldValue, newValue);
 
     if (intercept && changed) {
-      addDirty(propertyName);
+      addDirty(propertyIndex);
     }
 
     if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, propertyName, oldValue, newValue);
+      return new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
     }
     return null;
   }

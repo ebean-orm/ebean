@@ -14,6 +14,10 @@ import java.io.Serializable;
  */
 public interface EntityBean extends Serializable {
 
+  public String[] _ebean_getPropertyNames();
+  
+  public String _ebean_getPropertyName(int pos);
+  
   /**
    * Return the enhancement marker value.
    * <p>
