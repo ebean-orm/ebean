@@ -14,6 +14,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
   private static final String COMMA = ", ";
 
   private static final String PERIOD = ".";
+  private static final int STRING_BUILDER_INITIAL_CAPACITY = 140;
 
   private final String tableAliasPlaceHolder;
 
@@ -29,7 +30,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
   private int columnIndex;
 
-  private StringBuilder sb = new StringBuilder(140);
+  private StringBuilder sb = new StringBuilder(STRING_BUILDER_INITIAL_CAPACITY);
 
   /**
    * A Set used to make sure formula joins are only added once to a query.
@@ -145,7 +146,6 @@ public class DefaultDbSqlContext implements DbSqlContext {
   }
 
   public void pushTableAlias(String prefix) {
-    // store the currentPrefix on a stack
     prefixStack.push(currentPrefix);
     currentPrefix = prefix;
     tableAliasStack.push(getTableAlias(prefix));
@@ -153,13 +153,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
   public void popTableAlias() {
     tableAliasStack.pop();
-    // pop the currentPrefix from the stack
     currentPrefix = prefixStack.pop();
-    ;
-  }
-
-  public StringBuilder getBuffer() {
-    return sb;
   }
 
   public DefaultDbSqlContext append(String s) {
@@ -260,7 +254,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
   public String getContent() {
     String s = sb.toString();
-    sb = new StringBuilder();
+    sb = new StringBuilder(STRING_BUILDER_INITIAL_CAPACITY);
     return s;
   }
 

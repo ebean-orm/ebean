@@ -79,28 +79,6 @@ public final class TableJoin {
 
   }
 
-  /**
-   * Create a tableJoin based on this object but with different alias.
-   */
-  public TableJoin createWithAlias(String localAlias, String foreignAlias) {
-
-    return new TableJoin(this, localAlias, foreignAlias);
-  }
-
-  /**
-   * Construct a copy but with different table alias'.
-   */
-  private TableJoin(TableJoin join, String localAlias, String foreignAlias) {
-
-    // copy the immutable fields
-    this.importedPrimaryKey = join.importedPrimaryKey;
-    this.table = join.table;
-    this.type = join.type;
-    this.cascadeInfo = join.cascadeInfo;
-    this.properties = join.properties;
-    this.columns = join.columns;
-  }
-
   public String toString() {
     StringBuilder sb = new StringBuilder(30);
     sb.append(type).append(" ").append(table).append(" ");
