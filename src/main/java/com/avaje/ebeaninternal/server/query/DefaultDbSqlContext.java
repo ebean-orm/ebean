@@ -155,10 +155,6 @@ public class DefaultDbSqlContext implements DbSqlContext {
     currentPrefix = prefixStack.pop();
   }
 
-  public StringBuilder getBuffer() {
-    return sb;
-  }
-
   public DefaultDbSqlContext append(String s) {
     sb.append(s);
     return this;
