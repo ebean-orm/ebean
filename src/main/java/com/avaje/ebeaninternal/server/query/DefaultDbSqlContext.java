@@ -145,7 +145,6 @@ public class DefaultDbSqlContext implements DbSqlContext {
   }
 
   public void pushTableAlias(String prefix) {
-    // store the currentPrefix on a stack
     prefixStack.push(currentPrefix);
     currentPrefix = prefix;
     tableAliasStack.push(getTableAlias(prefix));
@@ -153,9 +152,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
   public void popTableAlias() {
     tableAliasStack.pop();
-    // pop the currentPrefix from the stack
     currentPrefix = prefixStack.pop();
-    ;
   }
 
   public StringBuilder getBuffer() {
