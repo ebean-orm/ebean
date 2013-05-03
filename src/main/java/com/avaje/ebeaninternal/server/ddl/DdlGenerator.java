@@ -234,10 +234,17 @@ public class DdlGenerator implements SpiEbeanPlugin {
    * Execute the list of statements.
    */
   private void runStatements(boolean expectErrors, List<String> statements, Connection c) {
+    List<String> noDuplicates = new ArrayList<String>();
 
-    for (int i = 0; i < statements.size(); i++) {
-      String xOfy = (i + 1) + " of " + statements.size();
-      runStatement(expectErrors, xOfy, statements.get(i), c);
+    for (String statement : statements) {
+      if (!noDuplicates.contains(statement)) {
+        noDuplicates.add(statement);
+      }
+    }
+
+    for (int i = 0; i < noDuplicates.size(); i++) {
+      String xOfy = (i + 1) + " of " + noDuplicates.size();
+      runStatement(expectErrors, xOfy, noDuplicates.get(i), c);
     }
   }
 
