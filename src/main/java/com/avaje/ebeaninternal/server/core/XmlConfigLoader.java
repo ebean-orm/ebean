@@ -87,7 +87,7 @@ public class XmlConfigLoader {
                 if (classPath.isDirectory()) {
                     checkDir(searchFor, xmlList, classPath);
 
-                } else if (classPath.getName().endsWith(".jar") || classPath.getName().endsWith(".war")) {
+                } else if (classPath.getName().endsWith(".jar") || classPath.getName().endsWith(".war") || classPath.getName().endsWith(".war!/WEB-INF/classes")) {
                     checkJar(searchFor, xmlList, classPath);
                   
                 } else {
@@ -151,6 +151,9 @@ public class XmlConfigLoader {
         String fileName = classPath.getName();
         if (fileName.toLowerCase().startsWith("surefire")){
             return;
+        }
+        if (classPath.getAbsolutePath().endsWith(".war!/WEB-INF/classes")) {
+           classPath = new File(classPath.getAbsolutePath().substring(0, classPath.getAbsolutePath().lastIndexOf('!')));
         }
         JarFile module = null;
         try {
