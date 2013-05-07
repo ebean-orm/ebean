@@ -39,4 +39,23 @@ public class TestUpdatePartial extends BaseTestCase {
     Ebean.save(c3);
 
   }
+
+  /**
+   * If we have no changes detected, don't execute an Update and don't update the Version column.
+   */
+  @Test
+  public void testWithoutChangesAndVersionColumn() {
+    // arrange
+    Customer customer = new Customer();
+    customer.setName("something");
+
+    Ebean.save(customer);
+
+    // act
+    Customer customerWithoutChanges = Ebean.find(Customer.class, customer.getId());
+    Ebean.save(customerWithoutChanges);
+
+    // assert
+    Assert.assertEquals(customer.getUpdtime().getTime(), customerWithoutChanges.getUpdtime().getTime());
+  }
 }
