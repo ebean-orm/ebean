@@ -7,3 +7,10 @@ target/
 logs/
 log/
 /mydb.db
+
+
+# Intellij project files
+*.iml
+*.ipr
+*.iws
+.idea/
