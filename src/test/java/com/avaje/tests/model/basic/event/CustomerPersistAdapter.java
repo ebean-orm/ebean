@@ -19,5 +19,17 @@ public class CustomerPersistAdapter extends BeanPersistAdapter {
 		
 		return true;
 	}
-	
+
+  @Override
+  public boolean preUpdate(BeanPersistRequest<?> request) {
+
+    Customer customer = (Customer) request.getBean();
+
+    if (customer.getContacts() != null) {
+      String test = "accessed";
+    }
+
+    return true;
+  }
+
 }

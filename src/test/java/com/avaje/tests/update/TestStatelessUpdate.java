@@ -1,5 +1,6 @@
 package com.avaje.tests.update;
 
+import com.avaje.tests.model.basic.Contact;
 import com.avaje.tests.model.basic.Customer;
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,6 +11,8 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.tests.model.basic.EBasic;
 import com.avaje.tests.model.basic.EBasic.Status;
+
+import java.util.ArrayList;
 
 public class TestStatelessUpdate extends BaseTestCase {
 
@@ -106,5 +109,36 @@ public class TestStatelessUpdate extends BaseTestCase {
 
     // assert
     Assert.assertEquals(customer.getUpdtime().getTime(), result.getUpdtime().getTime());
+  }
+
+  /**
+   * Many relations mustn't be deleted when having a {@link com.avaje.ebean.event.BeanPersistAdapter} which is accessing this many field.
+   */
+  @Test
+  public void testStatelessUpdateWithPersistAdapterAndIgnoreNullValues() {
+
+    // arrange
+    Contact contact = new Contact();
+    contact.setFirstName("wobu :P");
+
+    Customer customer = new Customer();
+    customer.setName("something");
+    customer.setContacts(new ArrayList<Contact>());
+    customer.getContacts().add(contact);
+
+    server.save(customer);
+
+    // act
+    Customer customerWithChange = new Customer();
+    customerWithChange.setId(customer.getId());
+    customerWithChange.setName("new name");
+
+    server.update(customerWithChange, null, null, true, false);
+
+    Customer result = Ebean.find(Customer.class, customer.getId());
+
+    // assert
+    Assert.assertNotNull(result.getContacts());
+    Assert.assertFalse("the contacts mustn't be deleted", result.getContacts().isEmpty());
   }
 }
