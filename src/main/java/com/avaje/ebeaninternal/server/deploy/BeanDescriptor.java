@@ -2195,13 +2195,8 @@ public class BeanDescriptor<T> {
    * is involved in a stateless update.
    */
   public boolean isStatelessUpdate(Object bean) {
-    if (propertyFirstVersion == null) {
-      Object versionValue = getId(bean);
-      return !DmlUtil.isNullOrZero(versionValue);
-    } else {
-      Object versionValue = propertyFirstVersion.getValue(bean);
-      return !DmlUtil.isNullOrZero(versionValue);
-    }
+    Object versionValue = getId(bean);
+    return !DmlUtil.isNullOrZero(versionValue);
   }
 
   /**

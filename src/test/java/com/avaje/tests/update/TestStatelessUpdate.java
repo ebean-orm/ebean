@@ -177,7 +177,7 @@ public class TestStatelessUpdate extends BaseTestCase {
     server.update(updateCustomer, null, null, true, false);
 
     // assert
+    // nothing to do, simply no exception should happen
     // maybe check if update instead of insert has been executed,
-    // currently "Unique index or primary key violation" PersistenceException is throwing
   }
 }
