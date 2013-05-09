@@ -43,30 +43,30 @@ public class Customer extends BasicDomain {
 	@Transient
 	ReentrantLock lock = new ReentrantLock();
 	
-    Status status;
-    
-    @NotNull
-    @Size(max=40)
-    //@Column(length=39,nullable=false)
-    String name;
-    
-    @Size(max=100)
-    String smallnote;
+  Status status;
 
-    Date anniversary;
-    
-    @ManyToOne(cascade=CascadeType.ALL)
-    Address billingAddress;
+  @NotNull
+  @Size(max=40)
+  //@Column(length=39,nullable=false)
+  String name;
 
-    @ManyToOne(cascade=CascadeType.ALL)
-    Address shippingAddress;
+  @Size(max=100)
+  String smallnote;
 
-    @OneToMany(mappedBy="customer")
-    @Where(clause="${ta}.order_date is not null")
-    List<Order> orders;
+  Date anniversary;
 
-    @OneToMany(mappedBy="customer", cascade=CascadeType.ALL)
-    List<Contact> contacts;
+  @ManyToOne(cascade=CascadeType.ALL)
+  Address billingAddress;
+
+  @ManyToOne(cascade=CascadeType.ALL)
+  Address shippingAddress;
+
+  @OneToMany(mappedBy="customer")
+  @Where(clause="${ta}.order_date is not null")
+  List<Order> orders;
+
+  @OneToMany(mappedBy="customer", cascade=CascadeType.ALL)
+  List<Contact> contacts;
 
 	public String toString() {
         return id+" "+status+" "+name;
