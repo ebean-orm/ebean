@@ -212,4 +212,43 @@ public class TestStatelessUpdate extends BaseTestCase {
     return server.getBeanState(cust).getLoadedProps().contains("contacts");
   }
   
+  /**
+   * when using stateless updates with recursive calls,
+   * the version column shouldn't decide to use insert instead of update,
+   * although an ID has been set.
+   */
+  @Test
+  public void testStatelessRecursiveUpdateWithVersionField() {
+    // arrange
+    Contact contact1 = new Contact();
+    contact1.setLastName("contact1");
+
+    Contact contact2 = new Contact();
+    contact2.setLastName("contact2");
+
+    Customer customer = new Customer();
+    customer.setName("something");
+    customer.getContacts().add(contact1);
+    customer.getContacts().add(contact2);
+
+    server.save(customer);
+
+    // act
+    Contact updateContact1 = new Contact();
+    updateContact1.setId(contact1.getId());
+
+    Contact updateContact2 = new Contact();
+    updateContact2.setId(contact2.getId());
+    
+    Customer updateCustomer = new Customer();
+    updateCustomer.setId(customer.getId());
+    updateCustomer.getContacts().add(updateContact1);
+    updateCustomer.getContacts().add(updateContact2);
+
+    server.update(updateCustomer);
+
+    // assert
+    // maybe check if update instead of insert has been executed,
+    // currently "Unique index or primary key violation" PersistenceException is throwing
+  }
 }

@@ -765,14 +765,14 @@ public final class DefaultPersister implements Persister {
 			  if (prop.isManyToMany()) {
 	        skipSavingThisBean = targetDescriptor.isReference(ebi);
 	      } else {
-          if (ebi.isNewOrDirty()) {
-            skipSavingThisBean = false;
-            // set the parent bean to detailBean
-            prop.setJoinValuesToChild(parentBean, detail, mapKeyValue);
-            
-          } else if (targetDescriptor.isReference(ebi)) {
+          if (targetDescriptor.isReference(ebi)) {
             // we can skip this one
             skipSavingThisBean = true;
+
+          } else if (ebi.isNewOrDirty()) {
+            skipSavingThisBean = false;
+            // set the parent bean to detailBean
+            prop.setJoinValuesToChild(parentBean, detail, mapKeyValue);            
 
           } else {
             // unmodified so skip depending on prop.isSaveRecurseSkippable();
