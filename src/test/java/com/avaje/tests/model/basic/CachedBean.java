@@ -1,12 +1,8 @@
 package com.avaje.tests.model.basic;
 
 import com.avaje.ebean.annotation.CacheStrategy;
-import com.avaje.ebean.annotation.CacheTuning;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,25 +14,36 @@ import java.util.List;
 @Table(name = "o_cached_bean")
 public class CachedBean {
 
-  @Id
-  Long id;
+    @Id
+    Long id;
 
-  @ManyToMany
-  List<Country> countries = new ArrayList<Country>();
+    @ManyToMany
+    List<Country> countries = new ArrayList<Country>();
 
-  public Long getId() {
-    return id;
-  }
+    @OneToMany(mappedBy = "cachedBean", cascade = CascadeType.ALL)
+    List<CachedBeanChild> children = new ArrayList<CachedBeanChild>();
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public List<Country> getCountries() {
-    return countries;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public void setCountries(List<Country> countries) {
-    this.countries = countries;
-  }
+    public List<Country> getCountries() {
+        return countries;
+    }
+
+    public void setCountries(List<Country> countries) {
+        this.countries = countries;
+    }
+
+    public List<CachedBeanChild> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<CachedBeanChild> children) {
+        this.children = children;
+    }
 }
