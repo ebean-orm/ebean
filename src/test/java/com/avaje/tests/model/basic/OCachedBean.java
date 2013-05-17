@@ -3,9 +3,11 @@ package com.avaje.tests.model.basic;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.avaje.ebean.annotation.CacheStrategy;
@@ -22,9 +24,12 @@ public class OCachedBean {
   Long id;
 
   String name;
-  
+
   @ManyToMany
   List<Country> countries = new ArrayList<Country>();
+
+  @OneToMany(mappedBy = "cachedBean", cascade = CascadeType.ALL)
+  List<OCachedBeanChild> children = new ArrayList<OCachedBeanChild>();
 
   public Long getId() {
     return id;
@@ -48,5 +53,13 @@ public class OCachedBean {
 
   public void setCountries(List<Country> countries) {
     this.countries = countries;
+  }
+
+  public List<OCachedBeanChild> getChildren() {
+    return children;
+  }
+
+  public void setChildren(List<OCachedBeanChild> children) {
+    this.children = children;
   }
 }
