@@ -1055,7 +1055,7 @@ public class BeanDescriptor<T> {
     for (int i = 0; i < propertiesOneImported.length; i++) {
       BeanPropertyAssocMany<?> many = propertiesOneImported[i].getRelationshipProperty();
       if (many != null) {
-        propertiesOneImported[i].cacheDelete(true, deleteRequest);
+        propertiesOneImported[i].cacheDelete(true, deleteRequest.getBean());
       }
     }
   }
