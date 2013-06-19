@@ -2,15 +2,14 @@ package com.avaje.tests.cache;
 
 import java.util.List;
 
+import com.avaje.ebeaninternal.server.cache.CachedManyIds;
+import com.avaje.tests.model.basic.*;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.cache.ServerCache;
-import com.avaje.tests.model.basic.Contact;
-import com.avaje.tests.model.basic.Customer;
-import com.avaje.tests.model.basic.ResetBasicData;
 
 public class TestCacheCollectionIds extends BaseTestCase {
 
@@ -85,5 +84,71 @@ public class TestCacheCollectionIds extends BaseTestCase {
       contact.getEmail();
     }
     return contacts2.size();
+  }
+
+  /**
+   * When updating a ManyToMany relations also the collection cache must be updated.
+   */
+  @Test
+  public void testUpdatingCollectionCacheForManyToManyRelations() {
+    // arrange
+    ResetBasicData.reset();
+
+    CachedBean cachedBean = new CachedBean();
+    cachedBean.getCountries().add(Ebean.find(Country.class, "NZ"));
+    cachedBean.getCountries().add(Ebean.find(Country.class, "AU"));
+
+    Ebean.save(cachedBean);
+
+    // act
+    CachedBean loadedBean = Ebean.find(CachedBean.class, cachedBean.getId());
+    loadedBean.getCountries().clear();
+    loadedBean.getCountries().add(Ebean.find(Country.class, "AU"));
+
+    Ebean.save(cachedBean);
+
+    CachedBean result = Ebean.find(CachedBean.class, cachedBean.getId());
+    ServerCache cachedBeanCountriesCache = Ebean.getServerCacheManager().getCollectionIdsCache(CachedBean.class, "countries");
+    CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
+
+
+    // assert
+    Assert.assertEquals(1, result.getCountries().size());
+    Assert.assertEquals(1, cachedManyIds.getIdList().size());
+    Assert.assertFalse(cachedManyIds.getIdList().contains("NZ"));
+    Assert.assertTrue(cachedManyIds.getIdList().contains("AU"));
+  }
+
+  /**
+   * When updating a ManyToMany relations also the collection cache must be updated.
+   */
+  @Test
+  public void testUpdatingCollectionCacheForManyToManyRelationsWithinStatelessUpdate() {
+    // arrange
+    ResetBasicData.reset();
+
+    CachedBean cachedBean = new CachedBean();
+    cachedBean.getCountries().add(Ebean.find(Country.class, "NZ"));
+    cachedBean.getCountries().add(Ebean.find(Country.class, "AU"));
+
+    Ebean.save(cachedBean);
+
+    // act
+    CachedBean update = new CachedBean();
+    update.setId(cachedBean.getId());
+    update.getCountries().add(Ebean.find(Country.class, "AU"));
+
+    Ebean.update(cachedBean);
+
+    CachedBean result = Ebean.find(CachedBean.class, cachedBean.getId());
+    ServerCache cachedBeanCountriesCache = Ebean.getServerCacheManager().getCollectionIdsCache(CachedBean.class, "countries");
+    CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
+
+
+    // assert
+    Assert.assertEquals(1, result.getCountries().size());
+    Assert.assertEquals(1, cachedManyIds.getIdList().size());
+    Assert.assertFalse(cachedManyIds.getIdList().contains("NZ"));
+    Assert.assertTrue(cachedManyIds.getIdList().contains("AU"));
   }
 }

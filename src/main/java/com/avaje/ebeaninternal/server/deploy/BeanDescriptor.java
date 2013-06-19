@@ -1055,7 +1055,7 @@ public class BeanDescriptor<T> {
     for (int i = 0; i < propertiesOneImported.length; i++) {
       BeanPropertyAssocMany<?> many = propertiesOneImported[i].getRelationshipProperty();
       if (many != null) {
-        propertiesOneImported[i].cacheDelete(true, deleteRequest);
+        propertiesOneImported[i].cacheDelete(true, deleteRequest.getBean());
       }
     }
   }
@@ -2195,13 +2195,8 @@ public class BeanDescriptor<T> {
    * is involved in a stateless update.
    */
   public boolean isStatelessUpdate(Object bean) {
-    if (propertyFirstVersion == null) {
-      Object versionValue = getId(bean);
-      return !DmlUtil.isNullOrZero(versionValue);
-    } else {
-      Object versionValue = propertyFirstVersion.getValue(bean);
-      return !DmlUtil.isNullOrZero(versionValue);
-    }
+    Object versionValue = getId(bean);
+    return !DmlUtil.isNullOrZero(versionValue);
   }
 
   /**

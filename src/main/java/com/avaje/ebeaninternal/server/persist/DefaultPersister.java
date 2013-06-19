@@ -852,7 +852,7 @@ public final class DefaultPersister implements Persister {
 
 			} else {
 				if (targetDescriptor.isStatelessUpdate(detailBean)) {
-					// update based on the value of Version/Id properties
+					// update based on the value of Id properties
 					// cascade update in stateless mode
 					forceUpdate(detailBean, null, t, deleteMissingChildren, updateNullProperties);
 				} else {
