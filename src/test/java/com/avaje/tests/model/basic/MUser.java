@@ -3,10 +3,7 @@ package com.avaje.tests.model.basic;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 
 @Entity
 public class MUser {
@@ -20,6 +17,9 @@ public class MUser {
 	// but will not delete the actual Roles
 	@ManyToMany(mappedBy="users",cascade=CascadeType.ALL)
 	List<MRole> roles;
+	
+	@ManyToOne
+	private MUserType userType;
 	
     public MUser() {
         
@@ -58,6 +58,14 @@ public class MUser {
 	        roles = new ArrayList<MRole>();
 	    }
 	    roles.add(role);
+	}
+
+	public MUserType getUserType() {
+		return userType;
+	}
+	
+	public void setUserType(MUserType userType) {
+		this.userType = userType;
 	}
 	
 }

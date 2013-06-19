@@ -28,4 +28,18 @@ public class Zone
 	{
 		this.id = id;
 	}
+	
+	public int hashCode() {
+		if (getId() != null) return getId().hashCode();
+		else return super.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Zone) {
+			return ((Zone) obj).getId().equals(getId());
+		} else {
+			return false;
+		}
+	}
 }
