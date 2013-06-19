@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
@@ -26,62 +27,27 @@ public class BindableCompound implements Bindable {
         return "BindableCompound " + compound + " items:" + Arrays.toString(items);
     }
 
-    public void dmlInsert(GenerateDmlRequest request, boolean checkIncludes) {
-        dmlAppend(request, checkIncludes);
-    }
-
-    public void dmlAppend(GenerateDmlRequest request, boolean checkIncludes) {
-        if (checkIncludes && !request.isIncluded(compound)) {
-            return;
-        }
+    public void dmlAppend(GenerateDmlRequest request) {
 
         for (int i = 0; i < items.length; i++) {
-            items[i].dmlAppend(request, false);
+            items[i].dmlAppend(request);
         }
     }
 
-    /**
-     * Used for dynamic where clause generation.
-     */
-    public void dmlWhere(GenerateDmlRequest request, boolean checkIncludes, Object origBean) {
-        if (checkIncludes && !request.isIncludedWhere(compound)) {
-            return;
-        }
-
-        Object valueObject = compound.getValue(origBean);
-
-        for (int i = 0; i < items.length; i++) {
-            items[i].dmlWhere(request, false, valueObject);
-        }
-    }
-
-    public void addChanged(PersistRequestBean<?> request, List<Bindable> list) {
-        if (request.hasChanged(compound)) {
+    public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
+        if (request.isAddToUpdate(compound)) {
             list.add(this);
         }
     }
 
-    public void dmlBind(BindableRequest bindRequest, boolean checkIncludes, Object bean) throws SQLException {
-        if (checkIncludes && !bindRequest.isIncluded(compound)) {
-            return;
-        }
+    public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
 
-        Object valueObject = compound.getValue(bean);
-
-        for (int i = 0; i < items.length; i++) {
-            items[i].dmlBind(bindRequest, false, valueObject);
-        }
+      throw new RuntimeException("This is broken, need to break out the scalar values!!");
+      
+        //Object valueObject = compound.getValue(bean);
+        //for (int i = 0; i < items.length; i++) {
+        //    items[i].dmlBind(bindRequest, valueObject);
+        //}
     }
 
-    public void dmlBindWhere(BindableRequest bindRequest, boolean checkIncludes, Object bean) throws SQLException {
-        if (checkIncludes && !bindRequest.isIncludedWhere(compound)) {
-            return;
-        }
-
-        Object valueObject = compound.getValue(bean);
-
-        for (int i = 0; i < items.length; i++) {
-            items[i].dmlBindWhere(bindRequest, false, valueObject);
-        }
-    }
 }

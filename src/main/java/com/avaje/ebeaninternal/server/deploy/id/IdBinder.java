@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.naming.InvalidNameException;
-import javax.naming.ldap.LdapName;
-
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -45,16 +43,6 @@ public interface IdBinder {
      * Read the Id value from the binary DataInput.
      */
     public Object readData(DataInput dataInput) throws IOException;
-
-	/**
-     * Adds RDN's to the LdapName using the id value.
-     */
-    public void createLdapNameById(LdapName name, Object id) throws InvalidNameException;
-
-    /**
-     * Adds RDN's to the LdapName using the id value from the bean.
-     */
-    public void createLdapNameByBean(LdapName name, Object bean) throws InvalidNameException;
 
 	/**
 	 * Return the name(s) of the Id property(s).
@@ -102,7 +90,7 @@ public interface IdBinder {
 	/**
 	 * Return the id values for a given bean.
 	 */
-	public Object[] getIdValues(Object bean);
+	public Object[] getIdValues(EntityBean bean);
 		
 	/**
 	 * Build a string of the logical expressions.
@@ -149,7 +137,7 @@ public interface IdBinder {
 	/**
 	 * Read the id value from the result set and set it to the bean also returning it.
 	 */
-	public Object readSet(DbReadContext ctx, Object bean) throws SQLException;
+	public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException;
 
 	/**
 	 * Ignore the appropriate number of scalar properties for this id.
@@ -187,6 +175,6 @@ public interface IdBinder {
 	 * If the bean is not null, then the value is set to the bean.
 	 * </p>
 	 */
-	public Object convertSetId(Object idValue, Object bean);
+	public Object convertSetId(Object idValue, EntityBean bean);
 
 }

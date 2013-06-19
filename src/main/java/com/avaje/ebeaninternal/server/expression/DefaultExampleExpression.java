@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import com.avaje.ebean.ExampleExpression;
 import com.avaje.ebean.LikeType;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
@@ -42,7 +43,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   /**
    * The example bean containing the properties.
    */
-  private final Object entity;
+  private final EntityBean entity;
 
   /**
    * Set to true to use case insensitive expressions.
@@ -77,7 +78,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
    * @param likeType
    *          the type of Like wild card used
    */
-  public DefaultExampleExpression(FilterExprPath pathPrefix, Object entity, boolean caseInsensitive, LikeType likeType) {
+  public DefaultExampleExpression(FilterExprPath pathPrefix, EntityBean entity, boolean caseInsensitive, LikeType likeType) {
     this.pathPrefix = pathPrefix;
     this.entity = entity;
     this.caseInsensitive = caseInsensitive;

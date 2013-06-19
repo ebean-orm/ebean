@@ -53,19 +53,9 @@ public class DeleteHandler extends DmlHandler {
 		int rowCount = dataBind.executeUpdate();
 		checkRowCount(rowCount);
 	}
-	
-    @Override
-    public boolean isIncluded(BeanProperty prop) {        
-        return prop.isDbUpdatable() && super.isIncluded(prop);
-    }
-    
-    @Override
-    public boolean isIncludedWhere(BeanProperty prop) {
-        return prop.isDbUpdatable() && (loadedProps == null || loadedProps.contains(prop.getName()));    
-    }
 
-    public void registerDerivedRelationship(DerivedRelationshipData assocBean) {
-	    throw new RuntimeException("Never called on delete");
-    }
+  public void registerDerivedRelationship(DerivedRelationshipData assocBean) {
+    throw new RuntimeException("Never called on delete");
+  }
     
 }

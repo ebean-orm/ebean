@@ -16,16 +16,4 @@ public class BeanEmbeddedMeta {
 		return properties;
 	}
 	
-	/**
-	 * Return true if at least one property is a version property.
-	 */
-	public boolean isEmbeddedVersion() {
-		for (int i = 0; i < properties.length; i++) {
-			if (properties[i].isVersion()){
-				return true;
-			}
-		}
-		return false;
-	}
-	
 }

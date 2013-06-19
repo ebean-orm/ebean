@@ -103,7 +103,7 @@ public class BatchedBeanHolder {
 	 */
 	public ArrayList<PersistRequest> getList(PersistRequestBean<?> request) {
 	    
-	    Integer objHashCode = Integer.valueOf(System.identityHashCode(request.getBean()));
+	    Integer objHashCode = Integer.valueOf(System.identityHashCode(request.getEntityBean()));
 	    
 	    if (!beanHashCodes.add(objHashCode)) {
 	        // special case where the same bean instance has already been

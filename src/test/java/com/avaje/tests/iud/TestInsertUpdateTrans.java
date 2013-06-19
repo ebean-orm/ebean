@@ -1,13 +1,16 @@
 package com.avaje.tests.iud;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Test;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.EBasicVer;
 
-public class TestInsertUpdateTrans extends TestCase {
+public class TestInsertUpdateTrans extends BaseTestCase {
 
+  @Test
 	public void test() {
 
 		Ebean.beginTransaction();

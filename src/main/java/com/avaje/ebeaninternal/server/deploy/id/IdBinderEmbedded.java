@@ -6,11 +6,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.naming.InvalidNameException;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -99,23 +97,6 @@ public final class IdBinderEmbedded implements IdBinder {
         return sb.toString();
     }
 
-    
-    public void createLdapNameById(LdapName name, Object id) throws InvalidNameException {
-
-        for (int i = 0; i < props.length; i++) {
-            Object v = props[i].getValue(id);
-            Rdn rdn = new Rdn(props[i].getDbColumn(), v);
-            name.add(rdn);
-        }
-    }
-    
-    
-
-    public void createLdapNameByBean(LdapName name, Object bean) throws InvalidNameException {
-        Object id = embIdProperty.getValue(bean);
-        createLdapNameById(name, id);
-    }
-
     public BeanDescriptor<?> getIdBeanDescriptor() {
         return idDesc;
     }
@@ -172,7 +153,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
     public void addIdInBindValue(SpiExpressionRequest request, Object value) {
         for (int i = 0; i < props.length; i++) {
-            request.addBindValue(props[i].getValue(value));
+            request.addBindValue(props[i].getValue((EntityBean)value));
         }
     }
     
@@ -238,7 +219,7 @@ public final class IdBinderEmbedded implements IdBinder {
             String msg = "Failed to split ["+idTermValue+"] using | for id.";
             throw new PersistenceException(msg);
         }
-        Object embId = idDesc.createBean();
+        EntityBean embId = idDesc.createBean();
         for (int i = 0; i < props.length; i++) {
             Object v = props[i].getScalarType().parse(split[i]);
             props[i].setValue(embId, v);
@@ -254,7 +235,7 @@ public final class IdBinderEmbedded implements IdBinder {
         StringBuilder sb = new StringBuilder();
         
         for (int i = 0; i < props.length; i++) {
-            Object v = props[i].getValue(idValue);
+            Object v = props[i].getValue((EntityBean)idValue);
             String formatValue = props[i].getScalarType().format(v);
             if (i > 0){
                 sb.append("|");
@@ -264,11 +245,11 @@ public final class IdBinderEmbedded implements IdBinder {
         return sb.toString();
     }
 
-    public Object[] getIdValues(Object bean) {
-        bean = embIdProperty.getValue(bean);
+    public Object[] getIdValues(EntityBean bean) {
+        Object val = embIdProperty.getValue(bean);
         Object[] bindvalues = new Object[props.length];
         for (int i = 0; i < props.length; i++) {
-            bindvalues[i] = props[i].getValue(bean);
+            bindvalues[i] = props[i].getValue((EntityBean)val);
         }
         return bindvalues;
     }
@@ -277,14 +258,14 @@ public final class IdBinderEmbedded implements IdBinder {
 
         Object[] bindvalues = new Object[props.length];
         for (int i = 0; i < props.length; i++) {
-            bindvalues[i] = props[i].getValue(value);
+            bindvalues[i] = props[i].getValue((EntityBean)value);
         }
         return bindvalues;
     }
 
     public void bindId(DefaultSqlUpdate sqlUpdate, Object value) {
         for (int i = 0; i < props.length; i++) {
-            Object embFieldValue = props[i].getValue(value);
+            Object embFieldValue = props[i].getValue((EntityBean)value);
             sqlUpdate.addParameter(embFieldValue);
         }
     }
@@ -292,14 +273,14 @@ public final class IdBinderEmbedded implements IdBinder {
     public void bindId(DataBind dataBind, Object value) throws SQLException {
 
         for (int i = 0; i < props.length; i++) {
-            Object embFieldValue = props[i].getValue(value);
+            Object embFieldValue = props[i].getValue((EntityBean)value);
             props[i].bind(dataBind, embFieldValue);
         }
     }
     
     public Object readData(DataInput dataInput) throws IOException {
         
-        Object embId = idDesc.createBean();
+      EntityBean embId = idDesc.createBean();
         boolean notNull = true;
 
         for (int i = 0; i < props.length; i++) {
@@ -319,7 +300,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
     public void writeData(DataOutput dataOutput, Object idValue) throws IOException {
         for (int i = 0; i < props.length; i++) {
-            Object embFieldValue = props[i].getValue(idValue);
+            Object embFieldValue = props[i].getValue((EntityBean)idValue);
             props[i].writeData(dataOutput, embFieldValue);
         }
     }
@@ -332,7 +313,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
     public Object read(DbReadContext ctx) throws SQLException {
 
-        Object embId = idDesc.createBean();
+      EntityBean embId = idDesc.createBean();
         boolean notNull = true;
 
         for (int i = 0; i < props.length; i++) {
@@ -349,7 +330,7 @@ public final class IdBinderEmbedded implements IdBinder {
         }
     }
 
-    public Object readSet(DbReadContext ctx, Object bean) throws SQLException {
+    public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
 
         Object embId = read(ctx);
         if (embId != null) {
@@ -443,7 +424,7 @@ public final class IdBinderEmbedded implements IdBinder {
         return sb.toString();
     }
 
-    public Object convertSetId(Object idValue, Object bean) {
+    public Object convertSetId(Object idValue, EntityBean bean) {
 
         // can not cast/convert if it is embedded
         if (bean != null) {

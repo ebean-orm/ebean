@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
@@ -90,7 +91,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     /**
      * Returns null as not an AssocOne.
      */
-    public Object[] getAssocOneIdValues(Object value) {
+    public Object[] getAssocOneIdValues(EntityBean value) {
         return null;
     }
 
@@ -154,7 +155,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
         throw new RuntimeException("ElPropertyDeploy only - not implemented");
     }
 
-    public void elSetReference(Object bean) {
+    public void elSetReference(EntityBean bean) {
         throw new RuntimeException("ElPropertyDeploy only - not implemented");
     }
 
@@ -162,15 +163,15 @@ public final class BeanFkeyProperty implements ElPropertyValue {
         throw new RuntimeException("ElPropertyDeploy only - not implemented");
     }
 
-    public void elSetValue(Object bean, Object value, boolean populate, boolean reference) {
+    public void elSetValue(EntityBean bean, Object value, boolean populate, boolean reference) {
         throw new RuntimeException("ElPropertyDeploy only - not implemented");
     }
 
-    public Object elGetValue(Object bean) {
+    public Object elGetValue(EntityBean bean) {
         throw new RuntimeException("ElPropertyDeploy only - not implemented");
     }
 
-    public Object elGetReference(Object bean) {
+    public Object elGetReference(EntityBean bean) {
         throw new RuntimeException("ElPropertyDeploy only - not implemented");
     }
 

@@ -31,7 +31,7 @@ class CQueryIteratorSimple<T> implements QueryIterator<T> {
     }
 
     public T next() {
-        return cquery.getLoadedBean();
+        return (T)cquery.getLoadedBean();
     }
 
     public void close() {

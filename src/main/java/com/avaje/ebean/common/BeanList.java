@@ -10,6 +10,7 @@ import java.util.ListIterator;
 
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
+import com.avaje.ebean.bean.EntityBean;
 
 /**
  * List capable of lazy loading.
@@ -40,12 +41,12 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   /**
    * Used to create deferred fetch proxy.
    */
-  public BeanList(BeanCollectionLoader loader, Object ownerBean, String propertyName) {
+  public BeanList(BeanCollectionLoader loader, EntityBean ownerBean, String propertyName) {
     super(loader, ownerBean, propertyName);
   }
 
   @SuppressWarnings("unchecked")
-  public void addBean(Object bean) {
+  public void addBean(EntityBean bean) {
     list.add((E) bean);
   }
 

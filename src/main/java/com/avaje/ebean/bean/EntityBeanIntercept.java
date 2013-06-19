@@ -6,6 +6,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.persistence.EntityNotFoundException;
@@ -24,6 +25,10 @@ public final class EntityBeanIntercept implements Serializable {
 
   private static final long serialVersionUID = -3664031775464862649L;
 
+  private static final int STATE_NEW = 0;
+  private static final int STATE_REFERENCE = 1;
+  private static final int STATE_LOADED = 2;
+  
   private transient NodeUsageCollector nodeUsageCollector;
 
   private transient PropertyChangeSupport pcs;
@@ -31,7 +36,7 @@ public final class EntityBeanIntercept implements Serializable {
   private transient PersistenceContext persistenceContext;
 
   private transient BeanLoader beanLoader;
-
+  
   private int beanLoaderIndex;
 
   private String ebeanServerName;
@@ -44,54 +49,43 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * The parent bean by relationship (1-1 or 1-M).
    */
-  private Object parentBean;
+  private EntityBean embeddedOwner;
+  private int embeddedOwnerIndex;
 
   /**
-   * true if the bean properties have been loaded. false if it is a reference
-   * bean (will lazy load etc).
+   * One of NEW, REF, UPD.
    */
-  private volatile boolean loaded;
-
+  private int state;
+  
+  private boolean readOnly;
+  
+  private boolean dirty;
+  
   /**
-   * Flag set to disable lazy loading - typically for SQL "report" type entity
-   * beans.
+   * Flag set to disable lazy loading - typically for SQL "report" type entity beans.
    */
   private boolean disableLazyLoad;
 
   /**
-   * Flag set when lazy loading failed due to the underlying bean being deleted
-   * in the DB.
+   * Flag set when lazy loading failed due to the underlying bean being deleted in the DB.
    */
   private boolean lazyLoadFailure;
 
   /**
-   * Set true when loaded or reference. Used to bypass interception when created
-   * by user code.
-   */
-  private boolean intercepting;
-
-  /**
-   * The state of the Bean (DEFAULT,UDPATE,READONLY,SHARED).
-   */
-  private boolean readOnly;
-
-  /**
-   * The bean as it was before it was modified. Null if no non-transient setters
-   * have been called.
-   */
-  private Object oldValues;
-
-  /**
    * Used when a bean is partially filled.
    */
-  private volatile boolean[] loadedProps;
+  private boolean[] loadedProps;
+  
+  private boolean fullyLoadedBean;
 
   /**
    * Set of changed properties.
    */
   private boolean[] changedProps;
 
-  private int lazyLoadProperty;
+  private Object[] origValues;
+
+  private int lazyLoadProperty = -1;
 
   /**
    * Create a intercept with a given entity.
@@ -99,20 +93,9 @@ public final class EntityBeanIntercept implements Serializable {
    * Refer to agent ProxyConstructor.
    * </p>
    */
-  public EntityBeanIntercept(Object owner) {
-    this.owner = (EntityBean) owner;
-  }
-
-  /**
-   * Copy the internal state of the intercept to another intercept.
-   */
-  public void copyStateTo(EntityBeanIntercept dest) {
-    dest.loadedProps = loadedProps;
-    dest.ebeanServerName = ebeanServerName;
-
-    if (loaded) {
-      dest.setLoaded();
-    }
+  public EntityBeanIntercept(Object ownerBean) {
+    this.owner = (EntityBean) ownerBean;
+    this.loadedProps = new boolean[owner._ebean_getPropertyNames().length];
   }
 
   /**
@@ -120,13 +103,6 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public EntityBean getOwner() {
     return owner;
-  }
-
-  public String toString() {
-    if (!loaded) {
-      return "Reference...";
-    }
-    return "OldValues: " + oldValues;
   }
 
   /**
@@ -193,16 +169,17 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Return the parent bean (by relationship).
    */
-  public Object getParentBean() {
-    return parentBean;
+  public Object getEmbeddedOwner() {
+    return embeddedOwner;
   }
 
   /**
    * Special case for a OneToOne, Set the parent bean (by relationship). This is
    * the owner of a 1-1.
    */
-  public void setParentBean(Object parentBean) {
-    this.parentBean = parentBean;
+  public void setEmbeddedOwner(EntityBean parentBean, int embeddedOwnerIndex) {
+    this.embeddedOwner = parentBean;
+    this.embeddedOwnerIndex = embeddedOwnerIndex;
   }
 
   /**
@@ -233,24 +210,37 @@ public final class EntityBeanIntercept implements Serializable {
     this.persistenceContext = ctx;
     this.ebeanServerName = beanLoader.getName();
   }
+  
+  public boolean isFullyLoadedBean() {
+    return fullyLoadedBean;
+  }
+
+  public void setFullyLoadedBean(boolean fullyLoadedBean) {
+    this.fullyLoadedBean = fullyLoadedBean;
+  }
 
   /**
    * Return true if this bean has been directly modified (it has oldValues) or
    * if any embedded beans are either new or dirty (and hence need saving).
    */
   public boolean isDirty() {
-    if (oldValues != null) {
-      return true;
-    }
-    // need to check all the embedded beans
-    return owner._ebean_isEmbeddedNewOrDirty();
+    return dirty;
+  }
+
+  public void setEmbeddedDirty(int embeddedProperty) {
+    this.dirty = true;
+    setChangedProperty(embeddedProperty);
+  }
+  
+  public void setDirty(boolean dirty) {
+    this.dirty = dirty;
   }
 
   /**
    * Return true if this entity bean is new and not yet saved.
    */
   public boolean isNew() {
-    return !intercepting && !loaded;
+    return state == STATE_NEW;
   }
 
   /**
@@ -264,22 +254,14 @@ public final class EntityBeanIntercept implements Serializable {
    * Return true if the entity is a reference.
    */
   public boolean isReference() {
-    return intercepting && !loaded;
+    return state == STATE_REFERENCE;
   }
 
   /**
    * Set this as a reference object.
    */
   public void setReference() {
-    this.loaded = false;
-    this.intercepting = true;
-  }
-
-  /**
-   * Return the old values used for ConcurrencyMode.ALL.
-   */
-  public Object getOldValues() {
-    return oldValues;
+    state = STATE_REFERENCE;
   }
 
   /**
@@ -299,32 +281,10 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Return true if the bean currently has interception on.
-   * <p>
-   * With interception on the bean will invoke lazy loading and dirty checking.
-   * </p>
-   */
-  public boolean isIntercepting() {
-    return intercepting;
-  }
-
-  /**
-   * Turn interception off or on.
-   * <p>
-   * This is to support custom serialisation mechanisms that just read all the
-   * properties on the bean.
-   * </p>
-   * 
-   */
-  public void setIntercepting(boolean intercepting) {
-    this.intercepting = intercepting;
-  }
-
-  /**
    * Return true if the entity has been loaded.
    */
   public boolean isLoaded() {
-    return loaded;
+    return state == STATE_LOADED;
   }
 
   /**
@@ -339,12 +299,12 @@ public final class EntityBeanIntercept implements Serializable {
    * </p>
    */
   public void setLoaded() {
-    this.loaded = true;
-    this.oldValues = null;
-    this.intercepting = true;
+    this.state = STATE_LOADED;
     this.owner._ebean_setEmbeddedLoaded();
     this.lazyLoadProperty = -1;
+    this.origValues = null;
     this.changedProps = null;
+    this.dirty = false;
   }
 
   /**
@@ -352,8 +312,7 @@ public final class EntityBeanIntercept implements Serializable {
    * bean.
    */
   public void setLoadedLazy() {
-    this.loaded = true;
-    this.intercepting = true;
+    this.state = STATE_LOADED;
     this.lazyLoadProperty = -1;
   }
 
@@ -423,27 +382,104 @@ public final class EntityBeanIntercept implements Serializable {
     }
   }
 
-  /**
-   * Set the property names for a partially loaded bean.
-   * 
-   * @param loadedPropertyNames
-   *          the names of the loaded properties
-   */
-//  public void setLoadedProps(boolean[] loadedPropertyNames) {
-//    this.loadedProps = loadedPropertyNames;
-//  }
+  public String getProperty(int propertyIndex) {
+    if (propertyIndex == -1) {
+      return null;
+    }
+    return owner._ebean_getPropertyName(propertyIndex);
+  }
   
-  public void setLoadedProps(Set<String> loadedPropertyNames) {
+  public int getPropertyLength() {
+    return owner._ebean_getPropertyNames().length;
+  }
+  
+  public void setLoadedProperty(int propertyIndex) {
+    loadedProps[propertyIndex] = true;
+  }
+  
+  public boolean isLoadedProperty(int propertyIndex) {
+    return loadedProps[propertyIndex];
+  }
+
+  public boolean isChangedProperty(int propertyIndex) {
+    return (changedProps != null && changedProps[propertyIndex]);
+  }
+
+  /**
+   * Explicitly mark a property as having been changed.
+   */
+  public void markPropertyAsChanged(int propertyIndex) {
+    setChangedProperty(propertyIndex);
+    setDirty(true);
+  }
+  
+  private void setChangedProperty(int propertyIndex) {
+    if (changedProps == null) {
+      changedProps = new boolean[owner._ebean_getPropertyNames().length];
+    }
+    changedProps[propertyIndex] = true;
+  }
+  
+  private void setOriginalValue(int propertyIndex, Object value) {
+    if (origValues == null) {
+      origValues = new Object[owner._ebean_getPropertyNames().length];
+    }
+    if (origValues[propertyIndex] == null) {
+      origValues[propertyIndex] = value;
+    }
+  }
+
+  /**
+   * For forced update on a 'New' bean move set all the changedProperties to loaded properties.
+   */
+  public void setNewBeanForUpdate() {
+  
+    for (int i=0; i< loadedProps.length; i++) {
+      if (loadedProps[i]) {
+        setChangedProperty(i);
+      }
+    }
+    setDirty(true);
   }
   
   /**
    * Return the set of property names for a partially loaded bean.
    */
-//  public boolean[] getLoadedProps() {
-//    return loadedProps;
-//  }
-  public Set<String> getLoadedProps() {
-    return null;
+  public Set<String> getLoadedPropertyNames() {
+    if (fullyLoadedBean) {
+      return null;
+    }
+    Set<String> props = new LinkedHashSet<String>();
+    for (int i=0; i<loadedProps.length; i++) {
+      if (loadedProps[i]) {
+        props.add(getProperty(i));
+      }
+    }
+    return props;
+  }
+  
+  public Set<String> getChangedPropertyNames() {
+    Set<String> props = new LinkedHashSet<String>();
+    if (changedProps != null) {
+      for (int i=0; i<changedProps.length; i++) {
+        if (changedProps[i]) {
+          props.add(getProperty(i));
+        }
+      }
+    }
+    return props;
+  }
+  
+  public int getChangedPropertiesHash() {
+    int h = 1;
+    if (changedProps != null) {
+      for (int i=0; i<changedProps.length; i++) {
+        if (changedProps[i]) {
+          h = h * 31 + (i+1);
+        }
+      }
+    }
+    return h;
   }
 
   /**
@@ -452,19 +488,16 @@ public final class EntityBeanIntercept implements Serializable {
   public boolean[] getChanged() {
     return changedProps;
   }
-  
-  public Set<String> getChangedProps() {
-    return null;
+
+  public boolean[] getLoaded() {
+    return loadedProps;
   }
 
   /**
    * Return the property read or write that triggered the lazy load.
    */
-//  public int getLazyLoadProperty() {
-//    return lazyLoadProperty;
-//  }
-  public String getLazyLoadProperty() {
-    return null;
+  public int getLazyLoadProperty() {
+    return lazyLoadProperty;
   }
 
   /**
@@ -498,13 +531,8 @@ public final class EntityBeanIntercept implements Serializable {
    */
   private void loadBeanInternal(int loadProperty, BeanLoader loader) {
 
-    if (loaded && (loadedProps == null || loadedProps[loadProperty])) {
+    if (loadedProps == null || loadedProps[loadProperty]) {
       // race condition where multiple threads calling preGetter concurrently
-      return;
-    }
-
-    if (disableLazyLoad) {
-      loaded = true;
       return;
     }
 
@@ -534,20 +562,6 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Create a copy of the bean as it is now. This is the original or 'old
-   * values' prior to any modification. This is used to perform concurrency
-   * testing.
-   */
-  protected void createOldValues() {
-
-    oldValues = owner._ebean_createCopy();
-
-    if (nodeUsageCollector != null) {
-      nodeUsageCollector.setModified();
-    }
-  }
-
-  /**
    * Helper method to check if two objects are equal.
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -571,7 +585,6 @@ public final class EntityBeanIntercept implements Serializable {
       } else {
         return false;
       }
-
     }
     if (obj1 instanceof URL) {
       // use the string format to determine if dirty
@@ -582,22 +595,17 @@ public final class EntityBeanIntercept implements Serializable {
   
   /**
    * Method that is called prior to a getter method on the actual entity.
-   * <p>
-   * This checks if the bean is a reference and should be loaded.
-   * </p>
    */
   public void preGetter(int propertyIndex) {
-    if (!intercepting) {
+    if (state == STATE_NEW || disableLazyLoad) {
       return;
     }
-
-    if (!loaded) {
-      loadBean(propertyIndex);
-    } else if (loadedProps != null && !loadedProps[propertyIndex]) {
+    
+    if (!isLoadedProperty(propertyIndex)) {
       loadBean(propertyIndex);
     }
 
-    if (nodeUsageCollector != null && loaded) {
+    if (nodeUsageCollector != null) {
       nodeUsageCollector.addUsed(getProperty(propertyIndex));
     }
   }
@@ -631,10 +639,15 @@ public final class EntityBeanIntercept implements Serializable {
    * OneToMany and ManyToMany don't have any interception so just check for
    * PropertyChangeSupport.
    */
-  public PropertyChangeEvent preSetterMany(boolean interceptField, int propertyIndex,
-      Object oldValue, Object newValue) {
+  public PropertyChangeEvent preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
 
-    // skip setter interception on many's
+    if (readOnly) {
+      throw new IllegalStateException("This bean is readOnly");
+    }
+    
+    setLoadedProperty(propertyIndex);
+
+    // Bean itself not considered dirty when many changed
     if (pcs != null) {
       return new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
     } else {
@@ -642,57 +655,27 @@ public final class EntityBeanIntercept implements Serializable {
     }
   }
   
-  public String getProperty(int propertyIndex) {
-    return owner._ebean_getPropertyName(propertyIndex);
-  }
-  
-  public int getPropertyLength() {
-    return owner._ebean_getPropertyNames().length;
-  }
+  private void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue) {
 
-  private final void changedProperty(int propertyIndex, boolean setDirty) {
-
-    if (changedProps == null) {
-      changedProps = new boolean[owner._ebean_getPropertyNames().length];
-    }
-    changedProps[propertyIndex] = true;
-
-    if (!setDirty || !intercepting) {
-      return;
-    }
     if (readOnly) {
       throw new IllegalStateException("This bean is readOnly");
     }
+    setChangedProperty(propertyIndex);
 
-    if (loaded) {
-      if (oldValues == null) {
-        // first time this bean is being made dirty
-        createOldValues();
+    if (setDirtyState) {
+      setOriginalValue(propertyIndex, origValue);
+      if (!dirty) {
+        dirty = true;        
+        if (embeddedOwner != null) {
+          // Cascade dirty state from Embedded bean to parent bean
+          embeddedOwner._ebean_getIntercept().setEmbeddedDirty(embeddedOwnerIndex);
+        }
+        if (nodeUsageCollector != null) {
+          nodeUsageCollector.setModified();
+        }
       }
     }
   }
-
-  private final void addDirty(int propertyIndex) {
-
-    if (!intercepting) {
-      return;
-    }
-    if (readOnly) {
-      throw new IllegalStateException("This bean is readOnly");
-    }
-
-    if (loaded) {
-      if (oldValues == null) {
-        // first time this bean is being made dirty
-        createOldValues();
-      }
-      if (changedProps == null) {
-        changedProps = new boolean[getPropertyLength()];
-      }
-      changedProps[propertyIndex] = true;
-    }
-  }
-
   
   /**
    * Check to see if the values are not equal. If they are not equal then create
@@ -700,205 +683,167 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
 
-    // If state 'new' then mark property as changed
-    // Else state is 'update', check for change
-    if (!areEqual(oldValue, newValue)) {
-      changedProperty(propertyIndex, intercept);
-      if (pcs != null) {
-        return new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
-      }
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);
+    } else if (!areEqual(oldValue, newValue)) {
+      setChangedPropertyValue(propertyIndex, intercept, newValue);   
+    } else {
+      return null;
     }
-
-    return null;
+    
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue); 
   }
-
+  
+  
   /**
    * Check for primitive boolean.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, boolean oldValue,
-      boolean newValue) {
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, boolean oldValue, boolean newValue) {
 
-    boolean changed = oldValue != newValue;
-
-    if (intercept && changed) {
-      addDirty(propertyIndex);
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);
+    } else if (oldValue != newValue) {
+      setChangedPropertyValue(propertyIndex, intercept, oldValue);
+    } else {
+      return null;
     }
-
-    if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Boolean.valueOf(oldValue),
-          Boolean.valueOf(newValue));
-    }
-
-    return null;
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Boolean.valueOf(oldValue), Boolean.valueOf(newValue));
   }
 
   /**
    * Check for primitive int.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, int oldValue,
-      int newValue) {
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, int oldValue, int newValue) {
 
-    boolean changed = oldValue != newValue;
-
-    if (intercept && changed) {
-      addDirty(propertyIndex);
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);
+    } else if (oldValue != newValue) {
+      setChangedPropertyValue(propertyIndex, intercept, oldValue);
+    } else {
+      return null;
     }
-
-    if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Integer.valueOf(oldValue),
-          Integer.valueOf(newValue));
-    }
-    return null;
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Integer.valueOf(oldValue), Integer.valueOf(newValue));
   }
 
   /**
    * long.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, long oldValue,
-      long newValue) {
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, long oldValue, long newValue) {
 
-    boolean changed = oldValue != newValue;
-
-    if (intercept && changed) {
-      addDirty(propertyIndex);
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);  
+    } else if (oldValue != newValue) {
+      setChangedPropertyValue(propertyIndex, intercept, oldValue);
+    } else {
+      return null;
     }
-
-    if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Long.valueOf(oldValue),
-          Long.valueOf(newValue));
-    }
-    return null;
+    
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Long.valueOf(oldValue), Long.valueOf(newValue));
   }
 
   /**
    * double.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, double oldValue,
-      double newValue) {
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, double oldValue, double newValue) {
 
-    boolean changed = oldValue != newValue;
-
-    if (intercept && changed) {
-      addDirty(propertyIndex);
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);
+    } else if (oldValue != newValue) {
+      setChangedPropertyValue(propertyIndex, intercept, oldValue);  
+    } else {
+      return null;
     }
-
-    if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Double.valueOf(oldValue),
-          Double.valueOf(newValue));
-    }
-    return null;
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Double.valueOf(oldValue), Double.valueOf(newValue));
   }
 
   /**
    * float.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, float oldValue,
-      float newValue) {
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, float oldValue, float newValue) {
 
-    boolean changed = oldValue != newValue;
-
-    if (intercept && changed) {
-      addDirty(propertyIndex);
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);
+    } else if (oldValue != newValue) {
+      setChangedPropertyValue(propertyIndex, intercept, oldValue);
+    } else {
+      return null;
     }
-
-    if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Float.valueOf(oldValue),
-          Float.valueOf(newValue));
-    }
-    return null;
+    return (pcs == null) ? null :  new PropertyChangeEvent(owner, getProperty(propertyIndex), Float.valueOf(oldValue), Float.valueOf(newValue));
   }
 
   /**
    * short.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, short oldValue,
-      short newValue) {
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, short oldValue, short newValue) {
 
-    boolean changed = oldValue != newValue;
-
-    if (intercept && changed) {
-      addDirty(propertyIndex);
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);
+    } else if (oldValue != newValue) {
+      setChangedPropertyValue(propertyIndex, intercept, oldValue);
+    } else {
+      return null;
     }
-
-    if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Short.valueOf(oldValue),
-          Short.valueOf(newValue));
-    }
-    return null;
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Short.valueOf(oldValue), Short.valueOf(newValue));
   }
 
   /**
    * char.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, char oldValue,
-      char newValue) {
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, char oldValue, char newValue) {
 
-    boolean changed = oldValue != newValue;
-
-    if (intercept && changed) {
-      addDirty(propertyIndex);
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);
+    } else if (oldValue != newValue) {
+      setChangedPropertyValue(propertyIndex, intercept, oldValue);
+    } else {
+      return null;
     }
-
-    if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Character.valueOf(oldValue),
-          Character.valueOf(newValue));
-    }
-    return null;
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Character.valueOf(oldValue), Character.valueOf(newValue));
   }
 
   /**
-   * char.
+   * byte.
    */
-  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, byte oldValue,
-      byte newValue) {
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, byte oldValue, byte newValue) {
 
-    boolean changed = oldValue != newValue;
-
-    if (intercept && changed) {
-      addDirty(propertyIndex);
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);
+    } else if (oldValue != newValue) {
+      setChangedPropertyValue(propertyIndex, intercept, oldValue);
+    } else {
+      return null;
     }
-
-    if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, getProperty(propertyIndex), Byte.valueOf(oldValue),
-          Byte.valueOf(newValue));
-    }
-    return null;
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Byte.valueOf(oldValue), Byte.valueOf(newValue));
   }
 
   /**
    * char[].
    */
-  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, char[] oldValue,
-      char[] newValue) {
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, char[] oldValue, char[] newValue) {
 
-    boolean changed = !areEqualChars(oldValue, newValue);
-
-    if (intercept && changed) {
-      addDirty(propertyIndex);
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);
+    } else if (!areEqualChars(oldValue, newValue)) {
+      setChangedPropertyValue(propertyIndex, intercept, oldValue);
+    } else {
+      return null;
     }
-
-    if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
-    }
-    return null;
+    return (pcs == null) ? null: new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
   }
 
   /**
    * byte[].
    */
-  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, byte[] oldValue,
-      byte[] newValue) {
+  public PropertyChangeEvent preSetter(boolean intercept, int propertyIndex, byte[] oldValue, byte[] newValue) {
 
-    boolean changed = !areEqualBytes(oldValue, newValue);
-
-    if (intercept && changed) {
-      addDirty(propertyIndex);
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);
+    } else if (!areEqualBytes(oldValue, newValue)) {
+      setChangedPropertyValue(propertyIndex, intercept, oldValue);
+    } else {
+      return null;
     }
-
-    if (changed && pcs != null) {
-      return new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
-    }
-    return null;
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
   }
 
   private static boolean areEqualBytes(byte[] b1, byte[] b2) {

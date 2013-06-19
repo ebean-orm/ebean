@@ -6,8 +6,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 import com.avaje.ebean.Query.UseIndex;
 import com.avaje.ebean.annotation.CacheStrategy;
@@ -54,32 +52,15 @@ public class AnnotationClass extends AnnotationParser {
     }
   }
 
-  private boolean isXmlElement(Class<?> cls) {
-    XmlRootElement rootElement = cls.getAnnotation(XmlRootElement.class);
-    if (rootElement != null) {
-      return true;
-    }
-    XmlType xmlType = cls.getAnnotation(XmlType.class);
-    if (xmlType != null) {
-      return true;
-    }
-    return false;
-  }
-
   private void read(Class<?> cls) {
 
     Entity entity = cls.getAnnotation(Entity.class);
     if (entity != null) {
-      // checkDefaultConstructor();
       if (entity.name().equals("")) {
         descriptor.setName(cls.getSimpleName());
-
       } else {
         descriptor.setName(entity.name());
       }
-    } else if (isXmlElement(cls)) {
-      descriptor.setName(cls.getSimpleName());
-      descriptor.setEntityType(EntityType.XMLELEMENT);
     }
 
     Embeddable embeddable = cls.getAnnotation(Embeddable.class);

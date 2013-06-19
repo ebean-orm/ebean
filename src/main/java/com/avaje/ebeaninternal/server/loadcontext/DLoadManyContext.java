@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionLoader;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.LoadManyContext;
@@ -123,7 +124,7 @@ public class DLoadManyContext implements LoadManyContext, BeanCollectionLoader {
 		synchronized (weakList) {
 			boolean hitCache = desc.isBeanCaching() && !onlyIds && !parent.isExcludeBeanCache();
 		    if (hitCache){
-		    	Object ownerBean = bc.getOwnerBean();
+		    	EntityBean ownerBean = bc.getOwnerBean();
 		    	BeanDescriptor<? extends Object> parentDesc = desc.getBeanDescriptor(ownerBean.getClass());
 		    	Object parentId = parentDesc.getId(ownerBean);
 		    	if (parentDesc.cacheLoadMany(property, bc, parentId, parent.isReadOnly())) {

@@ -10,8 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.FutureTask;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.bean.BeanCollection;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.BeanIdList;
@@ -26,8 +30,6 @@ import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
 import com.avaje.ebeaninternal.server.type.RsetDataReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Executes the select row count query.
@@ -299,11 +301,11 @@ public class CQueryFetchIds {
 			// no-op
 		}
 
-		public void setLoadedBean(Object loadedBean, Object id) {
+		public void setLoadedBean(EntityBean loadedBean, Object id) {
 			// no-op
 		}
 
-		public void setLoadedManyBean(Object loadedBean) {
+		public void setLoadedManyBean(EntityBean loadedBean) {
 			// no-op
 		}
 		

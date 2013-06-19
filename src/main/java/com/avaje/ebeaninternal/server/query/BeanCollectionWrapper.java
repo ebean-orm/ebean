@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.avaje.ebean.bean.BeanCollection;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.core.RelationalQueryRequest;
@@ -149,7 +150,7 @@ public final class BeanCollectionWrapper {
 	/**
 	 * Add the bean to the collection held in this wrapper.
 	 */
-	public void add(Object bean) {
+	public void add(EntityBean bean) {
 		add(bean, beanCollection);
 	}
 
@@ -162,7 +163,7 @@ public final class BeanCollectionWrapper {
 	 *            the collection or map to add the bean to
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void add(Object bean, Object collection) {
+	public void add(EntityBean bean, Object collection) {
 		if (bean == null) {
 			return;
 		}

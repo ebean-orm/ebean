@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
 /**
@@ -10,14 +11,14 @@ public class GeneratedUpdateLong implements GeneratedProperty {
     /**
      * Return now as a Timestamp.
      */
-    public Object getInsertValue(BeanProperty prop, Object bean) {
+    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
         return Long.valueOf(System.currentTimeMillis());
     }
 
     /**
      * Return now as a Timestamp.
      */
-    public Object getUpdateValue(BeanProperty prop, Object bean) {
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
         return Long.valueOf(System.currentTimeMillis());
     }
 
@@ -28,6 +29,11 @@ public class GeneratedUpdateLong implements GeneratedProperty {
         return true;
     }
 
+    @Override
+    public boolean includeInAllUpdates() {
+      return true;
+    }
+    
     /**
      * Include this in every insert.
      */

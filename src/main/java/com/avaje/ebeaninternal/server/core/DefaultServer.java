@@ -115,6 +115,10 @@ public final class DefaultServer implements SpiEbeanServer {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultServer.class);
 
+  private static final int IGNORE_LEADING_ELEMENTS = 5;
+  
+  private static final String AVAJE_EBEAN = Ebean.class.getName().substring(0, 15);
+  
   private final String serverName;
 
   private final DatabasePlatform databasePlatform;
@@ -486,12 +490,12 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public void refreshMany(Object parentBean, String propertyName, Transaction t) {
 
-    beanLoader.refreshMany(parentBean, propertyName, t);
+    beanLoader.refreshMany(checkEntityBean(parentBean), propertyName, t);
   }
 
   public void refreshMany(Object parentBean, String propertyName) {
 
-    beanLoader.refreshMany(parentBean, propertyName);
+    beanLoader.refreshMany(checkEntityBean(parentBean), propertyName);
   }
 
   public void loadMany(LoadManyRequest loadRequest) {
@@ -506,7 +510,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public void refresh(Object bean) {
 
-    beanLoader.refresh(bean);
+    beanLoader.refresh(checkEntityBean(bean));
   }
 
   public void loadBean(LoadBeanRequest loadRequest) {
@@ -638,7 +642,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
       } else {
         // use the default reference options
-        ref = desc.createReference(null, id, null);
+        ref = desc.createReference(null, id);
       }
 
       if (ctx != null && (ref instanceof EntityBean)) {
@@ -1565,10 +1569,8 @@ public final class DefaultServer implements SpiEbeanServer {
    * Save the bean with an explicit transaction.
    */
   public void save(Object bean, Transaction t) {
-    if (bean == null) {
-      throw new NullPointerException(Message.msg("bean.isnull"));
-    }
-    persister.save(bean, t);
+    
+    persister.save(checkEntityBean(bean), t);
   }
 
   /**
@@ -1606,10 +1608,8 @@ public final class DefaultServer implements SpiEbeanServer {
    * include in the update.
    */
   public void update(Object bean, Set<String> updateProps, Transaction t, boolean deleteMissingChildren, boolean updateNullProperties) {
-    if (bean == null) {
-      throw new NullPointerException(Message.msg("bean.isnull"));
-    }
-    persister.forceUpdate(bean, updateProps, t, deleteMissingChildren, updateNullProperties);
+    
+    persister.forceUpdate(checkEntityBean(bean), updateProps, t, deleteMissingChildren, updateNullProperties);
   }
 
   /**
@@ -1635,12 +1635,19 @@ public final class DefaultServer implements SpiEbeanServer {
    * </p>
    */
   public void insert(Object bean, Transaction t) {
+    persister.forceInsert(checkEntityBean(bean), t);
+  }
+
+  private EntityBean checkEntityBean(Object bean) {
     if (bean == null) {
       throw new NullPointerException(Message.msg("bean.isnull"));
     }
-    persister.forceInsert(bean, t);
+    if (bean instanceof EntityBean == false) {
+      throw new IllegalArgumentException("Was expecting an EntityBean but got a "+bean.getClass());
+    }
+    return (EntityBean)bean;
   }
-
+  
   /**
    * Delete the associations (from the intersection table) of a ManyToMany given
    * the owner bean and the propertyName of the ManyToMany collection.
@@ -1661,10 +1668,11 @@ public final class DefaultServer implements SpiEbeanServer {
    */
   public int deleteManyToManyAssociations(Object ownerBean, String propertyName, Transaction t) {
 
+    EntityBean owner = checkEntityBean(ownerBean);
     TransWrapper wrap = initTransIfRequired(t);
     try {
       SpiTransaction trans = wrap.transaction;
-      int rc = persister.deleteManyToManyAssociations(ownerBean, propertyName, trans);
+      int rc = persister.deleteManyToManyAssociations(owner, propertyName, trans);
       wrap.commitIfCreated();
       return rc;
 
@@ -1688,11 +1696,12 @@ public final class DefaultServer implements SpiEbeanServer {
    */
   public void saveManyToManyAssociations(Object ownerBean, String propertyName, Transaction t) {
 
+    EntityBean owner = checkEntityBean(ownerBean);
     TransWrapper wrap = initTransIfRequired(t);
     try {
       SpiTransaction trans = wrap.transaction;
 
-      persister.saveManyToManyAssociations(ownerBean, propertyName, trans);
+      persister.saveManyToManyAssociations(owner, propertyName, trans);
 
       wrap.commitIfCreated();
 
@@ -1708,21 +1717,12 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public void saveAssociation(Object ownerBean, String propertyName, Transaction t) {
 
-    if (ownerBean instanceof EntityBean) {
-      Set<String> loadedProps = ((EntityBean) ownerBean)._ebean_getIntercept().getLoadedProps();
-      if (loadedProps != null && !loadedProps.contains(propertyName)) {
-        // skip as property is not actually loaded in this partially
-        // loaded bean
-        logger.debug("Skip saveAssociation as property " + propertyName + " is not loaded");
-        return;
-      }
-    }
-
+    EntityBean owner = checkEntityBean(ownerBean);
+    
     TransWrapper wrap = initTransIfRequired(t);
     try {
       SpiTransaction trans = wrap.transaction;
-
-      persister.saveAssociation(ownerBean, propertyName, trans);
+      persister.saveAssociation(owner, propertyName, trans);
 
       wrap.commitIfCreated();
 
@@ -1758,7 +1758,7 @@ public final class DefaultServer implements SpiEbeanServer {
       SpiTransaction trans = wrap.transaction;
       int saveCount = 0;
       while (it.hasNext()) {
-        Object bean = it.next();
+        EntityBean bean = checkEntityBean(it.next());
         persister.save(bean, trans);
         saveCount++;
       }
@@ -1822,10 +1822,8 @@ public final class DefaultServer implements SpiEbeanServer {
    * Delete the bean with the explicit transaction.
    */
   public void delete(Object bean, Transaction t) {
-    if (bean == null) {
-      throw new NullPointerException(Message.msg("bean.isnull"));
-    }
-    persister.delete(bean, t);
+    
+    persister.delete(checkEntityBean(bean), t);
   }
 
   /**
@@ -1853,7 +1851,7 @@ public final class DefaultServer implements SpiEbeanServer {
       SpiTransaction trans = wrap.transaction;
       int deleteCount = 0;
       while (it.hasNext()) {
-        Object bean = it.next();
+        EntityBean bean = checkEntityBean(it.next());
         persister.delete(bean, trans);
         deleteCount++;
       }
@@ -1949,13 +1947,14 @@ public final class DefaultServer implements SpiEbeanServer {
   }
 
   public Object getBeanId(Object bean) {
+    EntityBean eb = checkEntityBean(bean);
     BeanDescriptor<?> desc = getBeanDescriptor(bean.getClass());
     if (desc == null) {
       String m = bean.getClass().getName() + " is NOT an Entity Bean registered with this server?";
       throw new PersistenceException(m);
     }
 
-    return desc.getId(bean);
+    return desc.getId(eb);
   }
 
   /**
@@ -2021,8 +2020,6 @@ public final class DefaultServer implements SpiEbeanServer {
     return transactionManager.createQueryTransaction();
   }
 
-  private static final int IGNORE_LEADING_ELEMENTS = 5;
-  private static final String AVAJE_EBEAN = Ebean.class.getName().substring(0, 15);
 
   /**
    * Create a CallStack object.

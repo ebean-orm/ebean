@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.persist;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -29,7 +30,7 @@ public class DeleteUnloadedForeignKeys {
     
     private final PersistRequestBean<?> request;
 
-    private Object beanWithForeignKeys;
+    private EntityBean beanWithForeignKeys;
     
     public DeleteUnloadedForeignKeys(SpiEbeanServer server, PersistRequestBean<?> request) {
         this.server = server;
@@ -70,7 +71,7 @@ public class DeleteUnloadedForeignKeys {
         if (t.isLogSummary()) {
         	t.logSummary("-- Ebean fetching foreign key values for delete of " + descriptor.getName() + " id:" + id);
         }
-        beanWithForeignKeys = server.findUnique(q, t);
+        beanWithForeignKeys = (EntityBean)server.findUnique(q, t);
     }
 
     /**
@@ -84,7 +85,7 @@ public class DeleteUnloadedForeignKeys {
             Object detailBean = prop.getValue(beanWithForeignKeys);
 
             // if bean exists with a unique id then delete it
-            if (detailBean != null && prop.hasId(detailBean)) {
+            if (detailBean != null && prop.hasId((EntityBean)detailBean)) {
                 server.delete(detailBean, request.getTransaction());
             }
         }

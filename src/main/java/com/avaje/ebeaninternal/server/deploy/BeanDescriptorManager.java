@@ -61,6 +61,7 @@ import com.avaje.ebeaninternal.server.lib.util.Dnode;
 import com.avaje.ebeaninternal.server.reflect.BeanReflect;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectFactory;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectGetter;
+import com.avaje.ebeaninternal.server.reflect.BeanReflectProperties;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectSetter;
 import com.avaje.ebeaninternal.server.reflect.EnhanceBeanReflectFactory;
 import com.avaje.ebeaninternal.server.type.TypeManager;
@@ -1286,43 +1287,33 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // abstract classes as well.
 
     Class<?> beanType = desc.getBeanType();
-    Class<?> factType = desc.getFactoryType();
 
-    BeanReflect beanReflect = reflectFactory.create(beanType, factType);
+    BeanReflectProperties reflectProps = new BeanReflectProperties(beanType);
+    
+    BeanReflect beanReflect = reflectFactory.create(beanType);
     desc.setBeanReflect(beanReflect);
+    desc.setProperties(reflectProps.getProperties());
 
-    try {
-      Iterator<DeployBeanProperty> it = desc.propertiesAll();
-      while (it.hasNext()) {
-        DeployBeanProperty prop = it.next();
-        String propName = prop.getName();
-
-        if (desc.isAbstract() || beanReflect.isVanillaOnly()) {
-          // use reflection in the case of imported abstract class
-          // with
-          // inheritance. Refer Bug 166
-          prop.setGetter(ReflectGetter.create(prop));
-          prop.setSetter(ReflectSetter.create(prop));
-
-        } else {
-          // use generated code for getting setting property values
-          BeanReflectGetter getter = beanReflect.getGetter(propName);
-          BeanReflectSetter setter = beanReflect.getSetter(propName);
-          prop.setGetter(getter);
-          prop.setSetter(setter);
-          if (getter == null) {
-            // should never happen
-            String m = "BeanReflectGetter for " + prop.getFullBeanName() + " was not found?";
-            throw new RuntimeException(m);
-          }
-        }
-
+    Iterator<DeployBeanProperty> it = desc.propertiesAll();
+    while (it.hasNext()) {
+      DeployBeanProperty prop = it.next();
+      String propName = prop.getName();
+          
+      Integer pos = reflectProps.getPropertyIndex(propName);
+      if (pos == null) {
+        throw new IllegalStateException("Property "+propName+" not found in "+reflectProps);
       }
-    } catch (IllegalArgumentException e) {
-      Class<?> superClass = desc.getBeanType().getSuperclass();
-      String msg = "Error with [" + desc.getFullName() + "] I believe it is not enhanced but it's superClass [" + superClass + "] is?"
-          + " (You are not allowed to mix enhancement in a single inheritance hierarchy)";
-      throw new PersistenceException(msg, e);
+
+      BeanReflectGetter getter = beanReflect.getGetter(propName, pos.intValue());
+      BeanReflectSetter setter = beanReflect.getSetter(propName, pos.intValue());
+      prop.setGetter(getter);
+      prop.setSetter(setter);
+      prop.setPropertyIndex(pos.intValue());
+      
+      if (getter == null) {
+        String m = "BeanReflectGetter for " + prop.getFullBeanName() + " was not found?";
+        throw new RuntimeException(m);
+      }
     }
   }
 
@@ -1333,13 +1324,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private void setConcurrencyMode(DeployBeanDescriptor<?> desc) {
 
-    if (!desc.getConcurrencyMode().equals(ConcurrencyMode.ALL)) {
+    if (desc.getConcurrencyMode() != null) {
       // concurrency mode explicitly set during deployment
       return;
     }
 
     if (checkForVersionProperties(desc)) {
       desc.setConcurrencyMode(ConcurrencyMode.VERSION);
+    } else {
+      desc.setConcurrencyMode(ConcurrencyMode.NONE);
     }
   }
 
@@ -1378,76 +1371,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     Class<?> beanClass = desc.getBeanType();
 
-    if (desc.isAbstract()) {
-      if (hasEntityBeanInterface(beanClass)) {
-        checkEnhanced(desc, beanClass);
-      } else {
-        checkSubclass(desc, beanClass);
-      }
-      return;
+    if (!hasEntityBeanInterface(beanClass)) {
+      throw new IllegalStateException("Bean "+beanClass+" is not enhanced?");
     }
-    try {
-      Object testBean = null;
-      try {
-        testBean = beanClass.newInstance();
-      } catch (InstantiationException e) {
-        // expected when no default constructor
-        logger.debug("no default constructor on " + beanClass + " e:" + e);
-      } catch (IllegalAccessException e) {
-        // expected when no default constructor
-        logger.debug("no default constructor on " + beanClass + " e:" + e);
-      }
-      if (testBean instanceof EntityBean == false) {
-        checkSubclass(desc, beanClass);
 
-      } else {
-        String className = beanClass.getName();
-        try {
-          // check that it really is enhanced (rather than mixed
-          // enhancement)
-          String marker = ((EntityBean) testBean)._ebean_getMarker();
-          if (!marker.equals(className)) {
-            String msg = "Error with [" + desc.getFullName() + "] It has not been enhanced but it's superClass ["
-                + beanClass.getSuperclass() + "] is?" + " (You are not allowed to mix enhancement in a single inheritance hierarchy)"
-                + " marker[" + marker + "] className[" + className + "]";
-            throw new PersistenceException(msg);
-          }
-        } catch (AbstractMethodError e) {
-          throw new PersistenceException("Old Ebean v1.0 enhancement detected in Ebean v1.1 - please do a clean enhancement.", e);
-        }
-
-        checkEnhanced(desc, beanClass);
-      }
-
-    } catch (PersistenceException ex) {
-      throw ex;
-
-    } catch (Exception ex) {
-      throw new PersistenceException(ex);
-    }
-  }
-
-  private void checkEnhanced(DeployBeanDescriptor<?> desc, Class<?> beanClass) {
     // the bean already implements EntityBean
-    checkInheritedClasses(true, beanClass);
+    checkInheritedClasses(beanClass);
 
-    desc.setFactoryType(beanClass);
     if (!beanClass.getName().startsWith("com.avaje.ebean.meta")) {
       enhancedClassCount++;
-    }
-  }
-
-  private void checkSubclass(DeployBeanDescriptor<?> desc, Class<?> beanClass) {
-
-    checkInheritedClasses(false, beanClass);
-    desc.checkReadAndWriteMethods();
-
-    EntityType entityType = desc.getEntityType();
-    if (EntityType.XMLELEMENT.equals(entityType)) {
-      desc.setFactoryType(beanClass);
-      
-    } else {
-      throw new PersistenceException("Entity type "+beanClass+" is not an enhanced entity bean. Subclassing is not longer supported in Ebean");
     }
   }
 
@@ -1455,26 +1387,18 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * Check that the inherited classes are the same as the entity bean (aka all
    * enhanced or all dynamically subclassed).
    */
-  private void checkInheritedClasses(boolean ensureEnhanced, Class<?> beanClass) {
+  private void checkInheritedClasses(Class<?> beanClass) {
     Class<?> superclass = beanClass.getSuperclass();
     if (Object.class.equals(superclass)) {
       // we got to the top of the inheritance
       return;
     }
-    boolean isClassEnhanced = EntityBean.class.isAssignableFrom(superclass);
-
-    if (ensureEnhanced != isClassEnhanced) {
-      String msg;
-      if (ensureEnhanced) {
-        msg = "Class [" + superclass + "] is not enhanced and [" + beanClass + "] is - (you can not mix!!)";
-      } else {
-        msg = "Class [" + superclass + "] is enhanced and [" + beanClass + "] is not - (you can not mix!!)";
-      }
-      throw new IllegalStateException(msg);
+    if (!EntityBean.class.isAssignableFrom(superclass)) {
+      throw new IllegalStateException("Super type "+superclass+" is not enhanced?");
     }
-
+    
     // recursively continue up the inheritance hierarchy
-    checkInheritedClasses(ensureEnhanced, superclass);
+    checkInheritedClasses(superclass);
   }
 
   /**

@@ -82,20 +82,21 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    * Flag set when 'master' bean changed.
    */
   boolean loadedBeanChanged;
+  
   /**
    * The 'master' bean just loaded.
    */
-  private Object loadedBean;
+  private EntityBean loadedBean;
 
   /**
    * Holds the previous loaded bean.
    */
-  private Object prevLoadedBean;
+  private EntityBean prevLoadedBean;
 
   /**
    * The detail bean just loaded.
    */
-  private Object loadedManyBean;
+  private EntityBean loadedManyBean;
 
   /**
    * The previous 'detail' collection remembered so that for manyToMany we can
@@ -414,7 +415,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return persistenceContext;
   }
 
-  public void setLoadedBean(Object bean, Object id) {
+  public void setLoadedBean(EntityBean bean, Object id) {
     if (id != null && id.equals(loadedBeanId)) {
       // master/detail loading with master bean
       // unchanged. NB Using id to avoid any issue
@@ -432,15 +433,14 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     }
   }
 
-  public void setLoadedManyBean(Object manyValue) {
+  public void setLoadedManyBean(EntityBean manyValue) {
     this.loadedManyBean = manyValue;
   }
 
   /**
    * Return the last read bean.
    */
-  @SuppressWarnings("unchecked")
-  public T getLoadedBean() {
+  public EntityBean getLoadedBean() {
     if (manyIncluded) {
       if (prevDetailCollection instanceof BeanCollection<?>) {
         ((BeanCollection<?>) prevDetailCollection).setModifyListening(manyProperty
@@ -453,9 +453,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     }
 
     if (prevLoadedBean != null) {
-      return (T) prevLoadedBean;
+      return prevLoadedBean;
     } else {
-      return (T) loadedBean;
+      return loadedBean;
     }
   }
 
@@ -641,10 +641,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void readTheRows(boolean inForeground) throws SQLException {
     while (hasNextBean(inForeground)) {
       if (queryListener != null) {
-        queryListener.process(getLoadedBean());
+        queryListener.process((T)getLoadedBean());
 
       } else {
         // add to the list/set/map

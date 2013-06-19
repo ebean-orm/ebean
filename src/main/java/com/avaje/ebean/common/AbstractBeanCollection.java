@@ -12,7 +12,6 @@ import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.BeanCollectionTouched;
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.bean.EntityBeanIntercept;
 
 /**
  * Base class for List Set and Map implementations of BeanCollection.
@@ -43,7 +42,7 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   /**
    * The owning bean (used for lazy fetch).
    */
-  protected final Object ownerBean;
+  protected final EntityBean ownerBean;
 
   /**
    * The name of this property in the owning bean (used for lazy fetch).
@@ -81,19 +80,15 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   /**
    * Used to create deferred fetch proxy.
    */
-  public AbstractBeanCollection(BeanCollectionLoader loader, Object ownerBean, String propertyName) {
+  public AbstractBeanCollection(BeanCollectionLoader loader, EntityBean ownerBean, String propertyName) {
     this.loader = loader;
     this.ebeanServerName = loader.getName();
     this.ownerBean = ownerBean;
     this.propertyName = propertyName;
-
-    if (ownerBean instanceof EntityBean) {
-      EntityBeanIntercept ebi = ((EntityBean) ownerBean)._ebean_getIntercept();
-      this.readOnly = ebi.isReadOnly();
-    }
+    this.readOnly = ownerBean._ebean_getIntercept().isReadOnly();
   }
 
-  public Object getOwnerBean() {
+  public EntityBean getOwnerBean() {
     return ownerBean;
   }
 

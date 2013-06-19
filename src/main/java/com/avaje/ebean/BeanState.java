@@ -90,5 +90,5 @@ public interface BeanState {
    *          the properties that where loaded or null for a fully loaded entity
    *          bean.
    */
-  public void setLoaded(Set<String> loadedProperties);
+  public void setLoaded();
 }

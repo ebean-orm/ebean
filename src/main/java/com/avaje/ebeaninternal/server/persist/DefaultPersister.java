@@ -2,19 +2,20 @@ package com.avaje.ebeaninternal.server.persist;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.CallableSql;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.Update;
-import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollection.ModifyListenMode;
 import com.avaje.ebean.bean.EntityBean;
@@ -38,8 +39,6 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.IntersectionRow;
 import com.avaje.ebeaninternal.server.deploy.ManyType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Persister implementation using DML.
@@ -157,20 +156,18 @@ public final class DefaultPersister implements Persister {
 	/**
 	 * Force an Update using the given bean.
 	 */
-	public void forceUpdate(Object bean, Set<String> updateProps, Transaction t, boolean deleteMissingChildren, boolean updateNullProperties) {
+	public void forceUpdate(EntityBean bean, Set<String> updateProps, Transaction t, boolean deleteMissingChildren, boolean updateNullProperties) {
 
-		if (bean == null) {
-			throw new NullPointerException(Message.msg("bean.isnull"));
+		EntityBean entityBean = (EntityBean)bean;
+		EntityBeanIntercept ebi = entityBean._ebean_getIntercept();
+		if (ebi.isNew()) {
+		  ebi.setNewBeanForUpdate();
 		}
-
-		if (updateProps == null) {
-			// checking to see if this is just a 'normal' update
-			if (bean instanceof EntityBean) {
-				EntityBeanIntercept ebi = ((EntityBean) bean)._ebean_getIntercept();
 				if (ebi.isDirty() || ebi.isLoaded()) {
 					// a 'normal' update using 'dirty' properties from internal bean state.
 					// if not dirty we still update in case any cascading save occurs
 					PersistRequestBean<?> req = createRequest(bean, t, null);
+					req.setStatelessUpdate(true, deleteMissingChildren, updateNullProperties);
 					try {
 						req.initTransIfRequired();
 						update(req);
@@ -182,76 +179,26 @@ public final class DefaultPersister implements Persister {
 						req.rollbackTransIfRequired();
 						throw ex;
 					}
+					
 				} else if (ebi.isReference()) {
 					// just return as no point in cascading (no modified beans/lists)
-					return;
+				  ((SpiTransaction)t).logSql("-- No update as bean is just a reference bean");
+				  return;
+				  
+				} else {
+				  ((SpiTransaction)t).logSql("-- No update as bean is not dirty");
 				}
 
-				// loadedProps set by Ebean JSON / XML Marshalling
-				updateProps = ebi.getLoadedProps();
-			}
-		}
-
-		BeanManager<?> mgr = getBeanManager(bean);
-		if (mgr == null) {
-			throw new PersistenceException(errNotRegistered(bean.getClass()));
-		}
-
-		forceUpdateStateless(bean, t, null, mgr, updateProps, deleteMissingChildren, updateNullProperties);
 	}
 
-	/**
-	 * Force a 'stateless' update determining which properties to update.
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void forceUpdateStateless(Object bean, Transaction t, Object parentBean, BeanManager<?> mgr, Set<String> updateProps, 
-			boolean deleteMissingChildren, boolean updateNullProperties) {
-
-		BeanDescriptor<?> descriptor = mgr.getBeanDescriptor();
-
-		// determine concurrency mode based on version property not null
-		ConcurrencyMode mode = descriptor.determineConcurrencyMode(bean);
-
-		if (updateProps == null) {
-			// determine based on null treatment (all properties updated or just the non-null ones)
-			updateProps = updateNullProperties ? null : descriptor.determineLoadedProperties(bean);
-
-		} else if (updateProps.isEmpty()) {
-			// in this case means we want to include all properties in the update
-			updateProps = null;
-
-		} else if (ConcurrencyMode.VERSION.equals(mode)) {
-			// check that the version property is included
-			String verName = descriptor.firstVersionProperty().getName();
-			if (!updateProps.contains(verName)) {
-				// defensively copy the updateProps and add the version property name
-				updateProps = new HashSet<String>(updateProps);
-				updateProps.add(verName);
-			}
-		}
-
-		PersistRequestBean<?> req = new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, updateProps, mode);
-	  req.setStatelessUpdate(true, deleteMissingChildren, updateNullProperties);
-		
-		try {
-			req.initTransIfRequired();
-			update(req);
-			req.commitTransIfRequired();
-
-		} catch (RuntimeException ex) {
-			req.rollbackTransIfRequired();
-			throw ex;
-		}
-	}
-
-	public void save(Object bean, Transaction t) {
+	public void save(EntityBean bean, Transaction t) {
 		saveRecurse(bean, t, null);
 	}
 
 	/**
 	 * Explicitly specify to insert this bean.
 	 */
-	public void forceInsert(Object bean, Transaction t) {
+	public void forceInsert(EntityBean bean, Transaction t) {
 
 		PersistRequestBean<?> req = createRequest(bean, t, null);
 		try {
@@ -324,7 +271,8 @@ public final class DefaultPersister implements Persister {
 		
 		try {
 			request.setType(PersistRequest.Type.INSERT);
-	
+			request.setNotNullAsLoaded();
+			
 			if (request.isPersistCascade()) {
 				// save associated One beans recursively first
 				saveAssocOne(request);
@@ -383,7 +331,7 @@ public final class DefaultPersister implements Persister {
 	/**
 	 * Delete the bean with the explicit transaction.
 	 */
-	public void delete(Object bean, Transaction t) {
+	public void delete(EntityBean bean, Transaction t) {
 
 		PersistRequestBean<?> req = createRequest(bean, t, null);
 		if (req.isRegisteredForDeleteBean()) {
@@ -408,7 +356,7 @@ public final class DefaultPersister implements Persister {
 
 	private void deleteList(List<?> beanList, Transaction t) {
 		for (int i = 0; i < beanList.size(); i++) {
-			Object bean = beanList.get(i);
+			EntityBean bean = (EntityBean)beanList.get(i);
 			delete(bean, t);
 		}
 	}
@@ -472,7 +420,7 @@ public final class DefaultPersister implements Persister {
 					if (t.isLogSummary()) {
 						t.logSummary("-- DeleteById of " + descriptor.getName() + " id[" + id + "] requires fetch of foreign key values");
 					}
-					Object bean = server.findUnique(q, t);
+					EntityBean bean = (EntityBean)server.findUnique(q, t);
 					if (bean == null) {
 						return 0;
 					} else {
@@ -601,7 +549,7 @@ public final class DefaultPersister implements Persister {
 	 */
 	private void saveAssocMany(boolean insertedParent, PersistRequestBean<?> request) {
 
-		Object parentBean = request.getBean();
+		EntityBean parentBean = request.getEntityBean();
 		BeanDescriptor<?> desc = request.getBeanDescriptor();
 		SpiTransaction t = request.getTransaction();
 
@@ -639,14 +587,14 @@ public final class DefaultPersister implements Persister {
 	private static class SaveManyPropRequest {
 		private final boolean insertedParent;
 		private final BeanPropertyAssocMany<?> many;
-		private final Object parentBean;
+		private final EntityBean parentBean;
 		private final SpiTransaction t;
 		private final boolean cascade;
 		private final boolean statelessUpdate;
 		private final boolean deleteMissingChildren;
 		private final boolean updateNullProperties;
 
-		private SaveManyPropRequest(boolean insertedParent, BeanPropertyAssocMany<?> many, Object parentBean, PersistRequestBean<?> request) {
+		private SaveManyPropRequest(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
 			this.insertedParent = insertedParent;
 			this.many = many;
 			this.cascade = many.getCascadeInfo().isSave();
@@ -657,7 +605,7 @@ public final class DefaultPersister implements Persister {
 			this.updateNullProperties = request.isUpdateNullProperties();
 		}
 
-		private SaveManyPropRequest(BeanPropertyAssocMany<?> many, Object parentBean, SpiTransaction t) {
+		private SaveManyPropRequest(BeanPropertyAssocMany<?> many, EntityBean parentBean, SpiTransaction t) {
 			this.insertedParent = false;
 			this.many = many;
 			this.parentBean = parentBean;
@@ -700,7 +648,7 @@ public final class DefaultPersister implements Persister {
 			return many;
 		}
 
-		private Object getParentBean() {
+		private EntityBean getParentBean() {
 			return parentBean;
 		}
 
@@ -800,7 +748,7 @@ public final class DefaultPersister implements Persister {
 		// set it to the appropriate property on the
 		// detail bean before we save it
 		boolean isMap = ManyType.JAVA_MAP.equals(prop.getManyType());
-		Object parentBean = saveMany.getParentBean();
+		EntityBean parentBean = (EntityBean)saveMany.getParentBean();
 		Object mapKeyValue = null;
 
 		boolean saveSkippable = prop.isSaveRecurseSkippable();
@@ -814,59 +762,58 @@ public final class DefaultPersister implements Persister {
 				detailBean = entry.getValue();
 			}
 
-			if (prop.isManyToMany()) {
-				if (detailBean instanceof EntityBean) {
-					skipSavingThisBean = ((EntityBean) detailBean)._ebean_getIntercept().isReference();
-				}
+			if (detailBean instanceof EntityBean == false) {
+			  skipSavingThisBean = true;
+			  logger.debug("Skip non entity bean");
+			
 			} else {
-				// set the 'parent/master' bean to the detailBean as long
-				// as we don't make it 'dirty' in doing so
-				if (detailBean instanceof EntityBean) {
-					EntityBeanIntercept ebi = ((EntityBean) detailBean)._ebean_getIntercept();
-					if (ebi.isNewOrDirty()) {
-						// set the parent bean to detailBean
-						prop.setJoinValuesToChild(parentBean, detailBean, mapKeyValue);
-					} else if (ebi.isReference()) {
-						// we can skip this one
-						skipSavingThisBean = true;
+			  EntityBean detail = (EntityBean)detailBean;
+			  if (prop.isManyToMany()) {
+	        skipSavingThisBean = detail._ebean_getIntercept().isReference();
+	      } else {
+	        EntityBeanIntercept ebi = detail._ebean_getIntercept();
+          if (ebi.isNewOrDirty()) {
+            skipSavingThisBean = false;
+            // set the parent bean to detailBean
+            prop.setJoinValuesToChild(parentBean, detail, mapKeyValue);
+            
+          } else if (ebi.isReference()) {
+            // we can skip this one
+            skipSavingThisBean = true;
 
-					} else {
-						// unmodified so skip depending on prop.isSaveRecurseSkippable();
-						skipSavingThisBean = saveSkippable;
-					}
-				} else {
-					// set the parent bean to detailBean
-					prop.setJoinValuesToChild(parentBean, detailBean, mapKeyValue);
-				}
-			}
+          } else {
+            // unmodified so skip depending on prop.isSaveRecurseSkippable();
+            skipSavingThisBean = saveSkippable;
+          }
+	      }
 
-			if (skipSavingThisBean) {
-				// unmodified bean that does not recurse its save
-				// so we can skip the save for this bean.
-				// Reset skipSavingThisBean for the next detailBean
-				skipSavingThisBean = false;
+	     if (skipSavingThisBean) {
+	        // unmodified bean that does not recurse its save
+	        // so we can skip the save for this bean.
+	        // Reset skipSavingThisBean for the next detailBean
+	        skipSavingThisBean = false;
 
-			} else if (!saveMany.isStatelessUpdate()) {
-				// normal save recurse
-				saveRecurse(detailBean, t, parentBean);
+	      } else if (!saveMany.isStatelessUpdate()) {
+	        // normal save recurse
+	        saveRecurse(detailBean, t, parentBean);
 
-			} else {
-				if (targetDescriptor.isStatelessUpdate(detailBean)) {
-					// update based on the value of Version/Id properties
-					// cascade update in stateless mode
-					forceUpdate(detailBean, null, t, deleteMissingChildren, updateNullProperties);
-				} else {
-					// cascade insert
-					forceInsert(detailBean, t);
-				}
-			}
-
-			if (detailIds != null) {
-				// remember the Id (other details not in the collection) will be removed
-				Object id = targetDescriptor.getId(detailBean);
-				if (!DmlUtil.isNullOrZero(id)) {
-					detailIds.add(id);
-				}
+	      } else {
+	        if (targetDescriptor.isStatelessUpdate(detail)) {
+	          // update based on the value of Version/Id properties
+	          // cascade update in stateless mode
+	          forceUpdate(detail, null, t, deleteMissingChildren, updateNullProperties);
+	        } else {
+	          // cascade insert
+	          forceInsert(detail, t);
+	        }
+	      }
+	      if (detailIds != null) {
+	        // remember the Id (other details not in the collection) will be removed
+	        Object id = targetDescriptor.getId(detail);
+	        if (!DmlUtil.isNullOrZero(id)) {
+	          detailIds.add(id);
+	        }
+	      }
 			}
 		}
 
@@ -878,14 +825,14 @@ public final class DefaultPersister implements Persister {
 
 	}
 
-	public int deleteManyToManyAssociations(Object ownerBean, String propertyName, Transaction t) {
+	public int deleteManyToManyAssociations(EntityBean ownerBean, String propertyName, Transaction t) {
 
 		BeanDescriptor<?> descriptor = beanDescriptorManager.getBeanDescriptor(ownerBean.getClass());
 		BeanPropertyAssocMany<?> prop = (BeanPropertyAssocMany<?>) descriptor.getBeanProperty(propertyName);
 		return deleteAssocManyIntersection(ownerBean, prop, t);
 	}
 
-	public void saveManyToManyAssociations(Object ownerBean, String propertyName, Transaction t) {
+	public void saveManyToManyAssociations(EntityBean ownerBean, String propertyName, Transaction t) {
 
 		BeanDescriptor<?> descriptor = beanDescriptorManager.getBeanDescriptor(ownerBean.getClass());
 		BeanPropertyAssocMany<?> prop = (BeanPropertyAssocMany<?>) descriptor.getBeanProperty(propertyName);
@@ -893,7 +840,7 @@ public final class DefaultPersister implements Persister {
 		saveAssocManyIntersection(new SaveManyPropRequest(prop, ownerBean, (SpiTransaction) t), false);
 	}
 
-	public void saveAssociation(Object parentBean, String propertyName, Transaction t) {
+	public void saveAssociation(EntityBean parentBean, String propertyName, Transaction t) {
 
 		BeanDescriptor<?> descriptor = beanDescriptorManager.getBeanDescriptor(parentBean.getClass());
 		SpiTransaction trans = (SpiTransaction) t;
@@ -978,7 +925,8 @@ public final class DefaultPersister implements Persister {
 		t.depth(+1);
 
 		if (additions != null && !additions.isEmpty()) {
-			for (Object otherBean : additions) {
+			for (Object other : additions) {
+			  EntityBean otherBean = (EntityBean)other;
 				// the object from the 'other' side of the ManyToMany
 				if (deletions != null && deletions.remove(otherBean)) {
 					String m = "Inserting and Deleting same object? " + otherBean;
@@ -1002,7 +950,8 @@ public final class DefaultPersister implements Persister {
 			}
 		}
 		if (deletions != null && !deletions.isEmpty()) {
-			for (Object otherDelete : deletions) {
+			for (Object other : deletions) {
+			  EntityBean otherDelete = (EntityBean)other;
 				// the object from the 'other' side of the ManyToMany
 				// build a intersection row for 'delete'
 				IntersectionRow intRow = prop.buildManyToManyMapBean(saveManyPropRequest.getParentBean(), otherDelete);
@@ -1015,7 +964,7 @@ public final class DefaultPersister implements Persister {
 		t.depth(-1);
 	}
 
-	private int deleteAssocManyIntersection(Object bean, BeanPropertyAssocMany<?> many, Transaction t) {
+	private int deleteAssocManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, Transaction t) {
 
 		// delete all intersection rows for this bean
 		IntersectionRow intRow = many.buildManyToManyDeleteChildren(bean);
@@ -1036,7 +985,7 @@ public final class DefaultPersister implements Persister {
 		t.depth(-1);
 
 		BeanDescriptor<?> desc = request.getBeanDescriptor();
-		Object parentBean = request.getBean();
+		EntityBean parentBean = request.getEntityBean();
 
 		BeanPropertyAssocOne<?>[] expOnes = desc.propertiesOneExportedDelete();
 		if (expOnes.length > 0) {
@@ -1079,7 +1028,8 @@ public final class DefaultPersister implements Persister {
 						if (modifyRemovals != null && !modifyRemovals.isEmpty()) {
 
 							// delete the orphans that have been removed from the collection
-							for (Object detailBean : modifyRemovals) {
+							for (Object detail : modifyRemovals) {
+							  EntityBean detailBean = (EntityBean)detail;
 								if (manys[i].hasId(detailBean)) {
 									deleteRecurse(detailBean, t);
 								}
@@ -1104,7 +1054,7 @@ public final class DefaultPersister implements Persister {
 	 * collection (and should not be deleted).
 	 * </p>
 	 */
-	private void deleteManyDetails(SpiTransaction t, BeanDescriptor<?> desc, Object parentBean,
+	private void deleteManyDetails(SpiTransaction t, BeanDescriptor<?> desc, EntityBean parentBean,
 	        BeanPropertyAssocMany<?> many, ArrayList<Object> excludeDetailIds) {
 
 		if (many.getCascadeInfo().isDelete()) {
@@ -1142,7 +1092,7 @@ public final class DefaultPersister implements Persister {
 
 			// check for partial objects
 			if (request.isLoadedProperty(prop)) {
-				Object detailBean = prop.getValue(request.getBean());
+				Object detailBean = prop.getValue(request.getEntityBean());
 				if (detailBean != null) {
 					if (isReference(detailBean)) {
 						// skip saving a reference
@@ -1206,9 +1156,12 @@ public final class DefaultPersister implements Persister {
 				// handled by DeleteUnloadedForeignKeys that was built
 				// via getDeleteUnloadedForeignKeys();
 			} else {
-				Object detailBean = prop.getValue(request.getBean());
-				if (detailBean != null && prop.hasId(detailBean)) {
-					deleteRecurse(detailBean, request.getTransaction());
+				Object detailBean = prop.getValue(request.getEntityBean());
+				if (detailBean != null) {
+				  EntityBean detail = (EntityBean)detailBean;
+				  if (prop.hasId(detail)) {
+				    deleteRecurse(detail, request.getTransaction());
+				  }
 				}
 			}
 		}
@@ -1230,7 +1183,7 @@ public final class DefaultPersister implements Persister {
 			return;
 		}
 
-		Object bean = request.getBean();
+		EntityBean bean = request.getEntityBean();
 		Object uid = idProp.getValue(bean);
 
 		if (DmlUtil.isNullOrZero(uid)) {

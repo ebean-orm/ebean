@@ -180,7 +180,9 @@ public class DLoadBeanContext implements LoadBeanContext, BeanLoader {
       }
     }
     
-    LoadBeanRequest req = new LoadBeanRequest(this, batch, null, batchSize, true, ebi.getLazyLoadProperty(), hitCache);
+    int lazyLoadIndex = ebi.getLazyLoadProperty();
+    String lazyLoadProp = ebi.getProperty(lazyLoadIndex);
+    LoadBeanRequest req = new LoadBeanRequest(this, batch, null, batchSize, true, lazyLoadProp, hitCache);
     parent.getEbeanServer().loadBean(req);
   
   }

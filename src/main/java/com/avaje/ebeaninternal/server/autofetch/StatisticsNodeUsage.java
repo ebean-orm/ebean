@@ -93,9 +93,9 @@ public class StatisticsNodeUsage implements Serializable {
             }
 
             if ((modified || queryTuningAddVersion) && desc != null) {
-                BeanProperty[] versionProps = desc.propertiesVersion();
-                if (versionProps.length > 0) {
-                    pathProps.addToPath(path, versionProps[0].getName());
+                BeanProperty versionProp = desc.getVersionProperty();
+                if (versionProp != null) {
+                    pathProps.addToPath(path, versionProp.getName());
                 }
             }
 		}

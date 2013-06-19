@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.expression;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
@@ -47,7 +48,7 @@ public class SimpleExpression extends AbstractExpression implements LuceneAwareE
     ElPropertyValue prop = getElProp(request);
     if (prop != null) {
       if (prop.isAssocId()) {
-        Object[] ids = prop.getAssocOneIdValues(value);
+        Object[] ids = prop.getAssocOneIdValues((EntityBean)value);
         if (ids != null) {
           for (int i = 0; i < ids.length; i++) {
             request.addBindValue(ids[i]);

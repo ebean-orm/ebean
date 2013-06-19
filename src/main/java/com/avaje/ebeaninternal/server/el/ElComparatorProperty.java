@@ -2,6 +2,8 @@ package com.avaje.ebeaninternal.server.el;
 
 import java.util.Comparator;
 
+import com.avaje.ebean.bean.EntityBean;
+
 /**
  * Comparator based on a ElGetValue.
  */
@@ -21,15 +23,15 @@ public final class ElComparatorProperty<T> implements Comparator<T>, ElComparato
 
 	public int compare(T o1, T o2) {
 		
-		Object val1 = elGetValue.elGetValue(o1);
-		Object val2 = elGetValue.elGetValue(o2);
+		Object val1 = elGetValue.elGetValue((EntityBean)o1);
+		Object val2 = elGetValue.elGetValue((EntityBean)o2);
 
 		return compareValues(val1, val2);
 	}
 
 	public int compareValue(Object value, T o2) {
 		
-		Object val2 = elGetValue.elGetValue(o2);
+		Object val2 = elGetValue.elGetValue((EntityBean)o2);
 
 		return compareValues(value, val2);
 	}	

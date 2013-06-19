@@ -284,7 +284,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 		}
 	}
 
-	protected void convertAndSetColumn(int columnPos, String strValue, Object bean) {
+	protected void convertAndSetColumn(int columnPos, String strValue, EntityBean bean) {
 
 		strValue = strValue.trim();
 
@@ -329,7 +329,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 		/**
 		 * Convert the string to the appropriate value and set it to the bean.
 		 */
-		public void convertAndSet(String strValue, Object bean) {
+		public void convertAndSet(String strValue, EntityBean bean) {
 
 			if (!ignore) {
 				Object value = parser.parse(strValue);

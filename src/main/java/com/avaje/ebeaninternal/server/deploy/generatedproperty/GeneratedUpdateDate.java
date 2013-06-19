@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 
 import java.util.Date;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
 /**
@@ -13,14 +14,14 @@ public class GeneratedUpdateDate implements GeneratedProperty {
     /**
      * Return now as a Timestamp.
      */
-    public Object getInsertValue(BeanProperty prop, Object bean) {
+    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
         return new Date(System.currentTimeMillis());
     }
 
     /**
      * Return now as a Timestamp.
      */
-    public Object getUpdateValue(BeanProperty prop, Object bean) {
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
         return new Date(System.currentTimeMillis());
     }
 
@@ -29,6 +30,11 @@ public class GeneratedUpdateDate implements GeneratedProperty {
      */
     public boolean includeInUpdate() {
         return true;
+    }
+    
+    @Override
+    public boolean includeInAllUpdates() {
+      return true;
     }
 
     /**

@@ -372,9 +372,6 @@ public class SqlTreeBuilder {
           // add the embedded bean (and effectively
           // all its properties)
           selectProps.add(p);
-          // also make sure it is added to included properties
-          // to avoid unnecessary lazy loading
-          selectProps.getIncludedProperties().add(baseName);
 
         } else {
           String m = "property [" + p.getFullBeanName()
@@ -412,12 +409,10 @@ public class SqlTreeBuilder {
     }
   }
 
-  private SqlTreeProperties getBaseSelectPartial(BeanDescriptor<?> desc,
-      OrmQueryProperties queryProps) {
+  private SqlTreeProperties getBaseSelectPartial(BeanDescriptor<?> desc, OrmQueryProperties queryProps) {
 
-    SqlTreeProperties selectProps = new SqlTreeProperties();
+    SqlTreeProperties selectProps = new SqlTreeProperties(desc);
     selectProps.setReadOnly(queryProps.isReadOnly());
-    selectProps.setIncludedProperties(queryProps.getAllIncludedProperties());
 
     // add properties in the order in which they appear
     // in the query. Gives predictable sql/properties for
@@ -444,7 +439,8 @@ public class SqlTreeBuilder {
       return getBaseSelectPartial(desc, queryProps);
     }
 
-    SqlTreeProperties selectProps = new SqlTreeProperties();
+    SqlTreeProperties selectProps = new SqlTreeProperties(desc);
+    selectProps.setAllProperties(true);
 
     // normal simple properties of the bean
     selectProps.add(desc.propertiesBaseScalar());

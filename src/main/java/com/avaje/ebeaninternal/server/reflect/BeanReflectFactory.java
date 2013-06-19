@@ -10,5 +10,5 @@ public interface BeanReflectFactory {
 	/**
 	 * Create the BeanReflect for the given plain bean and its EntityBean equivalent.
 	 */
-	public BeanReflect create(Class<?> vanillaType, Class<?> entityBeanType);
+	public BeanReflect create(Class<?> entityBeanType);
 }

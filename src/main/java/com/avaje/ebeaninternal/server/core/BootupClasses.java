@@ -325,10 +325,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
         } else if (isEntity(cls)) {
             entityList.add(cls);
-
-        } else if (isXmlBean(cls)){
-            entityList.add(cls);
-            //xmlBeanList.add(cls);
             
         } else if (isInterestingInterface(cls)) {
             return true;
@@ -420,17 +416,4 @@ public class BootupClasses implements ClassPathSearchMatcher {
         return false;
     }
     
-    private boolean isXmlBean(Class<?> cls) {
-
-        Annotation ann = cls.getAnnotation(XmlRootElement.class);
-        if (ann != null) {
-            return true;
-        }
-        ann = cls.getAnnotation(XmlType.class);
-        if (ann != null) {
-            // Only looking for Beans and not Enums
-            return !cls.isEnum();
-        }
-        return false;
-    }
 }

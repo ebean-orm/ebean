@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.deploy;
 import java.util.Map;
 
 import com.avaje.ebean.bean.BeanCollection;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -72,12 +73,12 @@ public interface DbReadContext {
 	/**
 	 * Set back the bean that has just been loaded with its id.
 	 */
-	public void setLoadedBean(Object loadedBean, Object id);
+	public void setLoadedBean(EntityBean loadedBean, Object id);
 
 	/**
 	 * Set back the 'detail' bean that has just been loaded.
 	 */
-	public void setLoadedManyBean(Object loadedBean);
+	public void setLoadedManyBean(EntityBean loadedBean);
 	
 	/**
 	 * Return the query mode.

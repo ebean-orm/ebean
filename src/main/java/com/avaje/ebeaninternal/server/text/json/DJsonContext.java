@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebean.text.json.JsonElement;
@@ -217,7 +218,7 @@ public class DJsonContext implements JsonContext {
         } else {
             BeanDescriptor<?> d = getDecriptor(o.getClass());
             WriteJsonContext ctx = new WriteJsonContext(buffer, pretty, dfltValueAdapter, options, requestCallback);
-            d.jsonWrite(ctx, o);
+            d.jsonWrite(ctx, (EntityBean)o);
             ctx.end();
         }
     }
@@ -238,11 +239,11 @@ public class DJsonContext implements JsonContext {
         BeanDescriptor<?> d = getDecriptor(o.getClass());
 
         ctx.appendArrayBegin();
-        d.jsonWrite(ctx, o);
+        d.jsonWrite(ctx, (EntityBean)o);
         while (it.hasNext()) {
             ctx.appendComma();
             T t = it.next();        
-            d.jsonWrite(ctx, t);
+            d.jsonWrite(ctx, (EntityBean)t);
         }
         ctx.appendArrayEnd();
         ctx.end();

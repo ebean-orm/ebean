@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
@@ -26,59 +27,25 @@ public class BindableEncryptedProperty implements Bindable {
         return prop.toString();
     }
 
-    public void addChanged(PersistRequestBean<?> request, List<Bindable> list) {
-        if (request.hasChanged(prop)) {
+    public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
+        if (request.isAddToUpdate(prop)) {
             list.add(this);
         }
     }
 
-    public void dmlInsert(GenerateDmlRequest request, boolean checkIncludes) {
+    public void dmlAppend(GenerateDmlRequest request) {
 
-        if (checkIncludes && !request.isIncluded(prop)) {
-            return;
-        }
-        // columnName
-        // AES_ENCRYPT(?,?)
+        // columnName = AES_ENCRYPT(?,?)
         request.appendColumn(prop.getDbColumn(), prop.getDbBind());
     }
 
-    public void dmlAppend(GenerateDmlRequest request, boolean checkIncludes) {
-
-        if (checkIncludes && !request.isIncluded(prop)) {
-            return;
-        }
-        // columnName = AES_ENCRYPT(?,?)
-        request.appendColumn(prop.getDbColumn(), "=", prop.getDbBind());
-    }
-
-    /**
-     * Used for dynamic where clause generation.
-     */
-    public void dmlWhere(GenerateDmlRequest request, boolean checkIncludes, Object bean) {
-        // only include encrypted property in where when it is included
-        // in the update as well (so not using isIncludedWhere)
-        if (checkIncludes && !request.isIncluded(prop)) {
-            return;
-        }
-
-        if (bean == null || request.isDbNull(prop.getValue(bean))) {
-            request.appendColumnIsNull(prop.getDbColumn());
-
-        } else {
-            // ? = AES_DECRYPT(columnName,?)
-            request.appendColumn("? = ", prop.getDecryptSql());
-        }
-    }
 
     /**
      * Bind a value in a Insert SET clause.
      */
-    public void dmlBind(BindableRequest request, boolean checkIncludes, Object bean)
+    public void dmlBind(BindableRequest request, EntityBean bean)
             throws SQLException {
         
-        if (checkIncludes && !request.isIncluded(prop)) {
-            return;
-        }
         Object value = null;
         if (bean != null) {
             value = prop.getValue(bean);
@@ -91,35 +58,12 @@ public class BindableEncryptedProperty implements Bindable {
             // H2 encrypt function ... different parameter order
             request.bindNoLog(encryptKeyValue, Types.VARCHAR, prop.getName() + "=****");                        
         }
-        request.bindNoLog(value, prop, prop.getName(), true);
+        request.bindNoLog(value, prop, prop.getName());
         
         if (bindEncryptDataFirst){
             // MySql, Postgres, Oracle
             request.bindNoLog(encryptKeyValue, Types.VARCHAR, prop.getName() + "=****");            
         }
-
     }
     
-
-    /**
-     * Bind a value in a Insert SET clause.
-     */
-    public void dmlBindWhere(BindableRequest request, boolean checkIncludes, Object bean)
-            throws SQLException {
-        
-        if (checkIncludes && !request.isIncluded(prop)) {
-            return;
-        }
-        Object value = null;
-        if (bean != null) {
-            value = prop.getValue(bean);
-        }
-
-        // get Encrypt key
-        String encryptKeyValue = prop.getEncryptKey().getStringValue();
-
-        request.bind(value, prop, prop.getName(), false);
-        request.bindNoLog(encryptKeyValue, Types.VARCHAR, prop.getName() + "=****");            
-
-    }
 }

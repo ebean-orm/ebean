@@ -6,10 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.naming.InvalidNameException;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
-
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.core.InternString;
@@ -74,16 +71,6 @@ public final class IdBinderSimple implements IdBinder {
         idProperty.buildSelectExpressionChain(prefix, selectChain);            
     }
     
-	public void createLdapNameById(LdapName name, Object id) throws InvalidNameException {
-        Rdn rdn = new Rdn(idProperty.getDbColumn(), id);
-        name.add(rdn);
-    }
-	
-    public void createLdapNameByBean(LdapName name, Object bean) throws InvalidNameException {
-        Object id = idProperty.getValue(bean);
-        createLdapNameById(name, id);
-    }
-
     /**
 	 * Returns 1.
 	 */
@@ -130,7 +117,7 @@ public final class IdBinderSimple implements IdBinder {
 	    }
 	}
 
-	public Object[] getIdValues(Object bean){
+	public Object[] getIdValues(EntityBean bean){
 		return new Object[]{idProperty.getValue(bean)};
 	}
 	
@@ -181,7 +168,7 @@ public final class IdBinderSimple implements IdBinder {
         idProperty.loadIgnore(ctx);
     }
 
-    public Object readSet(DbReadContext ctx, Object bean) throws SQLException {
+    public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
 		Object id = idProperty.read(ctx);
 		if (id != null){
 		    idProperty.setValue(bean, id);
@@ -220,7 +207,7 @@ public final class IdBinderSimple implements IdBinder {
         return sb.toString();
     }
 	
-	public Object convertSetId(Object idValue, Object bean) {
+	public Object convertSetId(Object idValue, EntityBean bean) {
 		
 		if (!idValue.getClass().equals(expectedType)){
 			idValue = scalarType.toBeanType(idValue);		

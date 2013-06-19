@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
 /**
@@ -14,14 +15,14 @@ public class GeneratedCounterInteger implements GeneratedProperty {
     /**
      * Always returns a 1.
      */
-    public Object getInsertValue(BeanProperty prop, Object bean) {
+    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
         return Integer.valueOf(1);
     }
 
     /**
      * Increments the current value by one.
      */
-    public Object getUpdateValue(BeanProperty prop, Object bean) {
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
         Integer i = (Integer) prop.getValue(bean);
         return Integer.valueOf(i.intValue() + 1);
     }
@@ -31,6 +32,11 @@ public class GeneratedCounterInteger implements GeneratedProperty {
      */
     public boolean includeInUpdate() {
         return true;
+    }
+    
+    @Override
+    public boolean includeInAllUpdates() {
+      return false;
     }
 
     /**

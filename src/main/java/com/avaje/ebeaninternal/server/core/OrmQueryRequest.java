@@ -365,8 +365,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
       cacheKey = Integer.valueOf(31 * query.queryHash() + query.getType().hashCode());
     }
 
-    // TODO: Sort out returning BeanCollection from L2 cache
-    return null;
+    return beanDescriptor.queryCacheGet(cacheKey);
   }
 
   public void putToQueryCache(BeanCollection<T> queryResult) {
