@@ -67,6 +67,10 @@ public class TestJsonSimple extends BaseTestCase {
     JsonElement jsonElement = InternalJsonParser.parse(s);
     Assert.assertNotNull(jsonElement);
 
+    JsonElement e3 = InternalJsonParser.parse("{\"name\":\"\\u60a8\\u597d\"}");
+
+    Assert.assertTrue(e3.evalString("name").length()==2);
+
   }
 
 }
