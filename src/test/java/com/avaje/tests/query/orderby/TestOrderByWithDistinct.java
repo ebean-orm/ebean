@@ -42,6 +42,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 		Ebean.save(user2);
 		
 		Query<MUser> query = Ebean.find(MUser.class)
+		    .fetch("userType","name")
 				.where()
 				.eq("roles.roleName", "A")
 				.orderBy("userType.name, userName");
@@ -69,6 +70,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 		query = Ebean.find(MUser.class)
 				.setAutofetch(false)
 				.select("userName")
+				.fetch("userType","name")
 				.where()
 				.eq("roles.roleName", "A")
 				.orderBy("userType.name");
