@@ -40,6 +40,8 @@ public final class TableJoin {
    */
   private final BeanCascadeInfo cascadeInfo;
 
+  private final InheritInfo inheritInfo;
+    
   /**
    * Properties as an array.
    */
@@ -59,6 +61,7 @@ public final class TableJoin {
     this.table = InternString.intern(deploy.getTable());
     this.type = InternString.intern(deploy.getType());
     this.cascadeInfo = deploy.getCascadeInfo();
+    this.inheritInfo = deploy.getInheritInfo();
 
     DeployTableJoinColumn[] deployCols = deploy.columns();
     this.columns = new TableJoinColumn[deployCols.length];
@@ -167,8 +170,10 @@ public final class TableJoin {
 
   public boolean addJoin(boolean forceOuterJoin, String a1, String a2, DbSqlContext ctx) {
 
-    ctx.addJoin(forceOuterJoin ? LEFT_OUTER : type, table, columns(), a1, a2);
+   	String inheritance = inheritInfo != null ? inheritInfo.getWhere() : null;
 
+    ctx.addJoin(forceOuterJoin?LEFT_OUTER:type, table, columns(), a1, a2, inheritance);
+        
     return forceOuterJoin || LEFT_OUTER.equals(type);
   }
 
@@ -176,6 +181,7 @@ public final class TableJoin {
    * Explicitly add a (non-outer) join.
    */
   public void addInnerJoin(String a1, String a2, DbSqlContext ctx) {
-    ctx.addJoin(JOIN, table, columns(), a1, a2);
+   	String inheritance = inheritInfo != null ? inheritInfo.getWhere() : null;
+    ctx.addJoin(JOIN, table, columns(), a1, a2, inheritance);
   }
 }

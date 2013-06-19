@@ -7,6 +7,7 @@ import javax.persistence.JoinColumn;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.deploy.BeanCascadeInfo;
 import com.avaje.ebeaninternal.server.deploy.BeanTable;
+import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
 
 /**
@@ -48,6 +49,7 @@ public class DeployTableJoin {
      */
     private BeanCascadeInfo cascadeInfo = new BeanCascadeInfo();
     
+    private InheritInfo inheritInfo;
 
     /**
      * Create a DeployTableJoin.
@@ -205,4 +207,12 @@ public class DeployTableJoin {
     	
     	return destJoin;
     }
+
+	public InheritInfo getInheritInfo() {
+		return inheritInfo;
+	}
+
+	public void setInheritInfo(InheritInfo inheritInfo) {
+		this.inheritInfo = inheritInfo;
+	}
 }

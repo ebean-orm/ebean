@@ -610,6 +610,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       secondaryPropsJoins(info);
     }
 
+    // Set inheritance info
+    for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
+        setInheritanceInfo(info);
+    }
+    
     for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
       DeployBeanDescriptor<?> deployBeanDescriptor = info.getDescriptor();
       Integer key = getUniqueHash(deployBeanDescriptor);
@@ -617,6 +622,33 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
+  /**
+   * Sets the inheritance info. ~EMG fix for join problem
+   *
+   * @param info the new inheritance info
+   */
+  private void setInheritanceInfo(DeployBeanInfo<?> info) {
+		for (DeployBeanPropertyAssocOne<?> oneProp : info.getDescriptor().propertiesAssocOne()) {
+			if (!oneProp.isTransient()) {
+				DeployBeanInfo<?> assoc = deplyInfoMap.get(oneProp.getTargetType());
+				
+				if (assoc != null){
+					oneProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
+				}
+			}
+		}
+		
+		for (DeployBeanPropertyAssocMany<?> manyProp : info.getDescriptor().propertiesAssocMany()) {
+			if (!manyProp.isTransient()) {
+				DeployBeanInfo<?> assoc = deplyInfoMap.get(manyProp.getTargetType());
+				
+				if (assoc != null){
+					manyProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
+				}
+			}
+		}
+  }
+  
   private Integer getUniqueHash(DeployBeanDescriptor<?> deployBeanDescriptor) {
 
     int hashCode = deployBeanDescriptor.getFullName().hashCode();

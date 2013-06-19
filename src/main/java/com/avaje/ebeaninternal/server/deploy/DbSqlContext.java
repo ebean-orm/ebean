@@ -8,7 +8,7 @@ public interface DbSqlContext {
   /**
    * Add a join to the sql query.
    */
-  public void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2);
+  public void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2, String inheritance);
 
   public void pushSecondaryTableAlias(String alias);
 

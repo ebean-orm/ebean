@@ -423,7 +423,8 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
   public void appendWhere(DbSqlContext ctx) {
 
-    if (inheritInfo != null) {
+	// Only apply inheritance to root node as any join will alreay have the inheritance join include - see TableJoin
+	if (inheritInfo != null && nodeBeanProp == null) {
       if (inheritInfo.isRoot()) {
         // at root of hierarchy so don't bother
         // adding a where clause because we want

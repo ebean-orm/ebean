@@ -93,7 +93,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
     joinStack.push(node);
   }
 
-  public void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2) {
+  public void addJoin(String type, String table, TableJoinColumn[] cols, String a1, String a2, String inheritance) {
 
     if (tableJoins == null) {
       tableJoins = new HashSet<String>();
@@ -123,6 +123,15 @@ public class DefaultDbSqlContext implements DbSqlContext {
       sb.append(" = ");
       sb.append(a1);
       sb.append(".").append(pair.getLocalDbColumn());
+    }
+
+
+    // add on any inheritance where clause
+    if (inheritance != null && inheritance.length() > 0){
+    	sb.append(" and ");
+    	sb.append(a2);
+    	sb.append(".");
+    	sb.append(inheritance);
     }
 
     sb.append(" ");
