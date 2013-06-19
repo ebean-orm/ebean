@@ -151,6 +151,15 @@ public class ReadBasicJsonContext implements ReadJsonInterface {
                 case '"':
                 	sb.append('"');
                 	break;
+                case 'u':
+                	String msg = "EOF reading unicode value";
+                	char c1 = src.nextChar(msg);
+                	char c2 = src.nextChar(msg);
+                	char c3 = src.nextChar(msg);
+                	char c4 = src.nextChar(msg);
+                	char u = (char) Integer.parseInt(""+c1+c2+c3+c4, 16);
+                	sb.append(u);
+                	break;
 
                 default:
                     sb.append('\\');
