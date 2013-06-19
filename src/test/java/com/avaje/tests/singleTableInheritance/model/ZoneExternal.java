@@ -18,4 +18,9 @@ public class ZoneExternal extends Zone
 	{
 		this.attribute = attribute;
 	}
+	
+	@Override
+	public String toString() {
+		return "ZoneExternal " + getId() + " \"" + getAttribute() + "\"";
+	}
 }
