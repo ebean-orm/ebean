@@ -52,6 +52,9 @@ public class DeleteHandler extends DmlHandler {
 	public void execute() throws SQLException, OptimisticLockException {
 		int rowCount = dataBind.executeUpdate();
 		checkRowCount(rowCount);
+		
+		// Deletes the bean from the PersistenceContext
+		persistRequest.postDelete();
 	}
 	
     @Override

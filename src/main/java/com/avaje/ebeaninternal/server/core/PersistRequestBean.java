@@ -176,23 +176,26 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 		return beanPersistListener != null;
 	}
 
-	public void notifyCache() {
-		if (notifyCache) {
-			switch (type) {
-            case INSERT:
-				beanDescriptor.cacheInsert(idValue, this);
-				break;
-            case UPDATE:
-				beanDescriptor.cacheUpdate(idValue, this);
-	            break;
-            case DELETE:
-				beanDescriptor.cacheDelete(idValue, this);
-	            break;
-            default:
-	            throw new IllegalStateException("Invalid type "+type);
-            }
-		}
-	}
+	/**
+	 * Notify/Update the local L2 cache after the transaction has successfully committed.
+	 */
+  public void notifyCache() {
+    if (notifyCache) {
+      switch (type) {
+      case INSERT:
+        beanDescriptor.cacheInsert(idValue, this);
+        break;
+      case UPDATE:
+        beanDescriptor.cacheUpdate(idValue, this);
+        break;
+      case DELETE:
+        // Bean deleted from cache early via postDelete()
+        break;
+      default:
+        throw new IllegalStateException("Invalid type " + type);
+      }
+    }
+  }
 
 	public void addToPersistMap(BeanPersistIdMap beanPersistMap) {
 
@@ -510,6 +513,14 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 		}
 	}
 
+	public void postDelete() {
+	  
+	  // Delete the bean from the PersistenceContent
+	  transaction.getPersistenceContext().clear(beanDescriptor.getBeanType(), idValue);
+	  // Delete from cache early even if transaction fails
+	  beanDescriptor.cacheDelete(idValue, this);
+	}
+	
 	/**
 	 * Post processing.
 	 */
