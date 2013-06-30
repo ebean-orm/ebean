@@ -48,6 +48,33 @@ public class TestInheritanceJoins extends BaseTestCase {
 	}
 	
 	@Test
+	public void testAssocOneWithNullAssoc() {
+		
+		/* Ensures the fetch join to a property with inheritance work as a left join */
+
+	  EbeanServer server = Ebean.getServer(null);
+	  
+		final ProductConfiguration pc = new ProductConfiguration();
+		pc.setName("PC1");
+		server.save(pc);
+
+		CalculationResult r = new CalculationResult();
+		final Double charge = 100.0;
+		r.setCharge(charge);
+		r.setProductConfiguration(pc);
+		r.setGroupConfiguration(null);
+		server.save(r);
+
+
+		Query<CalculationResult> q = server.createNamedQuery(CalculationResult.class, "loadResult");
+		q.setParameter("charge", charge);
+		
+		List<CalculationResult> results = q.findList();
+		
+		Assert.assertTrue(!results.isEmpty());
+	}
+
+	@Test
 	public void testAssocMany() {
 		Configurations configurations = new Configurations();
 		
@@ -69,4 +96,18 @@ public class TestInheritanceJoins extends BaseTestCase {
 		
 		Assert.assertTrue(!groups.isEmpty());
 	}
+
+	@Test
+	public void testAssocManyWithNoneRelated() {
+		Configurations configurations = new Configurations();
+		
+		EbeanServer server = Ebean.getServer(null);
+		
+		server.save(configurations);
+		
+		Configurations configurationsQueried = server.find(Configurations.class).fetch("groupConfigurations").where().idEq(configurations.getId()).findUnique();
+		
+		Assert.assertNotNull(configurationsQueried);
+	}
+	
 }
