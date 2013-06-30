@@ -53,6 +53,7 @@ public class Customer extends BasicDomain {
     @Size(max=100)
     String smallnote;
 
+    @NotNull(groups={ValidationGroupSomething.class})
     Date anniversary;
     
     @ManyToOne(cascade=CascadeType.ALL)
