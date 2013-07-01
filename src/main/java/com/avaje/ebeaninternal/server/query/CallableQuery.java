@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.query;
 
-import com.avaje.ebean.Query;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.api.SpiQuery;
 
 /**
  * Base object for making query execution into Callable's.
@@ -13,16 +13,24 @@ import com.avaje.ebeaninternal.api.SpiEbeanServer;
  */
 public abstract class CallableQuery<T> {
 
-	protected final Query<T> query;
+	protected final SpiQuery<T> query;
 	
 	protected final SpiEbeanServer server;
 	
-	protected final Transaction t;
+	protected final Transaction transaction;
 	
-	public CallableQuery(SpiEbeanServer server, Query<T> query, Transaction t) {
+	public CallableQuery(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
 		this.server = server;
 		this.query = query;
-		this.t = t;
+		this.transaction = t;
 	}
+
+  public SpiQuery<T> getQuery() {
+    return query;
+  }
+
+  public Transaction getTransaction() {
+    return transaction;
+  }
 	
 }

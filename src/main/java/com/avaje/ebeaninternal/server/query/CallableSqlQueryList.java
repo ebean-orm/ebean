@@ -17,19 +17,23 @@ public class CallableSqlQueryList implements Callable<List<SqlRow>> {
 	
 	private final EbeanServer server;
 	
-	private final Transaction t;
+	private final Transaction transaction;
 	
 	public CallableSqlQueryList(EbeanServer server, SqlQuery query, Transaction t) {
 		this.server = server;
 		this.query = query;
-		this.t = t;
+		this.transaction = t;
 	}
 
 	/**
 	 * Execute the query returning the resulting list.
 	 */
 	public List<SqlRow> call() throws Exception {
-		return server.findList(query, t);
+	  try {
+		return server.findList(query, transaction);
+	  } finally {
+	    transaction.end();
+	  }
 	}
 
 	

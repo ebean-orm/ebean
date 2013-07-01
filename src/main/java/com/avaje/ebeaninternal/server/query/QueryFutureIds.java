@@ -5,30 +5,38 @@ import java.util.concurrent.FutureTask;
 
 import com.avaje.ebean.FutureIds;
 import com.avaje.ebean.Query;
-import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebean.Transaction;
 
 /**
  * Default implementation of FutureIds.
  */
 public class QueryFutureIds<T> extends BaseFuture<List<Object>> implements FutureIds<T> {
 
-	private final SpiQuery<T> query;
+	private final CallableQueryIds<T> call;
 	
-	public QueryFutureIds(SpiQuery<T> query, FutureTask<List<Object>> futureTask) {
-		super(futureTask);
-		this.query = query;
+	public QueryFutureIds(CallableQueryIds<T> call ) {
+		super(new FutureTask<List<Object>>(call));
+		this.call = call;
+	}
+	
+	public FutureTask<List<Object>> getFutureTask() {
+	  return futureTask;
+	}
+	
+	public Transaction getTransaction() {
+	  return call.transaction;
 	}
 	
 	public Query<T> getQuery() {
-		return query;
+		return call.query;
 	}
 	
 	public List<Object> getPartialIds() {
-		return query.getIdList();
+		return call.query.getIdList();
 	}
 
 	public boolean cancel(boolean mayInterruptIfRunning) {
-		query.cancel();
+	  call.query.cancel();
 		return super.cancel(mayInterruptIfRunning);
 	}
 

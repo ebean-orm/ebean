@@ -15,7 +15,7 @@ import java.util.concurrent.TimeoutException;
  */
 public abstract class BaseFuture<T> implements Future<T> {
 	
-	private final FutureTask<T> futureTask;
+	protected final FutureTask<T> futureTask;
 	
 	public BaseFuture(FutureTask<T> futureTask) {
 		this.futureTask = futureTask;
@@ -43,5 +43,4 @@ public abstract class BaseFuture<T> implements Future<T> {
 		return futureTask.isDone();
 	}
 
-	
 }

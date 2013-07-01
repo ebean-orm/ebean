@@ -5,26 +5,34 @@ import java.util.concurrent.FutureTask;
 
 import com.avaje.ebean.FutureList;
 import com.avaje.ebean.Query;
+import com.avaje.ebean.Transaction;
 
 /**
  * Default implementation for FutureList.
  */
 public class QueryFutureList<T> extends BaseFuture<List<T>> implements FutureList<T> {
 
-	private final Query<T> query;
+	private final CallableQueryList<T> call;
 	
+	public QueryFutureList(CallableQueryList<T> call) {
+		super(new FutureTask<List<T>>(call));
+		this.call = call;
+	}
 	
-	public QueryFutureList(Query<T> query, FutureTask<List<T>> futureTask) {
-		super(futureTask);
-		this.query = query;
+	public FutureTask<List<T>> getFutureTask() {
+	  return futureTask;
+	}
+	
+	public Transaction getTransaction() {
+	  return call.transaction;
 	}
 	
 	public Query<T> getQuery() {
-		return query;
+		return call.query;
 	}
 
 	public boolean cancel(boolean mayInterruptIfRunning) {
-		query.cancel();
+	  call.query.cancel();
 		return super.cancel(mayInterruptIfRunning);
 	}
 

@@ -1340,10 +1340,9 @@ public final class DefaultServer implements SpiEbeanServer {
     Transaction newTxn = createTransaction();
 
     CallableQueryRowCount<T> call = new CallableQueryRowCount<T>(this, copy, newTxn);
-    FutureTask<Integer> futureTask = new FutureTask<Integer>(call);
 
-    QueryFutureRowCount<T> queryFuture = new QueryFutureRowCount<T>(copy, futureTask);
-    backgroundExecutor.execute(futureTask);
+    QueryFutureRowCount<T> queryFuture = new QueryFutureRowCount<T>(call);
+    backgroundExecutor.execute(queryFuture.getFutureTask());
 
     return queryFuture;
   }
@@ -1362,11 +1361,9 @@ public final class DefaultServer implements SpiEbeanServer {
     Transaction newTxn = createTransaction();
 
     CallableQueryIds<T> call = new CallableQueryIds<T>(this, copy, newTxn);
-    FutureTask<List<Object>> futureTask = new FutureTask<List<Object>>(call);
+    QueryFutureIds<T> queryFuture = new QueryFutureIds<T>(call);
 
-    QueryFutureIds<T> queryFuture = new QueryFutureIds<T>(copy, futureTask);
-
-    backgroundExecutor.execute(futureTask);
+    backgroundExecutor.execute(queryFuture.getFutureTask());
 
     return queryFuture;
   }
@@ -1376,6 +1373,7 @@ public final class DefaultServer implements SpiEbeanServer {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setFutureFetch(true);
 
+    // transfer the persistence content from the transaction
     if (spiQuery.getPersistenceContext() == null) {
       if (t != null) {
         spiQuery.setPersistenceContext(((SpiTransaction) t).getPersistenceContext());
@@ -1387,14 +1385,13 @@ public final class DefaultServer implements SpiEbeanServer {
       }
     }
 
+    // Create a new transaction solely to execute the findList() at some future time
     Transaction newTxn = createTransaction();
-    CallableQueryList<T> call = new CallableQueryList<T>(this, query, newTxn);
+    CallableQueryList<T> call = new CallableQueryList<T>(this, spiQuery, newTxn);
+    QueryFutureList<T> queryFuture = new QueryFutureList<T>(call);
+    backgroundExecutor.execute(queryFuture.getFutureTask());
 
-    FutureTask<List<T>> futureTask = new FutureTask<List<T>>(call);
-
-    backgroundExecutor.execute(futureTask);
-
-    return new QueryFutureList<T>(query, futureTask);
+    return queryFuture;
   }
 
   public <T> PagingList<T> findPagingList(Query<T> query, Transaction t, int pageSize) {
