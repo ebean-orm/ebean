@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.server.text.json;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,6 +12,8 @@ import com.avaje.ebean.text.json.JsonValueAdapter;
 import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
 import com.avaje.ebean.text.json.JsonWriteOptions;
 import com.avaje.ebean.text.json.JsonWriter;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.type.EscapeJson;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.util.ArrayStack;
@@ -17,6 +21,8 @@ import com.avaje.ebeaninternal.server.util.ArrayStack;
 
 public class WriteJsonContext implements JsonWriter {
 
+    private final SpiEbeanServer server;
+  
     private final WriteJsonBuffer buffer;
 
     private final boolean pretty;
@@ -40,8 +46,9 @@ public class WriteJsonContext implements JsonWriter {
     boolean assocOne;
 
     public WriteJsonContext(WriteJsonBuffer buffer, boolean pretty, JsonValueAdapter dfltValueAdapter, 
-            JsonWriteOptions options, String requestCallback){
+            JsonWriteOptions options, String requestCallback, SpiEbeanServer server){
         
+      this.server = server;
         this.buffer = buffer;
         this.pretty = pretty;
         this.pathStack = new PathStack();
@@ -61,6 +68,38 @@ public class WriteJsonContext implements JsonWriter {
             buffer.append(requestCallback).append("(");
         }
     }
+ 
+    public void toJson(String name, Collection<?> c) {
+        
+      internalAppendKeyBegin(name);
+      
+      Iterator<?> it = c.iterator();
+      if (!it.hasNext()){
+        buffer.append("[]");
+        return;
+      }
+          
+      Object o = it.next();
+      BeanDescriptor<?> d = getDecriptor(o.getClass());
+  
+      appendArrayBegin();
+      d.jsonWrite(this, o);
+      while (it.hasNext()) {
+          appendComma();
+          Object t = it.next();        
+          d.jsonWrite(this, t);
+      }
+      appendArrayEnd();
+    }
+    
+    private <T> BeanDescriptor<T> getDecriptor(Class<T> cls) {
+      BeanDescriptor<T> d = server.getBeanDescriptor(cls);
+      if (d == null){
+          String msg = "No BeanDescriptor found for "+cls;
+          throw new RuntimeException(msg);
+      }
+      return d;
+  }
     
     public void appendRawValue(String key, String rawJsonValue) {
     	appendKeyWithComma(key, true);

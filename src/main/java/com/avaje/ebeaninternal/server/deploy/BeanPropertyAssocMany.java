@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -752,7 +753,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
         Object value = getValueIntercept(bean);
         if (value != null){
             ctx.pushParentBeanMany(bean);
-            help.jsonWrite(ctx, name, value, include != null);
+            if (help != null){
+              help.jsonWrite(ctx, name, value, include != null);              
+            } else {
+              ctx.toJson(name, (Collection<?>)value);
+            }
             ctx.popParentBeanMany();
         }
     }

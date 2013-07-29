@@ -71,6 +71,7 @@ import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.util.SortByClause;
 import com.avaje.ebeaninternal.util.SortByClause.Property;
 import com.avaje.ebeaninternal.util.SortByClauseParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1318,10 +1319,8 @@ public class BeanDescriptor<T> {
   public EntityBean createEntityBean() {
     try {
       // Note factoryType is used indirectly via beanReflect
-      EntityBean eb = (EntityBean) beanReflect.createEntityBean();
-
-      return eb;
-
+      return (EntityBean) beanReflect.createEntityBean();
+      
     } catch (Exception ex) {
       throw new PersistenceException(ex);
     }
@@ -2308,6 +2307,9 @@ public class BeanDescriptor<T> {
         for (int j = 0; j < propertiesNonTransient.length; j++) {
           propertiesNonTransient[j].jsonWrite(ctx, bean);
         }
+        for (int j = 0; j < propertiesTransient.length; j++) {
+          propertiesTransient[j].jsonWrite(ctx, bean);
+        }
       }
     }
 
@@ -2372,9 +2374,20 @@ public class BeanDescriptor<T> {
   }
 
   @SuppressWarnings("unchecked")
+  private T createJsonBean() {
+    if (EntityType.XMLELEMENT.equals(entityType)) {
+      try {
+        return beanType.newInstance();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      } 
+    }
+    return (T)createEntityBean();
+  }
+  
   private ReadBeanState jsonReadObject(ReadJsonContext ctx, String path) {
 
-    T bean = (T) createEntityBean();
+    T bean = createJsonBean();
     ctx.pushBean(bean, path, this);
 
     do {
