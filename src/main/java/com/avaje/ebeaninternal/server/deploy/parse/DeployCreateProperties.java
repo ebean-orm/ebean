@@ -376,7 +376,8 @@ public class DeployCreateProperties {
 			    if (typeArgs[0] instanceof Class<?>){
 			        return (Class<?>) typeArgs[0];
 			    }
-			    throw new RuntimeException("Unexpected Parameterised Type? "+typeArgs[0]);
+			    //throw new RuntimeException("Unexpected Parameterised Type? "+typeArgs[0]);
+			    return null;
 			}
 			if (typeArgs.length == 2) {
 				// this is probably a Map

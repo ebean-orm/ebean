@@ -71,25 +71,24 @@ public class WriteJsonContext implements JsonWriter {
  
     public void toJson(String name, Collection<?> c) {
         
-      internalAppendKeyBegin(name);
+      beginAssocMany(name);
       
       Iterator<?> it = c.iterator();
       if (!it.hasNext()){
-        buffer.append("[]");
+        endAssocMany();
         return;
       }
           
       Object o = it.next();
       BeanDescriptor<?> d = getDecriptor(o.getClass());
   
-      appendArrayBegin();
       d.jsonWrite(this, o);
       while (it.hasNext()) {
           appendComma();
           Object t = it.next();        
           d.jsonWrite(this, t);
       }
-      appendArrayEnd();
+      endAssocMany();
     }
     
     private <T> BeanDescriptor<T> getDecriptor(Class<T> cls) {
