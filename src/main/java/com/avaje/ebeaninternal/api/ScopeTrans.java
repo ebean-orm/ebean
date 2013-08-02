@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.api;
 
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 
 import com.avaje.ebean.TxScope;
@@ -45,9 +44,6 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
 	 */
 	private final ArrayList<Class<? extends Throwable>> rollbackFor;
 
-
-	private final UncaughtExceptionHandler originalUncaughtHandler;
-
 	/**
 	 * Flag set when a rollback has occurred.
 	 */
@@ -65,11 +61,6 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
 		
 		this.noRollbackFor = txScope.getNoRollbackFor();
 		this.rollbackFor = txScope.getRollbackFor();
-		
-		Thread t = Thread.currentThread();
-		originalUncaughtHandler = t.getUncaughtExceptionHandler();
-		
-		t.setUncaughtExceptionHandler(this);
 	}
 	
 	/**
@@ -81,13 +72,8 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
 		// rollback transaction if required
 		caughtThrowable(e);
 		
-		// reinstate suspended transaction and
-		// original uncaughtExceptionHandler if required
+		// reinstate suspended transaction
 		onFinally();
-		
-		if (originalUncaughtHandler != null){
-			originalUncaughtHandler.uncaughtException(thread, e);
-		}
 	}
 	
 	/**
@@ -110,11 +96,7 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
 	 * Also reinstate the suspended transaction if there was one.
 	 */
 	public void onFinally() {
-		try {
-			if (originalUncaughtHandler != null){
-				Thread.currentThread().setUncaughtExceptionHandler(originalUncaughtHandler);
-			}
-			
+		try {		
 			if (!rolledBack && created) {
 				transaction.commit();
 			}
