@@ -1,8 +1,13 @@
 package com.avaje.tests.model.basic;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import com.avaje.ebean.annotation.CacheStrategy;
 
@@ -24,6 +29,9 @@ public class Section extends BasicDomain {
     
     @Lob
     String content;
+    
+    @OneToMany(cascade=CascadeType.ALL)
+    List<SubSection> subSections;
 
     public Section() {
     }
@@ -54,6 +62,21 @@ public class Section extends BasicDomain {
 
     public void setArticle(Article article) {
         this.article = article;
+    }
+
+    public List<SubSection> getSubSections() {
+        return subSections;
+    }
+
+    public void setSubSections(List<SubSection> subSections) {
+        this.subSections = subSections;
+    }
+    
+    public void addSubSection(SubSection s){
+        if (subSections == null){
+            subSections = new ArrayList<SubSection>();
+        }
+        subSections.add(s);
     }
     
 }
