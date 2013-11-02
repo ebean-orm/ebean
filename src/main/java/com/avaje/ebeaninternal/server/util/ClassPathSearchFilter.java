@@ -181,7 +181,7 @@ public class ClassPathSearchFilter {
 		Iterator<String> incIt = set.iterator();
 		while (incIt.hasNext()) {
 			String val = incIt.next();
-			if (match.startsWith(val)) {
+			if (match.contains(val)) {
 				return true;
 			}
 		}
