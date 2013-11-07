@@ -31,13 +31,12 @@ public class LimitOffsetSqlLimiter implements SqlLimiter {
       maxRows = maxRows + 1;
     }
 
-    sb.append(" ").append(NEW_LINE).append(LIMIT).append(" ");
-    if (maxRows > 0) {
-      sb.append(maxRows);
-    }
-    if (firstRow > 0) {
-      sb.append(" ").append(OFFSET).append(" ");
-      sb.append(firstRow);
+    if (maxRows > 0 || firstRow > 0) {
+      sb.append(" ").append(NEW_LINE).append(LIMIT).append(" ").append(maxRows);
+      if (firstRow > 0) {
+        sb.append(" ").append(OFFSET).append(" ");
+        sb.append(firstRow);
+      }
     }
 
     String sql = request.getDbPlatform().completeSql(sb.toString(), request.getOrmQuery());
