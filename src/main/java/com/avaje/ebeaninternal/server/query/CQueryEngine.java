@@ -122,7 +122,7 @@ public class CQueryEngine {
 
     try {
 
-      if (!cquery.prepareBindExecuteQuery()) {
+      if (!cquery.prepareBindExecuteQueryForwardOnly()) {
         // query has been cancelled already
         logger.trace("Future fetch already cancelled");
         return null;
