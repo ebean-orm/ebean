@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.instrument.ClassDefinition;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -43,6 +44,11 @@ public class ClassPathSearch {
 	ClassPathSearchMatcher matcher;
 
 	ArrayList<Class<?>> matchList = new ArrayList<Class<?>>();
+
+  /**
+   * For class-reloading, forcing them through the transformer
+   */
+  ArrayList<ClassDefinition> matchDefinitions = new ArrayList<ClassDefinition>();
 
 	HashSet<String> jarHits = new HashSet<String>();
 
@@ -139,8 +145,20 @@ public class ClassPathSearch {
 
 			// for each class path ...
 			File classPath;
+			String jarOffset = null; // used for war files with bang paths, e.g. !/WEB-INF/classes
 			if (URL.class.isInstance(classPaths[h])){
-				classPath = new File(((URL)classPaths[h]).getFile());
+				URL fileUrl = (URL)classPaths[h];
+				if (fileUrl.getPath().contains("!")) {
+					String[] parts = fileUrl.getPath().split("!");
+					if (parts[0].startsWith("file:")) {  // jar:file:..../file.war!/WEB-INF/classes typically
+						classPath = new File(parts[0].substring("file:".length()));
+					} else {
+						classPath = new File(parts[0]);
+					}
+					jarOffset = parts[1];
+				} else {
+					classPath = new File(fileUrl.getFile());
+				}
 			} else {
 				classPath = new File(classPaths[h].toString());
 			}
@@ -157,9 +175,11 @@ public class ClassPathSearch {
 			if (classPath.isDirectory()) {
 				files = getDirectoryEnumeration(classPath);
 
-			} else if (classPath.getName().endsWith(".jar")) {
+			} else if (classPath.getName().endsWith(".jar") || classPath.getName().endsWith(".war")) {
 				jarFileName = classPath.getName();
-				if (!filter.isSearchJar(jarFileName)) {
+
+				// search name needs to include the offset if it is there, in case it contains interesting info
+				if (!filter.isSearchJar(jarFileName + ((jarOffset == null) ? "" : ("!" + jarOffset)))) {
 					// skip any jars not list in the filter
 					continue;
 				}
@@ -183,7 +203,7 @@ public class ClassPathSearch {
 				logger.error(msg);
 			}
 
-			searchFiles(files, jarFileName);
+			searchFiles(files, jarFileName, jarOffset);
 
 			if (module != null) {
 				try {
@@ -232,14 +252,41 @@ public class ClassPathSearch {
 		return Collections.enumeration(fileNameList);
 	}
 
-	private void searchFiles(Enumeration<?> files, String jarFileName) {
+	/**
+	 * Searches through the Java Archive (jar or war file) looking for classes that match our requirements.
+	 *
+	 * @param files - all of the files in the Java Archive, this is an enumeration provided by the Jar file
+	 * @param jarFileName - the name of the java archive
+	 * @param jarOffset - an offset inside the archive to chop off the name of the class - this is used when
+	 *                  we have bang path offsets (e.g. file:///myfile.war!/WEB-INF/classes)
+	 */
+	private void searchFiles(Enumeration<?> files, String jarFileName, String jarOffset) {
+		/*
+		* Strips the first character off as all entries in a jar file have no / prefix. We want to come out with a name
+		* like WEB-INF/classes/ to ensure we filter the contents of the war/jar file by this.
+		 */
+		if (jarOffset != null) {
+			if (jarOffset.startsWith("/")) {
+				jarOffset = jarOffset.substring(1);
+			}
+
+			if (!jarOffset.endsWith("/")) {
+				jarOffset += "/";
+			}
+		}
 
 		while (files != null && files.hasMoreElements()) {
 
 			String fileName = files.nextElement().toString();
 
 			// we only want the class files
-			if (fileName.endsWith(".class")) {
+			if (fileName.endsWith(".class") && (jarOffset == null || fileName.startsWith(jarOffset))) {
+
+				if (jarOffset != null) {
+					// we got through here only if there is an offset and we matched it, so strip it off the file
+					// as we are trying to find the classname
+					fileName = fileName.substring(jarOffset.length());
+				}
 
 				String className = fileName.replace('/', '.').substring(0, fileName.length() - 6);
 				int lastPeriod = className.lastIndexOf(".");
@@ -261,6 +308,7 @@ public class ClassPathSearch {
 					theClass = Class.forName(className, false, classLoader);
 
 					if (matcher.isMatch(theClass)) {
+
 						matchList.add(theClass);
 						registerHit(jarFileName, theClass);
 					}
