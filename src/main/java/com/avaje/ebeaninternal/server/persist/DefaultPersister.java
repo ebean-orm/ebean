@@ -508,7 +508,9 @@ public final class DefaultPersister implements Persister {
 				} else {
 					// we need to fetch the Id's to delete (recurse or notify L2 cache/lucene)
 					List<Object> childIds = manys[i].findIdsByParentId(id, idList, t, null);
-					delete(targetDesc, null, childIds, t);
+					if (!childIds.isEmpty()) {
+						delete(targetDesc, null, childIds, t);
+					}
 				}
 			}
 		}
