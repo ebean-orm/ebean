@@ -25,6 +25,8 @@ public class CQueryEngine {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryEngine.class);
 
+  private final DatabasePlatform dbPlatform;
+  
   private final CQueryBuilder queryBuilder;
 
   private final BackgroundExecutor backgroundExecutor;
@@ -33,6 +35,7 @@ public class CQueryEngine {
 
   public CQueryEngine(DatabasePlatform dbPlatform, Binder binder, BackgroundExecutor backgroundExecutor) {
 
+    this.dbPlatform = dbPlatform;
     this.backgroundExecutor = backgroundExecutor;
     this.queryBuilder = new CQueryBuilder(backgroundExecutor, dbPlatform, binder);
   }
@@ -122,7 +125,7 @@ public class CQueryEngine {
 
     try {
 
-      if (!cquery.prepareBindExecuteQueryForwardOnly()) {
+      if (!cquery.prepareBindExecuteQueryForwardOnly(dbPlatform.isForwardOnlyHintOnFindIterate())) {
         // query has been cancelled already
         logger.trace("Future fetch already cancelled");
         return null;

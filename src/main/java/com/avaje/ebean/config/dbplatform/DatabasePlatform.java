@@ -64,6 +64,12 @@ public class DatabasePlatform {
   protected boolean selectCountWithAlias;
 
   /**
+   * If set then use the FORWARD ONLY hint when creating ResultSets for
+   * findIterate() and findVisit().
+   */
+  protected boolean forwardOnlyHintOnFindIterate;
+  
+  /**
    * Instantiates a new database platform.
    */
   public DatabasePlatform() {
@@ -197,6 +203,24 @@ public class DatabasePlatform {
    */
   public boolean isIdInExpandedForm() {
     return idInExpandedForm;
+  }
+
+  /**
+   * Return true if the ResultSet TYPE_FORWARD_ONLY Hint should be used on
+   * findIterate() and findVisit() PreparedStatements.
+   * <p>
+   * This specifically is required for MySql when processing large results.
+   * </p>
+   */
+  public boolean isForwardOnlyHintOnFindIterate() {
+    return forwardOnlyHintOnFindIterate;
+  }
+
+  /**
+   * Set to true if the ResultSet TYPE_FORWARD_ONLY Hint should be used by default on findIterate PreparedStatements.
+   */
+  public void setForwardOnlyHintOnFindIterate(boolean forwardOnlyHintOnFindIterate) {
+    this.forwardOnlyHintOnFindIterate = forwardOnlyHintOnFindIterate;
   }
 
   /**

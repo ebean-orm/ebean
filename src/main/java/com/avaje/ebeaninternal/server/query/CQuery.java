@@ -346,8 +346,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Prepare bind and execute query with Forward only hints.
    */
-  public boolean prepareBindExecuteQueryForwardOnly() throws SQLException {
-    return prepareBindExecuteQueryWithOption(true);
+  public boolean prepareBindExecuteQueryForwardOnly(boolean dbPlatformForwardOnlyHint) throws SQLException {
+    return prepareBindExecuteQueryWithOption(dbPlatformForwardOnlyHint);
   }
 
   /**
@@ -357,7 +357,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return prepareBindExecuteQueryWithOption(false);
   }
 
-  private boolean prepareBindExecuteQueryWithOption(boolean forward) throws SQLException {
+  private boolean prepareBindExecuteQueryWithOption(boolean forwardOnlyHint) throws SQLException {
 
     synchronized (this) {
       if (cancelled || query.isCancelled()) {
@@ -371,8 +371,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       // prepare
       SpiTransaction t = request.getTransaction();
       Connection conn = t.getInternalConnection();
-      if (forward) {
-        // Hints required for mysql for large resultset processing (Issue 56)
+            
+      if (forwardOnlyHint) {
+        // Use forward only hints for large resultset processing (Issue 56, MySql specific)
         pstmt = conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
       } else {
         pstmt = conn.prepareStatement(sql);        

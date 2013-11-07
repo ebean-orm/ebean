@@ -31,6 +31,7 @@ public class MySqlPlatform extends DatabasePlatform {
     this.openQuote = "`";
     this.closeQuote = "`";
 
+    this.forwardOnlyHintOnFindIterate = true;
     this.booleanDbType = Types.BIT;
 
     dbTypeMap.put(Types.BIT, new DbType("tinyint(1) default 0"));
