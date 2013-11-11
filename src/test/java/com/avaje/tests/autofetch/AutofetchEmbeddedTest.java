@@ -36,4 +36,9 @@ public class AutofetchEmbeddedTest extends BaseTestCase {
       }
     }
   }
+
+  @Test
+  public void testEmbeddedFetch() {
+    Ebean.find(EMain.class).fetch("embeddable").findList();
+  }
 }
