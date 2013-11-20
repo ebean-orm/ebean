@@ -17,6 +17,7 @@ public class DB2Platform extends DatabasePlatform {
 
     // only support getGeneratedKeys with non-batch JDBC
     // so generally use SEQUENCE instead for H2
+    this.sqlLimiter = new Db2SqlLimiter();
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsSequence(true);

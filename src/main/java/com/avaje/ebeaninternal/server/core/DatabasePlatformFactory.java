@@ -8,17 +8,7 @@ import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebean.config.dbplatform.H2Platform;
-import com.avaje.ebean.config.dbplatform.HsqldbPlatform;
-import com.avaje.ebean.config.dbplatform.MsSqlServer2000Platform;
-import com.avaje.ebean.config.dbplatform.MsSqlServer2005Platform;
-import com.avaje.ebean.config.dbplatform.MySqlPlatform;
-import com.avaje.ebean.config.dbplatform.Oracle10Platform;
-import com.avaje.ebean.config.dbplatform.Oracle9Platform;
-import com.avaje.ebean.config.dbplatform.PostgresPlatform;
-import com.avaje.ebean.config.dbplatform.SQLitePlatform;
-import com.avaje.ebean.config.dbplatform.SqlAnywherePlatform;
+import com.avaje.ebean.config.dbplatform.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +74,9 @@ public class DatabasePlatformFactory {
     if (dbName.equals("sqlanywhere")) {
       return new SqlAnywherePlatform();
     }
-
+    if (dbName.equals("db2")) {
+      return new DB2Platform();
+    }
     if (dbName.equals("mysql")) {
       return new MySqlPlatform();
     }
@@ -132,41 +124,43 @@ public class DatabasePlatformFactory {
 
     int majorVersion = metaData.getDatabaseMajorVersion();
 
-    if (dbProductName.indexOf("oracle") > -1) {
+    if (dbProductName.contains("oracle")) {
       if (majorVersion > 9) {
         return new Oracle10Platform();
       } else {
         return new Oracle9Platform();
       }
     }
-    if (dbProductName.indexOf("microsoft") > -1) {
+    else if (dbProductName.contains("microsoft")) {
       if (majorVersion > 8) {
         return new MsSqlServer2005Platform();
       } else {
         return new MsSqlServer2000Platform();
       }
     }
-
-    if (dbProductName.indexOf("mysql") > -1) {
+    else if (dbProductName.contains("mysql")) {
       return new MySqlPlatform();
     }
-    if (dbProductName.indexOf("h2") > -1) {
+    else if (dbProductName.contains("h2")) {
       return new H2Platform();
     }
-    if (dbProductName.indexOf("hsql database engine") > -1) {
+    else if (dbProductName.contains("hsql database engine")) {
       return new HsqldbPlatform();
     }
-    if (dbProductName.indexOf("postgres") > -1) {
+    else if (dbProductName.contains("postgres")) {
       return new PostgresPlatform();
     }
-    if (dbProductName.indexOf("sqlite") > -1) {
+    else if (dbProductName.contains("sqlite")) {
       return new SQLitePlatform();
     }
-    if (dbProductName.indexOf("sql anywhere") > -1) {
+    else if (dbProductName.contains("db2")) {
+      return new DB2Platform();
+    }
+    else if (dbProductName.contains("sql anywhere")) {
       return new SqlAnywherePlatform();
     }
-    
-    // use the standard one
+
+      // use the standard one
     return new DatabasePlatform();
   }
 }
