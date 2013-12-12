@@ -5,6 +5,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.avaje.ebeaninternal.server.lib.sql.PooledConnectionStatistics.LoadValues;
+
 /**
  * A buffer especially designed for Busy PooledConnections.
  * <p>
@@ -21,6 +26,8 @@ import java.util.List;
  */
 class BusyConnectionBuffer {
 
+    private static final Logger logger = LoggerFactory.getLogger(BusyConnectionBuffer.class);
+  
     private PooledConnection[] slots;
     
     private int growBy;
@@ -66,8 +73,13 @@ class BusyConnectionBuffer {
         return size;
     }
     
-    protected boolean isEmpty(){
-        return size == 0;
+    protected boolean isEmpty() {
+      for (int i = 0; i < slots.length; i++) {
+        if (slots[i] != null) {
+          return false;
+        }
+      }
+      return true;
     }
     
     protected int add(PooledConnection pc){
@@ -75,23 +87,37 @@ class BusyConnectionBuffer {
             // grow the capacity
             setCapacity(slots.length + growBy);
         }
-        ++size;
         int slot = nextEmptySlot();
         pc.setSlotId(slot);
         slots[slot] = pc;
-        return size;
+        return ++size;
     }
     
     protected boolean remove(PooledConnection pc) {
-        --size;
+        
         int slotId = pc.getSlotId();
         if (slots[slotId] != pc){
+            PooledConnection heldBy = slots[slotId];
+            logger.warn("Failed to remove from slot[{}] PooledConnection[{}] - HeldBy[{}]", pc.getSlotId(), pc, heldBy);
             return false;
         }
         slots[slotId] = null;
+        --size;
         return true;
     }
     
+    /**
+     * Collect the load statistics from all the busy connections.
+     * @param reset 
+     */
+    protected void collectStatistics(LoadValues values, boolean reset) {    
+        
+      for (int i = 0; i < slots.length; i++) {
+        if (slots[i] != null){
+          values.plus(slots[i].getStatistics().getValues(reset));
+        }
+      }
+    }
     
     /**
      * Get a shallow read only List of the busy connections.

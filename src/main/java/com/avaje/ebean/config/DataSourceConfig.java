@@ -42,14 +42,14 @@ public class DataSourceConfig {
 
   private int leakTimeMinutes = 30;
 
-  private int maxInactiveTimeSecs = 900;
+  private int maxInactiveTimeSecs = 720;
 
   private int pstmtCacheSize = 20;
   
   private int cstmtCacheSize = 20;
 
   private int waitTimeoutMillis = 1000;
-
+  
   private String poolListener;
 
   private boolean offline;

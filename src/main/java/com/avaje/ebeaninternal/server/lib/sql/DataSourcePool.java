@@ -15,10 +15,11 @@ import java.util.Set;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 
-import com.avaje.ebean.config.DataSourceConfig;
-import com.avaje.ebeaninternal.api.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.avaje.ebean.config.DataSourceConfig;
+import com.avaje.ebeaninternal.api.ClassUtil;
 
 /**
  * A robust DataSource.
@@ -73,7 +74,7 @@ public class DataSourcePool implements DataSource {
      * The sql used to test a connection.
      */
     private final String heartbeatsql;
-    
+        
     private final int heartbeatFreqSecs;
 
     /**
@@ -573,7 +574,15 @@ public class DataSourcePool implements DataSource {
         }
         queue.returnPooledConnection(pooledConnection);
     }
-
+    
+    /**
+     * Collect statistics of a connection that is fully closing
+     */
+    protected void reportClosingConnection(PooledConnection pooledConnection) {
+      
+      queue.reportClosingConnection(pooledConnection);
+    }
+    
     /**
      * Returns information describing connections that are currently being used.
      */
@@ -834,6 +843,14 @@ public class DataSourcePool implements DataSource {
     public Status getStatus(boolean reset) {
         return queue.getStatus(reset);
     }
+    
+    /**
+     * Return the aggregated load statistics collected on all the connections in the pool.
+     */
+    public DataSourcePoolStatistics getStatistics(boolean reset) {
+      
+      return queue.getStatistics(reset);
+    }
 
     /**
      * Deregister the JDBC driver.
@@ -873,8 +890,8 @@ public class DataSourcePool implements DataSource {
         }
 
         public String toString() {
-            return "min:" + minSize + " max:" + maxSize + " free:" + free + " busy:" + busy + " waiting:" + waiting
-                    + " highWaterMark:" + highWaterMark + " waitCount:" + waitCount + " hitCount:" + hitCount;
+            return "min[" + minSize + "] max[" + maxSize + "] free[" + free + "] busy[" + busy + "] waiting[" + waiting
+                    + "] highWaterMark[" + highWaterMark + "] waitCount[" + waitCount + "] hitCount[" + hitCount+"]";
         }
 
         /**

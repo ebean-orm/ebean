@@ -44,6 +44,7 @@ public class TestBusyBuffer extends BaseTestCase {
 
   }
 
+  @Test
   public void test_rotate() {
 
     BusyConnectionBuffer b = new BusyConnectionBuffer(2, 2);
@@ -54,13 +55,17 @@ public class TestBusyBuffer extends BaseTestCase {
     PooledConnection p3 = new PooledConnection("3");
 
     Assert.assertEquals(2, b.getCapacity());
+    Assert.assertEquals(0, b.size());
 
     b.add(p0);
     b.add(p1);
+    Assert.assertEquals(2, b.size());
     Assert.assertEquals(2, b.getCapacity());
     b.add(p2);
+    Assert.assertEquals(3, b.size());
     Assert.assertEquals(4, b.getCapacity());
     b.add(p3);
+    Assert.assertEquals(4, b.size());
     Assert.assertEquals(4, b.getCapacity());
 
     Assert.assertEquals(0, p0.getSlotId());
@@ -69,13 +74,20 @@ public class TestBusyBuffer extends BaseTestCase {
     Assert.assertEquals(3, p3.getSlotId());
 
     b.remove(p2);
+    Assert.assertEquals(3, b.size());
     b.remove(p0);
+    Assert.assertEquals(2, b.size());
     b.remove(p3);
+    Assert.assertEquals(1, b.size());
     b.add(p2);
+    Assert.assertEquals(2, b.size());
     Assert.assertEquals(0, p2.getSlotId());
 
     b.remove(p0);
+    Assert.assertEquals(2, b.size());
     b.add(p0);
+    Assert.assertEquals(3, b.size());
+
     // p1 is still in it's slot
     Assert.assertEquals(2, p0.getSlotId());
 

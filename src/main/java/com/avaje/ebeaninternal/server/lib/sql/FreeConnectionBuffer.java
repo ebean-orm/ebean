@@ -3,6 +3,8 @@ package com.avaje.ebeaninternal.server.lib.sql;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.avaje.ebeaninternal.server.lib.sql.PooledConnectionStatistics.LoadValues;
+
 /**
  * A buffer designed especially to hold free pooled connections.
  * <p>
@@ -48,11 +50,31 @@ class FreeConnectionBuffer {
      * Add at connection.
      */
     protected void add(PooledConnection pc) {
+        if (conns[addIndex] != null) {
+          throw new RuntimeException("Buffer slot ["+addIndex+"] already full?");
+        }
         conns[addIndex] = pc;
         addIndex = inc(addIndex);
         ++size;
     }
 
+    protected void closeAll(boolean logErrors) {
+      
+      final PooledConnection[] items = this.conns;
+      
+      this.conns = new PooledConnection[items.length];
+      this.size = 0;
+      this.removeIndex = 0;
+      this.addIndex = 0;
+
+      for (int i = 0; i < items.length; i++) {
+        PooledConnection c = items[i];
+        if (c != null) {
+          c.closeConnectionFully(logErrors);
+        }
+      }
+    }
+    
     /**
      * Remove a connection at current remove position.
      */
@@ -77,6 +99,18 @@ class FreeConnectionBuffer {
             }
         }
         return copy;
+    }
+    
+    /**
+     * Collect the load statistics from all the free connections.
+     */
+    protected void collectStatistics(LoadValues values, boolean reset) {    
+        
+        for (int i = 0; i < conns.length; i++) {
+            if (conns[i] != null){
+              values.plus(conns[i].getStatistics().getValues(reset));
+            }
+        }
     }
     
     /**

@@ -31,18 +31,17 @@ public class ExtendedPreparedStatement extends ExtendedStatement implements Prep
 	/**
 	 * The SQL used to create the underlying PreparedStatement.
 	 */
-    final String sql;
+   private final String sql;
 
 	/**
 	 * The key used to cache this in the connection.
 	 */
-    final String cacheKey;
+   private final String cacheKey;
 
 	/**
 	 * Create a wrapped PreparedStatement that can be cached.
 	 */
-	public ExtendedPreparedStatement(PooledConnection pooledConnection, PreparedStatement pstmt,
-			String sql, String cacheKey) {
+	public ExtendedPreparedStatement(PooledConnection pooledConnection, PreparedStatement pstmt, String sql, String cacheKey) {
 		super(pooledConnection, pstmt);
 		this.sql = sql;
 		this.cacheKey = cacheKey;

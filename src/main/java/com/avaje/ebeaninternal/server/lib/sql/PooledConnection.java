@@ -34,8 +34,7 @@ import org.slf4j.LoggerFactory;
  * statement that was executed. Keeps statistics on how long it is in use.
  * </p>
  */
-public class PooledConnection extends ConnectionDelegator
-{
+public class PooledConnection extends ConnectionDelegator {
 
 	private static final Logger logger = LoggerFactory.getLogger(PooledConnection.class);
 
@@ -45,49 +44,49 @@ public class PooledConnection extends ConnectionDelegator
 	 * Set when connection is idle in the pool. In general when in the pool the
 	 * connection should not be modified.
 	 */
-	static final int STATUS_IDLE = 88;
+	private static final int STATUS_IDLE = 88;
 
 	/**
 	 * Set when connection given to client.
 	 */
-	static final int STATUS_ACTIVE = 89;
+	private static final int STATUS_ACTIVE = 89;
 
 	/**
 	 * Set when commit() or rollback() called.
 	 */
-	static final int STATUS_ENDED = 87;
+	private static final int STATUS_ENDED = 87;
 
 	/**
 	 * Name used to identify the PooledConnection for logging.
 	 */
-	final String name;
+	private final String name;
 
 	/**
 	 * The pool this connection belongs to.
 	 */
-	final DataSourcePool pool;
+	private final DataSourcePool pool;
 
 	/**
 	 * The underlying connection.
 	 */
-	final Connection connection;
+	private final Connection connection;
 
 	/**
 	 * The time this connection was created.
 	 */
-	final long creationTime;
+	private final long creationTime;
 
 	/**
 	 * Cache of the PreparedStatements
 	 */
-	final PstmtCache pstmtCache;
+	private final PstmtCache pstmtCache;
 
-	final Object pstmtMonitor = new Object();
+	private final Object pstmtMonitor = new Object();
 	
 	/**
 	 * The status of the connection. IDLE, ACTIVE or ENDED.
 	 */
-	int status = STATUS_IDLE;
+	private int status = STATUS_IDLE;
 
 	/**
 	 * Set this to true if the connection will be busy for a long time.
@@ -95,56 +94,53 @@ public class PooledConnection extends ConnectionDelegator
 	 * This means it should skip the suspected connection pool leak checking.
 	 * </p>
 	 */
-	boolean longRunning;
+	private boolean longRunning;
 	
 	/**
 	 * Flag to indicate that this connection had errors and should be checked to
 	 * make sure it is okay.
 	 */
-	boolean hadErrors;
+	private boolean hadErrors;
 
 	/**
 	 * The last start time. When the connection was given to a thread.
 	 */
-	long startUseTime;
+	private long startUseTime;
 
 	/**
 	 * The last end time of this connection. This is to calculate the usage
 	 * time.
 	 */
-	long lastUseTime;
+	private long lastUseTime;
+	
+	private long exeStartNanos;
+	
+	private final PooledConnectionStatistics stats = new PooledConnectionStatistics();
 
 	/**
 	 * The last statement executed by this connection.
 	 */
-	String lastStatement;
-
-	/**
-	 * The number of hits against the preparedStatement cache.
-	 */
-	int pstmtHitCounter;
-
-	/**
-	 * The number of misses against the preparedStatement cache.
-	 */
-	int pstmtMissCounter;
+	private String lastStatement;
 
 	/**
 	 * The non avaje method that created the connection.
 	 */
-	String createdByMethod;
+	private String createdByMethod;
 
 	/**
 	 * Used to find connection pool leaks.
 	 */
-	StackTraceElement[] stackTrace;
+	private StackTraceElement[] stackTrace;
 
-	int maxStackTrace;
+	private int maxStackTrace;
 	
 	/**
 	 * Slot position in the BusyConnectionBuffer.
 	 */
-	int slotId;
+	private int slotId;
+
+	private boolean resetIsolationReadOnlyRequired;
+
 	
 	/**
 	 * Construct the connection that can refer back to the pool it belongs to.
@@ -165,47 +161,47 @@ public class PooledConnection extends ConnectionDelegator
 		this.lastUseTime = creationTime;
 	}
 
-	/**
-	 * For testing the pool without real connections.
-	 */
-	protected PooledConnection(String name) {
-	    super(null);
-	    this.name = name;
-	    this.pool = null;
-	    this.connection = null;
-	    this.pstmtCache = null;
-	    this.maxStackTrace = 0;
-        this.creationTime = System.currentTimeMillis();
-        this.lastUseTime = creationTime;
-    }
-	
-	/**
-     * Return the slot position in the busy buffer.
-     */
-	public int getSlotId() {
-        return slotId;
-    }
+  /**
+   * For testing the pool without real connections.
+   */
+  protected PooledConnection(String name) {
+    super(null);
+    this.name = name;
+    this.pool = null;
+    this.connection = null;
+    this.pstmtCache = null;
+    this.maxStackTrace = 0;
+    this.creationTime = System.currentTimeMillis();
+    this.lastUseTime = creationTime;
+  }
 
-    /**
-     * Set the slot position in the busy buffer.
-     */
-    public void setSlotId(int slotId) {
-        this.slotId = slotId;
-    }
+  /**
+   * Return the slot position in the busy buffer.
+   */
+  public int getSlotId() {
+    return slotId;
+  }
 
-    /**
-	 * Return the DataSourcePool that this connection belongs to.
-	 */
-	public DataSourcePool getDataSourcePool() {
-		return pool;
-	}
+  /**
+   * Set the slot position in the busy buffer.
+   */
+  public void setSlotId(int slotId) {
+    this.slotId = slotId;
+  }
 
-	/**
-	 * Return the time the connection was created.
-	 */
-	public long getCreationTime() {
-		return creationTime;
-	}
+  /**
+   * Return the DataSourcePool that this connection belongs to.
+   */
+  public DataSourcePool getDataSourcePool() {
+    return pool;
+  }
+
+  /**
+   * Return the time the connection was created.
+   */
+  public long getCreationTime() {
+    return creationTime;
+  }
 
 	/**
 	 * Return a string to identify the connection.
@@ -214,16 +210,24 @@ public class PooledConnection extends ConnectionDelegator
 		return name;
 	}
 
+	public String getNameSlot() {
+    return name+":"+slotId;
+  }
+ 
 	public String toString() {
-		return name;
+		return getDescription();
 	}
 	
 	public String getDescription() {
-		return "name["+name+"] startTime["+getStartUseTime()+"] stmt["+getLastStatement()+"] createdBy["+getCreatedByMethod()+"]";
+		return "name["+name+"] slot["+slotId+"] startTime["+getStartUseTime()+"] stmt["+getLastStatement()+"] createdBy["+getCreatedByMethod()+"]";
 	}
 		
-	public String getStatistics() {
-		return "name["+name+"] startTime["+getStartUseTime()+"] pstmtHits["+pstmtHitCounter+"] pstmtMiss["+pstmtMissCounter+"] "+pstmtCache.getDescription();
+	public String getPstmtStatistics() {
+		return "name["+name+"] startTime["+getStartUseTime()+"] "+pstmtCache.getDescription();
+	}
+	
+	public PooledConnectionStatistics getStatistics() {
+	  return stats;
 	}
 	
 	/**
@@ -253,21 +257,25 @@ public class PooledConnection extends ConnectionDelegator
 	 */
 	public void closeConnectionFully(boolean logErrors) {
 
-		String msg = "Closing Connection[" + getName() + "]" + " psReuse[" + pstmtHitCounter
-				+ "] psCreate[" + pstmtMissCounter + "] psSize[" + pstmtCache.size() + "]";
-
-		logger.debug(msg);
+	  if (pool != null) {
+	    // allow collection of load statistics 
+	    pool.reportClosingConnection(this);
+	  }
+	  
+	  if (logger.isDebugEnabled()) {
+		  logger.debug("Closing Connection[{}] slot[{}]  Stats: {} , PstmtStats: {} ", name, slotId, stats.getValues(false), pstmtCache.getDescription());
+	  }
 
 		try {
 			if (connection.isClosed()) {
 			  // Typically the JDBC Driver has its own JVM shutdown hook and already 
 			  // closed the connections in our DataSource pool so making this DEBUG level
-				logger.debug("Closing Connection[" + getName() + "] that is already closed?");
+				logger.debug("Closing Connection[{}] that is already closed?", name);
 				return;
 			}
 		} catch (SQLException ex) {
 			if (logErrors) {
-				logger.error("Error when fully closing connection [" + getName() + "]", ex);
+				logger.error("Error checking if connection [" + getNameSlot() + "] is closed", ex);
 			}
 		}
 
@@ -287,8 +295,8 @@ public class PooledConnection extends ConnectionDelegator
 		try {
 			connection.close();
 		} catch (SQLException ex) {
-			if (logErrors) {
-				logger.error("Error when fully closing connection [" + getName() + "]", ex);
+			if (logErrors || logger.isDebugEnabled()) {
+				logger.error("Error when fully closing connection [" + getNameSlot() + "]", ex);
 			}
 		}
 	}
@@ -337,26 +345,15 @@ public class PooledConnection extends ConnectionDelegator
 	protected void returnPreparedStatement(ExtendedPreparedStatement pstmt) {
 
 		 synchronized (pstmtMonitor) {
-			ExtendedPreparedStatement alreadyInCache = pstmtCache.get(pstmt.getCacheKey());
+		  if (!pstmtCache.returnStatement(pstmt)) {
+		    try {
+          // Already an entry in the cache with the exact same SQL...
+          pstmt.closeDestroy();
 
-			if (alreadyInCache == null) {
-				// add the returning prepared statement to the cache.
-				// Note that the LRUCache will automatically close fully old unused
-				// PStmts when the cache has hit its maximum size.
-				pstmtCache.put(pstmt.getCacheKey(), pstmt);
-				
-			} else {
-				try {
-					// if a entry in the cache exists for the exact same SQL...
-					// then remove it from the cache and close it fully.
-					// Only having one PreparedStatement per unique SQL
-					// statement
-					pstmt.closeDestroy();
-
-				} catch (SQLException e) {
-					logger.error("Error closing Pstmt", e);
-				}
-			}
+        } catch (SQLException e) {
+          logger.error("Error closing Pstmt", e);
+        }
+		  }		  
 		}
 	}
 
@@ -392,12 +389,10 @@ public class PooledConnection extends ConnectionDelegator
 				ExtendedPreparedStatement pstmt = pstmtCache.remove(cacheKey);
 	
 				if (pstmt != null) {
-					pstmtHitCounter++;
 					return pstmt;
 				}
 	
 				// create a new PreparedStatement
-				pstmtMissCounter++;
 				PreparedStatement actualPstmt;
 				if (useFlag) {
 					actualPstmt = connection.prepareStatement(sql, flag);
@@ -420,7 +415,6 @@ public class PooledConnection extends ConnectionDelegator
 		}
 		try {
 			// no caching when creating PreparedStatements this way
-			pstmtMissCounter++;
 			lastStatement = sql;
 			return connection.prepareStatement(sql, resultSetType, resultSetConcurreny);
 		} catch (SQLException ex) {
@@ -436,6 +430,7 @@ public class PooledConnection extends ConnectionDelegator
 	protected void resetForUse() {
 		this.status = STATUS_ACTIVE;
 		this.startUseTime = System.currentTimeMillis();
+		this.exeStartNanos = System.nanoTime();
 		this.createdByMethod = null;
 		this.lastStatement = null;
 		this.hadErrors = false;
@@ -480,6 +475,9 @@ public class PooledConnection extends ConnectionDelegator
 			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "close()");
 		}
 
+		long durationNanos = System.nanoTime() - exeStartNanos;
+		stats.add(durationNanos, hadErrors);
+		
 		if (hadErrors) {
 			if (!pool.validateConnection(this)) {
 				// the connection is BAD, close it and test the pool
@@ -530,12 +528,11 @@ public class PooledConnection extends ConnectionDelegator
 		try {
 			if (connection != null && !connection.isClosed()) {
 				// connect leak?
-				String msg = "Closing Connection[" + getName() + "] on finalize().";
-				logger.warn(msg);
+				logger.warn("Closing Connection[" + getName() + "] on finalize().");
 				closeConnectionFully(false);
 			}
 		} catch (Exception e) {
-			logger.error(null, e);
+			logger.error("Error when finalize is closing a connection? (unexpected)", e);
 		}
 		super.finalize();
 	}
@@ -581,7 +578,6 @@ public class PooledConnection extends ConnectionDelegator
 		}
 	}
 
-	boolean resetIsolationReadOnlyRequired = false;
 
 	/**
 	 * Also note the read only status needs to be reset when put back into the
@@ -614,327 +610,326 @@ public class PooledConnection extends ConnectionDelegator
 		}
 	}
 
-	//
-	// 
-	// Simple wrapper methods which pass a method call onto the acutal
-	// connection object. These methods are safe-guarded to prevent use of
-	// the methods whilst the connection is in the connection pool.
-	//
-	//
-	public void clearWarnings() throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "clearWarnings()");
-		}
-		connection.clearWarnings();
-	}
+  //
+  //
+  // Simple wrapper methods which pass a method call onto the acutal
+  // connection object. These methods are safe-guarded to prevent use of
+  // the methods whilst the connection is in the connection pool.
+  //
+  //
+  public void clearWarnings() throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "clearWarnings()");
+    }
+    connection.clearWarnings();
+  }
 
-	public void commit() throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "commit()");
-		}
-		try {
-			status = STATUS_ENDED;
-			connection.commit();
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
-	
-	public boolean getAutoCommit() throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "getAutoCommit()");
-		}
-		return connection.getAutoCommit();
-	}
+  public void commit() throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "commit()");
+    }
+    try {
+      status = STATUS_ENDED;
+      connection.commit();
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-	public String getCatalog() throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "getCatalog()");
-		}
-		return connection.getCatalog();
-	}
+  public boolean getAutoCommit() throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "getAutoCommit()");
+    }
+    return connection.getAutoCommit();
+  }
 
-	public DatabaseMetaData getMetaData() throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "getMetaData()");
-		}
-		return connection.getMetaData();
-	}
+  public String getCatalog() throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "getCatalog()");
+    }
+    return connection.getCatalog();
+  }
 
-	public int getTransactionIsolation() throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "getTransactionIsolation()");
-		}
-		return connection.getTransactionIsolation();
-	}
+  public DatabaseMetaData getMetaData() throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "getMetaData()");
+    }
+    return connection.getMetaData();
+  }
 
-	public Map<String,Class<?>> getTypeMap() throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "getTypeMap()");
-		}
-		return connection.getTypeMap();
-	}
+  public int getTransactionIsolation() throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "getTransactionIsolation()");
+    }
+    return connection.getTransactionIsolation();
+  }
 
-	public SQLWarning getWarnings() throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "getWarnings()");
-		}
-		return connection.getWarnings();
-	}
+  public Map<String, Class<?>> getTypeMap() throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "getTypeMap()");
+    }
+    return connection.getTypeMap();
+  }
 
-	public boolean isClosed() throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "isClosed()");
-		}
-		return connection.isClosed();
-	}
+  public SQLWarning getWarnings() throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "getWarnings()");
+    }
+    return connection.getWarnings();
+  }
 
-	public boolean isReadOnly() throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "isReadOnly()");
-		}
-		return connection.isReadOnly();
-	}
+  public boolean isClosed() throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "isClosed()");
+    }
+    return connection.isClosed();
+  }
 
-	public String nativeSQL(String sql) throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "nativeSQL()");
-		}
-		lastStatement = sql;
-		return connection.nativeSQL(sql);
-	}
+  public boolean isReadOnly() throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "isReadOnly()");
+    }
+    return connection.isReadOnly();
+  }
 
-	public CallableStatement prepareCall(String sql) throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "prepareCall()");
-		}
-		lastStatement = sql;
-		return connection.prepareCall(sql);
-	}
+  public String nativeSQL(String sql) throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "nativeSQL()");
+    }
+    lastStatement = sql;
+    return connection.nativeSQL(sql);
+  }
 
-	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurreny)
-			throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "prepareCall()");
-		}
-		lastStatement = sql;
-		return connection.prepareCall(sql, resultSetType, resultSetConcurreny);
-	}
+  public CallableStatement prepareCall(String sql) throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "prepareCall()");
+    }
+    lastStatement = sql;
+    return connection.prepareCall(sql);
+  }
 
-	public void rollback() throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "rollback()");
-		}
-		try {
-			status = STATUS_ENDED;
-			connection.rollback();
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
+  public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurreny) throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "prepareCall()");
+    }
+    lastStatement = sql;
+    return connection.prepareCall(sql, resultSetType, resultSetConcurreny);
+  }
 
-	public void setAutoCommit(boolean autoCommit) throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "setAutoCommit()");
-		}
-		try {
-			connection.setAutoCommit(autoCommit);
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
+  public void rollback() throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "rollback()");
+    }
+    try {
+      status = STATUS_ENDED;
+      connection.rollback();
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-	public void setCatalog(String catalog) throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "setCatalog()");
-		}
-		connection.setCatalog(catalog);
-	}
+  public void setAutoCommit(boolean autoCommit) throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "setAutoCommit()");
+    }
+    try {
+      connection.setAutoCommit(autoCommit);
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-	public void setTypeMap(Map<String,Class<?>> map) throws SQLException {
-		if (status == STATUS_IDLE) {
-			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "setTypeMap()");
-		}
-		connection.setTypeMap(map);
-	}
+  public void setCatalog(String catalog) throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "setCatalog()");
+    }
+    connection.setCatalog(catalog);
+  }
 
-	public Savepoint setSavepoint() throws SQLException {
-		try {
-			return connection.setSavepoint();
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
+  public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
+    if (status == STATUS_IDLE) {
+      throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "setTypeMap()");
+    }
+    connection.setTypeMap(map);
+  }
 
-	public Savepoint setSavepoint(String savepointName) throws SQLException {
-		try {
-			return connection.setSavepoint(savepointName);
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
+  public Savepoint setSavepoint() throws SQLException {
+    try {
+      return connection.setSavepoint();
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-	public void rollback(Savepoint sp) throws SQLException {
-		try {
-			connection.rollback(sp);
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
+  public Savepoint setSavepoint(String savepointName) throws SQLException {
+    try {
+      return connection.setSavepoint(savepointName);
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-	public void releaseSavepoint(Savepoint sp) throws SQLException {
-		try {
-			connection.releaseSavepoint(sp);
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
+  public void rollback(Savepoint sp) throws SQLException {
+    try {
+      connection.rollback(sp);
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-	public void setHoldability(int i) throws SQLException {
-		try {
-			connection.setHoldability(i);
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
+  public void releaseSavepoint(Savepoint sp) throws SQLException {
+    try {
+      connection.releaseSavepoint(sp);
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-	public int getHoldability() throws SQLException {
-		try {
-			return connection.getHoldability();
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
+  public void setHoldability(int i) throws SQLException {
+    try {
+      connection.setHoldability(i);
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-	public Statement createStatement(int i, int x, int y) throws SQLException {
-		try {
-			return connection.createStatement(i, x, y);
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
+  public int getHoldability() throws SQLException {
+    try {
+      return connection.getHoldability();
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-	public PreparedStatement prepareStatement(String s, int i, int x, int y) throws SQLException {
-		try {
-			return connection.prepareStatement(s, i, x, y);
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
+  public Statement createStatement(int i, int x, int y) throws SQLException {
+    try {
+      return connection.createStatement(i, x, y);
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-	public PreparedStatement prepareStatement(String s, int[] i) throws SQLException {
-		try {
-			return connection.prepareStatement(s, i);
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
+  public PreparedStatement prepareStatement(String s, int i, int x, int y) throws SQLException {
+    try {
+      return connection.prepareStatement(s, i, x, y);
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-	public PreparedStatement prepareStatement(String s, String[] s2) throws SQLException {
-		try {
-			return connection.prepareStatement(s, s2);
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
+  public PreparedStatement prepareStatement(String s, int[] i) throws SQLException {
+    try {
+      return connection.prepareStatement(s, i);
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-	public CallableStatement prepareCall(String s, int i, int x, int y) throws SQLException {
-		try {
-			return connection.prepareCall(s, i, x, y);
-		} catch (SQLException ex) {
-			addError(ex);
-			throw ex;
-		}
-	}
+  public PreparedStatement prepareStatement(String s, String[] s2) throws SQLException {
+    try {
+      return connection.prepareStatement(s, s2);
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-	/**
-	 * Returns the method that created the connection.
-	 * <p>
-	 * Used to help finding connection pool leaks.
-	 * </p>
-	 */
-	public String getCreatedByMethod() {
-		if (createdByMethod != null) {
-			return createdByMethod;
-		}
-		if (stackTrace == null) {
-			return null;
-		}
+  public CallableStatement prepareCall(String s, int i, int x, int y) throws SQLException {
+    try {
+      return connection.prepareCall(s, i, x, y);
+    } catch (SQLException ex) {
+      addError(ex);
+      throw ex;
+    }
+  }
 
-		for (int j = 0; j < stackTrace.length; j++) {
-			String methodLine = stackTrace[j].toString();
-			if (skipElement(methodLine)) {
-                // ignore these methods...
-			} else {
-				createdByMethod = methodLine;
-				return createdByMethod;
-			}
-		}
+  /**
+   * Returns the method that created the connection.
+   * <p>
+   * Used to help finding connection pool leaks.
+   * </p>
+   */
+  public String getCreatedByMethod() {
+    if (createdByMethod != null) {
+      return createdByMethod;
+    }
+    if (stackTrace == null) {
+      return null;
+    }
 
-		return null;
-	}
+    for (int j = 0; j < stackTrace.length; j++) {
+      String methodLine = stackTrace[j].toString();
+      if (skipElement(methodLine)) {
+        // ignore these methods...
+      } else {
+        createdByMethod = methodLine;
+        return createdByMethod;
+      }
+    }
 
-	private boolean skipElement(String methodLine) {
-	    if (methodLine.startsWith("java.lang.")) {
-            return true;
-	    } else if (methodLine.startsWith("java.util.")) {
-	        return true;
-        } else if (methodLine.startsWith("com.avaje.ebeaninternal.server.query.CallableQuery.<init>")) {
-            // creating connection on future...
-            return true;
-        } else if (methodLine.startsWith("com.avaje.ebeaninternal.server.query.Callable")) {
-            // it is a future task being executed...
-            return false;
-        } else if (methodLine.startsWith("com.avaje.ebeaninternal")) {
-            return true;
-        } else {
-            return false;
-        }
-	}
-	
-	/**
-	 * Set the stack trace to help find connection pool leaks.
-	 */
-	protected void setStackTrace(StackTraceElement[] stackTrace) {
-		this.stackTrace = stackTrace;
-	}
+    return null;
+  }
 
-	/**
-	 * Return the full stack trace that got the connection from the pool. You
-	 * could use this if getCreatedByMethod() doesn't work for you.
-	 */
-	public StackTraceElement[] getStackTrace() {
-	    
-	    if (stackTrace == null){
-	        return null;
-	    } 
-	    
-	    // filter off the top of the stack that we are not interested in
-        ArrayList<StackTraceElement> filteredList = new ArrayList<StackTraceElement>();
-        boolean include = false;
-        for (int i = 0; i < stackTrace.length; i++) {
-            if (!include && !skipElement(stackTrace[i].toString())){
-                include = true;
-            }
-            if (include && filteredList.size() < maxStackTrace){
-                filteredList.add(stackTrace[i]);
-            }
-        }
-        return filteredList.toArray(new StackTraceElement[filteredList.size()]);
-	    	    
-	}
+  private boolean skipElement(String methodLine) {
+    if (methodLine.startsWith("java.lang.")) {
+      return true;
+    } else if (methodLine.startsWith("java.util.")) {
+      return true;
+    } else if (methodLine.startsWith("com.avaje.ebeaninternal.server.query.CallableQuery.<init>")) {
+      // creating connection on future...
+      return true;
+    } else if (methodLine.startsWith("com.avaje.ebeaninternal.server.query.Callable")) {
+      // it is a future task being executed...
+      return false;
+    } else if (methodLine.startsWith("com.avaje.ebeaninternal")) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Set the stack trace to help find connection pool leaks.
+   */
+  protected void setStackTrace(StackTraceElement[] stackTrace) {
+    this.stackTrace = stackTrace;
+  }
+
+  /**
+   * Return the full stack trace that got the connection from the pool. You
+   * could use this if getCreatedByMethod() doesn't work for you.
+   */
+  public StackTraceElement[] getStackTrace() {
+
+    if (stackTrace == null) {
+      return null;
+    }
+
+    // filter off the top of the stack that we are not interested in
+    ArrayList<StackTraceElement> filteredList = new ArrayList<StackTraceElement>();
+    boolean include = false;
+    for (int i = 0; i < stackTrace.length; i++) {
+      if (!include && !skipElement(stackTrace[i].toString())) {
+        include = true;
+      }
+      if (include && filteredList.size() < maxStackTrace) {
+        filteredList.add(stackTrace[i]);
+      }
+    }
+    return filteredList.toArray(new StackTraceElement[filteredList.size()]);
+
+  }
 
 }
