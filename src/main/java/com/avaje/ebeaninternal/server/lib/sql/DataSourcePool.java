@@ -77,6 +77,8 @@ public class DataSourcePool implements DataSource {
         
     private final int heartbeatFreqSecs;
 
+    private final int trimPoolFreqSecs;
+
     /**
      * The transaction isolation level as per java.sql.Connection.
      */
@@ -181,6 +183,7 @@ public class DataSourcePool implements DataSource {
         this.waitTimeoutMillis = params.getWaitTimeoutMillis();
         this.heartbeatsql = params.getHeartbeatSql();
         this.heartbeatFreqSecs = params.getHeartbeatFreqSecs();
+        this.trimPoolFreqSecs = params.getTrimPoolFreqSecs();
         
         queue = new PooledConnectionQueue(this);
 
@@ -383,7 +386,7 @@ public class DataSourcePool implements DataSource {
 
             notifyDataSourceIsUp();
 
-            if (System.currentTimeMillis() > (lastTrimTime + (maxInactiveTimeSecs * 1000))) {
+            if (System.currentTimeMillis() > (lastTrimTime + (trimPoolFreqSecs * 1000))) {
                 queue.trim(maxInactiveTimeSecs);
                 lastTrimTime = System.currentTimeMillis();
             }

@@ -43,6 +43,8 @@ public class DataSourceConfig {
   private int leakTimeMinutes = 30;
 
   private int maxInactiveTimeSecs = 720;
+  
+  private int trimPoolFreqSecs = 59;
 
   private int pstmtCacheSize = 20;
   
@@ -321,6 +323,25 @@ public class DataSourceConfig {
     this.maxInactiveTimeSecs = maxInactiveTimeSecs;
   }
 
+  
+  /**
+   * Return the minimum time gap between pool trim checks.
+   * <p>
+   * This defaults to 59 seconds meaning that the pool trim check will run every
+   * minute assuming the heart beat check runs every 30 seconds.
+   * </p>
+   */
+  public int getTrimPoolFreqSecs() {
+    return trimPoolFreqSecs;
+  }
+
+  /**
+   * Set the minimum trim gap between pool trim checks.
+   */
+  public void setTrimPoolFreqSecs(int trimPoolFreqSecs) {
+    this.trimPoolFreqSecs = trimPoolFreqSecs;
+  }
+
   /**
    * Return the pool listener.
    */
@@ -388,18 +409,17 @@ public class DataSourceConfig {
     this.username = properties.get(prefix + "username", null);
     this.password = properties.get(prefix + "password", null);
 
-    String v;
+    String dbDriver = properties.get(prefix + "databaseDriver", null);
+    this.driver = properties.get(prefix + "driver", dbDriver);
 
-    v = properties.get(prefix + "databaseDriver", null);
-    this.driver = properties.get(prefix + "driver", v);
-
-    v = properties.get(prefix + "databaseUrl", null);
-    this.url = properties.get(prefix + "url", v);
+    String dbUrl = properties.get(prefix + "databaseUrl", null);
+    this.url = properties.get(prefix + "url", dbUrl);
 
     this.captureStackTrace = properties.getBoolean(prefix + "captureStackTrace", false);
     this.maxStackTraceSize = properties.getInt(prefix + "maxStackTraceSize", 5);
     this.leakTimeMinutes = properties.getInt(prefix + "leakTimeMinutes", 30);
-    this.maxInactiveTimeSecs = properties.getInt(prefix + "maxInactiveTimeSecs", 900);
+    this.maxInactiveTimeSecs = properties.getInt(prefix + "maxInactiveTimeSecs", 720);
+    this.trimPoolFreqSecs = properties.getInt(prefix + "trimPoolFreqSecs", 59);
 
     this.minConnections = properties.getInt(prefix + "minConnections", 0);
     this.maxConnections = properties.getInt(prefix + "maxConnections", 20);

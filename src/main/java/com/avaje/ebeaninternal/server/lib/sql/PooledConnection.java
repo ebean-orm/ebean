@@ -9,10 +9,12 @@ import java.sql.SQLWarning;
 import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
 import com.avaje.ebeaninternal.jdbc.ConnectionDelegator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -218,10 +220,18 @@ public class PooledConnection extends ConnectionDelegator {
 		return getDescription();
 	}
 	
-	public String getDescription() {
-		return "name["+name+"] slot["+slotId+"] startTime["+getStartUseTime()+"] stmt["+getLastStatement()+"] createdBy["+getCreatedByMethod()+"]";
+	public long getBusySeconds() {
+    return (System.currentTimeMillis() - startUseTime)/1000;
 	}
-		
+	
+	public String getDescription() {
+		return "name["+name+"] slot["+slotId+"] startTime["+getStartUseTime()+"] busySeconds["+getBusySeconds()+"] createdBy["+getCreatedByMethod()+"] stmt["+getLastStatement()+"]";
+	}
+
+	public String getFullDescription() {
+    return "name["+name+"] slot["+slotId+"] startTime["+getStartUseTime()+"] busySeconds["+getBusySeconds()+"] stackTrace["+getStackTraceAsString()+"] stmt["+getLastStatement()+"]";
+  }
+
 	public String getPstmtStatistics() {
 		return "name["+name+"] startTime["+getStartUseTime()+"] "+pstmtCache.getDescription();
 	}
@@ -905,6 +915,17 @@ public class PooledConnection extends ConnectionDelegator {
    */
   protected void setStackTrace(StackTraceElement[] stackTrace) {
     this.stackTrace = stackTrace;
+  }
+
+  /**
+   * Return the stackTrace as a String for logging purposes.
+   */
+  public String getStackTraceAsString() {
+    StackTraceElement[] stackTrace = getStackTrace();
+    if (stackTrace == null){
+      return "";
+    }
+    return Arrays.toString(stackTrace);
   }
 
   /**

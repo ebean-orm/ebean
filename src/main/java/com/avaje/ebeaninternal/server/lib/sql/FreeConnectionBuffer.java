@@ -19,10 +19,19 @@ import com.avaje.ebeaninternal.server.lib.sql.PooledConnectionStatistics.LoadVal
  */
 class FreeConnectionBuffer {
 
+    /**
+     * The buffer itself.
+     */
     private PooledConnection[] conns;
 
+    /**
+     * The position in the buffer where the next connection is removed from.
+     */
     private int removeIndex;
 
+    /**
+     * Position in the buffer where the next connection is added to.
+     */
     private int addIndex;
 
     /** 
@@ -51,13 +60,16 @@ class FreeConnectionBuffer {
      */
     protected void add(PooledConnection pc) {
         if (conns[addIndex] != null) {
-          throw new RuntimeException("Buffer slot ["+addIndex+"] already full?");
+          throw new IllegalStateException("Buffer slot ["+addIndex+"] already full?");
         }
         conns[addIndex] = pc;
         addIndex = inc(addIndex);
         ++size;
     }
 
+    /**
+     * Close all connections in this buffer.
+     */
     protected void closeAll(boolean logErrors) {
       
       final PooledConnection[] items = this.conns;
@@ -88,19 +100,25 @@ class FreeConnectionBuffer {
     }
     
     /**
-     * Return a shallow copy of the free connections.
+     * Trim any inactive connections that have not been used since usedSince.
      */
-    protected List<PooledConnection> getShallowCopy() {
-    
-        List<PooledConnection> copy = new ArrayList<PooledConnection>(conns.length);
-        for (int i = 0; i < conns.length; i++) {
-            if (conns[i] != null){
-                copy.add(conns[i]);
-            }
+    protected int trim(long usedSince) {
+      
+      int trimCount = 0;
+      for (int i = 0; i < conns.length; i++) {
+        if (conns[i] != null){
+          if (conns[i].getLastUsedTime() < usedSince) {
+            trimCount++;
+            conns[i].closeConnectionFully(true);
+            conns[i] = null;
+            --size;
+          }
         }
-        return copy;
+      }      
+      
+      return trimCount;
     }
-    
+        
     /**
      * Collect the load statistics from all the free connections.
      */
@@ -114,36 +132,25 @@ class FreeConnectionBuffer {
     }
     
     /**
-     * Set the free list to be the connections in this copy. This is done after
-     * unused connections have been trimmed.
-     * <p>
-     * Not a particularly performant approach but this should not be called very
-     * often
-     * </p>
+     * Return a shallow copy of the free connections.
      */
-    protected void setShallowCopy(List<PooledConnection> copy) {
-        
-        // reset to empty state
-        this.removeIndex = 0;
-        this.addIndex = 0;
-        this.size = 0;
-
-        // null all the current connections
-        for (int i = 0; i < conns.length; i++) {
-            conns[i] = null;
-        }
-
-        // add connections from the copy
-        for (int i = 0; i < copy.size(); i++) {
-            add(copy.get(i));
-        }
-    }
+    private List<PooledConnection> getShallowCopy() {
     
+        List<PooledConnection> copy = new ArrayList<PooledConnection>(conns.length);
+        for (int i = 0; i < conns.length; i++) {
+            if (conns[i] != null){
+                copy.add(conns[i]);
+            }
+        }
+        return copy;
+    }
+
     /**
      * Increase the capacity of the buffer. This is a relatively expensive
      * operation but should occur very infrequently.
      */
     protected void setCapacity(int newCapacity) {
+      
         if (newCapacity > conns.length){
             
             List<PooledConnection> copy = getShallowCopy();
