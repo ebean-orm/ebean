@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.transaction;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -686,5 +687,16 @@ public class JdbcTransaction implements SpiTransaction {
 
   public final TransactionManager getTransactionManger() {
     return manager;
+  }
+
+  /**
+   * Alias for end(), which enables this class to be used in try-with-resources.
+   */
+  public void close() throws IOException {
+    try {
+        end();
+    } catch (PersistenceException ex) {
+        throw new IOException(ex);
+    }
   }
 }

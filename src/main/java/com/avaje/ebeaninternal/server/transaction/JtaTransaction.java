@@ -95,7 +95,7 @@ public class JtaTransaction extends JdbcTransaction {
                     }
                     notifyRollback(e);
                 } finally {
-                    close();
+                    closeConnection();
                 }
             } catch (Exception ex) {
                 throw new PersistenceException(ex);
@@ -107,7 +107,7 @@ public class JtaTransaction extends JdbcTransaction {
     /**
      * Close the underlying connection.
      */
-    private void close() throws SQLException {
+    private void closeConnection() throws SQLException {
         if (connection != null) {
             connection.close();
             connection = null;

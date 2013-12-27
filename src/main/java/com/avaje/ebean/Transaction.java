@@ -3,12 +3,13 @@ package com.avaje.ebean;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
+import java.io.Closeable;
 import java.sql.Connection;
 
 /**
  * The Transaction object. Typically representing a JDBC or JTA transaction.
  */
-public interface Transaction {
+public interface Transaction extends Closeable {
 
   /**
    * Read Committed transaction isolation. Same as
