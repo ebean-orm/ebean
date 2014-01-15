@@ -10,13 +10,12 @@ import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Map;
-
-import com.avaje.ebeaninternal.jdbc.ConnectionDelegator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.avaje.ebeaninternal.jdbc.ConnectionDelegator;
 
 /**
  * Is a connection that belongs to a DataSourcePool.
@@ -40,8 +39,23 @@ public class PooledConnection extends ConnectionDelegator {
 
 	private static final Logger logger = LoggerFactory.getLogger(PooledConnection.class);
 
-	private static String IDLE_CONNECTION_ACCESSED_ERROR = "Pooled Connection has been accessed whilst idle in the pool, via method: ";
+	private static final String IDLE_CONNECTION_ACCESSED_ERROR = "Pooled Connection has been accessed whilst idle in the pool, via method: ";
 
+	/**
+	 * Marker for when connection is closed due to exceeding the max allowed age.
+	 */
+	private static final String REASON_MAXAGE = "maxAge";
+	
+	/**
+	 * Marker for when connection is closed due to exceeding the max inactive time.
+	 */
+	private static final String REASON_IDLE = "idleTime";
+	
+	/**
+	 * Marker for when the connection is closed due to a reset.
+	 */
+  private static final String REASON_RESET = "reset";
+	
 	/**
 	 * Set when connection is idle in the pool. In general when in the pool the
 	 * connection should not be modified.
@@ -86,10 +100,20 @@ public class PooledConnection extends ConnectionDelegator {
 	private final Object pstmtMonitor = new Object();
 	
 	/**
+	 * Helper for statistics collection. 
+	 */
+	private final PooledConnectionStatistics stats = new PooledConnectionStatistics();
+
+	/**
 	 * The status of the connection. IDLE, ACTIVE or ENDED.
 	 */
 	private int status = STATUS_IDLE;
 
+	/**
+	 * The reason for a connection closing.
+	 */
+	private String closeReason;
+	
 	/**
 	 * Set this to true if the connection will be busy for a long time.
 	 * <p>
@@ -117,8 +141,6 @@ public class PooledConnection extends ConnectionDelegator {
 	
 	private long exeStartNanos;
 	
-	private final PooledConnectionStatistics stats = new PooledConnectionStatistics();
-
 	/**
 	 * The last statement executed by this connection.
 	 */
@@ -273,7 +295,7 @@ public class PooledConnection extends ConnectionDelegator {
 	  }
 	  
 	  if (logger.isDebugEnabled()) {
-		  logger.debug("Closing Connection[{}] slot[{}]  Stats: {} , PstmtStats: {} ", name, slotId, stats.getValues(false), pstmtCache.getDescription());
+		  logger.debug("Closing Connection[{}] slot[{}] reason[{}] stats: {} , pstmtStats: {} ", name, slotId, closeReason, stats.getValues(false), pstmtCache.getDescription());
 	  }
 
 		try {
@@ -290,11 +312,9 @@ public class PooledConnection extends ConnectionDelegator {
 		}
 
 		try {
-			Iterator<ExtendedPreparedStatement> psi = pstmtCache.values().iterator();
-			while (psi.hasNext()) {
-				ExtendedPreparedStatement ps = (ExtendedPreparedStatement) psi.next();
-				ps.closeDestroy();
-			}
+			for (ExtendedPreparedStatement ps : pstmtCache.values()) {
+        ps.closeDestroy();
+      }
 
 		} catch (SQLException ex) {
 			if (logErrors) {
@@ -335,8 +355,7 @@ public class PooledConnection extends ConnectionDelegator {
 		}
 	}
 
-	public Statement createStatement(int resultSetType, int resultSetConcurreny)
-			throws SQLException {
+	public Statement createStatement(int resultSetType, int resultSetConcurreny) throws SQLException {
 		if (status == STATUS_IDLE) {
 			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "createStatement()");
 		}
@@ -388,8 +407,7 @@ public class PooledConnection extends ConnectionDelegator {
 	private PreparedStatement prepareStatement(String sql, boolean useFlag, int flag, String cacheKey) throws SQLException {
 		
 		if (status == STATUS_IDLE) {
-			String m = IDLE_CONNECTION_ACCESSED_ERROR + "prepareStatement()";
-			throw new SQLException(m);
+			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "prepareStatement()");
 		}
 		try {
 			synchronized (pstmtMonitor) {
@@ -418,8 +436,8 @@ public class PooledConnection extends ConnectionDelegator {
 		}
 	}
 
-	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurreny)
-			throws SQLException {
+	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurreny) throws SQLException {
+	  
 		if (status == STATUS_IDLE) {
 			throw new SQLException(IDLE_CONNECTION_ACCESSED_ERROR + "prepareStatement()");
 		}
@@ -518,6 +536,7 @@ public class PooledConnection extends ConnectionDelegator {
 
 		} catch (Exception ex) {
 			// the connection is BAD, close it and test the pool
+		  logger.warn("Error when trying to return connection to pool, closing fully.", ex);
 			closeConnectionFully(false);
 			pool.checkDataSource();
 		}
@@ -538,7 +557,7 @@ public class PooledConnection extends ConnectionDelegator {
 		try {
 			if (connection != null && !connection.isClosed()) {
 				// connect leak?
-				logger.warn("Closing Connection[" + getName() + "] on finalize().");
+				logger.warn("Closing Connection on finalize() - {}", getFullDescription());
 				closeConnectionFully(false);
 			}
 		} catch (Exception e) {
@@ -547,6 +566,45 @@ public class PooledConnection extends ConnectionDelegator {
 		super.finalize();
 	}
 
+	/**
+	 * Return true if the connection is too old.
+	 */
+  public boolean exceedsMaxAge(long maxAgeMillis) {
+    if (maxAgeMillis > 0 && (creationTime < (System.currentTimeMillis() - maxAgeMillis))){
+      this.closeReason = REASON_MAXAGE;
+      return true;
+    }
+    return false;
+  }
+  
+  public boolean shouldTrimOnReturn(long lastResetTime, long maxAgeMillis) {
+    if (creationTime <= lastResetTime) {
+      this.closeReason = REASON_RESET;
+      return true;
+    }
+    if (exceedsMaxAge(maxAgeMillis)) {
+      return true;
+    }
+    return false;
+  }
+  
+  /**
+   * Return true if the connection has been idle for too long or is too old.
+   */
+	public boolean shouldTrim(long usedSince, long createdSince) {
+	  if (lastUseTime < usedSince) {
+	    // been idle for too long so trim it
+	    this.closeReason = REASON_IDLE;
+	    return true;
+	  }
+	  if (createdSince > 0 && createdSince > creationTime) {
+	    // exceeds max age so trim it
+	    this.closeReason = REASON_MAXAGE;
+	    return true;
+	  }
+	  return false;
+	}
+	
 	/**
 	 * Return the time the connection was passed to the client code.
 	 * <p>

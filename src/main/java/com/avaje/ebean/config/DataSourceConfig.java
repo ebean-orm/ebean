@@ -36,6 +36,8 @@ public class DataSourceConfig {
   
   private int heartbeatFreqSecs = 30;
   
+  private int heartbeatTimeoutSeconds = 3;
+  
   private boolean captureStackTrace;
 
   private int maxStackTraceSize = 5;
@@ -43,6 +45,8 @@ public class DataSourceConfig {
   private int leakTimeMinutes = 30;
 
   private int maxInactiveTimeSecs = 720;
+  
+  private int maxAgeMinutes = 0;
   
   private int trimPoolFreqSecs = 59;
 
@@ -55,8 +59,8 @@ public class DataSourceConfig {
   private String poolListener;
 
   private boolean offline;
-
-  Map<String, String> customProperties;
+  
+  protected Map<String, String> customProperties;
 
   /**
    * Return the connection URL.
@@ -196,6 +200,20 @@ public class DataSourceConfig {
   public void setHeartbeatFreqSecs(int heartbeatFreqSecs) {
     this.heartbeatFreqSecs = heartbeatFreqSecs;
   }
+  
+  /**
+   * Return the heart beat timeout in seconds.
+   */
+  public int getHeartbeatTimeoutSeconds() {
+    return heartbeatTimeoutSeconds;
+  }
+
+  /**
+   * Set the heart beat timeout in seconds.
+   */
+  public void setHeartbeatTimeoutSeconds(int heartbeatTimeoutSeconds) {
+    this.heartbeatTimeoutSeconds = heartbeatTimeoutSeconds;
+  }
 
   /**
    * Return true if a stack trace should be captured when obtaining a connection
@@ -312,6 +330,23 @@ public class DataSourceConfig {
   }
 
   /**
+   * Return the maximum age a connection is allowed to be before it is closed.
+   * <p>
+   * This can be used to close really old connections.
+   * </p>
+   */
+  public int getMaxAgeMinutes() {
+    return maxAgeMinutes;
+  }
+  
+  /**
+   * Set the maximum age a connection can be in minutes.
+   */
+  public void setMaxAgeMinutes(int maxAgeMinutes) {
+    this.maxAgeMinutes = maxAgeMinutes;
+  }
+
+  /**
    * Set the time in seconds a connection can be idle after which it can be
    * trimmed from the pool.
    * <p>
@@ -380,7 +415,7 @@ public class DataSourceConfig {
   public void setOffline(boolean offline) {
     this.offline = offline;
   }
-
+  
   /**
    * Return a map of custom properties for the jdbc driver connection.
    */
@@ -420,6 +455,7 @@ public class DataSourceConfig {
     this.leakTimeMinutes = properties.getInt(prefix + "leakTimeMinutes", 30);
     this.maxInactiveTimeSecs = properties.getInt(prefix + "maxInactiveTimeSecs", 720);
     this.trimPoolFreqSecs = properties.getInt(prefix + "trimPoolFreqSecs", 59);
+    this.maxAgeMinutes = properties.getInt(prefix + "maxAgeMinutes", 0);
 
     this.minConnections = properties.getInt(prefix + "minConnections", 0);
     this.maxConnections = properties.getInt(prefix + "maxConnections", 20);
@@ -429,6 +465,7 @@ public class DataSourceConfig {
     this.waitTimeoutMillis = properties.getInt(prefix + "waitTimeout", 1000);
 
     this.heartbeatSql = properties.get(prefix + "heartbeatSql", null);
+    this.heartbeatTimeoutSeconds =  properties.getInt(prefix + "heartbeatTimeoutSeconds", 3);    
     this.poolListener = properties.get(prefix + "poolListener", null);
     this.offline = properties.getBoolean(prefix + "offline", false);
 
