@@ -16,6 +16,7 @@ import com.avaje.ebean.config.dbplatform.SqlLimitRequest;
 import com.avaje.ebean.config.dbplatform.SqlLimitResponse;
 import com.avaje.ebean.config.dbplatform.SqlLimiter;
 import com.avaje.ebean.text.PathProperties;
+import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -130,9 +131,16 @@ public class CQueryBuilder implements Constants {
     // always set the order by to null for row count query
     query.setOrder(null);
 
-    boolean hasMany = !query.getManyWhereJoins().isEmpty();
-
-    query.setSelectId();
+    ManyWhereJoins manyWhereJoins = query.getManyWhereJoins();
+    
+    boolean hasMany = manyWhereJoins.isHasMany();
+    if (manyWhereJoins.isSelectId()) {
+      // just select the id property
+      query.setSelectId();
+    } else {
+      // select the id and the required formula properties
+      query.select(manyWhereJoins.getFormulaProperties());
+    }
 
     String sqlSelect = "select count(*)";
     if (hasMany) {

@@ -122,7 +122,13 @@ public class ElPropertyChain implements ElPropertyValue {
         return false;
     }
 
-    public boolean containsMany() {
+  @Override
+  public boolean containsFormulaWithJoin() {
+    // Not cascading the check at this stage
+    return false;
+  }
+
+  public boolean containsMany() {
 		return containsMany;
 	}
 

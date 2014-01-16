@@ -19,6 +19,10 @@ public class ManyWhereJoins implements Serializable {
     
     private final TreeSet<String> joins = new TreeSet<String>();
 
+    private StringBuilder formulaProperties = new StringBuilder();
+    
+    private boolean formulaWithJoin;
+
     /**
      * Add a many where join.
      */
@@ -73,4 +77,36 @@ public class ManyWhereJoins implements Serializable {
         return joins;
     }
     
+    /**
+     * In findRowCount query found a formula property with a join clause so building a select clause
+     * specifically for the findRowCount query.
+     */
+    public void addFormulaWithJoin(String propertyName) {
+      if (formulaWithJoin) {
+        formulaProperties.append(",");
+      } else {
+        formulaProperties = new StringBuilder();
+        formulaWithJoin = true;
+      }
+      formulaProperties.append(propertyName);
+    }
+    
+    public boolean isHasMany() {
+      return formulaWithJoin || !joins.isEmpty();
+    }
+    
+    /**
+     * Return true if the findRowCount query just needs the id property in the select clause.
+     */
+    public boolean isSelectId() {
+      return !formulaWithJoin;
+    }
+    
+    /**
+     * Return the formula properties to build the select clause for a findRowCount query.
+     */
+    public String getFormulaProperties() {
+      return formulaProperties.toString();
+    }
+
 }

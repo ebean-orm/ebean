@@ -18,6 +18,11 @@ public interface ElPropertyDeploy {
 	public static final String ROOT_ELPREFIX = "${}";
 
 	/**
+	 * Return true if the property is a formula with a join clause.
+	 */
+  public boolean containsFormulaWithJoin();
+
+	/**
 	 * Return true if there is a property on the path that is a many property.
 	 */
 	public boolean containsMany();

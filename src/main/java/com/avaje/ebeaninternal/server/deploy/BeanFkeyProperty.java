@@ -63,6 +63,11 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     public boolean isDeployOnly() {
         return true;
     }
+    
+    @Override
+    public boolean containsFormulaWithJoin() {
+      return false;
+    }
 
     /**
      * Returns false.

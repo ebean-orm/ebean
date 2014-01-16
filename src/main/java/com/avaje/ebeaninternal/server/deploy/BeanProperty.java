@@ -837,6 +837,12 @@ public class BeanProperty implements ElPropertyValue {
         return false;
     }
 
+    
+    @Override
+    public boolean containsFormulaWithJoin() {
+      return formula && sqlFormulaJoin != null;
+    }
+
     public boolean containsManySince(String sinceProperty) {
         return containsMany();
     }

@@ -108,6 +108,11 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
         throw new RuntimeException("Not Supported or Expected");
     }
     
+    @Override
+    public boolean containsFormulaWithJoin() {
+      return false;
+    }
+
     public boolean containsMany() {
         return false;
     }
