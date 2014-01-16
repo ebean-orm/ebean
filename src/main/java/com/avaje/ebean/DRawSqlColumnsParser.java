@@ -1,7 +1,6 @@
 package com.avaje.ebean;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.persistence.PersistenceException;
 
@@ -57,6 +56,9 @@ final class DRawSqlColumnsParser {
       split = tmp.toArray(new String[tmp.size()]);
     }
 
+    if (split.length == 0) {
+      throw new PersistenceException("Huh? Not expecting length=0 when parsing column " + colInfo);
+    }
     if (split.length == 1) {
       // default to column the same name as the property
       return new ColumnMapping.Column(indexPos++, split[0], null);
@@ -64,17 +66,18 @@ final class DRawSqlColumnsParser {
     if (split.length == 2) {
       return new ColumnMapping.Column(indexPos++, split[0], split[1]);
     }
-    if (split.length == 3) {
-      if (!split[1].equalsIgnoreCase("as")) {
-        String msg = "Expecting AS keyword parsing column " + colInfo;
-        throw new PersistenceException(msg);
-      }
-      return new ColumnMapping.Column(indexPos++, split[0], split[2]);
+    // Ok, we now expect/require the AS keyword and it should be the 
+    // second to last word in the colInfo content 
+    if (!split[split.length - 2].equalsIgnoreCase("as")) {
+      throw new PersistenceException("Expecting AS keyword as second to last word when parsing column " + colInfo);
     }
-
-    String msg = "Expecting Max 3 words parsing column " + colInfo + ". Got "
-        + Arrays.toString(split);
-    throw new PersistenceException(msg);
+    // build back the 'column formula' that precedes the AS keyword
+    StringBuilder sb = new StringBuilder();
+    sb.append(split[0]);
+    for (int i = 1; i < split.length-2; i++) {
+      sb.append(" ").append(split[i]);
+    }
+    return new ColumnMapping.Column(indexPos++, sb.toString(), split[split.length - 1]);
   }
 
   private int nextComma() {
