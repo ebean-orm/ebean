@@ -30,6 +30,13 @@ public interface PersistenceContext {
   public Object get(Class<?> beanType, Object uid);
 
   /**
+   * Get the bean from the persistence context also checked to see if it had
+   * been previously deleted (if so then you also can't hit the L2 cache to
+   * fetch the bean for this particular persistence context).
+   */
+  public WithOption getWithOption(Class<?> beanType, Object uid);
+
+  /**
    * Clear all the references.
    */
   public void clear();
@@ -45,8 +52,59 @@ public interface PersistenceContext {
   public void clear(Class<?> beanType, Object uid);
 
   /**
+   * Clear the reference as a result of an entity being deleted.
+   */
+  public void deleted(Class<?> beanType, Object id);
+
+  /**
    * Return the number of beans of the given type in the persistence context.
    */
   public int size(Class<?> beanType);
 
+  /**
+   * Wrapper on a bean to also indicate if a bean has been deleted.
+   * <p>
+   * If a bean has been deleted then for the same persistence context is should
+   * not be able to be fetched from persistence context or L2 cache.
+   * </p>
+   */
+  public static class WithOption {
+
+    /**
+     * The bean was previously deleted from this persistence context (can't hit
+     * L2 cache).
+     */
+    public static WithOption DELETED = new WithOption(true);
+
+    private final boolean deleted;
+    private final Object bean;
+
+    private WithOption(boolean deleted) {
+      this.deleted = true;
+      this.bean = null;
+    }
+
+    /**
+     * The bean exists in the persistence context (and not been previously deleted).
+     */
+    public WithOption(Object bean) {
+      this.deleted = false;
+      this.bean = bean;
+    }
+
+    /**
+     * Return true if the bean was deleted. This means you can't hit the L2
+     * cache.
+     */
+    public boolean isDeleted() {
+      return deleted;
+    }
+
+    /**
+     * Return the bean (from the persistence context).
+     */
+    public Object getBean() {
+      return bean;
+    }
+  }
 }

@@ -50,6 +50,7 @@ import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebean.bean.PersistenceContext.WithOption;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.EncryptKeyManager;
 import com.avaje.ebean.config.GlobalProperties;
@@ -1136,9 +1137,14 @@ public final class DefaultServer implements SpiEbeanServer {
       // first look in the persistence context
       context = t.getPersistenceContext();
       if (context != null) {
-        Object o = context.get(beanDescriptor.getBeanType(), query.getId());
+        WithOption o = context.getWithOption(beanDescriptor.getBeanType(), query.getId());
         if (o != null) {
-          return (T) o;
+          if (o.isDeleted()) {
+            // Bean was previously deleted in the same transaction / persistence context
+            return null;
+          }
+          // Return the entity bean instance from the persistence context
+          return (T) o.getBean();
         }
       }
     }
@@ -1148,6 +1154,7 @@ public final class DefaultServer implements SpiEbeanServer {
       return null;
     }
 
+    // Hit the L2 bean cache
     Object cachedBean = beanDescriptor.cacheGetBean(query.getId(), query.isReadOnly());
     if (cachedBean != null) {
       if (context == null) {

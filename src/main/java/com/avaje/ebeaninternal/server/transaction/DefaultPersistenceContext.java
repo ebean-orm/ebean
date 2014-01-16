@@ -1,9 +1,11 @@
 package com.avaje.ebeaninternal.server.transaction;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.Monitor;
@@ -64,6 +66,12 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     		return getClassContext(beanType).get(id);
     	}
     }
+    
+    public WithOption getWithOption(Class<?> beanType, Object id) {
+      synchronized (monitor) {
+        return getClassContext(beanType).getWithOption(id);
+      }
+    }
 
     /**
      * Return the number of beans of the given type in the persistence context.
@@ -93,11 +101,19 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     	}
     }
 
+    public void deleted(Class<?> beanType, Object id) {
+      synchronized (monitor) {
+        ClassContext classMap = typeCache.get(beanType.getName());
+        if (classMap != null && id != null) {
+          classMap.deleted(id);
+        }
+      }
+    }
+    
     public void clear(Class<?> beanType, Object id) {
     	synchronized (monitor) {
 	    	ClassContext classMap = typeCache.get(beanType.getName());
 	        if (classMap != null && id != null) {
-	            //id = getUid(beanType, id);
 	            classMap.remove(id);
 	        }
     	}
@@ -130,16 +146,24 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
     private static class ClassContext {
     	
-        private final WeakValueMap<Object, Object> map = new WeakValueMap<Object, Object>();
-        
+      private final WeakValueMap<Object, Object> map = new WeakValueMap<Object, Object>();
+      private Set<Object> deleteSet;
+       
+      private WithOption getWithOption(Object id){
+        if (deleteSet != null && deleteSet.contains(id)) {
+          return WithOption.DELETED;
+        }
+        Object bean = map.get(id);
+        return (bean == null) ? null : new WithOption(bean);
+      }
+      
     	private Object get(Object id){
     	    return map.get(id);
     	}
     	
-        private Object putIfAbsent(Object id, Object bean){
-            
-            return map.putIfAbsent(id, bean);
-        }
+      private Object putIfAbsent(Object id, Object bean){          
+          return map.putIfAbsent(id, bean);
+      }
         
     	private void put(Object id, Object b){
     	    map.put(id, b);
@@ -156,6 +180,14 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     	private Object remove(Object id){
     		return map.remove(id);
     	}
+
+      private void deleted(Object id){
+        if (deleteSet == null) {
+          deleteSet = new HashSet<Object>();
+        }
+        deleteSet.add(id);
+        map.remove(id);
+      }
     }
     
 }

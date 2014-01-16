@@ -19,6 +19,7 @@ import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollection.ModifyListenMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
+import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.SpiUpdate;
@@ -38,6 +39,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.IntersectionRow;
 import com.avaje.ebeaninternal.server.deploy.ManyType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -538,7 +540,18 @@ public final class DefaultPersister implements Persister {
 		} else {
 			t.getEvent().addDeleteById(descriptor, id);
 		}
-		return executeSqlUpdate(deleteById, t);
+		int rows = executeSqlUpdate(deleteById, t);
+		
+		// Delete from the persistence context so that it can't be fetched again later
+		PersistenceContext persistenceContext = ((SpiTransaction)t).getPersistenceContext();
+		if (idList != null) {
+		  for (Object  idValue : idList) {
+        persistenceContext.deleted(descriptor.getBeanType(), idValue);
+      }
+		} else {
+		  persistenceContext.deleted(descriptor.getBeanType(), id);
+		}
+		return rows;
 	}
 
 	/**
