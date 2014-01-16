@@ -353,6 +353,11 @@ public class DefaultServerFactory implements BootupEbeanManager {
       if (sequenceFormat != null) {
         nc.setSequenceFormat(sequenceFormat);
       }
+      
+      String schema = config.getProperty("namingConvention.schema");
+      if (schema != null) {
+        nc.setSchema(schema);
+      }
     }
   }
 
