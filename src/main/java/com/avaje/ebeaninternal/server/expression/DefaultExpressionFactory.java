@@ -244,6 +244,9 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Id Equal to - ID property is equal to the value.
    */
   public Expression idEq(Object value) {
+    if (value == null) {
+      throw new NullPointerException("The id value is null");
+    }
     return new IdExpression(value);
   }
 
