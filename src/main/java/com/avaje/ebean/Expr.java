@@ -74,6 +74,14 @@ public class Expr {
   }
 
   /**
+   * Between - value between two given properties.
+   */
+  public static Expression between(String lowProperty, String highProperty, Object value) {
+    
+    return Ebean.getExpressionFactory().betweenProperties(lowProperty, highProperty, value);
+  }
+  
+  /**
    * Greater Than - property greater than the given value.
    */
   public static Expression gt(String propertyName, Object value) {
