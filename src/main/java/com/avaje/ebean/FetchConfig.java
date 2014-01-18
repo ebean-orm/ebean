@@ -24,7 +24,7 @@ import java.io.Serializable;
  * 
  * <pre class="code">
  * // Normal fetch join results in a single SQL query
- * List&lt;Order&gt; list = Ebean.find(Order.class).join(&quot;details&quot;).findList();
+ * List&lt;Order&gt; list = Ebean.find(Order.class).fetch(&quot;details&quot;).findList();
  * 
  * // Find Orders join details using a single SQL query
  * </pre>
@@ -51,8 +51,8 @@ import java.io.Serializable;
  * // This will use 3 SQL queries to build this object graph
  * List&lt;Order&gt; list =
  *     Ebean.find(Order.class)
- *         .fetch(&quot;details&quot;, new JoinConfig().query())
- *         .fetch(&quot;customer&quot;, new JoinConfig().query(5))
+ *         .fetch(&quot;details&quot;, new FetchConfig().query())
+ *         .fetch(&quot;customer&quot;, new FetchConfig().queryFirst(5))
  *         .findList();
  * 
  * // query 1) find order
@@ -70,7 +70,7 @@ import java.io.Serializable;
  *         .select(&quot;status, shipDate&quot;)
  *         .fetch(&quot;details&quot;, &quot;quantity, price&quot;, new FetchConfig().query())
  *         .fetch(&quot;details.product&quot;, &quot;sku, name&quot;)
- *         .fetch(&quot;customer&quot;, &quot;name&quot;, new FetchConfig().query(10))
+ *         .fetch(&quot;customer&quot;, &quot;name&quot;, new FetchConfig().queryFirst(5))
  *         .fetch(&quot;customer.contacts&quot;)
  *         .fetch(&quot;customer.shippingAddress&quot;)
  *         .findList();
@@ -96,13 +96,13 @@ import java.io.Serializable;
  * <pre class="code">
  * List&lt;Order&gt; list =
  *     Ebean.find(Order.class)
- *         .fetch(&quot;customer&quot;, new FetchConfig().query(3).lazy(10))
+ *         .fetch(&quot;customer&quot;, new FetchConfig().query(10).lazy(5))
  *         .findList();
  * 
  * // query 1) find order
- * // query 2) find customer where id in (?,?,?) // first 3 customers
+ * // query 2) find customer where id in (?,?,?,?,?,?,?,?,?,?) // first 10 customers
  * // .. then if lazy loading of customers is invoked
- * // .. use a batch size of 10 to load the customers
+ * // .. use a batch size of 5 to load the customers
  * 
  * </pre>
  * 
@@ -128,8 +128,8 @@ import java.io.Serializable;
  * // .. use a batch size of 5 to load the customers 
  *  
  *       find  customer (name) 
- *       fetch contact (contactName, phone, email) 
- *       fetch shippingAddress (*) 
+ *       fetch customer.contacts (contactName, phone, email) 
+ *       fetch customer.shippingAddress (*) 
  *       where id in (?,?,?,?,?)
  * 
  * </pre>
@@ -159,6 +159,7 @@ public class FetchConfig implements Serializable {
    */
   public FetchConfig lazy() {
     this.lazyBatchSize = 0;
+    this.queryAll = false;
     return this;
   }
 
@@ -170,11 +171,12 @@ public class FetchConfig implements Serializable {
    */
   public FetchConfig lazy(int lazyBatchSize) {
     this.lazyBatchSize = lazyBatchSize;
+    this.queryAll = false;
     return this;
   }
 
   /**
-   * Specify that this path should be loaded as a separate query (rather than as
+   * Eagerly fetch the beans in this path as a separate query (rather than as
    * part of the main query).
    * <p>
    * This will use the default batch size for separate query which is 100.
@@ -187,14 +189,15 @@ public class FetchConfig implements Serializable {
   }
 
   /**
-   * Specify that this path should be loaded as a separate query (rather than as
+   * Eagerly fetch the beans in this path as a separate query (rather than as
    * part of the main query).
    * <p>
    * The queryBatchSize is the number of parent id's that this separate query
    * will load per batch.
    * </p>
    * <p>
-   * This will load all beans on this path eagerly.
+   * This will load all beans on this path eagerly unless a {@link #lazy(int)}
+   * is also used.
    * </p>
    * 
    * @param queryBatchSize
@@ -202,12 +205,14 @@ public class FetchConfig implements Serializable {
    */
   public FetchConfig query(int queryBatchSize) {
     this.queryBatchSize = queryBatchSize;
-    this.queryAll = true;
+    // queryAll true as long as a lazy batch size has not already been set
+    this.queryAll = (lazyBatchSize == -1);
     return this;
   }
 
   /**
-   * Similar to {@link #query(int)} but only fetches the first batch.
+   * Eagerly fetch the first batch of beans on this path.
+   * This is similar to {@link #query(int)} but only fetches the first batch.
    * <p>
    * If there are more parent beans than the batch size then they will not be
    * loaded eagerly but instead use lazy loading.
@@ -228,7 +233,7 @@ public class FetchConfig implements Serializable {
   public int getLazyBatchSize() {
     return lazyBatchSize;
   }
-
+  
   /**
    * Return the batch size for separate query load.
    */

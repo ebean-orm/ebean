@@ -155,7 +155,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
   private final CQueryEngine cqueryEngine;
 
-  @Deprecated
+  //@Deprecated
   private DdlGenerator ddlGenerator;
 
   private final ExpressionFactory expressionFactory;
@@ -188,13 +188,15 @@ public final class DefaultServer implements SpiEbeanServer {
    */
   private int lazyLoadBatchSize;
 
-  /** The query batch size */
+  /** 
+   * The query batch size 
+   */
   private int queryBatchSize;
+
   /**
    * JDBC driver specific handling for JDBC batch execution.
    */
   private PstmtBatch pstmtBatch;
-
 
   /**
    * holds plugins (e.g. ddl generator) detected by the service loader
@@ -502,7 +504,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
 
-    beanLoader.loadMany(bc, null, onlyIds);
+    beanLoader.loadMany(bc, onlyIds);
   }
 
   public void refresh(Object bean) {

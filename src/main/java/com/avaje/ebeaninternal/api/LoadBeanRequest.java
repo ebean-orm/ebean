@@ -9,55 +9,52 @@ import com.avaje.ebean.bean.EntityBeanIntercept;
  * Request for loading ManyToOne and OneToOne relationships.
  */
 public class LoadBeanRequest extends LoadRequest {
-	
-	private final List<EntityBeanIntercept> batch;
 
-	private final LoadBeanContext loadContext;
-		
-	private final String lazyLoadProperty;
-	
-	private final boolean loadCache;
-	
-	public LoadBeanRequest(LoadBeanContext loadContext, List<EntityBeanIntercept> batch, 
-			Transaction transaction, int batchSize, boolean lazy, String lazyLoadProperty, boolean loadCache) {
-	
-		super(transaction, batchSize, lazy);
-		this.loadContext = loadContext;
-		this.batch = batch;
-		this.lazyLoadProperty = lazyLoadProperty;
-		this.loadCache = loadCache;
-	}
-	
-	public boolean isLoadCache() {
-    	return loadCache;
-    }
+  private final List<EntityBeanIntercept> batch;
 
-	public String getDescription() {
-		String fullPath = loadContext.getFullPath();
-		String s = "path:" + fullPath + " batch:" + batchSize + " actual:"
-				+ batch.size();
-		return s;
-	}
+  private final LoadBeanBuffer LoadBuffer;
 
-	/**
-	 * Return the batch of beans to actually load.
-	 */
-	public List<EntityBeanIntercept> getBatch() {
-		return batch;
-	}
+  private final String lazyLoadProperty;
 
-	/**
-	 * Return the load context.
-	 */
-	public LoadBeanContext getLoadContext() {
-		return loadContext;
-	}
+  private final boolean loadCache;
 
-	/**
-	 * Return the property that invoked the lazy loading.
-	 */
-	public String getLazyLoadProperty() {
-		return lazyLoadProperty;
-	}	
-	
+  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, Transaction transaction, boolean lazy, String lazyLoadProperty,
+      boolean loadCache) {
+
+    super(transaction, lazy);
+    this.LoadBuffer = LoadBuffer;
+    this.batch = LoadBuffer.getBatch();
+    this.lazyLoadProperty = lazyLoadProperty;
+    this.loadCache = loadCache;
+  }
+
+  public boolean isLoadCache() {
+    return loadCache;
+  }
+
+  public String getDescription() {
+    return "path:" + LoadBuffer.getFullPath() + " batch:" + batch.size();
+  }
+
+  /**
+   * Return the batch of beans to actually load.
+   */
+  public List<EntityBeanIntercept> getBatch() {
+    return batch;
+  }
+
+  /**
+   * Return the load context.
+   */
+  public LoadBeanBuffer getLoadContext() {
+    return LoadBuffer;
+  }
+
+  /**
+   * Return the property that invoked the lazy loading.
+   */
+  public String getLazyLoadProperty() {
+    return lazyLoadProperty;
+  }
+
 }

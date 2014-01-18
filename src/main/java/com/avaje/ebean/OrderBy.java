@@ -32,6 +32,10 @@ public final class OrderBy<T> implements Serializable {
   public OrderBy() {
     this.list = new ArrayList<Property>(2);
   }
+  
+  private OrderBy(List<Property> list) {
+    this.list = list;
+  }
 
   /**
    * Create an orderBy parsing the order by clause.
@@ -81,6 +85,17 @@ public final class OrderBy<T> implements Serializable {
     return query;
   }
 
+  /**
+   * Return a copy of this OrderBy with the path trimmed.
+   */
+  public OrderBy<T> copyWithTrim(String path) {
+    List<Property> newList = new ArrayList<Property>(list.size());
+    for (int i = 0; i < list.size(); i++) {
+      newList.add(list.get(i).copyWithTrim(path));
+    }
+    return new OrderBy<T>(newList);
+  }
+  
   /**
    * Return the properties for this OrderBy.
    */
@@ -194,6 +209,13 @@ public final class OrderBy<T> implements Serializable {
     public Property(String property, boolean ascending) {
       this.property = property;
       this.ascending = ascending;
+    }
+
+    /**
+     * Return a copy of this Property with the path trimmed.
+     */
+    public Property copyWithTrim(String path) {
+      return new Property(property.substring(path.length() + 1), ascending);
     }
 
     protected int hash() {

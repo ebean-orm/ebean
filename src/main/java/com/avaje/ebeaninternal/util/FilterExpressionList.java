@@ -15,6 +15,7 @@ import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.PagingList;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.QueryListener;
+import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.server.expression.FilterExprPath;
 
 public class FilterExpressionList<T> extends DefaultExpressionList<T> {
@@ -31,8 +32,8 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
         this.rootQuery = rootQuery;
     }
     
-    public void trimPath(int prefixTrim) {
-        pathPrefix.trimPath(prefixTrim);
+    public SpiExpressionList<?> trimPath(int prefixTrim) {
+        return new FilterExpressionList<T>(pathPrefix.trimPath(prefixTrim), expr, rootQuery);
     }
     
     public FilterExprPath getPathPrefix() {

@@ -33,13 +33,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   private static final long serialVersionUID = -6992345500247035947L;
 
-  private final ArrayList<SpiExpression> list = new ArrayList<SpiExpression>();
+  protected final ArrayList<SpiExpression> list = new ArrayList<SpiExpression>();
 
-  private final Query<T> query;
+  protected final Query<T> query;
 
-  private final ExpressionList<T> parentExprList;
+  protected final ExpressionList<T> parentExprList;
 
-  private transient ExpressionFactory expr;
+  protected transient ExpressionFactory expr;
 
   private final String exprLang;
   private final String listAndStart;
@@ -69,7 +69,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     }
   }
 
-  public void trimPath(int prefixTrim) {
+  public SpiExpressionList<?> trimPath(int prefixTrim) {
     throw new RuntimeException("Only allowed on FilterExpressionList");
   }
 

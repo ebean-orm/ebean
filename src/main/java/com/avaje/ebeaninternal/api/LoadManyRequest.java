@@ -13,28 +13,24 @@ public class LoadManyRequest extends LoadRequest {
 
 	private final List<BeanCollection<?>> batch;
 
-	private final LoadManyContext loadContext;
+	private final LoadManyBuffer loadContext;
 
 	private final boolean onlyIds;
 	
 	private final boolean loadCache;
 	
-	public LoadManyRequest(LoadManyContext loadContext,
-			List<BeanCollection<?>> batch, Transaction transaction,
-			int batchSize, boolean lazy, boolean onlyIds, boolean loadCache) {
+  public LoadManyRequest(LoadManyBuffer loadContext, Transaction transaction, int batchSize, boolean lazy,
+      boolean onlyIds, boolean loadCache) {
 
-		super(transaction, batchSize, lazy);
+		super(transaction, lazy);
 		this.loadContext = loadContext;
-		this.batch = batch;
+		this.batch = loadContext.getBatch();
 		this.onlyIds = onlyIds;
 		this.loadCache = loadCache;
 	}
 
 	public String getDescription() {
-		String fullPath = loadContext.getFullPath();
-		String s = "path:" + fullPath + " batch:" + batchSize + " actual:"
-				+ batch.size();
-		return s;
+		return "path:" + loadContext.getFullPath() + " size:"+ batch.size();
 	}
 
 	/**
@@ -47,7 +43,7 @@ public class LoadManyRequest extends LoadRequest {
 	/**
 	 * Return the load context.
 	 */
-	public LoadManyContext getLoadContext() {
+	public LoadManyBuffer getLoadContext() {
 		return loadContext;
 	}
 

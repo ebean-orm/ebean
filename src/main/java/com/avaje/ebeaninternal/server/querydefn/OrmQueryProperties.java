@@ -12,7 +12,6 @@ import java.util.Set;
 import com.avaje.ebean.ExpressionFactory;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.OrderBy;
-import com.avaje.ebean.OrderBy.Property;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionFactory;
@@ -187,8 +186,7 @@ public class OrmQueryProperties implements Serializable {
         if (filterMany == null){
             return null;
         }
-        filterMany.trimPath(trimPath);
-        return filterMany;
+        return filterMany.trimPath(trimPath);
     }
     
     /**
@@ -248,11 +246,7 @@ public class OrmQueryProperties implements Serializable {
         }
         
         if (orderBy != null){
-            List<Property> orderByProps = orderBy.getProperties();
-            for (int i = 0; i < orderByProps.size(); i++) {
-                orderByProps.get(i).trim(path);
-            }
-            query.setOrder(orderBy);
+          query.setOrder(orderBy.copyWithTrim(path));
         }
     }
 

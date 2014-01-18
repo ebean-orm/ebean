@@ -19,19 +19,27 @@ public class TestQueryFetchJoinWithOrder extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Order> list = Ebean.find(Order.class).fetch("details", new FetchConfig().query()).order()
-        .asc("id").order().desc("details.id").findList();
+    List<Order> list = Ebean.find(Order.class)
+        .fetch("details", new FetchConfig().query())
+        .order().asc("id")
+        .order().desc("details.id").findList();
 
     Assert.assertNotNull(list);
 
-    List<Order> list2 = Ebean.find(Order.class).fetch("customer", new FetchConfig().query())
-        .fetch("customer.contacts").order().asc("id").order().asc("customer.contacts.lastName")
+    List<Order> list2 = Ebean.find(Order.class)
+        .fetch("customer", new FetchConfig().query(5))
+        .fetch("customer.contacts")
+        .order().asc("id")
+        .order().asc("customer.contacts.lastName")
         .findList();
 
     Assert.assertNotNull(list2);
 
-    List<Customer> list3 = Ebean.find(Customer.class).fetch("orders").filterMany("orders")
-        .eq("status", Order.Status.NEW).order().desc("orders.id").findList();
+    List<Customer> list3 = Ebean.find(Customer.class)
+        .fetch("orders")
+        .filterMany("orders").eq("status", Order.Status.NEW)
+        .order().desc("orders.id")
+        .findList();
 
     Assert.assertNotNull(list3);
 

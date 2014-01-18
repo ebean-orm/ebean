@@ -30,7 +30,8 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
 
     List<Order> list = Ebean.find(Order.class).fetch("customer")
         .fetch("customer.contacts", "firstName", new FetchConfig().query().lazy(10))
-        .fetch("customer.contacts.group").where().lt("id", 3).findList();
+        .fetch("customer.contacts.group")
+        .where().lt("id", 3).findList();
 
     Assert.assertNotNull(list);
     Assert.assertTrue(list.size() > 0);

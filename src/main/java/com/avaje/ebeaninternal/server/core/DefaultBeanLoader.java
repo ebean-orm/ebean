@@ -15,10 +15,10 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
-import com.avaje.ebeaninternal.api.LoadBeanContext;
+import com.avaje.ebeaninternal.api.LoadBeanBuffer;
 import com.avaje.ebeaninternal.api.LoadBeanRequest;
-import com.avaje.ebeaninternal.api.LoadManyContext;
 import com.avaje.ebeaninternal.api.LoadManyRequest;
+import com.avaje.ebeaninternal.api.LoadManyBuffer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -27,8 +27,6 @@ import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 /**
  * Helper to handle lazy loading and refreshing of beans.
- * 
- * @author rbygrave
  */
 public class DefaultBeanLoader {
 
@@ -50,32 +48,29 @@ public class DefaultBeanLoader {
    * re-use the query plan cache and get DB statement re-use.
    * </p>
    */
-  private int getBatchSize(int batchListSize, int requestedBatchSize) {
-    if (batchListSize == requestedBatchSize) {
-      return batchListSize;
-    }
-    if (batchListSize == 1) {
+  private int getBatchSize(int batchSize) {
+    
+    if (batchSize == 1) {
       // there is only one bean/collection to load
       return 1;
     }
-    if (requestedBatchSize <= 5) {
+    if (batchSize <= 5) {
       // anything less than 5 becomes 5
       return 5;
     }
-    if (batchListSize <= 10 || requestedBatchSize <= 10) {
-      // 10 or less to load
-      // ... or we wanted a batch size between 6 and 10
+    if (batchSize <= 10) {
       return 10;
     }
-    if (batchListSize <= 20 || requestedBatchSize <= 20) {
-      // 20 or less to load
-      // ... or we wanted a batch size between 11 and 20
+    if (batchSize <= 20) {
       return 20;
     }
-    if (batchListSize <= 50) {
+    if (batchSize <= 50) {
       return 50;
     }
-    return requestedBatchSize;
+    if (batchSize <= 100) {
+      return 100;
+    }
+    return batchSize;
   }
 	
 	public void refreshMany(Object parentBean, String propertyName) {
@@ -86,9 +81,9 @@ public class DefaultBeanLoader {
 
     List<BeanCollection<?>> batch = loadRequest.getBatch();
 
-    int batchSize = getBatchSize(batch.size(), loadRequest.getBatchSize());
+    int batchSize = getBatchSize(batch.size());
 
-    LoadManyContext ctx = loadRequest.getLoadContext();
+    LoadManyBuffer ctx = loadRequest.getLoadContext();
     BeanPropertyAssocMany<?> many = ctx.getBeanProperty();
 
     PersistenceContext pc = ctx.getPersistenceContext();
@@ -154,14 +149,14 @@ public class DefaultBeanLoader {
     }
   }
 
-  public void loadMany(BeanCollection<?> bc, LoadManyContext ctx, boolean onlyIds) {
+  public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
 
     Object parentBean = bc.getOwnerBean();
     String propertyName = bc.getPropertyName();
 
-    ObjectGraphNode node = ctx == null ? null : ctx.getObjectGraphNode();
+    //ObjectGraphNode node = ctx == null ? null : ctx.getObjectGraphNode();
 
-    loadManyInternal(parentBean, propertyName, null, false, node, onlyIds);
+    loadManyInternal(parentBean, propertyName, null, false, null, onlyIds);
   }
 
 	public void refreshMany(Object parentBean, String propertyName, Transaction t) {
@@ -170,17 +165,15 @@ public class DefaultBeanLoader {
 
 	private void loadManyInternal(Object parentBean, String propertyName, Transaction t, boolean refresh, ObjectGraphNode node, boolean onlyIds) {
 
-    EntityBeanIntercept ebi = null;
-    PersistenceContext pc = null;
-    BeanCollection<?> beanCollection = null;
-    ExpressionList<?> filterMany = null;
-
-    ebi = ((EntityBean) parentBean)._ebean_getIntercept();
-    pc = ebi.getPersistenceContext();
+    EntityBeanIntercept ebi = ((EntityBean) parentBean)._ebean_getIntercept();
+    PersistenceContext pc = ebi.getPersistenceContext();
 
     BeanDescriptor<?> parentDesc = server.getBeanDescriptor(parentBean.getClass());
     BeanPropertyAssocMany<?> many = (BeanPropertyAssocMany<?>) parentDesc.getBeanProperty(propertyName);
 
+    BeanCollection<?> beanCollection = null;
+    ExpressionList<?> filterMany = null;
+    
     Object currentValue = many.getValue(parentBean);
     if (currentValue instanceof BeanCollection<?>) {
       beanCollection = (BeanCollection<?>) currentValue;
@@ -270,9 +263,9 @@ public class DefaultBeanLoader {
       throw new RuntimeException("Nothing in batch?");
     }
 
-    int batchSize = getBatchSize(batch.size(), loadRequest.getBatchSize());
+    int batchSize = getBatchSize(batch.size());
 
-    LoadBeanContext ctx = loadRequest.getLoadContext();
+    LoadBeanBuffer ctx = loadRequest.getLoadContext();
     BeanDescriptor<?> desc = ctx.getBeanDescriptor();
 
     Class<?> beanType = desc.getBeanType();
@@ -349,7 +342,6 @@ public class DefaultBeanLoader {
         ebis[i].setLazyLoadFailure();
       }
     }
-
   }
 
 	public void refresh(Object bean) {
@@ -362,7 +354,6 @@ public class DefaultBeanLoader {
 
   private void refreshBeanInternal(Object bean, SpiQuery.Mode mode) {
 
-    
     EntityBeanIntercept ebi = ((EntityBean) bean)._ebean_getIntercept();;
     PersistenceContext pc = ebi.getPersistenceContext();
 

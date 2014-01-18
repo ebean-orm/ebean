@@ -18,10 +18,10 @@ public interface SpiExpressionList<T> extends ExpressionList<T> {
    */
   public List<SpiExpression> getUnderlyingList();
   
-    /**
-     * Trim the path for filterMany() expressions.
-     */
-    public void trimPath(int prefixTrim);
+  /**
+   * Return a copy of the ExpressionList with the path trimmed for filterMany() expressions.
+   */
+  public SpiExpressionList<?> trimPath(int prefixTrim);
     
 	/**
 	 * Restore the ExpressionFactory after deserialisation.
