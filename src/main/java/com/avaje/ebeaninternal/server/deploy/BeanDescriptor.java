@@ -15,6 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.PersistenceException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Query.UseIndex;
 import com.avaje.ebean.SqlUpdate;
@@ -33,6 +36,8 @@ import com.avaje.ebean.event.BeanFinder;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanQueryAdapter;
+import com.avaje.ebean.meta.MetaBeanInfo;
+import com.avaje.ebean.meta.MetaBeanQueryPlanStatistic;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -59,6 +64,7 @@ import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.persist.DmlUtil;
 import com.avaje.ebeaninternal.server.query.CQueryPlan;
+import com.avaje.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.ebeaninternal.server.reflect.BeanReflect;
@@ -72,13 +78,10 @@ import com.avaje.ebeaninternal.util.SortByClause;
 import com.avaje.ebeaninternal.util.SortByClause.Property;
 import com.avaje.ebeaninternal.util.SortByClauseParser;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Describes Beans including their deployment information.
  */
-public class BeanDescriptor<T> {
+public class BeanDescriptor<T> implements MetaBeanInfo {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptor.class);
 
@@ -1147,6 +1150,27 @@ public class BeanDescriptor<T> {
    */
   public String convertOrmUpdateToSql(String ormUpdateStatement) {
     return new DeployUpdateParser(this).parse(ormUpdateStatement);
+  }
+
+  @Override
+  public List<MetaBeanQueryPlanStatistic> collectQueryPlanStatistics(boolean reset) {
+    return collectQueryPlanStatisticsInternal(reset, false);
+  }
+  
+  @Override
+  public List<MetaBeanQueryPlanStatistic> collectAllQueryPlanStatistics(boolean reset) {
+    return collectQueryPlanStatisticsInternal(reset, false);
+  }
+  
+  public List<MetaBeanQueryPlanStatistic> collectQueryPlanStatisticsInternal(boolean reset, boolean collectAll) {
+    List<MetaBeanQueryPlanStatistic> list = new ArrayList<MetaBeanQueryPlanStatistic>(queryPlanCache.size());
+    for (CQueryPlan queryPlan :  queryPlanCache.values()) {
+      Snapshot snapshot = queryPlan.getSnapshot(reset);
+      if (collectAll || snapshot.getExecutionCount() > 0) {
+        list.add(snapshot);
+      }
+    }
+    return list;
   }
 
   /**
@@ -2444,6 +2468,14 @@ public class BeanDescriptor<T> {
     }
 
     return false;
+  }
+
+  public void flushPersistenceContextOnIterate(PersistenceContext persistenceContext) {
+    persistenceContext.clear(beanType);
+    for (int i = 0; i < propertiesMany.length; i++) {
+      persistenceContext.clear(propertiesMany[i].getBeanDescriptor().getBeanType());
+    }
+    
   }
     
 }

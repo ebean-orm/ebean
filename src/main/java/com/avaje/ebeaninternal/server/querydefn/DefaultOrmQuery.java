@@ -112,6 +112,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	private OrderBy<T> orderBy;
 
 	private String loadMode;
+	
 	private String loadDescription;
 	
 	private String generatedSql;
@@ -127,7 +128,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
 	private String lazyLoadProperty;
 	
-    private String lazyLoadManyPath;
+  private String lazyLoadManyPath;
 	
 	/**
 	 * Set to true if you want a DISTINCT query.
@@ -172,6 +173,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	private boolean usageProfiling = true;
 
 	private boolean loadBeanCache;
+	
 	private Boolean useBeanCache;
 	
 	private Boolean useQueryCache;

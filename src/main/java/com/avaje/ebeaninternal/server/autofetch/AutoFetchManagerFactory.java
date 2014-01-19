@@ -61,6 +61,7 @@ public class AutoFetchManagerFactory {
 			FileInputStream fi = new FileInputStream(autoFetchFile);
 			ObjectInputStream ois = new ObjectInputStream(fi);
 			AutoFetchManager profListener = (AutoFetchManager) ois.readObject();
+			ois.close();
 			
 			logger.info("AutoFetch deserialized from file ["+autoFetchFile.getAbsolutePath()+"]");
 			

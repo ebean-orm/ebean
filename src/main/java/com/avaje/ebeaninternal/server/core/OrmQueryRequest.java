@@ -389,4 +389,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     }
   }
 
+  public void flushPersistenceContextOnIterate() {
+    beanDescriptor.flushPersistenceContextOnIterate(persistenceContext);
+  }
+
 }

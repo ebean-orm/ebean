@@ -127,7 +127,7 @@ public class Statistics implements Serializable {
 	}
 
 	
-	public void collectQueryInfo(ObjectGraphNode node, int beansLoaded, int micros) {
+	public void collectQueryInfo(ObjectGraphNode node, long beansLoaded, long micros) {
 		
 		synchronized (monitor) {
 			String key = node.getPath();

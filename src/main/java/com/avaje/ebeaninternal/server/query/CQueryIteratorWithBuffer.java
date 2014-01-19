@@ -10,58 +10,58 @@ import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 
 /**
  * A QueryIterator that uses a buffer to execute secondary queries periodically.
- * 
- * @author rbygrave
  */
 class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
 
-    private final CQuery<T> cquery;
-    private final int bufferSize;
-    private final OrmQueryRequest<T> request;
-    private final ArrayList<T> buffer;
+  private final CQuery<T> cquery;
+  private final int bufferSize;
+  private final OrmQueryRequest<T> request;
+  private final ArrayList<T> buffer;
 
-    private boolean moreToLoad = true;
+  private boolean moreToLoad = true;
 
-    CQueryIteratorWithBuffer(CQuery<T> cquery, OrmQueryRequest<T> request, int bufferSize) {
-        this.cquery = cquery;
-        this.request = request;
-        this.bufferSize = bufferSize;
-        this.buffer = new ArrayList<T>(bufferSize);
-    }
+  CQueryIteratorWithBuffer(CQuery<T> cquery, OrmQueryRequest<T> request, int bufferSize) {
+    this.cquery = cquery;
+    this.request = request;
+    this.bufferSize = bufferSize;
+    this.buffer = new ArrayList<T>(bufferSize);
+  }
 
-    public boolean hasNext() {
-        try {
-            if (buffer.isEmpty() && moreToLoad) {
-                // load buffer
-                int i = -1;
-                while (moreToLoad && ++i < bufferSize) {
-                    if (cquery.hasNextBean(true)) {
-                        buffer.add(cquery.getLoadedBean());
-                    } else {
-                        moreToLoad = false;
-                    }
-                }
-                // execute secondary queries
-                request.executeSecondaryQueries(bufferSize);
-            }
-            return !buffer.isEmpty();
+  public boolean hasNext() {
+    try {
+      if (buffer.isEmpty() && moreToLoad) {
+        // load buffer
+        request.flushPersistenceContextOnIterate();
 
-        } catch (SQLException e) {
-            throw cquery.createPersistenceException(e);
+        int i = -1;
+        while (moreToLoad && ++i < bufferSize) {
+          if (cquery.hasNextBean(true)) {
+            buffer.add(cquery.getLoadedBean());
+          } else {
+            moreToLoad = false;
+          }
         }
-    }
+        // execute secondary queries
+        request.executeSecondaryQueries(bufferSize);
+      }
+      return !buffer.isEmpty();
 
-    public T next() {
-        return buffer.remove(0);
+    } catch (SQLException e) {
+      throw cquery.createPersistenceException(e);
     }
+  }
 
-    public void close() {
-        cquery.updateExecutionStatistics();
-        cquery.close();
-        request.endTransIfRequired();
-    }
+  public T next() {
+    return buffer.remove(0);
+  }
 
-    public void remove() {
-        throw new PersistenceException("Remove not allowed");
-    }
+  public void close() {
+    cquery.updateExecutionStatistics();
+    cquery.close();
+    request.endTransIfRequired();
+  }
+
+  public void remove() {
+    throw new PersistenceException("Remove not allowed");
+  }
 }

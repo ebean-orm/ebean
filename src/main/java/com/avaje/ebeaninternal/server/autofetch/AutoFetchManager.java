@@ -224,7 +224,7 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * @param micros
 	 *            the query executing time in microseconds
 	 */
-	public void collectQueryInfo(ObjectGraphNode node, int beans, int micros);
+	public void collectQueryInfo(ObjectGraphNode node, long beans, long micros);
 
 	
 	/**

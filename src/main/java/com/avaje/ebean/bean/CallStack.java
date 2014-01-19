@@ -1,6 +1,7 @@
 package com.avaje.ebean.bean;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Represent the call stack (stack trace elements).
@@ -33,6 +34,25 @@ public final class CallStack implements Serializable {
       hc = 31 * hc + callStack[i].hashCode();
     }
     this.pathHash = enc(hc);
+  }
+  
+  public int hashCode() {
+    int hc = 0;
+    for (int i = 0; i < callStack.length; i++) {
+      hc = 31 * hc + callStack[i].hashCode();
+    }
+    return hc;
+  }
+  
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    if (!(obj instanceof CallStack)) {
+      return false;
+    }
+    CallStack e = (CallStack) obj;
+    return Arrays.equals(callStack, e.callStack);
   }
 
   /**

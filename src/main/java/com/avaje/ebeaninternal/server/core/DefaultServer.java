@@ -57,6 +57,8 @@ import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanQueryAdapter;
+import com.avaje.ebean.meta.MetaBeanInfo;
+import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebean.text.json.JsonElement;
@@ -168,6 +170,8 @@ public final class DefaultServer implements SpiEbeanServer {
 
   private final JsonContext jsonContext;
 
+  private final MetaInfoManager metaInfoManager;
+  
   /**
    * The MBean name used to register Ebean.
    */
@@ -208,6 +212,7 @@ public final class DefaultServer implements SpiEbeanServer {
    */
   public DefaultServer(InternalConfiguration config, ServerCacheManager cache) {
 
+    this.metaInfoManager = new DefaultMetaInfoManager(this);
     this.serverCacheManager = cache;
     this.pstmtBatch = config.getPstmtBatch();
     this.databasePlatform = config.getDatabasePlatform();
@@ -297,6 +302,11 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public DatabasePlatform getDatabasePlatform() {
     return databasePlatform;
+  }
+  
+  @Override
+  public MetaInfoManager getMetaInfoManager() {
+    return metaInfoManager;
   }
 
   public BackgroundExecutor getBackgroundExecutor() {
@@ -1927,6 +1937,13 @@ public final class DefaultServer implements SpiEbeanServer {
     return beanDescriptorManager.getBeanDescriptorList();
   }
 
+  public List<MetaBeanInfo> getMetaBeanInfoList() {
+
+    List<MetaBeanInfo> list = new ArrayList<MetaBeanInfo>();
+    list.addAll(getBeanDescriptors());
+    return list;
+  }
+  
   public void register(BeanPersistController c) {
     List<BeanDescriptor<?>> list = beanDescriptorManager.getBeanDescriptorList();
     for (int i = 0; i < list.size(); i++) {

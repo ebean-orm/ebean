@@ -127,6 +127,11 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     }
     
     @Override
+    public String getFullPath() {
+      return context.fullPath;
+    }
+    
+    @Override
     public BeanDescriptor<?> getBeanDescriptor() {
       return context.desc;
     }
@@ -171,10 +176,6 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
       context.desc.getEbeanServer().loadBean(req);
     }
 
-    @Override
-    public String getFullPath() {
-      return context.fullPath;
-    }
   }
 	
 }

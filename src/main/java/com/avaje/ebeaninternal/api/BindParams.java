@@ -3,8 +3,7 @@ package com.avaje.ebeaninternal.api;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,22 +13,16 @@ import com.avaje.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 /**
  * Parameters used for binding to a statement.
  * <p>
- * Used by FindByNativeSql and UpdateSql to support ordered and named
- * parameters. Note that you can use either ordered OR named parameters.
+ * Supports ordered or named parameters.
  * </p>
  */
 public class BindParams implements Serializable {
 
 	private static final long serialVersionUID = 4541081933302086285L;
 
-	private ArrayList<Param> positionedParameters = new ArrayList<Param>();
+	private List<Param> positionedParameters = new ArrayList<Param>();
 
-	private HashMap<String, Param> namedParameters = new HashMap<String, Param>();
-
-	/**
-	 * Need to create a hash when binding collection values (for in clauses). 
-	 */
-	private int queryPlanHash = 1;
+	private Map<String, Param> namedParameters = new LinkedHashMap<String, Param>();
 	
 	/**
 	 * This is the sql. For named parameters this is the sql after the named
@@ -38,6 +31,39 @@ public class BindParams implements Serializable {
 	 */
 	private String preparedSql;
 
+	public BindParams() {  
+	}
+	
+  public int queryBindHash() {
+     int hc = namedParameters.hashCode();
+     for (int i = 0; i < positionedParameters.size(); i++) {
+       hc = hc * 31 + positionedParameters.get(i).hashCode();
+     }
+     return hc;
+   }
+
+  /**
+   * Return the hash that should be included with the query plan.
+   * <p>
+   * This is to handle binding collections to in clauses. The number of values
+   * in the collection effects the query (number of bind values) and so must be
+   * taken into account when calculating the query hash.
+   * </p>
+   */
+  public int getQueryPlanHash() {
+    int hc = 31;
+    for (Param param : positionedParameters) {
+      hc = hc * 31 + param.queryBindCount();
+    }
+
+    for (Map.Entry<String, Param> entry : namedParameters.entrySet()) {
+      hc = hc * 31 + entry.getKey().hashCode();
+      hc = hc * 31 + entry.getValue().queryBindCount();
+    }
+
+    return hc;
+  }
+ 
 	/**
 	 * Return a deep copy of the BindParams.
 	 */
@@ -46,45 +72,12 @@ public class BindParams implements Serializable {
 		for (Param p : positionedParameters) {
 			copy.positionedParameters.add(p.copy());
 		}
-		Iterator<Entry<String, Param>> it = namedParameters.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<String, Param> entry = (Map.Entry<String, Param>) it.next();
-			copy.namedParameters.put(entry.getKey(), entry.getValue().copy());
+		for (Entry<String, Param> entry : namedParameters.entrySet()) {
+      copy.namedParameters.put(entry.getKey(), entry.getValue().copy());
 		}
 		return copy;
 	}
 	
-	public int queryBindHash() {
-		int hc = namedParameters.hashCode();
-		for (int i = 0; i < positionedParameters.size(); i++) {
-			hc = hc * 31 + positionedParameters.get(i).hashCode();
-		}
-		return hc;
-	}
-	
-	public int hashCode() {
-		int hc = getClass().hashCode();
-		hc = hc * 31 + namedParameters.hashCode();
-		for (int i = 0; i < positionedParameters.size(); i++) {
-			hc = hc * 31 + positionedParameters.get(i).hashCode();
-		}
-		hc = hc * 31 + (preparedSql == null ? 0 : preparedSql.hashCode());
-		return hc;
-	}
-
-	public boolean equals(Object o) {
-		if (o == null) {
-			return false;
-		}
-		if (o == this) {
-			return true;
-		}
-		if (o instanceof BindParams) {
-			return hashCode() == o.hashCode();
-		}
-		return false;
-	}
-
 	/**
 	 * Return true if there are no bind parameters.
 	 */
@@ -131,10 +124,8 @@ public class BindParams implements Serializable {
 	 * Set an In Out parameter using position.
 	 */
 	public void setParameter(int position, Object value, int outType) {
-		
-	    addToQueryPlanHash(String.valueOf(position), value);
 
-	    Param p = getParam(position);
+	  Param p = getParam(position);
 		p.setInValue(value);
 		p.setOutType(outType);
 	}
@@ -144,10 +135,8 @@ public class BindParams implements Serializable {
 	 * must use setNullParameter.
 	 */
 	public void setParameter(int position, Object value) {
-		
-	    addToQueryPlanHash(String.valueOf(position), value);
 
-	    Param p = getParam(position);
+	  Param p = getParam(position);
 		p.setInValue(value);
 	}
 
@@ -182,10 +171,8 @@ public class BindParams implements Serializable {
 	 * Set a named In Out parameter.
 	 */
 	public void setParameter(String name, Object value, int outType) {
-		
-	    addToQueryPlanHash(name, value);
 
-	    Param p = getParam(name);
+    Param p = getParam(name);
 		p.setInValue(value);
 		p.setOutType(outType);
 	}
@@ -203,48 +190,22 @@ public class BindParams implements Serializable {
 	 */
 	public Param setParameter(String name, Object value) {
 	    
-	    addToQueryPlanHash(name, value);
-
-	    Param p = getParam(name);
+	  Param p = getParam(name);
 		p.setInValue(value);
 		return p;
 	}
 
-	/**
-	 * For binding collections calculate a hash to be used for the query plan.
-	 */
-	private void addToQueryPlanHash(String name, Object value){
-	    if (value != null){
-	        if (value instanceof Collection<?>){
-	            queryPlanHash = queryPlanHash * 31 + name.hashCode();
-                queryPlanHash = queryPlanHash * 31 + ((Collection<?>)value).size();
-	        }
-	    }
-	}
-		
-	/**
-	 * Return the hash that should be included with the query plan.
-	 * <p>
-	 * This is to handle binding collections to in clauses. The number
-	 * of values in the collection effects the query (number of bind values)
-	 * and so must be taken into account when calculating the query hash.
-	 * </p>
-	 */
-	public int getQueryPlanHash() {
-        return queryPlanHash;
-    }
-
-    /**
-	 * Set an encryption key as a bind value.
-	 * <p>
-	 * Needs special treatment as the value should not be included in a log. 
-	 * </p>
-	 */
-    public Param setEncryptionKey(String name, Object value) {
-        Param p = getParam(name);
-        p.setEncryptionKey(value);
-        return p;
-    }
+  /**
+   * Set an encryption key as a bind value.
+   * <p>
+   * Needs special treatment as the value should not be included in a log.
+   * </p>
+   */
+  public Param setEncryptionKey(String name, Object value) {
+    Param p = getParam(name);
+    p.setEncryptionKey(value);
+    return p;
+  }
 
 	/**
 	 * Register the named parameter as an Out parameter.
@@ -300,9 +261,9 @@ public class BindParams implements Serializable {
 	 */
 	public static final class OrderedList {
 		
-		final List<Param> paramList;
+		private final List<Param> paramList;
 		
-		final StringBuilder preparedSql;
+		private final StringBuilder preparedSql;
 
 		public OrderedList() {
 			this(new ArrayList<Param>());
@@ -373,6 +334,16 @@ public class BindParams implements Serializable {
 		public Param() {
 		}
 
+		public int queryBindCount() {
+		  if (inValue == null) {
+		    return 0;
+		  }
+		  if (inValue instanceof Collection<?>){
+		    return ((Collection<?>)inValue).size();
+		  }
+		  return 1;	  
+		}
+		
 		/**
 		 * Create a deep copy of the Param.
 		 */
@@ -448,14 +419,14 @@ public class BindParams implements Serializable {
 			this.isInParam = true;
 		}
 
-		/**
-		 * Set an encryption key (which can not be logged).
-		 */
-        public void setEncryptionKey(Object in) {
-            this.inValue = in;
-            this.isInParam = true;
-            this.encryptionKey = true;
-        }
+    /**
+     * Set an encryption key (which can not be logged).
+     */
+    public void setEncryptionKey(Object in) {
+      this.inValue = in;
+      this.isInParam = true;
+      this.encryptionKey = true;
+    }
 		
 		/**
 		 * Specify that the In parameter is NULL and the specific type that it
@@ -506,12 +477,12 @@ public class BindParams implements Serializable {
 			this.textLocation = textLocation;
 		}
 
-		/**
-		 * If true do not include this value in a transaction log.
-		 */
-        public boolean isEncryptionKey() {
-            return encryptionKey;
-        }
-		
+    /**
+     * If true do not include this value in a transaction log.
+     */
+    public boolean isEncryptionKey() {
+      return encryptionKey;
+    }
+
 	}
 }

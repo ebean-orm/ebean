@@ -2,9 +2,7 @@ package com.avaje.ebeaninternal.server.transaction;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import com.avaje.ebean.bean.PersistenceContext;
@@ -17,8 +15,9 @@ import com.avaje.ebeaninternal.api.Monitor;
  * id.
  * </p>
  * <p>
- * PersistenceContext lives on a Transaction and as such is expected to only have
- * a single thread accessing it at a time. This is not expected to be used concurrently.
+ * PersistenceContext lives on a Transaction and as such is expected to only
+ * have a single thread accessing it at a time. This is not expected to be used
+ * concurrently.
  * </p>
  * <p>
  * Duplicate beans are ones having the same type and unique id value. These are
@@ -28,166 +27,172 @@ import com.avaje.ebeaninternal.api.Monitor;
  */
 public final class DefaultPersistenceContext implements PersistenceContext {
 
-    /**
-     * Map used hold caches. One cache per bean type.
-     */
-    private final HashMap<String,ClassContext> typeCache = new HashMap<String,ClassContext>();
+  /**
+   * Map used hold caches. One cache per bean type.
+   */
+  private final HashMap<String, ClassContext> typeCache = new HashMap<String, ClassContext>();
 
-    private final Monitor monitor = new Monitor();
-    
-    /**
-     * Create a new PersistanceContext.
-     */
-    public DefaultPersistenceContext() {
-    }
+  private final Monitor monitor = new Monitor();
 
-    /**
-     * Set an object into the PersistanceContext.
-     */
-    public void put(Object id, Object bean) {
-    	synchronized (monitor) {
-    		getClassContext(bean.getClass()).put(id, bean);
-    	}
-    }
-    
-    public Object putIfAbsent(Object id, Object bean){
-    	synchronized (monitor) {
-    		return getClassContext(bean.getClass()).putIfAbsent(id, bean);
-    	}
-    }
+  /**
+   * Create a new PersistanceContext.
+   */
+  public DefaultPersistenceContext() {
+  }
 
-    
-
-    /**
-     * Return an object given its type and unique id.
-     */
-    public Object get(Class<?> beanType, Object id) {
-    	synchronized (monitor) {
-    		return getClassContext(beanType).get(id);
-    	}
+  /**
+   * Set an object into the PersistanceContext.
+   */
+  public void put(Object id, Object bean) {
+    synchronized (monitor) {
+      getClassContext(bean.getClass()).put(id, bean);
     }
-    
-    public WithOption getWithOption(Class<?> beanType, Object id) {
-      synchronized (monitor) {
-        return getClassContext(beanType).getWithOption(id);
+  }
+
+  public Object putIfAbsent(Object id, Object bean) {
+    synchronized (monitor) {
+      return getClassContext(bean.getClass()).putIfAbsent(id, bean);
+    }
+  }
+
+  /**
+   * Return an object given its type and unique id.
+   */
+  public Object get(Class<?> beanType, Object id) {
+    synchronized (monitor) {
+      return getClassContext(beanType).get(id);
+    }
+  }
+
+  public WithOption getWithOption(Class<?> beanType, Object id) {
+    synchronized (monitor) {
+      return getClassContext(beanType).getWithOption(id);
+    }
+  }
+
+  /**
+   * Return the number of beans of the given type in the persistence context.
+   */
+  public int size(Class<?> beanType) {
+    synchronized (monitor) {
+      ClassContext classMap = typeCache.get(beanType.getName());
+      return classMap == null ? 0 : classMap.size();
+    }
+  }
+
+  /**
+   * Clear the PersistenceContext.
+   */
+  public void clear() {
+    synchronized (monitor) {
+      typeCache.clear();
+    }
+  }
+
+  public void clear(Class<?> beanType) {
+    synchronized (monitor) {
+      ClassContext classMap = typeCache.get(beanType.getName());
+      if (classMap != null) {
+        classMap.clear();
       }
     }
+  }
 
-    /**
-     * Return the number of beans of the given type in the persistence context.
-     */
-    public int size(Class<?> beanType) {
-        synchronized (monitor) {
-            ClassContext classMap = typeCache.get(beanType.getName());
-            return classMap == null ? 0 : classMap.size();
-        }
-    }
-    
-    /**
-     * Clear the PersistenceContext.
-     */
-    public void clear() {
-    	synchronized (monitor) {
-    		typeCache.clear();
-    	}
-    }
-
-    public void clear(Class<?> beanType) {
-    	synchronized (monitor) {
-	    	ClassContext classMap = typeCache.get(beanType.getName());
-	        if (classMap != null) {
-	        	classMap.clear();	
-	        }
-    	}
-    }
-
-    public void deleted(Class<?> beanType, Object id) {
-      synchronized (monitor) {
-        ClassContext classMap = typeCache.get(beanType.getName());
-        if (classMap != null && id != null) {
-          classMap.deleted(id);
-        }
+  public void deleted(Class<?> beanType, Object id) {
+    synchronized (monitor) {
+      ClassContext classMap = typeCache.get(beanType.getName());
+      if (classMap != null && id != null) {
+        classMap.deleted(id);
       }
     }
-    
-    public void clear(Class<?> beanType, Object id) {
-    	synchronized (monitor) {
-	    	ClassContext classMap = typeCache.get(beanType.getName());
-	        if (classMap != null && id != null) {
-	            classMap.remove(id);
-	        }
-    	}
+  }
+
+  public void clear(Class<?> beanType, Object id) {
+    synchronized (monitor) {
+      ClassContext classMap = typeCache.get(beanType.getName());
+      if (classMap != null && id != null) {
+        classMap.remove(id);
+      }
     }
-    
+  }
+
+  public String toString() {
+    synchronized (monitor) {
+      return typeCache.toString();
+    }
+  }
+
+  private ClassContext getClassContext(Class<?> beanType) {
+
+    String clsName = beanType.getName();
+    ClassContext classMap = typeCache.get(clsName);
+    if (classMap == null) {
+      classMap = new ClassContext();
+      typeCache.put(clsName, classMap);
+    }
+    return classMap;
+  }
+
+  private static class ClassContext {
+
+    private final Map<Object, Object> map = new HashMap<Object, Object>();
+
+    private Set<Object> deleteSet;
+
+    private ClassContext() {
+    }
+
     public String toString() {
-        synchronized (monitor) {
-            StringBuilder sb = new StringBuilder();
-            Iterator<Entry<String, ClassContext>> it = typeCache.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry<String, ClassContext> entry = it.next();
-                if (entry.getValue().size() > 0){
-                    sb.append(entry.getKey()+":"+entry.getValue().size()+"; ");
-                }
-            }
-            return sb.toString();
-        }
-    }
-   
-    private ClassContext getClassContext(Class<?> beanType) {
-
-    	String clsName = beanType.getName();    	
-    	ClassContext classMap = typeCache.get(clsName);
-        if (classMap == null) {            
-            classMap = new ClassContext();
-            typeCache.put(clsName, classMap);
-        }
-        return classMap;
+      return "size:" + map.size();
     }
 
-    private static class ClassContext {
-    	
-      private final WeakValueMap<Object, Object> map = new WeakValueMap<Object, Object>();
-      private Set<Object> deleteSet;
-       
-      private WithOption getWithOption(Object id){
-        if (deleteSet != null && deleteSet.contains(id)) {
-          return WithOption.DELETED;
-        }
-        Object bean = map.get(id);
-        return (bean == null) ? null : new WithOption(bean);
+    private WithOption getWithOption(Object id) {
+      if (deleteSet != null && deleteSet.contains(id)) {
+        return WithOption.DELETED;
       }
-      
-    	private Object get(Object id){
-    	    return map.get(id);
-    	}
-    	
-      private Object putIfAbsent(Object id, Object bean){          
-          return map.putIfAbsent(id, bean);
-      }
-        
-    	private void put(Object id, Object b){
-    	    map.put(id, b);
-    	}
-    	    	
-    	private int size() {
-    	    return map.size();
-    	}
-    	
-    	private void clear(){
-    		map.clear();
-    	}
-    	
-    	private Object remove(Object id){
-    		return map.remove(id);
-    	}
-
-      private void deleted(Object id){
-        if (deleteSet == null) {
-          deleteSet = new HashSet<Object>();
-        }
-        deleteSet.add(id);
-        map.remove(id);
-      }
+      Object bean = map.get(id);
+      return (bean == null) ? null : new WithOption(bean);
     }
+
+    private Object get(Object id) {
+      return map.get(id);
+    }
+
+    private Object putIfAbsent(Object id, Object bean) {
+
+      Object existingValue = map.get(id);
+      if (existingValue != null) {
+        // it is not absent
+        return existingValue;
+      }
+      // put the new value and return null indicating the put was successful
+      map.put(id, bean);
+      return null;
+    }
+
+    private void put(Object id, Object b) {
+      map.put(id, b);
+    }
+
+    private int size() {
+      return map.size();
+    }
+
+    private void clear() {
+      map.clear();
+    }
+
+    private Object remove(Object id) {
+      return map.remove(id);
+    }
+
+    private void deleted(Object id) {
+      if (deleteSet == null) {
+        deleteSet = new HashSet<Object>();
+      }
+      deleteSet.add(id);
+      map.remove(id);
+    }
+  }
     
 }

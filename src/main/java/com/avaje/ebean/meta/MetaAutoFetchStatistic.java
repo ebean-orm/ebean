@@ -101,13 +101,13 @@ public class MetaAutoFetchStatistic implements Serializable {
 
     private final String path;
 
-    private final int exeCount;
+    private final long exeCount;
 
-    private final int totalBeanLoaded;
+    private final long totalBeanLoaded;
 
-    private final int totalMicros;
+    private final long totalMicros;
 
-    public QueryStats(String path, int exeCount, int totalBeanLoaded, int totalMicros) {
+    public QueryStats(String path, long exeCount, long totalBeanLoaded, long totalMicros) {
       this.path = path;
       this.exeCount = exeCount;
       this.totalBeanLoaded = totalBeanLoaded;
@@ -125,21 +125,21 @@ public class MetaAutoFetchStatistic implements Serializable {
     /**
      * The number of queries executed.
      */
-    public int getExeCount() {
+    public long getExeCount() {
       return exeCount;
     }
 
     /**
      * The total number of beans loaded by the query.
      */
-    public int getTotalBeanLoaded() {
+    public long getTotalBeanLoaded() {
       return totalBeanLoaded;
     }
 
     /**
      * The total time in microseconds of the queries.
      */
-    public int getTotalMicros() {
+    public long getTotalMicros() {
       return totalMicros;
     }
 

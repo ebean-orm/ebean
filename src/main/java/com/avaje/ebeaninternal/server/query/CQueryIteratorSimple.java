@@ -9,38 +9,37 @@ import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 
 /**
  * QueryIterator that does not require a buffer for secondary queries.
- * 
- * @author rbygrave
  */
 class CQueryIteratorSimple<T> implements QueryIterator<T> {
 
-    private final CQuery<T> cquery;
-    private final OrmQueryRequest<T> request;
+  private final CQuery<T> cquery;
+  private final OrmQueryRequest<T> request;
 
-    CQueryIteratorSimple(CQuery<T> cquery, OrmQueryRequest<T> request){
-        this.cquery = cquery;
-        this.request = request;
-    }
-    
-    public boolean hasNext() {
-        try {
-            return cquery.hasNextBean(true);
-        } catch (SQLException e){
-            throw cquery.createPersistenceException(e);
-        }
-    }
+  CQueryIteratorSimple(CQuery<T> cquery, OrmQueryRequest<T> request) {
+    this.cquery = cquery;
+    this.request = request;
+  }
 
-    public T next() {
-        return cquery.getLoadedBean();
+  public boolean hasNext() {
+    try {
+      request.flushPersistenceContextOnIterate();
+      return cquery.hasNextBean(true);
+    } catch (SQLException e) {
+      throw cquery.createPersistenceException(e);
     }
+  }
 
-    public void close() {
-        cquery.updateExecutionStatistics();
-        cquery.close();
-        request.endTransIfRequired();
-    }
+  public T next() {
+    return cquery.getLoadedBean();
+  }
 
-    public void remove() {
-        throw new PersistenceException("Remove not allowed");
-    }
+  public void close() {
+    cquery.updateExecutionStatistics();
+    cquery.close();
+    request.endTransIfRequired();
+  }
+
+  public void remove() {
+    throw new PersistenceException("Remove not allowed");
+  }
 }

@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.PersistenceException;
 
@@ -39,6 +40,7 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -204,8 +206,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private final CQueryPlan queryPlan;
 
-  private long startNano;
-
   private final Mode queryMode;
 
   private final boolean autoFetchProfiling;
@@ -213,13 +213,16 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   private final ObjectGraphNode autoFetchParentNode;
 
   private final AutoFetchManager autoFetchManager;
+  
   private final WeakReference<NodeUsageListener> autoFetchManagerRef;
-
-  private int executionTimeMicros;
 
   private final Boolean readOnly;
 
   private final SpiExpressionList<?> filterMany;
+
+  private long startNano;
+
+  private long executionTimeMicros;
 
   /**
    * Create the Sql select based on the request.
@@ -520,7 +523,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     }
   }
 
-  public int getQueryExecutionTimeMicros() {
+  public long getQueryExecutionTimeMicros() {
     return executionTimeMicros;
   }
 
@@ -638,7 +641,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   protected void updateExecutionStatistics() {
     try {
       long exeNano = System.nanoTime() - startNano;
-      executionTimeMicros = (int) exeNano / 1000;
+      executionTimeMicros = TimeUnit.NANOSECONDS.toMicros(exeNano);
 
       if (autoFetchProfiling) {
         autoFetchManager
@@ -674,7 +677,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   }
 
   protected boolean hasNextBean(boolean inForeground) throws SQLException {
-
+    
     if (!readBeanInternal(inForeground)) {
       return false;
 

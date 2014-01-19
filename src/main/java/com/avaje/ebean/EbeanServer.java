@@ -11,6 +11,7 @@ import javax.persistence.OptimisticLockException;
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
 
@@ -116,6 +117,13 @@ public interface EbeanServer {
    * Return the ExpressionFactory for this server.
    */
   public ExpressionFactory getExpressionFactory();
+
+  /**
+   * Return the MetaInfoManager which is used to get meta data from the EbeanServer
+   * such as query execution statistics.
+   */
+  public MetaInfoManager getMetaInfoManager();
+
 
   /**
    * Return the BeanState for a given entity bean.
