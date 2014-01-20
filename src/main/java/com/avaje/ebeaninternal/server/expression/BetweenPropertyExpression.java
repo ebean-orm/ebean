@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -65,15 +66,13 @@ class BetweenPropertyExpression implements SpiExpression {
     request.append(" ? ").append(BETWEEN).append(name(lowProperty)).append(" and ").append(name(highProperty));
   }
 
-  public int queryAutoFetchHash() {
-    int hc = BetweenPropertyExpression.class.getName().hashCode();
-    hc = hc * 31 + lowProperty.hashCode();
-    hc = hc * 31 + highProperty.hashCode();
-    return hc;
+  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+    builder.add(BetweenPropertyExpression.class).add(lowProperty).add(highProperty);
+    builder.bind(1);
   }
 
-  public int queryPlanHash(BeanQueryRequest<?> request) {
-    return queryAutoFetchHash();
+  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+    queryAutoFetchHash(builder);
   }
 
   public int queryBindHash() {

@@ -3,9 +3,11 @@ package com.avaje.ebeaninternal.server.expression;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -105,29 +107,29 @@ class AllEqualsExpression implements SpiExpression {
    * The null check is required due to the "is null" sql being generated.
    * </p>
    */
-  public int queryAutoFetchHash() {
+  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
 
-    int hc = AllEqualsExpression.class.getName().hashCode();
-    Set<Entry<String, Object>> entries = propMap.entrySet();
-    Iterator<Entry<String, Object>> it = entries.iterator();
+    builder.add(AllEqualsExpression.class);
 
-    while (it.hasNext()) {
-      Map.Entry<java.lang.String, java.lang.Object> entry = it.next();
+    for (Entry<String, Object> entry :  propMap.entrySet()) {
       Object value = entry.getValue();
       String propName = entry.getKey();
-
-      hc = hc * 31 + propName.hashCode();
-      hc = hc * 31 + (value == null ? 0 : 1);
-    }
-
-    return hc;
+      builder.add(propName).add(value == null ? 0 : 1);
+      builder.bind(value == null ? 0 : 1);      
+    }    
   }
 
-  public int queryPlanHash(BeanQueryRequest<?> request) {
-    return queryAutoFetchHash();
+  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+    queryAutoFetchHash(builder);
   }
 
   public int queryBindHash() {
-    return queryAutoFetchHash();
+    
+    int hc = 31;
+    for (Object value : propMap.values()) {
+      hc = hc * 31 + Objects.hashCode(value);      
+    }
+
+    return hc;
   }
 }

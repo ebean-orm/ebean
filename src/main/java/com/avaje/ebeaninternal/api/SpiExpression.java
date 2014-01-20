@@ -26,7 +26,7 @@ public interface SpiExpression extends Expression {
 	 * from an AutoFetch perspective and get different tuning.
 	 * </p>
 	 */
-	public int queryAutoFetchHash();
+	public void queryAutoFetchHash(HashQueryPlanBuilder builder);
 	
 	/**
 	 * Calculate a hash value for the expression.
@@ -37,7 +37,7 @@ public interface SpiExpression extends Expression {
 	 * case the query execution plan can be reused.
 	 * </p>
 	 */
-	public int queryPlanHash(BeanQueryRequest<?> request);
+	public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder);
 	
 	/**
 	 * Return the hash value for the values that will be bound.

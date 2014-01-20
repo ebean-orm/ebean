@@ -1,10 +1,11 @@
 package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
-class CaseInsensitiveEqualExpression extends AbstractExpression implements LuceneAwareExpression {
+class CaseInsensitiveEqualExpression extends AbstractExpression {
 
   private static final long serialVersionUID = -6406036750998971064L;
 
@@ -40,14 +41,13 @@ class CaseInsensitiveEqualExpression extends AbstractExpression implements Lucen
     request.append("lower(").append(pname).append(") =? ");
   }
 
-  public int queryAutoFetchHash() {
-    int hc = CaseInsensitiveEqualExpression.class.getName().hashCode();
-    hc = hc * 31 + propName.hashCode();
-    return hc;
+  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+    builder.add(CaseInsensitiveEqualExpression.class).add(propName);
+    builder.bind(1);
   }
 
-  public int queryPlanHash(BeanQueryRequest<?> request) {
-    return queryAutoFetchHash();
+  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+    queryAutoFetchHash(builder);
   }
 
   public int queryBindHash() {

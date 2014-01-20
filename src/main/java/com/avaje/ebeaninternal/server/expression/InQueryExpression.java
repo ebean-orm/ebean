@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.expression;
 import java.util.List;
 
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -26,23 +27,19 @@ class InQueryExpression extends AbstractExpression {
     this.subQuery = subQuery;
   }
 
-  public int queryAutoFetchHash() {
-    int hc = InQueryExpression.class.getName().hashCode();
-    hc = hc * 31 + propName.hashCode();
-    hc = hc * 31 + subQuery.queryAutofetchHash();
-    return hc;
+  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+    builder.add(InQueryExpression.class).add(propName);
+    
+    subQuery.queryAutofetchHash(builder);
   }
 
-  public int queryPlanHash(BeanQueryRequest<?> request) {
+  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
 
     // queryPlanHash executes prior to addSql() or addBindValues()
     // ... so compiledQuery will exist
     compiledSubQuery = compileSubQuery(request);
 
-    int hc = InQueryExpression.class.getName().hashCode();
-    hc = hc * 31 + propName.hashCode();
-    hc = hc * 31 + subQuery.queryPlanHash(request);
-    return hc;
+    queryAutoFetchHash(builder);
   }
 
   /**

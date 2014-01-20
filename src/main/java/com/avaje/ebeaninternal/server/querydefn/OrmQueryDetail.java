@@ -14,6 +14,7 @@ import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
@@ -63,17 +64,19 @@ public class OrmQueryDetail implements Serializable {
     /**
      * Calculate the hash for the query plan.
      */
-    public int queryPlanHash(BeanQueryRequest<?> request) {
-
-        int hc = (baseProps == null ? 1 : baseProps.queryPlanHash(request));
-
-        if (fetchPaths != null) {
-            for (OrmQueryProperties p : fetchPaths.values()) {
-                hc = hc * 31 + p.queryPlanHash(request);
-            }
+    public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+      if (baseProps == null) {
+        builder.add(false);
+      } else {
+        builder.add(true);
+        baseProps.queryPlanHash(request, builder);
+      }
+  
+      if (fetchPaths != null) {
+        for (OrmQueryProperties p : fetchPaths.values()) {
+          p.queryPlanHash(request, builder);
         }
-
-        return hc;
+      }
     }
 
     /**

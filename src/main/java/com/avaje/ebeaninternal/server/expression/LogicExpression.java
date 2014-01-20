@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -69,18 +70,16 @@ abstract class LogicExpression implements SpiExpression {
   /**
    * Based on the joinType plus the two expressions.
    */
-  public int queryAutoFetchHash() {
-    int hc = LogicExpression.class.getName().hashCode() + joinType.hashCode();
-    hc = hc * 31 + expOne.queryAutoFetchHash();
-    hc = hc * 31 + expTwo.queryAutoFetchHash();
-    return hc;
+  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+    builder.add(LogicExpression.class).add(joinType);    
+    expOne.queryAutoFetchHash(builder);
+    expTwo.queryAutoFetchHash(builder);
   }
 
-  public int queryPlanHash(BeanQueryRequest<?> request) {
-    int hc = LogicExpression.class.getName().hashCode() + joinType.hashCode();
-    hc = hc * 31 + expOne.queryPlanHash(request);
-    hc = hc * 31 + expTwo.queryPlanHash(request);
-    return hc;
+  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+    builder.add(LogicExpression.class).add(joinType);    
+    expOne.queryPlanHash(request, builder);
+    expTwo.queryPlanHash(request, builder);
   }
 
   public int queryBindHash() {

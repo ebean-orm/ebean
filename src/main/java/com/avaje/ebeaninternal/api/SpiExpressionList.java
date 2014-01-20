@@ -28,14 +28,13 @@ public interface SpiExpressionList<T> extends ExpressionList<T> {
 	 */
 	public void setExpressionFactory(ExpressionFactory expr);
 
-    /**
-     * Process "Many" properties populating ManyWhereJoins.
-     * <p>
-     * Predicates on Many properties require an extra independent
-     * join clause.
-     * </p>
-     */
-	public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoins);
+  /**
+   * Process "Many" properties populating ManyWhereJoins.
+   * <p>
+   * Predicates on Many properties require an extra independent join clause.
+   * </p>
+   */
+  public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoins);
 	
 	/**
 	 * Return true if this list is empty.
@@ -62,10 +61,10 @@ public interface SpiExpressionList<T> extends ExpressionList<T> {
 	 */
 	public ArrayList<Object> buildBindValues(SpiExpressionRequest request);
 	
-    /**
-     * Calculate a hash based on the expressions but excluding the actual bind
-     * values.
-     */
-    public int queryPlanHash(BeanQueryRequest<?> request);
+  /**
+   * Calculate a hash based on the expressions but excluding the actual bind
+   * values.
+   */
+  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder);
 
 }

@@ -17,6 +17,7 @@ import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.QueryListener;
 import com.avaje.ebean.QueryResultVisitor;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -115,28 +116,20 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   /**
    * Based on Junction type and all the expression contained.
    */
-  public int queryAutoFetchHash() {
-    int hc = JunctionExpression.class.getName().hashCode();
-    hc = hc * 31 + joinType.hashCode();
-
+  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+    builder.add(JunctionExpression.class).add(joinType);
     List<SpiExpression> list = exprList.internalList();
     for (int i = 0; i < list.size(); i++) {
-      hc = hc * 31 + list.get(i).queryAutoFetchHash();
+      list.get(i).queryAutoFetchHash(builder);
     }
-
-    return hc;
   }
 
-  public int queryPlanHash(BeanQueryRequest<?> request) {
-    int hc = JunctionExpression.class.getName().hashCode();
-    hc = hc * 31 + joinType.hashCode();
-
+  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+    builder.add(JunctionExpression.class).add(joinType);
     List<SpiExpression> list = exprList.internalList();
     for (int i = 0; i < list.size(); i++) {
-      hc = hc * 31 + list.get(i).queryPlanHash(request);
+      list.get(i).queryPlanHash(request, builder);
     }
-
-    return hc;
   }
 
   public int queryBindHash() {

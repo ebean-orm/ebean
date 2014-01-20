@@ -6,6 +6,7 @@ import java.util.Iterator;
 import com.avaje.ebean.ExampleExpression;
 import com.avaje.ebean.LikeType;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -163,28 +164,26 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   /**
    * Return a hash for autoFetch query identification.
    */
-  public int queryAutoFetchHash() {
+  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
     // we have not yet built the list of expressions
     // so just based on the class name
-    return DefaultExampleExpression.class.getName().hashCode();
+    builder.add(DefaultExampleExpression.class);
   }
 
   /**
    * Return a hash for query plan identification.
    */
-  public int queryPlanHash(BeanQueryRequest<?> request) {
+  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
 
     // this is always called once, and always called before
     // addSql() and addBindValues() methods
     list = buildExpressions(request);
 
-    int hc = DefaultExampleExpression.class.getName().hashCode();
+    builder.add(DefaultExampleExpression.class);
 
     for (int i = 0; i < list.size(); i++) {
-      hc = hc * 31 + list.get(i).queryPlanHash(request);
+      list.get(i).queryPlanHash(request, builder);
     }
-
-    return hc;
   }
 
   /**

@@ -40,6 +40,7 @@ import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaBeanQueryPlanStatistic;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
+import com.avaje.ebeaninternal.api.HashQueryPlan;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
@@ -87,7 +88,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
   private final ConcurrentHashMap<Integer, SpiUpdatePlan> updatePlanCache = new ConcurrentHashMap<Integer, SpiUpdatePlan>();
 
-  private final ConcurrentHashMap<Integer, CQueryPlan> queryPlanCache = new ConcurrentHashMap<Integer, CQueryPlan>();
+  private final ConcurrentHashMap<HashQueryPlan, CQueryPlan> queryPlanCache = new ConcurrentHashMap<HashQueryPlan, CQueryPlan>();
 
   private final ConcurrentHashMap<String, ElPropertyValue> elGetCache = new ConcurrentHashMap<String, ElPropertyValue>();
 
@@ -1202,11 +1203,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return queryPlanCache.values().iterator();
   }
 
-  public CQueryPlan getQueryPlan(Integer key) {
+  public CQueryPlan getQueryPlan(HashQueryPlan key) {
     return queryPlanCache.get(key);
   }
 
-  public void putQueryPlan(Integer key, CQueryPlan plan) {
+  public void putQueryPlan(HashQueryPlan key, CQueryPlan plan) {
     queryPlanCache.put(key, plan);
   }
 

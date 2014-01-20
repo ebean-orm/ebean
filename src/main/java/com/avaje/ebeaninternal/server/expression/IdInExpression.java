@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.expression;
 import java.util.List;
 
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -67,16 +68,13 @@ public class IdInExpression implements SpiExpression {
   /**
    * Incorporates the number of Id values to bind.
    */
-  public int queryAutoFetchHash() {
-    // this number is unique for a given bean type
-    // which is all that is required
-    int hc = IdInExpression.class.getName().hashCode();
-    hc = hc * 31 + idList.size();
-    return hc;
+  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+    builder.add(IdInExpression.class).add(idList.size());
+    builder.bind(idList.size());
   }
 
-  public int queryPlanHash(BeanQueryRequest<?> request) {
-    return queryAutoFetchHash();
+  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+    queryAutoFetchHash(builder);
   }
 
   public int queryBindHash() {

@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.avaje.ebean.config.dbplatform.SqlLimitResponse;
+import com.avaje.ebeaninternal.api.HashQueryPlan;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
@@ -34,7 +36,7 @@ public class CQueryPlan {
 
 	private final boolean autofetchTuned;
 		
-	private final int hash;
+	private final HashQueryPlan hash;
 	
 	private final boolean rawSql;
 
@@ -86,7 +88,7 @@ public class CQueryPlan {
 		
 	  this.beanType = beanType;
 	  this.stats = new CQueryPlanStats(this);
-		this.hash = 0;
+		this.hash = buildHash(sql, rawSql, rowNumberIncluded, logWhereSql);
 		this.autofetchTuned = false;
 		this.sql = sql;
 		this.sqlTree = sqlTree;
@@ -94,6 +96,13 @@ public class CQueryPlan {
 		this.rowNumberIncluded = rowNumberIncluded;
 		this.logWhereSql = logWhereSql;
 		this.encryptedProps = sqlTree.getEncryptedProps();
+	}
+	
+	private HashQueryPlan buildHash(String sql, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
+	  HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
+	  builder.add(sql).add(rawSql).add(rowNumberIncluded).add(logWhereSql);
+	  builder.addRawSql(sql);
+	  return builder.build();
 	}
 
 	public String toString() {
@@ -122,7 +131,7 @@ public class CQueryPlan {
 		return autofetchTuned;
 	}
 
-	public int getHash() {
+	public HashQueryPlan getHash() {
 		return hash;
 	}
 

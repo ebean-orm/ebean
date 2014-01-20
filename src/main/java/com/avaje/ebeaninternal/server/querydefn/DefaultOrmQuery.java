@@ -33,6 +33,9 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.meta.MetaAutoFetchStatistic;
 import com.avaje.ebeaninternal.api.BindParams;
+import com.avaje.ebeaninternal.api.HashQuery;
+import com.avaje.ebeaninternal.api.HashQueryPlan;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
@@ -207,7 +210,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	/**
 	 * Hash of final query after AutoFetch tuning.
 	 */
-	private int queryPlanHash;
+	private HashQueryPlan queryPlanHash;
 	
 	private transient PersistenceContext persistenceContext;
 
@@ -627,62 +630,61 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	/**
 	 * Calculate the query hash for either AutoFetch query tuning or Query Plan caching.
 	 */
-	private int calculateHash(BeanQueryRequest<?> request) {
+	private HashQueryPlan calculateHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
 
 		// exclude bind values and things unrelated to
 		// the sql being generated
+	  
+	  if (builder == null) {
+	    builder = new HashQueryPlanBuilder();
+	  }
 
-		// must use String name of class as actual class hashCode
-		// can change between JVM restarts.
-		int hc = beanType.getName().hashCode();
+	  builder.add((type == null ? 0 : type.ordinal()+1));
+	  builder.add(useIndex).add(autoFetchTuned).add(distinct).add(query);
+    builder.add(firstRow).add(maxRows).add(orderBy).add(forUpdate);
+    builder.add(rawWhereClause).add(additionalWhere).add(additionalHaving);
+    builder.add(mapKey);
+    builder.add(id != null);
+    builder.add(rawSql == null ? 0 : rawSql.queryHash());
 
-    hc = hc * 31 + (type == null ? 0 : type.ordinal());
-    hc = hc * 31 + (useIndex == null ? 0 : useIndex.hashCode());
-
-    hc = hc * 31 + (rawSql == null ? 0 : rawSql.queryHash());
-
-    hc = hc * 31 + (autoFetchTuned ? 31 : 0);
-    hc = hc * 31 + (distinct ? 31 : 0);
-    hc = hc * 31 + (query == null ? 0 : query.hashCode());
-    hc = hc * 31 + detail.queryPlanHash(request);
-
-    hc = hc * 31 + (firstRow == 0 ? 0 : firstRow);
-    hc = hc * 31 + (maxRows == 0 ? 0 : maxRows);
-    hc = hc * 31 + (orderBy == null ? 0 : orderBy.hash());
-    hc = hc * 31 + (rawWhereClause == null ? 0 : rawWhereClause.hashCode());
-
-    hc = hc * 31 + (additionalWhere == null ? 0 : additionalWhere.hashCode());
-    hc = hc * 31 + (additionalHaving == null ? 0 : additionalHaving.hashCode());
-    hc = hc * 31 + (mapKey == null ? 0 : mapKey.hashCode());
-    hc = hc * 31 + (id == null ? 0 : 1);
-
-    if (bindParams != null) {
-      hc = hc * 31 + bindParams.getQueryPlanHash();
+    if (detail != null) {
+      detail.queryPlanHash(request, builder);      
     }
-
+    if (bindParams != null) {
+      bindParams.buildQueryPlanHash(builder);
+    }
+    
     if (request == null) {
       // for AutoFetch...
-      hc = hc * 31 + (whereExpressions == null ? 0 : whereExpressions.queryAutoFetchHash());
-      hc = hc * 31 + (havingExpressions == null ? 0 : havingExpressions.queryAutoFetchHash());
+      builder.add(true);
+      if (whereExpressions != null) {
+        whereExpressions.queryAutoFetchHash(builder);
+      }
+      if (havingExpressions != null) {
+        havingExpressions.queryAutoFetchHash(builder);
+      }
 
     } else {
       // for query plan...
-      hc = hc * 31 + (whereExpressions == null ? 0 : whereExpressions.queryPlanHash(request));
-      hc = hc * 31 + (havingExpressions == null ? 0 : havingExpressions.queryPlanHash(request));
+      builder.add(false);
+      if (whereExpressions != null) {
+        whereExpressions.queryPlanHash(request, builder);
+      }
+      if (havingExpressions != null) {
+        havingExpressions.queryPlanHash(request, builder);
+      }
     }
 
-    hc = hc * 31 + (forUpdate ? 31 : 0);
-
-		return hc;
+    return builder.build();
 	}
 	
 	/**
 	 * Calculate a hash used by AutoFetch to identify when a query has changed 
 	 * (and hence potentially needs a new tuned query plan to be developed).
 	 */
-	public int queryAutofetchHash() {
+	public HashQueryPlan queryAutofetchHash(HashQueryPlanBuilder builder) {
 		
-		return calculateHash(null);
+		return calculateHash(null, builder);
 	}
 	
 	/**
@@ -695,9 +697,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	 * This is calculated AFTER AutoFetch query tuning has occurred.
 	 * </p>
 	 */
-	public int queryPlanHash(BeanQueryRequest<?> request) {
+	public HashQueryPlan queryPlanHash(BeanQueryRequest<?> request) {
 
-		queryPlanHash = calculateHash(request);
+		queryPlanHash = calculateHash(request, null);
 		return queryPlanHash;
 	}
 
@@ -724,12 +726,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	 * (including bind values) before.
 	 * </p>
 	 */
-	public int queryHash() {
+	public HashQuery queryHash() {
 		// calculateQueryPlanHash is called just after potential AutoFetch tuning
 		// so queryPlanHash is calculated well before this method is called
-		int hc = queryPlanHash;
-		hc = hc * 31 + queryBindHash();
-		return hc;
+		int hc = queryBindHash();
+		
+		return new HashQuery(queryPlanHash, hc);
 	}
 
 	/**

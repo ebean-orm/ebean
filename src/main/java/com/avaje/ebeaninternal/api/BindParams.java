@@ -50,7 +50,7 @@ public class BindParams implements Serializable {
    * taken into account when calculating the query hash.
    * </p>
    */
-  public int getQueryPlanHash() {
+  public void buildQueryPlanHash(HashQueryPlanBuilder builder) {
     int hc = 31;
     for (Param param : positionedParameters) {
       hc = hc * 31 + param.queryBindCount();
@@ -61,7 +61,8 @@ public class BindParams implements Serializable {
       hc = hc * 31 + entry.getValue().queryBindCount();
     }
 
-    return hc;
+    int bindCount = positionedParameters.size() + namedParameters.size();
+    builder.add(hc).bind(bindCount);
   }
  
 	/**

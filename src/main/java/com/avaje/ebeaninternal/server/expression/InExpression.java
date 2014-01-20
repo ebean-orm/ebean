@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.expression;
 import java.util.Collection;
 
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
@@ -79,19 +80,18 @@ class InExpression extends AbstractExpression {
   /**
    * Based on the number of values in the in clause.
    */
-  public int queryAutoFetchHash() {
-    int hc = InExpression.class.getName().hashCode() + 31 * values.length;
-    hc = hc * 31 + propName.hashCode();
-    return hc;
+  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+    builder.add(InExpression.class).add(propName).add(values.length);
+    builder.bind(values.length);
   }
 
-  public int queryPlanHash(BeanQueryRequest<?> request) {
-    return queryAutoFetchHash();
+  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+    queryAutoFetchHash(builder);
   }
 
   public int queryBindHash() {
-    int hc = 0;
-    for (int i = 1; i < values.length; i++) {
+    int hc = 31;
+    for (int i = 0; i < values.length; i++) {
       hc = 31 * hc + values[i].hashCode();
     }
     return hc;

@@ -341,7 +341,7 @@ public interface SpiQuery<T> extends Query<T> {
      * tuning/modifying the query.
      * </p>
      */
-    public int queryAutofetchHash();
+    public HashQueryPlan queryAutofetchHash(HashQueryPlanBuilder builder);
 
     /**
      * Identifies queries that are the same bar the bind variables.
@@ -354,7 +354,7 @@ public interface SpiQuery<T> extends Query<T> {
      * Excludes the actual bind values (as they don't effect the query plan).
      * </p>
      */
-    public int queryPlanHash(BeanQueryRequest<?> request);
+    public HashQueryPlan queryPlanHash(BeanQueryRequest<?> request);
 
     /**
      * Calculate a hash based on the bind values used in the query.
@@ -368,7 +368,7 @@ public interface SpiQuery<T> extends Query<T> {
     /**
      * Identifies queries that are exactly the same including bind variables.
      */
-    public int queryHash();
+    public HashQuery queryHash();
 
     /**
      * Return true if this is a query based on a SqlSelect rather than

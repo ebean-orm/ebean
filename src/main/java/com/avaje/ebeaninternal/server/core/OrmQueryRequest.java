@@ -14,6 +14,8 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanFinder;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.BeanIdList;
+import com.avaje.ebeaninternal.api.HashQuery;
+import com.avaje.ebeaninternal.api.HashQueryPlan;
 import com.avaje.ebeaninternal.api.LoadContext;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -49,9 +51,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
   private PersistenceContext persistenceContext;
 
-  private Integer cacheKey;
+  private HashQuery cacheKey;
 
-  private int queryPlanHash;
+  private HashQueryPlan queryPlanHash;
 
   /**
    * Flag set if background fetching taking place. In this case the transaction
@@ -332,7 +334,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    * with just the bind variables changing.
    * </p>
    */
-  public int getQueryPlanHash() {
+  public HashQueryPlan getQueryPlanHash() {
     return queryPlanHash;
   }
 
@@ -356,14 +358,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
       return null;
     }
 
-    if (query.getType() == null) {
-      // the query plan and bind values must be the same
-      cacheKey = Integer.valueOf(query.queryHash());
-
-    } else {
-      // additionally the return type (List/Set/Map) must be the same
-      cacheKey = Integer.valueOf(31 * query.queryHash() + query.getType().hashCode());
-    }
+    cacheKey = query.queryHash();
 
     // TODO: Sort out returning BeanCollection from L2 cache
     return null;

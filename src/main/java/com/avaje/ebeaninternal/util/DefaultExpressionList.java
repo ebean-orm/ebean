@@ -20,6 +20,7 @@ import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.QueryListener;
 import com.avaje.ebean.QueryResultVisitor;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
@@ -283,26 +284,24 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * Calculate a hash based on the expressions but excluding the actual bind
    * values.
    */
-  public int queryAutoFetchHash() {
-    int hash = DefaultExpressionList.class.getName().hashCode();
+  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+    builder.add(DefaultExpressionList.class);
     for (int i = 0, size = list.size(); i < size; i++) {
       SpiExpression expression = list.get(i);
-      hash = hash * 31 + expression.queryAutoFetchHash();
+      expression.queryAutoFetchHash(builder);
     }
-    return hash;
   }
 
   /**
    * Calculate a hash based on the expressions but excluding the actual bind
    * values.
    */
-  public int queryPlanHash(BeanQueryRequest<?> request) {
-    int hash = DefaultExpressionList.class.getName().hashCode();
+  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+    builder.add(DefaultExpressionList.class);
     for (int i = 0, size = list.size(); i < size; i++) {
       SpiExpression expression = list.get(i);
-      hash = hash * 31 + expression.queryPlanHash(request);
+      expression.queryPlanHash(request, builder);
     }
-    return hash;
   }
 
   /**

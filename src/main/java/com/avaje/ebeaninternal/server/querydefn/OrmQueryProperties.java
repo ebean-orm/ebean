@@ -14,6 +14,7 @@ import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpressionFactory;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -355,17 +356,18 @@ public class OrmQueryProperties implements Serializable {
      * Calculate the query plan hash.
      */
     @SuppressWarnings("unchecked")
-    public int queryPlanHash(BeanQueryRequest<?> request) {
-        
-        int hc = (path != null ? path.hashCode() : 1);
-        if (properties != null){
-            hc = hc * 31 + properties.hashCode();
-        } else {
-            hc = hc * 31 + (included != null ? included.hashCode() : 1);
-        }
-        hc = hc * 31 + (filterMany != null ? filterMany.queryPlanHash(request) : 1);
-        
-        return hc;
+    public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+  
+      builder.add(path);
+      if (properties != null) {
+        builder.add(properties);
+      } else {
+        builder.add(included);
+      }
+      builder.add(filterMany != null);
+      if (filterMany != null) {
+        filterMany.queryPlanHash(request, builder);
+      }
     }
 
     public String getProperties() {

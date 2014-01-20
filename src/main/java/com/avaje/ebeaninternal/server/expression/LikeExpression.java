@@ -2,10 +2,11 @@ package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.LikeType;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
-class LikeExpression extends AbstractExpression implements LuceneAwareExpression {
+class LikeExpression extends AbstractExpression {
 
   private static final long serialVersionUID = -5398151809111172380L;
 
@@ -59,15 +60,13 @@ class LikeExpression extends AbstractExpression implements LuceneAwareExpression
   /**
    * Based on caseInsensitive and the property name.
    */
-  public int queryAutoFetchHash() {
-    int hc = LikeExpression.class.getName().hashCode();
-    hc = hc * 31 + (caseInsensitive ? 0 : 1);
-    hc = hc * 31 + propName.hashCode();
-    return hc;
+  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+    builder.add(LikeExpression.class).add(caseInsensitive).add(propName);
+    builder.bind(1);
   }
 
-  public int queryPlanHash(BeanQueryRequest<?> request) {
-    return queryAutoFetchHash();
+  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+    queryAutoFetchHash(builder);
   }
 
   public int queryBindHash() {

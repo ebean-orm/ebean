@@ -1,7 +1,5 @@
 package com.avaje.ebean.meta;
 
-
-
 /**
  * Query execution statistics Meta data.
  */
@@ -18,9 +16,9 @@ public interface MetaBeanQueryPlanStatistic {
   public boolean isAutofetchTuned();
 
   /**
-   * Return the query plan hash.
+   * Return a string representation of the query plan hash.
    */
-  public int getQueryPlanHash();
+  public String getQueryPlanHash();
 
   /**
    * Return the sql executed.

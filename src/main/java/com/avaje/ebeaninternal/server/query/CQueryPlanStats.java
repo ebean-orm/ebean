@@ -131,8 +131,8 @@ public final class CQueryPlanStats {
 
 
     @Override
-    public int getQueryPlanHash() {
-      return queryPlan.getHash();
+    public String getQueryPlanHash() {
+      return queryPlan.getHash().toString();
     }
 
     @Override
