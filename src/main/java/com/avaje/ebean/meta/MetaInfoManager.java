@@ -21,6 +21,19 @@ public interface MetaInfoManager {
    * executions (since the last collection with reset).
    * </p>
    */
-  public List<MetaBeanQueryPlanStatistic> collectQueryPlanStatistics(boolean reset);
+  public List<MetaQueryPlanStatistic> collectQueryPlanStatistics(boolean reset);
+
+  /**
+   * Collect and return the ObjectGraphNode statistics.
+   * <p>
+   * These show query executions for based on an origin point and paths. This is
+   * used to look at the amount of lazy loading occurring for a given query
+   * origin point.
+   * </p>
+   * 
+   * @param reset
+   *          Set to true to reset the underlying statistics after collection.
+   */
+  public List<MetaObjectGraphNodeStats> collectNodeStatistics(boolean reset);
 
 }

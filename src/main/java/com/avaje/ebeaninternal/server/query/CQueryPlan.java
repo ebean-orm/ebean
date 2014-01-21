@@ -3,9 +3,11 @@ package com.avaje.ebeaninternal.server.query;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.config.dbplatform.SqlLimitResponse;
 import com.avaje.ebeaninternal.api.HashQueryPlan;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
@@ -34,6 +36,8 @@ import com.avaje.ebeaninternal.server.type.RsetDataReader;
  */
 public class CQueryPlan {
 
+  private final SpiEbeanServer server;
+  
 	private final boolean autofetchTuned;
 		
 	private final HashQueryPlan hash;
@@ -60,34 +64,35 @@ public class CQueryPlan {
 	/**
 	 * Create a query plan based on a OrmQueryRequest.
 	 */
-	public CQueryPlan(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, 
-			boolean rawSql, String logWhereSql, String luceneQueryDescription) {
-		
-	  this.beanType = request.getBeanDescriptor().getBeanType();
-	  this.stats = new CQueryPlanStats(this);
-		this.hash = request.getQueryPlanHash();
-		this.autofetchTuned = request.getQuery().isAutofetchTuned();
-		if (sqlRes != null){
-	        this.sql = sqlRes.getSql();
-	        this.rowNumberIncluded = sqlRes.isIncludesRowNumberColumn();		    
-		} else {
-		    this.sql = luceneQueryDescription;
-		    this.rowNumberIncluded = false;
-		}
-		this.sqlTree = sqlTree;
-		this.rawSql = rawSql;
-		this.logWhereSql = logWhereSql;
-		this.encryptedProps = sqlTree.getEncryptedProps();
-	}
+  public CQueryPlan(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, boolean rawSql, String logWhereSql) {
+
+    this.server = request.getServer();
+    this.beanType = request.getBeanDescriptor().getBeanType();
+    this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
+    this.hash = request.getQueryPlanHash();
+    this.autofetchTuned = request.getQuery().isAutofetchTuned();
+    if (sqlRes != null) {
+      this.sql = sqlRes.getSql();
+      this.rowNumberIncluded = sqlRes.isIncludesRowNumberColumn();
+    } else {
+      this.sql = null;
+      this.rowNumberIncluded = false;
+    }
+    this.sqlTree = sqlTree;
+    this.rawSql = rawSql;
+    this.logWhereSql = logWhereSql;
+    this.encryptedProps = sqlTree.getEncryptedProps();
+  }
 
 	/**
 	 * Create a query plan for a raw sql query.
 	 */
-	public CQueryPlan(Class<?> beanType, String sql, SqlTree sqlTree, 
+	public CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, 
 			boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
-		
-	  this.beanType = beanType;
-	  this.stats = new CQueryPlanStats(this);
+			  
+	  this.server = request.getServer();
+	  this.beanType = request.getBeanDescriptor().getBeanType();
+	  this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
 		this.hash = buildHash(sql, rawSql, rowNumberIncluded, logWhereSql);
 		this.autofetchTuned = false;
 		this.sql = sql;
@@ -97,8 +102,9 @@ public class CQueryPlan {
 		this.logWhereSql = logWhereSql;
 		this.encryptedProps = sqlTree.getEncryptedProps();
 	}
-	
-	private HashQueryPlan buildHash(String sql, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
+
+
+  private HashQueryPlan buildHash(String sql, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
 	  HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
 	  builder.add(sql).add(rawSql).add(rowNumberIncluded).add(logWhereSql);
 	  builder.addRawSql(sql);
@@ -165,9 +171,13 @@ public class CQueryPlan {
 	/**
 	 * Register an execution time against this query plan;
 	 */
-	public void executionTime(long loadedBeanCount, long timeMicros) {
+	public void executionTime(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
 
-		stats.add(loadedBeanCount, timeMicros);
+		stats.add(loadedBeanCount, timeMicros, objectGraphNode);
+		if (objectGraphNode != null) {
+  		// collect stats based on objectGraphNode for lazy loading reporting
+  		server.collectQueryStats(objectGraphNode, loadedBeanCount, timeMicros);
+		}
 	}
 
   public Snapshot getSnapshot(boolean reset) {

@@ -1,15 +1,19 @@
 package com.avaje.ebean.meta;
 
+import java.util.List;
+
 /**
  * Query execution statistics Meta data.
+ * 
+ * @see MetaInfoManager#collectQueryPlanStatistics(boolean)
  */
-public interface MetaBeanQueryPlanStatistic {
+public interface MetaQueryPlanStatistic {
 
   /**
    * Return the bean type this query plan is for.
    */
   public Class<?> getBeanType();
-  
+
   /**
    * Return true if this query plan was tuned by Autofetch.
    */
@@ -47,7 +51,7 @@ public interface MetaBeanQueryPlanStatistic {
    * Return the max execution time for this query.
    */
   public long getMaxTimeMicros();
-  
+
   /**
    * Return the time collection started (or was last reset).
    */
@@ -73,5 +77,15 @@ public interface MetaBeanQueryPlanStatistic {
    * </p>
    */
   public long getAvgLoadedBeans();
+
+  /**
+   * Return the 'origin' points and paths that resulted in the query being
+   * executed and the associated number of times the query was executed via that
+   * path.
+   * <p>
+   * This includes direct and lazy loading paths.
+   * </p>
+   */
+  public List<MetaQueryPlanOriginCount> getOrigins();
 
 }

@@ -65,7 +65,7 @@ public final class ObjectGraphNode implements Serializable {
   }
 
   public String toString() {
-    return "origin:" + originQueryPoint + " " + ":" + path + ":" + path;
+    return "origin:" + originQueryPoint + " path[" + path+"]";
   }
   
   public int hashCode() {

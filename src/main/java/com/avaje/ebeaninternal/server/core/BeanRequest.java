@@ -96,6 +96,10 @@ public abstract class BeanRequest {
 		return ebeanServer;
 	}
 
+  public SpiEbeanServer getServer() {
+    return ebeanServer;
+  }
+
 	/**
 	 * Return the Transaction associated with this request.
 	 */

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -49,11 +50,13 @@ import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
+import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.bean.PersistenceContext.WithOption;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.EncryptKeyManager;
 import com.avaje.ebean.config.GlobalProperties;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanQueryAdapter;
@@ -207,26 +210,41 @@ public final class DefaultServer implements SpiEbeanServer {
    */
   private List<SpiEbeanPlugin> ebeanPlugins;
 
+  private final boolean collectQueryOrigins;
+  
+  private final boolean collectQueryStatsByNode;
+
+  /**
+   * Cache used to collect statistics based on ObjectGraphNode (used to highlight lazy loading origin points).
+   */
+  protected final ConcurrentHashMap<ObjectGraphNode, CObjectGraphNodeStatistics> objectGraphStats;
+
   /**
    * Create the DefaultServer.
    */
   public DefaultServer(InternalConfiguration config, ServerCacheManager cache) {
 
+    ServerConfig serverConfig = config.getServerConfig();
+    
+    this.objectGraphStats = new ConcurrentHashMap<ObjectGraphNode, CObjectGraphNodeStatistics>();
     this.metaInfoManager = new DefaultMetaInfoManager(this);
     this.serverCacheManager = cache;
     this.pstmtBatch = config.getPstmtBatch();
     this.databasePlatform = config.getDatabasePlatform();
     this.backgroundExecutor = config.getBackgroundExecutor();
-    this.serverName = config.getServerConfig().getName();
-    this.lazyLoadBatchSize = config.getServerConfig().getLazyLoadBatchSize();
-    this.queryBatchSize = config.getServerConfig().getQueryBatchSize();
+    
+    this.serverName = serverConfig.getName();
+    this.lazyLoadBatchSize = serverConfig.getLazyLoadBatchSize();
+    this.queryBatchSize = serverConfig.getQueryBatchSize();
     this.cqueryEngine = config.getCQueryEngine();
     this.expressionFactory = config.getExpressionFactory();
-    this.encryptKeyManager = config.getServerConfig().getEncryptKeyManager();
+    this.encryptKeyManager = serverConfig.getEncryptKeyManager();
 
     this.beanDescriptorManager = config.getBeanDescriptorManager();
     beanDescriptorManager.setEbeanServer(this);
 
+    this.collectQueryOrigins = serverConfig.isCollectQueryOrigins();
+    this.collectQueryStatsByNode = serverConfig.isCollectQueryStatsByNode();
     this.maxCallStack = GlobalProperties.getInt("ebean.maxCallStack", 5);
 
     this.defaultUpdateNullProperties = "true"
@@ -282,6 +300,11 @@ public final class DefaultServer implements SpiEbeanServer {
     for(SpiEbeanPlugin plugin : ebeanPlugins) {
       plugin.execute(online);
     }
+  }
+
+  @Override
+  public boolean isCollectQueryOrigins() {
+    return collectQueryOrigins;
   }
 
   public boolean isDefaultDeleteMissingChildren() {
@@ -2093,4 +2116,20 @@ public final class DefaultServer implements SpiEbeanServer {
     return jsonContext;
   }
 
+  
+  @Override
+  public void collectQueryStats(ObjectGraphNode node, long loadedBeanCount, long timeMicros) {
+    
+    if (collectQueryStatsByNode) {
+      CObjectGraphNodeStatistics nodeStatistics = objectGraphStats.get(node);
+      if (nodeStatistics == null) {
+        // race condition here but I actually don't care too much if we miss a 
+        // few early statistics - especially when the server is warming up etc
+        nodeStatistics = new CObjectGraphNodeStatistics(node);
+        objectGraphStats.put(node, nodeStatistics);
+      }
+      nodeStatistics.add(loadedBeanCount, timeMicros);
+    }
+  }
+  
 }

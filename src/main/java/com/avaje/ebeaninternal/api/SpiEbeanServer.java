@@ -9,6 +9,7 @@ import com.avaje.ebean.TxScope;
 import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.BeanLoader;
 import com.avaje.ebean.bean.CallStack;
+import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.core.PstmtBatch;
@@ -29,6 +30,8 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    */
   public void shutdownManaged();
 
+  public boolean isCollectQueryOrigins();
+  
   /**
    * Return true if DeleteMissingChildren defaults to true for stateless
    * updates.
@@ -186,5 +189,10 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Map of known bean types.
    */
   public boolean isSupportedType(java.lang.reflect.Type genericType);
+
+  /**
+   * Collect query statistics by ObjectGraphNode. Used for Lazy loading reporting.
+   */
+  public void collectQueryStats(ObjectGraphNode objectGraphNode, long loadedBeanCount, long timeMicros);
 
 }

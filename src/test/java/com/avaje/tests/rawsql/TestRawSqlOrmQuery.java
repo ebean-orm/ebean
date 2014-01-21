@@ -61,5 +61,10 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       
       System.out.println(page);
       System.out.println(list);
+      
+      for (Customer customer : list) {
+        customer.getCretime();
+      }
+      
     }
 }

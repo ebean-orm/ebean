@@ -18,6 +18,7 @@ import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.BulkTableEventListener;
 import com.avaje.ebean.event.ServerConfigStartup;
 import com.avaje.ebean.event.TransactionEventListener;
+import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.util.ClassUtil;
 
 /**
@@ -191,6 +192,10 @@ public class ServerConfig {
 
   private ServerCacheManager serverCacheManager;
 
+  private boolean collectQueryStatsByNode;
+
+  private boolean collectQueryOrigins;
+  
   /**
    * Construct a Server Configuration for programmatically creating an
    * EbeanServer.
@@ -926,6 +931,51 @@ public class ServerConfig {
   public void setUpdateChangesOnly(boolean updateChangesOnly) {
     this.updateChangesOnly = updateChangesOnly;
   }
+  
+  
+  /**
+   * Return true if the ebeanServer should collection query statistics by ObjectGraphNode.
+   */
+  public boolean isCollectQueryStatsByNode() {
+    return collectQueryStatsByNode;
+  }
+
+  /**
+   * Set to true to collection query execution statistics by ObjectGraphNode.
+   * <p>
+   * These statistics can be used to highlight code/query 'origin points' that result in lots of lazy loading.
+   * </p>
+   * <p>
+   * It is considered safe/fine to have this set to true for production.
+   * </p>
+   * <p>
+   * This information can be later retrieved via {@link MetaInfoManager}.
+   * </p>
+   * @see MetaInfoManager
+   */
+  public void setCollectQueryStatsByNode(boolean collectQueryStatsByNode) {
+    this.collectQueryStatsByNode = collectQueryStatsByNode;
+  }
+
+  /**
+   * Return true if query plans should also collect their 'origins'. This means for a given query plan you
+   * can identify the code/origin points where this query resulted from including lazy loading origins.
+   */
+  public boolean isCollectQueryOrigins() {
+    return collectQueryOrigins;
+  }
+
+  /**
+   * Set to true if query plans should collect their 'origin' points. This means for a given query plan you
+   * can identify the code/origin points where this query resulted from including lazy loading origins.
+   * <p>
+   * This information can be later retrieved via {@link MetaInfoManager}.
+   * </p>
+   * @see MetaInfoManager
+   */
+  public void setCollectQueryOrigins(boolean collectQueryOrigins) {
+    this.collectQueryOrigins = collectQueryOrigins;
+  }
 
   /**
    * Returns the resource directory.
@@ -1183,6 +1233,9 @@ public class ServerConfig {
       packages = getSearchJarsPackages(packagesProp);
     }
 
+    collectQueryStatsByNode = p.getBoolean("collectQueryStatsByNode", true);
+    collectQueryOrigins = p.getBoolean("collectQueryOrigins", true);
+    
     updateChangesOnly = p.getBoolean("updateChangesOnly", true);
 
     boolean batchMode = p.getBoolean("batch.mode", false);

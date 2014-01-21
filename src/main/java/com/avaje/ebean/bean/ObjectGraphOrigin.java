@@ -58,7 +58,7 @@ public final class ObjectGraphOrigin implements Serializable {
   }
 
   public String toString() {
-    return key + " " + beanType + " " + callStack.getFirstStackTraceElement();
+    return "key["+ key + "] type[" + beanType + "] " + callStack.getFirstStackTraceElement()+" ";
   }
 
   public int hashCode() {

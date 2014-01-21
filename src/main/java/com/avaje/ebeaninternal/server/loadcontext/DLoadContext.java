@@ -64,7 +64,6 @@ public class DLoadContext implements LoadContext {
 		this.ebeanServer = ebeanServer;
 		this.defaultBatchSize = ebeanServer.getLazyLoadBatchSize();
 		this.rootDescriptor = rootDescriptor;
-		this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
 		this.readOnly = readOnly;
 		this.excludeBeanCache = excludeBeanCache;
 		this.useAutofetchManager = useAutofetchManager;		
@@ -76,6 +75,9 @@ public class DLoadContext implements LoadContext {
 			this.origin = null;
 			this.relativePath = null;
 		}
+		
+		// initialise rootBeanContext after origin and relativePath have been set
+    this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
 	}	
 
 	protected boolean isExcludeBeanCache() {

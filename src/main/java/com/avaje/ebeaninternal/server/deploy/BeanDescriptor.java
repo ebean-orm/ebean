@@ -37,7 +37,7 @@ import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.meta.MetaBeanInfo;
-import com.avaje.ebean.meta.MetaBeanQueryPlanStatistic;
+import com.avaje.ebean.meta.MetaQueryPlanStatistic;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
 import com.avaje.ebeaninternal.api.HashQueryPlan;
@@ -1154,17 +1154,17 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   @Override
-  public List<MetaBeanQueryPlanStatistic> collectQueryPlanStatistics(boolean reset) {
+  public List<MetaQueryPlanStatistic> collectQueryPlanStatistics(boolean reset) {
     return collectQueryPlanStatisticsInternal(reset, false);
   }
   
   @Override
-  public List<MetaBeanQueryPlanStatistic> collectAllQueryPlanStatistics(boolean reset) {
+  public List<MetaQueryPlanStatistic> collectAllQueryPlanStatistics(boolean reset) {
     return collectQueryPlanStatisticsInternal(reset, false);
   }
   
-  public List<MetaBeanQueryPlanStatistic> collectQueryPlanStatisticsInternal(boolean reset, boolean collectAll) {
-    List<MetaBeanQueryPlanStatistic> list = new ArrayList<MetaBeanQueryPlanStatistic>(queryPlanCache.size());
+  public List<MetaQueryPlanStatistic> collectQueryPlanStatisticsInternal(boolean reset, boolean collectAll) {
+    List<MetaQueryPlanStatistic> list = new ArrayList<MetaQueryPlanStatistic>(queryPlanCache.size());
     for (CQueryPlan queryPlan :  queryPlanCache.values()) {
       Snapshot snapshot = queryPlan.getSnapshot(reset);
       if (collectAll || snapshot.getExecutionCount() > 0) {

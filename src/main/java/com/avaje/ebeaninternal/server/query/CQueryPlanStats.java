@@ -1,9 +1,17 @@
 
 package com.avaje.ebeaninternal.server.query;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.avaje.ebean.meta.MetaBeanQueryPlanStatistic;
+import com.avaje.ebean.bean.ObjectGraphNode;
+import com.avaje.ebean.meta.MetaQueryPlanStatistic;
+import com.avaje.ebean.meta.MetaQueryPlanOriginCount;
 import com.avaje.ebeaninternal.server.util.LongAdder;
 
 /**
@@ -25,12 +33,14 @@ public final class CQueryPlanStats {
 
   private long lastQueryTime;
 
-	
-	public CQueryPlanStats(CQueryPlan queryPlan) {
+  private final ConcurrentHashMap<ObjectGraphNode, LongAdder> origins;
+
+	public CQueryPlanStats(CQueryPlan queryPlan, boolean collectQueryOrigins) {
 	  this.queryPlan = queryPlan;
+	  this.origins = !collectQueryOrigins ? null : new ConcurrentHashMap<ObjectGraphNode, LongAdder>();
 	}
 
-	public void add(long loadedBeanCount, long timeMicros) {
+	public void add(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
 		count.increment();
 		totalBeans.add(loadedBeanCount);
 		totalTime.add(timeMicros);
@@ -38,15 +48,37 @@ public final class CQueryPlanStats {
 		  // effectively a high water mark
 		  maxTime.set(timeMicros);
 		}
+		// not safe but should be atomic
     lastQueryTime = System.currentTimeMillis();
+    
+    if (origins != null && objectGraphNode != null) {
+      // Maintain the origin points this query fires from
+      // with a simple counter
+      LongAdder counter = origins.get(objectGraphNode);
+      if (counter == null) {
+        // race condition - we can miss counters here but going
+        // to live with that. Don't want to lock/synchronize etc
+        counter = new LongAdder();
+        origins.put(objectGraphNode, counter);
+      } 
+      counter.increment();
+    }
 	}
 	
 	public void reset() {
+	  // Racey but near enough for our purposes as we don't want locks
 	  count.reset();
 	  totalBeans.reset();
 	  totalTime.reset();
 	  maxTime.set(0);
 	  startTime.set(System.currentTimeMillis());
+	  
+	  if (origins != null) {
+	    for (LongAdder counter : origins.values()) {
+        counter.reset();
+      }
+	  }
+	  
 	}
 	
 	public long getLastQueryTime() {
@@ -54,17 +86,68 @@ public final class CQueryPlanStats {
 	}
 	
 	public Snapshot getSnapshot(boolean reset) {
-	  // not guaranteed to be consistent  - time gaps between getting each value  
+	  
+	  List<MetaQueryPlanOriginCount> origins = getOrigins(reset);
+	  
+	  // not guaranteed to be consistent due to time gaps between getting each value out of LongAdders but can live with that
+	  // relative to the cost of making sure count and totalTime etc are all guaranteed to be consistent
 	  if (reset) {
-	    return new Snapshot(queryPlan, count.sumThenReset(), totalTime.sumThenReset(), totalBeans.sumThenReset(), maxTime.getAndSet(0), startTime.getAndSet(System.currentTimeMillis()), lastQueryTime);
+	    return new Snapshot(queryPlan, count.sumThenReset(), totalTime.sumThenReset(), totalBeans.sumThenReset(), maxTime.getAndSet(0), startTime.getAndSet(System.currentTimeMillis()), lastQueryTime, origins);
 	  }
-    return new Snapshot(queryPlan, count.sum(), totalTime.sum(), totalBeans.sum(), maxTime.get(), startTime.get(), lastQueryTime);
+    return new Snapshot(queryPlan, count.sum(), totalTime.sum(), totalBeans.sum(), maxTime.get(), startTime.get(), lastQueryTime, origins);
 	}
+	
+	/**
+	 * Return the list/snapshot of the origins and their counter value.
+	 */
+	private List<MetaQueryPlanOriginCount> getOrigins(boolean reset) {
+	  if (origins == null) {
+	    return Collections.emptyList();
+	  }
+	  
+	  List<MetaQueryPlanOriginCount> list = new ArrayList<MetaQueryPlanOriginCount>();
+	  
+	  for (Entry<ObjectGraphNode, LongAdder> entry : origins.entrySet()) {
+	    if (reset) {
+	      list.add(new OriginSnapshot(entry.getKey(), entry.getValue().sumThenReset()));
+	    } else {
+        list.add(new OriginSnapshot(entry.getKey(), entry.getValue().sum()));	      
+	    }
+    }
+	  return list;
+	}
+	
+	/**
+	 * Snapshot of the origin ObjectGraphNode and counter value.
+	 */
+	private static class OriginSnapshot implements MetaQueryPlanOriginCount {
+	  private final ObjectGraphNode objectGraphNode;
+	  private final long count;
+	  
+    public OriginSnapshot(ObjectGraphNode objectGraphNode, long count) {
+      this.objectGraphNode = objectGraphNode;
+      this.count = count;
+    }
 
+    public String toString() {
+      return "node["+objectGraphNode+"] count["+count+"]";
+    }
+    
+    @Override
+    public ObjectGraphNode getObjectGraphNode() {
+      return objectGraphNode;
+    }
+
+    @Override
+    public long getCount() {
+      return count;
+    }	  
+	}
+	
 	/**
 	 * A snapshot of the current statistics for a query plan.
 	 */
-	public static class Snapshot implements MetaBeanQueryPlanStatistic {
+	public static class Snapshot implements MetaQueryPlanStatistic {
 	  
 	  private final CQueryPlan queryPlan;
 	  private final long count;
@@ -73,9 +156,11 @@ public final class CQueryPlanStats {
 	  private final long maxTime;  
 	  private final long startTime;
 	  private final long lastQueryTime;
-    
-	  public Snapshot(CQueryPlan queryPlan, long count, long totalTime, long totalBeans, long maxTime, long startTime, long lastQueryTime) {
-      super();
+    private final List<MetaQueryPlanOriginCount> origins;
+	  
+	  public Snapshot(CQueryPlan queryPlan, long count, long totalTime, long totalBeans, long maxTime, long startTime, long lastQueryTime,
+	      List<MetaQueryPlanOriginCount> origins) {
+      
       this.queryPlan = queryPlan;
       this.count = count;
       this.totalTime = totalTime;
@@ -83,11 +168,13 @@ public final class CQueryPlanStats {
       this.maxTime = maxTime;
       this.startTime = startTime;
       this.lastQueryTime = lastQueryTime;
+      this.origins = origins;
     }
 	  	  
-	  public String toString() {
-	    return queryPlan+" count:"+count+" time:"+totalTime+" maxTime:"+maxTime+" beans:"+totalBeans+" start:"+startTime+" lastQuery:"+lastQueryTime;
-	  }
+    public String toString() {
+      return queryPlan + " count:" + count + " time:" + totalTime + " maxTime:" + maxTime + " beans:" + totalBeans
+          + " start:" + startTime + " lastQuery:" + lastQueryTime + " origins:" + origins;
+    }
 	  
     @Override
     public Class<?> getBeanType() {
@@ -149,6 +236,12 @@ public final class CQueryPlanStats {
     public long getAvgLoadedBeans() {
       return count < 1 ? 0 : totalBeans / count;
     }
+    
+    @Override
+    public List<MetaQueryPlanOriginCount> getOrigins() {
+      return origins;
+    }
+
 	}
 	
 }

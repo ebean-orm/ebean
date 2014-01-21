@@ -21,6 +21,7 @@ public class TestLoadOnDirty extends BaseTestCase {
     List<Customer> custs = Ebean.find(Customer.class).findList();
 
     Customer customer = Ebean.find(Customer.class).setId(custs.get(0).getId()).select("name")
+        .setUseCache(false)
         .findUnique();
 
     BeanState beanState = Ebean.getBeanState(customer);

@@ -10,6 +10,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.persistence.PersistenceException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.QueryListener;
 import com.avaje.ebean.bean.BeanCollection;
@@ -21,6 +24,7 @@ import com.avaje.ebean.bean.NodeUsageListener;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.LoadContext;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
@@ -40,9 +44,6 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An object that represents a SqlSelect statement.
@@ -210,7 +211,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private final boolean autoFetchProfiling;
 
-  private final ObjectGraphNode autoFetchParentNode;
+  private final ObjectGraphNode objectGraphNode;
 
   private final AutoFetchManager autoFetchManager;
   
@@ -238,7 +239,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
     this.autoFetchManager = query.getAutoFetchManager();
     this.autoFetchProfiling = autoFetchManager != null;
-    this.autoFetchParentNode = autoFetchProfiling ? query.getParentNode() : null;
+    this.objectGraphNode = query.getParentNode();
     this.autoFetchManagerRef = autoFetchProfiling ? new WeakReference<NodeUsageListener>(
         autoFetchManager) : null;
 
@@ -645,9 +646,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
       if (autoFetchProfiling) {
         autoFetchManager
-            .collectQueryInfo(autoFetchParentNode, loadedBeanCount, executionTimeMicros);
+            .collectQueryInfo(objectGraphNode, loadedBeanCount, executionTimeMicros);
       }
-      queryPlan.executionTime(loadedBeanCount, executionTimeMicros);
+      queryPlan.executionTime(loadedBeanCount, executionTimeMicros, objectGraphNode);
 
     } catch (Exception e) {
       logger.error(null, e);

@@ -115,7 +115,7 @@ public class CQueryBuilder implements Constants {
     String sql = s.getSql();
 
     // cache the query plan
-    queryPlan = new CQueryPlan(query.getBeanType(), sql, sqlTree, false, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, sql, sqlTree, false, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
 
     request.putQueryPlan(queryPlan);
     return new CQueryFetchIds(request, predicates, sql, backgroundExecutor);
@@ -171,7 +171,7 @@ public class CQueryBuilder implements Constants {
     }
 
     // cache the query plan
-    queryPlan = new CQueryPlan(query.getBeanType(), sql, sqlTree, false, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, sql, sqlTree, false, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
 
     return new CQueryRowCount(request, predicates, sql);
@@ -216,7 +216,7 @@ public class CQueryBuilder implements Constants {
       queryPlan = new CQueryPlanRawSql(request, res, sqlTree, predicates.getLogWhereSql());
 
     } else {
-      queryPlan = new CQueryPlan(request, res, sqlTree, rawSql, predicates.getLogWhereSql(), null);
+      queryPlan = new CQueryPlan(request, res, sqlTree, rawSql, predicates.getLogWhereSql());
     }
 
     // cache the query plan because we can reuse it and also
