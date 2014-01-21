@@ -353,6 +353,11 @@ public class DefaultServerFactory implements BootupEbeanManager {
       if (sequenceFormat != null) {
         nc.setSequenceFormat(sequenceFormat);
       }
+      
+      String schema = config.getProperty("namingConvention.schema");
+      if (schema != null) {
+        nc.setSchema(schema);
+      }
     }
   }
 
@@ -410,30 +415,8 @@ public class DefaultServerFactory implements BootupEbeanManager {
       return null;
     }
 
-    if (dsConfig.getHeartbeatSql() == null) {
-      // use default heartbeatSql from the DatabasePlatform
-      String heartbeatSql = getHeartbeatSql(dsConfig.getDriver());
-      dsConfig.setHeartbeatSql(heartbeatSql);
-    }
-
     DataSourceAlert notify = new SimpleDataSourceAlert();
     return new DataSourcePool(notify, config.getName(), dsConfig);
-  }
-
-  /**
-   * Return a heartbeatSql depending on the jdbc driver name.
-   */
-  private String getHeartbeatSql(String driver) {
-    if (driver != null) {
-      String d = driver.toLowerCase();
-      if (d.contains("oracle")) {
-        return "select 'x' from dual";
-      }
-      if (d.contains(".h2.") || d.contains(".mysql.") || d.contains("postgre")) {
-        return "select 1";
-      }
-    }
-    return null;
   }
 
   /**

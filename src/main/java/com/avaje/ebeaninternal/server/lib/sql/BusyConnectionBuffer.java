@@ -1,9 +1,11 @@
 package com.avaje.ebeaninternal.server.lib.sql;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.avaje.ebeaninternal.server.lib.sql.PooledConnectionStatistics.LoadValues;
 
 /**
  * A buffer especially designed for Busy PooledConnections.
@@ -21,6 +23,8 @@ import java.util.List;
  */
 class BusyConnectionBuffer {
 
+    private static final Logger logger = LoggerFactory.getLogger(BusyConnectionBuffer.class);
+  
     private PooledConnection[] slots;
     
     private int growBy;
@@ -46,7 +50,7 @@ class BusyConnectionBuffer {
     /**
      * We can only grow (not shrink) the capacity.
      */
-    private void setCapacity(int newCapacity) {
+    protected void setCapacity(int newCapacity) {
         if (newCapacity > slots.length){
             PooledConnection[] current = this.slots;
             this.slots = new PooledConnection[newCapacity];
@@ -66,8 +70,8 @@ class BusyConnectionBuffer {
         return size;
     }
     
-    protected boolean isEmpty(){
-        return size == 0;
+    protected boolean isEmpty() {
+      return size == 0;
     }
     
     protected int add(PooledConnection pc){
@@ -75,40 +79,102 @@ class BusyConnectionBuffer {
             // grow the capacity
             setCapacity(slots.length + growBy);
         }
-        ++size;
         int slot = nextEmptySlot();
         pc.setSlotId(slot);
         slots[slot] = pc;
-        return size;
+        return ++size;
     }
     
     protected boolean remove(PooledConnection pc) {
-        --size;
+        
         int slotId = pc.getSlotId();
         if (slots[slotId] != pc){
+            PooledConnection heldBy = slots[slotId];
+            logger.warn("Failed to remove from slot[{}] PooledConnection[{}] - HeldBy[{}]", pc.getSlotId(), pc, heldBy);
             return false;
         }
         slots[slotId] = null;
+        --size;
         return true;
     }
     
+    /**
+     * Collect the load statistics from all the busy connections.
+     * @param reset 
+     */
+    protected void collectStatistics(LoadValues values, boolean reset) {    
+        
+      for (int i = 0; i < slots.length; i++) {
+        if (slots[i] != null){
+          values.plus(slots[i].getStatistics().getValues(reset));
+        }
+      }
+    }
     
     /**
-     * Get a shallow read only List of the busy connections.
-     * <p>
-     * Note that the {@link #remove(PooledConnection)} MUST be used to remove PooledConnections.
-     * </p>
-     * @return
+     * Close connections that should be considered leaked.
      */
-    protected List<PooledConnection> getShallowCopy() {
-        ArrayList<PooledConnection> tmp = new ArrayList<PooledConnection>();
-        for (int i = 0; i < slots.length; i++) {
-            if (slots[i] != null){
-                tmp.add(slots[i]);
+    protected void closeBusyConnections(long leakTimeMinutes) {
+
+      long olderThanTime = System.currentTimeMillis() - (leakTimeMinutes*60000);
+
+      logger.debug("Closing busy connections using leakTimeMinutes {}", leakTimeMinutes);
+
+      for (int i = 0; i < slots.length; i++) {
+        if (slots[i] != null){
+            //tmp.add(slots[i]);
+            PooledConnection pc = slots[i];
+            if (pc.isLongRunning() || pc.getLastUsedTime() > olderThanTime) {
+              // PooledConnection has been used recently or
+              // expected to be longRunning so not closing...
+            } else {
+              slots[i] = null;
+              --size; 
+              closeBusyConnection(pc);
             }
         }
-        return Collections.unmodifiableList(tmp);
+      }
     }
+    
+    private void closeBusyConnection(PooledConnection pc) {
+      try {
+          
+          logger.warn("DataSourcePool closing busy connection? "+pc.getFullDescription());
+          System.out.println("CLOSING busy connection: "+pc.getFullDescription());
+          
+          pc.closeConnectionFully(false);
+
+      } catch (Exception ex) {
+          // this should never actually happen
+          logger.error("Error when closing potentially leaked connection "+pc.getDescription(), ex);
+      }
+  }
+    
+    /**
+     * Returns information describing connections that are currently being used.
+     */
+    protected String getBusyConnectionInformation(boolean toLogger) {
+               
+          if (toLogger) {
+            logger.info("Dumping [{}] busy connections: (Use datasource.xxx.capturestacktrace=true  ... to get stackTraces)", size());
+          }
+
+          StringBuilder sb = new StringBuilder();
+
+          for (int i = 0; i < slots.length; i++) {
+            if (slots[i] != null){
+                PooledConnection pc = slots[i];
+                if (toLogger) {
+                    logger.info("Busy Connection - {}", pc.getFullDescription());
+                } else {
+                    sb.append(pc.getFullDescription()).append("\r\n");
+                }
+            }
+          }
+          
+          return sb.toString();
+    }
+    
     
     /**
      * Return the position of the next empty slot.

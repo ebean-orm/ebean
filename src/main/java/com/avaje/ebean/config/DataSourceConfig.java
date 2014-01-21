@@ -36,25 +36,31 @@ public class DataSourceConfig {
   
   private int heartbeatFreqSecs = 30;
   
+  private int heartbeatTimeoutSeconds = 3;
+  
   private boolean captureStackTrace;
 
   private int maxStackTraceSize = 5;
 
   private int leakTimeMinutes = 30;
 
-  private int maxInactiveTimeSecs = 900;
+  private int maxInactiveTimeSecs = 720;
+  
+  private int maxAgeMinutes = 0;
+  
+  private int trimPoolFreqSecs = 59;
 
   private int pstmtCacheSize = 20;
   
   private int cstmtCacheSize = 20;
 
   private int waitTimeoutMillis = 1000;
-
+  
   private String poolListener;
 
   private boolean offline;
-
-  Map<String, String> customProperties;
+  
+  protected Map<String, String> customProperties;
 
   /**
    * Return the connection URL.
@@ -194,6 +200,20 @@ public class DataSourceConfig {
   public void setHeartbeatFreqSecs(int heartbeatFreqSecs) {
     this.heartbeatFreqSecs = heartbeatFreqSecs;
   }
+  
+  /**
+   * Return the heart beat timeout in seconds.
+   */
+  public int getHeartbeatTimeoutSeconds() {
+    return heartbeatTimeoutSeconds;
+  }
+
+  /**
+   * Set the heart beat timeout in seconds.
+   */
+  public void setHeartbeatTimeoutSeconds(int heartbeatTimeoutSeconds) {
+    this.heartbeatTimeoutSeconds = heartbeatTimeoutSeconds;
+  }
 
   /**
    * Return true if a stack trace should be captured when obtaining a connection
@@ -310,6 +330,23 @@ public class DataSourceConfig {
   }
 
   /**
+   * Return the maximum age a connection is allowed to be before it is closed.
+   * <p>
+   * This can be used to close really old connections.
+   * </p>
+   */
+  public int getMaxAgeMinutes() {
+    return maxAgeMinutes;
+  }
+  
+  /**
+   * Set the maximum age a connection can be in minutes.
+   */
+  public void setMaxAgeMinutes(int maxAgeMinutes) {
+    this.maxAgeMinutes = maxAgeMinutes;
+  }
+
+  /**
    * Set the time in seconds a connection can be idle after which it can be
    * trimmed from the pool.
    * <p>
@@ -319,6 +356,25 @@ public class DataSourceConfig {
    */
   public void setMaxInactiveTimeSecs(int maxInactiveTimeSecs) {
     this.maxInactiveTimeSecs = maxInactiveTimeSecs;
+  }
+
+  
+  /**
+   * Return the minimum time gap between pool trim checks.
+   * <p>
+   * This defaults to 59 seconds meaning that the pool trim check will run every
+   * minute assuming the heart beat check runs every 30 seconds.
+   * </p>
+   */
+  public int getTrimPoolFreqSecs() {
+    return trimPoolFreqSecs;
+  }
+
+  /**
+   * Set the minimum trim gap between pool trim checks.
+   */
+  public void setTrimPoolFreqSecs(int trimPoolFreqSecs) {
+    this.trimPoolFreqSecs = trimPoolFreqSecs;
   }
 
   /**
@@ -359,7 +415,7 @@ public class DataSourceConfig {
   public void setOffline(boolean offline) {
     this.offline = offline;
   }
-
+  
   /**
    * Return a map of custom properties for the jdbc driver connection.
    */
@@ -388,18 +444,18 @@ public class DataSourceConfig {
     this.username = properties.get(prefix + "username", null);
     this.password = properties.get(prefix + "password", null);
 
-    String v;
+    String dbDriver = properties.get(prefix + "databaseDriver", null);
+    this.driver = properties.get(prefix + "driver", dbDriver);
 
-    v = properties.get(prefix + "databaseDriver", null);
-    this.driver = properties.get(prefix + "driver", v);
-
-    v = properties.get(prefix + "databaseUrl", null);
-    this.url = properties.get(prefix + "url", v);
+    String dbUrl = properties.get(prefix + "databaseUrl", null);
+    this.url = properties.get(prefix + "url", dbUrl);
 
     this.captureStackTrace = properties.getBoolean(prefix + "captureStackTrace", false);
     this.maxStackTraceSize = properties.getInt(prefix + "maxStackTraceSize", 5);
     this.leakTimeMinutes = properties.getInt(prefix + "leakTimeMinutes", 30);
-    this.maxInactiveTimeSecs = properties.getInt(prefix + "maxInactiveTimeSecs", 900);
+    this.maxInactiveTimeSecs = properties.getInt(prefix + "maxInactiveTimeSecs", 720);
+    this.trimPoolFreqSecs = properties.getInt(prefix + "trimPoolFreqSecs", 59);
+    this.maxAgeMinutes = properties.getInt(prefix + "maxAgeMinutes", 0);
 
     this.minConnections = properties.getInt(prefix + "minConnections", 0);
     this.maxConnections = properties.getInt(prefix + "maxConnections", 20);
@@ -409,6 +465,7 @@ public class DataSourceConfig {
     this.waitTimeoutMillis = properties.getInt(prefix + "waitTimeout", 1000);
 
     this.heartbeatSql = properties.get(prefix + "heartbeatSql", null);
+    this.heartbeatTimeoutSeconds =  properties.getInt(prefix + "heartbeatTimeoutSeconds", 3);    
     this.poolListener = properties.get(prefix + "poolListener", null);
     this.offline = properties.getBoolean(prefix + "offline", false);
 

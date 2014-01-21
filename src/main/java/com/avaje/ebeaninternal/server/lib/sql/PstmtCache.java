@@ -14,37 +14,37 @@ public class PstmtCache extends LinkedHashMap<String, ExtendedPreparedStatement>
 
 	private static final Logger logger = LoggerFactory.getLogger(PstmtCache.class);
 	
-    static final long serialVersionUID = -3096406924865550697L;
+  static final long serialVersionUID = -3096406924865550697L;
 
 	/**
 	 * The name of the cache, for tracing purposes.
 	 */
-	final String cacheName;
+	protected final String cacheName;
 	
 	/**
 	 * The maximum size of the cache.  When this is exceeded the oldest entry is removed.
 	 */
-	final int maxSize;
+	private final int maxSize;
 
 	/**
 	 * The total number of entries removed from this cache.
 	 */
-	int removeCounter;
+	private int removeCounter;
 
 	/**
 	 * The number of get hits.
 	 */
-	int hitCounter;
+	private int hitCounter;
 
 	/** 
 	 * The number of get() misses.
 	 */
-	int missCounter;
+	private int missCounter;
 
 	/**
 	 * The number of puts into this cache.
 	 */
-	int putCounter;
+	private int putCounter;
 
 	public PstmtCache(String cacheName, int maxCacheSize) {
 
@@ -58,7 +58,7 @@ public class PstmtCache extends LinkedHashMap<String, ExtendedPreparedStatement>
 	 * Return a summary description of this cache.
 	 */
 	public String getDescription() {
-		return cacheName+" size:"+size()+" max:"+maxSize+" totalHits:"+hitCounter+" hitRatio:"+getHitRatio()+" removes:"+removeCounter;
+		return "size["+size()+"] max["+maxSize+"] hits["+hitCounter+"] miss["+missCounter+"] hitRatio["+getHitRatio()+"] removes["+removeCounter+"]";
 	}
 	
 	/**
@@ -101,6 +101,24 @@ public class PstmtCache extends LinkedHashMap<String, ExtendedPreparedStatement>
 		return putCounter;
 	}
 
+	/**
+	 * Try to add the returning statement to the cache. If there is already a
+	 * matching ExtendedPreparedStatement in the cache return false else add
+	 * the statement to the cache and return true.
+	 */
+	public boolean returnStatement(ExtendedPreparedStatement pstmt) {
+	  
+	  ExtendedPreparedStatement alreadyInCache = super.get(pstmt.getCacheKey());
+    if (alreadyInCache != null) {
+      return false;
+    }
+    // add the returning prepared statement to the cache.
+    // Note that the LRUCache will automatically close fully old unused
+    // PStmts when the cache has hit its maximum size.
+    put(pstmt.getCacheKey(), pstmt);
+    return true;
+	}
+	
 	/**
 	 * additionally maintains hit and miss statistics.
 	 */

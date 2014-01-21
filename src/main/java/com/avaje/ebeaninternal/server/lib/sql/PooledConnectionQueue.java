@@ -1,17 +1,15 @@
 package com.avaje.ebeaninternal.server.lib.sql;
 
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool.Status;
+import com.avaje.ebeaninternal.server.lib.sql.PooledConnectionStatistics.LoadValues;
 
 public class PooledConnectionQueue {
 
@@ -34,6 +32,16 @@ public class PooledConnectionQueue {
      */
     private final BusyConnectionBuffer busyList;
 
+    /**
+     * Load statistics collected off connections that have closed fully (left the pool).
+     */
+    private final PooledConnectionStatistics collectedStats = new PooledConnectionStatistics();
+    
+    /**
+     * Currently accumulated load statistics.
+     */
+    private LoadValues accumulatedValues = new LoadValues();
+
     /** 
      * Main lock guarding all access 
      */
@@ -46,10 +54,12 @@ public class PooledConnectionQueue {
 
     private int connectionId;
 
-    private long waitTimeoutMillis;
-
-    private long leakTimeMinutes;
+    private final long waitTimeoutMillis;
     
+    private final long leakTimeMinutes;
+    
+    private final long maxAgeMillis;
+
     private int warningSize;
     
     private int maxSize;
@@ -94,11 +104,12 @@ public class PooledConnectionQueue {
         this.warningSize = pool.getWarningSize();
         this.waitTimeoutMillis = pool.getWaitTimeoutMillis();
         this.leakTimeMinutes = pool.getLeakTimeMinutes();
-                
-        this.busyList = new BusyConnectionBuffer(50,20);
-        this.freeList = new FreeConnectionBuffer(maxSize);
-        
-        this.lock = new ReentrantLock(true);
+        this.maxAgeMillis = pool.getMaxAgeMillis();
+
+        this.busyList = new BusyConnectionBuffer(maxSize, 20);
+        this.freeList = new FreeConnectionBuffer();
+
+        this.lock = new ReentrantLock(false);
         this.notEmpty = lock.newCondition();
     }
     
@@ -115,6 +126,36 @@ public class PooledConnectionQueue {
             lock.unlock();
         }
     }
+    
+    /**
+     * Collect statistics of a connection that is fully closing
+     */
+    protected void reportClosingConnection(PooledConnection pooledConnection) {
+      
+      collectedStats.add(pooledConnection.getStatistics());
+    }
+
+    public DataSourcePoolStatistics getStatistics(boolean reset) {
+      
+      final ReentrantLock lock = this.lock;
+      lock.lock();
+      try {
+
+        LoadValues aggregate = collectedStats.getValues(reset);
+
+        freeList.collectStatistics(aggregate, reset);
+        busyList.collectStatistics(aggregate, reset);
+
+        aggregate.plus(accumulatedValues);
+        
+        this.accumulatedValues = (reset) ? new LoadValues() : aggregate;
+        
+        return new DataSourcePoolStatistics(aggregate.getCollectionStart(), aggregate.getCount(), aggregate.getErrorCount(), aggregate.getHwmMicros(), aggregate.getTotalMicros());
+        
+      } finally {
+          lock.unlock();
+      }
+  }
     
     public Status getStatus(boolean reset) {
         final ReentrantLock lock = this.lock;
@@ -152,7 +193,7 @@ public class PooledConnectionQueue {
             if (maxSize < this.minSize){
                 throw new IllegalArgumentException("maxSize "+maxSize+" < minSize "+this.minSize);
             }
-            freeList.setCapacity(maxSize);
+            this.busyList.setCapacity(maxSize);
             this.maxSize = maxSize;
         } finally {
             lock.unlock();
@@ -203,10 +244,11 @@ public class PooledConnectionQueue {
         lock.lock();
         try {            
             if (!busyList.remove(c)) {
-                logger.error("Connection [" + c + "] not found in BusyList? ");
+                logger.error("Connection [{}] not found in BusyList? ", c);
             }
-            if (c.getCreationTime() <= lastResetTime) {
+            if (c.shouldTrimOnReturn(lastResetTime, maxAgeMillis)) {
                 c.closeConnectionFully(false);
+                
             } else {
                 freeList.add(c);
                 notEmpty.signal();
@@ -261,8 +303,7 @@ public class PooledConnectionQueue {
             // are other threads already waiting? (they get priority)
             if (waitingThreads == 0){
                 
-                int freeSize = freeList.size();
-                if (freeSize > 0){
+                if (!freeList.isEmpty()){
                     // we have a free connection to return
                     return extractFromFreeList();
                 } 
@@ -272,9 +313,9 @@ public class PooledConnectionQueue {
                     PooledConnection c = pool.createConnectionForQueue(connectionId++);
                     int busySize = registerBusyConnection(c);
                     
-                    String msg = "DataSourcePool [" + name + "] grow; id["+c.getName()+"] busy["+busySize+"] max["+maxSize+"]";
-                    logger.debug(msg);
-                    
+                    if (logger.isDebugEnabled()) {
+                      logger.debug("DataSourcePool [{}] grow; id[{}] busy[{}] max[{}]", name, c.getName(), busySize, maxSize);
+                    }
                     checkForWarningSize();
                     return c;
                 }
@@ -333,13 +374,13 @@ public class PooledConnectionQueue {
         try {
             doingShutdown = true;
             Status status = createStatus();
-            logger.debug("DataSourcePool [" + name + "] shutdown: "+status);
+            DataSourcePoolStatistics statistics = pool.getStatistics(false);
+            logger.debug("DataSourcePool [{}] shutdown {} - Statistics {}", name, status, statistics);
             
             closeFreeConnections(true);
         
             if (!busyList.isEmpty()) {
-                logger.warn("A potential connection leak was detected.  Busy connections: "+ busyList.size());
-                
+                logger.warn("Closing busy connections on shutdown size: "+ busyList.size());
                 dumpBusyConnectionInformation();
                 closeBusyConnections(0);
             }
@@ -360,27 +401,30 @@ public class PooledConnectionQueue {
         lock.lock();
         try {
             Status status = createStatus();
-            logger.info("Reseting DataSourcePool [" + name + "] "+status);
+            logger.info("Reseting DataSourcePool [{}] {}", name, status);
             lastResetTime = System.currentTimeMillis();
 
             closeFreeConnections(false);
             closeBusyConnections(leakTimeMinutes);
 
-            String busyMsg = "Busy Connections:\r\n" + getBusyConnectionInformation();
-            logger.info(busyMsg);
+            logger.info("Busy Connections:\n" + getBusyConnectionInformation());
 
         } finally {
             lock.unlock();
         }
     }
 
-    public void trim(int maxInactiveTimeSecs) throws SQLException {
+    public void trim(long maxInactiveMillis, long maxAgeMillis) {
         final ReentrantLock lock = this.lock;
         lock.lock();
         try {
-            trimInactiveConnections(maxInactiveTimeSecs);
-            ensureMinimumConnections();
-            
+            if (trimInactiveConnections(maxInactiveMillis, maxAgeMillis) > 0) {
+              try {
+                ensureMinimumConnections();
+              } catch (SQLException e) {
+                logger.error("Error trying to ensure minimum connections", e);
+              }
+            }
         } finally {
             lock.unlock();
         }
@@ -389,40 +433,14 @@ public class PooledConnectionQueue {
     /**
      * Trim connections that have been not used for some time.
      */
-    private int trimInactiveConnections(int maxInactiveTimeSecs) {
-    
-        int maxTrim = freeList.size() - minSize;
-        if (maxTrim <= 0) {
-            return 0;
-        }
-        
-        int trimedCount = 0;
-        long usedSince = System.currentTimeMillis() - (maxInactiveTimeSecs * 1000);
-      
-        // get a shallow copy to manipulate
-        List<PooledConnection> freeListCopy = freeList.getShallowCopy();
-        
-        Iterator<PooledConnection> it = freeListCopy.iterator();
-        while (it.hasNext()) {
-            PooledConnection pc = it.next();
-            if (pc.getLastUsedTime() < usedSince) {
-                // trim this connection as it hasn't been used in a while
-                trimedCount++;
-                it.remove();
-                pc.closeConnectionFully(true);
-                if (trimedCount >= maxTrim) {
-                    break;
-                }
-            }
-        }
-        
-        if (trimedCount > 0) {
+    private int trimInactiveConnections(long maxInactiveMillis, long maxAgeMillis) {
             
-            // rebuild the free list from the trimmed copy
-            freeList.setShallowCopy(freeListCopy);
-
-            String msg = "DataSourcePool [" + name + "] trimmed [" + trimedCount + "] inactive connections. New size[" + totalConnections() + "]";
-            logger.debug(msg);
+        long usedSince = System.currentTimeMillis() - maxInactiveMillis;
+        long createdSince = (maxAgeMillis == 0) ? 0 : System.currentTimeMillis() - maxAgeMillis;
+        
+        int trimedCount = freeList.trim(usedSince, createdSince);
+        if (trimedCount > 0) {
+            logger.debug("DataSourcePool [{}] trimmed [{}] inactive connections. New size[{}]", name, trimedCount, totalConnections());
         }
         return trimedCount;
     }
@@ -434,11 +452,7 @@ public class PooledConnectionQueue {
         final ReentrantLock lock = this.lock;
         lock.lock();
         try {
-            while (!freeList.isEmpty()) {
-                PooledConnection c = freeList.remove();
-                logger.debug("PSTMT Statistics: "+c.getStatistics());
-                c.closeConnectionFully(logErrors);
-            }
+          freeList.closeAll(logErrors);
         } finally {
             lock.unlock();
         }
@@ -461,62 +475,12 @@ public class PooledConnectionQueue {
         final ReentrantLock lock = this.lock;
         lock.lock();
         try {
-
-            long olderThanTime = System.currentTimeMillis() - (leakTimeMinutes*60000);
-
-            List<PooledConnection> copy = busyList.getShallowCopy();
-            for (int i = 0; i < copy.size(); i++) {
-                PooledConnection pc = copy.get(i);
-                if (pc.isLongRunning() || pc.getLastUsedTime() > olderThanTime) {
-                    // PooledConnection has been used recently or
-                    // expected to be longRunning so not closing...
-                } else {
-                    busyList.remove(pc);
-                    closeBusyConnection(pc);
-                }
-            }
-            
+            busyList.closeBusyConnections(leakTimeMinutes);
         } finally {
             lock.unlock();
         }
     }
-
-    private void closeBusyConnection(PooledConnection pc) {
-        try {
-            String methodLine = pc.getCreatedByMethod();
-
-            Date luDate = new Date();
-            luDate.setTime(pc.getLastUsedTime());
-
-            String msg = "DataSourcePool closing leaked connection? " + " name["
-                    + pc.getName() + "] lastUsed[" + luDate + "] createdBy[" + methodLine
-                    + "] lastStmt[" + pc.getLastStatement() + "]";
-
-            logger.warn(msg);
-            logStackElement(pc, "Possible Leaked Connection: ");
-            
-            System.out.println("CLOSING BUSY CONNECTION ??? "+pc);
-            pc.close();
-
-        } catch (SQLException ex) {
-            // this should never actually happen
-            logger.error(null, ex);
-        }
-    }
     
-    private void logStackElement(PooledConnection pc, String prefix) {
-        StackTraceElement[] stackTrace = pc.getStackTrace();
-        if (stackTrace != null){
-            String s = Arrays.toString(stackTrace);
-            String msg = prefix+" name["+pc.getName()+"] stackTrace: "+s;
-            logger.warn(msg);
-            // also send to syserr ... as the loggers get turned 
-            // off early in JVM shutdown
-            System.err.println(msg);
-        }
-    }
- 
-
     /**
      * As the pool grows it gets closer to the maxConnections limit. We can send
      * an Alert (or warning) as we get close to this limit and hence an
@@ -557,26 +521,8 @@ public class PooledConnectionQueue {
         lock.lock();
         try {
 
-            if (toLogger) {
-                logger.info("Dumping busy connections: (Use datasource.xxx.capturestacktrace=true  ... to get stackTraces)");
-            }
-
-            StringBuilder sb = new StringBuilder();
-            
-            List<PooledConnection> copy = busyList.getShallowCopy();
-            for (int i = 0; i < copy.size(); i++) {
-                PooledConnection pc = copy.get(i);
-                if (toLogger) {
-                    logger.info(pc.getDescription());
-                    logStackElement(pc, "Busy Connection: ");
-
-                } else {
-                    sb.append(pc.getDescription()).append("\r\n");
-                }
-            }
-
-            return sb.toString();
-
+          return busyList.getBusyConnectionInformation(toLogger);
+          
         } finally {
             lock.unlock();
         }

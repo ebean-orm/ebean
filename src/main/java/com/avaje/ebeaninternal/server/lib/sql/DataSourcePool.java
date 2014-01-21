@@ -15,10 +15,11 @@ import java.util.Set;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 
-import com.avaje.ebean.config.DataSourceConfig;
-import com.avaje.ebeaninternal.api.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.avaje.ebean.config.DataSourceConfig;
+import com.avaje.ebeaninternal.api.ClassUtil;
 
 /**
  * A robust DataSource.
@@ -73,8 +74,13 @@ public class DataSourcePool implements DataSource {
      * The sql used to test a connection.
      */
     private final String heartbeatsql;
-    
+        
     private final int heartbeatFreqSecs;
+    
+    private final int heartbeatTimeoutSeconds;
+    
+
+    private final long trimPoolFreqMillis;
 
     /**
      * The transaction isolation level as per java.sql.Connection.
@@ -85,6 +91,17 @@ public class DataSourcePool implements DataSource {
      * The default autoCommit setting for Connections in this pool.
      */
     private final boolean autoCommit;
+
+    /**
+     * Max idle time in millis.
+     */
+    private final int maxInactiveMillis;
+    
+    /**
+     * Max age a connection is allowed in millis. 
+     * A value of 0 means no limit (no trimming based on max age).
+     */
+    private final long maxAgeMillis;
 
     /**
      * Flag set to true to capture stackTraces (can be expensive).
@@ -135,17 +152,12 @@ public class DataSourcePool implements DataSource {
     /**
      * The time a thread will wait for a connection to become available.
      */
-    private int waitTimeoutMillis;
+    private final int waitTimeoutMillis;
 
     /**
      * The size of the preparedStatement cache;
      */
     private int pstmtCacheSize;
-    
-    /**
-     * By default trim connections that are inactive for longer than this time.
-     */
-    private int maxInactiveTimeSecs;
 
     private final PooledConnectionQueue queue;
 
@@ -166,8 +178,9 @@ public class DataSourcePool implements DataSource {
 
         this.autoCommit = false;
         this.transactionIsolation = params.getIsolationLevel();
-
-        this.maxInactiveTimeSecs = params.getMaxInactiveTimeSecs();
+        
+        this.maxInactiveMillis = 1000 * params.getMaxInactiveTimeSecs();
+        this.maxAgeMillis = 60000 * params.getMaxAgeMinutes();
         this.leakTimeMinutes = params.getLeakTimeMinutes();
         this.captureStackTrace = params.isCaptureStackTrace();
         this.maxStackTraceSize = params.getMaxStackTraceSize();
@@ -180,6 +193,8 @@ public class DataSourcePool implements DataSource {
         this.waitTimeoutMillis = params.getWaitTimeoutMillis();
         this.heartbeatsql = params.getHeartbeatSql();
         this.heartbeatFreqSecs = params.getHeartbeatFreqSecs();
+        this.heartbeatTimeoutSeconds = params.getHeartbeatTimeoutSeconds();
+        this.trimPoolFreqMillis = 1000 * params.getTrimPoolFreqSecs();
         
         queue = new PooledConnectionQueue(this);
 
@@ -317,12 +332,11 @@ public class DataSourcePool implements DataSource {
     private void notifyDataSourceIsDown(SQLException ex) {
 
         if (!dataSourceDownAlertSent) {
-            logger.error("FATAL: DataSourcePool [" + name + "] is down!!!", ex);
+            logger.error("FATAL: DataSourcePool [" + name + "] is down or has network error!!!", ex);
             if (notify != null) {
                 notify.dataSourceDown(name);
             }
             dataSourceDownAlertSent = true;
-
         }
         if (dataSourceUp) {
             reset();
@@ -367,6 +381,20 @@ public class DataSourcePool implements DataSource {
     }
 
     /**
+     * Trim connections (in the free list) based on idle time and maximum age.
+     */
+    private void trimIdleConnections() {
+      if (System.currentTimeMillis() > (lastTrimTime + trimPoolFreqMillis)) {
+        try {
+          queue.trim(maxInactiveMillis, maxAgeMillis);
+          lastTrimTime = System.currentTimeMillis();
+        } catch (Exception e) {
+          logger.error("Error trying to trim idle connections", e);
+        }
+      }
+    }
+    
+    /**
      * Check the dataSource is up. Trim connections.
      * <p>
      * This is called by the HeartbeatRunnable which should be scheduled to 
@@ -374,17 +402,19 @@ public class DataSourcePool implements DataSource {
      * </p>
      */
     public void checkDataSource() {
+      
+        // first trim idle connections
+        trimIdleConnections();
+      
         Connection conn = null;
         try {
             // Get a connection from the pool and test it
             conn = getConnection();
-            testConnection(conn);
-
-            notifyDataSourceIsUp();
-
-            if (System.currentTimeMillis() > (lastTrimTime + (maxInactiveTimeSecs * 1000))) {
-                queue.trim(maxInactiveTimeSecs);
-                lastTrimTime = System.currentTimeMillis();
+            if (testConnection(conn)) {
+              notifyDataSourceIsUp();
+              
+            } else {
+              notifyDataSourceIsDown(null);              
             }
 
         } catch (SQLException ex) {
@@ -488,32 +518,37 @@ public class DataSourcePool implements DataSource {
     }
 
     /**
-     * Set the time after which inactive connections are trimmed.
-     */
-    public void setMaxInactiveTimeSecs(int maxInactiveTimeSecs) {
-        this.maxInactiveTimeSecs = maxInactiveTimeSecs;
-    }
-
-    /**
      * Return the time after which inactive connections are trimmed.
      */
-    public int getMaxInactiveTimeSecs() {
-        return maxInactiveTimeSecs;
+    public int getMaxInactiveMillis() {
+        return maxInactiveMillis;
+    }
+    
+  /**
+   * Return the maximum age a connection is allowed to be before it is trimmed
+   * out of the pool. This value can be 0 which means there is no maximum age.
+   */
+    public long getMaxAgeMillis() {
+      return maxAgeMillis;
     }
 
-    private void testConnection(Connection conn) throws SQLException {
+    private boolean testConnection(Connection conn) throws SQLException {
 
         if (heartbeatsql == null) {
-            return;
+            return conn.isValid(heartbeatTimeoutSeconds);
         }
         Statement stmt = null;
         ResultSet rset = null;
         try {
-            // It should only error IF the DataSource is down ? (or a network
-            // issue?)
+            // It should only error IF the DataSource is down or a network issue
             stmt = conn.createStatement();
+            if (heartbeatTimeoutSeconds > 0) {
+              stmt.setQueryTimeout(heartbeatTimeoutSeconds);
+            }
             rset = stmt.executeQuery(heartbeatsql);
             conn.commit();
+            
+            return true;
 
         } finally {
             try {
@@ -539,13 +574,7 @@ public class DataSourcePool implements DataSource {
      */
     protected boolean validateConnection(PooledConnection conn) {
         try {
-            if (heartbeatsql == null) {
-                logger.debug("Can not test connection as heartbeatsql is not set");
-                return false;
-            }
-
-            testConnection(conn);
-            return true;
+            return testConnection(conn);
 
         } catch (Exception e) {
             logger.warn("heartbeatsql test failed on connection[" + conn.getName() + "]");
@@ -573,7 +602,15 @@ public class DataSourcePool implements DataSource {
         }
         queue.returnPooledConnection(pooledConnection);
     }
-
+    
+    /**
+     * Collect statistics of a connection that is fully closing
+     */
+    protected void reportClosingConnection(PooledConnection pooledConnection) {
+      
+      queue.reportClosingConnection(pooledConnection);
+    }
+    
     /**
      * Returns information describing connections that are currently being used.
      */
@@ -635,7 +672,6 @@ public class DataSourcePool implements DataSource {
             notifyDataSourceIsDown(ex);
             throw ex;
         }
-
     }
 
     /**
@@ -834,6 +870,14 @@ public class DataSourcePool implements DataSource {
     public Status getStatus(boolean reset) {
         return queue.getStatus(reset);
     }
+    
+    /**
+     * Return the aggregated load statistics collected on all the connections in the pool.
+     */
+    public DataSourcePoolStatistics getStatistics(boolean reset) {
+      
+      return queue.getStatistics(reset);
+    }
 
     /**
      * Deregister the JDBC driver.
@@ -873,8 +917,8 @@ public class DataSourcePool implements DataSource {
         }
 
         public String toString() {
-            return "min:" + minSize + " max:" + maxSize + " free:" + free + " busy:" + busy + " waiting:" + waiting
-                    + " highWaterMark:" + highWaterMark + " waitCount:" + waitCount + " hitCount:" + hitCount;
+            return "min[" + minSize + "] max[" + maxSize + "] free[" + free + "] busy[" + busy + "] waiting[" + waiting
+                    + "] highWaterMark[" + highWaterMark + "] waitCount[" + waitCount + "] hitCount[" + hitCount+"]";
         }
 
         /**

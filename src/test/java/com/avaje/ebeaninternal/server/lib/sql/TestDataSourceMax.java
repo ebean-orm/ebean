@@ -1,8 +1,9 @@
 package com.avaje.ebeaninternal.server.lib.sql;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
@@ -15,44 +16,50 @@ public class TestDataSourceMax extends BaseTestCase {
   @Test
   public void test() {
 
-    boolean runThisManuallyNow = true;
+    boolean skipThisTest = true;
 
-    if (!runThisManuallyNow) {
+    if (skipThisTest) {
       return;
     }
-
-    String name = "h2";
+    
+    String name = "mysql";
 
     DataSourceConfig dsConfig = new DataSourceConfig();
     dsConfig.loadSettings(name);
-    dsConfig.setMinConnections(3);
-    dsConfig.setMaxConnections(3);
+    dsConfig.setMinConnections(2);
+    dsConfig.setMaxConnections(25);
     dsConfig.setWaitTimeoutMillis(30000);
+    dsConfig.setCaptureStackTrace(true);
 
     DataSourcePool pool = new DataSourcePool(null, name, dsConfig);
 
-    Assert.assertEquals(3, pool.getMaxSize());
-
-    DefaultBackgroundExecutor bg = new DefaultBackgroundExecutor(10, 2, 180, 30, "testDs");
+    
+    //pool.checkDataSource();
+    
+//    if (true) {
+//      pool.shutdown(false);
+//      return;
+//    }
+    
+    DefaultBackgroundExecutor bg = new DefaultBackgroundExecutor(1, 2, 180, 30, "testDs");
 
     try {
       for (int i = 0; i < 12; i++) {
         // Thread.sleep(10*i);
-        bg.execute(new ConnRunner(pool, 100));
+        bg.execute(new ConnRunner(pool, 4000, i));
       }
 
       System.out.println("main thread sleep ... " + pool.getStatus(false));
 
-      Thread.sleep(1000);
+      Thread.sleep(10000);
+      pool.getStatistics(true);
+
+      Thread.sleep(30000);
+
       Status status = pool.getStatus(false);
       System.out.println(status);
 
-      // this dumpOrder was for 3 vectors used in PooledConnectionQueue
-      // that logged the order of wait, notify and obtain events
-      // I have remove that code.
-
-      // String s = pool.dumpOrder();
-      // System.err.println(s);
+      pool.shutdown(false);
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -64,21 +71,65 @@ public class TestDataSourceMax extends BaseTestCase {
 
     final DataSourcePool pool;
     final long sleepMillis;
+    final int position;
 
-    ConnRunner(DataSourcePool pool, long sleepMillis) {
+    ConnRunner(DataSourcePool pool, long sleepMillis, int position) {
       this.pool = pool;
       this.sleepMillis = sleepMillis;
+      this.position = position;
     }
 
-    public void run() {
+    private void waitSomeTime(long count) {
       try {
-        Connection connection = pool.getConnection();
-        Thread.sleep(sleepMillis);
-        connection.close();
-      } catch (Exception e) {
-        e.printStackTrace();
+      System.out.println(position+" sleep " + sleepMillis+" count:"+count);
+      Thread.sleep(sleepMillis);
+      System.out.println(position+" sleep done");
+      } catch (InterruptedException e){
+        throw new RuntimeException(e);
       }
     }
+    
+    public void run() {
+      Connection connection = null;
+      PreparedStatement pstmt = null;
+      ResultSet rset = null;
+      long count = -1;
+      try {
+        connection = pool.getConnection();
+        pstmt = connection.prepareStatement("select count(*) from o_customer");
+        rset = pstmt.executeQuery();
+        
+        while (rset.next()) {
+          // do nothing actually
+          count = rset.getLong(1);
+        }
 
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      } finally {
+        if (rset != null) {
+          try {
+            rset.close();
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+          if (pstmt != null) {
+            try {
+              pstmt.close();
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          }
+          if (connection != null) {
+            try {
+              connection.close();
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          }
+        }
+        waitSomeTime(count);
+      }
+    }
   }
 }

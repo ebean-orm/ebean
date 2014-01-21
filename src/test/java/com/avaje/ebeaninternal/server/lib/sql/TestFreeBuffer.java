@@ -10,14 +10,13 @@ public class TestFreeBuffer extends BaseTestCase {
   @Test
   public void test() {
 
-    FreeConnectionBuffer b = new FreeConnectionBuffer(3);
+    FreeConnectionBuffer b = new FreeConnectionBuffer();
 
     PooledConnection p0 = new PooledConnection("0");
     PooledConnection p1 = new PooledConnection("1");
     PooledConnection p2 = new PooledConnection("2");
     // PooledConnection p3 = new PooledConnection("3");
 
-    Assert.assertEquals(3, b.getCapacity());
     Assert.assertEquals(0, b.size());
     Assert.assertEquals(true, b.isEmpty());
 
