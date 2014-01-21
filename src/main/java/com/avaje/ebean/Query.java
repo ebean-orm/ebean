@@ -684,7 +684,10 @@ public interface Query<T> extends Serializable {
   public Query<T> setParameter(int position, Object value);
 
   /**
+   * Please migrate to using {@link #findIterate()} or {@link #findVisit(QueryResultVisitor)}
+   * <p>
    * Set a listener to process the query on a row by row basis.
+   * </p>
    * <p>
    * Use this when you want to process a large query and do not want to hold the
    * entire query result in memory.
@@ -706,6 +709,7 @@ public interface Query<T> extends Serializable {
    * // list (emptyList) will be empty ...
    * List&lt;Order&gt; emtyList = query.findList();
    * </pre>
+   * @deprecated Deprecated in favor of {@link #findIterate()} and {@link #findVisit(QueryResultVisitor)}
    */
   public Query<T> setListener(QueryListener<T> queryListener);
 

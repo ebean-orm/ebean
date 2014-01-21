@@ -1,7 +1,10 @@
 package com.avaje.ebean;
 
 /**
+ * Deprecated, please migrate to using {@link #findIterate()} or {@link #findVisit(QueryResultVisitor)}
+ * <p>
  * Provides a mechanism for processing a query one bean at a time.
+ * </p>
  * <p>
  * This is useful when the query will return a large number of results and you
  * want to process the beans one at a time rather than whole all of the beans in
@@ -23,6 +26,8 @@ package com.avaje.ebean;
  * 
  * @param <T>
  *          the type of entity bean
+ * @deprecated Please migrate to using {@link #findIterate()} or
+ *             {@link #findVisit(QueryResultVisitor)}
  */
 public interface QueryListener<T> {
 
