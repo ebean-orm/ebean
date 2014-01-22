@@ -83,7 +83,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
         	Collection<T> c  = result.getActualDetails();
         	for (T bean : c) {
         		descriptor.cachePutBeanData(bean);
-            }
+          }
         }
 
     	if (!result.isEmpty() && query.isUseQueryCache()){

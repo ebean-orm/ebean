@@ -38,6 +38,10 @@ public class ManyType {
         }        
     }
 
+    public boolean isMap() {
+    	return Underlying.MAP.equals(underlying);
+    }
+    
     /**
      * Return the matching Query type.
      */

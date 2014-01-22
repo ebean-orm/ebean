@@ -104,14 +104,23 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   /**
-   * Returns the map entrySet iterator.
+   * Returns the collection of beans (map values).
+   */
+  public Collection<E> getActualDetails() {
+    return map.values();
+  }
+  
+  
+  /**
+   * Returns the map entrySet.
    * <p>
    * This is because the key values may need to be set against the details (so
    * they don't need to be set twice).
    * </p>
    */
-  public Collection<E> getActualDetails() {
-    return map.values();
+  public Collection<?> getActualEntries() {
+    return map.entrySet();
+
   }
 
   /**

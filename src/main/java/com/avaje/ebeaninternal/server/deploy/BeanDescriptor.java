@@ -970,11 +970,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
   public void cachePutMany(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId) {
     BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
-    Collection<?> actualDetails = bc.getActualDetails();
+
     ArrayList<Object> idList = new ArrayList<Object>();
+
+    // get the underlying collection of beans (in the List, Set or Map)
+    Collection<?> actualDetails = bc.getActualDetails();
     for (Object bean : actualDetails) {
-      Object id = targetDescriptor.getId(bean);
-      idList.add(id);
+      // Collect the id values 
+      idList.add(targetDescriptor.getId(bean));
     }
     CachedManyIds ids = new CachedManyIds(idList);
     cachePutCachedManyIds(parentId, many.getName(), ids);

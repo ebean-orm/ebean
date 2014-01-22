@@ -106,6 +106,11 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   public Collection<E> getActualDetails() {
     return list;
   }
+  
+  @Override
+  public Collection<?> getActualEntries() {
+    return list;
+  }
 
   /**
    * Returns the underlying list.

@@ -788,7 +788,8 @@ public final class DefaultPersister implements Persister {
 
 		// check that the list is not null and if it is a BeanCollection
 		// check that is has been populated (don't trigger lazy loading)
-		Collection<?> collection = getDetailsIterator(details);
+		// For a Map this is a collection of Map.Entry objects and not beans
+		Collection<?> collection = getActualEntries(details);
 
 		if (collection == null) {
 			// nothing to do here
@@ -1262,7 +1263,7 @@ public final class DefaultPersister implements Persister {
 	 * Return the details of the collection or map taking care to avoid
 	 * unnecessary fetching of the data.
 	 */
-	private Collection<?> getDetailsIterator(Object o) {
+	private Collection<?> getActualEntries(Object o) {
 		if (o == null) {
 			return null;
 		}
@@ -1271,7 +1272,9 @@ public final class DefaultPersister implements Persister {
 			if (!bc.isPopulated()) {
 				return null;
 			}
-			return bc.getActualDetails();
+			// For maps this is a collection of Map.Entry, otherwise it
+			// returns a collection of beans
+			return bc.getActualEntries();
 		}
 
 		if (o instanceof Map<?, ?>) {
@@ -1281,8 +1284,7 @@ public final class DefaultPersister implements Persister {
 		} else if (o instanceof Collection<?>) {
 			return ((Collection<?>) o);
 		}
-		String m = "expecting a Map or Collection but got [" + o.getClass().getName() + "]";
-		throw new PersistenceException(m);
+		throw new PersistenceException("expecting a Map or Collection but got [" + o.getClass().getName() + "]");
 	}
 
 	/**

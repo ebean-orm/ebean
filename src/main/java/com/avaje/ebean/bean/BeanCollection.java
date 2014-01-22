@@ -145,13 +145,18 @@ public interface BeanCollection<E> extends Serializable {
   public boolean isEmpty();
 
   /**
-   * Returns the underlying details as an iterator.
-   * <p>
-   * Note that for maps this returns the entrySet as we need the keys of the
-   * map.
-   * </p>
+   * Returns the underlying collection of beans from the Set, Map or List.
    */
   public Collection<E> getActualDetails();
+
+  /**
+   * Returns the underlying entries so for Maps this is a collection of
+   * Map.Entry.
+   * <p>
+   * For maps this returns the entrySet as we need the keys of the map.
+   * </p>
+   */
+  public Collection<?> getActualEntries();
 
   /**
    * Set to true if maxRows was hit and there are actually more rows available.

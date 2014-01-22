@@ -12,8 +12,7 @@ import com.avaje.ebean.bean.BeanCollectionLoader;
 /**
  * Set capable of lazy loading.
  */
-public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E>,
-    BeanCollectionAdd {
+public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E>, BeanCollectionAdd {
 
   /**
    * The underlying Set implementation.
@@ -110,6 +109,11 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   }
 
   public Collection<E> getActualDetails() {
+    return set;
+  }
+
+  @Override
+  public Collection<?> getActualEntries() {
     return set;
   }
 
