@@ -6,7 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.avaje.ebean.Query;
-import com.avaje.ebean.Query.UseIndex;
 
 /**
  * Specify the default cache use specific entity type.
@@ -56,9 +55,4 @@ public @interface CacheStrategy {
    */
   String warmingQuery() default "";
 
-  /**
-   * Default setting for using a text index if it has been defined on this bean
-   * type.
-   */
-  UseIndex useIndex() default UseIndex.DEFAULT;
 };

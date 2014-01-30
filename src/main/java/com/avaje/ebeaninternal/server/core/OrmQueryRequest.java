@@ -80,10 +80,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     graphContext.registerSecondaryQueries(query);
   }
 
-  public void setTotalHits(int totalHits) {
-    query.setTotalHits(totalHits);
-  }
-
   public void executeSecondaryQueries(int defaultQueryBatch) {
     graphContext.executeSecondaryQueries(this, defaultQueryBatch);
   }

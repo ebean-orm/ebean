@@ -61,15 +61,6 @@ public class ScalarTypeUtilDate {
 		public java.util.Date parseDateTime(long systemTimeMillis) {
 			return new java.util.Date(systemTimeMillis);
 		}
-
-        public Object luceneFromIndexValue(Object value) {
-            Long l = (Long)value;
-            return new java.util.Date(l);
-        }
-
-        public Object luceneToIndexValue(Object value) {
-            return ((java.util.Date)value).getTime();
-        }		
 	}
 
 	public static class DateType extends ScalarTypeBaseDate<java.util.Date> {

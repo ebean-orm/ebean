@@ -35,13 +35,6 @@ public interface Transaction extends Closeable {
    */
   public static final int SERIALIZABLE = java.sql.Connection.TRANSACTION_SERIALIZABLE;
 
-  // /**
-  // * You can call this after the transaction commit to wait for any changes to
-  // * Lucene indexes to be made and committed. Note that generally this could
-  // * be some time so it is not expected that you call this method generally.
-  // */
-  // public void waitForIndexUpdates();
-
   /**
    * Return true if this transaction is read only.
    */

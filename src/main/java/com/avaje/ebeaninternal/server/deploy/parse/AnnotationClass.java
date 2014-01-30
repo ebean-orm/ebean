@@ -7,7 +7,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import com.avaje.ebean.Query.UseIndex;
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.EntityConcurrencyMode;
 import com.avaje.ebean.annotation.NamedUpdate;
@@ -134,11 +133,6 @@ public class AnnotationClass extends AnnotationParser {
         beanProperty.setNaturalKey(true);
         cacheOptions.setNaturalKey(propName);
       }
-    }
-
-    if (!UseIndex.DEFAULT.equals(cacheStrategy.useIndex())) {
-      // a specific text index strategy has been defined
-      descriptor.setUseIndex(cacheStrategy.useIndex());
     }
   }
 

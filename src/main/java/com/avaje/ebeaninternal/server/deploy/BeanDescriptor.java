@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.Query;
-import com.avaje.ebean.Query.UseIndex;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.annotation.ConcurrencyMode;
@@ -106,7 +105,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   private final String serverName;
 
   /**
-   * Set to true if this is a LDAP domain object.
+   * The nature/type of this bean.
    */
   private final EntityType entityType;
 
@@ -346,11 +345,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
   private final String defaultSelectClause;
   private final Set<String> defaultSelectClauseSet;
-  private final String[] defaultSelectDbArray;
 
   private final String descriptorId;
-
-  private final UseIndex useIndex;
 
   private SpiEbeanServer ebeanServer;
 
@@ -372,7 +368,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.fullName = InternString.intern(deploy.getFullName());
     this.descriptorId = descriptorId;
 
-    this.useIndex = deploy.getUseIndex();
     this.typeManager = typeManager;
     this.beanType = deploy.getBeanType();
     this.factoryType = deploy.getFactoryType();
@@ -390,7 +385,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
     this.defaultSelectClause = deploy.getDefaultSelectClause();
     this.defaultSelectClauseSet = deploy.parseDefaultSelectClause(defaultSelectClause);
-    this.defaultSelectDbArray = deploy.getDefaultSelectDbArray(defaultSelectClauseSet);
 
     this.idType = deploy.getIdType();
     this.idGenerator = deploy.getIdGenerator();
@@ -567,14 +561,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public EntityType getEntityType() {
     return entityType;
-  }
-
-  /**
-   * Return the default strategy for using a lucene index (if an index is
-   * defined on this bean type).
-   */
-  public UseIndex getUseIndex() {
-    return useIndex;
   }
 
   /**
@@ -809,13 +795,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * For LDAP return array of (DB) attributes to include in query by default.
-   */
-  public String[] getDefaultSelectDbArray() {
-    return defaultSelectDbArray;
-  }
-
-  /**
    * Return true if this object is the root level object in its entity
    * inheritance.
    */
@@ -858,8 +837,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * Return true if there is L2 caching (Lucene or Bean cache) for this bean
-   * type.
+   * Return true if there is L2 bean caching for this bean type.
    */
   public boolean isUsingL2Cache() {
     return isBeanCaching();

@@ -72,17 +72,11 @@ public final class DefaultPersister implements Persister {
 
 	private final BeanDescriptorManager beanDescriptorManager;
 
-//	private final boolean defaultUpdateNullProperties;
-//	private final boolean defaultDeleteMissingChildren;
-
 	public DefaultPersister(SpiEbeanServer server, Binder binder, BeanDescriptorManager descMgr, PstmtBatch pstmtBatch) {
 
 		this.server = server;
 		this.beanDescriptorManager = descMgr;
 		this.persistExecute = new DefaultPersistExecute(binder, pstmtBatch);
-
-//    this.defaultUpdateNullProperties = server.isDefaultUpdateNullProperties();
-//    this.defaultDeleteMissingChildren = server.isDefaultDeleteMissingChildren();
 	}
 
 	/**
@@ -508,7 +502,7 @@ public final class DefaultPersister implements Persister {
 					SqlUpdate sqlDelete = manys[i].deleteByParentId(id, idList);
 					executeSqlUpdate(sqlDelete, t);
 				} else {
-					// we need to fetch the Id's to delete (recurse or notify L2 cache/lucene)
+					// we need to fetch the Id's to delete (recurse or notify L2 cache)
 					List<Object> childIds = manys[i].findIdsByParentId(id, idList, t, null);
 					if (!childIds.isEmpty()) {
 						delete(targetDesc, null, childIds, t);

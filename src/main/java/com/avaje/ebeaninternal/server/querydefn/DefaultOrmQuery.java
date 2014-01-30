@@ -89,9 +89,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	 * The name of the query.
 	 */
 	private String name;
-	
-	private UseIndex useIndex;
-	
+		
 	private Type type;
 	
 	private Mode mode = Mode.NORMAL;
@@ -484,18 +482,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 		this.type = type;
 	}
 
-	public UseIndex getUseIndex() {
-        return useIndex;
-    }
-
-    public DefaultOrmQuery<T> setUseIndex(UseIndex useIndex) {
-        this.useIndex = useIndex;
-        return this;
-    }
-
-    public String getLoadDescription() {
-		return loadDescription;
-	}
+  public String getLoadDescription() {
+    return loadDescription;
+  }
 
 	public String getLoadMode() {
 		return loadMode;
@@ -652,7 +641,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	  }
 
 	  builder.add((type == null ? 0 : type.ordinal()+1));
-	  builder.add(useIndex).add(autoFetchTuned).add(distinct).add(query);
+	  builder.add(autoFetchTuned).add(distinct).add(query);
     builder.add(firstRow).add(maxRows).add(orderBy).add(forUpdate);
     builder.add(rawWhereClause).add(additionalWhere).add(additionalHaving);
     builder.add(mapKey);

@@ -16,7 +16,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avaje.ebean.Query.UseIndex;
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
@@ -149,8 +148,6 @@ public class DeployBeanDescriptor<T> {
    */
   private BeanFinder<T> beanFinder;
 
-  private UseIndex useIndex;
-
   /**
    * The table joins for this bean. Server side only.
    */
@@ -177,20 +174,6 @@ public class DeployBeanDescriptor<T> {
    */
   public boolean isAbstract() {
     return Modifier.isAbstract(beanType.getModifiers());
-  }
-
-  /**
-   * Return the default UseIndex strategy.
-   */
-  public UseIndex getUseIndex() {
-    return useIndex;
-  }
-
-  /**
-   * Set the default UseIndex strategy.
-   */
-  public void setUseIndex(UseIndex useIndex) {
-    this.useIndex = useIndex;
   }
 
   public boolean isScalaObject() {
@@ -770,26 +753,6 @@ public class DeployBeanDescriptor<T> {
     }
     String selectClause = sb.toString();
     return selectClause.substring(0, selectClause.length() - 1);
-  }
-
-  /**
-   * Return an Array of properties to include in default fetch (for LDAP).
-   */
-  public String[] getDefaultSelectDbArray(Set<String> defaultSelect) {
-
-    ArrayList<String> list = new ArrayList<String>();
-    for (DeployBeanProperty p : propMap.values()) {
-      if (defaultSelect != null) {
-        if (defaultSelect.contains(p.getName())) {
-          // properties in defaultSelect
-          list.add(p.getDbColumn());
-        }
-      } else if (!p.isTransient() && p.isDbRead()) {
-        // non transient db properties
-        list.add(p.getDbColumn());
-      }
-    }
-    return list.toArray(new String[list.size()]);
   }
 
   /**

@@ -27,14 +27,6 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
     this.deployParser = deployParser;
   }
 
-  // public DefaultExpressionRequest(SpiOrmQueryRequest<?> queryRequest, LIndex
-  // index) {
-  // this.queryRequest = queryRequest;
-  // this.beanDescriptor = queryRequest.getBeanDescriptor();
-  // this.deployParser = null;
-  // this.luceneIndex = index;
-  // }
-
   public DefaultExpressionRequest(BeanDescriptor<?> beanDescriptor) {
     this.beanDescriptor = beanDescriptor;
     this.queryRequest = null;

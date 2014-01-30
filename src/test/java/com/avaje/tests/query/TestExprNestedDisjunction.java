@@ -6,7 +6,6 @@ import org.junit.Test;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.Query.UseIndex;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 
@@ -21,7 +20,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
 
     java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
 
-    Query<Customer> q = Ebean.find(Customer.class).setUseIndex(UseIndex.NO).where().disjunction()
+    Query<Customer> q = Ebean.find(Customer.class).where().disjunction()
         .conjunction().startsWith("name", "r").eq("anniversary", onAfter).endJunction()
         .conjunction().eq("status", Customer.Status.ACTIVE).gt("id", 0).endJunction().orderBy()
         .asc("name");

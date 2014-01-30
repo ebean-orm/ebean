@@ -490,7 +490,7 @@ public final class DefaultServer implements SpiEbeanServer {
   }
 
   /**
-   * Compile a query. Only valid for ORM queries (not LDAP)
+   * Compile a query. Only valid for ORM queries.
    */
   public <T> CQuery<T> compileQuery(Query<T> query, Transaction t) {
     SpiOrmQueryRequest<T> qr = createQueryRequest(Type.SUBQUERY, query, t);

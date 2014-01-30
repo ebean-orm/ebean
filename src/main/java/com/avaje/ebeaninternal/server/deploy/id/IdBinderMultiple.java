@@ -8,9 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.InvalidNameException;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -83,24 +80,6 @@ public final class IdBinderMultiple implements IdBinder {
         return sb.toString();
     }
     
-    public void createLdapNameById(LdapName name, Object id) throws InvalidNameException {
-        
-        if (id instanceof Map<?,?> == false){
-            throw new RuntimeException("Expecting a Map for concatinated key");
-        }
-        
-        Map<?,?> mapId = (Map<?,?>)id;
-        for (int i = 0; i < props.length; i++) {
-            
-            Object v = mapId.get(props[i].getName());
-            if (v == null){
-                throw new RuntimeException("No value in Map for key "+props[i].getName());
-            }
-            
-            Rdn rdn = new Rdn(props[i].getDbColumn(), v);
-            name.add(rdn);            
-        }
-    }
     
     public void buildSelectExpressionChain(String prefix, List<String> selectChain) {
 
@@ -109,19 +88,11 @@ public final class IdBinderMultiple implements IdBinder {
         }
     }
 
-	public void createLdapNameByBean(LdapName name, Object bean) throws InvalidNameException {
 
-        for (int i = 0; i < props.length; i++) {
-            
-            Object v = props[i].getValue(bean);            
-            Rdn rdn = new Rdn(props[i].getDbColumn(), v);
-            name.add(rdn);            
-        }
-    }
 
-    public int getPropertyCount() {
-		return props.length;
-	}
+  public int getPropertyCount() {
+    return props.length;
+  }
 
 	public String getIdProperty() {
 		return idProperties;
@@ -228,40 +199,6 @@ public final class IdBinderMultiple implements IdBinder {
 			throw new PersistenceException(msg, e);
 		}
 	}
-	
-    
-    public Object readTerm(String idTermValue) {
-        
-        String[] split = idTermValue.split("|");
-        if (split.length != props.length){
-            String msg = "Failed to split ["+idTermValue+"] using | for id.";
-            throw new PersistenceException(msg);
-        }
-        Map<String, Object> uidMap = new LinkedHashMap<String, Object>();
-        for (int i = 0; i < props.length; i++) {
-            Object v = props[i].getScalarType().parse(split[i]);
-            uidMap.put(props[i].getName(), v);
-        }
-        return uidMap;
-    }
-
-    @SuppressWarnings("unchecked")
-    public String writeTerm(Object idValue) {
-
-        Map<String, ?> uidMap = (Map<String, ?>) idValue;
-        
-        StringBuilder sb = new StringBuilder();
-        
-        for (int i = 0; i < props.length; i++) {
-            Object v = uidMap.get(props[i].getName());
-            String formatValue = props[i].getScalarType().format(v);
-            if (i > 0){
-                sb.append("|");
-            }
-            sb.append(formatValue);
-        }    
-        return sb.toString();
-    }
 	
     public Object readData(DataInput dataInput) throws IOException {
         

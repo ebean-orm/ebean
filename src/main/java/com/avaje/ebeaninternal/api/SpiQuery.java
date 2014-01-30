@@ -80,11 +80,6 @@ public interface SpiQuery<T> extends Query<T> {
          */
         SUBQUERY
     }
-
-    /**
-     * Set total hits when querying against lucene.
-     */
-    public void setTotalHits(int totalHits);
     
     /**
      * Return true if select all properties was used to ensure the property

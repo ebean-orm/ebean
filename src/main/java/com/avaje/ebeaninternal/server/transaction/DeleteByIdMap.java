@@ -10,7 +10,7 @@ import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 /**
- * Beans deleted by Id used for updating L2 Cache and Lucene indexes.
+ * Beans deleted by Id used for updating L2 Cache.
  */
 public final class DeleteByIdMap {
 

@@ -28,8 +28,7 @@ import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
 /**
  * Manages transactions.
  * <p>
- * Keeps the Cache, Cluster and Lucene indexes in synch when transactions are
- * committed.
+ * Keeps the Cache and Cluster in synch when transactions are committed.
  * </p>
  */
 public class TransactionManager {
@@ -426,7 +425,7 @@ public class TransactionManager {
       }
       
 		} catch (Exception ex) {
-			String m = "NotifyOfCommit failed. Cache/Lucene potentially not notified.";
+			String m = "NotifyOfCommit failed. L2 Cache potentially not notified.";
 			logger.error(m, ex);
 		}
 	}

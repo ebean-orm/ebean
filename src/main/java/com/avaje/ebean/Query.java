@@ -270,26 +270,6 @@ import java.util.Set;
 public interface Query<T> extends Serializable {
 
   /**
-   * How this query should use (or not) the Lucene Index if one is defined for
-   * the bean type.
-   */
-  public enum UseIndex {
-    NO, DEFAULT, YES_IDS, YES_OBJECTS
-  }
-
-  /**
-   * Explicitly specify how this query should use a Lucene Index if one is
-   * defined for this bean type.
-   */
-  public Query<T> setUseIndex(UseIndex useIndex);
-
-  /**
-   * Return the setting for how this query should use a Lucene Index if one is
-   * defined for this bean type.
-   */
-  public UseIndex getUseIndex();
-
-  /**
    * Return the RawSql that was set to use for this query.
    */
   public RawSql getRawSql();
@@ -1073,15 +1053,13 @@ public interface Query<T> extends Serializable {
   public String getGeneratedSql();
 
   /**
-   * Return the total hits matched for a lucene text search query.
-   */
-  public int getTotalHits();
-
-  /**
    * executed the select with "for update" which should lock the record
    * "on read"
    */
   public Query<T> setForUpdate(boolean forUpdate);
 
+  /**
+   * Return true if this query has forUpdate set.
+   */
   public boolean isForUpdate();
 }

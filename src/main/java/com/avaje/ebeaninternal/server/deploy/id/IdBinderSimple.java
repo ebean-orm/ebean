@@ -6,10 +6,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.naming.InvalidNameException;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
-
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.core.InternString;
@@ -48,14 +44,6 @@ public final class IdBinderSimple implements IdBinder {
 		// do nothing
 	}
 	
-    public Object readTerm(String idTermValue) {
-        return scalarType.parse(idTermValue);
-    }
-
-    public String writeTerm(Object idValue) {
-        return scalarType.format(idValue);
-    }
-
     public String getOrderBy(String pathPrefix, boolean ascending){
         
         StringBuilder sb = new StringBuilder();
@@ -72,16 +60,6 @@ public final class IdBinderSimple implements IdBinder {
     public void buildSelectExpressionChain(String prefix, List<String> selectChain) {
 
         idProperty.buildSelectExpressionChain(prefix, selectChain);            
-    }
-    
-	public void createLdapNameById(LdapName name, Object id) throws InvalidNameException {
-        Rdn rdn = new Rdn(idProperty.getDbColumn(), id);
-        name.add(rdn);
-    }
-	
-    public void createLdapNameByBean(LdapName name, Object bean) throws InvalidNameException {
-        Object id = idProperty.getValue(bean);
-        createLdapNameById(name, id);
     }
 
     /**

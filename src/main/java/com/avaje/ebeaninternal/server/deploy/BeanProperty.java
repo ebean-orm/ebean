@@ -1049,19 +1049,6 @@ public class BeanProperty implements ElPropertyValue {
         return value;
     }
 
-//    private ArrayList<LuceneIndex> luceneIndexes;
-//
-//    public void registerLuceneIndex(LuceneIndex luceneIndex) {
-//        if (luceneIndexes == null) {
-//            luceneIndexes = new ArrayList<LuceneIndex>();
-//        }
-//        luceneIndexes.add(luceneIndex);
-//    }
-//
-//    public boolean isDeltaRequired() {
-//        return true;//luceneIndexes != null;
-//    }
-
     /**
      * Return true if by default this property is set to fetch eager.
      * Lob's usually default to fetch lazy.
