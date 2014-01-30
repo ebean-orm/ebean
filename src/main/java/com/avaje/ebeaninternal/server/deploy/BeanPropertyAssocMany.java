@@ -140,11 +140,23 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 			} else {
 			    delStmt = "delete from "+targetDescriptor.getBaseTable()+" where ";
 			}
-			deleteByParentIdSql = delStmt + deriveWhereParentIdSql(false);
-			deleteByParentIdInSql = delStmt + deriveWhereParentIdSql(true);
+			deleteByParentIdSql = delStmt + deriveWhereParentIdSql(false,"");
+			deleteByParentIdInSql = delStmt + deriveWhereParentIdSql(true,"");
 		}
 	}
-    
+
+	/**
+	 * Add the bean to the appropriate collection on the parent bean.
+	 */
+    public void addBeanToCollectionWithCreate(Object parentBean, Object detailBean) {
+        BeanCollection<?> bc = (BeanCollection<?>)super.getValue(parentBean);
+        if (bc == null) {
+          bc = (BeanCollection<?>)help.createEmpty(false);
+          setValue(parentBean, bc);
+        }
+        help.add(bc, detailBean);
+    }
+
     @Override
     public Object getValue(Object bean) {
         return super.getValue(bean);
@@ -196,7 +208,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     
     private List<Object> findIdsByParentId(Object parentId, Transaction t, ArrayList<Object> excludeDetailIds) {
         
-        String rawWhere = deriveWhereParentIdSql(false);
+        String rawWhere = deriveWhereParentIdSql(false,"");
         
         EbeanServer server = getBeanDescriptor().getEbeanServer();
         Query<?> q = server.find(getPropertyType())
@@ -212,9 +224,29 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
         return server.findIds(q, t);
     }
     
+    /**
+     * Add a where clause to the query for a given list of parent Id's.
+     */
+    public void addWhereParentIdIn(SpiQuery<?> query, List<Object> parentIds) {
+
+      String tableAlias = manyToMany ? "int_." : "t0.";
+      if (manyToMany) {
+        query.setIncludeTableJoin(inverseJoin);
+      }
+      String rawWhere = deriveWhereParentIdSql(true, tableAlias);
+      String inClause = descriptor.getIdBinder().getIdInValueExpr(parentIds.size());
+
+      String expr = rawWhere+inClause;
+
+      // Flatten the bind values if needed (embeddedId)
+      List<Object> bindValues = getBindParentIds(parentIds);
+      
+      query.where().raw(expr, bindValues.toArray());
+    }
+    
     private List<Object> findIdsByParentIdList(List<Object> parentIdist, Transaction t, ArrayList<Object> excludeDetailIds) {
 
-        String rawWhere = deriveWhereParentIdSql(true);
+        String rawWhere = deriveWhereParentIdSql(true,"");
         String inClause = targetIdBinder.getIdInValueExpr(parentIdist.size());
         
         String expr = rawWhere+inClause;
@@ -465,6 +497,20 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 	public Object getParentId(Object parentBean) {
 		return descriptor.getId(parentBean);
 	}
+
+	public List<Object> getBindParentIds(List<Object> parentIds) {
+    if (exportedProperties.length == 1){
+      return parentIds;
+    }
+    List<Object> expandedList = new ArrayList<Object>(parentIds.size()*exportedProperties.length);
+    for (int i=0; i < parentIds.size(); i++) {
+      for (int y = 0; y < exportedProperties.length; y++) {
+        Object compId = parentIds.get(i);
+        expandedList.add(exportedProperties[y].getValue(compId));
+      }      
+    }
+    return expandedList;
+	}
 	
 	private void bindWhereParendId(DefaultSqlUpdate sqlUpd, Object parentId){
         
@@ -493,7 +539,18 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
         return pos;
     }
 	
-    private String deriveWhereParentIdSql(boolean inClause) {
+    public void addSelectExported(DbSqlContext ctx, String tableAlias) {
+      
+      String alias = manyToMany ? "int_" : tableAlias;
+      if (alias == null) {
+        alias = "t0";
+      }
+      for (int i = 0; i < exportedProperties.length; i++) {
+        ctx.appendColumn(alias, exportedProperties[i].getForeignDbColumn()); 
+      }
+    }
+    
+    private String deriveWhereParentIdSql(boolean inClause, String tableAlias) {
         
         StringBuilder sb = new StringBuilder();
         
@@ -506,7 +563,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
                 String s = inClause ? "," : " and ";
                 sb.append(s);
             }
-            sb.append(fkColumn);
+            sb.append(tableAlias).append(fkColumn);
             if (!inClause){
                 sb.append("=? ");
             }

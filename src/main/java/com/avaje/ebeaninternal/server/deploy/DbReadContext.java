@@ -72,7 +72,7 @@ public interface DbReadContext {
 	/**
 	 * Set back the bean that has just been loaded with its id.
 	 */
-	public void setLoadedBean(Object loadedBean, Object id);
+	public void setLoadedBean(Object loadedBean, Object id, Object lazyLoadParentId);
 
 	/**
 	 * Set back the 'detail' bean that has just been loaded.

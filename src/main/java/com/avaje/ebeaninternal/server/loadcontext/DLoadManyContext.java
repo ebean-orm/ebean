@@ -30,15 +30,13 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 	  super(parent, property.getBeanDescriptor(), path, defaultBatchSize, queryProps);
 
 		this.property = property;
-    this.currentBuffer = createBuffer(firstBatchSize);  
-    this.bufferList = queryFetch ? new ArrayList<DLoadManyContext.LoadBuffer>() : null;
+		this.bufferList = new ArrayList<DLoadManyContext.LoadBuffer>();
+    this.currentBuffer = createBuffer(firstBatchSize);
 	}
 	
   private LoadBuffer createBuffer(int size) {
     LoadBuffer buffer = new LoadBuffer(this, size);
-    if (bufferList != null) {
-      bufferList.add(buffer);
-    }
+    bufferList.add(buffer);
     return buffer;
   }
  
@@ -48,28 +46,14 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
   	if (parent.isReadOnly() != null){
   		query.setReadOnly(parent.isReadOnly());
   	}
-		query.setParentNode(getObjectGraphNode());
+		query.setParentNode(objectGraphNode);
 		
 		if (queryProps != null){
-			queryProps.configureManyQuery(query);
+			queryProps.configureBeanQuery(query);
 		}
 				
 		if (parent.isUseAutofetchManager()){
 			query.setAutofetch(true);
-		}
-	}
-
-	public ObjectGraphNode getObjectGraphNode() {
-		
-		// we return the parent node ... as we actually
-		// query on the parent selecting just it's id
-		
-		int pos = path.lastIndexOf('.');
-		if (pos == -1){
-			return parent.getObjectGraphNode(null);			
-		} else {
-			String parentPath = path.substring(0, pos);
-			return parent.getObjectGraphNode(parentPath);
 		}
 	}
 
@@ -156,7 +140,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
     
     @Override
     public ObjectGraphNode getObjectGraphNode() {
-      return context.getObjectGraphNode();
+      return context.objectGraphNode;
     }
     
     @Override

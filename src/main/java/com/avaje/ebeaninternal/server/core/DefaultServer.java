@@ -1198,7 +1198,7 @@ public final class DefaultServer implements SpiEbeanServer {
       }
       context.put(query.getId(), cachedBean);
 
-      DLoadContext loadContext = new DLoadContext(this, beanDescriptor, query.isReadOnly(), false, null, false);
+      DLoadContext loadContext = new DLoadContext(this, beanDescriptor, query.isReadOnly(), query);
       loadContext.setPersistenceContext(context);
 
       EntityBeanIntercept ebi = ((EntityBean) cachedBean)._ebean_getIntercept();

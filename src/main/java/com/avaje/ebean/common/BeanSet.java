@@ -44,6 +44,9 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   @SuppressWarnings("unchecked")
   public void internalAdd(Object bean) {
+    if (set == null) {
+      set = new LinkedHashSet<E>();
+    }
     set.add((E) bean);
   }
 

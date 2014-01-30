@@ -24,6 +24,7 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -256,7 +257,10 @@ public class SqlTreeBuilder {
 
     if (prefix == null) {
       buildExtraJoins(desc, myList);
-      return new SqlTreeNodeRoot(desc, props, myList, !subQuery, includeJoin);
+
+      // Optional many property for lazy loading query
+      BeanPropertyAssocMany<?> lazyLoadMany = (query == null) ? null : query.getLazyLoadForParentsProperty();
+      return new SqlTreeNodeRoot(desc, props, myList, !subQuery, includeJoin, lazyLoadMany);
 
     } else if (prop instanceof BeanPropertyAssocMany<?>) {
       return new SqlTreeNodeManyRoot(prefix, (BeanPropertyAssocMany<?>) prop, props, myList);

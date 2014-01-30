@@ -27,6 +27,9 @@ public class FilterExprPath implements Serializable {
    * due to a proceeding (earlier) query join etc.
    */
   public FilterExprPath trimPath(int prefixTrim) {
+    if (prefixTrim >= path.length()) {
+      return new FilterExprPath(null);  
+    }
     return new FilterExprPath(path.substring(prefixTrim));
   }
 

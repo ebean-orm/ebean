@@ -82,19 +82,22 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   Set<String> includedProps;
 
   final Map<String, String> pathMap;
-
+  
+  final BeanPropertyAssocMany<?> lazyLoadParent;
+  
   public SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
       List<SqlTreeNode> myChildren, boolean withId) {
 
-    this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, withId);
+    this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, withId, null);
   }
 
   /**
    * Create with the appropriate node.
    */
   public SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, BeanDescriptor<?> desc,
-      SqlTreeProperties props, List<SqlTreeNode> myChildren, boolean withId) {
+      SqlTreeProperties props, List<SqlTreeNode> myChildren, boolean withId,  BeanPropertyAssocMany<?> lazyLoadParent) {
 
+    this.lazyLoadParent = lazyLoadParent;
     this.prefix = prefix;
     this.nodeBeanProp = beanProp;
     this.desc = desc;
@@ -156,7 +159,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     }
   }
 
-  protected void postLoad(DbReadContext cquery, Object loadedBean, Object id) {
+  protected void postLoad(DbReadContext cquery, Object loadedBean, Object id, Object lazyLoadParentId) {
   }
 
   public void buildSelectExpressionChain(List<String> selectChain) {
@@ -179,6 +182,11 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    */
   public void load(DbReadContext ctx, Object parentBean) throws SQLException {
 
+    Object lazyLoadParentId = null;
+    if (lazyLoadParent != null) {
+      lazyLoadParentId = lazyLoadParent.getBeanDescriptor().getIdBinder().read(ctx);
+    }
+    
     // bean already existing in the persistence context
     Object contextBean = null;
 
@@ -333,13 +341,13 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     if (!readId) {
       // a bean with no Id (never found in context)
-      postLoad(ctx, localBean, id);
+      postLoad(ctx, localBean, id, null);
 
     } else {
       // return the contextBean which is either the localBean
       // read from the resultSet and put into the context OR
       // the 'matching' bean that already existed in the context
-      postLoad(ctx, contextBean, id);
+      postLoad(ctx, contextBean, id, lazyLoadParentId);
     }
   }
 
@@ -375,6 +383,10 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     ctx.pushJoin(prefix);
     ctx.pushTableAlias(prefix);
+    
+    if (lazyLoadParent != null) {
+      lazyLoadParent.addSelectExported(ctx, prefix);
+    }
 
     if (!subQuery && inheritInfo != null) {
       ctx.appendColumn(inheritInfo.getDiscriminatorColumn());

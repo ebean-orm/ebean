@@ -51,6 +51,9 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @SuppressWarnings("unchecked")
   public void internalAdd(Object bean) {
+    if (list == null) {
+      list = new ArrayList<E>();
+    }
     list.add((E) bean);
   }
 

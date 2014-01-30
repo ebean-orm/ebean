@@ -15,6 +15,7 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
 import com.avaje.ebeaninternal.server.querydefn.NaturalKeyBindParam;
@@ -154,10 +155,22 @@ public interface SpiQuery<T> extends Query<T> {
     public String getLoadMode();
 
     /**
+     * This becomes a lazy loading query for a many relationship.
+     */
+    public void setLazyLoadForParents(List<Object> parentIds, BeanPropertyAssocMany<?> many);
+
+    /**
+     * Return the lazy loading 'many' property.
+     */
+    public BeanPropertyAssocMany<?> getLazyLoadForParentsProperty();
+    
+    /**
+     * Return the list of parent Id's for lazy loading.
+     */
+    public List<Object> getLazyLoadForParentIds();
+    
+    /**
      * Set the load mode (+lazy or +query) and the load description.
-     * 
-     * @param loadMode
-     * @param loadDescription
      */
     public void setLoadDescription(String loadMode, String loadDescription);
 

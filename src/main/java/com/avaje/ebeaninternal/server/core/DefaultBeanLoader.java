@@ -106,20 +106,12 @@ public class DefaultBeanLoader {
 
     BeanDescriptor<?> desc = ctx.getBeanDescriptor();
 
-    String idProperty = desc.getIdBinder().getIdProperty();
+    SpiQuery<?> query = (SpiQuery<?>) server.createQuery(many.getTargetType());
 
-    SpiQuery<?> query = (SpiQuery<?>) server.createQuery(desc.getBeanType());
-    query.setMode(Mode.LAZYLOAD_MANY);
-    query.setLazyLoadManyPath(many.getName());
+    query.setLazyLoadForParents(idList, many);
+    many.addWhereParentIdIn(query, idList);
+
     query.setPersistenceContext(pc);
-    query.select(idProperty);
-    query.fetch(many.getName());
-
-    if (idList.size() == 1) {
-      query.where().idEq(idList.get(0));
-    } else {
-      query.where().idIn(idList);
-    }
 
     String mode = loadRequest.isLazy() ? "+lazy" : "+query";
     query.setLoadDescription(mode, loadRequest.getDescription());
@@ -129,7 +121,7 @@ public class DefaultBeanLoader {
 
     if (loadRequest.isOnlyIds()) {
       // override to just select the Id values
-      query.fetch(many.getName(), many.getTargetIdProperty());
+      query.select(many.getTargetIdProperty());
     }
 
     server.findList(query, loadRequest.getTransaction());

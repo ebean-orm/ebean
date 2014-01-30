@@ -42,6 +42,7 @@ import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DRawSqlSelect;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
@@ -207,6 +208,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	 */
 	private ObjectGraphNode parentNode;
 
+	private BeanPropertyAssocMany<?> lazyLoadForParentsProperty;
+	
+	private List<Object> lazyLoadForParentsIds;
+	
 	/**
 	 * Hash of final query after AutoFetch tuning.
 	 */
@@ -530,9 +535,25 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	 */
 	public void setPersistenceContext(PersistenceContext persistenceContext) {
 		this.persistenceContext = persistenceContext;
-	}
+	} 
 
-	/**
+  @Override
+  public void setLazyLoadForParents(List<Object> parentIds, BeanPropertyAssocMany<?> many) {
+     this.lazyLoadForParentsIds = parentIds;
+     this.lazyLoadForParentsProperty = many;
+  }
+  
+  @Override
+	public List<Object> getLazyLoadForParentIds() {
+    return lazyLoadForParentsIds;
+  }
+
+  @Override
+  public BeanPropertyAssocMany<?> getLazyLoadForParentsProperty() {
+    return lazyLoadForParentsProperty;
+  }
+
+  /**
 	 * Return true if the query detail has neither select or joins specified.
 	 */
 	public boolean isDetailEmpty() {

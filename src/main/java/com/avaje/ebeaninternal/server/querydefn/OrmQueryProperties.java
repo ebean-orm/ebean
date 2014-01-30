@@ -15,6 +15,7 @@ import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
+import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionFactory;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -170,7 +171,7 @@ public class OrmQueryProperties implements Serializable {
         if (filterMany == null){
             FilterExprPath exprPath = new FilterExprPath(path);
             SpiExpressionFactory queryEf = (SpiExpressionFactory)rootQuery.getExpressionFactory();
-            ExpressionFactory filterEf = queryEf.createExpressionFactory(exprPath);
+            ExpressionFactory filterEf = queryEf.createExpressionFactory();//exprPath);
             filterMany = new FilterExpressionList(exprPath, filterEf, rootQuery);
             // by default we need to make this a 'query join' now
             queryFetchAll = true;
@@ -229,12 +230,17 @@ public class OrmQueryProperties implements Serializable {
     public void configureBeanQuery(SpiQuery<?> query) {
 
         if (trimmedProperties != null && trimmedProperties.length() > 0) {
-            query.select(trimmedProperties);
-            if (filterMany != null){
-                query.setFilterMany(path, filterMany);
-            }
+          query.select(trimmedProperties);
         }
-
+        
+        if (filterMany != null){
+          SpiExpressionList<?> trimPath = filterMany.trimPath(path.length()+1);
+          List<SpiExpression> underlyingList = trimPath.getUnderlyingList();
+          for (SpiExpression spiExpression : underlyingList) {
+            query.where().add(spiExpression);            
+          }
+        }
+        
         if (secondaryChildren != null) {
             int trimPath = path.length() + 1;
             for (int i = 0; i < secondaryChildren.size(); i++) {
@@ -248,36 +254,6 @@ public class OrmQueryProperties implements Serializable {
         
         if (orderBy != null){
           query.setOrder(orderBy.copyWithTrim(path));
-        }
-    }
-
-    /**
-     * Define the select and joins for this query.
-     */
-    @SuppressWarnings("unchecked")
-    public void configureManyQuery(SpiQuery<?> query) {
-
-        if (trimmedProperties != null && trimmedProperties.length() > 0) {
-            query.fetch(query.getLazyLoadManyPath(), trimmedProperties);
-        }
-        if (filterMany != null){
-            query.setFilterMany(path, filterMany);
-        }   
-        if (secondaryChildren != null) {
-
-            int trimlen = path.length() - query.getLazyLoadManyPath().length();
-
-            for (int i = 0; i < secondaryChildren.size(); i++) {
-                OrmQueryProperties p = secondaryChildren.get(i);
-                String path = p.getPath();
-                path = path.substring(trimlen);
-                query.fetch(path, p.getProperties(), p.getFetchConfig());
-                query.setFilterMany(path, p.getFilterManyTrimPath(trimlen));
-            }
-        }
-        
-        if (orderBy != null){
-            query.setOrder(orderBy);
         }
     }
 

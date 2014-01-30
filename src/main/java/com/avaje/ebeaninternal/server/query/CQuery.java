@@ -84,12 +84,18 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Flag set when 'master' bean changed.
    */
-  boolean loadedBeanChanged;
+  private boolean loadedBeanChanged;
   /**
    * The 'master' bean just loaded.
    */
   private Object loadedBean;
 
+  private final BeanPropertyAssocMany<?> lazyLoadManyProperty;
+
+  private Object lazyLoadParentId;
+  
+  private Object lazyLoadParentBean;
+    
   /**
    * Holds the previous loaded bean.
    */
@@ -234,6 +240,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     this.queryPlan = queryPlan;
     this.query = request.getQuery();
     this.queryMode = query.getMode();
+    this.lazyLoadManyProperty = query.getLazyLoadForParentsProperty();
 
     this.readOnly = request.isReadOnly();
 
@@ -438,7 +445,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return persistenceContext;
   }
 
-  public void setLoadedBean(Object bean, Object id) {
+  public void setLoadedBean(Object bean, Object id, Object lazyLoadParentId) {
     if (id != null && id.equals(loadedBeanId)) {
       // master/detail loading with master bean
       // unchanged. NB Using id to avoid any issue
@@ -452,7 +459,19 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
         this.prevLoadedBean = loadedBean;
         this.loadedBeanId = id;
       }
+     
       this.loadedBean = bean;
+      
+      if (lazyLoadParentId != null) {
+        if (!lazyLoadParentId.equals(this.lazyLoadParentId)) {
+          // get the appropriate parent bean from the persistence context
+          this.lazyLoadParentBean = persistenceContext.get(lazyLoadManyProperty.getBeanDescriptor().getBeanType(), lazyLoadParentId);
+          this.lazyLoadParentId = lazyLoadParentId;
+        }
+        
+        // add the loadedBean to the appropriate collection of lazyLoadParentBean
+        lazyLoadManyProperty.addBeanToCollectionWithCreate(lazyLoadParentBean, loadedBean);
+      }
     }
   }
 

@@ -21,18 +21,19 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
 
   private static final Object[] EMPTY_ARRAY = new Object[] {};
 
-  private final FilterExprPath prefix;
+  private final FilterExprPath prefix = null;
 
   public DefaultExpressionFactory() {
-    this(null);
+    //this();//null);
   }
 
-  public DefaultExpressionFactory(FilterExprPath prefix) {
-    this.prefix = prefix;
-  }
+//  public DefaultExpressionFactory(FilterExprPath prefix) {
+//    this.prefix = prefix;
+//  }
 
-  public ExpressionFactory createExpressionFactory(FilterExprPath prefix) {
-    return new DefaultExpressionFactory(prefix);
+  public ExpressionFactory createExpressionFactory(){//FilterExprPath prefix) {
+    return this;
+    //return new DefaultExpressionFactory(prefix);
   }
 
   public String getLang() {
