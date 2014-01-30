@@ -58,9 +58,9 @@ public class ClassPathSearchTests {
 		List<Class<?>> found = search.findClasses();
 
 		Assert.assertEquals(1, found.size());
-		assert found.contains(cl.loadClass(SimpleJarBangClass.class.getName()));
+		Assert.assertTrue(found.contains(cl.loadClass(SimpleJarBangClass.class.getName())));
 
-		assert search.getJarHits().contains(new File(jarBang.getFile().split("!")[0]).getName());
+		Assert.assertTrue(search.getJarHits().contains(new File(jarBang.getFile().split("!")[0]).getName()));
 
 		filter = new ClassPathSearchFilter();
 		filter.includePackage("com.avaje.ebeaninternal.server");
@@ -76,7 +76,7 @@ public class ClassPathSearchTests {
 		runAsserts(search.findClasses(), cl, search, jar, jarBang);
 	}
 
-	private URL createJar(Class clazz, File jarFile, String offset) throws IOException {
+	private URL createJar(Class<?> clazz, File jarFile, String offset) throws IOException {
 		FileOutputStream stream = new FileOutputStream(jarFile);
 		JarOutputStream jarOutputStream = new JarOutputStream(stream);
 		String clazzPath = clazz.getPackage().getName().replace(".", "/") + "/" + clazz.getSimpleName() + ".class";

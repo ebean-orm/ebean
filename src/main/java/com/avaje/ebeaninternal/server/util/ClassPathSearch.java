@@ -3,8 +3,9 @@ package com.avaje.ebeaninternal.server.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.instrument.ClassDefinition;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -16,12 +17,19 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.jar.Attributes;
 import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.api.ClassUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.avaje.ebeaninternal.server.util.ClassPathReader;
+import com.avaje.ebeaninternal.server.util.ClassPathSearchFilter;
+import com.avaje.ebeaninternal.server.util.ClassPathSearchMatcher;
+import com.avaje.ebeaninternal.server.util.DefaultClassPathReader;
 
 /**
  * Can search the class path for classes using a ClassPathSearchMatcher. A
@@ -33,320 +41,424 @@ import org.slf4j.LoggerFactory;
  */
 public class ClassPathSearch {
 
-	private static final Logger logger = LoggerFactory.getLogger(ClassPathSearch.class);
+  private static final Logger logger = LoggerFactory.getLogger(ClassPathSearch.class);
 
-	ClassLoader classLoader;
+  private ClassLoader classLoader;
 
-	Object[] classPaths;
+  private Object[] classPaths;
 
-	ClassPathSearchFilter filter;
+  private ClassPathSearchFilter filter;
 
-	ClassPathSearchMatcher matcher;
+  private ClassPathSearchMatcher matcher;
 
-	ArrayList<Class<?>> matchList = new ArrayList<Class<?>>();
+  private ArrayList<Class<?>> matchList = new ArrayList<Class<?>>();
+
+  private HashSet<String> jarHits = new HashSet<String>();
+
+  private HashSet<String> packageHits = new HashSet<String>();
+
+  private ClassPathReader classPathReader = new DefaultClassPathReader();
+
+  private ArrayList<URI> scannedUris = new ArrayList<URI>();
+
+  public ClassPathSearch(ClassLoader classLoader, ClassPathSearchFilter filter, ClassPathSearchMatcher matcher) {
+    this.classLoader = classLoader;
+    this.filter = filter;
+    this.matcher = matcher;
+    initClassPaths();
+  }
+
+  private void initClassPaths() {
+
+    try {
+
+      String cn = GlobalProperties.get("ebean.classpathreader", null);
+      if (cn != null) {
+        // use a user defined classPathReader
+        logger.info("Using [" + cn + "] to read the searchable class path");
+        classPathReader = (ClassPathReader) ClassUtil.newInstance(cn, this.getClass());
+      }
+
+      classPaths = classPathReader.readPath(classLoader);
+
+      if (classPaths == null || classPaths.length == 0) {
+        String msg = "ClassPath is EMPTY using ClassPathReader [" + classPathReader + "]";
+        logger.warn(msg);
+      }
+
+      boolean debug = GlobalProperties.getBoolean("ebean.debug.classpath", false);
+      if (debug || logger.isTraceEnabled()) {
+        logger.info("Classpath " + Arrays.toString(classPaths));
+      }
+
+    } catch (Exception e) {
+      throw new RuntimeException("Error trying to read the classpath entries", e);
+    }
+  }
 
   /**
-   * For class-reloading, forcing them through the transformer
+   * Return the set of jars that contained classes that matched.
    */
-  ArrayList<ClassDefinition> matchDefinitions = new ArrayList<ClassDefinition>();
+  public Set<String> getJarHits() {
+    return jarHits;
+  }
 
-	HashSet<String> jarHits = new HashSet<String>();
+  /**
+   * Return the set of packages that contained classes that matched.
+   */
+  public Set<String> getPackageHits() {
+    return packageHits;
+  }
 
-	HashSet<String> packageHits = new HashSet<String>();
+  /**
+   * Register where matching classes where found.
+   * <p>
+   * Could use this info to speed up future searches.
+   * </p>
+   */
+  private void registerHit(String jarFileName, Class<?> cls) {
+    if (jarFileName != null) {
+      jarHits.add(jarFileName);
+    }
+    Package pkg = cls.getPackage();
+    if (pkg != null) {
+      packageHits.add(pkg.getName());
+    } else {
+      packageHits.add("");
+    }
+  }
 
-	ClassPathReader classPathReader = new DefaultClassPathReader();
-	
-	public ClassPathSearch(ClassLoader classLoader, ClassPathSearchFilter filter, ClassPathSearchMatcher matcher) {
-		this.classLoader = classLoader;
-		this.filter = filter;
-		this.matcher = matcher;
-		initClassPaths();
-	}
+  /**
+   * Searches the class path for all matching classes.
+   */
+  public List<Class<?>> findClasses() throws IOException {
 
-	private void initClassPaths() {
-		
-		try {
-			
-			String cn = GlobalProperties.get("ebean.classpathreader", null);
-			if (cn != null){
-				// use a user defined classPathReader
-				logger.info("Using ["+cn+"] to read the searchable class path");
-				classPathReader = (ClassPathReader)ClassUtil.newInstance(cn, this.getClass());
-			}
-			
-			classPaths = classPathReader.readPath(classLoader);
-				
-			if (classPaths == null || classPaths.length == 0){
-				String msg = "ClassPath is EMPTY using ClassPathReader ["+classPathReader+"]";
-				logger.warn(msg);
-			}
-			
-			boolean debug = GlobalProperties.getBoolean("ebean.debug.classpath", false);
-			if (debug || logger.isTraceEnabled()) {
-				String msg = "Classpath " + Arrays.toString(classPaths);
-				logger.info(msg);
-			}
-			
-		} catch (Exception e) {
-			String msg = "Error trying to read the classpath entries";
-			throw new RuntimeException(msg, e);
-		}
-	}
+    if (classPaths == null || classPaths.length == 0) {
+      // returning an empty list
+      return matchList;
+    }
 
-	/**
-	 * Return the set of jars that contained classes that matched.
-	 */
-	public Set<String> getJarHits() {
-		return jarHits;
-	}
+    for (int i = 0; i < classPaths.length; i++) {
 
-	/**
-	 * Return the set of packages that contained classes that matched.
-	 */
-	public Set<String> getPackageHits() {
-		return packageHits;
-	}
+      ClassPathElement element = getClassPathElement(classPaths[i]);
 
-	/**
-	 * Register where matching classes where found.
-	 * <p>
-	 * Could use this info to speed up future searches.
-	 * </p>
-	 */
-	private void registerHit(String jarFileName, Class<?> cls) {
-		if (jarFileName != null) {
-			jarHits.add(jarFileName);
-		}
-		Package pkg = cls.getPackage();
-		if (pkg != null){
-			packageHits.add(pkg.getName());			
-		} else {
-			packageHits.add("");
-		}
-	}
+      if (element.isDirectory()) {
+        scanDirectory(element);
 
-	/**
-	 * Searches the class path for all matching classes.
-	 */
-	public List<Class<?>> findClasses() throws ClassNotFoundException {
+      } else if (element.isJarOrWar()) {
+        // search name including the ! offset if it is there
+        if (filter.isSearchJar(element.getJarNameWithOffset())) {
+          scanJar(element);
+        }
 
-		if (classPaths == null || classPaths.length == 0){
-			// returning an empty list
-			return matchList;
-		}
-		
-		String charsetName = Charset.defaultCharset().name();
+      } else {
+        String msg = "Error: expected classPath entry [" + element
+            + "] to be a directory or a .jar file but it is not either of those?";
+        logger.error(msg);
+      }
+    }
 
-		for (int h = 0; h < classPaths.length; h++) {
-			
-			String jarFileName = null;
-			Enumeration<?> files = null;
-			JarFile module = null;
+    if (matchList.isEmpty()) {
+      String msg = "No Entities found in ClassPath using ClassPathReader [" + classPathReader + "] Classpath Searched["
+          + Arrays.toString(classPaths) + "]";
+      logger.warn(msg);
+    }
 
-			// for each class path ...
-			File classPath;
-			String jarOffset = null; // used for war files with bang paths, e.g. !/WEB-INF/classes
-			if (URL.class.isInstance(classPaths[h])){
-				URL fileUrl = (URL)classPaths[h];
-				if (fileUrl.getPath().contains("!")) {
-					String[] parts = fileUrl.getPath().split("!");
-					if (parts[0].startsWith("file:")) {  // jar:file:..../file.war!/WEB-INF/classes typically
-						classPath = new File(parts[0].substring("file:".length()));
-					} else {
-						classPath = new File(parts[0]);
-					}
-					jarOffset = parts[1];
-				} else {
-					classPath = new File(fileUrl.getFile());
-				}
-			} else {
-				classPath = new File(classPaths[h].toString());
-			}
-			
-			try {
-				// URL Decode the path replacing %20 to space characters.
-				String path = URLDecoder.decode(classPath.getAbsolutePath(), charsetName);
-				classPath = new File(path);
-				
-			} catch (UnsupportedEncodingException e) {
-				throw new RuntimeException(e);
-			}
+    return matchList;
+  }
 
-			if (classPath.isDirectory()) {
-				files = getDirectoryEnumeration(classPath);
+  private ClassPathElement getClassPathElement(Object classPathEntry) {
 
-			} else if (classPath.getName().endsWith(".jar") || classPath.getName().endsWith(".war")) {
-				jarFileName = classPath.getName();
+    if (!URL.class.isInstance(classPathEntry)) {
+      // assumed to be a file path
+      return new ClassPathElement(classPathEntry.toString());
+    }
+    URL fileUrl = (URL) classPathEntry;
+    if (!fileUrl.getPath().contains("!")) {
+      return new ClassPathElement(new File(fileUrl.getFile()));
+    }
 
-				// search name needs to include the offset if it is there, in case it contains interesting info
-				if (!filter.isSearchJar(jarFileName + ((jarOffset == null) ? "" : ("!" + jarOffset)))) {
-					// skip any jars not list in the filter
-					continue;
-				}
-				try {
-					// our resource is a jar
-					module = new JarFile(classPath);
-					files = module.entries();
+    // jar:file:..../file.war!/WEB-INF/classes typically
+    String[] parts = fileUrl.getPath().split("!");
+    String fileName = parts[0];
+    String jarOffset = parts[1];
+    if (fileName.startsWith("file:")) {
+      fileName = fileName.substring("file:".length());
+    }
+    return new ClassPathElement(new File(fileName), jarOffset);
+  }
 
-				} catch (MalformedURLException ex) {
-					throw new ClassNotFoundException("Bad classpath. Error: ", ex);
+  private void scanDirectory(ClassPathElement classPathEntry) {
+    scanDirectory(classPathEntry.classPath);
+  }
 
-				} catch (IOException ex) {
-					String msg = "jar file '" + classPath.getAbsolutePath()
-							+ "' could not be instantiate from file path. Error: ";
-					throw new ClassNotFoundException(msg, ex);
-				}
-			} else {
-				// this is not expected
-				String msg = "Error: expected classPath entry ["+classPath.getAbsolutePath()
-				+"] to be a directory or a .jar file but it is not either of those?";
-				logger.error(msg);
-			}
+  private void scanDirectory(File directory) {
+    List<String> directoryFiles = getDirectoryFiles(directory);
+    searchFiles(Collections.enumeration(directoryFiles), null, null);
+  }
 
-			searchFiles(files, jarFileName, jarOffset);
+  private void scanUri(URI uri) throws IOException {
 
-			if (module != null) {
-				try {
-					// close the jar if it was used
-					module.close();
-				} catch (IOException e) {
-					String msg = "Error closing jar";
-					throw new ClassNotFoundException(msg, e);
-				}
-			}
-		}
-		
-		if (matchList.isEmpty()){
-			String msg = "No Entities found in ClassPath using ClassPathReader ["
-				+classPathReader+"] Classpath Searched[" + Arrays.toString(classPaths)+"]";
-			logger.warn(msg);
-		}
+    if (uri.getScheme().equals("file") && scannedUris.add(uri)) {
+      File file = new File(uri);
+      if (file.exists()) {
+        if (file.isDirectory()) {
+          scanDirectory(file);
+        } else {
+          scanJar(new ClassPathElement(file));
+        }
+      }
+    }
+  }
 
-		return matchList;
-	}
 
-	private Enumeration<?> getDirectoryEnumeration(File classPath) {
+  private void scanJar(ClassPathElement classPathEntry) throws IOException {
 
-		// list of file names (latter checked as Classes)
-		ArrayList<String> fileNameList = new ArrayList<String>();
+    JarFile module = null;
+    try {
+      // our resource is a jar
+      File file = classPathEntry.classPath;
+      module = new JarFile(file);
 
-		Set<String> includePkgs = filter.getIncludePackages();
-		if (includePkgs.size() > 0) {
-			// just search the relevant directories based on the
-			// list of included packages
-			Iterator<String> it = includePkgs.iterator();
-			while (it.hasNext()) {
-				String pkg = it.next();
-				String relPath = pkg.replace('.', '/');
-				File dir = new File(classPath, relPath);
-				if (dir.exists()) {
-					recursivelyListDir(fileNameList, dir, new StringBuilder(relPath));
-				}
-			}
+      List<URI> classPathFromManifest = getClassPathFromManifest(file, module.getManifest());
+      for (URI uri : classPathFromManifest) {
+        scanUri(uri);
+      }
+      
+      searchFiles(module.entries(), classPathEntry.getJarName(), classPathEntry.jarOffset);
 
-		} else {
-			// get a recursive listing of this classpath
-			recursivelyListDir(fileNameList, classPath, new StringBuilder());
-		}
+    } catch (MalformedURLException ex) {
+      throw new IOException("Bad classpath error: ", ex);
 
-		return Collections.enumeration(fileNameList);
-	}
+    } finally {
+      if (module != null) {
+        try {
+          // close the jar if it was used
+          module.close();
+        } catch (IOException e) {
+          throw new IOException("Error closing jar", e);
+        }
+      }
+    }
+  }
 
-	/**
-	 * Searches through the Java Archive (jar or war file) looking for classes that match our requirements.
-	 *
-	 * @param files - all of the files in the Java Archive, this is an enumeration provided by the Jar file
-	 * @param jarFileName - the name of the java archive
-	 * @param jarOffset - an offset inside the archive to chop off the name of the class - this is used when
-	 *                  we have bang path offsets (e.g. file:///myfile.war!/WEB-INF/classes)
-	 */
-	private void searchFiles(Enumeration<?> files, String jarFileName, String jarOffset) {
-		/*
-		* Strips the first character off as all entries in a jar file have no / prefix. We want to come out with a name
-		* like WEB-INF/classes/ to ensure we filter the contents of the war/jar file by this.
-		 */
-		if (jarOffset != null) {
-			if (jarOffset.startsWith("/")) {
-				jarOffset = jarOffset.substring(1);
-			}
+  private List<String> getDirectoryFiles(File classPath) {
 
-			if (!jarOffset.endsWith("/")) {
-				jarOffset += "/";
-			}
-		}
+    // list of file names (latter checked as Classes)
+    ArrayList<String> fileNameList = new ArrayList<String>();
 
-		while (files != null && files.hasMoreElements()) {
+    Set<String> includePkgs = filter.getIncludePackages();
+    if (includePkgs.size() > 0) {
+      // just search the relevant directories based on the
+      // list of included packages
+      Iterator<String> it = includePkgs.iterator();
+      while (it.hasNext()) {
+        String pkg = it.next();
+        String relativePath = pkg.replace('.', '/');
+        File dir = new File(classPath, relativePath);
+        if (dir.exists()) {
+          recursivelyListDir(fileNameList, dir, new StringBuilder(relativePath));
+        }
+      }
 
-			String fileName = files.nextElement().toString();
+    } else {
+      // get a recursive listing of this classPath
+      recursivelyListDir(fileNameList, classPath, new StringBuilder());
+    }
 
-			// we only want the class files
-			if (fileName.endsWith(".class") && (jarOffset == null || fileName.startsWith(jarOffset))) {
+    return fileNameList;
+  }
 
-				if (jarOffset != null) {
-					// we got through here only if there is an offset and we matched it, so strip it off the file
-					// as we are trying to find the classname
-					fileName = fileName.substring(jarOffset.length());
-				}
+  /**
+   * Searches through the Java Archive (jar or war file) looking for classes
+   * that match our requirements.
+   * 
+   * @param files
+   *          - all of the files in the Java Archive, this is an enumeration
+   *          provided by the Jar file
+   * @param jarFileName
+   *          - the name of the java archive
+   * @param jarOffset
+   *          - an offset inside the archive to chop off the name of the class -
+   *          this is used when we have bang path offsets (e.g.
+   *          file:///myfile.war!/WEB-INF/classes)
+   */
+  private void searchFiles(Enumeration<?> files, String jarFileName, String jarOffset) {
 
-				String className = fileName.replace('/', '.').substring(0, fileName.length() - 6);
-				int lastPeriod = className.lastIndexOf(".");
-				
-				String pckgName;
-				if (lastPeriod > 0){
-					pckgName = className.substring(0, lastPeriod);
-				} else {
-					pckgName = "";
-				}
+    if (files == null) {
+      return;
+    }
+    /*
+     * Strips the first character off as all entries in a jar file have no /
+     * prefix. We want to come out with a name like WEB-INF/classes/ to ensure
+     * we filter the contents of the war/jar file by this.
+     */
+    if (jarOffset != null) {
+      if (jarOffset.startsWith("/")) {
+        jarOffset = jarOffset.substring(1);
+      }
 
-				if (!filter.isSearchPackage(pckgName)) {
-					continue;
-				}
+      if (!jarOffset.endsWith("/")) {
+        jarOffset += "/";
+      }
+    }
 
-				// get the class for our class name
-				Class<?> theClass = null;
-				try {
-					theClass = Class.forName(className, false, classLoader);
+    while (files.hasMoreElements()) {
 
-					if (matcher.isMatch(theClass)) {
+      String fileName = files.nextElement().toString();
 
-						matchList.add(theClass);
-						registerHit(jarFileName, theClass);
-					}
+      // we only want the class files
+      if (fileName.endsWith(".class") && (jarOffset == null || fileName.startsWith(jarOffset))) {
 
-				} catch (ClassNotFoundException e) {
-					// expected to get this hence finer
-					logger.trace("Error searching classpath" + e.getMessage());
-					continue;
+        if (jarOffset != null) {
+          // we got through here only if there is an offset and we
+          // matched it, so strip it off the file
+          // as we are trying to find the className
+          fileName = fileName.substring(jarOffset.length());
+        }
 
-				} catch (NoClassDefFoundError e) {
-					// expected to get this hence finer
-					logger.trace("Error searching classpath: " + e.getMessage());
-					continue;
-				}
-			}
-		}
-	}
+        String className = fileName.replace('/', '.').substring(0, fileName.length() - 6);
+        int lastPeriod = className.lastIndexOf(".");
 
-	private void recursivelyListDir(List<String> fileNameList, File dir, StringBuilder relativePath) {
+        String pckgName;
+        if (lastPeriod > 0) {
+          pckgName = className.substring(0, lastPeriod);
+        } else {
+          pckgName = "";
+        }
 
-		int prevLen;
+        if (filter.isSearchPackage(pckgName)) {
+          // get the class for our class name
+          try {
+            Class<?> theClass = Class.forName(className, false, classLoader);
 
-		if (dir.isDirectory()) {
-			File[] files = dir.listFiles();
+            if (matcher.isMatch(theClass)) {
+              matchList.add(theClass);
+              registerHit(jarFileName, theClass);
+            }
 
-			for (int i = 0; i < files.length; i++) {
-				// store our original relative path string length
-				prevLen = relativePath.length();
-				relativePath.append(prevLen == 0 ? "" : "/").append(files[i].getName());
+          } catch (ClassNotFoundException e) {
+            // expected to get this hence trace
+            logger.trace("Error searching classpath" + e.getMessage());
+          } catch (NoClassDefFoundError e) {
+            // expected to get this hence trace
+            logger.trace("Error searching classpath" + e.getMessage());
+          }
+        }
+      }
+    }
+  }
 
-				recursivelyListDir(fileNameList, files[i], relativePath);
+  private void recursivelyListDir(List<String> fileNameList, File dir, StringBuilder relativePath) {
 
-				// delete sub directory from our relative path
-				relativePath.delete(prevLen, relativePath.length());
-			}
-		} else {
-			// add class fileName to the list
-			fileNameList.add(relativePath.toString());
-		}
-	}
+    if (!dir.isDirectory()) {
+      // add class fileName to the list
+      fileNameList.add(relativePath.toString());
+
+    } else {
+
+      File[] files = dir.listFiles();
+      for (int i = 0; i < files.length; i++) {
+        // store our original relative path string length
+        int prevLen = relativePath.length();
+        relativePath.append(prevLen == 0 ? "" : "/").append(files[i].getName());
+
+        recursivelyListDir(fileNameList, files[i], relativePath);
+
+        // delete sub directory from our relative path
+        relativePath.delete(prevLen, relativePath.length());
+      }
+    }
+  }
+
+  private static List<URI> getClassPathFromManifest(File jarFile, Manifest manifest) {
+
+    if (manifest == null) {
+      return Collections.emptyList();
+    }
+    List<URI> list = new ArrayList<URI>();
+    String classpathAttribute = manifest.getMainAttributes().getValue(Attributes.Name.CLASS_PATH.toString());
+
+    if (classpathAttribute != null) {
+      String[] split = classpathAttribute.split(" ");
+      for (String path : split) {
+        try {
+          path = path.trim();
+          if (path.length() > 0) {
+            URI uri = getClassPathEntry(jarFile, path);
+            list.add(uri);
+          }
+        } catch (URISyntaxException e) {
+          // Ignore bad entry
+          logger.warn("Invalid Class-Path entry: " + path);
+        }
+      }
+    }
+    return list;
+  }
+
+  private static URI getClassPathEntry(File jarFile, String path) throws URISyntaxException {
+    URI uri = new URI(path);
+    if (uri.isAbsolute()) {
+      return uri;
+    } else {
+      return new File(jarFile.getParentFile(), path.replace('/', File.separatorChar)).toURI();
+    }
+  }
+
+  private static File decodePath(File classPath) {
+
+    try {
+      String charsetName = Charset.defaultCharset().name();
+
+      // URL Decode the path replacing %20 to space characters.
+      String path = URLDecoder.decode(classPath.getAbsolutePath(), charsetName);
+      return new File(path);
+
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Element that has both underlying file and ! jarOffset.
+   */
+  private static class ClassPathElement {
+
+    private final File classPath;
+    private final String jarOffset;
+
+    ClassPathElement(String path) {
+      this(new File(path));
+    }
+
+    ClassPathElement(File file) {
+      this(file, null);
+    }
+
+    ClassPathElement(File file, String jarOffset) {
+      classPath = decodePath(file);
+      this.jarOffset = jarOffset;
+    }
+
+    public String toString() {
+      return classPath.getAbsolutePath();
+    }
+
+    boolean isDirectory() {
+      return classPath.isDirectory();
+    }
+
+    boolean isJarOrWar() {
+      return classPath.getName().endsWith(".jar") || classPath.getName().endsWith(".war");
+    }
+
+    String getJarName() {
+      return classPath.getName();
+    }
+
+    String getJarNameWithOffset() {
+      return (jarOffset == null) ? classPath.getName() : classPath.getName() + "!" + jarOffset;
+    }
+  }
 }
