@@ -61,6 +61,7 @@ public class TestSkippable extends TestCase {
 		final ListAttributeValue value2_DB_2 = listAttributeDB_2.getValues().iterator().next();
 		
 		
+    Assert.assertEquals(value2.getId(), value2_DB_2.getId());
 		Assert.assertTrue("Cascade failed", value2.getId().equals(value2_DB_2.getId()));
 		
 	}

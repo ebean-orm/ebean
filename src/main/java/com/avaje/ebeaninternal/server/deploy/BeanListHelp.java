@@ -36,6 +36,9 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
     this.loader = loader;
   }
 
+  /**
+   * Internal add bypassing any modify listening.
+   */
   public void add(BeanCollection<?> collection, Object bean) {
     collection.internalAdd(bean);
   }
@@ -77,12 +80,21 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
   }
 
   public Object createEmpty(boolean vanilla) {
-    return vanilla ? new ArrayList<T>() : new BeanList<T>();
+    if (vanilla) {
+      return new ArrayList<T>();
+    }
+    BeanList<T> beanList = new BeanList<T>();
+    if (many != null) {
+      beanList.setModifyListening(many.getModifyListenMode());
+    }
+    return beanList;
   }
 
   public BeanCollection<T> createReference(Object parentBean, String propertyName) {
 
-    return new BeanList<T>(loader, parentBean, propertyName);
+    BeanList<T> beanList = new BeanList<T>(loader, parentBean, propertyName);
+    beanList.setModifyListening(many.getModifyListenMode());
+    return beanList;
   }
 
   public void refresh(EbeanServer server, Query<?> query, Transaction t, Object parentBean) {

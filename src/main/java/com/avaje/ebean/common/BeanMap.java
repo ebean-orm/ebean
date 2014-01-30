@@ -37,6 +37,14 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     super(ebeanServer, ownerBean, propertyName);
   }
 
+  @SuppressWarnings("unchecked")
+  public void internalPut(Object key, Object bean) {
+    if (map == null) {
+      map = new LinkedHashMap<K, E>();
+    }
+    map.put((K)key, (E)bean);
+  }
+  
   public void internalAdd(Object bean) {
     throw new RuntimeException("Not allowed for map");
   }

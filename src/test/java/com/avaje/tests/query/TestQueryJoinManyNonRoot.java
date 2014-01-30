@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
@@ -18,8 +19,10 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> q = Ebean.find(Order.class).fetch("customer").fetch("customer.contacts").where()
-        .gt("id", 0).query();
+    Query<Order> q = Ebean.find(Order.class)
+        .fetch("customer")
+        .fetch("customer.contacts")
+        .where().gt("id", 0).query();
 
     List<Order> list = q.findList();
     String sql = q.getGeneratedSql();
@@ -35,8 +38,12 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> q = Ebean.find(Order.class).fetch("details").fetch("details.product")
-        .fetch("customer").fetch("customer.contacts").where().gt("id", 0).query();
+    Query<Order> q = Ebean.find(Order.class)
+        .fetch("details")
+        .fetch("details.product")
+        .fetch("customer")
+        .fetch("customer.contacts")
+        .where().gt("id", 0).query();
 
     List<Order> list = q.findList();
     String sql = q.getGeneratedSql();
@@ -55,11 +62,19 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> q = Ebean.find(Order.class).fetch("customer").fetch("customer.contacts")
-        .fetch("details").fetch("details.product").where().gt("id", 0).query();
+    Query<Order> q = Ebean.find(Order.class)
+        .fetch("customer")
+        .fetch("customer.contacts")
+        .fetch("details", new FetchConfig().query(10))
+        .fetch("details.product")
+        .where().gt("id", 0).query();
 
     List<Order> list = q.findList();
     String sql = q.getGeneratedSql();
+    
+    for (Order order : list) {
+      order.getCustomer().getContacts().size();
+    }
 
     Assert.assertTrue(list.size() > 0);
     Assert.assertTrue(sql.contains("join o_customer t1 on t1.id "));

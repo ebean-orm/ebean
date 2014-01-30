@@ -101,22 +101,34 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
 
 	@SuppressWarnings("rawtypes")
     public Object createEmpty(boolean vanilla) {
-		return vanilla ? new LinkedHashMap() : new BeanMap();
+	  if (vanilla) {
+	    return new LinkedHashMap();
+	  }
+		BeanMap beanMap = new BeanMap();
+		if (many != null) {
+		  beanMap.setModifyListening(many.getModifyListenMode());
+		}
+		return beanMap;
 	}
 	
-	@SuppressWarnings("unchecked")
+
+  /**
+   * Internal add bypassing any modify listening.
+   */
 	public void add(BeanCollection<?> collection, Object bean) {
 
 		Object keyValue = beanProperty.getValueIntercept(bean);
-
-		Map<Object, Object> map = (Map<Object, Object>) collection;
-		map.put(keyValue, bean);
+		((BeanMap<?,?>) collection).internalPut(keyValue, bean);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public BeanCollection<T> createReference(Object parentBean, String propertyName) {
 
-		return new BeanMap(loader, parentBean, propertyName);
+	  BeanMap beanMap = new BeanMap(loader, parentBean, propertyName);
+    if (many != null) {
+      beanMap.setModifyListening(many.getModifyListenMode());
+    }
+    return beanMap;
 	}
 
 	public void refresh(EbeanServer server, Query<?> query, Transaction t, Object parentBean) {

@@ -77,17 +77,29 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
         }
     }
 	
+  /**
+   * Internal add bypassing any modify listening.
+   */
 	public void add(BeanCollection<?> collection, Object bean) {
 		collection.internalAdd(bean);
 	}
     
     public Object createEmpty(boolean vanilla) {
-	    return vanilla ? new LinkedHashSet<T>() : new BeanSet<T>();
+      if (vanilla) {
+        return new LinkedHashSet<T>();
+      }
+	    BeanSet<T> beanSet = new BeanSet<T>();
+	    if (many != null) {
+	      beanSet.setModifyListening(many.getModifyListenMode());
+	    }
+	    return beanSet;
 	}
 
 	public BeanCollection<T> createReference(Object parentBean, String propertyName) {
 		
-		return new BeanSet<T>(loader, parentBean, propertyName);
+	  BeanSet<T> beanSet = new BeanSet<T>(loader, parentBean, propertyName);
+	  beanSet.setModifyListening(many.getModifyListenMode());
+	  return beanSet;
 	}
 
 	public void refresh(EbeanServer server, Query<?> query, Transaction t, Object parentBean) {

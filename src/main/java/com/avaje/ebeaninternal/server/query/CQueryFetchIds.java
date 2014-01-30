@@ -299,7 +299,7 @@ public class CQueryFetchIds {
 			// no-op
 		}
 
-		public void setLoadedBean(Object loadedBean, Object id) {
+		public void setLoadedBean(Object loadedBean, Object id, Object lazyLoadParentId) {
 			// no-op
 		}
 

@@ -2,6 +2,9 @@ package com.avaje.ebean.meta;
 
 import java.util.List;
 
+/**
+ * Provides access to the meta data in EbeanServer such as query execution statistics.
+ */
 public interface MetaInfoManager {
 
   /**
@@ -26,9 +29,9 @@ public interface MetaInfoManager {
   /**
    * Collect and return the ObjectGraphNode statistics.
    * <p>
-   * These show query executions for based on an origin point and paths. This is
-   * used to look at the amount of lazy loading occurring for a given query
-   * origin point.
+   * These show query executions based on an origin point and relative path.
+   * This is used to look at the amount of lazy loading occurring for a given
+   * query origin point and highlight potential for tuning a query.
    * </p>
    * 
    * @param reset

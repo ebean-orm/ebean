@@ -34,7 +34,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   private static final long serialVersionUID = -6992345500247035947L;
 
-  protected final ArrayList<SpiExpression> list = new ArrayList<SpiExpression>();
+  protected final List<SpiExpression> list;
 
   protected final Query<T> query;
 
@@ -52,6 +52,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   public DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList) {
+    this(query, expr, parentExprList, new ArrayList<SpiExpression>());
+  }
+  
+  protected DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
+    this.list = list;
     this.query = query;
     this.expr = expr;
     this.exprLang = expr.getLang();

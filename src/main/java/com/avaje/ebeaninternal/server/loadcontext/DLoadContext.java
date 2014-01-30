@@ -51,23 +51,17 @@ public class DLoadContext implements LoadContext {
 	private PersistenceContext persistenceContext;
 	private List<OrmQueryProperties> secQuery;
 
+
 	public DLoadContext(SpiEbeanServer ebeanServer, BeanDescriptor<?> rootDescriptor, Boolean readOnly, SpiQuery<?> query) {
-		this(ebeanServer, rootDescriptor, readOnly, 
-				Boolean.FALSE.equals(query.isUseBeanCache()), 
-				query.getParentNode(),
-				query.getAutoFetchManager() != null);
-	}
-	
-	public DLoadContext(SpiEbeanServer ebeanServer, BeanDescriptor<?> rootDescriptor, Boolean readOnly, 
-			boolean excludeBeanCache, ObjectGraphNode parentNode, boolean useAutofetchManager) {
 		
 		this.ebeanServer = ebeanServer;
 		this.defaultBatchSize = ebeanServer.getLazyLoadBatchSize();
 		this.rootDescriptor = rootDescriptor;
 		this.readOnly = readOnly;
-		this.excludeBeanCache = excludeBeanCache;
-		this.useAutofetchManager = useAutofetchManager;		
+		this.excludeBeanCache = Boolean.FALSE.equals(query.isUseBeanCache());
+		this.useAutofetchManager = query.getAutoFetchManager() != null;		
 				
+		ObjectGraphNode parentNode = query.getParentNode();
 		if (parentNode != null){
 			this.origin = parentNode.getOriginQueryPoint();
 			this.relativePath = parentNode.getPath();
@@ -80,29 +74,29 @@ public class DLoadContext implements LoadContext {
     this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
 	}	
 
-	protected boolean isExcludeBeanCache() {
-    	return excludeBeanCache;
+  protected boolean isExcludeBeanCache() {
+    return excludeBeanCache;
+  }
+
+  /**
+   * Return the minimum batch size when using QueryIterator with query joins.
+   */
+  public int getSecondaryQueriesMinBatchSize(OrmQueryRequest<?> parentRequest, int defaultQueryBatch) {
+
+    if (secQuery == null) {
+      return -1;
     }
 
-	/**
-	 * Return the minimum batch size when using QueryIterator with query joins.
-	 */
-    public int getSecondaryQueriesMinBatchSize(OrmQueryRequest<?> parentRequest, int defaultQueryBatch) {
-
-        if (secQuery == null){
-            return -1;
-        }
-        
-        int maxBatch = 0;
-        for (int i = 0; i < secQuery.size(); i++) {
-            int batchSize = secQuery.get(i).getQueryFetchBatch();
-            if (batchSize == 0){
-                batchSize = defaultQueryBatch;
-            }
-            maxBatch = Math.max(maxBatch, batchSize);
-        }
-        return maxBatch;
+    int maxBatch = 0;
+    for (int i = 0; i < secQuery.size(); i++) {
+      int batchSize = secQuery.get(i).getQueryFetchBatch();
+      if (batchSize == 0) {
+        batchSize = defaultQueryBatch;
+      }
+      maxBatch = Math.max(maxBatch, batchSize);
     }
+    return maxBatch;
+  }
     
 	/**
 	 * Execute all the secondary queries.

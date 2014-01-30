@@ -10,6 +10,7 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
+import com.avaje.ebean.Update;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.tests.model.basic.EBasicEncrypt;
@@ -19,6 +20,9 @@ public class TestEncrypt extends BaseTestCase {
   @Test
   public void test() {
 
+    Update<EBasicEncrypt> deleteAll = Ebean.createUpdate(EBasicEncrypt.class, "delete from EBasicEncrypt");
+    deleteAll.execute();
+    
     EBasicEncrypt e = new EBasicEncrypt();
     e.setName("testname");
     e.setDescription("testdesc");
