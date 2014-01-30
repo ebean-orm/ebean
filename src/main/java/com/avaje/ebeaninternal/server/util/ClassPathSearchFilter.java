@@ -15,7 +15,7 @@ public class ClassPathSearchFilter {
 
     private boolean defaultPackageMatch = true;
 
-	private boolean defaultJarMatch = false;
+	private boolean defaultJarMatch = true;
 
 	private String ebeanJarPrefix = "ebean";
 

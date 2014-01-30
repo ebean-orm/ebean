@@ -47,6 +47,7 @@ public class ClassPathSearchTests {
 		ClassPathSearchFilter filter = new ClassPathSearchFilter();
 		filter.includePackage("com.avaje.ebeaninternal.server");
 		filter.includeJar("WEB-INF");
+		filter.setDefaultJarMatch(false);
 
 		ClassPathSearch search = new ClassPathSearch(cl, filter, new ClassPathSearchMatcher() {
 			@Override
