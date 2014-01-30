@@ -10,7 +10,7 @@ public class BaseTestCase {
   
   static {
     logger.debug("... preStart");
-    if (!AgentLoader.loadAgentFromClasspath("avaje-ebeanorm-agent","debug=0")) {
+    if (!AgentLoader.loadAgentFromClasspath("avaje-ebeanorm-agent","debug=0;packages=com.avaje.tests.**")) {
       logger.info("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
     }    
   }
