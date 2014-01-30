@@ -14,51 +14,39 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
  */
 public abstract class AbstractExpression implements SpiExpression {
 
-	private static final long serialVersionUID = 4072786211853856174L;
-	
-	protected final String propName;
-	
-	protected final FilterExprPath pathPrefix;
-	
-	protected AbstractExpression(FilterExprPath pathPrefix, String propName) {
-		this.pathPrefix = pathPrefix;
-	    this.propName = propName;
-	}
+  private static final long serialVersionUID = 4072786211853856174L;
 
-	public String getPropertyName() {
-	    if (pathPrefix == null){
-	        return propName;
-	    } else {
-	        String path = pathPrefix.getPath();
-	        if (path == null || path.length() == 0){
-	            return propName;
-	        } else {
-	            return path+"."+propName;
-	        }
-	    }
-	}
-	
-	public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
+  protected final String propName;
 
-	  String propertyName = getPropertyName();
-		if (propertyName != null){
-			ElPropertyDeploy elProp = desc.getElPropertyDeploy(propertyName);
-			if (elProp != null) {
-			  if (elProp.containsFormulaWithJoin()) {
-			    // for findRowCount query select clause
-			    manyWhereJoin.addFormulaWithJoin(propertyName);
-			  }
-			  if (elProp.containsMany()){
-			    // for findRowCount we join to a many property
+  protected AbstractExpression(String propName) {
+    this.propName = propName;
+  }
+
+  public String getPropertyName() {
+    return propName;
+  }
+
+  public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
+
+    String propertyName = getPropertyName();
+    if (propertyName != null) {
+      ElPropertyDeploy elProp = desc.getElPropertyDeploy(propertyName);
+      if (elProp != null) {
+        if (elProp.containsFormulaWithJoin()) {
+          // for findRowCount query select clause
+          manyWhereJoin.addFormulaWithJoin(propertyName);
+        }
+        if (elProp.containsMany()) {
+          // for findRowCount we join to a many property
           manyWhereJoin.add(elProp);
-			  }
-			}
-		}
-	}
-	
-	protected ElPropertyValue getElProp(SpiExpressionRequest request) {
-
-	    String propertyName = getPropertyName();
-        return request.getBeanDescriptor().getElGetValue(propertyName);
+        }
+      }
     }
+  }
+
+  protected ElPropertyValue getElProp(SpiExpressionRequest request) {
+
+    String propertyName = getPropertyName();
+    return request.getBeanDescriptor().getElGetValue(propertyName);
+  }
 }

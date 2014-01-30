@@ -22,8 +22,8 @@ class InQueryExpression extends AbstractExpression {
 
   private transient CQuery<?> compiledSubQuery;
 
-  public InQueryExpression(FilterExprPath pathPrefix, String propertyName, SpiQuery<?> subQuery) {
-    super(pathPrefix, propertyName);
+  public InQueryExpression(String propertyName, SpiQuery<?> subQuery) {
+    super(propertyName);
     this.subQuery = subQuery;
   }
 

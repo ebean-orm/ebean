@@ -13,13 +13,13 @@ class InExpression extends AbstractExpression {
 
   private final Object[] values;
 
-  InExpression(FilterExprPath pathPrefix, String propertyName, Collection<?> coll) {
-    super(pathPrefix, propertyName);
+  InExpression(String propertyName, Collection<?> coll) {
+    super(propertyName);
     values = coll.toArray(new Object[coll.size()]);
   }
 
-  InExpression(FilterExprPath pathPrefix, String propertyName, Object[] array) {
-    super(pathPrefix, propertyName);
+  InExpression(String propertyName, Object[] array) {
+    super(propertyName);
     this.values = array;
   }
 

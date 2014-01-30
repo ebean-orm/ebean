@@ -383,6 +383,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     return exprList.setFirstRow(firstRow);
   }
 
+  @Deprecated
   public com.avaje.ebean.Query<T> setListener(QueryListener<T> queryListener) {
     return exprList.setListener(queryListener);
   }

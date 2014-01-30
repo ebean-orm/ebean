@@ -37,11 +37,6 @@ import java.util.Map;
 public interface ExpressionFactory {
 
   /**
-   * Return the language for this expression factory.
-   */
-  public String getLang();
-
-  /**
    * Equal To - property equal to the given value.
    */
   public Expression eq(String propertyName, Object value);

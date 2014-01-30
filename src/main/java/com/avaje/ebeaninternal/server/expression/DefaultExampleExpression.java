@@ -66,8 +66,6 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
    */
   private ArrayList<SpiExpression> list;
 
-  private final FilterExprPath pathPrefix;
-
   /**
    * Construct the query by example expression.
    * 
@@ -78,8 +76,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
    * @param likeType
    *          the type of Like wild card used
    */
-  public DefaultExampleExpression(FilterExprPath pathPrefix, Object entity, boolean caseInsensitive, LikeType likeType) {
-    this.pathPrefix = pathPrefix;
+  public DefaultExampleExpression(Object entity, boolean caseInsensitive, LikeType likeType) {
     this.entity = entity;
     this.caseInsensitive = caseInsensitive;
     this.likeType = likeType;
@@ -217,13 +214,13 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
 
       if (beanProperty.isScalar() && value != null) {
         if (value instanceof String) {
-          list.add(new LikeExpression(pathPrefix, propName, (String) value, caseInsensitive, likeType));
+          list.add(new LikeExpression(propName, (String) value, caseInsensitive, likeType));
         } else {
           if (!includeZeros && isZero(value)) {
             // exclude the zero values typically to weed out
             // primitive int and long that initialise to 0
           } else {
-            list.add(new SimpleExpression(pathPrefix, propName, SimpleExpression.Op.EQ, value));
+            list.add(new SimpleExpression(propName, SimpleExpression.Op.EQ, value));
           }
         }
       }

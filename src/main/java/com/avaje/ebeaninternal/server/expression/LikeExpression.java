@@ -16,8 +16,8 @@ class LikeExpression extends AbstractExpression {
 
   private final LikeType type;
 
-  LikeExpression(FilterExprPath pathPrefix, String propertyName, String value, boolean caseInsensitive, LikeType type) {
-    super(pathPrefix, propertyName);
+  LikeExpression(String propertyName, String value, boolean caseInsensitive, LikeType type) {
+    super(propertyName);
     this.caseInsensitive = caseInsensitive;
     this.type = type;
     this.val = value;

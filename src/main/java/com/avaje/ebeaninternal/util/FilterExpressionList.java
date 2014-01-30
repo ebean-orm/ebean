@@ -136,6 +136,7 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
         return rootQuery.setFirstRow(firstRow);
     }
 
+    @Deprecated
     public Query<T> setListener(QueryListener<T> queryListener) {
         return rootQuery.setListener(queryListener);
     }

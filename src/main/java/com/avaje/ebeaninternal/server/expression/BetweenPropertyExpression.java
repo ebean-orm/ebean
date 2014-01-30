@@ -10,8 +10,6 @@ import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 
 /**
  * Between expression where a value is between two properties.
- * 
- * @author rbygrave
  */
 class BetweenPropertyExpression implements SpiExpression {
 
@@ -19,29 +17,18 @@ class BetweenPropertyExpression implements SpiExpression {
 
   private static final String BETWEEN = " between ";
 
-  private final FilterExprPath pathPrefix;
   private final String lowProperty;
   private final String highProperty;
   private final Object value;
 
-  BetweenPropertyExpression(FilterExprPath pathPrefix, String lowProperty, String highProperty, Object value) {
-    this.pathPrefix = pathPrefix;
+  BetweenPropertyExpression(String lowProperty, String highProperty, Object value) {
     this.lowProperty = lowProperty;
     this.highProperty = highProperty;
     this.value = value;
   }
 
   protected String name(String propName) {
-    if (pathPrefix == null) {
-      return propName;
-    } else {
-      String path = pathPrefix.getPath();
-      if (path == null || path.length() == 0) {
-        return propName;
-      } else {
-        return path + "." + propName;
-      }
-    }
+    return propName;
   }
 
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {

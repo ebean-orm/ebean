@@ -42,7 +42,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   protected transient ExpressionFactory expr;
 
-  private final String exprLang;
   private final String listAndStart;
   private final String listAndEnd;
   private final String listAndJoin;
@@ -59,20 +58,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     this.list = list;
     this.query = query;
     this.expr = expr;
-    this.exprLang = expr.getLang();
     this.parentExprList = parentExprList;
 
-    if ("ldap".equals(exprLang)) {
-      // Language is LDAP
-      listAndStart = "(&";
-      listAndEnd = ")";
-      listAndJoin = "";
-
-    } else {
-      listAndStart = "";
-      listAndEnd = "";
-      listAndJoin = " and ";
-    }
+    this.listAndStart = "";
+    this.listAndEnd = "";
+    this.listAndJoin = " and ";
   }
 
   public SpiExpressionList<?> trimPath(int prefixTrim) {
@@ -231,6 +221,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return query.setMapKey(mapKey);
   }
 
+  @Deprecated
   public Query<T> setListener(QueryListener<T> queryListener) {
     return query.setListener(queryListener);
   }

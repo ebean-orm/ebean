@@ -15,8 +15,8 @@ class NullExpression extends AbstractExpression {
 	
 	private final boolean notNull;
 	
-	NullExpression(FilterExprPath pathPrefix, String propertyName, boolean notNull) {
-		super(pathPrefix, propertyName);
+	NullExpression(String propertyName, boolean notNull) {
+		super(propertyName);
 		this.notNull = notNull;
 	}
     

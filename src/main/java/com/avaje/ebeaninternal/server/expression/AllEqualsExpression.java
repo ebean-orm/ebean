@@ -20,24 +20,12 @@ class AllEqualsExpression implements SpiExpression {
 
   private final Map<String, Object> propMap;
 
-  private final FilterExprPath pathPrefix;
-
-  AllEqualsExpression(FilterExprPath pathPrefix, Map<String, Object> propMap) {
-    this.pathPrefix = pathPrefix;
+  AllEqualsExpression(Map<String, Object> propMap) {
     this.propMap = propMap;
   }
 
   protected String name(String propName) {
-    if (pathPrefix == null) {
-      return propName;
-    } else {
-      String path = pathPrefix.getPath();
-      if (path == null || path.length() == 0) {
-        return propName;
-      } else {
-        return path + "." + propName;
-      }
-    }
+    return propName;
   }
 
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {

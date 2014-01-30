@@ -11,8 +11,8 @@ class CaseInsensitiveEqualExpression extends AbstractExpression {
 
   private final String value;
 
-  CaseInsensitiveEqualExpression(FilterExprPath pathPrefix, String propertyName, String value) {
-    super(pathPrefix, propertyName);
+  CaseInsensitiveEqualExpression(String propertyName, String value) {
+    super(propertyName);
     this.value = value.toLowerCase();
   }
 

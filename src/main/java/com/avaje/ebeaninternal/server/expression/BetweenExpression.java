@@ -15,8 +15,8 @@ class BetweenExpression extends AbstractExpression {
 	
 	private final Object valueLow;
 	
-	BetweenExpression(FilterExprPath pathPrefix, String propertyName, Object valLo, Object valHigh) {
-		super(pathPrefix, propertyName);
+	BetweenExpression(String propertyName, Object valLo, Object valHigh) {
+		super(propertyName);
 		this.valueLow = valLo;
 		this.valueHigh = valHigh;
 	}

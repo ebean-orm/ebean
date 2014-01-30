@@ -33,8 +33,8 @@ public class SimpleExpression extends AbstractExpression {
 
   private final Object value;
 
-  public SimpleExpression(FilterExprPath pathPrefix, String propertyName, Op type, Object value) {
-    super(pathPrefix, propertyName);
+  public SimpleExpression(String propertyName, Op type, Object value) {
+    super(propertyName);
     this.type = type;
     this.value = value;
   }
