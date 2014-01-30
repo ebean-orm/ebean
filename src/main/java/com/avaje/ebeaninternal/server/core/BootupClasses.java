@@ -8,8 +8,9 @@ import java.util.List;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.config.CompoundType;
 import com.avaje.ebean.config.ScalarTypeConverter;
@@ -22,8 +23,6 @@ import com.avaje.ebean.event.ServerConfigStartup;
 import com.avaje.ebean.event.TransactionEventListener;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.util.ClassPathSearchMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Interesting classes for a EbeanServer such as Embeddable, Entity,
@@ -32,8 +31,6 @@ import org.slf4j.LoggerFactory;
 public class BootupClasses implements ClassPathSearchMatcher {
 
     private static final Logger logger = LoggerFactory.getLogger(BootupClasses.class);
-
-    private ArrayList<Class<?>> xmlBeanList = new ArrayList<Class<?>>();
 
     private ArrayList<Class<?>> embeddableList = new ArrayList<Class<?>>();
 
@@ -55,8 +52,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
     private ArrayList<Class<?>> beanQueryAdapterList = new ArrayList<Class<?>>();
 
-    private ArrayList<Class<?>> luceneIndexList = new ArrayList<Class<?>>();
-
     private ArrayList<Class<?>> serverConfigStartupList = new ArrayList<Class<?>>();
     private ArrayList<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<ServerConfigStartup>();
 
@@ -75,7 +70,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
     }
 
     private BootupClasses(BootupClasses parent) {
-        this.xmlBeanList.addAll(parent.xmlBeanList);
         this.embeddableList.addAll(parent.embeddableList);
         this.entityList.addAll(parent.entityList);
         this.scalarTypeList.addAll(parent.scalarTypeList);
@@ -86,7 +80,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
         this.beanFinderList.addAll(parent.beanFinderList);
         this.beanListenerList.addAll(parent.beanListenerList);
         this.beanQueryAdapterList.addAll(parent.beanQueryAdapterList);
-        this.luceneIndexList.addAll(parent.luceneIndexList);
         this.serverConfigStartupList.addAll(parent.serverConfigStartupList);
     }
 
@@ -304,13 +297,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
         return beanListenerList;
     }
 
-    /**
-     * Return the list of XML Beans.
-     */
-    public ArrayList<Class<?>> getXmlBeanList() {
-        return xmlBeanList;
-    }
-
     public void add(Iterator<Class<?>> it) {
         while (it.hasNext()) {
             Class<?> clazz = it.next();
@@ -325,11 +311,7 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
         } else if (isEntity(cls)) {
             entityList.add(cls);
-
-        } else if (isXmlBean(cls)){
-            entityList.add(cls);
-            //xmlBeanList.add(cls);
-            
+  
         } else if (isInterestingInterface(cls)) {
             return true;
 
@@ -416,20 +398,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
         Annotation ann = cls.getAnnotation(Embeddable.class);
         if (ann != null) {
             return true;
-        }
-        return false;
-    }
-    
-    private boolean isXmlBean(Class<?> cls) {
-
-        Annotation ann = cls.getAnnotation(XmlRootElement.class);
-        if (ann != null) {
-            return true;
-        }
-        ann = cls.getAnnotation(XmlType.class);
-        if (ann != null) {
-            // Only looking for Beans and not Enums
-            return !cls.isEnum();
         }
         return false;
     }

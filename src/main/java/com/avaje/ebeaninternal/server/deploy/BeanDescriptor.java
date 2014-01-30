@@ -97,7 +97,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   private final ConcurrentHashMap<String, BeanFkeyProperty> fkeyMap = new ConcurrentHashMap<String, BeanFkeyProperty>();
 
   public enum EntityType {
-    ORM, EMBEDDED, SQL, META, XMLELEMENT
+    ORM, EMBEDDED, SQL
   }
 
   /**
@@ -2403,13 +2403,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
   @SuppressWarnings("unchecked")
   private T createJsonBean() {
-    if (EntityType.XMLELEMENT.equals(entityType)) {
-      try {
-        return beanType.newInstance();
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      } 
-    }
     return (T)createEntityBean();
   }
   

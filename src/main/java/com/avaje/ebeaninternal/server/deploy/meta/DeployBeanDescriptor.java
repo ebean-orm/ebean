@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.Query.UseIndex;
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.config.TableName;
@@ -22,7 +25,6 @@ import com.avaje.ebean.event.BeanFinder;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanQueryAdapter;
-import com.avaje.ebean.meta.MetaAutoFetchStatistic;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistController;
@@ -34,8 +36,6 @@ import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.reflect.BeanReflect;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Describes Beans including their deployment information.
@@ -57,8 +57,6 @@ public class DeployBeanDescriptor<T> {
   private static final String I_SCALAOBJECT = "scala.ScalaObject";
 
   private static final Logger logger = LoggerFactory.getLogger(DeployBeanDescriptor.class);
-
-  private static final String META_BEAN_PREFIX = MetaAutoFetchStatistic.class.getName().substring(0, 20);
 
   /**
    * Map of BeanProperty Linked so as to preserve order.
@@ -247,9 +245,6 @@ public class DeployBeanDescriptor<T> {
    */
   public boolean checkReadAndWriteMethods() {
 
-    if (isMeta()) {
-      return true;
-    }
     boolean missingMethods = false;
 
     Iterator<DeployBeanProperty> it = propMap.values().iterator();
@@ -289,20 +284,9 @@ public class DeployBeanDescriptor<T> {
 
   public EntityType getEntityType() {
     if (entityType == null) {
-      entityType = isMeta() ? EntityType.META : EntityType.ORM;
+      entityType = EntityType.ORM;
     }
     return entityType;
-  }
-
-  /**
-   * Return true if this is a Meta entity bean.
-   * <p>
-   * The Meta entity beans are not based on real tables but get meta information
-   * from memory such as all the entity bean meta data.
-   * </p>
-   */
-  private boolean isMeta() {
-    return beanType.getName().startsWith(META_BEAN_PREFIX);
   }
 
   public void add(DRawSqlMeta rawSqlMeta) {

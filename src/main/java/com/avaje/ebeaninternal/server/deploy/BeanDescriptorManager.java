@@ -106,9 +106,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final BeanManagerFactory beanManagerFactory;
 
   private int enhancedClassCount;
-  private int subclassClassCount;
-  private final HashSet<String> subclassedEntities = new HashSet<String>();
-
+  
   private final boolean updateChangesOnly;
 
   private final BootupClasses bootupClasses;
@@ -447,26 +445,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     logger.debug("BeanPersistControllers[" + cc + "] BeanFinders[" + fc + "] BeanPersistListeners[" + lc + "] BeanQueryAdapters[" + qa + "]");
   }
 
-  /**
-   * Log Warning if mixing subclass and enhancement.
-   * <p>
-   * If enhancement is used for some classes it is expected to be used for all
-   * and vice versa.
-   * </p>
-   */
   private void logStatus() {
-
-    String msg = "Entities enhanced[" + enhancedClassCount + "] subclassed[" + subclassClassCount + "]";
-    logger.info(msg);
-
-    if (enhancedClassCount > 0) {
-      if (subclassClassCount > 0) {
-        String subclassEntityNames = subclassedEntities.toString();
-
-        String m = "Mixing enhanced and subclassed entities. Subclassed classes:" + subclassEntityNames;
-        logger.warn(m);
-      }
-    }
+    logger.info("Entities enhanced[" + enhancedClassCount + "]");
   }
 
   private <T> BeanDescriptor<T> createEmbedded(Class<T> beanClass) {
@@ -1462,25 +1442,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private void checkEnhanced(DeployBeanDescriptor<?> desc, Class<?> beanClass) {
     // the bean already implements EntityBean
     checkInheritedClasses(true, beanClass);
-
     desc.setFactoryType(beanClass);
-    if (!beanClass.getName().startsWith("com.avaje.ebean.meta")) {
-      enhancedClassCount++;
-    }
+    enhancedClassCount++;
   }
 
   private void checkSubclass(DeployBeanDescriptor<?> desc, Class<?> beanClass) {
 
-    checkInheritedClasses(false, beanClass);
-    desc.checkReadAndWriteMethods();
-
-    EntityType entityType = desc.getEntityType();
-    if (EntityType.XMLELEMENT.equals(entityType)) {
-      desc.setFactoryType(beanClass);
-      
-    } else {
-      throw new PersistenceException("Entity type "+beanClass+" is not an enhanced entity bean. Subclassing is not longer supported in Ebean");
-    }
+    throw new PersistenceException("Entity type "+beanClass+" is not an enhanced entity bean. Subclassing is not longer supported in Ebean");
   }
 
   /**

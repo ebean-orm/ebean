@@ -2,8 +2,6 @@ package com.avaje.ebeaninternal.server.autofetch;
 
 import java.io.Serializable;
 
-import com.avaje.ebean.meta.MetaAutoFetchStatistic.QueryStats;
-
 /**
  * Used to accumulate query execution statistics.
  */
@@ -21,10 +19,6 @@ public class StatisticsQuery implements Serializable {
 	
 	public StatisticsQuery(String path){
 		this.path = path;
-	}
-		
-	public QueryStats createPublicMeta() {
-		return new QueryStats(path, exeCount, totalBeanLoaded, totalMicros);
 	}
 	
 	public void add(long beansLoaded, long micros) {

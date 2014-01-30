@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.autofetch;
 import java.io.Serializable;
 
 import com.avaje.ebean.bean.ObjectGraphOrigin;
-import com.avaje.ebean.meta.MetaAutoFetchTunedQueryInfo;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 
@@ -71,13 +70,6 @@ public class TunedQueryInfo implements Serializable {
 				return false;
 			}
 		}
-	}
-
-	/**
-	 * Create a copy of this tuned fetch data for public consumption.
-	 */
-	public MetaAutoFetchTunedQueryInfo createPublicMeta() {
-		return new MetaAutoFetchTunedQueryInfo(origin, tunedDetail.toString(), profileCount, tunedCount, lastTuneTime);
 	}
 
 	/**

@@ -1,19 +1,14 @@
 package com.avaje.ebeaninternal.server.autofetch;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.avaje.ebean.bean.NodeUsageCollector;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.ObjectGraphOrigin;
-import com.avaje.ebean.meta.MetaAutoFetchStatistic;
-import com.avaje.ebean.meta.MetaAutoFetchStatistic.NodeUsageStats;
-import com.avaje.ebean.meta.MetaAutoFetchStatistic.QueryStats;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebean.text.PathProperties.Props;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -50,30 +45,6 @@ public class Statistics implements Serializable {
 			// NB: create a copy of queryPoint allowing garbage
 			// collection of source...
 			return new TunedQueryInfo(origin, newFetchDetail, counter);
-		}
-	}
-	
-	public MetaAutoFetchStatistic createPublicMeta() {
-		
-		synchronized (monitor) {
-			
-			StatisticsQuery[] sourceQueryStats = queryStatsMap.values().toArray(new StatisticsQuery[queryStatsMap.size()]);
-			List<QueryStats> destQueryStats = new ArrayList<QueryStats>(sourceQueryStats.length);
-			
-			// copy the query statistics
-			for (int i = 0; i < sourceQueryStats.length; i++) {
-				destQueryStats.add(sourceQueryStats[i].createPublicMeta());
-			}
-			
-			StatisticsNodeUsage[] sourceNodeUsage = nodeUsageMap.values().toArray(new StatisticsNodeUsage[nodeUsageMap.size()]);
-			List<NodeUsageStats> destNodeUsage = new ArrayList<NodeUsageStats>(sourceNodeUsage.length);
-
-			// copy the node usage statistics
-			for (int i = 0; i < sourceNodeUsage.length; i++) {
-				destNodeUsage.add(sourceNodeUsage[i].createPublicMeta());
-			}
-			
-			return new MetaAutoFetchStatistic(origin, counter, destQueryStats, destNodeUsage);
 		}
 	}
 	

@@ -5,16 +5,16 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.bean.NodeUsageCollector;
-import com.avaje.ebean.meta.MetaAutoFetchStatistic.NodeUsageStats;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.query.SplitName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Collects usages statistics for a given node in the object graph.
@@ -42,13 +42,6 @@ public class StatisticsNodeUsage implements Serializable {
 	public StatisticsNodeUsage(String path, boolean queryTuningAddVersion) {
 		this.path = path;
 		this.queryTuningAddVersion = queryTuningAddVersion;
-	}
-	
-	public NodeUsageStats createPublicMeta() {
-		synchronized(monitor){
-			String[] usedProps = aggregateUsed.toArray(new String[aggregateUsed.size()]);
-			return new NodeUsageStats(path, profileCount, profileUsedCount, usedProps);
-		}
 	}
 	
 	public void buildTunedFetch(PathProperties pathProps, BeanDescriptor<?> rootDesc) {

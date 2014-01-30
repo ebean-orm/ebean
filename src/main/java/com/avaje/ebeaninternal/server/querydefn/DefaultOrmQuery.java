@@ -31,7 +31,6 @@ import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
-import com.avaje.ebean.meta.MetaAutoFetchStatistic;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.HashQuery;
 import com.avaje.ebeaninternal.api.HashQueryPlan;
@@ -316,14 +315,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
     public ExpressionFactory getExpressionFactory() {
 		return expressionFactory;
-	}
-
-	public MetaAutoFetchStatistic getMetaAutoFetchStatistic() {
-	    if (parentNode != null && server != null){
-	        ObjectGraphOrigin origin = parentNode.getOriginQueryPoint();
-	        return server.find(MetaAutoFetchStatistic.class, origin.getKey());
-	    }
-	    return null;
 	}
 	
     /**
