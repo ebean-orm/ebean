@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Entity;
+
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.Monitor;
 
@@ -124,7 +126,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
   private ClassContext getClassContext(Class<?> beanType) {
 
-    String clsName = beanType.getName();
+    String clsName = getBeanBaseType(beanType).getName();
     ClassContext classMap = typeCache.get(clsName);
     if (classMap == null) {
       classMap = new ClassContext();
@@ -133,6 +135,17 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     return classMap;
   }
 
+  private Class<?> getBeanBaseType(Class<?> beanType){
+	  Class<?> parent = beanType.getSuperclass();
+	  
+	  while(parent != null && parent.isAnnotationPresent(Entity.class)){
+		  beanType = parent;
+		  
+		  parent = parent.getSuperclass();
+	  }
+	  
+	  return beanType;
+  }
   private static class ClassContext {
 
     private final Map<Object, Object> map = new HashMap<Object, Object>();
