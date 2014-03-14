@@ -11,9 +11,9 @@ public class ClassPathSearchFilter {
 
 	private static final String COM_AVAJE_EBEANINTERNAL_SERVER_BEAN = "com.avaje.ebeaninternal.server.bean";
 
-    private static final String COM_AVAJE_EBEAN_META = "com.avaje.ebean.meta";
+  private static final String COM_AVAJE_EBEAN_META = "com.avaje.ebean.meta";
 
-    private boolean defaultPackageMatch = true;
+  private boolean defaultPackageMatch = true;
 
 	private boolean defaultJarMatch = true;
 
@@ -121,7 +121,7 @@ public class ClassPathSearchFilter {
 	 * Add a jar to explicitly exclude in the search.
 	 */
 	public void excludeJar(String jarName) {
-		includeJarSet.add(jarName);
+		excludeJarSet.add(jarName);
 	}
 
 	/**
@@ -129,7 +129,6 @@ public class ClassPathSearchFilter {
 	 */
 	public void includeJar(String jarName) {
 		includeJarSet.add(jarName);
-
 	}
 
 	/**
