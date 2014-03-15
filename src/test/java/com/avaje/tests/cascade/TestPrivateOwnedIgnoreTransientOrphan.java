@@ -29,12 +29,14 @@ public class TestPrivateOwnedIgnoreTransientOrphan extends BaseTestCase {
 		
 		master1 = Ebean.find(master0.getClass(), master0.getId());
 		
+		// Add then remove a bean that was never saved (to the DB)
 		master1.getDetails().add(new TSDetail());
 		master1.getDetails().clear();
 
 		try{
 			Ebean.save(master1);
 		} catch (OptimisticLockException exception) {
+		  // Occured when the "unsaved" bean was wrongly being deleted
 			Assert.fail("Optimistic lock exception wrongly thrown: " + exception.getMessage());
 			return;
 		}

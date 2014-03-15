@@ -764,7 +764,14 @@ public final class DefaultPersister implements Persister {
 				// increase depth for batching order
 				t.depth(+1);
 				for (Object removedBean : modifyRemovals) {
-					deleteRecurse(removedBean, t);
+				  if (removedBean instanceof EntityBean) {
+				    EntityBean eb = (EntityBean)removedBean;
+				    if (eb._ebean_getIntercept().isLoaded()) {
+				      // only delete if the bean was loaded meaning that
+				      // it is know to exist in the DB
+				      deleteRecurse(removedBean, t);
+				    }
+				  }
 				}
 				t.depth(-1);
 			}
