@@ -43,7 +43,8 @@ final class NotExpression implements SpiExpression {
   }
 
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoFetchHash(builder);
+    builder.add(NotExpression.class);
+    exp.queryPlanHash(request, builder);
   }
 
   public int queryBindHash() {
