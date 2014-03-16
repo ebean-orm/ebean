@@ -82,16 +82,22 @@ public class BootupClassPathSearch {
 		ClassPathSearchFilter filter = new ClassPathSearchFilter();
 		filter.addDefaultExcludePackages();
 
-        if (packages != null) {
+        if (packages != null && packages.size() > 0) {
             for (String packageName : packages) {
                 filter.includePackage(packageName);
             }
+
+	          // if they specified include packages, they don't want by default to include everything
+	          filter.setDefaultPackageMatch(false);
         }
 
-        if (jars != null) {
+        if (jars != null && jars.size() > 0) {
             for (String jarName : jars) {
                 filter.includeJar(jarName);
             }
+
+	          // if they specified jars to specifically include, they don't want everything included
+	          filter.setDefaultJarMatch(false);
         }
 
 		return filter;
