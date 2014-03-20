@@ -634,12 +634,13 @@ public class JdbcTransaction implements SpiTransaction {
     try {
       connection.rollback();
 
+    } catch (Exception ex) {
+      throw new PersistenceException(ex);
+      
+    } finally {
       // these will not throw an exception
       deactivate();
       notifyRollback(cause);
-
-    } catch (Exception ex) {
-      throw new PersistenceException(ex);
     }
   }
 
