@@ -597,12 +597,35 @@ public class DataSourcePool implements DataSource {
      */
     protected void returnConnection(PooledConnection pooledConnection) {
 
-        if (poolListener != null) {
-            poolListener.onBeforeReturnConnection(pooledConnection);
-        }
-        queue.returnPooledConnection(pooledConnection);
+      // return a normal 'good' connection
+      returnTheConnection(pooledConnection, false);
     }
-    
+
+    /**
+     * This is a bad connection and must be removed from the pool's busy list and fully closed.
+     */
+    protected void returnConnectionForceClose(PooledConnection pooledConnection) {
+
+      returnTheConnection(pooledConnection, true);
+    }
+
+    /**
+     * Return connection. If forceClose is true then this is a bad connection that
+     * must be removed and closed fully.
+     */
+    private void returnTheConnection(PooledConnection pooledConnection, boolean forceClose) {
+
+      if (poolListener != null && !forceClose) {
+          poolListener.onBeforeReturnConnection(pooledConnection);
+      }
+      queue.returnPooledConnection(pooledConnection, forceClose);
+      
+      if (forceClose) {
+        // Got a bad connection so check the pool
+        checkDataSource();
+      }
+    }
+
     /**
      * Collect statistics of a connection that is fully closing
      */

@@ -238,7 +238,7 @@ public class PooledConnectionQueue {
     /**
      * Return a PooledConnection.
      */
-    protected void returnPooledConnection(PooledConnection c) {
+    protected void returnPooledConnection(PooledConnection c, boolean forceClose) {
         
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -246,7 +246,7 @@ public class PooledConnectionQueue {
             if (!busyList.remove(c)) {
                 logger.error("Connection [{}] not found in BusyList? ", c);
             }
-            if (c.shouldTrimOnReturn(lastResetTime, maxAgeMillis)) {
+            if (forceClose || c.shouldTrimOnReturn(lastResetTime, maxAgeMillis)) {
                 c.closeConnectionFully(false);
                 
             } else {

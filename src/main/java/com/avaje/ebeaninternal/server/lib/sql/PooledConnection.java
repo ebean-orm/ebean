@@ -508,9 +508,8 @@ public class PooledConnection extends ConnectionDelegator {
 		
 		if (hadErrors) {
 			if (!pool.validateConnection(this)) {
-				// the connection is BAD, close it and test the pool
-				closeConnectionFully(false);
-				pool.checkDataSource();
+				// the connection is BAD, remove it, close it and test the pool
+				pool.returnConnectionForceClose(this);
 				return;
 			}
 		}
@@ -535,10 +534,9 @@ public class PooledConnection extends ConnectionDelegator {
 			pool.returnConnection(this);
 
 		} catch (Exception ex) {
-			// the connection is BAD, close it and test the pool
+      // the connection is BAD, remove it, close it and test the pool
 		  logger.warn("Error when trying to return connection to pool, closing fully.", ex);
-			closeConnectionFully(false);
-			pool.checkDataSource();
+      pool.returnConnectionForceClose(this);
 		}
 	}
 
