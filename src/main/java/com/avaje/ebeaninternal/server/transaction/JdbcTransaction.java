@@ -593,12 +593,14 @@ public class JdbcTransaction implements SpiTransaction {
         }
         connection.commit();
       }
-      // these will not throw an exception
-      deactivate();
-      notifyCommit();
 
     } catch (Exception e) {
       throw new RollbackException(e);
+      
+    } finally {
+      // these will not throw an exception
+      deactivate();
+      notifyCommit();      
     }
   }
 
