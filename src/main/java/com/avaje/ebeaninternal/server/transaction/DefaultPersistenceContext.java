@@ -145,6 +145,17 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     return beanType;
   }
 
+  private Class<?> getBeanBaseType(Class<?> beanType){
+	  Class<?> parent = beanType.getSuperclass();
+	  
+	  while(parent != null && parent.isAnnotationPresent(Entity.class)){
+		  beanType = parent;
+		  
+		  parent = parent.getSuperclass();
+	  }
+	  
+	  return beanType;
+  }
   private static class ClassContext {
 
     private final Map<Object, Object> map = new HashMap<Object, Object>();
