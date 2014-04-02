@@ -9,7 +9,7 @@
 
   <groupId>org.avaje.ebeanorm</groupId>
   <artifactId>avaje-ebeanorm</artifactId>
-  <version>3.3.1-SNAPSHOT</version>
+  <version>4.0.1-RC1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>avaje-ebeanorm</name>
@@ -139,10 +139,11 @@
   <!-- Enhance the meta beans -->
   <build>
     <plugins>
+    <!-- 
       <plugin>
         <groupId>org.avaje.ebeanorm</groupId>
         <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
-        <version>3.3.1-SNAPSHOT</version>
+        <version>3.2.2</version>
         <executions>
            <execution>
             <id>main</id>
@@ -170,7 +171,7 @@
           </execution>
         </executions>
       </plugin>
-
+ -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
