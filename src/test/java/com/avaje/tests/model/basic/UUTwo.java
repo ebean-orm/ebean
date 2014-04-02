@@ -2,6 +2,7 @@ package com.avaje.tests.model.basic;
 
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -14,7 +15,7 @@ public class UUTwo {
     
     String name;
 
-    @ManyToOne
+    @ManyToOne(cascade=CascadeType.PERSIST)
     UUOne master;
     
     public UUID getId() {
