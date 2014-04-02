@@ -32,6 +32,10 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
 		this.persistExecute = persistExecute;
 	}
 
+	public void setNotNullAsLoaded() {
+	  // Do nothing by default
+	}
+	
 	/**
 	 * Execute a the request or queue/batch it for later execution.
 	 */

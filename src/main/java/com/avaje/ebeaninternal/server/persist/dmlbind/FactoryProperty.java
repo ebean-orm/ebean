@@ -32,11 +32,11 @@ public class FactoryProperty {
 		}
 		
 		if (prop.isLob()) {
-			if (DmlMode.WHERE.equals(mode) || !withLobs) {
+			if (!withLobs) {
 				// Lob exclusion
 				return null;
 			} else {
-			    return prop.isDbEncrypted() ? new BindableEncryptedProperty(prop, bindEncryptDataFirst) : new BindableProperty(prop);
+			  return prop.isDbEncrypted() ? new BindableEncryptedProperty(prop, bindEncryptDataFirst) : new BindableProperty(prop);
 			}
 		}
 

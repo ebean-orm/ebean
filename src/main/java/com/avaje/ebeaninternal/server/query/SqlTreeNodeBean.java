@@ -45,17 +45,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    */
   final boolean partialObject;
 
-  /**
-   * The set of properties explicitly included in the query. We actually add the
-   * manyProp names to this as they are references/proxies we add via
-   * createListProxies().
-   */
-  final Set<String> partialProps;
-
-  /**
-   * The hash of the partialProps (calculate once).
-   */
-  int partialHash;
 
   final BeanProperty[] properties;
 
@@ -79,9 +68,9 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
   final String prefix;
 
-  Set<String> includedProps;
 
   final Map<String, String> pathMap;
+
   
   final BeanPropertyAssocMany<?> lazyLoadParent;
   
@@ -113,21 +102,11 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     this.tableJoins = props.getTableJoins();
 
     this.partialObject = props.isPartialObject();
-    this.partialProps = props.getIncludedProperties();
-    this.partialHash = partialObject ? partialProps.hashCode() : 0;
 
     this.readOnlyLeaf = props.isReadOnly();
 
     this.properties = props.getProps();
 
-    if (partialObject) {
-      // merge the explicit partialProps with the implicitly added
-      // list proxies (that are added by createListProxies()) to get
-      // the full set of 'loaded' properties for this bean.
-      includedProps = LoadedPropertiesCache.get(partialHash, partialProps, desc);
-    } else {
-      includedProps = null;
-    }
 
     if (myChildren == null) {
       children = NO_CHILDREN;
@@ -159,7 +138,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     }
   }
 
-  protected void postLoad(DbReadContext cquery, Object loadedBean, Object id, Object lazyLoadParentId) {
+  protected void postLoad(DbReadContext cquery, EntityBean loadedBean, Object id, Object lazyLoadParentId) {
   }
 
   public void buildSelectExpressionChain(List<String> selectChain) {
@@ -180,7 +159,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * read the properties from the resultSet.
    */
-  public void load(DbReadContext ctx, Object parentBean) throws SQLException {
+  public void load(DbReadContext ctx, EntityBean parentBean) throws SQLException {
 
     Object lazyLoadParentId = null;
     if (lazyLoadParent != null) {
@@ -188,12 +167,12 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     }
     
     // bean already existing in the persistence context
-    Object contextBean = null;
+    EntityBean contextBean = null;
 
     Class<?> localType;
     BeanDescriptor<?> localDesc;
     IdBinder localIdBinder;
-    Object localBean;
+    EntityBean localBean;
 
     if (inheritInfo != null) {
       InheritInfo localInfo = inheritInfo.readType(ctx);
@@ -232,7 +211,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
         localBean = null;
       } else {
         // check the PersistenceContext to see if the bean already exists
-        contextBean = persistenceContext.putIfAbsent(id, localBean);
+        contextBean = (EntityBean)persistenceContext.putIfAbsent(id, localBean);
         if (contextBean == null) {
           // bean just added to the persistenceContext
           contextBean = localBean;
@@ -241,10 +220,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
           if (isLoadContextBeanNeeded(queryMode, contextBean)){ 
             // refresh it anyway (lazy loading for example)
             localBean = contextBean;
-            if (localBean instanceof EntityBean) {
-              // temporarily turn off interception during load
-              ((EntityBean) localBean)._ebean_getIntercept().setIntercepting(false);
-            }
           } else {
             // ignore the DB data...
             localBean = null;
@@ -305,12 +280,11 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       ctx.setCurrentPrefix(prefix, pathMap);
       createListProxies(localDesc, ctx, localBean);
 
-      localDesc.postLoad(localBean, includedProps);
+      localDesc.postLoad(localBean, null);
 
       if (localBean instanceof EntityBean) {
         EntityBeanIntercept ebi = ((EntityBean) localBean)._ebean_getIntercept();
         ebi.setPersistenceContext(persistenceContext);
-        ebi.setLoadedProps(includedProps);
         if (Mode.LAZYLOAD_BEAN.equals(queryMode)) {
           // Lazy Load does not reset the dirty state
           ebi.setLoadedLazy();
@@ -321,6 +295,8 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
         if (partialObject) {
           ctx.register(null, ebi);
+        } else {
+          ebi.setFullyLoadedBean(true);
         }
 
         if (disableLazyLoad) {
@@ -355,7 +331,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    * Create lazy loading proxies for the Many's except for the one that is
    * included in the actual query.
    */
-  private void createListProxies(BeanDescriptor<?> localDesc, DbReadContext ctx, Object localBean) {
+  private void createListProxies(BeanDescriptor<?> localDesc, DbReadContext ctx, EntityBean localBean) {
 
     BeanPropertyAssocMany<?> fetchedMany = ctx.getManyProperty();
 

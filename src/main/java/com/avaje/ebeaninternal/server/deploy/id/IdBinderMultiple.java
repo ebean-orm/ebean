@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.core.InternString;
@@ -89,7 +90,6 @@ public final class IdBinderMultiple implements IdBinder {
     }
 
 
-
   public int getPropertyCount() {
     return props.length;
   }
@@ -134,7 +134,7 @@ public final class IdBinderMultiple implements IdBinder {
 	
 	public void addIdInBindValue(SpiExpressionRequest request, Object value) {
 		for (int i = 0; i < props.length; i++) {
-			request.addBindValue(props[i].getValue(value));
+			request.addBindValue(props[i].getValue((EntityBean)value));
 		}
 	}
 
@@ -171,7 +171,7 @@ public final class IdBinderMultiple implements IdBinder {
 		return sb.toString();
 	}
 
-	public Object[] getIdValues(Object bean){
+	public Object[] getIdValues(EntityBean bean){
 		Object[] bindvalues = new Object[props.length];
 		for (int i = 0; i < props.length; i++) {
 			bindvalues[i] = props[i].getValue(bean);
@@ -238,7 +238,7 @@ public final class IdBinderMultiple implements IdBinder {
         }
     }
 
-    public Object readSet(DbReadContext ctx, Object bean) throws SQLException {
+    public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
 		
 		LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
 		boolean notNull = false;
@@ -367,7 +367,7 @@ public final class IdBinderMultiple implements IdBinder {
 		return sb.toString();
 	}
 	
-	public Object convertSetId(Object idValue, Object bean) {
+	public Object convertSetId(Object idValue, EntityBean bean) {
 
 		// allow Map or String for concatenated id
 		Map<?,?> mapVal = null;

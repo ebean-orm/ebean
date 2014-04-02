@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
@@ -86,7 +87,7 @@ public class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
         // nothing to do here
     }
 
-    public void load(DbReadContext ctx, Object parentBean) throws SQLException {
+    public void load(DbReadContext ctx, EntityBean parentBean) throws SQLException {
         // nothing to do here
     }
 

@@ -15,9 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.PersistenceException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
@@ -77,6 +74,8 @@ import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.util.SortByClause;
 import com.avaje.ebeaninternal.util.SortByClause.Property;
 import com.avaje.ebeaninternal.util.SortByClauseParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Describes Beans including their deployment information.
@@ -180,12 +179,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   private final BeanDescriptorMap owner;
 
-  /**
-   * The EntityBean type used to create new EntityBeans.
-   */
-  private final Class<?> factoryType;
-
-  private final boolean enhancedBean;
+  
+  private final String[] properties;
+  
+  private final int propertyCount;
+  
 
   /**
    * Intercept pre post on insert,update,delete and postLoad(). Server side
@@ -223,7 +221,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   /**
    * Derived list of properties that are used for version concurrency checking.
    */
-  private final BeanProperty[] propertiesVersion;
+  private final BeanProperty versionProperty;
   private final BeanProperty propertiesNaturalKey;
 
   /**
@@ -284,11 +282,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   final BeanProperty[] propertiesNonTransient;
 
-  /**
-   * Set to true if the bean has version properties or an embedded bean has
-   * version properties.
-   */
-  private final BeanProperty propertyFirstVersion;
 
   /**
    * Set when the Id property is a single non-embedded property. Can make life
@@ -348,6 +341,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
   private final String descriptorId;
 
+
   private SpiEbeanServer ebeanServer;
 
   private ServerCache beanCache;
@@ -363,6 +357,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.cacheManager = owner.getCacheManager();
     this.serverName = owner.getServerName();
     this.entityType = deploy.getEntityType();
+    this.properties = deploy.getProperties();
+    this.propertyCount = this.properties.length;
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());
@@ -370,8 +366,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
     this.typeManager = typeManager;
     this.beanType = deploy.getBeanType();
-    this.factoryType = deploy.getFactoryType();
-    this.enhancedBean = beanType.equals(factoryType);
     this.namedQueries = deploy.getNamedQueries();
     this.namedUpdates = deploy.getNamedUpdates();
 
@@ -416,7 +410,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.propertiesBaseCompound = listHelper.getBaseCompound();
     this.propertiesId = listHelper.getId();
     this.propertiesNaturalKey = listHelper.getNaturalKey();
-    this.propertiesVersion = listHelper.getVersion();
+    this.versionProperty = listHelper.getVersionProperty();
     this.propertiesEmbedded = listHelper.getEmbedded();
     this.propertiesLocal = listHelper.getLocal();
     this.unidirectional = listHelper.getUnidirectional();
@@ -440,7 +434,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.namesOfManyPropsHash = namesOfManyProps.hashCode();
 
     this.derivedTableJoins = listHelper.getTableJoin();
-    this.propertyFirstVersion = listHelper.getFirstVersion();
 
     if (propertiesId.length == 1) {
       this.propertySingleId = propertiesId[0];
@@ -491,19 +484,19 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Determine the concurrency mode based on the existence of a non-null version
    * property value.
    */
-  public ConcurrencyMode determineConcurrencyMode(Object bean) {
+  public ConcurrencyMode determineConcurrencyMode(EntityBean bean) {
 
-    if (propertyFirstVersion == null) {
+    if (versionProperty == null) {
       return ConcurrencyMode.NONE;
     }
-    Object v = propertyFirstVersion.getValue(bean);
+    Object v = versionProperty.getValue(bean);
     return (v == null) ? ConcurrencyMode.NONE : ConcurrencyMode.VERSION;
   }
 
   /**
    * Return the Set of embedded beans that have changed.
    */
-  public Set<String> getDirtyEmbeddedProperties(Object bean) {
+  public Set<String> getDirtyEmbeddedProperties(EntityBean bean) {
 
     HashSet<String> dirtyProperties = null;
 
@@ -532,7 +525,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   /**
    * Determine the non-null properties of the bean.
    */
-  public Set<String> determineLoadedProperties(Object bean) {
+  public Set<String> determineLoadedProperties(EntityBean bean) {
 
     HashSet<String> nonNullProps = new HashSet<String>();
 
@@ -561,6 +554,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public EntityType getEntityType() {
     return entityType;
+  }
+
+  public int getPropertyCount() {
+    return propertyCount;
+  }
+  
+  public String[] getProperties() {
+    return properties;
   }
 
   /**
@@ -661,10 +662,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
   protected boolean hasInheritance() {
     return inheritInfo != null;
-  }
-
-  protected boolean isDynamicSubclass() {
-    return !beanType.equals(factoryType);
   }
 
   public SqlUpdate deleteById(Object id, List<Object> idList) {
@@ -902,10 +899,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     }
   }
 
+  public void cachePutBean(T bean) {
+    cachePutBeanData((EntityBean)bean);
+  }
+  
   /**
    * Put a bean into the bean cache.
    */
-  public void cachePutBeanData(Object bean) {
+  public void cachePutBeanData(EntityBean bean) {
 
     CachedBeanData beanData = CachedBeanDataFromBean.extract(this, bean);
 
@@ -936,10 +937,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     bc.checkEmptyLazyLoad();
     for (int i = 0; i < idList.size(); i++) {
       Object id = idList.get(i);
-      Object refBean = targetDescriptor.createReference(readOnly, id, null);
+      Object refBean = targetDescriptor.createReference(readOnly, id);
       EntityBeanIntercept refEbi = ((EntityBean) refBean)._ebean_getIntercept();
     
-      many.add(bc, refBean);
+      many.add(bc, (EntityBean)refBean);
       persistenceContext.put(id, refBean);
       refEbi.setPersistenceContext(persistenceContext);
     }
@@ -948,7 +949,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
   public void cachePutMany(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId) {
     BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
-
     ArrayList<Object> idList = new ArrayList<Object>();
 
     // get the underlying collection of beans (in the List, Set or Map)
@@ -998,14 +998,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       }
     }
 
-    T bean = (T) createBean();
+    EntityBean bean = createBean();
     convertSetId(id, bean);
     if (Boolean.TRUE.equals(readOnly)) {
-      ((EntityBean) bean)._ebean_getIntercept().setReadOnly(true);
+      bean._ebean_getIntercept().setReadOnly(true);
     }
 
     CachedBeanDataToBean.load(this, bean, d);
-    return bean;
+    return (T)bean;
   }
 
   public boolean cacheIsNaturalKey(String propName) {
@@ -1035,13 +1035,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Remove a bean from the cache given its Id.
    */
   public void cacheDelete(Object id, PersistRequestBean<T> deleteRequest) {
+    if (queryCache != null) {
+      queryCache.clear();
+    }
     if (beanCache != null) {
       beanCache.remove(id);
     }
     for (int i = 0; i < propertiesOneImported.length; i++) {
       BeanPropertyAssocMany<?> many = propertiesOneImported[i].getRelationshipProperty();
       if (many != null) {
-        propertiesOneImported[i].cacheDelete(true, deleteRequest.getBean());
+        propertiesOneImported[i].cacheDelete(true, deleteRequest.getEntityBean());
       }
     }
   }
@@ -1051,7 +1054,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       queryCache.clear();
     }
     for (int i = 0; i < propertiesOneImported.length; i++) {
-      propertiesOneImported[i].cacheDelete(false, insertRequest.getBean());
+      propertiesOneImported[i].cacheDelete(false, insertRequest.getEntityBean());
     }
   }
 
@@ -1060,17 +1063,22 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public void cacheUpdate(Object id, PersistRequestBean<T> updateRequest) {
 
+    if (queryCache != null) {
+      queryCache.clear();
+    }
+    
     ServerCache cache = getBeanCache();
     CachedBeanData cd = (CachedBeanData) cache.get(id);
     if (cd != null) {
       CachedBeanData newCd = CachedBeanDataUpdate.update(this, cd, updateRequest);
       cache.put(id, newCd);
       if (newCd.isNaturalKeyUpdate() && naturalKeyCache != null) {
-        Object oldKey = propertiesNaturalKey.getValue(updateRequest.getOldValues());
-        Object newKey = propertiesNaturalKey.getValue(updateRequest.getBean());
-        if (oldKey != null) {
-          naturalKeyCache.remove(oldKey);
-        }
+        //FIXME: natural key invalidate old value
+        //Object oldKey = propertiesNaturalKey.getValue(updateRequest.getOldValues());
+        Object newKey = propertiesNaturalKey.getValue(updateRequest.getEntityBean());
+        //if (oldKey != null) {
+        //  naturalKeyCache.remove(oldKey);
+        //}
         if (newKey != null) {
           naturalKeyCache.put(newKey, id);
         }
@@ -1087,24 +1095,24 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   public boolean loadFromCache(EntityBeanIntercept ebi) {
-    Object bean = ebi.getOwner();
+    EntityBean bean = ebi.getOwner();
     Object id = getId(bean);
 
     return loadFromCache(bean, ebi, id);
   }
 
-  public boolean loadFromCache(Object bean, EntityBeanIntercept ebi, Object id) {
+  public boolean loadFromCache(EntityBean bean, EntityBeanIntercept ebi, Object id) {
 
     CachedBeanData cacheData = (CachedBeanData) getBeanCache().get(id);
     if (cacheData == null) {
       return false;
     }
-    String lazyLoadProperty = ebi.getLazyLoadProperty();
-    if (lazyLoadProperty != null && !cacheData.containsProperty(lazyLoadProperty)) {
+    int lazyLoadProperty = ebi.getLazyLoadProperty();
+    if (lazyLoadProperty > -1 && !cacheData.containsProperty(lazyLoadProperty)) {
       return false;
     }
 
-    CachedBeanDataToBean.load(this, bean, ebi, cacheData);
+    CachedBeanDataToBean.load(this, bean, cacheData);
     return true;
   }
 
@@ -1315,7 +1323,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   /**
    * Create an EntityBean.
    */
-  public Object createBean() {
+  public EntityBean createBean() {
     return createEntityBean();
   }
 
@@ -1327,6 +1335,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       // Note factoryType is used indirectly via beanReflect
       return (EntityBean) beanReflect.createEntityBean();
       
+
     } catch (Exception ex) {
       throw new PersistenceException(ex);
     }
@@ -1348,25 +1357,18 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       }
     }
     try {
-      Object bean = createBean();
+      EntityBean eb = createBean();
 
-      convertSetId(id, bean);
-
-      EntityBean eb = (EntityBean) bean;
+      convertSetId(id, eb);
 
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
       ebi.setBeanLoaderByServerName(ebeanServer.getName());
 
-      if (parent != null) {
-        // Special case for a OneToOne ... parent
-        // needs to be added to context prior to query
-        ebi.setParentBean(parent);
-      }
 
       // Note: not creating proxies for many's...
       ebi.setReference();
 
-      return (T) bean;
+      return (T) eb;
 
     } catch (Exception ex) {
       throw new PersistenceException(ex);
@@ -1443,7 +1445,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   /**
    * Get a property value from a bean of this type.
    */
-  public Object getValue(Object bean, String property) {
+  public Object getValue(EntityBean bean, String property) {
     return getBeanProperty(property).getValue(bean);
   }
 
@@ -1471,13 +1473,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public Class<T> getBeanType() {
     return beanType;
-  }
-
-  /**
-   * Return the class type this BeanDescriptor describes.
-   */
-  public Class<?> getFactoryType() {
-    return factoryType;
   }
 
   /**
@@ -1511,16 +1506,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * unique id then a Map is built with the keys being the names of the
    * properties that make up the unique id.
    */
-  public Object getId(Object bean) {
+  public Object getId(EntityBean bean) {
 
     if (propertySingleId != null) {
-      if (inheritInfo != null && !enhancedBean) {
-        // avoid generated method via forced reflection use
-        return propertySingleId.getValueViaReflection(bean);
-
-      } else {
         return propertySingleId.getValue(bean);
-      }
     }
 
     // it is a concatenated id Not embedded
@@ -1564,7 +1553,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * after it has been converted to the correct type.
    * </p>
    */
-  public Object convertSetId(Object idValue, Object bean) {
+  public Object convertSetId(Object idValue, EntityBean bean) {
     return idBinder.convertSetId(idValue, bean);
   }
 
@@ -1596,19 +1585,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public boolean lazyLoadMany(EntityBeanIntercept ebi) {
 
-    String lazyLoadProperty = ebi.getLazyLoadProperty();
-    BeanProperty lazyLoadBeanProp = getBeanProperty(lazyLoadProperty);
+    int lazyLoadProperty = ebi.getLazyLoadProperty();
+    if (lazyLoadProperty == -1) {
+      return false;
+    }
+    String lazyLoadPropertyName = ebi.getProperty(lazyLoadProperty);
+    BeanProperty lazyLoadBeanProp = getBeanProperty(lazyLoadPropertyName);
 
     if (lazyLoadBeanProp instanceof BeanPropertyAssocMany<?>) {
       BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) lazyLoadBeanProp;
       manyProp.createReference(ebi.getOwner());
-      Set<String> loadedProps = ebi.getLoadedProps();
-      HashSet<String> newLoadedProps = new HashSet<String>();
-      if (loadedProps != null) {
-        newLoadedProps.addAll(loadedProps);
-      }
-      newLoadedProps.add(lazyLoadProperty);
-      ebi.setLoadedProps(newLoadedProps);
       ebi.setLoadedLazy();
       return true;
     }
@@ -1754,7 +1740,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return prop;
   }
 
-  protected Object getBeanPropertyWithInheritance(Object bean, String propName) {
+  protected Object getBeanPropertyWithInheritance(EntityBean bean, String propName) {
 
     BeanDescriptor<?> desc = getBeanDescriptor(bean.getClass());
     BeanProperty beanProperty = desc.findBeanProperty(propName);
@@ -2191,31 +2177,22 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Note that this DOES NOT find a version property on an embedded bean.
    * </p>
    */
-  public BeanProperty firstVersionProperty() {
-    return propertyFirstVersion;
+  public BeanProperty getVersionProperty() {
+    return versionProperty;
   }
 
   /**
    * Return true if this is an Update (rather than insert) given that the bean
    * is involved in a stateless update.
    */
-  public boolean isStatelessUpdate(Object bean) {
-    if (propertyFirstVersion == null) {
+  public boolean isStatelessUpdate(EntityBean bean) {
+    if (versionProperty == null) {
       Object versionValue = getId(bean);
       return !DmlUtil.isNullOrZero(versionValue);
     } else {
-      Object versionValue = propertyFirstVersion.getValue(bean);
+      Object versionValue = versionProperty.getValue(bean);
       return !DmlUtil.isNullOrZero(versionValue);
     }
-  }
-
-  /**
-   * Returns 'Version' properties on this bean. These are 'Counter' or 'Update
-   * Timestamp' type properties. Note version properties can also be on embedded
-   * beans rather than on the bean itself.
-   */
-  public BeanProperty[] propertiesVersion() {
-    return propertiesVersion;
   }
 
   /**
@@ -2242,7 +2219,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return propertiesLocal;
   }
 
-  public void jsonWrite(WriteJsonContext ctx, Object bean) {
+  public void jsonWrite(WriteJsonContext ctx, EntityBean bean) {
 
     if (bean != null) {
 
@@ -2268,7 +2245,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   @SuppressWarnings("unchecked")
-  private void jsonWriteProperties(WriteJsonContext ctx, Object bean) {
+  private void jsonWriteProperties(WriteJsonContext ctx, EntityBean bean) {
 
     boolean referenceBean = ctx.isReferenceBean();
 
@@ -2297,7 +2274,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
     if (!explicitAllProps && props == null) {
       // just render the loaded properties
-      props = ctx.getLoadedProps();
+      props = ((EntityBean)bean)._ebean_getIntercept().getLoadedPropertyNames();
     }
     if (props != null) {
       // render only the appropriate properties (when not all properties)
@@ -2386,7 +2363,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   
   private ReadBeanState jsonReadObject(ReadJsonContext ctx, String path) {
 
-    T bean = createJsonBean();
+    EntityBean bean = createEntityBean();
     ctx.pushBean(bean, path, this);
 
     do {
@@ -2421,7 +2398,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     if (isLoadedReference(loadedProps)) {
       ebi.setReference();
     } else {
-      ebi.setLoadedProps(loadedProps);
+      ebi.setLoaded();
     }
   }
 

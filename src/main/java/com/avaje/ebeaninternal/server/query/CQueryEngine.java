@@ -10,6 +10,7 @@ import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionTouched;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.BeanIdList;
@@ -226,7 +227,7 @@ public class CQueryEngine {
    */
   public <T> T find(OrmQueryRequest<T> request) {
 
-    T bean = null;
+    EntityBean bean = null;
 
     CQuery<T> cquery = queryBuilder.buildQuery(request);
 
@@ -247,7 +248,7 @@ public class CQueryEngine {
 
       request.executeSecondaryQueries(defaultSecondaryQueryBatchSize);
 
-      return bean;
+      return (T)bean;
 
     } catch (SQLException e) {
       throw cquery.createPersistenceException(e);

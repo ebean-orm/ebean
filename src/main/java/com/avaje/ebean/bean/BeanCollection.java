@@ -37,7 +37,7 @@ public interface BeanCollection<E> extends Serializable {
   /**
    * Return the bean that owns this collection.
    */
-  public Object getOwnerBean();
+  public EntityBean getOwnerBean();
 
   /**
    * Return the bean property name this collection represents.

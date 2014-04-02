@@ -26,6 +26,7 @@ public class TestReadOnlyPropagation extends BaseTestCase {
 		
 		Order order = Ebean.find(Order.class)
 			.setAutofetch(false)
+			.setUseCache(false)
 			.setReadOnly(true)
 			.setId(1)
 			.findUnique();

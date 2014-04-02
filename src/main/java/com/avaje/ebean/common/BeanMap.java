@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.avaje.ebean.bean.BeanCollectionLoader;
+import com.avaje.ebean.bean.EntityBean;
 
 /**
  * Map capable of lazy loading.
@@ -33,7 +34,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     this(new LinkedHashMap<K, E>());
   }
 
-  public BeanMap(BeanCollectionLoader ebeanServer, Object ownerBean, String propertyName) {
+  public BeanMap(BeanCollectionLoader ebeanServer, EntityBean ownerBean, String propertyName) {
     super(ebeanServer, ownerBean, propertyName);
   }
 

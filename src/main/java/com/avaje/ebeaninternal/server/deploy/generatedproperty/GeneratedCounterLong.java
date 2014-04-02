@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
 /**
@@ -14,14 +15,14 @@ public class GeneratedCounterLong implements GeneratedProperty {
     /**
      * Always returns a 1.
      */
-    public Object getInsertValue(BeanProperty prop, Object bean) {
+    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
         return Long.valueOf(1);
     }
 
     /**
      * Increments the current value by one.
      */
-    public Object getUpdateValue(BeanProperty prop, Object bean) {
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
         Long i = (Long) prop.getValue(bean);
         return Long.valueOf(i.longValue() + 1);
     }
@@ -33,6 +34,11 @@ public class GeneratedCounterLong implements GeneratedProperty {
         return true;
     }
 
+    @Override
+    public boolean includeInAllUpdates() {
+      return false;
+    }
+    
     /**
      * Include this in every insert setting initial counter value to 1.
      */

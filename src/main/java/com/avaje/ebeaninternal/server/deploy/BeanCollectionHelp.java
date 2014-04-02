@@ -8,6 +8,7 @@ import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
 
 /**
@@ -41,22 +42,22 @@ public interface BeanCollectionHelp<T> {
 	/**
 	 * Add a bean to the List Set or Map.
 	 */
-	public void add(BeanCollection<?> collection, Object bean);
+	public void add(BeanCollection<?> collection, EntityBean bean);
 
 	/**
 	 * Create a lazy loading proxy for a List Set or Map.
 	 */
-	public BeanCollection<T> createReference(Object parentBean, String propertyName);
+	public BeanCollection<T> createReference(EntityBean parentBean, String propertyName);
 
 	/**
 	 * Refresh the List Set or Map.
 	 */
-	public void refresh(EbeanServer server, Query<?> query, Transaction t, Object parentBean);
+	public void refresh(EbeanServer server, Query<?> query, Transaction t, EntityBean parentBean);
 	
 	/**
 	 * Apply the new refreshed BeanCollection to the appropriate property of the parent bean.
 	 */
-	public void refresh(BeanCollection<?> bc, Object parentBean);
+	public void refresh(BeanCollection<?> bc, EntityBean parentBean);
 
 	/**
 	 * Write the collection out as json.

@@ -358,45 +358,18 @@ public class WriteJsonContext implements JsonWriter {
         return beanState.isReferenceBean();
     }
     
-    public boolean includedProp(String name) {
-        return beanState.includedProp(name);
-    }
-    
-    public Set<String> getLoadedProps() {
-        return beanState.getLoadedProps();
-    }
-    
     
     public static class WriteBeanState {
         
         private final EntityBeanIntercept ebi;
-        private final Set<String> loadedProps;
         private final boolean referenceBean;
         private boolean firstKeyOut;
         
         public WriteBeanState(Object bean) {
-            if (bean instanceof EntityBean){
-                this.ebi = ((EntityBean)bean)._ebean_getIntercept();
-                this.loadedProps = ebi.getLoadedProps();
-                this.referenceBean = ebi.isReference();
-            } else {
-                this.ebi = null;
-                this.loadedProps = null;
-                this.referenceBean = false;
-            }
-        }
+          this.ebi = ((EntityBean)bean)._ebean_getIntercept();
+          this.referenceBean = ebi.isReference();          
+        }       
         
-        public Set<String> getLoadedProps() {
-            return loadedProps;
-        }
-        
-        public boolean includedProp(String name) {
-            if (loadedProps == null || loadedProps.contains(name)){
-                return true;
-            } else {
-                return false;
-            }
-        }
         public boolean isReferenceBean() {
             return referenceBean;
         }

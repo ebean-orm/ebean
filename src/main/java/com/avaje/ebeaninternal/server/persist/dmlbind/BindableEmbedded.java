@@ -18,103 +18,43 @@ public class BindableEmbedded implements Bindable {
 
     private final BeanPropertyAssocOne<?> embProp;
 
-    public BindableEmbedded(BeanPropertyAssocOne<?> embProp, List<Bindable> list) {
+    public BindableEmbedded(BeanPropertyAssocOne<?> embProp, List<Bindable> bindList) {
         this.embProp = embProp;
-        this.items = list.toArray(new Bindable[list.size()]);
+        this.items = bindList.toArray(new Bindable[bindList.size()]);        //this.props = propList.toArray(new BeanProperty[propList.size()]);
     }
 
     public String toString() {
         return "BindableEmbedded " + embProp + " items:" + Arrays.toString(items);
     }
 
-    public void dmlInsert(GenerateDmlRequest request, boolean checkIncludes) {
-        dmlAppend(request, checkIncludes);
-    }
-
-    public void dmlAppend(GenerateDmlRequest request, boolean checkIncludes) {
-        if (checkIncludes && !request.isIncluded(embProp)) {
-            return;
-        }
+    public void dmlAppend(GenerateDmlRequest request) {
 
         for (int i = 0; i < items.length; i++) {
-            items[i].dmlAppend(request, false);
+            items[i].dmlAppend(request);
         }
     }
 
-    /**
-     * Used for dynamic where clause generation.
-     */
-    public void dmlWhere(GenerateDmlRequest request, boolean checkIncludes, Object origBean) {
-        if (checkIncludes && !request.isIncludedWhere(embProp)) {
-            return;
-        }
-        Object embBean = embProp.getValue(origBean);
-        Object oldValues = getOldValue(embBean);
-
-        for (int i = 0; i < items.length; i++) {
-            items[i].dmlWhere(request, false, oldValues);
-        }
-    }
-
-    public void addChanged(PersistRequestBean<?> request, List<Bindable> list) {
-        if (request.hasChanged(embProp)) {
+    public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
+        if (request.isAddToUpdate(embProp)) {
             list.add(this);
         }
     }
 
-    public void dmlBind(BindableRequest bindRequest, boolean checkIncludes, Object bean)
-            throws SQLException {
-        
-        if (checkIncludes && !bindRequest.isIncluded(embProp)) {
-            return;
-        }
+    public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
 
-        // get the embedded bean
-        Object embBean = embProp.getValue(bean);
-        
+      // get the embedded bean
+      EntityBean embBean = (EntityBean)embProp.getValue(bean);
+      if (embBean == null) {
         for (int i = 0; i < items.length; i++) {
-            items[i].dmlBind(bindRequest, false, embBean);
+          items[i].dmlBind(bindRequest, null);
         }
-    }
-    
-    public void dmlBindWhere(BindableRequest bindRequest, boolean checkIncludes, Object bean)
-            throws SQLException {
-        
-        if (checkIncludes && !bindRequest.isIncludedWhere(embProp)) {
-            return;
-        }
-
-        // get the embedded bean
-        Object embBean = embProp.getValue(bean);
-        Object oldEmbBean = getOldValue(embBean);
-
+      } else {
+        //EntityBeanIntercept ebi = embBean._ebean_getIntercept();
         for (int i = 0; i < items.length; i++) {
-            items[i].dmlBindWhere(bindRequest, false, oldEmbBean);
+          //if (ebi.isLoadedProperty(props[i].getPropertyIndex())) {
+            items[i].dmlBind(bindRequest, embBean);
+          //}
         }
+      }
     }
-
-    /**
-     * Get the old bean which will have the original values.
-     * <p>
-     * These are bound to the WHERE clause for updates.
-     * </p>
-     */
-    private Object getOldValue(Object embBean) {
-
-        Object oldValues = null;
-
-        if (embBean instanceof EntityBean) {
-            // get the old embedded bean (with the original values)
-            oldValues = ((EntityBean) embBean)._ebean_getIntercept().getOldValues();
-        }
-
-        if (oldValues == null) {
-            // this embedded bean was not modified
-            // (or not an EntityBean)
-            oldValues = embBean;
-        }
-
-        return oldValues;
-    }
-
 }

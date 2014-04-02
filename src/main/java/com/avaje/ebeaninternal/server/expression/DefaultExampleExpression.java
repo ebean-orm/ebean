@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import com.avaje.ebean.ExampleExpression;
 import com.avaje.ebean.LikeType;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
@@ -43,7 +44,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   /**
    * The example bean containing the properties.
    */
-  private final Object entity;
+  private final EntityBean entity;
 
   /**
    * Set to true to use case insensitive expressions.
@@ -65,6 +66,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
    * expressions (like or equal to expressions).
    */
   private ArrayList<SpiExpression> list;
+
 
   /**
    * Construct the query by example expression.
@@ -181,6 +183,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
     for (int i = 0; i < list.size(); i++) {
       list.get(i).queryPlanHash(request, builder);
     }
+
+    return hc;
   }
 
   /**

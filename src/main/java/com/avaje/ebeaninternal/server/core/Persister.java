@@ -7,6 +7,7 @@ import com.avaje.ebean.CallableSql;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.Update;
+import com.avaje.ebean.bean.EntityBean;
 
 
 /**
@@ -17,23 +18,23 @@ public interface Persister {
     /**
      * Force an Update using the given bean.
      */
-    public void forceUpdate(Object entityBean, Set<String> updateProps, Transaction t, boolean deleteMissingChildren, boolean updateNullProperties);
+    public void forceUpdate(EntityBean entityBean, Set<String> updateProps, Transaction t, boolean deleteMissingChildren, boolean updateNullProperties);
 
     /**
      * Force an Insert using the given bean.
      */
-    public void forceInsert(Object entityBean, Transaction t);
+    public void forceInsert(EntityBean entityBean, Transaction t);
 
     /**
      * Insert or update the bean depending on its state.
      */
-    public void save(Object entityBean, Transaction t);
+    public void save(EntityBean entityBean, Transaction t);
 
     /**
      * Save the associations of a ManyToMany given the owner bean and the
      * propertyName of the ManyToMany collection.
      */
-    public void saveManyToManyAssociations(Object ownerBean, String propertyName, Transaction t);
+    public void saveManyToManyAssociations(EntityBean ownerBean, String propertyName, Transaction t);
 
     /**
      * Save an association (OneToMany, ManyToOne, OneToOne or ManyToMany).
@@ -45,12 +46,12 @@ public interface Persister {
      * @param t
      *            the transaction to use.
      */
-    public void saveAssociation(Object parentBean, String propertyName, Transaction t);
+    public void saveAssociation(EntityBean parentBean, String propertyName, Transaction t);
 
     /**
      * Delete the associations of a ManyToMany given the owner bean and the property name of the ManyToMany.
      */
-    public int deleteManyToManyAssociations(Object ownerBean, String propertyName, Transaction t);
+    public int deleteManyToManyAssociations(EntityBean ownerBean, String propertyName, Transaction t);
 
     /**
      * Delete a bean given it's type and id value.
@@ -63,7 +64,7 @@ public interface Persister {
     /**
      * Delete the bean.
      */
-    public void delete(Object entityBean, Transaction t);
+    public void delete(EntityBean entityBean, Transaction t);
 
     /**
      * Delete multiple beans given a collection of Id values.

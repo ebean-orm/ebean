@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.tests.model.embedded.EMain;
@@ -19,6 +20,7 @@ public class TestDynamicUpdate extends BaseTestCase {
 		b.getEmbeddable().setDescription("123");
 
 		EbeanServer server = Ebean.getServer(null);
+		
 		server.save(b);
 
 		Assert.assertNotNull(b.getId());
@@ -27,6 +29,11 @@ public class TestDynamicUpdate extends BaseTestCase {
 		EMain b2 = server.find(EMain.class, b.getId());
 
 		b2.getEmbeddable().setDescription("ABC");
+		
+		BeanState beanState = server.getBeanState(b2);
+		boolean dirty = beanState.isDirty();
+    Assert.assertTrue(dirty);
+    
 		server.save(b2);
 
 		server.beginTransaction();

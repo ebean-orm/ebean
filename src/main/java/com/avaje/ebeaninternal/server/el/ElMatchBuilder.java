@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.avaje.ebean.bean.EntityBean;
+
 
 /**
  * Contains the various ElMatcher implementations.
@@ -26,7 +28,7 @@ class ElMatchBuilder {
 		}
 		
 		public boolean isMatch(T bean) {
-			String v = (String)elGetValue.elGetValue(bean);
+			String v = (String)elGetValue.elGetValue((EntityBean)bean);
 			return pattern.matcher(v).matches();
 		}
 	}
@@ -53,7 +55,7 @@ class ElMatchBuilder {
 		}
 
 		public boolean isMatch(T bean) {
-			String v = (String)elGetValue.elGetValue(bean);
+			String v = (String)elGetValue.elGetValue((EntityBean)bean);
 			return value.equalsIgnoreCase(v);
 		}
 	}
@@ -73,7 +75,7 @@ class ElMatchBuilder {
 		
 		public boolean isMatch(T bean) {
 			
-			String v = (String)elGetValue.elGetValue(bean);
+			String v = (String)elGetValue.elGetValue((EntityBean)bean);
 			return charMatch.startsWith(v);
 		}
 	}
@@ -93,7 +95,7 @@ class ElMatchBuilder {
 		
 		public boolean isMatch(T bean) {
 			
-			String v = (String)elGetValue.elGetValue(bean);
+			String v = (String)elGetValue.elGetValue((EntityBean)bean);
 			return charMatch.endsWith(v);
 		}
 	}
@@ -104,7 +106,7 @@ class ElMatchBuilder {
 		}
 
 		public boolean isMatch(T bean) {
-			String v = (String)elGetValue.elGetValue(bean);
+			String v = (String)elGetValue.elGetValue((EntityBean)bean);
 			return value.startsWith(v);
 		}
 	}
@@ -115,7 +117,7 @@ class ElMatchBuilder {
 		}
 
 		public boolean isMatch(T bean) {
-			String v = (String)elGetValue.elGetValue(bean);
+			String v = (String)elGetValue.elGetValue((EntityBean)bean);
 			return value.endsWith(v);
 		}
 	}	
@@ -129,7 +131,7 @@ class ElMatchBuilder {
 		}
 		
 		public boolean isMatch(T bean) {
-			return (null == elGetValue.elGetValue(bean));
+			return (null == elGetValue.elGetValue((EntityBean)bean));
 		}
 	}
 
@@ -142,7 +144,7 @@ class ElMatchBuilder {
 		}
 		
 		public boolean isMatch(T bean) {
-			return (null != elGetValue.elGetValue(bean));
+			return (null != elGetValue.elGetValue((EntityBean)bean));
 		}
 	}
 
@@ -173,7 +175,7 @@ class ElMatchBuilder {
 
 		public boolean isMatch(T bean) {
 
-			Object value = elGetValue.elGetValue(bean);
+			Object value = elGetValue.elGetValue((EntityBean)bean);
 			if (value == null){
 				return false;
 			}

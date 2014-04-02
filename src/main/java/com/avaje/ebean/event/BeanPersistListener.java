@@ -54,7 +54,7 @@ public interface BeanPersistListener<T> {
    * @param updatedProperties
    *          the properties on the bean that where updated
    */
-  public boolean updated(T bean, Set<String> updatedProperties);
+  public boolean updated(T bean);//, Set<String> updatedProperties);
 
   /**
    * Notified that a bean has been deleted locally. Return true if you want the

@@ -12,6 +12,7 @@ import java.util.concurrent.FutureTask;
 
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.bean.BeanCollection;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.BeanIdList;
@@ -299,11 +300,11 @@ public class CQueryFetchIds {
 			// no-op
 		}
 
-		public void setLoadedBean(Object loadedBean, Object id, Object lazyLoadParentId) {
+		public void setLoadedBean(EntityBean loadedBean, Object id, Object lazyLoadParentId) {
 			// no-op
 		}
 
-		public void setLoadedManyBean(Object loadedBean) {
+		public void setLoadedManyBean(EntityBean loadedBean) {
 			// no-op
 		}
 		

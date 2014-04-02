@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -47,49 +48,29 @@ public final class BindableIdMap implements BindableId {
   /**
    * Does nothing for BindableId.
    */
-  public void addChanged(PersistRequestBean<?> request, List<Bindable> list) {
+  public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     // do nothing (id not changing)
   }
 
-  /**
-   * Id values are never null in where clause.
-   */
-  public void dmlWhere(GenerateDmlRequest request, boolean checkIncludes, Object bean) {
-    // id values are never null in where clause
-    dmlAppend(request, false);
-  }
-
-  public void dmlInsert(GenerateDmlRequest request, boolean checkIncludes) {
-    dmlAppend(request, checkIncludes);
-  }
-
-  public void dmlAppend(GenerateDmlRequest request, boolean checkIncludes) {
+  public void dmlAppend(GenerateDmlRequest request) {
     for (int i = 0; i < uids.length; i++) {
       request.appendColumn(uids[i].getDbColumn());
     }
   }
 
-  public void dmlBind(BindableRequest request, boolean checkIncludes, Object bean) throws SQLException {
-    dmlBind(request, checkIncludes, bean, true);
-  }
-
-  public void dmlBindWhere(BindableRequest request, boolean checkIncludes, Object bean) throws SQLException {
-    dmlBind(request, checkIncludes, bean, false);
-  }
-
-  private void dmlBind(BindableRequest bindRequest, boolean checkIncludes, Object bean, boolean bindNull) throws SQLException {
+  public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     LinkedHashMap<String, Object> mapId = new LinkedHashMap<String, Object>();
     for (int i = 0; i < uids.length; i++) {
       Object value = uids[i].getValue(bean);
 
-      bindRequest.bind(value, uids[i], uids[i].getName(), bindNull);
+      request.bind(value, uids[i], uids[i].getName());
 
       // putting logicalType into map rather than
       // the dbType (which may have been converted).
       mapId.put(uids[i].getName(), value);
     }
-    bindRequest.setIdValue(mapId);
+    request.setIdValue(mapId);
   }
 
   public boolean deriveConcatenatedId(PersistRequestBean<?> persist) {
@@ -101,7 +82,7 @@ public final class BindableIdMap implements BindableId {
       throw new PersistenceException(m);
     }
 
-    Object bean = persist.getBean();
+    EntityBean bean = persist.getEntityBean();
 
     // populate it from the assoc one id values...
     for (int i = 0; i < matches.length; i++) {

@@ -198,6 +198,8 @@ public class DeployBeanProperty {
      */
     private Method writeMethod;
 
+    private int propertyIndex;
+    
     private BeanReflectGetter getter;
 
     private BeanReflectSetter setter;
@@ -408,6 +410,14 @@ public class DeployBeanProperty {
 
     public void setScalarType(ScalarType<?> scalarType) {
         this.scalarType = scalarType;
+    }
+
+    public int getPropertyIndex() {
+      return propertyIndex;
+    }
+
+    public void setPropertyIndex(int propertyIndex) {
+      this.propertyIndex = propertyIndex;
     }
 
     public BeanReflectGetter getGetter() {

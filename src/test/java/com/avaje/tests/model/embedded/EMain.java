@@ -7,50 +7,50 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 @Entity
-@Table(name="e_main")
-public class EMain
-{
-    @Id
-    private Integer id;
-    
-    private String name;
+@Table(name = "e_main")
+public class EMain {
 
-	@Embedded
-    private Eembeddable embeddable = new Eembeddable();
+  @Id
+  private Integer id;
 
-	@Version
-	private Long version;
-    
-    public Integer getId() {
-        return id;
-    }
+  private String name;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  @Embedded
+  private Eembeddable embeddable = new Eembeddable();
 
-    public String getName() {
-        return name;
-    }
+  @Version
+  private Long version;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public Integer getId() {
+    return id;
+  }
 
-	public Eembeddable getEmbeddable() {
-		return embeddable;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public void setEmbeddable(Eembeddable embeddable) {
-		this.embeddable = embeddable;
-	}
+  public String getName() {
+    return name;
+  }
 
-    public Long getVersion() {
-        return version;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setVersion(Long version) {
-        this.version = version;
-    }
-	
+  public Eembeddable getEmbeddable() {
+    return embeddable;
+  }
+
+  public void setEmbeddable(Eembeddable embeddable) {
+    this.embeddable = embeddable;
+  }
+
+  public Long getVersion() {
+    return version;
+  }
+
+  public void setVersion(Long version) {
+    this.version = version;
+  }
+
 }

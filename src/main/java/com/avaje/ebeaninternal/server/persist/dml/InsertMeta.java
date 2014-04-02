@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
 import java.sql.SQLException;
-import java.util.Set;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -53,7 +53,7 @@ public final class InsertMeta {
 		this.all = all;
 		this.shadowFKey = shadowFKey;
 
-		this.sqlWithId = genSql(false, null);
+		this.sqlWithId = genSql(false);
 
 		// only available for single Id property
 		if (id.isConcatenated()) {
@@ -68,7 +68,7 @@ public final class InsertMeta {
 			// insert sql for db identity or sequence insert
 			this.concatinatedKey = false;
 			this.identityDbColumns = new String[]{id.getIdentityColumn()};
-			this.sqlNullId = genSql(true, null);
+			this.sqlNullId = genSql(true);
 			this.supportsGetGeneratedKeys = dbPlatform.getDbIdentity().isSupportsGetGeneratedKeys();
 			this.selectLastInsertedId = desc.getSelectLastInsertedId();
 		}
@@ -131,18 +131,18 @@ public final class InsertMeta {
 	/**
 	 * Bind the request based on whether the id value(s) are null.
 	 */
-	public void bind(DmlHandler request, Object bean, boolean withId) throws SQLException {
+	public void bind(DmlHandler request, EntityBean bean, boolean withId) throws SQLException {
 
 		if (withId) {
-			id.dmlBind(request, false, bean);
+			id.dmlBind(request, bean);
 		}
 		if (shadowFKey != null){
-			shadowFKey.dmlBind(request, false, bean);
+			shadowFKey.dmlBind(request, bean);
 		}
 		if (discriminator != null){
-			discriminator.dmlBind(request, false, bean);			
+			discriminator.dmlBind(request, bean);			
 		}
-		all.dmlBind(request, false, bean);
+		all.dmlBind(request, bean);
 	}
 
 	/**
@@ -157,27 +157,27 @@ public final class InsertMeta {
 		}
 	}
 
-	private String genSql(boolean nullId, Set<String> loadedProps) {
+	private String genSql(boolean nullId) {
 
-		GenerateDmlRequest request = new GenerateDmlRequest(emptyStringToNull, loadedProps, null);
+		GenerateDmlRequest request = new GenerateDmlRequest(emptyStringToNull, null, true);
 		request.setInsertSetMode();
 		
 		request.append("insert into ").append(tableName);
 		request.append(" (");
 
 		if (!nullId) {
-			id.dmlInsert(request, false);
+			id.dmlAppend(request);
 		} 
 		
 		if (shadowFKey != null){
-			shadowFKey.dmlInsert(request, false);
+			shadowFKey.dmlAppend(request);
 		}
 		
 		if (discriminator != null){
-			discriminator.dmlInsert(request, false);			
+			discriminator.dmlAppend(request);			
 		}
 		
-		all.dmlInsert(request, false);
+		all.dmlAppend(request);
 
 		request.append(") values (");
 		request.append(request.getInsertBindBuffer());

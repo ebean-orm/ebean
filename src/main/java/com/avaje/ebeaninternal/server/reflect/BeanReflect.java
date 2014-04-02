@@ -15,19 +15,12 @@ public interface BeanReflect {
 	public Object createEntityBean();
 	
 	/**
-	 * Create a plain vanilla bean for this type.
-	 */
-	public Object createVanillaBean();
-	
-	public boolean isVanillaOnly();
-	
-	/**
 	 * Return the getter for a given bean property.
 	 */
-	public BeanReflectGetter getGetter(String name);
+	public BeanReflectGetter getGetter(String name, int position);
 	
 	/**
 	 * Return the setter for a given bean property.
 	 */
-	public BeanReflectSetter getSetter(String name);
+	public BeanReflectSetter getSetter(String name, int position);
 }

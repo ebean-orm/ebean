@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployInheritInfo;
@@ -223,7 +224,7 @@ public class InheritInfo {
 	/**
 	 * Create an EntityBean for this type.
 	 */
-	public Object createBean() {
+	public EntityBean createBean() {
 		return descriptor.createBean();
 	}
 	

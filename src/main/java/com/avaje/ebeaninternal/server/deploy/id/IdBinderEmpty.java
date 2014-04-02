@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.avaje.ebean.bean.EntityBean;
+
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -131,5 +133,4 @@ public final class IdBinderEmpty implements IdBinder {
   public void writeData(DataOutput dataOutput, Object idValue) throws IOException {
 
   }
-
 }

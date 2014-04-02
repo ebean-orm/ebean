@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.persistence.PersistenceException;
+
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -150,7 +153,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
     public void addIdInBindValue(SpiExpressionRequest request, Object value) {
         for (int i = 0; i < props.length; i++) {
-            request.addBindValue(props[i].getValue(value));
+            request.addBindValue(props[i].getValue((EntityBean)value));
         }
     }
     
@@ -206,11 +209,11 @@ public final class IdBinderEmbedded implements IdBinder {
         return idInValueSql;
     }
 
-    public Object[] getIdValues(Object bean) {
-        bean = embIdProperty.getValue(bean);
+    public Object[] getIdValues(EntityBean bean) {
+        Object val = embIdProperty.getValue(bean);
         Object[] bindvalues = new Object[props.length];
         for (int i = 0; i < props.length; i++) {
-            bindvalues[i] = props[i].getValue(bean);
+            bindvalues[i] = props[i].getValue((EntityBean)val);
         }
         return bindvalues;
     }
@@ -219,14 +222,14 @@ public final class IdBinderEmbedded implements IdBinder {
 
         Object[] bindvalues = new Object[props.length];
         for (int i = 0; i < props.length; i++) {
-            bindvalues[i] = props[i].getValue(value);
+            bindvalues[i] = props[i].getValue((EntityBean)value);
         }
         return bindvalues;
     }
 
     public void bindId(DefaultSqlUpdate sqlUpdate, Object value) {
         for (int i = 0; i < props.length; i++) {
-            Object embFieldValue = props[i].getValue(value);
+            Object embFieldValue = props[i].getValue((EntityBean)value);
             sqlUpdate.addParameter(embFieldValue);
         }
     }
@@ -234,14 +237,14 @@ public final class IdBinderEmbedded implements IdBinder {
     public void bindId(DataBind dataBind, Object value) throws SQLException {
 
         for (int i = 0; i < props.length; i++) {
-            Object embFieldValue = props[i].getValue(value);
+            Object embFieldValue = props[i].getValue((EntityBean)value);
             props[i].bind(dataBind, embFieldValue);
         }
     }
     
     public Object readData(DataInput dataInput) throws IOException {
         
-        Object embId = idDesc.createBean();
+      EntityBean embId = idDesc.createBean();
         boolean notNull = true;
 
         for (int i = 0; i < props.length; i++) {
@@ -261,7 +264,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
     public void writeData(DataOutput dataOutput, Object idValue) throws IOException {
         for (int i = 0; i < props.length; i++) {
-            Object embFieldValue = props[i].getValue(idValue);
+            Object embFieldValue = props[i].getValue((EntityBean)idValue);
             props[i].writeData(dataOutput, embFieldValue);
         }
     }
@@ -274,7 +277,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
     public Object read(DbReadContext ctx) throws SQLException {
 
-        Object embId = idDesc.createBean();
+      EntityBean embId = idDesc.createBean();
         boolean notNull = true;
 
         for (int i = 0; i < props.length; i++) {
@@ -291,7 +294,7 @@ public final class IdBinderEmbedded implements IdBinder {
         }
     }
 
-    public Object readSet(DbReadContext ctx, Object bean) throws SQLException {
+    public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
 
         Object embId = read(ctx);
         if (embId != null) {
@@ -385,7 +388,7 @@ public final class IdBinderEmbedded implements IdBinder {
         return sb.toString();
     }
 
-    public Object convertSetId(Object idValue, Object bean) {
+    public Object convertSetId(Object idValue, EntityBean bean) {
 
         // can not cast/convert if it is embedded
         if (bean != null) {

@@ -1,9 +1,9 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
 import java.sql.SQLException;
-import java.util.Set;
 
 import com.avaje.ebean.annotation.ConcurrencyMode;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
@@ -23,21 +23,17 @@ public final class DeleteMeta {
 
   private final Bindable version;
 
-  private final Bindable all;
-
   private final String tableName;
 
   private final boolean emptyStringAsNull;
 
-  public DeleteMeta(boolean emptyStringAsNull, BeanDescriptor<?> desc, BindableId id, Bindable version, Bindable all) {
+  public DeleteMeta(boolean emptyStringAsNull, BeanDescriptor<?> desc, BindableId id, Bindable version) {
     this.emptyStringAsNull = emptyStringAsNull;
     this.tableName = desc.getBaseTable();
     this.id = id;
     this.version = version;
-    this.all = all;
-
-    sqlNone = genSql(ConcurrencyMode.NONE);
-    sqlVersion = genSql(ConcurrencyMode.VERSION);
+    this.sqlNone = genSql(ConcurrencyMode.NONE);
+    this.sqlVersion = genSql(ConcurrencyMode.VERSION);
   }
 
   public boolean isEmptyStringAsNull() {
@@ -56,18 +52,13 @@ public final class DeleteMeta {
    */
   public void bind(PersistRequestBean<?> persist, DmlHandler bind) throws SQLException {
 
-    Object bean = persist.getBean();
+    EntityBean bean = persist.getEntityBean();
 
-    id.dmlBind(bind, false, bean);
+    id.dmlBind(bind, bean);
 
     switch (persist.getConcurrencyMode()) {
     case VERSION:
-      version.dmlBind(bind, false, bean);
-      break;
-
-    case ALL:
-      Object oldBean = persist.getOldValues();
-      all.dmlBindWhere(bind, true, oldBean);
+      version.dmlBind(bind, bean);
       break;
 
     default:
@@ -91,9 +82,6 @@ public final class DeleteMeta {
     case VERSION:
       return sqlVersion;
 
-    case ALL:
-      return genDynamicWhere(request.getLoadedProperties(), request.getOldValues());
-
     default:
       throw new RuntimeException("Invalid mode " + request.determineConcurrencyMode());
     }
@@ -109,37 +97,15 @@ public final class DeleteMeta {
     request.append(" where ");
 
     request.setWhereIdMode();
-    id.dmlAppend(request, false);
+    id.dmlAppend(request);
 
     if (ConcurrencyMode.VERSION.equals(conMode)) {
       if (version == null) {
         return null;
       }
-      version.dmlAppend(request, false);
-
-    } else if (ConcurrencyMode.ALL.equals(conMode)) {
-      throw new RuntimeException("Never called for ConcurrencyMode.ALL");
+      version.dmlAppend(request);
     }
-
-    return request.toString();
-  }
-
-  /**
-   * Generate the sql dynamically for where using IS NULL for binding null
-   * values.
-   */
-  private String genDynamicWhere(Set<String> includedProps, Object oldBean) throws SQLException {
-
-    // always has a preceding id property(s) so the first
-    // option is always ' and ' and not blank.
-
-    GenerateDmlRequest request = new GenerateDmlRequest(emptyStringAsNull, includedProps, oldBean);
-
-    request.append(sqlNone);
-
-    request.setWhereMode();
-    all.dmlWhere(request, true, oldBean);
-
+    
     return request.toString();
   }
 

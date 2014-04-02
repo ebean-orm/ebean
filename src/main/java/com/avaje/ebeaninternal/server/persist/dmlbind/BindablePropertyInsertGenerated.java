@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.persist.dmlbind;
 
 import java.sql.SQLException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
@@ -21,36 +22,24 @@ public class BindablePropertyInsertGenerated extends BindableProperty {
 		this.gen = gen;
 	}
 	
-    public void dmlBind(BindableRequest request, boolean checkIncludes, Object bean) throws SQLException {
-        dmlBind(request, checkIncludes, bean, true);
-    }
-    
-    public void dmlBindWhere(BindableRequest request, boolean checkIncludes, Object bean) throws SQLException {
-        dmlBind(request, checkIncludes, bean, false);
-    }
-    
-    /**
-     * Bind a value in a Insert SET clause.
-     */
-	private void dmlBind(BindableRequest request, boolean checkIncludes, Object bean, boolean bindNull) throws SQLException {
+  public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
         
 		Object value = gen.getInsertValue(prop, bean);
 		
 		// generated value should be the correct type
 		if (bean != null){
 			// support PropertyChangeSupport
-			prop.setValueIntercept(bean, value);
-			request.registerAdditionalProperty(prop.getName());
+			//prop.setValueIntercept(bean, value);
+			prop.setValue(bean, value);
 		}
-        //value = prop.getDefaultValue();
-	    request.bind(value, prop, prop.getName(), bindNull);
-    }
-	
+    request.bind(value, prop, prop.getName());
+  }
+
 	/**
 	 * Always bind on Insert SET.
 	 */
 	@Override
-	public void dmlAppend(GenerateDmlRequest request, boolean checkIncludes){
+	public void dmlAppend(GenerateDmlRequest request){
 		request.appendColumn(prop.getDbColumn());
 	}
 	

@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.InternString;
 
 /**
@@ -32,7 +33,7 @@ public class ExportedProperty {
 	/**
 	 * Return the property value from the bean.
 	 */
-	public Object getValue(Object bean){
+	public Object getValue(EntityBean bean){
 		return property.getValue(bean);
 	}
 	

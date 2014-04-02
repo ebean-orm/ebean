@@ -11,6 +11,7 @@ import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Junction;
 import com.avaje.ebean.LikeType;
 import com.avaje.ebean.Query;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiExpressionFactory;
 import com.avaje.ebeaninternal.api.SpiQuery;
 
@@ -20,6 +21,7 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 public class DefaultExpressionFactory implements SpiExpressionFactory {
 
   private static final Object[] EMPTY_ARRAY = new Object[] {};
+
 
   public DefaultExpressionFactory() {
   }
@@ -128,11 +130,18 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new NullExpression(propertyName, true);
   }
 
+  private EntityBean checkEntityBean(Object bean) {
+    if (bean == null || (bean instanceof EntityBean == false)) {
+      throw new IllegalStateException("Expecting an EntityBean");
+    }
+    return (EntityBean)bean;
+  }
+  
   /**
    * Case insensitive {@link #exampleLike(Object)}
    */
   public ExampleExpression iexampleLike(Object example) {
-    return new DefaultExampleExpression(example, true, LikeType.RAW);
+    return new DefaultExampleExpression(checkEntityBean(example), true, LikeType.RAW);
   }
 
   /**
@@ -140,14 +149,14 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * LikeType.RAW (you need to add you own wildcards % and _).
    */
   public ExampleExpression exampleLike(Object example) {
-    return new DefaultExampleExpression(example, false, LikeType.RAW);
+    return new DefaultExampleExpression(checkEntityBean(example), false, LikeType.RAW);
   }
 
   /**
    * Create the query by Example expression specifying more options.
    */
   public ExampleExpression exampleLike(Object example, boolean caseInsensitive, LikeType likeType) {
-    return new DefaultExampleExpression(example, caseInsensitive, likeType);
+    return new DefaultExampleExpression(checkEntityBean(example), caseInsensitive, likeType);
   }
 
   /**

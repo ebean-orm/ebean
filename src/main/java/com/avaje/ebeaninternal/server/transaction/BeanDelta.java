@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.cluster.BinaryMessage;
 import com.avaje.ebeaninternal.server.cluster.BinaryMessageList;
@@ -51,7 +52,7 @@ public class BeanDelta {
         this.properties.add(propertyDelta);
     }
     
-    public void apply(Object bean) {
+    public void apply(EntityBean bean) {
         
         for (int i = 0; i < properties.size(); i++) {
             properties.get(i).apply(bean);

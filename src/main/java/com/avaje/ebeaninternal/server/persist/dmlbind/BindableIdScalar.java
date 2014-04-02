@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
@@ -40,7 +41,7 @@ public final class BindableIdScalar implements BindableId {
   /**
    * Does nothing for BindableId.
    */
-  public void addChanged(PersistRequestBean<?> request, List<Bindable> list) {
+  public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     // do nothing (id not changing)
   }
 
@@ -51,39 +52,19 @@ public final class BindableIdScalar implements BindableId {
     throw new PersistenceException("Should not be called? only for concatinated keys");
   }
 
-  /**
-   * Id values are never null in where clause.
-   */
-  public void dmlWhere(GenerateDmlRequest request, boolean checkIncludes, Object bean) {
-    // id values are never null in where clause
-    request.appendColumn(uidProp.getDbColumn());
-  }
-
-  public void dmlInsert(GenerateDmlRequest request, boolean checkIncludes) {
-    dmlAppend(request, checkIncludes);
-  }
-
-  public void dmlAppend(GenerateDmlRequest request, boolean checkIncludes) {
+  public void dmlAppend(GenerateDmlRequest request) {
 
     request.appendColumn(uidProp.getDbColumn());
   }
 
-  public void dmlBind(BindableRequest request, boolean checkIncludes, Object bean) throws SQLException {
-    dmlBind(request, checkIncludes, bean, true);
-  }
-
-  public void dmlBindWhere(BindableRequest request, boolean checkIncludes, Object bean) throws SQLException {
-    dmlBind(request, checkIncludes, bean, false);
-  }
-
-  private void dmlBind(BindableRequest bindRequest, boolean checkIncludes, Object bean, boolean bindNull) throws SQLException {
+  public void dmlBind(BindableRequest request,  EntityBean bean) throws SQLException {
 
     Object value = uidProp.getValue(bean);
 
-    bindRequest.bind(value, uidProp, uidProp.getName(), bindNull);
+    request.bind(value, uidProp, uidProp.getName());
 
     // used for summary logging
-    bindRequest.setIdValue(value);
+    request.setIdValue(value);
   }
 
 }

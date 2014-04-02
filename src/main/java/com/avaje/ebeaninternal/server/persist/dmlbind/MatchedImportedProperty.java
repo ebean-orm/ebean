@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
@@ -30,14 +31,14 @@ class MatchedImportedProperty {
 		this.localProp = localProp;
 	}
 
-	protected void populate(Object sourceBean, Object destBean) {
+	protected void populate(EntityBean sourceBean, EntityBean destBean) {
 		Object assocBean = assocOne.getValue(sourceBean);
 		if (assocBean == null) {
 			String msg = "The assoc bean for " + assocOne + " is null?";
 			throw new NullPointerException(msg);
 		}
 
-		Object value = foreignProp.getValue(assocBean);
+		Object value = foreignProp.getValue((EntityBean)assocBean);
 		localProp.setValue(destBean, value);
 	}
 

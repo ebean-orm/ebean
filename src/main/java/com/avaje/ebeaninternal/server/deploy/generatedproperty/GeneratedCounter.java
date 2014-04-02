@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
@@ -17,7 +18,7 @@ public class GeneratedCounter implements GeneratedProperty {
     /**
      * Always returns a 1.
      */
-    public Object getInsertValue(BeanProperty prop, Object bean) {
+    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
         Integer i = Integer.valueOf(1);
         return BasicTypeConverter.convert(i, numberType);
     }
@@ -25,7 +26,7 @@ public class GeneratedCounter implements GeneratedProperty {
     /**
      * Increments the current value by one.
      */
-    public Object getUpdateValue(BeanProperty prop, Object bean) {
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
         Number currVal = (Number) prop.getValue(bean);
         Integer nextVal = Integer.valueOf(currVal.intValue() + 1);
         return BasicTypeConverter.convert(nextVal, numberType);
@@ -36,6 +37,11 @@ public class GeneratedCounter implements GeneratedProperty {
      */
     public boolean includeInUpdate() {
         return true;
+    }
+
+    @Override
+    public boolean includeInAllUpdates() {
+      return false;
     }
 
     /**

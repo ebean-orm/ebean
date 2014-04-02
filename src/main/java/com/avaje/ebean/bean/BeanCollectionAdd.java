@@ -12,5 +12,5 @@ public interface BeanCollectionAdd {
   /**
    * Add a loaded bean to the collection.
    */
-  public void addBean(Object bean);
+  public void addBean(EntityBean bean);
 }

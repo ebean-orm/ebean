@@ -15,9 +15,9 @@ public class PFile extends BasicDomain {
 	private PFileContent fileContent;
 
 	/** Another persistent file. */
-    @OneToOne(cascade=CascadeType.ALL)
-    private PFileContent fileContent2;
-	
+  @OneToOne(cascade=CascadeType.ALL)
+  private PFileContent fileContent2;
+
 	public PFile() {
 	}
 
@@ -25,7 +25,6 @@ public class PFile extends BasicDomain {
 		super();
 		this.name = name;
 		this.fileContent = fileContent;
-		//this.persistentFileContent.setPersistentFile(this);
 	}
 
 	public String getName() {
@@ -36,20 +35,20 @@ public class PFile extends BasicDomain {
 		this.name = name;
 	}
 
-    public PFileContent getFileContent() {
-        return fileContent;
-    }
+  public PFileContent getFileContent() {
+      return fileContent;
+  }
 
-    public void setFileContent(PFileContent fileContent) {
-        this.fileContent = fileContent;
-    }
+  public void setFileContent(PFileContent fileContent) {
+      this.fileContent = fileContent;
+  }
 
-    public PFileContent getFileContent2() {
-        return fileContent2;
-    }
+  public PFileContent getFileContent2() {
+      return fileContent2;
+  }
 
-    public void setFileContent2(PFileContent fileContent2) {
-        this.fileContent2 = fileContent2;
-    }
+  public void setFileContent2(PFileContent fileContent2) {
+      this.fileContent2 = fileContent2;
+  }
 
 }

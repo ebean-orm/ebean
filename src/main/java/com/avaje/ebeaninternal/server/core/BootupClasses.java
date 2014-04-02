@@ -11,7 +11,6 @@ import javax.persistence.Table;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.config.CompoundType;
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.ServerConfig;
@@ -51,6 +50,7 @@ public class BootupClasses implements ClassPathSearchMatcher {
     private ArrayList<Class<?>> beanListenerList = new ArrayList<Class<?>>();
 
     private ArrayList<Class<?>> beanQueryAdapterList = new ArrayList<Class<?>>();
+
 
     private ArrayList<Class<?>> serverConfigStartupList = new ArrayList<Class<?>>();
     private ArrayList<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<ServerConfigStartup>();
@@ -311,7 +311,7 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
         } else if (isEntity(cls)) {
             entityList.add(cls);
-  
+
         } else if (isInterestingInterface(cls)) {
             return true;
 

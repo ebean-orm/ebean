@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.avaje.ebean.bean.EntityBean;
+
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -168,6 +170,6 @@ public interface IdBinder {
    * If the bean is not null, then the value is set to the bean.
    * </p>
    */
-  public Object convertSetId(Object idValue, Object bean);
+  public Object convertSetId(Object idValue, EntityBean bean);
 
 }

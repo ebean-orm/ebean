@@ -55,10 +55,8 @@ public class AnnotationClass extends AnnotationParser {
 
     Entity entity = cls.getAnnotation(Entity.class);
     if (entity != null) {
-      // checkDefaultConstructor();
       if (entity.name().equals("")) {
         descriptor.setName(cls.getSimpleName());
-
       } else {
         descriptor.setName(entity.name());
       }

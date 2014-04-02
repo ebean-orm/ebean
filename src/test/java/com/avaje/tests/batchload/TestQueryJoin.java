@@ -47,7 +47,7 @@ public class TestQueryJoin extends BaseTestCase {
 
     Customer customer = order.getCustomer();
     BeanState beanStateCustomer = Ebean.getBeanState(customer);
-    Assert.assertNull(beanStateCustomer.getLoadedProps());
+    Assert.assertTrue(beanStateCustomer.isReference());
 
     customer.getName();
     Assert.assertNotNull(beanStateCustomer.getLoadedProps());

@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.server.reflect;
 
+import com.avaje.ebean.bean.EntityBean;
+
 /**
  * The setter for a given bean property.
  */
@@ -8,7 +10,7 @@ public interface BeanReflectSetter {
 	/**
 	 * Set the property value of a bean.
 	 */
-	public void set(Object bean, Object value);
+	public void set(EntityBean bean, Object value);
 
 	/**
 	 * Set the property value of a bean with interception checks.
@@ -16,6 +18,6 @@ public interface BeanReflectSetter {
 	 * This could invoke lazy loading and or oldValues creation.
 	 * </p>
 	 */
-	public void setIntercept(Object bean, Object value);
+	public void setIntercept(EntityBean bean, Object value);
 
 }

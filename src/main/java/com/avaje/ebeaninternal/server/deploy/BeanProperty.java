@@ -33,7 +33,6 @@ import com.avaje.ebeaninternal.server.text.json.ReadJsonContext;
 import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
-import com.avaje.ebeaninternal.util.ValueUtil;
 
 /**
  * Description of a property of a bean. Includes its deployment information such
@@ -141,6 +140,8 @@ public class BeanProperty implements ElPropertyValue {
      */
     final String name;
 
+    final int propertyIndex;
+    
     /**
      * The reflected field.
      */
@@ -249,8 +250,6 @@ public class BeanProperty implements ElPropertyValue {
 
     final DbEncryptFunction dbEncryptFunction;
 
-    final boolean dynamicSubclassWithInheritance;
-
     int deployOrder;
 
     final boolean jsonSerialize;
@@ -265,11 +264,8 @@ public class BeanProperty implements ElPropertyValue {
 
         this.descriptor = descriptor;
         this.name = InternString.intern(deploy.getName());
-        if (descriptor != null) {
-            this.dynamicSubclassWithInheritance = (descriptor.isDynamicSubclass() && descriptor.hasInheritance());
-        } else {
-            this.dynamicSubclassWithInheritance = false;
-        }
+        this.propertyIndex = deploy.getPropertyIndex();
+        
         this.unidirectionalShadow = deploy.isUndirectionalShadow();
         this.localEncrypted = deploy.isLocalEncrypted();
         this.dbEncrypted = deploy.isDbEncrypted();
@@ -363,7 +359,7 @@ public class BeanProperty implements ElPropertyValue {
 
         this.descriptor = source.descriptor;
         this.name = InternString.intern(source.getName());
-        this.dynamicSubclassWithInheritance = source.dynamicSubclassWithInheritance;
+        this.propertyIndex = source.propertyIndex;
 
         this.dbColumn = InternString.intern(override.getDbColumn());
         this.sqlFormulaJoin = InternString.intern(override.getSqlFormulaJoin());
@@ -473,14 +469,7 @@ public class BeanProperty implements ElPropertyValue {
         return formula;
     }
 
-    public boolean hasChanged(Object bean, Object oldValues) {
-        Object value = getValue(bean);
-        Object oldVal = getValue(oldValues);
-
-        return !ValueUtil.areEqual(value, oldVal);
-    }
-
-    public void copyProperty(Object sourceBean, Object destBean) {
+    public void copyProperty(EntityBean sourceBean, EntityBean destBean) {
         Object value = getValue(sourceBean);
         setValue(destBean, value);
     }
@@ -561,7 +550,7 @@ public class BeanProperty implements ElPropertyValue {
         return owningType.isAssignableFrom(type);
     }
 
-    public Object readSetOwning(DbReadContext ctx, Object bean, Class<?> type) throws SQLException {
+    public Object readSetOwning(DbReadContext ctx, EntityBean bean, Class<?> type) throws SQLException {
 
         try {
             Object value = scalarType.read(ctx.getDataReader());
@@ -599,7 +588,7 @@ public class BeanProperty implements ElPropertyValue {
         return scalarType.read(ctx.getDataReader());
     }
 
-    public Object readSet(DbReadContext ctx, Object bean, Class<?> type) throws SQLException {
+    public Object readSet(DbReadContext ctx, EntityBean bean, Class<?> type) throws SQLException {
 
         try {
             Object value = scalarType.read(ctx.getDataReader());
@@ -690,15 +679,9 @@ public class BeanProperty implements ElPropertyValue {
      * Set the value of the property without interception or
      * PropertyChangeSupport.
      */
-    public void setValue(Object bean, Object value) {
+    public void setValue(EntityBean bean, Object value) {
         try {
-            if (bean instanceof EntityBean) {
-                setter.set(bean, value);
-            } else {
-                Object[] args = new Object[1];
-                args[0] = value;
-                writeMethod.invoke(bean, args);
-            }
+            setter.set(bean, value);
         } catch (Exception ex) {
             String beanType = bean == null ? "null" : bean.getClass().getName();
             String msg = "set " + name + " on [" + descriptor + "] arg[" + value + "] type[" + beanType
@@ -710,15 +693,9 @@ public class BeanProperty implements ElPropertyValue {
     /**
      * Set the value of the property.
      */
-    public void setValueIntercept(Object bean, Object value) {
+    public void setValueIntercept(EntityBean bean, Object value) {
         try {
-            if (bean instanceof EntityBean) {
-                setter.setIntercept(bean, value);
-            } else {
-                Object[] args = new Object[1];
-                args[0] = value;
-                writeMethod.invoke(bean, args);
-            }
+            setter.setIntercept(bean, value);
         } catch (Exception ex) {
             String beanType = bean == null ? "null" : bean.getClass().getName();
             String msg = "setIntercept " + name + " on [" + descriptor + "] arg[" + value + "] type[" + beanType
@@ -729,34 +706,20 @@ public class BeanProperty implements ElPropertyValue {
 
     private static Object[] NO_ARGS = new Object[0];
 
-    /**
-     * Return the property value taking inheritance into account.
-     */
-    public Object getValueWithInheritance(Object bean) {
-        if (dynamicSubclassWithInheritance) {
-            return descriptor.getBeanPropertyWithInheritance(bean, name);
-        }
-        return getValue(bean);
-    }
-
-    public Object getCacheDataValue(Object bean){
+    public Object getCacheDataValue(EntityBean bean){
     	return getValue(bean);
     }
     
-    public void setCacheDataValue(Object bean, Object cacheData, Object oldValues, boolean readOnly){
+    public void setCacheDataValue(EntityBean bean, Object cacheData){
     	setValue(bean, cacheData);
     }
     
     /**
      * Return the value of the property method.
      */
-    public Object getValue(Object bean) {
+    public Object getValue(EntityBean bean) {
         try {
-            if (bean instanceof EntityBean) {
-                return getter.get(bean);
-            } else {
-                return readMethod.invoke(bean, NO_ARGS);
-            }
+            return getter.get(bean);
         } catch (Exception ex) {
             String beanType = bean == null ? "null" : bean.getClass().getName();
             String msg = "get " + name + " on [" + descriptor + "] type[" + beanType + "] threw error.";
@@ -777,13 +740,9 @@ public class BeanProperty implements ElPropertyValue {
         }
     }
 
-    public Object getValueIntercept(Object bean) {
+    public Object getValueIntercept(EntityBean bean) {
         try {
-            if (bean instanceof EntityBean) {
-                return getter.getIntercept(bean);
-            } else {
-                return readMethod.invoke(bean, NO_ARGS);
-            }
+            return getter.getIntercept(bean);
         } catch (Exception ex) {
             String beanType = bean == null ? "null" : bean.getClass().getName();
             String msg = "getIntercept " + name + " on [" + descriptor + "] type[" + beanType + "] threw error.";
@@ -798,24 +757,25 @@ public class BeanProperty implements ElPropertyValue {
         return convertToLogicalType(value);
     }
 
-    public void elSetReference(Object bean) {
+    public void elSetReference(EntityBean bean) {
         throw new RuntimeException("Should not be called");
     }
 
-    public void elSetValue(Object bean, Object value, boolean populate, boolean reference) {
+    public void elSetValue(EntityBean bean, Object value, boolean populate, boolean reference) {
         if (bean != null) {
-            setValueIntercept(bean, value);
+            // Not using setValueIntercept at this stage
+            setValue(bean, value);
         }
     }
 
-    public Object elGetValue(Object bean) {
+    public Object elGetValue(EntityBean bean) {
         if (bean == null) {
             return null;
         }
         return getValueIntercept(bean);
     }
 
-    public Object elGetReference(Object bean) {
+    public Object elGetReference(EntityBean bean) {
         throw new RuntimeException("Not expected to call this");
     }
 
@@ -824,6 +784,13 @@ public class BeanProperty implements ElPropertyValue {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Return the position of this property in the enhanced bean.
+     */
+    public int getPropertyIndex() {
+      return propertyIndex;
     }
 
     public String getElName() {
@@ -851,7 +818,7 @@ public class BeanProperty implements ElPropertyValue {
         return false;
     }
 
-    public Object[] getAssocOneIdValues(Object bean) {
+    public Object[] getAssocOneIdValues(EntityBean bean) {
         // Returns null as not an AssocOne.
         return null;
     }
@@ -1177,7 +1144,7 @@ public class BeanProperty implements ElPropertyValue {
     }
 
     @SuppressWarnings("unchecked")
-    public void jsonWrite(WriteJsonContext ctx, Object bean) {
+    public void jsonWrite(WriteJsonContext ctx, EntityBean bean) {
         if(!jsonSerialize){
             return;
         }
@@ -1189,7 +1156,7 @@ public class BeanProperty implements ElPropertyValue {
         }
     }
 
-    public void jsonRead(ReadJsonContext ctx, Object bean) {
+    public void jsonRead(ReadJsonContext ctx, EntityBean bean) {
         if(!jsonDeserialize){
             return;
         }

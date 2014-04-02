@@ -32,6 +32,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 		this.property = property;
 		this.bufferList = new ArrayList<DLoadManyContext.LoadBuffer>();
     this.currentBuffer = createBuffer(firstBatchSize);
+
 	}
 	
   private LoadBuffer createBuffer(int size) {

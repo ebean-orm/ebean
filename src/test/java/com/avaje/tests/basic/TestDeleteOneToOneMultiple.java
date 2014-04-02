@@ -14,6 +14,11 @@ public class TestDeleteOneToOneMultiple extends BaseTestCase {
   public void testCreateDeletePersistentFile() {
 
     PFile persistentFile = new PFile("test.txt", new PFileContent("test".getBytes()));
+//    PFile persistentFile = new PFile();
+//    persistentFile.setName("test.txt");
+//    PFileContent content = new PFileContent();
+//    content.setContent("test".getBytes());
+//    persistentFile.setFileContent(content);
 
     Ebean.save(persistentFile);
     Integer id = persistentFile.getId();

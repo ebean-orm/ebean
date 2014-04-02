@@ -1,9 +1,9 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
 import java.sql.SQLException;
-import java.util.Set;
 
 import com.avaje.ebean.annotation.ConcurrencyMode;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
 
@@ -15,12 +15,12 @@ import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
  */
 public class UpdatePlan implements SpiUpdatePlan {
 
-    /**
-     * Special plan used when there is nothing in the set clause and the update
-     * should in fact be skipped. Occurs when the updated properties have
-     * updatable=false in their deployment.
-     */
-    public static final UpdatePlan EMPTY_SET_CLAUSE = new UpdatePlan();
+  /**
+   * Special plan used when there is nothing in the set clause and the update
+   * should in fact be skipped. Occurs when the updated properties have
+   * updatable=false in their deployment.
+   */
+  public static final UpdatePlan EMPTY_SET_CLAUSE = new UpdatePlan();
     
 	private final Integer key;
 
@@ -29,10 +29,6 @@ public class UpdatePlan implements SpiUpdatePlan {
 	private final String sql;
 
 	private final Bindable set;
-
-	private final Set<String> properties;
-
-	private final boolean checkIncludes;
 
 	private final long timeCreated;
 
@@ -45,22 +41,19 @@ public class UpdatePlan implements SpiUpdatePlan {
 	 */
 	public UpdatePlan(ConcurrencyMode mode, String sql, Bindable set) {
 
-		this(null, mode, sql, set, null);
+		this(null, mode, sql, set);
 	}
 
 	/**
 	 * Create a cachable UpdatePlan with a given key.
 	 */
-	public UpdatePlan(Integer key, ConcurrencyMode mode, String sql,
-			Bindable set, Set<String> properties) {
+	public UpdatePlan(Integer key, ConcurrencyMode mode, String sql, Bindable set) {
 
-	    this.emptySetClause = false;
+	  this.emptySetClause = (sql == null);
 		this.key = key;
 		this.mode = mode;
 		this.sql = sql;
 		this.set = set;
-		this.properties = properties;
-		this.checkIncludes = properties != null;
 		this.timeCreated = System.currentTimeMillis();
 	}
 
@@ -73,8 +66,6 @@ public class UpdatePlan implements SpiUpdatePlan {
 	    this.mode = ConcurrencyMode.NONE;
 	    this.sql = null;
 	    this.set = null;
-	    this.properties = null;
-	    this.checkIncludes = false;
 	    this.timeCreated = 0;
 	}
 	
@@ -86,9 +77,9 @@ public class UpdatePlan implements SpiUpdatePlan {
     /**
 	 * Run the prepared statement binding for the 'update set' properties.
 	 */
-	public void bindSet(DmlHandler bind, Object bean) throws SQLException {
+	public void bindSet(DmlHandler bind, EntityBean bean) throws SQLException {
 
-		set.dmlBind(bind, checkIncludes, bean);
+		set.dmlBind(bind, bean);
 
 		// not strictly 'thread safe' but object assignment is atomic
 		Long touched = Long.valueOf(System.currentTimeMillis());
@@ -137,17 +128,6 @@ public class UpdatePlan implements SpiUpdatePlan {
 	 */
 	public Bindable getSet() {
 		return set;
-	}
-
-	/**
-	 * Return the set of changed properties.
-	 * <p>
-	 * This can return null when all properties in the set are being bound in
-	 * the update statement.
-	 * </p>
-	 */
-	public Set<String> getProperties() {
-		return properties;
 	}
 
 }

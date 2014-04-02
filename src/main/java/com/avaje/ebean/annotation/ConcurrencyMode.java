@@ -13,10 +13,5 @@ public enum ConcurrencyMode {
 	/**
 	 * Use a version column.
 	 */
-	VERSION,
-	
-	/**
-	 * Use all the columns (except Lobs).
-	 */
-	ALL
+	VERSION
 }

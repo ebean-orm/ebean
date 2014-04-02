@@ -73,7 +73,7 @@ public class DefaultBeanLoader {
     return batchSize;
   }
 	
-	public void refreshMany(Object parentBean, String propertyName) {
+	public void refreshMany(EntityBean parentBean, String propertyName) {
 		refreshMany(parentBean, propertyName, null);
 	}
 
@@ -92,7 +92,7 @@ public class DefaultBeanLoader {
 
     for (int i = 0; i < batch.size(); i++) {
       BeanCollection<?> bc = batch.get(i);
-      Object ownerBean = bc.getOwnerBean();
+      EntityBean ownerBean = bc.getOwnerBean();
       Object id = many.getParentId(ownerBean);
       idList.add(id);
     }
@@ -143,7 +143,7 @@ public class DefaultBeanLoader {
 
   public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
 
-    Object parentBean = bc.getOwnerBean();
+    EntityBean parentBean = bc.getOwnerBean();
     String propertyName = bc.getPropertyName();
 
     //ObjectGraphNode node = ctx == null ? null : ctx.getObjectGraphNode();
@@ -151,11 +151,11 @@ public class DefaultBeanLoader {
     loadManyInternal(parentBean, propertyName, null, false, null, onlyIds);
   }
 
-	public void refreshMany(Object parentBean, String propertyName, Transaction t) {
+	public void refreshMany(EntityBean parentBean, String propertyName, Transaction t) {
 		loadManyInternal(parentBean, propertyName, t, true, null, false);
 	}
 
-	private void loadManyInternal(Object parentBean, String propertyName, Transaction t, boolean refresh, ObjectGraphNode node, boolean onlyIds) {
+	private void loadManyInternal(EntityBean parentBean, String propertyName, Transaction t, boolean refresh, ObjectGraphNode node, boolean onlyIds) {
 
     EntityBeanIntercept ebi = ((EntityBean) parentBean)._ebean_getIntercept();
     PersistenceContext pc = ebi.getPersistenceContext();
@@ -267,7 +267,7 @@ public class DefaultBeanLoader {
 
     for (int i = 0; i < batch.size(); i++) {
       EntityBeanIntercept ebi = batch.get(i);
-      Object bean = ebi.getOwner();
+      EntityBean bean = ebi.getOwner();
       Object id = desc.getId(bean);
       idList.add(id);
     }
@@ -289,17 +289,6 @@ public class DefaultBeanLoader {
     }
 
     PersistenceContext persistenceContext = ctx.getPersistenceContext();
-
-    // query the database
-    for (int i = 0; i < ebis.length; i++) {
-      Object parentBean = ebis[i].getParentBean();
-      if (parentBean != null) {
-        // Special case for OneToOne
-        BeanDescriptor<?> parentDesc = server.getBeanDescriptor(parentBean.getClass());
-        Object parentId = parentDesc.getId(parentBean);
-        persistenceContext.put(parentId, parentBean);
-      }
-    }
 
     SpiQuery<?> query = (SpiQuery<?>) server.createQuery(beanType);
 
@@ -323,7 +312,7 @@ public class DefaultBeanLoader {
 
     if (loadRequest.isLoadCache()) {
       for (int i = 0; i < list.size(); i++) {
-        desc.cachePutBeanData(list.get(i));
+        desc.cachePutBeanData((EntityBean)list.get(i));
       }
     }
 
@@ -336,7 +325,7 @@ public class DefaultBeanLoader {
     }
   }
 
-	public void refresh(Object bean) {
+	public void refresh(EntityBean bean) {
 		refreshBeanInternal(bean, SpiQuery.Mode.REFRESH_BEAN);
 	}
 	
@@ -344,7 +333,7 @@ public class DefaultBeanLoader {
 		refreshBeanInternal(ebi.getOwner(), SpiQuery.Mode.LAZYLOAD_BEAN);
 	}
 
-  private void refreshBeanInternal(Object bean, SpiQuery.Mode mode) {
+  private void refreshBeanInternal(EntityBean bean, SpiQuery.Mode mode) {
 
     EntityBeanIntercept ebi = ((EntityBean) bean)._ebean_getIntercept();;
     PersistenceContext pc = ebi.getPersistenceContext();
@@ -364,7 +353,7 @@ public class DefaultBeanLoader {
     if (ebi != null) {
       if (SpiQuery.Mode.LAZYLOAD_BEAN.equals(mode) && desc.isBeanCaching()) {
         // lazy loading and the bean cache is active 
-        if (desc.loadFromCache(bean, ebi, id)) {
+        if (desc.loadFromCache((EntityBean)bean, ebi, id)) {
           return;
         }
       }
@@ -375,15 +364,8 @@ public class DefaultBeanLoader {
 
     SpiQuery<?> query = (SpiQuery<?>) server.createQuery(desc.getBeanType());
     if (ebi != null) {
-      Object parentBean = ebi.getParentBean();
-      if (parentBean != null) {
-        // Special case for OneToOne
-        BeanDescriptor<?> parentDesc = server.getBeanDescriptor(parentBean.getClass());
-        Object parentId = parentDesc.getId(parentBean);
-        pc.putIfAbsent(parentId, parentBean);
-      }
-
-      query.setLazyLoadProperty(ebi.getLazyLoadProperty());
+      int propIndex = ebi.getLazyLoadProperty();
+      query.setLazyLoadProperty(ebi.getProperty(propIndex));
     }
 
     // don't collect autoFetch usage profiling information

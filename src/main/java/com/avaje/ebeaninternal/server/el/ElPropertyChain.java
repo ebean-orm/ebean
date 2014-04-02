@@ -156,7 +156,7 @@ public class ElPropertyChain implements ElPropertyValue {
         return lastElPropertyValue.isLocalEncrypted();
     }
 
-    public Object[] getAssocOneIdValues(Object bean) {
+    public Object[] getAssocOneIdValues(EntityBean bean) {
 		// Don't navigate the object graph as bean 
 		// is assumed to be the appropriate type
 		return lastElPropertyValue.getAssocOneIdValues(bean);
@@ -231,10 +231,10 @@ public class ElPropertyChain implements ElPropertyValue {
 		return lastElPropertyValue.elConvertType(value);
 	}
 	
-	public Object elGetValue(Object bean) {
+	public Object elGetValue(EntityBean bean) {
 
 		for (int i = 0; i < chain.length; i++) {
-			bean = chain[i].elGetValue(bean);
+			bean = (EntityBean)chain[i].elGetValue(bean);
 			if (bean == null) {
 				return null;
 			}
@@ -243,24 +243,22 @@ public class ElPropertyChain implements ElPropertyValue {
 		return bean;
 	}
 
-	public Object elGetReference(Object bean) {
+	public Object elGetReference(EntityBean bean) {
 		
-		Object prevBean = bean;
+	  EntityBean prevBean = bean;
 		for (int i = 0; i < last; i++) {
 			// always return non null prevBean
-			prevBean = chain[i].elGetReference(prevBean);
+			prevBean = (EntityBean)chain[i].elGetReference(prevBean);
 		}
 		// try the last step in the chain
-		bean = chain[last].elGetValue(prevBean);
-		
-		return bean;
+		return chain[last].elGetValue(prevBean);
 	}
 	
 
-	public void elSetLoaded(Object bean) {
+	public void elSetLoaded(EntityBean bean) {
 		
 		for (int i = 0; i < last; i++) {
-			bean = chain[i].elGetValue(bean);
+			bean = (EntityBean)chain[i].elGetValue(bean);
 			if (bean == null){
 				break;
 			}
@@ -270,10 +268,10 @@ public class ElPropertyChain implements ElPropertyValue {
 		}
 	}
 	
-	public void elSetReference(Object bean) {
+	public void elSetReference(EntityBean bean) {
 
 		for (int i = 0; i < last; i++) {
-			bean = chain[i].elGetValue(bean);
+			bean = (EntityBean)chain[i].elGetValue(bean);
 			if (bean == null){
 				break;
 			}
@@ -283,18 +281,18 @@ public class ElPropertyChain implements ElPropertyValue {
 		}
 	}
 	
-	public void elSetValue(Object bean, Object value, boolean populate, boolean reference){
+	public void elSetValue(EntityBean bean, Object value, boolean populate, boolean reference){
 
-		Object prevBean = bean;
+		EntityBean prevBean = bean;
 		if (populate){
 			for (int i = 0; i < last; i++) {
 				// always return non null prevBean
-				prevBean = chain[i].elGetReference(prevBean);
+				prevBean = (EntityBean)chain[i].elGetReference(prevBean);
 			}	
 		} else {
 			for (int i = 0; i < last; i++) {
 				// always return non null prevBean
-				prevBean = chain[i].elGetValue(prevBean);
+				prevBean = (EntityBean)chain[i].elGetValue(prevBean);
 				if (prevBean == null){
 					break;
 				}

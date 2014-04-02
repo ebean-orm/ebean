@@ -168,7 +168,7 @@ public final class BatchControl {
       // special case where the same bean instance has been added
       // to the batch more than once
       if (logger.isDebugEnabled()) {
-        logger.debug("Bean instance already in this batch: " + request.getBean());
+        logger.debug("Bean instance already in this batch: " + request.getEntityBean());
       }
       return -1;
     }

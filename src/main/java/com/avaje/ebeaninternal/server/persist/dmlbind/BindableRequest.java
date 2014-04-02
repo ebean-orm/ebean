@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.persist.dmlbind;
 
 import java.sql.SQLException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -31,7 +32,7 @@ public interface BindableRequest {
 	 * @param bindNull
 	 *            if true bind null values, if false use IS NULL.
 	 */
-	public Object bind(Object value, BeanProperty prop, String propName, boolean bindNull) throws SQLException;
+	public Object bind(Object value, BeanProperty prop, String propName) throws SQLException;
 
 	/**
 	 * Bind a raw value. Used to bind the discriminator column.
@@ -46,29 +47,14 @@ public interface BindableRequest {
     /**
      * Bind the value to the preparedStatement without logging.
      */
-    public Object bindNoLog(Object value, BeanProperty prop, String propName, boolean bindNull) throws SQLException;
+    public Object bindNoLog(Object value, BeanProperty prop, String propName) throws SQLException;
 
-	/**
-	 * Return true if the property is included in this request.
-	 */
-	public boolean isIncluded(BeanProperty prop);
-
-    /**
-     * Return true if the property is included in the WHERE clause for this
-     * request.
-     */
-    public boolean isIncludedWhere(BeanProperty prop);
 
 	/**
 	 * Register the value from a update GeneratedValue. This can only be set to
 	 * the bean property after the where clause has bean built.
 	 */
-	public void registerUpdateGenValue(BeanProperty prop, Object bean, Object value);
-
-	/**
-	 * Register a property into loadedProperties if required.
-	 */
-	public void registerAdditionalProperty(String propertyName);
+	public void registerUpdateGenValue(BeanProperty prop, EntityBean bean, Object value);
 	
 	/**
 	 * Return the original PersistRequest.

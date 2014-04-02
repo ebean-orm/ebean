@@ -216,7 +216,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	/**
 	 * Return true if the unique id properties are all not null for this bean.
 	 */
-	public boolean hasId(Object bean) {
+	public boolean hasId(EntityBean bean) {
 
 		BeanDescriptor<?> targetDesc = getTargetDescriptor();
 
