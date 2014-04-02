@@ -10,7 +10,7 @@
   <groupId>org.avaje.ebeanorm</groupId>
   <artifactId>avaje-ebeanorm-spring</artifactId>
   <name>avaje-ebeanorm-spring</name>
-  <version>3.2.2-SNAPSHOT</version>
+  <version>3.3.1-RC3-SNAPSHOT</version>
   <packaging>jar</packaging>
   <description>Support for Spring transactions and IOC setup of Ebean server config</description>
 
@@ -160,5 +160,40 @@
         </executions>
       </plugin>
     </plugins>
+    <pluginManagement>
+    	<plugins>
+    		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+    		<plugin>
+    			<groupId>org.eclipse.m2e</groupId>
+    			<artifactId>lifecycle-mapping</artifactId>
+    			<version>1.0.0</version>
+    			<configuration>
+    				<lifecycleMappingMetadata>
+    					<pluginExecutions>
+    						<pluginExecution>
+    							<pluginExecutionFilter>
+    								<groupId>
+    									org.avaje.ebeanorm
+    								</groupId>
+    								<artifactId>
+    									avaje-ebeanorm-mavenenhancer
+    								</artifactId>
+    								<versionRange>
+    									[3.2.1,)
+    								</versionRange>
+    								<goals>
+    									<goal>enhance</goal>
+    								</goals>
+    							</pluginExecutionFilter>
+    							<action>
+    								<ignore></ignore>
+    							</action>
+    						</pluginExecution>
+    					</pluginExecutions>
+    				</lifecycleMappingMetadata>
+    			</configuration>
+    		</plugin>
+    	</plugins>
+    </pluginManagement>
   </build>
 </project>

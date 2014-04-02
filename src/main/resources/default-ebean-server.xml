@@ -14,10 +14,6 @@
 			</bean>
 		</property>
 
-		<!-- turn off all logging by default -->
-		<property name="loggingDirectory" value="logs"/>
-		<property name="loggingLevel" value="NONE"/>
-	
 		<property name="externalTransactionManager">
 			<bean class="com.avaje.ebean.springsupport.txn.SpringAwareJdbcTransactionManager"/>
 		</property>
