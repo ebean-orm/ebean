@@ -10,7 +10,6 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -26,10 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.api.ClassUtil;
-import com.avaje.ebeaninternal.server.util.ClassPathReader;
-import com.avaje.ebeaninternal.server.util.ClassPathSearchFilter;
-import com.avaje.ebeaninternal.server.util.ClassPathSearchMatcher;
-import com.avaje.ebeaninternal.server.util.DefaultClassPathReader;
 
 /**
  * Can search the class path for classes using a ClassPathSearchMatcher. A
@@ -45,8 +40,8 @@ public class ClassPathSearch {
 
   private ClassLoader classLoader;
 
-  private Object[] classPaths;
-
+  private List<Object> classPath = new ArrayList<Object>();
+  
   private ClassPathSearchFilter filter;
 
   private ClassPathSearchMatcher matcher;
@@ -79,16 +74,27 @@ public class ClassPathSearch {
         classPathReader = (ClassPathReader) ClassUtil.newInstance(cn, this.getClass());
       }
 
-      classPaths = classPathReader.readPath(classLoader);
+      Object[] rawClassPaths = classPathReader.readPath(classLoader);
 
-      if (classPaths == null || classPaths.length == 0) {
-        String msg = "ClassPath is EMPTY using ClassPathReader [" + classPathReader + "]";
-        logger.warn(msg);
+      if (rawClassPaths == null || rawClassPaths.length == 0) {
+        logger.warn("ClassPath is EMPTY using ClassPathReader [" + classPathReader + "]");
+        return;
+      } 
+
+      for (int i = 0; i < rawClassPaths.length; i++) {
+        // check for a jarfile with a manifest classpath (e.g. maven surefire)
+        List<URI> classPathFromManifest = getClassPathFromManifest(rawClassPaths[i]);
+        if (classPathFromManifest.isEmpty()) {
+          classPath.add(rawClassPaths[i]);
+        } else {
+          classPath.addAll(classPathFromManifest);
+        }
       }
-
-      boolean debug = GlobalProperties.getBoolean("ebean.debug.classpath", false);
-      if (debug || logger.isTraceEnabled()) {
-        logger.info("Classpath " + Arrays.toString(classPaths));
+      
+      if (logger.isDebugEnabled()) {
+        for (Object entry : classPath) {
+          logger.debug("Classpath Entry: {}",entry);
+        }
       }
 
     } catch (Exception e) {
@@ -133,47 +139,52 @@ public class ClassPathSearch {
    */
   public List<Class<?>> findClasses() throws IOException {
 
-    if (classPaths == null || classPaths.length == 0) {
+    if (classPath.isEmpty()) {
       // returning an empty list
       return matchList;
     }
 
-    for (int i = 0; i < classPaths.length; i++) {
+    int classPathSize = classPath.size();
+    for (int i = 0; i < classPathSize; i++) {
 
-      ClassPathElement element = getClassPathElement(classPaths[i]);
+      ClassPathElement element = getClassPathElement(classPath.get(i));
 
       if (element.isDirectory()) {
         scanDirectory(element);
 
       } else if (element.isJarOrWar()) {
         // search name including the ! offset if it is there
-        if (filter.isSearchJar(element.getJarNameWithOffset())) {
+        if (classPathSize == 1 || filter.isSearchJar(element.getJarNameWithOffset())) {
           scanJar(element);
         }
 
       } else {
-        String msg = "Error: expected classPath entry [" + element
-            + "] to be a directory or a .jar file but it is not either of those?";
-        logger.error(msg);
+        logger.error("Error: expected classPath entry [" + element+ "] to be a directory or a .jar file but it is not either of those?");
       }
     }
 
     if (matchList.isEmpty()) {
-      String msg = "No Entities found in ClassPath using ClassPathReader [" + classPathReader + "] Classpath Searched["
-          + Arrays.toString(classPaths) + "]";
-      logger.warn(msg);
+      logger.warn("No Entities found in ClassPath using ClassPathReader [" + classPathReader + "] Classpath Searched[" + classPath + "]");
     }
 
     return matchList;
   }
 
-  private ClassPathElement getClassPathElement(Object classPathEntry) {
+  private ClassPathElement getClassPathElement(Object classPathEntry) throws MalformedURLException {
 
-    if (!URL.class.isInstance(classPathEntry)) {
+    URL fileUrl = null;
+    
+    if (URI.class.isInstance(classPathEntry)) {
+      fileUrl = ((URI)classPathEntry).toURL();
+      
+    } else if (!URL.class.isInstance(classPathEntry)) {
       // assumed to be a file path
       return new ClassPathElement(classPathEntry.toString());
+    
+    } else {
+      fileUrl = (URL) classPathEntry;
     }
-    URL fileUrl = (URL) classPathEntry;
+    
     if (!fileUrl.getPath().contains("!")) {
       return new ClassPathElement(new File(fileUrl.getFile()));
     }
@@ -371,6 +382,34 @@ public class ClassPathSearch {
     }
   }
 
+  /**
+   * If URL and actually a jarfile with manifest return the derived classpath.
+   */
+  private static List<URI> getClassPathFromManifest(Object classPathElement) {
+
+    try {
+      if (classPathElement instanceof URL) {
+        File file = new File(((URL)classPathElement).getFile());
+        if (file.isDirectory()) {
+          return Collections.emptyList();
+        }
+        JarFile jarFile = new JarFile(file);
+        try {
+          return getClassPathFromManifest(file, jarFile.getManifest());
+        } finally {
+          jarFile.close();
+        }
+      }
+      return Collections.emptyList();
+      
+    } catch (IOException e) {
+      return Collections.emptyList();
+    }
+  }
+  
+  /**
+   * If a jarfile with a manifest claspath return that.
+   */
   private static List<URI> getClassPathFromManifest(File jarFile, Manifest manifest) {
 
     if (manifest == null) {
