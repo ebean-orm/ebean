@@ -1,14 +1,14 @@
-avaje-ebeanorm-server
-=====================
+avaje-ebeanorm
+==============
 
-The internal server implementation of EbeanORM API
+Main EbeanORM artifact
 
 Maven Dependency
 ----------------
     <dependency>
       <groupId>org.avaje.ebeanorm</groupId>
       <artifactId>avaje-ebeanorm</artifactId>
-      <version>3.2.5</version>
+      <version>3.3.1</version>
     </dependency>
     
     
