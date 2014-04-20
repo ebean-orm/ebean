@@ -1108,7 +1108,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     if (cacheData == null) {
       return false;
     }
-    int lazyLoadProperty = ebi.getLazyLoadProperty();
+    int lazyLoadProperty = ebi.getLazyLoadPropertyIndex();
     if (lazyLoadProperty > -1 && !cacheData.containsProperty(lazyLoadProperty)) {
       return false;
     }
@@ -1586,7 +1586,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public boolean lazyLoadMany(EntityBeanIntercept ebi) {
 
-    int lazyLoadProperty = ebi.getLazyLoadProperty();
+    int lazyLoadProperty = ebi.getLazyLoadPropertyIndex();
     if (lazyLoadProperty == -1) {
       return false;
     }

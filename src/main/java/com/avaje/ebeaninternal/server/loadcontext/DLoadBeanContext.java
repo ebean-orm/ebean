@@ -173,7 +173,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
         }
       }
 
-      LoadBeanRequest req = new LoadBeanRequest(this, null, true, ebi.getLazyLoadProp(), context.hitCache);
+      LoadBeanRequest req = new LoadBeanRequest(this, null, true, ebi.getLazyLoadProperty(), context.hitCache);
       context.desc.getEbeanServer().loadBean(req);
     }
 

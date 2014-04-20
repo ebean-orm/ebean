@@ -364,7 +364,7 @@ public class DefaultBeanLoader {
 
     SpiQuery<?> query = (SpiQuery<?>) server.createQuery(desc.getBeanType());
     if (ebi != null) {
-      query.setLazyLoadProperty(ebi.getLazyLoadProp());
+      query.setLazyLoadProperty(ebi.getLazyLoadProperty());
     }
 
     // don't collect autoFetch usage profiling information

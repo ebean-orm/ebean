@@ -494,13 +494,16 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Return the property read or write that triggered the lazy load.
+   * Return the index of the property that triggered the lazy load.
    */
-  public int getLazyLoadProperty() {
+  public int getLazyLoadPropertyIndex() {
     return lazyLoadProperty;
   }
   
-  public String getLazyLoadProp() {
+  /**
+   * Return the property that triggered the lazy load.
+   */
+  public String getLazyLoadProperty() {
     return getProperty(lazyLoadProperty);
   }
 
