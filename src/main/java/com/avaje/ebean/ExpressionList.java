@@ -260,15 +260,6 @@ public interface ExpressionList<T> extends Serializable {
   public Query<T> setMapKey(String mapKey);
 
   /**
-   * Please migrate to using {@link #findIterate()} or {@link #findVisit(QueryResultVisitor)}.
-   * Set a QueryListener for bean by bean processing.
-   * 
-   * @see Query#setListener(QueryListener)
-   * @deprecated Migrate to {@link #findIterate()} or {@link #findVisit(QueryResultVisitor)}
-   */
-  public Query<T> setListener(QueryListener<T> queryListener);
-
-  /**
    * Set to true to use the query for executing this query.
    * 
    * @see Query#setUseCache(boolean)

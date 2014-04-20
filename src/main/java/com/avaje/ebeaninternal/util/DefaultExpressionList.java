@@ -17,7 +17,6 @@ import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.PagingList;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.QueryListener;
 import com.avaje.ebean.QueryResultVisitor;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
@@ -219,11 +218,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   public Query<T> setMapKey(String mapKey) {
     return query.setMapKey(mapKey);
-  }
-
-  @Deprecated
-  public Query<T> setListener(QueryListener<T> queryListener) {
-    return query.setListener(queryListener);
   }
 
   public Query<T> setUseCache(boolean useCache) {

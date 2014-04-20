@@ -664,36 +664,6 @@ public interface Query<T> extends Serializable {
   public Query<T> setParameter(int position, Object value);
 
   /**
-   * Please migrate to using {@link #findIterate()} or {@link #findVisit(QueryResultVisitor)}
-   * <p>
-   * Set a listener to process the query on a row by row basis.
-   * </p>
-   * <p>
-   * Use this when you want to process a large query and do not want to hold the
-   * entire query result in memory.
-   * </p>
-   * <p>
-   * It this case the rows are not loaded into the persistence context and
-   * instead are processed by the query listener.
-   * </p>
-   * 
-   * <pre class="code">
-   * QueryListener&lt;Order&gt; listener = ...;
-   *   
-   * Query&lt;Order&gt; query  = Ebean.createQuery(Order.class);
-   *   
-   * // set the listener that will process each order one at a time
-   * query.setListener(listener);
-   *   
-   * // execute the query. Note that the returned
-   * // list (emptyList) will be empty ...
-   * List&lt;Order&gt; emtyList = query.findList();
-   * </pre>
-   * @deprecated Deprecated in favor of {@link #findIterate()} and {@link #findVisit(QueryResultVisitor)}
-   */
-  public Query<T> setListener(QueryListener<T> queryListener);
-
-  /**
    * Set the Id value to query. This is used with findUnique().
    * <p>
    * You can use this to have further control over the query. For example adding

@@ -12,8 +12,8 @@ import javax.persistence.PersistenceException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.QueryListener;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.EntityBean;
@@ -23,7 +23,6 @@ import com.avaje.ebean.bean.NodeUsageListener;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.LoadContext;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
@@ -40,7 +39,6 @@ import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
-import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
 
@@ -134,8 +132,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   private final BeanDescriptor<T> desc;
 
   private final SpiQuery<T> query;
-
-  private final QueryListener<T> queryListener;
 
   private Map<String, String> currentPathMap;
 
@@ -277,20 +273,10 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
 
-    this.queryListener = query.getListener();
-    if (queryListener == null) {
-      // normal, use the one from the transaction
-      this.persistenceContext = request.getPersistenceContext();
-    } else {
-      // 'Row Level Transaction Context'...
-      // local transaction context that will be reset
-      // after each 'master' bean is sent to the listener
-      this.persistenceContext = new DefaultPersistenceContext();
-    }
-
+    this.persistenceContext = request.getPersistenceContext();
+ 
     this.maxRowsLimit = query.getMaxRows() > 0 ? query.getMaxRows() : GLOBAL_ROW_LIMIT;
-    this.backgroundFetchAfter = query.getBackgroundFetchAfter() > 0 ? query
-        .getBackgroundFetchAfter() : Integer.MAX_VALUE;
+    this.backgroundFetchAfter = query.getBackgroundFetchAfter() > 0 ? query.getBackgroundFetchAfter() : Integer.MAX_VALUE;
 
     this.help = createHelp(request);
     this.collection = (BeanCollection<T>) (help != null ? help.createEmpty(false) : null);
@@ -687,13 +673,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   @SuppressWarnings("unchecked")
   private void readTheRows(boolean inForeground) throws SQLException {
     while (hasNextBean(inForeground)) {
-      if (queryListener != null) {
-        queryListener.process((T)getLoadedBean());
-
-      } else {
-        // add to the list/set/map
-        help.add(collection, getLoadedBean());
-      }
+      // add to the list/set/map
+      help.add(collection, getLoadedBean());
     }
   }
 

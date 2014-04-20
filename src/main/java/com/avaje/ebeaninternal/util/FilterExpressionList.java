@@ -14,7 +14,6 @@ import com.avaje.ebean.FutureRowCount;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.PagingList;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryListener;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.server.expression.FilterExprPath;
 
@@ -134,11 +133,6 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
 
     public Query<T> setFirstRow(int firstRow) {
         return rootQuery.setFirstRow(firstRow);
-    }
-
-    @Deprecated
-    public Query<T> setListener(QueryListener<T> queryListener) {
-        return rootQuery.setListener(queryListener);
     }
 
     public Query<T> setMapKey(String mapKey) {

@@ -6,7 +6,6 @@ import java.util.List;
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryListener;
 import com.avaje.ebean.bean.BeanCollectionTouched;
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.EntityBean;
@@ -544,11 +543,6 @@ public interface SpiQuery<T> extends Query<T> {
      * Return the Id value.
      */
     public Object getId();
-
-    /**
-     * Return the queryListener.
-     */
-    public QueryListener<T> getListener();
 
     /**
      * Return true if this query should use its own transaction.

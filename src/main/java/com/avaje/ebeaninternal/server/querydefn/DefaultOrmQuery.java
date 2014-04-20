@@ -21,7 +21,6 @@ import com.avaje.ebean.OrderBy.Property;
 import com.avaje.ebean.PagingList;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.QueryListener;
 import com.avaje.ebean.QueryResultVisitor;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.bean.BeanCollectionTouched;
@@ -69,8 +68,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	 */
 	private transient ArrayList<EntityBean> contextAdditions;
 	
-	private transient QueryListener<T> queryListener;
-
 	/**
 	 * For lazy loading of ManyToMany we need to add a join to the intersection
 	 * table. This is that join to the intersection table.
@@ -1016,26 +1013,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 		return this;
 	}
 
-	/**
-	 * Return the findListener is one has been set.
-	 */
-	public QueryListener<T> getListener() {
-		return queryListener;
-	}
-
-	/**
-	 * Set a FindListener. This is designed for large fetches where lots are
-	 * rows are to be processed and instead of returning all the rows they are
-	 * processed one at a time.
-	 * <p>
-	 * Note that the returning List Set or Map will be empty.
-	 * </p>
-	 */
-	public DefaultOrmQuery<T> setListener(QueryListener<T> queryListener) {
-		this.queryListener = queryListener;
-		return this;
-	}
-
 	public Class<T> getBeanType() {
 		return beanType;
 	}
@@ -1044,13 +1021,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 		this.detail = detail;
 	}
 	
-	public boolean tuneFetchProperties(OrmQueryDetail tunedDetail) {
-        return detail.tuneFetchProperties(tunedDetail);
-    }
+  public boolean tuneFetchProperties(OrmQueryDetail tunedDetail) {
+    return detail.tuneFetchProperties(tunedDetail);
+  }
 
-    public OrmQueryDetail getDetail() {
-		return detail;
-	}
+  public OrmQueryDetail getDetail() {
+    return detail;
+  }
 
 	/**
 	 * Return any beans that should be added to the persistence context prior to
@@ -1244,7 +1221,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 			// their own transaction
 			return false;
 		}
-		if (backgroundFetchAfter > 0 || queryListener != null) {
+		if (backgroundFetchAfter > 0) {
 			// run in own transaction as we can't know how long
 			// the background fetching will continue etc
 			return true;
