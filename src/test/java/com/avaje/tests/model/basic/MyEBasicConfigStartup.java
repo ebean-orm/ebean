@@ -3,8 +3,6 @@ package com.avaje.tests.model.basic;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.avaje.ebean.BeanState;
-import com.avaje.ebean.Ebean;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BulkTableEvent;
@@ -44,10 +42,8 @@ public class MyEBasicConfigStartup implements ServerConfigStartup {
       return false;
     }
 
-    public boolean updated(EBasic bean) {
-      BeanState beanState = Ebean.getBeanState(bean);
-      Set<String> updatedProperties = beanState.getChangedProps();
-      System.out.println("-- EBasic updated " + bean.getId());
+    public boolean updated(EBasic bean, Set<String> updatedProperties) {
+      System.out.println("-- EBasic updated " + bean.getId()+" updatedProperties: "+updatedProperties);
       return false;
     }
 

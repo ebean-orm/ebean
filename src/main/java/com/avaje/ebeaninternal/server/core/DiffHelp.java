@@ -5,7 +5,9 @@ import java.util.Map;
 
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
 /**
@@ -30,17 +32,16 @@ public class DiffHelp {
 	 */
 	public Map<String, ValuePair> diff(Object a, Object b, BeanDescriptor<?> desc) {
 
-		boolean oldValues = false;
+	   Map<String, ValuePair> map = new LinkedHashMap<String, ValuePair>();
+
 		if (b == null) {
 			// get the old values from a
 			if (a instanceof EntityBean) {
-				EntityBean eb = (EntityBean) a;
-				b = null;//FIXME eb._ebean_getIntercept().getOldValues();
-				oldValues = true;
+				return ((EntityBean) a)._ebean_getIntercept().getDirtyValues();
 			}
+			return map;
 		}
 
-		Map<String, ValuePair> map = new LinkedHashMap<String, ValuePair>();
 
 //		if (b == null) {
 //			return map;
@@ -70,8 +71,7 @@ public class DiffHelp {
 	 * determined to be different as is added to the map.
 	 * </p>
 	 */
-	private void diffEmbedded(Object a, Object b, BeanDescriptor<?> desc, Map<String, ValuePair> map,
-			boolean oldValues) {
+	private void diffEmbedded(Object a, Object b, BeanDescriptor<?> desc, Map<String, ValuePair> map, boolean oldValues) {
 
 //		BeanPropertyAssocOne<?>[] emb = desc.propertiesEmbedded();
 //

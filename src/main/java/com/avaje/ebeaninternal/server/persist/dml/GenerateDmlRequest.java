@@ -59,7 +59,7 @@ public class GenerateDmlRequest {
         return true;
       }
       if (changesOnly) {
-        return ebi.isChangedProperty(prop.getPropertyIndex());
+        return ebi.isDirtyProperty(prop.getPropertyIndex());
       } else {
         return ebi.isLoadedProperty(prop.getPropertyIndex());
       }

@@ -11,7 +11,6 @@ import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableId;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableList;
@@ -115,19 +114,9 @@ public final class UpdateMeta {
     // we can use a cached UpdatePlan for the changed properties
     
     EntityBeanIntercept ebi = persistRequest.getEntityBeanIntercept();
-    int hash = ebi.getChangedPropertiesHash();
+    int hash = ebi.getDirtyPropertyHash();
     
     BeanDescriptor<?> beanDescriptor = persistRequest.getBeanDescriptor();
-    
-    BeanPropertyAssocOne<?>[] propertiesEmbedded = beanDescriptor.propertiesEmbedded();
-    for (int i=0; i< propertiesEmbedded.length; i++) {
-      EntityBean embeddedBean = (EntityBean)propertiesEmbedded[i].getValue(persistRequest.getEntityBean());
-      if (embeddedBean == null) {
-        hash = hash * 31;
-      } else {
-        hash = hash * 31 + embeddedBean._ebean_getIntercept().getChangedPropertiesHash();
-      }
-    }
     
     BeanProperty versionProperty = beanDescriptor.getVersionProperty();
     if (versionProperty != null) {

@@ -1,6 +1,7 @@
 package com.avaje.ebean;
 
 import java.beans.PropertyChangeListener;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -46,6 +47,11 @@ public interface BeanState {
    */
   public Set<String> getChangedProps();
 
+  /**
+   * Return a map of the updated properties and their new and old values.
+   */
+  public Map<String,ValuePair> getDirtyValues();
+  
   /**
    * Return true if the bean is readOnly.
    * <p>

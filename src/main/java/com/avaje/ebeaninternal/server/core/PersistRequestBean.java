@@ -2,9 +2,12 @@ package com.avaje.ebeaninternal.server.core;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.OptimisticLockException;
 
+import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
@@ -79,6 +82,8 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	private boolean statelessUpdate;
 	private boolean deleteMissingChildren;
 	private boolean updateNullProperties;
+	
+	private final Set<String> dirtyPropertyNames;
 
 	public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr,
 	        SpiTransaction t, PersistExecute persistExecute) {
@@ -89,6 +94,8 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 		this.beanManager = mgr;
 		this.beanDescriptor = mgr.getBeanDescriptor();
 		this.beanPersistListener = beanDescriptor.getPersistListener();
+    this.dirtyPropertyNames = (beanPersistListener == null) ? null : intercept.getDirtyPropertyNames();
+		
 		this.bean = bean;
 		this.parentBean = parentBean;
 
@@ -101,9 +108,23 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 		// this is ok to not use isNewOrDirty() as used for updates only
 		this.isDirty = intercept.isDirty();
 	}
-
 	
-	public void setNotNullAsLoaded() {
+	@Override
+  public Set<String> getLoadedProperties() {
+    return intercept.getLoadedPropertyNames();
+  }
+
+  @Override
+  public Set<String> getUpdatedProperties() {
+    return intercept.getDirtyPropertyNames();
+  }
+
+  @Override
+  public Map<String, ValuePair> getUpdatedValues() {
+    return intercept.getDirtyValues();
+  }
+
+  public void setNotNullAsLoaded() {
 	  BeanProperty[] props = beanDescriptor.propertiesNonMany();
 	  for (int i=0; i< props.length; i++) {
 	    BeanProperty prop = props[i];
@@ -163,7 +184,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 				return beanPersistListener.inserted(bean);
 
 			case UPDATE:
-				return beanPersistListener.updated(bean);//, getUpdatedProperties());
+				return beanPersistListener.updated(bean, dirtyPropertyNames);
 
 			case DELETE:
 				return beanPersistListener.deleted(bean);
@@ -558,7 +579,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 * update.
 	 */
 	public boolean isAddToUpdate(BeanProperty prop) {
-	  return intercept.isChangedProperty(prop.getPropertyIndex());
+	  return intercept.isDirtyProperty(prop.getPropertyIndex());
 	}
 
   public List<DerivedRelationshipData> getDerivedRelationships() {

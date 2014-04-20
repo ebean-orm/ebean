@@ -1,9 +1,11 @@
 package com.avaje.ebeaninternal.server.core;
 
 import java.beans.PropertyChangeListener;
+import java.util.Map;
 import java.util.Set;
 
 import com.avaje.ebean.BeanState;
+import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 
@@ -12,9 +14,9 @@ import com.avaje.ebean.bean.EntityBeanIntercept;
  */
 public class DefaultBeanState implements BeanState {
 
-	final EntityBean entityBean;
+	private final EntityBean entityBean;
 	
-	final EntityBeanIntercept intercept;
+	private final EntityBeanIntercept intercept;
 	
 	public DefaultBeanState(EntityBean  entityBean){
 		this.entityBean = entityBean;
@@ -42,7 +44,11 @@ public class DefaultBeanState implements BeanState {
 	}
 	
 	public Set<String> getChangedProps() {
-	  return intercept.getChangedPropertyNames();
+	  return intercept.getDirtyPropertyNames();
+  }
+	
+  public Map<String,ValuePair> getDirtyValues() {
+    return intercept.getDirtyValues();
   }
 	
 	public boolean isReadOnly() {
@@ -68,6 +74,5 @@ public class DefaultBeanState implements BeanState {
 	public void setReference() {
 		intercept.setReference();
 	}
-	
 	
 }

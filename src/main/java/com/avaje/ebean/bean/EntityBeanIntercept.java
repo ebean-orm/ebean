@@ -6,13 +6,16 @@ import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.ValuePair;
 
 /**
  * This is the object added to every entity bean using byte code enhancement.
@@ -82,6 +85,13 @@ public final class EntityBeanIntercept implements Serializable {
    * Set of changed properties.
    */
   private boolean[] changedProps;
+  
+  /**
+   * Flags indicating if a property is a dirty embedded bean. Used to distingush
+   * between an embedded bean being completely overwritten and one of its
+   * embedded properties being made dirty.
+   */
+  private boolean[] embeddedDirty;
 
   private Object[] origValues;
 
@@ -227,9 +237,12 @@ public final class EntityBeanIntercept implements Serializable {
     return dirty;
   }
 
+  /**
+   * Called by an embedded bean onto its owner.
+   */
   public void setEmbeddedDirty(int embeddedProperty) {
     this.dirty = true;
-    setChangedProperty(embeddedProperty);
+    setEmbeddedPropertyDirty(embeddedProperty);
   }
   
   public void setDirty(boolean dirty) {
@@ -382,6 +395,30 @@ public final class EntityBeanIntercept implements Serializable {
     }
   }
 
+  /**
+   * Return the original value that was changed via an update.
+   */
+  public Object getOrigValue(int propertyIndex) {
+    if (origValues == null) {
+      return null;
+    }
+    return origValues[propertyIndex];
+  }
+  
+  /**
+   * Finds the index position of a given property. Returns -1 if the property
+   * can not be found.
+   */
+  public int findProperty(String propertyName) {
+    String[] names = owner._ebean_getPropertyNames();
+    for (int i = 0; i < names.length; i++) {
+      if (names[i].equals(propertyName)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+  
   public String getProperty(int propertyIndex) {
     if (propertyIndex == -1) {
       return null;
@@ -406,6 +443,15 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
+   * Return true if the property was changed or if it is embedded and one of its
+   * embedded properties is dirty.
+   */
+  public boolean isDirtyProperty(int propertyIndex) {
+    return (changedProps != null && changedProps[propertyIndex] 
+        || embeddedDirty != null && embeddedDirty[propertyIndex]);
+  }
+
+  /**
    * Explicitly mark a property as having been changed.
    */
   public void markPropertyAsChanged(int propertyIndex) {
@@ -418,6 +464,16 @@ public final class EntityBeanIntercept implements Serializable {
       changedProps = new boolean[owner._ebean_getPropertyNames().length];
     }
     changedProps[propertyIndex] = true;
+  }
+
+  /**
+   * Set that an embedded bean has had one of its properties changed.
+   */
+  private void setEmbeddedPropertyDirty(int propertyIndex) {
+    if (embeddedDirty == null) {
+      embeddedDirty = new boolean[owner._ebean_getPropertyNames().length];
+    }
+    embeddedDirty[propertyIndex] = true;
   }
   
   private void setOriginalValue(int propertyIndex, Object value) {
@@ -457,29 +513,88 @@ public final class EntityBeanIntercept implements Serializable {
     }
     return props;
   }
-  
-  public Set<String> getChangedPropertyNames() {
+
+  /**
+   * Return the set of dirty properties.
+   */
+  public Set<String> getDirtyPropertyNames() {
     Set<String> props = new LinkedHashSet<String>();
-    if (changedProps != null) {
-      for (int i=0; i<changedProps.length; i++) {
-        if (changedProps[i]) {
-          props.add(getProperty(i));
-        }
-      }
-    }
+    addDirtyPropertyNames(props, null);
     return props;
   }
   
-  public int getChangedPropertiesHash() {
-    int h = 1;
-    if (changedProps != null) {
-      for (int i=0; i<changedProps.length; i++) {
-        if (changedProps[i]) {
-          h = h * 31 + (i+1);
-        }
+  /**
+   * Recursively add dirty properties.
+   */
+  public void addDirtyPropertyNames(Set<String> props, String prefix) {
+    int len = getPropertyLength();
+    for (int i = 0; i < len; i++) {
+      if (changedProps != null && changedProps[i]) {
+        // the property has been changed on this bean
+        String propName = (prefix == null ? getProperty(i) : prefix + getProperty(i));
+        props.add(propName);
+      } else if (embeddedDirty != null && embeddedDirty[i]) {
+        // an embedded property has been changed - recurse
+        EntityBean embeddedBean = (EntityBean)owner._ebean_getField(i);
+        embeddedBean._ebean_getIntercept().addDirtyPropertyNames(props, getProperty(i)+".");
       }
     }
-    return h;
+  }
+  
+  /**
+   * Return a map of dirty properties with their new and old values.
+   */
+  public Map<String,ValuePair> getDirtyValues() {
+    Map<String,ValuePair> dirtyValues = new LinkedHashMap<String, ValuePair>();
+    addDirtyPropertyValues(dirtyValues, null);
+    return dirtyValues;
+  }
+  
+  /**
+   * Recursively add dirty properties.
+   */
+  public void addDirtyPropertyValues(Map<String,ValuePair> dirtyValues, String prefix) {
+    int len = getPropertyLength();
+    for (int i = 0; i < len; i++) {
+      if (changedProps != null && changedProps[i]) {
+        // the property has been changed on this bean
+        String propName = (prefix == null ? getProperty(i) : prefix + getProperty(i));
+        Object newVal = owner._ebean_getField(i);
+        Object oldVal = getOrigValue(i);
+
+        dirtyValues.put(propName, new ValuePair(newVal, oldVal));
+        
+      } else if (embeddedDirty != null && embeddedDirty[i]) {
+        // an embedded property has been changed - recurse
+        EntityBean embeddedBean = (EntityBean)owner._ebean_getField(i);
+        embeddedBean._ebean_getIntercept().addDirtyPropertyValues(dirtyValues, getProperty(i)+".");
+      }
+    }
+  }
+  
+  /**
+   * Return a dirty property hash taking into account embedded beans.
+   */
+  public int getDirtyPropertyHash() {
+    return addDirtyPropertyHash(37);
+  }
+  
+  /**
+   * Add and return a dirty property hash recursing into embedded beans.
+   */
+  public int addDirtyPropertyHash(int hash) {
+    int len = getPropertyLength();
+    for (int i = 0; i < len; i++) {
+      if (changedProps != null && changedProps[i]) {
+        // the property has been changed on this bean
+        hash = hash * 31 + (i+1);
+      } else if (embeddedDirty != null && embeddedDirty[i]) {
+        // an embedded property has been changed - recurse
+        EntityBean embeddedBean = (EntityBean)owner._ebean_getField(i);
+        hash = hash * 31 + embeddedBean._ebean_getIntercept().addDirtyPropertyHash(hash);
+      }
+    }
+    return hash;
   }
 
   /**
@@ -693,7 +808,7 @@ public final class EntityBeanIntercept implements Serializable {
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else if (!areEqual(oldValue, newValue)) {
-      setChangedPropertyValue(propertyIndex, intercept, newValue);   
+      setChangedPropertyValue(propertyIndex, intercept, oldValue);   
     } else {
       return null;
     }

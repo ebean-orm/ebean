@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.avaje.ebean.event.BeanPersistListener;
 
@@ -11,6 +12,7 @@ import com.avaje.ebean.event.BeanPersistListener;
 public class ChainedBeanPersistListener<T> implements BeanPersistListener<T> {
 
 	private final List<BeanPersistListener<T>> list;
+	
 	private final BeanPersistListener<T>[] chain;
 	
 	/**
@@ -109,10 +111,10 @@ public class ChainedBeanPersistListener<T> implements BeanPersistListener<T> {
 		}
 	}
 
-	public boolean updated(T bean) {
+	public boolean updated(T bean, Set<String> updatedProperties) {
 		boolean notifyCluster = false;
 		for (int i = 0; i < chain.length; i++) {
-			if (chain[i].updated(bean)) {
+			if (chain[i].updated(bean, updatedProperties)) {
 				notifyCluster = true;
 			}
 		}
