@@ -83,7 +83,7 @@ public interface IdBinder {
   /**
    * Return the id values for a given bean.
    */
-  public Object[] getIdValues(Object bean);
+  public Object[] getIdValues(EntityBean bean);
 
   /**
    * Build a string of the logical expressions.
@@ -131,7 +131,7 @@ public interface IdBinder {
    * Read the id value from the result set and set it to the bean also returning
    * it.
    */
-  public Object readSet(DbReadContext ctx, Object bean) throws SQLException;
+  public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException;
 
   /**
    * Ignore the appropriate number of scalar properties for this id.

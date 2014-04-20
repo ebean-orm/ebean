@@ -1111,7 +1111,7 @@ public final class DefaultPersister implements Persister {
 
 			// check for partial objects
 			if (request.isLoadedProperty(prop)) {
-				Object detailBean = prop.getValue(request.getBean());
+				Object detailBean = prop.getValue(request.getEntityBean());
 				if (detailBean != null) {
 					if (isReference(detailBean)) {
 						// skip saving a reference

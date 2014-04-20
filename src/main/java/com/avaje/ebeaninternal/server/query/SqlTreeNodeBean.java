@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
@@ -499,55 +498,19 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     return "SqlTreeNodeBean: " + desc;
   }
   
-  private boolean isLoadContextBeanNeeded(Mode queryMode, Object contextBean) {
+  private boolean isLoadContextBeanNeeded(Mode queryMode, EntityBean contextBean) {
     // if explicitly set loadContextBean to true, then reload
     if (queryMode.isLoadContextBean()) {
       return true;
     }
 
-    // if contextBean is not EntityBean (I doubt this will happen), then reload
-    if (!(contextBean instanceof EntityBean)) {
-      return true;
-    }
-
-    EntityBean cb = (EntityBean) contextBean;
-
-    // always reload if contextBean is reference
-    if (cb._ebean_getIntercept().isReference()) {
-      return true;
-    }
-
-    // when localBean is partial object
-    if (partialObject) {
-      // don't reload if localBean is partial object but contextBean is not
-      if (cb._ebean_intercept().getLoadedProps() == null) {
-        return false;
-      }
-
-      // when both localBean and contextBean are partial objects
-      if (cb._ebean_getIntercept().getLoadedProps().containsAll(partialProps)) {
-        // don't reload if contextBean has all the properties which are included
-        // for localBean
-        return false;
-      } else {
-        // otherwise reload, need to add the loadedProps of context bean to the
-        // incluededProps of localBean
-        partialProps.addAll(cb._ebean_getIntercept().getLoadedProps());
-        // recalculate partialHash and includedProps
-        partialHash = partialProps.hashCode();
-        includedProps = LoadedPropertiesCache.get(partialHash, partialProps, desc);
-        return true;
-      }
-    }
-
-    // when localBean is not partial object
-    if (cb._ebean_getIntercept().getLoadedProps() != null) {
+    if (contextBean._ebean_getIntercept().isFullyLoadedBean()) {
       // reload if contextBean is partial object
-      return true;
+      return false;
     }
 
-    // return false by default
-    return false;
+    // return true by default
+    return true;
   }
    
 }

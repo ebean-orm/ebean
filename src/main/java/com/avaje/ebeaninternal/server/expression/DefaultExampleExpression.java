@@ -78,7 +78,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
    * @param likeType
    *          the type of Like wild card used
    */
-  public DefaultExampleExpression(Object entity, boolean caseInsensitive, LikeType likeType) {
+  public DefaultExampleExpression(EntityBean entity, boolean caseInsensitive, LikeType likeType) {
     this.entity = entity;
     this.caseInsensitive = caseInsensitive;
     this.likeType = likeType;
@@ -183,8 +183,6 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
     for (int i = 0; i < list.size(); i++) {
       list.get(i).queryPlanHash(request, builder);
     }
-
-    return hc;
   }
 
   /**

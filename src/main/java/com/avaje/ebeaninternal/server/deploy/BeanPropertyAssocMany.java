@@ -149,7 +149,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 	/**
 	 * Add the bean to the appropriate collection on the parent bean.
 	 */
-    public void addBeanToCollectionWithCreate(Object parentBean, Object detailBean) {
+    public void addBeanToCollectionWithCreate(EntityBean parentBean, EntityBean detailBean) {
         BeanCollection<?> bc = (BeanCollection<?>)super.getValue(parentBean);
         if (bc == null) {
           bc = (BeanCollection<?>)help.createEmpty(false);
@@ -507,7 +507,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     for (int i=0; i < parentIds.size(); i++) {
       for (int y = 0; y < exportedProperties.length; y++) {
         Object compId = parentIds.get(i);
-        expandedList.add(exportedProperties[y].getValue(compId));
+        expandedList.add(exportedProperties[y].getValue((EntityBean)compId));
       }      
     }
     return expandedList;

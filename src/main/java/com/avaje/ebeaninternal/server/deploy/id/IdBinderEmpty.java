@@ -92,7 +92,7 @@ public final class IdBinderEmpty implements IdBinder {
     return null;
   }
 
-  public Object[] getIdValues(Object bean) {
+  public Object[] getIdValues(EntityBean bean) {
     return null;
   }
 
@@ -111,7 +111,7 @@ public final class IdBinderEmpty implements IdBinder {
   public void loadIgnore(DbReadContext ctx) {
   }
 
-  public Object readSet(DbReadContext ctx, Object bean) throws SQLException {
+  public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
     return null;
   }
 
@@ -122,7 +122,7 @@ public final class IdBinderEmpty implements IdBinder {
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
   }
 
-  public Object convertSetId(Object idValue, Object bean) {
+  public Object convertSetId(Object idValue, EntityBean bean) {
     return idValue;
   }
 
@@ -131,6 +131,6 @@ public final class IdBinderEmpty implements IdBinder {
   }
 
   public void writeData(DataOutput dataOutput, Object idValue) throws IOException {
-
+    
   }
 }

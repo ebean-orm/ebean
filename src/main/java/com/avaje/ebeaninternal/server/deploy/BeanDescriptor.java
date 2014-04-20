@@ -74,6 +74,7 @@ import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.util.SortByClause;
 import com.avaje.ebeaninternal.util.SortByClause.Property;
 import com.avaje.ebeaninternal.util.SortByClauseParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -955,7 +956,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     Collection<?> actualDetails = bc.getActualDetails();
     for (Object bean : actualDetails) {
       // Collect the id values 
-      idList.add(targetDescriptor.getId(bean));
+      idList.add(targetDescriptor.getId((EntityBean)bean));
     }
     CachedManyIds ids = new CachedManyIds(idList);
     cachePutCachedManyIds(parentId, many.getName(), ids);
@@ -1345,7 +1346,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Create a reference bean based on the id.
    */
   @SuppressWarnings("unchecked")
-  public T createReference(Boolean readOnly, Object id, Object parent) {
+  public T createReference(Boolean readOnly, Object id) {//, Object parent) {
 
     if (cacheSharableBeans && !Boolean.FALSE.equals(readOnly)) {
       CachedBeanData d = (CachedBeanData) getBeanCache().get(id);
@@ -2354,11 +2355,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       BeanDescriptor<?> localDescriptor = localInheritInfo.getBeanDescriptor();
       return localDescriptor.jsonReadObject(ctx, path);
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  private T createJsonBean() {
-    return (T)createEntityBean();
   }
   
   private ReadBeanState jsonReadObject(ReadJsonContext ctx, String path) {

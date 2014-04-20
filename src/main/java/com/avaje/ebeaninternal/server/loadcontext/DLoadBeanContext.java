@@ -5,20 +5,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.avaje.ebean.bean.BeanLoader;
-import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
-import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.LoadBeanBuffer;
 import com.avaje.ebeaninternal.api.LoadBeanContext;
 import com.avaje.ebeaninternal.api.LoadBeanRequest;
-import com.avaje.ebeaninternal.api.LoadContext;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of LoadBeanContext.
@@ -178,7 +173,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
         }
       }
 
-      LoadBeanRequest req = new LoadBeanRequest(this, null, true, ebi.getLazyLoadProperty(), context.hitCache);
+      LoadBeanRequest req = new LoadBeanRequest(this, null, true, ebi.getLazyLoadProp(), context.hitCache);
       context.desc.getEbeanServer().loadBean(req);
     }
 

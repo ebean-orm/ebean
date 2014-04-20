@@ -79,13 +79,13 @@ public class WriteJsonContext implements JsonWriter {
         return;
       }
           
-      Object o = it.next();
+      EntityBean o = (EntityBean)it.next();
       BeanDescriptor<?> d = getDecriptor(o.getClass());
   
       d.jsonWrite(this, o);
       while (it.hasNext()) {
           appendComma();
-          Object t = it.next();        
+          EntityBean t = (EntityBean)it.next();        
           d.jsonWrite(this, t);
       }
       endAssocMany();

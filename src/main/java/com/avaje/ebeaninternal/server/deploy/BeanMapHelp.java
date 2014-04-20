@@ -130,7 +130,7 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
     return beanMap;
 	}
 
-	public void refresh(EbeanServer server, Query<?> query, Transaction t, Object parentBean) {
+	public void refresh(EbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
 		BeanMap<?, ?> newBeanMap = (BeanMap<?, ?>) server.findMap(query, t);
 		refresh(newBeanMap, parentBean);
 	}

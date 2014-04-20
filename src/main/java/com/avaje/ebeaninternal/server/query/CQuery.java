@@ -94,7 +94,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private Object lazyLoadParentId;
   
-  private Object lazyLoadParentBean;
+  private EntityBean lazyLoadParentBean;
     
   /**
    * Holds the previous loaded bean.
@@ -466,7 +466,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       if (lazyLoadParentId != null) {
         if (!lazyLoadParentId.equals(this.lazyLoadParentId)) {
           // get the appropriate parent bean from the persistence context
-          this.lazyLoadParentBean = persistenceContext.get(lazyLoadManyProperty.getBeanDescriptor().getBeanType(), lazyLoadParentId);
+          this.lazyLoadParentBean = (EntityBean)persistenceContext.get(lazyLoadManyProperty.getBeanDescriptor().getBeanType(), lazyLoadParentId);
           this.lazyLoadParentId = lazyLoadParentId;
         }
         

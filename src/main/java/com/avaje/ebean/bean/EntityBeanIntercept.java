@@ -499,6 +499,10 @@ public final class EntityBeanIntercept implements Serializable {
   public int getLazyLoadProperty() {
     return lazyLoadProperty;
   }
+  
+  public String getLazyLoadProp() {
+    return getProperty(lazyLoadProperty);
+  }
 
   /**
    * Load the bean when it is a reference.
