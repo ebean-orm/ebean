@@ -212,10 +212,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return query.setMaxRows(maxRows);
   }
 
-  public Query<T> setBackgroundFetchAfter(int backgroundFetchAfter) {
-    return query.setBackgroundFetchAfter(backgroundFetchAfter);
-  }
-
   public Query<T> setMapKey(String mapKey) {
     return query.setMapKey(mapKey);
   }

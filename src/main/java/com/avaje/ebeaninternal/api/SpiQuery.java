@@ -509,12 +509,6 @@ public interface SpiQuery<T> extends Query<T> {
     public String getMapKey();
 
     /**
-     * Return the number of rows after which fetching should occur in a
-     * background thread.
-     */
-    public int getBackgroundFetchAfter();
-
-    /**
      * Return the maximum number of rows to return in the query.
      */
     public int getMaxRows();
@@ -543,14 +537,6 @@ public interface SpiQuery<T> extends Query<T> {
      * Return the Id value.
      */
     public Object getId();
-
-    /**
-     * Return true if this query should use its own transaction.
-     * <p>
-     * This is true for background fetching and when using QueryListener.
-     * </p>
-     */
-    public boolean createOwnTransaction();
 
     /**
      * Set the generated sql for debug purposes.

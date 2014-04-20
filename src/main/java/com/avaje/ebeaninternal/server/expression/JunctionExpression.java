@@ -374,10 +374,6 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     return exprList.select(properties);
   }
 
-  public com.avaje.ebean.Query<T> setBackgroundFetchAfter(int backgroundFetchAfter) {
-    return exprList.setBackgroundFetchAfter(backgroundFetchAfter);
-  }
-
   public com.avaje.ebean.Query<T> setFirstRow(int firstRow) {
     return exprList.setFirstRow(firstRow);
   }

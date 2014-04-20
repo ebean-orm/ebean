@@ -1137,7 +1137,7 @@ public final class DefaultServer implements SpiEbeanServer {
     if (Mode.LAZYLOAD_MANY.equals(query.getMode())) {
       allowOneManyFetch = false;
 
-    } else if (query.hasMaxRowsOrFirstRow() && !query.isRawSql() && !query.isSqlSelect() && query.getBackgroundFetchAfter() == 0) {
+    } else if (query.hasMaxRowsOrFirstRow() && !query.isRawSql() && !query.isSqlSelect()) {
       // convert ALL fetch joins to Many's to be query joins
       // so that limit offset type SQL clauses work
       allowOneManyFetch = false;

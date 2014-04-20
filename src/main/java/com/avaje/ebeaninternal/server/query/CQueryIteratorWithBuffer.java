@@ -27,6 +27,7 @@ class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
     this.buffer = new ArrayList<T>(bufferSize);
   }
 
+  @SuppressWarnings("unchecked")
   public boolean hasNext() {
     try {
       if (buffer.isEmpty() && moreToLoad) {
@@ -35,7 +36,7 @@ class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
 
         int i = -1;
         while (moreToLoad && ++i < bufferSize) {
-          if (cquery.hasNextBean(true)) {
+          if (cquery.hasNextBean()) {
             buffer.add((T)cquery.getLoadedBean());
           } else {
             moreToLoad = false;

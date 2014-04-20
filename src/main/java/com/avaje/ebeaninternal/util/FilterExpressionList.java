@@ -127,10 +127,6 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
         throw new PersistenceException(notAllowedMessage);        
     }
 
-    public Query<T> setBackgroundFetchAfter(int backgroundFetchAfter) {
-        return rootQuery.setBackgroundFetchAfter(backgroundFetchAfter);
-    }
-
     public Query<T> setFirstRow(int firstRow) {
         return rootQuery.setFirstRow(firstRow);
     }

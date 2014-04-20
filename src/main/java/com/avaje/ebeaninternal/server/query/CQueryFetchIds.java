@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.FutureTask;
 
-import com.avaje.ebean.BackgroundExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
@@ -27,8 +28,6 @@ import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
 import com.avaje.ebeaninternal.server.type.RsetDataReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Executes the select row count query.
@@ -46,8 +45,6 @@ public class CQueryFetchIds {
 
 	private final SpiQuery<?> query;
 
-	private final BackgroundExecutor backgroundExecutor;
-	
 	/**
 	 * Where clause predicates.
 	 */
@@ -74,20 +71,16 @@ public class CQueryFetchIds {
 	private int rowCount;
 	
 	private final int maxRows;
-	private final int bgFetchAfter;
 	
 	/**
 	 * Create the Sql select based on the request.
 	 */
-	public CQueryFetchIds(OrmQueryRequest<?> request, CQueryPredicates predicates, 
-			String sql, BackgroundExecutor backgroundExecutor) {
+	public CQueryFetchIds(OrmQueryRequest<?> request, CQueryPredicates predicates, String sql) {
 
-		this.backgroundExecutor = backgroundExecutor;
 		this.request = request;
 		this.query = request.getQuery();
 		this.sql = sql;
 		this.maxRows = query.getMaxRows();
-		this.bgFetchAfter = query.getBackgroundFetchAfter();
 
 		query.setGeneratedSql(sql);
 
@@ -133,8 +126,6 @@ public class CQueryFetchIds {
 	 */
 	public BeanIdList findIds() throws SQLException {
 
-		boolean useBackgroundToContinueFetch = false;
-		
 		startNano = System.nanoTime();
 		
 		try {
@@ -185,28 +176,11 @@ public class CQueryFetchIds {
 					hasMoreRows = rset.next();
 					break;
 
-				} else if (bgFetchAfter > 0 && rowCount >= bgFetchAfter) {
-					useBackgroundToContinueFetch = true;
-					break;
 				}
 			}
 			
 			if (hitMaxRows){
 				result.setHasMore(hasMoreRows);
-			}
-			
-			if (useBackgroundToContinueFetch){
-				// tell the request not to end the transaction
-				// as we leave that up to the BackgroundIdFetch
-				request.setBackgroundFetching();
-				
-				// submit background future task
-				BackgroundIdFetch bgFetch = new BackgroundIdFetch(t, rset, pstmt, ctx, desc, result);
-				FutureTask<Integer> future = new FutureTask<Integer>(bgFetch);
-				backgroundExecutor.execute(future);
-				
-				// set on result so we can use the futureTask to wait
-				result.setBackgroundFetch(future);
 			}
 			
 			long exeNano = System.nanoTime() - startNano;
@@ -215,11 +189,7 @@ public class CQueryFetchIds {
 			return result;
 			
 		} finally {
-			if (useBackgroundToContinueFetch) {
-				// left closing resources to BackgroundFetch...
-			} else {
-				close();
-			}
+			close();
 		}
 	}
 

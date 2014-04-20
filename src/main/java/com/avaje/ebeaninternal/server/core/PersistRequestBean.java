@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.core;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.OptimisticLockException;
 

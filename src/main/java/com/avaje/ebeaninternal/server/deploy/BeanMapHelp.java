@@ -112,7 +112,6 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
 		return beanMap;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void add(BeanCollection<?> collection, EntityBean bean) {
 
 		Object keyValue = beanProperty.getValueIntercept(bean);

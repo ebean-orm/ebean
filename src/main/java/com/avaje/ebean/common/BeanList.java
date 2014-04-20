@@ -15,9 +15,10 @@ import com.avaje.ebean.bean.EntityBean;
 /**
  * List capable of lazy loading.
  */
-public final class BeanList<E> extends AbstractBeanCollection<E> implements List<E>,
-    BeanCollectionAdd {
+public final class BeanList<E> extends AbstractBeanCollection<E> implements List<E>, BeanCollectionAdd {
 
+  private static final long serialVersionUID = 1L;
+  
   /**
    * The underlying List implementation.
    */

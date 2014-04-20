@@ -15,6 +15,8 @@ import com.avaje.ebean.bean.EntityBean;
  */
 public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Map<K, E> {
 
+  private static final long serialVersionUID = 1L;
+
   /**
    * The underlying map implementation.
    */

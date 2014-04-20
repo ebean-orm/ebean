@@ -15,6 +15,8 @@ import com.avaje.ebean.bean.EntityBean;
  */
 public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E>, BeanCollectionAdd {
 
+  private static final long serialVersionUID = 1L;
+
   /**
    * The underlying Set implementation.
    */

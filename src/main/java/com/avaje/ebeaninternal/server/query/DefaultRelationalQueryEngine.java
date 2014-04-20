@@ -57,9 +57,6 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 		ResultSet rset = null;
 		PreparedStatement pstmt = null;
 
-		// flag indicating whether we need to close the resources...
-		boolean useBackgroundToContinueFetch = false;
-
 		String sql = query.getQuery();
 
 		BindParams bindParams = query.getBindParams();
@@ -170,17 +167,9 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 				}
 			}
 
-			if (!useBackgroundToContinueFetch) {
-				beanColl.setFinishedFetch(true);
-			}
-
 			if (request.isLogSummary()) {
-
 				long exeTime = System.currentTimeMillis() - startTime;
-
-				String msg = "SqlQuery  rows[" + loadRowCount + "] time[" + exeTime + "] bind["
-						+ bindLog + "] finished[" + beanColl.isFinishedFetch() + "]";
-
+				String msg = "SqlQuery  rows[" + loadRowCount + "] time[" + exeTime + "] bind[" + bindLog + "]";
 				t.logSummary(msg);
 			}
 			
@@ -195,22 +184,20 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 			throw new PersistenceException(m, e);
 
 		} finally {
-			if (!useBackgroundToContinueFetch) {
-				try {
-					if (rset != null) {
-						rset.close();
-					}
-				} catch (SQLException e) {
-					logger.error(null, e);
+			try {
+				if (rset != null) {
+					rset.close();
 				}
-				try {
-					if (pstmt != null) {
-						pstmt.close();
-					}
-				} catch (SQLException e) {
-					logger.error(null, e);
+			} catch (SQLException e) {
+				logger.error(null, e);
+			}
+			try {
+				if (pstmt != null) {
+					pstmt.close();
 				}
-			} 
+			} catch (SQLException e) {
+				logger.error(null, e);
+			}
 		}
 	}
 

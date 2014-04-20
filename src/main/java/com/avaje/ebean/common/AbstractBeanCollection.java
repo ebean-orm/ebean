@@ -1,8 +1,6 @@
 package com.avaje.ebean.common;
 
 import java.util.Set;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import javax.persistence.PersistenceException;
 
@@ -37,8 +35,6 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   protected transient BeanCollectionTouched beanCollectionTouched;
 
-  protected transient Future<Integer> fetchFuture;
-
   /**
    * The owning bean (used for lazy fetch).
    */
@@ -48,13 +44,6 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
    * The name of this property in the owning bean (used for lazy fetch).
    */
   protected final String propertyName;
-
-  /**
-   * Can be false when a background thread is used to continue the fetch the
-   * rows. It will set this to true when it is finished. If no background thread
-   * is used then this should already be true.
-   */
-  protected boolean finishedFetch = true;
 
   /**
    * Flag set to true if rows are limited by firstRow maxRows and more rows
@@ -167,46 +156,6 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
    */
   public void setHasMoreRows(boolean hasMoreRows) {
     this.hasMoreRows = hasMoreRows;
-  }
-
-  /**
-   * Returns true if the fetch has finished. False if the fetch is continuing in
-   * a background thread.
-   */
-  public boolean isFinishedFetch() {
-    return finishedFetch;
-  }
-
-  /**
-   * Set to true when a fetch has finished. Used when a fetch continues in the
-   * background.
-   */
-  public void setFinishedFetch(boolean finishedFetch) {
-    this.finishedFetch = finishedFetch;
-  }
-
-  public void setBackgroundFetch(Future<Integer> fetchFuture) {
-    this.fetchFuture = fetchFuture;
-  }
-
-  public void backgroundFetchWait(long wait, TimeUnit timeUnit) {
-    if (fetchFuture != null) {
-      try {
-        fetchFuture.get(wait, timeUnit);
-      } catch (Exception e) {
-        throw new PersistenceException(e);
-      }
-    }
-  }
-
-  public void backgroundFetchWait() {
-    if (fetchFuture != null) {
-      try {
-        fetchFuture.get();
-      } catch (Exception e) {
-        throw new PersistenceException(e);
-      }
-    }
   }
 
   protected void checkReadOnly() {

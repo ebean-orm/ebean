@@ -140,11 +140,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	
 	private List<Object> partialIds;
 	
-	/**
-	 * The rows after which the fetch continues in a bg thread.
-	 */
-	private int backgroundFetchAfter;
-
 	private int timeout = -1;
 	
 	/**
@@ -434,7 +429,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 		copy.additionalWhere = additionalWhere;
 		copy.additionalHaving = additionalHaving;
 		copy.distinct = distinct;
-		copy.backgroundFetchAfter = backgroundFetchAfter;
 		copy.timeout = timeout;
 		copy.mapKey = mapKey;
 		copy.id = id;
@@ -1089,15 +1083,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 		return this;
 	}
 
-	public int getBackgroundFetchAfter() {
-		return backgroundFetchAfter;
-	}
-
-	public DefaultOrmQuery<T> setBackgroundFetchAfter(int backgroundFetchAfter) {
-		this.backgroundFetchAfter = backgroundFetchAfter;
-		return this;
-	}
-
 	public Object getId() {
 		return id;
 	}
@@ -1210,23 +1195,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
 	public SpiExpressionList<T> getWhereExpressions() {
 		return whereExpressions;
-	}
-
-	/**
-	 * Return true if using background fetching or a queryListener.
-	 */
-	public boolean createOwnTransaction() {
-		if (futureFetch){
-			// the future fetches have already created
-			// their own transaction
-			return false;
-		}
-		if (backgroundFetchAfter > 0) {
-			// run in own transaction as we can't know how long
-			// the background fetching will continue etc
-			return true;
-		}
-		return false;
 	}
 
 	public String getGeneratedSql() {

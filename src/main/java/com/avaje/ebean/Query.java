@@ -937,13 +937,6 @@ public interface Query<T> extends Serializable {
   public Query<T> setMaxRows(int maxRows);
 
   /**
-   * Set the rows after which fetching should continue in a background thread.
-   * 
-   * @param backgroundFetchAfter
-   */
-  public Query<T> setBackgroundFetchAfter(int backgroundFetchAfter);
-
-  /**
    * Set the property to use as keys for a map.
    * <p>
    * If no property is set then the id property is used.

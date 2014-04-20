@@ -185,14 +185,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    */
   private final ElPropertyValue manyPropertyEl;
 
-  private final int backgroundFetchAfter;
-
   private final int maxRowsLimit;
-
-  /**
-   * Flag set when backgroundFetchAfter limit is hit.
-   */
-  private boolean hasHitBackgroundFetchAfter;
 
   private final PersistenceContext persistenceContext;
 
@@ -272,12 +265,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     this.logWhereSql = queryPlan.getLogWhereSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
-
     this.persistenceContext = request.getPersistenceContext();
- 
     this.maxRowsLimit = query.getMaxRows() > 0 ? query.getMaxRows() : GLOBAL_ROW_LIMIT;
-    this.backgroundFetchAfter = query.getBackgroundFetchAfter() > 0 ? query.getBackgroundFetchAfter() : Integer.MAX_VALUE;
-
     this.help = createHelp(request);
     this.collection = (BeanCollection<T>) (help != null ? help.createEmpty(false) : null);
   }
@@ -535,23 +524,17 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   public boolean readBean() throws SQLException {
 
-    boolean result = readBeanInternal(true);
+    boolean result = readBeanInternal();
 
     updateExecutionStatistics();
 
     return result;
   }
 
-  private boolean readBeanInternal(boolean inForeground) throws SQLException {
+  private boolean readBeanInternal() throws SQLException {
 
     if (loadedBeanCount >= maxRowsLimit) {
       collection.setHasMoreRows(hasMoreRows());
-      return false;
-    }
-
-    if (inForeground && loadedBeanCount >= backgroundFetchAfter) {
-      hasHitBackgroundFetchAfter = true;
-      collection.setFinishedFetch(false);
       return false;
     }
 
@@ -629,15 +612,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     }
   }
 
-  public BeanCollection<T> continueFetchingInBackground() throws SQLException {
-    readTheRows(false);
-    collection.setFinishedFetch(true);
-    return collection;
-  }
-
   public BeanCollection<T> readCollection() throws SQLException {
 
-    readTheRows(true);
+    readTheRows();
 
     updateExecutionStatistics();
 
@@ -670,17 +647,16 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  private void readTheRows(boolean inForeground) throws SQLException {
-    while (hasNextBean(inForeground)) {
+  private void readTheRows() throws SQLException {
+    while (hasNextBean()) {
       // add to the list/set/map
       help.add(collection, getLoadedBean());
     }
   }
 
-  protected boolean hasNextBean(boolean inForeground) throws SQLException {
+  protected boolean hasNextBean() throws SQLException {
 
-    if (!readBeanInternal(inForeground)) {
+    if (!readBeanInternal()) {
       return false;
 
     } else {
@@ -707,10 +683,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
     path = getPath(path);
     request.getGraphContext().register(path, bc);
-  }
-
-  public boolean useBackgroundToContinueFetch() {
-    return hasHitBackgroundFetchAfter;
   }
 
   /**

@@ -5,7 +5,6 @@ import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
-import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSql.ColumnMapping;
 import com.avaje.ebean.RawSql.ColumnMapping.Column;
@@ -44,8 +43,6 @@ public class CQueryBuilder implements Constants {
 
   private final Binder binder;
 
-  private final BackgroundExecutor backgroundExecutor;
-
   private final boolean selectCountWithAlias;
 
   private DatabasePlatform dbPlatform;
@@ -53,9 +50,8 @@ public class CQueryBuilder implements Constants {
   /**
    * Create the SqlGenSelect.
    */
-  public CQueryBuilder(BackgroundExecutor backgroundExecutor, DatabasePlatform dbPlatform, Binder binder) {
+  public CQueryBuilder(DatabasePlatform dbPlatform, Binder binder) {
 
-    this.backgroundExecutor = backgroundExecutor;
     this.binder = binder;
     this.tableAliasPlaceHolder = GlobalProperties.get("ebean.tableAliasPlaceHolder", "${ta}");
     this.columnAliasPrefix = GlobalProperties.get("ebean.columnAliasPrefix", "c");
@@ -103,8 +99,7 @@ public class CQueryBuilder implements Constants {
       // skip building the SqlTree and Sql string
       predicates.prepare(false);
       String sql = queryPlan.getSql();
-      return new CQueryFetchIds(request, predicates, sql, backgroundExecutor);
-
+      return new CQueryFetchIds(request, predicates, sql);
     }
 
     // use RawSql or generated Sql
@@ -118,7 +113,7 @@ public class CQueryBuilder implements Constants {
     queryPlan = new CQueryPlan(request, sql, sqlTree, false, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
 
     request.putQueryPlan(queryPlan);
-    return new CQueryFetchIds(request, predicates, sql, backgroundExecutor);
+    return new CQueryFetchIds(request, predicates, sql);
   }
 
   /**
