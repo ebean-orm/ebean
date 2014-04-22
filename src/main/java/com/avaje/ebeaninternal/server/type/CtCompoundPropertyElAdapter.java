@@ -45,7 +45,7 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
         // Do nothing
     }
 
-    public void elSetValue(EntityBean bean, Object value, boolean populate, boolean reference) {
+    public void elSetValue(EntityBean bean, Object value, boolean populate) {
         prop.setValue(bean, value);
     }
 

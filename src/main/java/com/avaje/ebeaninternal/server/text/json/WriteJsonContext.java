@@ -344,7 +344,7 @@ public class WriteJsonContext implements JsonWriter {
     }
     
     public WriteBeanState pushBeanState(Object bean) {
-        WriteBeanState newState = new WriteBeanState(bean);
+        WriteBeanState newState = new WriteBeanState();//bean);
         WriteBeanState prevState = beanState;
         beanState = newState;
         return prevState;
@@ -354,25 +354,14 @@ public class WriteJsonContext implements JsonWriter {
         this.beanState = previousState;
     }
     
-    public boolean isReferenceBean() {
-        return beanState.isReferenceBean();
-    }
-    
     
     public static class WriteBeanState {
         
-        private final EntityBeanIntercept ebi;
-        private final boolean referenceBean;
         private boolean firstKeyOut;
         
-        public WriteBeanState(Object bean) {
-          this.ebi = ((EntityBean)bean)._ebean_getIntercept();
-          this.referenceBean = ebi.isReference();          
+        public WriteBeanState() {
+          
         }       
-        
-        public boolean isReferenceBean() {
-            return referenceBean;
-        }
         
         public boolean isFirstKey() {
             if (!firstKeyOut){

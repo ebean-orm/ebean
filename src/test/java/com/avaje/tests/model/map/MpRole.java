@@ -7,6 +7,8 @@ public class MpRole {
 
   @Id
   private Long id;
+  
+  private String code;
 
   private Long organizationId;
 
@@ -16,6 +18,14 @@ public class MpRole {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public String getCode() {
+    return code;
+  }
+
+  public void setCode(String code) {
+    this.code = code;
   }
 
   public Long getOrganizationId() {

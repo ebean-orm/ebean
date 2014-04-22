@@ -757,11 +757,7 @@ public class BeanProperty implements ElPropertyValue {
         return convertToLogicalType(value);
     }
 
-    public void elSetReference(EntityBean bean) {
-        throw new RuntimeException("Should not be called");
-    }
-
-    public void elSetValue(EntityBean bean, Object value, boolean populate, boolean reference) {
+    public void elSetValue(EntityBean bean, Object value, boolean populate) {
         if (bean != null) {
             // Not using setValueIntercept at this stage
             setValue(bean, value);

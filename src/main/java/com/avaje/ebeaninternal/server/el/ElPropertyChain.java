@@ -268,20 +268,7 @@ public class ElPropertyChain implements ElPropertyValue {
 		}
 	}
 	
-	public void elSetReference(EntityBean bean) {
-
-		for (int i = 0; i < last; i++) {
-			bean = (EntityBean)chain[i].elGetValue(bean);
-			if (bean == null){
-				break;
-			}
-		}				
-		if (bean != null){
-			((EntityBean)bean)._ebean_getIntercept().setReference();
-		}
-	}
-	
-	public void elSetValue(EntityBean bean, Object value, boolean populate, boolean reference){
+	public void elSetValue(EntityBean bean, Object value, boolean populate) {
 
 		EntityBean prevBean = bean;
 		if (populate){
@@ -302,12 +289,10 @@ public class ElPropertyChain implements ElPropertyValue {
 		    if (lastBeanProperty != null){
 		        // last chain element maps to a real scalar property
     			lastBeanProperty.setValueIntercept(prevBean, value);
-    			if (reference){
-    				((EntityBean)prevBean)._ebean_getIntercept().setReference();
-    			}
+
 		    } else {
 		        // a non-scalar property of a Compound value object
-		        lastElPropertyValue.elSetValue(prevBean, value, populate, reference);
+		        lastElPropertyValue.elSetValue(prevBean, value, populate);
 		    }
 		}
 	}

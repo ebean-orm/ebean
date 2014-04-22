@@ -22,8 +22,6 @@ public final class IdBinderEmpty implements IdBinder {
 
   private static final String bindIdSql = "";
 
-  private static final BeanProperty[] properties = new BeanProperty[0];
-
   public IdBinderEmpty() {
 
   }
@@ -43,6 +41,11 @@ public final class IdBinderEmpty implements IdBinder {
     return 0;
   }
 
+  @Override
+  public BeanProperty getBeanProperty() {
+    return null;
+  }
+
   public String getIdProperty() {
     return null;
   }
@@ -58,10 +61,6 @@ public final class IdBinderEmpty implements IdBinder {
   public String getDefaultOrderBy() {
     // this should never happen?
     return "";
-  }
-
-  public BeanProperty[] getProperties() {
-    return properties;
   }
 
   public String getBindIdSql(String baseTableAlias) {

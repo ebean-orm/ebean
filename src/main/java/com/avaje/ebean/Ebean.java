@@ -454,6 +454,14 @@ public final class Ebean {
   }
 
   /**
+   * Insert the bean. This is useful when you set the Id property on a bean and
+   * want to explicitly insert it.
+   */
+  public static void insert(Object bean) {
+    serverMgr.getPrimaryServer().insert(bean);
+  }
+  
+  /**
    * Force an update using the bean updating the non-null properties.
    * <p>
    * You can use this method to FORCE an update to occur (even on a bean that
@@ -494,29 +502,6 @@ public final class Ebean {
    */
   public static void update(Object bean) {
     serverMgr.getPrimaryServer().update(bean);
-  }
-
-  /**
-   * Force an update using the bean explicitly stating the properties to update.
-   * <p>
-   * If you don't specify explicit properties to use in the update then the
-   * non-null properties are included in the update.
-   * </p>
-   * <p>
-   * For updates against beans that have not been fetched (say built from JSON
-   * or XML) this will treat deleteMissingChildren=true and will delete any
-   * 'missing children'. Refer to
-   * {@link EbeanServer#update(Object, Set, Transaction, boolean, boolean)}.
-   * </p>
-   * 
-   * @param bean
-   *          The bean holding the values to be included in the update.
-   * @param updateProps
-   *          the explicit set of properties to include in the update (can be
-   *          null).
-   */
-  public static void update(Object bean, Set<String> updateProps) {
-    serverMgr.getPrimaryServer().update(bean, updateProps);
   }
 
   /**

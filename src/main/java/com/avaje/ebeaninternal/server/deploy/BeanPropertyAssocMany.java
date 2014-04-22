@@ -588,8 +588,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
 		if (embeddedExportedProperties) {
 			// use the EmbeddedId object instead of the parentBean
-			BeanProperty[] uids = descriptor.propertiesId();
-			parentBean = (EntityBean)uids[0].getValue(parentBean);
+			BeanProperty idProp = descriptor.getIdProperty();
+			parentBean = (EntityBean)idProp.getValue(parentBean);
 		}
 
 		for (int i = 0; i < exportedProperties.length; i++) {
@@ -621,13 +621,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 	 */
 	private ExportedProperty[] createExported() {
 
-		BeanProperty[] uids = descriptor.propertiesId();
+		BeanProperty idProp = descriptor.getIdProperty();
 
 		ArrayList<ExportedProperty> list = new ArrayList<ExportedProperty>();
 
-		if (uids.length == 1 && uids[0].isEmbedded()) {
+		if (idProp != null && idProp.isEmbedded()) {
 
-			BeanPropertyAssocOne<?> one = (BeanPropertyAssocOne<?>) uids[0];
+			BeanPropertyAssocOne<?> one = (BeanPropertyAssocOne<?>) idProp;
 			BeanDescriptor<?> targetDesc = one.getTargetDescriptor();
 			BeanProperty[] emIds = targetDesc.propertiesBaseScalar();
 			try {
@@ -641,8 +641,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 			}
 
 		} else {
-			for (int i = 0; i < uids.length; i++) {
-				ExportedProperty expProp = findMatch(false, uids[i]);
+		  if (idProp != null) {
+				ExportedProperty expProp = findMatch(false, idProp);
 				list.add(expProp);
 			}
 		}
@@ -773,8 +773,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 	private void buildExport(IntersectionRow row, EntityBean parentBean) {
 
 		if (embeddedExportedProperties) {
-	        BeanProperty[] uids = descriptor.propertiesId();
-			parentBean = (EntityBean)uids[0].getValue(parentBean);
+	    BeanProperty idProp = descriptor.getIdProperty();
+			parentBean = (EntityBean)idProp.getValue(parentBean);
 		}
 		for (int i = 0; i < exportedProperties.length; i++) {
 			Object val = exportedProperties[i].getValue(parentBean);
@@ -856,6 +856,5 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
         } while(true);
         
         setValue(bean, collection);
-    
     }
 }

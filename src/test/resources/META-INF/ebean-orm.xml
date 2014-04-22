@@ -54,14 +54,4 @@
 	</raw-sql>
 </entity>
 
-<entity class="com.avaje.tests.noid.NoIdEntity">
-	<raw-sql name="noid">
-		<columnMapping column="id" property="id" />
-		<columnMapping column="value" property="value" />
-		<query>
-		select id, value from No_Id_Entity_Rob
-		</query>
-	</raw-sql>
-</entity>
-
 </entity-mappings>

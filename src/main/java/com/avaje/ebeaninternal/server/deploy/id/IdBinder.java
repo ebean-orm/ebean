@@ -45,6 +45,11 @@ public interface IdBinder {
   public String getIdProperty();
 
   /**
+   * Return the Id BeanProperty.
+   */
+  public BeanProperty getBeanProperty();
+
+  /**
    * Find a BeanProperty that is mapped to the database column.
    */
   public BeanProperty findBeanProperty(String dbColumnName);
@@ -153,11 +158,6 @@ public interface IdBinder {
    * that make up the id.
    */
   public String getBindIdSql(String baseTableAlias);
-
-  /**
-   * Return the id properties in flat form.
-   */
-  public BeanProperty[] getProperties();
 
   /**
    * Cast or convert the Id value if necessary and optionally set it.

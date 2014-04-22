@@ -2,7 +2,6 @@ package com.avaje.tests.batchload;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import junit.framework.Assert;
 
@@ -18,7 +17,6 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
 
   private UUOne insert(String name) {
     UUOne one = new UUOne();
-    one.setId(UUID.randomUUID());
     one.setName("test-BLWCH-"+name);
     Ebean.save(one);
     return one;

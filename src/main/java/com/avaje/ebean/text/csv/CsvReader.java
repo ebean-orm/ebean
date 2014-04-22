@@ -32,7 +32,6 @@ import com.avaje.ebean.text.StringParser;
  *   csvReader.addDateTime(&quot;anniversary&quot;, &quot;dd-MMM-yyyy&quot;);
  *   csvReader.addProperty(&quot;billingAddress.line1&quot;);
  *   csvReader.addProperty(&quot;billingAddress.city&quot;);
- *   csvReader.addReference(&quot;billingAddress.country.code&quot;);
  * 
  *   csvReader.process(reader);
  * 
@@ -40,8 +39,6 @@ import com.avaje.ebean.text.StringParser;
  *   throw new RuntimeException(e);
  * }
  * </pre>
- * 
- * @author rbygrave
  * 
  * @param <T>
  *          the entity bean type
@@ -128,13 +125,6 @@ public interface CsvReader<T> {
    * </p>
    */
   public void addProperty(String propertyName);
-
-  /**
-   * Define the next property to be a reference. This effectively means it
-   * represents a foreign key. For example, with an Address object a Country
-   * Code could be a reference.
-   */
-  public void addReference(String propertyName);
 
   /**
    * Define the next property and use a custom StringParser to convert the

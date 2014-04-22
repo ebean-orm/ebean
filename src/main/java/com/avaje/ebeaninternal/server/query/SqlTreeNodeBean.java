@@ -95,7 +95,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     this.idBinder = desc.getIdBinder();
 
     // the bean has an Id property and we want to use it
-    this.readId = withId && (desc.propertiesId().length > 0);
+    this.readId = withId && (desc.getIdProperty() != null);
     this.disableLazyLoad = !readId || desc.isSqlSelectBased();
 
     this.tableJoins = props.getTableJoins();
@@ -368,7 +368,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     }
 
     if (readId) {
-      appendSelect(ctx, false, idBinder.getProperties());
+      appendSelect(ctx, false, idBinder.getBeanProperty());
     }
     appendSelect(ctx, subQuery, properties);
     appendSelectTableJoins(ctx);
@@ -405,6 +405,13 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     for (int i = 0; i < props.length; i++) {
       props[i].appendSelect(ctx, subQuery);
+    }
+  }
+
+  private void appendSelect(DbSqlContext ctx, boolean subQuery, BeanProperty prop) {
+
+    if (prop != null) {
+      prop.appendSelect(ctx, subQuery);
     }
   }
 

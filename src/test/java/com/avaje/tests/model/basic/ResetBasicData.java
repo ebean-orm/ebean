@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.TxRunnable;
 
 public class ResetBasicData {
 
 	private static boolean runOnce;
+	
+	private static EbeanServer server = Ebean.getServer(null);
 	
 	public static synchronized void reset() {
 		
@@ -19,7 +22,7 @@ public class ResetBasicData {
 		
 		final ResetBasicData me = new ResetBasicData();
 		
-		Ebean.execute(new TxRunnable() {
+		server.execute(new TxRunnable() {
 			public void run() {
 				me.deleteAll();
 				me.insertCountries();
@@ -40,29 +43,29 @@ public class ResetBasicData {
 				//Ebean.currentTransaction().setBatchMode(false);
 				
 				// orm update use bean name and bean properties
-				Ebean.createUpdate(OrderShipment.class, "delete from orderShipment")
+			  server.createUpdate(OrderShipment.class, "delete from orderShipment")
 					.execute();
 			
-				Ebean.createUpdate(OrderDetail.class, "delete from orderDetail")
+			  server.createUpdate(OrderDetail.class, "delete from orderDetail")
 					.execute();
 				
-				Ebean.createUpdate(Order.class,"delete from order")
+			  server.createUpdate(Order.class,"delete from order")
 					.execute();
 
-				Ebean.createUpdate(Contact.class,"delete from contact")
+			  server.createUpdate(Contact.class,"delete from contact")
 					.execute();
 	
-				Ebean.createUpdate(Customer.class,"delete from Customer")
+			  server.createUpdate(Customer.class,"delete from Customer")
 					.execute();
 
-				Ebean.createUpdate(Address.class,"delete from address")
+			  server.createUpdate(Address.class,"delete from address")
 					.execute();
 	
 				// sql update uses table and column names
-				Ebean.createSqlUpdate("delete from o_country")
+			  server.createSqlUpdate("delete from o_country")
 					.execute();
 	
-				Ebean.createSqlUpdate("delete from o_product")
+			  server.createSqlUpdate("delete from o_product")
 					.execute();
 			
 			}
@@ -72,17 +75,17 @@ public class ResetBasicData {
 	
 	public void insertCountries() {
 		
-		Ebean.execute(new TxRunnable() {
+	  server.execute(new TxRunnable() {
 			public void run() {
 				Country c = new Country();
 				c.setCode("NZ");
 				c.setName("New Zealand");
-				Ebean.save(c);
+				server.insert(c);
 				
 				Country au = new Country();
 				au.setCode("AU");
 				au.setName("Australia");
-				Ebean.save(au);				
+				server.insert(au);				
 			}
 		});
 	}
@@ -90,31 +93,31 @@ public class ResetBasicData {
 
 	public void insertProducts() {
 		
-		Ebean.execute(new TxRunnable() {
+	  server.execute(new TxRunnable() {
 			public void run() {
 				Product p = new Product();
 				p.setId(1);
 				p.setName("Chair");
 				p.setSku("C001");
-				Ebean.save(p);
+				server.insert(p);
 		
 				p = new Product();
 				p.setId(2);
 				p.setName("Desk");
 				p.setSku("DSK1");
-				Ebean.save(p);
+				server.insert(p);
 		
 				p = new Product();
 				p.setId(3);
 				p.setName("Computer");
 				p.setSku("C002");
-				Ebean.save(p);
+				server.insert(p);
 		
 				p = new Product();
 				p.setId(4);
 				p.setName("Printer");
 				p.setSku("C003");
-				Ebean.save(p);
+				server.insert(p);
 			}
 		});
 	}

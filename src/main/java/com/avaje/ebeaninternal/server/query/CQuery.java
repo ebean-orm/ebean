@@ -592,7 +592,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     } else {
       // create a new collection to populate and assign to the bean
       currentDetailCollection = manyProperty.createEmpty(false);
-      manyPropertyEl.elSetValue(loadedBean, currentDetailCollection, false, false);
+      manyPropertyEl.elSetValue(loadedBean, currentDetailCollection, false);
     }
 
     if (filterMany != null) {
@@ -600,8 +600,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       ((BeanCollection<?>) currentDetailCollection).setFilterMany(filterMany);
     }
 
-    // the manyKey is always null for this case, just using default mapKey on
-    // the property
+    // the manyKey is always null for this case, just using default mapKey on the property
     currentDetailAdd = manyProperty.getBeanCollectionAdd(currentDetailCollection, null);
     addToCurrentDetailCollection();
   }

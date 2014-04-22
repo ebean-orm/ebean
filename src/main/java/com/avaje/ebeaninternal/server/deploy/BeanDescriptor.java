@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -217,12 +218,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   /**
    * Derived list of properties that make up the unique id.
    */
-  private final BeanProperty[] propertiesId;
+  private final BeanProperty idProperty;
+  private final int idPropertyIndex;
 
   /**
    * Derived list of properties that are used for version concurrency checking.
    */
   private final BeanProperty versionProperty;
+  private final int versionPropertyIndex;
+
   private final BeanProperty propertiesNaturalKey;
 
   /**
@@ -281,14 +285,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   /**
    * All non transient properties excluding the id properties.
    */
-  final BeanProperty[] propertiesNonTransient;
-
-
-  /**
-   * Set when the Id property is a single non-embedded property. Can make life
-   * simpler for this case.
-   */
-  private final BeanProperty propertySingleId;
+  private final BeanProperty[] propertiesNonTransient;
 
   /**
    * The bean class name or the table name for MapBeans.
@@ -403,15 +400,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     // helper object used to derive lists of properties
     DeployBeanPropertyLists listHelper = new DeployBeanPropertyLists(owner, this, deploy);
 
+    this.idProperty = listHelper.getId();
+    this.versionProperty = listHelper.getVersionProperty();
     this.propMap = listHelper.getPropertyMap();
     this.propMapByDbColumn = getReverseMap(propMap);
     this.propertiesTransient = listHelper.getTransients();
     this.propertiesNonTransient = listHelper.getNonTransients();
     this.propertiesBaseScalar = listHelper.getBaseScalar();
     this.propertiesBaseCompound = listHelper.getBaseCompound();
-    this.propertiesId = listHelper.getId();
     this.propertiesNaturalKey = listHelper.getNaturalKey();
-    this.versionProperty = listHelper.getVersionProperty();
     this.propertiesEmbedded = listHelper.getEmbedded();
     this.propertiesLocal = listHelper.getLocal();
     this.unidirectional = listHelper.getUnidirectional();
@@ -436,12 +433,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
     this.derivedTableJoins = listHelper.getTableJoin();
 
-    if (propertiesId.length == 1) {
-      this.propertySingleId = propertiesId[0];
-    } else {
-      this.propertySingleId = null;
-    }
-
     // Check if there are no cascade save associated beans ( subject to change
     // in initialiseOther()). Note that if we are in an inheritance hierarchy 
     // then we also need to check every BeanDescriptors in the InheritInfo as 
@@ -454,9 +445,20 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     deleteRecurseSkippable = (0 == (propertiesOneExportedDelete.length + propertiesOneImportedDelete.length + propertiesManyDelete.length));
     
     // object used to handle Id values
-    this.idBinder = owner.createIdBinder(propertiesId);
-  }
+    this.idBinder = owner.createIdBinder(idProperty);
 
+    // derive the index position of the Id and Version properties
+    if (Modifier.isAbstract(beanType.getModifiers())) {
+      this.idPropertyIndex = -1;
+      this.versionPropertyIndex = -1;
+    } else {
+      EntityBean entityBean = createEntityBean();
+      EntityBeanIntercept ebi = entityBean._ebean_getIntercept();
+      this.idPropertyIndex = (idProperty == null) ? -1 : ebi.findProperty(idProperty.getName());
+      this.versionPropertyIndex = (versionProperty == null) ? -1 : ebi.findProperty(versionProperty.getName());
+    }
+  }
+  
   private LinkedHashMap<String, BeanProperty> getReverseMap(LinkedHashMap<String, BeanProperty> propMap) {
 
     LinkedHashMap<String, BeanProperty> revMap = new LinkedHashMap<String, BeanProperty>(propMap.size() * 2);
@@ -524,26 +526,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * Determine the non-null properties of the bean.
-   */
-  public Set<String> determineLoadedProperties(EntityBean bean) {
-
-    HashSet<String> nonNullProps = new HashSet<String>();
-
-    for (int j = 0; j < propertiesId.length; j++) {
-      if (propertiesId[j].getValue(bean) != null) {
-        nonNullProps.add(propertiesId[j].getName());
-      }
-    }
-    for (int i = 0; i < propertiesNonTransient.length; i++) {
-      if (propertiesNonTransient[i].getValue(bean) != null) {
-        nonNullProps.add(propertiesNonTransient[i].getName());
-      }
-    }
-    return nonNullProps;
-  }
-
-  /**
    * Return the EbeanServer instance that owns this BeanDescriptor.
    */
   public SpiEbeanServer getEbeanServer() {
@@ -591,9 +573,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       }
     } else {
       // initialise just the Id properties
-      BeanProperty[] idProps = propertiesId();
-      for (int i = 0; i < idProps.length; i++) {
-        idProps[i].initialise();
+      if (idProperty != null) {
+        idProperty.initialise();
       }
     }
   }
@@ -1367,7 +1348,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
 
       // Note: not creating proxies for many's...
-      ebi.setReference();
+      ebi.setReference(idPropertyIndex);
 
       return (T) eb;
 
@@ -1508,20 +1489,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * properties that make up the unique id.
    */
   public Object getId(EntityBean bean) {
-
-    if (propertySingleId != null) {
-        return propertySingleId.getValue(bean);
-    }
-
-    // it is a concatenated id Not embedded
-    // so return a Map
-    LinkedHashMap<String, Object> idMap = new LinkedHashMap<String, Object>();
-    for (int i = 0; i < propertiesId.length; i++) {
-
-      Object value = propertiesId[i].getValue(bean);
-      idMap.put(propertiesId[i].getName(), value);
-    }
-    return idMap;
+    return (idProperty == null) ? null : idProperty.getValue(bean);
   }
 
   /**
@@ -2014,17 +1982,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * Return the BeanProperty that make up the unique id.
-   * <p>
-   * The order of these properties can be relied on to be consistent if the bean
-   * itself doesn't change or the xml deployment order does not change.
-   * </p>
-   */
-  public BeanProperty[] propertiesId() {
-    return propertiesId;
-  }
-
-  /**
    * Return the non transient non id properties.
    */
   public BeanProperty[] propertiesNonTransient() {
@@ -2039,19 +1996,56 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * If the Id is a single non-embedded property then returns that, otherwise
-   * returns null.
-   */
-  public BeanProperty getSingleIdProperty() {
-    return propertySingleId;
-  }
-
-  /**
    * Return the beans that are embedded. These share the base table with the
    * owner bean.
    */
   public BeanPropertyAssocOne<?>[] propertiesEmbedded() {
     return propertiesEmbedded;
+  }
+
+  public BeanProperty getIdProperty() {
+    return idProperty;
+  }
+
+  public boolean isInsertMode(EntityBeanIntercept ebi) {
+    if (idProperty.isEmbedded()) {
+      return !ebi.isLoaded();
+    }
+    //if (idGenerator == null) {
+    //  return !ebi.isLoaded();
+    //} else {
+      return !hasIdProperty(ebi);
+    //}
+  }
+  
+  public boolean isReference(EntityBeanIntercept ebi) {
+    return ebi.isReference() || hasIdPropertyOnly(ebi);
+  }
+  
+  public boolean hasIdPropertyOnly(EntityBeanIntercept ebi) {
+    return ebi.hasIdOnly(idPropertyIndex);
+  }
+  
+  public boolean hasIdProperty(EntityBeanIntercept ebi) {
+    if (idPropertyIndex > -1) {
+      return ebi.isLoadedProperty(idPropertyIndex);
+    }
+    return false;
+  }
+
+  public boolean hasVersionProperty(EntityBeanIntercept ebi) {
+    if (versionPropertyIndex > -1) {
+      return ebi.isLoadedProperty(versionPropertyIndex);
+    }
+    return false;
+  }
+
+  public ConcurrencyMode getConcurrencyMode(EntityBeanIntercept ebi) {
+    if (!hasVersionProperty(ebi)) {
+      return ConcurrencyMode.NONE;
+    } else {
+      return concurrencyMode;     
+    }
   }
 
   /**
@@ -2248,8 +2242,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   @SuppressWarnings("unchecked")
   private void jsonWriteProperties(WriteJsonContext ctx, EntityBean bean) {
 
-    boolean referenceBean = ctx.isReferenceBean();
-
     JsonWriteBeanVisitor<T> beanVisitor = (JsonWriteBeanVisitor<T>) ctx.getBeanVisitor();
 
     Set<String> props = ctx.getIncludeProperties();
@@ -2264,11 +2256,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       }
     }
 
-    for (int i = 0; i < propertiesId.length; i++) {
-      Object idValue = propertiesId[i].getValue(bean);
+    if (idProperty != null) {
+      Object idValue = idProperty.getValue(bean);
       if (idValue != null) {
-        if (props == null || props.contains(propertiesId[i].getName())) {
-          propertiesId[i].jsonWrite(ctx, bean);
+        if (props == null || props.contains(idProperty.getName())) {
+          idProperty.jsonWrite(ctx, bean);
         }
       }
     }
@@ -2286,7 +2278,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
         }
       }
     } else {
-      if (explicitAllProps || !referenceBean) {
+      if (explicitAllProps || !isReference(bean._ebean_getIntercept())) {
         // render all the properties and invoke lazy loading if required
         for (int j = 0; j < propertiesNonTransient.length; j++) {
           propertiesNonTransient[j].jsonWrite(ctx, bean);
@@ -2386,44 +2378,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return ctx.popBeanState();
   }
 
-  /**
-   * Set the loaded properties with additional check to see if the bean is a
-   * reference.
-   */
-  public void setLoadedProps(EntityBeanIntercept ebi, Set<String> loadedProps) {
-    if (isLoadedReference(loadedProps)) {
-      ebi.setReference();
-    } else {
-      ebi.setLoaded();
-    }
-  }
-
-  /**
-   * Return true if the loadedProperties is just the Id property and therefore
-   * this is really a reference.
-   */
-  public boolean isLoadedReference(Set<String> loadedProps) {
-
-    if (loadedProps != null) {
-      if (loadedProps.size() == propertiesId.length) {
-        for (int i = 0; i < propertiesId.length; i++) {
-          if (!loadedProps.contains(propertiesId[i].getName())) {
-            return false;
-          }
-        }
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   public void flushPersistenceContextOnIterate(PersistenceContext persistenceContext) {
     persistenceContext.clear(beanType);
     for (int i = 0; i < propertiesMany.length; i++) {
       persistenceContext.clear(propertiesMany[i].getBeanDescriptor().getBeanType());
     }
-    
   }
     
 }

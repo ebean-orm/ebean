@@ -397,13 +397,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         return targetDescriptor.createEntityBean();
     }
 
-    public void elSetReference(EntityBean bean) {
-        Object value = getValueIntercept(bean);
-        if (value != null) {
-            ((EntityBean) value)._ebean_getIntercept().setReference();
-        }
-    }
-
     @Override
     public Object elGetReference(EntityBean bean) {
         Object value = getValueIntercept(bean);
@@ -441,13 +434,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
      */
     private ExportedProperty[] createExported() {
 
-        BeanProperty[] uids = descriptor.propertiesId();
+        BeanProperty idProp = descriptor.getIdProperty();
 
         ArrayList<ExportedProperty> list = new ArrayList<ExportedProperty>();
 
-        if (uids.length == 1 && uids[0].isEmbedded()) {
+        if (idProp != null && idProp.isEmbedded()) {
 
-            BeanPropertyAssocOne<?> one = (BeanPropertyAssocOne<?>) uids[0];
+            BeanPropertyAssocOne<?> one = (BeanPropertyAssocOne<?>) idProp;
             BeanDescriptor<?> targetDesc = one.getTargetDescriptor();
             BeanProperty[] emIds = targetDesc.propertiesBaseScalar();
             try {
@@ -461,8 +454,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
             }
 
         } else {
-            for (int i = 0; i < uids.length; i++) {
-                ExportedProperty expProp = findMatch(false, uids[i]);
+            if (idProp != null) {
+                ExportedProperty expProp = findMatch(false, idProp);
                 list.add(expProp);
             }
         }
@@ -806,8 +799,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         @Override
         void appendSelect(DbSqlContext ctx, boolean subQuery) {
 
-            // set appropriate tableAlias for
-            // the exported id columns
+            // set appropriate tableAlias for the exported id columns
 
             String relativePrefix = ctx.getRelativePrefix(getName());
             ctx.pushTableAlias(relativePrefix);
@@ -838,20 +830,29 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
                 // bi-directional and already rendered parent
                 
             } else {
+              // Hmmm, not writing complex non-entity bean
+              if (value instanceof EntityBean) {  
                 ctx.pushParentBean(bean);
                 ctx.beginAssocOne(name);
                 BeanDescriptor<?> refDesc = descriptor.getBeanDescriptor(value.getClass());
-                refDesc.jsonWrite(ctx, (EntityBean)value);
+                refDesc.jsonWrite(ctx, (EntityBean)value);                  
                 ctx.endAssocOne();
                 ctx.popParentBean();
+              } 
             }
         }
     }
     
     @Override
     public void jsonRead(ReadJsonContext ctx, EntityBean bean){
-        
-        T assocBean = targetDescriptor.jsonReadBean(ctx, name);
-        setValue(bean, assocBean);
+        if (targetDescriptor != null) {
+          T assocBean = targetDescriptor.jsonReadBean(ctx, name);
+          setValue(bean, assocBean);
+        }
+    }
+
+    public boolean isReference(Object detailBean) {
+      EntityBean eb = (EntityBean)detailBean;
+      return targetDescriptor.isReference(eb._ebean_getIntercept());      
     }
 }

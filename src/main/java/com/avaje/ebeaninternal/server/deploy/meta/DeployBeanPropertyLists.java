@@ -185,8 +185,16 @@ public class DeployBeanPropertyLists {
     return null;
   }
 
-  public BeanProperty[] getId() {
-    return (BeanProperty[]) ids.toArray(new BeanProperty[ids.size()]);
+  public BeanProperty getId() {
+    if (ids.size() > 1) {
+      String msg = "Ebean does not support multiple @Id properties. You need to convert to using an @EmbeddedId."
+          +" Please email the ebean google group if you need further clarification.";
+      throw new IllegalStateException(msg);
+    }
+    if (ids.isEmpty()) {
+      return null;
+    }
+    return ids.get(0);
   }
 
   public BeanProperty[] getNonTransients() {

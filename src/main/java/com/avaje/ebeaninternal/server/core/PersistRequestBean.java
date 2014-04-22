@@ -64,7 +64,6 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 
 	protected ConcurrencyMode concurrencyMode;
 
-
 	/**
 	 * The unique id used for logging summary.
 	 */
@@ -76,17 +75,15 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	protected Integer beanHash;
 	protected Integer beanIdentityHash;
 
-
 	protected boolean notifyCache;
 
 	private boolean statelessUpdate;
 	private boolean deleteMissingChildren;
-	private boolean updateNullProperties;
 	
 	private final Set<String> dirtyPropertyNames;
 
 	public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr,
-	        SpiTransaction t, PersistExecute persistExecute) {
+	        SpiTransaction t, PersistExecute persistExecute, PersistRequest.Type type) {
 
 		super(server, t, persistExecute);
     this.entityBean = (EntityBean)bean;
@@ -94,21 +91,35 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 		this.beanManager = mgr;
 		this.beanDescriptor = mgr.getBeanDescriptor();
 		this.beanPersistListener = beanDescriptor.getPersistListener();
-    this.dirtyPropertyNames = (beanPersistListener == null) ? null : intercept.getDirtyPropertyNames();
+
+    if (PersistRequest.Type.DETERMINE != type) {
+      this.type = type;
+    } else {
+      this.type = beanDescriptor.isInsertMode(intercept) ? Type.INSERT : Type.UPDATE;
+    }
+		
+    if (this.type == Type.UPDATE && intercept.isNew() ) {
+      intercept.setNewBeanForUpdate();
+    }
+
+		this.dirtyPropertyNames = (beanPersistListener == null) ? null : intercept.getDirtyPropertyNames();
 		
 		this.bean = bean;
 		this.parentBean = parentBean;
 
 		this.controller = beanDescriptor.getPersistController();
-		this.concurrencyMode = beanDescriptor.getConcurrencyMode();
-		if (intercept.isReference()) {
-			// delete reference objects with no concurrency checking
-			this.concurrencyMode = ConcurrencyMode.NONE;
-		}
+    this.concurrencyMode = beanDescriptor.getConcurrencyMode(intercept);
 		// this is ok to not use isNewOrDirty() as used for updates only
 		this.isDirty = intercept.isDirty();
 	}
-	
+
+	/**
+	 * Return true if this is an insert request.
+	 */
+  public boolean isInsert() {
+    return Type.INSERT == type;
+  }
+  
 	@Override
   public Set<String> getLoadedProperties() {
     return intercept.getLoadedPropertyNames();
@@ -124,24 +135,9 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
     return intercept.getDirtyValues();
   }
 
-  public void setNotNullAsLoaded() {
-	  BeanProperty[] props = beanDescriptor.propertiesNonMany();
-	  for (int i=0; i< props.length; i++) {
-	    BeanProperty prop = props[i];
-	    if (!intercept.isLoadedProperty(prop.getPropertyIndex())) {
-	      if (prop.getValue(entityBean) != null) {
-	        intercept.setLoadedProperty(prop.getPropertyIndex());
-	      }
-	    }
-	  }
-	}
-
 	public boolean isNotify(TransactionEvent txnEvent) {
+	  this.notifyCache = beanDescriptor.isCacheNotify();
 		return notifyCache || isNotifyPersistListener();
-	}
-
-	public boolean isNotifyCache() {
-		return notifyCache;
 	}
 
 	public boolean isNotifyPersistListener() {
@@ -171,7 +167,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 
 	public void addToPersistMap(BeanPersistIdMap beanPersistMap) {
 
-		beanPersistMap.add(beanDescriptor, type, idValue);
+	  beanPersistMap.add(beanDescriptor, type, idValue);
 	}
 
 	public boolean notifyLocalPersistListener() {
@@ -248,16 +244,6 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 		}
 	}
 
-	/**
-	 * Set the type of this request. One of INSERT, UPDATE, DELETE, UPDATESQL or
-	 * CALLABLESQL.
-	 */
-	@Override
-	public void setType(Type type) {
-		this.type = type;
-		notifyCache = beanDescriptor.isCacheNotify();
-	}
-
 	public BeanManager<T> getBeanManager() {
 		return beanManager;
 	}
@@ -285,14 +271,6 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	}
 
 	/**
-	 * Return true if null properties should be updated (treated as loaded) for
-	 * stateless updates.
-	 */
-	public boolean isUpdateNullProperties() {
-		return updateNullProperties;
-	}
-
-	/**
 	 * Set to true if this is a stateless update.
 	 * <p>
 	 * By Stateless it means that the bean was not previously fetched (and so
@@ -300,10 +278,9 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 * that was probably created from JSON or XML.
 	 * </p>
 	 */
-	public void setStatelessUpdate(boolean statelessUpdate, boolean deleteMissingChildren, boolean updateNullProperties) {
+	public void setStatelessUpdate(boolean statelessUpdate, boolean deleteMissingChildren) {
 		this.statelessUpdate = statelessUpdate;
 		this.deleteMissingChildren = deleteMissingChildren;
-		this.updateNullProperties = updateNullProperties;
 	}
 
 	/**
@@ -546,7 +523,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 			if (prop != null && intercept.isLoadedProperty(prop.getPropertyIndex())) {
 				// OK to use version property
 			} else {
-				concurrencyMode = ConcurrencyMode.NONE;//ALL;
+				concurrencyMode = ConcurrencyMode.NONE;
 			}
 		}
 	
@@ -560,7 +537,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 * </p>
 	 */
 	public boolean isDynamicUpdateSql() {
-		return beanDescriptor.isUpdateChangesOnly() || !intercept.isFullyLoadedBean();//(loadedProps != null);
+		return beanDescriptor.isUpdateChangesOnly() || !intercept.isFullyLoadedBean();
 	}
 
 	/**
@@ -587,12 +564,15 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
   }
 
   public void postInsert() {
-    // mark all properties as loaded after an insert
-    // to support immediate update 
+    // mark all properties as loaded after an insert to support immediate update 
     int len = intercept.getPropertyLength();
     for (int i = 0; i < len; i++) {
       intercept.setLoadedProperty(i);      
     }
+  }
+
+  public boolean isReference() {
+    return beanDescriptor.isReference(intercept);
   }
 
 }

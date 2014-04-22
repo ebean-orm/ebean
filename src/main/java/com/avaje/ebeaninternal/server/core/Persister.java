@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.core;
 
 import java.util.Collection;
-import java.util.Set;
 
 import com.avaje.ebean.CallableSql;
 import com.avaje.ebean.SqlUpdate;
@@ -18,7 +17,7 @@ public interface Persister {
     /**
      * Force an Update using the given bean.
      */
-    public void forceUpdate(EntityBean entityBean, Set<String> updateProps, Transaction t, boolean deleteMissingChildren, boolean updateNullProperties);
+    public void forceUpdate(EntityBean entityBean, Transaction t, boolean deleteMissingChildren);
 
     /**
      * Force an Insert using the given bean.

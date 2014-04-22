@@ -35,7 +35,7 @@ public class TestElGetReference extends TestCase {
 		elProp.elGetReference((EntityBean)c0);
 		elProp.elGetReference((EntityBean)c1);
         
-		addrLine1Prop.elSetValue((EntityBean)c1, "12 someplace", true, false);
-		addrCityProp.elSetValue((EntityBean)c1, "Auckland", true, false);
+		addrLine1Prop.elSetValue((EntityBean)c1, "12 someplace", true);
+		addrCityProp.elSetValue((EntityBean)c1, "Auckland", true);
 	}
 }

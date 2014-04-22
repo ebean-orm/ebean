@@ -857,71 +857,6 @@ public interface EbeanServer {
   public void update(Object bean, Transaction t);
 
   /**
-   * Force an update using the bean explicitly stating the properties to update.
-   * <p>
-   * You can use this method to FORCE an update to occur (even on a bean that
-   * has not been fetched but say built from JSON or XML). When
-   * {@link EbeanServer#save(Object)} is used Ebean determines whether to use an
-   * insert or an update based on the state of the bean. Using this method will
-   * force an update to occur.
-   * </p>
-   * <p>
-   * It is expected that this method is most useful in stateless REST services
-   * or web applications where you have the values you wish to update but no
-   * existing bean.
-   * </p>
-   * <p>
-   * For updates against beans that have not been fetched (say built from JSON
-   * or XML) this will treat deleteMissingChildren=true and will delete any
-   * 'missing children'. Refer to
-   * {@link EbeanServer#update(Object, Set, Transaction, boolean, boolean)}.
-   * </p>
-   * 
-   * <pre class="code">
-   * 
-   * Customer c = new Customer();
-   * c.setId(7);
-   * c.setName(&quot;ModifiedNameNoOCC&quot;);
-   * 
-   * // generally you should set the version property
-   * // so that Optimistic Concurrency Checking is used.
-   * // If a version property is not set then no Optimistic
-   * // Concurrency Checking occurs for the update
-   * // c.setLastUpdate(lastUpdateTime);
-   * 
-   * // by default the Non-null properties
-   * // are included in the update
-   * ebeanServer.update(c);
-   * 
-   * </pre>
-   */
-  public void update(Object bean, Set<String> updateProps);
-
-  /**
-   * Force an update of the specified properties of the bean with an explicit
-   * transaction.
-   * <p>
-   * You can use this method to FORCE an update to occur (even on a bean that
-   * has not been fetched but say built from JSON or XML). When
-   * {@link EbeanServer#save(Object)} is used Ebean determines whether to use an
-   * insert or an update based on the state of the bean. Using this method will
-   * force an update to occur.
-   * </p>
-   * <p>
-   * It is expected that this method is most useful in stateless REST services
-   * or web applications where you have the values you wish to update but no
-   * existing bean.
-   * </p>
-   * <p>
-   * For updates against beans that have not been fetched (say built from JSON
-   * or XML) this will treat deleteMissingChildren=true and will delete any
-   * 'missing children'. Refer to
-   * {@link EbeanServer#update(Object, Set, Transaction, boolean, boolean)}.
-   * </p>
-   */
-  public void update(Object bean, Set<String> updateProps, Transaction t);
-
-  /**
    * Force an update additionally specifying whether to 'deleteMissingChildren'
    * when the update cascades to a OneToMany or ManyToMany.
    * <p>
@@ -945,21 +880,14 @@ public interface EbeanServer {
    * 
    * @param bean
    *          the bean to update
-   * @param updateProps
-   *          optionally you can specify the properties to update (can be null).
    * @param t
    *          optionally you can specify the transaction to use (can be null).
    * @param deleteMissingChildren
    *          specify false if you do not want 'missing children' of a OneToMany
    *          or ManyToMany to be automatically deleted.
-   * @param updateNullProperties
-   *          specify true if by default you want properties with null values to
-   *          be included in the update and false if those properties should be
-   *          treated as 'unloaded' and excluded from the update. This only
-   *          takes effect if the updateProps is null.
+
    */
-  public void update(Object bean, Set<String> updateProps, Transaction t,
-      boolean deleteMissingChildren, boolean updateNullProperties);
+  public void update(Object bean, Transaction t, boolean deleteMissingChildren);
 
   /**
    * Force the bean to be saved with an explicit insert.

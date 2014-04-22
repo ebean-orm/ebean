@@ -94,7 +94,7 @@
     <dependency>
       <groupId>org.avaje.ebeanorm</groupId>
       <artifactId>avaje-ebeanorm-agent</artifactId>
-      <version>4.0.1-RC1</version>
+      <version>4.0.1-RC2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
         
@@ -169,7 +169,7 @@
       <plugin>
         <groupId>org.avaje.ebeanorm</groupId>
         <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
-        <version>4.0.1-RC1</version>
+        <version>4.0.1-RC2-SNAPSHOT</version>
         <executions>
            <execution>
             <id>main</id>

@@ -70,9 +70,5 @@ public class DefaultBeanState implements BeanState {
 	public void setLoaded() {
 	  intercept.setLoaded();
 	}
-
-	public void setReference() {
-		intercept.setReference();
-	}
 	
 }

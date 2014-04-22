@@ -258,12 +258,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public Map<?, ?> findMap() {
     String mapKey = query.getMapKey();
     if (mapKey == null) {
-      BeanProperty[] ids = beanDescriptor.propertiesId();
-      if (ids.length == 1) {
-        query.setMapKey(ids[0].getName());
+      BeanProperty idProp = beanDescriptor.getIdProperty();
+      if (idProp != null) {
+        query.setMapKey(idProp.getName());
       } else {
-        String msg = "No mapKey specified for query";
-        throw new PersistenceException(msg);
+        throw new PersistenceException("No mapKey specified for query");
       }
     }
     return (Map<?, ?>) queryEngine.findMany(this);

@@ -264,6 +264,20 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
+   * Return true if only the Id property has been loaded.
+   */
+  public boolean hasIdOnly(int idIndex) {
+    for (int i = 0; i < loadedProps.length; i++) {
+      if (i == idIndex) {
+        if (!loadedProps[i]) return false;
+      } else if (loadedProps[i]) {
+        return false; 
+      }
+    }
+    return true;
+  }
+  
+  /**
    * Return true if the entity is a reference.
    */
   public boolean isReference() {
@@ -273,8 +287,17 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Set this as a reference object.
    */
-  public void setReference() {
+  public void setReference(int idPos) {
     state = STATE_REFERENCE;
+    if (idPos > -1) {
+      // For cases where properties are set on constructor
+      // set every non Id property to unloaded (for lazy loading)
+      for (int i=0; i< loadedProps.length; i++) {
+        if (i != idPos) { 
+          loadedProps[i] = false;
+        }
+      }
+    }
   }
 
   /**
@@ -330,16 +353,18 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Mark this bean as having failed lazy loading due to the underlying row
-   * being deleted.
+   * Check if the lazy load succeeded. If not then mark this bean as having
+   * failed lazy loading due to the underlying row being deleted.
    * <p>
    * We mark the bean this way rather than immediately fail as we might be batch
    * lazy loading and this bean might not be used by the client code at all.
    * Instead we will fail as soon as the client code tries to use this bean.
    * </p>
    */
-  public void setLazyLoadFailure() {
-    this.lazyLoadFailure = true;
+  public void checkLazyLoadFailure() {
+    if (lazyLoadProperty != -1) {
+      this.lazyLoadFailure = true;
+    }
   }
 
   /**
@@ -490,9 +515,13 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public void setNewBeanForUpdate() {
   
+    if (changedProps == null) {
+      changedProps = new boolean[owner._ebean_getPropertyNames().length];
+    }
+    
     for (int i=0; i< loadedProps.length; i++) {
       if (loadedProps[i]) {
-        setChangedProperty(i);
+        changedProps[i] = true;        
       }
     }
     setDirty(true);

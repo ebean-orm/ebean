@@ -222,8 +222,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
-  public IdBinder createIdBinder(BeanProperty[] uids) {
-    return idBinderFactory.createIdBinder(uids);
+  public IdBinder createIdBinder(BeanProperty idProperty) {
+    return idBinderFactory.createIdBinder(idProperty);
   }
 
   public void deploy() {

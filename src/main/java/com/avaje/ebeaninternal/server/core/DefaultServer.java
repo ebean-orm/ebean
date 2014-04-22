@@ -142,8 +142,8 @@ public final class DefaultServer implements SpiEbeanServer {
    * false;
    */
   private final boolean rollbackOnChecked;
+  
   private final boolean defaultDeleteMissingChildren;
-  private final boolean defaultUpdateNullProperties;
 
   /**
    * Handles the save, delete, updateSql CallableSql.
@@ -251,8 +251,6 @@ public final class DefaultServer implements SpiEbeanServer {
     this.collectQueryStatsByNode = serverConfig.isCollectQueryStatsByNode();
     this.maxCallStack = GlobalProperties.getInt("ebean.maxCallStack", 5);
 
-    this.defaultUpdateNullProperties = "true"
-        .equalsIgnoreCase(config.getServerConfig().getProperty("defaultUpdateNullProperties", "false"));
     this.defaultDeleteMissingChildren = "true".equalsIgnoreCase(config.getServerConfig()
         .getProperty("defaultDeleteMissingChildren", "true"));
 
@@ -313,10 +311,6 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public boolean isDefaultDeleteMissingChildren() {
     return defaultDeleteMissingChildren;
-  }
-
-  public boolean isDefaultUpdateNullProperties() {
-    return defaultUpdateNullProperties;
   }
 
   public int getLazyLoadBatchSize() {
@@ -656,23 +650,15 @@ public final class DefaultServer implements SpiEbeanServer {
         // we actually need to do a query because
         // we don't know the type without the
         // discriminator value
-        BeanProperty[] idProps = desc.propertiesId();
-        String idNames;
-        switch (idProps.length) {
-        case 0:
-          throw new PersistenceException("No ID properties for this type? " + desc);
-        case 1:
-          idNames = idProps[0].getName();
-          break;
-        default:
-          idNames = Arrays.toString(idProps);
-          idNames = idNames.substring(1, idNames.length() - 1);
+        BeanProperty idProp = desc.getIdProperty();
+        if (idProp == null) {
+          throw new PersistenceException("No ID properties for this type? " + desc);          
         }
-
+        
         // just select the id properties and
         // the discriminator column (auto added)
         Query<T> query = createQuery(type);
-        query.select(idNames).setId(id);
+        query.select(idProp.getName()).setId(id);
 
         ref = query.findUnique();
 
@@ -1616,39 +1602,24 @@ public final class DefaultServer implements SpiEbeanServer {
    * Force an update using the bean updating non-null properties.
    */
   public void update(Object bean) {
-    update(bean, null, null);
+    update(bean, null);
   }
 
   /**
    * Force an update using the bean explicitly stating which properties to
    * include in the update.
-   */
-  public void update(Object bean, Set<String> updateProps) {
-    update(bean, updateProps, null);
-  }
-
-  /**
-   * Force an update using the bean updating non-null properties.
    */
   public void update(Object bean, Transaction t) {
-    update(bean, null, t);
+    update(bean, t, defaultDeleteMissingChildren);
   }
 
   /**
    * Force an update using the bean explicitly stating which properties to
    * include in the update.
    */
-  public void update(Object bean, Set<String> updateProps, Transaction t) {
-    update(bean, updateProps, t, defaultDeleteMissingChildren, defaultUpdateNullProperties);
-  }
-
-  /**
-   * Force an update using the bean explicitly stating which properties to
-   * include in the update.
-   */
-  public void update(Object bean, Set<String> updateProps, Transaction t, boolean deleteMissingChildren, boolean updateNullProperties) {
+  public void update(Object bean, Transaction t, boolean deleteMissingChildren) {
     
-    persister.forceUpdate(checkEntityBean(bean), updateProps, t, deleteMissingChildren, updateNullProperties);
+    persister.forceUpdate(checkEntityBean(bean), t, deleteMissingChildren);
   }
 
   /**

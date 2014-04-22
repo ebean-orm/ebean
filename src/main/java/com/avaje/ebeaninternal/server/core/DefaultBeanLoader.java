@@ -317,11 +317,9 @@ public class DefaultBeanLoader {
     }
 
     for (int i = 0; i < ebis.length; i++) {
-      if (ebis[i].isReference()) {
-        // The underlying row in DB was deleted. Mark this bean as 'failed'
-        // but allow processing to continue until it is accessed by client code
-        ebis[i].setLazyLoadFailure();
-      }
+      // Check if the underlying row in DB was deleted. Mark this bean as 'failed' if
+      // necessary but allow processing to continue until it is accessed by client code
+      ebis[i].checkLazyLoadFailure();
     }
   }
 

@@ -16,8 +16,8 @@ public class MpUser {
   private String name;
 
   @OneToMany(cascade = CascadeType.ALL)
-  @MapKey(name = "id")
-  public Map<Long, MpRole> roles = new HashMap<Long, MpRole>();
+  @MapKey(name = "code")
+  public Map<String, MpRole> roles = new HashMap<String, MpRole>();
 
   public Long getId() {
     return id;
@@ -35,11 +35,11 @@ public class MpUser {
     this.name = name;
   }
 
-  public Map<Long, MpRole> getRoles() {
+  public Map<String, MpRole> getRoles() {
     return roles;
   }
 
-  public void setRoles(Map<Long, MpRole> roles) {
+  public void setRoles(Map<String, MpRole> roles) {
     this.roles = roles;
   }
 }

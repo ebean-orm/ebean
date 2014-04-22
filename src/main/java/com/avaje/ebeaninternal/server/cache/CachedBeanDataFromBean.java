@@ -56,10 +56,10 @@ public class CachedBeanDataFromBean {
     
     // create a readOnly sharable instance by copying the data
     EntityBean sharableBean = desc.createBean();
-    BeanProperty[] propertiesId = desc.propertiesId();
-    for (int i = 0; i < propertiesId.length; i++) {
-      Object v = propertiesId[i].getValue(bean);
-      propertiesId[i].setValue(sharableBean, v);
+    BeanProperty idProp = desc.getIdProperty();
+    if (idProp != null) {
+      Object v = idProp.getValue(bean);
+      idProp.setValue(sharableBean, v);
     }
     BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
     for (int i = 0; i < propertiesNonTransient.length; i++) {

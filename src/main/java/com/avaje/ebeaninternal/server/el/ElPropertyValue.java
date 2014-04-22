@@ -104,12 +104,7 @@ public interface ElPropertyValue extends ElPropertyDeploy {
      * If populate then
      * </p>
      */
-    public void elSetValue(EntityBean bean, Object value, boolean populate, boolean reference);
-
-    /**
-     * Make the owning bean of this property a reference (as in not new/dirty).
-     */
-    public void elSetReference(EntityBean bean);
+    public void elSetValue(EntityBean bean, Object value, boolean populate);
 
     /**
      * Convert the value to the expected type.

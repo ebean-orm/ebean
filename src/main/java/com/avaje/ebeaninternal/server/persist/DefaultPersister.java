@@ -2,12 +2,14 @@ package com.avaje.ebeaninternal.server.persist;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.PersistenceException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.CallableSql;
 import com.avaje.ebean.Query;
@@ -38,8 +40,6 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.IntersectionRow;
 import com.avaje.ebeaninternal.server.deploy.ManyType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Persister implementation using DML.
@@ -76,7 +76,6 @@ public final class DefaultPersister implements Persister {
 		this.server = server;
 		this.beanDescriptorManager = descMgr;
 		this.persistExecute = new DefaultPersistExecute(binder, pstmtBatch);
-
 	}
 
 	/**
@@ -150,44 +149,25 @@ public final class DefaultPersister implements Persister {
 		server.delete(detailBean, t);
 	}
 
-	/**
-	 * Force an Update using the given bean.
-	 */
-	public void forceUpdate(EntityBean bean, Set<String> updateProps, Transaction t, boolean deleteMissingChildren, boolean updateNullProperties) {
+  /**
+   * Force an Update using the given bean.
+   */
+  public void forceUpdate(EntityBean entityBean, Transaction t, boolean deleteMissingChildren) {
 
-		EntityBean entityBean = (EntityBean)bean;
-		EntityBeanIntercept ebi = entityBean._ebean_getIntercept();
-		if (ebi.isNew()) {
-		  ebi.setNewBeanForUpdate();
-		}
+    PersistRequestBean<?> req = createRequest(entityBean, t, null, PersistRequest.Type.UPDATE);
+    req.setStatelessUpdate(true, deleteMissingChildren);
+    try {
+      req.initTransIfRequired();
+      update(req);
+      req.commitTransIfRequired();
+      // finished a 'normal' update
+      return;
 
-				if (ebi.isDirty() || ebi.isLoaded()) {
-					// a 'normal' update using 'dirty' properties from internal bean state.
-					// if not dirty we still update in case any cascading save occurs
-					PersistRequestBean<?> req = createRequest(bean, t, null);
-					req.setStatelessUpdate(true, deleteMissingChildren, updateNullProperties);
-					try {
-						req.initTransIfRequired();
-						update(req);
-						req.commitTransIfRequired();
-						// finished a 'normal' update
-						return;
-
-					} catch (RuntimeException ex) {
-						req.rollbackTransIfRequired();
-						throw ex;
-					}
-					
-				} else if (ebi.isReference()) {
-					// just return as no point in cascading (no modified beans/lists)
-				  ((SpiTransaction)t).logSql("-- No update as bean is just a reference bean");
-				  return;
-				  
-				} else {
-				  ((SpiTransaction)t).logSql("-- No update as bean is not dirty");
-				}
-
-	}
+    } catch (RuntimeException ex) {
+      req.rollbackTransIfRequired();
+      throw ex;
+    }
+  }
 
 	public void save(EntityBean bean, Transaction t) {
 		saveRecurse(bean, t, null);
@@ -198,7 +178,7 @@ public final class DefaultPersister implements Persister {
 	 */
 	public void forceInsert(EntityBean bean, Transaction t) {
 
-		PersistRequestBean<?> req = createRequest(bean, t, null);
+		PersistRequestBean<?> req = createRequest(bean, t, null, PersistRequest.Type.INSERT);
 		try {
 			req.initTransIfRequired();
 			insert(req);
@@ -219,7 +199,7 @@ public final class DefaultPersister implements Persister {
 			throw new IllegalArgumentException("This bean is of type ["+bean.getClass()+"] is not enhanced?");
 		}
 
-		PersistRequestBean<?> req = createRequest(bean, t, parentBean);
+		PersistRequestBean<?> req = createRequest(bean, t, parentBean, PersistRequest.Type.DETERMINE);
 		try {
 			req.initTransIfRequired();
 			saveEnhanced(req);
@@ -238,21 +218,20 @@ public final class DefaultPersister implements Persister {
 
 		EntityBeanIntercept intercept = request.getEntityBeanIntercept();
 
-		if (intercept.isReference()) {
+		if (request.isReference()) {
 			// its a reference...
 			if (request.isPersistCascade()) {
 				// save any associated List held beans
 				intercept.setLoaded();
 				saveAssocMany(false, request);
-				intercept.setReference();
+				intercept.setReference(-1);
 			}
 
 		} else {
-			if (intercept.isLoaded()) {
-				// Need to call setLoaded(false) to simulate insert
-				update(request);
+			if (request.isInsert()) {
+        insert(request);
 			} else {
-				insert(request);
+        update(request);
 			}
 		}
 	}
@@ -268,9 +247,6 @@ public final class DefaultPersister implements Persister {
 		}
 		
 		try {
-			request.setType(PersistRequest.Type.INSERT);
-			request.setNotNullAsLoaded();
-			
 			if (request.isPersistCascade()) {
 				// save associated One beans recursively first
 				saveAssocOne(request);
@@ -300,8 +276,6 @@ public final class DefaultPersister implements Persister {
 		}
 		
 		try {
-			// we have determined that it is an update
-			request.setType(PersistRequest.Type.UPDATE);
 			if (request.isPersistCascade()) {
 				// save associated One beans recursively first
 				saveAssocOne(request);
@@ -331,7 +305,7 @@ public final class DefaultPersister implements Persister {
 	 */
 	public void delete(EntityBean bean, Transaction t) {
 
-		PersistRequestBean<?> req = createRequest(bean, t, null);
+		PersistRequestBean<?> req = createRequest(bean, t, null, PersistRequest.Type.DELETE);
 		if (req.isRegisteredForDeleteBean()) {
 			// skip deleting bean. Used where cascade is on
 			// both sides of a relationship
@@ -340,7 +314,7 @@ public final class DefaultPersister implements Persister {
 			}
 			return;
 		}
-		req.setType(PersistRequest.Type.DELETE);
+
 		try {
 			req.initTransIfRequired();
 			delete(req);
@@ -603,7 +577,6 @@ public final class DefaultPersister implements Persister {
 		private final boolean cascade;
 		private final boolean statelessUpdate;
 		private final boolean deleteMissingChildren;
-		private final boolean updateNullProperties;
 
 		private SaveManyPropRequest(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
 			this.insertedParent = insertedParent;
@@ -613,7 +586,6 @@ public final class DefaultPersister implements Persister {
 			this.t = request.getTransaction();
 			this.statelessUpdate = request.isStatelessUpdate();
 			this.deleteMissingChildren = request.isDeleteMissingChildren();
-			this.updateNullProperties = request.isUpdateNullProperties();
 		}
 
 		private SaveManyPropRequest(BeanPropertyAssocMany<?> many, EntityBean parentBean, SpiTransaction t) {
@@ -624,7 +596,6 @@ public final class DefaultPersister implements Persister {
 			this.cascade = true;
 			this.statelessUpdate = false;
 			this.deleteMissingChildren = false;
-			this.updateNullProperties = false;
 		}
 		
 		public boolean isSaveIntersection() {
@@ -646,10 +617,6 @@ public final class DefaultPersister implements Persister {
 		private boolean isDeleteMissingChildren() {
 			return deleteMissingChildren;
 		}
-		
-		private boolean isUpdateNullProperties() {
-        	return updateNullProperties;
-        }
 
 		private boolean isInsertedParent() {
 			return insertedParent;
@@ -680,7 +647,7 @@ public final class DefaultPersister implements Persister {
 		  boolean saveIntersectionFromThisDirection = saveMany.isSaveIntersection();
 			if (saveMany.isCascade()) {
 				// Need explicit Cascade to save the beans on other side
-				saveAssocManyDetails(saveMany, false, saveMany.isUpdateNullProperties());
+				saveAssocManyDetails(saveMany, false);
 			}
 			// for ManyToMany save the 'relationship' via inserts/deletes
 			// into/from the intersection table
@@ -690,7 +657,7 @@ public final class DefaultPersister implements Persister {
 			}
 		} else {
 			if (saveMany.isCascade()) {
-				saveAssocManyDetails(saveMany, saveMany.isDeleteMissingChildren(), saveMany.isUpdateNullProperties());
+				saveAssocManyDetails(saveMany, saveMany.isDeleteMissingChildren());
 			}
 			if (saveMany.isModifyListenMode()) {
 				removeAssocManyPrivateOwned(saveMany);
@@ -731,7 +698,7 @@ public final class DefaultPersister implements Persister {
 	/**
 	 * Save the details from a OneToMany collection.
 	 */
-	private void saveAssocManyDetails(SaveManyPropRequest saveMany, boolean deleteMissingChildren, boolean updateNullProperties) {
+	private void saveAssocManyDetails(SaveManyPropRequest saveMany, boolean deleteMissingChildren) {
 
 		BeanPropertyAssocMany<?> prop = saveMany.getMany();
 
@@ -747,12 +714,12 @@ public final class DefaultPersister implements Persister {
 			return;
 		}
 
+    BeanDescriptor<?> targetDescriptor = prop.getTargetDescriptor();
 		if (saveMany.isInsertedParent()) {
 			// performance optimisation for large collections
-			prop.getTargetDescriptor().preAllocateIds(collection.size());
+		  targetDescriptor.preAllocateIds(collection.size());
 		}
 
-		BeanDescriptor<?> targetDescriptor = prop.getTargetDescriptor();
 		ArrayList<Object> detailIds = null;
 		if (deleteMissingChildren) {
 			// collect the Id's (to exclude from deleteManyDetails)
@@ -787,16 +754,16 @@ public final class DefaultPersister implements Persister {
 			
 			} else {
 			  EntityBean detail = (EntityBean)detailBean;
+        EntityBeanIntercept ebi = detail._ebean_getIntercept();
 			  if (prop.isManyToMany()) {
-	        skipSavingThisBean = detail._ebean_getIntercept().isReference();
+	        skipSavingThisBean = targetDescriptor.isReference(ebi);
 	      } else {
-	        EntityBeanIntercept ebi = detail._ebean_getIntercept();
           if (ebi.isNewOrDirty()) {
             skipSavingThisBean = false;
             // set the parent bean to detailBean
             prop.setJoinValuesToChild(parentBean, detail, mapKeyValue);
             
-          } else if (ebi.isReference()) {
+          } else if (targetDescriptor.isReference(ebi)) {
             // we can skip this one
             skipSavingThisBean = true;
 
@@ -820,7 +787,7 @@ public final class DefaultPersister implements Persister {
 	        if (targetDescriptor.isStatelessUpdate(detail)) {
 	          // update based on the value of Version/Id properties
 	          // cascade update in stateless mode
-	          forceUpdate(detail, null, t, deleteMissingChildren, updateNullProperties);
+	          forceUpdate(detail, t, deleteMissingChildren);
 	        } else {
 	          // cascade insert
 	          forceInsert(detail, t);
@@ -1113,7 +1080,7 @@ public final class DefaultPersister implements Persister {
 			if (request.isLoadedProperty(prop)) {
 				Object detailBean = prop.getValue(request.getEntityBean());
 				if (detailBean != null) {
-					if (isReference(detailBean)) {
+					if (prop.isReference(detailBean)) {
 						// skip saving a reference
 					} else if (request.isParent(detailBean)) {
 						// skip saving the parent as already saved
@@ -1129,13 +1096,6 @@ public final class DefaultPersister implements Persister {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Return true if the bean is a reference.
-	 */
-	private boolean isReference(Object bean) {
-		return (bean instanceof EntityBean) && ((EntityBean) bean)._ebean_getIntercept().isReference();
 	}
 
 	/**
@@ -1196,7 +1156,7 @@ public final class DefaultPersister implements Persister {
 			return;
 		}
 
-		BeanProperty idProp = desc.getSingleIdProperty();
+		BeanProperty idProp = desc.getIdProperty();
 		if (idProp == null || idProp.isEmbedded()) {
 			// not supporting IdGeneration for concatenated or Embedded
 			return;
@@ -1248,12 +1208,12 @@ public final class DefaultPersister implements Persister {
 	 * perform an insert, update or delete.
 	 */
 	@SuppressWarnings("unchecked")
-	private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean) {
+	private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, PersistRequest.Type type) {
 		BeanManager<T> mgr = getBeanManager(bean);
 		if (mgr == null) {
 			throw new PersistenceException(errNotRegistered(bean.getClass()));
 		}
-		return (PersistRequestBean<T>) createRequest(bean, t, parentBean, mgr);
+		return (PersistRequestBean<T>) createRequest(bean, t, parentBean, mgr, type);
 	}
 
 	private String errNotRegistered(Class<?> beanClass) {
@@ -1268,9 +1228,9 @@ public final class DefaultPersister implements Persister {
 	 * perform an insert, update or delete.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private PersistRequestBean<?> createRequest(Object bean, Transaction t, Object parentBean, BeanManager<?> mgr) {
+	private PersistRequestBean<?> createRequest(Object bean, Transaction t, Object parentBean, BeanManager<?> mgr, PersistRequest.Type type) {
 
-		return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute);
+		return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, type);
 	}
 
 	/**

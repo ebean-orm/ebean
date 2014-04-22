@@ -193,11 +193,10 @@ public final class DRawSqlSelectColumnsParser {
 			}
 		}
 
-		BeanProperty[] propertiesId = desc.propertiesId();
-		for (int i = 0; i < propertiesId.length; i++) {
-			BeanProperty prop = propertiesId[i];
-			if (isMatch(prop, searchColumn)) {
-				return prop;
+		BeanProperty idProp = desc.getIdProperty();
+		if (idProp != null) {
+			if (isMatch(idProp, searchColumn)) {
+				return idProp;
 			}
 		}
 

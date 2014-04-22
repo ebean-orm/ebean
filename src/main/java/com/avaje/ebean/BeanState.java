@@ -76,16 +76,6 @@ public interface BeanState {
   public void removePropertyChangeListener(PropertyChangeListener listener);
 
   /**
-   * Advanced - Used to programmatically build a reference object.
-   * <p>
-   * You can create a new EntityBean (
-   * {@link EbeanServer#createEntityBean(Class)}, set its Id property and then
-   * call this setReference() method.
-   * </p>
-   */
-  public void setReference();
-
-  /**
    * Advanced - Used to programmatically build a partially or fully loaded
    * entity bean. First create an entity bean via
    * {@link EbeanServer#createEntityBean(Class)}, then populate its properties
