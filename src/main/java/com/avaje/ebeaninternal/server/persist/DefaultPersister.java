@@ -155,6 +155,10 @@ public final class DefaultPersister implements Persister {
   public void forceUpdate(EntityBean entityBean, Transaction t, boolean deleteMissingChildren) {
 
     PersistRequestBean<?> req = createRequest(entityBean, t, null, PersistRequest.Type.UPDATE);
+    if (req.isReference()) {
+      // skip update as only got the Id property set
+      return;
+    }
     req.setStatelessUpdate(true, deleteMissingChildren);
     try {
       req.initTransIfRequired();

@@ -64,7 +64,7 @@ public class TestStatelessUpdate extends BaseTestCase {
     // act
     EBasic basicWithoutChanges = new EBasic();
     basicWithoutChanges.setId(basic.getId());
-    server.update(basicWithoutChanges, null, null, true, false);
+    server.update(basicWithoutChanges);
 
     // assert
     // Nothing to check, simply no exception should occur
@@ -93,7 +93,7 @@ public class TestStatelessUpdate extends BaseTestCase {
     // act
     Customer customerWithoutChanges = new Customer();
     customerWithoutChanges.setId(customer.getId());
-    server.update(customerWithoutChanges, null, null, true, false);
+    server.update(customerWithoutChanges);
 
     Customer result = Ebean.find(Customer.class, customer.getId());
 
