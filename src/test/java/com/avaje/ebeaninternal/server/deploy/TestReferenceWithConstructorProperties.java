@@ -26,15 +26,13 @@ public class TestReferenceWithConstructorProperties extends BaseTestCase {
     Set<String> loadedProps = beanState.getLoadedProps();
     
     Assert.assertEquals(1, loadedProps.size());
+    Assert.assertTrue(beanState.isReference());
 
     // read the status invokes lazy loading
     order.getStatus();
     
-    BeanState beanState2 = Ebean.getBeanState(order);
-    // fully loaded
-    Assert.assertNull(beanState2.getLoadedProps());
-    
-    
+    Assert.assertFalse(beanState.isReference());
+
   }
   
 }

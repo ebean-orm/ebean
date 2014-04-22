@@ -47,21 +47,15 @@ public class TestJsonStatelessUpdate extends BaseTestCase {
     // The update below cascades to also save "master" and that fails
     // as it thinks it should INSERT master rather than UPDATE master
     
-//  Ebean.update(two2);
+    Ebean.update(two2);
 
-    
-    // The following is a workaround, to explicitly update master first
-    // so then Ebean doesn't try to save it when two2 is updated
-    Ebean.beginTransaction();
-    try {
-      UUOne master = two2.getMaster();
-      Ebean.update(master);
-      Ebean.update(two2);
-      
-    } finally {
-      Ebean.endTransaction();
-    }
-    
+
+    // confirm the properties where updated as expected
+    UUTwo twoConfirm = Ebean.find(UUTwo.class, two.getId());
+
+    Assert.assertEquals("twoNameModified", twoConfirm.getName());
+    Assert.assertEquals("oneNameModified", twoConfirm.getMaster().getName());
+        
   }
   
 }

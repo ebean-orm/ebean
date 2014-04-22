@@ -46,8 +46,17 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
       EntityBean eb = (EntityBean)refProd;
       prodDesc.isReference(eb._ebean_getIntercept());
       
+      BeanState beanState = Ebean.getBeanState(refProd);
+      Assert.assertTrue(beanState.isNew());
+      
       String name = refProd.getName();
-      Assert.assertNotNull(name);
+      Assert.assertNull(name);
+
+      // Set to be 'loaded' to invoke lazy loading
+      beanState.setLoaded();
+      String name2 = refProd.getName();
+      Assert.assertNotNull(name2);
+
     }
 
     List<Order> orders = Ebean.find(Order.class)

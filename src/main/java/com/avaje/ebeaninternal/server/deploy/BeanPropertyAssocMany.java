@@ -847,9 +847,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
                 childMasterProperty.setValue(detailBean, bean);
                 detailBeanState.setLoaded(childMasterProperty.getName());
             }
-            
-            detailBeanState.setLoadedState();
-            
+                        
             if (!ctx.readArrayNext()){
                 break;
             }

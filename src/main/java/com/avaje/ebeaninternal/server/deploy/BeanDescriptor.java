@@ -2300,7 +2300,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     if (beanState == null) {
       return null;
     } else {
-      beanState.setLoadedState();
       return (T) beanState.getBean();
     }
   }

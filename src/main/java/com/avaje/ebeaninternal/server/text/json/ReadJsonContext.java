@@ -161,12 +161,6 @@ public class ReadJsonContext extends ReadBasicJsonContext {
             }
         }
         
-        public void setLoadedState(){
-            if (ebi != null){
-                ebi.setLoaded();
-            }
-        }
-        
         public void propertyChange(PropertyChangeEvent evt) {
             String propName = evt.getPropertyName();
             loadedProps.add(propName);
