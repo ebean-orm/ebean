@@ -158,6 +158,18 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
         help.add(bc, detailBean);
     }
 
+    public boolean isEmptyBeanCollection(EntityBean bean) {
+      Object val = getValue(bean);
+      if (val == null) {
+        return true;
+      }
+      if (val instanceof BeanCollection<?>) {
+        // if empty and not been cleared or elements removed
+        return ((BeanCollection<?>)val).isEmptyAndUntouched();
+      }
+      return false;
+    }
+    
     @Override
     public Object getValue(EntityBean bean) {
         return super.getValue(bean);

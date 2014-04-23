@@ -1,7 +1,8 @@
 package com.avaje.tests.update;
 
-import com.avaje.tests.model.basic.Contact;
-import com.avaje.tests.model.basic.Customer;
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,10 +10,10 @@ import org.junit.Test;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
+import com.avaje.tests.model.basic.Contact;
+import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.EBasic;
 import com.avaje.tests.model.basic.EBasic.Status;
-
-import java.util.ArrayList;
 
 public class TestStatelessUpdate extends BaseTestCase {
 
@@ -105,10 +106,10 @@ public class TestStatelessUpdate extends BaseTestCase {
   }
 
   /**
-   * Many relations mustn't be deleted when having a {@link com.avaje.ebean.event.BeanPersistAdapter} which is accessing this many field.
+   * Many relations mustn't be deleted when they are not loaded.
    */
   @Test
-  public void testStatelessUpdateWithPersistAdapterAndIgnoreNullValues() {
+  public void testStatelessUpdateIgnoreNullCollection() {
 
     // arrange
     Contact contact = new Contact();
@@ -126,12 +127,89 @@ public class TestStatelessUpdate extends BaseTestCase {
     customerWithChange.setId(customer.getId());
     customerWithChange.setName("new name");
 
-    server.update(customerWithChange, null, null, true, false);
+    // contacts is not loaded
+    Assert.assertFalse(containsContacts(customerWithChange));
+    server.update(customerWithChange);
 
     Customer result = Ebean.find(Customer.class, customer.getId());
 
-    // assert
+    // assert null list was ignored (missing children not deleted)
     Assert.assertNotNull(result.getContacts());
     Assert.assertFalse("the contacts mustn't be deleted", result.getContacts().isEmpty());
   }
+  
+  /**
+   * When BeanCollection is inadvertantly initialised and empty then ignore it
+   * Specifically a non-BeanCollection (like ArrayList) is not ignored in terms
+   * of deleting missing children.
+   */
+  @Test
+  public void testStatelessUpdateIgnoreEmptyBeanCollection() {
+
+    // arrange
+    Contact contact = new Contact();
+    contact.setFirstName("wobu :P");
+
+    Customer customer = new Customer();
+    customer.setName("something");
+    customer.setContacts(new ArrayList<Contact>());
+    customer.getContacts().add(contact);
+
+    server.save(customer);
+
+    // act
+    Customer customerWithChange = new Customer();
+    customerWithChange.setId(customer.getId());
+    customerWithChange.setName("new name");
+
+    // with Ebean enhancement this loads the an empty contacts BeanList
+    customerWithChange.getContacts();
+    
+    // contacts has been initialised to empty BeanList
+    Assert.assertTrue(containsContacts(customerWithChange));
+    server.update(customerWithChange);
+
+    Customer result = Ebean.find(Customer.class, customer.getId());
+
+    // assert empty bean list was ignore (missing children not deleted)
+    Assert.assertNotNull(result.getContacts());
+    Assert.assertFalse("the contacts mustn't be deleted", result.getContacts().isEmpty());
+  }
+  
+  @Test
+  public void testStatelessUpdateDeleteChildrenForNonBeanCollection() {
+
+    // arrange
+    Contact contact = new Contact();
+    contact.setFirstName("wobu :P");
+
+    Customer customer = new Customer();
+    customer.setName("something");
+    customer.setContacts(new ArrayList<Contact>());
+    customer.getContacts().add(contact);
+
+    server.save(customer);
+
+    // act
+    Customer customerWithChange = new Customer();
+    customerWithChange.setId(customer.getId());
+    customerWithChange.setName("new name");
+
+    // with Ebean enhancement this loads the an empty contacts BeanList
+    customerWithChange.setContacts(Collections.<Contact> emptyList());
+    
+    Assert.assertTrue(containsContacts(customerWithChange));
+    server.update(customerWithChange);
+
+    Customer result = Ebean.find(Customer.class, customer.getId());
+
+    // assert empty bean list was ignore (missing children not deleted)
+    Assert.assertNotNull(result.getContacts());
+    Assert.assertTrue("the contacts were deleted", result.getContacts().isEmpty());
+  }
+  
+  private boolean containsContacts(Customer cust) {
+    return server.getBeanState(cust).getLoadedProps().contains("contacts");
+  }
+  
 }

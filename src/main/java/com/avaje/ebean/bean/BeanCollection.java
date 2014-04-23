@@ -32,6 +32,12 @@ public interface BeanCollection<E> extends Serializable {
   }
 
   /**
+   * Return true if the collection is empty and untouched. Used to detect if a
+   * collection was 'cleared' deliberately or just un-initialised.
+   */
+  public boolean isEmptyAndUntouched();
+
+  /**
    * Return the bean that owns this collection.
    */
   public EntityBean getOwnerBean();

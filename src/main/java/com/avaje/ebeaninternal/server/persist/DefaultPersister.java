@@ -565,7 +565,10 @@ public final class DefaultPersister implements Persister {
 		// many's with cascade save
 		BeanPropertyAssocMany<?>[] manys = desc.propertiesManySave();
 		for (int i = 0; i < manys.length; i++) {
-			saveMany(new SaveManyPropRequest(insertedParent, manys[i], parentBean, request));
+		  // check that property is loaded and not empty uninitialised collection
+      if (request.isLoadedProperty(manys[i]) && !manys[i].isEmptyBeanCollection(parentBean)) {
+        saveMany(new SaveManyPropRequest(insertedParent, manys[i], parentBean, request));
+      }
 		}
 	}
 
@@ -605,7 +608,7 @@ public final class DefaultPersister implements Persister {
 		public boolean isSaveIntersection() {
 		  return t.isSaveAssocManyIntersection(many.getIntersectionTableJoin().getTable(), many.getBeanDescriptor().getName());
 		}
-
+		
 		private Object getValue() {
 			return many.getValue(parentBean);
 		}

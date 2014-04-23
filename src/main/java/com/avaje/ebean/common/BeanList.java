@@ -46,6 +46,11 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     super(loader, ownerBean, propertyName);
   }
 
+  @Override
+  public boolean isEmptyAndUntouched() {
+    return !touched && (list == null || list.isEmpty());
+  }
+
   @SuppressWarnings("unchecked")
   public void addBean(EntityBean bean) {
     list.add((E) bean);
@@ -77,16 +82,24 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
           list = new ArrayList<E>();
         }
       }
-      touched();
+      touched(true);
     }
   }
 
+  private void initAsUntouched() {
+    init(false);
+  }
+  
   private void init() {
+    init(true);
+  }
+  
+  private void init(boolean setTouched) {
     synchronized (this) {
       if (list == null) {
         lazyLoadCollection(false);
       }
-      touched();
+      touched(setTouched);
     }
   }
 
@@ -259,7 +272,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   }
 
   public boolean isEmpty() {
-    init();
+    initAsUntouched();
     return list.isEmpty();
   }
 

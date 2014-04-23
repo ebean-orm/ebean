@@ -39,6 +39,10 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   public BeanMap(BeanCollectionLoader ebeanServer, EntityBean ownerBean, String propertyName) {
     super(ebeanServer, ownerBean, propertyName);
   }
+  
+  public boolean isEmptyAndUntouched() {
+    return !touched && (map == null || map.isEmpty());
+  }
 
   @SuppressWarnings("unchecked")
   public void internalPut(Object key, Object bean) {
@@ -86,16 +90,24 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
           map = new LinkedHashMap<K, E>();
         }
       }
-      touched();
+      touched(true);
     }
   }
 
+  private void initAsUntouched() {
+    init(false);
+  }
+  
   private void init() {
+    init(true);
+  }
+  
+  private void init(boolean setTouched) {
     synchronized (this) {
       if (map == null) {
         lazyLoadCollection(false);
       }
-      touched();
+      touched(setTouched);
     }
   }
 
@@ -212,7 +224,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   public boolean isEmpty() {
-    init();
+    initAsUntouched();
     return map.isEmpty();
   }
 

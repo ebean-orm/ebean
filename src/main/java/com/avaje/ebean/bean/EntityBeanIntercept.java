@@ -745,6 +745,13 @@ public final class EntityBeanIntercept implements Serializable {
   }
   
   /**
+   * Called when a BeanCollection is initialised automatically.
+   */
+  public void initialisedMany(int propertyIndex) {
+    loadedProps[propertyIndex] = true;
+  }
+  
+  /**
    * Method that is called prior to a getter method on the actual entity.
    */
   public void preGetter(int propertyIndex) {

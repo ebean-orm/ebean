@@ -59,6 +59,12 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   protected boolean modifyListening;
 
   /**
+   * Flag used to tell if empty collections have been cleared etc or just
+   * uninitialised.
+   */
+  protected boolean touched;
+
+  /**
    * Constructor not non-lazy loading collection.
    */
   public AbstractBeanCollection() {
@@ -112,7 +118,14 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     checkEmptyLazyLoad();
   }
 
-  protected void touched() {
+  /**
+   * Set touched. If setFlag is false then typically an isEmpty() call and still
+   * considering that to be untouched.
+   */
+  protected void touched(boolean setFlag) {
+    if (setFlag) {
+      touched = true;
+    }
     if (beanCollectionTouched != null) {
       // only call this once
       beanCollectionTouched.notifyTouched(this);

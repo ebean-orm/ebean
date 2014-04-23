@@ -23,12 +23,8 @@ public class CustomerPersistAdapter extends BeanPersistAdapter {
   @Override
   public boolean preUpdate(BeanPersistRequest<?> request) {
 
-    Customer customer = (Customer) request.getBean();
-
-    if (customer.getContacts() != null) {
-      String test = "accessed";
-    }
-
+    // Do nothing intentionally. TestStatelessUpdate needs
+    // to control if customer contacts is 'touched'
     return true;
   }
 
