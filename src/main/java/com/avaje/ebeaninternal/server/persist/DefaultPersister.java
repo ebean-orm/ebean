@@ -412,7 +412,7 @@ public final class DefaultPersister implements Persister {
 			BeanPropertyAssocOne<?>[] expOnes = descriptor.propertiesOneExportedDelete();
 			for (int i = 0; i < expOnes.length; i++) {
 				BeanDescriptor<?> targetDesc = expOnes[i].getTargetDescriptor();
-				if (targetDesc.isDeleteRecurseSkippable() && !targetDesc.isUsingL2Cache()) {
+				if (targetDesc.isDeleteRecurseSkippable() && !targetDesc.isBeanCaching()) {
 					SqlUpdate sqlDelete = expOnes[i].deleteByParentId(id, idList);
 					executeSqlUpdate(sqlDelete, t);
 				} else {
@@ -425,7 +425,7 @@ public final class DefaultPersister implements Persister {
 			BeanPropertyAssocMany<?>[] manys = descriptor.propertiesManyDelete();
 			for (int i = 0; i < manys.length; i++) {
 				BeanDescriptor<?> targetDesc = manys[i].getTargetDescriptor();
-				if (targetDesc.isDeleteRecurseSkippable() && !targetDesc.isUsingL2Cache()) {
+				if (targetDesc.isDeleteRecurseSkippable() && !targetDesc.isBeanCaching()) {
 					// we can just delete children with a single statement
 					SqlUpdate sqlDelete = manys[i].deleteByParentId(id, idList);
 					executeSqlUpdate(sqlDelete, t);
@@ -1053,7 +1053,7 @@ public final class DefaultPersister implements Persister {
 		if (many.getCascadeInfo().isDelete()) {
 			// cascade delete the beans in the collection
 			BeanDescriptor<?> targetDesc = many.getTargetDescriptor();
-			if (targetDesc.isDeleteRecurseSkippable() && !targetDesc.isUsingL2Cache()) {
+			if (targetDesc.isDeleteRecurseSkippable() && !targetDesc.isBeanCaching()) {
 				// Just delete all the children with one statement
 				IntersectionRow intRow = many.buildManyDeleteChildren(parentBean, excludeDetailIds);
 				SqlUpdate sqlDelete = intRow.createDelete(server);

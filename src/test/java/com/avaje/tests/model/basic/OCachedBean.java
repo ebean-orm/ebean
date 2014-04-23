@@ -1,14 +1,14 @@
 package com.avaje.tests.model.basic;
 
-import com.avaje.ebean.annotation.CacheStrategy;
-import com.avaje.ebean.annotation.CacheTuning;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
+
+import com.avaje.ebean.annotation.CacheStrategy;
 
 /**
  * Cached bean for testing caching implementation.
@@ -16,11 +16,13 @@ import java.util.List;
 @CacheStrategy
 @Entity
 @Table(name = "o_cached_bean")
-public class CachedBean {
+public class OCachedBean {
 
   @Id
   Long id;
 
+  String name;
+  
   @ManyToMany
   List<Country> countries = new ArrayList<Country>();
 
@@ -30,6 +32,14 @@ public class CachedBean {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public List<Country> getCountries() {

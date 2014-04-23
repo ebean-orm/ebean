@@ -7,50 +7,41 @@ import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
 public class CachedBeanDataFromBean {
 
-  private final BeanDescriptor<?> desc;
-  private final EntityBean bean;
-  private final EntityBeanIntercept ebi;
 
   public static CachedBeanData extract(BeanDescriptor<?> desc, EntityBean bean) {
-    return new CachedBeanDataFromBean(desc, bean, bean._ebean_getIntercept()).extract();
-  }
 
-  private CachedBeanDataFromBean(BeanDescriptor<?> desc, EntityBean bean, EntityBeanIntercept ebi) {
-    this.desc = desc;
-    this.bean = bean;
-    this.ebi = ebi;
-  }
-
-  private CachedBeanData extract() {
-
+    EntityBeanIntercept ebi = bean._ebean_getIntercept();
+    
     Object[] data = new Object[desc.getPropertyCount()];
     boolean[] loaded = new boolean[desc.getPropertyCount()];
     
     BeanProperty[] props = desc.propertiesNonMany();
 
-    int naturalKeyUpdate = -1;
+    Object naturalKey = null;
+
     for (int i = 0; i < props.length; i++) {
       BeanProperty prop = props[i];
-      if (isLoaded(prop)) {
+      if (ebi.isLoadedProperty(prop.getPropertyIndex())) {
         int propertyIndex = prop.getPropertyIndex();
         data[propertyIndex] = prop.getCacheDataValue(bean);
         loaded[propertyIndex] = true;
         if (prop.isNaturalKey()) {
-          naturalKeyUpdate = propertyIndex;
+          naturalKey = prop.getValue(bean);
         }
       }
     }
 
-    EntityBean sharableBean = createSharableBean();
+    EntityBean sharableBean = createSharableBean(desc, bean, ebi);
 
-    return new CachedBeanData(sharableBean, loaded, data, naturalKeyUpdate);
+    return new CachedBeanData(sharableBean, loaded, data, naturalKey, null);
   }
 
-  private EntityBean createSharableBean() {
-    if (!desc.isCacheSharableBeans() || !ebi.isFullyLoadedBean()) {
+  private static EntityBean createSharableBean(BeanDescriptor<?> desc, EntityBean bean, EntityBeanIntercept beanEbi) {
+    
+    if (!desc.isCacheSharableBeans() || !beanEbi.isFullyLoadedBean()) {
       return null;
     }
-    if (ebi.isReadOnly()) {
+    if (beanEbi.isReadOnly()) {
       return bean;
     } 
     
@@ -66,14 +57,11 @@ public class CachedBeanDataFromBean {
       Object v = propertiesNonTransient[i].getValue(bean);
       propertiesNonTransient[i].setValue(sharableBean, v);
     }
-    EntityBeanIntercept ebi = ((EntityBean) sharableBean)._ebean_intercept();
-    ebi.setReadOnly(true);
-    ebi.setLoaded();
+    EntityBeanIntercept intercept = sharableBean._ebean_intercept();
+    intercept.setReadOnly(true);
+    intercept.setLoaded();
     return sharableBean;
   }
 
-  private boolean isLoaded(BeanProperty prop) {
-    return ebi.isLoadedProperty(prop.getPropertyIndex());
-  }
 
 }

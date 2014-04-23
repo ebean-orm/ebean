@@ -118,7 +118,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
 	public void cacheClear() {
 		if (targetDescriptor.isBeanCaching() && relationshipProperty != null) {
-			targetDescriptor.cacheClearCachedManyIds(relationshipProperty.getName());
+			targetDescriptor.cacheManyPropClear(relationshipProperty.getName());
 		}
 	}
 	
@@ -128,12 +128,12 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 			if (assocBean != null) {
     			Object parentId = targetDescriptor.getId((EntityBean)assocBean);
     			if (parentId != null) {
-    				targetDescriptor.cacheRemoveCachedManyIds(parentId, relationshipProperty.getName());
+    				targetDescriptor.cacheManyPropRemove(parentId, relationshipProperty.getName());
     				return;
     			}
 			}
 			if (clearOnNull) {
-				targetDescriptor.cacheClearCachedManyIds(relationshipProperty.getName());
+				targetDescriptor.cacheManyPropClear(relationshipProperty.getName());
 			}
 		}
 	}

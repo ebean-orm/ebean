@@ -94,7 +94,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     }
   }
 
-  private void initWithoutTouchedFlag() {
+  private void initAsUntouched() {
     init(false);
   }
   
@@ -102,12 +102,12 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     init(true);
   }
   
-  private void init(boolean setFlag) {
+  private void init(boolean setTouched) {
     synchronized (this) {
       if (set == null) {
         lazyLoadCollection(true);
       }
-      touched(setFlag);
+      touched(setTouched);
     }
   }
 
@@ -232,7 +232,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   }
 
   public boolean isEmpty() {
-    initWithoutTouchedFlag();
+    initAsUntouched();
     return set.isEmpty();
   }
 

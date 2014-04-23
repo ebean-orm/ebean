@@ -136,7 +136,7 @@ public class DefaultBeanLoader {
         }
       } else if (loadRequest.isLoadCache()) {
         Object parentId = desc.getId(bc.getOwnerBean());
-        desc.cachePutMany(many, bc, parentId);
+        desc.cacheManyPropPut(many, bc, parentId);
       }
     }
   }
@@ -179,13 +179,13 @@ public class DefaultBeanLoader {
       pc.put(parentId, parentBean);
     }
 
-    boolean useManyIdCache = beanCollection != null && parentDesc.cacheIsUseManyId();
+    boolean useManyIdCache = beanCollection != null && parentDesc.isManyPropCaching();
     if (useManyIdCache) {
       Boolean readOnly = null;
       if (ebi != null && ebi.isReadOnly()) {
         readOnly = Boolean.TRUE;
       }
-      if (parentDesc.cacheLoadMany(many, beanCollection, parentId, readOnly)) {
+      if (parentDesc.cacheManyPropLoad(many, beanCollection, parentId, readOnly)) {
         return;
       }
     }
@@ -238,7 +238,7 @@ public class DefaultBeanLoader {
           logger.debug("BeanCollection after load was empty. Owner:" + beanCollection.getOwnerBean());
         }
       } else if (useManyIdCache) {
-        parentDesc.cachePutMany(many, beanCollection, parentId);
+        parentDesc.cacheManyPropPut(many, beanCollection, parentId);
       }
     }
   }
@@ -312,7 +312,7 @@ public class DefaultBeanLoader {
 
     if (loadRequest.isLoadCache()) {
       for (int i = 0; i < list.size(); i++) {
-        desc.cachePutBeanData((EntityBean)list.get(i));
+        desc.cacheBeanPutData((EntityBean)list.get(i));
       }
     }
 
@@ -351,7 +351,7 @@ public class DefaultBeanLoader {
     if (ebi != null) {
       if (SpiQuery.Mode.LAZYLOAD_BEAN.equals(mode) && desc.isBeanCaching()) {
         // lazy loading and the bean cache is active 
-        if (desc.loadFromCache((EntityBean)bean, ebi, id)) {
+        if (desc.cacheBeanLoad((EntityBean)bean, ebi, id)) {
           return;
         }
       }

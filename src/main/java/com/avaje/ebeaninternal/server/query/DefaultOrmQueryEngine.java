@@ -83,7 +83,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
         	BeanDescriptor<T> descriptor = request.getBeanDescriptor();
         	Collection<T> c  = result.getActualDetails();
         	for (T bean : c) {
-        		descriptor.cachePutBeanData((EntityBean)bean);
+        		descriptor.cacheBeanPutData((EntityBean)bean);
           }
         }
 
@@ -120,7 +120,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
         }
         
         if (result != null && request.isUseBeanCache()){
-        	request.getBeanDescriptor().cachePutBeanData((EntityBean)result);        		
+        	request.getBeanDescriptor().cacheBeanPutData((EntityBean)result);        		
         }
         
         return result;

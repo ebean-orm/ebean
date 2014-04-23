@@ -19,7 +19,7 @@ import com.avaje.tests.model.basic.Customer.Status;
 public class TestCacheBeanData extends BaseTestCase {
 
   @Test
-  public void test() {
+  public void testCacheBeanExtractAndLoad() {
     
     SpiEbeanServer server = (SpiEbeanServer)Ebean.getServer(null);
     BeanDescriptor<Customer> desc = server.getBeanDescriptor(Customer.class);
@@ -42,8 +42,7 @@ public class TestCacheBeanData extends BaseTestCase {
     ((EntityBean)c)._ebean_getIntercept().setNewBeanForUpdate();
     
     CachedBeanData cacheData = CachedBeanDataFromBean.extract(desc, (EntityBean)c);
-    //BeanProperty idProperty = desc.getBeanProperty("id");
-    //Assert.assertTrue(cacheData.isLoaded(idProperty.getPropertyIndex()));
+
     
     Assert.assertNotNull(cacheData);
     
@@ -54,6 +53,19 @@ public class TestCacheBeanData extends BaseTestCase {
     Assert.assertEquals(c.getId(), newCustomer.getId());
     Assert.assertEquals(c.getName(), newCustomer.getName());
     Assert.assertEquals(c.getStatus(), newCustomer.getStatus());
+    Assert.assertEquals(c.getSmallnote(), newCustomer.getSmallnote());
+    Assert.assertEquals(c.getCretime(), newCustomer.getCretime());
+    Assert.assertEquals(c.getUpdtime(), newCustomer.getUpdtime());
+    Assert.assertEquals(c.getBillingAddress().getId(), newCustomer.getBillingAddress().getId());
+    
+    Assert.assertNotNull(newCustomer.getId());
+    Assert.assertNotNull(newCustomer.getName());
+    Assert.assertNotNull(newCustomer.getStatus());
+    Assert.assertNotNull(newCustomer.getSmallnote());
+    Assert.assertNotNull(newCustomer.getCretime());
+    Assert.assertNotNull(newCustomer.getUpdtime());
+    Assert.assertNotNull(newCustomer.getBillingAddress());
+    Assert.assertNotNull(newCustomer.getBillingAddress().getId());
     
   }
 }

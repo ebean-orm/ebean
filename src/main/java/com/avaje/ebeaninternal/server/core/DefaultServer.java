@@ -1180,7 +1180,7 @@ public final class DefaultServer implements SpiEbeanServer {
     }
 
     // Hit the L2 bean cache
-    Object cachedBean = beanDescriptor.cacheGetBean(query.getId(), query.isReadOnly());
+    Object cachedBean = beanDescriptor.cacheBeanGet(query.getId(), query.isReadOnly());
     if (cachedBean != null) {
       if (context == null) {
         context = new DefaultPersistenceContext();
@@ -1249,7 +1249,7 @@ public final class DefaultServer implements SpiEbeanServer {
       // check if it is a find by unique id
       NaturalKeyBindParam keyBindParam = q.getNaturalKeyBindParam();
       if (keyBindParam != null && desc.cacheIsNaturalKey(keyBindParam.getName())) {
-        Object id2 = desc.cacheGetNaturalKeyId(keyBindParam.getValue());
+        Object id2 = desc.cacheNaturalKeyLookup(keyBindParam.getValue());
         if (id2 != null) {
           SpiQuery<T> copy = q.copy();
           copy.convertWhereNaturalKeyToId(id2);

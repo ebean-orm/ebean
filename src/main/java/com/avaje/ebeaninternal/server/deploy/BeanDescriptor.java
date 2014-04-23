@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.deploy;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,7 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.PersistenceException;
 
-import com.avaje.ebean.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.annotation.ConcurrencyMode;
@@ -24,8 +25,6 @@ import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
-import com.avaje.ebean.cache.ServerCache;
-import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
@@ -43,9 +42,6 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cache.CachedBeanData;
-import com.avaje.ebeaninternal.server.cache.CachedBeanDataFromBean;
-import com.avaje.ebeaninternal.server.cache.CachedBeanDataToBean;
-import com.avaje.ebeaninternal.server.cache.CachedBeanDataUpdate;
 import com.avaje.ebeaninternal.server.cache.CachedManyIds;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
@@ -75,9 +71,6 @@ import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.util.SortByClause;
 import com.avaje.ebeaninternal.util.SortByClause.Property;
 import com.avaje.ebeaninternal.util.SortByClauseParser;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Describes Beans including their deployment information.
@@ -129,11 +122,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   private final String selectLastInsertedId;
 
   private final boolean autoFetchTunable;
-
-  /**
-   * Flag indicating this bean has no relationships.
-   */
-  private final boolean cacheSharableBeans;
 
   private final String lazyFetchIncludes;
 
@@ -226,8 +214,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   private final BeanProperty versionProperty;
   private final int versionPropertyIndex;
-
-  private final BeanProperty propertiesNaturalKey;
 
   /**
    * Properties local to this type (not from a super type).
@@ -330,21 +316,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   private final boolean updateChangesOnly;
 
-  private final ServerCacheManager cacheManager;
-
-  private final CacheOptions cacheOptions;
+  private final boolean cacheSharableBeans;
+  
+  private final BeanDescriptorCacheHelp<T> cacheHelp;
 
   private final String defaultSelectClause;
   private final Set<String> defaultSelectClauseSet;
 
   private final String descriptorId;
 
-
   private SpiEbeanServer ebeanServer;
-
-  private ServerCache beanCache;
-  private ServerCache naturalKeyCache;
-  private ServerCache queryCache;
 
   /**
    * Construct the BeanDescriptor.
@@ -352,7 +333,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   public BeanDescriptor(BeanDescriptorMap owner, TypeManager typeManager, DeployBeanDescriptor<T> deploy, String descriptorId) {
 
     this.owner = owner;
-    this.cacheManager = owner.getCacheManager();
     this.serverName = owner.getServerName();
     this.entityType = deploy.getEntityType();
     this.properties = deploy.getProperties();
@@ -373,7 +353,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.persistController = deploy.getPersistController();
     this.persistListener = deploy.getPersistListener();
     this.queryAdapter = deploy.getQueryAdapter();
-    this.cacheOptions = deploy.getCacheOptions();
 
     this.defaultSelectClause = deploy.getDefaultSelectClause();
     this.defaultSelectClauseSet = deploy.parseDefaultSelectClause(defaultSelectClause);
@@ -408,7 +387,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.propertiesNonTransient = listHelper.getNonTransients();
     this.propertiesBaseScalar = listHelper.getBaseScalar();
     this.propertiesBaseCompound = listHelper.getBaseCompound();
-    this.propertiesNaturalKey = listHelper.getNaturalKey();
     this.propertiesEmbedded = listHelper.getEmbedded();
     this.propertiesLocal = listHelper.getLocal();
     this.unidirectional = listHelper.getUnidirectional();
@@ -425,14 +403,18 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.propertiesManySave = listHelper.getManySave();
     this.propertiesManyDelete = listHelper.getManyDelete();
     this.propertiesManyToMany = listHelper.getManyToMany();
-    boolean noRelationships = propertiesOne.length + propertiesMany.length == 0;
-    this.cacheSharableBeans = noRelationships && cacheOptions.isReadOnly();
 
     this.namesOfManyProps = deriveManyPropNames();
     this.namesOfManyPropsHash = namesOfManyProps.hashCode();
 
     this.derivedTableJoins = listHelper.getTableJoin();
 
+    boolean noRelationships = propertiesOne.length + propertiesMany.length == 0;
+    
+    this.cacheSharableBeans = noRelationships && deploy.getCacheOptions().isReadOnly();
+    this.cacheHelp = new BeanDescriptorCacheHelp<T>(this, owner.getCacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
+
+    
     // Check if there are no cascade save associated beans ( subject to change
     // in initialiseOther()). Note that if we are in an inheritance hierarchy 
     // then we also need to check every BeanDescriptors in the InheritInfo as 
@@ -615,7 +597,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
         namedUpdate.initialise(parser);
       }
     }
-
   }
 
   public void initInheritInfo() {
@@ -634,12 +615,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Initialise the cache once the server has started.
    */
   public void cacheInitialise() {
-    if (cacheOptions.isUseNaturalKeyCache()) {
-      this.naturalKeyCache = cacheManager.getNaturalKeyCache(beanType);
-    }
-    if (cacheOptions.isUseCache()) {
-      this.beanCache = cacheManager.getBeanCache(beanType);
-    }
+    cacheHelp.initialise();
   }
 
   protected boolean hasInheritance() {
@@ -713,7 +689,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Return the cache options.
    */
   public CacheOptions getCacheOptions() {
-    return cacheOptions;
+    return cacheHelp.getCacheOptions();
   }
 
   /**
@@ -734,21 +710,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Execute the warming cache query (if defined) and load the cache.
    */
   public void runCacheWarming() {
-    if (cacheOptions == null) {
-      return;
-    }
-    String warmingQuery = cacheOptions.getWarmingQuery();
-    if (warmingQuery != null && warmingQuery.trim().length() > 0) {
-      Query<T> query = ebeanServer.createQuery(beanType, warmingQuery);
-      query.setUseCache(true);
-      query.setReadOnly(true);
-      query.setLoadBeanCache(true);
-      List<T> list = query.findList();
-      if (logger.isInfoEnabled()) {
-        String msg = "Loaded " + beanType + " cache with [" + list.size() + "] beans";
-        logger.info(msg);
-      }
-    }
+    cacheHelp.runCacheWarming(ebeanServer);
   }
 
   /**
@@ -785,17 +747,17 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Return true if there is currently query caching for this type of bean.
    */
   public boolean isQueryCaching() {
-    return queryCache != null;
+    return cacheHelp.isQueryCaching();
   }
 
   /**
    * Return true if there is currently bean caching for this type of bean.
    */
   public boolean isBeanCaching() {
-    return beanCache != null;
+    return cacheHelp.isBeanCaching();
   }
 
-  public boolean cacheIsUseManyId() {
+  public boolean isManyPropCaching() {
     return isBeanCaching();
   }
 
@@ -803,299 +765,151 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Return true if the persist request needs to notify the cache.
    */
   public boolean isCacheNotify() {
-
-    if (isBeanCaching() || isQueryCaching()) {
-      return true;
-    }
-    for (int i = 0; i < propertiesOneImported.length; i++) {
-      if (propertiesOneImported[i].getTargetDescriptor().isBeanCaching()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Return true if there is L2 bean caching for this bean type.
-   */
-  public boolean isUsingL2Cache() {
-    return isBeanCaching();
-  }
-
-  /**
-   * Invalidate parts of cache due to SqlUpdate or external modification etc.
-   */
-  public void cacheNotify(TableIUD tableIUD) {
-    // inserts don't invalidate the bean cache
-    if (tableIUD.isUpdateOrDelete()) {
-      cacheClear();
-    }
-    // any change invalidates the query cache
-    queryCacheClear();
+    return cacheHelp.isCacheNotify();
   }
 
   /**
    * Clear the query cache.
    */
   public void queryCacheClear() {
-    if (queryCache != null) {
-      queryCache.clear();
-    }
+    cacheHelp.queryCacheClear();
   }
 
   /**
    * Get a query result from the query cache.
    */
-  @SuppressWarnings("unchecked")
   public BeanCollection<T> queryCacheGet(Object id) {
-    if (queryCache == null) {
-      return null;
-    } else {
-      return (BeanCollection<T>) queryCache.get(id);
-    }
+    return cacheHelp.queryCacheGet(id);
   }
 
   /**
    * Put a query result into the query cache.
    */
   public void queryCachePut(Object id, BeanCollection<T> query) {
-    if (queryCache == null) {
-      queryCache = cacheManager.getQueryCache(beanType);
-    }
-    queryCache.put(id, query);
+    cacheHelp.queryCachePut(id, query);
   }
 
-  private ServerCache getBeanCache() {
-    if (beanCache == null) {
-      beanCache = cacheManager.getBeanCache(beanType);
-    }
-    return beanCache;
+
+
+  /**
+   * Try to load the beanCollection from cache return true if successful.
+   */
+  public boolean cacheManyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId, Boolean readOnly) {
+    return cacheHelp.manyPropLoad(many, bc, parentId, readOnly);
+  }
+
+  /**
+   * Put the beanCollection into the cache.
+   */
+  public void cacheManyPropPut(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId) {
+    cacheHelp.manyPropPut(many, bc, parentId);
+  }
+
+  public void cacheManyPropRemove(Object parentId, String propertyName) {
+    cacheHelp.manyPropRemove(parentId, propertyName);
+  }
+
+  public void cacheManyPropClear(String propertyName) {
+    cacheHelp.manyPropClear(propertyName);    
+  }
+
+  /**
+   * Return the CachedManyIds for a given bean and property. Returns null if not in the cache.
+   */
+  public CachedManyIds cacheManyPropGet(Object parentId, String propertyName) {
+    return cacheHelp.manyPropGet(parentId, propertyName);
+  }
+
+  /**
+   * Put the CachedManyIds into the cache.
+   */
+  public void cacheManyPropPutEntry(Object parentId, String propertyName, CachedManyIds ids) {
+    cacheHelp.manyPropPutEntry(parentId, propertyName, ids);
   }
 
   /**
    * Clear the bean cache.
    */
-  public void cacheClear() {
-    if (beanCache != null) {
-      beanCache.clear();
-    }
+  public void cacheBeanClear() {
+    cacheHelp.beanCacheClear();
   }
 
-  public void cachePutBean(T bean) {
-    cachePutBeanData((EntityBean)bean);
+  public void cacheBeanPut(T bean) {
+    cacheBeanPutData((EntityBean)bean);
   }
   
   /**
    * Put a bean into the bean cache.
    */
-  public void cachePutBeanData(EntityBean bean) {
-
-    CachedBeanData beanData = CachedBeanDataFromBean.extract(this, bean);
-
-    Object id = getId(bean);
-    getBeanCache().put(id, beanData);
-    if (beanData.isNaturalKeyUpdate() && naturalKeyCache != null) {
-      Object naturalKey = beanData.getNaturalKey();
-      if (naturalKey != null) {
-        naturalKeyCache.put(naturalKey, id);
-      }
-    }
+  public void cacheBeanPutData(EntityBean bean) {
+    cacheHelp.beanCachePut(bean);
   }
-
-  public boolean cacheLoadMany(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId, Boolean readOnly) {
-    
-    CachedManyIds ids = cacheGetCachedManyIds(parentId, many.getName());
-    if (ids == null) {
-      return false;
-    }
-
-    Object ownerBean = bc.getOwnerBean();
-    EntityBeanIntercept ebi = ((EntityBean) ownerBean)._ebean_getIntercept();
-    PersistenceContext persistenceContext = ebi.getPersistenceContext();
-
-    BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
-    
-    List<Object> idList = ids.getIdList();
-    bc.checkEmptyLazyLoad();
-    for (int i = 0; i < idList.size(); i++) {
-      Object id = idList.get(i);
-      Object refBean = targetDescriptor.createReference(readOnly, id);
-      EntityBeanIntercept refEbi = ((EntityBean) refBean)._ebean_getIntercept();
-    
-      many.add(bc, (EntityBean)refBean);
-      persistenceContext.put(id, refBean);
-      refEbi.setPersistenceContext(persistenceContext);
-    }
-    return true;
-  }
-
-  public void cachePutMany(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId) {
-    BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
-    ArrayList<Object> idList = new ArrayList<Object>();
-
-    // get the underlying collection of beans (in the List, Set or Map)
-    Collection<?> actualDetails = bc.getActualDetails();
-    for (Object bean : actualDetails) {
-      // Collect the id values 
-      idList.add(targetDescriptor.getId((EntityBean)bean));
-    }
-    CachedManyIds ids = new CachedManyIds(idList);
-    cachePutCachedManyIds(parentId, many.getName(), ids);
-  }
-
-  public void cacheRemoveCachedManyIds(Object parentId, String propertyName) {
-    ServerCache collectionIdsCache = cacheManager.getCollectionIdsCache(beanType, propertyName);
-    collectionIdsCache.remove(parentId);
-  }
-
-  public void cacheClearCachedManyIds(String propertyName) {
-    ServerCache collectionIdsCache = cacheManager.getCollectionIdsCache(beanType, propertyName);
-    collectionIdsCache.clear();
-  }
-
-  public CachedManyIds cacheGetCachedManyIds(Object parentId, String propertyName) {
-    ServerCache collectionIdsCache = cacheManager.getCollectionIdsCache(beanType, propertyName);
-    return (CachedManyIds) collectionIdsCache.get(parentId);
-  }
-
-  public void cachePutCachedManyIds(Object parentId, String propertyName, CachedManyIds ids) {
-    ServerCache collectionIdsCache = cacheManager.getCollectionIdsCache(beanType, propertyName);
-    collectionIdsCache.put(parentId, ids);
-  }
-
+  
   /**
    * Return a bean from the bean cache.
    */
-  @SuppressWarnings("unchecked")
-  public T cacheGetBean(Object id, Boolean readOnly) {
-
-    CachedBeanData d = (CachedBeanData) getBeanCache().get(id);
-    if (d == null) {
-      return null;
-    }
-    if (cacheSharableBeans && !Boolean.FALSE.equals(readOnly)) {
-      Object bean = d.getSharableBean();
-      if (bean != null) {
-        return (T) bean;
-      }
-    }
-
-    EntityBean bean = createBean();
-    convertSetId(id, bean);
-    if (Boolean.TRUE.equals(readOnly)) {
-      bean._ebean_getIntercept().setReadOnly(true);
-    }
-
-    CachedBeanDataToBean.load(this, bean, d);
-    return (T)bean;
+  public T cacheBeanGet(Object id, Boolean readOnly) {
+    return cacheHelp.beanCacheGet(id, readOnly);
   }
+
+  /**
+   * Remove a bean from the cache given its Id.
+   */
+  public void cacheBeanRemove(Object id) {
+    cacheHelp.beanCacheRemove(id);
+  }
+  
+  public boolean cacheBeanLoad(EntityBean bean, EntityBeanIntercept ebi, Object id) {
+    return cacheHelp.beanCacheLoad(bean, ebi, id);
+  }
+  
+  public boolean cacheBeanLoad(EntityBeanIntercept ebi) {
+    EntityBean bean = ebi.getOwner();
+    Object id = getId(bean);
+
+    return cacheBeanLoad(bean, ebi, id);
+  }
+
 
   public boolean cacheIsNaturalKey(String propName) {
-    return propName != null && propName.equals(cacheOptions.getNaturalKey());
+    return cacheHelp.isNaturalKey(propName);
   }
 
-  public Object cacheGetNaturalKeyId(Object uniqueKeyValue) {
-    if (naturalKeyCache != null) {
-      return naturalKeyCache.get(uniqueKeyValue);
-    }
-    return null;
+  public Object cacheNaturalKeyLookup(Object uniqueKeyValue) {
+    return cacheHelp.naturalKeyLookup(uniqueKeyValue);
+  }
+
+  /**
+   * Invalidate parts of cache due to SqlUpdate or external modification etc.
+   */
+  public void cacheHandleBulkUpdate(TableIUD tableIUD) {
+    cacheHelp.handleBulkUpdate(tableIUD);    
   }
 
   /**
    * Remove a bean from the cache given its Id.
    */
-  public void cacheRemove(Object id) {
-    if (beanCache != null) {
-      beanCache.remove(id);
-    }
-    for (int i = 0; i < propertiesOneImported.length; i++) {
-      propertiesOneImported[i].cacheClear();
-    }
+  public void cacheHandleDelete(Object id, PersistRequestBean<T> deleteRequest) {
+    cacheHelp.handleDelete(id, deleteRequest);
   }
 
-  /**
-   * Remove a bean from the cache given its Id.
-   */
-  public void cacheDelete(Object id, PersistRequestBean<T> deleteRequest) {
-    if (queryCache != null) {
-      queryCache.clear();
-    }
-    if (beanCache != null) {
-      beanCache.remove(id);
-    }
-    for (int i = 0; i < propertiesOneImported.length; i++) {
-      BeanPropertyAssocMany<?> many = propertiesOneImported[i].getRelationshipProperty();
-      if (many != null) {
-        propertiesOneImported[i].cacheDelete(true, deleteRequest.getEntityBean());
-      }
-    }
-  }
-
-  public void cacheInsert(Object id, PersistRequestBean<T> insertRequest) {
-    if (queryCache != null) {
-      queryCache.clear();
-    }
-    for (int i = 0; i < propertiesOneImported.length; i++) {
-      propertiesOneImported[i].cacheDelete(false, insertRequest.getEntityBean());
-    }
+  public void cacheHandleInsert(Object id, PersistRequestBean<T> insertRequest) {
+    cacheHelp.handleInsert(id, insertRequest);
   }
 
   /**
    * Update the cached bean data.
    */
-  public void cacheUpdate(Object id, PersistRequestBean<T> updateRequest) {
-
-    if (queryCache != null) {
-      queryCache.clear();
-    }
-    
-    ServerCache cache = getBeanCache();
-    CachedBeanData cd = (CachedBeanData) cache.get(id);
-    if (cd != null) {
-      CachedBeanData newCd = CachedBeanDataUpdate.update(this, cd, updateRequest);
-      cache.put(id, newCd);
-      if (newCd.isNaturalKeyUpdate() && naturalKeyCache != null) {
-        //FIXME: natural key invalidate old value
-        //Object oldKey = propertiesNaturalKey.getValue(updateRequest.getOldValues());
-        Object newKey = propertiesNaturalKey.getValue(updateRequest.getEntityBean());
-        //if (oldKey != null) {
-        //  naturalKeyCache.remove(oldKey);
-        //}
-        if (newKey != null) {
-          naturalKeyCache.put(newKey, id);
-        }
-      }
-    }
+  public void cacheHandleUpdate(Object id, PersistRequestBean<T> updateRequest) {
+    cacheHelp.handleUpdate(id, updateRequest);
   }
-
+  
   /**
    * Return the base table alias. This is always the first letter of the bean
    * name.
    */
   public String getBaseTableAlias() {
     return baseTableAlias;
-  }
-
-  public boolean loadFromCache(EntityBeanIntercept ebi) {
-    EntityBean bean = ebi.getOwner();
-    Object id = getId(bean);
-
-    return loadFromCache(bean, ebi, id);
-  }
-
-  public boolean loadFromCache(EntityBean bean, EntityBeanIntercept ebi, Object id) {
-
-    CachedBeanData cacheData = (CachedBeanData) getBeanCache().get(id);
-    if (cacheData == null) {
-      return false;
-    }
-    int lazyLoadProperty = ebi.getLazyLoadPropertyIndex();
-    if (lazyLoadProperty > -1 && !cacheData.containsProperty(lazyLoadProperty)) {
-      return false;
-    }
-
-    CachedBeanDataToBean.load(this, bean, cacheData);
-    return true;
   }
 
   public void preAllocateIds(int batchSize) {
@@ -1327,10 +1141,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Create a reference bean based on the id.
    */
   @SuppressWarnings("unchecked")
-  public T createReference(Boolean readOnly, Object id) {//, Object parent) {
+  public T createReference(Boolean readOnly, Object id) {
 
     if (cacheSharableBeans && !Boolean.FALSE.equals(readOnly)) {
-      CachedBeanData d = (CachedBeanData) getBeanCache().get(id);
+      CachedBeanData d = (CachedBeanData) cacheHelp.beanCacheGetData(id);
       if (d != null) {
         Object shareableBean = d.getSharableBean();
         if (shareableBean != null) {

@@ -2,29 +2,35 @@ package com.avaje.tests.cache;
 
 import java.util.List;
 
-import com.avaje.ebeaninternal.server.cache.CachedManyIds;
-import com.avaje.tests.model.basic.*;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.cache.ServerCache;
+import com.avaje.ebean.cache.ServerCacheManager;
+import com.avaje.ebeaninternal.server.cache.CachedManyIds;
+import com.avaje.tests.model.basic.Contact;
+import com.avaje.tests.model.basic.Country;
+import com.avaje.tests.model.basic.Customer;
+import com.avaje.tests.model.basic.OCachedBean;
+import com.avaje.tests.model.basic.ResetBasicData;
 
 public class TestCacheCollectionIds extends BaseTestCase {
 
+  ServerCacheManager cacheManager = Ebean.getServerCacheManager();
+  
   @Test
   public void test() {
 
     ResetBasicData.reset();
 
-    ServerCache custCache = Ebean.getServerCacheManager().getBeanCache(Customer.class);
-    ServerCache contactCache = Ebean.getServerCacheManager().getBeanCache(Contact.class);
-    ServerCache custManyIdsCache = Ebean.getServerCacheManager().getCollectionIdsCache(
-        Customer.class, "contacts");
+    ServerCache custCache = cacheManager.getBeanCache(Customer.class);
+    ServerCache contactCache = cacheManager.getBeanCache(Contact.class);
+    ServerCache custManyIdsCache = cacheManager.getCollectionIdsCache(Customer.class, "contacts");
 
-    // Ebean.getServerCacheManager().setCaching(Customer.class, true);
-    // Ebean.getServerCacheManager().setCaching(Contact.class, true);
+    // cacheManager.setCaching(Customer.class, true);
+    // cacheManager.setCaching(Contact.class, true);
 
     custCache.clear();
     custManyIdsCache.clear();
@@ -94,21 +100,21 @@ public class TestCacheCollectionIds extends BaseTestCase {
     // arrange
     ResetBasicData.reset();
 
-    CachedBean cachedBean = new CachedBean();
+    OCachedBean cachedBean = new OCachedBean();
     cachedBean.getCountries().add(Ebean.find(Country.class, "NZ"));
     cachedBean.getCountries().add(Ebean.find(Country.class, "AU"));
 
     Ebean.save(cachedBean);
 
     // act
-    CachedBean loadedBean = Ebean.find(CachedBean.class, cachedBean.getId());
+    OCachedBean loadedBean = Ebean.find(OCachedBean.class, cachedBean.getId());
     loadedBean.getCountries().clear();
     loadedBean.getCountries().add(Ebean.find(Country.class, "AU"));
 
     Ebean.save(cachedBean);
 
-    CachedBean result = Ebean.find(CachedBean.class, cachedBean.getId());
-    ServerCache cachedBeanCountriesCache = Ebean.getServerCacheManager().getCollectionIdsCache(CachedBean.class, "countries");
+    OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
+    ServerCache cachedBeanCountriesCache = cacheManager.getCollectionIdsCache(OCachedBean.class, "countries");
     CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
 
 
@@ -127,21 +133,44 @@ public class TestCacheCollectionIds extends BaseTestCase {
     // arrange
     ResetBasicData.reset();
 
-    CachedBean cachedBean = new CachedBean();
+    OCachedBean cachedBean = new OCachedBean();
+    cachedBean.setName("cachedBeanTest");
     cachedBean.getCountries().add(Ebean.find(Country.class, "NZ"));
     cachedBean.getCountries().add(Ebean.find(Country.class, "AU"));
 
     Ebean.save(cachedBean);
 
-    // act
-    CachedBean update = new CachedBean();
+    // clear the cache
+    ServerCache cachedBeanCountriesCache = cacheManager.getCollectionIdsCache(OCachedBean.class, "countries");
+    cachedBeanCountriesCache.clear();
+    Assert.assertEquals(0, cachedBeanCountriesCache.size());
+
+    // load the cache
+    OCachedBean dummyLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    List<Country> dummyCountries = dummyLoad.getCountries();
+    Assert.assertEquals(2, dummyCountries.size());
+
+    // assert that the cache contains the expected entry
+    Assert.assertEquals("countries cache now loaded with 1 entry", 1, cachedBeanCountriesCache.size());
+    CachedManyIds dummyEntry = (CachedManyIds) cachedBeanCountriesCache.get(dummyLoad.getId());
+    Assert.assertNotNull(dummyEntry);
+    Assert.assertEquals("2 ids in the entry", 2, dummyEntry.getIdList().size());
+    Assert.assertTrue(dummyEntry.getIdList().contains("NZ"));
+    Assert.assertTrue(dummyEntry.getIdList().contains("AU"));
+    
+    
+    // act - this should invalidate our cache entry
+    OCachedBean update = new OCachedBean();
     update.setId(cachedBean.getId());
+    update.setName("modified");
     update.getCountries().add(Ebean.find(Country.class, "AU"));
 
-    Ebean.update(cachedBean);
+    Ebean.update(update);
+    
+    Assert.assertEquals("countries entry was invalidated", 0, cachedBeanCountriesCache.size());
+    
 
-    CachedBean result = Ebean.find(CachedBean.class, cachedBean.getId());
-    ServerCache cachedBeanCountriesCache = Ebean.getServerCacheManager().getCollectionIdsCache(CachedBean.class, "countries");
+    OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
     CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
 
 

@@ -27,7 +27,7 @@ public final class DeleteByIdMap {
 	        if (idValues != null){
 	            d.queryCacheClear();
 	            for (int i = 0; i < idValues.size(); i++) {
-                    d.cacheRemove(idValues.get(i));
+                    d.cacheBeanRemove(idValues.get(i));
                 }
 	        }
         }

@@ -36,6 +36,7 @@ public class DeployBeanPropertyLists {
   private final ArrayList<BeanProperty> local = new ArrayList<BeanProperty>();
 
   private final ArrayList<BeanProperty> manys = new ArrayList<BeanProperty>();
+  
   private final ArrayList<BeanProperty> nonManys = new ArrayList<BeanProperty>();
 
   private final ArrayList<BeanProperty> ones = new ArrayList<BeanProperty>();
@@ -175,14 +176,6 @@ public class DeployBeanPropertyLists {
 
   public BeanPropertyCompound[] getBaseCompound() {
     return (BeanPropertyCompound[]) baseCompound.toArray(new BeanPropertyCompound[baseCompound.size()]);
-  }
-
-  public BeanProperty getNaturalKey() {
-    String naturalKey = desc.getCacheOptions().getNaturalKey();
-    if (naturalKey != null) {
-      return propertyMap.get(naturalKey);
-    }
-    return null;
   }
 
   public BeanProperty getId() {

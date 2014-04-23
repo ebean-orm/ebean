@@ -281,7 +281,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     List<BeanDescriptor<?>> list = getBeanDescriptors(tableIUD.getTableName());
     if (list != null) {
       for (int i = 0; i < list.size(); i++) {
-        list.get(i).cacheNotify(tableIUD);
+        list.get(i).cacheHandleBulkUpdate(tableIUD);
       }
     }
   }

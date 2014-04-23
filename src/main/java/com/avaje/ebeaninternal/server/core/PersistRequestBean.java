@@ -151,10 +151,10 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
     if (notifyCache) {
       switch (type) {
       case INSERT:
-        beanDescriptor.cacheInsert(idValue, this);
+        beanDescriptor.cacheHandleInsert(idValue, this);
         break;
       case UPDATE:
-        beanDescriptor.cacheUpdate(idValue, this);
+        beanDescriptor.cacheHandleUpdate(idValue, this);
         break;
       case DELETE:
         // Bean deleted from cache early via postDelete()
@@ -436,7 +436,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	  // Delete the bean from the PersistenceContent
 	  transaction.getPersistenceContext().clear(beanDescriptor.getBeanType(), idValue);
 	  // Delete from cache early even if transaction fails
-	  beanDescriptor.cacheDelete(idValue, this);
+	  beanDescriptor.cacheHandleDelete(idValue, this);
 	}
 	
 	/**
