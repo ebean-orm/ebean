@@ -30,7 +30,7 @@ public class CachedBeanDataUpdate {
       int propertyIndex = props[i].getPropertyIndex();
       if (ebi.isLoadedProperty(propertyIndex)) {
         if (props[i].isNaturalKey()) {
-          newNaturalKey = updateBean._ebean_getField(i);
+          newNaturalKey = updateBean._ebean_getField(propertyIndex);
         }
         // set the cache safe value for the property and mark it as loaded
         copyData[propertyIndex] = props[i].getCacheDataValue(updateBean);

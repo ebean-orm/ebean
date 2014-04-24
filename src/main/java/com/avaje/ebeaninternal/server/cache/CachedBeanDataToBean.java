@@ -30,13 +30,7 @@ public class CachedBeanDataToBean {
 
     BeanPropertyAssocMany<?>[] manys = desc.propertiesMany();
     for (int i = 0; i < manys.length; i++) {
-      BeanPropertyAssocMany<?> prop = manys[i];
-      if (ebi.isLoadedProperty(prop.getPropertyIndex())) {
-        // already loaded property
-      } else {
-        // set a lazy loading proxy
-        prop.createReference(bean);
-      }
+      manys[i].createReferenceIfNull(bean);
     }
 
     ebi.setLoadedLazy();

@@ -39,6 +39,7 @@ import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
 import com.avaje.ebeaninternal.api.HashQueryPlan;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cache.CachedBeanData;
@@ -681,10 +682,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return (queryUseCache != null) ? queryUseCache.booleanValue() : isBeanCaching();
   }
 
-  public boolean calculateUseNaturalKeyCache(Boolean queryUseCache) {
-    return (queryUseCache != null) ? queryUseCache.booleanValue() :  isBeanCaching();
+  public T cacheNaturalKey(SpiQuery<T> query, SpiTransaction t) {
+    return cacheHelp.naturalKeyLookup(query, t);
   }
-
+  
   /**
    * Return the cache options.
    */
@@ -821,13 +822,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * Put the CachedManyIds into the cache.
-   */
-  public void cacheManyPropPutEntry(Object parentId, String propertyName, CachedManyIds ids) {
-    cacheHelp.manyPropPutEntry(parentId, propertyName, ids);
-  }
-
-  /**
    * Clear the bean cache.
    */
   public void cacheBeanClear() {
@@ -844,12 +838,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   public void cacheBeanPutData(EntityBean bean) {
     cacheHelp.beanCachePut(bean);
   }
-  
+
   /**
-   * Return a bean from the bean cache.
+   * Return a bean from the bean cache (or null).
    */
-  public T cacheBeanGet(Object id, Boolean readOnly) {
-    return cacheHelp.beanCacheGet(id, readOnly);
+  public T cacheBeanGet(SpiQuery<T> query, PersistenceContext context) {
+    return cacheHelp.beanCacheGet(query, context);
   }
 
   /**
@@ -859,24 +853,27 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     cacheHelp.beanCacheRemove(id);
   }
   
+  /**
+   * Returns true if it managed to populate/load the bean from the cache.
+   */
   public boolean cacheBeanLoad(EntityBean bean, EntityBeanIntercept ebi, Object id) {
     return cacheHelp.beanCacheLoad(bean, ebi, id);
   }
   
+  /**
+   * Returns true if it managed to populate/load the bean from the cache.
+   */
   public boolean cacheBeanLoad(EntityBeanIntercept ebi) {
     EntityBean bean = ebi.getOwner();
     Object id = getId(bean);
-
     return cacheBeanLoad(bean, ebi, id);
   }
 
-
-  public boolean cacheIsNaturalKey(String propName) {
-    return cacheHelp.isNaturalKey(propName);
-  }
-
-  public Object cacheNaturalKeyLookup(Object uniqueKeyValue) {
-    return cacheHelp.naturalKeyLookup(uniqueKeyValue);
+  /**
+   * Try to hit the cache using the natural key.
+   */
+  public T cacheNaturalKeyLookup(SpiQuery<T> query, SpiTransaction t) {
+    return cacheHelp.naturalKeyLookup(query, t);
   }
 
   /**

@@ -337,7 +337,7 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Return the reference options.
+   * Return the cache options.
    */
   public CacheOptions getCacheOptions() {
     return cacheOptions;

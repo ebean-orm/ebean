@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.core;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +22,7 @@ import com.avaje.ebeaninternal.api.TransactionEvent;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanManager;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 import com.avaje.ebeaninternal.server.persist.PersistExecute;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
@@ -60,7 +62,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 */
 	protected final Object parentBean;
 
-	protected final boolean isDirty;
+	protected final boolean dirty;
 
 	protected ConcurrencyMode concurrencyMode;
 
@@ -81,6 +83,17 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	private boolean deleteMissingChildren;
 	
 	private final Set<String> dirtyPropertyNames;
+
+  /**
+   * Flag used to detect when only many properties where updated via a cascade. Used to ensure
+   * appropriate cache updates occur in that case.
+   */
+	private boolean updatedManysOnly;
+	
+	/**
+	 * Many properties that were cascade saved (and hence might need cache update later).
+	 */
+  private List<BeanPropertyAssocMany<?>> updatedManys;
 
 	public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr,
 	        SpiTransaction t, PersistExecute persistExecute, PersistRequest.Type type) {
@@ -110,7 +123,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 		this.controller = beanDescriptor.getPersistController();
     this.concurrencyMode = beanDescriptor.getConcurrencyMode(intercept);
 		// this is ok to not use isNewOrDirty() as used for updates only
-		this.isDirty = intercept.isDirty();
+		this.dirty = intercept.isDirty();
 	}
 
 	/**
@@ -288,7 +301,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 * for EntityBeans that have not been modified.
 	 */
 	public boolean isDirty() {
-		return isDirty;
+		return dirty;
 	}
 
 	/**
@@ -573,6 +586,49 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 
   public boolean isReference() {
     return beanDescriptor.isReference(intercept);
+  }
+  
+  /**
+   * This many property has been cascade saved. Keep note of this and update the 'many property'
+   * cache on post commit.
+   */
+  public void addUpdatedManyProperty(BeanPropertyAssocMany<?> updatedAssocMany) {
+    //if (notifyCache) {
+      if (updatedManys == null) {
+        updatedManys = new ArrayList<BeanPropertyAssocMany<?>>(5);
+      }
+      updatedManys.add(updatedAssocMany);
+    //}
+  }
+
+  /**
+   * Return the list of cascade updated many properties (can be null).
+   */
+  public List<BeanPropertyAssocMany<?>> getUpdatedManyCollections() {
+    return updatedManys;
+  }
+
+  /**
+   * A reference bean was saved. Check if any of its many properties where
+   * cascade saved and hence we need to update related many property caches.
+   */
+  public void checkUpdatedManysOnly() {
+    if (!dirty && updatedManys != null) {
+      // set the flag and register for post commit processing if there
+      // is caching or registered listeners
+      if (idValue == null) {
+        this.idValue = beanDescriptor.getId(entityBean);
+      }
+      updatedManysOnly = true;
+      addEvent();
+    }
+  }
+
+  /**
+   * Return true if only many properties where updated.
+   */
+  public boolean isUpdatedManysOnly() {
+    return updatedManysOnly;
   }
 
 }

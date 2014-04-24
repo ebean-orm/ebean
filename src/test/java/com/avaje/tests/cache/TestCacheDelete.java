@@ -22,20 +22,24 @@ public class TestCacheDelete extends BaseTestCase {
         OCachedBeanChild child = new OCachedBeanChild();
         OCachedBeanChild child2 = new OCachedBeanChild();
 
-        OCachedBean cachedBean = new OCachedBean();
-        cachedBean.getChildren().add(child);
-        cachedBean.getChildren().add(child2);
-        Ebean.save(cachedBean);
+        OCachedBean parentBean = new OCachedBean();
+        parentBean.getChildren().add(child);
+        parentBean.getChildren().add(child2);
+        Ebean.save(parentBean);
+
+        // confirm there are 2 children loaded from the parent
+        Assert.assertEquals(2, Ebean.find(OCachedBean.class, parentBean.getId()).getChildren().size());
 
         // ensure cache has been populated
         Ebean.find(OCachedBeanChild.class, child.getId());
         child2 = Ebean.find(OCachedBeanChild.class, child2.getId());
-        cachedBean = Ebean.find(OCachedBean.class, cachedBean.getId());
+        parentBean = Ebean.find(OCachedBean.class, parentBean.getId());
 
         // act
         Ebean.delete(child2);
 
         // assert
-        Assert.assertTrue(Ebean.find(OCachedBean.class, cachedBean.getId()).getChildren().size() == 1);
+        OCachedBean beanFromCache = Ebean.find(OCachedBean.class, parentBean.getId());
+        Assert.assertEquals(1, beanFromCache.getChildren().size());
     }
 }

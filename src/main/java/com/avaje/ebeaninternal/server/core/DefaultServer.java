@@ -1180,23 +1180,7 @@ public final class DefaultServer implements SpiEbeanServer {
     }
 
     // Hit the L2 bean cache
-    Object cachedBean = beanDescriptor.cacheBeanGet(query.getId(), query.isReadOnly());
-    if (cachedBean != null) {
-      if (context == null) {
-        context = new DefaultPersistenceContext();
-
-      }
-      context.put(query.getId(), cachedBean);
-
-      DLoadContext loadContext = new DLoadContext(this, beanDescriptor, query.isReadOnly(), query);
-      loadContext.setPersistenceContext(context);
-
-      EntityBeanIntercept ebi = ((EntityBean) cachedBean)._ebean_getIntercept();
-      ebi.setPersistenceContext(context);
-      loadContext.register(null, ebi);
-    }
-
-    return (T) cachedBean;
+    return beanDescriptor.cacheBeanGet(query, context);
   }
     
   @SuppressWarnings("unchecked")
@@ -1245,17 +1229,9 @@ public final class DefaultServer implements SpiEbeanServer {
 
     BeanDescriptor<T> desc = beanDescriptorManager.getBeanDescriptor(q.getBeanType());
 
-    if (desc.calculateUseNaturalKeyCache(q.isUseBeanCache())) {
-      // check if it is a find by unique id
-      NaturalKeyBindParam keyBindParam = q.getNaturalKeyBindParam();
-      if (keyBindParam != null && desc.cacheIsNaturalKey(keyBindParam.getName())) {
-        Object id2 = desc.cacheNaturalKeyLookup(keyBindParam.getValue());
-        if (id2 != null) {
-          SpiQuery<T> copy = q.copy();
-          copy.convertWhereNaturalKeyToId(id2);
-          return findId(copy, t);
-        }
-      }
+    T bean = desc.cacheNaturalKeyLookup(q, (SpiTransaction)t);
+    if (bean != null) {
+      return bean;
     }
 
     // a query that is expected to return either 0 or 1 rows
@@ -1263,9 +1239,10 @@ public final class DefaultServer implements SpiEbeanServer {
 
     if (list.size() == 0) {
       return null;
+      
     } else if (list.size() > 1) {
-      String m = "Unique expecting 0 or 1 rows but got [" + list.size() + "]";
-      throw new PersistenceException(m);
+      throw new PersistenceException("Unique expecting 0 or 1 rows but got [" + list.size() + "]");
+      
     } else {
       return list.get(0);
     }

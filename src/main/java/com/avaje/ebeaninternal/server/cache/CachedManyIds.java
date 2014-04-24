@@ -16,6 +16,10 @@ public class CachedManyIds {
     this.idList = idList;
   }
 
+  public String toString() {
+    return idList.toString();
+  }
+  
   public List<Object> getIdList() {
     return idList;
   }

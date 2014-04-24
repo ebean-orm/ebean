@@ -101,24 +101,84 @@ public class TestCacheCollectionIds extends BaseTestCase {
     ResetBasicData.reset();
 
     OCachedBean cachedBean = new OCachedBean();
+    cachedBean.setName("hello");
     cachedBean.getCountries().add(Ebean.find(Country.class, "NZ"));
     cachedBean.getCountries().add(Ebean.find(Country.class, "AU"));
 
     Ebean.save(cachedBean);
 
+    // used to just load the cache - trigger loading 
+    OCachedBean dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    dummyToLoad.getCountries().size();
+    
+    ServerCache cachedBeanCountriesCache = cacheManager.getCollectionIdsCache(OCachedBean.class, "countries");
+    CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(cachedBean.getId());
+    
+    // confirm the starting data and cache entry
+    Assert.assertEquals(2, dummyToLoad.getCountries().size());
+    Assert.assertEquals(2, cachedManyIds.getIdList().size());
+
+    
     // act
     OCachedBean loadedBean = Ebean.find(OCachedBean.class, cachedBean.getId());
     loadedBean.getCountries().clear();
     loadedBean.getCountries().add(Ebean.find(Country.class, "AU"));
 
+    Ebean.save(loadedBean);
+
+    // Get the data to assert/check against
+    OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
+    cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
+
+    // assert that data and cache both show correct data
+    Assert.assertEquals(1, result.getCountries().size());
+    Assert.assertEquals(1, cachedManyIds.getIdList().size());
+    Assert.assertFalse(cachedManyIds.getIdList().contains("NZ"));
+    Assert.assertTrue(cachedManyIds.getIdList().contains("AU"));
+  }
+
+  
+  /**
+   * When updating a ManyToMany relations also the collection cache must be updated.
+   * Alternate to above test where in this case the bean is dirty - loadedBean.setName("goodbye");.
+   */
+  @Test
+  public void testUpdatingCollectionCacheForManyToManyRelationsWithUpdatedBean() {
+    // arrange
+    ResetBasicData.reset();
+
+    OCachedBean cachedBean = new OCachedBean();
+    cachedBean.setName("hello");
+    cachedBean.getCountries().add(Ebean.find(Country.class, "NZ"));
+    cachedBean.getCountries().add(Ebean.find(Country.class, "AU"));
+
     Ebean.save(cachedBean);
 
-    OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
+    // used to just load the cache - trigger loading 
+    OCachedBean dummyToLoad = Ebean.find(OCachedBean.class, cachedBean.getId());
+    dummyToLoad.getCountries().size();
+    
     ServerCache cachedBeanCountriesCache = cacheManager.getCollectionIdsCache(OCachedBean.class, "countries");
-    CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
+    CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(cachedBean.getId());
+    
+    // confirm the starting data and cache entry
+    Assert.assertEquals(2, dummyToLoad.getCountries().size());
+    Assert.assertEquals(2, cachedManyIds.getIdList().size());
 
+    
+    // act - this time update the name property so the bean is dirty
+    OCachedBean loadedBean = Ebean.find(OCachedBean.class, cachedBean.getId());
+    loadedBean.setName("goodbye");
+    loadedBean.getCountries().clear();
+    loadedBean.getCountries().add(Ebean.find(Country.class, "AU"));
 
-    // assert
+    Ebean.save(loadedBean);
+
+    // Get the data to assert/check against
+    OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
+    cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
+
+    // assert that data and cache both show correct data
     Assert.assertEquals(1, result.getCountries().size());
     Assert.assertEquals(1, cachedManyIds.getIdList().size());
     Assert.assertFalse(cachedManyIds.getIdList().contains("NZ"));
@@ -167,17 +227,19 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
     Ebean.update(update);
     
-    Assert.assertEquals("countries entry was invalidated", 0, cachedBeanCountriesCache.size());
+    Assert.assertEquals("countries entry still there (but updated)", 1, cachedBeanCountriesCache.size());
     
 
-    OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
-    CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
+    CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(update.getId());
 
-
-    // assert
-    Assert.assertEquals(1, result.getCountries().size());
+    // assert cache updated
     Assert.assertEquals(1, cachedManyIds.getIdList().size());
     Assert.assertFalse(cachedManyIds.getIdList().contains("NZ"));
     Assert.assertTrue(cachedManyIds.getIdList().contains("AU"));
+    
+    // assert countries good
+    OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
+    Assert.assertEquals(1, result.getCountries().size());
+
   }
 }

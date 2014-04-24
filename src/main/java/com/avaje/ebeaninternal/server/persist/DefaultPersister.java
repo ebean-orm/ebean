@@ -32,6 +32,7 @@ import com.avaje.ebeaninternal.server.core.PersistRequestOrmUpdate;
 import com.avaje.ebeaninternal.server.core.PersistRequestUpdateSql;
 import com.avaje.ebeaninternal.server.core.Persister;
 import com.avaje.ebeaninternal.server.core.PstmtBatch;
+import com.avaje.ebeaninternal.server.deploy.BeanCollectionUtil;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.BeanManager;
@@ -230,6 +231,8 @@ public final class DefaultPersister implements Persister {
 				saveAssocMany(false, request);
 				intercept.setReference(-1);
 			}
+			
+			request.checkUpdatedManysOnly();
 
 		} else {
 			if (request.isInsert()) {
@@ -299,6 +302,9 @@ public final class DefaultPersister implements Persister {
 				// save all the beans in assocMany's after
 				saveAssocMany(false, request);
 			}
+			
+			request.checkUpdatedManysOnly();
+			
 		} finally {
 			request.unRegisterBean();
 		}
@@ -568,6 +574,9 @@ public final class DefaultPersister implements Persister {
 		  // check that property is loaded and not empty uninitialised collection
       if (request.isLoadedProperty(manys[i]) && !manys[i].isEmptyBeanCollection(parentBean)) {
         saveMany(new SaveManyPropRequest(insertedParent, manys[i], parentBean, request));
+        if (!insertedParent) {
+          request.addUpdatedManyProperty(manys[i]);
+        }
       }
 		}
 	}
@@ -580,7 +589,7 @@ public final class DefaultPersister implements Persister {
 		private final boolean insertedParent;
 		private final BeanPropertyAssocMany<?> many;
 		private final EntityBean parentBean;
-		private final SpiTransaction t;
+		private final SpiTransaction transaction;
 		private final boolean cascade;
 		private final boolean statelessUpdate;
 		private final boolean deleteMissingChildren;
@@ -590,7 +599,7 @@ public final class DefaultPersister implements Persister {
 			this.many = many;
 			this.cascade = many.getCascadeInfo().isSave();
 			this.parentBean = parentBean;
-			this.t = request.getTransaction();
+			this.transaction = request.getTransaction();
 			this.statelessUpdate = request.isStatelessUpdate();
 			this.deleteMissingChildren = request.isDeleteMissingChildren();
 		}
@@ -599,14 +608,14 @@ public final class DefaultPersister implements Persister {
 			this.insertedParent = false;
 			this.many = many;
 			this.parentBean = parentBean;
-			this.t = t;
+			this.transaction = t;
 			this.cascade = true;
 			this.statelessUpdate = false;
 			this.deleteMissingChildren = false;
 		}
 		
 		public boolean isSaveIntersection() {
-		  return t.isSaveAssocManyIntersection(many.getIntersectionTableJoin().getTable(), many.getBeanDescriptor().getName());
+		  return transaction.isSaveAssocManyIntersection(many.getIntersectionTableJoin().getTable(), many.getBeanDescriptor().getName());
 		}
 		
 		private Object getValue() {
@@ -638,7 +647,7 @@ public final class DefaultPersister implements Persister {
 		}
 
 		private SpiTransaction getTransaction() {
-			return t;
+			return transaction;
 		}
 
 		private boolean isCascade() {
@@ -714,7 +723,7 @@ public final class DefaultPersister implements Persister {
 		// check that the list is not null and if it is a BeanCollection
 		// check that is has been populated (don't trigger lazy loading)
 		// For a Map this is a collection of Map.Entry objects and not beans
-		Collection<?> collection = getActualEntries(details);
+		Collection<?> collection = BeanCollectionUtil.getActualEntries(details);
 
 		if (collection == null) {
 			// nothing to do here
@@ -1182,33 +1191,7 @@ public final class DefaultPersister implements Persister {
 		}
 	}
 
-	/**
-	 * Return the details of the collection or map taking care to avoid
-	 * unnecessary fetching of the data.
-	 */
-	private Collection<?> getActualEntries(Object o) {
-		if (o == null) {
-			return null;
-		}
-		if (o instanceof BeanCollection<?>) {
-			BeanCollection<?> bc = (BeanCollection<?>) o;
-			if (!bc.isPopulated()) {
-				return null;
-			}
-			// For maps this is a collection of Map.Entry, otherwise it
-			// returns a collection of beans
-			return bc.getActualEntries();
-		}
 
-		if (o instanceof Map<?, ?>) {
-			// yes, we want the entrySet (to set the keys)
-			return ((Map<?, ?>) o).entrySet();
-
-		} else if (o instanceof Collection<?>) {
-			return ((Collection<?>) o);
-		}
-		throw new PersistenceException("expecting a Map or Collection but got [" + o.getClass().getName() + "]");
-	}
 
 	/**
 	 * Create the Persist Request Object that wraps all the objects used to
