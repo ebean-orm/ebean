@@ -27,8 +27,6 @@ public class FactoryAssocOnes {
 				
 			} else {
 				switch (mode) {
-				case WHERE: 
-				    break;
 				case INSERT:
 					if (!ones[i].isInsertable()) {
 						continue;

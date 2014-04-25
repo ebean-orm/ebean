@@ -19,21 +19,44 @@ public class TestUpdatePartial extends BaseTestCase {
 
     Ebean.save(c);
 
-    Customer c2 = Ebean.find(Customer.class, c.getId());
-    Assert.assertNull("not partial", Ebean.getBeanState(c2).getLoadedProps());
-
+    Customer c2 = Ebean.find(Customer.class)
+        .select("status, smallnote")
+        .setId(c.getId())
+        .findUnique();
+    
     c2.setStatus(Customer.Status.INACTIVE);
     c2.setSmallnote("2nd note");
 
     Ebean.save(c2);
 
-    Customer c3 = Ebean.find(Customer.class, c.getId());
-    Assert.assertNull("not partial", Ebean.getBeanState(c3).getLoadedProps());
+    Customer c3 = Ebean.find(Customer.class)
+        .select("status")
+        .setId(c.getId())
+        .findUnique();
+   
+    c3.setStatus(Customer.Status.NEW);
+    c3.setSmallnote("3rd note");
 
-    c2.setStatus(Customer.Status.NEW);
-    c2.setSmallnote("3rd note");
+    Ebean.save(c3);
 
-    Ebean.save(c2);
+  }
 
+  /**
+   * If we have no changes detected, don't execute an Update and don't update the Version column.
+   */
+  @Test
+  public void testWithoutChangesAndVersionColumn() {
+    // arrange
+    Customer customer = new Customer();
+    customer.setName("something");
+
+    Ebean.save(customer);
+
+    // act
+    Customer customerWithoutChanges = Ebean.find(Customer.class, customer.getId());
+    Ebean.save(customerWithoutChanges);
+
+    // assert
+    Assert.assertEquals(customer.getUpdtime().getTime(), customerWithoutChanges.getUpdtime().getTime());
   }
 }

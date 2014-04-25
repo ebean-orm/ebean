@@ -201,12 +201,12 @@ public class CreateTableVisitor extends AbstractBeanVisitor {
 		}
 
 		
-		BeanProperty[] ids = descriptor.propertiesId();
+		BeanProperty idProp = descriptor.getIdProperty();
 
-		if (ids.length == 0){
+		if (idProp == null){
 			// No comma + new line
 			ctx.removeLast().removeLast();		
-		} else if (ids.length > 1 || ddl.isInlinePrimaryKeyConstraint()) {
+		} else if (ddl.isInlinePrimaryKeyConstraint()) {
 			// The Primary Key constraint was inlined with the column
 			// ... No comma + new line
 			ctx.removeLast().removeLast();					
@@ -216,7 +216,7 @@ public class CreateTableVisitor extends AbstractBeanVisitor {
 			String pkName = ddl.getPrimaryKeyName(table);
 			ctx.write("  constraint ").write(pkName).write(" primary key (");
 	
-			VisitorUtil.visit(ids, new AbstractPropertyVisitor() {
+			VisitorUtil.visit(idProp, new AbstractPropertyVisitor() {
 	
 				@Override
 				public void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded) {

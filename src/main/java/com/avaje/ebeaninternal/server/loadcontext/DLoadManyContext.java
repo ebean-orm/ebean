@@ -5,11 +5,12 @@ import java.util.List;
 
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionLoader;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebeaninternal.api.LoadManyBuffer;
 import com.avaje.ebeaninternal.api.LoadManyContext;
 import com.avaje.ebeaninternal.api.LoadManyRequest;
-import com.avaje.ebeaninternal.api.LoadManyBuffer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -32,6 +33,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 		this.property = property;
 		this.bufferList = new ArrayList<DLoadManyContext.LoadBuffer>();
     this.currentBuffer = createBuffer(firstBatchSize);
+
 	}
 	
   private LoadBuffer createBuffer(int size) {
@@ -173,10 +175,10 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
       synchronized (this) {
         boolean useCache = context.hitCache && !onlyIds;
         if (useCache) {
-          Object ownerBean = bc.getOwnerBean();
+          EntityBean ownerBean = bc.getOwnerBean();
           BeanDescriptor<? extends Object> parentDesc = context.desc.getBeanDescriptor(ownerBean.getClass());
           Object parentId = parentDesc.getId(ownerBean);
-          if (parentDesc.cacheLoadMany(context.property, bc, parentId, context.parent.isReadOnly())) {
+          if (parentDesc.cacheManyPropLoad(context.property, bc, parentId, context.parent.isReadOnly())) {
             // we loaded the bean from cache
             list.remove(bc);
             return;

@@ -13,7 +13,7 @@ import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 
 @Entity
-@CacheStrategy(useBeanCache=true,naturalKey="email")
+@CacheStrategy(naturalKey="email")
 public class Contact {
 
     private static final long serialVersionUID = 1L;

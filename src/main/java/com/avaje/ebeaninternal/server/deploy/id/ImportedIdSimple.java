@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.BeanFkeyProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -15,7 +16,6 @@ import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 import com.avaje.ebeaninternal.server.deploy.IntersectionRow;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableRequest;
-import com.avaje.ebeaninternal.util.ValueUtil;
 
 /**
  * Single scalar imported id.
@@ -90,11 +90,11 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 		return localDbColumn;
 	}
 	
-	private Object getIdValue(Object bean) {
-        return foreignProperty.getValueWithInheritance(bean);
-	}
+  private Object getIdValue(EntityBean bean) {
+    return foreignProperty.getValue(bean);
+  }
 
-	public void buildImport(IntersectionRow row, Object other){
+	public void buildImport(IntersectionRow row, EntityBean other){
 
 	    Object value = getIdValue(other);
 		if (value == null){
@@ -114,7 +114,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 		request.appendColumn(localDbColumn);
 	}
 
-	public void dmlWhere(GenerateDmlRequest request, Object bean){
+	public void dmlWhere(GenerateDmlRequest request, EntityBean bean){
 
 	    if (owner.isDbUpdatable()){
     		Object value = null;
@@ -129,25 +129,13 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 	    }
 	}
 
-	public boolean hasChanged(Object bean, Object oldValues) {
-		
-		Object id = getIdValue(bean);
-
-		if (oldValues != null){
-			Object oldId = getIdValue(oldValues);
-			return !ValueUtil.areEqual(id, oldId);
-		}
-
-		return true;
-	}
-
-	public Object bind(BindableRequest request, Object bean, boolean bindNull) throws SQLException {
+	public Object bind(BindableRequest request, EntityBean bean) throws SQLException {
 
 		Object value = null;
 		if (bean != null){
 			value = getIdValue(bean);
 		}
-		request.bind(value, foreignProperty, localDbColumn, bindNull);
+		request.bind(value, foreignProperty, localDbColumn);
 		return value;
 	}
 

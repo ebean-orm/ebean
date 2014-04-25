@@ -17,20 +17,17 @@ public class FactoryId {
    */
   public BindableId createId(BeanDescriptor<?> desc) {
 
-    BeanProperty[] uids = desc.propertiesId();
-    if (uids.length == 0) {
+    BeanProperty id = desc.getIdProperty();
+    if (id == null) {
       return new BindableIdEmpty();
 
-    } else if (uids.length == 1) {
-      if (!uids[0].isEmbedded()) {
-        return new BindableIdScalar(uids[0]);
+    }     
+    if (!id.isEmbedded()) {
+      return new BindableIdScalar(id);
 
-      } else {
-        BeanPropertyAssocOne<?> embId = (BeanPropertyAssocOne<?>) uids[0];
-        return new BindableIdEmbedded(embId, desc);
-      }
     } else {
-      return new BindableIdMap(uids, desc);
+      BeanPropertyAssocOne<?> embId = (BeanPropertyAssocOne<?>) id;
+      return new BindableIdEmbedded(embId, desc);
     }
   }
 }

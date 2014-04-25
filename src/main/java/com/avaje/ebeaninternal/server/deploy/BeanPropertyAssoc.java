@@ -4,18 +4,18 @@ import java.util.ArrayList;
 
 import javax.persistence.PersistenceException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedIdEmbedded;
-import com.avaje.ebeaninternal.server.deploy.id.ImportedIdMultiple;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedIdSimple;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base for properties mapped to an associated bean, list, set or map.
@@ -216,14 +216,12 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	/**
 	 * Return true if the unique id properties are all not null for this bean.
 	 */
-	public boolean hasId(Object bean) {
+	public boolean hasId(EntityBean bean) {
 
 		BeanDescriptor<?> targetDesc = getTargetDescriptor();
-
-		BeanProperty[] uids = targetDesc.propertiesId();
-		for (int i = 0; i < uids.length; i++) {
-
-			Object value = uids[i].getValue(bean);
+		BeanProperty idProp = targetDesc.getIdProperty();
+		if (idProp != null) {
+			Object value = idProp.getValue(bean);
 			if (value == null) {
 				return false;
 			}
@@ -311,39 +309,36 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	 */
 	protected ImportedId createImportedId(BeanPropertyAssoc<?> owner, BeanDescriptor<?> target, TableJoin join) {
 
-		BeanProperty[] props = target.propertiesId();
+		BeanProperty idProp = target.getIdProperty();
 		BeanProperty[] others = target.propertiesBaseScalar();
 
 		if (descriptor.isSqlSelectBased()){
 			String dbColumn = owner.getDbColumn();
-			return new ImportedIdSimple(owner, dbColumn, props[0], 0);
+			return new ImportedIdSimple(owner, dbColumn, idProp, 0);
 		}
 
 		TableJoinColumn[] cols = join.columns();
 
-		if (props.length == 1) {
-			if (!props[0].isEmbedded()) {
-				// simple single scalar id
-				if (cols.length != 1){
-					String msg = "No Imported Id column for ["+props[0]+"] in table ["+join.getTable()+"]";
-					logger.error(msg);
-					return null;
-				} else {
-					return createImportedScalar(owner, cols[0], props, others);
-				}
+		if (idProp == null) {
+		  return null;
+		}
+		if (!idProp.isEmbedded()) {
+			// simple single scalar id
+			if (cols.length != 1){
+				String msg = "No Imported Id column for ["+idProp+"] in table ["+join.getTable()+"]";
+				logger.error(msg);
+				return null;
 			} else {
-				// embedded id
-				BeanPropertyAssocOne<?> embProp = (BeanPropertyAssocOne<?>)props[0];
-				BeanProperty[] embBaseProps = embProp.getTargetDescriptor().propertiesBaseScalar();
-				ImportedIdSimple[] scalars = createImportedList(owner, cols, embBaseProps, others);
-
-				return new ImportedIdEmbedded(owner, embProp, scalars);
+			  BeanProperty[] idProps = {idProp};
+				return createImportedScalar(owner, cols[0], idProps, others);
 			}
-
 		} else {
-			// Concatenated key that is not embedded
-			ImportedIdSimple[] scalars = createImportedList(owner, cols, props, others);
-			return new ImportedIdMultiple(owner, scalars);
+			// embedded id
+			BeanPropertyAssocOne<?> embProp = (BeanPropertyAssocOne<?>)idProp;
+			BeanProperty[] embBaseProps = embProp.getTargetDescriptor().propertiesBaseScalar();
+			ImportedIdSimple[] scalars = createImportedList(owner, cols, embBaseProps, others);
+
+			return new ImportedIdEmbedded(owner, embProp, scalars);
 		}
 	}
 

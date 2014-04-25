@@ -264,7 +264,7 @@ public class BeanPersistIds implements Serializable {
                 Serializable id = updateIds.get(i);
 
                 // remove from cache
-                beanDescriptor.cacheRemove(id);
+                beanDescriptor.cacheBeanRemove(id);
                 if (listener != null) {
                     // notify listener
                     listener.remoteInsert(id);
@@ -276,7 +276,7 @@ public class BeanPersistIds implements Serializable {
                 Serializable id = deleteIds.get(i);
 
                 // remove from cache
-                beanDescriptor.cacheRemove(id);
+                beanDescriptor.cacheBeanRemove(id);
                 if (listener != null) {
                     // notify listener
                     listener.remoteInsert(id);

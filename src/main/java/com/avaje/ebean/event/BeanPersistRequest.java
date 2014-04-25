@@ -1,9 +1,11 @@
 package com.avaje.ebean.event;
 
+import java.util.Map;
 import java.util.Set;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Transaction;
+import com.avaje.ebean.ValuePair;
 
 /**
  * Holds the information available for a bean persist (insert, update or
@@ -41,12 +43,8 @@ public interface BeanPersistRequest<T> {
   public T getBean();
 
   /**
-   * Returns a bean containing the original values prior to the bean being
-   * modified.
-   * <p>
-   * This is for updates only.
-   * </p>
+   * Returns a map of the properties that have changed and their new and old values.
    */
-  public T getOldValues();
+  public Map<String,ValuePair> getUpdatedValues();
 
 }

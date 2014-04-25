@@ -21,8 +21,9 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     EbeanServer server = Ebean.getServer(null);
 
-    Query<Customer> query = server.find(Customer.class).setAutofetch(false)
-        .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
+    Query<Customer> query = server.find(Customer.class)
+        .setAutofetch(false)
+        //.fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
         .setMaxRows(2);
 
     int count = 0;

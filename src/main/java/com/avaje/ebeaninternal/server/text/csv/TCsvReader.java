@@ -29,9 +29,6 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
  */
 public class TCsvReader<T> implements CsvReader<T> {
 
-	// private static final Logger logger =
-	// Logger.getLogger(TCsvReader.class.getName());
-
 	private static final TimeStringParser TIME_PARSER = new TimeStringParser();
 
 	private final EbeanServer server;
@@ -113,14 +110,6 @@ public class TCsvReader<T> implements CsvReader<T> {
 		addProperty(propertyName, null);
 	}
 
-	public void addReference(String propertyName) {
-		addProperty(propertyName, null, true);
-	}
-
-	public void addProperty(String propertyName, StringParser parser) {
-		addProperty(propertyName, parser, false);
-	}
-
 	public void addDateTime(String propertyName, String dateTimeFormat) {
 		addDateTime(propertyName, dateTimeFormat, Locale.getDefault());
 	}
@@ -143,7 +132,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 		SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat, locale);
 		DateTimeParser parser = new DateTimeParser(sdf, dateTimeFormat, elProp);
 
-		CsvColumn column = new CsvColumn(elProp, parser, false);
+		CsvColumn column = new CsvColumn(elProp, parser);
 		columnList.add(column);
 	}
 
@@ -161,13 +150,13 @@ public class TCsvReader<T> implements CsvReader<T> {
 		}
 	}
 
-	public void addProperty(String propertyName, StringParser parser, boolean reference) {
+	public void addProperty(String propertyName, StringParser parser) {
 
 		ElPropertyValue elProp = descriptor.getElGetValue(propertyName);
 		if (parser == null) {
 			parser = elProp.getStringParser();
 		}
-		CsvColumn column = new CsvColumn(elProp, parser, reference);
+		CsvColumn column = new CsvColumn(elProp, parser);
 		columnList.add(column);
 	}
 
@@ -250,7 +239,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 			} else if (elProp.isAssocProperty()) {
 				BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) elProp.getBeanProperty();
 				String idProp = assocOne.getBeanDescriptor().getIdBinder().getIdProperty();
-				addReference(line[i] + "." + idProp);
+				addProperty(line[i] + "." + idProp);
 			} else {
 				addProperty(line[i]);
 			}
@@ -284,7 +273,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 		}
 	}
 
-	protected void convertAndSetColumn(int columnPos, String strValue, Object bean) {
+	protected void convertAndSetColumn(int columnPos, String strValue, EntityBean bean) {
 
 		strValue = strValue.trim();
 
@@ -304,7 +293,6 @@ public class TCsvReader<T> implements CsvReader<T> {
 		private final ElPropertyValue elProp;
 		private final StringParser parser;
 		private final boolean ignore;
-		private final boolean reference;
 
 		/**
 		 * Constructor for the IGNORE column.
@@ -312,28 +300,26 @@ public class TCsvReader<T> implements CsvReader<T> {
 		private CsvColumn() {
 			this.elProp = null;
 			this.parser = null;
-			this.reference = false;
 			this.ignore = true;
 		}
 
 		/**
 		 * Construct with a property and parser.
 		 */
-		public CsvColumn(ElPropertyValue elProp, StringParser parser, boolean reference) {
+		public CsvColumn(ElPropertyValue elProp, StringParser parser) {
 			this.elProp = elProp;
 			this.parser = parser;
-			this.reference = reference;
 			this.ignore = false;
 		}
 
 		/**
 		 * Convert the string to the appropriate value and set it to the bean.
 		 */
-		public void convertAndSet(String strValue, Object bean) {
+		public void convertAndSet(String strValue, EntityBean bean) {
 
 			if (!ignore) {
 				Object value = parser.parse(strValue);
-				elProp.elSetValue(bean, value, true, reference);
+				elProp.elSetValue(bean, value, true);
 			}
 		}
 	}

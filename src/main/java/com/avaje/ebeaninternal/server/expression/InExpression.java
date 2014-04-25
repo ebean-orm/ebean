@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.expression;
 
 import java.util.Collection;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -36,7 +37,7 @@ class InExpression extends AbstractExpression {
 
       } else {
         // extract the id values from the bean
-        Object[] ids = prop.getAssocOneIdValues(values[i]);
+        Object[] ids = prop.getAssocOneIdValues((EntityBean)values[i]);
         if (ids != null) {
           for (int j = 0; j < ids.length; j++) {
             request.addBindValue(ids[j]);

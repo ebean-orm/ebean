@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.avaje.ebean.bean.EntityBean;
+
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -41,6 +43,11 @@ public interface IdBinder {
    * </p>
    */
   public String getIdProperty();
+
+  /**
+   * Return the Id BeanProperty.
+   */
+  public BeanProperty getBeanProperty();
 
   /**
    * Find a BeanProperty that is mapped to the database column.
@@ -81,7 +88,7 @@ public interface IdBinder {
   /**
    * Return the id values for a given bean.
    */
-  public Object[] getIdValues(Object bean);
+  public Object[] getIdValues(EntityBean bean);
 
   /**
    * Build a string of the logical expressions.
@@ -129,7 +136,7 @@ public interface IdBinder {
    * Read the id value from the result set and set it to the bean also returning
    * it.
    */
-  public Object readSet(DbReadContext ctx, Object bean) throws SQLException;
+  public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException;
 
   /**
    * Ignore the appropriate number of scalar properties for this id.
@@ -153,11 +160,6 @@ public interface IdBinder {
   public String getBindIdSql(String baseTableAlias);
 
   /**
-   * Return the id properties in flat form.
-   */
-  public BeanProperty[] getProperties();
-
-  /**
    * Cast or convert the Id value if necessary and optionally set it.
    * <p>
    * The Id value is not assumed to be the correct type so it is converted to
@@ -168,6 +170,6 @@ public interface IdBinder {
    * If the bean is not null, then the value is set to the bean.
    * </p>
    */
-  public Object convertSetId(Object idValue, Object bean);
+  public Object convertSetId(Object idValue, EntityBean bean);
 
 }

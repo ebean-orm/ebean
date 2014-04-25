@@ -8,11 +8,14 @@ import java.util.Map;
 import java.util.Set;
 
 import com.avaje.ebean.bean.BeanCollectionLoader;
+import com.avaje.ebean.bean.EntityBean;
 
 /**
  * Map capable of lazy loading.
  */
 public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Map<K, E> {
+
+  private static final long serialVersionUID = 1L;
 
   /**
    * The underlying map implementation.
@@ -33,8 +36,12 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     this(new LinkedHashMap<K, E>());
   }
 
-  public BeanMap(BeanCollectionLoader ebeanServer, Object ownerBean, String propertyName) {
+  public BeanMap(BeanCollectionLoader ebeanServer, EntityBean ownerBean, String propertyName) {
     super(ebeanServer, ownerBean, propertyName);
+  }
+  
+  public boolean isEmptyAndUntouched() {
+    return !touched && (map == null || map.isEmpty());
   }
 
   @SuppressWarnings("unchecked")
@@ -83,16 +90,24 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
           map = new LinkedHashMap<K, E>();
         }
       }
-      touched();
+      touched(true);
     }
   }
 
+  private void initAsUntouched() {
+    init(false);
+  }
+  
   private void init() {
+    init(true);
+  }
+  
+  private void init(boolean setTouched) {
     synchronized (this) {
       if (map == null) {
         lazyLoadCollection(false);
       }
-      touched();
+      touched(setTouched);
     }
   }
 
@@ -209,7 +224,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   public boolean isEmpty() {
-    init();
+    initAsUntouched();
     return map.isEmpty();
   }
 

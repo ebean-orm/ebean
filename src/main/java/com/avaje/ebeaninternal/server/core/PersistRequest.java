@@ -12,7 +12,7 @@ import com.avaje.ebeaninternal.server.persist.PersistExecute;
 public abstract class PersistRequest extends BeanRequest implements BatchPostExecute {
 
 	public enum Type {
-		INSERT, UPDATE, DELETE, ORMUPDATE, UPDATESQL, CALLABLESQL
+	  DETERMINE, INSERT, UPDATE, DELETE, ORMUPDATE, UPDATESQL, CALLABLESQL
 	};
 
 	boolean persistCascade;
@@ -31,7 +31,7 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
 		super(server, t);
 		this.persistExecute = persistExecute;
 	}
-
+	
 	/**
 	 * Execute a the request or queue/batch it for later execution.
 	 */
@@ -88,14 +88,6 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
 	 */
 	public Type getType() {
 		return type;
-	}
-
-	/**
-	 * Set the type of this request. One of INSERT, UPDATE, DELETE, UPDATESQL or
-	 * CALLABLESQL.
-	 */
-	public void setType(Type type) {
-		this.type = type;
 	}
 
 	/**

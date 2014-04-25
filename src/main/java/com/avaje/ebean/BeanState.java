@@ -1,6 +1,7 @@
 package com.avaje.ebean;
 
 import java.beans.PropertyChangeListener;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -47,6 +48,11 @@ public interface BeanState {
   public Set<String> getChangedProps();
 
   /**
+   * Return a map of the updated properties and their new and old values.
+   */
+  public Map<String,ValuePair> getDirtyValues();
+  
+  /**
    * Return true if the bean is readOnly.
    * <p>
    * If a setter is called on a readOnly bean it will throw an exception.
@@ -70,16 +76,6 @@ public interface BeanState {
   public void removePropertyChangeListener(PropertyChangeListener listener);
 
   /**
-   * Advanced - Used to programmatically build a reference object.
-   * <p>
-   * You can create a new EntityBean (
-   * {@link EbeanServer#createEntityBean(Class)}, set its Id property and then
-   * call this setReference() method.
-   * </p>
-   */
-  public void setReference();
-
-  /**
    * Advanced - Used to programmatically build a partially or fully loaded
    * entity bean. First create an entity bean via
    * {@link EbeanServer#createEntityBean(Class)}, then populate its properties
@@ -90,5 +86,5 @@ public interface BeanState {
    *          the properties that where loaded or null for a fully loaded entity
    *          bean.
    */
-  public void setLoaded(Set<String> loadedProperties);
+  public void setLoaded();
 }

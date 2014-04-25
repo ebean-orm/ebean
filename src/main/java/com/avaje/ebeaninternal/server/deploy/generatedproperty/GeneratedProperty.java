@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
 /**
@@ -11,12 +12,12 @@ public interface GeneratedProperty {
     /**
      * Get the generated insert value for a specific property of a bean.
      */
-    public Object getInsertValue(BeanProperty prop, Object bean);
+    public Object getInsertValue(BeanProperty prop, EntityBean bean);
 
     /**
      * Get the generated update value for a specific property of a bean.
      */
-    public Object getUpdateValue(BeanProperty prop, Object bean);
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean);
 
     /**
      * Return true if this should always be includes in an update statement.
@@ -25,6 +26,12 @@ public interface GeneratedProperty {
      * </p>
      */
     public boolean includeInUpdate();
+    
+    /**
+     * Return true if the property should be included in an update even if
+     * it is not loaded (ie. Last Updated Timestamp).
+     */
+    public boolean includeInAllUpdates();
 
     /**
      * Return true if this should be included in insert statements.

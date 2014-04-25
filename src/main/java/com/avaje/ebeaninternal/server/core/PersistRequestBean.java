@@ -1,11 +1,14 @@
 package com.avaje.ebeaninternal.server.core;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.OptimisticLockException;
 
+import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
@@ -19,6 +22,7 @@ import com.avaje.ebeaninternal.api.TransactionEvent;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanManager;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 import com.avaje.ebeaninternal.server.persist.PersistExecute;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
@@ -41,6 +45,13 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 */
 	protected final BeanPersistController controller;
 
+	 /**
+   * The bean being persisted.
+   */
+  protected final T bean;
+  
+  protected final EntityBean entityBean;
+  
 	/**
 	 * The associated intercept.
 	 */
@@ -51,24 +62,9 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 */
 	protected final Object parentBean;
 
-	protected final boolean isDirty;
+	protected final boolean dirty;
 
-	/**
-	 * The bean being persisted.
-	 */
-	protected final T bean;
-
-	/**
-	 * Old values used for concurrency checking.
-	 */
-	protected T oldValues;
-
-	/**
-	 * The concurrency mode used for update or delete.
-	 */
 	protected ConcurrencyMode concurrencyMode;
-
-	protected final Set<String> loadedProps;
 
 	/**
 	 * The unique id used for logging summary.
@@ -81,95 +77,80 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	protected Integer beanHash;
 	protected Integer beanIdentityHash;
 
-	protected final Set<String> changedProps;
-
 	protected boolean notifyCache;
 
 	private boolean statelessUpdate;
 	private boolean deleteMissingChildren;
-	private boolean updateNullProperties;
+	
+	private final Set<String> dirtyPropertyNames;
 
+  /**
+   * Flag used to detect when only many properties where updated via a cascade. Used to ensure
+   * appropriate cache updates occur in that case.
+   */
+	private boolean updatedManysOnly;
+	
 	/**
-	 * Used for forced update of a bean.
+	 * Many properties that were cascade saved (and hence might need cache update later).
 	 */
-	public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
-	        PersistExecute persistExecute, Set<String> updateProps, ConcurrencyMode concurrencyMode) {
+  private List<BeanPropertyAssocMany<?>> updatedManys;
 
-		super(server, t, persistExecute);
-		this.beanManager = mgr;
-		this.beanDescriptor = mgr.getBeanDescriptor();
-		this.beanPersistListener = beanDescriptor.getPersistListener();
-		this.bean = bean;
-		this.parentBean = parentBean;
-		
-		this.controller = beanDescriptor.getPersistController();
-		this.concurrencyMode = beanDescriptor.getConcurrencyMode();
-
-		this.concurrencyMode = concurrencyMode;
-		this.loadedProps = updateProps;
-		this.changedProps = updateProps;
-		this.isDirty = true;
-		this.oldValues = bean;
-		if (bean instanceof EntityBean) {
-			this.intercept = ((EntityBean) bean)._ebean_getIntercept();
-		} else {
-			this.intercept = null;
-		}
-	}
-
-	@SuppressWarnings("unchecked")
 	public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr,
-	        SpiTransaction t, PersistExecute persistExecute) {
+	        SpiTransaction t, PersistExecute persistExecute, PersistRequest.Type type) {
 
 		super(server, t, persistExecute);
+    this.entityBean = (EntityBean)bean;
+    this.intercept = entityBean._ebean_getIntercept();
 		this.beanManager = mgr;
 		this.beanDescriptor = mgr.getBeanDescriptor();
 		this.beanPersistListener = beanDescriptor.getPersistListener();
+
+    if (PersistRequest.Type.DETERMINE != type) {
+      this.type = type;
+    } else {
+      this.type = beanDescriptor.isInsertMode(intercept) ? Type.INSERT : Type.UPDATE;
+    }
+		
+    if (this.type == Type.UPDATE && intercept.isNew() ) {
+      intercept.setNewBeanForUpdate();
+    }
+
+		this.dirtyPropertyNames = (beanPersistListener == null) ? null : intercept.getDirtyPropertyNames();
+		
 		this.bean = bean;
 		this.parentBean = parentBean;
 
 		this.controller = beanDescriptor.getPersistController();
-		this.concurrencyMode = beanDescriptor.getConcurrencyMode();
-		this.intercept = ((EntityBean) bean)._ebean_getIntercept();
-		if (intercept.isReference()) {
-			// allowed to delete reference objects
-			// with no concurrency checking
-			this.concurrencyMode = ConcurrencyMode.NONE;
-		}
+    this.concurrencyMode = beanDescriptor.getConcurrencyMode(intercept);
 		// this is ok to not use isNewOrDirty() as used for updates only
-		this.isDirty = intercept.isDirty();
-		if (!isDirty) {
-			this.changedProps = intercept.getChangedProps();
-		} else {
-			// merge changed properties on the bean with changed embedded beans
-			Set<String> beanChangedProps = intercept.getChangedProps();
-			Set<String> dirtyEmbedded = beanDescriptor.getDirtyEmbeddedProperties(bean);
-			this.changedProps = mergeChangedProperties(beanChangedProps, dirtyEmbedded);
-		}
-		this.loadedProps = intercept.getLoadedProps();
-		this.oldValues = (T) intercept.getOldValues();
+		this.dirty = intercept.isDirty();
 	}
 
 	/**
-	 * Merge the changed properties for the bean and embedded beans.
+	 * Return true if this is an insert request.
 	 */
-	private Set<String> mergeChangedProperties(Set<String> beanChangedProps, Set<String> embChanged) {
-		if (embChanged == null) {
-			return beanChangedProps;
-		} else if (beanChangedProps == null) {
-			return embChanged;
-		} else {
-			beanChangedProps.addAll(embChanged);
-			return beanChangedProps;
-		}
-	}
+  public boolean isInsert() {
+    return Type.INSERT == type;
+  }
+  
+	@Override
+  public Set<String> getLoadedProperties() {
+    return intercept.getLoadedPropertyNames();
+  }
+
+  @Override
+  public Set<String> getUpdatedProperties() {
+    return intercept.getDirtyPropertyNames();
+  }
+
+  @Override
+  public Map<String, ValuePair> getUpdatedValues() {
+    return intercept.getDirtyValues();
+  }
 
 	public boolean isNotify(TransactionEvent txnEvent) {
+	  this.notifyCache = beanDescriptor.isCacheNotify();
 		return notifyCache || isNotifyPersistListener();
-	}
-
-	public boolean isNotifyCache() {
-		return notifyCache;
 	}
 
 	public boolean isNotifyPersistListener() {
@@ -183,10 +164,10 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
     if (notifyCache) {
       switch (type) {
       case INSERT:
-        beanDescriptor.cacheInsert(idValue, this);
+        beanDescriptor.cacheHandleInsert(idValue, this);
         break;
       case UPDATE:
-        beanDescriptor.cacheUpdate(idValue, this);
+        beanDescriptor.cacheHandleUpdate(idValue, this);
         break;
       case DELETE:
         // Bean deleted from cache early via postDelete()
@@ -199,7 +180,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 
 	public void addToPersistMap(BeanPersistIdMap beanPersistMap) {
 
-		beanPersistMap.add(beanDescriptor, type, idValue);
+	  beanPersistMap.add(beanDescriptor, type, idValue);
 	}
 
 	public boolean notifyLocalPersistListener() {
@@ -212,7 +193,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 				return beanPersistListener.inserted(bean);
 
 			case UPDATE:
-				return beanPersistListener.updated(bean, getUpdatedProperties());
+				return beanPersistListener.updated(bean, dirtyPropertyNames);
 
 			case DELETE:
 				return beanPersistListener.deleted(bean);
@@ -229,7 +210,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 
 	/**
 	 * Return true if this bean has been already been persisted 
-	 * (inserted/updated or deleted) in this transaction.
+	 * (inserted or updated) in this transaction.
 	 */
 	public boolean isRegisteredBean() {
 		return transaction.isRegisteredBean(bean);
@@ -247,7 +228,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 */
 	private Integer getBeanHash() {
 		if (beanHash == null) {
-			Object id = beanDescriptor.getId(bean);
+			Object id = beanDescriptor.getId(entityBean);
 			int hc = 31 * bean.getClass().getName().hashCode();
 			if (id != null) {
 				hc += id.hashCode();
@@ -274,21 +255,6 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 			Integer hash = getBeanHash();
 			return transaction.isRegisteredDeleteBean(hash);
 		}
-	}
-
-	/**
-	 * Set the type of this request. One of INSERT, UPDATE, DELETE, UPDATESQL or
-	 * CALLABLESQL.
-	 */
-	@Override
-	public void setType(Type type) {
-		this.type = type;
-		notifyCache = beanDescriptor.isCacheNotify();
-		if (type == Type.DELETE || type == Type.UPDATE) {
-			if (oldValues == null) {
-				oldValues = bean;
-			}
-		} 
 	}
 
 	public BeanManager<T> getBeanManager() {
@@ -318,14 +284,6 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	}
 
 	/**
-	 * Return true if null properties should be updated (treated as loaded) for
-	 * stateless updates.
-	 */
-	public boolean isUpdateNullProperties() {
-		return updateNullProperties;
-	}
-
-	/**
 	 * Set to true if this is a stateless update.
 	 * <p>
 	 * By Stateless it means that the bean was not previously fetched (and so
@@ -333,10 +291,9 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 * that was probably created from JSON or XML.
 	 * </p>
 	 */
-	public void setStatelessUpdate(boolean statelessUpdate, boolean deleteMissingChildren, boolean updateNullProperties) {
+	public void setStatelessUpdate(boolean statelessUpdate, boolean deleteMissingChildren) {
 		this.statelessUpdate = statelessUpdate;
 		this.deleteMissingChildren = deleteMissingChildren;
-		this.updateNullProperties = updateNullProperties;
 	}
 
 	/**
@@ -344,7 +301,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 * for EntityBeans that have not been modified.
 	 */
 	public boolean isDirty() {
-		return isDirty;
+		return dirty;
 	}
 
 	/**
@@ -352,20 +309,6 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 */
 	public ConcurrencyMode getConcurrencyMode() {
 		return concurrencyMode;
-	}
-
-	/**
-	 * Set loaded properties when generated values has added properties such as
-	 * created and updated timestamps.
-	 */
-	public void setLoadedProps(Set<String> additionalProps) {
-		if (intercept != null) {
-			intercept.setLoadedProps(additionalProps);
-		}
-	}
-
-	public Set<String> getLoadedProperties() {
-		return loadedProps;
 	}
 
 	/**
@@ -387,23 +330,20 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 		return bean;
 	}
 
-	/**
+	
+	public EntityBean getEntityBean() {
+    return entityBean;
+  }
+
+  /**
 	 * Return the Id value for the bean.
 	 */
 	public Object getBeanId() {
-		return beanDescriptor.getId(bean);
+		return beanDescriptor.getId(entityBean);
 	}
 
 	public BeanDelta createDeltaBean() {
 		return new BeanDelta(beanDescriptor, getBeanId());
-	}
-
-	/**
-	 * Get the old values bean. This is used to perform optimistic concurrency
-	 * checking on updates and deletes.
-	 */
-	public T getOldValues() {
-		return oldValues;
 	}
 
 	/**
@@ -434,11 +374,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 * bean).
 	 */
 	public boolean isLoadedProperty(BeanProperty prop) {
-		if (loadedProps == null) {
-			return true;
-		} else {
-			return loadedProps.contains(prop.getName());
-		}
+	  return intercept.isLoadedProperty(prop.getPropertyIndex());
 	}
 
 	@Override
@@ -485,13 +421,8 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 */
 	public void setGeneratedKey(Object idValue) {
 		if (idValue != null) {
-
-			// set back to the bean so that we can use the same bean later
-			// for update [refer ebeanIntercept.setLoaded(true)].
-			idValue = beanDescriptor.convertSetId(idValue, bean);
-
 			// remember it for logging summary
-			this.idValue = idValue;
+			this.idValue = beanDescriptor.convertSetId(idValue, entityBean);
 		}
 	}
 
@@ -518,7 +449,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	  // Delete the bean from the PersistenceContent
 	  transaction.getPersistenceContext().clear(beanDescriptor.getBeanType(), idValue);
 	  // Delete from cache early even if transaction fails
-	  beanDescriptor.cacheDelete(idValue, this);
+	  beanDescriptor.cacheHandleDelete(idValue, this);
 	}
 	
 	/**
@@ -597,18 +528,18 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 * </p>
 	 */
 	public ConcurrencyMode determineConcurrencyMode() {
-		if (loadedProps != null) {
-			// 'partial bean' update/delete...
-			if (concurrencyMode.equals(ConcurrencyMode.VERSION)) {
-				// check the version property was loaded
-				BeanProperty prop = beanDescriptor.firstVersionProperty();
-				if (prop != null && loadedProps.contains(prop.getName())) {
-					// OK to use version property
-				} else {
-					concurrencyMode = ConcurrencyMode.ALL;
-				}
+		
+		// 'partial bean' update/delete...
+		if (concurrencyMode.equals(ConcurrencyMode.VERSION)) {
+			// check the version property was loaded
+			BeanProperty prop = beanDescriptor.getVersionProperty();
+			if (prop != null && intercept.isLoadedProperty(prop.getPropertyIndex())) {
+				// OK to use version property
+			} else {
+				concurrencyMode = ConcurrencyMode.NONE;
 			}
 		}
+	
 		return concurrencyMode;
 	}
 
@@ -619,7 +550,7 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 * </p>
 	 */
 	public boolean isDynamicUpdateSql() {
-		return beanDescriptor.isUpdateChangesOnly() || (loadedProps != null);
+		return beanDescriptor.isUpdateChangesOnly() || !intercept.isFullyLoadedBean();
 	}
 
 	/**
@@ -630,37 +561,74 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	 * </p>
 	 */
 	public GenerateDmlRequest createGenerateDmlRequest(boolean emptyStringAsNull) {
-		if (beanDescriptor.isUpdateChangesOnly()) {
-			return new GenerateDmlRequest(emptyStringAsNull, changedProps, loadedProps, oldValues);
-		} else {
-			return new GenerateDmlRequest(emptyStringAsNull, loadedProps, loadedProps, oldValues);
-		}
-	}
-
-	/**
-	 * Return the updated properties. If this returns null then all the
-	 * properties on the bean where updated.
-	 */
-	public Set<String> getUpdatedProperties() {
-		if (changedProps != null) {
-			return changedProps;
-		}
-		return loadedProps;
+	  return new GenerateDmlRequest(emptyStringAsNull, intercept, beanDescriptor.isUpdateChangesOnly());
 	}
 
 	/**
 	 * Test if the property value has changed and if so include it in the
 	 * update.
 	 */
-	public boolean hasChanged(BeanProperty prop) {
-	  if (changedProps == null) {
-	    return false;
-	  }
-		return changedProps.contains(prop.getName());
+	public boolean isAddToUpdate(BeanProperty prop) {
+	  return intercept.isDirtyProperty(prop.getPropertyIndex());
 	}
 
-	public List<DerivedRelationshipData> getDerivedRelationships() {
-	    return transaction.getDerivedRelationship(bean);
+  public List<DerivedRelationshipData> getDerivedRelationships() {
+    return transaction.getDerivedRelationship(bean);
+  }
+
+  public void postInsert() {
+    // mark all properties as loaded after an insert to support immediate update 
+    int len = intercept.getPropertyLength();
+    for (int i = 0; i < len; i++) {
+      intercept.setLoadedProperty(i);      
     }
+  }
+
+  public boolean isReference() {
+    return beanDescriptor.isReference(intercept);
+  }
+  
+  /**
+   * This many property has been cascade saved. Keep note of this and update the 'many property'
+   * cache on post commit.
+   */
+  public void addUpdatedManyProperty(BeanPropertyAssocMany<?> updatedAssocMany) {
+    //if (notifyCache) {
+      if (updatedManys == null) {
+        updatedManys = new ArrayList<BeanPropertyAssocMany<?>>(5);
+      }
+      updatedManys.add(updatedAssocMany);
+    //}
+  }
+
+  /**
+   * Return the list of cascade updated many properties (can be null).
+   */
+  public List<BeanPropertyAssocMany<?>> getUpdatedManyCollections() {
+    return updatedManys;
+  }
+
+  /**
+   * A reference bean was saved. Check if any of its many properties where
+   * cascade saved and hence we need to update related many property caches.
+   */
+  public void checkUpdatedManysOnly() {
+    if (!dirty && updatedManys != null) {
+      // set the flag and register for post commit processing if there
+      // is caching or registered listeners
+      if (idValue == null) {
+        this.idValue = beanDescriptor.getId(entityBean);
+      }
+      updatedManysOnly = true;
+      addEvent();
+    }
+  }
+
+  /**
+   * Return true if only many properties where updated.
+   */
+  public boolean isUpdatedManysOnly() {
+    return updatedManysOnly;
+  }
 
 }

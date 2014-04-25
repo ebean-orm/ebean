@@ -19,5 +19,13 @@ public class CustomerPersistAdapter extends BeanPersistAdapter {
 		
 		return true;
 	}
-	
+
+  @Override
+  public boolean preUpdate(BeanPersistRequest<?> request) {
+
+    // Do nothing intentionally. TestStatelessUpdate needs
+    // to control if customer contacts is 'touched'
+    return true;
+  }
+
 }

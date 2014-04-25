@@ -10,13 +10,15 @@ import java.util.ListIterator;
 
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
+import com.avaje.ebean.bean.EntityBean;
 
 /**
  * List capable of lazy loading.
  */
-public final class BeanList<E> extends AbstractBeanCollection<E> implements List<E>,
-    BeanCollectionAdd {
+public final class BeanList<E> extends AbstractBeanCollection<E> implements List<E>, BeanCollectionAdd {
 
+  private static final long serialVersionUID = 1L;
+  
   /**
    * The underlying List implementation.
    */
@@ -40,12 +42,17 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   /**
    * Used to create deferred fetch proxy.
    */
-  public BeanList(BeanCollectionLoader loader, Object ownerBean, String propertyName) {
+  public BeanList(BeanCollectionLoader loader, EntityBean ownerBean, String propertyName) {
     super(loader, ownerBean, propertyName);
   }
 
+  @Override
+  public boolean isEmptyAndUntouched() {
+    return !touched && (list == null || list.isEmpty());
+  }
+
   @SuppressWarnings("unchecked")
-  public void addBean(Object bean) {
+  public void addBean(EntityBean bean) {
     list.add((E) bean);
   }
 
@@ -75,16 +82,24 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
           list = new ArrayList<E>();
         }
       }
-      touched();
+      touched(true);
     }
   }
 
+  private void initAsUntouched() {
+    init(false);
+  }
+  
   private void init() {
+    init(true);
+  }
+  
+  private void init(boolean setTouched) {
     synchronized (this) {
       if (list == null) {
         lazyLoadCollection(false);
       }
-      touched();
+      touched(setTouched);
     }
   }
 
@@ -257,7 +272,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   }
 
   public boolean isEmpty() {
-    init();
+    initAsUntouched();
     return list.isEmpty();
   }
 

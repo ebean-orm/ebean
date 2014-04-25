@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.deploy.id;
 
 import java.sql.SQLException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 import com.avaje.ebeaninternal.server.deploy.IntersectionRow;
@@ -48,22 +49,17 @@ public interface ImportedId {
 	/**
 	 * Append to the DML statement to the where clause.
 	 */
-	public void dmlWhere(GenerateDmlRequest request, Object bean);
-
-	/**
-	 * Return true if the id value has changed.
-	 */
-	public boolean hasChanged(Object bean, Object oldValues);
+	public void dmlWhere(GenerateDmlRequest request, EntityBean bean);
 	
 	/**
 	 * Bind the value from the bean.
 	 */
-	public Object bind(BindableRequest request, Object bean, boolean bindNull) throws SQLException;
+	public Object bind(BindableRequest request, EntityBean bean) throws SQLException;
 
 	/**
 	 * For inserting into ManyToMany intersection.
 	 */
-	public void buildImport(IntersectionRow row, Object other);
+	public void buildImport(IntersectionRow row, EntityBean other);
 
 	/**
 	 * Used to derive a missing concatenated key from multiple imported keys.

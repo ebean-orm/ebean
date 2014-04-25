@@ -21,11 +21,9 @@ public class TestBatchLazyWithDeleted extends BaseTestCase {
   public void testOnDeleted() {
 
     UUOne oneA = new UUOne();
-    oneA.setId(UUID.randomUUID());
     oneA.setName("oneA");
 
     UUOne oneB = new UUOne();
-    oneB.setId(UUID.randomUUID());
     oneB.setName("oneB");
 
     UUTwo two = new UUTwo();

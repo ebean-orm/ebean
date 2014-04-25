@@ -66,16 +66,9 @@ public class MetaFactory {
 
     Bindable ver = versionFact.create(desc);
 
-    List<Bindable> allList = new ArrayList<Bindable>();
-
-    baseFact.create(allList, desc, DmlMode.WHERE, false);
-    embeddedFact.create(allList, desc, DmlMode.WHERE, false);
-    assocOneFact.create(allList, desc, DmlMode.WHERE);
-
     BindableList setBindable = new BindableList(setList);
-    BindableList allBindable = new BindableList(allList);
 
-    return new UpdateMeta(emptyStringAsNull, desc, setBindable, id, ver, allBindable);
+    return new UpdateMeta(emptyStringAsNull, desc, setBindable, id, ver);
   }
 
   /**
@@ -87,15 +80,7 @@ public class MetaFactory {
 
     Bindable ver = versionFact.create(desc);
 
-    List<Bindable> allList = new ArrayList<Bindable>();
-
-    baseFact.create(allList, desc, DmlMode.WHERE, false);
-    embeddedFact.create(allList, desc, DmlMode.WHERE, false);
-    assocOneFact.create(allList, desc, DmlMode.WHERE);
-
-    Bindable allBindable = new BindableList(allList);
-
-    return new DeleteMeta(emptyStringAsNull, desc, id, ver, allBindable);
+    return new DeleteMeta(emptyStringAsNull, desc, id, ver);
   }
 
   /**

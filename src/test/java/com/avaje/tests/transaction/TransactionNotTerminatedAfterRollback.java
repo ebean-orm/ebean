@@ -49,7 +49,7 @@ public class TransactionNotTerminatedAfterRollback {
 		}
 	}
 
-	@Entity public class User {
+	@Entity public static class User {
 		@Id Long id;
 		String name;
 

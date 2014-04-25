@@ -8,6 +8,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.CacheTuning;
 import com.avaje.ebean.annotation.EntityConcurrencyMode;
 import com.avaje.ebean.annotation.NamedUpdate;
 import com.avaje.ebean.annotation.NamedUpdates;
@@ -55,10 +56,8 @@ public class AnnotationClass extends AnnotationParser {
 
     Entity entity = cls.getAnnotation(Entity.class);
     if (entity != null) {
-      // checkDefaultConstructor();
       if (entity.name().equals("")) {
         descriptor.setName(cls.getSimpleName());
-
       } else {
         descriptor.setName(entity.name());
       }
@@ -110,8 +109,9 @@ public class AnnotationClass extends AnnotationParser {
     }
 
     CacheStrategy cacheStrategy = cls.getAnnotation(CacheStrategy.class);
-    if (cacheStrategy != null) {
-      readCacheStrategy(cacheStrategy);
+    CacheTuning cacheTuning = cls.getAnnotation(CacheTuning.class);
+    if (cacheStrategy != null || cacheTuning != null) {
+      readCacheStrategy(cacheStrategy, cacheTuning);
     }
 
     EntityConcurrencyMode entityConcurrencyMode = cls.getAnnotation(EntityConcurrencyMode.class);
@@ -120,18 +120,24 @@ public class AnnotationClass extends AnnotationParser {
     }
   }
 
-  private void readCacheStrategy(CacheStrategy cacheStrategy) {
+  private void readCacheStrategy(CacheStrategy cacheStrategy, CacheTuning cacheTuning) {
 
     CacheOptions cacheOptions = descriptor.getCacheOptions();
-    cacheOptions.setUseCache(cacheStrategy.useBeanCache());
-    cacheOptions.setReadOnly(cacheStrategy.readOnly());
-    cacheOptions.setWarmingQuery(cacheStrategy.warmingQuery());
-    if (cacheStrategy.naturalKey().length() > 0) {
-      String propName = cacheStrategy.naturalKey().trim();
-      DeployBeanProperty beanProperty = descriptor.getBeanProperty(propName);
-      if (beanProperty != null) {
-        beanProperty.setNaturalKey(true);
-        cacheOptions.setNaturalKey(propName);
+    if (cacheTuning != null) {
+      cacheOptions.setMaxSecsToLive(cacheTuning.maxSecsToLive());
+      cacheOptions.setMaxIdleSecs(cacheTuning.maxIdleSecs()); 
+    }
+    if (cacheStrategy != null) {
+      cacheOptions.setUseCache(cacheStrategy.useBeanCache());
+      cacheOptions.setReadOnly(cacheStrategy.readOnly());
+      cacheOptions.setWarmingQuery(cacheStrategy.warmingQuery());
+      if (cacheStrategy.naturalKey().length() > 0) {
+        String propName = cacheStrategy.naturalKey().trim();
+        DeployBeanProperty beanProperty = descriptor.getBeanProperty(propName);
+        if (beanProperty != null) {
+          beanProperty.setNaturalKey(true);
+          cacheOptions.setNaturalKey(propName);
+        }
       }
     }
   }

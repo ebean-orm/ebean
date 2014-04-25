@@ -79,13 +79,13 @@ public class WriteJsonContext implements JsonWriter {
         return;
       }
           
-      Object o = it.next();
+      EntityBean o = (EntityBean)it.next();
       BeanDescriptor<?> d = getDecriptor(o.getClass());
   
       d.jsonWrite(this, o);
       while (it.hasNext()) {
           appendComma();
-          Object t = it.next();        
+          EntityBean t = (EntityBean)it.next();        
           d.jsonWrite(this, t);
       }
       endAssocMany();
@@ -344,7 +344,7 @@ public class WriteJsonContext implements JsonWriter {
     }
     
     public WriteBeanState pushBeanState(Object bean) {
-        WriteBeanState newState = new WriteBeanState(bean);
+        WriteBeanState newState = new WriteBeanState();//bean);
         WriteBeanState prevState = beanState;
         beanState = newState;
         return prevState;
@@ -354,52 +354,14 @@ public class WriteJsonContext implements JsonWriter {
         this.beanState = previousState;
     }
     
-    public boolean isReferenceBean() {
-        return beanState.isReferenceBean();
-    }
-    
-    public boolean includedProp(String name) {
-        return beanState.includedProp(name);
-    }
-    
-    public Set<String> getLoadedProps() {
-        return beanState.getLoadedProps();
-    }
-    
     
     public static class WriteBeanState {
         
-        private final EntityBeanIntercept ebi;
-        private final Set<String> loadedProps;
-        private final boolean referenceBean;
         private boolean firstKeyOut;
         
-        public WriteBeanState(Object bean) {
-            if (bean instanceof EntityBean){
-                this.ebi = ((EntityBean)bean)._ebean_getIntercept();
-                this.loadedProps = ebi.getLoadedProps();
-                this.referenceBean = ebi.isReference();
-            } else {
-                this.ebi = null;
-                this.loadedProps = null;
-                this.referenceBean = false;
-            }
-        }
-        
-        public Set<String> getLoadedProps() {
-            return loadedProps;
-        }
-        
-        public boolean includedProp(String name) {
-            if (loadedProps == null || loadedProps.contains(name)){
-                return true;
-            } else {
-                return false;
-            }
-        }
-        public boolean isReferenceBean() {
-            return referenceBean;
-        }
+        public WriteBeanState() {
+          
+        }       
         
         public boolean isFirstKey() {
             if (!firstKeyOut){

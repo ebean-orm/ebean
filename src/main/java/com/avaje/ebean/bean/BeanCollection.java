@@ -3,11 +3,8 @@ package com.avaje.ebean.bean;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import com.avaje.ebean.ExpressionList;
-import com.avaje.ebean.Query;
 
 /**
  * Lazy loading capable Maps, Lists and Sets.
@@ -35,9 +32,15 @@ public interface BeanCollection<E> extends Serializable {
   }
 
   /**
+   * Return true if the collection is empty and untouched. Used to detect if a
+   * collection was 'cleared' deliberately or just un-initialised.
+   */
+  public boolean isEmptyAndUntouched();
+
+  /**
    * Return the bean that owns this collection.
    */
-  public Object getOwnerBean();
+  public EntityBean getOwnerBean();
 
   /**
    * Return the bean property name this collection represents.
@@ -74,30 +77,6 @@ public interface BeanCollection<E> extends Serializable {
    * Set the filter that was used in building this collection.
    */
   public void setFilterMany(ExpressionList<?> filterMany);
-
-  /**
-   * Set when this collection is being loaded via a background thread.
-   * <p>
-   * Refer to {@link Query#setBackgroundFetchAfter(int)}
-   * </p>
-   */
-  public void setBackgroundFetch(Future<Integer> future);
-
-  /**
-   * Wait for the fetch to complete with a given timeout.
-   * <p>
-   * Refer to {@link Query#setBackgroundFetchAfter(int)}
-   * </p>
-   */
-  public void backgroundFetchWait(long wait, TimeUnit timeUnit);
-
-  /**
-   * Wait for the fetch to complete.
-   * <p>
-   * Refer to {@link Query#setBackgroundFetchAfter(int)}
-   * </p>
-   */
-  public void backgroundFetchWait();
 
   /**
    * Set a listener to be notified when the BeanCollection is first touched.
@@ -173,18 +152,6 @@ public interface BeanCollection<E> extends Serializable {
    * This is set so that client code knows that there is more data available.
    */
   public void setHasMoreRows(boolean hasMoreRows);
-
-  /**
-   * Returns true if the fetch has finished. False if the fetch is continuing in
-   * a background thread.
-   */
-  public boolean isFinishedFetch();
-
-  /**
-   * Set to true when a fetch has finished. Used when a fetch continues in the
-   * background.
-   */
-  public void setFinishedFetch(boolean finishedFetch);
 
   /**
    * return true if there are real rows held. Return false is this is using

@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
@@ -28,31 +29,15 @@ public class BindableDiscriminator implements Bindable {
         return columnName + " = " + discValue;
     }
 
-    public void addChanged(PersistRequestBean<?> request, List<Bindable> list) {
+    public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
         throw new PersistenceException("Never called (only for inserts)");
     }
 
-    public void dmlInsert(GenerateDmlRequest request, boolean checkIncludes) {
-        dmlAppend(request, checkIncludes);
-    }
-
-    /**
-     * Never used in where clause.
-     */
-    public void dmlWhere(GenerateDmlRequest request, boolean checkIncludes, Object bean) {
-        // never used in where
-    }
-
-    public void dmlAppend(GenerateDmlRequest request, boolean checkIncludes) {
+    public void dmlAppend(GenerateDmlRequest request) {
         request.appendColumn(columnName);
     }
 
-    public void dmlBind(BindableRequest bindRequest, boolean checkIncludes, Object bean) throws SQLException {
-
-        bindRequest.bind(columnName, discValue, sqlType);
-    }
-
-    public void dmlBindWhere(BindableRequest bindRequest, boolean checkIncludes, Object bean) throws SQLException {
+    public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
 
         bindRequest.bind(columnName, discValue, sqlType);
     }

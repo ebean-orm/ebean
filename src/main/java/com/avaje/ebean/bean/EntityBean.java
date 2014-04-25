@@ -14,6 +14,10 @@ import java.io.Serializable;
  */
 public interface EntityBean extends Serializable {
 
+  public String[] _ebean_getPropertyNames();
+  
+  public String _ebean_getPropertyName(int pos);
+  
   /**
    * Return the enhancement marker value.
    * <p>
@@ -80,30 +84,18 @@ public interface EntityBean extends Serializable {
   public Object _ebean_createCopy();
 
   /**
-   * Return the fields in their index order.
-   */
-  public String[] _ebean_getFieldNames();
-
-  /**
    * Set the value of a field of an entity bean of this type.
    * <p>
    * Note that using this method bypasses any interception that otherwise occurs
    * on entity beans. That means lazy loading and oldValues creation.
    * </p>
-   * 
-   * @param fieldIndex
-   *          the index of the field
-   * @param entityBean
-   *          the entityBean of this type to modify
-   * @param value
-   *          the value to set
    */
-  public void _ebean_setField(int fieldIndex, Object entityBean, Object value);
+  public void _ebean_setField(int fieldIndex, Object value);
 
   /**
    * Set the field value with interception.
    */
-  public void _ebean_setFieldIntercept(int fieldIndex, Object entityBean, Object value);
+  public void _ebean_setFieldIntercept(int fieldIndex, Object value);
 
   /**
    * Return the value of a field from an entity bean of this type.
@@ -111,17 +103,12 @@ public interface EntityBean extends Serializable {
    * Note that using this method bypasses any interception that otherwise occurs
    * on entity beans. That means lazy loading.
    * </p>
-   * 
-   * @param fieldIndex
-   *          the index of the field
-   * @param entityBean
-   *          the entityBean to get the value from
    */
-  public Object _ebean_getField(int fieldIndex, Object entityBean);
+  public Object _ebean_getField(int fieldIndex);
 
   /**
    * Return the field value with interception.
    */
-  public Object _ebean_getFieldIntercept(int fieldIndex, Object entityBean);
+  public Object _ebean_getFieldIntercept(int fieldIndex);
 
 }

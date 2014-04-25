@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanFkeyProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
@@ -68,7 +69,7 @@ public class ImportedIdEmbedded implements ImportedId {
 		}
 	}
 
-	public void dmlWhere(GenerateDmlRequest request, Object bean){
+	public void dmlWhere(GenerateDmlRequest request, EntityBean bean){
 
 		Object embeddedId = null;
 		if (bean != null) {
@@ -82,10 +83,10 @@ public class ImportedIdEmbedded implements ImportedId {
                 }
 			}
 		} else {
-		
+		  EntityBean embedded = (EntityBean)embeddedId;
 			for (int i = 0; i < imported.length; i++) {
 			    if (imported[i].owner.isDbUpdatable()) {
-    				Object value = imported[i].foreignProperty.getValue(embeddedId);
+    				Object value = imported[i].foreignProperty.getValue(embedded);
     				if (value == null){
     					request.appendColumnIsNull(imported[i].localDbColumn);	
     				} else {
@@ -96,14 +97,7 @@ public class ImportedIdEmbedded implements ImportedId {
 		}
 	}
 	
-	public boolean hasChanged(Object bean, Object oldValues) {
-		Object id = foreignAssocOne.getValue(bean);
-		Object oldId = foreignAssocOne.getValue(oldValues);
-		
-		return !ValueUtil.areEqual(id, oldId);
-	}
-	
-	public Object bind(BindableRequest request, Object bean, boolean bindNull) throws SQLException {
+	public Object bind(BindableRequest request, EntityBean bean) throws SQLException {
 
         Object embeddedId = null;
 
@@ -114,15 +108,16 @@ public class ImportedIdEmbedded implements ImportedId {
 		if (embeddedId == null){
 			for (int i = 0; i < imported.length; i++) {
 			    if (imported[i].owner.isUpdateable()) {
-			        request.bind(null, imported[i].foreignProperty, imported[i].localDbColumn, true);
+			        request.bind(null, imported[i].foreignProperty, imported[i].localDbColumn);
 			    }
 			}
 			
 		} else {
+		  EntityBean embedded = (EntityBean)embeddedId;
 			for (int i = 0; i < imported.length; i++) {
 			    if (imported[i].owner.isUpdateable()) {
-    				Object scalarValue = imported[i].foreignProperty.getValue(embeddedId);
-    				request.bind(scalarValue, imported[i].foreignProperty, imported[i].localDbColumn, true);
+    				Object scalarValue = imported[i].foreignProperty.getValue(embedded);
+    				request.bind(scalarValue, imported[i].foreignProperty, imported[i].localDbColumn);
 			    }
 			}
 		}
@@ -130,9 +125,9 @@ public class ImportedIdEmbedded implements ImportedId {
 		return null;
 	}
 
-	public void buildImport(IntersectionRow row, Object other){
+	public void buildImport(IntersectionRow row, EntityBean other){
 		
-		Object embeddedId = foreignAssocOne.getValue(other);
+		EntityBean embeddedId = (EntityBean)foreignAssocOne.getValue(other);
 		if (embeddedId == null){
 			String msg = "Foreign Key value null?";
 			throw new PersistenceException(msg);

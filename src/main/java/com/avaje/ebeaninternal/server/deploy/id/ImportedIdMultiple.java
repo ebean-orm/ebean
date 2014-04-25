@@ -2,13 +2,13 @@ package com.avaje.ebeaninternal.server.deploy.id;
 
 import java.sql.SQLException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 import com.avaje.ebeaninternal.server.deploy.IntersectionRow;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableRequest;
-import com.avaje.ebeaninternal.util.ValueUtil;
 
 /**
  * Imported concatenated id that is not embedded.
@@ -55,7 +55,7 @@ public class ImportedIdMultiple implements ImportedId {
 		}
 	}
 
-	public void dmlWhere(GenerateDmlRequest request, Object bean){
+	public void dmlWhere(GenerateDmlRequest request, EntityBean bean){
 		if (bean == null){
 			for (int i = 0; i < imported.length; i++) {
 				request.appendColumnIsNull(imported[i].localDbColumn);	
@@ -72,32 +72,19 @@ public class ImportedIdMultiple implements ImportedId {
 		}
 	}
 	
-	public boolean hasChanged(Object bean, Object oldValues) {
-		
-		for (int i = 0; i < imported.length; i++) {
-			Object id = imported[i].foreignProperty.getValue(bean);
-			Object oldId = imported[i].foreignProperty.getValue(oldValues);
-			if (!ValueUtil.areEqual(id, oldId)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	
-	public Object bind(BindableRequest request, Object bean, boolean bindNull) throws SQLException {
+	public Object bind(BindableRequest request, EntityBean bean) throws SQLException {
 		
 		for (int i = 0; i < imported.length; i++) {
 		    if (imported[i].owner.isUpdateable()) {
     			Object scalarValue = imported[i].foreignProperty.getValue(bean);
-    			request.bind(scalarValue, imported[i].foreignProperty, imported[i].localDbColumn, true);
+    			request.bind(scalarValue, imported[i].foreignProperty, imported[i].localDbColumn);
 		    }
 		}
 		// hmmm, not worrying about this just yet
 		return null;
 	}
 	
-	public void buildImport(IntersectionRow row, Object other){
+	public void buildImport(IntersectionRow row, EntityBean other){
 				
 		for (int i = 0; i < imported.length; i++) {
 			Object scalarValue = imported[i].foreignProperty.getValue(other);

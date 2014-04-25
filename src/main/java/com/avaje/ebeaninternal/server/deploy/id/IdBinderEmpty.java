@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.avaje.ebean.bean.EntityBean;
+
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -19,8 +21,6 @@ import com.avaje.ebeaninternal.server.type.DataBind;
 public final class IdBinderEmpty implements IdBinder {
 
   private static final String bindIdSql = "";
-
-  private static final BeanProperty[] properties = new BeanProperty[0];
 
   public IdBinderEmpty() {
 
@@ -41,6 +41,11 @@ public final class IdBinderEmpty implements IdBinder {
     return 0;
   }
 
+  @Override
+  public BeanProperty getBeanProperty() {
+    return null;
+  }
+
   public String getIdProperty() {
     return null;
   }
@@ -56,10 +61,6 @@ public final class IdBinderEmpty implements IdBinder {
   public String getDefaultOrderBy() {
     // this should never happen?
     return "";
-  }
-
-  public BeanProperty[] getProperties() {
-    return properties;
   }
 
   public String getBindIdSql(String baseTableAlias) {
@@ -90,7 +91,7 @@ public final class IdBinderEmpty implements IdBinder {
     return null;
   }
 
-  public Object[] getIdValues(Object bean) {
+  public Object[] getIdValues(EntityBean bean) {
     return null;
   }
 
@@ -109,7 +110,7 @@ public final class IdBinderEmpty implements IdBinder {
   public void loadIgnore(DbReadContext ctx) {
   }
 
-  public Object readSet(DbReadContext ctx, Object bean) throws SQLException {
+  public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
     return null;
   }
 
@@ -120,7 +121,7 @@ public final class IdBinderEmpty implements IdBinder {
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
   }
 
-  public Object convertSetId(Object idValue, Object bean) {
+  public Object convertSetId(Object idValue, EntityBean bean) {
     return idValue;
   }
 
@@ -129,7 +130,6 @@ public final class IdBinderEmpty implements IdBinder {
   }
 
   public void writeData(DataOutput dataOutput, Object idValue) throws IOException {
-
+    
   }
-
 }

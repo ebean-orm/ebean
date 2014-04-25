@@ -10,6 +10,7 @@ import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.common.BeanSet;
 import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
 
@@ -72,15 +73,12 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
             this.set = set;
         }
 
-        public void addBean(Object bean) {
+        public void addBean(EntityBean bean) {
             set.add(bean);
         }
     }
 	
-  /**
-   * Internal add bypassing any modify listening.
-   */
-	public void add(BeanCollection<?> collection, Object bean) {
+	public void add(BeanCollection<?> collection, EntityBean bean) {
 		collection.internalAdd(bean);
 	}
     
@@ -95,20 +93,20 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
 	    return beanSet;
 	}
 
-	public BeanCollection<T> createReference(Object parentBean, String propertyName) {
+	public BeanCollection<T> createReference(EntityBean parentBean, String propertyName) {
 		
 	  BeanSet<T> beanSet = new BeanSet<T>(loader, parentBean, propertyName);
 	  beanSet.setModifyListening(many.getModifyListenMode());
 	  return beanSet;
 	}
 
-	public void refresh(EbeanServer server, Query<?> query, Transaction t, Object parentBean) {
+	public void refresh(EbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
 		
 		BeanSet<?> newBeanSet = (BeanSet<?>)server.findSet(query, t);
 		refresh(newBeanSet, parentBean);
 	}
 	
-	public void refresh(BeanCollection<?> bc, Object parentBean) {
+	public void refresh(BeanCollection<?> bc, EntityBean parentBean) {
 		
 		BeanSet<?> newBeanSet = (BeanSet<?>)bc;
 		
@@ -158,7 +156,7 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
             if (count++ > 0){
                 ctx.appendComma();
             }
-            targetDescriptor.jsonWrite(ctx, detailBean);
+            targetDescriptor.jsonWrite(ctx, (EntityBean)detailBean);
         }
         ctx.endAssocMany();        
     }

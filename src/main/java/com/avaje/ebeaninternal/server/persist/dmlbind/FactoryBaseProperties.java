@@ -47,16 +47,16 @@ public class FactoryBaseProperties {
 
         for (int i = 0; i < props.length; i++) {
 
-          if(DmlMode.WHERE.equals(mode) && !withLobs && !props[i].isDbUpdatable()) {
-            // skip non-updatable column from where clause
-          } else {
+//          if(DmlMode.WHERE.equals(mode) && !withLobs && !props[i].isDbUpdatable()) {
+//            // skip non-updatable column from where clause
+//          } else {
             Bindable item = factoryProperty.create(props[i], mode, withLobs);
             if (item != null) {
                 list.add(item);
             } else {
                 // null where readOnly (Secondary tables) or Lob exclusion
             }
-          }
+//          }
         }
 
     }

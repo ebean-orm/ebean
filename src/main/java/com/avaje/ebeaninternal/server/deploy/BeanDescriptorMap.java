@@ -32,6 +32,6 @@ public interface BeanDescriptorMap {
      */
     public EncryptKey getEncryptKey(String tableName, String columnName);
     
-    public IdBinder createIdBinder(BeanProperty[] uids);
+    public IdBinder createIdBinder(BeanProperty id);
 
 }

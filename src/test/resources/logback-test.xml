@@ -32,6 +32,12 @@
     <logger name="org.avaje.ebean.SQL" level="TRACE"/>
     <logger name="org.avaje.ebean.TXN" level="TRACE"/>
     <logger name="org.avaje.ebean.SUM" level="TRACE"/>
+
+    <logger name="org.avaje.ebean.cache.QUERY" level="TRACE"/>
+    <logger name="org.avaje.ebean.cache.BEAN" level="TRACE"/>
+    <logger name="org.avaje.ebean.cache.COLL" level="TRACE"/>
+    <logger name="org.avaje.ebean.cache.NATKEY" level="TRACE"/>
+
     <logger name="com.avaje.tests" level="DEBUG"/>
     
     <logger name="com.avaje.ebeaninternal.server.lib" level="DEBUG"/>

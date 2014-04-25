@@ -10,7 +10,6 @@ import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.type.DataBind;
 
 /**
@@ -18,10 +17,7 @@ import com.avaje.ebeaninternal.server.type.DataBind;
  */
 public class UpdateHandler extends DmlHandler {
 
-
 	private final UpdateMeta meta;
-
-	private Set<String> updatedProperties;
 	
 	private boolean emptySetClause;
 	
@@ -41,8 +37,6 @@ public class UpdateHandler extends DmlHandler {
 		    emptySetClause = true;
 		    return;
 		} 
-		
-		updatedProperties = updatePlan.getProperties();
 
 		sql  = updatePlan.getSql();
 		
@@ -79,18 +73,11 @@ public class UpdateHandler extends DmlHandler {
 	    if (!emptySetClause){	    
     		int rowCount = dataBind.executeUpdate();
     		checkRowCount(rowCount);
-    		setAdditionalProperties();
 	    }
 	}
 
-	@Override
-	public boolean isIncluded(BeanProperty prop) {
-
-		return prop.isDbUpdatable() && (updatedProperties == null || updatedProperties.contains(prop.getName()));
-	}
-
-    public void registerDerivedRelationship(DerivedRelationshipData derivedRelationship) {
-	    persistRequest.getTransaction().registerDerivedRelationship(derivedRelationship);
-    }
+  public void registerDerivedRelationship(DerivedRelationshipData derivedRelationship) {
+    persistRequest.getTransaction().registerDerivedRelationship(derivedRelationship);
+  }
 	
 }

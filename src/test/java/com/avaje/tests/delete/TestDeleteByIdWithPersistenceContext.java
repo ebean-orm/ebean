@@ -20,9 +20,9 @@ public class TestDeleteByIdWithPersistenceContext extends BaseTestCase {
     
     EbeanServer server = Ebean.getServer(null);
     Product prod1 = createProduct(100,"apples");
-    server.save(prod1);
+    server.insert(prod1);
     Product prod2 = createProduct(101, "bananas");
-    server.save(prod2);
+    server.insert(prod2);
     
     server.beginTransaction();
     // effectively load these into the persistence context

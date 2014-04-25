@@ -3,6 +3,7 @@ package com.avaje.tests.el;
 import junit.framework.TestCase;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
@@ -31,10 +32,10 @@ public class TestElGetReference extends TestCase {
 		ElPropertyValue addrLine1Prop = descriptor.getElGetValue("billingAddress.line1");
 		ElPropertyValue addrCityProp = descriptor.getElGetValue("billingAddress.city");
 		
-		elProp.elGetReference(c0);
-		elProp.elGetReference(c1);
+		elProp.elGetReference((EntityBean)c0);
+		elProp.elGetReference((EntityBean)c1);
         
-		addrLine1Prop.elSetValue(c1, "12 someplace", true, false);
-		addrCityProp.elSetValue(c1, "Auckland", true, false);
+		addrLine1Prop.elSetValue((EntityBean)c1, "12 someplace", true);
+		addrCityProp.elSetValue((EntityBean)c1, "Auckland", true);
 	}
 }

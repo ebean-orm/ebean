@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import java.util.Set;
-
+import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
 /**
@@ -15,10 +14,8 @@ public class GenerateDmlRequest {
 
     private final StringBuilder sb = new StringBuilder(100);
 
-    private final Set<String> includeProps;
-    private final Set<String> includeWhereProps;
-    
-    private final Object oldValues;
+    private final EntityBeanIntercept ebi;
+    private final boolean changesOnly;
 
     private StringBuilder insertBindBuffer;
 
@@ -28,29 +25,21 @@ public class GenerateDmlRequest {
     private int insertMode;
     
     private int bindColumnCount;
-
-    /**
-     * Create with includeWhereProps same as includeProps.
-     */
-    public GenerateDmlRequest(boolean emptyStringAsNull, Set<String> includeProps, Object oldValues) {
-        this(emptyStringAsNull, includeProps, includeProps, oldValues);
-    }
     
     /**
      * Create from a PersistRequestBean.
      */
-    public GenerateDmlRequest(boolean emptyStringAsNull, Set<String> includeProps, Set<String> includeWhereProps, Object oldValues) {
+    public GenerateDmlRequest(boolean emptyStringAsNull, EntityBeanIntercept ebi, boolean changesOnly) {//, Object oldValues) {
         this.emptyStringAsNull = emptyStringAsNull;
-        this.includeProps = includeProps;
-        this.includeWhereProps = includeWhereProps;
-        this.oldValues = oldValues;
+        this.ebi = ebi;
+        this.changesOnly = changesOnly;
     }
 
     /**
      * Create for generating standard all properties DML/SQL.
      */
     public GenerateDmlRequest(boolean emptyStringAsNull) {
-        this(emptyStringAsNull, null, null, null);
+        this(emptyStringAsNull, null, false);
     }
 
     public GenerateDmlRequest append(String s) {
@@ -66,14 +55,21 @@ public class GenerateDmlRequest {
      * Return true if this property should be included in the set clause.
      */
     public boolean isIncluded(BeanProperty prop) {
-        return (includeProps == null || includeProps.contains(prop.getName()));
+      if (ebi == null) {
+        return true;
+      }
+      if (changesOnly) {
+        return ebi.isDirtyProperty(prop.getPropertyIndex());
+      } else {
+        return ebi.isLoadedProperty(prop.getPropertyIndex());
+      }
     }
     
     /**
      * Return true if this property should be included in the where clause.
      */
     public boolean isIncludedWhere(BeanProperty prop) {
-        return (includeWhereProps == null || includeWhereProps.contains(prop.getName()));
+      return ebi == null || ebi.isLoadedProperty(prop.getPropertyIndex());
     }
 
     public void appendColumnIsNull(String column) {
@@ -81,28 +77,29 @@ public class GenerateDmlRequest {
     }
 
     public void appendColumn(String column) {
-        String bind = (insertMode > 0) ? "?" : "=?";
-        appendColumn(column, bind);
+        //String bind = (insertMode > 0) ? "?" : "=?";
+        appendColumn(column, "?");
     }
 
-    public void appendColumn(String column, String suffik) {
-        appendColumn(column, "", suffik);
+    public void appendColumn(String column, String bind) {
+        appendColumn(column, "", bind);
     }
 
-    public void appendColumn(String column, String expr, String suffik) {
+    public void appendColumn(String column, String expr, String bind) {
         
         ++bindColumnCount;
         
         sb.append(prefix);
         sb.append(column);
-        sb.append(expr);
+        //sb.append(expr);
         if (insertMode > 0) {
             if (insertMode++ > 1) {
                 insertBindBuffer.append(",");
             }
-            insertBindBuffer.append(suffik);
+            insertBindBuffer.append(bind);
         } else {
-            sb.append(suffik);
+            sb.append("=");
+            sb.append(bind);
         }
 
         if (prefix2 != null) {
@@ -143,10 +140,6 @@ public class GenerateDmlRequest {
     public void setUpdateSetMode() {
         this.prefix = "";
         this.prefix2 = ", ";
-    }
-
-    public Object getOldValues() {
-        return oldValues;
     }
 
 }

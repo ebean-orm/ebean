@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
@@ -89,7 +90,7 @@ public class BeanPropertyCompound extends BeanProperty {
      * Get the underlying compound type.
      */
     @SuppressWarnings("unchecked")
-    public Object getValueUnderlying(Object bean) {
+    public Object getValueUnderlying(EntityBean bean) {
 
         Object value =  getValue(bean);
         if (typeConverter != null){
@@ -97,27 +98,7 @@ public class BeanPropertyCompound extends BeanProperty {
         }
         return value;
     }
-    
-    @Override
-    public Object getValue(Object bean) {
-        return super.getValue(bean);
-    }
-
-    @Override
-    public Object getValueIntercept(Object bean) {
-        return super.getValueIntercept(bean);
-    }
-
-    @Override
-    public void setValue(Object bean, Object value) {
-        super.setValue(bean, value);
-    }
-
-    @Override
-    public void setValueIntercept(Object bean, Object value) {
-        super.setValueIntercept(bean, value);
-    }    
-    
+ 
     public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
 
         if (chain == null) {
@@ -154,7 +135,7 @@ public class BeanPropertyCompound extends BeanProperty {
     }
 
     @Override
-    public Object readSet(DbReadContext ctx, Object bean, Class<?> type) throws SQLException {
+    public Object readSet(DbReadContext ctx, EntityBean bean, Class<?> type) throws SQLException {
 
         boolean assignable = (type == null || owningType.isAssignableFrom(type));
 
@@ -192,17 +173,17 @@ public class BeanPropertyCompound extends BeanProperty {
     }
 
     @Override
-    public Object elGetReference(Object bean) {
+    public Object elGetReference(EntityBean bean) {
         return bean;
     }
 
-    public void jsonWrite(WriteJsonContext ctx, Object bean) {
+    public void jsonWrite(WriteJsonContext ctx, EntityBean bean) {
         
         Object valueObject = getValueIntercept(bean);
         compoundType.jsonWrite(ctx, valueObject, name);
     }
     
-    public void jsonRead(ReadJsonContext ctx, Object bean){
+    public void jsonRead(ReadJsonContext ctx, EntityBean bean){
 
         Object objValue = compoundType.jsonRead(ctx);
         setValue(bean, objValue);

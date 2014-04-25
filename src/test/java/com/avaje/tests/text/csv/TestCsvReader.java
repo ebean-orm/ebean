@@ -35,7 +35,7 @@ public class TestCsvReader extends BaseTestCase {
       csvReader.addDateTime("anniversary", "dd-MMM-yyyy", Locale.GERMAN);
       csvReader.addProperty("billingAddress.line1");
       csvReader.addProperty("billingAddress.city");
-      csvReader.addReference("billingAddress.country.code");
+      csvReader.addProperty("billingAddress.country.code");
 
       csvReader.process(reader);
 

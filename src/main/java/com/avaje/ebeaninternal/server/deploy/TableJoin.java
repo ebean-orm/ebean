@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.deploy;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoin;
@@ -103,7 +104,7 @@ public final class TableJoin {
     }
   }
 
-  public Object readSet(DbReadContext ctx, Object bean, Class<?> type) throws SQLException {
+  public Object readSet(DbReadContext ctx, EntityBean bean, Class<?> type) throws SQLException {
     for (int i = 0, x = properties.length; i < x; i++) {
       properties[i].readSet(ctx, bean, type);
     }

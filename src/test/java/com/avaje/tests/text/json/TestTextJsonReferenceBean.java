@@ -8,8 +8,12 @@ import org.junit.Test;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebean.text.json.JsonWriteOptions;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.Product;
 import com.avaje.tests.model.basic.ResetBasicData;
@@ -21,6 +25,8 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
     ResetBasicData.reset();
 
+    SpiEbeanServer server = (SpiEbeanServer)Ebean.getServer(null);
+    
     JsonContext jsonContext = Ebean.createJsonContext();
 
     Product product = Ebean.getReference(Product.class, 1);
@@ -36,11 +42,21 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
       Product refProd = jsonContext.toBean(Product.class, jsonString);
 
+      BeanDescriptor<Product> prodDesc = server.getBeanDescriptor(Product.class);
+      EntityBean eb = (EntityBean)refProd;
+      prodDesc.isReference(eb._ebean_getIntercept());
+      
       BeanState beanState = Ebean.getBeanState(refProd);
-      Assert.assertTrue(beanState.isReference());
-
+      Assert.assertTrue(beanState.isNew());
+      
       String name = refProd.getName();
-      Assert.assertNotNull(name);
+      Assert.assertNull(name);
+
+      // Set to be 'loaded' to invoke lazy loading
+      beanState.setLoaded();
+      String name2 = refProd.getName();
+      Assert.assertNotNull(name2);
+
     }
 
     List<Order> orders = Ebean.find(Order.class)
@@ -58,9 +74,12 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
     System.out.println(jsonOrder);
 
     Order o2 = jsonContext.toBean(Order.class, jsonOrder);
+    Customer customer = o2.getCustomer();
+    
+    BeanDescriptor<Customer> custDesc = server.getBeanDescriptor(Customer.class);
 
-    BeanState beanStateCust = Ebean.getBeanState(o2.getCustomer());
-    Assert.assertTrue(beanStateCust.isReference());
+    Assert.assertTrue(custDesc.isReference(((EntityBean)customer)._ebean_getIntercept()));
+
 
   }
 

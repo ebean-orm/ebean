@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
@@ -37,33 +38,17 @@ public class BindableUnidirectional implements Bindable {
         return "BindableShadowFKey " + unidirectional;
     }
 
-    public void addChanged(PersistRequestBean<?> request, List<Bindable> list) {
+    public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
         throw new PersistenceException("Never called (for insert only)");
     }
 
-    public void dmlInsert(GenerateDmlRequest request, boolean checkIncludes) {
-        dmlAppend(request, checkIncludes);
-    }
-
-    public void dmlAppend(GenerateDmlRequest request, boolean checkIncludes) {
+    public void dmlAppend(GenerateDmlRequest request) {
         // always included (in insert)
         importedId.dmlAppend(request);
     }
 
-    public void dmlWhere(GenerateDmlRequest request, boolean checkIncludes, Object bean) {
-        throw new RuntimeException("Never called");
-    }
 
-    public void dmlBind(BindableRequest request, boolean checkIncludes, Object bean) throws SQLException {
-        dmlBind(request, checkIncludes, bean, true);
-    }
-    
-    public void dmlBindWhere(BindableRequest request, boolean checkIncludes, Object bean) throws SQLException {
-        dmlBind(request, checkIncludes, bean, false);
-    }
-    
-    private void dmlBind(BindableRequest request, boolean checkIncludes, Object bean, boolean bindNull)
-            throws SQLException {
+    public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
         PersistRequestBean<?> persistRequest = request.getPersistRequest();
         Object parentBean = persistRequest.getParentBean();
@@ -71,13 +56,13 @@ public class BindableUnidirectional implements Bindable {
         if (parentBean == null) {
             Class<?> localType = desc.getBeanType();
             Class<?> targetType = unidirectional.getTargetType();
-            ;
+            
             String msg = "Error inserting bean [" + localType + "] with unidirectional relationship. ";
             msg += "For inserts you must use cascade save on the master bean [" + targetType + "].";
             throw new PersistenceException(msg);
         }
 
-        importedId.bind(request, parentBean, bindNull);
+        importedId.bind(request, (EntityBean)parentBean);
     }
 
 }

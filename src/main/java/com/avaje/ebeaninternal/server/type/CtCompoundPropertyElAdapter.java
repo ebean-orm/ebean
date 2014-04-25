@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -32,19 +33,19 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
         return value;
     }
 
-    public Object elGetReference(Object bean) {
+    public Object elGetReference(EntityBean bean) {
         return bean;
     }
 
-    public Object elGetValue(Object bean) {
+    public Object elGetValue(EntityBean bean) {
         return prop.getValue(bean);
     }
 
-    public void elSetReference(Object bean) {
-        // prop.setValue(bean, value)
+    public void elSetReference(EntityBean bean) {
+        // Do nothing
     }
 
-    public void elSetValue(Object bean, Object value, boolean populate, boolean reference) {
+    public void elSetValue(EntityBean bean, Object value, boolean populate) {
         prop.setValue(bean, value);
     }
 
@@ -56,7 +57,7 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
         throw new RuntimeException("Not Supported or Expected");
     }
 
-    public Object[] getAssocOneIdValues(Object bean) {
+    public Object[] getAssocOneIdValues(EntityBean bean) {
         throw new RuntimeException("Not Supported or Expected");
     }
     

@@ -2,7 +2,6 @@
 package com.avaje.ebeaninternal.server.query;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
@@ -10,8 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.avaje.ebean.bean.ObjectGraphNode;
-import com.avaje.ebean.meta.MetaQueryPlanStatistic;
 import com.avaje.ebean.meta.MetaQueryPlanOriginCount;
+import com.avaje.ebean.meta.MetaQueryPlanStatistic;
 import com.avaje.ebeaninternal.server.util.LongAdder;
 
 /**

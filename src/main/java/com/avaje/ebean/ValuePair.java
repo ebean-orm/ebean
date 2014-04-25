@@ -5,30 +5,46 @@ package com.avaje.ebean;
  */
 public class ValuePair {
 
-  final Object value1;
+  private final Object newValue;
 
-  final Object value2;
+  private final Object oldValue;
 
-  public ValuePair(Object value1, Object value2) {
-    this.value1 = value1;
-    this.value2 = value2;
+  public ValuePair(Object newValue, Object oldValue) {
+    this.newValue = newValue;
+    this.oldValue = oldValue;
   }
 
   /**
-   * Return the first value.
+   * Return the new value.
    */
+  public Object getNewValue() {
+    return newValue;
+  }
+  
+  /**
+   * Return the old value.
+   */
+  public Object getOldValue() {
+    return oldValue;
+  }
+  
+  /**
+   * Return the new value.
+   */
+  @Deprecated
   public Object getValue1() {
-    return value1;
+    return newValue;
   }
 
   /**
-   * Return the second value.
+   * Return the old value.
    */
+  @Deprecated
   public Object getValue2() {
-    return value2;
+    return oldValue;
   }
 
   public String toString() {
-    return value1 + "," + value2;
+    return newValue + "," + oldValue;
   }
 }

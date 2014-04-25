@@ -32,7 +32,7 @@ public class TestCKeyLazyLoad extends BaseTestCase {
     p.add(new CKeyDetail("somethine one"));
     p.add(new CKeyDetail("somethine two"));
 
-    Ebean.save(p);
+    Ebean.insert(p);
 
     CKeyAssoc assoc2 = new CKeyAssoc();
     assoc2.setAssocOne("assocTwo");
@@ -46,14 +46,14 @@ public class TestCKeyLazyLoad extends BaseTestCase {
     p2.add(new CKeyDetail("somethine one"));
     p2.add(new CKeyDetail("somethine two"));
 
-    Ebean.save(p2);
+    Ebean.insert(p2);
 
     CKeyParentId searchId = new CKeyParentId(1, "one");
 
     CKeyParent found = Ebean.find(CKeyParent.class).where().idEq(searchId).findUnique();
 
     Assert.assertNotNull(found);
-    Assert.assertTrue(found.getDetails().size() == 2);
+    Assert.assertEquals(2,found.getDetails().size());
 
     List<CKeyParent> list = Ebean.find(CKeyParent.class).findList();
 

@@ -43,36 +43,36 @@ public class VisitorUtil {
 	/**
 	 * Visit the bean using a visitor.
 	 */
-	public static void visitBean(BeanDescriptor<?> desc, BeanVisitor visitor) {
+  public static void visitBean(BeanDescriptor<?> desc, BeanVisitor visitor) {
 
-		if (visitor.visitBean(desc)) {
+    if (visitor.visitBean(desc)) {
 
-		    BeanProperty[] propertiesId = desc.propertiesId();
-		    for (int i = 0; i < propertiesId.length; i++) {
-		        visit(visitor, propertiesId[i]);
-            }
-		    BeanPropertyAssocOne<?> unidirectional = desc.getUnidirectional();
-		    if (unidirectional != null){
-                visit(visitor, unidirectional);
-		    }
-		    BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
-		    for (int i = 0; i < propertiesNonTransient.length; i++) {
-		        BeanProperty p = propertiesNonTransient[i];
-		        if (!p.isFormula() && !p.isSecondaryTable()){
-    		        visit(visitor, p);
-    		    }
-            }
-	
-			visitor.visitBeanEnd(desc);
-		}
-	}
-	
-	private static void visit(BeanVisitor visitor, BeanProperty p) {
-	    PropertyVisitor pv = visitor.visitProperty(p);
-        if (pv != null){
-            visit(p, pv);
+      BeanProperty idProp = desc.getIdProperty();
+      if (idProp != null) {
+        visit(visitor, idProp);
+      }
+      BeanPropertyAssocOne<?> unidirectional = desc.getUnidirectional();
+      if (unidirectional != null) {
+        visit(visitor, unidirectional);
+      }
+      BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
+      for (int i = 0; i < propertiesNonTransient.length; i++) {
+        BeanProperty p = propertiesNonTransient[i];
+        if (!p.isFormula() && !p.isSecondaryTable()) {
+          visit(visitor, p);
         }
-	}
+      }
+
+      visitor.visitBeanEnd(desc);
+    }
+  }
+	
+  private static void visit(BeanVisitor visitor, BeanProperty p) {
+    PropertyVisitor pv = visitor.visitProperty(p);
+    if (pv != null) {
+      visit(p, pv);
+    }
+  }
 
 	/**
 	 * Visit all the properties.

@@ -161,13 +161,6 @@ public class ReadJsonContext extends ReadBasicJsonContext {
             }
         }
         
-        public void setLoadedState(){
-            if (ebi != null){
-                // takes into account reference beans
-                beanDescriptor.setLoadedProps(ebi, loadedProps);
-            }
-        }
-        
         public void propertyChange(PropertyChangeEvent evt) {
             String propName = evt.getPropertyName();
             loadedProps.add(propName);

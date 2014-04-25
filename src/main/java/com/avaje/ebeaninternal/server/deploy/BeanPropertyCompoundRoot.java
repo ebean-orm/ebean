@@ -73,7 +73,7 @@ public class BeanPropertyCompoundRoot {
      * Set the value of the property without interception or
      * PropertyChangeSupport.
      */
-    public void setRootValue(Object bean, Object value) {
+    public void setRootValue(EntityBean bean, Object value) {
         try {
             if (bean instanceof EntityBean) {
                 setter.set(bean, value);
@@ -92,7 +92,7 @@ public class BeanPropertyCompoundRoot {
     /**
      * Set the value of the property.
      */
-    public void setRootValueIntercept(Object bean, Object value) {
+    public void setRootValueIntercept(EntityBean bean, Object value) {
         try {
             if (bean instanceof EntityBean) {
                 setter.setIntercept(bean, value);

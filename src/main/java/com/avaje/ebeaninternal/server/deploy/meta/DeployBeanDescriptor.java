@@ -62,11 +62,6 @@ public class DeployBeanDescriptor<T> {
    */
   private LinkedHashMap<String, DeployBeanProperty> propMap = new LinkedHashMap<String, DeployBeanProperty>();
 
-  /**
-   * The type of bean this describes.
-   */
-  private final Class<T> beanType;
-
   private EntityType entityType;
 
   private final Map<String, DeployNamedQuery> namedQueries = new LinkedHashMap<String, DeployNamedQuery>();
@@ -104,7 +99,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * The concurrency mode for beans of this type.
    */
-  private ConcurrencyMode concurrencyMode = ConcurrencyMode.ALL;
+  private ConcurrencyMode concurrencyMode;
 
   private boolean updateChangesOnly;
 
@@ -131,11 +126,12 @@ public class DeployBeanDescriptor<T> {
    * faster than reflection at this stage.
    */
   private BeanReflect beanReflect;
+  private String[] properties;
 
   /**
    * The EntityBean type used to create new EntityBeans.
    */
-  private Class<?> factoryType;
+  private Class<T> beanType;
 
   private List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>();
   private List<BeanPersistListener<T>> persistListeners = new ArrayList<BeanPersistListener<T>>();
@@ -298,6 +294,14 @@ public class DeployBeanDescriptor<T> {
     return namedUpdates;
   }
 
+  public String[] getProperties() {
+    return properties;
+  }
+
+  public void setProperties(String[] props) {
+    this.properties = props;
+  }
+
   public BeanReflect getBeanReflect() {
     return beanReflect;
   }
@@ -307,23 +311,6 @@ public class DeployBeanDescriptor<T> {
    */
   public Class<T> getBeanType() {
     return beanType;
-  }
-
-  /**
-   * Return the class type this BeanDescriptor describes.
-   */
-  public Class<?> getFactoryType() {
-    return factoryType;
-  }
-
-  /**
-   * Set the class used to create new EntityBean instances.
-   * <p>
-   * Normally this would be a subclass dynamically generated for this bean.
-   * </p>
-   */
-  public void setFactoryType(Class<?> factoryType) {
-    this.factoryType = factoryType;
   }
 
   /**
@@ -350,7 +337,7 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Return the reference options.
+   * Return the cache options.
    */
   public CacheOptions getCacheOptions() {
     return cacheOptions;

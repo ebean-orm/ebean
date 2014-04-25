@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.bean.BeanCollection;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.event.BeanFinder;
 import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -82,7 +83,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
         	BeanDescriptor<T> descriptor = request.getBeanDescriptor();
         	Collection<T> c  = result.getActualDetails();
         	for (T bean : c) {
-        		descriptor.cachePutBeanData(bean);
+        		descriptor.cacheBeanPutData((EntityBean)bean);
           }
         }
 
@@ -119,7 +120,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
         }
         
         if (result != null && request.isUseBeanCache()){
-        	request.getBeanDescriptor().cachePutBeanData(result);        		
+        	request.getBeanDescriptor().cacheBeanPutData((EntityBean)result);        		
         }
         
         return result;

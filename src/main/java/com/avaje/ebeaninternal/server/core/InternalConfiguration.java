@@ -116,7 +116,7 @@ public class InternalConfiguration {
     this.transactionManager = new TransactionManager(clusterManager, backgroundExecutor,
         serverConfig, beanDescriptorManager, this.getBootupClasses());
 
-    this.cQueryEngine = new CQueryEngine(serverConfig.getDatabasePlatform(), binder, backgroundExecutor);
+    this.cQueryEngine = new CQueryEngine(serverConfig.getDatabasePlatform(), binder);
 
     ExternalTransactionManager externalTransactionManager = serverConfig.getExternalTransactionManager();
     if (externalTransactionManager == null && serverConfig.isUseJtaTransactionManager()) {

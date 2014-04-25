@@ -2,6 +2,8 @@ package com.avaje.ebean.event;
 
 import java.util.Set;
 
+import com.avaje.ebean.config.ServerConfig;
+
 /**
  * Listens for committed bean events.
  * <p>
@@ -31,8 +33,9 @@ import java.util.Set;
  * </p>
  * <p>
  * A BeanPersistListener is either found automatically via class path search or
- * can be added programmatically via ServerConfiguration.addEntity().
+ * can be added programmatically via {@link ServerConfig#add(BeanPersistListener)}.
  * </p>
+ * @see ServerConfig#add(BeanPersistListener)
  */
 public interface BeanPersistListener<T> {
 
@@ -52,7 +55,7 @@ public interface BeanPersistListener<T> {
    * @param bean
    *          The bean that was updated.
    * @param updatedProperties
-   *          the properties on the bean that where updated
+   *          The properties that were modified by this update.
    */
   public boolean updated(T bean, Set<String> updatedProperties);
 

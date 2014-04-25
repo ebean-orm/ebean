@@ -1,8 +1,5 @@
 package com.avaje.ebeaninternal.server.cache;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -10,94 +7,61 @@ import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
 public class CachedBeanDataFromBean {
 
-    private final BeanDescriptor<?> desc;
-    private final Object bean;
-    private final EntityBeanIntercept ebi;
-    
-    private final Set<String> loadedProps;
-    private final Set<String> extractProps;
 
-    public static CachedBeanData extract(BeanDescriptor<?> desc, Object bean){
-    	if (bean instanceof EntityBean){
-        	return new CachedBeanDataFromBean(desc, bean, ((EntityBean)bean)._ebean_getIntercept()).extract();    		
-    		
-    	} else {
-        	return new CachedBeanDataFromBean(desc, bean, null).extract();    		
-    	}
-    }
-    
-    public static CachedBeanData extract(BeanDescriptor<?> desc, Object bean, EntityBeanIntercept ebi){
-    	return new CachedBeanDataFromBean(desc, bean, ebi).extract();
-    }
-    
-    private CachedBeanDataFromBean(BeanDescriptor<?> desc, Object bean, EntityBeanIntercept ebi) {
-        this.desc = desc;
-        this.bean = bean;
-        this.ebi = ebi;        
-        if (ebi != null){
-        	this.loadedProps = ebi.getLoadedProps(); 
-        	this.extractProps = (loadedProps == null) ? null : new HashSet<String>();
-        } else {
-        	this.extractProps = new HashSet<String>();
-        	this.loadedProps = null;
-        }
-    }
-    
-    private CachedBeanData extract(){
+  public static CachedBeanData extract(BeanDescriptor<?> desc, EntityBean bean) {
 
-        BeanProperty[] props = desc.propertiesNonMany();
+    EntityBeanIntercept ebi = bean._ebean_getIntercept();
+    
+    Object[] data = new Object[desc.getPropertyCount()];
+    boolean[] loaded = new boolean[desc.getPropertyCount()];
+    
+    BeanProperty[] props = desc.propertiesNonMany();
 
-    	Object[] data = new Object[props.length];
-    	
-    	int naturalKeyUpdate = -1;
-        for (int i = 0; i < props.length; i++) {
-        	BeanProperty prop  = props[i];
-            if (includeNonManyProperty(prop.getName())){
-            	
-            	data[i] = prop.getCacheDataValue(bean);
-            	if (prop.isNaturalKey()) {
-            		naturalKeyUpdate = i;
-            	}
-            	if (ebi != null){
-            		if (extractProps != null){
-            			extractProps.add(prop.getName());
-            		}
-            	} else if (data[i] != null){
-            		if (extractProps != null){
-            			extractProps.add(prop.getName());
-            		}
-            	}
-            }
+    Object naturalKey = null;
+
+    for (int i = 0; i < props.length; i++) {
+      BeanProperty prop = props[i];
+      if (ebi.isLoadedProperty(prop.getPropertyIndex())) {
+        int propertyIndex = prop.getPropertyIndex();
+        data[propertyIndex] = prop.getCacheDataValue(bean);
+        loaded[propertyIndex] = true;
+        if (prop.isNaturalKey()) {
+          naturalKey = prop.getValue(bean);
         }
-        
-        Object sharableBean = null;
-        if (desc.isCacheSharableBeans() && ebi != null && loadedProps == null){
-        	if (ebi.isReadOnly()){
-        		sharableBean = bean;
-        	} else {
-        		// create a readOnly sharable instance by copying the data
-        		sharableBean = desc.createBean();
-        		BeanProperty[] propertiesId = desc.propertiesId();
-        		for (int i = 0; i < propertiesId.length; i++) {
-        			Object v = propertiesId[i].getValue(bean);
-        			propertiesId[i].setValue(sharableBean, v);
-                }
-        		BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
-        		for (int i = 0; i < propertiesNonTransient.length; i++) {
-        			Object v = propertiesNonTransient[i].getValue(bean);
-        			propertiesNonTransient[i].setValue(sharableBean, v);
-                }
-        		EntityBeanIntercept ebi = ((EntityBean)sharableBean)._ebean_intercept();
-        		ebi.setReadOnly(true);
-        		ebi.setLoaded();
-        	}
-        }
-        
-        return new CachedBeanData(sharableBean, extractProps, data, naturalKeyUpdate);
+      }
     }
+
+    EntityBean sharableBean = createSharableBean(desc, bean, ebi);
+
+    return new CachedBeanData(sharableBean, loaded, data, naturalKey, null);
+  }
+
+  private static EntityBean createSharableBean(BeanDescriptor<?> desc, EntityBean bean, EntityBeanIntercept beanEbi) {
     
-    private boolean includeNonManyProperty(String name) {
-    	return loadedProps == null || loadedProps.contains(name);
+    if (!desc.isCacheSharableBeans() || !beanEbi.isFullyLoadedBean()) {
+      return null;
     }
+    if (beanEbi.isReadOnly()) {
+      return bean;
+    } 
     
+    // create a readOnly sharable instance by copying the data
+    EntityBean sharableBean = desc.createBean();
+    BeanProperty idProp = desc.getIdProperty();
+    if (idProp != null) {
+      Object v = idProp.getValue(bean);
+      idProp.setValue(sharableBean, v);
+    }
+    BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
+    for (int i = 0; i < propertiesNonTransient.length; i++) {
+      Object v = propertiesNonTransient[i].getValue(bean);
+      propertiesNonTransient[i].setValue(sharableBean, v);
+    }
+    EntityBeanIntercept intercept = sharableBean._ebean_intercept();
+    intercept.setReadOnly(true);
+    intercept.setLoaded();
+    return sharableBean;
+  }
+
+
 }

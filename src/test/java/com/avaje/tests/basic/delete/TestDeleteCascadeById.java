@@ -22,7 +22,7 @@ public class TestDeleteCascadeById extends BaseTestCase {
 
     OrderDetail dummy = Ebean.getReference(OrderDetail.class, 1);
     SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
-    server.getBeanDescriptor(OrderDetail.class).cachePutBeanData(dummy);
+    server.getBeanDescriptor(OrderDetail.class).cacheBeanPut(dummy);
 
     Customer cust = ResetBasicData.createCustAndOrder("DelCas");
     Assert.assertNotNull(cust);

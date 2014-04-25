@@ -15,8 +15,4 @@ public enum DmlMode {
 	 */
 	UPDATE,
 	
-	/**
-	 * The Update or Delete WHERE.
-	 */
-	WHERE
 }

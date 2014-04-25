@@ -1,15 +1,14 @@
 package com.avaje.ebeaninternal.server.query;
 
 import java.sql.SQLException;
-import java.util.concurrent.FutureTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionTouched;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.BeanIdList;
@@ -29,15 +28,11 @@ public class CQueryEngine {
   
   private final CQueryBuilder queryBuilder;
 
-  private final BackgroundExecutor backgroundExecutor;
-
   private final int defaultSecondaryQueryBatchSize = 100;
 
-  public CQueryEngine(DatabasePlatform dbPlatform, Binder binder, BackgroundExecutor backgroundExecutor) {
-
+  public CQueryEngine(DatabasePlatform dbPlatform, Binder binder) {
     this.dbPlatform = dbPlatform;
-    this.backgroundExecutor = backgroundExecutor;
-    this.queryBuilder = new CQueryBuilder(backgroundExecutor, dbPlatform, binder);
+    this.queryBuilder = new CQueryBuilder(dbPlatform, binder);
   }
 
   public <T> CQuery<T> buildQuery(OrmQueryRequest<T> request) {
@@ -155,9 +150,6 @@ public class CQueryEngine {
    */
   public <T> BeanCollection<T> findMany(OrmQueryRequest<T> request) {
 
-    // flag indicating whether we need to close the resources...
-    boolean useBackgroundToContinueFetch = false;
-
     CQuery<T> cquery = queryBuilder.buildQuery(request);
     request.setCancelableQuery(cquery);
 
@@ -181,18 +173,6 @@ public class CQueryEngine {
         beanCollection.setBeanCollectionTouched(collectionTouched);
       }
 
-      if (cquery.useBackgroundToContinueFetch()) {
-        // stop the request from putting connection back into pool
-        // before background fetching is finished.
-        request.setBackgroundFetching();
-        useBackgroundToContinueFetch = true;
-        BackgroundFetch fetch = new BackgroundFetch(cquery);
-
-        FutureTask<Integer> future = new FutureTask<Integer>(fetch);
-        beanCollection.setBackgroundFetch(future);
-        backgroundExecutor.execute(future);
-      }
-
       if (request.isLogSummary()) {
         logFindManySummary(cquery);
       }
@@ -205,18 +185,14 @@ public class CQueryEngine {
       throw cquery.createPersistenceException(e);
       
     } finally {
-      if (useBackgroundToContinueFetch) {
-        // left closing resources to BackgroundFetch...
-      } else {
-        if (cquery != null) {
-          cquery.close();
-        }
-        if (request.getQuery().isFutureFetch()) {
-          // end the transaction for futureFindIds
-          // as it had it's own transaction
-          logger.debug("Future fetch completed!");
-          request.getTransaction().end();
-        }
+      if (cquery != null) {
+        cquery.close();
+      }
+      if (request.getQuery().isFutureFetch()) {
+        // end the transaction for futureFindIds
+        // as it had it's own transaction
+        logger.debug("Future fetch completed!");
+        request.getTransaction().end();
       }
     }
   }
@@ -224,9 +200,10 @@ public class CQueryEngine {
   /**
    * Find and return a single bean using its unique id.
    */
+  @SuppressWarnings("unchecked")
   public <T> T find(OrmQueryRequest<T> request) {
 
-    T bean = null;
+    EntityBean bean = null;
 
     CQuery<T> cquery = queryBuilder.buildQuery(request);
 
@@ -247,7 +224,7 @@ public class CQueryEngine {
 
       request.executeSecondaryQueries(defaultSecondaryQueryBatchSize);
 
-      return bean;
+      return (T)bean;
 
     } catch (SQLException e) {
       throw cquery.createPersistenceException(e);

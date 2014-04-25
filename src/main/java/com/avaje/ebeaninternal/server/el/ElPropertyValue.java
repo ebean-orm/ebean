@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.el;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
 
@@ -14,7 +15,7 @@ public interface ElPropertyValue extends ElPropertyDeploy {
     /**
      * Return the Id values for the given bean value.
      */
-    public Object[] getAssocOneIdValues(Object bean);
+    public Object[] getAssocOneIdValues(EntityBean bean);
 
     /**
      * Return the Id expression string.
@@ -89,13 +90,13 @@ public interface ElPropertyValue extends ElPropertyDeploy {
     /**
      * Return the value from a given entity bean.
      */
-    public Object elGetValue(Object bean);
+    public Object elGetValue(EntityBean bean);
 
     /**
      * Return the value ensuring objects prior to the top scalar property are
      * automatically populated.
      */
-    public Object elGetReference(Object bean);
+    public Object elGetReference(EntityBean bean);
 
     /**
      * Set a value given a root level bean.
@@ -103,12 +104,7 @@ public interface ElPropertyValue extends ElPropertyDeploy {
      * If populate then
      * </p>
      */
-    public void elSetValue(Object bean, Object value, boolean populate, boolean reference);
-
-    /**
-     * Make the owning bean of this property a reference (as in not new/dirty).
-     */
-    public void elSetReference(Object bean);
+    public void elSetValue(EntityBean bean, Object value, boolean populate);
 
     /**
      * Convert the value to the expected type.

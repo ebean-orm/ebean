@@ -4,11 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.OptimisticLockException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.core.PstmtBatch;
@@ -18,8 +20,6 @@ import com.avaje.ebeaninternal.server.persist.BatchedPstmtHolder;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableRequest;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 import com.avaje.ebeaninternal.server.type.DataBind;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for Handler implementations.
@@ -34,8 +34,6 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   protected final PersistRequestBean<?> persistRequest;
 
   protected final StringBuilder bindLog;
-
-  protected final Set<String> loadedProps;
 
   protected final SpiTransaction transaction;
 
@@ -52,12 +50,9 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
 
   protected ArrayList<UpdateGenValue> updateGenValues;
 
-  private Set<String> additionalProps;
-
   protected DmlHandler(PersistRequestBean<?> persistRequest, boolean emptyStringToNull) {
     this.persistRequest = persistRequest;
     this.emptyStringToNull = emptyStringToNull;
-    this.loadedProps = persistRequest.getLoadedProperties();
     this.transaction = persistRequest.getTransaction();
     this.logLevelSql = transaction.isLogSql();
     if (logLevelSql) {
@@ -148,20 +143,6 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     }
   }
 
-  public boolean isIncluded(BeanProperty prop) {
-    return (loadedProps == null || loadedProps.contains(prop.getName()));
-  }
-
-  public boolean isIncludedWhere(BeanProperty prop) {
-    if (prop.isDbEncrypted()) {
-      // update without a version property ...
-      // for encrypted properties only include if it was
-      // also an updated/modified property
-      return isIncluded(prop);
-    }
-    return prop.isDbUpdatable() && (loadedProps == null || loadedProps.contains(prop.getName()));
-  }
-
   /**
    * Bind a raw value. Used to bind the discriminator column.
    */
@@ -194,78 +175,34 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Bind the value to the preparedStatement.
    */
-  public Object bind(Object value, BeanProperty prop, String propName, boolean bindNull)
-      throws SQLException {
-    return bindInternal(logLevelSql, value, prop, propName, bindNull);
+  public Object bind(Object value, BeanProperty prop, String propName) throws SQLException {
+    return bindInternal(logLevelSql, value, prop, propName);
   }
 
   /**
    * Bind the value to the preparedStatement without logging.
    */
-  public Object bindNoLog(Object value, BeanProperty prop, String propName, boolean bindNull)
-      throws SQLException {
-    return bindInternal(false, value, prop, propName, bindNull);
+  public Object bindNoLog(Object value, BeanProperty prop, String propName) throws SQLException {
+    return bindInternal(false, value, prop, propName);
   }
 
-  private Object bindInternal(boolean log, Object value, BeanProperty prop, String propName,
-      boolean bindNull) throws SQLException {
+  private Object bindInternal(boolean log, Object value, BeanProperty prop, String propName) throws SQLException {
 
-    if (!bindNull) {
-      if (emptyStringToNull && (value instanceof String) && ((String) value).length() == 0) {
-        // support Oracle conversion of empty string to null
-        // value = prop.getDbNullValue(value);
-        value = null;
-      }
-    }
-
-    if (!bindNull && value == null) {
-      // where will have IS NULL clause so don't actually bind
-      if (log) {
-        bindLog.append("null, ");
-      }
-    } else {
-      if (log) {
-        if (prop.isLob()) {
-          bindLog.append("[LOB]");
-        } else {
-          String sv = String.valueOf(value);
-          if (sv.length() > 50) {
-            sv = sv.substring(0, 47) + "...";
-          }
-          bindLog.append(sv);
+    if (log) {
+      if (prop.isLob()) {
+        bindLog.append("[LOB]");
+      } else {
+        String sv = String.valueOf(value);
+        if (sv.length() > 50) {
+          sv = sv.substring(0, 47) + "...";
         }
-        bindLog.append(",");
+        bindLog.append(sv);
       }
-      // do the actual binding to PreparedStatement
-      prop.bind(dataBind, value);
+      bindLog.append(",");
     }
+    // do the actual binding to PreparedStatement
+    prop.bind(dataBind, value);
     return value;
-  }
-
-  /**
-   * For generated properties set on insert register as additional loaded
-   * properties if required.
-   */
-  public final void registerAdditionalProperty(String propertyName) {
-    if (loadedProps != null && !loadedProps.contains(propertyName)) {
-      if (additionalProps == null) {
-        additionalProps = new HashSet<String>();
-      }
-      additionalProps.add(propertyName);
-    }
-  }
-
-  /**
-   * Set any additional (generated) properties to the set of loaded properties
-   * if required.
-   */
-  protected void setAdditionalProperties() {
-    if (additionalProps != null) {
-      // additional generated properties set on insert
-      // added to the set of loaded properties
-      additionalProps.addAll(loadedProps);
-      persistRequest.setLoadedProps(additionalProps);
-    }
   }
 
   /**
@@ -277,12 +214,11 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * generation.
    * </p>
    */
-  public void registerUpdateGenValue(BeanProperty prop, Object bean, Object value) {
+  public void registerUpdateGenValue(BeanProperty prop, EntityBean bean, Object value) {
     if (updateGenValues == null) {
       updateGenValues = new ArrayList<UpdateGenValue>();
     }
     updateGenValues.add(new UpdateGenValue(prop, bean, value));
-    registerAdditionalProperty(prop.getName());
   }
 
   /**
@@ -303,6 +239,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    */
   protected PreparedStatement getPstmt(SpiTransaction t, String sql, boolean genKeys)
       throws SQLException {
+    
     Connection conn = t.getInternalConnection();
     if (genKeys) {
       // the Id generated is always the first column
@@ -353,11 +290,11 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
 
     private final BeanProperty property;
 
-    private final Object bean;
+    private final EntityBean bean;
 
     private final Object value;
 
-    private UpdateGenValue(BeanProperty property, Object bean, Object value) {
+    private UpdateGenValue(BeanProperty property, EntityBean bean, Object value) {
       this.property = property;
       this.bean = bean;
       this.value = value;

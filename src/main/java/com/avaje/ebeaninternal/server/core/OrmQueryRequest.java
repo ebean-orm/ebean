@@ -56,13 +56,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   private HashQueryPlan queryPlanHash;
 
   /**
-   * Flag set if background fetching taking place. In this case the transaction
-   * is rolled back by the background fetching thread. Background fetching
-   * always takes place in its own transaction.
-   */
-  private boolean backgroundFetching;
-
-  /**
    * Create the InternalQueryRequest.
    */
   public OrmQueryRequest(SpiEbeanServer server, OrmQueryEngine queryEngine, SpiQuery<T> query, BeanDescriptor<T> desc, SpiTransaction t) {
@@ -163,12 +156,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   @Override
   public void initTransIfRequired() {
     // first check if the query requires its own transaction
-    if (query.createOwnTransaction()) {
-      // using background fetch or query listener etc
-      transaction = ebeanServer.createQueryTransaction();
-      createdTransaction = true;
-
-    } else if (transaction == null) {
+    if (transaction == null) {
       // maybe a current one
       transaction = ebeanServer.getCurrentServerTransaction();
       if (transaction == null) {
@@ -202,17 +190,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    * </p>
    */
   public void endTransIfRequired() {
-    if (createdTransaction && !backgroundFetching) {
+    if (createdTransaction) {
       // we can rollback as readOnly transaction
       transaction.rollback();
     }
-  }
-
-  /**
-   * This query is using background fetching.
-   */
-  public void setBackgroundFetching() {
-    backgroundFetching = true;
   }
 
   /**
@@ -277,12 +258,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public Map<?, ?> findMap() {
     String mapKey = query.getMapKey();
     if (mapKey == null) {
-      BeanProperty[] ids = beanDescriptor.propertiesId();
-      if (ids.length == 1) {
-        query.setMapKey(ids[0].getName());
+      BeanProperty idProp = beanDescriptor.getIdProperty();
+      if (idProp != null) {
+        query.setMapKey(idProp.getName());
       } else {
-        String msg = "No mapKey specified for query";
-        throw new PersistenceException(msg);
+        throw new PersistenceException("No mapKey specified for query");
       }
     }
     return (Map<?, ?>) queryEngine.findMany(this);
@@ -356,8 +336,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
     cacheKey = query.queryHash();
 
-    // TODO: Sort out returning BeanCollection from L2 cache
-    return null;
+    return beanDescriptor.queryCacheGet(cacheKey);
   }
 
   public void putToQueryCache(BeanCollection<T> queryResult) {

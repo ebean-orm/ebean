@@ -39,11 +39,6 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   public boolean isDefaultDeleteMissingChildren();
 
   /**
-   * Return true if UpdateNullProperties defaults to true for stateless updates.
-   */
-  public boolean isDefaultUpdateNullProperties();
-
-  /**
    * Return the DatabasePlatform for this server.
    */
   public DatabasePlatform getDatabasePlatform();

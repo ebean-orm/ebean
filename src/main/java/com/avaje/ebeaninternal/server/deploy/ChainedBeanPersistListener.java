@@ -12,6 +12,7 @@ import com.avaje.ebean.event.BeanPersistListener;
 public class ChainedBeanPersistListener<T> implements BeanPersistListener<T> {
 
 	private final List<BeanPersistListener<T>> list;
+	
 	private final BeanPersistListener<T>[] chain;
 	
 	/**

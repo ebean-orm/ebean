@@ -19,21 +19,17 @@ public class IdBinderFactory {
 	/**
 	 * Create the IdConvertSet for the given type of Id properties.
 	 */
-	public IdBinder createIdBinder(BeanProperty[] uids) {
+	public IdBinder createIdBinder(BeanProperty id) {
 		
-		if (uids.length == 0){
+		if (id == null){
 			// for report type beans that don't need an id
 			return EMPTY;
 			
-		} else if (uids.length == 1){
-			if (uids[0].isEmbedded()){
-				return new IdBinderEmbedded(idInExpandedForm, (BeanPropertyAssocOne<?>)uids[0]);
-			} else {
-				return new IdBinderSimple(uids[0]);
-			}
-		
+		} 
+		if (id.isEmbedded()){
+			return new IdBinderEmbedded(idInExpandedForm, (BeanPropertyAssocOne<?>)id);
 		} else {
-			return new IdBinderMultiple(uids);
+			return new IdBinderSimple(id);
 		}
 	}
 	

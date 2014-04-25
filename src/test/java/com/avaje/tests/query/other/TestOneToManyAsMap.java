@@ -28,15 +28,20 @@ public class TestOneToManyAsMap extends BaseTestCase {
     u2.setName("Charlie Brown");
     MpRole ourl = new MpRole();
     ourl.setOrganizationId(47L);
-    u2.getRoles().put(ourl.getOrganizationId(), ourl);
+    u2.getRoles().put("one", ourl);
     eServer.save(u2);
 
     MpUser u3 = eServer.find(MpUser.class, u.getId());
     Assert.assertEquals("Charlie Brown", u3.getName());
 
-    Map<Long, MpRole> listMap = u3.getRoles();
+    Map<String, MpRole> listMap = u3.getRoles();
     Assert.assertEquals(1, listMap.size());
-
+    
+    MpRole mpRole = listMap.get("one");
+    Assert.assertNotNull(mpRole);
+    Assert.assertEquals(Long.valueOf(47L), mpRole.getOrganizationId());
+    Assert.assertEquals("one", mpRole.getCode());
+    
   }
 
 }

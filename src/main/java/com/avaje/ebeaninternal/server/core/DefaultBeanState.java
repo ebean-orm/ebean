@@ -1,10 +1,11 @@
 package com.avaje.ebeaninternal.server.core;
 
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import com.avaje.ebean.BeanState;
+import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 
@@ -13,9 +14,9 @@ import com.avaje.ebean.bean.EntityBeanIntercept;
  */
 public class DefaultBeanState implements BeanState {
 
-	final EntityBean entityBean;
+	private final EntityBean entityBean;
 	
-	final EntityBeanIntercept intercept;
+	private final EntityBeanIntercept intercept;
 	
 	public DefaultBeanState(EntityBean  entityBean){
 		this.entityBean = entityBean;
@@ -39,14 +40,16 @@ public class DefaultBeanState implements BeanState {
 	}
 	
 	public Set<String> getLoadedProps() {
-	    Set<String> props = intercept.getLoadedProps();
-	    return props == null ? null : Collections.unmodifiableSet(props);
+	  return intercept.getLoadedPropertyNames();
 	}
 	
 	public Set<String> getChangedProps() {
-	    Set<String> props = intercept.getChangedProps();
-        return props == null ? null : Collections.unmodifiableSet(props);
-    }
+	  return intercept.getDirtyPropertyNames();
+  }
+	
+  public Map<String,ValuePair> getDirtyValues() {
+    return intercept.getDirtyValues();
+  }
 	
 	public boolean isReadOnly() {
 		return intercept.isReadOnly();
@@ -64,14 +67,8 @@ public class DefaultBeanState implements BeanState {
 		entityBean.removePropertyChangeListener(listener);
 	}
 
-	public void setLoaded(Set<String> loadedProperties) {
-		intercept.setLoadedProps(loadedProperties);
-		intercept.setLoaded();
+	public void setLoaded() {
+	  intercept.setLoaded();
 	}
-
-	public void setReference() {
-		intercept.setReference();
-	}
-	
 	
 }

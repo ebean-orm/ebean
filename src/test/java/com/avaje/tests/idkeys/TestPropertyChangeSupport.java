@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.tests.idkeys.db.AuditLog;
@@ -165,6 +166,9 @@ public class TestPropertyChangeSupport extends EbeanTestCase implements Property
     {
         try
         {
+          
+          //Ebean.getBeanState(al).addPropertyChangeListener(listener);
+          
             Method apcs = al.getClass().getMethod("addPropertyChangeListener", PropertyChangeListener.class);
             apcs.invoke(al, listener);
         }

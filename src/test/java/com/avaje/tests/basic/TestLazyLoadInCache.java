@@ -49,9 +49,6 @@ public class TestLazyLoadInCache extends BaseTestCase {
 		Assert.assertFalse(loadedProps.contains("status"));
 		
 		cust1.getStatus();
-				
-		// null after lazy load
-		Assert.assertNull(Ebean.getBeanState(cust1).getLoadedProps());
 		
 		// a readOnly reference
 		Address billingAddress = cust1.getBillingAddress();

@@ -3,14 +3,14 @@ package com.avaje.ebeaninternal.server.persist.dml;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
-import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.annotation.ConcurrencyMode;
+import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableId;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableList;
@@ -28,7 +28,6 @@ public final class UpdateMeta {
   private final BindableList set;
   private final BindableId id;
   private final Bindable version;
-  private final Bindable all;
 
   private final String tableName;
 
@@ -37,20 +36,18 @@ public final class UpdateMeta {
 
   private final boolean emptyStringAsNull;
 
-  public UpdateMeta(boolean emptyStringAsNull, BeanDescriptor<?> desc, BindableList set, BindableId id, Bindable version, Bindable all) {
+  public UpdateMeta(boolean emptyStringAsNull, BeanDescriptor<?> desc, BindableList set, BindableId id, Bindable version) {
     this.emptyStringAsNull = emptyStringAsNull;
     this.tableName = desc.getBaseTable();
     this.set = set;
     this.id = id;
     this.version = version;
-    this.all = all;
 
-    this.sqlNone = genSql(ConcurrencyMode.NONE, null, null);
-    this.sqlVersion = genSql(ConcurrencyMode.VERSION, null, null);
+    this.sqlNone = genSql(ConcurrencyMode.NONE, null, set);
+    this.sqlVersion = genSql(ConcurrencyMode.VERSION, null, set);
 
     this.modeNoneUpdatePlan = new UpdatePlan(ConcurrencyMode.NONE, sqlNone, set);
     this.modeVersionUpdatePlan = new UpdatePlan(ConcurrencyMode.VERSION, sqlVersion, set);
-
   }
 
   /**
@@ -72,19 +69,15 @@ public final class UpdateMeta {
    */
   public void bind(PersistRequestBean<?> persist, DmlHandler bind, SpiUpdatePlan updatePlan) throws SQLException {
 
-    Object bean = persist.getBean();
+    EntityBean bean = persist.getEntityBean();
 
     updatePlan.bindSet(bind, bean);
 
-    id.dmlBind(bind, false, bean);
+    id.dmlBind(bind, bean);
 
     switch (persist.getConcurrencyMode()) {
     case VERSION:
-      version.dmlBind(bind, false, bean);
-      break;
-    case ALL:
-      Object oldBean = persist.getOldValues();
-      all.dmlBindWhere(bind, true, oldBean);
+      version.dmlBind(bind, bean);
       break;
 
     default:
@@ -110,14 +103,6 @@ public final class UpdateMeta {
     case VERSION:
       return modeVersionUpdatePlan;
 
-    case ALL:
-      Object oldValues = request.getOldValues();
-      if (oldValues == null) {
-        throw new PersistenceException("OldValues are null?");
-      }
-      String sql = genDynamicWhere(request.getUpdatedProperties(), request.getLoadedProperties(), oldValues);
-      return new UpdatePlan(ConcurrencyMode.ALL, sql, set);
-
     default:
       throw new RuntimeException("Invalid mode " + mode);
     }
@@ -125,26 +110,23 @@ public final class UpdateMeta {
 
   private SpiUpdatePlan getDynamicUpdatePlan(ConcurrencyMode mode, PersistRequestBean<?> persistRequest) {
 
-    Set<String> updatedProps = persistRequest.getUpdatedProperties();
 
-    if (ConcurrencyMode.ALL.equals(mode)) {
-      // due to is null in where clause we won't bother trying to
-      // cache plans for ConcurrencyMode.ALL
-      String sql = genSql(mode, persistRequest, null);
-      if (sql == null) {
-        // changed properties must have been updatable=false
-        return UpdatePlan.EMPTY_SET_CLAUSE;
-      } else {
-        return new UpdatePlan(null, mode, sql, set, updatedProps);
+    // we can use a cached UpdatePlan for the changed properties
+    
+    EntityBeanIntercept ebi = persistRequest.getEntityBeanIntercept();
+    int hash = ebi.getDirtyPropertyHash();
+    
+    BeanDescriptor<?> beanDescriptor = persistRequest.getBeanDescriptor();
+    
+    BeanProperty versionProperty = beanDescriptor.getVersionProperty();
+    if (versionProperty != null) {
+      if (ebi.isLoadedProperty(versionProperty.getPropertyIndex())) {
+        hash = hash * 31 + 7;
       }
     }
 
-    // we can use a cached UpdatePlan for the changed properties
-    int hash = mode.hashCode();
-    hash = hash * 31 + (updatedProps == null ? 0 : updatedProps.hashCode());
     Integer key = Integer.valueOf(hash);
 
-    BeanDescriptor<?> beanDescriptor = persistRequest.getBeanDescriptor();
     SpiUpdatePlan updatePlan = beanDescriptor.getUpdatePlan(key);
     if (updatePlan != null) {
       return updatePlan;
@@ -154,18 +136,13 @@ public final class UpdateMeta {
 
     // build a bindableList that only contains the changed properties
     List<Bindable> list = new ArrayList<Bindable>();
-    if (updatedProps == null) {
-      // update all the properties
-      set.addAll(list);
-    } else {
-      set.addChanged(persistRequest, list);  
-    }
+    set.addToUpdate(persistRequest, list);  
     BindableList bindableList = new BindableList(list);
 
     // build the SQL for this update statement
     String sql = genSql(mode, persistRequest, bindableList);
 
-    updatePlan = new UpdatePlan(key, mode, sql, bindableList, null);
+    updatePlan = new UpdatePlan(key, mode, sql, bindableList);
 
     // add the UpdatePlan to the cache
     beanDescriptor.putUpdatePlan(key, updatePlan);
@@ -188,12 +165,8 @@ public final class UpdateMeta {
     request.append("update ").append(tableName).append(" set ");
 
     request.setUpdateSetMode();
-    if (bindableList != null) {
-      bindableList.dmlAppend(request, false);
-    } else {
-      set.dmlAppend(request, true);
-    }
-
+    bindableList.dmlAppend(request);
+    
     if (request.getBindColumnCount() == 0) {
       // update properties must have been updatable=false
       // with the result that nothing is in the set clause
@@ -203,38 +176,15 @@ public final class UpdateMeta {
     request.append(" where ");
 
     request.setWhereIdMode();
-    id.dmlAppend(request, false);
+    id.dmlAppend(request);
 
     if (ConcurrencyMode.VERSION.equals(conMode)) {
       if (version == null) {
         return null;
       }
-      version.dmlAppend(request, false);
-
-    } else if (ConcurrencyMode.ALL.equals(conMode)) {
-
-      all.dmlWhere(request, true, request.getOldValues());
+      version.dmlAppend(request);
     }
-
-    return request.toString();
-  }
-
-  /**
-   * Generate the sql dynamically for where using IS NULL for binding null
-   * values.
-   */
-  private String genDynamicWhere(Set<String> loadedProps, Set<String> whereProps, Object oldBean) {
-
-    // always has a preceding id property(s) so the first
-    // option is always ' and ' and not blank.
-
-    GenerateDmlRequest request = new GenerateDmlRequest(emptyStringAsNull, loadedProps, whereProps, oldBean);
-
-    request.append(sqlNone);
-
-    request.setWhereMode();
-    all.dmlWhere(request, true, oldBean);
-
+    
     return request.toString();
   }
 

@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.transaction;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.cluster.BinaryMessage;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
@@ -21,7 +22,7 @@ public class BeanDeltaProperty {
         return beanProperty.getName()+":"+value;
     }
     
-    public void apply(Object bean) {
+    public void apply(EntityBean bean) {
         beanProperty.setValue(bean, value);
     }
     
