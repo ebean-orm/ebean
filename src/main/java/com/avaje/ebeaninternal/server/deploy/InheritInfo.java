@@ -224,8 +224,8 @@ public class InheritInfo {
 	/**
 	 * Create an EntityBean for this type.
 	 */
-	public EntityBean createBean() {
-		return descriptor.createBean();
+	public EntityBean createEntityBean() {
+		return descriptor.createEntityBean();
 	}
 	
 	/**

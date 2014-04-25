@@ -46,7 +46,7 @@ public class CachedBeanDataFromBean {
     } 
     
     // create a readOnly sharable instance by copying the data
-    EntityBean sharableBean = desc.createBean();
+    EntityBean sharableBean = desc.createEntityBean();
     BeanProperty idProp = desc.getIdProperty();
     if (idProp != null) {
       Object v = idProp.getValue(bean);

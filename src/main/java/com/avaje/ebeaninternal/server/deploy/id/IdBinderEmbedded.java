@@ -246,7 +246,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
   public Object readData(DataInput dataInput) throws IOException {
 
-    EntityBean embId = idDesc.createBean();
+    EntityBean embId = idDesc.createEntityBean();
     boolean notNull = true;
 
     for (int i = 0; i < props.length; i++) {
@@ -279,7 +279,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
   public Object read(DbReadContext ctx) throws SQLException {
 
-    EntityBean embId = idDesc.createBean();
+    EntityBean embId = idDesc.createEntityBean();
     boolean notNull = true;
 
     for (int i = 0; i < props.length; i++) {

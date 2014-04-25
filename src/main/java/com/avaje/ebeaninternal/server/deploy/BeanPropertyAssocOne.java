@@ -387,7 +387,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
      * value.
      */
     public Object createEmbeddedId() {
-        return getTargetDescriptor().createBean();
+        return getTargetDescriptor().createEntityBean();
     }
 
     /**

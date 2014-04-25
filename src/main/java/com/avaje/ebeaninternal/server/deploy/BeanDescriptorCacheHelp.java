@@ -419,7 +419,7 @@ public final class BeanDescriptorCacheHelp<T> {
       }
     }
 
-    EntityBean bean = desc.createBean();
+    EntityBean bean = desc.createEntityBean();
     desc.convertSetId(id, bean);
     if (Boolean.TRUE.equals(readOnly)) {
       bean._ebean_getIntercept().setReadOnly(true);

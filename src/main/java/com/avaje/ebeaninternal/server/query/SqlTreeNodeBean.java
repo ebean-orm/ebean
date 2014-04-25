@@ -182,7 +182,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
         localType = null;
         localDesc = desc;
       } else {
-        localBean = localInfo.createBean();
+        localBean = localInfo.createEntityBean();
         localType = localInfo.getType();
         localIdBinder = localInfo.getIdBinder();
         localDesc = localInfo.getBeanDescriptor();
@@ -191,7 +191,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     } else {
       localType = null;
       localDesc = desc;
-      localBean = desc.createBean();
+      localBean = desc.createEntityBean();
       localIdBinder = idBinder;
     }
 

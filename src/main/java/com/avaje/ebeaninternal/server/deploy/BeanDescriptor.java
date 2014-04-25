@@ -62,7 +62,6 @@ import com.avaje.ebeaninternal.server.query.CQueryPlan;
 import com.avaje.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
-import com.avaje.ebeaninternal.server.reflect.BeanReflect;
 import com.avaje.ebeaninternal.server.text.json.ReadJsonContext;
 import com.avaje.ebeaninternal.server.text.json.ReadJsonContext.ReadBeanState;
 import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
@@ -147,12 +146,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * The base database table.
    */
   private final String baseTable;
-
-  /**
-   * Used to provide mechanism to new EntityBean instances. Generated code
-   * faster than reflection at this stage.
-   */
-  private final BeanReflect beanReflect;
 
   /**
    * Map of BeanProperty Linked so as to preserve order.
@@ -298,6 +291,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   private final TypeManager typeManager;
 
+  private final EntityBean prototypeEntityBean;
+  
   private final IdBinder idBinder;
 
   private String idBinderInLHSSql;
@@ -345,6 +340,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
     this.typeManager = typeManager;
     this.beanType = deploy.getBeanType();
+    this.prototypeEntityBean = createPrototypeEntityBean(beanType);
+    
     this.namedQueries = deploy.getNamedQueries();
     this.namedUpdates = deploy.getNamedUpdates();
 
@@ -372,8 +369,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.extraAttrMap = deploy.getExtraAttributeMap();
 
     this.baseTable = InternString.intern(deploy.getBaseTable());
-
-    this.beanReflect = deploy.getBeanReflect();
 
     this.autoFetchTunable = EntityType.ORM.equals(entityType) && (beanFinder == null);
 
@@ -434,11 +429,25 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     if (Modifier.isAbstract(beanType.getModifiers())) {
       this.idPropertyIndex = -1;
       this.versionPropertyIndex = -1;
+      
     } else {
-      EntityBean entityBean = createEntityBean();
-      EntityBeanIntercept ebi = entityBean._ebean_getIntercept();
+      EntityBeanIntercept ebi = prototypeEntityBean._ebean_getIntercept();
       this.idPropertyIndex = (idProperty == null) ? -1 : ebi.findProperty(idProperty.getName());
       this.versionPropertyIndex = (versionProperty == null) ? -1 : ebi.findProperty(versionProperty.getName());
+    }
+  }
+
+  /**
+   * Create an entity bean that is used as a prototype/factory to create new instances. 
+   */
+  private EntityBean createPrototypeEntityBean(Class<T> beanType) {
+    if (Modifier.isAbstract(beanType.getModifiers())) {
+      return null;      
+    } 
+    try {
+      return (EntityBean) beanType.newInstance();
+    } catch (Exception e) {
+      throw new IllegalStateException("Error trying to create the prototypeEntityBean for "+beanType, e);
     }
   }
   
@@ -1114,21 +1123,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * Create an EntityBean.
-   */
-  public EntityBean createBean() {
-    return createEntityBean();
-  }
-
-  /**
-   * Creates a new EntityBean without using the creation queue.
+   * Creates a new EntityBean.
    */
   public EntityBean createEntityBean() {
     try {
-      // Note factoryType is used indirectly via beanReflect
-      return (EntityBean) beanReflect.createEntityBean();
-      
-
+      return (EntityBean)prototypeEntityBean._ebean_newInstance();
     } catch (Exception ex) {
       throw new PersistenceException(ex);
     }
@@ -1150,7 +1149,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       }
     }
     try {
-      EntityBean eb = createBean();
+      EntityBean eb = createEntityBean();
 
       convertSetId(id, eb);
 
