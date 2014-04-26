@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.persist.dml;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Set;
 
 import javax.persistence.OptimisticLockException;
 

@@ -22,6 +22,7 @@ import javax.persistence.Transient;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.EmbeddedColumns;
 import com.avaje.ebean.annotation.Encrypted;
@@ -37,6 +38,7 @@ import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.idgen.UuidIdGenerator;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
@@ -102,6 +104,12 @@ public class AnnotationFields extends AnnotationParser {
       prop.setEmbedded(true);
     }
 
+    if (prop instanceof DeployBeanPropertyAssocOne<?>) {
+      if (prop.isId() && !prop.isEmbedded()) {
+        prop.setEmbedded(true);
+      }
+      readEmbeddedAttributeOverrides((DeployBeanPropertyAssocOne<?>)prop);
+    }
   }
 
   private void readField(DeployBeanProperty prop) {

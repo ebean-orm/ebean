@@ -26,7 +26,7 @@ public final class BindableIdEmbedded implements BindableId {
 
   public BindableIdEmbedded(BeanPropertyAssocOne<?> embId, BeanDescriptor<?> desc) {
     this.embId = embId;
-    this.props = embId.getTargetDescriptor().propertiesBaseScalar();
+    this.props = embId.getProperties();
     matches = MatchedImportedProperty.build(props, desc);
   }
 
