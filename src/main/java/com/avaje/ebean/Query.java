@@ -615,6 +615,7 @@ public interface Query<T> extends Serializable {
    * @param pageSize
    *          the number of beans fetched per Page
    * 
+   * @deprecated
    */
   public PagingList<T> findPagingList(int pageSize);
 

@@ -547,7 +547,8 @@ public interface EbeanServer {
 
   /**
    * Find using a PagingList with explicit transaction and pageSize.
-   */
+   * @deprecated
+   */  
   public <T> PagingList<T> findPagingList(Query<T> query, Transaction transaction, int pageSize);
 
   /**
