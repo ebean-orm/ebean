@@ -595,6 +595,7 @@ public interface Query<T> extends Serializable {
    * </p>
    * 
    * @return a Future object for the list result of the query
+   * @deprecated
    */
   public FutureList<T> findFutureList();
 

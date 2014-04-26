@@ -524,6 +524,7 @@ public interface EbeanServer {
    * @param t
    *          the transaction (can be null).
    * @return a Future object for the list result of the query
+   * @deprecated
    */
   public <T> FutureList<T> findFutureList(Query<T> query, Transaction transaction);
 
@@ -540,6 +541,7 @@ public interface EbeanServer {
    * @param t
    *          the transaction (can be null).
    * @return a Future object for the list result of the query
+   * @deprecated 
    */
   public SqlFutureList findFutureList(SqlQuery query, Transaction transaction);
 

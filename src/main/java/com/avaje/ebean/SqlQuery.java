@@ -79,6 +79,7 @@ public interface SqlQuery extends Serializable {
    * </p>
    * 
    * @return a Future object for the list result of the query
+   * @deprecated
    */
   public SqlFutureList findFutureList();
 
