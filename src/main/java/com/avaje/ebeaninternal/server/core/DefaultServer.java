@@ -90,7 +90,6 @@ import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.el.ElFilter;
 import com.avaje.ebeaninternal.server.jmx.MAdminAutofetch;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
-import com.avaje.ebeaninternal.server.loadcontext.DLoadContext;
 import com.avaje.ebeaninternal.server.query.CQuery;
 import com.avaje.ebeaninternal.server.query.CQueryEngine;
 import com.avaje.ebeaninternal.server.query.CallableQueryIds;
@@ -105,7 +104,6 @@ import com.avaje.ebeaninternal.server.query.SqlQueryFutureList;
 import com.avaje.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import com.avaje.ebeaninternal.server.querydefn.DefaultOrmUpdate;
 import com.avaje.ebeaninternal.server.querydefn.DefaultRelationalQuery;
-import com.avaje.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import com.avaje.ebeaninternal.server.text.csv.TCsvReader;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
@@ -125,6 +123,8 @@ public final class DefaultServer implements SpiEbeanServer {
   
   private static final String AVAJE_EBEAN = Ebean.class.getName().substring(0, 15);
   
+  private final ServerConfig serverConfig;
+  
   private final String serverName;
 
   private final DatabasePlatform databasePlatform;
@@ -143,8 +143,6 @@ public final class DefaultServer implements SpiEbeanServer {
    */
   private final boolean rollbackOnChecked;
   
-  private final boolean defaultDeleteMissingChildren;
-
   /**
    * Handles the save, delete, updateSql CallableSql.
    */
@@ -228,8 +226,7 @@ public final class DefaultServer implements SpiEbeanServer {
    */
   public DefaultServer(InternalConfiguration config, ServerCacheManager cache) {
 
-    ServerConfig serverConfig = config.getServerConfig();
-    
+    this.serverConfig = config.getServerConfig();
     this.objectGraphStats = new ConcurrentHashMap<ObjectGraphNode, CObjectGraphNodeStatistics>();
     this.metaInfoManager = new DefaultMetaInfoManager(this);
     this.serverCacheManager = cache;
@@ -250,9 +247,6 @@ public final class DefaultServer implements SpiEbeanServer {
     this.collectQueryOrigins = serverConfig.isCollectQueryOrigins();
     this.collectQueryStatsByNode = serverConfig.isCollectQueryStatsByNode();
     this.maxCallStack = GlobalProperties.getInt("ebean.maxCallStack", 5);
-
-    this.defaultDeleteMissingChildren = "true".equalsIgnoreCase(config.getServerConfig()
-        .getProperty("defaultDeleteMissingChildren", "true"));
 
     this.rollbackOnChecked = GlobalProperties.getBoolean("ebean.transaction.rollbackOnChecked", true);
     this.transactionManager = config.getTransactionManager();
@@ -309,16 +303,16 @@ public final class DefaultServer implements SpiEbeanServer {
     return collectQueryOrigins;
   }
 
-  public boolean isDefaultDeleteMissingChildren() {
-    return defaultDeleteMissingChildren;
-  }
-
   public int getLazyLoadBatchSize() {
     return lazyLoadBatchSize;
   }
 
   public PstmtBatch getPstmtBatch() {
     return pstmtBatch;
+  }
+
+  public ServerConfig getServerConfig() {
+    return serverConfig;
   }
 
   public DatabasePlatform getDatabasePlatform() {
@@ -1571,63 +1565,109 @@ public final class DefaultServer implements SpiEbeanServer {
    * Save the bean with an explicit transaction.
    */
   public void save(Object bean, Transaction t) {
-    
     persister.save(checkEntityBean(bean), t);
   }
 
   /**
-   * Force an update using the bean updating non-null properties.
+   * Update the bean using the default 'updatesDeleteMissingChildren' setting. 
    */
   public void update(Object bean) {
     update(bean, null);
   }
 
   /**
-   * Force an update using the bean explicitly stating which properties to
-   * include in the update.
+   * Update the bean using the default 'updatesDeleteMissingChildren' setting. 
    */
   public void update(Object bean, Transaction t) {
-    update(bean, t, defaultDeleteMissingChildren);
+    persister.update(checkEntityBean(bean), t);
   }
 
   /**
-   * Force an update using the bean explicitly stating which properties to
-   * include in the update.
+   * Update the bean specifying the deleteMissingChildren option.
    */
   public void update(Object bean, Transaction t, boolean deleteMissingChildren) {
-    
-    persister.forceUpdate(checkEntityBean(bean), t, deleteMissingChildren);
+    persister.update(checkEntityBean(bean), t, deleteMissingChildren);
   }
 
   /**
-   * Force the bean to be saved with an explicit insert.
-   * <p>
-   * Typically you would use save() and let Ebean determine if the bean should
-   * be inserted or updated. This can be useful when you are transferring data
-   * between databases and want to explicitly insert a bean into a different
-   * database that it came from.
-   * </p>
+   * Update all beans in the collection.
+   */
+  public void update(Collection<?> beans) {
+    update(beans, null);
+  }
+  
+  /**
+   * Update all beans in the collection with an explicit transaction.
+   */
+  public void update(Collection<?> beans, Transaction t) {
+
+    if (beans == null || beans.isEmpty()) {
+      // Nothing to update?
+      return;
+    }
+    
+    TransWrapper wrap = initTransIfRequired(t);
+    try {
+      SpiTransaction trans = wrap.transaction;
+      for (Object bean : beans) {
+        update(checkEntityBean(bean), trans);
+      }
+      wrap.commitIfCreated();
+      
+    } catch (RuntimeException e) {
+      wrap.rollbackIfCreated();
+      throw e;
+    }
+  }
+  
+  /**
+   * Insert the bean.
    */
   public void insert(Object bean) {
     insert(bean, null);
   }
 
   /**
-   * Force the bean to be saved with an explicit insert.
-   * <p>
-   * Typically you would use save() and let Ebean determine if the bean should
-   * be inserted or updated. This can be useful when you are transferring data
-   * between databases and want to explicitly insert a bean into a different
-   * database that it came from.
-   * </p>
+   * Insert the bean with a transaction.
    */
   public void insert(Object bean, Transaction t) {
-    persister.forceInsert(checkEntityBean(bean), t);
+    persister.insert(checkEntityBean(bean), t);
+  }
+
+  /**
+   * Insert all beans in the collection.
+   */
+  public void insert(Collection<?> beans) {
+    insert(beans, null);
+  }
+  
+  /**
+   * Insert all beans in the collection with a transaction.
+   */
+  public void insert(Collection<?> beans, Transaction t) {
+
+    if (beans == null || beans.isEmpty()) {
+      // Nothing to insert?
+      return;
+    }
+    
+    TransWrapper wrap = initTransIfRequired(t);
+    try {
+      SpiTransaction trans = wrap.transaction;
+      for (Object bean : beans) {
+        persister.insert(checkEntityBean(bean), trans);
+      }
+      wrap.commitIfCreated();
+      
+    } catch (RuntimeException e) {
+      wrap.rollbackIfCreated();
+      throw e;
+    }
   }
 
   private EntityBean checkEntityBean(Object bean) {
     if (bean == null) {
-      throw new NullPointerException(Message.msg("bean.isnull"));
+      throw new IllegalArgumentException(Message.msg("bean.isnull"));
     }
     if (bean instanceof EntityBean == false) {
       throw new IllegalArgumentException("Was expecting an EntityBean but got a "+bean.getClass());
@@ -1735,6 +1775,14 @@ public final class DefaultServer implements SpiEbeanServer {
     return save(c.iterator(), null);
   }
 
+  /**
+   * Perform an update or insert on each bean in the collection. Returns the
+   * number of beans that where saved.
+   */
+  public int save(Collection<?> c, Transaction t) {
+    return save(c.iterator(), t);
+  }
+  
   /**
    * Save all beans in the iterator with an explicit transaction.
    */

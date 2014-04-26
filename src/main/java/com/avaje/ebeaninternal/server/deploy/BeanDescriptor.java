@@ -207,8 +207,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Derived list of properties that are used for version concurrency checking.
    */
   private final BeanProperty versionProperty;
+  
   private final int versionPropertyIndex;
-
+  
   /**
    * Properties local to this type (not from a super type).
    */
@@ -436,7 +437,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       this.versionPropertyIndex = (versionProperty == null) ? -1 : ebi.findProperty(versionProperty.getName());
     }
   }
-
+  
   /**
    * Create an entity bean that is used as a prototype/factory to create new instances. 
    */
@@ -1818,6 +1819,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   public boolean isInsertMode(EntityBeanIntercept ebi) {
+    
+    if (ebi.isLoaded()) {
+      return false;
+    }
+    
+    // determine based on Id property
     if (idProperty.isEmbedded()) {
       return !ebi.isLoaded();
     }

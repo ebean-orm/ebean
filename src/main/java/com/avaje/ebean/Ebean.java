@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.cache.ServerCacheManager;
@@ -17,8 +19,6 @@ import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This Ebean object is effectively a singleton that holds a map of registered
@@ -462,46 +462,57 @@ public final class Ebean {
   }
   
   /**
-   * Force an update using the bean updating the non-null properties.
+   * Insert a collection of beans.
+   */
+  public static void insert(Collection<?> beans) {
+    serverMgr.getPrimaryServer().insert(beans);
+  }
+  
+  /**
+   * Saves the bean using an update. If you know you are updating a bean then it is preferrable to
+   * use this update() method rather than save().
    * <p>
-   * You can use this method to FORCE an update to occur (even on a bean that
-   * has not been fetched but say built from JSON or XML). When
-   * {@link Ebean#save(Object)} is used Ebean determines whether to use an
-   * insert or an update based on the state of the bean. Using this method will
-   * force an update to occur.
+   * <b>Stateless updates:</b> Note that the bean does not have to be previously fetched to call
+   * update().You can create a new instance and set some of its properties programmatically for via
+   * JSON/XML marshalling etc. This is described as a 'stateless update'.
    * </p>
    * <p>
-   * It is expected that this method is most useful in stateless REST services
-   * or web applications where you have the values you wish to update but no
-   * existing bean.
+   * <b>Optimistic Locking: </b> Note that if the version property is not set when update() is
+   * called then no optimistic locking is performed (internally ConcurrencyMode.NONE is used).
    * </p>
    * <p>
-   * For updates against beans that have not been fetched (say built from JSON
-   * or XML) this will treat deleteMissingChildren=true and will delete any
-   * 'missing children'. Refer to
-   * {@link EbeanServer#update(Object, Set, Transaction, boolean, boolean)}.
+   * <b>{@link ServerConfig#setUpdatesDeleteMissingChildren(boolean)}: </b> When cascade saving to a
+   * OneToMany or ManyToMany the updatesDeleteMissingChildren setting controls if any other children
+   * that are in the database but are not in the collection are deleted.
+   * </p>
+   * <p>
+   * <b>{@link ServerConfig#setUpdateChangesOnly(boolean)}: </b> The updateChangesOnly setting
+   * controls if only the changed properties are included in the update or if all the loaded
+   * properties are included instead.
    * </p>
    * 
    * <pre class="code">
    * 
-   * Customer c = new Customer();
-   * c.setId(7);
-   * c.setName(&quot;ModifiedNameNoOCC&quot;);
-   * 
-   * // generally you should set the version property
-   * // so that Optimistic Concurrency Checking is used.
-   * // If a version property is not set then no Optimistic
-   * // Concurrency Checking occurs for the update
-   * // c.setLastUpdate(lastUpdateTime);
-   * 
-   * // by default the Non-null properties
-   * // are included in the update
-   * Ebean.update(c);
+   * // A 'stateless update' example
+   * Customer customer = new Customer();
+   * customer.setId(7);
+   * customer.setName(&quot;ModifiedNameNoOCC&quot;);
+   * ebeanServer.update(customer);
    * 
    * </pre>
+   * 
+   * @see ServerConfig#setUpdatesDeleteMissingChildren(boolean)
+   * @see ServerConfig#setUpdateChangesOnly(boolean)
    */
-  public static void update(Object bean) {
+  public static void update(Object bean) throws OptimisticLockException {
     serverMgr.getPrimaryServer().update(bean);
+  }
+
+  /**
+   * Update the beans in the collection.
+   */
+  public static void update(Collection<?> beans) throws OptimisticLockException {
+    serverMgr.getPrimaryServer().update(beans);
   }
 
   /**
@@ -514,8 +525,8 @@ public final class Ebean {
   /**
    * Save all the beans from a Collection.
    */
-  public static int save(Collection<?> c) throws OptimisticLockException {
-    return save(c.iterator());
+  public static int save(Collection<?> beans) throws OptimisticLockException {
+    return serverMgr.getPrimaryServer().save(beans);
   }
 
   /**

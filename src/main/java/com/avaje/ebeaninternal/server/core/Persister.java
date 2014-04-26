@@ -14,15 +14,20 @@ import com.avaje.ebean.bean.EntityBean;
  */
 public interface Persister {
 
+  /**
+   * Update the bean.
+   */
+    public void update(EntityBean entityBean, Transaction t);
+
     /**
-     * Force an Update using the given bean.
+     * Update the bean specifying deleteMissingChildren.
      */
-    public void forceUpdate(EntityBean entityBean, Transaction t, boolean deleteMissingChildren);
+    public void update(EntityBean entityBean, Transaction t, boolean deleteMissingChildren);
 
     /**
      * Force an Insert using the given bean.
      */
-    public void forceInsert(EntityBean entityBean, Transaction t);
+    public void insert(EntityBean entityBean, Transaction t);
 
     /**
      * Insert or update the bean depending on its state.

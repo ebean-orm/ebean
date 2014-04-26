@@ -2,6 +2,9 @@ package com.avaje.tests.update;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -250,5 +253,121 @@ public class TestStatelessUpdate extends BaseTestCase {
     // assert
     // maybe check if update instead of insert has been executed,
     // currently "Unique index or primary key violation" PersistenceException is throwing
+  }
+  
+  @Test
+  public void testStatelessRecursiveUpdateWithChangesInDetailOnly() {
+    // arrange
+    Contact contact1 = new Contact();
+    contact1.setLastName("contact1");
+
+    Contact contact2 = new Contact();
+    contact2.setLastName("contact2");
+
+    Customer customer = new Customer();
+    customer.setName("something");
+    customer.getContacts().add(contact1);
+    customer.getContacts().add(contact2);
+
+    server.save(customer);
+    
+
+
+    // act
+    Contact updateContact1 = new Contact();
+    updateContact1.setId(contact1.getId());
+    updateContact1.setLastName("contact1-changed");
+
+    
+    Contact updateContact3 = new Contact();
+    //updateContact3.setId(contact3.getId());
+    updateContact3.setLastName("contact3-added");
+    
+    Customer updateCustomer = new Customer();
+    updateCustomer.setId(customer.getId());
+    updateCustomer.getContacts().add(updateContact1);
+    updateCustomer.getContacts().add(updateContact3);
+
+    // not adding contact2 so it will get deleted
+    //updateCustomer.getContacts().add(updateContact2);
+    
+    server.update(updateCustomer);
+
+    
+    // assert
+    Customer assCustomer = server.find(Customer.class, customer.getId());
+    List<Contact> assContacts = assCustomer.getContacts();
+    Assert.assertEquals(2, assContacts.size());
+    Set<Integer> ids = new LinkedHashSet<Integer>();
+    Set<String> names = new LinkedHashSet<String>();
+    for (Contact contact : assContacts) {
+      ids.add(contact.getId());
+      names.add(contact.getLastName());
+    }
+    Assert.assertTrue(ids.contains(contact1.getId()));
+    Assert.assertTrue(ids.contains(updateContact3.getId()));
+    Assert.assertFalse(ids.contains(contact2.getId()));
+    
+    Assert.assertTrue(names.contains(updateContact1.getLastName()));
+    Assert.assertTrue(names.contains(updateContact3.getLastName()));
+  }
+  
+  
+  @Test
+  public void testStatelessRecursiveUpdateWithChangesInDetailOnlyAnd() {
+    // arrange
+    Contact contact1 = new Contact();
+    contact1.setLastName("contact1");
+
+    Contact contact2 = new Contact();
+    contact2.setLastName("contact2");
+
+    Customer customer = new Customer();
+    customer.setName("something");
+    customer.getContacts().add(contact1);
+    customer.getContacts().add(contact2);
+
+    server.save(customer);
+    
+
+    // act
+    Contact updateContact1 = new Contact();
+    updateContact1.setId(contact1.getId());
+    updateContact1.setLastName("contact1-changed");
+
+    
+    Contact updateContact3 = new Contact();
+    updateContact3.setLastName("contact3-added");
+    
+    Customer updateCustomer = new Customer();
+    updateCustomer.setId(customer.getId());
+    updateCustomer.getContacts().add(updateContact1);
+    updateCustomer.getContacts().add(updateContact3);
+
+    // not adding contact2 but it won't be deleted in this case
+    boolean deleteMissingChildren = false;
+    server.update(updateCustomer, null, deleteMissingChildren);
+
+    
+    // assert
+    Customer assCustomer = server.find(Customer.class, customer.getId());
+    List<Contact> assContacts = assCustomer.getContacts();
+    
+    // contact 2 was not deleted this time
+    Assert.assertEquals(3, assContacts.size());
+    
+    Set<Integer> ids = new LinkedHashSet<Integer>();
+    Set<String> names = new LinkedHashSet<String>();
+    for (Contact contact : assContacts) {
+      ids.add(contact.getId());
+      names.add(contact.getLastName());
+    }
+    Assert.assertTrue(ids.contains(contact1.getId()));
+    Assert.assertTrue(ids.contains(updateContact3.getId()));
+    Assert.assertTrue(ids.contains(contact2.getId()));
+    
+    Assert.assertTrue(names.contains(updateContact1.getLastName()));
+    Assert.assertTrue(names.contains(contact2.getLastName()));
+    Assert.assertTrue(names.contains(updateContact3.getLastName()));
   }
 }

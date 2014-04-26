@@ -511,7 +511,7 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * For forced update on a 'New' bean move set all the changedProperties to loaded properties.
+   * For forced update on a 'New' bean set all the loaded properties to changed.
    */
   public void setNewBeanForUpdate() {
   

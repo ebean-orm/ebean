@@ -32,7 +32,7 @@ public class TestCKeyLazyLoad extends BaseTestCase {
     p.add(new CKeyDetail("somethine one"));
     p.add(new CKeyDetail("somethine two"));
 
-    Ebean.insert(p);
+    Ebean.save(p);
 
     CKeyAssoc assoc2 = new CKeyAssoc();
     assoc2.setAssocOne("assocTwo");
@@ -46,7 +46,7 @@ public class TestCKeyLazyLoad extends BaseTestCase {
     p2.add(new CKeyDetail("somethine one"));
     p2.add(new CKeyDetail("somethine two"));
 
-    Ebean.insert(p2);
+    Ebean.save(p2);
 
     CKeyParentId searchId = new CKeyParentId(1, "one");
 

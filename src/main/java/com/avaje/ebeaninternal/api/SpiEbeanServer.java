@@ -10,6 +10,7 @@ import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.BeanLoader;
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.ObjectGraphNode;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.core.PstmtBatch;
@@ -30,13 +31,15 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    */
   public void shutdownManaged();
 
+  /**
+   * Return true if query origins should be collected.
+   */
   public boolean isCollectQueryOrigins();
   
   /**
-   * Return true if DeleteMissingChildren defaults to true for stateless
-   * updates.
+   * Return the server configuration.
    */
-  public boolean isDefaultDeleteMissingChildren();
+  public ServerConfig getServerConfig();
 
   /**
    * Return the DatabasePlatform for this server.

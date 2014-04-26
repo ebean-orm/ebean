@@ -107,6 +107,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
             }
         }
     }
+    
+    /**
+     * Return the property value as an entity bean.
+     */
+    public EntityBean getValueAsEntityBean(EntityBean owner) {
+      return (EntityBean)getValue(owner);
+    }
 
     public void setRelationshipProperty(BeanPropertyAssocMany<?> relationshipProperty){
     	this.relationshipProperty = relationshipProperty;

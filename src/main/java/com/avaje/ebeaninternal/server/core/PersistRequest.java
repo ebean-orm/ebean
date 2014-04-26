@@ -15,14 +15,14 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
 	  DETERMINE, INSERT, UPDATE, DELETE, ORMUPDATE, UPDATESQL, CALLABLESQL
 	};
 
-	boolean persistCascade;
+	protected boolean persistCascade;
 	
 	/**
 	 * One of INSERT, UPDATE, DELETE, UPDATESQL or CALLABLESQL.
 	 */
-	Type type;
+	protected Type type;
 	
-	final PersistExecute persistExecute;
+	protected final PersistExecute persistExecute;
 
 	/**
 	 * Used by CallableSqlRequest and UpdateSqlRequest.

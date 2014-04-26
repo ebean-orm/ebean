@@ -32,66 +32,64 @@ import com.avaje.ebeaninternal.server.transaction.BeanPersistIdMap;
 /**
  * PersistRequest for insert update or delete of a bean.
  */
-public class PersistRequestBean<T> extends PersistRequest implements BeanPersistRequest<T> {
+public final class PersistRequestBean<T> extends PersistRequest implements BeanPersistRequest<T> {
 
-	protected final BeanManager<T> beanManager;
+	private final BeanManager<T> beanManager;
 
-	protected final BeanDescriptor<T> beanDescriptor;
+	private final BeanDescriptor<T> beanDescriptor;
 
-	protected final BeanPersistListener<T> beanPersistListener;
+	private final BeanPersistListener<T> beanPersistListener;
 
 	/**
 	 * For per post insert update delete control.
 	 */
-	protected final BeanPersistController controller;
+	private final BeanPersistController controller;
 
 	 /**
    * The bean being persisted.
    */
-  protected final T bean;
+	private final T bean;
   
-  protected final EntityBean entityBean;
+	private final EntityBean entityBean;
   
 	/**
 	 * The associated intercept.
 	 */
-	protected final EntityBeanIntercept intercept;
+	private final EntityBeanIntercept intercept;
 
 	/**
 	 * The parent bean for unidirectional save.
 	 */
-	protected final Object parentBean;
+	private final Object parentBean;
 
-	protected final boolean dirty;
+	private final boolean dirty;
 
-	protected ConcurrencyMode concurrencyMode;
+	private ConcurrencyMode concurrencyMode;
 
 	/**
 	 * The unique id used for logging summary.
 	 */
-	protected Object idValue;
+	private Object idValue;
 
 	/**
 	 * Hash value used to handle cascade delete both ways in a relationship.
 	 */
-	protected Integer beanHash;
-	protected Integer beanIdentityHash;
+	private Integer beanHash;
 
-	protected boolean notifyCache;
+	private boolean notifyCache;
 
-	private boolean statelessUpdate;
 	private boolean deleteMissingChildren;
 	
 	private final Set<String> dirtyPropertyNames;
 
   /**
    * Flag used to detect when only many properties where updated via a cascade. Used to ensure
-   * appropriate cache updates occur in that case.
+   * appropriate caches are updated in that case.
    */
 	private boolean updatedManysOnly;
 	
 	/**
-	 * Many properties that were cascade saved (and hence might need cache update later).
+	 * Many properties that were cascade saved (and hence might need caches updated later).
 	 */
   private List<BeanPropertyAssocMany<?>> updatedManys;
 
@@ -108,21 +106,23 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
     if (PersistRequest.Type.DETERMINE != type) {
       this.type = type;
     } else {
+      // determine mode during cascade save (supporting stateless update)
       this.type = beanDescriptor.isInsertMode(intercept) ? Type.INSERT : Type.UPDATE;
+      this.persistCascade = t.isPersistCascade();
     }
 		
     if (this.type == Type.UPDATE && intercept.isNew() ) {
+      // 'stateless update' - set bean up for doing update
       intercept.setNewBeanForUpdate();
     }
 
+    // derive the set of property names now as we will pass them to a beanPersistListener later
 		this.dirtyPropertyNames = (beanPersistListener == null) ? null : intercept.getDirtyPropertyNames();
 		
 		this.bean = bean;
 		this.parentBean = parentBean;
-
 		this.controller = beanDescriptor.getPersistController();
     this.concurrencyMode = beanDescriptor.getConcurrencyMode(intercept);
-		// this is ok to not use isNewOrDirty() as used for updates only
 		this.dirty = intercept.isDirty();
 	}
 
@@ -269,13 +269,6 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	}
 
 	/**
-	 * Return true if this is a stateless update.
-	 */
-	public boolean isStatelessUpdate() {
-		return statelessUpdate;
-	}
-
-	/**
 	 * Return true if a stateless update should also delete any missing details
 	 * beans.
 	 */
@@ -284,15 +277,9 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
 	}
 
 	/**
-	 * Set to true if this is a stateless update.
-	 * <p>
-	 * By Stateless it means that the bean was not previously fetched (and so
-	 * does not have it's previous state) so we are doing an update on a bean
-	 * that was probably created from JSON or XML.
-	 * </p>
+	 * Set if deleteMissingChildren occurs on cascade save to OneToMany or ManyToMany.
 	 */
-	public void setStatelessUpdate(boolean statelessUpdate, boolean deleteMissingChildren) {
-		this.statelessUpdate = statelessUpdate;
+	public void setDeleteMissingChildren(boolean deleteMissingChildren) {
 		this.deleteMissingChildren = deleteMissingChildren;
 	}
 
@@ -609,8 +596,8 @@ public class PersistRequestBean<T> extends PersistRequest implements BeanPersist
   }
 
   /**
-   * A reference bean was saved. Check if any of its many properties where
-   * cascade saved and hence we need to update related many property caches.
+   * Check if any of its many properties where cascade saved and hence we need to update related
+   * many property caches.
    */
   public void checkUpdatedManysOnly() {
     if (!dirty && updatedManys != null) {

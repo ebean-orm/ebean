@@ -71,10 +71,12 @@ public final class DefaultPersister implements Persister {
 
 	private final BeanDescriptorManager beanDescriptorManager;
 
+  private final boolean updatesDeleteMissingChildren;
 
 	public DefaultPersister(SpiEbeanServer server, Binder binder, BeanDescriptorManager descMgr, PstmtBatch pstmtBatch) {
 
 		this.server = server;
+		this.updatesDeleteMissingChildren = server.getServerConfig().isUpdatesDeleteMissingChildren();
 		this.beanDescriptorManager = descMgr;
 		this.persistExecute = new DefaultPersistExecute(binder, pstmtBatch);
 	}
@@ -151,21 +153,34 @@ public final class DefaultPersister implements Persister {
 	}
 
   /**
-   * Force an Update using the given bean.
+   * Update the bean.
    */
-  public void forceUpdate(EntityBean entityBean, Transaction t, boolean deleteMissingChildren) {
+  public void update(EntityBean entityBean, Transaction t) {
+    update(entityBean, t, updatesDeleteMissingChildren);
+  }
+  
+  /**
+   * Update the bean specifying deleteMissingChildren.
+   */
+  public void update(EntityBean entityBean, Transaction t, boolean deleteMissingChildren) {
 
     PersistRequestBean<?> req = createRequest(entityBean, t, null, PersistRequest.Type.UPDATE);
-    if (req.isReference()) {
-      // skip update as only got the Id property set
-      return;
-    }
-    req.setStatelessUpdate(true, deleteMissingChildren);
+    req.setDeleteMissingChildren(deleteMissingChildren);
     try {
       req.initTransIfRequired();
-      update(req);
+      
+      if (req.isReference()) {
+        // its a reference so see if there are manys to save...
+        if (req.isPersistCascade()) {
+          saveAssocMany(false, req);
+        }        
+        req.checkUpdatedManysOnly();
+
+      } else {
+        update(req);
+      }
+      
       req.commitTransIfRequired();
-      // finished a 'normal' update
       return;
 
     } catch (RuntimeException ex) {
@@ -174,14 +189,22 @@ public final class DefaultPersister implements Persister {
     }
   }
 
+  /**
+   * Insert or update the bean.
+   */
 	public void save(EntityBean bean, Transaction t) {
-		saveRecurse(bean, t, null);
+	  if (bean._ebean_getIntercept().isLoaded()) {
+	    // deleteMissingChildren is false when using 'save' on 'loaded' beans
+      update(bean, t, false);
+	  } else {
+      insert(bean, t);
+	  }
 	}
 
 	/**
-	 * Explicitly specify to insert this bean.
+	 * Insert this bean.
 	 */
-	public void forceInsert(EntityBean bean, Transaction t) {
+	public void insert(EntityBean bean, Transaction t) {
 
 		PersistRequestBean<?> req = createRequest(bean, t, null, PersistRequest.Type.INSERT);
 		try {
@@ -195,43 +218,17 @@ public final class DefaultPersister implements Persister {
 		}
 	}
 
-	private void saveRecurse(Object bean, Transaction t, Object parentBean) {
-		if (bean == null) {
-			throw new NullPointerException(Message.msg("bean.isnull"));
-		}
+	private void saveRecurse(EntityBean bean, Transaction t, Object parentBean) {
 
-		if (bean instanceof EntityBean == false) {
-			throw new IllegalArgumentException("This bean is of type ["+bean.getClass()+"] is not enhanced?");
-		}
-
-		PersistRequestBean<?> req = createRequest(bean, t, parentBean, PersistRequest.Type.DETERMINE);
-		try {
-			req.initTransIfRequired();
-			saveEnhanced(req);
-			req.commitTransIfRequired();
-
-		} catch (RuntimeException ex) {
-			req.rollbackTransIfRequired();
-			throw ex;
-		}
-	}
-
-	/**
-	 * Insert or update the bean depending on PersistControl and the bean state.
-	 */
-	private void saveEnhanced(PersistRequestBean<?> request) {
-
-		EntityBeanIntercept intercept = request.getEntityBeanIntercept();
-
+	  // determine insert or update taking into account stateless updates
+		PersistRequestBean<?> request = createRequest(bean, t, parentBean, PersistRequest.Type.DETERMINE);
+		
 		if (request.isReference()) {
 			// its a reference...
 			if (request.isPersistCascade()) {
 				// save any associated List held beans
-				intercept.setLoaded();
 				saveAssocMany(false, request);
-				intercept.setReference(-1);
-			}
-			
+			}			
 			request.checkUpdatedManysOnly();
 
 		} else {
@@ -273,7 +270,7 @@ public final class DefaultPersister implements Persister {
 	}
 
 	/**
-	 * Update the bean. Return NOT_SAVED if the bean values have not changed.
+	 * Update the bean.
 	 */
 	private void update(PersistRequestBean<?> request) {
 
@@ -555,7 +552,7 @@ public final class DefaultPersister implements Persister {
 
 			// check for partial beans
 			if (request.isLoadedProperty(prop)) {
-				Object detailBean = prop.getValue(parentBean);
+			  EntityBean detailBean = prop.getValueAsEntityBean(parentBean);
 				if (detailBean != null) {
 					if (prop.isSaveRecurseSkippable(detailBean)) {
 						// skip saving this bean
@@ -591,7 +588,6 @@ public final class DefaultPersister implements Persister {
 		private final EntityBean parentBean;
 		private final SpiTransaction transaction;
 		private final boolean cascade;
-		private final boolean statelessUpdate;
 		private final boolean deleteMissingChildren;
 
 		private SaveManyPropRequest(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
@@ -600,7 +596,6 @@ public final class DefaultPersister implements Persister {
 			this.cascade = many.getCascadeInfo().isSave();
 			this.parentBean = parentBean;
 			this.transaction = request.getTransaction();
-			this.statelessUpdate = request.isStatelessUpdate();
 			this.deleteMissingChildren = request.isDeleteMissingChildren();
 		}
 
@@ -610,7 +605,6 @@ public final class DefaultPersister implements Persister {
 			this.parentBean = parentBean;
 			this.transaction = t;
 			this.cascade = true;
-			this.statelessUpdate = false;
 			this.deleteMissingChildren = false;
 		}
 		
@@ -624,10 +618,6 @@ public final class DefaultPersister implements Persister {
 
 		private boolean isModifyListenMode() {
 			return ModifyListenMode.REMOVALS.equals(many.getModifyListenMode());
-		}
-
-		private boolean isStatelessUpdate() {
-			return statelessUpdate;
 		}
 
 		private boolean isDeleteMissingChildren() {
@@ -672,11 +662,14 @@ public final class DefaultPersister implements Persister {
 			  saveAssocManyIntersection(saveMany, saveMany.isDeleteMissingChildren());
 			}
 		} else {
-			if (saveMany.isCascade()) {
+      if (saveMany.isModifyListenMode()) {
+        // delete any removed beans via private owned. Needs to occur before 
+        // a 'deleteMissingChildren' statement occurs
+        removeAssocManyPrivateOwned(saveMany);
+      }
+		  if (saveMany.isCascade()) {
+		    // potentially deletes 'missing children' for 'stateless update'
 				saveAssocManyDetails(saveMany, saveMany.isDeleteMissingChildren());
-			}
-			if (saveMany.isModifyListenMode()) {
-				removeAssocManyPrivateOwned(saveMany);
 			}
 		}
 	}
@@ -789,42 +782,32 @@ public final class DefaultPersister implements Persister {
           }
 	      }
 
-	     if (skipSavingThisBean) {
-	        // unmodified bean that does not recurse its save
-	        // so we can skip the save for this bean.
-	        // Reset skipSavingThisBean for the next detailBean
-	        skipSavingThisBean = false;
+        if (skipSavingThisBean) {
+          // unmodified bean that does not recurse its save
+          // so we can skip the save for this bean.
+          // Reset skipSavingThisBean for the next detailBean
+          skipSavingThisBean = false;
 
-	      } else if (!saveMany.isStatelessUpdate()) {
-	        // normal save recurse
-	        saveRecurse(detailBean, t, parentBean);
-
-	      } else {
-	        if (targetDescriptor.isStatelessUpdate(detail)) {
-	          // update based on the value of Version/Id properties
-	          // cascade update in stateless mode
-	          forceUpdate(detail, t, deleteMissingChildren);
-	        } else {
-	          // cascade insert
-	          forceInsert(detail, t);
-	        }
-	      }
-	      if (detailIds != null) {
-	        // remember the Id (other details not in the collection) will be removed
-	        Object id = targetDescriptor.getId(detail);
-	        if (!DmlUtil.isNullOrZero(id)) {
-	          detailIds.add(id);
-	        }
-	      }
-			}
+        } else {
+          // normal save recurse
+          saveRecurse(detail, t, parentBean);
+        }
+        if (detailIds != null) {
+          // remember the Id (other details not in the collection) will be removed
+          Object id = targetDescriptor.getId(detail);
+          if (!DmlUtil.isNullOrZero(id)) {
+            detailIds.add(id);
+          }
+        }
+      }
 		}
 
 		if (detailIds != null) {
+		  // deleteMissingChildren is true so deleting children that were not just processed
 			deleteManyDetails(t, prop.getBeanDescriptor(), parentBean, prop, detailIds);
 		}
 
 		t.depth(-1);
-
 	}
 
 	public int deleteManyToManyAssociations(EntityBean ownerBean, String propertyName, Transaction t) {
@@ -859,7 +842,7 @@ public final class DefaultPersister implements Persister {
 
 		} else if (prop instanceof BeanPropertyAssocOne<?>) {
 			BeanPropertyAssocOne<?> oneProp = (BeanPropertyAssocOne<?>) prop;
-			Object assocBean = oneProp.getValue(parentBean);
+			EntityBean assocBean = oneProp.getValueAsEntityBean(parentBean);
 
 			int depth = oneProp.isOneToOneExported() ? 1 : -1;
 			int revertDepth = -1 * depth;
@@ -1094,7 +1077,7 @@ public final class DefaultPersister implements Persister {
 
 			// check for partial objects
 			if (request.isLoadedProperty(prop)) {
-				Object detailBean = prop.getValue(request.getEntityBean());
+			  EntityBean detailBean = prop.getValueAsEntityBean(request.getEntityBean());
 				if (detailBean != null) {
 					if (prop.isReference(detailBean)) {
 						// skip saving a reference

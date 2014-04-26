@@ -3,6 +3,9 @@ package com.avaje.tests.inheritance;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.AttributeHolder;
 import com.avaje.tests.model.basic.ListAttribute;
@@ -10,7 +13,7 @@ import com.avaje.tests.model.basic.ListAttributeValue;
 
 public class TestSkippable extends TestCase {
 
-
+  private static final Logger logger = LoggerFactory.getLogger(TestSkippable.class);
 
 	/**
 	 * Test query.
@@ -18,8 +21,8 @@ public class TestSkippable extends TestCase {
 	 * it was considered safe to skip as it didn't take into account any derived classes 
 	 * into account with e.g. collections and Cascade options </p>
 	 */
-	public void testQuery()
-	{
+	public void testQuery() {
+	  
 		// Setup the data first
 		final ListAttributeValue value1 = new ListAttributeValue();
 		final ListAttributeValue value2 = new ListAttributeValue();
@@ -30,20 +33,21 @@ public class TestSkippable extends TestCase {
 		final ListAttribute listAttribute = new ListAttribute();
 		listAttribute.add(value1);
 		Ebean.save(listAttribute);
-		
+		logger.info(" -- seeded data");
+    
 		final ListAttribute listAttributeDB = Ebean.find(ListAttribute.class, listAttribute.getId());
 		Assert.assertNotNull(listAttributeDB);
 
 		final ListAttributeValue value1_DB = listAttributeDB.getValues().iterator().next();
-		
-		
 		Assert.assertTrue(value1.getId().equals(value1_DB.getId()));
+    logger.info(" -- asserted data in db");
 		
 		
 		final AttributeHolder holder = new AttributeHolder();
 		holder.add(listAttributeDB);
 		
 		Ebean.save(holder);
+    logger.info(" -- saved holder");
 		
 		// Now change the M2M listAttribute.values and save the holder
 		// The save should cascade as follows 
@@ -53,11 +57,11 @@ public class TestSkippable extends TestCase {
 		
 		// Save the holder - should cascade down to the listAtribute and save the values
 		Ebean.save(holder);
+    logger.info(" -- M2M detected delete of value1 and add of value2 ?");
 		
 
 		final ListAttribute listAttributeDB_2 = Ebean.find(ListAttribute.class, listAttributeDB.getId());
 		Assert.assertNotNull(listAttributeDB_2);
-
 		final ListAttributeValue value2_DB_2 = listAttributeDB_2.getValues().iterator().next();
 		
 		

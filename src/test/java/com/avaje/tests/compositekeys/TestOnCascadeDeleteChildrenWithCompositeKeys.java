@@ -35,8 +35,8 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
     Ebean.delete(Ebean.find(User.class).findList());
 
     // insert 2 User records
-    Ebean.insert(new User(1L));
-    Ebean.insert(new User(2L));
+    Ebean.save(new User(1L));
+    Ebean.save(new User(2L));
   }
 
   /**

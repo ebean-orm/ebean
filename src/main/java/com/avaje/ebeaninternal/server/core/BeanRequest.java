@@ -21,18 +21,18 @@ public abstract class BeanRequest {
 	/**
 	 * The server processing the request.
 	 */
-	final SpiEbeanServer ebeanServer;
+	protected final SpiEbeanServer ebeanServer;
 
-	final String serverName;
+	protected final String serverName;
 
 	/**
 	 * The transaction this is part of.
 	 */
-	SpiTransaction transaction;
+	protected SpiTransaction transaction;
 
-	boolean createdTransaction;
+	protected boolean createdTransaction;
 
-	boolean readOnly;
+	protected boolean readOnly;
 
 	public BeanRequest(SpiEbeanServer ebeanServer, SpiTransaction t) {
 		this.ebeanServer = ebeanServer;

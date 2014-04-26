@@ -80,12 +80,12 @@ public class ResetBasicData {
 				Country c = new Country();
 				c.setCode("NZ");
 				c.setName("New Zealand");
-				server.insert(c);
+				server.save(c);
 				
 				Country au = new Country();
 				au.setCode("AU");
 				au.setName("Australia");
-				server.insert(au);				
+				server.save(au);				
 			}
 		});
 	}
@@ -99,25 +99,25 @@ public class ResetBasicData {
 				p.setId(1);
 				p.setName("Chair");
 				p.setSku("C001");
-				server.insert(p);
+				server.save(p);
 		
 				p = new Product();
 				p.setId(2);
 				p.setName("Desk");
 				p.setSku("DSK1");
-				server.insert(p);
+				server.save(p);
 		
 				p = new Product();
 				p.setId(3);
 				p.setName("Computer");
 				p.setSku("C002");
-				server.insert(p);
+				server.save(p);
 		
 				p = new Product();
 				p.setId(4);
 				p.setName("Printer");
 				p.setSku("C003");
-				server.insert(p);
+				server.save(p);
 			}
 		});
 	}
