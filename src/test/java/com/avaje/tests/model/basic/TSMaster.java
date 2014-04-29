@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.avaje.ebean.annotation.PrivateOwned;
 
@@ -29,6 +30,9 @@ public class TSMaster {
 	String description;
 
 	boolean active;
+	
+	@Transient
+	Object[] someArray;
 	
 	@OneToMany(cascade=CascadeType.ALL,mappedBy="master")
 	@PrivateOwned
@@ -80,4 +84,13 @@ public class TSMaster {
 		}
 		details.add(detail);
 	}
+
+  public Object[] getSomeArray() {
+    return someArray;
+  }
+
+  public void setSomeArray(Object[] someArray) {
+    this.someArray = someArray;
+  }
+	
 }
