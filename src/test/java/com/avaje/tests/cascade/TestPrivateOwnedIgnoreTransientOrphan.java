@@ -2,8 +2,7 @@ package com.avaje.tests.cascade;
 
 import javax.persistence.OptimisticLockException;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
