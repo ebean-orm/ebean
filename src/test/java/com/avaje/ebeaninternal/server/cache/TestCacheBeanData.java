@@ -2,8 +2,7 @@ package com.avaje.ebeaninternal.server.cache;
 
 import java.sql.Timestamp;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
@@ -11,10 +10,13 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.tests.model.basic.Address;
 import com.avaje.tests.model.basic.Country;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Customer.Status;
+import com.avaje.tests.model.embedded.EAddress;
+import com.avaje.tests.model.embedded.EPerson;
 
 public class TestCacheBeanData extends BaseTestCase {
 
@@ -67,5 +69,55 @@ public class TestCacheBeanData extends BaseTestCase {
     Assert.assertNotNull(newCustomer.getBillingAddress());
     Assert.assertNotNull(newCustomer.getBillingAddress().getId());
     
+  }
+  
+
+  @Test
+  public void testCacheBeanExtractAndLoadWithEmbdedded() {
+    
+    SpiEbeanServer server = (SpiEbeanServer)Ebean.getServer(null);
+    BeanDescriptor<EPerson> desc = server.getBeanDescriptor(EPerson.class);
+    BeanPropertyAssocOne<?> addressBeanProperty = (BeanPropertyAssocOne<?>)desc.getBeanProperty("address");
+
+    EAddress address = new EAddress();
+    address.setStreet("92 Someplace Else");
+    address.setSuburb("Sandringham");
+    address.setCity("Auckland");
+
+    EPerson person = new EPerson();
+    person.setId(98989L);
+    person.setName("Rob");
+    person.setAddress(address);
+    
+    CachedBeanData addressCacheData = (CachedBeanData)addressBeanProperty.getCacheDataValue((EntityBean) person);
+    
+    EPerson newPersonCheck = new EPerson();
+    newPersonCheck.setId(98989L);
+    addressBeanProperty.setCacheDataValue((EntityBean) newPersonCheck, addressCacheData);
+
+    EAddress newAddress = newPersonCheck.getAddress();
+    Assert.assertEquals(address.getStreet(), newAddress.getStreet());
+    Assert.assertEquals(address.getCity(), newAddress.getCity());
+    Assert.assertEquals(address.getSuburb(), newAddress.getSuburb());
+
+
+
+    
+    CachedBeanData cacheData = desc.cacheBeanExtractData((EntityBean)person);
+    
+    Assert.assertNotNull(cacheData);
+    
+    EPerson newPerson = new EPerson();
+    desc.cacheBeanLoadData((EntityBean)newPerson, cacheData);
+    
+    Assert.assertNotNull(newPerson.getId());
+    Assert.assertNotNull(newPerson.getName());
+    Assert.assertNotNull(newPerson.getAddress());
+
+    Assert.assertEquals(person.getId(), newPerson.getId());
+    Assert.assertEquals(person.getName(), newPerson.getName());
+    Assert.assertEquals(person.getAddress().getStreet(), newPerson.getAddress().getStreet());
+    Assert.assertEquals(person.getAddress().getCity(), newPerson.getAddress().getCity());
+        
   }
 }

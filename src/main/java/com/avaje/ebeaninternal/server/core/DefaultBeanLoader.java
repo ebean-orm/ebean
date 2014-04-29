@@ -23,6 +23,7 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 /**
@@ -324,19 +325,27 @@ public class DefaultBeanLoader {
   }
 
 	public void refresh(EntityBean bean) {
-		refreshBeanInternal(bean, SpiQuery.Mode.REFRESH_BEAN);
+		refreshBeanInternal(bean, SpiQuery.Mode.REFRESH_BEAN, -1);
 	}
 	
 	public void loadBean(EntityBeanIntercept ebi) {
-		refreshBeanInternal(ebi.getOwner(), SpiQuery.Mode.LAZYLOAD_BEAN);
+		refreshBeanInternal(ebi.getOwner(), SpiQuery.Mode.LAZYLOAD_BEAN, -1);
 	}
 
-  private void refreshBeanInternal(EntityBean bean, SpiQuery.Mode mode) {
+  private void refreshBeanInternal(EntityBean bean, SpiQuery.Mode mode, int embeddedOwnerIndex) {
 
     EntityBeanIntercept ebi = ((EntityBean) bean)._ebean_getIntercept();;
     PersistenceContext pc = ebi.getPersistenceContext();
 
     BeanDescriptor<?> desc = server.getBeanDescriptor(bean.getClass());
+    if (EntityType.EMBEDDED == desc.getEntityType()) {
+      // lazy loading on an embedded bean property
+      EntityBean embeddedOwner = (EntityBean)ebi.getEmbeddedOwner();
+      int ownerIndex = ebi.getEmbeddedOwnerIndex();
+
+      refreshBeanInternal(embeddedOwner, mode, ownerIndex);
+    }
+    
     Object id = desc.getId(bean);
 
     if (pc == null) {
@@ -348,7 +357,7 @@ public class DefaultBeanLoader {
       }
     }
 
-    if (ebi != null) {
+    if (embeddedOwnerIndex == -1) {
       if (SpiQuery.Mode.LAZYLOAD_BEAN.equals(mode) && desc.isBeanCaching()) {
         // lazy loading and the bean cache is active 
         if (desc.cacheBeanLoad((EntityBean)bean, ebi, id)) {
@@ -365,6 +374,11 @@ public class DefaultBeanLoader {
       query.setLazyLoadProperty(ebi.getLazyLoadProperty());
     }
 
+    if (embeddedOwnerIndex > -1) {
+      String embeddedBeanPropertyName = ebi.getProperty(embeddedOwnerIndex);
+      query.select("id,"+embeddedBeanPropertyName);
+    }
+    
     // don't collect autoFetch usage profiling information
     // as we just copy the data out of these fetched beans
     // and put the data into the original bean
@@ -373,12 +387,13 @@ public class DefaultBeanLoader {
 
     query.setMode(mode);
     query.setId(id);
-    // make sure the query doesn't use the cache
-    if (mode.equals(SpiQuery.Mode.REFRESH_BEAN)) {
+
+    if (embeddedOwnerIndex > -1 || mode.equals(SpiQuery.Mode.REFRESH_BEAN)) {
+      // make sure the query doesn't use the cache
       query.setUseCache(false);
     }
 
-    if (ebi != null && ebi.isReadOnly()) {
+    if (ebi.isReadOnly()) {
       query.setReadOnly(true);
     }
 

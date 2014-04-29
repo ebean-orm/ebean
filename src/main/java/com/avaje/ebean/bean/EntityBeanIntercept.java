@@ -182,6 +182,13 @@ public final class EntityBeanIntercept implements Serializable {
   public Object getEmbeddedOwner() {
     return embeddedOwner;
   }
+  
+  /**
+   * Return the property index (for the parent) of this embedded bean.
+   */
+  public int getEmbeddedOwnerIndex() {
+    return embeddedOwnerIndex;
+  }
 
   /**
    * Special case for a OneToOne, Set the parent bean (by relationship). This is

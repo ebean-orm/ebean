@@ -360,12 +360,20 @@ public final class BeanDescriptorCacheHelp<T> {
     }
   }
 
+  public CachedBeanData beanExtractData(EntityBean bean) {
+    return CachedBeanDataFromBean.extract(desc, bean);
+  }
+
+  public void beanLoadData(EntityBean bean, CachedBeanData data) {
+    CachedBeanDataToBean.load(desc, bean, data);
+  }
+  
   /**
    * Put a bean into the bean cache.
    */
   public void beanCachePut(EntityBean bean) {
 
-    CachedBeanData beanData = CachedBeanDataFromBean.extract(desc, bean);
+    CachedBeanData beanData = beanExtractData(bean);
 
     Object id = desc.getId(bean);
     if (beanLog.isDebugEnabled()) {
@@ -402,15 +410,15 @@ public final class BeanDescriptorCacheHelp<T> {
   @SuppressWarnings("unchecked")
   private T beanCacheGetInternal(Object id, Boolean readOnly) {
 
-    CachedBeanData d = (CachedBeanData) getBeanCache().get(id);
-    if (d == null) {
+    CachedBeanData data = (CachedBeanData) getBeanCache().get(id);
+    if (data == null) {
       if (beanLog.isTraceEnabled()) {
         beanLog.trace("   GET {}({}) - cache miss", cacheName, id);
       }
       return null;
     }
     if (cacheSharableBeans && !Boolean.FALSE.equals(readOnly)) {
-      Object bean = d.getSharableBean();
+      Object bean = data.getSharableBean();
       if (bean != null) {
         if (beanLog.isTraceEnabled()) {
           beanLog.trace("   GET {}({}) - hit shared bean", cacheName, id);
@@ -425,7 +433,7 @@ public final class BeanDescriptorCacheHelp<T> {
       bean._ebean_getIntercept().setReadOnly(true);
     }
 
-    CachedBeanDataToBean.load(desc, bean, d);
+    beanLoadData(bean, data);
     if (beanLog.isTraceEnabled()) {
       beanLog.trace("   GET {}({}) - hit", cacheName, id);
     }

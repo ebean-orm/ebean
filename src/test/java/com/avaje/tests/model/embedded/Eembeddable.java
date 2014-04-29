@@ -3,16 +3,16 @@ package com.avaje.tests.model.embedded;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class Eembeddable
-{
-    String description;
+public class Eembeddable {
+  
+  String description;
 
-    public String getDescription() {
-        return description;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
 }

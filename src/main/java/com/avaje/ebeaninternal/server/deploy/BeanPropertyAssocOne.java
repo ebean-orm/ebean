@@ -14,6 +14,7 @@ import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebeaninternal.server.cache.CachedBeanData;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
@@ -323,15 +324,15 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
 
     public Object getCacheDataValue(EntityBean bean){
-    	if (embedded) {
-    		throw new RuntimeException();
+      Object ap = getValue(bean);
+      if (ap == null){
+        return null;
+      }
+      if (embedded) {
+    	  return targetDescriptor.cacheBeanExtractData((EntityBean) ap);
+    		
     	} else {
-    		Object ap = getValue(bean);
-    		if (ap == null){
-    			return null;
-    		} else {
-        		return targetDescriptor.getId((EntityBean)ap);    			
-    		}
+        return targetDescriptor.getId((EntityBean)ap);    			
     	}
     }
     
@@ -339,7 +340,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     public void setCacheDataValue(EntityBean bean, Object cacheData){
     	if (cacheData != null) {
     		if (embedded){
-        		throw new RuntimeException();
+    		  EntityBean embeddedBean = targetDescriptor.createEntityBean();
+    		  targetDescriptor.cacheBeanLoadData(embeddedBean, (CachedBeanData) cacheData);
+          setValue(bean, embeddedBean);
+          
     		} else {
 		    	T ref  = targetDescriptor.createReference(Boolean.FALSE, cacheData);
 		    	setValue(bean, ref);

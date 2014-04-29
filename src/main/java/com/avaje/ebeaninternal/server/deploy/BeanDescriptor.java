@@ -843,6 +843,20 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
   
   /**
+   * Extract the raw cache data from the bean.
+   */
+  public CachedBeanData cacheBeanExtractData(EntityBean bean) {
+    return cacheHelp.beanExtractData(bean);
+  }
+  
+  /**
+   * Load the raw cache data into the bean.
+   */
+  public void cacheBeanLoadData(EntityBean bean, CachedBeanData data) {
+    cacheHelp.beanLoadData(bean, data);
+  }
+  
+  /**
    * Put a bean into the bean cache.
    */
   public void cacheBeanPutData(EntityBean bean) {

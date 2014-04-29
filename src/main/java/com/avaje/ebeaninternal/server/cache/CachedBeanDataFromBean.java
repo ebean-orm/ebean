@@ -15,10 +15,20 @@ public class CachedBeanDataFromBean {
     Object[] data = new Object[desc.getPropertyCount()];
     boolean[] loaded = new boolean[desc.getPropertyCount()];
     
+    BeanProperty idProperty = desc.getIdProperty();
+    if (idProperty != null) {
+      int propertyIndex = idProperty.getPropertyIndex();
+      if (ebi.isLoadedProperty(propertyIndex)) {
+        // extract the id property value
+        data[propertyIndex] = idProperty.getCacheDataValue(bean);
+        loaded[propertyIndex] = true;
+      }
+    }
     BeanProperty[] props = desc.propertiesNonMany();
 
     Object naturalKey = null;
 
+    // extract all the non-many properties
     for (int i = 0; i < props.length; i++) {
       BeanProperty prop = props[i];
       if (ebi.isLoadedProperty(prop.getPropertyIndex())) {
