@@ -3,8 +3,6 @@ package com.avaje.tests.query.other;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.constraints.AssertTrue;
-
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
@@ -56,7 +54,7 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
       
       beanProperty.addWhereParentIdIn(query0, parentIds);
       
-      List<?> list0 = query0.findList();
+      query0.findList();
 
     } finally {
       Ebean.endTransaction();
