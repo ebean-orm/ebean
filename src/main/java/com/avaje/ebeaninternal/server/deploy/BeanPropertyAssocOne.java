@@ -862,4 +862,18 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       EntityBean eb = (EntityBean)detailBean;
       return targetDescriptor.isReference(eb._ebean_getIntercept());      
     }
+
+    /**
+     * Set the parent bean to the child bean if it has not already been set.
+     */
+    public void setParentBeanToChild(EntityBean parent, EntityBean child) {
+
+      if (mappedBy != null) {
+        BeanProperty beanProperty = targetDescriptor.getBeanProperty(mappedBy);
+        if (beanProperty != null && beanProperty.getValue(child) == null) {
+          // set the 'parent' bean to the 'child' bean
+          beanProperty.setValue(child, parent);          
+        }      
+      }
+    }
 }

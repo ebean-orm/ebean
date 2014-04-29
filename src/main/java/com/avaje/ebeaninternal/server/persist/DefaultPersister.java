@@ -558,6 +558,7 @@ public final class DefaultPersister implements Persister {
 						// skip saving this bean
 					} else {
 						t.depth(+1);
+						prop.setParentBeanToChild(parentBean, detailBean);
 						saveRecurse(detailBean, t, parentBean);
 						t.depth(-1);
 					}
