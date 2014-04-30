@@ -22,6 +22,7 @@ import com.avaje.ebean.bean.NodeUsageCollector;
 import com.avaje.ebean.bean.NodeUsageListener;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.api.LoadContext;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -58,7 +59,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private static final Logger logger = LoggerFactory.getLogger(CQuery.class);
 
-  private static final int GLOBAL_ROW_LIMIT = 1000000;
+  private static final int GLOBAL_ROW_LIMIT = GlobalProperties.getInt("query.globallimit",1000000);
 
   /**
    * The resultSet rows read.
