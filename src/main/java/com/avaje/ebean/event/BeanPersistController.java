@@ -5,7 +5,7 @@ import java.util.Set;
 /**
  * Used to enhance or override the default bean persistence mechanism.
  * <p>
- * Note that if want to totally change the finding, you need to use a BeanFinder
+ * Note that if want to totally change the finding, you need to use a BeanQueryAdapter
  * rather than using postLoad().
  * </p>
  * <p>
