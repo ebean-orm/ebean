@@ -1,5 +1,7 @@
 package com.avaje.tests.model.basic;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -7,59 +9,69 @@ import javax.persistence.Table;
 import com.avaje.ebean.annotation.EnumValue;
 
 @Entity
-@Table(name="e_basic")
+@Table(name = "e_basic")
 public class EBasic {
 
-    public enum Status {
-        @EnumValue("N")
-        NEW,
-        
-        @EnumValue("A")
-        ACTIVE,
-        
-        @EnumValue("I")
-        INACTIVE,
-    }
-    
-    @Id
-    Integer id;
-    
-    Status status;
+  public enum Status {
+    @EnumValue("N")
+    NEW,
 
-    String name;
+    @EnumValue("A")
+    ACTIVE,
 
-    String description;
-    
-    public Integer getId() {
-        return id;
-    }
+    @EnumValue("I")
+    INACTIVE,
+  }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  @Id
+  Integer id;
 
-    public Status getStatus() {
-        return status;
-    }
+  Status status;
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
+  String name;
 
-    public String getName() {
-        return name;
-    }
+  String description;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  Date someDate;
 
-    public String getDescription() {
-        return description;
-    }
+  public Integer getId() {
+    return id;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public Date getSomeDate() {
+    return someDate;
+  }
+
+  public void setSomeDate(Date someDate) {
+    this.someDate = someDate;
+  }
+
 }
