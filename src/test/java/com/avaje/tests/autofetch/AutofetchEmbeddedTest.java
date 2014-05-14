@@ -1,14 +1,40 @@
 package com.avaje.tests.autofetch;
 
+import java.util.List;
+
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.embedded.EMain;
-import org.junit.Test;
-import java.util.List;
+import com.avaje.tests.model.embedded.Eembeddable;
 
 
 public class AutofetchEmbeddedTest extends BaseTestCase {
 
+  private final Logger logger = LoggerFactory.getLogger(AutofetchEmbeddedTest.class);
+
+  @Test
+  public void testEmbeddedBeanLazyLoadAndUpdate() {
+    
+    EMain testBean = new EMain();
+    testBean.setName("test");
+    testBean.getEmbeddable().setDescription("test description");
+    Ebean.save(testBean);
+
+    EMain partialBean = Ebean.find(EMain.class).select("version").setId(testBean.getId()).findUnique();
+    
+    logger.info(" -- invoke lazy loading of embedded bean");
+    Eembeddable embeddable = partialBean.getEmbeddable();
+    embeddable.setDescription("modified description");
+    
+    logger.info(" -- update bean");
+    Ebean.save(partialBean);
+    
+  }
+  
   @Test
   public void testEmbeddedBeanQueryTuning() {
     Ebean.getServer(null).getAdminAutofetch().setProfiling(true);

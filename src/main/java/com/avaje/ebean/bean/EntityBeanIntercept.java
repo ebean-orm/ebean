@@ -451,6 +451,9 @@ public final class EntityBeanIntercept implements Serializable {
     return -1;
   }
   
+  /**
+   * Return the property name for the given property.
+   */
   public String getProperty(int propertyIndex) {
     if (propertyIndex == -1) {
       return null;
@@ -458,18 +461,38 @@ public final class EntityBeanIntercept implements Serializable {
     return owner._ebean_getPropertyName(propertyIndex);
   }
   
+  /**
+   * Return the number of properties.s
+   */
   public int getPropertyLength() {
     return owner._ebean_getPropertyNames().length;
   }
   
+  /**
+   * Set the property to be treated as unloaded. Used for properties initialised in default
+   * constructor.
+   */
+  public void setPropertyUnloaded(int propertyIndex) {
+    loadedProps[propertyIndex] = false;
+  }
+  
+  /**
+   * Set the property to be loaded.
+   */
   public void setLoadedProperty(int propertyIndex) {
     loadedProps[propertyIndex] = true;
   }
   
+  /**
+   * Return true if the property is loaded.
+   */
   public boolean isLoadedProperty(int propertyIndex) {
     return loadedProps[propertyIndex];
   }
 
+  /**
+   * Return true if the property is considered changed.
+   */
   public boolean isChangedProperty(int propertyIndex) {
     return (changedProps != null && changedProps[propertyIndex]);
   }

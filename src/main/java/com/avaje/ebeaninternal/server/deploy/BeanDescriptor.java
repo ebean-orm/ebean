@@ -211,6 +211,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   private final int versionPropertyIndex;
   
   /**
+   * Properties that are initialised in the constructor need to be 'unloaded' to support partial object queries.
+   */
+  private final int[] unloadProperties;
+  
+  /**
    * Properties local to this type (not from a super type).
    */
   private final BeanProperty[] propertiesLocal;
@@ -430,12 +435,44 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     if (Modifier.isAbstract(beanType.getModifiers())) {
       this.idPropertyIndex = -1;
       this.versionPropertyIndex = -1;
+      this.unloadProperties = new int[0];
       
     } else {
       EntityBeanIntercept ebi = prototypeEntityBean._ebean_getIntercept();
       this.idPropertyIndex = (idProperty == null) ? -1 : ebi.findProperty(idProperty.getName());
       this.versionPropertyIndex = (versionProperty == null) ? -1 : ebi.findProperty(versionProperty.getName());
+      this.unloadProperties = derivePropertiesToUnload(prototypeEntityBean);
     }
+  }
+  
+  /**
+   * Derive an array of property positions for properties that are initialised in the constructor.
+   * These properties need to be unloaded when populating beans for queries.
+   */
+  private int[] derivePropertiesToUnload(EntityBean prototypeEntityBean) {
+    
+    boolean[] loaded = prototypeEntityBean._ebean_getIntercept().getLoaded();
+    int[] props = new int[loaded.length];
+    int pos = 0;
+    
+    // collect the positions of the properties initialised in the default constructor.
+    for (int i = 0; i < loaded.length; i++) {
+      if (loaded[i]) {
+        props[pos++] = i;
+      }
+    }
+    
+    if (pos == 0) {
+      // nothing set in the constructor
+      return new int[0];
+    }
+    
+    // populate a smaller/minimal array
+    int[] unload = new int[pos];
+    for (int i = 0; i < pos; i++) {
+      unload[i] = props[i];
+    }
+    return unload;
   }
   
   /**
@@ -1142,7 +1179,17 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public EntityBean createEntityBean() {
     try {
-      return (EntityBean)prototypeEntityBean._ebean_newInstance();
+      EntityBean bean = (EntityBean)prototypeEntityBean._ebean_newInstance();
+      
+      if (unloadProperties.length > 0) {
+        // 'unload' any properties initialised in the default constructor
+        EntityBeanIntercept ebi = bean._ebean_getIntercept();
+        for (int i = 0; i < unloadProperties.length; i++) {
+          ebi.setPropertyUnloaded(unloadProperties[i]);
+        }
+      }
+      return bean;
+      
     } catch (Exception ex) {
       throw new PersistenceException(ex);
     }

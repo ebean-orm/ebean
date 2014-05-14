@@ -7,6 +7,7 @@ import java.util.List;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.TxRunnable;
+import com.avaje.tests.model.basic.Order.Status;
 
 public class ResetBasicData {
 
@@ -273,6 +274,7 @@ public class ResetBasicData {
 		Product product1 = Ebean.getReference(Product.class, 1);
 					
 		Order order = new Order();
+    order.setStatus(Status.SHIPPED);
 		order.setCustomer(customer);
 		
 		List<OrderDetail> details = new ArrayList<OrderDetail>();
@@ -290,6 +292,7 @@ public class ResetBasicData {
 		Product product3 = Ebean.getReference(Product.class, 3);
 					
 		Order order = new Order();
+		order.setStatus(Status.COMPLETE);
 		order.setCustomer(customer);
 		
 		List<OrderDetail> details = new ArrayList<OrderDetail>();
@@ -301,15 +304,14 @@ public class ResetBasicData {
 
 		Ebean.save(order);
 	}
-	
-    private void createOrder4(Customer customer) {
 
+  private void createOrder4(Customer customer) {
 
-        Order order = new Order();
-        order.setCustomer(customer);
+    Order order = new Order();
+    order.setCustomer(customer);
 
-        order.addShipment(new OrderShipment());
+    order.addShipment(new OrderShipment());
 
-        Ebean.save(order);
-    }
+    Ebean.save(order);
+  }
 }

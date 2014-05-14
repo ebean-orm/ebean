@@ -65,8 +65,8 @@ public class SqlTreeAlias {
 			for (String propJoin : propJoins) {
 				ElPropertyDeploy elProp = desc.getElPropertyDeploy(propJoin);
 	    		if (elProp != null && elProp.getBeanProperty().isEmbedded()) {
-	    			String[] split = SplitName.split(propJoin);
-	    			addPropertyJoin(split[0], joinProps);
+	    			//String[] split = SplitName.split(propJoin);
+	    			//addPropertyJoin(split[0], joinProps);
 	    			addEmbeddedPropertyJoin(propJoin);
 	    			
 	    		} else {
