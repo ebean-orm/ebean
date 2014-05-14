@@ -2,6 +2,7 @@ package com.avaje.tests.inheritance;
 
 
 import org.junit.Assert;
+import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
@@ -18,8 +19,9 @@ public class TestDuplcateKeyException extends BaseTestCase {
 	 * it was considered safe to skip as it didn't take into account any derived classes 
 	 * into account with e.g. collections and Cascade options </p>
 	 */
-	public void testQuery()
-	{
+  @Test
+	public void testQuery() {
+    
 		// Setup the data first
 		final ListAttributeValue value1 = new ListAttributeValue();
 		

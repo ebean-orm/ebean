@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -19,6 +20,9 @@ public abstract class Animal {
   
   @Version
   Long version;
+
+  @ManyToOne
+  AnimalShelter shelter;
 
   public Long getId() {
     return id;
@@ -35,4 +39,13 @@ public abstract class Animal {
   public void setVersion(Long version) {
     this.version = version;
   }
+
+  public AnimalShelter getShelter() {
+    return shelter;
+  }
+
+  public void setShelter(AnimalShelter shelter) {
+    this.shelter = shelter;
+  }
+  
 }

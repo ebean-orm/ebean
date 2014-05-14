@@ -1,6 +1,7 @@
 package com.avaje.tests.inheritance;
 
 import org.junit.Assert;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,7 @@ public class TestSkippable extends BaseTestCase {
 	 * it was considered safe to skip as it didn't take into account any derived classes 
 	 * into account with e.g. collections and Cascade options </p>
 	 */
+  @Test
 	public void testQuery() {
 	  
 		// Setup the data first
