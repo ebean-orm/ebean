@@ -107,10 +107,13 @@ public class AnnotationAssocOnes extends AnnotationParser {
         BeanTable beanTable = prop.getBeanTable();
         JoinColumn joinColumn = get(prop, JoinColumn.class);
         if (joinColumn != null) {
-            prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
-            if (!joinColumn.updatable()){
-                prop.setDbUpdateable(false);
-            }
+          prop.getTableJoin().addJoinColumn(false, joinColumn, beanTable);
+          if (!joinColumn.updatable()) {
+            prop.setDbUpdateable(false);
+          }
+          if (!joinColumn.nullable()) {
+            prop.setNullable(false);
+          }
         }
 
         JoinColumns joinColumns = get(prop, JoinColumns.class);
