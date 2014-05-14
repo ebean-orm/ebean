@@ -56,7 +56,7 @@ public class SqlBeanLoad {
 
   public Object load(BeanProperty prop) throws SQLException {
 
-    if (!rawSql && prop.isTransient()) {
+    if (!rawSql && !prop.isLoadProperty()) {
       return null;
     }
 

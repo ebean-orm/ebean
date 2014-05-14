@@ -24,6 +24,11 @@ public class TestFormulaWithFindCount extends BaseTestCase {
     
     ExpressionList<Order> ex = server.find(Order.class).select("id, status ,totalAmount").where().gt("totalAmount", 1d);
     List<Order> list = ex.findList();
+
+    for (Order order : list) {
+      Double amount = order.getTotalAmount();
+      Assert.assertNotNull(amount);
+    }
     
     ExpressionList<Order> expressionList = server.find(Order.class).where().gt("totalAmount", 1d);
     int rowCount = expressionList.findRowCount();

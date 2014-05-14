@@ -978,6 +978,13 @@ public class BeanProperty implements ElPropertyValue {
     }
 
     /**
+     * Return true if this property is loadable from a resultSet.
+     */
+    public boolean isLoadProperty() {
+      return !isTransient || formula;
+    }
+    
+    /**
      * Return true if this is a version column used for concurrency checking.
      */
     public boolean isVersion() {
