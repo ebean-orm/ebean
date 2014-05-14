@@ -97,7 +97,7 @@ public class SqlTreeBuilder {
     this.desc = request.getBeanDescriptor();
     this.query = request.getQuery();
 
-    this.subQuery = Type.SUBQUERY.equals(query.getType());
+    this.subQuery = Type.SUBQUERY.equals(query.getType()) || Type.ID_LIST.equals(query.getType());
     this.includeJoin = query.getIncludeTableJoin();
     this.manyWhereJoins = query.getManyWhereJoins();
     this.queryDetail = query.getDetail();
