@@ -1,17 +1,16 @@
 package com.avaje.tests.inheritance;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.AttributeHolder;
 import com.avaje.tests.model.basic.ListAttribute;
 import com.avaje.tests.model.basic.ListAttributeValue;
 
-public class TestSkippable extends TestCase {
+public class TestSkippable extends BaseTestCase {
 
   private static final Logger logger = LoggerFactory.getLogger(TestSkippable.class);
 

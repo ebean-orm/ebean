@@ -1,17 +1,16 @@
 package com.avaje.tests.inheritance;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
+import org.junit.Assert;
+
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.TxRunnable;
 import com.avaje.tests.model.basic.AttributeHolder;
 import com.avaje.tests.model.basic.ListAttribute;
 import com.avaje.tests.model.basic.ListAttributeValue;
 
-public class TestDuplcateKeyException extends TestCase {
-
-
+public class TestDuplcateKeyException extends BaseTestCase {
 
 	/**
 	 * Test query.
