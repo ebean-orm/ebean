@@ -18,6 +18,7 @@ import com.avaje.ebean.FutureList;
 import com.avaje.ebean.FutureRowCount;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.OrderBy.Property;
+import com.avaje.ebean.PagedList;
 import com.avaje.ebean.PagingList;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.QueryIterator;
@@ -915,7 +916,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 		return server.findPagingList(this, null, pageSize);
 	}
 
-	/**
+	@Override
+  public PagedList<T> findPagedList(int pageIndex, int pageSize) {
+    return server.findPagedList(this, null, pageIndex, pageSize);
+  }
+
+  /**
 	 * Set an ordered bind parameter according to its position. Note that the
 	 * position starts at 1 to be consistent with JDBC PreparedStatement. You
 	 * need to set a parameter value for each ? you have in the query.

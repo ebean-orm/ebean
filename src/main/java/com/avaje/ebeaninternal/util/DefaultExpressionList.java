@@ -14,6 +14,7 @@ import com.avaje.ebean.FutureList;
 import com.avaje.ebean.FutureRowCount;
 import com.avaje.ebean.Junction;
 import com.avaje.ebean.OrderBy;
+import com.avaje.ebean.PagedList;
 import com.avaje.ebean.PagingList;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.QueryIterator;
@@ -150,6 +151,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   public PagingList<T> findPagingList(int pageSize) {
     return query.findPagingList(pageSize);
+  }
+
+  @Override
+  public PagedList<T> findPagedList(int pageIndex, int pageSize) {
+    return query.findPagedList(pageIndex, pageSize);
   }
 
   public int findRowCount() {

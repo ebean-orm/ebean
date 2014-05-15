@@ -547,9 +547,31 @@ public interface EbeanServer {
 
   /**
    * Find using a PagingList with explicit transaction and pageSize.
-   * @deprecated
+   * Deprecated in favour of findPagedList().
+   * @deprecated 
    */  
   public <T> PagingList<T> findPagingList(Query<T> query, Transaction transaction, int pageSize);
+
+  /**
+   * Return a PagedList for this query.
+   * <p>
+   * The benefit of using this over just using the normal {@link Query#setFirstRow(int)} and
+   * {@link Query#setMaxRows(int)} is that it additionally wraps an optional call to
+   * {@link Query#findFutureRowCount()} to determine total row count, total page count etc.
+   * </p>
+   * <p>
+   * Internally this works using {@link Query#setFirstRow(int)} and {@link Query#setMaxRows(int)} on
+   * the query. This translates into SQL that uses limit offset, rownum or row_number
+   * function to limit the result set.
+   * </p>
+   * 
+   * @param pageIndex
+   *          The zero based index of the page.
+   * @param pageSize
+   *          The number of beans to return per page.
+   * @return The PagedList
+   */
+  public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction, int pageIndex, int pageSize);
 
   /**
    * Execute the query returning a set of entity beans.
@@ -1078,5 +1100,6 @@ public interface EbeanServer {
    * Create a JsonContext that will use the default configuration options.
    */
   public JsonContext createJsonContext();
+
 
 }

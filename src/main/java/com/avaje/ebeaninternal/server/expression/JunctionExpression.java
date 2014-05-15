@@ -12,6 +12,7 @@ import com.avaje.ebean.FutureList;
 import com.avaje.ebean.FutureRowCount;
 import com.avaje.ebean.Junction;
 import com.avaje.ebean.OrderBy;
+import com.avaje.ebean.PagedList;
 import com.avaje.ebean.PagingList;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.QueryResultVisitor;
@@ -228,6 +229,11 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
 
   public PagingList<T> findPagingList(int pageSize) {
     return exprList.findPagingList(pageSize);
+  }
+  
+  @Override
+  public PagedList<T> findPagedList(int pageIndex, int pageSize) {
+    return exprList.findPagedList(pageIndex, pageSize);
   }
 
   public int findRowCount() {

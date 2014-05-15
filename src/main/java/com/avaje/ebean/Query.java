@@ -589,9 +589,7 @@ public interface Query<T> extends Serializable {
   /**
    * Execute find list query in a background thread.
    * <p>
-   * This returns a Future object which can be used to cancel, check the
-   * execution status (isDone etc) and get the value (with or without a
-   * timeout).
+   * Deprecated with a view to simplifying internals.
    * </p>
    * 
    * @return a Future object for the list result of the query
@@ -600,24 +598,32 @@ public interface Query<T> extends Serializable {
   public FutureList<T> findFutureList();
 
   /**
-   * Return a PagingList for this query.
-   * <p>
-   * This can be used to break up a query into multiple queries to fetch the
-   * data a page at a time.
-   * </p>
-   * <p>
-   * This typically works by using a query per page and setting
-   * {@link Query#setFirstRow(int)} and and {@link Query#setMaxRows(int)} on the
-   * query. This usually would translate into SQL that uses limit offset, rownum
-   * or row_number function to limit the result set.
-   * </p>
-   * 
-   * @param pageSize
-   *          the number of beans fetched per Page
+   * This is being deprecated in favour of the simplier {@link Query#findPagedList(int, int)}.
    * 
    * @deprecated
    */
   public PagingList<T> findPagingList(int pageSize);
+
+  /**
+   * Return a PagedList for this query.
+   * <p>
+   * The benefit of using this over just using the normal {@link Query#setFirstRow(int)} and
+   * {@link Query#setMaxRows(int)} is that it additionally wraps an optional call to
+   * {@link Query#findFutureRowCount()} to determine total row count, total page count etc.
+   * </p>
+   * <p>
+   * Internally this works using {@link Query#setFirstRow(int)} and {@link Query#setMaxRows(int)} on
+   * the query. This translates into SQL that uses limit offset, rownum or row_number function to
+   * limit the result set.
+   * </p>
+   * 
+   * @param pageIndex
+   *          The zero based index of the page.
+   * @param pageSize
+   *          The number of beans to return per page.
+   * @return The PagedList
+   */
+  public PagedList<T> findPagedList(int pageIndex, int pageSize);
 
   /**
    * Set a named bind parameter. Named parameters have a colon to prefix the

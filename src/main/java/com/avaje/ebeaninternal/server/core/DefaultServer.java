@@ -30,6 +30,7 @@ import com.avaje.ebean.Filter;
 import com.avaje.ebean.FutureIds;
 import com.avaje.ebean.FutureList;
 import com.avaje.ebean.FutureRowCount;
+import com.avaje.ebean.PagedList;
 import com.avaje.ebean.PagingList;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.QueryIterator;
@@ -96,6 +97,7 @@ import com.avaje.ebeaninternal.server.query.CallableQueryIds;
 import com.avaje.ebeaninternal.server.query.CallableQueryList;
 import com.avaje.ebeaninternal.server.query.CallableQueryRowCount;
 import com.avaje.ebeaninternal.server.query.CallableSqlQueryList;
+import com.avaje.ebeaninternal.server.query.LimitOffsetPagedList;
 import com.avaje.ebeaninternal.server.query.LimitOffsetPagingQuery;
 import com.avaje.ebeaninternal.server.query.QueryFutureIds;
 import com.avaje.ebeaninternal.server.query.QueryFutureList;
@@ -1417,6 +1419,12 @@ public final class DefaultServer implements SpiEbeanServer {
     }
 
     return new LimitOffsetPagingQuery<T>(this, spiQuery, pageSize);
+  }
+
+  @Override
+  public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction, int pageIndex, int pageSize) {
+    
+    return new LimitOffsetPagedList<T>(this, (SpiQuery<T>)query, pageIndex, pageSize);
   }
 
   public <T> void findVisit(Query<T> query, QueryResultVisitor<T> visitor, Transaction t) {

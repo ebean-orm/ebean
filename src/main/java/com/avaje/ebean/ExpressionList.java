@@ -200,10 +200,34 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @param pageSize
    *          the number of beans fetched per Page
-   * 
+   * @deprecated
    */
   public PagingList<T> findPagingList(int pageSize);
 
+  /**
+   * Return a PagedList for this query.
+   * <p>
+   * The benefit of using this over just using the normal {@link Query#setFirstRow(int)} and
+   * {@link Query#setMaxRows(int)} is that it additionally wraps an optional call to
+   * {@link Query#findFutureRowCount()} to determine total row count, total page count etc.
+   * </p>
+   * <p>
+   * Internally this works using {@link Query#setFirstRow(int)} and {@link Query#setMaxRows(int)} on
+   * the query. This translates into SQL that uses limit offset, rownum or row_number
+   * function to limit the result set.
+   * </p>
+   * 
+   * @param pageIndex
+   *          The zero based index of the page.
+   * @param pageSize
+   *          The number of beans to return per page.
+   * @return The PagedList
+   */
+  public PagedList<T> findPagedList(int pageIndex, int pageSize);
+
+  /**
+   * Add some filter predicate expressions to the many property.
+   */
   public ExpressionList<T> filterMany(String prop);
 
   /**
