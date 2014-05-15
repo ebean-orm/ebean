@@ -7,6 +7,10 @@ import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.cache.ServerCache;
+import com.avaje.ebean.cache.ServerCacheManager;
+import com.avaje.ebean.cache.ServerCacheStatistics;
 import com.avaje.tests.model.embedded.EAddress;
 import com.avaje.tests.model.embedded.EInvoice;
 import com.avaje.tests.model.embedded.EInvoice.State;
@@ -71,7 +75,45 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
       
     Assert.assertNotNull(billAddress);
     Assert.assertEquals("3 Pineapple St", billAddress.getStreet());
+   
+    EbeanServer server = Ebean.getServer(null);
+    ServerCacheManager serverCacheManager = server.getServerCacheManager();
     
+    // get cache, clear the cache and statistics
+    ServerCache beanCache = serverCacheManager.getBeanCache(EInvoice.class);
+    beanCache.clear();
+    beanCache.getStatistics(true);
+    
+    // fetch and load the cache
+    EInvoice invoice4 = Ebean.find(EInvoice.class)
+        .where().idEq(invoice.getId())
+        .setUseCache(true)
+        .findUnique();
+    
+    Assert.assertNotNull(invoice4);
+    
+    ServerCacheStatistics statistics = beanCache.getStatistics(false);
+
+    Assert.assertEquals(1, statistics.getSize());
+    Assert.assertEquals(0, statistics.getHitCount());
+
+    // fetch out of the cache this time
+    EInvoice invoice5 = Ebean.find(EInvoice.class)
+        .where().idEq(invoice.getId())
+        .setUseCache(true)
+        .findUnique();
+
+    Assert.assertNotNull(invoice5);
+    
+    statistics = beanCache.getStatistics(false);
+    Assert.assertEquals(1, statistics.getSize());
+    Assert.assertEquals(1, statistics.getHitCount());
+
+    billAddress = invoice5.getBillAddress();
+    
+    Assert.assertNotNull(billAddress);
+    Assert.assertEquals("3 Pineapple St", billAddress.getStreet());
+
   }
   
 }
