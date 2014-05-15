@@ -1,5 +1,6 @@
 package com.avaje.tests.model.carwheeltruck;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import javax.persistence.InheritanceType;
 @DiscriminatorValue("truck")
 public class TTruck extends TCar {
 
+  @Column(name="truckLoad")
   Long load;
 
   public Long getLoad() {

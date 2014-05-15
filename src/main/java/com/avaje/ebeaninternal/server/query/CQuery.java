@@ -363,6 +363,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       if (forwardOnlyHint) {
         // Use forward only hints for large resultset processing (Issue 56, MySql specific)
         pstmt = conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        pstmt.setFetchSize(Integer.MIN_VALUE);
       } else {
         pstmt = conn.prepareStatement(sql);        
       }
