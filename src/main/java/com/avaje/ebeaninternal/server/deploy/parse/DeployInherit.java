@@ -135,7 +135,8 @@ public class DeployInherit {
 		}
 		DiscriminatorColumn da = (DiscriminatorColumn) cls.getAnnotation(DiscriminatorColumn.class);
 		if (da != null) {
-			info.setDiscriminatorColumn(da.name());
+		  // lowercase the discriminator column for RawSql and JSON
+			info.setDiscriminatorColumn(da.name().toLowerCase());
 			DiscriminatorType discriminatorType = da.discriminatorType();
 			if (discriminatorType.equals(DiscriminatorType.INTEGER)){
 				info.setDiscriminatorType(Types.INTEGER);				

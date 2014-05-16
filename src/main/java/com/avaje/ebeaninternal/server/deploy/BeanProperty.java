@@ -74,6 +74,11 @@ public class BeanProperty implements ElPropertyValue {
     final boolean unidirectionalShadow;
 
     /**
+     * Flag set if this maps to the inheritance discriminator column
+     */
+    final boolean discriminator;
+    
+    /**
      * Flag to mark the property as embedded. This could be on
      * BeanPropertyAssocOne rather than here. Put it here for checking Id type
      * (embedded or not).
@@ -267,6 +272,7 @@ public class BeanProperty implements ElPropertyValue {
         this.propertyIndex = deploy.getPropertyIndex();
         
         this.unidirectionalShadow = deploy.isUndirectionalShadow();
+        this.discriminator = deploy.isDiscriminator();
         this.localEncrypted = deploy.isLocalEncrypted();
         this.dbEncrypted = deploy.isDbEncrypted();
         this.dbEncryptedType = deploy.getDbEncryptedType();
@@ -305,12 +311,6 @@ public class BeanProperty implements ElPropertyValue {
         this.readMethod = deploy.getReadMethod();
         this.writeMethod = deploy.getWriteMethod();
         this.getter = deploy.getGetter();
-        if (descriptor != null && getter == null) {
-            if (!unidirectionalShadow) {
-                String m = "Null Getter for: " + getFullBeanName();
-                throw new RuntimeException(m);
-            }
-        }
         this.setter = deploy.getSetter();
 
         this.dbColumn = tableAliasIntern(descriptor, deploy.getDbColumn(), false, null);
@@ -368,6 +368,7 @@ public class BeanProperty implements ElPropertyValue {
 
         this.fetchEager = source.fetchEager;
         this.unidirectionalShadow = source.unidirectionalShadow;
+        this.discriminator = source.discriminator;
         this.localEncrypted = source.isLocalEncrypted();
         this.isTransient = source.isTransient();
         this.secondaryTable = source.isSecondaryTable();
@@ -467,6 +468,13 @@ public class BeanProperty implements ElPropertyValue {
      */
     public boolean isFormula() {
         return formula;
+    }
+
+    /**
+     * Return true if this property maps to the inheritance discriminator column.
+     */
+    public boolean isDiscriminator() {
+      return discriminator;
     }
 
     public void copyProperty(EntityBean sourceBean, EntityBean destBean) {

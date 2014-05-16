@@ -69,8 +69,7 @@ public class SqlTreeBuilder {
   /**
    * Construct for RawSql query.
    */
-  public SqlTreeBuilder(OrmQueryRequest<?> request, CQueryPredicates predicates,
-      OrmQueryDetail queryDetail) {
+  public SqlTreeBuilder(OrmQueryRequest<?> request, CQueryPredicates predicates, OrmQueryDetail queryDetail) {
 
     this.rawSql = true;
     this.desc = request.getBeanDescriptor();
@@ -240,9 +239,7 @@ public class SqlTreeBuilder {
 
     Set<String> includes = manyWhereJoins.getJoins();
     for (String joinProp : includes) {
-
-      BeanPropertyAssoc<?> beanProperty = (BeanPropertyAssoc<?>) desc
-          .getBeanPropertyFromPath(joinProp);
+      BeanPropertyAssoc<?> beanProperty = (BeanPropertyAssoc<?>) desc.getBeanPropertyFromPath(joinProp);
       SqlTreeNodeManyWhereJoin nodeJoin = new SqlTreeNodeManyWhereJoin(joinProp, beanProperty);
       myJoinList.add(nodeJoin);
     }
@@ -334,8 +331,7 @@ public class SqlTreeBuilder {
 
     BeanProperty p = desc.findBeanProperty(propName);
     if (p == null) {
-      logger
-          .error("property [" + propName + "]not found on " + desc + " for query - excluding it.");
+      logger.error("property [" + propName + "]not found on " + desc + " for query - excluding it.");
 
     } else if (p instanceof BeanPropertyAssoc<?> && p.isEmbedded()) {
       // if the property is embedded we need to lookup the real column name
@@ -368,9 +364,7 @@ public class SqlTreeBuilder {
       if (!selectProps.containsProperty(baseName)) {
         BeanProperty p = desc.findBeanProperty(baseName);
         if (p == null) {
-          String m = "property [" + propName + "] not found on " + desc
-              + " for query - excluding it.";
-          logger.error(m);
+          logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
 
         } else if (p.isEmbedded()) {
           // add the embedded bean (and effectively
@@ -378,8 +372,7 @@ public class SqlTreeBuilder {
           selectProps.add(p);
 
         } else {
-          String m = "property [" + p.getFullBeanName()
-              + "] expected to be an embedded bean for query - excluding it.";
+          String m = "property [" + p.getFullBeanName() + "] expected to be an embedded bean for query - excluding it.";
           logger.error(m);
         }
       }
@@ -389,8 +382,9 @@ public class SqlTreeBuilder {
       // sub class hierarchy if required
       BeanProperty p = desc.findBeanProperty(propName);
       if (p == null) {
-        logger.error("property [" + propName + "] not found on " + desc
-            + " for query - excluding it.");
+        logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
+        p =  desc.findBeanProperty("id");
+        selectProps.add(p);
 
       } else if (p.isId()) {
         // do not bother to include id for normal queries as the
@@ -415,7 +409,7 @@ public class SqlTreeBuilder {
 
   private SqlTreeProperties getBaseSelectPartial(BeanDescriptor<?> desc, OrmQueryProperties queryProps) {
 
-    SqlTreeProperties selectProps = new SqlTreeProperties(desc);
+    SqlTreeProperties selectProps = new SqlTreeProperties();
     selectProps.setReadOnly(queryProps.isReadOnly());
 
     // add properties in the order in which they appear
@@ -443,7 +437,7 @@ public class SqlTreeBuilder {
       return getBaseSelectPartial(desc, queryProps);
     }
 
-    SqlTreeProperties selectProps = new SqlTreeProperties(desc);
+    SqlTreeProperties selectProps = new SqlTreeProperties();
     selectProps.setAllProperties(true);
 
     // normal simple properties of the bean
@@ -486,9 +480,7 @@ public class SqlTreeBuilder {
       if (manyProperty != null) {
         // only one many associated allowed to be included in fetch
         if (logger.isDebugEnabled()) {
-          String msg = "Not joining [" + propName + "] as already joined to a Many[" + manyProperty
-              + "].";
-          logger.debug(msg);
+          logger.debug("Not joining [" + propName + "] as already joined to a Many[" + manyProperty + "].");
         }
         return false;
       }

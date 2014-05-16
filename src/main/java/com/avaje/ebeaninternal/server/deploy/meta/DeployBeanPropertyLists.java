@@ -16,7 +16,9 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
+import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
+import com.avaje.ebeaninternal.server.type.ScalarTypeString;
 
 /**
  * Helper object to classify BeanProperties into appropriate lists.
@@ -88,6 +90,21 @@ public class DeployBeanPropertyLists {
       allocateToList(prop);
     }
 
+    InheritInfo inheritInfo = deploy.getInheritInfo();
+    if (inheritInfo != null) {
+      // Create a BeanProperty for the discriminator column to support 
+      // using RawSql queries with inheritance
+      String discriminatorColumn = inheritInfo.getDiscriminatorColumn();
+      DeployBeanProperty discDeployProp = new DeployBeanProperty(deploy, String.class, new ScalarTypeString(), null);
+      discDeployProp.setDiscriminator(true);
+      discDeployProp.setName(discriminatorColumn);
+      discDeployProp.setDbColumn(discriminatorColumn);
+      
+      // create the discriminator BeanProperty and only register it in the propertyMap
+      BeanProperty dprop = new BeanProperty(owner, desc, discDeployProp);
+      propertyMap.put(dprop.getName(), dprop);
+    }
+    
     List<DeployTableJoin> deployTableJoins = deploy.getTableJoins();
     tableJoins = new TableJoin[deployTableJoins.size()];
     for (int i = 0; i < deployTableJoins.size(); i++) {

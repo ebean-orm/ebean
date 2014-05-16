@@ -127,7 +127,7 @@ public class DRawSqlSelect {
 		sqlTree.setSummary(desc.getName());
 
 		LinkedHashSet<String> includedProps = new LinkedHashSet<String>();
-		SqlTreeProperties selectProps = new SqlTreeProperties(desc);
+		SqlTreeProperties selectProps = new SqlTreeProperties();
 
 		for (int i = 0; i < selectColumns.length; i++) {
 

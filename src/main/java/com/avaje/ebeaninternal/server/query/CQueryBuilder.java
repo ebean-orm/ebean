@@ -257,21 +257,21 @@ public class CQueryBuilder implements Constants {
 
         ElPropertyValue el = descriptor.getElGetValue(propertyName);
         if (el == null) {
-          String msg = "Property [" + propertyName + "] not found on " + descriptor.getFullName();
-          throw new PersistenceException(msg);
-        }
-        BeanProperty beanProperty = el.getBeanProperty();
-        if (beanProperty.isId()) {
-          // For @Id properties we chop off the last part of the path
-          propertyName = SplitName.parent(propertyName);
-        } else if (beanProperty instanceof BeanPropertyAssocOne<?>) {
-          String msg = "Column [" + column.getDbColumn() + "] mapped to complex Property[" + propertyName + "]";
-          msg += ". It should be mapped to a simple property (proably the Id property). ";
-          throw new PersistenceException(msg);
-        }
-        if (propertyName != null) {
-          String[] pathProp = SplitName.split(propertyName);
-          pathProps.addToPath(pathProp[0], pathProp[1]);
+            throw new PersistenceException("Property [" + propertyName + "] not found on " + descriptor.getFullName());
+        } else {
+          BeanProperty beanProperty = el.getBeanProperty();
+          if (beanProperty.isId() || beanProperty.isDiscriminator()) {
+            // For @Id properties we chop off the last part of the path
+            propertyName = SplitName.parent(propertyName);
+          } else if (beanProperty instanceof BeanPropertyAssocOne<?>) {
+            String msg = "Column [" + column.getDbColumn() + "] mapped to complex Property[" + propertyName + "]";
+            msg += ". It should be mapped to a simple property (proably the Id property). ";
+            throw new PersistenceException(msg);
+          }
+          if (propertyName != null) {
+            String[] pathProp = SplitName.split(propertyName);
+            pathProps.addToPath(pathProp[0], pathProp[1]);
+          }
         }
       }
     }
