@@ -149,6 +149,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final XmlConfig xmlConfig;
 
+  private final BeanLifecycleAdapterFactory beanLifecycleAdapterFactory;
+
   /**
    * Create for a given database dbConfig.
    */
@@ -177,6 +179,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     this.updateChangesOnly = config.getServerConfig().isUpdateChangesOnly();
 
+    this.beanLifecycleAdapterFactory = new BeanLifecycleAdapterFactory();
     this.persistControllerManager = new PersistControllerManager(bootupClasses);
     this.persistListenerManager = new PersistListenerManager(bootupClasses);
     this.beanQueryAdapterManager = new BeanQueryAdapterManager(bootupClasses);
@@ -1010,6 +1013,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     desc.setUpdateChangesOnly(updateChangesOnly);
 
+    beanLifecycleAdapterFactory.addLifecycleMethods(desc);
+    
     // set bean controller, finder and listener
     setBeanControllerFinderListener(desc);
     deplyInherit.process(desc);

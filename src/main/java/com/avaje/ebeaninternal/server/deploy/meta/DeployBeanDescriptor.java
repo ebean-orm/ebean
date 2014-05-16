@@ -133,9 +133,9 @@ public class DeployBeanDescriptor<T> {
    */
   private Class<T> beanType;
 
-  private List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>();
-  private List<BeanPersistListener<T>> persistListeners = new ArrayList<BeanPersistListener<T>>();
-  private List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>();
+  private List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>(2);
+  private List<BeanPersistListener<T>> persistListeners = new ArrayList<BeanPersistListener<T>>(2);
+  private List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>(2);
 
   private CacheOptions cacheOptions = new CacheOptions();
 
@@ -147,7 +147,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * The table joins for this bean. Server side only.
    */
-  private ArrayList<DeployTableJoin> tableJoinList = new ArrayList<DeployTableJoin>();
+  private ArrayList<DeployTableJoin> tableJoinList = new ArrayList<DeployTableJoin>(2);
 
   /**
    * Inheritance information. Server side only.
