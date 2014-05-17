@@ -204,6 +204,12 @@ public class ServerConfig {
    * Default behaviour for updates when cascade save on a O2M or M2M to delete any missing children.
    */
   private boolean updatesDeleteMissingChildren = true;
+  
+  /**
+   * Setting to indicate if UUID should be stored as binary(16) or varchar(40).
+   */
+  private boolean uuidStoreAsBinary;
+  
 
   private List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>();
   private List<BeanPersistListener<?>> persistListeners = new ArrayList<BeanPersistListener<?>>();
@@ -796,6 +802,21 @@ public class ServerConfig {
     this.dbEncrypt = dbEncrypt;
   }
 
+  
+  /**
+   * Return true if UUID should be stored as binary(16) (as opposed to varchar(40)).
+   */
+  public boolean isUuidStoreAsBinary() {
+    return uuidStoreAsBinary;
+  }
+
+  /**
+   * Set to true if UUID should be stored as binary(16) (as opposed to varchar(40)).
+   */
+  public void setUuidStoreAsBinary(boolean uuidStoreAsBinary) {
+    this.uuidStoreAsBinary = uuidStoreAsBinary;
+  }
+
   /**
    * Set to true to run the DDL generation on startup.
    */
@@ -1282,7 +1303,7 @@ public class ServerConfig {
 
     collectQueryStatsByNode = p.getBoolean("collectQueryStatsByNode", true);
     collectQueryOrigins = p.getBoolean("collectQueryOrigins", true);
-    
+
     updateChangesOnly = p.getBoolean("updateChangesOnly", true);
     
     boolean defaultDeleteMissingChildren = p.getBoolean("defaultDeleteMissingChildren", true);
@@ -1299,6 +1320,7 @@ public class ServerConfig {
     databaseBooleanTrue = p.get("databaseBooleanTrue", null);
     databaseBooleanFalse = p.get("databaseBooleanFalse", null);
     databasePlatformName = p.get("databasePlatformName", null);
+    uuidStoreAsBinary = p.getBoolean("uuidStoreAsBinary", false);
 
     lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", 1);
     queryBatchSize = p.getInt("queryBatchSize", DEFAULT_QUERY_BATCH_SIZE);

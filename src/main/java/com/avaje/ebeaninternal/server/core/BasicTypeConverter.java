@@ -8,6 +8,7 @@ import java.sql.Types;
 import java.util.Calendar;
 import java.util.UUID;
 
+import com.avaje.ebeaninternal.server.type.ScalarTypeUUIDBinary;
 
 /**
  * Default implementation of TypeConverter.
@@ -191,6 +192,9 @@ public final class BasicTypeConverter implements Serializable {
 		}
 		if (value instanceof String) {
 			return UUID.fromString((String) value);
+		}
+		if (value instanceof byte[]) {
+		  return ScalarTypeUUIDBinary.convertFromBytes((byte[])value);
 		}
 		return (UUID) value;
 	}

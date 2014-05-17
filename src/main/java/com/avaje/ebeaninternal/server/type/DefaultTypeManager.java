@@ -102,7 +102,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final ScalarType<?> timestampType = new ScalarTypeTimestamp();
 
-  private final ScalarType<?> uuidType = new ScalarTypeUUID();
   private final ScalarType<?> urlType = new ScalarTypeURL();
   private final ScalarType<?> uriType = new ScalarTypeURI();
   private final ScalarType<?> localeType = new ScalarTypeLocale();
@@ -140,7 +139,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
 
-    initialiseStandard(clobType, blobType);
+    initialiseStandard(clobType, blobType, config.isUuidStoreAsBinary());
     initialiseJodaTypes();
 
     if (bootupClasses != null) {
@@ -613,7 +612,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * Register all the standard types supported. This is the standard JDBC types
    * plus some other common types such as java.util.Date and java.util.Calendar.
    */
-  protected void initialiseStandard(int platformClobType, int platformBlobType) {
+  protected void initialiseStandard(int platformClobType, int platformBlobType, boolean binaryUUID) {
 
     ScalarType<?> utilDateType = extraTypeFactory.createUtilDate();
     typeMap.put(java.util.Date.class, utilDateType);
@@ -637,13 +636,13 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       // boolean mapping to Types.Integer, Types.VARCHAR or Types.Boolean
     }
 
-//    ScalarTypeScalaDouble scalaDoubleType = new ScalarTypeScalaDouble();
-//    typeMap.put(scala.Double.class, scalaDoubleType);
+    // Store UUID as binary(16) or varchar(40)
+    ScalarType<?> uuidType = (binaryUUID) ? new ScalarTypeUUIDBinary() : new ScalarTypeUUIDVarchar();
+    typeMap.put(UUID.class, uuidType);
 
     typeMap.put(Locale.class, localeType);
     typeMap.put(Currency.class, currencyType);
     typeMap.put(TimeZone.class, timeZoneType);
-    typeMap.put(UUID.class, uuidType);
     typeMap.put(URL.class, urlType);
     typeMap.put(URI.class, uriType);
 
