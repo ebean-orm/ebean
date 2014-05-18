@@ -10,7 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
+import com.avaje.ebeaninternal.api.PropertyJoin;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Type;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
@@ -24,9 +28,6 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Factory for SqlTree.
@@ -169,7 +170,7 @@ public class SqlTreeBuilder {
     if (rawSql) {
       return "Not Used";
     }
-    rootNode.appendFrom(ctx, false);
+    rootNode.appendFrom(ctx, SqlJoinType.AUTO);
     return ctx.getContent();
   }
 
@@ -181,7 +182,7 @@ public class SqlTreeBuilder {
     if (!rawSql) {
       alias.addJoin(queryDetail.getIncludes(), desc);
       alias.addJoin(predicates.getPredicateIncludes(), desc);
-      alias.addManyWhereJoins(manyWhereJoins.getJoins());
+      alias.addManyWhereJoins(manyWhereJoins.getPropertyNames());
 
       // build set of table alias
       alias.buildAlias();
@@ -237,10 +238,10 @@ public class SqlTreeBuilder {
    */
   private void addManyWhereJoins(List<SqlTreeNode> myJoinList) {
 
-    Set<String> includes = manyWhereJoins.getJoins();
-    for (String joinProp : includes) {
-      BeanPropertyAssoc<?> beanProperty = (BeanPropertyAssoc<?>) desc.getBeanPropertyFromPath(joinProp);
-      SqlTreeNodeManyWhereJoin nodeJoin = new SqlTreeNodeManyWhereJoin(joinProp, beanProperty);
+    Collection<PropertyJoin> includes = manyWhereJoins.getPropertyJoins();
+    for (PropertyJoin joinProp : includes) {
+      BeanPropertyAssoc<?> beanProperty = (BeanPropertyAssoc<?>) desc.getBeanPropertyFromPath(joinProp.getProperty());
+      SqlTreeNodeManyWhereJoin nodeJoin = new SqlTreeNodeManyWhereJoin(joinProp.getProperty(), beanProperty, joinProp.getSqlJoinType());
       myJoinList.add(nodeJoin);
     }
   }
@@ -289,12 +290,11 @@ public class SqlTreeBuilder {
     // support the predicates or order by clauses.
 
     // remove ManyWhereJoins from the predicateIncludes
-    predicateIncludes.removeAll(manyWhereJoins.getJoins());
+    predicateIncludes.removeAll(manyWhereJoins.getPropertyNames());
 
     // look for predicateIncludes that are not in selectIncludes and add
     // them as extra joins to the query
-    IncludesDistiller extraJoinDistill = new IncludesDistiller(desc, selectIncludes,
-        predicateIncludes);
+    IncludesDistiller extraJoinDistill = new IncludesDistiller(desc, selectIncludes, predicateIncludes);
 
     Collection<SqlTreeNodeExtraJoin> extraJoins = extraJoinDistill.getExtraJoinRootNodes();
     if (extraJoins.isEmpty()) {

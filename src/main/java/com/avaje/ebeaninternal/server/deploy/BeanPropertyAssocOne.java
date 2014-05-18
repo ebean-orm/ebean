@@ -23,6 +23,7 @@ import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
+import com.avaje.ebeaninternal.server.query.SqlJoinType;
 import com.avaje.ebeaninternal.server.text.json.ReadJsonContext;
 import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
 
@@ -508,9 +509,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
 
     @Override
-    public void appendFrom(DbSqlContext ctx, boolean forceOuterJoin) {
+    public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
         if (!isTransient) {
-            localHelp.appendFrom(ctx, forceOuterJoin);
+            localHelp.appendFrom(ctx, joinType);
         }
     }
 
@@ -587,7 +588,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
         abstract void appendSelect(DbSqlContext ctx, boolean subQuery);
 
-        abstract void appendFrom(DbSqlContext ctx, boolean forceOuterJoin);
+        abstract void appendFrom(DbSqlContext ctx, SqlJoinType joinType);
         
     }
 
@@ -633,7 +634,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         }
 
         @Override
-        void appendFrom(DbSqlContext ctx, boolean forceOuterJoin) {
+        void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
         }
 
         @Override
@@ -729,11 +730,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         }
 
         @Override
-        void appendFrom(DbSqlContext ctx, boolean forceOuterJoin) {
+        void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
             if (targetInheritInfo != null) {
                 // add join to support the discriminator column
                 String relativePrefix = ctx.getRelativePrefix(name);
-                tableJoin.addJoin(forceOuterJoin, relativePrefix, ctx);
+                tableJoin.addJoin(joinType, relativePrefix, ctx);
             }
         }
 
@@ -822,10 +823,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         }
 
         @Override
-        void appendFrom(DbSqlContext ctx, boolean forceOuterJoin) {
+        void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
 
             String relativePrefix = ctx.getRelativePrefix(getName());
-            tableJoin.addJoin(forceOuterJoin, relativePrefix, ctx);
+            tableJoin.addJoin(joinType, relativePrefix, ctx);
         }
     }
     

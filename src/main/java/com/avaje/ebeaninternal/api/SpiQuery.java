@@ -260,10 +260,25 @@ public interface SpiQuery<T> extends Query<T> {
      */
     public Boolean isAutofetch();
 
-//    /**
-//     * Return explicit forUpdate setting or null.
-//     */
-//    public boolean isForUpdate();
+    /**
+     * Set to true if you want to capture executed secondary queries. 
+     */
+    public void setLogSecondaryQuery(boolean logSecondaryQuery);
+
+    /**
+     * Return true if executed secondary queries should be captured.
+     */
+    public boolean isLogSecondaryQuery();
+
+    /**
+     * Return the list of secondary queries that were executed.
+     */
+    public List<SpiQuery<?>> getLoggedSecondaryQueries(); 
+    
+    /**
+     * Log an executed secondary query.
+     */
+    public void logSecondaryQuery(SpiQuery<?> query);
 
     /**
      * If return null then no autoFetch profiling for this query. If a

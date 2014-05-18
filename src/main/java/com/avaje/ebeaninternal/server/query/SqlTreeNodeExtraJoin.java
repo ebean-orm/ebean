@@ -22,13 +22,13 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
 public class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
 	
-	final BeanPropertyAssoc<?> assocBeanProperty;
+	private final BeanPropertyAssoc<?> assocBeanProperty;
 	
-	final String prefix;
+	private final String prefix;
 	
-	final boolean manyJoin;
+	private final boolean manyJoin;
 	
-	List<SqlTreeNodeExtraJoin> children;
+	private List<SqlTreeNodeExtraJoin> children;
 	
 	public SqlTreeNodeExtraJoin(String prefix, BeanPropertyAssoc<?> assocBeanProperty) {
 		this.prefix = prefix;
@@ -66,7 +66,7 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
 		children.add(child);
 	}
 	
-	public void appendFrom(DbSqlContext ctx, boolean forceOuterJoin) {
+	public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
 		
 		boolean manyToMany = false;
 		
@@ -82,29 +82,29 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
 				String alias2 = alias+"z_";
 				
 				TableJoin manyToManyJoin = manyProp.getIntersectionTableJoin();
-				manyToManyJoin.addJoin(forceOuterJoin, parentAlias, alias2, ctx);
+				manyToManyJoin.addJoin(joinType, parentAlias, alias2, ctx);
 				
-				assocBeanProperty.addJoin(forceOuterJoin, alias2, alias, ctx);
+				assocBeanProperty.addJoin(joinType, alias2, alias, ctx);
 			}
 		}
         
 		if (!manyToMany){
-			assocBeanProperty.addJoin(forceOuterJoin, prefix, ctx);
+			assocBeanProperty.addJoin(joinType, prefix, ctx);
 		}
-        
-        if (children != null){
-        	
-        	if (manyJoin){
-        		// make sure all decendants use OUTER JOIN
-        		forceOuterJoin = true;
-        	}
-        	
-        	for (int i = 0; i < children.size(); i++) {
-        		SqlTreeNodeExtraJoin child = children.get(i);
-        		child.appendFrom(ctx, forceOuterJoin);
-			}
-        }
-	}
+
+    if (children != null) {
+
+      if (manyJoin) {
+        // if AUTO then make all decendants use OUTER JOIN
+        joinType = joinType.autoToOuter();
+      }
+
+      for (int i = 0; i < children.size(); i++) {
+        SqlTreeNodeExtraJoin child = children.get(i);
+        child.appendFrom(ctx, joinType);
+      }
+    }
+  }
 
 	/**
 	 * Does nothing.

@@ -28,7 +28,7 @@ public interface SqlTreeNode {
   /**
    * Append to the FROM part of the sql.
    */
-  public void appendFrom(DbSqlContext ctx, boolean forceOuterJoin);
+  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType);
 
   /**
    * Append any where predicates for inheritance.

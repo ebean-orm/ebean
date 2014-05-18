@@ -56,6 +56,13 @@ public abstract class DLoadBaseContext {
     if (queryProps == null) {
       return batchSize;
     }
+    
+    int queryFetchBatch = queryProps.getQueryFetchBatch();
+    if (queryFetchBatch > 0) {
+      // property join was automatically set to a 'query join'
+      return queryFetchBatch;
+    }
+    
     FetchConfig fetchConfig = queryProps.getFetchConfig();
     if (fetchConfig == null) {
       return batchSize;

@@ -34,8 +34,8 @@ public final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
    * Force outer join for everything after the many property.
    */
   @Override
-  public void appendFrom(DbSqlContext ctx, boolean forceOuterJoin) {
-    super.appendFrom(ctx, true);
+  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
+    super.appendFrom(ctx, joinType.autoToOuter());
   }
 
 }

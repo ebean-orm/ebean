@@ -24,13 +24,14 @@ public class TestOrderTotalAmountFormula extends BaseTestCase {
         .findList();
 
     for (Customer c0 : l0) {
-      System.out.println("customer: " + c0.getId());
+      c0.getId();
       List<Order> orders = c0.getOrders();
       for (Order order : orders) {
-        System.out.println("... order:" + order);
+        order.getId();
       }
     }
 
   }
+
 
 }

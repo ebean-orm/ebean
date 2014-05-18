@@ -1,4 +1,4 @@
-package com.avaje.tests.query;
+package com.avaje.tests.query.joins;
 
 import java.util.List;
 
@@ -28,7 +28,8 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Order> list = Ebean.find(Order.class).fetch("customer")
+    List<Order> list = Ebean.find(Order.class)
+        .fetch("customer")
         .fetch("customer.contacts", "firstName", new FetchConfig().query().lazy(10))
         .fetch("customer.contacts.group")
         .where().lt("id", 3).findList();
@@ -52,4 +53,6 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
     // Assert.assertTrue(list2.size() > 0);
 
   }
+  
+
 }

@@ -10,6 +10,7 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
+import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
 /**
  * Represents a join to another table.
@@ -32,9 +33,9 @@ public final class TableJoin {
   private final String table;
 
   /**
-   * The type of join. LEFT OUTER etc.
+   * The type of join as per deployment (cardinality and optionality).
    */
-  private final String type;
+  private final SqlJoinType type;
 
   /**
    * The persist cascade info.
@@ -60,7 +61,7 @@ public final class TableJoin {
 
     this.importedPrimaryKey = deploy.isImportedPrimaryKey();
     this.table = InternString.intern(deploy.getTable());
-    this.type = InternString.intern(deploy.getType());
+    this.type = deploy.getType();
     this.cascadeInfo = deploy.getCascadeInfo();
     this.inheritInfo = deploy.getInheritInfo();
 
@@ -149,7 +150,7 @@ public final class TableJoin {
   /**
    * Return the type of join. LEFT OUTER JOIN etc.
    */
-  public String getType() {
+  public SqlJoinType getType() {
     return type;
   }
 
@@ -157,32 +158,26 @@ public final class TableJoin {
    * Return true if this join is a left outer join.
    */
   public boolean isOuterJoin() {
-    return type.equals(LEFT_OUTER);
+    return type == SqlJoinType.OUTER;
   }
 
-  public boolean addJoin(boolean forceOuterJoin, String prefix, DbSqlContext ctx) {
+  public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {
 
     String[] names = SplitName.split(prefix);
     String a1 = ctx.getTableAlias(names[0]);
     String a2 = ctx.getTableAlias(prefix);
 
-    return addJoin(forceOuterJoin, a1, a2, ctx);
+    return addJoin(joinType, a1, a2, ctx);
   }
 
-  public boolean addJoin(boolean forceOuterJoin, String a1, String a2, DbSqlContext ctx) {
+  public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
 
    	String inheritance = inheritInfo != null ? inheritInfo.getWhere() : null;
 
-    ctx.addJoin(forceOuterJoin?LEFT_OUTER:type, table, columns(), a1, a2, inheritance);
+   	String joinLiteral = joinType.getLiteral(type);
+   	ctx.addJoin(joinLiteral, table, columns(), a1, a2, inheritance);
         
-    return forceOuterJoin || LEFT_OUTER.equals(type);
+   	return joinType.autoToOuter(type);
   }
-
-  /**
-   * Explicitly add a (non-outer) join.
-   */
-  public void addInnerJoin(String a1, String a2, DbSqlContext ctx) {
-   	String inheritance = inheritInfo != null ? inheritInfo.getWhere() : null;
-    ctx.addJoin(JOIN, table, columns(), a1, a2, inheritance);
-  }
+  
 }

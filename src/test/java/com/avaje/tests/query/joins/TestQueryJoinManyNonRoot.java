@@ -1,4 +1,4 @@
-package com.avaje.tests.query;
+package com.avaje.tests.query.joins;
 
 import java.util.List;
 
@@ -30,7 +30,15 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
     Assert.assertTrue(list.size() > 0);
     Assert.assertTrue(sql.contains("join o_customer t1 on t1.id "));
     Assert.assertTrue(sql.contains("left outer join contact t2 on"));
-
+    
+    // select t0.id c0, t0.status c1, t0.order_date c2, t0.ship_date c3, t1.name c4, t0.cretime c5, t0.updtime c6, 
+    //        t1.id c7, t1.status c8, t1.name c9, t1.smallnote c10, t1.anniversary c11, t1.cretime c12, t1.updtime c13, t1.billing_address_id c14, t1.shipping_address_id c15, 
+    //        t2.id c16, t2.first_name c17, t2.last_name c18, t2.phone c19, t2.mobile c20, t2.email c21, t2.cretime c22, t2.updtime c23, t2.customer_id c24, t2.group_id c25 
+    // from o_order t0 
+    // join o_customer t1 on t1.id = t0.kcustomer_id 
+    // left outer join contact t2 on t2.customer_id = t1.id 
+    // where t0.id > ? ; --bind(0)
+    
   }
 
   @Test

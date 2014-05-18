@@ -10,13 +10,12 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
  */
 public interface SpiExpression extends Expression {
 
-	/**
-	 * Process "Many" properties populating ManyWhereJoins.
-	 * <p>
-	 * Predicates on Many properties require an extra independent
-     * join clause.
-	 * </p>
-	 */
+  /**
+   * Process "Many" properties populating ManyWhereJoins.
+   * <p>
+   * Predicates on Many properties require an extra independent join clause.
+   * </p>
+   */
 	public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins);
 	
 	/**

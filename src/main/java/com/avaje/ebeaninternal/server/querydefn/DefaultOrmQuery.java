@@ -191,6 +191,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	 */
 	private boolean autoFetchTuned;
 	
+	private boolean logSecondaryQuery;
+	
 	/**
 	 * The node of the bean or collection that fired lazy loading. Not null if
 	 * profiling is on and this query is for lazy loading. Used to hook back a
@@ -585,8 +587,31 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	public void setUsageProfiling(boolean usageProfiling) {
 		this.usageProfiling = usageProfiling;
 	}
+	
+  public void setLogSecondaryQuery(boolean logSecondaryQuery) {
+    this.logSecondaryQuery = logSecondaryQuery;
+  }	
+  
+	public boolean isLogSecondaryQuery() {
+    return logSecondaryQuery;
+  }
 
-	public void setParentNode(ObjectGraphNode parentNode) {
+	private List<SpiQuery<?>> loggedSecondaryQueries;
+	
+  @Override
+  public List<SpiQuery<?>> getLoggedSecondaryQueries() {
+    return loggedSecondaryQueries;
+  }
+  
+  public void logSecondaryQuery(SpiQuery<?> query) {
+    if (loggedSecondaryQueries == null) {
+      loggedSecondaryQueries = new ArrayList<SpiQuery<?>>();
+    }
+    loggedSecondaryQueries.add(query);
+  }
+  
+
+  public void setParentNode(ObjectGraphNode parentNode) {
 		this.parentNode = parentNode;
 	}
 

@@ -54,7 +54,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   private HashQuery cacheKey;
 
   private HashQueryPlan queryPlanHash;
-
+  
   /**
    * Create the InternalQueryRequest.
    */
@@ -361,6 +361,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
   public void flushPersistenceContextOnIterate() {
     beanDescriptor.flushPersistenceContextOnIterate(persistenceContext);
+  }
+
+  /**
+   * Return true if the request wants to log the secondary queries (test purpose).
+   */
+  public boolean isLogSecondaryQuery() {
+    return query.isLogSecondaryQuery();
   }
 
 }

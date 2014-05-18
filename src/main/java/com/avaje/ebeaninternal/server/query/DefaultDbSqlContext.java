@@ -175,12 +175,11 @@ public class DefaultDbSqlContext implements DbSqlContext {
     return this;
   }
 
-  public void appendFormulaJoin(String sqlFormulaJoin, boolean forceOuterJoin) {
+  public void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType) {
 
     // replace ${ta} place holder with the real table alias...
     String tableAlias = tableAliasStack.peek();
-    String converted = StringHelper
-        .replaceString(sqlFormulaJoin, tableAliasPlaceHolder, tableAlias);
+    String converted = StringHelper.replaceString(sqlFormulaJoin, tableAliasPlaceHolder, tableAlias);
 
     if (formulaJoins == null) {
       formulaJoins = new HashSet<String>();
@@ -195,7 +194,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
     formulaJoins.add(converted);
 
     sb.append(" ");
-    if (forceOuterJoin) {
+    if (joinType == SqlJoinType.OUTER) {
       if ("join".equals(sqlFormulaJoin.substring(0, 4).toLowerCase())) {
         // prepend left outer as we are in the 'many' part
         append(" left outer ");

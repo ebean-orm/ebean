@@ -140,6 +140,9 @@ public class DefaultBeanLoader {
         desc.cacheManyPropPut(many, bc, parentId);
       }
     }
+    
+    // log the query (for testing secondary queries)
+    loadRequest.logSecondaryQuery(query);
   }
 
   public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
@@ -322,6 +325,9 @@ public class DefaultBeanLoader {
       // necessary but allow processing to continue until it is accessed by client code
       ebis[i].checkLazyLoadFailure();
     }
+    
+    // log the query (for testing secondary queries)
+    loadRequest.logSecondaryQuery(query);
   }
 
 	public void refresh(EntityBean bean) {

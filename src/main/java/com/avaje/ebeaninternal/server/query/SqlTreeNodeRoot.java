@@ -40,7 +40,7 @@ public final class SqlTreeNodeRoot extends SqlTreeNodeBean {
    * For the root node there is no join type or on clause etc.
    */
   @Override
-  public boolean appendFromBaseTable(DbSqlContext ctx, boolean forceOuterJoin) {
+  public SqlJoinType appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
 
     ctx.append(desc.getBaseTable());
     ctx.append(" ").append(ctx.getTableAlias(null));
@@ -48,10 +48,10 @@ public final class SqlTreeNodeRoot extends SqlTreeNodeBean {
     if (includeJoin != null) {
       String a1 = ctx.getTableAlias(null);
       String a2 = "int_"; // unique alias for intersection join
-      includeJoin.addJoin(forceOuterJoin, a1, a2, ctx);
+      includeJoin.addJoin(joinType, a1, a2, ctx);
     }
 
-    return forceOuterJoin;
+    return joinType;
   }
 	
 }

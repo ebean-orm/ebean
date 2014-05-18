@@ -28,50 +28,47 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
   private static final SqlTreeNode[] NO_CHILDREN = new SqlTreeNode[0];
 
-  final BeanDescriptor<?> desc;
+  protected final BeanDescriptor<?> desc;
 
-  final IdBinder idBinder;
+  protected final IdBinder idBinder;
 
   /**
    * The children which will be other SelectBean or SelectProxyBean.
    */
-  final SqlTreeNode[] children;
+  protected final SqlTreeNode[] children;
 
-  final boolean readOnlyLeaf;
+  protected final boolean readOnlyLeaf;
 
   /**
    * Set to true if this is a partial object fetch.
    */
-  final boolean partialObject;
+  protected final boolean partialObject;
 
-
-  final BeanProperty[] properties;
+  protected final BeanProperty[] properties;
 
   /**
    * Extra where clause added by Where annotation on associated many.
    */
-  final String extraWhere;
+  protected final String extraWhere;
 
-  final BeanPropertyAssoc<?> nodeBeanProp;
+  protected final BeanPropertyAssoc<?> nodeBeanProp;
 
-  final TableJoin[] tableJoins;
+  protected final TableJoin[] tableJoins;
 
   /**
    * False if report bean and has no id property.
    */
-  final boolean readId;
+  protected final boolean readId;
 
-  final boolean disableLazyLoad;
+  protected final boolean disableLazyLoad;
 
-  final InheritInfo inheritInfo;
+  protected final InheritInfo inheritInfo;
 
-  final String prefix;
+  protected final String prefix;
 
-
-  final Map<String, String> pathMap;
-
+  protected final Map<String, String> pathMap;
   
-  final BeanPropertyAssocMany<?> lazyLoadParent;
+  protected final BeanPropertyAssocMany<?> lazyLoadParent;
   
   public SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
       List<SqlTreeNode> myChildren, boolean withId) {
@@ -452,20 +449,21 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Append to the FROM clause for this node.
    */
-  public void appendFrom(DbSqlContext ctx, boolean forceOuterJoin) {
+  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
 
     ctx.pushJoin(prefix);
     ctx.pushTableAlias(prefix);
 
-    forceOuterJoin = appendFromBaseTable(ctx, forceOuterJoin);
+    // join and return SqlJoinType to use for child joins
+    joinType = appendFromBaseTable(ctx, joinType);
 
     for (int i = 0; i < properties.length; i++) {
       // usually nothing... except for 1-1 Exported
-      properties[i].appendFrom(ctx, forceOuterJoin);
+      properties[i].appendFrom(ctx, joinType);
     }
 
     for (int i = 0; i < children.length; i++) {
-      children[i].appendFrom(ctx, forceOuterJoin);
+      children[i].appendFrom(ctx, joinType);
     }
 
     ctx.popTableAlias();
@@ -476,7 +474,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    * Join to base table for this node. This includes a join to the intersection
    * table if this is a ManyToMany node.
    */
-  public boolean appendFromBaseTable(DbSqlContext ctx, boolean forceOuterJoin) {
+  public SqlJoinType appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
 
     if (nodeBeanProp instanceof BeanPropertyAssocMany<?>) {
       BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) nodeBeanProp;
@@ -488,14 +486,14 @@ public class SqlTreeNodeBean implements SqlTreeNode {
         String alias2 = alias + "z_";
 
         TableJoin manyToManyJoin = manyProp.getIntersectionTableJoin();
-        manyToManyJoin.addJoin(forceOuterJoin, parentAlias, alias2, ctx);
+        manyToManyJoin.addJoin(joinType, parentAlias, alias2, ctx);
 
-        return nodeBeanProp.addJoin(forceOuterJoin, alias2, alias, ctx);
+        return nodeBeanProp.addJoin(joinType, alias2, alias, ctx);
       }
 
     }
 
-    return nodeBeanProp.addJoin(forceOuterJoin, prefix, ctx);
+    return nodeBeanProp.addJoin(joinType, prefix, ctx);
   }
 
   /**

@@ -16,6 +16,7 @@ import com.avaje.ebeaninternal.server.deploy.id.ImportedIdSimple;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
+import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
 /**
  * Abstract base for properties mapped to an associated bean, list, set or map.
@@ -129,22 +130,15 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
     /**
 	 * Add table join with table alias based on prefix.
 	 */
-    public boolean addJoin(boolean forceOuterJoin, String prefix, DbSqlContext ctx) {
-    	return tableJoin.addJoin(forceOuterJoin, prefix, ctx);
+    public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {
+    	return tableJoin.addJoin(joinType, prefix, ctx);
     }
     
     /**
 	 * Add table join with explicit table alias.
 	 */
-    public boolean addJoin(boolean forceOuterJoin, String a1, String a2, DbSqlContext ctx) {
-    	return tableJoin.addJoin(forceOuterJoin, a1, a2, ctx);
-    }
-    	
-    /**
-     * Add table join with explicit table alias.
-     */
-    public void addInnerJoin(String a1, String a2, DbSqlContext ctx) {
-        tableJoin.addInnerJoin(a1, a2, ctx);
+    public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
+    	return tableJoin.addJoin(joinType, a1, a2, ctx);
     }
     
 	/**

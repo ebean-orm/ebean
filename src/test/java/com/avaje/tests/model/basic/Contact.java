@@ -28,7 +28,7 @@ public class Contact {
     String mobile;
     String email;
 
-    @ManyToOne
+    @ManyToOne(optional=false)
     Customer customer;
     
     @ManyToOne(optional=true)

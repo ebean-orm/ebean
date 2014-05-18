@@ -2,8 +2,8 @@ package com.avaje.ebeaninternal.api;
 
 import java.util.List;
 
-import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.EntityBeanIntercept;
+import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 
 /**
  * Request for loading ManyToOne and OneToOne relationships.
@@ -18,10 +18,12 @@ public class LoadBeanRequest extends LoadRequest {
 
   private final boolean loadCache;
 
-  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, Transaction transaction, boolean lazy, String lazyLoadProperty,
-      boolean loadCache) {
-
-    super(transaction, lazy);
+  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, boolean lazy, String lazyLoadProperty, boolean loadCache) {
+    this(LoadBuffer, null, lazy, lazyLoadProperty, loadCache);
+  }
+  
+  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, OrmQueryRequest<?> parentRequest, boolean lazy, String lazyLoadProperty, boolean loadCache) {
+    super(parentRequest, lazy);
     this.LoadBuffer = LoadBuffer;
     this.batch = LoadBuffer.getBatch();
     this.lazyLoadProperty = lazyLoadProperty;

@@ -1,7 +1,7 @@
 package com.avaje.tests.query;
 
-import junit.framework.Assert;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
@@ -18,18 +18,18 @@ public class TestIContains extends BaseTestCase {
     ResetBasicData.reset();
 
     // case insensitive
-    Query<Customer> q0 = Ebean.find(Customer.class).where().icontains("name", "Rob").query();
+    Query<Customer> query = Ebean.find(Customer.class).where().icontains("name", "Rob").query();
 
-    q0.findList();
-    String generatedSql = q0.getGeneratedSql();
+    query.findList();
+    String generatedSql = query.getGeneratedSql();
 
     Assert.assertTrue(generatedSql.contains("lower(t0.name)"));
 
     // not case insensitive
-    q0 = Ebean.find(Customer.class).where().contains("name", "Rob").query();
+    query = Ebean.find(Customer.class).where().contains("name", "Rob").query();
 
-    q0.findList();
-    generatedSql = q0.getGeneratedSql();
+    query.findList();
+    generatedSql = query.getGeneratedSql();
 
     Assert.assertTrue(generatedSql.contains(" t0.name "));
 

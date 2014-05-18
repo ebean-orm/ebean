@@ -29,8 +29,8 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     
     super(parent, desc, path, defaultBatchSize, queryProps);
     
+    this.bufferList = new ArrayList<DLoadBeanContext.LoadBuffer>();
     this.currentBuffer = createBuffer(firstBatchSize);  
-    this.bufferList = queryFetch ? new ArrayList<DLoadBeanContext.LoadBuffer>() : null;
   }
   
   protected void configureQuery(SpiQuery<?> query, String lazyLoadProperty) {
@@ -78,7 +78,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
         for (LoadBuffer loadBuffer : bufferList) {
           if (!loadBuffer.list.isEmpty()) {
             boolean loadCache = false;
-            LoadBeanRequest req = new LoadBeanRequest(loadBuffer, parentRequest.getTransaction(), false, null, loadCache);
+            LoadBeanRequest req = new LoadBeanRequest(loadBuffer, parentRequest, false, null, loadCache);
     
             parent.getEbeanServer().loadBean(req);  
             if (!queryProps.isQueryFetchAll()) {
@@ -173,7 +173,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
         }
       }
 
-      LoadBeanRequest req = new LoadBeanRequest(this, null, true, ebi.getLazyLoadProperty(), context.hitCache);
+      LoadBeanRequest req = new LoadBeanRequest(this, true, ebi.getLazyLoadProperty(), context.hitCache);
       context.desc.getEbeanServer().loadBean(req);
     }
 

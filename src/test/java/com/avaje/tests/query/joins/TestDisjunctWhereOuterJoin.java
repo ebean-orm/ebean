@@ -1,4 +1,4 @@
-package com.avaje.tests.query;
+package com.avaje.tests.query.joins;
 
 import java.util.List;
 

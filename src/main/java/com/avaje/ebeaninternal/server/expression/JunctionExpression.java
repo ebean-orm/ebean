@@ -40,7 +40,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     private static final long serialVersionUID = -645619859900030678L;
 
     Conjunction(com.avaje.ebean.Query<T> query, ExpressionList<T> parent) {
-      super(AND, query, parent);
+      super(false, AND, query, parent);
     }
   }
 
@@ -49,17 +49,21 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     private static final long serialVersionUID = -8464470066692221413L;
 
     Disjunction(com.avaje.ebean.Query<T> query, ExpressionList<T> parent) {
-      super(OR, query, parent);
+      super(true, OR, query, parent);
     }
   }
 
-  // private final ArrayList<SpiExpression> list = new
-  // ArrayList<SpiExpression>();
   private final DefaultExpressionList<T> exprList;
 
   private final String joinType;
 
-  JunctionExpression(String joinType, com.avaje.ebean.Query<T> query, ExpressionList<T> parent) {
+  /**
+   * If true then a disjunction which means outer joins are required.
+   */
+  private final boolean disjunction;
+  
+  JunctionExpression(boolean disjunction, String joinType, com.avaje.ebean.Query<T> query, ExpressionList<T> parent) {
+    this.disjunction = disjunction;
     this.joinType = joinType;
     this.exprList = new DefaultExpressionList<T>(query, parent);
   }
@@ -68,8 +72,19 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
 
     List<SpiExpression> list = exprList.internalList();
 
+    // get the current state for 'require outer joins'
+    boolean parentOuterJoins = manyWhereJoin.isRequireOuterJoins();
+    if (disjunction) {
+      // turn on outer joins required for disjunction expressions
+      manyWhereJoin.setRequireOuterJoins(true);
+    }
+    
     for (int i = 0; i < list.size(); i++) {
       list.get(i).containsMany(desc, manyWhereJoin);
+    }
+    if (disjunction && !parentOuterJoins) {
+      // restore state to not forcing outer joins
+      manyWhereJoin.setRequireOuterJoins(false);
     }
   }
 

@@ -27,6 +27,7 @@ import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
+import com.avaje.ebeaninternal.server.query.SqlJoinType;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectGetter;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectSetter;
 import com.avaje.ebeaninternal.server.text.json.ReadJsonContext;
@@ -509,14 +510,14 @@ public class BeanProperty implements ElPropertyValue {
      * Add any extra joins required to support this property. Generally a no
      * operation except for a OneToOne exported.
      */
-    public void appendFrom(DbSqlContext ctx, boolean forceOuterJoin) {
+    public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
         if (formula && sqlFormulaJoin != null) {
-            ctx.appendFormulaJoin(sqlFormulaJoin, forceOuterJoin);
+            ctx.appendFormulaJoin(sqlFormulaJoin, joinType);
 
         } else if (secondaryTableJoin != null) {
 
             String relativePrefix = ctx.getRelativePrefix(secondaryTableJoinPrefix);
-            secondaryTableJoin.addJoin(forceOuterJoin, relativePrefix, ctx);
+            secondaryTableJoin.addJoin(joinType, relativePrefix, ctx);
         }
     }
 
