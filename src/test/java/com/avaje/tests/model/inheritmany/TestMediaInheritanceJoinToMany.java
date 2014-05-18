@@ -32,7 +32,11 @@ public class TestMediaInheritanceJoinToMany extends BaseTestCase {
     // where t0.name = ? ; --bind(nopic)
     
     // specifically t1.type = 'Picture' ... on on the join and not in the where
-        
+   
+    String generatedSql = query.getGeneratedSql();
+    Assert.assertTrue(generatedSql.contains("from mprofile t0 left outer join mmedia t1 on t1.id = t0.picture_id and t1.type = 'Picture' "));
+    Assert.assertTrue(generatedSql.contains("where t0.name = ? "));
+    
   }
   
 }
