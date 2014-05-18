@@ -305,6 +305,8 @@ public class CQueryBuilder implements Constants {
 
     StringBuilder sb = new StringBuilder(500);
 
+    String dbOrderBy = predicates.getDbOrderBy();
+    
     if (selectClause != null) {
       sb.append(selectClause);
 
@@ -320,6 +322,10 @@ public class CQueryBuilder implements Constants {
       }
 
       sb.append(select.getSelectSql());
+      if (query.isDistinct() && dbOrderBy != null) {
+        // add the orderby columns to the select clause (due to distinct)
+        sb.append(", ").append(convertDbOrderByForSelect(dbOrderBy));
+      }
     }
 
     sb.append(" from ");
@@ -375,7 +381,7 @@ public class CQueryBuilder implements Constants {
       sb.append(dbFilterMany);
     }
 
-    String dbOrderBy = predicates.getDbOrderBy();
+    
     if (dbOrderBy != null) {
       sb.append(" order by ").append(dbOrderBy);
     }
@@ -386,12 +392,20 @@ public class CQueryBuilder implements Constants {
       return sqlLimiter.limit(r);
 
     } else {
-
       return new SqlLimitResponse(dbPlatform.completeSql(sb.toString(), query), false);
     }
 
   }
 
+  /**
+   * Convert the dbOrderBy clause to be safe for adding to select. This is done when 'distinct' is
+   * used.
+   */
+  private String convertDbOrderByForSelect(String dbOrderBy) {
+    // just remove the ASC and DESC keywords
+    return dbOrderBy.replaceAll("(?i)\\b asc\\b|\\b desc\\b", "");
+  }
+  
   private boolean isEmpty(String s) {
     return s == null || s.length() == 0;
   }
