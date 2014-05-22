@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.api;
 
-import java.util.Objects;
-
 /**
  * A hash for a query plan.
  */
@@ -26,7 +24,7 @@ public class HashQueryPlan {
   public int hashCode() {
     int hc = planHash;
     hc = hc * 31 + bindCount;
-    hc = hc * 31 + Objects.hashCode(rawSql);
+    hc = hc * 31 + (rawSql == null ? 0 : rawSql.hashCode());
     return hc;
   }
   
@@ -41,6 +39,6 @@ public class HashQueryPlan {
     HashQueryPlan e = (HashQueryPlan) obj;
     return e.planHash == planHash 
         && e.bindCount == bindCount
-        && Objects.equals(e.rawSql, rawSql);
+        &&  ((e.rawSql == rawSql) || (e.rawSql != null && e.rawSql.equals(rawSql)));
   }
 }

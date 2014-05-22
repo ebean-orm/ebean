@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.api;
 
-import java.util.Objects;
-
 /**
  * Used to build HashQueryPlan instances.
  */
@@ -33,7 +31,7 @@ public class HashQueryPlanBuilder {
    * Add an object to the hash calculation.
    */
   public HashQueryPlanBuilder add(Object object) {
-    planHash = planHash * 31 + Objects.hashCode(object);
+    planHash = planHash * 31 + (object == null ? 0 : object.hashCode());
     return this;
   }
 

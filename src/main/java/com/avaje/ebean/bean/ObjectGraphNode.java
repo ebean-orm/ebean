@@ -1,7 +1,6 @@
 package com.avaje.ebean.bean;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * Identifies a unique node of an object graph.
@@ -70,7 +69,7 @@ public final class ObjectGraphNode implements Serializable {
   
   public int hashCode() {
     int hc = 31 * originQueryPoint.hashCode();
-    hc = 31 * hc + Objects.hashCode(path);
+    hc = 31 * hc + (path == null ? 0 : path.hashCode());
     return hc;
   }
   
@@ -83,7 +82,7 @@ public final class ObjectGraphNode implements Serializable {
     }
     
     ObjectGraphNode e = (ObjectGraphNode) obj;
-    return Objects.equals(e.path, path) 
+    return  ((e.path == path) || (e.path != null && e.path.equals(path)))
         && e.originQueryPoint.equals(originQueryPoint);
   }
 }
