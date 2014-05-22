@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.expression;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 
 import com.avaje.ebean.event.BeanQueryRequest;
@@ -115,7 +114,7 @@ class AllEqualsExpression implements SpiExpression {
     
     int hc = 31;
     for (Object value : propMap.values()) {
-      hc = hc * 31 + Objects.hashCode(value);      
+      hc = hc * 31 + (value == null ? 0 : value.hashCode());
     }
 
     return hc;
