@@ -7,16 +7,19 @@ import java.util.Set;
 import javax.persistence.MappedSuperclass;
 
 /**
- * A MappedSuperclass base class that provides convenience methods for inserting, updating and deleting beans.
+ * A MappedSuperclass base class that provides convenience methods for inserting, updating and
+ * deleting beans.
  * 
- * <p>By having your entity beans extend this it provides a 'Active Record' style programming model for Ebean users.
+ * <p>
+ * By having your entity beans extend this it provides a 'Active Record' style programming model for
+ * Ebean users.
  * 
- * <p>Note that there is a avaje-ebeanorm-mocker project that enables you to use Mockito or similar tools to still
- * mock out the underlying 'default EbeanServer' for testing purposes.
+ * <p>
+ * Note that there is a avaje-ebeanorm-mocker project that enables you to use Mockito or similar
+ * tools to still mock out the underlying 'default EbeanServer' for testing purposes.
  */
 @MappedSuperclass
 public class Model {
- 
 
   private Object _getId() {
     try {
@@ -31,21 +34,23 @@ public class Model {
   /**
    * Return the underlying 'default' EbeanServer.
    * 
-   * <p>This provides full access to the API such as explicit transaction demarcation etc.
+   * <p>
+   * This provides full access to the API such as explicit transaction demarcation etc.
    */
   public EbeanServer db() {
     return Ebean.getServer(null);
   }
-  
+
   /**
    * Return typically a different EbeanServer to the default.
    * 
-   * @param server The name of the EbeanServer. If this is null then the default EbeanServer is returned.
+   * @param server
+   *          The name of the EbeanServer. If this is null then the default EbeanServer is returned.
    */
   public EbeanServer db(String server) {
     return Ebean.getServer(server);
   }
-  
+
   /**
    * Inserts or update this entity depending on its state.
    */
@@ -73,7 +78,6 @@ public class Model {
   public void refresh() {
     Ebean.refresh(this);
   }
-
 
   @Override
   public boolean equals(Object other) {
@@ -108,7 +112,8 @@ public class Model {
     /**
      * Creates a finder for entity of type <code>T</code> with ID of type <code>I</code>.
      * 
-     * <p>Typically you use this constructor to have a static "find" field on each entity bean.
+     * <p>
+     * Typically you use this constructor to have a static "find" field on each entity bean.
      */
     public Finder(Class<I> idType, Class<T> type) {
       this(null, idType, type);
@@ -118,7 +123,8 @@ public class Model {
      * Creates a finder for entity of type <code>T</code> with ID of type <code>I</code>, using a
      * specific Ebean server.
      * 
-     * <p>Typically you don't need to use this method.
+     * <p>
+     * Typically you don't need to use this method.
      */
     public Finder(String serverName, Class<I> idType, Class<T> type) {
       this.type = type;
@@ -133,26 +139,29 @@ public class Model {
     /**
      * Return the underlying 'default' EbeanServer.
      * 
-     * <p>This provides full access to the API such as explicit transaction demarcation etc.
+     * <p>
+     * This provides full access to the API such as explicit transaction demarcation etc.
      */
     public EbeanServer db() {
       return Ebean.getServer(null);
     }
-    
+
     /**
      * Return typically a different EbeanServer to the default.
      * 
-     * @param server The name of the EbeanServer. If this is null then the default EbeanServer is returned.
+     * @param server
+     *          The name of the EbeanServer. If this is null then the default EbeanServer is
+     *          returned.
      */
     public EbeanServer db(String server) {
       return Ebean.getServer(server);
     }
-    
+
     /**
      * Changes the Ebean server.
      */
     public Finder<I, T> on(String server) {
-      return new Finder<I,T>(server, idType, type);
+      return new Finder<I, T>(server, idType, type);
     }
 
     /**
@@ -200,6 +209,101 @@ public class Model {
     }
 
     /**
+     * Executes a find IDs query in a background thread.
+     * 
+     * @deprecated RB: Hmm, this is a "find all" - less is more, prefer to hide this - just get from
+     *             query().
+     */
+    public FutureIds<T> findFutureIds() {
+      return query().findFutureIds();
+    }
+
+    /**
+     * Executes a query and returns the results as a list of IDs.
+     */
+    public List<Object> findIds() {
+      return query().findIds();
+    }
+
+    /**
+     * Retrieves all entities of the given type.
+     * 
+     * <p>
+     * The same as {@link #all()}
+     */
+    public List<T> findList() {
+      return query().findList();
+    }
+
+    /**
+     * Returns all the entities of the given type as a set.
+     */
+    public Set<T> findSet() {
+      return query().findSet();
+    }
+
+    /**
+     * Retrieves all entities of the given type as a map of objects.
+     */
+    public Map<?, T> findMap() {
+      return query().findMap();
+    }
+
+    /**
+     * Executes the query and returns the results as a map of the objects specifying the map key
+     * property.
+     */
+    public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
+      return query().findMap(keyProperty, keyType);
+    }
+
+    /**
+     * Return a PagedList of all entities of the given type (use where() to specify predicates as
+     * needed).
+     */
+    public PagedList<T> findPagedList(int pageIndex, int pageSize) {
+      return query().findPagedList(pageIndex, pageSize);
+    }
+
+    /**
+     * Returns a <code>PagingList</code> for this query.
+     * 
+     * @deprecated RB: PagingList deprecated - migrate to findPagedList().
+     */
+    public PagingList<T> findPagingList(int pageSize) {
+      return query().findPagingList(pageSize);
+    }
+
+    /**
+     * Executes a find row count query in a background thread.
+     */
+    public FutureRowCount<T> findFutureRowCount() {
+      return query().findFutureRowCount();
+    }
+
+    /**
+     * Returns the total number of entities for this type.
+     */
+    public int findRowCount() {
+      return query().findRowCount();
+    }
+
+    /**
+     * Returns the <code>ExpressionFactory</code> used by this query.
+     */
+    public ExpressionFactory getExpressionFactory() {
+      return query().getExpressionFactory();
+    }
+
+    /**
+     * Explicitly sets a comma delimited list of the properties to fetch on the 'main' entity bean,
+     * to load a partial object.
+     */
+    public Query<T> select(String fetchProperties) {
+      return query().select(fetchProperties);
+    }
+
+    /**
      * Specifies a path to load including all its properties.
      */
     public Query<T> fetch(String path) {
@@ -231,86 +335,25 @@ public class Model {
     }
 
     /**
-     * Executes a find IDs query in a background thread.
-     * 
-     * @deprecated RB: Hmm, this is a "find all" - less is more, prefer to hide this - just get from query().
+     * Adds expressions to the <code>where</code> clause with the ability to chain on the
+     * <code>ExpressionList</code>.
      */
-    public FutureIds<T> findFutureIds() {
-      return query().findFutureIds();
+    public ExpressionList<T> where() {
+      return query().where();
     }
 
     /**
-     * Executes a find row count query in a background thread.
+     * Adds a single <code>Expression</code> to the <code>where</code> clause and returns the query.
      */
-    public FutureRowCount<T> findFutureRowCount() {
-      return query().findFutureRowCount();
+    public Query<T> where(com.avaje.ebean.Expression expression) {
+      return query().where(expression);
     }
 
     /**
-     * Executes a query and returns the results as a list of IDs.
+     * Adds additional clauses to the <code>where</code> clause.
      */
-    public List<Object> findIds() {
-      return query().findIds();
-    }
-
-    /**
-     * Retrieves all entities of the given type.
-     * 
-     * <p>The same as {@link #all()}
-     */
-    public List<T> findList() {
-      return query().findList();
-    }
-
-    /**
-     * Retrieves all entities of the given type as a map of objects.
-     */
-    public Map<?, T> findMap() {
-      return query().findMap();
-    }
-
-    /**
-     * Executes the query and returns the results as a map of the objects specifying the map key property.
-     */
-    public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
-      return query().findMap(keyProperty, keyType);
-    }
-
-    /**
-     * Return a PagedList of all entities of the given type (use where() to specify predicates as needed).
-     */
-    public PagedList<T> findPagedList(int pageIndex, int pageSize) {
-      return query().findPagedList(pageIndex, pageSize);
-    }
-
-    /**
-     * Returns a <code>PagingList</code> for this query.
-     * 
-     * @deprecated RB: PagingList deprecated - migrate to findPagedList().
-     */
-    public PagingList<T> findPagingList(int pageSize) {
-      return query().findPagingList(pageSize);
-    }
-
-    /**
-     * Returns the total number of entities for this type.
-     */
-    public int findRowCount() {
-      return query().findRowCount();
-    }
-
-    /**
-     * Returns all the entities of the given type as a set.
-     */
-    public Set<T> findSet() {
-      return query().findSet();
-    }
-
-    /**
-     * Returns the <code>ExpressionFactory</code> used by this query.
-     */
-    public ExpressionFactory getExpressionFactory() {
-      return query().getExpressionFactory();
+    public Query<T> where(String addToWhereClause) {
+      return query().where(addToWhereClause);
     }
 
     /**
@@ -354,21 +397,6 @@ public class Model {
     }
 
     /**
-     * Explicitly sets a comma delimited list of the properties to fetch on the 'main' entity bean,
-     * to load a partial object.
-     */
-    public Query<T> select(String fetchProperties) {
-      return query().select(fetchProperties);
-    }
-
-    /**
-     * Explicitly specifies whether to use 'Autofetch' for this query.
-     */
-    public Query<T> setAutofetch(boolean autofetch) {
-      return query().setAutofetch(autofetch);
-    }
-
-    /**
      * Sets the first row to return for this query.
      */
     public Query<T> setFirstRow(int firstRow) {
@@ -376,31 +404,17 @@ public class Model {
     }
 
     /**
-     * Sets the ID value to query.
-     */
-    public Query<T> setId(Object id) {
-      return query().setId(id);
-    }
-
-    /**
-     * When set to <code>true</code>, all the beans from this query are loaded into the bean cache.
-     */
-    public Query<T> setLoadBeanCache(boolean loadBeanCache) {
-      return query().setLoadBeanCache(loadBeanCache);
-    }
-
-    /**
-     * Sets the property to use as keys for a map.
-     */
-    public Query<T> setMapKey(String mapKey) {
-      return query().setMapKey(mapKey);
-    }
-
-    /**
      * Sets the maximum number of rows to return in the query.
      */
     public Query<T> setMaxRows(int maxRows) {
       return query().setMaxRows(maxRows);
+    }
+
+    /**
+     * Sets the ID value to query.
+     */
+    public Query<T> setId(Object id) {
+      return query().setId(id);
     }
 
     /**
@@ -418,10 +432,38 @@ public class Model {
     }
 
     /**
+     * Sets the property to use as keys for a {@link Query#findMap()} query.
+     */
+    public Query<T> setMapKey(String mapKey) {
+      return query().setMapKey(mapKey);
+    }
+
+    /**
+     * Explicitly specifies whether to use 'Autofetch' for this query.
+     */
+    public Query<T> setAutofetch(boolean autofetch) {
+      return query().setAutofetch(autofetch);
+    }
+
+    /**
+     * Execute the select with "for update" which should lock the record "on read"
+     */
+    public Query<T> setForUpdate(boolean forUpdate) {
+      return query().setForUpdate(forUpdate);
+    }
+
+    /**
      * Sets whether the returned beans will be read-only.
      */
     public Query<T> setReadOnly(boolean readOnly) {
       return query().setReadOnly(readOnly);
+    }
+
+    /**
+     * When set to <code>true</code>, all the beans from this query are loaded into the bean cache.
+     */
+    public Query<T> setLoadBeanCache(boolean loadBeanCache) {
+      return query().setLoadBeanCache(loadBeanCache);
     }
 
     /**
@@ -436,35 +478,6 @@ public class Model {
      */
     public Query<T> setUseQueryCache(boolean useQueryCache) {
       return query().setUseQueryCache(useQueryCache);
-    }
-
-    /**
-     * Adds expressions to the <code>where</code> clause with the ability to chain on the
-     * <code>ExpressionList</code>.
-     */
-    public ExpressionList<T> where() {
-      return query().where();
-    }
-
-    /**
-     * Adds a single <code>Expression</code> to the <code>where</code> clause and returns the query.
-     */
-    public Query<T> where(com.avaje.ebean.Expression expression) {
-      return query().where(expression);
-    }
-
-    /**
-     * Adds additional clauses to the <code>where</code> clause.
-     */
-    public Query<T> where(String addToWhereClause) {
-      return query().where(addToWhereClause);
-    }
-
-    /**
-     * Execute the select with "for update" which should lock the record "on read"
-     */
-    public Query<T> setForUpdate(boolean forUpdate) {
-      return query().setForUpdate(forUpdate);
     }
 
   }
