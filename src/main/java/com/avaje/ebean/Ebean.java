@@ -214,14 +214,13 @@ public final class Ebean {
      * Register a server so we can get it by its name.
      */
     private void register(EbeanServer server, boolean isPrimaryServer) {
+      registerWithName(server.getName(), server, isPrimaryServer);
+    }
+    
+    private void registerWithName(String name, EbeanServer server, boolean isPrimaryServer) {
       synchronized (monitor) {
-        concMap.put(server.getName(), server);
-        EbeanServer existingServer = syncMap.put(server.getName(), server);
-        if (existingServer != null) {
-          String msg = "Existing EbeanServer [" + server.getName() + "] is being replaced?";
-          logger.warn(msg);
-        }
-
+        concMap.put(name, server);
+        syncMap.put(name, server);
         if (isPrimaryServer) {
           primaryServer = server;
         }
@@ -286,6 +285,15 @@ public final class Ebean {
     serverMgr.register(server, isPrimaryServer);
   }
 
+  /**
+   * Backdoor for registering a mock implementation of EbeanServer as the default  server.
+   */
+  protected static EbeanServer mock(String name, EbeanServer server, boolean isPrimaryServer) {
+    EbeanServer originalPrimaryServer = serverMgr.primaryServer;
+    serverMgr.registerWithName(name, server, isPrimaryServer);
+    return originalPrimaryServer;
+  }
+  
   /**
    * Return the next identity value for a given bean type.
    * <p>
