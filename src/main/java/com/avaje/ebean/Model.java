@@ -1,73 +1,26 @@
 package com.avaje.ebean;
 
-import java.util.*;
-import java.beans.*;
-import java.lang.reflect.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.OrderBy;
-import com.avaje.ebean.ExpressionList;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.ExpressionFactory;
-import com.avaje.ebean.PagingList;
-import com.avaje.ebean.FutureRowCount;
-import com.avaje.ebean.FutureList;
-import com.avaje.ebean.FutureIds;
-import com.avaje.ebean.FetchConfig;
-//import com.avaje.ebean.QueryListener;
-//import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Filter;
-//import com.avaje.ebean.QueryResultVisitor;
-
-//import play.Play;
-//import play.libs.F.*;
-//import static play.libs.F.*;
-
-//import org.springframework.beans.*;
+import javax.persistence.MappedSuperclass;
 
 /**
- * Base-class for Ebean-mapped models that provides convenience methods.
+ * A MappedSuperclass base class that provides convenience methods for inserting, updating and deleting beans.
+ * 
+ * <p>By having your entity beans extend this it provides a 'Active Record' style programming model for Ebean users.
+ * 
+ * <p>Note that there is a avaje-ebeanorm-mocker project that enables you to use Mockito or similar tools to still
+ * mock out the underlying 'default EbeanServer' for testing purposes.
  */
-@javax.persistence.MappedSuperclass
+@MappedSuperclass
 public class Model {
-
-  // -- Magic to dynamically access the @Id property
-
-  // @javax.persistence.Transient
-  // private Tuple<Method,Method> _idGetSet;
-  //
-  // private Tuple<Method,Method> _idAccessors() {
-  // if(_idGetSet == null) {
-  // try {
-  // Class<?> clazz = this.getClass();
-  // while(clazz != null) {
-  // for(Field f:clazz.getDeclaredFields()) {
-  // if(f.isAnnotationPresent(javax.persistence.Id.class) ||
-  // f.isAnnotationPresent(javax.persistence.EmbeddedId.class)) {
-  // PropertyDescriptor idProperty = new BeanWrapperImpl(this).getPropertyDescriptor(f.getName());
-  // _idGetSet = Tuple(idProperty.getReadMethod() , idProperty.getWriteMethod());
-  // }
-  // }
-  // clazz = clazz.getSuperclass();
-  // }
-  // if(_idGetSet == null) {
-  // throw new RuntimeException("No @javax.persistence.Id field found in class [" + this.getClass()
-  // + "]");
-  // }
-  // } catch(RuntimeException e) {
-  // throw e;
-  // } catch(Exception e) {
-  // throw new RuntimeException(e);
-  // }
-  // }
-  // return _idGetSet;
-  // }
+ 
 
   private Object _getId() {
     try {
-      return null;// _idAccessors()._1.invoke(this);
+      return Ebean.getServer(null).getBeanId(this);
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
@@ -75,27 +28,10 @@ public class Model {
     }
   }
 
-  private void _setId(Object id) {
-    try {
-      // _idAccessors()._2.invoke(this,id);
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  // --
-
   /**
-   * Save inserts or updates this entity depending on its state.
-   */
-  public void save() {
-    Ebean.save(this);
-  }
-
-  /**
-   * Return the default EbeanServer.
+   * Return the underlying 'default' EbeanServer.
+   * 
+   * <p>This provides full access to the API such as explicit transaction demarcation etc.
    */
   public EbeanServer db() {
     return Ebean.getServer(null);
@@ -103,53 +39,19 @@ public class Model {
   
   /**
    * Return typically a different EbeanServer to the default.
+   * 
    * @param server The name of the EbeanServer. If this is null then the default EbeanServer is returned.
    */
   public EbeanServer db(String server) {
     return Ebean.getServer(server);
   }
   
-  // RB: Actually they should probably not use save() but insert() in this case
-//  /**
-//   * Saves (inserts) this entity.
-//   * 
-//   * @param server
-//   *          the Ebean server to use
-//   */
-//  public void save(String server) {
-//    Ebean.getServer(server).save(this);
-//  }
-
-  // RB: Uncommonly used so get this method off the db() so ... db().saveManyToManyAssociations(this, path)
-//  
-//  /**
-//   * Persist a many-to-many association.
-//   */
-//  public void saveManyToManyAssociations(String path) {
-//    Ebean.saveManyToManyAssociations(this, path);
-//  }
-
-  // RB: Uncommonly used so get this method off the db() 
-//  /**
-//   * Persist a many-to-many association.
-//   * 
-//   * @param server
-//   *          the Ebean server to use
-//   */
-//  public void saveManyToManyAssociations(String server, String path) {
-//    Ebean.getServer(server).saveManyToManyAssociations(this, path);
-//  }
-
-  // RB: Uncommonly used so get this method off the db() 
-//  /**
-//   * Deletes a many-to-many association
-//   * 
-//   * @param path
-//   *          name of the many-to-many association we want to delete
-//   */
-//  public void deleteManyToManyAssociations(String path) {
-//    Ebean.deleteManyToManyAssociations(this, path);
-//  }
+  /**
+   * Inserts or update this entity depending on its state.
+   */
+  public void save() {
+    Ebean.save(this);
+  }
 
   /**
    * Updates this entity.
@@ -158,55 +60,12 @@ public class Model {
     Ebean.update(this);
   }
 
-  // RB: Uncommon - just use db(server).update(this);
-//  /**
-//   * Updates this entity, using a specific Ebean server.
-//   * 
-//   * @param server
-//   *          the Ebean server to use
-//   */
-//  public void update(String server) {
-//    Ebean.getServer(server).update(this);
-//  }
-
-  // RB: ?? 
-//  /**
-//   * Updates this entity, by specifying the entity ID.
-//   */
-//  public void update(Object id) {
-//    _setId(id);
-//    Ebean.update(this);
-//  }
-
-  // RB: Again ??
-//  /**
-//   * Updates this entity, by specifying the entity ID, using a specific Ebean server.
-//   * 
-//   * @param server
-//   *          the Ebean server to use
-//   */
-//  public void update(Object id, String server) {
-//    _setId(id);
-//    Ebean.getServer(server).update(this);
-//  }
-
   /**
    * Deletes this entity.
    */
   public void delete() {
     Ebean.delete(this);
   }
-
-  // RB: Uncommon - always use db(server) to get other EbeanServer instances
-//  /**
-//   * Deletes this entity, using a specific Ebean server.
-//   * 
-//   * @param server
-//   *          the Ebean server to use
-//   */
-//  public void delete(String server) {
-//    Ebean.getServer(server).delete(this);
-//  }
 
   /**
    * Refreshes this entity from the database.
@@ -215,15 +74,6 @@ public class Model {
     Ebean.refresh(this);
   }
 
-//  /**
-//   * Refreshes this entity from the database, using a specific Ebean server.
-//   * 
-//   * @param server
-//   *          the Ebean server to use
-//   */
-//  public void refresh(String server) {
-//    Ebean.getServer(server).refresh(this);
-//  }
 
   @Override
   public boolean equals(Object other) {
@@ -247,9 +97,9 @@ public class Model {
   }
 
   /**
-   * Helper for Ebean queries.
+   * Helper for queries.
    */
-  public static class Finder<I, T> {// implements Query<T> {
+  public static class Finder<I, T> {
 
     private final Class<I> idType;
     private final Class<T> type;
@@ -257,6 +107,8 @@ public class Model {
 
     /**
      * Creates a finder for entity of type <code>T</code> with ID of type <code>I</code>.
+     * 
+     * <p>Typically you use this constructor to have a static "find" field on each entity bean.
      */
     public Finder(Class<I> idType, Class<T> type) {
       this(null, idType, type);
@@ -265,6 +117,8 @@ public class Model {
     /**
      * Creates a finder for entity of type <code>T</code> with ID of type <code>I</code>, using a
      * specific Ebean server.
+     * 
+     * <p>Typically you don't need to use this method.
      */
     public Finder(String serverName, Class<I> idType, Class<T> type) {
       this.type = type;
@@ -276,6 +130,24 @@ public class Model {
       return Ebean.getServer(serverName);
     }
 
+    /**
+     * Return the underlying 'default' EbeanServer.
+     * 
+     * <p>This provides full access to the API such as explicit transaction demarcation etc.
+     */
+    public EbeanServer db() {
+      return Ebean.getServer(null);
+    }
+    
+    /**
+     * Return typically a different EbeanServer to the default.
+     * 
+     * @param server The name of the EbeanServer. If this is null then the default EbeanServer is returned.
+     */
+    public EbeanServer db(String server) {
+      return Ebean.getServer(server);
+    }
+    
     /**
      * Changes the Ebean server.
      */
@@ -298,9 +170,7 @@ public class Model {
     }
 
     /**
-     * Retrieves an entity reference for this ID.
-     * 
-     * @deprecated RB: Move to Model
+     * Creates an entity reference for this ID.
      */
     public T ref(I id) {
       return server().getReference(type, id);
@@ -323,26 +193,11 @@ public class Model {
 
     /**
      * Returns the next identity value.
-     * 
-     * @deprecated RB: move to model
      */
+    @SuppressWarnings("unchecked")
     public I nextId() {
       return (I) server().nextId(type);
     }
-
-    // /**
-    // * Cancels query execution, if supported by the underlying database and driver.
-    // */
-    // public void cancel() {
-    // query().cancel();
-    // }
-
-    // /**
-    // * Copies this query.
-    // */
-    // public Query<T> copy() {
-    // return query().copy();
-    // }
 
     /**
      * Specifies a path to load including all its properties.
@@ -375,31 +230,13 @@ public class Model {
       return query().fetch(assocProperty, fetchProperties, fetchConfig);
     }
 
-//    /**
-//     * Applies a filter on the 'many' property list rather than the root level objects.
-//     * 
-//     * @deprecated RB: Get this off the query(). Advanced feature.
-//     */
-//    public ExpressionList<T> filterMany(String propertyName) {
-//      return query().filterMany(propertyName);
-//    }
-
     /**
      * Executes a find IDs query in a background thread.
      * 
-     * @deprecated RB: Hmm, this is a "find all" - less is more, hide from newbies.
+     * @deprecated RB: Hmm, this is a "find all" - less is more, prefer to hide this - just get from query().
      */
     public FutureIds<T> findFutureIds() {
       return query().findFutureIds();
-    }
-
-    /**
-     * Executes a find list query in a background thread.
-     * 
-     * @deprecated RB:underlying method deprecated
-     */
-    public FutureList<T> findFutureList() {
-      return query().findFutureList();
     }
 
     /**
@@ -417,24 +254,33 @@ public class Model {
     }
 
     /**
-     * Executes the query and returns the results as a list of objects.
+     * Retrieves all entities of the given type.
+     * 
+     * <p>The same as {@link #all()}
      */
     public List<T> findList() {
       return query().findList();
     }
 
     /**
-     * Executes the query and returns the results as a map of objects.
+     * Retrieves all entities of the given type as a map of objects.
      */
     public Map<?, T> findMap() {
       return query().findMap();
     }
 
     /**
-     * Executes the query and returns the results as a map of the objects.
+     * Executes the query and returns the results as a map of the objects specifying the map key property.
      */
-    public <K> Map<K, T> findMap(String a, Class<K> b) {
-      return query().findMap(a, b);
+    public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
+      return query().findMap(keyProperty, keyType);
+    }
+
+    /**
+     * Return a PagedList of all entities of the given type (use where() to specify predicates as needed).
+     */
+    public PagedList<T> findPagedList(int pageIndex, int pageSize) {
+      return query().findPagedList(pageIndex, pageSize);
     }
 
     /**
@@ -447,36 +293,18 @@ public class Model {
     }
 
     /**
-     * Returns the number of entities this query should return.
-     * 
-     * 
+     * Returns the total number of entities for this type.
      */
     public int findRowCount() {
       return query().findRowCount();
     }
 
     /**
-     * Executes the query and returns the results as a set of objects.
+     * Returns all the entities of the given type as a set.
      */
     public Set<T> findSet() {
       return query().findSet();
     }
-
-    // /**
-    // * Executes the query and returns the results as either a single bean or <code>null</code>, if
-    // no matching bean is found.
-    // */
-    // public T findUnique() {
-    // return query().findUnique();
-    // }
-
-    // public void findVisit(QueryResultVisitor<T> visitor) {
-    // query().findVisit(visitor);
-    // }
-    //
-    // public QueryIterator<T> findIterate() {
-    // return query().findIterate();
-    // }
 
     /**
      * Returns the <code>ExpressionFactory</code> used by this query.
@@ -484,62 +312,6 @@ public class Model {
     public ExpressionFactory getExpressionFactory() {
       return query().getExpressionFactory();
     }
-
-    // /**
-    // * Returns the first row value.
-    // */
-    // public int getFirstRow() {
-    // return query().getFirstRow();
-    // }
-
-    // /**
-    // * Returns the SQL that was generated for executing this query.
-    // */
-    // public String getGeneratedSql() {
-    // return query().getGeneratedSql();
-    // }
-
-    // /**
-    // * Returns the maximum of rows for this query.
-    // */
-    // public int getMaxRows() {
-    // return query().getMaxRows();
-    // }
-
-    // /**
-    // * Returns the <code>RawSql</code> that was set to use for this query.
-    // */
-    // public RawSql getRawSql() {
-    // return query().getRawSql();
-    // }
-
-    // /**
-    // * Returns the query's <code>having</code> clause.
-    // */
-    // public ExpressionList<T> having() {
-    // return query().having();
-    // }
-    //
-    // /**
-    // * Adds an expression to the <code>having</code> clause and returns the query.
-    // */
-    // public Query<T> having(com.avaje.ebean.Expression addExpressionToHaving) {
-    // return query().having(addExpressionToHaving);
-    // }
-    //
-    // /**
-    // * Adds clauses to the <code>having</code> clause and returns the query.
-    // */
-    // public Query<T> having(String addToHavingClause) {
-    // return query().having(addToHavingClause);
-    // }
-    //
-    // /**
-    // * Returns <code>true</code> if this query was tuned by <code>autoFetch</code>.
-    // */
-    // public boolean isAutofetchTuned() {
-    // return query().isAutofetchTuned();
-    // }
 
     /**
      * Returns the <code>order by</code> clause so that you can append an ascending or descending
@@ -596,27 +368,6 @@ public class Model {
       return query().setAutofetch(autofetch);
     }
 
-    // /**
-    // * Sets the rows after which fetching should continue in a background thread.
-    // */
-    // public Query<T> setBackgroundFetchAfter(int backgroundFetchAfter) {
-    // return query().setBackgroundFetchAfter(backgroundFetchAfter);
-    // }
-    //
-    // /**
-    // * Sets a hint, which for JDBC translates to <code>Statement.fetchSize()</code>.
-    // */
-    // public Query<T> setBufferFetchSizeHint(int fetchSize) {
-    // return query().setBufferFetchSizeHint(fetchSize);
-    // }
-    //
-    // /**
-    // * Sets whether this query uses <code>DISTINCT</code>.
-    // */
-    // public Query<T> setDistinct(boolean isDistinct) {
-    // return query().setDistinct(isDistinct);
-    // }
-
     /**
      * Sets the first row to return for this query.
      */
@@ -630,13 +381,6 @@ public class Model {
     public Query<T> setId(Object id) {
       return query().setId(id);
     }
-
-    // /**
-    // * Sets a listener to process the query on a row-by-row basis.
-    // */
-    // public Query<T> setListener(QueryListener<T> queryListener) {
-    // return query().setListener(queryListener);
-    // }
 
     /**
      * When set to <code>true</code>, all the beans from this query are loaded into the bean cache.
@@ -659,38 +403,6 @@ public class Model {
       return query().setMaxRows(maxRows);
     }
 
-    // /**
-    // * Replaces any existing <code>order by</code> clause using an <code>OrderBy</code> object.
-    // * <p>
-    // * This is exactly the same as {@link #setOrderBy(com.avaje.ebean.OrderBy)}.
-    // */
-    // public Query<T> setOrder(OrderBy<T> orderBy) {
-    // return query().setOrder(orderBy);
-    // }
-    //
-    // /**
-    // * Set an OrderBy object to replace any existing <code>order by</code> clause.
-    // * <p>
-    // * This is exactly the same as {@link #setOrder(com.avaje.ebean.OrderBy)}.
-    // */
-    // public Query<T> setOrderBy(OrderBy<T> orderBy) {
-    // return query().setOrderBy(orderBy);
-    // }
-    //
-    // /**
-    // * Sets an ordered bind parameter according to its position.
-    // */
-    // public Query<T> setParameter(int position, Object value) {
-    // return query().setParameter(position, value);
-    // }
-    //
-    // /**
-    // * Sets a named bind parameter.
-    // */
-    // public Query<T> setParameter(String name, Object value) {
-    // return query().setParameter(name, value);
-    // }
-
     /**
      * Sets the OQL query to run
      */
@@ -711,13 +423,6 @@ public class Model {
     public Query<T> setReadOnly(boolean readOnly) {
       return query().setReadOnly(readOnly);
     }
-
-    // /**
-    // * Sets a timeout on this query.
-    // */
-    // public Query<T> setTimeout(int secs) {
-    // return query().setTimeout(secs);
-    // }
 
     /**
      * Sets whether to use the bean cache.
@@ -758,17 +463,9 @@ public class Model {
     /**
      * Execute the select with "for update" which should lock the record "on read"
      */
-    // @Override
     public Query<T> setForUpdate(boolean forUpdate) {
       return query().setForUpdate(forUpdate);
     }
 
-    // /**
-    // * Whether this query is for update
-    // */
-    // @Override
-    // public boolean isForUpdate() {
-    // return query().isForUpdate();
-    // }
   }
 }
