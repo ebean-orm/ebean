@@ -23,7 +23,7 @@ public class Model {
 
   private Object _getId() {
     try {
-      return Ebean.getServer(null).getBeanId(this);
+      return db().getBeanId(this);
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
@@ -36,6 +36,9 @@ public class Model {
    * 
    * <p>
    * This provides full access to the API such as explicit transaction demarcation etc.
+   * 
+   * <p>
+   * TODO: Transaction example
    */
   public EbeanServer db() {
     return Ebean.getServer(null);
@@ -52,35 +55,69 @@ public class Model {
   }
 
   /**
-   * Inserts or update this entity depending on its state.
+   * Insert or update this entity depending on its state.
+   * 
+   * <p>
+   * Ebean will detect if this is a new bean or a previously fetched bean and perform either an
+   * insert or an update based on that.
    */
   public void save() {
-    Ebean.save(this);
+    db().save(this);
   }
 
   /**
-   * Updates this entity.
+   * Update this entity.
    */
   public void update() {
-    Ebean.update(this);
+    db().update(this);
+  }
+
+  /**
+   * Insert this entity.
+   */
+  public void insert() {
+    db().insert(this);
   }
 
   /**
    * Deletes this entity.
    */
   public void delete() {
-    Ebean.delete(this);
+    db().delete(this);
+  }
+
+  /**
+   * Update this entity.
+   */
+  public void update(String server) {
+    db(server).update(this);
+  }
+
+  /**
+   * Insert this entity.
+   */
+  public void insert(String server) {
+    db(server).insert(this);
+  }
+
+  /**
+   * Deletes this entity.
+   */
+  public void delete(String server) {
+    db(server).delete(this);
   }
 
   /**
    * Refreshes this entity from the database.
    */
   public void refresh() {
-    Ebean.refresh(this);
+    db().refresh(this);
   }
 
   @Override
   public boolean equals(Object other) {
+    // RB: This is inconsistent with the default Ebean implementation so
+    // in that sense I don't believe this can be the default implementation 
     if (this == other)
       return true;
     if (other == null || other.getClass() != this.getClass())
@@ -96,6 +133,11 @@ public class Model {
 
   @Override
   public int hashCode() {
+    // RB: this hashCode changes ... so I don't like this as the
+    // baked in default behaviour - but need to support this for any Play users
+    // that convert over to this. Best option is to support this in enhancement and let the
+    // users choose their poison. Alternatively provide 2 versions of Model with the
+    // 2 different behaviours for hashCode / equals
     Object id = _getId();
     return id == null ? super.hashCode() : id.hashCode();
   }
@@ -132,10 +174,6 @@ public class Model {
       this.serverName = serverName;
     }
 
-    private EbeanServer server() {
-      return Ebean.getServer(serverName);
-    }
-
     /**
      * Return the underlying 'default' EbeanServer.
      * 
@@ -143,7 +181,7 @@ public class Model {
      * This provides full access to the API such as explicit transaction demarcation etc.
      */
     public EbeanServer db() {
-      return Ebean.getServer(null);
+      return Ebean.getServer(serverName);
     }
 
     /**
@@ -159,30 +197,41 @@ public class Model {
 
     /**
      * Changes the Ebean server.
+     * 
+     * <p>
+     * Create and return a new Finder for a different server.
      */
     public Finder<I, T> on(String server) {
       return new Finder<I, T>(server, idType, type);
     }
 
+    // Does not exist yet but I think should
+    // public void deleteById(I id) {
+    // return db().deleteById(type, id);
+    // }
+
     /**
      * Retrieves all entities of the given type.
+     * 
+     * <p>
+     * This is the same as (synonym for) {@link #findList()}
      */
     public List<T> all() {
-      return server().find(type).findList();
+      return findList();
     }
 
     /**
      * Retrieves an entity by ID.
      */
     public T byId(I id) {
-      return server().find(type, id);
+      return db().find(type, id);
     }
 
     /**
      * Creates an entity reference for this ID.
      */
     public T ref(I id) {
-      return server().getReference(type, id);
+      return db().getReference(type, id);
     }
 
     /**
@@ -190,14 +239,14 @@ public class Model {
      * the database.
      */
     public Filter<T> filter() {
-      return server().filter(type);
+      return db().filter(type);
     }
 
     /**
      * Creates a query.
      */
     public Query<T> query() {
-      return server().find(type);
+      return db().find(type);
     }
 
     /**
@@ -205,7 +254,7 @@ public class Model {
      */
     @SuppressWarnings("unchecked")
     public I nextId() {
-      return (I) server().nextId(type);
+      return (I) db().nextId(type);
     }
 
     /**
@@ -412,20 +461,24 @@ public class Model {
 
     /**
      * Sets the ID value to query.
+     * 
+     * <p>
+     * Use this to perform a find byId query but with additional control over the query such as
+     * using select and fetch to control what parts of the object graph are returned.
      */
     public Query<T> setId(Object id) {
       return query().setId(id);
     }
 
     /**
-     * Sets the OQL query to run
+     * Create and return a new query using the OQL.
      */
     public Query<T> setQuery(String oql) {
-      return server().createQuery(type, oql);
+      return db().createQuery(type, oql);
     }
 
     /**
-     * Sets <code>RawSql</code> to use for this query.
+     * Create and return a new query based on the <code>RawSql</code>.
      */
     public Query<T> setRawSql(RawSql rawSql) {
       return query().setRawSql(rawSql);
@@ -439,42 +492,45 @@ public class Model {
     }
 
     /**
-     * Explicitly specifies whether to use 'Autofetch' for this query.
+     * Create a query with explicit 'Autofetch' use.
      */
     public Query<T> setAutofetch(boolean autofetch) {
       return query().setAutofetch(autofetch);
     }
 
     /**
-     * Execute the select with "for update" which should lock the record "on read"
+     * Create a query with the select with "for update" specified.
+     * 
+     * <p>
+     * This will typically create row level database locks on the selected rows.
      */
     public Query<T> setForUpdate(boolean forUpdate) {
       return query().setForUpdate(forUpdate);
     }
 
     /**
-     * Sets whether the returned beans will be read-only.
+     * Create a query specifying whether the returned beans will be read-only.
      */
     public Query<T> setReadOnly(boolean readOnly) {
       return query().setReadOnly(readOnly);
     }
 
     /**
-     * When set to <code>true</code>, all the beans from this query are loaded into the bean cache.
+     * Create a query specifying if the beans should be loaded into the L2 cache.
      */
     public Query<T> setLoadBeanCache(boolean loadBeanCache) {
       return query().setLoadBeanCache(loadBeanCache);
     }
 
     /**
-     * Sets whether to use the bean cache.
+     * Create a query specifying if the L2 bean cache should be used.
      */
     public Query<T> setUseCache(boolean useBeanCache) {
       return query().setUseCache(useBeanCache);
     }
 
     /**
-     * Sets whether to use the query cache.
+     * Create a query specifying if the L2 query cache should be used.
      */
     public Query<T> setUseQueryCache(boolean useQueryCache) {
       return query().setUseQueryCache(useQueryCache);
