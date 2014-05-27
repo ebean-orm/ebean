@@ -52,12 +52,14 @@ public class DLoadContext implements LoadContext {
 	private List<OrmQueryProperties> secQuery;
 
 
-	public DLoadContext(SpiEbeanServer ebeanServer, BeanDescriptor<?> rootDescriptor, Boolean readOnly, SpiQuery<?> query) {
+	public DLoadContext(OrmQueryRequest<?> request) {
 		
-		this.ebeanServer = ebeanServer;
+	  this.persistenceContext = request.getPersistenceContext();
+		this.ebeanServer = request.getServer();
 		this.defaultBatchSize = ebeanServer.getLazyLoadBatchSize();
-		this.rootDescriptor = rootDescriptor;
-		this.readOnly = readOnly;
+		this.rootDescriptor = request.getBeanDescriptor();
+		SpiQuery<?> query = request.getQuery();
+		this.readOnly = query.isReadOnly();
 		this.excludeBeanCache = Boolean.FALSE.equals(query.isUseBeanCache());
 		this.useAutofetchManager = query.getAutoFetchManager() != null;		
 				

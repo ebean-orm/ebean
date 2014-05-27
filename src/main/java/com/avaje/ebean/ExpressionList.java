@@ -245,28 +245,11 @@ public interface ExpressionList<T> extends Serializable {
   public Query<T> setMaxRows(int maxRows);
 
   /**
-   * Set the number of rows after which the fetching should continue in a
-   * background thread.
-   * 
-   * @see Query#setBackgroundFetchAfter(int)
-   */
-  public Query<T> setBackgroundFetchAfter(int backgroundFetchAfter);
-
-  /**
    * Set the name of the property which values become the key of a map.
    * 
    * @see Query#setMapKey(String)
    */
   public Query<T> setMapKey(String mapKey);
-
-  /**
-   * Please migrate to using {@link #findIterate()} or {@link #findVisit(QueryResultVisitor)}.
-   * Set a QueryListener for bean by bean processing.
-   * 
-   * @see Query#setListener(QueryListener)
-   * @deprecated Migrate to {@link #findIterate()} or {@link #findVisit(QueryResultVisitor)}
-   */
-  public Query<T> setListener(QueryListener<T> queryListener);
 
   /**
    * Set to true to use the query for executing this query.

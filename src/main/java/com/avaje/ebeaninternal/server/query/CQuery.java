@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.QueryListener;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.EntityBean;
@@ -24,7 +23,6 @@ import com.avaje.ebean.bean.NodeUsageListener;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.LoadContext;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
@@ -41,7 +39,6 @@ import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
-import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
 
@@ -135,8 +132,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private final SpiQuery<T> query;
 
-  private final QueryListener<T> queryListener;
-
   private Map<String, String> currentPathMap;
 
   private String currentPrefix;
@@ -189,16 +184,12 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    */
   private final ElPropertyValue manyPropertyEl;
 
-  private final int backgroundFetchAfter;
-
   private final int maxRowsLimit;
 
   /**
    * Flag set when backgroundFetchAfter limit is hit.
    */
   private boolean hasHitBackgroundFetchAfter;
-
-  private final PersistenceContext persistenceContext;
 
   private DataReader dataReader;
 
@@ -276,20 +267,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
 
-    this.queryListener = query.getListener();
-    if (queryListener == null) {
-      // normal, use the one from the transaction
-      this.persistenceContext = request.getPersistenceContext();
-    } else {
-      // 'Row Level Transaction Context'...
-      // local transaction context that will be reset
-      // after each 'master' bean is sent to the listener
-      this.persistenceContext = new DefaultPersistenceContext();
-    }
-
     this.maxRowsLimit = query.getMaxRows() > 0 ? query.getMaxRows() : GLOBAL_ROW_LIMIT;
-    this.backgroundFetchAfter = query.getBackgroundFetchAfter() > 0 ? query
-        .getBackgroundFetchAfter() : Integer.MAX_VALUE;
 
     this.help = createHelp(request);
     this.collection = (BeanCollection<T>) (help != null ? help.createEmpty(false) : null);
@@ -443,7 +421,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    * Return the persistence context.
    */
   public PersistenceContext getPersistenceContext() {
-    return persistenceContext;
+    return request.getPersistenceContext();
   }
 
   public void setLoadedBean(Object bean, Object id, Object lazyLoadParentId) {
@@ -466,7 +444,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       if (lazyLoadParentId != null) {
         if (!lazyLoadParentId.equals(this.lazyLoadParentId)) {
           // get the appropriate parent bean from the persistence context
-          this.lazyLoadParentBean = persistenceContext.get(lazyLoadManyProperty.getBeanDescriptor().getBeanType(), lazyLoadParentId);
+          this.lazyLoadParentBean = getPersistenceContext().get(lazyLoadManyProperty.getBeanDescriptor().getBeanType(), lazyLoadParentId);
           this.lazyLoadParentId = lazyLoadParentId;
         }
         
@@ -561,12 +539,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
     if (loadedBeanCount >= maxRowsLimit) {
       collection.setHasMoreRows(hasMoreRows());
-      return false;
-    }
-
-    if (inForeground && loadedBeanCount >= backgroundFetchAfter) {
-      hasHitBackgroundFetchAfter = true;
-      collection.setFinishedFetch(false);
       return false;
     }
 
@@ -687,13 +659,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private void readTheRows(boolean inForeground) throws SQLException {
     while (hasNextBean(inForeground)) {
-      if (queryListener != null) {
-        queryListener.process(getLoadedBean());
-
-      } else {
-        // add to the list/set/map
-        help.add(collection, getLoadedBean());
-      }
+      // add to the list/set/map
+      help.add(collection, getLoadedBean());
     }
   }
 

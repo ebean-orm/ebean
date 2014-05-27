@@ -28,8 +28,9 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     
     super(parent, desc, path, defaultBatchSize, queryProps);
     
-    this.currentBuffer = createBuffer(firstBatchSize);  
-    this.bufferList = queryFetch ? new ArrayList<DLoadBeanContext.LoadBuffer>() : null;
+    // bufferList only required when using query joins (queryFetch)
+    this.bufferList = (!queryFetch) ? null : new ArrayList<DLoadBeanContext.LoadBuffer>();
+    this.currentBuffer = createBuffer(firstBatchSize);
   }
   
   protected void configureQuery(SpiQuery<?> query, String lazyLoadProperty) {
@@ -51,11 +52,11 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
 
   protected void register(EntityBeanIntercept ebi){
 
-    ebi.setBeanLoader(0, currentBuffer, getPersistenceContext());
-    if (currentBuffer.add(ebi)) {
-      // the currentBuffer is full so create another one
+    if (currentBuffer.isFull()) {
       currentBuffer = createBuffer(secondaryBatchSize);
     }
+    currentBuffer.add(ebi);
+    ebi.setBeanLoader(0, currentBuffer, getPersistenceContext());      
   }
   
 	private LoadBuffer createBuffer(int size) {
@@ -98,22 +99,29 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
    */
   public static class LoadBuffer implements BeanLoader, LoadBeanBuffer {
     
+    private final PersistenceContext persistenceContext;
     private final DLoadBeanContext context;
     private final int batchSize;
     private final List<EntityBeanIntercept> list;
     
     public LoadBuffer(DLoadBeanContext context, int batchSize) {
       this.context = context;
+      // set the persistence context as at this moment in
+      // case it changes as part of a findIterate etc
+      this.persistenceContext = context.getPersistenceContext();
       this.batchSize = batchSize;
       this.list = new ArrayList<EntityBeanIntercept>(batchSize);
     }
 
+    public boolean isFull() {
+      return batchSize == list.size();
+    }
+    
     /**
      * Return true if the buffer is full.
      */
-    public boolean add(EntityBeanIntercept ebi) {
+    public void add(EntityBeanIntercept ebi) {
       list.add(ebi);
-      return batchSize == list.size();
     }
     
     @Override
@@ -138,7 +146,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
 
     @Override
     public PersistenceContext getPersistenceContext() {
-      return context.getPersistenceContext();
+      return persistenceContext;
     }
 
     @Override

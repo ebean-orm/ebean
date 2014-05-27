@@ -90,7 +90,6 @@ import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.el.ElFilter;
 import com.avaje.ebeaninternal.server.jmx.MAdminAutofetch;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
-import com.avaje.ebeaninternal.server.loadcontext.DLoadContext;
 import com.avaje.ebeaninternal.server.query.CQuery;
 import com.avaje.ebeaninternal.server.query.CQueryEngine;
 import com.avaje.ebeaninternal.server.query.CallableQueryIds;
@@ -1133,7 +1132,7 @@ public final class DefaultServer implements SpiEbeanServer {
     if (Mode.LAZYLOAD_MANY.equals(query.getMode())) {
       allowOneManyFetch = false;
 
-    } else if (query.hasMaxRowsOrFirstRow() && !query.isRawSql() && !query.isSqlSelect() && query.getBackgroundFetchAfter() == 0) {
+    } else if (query.hasMaxRowsOrFirstRow() && !query.isRawSql() && !query.isSqlSelect()) {
       // convert ALL fetch joins to Many's to be query joins
       // so that limit offset type SQL clauses work
       allowOneManyFetch = false;
@@ -1194,16 +1193,15 @@ public final class DefaultServer implements SpiEbeanServer {
     if (cachedBean != null) {
       if (context == null) {
         context = new DefaultPersistenceContext();
-
       }
-      context.put(query.getId(), cachedBean);
-
-      DLoadContext loadContext = new DLoadContext(this, beanDescriptor, query.isReadOnly(), query);
-      loadContext.setPersistenceContext(context);
-
-      EntityBeanIntercept ebi = ((EntityBean) cachedBean)._ebean_getIntercept();
+      
+      // Not using a loadContext for beans coming out of L2 cache
+      // so that means no batch lazy loading for these beans
+      EntityBean entityBean = (EntityBean) cachedBean;
+      EntityBeanIntercept ebi = entityBean._ebean_getIntercept();
       ebi.setPersistenceContext(context);
-      loadContext.register(null, ebi);
+      Object id = beanDescriptor.getId(entityBean);
+      context.put(id, entityBean);
     }
 
     return (T) cachedBean;

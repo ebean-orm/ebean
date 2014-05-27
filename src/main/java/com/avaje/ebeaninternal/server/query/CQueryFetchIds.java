@@ -73,7 +73,6 @@ public class CQueryFetchIds {
 	private int rowCount;
 	
 	private final int maxRows;
-	private final int bgFetchAfter;
 	
 	/**
 	 * Create the Sql select based on the request.
@@ -86,7 +85,6 @@ public class CQueryFetchIds {
 		this.query = request.getQuery();
 		this.sql = sql;
 		this.maxRows = query.getMaxRows();
-		this.bgFetchAfter = query.getBackgroundFetchAfter();
 
 		query.setGeneratedSql(sql);
 
@@ -184,9 +182,6 @@ public class CQueryFetchIds {
 					hasMoreRows = rset.next();
 					break;
 
-				} else if (bgFetchAfter > 0 && rowCount >= bgFetchAfter) {
-					useBackgroundToContinueFetch = true;
-					break;
 				}
 			}
 			

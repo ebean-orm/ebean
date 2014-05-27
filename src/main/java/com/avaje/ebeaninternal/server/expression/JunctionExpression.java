@@ -14,7 +14,6 @@ import com.avaje.ebean.Junction;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.PagingList;
 import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.QueryListener;
 import com.avaje.ebean.QueryResultVisitor;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
@@ -375,17 +374,8 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     return exprList.select(properties);
   }
 
-  public com.avaje.ebean.Query<T> setBackgroundFetchAfter(int backgroundFetchAfter) {
-    return exprList.setBackgroundFetchAfter(backgroundFetchAfter);
-  }
-
   public com.avaje.ebean.Query<T> setFirstRow(int firstRow) {
     return exprList.setFirstRow(firstRow);
-  }
-
-  @Deprecated
-  public com.avaje.ebean.Query<T> setListener(QueryListener<T> queryListener) {
-    return exprList.setListener(queryListener);
   }
 
   public com.avaje.ebean.Query<T> setMapKey(String mapKey) {

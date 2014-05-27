@@ -2444,13 +2444,5 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
     return false;
   }
-
-  public void flushPersistenceContextOnIterate(PersistenceContext persistenceContext) {
-    persistenceContext.clear(beanType);
-    for (int i = 0; i < propertiesMany.length; i++) {
-      persistenceContext.clear(propertiesMany[i].getBeanDescriptor().getBeanType());
-    }
-    
-  }
     
 }

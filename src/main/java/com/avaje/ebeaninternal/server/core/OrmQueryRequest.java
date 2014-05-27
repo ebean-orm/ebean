@@ -29,6 +29,7 @@ import com.avaje.ebeaninternal.server.deploy.DeployPropertyParserMap;
 import com.avaje.ebeaninternal.server.loadcontext.DLoadContext;
 import com.avaje.ebeaninternal.server.query.CQueryPlan;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
+import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 /**
  * Wraps the objects involved in executing a Query.
@@ -43,7 +44,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
   private final BeanFinder<T> finder;
 
-  private final LoadContext graphContext;
+  private LoadContext graphContext;
 
   private final Boolean readOnly;
 
@@ -75,9 +76,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     this.queryEngine = queryEngine;
     this.query = query;
     this.readOnly = query.isReadOnly();
-
-    this.graphContext = new DLoadContext(ebeanServer, beanDescriptor, readOnly, query);
-    graphContext.registerSecondaryQueries(query);
   }
 
   public void executeSecondaryQueries(int defaultQueryBatch) {
@@ -163,12 +161,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   @Override
   public void initTransIfRequired() {
     // first check if the query requires its own transaction
-    if (query.createOwnTransaction()) {
-      // using background fetch or query listener etc
-      transaction = ebeanServer.createQueryTransaction();
-      createdTransaction = true;
-
-    } else if (transaction == null) {
+    if (transaction == null) {
       // maybe a current one
       transaction = ebeanServer.getCurrentServerTransaction();
       if (transaction == null) {
@@ -177,8 +170,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
         createdTransaction = true;
       }
     }
+    
     this.persistenceContext = getPersistenceContext(query, transaction);
-    this.graphContext.setPersistenceContext(persistenceContext);
+    
+    this.graphContext = new DLoadContext(this);
+    this.graphContext.registerSecondaryQueries(query);
   }
 
   /**
@@ -381,7 +377,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   public void flushPersistenceContextOnIterate() {
-    beanDescriptor.flushPersistenceContextOnIterate(persistenceContext);
+    persistenceContext = new DefaultPersistenceContext();
+    graphContext.setPersistenceContext(persistenceContext);
   }
 
 }

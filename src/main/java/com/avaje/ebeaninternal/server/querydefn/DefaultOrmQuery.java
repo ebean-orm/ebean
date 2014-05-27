@@ -21,7 +21,6 @@ import com.avaje.ebean.OrderBy.Property;
 import com.avaje.ebean.PagingList;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.QueryListener;
 import com.avaje.ebean.QueryResultVisitor;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.bean.BeanCollectionTouched;
@@ -68,8 +67,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	 * Used to add beans to the PersistanceContext prior to query.
 	 */
 	private transient ArrayList<EntityBean> contextAdditions;
-	
-	private transient QueryListener<T> queryListener;
 
 	/**
 	 * For lazy loading of ManyToMany we need to add a join to the intersection
@@ -142,11 +139,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	private boolean futureFetch;
 	
 	private List<Object> partialIds;
-	
-	/**
-	 * The rows after which the fetch continues in a bg thread.
-	 */
-	private int backgroundFetchAfter;
 
 	private int timeout = -1;
 	
@@ -437,7 +429,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 		copy.additionalWhere = additionalWhere;
 		copy.additionalHaving = additionalHaving;
 		copy.distinct = distinct;
-		copy.backgroundFetchAfter = backgroundFetchAfter;
 		copy.timeout = timeout;
 		copy.mapKey = mapKey;
 		copy.id = id;
@@ -1016,26 +1007,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 		return this;
 	}
 
-	/**
-	 * Return the findListener is one has been set.
-	 */
-	public QueryListener<T> getListener() {
-		return queryListener;
-	}
-
-	/**
-	 * Set a FindListener. This is designed for large fetches where lots are
-	 * rows are to be processed and instead of returning all the rows they are
-	 * processed one at a time.
-	 * <p>
-	 * Note that the returning List Set or Map will be empty.
-	 * </p>
-	 */
-	public DefaultOrmQuery<T> setListener(QueryListener<T> queryListener) {
-		this.queryListener = queryListener;
-		return this;
-	}
-
 	public Class<T> getBeanType() {
 		return beanType;
 	}
@@ -1109,15 +1080,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
 	public DefaultOrmQuery<T> setMapKey(String mapKey) {
 		this.mapKey = mapKey;
-		return this;
-	}
-
-	public int getBackgroundFetchAfter() {
-		return backgroundFetchAfter;
-	}
-
-	public DefaultOrmQuery<T> setBackgroundFetchAfter(int backgroundFetchAfter) {
-		this.backgroundFetchAfter = backgroundFetchAfter;
 		return this;
 	}
 
@@ -1233,23 +1195,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
 	public SpiExpressionList<T> getWhereExpressions() {
 		return whereExpressions;
-	}
-
-	/**
-	 * Return true if using background fetching or a queryListener.
-	 */
-	public boolean createOwnTransaction() {
-		if (futureFetch){
-			// the future fetches have already created
-			// their own transaction
-			return false;
-		}
-		if (backgroundFetchAfter > 0 || queryListener != null) {
-			// run in own transaction as we can't know how long
-			// the background fetching will continue etc
-			return true;
-		}
-		return false;
 	}
 
 	public String getGeneratedSql() {
