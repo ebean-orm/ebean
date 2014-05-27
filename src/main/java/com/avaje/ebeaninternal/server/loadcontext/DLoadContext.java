@@ -49,15 +49,18 @@ public class DLoadContext implements LoadContext {
 	private final Map<String,ObjectGraphNode> nodePathMap = new HashMap<String, ObjectGraphNode>();
 		
 	private PersistenceContext persistenceContext;
+	
 	private List<OrmQueryProperties> secQuery;
 
+	public DLoadContext(OrmQueryRequest<?> request) {
 
-	public DLoadContext(SpiEbeanServer ebeanServer, BeanDescriptor<?> rootDescriptor, Boolean readOnly, SpiQuery<?> query) {
-		
-		this.ebeanServer = ebeanServer;
-		this.defaultBatchSize = ebeanServer.getLazyLoadBatchSize();
-		this.rootDescriptor = rootDescriptor;
-		this.readOnly = readOnly;
+	  this.persistenceContext = request.getPersistenceContext();
+    this.ebeanServer = request.getServer();
+    this.defaultBatchSize = ebeanServer.getLazyLoadBatchSize();
+    this.rootDescriptor = request.getBeanDescriptor();
+    
+    SpiQuery<?> query = request.getQuery();
+    this.readOnly = query.isReadOnly();	  
 		this.excludeBeanCache = Boolean.FALSE.equals(query.isUseBeanCache());
 		this.useAutofetchManager = query.getAutoFetchManager() != null;		
 				
@@ -72,7 +75,7 @@ public class DLoadContext implements LoadContext {
 		
 		// initialise rootBeanContext after origin and relativePath have been set
     this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
-	}	
+	}
 
   protected boolean isExcludeBeanCache() {
     return excludeBeanCache;

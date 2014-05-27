@@ -188,8 +188,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private final int maxRowsLimit;
 
-  private final PersistenceContext persistenceContext;
-
   private DataReader dataReader;
 
   /**
@@ -266,7 +264,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     this.logWhereSql = queryPlan.getLogWhereSql();
     this.desc = request.getBeanDescriptor();
     this.predicates = predicates;
-    this.persistenceContext = request.getPersistenceContext();
     this.maxRowsLimit = query.getMaxRows() > 0 ? query.getMaxRows() : GLOBAL_ROW_LIMIT;
     this.help = createHelp(request);
     this.collection = (BeanCollection<T>) (help != null ? help.createEmpty(false) : null);
@@ -420,7 +417,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    * Return the persistence context.
    */
   public PersistenceContext getPersistenceContext() {
-    return persistenceContext;
+    return request.getPersistenceContext();
   }
 
   public void setLoadedBean(EntityBean bean, Object id, Object lazyLoadParentId) {
@@ -443,7 +440,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       if (lazyLoadParentId != null) {
         if (!lazyLoadParentId.equals(this.lazyLoadParentId)) {
           // get the appropriate parent bean from the persistence context
-          this.lazyLoadParentBean = (EntityBean)persistenceContext.get(lazyLoadManyProperty.getBeanDescriptor().getBeanType(), lazyLoadParentId);
+          this.lazyLoadParentBean = (EntityBean)getPersistenceContext().get(lazyLoadManyProperty.getBeanDescriptor().getBeanType(), lazyLoadParentId);
           this.lazyLoadParentId = lazyLoadParentId;
         }
         

@@ -25,7 +25,6 @@ import com.avaje.ebeaninternal.server.cache.CachedBeanDataUpdate;
 import com.avaje.ebeaninternal.server.cache.CachedManyIds;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
-import com.avaje.ebeaninternal.server.loadcontext.DLoadContext;
 import com.avaje.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
@@ -328,14 +327,15 @@ public final class BeanDescriptorCacheHelp<T> {
     if (context == null) {
       context = new DefaultPersistenceContext();
     }
-    context.put(query.getId(), bean);
 
-    DLoadContext loadContext = new DLoadContext(desc.getEbeanServer(), desc, query.isReadOnly(), query);
-    loadContext.setPersistenceContext(context);
-
-    EntityBeanIntercept ebi = ((EntityBean) bean)._ebean_getIntercept();
+    // Not using a loadContext for beans coming out of L2 cache
+    // so that means no batch lazy loading for these beans
+    EntityBean entityBean = (EntityBean)bean;
+    EntityBeanIntercept ebi = entityBean._ebean_getIntercept();
     ebi.setPersistenceContext(context);
-    loadContext.register(null, ebi);
+    Object id = desc.getId(entityBean);
+    context.put(id, bean);
+
   }
   
   /**

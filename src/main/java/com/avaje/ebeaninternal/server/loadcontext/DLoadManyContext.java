@@ -31,14 +31,16 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 	  super(parent, property.getBeanDescriptor(), path, defaultBatchSize, queryProps);
 
 		this.property = property;
-		this.bufferList = new ArrayList<DLoadManyContext.LoadBuffer>();
+    // bufferList only required when using query joins (queryFetch)
+		this.bufferList = (!queryFetch) ? null : new ArrayList<DLoadManyContext.LoadBuffer>();
     this.currentBuffer = createBuffer(firstBatchSize);
-
 	}
-	
+  
   private LoadBuffer createBuffer(int size) {
     LoadBuffer buffer = new LoadBuffer(this, size);
-    bufferList.add(buffer);
+    if (bufferList != null) {
+      bufferList.add(buffer);
+    }
     return buffer;
   }
  
@@ -74,11 +76,11 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 
 	public void register(BeanCollection<?> bc){
 		
-		bc.setLoader(0, currentBuffer);
-    if (currentBuffer.add(bc)) {
-      // the currentBuffer is full so create another one
+		if (currentBuffer.isFull()) {
       currentBuffer = createBuffer(secondaryBatchSize);
-    }
+		}
+		currentBuffer.add(bc);
+    bc.setLoader(0, currentBuffer);
 	}
 
 	
@@ -112,22 +114,32 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
    */
   public static class LoadBuffer implements BeanCollectionLoader, LoadManyBuffer {
     
+    private final PersistenceContext persistenceContext;
     private final DLoadManyContext context;
     private final int batchSize;
     private final List<BeanCollection<?>> list;
     
     public LoadBuffer(DLoadManyContext context, int batchSize) {
       this.context = context;
+      // set the persistence context as at this moment in 
+      // case it changes as part of a findIterate etc      
+      this.persistenceContext = context.getPersistenceContext();
       this.batchSize = batchSize;
       this.list = new ArrayList<BeanCollection<?>>(batchSize);
     }
-
+    
     /**
      * Return true if the buffer is full.
      */
-    public boolean add(BeanCollection<?> bc) {
+    public boolean isFull() {
+      return batchSize == list.size();      
+    }
+    
+    /**
+     * Return true if the buffer is full.
+     */
+    public void add(BeanCollection<?> bc) {
       list.add(bc);
-      return batchSize == list.size();
     }
     
     @Override
@@ -162,7 +174,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 
     @Override
     public PersistenceContext getPersistenceContext() {
-      return context.getPersistenceContext();
+      return persistenceContext;
     }
     
     @Override
