@@ -3,6 +3,7 @@ package com.avaje.ebean;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.MappedSuperclass;
 
@@ -17,19 +18,18 @@ import javax.persistence.MappedSuperclass;
  * <p>
  * Note that there is a avaje-ebeanorm-mocker project that enables you to use Mockito or similar
  * tools to still mock out the underlying 'default EbeanServer' for testing purposes.
+ * 
+ * <p>
+ * You may choose not use this Model mapped superclass if you don't like the 'Active Record' style
+ * or if you believe it 'pollutes' your entity beans.
+ * 
+ * <p>
+ * If you choose to use the Model mapped superclass you will probably also chose to additionally add
+ * a {@link Finder} as a public static field to complete the active record pattern and provide a
+ * relatively nice clean way to write queries.
  */
 @MappedSuperclass
 public class Model {
-
-  private Object _getId() {
-    try {
-      return db().getBeanId(this);
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
 
   /**
    * Return the underlying 'default' EbeanServer.
@@ -45,7 +45,11 @@ public class Model {
   }
 
   /**
-   * Return typically a different EbeanServer to the default.
+   * Return a named EbeanServer that is typically different to the default server.
+   * 
+   * <p>
+   * If you are using multiple databases then each database has a name and maps to a single
+   * EbeanServer. You can use this method to get an EbeanServer for another database.
    * 
    * @param server
    *          The name of the EbeanServer. If this is null then the default EbeanServer is returned.
@@ -80,28 +84,28 @@ public class Model {
   }
 
   /**
-   * Deletes this entity.
+   * Delete this entity.
    */
   public void delete() {
     db().delete(this);
   }
 
   /**
-   * Update this entity.
+   * Perform an update using this entity against the specified server.
    */
   public void update(String server) {
     db(server).update(this);
   }
 
   /**
-   * Insert this entity.
+   * Perform an insert using this entity against the specified server.
    */
   public void insert(String server) {
     db(server).insert(this);
   }
 
   /**
-   * Deletes this entity.
+   * Perform a delete using this entity against the specified server.
    */
   public void delete(String server) {
     db(server).delete(this);
@@ -114,36 +118,19 @@ public class Model {
     db().refresh(this);
   }
 
-  @Override
-  public boolean equals(Object other) {
-    // RB: This is inconsistent with the default Ebean implementation so
-    // in that sense I don't believe this can be the default implementation 
-    if (this == other)
-      return true;
-    if (other == null || other.getClass() != this.getClass())
-      return false;
-    Object id = _getId();
-    Object otherId = ((Model) other)._getId();
-    if (id == null)
-      return false;
-    if (otherId == null)
-      return false;
-    return id.equals(otherId);
-  }
-
-  @Override
-  public int hashCode() {
-    // RB: this hashCode changes ... so I don't like this as the
-    // baked in default behaviour - but need to support this for any Play users
-    // that convert over to this. Best option is to support this in enhancement and let the
-    // users choose their poison. Alternatively provide 2 versions of Model with the
-    // 2 different behaviours for hashCode / equals
-    Object id = _getId();
-    return id == null ? super.hashCode() : id.hashCode();
-  }
-
   /**
-   * Helper for queries.
+   * Helper object for performing queries.
+   * 
+   * <p>
+   * Typically a Finder is defined as a public static field on an entity bean class to provide a
+   * nice way to write queries.
+   * 
+   * @param I
+   *          The Id type. This is most often a {@link Long} but is also often a {@link UUID} or
+   *          {@link String}.
+   * 
+   * @param T
+   *          The bean type
    */
   public static class Finder<I, T> {
 
@@ -163,7 +150,7 @@ public class Model {
 
     /**
      * Creates a finder for entity of type <code>T</code> with ID of type <code>I</code>, using a
-     * specific Ebean server.
+     * specific EbeanServer.
      * 
      * <p>
      * Typically you don't need to use this method.
@@ -179,6 +166,7 @@ public class Model {
      * 
      * <p>
      * This provides full access to the API such as explicit transaction demarcation etc.
+     * 
      */
     public EbeanServer db() {
       return Ebean.getServer(serverName);
@@ -186,6 +174,8 @@ public class Model {
 
     /**
      * Return typically a different EbeanServer to the default.
+     * <p>
+     * This is equivilent to {@link Ebean#getServer(String)}
      * 
      * @param server
      *          The name of the EbeanServer. If this is null then the default EbeanServer is
@@ -196,7 +186,7 @@ public class Model {
     }
 
     /**
-     * Changes the Ebean server.
+     * Creates a Finder for the named EbeanServer.
      * 
      * <p>
      * Create and return a new Finder for a different server.
@@ -222,6 +212,9 @@ public class Model {
 
     /**
      * Retrieves an entity by ID.
+     * 
+     * <p>
+     * Equivilent to {@link EbeanServer#find(Class, Object)}
      */
     public T byId(I id) {
       return db().find(type, id);
@@ -229,6 +222,9 @@ public class Model {
 
     /**
      * Creates an entity reference for this ID.
+     * 
+     * <p>
+     * Equivilent to {@link EbeanServer#getReference(Class, Object)}
      */
     public T ref(I id) {
       return db().getReference(type, id);
@@ -237,6 +233,8 @@ public class Model {
     /**
      * Creates a filter for sorting and filtering lists of entities locally without going back to
      * the database.
+     * <p>
+     * Equivilent to {@link EbeanServer#filter(Class)}
      */
     public Filter<T> filter() {
       return db().filter(type);
@@ -244,6 +242,8 @@ public class Model {
 
     /**
      * Creates a query.
+     * <p>
+     * Equivilent to {@link EbeanServer#find(Class)}
      */
     public Query<T> query() {
       return db().find(type);
@@ -251,6 +251,8 @@ public class Model {
 
     /**
      * Returns the next identity value.
+     * 
+     * @see EbeanServer#nextId(Class)
      */
     @SuppressWarnings("unchecked")
     public I nextId() {
@@ -258,17 +260,9 @@ public class Model {
     }
 
     /**
-     * Executes a find IDs query in a background thread.
-     * 
-     * @deprecated RB: Hmm, this is a "find all" - less is more, prefer to hide this - just get from
-     *             query().
-     */
-    public FutureIds<T> findFutureIds() {
-      return query().findFutureIds();
-    }
-
-    /**
      * Executes a query and returns the results as a list of IDs.
+     * <p>
+     * Equivilent to {@link Query#findIds()}
      */
     public List<Object> findIds() {
       return query().findIds();
@@ -276,9 +270,10 @@ public class Model {
 
     /**
      * Retrieves all entities of the given type.
-     * 
      * <p>
      * The same as {@link #all()}
+     * <p>
+     * Equivilent to {@link Query#findList()}
      */
     public List<T> findList() {
       return query().findList();
@@ -286,6 +281,8 @@ public class Model {
 
     /**
      * Returns all the entities of the given type as a set.
+     * <p>
+     * Equivilent to {@link Query#findSet()}
      */
     public Set<T> findSet() {
       return query().findSet();
@@ -293,6 +290,8 @@ public class Model {
 
     /**
      * Retrieves all entities of the given type as a map of objects.
+     * <p>
+     * Equivilent to {@link Query#findMap()}
      */
     public Map<?, T> findMap() {
       return query().findMap();
@@ -301,6 +300,8 @@ public class Model {
     /**
      * Executes the query and returns the results as a map of the objects specifying the map key
      * property.
+     * <p>
+     * Equivilent to {@link Query#findMap(String, Class)}
      */
     public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
       return query().findMap(keyProperty, keyType);
@@ -309,29 +310,26 @@ public class Model {
     /**
      * Return a PagedList of all entities of the given type (use where() to specify predicates as
      * needed).
+     * <p>
+     * Equivilent to {@link Query#findPagedList(int, int)}
      */
     public PagedList<T> findPagedList(int pageIndex, int pageSize) {
       return query().findPagedList(pageIndex, pageSize);
     }
 
     /**
-     * Returns a <code>PagingList</code> for this query.
-     * 
-     * @deprecated RB: PagingList deprecated - migrate to findPagedList().
-     */
-    public PagingList<T> findPagingList(int pageSize) {
-      return query().findPagingList(pageSize);
-    }
-
-    /**
      * Executes a find row count query in a background thread.
+     * <p>
+     * Equivilent to {@link Query#findFutureRowCount()}
      */
     public FutureRowCount<T> findFutureRowCount() {
       return query().findFutureRowCount();
     }
 
     /**
-     * Returns the total number of entities for this type.
+     * Returns the total number of entities for this type. *
+     * <p>
+     * Equivilent to {@link Query#findRowCount()}
      */
     public int findRowCount() {
       return query().findRowCount();
@@ -347,6 +345,8 @@ public class Model {
     /**
      * Explicitly sets a comma delimited list of the properties to fetch on the 'main' entity bean,
      * to load a partial object.
+     * <p>
+     * Equivilent to {@link Query#select(String)}
      */
     public Query<T> select(String fetchProperties) {
       return query().select(fetchProperties);
@@ -354,6 +354,8 @@ public class Model {
 
     /**
      * Specifies a path to load including all its properties.
+     * <p>
+     * Equivilent to {@link Query#fetch(String)}
      */
     public Query<T> fetch(String path) {
       return query().fetch(path);
@@ -362,6 +364,8 @@ public class Model {
     /**
      * Additionally specifies a <code>FetchConfig</code> to specify a 'query join' and/or define the
      * lazy loading query.
+     * <p>
+     * Equivilent to {@link Query#fetch(String, FetchConfig)}
      */
     public Query<T> fetch(String path, FetchConfig joinConfig) {
       return query().fetch(path, joinConfig);
@@ -370,6 +374,8 @@ public class Model {
     /**
      * Specifies a path to fetch with a specific list properties to include, to load a partial
      * object.
+     * <p>
+     * Equivilent to {@link Query#fetch(String, String)}
      */
     public Query<T> fetch(String path, String fetchProperties) {
       return query().fetch(path, fetchProperties);
@@ -378,6 +384,8 @@ public class Model {
     /**
      * Additionally specifies a <code>FetchConfig</code> to use a separate query or lazy loading to
      * load this path.
+     * <p>
+     * Equivilent to {@link Query#fetch(String, String, FetchConfig)}
      */
     public Query<T> fetch(String assocProperty, String fetchProperties, FetchConfig fetchConfig) {
       return query().fetch(assocProperty, fetchProperties, fetchConfig);
@@ -386,23 +394,11 @@ public class Model {
     /**
      * Adds expressions to the <code>where</code> clause with the ability to chain on the
      * <code>ExpressionList</code>.
+     * <p>
+     * Equivilent to {@link Query#where()}
      */
     public ExpressionList<T> where() {
       return query().where();
-    }
-
-    /**
-     * Adds a single <code>Expression</code> to the <code>where</code> clause and returns the query.
-     */
-    public Query<T> where(com.avaje.ebean.Expression expression) {
-      return query().where(expression);
-    }
-
-    /**
-     * Adds additional clauses to the <code>where</code> clause.
-     */
-    public Query<T> where(String addToWhereClause) {
-      return query().where(addToWhereClause);
     }
 
     /**
@@ -410,6 +406,8 @@ public class Model {
      * property to the <code>order by</code> clause.
      * <p>
      * This is exactly the same as {@link #orderBy}.
+     * <p>
+     * Equivilent to {@link Query#order()}
      */
     public OrderBy<T> order() {
       return query().order();
@@ -430,6 +428,8 @@ public class Model {
      * property to the <code>order by</code> clause.
      * <p>
      * This is exactly the same as {@link #order}.
+     * <p>
+     * Equivilent to {@link Query#orderBy()}
      */
     public OrderBy<T> orderBy() {
       return query().orderBy();
@@ -447,6 +447,8 @@ public class Model {
 
     /**
      * Sets the first row to return for this query.
+     * <p>
+     * Equivilent to {@link Query#setFirstRow(int)}
      */
     public Query<T> setFirstRow(int firstRow) {
       return query().setFirstRow(firstRow);
@@ -454,6 +456,8 @@ public class Model {
 
     /**
      * Sets the maximum number of rows to return in the query.
+     * <p>
+     * Equivilent to {@link Query#setMaxRows(int)}
      */
     public Query<T> setMaxRows(int maxRows) {
       return query().setMaxRows(maxRows);
@@ -465,6 +469,8 @@ public class Model {
      * <p>
      * Use this to perform a find byId query but with additional control over the query such as
      * using select and fetch to control what parts of the object graph are returned.
+     * <p>
+     * Equivilent to {@link Query#setId(Object)}
      */
     public Query<T> setId(Object id) {
       return query().setId(id);
@@ -472,6 +478,8 @@ public class Model {
 
     /**
      * Create and return a new query using the OQL.
+     * <p>
+     * Equivilent to {@link EbeanServer#createQuery(Class, String)}
      */
     public Query<T> setQuery(String oql) {
       return db().createQuery(type, oql);
@@ -479,16 +487,11 @@ public class Model {
 
     /**
      * Create and return a new query based on the <code>RawSql</code>.
+     * <p>
+     * Equivilent to {@link Query#setRawSql(RawSql)}
      */
     public Query<T> setRawSql(RawSql rawSql) {
       return query().setRawSql(rawSql);
-    }
-
-    /**
-     * Sets the property to use as keys for a {@link Query#findMap()} query.
-     */
-    public Query<T> setMapKey(String mapKey) {
-      return query().setMapKey(mapKey);
     }
 
     /**
