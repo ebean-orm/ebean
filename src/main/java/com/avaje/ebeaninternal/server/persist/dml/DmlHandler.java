@@ -266,10 +266,6 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
       return stmt;
     }
 
-    if (logLevelSql) {
-      t.logSql(sql);
-    }
-
     stmt = getPstmt(t, sql, genKeys);
 
     PstmtBatch pstmtBatch = request.getPstmtBatch();
