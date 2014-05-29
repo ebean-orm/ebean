@@ -56,8 +56,9 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     if (currentBuffer.isFull()) {
       currentBuffer = createBuffer(secondaryBatchSize);      
     }
-    currentBuffer.add(ebi);
+    // set the persistenceContext on the bean first 
     ebi.setBeanLoader(0, currentBuffer, getPersistenceContext());
+    currentBuffer.add(ebi);
   }
   
 	private LoadBuffer createBuffer(int size) {
@@ -100,16 +101,13 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
    */
   public static class LoadBuffer implements BeanLoader, LoadBeanBuffer {
     
-    private final PersistenceContext persistenceContext;
     private final DLoadBeanContext context;
     private final int batchSize;
     private final List<EntityBeanIntercept> list;
+    private PersistenceContext persistenceContext;
     
     public LoadBuffer(DLoadBeanContext context, int batchSize) {
       this.context = context;
-      // set the persistence context as at this moment in 
-      // case it changes as part of a findIterate etc
-      this.persistenceContext = context.getPersistenceContext();
       this.batchSize = batchSize;
       this.list = new ArrayList<EntityBeanIntercept>(batchSize);
     }
@@ -125,6 +123,10 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
      * Return true if the buffer is full.
      */
     public void add(EntityBeanIntercept ebi) {
+      if (persistenceContext == null) {
+        // get persistenceContext from first loaded bean into the buffer
+        persistenceContext = ebi.getPersistenceContext();
+      }
       list.add(ebi);
     }
     
