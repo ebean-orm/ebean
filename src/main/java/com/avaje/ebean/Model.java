@@ -29,7 +29,7 @@ import javax.persistence.MappedSuperclass;
  * relatively nice clean way to write queries.
  */
 @MappedSuperclass
-public class Model {
+public abstract class Model {
 
   /**
    * Return the underlying 'default' EbeanServer.
@@ -38,9 +38,36 @@ public class Model {
    * This provides full access to the API such as explicit transaction demarcation etc.
    * 
    * <p>
-   * TODO: Transaction example
+   * Example:
+   * <pre class="code">
+   * Transaction transaction = Customer.db().beginTransaction();
+   * try {
+   * 
+   *   // turn off cascade persist for this transaction
+   *   transaction.setPersistCascade(false);
+   * 
+   *   // extra control over jdbc batching for this transaction
+   *   transaction.setBatchGetGeneratedKeys(false);
+   *   transaction.setBatchMode(true);
+   *   transaction.setBatchSize(20);
+   * 
+   *   Customer customer = new Customer();
+   *   customer.setName(&quot;Roberto&quot;);
+   *   customer.save();
+   * 
+   *   Customer otherCustomer = new Customer();
+   *   otherCustomer.setName(&quot;Franko&quot;);
+   *   otherCustomer.save();
+   * 
+   *   transaction.commit();
+   * 
+   * } finally {
+   *   transaction.end();
+   * }
+   * 
+   * </pre>
    */
-  public EbeanServer db() {
+  public static EbeanServer db() {
     return Ebean.getServer(null);
   }
 
@@ -54,7 +81,7 @@ public class Model {
    * @param server
    *          The name of the EbeanServer. If this is null then the default EbeanServer is returned.
    */
-  public EbeanServer db(String server) {
+  public static EbeanServer db(String server) {
     return Ebean.getServer(server);
   }
 

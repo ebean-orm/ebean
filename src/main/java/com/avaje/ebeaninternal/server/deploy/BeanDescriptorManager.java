@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.Model;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.annotation.ConcurrencyMode;
@@ -1409,6 +1410,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     Class<?> superclass = beanClass.getSuperclass();
     if (Object.class.equals(superclass)) {
       // we got to the top of the inheritance
+      return;
+    }
+    if (Model.class.equals(superclass)) {
+      // top of the inheritance. Not enhancing Model at this stage
       return;
     }
     if (!EntityBean.class.isAssignableFrom(superclass)) {
