@@ -188,18 +188,7 @@
         <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
         <version>4.1.2</version>
         <executions>
-           <execution>
-            <id>main</id>
-            <phase>process-classes</phase>
-            <configuration>
-              <classSource>target/classes</classSource>
-              <packages>com.avaje.ebean.meta.**</packages>
-              <transformArgs>debug=1</transformArgs>
-            </configuration>
-            <goals>
-              <goal>enhance</goal>
-            </goals>
-          </execution>
+          <!--   Not going to enhance Model bean -->
           <execution>
             <id>test</id>
             <phase>process-test-classes</phase>
@@ -230,8 +219,28 @@
         </configuration>
       </plugin>
 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9.1</version>
+        <configuration>
+          <doctitle>Ebean 4</doctitle>
+          <overview>src/main/java/com/avaje/ebean/overview.html</overview>
+          <excludePackageNames>com.avaje.ebeaninternal.*:com.avaje.ebean.util</excludePackageNames>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <phase>site</phase>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    
     </plugins>
 
   </build>
-
+ 
 </project>
