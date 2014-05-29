@@ -9,6 +9,6 @@ Maven Dependency
     <dependency>
       <groupId>org.avaje.ebeanorm</groupId>
       <artifactId>avaje-ebeanorm</artifactId>
-      <version>4.0.2</version>
+      <version>4.0.4</version>
     </dependency>
     
