@@ -37,40 +37,55 @@ public class TestFindPagedList extends BaseTestCase {
       transaction.end();
     }    
     
-    PagedList<EBasic> list1 = Ebean.find(EBasic.class)
+    PagedList<EBasic> page1 = Ebean.find(EBasic.class)
           .where().like("name", "HelloB0B%")
           .findPagedList(0, 10);
     
-    list1.loadRowCount();
-    List<EBasic> list = list1.getList();
-    int totalRowCount = list1.getTotalRowCount();
-    int totalPageCount = list1.getTotalPageCount();
+    page1.loadRowCount();
+    List<EBasic> list = page1.getList();
     
     Assert.assertEquals(10, list.size());
-    Assert.assertEquals(87, totalRowCount);
-    Assert.assertEquals(9, totalPageCount);
+    Assert.assertEquals(87, page1.getTotalRowCount());
+    Assert.assertEquals(9, page1.getTotalPageCount());
+    Assert.assertEquals(true, page1.hasNext());
     
-    PagedList<EBasic> list2 = Ebean.find(EBasic.class)
+    
+    PagedList<EBasic> page1b = Ebean.find(EBasic.class)
+        .where().like("name", "HelloB0B%")
+        .findPagedList(0, 10);
+  
+    // Same as page1 but without initial loadRowCount() call
+    List<EBasic> list1B = page1b.getList();
+    Assert.assertEquals(10, list1B.size());
+    Assert.assertEquals(87, page1b.getTotalRowCount());
+    Assert.assertEquals(9, page1b.getTotalPageCount());
+    Assert.assertEquals(true, page1.hasNext());
+  
+    
+    PagedList<EBasic> page2 = Ebean.find(EBasic.class)
         .where().like("name", "HelloB0B%")
         .findPagedList(4, 10);
   
-    list = list2.getList();
+    list = page2.getList();
     
-    Assert.assertEquals(10, list2.getList().size());
-    Assert.assertEquals(87, list2.getTotalRowCount());
-    Assert.assertEquals(9, list2.getTotalPageCount());
+    Assert.assertEquals(10, page2.getList().size());
+    Assert.assertEquals(87, page2.getTotalRowCount());
+    Assert.assertEquals(9, page2.getTotalPageCount());
+    Assert.assertEquals(true, page2.hasNext());
     
-    PagedList<EBasic> list3 = Ebean.find(EBasic.class)
+    PagedList<EBasic> page3 = Ebean.find(EBasic.class)
         .where().like("name", "HelloB0B%")
         .findPagedList(8, 10);
   
-    Future<Integer> rowCount = list3.getFutureRowCount();
-    list = list3.getList();
+    Future<Integer> rowCount = page3.getFutureRowCount();
+    list = page3.getList();
     
     Assert.assertEquals(Integer.valueOf(87), rowCount.get());
-    Assert.assertEquals(7, list3.getList().size());
-    Assert.assertEquals(87, list3.getTotalRowCount());
-    Assert.assertEquals(9, list3.getTotalPageCount());
+    Assert.assertEquals(7, page3.getList().size());
+    Assert.assertEquals(87, page3.getTotalRowCount());
+    Assert.assertEquals(9, page3.getTotalPageCount());
+    Assert.assertEquals(false, page3.hasNext());
+    
   }
   
 }
