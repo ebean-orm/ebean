@@ -153,7 +153,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   }
 
   public String toString() {
-    StringBuffer sb = new StringBuffer();
+    StringBuffer sb = new StringBuffer(50);
     sb.append("BeanList ");
     if (isReadOnly()) {
       sb.append("readOnly ");
@@ -163,7 +163,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
     } else {
       sb.append("size[").append(list.size()).append("] ");
-      sb.append("hasMoreRows[").append(hasMoreRows).append("] ");
       sb.append("list").append(list).append("");
     }
     return sb.toString();

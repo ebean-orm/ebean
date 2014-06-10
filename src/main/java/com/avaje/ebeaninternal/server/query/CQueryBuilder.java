@@ -125,6 +125,10 @@ public class CQueryBuilder implements Constants {
 
     // always set the order by to null for row count query
     query.setOrder(null);
+    if (query.isRawSql()) {
+      query.setFirstRow(0);
+      query.setMaxRows(0);
+    }
 
     ManyWhereJoins manyWhereJoins = query.getManyWhereJoins();
     
@@ -158,7 +162,7 @@ public class CQueryBuilder implements Constants {
     SqlTree sqlTree = createSqlTree(request, predicates);
     SqlLimitResponse s = buildSql(sqlSelect, request, predicates, sqlTree);
     String sql = s.getSql();
-    if (hasMany) {
+    if (hasMany || query.isRawSql()) {
       sql = "select count(*) from ( " + sql + ")";
       if (selectCountWithAlias) {
         sql += " as c";

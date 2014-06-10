@@ -5,8 +5,6 @@ import com.avaje.ebean.Query;
 /**
  * The request object for the query that can have sql limiting applied to it
  * (such as a LIMIT OFFSET clause).
- * 
- * @author rob
  */
 public interface SqlLimitRequest {
 

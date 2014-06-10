@@ -143,7 +143,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   }
 
   public String toString() {
-    StringBuffer sb = new StringBuffer();
+    StringBuffer sb = new StringBuffer(50);
     sb.append("BeanSet ");
     if (isReadOnly()) {
       sb.append("readOnly ");
@@ -153,7 +153,6 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
     } else {
       sb.append("size[").append(set.size()).append("]");
-      sb.append(" hasMoreRows[").append(hasMoreRows).append("]");
       sb.append(" set").append(set);
     }
     return sb.toString();

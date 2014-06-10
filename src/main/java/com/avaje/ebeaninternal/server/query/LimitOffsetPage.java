@@ -52,7 +52,7 @@ public class LimitOffsetPage<T> implements Page<T>, BeanCollectionTouched {
 	 * Perform fetch ahead when the list is first accessed.
 	 */
 	public void notifyTouched(BeanCollection<?> c) {
-		if (c.hasMoreRows()) {
+		if (hasNext()) {
 			owner.fetchAheadIfRequired(pageIndex);
 		}
 	}
@@ -65,9 +65,8 @@ public class LimitOffsetPage<T> implements Page<T>, BeanCollectionTouched {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean hasNext() {
-		return ((BeanCollection<T>) getList()).hasMoreRows();
+	  return pageIndex < getTotalPageCount() - 1;
 	}
 
 	public boolean hasPrev() {

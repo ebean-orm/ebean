@@ -154,7 +154,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   public String toString() {
-    StringBuffer sb = new StringBuffer();
+    StringBuffer sb = new StringBuffer(50);
     sb.append("BeanMap ");
     if (isReadOnly()) {
       sb.append("readOnly ");
@@ -164,7 +164,6 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
     } else {
       sb.append("size[").append(map.size()).append("]");
-      sb.append(" hasMoreRows[").append(hasMoreRows).append("]");
       sb.append(" map").append(map);
     }
     return sb.toString();

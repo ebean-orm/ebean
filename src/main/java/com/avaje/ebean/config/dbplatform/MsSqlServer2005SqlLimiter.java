@@ -26,9 +26,7 @@ public class MsSqlServer2005SqlLimiter implements SqlLimiter {
 
     int lastRow = request.getMaxRows();
     if (lastRow > 0) {
-      // fetch 1 more than we return so that
-      // we know if more rows are available
-      lastRow = lastRow + firstRow + 1;
+      lastRow = lastRow + firstRow;
     }
 
     if (firstRow < 1) {

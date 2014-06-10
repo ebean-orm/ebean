@@ -115,8 +115,6 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 				maxRows = query.getMaxRows();
 			}
 
-			boolean hasHitMaxRows = false;
-
 			int loadRowCount = 0;
 
 			SqlQueryListener listener = query.getListener();
@@ -152,20 +150,12 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 	
 					if (loadRowCount == maxRows) {
 						// break, as we have hit the max rows to fetch...
-						hasHitMaxRows = true;
 						break;
 					}
 				}
 			}
 
 			BeanCollection<?> beanColl = wrapper.getBeanCollection();
-
-			if (hasHitMaxRows) {
-				if (rset.next()) {
-					// there are more rows available after the maxRows limit
-					beanColl.setHasMoreRows(true);
-				}
-			}
 
 			if (request.isLogSummary()) {
 				long exeTime = System.currentTimeMillis() - startTime;

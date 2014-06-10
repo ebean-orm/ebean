@@ -45,12 +45,6 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
    */
   protected final String propertyName;
 
-  /**
-   * Flag set to true if rows are limited by firstRow maxRows and more rows
-   * exist. For use by client to enable 'next' for paging.
-   */
-  protected boolean hasMoreRows;
-
   protected ModifyHolder<E> modifyHolder;
 
   protected ModifyListenMode modifyListenMode;
@@ -149,26 +143,6 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
-  }
-
-  /**
-   * Set to true if maxRows was hit and there are actually more rows available.
-   * <p>
-   * Can be used by client code that is paging through results using
-   * setFirstRow() setMaxRows(). If this returns true then the client can
-   * display a 'next' button etc.
-   * </p>
-   */
-  public boolean hasMoreRows() {
-    return hasMoreRows;
-  }
-
-  /**
-   * Set to true when maxRows is hit but there are actually more rows available.
-   * This is set so that client code knows that there is more data available.
-   */
-  public void setHasMoreRows(boolean hasMoreRows) {
-    this.hasMoreRows = hasMoreRows;
   }
 
   protected void checkReadOnly() {

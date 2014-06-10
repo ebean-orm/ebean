@@ -17,22 +17,21 @@ public class LimitOffsetSqlLimiter implements SqlLimiter {
 
   public SqlLimitResponse limit(SqlLimitRequest request) {
 
-    StringBuilder sb = new StringBuilder(512);
+    String dbSql = request.getDbSql();
+    
+    StringBuilder sb = new StringBuilder(50 + dbSql.length());
     sb.append("select ");
     if (request.isDistinct()) {
       sb.append("distinct ");
     }
 
-    sb.append(request.getDbSql());
+    sb.append(dbSql);
 
     int firstRow = request.getFirstRow();
     int maxRows = request.getMaxRows();
-    if (maxRows > 0) {
-      maxRows = maxRows + 1;
-    }
 
     if (maxRows > 0 || firstRow > 0) {
-      sb.append(" ").append(NEW_LINE).append(LIMIT).append(" ").append(maxRows);
+      sb.append(" ").append(LIMIT).append(" ").append(maxRows);
       if (firstRow > 0) {
         sb.append(" ").append(OFFSET).append(" ");
         sb.append(firstRow);

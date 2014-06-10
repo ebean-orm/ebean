@@ -2,8 +2,7 @@ package com.avaje.tests.basic;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
@@ -41,7 +40,7 @@ public class TestLimitQuery extends BaseTestCase {
 			.setMaxRows(0)
 			.setFirstRow(3);
 
-		List<Order> list = query.findList();
+		query.findList();
 
 		String sql = query.getGeneratedSql();
 		boolean hasLimit = sql.indexOf("limit 0") > -1;
@@ -67,10 +66,10 @@ public class TestLimitQuery extends BaseTestCase {
 			.setMaxRows(3)
 			.setFirstRow(0);
 
-		List<Order> list = query.findList();
+		query.findList();
 
 		String sql = query.getGeneratedSql();
-		boolean hasLimit = sql.indexOf("limit 4") > -1;
+		boolean hasLimit = sql.indexOf("limit 3") > -1;
 		boolean hasOffset = sql.indexOf("offset") > -1;
 
 		if (h2Db) {
@@ -92,7 +91,7 @@ public class TestLimitQuery extends BaseTestCase {
 			.where().gt("details.id", 0)
 			.query();
 
-		List<Order> list = query.findList();
+		query.findList();
 
 		String sql = query.getGeneratedSql();
 		boolean hasLimit = sql.indexOf("limit") > -1;
@@ -123,7 +122,7 @@ public class TestLimitQuery extends BaseTestCase {
 
 		String sql = query.getGeneratedSql();
 		boolean hasDetailsJoin = sql.indexOf("join o_order_detail") > -1;
-		boolean hasLimit = sql.indexOf("limit 11") > -1;
+		boolean hasLimit = sql.indexOf("limit 10") > -1;
 		boolean hasSelectedDetails = sql.indexOf("od.id,") > -1;
 		boolean hasDistinct = sql.indexOf("select distinct") > -1;
 		
@@ -143,7 +142,7 @@ public class TestLimitQuery extends BaseTestCase {
 		
 		sql = query.getGeneratedSql();
 		hasDetailsJoin = sql.indexOf("left outer join o_order_detail") > -1;
-		hasLimit = sql.indexOf("limit 11") > -1;
+		hasLimit = sql.indexOf("limit 10") > -1;
 		hasSelectedDetails = sql.indexOf("od.id") > -1;
 		hasDistinct = sql.indexOf("select distinct") > -1;
 

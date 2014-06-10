@@ -138,22 +138,6 @@ public interface BeanCollection<E> extends Serializable {
   public Collection<?> getActualEntries();
 
   /**
-   * Set to true if maxRows was hit and there are actually more rows available.
-   * <p>
-   * Can be used by client code that is paging through results using
-   * setFirstRow() setMaxRows(). If this returns true then the client can
-   * display a 'next' button etc.
-   * </p>
-   */
-  public boolean hasMoreRows();
-
-  /**
-   * Set to true when maxRows is hit but there are actually more rows available.
-   * This is set so that client code knows that there is more data available.
-   */
-  public void setHasMoreRows(boolean hasMoreRows);
-
-  /**
    * return true if there are real rows held. Return false is this is using
    * Deferred fetch to lazy load the rows and the rows have not yet been
    * fetched.

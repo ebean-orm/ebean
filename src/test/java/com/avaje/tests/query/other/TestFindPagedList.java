@@ -10,7 +10,9 @@ import org.junit.Test;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.Page;
 import com.avaje.ebean.PagedList;
+import com.avaje.ebean.PagingList;
 import com.avaje.ebean.Transaction;
 import com.avaje.tests.model.basic.EBasic;
 
@@ -37,6 +39,17 @@ public class TestFindPagedList extends BaseTestCase {
       transaction.end();
     }    
     
+    @SuppressWarnings("deprecation")
+    PagingList<EBasic> pagingList = Ebean.find(EBasic.class)
+        .where().like("name", "HelloB0B%")
+        .findPagingList(10);
+    
+    Page<EBasic> page7 = pagingList.getPage(7);
+    Assert.assertTrue(page7.hasNext());
+
+    Page<EBasic> page8 = pagingList.getPage(8);
+    Assert.assertFalse(page8.hasNext());
+
     PagedList<EBasic> page1 = Ebean.find(EBasic.class)
           .where().like("name", "HelloB0B%")
           .findPagedList(0, 10);

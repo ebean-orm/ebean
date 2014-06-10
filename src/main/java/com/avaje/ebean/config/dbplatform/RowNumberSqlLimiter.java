@@ -15,7 +15,7 @@ public class RowNumberSqlLimiter implements SqlLimiter {
    */
   private static final String ROW_NUMBER_AS = ") as rn, ";
 
-  final String rowNumberWindowAlias;
+  private final String rowNumberWindowAlias;
 
   /**
    * Specify the name of the rowNumberWindowAlias.
@@ -30,16 +30,18 @@ public class RowNumberSqlLimiter implements SqlLimiter {
 
   public SqlLimitResponse limit(SqlLimitRequest request) {
 
-    StringBuilder sb = new StringBuilder(500);
+    String dbSql = request.getDbSql();
+    
+    StringBuilder sb = new StringBuilder(60 + dbSql.length());
 
     int firstRow = request.getFirstRow();
 
     int lastRow = request.getMaxRows();
     if (lastRow > 0) {
-      lastRow = lastRow + firstRow + 1;
+      lastRow = lastRow + firstRow;
     }
 
-    sb.append("select * from (").append(NEW_LINE);
+    sb.append("select * from ( ");
 
     sb.append("select ");
     if (request.isDistinct()) {
@@ -50,9 +52,9 @@ public class RowNumberSqlLimiter implements SqlLimiter {
     sb.append(request.getDbOrderBy());
     sb.append(ROW_NUMBER_AS);
 
-    sb.append(request.getDbSql());
+    sb.append(dbSql);
 
-    sb.append(NEW_LINE).append(") ");
+    sb.append(" ) ");
     sb.append(rowNumberWindowAlias);
     sb.append(" where ");
     if (firstRow > 0) {

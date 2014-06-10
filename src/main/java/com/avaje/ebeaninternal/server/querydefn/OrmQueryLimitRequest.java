@@ -6,12 +6,13 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 
 public class OrmQueryLimitRequest implements SqlLimitRequest {
 
-	final SpiQuery<?> ormQuery;
-  final DatabasePlatform dbPlatform;
-
-	final String sql;
+	private final SpiQuery<?> ormQuery;
 	
-	final String sqlOrderBy;
+  private final DatabasePlatform dbPlatform;
+
+	private final String sql;
+	
+	private final String sqlOrderBy;
 	
   public OrmQueryLimitRequest(String sql, String sqlOrderBy, SpiQuery<?> ormQuery, DatabasePlatform dbPlatform) {
     this.sql = sql;

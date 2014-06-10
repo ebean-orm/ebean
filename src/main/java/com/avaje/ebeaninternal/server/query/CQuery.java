@@ -476,15 +476,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     }
   }
 
-  private boolean hasMoreRows() throws SQLException {
-    synchronized (this) {
-      if (cancelled) {
-        return false;
-      }
-      return dataReader.next();
-    }
-  }
-
   /**
    * Read a row from the result set returning a bean.
    * <p>
@@ -533,7 +524,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   private boolean readBeanInternal() throws SQLException {
 
     if (loadedBeanCount >= maxRowsLimit) {
-      collection.setHasMoreRows(hasMoreRows());
       return false;
     }
 

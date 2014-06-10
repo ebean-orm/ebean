@@ -8,15 +8,12 @@ public class SqlAnywhereLimiter implements SqlLimiter {
 
   public SqlLimitResponse limit(SqlLimitRequest request) {
 
-    StringBuilder sb = new StringBuilder(500);
+    String dbSql = request.getDbSql();
+    
+    StringBuilder sb = new StringBuilder(60 + dbSql.length());
 
     int firstRow = request.getFirstRow();
     int maxRows = request.getMaxRows();
-    if (maxRows > 0) {
-      // fetch 1 more than we return so that
-      // we know if more rows are available
-      maxRows = maxRows + 1;
-    }
 
     /*
      * SELECT TOP xx START AT xx ... FROM ...
@@ -31,7 +28,7 @@ public class SqlAnywhereLimiter implements SqlLimiter {
     if (firstRow > 0) {
       sb.append("start at ").append(firstRow + 1).append(" ");
     }
-    sb.append(request.getDbSql());
+    sb.append(dbSql);
 
     String sql = request.getDbPlatform().completeSql(sb.toString(), request.getOrmQuery());
 
