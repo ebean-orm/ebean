@@ -122,6 +122,18 @@ public final class TableName {
   }
 
   /**
+   * Append a catalog and schema prefix if they exist to the string builder.
+   */
+  public void appendCatalogAndSchema(StringBuilder buffer) {
+    if (catalog != null) {
+      buffer.append(catalog).append(".");
+    }
+    if (schema != null) {
+      buffer.append(schema).append(".");
+    }
+  }
+  
+  /**
    * Checks if is table name is valid i.e. it has at least a name.
    * 
    * @return true, if is valid

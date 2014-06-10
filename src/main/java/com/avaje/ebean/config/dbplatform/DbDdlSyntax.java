@@ -1,5 +1,7 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.config.TableName;
+
 /**
  * Used to support DB specific syntax for DDL generation.
  */
@@ -248,11 +250,17 @@ public class DbDdlSyntax {
     this.inlinePrimaryKeyConstraint = inlinePrimaryKeyConstraint;
   }
 
-  public String getIndexName(String table, String propName, int ixCount) {
+  /**
+   * Builds and returns a fully index name.
+   */
+  public String getIndexName(String qualifiedTableName, String propName, int ixCount) {
 
+    TableName tableName = new TableName(qualifiedTableName);
+    
     StringBuilder buffer = new StringBuilder();
+    tableName.appendCatalogAndSchema(buffer);
     buffer.append("ix_");
-    buffer.append(table);
+    buffer.append(tableName.getName());
     buffer.append("_");
     buffer.append(propName);
 
@@ -261,11 +269,17 @@ public class DbDdlSyntax {
     return buffer.toString();
   }
 
-  public String getForeignKeyName(String table, String propName, int fkCount) {
+  /**
+   * Builds and returns a fully qualified foreign key constraint name.
+   */
+  public String getForeignKeyName(String qualifiedTableName, String propName, int fkCount) {
 
+    TableName tableName = new TableName(qualifiedTableName);
+    
     StringBuilder buffer = new StringBuilder();
+    tableName.appendCatalogAndSchema(buffer);
     buffer.append("fk_");
-    buffer.append(table);
+    buffer.append(tableName.getName());
     buffer.append("_");
     buffer.append(propName);
 
@@ -276,11 +290,6 @@ public class DbDdlSyntax {
 
   /**
    * Adds the suffix.
-   * 
-   * @param buffer
-   *          the buffer
-   * @param count
-   *          the count
    */
   protected void addSuffix(StringBuilder buffer, int count) {
     final String suffixNr = Integer.toString(count);
