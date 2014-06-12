@@ -2,6 +2,10 @@ package com.avaje.ebeaninternal.server.ddl;
 
 import java.sql.Types;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.avaje.ebean.config.TableName;
 import com.avaje.ebean.config.dbplatform.DbDdlSyntax;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -12,8 +16,6 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.deploy.TableJoinColumn;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Used as part of CreateTableVisitor to generated the create table DDL script.
@@ -71,7 +73,7 @@ public class CreateTableColumnVisitor extends BaseTablePropertyVisitor {
 
   private StringBuilder createUniqueConstraintBuffer(String table, String column) {
 
-    String uqConstraintName = "uq_" + table + "_" + column;
+    String uqConstraintName = "uq_"+TableName.parse(table)+"_"+column;
 
     if (uqConstraintName.length() > ddl.getMaxConstraintNameLength()) {
       uqConstraintName = uqConstraintName.substring(0, ddl.getMaxConstraintNameLength());

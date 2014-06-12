@@ -57,6 +57,13 @@ public final class TableName {
     this.name = split[len - 1];
   }
 
+  /**
+   * Parse a qualifiedTableName that might include a catalog and schema and just return the table name.
+   */
+  public static String parse(String qualifiedTableName) {
+    return new TableName(qualifiedTableName).getName();
+  }
+  
   public String toString() {
     return getQualifiedName();
   }
