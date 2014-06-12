@@ -1,5 +1,7 @@
 package com.avaje.ebean;
 
+import java.sql.ResultSet;
+
 import com.avaje.ebean.RawSql.ColumnMapping;
 import com.avaje.ebean.RawSql.Sql;
 
@@ -10,8 +12,6 @@ import com.avaje.ebean.RawSql.Sql;
  * named query.
  * </p>
  * 
- * @author rbygrave
- * 
  * @see RawSql
  */
 public class RawSqlBuilder {
@@ -21,10 +21,23 @@ public class RawSqlBuilder {
    */
   public static final String IGNORE_COLUMN = "$$_IGNORE_COLUMN_$$";
 
+  private final ResultSet resultSet;
+  
   private final Sql sql;
 
   private final ColumnMapping columnMapping;
 
+  /**
+   * Create and return a RawSql object based on the resultSet and list of properties the columns in
+   * the resultSet map to.
+   * <p>
+   * The properties listed in the propertyNames must be in the same order as the columns in the
+   * resultSet.
+   */
+  public static RawSql resultSet(ResultSet resultSet, String... propertyNames) {
+    return new RawSql(resultSet, propertyNames);
+  }
+  
   /**
    * Return an unparsed RawSqlBuilder. Unlike a parsed one this query can not be
    * modified - so no additional WHERE or HAVING expressions can be added to
@@ -58,9 +71,17 @@ public class RawSqlBuilder {
     return new RawSqlBuilder(sql2, mapping);
   }
 
+  
+  private RawSqlBuilder(ResultSet resultSet, ColumnMapping columnMapping) {
+    this.resultSet = resultSet;
+    this.columnMapping = columnMapping;
+    this.sql = null;
+  }
+  
   private RawSqlBuilder(Sql sql, ColumnMapping columnMapping) {
     this.sql = sql;
     this.columnMapping = columnMapping;
+    this.resultSet = null;
   }
 
   /**
@@ -92,7 +113,7 @@ public class RawSqlBuilder {
    * has been defined.
    */
   public RawSql create() {
-    return new RawSql(sql, columnMapping.createImmutableCopy());
+    return new RawSql(resultSet, sql, columnMapping.createImmutableCopy());
   }
 
   /**
@@ -101,4 +122,6 @@ public class RawSqlBuilder {
   protected Sql getSql() {
     return sql;
   }
+  
+
 }

@@ -1,6 +1,7 @@
 package com.avaje.ebean;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -135,18 +136,33 @@ import com.avaje.ebean.util.CamelCaseHelper;
  * Note that lazy loading also works with object graphs built with RawSql.
  * </p>
  * 
- * @author rbygrave
- * 
  */
 public final class RawSql implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
+  private final ResultSet resultSet;
+  
   private final Sql sql;
 
   private final ColumnMapping columnMapping;
 
-  protected RawSql(Sql sql, ColumnMapping columnMapping) {
+  /**
+   * Construct with a ResultSet and properties that the columns map to.
+   * <p>
+   * The properties listed in the propertyNames must be in the same order as the columns in the
+   * resultSet.
+   * <p>
+   * When a query executes this RawSql object then it will close the resultSet.
+   */
+  public RawSql(ResultSet resultSet, String... propertyNames) {
+    this.resultSet = resultSet;
+    this.sql = null;
+    this.columnMapping = new ColumnMapping(propertyNames);
+  }
+  
+  protected RawSql(ResultSet resultSet, Sql sql, ColumnMapping columnMapping) {
+    this.resultSet = resultSet;
     this.sql = sql;
     this.columnMapping = columnMapping;
   }
@@ -156,6 +172,14 @@ public final class RawSql implements Serializable {
    */
   public Sql getSql() {
     return sql;
+  }
+
+  
+  /**
+   * Return the resultSet if this is a ResultSet based RawSql.
+   */
+  public ResultSet getResultSet() {
+    return resultSet;
   }
 
   /**
@@ -169,6 +193,9 @@ public final class RawSql implements Serializable {
    * Return the hash for this query.
    */
   public int queryHash() {
+    if (resultSet != null) {
+      return 31 * columnMapping.queryHash();
+    }
     return 31 * sql.queryHash() + columnMapping.queryHash();
   }
 
@@ -329,6 +356,7 @@ public final class RawSql implements Serializable {
     private final LinkedHashMap<String, Column> dbColumnMap;
 
     private final Map<String, String> propertyMap;
+    
     private final Map<String, Column> propertyColumnMap;
 
     private final boolean parsed;
@@ -363,6 +391,26 @@ public final class RawSql implements Serializable {
       this.propertyMap = null;
       this.propertyColumnMap = null;
       this.dbColumnMap = new LinkedHashMap<String, Column>();
+    }
+    
+    /**
+     * Construct for ResultSet use.
+     */
+    protected ColumnMapping(String... propertyNames) {
+      this.immutable = false;
+      this.parsed = false;
+      this.propertyMap = null;
+      //this.propertyColumnMap = null;
+      this.dbColumnMap = new LinkedHashMap<String, Column>();
+      
+      int hc = 31;
+      int pos = 0;
+      for (String prop : propertyNames) {
+        hc = 31 * hc + prop.hashCode();
+        dbColumnMap.put(prop, new Column(pos++, prop, null, prop));
+      }
+      propertyColumnMap = dbColumnMap;
+      this.queryHashCode = hc;
     }
 
     /**

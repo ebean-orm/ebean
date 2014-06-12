@@ -357,6 +357,16 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       SpiTransaction t = request.getTransaction();
       Connection conn = t.getInternalConnection();
             
+      if (query.isRawSql()) {
+        ResultSet suppliedResultSet = query.getRawSql().getResultSet();
+        if (suppliedResultSet != null) {
+          // this is a user supplied ResultSet so use that
+          dataReader = queryPlan.createDataReader(suppliedResultSet);
+          bindLog = "";
+          return true;
+        }
+      }
+      
       if (forwardOnlyHint) {
         // Use forward only hints for large resultset processing (Issue 56, MySql specific)
         pstmt = conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);

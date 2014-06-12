@@ -25,7 +25,12 @@ public class CQueryBuilderRawSql implements Constants {
      * Build the full SQL Select statement for the request.
      */
     public SqlLimitResponse buildSql(OrmQueryRequest<?> request, CQueryPredicates predicates, RawSql.Sql rsql) {
-        
+      
+        if (rsql == null) {
+          // this is a ResultSet based RawSql query - just use some placeholder for the SQL
+          return new SqlLimitResponse("--ResultSetBasedRawSql", false);
+        }
+      
         if (!rsql.isParsed()){
             String sql = rsql.getUnparsedSql();
             BindParams bindParams = request.getQuery().getBindParams();

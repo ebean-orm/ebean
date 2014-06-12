@@ -35,13 +35,15 @@ public class TestRawSqlPositionedParams extends BaseTestCase {
     Assert.assertNotNull(list);
   }
 
+  @Test
   public void test_unparsed() {
 
     ResetBasicData.reset();
 
     RawSql rawSql = RawSqlBuilder
         .unparsed("select r.id, r.name from o_customer r where r.id >= ? and r.name like ?")
-        .columnMapping("r.id", "id").columnMapping("r.name", "name").create();
+        .columnMapping("r.id", "id")
+        .columnMapping("r.name", "name").create();
 
     Query<Customer> query = Ebean.find(Customer.class);
     query.setRawSql(rawSql);
