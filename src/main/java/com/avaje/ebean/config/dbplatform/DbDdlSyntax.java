@@ -253,16 +253,12 @@ public class DbDdlSyntax {
   /**
    * Builds and returns a fully index name.
    */
-  public String getIndexName(String qualifiedTableName, String propName, int ixCount) {
+  public String getIndexName(String table, String propName, int ixCount) {
 
-    TableName tableName = new TableName(qualifiedTableName);
-    
-    StringBuilder buffer = new StringBuilder();
-    tableName.appendCatalogAndSchema(buffer);
-    buffer.append("ix_");
-    buffer.append(tableName.getName());
-    buffer.append("_");
-    buffer.append(propName);
+
+    StringBuilder buffer = new StringBuilder(30);
+    buffer.append("ix_").append(TableName.parse(table));
+    buffer.append("_").append(propName);
 
     addSuffix(buffer, ixCount);
 
@@ -272,16 +268,11 @@ public class DbDdlSyntax {
   /**
    * Builds and returns a fully qualified foreign key constraint name.
    */
-  public String getForeignKeyName(String qualifiedTableName, String propName, int fkCount) {
+  public String getForeignKeyName(String table, String propName, int fkCount) {
 
-    TableName tableName = new TableName(qualifiedTableName);
-    
-    StringBuilder buffer = new StringBuilder();
-    tableName.appendCatalogAndSchema(buffer);
-    buffer.append("fk_");
-    buffer.append(tableName.getName());
-    buffer.append("_");
-    buffer.append(propName);
+    StringBuilder buffer = new StringBuilder(30);
+    buffer.append("fk_").append(TableName.parse(table));
+    buffer.append("_").append(propName);
 
     addSuffix(buffer, fkCount);
 
@@ -292,8 +283,8 @@ public class DbDdlSyntax {
    * Adds the suffix.
    */
   protected void addSuffix(StringBuilder buffer, int count) {
-    final String suffixNr = Integer.toString(count);
-    final int suffixLen = suffixNr.length() + 1;
+    String suffixNr = Integer.toString(count);
+    int suffixLen = suffixNr.length() + 1;
 
     if (buffer.length() + suffixLen > maxConstraintNameLength) {
       buffer.setLength(maxConstraintNameLength - suffixLen);

@@ -40,7 +40,7 @@ public class CreateTableVisitor extends AbstractBeanVisitor {
 
   private ArrayList<String> uniqueConstraints = new ArrayList<String>();
 
-  private TableName tableName;
+  private String table;
     
 	public Set<String> getWroteColumns() {
 		return wroteColumns;
@@ -70,7 +70,8 @@ public class CreateTableVisitor extends AbstractBeanVisitor {
    */
   protected void writeTableName(BeanDescriptor<?> descriptor) {
     
-    tableName = new TableName(descriptor.getBaseTable());
+    // parse to remove any catalog or schema prefix on the table
+    table = TableName.parse(descriptor.getBaseTable());
     ctx.write(descriptor.getBaseTable());
   }
 
@@ -109,7 +110,7 @@ public class CreateTableVisitor extends AbstractBeanVisitor {
   }
 
   protected String getConstraintName(String prefix, BeanProperty p) {
-    return prefix + tableName.getName() + "_" + p.getDbColumn();
+    return prefix + table + "_" + p.getDbColumn();
   }
 
   protected void addUniqueConstraint(String constraintExpression) {
@@ -192,7 +193,7 @@ public class CreateTableVisitor extends AbstractBeanVisitor {
 
     } else {
       // Add the primay key constraint
-      String pkName = ddl.getPrimaryKeyName(tableName.getName());
+      String pkName = ddl.getPrimaryKeyName(table);
       ctx.write("  constraint ").write(pkName).write(" primary key (");
 
       VisitorUtil.visit(idProp, new AbstractPropertyVisitor() {
@@ -225,10 +226,10 @@ public class CreateTableVisitor extends AbstractBeanVisitor {
 
   private String createUniqueConstraint(String table, int idx, CompoundUniqueContraint uc) {
 
-    String uqConstraintName = "uq_"+TableName.parse(table)+"_"+(idx + 1);
-
-    StringBuilder sb = new StringBuilder();
-    sb.append("constraint ").append(uqConstraintName).append(" unique (");
+    StringBuilder sb = new StringBuilder(50);
+    sb.append("constraint ")
+      .append("uq_").append(TableName.parse(table)).append("_").append(idx + 1)
+      .append(" unique (");
 
     String[] columns = uc.getColumns();
 
