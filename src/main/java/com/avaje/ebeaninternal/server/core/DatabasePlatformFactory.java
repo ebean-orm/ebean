@@ -53,16 +53,16 @@ public class DatabasePlatformFactory {
   private DatabasePlatform byDatabaseName(String dbName) throws SQLException {
 
     dbName = dbName.toLowerCase();
-    if (dbName.equals("postgres83")) {
+    if (dbName.equals("postgres") || dbName.equals("postgres9")) {
       return new PostgresPlatform();
+    }
+    if (dbName.equals("postgres8") || dbName.equals("postgres83")) {
+      return new Postgres8Platform();
     }
     if (dbName.equals("oracle9")) {
       return new Oracle9Platform();
     }
-    if (dbName.equals("oracle10")) {
-      return new Oracle10Platform();
-    }
-    if (dbName.equals("oracle")) {
+    if (dbName.equals("oracle") || dbName.equals("oracle10")) {
       return new Oracle10Platform();
     }
     if (dbName.equals("sqlserver2005")) {

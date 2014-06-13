@@ -237,8 +237,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Check with useGeneratedKeys to get appropriate PreparedStatement.
    */
-  protected PreparedStatement getPstmt(SpiTransaction t, String sql, boolean genKeys)
-      throws SQLException {
+  protected PreparedStatement getPstmt(SpiTransaction t, String sql, boolean genKeys) throws SQLException {
     
     Connection conn = t.getInternalConnection();
     if (genKeys) {

@@ -155,11 +155,12 @@ public class CreateTableColumnVisitor extends BaseTablePropertyVisitor {
 		parent.writeColumnName(p.getDbColumn(), p);
 
 		String columnDefn = ctx.getColumnDefn(p);
-		ctx.write(columnDefn);
-
+		
 		boolean identity = isIdentity(p); 
 		if (identity) {
-			writeIdentity();
+		  ctx.write(ddl.getIdentityColumnDefn(columnDefn));
+		} else {
+		  ctx.write(columnDefn);  
 		}
 
 		if (p.isId() && ddl.isInlinePrimaryKeyConstraint()){
@@ -188,13 +189,6 @@ public class CreateTableColumnVisitor extends BaseTablePropertyVisitor {
     expr.append(p.getDbColumn()).append(")");
     return expr.toString();
   }
-	
-	protected void writeIdentity() {
-		String identity = ddl.getIdentity();
-		if (identity != null && identity.length() > 0) {
-			ctx.write(" ").write(identity);
-		}
-	}
 
   protected void writeIdentitySuffix() {
     String identity = ddl.getIdentitySuffix();

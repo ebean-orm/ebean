@@ -7,28 +7,24 @@ import javax.sql.DataSource;
 import java.sql.Types;
 
 /**
- * Postgres v9 specific platform.
+ * Postgres v8.3 specific platform.
  * <p>
- * Uses serial types and getGeneratedKeys.
+ * No support for getGeneratedKeys.
  * </p>
  */
-public class PostgresPlatform extends DatabasePlatform {
+public class Postgres8Platform extends DatabasePlatform {
 
-  public PostgresPlatform() {
+  public Postgres8Platform() {
     super();
     this.name = "postgres";
-    
-    this.dbDdlSyntax = new PostgresDdlSyntax();
-    
     this.selectCountWithAlias = true;
     this.blobDbType = Types.LONGVARBINARY;
     this.clobDbType = Types.VARCHAR;
 
     this.dbEncrypt = new PostgresDbEncrypt();
 
-    // Use Identity and getGeneratedKeys
-    this.dbIdentity.setIdType(IdType.IDENTITY);
-    this.dbIdentity.setSupportsGetGeneratedKeys(true);
+    this.dbIdentity.setSupportsGetGeneratedKeys(false);
+    this.dbIdentity.setIdType(IdType.SEQUENCE);
     this.dbIdentity.setSupportsSequence(true);
 
     String colAlias = GlobalProperties.get("ebean.columnAliasPrefix", null);
@@ -39,6 +35,8 @@ public class PostgresPlatform extends DatabasePlatform {
 
     this.openQuote = "\"";
     this.closeQuote = "\"";
+
+    // dbTypeMap.put(Types.BOOLEAN, new DbType("bit default 0"));
 
     dbTypeMap.put(Types.INTEGER, new DbType("integer", false));
     dbTypeMap.put(Types.DOUBLE, new DbType("float"));

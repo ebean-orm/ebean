@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 import javax.persistence.OptimisticLockException;
@@ -115,7 +114,7 @@ public class InsertHandler extends DmlHandler {
   protected PreparedStatement getPstmt(SpiTransaction t, String sql, boolean useGeneratedKeys) throws SQLException {
     Connection conn = t.getInternalConnection();
     if (useGeneratedKeys) {
-      return conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+      return conn.prepareStatement(sql, meta.getIdentityDbColumns());
 
     } else {
       return conn.prepareStatement(sql);

@@ -46,6 +46,17 @@ public class DbDdlSyntax {
   }
 
   /**
+   * Return the column definition for an identity column.
+   */
+  public String getIdentityColumnDefn(String columnDefn) {
+    String identity = getIdentity();
+    if (identity != null && identity.length() > 0) {
+      return columnDefn+" "+identity;
+    }
+    return columnDefn;
+  }
+  
+  /**
    * Return the identity clause for DB's that have identities.
    */
   public String getIdentity() {
