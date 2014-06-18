@@ -1,7 +1,7 @@
 package com.avaje.tests.basic.event;
 
-import junit.framework.Assert;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
@@ -19,8 +19,9 @@ public class TestPreInsertValidation extends BaseTestCase {
 		// name with should not be null
 		Ebean.save(e);
 		
-		// the save worked
+		// the save worked and name set in preInsert
 		Assert.assertNotNull(e.getId());
+		Assert.assertNotNull(e.getName());
 		
 		TWithPreInsert e1 = Ebean.find(TWithPreInsert.class, e.getId());
 		
@@ -28,4 +29,22 @@ public class TestPreInsertValidation extends BaseTestCase {
 		Ebean.save(e1);
 	}
 	
+  @Test
+  public void testStatelessUpdate() {
+    
+    TWithPreInsert e = new TWithPreInsert();
+    e.setName("BeanForUpdateTest");
+    Ebean.save(e);
+    
+    TWithPreInsert bean2 = new TWithPreInsert();
+    bean2.setId(e.getId());
+    bean2.setName("stateless-update-name");
+    bean2.setTitle(null);
+    
+    Ebean.update(bean2);
+    
+    // title set on preUpdate
+    Assert.assertNotNull(bean2.getTitle());
+  }
+  
 }
