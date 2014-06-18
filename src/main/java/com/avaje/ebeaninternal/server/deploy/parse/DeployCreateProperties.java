@@ -10,6 +10,7 @@ import java.util.Iterator;
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
 
+import com.avaje.ebean.annotation.ColumnHstore;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.deploy.DetermineManyType;
 import com.avaje.ebeaninternal.server.deploy.ManyType;
@@ -21,8 +22,10 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertySimpleCollection;
 import com.avaje.ebeaninternal.server.type.CtCompoundType;
 import com.avaje.ebeaninternal.server.type.ScalarType;
+import com.avaje.ebeaninternal.server.type.ScalarTypePostgresHstore;
 import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -276,6 +279,16 @@ public class DeployCreateProperties {
     Class<?> propertyType = field.getType();
     Class<?> innerType = propertyType;
 
+    String specialTypeKey = getSpecialScalarType(field);
+    if (specialTypeKey != null) {
+      ScalarType<?> scalarType = typeManager.getScalarTypeFromKey(specialTypeKey);
+      if (scalarType == null) {
+        logger.error("Could not find ScalarType to match key ["+specialTypeKey+"]");
+      } else {
+        return new DeployBeanProperty(desc, propertyType, scalarType, null);
+      }
+    }
+    
     // check for Collection type (list, set or map)
     ManyType manyType = determineManyType.getManyType(propertyType);
 
@@ -336,6 +349,15 @@ public class DeployCreateProperties {
     }
   }
 
+  private String getSpecialScalarType(Field field) {
+
+    if (field.getAnnotation(ColumnHstore.class) != null) {
+      return ScalarTypePostgresHstore.KEY;
+    };
+    
+    return null;
+  }
+  
   private boolean isTransientField(Field field) {
 
     Transient t = field.getAnnotation(Transient.class);

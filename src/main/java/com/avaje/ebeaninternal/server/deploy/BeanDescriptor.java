@@ -220,6 +220,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   private final BeanProperty[] propertiesLocal;
 
+  /**
+   * Scalar mutable properties (need to dirty check on update).
+   */
+  private final BeanProperty[] propertiesMutable;
+
+  
   private final BeanPropertyAssocOne<?> unidirectional;
 
   /**
@@ -391,6 +397,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.propertiesBaseCompound = listHelper.getBaseCompound();
     this.propertiesEmbedded = listHelper.getEmbedded();
     this.propertiesLocal = listHelper.getLocal();
+    this.propertiesMutable = listHelper.getMutable();
     this.unidirectional = listHelper.getUnidirectional();
     this.propertiesOne = listHelper.getOnes();
     this.propertiesOneExported = listHelper.getOneExported();
@@ -1918,7 +1925,27 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return false;
   }
 
+  /**
+   * Check for mutable scalar types and mark as dirty if necessary.
+   */
+  public void checkMutableProperties(EntityBeanIntercept ebi) {
+    for (int i = 0; i < propertiesMutable.length; i++) {
+      BeanProperty beanProperty = propertiesMutable[i];
+      if (ebi.isDirtyProperty(beanProperty.getPropertyIndex())) {
+        // already marked as dirty
+      } else if (ebi.isLoadedProperty(beanProperty.getPropertyIndex())) {
+        Object value = beanProperty.getValue(ebi.getOwner());
+        if (value == null || beanProperty.isDirtyValue(value)) {
+          // mutable scalar value which is considered dirty so mark
+          // it as such so that it is included in an update
+          ebi.markPropertyAsChanged(beanProperty.getPropertyIndex());
+        }
+      }
+    }
+  }
+  
   public ConcurrencyMode getConcurrencyMode(EntityBeanIntercept ebi) {
+    
     if (!hasVersionProperty(ebi)) {
       return ConcurrencyMode.NONE;
     } else {

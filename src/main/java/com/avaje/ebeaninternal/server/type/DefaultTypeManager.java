@@ -45,6 +45,7 @@ import com.avaje.ebeaninternal.server.type.reflect.KnownImmutable;
 import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundType;
 import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundTypeProperty;
 import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedTypeBuilder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +64,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   private final ConcurrentHashMap<Class<?>, ScalarType<?>> typeMap;
 
   private final ConcurrentHashMap<Integer, ScalarType<?>> nativeMap;
+
+  private final ConcurrentHashMap<String, ScalarType<?>> customTypeMap;
 
   private final DefaultTypeFactory extraTypeFactory;
 
@@ -136,6 +139,9 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     this.compoundTypeMap = new ConcurrentHashMap<Class<?>, CtCompoundType<?>>();
     this.typeMap = new ConcurrentHashMap<Class<?>, ScalarType<?>>();
     this.nativeMap = new ConcurrentHashMap<Integer, ScalarType<?>>();
+    this.customTypeMap = new ConcurrentHashMap<String, ScalarType<?>>();
+
+    this.customTypeMap.put(ScalarTypePostgresHstore.KEY, new ScalarTypePostgresHstore());
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
 
@@ -147,6 +153,14 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       initialiseScalarConverters(bootupClasses);
       initialiseCompoundTypes(bootupClasses);
     }
+  }
+
+  /**
+   * Lookup a special or custom scalar type by key.
+   */
+  @Override
+  public ScalarType<?> getScalarTypeFromKey(String specialTypeKey) {
+    return customTypeMap.get(specialTypeKey);
   }
 
   public boolean isKnownImmutable(Class<?> cls) {
@@ -613,7 +627,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * plus some other common types such as java.util.Date and java.util.Calendar.
    */
   protected void initialiseStandard(int platformClobType, int platformBlobType, boolean binaryUUID) {
-
+    
     ScalarType<?> utilDateType = extraTypeFactory.createUtilDate();
     typeMap.put(java.util.Date.class, utilDateType);
 

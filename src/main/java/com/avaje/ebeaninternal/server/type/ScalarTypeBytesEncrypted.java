@@ -26,6 +26,16 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
         this.dataEncryptSupport = dataEncryptSupport;
     }
     
+    @Override
+    public boolean isMutable() {
+      return false;
+    }
+
+    @Override
+    public boolean isDirty(Object value) {
+      return false;
+    }
+    
     public void bind(DataBind b, byte[] value) throws SQLException {
         value = dataEncryptSupport.encrypt(value);
         baseType.bind(b, value);

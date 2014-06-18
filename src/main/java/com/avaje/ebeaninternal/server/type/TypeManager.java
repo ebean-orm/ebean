@@ -57,4 +57,9 @@ public interface TypeManager {
 	 * or String which has limitations).
 	 */
 	public ScalarType<?> createEnumScalarType(Class<?> enumType);
+
+	/**
+	 * Find a scalarType using a custom type key. Used for Hstore and similar special types.
+	 */
+  public ScalarType<?> getScalarTypeFromKey(String specialTypeKey);
 }

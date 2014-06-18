@@ -122,6 +122,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 		this.bean = bean;
 		this.parentBean = parentBean;
 		this.controller = beanDescriptor.getPersistController();
+		if (Type.UPDATE == type) {
+		  // Mark Mutable scalar properties (like Hstore) as dirty where necessary
+		  beanDescriptor.checkMutableProperties(intercept);
+		}
     this.concurrencyMode = beanDescriptor.getConcurrencyMode(intercept);
 		this.dirty = intercept.isDirty();
 	}

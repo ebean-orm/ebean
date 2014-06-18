@@ -37,11 +37,21 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
         this.nullValue = converter.getNullValue();
         this.wrapperType = wrapperType;
     }
-
+    
     public String toString() {
         return "ScalarTypeWrapper " + wrapperType + " to " + scalarType.getType();
     }
     
+    @Override
+    public boolean isMutable() {
+      return scalarType.isMutable();
+    }
+    
+    @Override
+    public boolean isDirty(Object value) {
+      return scalarType.isDirty(value);
+    }
+
     @SuppressWarnings("unchecked")
     public Object readData(DataInput dataInput) throws IOException {
         Object v = scalarType.readData(dataInput);

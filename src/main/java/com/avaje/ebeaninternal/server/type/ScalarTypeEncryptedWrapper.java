@@ -22,6 +22,16 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
         this.dataEncryptSupport = dataEncryptSupport;
     }
 
+    @Override
+    public boolean isMutable() {
+      return wrapped.isMutable();
+    }
+    
+    @Override
+    public boolean isDirty(Object value) {
+      return wrapped.isDirty(value);
+    }
+    
     public Object readData(DataInput dataInput) throws IOException {
         return wrapped.readData(dataInput);
     }

@@ -37,6 +37,8 @@ public class DeployBeanPropertyLists {
 
   private final ArrayList<BeanProperty> local = new ArrayList<BeanProperty>();
 
+  private final ArrayList<BeanProperty> mutable = new ArrayList<BeanProperty>();
+
   private final ArrayList<BeanProperty> manys = new ArrayList<BeanProperty>();
   
   private final ArrayList<BeanProperty> nonManys = new ArrayList<BeanProperty>();
@@ -135,6 +137,10 @@ public class DeployBeanPropertyLists {
       nonTransients.add(prop);
     }
 
+    if (prop.isMutableScalarType()) {
+      mutable.add(prop);
+    }
+    
     if (desc.getInheritInfo() != null && prop.isLocal()) {
       local.add(prop);
     }
@@ -197,7 +203,7 @@ public class DeployBeanPropertyLists {
 
   public BeanProperty getId() {
     if (ids.size() > 1) {
-      String msg = "Ebean does not support multiple @Id properties. You need to convert to using an @EmbeddedId."
+      String msg = "Issue with bean "+desc+". Ebean does not support multiple @Id properties. You need to convert to using an @EmbeddedId."
           +" Please email the ebean google group if you need further clarification.";
       throw new IllegalStateException(msg);
     }
@@ -221,6 +227,10 @@ public class DeployBeanPropertyLists {
 
   public BeanProperty[] getLocal() {
     return (BeanProperty[]) local.toArray(new BeanProperty[local.size()]);
+  }
+
+  public BeanProperty[] getMutable() {
+    return (BeanProperty[]) mutable.toArray(new BeanProperty[mutable.size()]);
   }
 
   public BeanPropertyAssocOne<?>[] getEmbedded() {

@@ -34,6 +34,17 @@ import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
  */
 public interface ScalarType<T> extends StringParser, StringFormatter, ScalarDataReader<T> {
 
+  /**
+   * Return true if this is a mutable scalar type (like hstore).
+   */
+  public boolean isMutable();
+  
+  /**
+   * For mutable scalarType's return true if the value is dirty.
+   * Non-dirty properties may be excluded from updates.
+   */
+  public boolean isDirty(Object value);
+  
 	/**
 	 * Return the default DB column length for this type.
 	 * <p>

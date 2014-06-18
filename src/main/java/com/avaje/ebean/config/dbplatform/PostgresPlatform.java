@@ -4,6 +4,7 @@ import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.config.GlobalProperties;
 
 import javax.sql.DataSource;
+
 import java.sql.Types;
 
 /**
@@ -14,6 +15,11 @@ import java.sql.Types;
  */
 public class PostgresPlatform extends DatabasePlatform {
 
+  /**
+   * Unique jdbc type id defined for hstore type.
+   */
+  public static final int TYPE_HSTORE = 4001;
+  
   public PostgresPlatform() {
     super();
     this.name = "postgres";
@@ -40,6 +46,8 @@ public class PostgresPlatform extends DatabasePlatform {
     this.openQuote = "\"";
     this.closeQuote = "\"";
 
+    dbTypeMap.put(TYPE_HSTORE, new DbType("hstore"));
+    
     dbTypeMap.put(Types.INTEGER, new DbType("integer", false));
     dbTypeMap.put(Types.DOUBLE, new DbType("float"));
     dbTypeMap.put(Types.TINYINT, new DbType("smallint"));

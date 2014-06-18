@@ -21,6 +21,22 @@ public abstract class ScalarTypeBase<T> implements ScalarType<T> {
 	}
 	
 	/**
+	 * Default implementation of mutable false.
+	 */
+	@Override
+  public boolean isMutable() {
+    return false;
+  }
+
+	/**
+	 * Default to true.
+	 */
+  @Override
+  public boolean isDirty(Object value) {
+    return true;
+  }
+
+  /**
 	 * Just return 0.
 	 */
 	public int getLength() {

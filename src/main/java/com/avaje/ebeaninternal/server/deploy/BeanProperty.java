@@ -477,6 +477,13 @@ public class BeanProperty implements ElPropertyValue {
     public boolean isDiscriminator() {
       return discriminator;
     }
+    
+    /**
+     * Return true if the underlying type is mutable.
+     */
+    public boolean isMutableScalarType() {
+      return scalarType.isMutable();
+    }
 
     public void copyProperty(EntityBean sourceBean, EntityBean destBean) {
         Object value = getValue(sourceBean);
@@ -868,6 +875,14 @@ public class BeanProperty implements ElPropertyValue {
         return descriptor.getFullName() + "." + name;
     }
 
+    /**
+     * Return true if the mutable value is considered dirty.
+     * This is only used for 'mutable' scalar types like hstore etc. 
+     */
+    public boolean isDirtyValue(Object value) {
+      return scalarType.isDirty(value);
+    }
+    
     /**
      * Return the scalarType.
      */
