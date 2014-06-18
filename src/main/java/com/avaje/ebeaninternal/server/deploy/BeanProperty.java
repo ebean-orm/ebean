@@ -482,6 +482,9 @@ public class BeanProperty implements ElPropertyValue {
      * Return true if the underlying type is mutable.
      */
     public boolean isMutableScalarType() {
+      if (scalarType == null) {
+        return false;
+      }
       return scalarType.isMutable();
     }
 
