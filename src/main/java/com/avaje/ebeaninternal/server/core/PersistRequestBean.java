@@ -79,8 +79,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 	private boolean notifyCache;
 
 	private boolean deleteMissingChildren;
-	
-	private final Set<String> dirtyPropertyNames;
 
   /**
    * Flag used to detect when only many properties where updated via a cascade. Used to ensure
@@ -102,6 +100,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 		this.beanManager = mgr;
 		this.beanDescriptor = mgr.getBeanDescriptor();
 		this.beanPersistListener = beanDescriptor.getPersistListener();
+		this.bean = bean;
+		this.parentBean = parentBean;
+		this.controller = beanDescriptor.getPersistController();
 
     if (PersistRequest.Type.DETERMINE != type) {
       this.type = type;
@@ -111,18 +112,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       this.persistCascade = t.isPersistCascade();
     }
 		
-    if (this.type == Type.UPDATE && intercept.isNew() ) {
-      // 'stateless update' - set bean up for doing update
-      intercept.setNewBeanForUpdate();
-    }
-
-    // derive the set of property names now as we will pass them to a beanPersistListener later
-		this.dirtyPropertyNames = (beanPersistListener == null) ? null : intercept.getDirtyPropertyNames();
-		
-		this.bean = bean;
-		this.parentBean = parentBean;
-		this.controller = beanDescriptor.getPersistController();
-		if (Type.UPDATE == type) {
+		if (this.type == Type.UPDATE) {
+	    if (intercept.isNew() ) {
+	      // 'stateless update' - set loaded properties as dirty
+	      intercept.setNewBeanForUpdate();
+	    }
 		  // Mark Mutable scalar properties (like Hstore) as dirty where necessary
 		  beanDescriptor.checkMutableProperties(intercept);
 		}
@@ -197,7 +191,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 				return beanPersistListener.inserted(bean);
 
 			case UPDATE:
-				return beanPersistListener.updated(bean, dirtyPropertyNames);
+				return beanPersistListener.updated(bean, intercept.getDirtyPropertyNames());
 
 			case DELETE:
 				return beanPersistListener.deleted(bean);
@@ -285,6 +279,16 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 	 */
 	public void setDeleteMissingChildren(boolean deleteMissingChildren) {
 		this.deleteMissingChildren = deleteMissingChildren;
+	}
+	
+	/**
+	 * Prepare the update after potential modifications in a BeanPersistController.
+	 */
+	public void postControllerPrepareUpdate() {
+	  if (intercept.isNew() && controller != null) {
+      // 'stateless update' - set dirty properties modified in controller preUpdate
+      intercept.setNewBeanForUpdate();
+    }
 	}
 
 	/**

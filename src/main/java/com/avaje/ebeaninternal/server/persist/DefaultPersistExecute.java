@@ -64,8 +64,6 @@ public final class DefaultPersistExecute implements PersistExecute {
     BeanPersistController controller = request.getBeanController();
     if (controller == null || controller.preInsert(request)) {
       persister.insert(request);
-      // NOTE: the persister fires the postInsert so that this
-      // occurs before ebeanIntercept.setLoaded(true)
     }
   }
 
@@ -79,9 +77,8 @@ public final class DefaultPersistExecute implements PersistExecute {
 
     BeanPersistController controller = request.getBeanController();
     if (controller == null || controller.preUpdate(request)) {
+      request.postControllerPrepareUpdate();
       persister.update(request);
-      // NOTE: the persister fires the postUpdate so that this
-      // occurs before ebeanIntercept.setLoaded(true)
     }
   }
 
@@ -95,9 +92,7 @@ public final class DefaultPersistExecute implements PersistExecute {
 
     BeanPersistController controller = request.getBeanController();
     if (controller == null || controller.preDelete(request)) {
-
       persister.delete(request);
-      // NOTE: the persister fires the postDelete
     }
   }
 
