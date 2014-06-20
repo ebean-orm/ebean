@@ -34,75 +34,75 @@ import com.avaje.ebeaninternal.server.transaction.BeanPersistIdMap;
  */
 public final class PersistRequestBean<T> extends PersistRequest implements BeanPersistRequest<T> {
 
-	private final BeanManager<T> beanManager;
+  private final BeanManager<T> beanManager;
 
-	private final BeanDescriptor<T> beanDescriptor;
+  private final BeanDescriptor<T> beanDescriptor;
 
-	private final BeanPersistListener<T> beanPersistListener;
+  private final BeanPersistListener<T> beanPersistListener;
 
-	/**
-	 * For per post insert update delete control.
-	 */
-	private final BeanPersistController controller;
+  /**
+   * For per post insert update delete control.
+   */
+  private final BeanPersistController controller;
 
-	 /**
+  /**
    * The bean being persisted.
    */
-	private final T bean;
-  
-	private final EntityBean entityBean;
-  
-	/**
-	 * The associated intercept.
-	 */
-	private final EntityBeanIntercept intercept;
+  private final T bean;
 
-	/**
-	 * The parent bean for unidirectional save.
-	 */
-	private final Object parentBean;
+  private final EntityBean entityBean;
 
-	private final boolean dirty;
+  /**
+   * The associated intercept.
+   */
+  private final EntityBeanIntercept intercept;
 
-	private ConcurrencyMode concurrencyMode;
+  /**
+   * The parent bean for unidirectional save.
+   */
+  private final Object parentBean;
 
-	/**
-	 * The unique id used for logging summary.
-	 */
-	private Object idValue;
+  private final boolean dirty;
 
-	/**
-	 * Hash value used to handle cascade delete both ways in a relationship.
-	 */
-	private Integer beanHash;
+  private ConcurrencyMode concurrencyMode;
 
-	private boolean notifyCache;
+  /**
+   * The unique id used for logging summary.
+   */
+  private Object idValue;
 
-	private boolean deleteMissingChildren;
+  /**
+   * Hash value used to handle cascade delete both ways in a relationship.
+   */
+  private Integer beanHash;
+
+  private boolean notifyCache;
+
+  private boolean deleteMissingChildren;
 
   /**
    * Flag used to detect when only many properties where updated via a cascade. Used to ensure
    * appropriate caches are updated in that case.
    */
-	private boolean updatedManysOnly;
-	
-	/**
-	 * Many properties that were cascade saved (and hence might need caches updated later).
-	 */
+  private boolean updatedManysOnly;
+
+  /**
+   * Many properties that were cascade saved (and hence might need caches updated later).
+   */
   private List<BeanPropertyAssocMany<?>> updatedManys;
 
-	public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr,
-	        SpiTransaction t, PersistExecute persistExecute, PersistRequest.Type type) {
+  public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
+      PersistExecute persistExecute, PersistRequest.Type type) {
 
-		super(server, t, persistExecute);
-    this.entityBean = (EntityBean)bean;
+    super(server, t, persistExecute);
+    this.entityBean = (EntityBean) bean;
     this.intercept = entityBean._ebean_getIntercept();
-		this.beanManager = mgr;
-		this.beanDescriptor = mgr.getBeanDescriptor();
-		this.beanPersistListener = beanDescriptor.getPersistListener();
-		this.bean = bean;
-		this.parentBean = parentBean;
-		this.controller = beanDescriptor.getPersistController();
+    this.beanManager = mgr;
+    this.beanDescriptor = mgr.getBeanDescriptor();
+    this.beanPersistListener = beanDescriptor.getPersistListener();
+    this.bean = bean;
+    this.parentBean = parentBean;
+    this.controller = beanDescriptor.getPersistController();
 
     if (PersistRequest.Type.DETERMINE != type) {
       this.type = type;
@@ -111,27 +111,27 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       this.type = beanDescriptor.isInsertMode(intercept) ? Type.INSERT : Type.UPDATE;
       this.persistCascade = t.isPersistCascade();
     }
-		
-		if (this.type == Type.UPDATE) {
-	    if (intercept.isNew() ) {
-	      // 'stateless update' - set loaded properties as dirty
-	      intercept.setNewBeanForUpdate();
-	    }
-		  // Mark Mutable scalar properties (like Hstore) as dirty where necessary
-		  beanDescriptor.checkMutableProperties(intercept);
-		}
-    this.concurrencyMode = beanDescriptor.getConcurrencyMode(intercept);
-		this.dirty = intercept.isDirty();
-	}
 
-	/**
-	 * Return true if this is an insert request.
-	 */
+    if (this.type == Type.UPDATE) {
+      if (intercept.isNew()) {
+        // 'stateless update' - set loaded properties as dirty
+        intercept.setNewBeanForUpdate();
+      }
+      // Mark Mutable scalar properties (like Hstore) as dirty where necessary
+      beanDescriptor.checkMutableProperties(intercept);
+    }
+    this.concurrencyMode = beanDescriptor.getConcurrencyMode(intercept);
+    this.dirty = intercept.isDirty();
+  }
+
+  /**
+   * Return true if this is an insert request.
+   */
   public boolean isInsert() {
     return Type.INSERT == type;
   }
-  
-	@Override
+
+  @Override
   public Set<String> getLoadedProperties() {
     return intercept.getLoadedPropertyNames();
   }
@@ -146,18 +146,18 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return intercept.getDirtyValues();
   }
 
-	public boolean isNotify(TransactionEvent txnEvent) {
-	  this.notifyCache = beanDescriptor.isCacheNotify();
-		return notifyCache || isNotifyPersistListener();
-	}
+  public boolean isNotify(TransactionEvent txnEvent) {
+    this.notifyCache = beanDescriptor.isCacheNotify();
+    return notifyCache || isNotifyPersistListener();
+  }
 
-	public boolean isNotifyPersistListener() {
-		return beanPersistListener != null;
-	}
+  public boolean isNotifyPersistListener() {
+    return beanPersistListener != null;
+  }
 
-	/**
-	 * Notify/Update the local L2 cache after the transaction has successfully committed.
-	 */
+  /**
+   * Notify/Update the local L2 cache after the transaction has successfully committed.
+   */
   public void notifyCache() {
     if (notifyCache) {
       switch (type) {
@@ -176,424 +176,416 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
-	public void addToPersistMap(BeanPersistIdMap beanPersistMap) {
+  public void addToPersistMap(BeanPersistIdMap beanPersistMap) {
 
-	  beanPersistMap.add(beanDescriptor, type, idValue);
-	}
+    beanPersistMap.add(beanDescriptor, type, idValue);
+  }
 
-	public boolean notifyLocalPersistListener() {
-		if (beanPersistListener == null) {
-			return false;
+  public boolean notifyLocalPersistListener() {
+    if (beanPersistListener == null) {
+      return false;
 
-		} else {
-			switch (type) {
-			case INSERT:
-				return beanPersistListener.inserted(bean);
+    } else {
+      switch (type) {
+      case INSERT:
+        return beanPersistListener.inserted(bean);
 
-			case UPDATE:
-				return beanPersistListener.updated(bean, intercept.getDirtyPropertyNames());
+      case UPDATE:
+        return beanPersistListener.updated(bean, intercept.getDirtyPropertyNames());
 
-			case DELETE:
-				return beanPersistListener.deleted(bean);
+      case DELETE:
+        return beanPersistListener.deleted(bean);
 
-			default:
-				return false;
-			}
-		}
-	}
+      default:
+        return false;
+      }
+    }
+  }
 
-	public boolean isParent(Object o) {
-		return o == parentBean;
-	}
+  public boolean isParent(Object o) {
+    return o == parentBean;
+  }
 
-	/**
-	 * Return true if this bean has been already been persisted 
-	 * (inserted or updated) in this transaction.
-	 */
-	public boolean isRegisteredBean() {
-		return transaction.isRegisteredBean(bean);
-	}
-	
-	public void unRegisterBean() {
-		transaction.unregisterBean(bean);
-	}
-	
-	/**
-	 * The hash used to register the bean with the transaction.
-	 * <p>
-	 * Takes into account the class type and id value.
-	 * </p>
-	 */
-	private Integer getBeanHash() {
-		if (beanHash == null) {
-			Object id = beanDescriptor.getId(entityBean);
-			int hc = 31 * bean.getClass().getName().hashCode();
-			if (id != null) {
-				hc += id.hashCode();
-			}
-			beanHash = Integer.valueOf(hc);
-		}
-		return beanHash;
-	}
-	
-	public void registerDeleteBean() {
-		Integer hash = getBeanHash();
-		transaction.registerDeleteBean(hash);
-	}
-	
-	public void unregisterDeleteBean() {
-		Integer hash = getBeanHash();
-		transaction.unregisterDeleteBean(hash);
-	}
-	
-	public boolean isRegisteredForDeleteBean() {
-		if (transaction == null){
-			return false;
-		} else {
-			Integer hash = getBeanHash();
-			return transaction.isRegisteredDeleteBean(hash);
-		}
-	}
+  /**
+   * Return true if this bean has been already been persisted (inserted or updated) in this
+   * transaction.
+   */
+  public boolean isRegisteredBean() {
+    return transaction.isRegisteredBean(bean);
+  }
 
-	public BeanManager<T> getBeanManager() {
-		return beanManager;
-	}
+  public void unRegisterBean() {
+    transaction.unregisterBean(bean);
+  }
 
-	/**
-	 * Return the BeanDescriptor for the associated bean.
-	 */
-	public BeanDescriptor<T> getBeanDescriptor() {
-		return beanDescriptor;
-	}
+  /**
+   * The hash used to register the bean with the transaction.
+   * <p>
+   * Takes into account the class type and id value.
+   * </p>
+   */
+  private Integer getBeanHash() {
+    if (beanHash == null) {
+      Object id = beanDescriptor.getId(entityBean);
+      int hc = 31 * bean.getClass().getName().hashCode();
+      if (id != null) {
+        hc += id.hashCode();
+      }
+      beanHash = Integer.valueOf(hc);
+    }
+    return beanHash;
+  }
 
-	/**
-	 * Return true if a stateless update should also delete any missing details
-	 * beans.
-	 */
-	public boolean isDeleteMissingChildren() {
-		return deleteMissingChildren;
-	}
+  public void registerDeleteBean() {
+    Integer hash = getBeanHash();
+    transaction.registerDeleteBean(hash);
+  }
 
-	/**
-	 * Set if deleteMissingChildren occurs on cascade save to OneToMany or ManyToMany.
-	 */
-	public void setDeleteMissingChildren(boolean deleteMissingChildren) {
-		this.deleteMissingChildren = deleteMissingChildren;
-	}
-	
-	/**
-	 * Prepare the update after potential modifications in a BeanPersistController.
-	 */
-	public void postControllerPrepareUpdate() {
-	  if (intercept.isNew() && controller != null) {
+  public void unregisterDeleteBean() {
+    Integer hash = getBeanHash();
+    transaction.unregisterDeleteBean(hash);
+  }
+
+  public boolean isRegisteredForDeleteBean() {
+    if (transaction == null) {
+      return false;
+    } else {
+      Integer hash = getBeanHash();
+      return transaction.isRegisteredDeleteBean(hash);
+    }
+  }
+
+  public BeanManager<T> getBeanManager() {
+    return beanManager;
+  }
+
+  /**
+   * Return the BeanDescriptor for the associated bean.
+   */
+  public BeanDescriptor<T> getBeanDescriptor() {
+    return beanDescriptor;
+  }
+
+  /**
+   * Return true if a stateless update should also delete any missing details beans.
+   */
+  public boolean isDeleteMissingChildren() {
+    return deleteMissingChildren;
+  }
+
+  /**
+   * Set if deleteMissingChildren occurs on cascade save to OneToMany or ManyToMany.
+   */
+  public void setDeleteMissingChildren(boolean deleteMissingChildren) {
+    this.deleteMissingChildren = deleteMissingChildren;
+  }
+
+  /**
+   * Prepare the update after potential modifications in a BeanPersistController.
+   */
+  public void postControllerPrepareUpdate() {
+    if (intercept.isNew() && controller != null) {
       // 'stateless update' - set dirty properties modified in controller preUpdate
       intercept.setNewBeanForUpdate();
     }
-	}
+  }
 
-	/**
-	 * Used to skip updates if we know the bean is not dirty. This is the case
-	 * for EntityBeans that have not been modified.
-	 */
-	public boolean isDirty() {
-		return dirty;
-	}
+  /**
+   * Used to skip updates if we know the bean is not dirty. This is the case for EntityBeans that
+   * have not been modified.
+   */
+  public boolean isDirty() {
+    return dirty;
+  }
 
-	/**
-	 * Return the concurrency mode used for this persist.
-	 */
-	public ConcurrencyMode getConcurrencyMode() {
-		return concurrencyMode;
-	}
+  /**
+   * Return the concurrency mode used for this persist.
+   */
+  public ConcurrencyMode getConcurrencyMode() {
+    return concurrencyMode;
+  }
 
-	/**
-	 * Returns a description of the request. This is typically the bean class
-	 * name or the base table for MapBeans.
-	 * <p>
-	 * Used to determine common persist requests for queueing and statement
-	 * batching.
-	 * </p>
-	 */
-	public String getFullName() {
-		return beanDescriptor.getFullName();
-	}
+  /**
+   * Returns a description of the request. This is typically the bean class name or the base table
+   * for MapBeans.
+   * <p>
+   * Used to determine common persist requests for queueing and statement batching.
+   * </p>
+   */
+  public String getFullName() {
+    return beanDescriptor.getFullName();
+  }
 
-	/**
-	 * Return the bean associated with this request.
-	 */
-	public T getBean() {
-		return bean;
-	}
+  /**
+   * Return the bean associated with this request.
+   */
+  public T getBean() {
+    return bean;
+  }
 
-	
-	public EntityBean getEntityBean() {
+  public EntityBean getEntityBean() {
     return entityBean;
   }
 
   /**
-	 * Return the Id value for the bean.
-	 */
-	public Object getBeanId() {
-		return beanDescriptor.getId(entityBean);
-	}
+   * Return the Id value for the bean.
+   */
+  public Object getBeanId() {
+    return beanDescriptor.getId(entityBean);
+  }
 
-	public BeanDelta createDeltaBean() {
-		return new BeanDelta(beanDescriptor, getBeanId());
-	}
+  public BeanDelta createDeltaBean() {
+    return new BeanDelta(beanDescriptor, getBeanId());
+  }
 
-	/**
-	 * Return the parent bean for cascading save with unidirectional
-	 * relationship.
-	 */
-	public Object getParentBean() {
-		return parentBean;
-	}
+  /**
+   * Return the parent bean for cascading save with unidirectional relationship.
+   */
+  public Object getParentBean() {
+    return parentBean;
+  }
 
-	/**
-	 * Return the controller if there is one associated with this type of bean.
-	 * This returns null if there is no controller associated.
-	 */
-	public BeanPersistController getBeanController() {
-		return controller;
-	}
+  /**
+   * Return the controller if there is one associated with this type of bean. This returns null if
+   * there is no controller associated.
+   */
+  public BeanPersistController getBeanController() {
+    return controller;
+  }
 
-	/**
-	 * Return the intercept if there is one.
-	 */
-	public EntityBeanIntercept getEntityBeanIntercept() {
-		return intercept;
-	}
+  /**
+   * Return the intercept if there is one.
+   */
+  public EntityBeanIntercept getEntityBeanIntercept() {
+    return intercept;
+  }
 
-	/**
-	 * Return true if this property is loaded (full bean or included in partial
-	 * bean).
-	 */
-	public boolean isLoadedProperty(BeanProperty prop) {
-	  return intercept.isLoadedProperty(prop.getPropertyIndex());
-	}
+  /**
+   * Return true if this property is loaded (full bean or included in partial bean).
+   */
+  public boolean isLoadedProperty(BeanProperty prop) {
+    return intercept.isLoadedProperty(prop.getPropertyIndex());
+  }
 
-	@Override
-	public int executeNow() {
-		switch (type) {
-		case INSERT:
-			persistExecute.executeInsertBean(this);
-			return -1;
+  @Override
+  public int executeNow() {
+    switch (type) {
+    case INSERT:
+      persistExecute.executeInsertBean(this);
+      return -1;
 
-		case UPDATE:
-			persistExecute.executeUpdateBean(this);
-			return -1;
+    case UPDATE:
+      persistExecute.executeUpdateBean(this);
+      return -1;
 
-		case DELETE:
-			persistExecute.executeDeleteBean(this);
-			return -1;
+    case DELETE:
+      persistExecute.executeDeleteBean(this);
+      return -1;
 
-		default:
-			throw new RuntimeException("Invalid type " + type);
-		}
-	}
+    default:
+      throw new RuntimeException("Invalid type " + type);
+    }
+  }
 
-	@Override
-	public int executeOrQueue() {
+  @Override
+  public int executeOrQueue() {
 
-		boolean batch = transaction.isBatchThisRequest();
+    boolean batch = transaction.isBatchThisRequest();
 
-		BatchControl control = transaction.getBatchControl();
-		if (control != null) {
-			return control.executeOrQueue(this, batch);
-		}
-		if (batch) {
-			control = persistExecute.createBatchControl(transaction);
-			return control.executeOrQueue(this, batch);
+    BatchControl control = transaction.getBatchControl();
+    if (control != null) {
+      return control.executeOrQueue(this, batch);
+    }
+    if (batch) {
+      control = persistExecute.createBatchControl(transaction);
+      return control.executeOrQueue(this, batch);
 
-		} else {
-			return executeNow();
-		}
-	}
+    } else {
+      return executeNow();
+    }
+  }
 
-	/**
-	 * Set the generated key back to the bean. Only used for inserts with
-	 * getGeneratedKeys.
-	 */
-	public void setGeneratedKey(Object idValue) {
-		if (idValue != null) {
-			// remember it for logging summary
-			this.idValue = beanDescriptor.convertSetId(idValue, entityBean);
-		}
-	}
+  /**
+   * Set the generated key back to the bean. Only used for inserts with getGeneratedKeys.
+   */
+  public void setGeneratedKey(Object idValue) {
+    if (idValue != null) {
+      // remember it for logging summary
+      this.idValue = beanDescriptor.convertSetId(idValue, entityBean);
+    }
+  }
 
-	/**
-	 * Set the Id value that was bound. Used for the purposes of logging summary
-	 * information on this request.
-	 */
-	public void setBoundId(Object idValue) {
-		this.idValue = idValue;
-	}
+  /**
+   * Set the Id value that was bound. Used for the purposes of logging summary information on this
+   * request.
+   */
+  public void setBoundId(Object idValue) {
+    this.idValue = idValue;
+  }
 
-	/**
-	 * Check for optimistic concurrency exception.
-	 */
-	public final void checkRowCount(int rowCount) throws SQLException {
-		if (rowCount != 1) {
-			String m = Message.msg("persist.conc2", "" + rowCount);
-			throw new OptimisticLockException(m, null, bean);
-		}
-	}
+  /**
+   * Check for optimistic concurrency exception.
+   */
+  public final void checkRowCount(int rowCount) throws SQLException {
+    if (rowCount != 1) {
+      String m = Message.msg("persist.conc2", "" + rowCount);
+      throw new OptimisticLockException(m, null, bean);
+    }
+  }
 
-	public void postDelete() {
-	  
-	  // Delete the bean from the PersistenceContent
-	  transaction.getPersistenceContext().clear(beanDescriptor.getBeanType(), idValue);
-	  // Delete from cache early even if transaction fails
-	  beanDescriptor.cacheHandleDelete(idValue, this);
-	}
-	
-	/**
-	 * Post processing.
-	 */
-	public void postExecute() throws SQLException {
+  public void postDelete() {
 
-		if (controller != null) {
-			controllerPost();
-		}
+    // Delete the bean from the PersistenceContent
+    transaction.getPersistenceContext().clear(beanDescriptor.getBeanType(), idValue);
+    // Delete from cache early even if transaction fails
+    beanDescriptor.cacheHandleDelete(idValue, this);
+  }
 
-		if (intercept != null) {
-			// if bean persisted again then should result in an update
-			intercept.setLoaded();
-		}
+  /**
+   * Post processing.
+   */
+  public void postExecute() throws SQLException {
 
-		addEvent();
+    if (controller != null) {
+      controllerPost();
+    }
 
-		if (isLogSummary()) {
-			logSummary();
-		}
-	}
+    if (intercept != null) {
+      // if bean persisted again then should result in an update
+      intercept.setLoaded();
+    }
 
-	private void controllerPost() {
-		switch (type) {
-		case INSERT:
-			controller.postInsert(this);
-			break;
-		case UPDATE:
-			controller.postUpdate(this);
-			break;
-		case DELETE:
-			controller.postDelete(this);
-			break;
-		default:
-			break;
-		}
-	}
+    addEvent();
 
-	private void logSummary() {
+    if (isLogSummary()) {
+      logSummary();
+    }
+  }
 
-		String name = beanDescriptor.getName();
-		switch (type) {
-		case INSERT:
-			transaction.logSummary("Inserted [" + name + "] [" + idValue + "]");
-			break;
-		case UPDATE:
-			transaction.logSummary("Updated [" + name + "] [" + idValue + "]");
-			break;
-		case DELETE:
-			transaction.logSummary("Deleted [" + name + "] [" + idValue + "]");
-			break;
-		default:
-			break;
-		}
-	}
+  private void controllerPost() {
+    switch (type) {
+    case INSERT:
+      controller.postInsert(this);
+      break;
+    case UPDATE:
+      controller.postUpdate(this);
+      break;
+    case DELETE:
+      controller.postDelete(this);
+      break;
+    default:
+      break;
+    }
+  }
 
-	/**
-	 * Add the bean to the TransactionEvent. This will be used by
-	 * TransactionManager to synch Cache, Cluster and text indexes.
-	 */
-	private void addEvent() {
+  private void logSummary() {
 
-		TransactionEvent event = transaction.getEvent();
-		if (event != null) {
-			event.add(this);
-		}
-	}
+    String name = beanDescriptor.getName();
+    switch (type) {
+    case INSERT:
+      transaction.logSummary("Inserted [" + name + "] [" + idValue + "]");
+      break;
+    case UPDATE:
+      transaction.logSummary("Updated [" + name + "] [" + idValue + "]");
+      break;
+    case DELETE:
+      transaction.logSummary("Deleted [" + name + "] [" + idValue + "]");
+      break;
+    default:
+      break;
+    }
+  }
 
-	/**
-	 * Determine the concurrency mode depending on fully/partially populated
-	 * bean.
-	 * <p>
-	 * Specifically with version concurrency we want to check that the version
-	 * property was one of the loaded properties.
-	 * </p>
-	 */
-	public ConcurrencyMode determineConcurrencyMode() {
-		
-		// 'partial bean' update/delete...
-		if (concurrencyMode.equals(ConcurrencyMode.VERSION)) {
-			// check the version property was loaded
-			BeanProperty prop = beanDescriptor.getVersionProperty();
-			if (prop != null && intercept.isLoadedProperty(prop.getPropertyIndex())) {
-				// OK to use version property
-			} else {
-				concurrencyMode = ConcurrencyMode.NONE;
-			}
-		}
-	
-		return concurrencyMode;
-	}
+  /**
+   * Add the bean to the TransactionEvent. This will be used by TransactionManager to synch Cache,
+   * Cluster and text indexes.
+   */
+  private void addEvent() {
 
-	/**
-	 * Return true if the update DML/SQL must be dynamically generated.
-	 * <p>
-	 * This is the case for updates/deletes of partially populated beans.
-	 * </p>
-	 */
-	public boolean isDynamicUpdateSql() {
-		return beanDescriptor.isUpdateChangesOnly() || !intercept.isFullyLoadedBean();
-	}
+    TransactionEvent event = transaction.getEvent();
+    if (event != null) {
+      event.add(this);
+    }
+  }
 
-	/**
-	 * Create a GenerateDmlRequest used to generate the DML.
-	 * <p>
-	 * Will used changed properties or loaded properties depending on the
-	 * BeanDescriptor.isUpdateChangesOnly() value.
-	 * </p>
-	 */
-	public GenerateDmlRequest createGenerateDmlRequest(boolean emptyStringAsNull) {
-	  return new GenerateDmlRequest(emptyStringAsNull, intercept, beanDescriptor.isUpdateChangesOnly());
-	}
+  /**
+   * Determine the concurrency mode depending on fully/partially populated bean.
+   * <p>
+   * Specifically with version concurrency we want to check that the version property was one of the
+   * loaded properties.
+   * </p>
+   */
+  public ConcurrencyMode determineConcurrencyMode() {
 
-	/**
-	 * Test if the property value has changed and if so include it in the
-	 * update.
-	 */
-	public boolean isAddToUpdate(BeanProperty prop) {
-	  return intercept.isDirtyProperty(prop.getPropertyIndex());
-	}
+    // 'partial bean' update/delete...
+    if (concurrencyMode.equals(ConcurrencyMode.VERSION)) {
+      // check the version property was loaded
+      BeanProperty prop = beanDescriptor.getVersionProperty();
+      if (prop != null && intercept.isLoadedProperty(prop.getPropertyIndex())) {
+        // OK to use version property
+      } else {
+        concurrencyMode = ConcurrencyMode.NONE;
+      }
+    }
+
+    return concurrencyMode;
+  }
+
+  /**
+   * Return true if the update DML/SQL must be dynamically generated.
+   * <p>
+   * This is the case for updates/deletes of partially populated beans.
+   * </p>
+   */
+  public boolean isDynamicUpdateSql() {
+    return beanDescriptor.isUpdateChangesOnly() || !intercept.isFullyLoadedBean();
+  }
+
+  /**
+   * Create a GenerateDmlRequest used to generate the DML.
+   * <p>
+   * Will used changed properties or loaded properties depending on the
+   * BeanDescriptor.isUpdateChangesOnly() value.
+   * </p>
+   */
+  public GenerateDmlRequest createGenerateDmlRequest(boolean emptyStringAsNull) {
+    return new GenerateDmlRequest(emptyStringAsNull, intercept, beanDescriptor.isUpdateChangesOnly());
+  }
+
+  /**
+   * Test if the property value has changed and if so include it in the update.
+   */
+  public boolean isAddToUpdate(BeanProperty prop) {
+    return intercept.isDirtyProperty(prop.getPropertyIndex());
+  }
 
   public List<DerivedRelationshipData> getDerivedRelationships() {
     return transaction.getDerivedRelationship(bean);
   }
 
   public void postInsert() {
-    // mark all properties as loaded after an insert to support immediate update 
+    // mark all properties as loaded after an insert to support immediate update
     int len = intercept.getPropertyLength();
     for (int i = 0; i < len; i++) {
-      intercept.setLoadedProperty(i);      
+      intercept.setLoadedProperty(i);
     }
   }
 
   public boolean isReference() {
     return beanDescriptor.isReference(intercept);
   }
-  
+
   /**
    * This many property has been cascade saved. Keep note of this and update the 'many property'
    * cache on post commit.
    */
   public void addUpdatedManyProperty(BeanPropertyAssocMany<?> updatedAssocMany) {
-    //if (notifyCache) {
-      if (updatedManys == null) {
-        updatedManys = new ArrayList<BeanPropertyAssocMany<?>>(5);
-      }
-      updatedManys.add(updatedAssocMany);
-    //}
+    // if (notifyCache) {
+    if (updatedManys == null) {
+      updatedManys = new ArrayList<BeanPropertyAssocMany<?>>(5);
+    }
+    updatedManys.add(updatedAssocMany);
+    // }
   }
 
   /**
