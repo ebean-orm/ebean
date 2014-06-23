@@ -413,14 +413,14 @@ public final class DefaultPersister implements Persister {
 		if (t.isPersistCascade()) {
 			// OneToOne exported side with delete cascade
 			BeanPropertyAssocOne<?>[] expOnes = descriptor.propertiesOneExportedDelete();
-			for (int i = 0; i < expOnes.length; i++) {
+			for (int i = 0; i < expOnes.length; i++) {			  
 				BeanDescriptor<?> targetDesc = expOnes[i].getTargetDescriptor();
 				if (targetDesc.isDeleteRecurseSkippable() && !targetDesc.isBeanCaching()) {
 					SqlUpdate sqlDelete = expOnes[i].deleteByParentId(id, idList);
 					executeSqlUpdate(sqlDelete, t);
 				} else {
 					List<Object> childIds = expOnes[i].findIdsByParentId(id, idList, t);
-					delete(targetDesc, null, childIds, t);
+				  deleteChildrenById(t, targetDesc, childIds);
 				}
 			}
 
@@ -1057,11 +1057,32 @@ public final class DefaultPersister implements Persister {
 				Object parentId = desc.getId(parentBean);
 				List<Object> idsByParentId = many.findIdsByParentId(parentId, null, t, excludeDetailIds);
 				if (!idsByParentId.isEmpty()) {
-					delete(targetDesc, null, idsByParentId, t);
+				  deleteChildrenById(t, targetDesc, idsByParentId);
 				}
 			}
 		}
 	}
+
+	/**
+	 * Cascade delete child entities by Id.
+	 * <p>
+	 * Will use delete by object if the child entity has manyToMany relationships.
+	 */
+  private void deleteChildrenById(SpiTransaction t, BeanDescriptor<?> targetDesc, List<Object> childIds) {
+    
+    if (targetDesc.propertiesManyToMany().length > 0) {
+      // convert into a list of reference objects and perform delete by object
+      List<Object> refList = new ArrayList<Object>(childIds.size());
+      for (Object id : childIds) {
+        refList.add(targetDesc.createReference(null, id));
+      }
+      deleteList(refList, t);
+      
+    } else {
+      // perform delete by statement if possible
+      delete(targetDesc, null, childIds, t);				
+    }
+  }
 
 	/**
 	 * Save any associated one beans.
