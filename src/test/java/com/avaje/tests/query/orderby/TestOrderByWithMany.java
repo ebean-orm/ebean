@@ -16,6 +16,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
+    checkWithBuiltInManyBasic();
     checkWithBuiltInMany();
     checkAppendId();
     checkNone();
@@ -25,6 +26,17 @@ public class TestOrderByWithMany extends BaseTestCase {
     checkAlreadyIncluded2();
   }
 
+  private void checkWithBuiltInManyBasic() {
+
+    Query<Order> query = Ebean.find(Order.class).fetch("details");
+    query.findList();
+
+    String sql = query.getGeneratedSql();
+    
+    Assert.assertTrue(sql.contains("order by t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc"));
+  }
+
+  
   private void checkWithBuiltInMany() {
 
     Query<Order> query = Ebean.find(Order.class).fetch("details").order().desc("customer.name");
@@ -35,6 +47,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     // t0.id inserted into the middle of the order by
     Assert.assertTrue(sql.contains("order by t1.name desc, t0.id, t2.id asc"));
+    Assert.assertTrue(sql.contains("t2.id asc, t2.order_qty asc, t2.cretime desc"));
   }
 
   private void checkAppendId() {
