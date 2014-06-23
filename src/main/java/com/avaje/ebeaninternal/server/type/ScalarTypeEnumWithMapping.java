@@ -72,6 +72,9 @@ public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase i
   }
 
   public Object toBeanType(Object dbValue) {
+    if (dbValue == null || dbValue instanceof Enum<?>) {
+      return dbValue;
+    }
     return beanDbMap.getBeanValue(dbValue);
   }
 

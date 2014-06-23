@@ -103,13 +103,12 @@ public class ScalarTypeEnumStandard {
 			return ((Enum<?>)beanValue).toString();
 		}
 	
-		public Object toBeanType(Object dbValue) {
-			if (dbValue == null) {
-				return null;
-			}
-			
-			return Enum.valueOf(enumType, (String)dbValue);
-		}
+    public Object toBeanType(Object dbValue) {
+      if (dbValue == null || dbValue instanceof Enum<?>) {
+        return dbValue;
+      }
+      return Enum.valueOf(enumType, (String) dbValue);
+    }
 
 	}
 	
@@ -183,8 +182,8 @@ public class ScalarTypeEnumStandard {
 		 * Convert the db value to the Enum value.
 		 */
 		public Object toBeanType(Object dbValue) {
-			if (dbValue == null) {
-				return null;
+			if (dbValue == null || dbValue instanceof Enum<?>) {
+			  return dbValue;
 			}
 			
 			int ordinal = ((Integer)dbValue).intValue();

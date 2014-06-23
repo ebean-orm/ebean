@@ -14,7 +14,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.avaje.ebean.annotation.EnumMapping;
+import com.avaje.ebean.annotation.EnumValue;
 import com.avaje.ebean.annotation.Where;
 
 /**
@@ -28,12 +28,16 @@ public class Customer extends BasicDomain {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * EnumMapping is an Ebean specific mapping for enums.
+	 * EnumValue is an Ebean specific mapping for enums.
 	 */
-	@EnumMapping(nameValuePairs="NEW=N,ACTIVE=A,INACTIVE=I")
 	public enum Status {
+	  @EnumValue("N")
 		NEW,
+		
+		@EnumValue("A")
 		ACTIVE,
+		
+		@EnumValue("I")
 		INACTIVE
 	}
 	
