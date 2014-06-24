@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/ebean-orm/avaje-ebeanorm.png?label=ready&title=Ready)](https://waffle.io/ebean-orm/avaje-ebeanorm)
 avaje-ebeanorm
 ==============
 - Release - 4.0.2 - May 19th: https://github.com/ebean-orm/avaje-ebeanorm/wiki/4.0.2-Release
