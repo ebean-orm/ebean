@@ -1,5 +1,8 @@
 package com.avaje.tests.query.orderby;
 
+import java.util.List;
+
+import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -7,6 +10,7 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Order;
+import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.ResetBasicData;
 
 public class TestOrderByWithMany extends BaseTestCase {
@@ -16,6 +20,8 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
+    checkWithLazyLoadingOnBuiltInMany();
+    checkWithBuiltInManyBasic();
     checkWithBuiltInMany();
     checkAppendId();
     checkNone();
@@ -23,6 +29,42 @@ public class TestOrderByWithMany extends BaseTestCase {
     checkPrepend();
     checkAlreadyIncluded();
     checkAlreadyIncluded2();
+  }
+
+  private void checkWithLazyLoadingOnBuiltInMany() {
+
+    LoggedSqlCollector.start();
+
+    Query<Order> query = Ebean.find(Order.class);
+
+    // a query that ensures we are going to lazy load on the details
+    List<Order> orders = query.findList();
+
+    for (Order order : orders) {
+      // invoke lazy loading
+      List<OrderDetail> details = order.getDetails();
+      details.size();
+    }
+
+    // first one is the main query and others are lazy loading queries
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    Assert.assertTrue(loggedSql.size() > 1);
+
+    String lazyLoadSql = loggedSql.get(1);
+    // contains the foreign key back to the parent bean (t0.order_id)
+    Assert.assertTrue(lazyLoadSql.contains("select t0.order_id c0, t0.id"));
+    Assert.assertTrue(lazyLoadSql.contains("order by t0.order_id, t0.id, t0.order_qty, t0.cretime desc"));
+
+  }
+
+  private void checkWithBuiltInManyBasic() {
+
+    Query<Order> query = Ebean.find(Order.class).fetch("details");
+    query.findList();
+
+    String sql = query.getGeneratedSql();
+
+    Assert.assertTrue(sql.contains("order by t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc"));
   }
 
   private void checkWithBuiltInMany() {
