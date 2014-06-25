@@ -60,7 +60,15 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
    */
   private final boolean manyToMany;
 
+  /**
+   * Order by used when fetch joining the associated many.
+   */
   private final String fetchOrderBy;
+
+  /**
+   * Order by used when lazy loading the associated many.
+   */
+  private String lazyFetchOrderBy;
 
   private final String mapKey;
 
@@ -137,6 +145,22 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 			if (exportedProperties.length > 0){
 				embeddedExportedProperties = exportedProperties[0].isEmbedded();
 				exportedPropertyBindProto = deriveExportedPropertyBindProto();
+				
+				if (fetchOrderBy != null) {
+  				// derive lazyFetchOrderBy
+  				StringBuilder sb = new StringBuilder(50);
+  	      for (int i = 0; i < exportedProperties.length; i++) {
+  	        if (i > 0) {
+  	          sb.append(", ");
+  	        }
+  	        // these fkcolumns always on base table hence t0 as alias
+  	        sb.append("t0.").append(exportedProperties[i].getForeignDbColumn()); 
+  	      }
+  	      if (fetchOrderBy != null) {
+  	        sb.append(", ").append(fetchOrderBy);
+  	      }
+  	      lazyFetchOrderBy = sb.toString().trim();
+				}
 			}
 			
 			String delStmt;
@@ -510,6 +534,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 	}
 
 	/**
+	 * Return the order by for use when lazy loading the associated collection.
+	 */
+	public String getLazyFetchOrderBy() {
+    return lazyFetchOrderBy;
+  }
+
+  /**
 	 * Return the default mapKey when returning a Map.
 	 */
 	public String getMapKey() {

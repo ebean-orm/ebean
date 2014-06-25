@@ -2,8 +2,7 @@ package com.avaje.tests.basic;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
@@ -25,6 +24,8 @@ public class TestSharedInstancePropagation extends BaseTestCase {
 
 		ResetBasicData.reset();
 		
+		Ebean.getServerCacheManager().clearAll();
+
 		Order order = Ebean.find(Order.class)
 			.setAutofetch(false)
 			.setUseCache(true)

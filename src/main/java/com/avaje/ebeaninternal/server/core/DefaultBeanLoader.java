@@ -108,7 +108,10 @@ public class DefaultBeanLoader {
     BeanDescriptor<?> desc = ctx.getBeanDescriptor();
 
     SpiQuery<?> query = (SpiQuery<?>) server.createQuery(many.getTargetType());
-
+    String orderBy = many.getLazyFetchOrderBy();
+    if (orderBy != null) {
+      query.orderBy(orderBy);
+    }
     query.setLazyLoadForParents(idList, many);
     many.addWhereParentIdIn(query, idList);
 
