@@ -128,17 +128,17 @@ public abstract class BeanRequest {
 		return transaction.getInternalConnection();
 	}
 
-    /**
-     * Return true if SQL should be logged for this transaction.
-     */
-    public boolean isLogSql() {
-        return transaction.isLogSql();
-    }
-    
-    /**
-     * Return true if SUMMARY information should be logged for this transaction.
-     */
-    public boolean isLogSummary() {
-        return transaction.isLogSummary();
-    }
+  /**
+   * Return true if SQL should be logged for this transaction.
+   */
+  public boolean isLogSql() {
+    return transaction.isLogSql();
+  }
+
+  /**
+   * Return true if SUMMARY information should be logged for this transaction.
+   */
+  public boolean isLogSummary() {
+    return transaction.isLogSummary();
+  }
 }

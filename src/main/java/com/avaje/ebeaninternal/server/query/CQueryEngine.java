@@ -14,6 +14,7 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
+import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 
@@ -53,7 +54,7 @@ public class CQueryEngine {
       if (request.isLogSql()) {
         String logSql = rcQuery.getGeneratedSql();
         if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-          logSql += "; --bind("+rcQuery.getBindLog()+")";
+          logSql = Str.add(logSql, "; --bind(", rcQuery.getBindLog(), ")");
         }
         request.logSql(logSql);
       }
@@ -88,7 +89,7 @@ public class CQueryEngine {
       if (request.isLogSql()) {
         String logSql = rcQuery.getGeneratedSql();
         if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-          logSql += "; --bind("+rcQuery.getBindLog()+")";
+          logSql= Str.add(logSql, "; --bind(", rcQuery.getBindLog(), ")");
         }
         request.logSql(logSql);
       }
@@ -241,7 +242,7 @@ public class CQueryEngine {
 
     String sql = query.getGeneratedSql();
     if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-      sql += "; --bind("+query.getBindLog()+")"; 
+      sql= Str.add(sql, "; --bind(", query.getBindLog(), ")");
     }
     query.getTransaction().logSql(sql);
   }

@@ -362,9 +362,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    * Log the SQL if the logLevel is appropriate.
    */
   public void logSql(String sql) {
-    if (transaction.isLogSql()) {
-      transaction.logSql(sql);
-    }
+    transaction.logSql(sql);
   }
 
   /**

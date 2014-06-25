@@ -15,6 +15,7 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.core.PstmtBatch;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.BatchedPstmt;
 import com.avaje.ebeaninternal.server.persist.BatchedPstmtHolder;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableRequest;
@@ -56,7 +57,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     this.transaction = persistRequest.getTransaction();
     this.logLevelSql = transaction.isLogSql();
     if (logLevelSql) {
-      this.bindLog = new StringBuilder();
+      this.bindLog = new StringBuilder(50);
     } else {
       this.bindLog = null;
     }
@@ -137,7 +138,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   protected void logSql(String sql) {
     if (logLevelSql) {
       if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-        sql += "; --bind(" + bindLog + ")";
+        sql = Str.add(sql, "; --bind(", bindLog.toString(), ")");
       }
       transaction.logSql(sql);
     }

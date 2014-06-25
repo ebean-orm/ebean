@@ -20,6 +20,7 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
+import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager.OnQueryOnly;
 
@@ -476,13 +477,13 @@ public class JdbcTransaction implements SpiTransaction {
   }
   
   public void logSql(String msg) {
-    TransactionManager.SQL_LOGGER.trace(logPrefix+msg);
+    TransactionManager.SQL_LOGGER.trace(Str.add(logPrefix, msg));
   }
   
   public void logSummary(String msg) {
-    TransactionManager.SUM_LOGGER.debug(logPrefix+msg);
+    TransactionManager.SUM_LOGGER.debug(Str.add(logPrefix, msg));
   }
-
+  
   /**
    * Return the transaction id.
    */

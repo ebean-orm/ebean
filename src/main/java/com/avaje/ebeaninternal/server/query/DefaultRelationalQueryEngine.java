@@ -22,6 +22,7 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.core.RelationalQueryEngine;
 import com.avaje.ebeaninternal.server.core.RelationalQueryRequest;
+import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 import com.avaje.ebeaninternal.server.type.DataBind;
@@ -94,7 +95,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 				if (request.isLogSql()) {
 				  String logSql = sql;
 				  if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-				    logSql += "; --bind("+bindLog+")";
+				    logSql = Str.add(logSql, "; --bind(", bindLog, ")");
 				  }
 					t.logSql(logSql);
 				}
