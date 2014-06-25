@@ -37,92 +37,96 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * The associated TransactionManager.
    */
-  final protected TransactionManager manager;
+  protected final TransactionManager manager;
 
   /**
    * The transaction id.
    */
-  final String id;
+  protected final String id;
 
   /**
    * Flag to indicate if this was an explicitly created Transaction.
    */
-  final boolean explicit;
+  protected final boolean explicit;
 
   /**
    * Set to true if the connection has autoCommit=true initially.
    */
-  final boolean autoCommit;
+  protected final boolean autoCommit;
 
   /**
    * Behaviour for ending query only transactions.
    */
-  final OnQueryOnly onQueryOnly;
+  protected final OnQueryOnly onQueryOnly;
 
   /**
    * The status of the transaction.
    */
-  boolean active;
+  protected boolean active;
 
   /**
    * The underlying Connection.
    */
-  Connection connection;
+  protected Connection connection;
 
   /**
    * Used to queue up persist requests for batch execution.
    */
-  BatchControl batchControl;
+  protected BatchControl batchControl;
 
   /**
    * The event which holds persisted beans.
    */
-  TransactionEvent event;
+  protected TransactionEvent event;
 
   /**
    * Holder of the objects fetched to ensure unique objects are used.
    */
-  PersistenceContext persistenceContext;
+  protected PersistenceContext persistenceContext;
 
   /**
    * Used to give developers more control over the insert update and delete
    * functionality.
    */
-  boolean persistCascade = true;
+  protected boolean persistCascade = true;
 
   /**
    * Flag used for performance to skip commit or rollback of query only
    * transactions in read committed transaction isolation.
    */
-  boolean queryOnly = true;
+  protected boolean queryOnly = true;
 
-  boolean localReadOnly;
+  protected boolean localReadOnly;
 
   /**
    * Set to true if using batch processing.
    */
-  boolean batchMode;
+  protected boolean batchMode;
 
-  int batchSize = -1;
+  protected int batchSize = -1;
 
-  boolean batchFlushOnQuery = true;
+  protected boolean batchFlushOnQuery = true;
 
-  Boolean batchGetGeneratedKeys;
+  protected Boolean batchGetGeneratedKeys;
 
-  Boolean batchFlushOnMixed;
+  protected Boolean batchFlushOnMixed;
 
-  String logPrefix;
+  protected String logPrefix;
   
   /**
    * The depth used by batch processing to help the ordering of statements.
    */
-  int depth = 0;
+  protected int depth;
 
-  IdentityHashMap<Object,Object> persistingBeans;
-  HashSet<Integer> deletingBeansHash;
-  HashMap<String,String> m2mIntersectionSave;
-  HashMap<Integer, List<DerivedRelationshipData>> derivedRelMap;
-  Map<String, Object> userObjects;
+  protected IdentityHashMap<Object,Object> persistingBeans;
+  
+  protected HashSet<Integer> deletingBeansHash;
+  
+  protected HashMap<String,String> m2mIntersectionSave;
+  
+  protected HashMap<Integer, List<DerivedRelationshipData>> derivedRelMap;
+  
+  protected Map<String, Object> userObjects;
 
   /**
    * Create a new JdbcTransaction.
