@@ -5,6 +5,10 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import com.avaje.ebean.text.json.JsonValueAdapter;
 import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
 
@@ -31,7 +35,12 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
     public boolean isDirty(Object value) {
       return wrapped.isDirty(value);
     }
-    
+
+    @Override
+    public Object jsonRead(JsonParser ctx, Event event) {
+      return wrapped.jsonRead(ctx, event);
+    }
+
     public Object readData(DataInput dataInput) throws IOException {
         return wrapped.readData(dataInput);
     }
@@ -126,4 +135,7 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
         return wrapped.jsonFromString(value, ctx);
     }
     
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+    wrapped.jsonWrite(ctx, name, value);
+  }
 }

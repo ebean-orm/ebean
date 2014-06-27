@@ -7,6 +7,10 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import com.avaje.ebean.text.json.JsonValueAdapter;
 import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
 
@@ -61,6 +65,24 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
         return true;
     }
     
+    @Override
+    public Object jsonRead(JsonParser ctx, Event event) {
+      if (ctx.isIntegralNumber()) {
+        long millis = ctx.getLong();
+        return parseDateTime(millis);
+      } else {
+        String string = ctx.getString();
+        throw new RuntimeException("convert "+string);
+      }
+    }
+    
+    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+      long millis = convertToMillis(value);
+      ctx.write(name, millis);
+    }
+    
+    public abstract long convertToMillis(Object value);
+
     @Override
     public String jsonToString(T value, JsonValueAdapter ctx) {
         Date date = convertToDate(value);

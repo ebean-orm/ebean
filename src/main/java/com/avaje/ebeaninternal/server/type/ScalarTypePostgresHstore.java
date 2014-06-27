@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import com.avaje.ebean.config.dbplatform.PostgresPlatform;
 
 /**
@@ -62,6 +65,12 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   @Override
   public Map toBeanType(Object value) {
     return (Map)value;
+  }
+  
+  @Override
+  public Object jsonRead(JsonParser ctx, Event event) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   @Override

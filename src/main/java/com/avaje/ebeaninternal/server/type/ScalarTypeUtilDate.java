@@ -17,7 +17,12 @@ public class ScalarTypeUtilDate {
 		public TimestampType() {
 			super(java.util.Date.class, false, Types.TIMESTAMP);
 		}
-
+		
+    @Override
+    public long convertToMillis(Object value) {
+      return BasicTypeConverter.toTimestamp(value).getTime();
+    }
+    
 		public java.util.Date read(DataReader dataReader) throws SQLException {
 			Timestamp timestamp = dataReader.getTimestamp();
 			if (timestamp == null) {
@@ -69,7 +74,15 @@ public class ScalarTypeUtilDate {
 			super(Date.class, false, Types.DATE);
 		}
 
+		
 		@Override
+    public long convertToMillis(Object value) {
+		  java.sql.Date date = BasicTypeConverter.toDate(value);
+      return date.getTime();
+    }
+
+
+    @Override
         public Date convertFromDate(java.sql.Date ts) {
             return new java.util.Date(ts.getTime());
         }

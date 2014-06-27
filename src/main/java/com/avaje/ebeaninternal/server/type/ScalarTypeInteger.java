@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.JsonValueAdapter;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
@@ -71,4 +75,14 @@ public class ScalarTypeInteger extends ScalarTypeBase<Integer> {
     public Integer jsonFromString(String value, JsonValueAdapter ctx) {
         return Integer.valueOf(value);
     }
+    
+    @Override
+    public Object jsonRead(JsonParser ctx, Event event) {
+      return Integer.valueOf(ctx.getInt());
+    }    
+    
+    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+      ctx.write(name, (Integer)value);
+    }
+
 }

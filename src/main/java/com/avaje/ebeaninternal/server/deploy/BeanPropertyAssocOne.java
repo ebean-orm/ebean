@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.json.stream.JsonParser;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.EbeanServer;
@@ -854,13 +855,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
             }
         }
     }
-    
+
     @Override
-    public void jsonRead(ReadJsonContext ctx, EntityBean bean){
-        if (targetDescriptor != null) {
-          T assocBean = targetDescriptor.jsonReadBean(ctx, name);
-          setValue(bean, assocBean);
-        }
+    public void jsonRead(JsonParser parser, EntityBean bean) {
+      if (targetDescriptor != null) {
+        T assocBean = targetDescriptor.jsonRead(parser, name);
+        setValue(bean, assocBean);
+      }
     }
 
     public boolean isReference(Object detailBean) {

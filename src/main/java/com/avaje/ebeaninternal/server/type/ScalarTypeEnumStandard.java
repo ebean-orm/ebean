@@ -7,6 +7,10 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.EnumSet;
 
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.JsonValueAdapter;
 
@@ -224,6 +228,17 @@ public class ScalarTypeEnumStandard {
 
         public boolean isDateTimeCapable() {
             return false;
+        }
+        
+        @Override
+        public Object jsonRead(JsonParser ctx, Event event) {
+          
+          String val = ctx.getString();
+          return parse(val);
+        }
+        
+        public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+          ctx.write(name, formatValue(value));
         }
                 
         @Override

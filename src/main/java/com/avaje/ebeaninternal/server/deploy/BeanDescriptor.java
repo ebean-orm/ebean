@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.json.stream.JsonParser;
 import javax.persistence.PersistenceException;
 
 import org.slf4j.Logger;
@@ -195,12 +196,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   /**
    * Inheritance information. Server side only.
    */
-  private final InheritInfo inheritInfo;
+  protected final InheritInfo inheritInfo;
 
   /**
    * Derived list of properties that make up the unique id.
    */
-  private final BeanProperty idProperty;
+  protected final BeanProperty idProperty;
   private final int idPropertyIndex;
 
   /**
@@ -327,7 +328,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   private final boolean cacheSharableBeans;
   
   private final BeanDescriptorCacheHelp<T> cacheHelp;
-
+  private final BeanDescriptorJsonHelp<T> jsonHelp;
+  
   private final String defaultSelectClause;
   private final Set<String> defaultSelectClauseSet;
 
@@ -422,7 +424,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     
     this.cacheSharableBeans = noRelationships && deploy.getCacheOptions().isReadOnly();
     this.cacheHelp = new BeanDescriptorCacheHelp<T>(this, owner.getCacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
-
+    this.jsonHelp = new BeanDescriptorJsonHelp<T>(this);
     
     // Check if there are no cascade save associated beans ( subject to change
     // in initialiseOther()). Note that if we are in an inheritance hierarchy 
@@ -2198,88 +2200,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       beanVisitor.visit((T) bean, ctx);
     }
   }
-
-  @SuppressWarnings("unchecked")
-  public T jsonReadBean(ReadJsonContext ctx, String path) {
-    ReadBeanState beanState = jsonRead(ctx, path);
-    if (beanState == null) {
-      return null;
-    } else {
-      return (T) beanState.getBean();
-    }
-  }
-
-  public ReadBeanState jsonRead(ReadJsonContext ctx, String path) {
-    if (!ctx.readObjectBegin()) {
-      // the object is null
-      return null;
-    }
-
-    if (inheritInfo == null) {
-      return jsonReadObject(ctx, path);
-
-    } else {
-
-      // check for the discriminator value to determine the correct sub type
-      String discColumn = inheritInfo.getRoot().getDiscriminatorColumn();
-
-      if (!ctx.readKeyNext()) {
-        String msg = "Error reading inheritance discriminator - expected [" + discColumn + "] but no json key?";
-        throw new TextException(msg);
-      }
-      
-      String propName = ctx.getTokenKey();      
-      String discValue;
-      if (propName.equalsIgnoreCase(discColumn)) {
-        discValue = ctx.readScalarValue(); 
-        if (!ctx.readValueNext()) {
-          // Expected to read a comma to setup for reading the real properties of the bean 
-          String msg = "Error reading inheritance discriminator [" + discColumn + "]. Expected more json name values?";
-          throw new TextException(msg);
-        }
-        
-      } else {
-        // Assume that the we are just reading using this bean type
-        // Push the token key back so that it is re-read as it is one 
-        // of the real properties of the bean itself
-        ctx.pushTokenKey();
-        discValue = inheritInfo.getDiscriminatorStringValue();
-      }
-
-      // determine the sub type for this particular json object
-      InheritInfo localInheritInfo = inheritInfo.readType(discValue);
-      BeanDescriptor<?> localDescriptor = localInheritInfo.getBeanDescriptor();
-      return localDescriptor.jsonReadObject(ctx, path);
-    }
+    
+  public T jsonRead(JsonParser parser, String path) {
+    return jsonHelp.jsonRead(parser, path);
   }
   
-  private ReadBeanState jsonReadObject(ReadJsonContext ctx, String path) {
-
-    EntityBean bean = createEntityBean();
-    ctx.pushBean(bean, path, this);
-
-    do {
-      if (!ctx.readKeyNext()) {
-        break;
-      } else {
-        // we read a property key ...
-        String propName = ctx.getTokenKey();
-        BeanProperty p = getBeanProperty(propName);
-        if (p != null) {
-          p.jsonRead(ctx, bean);
-          ctx.setProperty(propName);
-        } else {
-          // unknown property key ...
-          ctx.readUnmappedJson(propName);
-        }
-
-        if (!ctx.readValueNext()) {
-          break;
-        }
-      }
-    } while (true);
-
-    return ctx.popBeanState();
+  protected T jsonReadObject(JsonParser parser, String path) {
+    return jsonHelp.jsonReadObject(parser, path);
   }
-    
 }

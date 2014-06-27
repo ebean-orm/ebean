@@ -5,6 +5,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import com.avaje.ebean.text.TextException;
 
 /**
@@ -41,7 +44,12 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
 	}
 
 	
-	public String formatValue(byte[] t) {
+	@Override
+  public Object jsonRead(JsonParser ctx, Event event) {
+	  throw new TextException("Not supported");
+  }
+
+  public String formatValue(byte[] t) {
         throw new TextException("Not supported");
     }
 

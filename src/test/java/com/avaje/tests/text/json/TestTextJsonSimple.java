@@ -44,8 +44,8 @@ public class TestTextJsonSimple extends BaseTestCase {
 
     });
 
-    // String s = json.toJsonString(list, true);
-    String s = json.toJsonString(list, true, options);
+     String s = json.toJsonString(list, true);
+//    String s = json.toJsonString(list, true, options);
 
     System.out.println(s);
 

@@ -5,6 +5,10 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.text.json.JsonValueAdapter;
 import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
@@ -180,5 +184,20 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
         S s = scalarType.jsonFromString(value, ctx);
         return converter.wrapValue(s);
     }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Object jsonRead(JsonParser ctx, Event event) {
+    Object object = scalarType.jsonRead(ctx, event);
+    return converter.wrapValue((S)object);
+  }
+
+  @Override
+  public void jsonWrite(JsonGenerator ctx, String name, Object beanValue) {
+    S unwrapValue = converter.unwrapValue((B)beanValue);
+    scalarType.jsonWrite(ctx, name, unwrapValue);
     
+  }
+  
+  
 }

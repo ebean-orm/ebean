@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -15,6 +16,11 @@ public class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
 		super(Timestamp.class, true, Types.TIMESTAMP);
 	}
 	
+	 @Override
+	  public long convertToMillis(Object value) {
+	    return ((Timestamp)value).getTime();
+	  }
+	 
 	@Override
     public Timestamp convertFromTimestamp(Timestamp ts) {
         return ts;

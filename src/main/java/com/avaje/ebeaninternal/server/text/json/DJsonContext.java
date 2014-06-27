@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.text.json;
 
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -10,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.json.Json;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.TextException;
@@ -48,12 +53,13 @@ public class DJsonContext implements JsonContext {
         return server.isSupportedType(genericType);
     }
 
-    private ReadJsonSource createReader(Reader jsonReader) {
-        return new ReadJsonSourceReader(jsonReader, 256, 512);
+    private JsonParser createReader(Reader jsonReader) {
+        return Json.createParser(jsonReader);
+        //return new ReadJsonSourceReader(jsonReader, 256, 512);
     }
     
     public <T> T toBean(Class<T> cls, String json){
-        return toBean(cls, new ReadJsonSourceString(json), null);
+        return toBean(cls, new StringReader(json), null);
     }
     
     public <T> T toBean(Class<T> cls, Reader jsonReader) {
@@ -61,26 +67,33 @@ public class DJsonContext implements JsonContext {
     }
     
     public <T> T toBean(Class<T> cls, String json, JsonReadOptions options){
-        return toBean(cls, new ReadJsonSourceString(json), options);
+        return toBean(cls, new StringReader(json), options);
     }    
 
     public <T> T toBean(Class<T> cls, Reader jsonReader, JsonReadOptions options) {
         return toBean(cls, createReader(jsonReader), options);
     }
 
-    private <T> T toBean(Class<T> cls, ReadJsonSource src, JsonReadOptions options){
+//    private <T> T toBean(Class<T> cls, ReadJsonSource src, JsonReadOptions options){
+//
+//        BeanDescriptor<T> d = getDecriptor(cls);
+//        ReadJsonContext ctx = new ReadJsonContext(src, dfltValueAdapter, options);
+//        return d.jsonReadBean(ctx, null);
+//    }
 
-        BeanDescriptor<T> d = getDecriptor(cls);
-        ReadJsonContext ctx = new ReadJsonContext(src, dfltValueAdapter, options);
-        return d.jsonReadBean(ctx, null);
+    private <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) {
+  
+      BeanDescriptor<T> d = getDecriptor(cls);
+      // ReadJsonContext ctx = new ReadJsonContext(src, dfltValueAdapter, options);
+      return d.jsonRead(parser, null);
     }
-
+    
     public <T> List<T> toList(Class<T> cls, String json){
-        return toList(cls, new ReadJsonSourceString(json), null);        
+        return toList(cls, new StringReader(json), null);        
     }
 
     public <T> List<T> toList(Class<T> cls, String json, JsonReadOptions options){
-        return toList(cls, new ReadJsonSourceString(json), options);        
+        return toList(cls, new StringReader(json), options);        
     }
     
     public <T> List<T> toList(Class<T> cls, Reader jsonReader){
@@ -91,26 +104,36 @@ public class DJsonContext implements JsonContext {
         return toList(cls, createReader(jsonReader), options);        
     }
     
-    private <T> List<T> toList(Class<T> cls, ReadJsonSource src, JsonReadOptions options){
+    private <T> List<T> toList(Class<T> cls, JsonParser src, JsonReadOptions options){
 
         try {
             BeanDescriptor<T> d = getDecriptor(cls);
     
             List<T> list = new ArrayList<T>();
             
-            ReadJsonContext ctx = new ReadJsonContext(src, dfltValueAdapter, options);
-            ctx.readArrayBegin();
+            //ReadJsonContext ctx = new ReadJsonContext(src, dfltValueAdapter, options);
+            if (!src.hasNext()) {
+              return list;
+            }
+            Event event = src.next();
+            if (event != Event.START_ARRAY) {
+              throw new TextException("Expecting start_array event but got ["+event+"] at ["+src.getLocation()+"]");
+            }
+            //ctx.readArrayBegin();
             do {
-                T bean = d.jsonReadBean(ctx, null);
-                if (bean != null){
+                T bean = d.jsonRead(src, null);
+                if (bean == null){
+                  break;
+                } else {
                     list.add(bean);
                 }
-                if (!ctx.readArrayNext()){
-                    break;
-                }
+//                if (!ctx.readArrayNext()){
+//                    break;
+//                }
             } while(true);
             
             return list;
+            
         } catch (RuntimeException e){
             throw new TextException("Error parsing "+src, e);
         }

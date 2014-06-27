@@ -5,6 +5,10 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
 import com.avaje.ebean.text.json.JsonValueAdapter;
@@ -192,5 +196,9 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
     public Object readData(DataInput dataInput) throws IOException;
 
     public void writeData(DataOutput dataOutput, Object v) throws IOException;
+
+    public Object jsonRead(JsonParser ctx, Event event);
+
+    public void jsonWrite(JsonGenerator ctx, String name, Object value);
     
 }
