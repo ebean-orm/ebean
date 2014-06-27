@@ -838,6 +838,28 @@ public interface EbeanServer {
   public int save(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
 
   /**
+   * Marks the entity bean as dirty.
+   * <p>
+   * This is used so that when a bean that is otherwise unmodified is updated the version
+   * property is updated.
+   * <p>
+   * An unmodified bean that is saved or updated is normally skipped and this marks the bean as
+   * dirty so that it is not skipped.
+   * 
+   * <pre class="code">
+   * 
+   * Customer customer = ebeanServer.find(Customer, id);
+   * 
+   * // mark the bean as dirty so that a save() or update() will
+   * // increment the version property
+   * ebeanServer.markAsDirty(customer);
+   * ebeanServer.save(customer);
+   * 
+   * </pre>   
+   */
+  public void markAsDirty(Object bean);
+  
+  /**
    * Saves the bean using an update. If you know you are updating a bean then it is preferrable to
    * use this update() method rather than save().
    * <p>

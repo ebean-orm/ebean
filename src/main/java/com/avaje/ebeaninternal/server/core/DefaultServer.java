@@ -1576,6 +1576,16 @@ public final class DefaultServer implements SpiEbeanServer {
     persister.save(checkEntityBean(bean), t);
   }
 
+  
+  @Override
+  public void markAsDirty(Object bean) {
+    if (bean instanceof EntityBean == false) {
+      throw new IllegalArgumentException("This bean is not an EntityBean?");
+    }
+    // mark the bean as dirty (so that an update will not get skipped)
+    ((EntityBean)bean)._ebean_getIntercept().setDirty(true); 
+  }
+
   /**
    * Update the bean using the default 'updatesDeleteMissingChildren' setting. 
    */

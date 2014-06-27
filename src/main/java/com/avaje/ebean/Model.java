@@ -86,6 +86,30 @@ public abstract class Model {
   }
 
   /**
+   * Marks the entity bean as dirty.
+   * <p>
+   * This is used so that when a bean that is otherwise unmodified is updated the version
+   * property is updated.
+   * <p>
+   * An unmodified bean that is saved or updated is normally skipped and this marks the bean as
+   * dirty so that it is not skipped.
+   * 
+   * <pre class="code">
+   * 
+   * Customer customer = Customer.find.byId(id);
+   * 
+   * // mark the bean as dirty so that a save() or update() will
+   * // increment the version property
+   * customer.markAsDirty();
+   * customer.save();
+   * 
+   * </pre>   
+   */
+  public void markAsDirty() {
+    db().markAsDirty(this);
+  }
+  
+  /**
    * Insert or update this entity depending on its state.
    * 
    * <p>

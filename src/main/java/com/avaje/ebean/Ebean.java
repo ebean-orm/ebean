@@ -475,7 +475,31 @@ public final class Ebean {
   public static void insert(Collection<?> beans) {
     serverMgr.getPrimaryServer().insert(beans);
   }
-  
+
+  /**
+   * Marks the entity bean as dirty.
+   * <p>
+   * This is used so that when a bean that is otherwise unmodified is updated with the version
+   * property updated.
+   * <p>
+   * An unmodified bean that is saved or updated is normally skipped and this marks the bean as
+   * dirty so that it is not skipped.
+   * 
+   * <pre class="code">
+   * 
+   * Customer customer = Ebean.find(Customer, id);
+   * 
+   * // mark the bean as dirty so that a save() or update() will
+   * // increment the version property
+   * Ebean.markAsDirty(customer);
+   * Ebean.save(customer);
+   * 
+   * </pre>
+   */
+  public static void markAsDirty(Object bean) throws OptimisticLockException {
+    serverMgr.getPrimaryServer().markAsDirty(bean);
+  }
+
   /**
    * Saves the bean using an update. If you know you are updating a bean then it is preferrable to
    * use this update() method rather than save().
