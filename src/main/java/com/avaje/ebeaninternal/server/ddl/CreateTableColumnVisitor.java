@@ -30,6 +30,8 @@ public class CreateTableColumnVisitor extends BaseTablePropertyVisitor {
 
   private final CreateTableVisitor parent;
 
+  private BeanPropertyAssocOne<?> embedded;
+  
   public CreateTableColumnVisitor(CreateTableVisitor parent, DdlGenContext ctx) {
     this.parent = parent;
     this.ctx = ctx;
@@ -68,6 +70,7 @@ public class CreateTableColumnVisitor extends BaseTablePropertyVisitor {
   @Override
   public void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded) {
 
+    this.embedded = embedded;
     visitScalar(p);
   }
 
@@ -184,7 +187,12 @@ public class CreateTableColumnVisitor extends BaseTablePropertyVisitor {
 
   private String createUniqueConstraint(BeanProperty p) {
 
-    StringBuilder expr = createUniqueConstraintBuffer(p.getBeanDescriptor().getBaseTable(), p.getDbColumn());
+    String baseTable = p.getBeanDescriptor().getBaseTable();
+    if (baseTable == null) {
+      // Embedded bean property that has unique constraint on it
+      baseTable = embedded.getBeanDescriptor().getBaseTable();
+    }
+    StringBuilder expr = createUniqueConstraintBuffer(baseTable, p.getDbColumn());
 
     expr.append(p.getDbColumn()).append(")");
     return expr.toString();
