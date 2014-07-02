@@ -13,18 +13,17 @@ import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 import com.avaje.ebeaninternal.server.deploy.IntersectionRow;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableRequest;
-import com.avaje.ebeaninternal.util.ValueUtil;
 
 /**
  * Imported Embedded id.
  */
 public class ImportedIdEmbedded implements ImportedId {
 	
-	final BeanPropertyAssoc<?> owner;
+	private final BeanPropertyAssoc<?> owner;
 
-	final BeanPropertyAssocOne<?> foreignAssocOne;
+	private final BeanPropertyAssocOne<?> foreignAssocOne;
 
-	final ImportedIdSimple[] imported;
+	private final ImportedIdSimple[] imported;
 	
 	public ImportedIdEmbedded(BeanPropertyAssoc<?> owner, BeanPropertyAssocOne<?> foreignAssocOne, ImportedIdSimple[] imported) {
 		this.owner = owner;

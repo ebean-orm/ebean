@@ -264,7 +264,7 @@ public class DeployCreateProperties {
     try {
       ScalarType<?> scalarType = typeManager.getScalarType(targetType);
       if (scalarType != null) {
-        return new DeployBeanPropertySimpleCollection(desc, targetType, scalarType, manyType);
+        return new DeployBeanPropertySimpleCollection(desc, targetType, manyType);
       }
     } catch (NullPointerException e) {
       logger.debug("expected non-scalar type" + e.getMessage());
