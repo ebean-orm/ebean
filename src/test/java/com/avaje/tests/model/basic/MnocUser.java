@@ -7,6 +7,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Version;
 
 @Entity
@@ -22,6 +23,7 @@ public class MnocUser {
 
     // No cascade REMOVE
     @ManyToMany(cascade=CascadeType.PERSIST)
+    @OrderBy("roleName")
     List<MnocRole> validRoles;
     
     public MnocUser() {

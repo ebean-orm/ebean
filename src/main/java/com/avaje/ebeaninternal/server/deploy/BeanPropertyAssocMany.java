@@ -153,8 +153,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   	        if (i > 0) {
   	          sb.append(", ");
   	        }
-  	        // these fkcolumns always on base table hence t0 as alias
-  	        sb.append("t0.").append(exportedProperties[i].getForeignDbColumn()); 
+  	        // these fk columns are either on the intersection (int_) or base table (t0) 
+  	        String fkTableAlias = isManyToMany() ? "int_" : "t0";
+  	        sb.append(fkTableAlias).append(".").append(exportedProperties[i].getForeignDbColumn()); 
   	      }
   	      if (fetchOrderBy != null) {
   	        sb.append(", ").append(fetchOrderBy);

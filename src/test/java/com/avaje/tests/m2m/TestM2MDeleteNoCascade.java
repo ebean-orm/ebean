@@ -1,5 +1,7 @@
 package com.avaje.tests.m2m;
 
+import java.util.List;
+
 import javax.persistence.PersistenceException;
 
 import org.junit.Assert;
@@ -27,6 +29,11 @@ public class TestM2MDeleteNoCascade extends BaseTestCase {
 
     Ebean.save(u0);
 
+    MnocUser loadedUser = Ebean.find(MnocUser.class, u0.getUserId());
+    List<MnocRole> validRoles = loadedUser.getValidRoles();
+    
+    Assert.assertEquals(2, validRoles.size());
+    
     try {
       Ebean.delete(u0);
       Assert.assertTrue("expecting an exception", false);
