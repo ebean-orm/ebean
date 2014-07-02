@@ -36,7 +36,7 @@ public class BeanReflectProperties {
       return (String[]) field.get(null);
 
     } catch (Exception e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException("Error getting _ebean_props field on type "+clazz, e);
     }
   }
 }
