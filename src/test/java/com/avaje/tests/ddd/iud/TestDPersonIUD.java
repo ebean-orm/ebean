@@ -1,20 +1,9 @@
 package com.avaje.tests.ddd.iud;
 
-import java.util.Currency;
-import java.util.List;
-
 import junit.framework.TestCase;
 
-import org.joda.time.Interval;
-import org.junit.Assert;
-
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Query;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.tests.model.ddd.DPerson;
-import com.avaje.tests.model.ivo.CMoney;
-import com.avaje.tests.model.ivo.Money;
-import com.avaje.tests.model.ivo.Oid;
 
 public class TestDPersonIUD extends TestCase {
 

@@ -3,8 +3,7 @@ package com.avaje.tests.basic;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;

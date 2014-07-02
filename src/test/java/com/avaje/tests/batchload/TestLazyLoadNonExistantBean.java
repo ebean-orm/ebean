@@ -4,8 +4,7 @@ import java.util.UUID;
 
 import javax.persistence.EntityNotFoundException;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;

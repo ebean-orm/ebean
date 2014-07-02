@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Transaction;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.EBasicVer;
 import com.avaje.tests.model.basic.Order;
@@ -20,9 +19,9 @@ public class TestLogTransLogOnError extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Transaction t = Ebean.beginTransaction();
+    Ebean.beginTransaction();
     try {
-      // t.log("--- hello");
+      
       Ebean.find(Customer.class).findList();
       Ebean.find(Order.class).where().gt("id", 1).findList();
 
@@ -52,9 +51,8 @@ public class TestLogTransLogOnError extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Transaction t = Ebean.beginTransaction();
+    Ebean.beginTransaction();
     try {
-      // t.log("--- hello testPersistError");
       Ebean.find(Customer.class).findList();
 
       EBasicVer newBean = new EBasicVer();

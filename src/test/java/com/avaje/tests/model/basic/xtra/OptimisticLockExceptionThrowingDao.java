@@ -2,8 +2,7 @@ package com.avaje.tests.model.basic.xtra;
 
 import javax.persistence.PersistenceException;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.SqlUpdate;

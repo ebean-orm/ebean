@@ -1,9 +1,5 @@
 package com.avaje.ebeaninternal.server.util;
 
-import junit.framework.Assert;
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,6 +9,10 @@ import java.net.URLClassLoader;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * This ensures that the ClassPathSearch supports normal file:file.jar files as well as jar/war files

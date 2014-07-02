@@ -1,14 +1,16 @@
 package com.avaje.tests.idkeys;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.tests.model.basic.ESimple;
 
-public class TestSimpleIdInsert extends TestCase {
+public class TestSimpleIdInsert extends BaseTestCase {
 
+  @Test
 	public void test() {
 
 		GlobalProperties.put("datasource.default", "h2");

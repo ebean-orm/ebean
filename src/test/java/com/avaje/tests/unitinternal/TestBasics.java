@@ -1,11 +1,11 @@
 
 package com.avaje.tests.unitinternal;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 
-public class TestBasics extends TestCase {
+public class TestBasics  {
 
 
 	private String parentPath(String path) {
@@ -18,6 +18,7 @@ public class TestBasics extends TestCase {
 		}		
 	}
 	
+	@Test
 	public void testParentPath() {
 		
 		Assert.assertTrue((parentPath("banana") == null));

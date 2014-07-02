@@ -2,16 +2,18 @@ package com.avaje.ebeaninternal.server.querydefn;
 
 import java.util.Set;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebeaninternal.server.expression.DefaultExpressionFactory;
 import com.avaje.tests.model.basic.Order;
 
-public class TestQueryLanguage extends TestCase {
+public class TestQueryLanguage extends BaseTestCase {
 
+  @Test
   public void test() {
 
     DefaultOrmQuery<Order> q = check("find order join customer (id, name)");

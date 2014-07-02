@@ -1,7 +1,6 @@
 package com.avaje.tests.cache;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
@@ -31,6 +30,7 @@ public class TestCacheBasic extends BaseTestCase {
     ServerCacheStatistics statistics = countryCache.getStatistics(false);
     int hc = statistics.getHitCount();
     Assert.assertEquals(1, hc);
+    Assert.assertNotNull(c0);
 
     // Country c1 = Ebean.getReference(Country.class, "NZ");
     // Assert.assertEquals(2, countryCache.getStatistics(false).getHitCount());

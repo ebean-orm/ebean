@@ -4,8 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;

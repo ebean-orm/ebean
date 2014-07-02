@@ -1,8 +1,9 @@
 package com.avaje.tests.el;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -14,8 +15,9 @@ import com.avaje.ebeaninternal.server.el.ElPropertyChain;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 import com.avaje.tests.model.basic.Customer;
 
-public class TestELBasic extends TestCase {
+public class TestELBasic extends BaseTestCase {
 
+  @Test
 	public void testEl() {
 		
 		SpiEbeanServer server = (SpiEbeanServer)Ebean.getServer(null);

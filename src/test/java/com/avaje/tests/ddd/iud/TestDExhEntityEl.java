@@ -1,21 +1,9 @@
 package com.avaje.tests.ddd.iud;
 
-import java.util.Currency;
-
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.GlobalProperties;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.tests.model.ddd.DExhEntity;
-import com.avaje.tests.model.ivo.CMoney;
-import com.avaje.tests.model.ivo.ExhangeCMoneyRate;
-import com.avaje.tests.model.ivo.Money;
-import com.avaje.tests.model.ivo.Rate;
 
 public class TestDExhEntityEl extends TestCase {
 

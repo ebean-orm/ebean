@@ -2,16 +2,13 @@ package com.avaje.tests.model.selfref;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.TxRunnable;
-import com.avaje.ebean.text.json.JsonWriteOptions;
-import com.avaje.tests.model.selfref.SelfRefCustomer;
 
 public class TestTextJsonSelfRef extends BaseTestCase {
 

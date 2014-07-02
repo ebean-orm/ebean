@@ -1,14 +1,13 @@
 package com.avaje.tests.lib;
 
-import junit.framework.TestCase;
-
 import org.junit.Assert;
+import org.junit.Test;
 
 import com.avaje.ebeaninternal.server.core.Message;
 
-public class TestMessage extends TestCase {
+public class TestMessage  {
 
-	
+	@Test
 	public void testMessage(){
 		
 		String one = "one";

@@ -3,8 +3,7 @@ package com.avaje.tests.unitinternal;
 import java.sql.Timestamp;
 import java.util.Arrays;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;

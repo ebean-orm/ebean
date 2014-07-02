@@ -2,8 +2,7 @@ package com.avaje.tests.basic.encrypt;
 
 import java.sql.Timestamp;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;

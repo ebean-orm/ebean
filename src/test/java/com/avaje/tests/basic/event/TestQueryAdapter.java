@@ -1,7 +1,6 @@
 package com.avaje.tests.basic.event;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;

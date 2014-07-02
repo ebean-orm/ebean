@@ -1,16 +1,18 @@
 package com.avaje.tests.genkey;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.tests.model.basic.TOne;
 
-public class TestSeqBatch extends TestCase {
+public class TestSeqBatch extends BaseTestCase {
 
+  @Test
 	public void test() {
 		
 		EbeanServer server = Ebean.getServer(null);

@@ -1,12 +1,10 @@
 package com.avaje.tests.batchload;
 
 import java.util.List;
-import java.util.UUID;
 
 import javax.persistence.EntityNotFoundException;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
@@ -57,7 +55,7 @@ public class TestBatchLazyWithDeleted extends BaseTestCase {
     Assert.assertEquals(1, deletedCount);
 
     for (UUTwo u : list) {
-      UUOne master = u.getMaster();
+      u.getMaster();
       //BeanState beanState = Ebean.getBeanState(master);
       //Assert.assertTrue(beanState.isReference());
     }

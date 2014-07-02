@@ -2,7 +2,7 @@ package com.avaje.tests.basic;
 
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.EbeanServerFactory;

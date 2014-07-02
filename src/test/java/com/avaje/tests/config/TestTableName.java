@@ -1,12 +1,14 @@
 package com.avaje.tests.config;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.config.TableName;
 
-public class TestTableName extends TestCase {
+public class TestTableName extends BaseTestCase {
 
+  @Test
 	public void test() {
 		
 		TableName t = new TableName("a");
