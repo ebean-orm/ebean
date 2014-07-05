@@ -21,7 +21,6 @@ public class TestErrorBindLog extends BaseTestCase {
 
     } catch (PersistenceException e) {
       String msg = e.getMessage();
-      e.printStackTrace();
       Assert.assertTrue(msg.contains("Bind values:"));
     }
   }

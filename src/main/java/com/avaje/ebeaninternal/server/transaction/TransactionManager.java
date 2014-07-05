@@ -91,8 +91,6 @@ public class TransactionManager {
 			
 	private final ClusterManager clusterManager;
 	
-	//private final int commitDebugLevel;
-
 	private final String serverName;
 	
 	/**
@@ -100,11 +98,11 @@ public class TransactionManager {
 	 */
 	private AtomicLong transactionCounter = new AtomicLong(1000);
 	
-	private int clusterDebugLevel;
-	
-	private final BulkEventListenerMap bulkEventListenerMap;
+  private int clusterDebugLevel;
 
-    private TransactionEventListener[] transactionEventListeners;
+  private final BulkEventListenerMap bulkEventListenerMap;
+
+  private TransactionEventListener[] transactionEventListeners;
 
 	/**
 	 * Create the TransactionManager
@@ -130,7 +128,7 @@ public class TransactionManager {
 		this.prefix = GlobalProperties.get("transaction.prefix", "");
 		this.externalTransPrefix = GlobalProperties.get("transaction.prefix", "e");
 		
-		String value = GlobalProperties.get("transaction.onqueryonly", "ROLLBACK").toUpperCase().trim();
+		String value = GlobalProperties.get("transaction.onqueryonly", "CLOSE").toUpperCase().trim();
 		this.onQueryOnly = getOnQueryOnly(value, dataSource);
 		
 		initialiseHeartbeat();
@@ -170,7 +168,6 @@ public class TransactionManager {
 	 * </p>
 	 */
 	private OnQueryOnly getOnQueryOnly(String onQueryOnly, DataSource ds) {
-		
 		
 		if (onQueryOnly.equals("COMMIT")){
 			return OnQueryOnly.COMMIT;
@@ -429,9 +426,6 @@ public class TransactionManager {
 			logger.error(m, ex);
 		}
 	}
-	
-
-
 
 	/**
 	 * Process a Transaction that comes from another framework or local code.

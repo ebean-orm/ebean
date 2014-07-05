@@ -136,7 +136,7 @@ public class JdbcTransaction implements SpiTransaction {
     try {
       this.active = true;
       this.id = id;
-      this.logPrefix = deriveLogPrefix(id,null);
+      this.logPrefix = deriveLogPrefix(id);
       this.explicit = explicit;
       this.manager = manager;
       this.connection = connection;
@@ -152,21 +152,15 @@ public class JdbcTransaction implements SpiTransaction {
     }
   }
 
-  private static String deriveLogPrefix(String id, String label) {
+  private static String deriveLogPrefix(String id) {
+    
     StringBuilder sb = new StringBuilder();
     sb.append("txn[");
     if (id != null) {
       sb.append(id);
     }
     sb.append("] ");
-    if (label != null) {
-      sb.append("label[").append(label).append("] ");
-    }
     return sb.toString();
-  }
-  
-  public void setLabel(String label) {
-    this.logPrefix = deriveLogPrefix(id,label);
   }
   
   public String getLogPrefix() {
@@ -541,16 +535,21 @@ public class JdbcTransaction implements SpiTransaction {
    * Notify the transaction manager.
    */
   protected void notifyCommit() {
-    if (manager == null) {
-      return;
-    }
-    if (queryOnly) {
-      manager.notifyOfQueryOnly(true, this, null);
-    } else {
-      manager.notifyOfCommit(this);
+    if (manager != null) {
+      if (queryOnly) {
+        manager.notifyOfQueryOnly(true, this, null);
+      } else {
+        manager.notifyOfCommit(this);
+      }
     }
   }
 
+  protected void notifyQueryOnly() {
+    if (manager != null) {
+      manager.notifyOfQueryOnly(true, this, null);
+    }
+  }
+  
   /**
    * Rollback, Commit or Close for query only transaction.
    * <p>
@@ -558,7 +557,7 @@ public class JdbcTransaction implements SpiTransaction {
    * rollback or just close the connection for performance.
    * </p>
    */
-  private void commitQueryOnly() {
+  private void connectionEndForQueryOnly() {
     try {
       switch (onQueryOnly) {
       case ROLLBACK:
@@ -581,6 +580,22 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   /**
+   * End the transaction on a query only request.
+   */
+  public void endQueryOnly() {
+    if (!isActive()) {
+      throw new IllegalStateException(illegalStateMessage);
+    }
+    try {
+      connectionEndForQueryOnly();
+    } finally {
+      // these will not throw an exception
+      deactivate();
+      notifyQueryOnly();      
+    }
+  }
+  
+  /**
    * Commit the transaction.
    */
   public void commit() throws RollbackException {
@@ -590,7 +605,7 @@ public class JdbcTransaction implements SpiTransaction {
     try {
       if (queryOnly) {
         // can rollback or just close for performance
-        commitQueryOnly();
+        connectionEndForQueryOnly();
       } else {
         // commit
         if (batchControl != null && !batchControl.isEmpty()) {

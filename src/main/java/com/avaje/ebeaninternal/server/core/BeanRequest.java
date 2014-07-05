@@ -32,8 +32,6 @@ public abstract class BeanRequest {
 
 	protected boolean createdTransaction;
 
-	protected boolean readOnly;
-
 	public BeanRequest(SpiEbeanServer ebeanServer, SpiTransaction t) {
 		this.ebeanServer = ebeanServer;
 		this.serverName = ebeanServer.getName();
@@ -62,29 +60,19 @@ public abstract class BeanRequest {
 			if (transaction == null || !transaction.isActive()) {
 				// create an implicit transaction to execute this query
 				transaction = ebeanServer.createServerTransaction(false, -1);
-				// commented out for performance reasons...
-				// TODO: review performance of trans.setReadOnly(true)
-				//if (readOnlyTransaction) {
-				//	readOnly = true;
-				//	transaction.setReadOnly(true);
-				//}
 				createdTransaction = true;
 			}
 		}
 	}
 
-	/**
-	 * Commit this transaction if it was created for this request.
-	 */
-	public void commitTransIfRequired() {
-		if (createdTransaction) {
-			if (readOnly) {
-				transaction.rollback();
-			} else {
-				transaction.commit();
-			}
-		}
-	}
+  /**
+   * Commit this transaction if it was created for this request.
+   */
+  public void commitTransIfRequired() {
+    if (createdTransaction) {
+      transaction.commit();
+    }
+  }
 
 	/**
 	 * Rollback the transaction if it was created for this request.

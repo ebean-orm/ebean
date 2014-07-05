@@ -1,5 +1,7 @@
 package com.avaje.tests.query;
 
+import javax.persistence.PersistenceException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,5 +41,51 @@ public class TestQueryFindIterate extends BaseTestCase {
     }
 
     Assert.assertEquals(2, count);
+  }
+  
+  @Test(expected=PersistenceException.class)
+  public void testWithExceptionInQuery() {
+
+    ResetBasicData.reset();
+
+    EbeanServer server = Ebean.getServer(null);
+
+    // intentionally a query with incorrect type binding
+    Query<Customer> query = server.find(Customer.class)
+        .setAutofetch(false)
+        .where().gt("id","JUNK_NOT_A_LONG")
+        .setMaxRows(2);
+
+    // this throws an exception immediately
+    QueryIterator<Customer> it = query.findIterate();
+    it.hashCode();
+    Assert.assertTrue("Never get here as exception thrown", false);
+  }
+  
+  
+  @Test(expected=IllegalStateException.class)
+  public void testWithExceptionInLoop() {
+
+    ResetBasicData.reset();
+
+    EbeanServer server = Ebean.getServer(null);
+
+    Query<Customer> query = server.find(Customer.class)
+        .setAutofetch(false)
+        .where().gt("id", 0)
+        .setMaxRows(2);
+
+    QueryIterator<Customer> it = query.findIterate();
+    try {
+      while (it.hasNext()) {
+        Customer customer = it.next();
+        if (customer != null) {
+          throw new IllegalStateException("cause an exception");
+        }
+      }
+      
+    } finally {
+      it.close();
+    }
   }
 }

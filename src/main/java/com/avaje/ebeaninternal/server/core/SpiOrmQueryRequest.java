@@ -45,8 +45,6 @@ public interface SpiOrmQueryRequest<T> {
      */
     public void endTransIfRequired();
 
-    public void rollbackTransIfRequired();
-
     /**
      * Execute the query as findById.
      */

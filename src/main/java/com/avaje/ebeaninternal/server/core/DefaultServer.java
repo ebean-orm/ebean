@@ -1198,18 +1198,12 @@ public final class DefaultServer implements SpiEbeanServer {
     }
 
     SpiOrmQueryRequest<T> request = createQueryRequest(desc, spiQuery, t);
-
     try {
       request.initTransIfRequired();
+      return (T) request.findId();
 
-      T bean = (T) request.findId();
+    } finally {
       request.endTransIfRequired();
-
-      return bean;
-
-    } catch (RuntimeException ex) {
-      request.rollbackTransIfRequired();
-      throw ex;
     }
   }
 
@@ -1256,15 +1250,10 @@ public final class DefaultServer implements SpiEbeanServer {
 
     try {
       request.initTransIfRequired();
-      Set<T> set = (Set<T>) request.findSet();
+      return (Set<T>) request.findSet();
+
+    } finally {
       request.endTransIfRequired();
-
-      return set;
-
-    } catch (RuntimeException ex) {
-      // String stackTrace = throwablePrinter.print(ex);
-      request.rollbackTransIfRequired();
-      throw ex;
     }
   }
 
@@ -1280,15 +1269,10 @@ public final class DefaultServer implements SpiEbeanServer {
 
     try {
       request.initTransIfRequired();
-      Map<?, T> map = (Map<?, T>) request.findMap();
+      return (Map<?, T>) request.findMap();
+
+    } finally {
       request.endTransIfRequired();
-
-      return map;
-
-    } catch (RuntimeException ex) {
-      // String stackTrace = throwablePrinter.print(ex);
-      request.rollbackTransIfRequired();
-      throw ex;
     }
   }
 
@@ -1303,14 +1287,10 @@ public final class DefaultServer implements SpiEbeanServer {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ROWCOUNT, query, t);
     try {
       request.initTransIfRequired();
-      int rowCount = request.findRowCount();
+      return request.findRowCount();
+
+    } finally {
       request.endTransIfRequired();
-
-      return rowCount;
-
-    } catch (RuntimeException ex) {
-      request.rollbackTransIfRequired();
-      throw ex;
     }
   }
 
@@ -1326,14 +1306,10 @@ public final class DefaultServer implements SpiEbeanServer {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ID_LIST, query, t);
     try {
       request.initTransIfRequired();
-      List<Object> list = request.findIds();
+      return request.findIds();
+      
+    } finally {
       request.endTransIfRequired();
-
-      return list;
-
-    } catch (RuntimeException ex) {
-      request.rollbackTransIfRequired();
-      throw ex;
     }
   }
 
@@ -1434,10 +1410,8 @@ public final class DefaultServer implements SpiEbeanServer {
     try {
       request.initTransIfRequired();
       request.findVisit(visitor);
-
-    } catch (RuntimeException ex) {
-      request.rollbackTransIfRequired();
-      throw ex;
+    } finally {
+      // do nothing - findVisit garuntee's cleanup of the transaction if required
     }
   }
 
@@ -1448,10 +1422,9 @@ public final class DefaultServer implements SpiEbeanServer {
     try {
       request.initTransIfRequired();
       return request.findIterate();
-      // request.endTransIfRequired();
-
+      
     } catch (RuntimeException ex) {
-      request.rollbackTransIfRequired();
+      request.endTransIfRequired();
       throw ex;
     }
   }
@@ -1468,14 +1441,10 @@ public final class DefaultServer implements SpiEbeanServer {
 
     try {
       request.initTransIfRequired();
-      List<T> list = request.findList();
+      return request.findList();
+      
+    } finally {
       request.endTransIfRequired();
-
-      return list;
-
-    } catch (RuntimeException ex) {
-      request.rollbackTransIfRequired();
-      throw ex;
     }
   }
 
@@ -1518,14 +1487,10 @@ public final class DefaultServer implements SpiEbeanServer {
 
     try {
       request.initTransIfRequired();
-      List<SqlRow> list = request.findList();
+      return request.findList();
+
+    } finally {
       request.endTransIfRequired();
-
-      return list;
-
-    } catch (RuntimeException ex) {
-      request.rollbackTransIfRequired();
-      throw ex;
     }
   }
 
@@ -1535,14 +1500,10 @@ public final class DefaultServer implements SpiEbeanServer {
 
     try {
       request.initTransIfRequired();
-      Set<SqlRow> set = request.findSet();
+      return request.findSet();
+
+    } finally {
       request.endTransIfRequired();
-
-      return set;
-
-    } catch (RuntimeException ex) {
-      request.rollbackTransIfRequired();
-      throw ex;
     }
   }
 
@@ -1551,14 +1512,10 @@ public final class DefaultServer implements SpiEbeanServer {
     RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, t);
     try {
       request.initTransIfRequired();
-      Map<?, SqlRow> map = request.findMap();
+      return request.findMap();
+
+    } finally {
       request.endTransIfRequired();
-
-      return map;
-
-    } catch (RuntimeException ex) {
-      request.rollbackTransIfRequired();
-      throw ex;
     }
   }
 

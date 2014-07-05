@@ -16,6 +16,11 @@ import com.avaje.ebeaninternal.server.persist.BatchControl;
 public interface SpiTransaction extends Transaction {
 
   /**
+   * End the transaction when had query only use.
+   */
+  public void endQueryOnly();
+  
+  /**
    * Return the string prefix with the transactin id and label used in logging.
    */
   public String getLogPrefix();

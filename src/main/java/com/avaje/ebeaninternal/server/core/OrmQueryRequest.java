@@ -193,14 +193,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Will end a locally created transaction.
    * <p>
-   * It ends the transaction by using a rollback() as the transaction is known
-   * to be readOnly.
+   * It ends the query only transaction.
    * </p>
    */
   public void endTransIfRequired() {
     if (createdTransaction) {
-      // we can rollback as readOnly transaction
-      transaction.rollback();
+      transaction.endQueryOnly();
     }
   }
 

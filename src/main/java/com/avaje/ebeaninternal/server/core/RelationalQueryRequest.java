@@ -41,15 +41,6 @@ public final class RelationalQueryRequest {
     }
 
     /**
-     * Rollback the transaction if it was created for this request.
-     */
-    public void rollbackTransIfRequired() {
-        if (createdTransaction) {
-            trans.rollback();
-        }
-    }
-
-    /**
      * Create a transaction if none currently exists.
      */
     public void initTransIfRequired() {
@@ -58,10 +49,6 @@ public final class RelationalQueryRequest {
             if (trans == null || !trans.isActive()) {
                 // create a local readOnly transaction
                 trans = ebeanServer.createServerTransaction(false, -1);
-
-                // commented out for performance reasons...
-                // TODO: review performance of trans.setReadOnly(true)
-                // trans.setReadOnly(true);
                 createdTransaction = true;
             }
         }
@@ -72,8 +59,7 @@ public final class RelationalQueryRequest {
      */
     public void endTransIfRequired() {
         if (createdTransaction) {
-            // we can rollback as a readOnly transaction.
-            trans.rollback();
+            trans.endQueryOnly();
         }
     }
 
