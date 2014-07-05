@@ -3,16 +3,18 @@ package com.avaje.tests.iud;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.tests.model.carwheel.Car;
 import com.avaje.tests.model.carwheel.Tire;
 import com.avaje.tests.model.carwheel.Wheel;
 
-public class TestCarWheelIud extends TestCase {
+public class TestCarWheelIud extends BaseTestCase {
 
+  @Test
 	public void test() {
 
 		GlobalProperties.put("ebean.search.packages", "com.avaje.tests.model.carwheel");
