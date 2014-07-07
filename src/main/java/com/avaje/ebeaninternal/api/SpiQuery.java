@@ -532,12 +532,24 @@ public interface SpiQuery<T> extends Query<T> {
      * Return the index of the first row to return in the query.
      */
     public int getFirstRow();
+    
+    /**
+     * Internally set by Ebean when this query must use the DISTINCT keyword.
+     * <p>
+     * This does not exclude/remove the use of the id property.
+     */
+    public Query<T> setSqlDistinct(boolean sqlDistinct);
 
     /**
-     * return true if this query uses DISTINCT.
+     * Return true if this query has been specified by a user or internally by Ebean to use DISTINCT.
+     */
+    public boolean isDistinctQuery();
+
+    /**
+     * Return true if this query has been specified by a user to use DISTINCT.
      */
     public boolean isDistinct();
-
+    
     /**
      * Set default select clauses where none have been explicitly defined.
      */

@@ -1112,7 +1112,7 @@ public final class DefaultServer implements SpiEbeanServer {
     // predicates on *ToMany properties
     if (query.initManyWhereJoins()) {
       // we need a sql distinct now
-      query.setDistinct(true);
+      query.setSqlDistinct(true);
     }
 
     boolean allowOneManyFetch = true;

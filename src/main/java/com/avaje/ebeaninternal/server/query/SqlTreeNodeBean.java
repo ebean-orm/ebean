@@ -194,7 +194,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     Mode queryMode = ctx.getQueryMode();
 
-    PersistenceContext persistenceContext = ctx.getPersistenceContext();
+    PersistenceContext persistenceContext = !readId ? null : ctx.getPersistenceContext();
 
     Object id = null;
     if (!readId) {
@@ -274,8 +274,9 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     } else if (localBean != null) {
 
       ctx.setCurrentPrefix(prefix, pathMap);
-      createListProxies(localDesc, ctx, localBean);
-
+      if (readId) {
+        createListProxies(localDesc, ctx, localBean);
+      }
       localDesc.postLoad(localBean, null);
 
       if (localBean instanceof EntityBean) {
@@ -290,7 +291,10 @@ public class SqlTreeNodeBean implements SqlTreeNode {
         }
 
         if (partialObject) {
-          ctx.register(null, ebi);
+          if (readId) {
+            // register for lazy loading 
+            ctx.register(null, ebi);
+          }
         } else {
           ebi.setFullyLoadedBean(true);
         }

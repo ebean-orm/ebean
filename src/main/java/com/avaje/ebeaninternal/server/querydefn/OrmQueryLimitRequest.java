@@ -38,7 +38,7 @@ public class OrmQueryLimitRequest implements SqlLimitRequest {
 	}
 
 	public boolean isDistinct() {
-		return ormQuery.isDistinct();
+		return ormQuery.isDistinctQuery();
 	}
 
   public SpiQuery<?> getOrmQuery() {

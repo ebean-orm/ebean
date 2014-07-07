@@ -144,7 +144,7 @@ public class CQueryBuilder implements Constants {
     String sqlSelect = "select count(*)";
     if (hasMany) {
       // need to count distinct id's ...
-      query.setDistinct(true);
+      query.setSqlDistinct(true);
       sqlSelect = null;
     }
 
@@ -320,13 +320,13 @@ public class CQueryBuilder implements Constants {
 
       if (!useSqlLimiter) {
         sb.append("select ");
-        if (query.isDistinct()) {
+        if (query.isDistinctQuery()) {
           sb.append("distinct ");
         }
       }
 
       sb.append(select.getSelectSql());
-      if (query.isDistinct() && dbOrderBy != null) {
+      if (query.isDistinctQuery() && dbOrderBy != null) {
         // add the orderby columns to the select clause (due to distinct)
         sb.append(", ").append(convertDbOrderByForSelect(dbOrderBy));
       }

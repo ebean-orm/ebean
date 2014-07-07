@@ -128,11 +128,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	private String lazyLoadProperty;
 	
   private String lazyLoadManyPath;
-	
+
+  /**
+   * Set to true by a user wanting a DISTINCT query (id property must be excluded).
+   */
+  private boolean distinct;
+
 	/**
-	 * Set to true if you want a DISTINCT query.
+	 * Set to true internally by Ebean when it needs the DISTINCT keyword added to the query (id property still expected).
 	 */
-	private boolean distinct;
+	private boolean sqlDistinct;
 	
 	/**
 	 * Set to true if this is a future fetch using background threads.
@@ -431,7 +436,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 		copy.query = query;
 		copy.additionalWhere = additionalWhere;
 		copy.additionalHaving = additionalHaving;
-		copy.distinct = distinct;
+    copy.distinct = distinct;
+		copy.sqlDistinct = sqlDistinct;
 		copy.timeout = timeout;
 		copy.mapKey = mapKey;
 		copy.id = id;
@@ -658,7 +664,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 	  }
 
 	  builder.add((type == null ? 0 : type.ordinal()+1));
-	  builder.add(autoFetchTuned).add(distinct).add(query);
+	  builder.add(autoFetchTuned).add(distinct).add(sqlDistinct).add(query);
     builder.add(firstRow).add(maxRows).add(orderBy).add(forUpdate);
     builder.add(rawWhereClause).add(additionalWhere).add(additionalHaving);
     builder.add(mapKey);
@@ -1022,19 +1028,33 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 		return this;
 	}
 
+  /**
+   * return true if user specified to use SQL DISTINCT (effectively excludes id property).
+   */
+  public boolean isDistinct() {
+    return distinct;
+  }
+
+  /**
+   * Internally set to use SQL DISTINCT on the query but still have id property included.
+   */
+  public DefaultOrmQuery<T> setDistinct(boolean distinct) {
+    this.distinct = distinct;
+    return this;
+  }
 
 	/**
-	 * return true if this query uses DISTINCT.
+	 * Return true if this query uses SQL DISTINCT either explicitly by the user or internally defined by ebean.
 	 */
-	public boolean isDistinct() {
-		return distinct;
+	public boolean isDistinctQuery() {
+		return distinct || sqlDistinct;
 	}
 
 	/**
-	 * Set whether this query uses DISTINCT.
+	 * Internally set to use SQL DISTINCT on the query but still have id property included.
 	 */
-	public DefaultOrmQuery<T> setDistinct(boolean isDistinct) {
-		this.distinct = isDistinct;
+	public DefaultOrmQuery<T> setSqlDistinct(boolean sqlDistinct) {
+		this.sqlDistinct = sqlDistinct;
 		return this;
 	}
 

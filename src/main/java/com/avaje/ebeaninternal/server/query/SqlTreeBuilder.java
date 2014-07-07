@@ -258,7 +258,8 @@ public class SqlTreeBuilder {
 
       // Optional many property for lazy loading query
       BeanPropertyAssocMany<?> lazyLoadMany = (query == null) ? null : query.getLazyLoadForParentsProperty();
-      return new SqlTreeNodeRoot(desc, props, myList, !subQuery, includeJoin, lazyLoadMany);
+      boolean withId = !subQuery && (query == null || !query.isDistinct());
+      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany);
 
     } else if (prop instanceof BeanPropertyAssocMany<?>) {
       return new SqlTreeNodeManyRoot(prefix, (BeanPropertyAssocMany<?>) prop, props, myList);
@@ -312,7 +313,7 @@ public class SqlTreeBuilder {
           // as we are now going to join to the many then we need
           // to add the distinct to the sql query to stop duplicate
           // rows...
-          query.setDistinct(true);
+          query.setSqlDistinct(true);
         }
       }
     }
