@@ -11,7 +11,7 @@ public class DbDdlSyntax {
 
   private boolean inlinePrimaryKeyConstraint = false;
 
-  private boolean addOneToOneUniqueContraint = false;
+  private boolean addOneToOneUniqueContraint = true;
 
   private int maxConstraintNameLength = 32;
 
