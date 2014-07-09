@@ -1531,7 +1531,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     if (propertyDeploy && chain != null) {
       BeanFkeyProperty fk = fkeyMap.get(propName);
       if (fk != null) {
-        return fk.create(chain.getExpression());
+        return fk.create(chain.getExpression(), chain.isContainsMany());
       }
     }
 

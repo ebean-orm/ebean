@@ -53,13 +53,15 @@ public class ManyWhereJoins implements Serializable {
         String join = elProp.getElPrefix();
         BeanProperty p = elProp.getBeanProperty();
         if (p instanceof BeanPropertyAssocMany<?>){
-            join = addManyToJoin(join, p.getName());
+            join = addManyToJoin(join, p.getName());          
         }
         if (join != null){
             addJoin(join);
-            String secondaryTableJoinPrefix = p.getSecondaryTableJoinPrefix();
-            if (secondaryTableJoinPrefix != null) {
-              addJoin(join+"."+secondaryTableJoinPrefix);
+            if (p != null) {
+              String secondaryTableJoinPrefix = p.getSecondaryTableJoinPrefix();
+              if (secondaryTableJoinPrefix != null) {
+                addJoin(join+"."+secondaryTableJoinPrefix);
+              }
             }
             addParentJoins(join);
         }

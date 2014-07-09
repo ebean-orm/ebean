@@ -10,182 +10,188 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
  */
 public final class BeanFkeyProperty implements ElPropertyValue {
 
-    private final String placeHolder;
-    private final String prefix;
-    private final String name;
-    private final String dbColumn;
+  private final String placeHolder;
+  private final String prefix;
+  private final String name;
+  private final String dbColumn;
+  private final boolean containsMany;
 
-    private int deployOrder;
+  private int deployOrder;
 
-    public BeanFkeyProperty(String prefix, String name, String dbColumn, int deployOrder) {
-        this.prefix = prefix;
-        this.name = name;
-        this.dbColumn = dbColumn;
-        this.deployOrder = deployOrder;
-        this.placeHolder = calcPlaceHolder(prefix, dbColumn);
-    }
+  public BeanFkeyProperty(String prefix, String name, String dbColumn, int deployOrder) {
+    this(prefix, name, dbColumn, deployOrder, false);
+  }
+  
+  private BeanFkeyProperty(String prefix, String name, String dbColumn, int deployOrder, boolean containsMany) {
+    this.prefix = prefix;
+    this.name = name;
+    this.dbColumn = dbColumn;
+    this.deployOrder = deployOrder;
+    this.containsMany = containsMany;
+    this.placeHolder = calcPlaceHolder(prefix, dbColumn);
+  }
 
-    public int getDeployOrder() {
-        return deployOrder;
-    }
+  public int getDeployOrder() {
+    return deployOrder;
+  }
 
-    private String calcPlaceHolder(String prefix, String dbColumn) {
-        if (prefix != null) {
-            return "${" + prefix + "}" + dbColumn;
-        } else {
-            return ROOT_ELPREFIX + dbColumn;
-        }
+  private String calcPlaceHolder(String prefix, String dbColumn) {
+    if (prefix != null) {
+      return "${" + prefix + "}" + dbColumn;
+    } else {
+      return ROOT_ELPREFIX + dbColumn;
     }
+  }
 
-    public BeanFkeyProperty create(String expression) {
-        int len = expression.length() - name.length() - 1;
-        String prefix = expression.substring(0, len);
+  public BeanFkeyProperty create(String expression, boolean containsMany) {
+    int len = expression.length() - name.length() - 1;
+    String prefix = expression.substring(0, len);
 
-        return new BeanFkeyProperty(prefix, name, dbColumn, deployOrder);
-    }
+    return new BeanFkeyProperty(prefix, name, dbColumn, deployOrder, containsMany);
+  }
 
-    /**
-     * Returns false for keys.
-     */
-    public boolean isDbEncrypted() {
-        return false;
-    }
+  /**
+   * Returns false for keys.
+   */
+  public boolean isDbEncrypted() {
+    return false;
+  }
 
-    /**
-     * Returns false for keys.
-     */
-    public boolean isLocalEncrypted() {
-        return false;
-    }
+  /**
+   * Returns false for keys.
+   */
+  public boolean isLocalEncrypted() {
+    return false;
+  }
 
-    /**
-     * Only usable as ElPropertyDeploy.
-     */
-    public boolean isDeployOnly() {
-        return true;
-    }
-    
-    @Override
-    public boolean containsFormulaWithJoin() {
-      return false;
-    }
+  /**
+   * Only usable as ElPropertyDeploy.
+   */
+  public boolean isDeployOnly() {
+    return true;
+  }
 
-    /**
-     * Returns false.
-     */
-    public boolean containsMany() {
-        return false;
-    }
-    
-    public boolean containsManySince(String sinceProperty) {
-        return containsMany();
-    }
+  @Override
+  public boolean containsFormulaWithJoin() {
+    return false;
+  }
 
-    public String getDbColumn() {
-        return dbColumn;
-    }
+  /**
+   * Returns false.
+   */
+  public boolean containsMany() {
+    return containsMany;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public boolean containsManySince(String sinceProperty) {
+    return containsMany();
+  }
 
-    public String getElName() {
-        return name;
-    }
+  public String getDbColumn() {
+    return dbColumn;
+  }
 
-    /**
-     * Returns null as not an AssocOne.
-     */
-    public Object[] getAssocOneIdValues(EntityBean value) {
-        return null;
-    }
+  public String getName() {
+    return name;
+  }
 
-    /**
-     * Returns null as not an AssocOne.
-     */
-    public String getAssocOneIdExpr(String prefix, String operator) {
-        return null;
-    }
+  public String getElName() {
+    return name;
+  }
 
-    /**
-     * Returns null as not an AssocOne.
-     */
-    public String getAssocIdInExpr(String prefix) {
-        return null;
-    }
+  /**
+   * Returns null as not an AssocOne.
+   */
+  public Object[] getAssocOneIdValues(EntityBean value) {
+    return null;
+  }
 
-    /**
-     * Returns null as not an AssocOne.
-     */
-    public String getAssocIdInValueExpr(int size) {
-        return null;
-    }
+  /**
+   * Returns null as not an AssocOne.
+   */
+  public String getAssocOneIdExpr(String prefix, String operator) {
+    return null;
+  }
 
-    /**
-     * Returns false as not an AssocOne.
-     */
-    public boolean isAssocId() {
-        return false;
-    }
-    
-    public boolean isAssocProperty() {
-        return false;
-    }
+  /**
+   * Returns null as not an AssocOne.
+   */
+  public String getAssocIdInExpr(String prefix) {
+    return null;
+  }
 
-    public String getElPlaceholder(boolean encrypted) {
-        return placeHolder;
-    }
+  /**
+   * Returns null as not an AssocOne.
+   */
+  public String getAssocIdInValueExpr(int size) {
+    return null;
+  }
 
-    public String getElPrefix() {
-        return prefix;
-    }
+  /**
+   * Returns false as not an AssocOne.
+   */
+  public boolean isAssocId() {
+    return false;
+  }
 
-    public boolean isDateTimeCapable() {
-        return false;
-    }
-    
-    public int getJdbcType() {
-	    return 0;
-    }
+  public boolean isAssocProperty() {
+    return false;
+  }
 
-	public Object parseDateTime(long systemTimeMillis) {
-        throw new RuntimeException("ElPropertyDeploy only - not implemented");
-    }
+  public String getElPlaceholder(boolean encrypted) {
+    return placeHolder;
+  }
 
-    public StringFormatter getStringFormatter() {
-        throw new RuntimeException("ElPropertyDeploy only - not implemented");
-    }
+  public String getElPrefix() {
+    return prefix;
+  }
 
-    public StringParser getStringParser() {
-        throw new RuntimeException("ElPropertyDeploy only - not implemented");
-    }
+  public boolean isDateTimeCapable() {
+    return false;
+  }
 
-    public void elSetReference(EntityBean bean) {
-        throw new RuntimeException("ElPropertyDeploy only - not implemented");
-    }
+  public int getJdbcType() {
+    return 0;
+  }
 
-    public Object elConvertType(Object value) {
-        throw new RuntimeException("ElPropertyDeploy only - not implemented");
-    }
+  public BeanProperty getBeanProperty() {
+    return null;
+  }
 
-    public void elSetValue(EntityBean bean, Object value, boolean populate) {
-        throw new RuntimeException("ElPropertyDeploy only - not implemented");
-    }
+  public Object parseDateTime(long systemTimeMillis) {
+    throw new RuntimeException("ElPropertyDeploy only - not implemented");
+  }
 
-    public Object elGetValue(EntityBean bean) {
-        throw new RuntimeException("ElPropertyDeploy only - not implemented");
-    }
+  public StringFormatter getStringFormatter() {
+    throw new RuntimeException("ElPropertyDeploy only - not implemented");
+  }
 
-    public Object elGetReference(EntityBean bean) {
-        throw new RuntimeException("ElPropertyDeploy only - not implemented");
-    }
+  public StringParser getStringParser() {
+    throw new RuntimeException("ElPropertyDeploy only - not implemented");
+  }
 
-    public BeanProperty getBeanProperty() {
-        throw new RuntimeException("ElPropertyDeploy only - not implemented");
-    }
+  public void elSetReference(EntityBean bean) {
+    throw new RuntimeException("ElPropertyDeploy only - not implemented");
+  }
 
-    public String getDeployProperty() {
-        throw new RuntimeException("ElPropertyDeploy only - not implemented");
-    }
+  public Object elConvertType(Object value) {
+    throw new RuntimeException("ElPropertyDeploy only - not implemented");
+  }
+
+  public void elSetValue(EntityBean bean, Object value, boolean populate) {
+    throw new RuntimeException("ElPropertyDeploy only - not implemented");
+  }
+
+  public Object elGetValue(EntityBean bean) {
+    throw new RuntimeException("ElPropertyDeploy only - not implemented");
+  }
+
+  public Object elGetReference(EntityBean bean) {
+    throw new RuntimeException("ElPropertyDeploy only - not implemented");
+  }
+
+  public String getDeployProperty() {
+    throw new RuntimeException("ElPropertyDeploy only - not implemented");
+  }
 
 }
