@@ -298,6 +298,7 @@ public class ResetBasicData {
 		List<OrderDetail> details = new ArrayList<OrderDetail>();
 		details.add(new OrderDetail(product1, 3, 10.50));
 		details.add(new OrderDetail(product3, 40, 2.10));
+		details.add(new OrderDetail(product1, 5, 10.00));
 		order.setDetails(details);
 		
 		order.addShipment(new OrderShipment());
