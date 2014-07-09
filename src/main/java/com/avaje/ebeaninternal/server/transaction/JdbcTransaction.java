@@ -51,11 +51,6 @@ public class JdbcTransaction implements SpiTransaction {
   protected final boolean explicit;
 
   /**
-   * Set to true if the connection has autoCommit=true initially.
-   */
-  protected final boolean autoCommit;
-
-  /**
    * Behaviour for ending query only transactions.
    */
   protected final OnQueryOnly onQueryOnly;
@@ -140,10 +135,6 @@ public class JdbcTransaction implements SpiTransaction {
       this.explicit = explicit;
       this.manager = manager;
       this.connection = connection;
-      this.autoCommit = connection.getAutoCommit();
-      if (this.autoCommit) {
-        connection.setAutoCommit(false);
-      }
       this.onQueryOnly = manager == null ? OnQueryOnly.ROLLBACK : manager.getOnQueryOnly();
       this.persistenceContext = new DefaultPersistenceContext();
 
@@ -508,14 +499,6 @@ public class JdbcTransaction implements SpiTransaction {
       if (localReadOnly) {
         // reset readOnly status prior to returning to pool
         connection.setReadOnly(false);
-      }
-    } catch (SQLException e) {
-      logger.error("Error setting to readOnly?", e);
-    }
-    try {
-      if (this.autoCommit) {
-        // reset the autoCommit status prior to returning to pool
-        connection.setAutoCommit(true);
       }
     } catch (SQLException e) {
       logger.error("Error setting to readOnly?", e);
