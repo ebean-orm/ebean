@@ -223,7 +223,5 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
 			return cancelled;
 		}
 	}    
-	
-	
-	
+
 }

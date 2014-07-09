@@ -6,40 +6,40 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 
 public class OrmQueryLimitRequest implements SqlLimitRequest {
 
-	private final SpiQuery<?> ormQuery;
-	
+  private final SpiQuery<?> ormQuery;
+
   private final DatabasePlatform dbPlatform;
 
-	private final String sql;
-	
-	private final String sqlOrderBy;
-	
+  private final String sql;
+
+  private final String sqlOrderBy;
+
   public OrmQueryLimitRequest(String sql, String sqlOrderBy, SpiQuery<?> ormQuery, DatabasePlatform dbPlatform) {
     this.sql = sql;
     this.sqlOrderBy = sqlOrderBy;
     this.ormQuery = ormQuery;
     this.dbPlatform = dbPlatform;
   }
-	
-	public String getDbOrderBy() {
-		return sqlOrderBy;
-	}
 
-	public String getDbSql() {
-		return sql;
-	}
+  public String getDbOrderBy() {
+    return sqlOrderBy;
+  }
 
-	public int getFirstRow() {
-		return ormQuery.getFirstRow();
-	}
+  public String getDbSql() {
+    return sql;
+  }
 
-	public int getMaxRows() {
-		return ormQuery.getMaxRows();
-	}
+  public int getFirstRow() {
+    return ormQuery.getFirstRow();
+  }
 
-	public boolean isDistinct() {
-		return ormQuery.isDistinctQuery();
-	}
+  public int getMaxRows() {
+    return ormQuery.getMaxRows();
+  }
+
+  public boolean isDistinct() {
+    return ormQuery.isDistinctQuery();
+  }
 
   public SpiQuery<?> getOrmQuery() {
     return ormQuery;

@@ -71,8 +71,7 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
 		this.name =  namedUpdate.getName();
 		this.notifyCache = namedUpdate.isNotifyCache();
 		
-		// named updates are always converted to sql as part
-		// of the initialisation
+		// named updates are always converted to sql as part of the initialisation
 		this.updateStatement = namedUpdate.getSqlUpdateStatement();
 		this.type = deriveType(updateStatement);
 	}
