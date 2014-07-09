@@ -2,10 +2,10 @@ package com.avaje.ebeaninternal.server.deploy.parse;
 
 import java.util.HashMap;
 
-import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoin;
+import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
 /**
  * Wraps information about a bean during deployment parsing.
@@ -58,7 +58,7 @@ public class DeployBeanInfo<T> {
 		if (tableJoin == null) {
 			tableJoin = new DeployTableJoin();
 			tableJoin.setTable(tableName);
-			tableJoin.setType(TableJoin.JOIN);
+			tableJoin.setType(SqlJoinType.INNER);
 			descriptor.addTableJoin(tableJoin);
 
 			tableJoinMap.put(key, tableJoin);
@@ -71,13 +71,8 @@ public class DeployBeanInfo<T> {
 	 */
 	public void setBeanJoinType(DeployBeanPropertyAssocOne<?> beanProp, boolean outerJoin) {
 
-		String joinType = TableJoin.JOIN;
-		if (outerJoin){// && util.isUseOneToOneOptional()) {
-			joinType = TableJoin.LEFT_OUTER;
-		}
-
 		DeployTableJoin tableJoin = beanProp.getTableJoin();
-		tableJoin.setType(joinType);
+		tableJoin.setType(outerJoin ? SqlJoinType.OUTER : SqlJoinType.INNER);
 	}
 
 }

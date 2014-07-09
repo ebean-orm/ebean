@@ -18,12 +18,12 @@ import com.avaje.ebean.config.TableName;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanTable;
-import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
+import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
 /**
  * Read the deployment annotation for Assoc Many beans.
@@ -160,7 +160,7 @@ public class AnnotationAssocManys extends AnnotationParser {
 		DeployTableJoin destJoin = prop.getTableJoin();
 		destJoin.addJoinColumn(false, joinTable.inverseJoinColumns(), prop.getBeanTable());
 
-		intJoin.setType(TableJoin.LEFT_OUTER);
+		intJoin.setType(SqlJoinType.OUTER);
 
 		// reverse join from dest back to intersection
 		DeployTableJoin inverseDest = destJoin.createInverse(intTableName);
@@ -216,7 +216,7 @@ public class AnnotationAssocManys extends AnnotationParser {
     		intTableName = getM2MJoinTableName(localTable, otherTable);
 
     		intJoin.setTable(intTableName);
-    		intJoin.setType(TableJoin.LEFT_OUTER);
+    		intJoin.setType(SqlJoinType.OUTER);
     	}
 
 		DeployTableJoin destJoin = prop.getTableJoin();
@@ -282,7 +282,7 @@ public class AnnotationAssocManys extends AnnotationParser {
 		manyProp.setManyToMany(true);
 		manyProp.setModifyListenMode(ModifyListenMode.ALL);
 		manyProp.setBeanTable(assoc);
-		manyProp.getTableJoin().setType(TableJoin.LEFT_OUTER);
+		manyProp.getTableJoin().setType(SqlJoinType.OUTER);
 	}
 
 	private void readToOne(OneToMany propAnn, DeployBeanPropertyAssocMany<?> manyProp) {
@@ -307,7 +307,7 @@ public class AnnotationAssocManys extends AnnotationParser {
 		}
 
 		manyProp.setBeanTable(assoc);
-		manyProp.getTableJoin().setType(TableJoin.LEFT_OUTER);
+		manyProp.getTableJoin().setType(SqlJoinType.OUTER);
 	}
 
 	

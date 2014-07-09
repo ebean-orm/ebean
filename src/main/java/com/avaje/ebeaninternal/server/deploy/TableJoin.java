@@ -17,10 +17,6 @@ import com.avaje.ebeaninternal.server.query.SqlJoinType;
  */
 public final class TableJoin {
 
-  public static final String LEFT_OUTER = "left outer join";
-
-  public static final String JOIN = "join";
-
   /**
    * Flag set when the imported key maps to the primary key. This occurs for
    * intersection tables (ManyToMany).

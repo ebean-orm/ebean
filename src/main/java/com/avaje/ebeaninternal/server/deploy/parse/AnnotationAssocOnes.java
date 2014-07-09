@@ -19,10 +19,10 @@ import com.avaje.ebean.annotation.Where;
 import com.avaje.ebean.config.NamingConvention;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.BeanTable;
-import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
+import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
 /**
  * Read the deployment annotations for Associated One beans.
@@ -99,7 +99,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
           if (notNull != null) {
               prop.setNullable(false);
               // overrides optional attribute of ManyToOne etc
-              prop.getTableJoin().setType(TableJoin.JOIN);
+              prop.getTableJoin().setType(SqlJoinType.INNER);
           }
         }
 

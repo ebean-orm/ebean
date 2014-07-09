@@ -877,7 +877,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     if (!tableJoin.hasJoinColumns()) {
       // define Join as the inverse of the mappedBy property
       DeployTableJoin otherTableJoin = mappedAssocOne.getTableJoin();
-      otherTableJoin.copyTo(tableJoin, true, tableJoin.getTable());
+      otherTableJoin.copyWithoutType(tableJoin, true, tableJoin.getTable());
     }
   }
 

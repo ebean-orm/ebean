@@ -4,11 +4,9 @@ import java.util.ArrayList;
 
 import javax.persistence.JoinColumn;
 
-import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.deploy.BeanCascadeInfo;
 import com.avaje.ebeaninternal.server.deploy.BeanTable;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
-import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
 /**
@@ -175,48 +173,40 @@ public class DeployTableJoin {
     return type == SqlJoinType.OUTER;
   }
 
-  private void setType(SqlJoinType type) {
+  public void setType(SqlJoinType type) {
     this.type = type;
-  }
-
-  /**
-   * Set the type of join.
-   */
-  public void setType(String joinType) {
-    joinType = joinType.toUpperCase();
-    if (joinType.equalsIgnoreCase(TableJoin.JOIN)) {
-      type = SqlJoinType.INNER;
-    } else if (joinType.indexOf("LEFT") > -1) {
-      type = SqlJoinType.OUTER;
-    } else if (joinType.indexOf("OUTER") > -1) {
-      type = SqlJoinType.OUTER;
-    } else if (joinType.indexOf("INNER") > -1) {
-      type = SqlJoinType.INNER;
-    } else {
-      throw new RuntimeException(Message.msg("join.type.unknown", joinType));
-    }
   }
 
   public DeployTableJoin createInverse(String tableName) {
 
     DeployTableJoin inverse = new DeployTableJoin();
-    return copyTo(inverse, true, tableName);
+    return copyInternal(inverse, true, tableName, true);
   }
 
   public DeployTableJoin copyTo(DeployTableJoin destJoin, boolean reverse, String tableName) {
+    return copyInternal(destJoin, reverse, tableName, true);
+  }
+
+  public DeployTableJoin copyWithoutType(DeployTableJoin destJoin, boolean reverse, String tableName) {
+    return copyInternal(destJoin, reverse, tableName, false);
+  }
+
+  private DeployTableJoin copyInternal(DeployTableJoin destJoin, boolean reverse, String tableName, boolean withType) {
 
     destJoin.setTable(tableName);
-    destJoin.setType(type);
+    if (withType) {
+      destJoin.setType(type);
+    }
     destJoin.setColumns(columns(), reverse);
 
     return destJoin;
   }
 
-	public InheritInfo getInheritInfo() {
-		return inheritInfo;
-	}
+  public InheritInfo getInheritInfo() {
+    return inheritInfo;
+  }
 
-	public void setInheritInfo(InheritInfo inheritInfo) {
-		this.inheritInfo = inheritInfo;
-	}
+  public void setInheritInfo(InheritInfo inheritInfo) {
+    this.inheritInfo = inheritInfo;
+  }
 }
