@@ -92,7 +92,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private List<BeanPropertyAssocMany<?>> updatedManys;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
-      PersistExecute persistExecute, PersistRequest.Type type) {
+      PersistExecute persistExecute, PersistRequest.Type type, boolean saveRecurse) {
 
     super(server, t, persistExecute);
     this.entityBean = (EntityBean) bean;
@@ -103,12 +103,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     this.bean = bean;
     this.parentBean = parentBean;
     this.controller = beanDescriptor.getPersistController();
-
-    if (PersistRequest.Type.DETERMINE != type) {
-      this.type = type;
-    } else {
-      // determine mode during cascade save (supporting stateless update)
-      this.type = beanDescriptor.isInsertMode(intercept) ? Type.INSERT : Type.UPDATE;
+    this.type = type;
+    
+    if (saveRecurse) {
       this.persistCascade = t.isPersistCascade();
     }
 

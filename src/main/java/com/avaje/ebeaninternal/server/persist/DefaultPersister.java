@@ -32,6 +32,7 @@ import com.avaje.ebeaninternal.server.core.PersistRequestOrmUpdate;
 import com.avaje.ebeaninternal.server.core.PersistRequestUpdateSql;
 import com.avaje.ebeaninternal.server.core.Persister;
 import com.avaje.ebeaninternal.server.core.PstmtBatch;
+import com.avaje.ebeaninternal.server.core.PersistRequest.Type;
 import com.avaje.ebeaninternal.server.deploy.BeanCollectionUtil;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
@@ -172,7 +173,7 @@ public final class DefaultPersister implements Persister {
       if (req.isReference()) {
         // its a reference so see if there are manys to save...
         if (req.isPersistCascade()) {
-          saveAssocMany(false, req);
+          saveAssocMany(false, req, false);
         }        
         req.checkUpdatedManysOnly();
 
@@ -218,16 +219,16 @@ public final class DefaultPersister implements Persister {
 		}
 	}
 
-	private void saveRecurse(EntityBean bean, Transaction t, Object parentBean) {
+	private void saveRecurse(EntityBean bean, Transaction t, Object parentBean, boolean insertMode) {
 
 	  // determine insert or update taking into account stateless updates
-		PersistRequestBean<?> request = createRequest(bean, t, parentBean, PersistRequest.Type.DETERMINE);
+		PersistRequestBean<?> request = createRequest(bean, t, parentBean, insertMode);
 		
 		if (request.isReference()) {
 			// its a reference...
 			if (request.isPersistCascade()) {
 				// save any associated List held beans
-				saveAssocMany(false, request);
+				saveAssocMany(false, request, insertMode);
 			}			
 			request.checkUpdatedManysOnly();
 
@@ -253,7 +254,7 @@ public final class DefaultPersister implements Persister {
 		try {
 			if (request.isPersistCascade()) {
 				// save associated One beans recursively first
-				saveAssocOne(request);
+				saveAssocOne(request, true);
 			}
 	
 			// set the IDGenerated value if required
@@ -262,7 +263,7 @@ public final class DefaultPersister implements Persister {
 			
 			if (request.isPersistCascade()) {
 				// save any associated List held beans
-				saveAssocMany(true, request);
+				saveAssocMany(true, request, true);
 			}
 		} finally {
 			request.unRegisterBean();
@@ -282,7 +283,7 @@ public final class DefaultPersister implements Persister {
 		try {
 			if (request.isPersistCascade()) {
 				// save associated One beans recursively first
-				saveAssocOne(request);
+				saveAssocOne(request, false);
 			}
 	
 			if (request.isDirty()) {
@@ -297,7 +298,7 @@ public final class DefaultPersister implements Persister {
 	
 			if (request.isPersistCascade()) {
 				// save all the beans in assocMany's after
-				saveAssocMany(false, request);
+				saveAssocMany(false, request, false);
 			}
 			
 			request.checkUpdatedManysOnly();
@@ -539,7 +540,7 @@ public final class DefaultPersister implements Persister {
 	 * bean to the child beans.
 	 * </p>
 	 */
-	private void saveAssocMany(boolean insertedParent, PersistRequestBean<?> request) {
+	private void saveAssocMany(boolean insertedParent, PersistRequestBean<?> request, boolean insertMode) {
 
 		EntityBean parentBean = request.getEntityBean();
 		BeanDescriptor<?> desc = request.getBeanDescriptor();
@@ -559,7 +560,7 @@ public final class DefaultPersister implements Persister {
 					} else {
 						t.depth(+1);
 						prop.setParentBeanToChild(parentBean, detailBean);
-						saveRecurse(detailBean, t, parentBean);
+						saveRecurse(detailBean, t, parentBean, insertMode);
 						t.depth(-1);
 					}
 				}
@@ -571,7 +572,7 @@ public final class DefaultPersister implements Persister {
 		for (int i = 0; i < manys.length; i++) {
 		  // check that property is loaded and not empty uninitialised collection
       if (request.isLoadedProperty(manys[i]) && !manys[i].isEmptyBeanCollection(parentBean)) {
-        saveMany(new SaveManyPropRequest(insertedParent, manys[i], parentBean, request));
+        saveMany(new SaveManyPropRequest(insertedParent, manys[i], parentBean, request), insertMode);
         if (!insertedParent) {
           request.addUpdatedManyProperty(manys[i]);
         }
@@ -646,7 +647,7 @@ public final class DefaultPersister implements Persister {
 		}
 	}
 
-	private void saveMany(SaveManyPropRequest saveMany) {
+	private void saveMany(SaveManyPropRequest saveMany, boolean insertMode) {
 
 		if (saveMany.getMany().isManyToMany()) {
 			
@@ -654,7 +655,7 @@ public final class DefaultPersister implements Persister {
 		  boolean saveIntersectionFromThisDirection = saveMany.isSaveIntersection();
 			if (saveMany.isCascade()) {
 				// Need explicit Cascade to save the beans on other side
-				saveAssocManyDetails(saveMany, false);
+				saveAssocManyDetails(saveMany, false, insertMode);
 			}
 			// for ManyToMany save the 'relationship' via inserts/deletes
 			// into/from the intersection table
@@ -670,7 +671,7 @@ public final class DefaultPersister implements Persister {
       }
 		  if (saveMany.isCascade()) {
 		    // potentially deletes 'missing children' for 'stateless update'
-				saveAssocManyDetails(saveMany, saveMany.isDeleteMissingChildren());
+				saveAssocManyDetails(saveMany, saveMany.isDeleteMissingChildren(), insertMode);
 			}
 		}
 	}
@@ -708,7 +709,7 @@ public final class DefaultPersister implements Persister {
 	/**
 	 * Save the details from a OneToMany collection.
 	 */
-	private void saveAssocManyDetails(SaveManyPropRequest saveMany, boolean deleteMissingChildren) {
+	private void saveAssocManyDetails(SaveManyPropRequest saveMany, boolean deleteMissingChildren, boolean insertMode) {
 
 		BeanPropertyAssocMany<?> prop = saveMany.getMany();
 
@@ -791,7 +792,7 @@ public final class DefaultPersister implements Persister {
 
         } else {
           // normal save recurse
-          saveRecurse(detail, t, parentBean);
+          saveRecurse(detail, t, parentBean, insertMode);
         }
         if (detailIds != null) {
           // remember the Id (other details not in the collection) will be removed
@@ -839,7 +840,7 @@ public final class DefaultPersister implements Persister {
 
 		if (prop instanceof BeanPropertyAssocMany<?>) {
 			BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) prop;
-			saveMany(new SaveManyPropRequest(manyProp, parentBean, (SpiTransaction) t));
+			saveMany(new SaveManyPropRequest(manyProp, parentBean, (SpiTransaction) t), true);
 
 		} else if (prop instanceof BeanPropertyAssocOne<?>) {
 			BeanPropertyAssocOne<?> oneProp = (BeanPropertyAssocOne<?>) prop;
@@ -849,7 +850,7 @@ public final class DefaultPersister implements Persister {
 			int revertDepth = -1 * depth;
 
 			trans.depth(depth);
-			saveRecurse(assocBean, t, parentBean);
+			saveRecurse(assocBean, t, parentBean, true);
 			trans.depth(revertDepth);
 
 		} else {
@@ -1087,7 +1088,7 @@ public final class DefaultPersister implements Persister {
 	/**
 	 * Save any associated one beans.
 	 */
-	private void saveAssocOne(PersistRequestBean<?> request) {
+	private void saveAssocOne(PersistRequestBean<?> request, boolean insertMode) {
 
 		BeanDescriptor<?> desc = request.getBeanDescriptor();
 
@@ -1111,7 +1112,7 @@ public final class DefaultPersister implements Persister {
 					} else {
 						SpiTransaction t = request.getTransaction();
 						t.depth(-1);
-						saveRecurse(detailBean, t, null);
+						saveRecurse(detailBean, t, null, insertMode);
 						t.depth(+1);
 					}
 				}
@@ -1196,38 +1197,52 @@ public final class DefaultPersister implements Persister {
 		}
 	}
 
-
-
 	/**
 	 * Create the Persist Request Object that wraps all the objects used to
 	 * perform an insert, update or delete.
 	 */
-	@SuppressWarnings("unchecked")
 	private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, PersistRequest.Type type) {
 		BeanManager<T> mgr = getBeanManager(bean);
 		if (mgr == null) {
 			throw new PersistenceException(errNotRegistered(bean.getClass()));
 		}
-		return (PersistRequestBean<T>) createRequest(bean, t, parentBean, mgr, type);
+		return createRequest(bean, t, parentBean, mgr, type, false);
 	}
 
-	private String errNotRegistered(Class<?> beanClass) {
-		String msg = "The type [" + beanClass + "] is not a registered entity?";
-		msg += " If you don't explicitly list the entity classes to use Ebean will search for them in the classpath.";
-		msg += " If the entity is in a Jar check the ebean.search.jars property in ebean.properties file or check ServerConfig.addJar().";
-		return msg;
-	}
+	/**
+	 * Create an Insert or Update PersistRequestBean when cascading.
+	 * <p>
+	 * This call determines the PersistRequest.Type based on bean state and the insert flag (root persist type).
+	 */
+  private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, boolean insertMode) {
+    BeanManager<T> mgr = getBeanManager(bean);
+    if (mgr == null) {
+      throw new PersistenceException(errNotRegistered(bean.getClass()));
+    }
+    BeanDescriptor<T> desc = mgr.getBeanDescriptor();
+    EntityBean entityBean = (EntityBean)bean;
+    // determine Insert or Update based on bean state and insert flag
+    PersistRequest.Type type = desc.isInsertMode(entityBean._ebean_getIntercept(), insertMode) ? Type.INSERT : Type.UPDATE;
+    return createRequest(bean, t, parentBean, mgr, type, true);
+  }
 
 	/**
 	 * Create the Persist Request Object that wraps all the objects used to
 	 * perform an insert, update or delete.
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private PersistRequestBean<?> createRequest(Object bean, Transaction t, Object parentBean, BeanManager<?> mgr, PersistRequest.Type type) {
+	private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, BeanManager<?> mgr, PersistRequest.Type type, boolean saveRecurse) {
 
-		return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, type);
+		return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, type, saveRecurse);
 	}
 
+  private String errNotRegistered(Class<?> beanClass) {
+    String msg = "The type [" + beanClass + "] is not a registered entity?";
+    msg += " If you don't explicitly list the entity classes to use Ebean will search for them in the classpath.";
+    msg += " If the entity is in a Jar check the ebean.search.jars property in ebean.properties file or check ServerConfig.addJar().";
+    return msg;
+  }
+  
 	/**
 	 * Return the BeanDescriptor for a bean that is being persisted.
 	 * <p>

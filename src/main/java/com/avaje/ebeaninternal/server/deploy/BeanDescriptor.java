@@ -1886,21 +1886,31 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return idProperty;
   }
 
-  public boolean isInsertMode(EntityBeanIntercept ebi) {
+  /**
+   * Return true if this bean should be inserted rather than updated.
+   * 
+   * @param ebi
+   *          The entity bean intercept
+   * @param insertMode
+   *          true if the 'root request' was an insert rather than an update
+   */
+  public boolean isInsertMode(EntityBeanIntercept ebi, boolean insertMode) {
     
     if (ebi.isLoaded()) {
+      // must be an update as the bean is loaded
       return false;
     }
     
-    // determine based on Id property
     if (idProperty.isEmbedded()) {
+      // not using Id generator so just base on isLoaded() 
       return !ebi.isLoaded();
     }
-    //if (idGenerator == null) {
-    //  return !ebi.isLoaded();
-    //} else {
-      return !hasIdProperty(ebi);
-    //}
+    if (!hasIdProperty(ebi)) {
+      // No Id property means it must be an insert
+      return true;
+    }
+    // same as the 'root request'
+    return insertMode;
   }
   
   public boolean isReference(EntityBeanIntercept ebi) {
