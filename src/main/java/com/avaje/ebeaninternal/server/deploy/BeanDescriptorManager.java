@@ -1019,6 +1019,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // set bean controller, finder and listener
     setBeanControllerFinderListener(desc);
     deplyInherit.process(desc);
+    desc.checkInheritanceMapping();
 
     createProperties.createProperties(desc);
 

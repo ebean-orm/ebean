@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -905,4 +908,32 @@ public class DeployBeanDescriptor<T> {
     return list;
   }
 
+  /**
+   * Check the mapping for class inheritance
+   */
+  public void checkInheritanceMapping() {
+    if (inheritInfo == null) {
+      checkInheritance(getBeanType());
+    }
+  }
+
+  /**
+   * Check valid mapping annotations on the class hierarchy. 
+   */
+  private void checkInheritance(Class<?> beanType) {
+    
+    Class<?> parent = beanType.getSuperclass();
+    if (parent == null || Object.class.equals(parent)) {
+      // all good
+      return;
+    }
+    if (parent.isAnnotationPresent(Entity.class)) {
+      String msg = "Checking "+getBeanType()+" and found "+parent+" that has @Entity annotation rather than MappedSuperclass?";
+      throw new IllegalStateException(msg);
+    }
+    if (parent.isAnnotationPresent(MappedSuperclass.class)) {
+      // continue checking
+      checkInheritance(parent);
+    }
+  }
 }
