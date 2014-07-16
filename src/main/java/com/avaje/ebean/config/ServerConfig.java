@@ -175,6 +175,13 @@ public class ServerConfig {
    */
   private DataSourceConfig dataSourceConfig = new DataSourceConfig();
 
+  /**
+   * Set to true if the DataSource uses autoCommit.
+   * <p>
+   * Indicates that Ebean should use autoCommit friendly Transactions and TransactionManager.
+   */
+  private boolean autoCommitMode;
+  
   /** 
    * The data source JNDI name if using a JNDI DataSource. 
    */
@@ -581,6 +588,20 @@ public class ServerConfig {
    */
   public void setDataSourceJndiName(String dataSourceJndiName) {
     this.dataSourceJndiName = dataSourceJndiName;
+  }
+  
+  /**
+   * Return true if autoCommit mode is on. This indicates to Ebean to use autoCommit friendly Transactions and TransactionManager.
+   */
+  public boolean isAutoCommitMode() {
+    return autoCommitMode;
+  }
+
+  /**
+   * Set to true if autoCommit mode is on and Ebean should use autoCommit friendly Transactions and TransactionManager.
+   */
+  public void setAutoCommitMode(boolean autoCommitMode) {
+    this.autoCommitMode = autoCommitMode;
   }
 
   /**
@@ -1281,6 +1302,7 @@ public class ServerConfig {
 
     loadDataSourceSettings(p);
 
+    autoCommitMode = p.getBoolean("autoCommitMode", false);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", false);
     namingConvention = createNamingConvention(p);
     databasePlatform = createInstance(p, DatabasePlatform.class, "databasePlatform");

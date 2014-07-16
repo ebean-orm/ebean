@@ -32,6 +32,8 @@ public class DataSourceConfig {
 
   private int isolationLevel = Transaction.READ_COMMITTED;
 
+  private boolean autoCommit;
+  
   private String heartbeatSql;
   
   private int heartbeatFreqSecs = 30;
@@ -130,6 +132,20 @@ public class DataSourceConfig {
    */
   public void setIsolationLevel(int isolationLevel) {
     this.isolationLevel = isolationLevel;
+  }
+  
+  /**
+   * Return autoCommit setting.
+   */
+  public boolean isAutoCommit() {
+    return autoCommit;
+  }
+
+  /**
+   * Set to true to turn on autoCommit.
+   */
+  public void setAutoCommit(boolean autoCommit) {
+    this.autoCommit = autoCommit;
   }
 
   /**
@@ -450,6 +466,7 @@ public class DataSourceConfig {
     String dbUrl = properties.get(prefix + "databaseUrl", null);
     this.url = properties.get(prefix + "url", dbUrl);
 
+    this.autoCommit = properties.getBoolean(prefix + "autoCommit", false);
     this.captureStackTrace = properties.getBoolean(prefix + "captureStackTrace", false);
     this.maxStackTraceSize = properties.getInt(prefix + "maxStackTraceSize", 5);
     this.leakTimeMinutes = properties.getInt(prefix + "leakTimeMinutes", 30);

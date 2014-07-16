@@ -42,7 +42,7 @@ public class TransactionManager {
   public static final Logger TXN_LOGGER = LoggerFactory.getLogger("org.avaje.ebean.TXN");
   
 	/**
-	 * The behaviour desired when ending a query only transaction.
+	 * The behavior desired when ending a query only transaction.
 	 */
 	public enum OnQueryOnly {
 		
@@ -62,47 +62,47 @@ public class TransactionManager {
 		COMMIT
 	}
     
-	private final BeanDescriptorManager beanDescriptorManager;
+	protected final BeanDescriptorManager beanDescriptorManager;
 	
 	/**
 	 * Prefix for transaction id's (logging).
 	 */
-	private final String prefix;
+	protected final String prefix;
 
-	private final String externalTransPrefix;
+	protected final String externalTransPrefix;
 
 	/**
 	 * The dataSource of connections.
 	 */
-	private final DataSource dataSource;
+	protected final DataSource dataSource;
 
 	/**
 	 * Flag to indicate the default Isolation is READ COMMITTED. This enables us
 	 * to close queryOnly transactions rather than commit or rollback them.
 	 */
-	private final OnQueryOnly onQueryOnly;
+	protected final OnQueryOnly onQueryOnly;
 
 	/**
 	 * The default batchMode for transactions.
 	 */
-	private final boolean defaultBatchMode;
+	protected final boolean defaultBatchMode;
 
-	private final BackgroundExecutor backgroundExecutor;
+	protected final BackgroundExecutor backgroundExecutor;
 			
-	private final ClusterManager clusterManager;
+	protected final ClusterManager clusterManager;
 	
-	private final String serverName;
+	protected final String serverName;
 	
 	/**
 	 * Id's for transaction logging.
 	 */
-	private AtomicLong transactionCounter = new AtomicLong(1000);
+	protected AtomicLong transactionCounter = new AtomicLong(1000);
 	
-  private int clusterDebugLevel;
+	protected int clusterDebugLevel;
 
-  private final BulkEventListenerMap bulkEventListenerMap;
+	protected final BulkEventListenerMap bulkEventListenerMap;
 
-  private TransactionEventListener[] transactionEventListeners;
+	protected TransactionEventListener[] transactionEventListeners;
 
 	/**
 	 * Create the TransactionManager
@@ -146,14 +146,14 @@ public class TransactionManager {
 	    ((DataSourcePool)dataSource).shutdown(deregisterDriver);
 	  }	  
 	}
-	
-	public BeanDescriptorManager getBeanDescriptorManager() {
-        return beanDescriptorManager;
-    }
 
-	public BulkEventListenerMap getBulkEventListenerMap() {
-    	return bulkEventListenerMap;
-    }
+  public BeanDescriptorManager getBeanDescriptorManager() {
+    return beanDescriptorManager;
+  }
+
+  public BulkEventListenerMap getBulkEventListenerMap() {
+    return bulkEventListenerMap;
+  }
 	
 	/**
 	 * Return the behaviour to use when a query only transaction is committed.
@@ -219,26 +219,26 @@ public class TransactionManager {
 		return dataSource;
 	}
 
-	/**
-	 * Return the cluster debug level.
-	 */
-	public int getClusterDebugLevel() {
-        return clusterDebugLevel;
-    }
+  /**
+   * Return the cluster debug level.
+   */
+  public int getClusterDebugLevel() {
+    return clusterDebugLevel;
+  }
 
-    /**
-     * Set the cluster debug level. 
-     */
-    public void setClusterDebugLevel(int clusterDebugLevel) {
-        this.clusterDebugLevel = clusterDebugLevel;
-    }
+  /**
+   * Set the cluster debug level.
+   */
+  public void setClusterDebugLevel(int clusterDebugLevel) {
+    this.clusterDebugLevel = clusterDebugLevel;
+  }
 
-    /**
-	 * Defines the type of behaviour to use when closing a transaction that was used to query data only.
-	 */
-	public OnQueryOnly getOnQueryOnly() {
-		return onQueryOnly;
-	}
+  /**
+   * Defines the type of behavior to use when closing a transaction that was used to query data only.
+   */
+  public OnQueryOnly getOnQueryOnly() {
+    return onQueryOnly;
+  }
 
 	/**
 	 * Wrap the externally supplied Connection.
@@ -273,7 +273,7 @@ public class TransactionManager {
 		  c = dataSource.getConnection();
 		  long id = transactionCounter.incrementAndGet();
 
-			JdbcTransaction t = new JdbcTransaction(prefix + id, explicit, c, this);
+			SpiTransaction t = createTransaction(explicit, c, id);
 
 			// set the default batch mode. This can be on for
 			// jdbc drivers that support getGeneratedKeys
@@ -309,7 +309,7 @@ public class TransactionManager {
       c = dataSource.getConnection();
 		  long id = transactionCounter.incrementAndGet();
 
-			JdbcTransaction t = new JdbcTransaction(prefix + id, false, c, this);
+			SpiTransaction t = createTransaction(false, c, id);
 			
 			// set the default batch mode. Can be true for
 			// jdbc drivers that support getGeneratedKeys
@@ -336,6 +336,13 @@ public class TransactionManager {
 		}
 	}
 
+	/**
+	 * Create a new transaction.
+	 */
+  protected SpiTransaction createTransaction(boolean explicit, Connection c, long id) {
+    return new JdbcTransaction(prefix + id, explicit, c, this);
+  }
+  
 	/**
 	 * Process a local rolled back transaction.
 	 */
@@ -446,34 +453,33 @@ public class TransactionManager {
 		
 		backgroundExecutor.execute(postCommit.notifyPersistListeners());
 	}
-	
-	
-    /**
-     * Notify local BeanPersistListeners etc of events from another server in the cluster.
-     */
-	public void remoteTransactionEvent(RemoteTransactionEvent remoteEvent) {
-        
-        if (clusterDebugLevel > 0 || logger.isDebugEnabled()){
-            logger.info("Cluster Received: "+remoteEvent.toString());
-        }
 
-        List<TableIUD> tableIUDList = remoteEvent.getTableIUDList();
-        if (tableIUDList != null){
-            for (int i = 0; i < tableIUDList.size(); i++) {
-                TableIUD tableIUD = tableIUDList.get(i);
-                beanDescriptorManager.cacheNotify(tableIUD);
-            }
-        }
-        
-        List<BeanPersistIds> beanPersistList = remoteEvent.getBeanPersistList();
-        if (beanPersistList != null){
-            for (int i = 0; i < beanPersistList.size(); i++) {
-                BeanPersistIds beanPersist = beanPersistList.get(i);
-                beanPersist.notifyCacheAndListener();
-            }
-        }
-        
+  /**
+   * Notify local BeanPersistListeners etc of events from another server in the cluster.
+   */
+  public void remoteTransactionEvent(RemoteTransactionEvent remoteEvent) {
+
+    if (clusterDebugLevel > 0 || logger.isDebugEnabled()) {
+      logger.info("Cluster Received: " + remoteEvent.toString());
     }
+
+    List<TableIUD> tableIUDList = remoteEvent.getTableIUDList();
+    if (tableIUDList != null) {
+      for (int i = 0; i < tableIUDList.size(); i++) {
+        TableIUD tableIUD = tableIUDList.get(i);
+        beanDescriptorManager.cacheNotify(tableIUD);
+      }
+    }
+
+    List<BeanPersistIds> beanPersistList = remoteEvent.getBeanPersistList();
+    if (beanPersistList != null) {
+      for (int i = 0; i < beanPersistList.size(); i++) {
+        BeanPersistIds beanPersist = beanPersistList.get(i);
+        beanPersist.notifyCacheAndListener();
+      }
+    }
+
+  }
 	
 
 }

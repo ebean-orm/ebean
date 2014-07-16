@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.server.core;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +24,7 @@ import com.avaje.ebeaninternal.server.deploy.parse.DeployCreateProperties;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployInherit;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployUtil;
 import com.avaje.ebeaninternal.server.expression.DefaultExpressionFactory;
+import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.persist.DefaultPersister;
 import com.avaje.ebeaninternal.server.query.CQueryEngine;
@@ -31,6 +34,7 @@ import com.avaje.ebeaninternal.server.resource.ResourceManager;
 import com.avaje.ebeaninternal.server.resource.ResourceManagerFactory;
 import com.avaje.ebeaninternal.server.text.json.DJsonContext;
 import com.avaje.ebeaninternal.server.text.json.DefaultJsonValueAdapter;
+import com.avaje.ebeaninternal.server.transaction.AutoCommitTransactionManager;
 import com.avaje.ebeaninternal.server.transaction.DefaultTransactionScopeManager;
 import com.avaje.ebeaninternal.server.transaction.ExternalTransactionScopeManager;
 import com.avaje.ebeaninternal.server.transaction.JtaTransactionManager;
@@ -42,8 +46,6 @@ import com.avaje.ebeaninternal.server.type.TypeManager;
 /**
  * Used to extend the ServerConfig with additional objects used to configure and
  * construct an EbeanServer.
- * 
- * @author rbygrave
  */
 public class InternalConfiguration {
 
@@ -113,8 +115,7 @@ public class InternalConfiguration {
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     beanDescriptorManager.deploy();
 
-    this.transactionManager = new TransactionManager(clusterManager, backgroundExecutor,
-        serverConfig, beanDescriptorManager, this.getBootupClasses());
+    this.transactionManager = createTransactionManager();
 
     this.cQueryEngine = new CQueryEngine(serverConfig.getDatabasePlatform(), binder);
 
@@ -130,6 +131,34 @@ public class InternalConfiguration {
       this.transactionScopeManager = new DefaultTransactionScopeManager(transactionManager);
     }
 
+  }
+  
+  /**
+   * Create the TransactionManager taking into account autoCommit mode.
+   */
+  private TransactionManager createTransactionManager() {
+    
+    if (isAutoCommitMode()) {
+      return new AutoCommitTransactionManager(clusterManager, backgroundExecutor, serverConfig, beanDescriptorManager, this.getBootupClasses());
+    }
+    
+    return new TransactionManager(clusterManager, backgroundExecutor, serverConfig, beanDescriptorManager, this.getBootupClasses());
+  }
+  
+  /**
+   * Return true if autoCommit mode is on.
+   */
+  private boolean isAutoCommitMode() {
+    if (serverConfig.isAutoCommitMode()) {
+      // explicitly set
+      return true;
+    }
+    DataSource dataSource = serverConfig.getDataSource();
+    if (dataSource instanceof DataSourcePool && ((DataSourcePool)dataSource).getAutoCommit()) {
+      // We know the DataSourcePool is using autoCommit
+      return true;
+    }
+    return false;
   }
 
   public JsonContext createJsonContext(SpiEbeanServer server) {

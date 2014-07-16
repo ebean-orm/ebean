@@ -540,26 +540,38 @@ public class JdbcTransaction implements SpiTransaction {
    * rollback or just close the connection for performance.
    * </p>
    */
-  private void connectionEndForQueryOnly() {
+  protected void connectionEndForQueryOnly() {
     try {
       switch (onQueryOnly) {
       case ROLLBACK:
-        connection.rollback();
+        performRollback();
         break;
       case COMMIT:
-        connection.commit();
+        performCommit();
         break;
       case CLOSE_ON_READCOMMITTED:
-        // Connection is closed via deactivate() which follows
-        // This optimisation is only available at READ COMMITTED Isolation
+        // valid at READ COMMITTED Isolation
         break;
       default:
-        connection.rollback();
+        performRollback();
       }
     } catch (SQLException e) {
-      String m = "Error when ending a query only transaction via " + onQueryOnly;
-      logger.error(m, e);
+      logger.error("Error when ending a query only transaction via " + onQueryOnly, e);
     }
+  }
+
+  /**
+   * Perform the actual rollback on the connection.
+   */
+  protected void performRollback() throws SQLException {
+    connection.rollback();
+  }
+
+  /**
+   * Perform the actual commit on the connection.
+   */
+  protected void performCommit() throws SQLException {
+    connection.commit();
   }
 
   /**
@@ -594,7 +606,7 @@ public class JdbcTransaction implements SpiTransaction {
         if (batchControl != null && !batchControl.isEmpty()) {
           batchControl.flush();
         }
-        connection.commit();
+        performCommit();
       }
 
     } catch (Exception e) {
@@ -611,13 +623,12 @@ public class JdbcTransaction implements SpiTransaction {
    * Notify the transaction manager.
    */
   protected void notifyRollback(Throwable cause) {
-    if (manager == null) {
-      return;
-    }
-    if (queryOnly) {
-      manager.notifyOfQueryOnly(false, this, cause);
-    } else {
-      manager.notifyOfRollback(this, cause);
+    if (manager != null) {
+      if (queryOnly) {
+        manager.notifyOfQueryOnly(false, this, cause);
+      } else {
+        manager.notifyOfRollback(this, cause);
+      }
     }
   }
 
@@ -637,7 +648,7 @@ public class JdbcTransaction implements SpiTransaction {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
-      connection.rollback();
+      performRollback();
 
     } catch (Exception ex) {
       throw new PersistenceException(ex);

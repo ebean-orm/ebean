@@ -176,7 +176,7 @@ public class DataSourcePool implements DataSource {
         this.name = name;
         this.poolListener = createPoolListener(params.getPoolListener());
 
-        this.autoCommit = false;
+        this.autoCommit = params.isAutoCommit();
         this.transactionIsolation = params.getIsolationLevel();
         
         this.maxInactiveMillis = 1000 * params.getMaxInactiveTimeSecs();
