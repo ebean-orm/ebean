@@ -24,6 +24,7 @@ import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
+import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 /**
@@ -112,6 +113,15 @@ public class DefaultBeanLoader {
     if (orderBy != null) {
       query.orderBy(orderBy);
     }
+    
+    String extraWhere = many.getExtraWhere();
+    if (extraWhere != null) {
+      // replace special ${ta} placeholder with the base table alias 
+      // which is always t0 and add the extra where clause
+      String ew = StringHelper.replaceString(extraWhere, "${ta}", "t0");
+      query.where().raw(ew);
+    }
+    
     query.setLazyLoadForParents(idList, many);
     many.addWhereParentIdIn(query, idList);
 

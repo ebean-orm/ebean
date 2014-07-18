@@ -103,7 +103,7 @@ public class TestSecondaryQueries extends BaseTestCase {
     // from o_order_detail t0 
     // where (t0.order_id) in (?,?,?,?,?) ; --bind(1,4,1,1,1)
 
-    Assert.assertTrue(ordSecondarySql.contains(" from o_order_detail t0 where (t0.order_id) in (?"));
+    Assert.assertTrue(ordSecondarySql.contains(" from o_order_detail t0 where t0.id > 0 and (t0.order_id) in (?"));
   }
 
 }
