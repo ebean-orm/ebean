@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -44,9 +43,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
      */
     public void parse() {
 
-        Iterator<DeployBeanProperty> it = descriptor.propertiesAll();
-        while (it.hasNext()) {
-            DeployBeanProperty prop = it.next();
+      for (DeployBeanProperty prop : descriptor.propertiesAll()) {
             if (prop instanceof DeployBeanPropertyAssocOne<?>) {
                 readAssocOne((DeployBeanPropertyAssocOne<?>) prop);
             }

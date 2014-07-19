@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
 import java.sql.Types;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -74,15 +73,12 @@ public class AnnotationFields extends AnnotationParser {
    */
   public void parse() {
 
-    Iterator<DeployBeanProperty> it = descriptor.propertiesAll();
-    while (it.hasNext()) {
-      DeployBeanProperty prop = it.next();
+    for (DeployBeanProperty prop : descriptor.propertiesAll()) {
       if (prop instanceof DeployBeanPropertyAssoc<?>) {
         readAssocOne(prop);
       } else {
         readField(prop);
       }
-
     }
   }
 

@@ -707,10 +707,10 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Return an Iterator of all BeanProperty.
+   * Return a collection of all BeanProperty deployment information.
    */
-  public Iterator<DeployBeanProperty> propertiesAll() {
-    return propMap.values().iterator();
+  public Collection<DeployBeanProperty> propertiesAll() {
+    return propMap.values();
   }
 
   /**

@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -76,18 +75,13 @@ public class DeployBeanPropertyLists {
 
     this.propertyMap = new LinkedHashMap<String, BeanProperty>();
 
-    Iterator<DeployBeanProperty> deployIt = deploy.propertiesAll();
-    while (deployIt.hasNext()) {
-      DeployBeanProperty deployProp = deployIt.next();
-      BeanProperty beanProp = createBeanProperty(owner, deployProp);
+    for (DeployBeanProperty prop : deploy.propertiesAll()) {
+      BeanProperty beanProp = createBeanProperty(owner, prop);
       propertyMap.put(beanProp.getName(), beanProp);
     }
 
-    Iterator<BeanProperty> it = propertyMap.values().iterator();
-
     int order = 0;
-    while (it.hasNext()) {
-      BeanProperty prop = it.next();
+    for (BeanProperty prop : propertyMap.values()) {
       prop.setDeployOrder(order++);
       allocateToList(prop);
     }

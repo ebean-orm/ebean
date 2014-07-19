@@ -5,10 +5,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Iterator;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.annotation.ColumnHstore;
 import com.avaje.ebeaninternal.server.core.Message;
@@ -25,9 +27,6 @@ import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.ScalarTypePostgresHstore;
 import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Create the properties for a bean.
@@ -58,10 +57,7 @@ public class DeployCreateProperties {
     desc.sortProperties();
 
     // check the transient properties...
-    Iterator<DeployBeanProperty> it = desc.propertiesAll();
-
-    while (it.hasNext()) {
-      DeployBeanProperty prop = it.next();
+    for (DeployBeanProperty prop : desc.propertiesAll()) {
       if (prop.isTransient()) {
         if (prop.getWriteMethod() == null || prop.getReadMethod() == null) {
           // Typically a helper method ... this is expected

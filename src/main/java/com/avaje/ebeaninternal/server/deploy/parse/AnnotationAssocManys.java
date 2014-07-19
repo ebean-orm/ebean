@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import java.util.Iterator;
-
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
@@ -44,9 +42,7 @@ public class AnnotationAssocManys extends AnnotationParser {
 	 * Parse the annotations.
 	 */
 	public void parse() {
-		Iterator<DeployBeanProperty> it = descriptor.propertiesAll();
-		while (it.hasNext()) {
-			DeployBeanProperty prop = it.next();
+		for (DeployBeanProperty prop : descriptor.propertiesAll()) {
 			if (prop instanceof DeployBeanPropertyAssocMany<?>) {
 				read((DeployBeanPropertyAssocMany<?>) prop);
 			}

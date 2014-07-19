@@ -1,6 +1,8 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,7 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.MappedSuperclass;
 import javax.persistence.PersistenceException;
+import javax.persistence.Transient;
 import javax.sql.DataSource;
 
 import org.slf4j.Logger;
@@ -61,9 +65,7 @@ import com.avaje.ebeaninternal.server.idgen.UuidIdGenerator;
 import com.avaje.ebeaninternal.server.lib.util.Dnode;
 import com.avaje.ebeaninternal.server.reflect.BeanReflect;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectFactory;
-import com.avaje.ebeaninternal.server.reflect.BeanReflectGetter;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectProperties;
-import com.avaje.ebeaninternal.server.reflect.BeanReflectSetter;
 import com.avaje.ebeaninternal.server.reflect.EnhanceBeanReflectFactory;
 import com.avaje.ebeaninternal.server.type.TypeManager;
 
@@ -1154,12 +1156,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private void setScalarType(DeployBeanDescriptor<?> deployDesc) {
 
-    Iterator<DeployBeanProperty> it = deployDesc.propertiesAll();
-    while (it.hasNext()) {
-      DeployBeanProperty prop = it.next();
-      if (prop instanceof DeployBeanPropertyAssoc<?>) {
-
-      } else {
+    for (DeployBeanProperty prop : deployDesc.propertiesAll()) {
+      if (prop instanceof DeployBeanPropertyAssoc<?> == false) {
         deployUtil.setScalarType(prop);
       }
     }
@@ -1313,28 +1311,37 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     desc.setBeanReflect(beanReflect);
     desc.setProperties(reflectProps.getProperties());
 
-    Iterator<DeployBeanProperty> it = desc.propertiesAll();
-    while (it.hasNext()) {
-      DeployBeanProperty prop = it.next();
+    for (DeployBeanProperty prop : desc.propertiesAll()) {
       String propName = prop.getName();
-          
       Integer pos = reflectProps.getPropertyIndex(propName);
       if (pos == null) {
-        throw new IllegalStateException("Property "+propName+" not found in "+reflectProps);
-      }
-
-      BeanReflectGetter getter = beanReflect.getGetter(propName, pos.intValue());
-      BeanReflectSetter setter = beanReflect.getSetter(propName, pos.intValue());
-      prop.setGetter(getter);
-      prop.setSetter(setter);
-      prop.setPropertyIndex(pos.intValue());
-      
-      if (getter == null) {
-        String m = "BeanReflectGetter for " + prop.getFullBeanName() + " was not found?";
-        throw new RuntimeException(m);
-
+        if (isPersistentField(prop)) {
+          throw new IllegalStateException("Property "+propName+" not found in "+reflectProps);
+        }
+        
+      } else {
+        int propertyIndex = pos.intValue();
+        prop.setPropertyIndex(propertyIndex);
+        prop.setGetter(beanReflect.getGetter(propName, propertyIndex));
+        prop.setSetter(beanReflect.getSetter(propName, propertyIndex));
       }
     }
+  }
+
+  /**
+   * Return true if this is a persistent field (not transient or static).
+   */
+  private boolean isPersistentField(DeployBeanProperty prop) {
+    
+    Field field = prop.getField();
+    int modifiers = field.getModifiers();
+    if (Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers)) {
+      return false;
+    }
+    if (field.isAnnotationPresent(Transient.class)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -1408,6 +1415,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * enhanced or all dynamically subclassed).
    */
   private void checkInheritedClasses(Class<?> beanClass) {
+    
     Class<?> superclass = beanClass.getSuperclass();
     if (Object.class.equals(superclass)) {
       // we got to the top of the inheritance
@@ -1418,14 +1426,40 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       return;
     }
     if (!EntityBean.class.isAssignableFrom(superclass)) {
+      if (isMappedSuperWithNoProperties(superclass)) {
+        // ok to stop and treat just the same as Object.class
+        return;
+      }
       throw new IllegalStateException("Super type "+superclass+" is not enhanced?");
     }
-
     
     // recursively continue up the inheritance hierarchy
     checkInheritedClasses(superclass);
   }
 
+  /**
+   * Return true if this is a MappedSuperclass bean with no persistent properties.
+   * If so it is ok for it not to be enhanced.
+   */
+  private boolean isMappedSuperWithNoProperties(Class<?> beanClass) {
+    
+    MappedSuperclass annotation = beanClass.getAnnotation(MappedSuperclass.class);
+    if (annotation == null) {
+      return false;
+    }
+    Field[] fields = beanClass.getDeclaredFields();
+    for (Field field : fields) {
+      if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
+        // ignore this field
+      } else if (field.isAnnotationPresent(Transient.class)) {
+        // ignore this field
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
+  
   /**
    * Comparator to sort the BeanDescriptors by name.
    */
