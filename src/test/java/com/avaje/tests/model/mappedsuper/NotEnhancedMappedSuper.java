@@ -4,7 +4,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
 @MappedSuperclass
-public abstract class NotEnhancedMappedSuper {
+public class NotEnhancedMappedSuper {
 
   public static String SOMETHING = "Hello";
   
