@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -304,11 +303,8 @@ public class SqlTreeBuilder {
     } else {
       // add extra joins required to support predicates
       // and/or order by clause
-      Iterator<SqlTreeNodeExtraJoin> it = extraJoins.iterator();
-      while (it.hasNext()) {
-        SqlTreeNodeExtraJoin extraJoin = it.next();
+      for (SqlTreeNodeExtraJoin extraJoin: extraJoins) {
         myList.add(extraJoin);
-
         if (extraJoin.isManyJoin()) {
           // as we are now going to join to the many then we need
           // to add the distinct to the sql query to stop duplicate
@@ -420,9 +416,7 @@ public class SqlTreeBuilder {
     // Also note that this can include transient properties.
     // This makes sense for transient properties used to
     // hold sum() count() type values (with SqlSelect)
-    Iterator<String> it = queryProps.getSelectProperties();
-    while (it.hasNext()) {
-      String propName = it.next();
+    for (String propName : queryProps.getSelectProperties()) {
       if (propName.length() > 0) {
         addProperty(selectProps, desc, queryProps, propName);
       }

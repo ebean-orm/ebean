@@ -1,19 +1,17 @@
 package com.avaje.ebean.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Map.Entry;
 
 import javax.servlet.ServletContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper used to load the PropertyMap.
@@ -81,9 +79,7 @@ final class PropertyMapLoader {
     }
 
     // put values in initially without any evaluation
-    Iterator<Entry<Object, Object>> it = props.entrySet().iterator();
-    while (it.hasNext()) {
-      Map.Entry<Object, Object> entry = it.next();
+    for (Map.Entry<Object, Object> entry : props.entrySet()) {
       String key = ((String) entry.getKey()).toLowerCase();
       String val = ((String) entry.getValue());
       if (val != null) {

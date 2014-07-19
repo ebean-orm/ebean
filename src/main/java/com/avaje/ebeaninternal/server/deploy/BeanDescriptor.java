@@ -3,9 +3,9 @@ package com.avaje.ebeaninternal.server.deploy;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -603,9 +603,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
     if (isEmbedded()) {
       // initialise all the properties
-      Iterator<BeanProperty> it = propertiesAll();
-      while (it.hasNext()) {
-        BeanProperty prop = it.next();
+      for (BeanProperty prop : propertiesAll()) {
         prop.initialise();
       }
     } else {
@@ -623,9 +621,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
     if (!isEmbedded()) {
       // initialise all the non-id properties
-      Iterator<BeanProperty> it = propertiesAll();
-      while (it.hasNext()) {
-        BeanProperty prop = it.next();
+      for (BeanProperty prop : propertiesAll()) {
         if (!prop.isId()) {
           prop.initialise();
         }
@@ -1028,9 +1024,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Reset the statistics on all the query plans.
    */
   public void clearQueryStatistics() {
-    Iterator<CQueryPlan> it = queryPlanCache.values().iterator();
-    while (it.hasNext()) {
-      CQueryPlan queryPlan = (CQueryPlan) it.next();
+    for (CQueryPlan queryPlan : queryPlanCache.values()) {
       queryPlan.resetStatistics();
     }
   }
@@ -1044,13 +1038,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     if (c != null) {
       c.postLoad((T) bean, includedProperties);
     }
-  }
-
-  /**
-   * Return the query plans for this BeanDescriptor.
-   */
-  public Iterator<CQueryPlan> queryPlans() {
-    return queryPlanCache.values().iterator();
   }
 
   public CQueryPlan getQueryPlan(HashQueryPlan key) {
@@ -1854,10 +1841,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * Return an Iterator of all BeanProperty. This includes transient properties.
+   * Return a collection of all BeanProperty. This includes transient properties.
    */
-  public Iterator<BeanProperty> propertiesAll() {
-    return propMap.values().iterator();
+  public Collection<BeanProperty> propertiesAll() {
+    return propMap.values();
   }
 
   /**

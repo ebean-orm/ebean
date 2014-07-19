@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -390,16 +389,16 @@ public class OrmQueryProperties implements Serializable {
    * This is because bean joins will have there own node in the SqlTree.
    * </p>
    */
-  public Iterator<String> getSelectProperties() {
+  public Set<String> getSelectProperties() {
 
     if (secondaryQueryJoins == null) {
-      return included.iterator();
+      return included;
     }
 
     LinkedHashSet<String> temp = new LinkedHashSet<String>(secondaryQueryJoins.size() + included.size());
     temp.addAll(included);
     temp.addAll(secondaryQueryJoins);
-    return temp.iterator();
+    return temp;
   }
 
   public void addSecondaryQueryJoin(String property) {

@@ -1,11 +1,10 @@
 package com.avaje.ebean.config;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * A map like structure of properties.
@@ -68,9 +67,8 @@ final class PropertyMap implements Serializable {
   }
 
   synchronized void putAll(Map<String, String> keyValueMap) {
-    Iterator<Entry<String, String>> it = keyValueMap.entrySet().iterator();
-    while (it.hasNext()) {
-      Map.Entry<String, String> entry = it.next();
+
+    for (Map.Entry<String, String> entry : keyValueMap.entrySet()) {
       put(entry.getKey(), entry.getValue());
     }
   }

@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.cache;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.avaje.ebean.annotation.CacheTuning;
@@ -89,9 +88,7 @@ public class DefaultCacheHolder {
 	}
 
 	public void clearAll() {
-		Iterator<ServerCache> it = concMap.values().iterator();
-		while (it.hasNext()) {
-			ServerCache serverCache = it.next();
+		for (ServerCache serverCache : concMap.values()) {
 			serverCache.clear();
 		}
 	}

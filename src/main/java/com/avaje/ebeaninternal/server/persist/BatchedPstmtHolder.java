@@ -1,14 +1,13 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import javax.persistence.PersistenceException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Used to hold BatchedPstmt objects for batch based execution.
@@ -92,9 +91,7 @@ public class BatchedPstmtHolder {
 		// but still need to close PreparedStatements.
 		boolean isError = false;
 
-		Iterator<BatchedPstmt> it = stmtMap.values().iterator();
-		while (it.hasNext()) {
-			BatchedPstmt bs = it.next();
+		for (BatchedPstmt bs : stmtMap.values()) {
 			try {
 				if (!isError) {
 					bs.executeBatch(getGeneratedKeys);
@@ -119,7 +116,7 @@ public class BatchedPstmtHolder {
 					bs.close();
 				} catch (SQLException ex) {
 					// error closing PreparedStatement
-		        	logger.error(null, ex);
+		      logger.error(null, ex);
 				}
 			}
 		}

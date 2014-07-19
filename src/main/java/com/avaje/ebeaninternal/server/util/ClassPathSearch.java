@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.jar.Attributes;
@@ -262,9 +261,7 @@ public class ClassPathSearch {
     if (includePkgs.size() > 0) {
       // just search the relevant directories based on the
       // list of included packages
-      Iterator<String> it = includePkgs.iterator();
-      while (it.hasNext()) {
-        String pkg = it.next();
+      for (String pkg : includePkgs) {
         String relativePath = pkg.replace('.', '/');
         File dir = new File(classPath, relativePath);
         if (dir.exists()) {

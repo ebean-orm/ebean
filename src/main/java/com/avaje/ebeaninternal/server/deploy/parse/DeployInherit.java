@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.deploy.parse;
 
 import java.lang.annotation.Annotation;
 import java.sql.Types;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,9 +50,7 @@ public class DeployInherit {
 	private void findInheritClasses(List<Class<?>> entityList) {
 
 		// go through each class and initialise the info object...
-		Iterator<Class<?>> it = entityList.iterator();
-		while (it.hasNext()) {
-			Class<?> cls = (Class<?>) it.next();
+		for (Class<?> cls : entityList) {
 			if (isInheritanceClass(cls)) {
 				DeployInheritInfo info = createInfo(cls);
 				deployMap.put(cls, info);
@@ -62,9 +59,8 @@ public class DeployInherit {
 	}
 
 	private void buildDeployTree() {
-		Iterator<DeployInheritInfo> it = deployMap.values().iterator();
-		while (it.hasNext()) {
-			DeployInheritInfo info = it.next();
+
+	  for (DeployInheritInfo info : deployMap.values()) {
 			if (!info.isRoot()) {
 				DeployInheritInfo parent = getInfo(info.getParent());
 				parent.addChild(info);
@@ -74,19 +70,15 @@ public class DeployInherit {
 
 	private void buildFinalTree() {
 
-		Iterator<DeployInheritInfo> it = deployMap.values().iterator();
-		while (it.hasNext()) {
-			DeployInheritInfo deploy = it.next();
+		for (DeployInheritInfo deploy : deployMap.values()) {
 			if (deploy.isRoot()) {
 				// build tree top down...
 				createFinalInfo(null, null, deploy);
-
 			}
 		}
 	}
 
-	private InheritInfo createFinalInfo(InheritInfo root, InheritInfo parent,
-			DeployInheritInfo deploy) {
+	private InheritInfo createFinalInfo(InheritInfo root, InheritInfo parent, DeployInheritInfo deploy) {
 
 		InheritInfo node = new InheritInfo(root, parent, deploy);
 		if (parent != null) {
@@ -99,12 +91,7 @@ public class DeployInherit {
 		}
 
 		// buildFinalChildren(root, child, deploy);
-
-		Iterator<DeployInheritInfo> it = deploy.children();
-
-		while (it.hasNext()) {
-			DeployInheritInfo childDeploy = it.next();
-
+		for (DeployInheritInfo childDeploy : deploy.children()) {
 			createFinalInfo(root, node, childDeploy);
 		}
 

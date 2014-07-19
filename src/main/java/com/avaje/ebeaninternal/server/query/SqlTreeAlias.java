@@ -2,9 +2,7 @@ package com.avaje.ebeaninternal.server.query;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -87,14 +85,12 @@ public class SqlTreeAlias {
    */
   public void buildAlias() {
 
-    Iterator<String> i = joinProps.iterator();
-    while (i.hasNext()) {
-      calcAlias(i.next());
+    for (String joinProp : joinProps) {
+      calcAlias(joinProp);
     }
 
-    i = manyWhereJoinProps.iterator();
-    while (i.hasNext()) {
-      calcAliasManyWhere(i.next());
+    for (String joinProp : manyWhereJoinProps) {
+      calcAliasManyWhere(joinProp);
     }
 
     mapEmbeddedPropertyAlias();
@@ -192,9 +188,7 @@ public class SqlTreeAlias {
    */
   private String parseAliasMap(String clause, HashMap<String, String> parseAliasMap) {
 
-    Iterator<Entry<String, String>> i = parseAliasMap.entrySet().iterator();
-    while (i.hasNext()) {
-      Map.Entry<String, String> e = i.next();
+    for (Map.Entry<String, String> e : parseAliasMap.entrySet()) {
       String k = "${" + e.getKey() + "}";
       clause = clause.replace(k, e.getValue() + ".");
     }

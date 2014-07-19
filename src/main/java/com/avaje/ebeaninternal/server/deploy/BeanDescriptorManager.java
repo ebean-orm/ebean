@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -512,9 +511,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private void readEntityBeanTable() {
 
-    Iterator<DeployBeanInfo<?>> it = deplyInfoMap.values().iterator();
-    while (it.hasNext()) {
-      DeployBeanInfo<?> info = it.next();
+    for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
       BeanTable beanTable = createBeanTable(info);
       beanTableMap.put(beanTable.getBeanType(), beanTable);
     }
@@ -528,18 +525,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private void readEntityDeploymentAssociations() {
 
-    Iterator<DeployBeanInfo<?>> it = deplyInfoMap.values().iterator();
-    while (it.hasNext()) {
-      DeployBeanInfo<?> info = it.next();
+    for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
       readDeployAssociations(info);
     }
   }
 
   private void readInheritedIdGenerators() {
 
-    Iterator<DeployBeanInfo<?>> it = deplyInfoMap.values().iterator();
-    while (it.hasNext()) {
-      DeployBeanInfo<?> info = it.next();
+    for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
       DeployBeanDescriptor<?> descriptor = info.getDescriptor();
       InheritInfo inheritInfo = descriptor.getInheritInfo();
       if (inheritInfo != null && !inheritInfo.isRoot()) {
@@ -615,10 +608,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * @param info the new inheritance info
    */
   private void setInheritanceInfo(DeployBeanInfo<?> info) {
+    
 		for (DeployBeanPropertyAssocOne<?> oneProp : info.getDescriptor().propertiesAssocOne()) {
 			if (!oneProp.isTransient()) {
 				DeployBeanInfo<?> assoc = deplyInfoMap.get(oneProp.getTargetType());
-				
 				if (assoc != null){
 					oneProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
 				}
@@ -628,7 +621,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 		for (DeployBeanPropertyAssocMany<?> manyProp : info.getDescriptor().propertiesAssocMany()) {
 			if (!manyProp.isTransient()) {
 				DeployBeanInfo<?> assoc = deplyInfoMap.get(manyProp.getTargetType());
-				
 				if (assoc != null){
 					manyProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
 				}
@@ -757,9 +749,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         String searchName = name.substring(0, p).toLowerCase();
 
         // search for this in the possible matches
-        Iterator<String> it = matchSet.iterator();
-        while (it.hasNext()) {
-          String possibleMappedBy = it.next();
+        for (String possibleMappedBy : matchSet) {
           String possibleLower = possibleMappedBy.toLowerCase();
           if (possibleLower.indexOf(searchName) > -1) {
             // we have a match..

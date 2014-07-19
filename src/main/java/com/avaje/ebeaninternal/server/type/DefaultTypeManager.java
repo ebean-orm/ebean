@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Currency;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -27,6 +26,8 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.annotation.EnumMapping;
 import com.avaje.ebean.annotation.EnumValue;
@@ -45,9 +46,6 @@ import com.avaje.ebeaninternal.server.type.reflect.KnownImmutable;
 import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundType;
 import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundTypeProperty;
 import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedTypeBuilder;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of TypeManager.
@@ -441,11 +439,9 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     int maxValueLen = 0;
 
-    Iterator it = nameValueMap.entrySet().iterator();
-    while (it.hasNext()) {
-      Map.Entry entry = (Map.Entry) it.next();
-      String name = (String) entry.getKey();
-      String value = (String) entry.getValue();
+    for (Map.Entry<String,String> entry : nameValueMap.entrySet()) {
+      String name = entry.getKey();
+      String value = entry.getValue();
 
       maxValueLen = Math.max(maxValueLen, value.length());
 

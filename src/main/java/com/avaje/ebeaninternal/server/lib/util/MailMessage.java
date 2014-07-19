@@ -2,8 +2,9 @@ package com.avaje.ebeaninternal.server.lib.util;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * A simple test message that can be sent via smtp.
@@ -84,8 +85,8 @@ public class MailMessage {
     /**
      * Return the recipient list.
      */
-    public Iterator<MailAddress> getRecipientList() {
-        return recipientList.iterator();
+    public List<MailAddress> getRecipientList() {
+        return recipientList;
     }
 
     /**
@@ -119,15 +120,15 @@ public class MailMessage {
     /**
      * Return the body text.
      */
-    public Iterator<String> getBodyLines() {
-        return bodylines.iterator();
+    public List<String> getBodyLines() {
+        return bodylines;
     }
 
     /**
      * Return the headers.
      */
-    public Iterator<String> getHeaderFields() {
-        return header.keySet().iterator();
+    public Collection<String> getHeaderFields() {
+        return header.keySet();
     }
 
     /**
@@ -140,16 +141,13 @@ public class MailMessage {
     public String toString() {
         StringBuilder sb = new StringBuilder(100);
         sb.append("Sender: " + senderAddress + "\tRecipient: " + recipientList + "\n");
-        Iterator<String> hi = header.keySet().iterator();
-        while (hi.hasNext()) {
-            String key = hi.next();
+        for (String key : header.keySet()) {
             String hline = key + ": " + header.get(key) + "\n";
             sb.append(hline);
         }
         sb.append("\n");
-        Iterator<String> e = bodylines.iterator();
-        while (e.hasNext()) {
-            sb.append(e.next()).append("\n");
+        for (String line : bodylines) {
+            sb.append(line).append("\n");
         }
         return sb.toString();
     }

@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.core;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.Embeddable;
@@ -11,6 +10,7 @@ import javax.persistence.Table;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.avaje.ebean.config.CompoundType;
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.ServerConfig;
@@ -65,7 +65,9 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
     public BootupClasses(List<Class<?>> list) {
         if (list != null) {
-            process(list.iterator());
+            for (Class<?> cls : list) {
+              isMatch(cls);
+            }
         }
     }
 
@@ -81,13 +83,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
         this.beanListenerList.addAll(parent.beanListenerList);
         this.beanQueryAdapterList.addAll(parent.beanQueryAdapterList);
         this.serverConfigStartupList.addAll(parent.serverConfigStartupList);
-    }
-
-    private void process(Iterator<Class<?>> it) {
-        while (it.hasNext()) {
-            Class<?> cls = it.next();
-            isMatch(cls);
-        }
     }
 
     /**
@@ -295,13 +290,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
      */
     public ArrayList<Class<?>> getBeanListeners() {
         return beanListenerList;
-    }
-
-    public void add(Iterator<Class<?>> it) {
-        while (it.hasNext()) {
-            Class<?> clazz = it.next();
-            isMatch(clazz);
-        }
     }
 
     public boolean isMatch(Class<?> cls) {

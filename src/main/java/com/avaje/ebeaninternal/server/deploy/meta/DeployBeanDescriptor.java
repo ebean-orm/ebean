@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -229,9 +228,7 @@ public class DeployBeanDescriptor<T> {
 
     boolean missingMethods = false;
 
-    Iterator<DeployBeanProperty> it = propMap.values().iterator();
-    while (it.hasNext()) {
-      DeployBeanProperty prop = it.next();
+    for (DeployBeanProperty prop : propMap.values()) {
       if (!prop.isTransient()) {
         String m = "";
         if (prop.getReadMethod() == null) {
@@ -722,9 +719,7 @@ public class DeployBeanDescriptor<T> {
 
     boolean hasLazyFetch = false;
 
-    Iterator<DeployBeanProperty> it = propMap.values().iterator();
-    while (it.hasNext()) {
-      DeployBeanProperty prop = it.next();
+    for (DeployBeanProperty prop : propMap.values()) {
       if (prop.isTransient()) {
         // ignore transient props etc
       } else if (prop instanceof DeployBeanPropertyAssocMany<?>) {
@@ -797,9 +792,7 @@ public class DeployBeanDescriptor<T> {
 
     ArrayList<DeployBeanProperty> list = new ArrayList<DeployBeanProperty>(2);
 
-    Iterator<DeployBeanProperty> it = propMap.values().iterator();
-    while (it.hasNext()) {
-      DeployBeanProperty prop = it.next();
+    for (DeployBeanProperty prop : propMap.values()) {
       if (prop.isId()) {
         list.add(prop);
       }
@@ -828,9 +821,7 @@ public class DeployBeanDescriptor<T> {
 
     ArrayList<DeployBeanPropertyAssocOne<?>> list = new ArrayList<DeployBeanPropertyAssocOne<?>>();
 
-    Iterator<DeployBeanProperty> it = propMap.values().iterator();
-    while (it.hasNext()) {
-      DeployBeanProperty prop = it.next();
+    for (DeployBeanProperty prop : propMap.values()) {
       if (prop instanceof DeployBeanPropertyAssocOne<?>) {
         if (!prop.isEmbedded()) {
           list.add((DeployBeanPropertyAssocOne<?>) prop);
@@ -849,9 +840,7 @@ public class DeployBeanDescriptor<T> {
 
     ArrayList<DeployBeanPropertyAssocMany<?>> list = new ArrayList<DeployBeanPropertyAssocMany<?>>();
 
-    Iterator<DeployBeanProperty> it = propMap.values().iterator();
-    while (it.hasNext()) {
-      DeployBeanProperty prop = it.next();
+    for (DeployBeanProperty prop : propMap.values()) {
       if (prop instanceof DeployBeanPropertyAssocMany<?>) {
         list.add((DeployBeanPropertyAssocMany<?>) prop);
       }
@@ -869,13 +858,8 @@ public class DeployBeanDescriptor<T> {
 
     ArrayList<DeployBeanProperty> list = new ArrayList<DeployBeanProperty>();
 
-    Iterator<DeployBeanProperty> it = propMap.values().iterator();
-    while (it.hasNext()) {
-      DeployBeanProperty prop = it.next();
-
-      if (prop instanceof DeployBeanPropertyAssoc<?>) {
-
-      } else {
+    for (DeployBeanProperty prop : propMap.values()) {
+      if (prop instanceof DeployBeanPropertyAssoc<?> == false) {
         if (!prop.isId() && prop.isVersionColumn()) {
           list.add(prop);
         }
@@ -892,13 +876,8 @@ public class DeployBeanDescriptor<T> {
 
     ArrayList<DeployBeanProperty> list = new ArrayList<DeployBeanProperty>();
 
-    Iterator<DeployBeanProperty> it = propMap.values().iterator();
-    while (it.hasNext()) {
-      DeployBeanProperty prop = it.next();
-
-      if (prop instanceof DeployBeanPropertyAssoc<?>) {
-
-      } else {
+    for (DeployBeanProperty prop : propMap.values()) {
+      if (prop instanceof DeployBeanPropertyAssoc<?> == false) {
         if (!prop.isId()) {
           list.add(prop);
         }

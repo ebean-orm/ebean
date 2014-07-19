@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.server.lib.util;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -60,9 +60,7 @@ public class Dnode {
 			sb = new StringBuilder();
 		}
 		sb.append("<").append(nodeName);
-		Iterator<String> it = attributeNames();
-		while (it.hasNext()) {
-			String attr = it.next();
+		for (String attr : attrList.keySet()) {
 			Object attrValue = getAttribute(attr);
 			sb.append(" ").append(attr).append("=\"");
 			if (attrValue != null) {
@@ -145,9 +143,7 @@ public class Dnode {
 		if (children.remove(node)) {
 			return true;
 		}
-		Iterator<Dnode> it = children.iterator();
-		while (it.hasNext()) {
-			Dnode child = it.next();
+		for (Dnode child : children) {
 			if (child.remove(node)) {
 				return true;
 			}
@@ -286,8 +282,8 @@ public class Dnode {
 	/**
 	 * The attribute names as strings.
 	 */
-	public Iterator<String> attributeNames() {
-		return attrList.keySet().iterator();
+	public Collection<String> attributeNames() {
+		return attrList.keySet();
 	}
 
 	/**

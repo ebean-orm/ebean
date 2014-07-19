@@ -111,9 +111,7 @@ public class DefaultServerCache implements ServerCache {
 		
 		int hc = reset ? removedHitCount.getAndSet(0) : removedHitCount.get();
 		
-		Iterator<CacheEntry> it = map.values().iterator();
-		while (it.hasNext()) {
-			CacheEntry cacheEntry = it.next();
+		for (CacheEntry cacheEntry : map.values()) {
 			hc += cacheEntry.getHitCount(reset);
 		}
 		
@@ -268,10 +266,6 @@ public class DefaultServerCache implements ServerCache {
 		return map.size();
 	}
 
-	private Iterator<CacheEntry> cacheEntries() {
-		return map.values().iterator();
-	}
-
 	/**
 	 * The task used to periodically trim the cache.
 	 */
@@ -296,7 +290,7 @@ public class DefaultServerCache implements ServerCache {
 			long idleExpire = System.currentTimeMillis() - (maxIdleSecs*1000);
 			long ttlExpire = System.currentTimeMillis() - (maxSecsToLive*1000);
 
-			Iterator<CacheEntry> it = cacheEntries();
+			Iterator<CacheEntry> it = map.values().iterator();
 			while (it.hasNext()) {
 				CacheEntry cacheEntry = it.next();
 				if (maxIdleSecs > 0 && idleExpire > cacheEntry.getLastAccessTime()) {

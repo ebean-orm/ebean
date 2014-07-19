@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.util;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -177,9 +176,7 @@ public class ClassPathSearchFilter {
 		if (set.contains(match)) {
 			return true;
 		}
-		Iterator<String> incIt = set.iterator();
-		while (incIt.hasNext()) {
-			String val = incIt.next();
+		for (String val : set) {
 			if (match.contains(val)) {
 				return true;
 			}

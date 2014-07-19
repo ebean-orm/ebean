@@ -1,9 +1,7 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
@@ -29,9 +27,7 @@ class AllEqualsExpression implements SpiExpression {
 
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     if (propMap != null) {
-      Iterator<String> it = propMap.keySet().iterator();
-      while (it.hasNext()) {
-        String propertyName = it.next();
+      for (String propertyName : propMap.keySet()) {
         ElPropertyDeploy elProp = desc.getElPropertyDeploy(name(propertyName));
         if (elProp != null && elProp.containsMany()) {
           manyWhereJoin.add(elProp);
@@ -45,9 +41,7 @@ class AllEqualsExpression implements SpiExpression {
     if (propMap.isEmpty()) {
       return;
     }
-    Iterator<Object> it = propMap.values().iterator();
-    while (it.hasNext()) {
-      Object value = it.next();
+    for (Object value : propMap.values()) {
       if (value != null) {
         request.addBindValue(value);
       } else {
@@ -64,12 +58,9 @@ class AllEqualsExpression implements SpiExpression {
 
     request.append("(");
 
-    Set<Entry<String, Object>> entries = propMap.entrySet();
-    Iterator<Entry<String, Object>> it = entries.iterator();
-
     int count = 0;
-    while (it.hasNext()) {
-      Map.Entry<java.lang.String, java.lang.Object> entry = it.next();
+    for (Map.Entry<String,Object> entry : propMap.entrySet()) {
+       
       Object value = entry.getValue();
       String propName = entry.getKey();
 

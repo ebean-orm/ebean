@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.deploy.parse;
 
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
@@ -80,8 +79,8 @@ public class DeployInheritInfo {
     /**
      * Return the child nodes.
      */
-    public Iterator<DeployInheritInfo> children() {
-        return children.iterator();
+    public List<DeployInheritInfo> children() {
+        return children;
     }
     
     /**

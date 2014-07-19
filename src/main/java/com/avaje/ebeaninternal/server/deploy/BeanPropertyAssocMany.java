@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.deploy;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.PersistenceException;
@@ -806,12 +805,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 	private BeanProperty initMapKeyProperty() {
 
 		// search for the property
-
 		BeanDescriptor<?> targetDesc = getTargetDescriptor();
-
-		Iterator<BeanProperty> it = targetDesc.propertiesAll();
-		while (it.hasNext()){
-			BeanProperty  prop = it.next();
+		for (BeanProperty prop : targetDesc.propertiesAll()) {
 			if (mapKey.equalsIgnoreCase(prop.getName())) {
 				return prop;
 			}

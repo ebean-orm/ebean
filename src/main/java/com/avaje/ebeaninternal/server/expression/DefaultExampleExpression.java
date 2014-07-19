@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.expression;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import com.avaje.ebean.ExampleExpression;
 import com.avaje.ebean.LikeType;
@@ -207,10 +206,8 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
     OrmQueryRequest<?> r = (OrmQueryRequest<?>) request;
     BeanDescriptor<?> beanDescriptor = r.getBeanDescriptor();
 
-    Iterator<BeanProperty> propIter = beanDescriptor.propertiesAll();
-
-    while (propIter.hasNext()) {
-      BeanProperty beanProperty = propIter.next();
+    for (BeanProperty beanProperty : beanDescriptor.propertiesAll()) {
+      
       String propName = beanProperty.getName();
       Object value = beanProperty.getValue(entity);
 

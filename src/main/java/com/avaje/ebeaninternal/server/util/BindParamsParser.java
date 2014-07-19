@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.util;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.persistence.PersistenceException;
 
@@ -180,10 +179,8 @@ public class BindParamsParser {
                 	// Chop up Collection parameter into a number 
                 	// of individual parameters and add each one individually
                     Collection<?> collection = (Collection<?>)inValue;
-                    Iterator<?> it = collection.iterator();
                     int c = 0;
-                    while (it.hasNext()) {
-                        Object elVal = (Object) it.next();
+                    for (Object elVal : collection) {
                         if (++c > 1){
                         	orderedList.appendSql(",");
                         }
