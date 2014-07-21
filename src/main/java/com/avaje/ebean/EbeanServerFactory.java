@@ -6,8 +6,6 @@ import com.avaje.ebean.common.BootupEbeanManager;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.util.ClassUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Creates EbeanServer instances.
@@ -26,13 +24,8 @@ import org.slf4j.LoggerFactory;
  * methods on the Ebean singleton such as {@link Ebean#find(Class)} are just a
  * convenient way of using the 'default/primary' EbeanServer.
  * </p>
- * 
- * @author Rob Bygrave
- * 
  */
 public class EbeanServerFactory {
-
-  private static final Logger logger = LoggerFactory.getLogger(EbeanServerFactory.class);
 
   private static BootupEbeanManager serverFactory = createServerFactory();
 
@@ -69,27 +62,10 @@ public class EbeanServerFactory {
 
   private static BootupEbeanManager createServerFactory() {
 
-    // String d___ =
-    // com.avaje.ebean.server.core.DefaultServerFactory.class.getName();
     String dflt = "com.avaje.ebeaninternal.server.core.DefaultServerFactory";
-    String implClassName = GlobalProperties.get("ebean.serverfactory", dflt);
+    String implClassName = System.getProperty("ebean.serverfactory", dflt);
 
-    int delaySecs = GlobalProperties.getInt("ebean.start.delay", 0);
-    if (delaySecs > 0) {
-      try {
-        // perhaps useful to delay the startup to give time to
-        // attach a debugger when running in a server like tomcat.
-        String m = "Ebean sleeping " + delaySecs + " seconds due to ebean.start.delay";
-        logger.info(m);
-        Thread.sleep(delaySecs * 1000);
-
-      } catch (InterruptedException e) {
-        String m = "Interrupting debug.start.delay of " + delaySecs;
-        logger.error(m, e);
-      }
-    }
     try {
-      // use a client side implementation?
       return (BootupEbeanManager) ClassUtil.newInstance(implClassName);
     } catch (Exception ex) {
       throw new RuntimeException(ex);
