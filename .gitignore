@@ -6,6 +6,7 @@
 target/
 logs/
 log/
+/db
 /mydb.db
 
 
