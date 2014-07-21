@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,33 +9,33 @@ import java.util.Set;
  */
 public final class DeployPropertyParserMap extends DeployParser {
 
-    private final Map<String,String> map;
+  private final Map<String, String> map;
 
-    public DeployPropertyParserMap(Map<String,String> map) {
-        this.map = map;
-    }
+  public DeployPropertyParserMap(Map<String, String> map) {
+    this.map = map;
+  }
 
-    /**
-     * Returns null for raw sql queries.
-     */
-    public Set<String> getIncludes() {
-        return null;
-    }
+  /**
+   * Returns null for raw sql queries.
+   */
+  public Set<String> getIncludes() {
+    return Collections.emptySet();
+  }
 
-    public String convertWord() {
-        String r = getDeployWord(word);
-        return r == null ? word : r;
-    }
+  public String convertWord() {
+    String r = getDeployWord(word);
+    return r == null ? word : r;
+  }
 
-    @Override
-    public String getDeployWord(String expression) {
-        
-        String deployExpr = map.get(expression);
-        if (deployExpr == null) {
-            return null;
-        } else {
-            return deployExpr;
-        }
+  @Override
+  public String getDeployWord(String expression) {
+
+    String deployExpr = map.get(expression);
+    if (deployExpr == null) {
+      return null;
+    } else {
+      return deployExpr;
     }
+  }
 
 }

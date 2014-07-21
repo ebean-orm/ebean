@@ -2,7 +2,11 @@ package com.avaje.ebeaninternal.server.query;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.BindParams.OrderedList;
@@ -17,8 +21,6 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
 import com.avaje.ebeaninternal.util.DefaultExpressionRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Compile Query Predicates.
@@ -121,6 +123,8 @@ public class CQueryPredicates {
    * Includes from where and order by clauses.
    */
   private Set<String> predicateIncludes;
+  
+  private Set<String> orderByIncludes;
 
   public CQueryPredicates(Binder binder, OrmQueryRequest<?> request) {
     this.binder = binder;
@@ -316,16 +320,20 @@ public class CQueryPredicates {
    */
   private void parsePropertiesToDbColumns(DeployParser deployParser) {
 
-    dbWhere = deriveWhere(deployParser);
-    dbFilterMany = deriveFilterMany(deployParser);
-    dbHaving = deriveHaving(deployParser);
-
     // order by is dependent on the manyProperty (if there is one)
     logicalOrderBy = deriveOrderByWithMany(request.getManyProperty());
     if (logicalOrderBy != null) {
       dbOrderBy = deployParser.parse(logicalOrderBy);
     }
+    
+    // create a copy of the includes required to support the orderBy
+    orderByIncludes = new HashSet<String>(deployParser.getIncludes());
 
+    dbWhere = deriveWhere(deployParser);
+    dbFilterMany = deriveFilterMany(deployParser);
+    dbHaving = deriveHaving(deployParser);
+
+    // all includes including ones for manyWhere clause
     predicateIncludes = deployParser.getIncludes();
   }
 
@@ -502,6 +510,13 @@ public class CQueryPredicates {
    */
   public Set<String> getPredicateIncludes() {
     return predicateIncludes;
+  }
+
+  /**
+   * Return the orderBy includes.
+   */
+  public Set<String> getOrderByIncludes() {
+    return orderByIncludes;
   }
 
   /**

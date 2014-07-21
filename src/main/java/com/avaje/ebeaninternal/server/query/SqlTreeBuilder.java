@@ -291,6 +291,7 @@ public class SqlTreeBuilder {
 
     // remove ManyWhereJoins from the predicateIncludes
     predicateIncludes.removeAll(manyWhereJoins.getPropertyNames());
+    predicateIncludes.addAll(predicates.getOrderByIncludes());
 
     // look for predicateIncludes that are not in selectIncludes and add
     // them as extra joins to the query
