@@ -415,6 +415,13 @@ public class DefaultBeanLoader {
     if (ebi.isReadOnly()) {
       query.setReadOnly(true);
     }
+    
+    if (SpiQuery.Mode.REFRESH_BEAN.equals(mode)) {
+      // explicitly state to load all properties on REFRESH.
+      // Lobs default to fetch lazy so this forces lobs to be 
+      // included in a 'refresh' query
+      query.select("*");
+    }
 
     Object dbBean = query.findUnique();
     if (dbBean == null) {

@@ -12,6 +12,9 @@ public class EBasicClobNoVer {
 
     private String name;
 
+    /**
+     * Note that lobs default to FetchType.LAZY - see EBasicClobFetchEager.
+     */
     @Lob
     private String description;
 
