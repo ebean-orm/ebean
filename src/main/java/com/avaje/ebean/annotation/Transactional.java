@@ -55,21 +55,6 @@ import com.avaje.ebean.TxType;
  *    Ebean.save(order);
  *  }
  * </pre>
- * 
- * <p>
- * During development and testing you can set a debug level which will log the
- * transaction begin, commit and rollback events so that you can easily confirm
- * it is behaving as you would expect.
- * </p>
- * 
- * <pre class="code">
- *  ## in ebean.properties file
- *  
- *  ## Log transaction begins and ends etc
- *  ## (0=NoLogging 1=minimal ... 9=logAll)
- *  ebean.debug.transaction=3
- * 
- * </pre>
  */
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
