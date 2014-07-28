@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.avaje.ebean.annotation.EnumValue;
+import com.avaje.ebean.annotation.Index;
 
 @Entity
 @Table(name = "e_basic")
@@ -28,6 +29,7 @@ public class EBasic {
 
   Status status;
 
+  @Index
   String name;
 
   String description;
