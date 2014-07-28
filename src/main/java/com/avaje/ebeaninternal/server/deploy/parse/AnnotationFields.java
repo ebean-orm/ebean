@@ -4,21 +4,7 @@ import java.sql.Types;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.PersistenceException;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import javax.persistence.Version;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -29,6 +15,7 @@ import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.IdType;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
@@ -254,9 +241,18 @@ public class AnnotationFields extends AnnotationParser {
 
     Index index = get(prop, Index.class);
     if (index != null) {
+      if(hasRelationshipItem(prop)) {
+        throw new RuntimeException("Can't use Index on foreign key relationships.");
+      }
       prop.setIndexed(true);
       prop.setIndexName(index.value());
     }
+  }
+
+  private boolean hasRelationshipItem(DeployBeanProperty prop) {
+    return get(prop, OneToMany.class) != null ||
+            get(prop, ManyToOne.class) != null ||
+            get(prop, OneToOne.class) != null;
   }
 
   /**
