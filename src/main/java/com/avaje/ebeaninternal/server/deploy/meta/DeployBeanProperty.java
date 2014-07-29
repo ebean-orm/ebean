@@ -217,6 +217,9 @@ public class DeployBeanProperty {
     
     private int sortOrder;
 
+    private boolean indexed;
+    private String indexName;
+
     public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
         this.desc = desc;
         this.propertyType = propertyType;
@@ -930,4 +933,19 @@ public class DeployBeanProperty {
         return desc.getFullName() + "." + name;
     }
 
+    public boolean isIndexed() {
+      return indexed;
+    }
+
+    public void setIndexed(boolean indexed) {
+      this.indexed = indexed;
+    }
+
+    public String getIndexName() {
+      return indexName;
+    }
+
+    public void setIndexName(String indexName) {
+      this.indexName = indexName;
+    }
 }

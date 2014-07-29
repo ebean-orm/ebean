@@ -98,17 +98,17 @@ public class DdlGenerator implements SpiEbeanPlugin {
     }
   }
 
-	protected void writeDrop(String dropFile) {
+  protected void writeDrop(String dropFile) {
 
-		try {
-			String c = generateDropDdl();
-			writeFile(dropFile, c);
+    try {
+      String c = generateDropDdl();
+      writeFile(dropFile, c);
 
-		} catch (IOException e) {
-			String msg = "Error generating Drop DDL";
-			throw new PersistenceException(msg, e);
-		}
-	}
+    } catch (IOException e) {
+      String msg = "Error generating Drop DDL";
+      throw new PersistenceException(msg, e);
+    }
+  }
 
   protected void writeCreate(String createFile) {
 
@@ -148,6 +148,9 @@ public class DdlGenerator implements SpiEbeanPlugin {
 
     AddForeignKeysVisitor fkeys = new AddForeignKeysVisitor(ctx);
     VisitorUtil.visit(server, fkeys);
+
+    CreateIndexVisitor indexes = new CreateIndexVisitor(ctx);
+    VisitorUtil.visit(server, indexes);
 
     ctx.flush();
     createContent = ctx.getContent();
