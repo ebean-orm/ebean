@@ -8,126 +8,121 @@ import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
 
 /**
- * Cachable plan for executing bean updates for a given set of changed
- * properties.
- * 
- * @author rbygrave
+ * Plan for executing bean updates for a given set of changed properties.
  */
 public class UpdatePlan implements SpiUpdatePlan {
 
   /**
-   * Special plan used when there is nothing in the set clause and the update
-   * should in fact be skipped. Occurs when the updated properties have
-   * updatable=false in their deployment.
+   * Special plan used when there is nothing in the set clause and the update should in fact be
+   * skipped. Occurs when the updated properties have updatable=false in their deployment.
    */
   public static final UpdatePlan EMPTY_SET_CLAUSE = new UpdatePlan();
-    
-	private final Integer key;
 
-	private final ConcurrencyMode mode;
+  private final Integer key;
 
-	private final String sql;
+  private final ConcurrencyMode mode;
 
-	private final Bindable set;
+  private final String sql;
 
-	private final long timeCreated;
+  private final Bindable set;
 
-	private final boolean emptySetClause;
-	
-	private Long timeLastUsed;
+  private final long timeCreated;
 
-	/**
-	 * Create a non cachable UpdatePlan.
-	 */
-	public UpdatePlan(ConcurrencyMode mode, String sql, Bindable set) {
+  private final boolean emptySetClause;
 
-		this(null, mode, sql, set);
-	}
+  private Long timeLastUsed;
 
-	/**
-	 * Create a cachable UpdatePlan with a given key.
-	 */
-	public UpdatePlan(Integer key, ConcurrencyMode mode, String sql, Bindable set) {
+  /**
+   * Create a non cached UpdatePlan.
+   */
+  public UpdatePlan(ConcurrencyMode mode, String sql, Bindable set) {
 
-	  this.emptySetClause = (sql == null);
-		this.key = key;
-		this.mode = mode;
-		this.sql = sql;
-		this.set = set;
-		this.timeCreated = System.currentTimeMillis();
-	}
+    this(null, mode, sql, set);
+  }
 
-	/**
-	 * Special constructor for emptySetClause=true instance.
-	 */
-	private UpdatePlan(){
-	    this.emptySetClause = true;
-	    this.key = Integer.valueOf(0);
-	    this.mode = ConcurrencyMode.NONE;
-	    this.sql = null;
-	    this.set = null;
-	    this.timeCreated = 0;
-	}
-	
-	
-	public boolean isEmptySetClause() {
-        return emptySetClause;
-    }
+  /**
+   * Create a UpdatePlan with a given key.
+   */
+  public UpdatePlan(Integer key, ConcurrencyMode mode, String sql, Bindable set) {
 
-    /**
-	 * Run the prepared statement binding for the 'update set' properties.
-	 */
-	public void bindSet(DmlHandler bind, EntityBean bean) throws SQLException {
+    this.emptySetClause = (sql == null);
+    this.key = key;
+    this.mode = mode;
+    this.sql = sql;
+    this.set = set;
+    this.timeCreated = System.currentTimeMillis();
+  }
 
-		set.dmlBind(bind, bean);
+  /**
+   * Special constructor for emptySetClause=true instance.
+   */
+  private UpdatePlan() {
+    this.emptySetClause = true;
+    this.key = Integer.valueOf(0);
+    this.mode = ConcurrencyMode.NONE;
+    this.sql = null;
+    this.set = null;
+    this.timeCreated = 0;
+  }
 
-		// not strictly 'thread safe' but object assignment is atomic
-		Long touched = Long.valueOf(System.currentTimeMillis());
-		this.timeLastUsed = touched;
-	}
+  public boolean isEmptySetClause() {
+    return emptySetClause;
+  }
 
-	/**
-	 * Return the time this plan was created.
-	 */
-	public long getTimeCreated() {
-		return timeCreated;
-	}
+  /**
+   * Run the prepared statement binding for the 'update set' properties.
+   */
+  public void bindSet(DmlHandler bind, EntityBean bean) throws SQLException {
 
-	/**
-	 * Return the time this plan was last used.
-	 */
-	public Long getTimeLastUsed() {
+    set.dmlBind(bind, bean);
 
-		// not thread safe but atomic
-		return timeLastUsed;
-	}
+    // not strictly 'thread safe' but object assignment is atomic
+    Long touched = Long.valueOf(System.currentTimeMillis());
+    this.timeLastUsed = touched;
+  }
 
-	/**
-	 * Return the hash key.
-	 */
-	public Integer getKey() {
-		return key;
-	}
+  /**
+   * Return the time this plan was created.
+   */
+  public long getTimeCreated() {
+    return timeCreated;
+  }
 
-	/**
-	 * Return the concurrency mode for this plan.
-	 */
-	public ConcurrencyMode getMode() {
-		return mode;
-	}
+  /**
+   * Return the time this plan was last used.
+   */
+  public Long getTimeLastUsed() {
 
-	/**
-	 * Return the DML statement.
-	 */
-	public String getSql() {
-		return sql;
-	}
+    // not thread safe but atomic
+    return timeLastUsed;
+  }
 
-	/**
-	 * Return the Bindable properties for the update set.
-	 */
-	public Bindable getSet() {
-		return set;
-	}
+  /**
+   * Return the hash key.
+   */
+  public Integer getKey() {
+    return key;
+  }
+
+  /**
+   * Return the concurrency mode for this plan.
+   */
+  public ConcurrencyMode getMode() {
+    return mode;
+  }
+
+  /**
+   * Return the DML statement.
+   */
+  public String getSql() {
+    return sql;
+  }
+
+  /**
+   * Return the Bindable properties for the update set.
+   */
+  public Bindable getSet() {
+    return set;
+  }
 
 }
