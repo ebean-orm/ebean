@@ -1,4 +1,3 @@
-
 package com.avaje.ebeaninternal.server.query;
 
 import java.util.ArrayList;
@@ -12,6 +11,7 @@ import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.meta.MetaQueryPlanOriginCount;
 import com.avaje.ebean.meta.MetaQueryPlanStatistic;
 import com.avaje.ebeaninternal.server.util.LongAdder;
+import com.avaje.ebeaninternal.server.util.LongMaxUpdater;
 
 /**
  * Statistics for a specific query plan that can accumulate. 
@@ -26,7 +26,7 @@ public final class CQueryPlanStats {
 
   private final LongAdder totalBeans = new LongAdder();
 
-  private final AtomicLong maxTime = new AtomicLong();
+  private final LongMaxUpdater maxTime = new LongMaxUpdater();
 
   private final AtomicLong startTime = new AtomicLong(System.currentTimeMillis());
 
@@ -34,19 +34,25 @@ public final class CQueryPlanStats {
 
   private final ConcurrentHashMap<ObjectGraphNode, LongAdder> origins;
 
+  /**
+   * Construct for a given query plan.
+   */
 	public CQueryPlanStats(CQueryPlan queryPlan, boolean collectQueryOrigins) {
+	  
 	  this.queryPlan = queryPlan;
 	  this.origins = !collectQueryOrigins ? null : new ConcurrentHashMap<ObjectGraphNode, LongAdder>();
 	}
 
+	/**
+	 * Add a query execution to the statistics.
+	 */
 	public void add(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
+	  
 		count.increment();
 		totalBeans.add(loadedBeanCount);
 		totalTime.add(timeMicros);
-		if (timeMicros > maxTime.get()) {
-		  // effectively a high water mark
-		  maxTime.set(timeMicros);
-		}
+		maxTime.update(timeMicros);
+
 		// not safe but should be atomic
     lastQueryTime = System.currentTimeMillis();
     
@@ -64,12 +70,16 @@ public final class CQueryPlanStats {
     }
 	}
 	
+	/**
+	 * Reset the internal statistics counters.
+	 */
 	public void reset() {
+	  
 	  // Racey but near enough for our purposes as we don't want locks
 	  count.reset();
 	  totalBeans.reset();
 	  totalTime.reset();
-	  maxTime.set(0);
+	  maxTime.reset();
 	  startTime.set(System.currentTimeMillis());
 	  
 	  if (origins != null) {
@@ -77,13 +87,18 @@ public final class CQueryPlanStats {
         counter.reset();
       }
 	  }
-	  
 	}
 	
+	/**
+	 * Return the last time this query was executed.
+	 */
 	public long getLastQueryTime() {
 		return lastQueryTime;
 	}
 	
+	/**
+	 * Return a Snapshot of the query execution statistics potentially resetting the internal counters.
+	 */
 	public Snapshot getSnapshot(boolean reset) {
 	  
 	  List<MetaQueryPlanOriginCount> origins = getOrigins(reset);
@@ -91,9 +106,9 @@ public final class CQueryPlanStats {
 	  // not guaranteed to be consistent due to time gaps between getting each value out of LongAdders but can live with that
 	  // relative to the cost of making sure count and totalTime etc are all guaranteed to be consistent
 	  if (reset) {
-	    return new Snapshot(queryPlan, count.sumThenReset(), totalTime.sumThenReset(), totalBeans.sumThenReset(), maxTime.getAndSet(0), startTime.getAndSet(System.currentTimeMillis()), lastQueryTime, origins);
+	    return new Snapshot(queryPlan, count.sumThenReset(), totalTime.sumThenReset(), totalBeans.sumThenReset(), maxTime.maxThenReset(), startTime.getAndSet(System.currentTimeMillis()), lastQueryTime, origins);
 	  }
-    return new Snapshot(queryPlan, count.sum(), totalTime.sum(), totalBeans.sum(), maxTime.get(), startTime.get(), lastQueryTime, origins);
+    return new Snapshot(queryPlan, count.sum(), totalTime.sum(), totalBeans.sum(), maxTime.max(), startTime.get(), lastQueryTime, origins);
 	}
 	
 	/**
