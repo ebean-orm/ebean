@@ -78,7 +78,7 @@ public class BeanProperty implements ElPropertyValue {
      * Flag set if this maps to the inheritance discriminator column
      */
     final boolean discriminator;
-    
+
     /**
      * Flag to mark the property as embedded. This could be on
      * BeanPropertyAssocOne rather than here. Put it here for checking Id type
@@ -92,7 +92,7 @@ public class BeanProperty implements ElPropertyValue {
     final boolean version;
 
     final boolean naturalKey;
-    
+
     /**
      * Set if this property is nullable.
      */
@@ -136,7 +136,7 @@ public class BeanProperty implements ElPropertyValue {
      * True if the property is a Clob, Blob LongVarchar or LongVarbinary.
      */
     final boolean lob;
-    
+
     final boolean fetchEager;
 
     final boolean isTransient;
@@ -147,7 +147,7 @@ public class BeanProperty implements ElPropertyValue {
     final String name;
 
     final int propertyIndex;
-    
+
     /**
      * The reflected field.
      */
@@ -262,6 +262,10 @@ public class BeanProperty implements ElPropertyValue {
 
     final boolean jsonDeserialize;
 
+    final boolean indexed;
+
+    final String indexName;
+
     public BeanProperty(DeployBeanProperty deploy) {
         this(null, null, deploy);
     }
@@ -271,7 +275,10 @@ public class BeanProperty implements ElPropertyValue {
         this.descriptor = descriptor;
         this.name = InternString.intern(deploy.getName());
         this.propertyIndex = deploy.getPropertyIndex();
-        
+
+        this.indexed = deploy.isIndexed();
+        this.indexName = deploy.getIndexName();
+
         this.unidirectionalShadow = deploy.isUndirectionalShadow();
         this.discriminator = deploy.isDiscriminator();
         this.localEncrypted = deploy.isLocalEncrypted();
@@ -326,7 +333,7 @@ public class BeanProperty implements ElPropertyValue {
         this.lob = isLobType(dbType);
         this.propertyType = deploy.getPropertyType();
         this.field = deploy.getField();
-        
+
         EntityType et = descriptor == null ? null : descriptor.getEntityType();
         this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), false, null);
         this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), dbEncrypted, dbColumn);
@@ -361,6 +368,9 @@ public class BeanProperty implements ElPropertyValue {
         this.descriptor = source.descriptor;
         this.name = InternString.intern(source.getName());
         this.propertyIndex = source.propertyIndex;
+
+        this.indexed = source.isIndexed();
+        this.indexName = source.getIndexName();
 
         this.dbColumn = InternString.intern(override.getDbColumn());
         this.sqlFormulaJoin = InternString.intern(override.getSqlFormulaJoin());
@@ -410,7 +420,7 @@ public class BeanProperty implements ElPropertyValue {
         this.lob = isLobType(dbType);
         this.propertyType = source.getPropertyType();
         this.field = source.getField();
-        
+
         this.elPlaceHolder = override.replace(source.elPlaceHolder, source.dbColumn);
         this.elPlaceHolderEncrypted = override.replace(source.elPlaceHolderEncrypted, source.dbColumn);
 
@@ -446,7 +456,7 @@ public class BeanProperty implements ElPropertyValue {
     }
 
     public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain,
-            boolean propertyDeploy) {
+                                                boolean propertyDeploy) {
         throw new PersistenceException("Not valid on scalar bean property " + getFullBeanName());
     }
 
@@ -475,17 +485,17 @@ public class BeanProperty implements ElPropertyValue {
      * Return true if this property maps to the inheritance discriminator column.
      */
     public boolean isDiscriminator() {
-      return discriminator;
+        return discriminator;
     }
-    
+
     /**
      * Return true if the underlying type is mutable.
      */
     public boolean isMutableScalarType() {
-      if (scalarType == null) {
-        return false;
-      }
-      return scalarType.isMutable();
+        if (scalarType == null) {
+            return false;
+        }
+        return scalarType.isMutable();
     }
 
     public void copyProperty(EntityBean sourceBean, EntityBean destBean) {
@@ -725,14 +735,14 @@ public class BeanProperty implements ElPropertyValue {
 
     private static Object[] NO_ARGS = new Object[0];
 
-    public Object getCacheDataValue(EntityBean bean){
-    	return getValue(bean);
+    public Object getCacheDataValue(EntityBean bean) {
+        return getValue(bean);
     }
-    
-    public void setCacheDataValue(EntityBean bean, Object cacheData){
-    	setValue(bean, cacheData);
+
+    public void setCacheDataValue(EntityBean bean, Object cacheData) {
+        setValue(bean, cacheData);
     }
-    
+
     /**
      * Return the value of the property method.
      */
@@ -745,12 +755,12 @@ public class BeanProperty implements ElPropertyValue {
             throw new RuntimeException(msg, ex);
         }
     }
-    
+
     /**
      * Explicitly use reflection to get value.
      */
     public Object getValueViaReflection(Object bean) {
-    	try {
+        try {
             return readMethod.invoke(bean, NO_ARGS);
         } catch (Exception ex) {
             String beanType = bean == null ? "null" : bean.getClass().getName();
@@ -805,7 +815,7 @@ public class BeanProperty implements ElPropertyValue {
      * Return the position of this property in the enhanced bean.
      */
     public int getPropertyIndex() {
-      return propertyIndex;
+        return propertyIndex;
     }
 
     public String getElName() {
@@ -819,10 +829,10 @@ public class BeanProperty implements ElPropertyValue {
         return false;
     }
 
-    
+
     @Override
     public boolean containsFormulaWithJoin() {
-      return formula && sqlFormulaJoin != null;
+        return formula && sqlFormulaJoin != null;
     }
 
     public boolean containsManySince(String sinceProperty) {
@@ -880,12 +890,12 @@ public class BeanProperty implements ElPropertyValue {
 
     /**
      * Return true if the mutable value is considered dirty.
-     * This is only used for 'mutable' scalar types like hstore etc. 
+     * This is only used for 'mutable' scalar types like hstore etc.
      */
     public boolean isDirtyValue(Object value) {
-      return scalarType.isDirty(value);
+        return scalarType.isDirty(value);
     }
-    
+
     /**
      * Return the scalarType.
      */
@@ -904,12 +914,12 @@ public class BeanProperty implements ElPropertyValue {
     public boolean isDateTimeCapable() {
         return scalarType != null && scalarType.isDateTimeCapable();
     }
-    
+
     public int getJdbcType() {
-	    return scalarType == null ? 0 : scalarType.getJdbcType();
+        return scalarType == null ? 0 : scalarType.getJdbcType();
     }
 
-	public Object parseDateTime(long systemTimeMillis) {
+    public Object parseDateTime(long systemTimeMillis) {
         return scalarType.parseDateTime(systemTimeMillis);
     }
 
@@ -972,10 +982,10 @@ public class BeanProperty implements ElPropertyValue {
      * Return true if this is the natural key property.
      */
     public boolean isNaturalKey() {
-    	return naturalKey;
+        return naturalKey;
     }
 
-	/**
+    /**
      * Return true if this property is mandatory.
      */
     public boolean isNullable() {
@@ -1008,9 +1018,9 @@ public class BeanProperty implements ElPropertyValue {
      * Return true if this property is loadable from a resultSet.
      */
     public boolean isLoadProperty() {
-      return !isTransient || formula;
+        return !isTransient || formula;
     }
-    
+
     /**
      * Return true if this is a version column used for concurrency checking.
      */
@@ -1051,10 +1061,10 @@ public class BeanProperty implements ElPropertyValue {
      * Lob's usually default to fetch lazy.
      */
     public boolean isFetchEager() {
-    	return fetchEager;
+        return fetchEager;
     }
 
-	/**
+    /**
      * Return true if this is mapped to a Clob Blob LongVarchar or
      * LongVarbinary.
      */
@@ -1064,17 +1074,17 @@ public class BeanProperty implements ElPropertyValue {
 
     private boolean isLobType(int type) {
         switch (type) {
-        case Types.CLOB:
-            return true;
-        case Types.BLOB:
-            return true;
-        case Types.LONGVARBINARY:
-            return true;
-        case Types.LONGVARCHAR:
-            return true;
+            case Types.CLOB:
+                return true;
+            case Types.BLOB:
+                return true;
+            case Types.LONGVARBINARY:
+                return true;
+            case Types.LONGVARCHAR:
+                return true;
 
-        default:
-            return false;
+            default:
+                return false;
         }
     }
 
@@ -1175,7 +1185,7 @@ public class BeanProperty implements ElPropertyValue {
 
     @SuppressWarnings("unchecked")
     public void jsonWrite(WriteJsonContext ctx, EntityBean bean) {
-        if(!jsonSerialize){
+        if (!jsonSerialize) {
             return;
         }
         Object value = getValueIntercept(bean);
@@ -1187,15 +1197,15 @@ public class BeanProperty implements ElPropertyValue {
     }
 
     public void jsonRead(ReadJsonContext ctx, EntityBean bean) {
-        if(!jsonDeserialize){
+        if (!jsonDeserialize) {
             return;
         }
-    	String jsonValue;
-    	try {
-        	jsonValue = ctx.readScalarValue();
-    	} catch (TextException e){
-    		throw new TextException("Error reading property "+getFullBeanName(), e);
-    	}
+        String jsonValue;
+        try {
+            jsonValue = ctx.readScalarValue();
+        } catch (TextException e) {
+            throw new TextException("Error reading property " + getFullBeanName(), e);
+        }
         Object objValue;
         if (jsonValue == null) {
             objValue = null;
@@ -1203,5 +1213,13 @@ public class BeanProperty implements ElPropertyValue {
             objValue = scalarType.jsonFromString(jsonValue, ctx.getValueAdapter());
         }
         setValue(bean, objValue);
+    }
+
+    public boolean isIndexed() {
+        return indexed;
+    }
+
+    public String getIndexName() {
+        return indexName;
     }
 }

@@ -4,36 +4,18 @@ import java.sql.Types;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.PersistenceException;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import javax.persistence.Version;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.annotation.EmbeddedColumns;
-import com.avaje.ebean.annotation.Encrypted;
-import com.avaje.ebean.annotation.Expose;
-import com.avaje.ebean.annotation.Formula;
-import com.avaje.ebean.annotation.UpdatedTimestamp;
+import com.avaje.ebean.annotation.*;
 import com.avaje.ebean.config.EncryptDeploy;
 import com.avaje.ebean.config.EncryptDeploy.Mode;
 import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.IdType;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
@@ -65,7 +47,7 @@ public class AnnotationFields extends AnnotationParser {
 
     if (GlobalProperties.getBoolean("ebean.lobEagerFetch", false)) {
       defaultLobFetchType = FetchType.EAGER;
-    }    
+    }
   }
 
   /**
@@ -104,7 +86,7 @@ public class AnnotationFields extends AnnotationParser {
       if (prop.isId() && !prop.isEmbedded()) {
         prop.setEmbedded(true);
       }
-      readEmbeddedAttributeOverrides((DeployBeanPropertyAssocOne<?>)prop);
+      readEmbeddedAttributeOverrides((DeployBeanPropertyAssocOne<?>) prop);
     }
   }
 
@@ -149,7 +131,7 @@ public class AnnotationFields extends AnnotationParser {
     if (id != null) {
       readId(id, prop);
     }
-    
+
     // determine the JDBC type using Lob/Temporal
     // otherwise based on the property Class
     Lob lob = get(prop, Lob.class);
@@ -199,9 +181,9 @@ public class AnnotationFields extends AnnotationParser {
       if (notNull != null && isNotNullOnAllValidationGroups(notNull.groups())) {
         // Not null on all validation groups so enable
         // DDL generation of Not Null Constraint
-        prop.setNullable(false);  
+        prop.setNullable(false);
       }
-  
+
       Size size = get(prop, Size.class);
       if (size != null) {
         if (size.max() < Integer.MAX_VALUE) {
@@ -229,7 +211,7 @@ public class AnnotationFields extends AnnotationParser {
 
       } else {
         throw new RuntimeException("Can't use EmbeddedColumns on ScalarType "
-            + prop.getFullBeanName());
+                + prop.getFullBeanName());
       }
     }
 
@@ -246,7 +228,7 @@ public class AnnotationFields extends AnnotationParser {
     if (!prop.isTransient()) {
 
       EncryptDeploy encryptDeploy = util.getEncryptDeploy(info.getDescriptor().getBaseTableFull(),
-          prop.getDbColumn());
+              prop.getDbColumn());
       if (encryptDeploy == null || encryptDeploy.getMode().equals(Mode.MODE_ANNOTATION)) {
         Encrypted encrypted = get(prop, Encrypted.class);
         if (encrypted != null) {
@@ -257,6 +239,20 @@ public class AnnotationFields extends AnnotationParser {
       }
     }
 
+    Index index = get(prop, Index.class);
+    if (index != null) {
+      if(hasRelationshipItem(prop)) {
+        throw new RuntimeException("Can't use Index on foreign key relationships.");
+      }
+      prop.setIndexed(true);
+      prop.setIndexName(index.value());
+    }
+  }
+
+  private boolean hasRelationshipItem(DeployBeanProperty prop) {
+    return get(prop, OneToMany.class) != null ||
+            get(prop, ManyToOne.class) != null ||
+            get(prop, OneToOne.class) != null;
   }
 
   /**
@@ -313,7 +309,7 @@ public class AnnotationFields extends AnnotationParser {
     }
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private ScalarTypeEncryptedWrapper<?> createScalarType(DeployBeanProperty prop, ScalarType<?> st) {
 
     // Use Java Encryptor wrapping the logical scalar type
