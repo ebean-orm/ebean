@@ -48,6 +48,12 @@
       <artifactId>persistence-api</artifactId>
       <version>1.0</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.7</version>
+    </dependency>
     
     <dependency>
       <groupId>javax.transaction</groupId>
@@ -74,13 +80,6 @@
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
       <version>1.6</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.2</version>
       <scope>provided</scope>
     </dependency>
 
