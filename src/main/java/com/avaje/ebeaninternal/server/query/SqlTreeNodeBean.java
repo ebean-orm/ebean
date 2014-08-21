@@ -310,7 +310,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       }
 
     }
-    if (parentBean != null && contextBean != null) {
+    if (parentBean != null) {
       // set this back to the parentBean
       nodeBeanProp.setValue(parentBean, contextBean);
     }
