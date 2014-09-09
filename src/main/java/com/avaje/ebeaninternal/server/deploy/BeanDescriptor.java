@@ -1210,8 +1210,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       convertSetId(id, eb);
 
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
-      ebi.setBeanLoaderByServerName(ebeanServer.getName());
-
+      ebi.setBeanLoader(ebeanServer);
 
       // Note: not creating proxies for many's...
       ebi.setReference(idPropertyIndex);

@@ -429,17 +429,20 @@ public final class BeanDescriptorCacheHelp<T> {
 
     EntityBean bean = desc.createEntityBean();
     desc.convertSetId(id, bean);
+    EntityBeanIntercept ebi = bean._ebean_getIntercept();
+    ebi.setBeanLoader(desc.getEbeanServer());
+    
     if (Boolean.TRUE.equals(readOnly)) {
-      bean._ebean_getIntercept().setReadOnly(true);
+      ebi.setReadOnly(true);
     }
 
     beanLoadData(bean, data);
+    
     if (beanLog.isTraceEnabled()) {
       beanLog.trace("   GET {}({}) - hit", cacheName, id);
     }
     return (T) bean;
   }
-
 
   /**
    * Remove a bean from the cache given its Id.

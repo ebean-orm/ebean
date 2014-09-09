@@ -57,7 +57,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
       currentBuffer = createBuffer(secondaryBatchSize);      
     }
     // set the persistenceContext on the bean first 
-    ebi.setBeanLoader(0, currentBuffer, getPersistenceContext());
+    ebi.setBeanLoader(currentBuffer, getPersistenceContext());
     currentBuffer.add(ebi);
   }
   

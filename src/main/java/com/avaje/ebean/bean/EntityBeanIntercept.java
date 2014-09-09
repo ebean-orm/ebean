@@ -39,8 +39,6 @@ public final class EntityBeanIntercept implements Serializable {
   private transient PersistenceContext persistenceContext;
 
   private transient BeanLoader beanLoader;
-  
-  private int beanLoaderIndex;
 
   private String ebeanServerName;
 
@@ -200,34 +198,22 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Return the index position for batch loading via BeanLoader.
+   * Set the BeanLoader with PersistenceContext.
    */
-  public int getBeanLoaderIndex() {
-    return beanLoaderIndex;
-  }
-
-  /**
-   * Set Lazy Loading by ebeanServerName.
-   * <p>
-   * This is for reference beans created by themselves.
-   * </p>
-   */
-  public void setBeanLoaderByServerName(String ebeanServerName) {
-    this.beanLoaderIndex = 0;
-    this.beanLoader = null;
-    this.ebeanServerName = ebeanServerName;
-  }
-
-  /**
-   * Set the BeanLoader for general lazy loading.
-   */
-  public void setBeanLoader(int index, BeanLoader beanLoader, PersistenceContext ctx) {
-    this.beanLoaderIndex = index;
+  public void setBeanLoader(BeanLoader beanLoader, PersistenceContext ctx) {
     this.beanLoader = beanLoader;
     this.persistenceContext = ctx;
     this.ebeanServerName = beanLoader.getName();
   }
-  
+
+  /**
+   * Set the BeanLoader.
+   */
+  public void setBeanLoader(BeanLoader beanLoader) {
+    this.beanLoader = beanLoader;
+    this.ebeanServerName = beanLoader.getName();
+  }
+
   public boolean isFullyLoadedBean() {
     return fullyLoadedBean;
   }
