@@ -53,7 +53,8 @@ class LikeExpression extends AbstractExpression {
     if (type.equals(LikeType.EQUAL_TO)) {
       request.append(" = ? ");
     } else {
-      request.append(" like ? ");
+      // append db platform like clause
+      request.appendLike();
     }
   }
 

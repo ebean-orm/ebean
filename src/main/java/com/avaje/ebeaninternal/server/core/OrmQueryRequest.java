@@ -71,6 +71,15 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     this.readOnly = query.isReadOnly();
   }
 
+  
+  /**
+   * Return the database platform like clause.
+   */
+  @Override
+  public String getDBLikeClause() {
+    return ebeanServer.getDatabasePlatform().getLikeClause();
+  }
+
   public void executeSecondaryQueries(int defaultQueryBatch) {
     loadContext.executeSecondaryQueries(this, defaultQueryBatch);
   }

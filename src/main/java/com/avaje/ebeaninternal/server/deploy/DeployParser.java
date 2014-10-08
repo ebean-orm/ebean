@@ -71,6 +71,9 @@ public abstract class DeployParser {
 			sb.append(deployWord);
 			if (pos < sourceLength) {
 				sb.append(wordTerminator);
+				if (wordTerminator == SINGLE_QUOTE) {
+				  readLiteral();
+				}
 			}
 		}
 

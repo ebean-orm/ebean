@@ -95,4 +95,9 @@ public interface SpiOrmQueryRequest<T> {
      */
     public BeanCollection<T> getFromQueryCache();
 
+    /**
+     * Return the Database platform like clause.
+     */
+    public String getDBLikeClause();
+
 }

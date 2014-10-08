@@ -20,6 +20,7 @@ public class MySqlPlatform extends DatabasePlatform {
   public MySqlPlatform() {
     super();
     this.name = "mysql";
+    this.likeClause = "like ? escape''";
     this.selectCountWithAlias = true;
     this.dbEncrypt = new MySqlDbEncrypt();
 

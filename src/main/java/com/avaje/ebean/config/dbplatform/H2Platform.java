@@ -14,6 +14,7 @@ public class H2Platform extends DatabasePlatform {
     super();
     this.name = "h2";
     this.dbEncrypt = new H2DbEncrypt();
+    this.likeClause = "like ? escape''";
 
     // only support getGeneratedKeys with non-batch JDBC
     // so generally use SEQUENCE instead of IDENTITY for H2

@@ -40,6 +40,16 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
   }
 
   /**
+   * Append the database platform like clause.
+   */
+  @Override
+  public void appendLike() {
+    sb.append(" ");
+    sb.append(queryRequest.getDBLikeClause());
+    sb.append(" ");
+  }
+
+  /**
    * Increments the parameter index and returns that value.
    */
   public int nextParameter() {

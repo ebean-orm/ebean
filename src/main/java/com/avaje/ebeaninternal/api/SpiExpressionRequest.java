@@ -44,9 +44,14 @@ public interface SpiExpressionRequest {
 	 * Return the ordered list of bind values for all expressions in this request.
 	 */
 	public ArrayList<Object> getBindValues();
-	
-    /**
-     * Increments the parameter index and returns that value.
-     */
-    public int nextParameter();
+
+  /**
+   * Increments the parameter index and returns that value.
+   */
+  public int nextParameter();
+
+  /**
+   * Append a DB Like clause.
+   */
+  public void appendLike();
 }

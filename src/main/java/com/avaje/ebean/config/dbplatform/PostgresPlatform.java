@@ -23,6 +23,7 @@ public class PostgresPlatform extends DatabasePlatform {
   public PostgresPlatform() {
     super();
     this.name = "postgres";
+    this.likeClause = "like ? escape''";
     
     this.dbDdlSyntax = new PostgresDdlSyntax();
     

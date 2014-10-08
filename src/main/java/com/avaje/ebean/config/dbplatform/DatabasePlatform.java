@@ -6,6 +6,7 @@ import javax.sql.DataSource;
 
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.Query;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,40 +15,61 @@ import org.slf4j.LoggerFactory;
  */
 public class DatabasePlatform {
 
-  /** The Constant logger. */
   private static final Logger logger = LoggerFactory.getLogger(DatabasePlatform.class);
 
-  /** The open quote used by quoted identifiers. */
+  /** 
+   * The open quote used by quoted identifiers. 
+   */
   protected String openQuote = "\"";
 
-  /** The close quote used by quoted identifiers. */
+  /**
+   *  The close quote used by quoted identifiers. 
+   */
   protected String closeQuote = "\"";
 
-  /** For limit/offset, row_number etc limiting of SQL queries. */
+  /** 
+   * For limit/offset, row_number etc limiting of SQL queries. 
+   */
   protected SqlLimiter sqlLimiter = new LimitOffsetSqlLimiter();
 
-  /** Mapping of JDBC to Database types. */
+  /** 
+   * Mapping of JDBC to Database types. 
+   */
   protected DbTypeMap dbTypeMap = new DbTypeMap();
 
-  /** DB specific DDL syntax. */
+  /** 
+   * DB specific DDL syntax. 
+   */
   protected DbDdlSyntax dbDdlSyntax = new DbDdlSyntax();
 
-  /** Defines DB identity/sequence features. */
+  /** 
+   * Defines DB identity/sequence features. 
+   */
   protected DbIdentity dbIdentity = new DbIdentity();
 
-  /** The JDBC type to map booleans to (by default). */
+  /** 
+   * The JDBC type to map booleans to (by default). 
+   */
   protected int booleanDbType = Types.BOOLEAN;
 
-  /** The JDBC type to map Blob to. */
+  /** 
+   * The JDBC type to map Blob to. 
+   */
   protected int blobDbType = Types.BLOB;
 
-  /** The JDBC type to map Clob to. */
+  /** 
+   * The JDBC type to map Clob to. 
+   */
   protected int clobDbType = Types.CLOB;
 
-  /** For Oracle treat empty strings as null. */
+  /** 
+   * For Oracle treat empty strings as null. 
+   */
   protected boolean treatEmptyStringsAsNull;
 
-  /** The name. */
+  /** 
+   * The database platform name. 
+   */
   protected String name = "generic";
 
   /**
@@ -57,6 +79,11 @@ public class DatabasePlatform {
    */
   private static final char BACK_TICK = '`';
 
+  /**
+   * The like clause. Can be overridden to disable default escape character.
+   */
+  protected String likeClause = "like ?";
+  
   protected DbEncrypt dbEncrypt;
 
   protected boolean idInExpandedForm;
@@ -298,5 +325,14 @@ public class DatabasePlatform {
     logger.info("it seems your database does not support the 'for update' clause");
 
     return sql;
+  }
+
+  /**
+   * Returns the like clause used by this database platform.
+   * <p>
+   * This may include an escape clause to disable a default escape character.
+   */
+  public String getLikeClause() {
+    return likeClause;
   }
 }

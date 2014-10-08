@@ -16,8 +16,6 @@ public class TestExprNestedDisjunction extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    // java.sql.Date dateAfter = java.sql.Date.valueOf("2010-01-01");
-
     java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
 
     Query<Customer> q = Ebean.find(Customer.class).where().disjunction()
@@ -28,8 +26,8 @@ public class TestExprNestedDisjunction extends BaseTestCase {
     q.findList();
     String s = q.getGeneratedSql();
 
-    Assert.assertTrue(s
-        .contains("(t0.name like ?  and t0.anniversary = ? )  or (t0.status = ?  and t0.id > ? )"));
+    Assert.assertTrue(s.contains("(t0.name like ? "));
+    Assert.assertTrue(s.contains(" and t0.anniversary = ? )  or (t0.status = ?  and t0.id > ? )"));
   }
 
 }
