@@ -10,7 +10,7 @@
   <groupId>org.avaje.ebeanorm</groupId>
   <artifactId>avaje-ebeanorm-spring</artifactId>
   <name>avaje-ebeanorm-spring</name>
-  <version>3.3.2-SNAPSHOT</version>
+  <version>4.1.9-SNAPSHOT</version>
   <packaging>jar</packaging>
   <description>Support for Spring transactions and IOC setup of Ebean server config</description>
 
@@ -158,6 +158,15 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
       </plugin>
     </plugins>
     <pluginManagement>
