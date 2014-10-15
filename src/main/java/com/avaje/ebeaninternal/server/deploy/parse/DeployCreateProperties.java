@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import javax.persistence.ManyToOne;
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
 
@@ -273,6 +274,17 @@ public class DeployCreateProperties {
   private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field) {
 
     Class<?> propertyType = field.getType();
+    
+    ManyToOne manyToOne = field.getAnnotation(ManyToOne.class);
+    
+    if (manyToOne != null){
+    	Class<?> tt = manyToOne.targetEntity();
+    	
+    	if (tt != null && !tt.equals(void.class)){
+    		propertyType = tt;
+    		logger.debug("target type" + tt);
+    	}
+    }
     Class<?> innerType = propertyType;
 
     String specialTypeKey = getSpecialScalarType(field);
