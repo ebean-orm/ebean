@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Premain-Class: com.avaje.ebean.enhance.agent.Transformer
+Bundle-ManifestVersion: 2
+Bundle-Name: Ebean-ORM-SPRING
+Bundle-SymbolicName: com.avaje.ebean.springsupport
+Bundle-Version: 4.1.9
+Bundle-ClassPath: .
+Bundle-Vendor: avaje
+Export-Package:  com.avaje.ebean.springsupport.factory,
+ com.avaje.ebean.springsupport.txn
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Require-Bundle: com.avaje.ebean;bundle-version="4.1.9",
+ org.springframework.beans;bundle-version="3.1.0",
+ org.springframework.context;bundle-version="3.1.0",
+ org.slf4j.api;bundle-version="1.7.2"
+Import-Package: javax.persistence;version="2.0.0"
+
+
