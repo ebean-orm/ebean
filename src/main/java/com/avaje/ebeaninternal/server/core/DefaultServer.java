@@ -287,10 +287,11 @@ public final class DefaultServer implements SpiEbeanServer {
       } 
     }
     
-    if (ddlGenerator == null){
-    	ddlGenerator = new DdlGenerator();
-    	 spiPlugins.add(ddlGenerator);
-    	 ddlGenerator.setup(this, this.getDatabasePlatform(), config.getServerConfig());
+    if (ddlGenerator == null) {
+      // ServiceLoader not finding ddlGenerator (typically OSGi) 
+      ddlGenerator = new DdlGenerator();
+      spiPlugins.add(ddlGenerator);
+      ddlGenerator.setup(this, this.getDatabasePlatform(), config.getServerConfig());
     }
 
     ebeanPlugins = Collections.unmodifiableList(spiPlugins);
