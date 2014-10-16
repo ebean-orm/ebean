@@ -90,6 +90,13 @@ public class ClassPathSearch {
         }
       }
       
+      if (rawClassPaths.length == 1) {
+        // look to add an 'outer' jar when it contains a manifest classpath
+        if (!classPath.contains(rawClassPaths[0])) {
+          classPath.add(rawClassPaths[0]);
+        }
+      }
+      
       if (logger.isDebugEnabled()) {
         for (Object entry : classPath) {
           logger.debug("Classpath Entry: {}",entry);
