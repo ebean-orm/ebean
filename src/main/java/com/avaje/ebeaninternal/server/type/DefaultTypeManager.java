@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.type;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
 import java.sql.Date;
@@ -103,6 +104,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final ScalarType<?> timestampType = new ScalarTypeTimestamp();
 
+  private final ScalarType<?> inetAddressType = new ScalarTypeInetAddress();
   private final ScalarType<?> urlType = new ScalarTypeURL();
   private final ScalarType<?> uriType = new ScalarTypeURI();
   private final ScalarType<?> localeType = new ScalarTypeLocale();
@@ -650,6 +652,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     ScalarType<?> uuidType = (binaryUUID) ? new ScalarTypeUUIDBinary() : new ScalarTypeUUIDVarchar();
     typeMap.put(UUID.class, uuidType);
 
+    typeMap.put(InetAddress.class, inetAddressType);
     typeMap.put(Locale.class, localeType);
     typeMap.put(Currency.class, currencyType);
     typeMap.put(TimeZone.class, timeZoneType);
