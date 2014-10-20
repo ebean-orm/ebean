@@ -14,6 +14,11 @@ public class ScalarTypeInetAddress extends ScalarTypeBaseVarchar<InetAddress> {
   }
 
   @Override
+  public int getLength() {
+    return 50;
+  }
+
+  @Override
   public InetAddress convertFromDbString(String dbValue) {
     try {
       return parse(dbValue);
