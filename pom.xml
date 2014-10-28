@@ -93,7 +93,7 @@
     <dependency>
       <groupId>org.avaje.ebeanorm</groupId>
       <artifactId>avaje-ebeanorm-agent</artifactId>
-      <version>4.1.6</version>
+      <version>4.1.9</version>
       <scope>test</scope>
     </dependency>
         
@@ -185,7 +185,7 @@
       <plugin>
         <groupId>org.avaje.ebeanorm</groupId>
         <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
-        <version>4.1.6</version>
+        <version>4.1.9</version>
         <executions>
           <!--   Not going to enhance Model bean -->
           <execution>
@@ -220,6 +220,7 @@
  	 <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+        <version>2.5</version>
         <configuration>
           <archive>
             <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
