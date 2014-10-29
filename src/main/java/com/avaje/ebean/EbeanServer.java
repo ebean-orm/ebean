@@ -433,7 +433,7 @@ public interface EbeanServer {
    * @param id
    *          the id value
    */
-  public <T> T getReference(Class<T> beanType, Object uid);
+  public <T> T getReference(Class<T> beanType, Object id);
 
   /**
    * Return the number of 'top level' or 'root' entities this query should
@@ -489,7 +489,7 @@ public interface EbeanServer {
    * 
    * @param query
    *          the query to execute the row count on
-   * @param t
+   * @param transaction
    *          the transaction (can be null).
    * @return a Future object for the row count query
    */
@@ -505,7 +505,7 @@ public interface EbeanServer {
    * 
    * @param query
    *          the query to execute the fetch Id's on
-   * @param t
+   * @param transaction
    *          the transaction (can be null).
    * @return a Future object for the list of Id's
    */
@@ -521,7 +521,7 @@ public interface EbeanServer {
    * 
    * @param query
    *          the query to execute in the background
-   * @param t
+   * @param transaction
    *          the transaction (can be null).
    * @return a Future object for the list result of the query
    * @deprecated
@@ -538,13 +538,13 @@ public interface EbeanServer {
    * 
    * @param query
    *          the query to execute in the background
-   * @param t
+   * @param transaction
    *          the transaction (can be null).
    * @return a Future object for the list result of the query
    * @deprecated 
    */
   public SqlFutureList findFutureList(SqlQuery query, Transaction transaction);
-
+  
   /**
    * Find using a PagingList with explicit transaction and pageSize.
    * Deprecated in favour of findPagedList().
