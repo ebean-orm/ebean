@@ -18,8 +18,7 @@ public class InfoCustomer extends Model {
   String name;
 
   @OneToOne(cascade = CascadeType.ALL)
-  //@JoinColumn(name = "id_info_company")
-  InfoCompany infos = new InfoCompany();
+  InfoCompany company;
 
   public Long getId() {
     return id;
@@ -45,11 +44,11 @@ public class InfoCustomer extends Model {
     this.name = name;
   }
 
-  public InfoCompany getInfos() {
-    return infos;
+  public InfoCompany getCompany() {
+    return company;
   }
 
-  public void setInfos(InfoCompany infos) {
-    this.infos = infos;
+  public void setCompany(InfoCompany company) {
+    this.company = company;
   }
 }

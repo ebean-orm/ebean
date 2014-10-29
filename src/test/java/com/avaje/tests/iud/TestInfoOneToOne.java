@@ -16,7 +16,7 @@ public class TestInfoOneToOne extends BaseTestCase {
 
     InfoCustomer customer = new InfoCustomer();
     customer.setName("first info cust");
-    customer.setInfos(company);
+    customer.setCompany(company);
 
     customer.save();
 
@@ -34,13 +34,13 @@ public class TestInfoOneToOne extends BaseTestCase {
     customer.update();
 
     // update the customer and company
-    customer.getInfos().setName("2nd mod company");
+    customer.getCompany().setName("2nd mod company");
     customer.setName("2nd mod customer");
     customer.update();
 
     // fetch and then update both
     InfoCustomer fetchedCustomer = InfoCustomer.find.byId(customer.getId());
-    fetchedCustomer.getInfos().setName("3rd mod company");
+    fetchedCustomer.getCompany().setName("3rd mod company");
     fetchedCustomer.setName("3rd mod customer");
     fetchedCustomer.update();
 

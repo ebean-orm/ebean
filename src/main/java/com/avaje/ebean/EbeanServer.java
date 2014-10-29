@@ -544,7 +544,7 @@ public interface EbeanServer {
    * @deprecated 
    */
   public SqlFutureList findFutureList(SqlQuery query, Transaction transaction);
-  
+
   /**
    * Find using a PagingList with explicit transaction and pageSize.
    * Deprecated in favour of findPagedList().
