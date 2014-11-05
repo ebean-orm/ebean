@@ -13,7 +13,7 @@ import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.common.BeanMap;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
+import com.avaje.ebeaninternal.server.text.json.WriteJson;
 
 /**
  * Helper specifically for dealing with Maps.
@@ -156,7 +156,7 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
 		}
 	}
 
-    public void jsonWrite(WriteJsonContext ctx, String name, Object collection, boolean explicitInclude) {
+    public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) {
         
         Map<?,?> map;
         if (collection instanceof BeanCollection<?>){
@@ -175,19 +175,14 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
             map = (Map<?,?>)collection;
         }
         
-        int count = 0;
-        ctx.beginAssocMany(name);
+        ctx.gen().writeStartArray(name);
         Iterator<?> it = map.entrySet().iterator();
         while (it.hasNext()) {
             Entry<?, ?> entry = (Entry<?, ?>)it.next();
-            if (count++ > 0){
-                ctx.appendComma();
-            }
             //FIXME: json write map key ...
-            Object detailBean = entry.getValue();
-            targetDescriptor.jsonWrite(ctx, (EntityBean)detailBean);
+            targetDescriptor.jsonWrite(ctx, (EntityBean) entry.getValue());
         }
-        ctx.endAssocMany();      
+        ctx.gen().writeEnd();      
     }
 
 }

@@ -15,19 +15,19 @@ import javax.json.stream.JsonGenerator;
 
 class EJsonWriter {
 
-  public static String write(Object object) {
+  static String write(Object object) {
     StringWriter writer = new StringWriter(200);
     write(object, writer);
     return writer.toString();
   }
 
-  public static void write(Object object, Writer writer) {
+  static void write(Object object, Writer writer) {
     JsonGenerator generator = Json.createGenerator(writer);
     write(object, generator);
     generator.close();
   }
 
-  public static void write(Object object, JsonGenerator jsonGenerator) {
+  static void write(Object object, JsonGenerator jsonGenerator) {
     new EJsonWriter(jsonGenerator).writeJson(object);
   }
 
@@ -174,7 +174,7 @@ class EJsonWriter {
 
   private void writeCollection(String name, Collection<Object> collection) {
     if (name == null) {
-      jsonGenerator.writeStartObject();
+      jsonGenerator.writeStartArray();
     } else {
       jsonGenerator.writeStartArray(name);
     }

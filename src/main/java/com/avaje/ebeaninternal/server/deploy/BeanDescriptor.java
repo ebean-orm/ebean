@@ -35,8 +35,6 @@ import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaQueryPlanStatistic;
-import com.avaje.ebean.text.TextException;
-import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
 import com.avaje.ebeaninternal.api.HashQueryPlan;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -63,10 +61,7 @@ import com.avaje.ebeaninternal.server.query.CQueryPlan;
 import com.avaje.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
-import com.avaje.ebeaninternal.server.text.json.ReadJsonContext;
-import com.avaje.ebeaninternal.server.text.json.ReadJsonContext.ReadBeanState;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext.WriteBeanState;
+import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.util.SortByClause;
@@ -2121,84 +2116,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return propertiesLocal;
   }
 
-  public void jsonWrite(WriteJsonContext ctx, EntityBean bean) {
-
-    if (bean != null) {
-
-      ctx.appendObjectBegin();
-      WriteBeanState prevState = ctx.pushBeanState(bean);
-
-      if (inheritInfo != null) {
-        InheritInfo localInheritInfo = inheritInfo.readType(bean.getClass());
-        String discValue = localInheritInfo.getDiscriminatorStringValue();
-        String discColumn = localInheritInfo.getDiscriminatorColumn();
-        ctx.appendDiscriminator(discColumn, discValue);
-
-        BeanDescriptor<?> localDescriptor = localInheritInfo.getBeanDescriptor();
-        localDescriptor.jsonWriteProperties(ctx, bean);
-
-      } else {
-        jsonWriteProperties(ctx, bean);
-      }
-
-      ctx.pushPreviousState(prevState);
-      ctx.appendObjectEnd();
-    }
+  public void jsonWrite(WriteJson writeJson, EntityBean bean) {
+    jsonHelp.jsonWrite(writeJson, bean, null);
+  }  
+  
+  public void jsonWrite(WriteJson writeJson, EntityBean bean, String key) {
+    jsonHelp.jsonWrite(writeJson, bean, key);
   }
 
-  @SuppressWarnings("unchecked")
-  private void jsonWriteProperties(WriteJsonContext ctx, EntityBean bean) {
-
-    JsonWriteBeanVisitor<T> beanVisitor = (JsonWriteBeanVisitor<T>) ctx.getBeanVisitor();
-
-    Set<String> props = ctx.getIncludeProperties();
-
-    boolean explicitAllProps;
-    if (props == null) {
-      explicitAllProps = false;
-    } else {
-      explicitAllProps = props.contains("*");
-      if (explicitAllProps || props.isEmpty()) {
-        props = null;
-      }
-    }
-
-    if (idProperty != null) {
-      Object idValue = idProperty.getValue(bean);
-      if (idValue != null) {
-        if (props == null || props.contains(idProperty.getName())) {
-          idProperty.jsonWrite(ctx, bean);
-        }
-      }
-    }
-
-    if (!explicitAllProps && props == null) {
-      // just render the loaded properties
-      props = ((EntityBean)bean)._ebean_getIntercept().getLoadedPropertyNames();
-    }
-    if (props != null) {
-      // render only the appropriate properties (when not all properties)
-      for (String prop : props) {
-        BeanProperty p = getBeanProperty(prop);
-        if (p != null && !p.isId()) {
-          p.jsonWrite(ctx, bean);
-        }
-      }
-    } else {
-      if (explicitAllProps || !isReference(bean._ebean_getIntercept())) {
-        // render all the properties and invoke lazy loading if required
-        for (int j = 0; j < propertiesNonTransient.length; j++) {
-          propertiesNonTransient[j].jsonWrite(ctx, bean);
-        }
-        for (int j = 0; j < propertiesTransient.length; j++) {
-          propertiesTransient[j].jsonWrite(ctx, bean);
-        }
-      }
-    }
-
-    if (beanVisitor != null) {
-      beanVisitor.visit((T) bean, ctx);
-    }
+  protected void jsonWriteProperties(WriteJson writeJson, EntityBean bean) {
+    jsonHelp.jsonWriteProperties(writeJson, bean);
   }
     
   public T jsonRead(JsonParser parser, String path) {

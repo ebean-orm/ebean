@@ -12,27 +12,47 @@ import javax.json.Json;
 import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
 
-public class EJsonReader {
+class EJsonReader {
 
   @SuppressWarnings("unchecked")
-  public static Map<String, Object> parseObject(String json) {
+  static Map<String, Object> parseObject(String json) {
     return (Map<String, Object>) parse(json);
   }
-
+  
   @SuppressWarnings("unchecked")
-  public static List<Object> parseList(String json) {
-    return (List<Object>) parse(json);
+  static Map<String, Object> parseObject(Reader reader) {
+    return (Map<String, Object>) parse(reader);
+  }
+  
+  @SuppressWarnings("unchecked")
+  static Map<String, Object> parseObject(JsonParser parser) {
+    return (Map<String, Object>) parse(parser);
   }
 
-  public static Object parse(String json) {
+  @SuppressWarnings("unchecked")
+  static List<Object> parseList(String json) {
+    return (List<Object>) parse(json);
+  }
+  
+  @SuppressWarnings("unchecked")
+  static List<Object> parseList(Reader reader) {
+    return (List<Object>) parse(reader);
+  }
+  
+  @SuppressWarnings("unchecked")
+  static List<Object> parseList(JsonParser parser) {
+    return (List<Object>) parse(parser);
+  }
+
+  static Object parse(String json) {
     return parse(new StringReader(json));
   }
 
-  public static Object parse(Reader reader) {
+  static Object parse(Reader reader) {
     return parse(Json.createParser(reader));
   }
 
-  public static Object parse(JsonParser parser) {
+  static Object parse(JsonParser parser) {
     return new EJsonReader(parser).parseJson();
   }
 
@@ -67,7 +87,11 @@ public class EJsonReader {
 
   private void end() {
     if (!stack.isEmpty()) {
-      currentContext = stack.pop();
+      
+      //if (currentContext != null) {
+      //  Object value = currentContext.getValue();
+      //}
+      currentContext = stack.pop(currentContext);
     }
   }
 
@@ -133,7 +157,7 @@ public class EJsonReader {
       return Boolean.FALSE;
 
     default:
-      return false;
+      return null;
     }
   }
 
@@ -203,12 +227,13 @@ public class EJsonReader {
       }
     }
 
-    private Context pop() {
+    private Context pop(Context endingContext) {
       if (head == null) {
         throw new NoSuchElementException();
       }
       Context temp = head;
       head = head.next;
+      temp.popContext(endingContext);
       return temp;
     }
 
@@ -219,6 +244,7 @@ public class EJsonReader {
 
   private static abstract class Context {
     Context next;
+    abstract void popContext(Context temp);
     abstract Object getValue();
     abstract void setKey(String key);
     abstract void setValue(Object value);
@@ -230,6 +256,10 @@ public class EJsonReader {
     private final Map<String, Object> map = new LinkedHashMap<String, Object>();
 
     private String key;
+
+    public void popContext(Context temp) {
+      setValue(temp.getValue());
+    }
 
     Object getValue() {
       return map;
@@ -251,6 +281,10 @@ public class EJsonReader {
   private static class ArrayContext extends Context {
     
     private final List<Object> values = new ArrayList<Object>();
+
+    public void popContext(Context temp) {
+      values.add(temp.getValue());
+    }
 
     Object getValue() {
       return values;

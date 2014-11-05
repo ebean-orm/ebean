@@ -5,6 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
 
@@ -45,6 +46,11 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
 
 	
 	@Override
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+    throw new TextException("Not supported");
+  }
+
+  @Override
   public Object jsonRead(JsonParser ctx, Event event) {
 	  throw new TextException("Not supported");
   }

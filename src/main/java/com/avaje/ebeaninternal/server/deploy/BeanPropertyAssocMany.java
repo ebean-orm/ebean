@@ -30,9 +30,7 @@ import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
-import com.avaje.ebeaninternal.server.text.json.ReadJsonContext;
-import com.avaje.ebeaninternal.server.text.json.ReadJsonContext.ReadBeanState;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
+import com.avaje.ebeaninternal.server.text.json.WriteJson;
 
 /**
  * Property mapped to a List Set or Map.
@@ -883,7 +881,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
         return null != targetDescriptor.getId(otherBean);
     }
 
-    public void jsonWrite(WriteJsonContext ctx, EntityBean bean) {
+    public void jsonWrite(WriteJson ctx, EntityBean bean) {
         if(!this.jsonSerialize){
             return;
         }

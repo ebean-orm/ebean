@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
 
@@ -67,6 +68,11 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
     return (Map)value;
   }
   
+  @Override
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+    // TODO Auto-generated method stub  
+  }
+
   @Override
   public Object jsonRead(JsonParser ctx, Event event) {
     // TODO Auto-generated method stub

@@ -9,8 +9,8 @@ import com.avaje.ebean.config.CompoundTypeProperty;
 import com.avaje.ebean.text.json.JsonElement;
 import com.avaje.ebean.text.json.JsonElementObject;
 import com.avaje.ebeaninternal.server.text.json.ReadJsonContext;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext.WriteBeanState;
+//import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
+//import com.avaje.ebeaninternal.server.text.json.WriteJsonContext.WriteBeanState;
 
 /**
  * The internal representation of a Compound Type (Immutable Compound Value
@@ -223,40 +223,40 @@ public final class CtCompoundType<V> implements ScalarDataReader<V> {
     }
 
     
-    public void jsonWrite(WriteJsonContext ctx, Object valueObject, String propertyName) {
-       
-        if (valueObject == null){
-            ctx.beginAssocOneIsNull(propertyName);
-            
-        } else {
-            ctx.pushParentBean(valueObject);
-            ctx.beginAssocOne(propertyName);            
-            jsonWriteProps(ctx, valueObject, propertyName);
-            ctx.endAssocOne();
-            ctx.popParentBean();
-        }
-    }
-
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private void jsonWriteProps(WriteJsonContext ctx, Object valueObject, String propertyName) {
-            
-        ctx.appendObjectBegin();
-        WriteBeanState prevState = ctx.pushBeanState(valueObject);
-
-        for (int i = 0; i < properties.length; i++) {
-            String propName = properties[i].getName();
-            Object value = properties[i].getValue((V)valueObject);
-            if (propReaders[i] instanceof CtCompoundType<?>) {
-                ((CtCompoundType)propReaders[i]).jsonWrite(ctx, value, propName);
-              
-            } else {
-                ctx.appendNameValue(propName, (ScalarType)propReaders[i], value);
-            }   
-        }
-        
-        ctx.pushPreviousState(prevState);
-        ctx.appendObjectEnd();
-    }
+//    public void jsonWrite(WriteJsonContext ctx, Object valueObject, String propertyName) {
+//       
+//        if (valueObject == null){
+//            ctx.beginAssocOneIsNull(propertyName);
+//            
+//        } else {
+//            ctx.pushParentBean(valueObject);
+//            ctx.beginAssocOne(propertyName);            
+//            jsonWriteProps(ctx, valueObject, propertyName);
+//            ctx.endAssocOne();
+//            ctx.popParentBean();
+//        }
+//    }
+//
+//
+//    @SuppressWarnings({ "unchecked", "rawtypes" })
+//    private void jsonWriteProps(WriteJsonContext ctx, Object valueObject, String propertyName) {
+//            
+//        ctx.appendObjectBegin();
+//        WriteBeanState prevState = ctx.pushBeanState(valueObject);
+//
+//        for (int i = 0; i < properties.length; i++) {
+//            String propName = properties[i].getName();
+//            Object value = properties[i].getValue((V)valueObject);
+//            if (propReaders[i] instanceof CtCompoundType<?>) {
+//                ((CtCompoundType)propReaders[i]).jsonWrite(ctx, value, propName);
+//              
+//            } else {
+//                ctx.appendNameValue(propName, (ScalarType)propReaders[i], value);
+//            }   
+//        }
+//        
+//        ctx.pushPreviousState(prevState);
+//        ctx.appendObjectEnd();
+//    }
 
 }

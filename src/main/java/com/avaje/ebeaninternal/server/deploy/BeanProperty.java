@@ -10,7 +10,6 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
-import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
 import javax.persistence.PersistenceException;
@@ -32,7 +31,7 @@ import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectGetter;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectSetter;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
+import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 
@@ -1174,54 +1173,18 @@ public class BeanProperty implements ElPropertyValue {
         return name;
     }
 
-    
-
-    @SuppressWarnings("unchecked")
-    public void jsonWrite(JsonGenerator ctx, EntityBean bean) {
-        if(!jsonSerialize){
-            return;
-        }
-        Object value = getValueIntercept(bean);
-        if (value == null) {
-            ctx.writeNull(name);
-        } else {
-          scalarType.jsonWrite(ctx, name, value);
-          //ctx.appendNameValue(name, scalarType, value);
-        }
+  public void jsonWrite(WriteJson writeJson, EntityBean bean) {
+    if (!jsonSerialize) {
+      return;
     }
-
-    @SuppressWarnings("unchecked")
-    public void jsonWrite(WriteJsonContext ctx, EntityBean bean) {
-        if(!jsonSerialize){
-            return;
-        }
-        Object value = getValueIntercept(bean);
-        if (value == null) {
-            ctx.appendNull(name);
-        } else {
-            ctx.appendNameValue(name, scalarType, value);
-        }
+    Object value = getValueIntercept(bean);
+    if (value == null) {
+      writeJson.gen().writeNull(name);
+    } else {
+      scalarType.jsonWrite(writeJson.gen(), name, value);
     }
+  }
 
-//    public void jsonRead(ReadJsonContext ctx, EntityBean bean) {
-//        if(!jsonDeserialize){
-//            return;
-//        }
-//    	String jsonValue;
-//    	try {
-//        	jsonValue = ctx.readScalarValue();
-//    	} catch (TextException e){
-//    		throw new TextException("Error reading property "+getFullBeanName(), e);
-//    	}
-//        Object objValue;
-//        if (jsonValue == null) {
-//            objValue = null;
-//        } else {
-//            objValue = scalarType.jsonFromString(jsonValue, ctx.getValueAdapter());
-//        }
-//        setValue(bean, objValue);
-//    }
-    
   public void jsonRead(JsonParser ctx, EntityBean bean) {
     if (!jsonDeserialize) {
       return;

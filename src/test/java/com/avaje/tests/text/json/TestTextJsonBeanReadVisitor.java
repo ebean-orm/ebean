@@ -4,8 +4,7 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
@@ -26,9 +25,12 @@ public class TestTextJsonBeanReadVisitor extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).select("id, name, status, shippingAddress")
-        .fetch("billingAddress", "line1, city").fetch("billingAddress.country", "*")
-        .fetch("contacts", "firstName,email").order().desc("id").findList();
+    List<Customer> list = Ebean.find(Customer.class)
+        .select("id, name, status, shippingAddress")
+        .fetch("billingAddress", "line1, city")
+        .fetch("billingAddress.country", "*")
+        .fetch("contacts", "firstName,email")
+        .order().desc("id").findList();
 
     JsonContext json = Ebean.createJsonContext();
 

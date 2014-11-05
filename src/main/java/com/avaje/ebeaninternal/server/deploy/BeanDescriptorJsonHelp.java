@@ -1,111 +1,56 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.util.Set;
-
-import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
 
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.json.EJson;
 import com.avaje.ebean.text.TextException;
-import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext.WriteBeanState;
+import com.avaje.ebeaninternal.server.text.json.WriteJson;
+import com.avaje.ebeaninternal.server.text.json.WriteJson.WriteBean;
 
 public class BeanDescriptorJsonHelp<T> {
 
   private final BeanDescriptor<T> desc;
+  
   private final InheritInfo inheritInfo;
   
   public BeanDescriptorJsonHelp(BeanDescriptor<T> desc) {
     this.desc = desc;
     this.inheritInfo = desc.inheritInfo;
   }
+  
+  public void jsonWrite(WriteJson writeJson, EntityBean bean, String key) {
 
+//    if (writeJson.hasBean()) {
 
-  public void jsonWrite(JsonGenerator ctx, EntityBean bean) {
-
-    if (bean != null) {
-
-      ctx.writeStartObject();
+      writeJson.writeStartObject(key);
       //WriteBeanState prevState = ctx.pushBeanState(bean);
 
-      if (inheritInfo != null) {
+      if (inheritInfo == null) {
+        jsonWriteProperties(writeJson, bean);
+        
+      } else {
         InheritInfo localInheritInfo = inheritInfo.readType(bean.getClass());
         String discValue = localInheritInfo.getDiscriminatorStringValue();
         String discColumn = localInheritInfo.getDiscriminatorColumn();
-        ctx.write(discColumn, discValue);
-        //ctx.appendDiscriminator(discColumn, discValue);
+        writeJson.gen().write(discColumn, discValue);
 
         BeanDescriptor<?> localDescriptor = localInheritInfo.getBeanDescriptor();
-        localDescriptor.jsonWriteProperties(ctx, bean);
-
-      } else {
-        jsonWriteProperties(ctx, bean);
-      }
+        localDescriptor.jsonWriteProperties(writeJson, bean);
+      } 
 
       //ctx.pushPreviousState(prevState);
-      //ctx.appendObjectEnd();
-      ctx.writeEnd();
-    }
+      writeJson.gen().writeEnd();
   }
 
-  @SuppressWarnings("unchecked")
-  private void jsonWriteProperties(JsonGenerator ctx, EntityBean bean) {
+  protected void jsonWriteProperties(WriteJson writeJson, EntityBean bean) {
 
-    //JsonWriteBeanVisitor<T> beanVisitor = (JsonWriteBeanVisitor<T>) ctx.getBeanVisitor();
-
-    Set<String> props = ctx.getIncludeProperties();
-
-    boolean explicitAllProps;
-    if (props == null) {
-      explicitAllProps = false;
-    } else {
-      explicitAllProps = props.contains("*");
-      if (explicitAllProps || props.isEmpty()) {
-        props = null;
-      }
-    }
-
-    if (desc.idProperty != null) {
-      Object idValue = desc.idProperty.getValue(bean);
-      if (idValue != null) {
-        if (props == null || props.contains(idProperty.getName())) {
-          idProperty.jsonWrite(ctx, bean);
-        }
-      }
-    }
-
-    if (!explicitAllProps && props == null) {
-      // just render the loaded properties
-      props = ((EntityBean)bean)._ebean_getIntercept().getLoadedPropertyNames();
-    }
-    if (props != null) {
-      // render only the appropriate properties (when not all properties)
-      for (String prop : props) {
-        BeanProperty p = getBeanProperty(prop);
-        if (p != null && !p.isId()) {
-          p.jsonWrite(ctx, bean);
-        }
-      }
-    } else {
-      if (explicitAllProps || !isReference(bean._ebean_getIntercept())) {
-        // render all the properties and invoke lazy loading if required
-        for (int j = 0; j < propertiesNonTransient.length; j++) {
-          propertiesNonTransient[j].jsonWrite(ctx, bean);
-        }
-        for (int j = 0; j < propertiesTransient.length; j++) {
-          propertiesTransient[j].jsonWrite(ctx, bean);
-        }
-      }
-    }
-
-    if (beanVisitor != null) {
-      beanVisitor.visit((T) bean, ctx);
-    }
+    
+    WriteBean writeBean = writeJson.createWriteBean(desc, bean);
+    writeBean.write(writeJson);
   }
-
+  
+  
   @SuppressWarnings("unchecked")
   public T jsonRead(JsonParser parser, String path) {
     
@@ -124,7 +69,6 @@ public class BeanDescriptorJsonHelp<T> {
       return jsonReadObject(parser, path);
     } 
     
-
     // check for the discriminator value to determine the correct sub type
     String discColumn = inheritInfo.getRoot().getDiscriminatorColumn();
 
@@ -135,6 +79,13 @@ public class BeanDescriptorJsonHelp<T> {
     
     String propName = parser.getString();      
     if (!propName.equalsIgnoreCase(discColumn)) {
+      // just try to assume this is the correct bean type in the inheritance 
+      BeanProperty property = desc.getBeanProperty(propName);
+      if (property != null) {
+        EntityBean bean = desc.createEntityBean();
+        property.jsonRead(parser, bean);
+        return jsonReadProperties(parser, bean);
+      }
       String msg = "Error reading inheritance discriminator, expected property ["+discColumn+"] but got [" + propName + "] ?";
       throw new TextException(msg);        
     }
@@ -152,11 +103,16 @@ public class BeanDescriptorJsonHelp<T> {
     return (T) localDescriptor.jsonReadObject(parser, path);
   }
   
-  @SuppressWarnings("unchecked")
   protected T jsonReadObject(JsonParser parser, String path) {
 
     EntityBean bean = desc.createEntityBean();
     //ctx.pushBean(bean, path, this);
+
+    return jsonReadProperties(parser, bean);
+  }
+  
+  @SuppressWarnings("unchecked")
+  protected T jsonReadProperties(JsonParser parser, EntityBean bean) {
 
     do {
      
@@ -169,7 +125,7 @@ public class BeanDescriptorJsonHelp<T> {
             p.jsonRead(parser, bean);
           
           } else {
-            Object rawValue = EJson.parse(parser);           
+            //Object rawValue = EJson.parse(parser);           
             // unknown property key ...
             //ctx.readUnmappedJson(propName);
           }
@@ -183,7 +139,6 @@ public class BeanDescriptorJsonHelp<T> {
       }
       
     } while (true);
-
     return (T)bean;
   }
     

@@ -7,10 +7,10 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Types;
 
+import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
 
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 
@@ -66,7 +66,10 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
         return new LocalTime(value);
 	}
     
-    
+  @Override
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+    ctx.write(value.toString());
+  }
     
     @Override
     public Object jsonRead(JsonParser ctx, Event event) {
