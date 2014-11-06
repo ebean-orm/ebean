@@ -16,7 +16,9 @@ import com.avaje.ebeaninternal.server.util.ArrayStack;
 public class WriteJson {
 
   private final SpiEbeanServer server;
+  
   private final JsonGenerator generator;
+  
   private final PathProperties pathProperties;
 
   private final PathStack pathStack = new PathStack();
@@ -49,7 +51,7 @@ public class WriteJson {
     parentBeans.pop();
   }
 
-  public void beginAssocOne(String key, EntityBean bean) {
+  public void beginAssocOne(String key, Object bean) {
     parentBeans.push(bean);
     pathStack.pushPathKey(key);
   }

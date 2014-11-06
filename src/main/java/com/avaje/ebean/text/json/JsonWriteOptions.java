@@ -1,8 +1,6 @@
 package com.avaje.ebean.text.json;
 
-import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 import com.avaje.ebean.text.PathProperties;
@@ -69,10 +67,6 @@ public class JsonWriteOptions {
 
   protected String callback;
 
-  protected JsonValueAdapter valueAdapter;
-
-  protected Map<String, JsonWriteBeanVisitor<?>> visitorMap;
-
   protected PathProperties pathProperties;
 
   /**
@@ -99,11 +93,7 @@ public class JsonWriteOptions {
   public JsonWriteOptions copy() {
     JsonWriteOptions copy = new JsonWriteOptions();
     copy.callback = callback;
-    copy.valueAdapter = valueAdapter;
     copy.pathProperties = pathProperties;
-    if (visitorMap != null) {
-      copy.visitorMap = new HashMap<String, JsonWriteBeanVisitor<?>>(visitorMap);
-    }
     return copy;
   }
 
@@ -119,39 +109,6 @@ public class JsonWriteOptions {
    */
   public JsonWriteOptions setCallback(String callback) {
     this.callback = callback;
-    return this;
-  }
-
-  /**
-   * Return the JsonValueAdapter.
-   */
-  public JsonValueAdapter getValueAdapter() {
-    return valueAdapter;
-  }
-
-  /**
-   * Set a JsonValueAdapter for custom DateTime and Date formatting.
-   */
-  public JsonWriteOptions setValueAdapter(JsonValueAdapter valueAdapter) {
-    this.valueAdapter = valueAdapter;
-    return this;
-  }
-
-  /**
-   * Register a JsonWriteBeanVisitor for the root level.
-   */
-  public JsonWriteOptions setRootPathVisitor(JsonWriteBeanVisitor<?> visitor) {
-    return setPathVisitor(null, visitor);
-  }
-
-  /**
-   * Register a JsonWriteBeanVisitor for the given path.
-   */
-  public JsonWriteOptions setPathVisitor(String path, JsonWriteBeanVisitor<?> visitor) {
-    if (visitorMap == null) {
-      visitorMap = new HashMap<String, JsonWriteBeanVisitor<?>>();
-    }
-    visitorMap.put(path, visitor);
     return this;
   }
 
@@ -211,13 +168,6 @@ public class JsonWriteOptions {
       }
     }
     return props;
-  }
-
-  /**
-   * Return the Map of registered JsonWriteBeanVisitor's by path.
-   */
-  public Map<String, JsonWriteBeanVisitor<?>> getVisitorMap() {
-    return visitorMap;
   }
 
   /**

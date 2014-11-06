@@ -31,7 +31,7 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
     o.setPathProperties(pp);
 
     System.out.println("Expect lazy loading of Customer beans and customer contacts");
-    String s = json.toJsonString(list, true, o);
+    String s = json.toJsonString(list, o);
     System.out.println(s);
     Assert.assertTrue(s.contains("\"contacts\""));
     Assert.assertTrue(s.contains("\"name\""));
@@ -54,7 +54,7 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
     o.setPathProperties(pp);
 
     System.out.println("expecting lazy load of Customer beans to fetch customer name");
-    String s = json.toJsonString(list, true, o);
+    String s = json.toJsonString(list, o);
     System.out.println(s);
     Assert.assertTrue(s.contains("\"contacts\""));
     Assert.assertTrue(s.contains("\"name\""));
@@ -78,7 +78,7 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
     o.setPathProperties(pp);
 
     System.out.println("expecting lazy load of Customer contacts ");
-    String s = json.toJsonString(list, true, o);
+    String s = json.toJsonString(list, o);
     System.out.println(s);
     Assert.assertTrue(s.contains("\"contacts\""));
     Assert.assertTrue(s.contains("\"name\""));

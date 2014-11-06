@@ -23,25 +23,9 @@ public interface JsonContext {
   public <T> T toBean(Class<T> rootType, Reader json);
 
   /**
-   * Convert json string input into a Bean of a specific type with options.
-   */
-  public <T> T toBean(Class<T> rootType, String json, JsonReadOptions options);
-
-  /**
-   * Convert json reader input into a Bean of a specific type with options.
-   */
-  public <T> T toBean(Class<T> rootType, Reader json, JsonReadOptions options);
-
-  /**
    * Convert json string input into a list of beans of a specific type.
    */
   public <T> List<T> toList(Class<T> rootType, String json);
-
-  /**
-   * Convert json string input into a list of beans of a specific type with
-   * options.
-   */
-  public <T> List<T> toList(Class<T> rootType, String json, JsonReadOptions options);
 
   /**
    * Convert json reader input into a list of beans of a specific type.
@@ -49,22 +33,16 @@ public interface JsonContext {
   public <T> List<T> toList(Class<T> rootType, Reader json);
 
   /**
-   * Convert json reader input into a list of beans of a specific type with
-   * options.
+   * Use the genericType to determine if this should be converted into a List or
+   * bean.
    */
-  public <T> List<T> toList(Class<T> rootType, Reader json, JsonReadOptions options);
+  public Object toObject(Type genericType, Reader json);
 
   /**
    * Use the genericType to determine if this should be converted into a List or
    * bean.
    */
-  public Object toObject(Type genericType, Reader json, JsonReadOptions options);
-
-  /**
-   * Use the genericType to determine if this should be converted into a List or
-   * bean.
-   */
-  public Object toObject(Type genericType, String json, JsonReadOptions options);
+  public Object toObject(Type genericType, String json);
 
   /**
    * Write the bean or collection in JSON format to the writer with default
@@ -78,11 +56,6 @@ public interface JsonContext {
   public void toJsonWriter(Object o, Writer writer);
 
   /**
-   * With additional pretty output option.
-   */
-  public void toJsonWriter(Object o, Writer writer, boolean pretty);
-
-  /**
    * With additional options to specify JsonValueAdapter and
    * JsonWriteBeanVisitor's.
    * 
@@ -93,13 +66,7 @@ public interface JsonContext {
    * @param options
    *          additional options to control the JSON output
    */
-  public void toJsonWriter(Object o, Writer writer, boolean pretty, JsonWriteOptions options);
-
-  /**
-   * With additional JSONP callback function.
-   */
-  public void toJsonWriter(Object o, Writer writer, boolean pretty, JsonWriteOptions options,
-      String callback);
+  public void toJsonWriter(Object o, Writer writer, JsonWriteOptions options);
 
   /**
    * Convert a bean or collection to json string using default options.
@@ -107,20 +74,9 @@ public interface JsonContext {
   public String toJsonString(Object o);
 
   /**
-   * Convert a bean or collection to json string with pretty format using
-   * default options.
+   * Convert a bean or collection to json string.
    */
-  public String toJsonString(Object o, boolean pretty);
-
-  /**
-   * Convert a bean or collection to json string using options.
-   */
-  public String toJsonString(Object o, boolean pretty, JsonWriteOptions options);
-
-  /**
-   * Convert a bean or collection to json string using a JSONP callback.
-   */
-  public String toJsonString(Object o, boolean pretty, JsonWriteOptions options, String callback);
+  public String toJsonString(Object o, JsonWriteOptions options);
 
   /**
    * Return true if the type is known as an Entity or Xml type or a List Set or

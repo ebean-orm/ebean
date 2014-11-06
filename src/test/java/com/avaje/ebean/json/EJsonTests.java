@@ -1,7 +1,11 @@
 package com.avaje.ebean.json;
 
+import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
+
+import javax.json.Json;
+import javax.json.stream.JsonParser;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -101,4 +105,48 @@ public class EJsonTests {
     String jsonOutput = EJson.write(result);
     Assert.assertEquals(jsonInput, jsonOutput);
   }
+  
+  @Test
+  public void test_partial_read() {
+    
+    String jsonInput = "{\"name\":\"rob\",\"age\":null,\"friend\":{\"name\":\"mike\",\"age\":13}},some more json would follow...";
+    StringReader reader = new StringReader(jsonInput);
+    JsonParser parser = Json.createParser(reader);
+    
+    Object result = EJson.parsePartial(parser);
+    
+    Assert.assertTrue(result instanceof Map);
+    Map<?,?> map = (Map<?,?>)result;
+    Assert.assertEquals("rob", map.get("name"));
+    Assert.assertNull(map.get("age"));
+
+    Map<?,?> friend = (Map<?,?>)map.get("friend");
+    Assert.assertEquals("mike", friend.get("name"));
+    Assert.assertEquals(13L, friend.get("age"));
+
+  }
+
+//  @Test
+//  public void test_partial_read_primitives() {
+//    
+//    Object result = null;
+//    JsonParser parser = Json.createParser(new StringReader(","));
+//    
+////    Object result = EJson.parsePartial(parser);
+////    Assert.assertNull(result);
+//    
+//    parser = Json.createParser(new StringReader("12L"));
+//    result = EJson.parsePartial(parser);
+//    Assert.assertEquals(12L, result);
+//
+//    parser = Json.createParser(new StringReader("true"));
+//    result = EJson.parsePartial(parser);
+//    Assert.assertEquals(Boolean.TRUE, result);
+//
+//    parser = Json.createParser(new StringReader("\"foo\""));
+//    result = EJson.parsePartial(parser);
+//    Assert.assertEquals("foo", result);
+//
+//  }
+
 }

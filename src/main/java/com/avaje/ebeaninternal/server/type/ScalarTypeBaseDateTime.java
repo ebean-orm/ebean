@@ -11,9 +11,6 @@ import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
 
-import com.avaje.ebean.text.json.JsonValueAdapter;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
-
 /**
  * Base type for DateTime types.
  */
@@ -82,24 +79,6 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
 
     public boolean isDateTimeCapable() {
         return true;
-    }
-    
-    @Override
-    public void jsonWrite(WriteJsonBuffer buffer, T value, JsonValueAdapter ctx) {
-    	String v = jsonToString(value, ctx);
-    	buffer.append(v);
-    }
-
-	@Override
-    public String jsonToString(T value, JsonValueAdapter ctx) {
-        Timestamp ts = convertToTimestamp(value);
-        return ctx.jsonFromTimestamp(ts);
-    }
-    
-    @Override
-    public T jsonFromString(String value, JsonValueAdapter ctx) {
-        Timestamp ts = ctx.jsonToTimestamp(value);
-        return convertFromTimestamp(ts);
     }
 
     public Object readData(DataInput dataInput) throws IOException {

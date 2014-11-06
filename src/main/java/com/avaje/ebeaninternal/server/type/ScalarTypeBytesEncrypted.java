@@ -10,8 +10,6 @@ import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
 
 import com.avaje.ebean.text.TextException;
-import com.avaje.ebean.text.json.JsonValueAdapter;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
 
 /**
  * Encrypted ScalarType that wraps a byte[] types.
@@ -113,18 +111,6 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
 
     public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
         baseType.accumulateScalarTypes(propName, list);
-    }
-
-    public void jsonWrite(WriteJsonBuffer buffer, byte[] value, JsonValueAdapter ctx) {
-    	baseType.jsonWrite(buffer, value, ctx);
-    }
-
-	public String jsonToString(byte[] value, JsonValueAdapter ctx) {
-        return baseType.jsonToString(value, ctx);
-    }
-
-    public byte[] jsonFromString(String value, JsonValueAdapter ctx) {
-        return baseType.jsonFromString(value, ctx);
     }
 
     public Object readData(DataInput dataInput) throws IOException {

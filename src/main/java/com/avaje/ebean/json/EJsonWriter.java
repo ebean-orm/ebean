@@ -64,6 +64,10 @@ class EJsonWriter {
     } else if (object instanceof String) {
       writeString(name, (String) object);
 
+    } else if (object instanceof Map.Entry<?, ?>) {
+      Map.Entry<?, ?> entry = (Map.Entry<?, ?>)object;
+      writeJson(entry.getKey().toString(), entry.getValue());
+      
     } else {
       writeString(name, object.toString());
     }

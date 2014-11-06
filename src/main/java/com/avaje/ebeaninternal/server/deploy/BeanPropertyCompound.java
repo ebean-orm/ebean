@@ -3,14 +3,17 @@ package com.avaje.ebeaninternal.server.deploy;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.json.stream.JsonParser;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.ScalarTypeConverter;
+import com.avaje.ebean.json.EJson;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
-import com.avaje.ebeaninternal.server.text.json.ReadJsonContext;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.CtCompoundProperty;
 import com.avaje.ebeaninternal.server.type.CtCompoundPropertyElAdapter;
@@ -178,14 +181,31 @@ public class BeanPropertyCompound extends BeanProperty {
     }
 
     public void jsonWrite(WriteJson ctx, EntityBean bean) {
-        
-        Object valueObject = getValueIntercept(bean);
-        //FIXME: compoundType.jsonWrite(ctx, valueObject, name);
+      if (!jsonSerialize) {
+        return;
+      }
+      Object value = getValueIntercept(bean);
+      if (value == null) {
+        ctx.gen().writeNull(name);
+      } else {
+        compoundType.jsonWrite(ctx, value, name);
+      }        
     }
     
-    public void jsonRead(ReadJsonContext ctx, EntityBean bean){
-
-        Object objValue = compoundType.jsonRead(ctx);
+    public void jsonRead(JsonParser ctx, EntityBean bean) {
+      
+      if (!jsonDeserialize) {
+        return;
+      }
+      
+      Object value = EJson.parsePartial(ctx);
+      if (value == null) {
+        setValue(bean, null);
+      } else {
+        @SuppressWarnings("unchecked")
+        Map<String,Object> map = (Map<String,Object>)value;
+        Object objValue = compoundType.jsonConvert(map);
         setValue(bean, objValue);
+      }
     }
 }

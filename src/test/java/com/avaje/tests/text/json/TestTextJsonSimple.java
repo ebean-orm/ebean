@@ -8,9 +8,7 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.text.json.JsonContext;
-import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
 import com.avaje.ebean.text.json.JsonWriteOptions;
-import com.avaje.ebean.text.json.JsonWriter;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 
@@ -23,10 +21,7 @@ public class TestTextJsonSimple extends BaseTestCase {
 
     List<Customer> list = Ebean.find(Customer.class).select("id, name, status, shippingAddress")
         .fetch("billingAddress", "line1, city").fetch("billingAddress.country", "*")
-        .fetch("contacts", "firstName,email")// , new
-                                             // FetchConfig().queryFirst(2))
-        // .filterMany("contacts").ilike("firstName", "J%").query()
-        // .where().lt("id", 3)
+        .fetch("contacts", "firstName,email")
         .order().desc("id").findList();
 
     EbeanServer server = Ebean.getServer(null);
@@ -35,18 +30,8 @@ public class TestTextJsonSimple extends BaseTestCase {
 
     JsonWriteOptions options = new JsonWriteOptions();
     options.setRootPathProperties("name, id");
-    options.setRootPathVisitor(new JsonWriteBeanVisitor<Customer>() {
-
-      public void visit(Customer bean, JsonWriter ctx) {
-        System.out.println("visiting " + bean);
-        ctx.appendRawValue("dummy", "34");
-      }
-
-    });
-
-     String s = json.toJsonString(list, true);
-//    String s = json.toJsonString(list, true, options);
-
+   
+    String s = json.toJsonString(list);
     System.out.println(s);
 
     List<Customer> mList = json.toList(Customer.class, s);

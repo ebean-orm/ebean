@@ -10,9 +10,7 @@ import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
 
-import com.avaje.ebean.text.json.JsonValueAdapter;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
 
 /**
  * ScalarType for String.
@@ -59,23 +57,6 @@ public class ScalarTypeString extends ScalarTypeBase<String> {
 	public boolean isDateTimeCapable() {
 		return true;
 	}
-
-	
-    @Override
-    public void jsonWrite(WriteJsonBuffer buffer, String value, JsonValueAdapter ctx) {
-	    String s = format(value);
-    	EscapeJson.escapeQuote(s, buffer);
-    }
-
-	@Override
-    public String jsonFromString(String value, JsonValueAdapter ctx) {
-        return value;
-    }
-
-    @Override
-    public String jsonToString(String value, JsonValueAdapter ctx) {
-        return EscapeJson.escapeQuote(value);
-    }
 
     public Object readData(DataInput dataInput) throws IOException {
         if (!dataInput.readBoolean()) {

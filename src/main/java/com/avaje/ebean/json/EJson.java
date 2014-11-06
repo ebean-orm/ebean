@@ -88,13 +88,31 @@ public class EJson {
    * Parse the json and return as a List or Map.
    */
   public static Object parse(Reader reader) {
-    return EJsonReader.parse(reader);
+    return EJsonReader.parse(reader, false);
   }
   
   /**
    * Parse the json and return as a List or Map.
    */
   public static Object parse(JsonParser parser) {
-    return EJsonReader.parse(parser);
+    return EJsonReader.parse(parser, false);
+  }
+  
+  /**
+   * Parse the json and return the next json value, List or Map.
+   * This will not consume all the reader content and return once the 
+   * next json object, list or value is read.
+   */
+  public static Object parsePartial(Reader reader) {
+    return EJsonReader.parse(reader, true);
+  }
+  
+  /**
+   * Parse the json and return the next json value, List or Map.
+   * This will not consume all the reader content and return once the 
+   * next json object, list or value is read.
+   */
+  public static Object parsePartial(JsonParser parser) {
+    return EJsonReader.parse(parser, true);
   }
 }

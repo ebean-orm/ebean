@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.type;
 
-import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;

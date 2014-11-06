@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.type;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Types;
 
@@ -8,7 +7,6 @@ import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
 
-import com.avaje.ebean.text.json.JsonValueAdapter;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 
 /**
@@ -64,16 +62,6 @@ public class ScalarTypeCharArray extends ScalarTypeBaseVarchar<char[]>{
     public char[] parse(String value) {
 		return value.toCharArray();
 	}
-	
-    @Override
-    public char[] jsonFromString(String value, JsonValueAdapter ctx) {
-        return value.toCharArray();
-    }
-
-    @Override
-    public String jsonToString(char[] value, JsonValueAdapter ctx) {
-        return EscapeJson.escapeQuote(String.valueOf(value));
-    }
     
     @Override
     public Object jsonRead(JsonParser ctx, Event event) {

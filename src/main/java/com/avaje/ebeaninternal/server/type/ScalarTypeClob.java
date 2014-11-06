@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.type;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import com.avaje.ebean.text.json.JsonValueAdapter;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 
 /**
@@ -11,66 +10,55 @@ import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
  */
 public class ScalarTypeClob extends ScalarTypeBaseVarchar<String> {
 
-	static final int clobBufferSize = 512;
-	
-	static final int stringInitialSize = 512;
-	
-	protected ScalarTypeClob(boolean jdbcNative, int jdbcType) {
-		super(String.class, jdbcNative, jdbcType);
-	}
-	
-	public ScalarTypeClob() {
-		super(String.class, true, Types.CLOB);
-	}
-	
-	@Override
-    public String convertFromDbString(String dbValue) {
-        return dbValue;
+  static final int clobBufferSize = 512;
+
+  static final int stringInitialSize = 512;
+
+  protected ScalarTypeClob(boolean jdbcNative, int jdbcType) {
+    super(String.class, jdbcNative, jdbcType);
+  }
+
+  public ScalarTypeClob() {
+    super(String.class, true, Types.CLOB);
+  }
+
+  @Override
+  public String convertFromDbString(String dbValue) {
+    return dbValue;
+  }
+
+  @Override
+  public String convertToDbString(String beanValue) {
+    return beanValue;
+  }
+
+  public void bind(DataBind b, String value) throws SQLException {
+    if (value == null) {
+      b.setNull(Types.VARCHAR);
+    } else {
+      b.setString(value);
     }
+  }
 
-    @Override
-    public String convertToDbString(String beanValue) {
-        return beanValue;
-    }
+  public String read(DataReader dataReader) throws SQLException {
 
-    public void bind(DataBind b, String value) throws SQLException {
-		if (value == null) {
-			b.setNull(Types.VARCHAR);
-		} else {
-			b.setString(value);
-		}
-	}
+    return dataReader.getStringClob();
+  }
 
-	public String read(DataReader dataReader) throws SQLException {
+  public Object toJdbcType(Object value) {
+    return BasicTypeConverter.toString(value);
+  }
 
-	    return dataReader.getStringClob();
-	}
+  public String toBeanType(Object value) {
+    return BasicTypeConverter.toString(value);
+  }
 
-	public Object toJdbcType(Object value) {
-		return BasicTypeConverter.toString(value);
-	}
+  public String formatValue(String t) {
+    return t;
+  }
 
-	public String toBeanType(Object value) {
-		return BasicTypeConverter.toString(value);
-	}
+  public String parse(String value) {
+    return value;
+  }
 
-	
-	public String formatValue(String t) {
-        return t;
-    }
-
-    public String parse(String value) {
-		return value;
-	}
-	
-    @Override
-    public String jsonFromString(String value, JsonValueAdapter ctx) {
-        return value;
-    }
-
-    @Override
-    public String jsonToString(String value, JsonValueAdapter ctx) {
-        return EscapeJson.escapeQuote(value);
-    }
-    
 }

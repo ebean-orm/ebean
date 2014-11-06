@@ -48,7 +48,7 @@ public class TestJsonInheritanceDiscriminator extends BaseTestCase {
 
     List<Animal> animals = Ebean.find(Animal.class).findList();
 
-    String listJson = json.toJsonString(animals, false);
+    String listJson = json.toJsonString(animals);
 
     List<Animal> animals2 = json.toList(Animal.class, listJson);
     Assert.assertEquals(animals.size(), animals2.size());

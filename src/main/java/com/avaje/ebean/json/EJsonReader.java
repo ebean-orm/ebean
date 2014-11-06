@@ -21,12 +21,12 @@ class EJsonReader {
   
   @SuppressWarnings("unchecked")
   static Map<String, Object> parseObject(Reader reader) {
-    return (Map<String, Object>) parse(reader);
+    return (Map<String, Object>) parse(reader, false);
   }
   
   @SuppressWarnings("unchecked")
   static Map<String, Object> parseObject(JsonParser parser) {
-    return (Map<String, Object>) parse(parser);
+    return (Map<String, Object>) parse(parser, false);
   }
 
   @SuppressWarnings("unchecked")
@@ -36,43 +36,50 @@ class EJsonReader {
   
   @SuppressWarnings("unchecked")
   static List<Object> parseList(Reader reader) {
-    return (List<Object>) parse(reader);
+    return (List<Object>) parse(reader, false);
   }
   
   @SuppressWarnings("unchecked")
   static List<Object> parseList(JsonParser parser) {
-    return (List<Object>) parse(parser);
+    return (List<Object>) parse(parser, false);
   }
 
   static Object parse(String json) {
-    return parse(new StringReader(json));
+    return parse(new StringReader(json), false);
   }
 
-  static Object parse(Reader reader) {
-    return parse(Json.createParser(reader));
+  static Object parse(Reader reader, boolean partial) {
+    return parse(Json.createParser(reader), partial);
   }
 
-  static Object parse(JsonParser parser) {
-    return new EJsonReader(parser).parseJson();
+  static Object parse(JsonParser parser, boolean partial) {
+    return new EJsonReader(parser, partial).parseJson();
   }
 
   private final JsonParser parser;
+  
+  private final boolean partial;
+  
+  private int depth;
   
   private Stack stack;
 
   private Context currentContext;
 
 
-  EJsonReader(JsonParser parser) {
+  EJsonReader(JsonParser parser, boolean partial) {
     this.parser = parser;
+    this.partial = partial;
   }
 
   private void startArray() {
+    depth++;
     stack.push(currentContext);
     currentContext = new ArrayContext();
   }
 
   private void startObject() {
+    depth++;
     stack.push(currentContext);
     currentContext = new ObjectContext();
   }
@@ -86,6 +93,7 @@ class EJsonReader {
   }
 
   private void end() {
+    depth--;
     if (!stack.isEmpty()) {
       
       //if (currentContext != null) {
@@ -127,6 +135,12 @@ class EJsonReader {
     // process the rest of the object or array
     while (parser.hasNext()) {
       processEvent(parser.next());
+      
+      if (partial && depth == 0) {
+        // completed the object/array
+        return currentContext.getValue();        
+      }
+      
     }
 
     return currentContext.getValue();
@@ -219,7 +233,7 @@ class EJsonReader {
   private static final class Stack {
     
     private Context head;
-
+    
     private void push(Context context) {
       if (context != null) {
         context.next = head;

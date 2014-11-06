@@ -12,7 +12,6 @@ import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
 
 import com.avaje.ebean.text.TextException;
-import com.avaje.ebean.text.json.JsonValueAdapter;
 
 
 /**
@@ -239,16 +238,6 @@ public class ScalarTypeEnumStandard {
         
         public void jsonWrite(JsonGenerator ctx, String name, Object value) {
           ctx.write(name, formatValue(value));
-        }
-                
-        @Override
-        public Object jsonFromString(String value, JsonValueAdapter ctx) {
-            return parse(value);
-        }
-
-        @Override
-        public String jsonToString(Object value, JsonValueAdapter ctx) {
-            return EscapeJson.escapeQuote(format(value));
         }
 
         public Object readData(DataInput dataInput) throws IOException {

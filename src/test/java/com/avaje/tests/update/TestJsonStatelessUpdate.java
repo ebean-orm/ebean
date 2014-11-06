@@ -31,7 +31,7 @@ public class TestJsonStatelessUpdate extends BaseTestCase {
     JsonContext jsonContext = Ebean.createJsonContext();
     
     JsonWriteOptions writeOptions = JsonWriteOptions.parsePath("(id,name,master(*))");
-    String jsonString = jsonContext.toJsonString(twoX, true, writeOptions);
+    String jsonString = jsonContext.toJsonString(twoX, writeOptions);
     
     System.out.println(jsonString);
     jsonString = jsonString.replace("twoName", "twoNameModified");

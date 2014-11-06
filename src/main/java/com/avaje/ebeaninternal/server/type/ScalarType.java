@@ -11,8 +11,6 @@ import javax.json.stream.JsonParser.Event;
 
 import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
-import com.avaje.ebean.text.json.JsonValueAdapter;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
 
 /**
  * Describes a scalar type.
@@ -187,18 +185,12 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
 	 */
 	public boolean isDateTimeCapable();
 
-	public void jsonWrite(WriteJsonBuffer buffer, T value, JsonValueAdapter ctx);
-	
-	public String jsonToString(T value, JsonValueAdapter ctx);
+  public Object readData(DataInput dataInput) throws IOException;
 
-    public T jsonFromString(String value, JsonValueAdapter ctx);
+  public void writeData(DataOutput dataOutput, Object v) throws IOException;
 
-    public Object readData(DataInput dataInput) throws IOException;
+  public Object jsonRead(JsonParser ctx, Event event);
 
-    public void writeData(DataOutput dataOutput, Object v) throws IOException;
-
-    public Object jsonRead(JsonParser ctx, Event event);
-
-    public void jsonWrite(JsonGenerator ctx, String name, Object value);
+  public void jsonWrite(JsonGenerator ctx, String name, Object value);
     
 }

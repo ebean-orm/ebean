@@ -14,18 +14,14 @@ import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.json.EJson;
 import com.avaje.ebean.text.json.JsonContext;
-import com.avaje.ebean.text.json.JsonElement;
-import com.avaje.ebean.text.json.JsonElementObject;
-import com.avaje.ebeaninternal.server.text.json.InternalJsonParser;
 
 public class TestJsonSimple extends BaseTestCase {
 
+  @SuppressWarnings("unchecked")
   @Test
   public void test() throws IOException {
-
-    boolean b = JsonElement.class.isAssignableFrom(JsonElementObject.class);
-    Assert.assertTrue(b);
 
     InputStream is = this.getClass().getResourceAsStream("/example1.json");
 
@@ -41,35 +37,30 @@ public class TestJsonSimple extends BaseTestCase {
 
     String jsonText = sb.toString();
 
-    JsonElement el = InternalJsonParser.parse(jsonText);
-
+    Object el = EJson.parse(jsonText);
     System.out.println("Got " + el);
 
-    JsonElement e2 = InternalJsonParser
-        .parse("{\"a\":12, \"name\":{\"first\":\"rob\", \"last\":\"byg\"}}");
+    Map<String,Object> e2 = EJson.parseObject("{\"a\":12, \"name\":{\"first\":\"rob\", \"last\":\"byg\"}}");
 
-    Assert.assertEquals(Double.valueOf(12), e2.eval("a"));
-    Assert.assertEquals(12, e2.evalInt("a"));
-    Assert.assertEquals("rob", e2.evalString("name.first"));
-
-    Assert.assertEquals("byg", e2.evalString("name.last"));
+    Assert.assertEquals(12L, e2.get("a"));
+    Assert.assertEquals("rob", ((Map<String,Object>)e2.get("name")).get("first"));
 
     Map<String, String> m = new LinkedHashMap<String, String>();
     m.put("hello", "rob");
     m.put("test", "me");
 
     JsonContext jsonContext = Ebean.createJsonContext();
-    String jsonString = jsonContext.toJsonString(m, true);
+    String jsonString = jsonContext.toJsonString(m);
     System.out.println(jsonString);
 
-    String s = "{\"parishId\":\"18\",\"contentId\":null,\"contentStatus\":null,\"contentType\":\"pg-hello\",\"content\":\"<p>\n\tSomeThing</p>\n\"}";
+    String s = "{\"parishId\":\"18\",\"contentId\":null,\"contentStatus\":null,\"contentType\":\"pg-hello\",\"content\":\"asd\"}";
 
-    JsonElement jsonElement = InternalJsonParser.parse(s);
+    Object jsonElement = EJson.parse(s);
     Assert.assertNotNull(jsonElement);
 
-    JsonElement e3 = InternalJsonParser.parse("{\"name\":\"\\u60a8\\u597d\"}");
+    Map<String,Object> e3 = EJson.parseObject("{\"name\":\"\\u60a8\\u597d\"}");
 
-    Assert.assertTrue(e3.evalString("name").length()==2);
+    Assert.assertTrue(((String)e3.get("name")).length()==2);
 
   }
 

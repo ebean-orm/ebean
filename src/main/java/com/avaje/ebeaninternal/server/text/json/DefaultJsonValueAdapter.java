@@ -5,9 +5,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-import com.avaje.ebean.text.json.JsonValueAdapter;
-
-public class DefaultJsonValueAdapter implements JsonValueAdapter {
+public class DefaultJsonValueAdapter {//implements JsonValueAdapter {
 
   private final SimpleDateFormat dateTimeProto;
 
