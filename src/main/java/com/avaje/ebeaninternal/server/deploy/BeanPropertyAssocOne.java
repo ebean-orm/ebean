@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.json.stream.JsonParser;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.EbeanServer;
@@ -24,8 +25,7 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
-import com.avaje.ebeaninternal.server.text.json.ReadJsonContext;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
+import com.avaje.ebeaninternal.server.text.json.WriteJson;
 
 /**
  * Property mapped to a joined bean.
@@ -831,36 +831,34 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
     
     @Override
-    public void jsonWrite(WriteJsonContext ctx, EntityBean bean) {
+    public void jsonWrite(WriteJson writeJson, EntityBean bean) {
         
         Object value = getValueIntercept(bean);
         if (value == null){
-            ctx.beginAssocOneIsNull(name);
+          writeJson.gen().writeNull(name);
             
         } else {
-            if (ctx.isParentBean(value)){
+            if (writeJson.isParentBean(value)){
                 // bi-directional and already rendered parent
                 
             } else {
               // Hmmm, not writing complex non-entity bean
               if (value instanceof EntityBean) {  
-                ctx.pushParentBean(bean);
-                ctx.beginAssocOne(name);
+                writeJson.beginAssocOne(name, bean);
                 BeanDescriptor<?> refDesc = descriptor.getBeanDescriptor(value.getClass());
-                refDesc.jsonWrite(ctx, (EntityBean)value);                  
-                ctx.endAssocOne();
-                ctx.popParentBean();
+                refDesc.jsonWrite(writeJson, (EntityBean)value, name);                  
+                writeJson.endAssocOne();
               } 
             }
         }
     }
-    
+
     @Override
-    public void jsonRead(ReadJsonContext ctx, EntityBean bean){
-        if (targetDescriptor != null) {
-          T assocBean = targetDescriptor.jsonReadBean(ctx, name);
-          setValue(bean, assocBean);
-        }
+    public void jsonRead(JsonParser parser, EntityBean bean) {
+      if (targetDescriptor != null) {
+        T assocBean = targetDescriptor.jsonRead(parser, name);
+        setValue(bean, assocBean);
+      }
     }
 
     public boolean isReference(Object detailBean) {

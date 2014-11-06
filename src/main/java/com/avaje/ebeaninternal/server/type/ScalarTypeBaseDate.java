@@ -7,8 +7,9 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import com.avaje.ebean.text.json.JsonValueAdapter;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
 
 /**
  * Base class for Date types.
@@ -62,22 +63,22 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
     }
     
     @Override
-    public String jsonToString(T value, JsonValueAdapter ctx) {
-        Date date = convertToDate(value);
-        return ctx.jsonFromDate(date);
+    public Object jsonRead(JsonParser ctx, Event event) {
+      if (ctx.isIntegralNumber()) {
+        return parseDateTime(ctx.getLong());
+      } else {
+        String string = ctx.getString();
+        throw new RuntimeException("convert "+string);
+      }
     }
     
-    @Override
-    public void jsonWrite(WriteJsonBuffer buffer, T value, JsonValueAdapter ctx) {
-    	String s = jsonToString(value, ctx);
-    	buffer.append(s);
+    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+      long millis = convertToMillis(value);
+      ctx.write(name, millis);
     }
+    
+    public abstract long convertToMillis(Object value);
 
-	@Override
-    public T jsonFromString(String value, JsonValueAdapter ctx) {
-        Date ts = ctx.jsonToDate(value);
-        return convertFromDate(ts);
-    }
 
     public Object readData(DataInput dataInput) throws IOException {
         if (!dataInput.readBoolean()) {

@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.util.StringHelper;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
 
 public class EscapeJson {
 
@@ -43,24 +42,6 @@ public class EscapeJson {
 		escapeAppend(s, sb);
 		return sb.toString();
 
-	}
-
-	public static void escape(String value, WriteJsonBuffer sb) {
-		if (value == null) {
-			sb.append("null");
-		} else {
-			escapeAppend(value, sb);
-		}
-	}
-	
-	public static void escapeQuote(String value, WriteJsonBuffer sb) {
-		if (value == null) {
-			sb.append("null");
-		} else {
-			sb.append("\"");
-			escapeAppend(value, sb);
-			sb.append("\"");
-		}
 	}
 
 	/**

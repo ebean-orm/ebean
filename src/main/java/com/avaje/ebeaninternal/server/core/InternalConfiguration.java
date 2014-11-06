@@ -11,8 +11,6 @@ import com.avaje.ebean.config.ExternalTransactionManager;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.text.json.JsonContext;
-import com.avaje.ebean.text.json.JsonValueAdapter;
-import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
@@ -33,7 +31,6 @@ import com.avaje.ebeaninternal.server.query.DefaultRelationalQueryEngine;
 import com.avaje.ebeaninternal.server.resource.ResourceManager;
 import com.avaje.ebeaninternal.server.resource.ResourceManagerFactory;
 import com.avaje.ebeaninternal.server.text.json.DJsonContext;
-import com.avaje.ebeaninternal.server.text.json.DefaultJsonValueAdapter;
 import com.avaje.ebeaninternal.server.transaction.AutoCommitTransactionManager;
 import com.avaje.ebeaninternal.server.transaction.DefaultTransactionScopeManager;
 import com.avaje.ebeaninternal.server.transaction.ExternalTransactionScopeManager;
@@ -46,6 +43,8 @@ import com.avaje.ebeaninternal.server.type.TypeManager;
 /**
  * Used to extend the ServerConfig with additional objects used to configure and
  * construct an EbeanServer.
+ * 
+ * @author rbygrave
  */
 public class InternalConfiguration {
 
@@ -163,16 +162,8 @@ public class InternalConfiguration {
 
   public JsonContext createJsonContext(SpiEbeanServer server) {
 
-    String s = serverConfig.getProperty("json.pretty", "false");
-    boolean dfltPretty = "true".equalsIgnoreCase(s);
-
-    s = serverConfig.getProperty("json.jsonValueAdapter", null);
-
-    JsonValueAdapter va = new DefaultJsonValueAdapter();
-    if (s != null) {
-      va = (JsonValueAdapter) ClassUtil.newInstance(s, this.getClass());
-    }
-    return new DJsonContext(server, va, dfltPretty);
+    
+    return new DJsonContext(server);
   }
 
   public XmlConfig getXmlConfig() {

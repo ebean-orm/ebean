@@ -65,7 +65,6 @@ import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
-import com.avaje.ebean.text.json.JsonElement;
 import com.avaje.ebeaninternal.api.LoadBeanRequest;
 import com.avaje.ebeaninternal.api.LoadManyRequest;
 import com.avaje.ebeaninternal.api.ScopeTrans;
@@ -1962,10 +1961,6 @@ public final class DefaultServer implements SpiEbeanServer {
     TypeInfo typeInfo = ParamTypeHelper.getTypeInfo(genericType);
     if (typeInfo == null) {
       return false;
-    }
-    Class<?> beanType = typeInfo.getBeanType();
-    if (JsonElement.class.isAssignableFrom(beanType)) {
-      return true;
     }
     return getBeanDescriptor(typeInfo.getBeanType()) != null;
   }

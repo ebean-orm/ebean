@@ -7,8 +7,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 
-import com.avaje.ebean.text.json.JsonValueAdapter;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
 
 /**
  * Base type for DateTime types.
@@ -18,6 +19,8 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
     public ScalarTypeBaseDateTime(Class<T> type, boolean jdbcNative, int jdbcType) {
         super(type, jdbcNative, jdbcType);
     }
+    
+    public abstract long convertToMillis(Object value);
     
     public abstract Timestamp convertToTimestamp(T t);
     
@@ -42,6 +45,23 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
         }
     }
     
+    @Override
+    public Object jsonRead(JsonParser ctx, Event event) {
+      if (ctx.isIntegralNumber()) {
+        long millis = ctx.getLong();
+        return parseDateTime(millis);
+      } else {
+        String string = ctx.getString();
+        throw new RuntimeException("convert "+string);
+      }
+    }
+    
+    @Override
+    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+      long millis = convertToMillis(value);
+      ctx.write(name, millis);
+    }
+
     public String formatValue(T t) {
         Timestamp ts = convertToTimestamp(t);
         return ts.toString();
@@ -59,24 +79,6 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
 
     public boolean isDateTimeCapable() {
         return true;
-    }
-    
-    @Override
-    public void jsonWrite(WriteJsonBuffer buffer, T value, JsonValueAdapter ctx) {
-    	String v = jsonToString(value, ctx);
-    	buffer.append(v);
-    }
-
-	@Override
-    public String jsonToString(T value, JsonValueAdapter ctx) {
-        Timestamp ts = convertToTimestamp(value);
-        return ctx.jsonFromTimestamp(ts);
-    }
-    
-    @Override
-    public T jsonFromString(String value, JsonValueAdapter ctx) {
-        Timestamp ts = ctx.jsonToTimestamp(value);
-        return convertFromTimestamp(ts);
     }
 
     public Object readData(DataInput dataInput) throws IOException {

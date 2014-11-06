@@ -15,6 +15,11 @@ public class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
 		super(Timestamp.class, true, Types.TIMESTAMP);
 	}
 	
+	 @Override
+	  public long convertToMillis(Object value) {
+	    return ((Timestamp)value).getTime();
+	  }
+	 
 	@Override
     public Timestamp convertFromTimestamp(Timestamp ts) {
         return ts;

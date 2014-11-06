@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 
@@ -16,6 +17,11 @@ public class ScalarTypeJodaDateTime extends ScalarTypeBaseDateTime<DateTime> {
 		super(DateTime.class, false, Types.TIMESTAMP);
 	}
 	
+  @Override
+  public long convertToMillis(Object value) {
+    return ((DateTime) value).getMillis();
+  }
+	 
 	@Override
     public DateTime convertFromTimestamp(Timestamp ts) {
         return new DateTime(ts.getTime());

@@ -5,8 +5,11 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import com.avaje.ebean.text.json.JsonValueAdapter;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
+import com.avaje.ebean.text.TextException;
 
 /**
  * Encrypted ScalarType that wraps a byte[] types.
@@ -65,6 +68,16 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
         baseType.loadIgnore(dataReader);
     }
 
+    @Override
+    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+      throw new TextException("Not supported");
+    }
+    
+    @Override
+    public Object jsonRead(JsonParser ctx, Event event) {
+      throw new TextException("Not supported");
+    }
+    
     public String format(Object v) {
         throw new RuntimeException("Not used");
     }
@@ -98,18 +111,6 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
 
     public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
         baseType.accumulateScalarTypes(propName, list);
-    }
-
-    public void jsonWrite(WriteJsonBuffer buffer, byte[] value, JsonValueAdapter ctx) {
-    	baseType.jsonWrite(buffer, value, ctx);
-    }
-
-	public String jsonToString(byte[] value, JsonValueAdapter ctx) {
-        return baseType.jsonToString(value, ctx);
-    }
-
-    public byte[] jsonFromString(String value, JsonValueAdapter ctx) {
-        return baseType.jsonFromString(value, ctx);
     }
 
     public Object readData(DataInput dataInput) throws IOException {

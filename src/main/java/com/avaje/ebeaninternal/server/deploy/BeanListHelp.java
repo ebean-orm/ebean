@@ -12,7 +12,7 @@ import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.common.BeanList;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
+import com.avaje.ebeaninternal.server.text.json.WriteJson;
 
 /**
  * Helper object for dealing with Lists.
@@ -128,7 +128,7 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
     }
   }
 
-  public void jsonWrite(WriteJsonContext ctx, String name, Object collection, boolean explicitInclude) {
+  public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) {
 
     List<?> list;
     if (collection instanceof BeanCollection<?>) {
@@ -147,15 +147,11 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
       list = (List<?>) collection;
     }
 
-    ctx.beginAssocMany(name);
+    ctx.gen().writeStartArray(name);
     for (int j = 0; j < list.size(); j++) {
-      if (j > 0) {
-        ctx.appendComma();
-      }
-      Object detailBean = list.get(j);
-      targetDescriptor.jsonWrite(ctx, (EntityBean)detailBean);
+      targetDescriptor.jsonWrite(ctx, (EntityBean)list.get(j));
     }
-    ctx.endAssocMany();
+    ctx.gen().writeEnd();
   }
 
 }

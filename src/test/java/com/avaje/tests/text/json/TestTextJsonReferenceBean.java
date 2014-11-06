@@ -70,7 +70,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
     JsonWriteOptions options = new JsonWriteOptions();
     options.setPathProperties("details.product", "id");
 
-    String jsonOrder = jsonContext.toJsonString(order, true, options);
+    String jsonOrder = jsonContext.toJsonString(order, options);
     System.out.println(jsonOrder);
 
     Order o2 = jsonContext.toBean(Order.class, jsonOrder);

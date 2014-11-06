@@ -53,6 +53,9 @@ class PathPropertiesParser {
       case '(':
         return currentWord();
       default:
+        if (pos == 1) {
+          return "";
+        }
       }
     } while (pos < eof);
     throw new RuntimeException("Hit EOF while reading sectionTitle from " + startPos);
@@ -91,6 +94,10 @@ class PathPropertiesParser {
       }
 
     } while (pos < eof);
+    if (startPos < pos) {
+      String currentWord = source.substring(startPos, pos);
+      currentPathProps.addProperty(currentWord);
+    }
   }
 
   private void addSubpath() {

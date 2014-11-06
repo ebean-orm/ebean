@@ -2,6 +2,9 @@ package com.avaje.ebeaninternal.server.type;
 
 import java.util.UUID;
 
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 
 /**
@@ -42,6 +45,11 @@ public class ScalarTypeUUIDVarchar extends ScalarTypeBaseVarchar<UUID> {
 
   public UUID parse(String value) {
     return UUID.fromString(value);
+  }
+
+  @Override
+  public Object jsonRead(JsonParser ctx, Event event) {
+    return UUID.fromString(ctx.getString());
   }
 
 }

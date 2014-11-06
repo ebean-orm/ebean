@@ -7,6 +7,10 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Types;
 
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 
@@ -20,7 +24,7 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
 	public ScalarTypeJodaLocalTime() {
 		super(LocalTime.class, false, Types.TIME);
 	}
-	
+  
 	public void bind(DataBind b, LocalTime value) throws SQLException {
 		if (value == null){
 			b.setNull(Types.TIME);
@@ -61,8 +65,24 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
     public LocalTime parse(String value) {
         return new LocalTime(value);
 	}
-	
-	public LocalTime parseDateTime(long systemTimeMillis) {
+    
+  @Override
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+    ctx.write(value.toString());
+  }
+    
+    @Override
+    public Object jsonRead(JsonParser ctx, Event event) {
+      if (ctx.isIntegralNumber()) {
+        long millis = ctx.getLong();
+        return parseDateTime(millis);
+      } else {
+        String string = ctx.getString();
+        throw new RuntimeException("convert "+string);
+      }
+    }
+
+  public LocalTime parseDateTime(long systemTimeMillis) {
 		return new LocalTime(systemTimeMillis);
 	}
 

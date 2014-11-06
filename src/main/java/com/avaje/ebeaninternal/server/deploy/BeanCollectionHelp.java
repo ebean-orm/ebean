@@ -9,7 +9,7 @@ import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
+import com.avaje.ebeaninternal.server.text.json.WriteJson;
 
 /**
  * Helper functions for performing tasks on Lists Sets or Maps.
@@ -62,6 +62,6 @@ public interface BeanCollectionHelp<T> {
 	/**
 	 * Write the collection out as json.
 	 */
-    public void jsonWrite(WriteJsonContext ctx, String name, Object collection, boolean explicitInclude);
+    public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude);
 
 }

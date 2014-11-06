@@ -10,6 +10,8 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.bean.EntityBean;
@@ -18,7 +20,6 @@ import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
-import com.avaje.ebean.text.TextException;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
@@ -30,8 +31,7 @@ import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectGetter;
 import com.avaje.ebeaninternal.server.reflect.BeanReflectSetter;
-import com.avaje.ebeaninternal.server.text.json.ReadJsonContext;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
+import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 
@@ -78,7 +78,7 @@ public class BeanProperty implements ElPropertyValue {
      * Flag set if this maps to the inheritance discriminator column
      */
     final boolean discriminator;
-
+    
     /**
      * Flag to mark the property as embedded. This could be on
      * BeanPropertyAssocOne rather than here. Put it here for checking Id type
@@ -92,7 +92,7 @@ public class BeanProperty implements ElPropertyValue {
     final boolean version;
 
     final boolean naturalKey;
-
+    
     /**
      * Set if this property is nullable.
      */
@@ -136,7 +136,7 @@ public class BeanProperty implements ElPropertyValue {
      * True if the property is a Clob, Blob LongVarchar or LongVarbinary.
      */
     final boolean lob;
-
+    
     final boolean fetchEager;
 
     final boolean isTransient;
@@ -147,7 +147,7 @@ public class BeanProperty implements ElPropertyValue {
     final String name;
 
     final int propertyIndex;
-
+    
     /**
      * The reflected field.
      */
@@ -265,7 +265,6 @@ public class BeanProperty implements ElPropertyValue {
     final boolean indexed;
 
     final String indexName;
-
     public BeanProperty(DeployBeanProperty deploy) {
         this(null, null, deploy);
     }
@@ -275,10 +274,8 @@ public class BeanProperty implements ElPropertyValue {
         this.descriptor = descriptor;
         this.name = InternString.intern(deploy.getName());
         this.propertyIndex = deploy.getPropertyIndex();
-
         this.indexed = deploy.isIndexed();
         this.indexName = deploy.getIndexName();
-
         this.unidirectionalShadow = deploy.isUndirectionalShadow();
         this.discriminator = deploy.isDiscriminator();
         this.localEncrypted = deploy.isLocalEncrypted();
@@ -333,7 +330,7 @@ public class BeanProperty implements ElPropertyValue {
         this.lob = isLobType(dbType);
         this.propertyType = deploy.getPropertyType();
         this.field = deploy.getField();
-
+        
         EntityType et = descriptor == null ? null : descriptor.getEntityType();
         this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), false, null);
         this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), dbEncrypted, dbColumn);
@@ -371,7 +368,6 @@ public class BeanProperty implements ElPropertyValue {
 
         this.indexed = source.isIndexed();
         this.indexName = source.getIndexName();
-
         this.dbColumn = InternString.intern(override.getDbColumn());
         this.sqlFormulaJoin = InternString.intern(override.getSqlFormulaJoin());
         this.sqlFormulaSelect = InternString.intern(override.getSqlFormulaSelect());
@@ -420,7 +416,7 @@ public class BeanProperty implements ElPropertyValue {
         this.lob = isLobType(dbType);
         this.propertyType = source.getPropertyType();
         this.field = source.getField();
-
+        
         this.elPlaceHolder = override.replace(source.elPlaceHolder, source.dbColumn);
         this.elPlaceHolderEncrypted = override.replace(source.elPlaceHolderEncrypted, source.dbColumn);
 
@@ -487,7 +483,7 @@ public class BeanProperty implements ElPropertyValue {
     public boolean isDiscriminator() {
         return discriminator;
     }
-
+    
     /**
      * Return true if the underlying type is mutable.
      */
@@ -675,6 +671,14 @@ public class BeanProperty implements ElPropertyValue {
     public BeanProperty getBeanProperty() {
         return this;
     }
+    
+    public boolean isIndexed() {
+      return indexed;
+    }
+
+    public String getIndexName() {
+      return indexName;
+    }
 
     /**
      * Return the getter method.
@@ -742,7 +746,7 @@ public class BeanProperty implements ElPropertyValue {
     public void setCacheDataValue(EntityBean bean, Object cacheData) {
         setValue(bean, cacheData);
     }
-
+    
     /**
      * Return the value of the property method.
      */
@@ -755,12 +759,12 @@ public class BeanProperty implements ElPropertyValue {
             throw new RuntimeException(msg, ex);
         }
     }
-
+    
     /**
      * Explicitly use reflection to get value.
      */
     public Object getValueViaReflection(Object bean) {
-        try {
+    	try {
             return readMethod.invoke(bean, NO_ARGS);
         } catch (Exception ex) {
             String beanType = bean == null ? "null" : bean.getClass().getName();
@@ -815,7 +819,7 @@ public class BeanProperty implements ElPropertyValue {
      * Return the position of this property in the enhanced bean.
      */
     public int getPropertyIndex() {
-        return propertyIndex;
+      return propertyIndex;
     }
 
     public String getElName() {
@@ -828,7 +832,6 @@ public class BeanProperty implements ElPropertyValue {
     public boolean isDeployOnly() {
         return false;
     }
-
 
     @Override
     public boolean containsFormulaWithJoin() {
@@ -895,7 +898,7 @@ public class BeanProperty implements ElPropertyValue {
     public boolean isDirtyValue(Object value) {
         return scalarType.isDirty(value);
     }
-
+    
     /**
      * Return the scalarType.
      */
@@ -914,7 +917,7 @@ public class BeanProperty implements ElPropertyValue {
     public boolean isDateTimeCapable() {
         return scalarType != null && scalarType.isDateTimeCapable();
     }
-
+    
     public int getJdbcType() {
         return scalarType == null ? 0 : scalarType.getJdbcType();
     }
@@ -1020,7 +1023,7 @@ public class BeanProperty implements ElPropertyValue {
     public boolean isLoadProperty() {
         return !isTransient || formula;
     }
-
+    
     /**
      * Return true if this is a version column used for concurrency checking.
      */
@@ -1183,43 +1186,32 @@ public class BeanProperty implements ElPropertyValue {
         return name;
     }
 
-    @SuppressWarnings("unchecked")
-    public void jsonWrite(WriteJsonContext ctx, EntityBean bean) {
-        if (!jsonSerialize) {
-            return;
-        }
-        Object value = getValueIntercept(bean);
-        if (value == null) {
-            ctx.appendNull(name);
-        } else {
-            ctx.appendNameValue(name, scalarType, value);
-        }
+  public void jsonWrite(WriteJson writeJson, EntityBean bean) {
+    if (!jsonSerialize) {
+      return;
+    }
+    Object value = getValueIntercept(bean);
+    if (value == null) {
+      writeJson.gen().writeNull(name);
+    } else {
+      scalarType.jsonWrite(writeJson.gen(), name, value);
+    }
+  }
+
+  public void jsonRead(JsonParser ctx, EntityBean bean) {
+    if (!jsonDeserialize) {
+      return;
+    }
+    if (!ctx.hasNext()) {
+      throw new RuntimeException(ctx.getLocation().toString());
+    }
+    Event event = ctx.next();
+    if (Event.VALUE_NULL == event) {
+      setValue(bean, null);
+    } else {
+      Object objValue = scalarType.jsonRead(ctx, event);
+      setValue(bean, objValue);
     }
 
-    public void jsonRead(ReadJsonContext ctx, EntityBean bean) {
-        if (!jsonDeserialize) {
-            return;
-        }
-        String jsonValue;
-        try {
-            jsonValue = ctx.readScalarValue();
-        } catch (TextException e) {
-            throw new TextException("Error reading property " + getFullBeanName(), e);
-        }
-        Object objValue;
-        if (jsonValue == null) {
-            objValue = null;
-        } else {
-            objValue = scalarType.jsonFromString(jsonValue, ctx.getValueAdapter());
-        }
-        setValue(bean, objValue);
-    }
-
-    public boolean isIndexed() {
-        return indexed;
-    }
-
-    public String getIndexName() {
-        return indexName;
-    }
+  }
 }

@@ -14,8 +14,13 @@ public class ScalarTypeDate extends ScalarTypeBaseDate<java.sql.Date> {
 	public ScalarTypeDate() {
 		super(Date.class, true, Types.DATE);
 	}
-	
+		
 	@Override
+  public long convertToMillis(Object value) {
+    return ((Date)value).getTime();
+  }
+
+  @Override
     public Date convertFromDate(Date date) {
         return date;
     }

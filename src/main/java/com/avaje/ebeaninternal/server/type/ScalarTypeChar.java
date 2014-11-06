@@ -3,7 +3,9 @@ package com.avaje.ebeaninternal.server.type;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import com.avaje.ebean.text.json.JsonValueAdapter;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 
 /**
@@ -59,15 +61,11 @@ public class ScalarTypeChar extends ScalarTypeBaseVarchar<Character> {
     public Character parse(String value) {
 		return value.charAt(0);
 	}
-	
+    
     @Override
-    public Character jsonFromString(String value, JsonValueAdapter ctx) {
-        return value.charAt(0);
+    public Object jsonRead(JsonParser ctx, Event event) {
+      return ctx.getString();
     }
 
-    @Override
-    public String jsonToString(Character value, JsonValueAdapter ctx) {
-        return EscapeJson.escapeQuote(value.toString());
-    }
     
 }

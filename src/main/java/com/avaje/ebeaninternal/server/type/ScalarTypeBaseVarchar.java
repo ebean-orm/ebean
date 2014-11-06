@@ -6,9 +6,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import com.avaje.ebean.text.TextException;
-import com.avaje.ebean.text.json.JsonValueAdapter;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
 
 /**
  * Base ScalarType for types which converts to and from a VARCHAR database
@@ -81,19 +83,6 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
     return formatValue((T) v);
   }
 
-  public T jsonFromString(String value, JsonValueAdapter ctx) {
-    return parse(EscapeJson.unescapeSlash(value));
-  }
-
-  public String toJsonString(Object value, JsonValueAdapter ctx) {
-    return EscapeJson.escapeQuote(format(value));
-  }
-  
-  @Override
-  public void jsonWrite(WriteJsonBuffer buffer, T value, JsonValueAdapter ctx) {
-    EscapeJson.escapeQuote(format(value), buffer);
-  }
-
   public Object readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
@@ -114,5 +103,14 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
       String s = convertToDbString(value);
       dataOutput.writeUTF(s);
     }
+  }
+  
+  @Override
+  public Object jsonRead(JsonParser ctx, Event event) {
+    return parse(ctx.getString());
+  }
+  
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+    ctx.write(name, format(value));
   }
 }

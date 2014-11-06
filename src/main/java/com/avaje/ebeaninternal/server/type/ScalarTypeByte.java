@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 
@@ -37,9 +41,18 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
 	public Byte toBeanType(Object value) {
 		return BasicTypeConverter.toByte(value);
 	}
-
 	
-	public String formatValue(Byte t) {
+  @Override
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+    throw new TextException("Not supported");
+  }
+	 
+	@Override
+  public Object jsonRead(JsonParser ctx, Event event) {
+    throw new TextException("Not supported");
+  }
+
+  public String formatValue(Byte t) {
         return t.toString();
     }
 

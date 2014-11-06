@@ -5,8 +5,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import com.avaje.ebean.text.json.JsonValueAdapter;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonBuffer;
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
 
 public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
 
@@ -31,7 +32,12 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
     public boolean isDirty(Object value) {
       return wrapped.isDirty(value);
     }
-    
+
+    @Override
+    public Object jsonRead(JsonParser ctx, Event event) {
+      return wrapped.jsonRead(ctx, event);
+    }
+
     public Object readData(DataInput dataInput) throws IOException {
         return wrapped.readData(dataInput);
     }
@@ -113,17 +119,8 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
     public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
         wrapped.accumulateScalarTypes(propName, list);
     }
-
-    public String jsonToString(T value, JsonValueAdapter ctx) {
-        return wrapped.jsonToString(value, ctx);
-    }
     
-    public void jsonWrite(WriteJsonBuffer buffer, T value, JsonValueAdapter ctx) {
-	    wrapped.jsonWrite(buffer, value, ctx);
-    }
-
-	public T jsonFromString(String value, JsonValueAdapter ctx) {
-        return wrapped.jsonFromString(value, ctx);
-    }
-    
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+    wrapped.jsonWrite(ctx, name, value);
+  }
 }

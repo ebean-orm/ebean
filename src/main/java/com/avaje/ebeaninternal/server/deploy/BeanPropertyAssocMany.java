@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.json.stream.JsonParser;
 import javax.persistence.PersistenceException;
 
 import org.slf4j.Logger;
@@ -28,9 +29,7 @@ import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
-import com.avaje.ebeaninternal.server.text.json.ReadJsonContext;
-import com.avaje.ebeaninternal.server.text.json.ReadJsonContext.ReadBeanState;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
+import com.avaje.ebeaninternal.server.text.json.WriteJson;
 
 /**
  * Property mapped to a List Set or Map.
@@ -38,6 +37,8 @@ import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
 public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanPropertyAssocMany.class);
+  
+  private final BeanPropertyAssocManyJsonHelp jsonHelp;
   
   /**
    * Join for manyToMany intersection table.
@@ -90,7 +91,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   /**
    * Property on the 'child' bean that links back to the 'master'.
    */
-  private BeanPropertyAssocOne<?> childMasterProperty;
+  protected BeanPropertyAssocOne<?> childMasterProperty;
 
   private boolean embeddedExportedProperties;
 
@@ -115,6 +116,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 		this.intersectionJoin = deploy.createIntersectionTableJoin();
 		this.inverseJoin = deploy.createInverseTableJoin();
 		this.modifyListenMode = deploy.getModifyListenMode();
+		this.jsonHelp = new BeanPropertyAssocManyJsonHelp(this);
 	}
 
 	public void initialise() {
@@ -875,7 +877,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
         return null != targetDescriptor.getId(otherBean);
     }
 
-    public void jsonWrite(WriteJsonContext ctx, EntityBean bean) {
+    public void jsonWrite(WriteJson ctx, EntityBean bean) {
         if(!this.jsonSerialize){
             return;
         }
@@ -896,37 +898,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
         }
     }
     
-    public void jsonRead(ReadJsonContext ctx, EntityBean bean){
-        if(!this.jsonDeserialize){
-            return;
-        }
-        if (!ctx.readArrayBegin()) {
-            // the array is null
-            return;
-        }
-        
-        Object collection = help.createEmpty(false);
-        BeanCollectionAdd add = getBeanCollectionAdd(collection, null);
-        do {
-            ReadBeanState detailBeanState = targetDescriptor.jsonRead(ctx, name);
-            if (detailBeanState == null){
-                // probably empty array
-                break;
-            } 
-            EntityBean detailBean = (EntityBean)detailBeanState.getBean();
-            add.addBean(detailBean);
-            
-            if (bean != null && childMasterProperty != null){
-                // bind detail bean back to master via mappedBy property
-                childMasterProperty.setValue(detailBean, bean);
-                detailBeanState.setLoaded(childMasterProperty.getName());
-            }
-                        
-            if (!ctx.readArrayNext()){
-                break;
-            }
-        } while(true);
-        
-        setValue(bean, collection);
+    public void jsonRead(JsonParser parser, EntityBean parentBean) {
+      jsonHelp.jsonRead(parser, parentBean);
     }
 }

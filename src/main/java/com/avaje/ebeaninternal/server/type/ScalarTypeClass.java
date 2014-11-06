@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import javax.json.stream.JsonGenerator;
 import javax.persistence.PersistenceException;
 
 /**
@@ -41,6 +42,10 @@ public class ScalarTypeClass extends ScalarTypeBaseVarchar<Class> {
             String msg = "Unable to find Class "+value;
             throw new PersistenceException(msg, e);
         }
+    }
+    
+    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+      ctx.write(name, formatValue((Class<?>)value));
     }
 	
 	

@@ -29,7 +29,7 @@ public class TestTextJsonSuperSimple extends BaseTestCase {
     if (list.size() > 1) {
       Customer customer = list.get(0);
 
-      String s = json.toJsonString(customer, true);
+      String s = json.toJsonString(customer);
       System.out.println(s);
       int statusPos = s.indexOf("status");
       Assert.assertEquals(-1, statusPos);

@@ -39,6 +39,11 @@ public class ScalarTypeCalendar extends ScalarTypeBaseDateTime<Calendar> {
         return calendar;
     }
 
+  @Override
+  public long convertToMillis(Object value) {
+    return ((Calendar) value).getTimeInMillis();
+  }
+
     @Override
     public Timestamp convertToTimestamp(Calendar t) {
         return new Timestamp(t.getTimeInMillis());

@@ -24,7 +24,7 @@ public class TestJsonMap extends BaseTestCase {
     JsonContext jsonContext = Ebean.createJsonContext();
     JsonWriteOptions jsonWriteOptions = JsonWriteOptions.parsePath("(id,status,name)");
 
-    String jsonString = jsonContext.toJsonString(map, true, jsonWriteOptions);
+    String jsonString = jsonContext.toJsonString(map, jsonWriteOptions);
     System.out.println(jsonString);
 
     jsonContext = Ebean.createJsonContext();
@@ -33,7 +33,7 @@ public class TestJsonMap extends BaseTestCase {
     // jsonWriteOptions =
     // JsonWriteOptions.parsePath("(id,status,billingAddress(*))");
 
-    jsonString = jsonContext.toJsonString(map, true, jsonWriteOptions);
+    jsonString = jsonContext.toJsonString(map, jsonWriteOptions);
     System.out.println(jsonString);
 
     // Assert.assertTrue(jsonString.indexOf("{\"1\":") > -1);

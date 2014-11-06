@@ -3,6 +3,9 @@ package com.avaje.ebeaninternal.server.type;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
+
 import com.avaje.ebean.text.TextException;
 
 /**
@@ -40,4 +43,10 @@ public class ScalarTypeURL extends ScalarTypeBaseVarchar<URL> {
 			throw new TextException(e);
 		}
 	}
+    
+    @Override
+    public Object jsonRead(JsonParser ctx, Event event) {
+      return parse(ctx.getString());
+    }
+
 }

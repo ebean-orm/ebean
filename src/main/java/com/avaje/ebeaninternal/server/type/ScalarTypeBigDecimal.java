@@ -4,8 +4,13 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.sql.Types;
+
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import javax.json.stream.JsonParser.Event;
 
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 
@@ -74,5 +79,15 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
 	public boolean isDateTimeCapable() {
 		return true;
 	}
+
+  @Override
+  public Object jsonRead(JsonParser ctx, Event event) {
+    return ctx.getBigDecimal();
+  }
+	
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+    ctx.write(name, (BigDecimal)value);
+  }
+
 	
 }

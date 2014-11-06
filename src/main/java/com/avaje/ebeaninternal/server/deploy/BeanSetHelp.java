@@ -12,7 +12,7 @@ import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.common.BeanSet;
-import com.avaje.ebeaninternal.server.text.json.WriteJsonContext;
+import com.avaje.ebeaninternal.server.text.json.WriteJson;
 
 /**
  * Helper specifically for dealing with Sets.
@@ -129,7 +129,7 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
 		}
 	}
 	
-    public void jsonWrite(WriteJsonContext ctx, String name, Object collection, boolean explicitInclude) {
+    public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) {
         
         Set<?> set;
         if (collection instanceof BeanCollection<?>){
@@ -148,16 +148,11 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
             set = (Set<?>)collection;
         }
         
-        int count = 0;
-        ctx.beginAssocMany(name);
+        ctx.gen().writeStartArray(name);
         Iterator<?> it = set.iterator();
         while (it.hasNext()) {
-            Object detailBean = it.next();
-            if (count++ > 0){
-                ctx.appendComma();
-            }
-            targetDescriptor.jsonWrite(ctx, (EntityBean)detailBean);
+            targetDescriptor.jsonWrite(ctx, (EntityBean)it.next());
         }
-        ctx.endAssocMany();        
+        ctx.gen().writeEnd();        
     }
 }

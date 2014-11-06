@@ -16,7 +16,14 @@ public class ScalarTypeJodaLocalDateTime extends ScalarTypeBaseDateTime<LocalDat
 		super(LocalDateTime.class, false, Types.TIMESTAMP);
 	}
 	
+	
 	@Override
+  public long convertToMillis(Object value) {
+    return ((LocalDateTime)value).toDateTime().getMillis();
+  }
+
+
+  @Override
     public LocalDateTime convertFromTimestamp(Timestamp ts) {
         return new LocalDateTime(ts.getTime());
     }
