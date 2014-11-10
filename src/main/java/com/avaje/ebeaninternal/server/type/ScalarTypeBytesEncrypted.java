@@ -5,11 +5,10 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebean.text.TextException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Encrypted ScalarType that wraps a byte[] types.
@@ -74,7 +73,7 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
     }
     
     @Override
-    public Object jsonRead(JsonParser ctx, Event event) {
+    public Object jsonRead(JsonParser ctx, JsonToken event) {
       throw new TextException("Not supported");
     }
     

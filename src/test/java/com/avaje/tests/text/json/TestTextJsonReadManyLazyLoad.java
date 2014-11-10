@@ -1,5 +1,6 @@
 package com.avaje.tests.text.json;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.Assert;
@@ -16,7 +17,7 @@ import com.avaje.tests.model.basic.ResetBasicData;
 public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
 
   @Test
-  public void test_lazyLoadBoth() {
+  public void test_lazyLoadBoth() throws IOException {
 
     ResetBasicData.reset();
 
@@ -39,7 +40,7 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
   }
 
   @Test
-  public void test_lazyLoadCust() {
+  public void test_lazyLoadCust() throws IOException {
 
     ResetBasicData.reset();
 
@@ -62,7 +63,7 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
   }
 
   @Test
-  public void test_lazyLoadContacts() {
+  public void test_lazyLoadContacts() throws IOException {
 
     ResetBasicData.reset();
 

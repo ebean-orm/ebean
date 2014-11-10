@@ -7,11 +7,10 @@ import java.math.BigInteger;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for java.math.BigInteger.
@@ -85,12 +84,12 @@ public class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
     }
 
     @Override
-    public Object jsonRead(JsonParser ctx, Event event) {
-      return ctx.getBigDecimal().toBigInteger();
+    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+      return ctx.getDecimalValue().toBigInteger();
     }
     
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-      ctx.write(name, (BigInteger)value);
+    public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+      ctx.writeNumberField(name, ((BigInteger)value).longValue());
     }
     
 }

@@ -4,15 +4,13 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for BigDecimal.
@@ -81,12 +79,12 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
 	}
 
   @Override
-  public Object jsonRead(JsonParser ctx, Event event) {
-    return ctx.getBigDecimal();
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    return ctx.getDecimalValue();
   }
 	
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-    ctx.write(name, (BigDecimal)value);
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    ctx.writeNumberField(name, (BigDecimal)value);
   }
 
 	

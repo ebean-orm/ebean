@@ -11,9 +11,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.UUID;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 public class ScalarTypeUUIDBinary extends ScalarTypeBase<UUID> {
 
@@ -143,13 +143,13 @@ public class ScalarTypeUUIDBinary extends ScalarTypeBase<UUID> {
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, Event event) {
-    return UUID.fromString(ctx.getString());
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    return UUID.fromString(ctx.getValueAsString());
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-    ctx.write(name, value.toString());
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    ctx.writeStringField(name, value.toString());
   }
 
 }

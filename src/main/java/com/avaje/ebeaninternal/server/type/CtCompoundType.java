@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -195,7 +196,7 @@ public final class CtCompoundType<V> implements ScalarDataReader<V> {
     }
 
     
-  public void jsonWrite(WriteJson ctx, Object valueObject, String propertyName) {
+  public void jsonWrite(WriteJson ctx, Object valueObject, String propertyName) throws IOException {
 
     ctx.beginAssocOne(propertyName, valueObject);
     jsonWriteProps(ctx, valueObject, propertyName);
@@ -203,13 +204,12 @@ public final class CtCompoundType<V> implements ScalarDataReader<V> {
   }
     
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  private void jsonWriteProps(WriteJson ctx, Object valueObject, String propertyName) {
+  private void jsonWriteProps(WriteJson ctx, Object valueObject, String propertyName) throws IOException {
 
     if (propertyName != null) {
-      ctx.gen().writeStartObject(propertyName);
-    } else {
-      ctx.gen().writeStartObject();
-    }
+      ctx.gen().writeFieldName(propertyName);
+    } 
+    ctx.gen().writeStartObject();
 
     for (int i = 0; i < properties.length; i++) {
       String propName = properties[i].getName();
@@ -223,7 +223,7 @@ public final class CtCompoundType<V> implements ScalarDataReader<V> {
       }
     }
 
-    ctx.gen().writeEnd();
+    ctx.gen().writeEndObject();
   }
 
 }

@@ -1,10 +1,9 @@
 package com.avaje.ebeaninternal.server.text.json;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
-
-import javax.json.stream.JsonGenerator;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.PathProperties;
@@ -12,6 +11,7 @@ import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.util.ArrayStack;
+import com.fasterxml.jackson.core.JsonGenerator;
 
 public class WriteJson {
 
@@ -122,8 +122,8 @@ public class WriteJson {
       }
     }
 
-    public void write(WriteJson writeJson) {
-      //EntityBean bean = writeJson.getBean();
+    public void write(WriteJson writeJson) throws IOException {
+      
       BeanProperty beanProp = desc.getIdProperty();
       if (beanProp != null) {
         if (isIncludeProperty(beanProp)) {
@@ -159,7 +159,7 @@ public class WriteJson {
     return null;
   }
 
-  public void toJson(String name, Collection<?> c) {
+  public void toJson(String name, Collection<?> c) throws IOException {
 
     beginAssocMany(name);
 
@@ -181,22 +181,40 @@ public class WriteJson {
     return d;
   }
 
-  public void beginAssocMany(String key) {
+  public void beginAssocMany(String key) throws IOException {
     pathStack.pushPathKey(key);
-    generator.writeStartArray(key);
+    generator.writeFieldName(key);
+    generator.writeStartArray();
   }
 
-  public void endAssocMany() {
+  public void endAssocMany() throws IOException {
     pathStack.pop();
-    generator.writeEnd();
+    generator.writeEndArray();
   }
 
-  public void writeStartObject(String key) {
-    if (key == null) {
-      generator.writeStartObject();
-    } else {
-      generator.writeStartObject(key);
+  public void writeStartArray(String key) throws IOException {
+    if (key != null) {
+      generator.writeFieldName(key);
+    } 
+    generator.writeStartArray();  
+  }
+  
+  public void writeStartObject(String key) throws IOException {
+    if (key != null) {
+      generator.writeFieldName(key);
     }
+    generator.writeStartObject();
+  }
+  
+  public void writeNull(String name) throws IOException {
+    generator.writeNullField(name);
   }
 
+  public void writeEndObject() throws IOException {
+    generator.writeEndObject();
+  }
+  
+  public void writeEndArray() throws IOException {
+    generator.writeEndArray();
+  }
 }

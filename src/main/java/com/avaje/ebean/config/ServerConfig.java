@@ -20,6 +20,7 @@ import com.avaje.ebean.event.ServerConfigStartup;
 import com.avaje.ebean.event.TransactionEventListener;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.util.ClassUtil;
+import com.fasterxml.jackson.core.JsonFactory;
 
 /**
  * The configuration used for creating a EbeanServer.
@@ -241,12 +242,32 @@ public class ServerConfig {
 
   private boolean collectQueryOrigins;
   
+  private JsonFactory jsonFactory;
+
   /**
    * Construct a Server Configuration for programmatically creating an
    * EbeanServer.
    */
   public ServerConfig() {
 
+  }
+  
+  /**
+   * Return the Jackson JsonFactory to use.
+   * <p>
+   * If not set a default implmentation will be used.
+   */
+  public JsonFactory getJsonFactory() {
+    return jsonFactory;
+  }
+
+  /**
+   * Set the Jackson JsonFactory to use.
+   * <p>
+   * If not set a default implmentation will be used.
+   */
+  public void setJsonFactory(JsonFactory jsonFactory) {
+    this.jsonFactory = jsonFactory;
   }
 
   /**

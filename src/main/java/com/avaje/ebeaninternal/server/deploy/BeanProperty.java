@@ -10,8 +10,6 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.bean.EntityBean;
@@ -34,6 +32,8 @@ import com.avaje.ebeaninternal.server.reflect.BeanReflectSetter;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Description of a property of a bean. Includes its deployment information such
@@ -1186,32 +1186,30 @@ public class BeanProperty implements ElPropertyValue {
         return name;
     }
 
-  public void jsonWrite(WriteJson writeJson, EntityBean bean) {
+  public void jsonWrite(WriteJson writeJson, EntityBean bean) throws IOException {
     if (!jsonSerialize) {
       return;
     }
     Object value = getValueIntercept(bean);
     if (value == null) {
-      writeJson.gen().writeNull(name);
+      writeJson.writeNull(name);
     } else {
       scalarType.jsonWrite(writeJson.gen(), name, value);
     }
   }
 
-  public void jsonRead(JsonParser ctx, EntityBean bean) {
+  public void jsonRead(JsonParser ctx, EntityBean bean) throws IOException {
     if (!jsonDeserialize) {
       return;
     }
-    if (!ctx.hasNext()) {
-      throw new RuntimeException(ctx.getLocation().toString());
-    }
-    Event event = ctx.next();
-    if (Event.VALUE_NULL == event) {
+
+    JsonToken event = ctx.nextToken();
+    if (JsonToken.VALUE_NULL == event) {
       setValue(bean, null);
     } else {
+      // expect to read non-null json value
       Object objValue = scalarType.jsonRead(ctx, event);
       setValue(bean, objValue);
     }
-
   }
 }

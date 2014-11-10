@@ -1,5 +1,6 @@
 package com.avaje.tests.text.json;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import com.avaje.tests.model.basic.Dog;
 public class TestJsonInheritanceDiscriminator extends BaseTestCase {
 
   @Test
-  public void testNoDiscriminator() {
+  public void testNoDiscriminator() throws IOException {
 
     Cat cat = new Cat();
     cat.setName("Gemma");

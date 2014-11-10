@@ -1,13 +1,13 @@
 package com.avaje.ebeaninternal.server.type;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for char[].
@@ -64,11 +64,11 @@ public class ScalarTypeCharArray extends ScalarTypeBaseVarchar<char[]>{
 	}
     
     @Override
-    public Object jsonRead(JsonParser ctx, Event event) {
-      return ctx.getString().toCharArray();
+    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+      return ctx.getValueAsString().toCharArray();
     }
     
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-      ctx.write(name, String.valueOf(value));
+    public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+      ctx.writeStringField(name, String.valueOf(value));
     }
 }

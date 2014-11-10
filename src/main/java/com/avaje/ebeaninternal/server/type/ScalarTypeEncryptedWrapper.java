@@ -5,9 +5,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
 
@@ -34,7 +34,7 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
     }
 
     @Override
-    public Object jsonRead(JsonParser ctx, Event event) {
+    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
       return wrapped.jsonRead(ctx, event);
     }
 
@@ -120,7 +120,7 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
         wrapped.accumulateScalarTypes(propName, list);
     }
     
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
     wrapped.jsonWrite(ctx, name, value);
   }
 }

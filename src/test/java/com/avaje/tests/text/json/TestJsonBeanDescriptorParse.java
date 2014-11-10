@@ -1,10 +1,8 @@
 package com.avaje.tests.text.json;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.Set;
-
-import javax.json.Json;
-import javax.json.stream.JsonParser;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -15,18 +13,20 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.tests.model.basic.Customer;
+import com.fasterxml.jackson.core.JsonParser;
 
 public class TestJsonBeanDescriptorParse extends BaseTestCase {
 
   @Test
-  public void test() {
+  public void test() throws IOException {
     
     SpiEbeanServer server = (SpiEbeanServer)Ebean.getServer(null);
     
     BeanDescriptor<Customer> descriptor = server.getBeanDescriptor(Customer.class);
     
+    
     StringReader reader = new StringReader("{\"id\":123,\"name\":\"Hello rob\"}");
-    JsonParser parser = Json.createParser(reader);
+    JsonParser parser = server.json().createParser(reader);
     
     Customer customer = (Customer)descriptor.jsonRead(parser, null);
     

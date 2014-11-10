@@ -7,11 +7,10 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.EnumSet;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebean.text.TextException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 
 /**
@@ -230,14 +229,14 @@ public class ScalarTypeEnumStandard {
         }
         
         @Override
-        public Object jsonRead(JsonParser ctx, Event event) {
+        public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
           
-          String val = ctx.getString();
+          String val = ctx.getValueAsString();
           return parse(val);
         }
         
-        public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-          ctx.write(name, formatValue(value));
+        public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+          ctx.writeStringField(name, formatValue(value));
         }
 
         public Object readData(DataInput dataInput) throws IOException {

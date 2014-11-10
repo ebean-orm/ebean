@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 import com.avaje.ebean.EbeanServer;
@@ -59,9 +60,9 @@ public interface BeanCollectionHelp<T> {
 	 */
 	public void refresh(BeanCollection<?> bc, EntityBean parentBean);
 
-	/**
-	 * Write the collection out as json.
-	 */
-    public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude);
+  /**
+   * Write the collection out as json.
+   */
+  public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) throws IOException;
 
 }

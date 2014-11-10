@@ -1,5 +1,7 @@
 package com.avaje.tests.update;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,7 +15,7 @@ import com.avaje.tests.model.basic.UUTwo;
 public class TestJsonStatelessUpdate extends BaseTestCase {
 
   @Test
-  public void test() {
+  public void test() throws IOException {
     
     UUOne one = new UUOne();
     one.setName("oneName");

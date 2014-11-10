@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebean.config.dbplatform.PostgresPlatform;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Postgres Hstore type which maps Map<String,String> to a single 'HStore column' in the DB.
@@ -74,7 +73,7 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, Event event) {
+  public Object jsonRead(JsonParser ctx, JsonToken event) {
     // TODO Auto-generated method stub
     return null;
   }

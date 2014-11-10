@@ -6,12 +6,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for Integer and int.
@@ -68,11 +67,11 @@ public class ScalarTypeInteger extends ScalarTypeBase<Integer> {
 	}
     
   @Override
-  public Object jsonRead(JsonParser ctx, Event event) {
-    return Integer.valueOf(ctx.getInt());
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    return ctx.getIntValue();
   }
 
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-    ctx.write(name, (Integer) value);
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    ctx.writeNumberField(name, (Integer) value);
   }
 }

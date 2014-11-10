@@ -1,11 +1,11 @@
 package com.avaje.ebeaninternal.server.type;
 
+import java.io.IOException;
 import java.util.UUID;
 
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for java.util.UUID which converts to and from a VARCHAR database column.
@@ -48,8 +48,8 @@ public class ScalarTypeUUIDVarchar extends ScalarTypeBaseVarchar<UUID> {
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, Event event) {
-    return UUID.fromString(ctx.getString());
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    return UUID.fromString(ctx.getValueAsString());
   }
 
 }

@@ -1,5 +1,6 @@
 package com.avaje.ebean.json;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -8,57 +9,59 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import javax.json.Json;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 class EJsonReader {
 
+  static JsonFactory json = new JsonFactory();
+  
   @SuppressWarnings("unchecked")
-  static Map<String, Object> parseObject(String json) {
+  static Map<String, Object> parseObject(String json) throws IOException  {
     return (Map<String, Object>) parse(json);
   }
   
   @SuppressWarnings("unchecked")
-  static Map<String, Object> parseObject(Reader reader) {
+  static Map<String, Object> parseObject(Reader reader) throws IOException {
     return (Map<String, Object>) parse(reader, false);
   }
   
   @SuppressWarnings("unchecked")
-  static Map<String, Object> parseObject(JsonParser parser) {
+  static Map<String, Object> parseObject(JsonParser parser) throws IOException {
     return (Map<String, Object>) parse(parser, false);
   }
 
   @SuppressWarnings("unchecked")
-  static List<Object> parseList(String json) {
+  static List<Object> parseList(String json) throws IOException {
     return (List<Object>) parse(json);
   }
   
   @SuppressWarnings("unchecked")
-  static List<Object> parseList(Reader reader) {
+  static List<Object> parseList(Reader reader) throws IOException {
     return (List<Object>) parse(reader, false);
   }
   
   @SuppressWarnings("unchecked")
-  static List<Object> parseList(JsonParser parser) {
+  static List<Object> parseList(JsonParser parser) throws IOException {
     return (List<Object>) parse(parser, false);
   }
 
-  static Object parse(String json) {
+  static Object parse(String json) throws IOException {
     return parse(new StringReader(json), false);
   }
 
-  static Object parse(Reader reader, boolean partial) {
-    return parse(Json.createParser(reader), partial);
+  static Object parse(Reader reader, boolean partial) throws IOException {
+    return parse(json.createParser(reader), partial);
   }
 
-  static Object parse(JsonParser parser, boolean partial) {
+  static Object parse(JsonParser parser, boolean partial) throws IOException {
     return new EJsonReader(parser, partial).parseJson();
   }
 
   private final JsonParser parser;
   
-  private final boolean partial;
+  //private final boolean partial;
   
   private int depth;
   
@@ -69,7 +72,7 @@ class EJsonReader {
 
   EJsonReader(JsonParser parser, boolean partial) {
     this.parser = parser;
-    this.partial = partial;
+    //this.partial = partial;
   }
 
   private void startArray() {
@@ -113,73 +116,83 @@ class EJsonReader {
 
   private Object parseJson() {
 
-    if (!parser.hasNext()) {
-      return null;
-    }
-    
-    Event event = parser.next();
-    if (Event.VALUE_NULL == event) {
-      // it is just a null value
-      return null;
-    }
-    Object simpleValue = getSimpleValue(event);
-    if (simpleValue != null) {
-      // it is a simple string, number or boolean
-      return simpleValue;
-    }
-    
-    stack = new Stack();
-    // it is a object or array, process the first event
-    processEvent(event);
-    
-    // process the rest of the object or array
-    while (parser.hasNext()) {
-      processEvent(parser.next());
-      
-      if (partial && depth == 0) {
-        // completed the object/array
-        return currentContext.getValue();        
+    try {
+      JsonToken token = parser.nextToken();
+      if (JsonToken.VALUE_NULL == token) {
+        return null;
       }
-      
-    }
+    
+////    if (jp.nextToken() != JsonToken.START_OBJECT) {
+////      throw new IOException("Expected data to start with an Object");
+////    }
+////    TwitterEntry result = new TwitterEntry();
+////    // Iterate over object fields:
+////    while (jp.nextToken() != JsonToken.END_OBJECT) {
+////     String fieldName = jp.getCurrentName();
+////     // Let's move to value
+////     jp.nextToken();
+////     
+//    if (!parser.hasNext()) {
+//      return null;
+//    }
+//    
+//   
+//    Object simpleValue = getSimpleValue(JsonToken);
+//    if (simpleValue != null) {
+//      // it is a simple string, number or boolean
+//      return simpleValue;
+//    }
 
-    return currentContext.getValue();
+      stack = new Stack();
+      // it is a object or array, process the first JsonToken
+      processJsonToken(token);
+
+      // process the rest of the object or array
+      while (depth > 0) {
+        token = parser.nextToken();
+        processJsonToken(token);
+      }
+
+      return currentContext.getValue();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
   
+//  /**
+//   * See if the JsonToken is a value rather than object or array.
+//   * <p>
+//   * If just a value then return that value else return null.
+//   * @throws IOException 
+//   */
+//  private Object getSimpleValue(JsonToken JsonToken) throws IOException {
+//    
+//    switch (JsonToken) {
+//    case VALUE_STRING:
+//      return parser.getValueAsString();
+//
+//    case VALUE_NUMBER_INT:
+//      return parser.getLongValue();
+//
+//    case VALUE_NUMBER_FLOAT:
+//      return parser.getDecimalValue();
+//
+//    case VALUE_TRUE:
+//      return Boolean.TRUE;
+//
+//    case VALUE_FALSE:
+//      return Boolean.FALSE;
+//
+//    default:
+//      return null;
+//    }
+//  }
+
   /**
-   * See if the event is a value rather than object or array.
-   * <p>
-   * If just a value then return that value else return null.
+   * Process the JsonToken for objects and arrays.
    */
-  private Object getSimpleValue(Event event) {
-    
-    switch (event) {
-    case VALUE_STRING:
-      return parser.getString();
-
-    case VALUE_NUMBER:
-      if (parser.isIntegralNumber()) {
-        return parser.getLong();
-      } else {
-        return parser.getBigDecimal();
-      }
-
-    case VALUE_TRUE:
-      return Boolean.TRUE;
-
-    case VALUE_FALSE:
-      return Boolean.FALSE;
-
-    default:
-      return null;
-    }
-  }
-
-  /**
-   * Process the event for objects and arrays.
-   */
-  private void processEvent(Event event) {
-    switch (event) {
+  private void processJsonToken(JsonToken token) throws IOException {
+    switch (token) {
 
     case START_ARRAY:
       startArray();
@@ -189,20 +202,20 @@ class EJsonReader {
       startObject();
       break;
 
-    case KEY_NAME:
-      currentContext.setKey(parser.getString());
+    case FIELD_NAME:
+      currentContext.setKey(parser.getCurrentName());
       break;
 
     case VALUE_STRING:
-      setValue(parser.getString());
+      setValue(parser.getValueAsString());
       break;
 
-    case VALUE_NUMBER:
-      if (parser.isIntegralNumber()) {
-        setValue(parser.getLong());
-      } else {
-        setValue(parser.getBigDecimal());
-      }
+    case VALUE_NUMBER_INT:
+      setValue(parser.getLongValue());
+      break;
+      
+    case VALUE_NUMBER_FLOAT:
+      setValue(parser.getDecimalValue());
       break;
 
     case VALUE_TRUE:

@@ -1,11 +1,12 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
+import java.io.IOException;
 
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.text.TextException;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 public class BeanPropertyAssocManyJsonHelp {
 
@@ -15,23 +16,24 @@ public class BeanPropertyAssocManyJsonHelp {
     this.many = many;
   }
 
-  public void jsonRead(JsonParser parser, EntityBean parentBean) {
+  public void jsonRead(JsonParser parser, EntityBean parentBean) throws IOException {
     
-    if (!this.many.jsonDeserialize || !parser.hasNext()) {
+    if (!this.many.jsonDeserialize) {
       return;
     }
-    Event event = parser.next();
-    if (Event.VALUE_NULL == event) {
+
+    JsonToken event = parser.nextToken();
+    if (JsonToken.VALUE_NULL == event) {
       return;
     }
-    if (Event.START_ARRAY != event) {
-      throw new TextException("Unexpected token "+event+" - expecting start_array at: "+parser.getLocation());
+    if (JsonToken.START_ARRAY != event) {
+      throw new JsonParseException("Unexpected token " + event + " - expecting start_array ", parser.getCurrentLocation());
     }
-    
+
     Object collection = many.createEmpty(false);
     BeanCollectionAdd add = many.getBeanCollectionAdd(collection, null);
     do {
-      EntityBean detailBean = (EntityBean)many.targetDescriptor.jsonRead(parser, many.name);
+      EntityBean detailBean = (EntityBean) many.targetDescriptor.jsonRead(parser, many.name);
       if (detailBean == null) {
         // read the entire array
         break;

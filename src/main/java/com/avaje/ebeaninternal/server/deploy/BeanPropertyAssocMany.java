@@ -1,11 +1,11 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.json.stream.JsonParser;
 import javax.persistence.PersistenceException;
 
 import org.slf4j.Logger;
@@ -30,6 +30,7 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
+import com.fasterxml.jackson.core.JsonParser;
 
 /**
  * Property mapped to a List Set or Map.
@@ -877,7 +878,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
         return null != targetDescriptor.getId(otherBean);
     }
 
-    public void jsonWrite(WriteJson ctx, EntityBean bean) {
+    public void jsonWrite(WriteJson ctx, EntityBean bean) throws IOException {
         if(!this.jsonSerialize){
             return;
         }
@@ -898,7 +899,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
         }
     }
     
-    public void jsonRead(JsonParser parser, EntityBean parentBean) {
+    public void jsonRead(JsonParser parser, EntityBean parentBean) throws IOException {
       jsonHelp.jsonRead(parser, parentBean);
     }
 }

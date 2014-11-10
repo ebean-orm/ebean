@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebean.text.TextException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Base ScalarType for types which converts to and from a VARCHAR database
@@ -106,11 +105,11 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
   }
   
   @Override
-  public Object jsonRead(JsonParser ctx, Event event) {
-    return parse(ctx.getString());
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    return parse(ctx.getValueAsString());
   }
   
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-    ctx.write(name, format(value));
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    ctx.writeStringField(name, format(value));
   }
 }

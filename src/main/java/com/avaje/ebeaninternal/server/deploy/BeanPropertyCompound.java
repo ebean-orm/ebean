@@ -1,11 +1,10 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.json.stream.JsonParser;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.ScalarTypeConverter;
@@ -18,6 +17,7 @@ import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.CtCompoundProperty;
 import com.avaje.ebeaninternal.server.type.CtCompoundPropertyElAdapter;
 import com.avaje.ebeaninternal.server.type.CtCompoundType;
+import com.fasterxml.jackson.core.JsonParser;
 
 /**
  * Property mapped to an Immutable Compound Value Object.
@@ -180,19 +180,19 @@ public class BeanPropertyCompound extends BeanProperty {
         return bean;
     }
 
-    public void jsonWrite(WriteJson ctx, EntityBean bean) {
+    public void jsonWrite(WriteJson ctx, EntityBean bean) throws IOException {
       if (!jsonSerialize) {
         return;
       }
       Object value = getValueIntercept(bean);
       if (value == null) {
-        ctx.gen().writeNull(name);
+        ctx.writeNull(name);
       } else {
         compoundType.jsonWrite(ctx, value, name);
       }        
     }
     
-    public void jsonRead(JsonParser ctx, EntityBean bean) {
+    public void jsonRead(JsonParser ctx, EntityBean bean) throws IOException {
       
       if (!jsonDeserialize) {
         return;

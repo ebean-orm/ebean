@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -128,7 +129,7 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
     }
   }
 
-  public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) {
+  public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) throws IOException {
 
     List<?> list;
     if (collection instanceof BeanCollection<?>) {
@@ -147,11 +148,11 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
       list = (List<?>) collection;
     }
 
-    ctx.gen().writeStartArray(name);
+    ctx.writeStartArray(name);
     for (int j = 0; j < list.size(); j++) {
       targetDescriptor.jsonWrite(ctx, (EntityBean)list.get(j));
     }
-    ctx.gen().writeEnd();
+    ctx.writeEndArray();
   }
 
 }

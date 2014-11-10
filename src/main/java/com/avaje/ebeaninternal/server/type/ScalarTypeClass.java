@@ -1,7 +1,10 @@
 package com.avaje.ebeaninternal.server.type;
 
-import javax.json.stream.JsonGenerator;
+import java.io.IOException;
+
 import javax.persistence.PersistenceException;
+
+import com.fasterxml.jackson.core.JsonGenerator;
 
 /**
  * ScalarType for Class that persists it to VARCHAR column.
@@ -44,8 +47,8 @@ public class ScalarTypeClass extends ScalarTypeBaseVarchar<Class> {
         }
     }
     
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-      ctx.write(name, formatValue((Class<?>)value));
+    public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+      ctx.writeStringField(name, formatValue((Class<?>)value));
     }
 	
 	

@@ -1119,9 +1119,13 @@ public interface EbeanServer {
   public void runCacheWarming(Class<?> beanType);
 
   /**
-   * Create a JsonContext that will use the default configuration options.
+   * Return the JsonContext for reading/writing JSON.
    */
   public JsonContext createJsonContext();
 
+  /**
+   * Return the JsonContext for reading/writing JSON.
+   */
+  public JsonContext json();
 
 }

@@ -1383,10 +1383,17 @@ public final class Ebean {
   }
 
   /**
-   * Create a JsonContext that will use the default configuration options.
+   * Return the JsonContext for reading/writing JSON.
+   */
+  public static JsonContext json() {
+    return serverMgr.getPrimaryServer().json();
+  }
+  
+  /**
+   * Return the JsonContext for reading/writing JSON.
    */
   public static JsonContext createJsonContext() {
-    return serverMgr.getPrimaryServer().createJsonContext();
+    return json();
   }
 
 }

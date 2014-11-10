@@ -1,5 +1,6 @@
 package com.avaje.tests.text.json;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import com.avaje.tests.model.basic.ResetBasicData;
 public class TestTextJsonBeanReadVisitor extends BaseTestCase {
 
   @Test
-  public void test() {
+  public void test() throws IOException {
 
     ResetBasicData.reset();
 

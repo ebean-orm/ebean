@@ -1,12 +1,13 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
+import java.io.IOException;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson.WriteBean;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 public class BeanDescriptorJsonHelp<T> {
 
@@ -19,31 +20,27 @@ public class BeanDescriptorJsonHelp<T> {
     this.inheritInfo = desc.inheritInfo;
   }
   
-  public void jsonWrite(WriteJson writeJson, EntityBean bean, String key) {
+  public void jsonWrite(WriteJson writeJson, EntityBean bean, String key) throws IOException {
 
-//    if (writeJson.hasBean()) {
+    writeJson.writeStartObject(key);
 
-      writeJson.writeStartObject(key);
-      //WriteBeanState prevState = ctx.pushBeanState(bean);
+    if (inheritInfo == null) {
+      jsonWriteProperties(writeJson, bean);
 
-      if (inheritInfo == null) {
-        jsonWriteProperties(writeJson, bean);
-        
-      } else {
-        InheritInfo localInheritInfo = inheritInfo.readType(bean.getClass());
-        String discValue = localInheritInfo.getDiscriminatorStringValue();
-        String discColumn = localInheritInfo.getDiscriminatorColumn();
-        writeJson.gen().write(discColumn, discValue);
+    } else {
+      InheritInfo localInheritInfo = inheritInfo.readType(bean.getClass());
+      String discValue = localInheritInfo.getDiscriminatorStringValue();
+      String discColumn = localInheritInfo.getDiscriminatorColumn();
+      writeJson.gen().writeStringField(discColumn, discValue);
 
-        BeanDescriptor<?> localDescriptor = localInheritInfo.getBeanDescriptor();
-        localDescriptor.jsonWriteProperties(writeJson, bean);
-      } 
+      BeanDescriptor<?> localDescriptor = localInheritInfo.getBeanDescriptor();
+      localDescriptor.jsonWriteProperties(writeJson, bean);
+    }
 
-      //ctx.pushPreviousState(prevState);
-      writeJson.gen().writeEnd();
+    writeJson.writeEndObject();
   }
 
-  protected void jsonWriteProperties(WriteJson writeJson, EntityBean bean) {
+  protected void jsonWriteProperties(WriteJson writeJson, EntityBean bean) throws IOException {
 
     
     WriteBean writeBean = writeJson.createWriteBean(desc, bean);
@@ -52,17 +49,14 @@ public class BeanDescriptorJsonHelp<T> {
   
   
   @SuppressWarnings("unchecked")
-  public T jsonRead(JsonParser parser, String path) {
+  public T jsonRead(JsonParser parser, String path) throws IOException {
     
-    if (!parser.hasNext()) {
+    JsonToken token = parser.nextToken();
+    if (JsonToken.VALUE_NULL == token || JsonToken.END_ARRAY == token) {
       return null;
     }
-    Event event = parser.next();
-    if (Event.VALUE_NULL == event || Event.END_ARRAY == event) {
-      return null;
-    }
-    if (Event.START_OBJECT != event) {
-      throw new RuntimeException("Unexpected token "+event+" - expecting start_object at: "+parser.getLocation());
+    if (JsonToken.START_OBJECT != token) {
+      throw new IOException("Unexpected token "+token+" - expecting start_object at: "+parser.getCurrentLocation());
     }
 
     if (desc.inheritInfo == null) {
@@ -72,12 +66,13 @@ public class BeanDescriptorJsonHelp<T> {
     // check for the discriminator value to determine the correct sub type
     String discColumn = inheritInfo.getRoot().getDiscriminatorColumn();
 
-    if (!parser.hasNext() || ((event = parser.next()) != Event.KEY_NAME)) {
+    token = parser.nextToken();
+    if (token != JsonToken.FIELD_NAME) {
       String msg = "Error reading inheritance discriminator - expected [" + discColumn + "] but no json key?";
       throw new TextException(msg);        
     }
     
-    String propName = parser.getString();      
+    String propName = parser.getCurrentName();      
     if (!propName.equalsIgnoreCase(discColumn)) {
       // just try to assume this is the correct bean type in the inheritance 
       BeanProperty property = desc.getBeanProperty(propName);
@@ -89,13 +84,8 @@ public class BeanDescriptorJsonHelp<T> {
       String msg = "Error reading inheritance discriminator, expected property ["+discColumn+"] but got [" + propName + "] ?";
       throw new TextException(msg);        
     }
-    
-    if (!parser.hasNext() || ((event = parser.next()) != Event.VALUE_STRING)) {
-      String msg = "Error reading inheritance discriminator - expected value_string token but got [" + event + "] at ["+parser.getLocation()+"]?";
-      throw new TextException(msg);        
-    }
-      
-    String discValue = parser.getString(); 
+          
+    String discValue = parser.nextTextValue(); 
     
     // determine the sub type for this particular json object
     InheritInfo localInheritInfo = inheritInfo.readType(discValue);
@@ -103,39 +93,35 @@ public class BeanDescriptorJsonHelp<T> {
     return (T) localDescriptor.jsonReadObject(parser, path);
   }
   
-  protected T jsonReadObject(JsonParser parser, String path) {
+  protected T jsonReadObject(JsonParser parser, String path) throws IOException {
 
     EntityBean bean = desc.createEntityBean();
-    //ctx.pushBean(bean, path, this);
-
     return jsonReadProperties(parser, bean);
   }
   
   @SuppressWarnings("unchecked")
-  protected T jsonReadProperties(JsonParser parser, EntityBean bean) {
+  protected T jsonReadProperties(JsonParser parser, EntityBean bean) throws IOException {
 
     do {
      
-      if (parser.hasNext()) {
-        Event event = parser.next();
-        if (Event.KEY_NAME == event) {
-          String key = parser.getString();
-          BeanProperty p = desc.getBeanProperty(key);
-          if (p != null) {
-            p.jsonRead(parser, bean);
-          
-          } else {
-            //Object rawValue = EJson.parse(parser);           
-            // unknown property key ...
-            //ctx.readUnmappedJson(propName);
-          }
-          
-        } else if (Event.END_OBJECT == event) {
-          break;
-          
+      JsonToken event = parser.nextToken();
+      if (JsonToken.FIELD_NAME == event) {
+        String key = parser.getCurrentName();
+        BeanProperty p = desc.getBeanProperty(key);
+        if (p != null) {
+          p.jsonRead(parser, bean);
+
         } else {
-          throw new RuntimeException("Unexpected token "+event+" - expecting key or end_object at: "+parser.getLocation());
+          // Object rawValue = EJson.parse(parser);
+          // unknown property key ...
+          // ctx.readUnmappedJson(propName);
         }
+
+      } else if (JsonToken.END_OBJECT == event) {
+        break;
+
+      } else {
+        throw new RuntimeException("Unexpected token " + event + " - expecting key or end_object at: " + parser.getCurrentLocation());
       }
       
     } while (true);

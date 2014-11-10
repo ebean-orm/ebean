@@ -5,12 +5,11 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Describes a scalar type.
@@ -189,8 +188,8 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
 
   public void writeData(DataOutput dataOutput, Object v) throws IOException;
 
-  public Object jsonRead(JsonParser ctx, Event event);
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException;
 
-  public void jsonWrite(JsonGenerator ctx, String name, Object value);
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException;
     
 }

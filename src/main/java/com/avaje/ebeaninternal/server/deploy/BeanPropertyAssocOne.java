@@ -1,11 +1,11 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.json.stream.JsonParser;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.EbeanServer;
@@ -26,6 +26,7 @@ import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
+import com.fasterxml.jackson.core.JsonParser;
 
 /**
  * Property mapped to a joined bean.
@@ -830,36 +831,40 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         }
     }
     
-    @Override
-    public void jsonWrite(WriteJson writeJson, EntityBean bean) {
-        
-        Object value = getValueIntercept(bean);
-        if (value == null){
-          writeJson.gen().writeNull(name);
-            
-        } else {
-            if (writeJson.isParentBean(value)){
-                // bi-directional and already rendered parent
-                
-            } else {
-              // Hmmm, not writing complex non-entity bean
-              if (value instanceof EntityBean) {  
-                writeJson.beginAssocOne(name, bean);
-                BeanDescriptor<?> refDesc = descriptor.getBeanDescriptor(value.getClass());
-                refDesc.jsonWrite(writeJson, (EntityBean)value, name);                  
-                writeJson.endAssocOne();
-              } 
-            }
-        }
+  @Override
+  public void jsonWrite(WriteJson writeJson, EntityBean bean) throws IOException {
+
+    if (!jsonSerialize) {
+      return;
     }
 
-    @Override
-    public void jsonRead(JsonParser parser, EntityBean bean) {
-      if (targetDescriptor != null) {
-        T assocBean = targetDescriptor.jsonRead(parser, name);
-        setValue(bean, assocBean);
+    Object value = getValueIntercept(bean);
+    if (value == null) {
+      writeJson.writeNull(name);
+
+    } else {
+      if (writeJson.isParentBean(value)) {
+        // bi-directional and already rendered parent
+
+      } else {
+        // Hmmm, not writing complex non-entity bean
+        if (value instanceof EntityBean) {
+          writeJson.beginAssocOne(name, bean);
+          BeanDescriptor<?> refDesc = descriptor.getBeanDescriptor(value.getClass());
+          refDesc.jsonWrite(writeJson, (EntityBean) value, name);
+          writeJson.endAssocOne();
+        }
       }
     }
+  }
+
+  @Override
+  public void jsonRead(JsonParser parser, EntityBean bean) throws IOException {
+    if (jsonDeserialize && targetDescriptor != null) {
+      T assocBean = targetDescriptor.jsonRead(parser, name);
+      setValue(bean, assocBean);
+    }
+  }
 
     public boolean isReference(Object detailBean) {
       EntityBean eb = (EntityBean)detailBean;

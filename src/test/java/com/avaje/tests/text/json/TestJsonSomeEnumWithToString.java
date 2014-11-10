@@ -1,5 +1,7 @@
 package com.avaje.tests.text.json;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -12,7 +14,7 @@ import com.avaje.tests.model.basic.SomeEnumBean;
 public class TestJsonSomeEnumWithToString extends BaseTestCase {
 
   @Test
-  public void testJsonConversion() {
+  public void testJsonConversion() throws IOException {
 
     SomeEnumBean bean = new SomeEnumBean();
     bean.setId(100l);

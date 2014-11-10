@@ -7,14 +7,13 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Types;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for Joda LocalTime. This maps to a JDBC Time.
@@ -67,17 +66,17 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
 	}
     
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-    ctx.write(value.toString());
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    ctx.writeStringField(name, value.toString());
   }
     
     @Override
-    public Object jsonRead(JsonParser ctx, Event event) {
-      if (ctx.isIntegralNumber()) {
-        long millis = ctx.getLong();
+    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+      if (JsonToken.VALUE_NUMBER_INT == event) {
+        long millis = ctx.getLongValue();
         return parseDateTime(millis);
       } else {
-        String string = ctx.getString();
+        String string = ctx.getValueAsString();
         throw new RuntimeException("convert "+string);
       }
     }

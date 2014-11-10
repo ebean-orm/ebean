@@ -1,5 +1,6 @@
 package com.avaje.tests.text.json;
 
+import java.io.IOException;
 import java.util.TimeZone;
 
 import org.junit.Assert;
@@ -15,7 +16,7 @@ public class TestJsonBeanWithTimeZone extends BaseTestCase {
   //private static final Logger logger = LoggerFactory.getLogger(TestJsonBeanWithTimeZone.class);
 
   @Test
-  public void testSimple() {
+  public void testSimple() throws IOException {
 
     TimeZone defaultTimeZone = TimeZone.getDefault();
 

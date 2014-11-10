@@ -7,11 +7,10 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Types;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for java.sql.Time.
@@ -81,13 +80,13 @@ public class ScalarTypeTime extends ScalarTypeBase<Time> {
     }
 
   @Override
-  public Object jsonRead(JsonParser ctx, Event event) {
-    return parse(ctx.getString());
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    return parse(ctx.getValueAsString());
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-    ctx.write(name, value.toString());
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    ctx.writeStringField(name, value.toString());
   }
   
 }

@@ -1,5 +1,6 @@
 package com.avaje.tests.text.json;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.Assert;
@@ -17,7 +18,7 @@ import com.avaje.tests.model.basic.VehicleDriver;
 public class TestTextJsonInheritance extends BaseTestCase {
 
   @Test
-  public void test() {
+  public void test() throws IOException {
 
     setupData();
 

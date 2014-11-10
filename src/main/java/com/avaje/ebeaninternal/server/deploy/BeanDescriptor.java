@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.json.stream.JsonParser;
 import javax.persistence.PersistenceException;
 
 import org.slf4j.Logger;
@@ -67,6 +67,7 @@ import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.util.SortByClause;
 import com.avaje.ebeaninternal.util.SortByClause.Property;
 import com.avaje.ebeaninternal.util.SortByClauseParser;
+import com.fasterxml.jackson.core.JsonParser;
 
 /**
  * Describes Beans including their deployment information.
@@ -2112,23 +2113,23 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return propertiesLocal;
   }
 
-  public void jsonWrite(WriteJson writeJson, EntityBean bean) {
+  public void jsonWrite(WriteJson writeJson, EntityBean bean) throws IOException {
     jsonHelp.jsonWrite(writeJson, bean, null);
   }  
   
-  public void jsonWrite(WriteJson writeJson, EntityBean bean, String key) {
+  public void jsonWrite(WriteJson writeJson, EntityBean bean, String key) throws IOException {
     jsonHelp.jsonWrite(writeJson, bean, key);
   }
 
-  protected void jsonWriteProperties(WriteJson writeJson, EntityBean bean) {
+  protected void jsonWriteProperties(WriteJson writeJson, EntityBean bean) throws IOException {
     jsonHelp.jsonWriteProperties(writeJson, bean);
   }
     
-  public T jsonRead(JsonParser parser, String path) {
+  public T jsonRead(JsonParser parser, String path) throws IOException {
     return jsonHelp.jsonRead(parser, path);
   }
   
-  protected T jsonReadObject(JsonParser parser, String path) {
+  protected T jsonReadObject(JsonParser parser, String path) throws IOException {
     return jsonHelp.jsonReadObject(parser, path);
   }
 }

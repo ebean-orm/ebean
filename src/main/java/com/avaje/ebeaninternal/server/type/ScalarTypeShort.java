@@ -6,12 +6,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for Short and short.
@@ -80,11 +79,11 @@ public class ScalarTypeShort extends ScalarTypeBase<Short> {
     }
     
     @Override
-    public Object jsonRead(JsonParser ctx, Event event) {
-      return (short)ctx.getInt();
+    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+      return ctx.getShortValue();
     }
     
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-      ctx.write(name, (Short)value);
+    public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+      ctx.writeNumberField(name, (Short)value);
     }
 }

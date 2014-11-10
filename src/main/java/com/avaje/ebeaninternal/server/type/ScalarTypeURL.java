@@ -1,12 +1,12 @@
 package com.avaje.ebeaninternal.server.type;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebean.text.TextException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for java.net.URL which converts to and from a VARCHAR database column.
@@ -45,8 +45,8 @@ public class ScalarTypeURL extends ScalarTypeBaseVarchar<URL> {
 	}
     
     @Override
-    public Object jsonRead(JsonParser ctx, Event event) {
-      return parse(ctx.getString());
+    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+      return parse(ctx.getValueAsString());
     }
 
 }

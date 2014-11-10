@@ -7,9 +7,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Base type for DateTime types.
@@ -45,21 +45,23 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
         }
     }
     
-    @Override
-    public Object jsonRead(JsonParser ctx, Event event) {
-      if (ctx.isIntegralNumber()) {
-        long millis = ctx.getLong();
-        return parseDateTime(millis);
-      } else {
-        String string = ctx.getString();
-        throw new RuntimeException("convert "+string);
-      }
+  @Override
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    
+    if (JsonToken.VALUE_NUMBER_INT == event) {
+      long millis = ctx.getLongValue();
+      return parseDateTime(millis);
+      
+    } else {
+      String string = ctx.getText();
+      throw new RuntimeException("convert " + string);
     }
+  }
     
     @Override
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
+    public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
       long millis = convertToMillis(value);
-      ctx.write(name, millis);
+      ctx.writeNumberField(name, millis);
     }
 
     public String formatValue(T t) {

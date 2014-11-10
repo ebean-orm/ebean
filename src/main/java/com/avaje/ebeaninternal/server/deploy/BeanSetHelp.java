@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -129,7 +130,7 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
 		}
 	}
 	
-    public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) {
+    public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) throws IOException {
         
         Set<?> set;
         if (collection instanceof BeanCollection<?>){
@@ -148,11 +149,11 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
             set = (Set<?>)collection;
         }
         
-        ctx.gen().writeStartArray(name);
+        ctx.writeStartArray(name);
         Iterator<?> it = set.iterator();
         while (it.hasNext()) {
             targetDescriptor.jsonWrite(ctx, (EntityBean)it.next());
         }
-        ctx.gen().writeEnd();        
+        ctx.writeEndArray();        
     }
 }

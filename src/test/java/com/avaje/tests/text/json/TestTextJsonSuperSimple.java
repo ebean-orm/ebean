@@ -1,5 +1,6 @@
 package com.avaje.tests.text.json;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.Assert;
@@ -15,7 +16,7 @@ import com.avaje.tests.model.basic.ResetBasicData;
 public class TestTextJsonSuperSimple extends BaseTestCase {
 
   @Test
-  public void test() {
+  public void test() throws IOException {
 
     ResetBasicData.reset();
 

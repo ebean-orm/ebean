@@ -4,7 +4,6 @@ import java.sql.Date;
 import java.sql.Types;
 
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
 
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 

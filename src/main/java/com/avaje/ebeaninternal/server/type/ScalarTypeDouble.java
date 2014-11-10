@@ -5,13 +5,11 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Currency;
-
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
 
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for Double and double.
@@ -89,11 +87,11 @@ public class ScalarTypeDouble extends ScalarTypeBase<Double> {
     }
     
     @Override
-    public Object jsonRead(JsonParser ctx, Event event) {
-      return ctx.getBigDecimal().doubleValue();
+    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+      return ctx.getDoubleValue();
     }
     
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-      ctx.write(name, (Double)value);
+    public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+      ctx.writeNumberField(name, (Double)value);
     }
 }

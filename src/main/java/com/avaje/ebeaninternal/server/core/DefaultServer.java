@@ -2081,9 +2081,16 @@ public final class DefaultServer implements SpiEbeanServer {
     return new CallStack(finalTrace);
   }
 
-  public JsonContext createJsonContext() {
+  
+  @Override
+  public JsonContext json() {
     // immutable thread safe so return shared instance
     return jsonContext;
+  }
+
+  @Override
+  public JsonContext createJsonContext() {
+    return json();
   }
 
   

@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -156,7 +157,7 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
 		}
 	}
 
-    public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) {
+    public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) throws IOException {
         
         Map<?,?> map;
         if (collection instanceof BeanCollection<?>){
@@ -175,14 +176,14 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
             map = (Map<?,?>)collection;
         }
         
-        ctx.gen().writeStartArray(name);
+        ctx.writeStartArray(name);
         Iterator<?> it = map.entrySet().iterator();
         while (it.hasNext()) {
             Entry<?, ?> entry = (Entry<?, ?>)it.next();
             //FIXME: json write map key ...
             targetDescriptor.jsonWrite(ctx, (EntityBean) entry.getValue());
         }
-        ctx.gen().writeEnd();      
+        ctx.writeEndArray();
     }
 
 }

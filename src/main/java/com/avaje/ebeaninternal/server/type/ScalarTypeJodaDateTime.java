@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.sql.Types;
 
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 

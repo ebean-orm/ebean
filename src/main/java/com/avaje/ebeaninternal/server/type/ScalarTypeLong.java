@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
-import javax.json.stream.JsonParser.Event;
-
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for Long and long.
@@ -79,11 +78,11 @@ public class ScalarTypeLong extends ScalarTypeBase<Long> {
     }
     
     @Override
-    public Object jsonRead(JsonParser ctx, Event event) {
-      return ctx.getLong();
+    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+      return ctx.getLongValue();
     }
     
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-      ctx.write(name, (Long)value);
+    public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+      ctx.writeNumberField(name, (Long)value);
     }
 }

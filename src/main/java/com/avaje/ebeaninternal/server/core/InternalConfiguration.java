@@ -39,6 +39,7 @@ import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 import com.avaje.ebeaninternal.server.transaction.TransactionScopeManager;
 import com.avaje.ebeaninternal.server.type.DefaultTypeManager;
 import com.avaje.ebeaninternal.server.type.TypeManager;
+import com.fasterxml.jackson.core.JsonFactory;
 
 /**
  * Used to extend the ServerConfig with additional objects used to configure and
@@ -88,10 +89,13 @@ public class InternalConfiguration {
 
   private final XmlConfig xmlConfig;
 
+  private final JsonFactory jsonFactory;
+  
   public InternalConfiguration(XmlConfig xmlConfig, ClusterManager clusterManager,
       ServerCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
       ServerConfig serverConfig, BootupClasses bootupClasses, PstmtBatch pstmtBatch) {
 
+    this.jsonFactory = serverConfig.getJsonFactory();
     this.xmlConfig = xmlConfig;
     this.pstmtBatch = pstmtBatch;
     this.clusterManager = clusterManager;
@@ -162,8 +166,7 @@ public class InternalConfiguration {
 
   public JsonContext createJsonContext(SpiEbeanServer server) {
 
-    
-    return new DJsonContext(server);
+    return new DJsonContext(server, jsonFactory);
   }
 
   public XmlConfig getXmlConfig() {

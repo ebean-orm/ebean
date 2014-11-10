@@ -1,7 +1,10 @@
 package com.avaje.tests.ddd.iud;
 
+import java.io.IOException;
 import java.util.Currency;
+
 import junit.framework.TestCase;
+
 import org.junit.Assert;
 
 import com.avaje.ebean.Ebean;
@@ -17,7 +20,7 @@ import com.avaje.tests.model.ivo.Money;
 
 public class TestDPersonEl extends TestCase {
 
-    public void test() {
+    public void test() throws IOException {
         
         GlobalProperties.put("classes", DPerson.class.toString());
         
