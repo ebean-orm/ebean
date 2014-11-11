@@ -11,43 +11,46 @@ import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
  */
 public class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
 
-	public ScalarTypeTimestamp() {
-		super(Timestamp.class, true, Types.TIMESTAMP);
-	}
-	
-	 @Override
-	  public long convertToMillis(Object value) {
-	    return ((Timestamp)value).getTime();
-	  }
-	 
-	@Override
-    public Timestamp convertFromTimestamp(Timestamp ts) {
-        return ts;
+  public ScalarTypeTimestamp() {
+    super(Timestamp.class, true, Types.TIMESTAMP);
+  }
+
+  @Override
+  public long convertToMillis(Object value) {
+    return ((Timestamp) value).getTime();
+  }
+
+  @Override
+  public Timestamp convertFromTimestamp(Timestamp ts) {
+    return ts;
+  }
+
+  @Override
+  public Timestamp convertToTimestamp(Timestamp t) {
+    return t;
+  }
+
+  @Override
+  public void bind(DataBind b, Timestamp value) throws SQLException {
+    if (value == null) {
+      b.setNull(Types.TIMESTAMP);
+    } else {
+      b.setTimestamp(value);
     }
+  }
 
-    @Override
-    public Timestamp convertToTimestamp(Timestamp t) {
-        return t;
-    }
+  @Override
+  public Timestamp read(DataReader dataReader) throws SQLException {
+    return dataReader.getTimestamp();
+  }
 
-    public void bind(DataBind b, Timestamp value) throws SQLException {
-		if (value == null){
-			b.setNull(Types.TIMESTAMP);
-		} else {
-			b.setTimestamp(value);
-		}
-	}
+  @Override
+  public Object toJdbcType(Object value) {
+    return BasicTypeConverter.toTimestamp(value);
+  }
 
-	public Timestamp read(DataReader dataReader) throws SQLException {
-		
-		return dataReader.getTimestamp();
-	}
-	
-	public Object toJdbcType(Object value) {
-		return BasicTypeConverter.toTimestamp(value);
-	}
-
-	public Timestamp toBeanType(Object value) {
-		return BasicTypeConverter.toTimestamp(value);
-	}	
+  @Override
+  public Timestamp toBeanType(Object value) {
+    return BasicTypeConverter.toTimestamp(value);
+  }
 }

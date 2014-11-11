@@ -11,115 +11,133 @@ import com.fasterxml.jackson.core.JsonToken;
 
 public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
 
-    private final ScalarType<T> wrapped;
-    
-    private final DataEncryptSupport dataEncryptSupport;
-    
-    private final ScalarTypeBytesBase byteArrayType;
-    
-    public ScalarTypeEncryptedWrapper(ScalarType<T> wrapped, ScalarTypeBytesBase byteArrayType, DataEncryptSupport dataEncryptSupport) {
-        this.wrapped = wrapped;
-        this.byteArrayType = byteArrayType;
-        this.dataEncryptSupport = dataEncryptSupport;
-    }
+  private final ScalarType<T> wrapped;
 
-    @Override
-    public boolean isMutable() {
-      return wrapped.isMutable();
-    }
-    
-    @Override
-    public boolean isDirty(Object value) {
-      return wrapped.isDirty(value);
-    }
+  private final DataEncryptSupport dataEncryptSupport;
 
-    @Override
-    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-      return wrapped.jsonRead(ctx, event);
-    }
+  private final ScalarTypeBytesBase byteArrayType;
 
-    public Object readData(DataInput dataInput) throws IOException {
-        return wrapped.readData(dataInput);
-    }
+  public ScalarTypeEncryptedWrapper(ScalarType<T> wrapped, ScalarTypeBytesBase byteArrayType, DataEncryptSupport dataEncryptSupport) {
+    this.wrapped = wrapped;
+    this.byteArrayType = byteArrayType;
+    this.dataEncryptSupport = dataEncryptSupport;
+  }
 
-    public void writeData(DataOutput dataOutput, Object v) throws IOException {
-        wrapped.writeData(dataOutput, v);
-    }
+  @Override
+  public boolean isMutable() {
+    return wrapped.isMutable();
+  }
 
-    public T read(DataReader dataReader) throws SQLException {
+  @Override
+  public boolean isDirty(Object value) {
+    return wrapped.isDirty(value);
+  }
 
-        byte[] data = dataReader.getBytes();
-        String formattedValue = dataEncryptSupport.decryptObject(data);
-        if (formattedValue == null){
-            return null;
-        }
-        return wrapped.parse(formattedValue);
-    }
+  @Override
+  public Object readData(DataInput dataInput) throws IOException {
+    return wrapped.readData(dataInput);
+  }
 
-    private byte[] encrypt(T value){
-        String formatValue = wrapped.formatValue(value);
-        return dataEncryptSupport.encryptObject(formatValue);
-    }
-    
-    public void bind(DataBind b, T value) throws SQLException {
-        
-        byte[] encryptedValue = encrypt(value);
-        byteArrayType.bind(b, encryptedValue);
-    }
+  @Override
+  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+    wrapped.writeData(dataOutput, v);
+  }
 
-    public int getJdbcType() {
-        return byteArrayType.getJdbcType();
-    }
+  @Override
+  public T read(DataReader dataReader) throws SQLException {
 
-    public int getLength() {
-        return byteArrayType.getLength();
+    byte[] data = dataReader.getBytes();
+    String formattedValue = dataEncryptSupport.decryptObject(data);
+    if (formattedValue == null) {
+      return null;
     }
+    return wrapped.parse(formattedValue);
+  }
 
-    public Class<T> getType() {
-        return wrapped.getType();
-    }
+  private byte[] encrypt(T value) {
+    String formatValue = wrapped.formatValue(value);
+    return dataEncryptSupport.encryptObject(formatValue);
+  }
 
-    public boolean isDateTimeCapable() {
-        return wrapped.isDateTimeCapable();
-    }
+  @Override
+  public void bind(DataBind b, T value) throws SQLException {
 
-    public boolean isJdbcNative() {
-        return false;
-    }
+    byte[] encryptedValue = encrypt(value);
+    byteArrayType.bind(b, encryptedValue);
+  }
 
-    public void loadIgnore(DataReader dataReader) {
-        wrapped.loadIgnore(dataReader);
-    }
-    
-    @SuppressWarnings("unchecked")
-    public String format(Object v) {
-        return formatValue((T)v);
-    }
+  @Override
+  public int getJdbcType() {
+    return byteArrayType.getJdbcType();
+  }
 
-    public String formatValue(T v) {
-        return wrapped.formatValue(v);
-    }
+  @Override
+  public int getLength() {
+    return byteArrayType.getLength();
+  }
 
-    public T parse(String value) {
-        return wrapped.parse(value);
-    }
+  @Override
+  public Class<T> getType() {
+    return wrapped.getType();
+  }
 
-    public T parseDateTime(long systemTimeMillis) {
-        return wrapped.parseDateTime(systemTimeMillis);
-    }
+  @Override
+  public boolean isDateTimeCapable() {
+    return wrapped.isDateTimeCapable();
+  }
 
-    public T toBeanType(Object value) {
-        return wrapped.toBeanType(value);
-    }
+  @Override
+  public boolean isJdbcNative() {
+    return false;
+  }
 
-    public Object toJdbcType(Object value) {
-        return wrapped.toJdbcType(value);
-    }
+  @Override
+  public void loadIgnore(DataReader dataReader) {
+    wrapped.loadIgnore(dataReader);
+  }
 
-    public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
-        wrapped.accumulateScalarTypes(propName, list);
-    }
-    
+  @Override
+  @SuppressWarnings("unchecked")
+  public String format(Object v) {
+    return formatValue((T) v);
+  }
+
+  @Override
+  public String formatValue(T v) {
+    return wrapped.formatValue(v);
+  }
+
+  @Override
+  public T parse(String value) {
+    return wrapped.parse(value);
+  }
+
+  @Override
+  public T parseDateTime(long systemTimeMillis) {
+    return wrapped.parseDateTime(systemTimeMillis);
+  }
+
+  @Override
+  public T toBeanType(Object value) {
+    return wrapped.toBeanType(value);
+  }
+
+  @Override
+  public Object toJdbcType(Object value) {
+    return wrapped.toJdbcType(value);
+  }
+
+  @Override
+  public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
+    wrapped.accumulateScalarTypes(propName, list);
+  }
+
+  @Override
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    return wrapped.jsonRead(ctx, event);
+  }
+  
+  @Override
   public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
     wrapped.jsonWrite(ctx, name, value);
   }

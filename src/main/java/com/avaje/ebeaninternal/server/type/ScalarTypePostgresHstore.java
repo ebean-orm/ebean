@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import com.avaje.ebean.config.dbplatform.PostgresPlatform;
+import com.avaje.ebean.json.EJson;
+import com.avaje.ebean.text.TextException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -66,28 +68,23 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   public Map toBeanType(Object value) {
     return (Map)value;
   }
-  
-  @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-    // TODO Auto-generated method stub  
-  }
-
-  @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   @Override
   public String formatValue(Map v) {
-    // TODO format as json
-    return null;
+    try {
+      return EJson.write(v);
+    } catch (IOException e) {
+      throw new TextException(e);
+    }
   }
 
   @Override
   public Map parse(String value) {
-    // TODO parse json into map
-    return null;
+    try {
+      return EJson.parseObject(value);
+    } catch (IOException e) {
+      throw new TextException(e);
+    }
   }
 
   @Override
@@ -102,13 +99,24 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
 
   @Override
   public Object readData(DataInput dataInput) throws IOException {
-    return null;
+    String json = dataInput.readUTF();
+    return parse(json);
   }
 
   @Override
   public void writeData(DataOutput dataOutput, Object v) throws IOException {
-    
+    String json = format(v);
+    dataOutput.writeUTF(json);
   }
 
+  @Override
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    EJson.write(value, ctx);
+  }
+
+  @Override
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    return EJson.parseObject(ctx);
+  }
   
 }

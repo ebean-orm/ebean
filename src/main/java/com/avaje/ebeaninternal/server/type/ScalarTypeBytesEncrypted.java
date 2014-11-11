@@ -1,11 +1,11 @@
 package com.avaje.ebeaninternal.server.type;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import com.avaje.ebean.text.TextException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -14,115 +14,116 @@ import com.fasterxml.jackson.core.JsonToken;
  * Encrypted ScalarType that wraps a byte[] types.
  * 
  * @author rbygrave
- *
+ * 
  */
 public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
 
-    private final ScalarTypeBytesBase baseType;
-    
-    private final DataEncryptSupport dataEncryptSupport;
-    
-    
-    public ScalarTypeBytesEncrypted(ScalarTypeBytesBase baseType, DataEncryptSupport dataEncryptSupport) {
-        this.baseType = baseType;
-        this.dataEncryptSupport = dataEncryptSupport;
-    }
-    
-    @Override
-    public boolean isMutable() {
-      return false;
-    }
+  private final ScalarTypeBytesBase baseType;
 
-    @Override
-    public boolean isDirty(Object value) {
-      return false;
-    }
-    
-    public void bind(DataBind b, byte[] value) throws SQLException {
-        value = dataEncryptSupport.encrypt(value);
-        baseType.bind(b, value);
-    }
+  private final DataEncryptSupport dataEncryptSupport;
 
-    public int getJdbcType() {
-        return baseType.getJdbcType();
-    }
+  public ScalarTypeBytesEncrypted(ScalarTypeBytesBase baseType, DataEncryptSupport dataEncryptSupport) {
+    this.baseType = baseType;
+    this.dataEncryptSupport = dataEncryptSupport;
+  }
 
-    public int getLength() {
-        return baseType.getLength();
-    }
+  @Override
+  public boolean isMutable() {
+    return false;
+  }
 
-    public Class<byte[]> getType() {
-        return byte[].class;
-    }
+  @Override
+  public boolean isDirty(Object value) {
+    return false;
+  }
 
-    public boolean isDateTimeCapable() {
-        return baseType.isDateTimeCapable();
-    }
+  public void bind(DataBind b, byte[] value) throws SQLException {
+    value = dataEncryptSupport.encrypt(value);
+    baseType.bind(b, value);
+  }
 
-    public boolean isJdbcNative() {
-        return baseType.isJdbcNative();
-    }
+  public int getJdbcType() {
+    return baseType.getJdbcType();
+  }
 
-    public void loadIgnore(DataReader dataReader) {
-        baseType.loadIgnore(dataReader);
-    }
+  public int getLength() {
+    return baseType.getLength();
+  }
 
-    @Override
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-      throw new TextException("Not supported");
-    }
-    
-    @Override
-    public Object jsonRead(JsonParser ctx, JsonToken event) {
-      throw new TextException("Not supported");
-    }
-    
-    public String format(Object v) {
-        throw new RuntimeException("Not used");
-    }
-    
-    public String formatValue(byte[] v) {
-        throw new RuntimeException("Not used");
-    }
+  public Class<byte[]> getType() {
+    return byte[].class;
+  }
 
-    public byte[] parse(String value) {
-        return baseType.parse(value);
-    }
+  public boolean isDateTimeCapable() {
+    return baseType.isDateTimeCapable();
+  }
 
-    public byte[] parseDateTime(long systemTimeMillis) {
-        return baseType.parseDateTime(systemTimeMillis);
-    }
+  public boolean isJdbcNative() {
+    return baseType.isJdbcNative();
+  }
 
-    public byte[] read(DataReader dataReader) throws SQLException {
-        
-        byte[] data = baseType.read(dataReader);
-        data  = dataEncryptSupport.decrypt(data);
-        return data;
-    }
+  public void loadIgnore(DataReader dataReader) {
+    baseType.loadIgnore(dataReader);
+  }
 
-    public byte[] toBeanType(Object value) {
-        return baseType.toBeanType(value);
-    }
+  @Override
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    ctx.writeBinaryField(name, (byte[]) value);
+  }
 
-    public Object toJdbcType(Object value) {
-        return baseType.toJdbcType(value);
-    }
+  @Override
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    ByteArrayOutputStream out = new ByteArrayOutputStream(500);
+    ctx.readBinaryValue(out);
+    return out.toByteArray();
+  }
 
-    public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
-        baseType.accumulateScalarTypes(propName, list);
-    }
+  public String format(Object v) {
+    throw new RuntimeException("Not used");
+  }
 
-    public Object readData(DataInput dataInput) throws IOException {
-        int len = dataInput.readInt();
-        byte[] value = new byte[len];
-        dataInput.readFully(value);
-        return value;
-    }
+  public String formatValue(byte[] v) {
+    throw new RuntimeException("Not used");
+  }
 
-    public void writeData(DataOutput dataOutput, Object v) throws IOException {
-        byte[] value = (byte[])v;
-        dataOutput.writeInt(value.length);
-        dataOutput.write(value);
-    }
-    
+  public byte[] parse(String value) {
+    return baseType.parse(value);
+  }
+
+  public byte[] parseDateTime(long systemTimeMillis) {
+    return baseType.parseDateTime(systemTimeMillis);
+  }
+
+  public byte[] read(DataReader dataReader) throws SQLException {
+
+    byte[] data = baseType.read(dataReader);
+    data = dataEncryptSupport.decrypt(data);
+    return data;
+  }
+
+  public byte[] toBeanType(Object value) {
+    return baseType.toBeanType(value);
+  }
+
+  public Object toJdbcType(Object value) {
+    return baseType.toJdbcType(value);
+  }
+
+  public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
+    baseType.accumulateScalarTypes(propName, list);
+  }
+
+  public Object readData(DataInput dataInput) throws IOException {
+    int len = dataInput.readInt();
+    byte[] value = new byte[len];
+    dataInput.readFully(value);
+    return value;
+  }
+
+  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+    byte[] value = (byte[]) v;
+    dataOutput.writeInt(value.length);
+    dataOutput.write(value);
+  }
+
 }

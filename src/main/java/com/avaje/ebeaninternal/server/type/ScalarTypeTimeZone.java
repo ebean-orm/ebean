@@ -3,8 +3,7 @@ package com.avaje.ebeaninternal.server.type;
 import java.util.TimeZone;
 
 /**
- * ScalarType for java.util.TimeZone which converts to and from a VARCHAR
- * database column.
+ * ScalarType for java.util.TimeZone which converts to and from a VARCHAR database column.
  */
 public class ScalarTypeTimeZone extends ScalarTypeBaseVarchar<TimeZone> {
 
@@ -27,10 +26,12 @@ public class ScalarTypeTimeZone extends ScalarTypeBaseVarchar<TimeZone> {
     return ((TimeZone) beanValue).getID();
   }
 
+  @Override
   public String formatValue(TimeZone v) {
     return v.getID();
   }
 
+  @Override
   public TimeZone parse(String value) {
     return TimeZone.getTimeZone(value);
   }

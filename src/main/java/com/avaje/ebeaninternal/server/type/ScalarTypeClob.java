@@ -32,6 +32,7 @@ public class ScalarTypeClob extends ScalarTypeBaseVarchar<String> {
     return beanValue;
   }
 
+  @Override
   public void bind(DataBind b, String value) throws SQLException {
     if (value == null) {
       b.setNull(Types.VARCHAR);
@@ -40,23 +41,28 @@ public class ScalarTypeClob extends ScalarTypeBaseVarchar<String> {
     }
   }
 
+  @Override
   public String read(DataReader dataReader) throws SQLException {
 
     return dataReader.getStringClob();
   }
 
+  @Override
   public Object toJdbcType(Object value) {
     return BasicTypeConverter.toString(value);
   }
 
+  @Override
   public String toBeanType(Object value) {
     return BasicTypeConverter.toString(value);
   }
 
+  @Override
   public String formatValue(String t) {
     return t;
   }
 
+  @Override
   public String parse(String value) {
     return value;
   }

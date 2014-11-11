@@ -17,60 +17,70 @@ import com.fasterxml.jackson.core.JsonToken;
  */
 public class ScalarTypeInteger extends ScalarTypeBase<Integer> {
 
-	public ScalarTypeInteger() {
-		super(Integer.class, true, Types.INTEGER);
-	}
-	
-	public void bind(DataBind b, Integer value) throws SQLException {
-		if (value == null){
-			b.setNull(Types.INTEGER);
-		} else {
-			b.setInt(value.intValue());
-		}
-	}
+  public ScalarTypeInteger() {
+    super(Integer.class, true, Types.INTEGER);
+  }
 
-	public Integer read(DataReader dataReader) throws SQLException {
-		
-		return dataReader.getInt();
-	}
-
-    public Object readData(DataInput dataInput) throws IOException {
-        return Integer.valueOf(dataInput.readInt());
+  @Override
+  public void bind(DataBind b, Integer value) throws SQLException {
+    if (value == null) {
+      b.setNull(Types.INTEGER);
+    } else {
+      b.setInt(value.intValue());
     }
+  }
 
-    public void writeData(DataOutput dataOutput, Object v) throws IOException {
-        dataOutput.writeInt((Integer) v);
-    }
-	
-	public Object toJdbcType(Object value) {
-		return BasicTypeConverter.toInteger(value);
-	}
+  @Override
+  public Integer read(DataReader dataReader) throws SQLException {
+    return dataReader.getInt();
+  }
 
-	public Integer toBeanType(Object value) {
-		return BasicTypeConverter.toInteger(value);
-	}
+  @Override
+  public Object readData(DataInput dataInput) throws IOException {
+    return Integer.valueOf(dataInput.readInt());
+  }
 
-    public String formatValue(Integer v) {
-        return v.toString();
-    }
+  @Override
+  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+    dataOutput.writeInt((Integer) v);
+  }
 
-	public Integer parse(String value) {
-		return Integer.valueOf(value);
-	}
+  @Override
+  public Object toJdbcType(Object value) {
+    return BasicTypeConverter.toInteger(value);
+  }
 
-	public Integer parseDateTime(long systemTimeMillis) {
-		throw new TextException("Not Supported");
-	}
+  @Override
+  public Integer toBeanType(Object value) {
+    return BasicTypeConverter.toInteger(value);
+  }
 
-	public boolean isDateTimeCapable() {
-		return false;
-	}
-    
+  @Override
+  public String formatValue(Integer v) {
+    return v.toString();
+  }
+
+  @Override
+  public Integer parse(String value) {
+    return Integer.valueOf(value);
+  }
+
+  @Override
+  public Integer parseDateTime(long systemTimeMillis) {
+    throw new TextException("Not Supported");
+  }
+
+  @Override
+  public boolean isDateTimeCapable() {
+    return false;
+  }
+
   @Override
   public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     return ctx.getIntValue();
   }
 
+  @Override
   public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
     ctx.writeNumberField(name, (Integer) value);
   }

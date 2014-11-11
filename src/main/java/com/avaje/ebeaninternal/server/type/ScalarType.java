@@ -184,12 +184,24 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
 	 */
 	public boolean isDateTimeCapable();
 
+	/**
+	 * Read the value from binary input.
+	 */
   public Object readData(DataInput dataInput) throws IOException;
 
+  /**
+   * Write the value to binary output.
+   */
   public void writeData(DataOutput dataOutput, Object v) throws IOException;
 
+  /**
+   * Read the value from JsonParser.
+   */
   public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException;
 
+  /**
+   * Write the value to the JsonGenerator.
+   */
   public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException;
     
 }

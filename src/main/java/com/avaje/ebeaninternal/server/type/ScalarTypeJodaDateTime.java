@@ -12,37 +12,39 @@ import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
  */
 public class ScalarTypeJodaDateTime extends ScalarTypeBaseDateTime<DateTime> {
 
-	public ScalarTypeJodaDateTime() {
-		super(DateTime.class, false, Types.TIMESTAMP);
-	}
-	
+  public ScalarTypeJodaDateTime() {
+    super(DateTime.class, false, Types.TIMESTAMP);
+  }
+
   @Override
   public long convertToMillis(Object value) {
     return ((DateTime) value).getMillis();
   }
-	 
-	@Override
-    public DateTime convertFromTimestamp(Timestamp ts) {
-        return new DateTime(ts.getTime());
-    }
 
-    @Override
-    public Timestamp convertToTimestamp(DateTime t) {
-        return new Timestamp(t.getMillis());
-    }
-	
-	public Object toJdbcType(Object value) {
-		if (value instanceof DateTime){
-			return new Timestamp(((DateTime)value).getMillis());
-		}
-		return BasicTypeConverter.toTimestamp(value);
-	}
+  @Override
+  public DateTime convertFromTimestamp(Timestamp ts) {
+    return new DateTime(ts.getTime());
+  }
 
-	public DateTime toBeanType(Object value) {
-		if (value instanceof java.util.Date){
-			return new DateTime(((java.util.Date)value).getTime());
-		}
-		return (DateTime)value;
-	}
- 
+  @Override
+  public Timestamp convertToTimestamp(DateTime t) {
+    return new Timestamp(t.getMillis());
+  }
+
+  @Override
+  public Object toJdbcType(Object value) {
+    if (value instanceof DateTime) {
+      return new Timestamp(((DateTime) value).getMillis());
+    }
+    return BasicTypeConverter.toTimestamp(value);
+  }
+
+  @Override
+  public DateTime toBeanType(Object value) {
+    if (value instanceof java.util.Date) {
+      return new DateTime(((java.util.Date) value).getTime());
+    }
+    return (DateTime) value;
+  }
+
 }

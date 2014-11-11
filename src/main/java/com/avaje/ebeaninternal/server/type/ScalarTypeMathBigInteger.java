@@ -17,79 +17,89 @@ import com.fasterxml.jackson.core.JsonToken;
  */
 public class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
 
-	public ScalarTypeMathBigInteger() {
-		super(BigInteger.class, false, Types.BIGINT);
-	}
-	
-	public void bind(DataBind b, BigInteger value) throws SQLException {
-		if (value == null){
-			b.setNull(Types.BIGINT);
-		} else {
-			b.setLong(value.longValue());
-		}
-	}
+  public ScalarTypeMathBigInteger() {
+    super(BigInteger.class, false, Types.BIGINT);
+  }
 
-	public BigInteger read(DataReader dataReader) throws SQLException {
-		
-		Long l = dataReader.getLong();
-		if (l == null){
-			return null;
-		}
-		return new BigInteger(String.valueOf(l));
-	}
-	
-	public Object toJdbcType(Object value) {
-		return BasicTypeConverter.toLong(value);
-	}
-
-	public BigInteger toBeanType(Object value) {
-		return BasicTypeConverter.toMathBigInteger(value);
-	}
-
-	
-	public String formatValue(BigInteger v) {
-        return v.toString();
+  @Override
+  public void bind(DataBind b, BigInteger value) throws SQLException {
+    if (value == null) {
+      b.setNull(Types.BIGINT);
+    } else {
+      b.setLong(value.longValue());
     }
+  }
 
-    public BigInteger parse(String value) {
-		return new BigInteger(value);
-	}
+  @Override
+  public BigInteger read(DataReader dataReader) throws SQLException {
 
-	public BigInteger parseDateTime(long systemTimeMillis) {
-		return BigInteger.valueOf(systemTimeMillis);
-	}
-
-	public boolean isDateTimeCapable() {
-		return true;
-	}
-    
-    public Object readData(DataInput dataInput) throws IOException {
-        if (!dataInput.readBoolean()) {
-            return null;
-        } else {
-            long val = dataInput.readLong();
-            return Long.valueOf(val);
-        }
+    Long l = dataReader.getLong();
+    if (l == null) {
+      return null;
     }
+    return new BigInteger(String.valueOf(l));
+  }
 
-    public void writeData(DataOutput dataOutput, Object v) throws IOException {
-        
-        Long value = (Long)v;
-        if (value == null){
-            dataOutput.writeBoolean(false);
-        } else {
-            dataOutput.writeBoolean(true);
-            dataOutput.writeLong(value.longValue());            
-        }
-    }
+  @Override
+  public Object toJdbcType(Object value) {
+    return BasicTypeConverter.toLong(value);
+  }
 
-    @Override
-    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-      return ctx.getDecimalValue().toBigInteger();
+  @Override
+  public BigInteger toBeanType(Object value) {
+    return BasicTypeConverter.toMathBigInteger(value);
+  }
+
+  @Override
+  public String formatValue(BigInteger v) {
+    return v.toString();
+  }
+
+  @Override
+  public BigInteger parse(String value) {
+    return new BigInteger(value);
+  }
+
+  @Override
+  public BigInteger parseDateTime(long systemTimeMillis) {
+    return BigInteger.valueOf(systemTimeMillis);
+  }
+
+  @Override
+  public boolean isDateTimeCapable() {
+    return true;
+  }
+
+  @Override
+  public Object readData(DataInput dataInput) throws IOException {
+    if (!dataInput.readBoolean()) {
+      return null;
+    } else {
+      long val = dataInput.readLong();
+      return Long.valueOf(val);
     }
-    
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
-      ctx.writeNumberField(name, ((BigInteger)value).longValue());
+  }
+
+  @Override
+  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+
+    Long value = (Long) v;
+    if (value == null) {
+      dataOutput.writeBoolean(false);
+    } else {
+      dataOutput.writeBoolean(true);
+      dataOutput.writeLong(value.longValue());
     }
-    
+  }
+
+  @Override
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    return ctx.getDecimalValue().toBigInteger();
+  }
+
+  @Override
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    ctx.writeNumberField(name, ((BigInteger) value).longValue());
+  }
+
 }

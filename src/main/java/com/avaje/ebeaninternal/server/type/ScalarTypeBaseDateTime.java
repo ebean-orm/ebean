@@ -16,94 +16,96 @@ import com.fasterxml.jackson.core.JsonToken;
  */
 public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
 
-    public ScalarTypeBaseDateTime(Class<T> type, boolean jdbcNative, int jdbcType) {
-        super(type, jdbcNative, jdbcType);
-    }
-    
-    public abstract long convertToMillis(Object value);
-    
-    public abstract Timestamp convertToTimestamp(T t);
-    
-    public abstract T convertFromTimestamp(Timestamp ts);
-    
-    public void bind(DataBind b, T value) throws SQLException {
-        if (value == null){
-            b.setNull(Types.TIMESTAMP);
-        } else {
-            Timestamp ts = convertToTimestamp(value);
-            b.setTimestamp(ts);
-        }
-    }
+  protected DateTimeJsonParser dateTimeParser = new DateTimeJsonParser();
+  
+  public ScalarTypeBaseDateTime(Class<T> type, boolean jdbcNative, int jdbcType) {
+    super(type, jdbcNative, jdbcType);
+  }
 
-    public T read(DataReader dataReader) throws SQLException {
-        
-        Timestamp ts = dataReader.getTimestamp();
-        if (ts == null){
-            return null;
-        } else {
-            return convertFromTimestamp(ts);
-        }
+  public abstract long convertToMillis(Object value);
+
+  public abstract Timestamp convertToTimestamp(T t);
+
+  public abstract T convertFromTimestamp(Timestamp ts);
+
+  public void bind(DataBind b, T value) throws SQLException {
+    if (value == null) {
+      b.setNull(Types.TIMESTAMP);
+    } else {
+      Timestamp ts = convertToTimestamp(value);
+      b.setTimestamp(ts);
     }
-    
+  }
+
+  public T read(DataReader dataReader) throws SQLException {
+
+    Timestamp ts = dataReader.getTimestamp();
+    if (ts == null) {
+      return null;
+    } else {
+      return convertFromTimestamp(ts);
+    }
+  }
+
   @Override
   public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-    
+
     if (JsonToken.VALUE_NUMBER_INT == event) {
       long millis = ctx.getLongValue();
       return parseDateTime(millis);
-      
+
     } else {
-      String string = ctx.getText();
-      throw new RuntimeException("convert " + string);
+      String jsonDateTime = ctx.getText();
+      return convertFromTimestamp(dateTimeParser.parse(jsonDateTime));
     }
   }
-    
-    @Override
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
-      long millis = convertToMillis(value);
-      ctx.writeNumberField(name, millis);
-    }
 
-    public String formatValue(T t) {
-        Timestamp ts = convertToTimestamp(t);
-        return ts.toString();
-    }
+  @Override
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    long millis = convertToMillis(value);
+    ctx.writeNumberField(name, millis);
+  }
 
-    public T parse(String value) {
-        Timestamp ts = Timestamp.valueOf(value);
-        return convertFromTimestamp(ts);
-    }
-    
-    public T parseDateTime(long systemTimeMillis) {
-        Timestamp ts = new Timestamp(systemTimeMillis);
-        return convertFromTimestamp(ts);
-    }
+  public String formatValue(T t) {
+    Timestamp ts = convertToTimestamp(t);
+    return ts.toString();
+  }
 
-    public boolean isDateTimeCapable() {
-        return true;
-    }
+  public T parse(String value) {
+    Timestamp ts = Timestamp.valueOf(value);
+    return convertFromTimestamp(ts);
+  }
 
-    public Object readData(DataInput dataInput) throws IOException {
-        if (!dataInput.readBoolean()) {
-            return null;
-        } else {
-            long val = dataInput.readLong();
-            Timestamp ts = new Timestamp(val);
-            return convertFromTimestamp(ts);
-        }
-    }
+  public T parseDateTime(long systemTimeMillis) {
+    Timestamp ts = new Timestamp(systemTimeMillis);
+    return convertFromTimestamp(ts);
+  }
 
-    @SuppressWarnings("unchecked")
-    public void writeData(DataOutput dataOutput, Object v) throws IOException {
-        
-        T value = (T)v;
-        if (value == null){
-            dataOutput.writeBoolean(false);
-        } else {
-            dataOutput.writeBoolean(true);
-            Timestamp ts = convertToTimestamp(value);
-            dataOutput.writeLong(ts.getTime());            
-        }
+  public boolean isDateTimeCapable() {
+    return true;
+  }
+
+  public Object readData(DataInput dataInput) throws IOException {
+    if (!dataInput.readBoolean()) {
+      return null;
+    } else {
+      long val = dataInput.readLong();
+      Timestamp ts = new Timestamp(val);
+      return convertFromTimestamp(ts);
     }
-    
+  }
+
+  @SuppressWarnings("unchecked")
+  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+
+    T value = (T) v;
+    if (value == null) {
+      dataOutput.writeBoolean(false);
+    } else {
+      dataOutput.writeBoolean(true);
+      Timestamp ts = convertToTimestamp(value);
+      dataOutput.writeLong(ts.getTime());
+    }
+  }
+
 }

@@ -8,13 +8,12 @@ import java.sql.Types;
  */
 public class ScalarTypeLongVarchar extends ScalarTypeClob {
 
-	public ScalarTypeLongVarchar() {
-		super(true, Types.LONGVARCHAR);
-	}
+  public ScalarTypeLongVarchar() {
+    super(true, Types.LONGVARCHAR);
+  }
 
-	@Override
-	public String read(DataReader dataReader) throws SQLException {
-
-	    return dataReader.getStringFromStream();
-	}	
+  @Override
+  public String read(DataReader dataReader) throws SQLException {
+    return dataReader.getStringFromStream();
+  }
 }

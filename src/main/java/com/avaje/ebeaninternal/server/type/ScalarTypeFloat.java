@@ -16,81 +16,83 @@ import com.fasterxml.jackson.core.JsonToken;
  */
 public class ScalarTypeFloat extends ScalarTypeBase<Float> {
 
-	public ScalarTypeFloat() {
-		super(Float.class, true, Types.REAL);
-	}
-	
-	public void bind(DataBind b, Float value) throws SQLException {
-		if (value == null){
-			b.setNull(Types.REAL);
-		} else {
-			b.setFloat(value.floatValue());
-		}
-	}
+  public ScalarTypeFloat() {
+    super(Float.class, true, Types.REAL);
+  }
 
-	public Float read(DataReader dataReader) throws SQLException {
-		
-		return dataReader.getFloat();
-	}
-	
-	public Object toJdbcType(Object value) {
-		return BasicTypeConverter.toFloat(value);
-	}
+  @Override
+  public void bind(DataBind b, Float value) throws SQLException {
+    if (value == null) {
+      b.setNull(Types.REAL);
+    } else {
+      b.setFloat(value.floatValue());
+    }
+  }
 
-	public Float toBeanType(Object value) {
-		return BasicTypeConverter.toFloat(value);
-	}
+  @Override
+  public Float read(DataReader dataReader) throws SQLException {
+    return dataReader.getFloat();
+  }
 
-    public String formatValue(Float t) {
-        return t.toString();
-    }
-	
-	public Float parse(String value) {
-		return Float.valueOf(value);
-	}
-	
-	public Float parseDateTime(long systemTimeMillis) {
-		return Float.valueOf(systemTimeMillis);
-	}
+  @Override
+  public Object toJdbcType(Object value) {
+    return BasicTypeConverter.toFloat(value);
+  }
 
-	public boolean isDateTimeCapable() {
-		return true;
-	}
+  @Override
+  public Float toBeanType(Object value) {
+    return BasicTypeConverter.toFloat(value);
+  }
 
-    public String toJsonString(Float value) {
-        if(value.isInfinite() || value.isNaN()) {
-            return "null";
-        } else {
-            return value.toString();
-        }
-    }
-    
-    public Object readData(DataInput dataInput) throws IOException {
-        if (!dataInput.readBoolean()) {
-            return null;
-        } else {
-            float val = dataInput.readFloat();
-            return Float.valueOf(val);
-        }
-    }
+  @Override
+  public String formatValue(Float t) {
+    return t.toString();
+  }
 
-    public void writeData(DataOutput dataOutput, Object v) throws IOException {
-        
-        Float value = (Float)v;
-        if (value == null){
-            dataOutput.writeBoolean(false);
-        } else {
-            dataOutput.writeBoolean(true);
-            dataOutput.writeFloat(value.floatValue());            
-        }
+  @Override
+  public Float parse(String value) {
+    return Float.valueOf(value);
+  }
+
+  @Override
+  public Float parseDateTime(long systemTimeMillis) {
+    return Float.valueOf(systemTimeMillis);
+  }
+
+  @Override
+  public boolean isDateTimeCapable() {
+    return true;
+  }
+
+  @Override
+  public Object readData(DataInput dataInput) throws IOException {
+    if (!dataInput.readBoolean()) {
+      return null;
+    } else {
+      float val = dataInput.readFloat();
+      return Float.valueOf(val);
     }
-    
-    @Override
-    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-      return ctx.getFloatValue();
+  }
+
+  @Override
+  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+
+    Float value = (Float) v;
+    if (value == null) {
+      dataOutput.writeBoolean(false);
+    } else {
+      dataOutput.writeBoolean(true);
+      dataOutput.writeFloat(value.floatValue());
     }
-    
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
-      ctx.writeNumberField(name, (Float)value);
-    }
+  }
+
+  @Override
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    return ctx.getFloatValue();
+  }
+
+  @Override
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    ctx.writeNumberField(name, (Float) value);
+  }
 }

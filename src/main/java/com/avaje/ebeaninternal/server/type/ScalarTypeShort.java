@@ -17,73 +17,83 @@ import com.fasterxml.jackson.core.JsonToken;
  */
 public class ScalarTypeShort extends ScalarTypeBase<Short> {
 
-	public ScalarTypeShort() {
-		super(Short.class, true, Types.SMALLINT);
-	}
-	
-	public void bind(DataBind b, Short value) throws SQLException {
-		if (value == null){
-			b.setNull(Types.SMALLINT);
-		} else {
-			b.setShort(value.shortValue());
-		}
-	}
+  public ScalarTypeShort() {
+    super(Short.class, true, Types.SMALLINT);
+  }
 
-	public Short read(DataReader dataReader) throws SQLException {
-		
-		return dataReader.getShort();
-	}
-	
-	public Object toJdbcType(Object value) {
-		return BasicTypeConverter.toShort(value);
-	}
-
-	public Short toBeanType(Object value) {
-		return BasicTypeConverter.toShort(value);
-	}
-	
-	public String formatValue(Short v) {
-        return v.toString();
+  @Override
+  public void bind(DataBind b, Short value) throws SQLException {
+    if (value == null) {
+      b.setNull(Types.SMALLINT);
+    } else {
+      b.setShort(value.shortValue());
     }
+  }
 
-    public Short parse(String value) {
-		return Short.valueOf(value);
-	}
+  @Override
+  public Short read(DataReader dataReader) throws SQLException {
+    return dataReader.getShort();
+  }
 
-	public Short parseDateTime(long systemTimeMillis) {
-		throw new TextException("Not Supported");
-	}
+  @Override
+  public Object toJdbcType(Object value) {
+    return BasicTypeConverter.toShort(value);
+  }
 
-	public boolean isDateTimeCapable() {
-		return false;
-	}
-	
-    public Object readData(DataInput dataInput) throws IOException {
-        if (!dataInput.readBoolean()) {
-            return null;
-        } else {
-            short val = dataInput.readShort();
-            return Short.valueOf(val);
-        }
-    }
+  @Override
+  public Short toBeanType(Object value) {
+    return BasicTypeConverter.toShort(value);
+  }
 
-    public void writeData(DataOutput dataOutput, Object v) throws IOException {
-        
-        Short value = (Short)v;
-        if (value == null){
-            dataOutput.writeBoolean(false);
-        } else {
-            dataOutput.writeBoolean(true);
-            dataOutput.writeShort(value.shortValue());            
-        }
+  @Override
+  public String formatValue(Short v) {
+    return v.toString();
+  }
+
+  @Override
+  public Short parse(String value) {
+    return Short.valueOf(value);
+  }
+
+  @Override
+  public Short parseDateTime(long systemTimeMillis) {
+    throw new TextException("Not Supported");
+  }
+
+  @Override
+  public boolean isDateTimeCapable() {
+    return false;
+  }
+
+  @Override
+  public Object readData(DataInput dataInput) throws IOException {
+    if (!dataInput.readBoolean()) {
+      return null;
+    } else {
+      short val = dataInput.readShort();
+      return Short.valueOf(val);
     }
-    
-    @Override
-    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-      return ctx.getShortValue();
+  }
+
+  @Override
+  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+
+    Short value = (Short) v;
+    if (value == null) {
+      dataOutput.writeBoolean(false);
+    } else {
+      dataOutput.writeBoolean(true);
+      dataOutput.writeShort(value.shortValue());
     }
-    
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
-      ctx.writeNumberField(name, (Short)value);
-    }
+  }
+
+  @Override
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    return ctx.getShortValue();
+  }
+
+  @Override
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    ctx.writeNumberField(name, (Short) value);
+  }
 }

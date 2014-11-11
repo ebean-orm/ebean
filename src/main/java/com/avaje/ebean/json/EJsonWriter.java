@@ -1,6 +1,8 @@
 package com.avaje.ebean.json;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
@@ -9,21 +11,27 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 class EJsonWriter {
 
-//  static String write(Object object) {
-//    StringWriter writer = new StringWriter(200);
-//    write(object, writer);
-//    return writer.toString();
-//  }
-//
-//  static void write(Object object, Writer writer) {
-//    JsonGenerator generator = Json.createGenerator(writer);
-//    write(object, generator);
-//    generator.close();
-//  }
+  /**
+   * Base jsonFactory implementation used when it is not passed in.
+   */
+  static JsonFactory jsonFactory = new JsonFactory();
+  
+  static String write(Object object) throws IOException {
+    StringWriter writer = new StringWriter(200);
+    write(object, writer);
+    return writer.toString();
+  }
+
+  static void write(Object object, Writer writer) throws IOException {
+    JsonGenerator generator = jsonFactory.createGenerator(writer);
+    write(object, generator);
+    generator.close();
+  }
 
   static void write(Object object, JsonGenerator jsonGenerator) {
     new EJsonWriter(jsonGenerator).writeJson(object);

@@ -59,8 +59,9 @@ Export-Package: com.avaje.ebean,
  com.avaje.ebeaninternal.server.util,
  com.avaje.ebeaninternal.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Require-Bundle: 
+Require-Bundle:
  org.slf4j.api;bundle-version="1.7.2",
+ com.fasterxml.jackson.core;bundle-version="2.4.3",
  com.springsource.org.joda.time;bundle-version="1.6.0"
 Import-Package: javax.persistence;version="2.0.0"
 

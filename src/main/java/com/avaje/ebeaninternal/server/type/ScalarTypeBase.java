@@ -1,76 +1,75 @@
 package com.avaje.ebeaninternal.server.type;
 
-
-
-
 /**
  * Base ScalarType object.
  */
 public abstract class ScalarTypeBase<T> implements ScalarType<T> {
 
-	protected final Class<T> type;
-	protected final boolean jdbcNative;
-	protected final int jdbcType;
-	
-	public ScalarTypeBase(Class<T> type, boolean jdbcNative, int jdbcType) {
-		this.type = type;
-		this.jdbcNative = jdbcNative;
-		this.jdbcType = jdbcType;
-	}
-	
-	/**
-	 * Default implementation of mutable false.
-	 */
-	@Override
+  protected final Class<T> type;
+
+  protected final boolean jdbcNative;
+
+  protected final int jdbcType;
+
+  public ScalarTypeBase(Class<T> type, boolean jdbcNative, int jdbcType) {
+    this.type = type;
+    this.jdbcNative = jdbcNative;
+    this.jdbcType = jdbcType;
+  }
+
+  /**
+   * Default implementation of mutable false.
+   */
+  @Override
   public boolean isMutable() {
     return false;
   }
 
-	/**
-	 * Default to true.
-	 */
+  /**
+   * Default to true.
+   */
   @Override
   public boolean isDirty(Object value) {
     return true;
   }
 
   /**
-	 * Just return 0.
-	 */
-	public int getLength() {
-		return 0;
-	}
+   * Just return 0.
+   */
+  public int getLength() {
+    return 0;
+  }
 
-	public boolean isJdbcNative() {
-		return jdbcNative;
-	}
-	
-	public int getJdbcType() {
-		return jdbcType;
-	}
-	
-	public Class<T> getType() {
-		return type;
-	}
+  public boolean isJdbcNative() {
+    return jdbcNative;
+  }
 
-	@SuppressWarnings("unchecked")
-    public String format(Object v) {
-        return formatValue((T)v);
-    }
+  public int getJdbcType() {
+    return jdbcType;
+  }
 
-    /**
-	 * Return true if the value is null.
-	 */
-	public boolean isDbNull(Object value) {
-		return value == null;
-	}
+  public Class<T> getType() {
+    return type;
+  }
 
-	/**
-	 * Returns the value that was passed in.
-	 */
-	public Object getDbNullValue(Object value) {
-		return value;
-	}
+  @SuppressWarnings("unchecked")
+  public String format(Object v) {
+    return formatValue((T) v);
+  }
+
+  /**
+   * Return true if the value is null.
+   */
+  public boolean isDbNull(Object value) {
+    return value == null;
+  }
+
+  /**
+   * Returns the value that was passed in.
+   */
+  public Object getDbNullValue(Object value) {
+    return value;
+  }
 
   public void loadIgnore(DataReader dataReader) {
     dataReader.incrementPos(1);
@@ -79,5 +78,5 @@ public abstract class ScalarTypeBase<T> implements ScalarType<T> {
   public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
     list.addScalarType(propName, this);
   }
-    
+
 }

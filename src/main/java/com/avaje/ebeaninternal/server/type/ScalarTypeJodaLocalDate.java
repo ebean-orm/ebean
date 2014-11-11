@@ -12,41 +12,44 @@ import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
  */
 public class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
 
-	public ScalarTypeJodaLocalDate() {
-		super(LocalDate.class, false, Types.DATE);
-	}
-	
-	@Override
-  public long convertToMillis(Object value) {
-    return ((LocalDate)value).toDateMidnight().getMillis();
+  public ScalarTypeJodaLocalDate() {
+    super(LocalDate.class, false, Types.DATE);
   }
 
   @Override
-    public LocalDate convertFromDate(Date ts) {
-	    return new LocalDate(((java.util.Date)ts).getTime());
-    }
+  public long convertToMillis(Object value) {
+    return ((LocalDate) value).toDateMidnight().getMillis();
+  }
 
-    @Override
-    public Date convertToDate(LocalDate t) {
-        return new java.sql.Date(t.toDateMidnight().getMillis());
-    }
-	
-	public Object toJdbcType(Object value) {
-		if (value instanceof LocalDate){
-			return new java.sql.Date(((LocalDate)value).toDateMidnight().getMillis());
-		}
-		return BasicTypeConverter.toDate(value);
-	}
+  @Override
+  public LocalDate convertFromDate(Date ts) {
+    return new LocalDate(((java.util.Date) ts).getTime());
+  }
 
-	public LocalDate toBeanType(Object value) {
-		if (value instanceof java.util.Date){
-			return new LocalDate(((java.util.Date)value).getTime());
-		}
-		return (LocalDate)value;
-	}
-	
-	public LocalDate parseDateTime(long systemTimeMillis) {
-		return new LocalDate(systemTimeMillis);
-	}
-	
+  @Override
+  public Date convertToDate(LocalDate t) {
+    return new java.sql.Date(t.toDateMidnight().getMillis());
+  }
+
+  @Override
+  public Object toJdbcType(Object value) {
+    if (value instanceof LocalDate) {
+      return new java.sql.Date(((LocalDate) value).toDateMidnight().getMillis());
+    }
+    return BasicTypeConverter.toDate(value);
+  }
+
+  @Override
+  public LocalDate toBeanType(Object value) {
+    if (value instanceof java.util.Date) {
+      return new LocalDate(((java.util.Date) value).getTime());
+    }
+    return (LocalDate) value;
+  }
+
+  @Override
+  public LocalDate parseDateTime(long systemTimeMillis) {
+    return new LocalDate(systemTimeMillis);
+  }
+
 }

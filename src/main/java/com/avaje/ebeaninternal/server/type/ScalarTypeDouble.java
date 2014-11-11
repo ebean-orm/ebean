@@ -15,83 +15,84 @@ import com.fasterxml.jackson.core.JsonToken;
  * ScalarType for Double and double.
  */
 public class ScalarTypeDouble extends ScalarTypeBase<Double> {
-	
-	public ScalarTypeDouble() {
-		super(Double.class, true, Types.DOUBLE);
-	}
-	
-	public void bind(DataBind b, Double value) throws SQLException {
-		if (value == null){
-			b.setNull(Types.DOUBLE);
-		} else {
-			b.setDouble(value.doubleValue());
-		}
-	}
 
-	public Double read(DataReader dataReader) throws SQLException {
-		
-		return dataReader.getDouble();
-	}
-	
-	public Object toJdbcType(Object value) {
-		return BasicTypeConverter.toDouble(value);
-	}
+  public ScalarTypeDouble() {
+    super(Double.class, true, Types.DOUBLE);
+  }
 
-	public Double toBeanType(Object value) {
-		return BasicTypeConverter.toDouble(value);
-	}
-
-	
-	public String formatValue(Double t) {
-        return t.toString();
+  @Override
+  public void bind(DataBind b, Double value) throws SQLException {
+    if (value == null) {
+      b.setNull(Types.DOUBLE);
+    } else {
+      b.setDouble(value.doubleValue());
     }
+  }
 
-    public Double parse(String value) {
-		return Double.valueOf(value);
-	}
+  @Override
+  public Double read(DataReader dataReader) throws SQLException {
+    return dataReader.getDouble();
+  }
 
-	public Double parseDateTime(long systemTimeMillis) {
-		return Double.valueOf(systemTimeMillis);
-	}
+  @Override
+  public Object toJdbcType(Object value) {
+    return BasicTypeConverter.toDouble(value);
+  }
 
-	public boolean isDateTimeCapable() {
-		return true;
-	}
+  @Override
+  public Double toBeanType(Object value) {
+    return BasicTypeConverter.toDouble(value);
+  }
 
-    public String toJsonString(Double value) {
-        if(value.isInfinite() || value.isNaN()) {
-            return "null";
-        } else {
-            return value.toString();
-        }
-    }
-    
-    public Object readData(DataInput dataInput) throws IOException {
-        if (!dataInput.readBoolean()) {
-            return null;
-        } else {
-            double val = dataInput.readDouble();
-            return Double.valueOf(val);
-        }
-    }
+  @Override
+  public String formatValue(Double t) {
+    return t.toString();
+  }
 
-    public void writeData(DataOutput dataOutput, Object v) throws IOException {
-        
-        Double value = (Double)v;
-        if (value == null){
-            dataOutput.writeBoolean(false);
-        } else {
-            dataOutput.writeBoolean(true);
-            dataOutput.writeDouble(value.doubleValue());            
-        }
+  @Override
+  public Double parse(String value) {
+    return Double.valueOf(value);
+  }
+
+  @Override
+  public Double parseDateTime(long systemTimeMillis) {
+    return Double.valueOf(systemTimeMillis);
+  }
+
+  @Override
+  public boolean isDateTimeCapable() {
+    return true;
+  }
+
+  @Override
+  public Object readData(DataInput dataInput) throws IOException {
+    if (!dataInput.readBoolean()) {
+      return null;
+    } else {
+      double val = dataInput.readDouble();
+      return Double.valueOf(val);
     }
-    
-    @Override
-    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-      return ctx.getDoubleValue();
+  }
+
+  @Override
+  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+
+    Double value = (Double) v;
+    if (value == null) {
+      dataOutput.writeBoolean(false);
+    } else {
+      dataOutput.writeBoolean(true);
+      dataOutput.writeDouble(value.doubleValue());
     }
-    
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
-      ctx.writeNumberField(name, (Double)value);
-    }
+  }
+
+  @Override
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    return ctx.getDoubleValue();
+  }
+
+  @Override
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    ctx.writeNumberField(name, (Double) value);
+  }
 }

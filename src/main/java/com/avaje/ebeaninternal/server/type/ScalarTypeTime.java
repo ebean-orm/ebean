@@ -17,67 +17,75 @@ import com.fasterxml.jackson.core.JsonToken;
  */
 public class ScalarTypeTime extends ScalarTypeBase<Time> {
 
-	public ScalarTypeTime() {
-		super(Time.class, true, Types.TIME);
-	}
-	
-	public void bind(DataBind b, Time value) throws SQLException {
-		if (value == null){
-			b.setNull(Types.TIME);
-		} else {
-			b.setTime(value);
-		}
-	}
+  public ScalarTypeTime() {
+    super(Time.class, true, Types.TIME);
+  }
 
-	public Time read(DataReader dataReader) throws SQLException {
-		
-		return dataReader.getTime();
-	}
-	
-	public Object toJdbcType(Object value) {
-		return BasicTypeConverter.toTime(value);
-	}
-
-	public Time toBeanType(Object value) {
-		return BasicTypeConverter.toTime(value);
-	}
-
-	
-	public String formatValue(Time v) {
-        return v.toString();
+  @Override
+  public void bind(DataBind b, Time value) throws SQLException {
+    if (value == null) {
+      b.setNull(Types.TIME);
+    } else {
+      b.setTime(value);
     }
+  }
 
-    public Time parse(String value) {
-		return Time.valueOf(value);
-	}
-	
-	public Time parseDateTime(long systemTimeMillis) {
-		return new Time(systemTimeMillis);
-	}
+  @Override
+  public Time read(DataReader dataReader) throws SQLException {
+    return dataReader.getTime();
+  }
 
-	public boolean isDateTimeCapable() {
-		return true;
-	}
-    
-    public Object readData(DataInput dataInput) throws IOException {
-        if (!dataInput.readBoolean()) {
-            return null;
-        } else {
-            String val = dataInput.readUTF();
-            return parse(val);
-        }
+  @Override
+  public Object toJdbcType(Object value) {
+    return BasicTypeConverter.toTime(value);
+  }
+
+  @Override
+  public Time toBeanType(Object value) {
+    return BasicTypeConverter.toTime(value);
+  }
+
+  @Override
+  public String formatValue(Time v) {
+    return v.toString();
+  }
+
+  @Override
+  public Time parse(String value) {
+    return Time.valueOf(value);
+  }
+
+  @Override
+  public Time parseDateTime(long systemTimeMillis) {
+    return new Time(systemTimeMillis);
+  }
+
+  @Override
+  public boolean isDateTimeCapable() {
+    return true;
+  }
+
+  @Override
+  public Object readData(DataInput dataInput) throws IOException {
+    if (!dataInput.readBoolean()) {
+      return null;
+    } else {
+      String val = dataInput.readUTF();
+      return parse(val);
     }
+  }
 
-    public void writeData(DataOutput dataOutput, Object v) throws IOException {
-        
-        Time value = (Time)v;
-        if (value == null){
-            dataOutput.writeBoolean(false);
-        } else {
-            dataOutput.writeBoolean(true);
-            dataOutput.writeUTF(format(value));            
-        }
+  @Override
+  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+
+    Time value = (Time) v;
+    if (value == null) {
+      dataOutput.writeBoolean(false);
+    } else {
+      dataOutput.writeBoolean(true);
+      dataOutput.writeUTF(format(value));
     }
+  }
 
   @Override
   public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
@@ -86,7 +94,7 @@ public class ScalarTypeTime extends ScalarTypeBase<Time> {
 
   @Override
   public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
-    ctx.writeStringField(name, value.toString());
+    ctx.writeStringField(name, format(value));
   }
-  
+
 }

@@ -32,10 +32,12 @@ public class ScalarTypeInetAddress extends ScalarTypeBaseVarchar<InetAddress> {
     return ConvertInetAddresses.toUriString(beanValue);
   }
 
+  @Override
   public String formatValue(InetAddress v) {
     return ConvertInetAddresses.toUriString(v);
   }
 
+  @Override
   public InetAddress parse(String value) {
     try {
       return ConvertInetAddresses.forUriString(value);

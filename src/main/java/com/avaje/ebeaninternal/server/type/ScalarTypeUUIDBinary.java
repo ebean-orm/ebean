@@ -26,6 +26,7 @@ public class ScalarTypeUUIDBinary extends ScalarTypeBase<UUID> {
     return 16;
   }
 
+  @Override
   public Object toJdbcType(Object value) {
     return convertToBytes(value);
   }
@@ -50,6 +51,7 @@ public class ScalarTypeUUIDBinary extends ScalarTypeBase<UUID> {
     throw new IllegalStateException("Never called");
   }
 
+  @Override
   public boolean isDateTimeCapable() {
     return false;
   }

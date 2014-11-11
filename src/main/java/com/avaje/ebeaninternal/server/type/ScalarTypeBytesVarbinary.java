@@ -8,12 +8,12 @@ import java.sql.Types;
  */
 public class ScalarTypeBytesVarbinary extends ScalarTypeBytesBase {
 
-	public ScalarTypeBytesVarbinary() {
-		super(true, Types.VARBINARY);
-	}
-	
-	public byte[] read(DataReader dataReader) throws SQLException {
-		return dataReader.getBytes();
-	}
-	
+  public ScalarTypeBytesVarbinary() {
+    super(true, Types.VARBINARY);
+  }
+
+  public byte[] read(DataReader dataReader) throws SQLException {
+    return dataReader.getBytes();
+  }
+
 }

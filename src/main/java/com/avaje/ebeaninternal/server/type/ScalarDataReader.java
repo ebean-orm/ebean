@@ -4,8 +4,6 @@ import java.sql.SQLException;
 
 /**
  * Reads from and binds to database columns.
- * 
- * @author rbygrave
  */
 public interface ScalarDataReader<T> {
 

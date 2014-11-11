@@ -2,6 +2,7 @@ package com.avaje.ebean.json;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
@@ -13,19 +14,19 @@ import com.fasterxml.jackson.core.JsonParser;
  */
 public class EJson {
 
-//  /**
-//   * Write the nested Map/List as json.
-//   */
-//  public static String write(Object object) {
-//    return EJsonWriter.write(object);
-//  }
-//  
-//  /**
-//   * Write the nested Map/List as json to the writer.
-//   */
-//  public static void write(Object object, Writer writer) {
-//    EJsonWriter.write(object, writer);
-//  }
+  /**
+   * Write the nested Map/List as json.
+   */
+  public static String write(Object object) throws IOException {
+    return EJsonWriter.write(object);
+  }
+  
+  /**
+   * Write the nested Map/List as json to the writer.
+   */
+  public static void write(Object object, Writer writer) throws IOException {
+    EJsonWriter.write(object, writer);
+  }
   
   /**
    * Write the nested Map/List as json to the jsonGenerator.
