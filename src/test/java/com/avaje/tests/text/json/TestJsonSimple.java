@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.json.EJson;
+import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebean.text.json.JsonContext;
 
 public class TestJsonSimple extends BaseTestCase {
@@ -28,7 +28,7 @@ public class TestJsonSimple extends BaseTestCase {
     final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
     LineNumberReader lineReader = new LineNumberReader(reader);
 
-    String readLine = null;
+    String readLine;
 
     StringBuilder sb = new StringBuilder();
     while ((readLine = lineReader.readLine()) != null) {

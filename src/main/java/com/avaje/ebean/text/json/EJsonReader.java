@@ -1,4 +1,4 @@
-package com.avaje.ebean.json;
+package com.avaje.ebean.text.json;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -24,12 +24,12 @@ class EJsonReader {
   
   @SuppressWarnings("unchecked")
   static Map<String, Object> parseObject(Reader reader) throws IOException {
-    return (Map<String, Object>) parse(reader, false);
+    return (Map<String, Object>) parse(reader);
   }
   
   @SuppressWarnings("unchecked")
   static Map<String, Object> parseObject(JsonParser parser) throws IOException {
-    return (Map<String, Object>) parse(parser, false);
+    return (Map<String, Object>) parse(parser);
   }
 
   @SuppressWarnings("unchecked")
@@ -39,40 +39,36 @@ class EJsonReader {
   
   @SuppressWarnings("unchecked")
   static List<Object> parseList(Reader reader) throws IOException {
-    return (List<Object>) parse(reader, false);
+    return (List<Object>) parse(reader);
   }
   
   @SuppressWarnings("unchecked")
   static List<Object> parseList(JsonParser parser) throws IOException {
-    return (List<Object>) parse(parser, false);
+    return (List<Object>) parse(parser);
   }
 
   static Object parse(String json) throws IOException {
-    return parse(new StringReader(json), false);
+    return parse(new StringReader(json));
   }
 
-  static Object parse(Reader reader, boolean partial) throws IOException {
-    return parse(json.createParser(reader), partial);
+  static Object parse(Reader reader) throws IOException {
+    return parse(json.createParser(reader));
   }
 
-  static Object parse(JsonParser parser, boolean partial) throws IOException {
-    return new EJsonReader(parser, partial).parseJson();
+  static Object parse(JsonParser parser) throws IOException {
+    return new EJsonReader(parser).parseJson();
   }
 
   private final JsonParser parser;
-  
-  //private final boolean partial;
-  
+
   private int depth;
   
   private Stack stack;
 
   private Context currentContext;
 
-
-  EJsonReader(JsonParser parser, boolean partial) {
+  EJsonReader(JsonParser parser) {
     this.parser = parser;
-    //this.partial = partial;
   }
 
   private void startArray() {
@@ -98,10 +94,6 @@ class EJsonReader {
   private void end() {
     depth--;
     if (!stack.isEmpty()) {
-      
-      //if (currentContext != null) {
-      //  Object value = currentContext.getValue();
-      //}
       currentContext = stack.pop(currentContext);
     }
   }
@@ -121,27 +113,6 @@ class EJsonReader {
       if (JsonToken.VALUE_NULL == token) {
         return null;
       }
-    
-////    if (jp.nextToken() != JsonToken.START_OBJECT) {
-////      throw new IOException("Expected data to start with an Object");
-////    }
-////    TwitterEntry result = new TwitterEntry();
-////    // Iterate over object fields:
-////    while (jp.nextToken() != JsonToken.END_OBJECT) {
-////     String fieldName = jp.getCurrentName();
-////     // Let's move to value
-////     jp.nextToken();
-////     
-//    if (!parser.hasNext()) {
-//      return null;
-//    }
-//    
-//   
-//    Object simpleValue = getSimpleValue(JsonToken);
-//    if (simpleValue != null) {
-//      // it is a simple string, number or boolean
-//      return simpleValue;
-//    }
 
       stack = new Stack();
       // it is a object or array, process the first JsonToken
@@ -158,35 +129,6 @@ class EJsonReader {
       throw new RuntimeException(e);
     }
   }
-  
-//  /**
-//   * See if the JsonToken is a value rather than object or array.
-//   * <p>
-//   * If just a value then return that value else return null.
-//   * @throws IOException 
-//   */
-//  private Object getSimpleValue(JsonToken JsonToken) throws IOException {
-//    
-//    switch (JsonToken) {
-//    case VALUE_STRING:
-//      return parser.getValueAsString();
-//
-//    case VALUE_NUMBER_INT:
-//      return parser.getLongValue();
-//
-//    case VALUE_NUMBER_FLOAT:
-//      return parser.getDecimalValue();
-//
-//    case VALUE_TRUE:
-//      return Boolean.TRUE;
-//
-//    case VALUE_FALSE:
-//      return Boolean.FALSE;
-//
-//    default:
-//      return null;
-//    }
-//  }
 
   /**
    * Process the JsonToken for objects and arrays.

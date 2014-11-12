@@ -8,7 +8,7 @@ import java.util.Map;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.ScalarTypeConverter;
-import com.avaje.ebean.json.EJson;
+import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
@@ -198,7 +198,7 @@ public class BeanPropertyCompound extends BeanProperty {
         return;
       }
       
-      Object value = EJson.parsePartial(ctx);
+      Object value = EJson.parse(ctx);
       if (value == null) {
         setValue(bean, null);
       } else {

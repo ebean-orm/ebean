@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.server.text.json;
 
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.json.EJson;
+import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebean.text.json.JsonWriteOptions;

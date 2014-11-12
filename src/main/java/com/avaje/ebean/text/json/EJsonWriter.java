@@ -1,4 +1,4 @@
-package com.avaje.ebean.json;
+package com.avaje.ebean.text.json;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -20,7 +20,7 @@ class EJsonWriter {
    * Base jsonFactory implementation used when it is not passed in.
    */
   static JsonFactory jsonFactory = new JsonFactory();
-  
+
   static String write(Object object) throws IOException {
     StringWriter writer = new StringWriter(200);
     write(object, writer);
@@ -102,22 +102,21 @@ class EJsonWriter {
 
   private void writeNumber(String name, Number object) throws IOException {
 
-    
     if (object instanceof Long) {
       writeLong(name, object);
 
     } else if (object instanceof Integer) {
       writeInteger(name, object);
-      
+
     } else if (object instanceof Double) {
       writeDouble(name, object);
-      
+
     } else if (object instanceof BigDecimal) {
       writeBigDecimal(name, object);
 
     } else if (object instanceof BigInteger) {
       writeBigInteger(name, object);
-      
+
     } else {
       writeGeneralNumber(name, object);
     }
@@ -139,7 +138,7 @@ class EJsonWriter {
     if (name == null) {
       jsonGenerator.writeNumber((BigInteger) object);
     } else {
-      jsonGenerator.writeNumberField(name, ((BigInteger) object).longValue());
+      jsonGenerator.writeNumberField(name, object.longValue());
     }
   }
 
@@ -186,7 +185,7 @@ class EJsonWriter {
   private void writeCollection(String name, Collection<Object> collection) throws IOException {
     if (name != null) {
       jsonGenerator.writeFieldName(name);
-    } 
+    }
     jsonGenerator.writeStartArray();
     for (Object object : collection) {
       writeJson(null, object);

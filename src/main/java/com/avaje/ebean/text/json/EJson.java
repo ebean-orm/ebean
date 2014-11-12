@@ -1,4 +1,4 @@
-package com.avaje.ebean.json;
+package com.avaje.ebean.text.json;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -10,7 +10,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 
 /**
- * Utility that converts between JSON content and java Maps/Lists.
+ * Utility that converts between JSON content and simple java Maps/Lists.
  */
 public class EJson {
 
@@ -91,31 +91,14 @@ public class EJson {
    * Parse the json and return as a List or Map.
    */
   public static Object parse(Reader reader) throws IOException {
-    return EJsonReader.parse(reader, false);
+    return EJsonReader.parse(reader);
   }
   
   /**
    * Parse the json and return as a List or Map.
    */
   public static Object parse(JsonParser parser) throws IOException {
-    return EJsonReader.parse(parser, false);
+    return EJsonReader.parse(parser);
   }
-  
-//  /**
-//   * Parse the json and return the next json value, List or Map.
-//   * This will not consume all the reader content and return once the 
-//   * next json object, list or value is read.
-//   */
-//  public static Object parsePartial(Reader reader) {
-//    return EJsonReader.parse(reader, true);
-//  }
-  
-  /**
-   * Parse the json and return the next json value, List or Map.
-   * This will not consume all the reader content and return once the 
-   * next json object, list or value is read.
-   */
-  public static Object parsePartial(JsonParser parser) throws IOException {
-    return EJsonReader.parse(parser, true);
-  }
+
 }

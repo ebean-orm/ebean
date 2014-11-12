@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import com.avaje.ebean.config.dbplatform.PostgresPlatform;
-import com.avaje.ebean.json.EJson;
+import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebean.text.TextException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
