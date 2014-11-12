@@ -1,5 +1,7 @@
 package com.avaje.ebean;
 
+import com.avaje.ebean.text.PathProperties;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -176,11 +178,11 @@ public abstract class Model {
    * Typically a Finder is defined as a public static field on an entity bean class to provide a
    * nice way to write queries.
    * 
-   * @param I
+   * @param <I>
    *          The Id type. This is most often a {@link Long} but is also often a {@link UUID} or
    *          {@link String}.
-   * 
-   * @param T
+   *
+   * @param <T>
    *          The bean type
    */
   public static class Finder<I, T> {
@@ -265,7 +267,7 @@ public abstract class Model {
      * Retrieves an entity by ID.
      * 
      * <p>
-     * Equivilent to {@link EbeanServer#find(Class, Object)}
+     * Equivalent to {@link EbeanServer#find(Class, Object)}
      */
     public T byId(I id) {
       return db().find(type, id);
@@ -275,7 +277,7 @@ public abstract class Model {
      * Creates an entity reference for this ID.
      * 
      * <p>
-     * Equivilent to {@link EbeanServer#getReference(Class, Object)}
+     * Equivalent to {@link EbeanServer#getReference(Class, Object)}
      */
     public T ref(I id) {
       return db().getReference(type, id);
@@ -285,7 +287,7 @@ public abstract class Model {
      * Creates a filter for sorting and filtering lists of entities locally without going back to
      * the database.
      * <p>
-     * Equivilent to {@link EbeanServer#filter(Class)}
+     * Equivalent to {@link EbeanServer#filter(Class)}
      */
     public Filter<T> filter() {
       return db().filter(type);
@@ -294,10 +296,17 @@ public abstract class Model {
     /**
      * Creates a query.
      * <p>
-     * Equivilent to {@link EbeanServer#find(Class)}
+     * Equivalent to {@link EbeanServer#find(Class)}
      */
     public Query<T> query() {
       return db().find(type);
+    }
+
+    /**
+     * Creates a query applying the path properties to set the select and fetch clauses.
+     */
+    public Query<T> apply(PathProperties pathProperties) {
+      return db().find(type).apply(pathProperties);
     }
 
     /**
@@ -313,7 +322,7 @@ public abstract class Model {
     /**
      * Executes a query and returns the results as a list of IDs.
      * <p>
-     * Equivilent to {@link Query#findIds()}
+     * Equivalent to {@link Query#findIds()}
      */
     public List<Object> findIds() {
       return query().findIds();
@@ -324,7 +333,7 @@ public abstract class Model {
      * <p>
      * The same as {@link #all()}
      * <p>
-     * Equivilent to {@link Query#findList()}
+     * Equivalent to {@link Query#findList()}
      */
     public List<T> findList() {
       return query().findList();
@@ -333,7 +342,7 @@ public abstract class Model {
     /**
      * Returns all the entities of the given type as a set.
      * <p>
-     * Equivilent to {@link Query#findSet()}
+     * Equivalent to {@link Query#findSet()}
      */
     public Set<T> findSet() {
       return query().findSet();
@@ -342,7 +351,7 @@ public abstract class Model {
     /**
      * Retrieves all entities of the given type as a map of objects.
      * <p>
-     * Equivilent to {@link Query#findMap()}
+     * Equivalent to {@link Query#findMap()}
      */
     public Map<?, T> findMap() {
       return query().findMap();
@@ -352,7 +361,7 @@ public abstract class Model {
      * Executes the query and returns the results as a map of the objects specifying the map key
      * property.
      * <p>
-     * Equivilent to {@link Query#findMap(String, Class)}
+     * Equivalent to {@link Query#findMap(String, Class)}
      */
     public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
       return query().findMap(keyProperty, keyType);
@@ -362,7 +371,7 @@ public abstract class Model {
      * Return a PagedList of all entities of the given type (use where() to specify predicates as
      * needed).
      * <p>
-     * Equivilent to {@link Query#findPagedList(int, int)}
+     * Equivalent to {@link Query#findPagedList(int, int)}
      */
     public PagedList<T> findPagedList(int pageIndex, int pageSize) {
       return query().findPagedList(pageIndex, pageSize);
@@ -371,7 +380,7 @@ public abstract class Model {
     /**
      * Executes a find row count query in a background thread.
      * <p>
-     * Equivilent to {@link Query#findFutureRowCount()}
+     * Equivalent to {@link Query#findFutureRowCount()}
      */
     public FutureRowCount<T> findFutureRowCount() {
       return query().findFutureRowCount();
@@ -380,7 +389,7 @@ public abstract class Model {
     /**
      * Returns the total number of entities for this type. *
      * <p>
-     * Equivilent to {@link Query#findRowCount()}
+     * Equivalent to {@link Query#findRowCount()}
      */
     public int findRowCount() {
       return query().findRowCount();
@@ -397,7 +406,7 @@ public abstract class Model {
      * Explicitly sets a comma delimited list of the properties to fetch on the 'main' entity bean,
      * to load a partial object.
      * <p>
-     * Equivilent to {@link Query#select(String)}
+     * Equivalent to {@link Query#select(String)}
      */
     public Query<T> select(String fetchProperties) {
       return query().select(fetchProperties);
@@ -406,7 +415,7 @@ public abstract class Model {
     /**
      * Specifies a path to load including all its properties.
      * <p>
-     * Equivilent to {@link Query#fetch(String)}
+     * Equivalent to {@link Query#fetch(String)}
      */
     public Query<T> fetch(String path) {
       return query().fetch(path);
@@ -416,7 +425,7 @@ public abstract class Model {
      * Additionally specifies a <code>FetchConfig</code> to specify a 'query join' and/or define the
      * lazy loading query.
      * <p>
-     * Equivilent to {@link Query#fetch(String, FetchConfig)}
+     * Equivalent to {@link Query#fetch(String, FetchConfig)}
      */
     public Query<T> fetch(String path, FetchConfig joinConfig) {
       return query().fetch(path, joinConfig);
@@ -426,7 +435,7 @@ public abstract class Model {
      * Specifies a path to fetch with a specific list properties to include, to load a partial
      * object.
      * <p>
-     * Equivilent to {@link Query#fetch(String, String)}
+     * Equivalent to {@link Query#fetch(String, String)}
      */
     public Query<T> fetch(String path, String fetchProperties) {
       return query().fetch(path, fetchProperties);
@@ -436,7 +445,7 @@ public abstract class Model {
      * Additionally specifies a <code>FetchConfig</code> to use a separate query or lazy loading to
      * load this path.
      * <p>
-     * Equivilent to {@link Query#fetch(String, String, FetchConfig)}
+     * Equivalent to {@link Query#fetch(String, String, FetchConfig)}
      */
     public Query<T> fetch(String assocProperty, String fetchProperties, FetchConfig fetchConfig) {
       return query().fetch(assocProperty, fetchProperties, fetchConfig);
@@ -446,7 +455,7 @@ public abstract class Model {
      * Adds expressions to the <code>where</code> clause with the ability to chain on the
      * <code>ExpressionList</code>.
      * <p>
-     * Equivilent to {@link Query#where()}
+     * Equivalent to {@link Query#where()}
      */
     public ExpressionList<T> where() {
       return query().where();
@@ -458,7 +467,7 @@ public abstract class Model {
      * <p>
      * This is exactly the same as {@link #orderBy}.
      * <p>
-     * Equivilent to {@link Query#order()}
+     * Equivalent to {@link Query#order()}
      */
     public OrderBy<T> order() {
       return query().order();
@@ -480,7 +489,7 @@ public abstract class Model {
      * <p>
      * This is exactly the same as {@link #order}.
      * <p>
-     * Equivilent to {@link Query#orderBy()}
+     * Equivalent to {@link Query#orderBy()}
      */
     public OrderBy<T> orderBy() {
       return query().orderBy();
@@ -499,7 +508,7 @@ public abstract class Model {
     /**
      * Sets the first row to return for this query.
      * <p>
-     * Equivilent to {@link Query#setFirstRow(int)}
+     * Equivalent to {@link Query#setFirstRow(int)}
      */
     public Query<T> setFirstRow(int firstRow) {
       return query().setFirstRow(firstRow);
@@ -508,7 +517,7 @@ public abstract class Model {
     /**
      * Sets the maximum number of rows to return in the query.
      * <p>
-     * Equivilent to {@link Query#setMaxRows(int)}
+     * Equivalent to {@link Query#setMaxRows(int)}
      */
     public Query<T> setMaxRows(int maxRows) {
       return query().setMaxRows(maxRows);
@@ -521,7 +530,7 @@ public abstract class Model {
      * Use this to perform a find byId query but with additional control over the query such as
      * using select and fetch to control what parts of the object graph are returned.
      * <p>
-     * Equivilent to {@link Query#setId(Object)}
+     * Equivalent to {@link Query#setId(Object)}
      */
     public Query<T> setId(Object id) {
       return query().setId(id);
@@ -530,7 +539,7 @@ public abstract class Model {
     /**
      * Create and return a new query using the OQL.
      * <p>
-     * Equivilent to {@link EbeanServer#createQuery(Class, String)}
+     * Equivalent to {@link EbeanServer#createQuery(Class, String)}
      */
     public Query<T> setQuery(String oql) {
       return db().createQuery(type, oql);
@@ -539,7 +548,7 @@ public abstract class Model {
     /**
      * Create and return a new query based on the <code>RawSql</code>.
      * <p>
-     * Equivilent to {@link Query#setRawSql(RawSql)}
+     * Equivalent to {@link Query#setRawSql(RawSql)}
      */
     public Query<T> setRawSql(RawSql rawSql) {
       return query().setRawSql(rawSql);
