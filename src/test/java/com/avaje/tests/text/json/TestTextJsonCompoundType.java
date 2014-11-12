@@ -31,7 +31,7 @@ public class TestTextJsonCompoundType extends BaseTestCase {
 //
 //    JsonContext jsonContext = Ebean.createJsonContext();
 //
-//    String jsonString = jsonContext.toJsonString(p, true);
+//    String jsonString = jsonContext.toJson(p, true);
 //    System.out.println(jsonString);
 //
 //    CMoney cm = new CMoney(new Money("12"), NZD);
@@ -43,7 +43,7 @@ public class TestTextJsonCompoundType extends BaseTestCase {
 //    ep.setOid(new Oid<DExhEntity>(112));
 //    ep.setExhange(exh);
 //
-//    String jsonString0 = jsonContext.toJsonString(ep, true);
+//    String jsonString0 = jsonContext.toJson(ep, true);
 //    System.out.println(jsonString0);
 //
 //    DExhEntity bean0 = jsonContext.toBean(DExhEntity.class, jsonString0);

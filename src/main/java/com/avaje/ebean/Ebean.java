@@ -1391,6 +1391,7 @@ public final class Ebean {
   
   /**
    * Return the JsonContext for reading/writing JSON.
+   * @deprecated Please use #json instead.
    */
   public static JsonContext createJsonContext() {
     return json();

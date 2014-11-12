@@ -21,11 +21,10 @@ public class TestTextJsonInvokeLazy extends BaseTestCase {
 
     List<Customer> list = Ebean.find(Customer.class).select("name").findList();
 
-    JsonWriteOptions opt = new JsonWriteOptions();
-    opt.setRootPathProperties("name, status");
+    JsonWriteOptions opt = JsonWriteOptions.parsePath("name, status");
 
-    JsonContext jsonContext = Ebean.createJsonContext();
-    String jsonString = jsonContext.toJsonString(list, opt);
+    JsonContext jsonContext = Ebean.json();
+    String jsonString = jsonContext.toJson(list, opt);
 
     System.out.println(jsonString);
 

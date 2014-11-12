@@ -31,8 +31,8 @@ public class TestJsonBeanWithTimeZone extends BaseTestCase {
     bean.setName("foo");
     bean.setTimezone(TimeZone.getDefault());
 
-    JsonContext jsonContext = Ebean.createJsonContext();
-    String jsonContent = jsonContext.toJsonString(bean);
+    JsonContext jsonContext = Ebean.json();
+    String jsonContent = jsonContext.toJson(bean);
 
     BeanWithTimeZone bean2 = jsonContext.toBean(BeanWithTimeZone.class, jsonContent);
 

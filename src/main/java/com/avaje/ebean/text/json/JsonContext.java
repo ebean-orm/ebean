@@ -11,8 +11,6 @@ import com.fasterxml.jackson.core.JsonParser;
 
 /**
  * Converts objects to and from JSON format.
- * 
- * @author rbygrave
  */
 public interface JsonContext {
 
@@ -53,39 +51,39 @@ public interface JsonContext {
    * Write the bean or collection in JSON format to the writer with default
    * options.
    * 
-   * @param o
+   * @param value
    *          the bean or collection of beans to write
    * @param writer
    *          used to write the json output to
    */
-  public void toJsonWriter(Object o, Writer writer) throws IOException;
+  public void toJson(Object value, Writer writer) throws IOException;
 
   /**
    * With additional options to specify JsonValueAdapter and
    * JsonWriteBeanVisitor's.
    * 
-   * @param o
+   * @param value
    *          the bean or collection of beans to write
    * @param writer
    *          used to write the json output to
    * @param options
    *          additional options to control the JSON output
    */
-  public void toJsonWriter(Object o, Writer writer, JsonWriteOptions options) throws IOException;
+  public void toJson(Object value, Writer writer, JsonWriteOptions options) throws IOException;
 
   /**
    * Convert a bean or collection to json string using default options.
    */
-  public String toJsonString(Object o) throws IOException;
+  public String toJson(Object value) throws IOException;
 
   /**
    * Convert a bean or collection to json string.
    */
-  public String toJsonString(Object o, JsonWriteOptions options) throws IOException;
+  public String toJson(Object value, JsonWriteOptions options) throws IOException;
 
   /**
-   * Return true if the type is known as an Entity or Xml type or a List Set or
-   * Map of known bean types.
+   * Return true if the type is known as an Entity bean or a List Set or
+   * Map of entity beans.
    */
   public boolean isSupportedType(Type genericType);
 

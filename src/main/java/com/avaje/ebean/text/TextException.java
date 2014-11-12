@@ -1,7 +1,7 @@
 package com.avaje.ebean.text;
 
 /**
- * An exception occured typically in processing CSV, JSON or XML.
+ * An exception occurred typically in processing CSV, JSON or XML.
  * 
  * @author rbygrave
  */

@@ -21,8 +21,8 @@ public class TestJsonSomeEnumWithToString extends BaseTestCase {
     bean.setName("Some name");
     bean.setSomeEnum(SomeEnum.ALPHA);
 
-    JsonContext json = Ebean.createJsonContext();
-    String jsonContent = json.toJsonString(bean);
+    JsonContext json = Ebean.json();
+    String jsonContent = json.toJson(bean);
 
     SomeEnumBean bean2 = json.toBean(SomeEnumBean.class, jsonContent);
 

@@ -40,8 +40,8 @@ public class TestDPersonEl extends TestCase {
 //        ElPropertyValue elCmoneyAmt = descriptor.getElGetValue("cmoney.amount");
 //        ElPropertyValue elCmoneyCur = descriptor.getElGetValue("cmoney.currency");
         
-        JsonContext jsonContext = server.createJsonContext();
-        String json = jsonContext.toJsonString(p);
+        JsonContext jsonContext = server.json();
+        String json = jsonContext.toJson(p);
         
         DPerson bean = jsonContext.toBean(DPerson.class, json);
         Assert.assertEquals("first", bean.getFirstName());

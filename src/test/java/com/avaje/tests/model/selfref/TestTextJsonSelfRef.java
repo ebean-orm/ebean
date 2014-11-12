@@ -47,7 +47,7 @@ public class TestTextJsonSelfRef extends BaseTestCase {
     }
     
 //    JsonWriteOptions options = JsonWriteOptions.parsePath("(id,name,referredBy(id))");
-//    String customerContent = Ebean.createJsonContext().toJsonString(customers);//, false, options);
+//    String customerContent = Ebean.createJsonContext().toJson(customers);//, false, options);
 //    System.out.println("Customers: " + customerContent);
 //
 //    Assert

@@ -28,7 +28,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
     SpiEbeanServer server = (SpiEbeanServer)Ebean.getServer(null);
     
-    JsonContext jsonContext = Ebean.createJsonContext();
+    JsonContext jsonContext = Ebean.json();
 
     Product product = Ebean.getReference(Product.class, 1);
 
@@ -38,7 +38,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
     } else {
 
-      String jsonString = jsonContext.toJsonString(product);
+      String jsonString = jsonContext.toJson(product);
       System.out.println(jsonString);
 
       Product refProd = jsonContext.toBean(Product.class, jsonString);
@@ -68,10 +68,9 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
     Order order = orders.get(0);
 
-    JsonWriteOptions options = new JsonWriteOptions();
-    options.setPathProperties("details.product", "id");
+    JsonWriteOptions options = JsonWriteOptions.parsePath("*,details(id,orderQty,product(id))");
 
-    String jsonOrder = jsonContext.toJsonString(order, options);
+    String jsonOrder = jsonContext.toJson(order, options);
     System.out.println(jsonOrder);
 
     Order o2 = jsonContext.toBean(Order.class, jsonOrder);

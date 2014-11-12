@@ -57,8 +57,8 @@ public class TestTextJsonUpdateCascade extends BaseTestCase {
 
     EbeanServer server = Ebean.getServer(null);
 
-    JsonContext jsonContext = server.createJsonContext();
-    String jsonString = jsonContext.toJsonString(order);
+    JsonContext jsonContext = server.json();
+    String jsonString = jsonContext.toJson(order);
     System.out.println(jsonString);
 
     Order updOrder = jsonContext.toBean(Order.class, jsonString);
@@ -85,7 +85,7 @@ public class TestTextJsonUpdateCascade extends BaseTestCase {
 
     Ebean.save(u0);
 
-    String jsonUser = jsonContext.toJsonString(u0);
+    String jsonUser = jsonContext.toJson(u0);
 
     System.out.println(jsonUser);
 

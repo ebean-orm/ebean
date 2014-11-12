@@ -1120,6 +1120,7 @@ public interface EbeanServer {
 
   /**
    * Return the JsonContext for reading/writing JSON.
+   * @deprecated Please use #json instead.
    */
   public JsonContext createJsonContext();
 

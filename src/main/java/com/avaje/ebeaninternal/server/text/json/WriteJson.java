@@ -1,10 +1,5 @@
 package com.avaje.ebeaninternal.server.text.json;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -12,6 +7,10 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.util.ArrayStack;
 import com.fasterxml.jackson.core.JsonGenerator;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
 
 public class WriteJson {
 
@@ -36,11 +35,7 @@ public class WriteJson {
   }
 
   public boolean isParentBean(Object bean) {
-    if (parentBeans.isEmpty()) {
-      return false;
-    } else {
-      return parentBeans.contains(bean);
-    }
+    return !parentBeans.isEmpty() && parentBeans.contains(bean);
   }
 
   public void pushParentBeanMany(Object parentBean) {
@@ -59,15 +54,6 @@ public class WriteJson {
   public void endAssocOne() {
     parentBeans.pop();
     pathStack.pop();
-  }
-
-  public Set<String> getIncludeProperties() {
-
-    if (pathProperties == null) {
-      return null;
-    } else {
-      return pathProperties.get(pathStack.peekWithNull());
-    }
   }
 
   public WriteBean createWriteBean(BeanDescriptor<?> desc, EntityBean bean) {
@@ -135,7 +121,6 @@ public class WriteJson {
         // render all the properties and invoke lazy loading if required
         BeanProperty[] props = desc.propertiesNonTransient();
         for (int j = 0; j < props.length; j++) {
-          System.out.println("bean "+ currentBean+" prop:"+props[j]);
           if (isIncludeProperty(props[j])) {
             props[j].jsonWrite(writeJson, currentBean);
           }
@@ -163,20 +148,17 @@ public class WriteJson {
 
     beginAssocMany(name);
 
-    Iterator<?> it = c.iterator();
-    while (it.hasNext()) {
-      EntityBean o = (EntityBean) it.next();
-      BeanDescriptor<?> d = getDecriptor(o.getClass());
-      d.jsonWrite(this, o, null);
+    for (Object bean : c) {
+      BeanDescriptor<?> d = getDescriptor(bean.getClass());
+      d.jsonWrite(this, (EntityBean)bean, null);
     }
     endAssocMany();
   }
 
-  private <T> BeanDescriptor<T> getDecriptor(Class<T> cls) {
+  private <T> BeanDescriptor<T> getDescriptor(Class<T> cls) {
     BeanDescriptor<T> d = server.getBeanDescriptor(cls);
     if (d == null) {
-      String msg = "No BeanDescriptor found for " + cls;
-      throw new RuntimeException(msg);
+      throw new RuntimeException("No BeanDescriptor found for " + cls);
     }
     return d;
   }

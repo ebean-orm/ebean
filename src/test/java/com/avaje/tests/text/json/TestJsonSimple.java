@@ -49,8 +49,8 @@ public class TestJsonSimple extends BaseTestCase {
     m.put("hello", "rob");
     m.put("test", "me");
 
-    JsonContext jsonContext = Ebean.createJsonContext();
-    String jsonString = jsonContext.toJsonString(m);
+    JsonContext jsonContext = Ebean.json();
+    String jsonString = jsonContext.toJson(m);
     System.out.println(jsonString);
 
     String s = "{\"parishId\":\"18\",\"contentId\":null,\"contentStatus\":null,\"contentType\":\"pg-hello\",\"content\":\"asd\"}";

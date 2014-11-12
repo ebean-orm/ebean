@@ -30,10 +30,10 @@ public class TestJsonStatelessUpdate extends BaseTestCase {
     
     UUTwo twoX = Ebean.find(UUTwo.class, two.getId());
     
-    JsonContext jsonContext = Ebean.createJsonContext();
+    JsonContext jsonContext = Ebean.json();
     
     JsonWriteOptions writeOptions = JsonWriteOptions.parsePath("(id,name,master(*))");
-    String jsonString = jsonContext.toJsonString(twoX, writeOptions);
+    String jsonString = jsonContext.toJson(twoX, writeOptions);
     
     System.out.println(jsonString);
     jsonString = jsonString.replace("twoName", "twoNameModified");

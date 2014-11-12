@@ -20,14 +20,14 @@ public class TestTextJsonInsertUpdate extends BaseTestCase {
 
     String json0 = "{\"name\":\"InsJson\",\"status\":\"NEW\"}";
 
-    JsonContext jsonContext = Ebean.createJsonContext();
+    JsonContext jsonContext = Ebean.json();
 
     // insert
     Customer c0 = jsonContext.toBean(Customer.class, json0);
     Ebean.save(c0);
 
     // update with optimistic concurrency checking
-    String j0 = jsonContext.toJsonString(c0);
+    String j0 = jsonContext.toJson(c0);
     String j1 = StringHelper.replaceString(j0, "InsJson", "Mod1");
     Customer c1 = jsonContext.toBean(Customer.class, j1);
     Ebean.update(c1);

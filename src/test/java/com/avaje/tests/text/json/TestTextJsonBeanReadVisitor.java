@@ -27,10 +27,10 @@ public class TestTextJsonBeanReadVisitor extends BaseTestCase {
         .fetch("contacts", "firstName,email")
         .order().desc("id").findList();
 
-    JsonContext json = Ebean.createJsonContext();
+    JsonContext json = Ebean.json();
 
 
-    String s = json.toJsonString(list);
+    String s = json.toJson(list);
     System.out.println(s);
 
     List<Customer> mList = json.toList(Customer.class, s);

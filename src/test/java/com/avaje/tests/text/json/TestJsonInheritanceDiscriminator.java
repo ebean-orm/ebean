@@ -24,8 +24,8 @@ public class TestJsonInheritanceDiscriminator extends BaseTestCase {
 
     Ebean.save(cat);
 
-    JsonContext json = Ebean.createJsonContext();
-    String jsonContent = json.toJsonString(cat);
+    JsonContext json = Ebean.json();
+    String jsonContent = json.toJson(cat);
 
     Cat cat2 = json.toBean(Cat.class, jsonContent);
 
@@ -37,9 +37,9 @@ public class TestJsonInheritanceDiscriminator extends BaseTestCase {
 
     Cat cat3 = json.toBean(Cat.class, noDiscriminator);
 
-    Assert.assertEquals(cat.getId(), cat3.getId());
-    Assert.assertEquals(cat.getName(), cat3.getName());
-    Assert.assertEquals(cat.getVersion(), cat3.getVersion());
+    Assert.assertEquals(1L, cat3.getId().longValue());
+    Assert.assertEquals("Gemma", cat3.getName());
+    Assert.assertEquals(1L, cat3.getVersion().longValue());
 
     Dog dog = new Dog();
     dog.setRegistrationNumber("ABC123");
@@ -49,7 +49,7 @@ public class TestJsonInheritanceDiscriminator extends BaseTestCase {
 
     List<Animal> animals = Ebean.find(Animal.class).findList();
 
-    String listJson = json.toJsonString(animals);
+    String listJson = json.toJson(animals);
 
     List<Animal> animals2 = json.toList(Animal.class, listJson);
     Assert.assertEquals(animals.size(), animals2.size());

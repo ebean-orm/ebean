@@ -42,13 +42,13 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) {
-    throw new TextException("Not supported");
+  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    throw new IOException("Not supported");
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) {
-    throw new TextException("Not supported");
+  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    throw new IOException("Not supported");
   }
 
   public String formatValue(Byte t) {

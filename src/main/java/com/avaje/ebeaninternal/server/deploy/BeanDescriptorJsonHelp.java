@@ -1,13 +1,13 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.io.IOException;
-
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.text.TextException;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson.WriteBean;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+
+import java.io.IOException;
 
 public class BeanDescriptorJsonHelp<T> {
 
@@ -56,7 +56,7 @@ public class BeanDescriptorJsonHelp<T> {
       return null;
     }
     if (JsonToken.START_OBJECT != token) {
-      throw new IOException("Unexpected token "+token+" - expecting start_object at: "+parser.getCurrentLocation());
+      throw new JsonParseException("Unexpected token "+token+" - expecting start_object", parser.getCurrentLocation());
     }
 
     if (desc.inheritInfo == null) {
@@ -69,7 +69,7 @@ public class BeanDescriptorJsonHelp<T> {
     token = parser.nextToken();
     if (token != JsonToken.FIELD_NAME) {
       String msg = "Error reading inheritance discriminator - expected [" + discColumn + "] but no json key?";
-      throw new TextException(msg);        
+      throw new JsonParseException(msg, parser.getCurrentLocation());
     }
     
     String propName = parser.getCurrentName();      
@@ -82,7 +82,7 @@ public class BeanDescriptorJsonHelp<T> {
         return jsonReadProperties(parser, bean);
       }
       String msg = "Error reading inheritance discriminator, expected property ["+discColumn+"] but got [" + propName + "] ?";
-      throw new TextException(msg);        
+      throw new JsonParseException(msg, parser.getCurrentLocation());
     }
           
     String discValue = parser.nextTextValue(); 
