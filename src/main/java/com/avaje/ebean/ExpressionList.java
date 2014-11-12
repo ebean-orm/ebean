@@ -1,5 +1,7 @@
 package com.avaje.ebean;
 
+import com.avaje.ebean.text.PathProperties;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -86,6 +88,11 @@ public interface ExpressionList<T> extends Serializable {
    * @see Query#orderBy(String)
    */
   public Query<T> setOrderBy(String orderBy);
+
+  /**
+   * Apply the path properties to the query replacing the select and fetch clauses.
+   */
+  public Query<T> apply(PathProperties pathProperties);
 
   /**
    * Execute the query iterating over the results.
@@ -242,7 +249,8 @@ public interface ExpressionList<T> extends Serializable {
    * Specify a property (associated bean) to join and <em>fetch</em> including
    * all its properties.
    * 
-   * @see Query#join(String)
+   * @see Query#fetch(String)
+   * @deprecated
    */
   public Query<T> join(String assocProperties);
 
@@ -250,7 +258,8 @@ public interface ExpressionList<T> extends Serializable {
    * Specify a property (associated bean) to join and <em>fetch</em> with its
    * specific properties to include (aka partial object).
    * 
-   * @see Query#join(String,String)
+   * @see Query#fetch(String,String)
+   * @deprecated
    */
   public Query<T> join(String assocProperty, String assocProperties);
 

@@ -31,6 +31,7 @@ import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.HashQuery;
 import com.avaje.ebeaninternal.api.HashQueryPlan;
@@ -268,6 +269,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public void setTotalHits(int totalHits) {
     this.totalHits = totalHits;
+  }
+
+  @Override
+  public Query<T> apply(PathProperties pathProperties) {
+    pathProperties.apply(this);
+    return this;
   }
 
   /**

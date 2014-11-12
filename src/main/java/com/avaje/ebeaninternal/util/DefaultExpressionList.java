@@ -20,6 +20,7 @@ import com.avaje.ebean.Query;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.QueryResultVisitor;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
@@ -135,6 +136,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   public Query<T> setOrderBy(String orderBy) {
     return query.order(orderBy);
+  }
+
+  @Override
+  public Query<T> apply(PathProperties pathProperties) {
+    return query.apply(pathProperties);
   }
 
   public FutureIds<T> findFutureIds() {

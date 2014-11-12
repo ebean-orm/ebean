@@ -1,5 +1,7 @@
 package com.avaje.ebean;
 
+import com.avaje.ebean.text.PathProperties;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -412,6 +414,14 @@ public interface Query<T> extends Serializable {
    * the lazy loading query.
    */
   public Query<T> fetch(String path, FetchConfig joinConfig);
+
+  /**
+   * Apply the path properties replacing the select and fetch clauses.
+   * <p>
+   * This is typically used when the PathProperties is applied to both the query and the JSON output.
+   * </p>
+   */
+  public Query<T> apply(PathProperties pathProperties);
 
   /**
    * Execute the query returning the list of Id's.

@@ -69,9 +69,9 @@ public class TestJsonMap extends BaseTestCase {
 
     PathProperties pathProperties = PathProperties.parse("(id,status,name,shippingAddress(id,line1,city),billingAddress(*),contacts(*))");
 
-    Query<Customer> customerQuery = Ebean.find(Customer.class);
-    pathProperties.apply(customerQuery);
-    List<Customer> customers = customerQuery.findList();
+    List<Customer> customers = Ebean.find(Customer.class)
+        .apply(pathProperties)
+        .findList();
 
     JsonWriteOptions options = JsonWriteOptions.parsePath("(id,status,name)");
 
