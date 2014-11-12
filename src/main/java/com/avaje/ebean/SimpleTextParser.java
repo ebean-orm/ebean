@@ -1,6 +1,6 @@
 package com.avaje.ebean;
 
-public class SimpleTextParser {
+class SimpleTextParser {
 
   private final String oql;
   private final char[] chars;
@@ -10,9 +10,7 @@ public class SimpleTextParser {
   private String word;
   private String lowerWord;
 
-  private int openParenthesisCount;
-
-  public SimpleTextParser(String oql) {
+  SimpleTextParser(String oql) {
     this.oql = oql;
     this.chars = oql.toCharArray();
     this.eof = oql.length();
@@ -20,10 +18,6 @@ public class SimpleTextParser {
 
   public int getPos() {
     return pos;
-  }
-
-  public String getOql() {
-    return oql;
   }
 
   public String getWord() {
@@ -104,7 +98,7 @@ public class SimpleTextParser {
   private void moveToClose() {
 
     pos++;
-    openParenthesisCount = 0;
+    int openParenthesisCount = 0;
 
     for (; pos < eof; pos++) {
       char c = chars[pos];
@@ -143,11 +137,7 @@ public class SimpleTextParser {
     if (isOperator(c)) {
       return !isOperator;
     }
-    if (c == '(') {
-      return true;
-    }
-
-    return isOperator;
+    return c == '(' || isOperator;
   }
 
   private boolean isOperator(char c) {
