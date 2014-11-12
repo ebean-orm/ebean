@@ -57,41 +57,54 @@ public class ScalarTypePostgresHstoreTest {
 
   @Test
   public void testJsonWrite() throws Exception {
+
+    assertEquals("{\"key\":null}", generateJson(null));
+
     Map<String,Object> map = new LinkedHashMap<String, Object>();
 
-    assertEquals("{}", generateJson(map));
+    assertEquals("{\"key\":{}}", generateJson(map));
 
     map.put("name", "rob");
-    assertEquals("{\"name\":\"rob\"}", generateJson(map));
+    assertEquals("{\"key\":{\"name\":\"rob\"}}", generateJson(map));
 
     map.put("age", 12);
-    assertEquals("{\"name\":\"rob\",\"age\":12}", generateJson(map));
+    assertEquals("{\"key\":{\"name\":\"rob\",\"age\":12}}", generateJson(map));
   }
 
   @Test
   public void testJsonRead() throws Exception {
 
-    Map<String, Object> map = parse("{\"name\":\"rob\"}");
+    Map<String, Object> map = parseHstore("{\"name\":\"rob\"}");
     assertEquals(1, map.size());
     assertEquals("rob", map.get("name"));
 
-    map = parse("{\"name\":\"rob\",\"age\":12}");
+    map = parseHstore("{\"name\":\"rob\",\"age\":12}");
     assertEquals(2, map.size());
     assertEquals("rob", map.get("name"));
     assertEquals(12L, map.get("age"));
 
   }
 
-  private Map<String,Object> parse(String json) throws IOException {
+  private Map<String,Object> parseHstore(String json) throws IOException {
     JsonParser parser = jsonFactory.createParser(json);
-    return (Map<String,Object>)hstore.jsonRead(parser, JsonToken.FIELD_NAME);
+    // BeanProperty reads the first token checking for null so
+    // simulate that here
+    JsonToken token = parser.nextToken();
+    assertEquals(JsonToken.START_OBJECT, token);
+    return (Map<String,Object>)hstore.jsonRead(parser, token);
   }
 
-  private String generateJson(Map<String, Object> emptyMap) throws IOException {
+  private String generateJson(Map<String, Object> map) throws IOException {
     StringWriter writer = new StringWriter();
     JsonGenerator generator = jsonFactory.createGenerator(writer);
-    hstore.jsonWrite(generator, "name", emptyMap);
+    // wrap in an object to form proper json
+    generator.writeStartObject();
+
+    hstore.jsonWrite(generator, "key", map);
+
+    generator.writeEndObject();
     generator.flush();
+
     return writer.toString();
   }
 

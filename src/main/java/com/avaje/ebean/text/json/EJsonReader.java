@@ -33,6 +33,11 @@ class EJsonReader {
   }
 
   @SuppressWarnings("unchecked")
+  static Map<String, Object> parseObject(JsonParser parser, JsonToken token) throws IOException {
+    return (Map<String, Object>)parse(parser, token);
+  }
+
+  @SuppressWarnings("unchecked")
   static List<Object> parseList(String json) throws IOException {
     return (List<Object>) parse(json);
   }
@@ -56,7 +61,11 @@ class EJsonReader {
   }
 
   static Object parse(JsonParser parser) throws IOException {
-    return new EJsonReader(parser).parseJson();
+    return parse(parser, null);
+  }
+
+  static Object parse(JsonParser parser, JsonToken token) throws IOException {
+    return new EJsonReader(parser).parseJson(token);
   }
 
   private final JsonParser parser;
@@ -106,28 +115,27 @@ class EJsonReader {
     currentContext.setValueNull();
   }
 
-  private Object parseJson() {
+  private Object parseJson(JsonToken token) throws IOException {
 
-    try {
-      JsonToken token = parser.nextToken();
+    if (token == null) {
+      // no initial token so expect to read START_OBJECT or similar
+      token = parser.nextToken();
       if (JsonToken.VALUE_NULL == token) {
         return null;
       }
-
-      stack = new Stack();
-      // it is a object or array, process the first JsonToken
-      processJsonToken(token);
-
-      // process the rest of the object or array
-      while (depth > 0) {
-        token = parser.nextToken();
-        processJsonToken(token);
-      }
-
-      return currentContext.getValue();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
     }
+
+    stack = new Stack();
+    // it is a object or array, process the first JsonToken
+    processJsonToken(token);
+
+    // process the rest of the object or array
+    while (depth > 0) {
+      token = parser.nextToken();
+      processJsonToken(token);
+    }
+
+    return currentContext.getValue();
   }
 
   /**

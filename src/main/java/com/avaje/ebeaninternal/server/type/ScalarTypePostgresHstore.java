@@ -48,7 +48,7 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
     if (value == null) {
       return null;
     }
-    if (value instanceof Map == false) {
+    if (!(value instanceof Map)) {
       throw new RuntimeException("Expecting Hstore to return as Map but got type "+value.getClass());
     }
     return new ModifyAwareMap((Map)value);
@@ -111,12 +111,21 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
 
   @Override
   public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
-    EJson.write(value, ctx);
+    // write the field name followed by the Map/JSON Object
+    if (value == null) {
+      ctx.writeNullField(name);
+    } else {
+      ctx.writeFieldName(name);
+      EJson.write(value, ctx);
+    }
   }
 
   @Override
   public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-    return EJson.parseObject(ctx);
+    // at this point the BeanProperty has read the START_OBJECT token
+    // to check for a null value. Pass the START_OBJECT token through to
+    // the EJson parsing so that it knows the first token has been read
+    return EJson.parseObject(ctx, event);
   }
   
 }

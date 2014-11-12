@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Utility that converts between JSON content and simple java Maps/Lists.
@@ -55,7 +56,17 @@ public class EJson {
   public static Map<String,Object> parseObject(JsonParser parser) throws IOException {
     return EJsonReader.parseObject(parser);
   }
-  
+
+  /**
+   * Parse the json and return as a Map taking a JsonParser and a starting token.
+   * <p>
+   * Used when the first token is checked to see if the value is null prior to calling this.
+   * </p>
+   */
+  public static Map<String,Object> parseObject(JsonParser parser, JsonToken token) throws IOException {
+    return EJsonReader.parseObject(parser, token);
+  }
+
   /**
    * Parse the json and return as a List.
    * @throws IOException 
