@@ -3,7 +3,7 @@ Premain-Class: com.avaje.ebean.enhance.agent.Transformer
 Bundle-ManifestVersion: 2
 Bundle-Name: Ebean-ORM
 Bundle-SymbolicName: com.avaje.ebean
-Bundle-Version: 4.1.9
+Bundle-Version: 4.2.0
 Bundle-ClassPath: .
 Bundle-Vendor: avaje
 Export-Package: com.avaje.ebean,
@@ -59,7 +59,7 @@ Export-Package: com.avaje.ebean,
  com.avaje.ebeaninternal.server.util,
  com.avaje.ebeaninternal.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Require-Bundle:
+Require-Bundle: 
  org.slf4j.api;bundle-version="1.7.2",
  com.springsource.org.joda.time;bundle-version="1.6.0"
 Import-Package: javax.persistence;version="2.0.0"
