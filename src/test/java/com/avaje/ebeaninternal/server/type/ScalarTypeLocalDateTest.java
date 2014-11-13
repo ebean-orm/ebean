@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.type;
 
 import org.junit.Test;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 import static org.junit.Assert.*;
@@ -19,32 +20,39 @@ public class ScalarTypeLocalDateTest {
     System.out.println(date);
 
     LocalDate parseDate = type.parseDateTime(millis);
-
     assertEquals(date, parseDate);
   }
 
   @Test
   public void testConvertFromDate() throws Exception {
 
+    LocalDate localDate = LocalDate.now();
+    Date date = Date.valueOf(localDate);
+
+    LocalDate localDate1 = type.convertFromDate(date);
+    assertEquals(localDate, localDate1);
+
+    Date date1 = type.convertToDate(localDate);
+    assertEquals(date, date1);
   }
 
-  @Test
-  public void testConvertToDate() throws Exception {
-
-  }
 
   @Test
   public void testToJdbcType() throws Exception {
 
+    LocalDate localDate = LocalDate.now();
+    Object o = type.toJdbcType(localDate);
+    assertTrue(o instanceof Date);
   }
 
   @Test
   public void testToBeanType() throws Exception {
 
+    LocalDate localDate = LocalDate.now();
+    Date date = Date.valueOf(localDate);
+
+    LocalDate localDate1 = type.toBeanType(date);
+    assertEquals(localDate, localDate1);
   }
 
-  @Test
-  public void testParseDateTime() throws Exception {
-
-  }
 }

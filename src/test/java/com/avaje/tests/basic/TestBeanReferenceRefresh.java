@@ -2,6 +2,7 @@ package com.avaje.tests.basic;
 
 import java.sql.Date;
 
+import com.avaje.ebean.cache.ServerCache;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -18,8 +19,11 @@ public class TestBeanReferenceRefresh extends BaseTestCase {
 	public void testMe() {
 		
 		ResetBasicData.reset();
-	
-		Order order = Ebean.getReference(Order.class, 1);
+
+    ServerCache beanCache = Ebean.getServerCacheManager().getBeanCache(Order.class);
+    beanCache.clear();
+
+    Order order = Ebean.getReference(Order.class, 1);
 		
 		Assert.assertTrue(Ebean.getBeanState(order).isReference());
 		

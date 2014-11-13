@@ -6,6 +6,8 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 /**
  * ScalarType for java.time.LocalDate. This maps to a JDBC Date.
@@ -18,7 +20,9 @@ public class ScalarTypeLocalDate extends ScalarTypeBaseDate<LocalDate> {
 
   @Override
   public long convertToMillis(Object value) {
-    return convertToDate((LocalDate) value).toInstant().toEpochMilli();
+    LocalDate localDate = (LocalDate) value;
+    ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());
+    return zonedDateTime.toInstant().toEpochMilli();
   }
 
   @Override

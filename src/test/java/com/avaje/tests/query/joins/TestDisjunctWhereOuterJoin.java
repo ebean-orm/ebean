@@ -17,49 +17,52 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
   public void test() {
 
     Ebean.beginTransaction();
+    try {
 
-    MRole r1 = new MRole();
-    r1.setRoleName("role1");
-    Ebean.save(r1);
+      MRole r1 = new MRole();
+      r1.setRoleName("role1B");
+      Ebean.save(r1);
 
-    MRole r2 = new MRole();
-    r2.setRoleName("role2special");
-    Ebean.save(r2);
+      MRole r2 = new MRole();
+      r2.setRoleName("role2specialB");
+      Ebean.save(r2);
 
-    MRole r3 = new MRole();
-    r3.setRoleName("role3");
-    Ebean.save(r3);
+      MRole r3 = new MRole();
+      r3.setRoleName("role3B");
+      Ebean.save(r3);
 
-    MUser u0 = new MUser();
-    u0.setUserName("user0");
-    u0.addRole(r1);
-    u0.addRole(r2);
+      MUser u0 = new MUser();
+      u0.setUserName("user0B");
+      u0.addRole(r1);
+      u0.addRole(r2);
 
-    Ebean.save(u0);
+      Ebean.save(u0);
 
-    MUser u1 = new MUser();
-    u1.setUserName("user1");
-    u1.addRole(r1);
+      MUser u1 = new MUser();
+      u1.setUserName("user1B");
+      u1.addRole(r1);
 
-    Ebean.save(u1);
+      Ebean.save(u1);
 
-    Ebean.commitTransaction();
 
-    
-    Query<MUser> query = Ebean.find(MUser.class)
-        .where().disjunction()
-                .eq("roles.roleName", "role2special") // user0
-                .eq("roles.roleName", "role3") // nobody
-            .endJunction().query();
+      Query<MUser> query = Ebean.find(MUser.class)
+              .where().disjunction()
+              .eq("roles.roleName", "role2specialB") // user0
+              .eq("roles.roleName", "role3B") // nobody
+              .endJunction().query();
 
-    List<MUser> list = query.findList();
-    Assert.assertSame(1, list.size()); // list should contain user0
-    System.out.println(list);
+      List<MUser> list = query.findList();
+      Assert.assertSame(1, list.size()); // list should contain user0
+      System.out.println(list);
 
-    String sql = query.getGeneratedSql();
-    Assert.assertTrue(sql.indexOf("select distinct") > -1);
-    Assert.assertTrue(sql.indexOf("outer join mrole ") > -1);
-    Assert.assertTrue(sql.indexOf(".role_name = ?") > -1);
+      String sql = query.getGeneratedSql();
+      Assert.assertTrue(sql.indexOf("select distinct") > -1);
+      Assert.assertTrue(sql.indexOf("outer join mrole ") > -1);
+      Assert.assertTrue(sql.indexOf(".role_name = ?") > -1);
+
+    } finally {
+      Ebean.rollbackTransaction();
+    }
 
   }
 }

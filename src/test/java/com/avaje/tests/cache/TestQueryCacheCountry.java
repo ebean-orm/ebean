@@ -19,17 +19,20 @@ public class TestQueryCacheCountry extends BaseTestCase {
     
     ResetBasicData.reset();
     
-    ServerCache cache = Ebean.getServerCacheManager().getQueryCache(Country.class);
-    cache.clear();
+    ServerCache queryCache = Ebean.getServerCacheManager().getQueryCache(Country.class);
+    queryCache.clear();
 
-    Assert.assertEquals(0, cache.getStatistics(false).getSize());
+    ServerCache beanCache = Ebean.getServerCacheManager().getBeanCache(Country.class);
+    beanCache.clear();
+
+    Assert.assertEquals(0, queryCache.getStatistics(false).getSize());
     
     List<Country> countryList0 = Ebean.find(Country.class)
       .setUseQueryCache(true)
       .order().asc("name")
       .findList();
     
-    Assert.assertEquals(1, cache.getStatistics(false).getSize());
+    Assert.assertEquals(1, queryCache.getStatistics(false).getSize());
     Assert.assertTrue(countryList0.size() > 0);
     
     List<Country> countryList1 = Ebean.find(Country.class)
@@ -37,7 +40,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
         .order().asc("name")
         .findList();
       
-    ServerCacheStatistics statistics = cache.getStatistics(false);
+    ServerCacheStatistics statistics = queryCache.getStatistics(false);
     Assert.assertEquals(1, statistics.getSize());
     Assert.assertEquals(1, statistics.getHitCount());
     Assert.assertSame(countryList1, countryList0);
@@ -46,7 +49,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
     nz.setName("New Zealandia");
     Ebean.save(nz);
     
-    statistics = cache.getStatistics(false);
+    statistics = queryCache.getStatistics(false);
     Assert.assertEquals(0, statistics.getSize());
     
     List<Country> countryList2 = Ebean.find(Country.class)
