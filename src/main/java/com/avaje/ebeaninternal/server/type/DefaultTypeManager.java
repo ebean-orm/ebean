@@ -10,6 +10,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -146,6 +147,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     this.extraTypeFactory = new DefaultTypeFactory(config);
 
     initialiseStandard(clobType, blobType, config.isUuidStoreAsBinary());
+    initialiseJavaTimeTypes();
     initialiseJodaTypes();
 
     if (bootupClasses != null) {
@@ -600,6 +602,15 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     }
 
     return propParamTypes[1];
+  }
+
+  protected void initialiseJavaTimeTypes() {
+    if (ClassUtil.isPresent("java.time.LocalDate", this.getClass())) {
+      logger.debug("Registering java.time data types");
+      typeMap.put(java.time.LocalDate.class, new ScalarTypeLocalDate());
+      typeMap.put(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime());
+      typeMap.put(OffsetDateTime.class, new ScalarTypeOffsetDateTime());
+    }
   }
 
   /**
