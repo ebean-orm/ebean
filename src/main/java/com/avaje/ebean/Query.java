@@ -447,36 +447,88 @@ public interface Query<T> extends Serializable {
   public QueryIterator<T> findIterate();
 
   /**
+   * This is deprecated in favor of #findEachWhile.
+   * <p>
+   * This is functionally exactly the same as #findEachWhile.  It is
+   * replaced by findEachWhile because the method name is much better.
+   * </p>
+   *
+   * @param visitor
+   *          the visitor used to process the queried beans.
+   *
+   * @deprecated
+   */
+  public void findVisit(QueryResultVisitor<T> visitor);
+
+  /**
+   * Execute the query processing the beans one at a time.
+   * <p>
+   * This method is appropriate to process very large query results as the
+   * beans are consumed one at a time and do not need to be held in memory
+   * (unlike #findList #findSet etc)
+   * </p>
+   * <p>
+   * Compared with #findEachWhile this will always process all the beans where as
+   * #findEachWhile provides a way to stop processing the query result early before
+   * all the beans have been read.
+   * </p>
+   * <p>
+   * This method is functionally equivalent to findIterate() but instead of using an
+   * iterator uses the QueryEachConsumer (SAM) interface which is better suited to use
+   * with Java8 closures.
+   * </p>
+   *
+   * <pre class="code">
+   *
+   * Query&lt;Customer&gt; query = server.find(Customer.class)
+   *     .where().gt(&quot;id&quot;, 0)
+   *     .orderBy(&quot;id&quot;)
+   *     .setMaxRows(2);
+   *
+   * query.findVisit((Customer customer) -> {
+   *
+   *     // do something with customer
+   *     System.out.println(&quot;-- visit &quot; + customer);
+   * });
+   * </pre>
+   *
+   * @param consumer
+   *          the consumer used to process the queried beans.
+   */
+  public void findEach(QueryEachConsumer<T> consumer);
+
+  /**
    * Execute the query using callbacks to a visitor to process the resulting
    * beans one at a time.
    * <p>
-   * Similar to findIterate() this query method does not require all the result
-   * beans to be all held in memory at once and as such is useful for processing
-   * large queries.
+   * This method is functionally equivalent to findIterate() but instead of using an
+   * iterator uses the QueryEachWhileConsumer (SAM) interface which is better suited to use
+   * with Java8 closures.
    * </p>
-   * 
+
+   *
    * <pre class="code">
-   * 
+   *
    * Query&lt;Customer&gt; query = server.find(Customer.class)
    *     .fetch(&quot;contacts&quot;, new FetchConfig().query(2))
    *     .where().gt(&quot;id&quot;, 0)
    *     .orderBy(&quot;id&quot;)
    *     .setMaxRows(2);
-   * 
-   * query.findVisit(new QueryResultVisitor&lt;Customer&gt;() {
-   * 
-   *   public boolean accept(Customer customer) {
+   *
+   * query.findEachWhile((Customer customer) -> {
+   *
    *     // do something with customer
    *     System.out.println(&quot;-- visit &quot; + customer);
-   *     return true;
-   *   }
+   *
+   *     // return true to continue processing or false to stop
+   *     return (customer.getId() < 40);
    * });
    * </pre>
-   * 
-   * @param visitor
-   *          the visitor used to process the queried beans.
+   *
+   * @param consumer
+   *          the consumer used to process the queried beans.
    */
-  public void findVisit(QueryResultVisitor<T> visitor);
+  public void findEachWhile(QueryEachWhileConsumer<T> consumer);
 
   /**
    * Execute the query returning the list of objects.

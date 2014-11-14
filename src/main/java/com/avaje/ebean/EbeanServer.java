@@ -457,6 +457,30 @@ public interface EbeanServer {
    * Execute the query visiting the results. This is similar to findIterate in
    * that not all the result beans need to be held in memory at the same time
    * and as such is go for processing large queries.
+   *
+   * @see Query#findEach(QueryEachConsumer)
+   */
+  public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction transaction);
+
+  /**
+   * Execute the query visiting the results. This is similar to findIterate in
+   * that not all the result beans need to be held in memory at the same time
+   * and as such is go for processing large queries.
+   *
+   * @see Query#findEachWhile(QueryEachWhileConsumer)
+   */
+  public <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer, Transaction transaction);
+
+  /**
+   * Deprecated in favor of #findEachWhile which is functionally exactly the same
+   * but has a much better name.
+   * <p>
+   * Execute the query visiting the results. This is similar to findIterate in
+   * that not all the result beans need to be held in memory at the same time
+   * and as such is go for processing large queries.
+   * </p>
+   *
+   * @deprecated
    */
   public <T> void findVisit(Query<T> query, QueryResultVisitor<T> visitor, Transaction transaction);
 

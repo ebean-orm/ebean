@@ -6,9 +6,7 @@ import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
-import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.QueryResultVisitor;
-import com.avaje.ebean.RawSql;
+import com.avaje.ebean.*;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanFinder;
@@ -232,6 +230,30 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public List<Object> findIds() {
     BeanIdList idList = queryEngine.findIds(this);
     return idList.getIdList();
+  }
+
+  public void findEach(QueryEachConsumer<T> consumer) {
+    QueryIterator<T> it = queryEngine.findIterate(this);
+    try {
+      while (it.hasNext()) {
+        consumer.accept(it.next());
+      }
+    } finally {
+      it.close();
+    }
+  }
+
+  public void findEachWhile(QueryEachWhileConsumer<T> consumer) {
+    QueryIterator<T> it = queryEngine.findIterate(this);
+    try {
+      while (it.hasNext()) {
+        if (!consumer.accept(it.next())) {
+          break;
+        }
+      }
+    } finally {
+      it.close();
+    }
   }
 
   public void findVisit(QueryResultVisitor<T> visitor) {

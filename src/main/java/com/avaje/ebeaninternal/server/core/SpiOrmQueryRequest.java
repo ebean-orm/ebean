@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.avaje.ebean.QueryEachConsumer;
+import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.QueryResultVisitor;
 import com.avaje.ebean.bean.BeanCollection;
@@ -65,7 +67,17 @@ public interface SpiOrmQueryRequest<T> {
      */
     public void findVisit(QueryResultVisitor<T> visitor);
 
-    /**
+  /**
+   * Execute the find returning a QueryIterator and visitor pattern.
+   */
+  public void findEach(QueryEachConsumer<T> consumer);
+
+  /**
+   * Execute the find returning a QueryIterator and visitor pattern.
+   */
+  public void findEachWhile(QueryEachWhileConsumer<T> consumer);
+
+  /**
      * Execute the find returning a QueryIterator.
      */
     public QueryIterator<T> findIterate();
