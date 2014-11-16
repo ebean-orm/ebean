@@ -125,7 +125,7 @@ public class DeployCreateProperties {
           Method getter = findGetter(field, initFieldName, declaredMethods, scalaObject);
           Method setter = findSetter(field, initFieldName, declaredMethods, scalaObject);
 
-          DeployBeanProperty prop = createProp(level, desc, field, beanType, getter, setter);
+          DeployBeanProperty prop = createProp(desc, field, beanType, getter, setter);
           if (prop == null) {
             // transient annotation on unsupported type
 
@@ -361,7 +361,7 @@ public class DeployCreateProperties {
 
     if (field.getAnnotation(ColumnHstore.class) != null) {
       return ScalarTypePostgresHstore.KEY;
-    };
+    }
     
     return null;
   }
@@ -372,7 +372,7 @@ public class DeployCreateProperties {
     return (t != null);
   }
 
-  private DeployBeanProperty createProp(int level, DeployBeanDescriptor<?> desc, Field field, Class<?> beanType,
+  private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field, Class<?> beanType,
       Method getter, Method setter) {
 
     DeployBeanProperty prop = createProp(desc, field);
