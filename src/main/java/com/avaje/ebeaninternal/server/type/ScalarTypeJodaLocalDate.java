@@ -48,7 +48,7 @@ public class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
   }
 
   @Override
-  public LocalDate parseDateTime(long systemTimeMillis) {
+  public LocalDate convertFromMillis(long systemTimeMillis) {
     return new LocalDate(systemTimeMillis);
   }
 

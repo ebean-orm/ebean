@@ -1,9 +1,9 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.config.JsonConfig;
 import org.junit.Test;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 import static org.junit.Assert.*;
@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 public class ScalarTypeOffsetDateTimeTest {
 
 
-  ScalarTypeOffsetDateTime type = new ScalarTypeOffsetDateTime();
+  ScalarTypeOffsetDateTime type = new ScalarTypeOffsetDateTime(JsonConfig.DateTime.MILLIS);
 
   OffsetDateTime warmUp = OffsetDateTime.now();
 
@@ -22,7 +22,7 @@ public class ScalarTypeOffsetDateTimeTest {
     warmUp.hashCode();
 
     long now = System.currentTimeMillis();
-    long toMillis = type.convertToMillis( OffsetDateTime.now());
+    long toMillis = type.convertToMillis(OffsetDateTime.now());
 
     assertTrue(toMillis - now < 10);
 

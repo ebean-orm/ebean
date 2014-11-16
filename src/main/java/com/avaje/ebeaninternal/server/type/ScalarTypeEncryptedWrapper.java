@@ -34,12 +34,12 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
   }
 
   @Override
-  public Object readData(DataInput dataInput) throws IOException {
+  public T readData(DataInput dataInput) throws IOException {
     return wrapped.readData(dataInput);
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, T v) throws IOException {
     wrapped.writeData(dataOutput, v);
   }
 
@@ -113,8 +113,8 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
   }
 
   @Override
-  public T parseDateTime(long systemTimeMillis) {
-    return wrapped.parseDateTime(systemTimeMillis);
+  public T convertFromMillis(long systemTimeMillis) {
+    return wrapped.convertFromMillis(systemTimeMillis);
   }
 
   @Override
@@ -133,12 +133,12 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public T jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     return wrapped.jsonRead(ctx, event);
   }
   
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, T value) throws IOException {
     wrapped.jsonWrite(ctx, name, value);
   }
 }

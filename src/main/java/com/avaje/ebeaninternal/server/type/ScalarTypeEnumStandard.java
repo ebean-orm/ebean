@@ -222,7 +222,7 @@ public class ScalarTypeEnumStandard {
     }
 
     @Override
-    public Object parseDateTime(long systemTimeMillis) {
+    public Object convertFromMillis(long systemTimeMillis) {
       throw new TextException("Not Supported");
     }
 

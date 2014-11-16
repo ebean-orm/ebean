@@ -1,21 +1,40 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.config.JsonConfig;
+
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 /**
  * ScalarType for java.sql.Timestamp.
  */
 public class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime> {
 
-  public ScalarTypeLocalDateTime() {
-    super(LocalDateTime.class, true, Types.TIMESTAMP);
+  public ScalarTypeLocalDateTime(JsonConfig.DateTime mode) {
+    super(mode, LocalDateTime.class, true, Types.TIMESTAMP);
   }
 
   @Override
-  public long convertToMillis(Object value) {
-    return ((LocalDateTime) value).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+  public LocalDateTime convertFromMillis(long systemTimeMillis) {
+    return new Timestamp(systemTimeMillis).toLocalDateTime();
+  }
+
+  @Override
+  public long convertToMillis(LocalDateTime value) {
+    return value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+  }
+
+  @Override
+  protected String toJsonNanos(LocalDateTime value) {
+    return String.valueOf(convertToMillis(value));
+  }
+
+  @Override
+  protected String toJsonISO8601(LocalDateTime value) {
+    return value.toString();
   }
 
   @Override

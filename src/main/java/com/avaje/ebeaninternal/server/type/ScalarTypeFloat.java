@@ -55,7 +55,7 @@ public class ScalarTypeFloat extends ScalarTypeBase<Float> {
   }
 
   @Override
-  public Float parseDateTime(long systemTimeMillis) {
+  public Float convertFromMillis(long systemTimeMillis) {
     return Float.valueOf(systemTimeMillis);
   }
 
@@ -65,7 +65,7 @@ public class ScalarTypeFloat extends ScalarTypeBase<Float> {
   }
 
   @Override
-  public Object readData(DataInput dataInput) throws IOException {
+  public Float readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
@@ -75,24 +75,23 @@ public class ScalarTypeFloat extends ScalarTypeBase<Float> {
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, Float value) throws IOException {
 
-    Float value = (Float) v;
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {
       dataOutput.writeBoolean(true);
-      dataOutput.writeFloat(value.floatValue());
+      dataOutput.writeFloat(value);
     }
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public Float jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     return ctx.getFloatValue();
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, Float value) throws IOException {
     ctx.writeNumberField(name, (Float) value);
   }
 }

@@ -1,7 +1,10 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.config.JsonConfig;
+
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 
@@ -10,13 +13,28 @@ import java.time.ZoneId;
  */
 public class ScalarTypeOffsetDateTime extends ScalarTypeBaseDateTime<OffsetDateTime> {
 
-  public ScalarTypeOffsetDateTime() {
-    super(OffsetDateTime.class, true, Types.TIMESTAMP);
+  public ScalarTypeOffsetDateTime(JsonConfig.DateTime mode) {
+    super(mode, OffsetDateTime.class, true, Types.TIMESTAMP);
   }
 
   @Override
-  public long convertToMillis(Object value) {
-    return ((OffsetDateTime) value).toInstant().toEpochMilli();
+  protected String toJsonNanos(OffsetDateTime value) {
+    return toJsonNanos(value.toEpochSecond(), value.getNano());
+  }
+
+  @Override
+  protected String toJsonISO8601(OffsetDateTime value) {
+    return value.toString();
+  }
+
+  @Override
+  public long convertToMillis(OffsetDateTime value) {
+    return value.toInstant().toEpochMilli();
+  }
+
+  @Override
+  public OffsetDateTime convertFromMillis(long systemTimeMillis) {
+    return OffsetDateTime.ofInstant(Instant.ofEpochMilli(systemTimeMillis), ZoneId.systemDefault());
   }
 
   @Override

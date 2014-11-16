@@ -19,7 +19,7 @@ public class ScalarTypeLocalDateTest {
 
     System.out.println(date);
 
-    LocalDate parseDate = type.parseDateTime(millis);
+    LocalDate parseDate = type.convertFromMillis(millis);
     assertEquals(date, parseDate);
   }
 

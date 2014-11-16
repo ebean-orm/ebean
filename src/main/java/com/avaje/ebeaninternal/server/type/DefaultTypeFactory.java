@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.sql.Types;
 import java.util.Calendar;
 
+import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 
@@ -80,27 +81,27 @@ public class DefaultTypeFactory {
     /**
      * Create the default ScalarType for java.util.Date.
      */
-    public ScalarType<java.util.Date> createUtilDate() {
+    public ScalarType<java.util.Date> createUtilDate(JsonConfig.DateTime mode) {
         // by default map anonymous java.util.Date to java.sql.Timestamp.
         // String mapType =
         // properties.getProperty("type.mapping.java.util.Date","timestamp");
         int utilDateType = getTemporalMapType("timestamp");
 
-        return createUtilDate(utilDateType);
+        return createUtilDate(mode, utilDateType);
     }
 
     /**
      * Create a ScalarType for java.util.Date explicitly specifying the type to
      * map to.
      */
-    public ScalarType<java.util.Date> createUtilDate(int utilDateType) {
+    public ScalarType<java.util.Date> createUtilDate(JsonConfig.DateTime mode, int utilDateType) {
 
         switch (utilDateType) {
         case Types.DATE:
             return new ScalarTypeUtilDate.DateType();
 
         case Types.TIMESTAMP:
-            return new ScalarTypeUtilDate.TimestampType();
+            return new ScalarTypeUtilDate.TimestampType(mode);
 
         default:
             throw new RuntimeException("Invalid type " + utilDateType);
@@ -110,23 +111,19 @@ public class DefaultTypeFactory {
     /**
      * Create the default ScalarType for java.util.Calendar.
      */
-    public ScalarType<Calendar> createCalendar() {
-        // by default map anonymous java.util.Calendar to java.sql.Timestamp.
-        // String mapType =
-        // properties.getProperty("type.mapping.java.util.Calendar",
-        // "timestamp");
-        int jdbcType = getTemporalMapType("timestamp");
+    public ScalarType<Calendar> createCalendar(JsonConfig.DateTime mode) {
 
-        return createCalendar(jdbcType);
+        int jdbcType = getTemporalMapType("timestamp");
+        return createCalendar(mode, jdbcType);
     }
 
     /**
      * Create a ScalarType for java.util.Calendar explicitly specifying the type
      * to map to.
      */
-    public ScalarType<Calendar> createCalendar(int jdbcType) {
+    public ScalarType<Calendar> createCalendar(JsonConfig.DateTime mode, int jdbcType) {
 
-        return new ScalarTypeCalendar(jdbcType);
+        return new ScalarTypeCalendar(mode, jdbcType);
     }
 
     private int getTemporalMapType(String mapType) {

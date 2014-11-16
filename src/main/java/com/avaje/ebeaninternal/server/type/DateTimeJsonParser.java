@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.type;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.TimeZone;
 
 public class DateTimeJsonParser {
@@ -31,4 +32,7 @@ public class DateTimeJsonParser {
     }
   }
 
+  public String format(Date value) {
+    return dtFormat().format(value);
+  }
 }

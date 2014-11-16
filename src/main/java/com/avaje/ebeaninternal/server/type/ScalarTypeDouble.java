@@ -55,7 +55,7 @@ public class ScalarTypeDouble extends ScalarTypeBase<Double> {
   }
 
   @Override
-  public Double parseDateTime(long systemTimeMillis) {
+  public Double convertFromMillis(long systemTimeMillis) {
     return Double.valueOf(systemTimeMillis);
   }
 
@@ -65,34 +65,32 @@ public class ScalarTypeDouble extends ScalarTypeBase<Double> {
   }
 
   @Override
-  public Object readData(DataInput dataInput) throws IOException {
+  public Double readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      double val = dataInput.readDouble();
-      return Double.valueOf(val);
+      return dataInput.readDouble();
     }
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, Double value) throws IOException {
 
-    Double value = (Double) v;
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {
       dataOutput.writeBoolean(true);
-      dataOutput.writeDouble(value.doubleValue());
+      dataOutput.writeDouble(value);
     }
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public Double jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     return ctx.getDoubleValue();
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
-    ctx.writeNumberField(name, (Double) value);
+  public void jsonWrite(JsonGenerator ctx, String name, Double value) throws IOException {
+    ctx.writeNumberField(name, value);
   }
 }

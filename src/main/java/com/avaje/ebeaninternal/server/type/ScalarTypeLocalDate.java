@@ -52,7 +52,7 @@ public class ScalarTypeLocalDate extends ScalarTypeBaseDate<LocalDate> {
   }
 
   @Override
-  public LocalDate parseDateTime(long systemTimeMillis) {
+  public LocalDate convertFromMillis(long systemTimeMillis) {
     return new Timestamp(systemTimeMillis).toLocalDateTime().toLocalDate();
   }
 

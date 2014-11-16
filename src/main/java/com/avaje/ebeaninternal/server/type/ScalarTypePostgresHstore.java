@@ -88,7 +88,7 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public Map parseDateTime(long dateTime) {
+  public Map convertFromMillis(long dateTime) {
     throw new RuntimeException("Should never be called");
   }
 
@@ -98,19 +98,28 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public Object readData(DataInput dataInput) throws IOException {
-    String json = dataInput.readUTF();
-    return parse(json);
+  public Map readData(DataInput dataInput) throws IOException {
+    if (!dataInput.readBoolean()) {
+      return null;
+    } else {
+      String json = dataInput.readUTF();
+      return parse(json);
+    }
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
-    String json = format(v);
-    dataOutput.writeUTF(json);
+  public void writeData(DataOutput dataOutput, Map v) throws IOException {
+    if (v == null) {
+      dataOutput.writeBoolean(false);
+    } else {
+      dataOutput.writeBoolean(true);
+      String json = format(v);
+      dataOutput.writeUTF(json);
+    }
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, Map value) throws IOException {
     // write the field name followed by the Map/JSON Object
     if (value == null) {
       ctx.writeNullField(name);
@@ -121,7 +130,7 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public Map jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     // at this point the BeanProperty has read the START_OBJECT token
     // to check for a null value. Pass the START_OBJECT token through to
     // the EJson parsing so that it knows the first token has been read

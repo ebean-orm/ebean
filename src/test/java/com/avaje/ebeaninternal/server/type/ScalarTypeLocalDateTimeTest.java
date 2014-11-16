@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.config.JsonConfig;
 import org.junit.Test;
 
 import java.sql.Timestamp;
@@ -9,7 +10,7 @@ import static org.junit.Assert.*;
 
 public class ScalarTypeLocalDateTimeTest {
 
-  ScalarTypeLocalDateTime type = new ScalarTypeLocalDateTime();
+  ScalarTypeLocalDateTime type = new ScalarTypeLocalDateTime(JsonConfig.DateTime.MILLIS);
 
   // warm up
   LocalDateTime warmUp = LocalDateTime.now();
@@ -20,7 +21,7 @@ public class ScalarTypeLocalDateTimeTest {
     warmUp.hashCode();
 
     long now = System.currentTimeMillis();
-    long toMillis = type.convertToMillis( LocalDateTime.now());
+    long toMillis = type.convertToMillis(LocalDateTime.now());
 
     assertTrue(toMillis - now < 10);
   }
@@ -42,17 +43,22 @@ public class ScalarTypeLocalDateTimeTest {
 
     Object jdbcType = type.toJdbcType(LocalDateTime.now());
     assertTrue(jdbcType instanceof Timestamp);
+
+    jdbcType = type.toJdbcType(new Timestamp(System.currentTimeMillis()));
+    assertTrue(jdbcType instanceof Timestamp);
   }
 
   @Test
   public void testToBeanType() throws Exception {
 
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-    LocalDateTime localDateTime = type.toBeanType(timestamp);
+    LocalDateTime val1 = type.toBeanType(timestamp);
+    assertNotNull(val1);
 
-    assertNotNull(localDateTime);
-    
-    Timestamp timestamp1 = type.convertToTimestamp(localDateTime);
+    LocalDateTime val2 = type.toBeanType(timestamp.toLocalDateTime());
+    assertNotNull(val2);
+
+    Timestamp timestamp1 = type.convertToTimestamp(val1);
     assertEquals(timestamp, timestamp1);
   }
 }

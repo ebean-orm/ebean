@@ -42,12 +42,12 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, Byte value) throws IOException {
     throw new IOException("Not supported");
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public Byte jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     throw new IOException("Not supported");
   }
 
@@ -59,7 +59,7 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
     throw new TextException("Not supported");
   }
 
-  public Byte parseDateTime(long systemTimeMillis) {
+  public Byte convertFromMillis(long systemTimeMillis) {
     throw new TextException("Not Supported");
   }
 
@@ -67,18 +67,16 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
     return false;
   }
 
-  public Object readData(DataInput dataInput) throws IOException {
+  public Byte readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      byte val = dataInput.readByte();
-      return Byte.valueOf(val);
+      return dataInput.readByte();
     }
   }
 
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, Byte val) throws IOException {
 
-    Byte val = (Byte) v;
     if (val == null) {
       dataOutput.writeBoolean(false);
     } else {

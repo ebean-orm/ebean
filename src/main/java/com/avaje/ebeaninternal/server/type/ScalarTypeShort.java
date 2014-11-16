@@ -56,7 +56,7 @@ public class ScalarTypeShort extends ScalarTypeBase<Short> {
   }
 
   @Override
-  public Short parseDateTime(long systemTimeMillis) {
+  public Short convertFromMillis(long systemTimeMillis) {
     throw new TextException("Not Supported");
   }
 
@@ -66,34 +66,32 @@ public class ScalarTypeShort extends ScalarTypeBase<Short> {
   }
 
   @Override
-  public Object readData(DataInput dataInput) throws IOException {
+  public Short readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      short val = dataInput.readShort();
-      return Short.valueOf(val);
+      return dataInput.readShort();
     }
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, Short value) throws IOException {
 
-    Short value = (Short) v;
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {
       dataOutput.writeBoolean(true);
-      dataOutput.writeShort(value.shortValue());
+      dataOutput.writeShort(value);
     }
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public Short jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     return ctx.getShortValue();
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, Short value) throws IOException {
     ctx.writeNumberField(name, (Short) value);
   }
 }

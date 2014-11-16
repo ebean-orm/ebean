@@ -36,13 +36,22 @@ public class ScalarTypeInteger extends ScalarTypeBase<Integer> {
   }
 
   @Override
-  public Object readData(DataInput dataInput) throws IOException {
-    return Integer.valueOf(dataInput.readInt());
+  public Integer readData(DataInput dataInput) throws IOException {
+    if (!dataInput.readBoolean()) {
+      return null;
+    } else {
+      return Integer.valueOf(dataInput.readInt());
+    }
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
-    dataOutput.writeInt((Integer) v);
+  public void writeData(DataOutput dataOutput, Integer value) throws IOException {
+    if (value == null) {
+      dataOutput.writeBoolean(false);
+    } else {
+      dataOutput.writeBoolean(true);
+      dataOutput.writeInt(value);
+    }
   }
 
   @Override
@@ -66,7 +75,7 @@ public class ScalarTypeInteger extends ScalarTypeBase<Integer> {
   }
 
   @Override
-  public Integer parseDateTime(long systemTimeMillis) {
+  public Integer convertFromMillis(long systemTimeMillis) {
     throw new TextException("Not Supported");
   }
 
@@ -76,12 +85,12 @@ public class ScalarTypeInteger extends ScalarTypeBase<Integer> {
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public Integer jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     return ctx.getIntValue();
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
-    ctx.writeNumberField(name, (Integer) value);
+  public void jsonWrite(JsonGenerator ctx, String name, Integer value) throws IOException {
+    ctx.writeNumberField(name, value);
   }
 }

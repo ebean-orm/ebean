@@ -385,12 +385,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return null;
   }
 
-
-  @Override
-  public boolean isValueLoaded(Object value) {
-    return !(value instanceof BeanCollection<?>) || ((BeanCollection<?>) value).isPopulated();
-  }
-
   public void add(BeanCollection<?> collection, EntityBean bean) {
     help.add(collection, bean);
   }

@@ -23,6 +23,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.avaje.ebean.config.*;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -33,10 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.annotation.EnumMapping;
 import com.avaje.ebean.annotation.EnumValue;
-import com.avaje.ebean.config.CompoundType;
-import com.avaje.ebean.config.CompoundTypeProperty;
-import com.avaje.ebean.config.ScalarTypeConverter;
-import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
@@ -103,8 +100,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final ScalarType<?> dateType = new ScalarTypeDate();
 
-  private final ScalarType<?> timestampType = new ScalarTypeTimestamp();
-
   private final ScalarType<?> inetAddressType = new ScalarTypeInetAddress();
   private final ScalarType<?> urlType = new ScalarTypeURL();
   private final ScalarType<?> uriType = new ScalarTypeURI();
@@ -116,7 +111,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final ScalarType<?> classType = new ScalarTypeClass();
 
-  private final ScalarTypeLongToTimestamp longToTimestamp = new ScalarTypeLongToTimestamp();
 
   private final List<ScalarType<?>> customScalarTypes = new ArrayList<ScalarType<?>>();
 
@@ -126,6 +120,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final ReflectionBasedTypeBuilder reflectScalarBuilder;
 
+  private final JsonConfig.DateTime jsonDateTime;
+
   /**
    * Create the DefaultTypeManager.
    */
@@ -134,6 +130,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     int clobType = config == null ? Types.CLOB : config.getDatabasePlatform().getClobDbType();
     int blobType = config == null ? Types.BLOB : config.getDatabasePlatform().getBlobDbType();
 
+    this.jsonDateTime = config.getJsonDateTime();
     this.checkImmutable = new CheckImmutable(this);
     this.reflectScalarBuilder = new ReflectionBasedTypeBuilder(this);
 
@@ -146,12 +143,12 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
 
-    initialiseStandard(clobType, blobType, config.isUuidStoreAsBinary());
-    initialiseJavaTimeTypes();
-    initialiseJodaTypes();
+    initialiseStandard(jsonDateTime, clobType, blobType, config.isUuidStoreAsBinary());
+    initialiseJavaTimeTypes(jsonDateTime);
+    initialiseJodaTypes(jsonDateTime);
 
     if (bootupClasses != null) {
-      initialiseCustomScalarTypes(bootupClasses);
+      initialiseCustomScalarTypes(jsonDateTime, bootupClasses);
       initialiseScalarConverters(bootupClasses);
       initialiseCompoundTypes(bootupClasses);
     }
@@ -313,19 +310,15 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       if (jdbcType == 0 || scalarType.getJdbcType() == jdbcType) {
         // matching type
         return (ScalarType<T>) scalarType;
-      } else {
-        // sometime like java.util.Date or java.util.Calendar
-        // that that does not map to the same jdbc type as the
-        // server wide settings.
       }
     }
     // a util Date with jdbcType not matching server wide settings
     if (type.equals(java.util.Date.class)) {
-      return (ScalarType<T>) extraTypeFactory.createUtilDate(jdbcType);
+      return (ScalarType<T>) extraTypeFactory.createUtilDate(jsonDateTime, jdbcType);
     }
     // a Calendar with jdbcType not matching server wide settings
     if (type.equals(java.util.Calendar.class)) {
-      return (ScalarType<T>) extraTypeFactory.createCalendar(jdbcType);
+      return (ScalarType<T>) extraTypeFactory.createCalendar(jsonDateTime, jdbcType);
     }
 
     String msg = "Unmatched ScalarType for " + type + " jdbcType:" + jdbcType;
@@ -417,7 +410,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   public ScalarType<?> createEnumScalarType(Class<?> enumType) {
 
     // get the mapping information from EnumMapping
-    EnumMapping enumMapping = (EnumMapping) enumType.getAnnotation(EnumMapping.class);
+    EnumMapping enumMapping = enumType.getAnnotation(EnumMapping.class);
     if (enumMapping == null) {
       // look for EnumValue annotations instead
       return createEnumScalarType2(enumType);
@@ -468,7 +461,9 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * interface and register it with this TypeManager.
    * </p>
    */
-  protected void initialiseCustomScalarTypes(BootupClasses bootupClasses) {
+  protected void initialiseCustomScalarTypes(JsonConfig.DateTime mode, BootupClasses bootupClasses) {
+
+    ScalarTypeLongToTimestamp longToTimestamp = new ScalarTypeLongToTimestamp(mode);
 
     customScalarTypes.add(longToTimestamp);
 
@@ -604,12 +599,12 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return propParamTypes[1];
   }
 
-  protected void initialiseJavaTimeTypes() {
+  protected void initialiseJavaTimeTypes(JsonConfig.DateTime mode) {
     if (ClassUtil.isPresent("java.time.LocalDate", this.getClass())) {
       logger.debug("Registering java.time data types");
       typeMap.put(java.time.LocalDate.class, new ScalarTypeLocalDate());
-      typeMap.put(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime());
-      typeMap.put(OffsetDateTime.class, new ScalarTypeOffsetDateTime());
+      typeMap.put(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(mode));
+      typeMap.put(OffsetDateTime.class, new ScalarTypeOffsetDateTime(mode));
     }
   }
 
@@ -617,16 +612,16 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * Detect if Joda classes are in the classpath and if so register the Joda
    * data types.
    */
-  protected void initialiseJodaTypes() {
+  protected void initialiseJodaTypes(JsonConfig.DateTime mode) {
 
     // detect if Joda classes are in the classpath
     if (ClassUtil.isPresent("org.joda.time.LocalDateTime", this.getClass())) {
       // Joda classes are in the classpath so register the types
       logger.debug("Registering Joda data types");
-      typeMap.put(LocalDateTime.class, new ScalarTypeJodaLocalDateTime());
+      typeMap.put(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(mode));
+      typeMap.put(DateTime.class, new ScalarTypeJodaDateTime(mode));
       typeMap.put(LocalDate.class, new ScalarTypeJodaLocalDate());
       typeMap.put(LocalTime.class, new ScalarTypeJodaLocalTime());
-      typeMap.put(DateTime.class, new ScalarTypeJodaDateTime());
       typeMap.put(DateMidnight.class, new ScalarTypeJodaDateMidnight());
     }
   }
@@ -635,12 +630,12 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * Register all the standard types supported. This is the standard JDBC types
    * plus some other common types such as java.util.Date and java.util.Calendar.
    */
-  protected void initialiseStandard(int platformClobType, int platformBlobType, boolean binaryUUID) {
+  protected void initialiseStandard(JsonConfig.DateTime mode, int platformClobType, int platformBlobType, boolean binaryUUID) {
     
-    ScalarType<?> utilDateType = extraTypeFactory.createUtilDate();
+    ScalarType<?> utilDateType = extraTypeFactory.createUtilDate(mode);
     typeMap.put(java.util.Date.class, utilDateType);
 
-    ScalarType<?> calType = extraTypeFactory.createCalendar();
+    ScalarType<?> calType = extraTypeFactory.createCalendar(mode);
     typeMap.put(Calendar.class, calType);
 
     ScalarType<?> mathBigIntType = extraTypeFactory.createMathBigInteger();
@@ -655,8 +650,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     if (booleanType.getJdbcType() == Types.BIT) {
       // for MapBeans ... BIT types are assumed to be booleans
       nativeMap.put(Types.BIT, booleanType);
-    } else {
-      // boolean mapping to Types.Integer, Types.VARCHAR or Types.Boolean
     }
 
     // Store UUID as binary(16) or varchar(40)
@@ -744,6 +737,9 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     nativeMap.put(Types.TIME, timeType);
     typeMap.put(Date.class, dateType);
     nativeMap.put(Types.DATE, dateType);
+
+    ScalarType<?> timestampType = new ScalarTypeTimestamp(mode);
+
     typeMap.put(Timestamp.class, timestampType);
     nativeMap.put(Types.TIMESTAMP, timestampType);
 

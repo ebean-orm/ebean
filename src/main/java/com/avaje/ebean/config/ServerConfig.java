@@ -121,6 +121,11 @@ public class ServerConfig {
    */
   private AutofetchConfig autofetchConfig = new AutofetchConfig();
 
+  /**
+   * The JSON format used for DateTime types. Default to millis.
+   */
+  private JsonConfig.DateTime jsonDateTime = JsonConfig.DateTime.MILLIS;
+
   /** 
    * The database platform name. Used to imply a DatabasePlatform to use.  
    */
@@ -268,6 +273,20 @@ public class ServerConfig {
    */
   public void setJsonFactory(JsonFactory jsonFactory) {
     this.jsonFactory = jsonFactory;
+  }
+
+  /**
+   * Return the JSON format used for DateTime types.
+   */
+  public JsonConfig.DateTime getJsonDateTime() {
+    return jsonDateTime;
+  }
+
+  /**
+   * Set the JSON format to use for DateTime types.
+   */
+  public void setJsonDateTime(JsonConfig.DateTime jsonDateTime) {
+    this.jsonDateTime = jsonDateTime;
   }
 
   /**
@@ -1367,6 +1386,13 @@ public class ServerConfig {
 
     lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", 1);
     queryBatchSize = p.getInt("queryBatchSize", DEFAULT_QUERY_BATCH_SIZE);
+
+    String jsonDateTimeFormat = p.get("jsonDateTime", null);
+    if (jsonDateTimeFormat != null) {
+      jsonDateTime = JsonConfig.DateTime.valueOf(jsonDateTimeFormat);
+    } else {
+      jsonDateTime = JsonConfig.DateTime.MILLIS;
+    }
 
     ddlGenerate = p.getBoolean("ddl.generate", false);
     ddlRun = p.getBoolean("ddl.run", false);

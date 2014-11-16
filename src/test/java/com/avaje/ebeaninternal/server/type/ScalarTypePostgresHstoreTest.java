@@ -50,7 +50,7 @@ public class ScalarTypePostgresHstoreTest {
 
   @Test(expected = RuntimeException.class)
   public void testParseDateTime() throws Exception {
-    Map<String,Object> map = (Map<String,Object>)hstore.parseDateTime(1234L);
+    Map<String,Object> map = (Map<String,Object>)hstore.convertFromMillis(1234L);
     assertEquals(1, map.size());
     assertEquals("rob", map.get("name"));
   }
