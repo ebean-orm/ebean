@@ -9,10 +9,10 @@ import com.fasterxml.jackson.core.JsonToken;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.Duration;
-import java.time.LocalTime;
 
 /**
  * ScalarType for java.time.Duration
@@ -27,6 +27,14 @@ public class ScalarTypeDuration extends ScalarTypeBase<Duration> {
     super(Duration.class, false, jdbcType);
   }
 
+  public BigDecimal convertToBigDecimal(Duration value) {
+    return (value == null) ? null : DecimalUtils.toDecimal(value);
+  }
+
+  public Duration convertFromBigDecimal(BigDecimal value) {
+    return (value == null) ? null : DecimalUtils.toDuration(value);
+  }
+
   @Override
   public void bind(DataBind bind, Duration value) throws SQLException {
     if (value == null) {
@@ -38,26 +46,8 @@ public class ScalarTypeDuration extends ScalarTypeBase<Duration> {
 
   @Override
   public Duration read(DataReader dataReader) throws SQLException {
-    return Duration.ofSeconds(dataReader.getLong());
-  }
-
-  @Override
-  public Duration readData(DataInput dataInput) throws IOException {
-    if (!dataInput.readBoolean()) {
-      return null;
-    } else {
-      return Duration.ofSeconds(dataInput.readLong());
-    }
-  }
-
-  @Override
-  public void writeData(DataOutput dataOutput, Duration value) throws IOException {
-    if (value == null) {
-      dataOutput.writeBoolean(false);
-    } else {
-      dataOutput.writeBoolean(true);
-      dataOutput.writeLong(value.getSeconds());
-    }
+    Long value = dataReader.getLong();
+    return (value == null) ? null : Duration.ofSeconds(value);
   }
 
   @Override
@@ -71,6 +61,26 @@ public class ScalarTypeDuration extends ScalarTypeBase<Duration> {
     if (value instanceof Duration) return (Duration) value;
     return Duration.ofSeconds(BasicTypeConverter.toLong(value));
   }
+
+  @Override
+  public Duration readData(DataInput dataInput) throws IOException {
+    if (!dataInput.readBoolean()) {
+      return null;
+    } else {
+      return convertFromBigDecimal(new BigDecimal(dataInput.readUTF()));
+    }
+  }
+
+  @Override
+  public void writeData(DataOutput dataOutput, Duration value) throws IOException {
+    if (value == null) {
+      dataOutput.writeBoolean(false);
+    } else {
+      dataOutput.writeBoolean(true);
+      dataOutput.writeUTF(convertToBigDecimal(value).toString());
+    }
+  }
+
 
   @Override
   public String formatValue(Duration v) {

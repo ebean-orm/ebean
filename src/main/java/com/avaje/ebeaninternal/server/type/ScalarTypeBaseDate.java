@@ -39,19 +39,14 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
     if (value == null) {
       b.setNull(Types.DATE);
     } else {
-      Date date = convertToDate(value);
-      b.setDate(date);
+      b.setDate(convertToDate(value));
     }
   }
 
   public T read(DataReader dataReader) throws SQLException {
 
     Date ts = dataReader.getDate();
-    if (ts == null) {
-      return null;
-    } else {
-      return convertFromDate(ts);
-    }
+    return ts == null ? null : convertFromDate(ts);
   }
 
   public String formatValue(T t) {

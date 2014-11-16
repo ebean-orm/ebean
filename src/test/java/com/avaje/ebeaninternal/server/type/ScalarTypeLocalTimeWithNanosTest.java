@@ -8,14 +8,13 @@ import com.fasterxml.jackson.core.JsonToken;
 import org.junit.Test;
 
 import java.io.*;
-import java.sql.Time;
 import java.time.LocalTime;
 
 import static org.junit.Assert.*;
 
-public class ScalarTypeLocalTimeTest {
+public class ScalarTypeLocalTimeWithNanosTest {
 
-  ScalarTypeLocalTime type = new ScalarTypeLocalTime();
+  ScalarTypeLocalTimeWithNanos type = new ScalarTypeLocalTimeWithNanos();
 
   @Test
   public void testReadData() throws Exception {
@@ -23,7 +22,7 @@ public class ScalarTypeLocalTimeTest {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     ObjectOutputStream out = new ObjectOutputStream(os);
 
-    LocalTime localTime = LocalTime.of(9, 23, 45);
+    LocalTime localTime = LocalTime.of(9, 23, 45, 115);
     type.writeData(out, localTime);
     type.writeData(out, null);
     out.flush();
@@ -42,14 +41,13 @@ public class ScalarTypeLocalTimeTest {
   @Test
   public void testToJdbcType() throws Exception {
 
-    LocalTime localTime = LocalTime.of(9, 23, 45, 123);
-    Time time = Time.valueOf(localTime);
-
+    LocalTime localTime = LocalTime.of(9, 23, 45, 115);
+    long asNanos = localTime.toNanoOfDay();
     Object val1 = type.toJdbcType(localTime);
-    Object val2 = type.toJdbcType(time);
+    Object val2 = type.toJdbcType(asNanos);
 
-    assertEquals(time, val1);
-    assertEquals(time, val2);
+    assertEquals(asNanos, val1);
+    assertEquals(asNanos, val2);
   }
 
   @Test
@@ -57,7 +55,7 @@ public class ScalarTypeLocalTimeTest {
 
     LocalTime localTime = LocalTime.of(9, 23, 45);
     LocalTime val1 = type.toBeanType(localTime);
-    LocalTime val2 = type.toBeanType(Time.valueOf(localTime));
+    LocalTime val2 = type.toBeanType(localTime.toNanoOfDay());
 
     assertEquals(localTime, val1);
     assertEquals(localTime, val2);

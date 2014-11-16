@@ -33,7 +33,8 @@ public class ScalarTypeYear extends ScalarTypeBase<Year> {
 
   @Override
   public Year read(DataReader dataReader) throws SQLException {
-    return Year.of(dataReader.getInt());
+    Integer value = dataReader.getInt();
+    return (value == null) ? null : Year.of(value);
   }
 
   @Override

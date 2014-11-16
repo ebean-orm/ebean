@@ -152,7 +152,7 @@ public class DeployCreateProperties {
       Class<?> superClass = beanType.getSuperclass();
 
       if (!superClass.equals(Object.class)) {
-        // recursively add any properties in the inheritance heirarchy
+        // recursively add any properties in the inheritance hierarchy
         // up to the Object.class level...
         createProperties(desc, superClass, level + 1);
       }
