@@ -90,25 +90,10 @@ public class ScalarTypeYearTest {
   }
 
   @Test
-  public void testJsonRead() throws Exception {
+  public void testJson() throws Exception {
 
-    StringWriter writer = new StringWriter();
-    JsonFactory factory = new JsonFactory();
-    JsonGenerator generator = factory.createGenerator(writer);
-    generator.writeStartObject();
-    type.jsonWrite(generator, "key", Year.of(2013));
-    generator.writeEndObject();
-    generator.flush();
-
-    JsonParser parser = factory.createParser(writer.toString());
-    JsonToken token = parser.nextToken();
-    assertEquals(JsonToken.START_OBJECT, token);
-    token = parser.nextToken();
-    assertEquals(JsonToken.FIELD_NAME, token);
-    token = parser.nextToken();
-
-    Year year = type.jsonRead(parser, token);
-    assertEquals(Year.of(2013), year);
+    JsonTester jsonTester = new JsonTester(type);
+    jsonTester.test(Year.of(2013));
   }
 
 }

@@ -68,7 +68,7 @@ public final class DecimalUtils {
   public static Instant toInstant(BigDecimal value) {
 
     long seconds = value.longValue();
-    int nanoseconds = DecimalUtils.extractNanosecondDecimal(value, seconds);
+    int nanoseconds = extractNanosecondDecimal(value, seconds);
     return Instant.ofEpochSecond(seconds, nanoseconds);
   }
 

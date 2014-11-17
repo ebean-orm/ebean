@@ -17,8 +17,8 @@ public class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
   }
 
   @Override
-  public long convertToMillis(Object value) {
-    return ((LocalDate) value).toDateMidnight().getMillis();
+  public long convertToMillis(LocalDate value) {
+    return value.toDateMidnight().getMillis();
   }
 
   @Override

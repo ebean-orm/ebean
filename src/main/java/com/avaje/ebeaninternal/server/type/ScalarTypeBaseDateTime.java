@@ -93,9 +93,8 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
       }
       case VALUE_NUMBER_FLOAT: {
         BigDecimal value = ctx.getDecimalValue();
-        //Instant instant = DecimalUtils.toInstant(value);
         Timestamp timestamp = DecimalUtils.toTimestamp(value);
-        convertFromTimestamp(timestamp);//Timestamp.from(instant));
+        return convertFromTimestamp(timestamp);
       }
       default: {
         String jsonDateTime = ctx.getText();
@@ -109,10 +108,12 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
 
     switch (mode) {
       case ISO8601: {
-        generator.writeNumber(toJsonISO8601(value));
+        generator.writeFieldName(name);
+        generator.writeString(toJsonISO8601(value));
         break;
       }
       case NANOS: {
+        generator.writeFieldName(name);
         generator.writeNumber(toJsonNanos(value));
         break;
       }

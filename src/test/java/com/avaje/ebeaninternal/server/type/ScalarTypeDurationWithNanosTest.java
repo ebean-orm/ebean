@@ -99,23 +99,8 @@ public class ScalarTypeDurationWithNanosTest {
 
     Duration duration = Duration.ofSeconds(323, 1500000);
 
-    StringWriter writer = new StringWriter();
-    JsonFactory factory = new JsonFactory();
-    JsonGenerator generator = factory.createGenerator(writer);
-    generator.writeStartObject();
-    type.jsonWrite(generator, "key", duration);
-    generator.writeEndObject();
-    generator.flush();
-
-    JsonParser parser = factory.createParser(writer.toString());
-    JsonToken token = parser.nextToken();
-    assertEquals(JsonToken.START_OBJECT, token);
-    token = parser.nextToken();
-    assertEquals(JsonToken.FIELD_NAME, token);
-    token = parser.nextToken();
-
-    Duration val1 = type.jsonRead(parser, token);
-    assertEquals(duration, val1);
+    JsonTester jsonTester = new JsonTester(type);
+    jsonTester.test(duration);
   }
 
 }

@@ -4,16 +4,17 @@ import com.avaje.ebean.config.JsonConfig;
 import org.junit.Test;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 
 import static org.junit.Assert.*;
 
-public class ScalarTypeLocalDateTimeTest {
+public class ScalarTypeZonedDateTimeTest {
 
-  ScalarTypeLocalDateTime type = new ScalarTypeLocalDateTime(JsonConfig.DateTime.MILLIS);
 
-  // warm up
-  LocalDateTime warmUp = LocalDateTime.now();
+  ScalarTypeZonedDateTime type = new ScalarTypeZonedDateTime(JsonConfig.DateTime.MILLIS);
+
+  ZonedDateTime warmUp = ZonedDateTime.now();
 
   @Test
   public void testConvertToMillis() throws Exception {
@@ -21,9 +22,10 @@ public class ScalarTypeLocalDateTimeTest {
     warmUp.hashCode();
 
     long now = System.currentTimeMillis();
-    long toMillis = type.convertToMillis(LocalDateTime.now());
+    long toMillis = type.convertToMillis(ZonedDateTime.now());
 
     assertTrue(toMillis - now < 10);
+
   }
 
   @Test
@@ -31,8 +33,8 @@ public class ScalarTypeLocalDateTimeTest {
 
     Timestamp now = new Timestamp(System.currentTimeMillis());
 
-    LocalDateTime localDateTime = type.convertFromTimestamp(now);
-    Timestamp timestamp = type.convertToTimestamp(localDateTime);
+    ZonedDateTime val1 = type.convertFromTimestamp(now);
+    Timestamp timestamp = type.convertToTimestamp(val1);
 
     assertEquals(now, timestamp);
   }
@@ -41,10 +43,7 @@ public class ScalarTypeLocalDateTimeTest {
   @Test
   public void testToJdbcType() throws Exception {
 
-    Object jdbcType = type.toJdbcType(LocalDateTime.now());
-    assertTrue(jdbcType instanceof Timestamp);
-
-    jdbcType = type.toJdbcType(new Timestamp(System.currentTimeMillis()));
+    Object jdbcType = type.toJdbcType(ZonedDateTime.now());
     assertTrue(jdbcType instanceof Timestamp);
   }
 
@@ -52,29 +51,28 @@ public class ScalarTypeLocalDateTimeTest {
   public void testToBeanType() throws Exception {
 
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-    LocalDateTime val1 = type.toBeanType(timestamp);
-    assertNotNull(val1);
+    ZonedDateTime localDateTime = type.toBeanType(timestamp);
 
-    LocalDateTime val2 = type.toBeanType(timestamp.toLocalDateTime());
-    assertNotNull(val2);
+    assertNotNull(localDateTime);
 
-    Timestamp timestamp1 = type.convertToTimestamp(val1);
+    Timestamp timestamp1 = type.convertToTimestamp(localDateTime);
     assertEquals(timestamp, timestamp1);
+
   }
 
   @Test
   public void testJson() throws Exception {
 
-    LocalDateTime now = LocalDateTime.now();
+    ZonedDateTime now = ZonedDateTime.now();
 
     JsonTester jsonTester = new JsonTester(type);
     jsonTester.test(now);
 
-    ScalarTypeLocalDateTime typeNanos = new ScalarTypeLocalDateTime(JsonConfig.DateTime.NANOS);
+    ScalarTypeZonedDateTime typeNanos = new ScalarTypeZonedDateTime(JsonConfig.DateTime.NANOS);
     jsonTester = new JsonTester(typeNanos);
     jsonTester.test(now);
 
-    ScalarTypeLocalDateTime typeIso = new ScalarTypeLocalDateTime(JsonConfig.DateTime.ISO8601);
+    ScalarTypeZonedDateTime typeIso = new ScalarTypeZonedDateTime(JsonConfig.DateTime.ISO8601);
     jsonTester = new JsonTester(typeIso);
     jsonTester.test(now);
   }

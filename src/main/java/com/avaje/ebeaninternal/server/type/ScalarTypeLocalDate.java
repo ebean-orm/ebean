@@ -19,9 +19,8 @@ public class ScalarTypeLocalDate extends ScalarTypeBaseDate<LocalDate> {
   }
 
   @Override
-  public long convertToMillis(Object value) {
-    LocalDate localDate = (LocalDate) value;
-    ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());
+  public long convertToMillis(LocalDate value) {
+    ZonedDateTime zonedDateTime = value.atStartOfDay(ZoneId.systemDefault());
     return zonedDateTime.toInstant().toEpochMilli();
   }
 

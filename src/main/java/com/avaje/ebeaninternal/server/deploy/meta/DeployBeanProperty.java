@@ -414,7 +414,7 @@ public class DeployBeanProperty {
             ScalarTypeEnum etype = (ScalarTypeEnum) scalarType;
 
             // check dbColName IN ('A', 'I', 'D')
-            return "check (" + dbColumn + " in " + etype.getContraintInValues() + ")";
+            return "check (" + dbColumn + " in " + etype.getConstraintInValues() + ")";
         }
         return null;
     }

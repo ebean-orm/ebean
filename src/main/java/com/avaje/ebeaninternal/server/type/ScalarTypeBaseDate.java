@@ -23,7 +23,7 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
   /**
    * Convert the target value to millis.
    */
-  public abstract long convertToMillis(Object value);
+  public abstract long convertToMillis(T value);
 
   /**
    * Convert to java.sql.Date from the target Date type.

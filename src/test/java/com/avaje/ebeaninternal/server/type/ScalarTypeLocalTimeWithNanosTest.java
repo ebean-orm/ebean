@@ -95,25 +95,11 @@ public class ScalarTypeLocalTimeWithNanosTest {
 
     LocalTime localTime = LocalTime.of(9, 23, 45);
 
-
-    StringWriter writer = new StringWriter();
-    JsonFactory factory = new JsonFactory();
-    JsonGenerator generator = factory.createGenerator(writer);
-    generator.writeStartObject();
-    type.jsonWrite(generator, "key", localTime);
-    generator.writeEndObject();
-    generator.flush();
-
-    JsonParser parser = factory.createParser(writer.toString());
-    JsonToken token = parser.nextToken();
-    assertEquals(JsonToken.START_OBJECT, token);
-    token = parser.nextToken();
-    assertEquals(JsonToken.FIELD_NAME, token);
-    token = parser.nextToken();
-
-    LocalTime val1 = type.jsonRead(parser, token);
-    assertEquals(localTime, val1);
+    JsonTester jsonTester = new JsonTester(type);
+    jsonTester.test(localTime);
 
   }
+
+
 
 }

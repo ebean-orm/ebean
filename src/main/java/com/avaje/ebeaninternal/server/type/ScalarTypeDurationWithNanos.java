@@ -15,7 +15,7 @@ import java.sql.Types;
 import java.time.Duration;
 
 /**
- * ScalarType for java.time.Duration with Nanos precision.
+ * ScalarType for java.time.Duration (with Nanos precision).
  * <p>
  *  Stored in the DB as DECIMAL value.
  * </p>

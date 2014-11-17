@@ -25,7 +25,7 @@ public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase i
   /**
    * Return the IN values for DB constraint construction.
    */
-  public String getContraintInValues() {
+  public String getConstraintInValues() {
 
     StringBuilder sb = new StringBuilder();
 

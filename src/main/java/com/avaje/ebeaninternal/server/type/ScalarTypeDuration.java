@@ -15,7 +15,7 @@ import java.sql.Types;
 import java.time.Duration;
 
 /**
- * ScalarType for java.time.Duration
+ * ScalarType for java.time.Duration (with seconds precision).
  */
 public class ScalarTypeDuration extends ScalarTypeBase<Duration> {
 
@@ -80,7 +80,6 @@ public class ScalarTypeDuration extends ScalarTypeBase<Duration> {
       dataOutput.writeUTF(convertToBigDecimal(value).toString());
     }
   }
-
 
   @Override
   public String formatValue(Duration v) {

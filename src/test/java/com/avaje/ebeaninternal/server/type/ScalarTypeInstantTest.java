@@ -102,23 +102,16 @@ public class ScalarTypeInstantTest {
 
     Instant now = Instant.now();
 
-    StringWriter writer = new StringWriter();
-    JsonFactory factory = new JsonFactory();
-    JsonGenerator generator = factory.createGenerator(writer);
-    generator.writeStartObject();
-    type.jsonWrite(generator, "key", now);
-    generator.writeEndObject();
-    generator.flush();
+    JsonTester jsonTester = new JsonTester(type);
+    jsonTester.test(now);
 
-    JsonParser parser = factory.createParser(writer.toString());
-    JsonToken token = parser.nextToken();
-    assertEquals(JsonToken.START_OBJECT, token);
-    token = parser.nextToken();
-    assertEquals(JsonToken.FIELD_NAME, token);
-    token = parser.nextToken();
+    ScalarTypeInstant typeNanos = new ScalarTypeInstant(JsonConfig.DateTime.NANOS);
+    jsonTester = new JsonTester(typeNanos);
+    jsonTester.test(now);
 
-    Instant val1 = type.jsonRead(parser, token);
-    assertEquals(now, val1);
+    ScalarTypeInstant typeIso = new ScalarTypeInstant(JsonConfig.DateTime.ISO8601);
+    jsonTester = new JsonTester(typeIso);
+    jsonTester.test(now);
 
   }
 

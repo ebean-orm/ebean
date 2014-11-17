@@ -91,11 +91,9 @@ public class ScalarTypeUtilDate {
 
 
     @Override
-    public long convertToMillis(Object value) {
-      java.sql.Date date = BasicTypeConverter.toDate(value);
-      return date.getTime();
+    public long convertToMillis(java.util.Date value) {
+      return value.getTime();
     }
-
 
     @Override
     public Date convertFromDate(java.sql.Date ts) {

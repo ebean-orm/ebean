@@ -10,7 +10,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.OffsetDateTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -144,7 +144,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     this.extraTypeFactory = new DefaultTypeFactory(config);
 
     initialiseStandard(jsonDateTime, clobType, blobType, config.isUuidStoreAsBinary());
-    initialiseJavaTimeTypes(jsonDateTime);
+    initialiseJavaTimeTypes(jsonDateTime, config);
     initialiseJodaTypes(jsonDateTime);
 
     if (bootupClasses != null) {
@@ -599,12 +599,28 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return propParamTypes[1];
   }
 
-  protected void initialiseJavaTimeTypes(JsonConfig.DateTime mode) {
+  protected void initialiseJavaTimeTypes(JsonConfig.DateTime mode, ServerConfig config) {
     if (ClassUtil.isPresent("java.time.LocalDate", this.getClass())) {
       logger.debug("Registering java.time data types");
       typeMap.put(java.time.LocalDate.class, new ScalarTypeLocalDate());
       typeMap.put(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(mode));
       typeMap.put(OffsetDateTime.class, new ScalarTypeOffsetDateTime(mode));
+      typeMap.put(ZonedDateTime.class, new ScalarTypeZonedDateTime(mode));
+      typeMap.put(Instant.class, new ScalarTypeInstant(mode));
+
+      typeMap.put(DayOfWeek.class, new ScalarTypeDayOfWeek());
+      typeMap.put(Month.class, new ScalarTypeMonth());
+      typeMap.put(Year.class, new ScalarTypeYear());
+      typeMap.put(YearMonth.class, new ScalarTypeYearMonthDate());
+      typeMap.put(OffsetTime.class, new ScalarTypeOffsetTime());
+      typeMap.put(ZoneId.class, new ScalarTypeZoneId());
+      typeMap.put(ZoneOffset.class, new ScalarTypeZoneOffset());
+
+      boolean localTimeNanos = config.isLocalTimeWithNanos();
+      typeMap.put(java.time.LocalTime.class, (localTimeNanos)? new ScalarTypeLocalTimeWithNanos() : new ScalarTypeLocalTime());
+
+      boolean durationNanos = config.isDurationWithNanos();
+      typeMap.put(Duration.class, (durationNanos)? new ScalarTypeDurationWithNanos() : new ScalarTypeDuration());
     }
   }
 

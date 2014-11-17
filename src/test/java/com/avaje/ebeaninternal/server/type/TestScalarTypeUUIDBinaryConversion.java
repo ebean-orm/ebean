@@ -15,7 +15,7 @@ public class TestScalarTypeUUIDBinaryConversion {
     byte[] bytes = ScalarTypeUUIDBinary.convertToBytes(id);
     Assert.assertEquals(16, bytes.length);
     
-    UUID id2 = (UUID)ScalarTypeUUIDBinary.convertFromBytes(bytes);
+    UUID id2 = ScalarTypeUUIDBinary.convertFromBytes(bytes);
     Assert.assertEquals(id, id2);
   }
   

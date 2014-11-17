@@ -41,7 +41,7 @@ public class ScalarTypeEnumStandard {
     /**
      * Return the IN values for DB constraint construction.
      */
-    public String getContraintInValues() {
+    public String getConstraintInValues() {
 
       StringBuilder sb = new StringBuilder();
 
@@ -129,7 +129,7 @@ public class ScalarTypeEnumStandard {
     /**
      * Return the IN values for DB constraint construction.
      */
-    public String getContraintInValues() {
+    public String getConstraintInValues() {
 
       StringBuilder sb = new StringBuilder();
 

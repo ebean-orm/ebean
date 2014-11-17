@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 /**
@@ -34,7 +35,7 @@ public class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTim
 
   @Override
   protected String toJsonISO8601(LocalDateTime value) {
-    return value.toString();
+    return value.atZone(ZoneId.systemDefault()).toInstant().toString();
   }
 
   @Override

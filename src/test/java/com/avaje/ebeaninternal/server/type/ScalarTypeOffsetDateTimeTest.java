@@ -7,7 +7,6 @@ import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 public class ScalarTypeOffsetDateTimeTest {
 
@@ -25,7 +24,6 @@ public class ScalarTypeOffsetDateTimeTest {
     long toMillis = type.convertToMillis(OffsetDateTime.now());
 
     assertTrue(toMillis - now < 10);
-
   }
 
   @Test
@@ -58,5 +56,22 @@ public class ScalarTypeOffsetDateTimeTest {
     Timestamp timestamp1 = type.convertToTimestamp(localDateTime);
     assertEquals(timestamp, timestamp1);
 
+  }
+
+  @Test
+  public void testJson() throws Exception {
+
+    OffsetDateTime now = OffsetDateTime.now();
+
+    JsonTester jsonTester = new JsonTester(type);
+    jsonTester.test(now);
+
+    ScalarTypeOffsetDateTime typeNanos = new ScalarTypeOffsetDateTime(JsonConfig.DateTime.NANOS);
+    jsonTester = new JsonTester(typeNanos);
+    jsonTester.test(now);
+
+    ScalarTypeOffsetDateTime typeIso = new ScalarTypeOffsetDateTime(JsonConfig.DateTime.ISO8601);
+    jsonTester = new JsonTester(typeIso);
+    jsonTester.test(now);
   }
 }

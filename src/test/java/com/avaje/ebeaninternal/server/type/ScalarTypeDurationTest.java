@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.text.TextException;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -99,23 +100,9 @@ public class ScalarTypeDurationTest {
 
     Duration duration = Duration.ofSeconds(1234);
 
-    StringWriter writer = new StringWriter();
-    JsonFactory factory = new JsonFactory();
-    JsonGenerator generator = factory.createGenerator(writer);
-    generator.writeStartObject();
-    type.jsonWrite(generator, "key", duration);
-    generator.writeEndObject();
-    generator.flush();
+    JsonTester jsonTester = new JsonTester(type);
+    jsonTester.test(duration);
 
-    JsonParser parser = factory.createParser(writer.toString());
-    JsonToken token = parser.nextToken();
-    assertEquals(JsonToken.START_OBJECT, token);
-    token = parser.nextToken();
-    assertEquals(JsonToken.FIELD_NAME, token);
-    token = parser.nextToken();
-
-    Duration val1 = type.jsonRead(parser, token);
-    assertEquals(duration, val1);
   }
 
 }
