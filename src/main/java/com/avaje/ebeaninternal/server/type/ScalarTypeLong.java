@@ -55,8 +55,8 @@ public class ScalarTypeLong extends ScalarTypeBase<Long> {
   }
 
   @Override
-  public Long parseDateTime(long systemTimeMillis) {
-    return Long.valueOf(systemTimeMillis);
+  public Long convertFromMillis(long systemTimeMillis) {
+    return systemTimeMillis;
   }
 
   @Override
@@ -65,34 +65,32 @@ public class ScalarTypeLong extends ScalarTypeBase<Long> {
   }
 
   @Override
-  public Object readData(DataInput dataInput) throws IOException {
+  public Long readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      long val = dataInput.readLong();
-      return Long.valueOf(val);
+      return dataInput.readLong();
     }
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, Long value) throws IOException {
 
-    Long value = (Long) v;
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {
       dataOutput.writeBoolean(true);
-      dataOutput.writeLong(value.longValue());
+      dataOutput.writeLong(value);
     }
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public Long jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     return ctx.getLongValue();
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, Long value) throws IOException {
     ctx.writeNumberField(name, (Long) value);
   }
 }

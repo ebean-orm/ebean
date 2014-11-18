@@ -19,11 +19,7 @@ public class ConvertInetAddressTest {
     String uriAddr6 = ConvertInetAddresses.toUriString(addr6);
     Assert.assertEquals("["+ip6addr+"]", uriAddr6);
     Assert.assertEquals(ip6addr, addr6.getHostAddress());
-    
-    
   }
-  
-  
 
   @Test
   public void toUriString() {

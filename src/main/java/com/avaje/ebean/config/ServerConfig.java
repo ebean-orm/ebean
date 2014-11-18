@@ -121,6 +121,11 @@ public class ServerConfig {
    */
   private AutofetchConfig autofetchConfig = new AutofetchConfig();
 
+  /**
+   * The JSON format used for DateTime types. Default to millis.
+   */
+  private JsonConfig.DateTime jsonDateTime = JsonConfig.DateTime.MILLIS;
+
   /** 
    * The database platform name. Used to imply a DatabasePlatform to use.  
    */
@@ -217,7 +222,7 @@ public class ServerConfig {
    * Setting to indicate if UUID should be stored as binary(16) or varchar(40).
    */
   private boolean uuidStoreAsBinary;
-  
+
 
   private List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>();
   private List<BeanPersistListener<?>> persistListeners = new ArrayList<BeanPersistListener<?>>();
@@ -241,8 +246,12 @@ public class ServerConfig {
   private boolean collectQueryStatsByNode;
 
   private boolean collectQueryOrigins;
-  
+
   private JsonFactory jsonFactory;
+
+  private boolean localTimeWithNanos;
+
+  private boolean durationWithNanos;
 
   /**
    * Construct a Server Configuration for programmatically creating an
@@ -268,6 +277,20 @@ public class ServerConfig {
    */
   public void setJsonFactory(JsonFactory jsonFactory) {
     this.jsonFactory = jsonFactory;
+  }
+
+  /**
+   * Return the JSON format used for DateTime types.
+   */
+  public JsonConfig.DateTime getJsonDateTime() {
+    return jsonDateTime;
+  }
+
+  /**
+   * Set the JSON format to use for DateTime types.
+   */
+  public void setJsonDateTime(JsonConfig.DateTime jsonDateTime) {
+    this.jsonDateTime = jsonDateTime;
   }
 
   /**
@@ -860,6 +883,43 @@ public class ServerConfig {
   }
 
   /**
+   * Return true if LocalTime should be persisted with nanos precision.
+   */
+  public boolean isLocalTimeWithNanos() {
+    return localTimeWithNanos;
+  }
+
+  /**
+   * Set to true if LocalTime should be persisted with nanos precision.
+   * <p>
+   * Otherwise it is persisted using java.sql.Time which is seconds precision.
+   * </p>
+   */
+  public void setLocalTimeWithNanos(boolean localTimeWithNanos) {
+    this.localTimeWithNanos = localTimeWithNanos;
+  }
+
+  /**
+   * Return true if Duration should be persisted with nanos precision (SQL DECIMAL).
+   * <p>
+   * Otherwise it is persisted with second precision (SQL INTEGER).
+   * </p>
+   */
+  public boolean isDurationWithNanos() {
+    return durationWithNanos;
+  }
+
+  /**
+   * Set to true if Duration should be persisted with nanos precision (SQL DECIMAL).
+   * <p>
+   * Otherwise it is persisted with second precision (SQL INTEGER).
+   * </p>
+   */
+  public void setDurationWithNanos(boolean durationWithNanos) {
+    this.durationWithNanos = durationWithNanos;
+  }
+
+  /**
    * Set to true to run the DDL generation on startup.
    */
   public void setDdlGenerate(boolean ddlGenerate) {
@@ -1364,9 +1424,17 @@ public class ServerConfig {
     databaseBooleanFalse = p.get("databaseBooleanFalse", null);
     databasePlatformName = p.get("databasePlatformName", null);
     uuidStoreAsBinary = p.getBoolean("uuidStoreAsBinary", false);
+    localTimeWithNanos = p.getBoolean("localTimeWithNanos", false);
 
     lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", 1);
     queryBatchSize = p.getInt("queryBatchSize", DEFAULT_QUERY_BATCH_SIZE);
+
+    String jsonDateTimeFormat = p.get("jsonDateTime", null);
+    if (jsonDateTimeFormat != null) {
+      jsonDateTime = JsonConfig.DateTime.valueOf(jsonDateTimeFormat);
+    } else {
+      jsonDateTime = JsonConfig.DateTime.MILLIS;
+    }
 
     ddlGenerate = p.getBoolean("ddl.generate", false);
     ddlRun = p.getBoolean("ddl.run", false);

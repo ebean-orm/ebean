@@ -329,6 +329,37 @@ public abstract class Model {
     }
 
     /**
+     * Execute the query consuming each bean one at a time.
+     * <p>
+     * This is generally used to process large queries where unlike findList
+     * you do not want to hold all the results in memory at once but instead
+     * process them one at a time (requiring far less memory).
+     * </p>
+     * Equivalent to {@link Query#findEach(QueryEachConsumer)}
+     */
+    public void findEach(QueryEachConsumer<T> consumer) {
+      query().findEach(consumer);
+    }
+
+    /**
+     * Execute the query consuming each bean one at a time.
+     * <p>
+     * This is similar to #findEach except that you return boolean
+     * true to continue processing beans and return false to stop
+     * processing early.
+     * </p>
+     * <p>
+     * This is generally used to process large queries where unlike findList
+     * you do not want to hold all the results in memory at once but instead
+     * process them one at a time (requiring far less memory).
+     * </p>
+     * Equivalent to {@link Query#findEachWhile(QueryEachWhileConsumer)}
+     */
+    public void findEachWhile(QueryEachWhileConsumer<T> consumer) {
+      query().findEachWhile(consumer);
+    }
+
+    /**
      * Retrieves all entities of the given type.
      * <p>
      * The same as {@link #all()}

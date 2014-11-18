@@ -261,7 +261,7 @@ public class ScalarTypeBoolean {
       return Boolean.valueOf(value);
     }
 
-    public Boolean parseDateTime(long systemTimeMillis) {
+    public Boolean convertFromMillis(long systemTimeMillis) {
       throw new TextException("Not Supported");
     }
 
@@ -269,32 +269,30 @@ public class ScalarTypeBoolean {
       return false;
     }
 
-    public Object readData(DataInput dataInput) throws IOException {
+    public Boolean readData(DataInput dataInput) throws IOException {
       if (!dataInput.readBoolean()) {
         return null;
       } else {
-        boolean val = dataInput.readBoolean();
-        return Boolean.valueOf(val);
+        return dataInput.readBoolean();
       }
     }
 
-    public void writeData(DataOutput dataOutput, Object v) throws IOException {
+    public void writeData(DataOutput dataOutput, Boolean val) throws IOException {
 
-      Boolean val = (Boolean) v;
       if (val == null) {
         dataOutput.writeBoolean(false);
       } else {
         dataOutput.writeBoolean(true);
-        dataOutput.writeBoolean(val.booleanValue());
+        dataOutput.writeBoolean(val);
       }
     }
 
     @Override
-    public Object jsonRead(JsonParser ctx, JsonToken event) {
+    public Boolean jsonRead(JsonParser ctx, JsonToken event) {
       return JsonToken.VALUE_TRUE == event ? Boolean.TRUE : Boolean.FALSE;
     }
 
-    public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+    public void jsonWrite(JsonGenerator ctx, String name, Boolean value) throws IOException {
       ctx.writeBooleanField(name, (Boolean) value);
     }
   }

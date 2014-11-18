@@ -47,7 +47,7 @@ public class ScalarTypeUUIDBinary extends ScalarTypeBase<UUID> {
   }
 
   @Override
-  public UUID parseDateTime(long dateTime) {
+  public UUID convertFromMillis(long dateTime) {
     throw new IllegalStateException("Never called");
   }
 
@@ -124,33 +124,32 @@ public class ScalarTypeUUIDBinary extends ScalarTypeBase<UUID> {
   }
 
   @Override
-  public Object readData(DataInput dataInput) throws IOException {
+  public UUID readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      return dataInput.readUTF();
+      return parse(dataInput.readUTF());
     }
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, UUID value) throws IOException {
 
-    String value = (String) v;
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {
       dataOutput.writeBoolean(true);
-      dataOutput.writeUTF(format(v));
+      dataOutput.writeUTF(format(value));
     }
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public UUID jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     return UUID.fromString(ctx.getValueAsString());
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, UUID value) throws IOException {
     ctx.writeStringField(name, value.toString());
   }
 

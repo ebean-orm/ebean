@@ -1,14 +1,14 @@
-package com.avaje.ebeaninternal.server.reflect;
+package com.avaje.ebeaninternal.server.properties;
 
 
 /**
  * Creates BeanReflect object used to provide getter setter and construction
  * for the beans.
  */
-public interface BeanReflectFactory {
+public interface BeanPropertyInfoFactory {
 
 	/**
 	 * Create the BeanReflect for the given plain bean and its EntityBean equivalent.
 	 */
-	public BeanReflect create(Class<?> entityBeanType);
+	public BeanPropertyInfo create(Class<?> entityBeanType);
 }

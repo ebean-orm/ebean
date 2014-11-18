@@ -1,11 +1,11 @@
-package com.avaje.ebeaninternal.server.reflect;
+package com.avaje.ebeaninternal.server.properties;
 
 import com.avaje.ebean.bean.EntityBean;
 
 /**
  * The setter for a given bean property.
  */
-public interface BeanReflectSetter {
+public interface BeanPropertySetter {
 
 	/**
 	 * Set the property value of a bean.

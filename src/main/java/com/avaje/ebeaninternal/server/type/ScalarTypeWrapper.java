@@ -57,16 +57,16 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
 
   @Override
   @SuppressWarnings("unchecked")
-  public Object readData(DataInput dataInput) throws IOException {
-    Object v = scalarType.readData(dataInput);
-    return converter.wrapValue((S) v);
+  public B readData(DataInput dataInput) throws IOException {
+    S unwrapValue = scalarType.readData(dataInput);
+    return converter.wrapValue(unwrapValue);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
-    S sv = converter.unwrapValue((B) v);
-    scalarType.writeData(dataOutput, sv);
+  public void writeData(DataOutput dataOutput, B value) throws IOException {
+    S unwrapValue = converter.unwrapValue(value);
+    scalarType.writeData(dataOutput, unwrapValue);
   }
 
   @Override
@@ -126,8 +126,8 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public B parseDateTime(long systemTimeMillis) {
-    S sv = scalarType.parseDateTime(systemTimeMillis);
+  public B convertFromMillis(long systemTimeMillis) {
+    S sv = scalarType.convertFromMillis(systemTimeMillis);
     if (sv == null) {
       return nullValue;
     }
@@ -185,17 +185,15 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
     return this;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-    Object object = scalarType.jsonRead(ctx, event);
-    return converter.wrapValue((S) object);
+  public B jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+    S object = scalarType.jsonRead(ctx, event);
+    return converter.wrapValue(object);
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object beanValue) throws IOException {
-    @SuppressWarnings("unchecked")
-    S unwrapValue = converter.unwrapValue((B) beanValue);
+  public void jsonWrite(JsonGenerator ctx, String name, B beanValue) throws IOException {
+    S unwrapValue = converter.unwrapValue(beanValue);
     scalarType.jsonWrite(ctx, name, unwrapValue);
   }
 

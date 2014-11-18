@@ -102,9 +102,25 @@ public interface ExpressionList<T> extends Serializable {
   public QueryIterator<T> findIterate();
 
   /**
-   * Execute the query visiting the results.
-   * 
-   * @see Query#findVisit(QueryResultVisitor)
+   * Execute the query process the beans one at a time.
+   *
+   * @see Query#findEach(QueryEachConsumer)
+   */
+  public void findEach(QueryEachConsumer<T> consumer);
+
+  /**
+   * Execute the query processing the beans one at a time with the ability to
+   * stop processing before reading all the beans.
+   *
+   * @see Query#findEachWhile(QueryEachWhileConsumer)
+   */
+  public void findEachWhile(QueryEachWhileConsumer<T> consumer);
+
+  /**
+   * Deprecated in favor of #findEachWhile which is functionally exactly the same
+   * but has a much better name.
+   *
+   * @deprecated
    */
   public void findVisit(QueryResultVisitor<T> visitor);
 

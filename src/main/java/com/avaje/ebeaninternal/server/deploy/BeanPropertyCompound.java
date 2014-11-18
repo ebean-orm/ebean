@@ -89,19 +89,6 @@ public class BeanPropertyCompound extends BeanProperty {
         }
     }
 
-    /**
-     * Get the underlying compound type.
-     */
-    @SuppressWarnings("unchecked")
-    public Object getValueUnderlying(EntityBean bean) {
-
-        Object value =  getValue(bean);
-        if (typeConverter != null){
-            value = typeConverter.unwrapValue(value);
-        }
-        return value;
-    }
- 
     public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
 
         if (chain == null) {

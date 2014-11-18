@@ -72,15 +72,15 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, LocalTime value) throws IOException {
     ctx.writeStringField(name, value.toString());
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public LocalTime jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     if (JsonToken.VALUE_NUMBER_INT == event) {
       long millis = ctx.getLongValue();
-      return parseDateTime(millis);
+      return convertFromMillis(millis);
     } else {
       String string = ctx.getValueAsString();
       throw new RuntimeException("convert " + string);
@@ -88,7 +88,7 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
   }
 
   @Override
-  public LocalTime parseDateTime(long systemTimeMillis) {
+  public LocalTime convertFromMillis(long systemTimeMillis) {
     return new LocalTime(systemTimeMillis);
   }
 
@@ -98,7 +98,7 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
   }
 
   @Override
-  public Object readData(DataInput dataInput) throws IOException {
+  public LocalTime readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
@@ -108,9 +108,8 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, LocalTime value) throws IOException {
 
-    Time value = (Time) v;
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

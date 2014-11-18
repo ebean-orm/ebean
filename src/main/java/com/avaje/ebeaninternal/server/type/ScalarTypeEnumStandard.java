@@ -41,7 +41,7 @@ public class ScalarTypeEnumStandard {
     /**
      * Return the IN values for DB constraint construction.
      */
-    public String getContraintInValues() {
+    public String getConstraintInValues() {
 
       StringBuilder sb = new StringBuilder();
 
@@ -101,7 +101,7 @@ public class ScalarTypeEnumStandard {
       if (beanValue == null) {
         return null;
       }
-      return ((Enum<?>) beanValue).toString();
+      return beanValue.toString();
     }
 
     public Object toBeanType(Object dbValue) {
@@ -129,7 +129,7 @@ public class ScalarTypeEnumStandard {
     /**
      * Return the IN values for DB constraint construction.
      */
-    public String getContraintInValues() {
+    public String getConstraintInValues() {
 
       StringBuilder sb = new StringBuilder();
 
@@ -186,7 +186,7 @@ public class ScalarTypeEnumStandard {
         return dbValue;
       }
 
-      int ordinal = ((Integer) dbValue).intValue();
+      int ordinal = (Integer) dbValue;
       if (ordinal < 0 || ordinal >= enumArray.length) {
         String m = "Unexpected ordinal [" + ordinal + "] out of range [" + enumArray.length + "]";
         throw new IllegalStateException(m);
@@ -222,7 +222,7 @@ public class ScalarTypeEnumStandard {
     }
 
     @Override
-    public Object parseDateTime(long systemTimeMillis) {
+    public Object convertFromMillis(long systemTimeMillis) {
       throw new TextException("Not Supported");
     }
 

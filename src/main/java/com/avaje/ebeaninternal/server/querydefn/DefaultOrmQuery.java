@@ -8,22 +8,8 @@ import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Expression;
-import com.avaje.ebean.ExpressionFactory;
-import com.avaje.ebean.ExpressionList;
-import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.FutureIds;
-import com.avaje.ebean.FutureList;
-import com.avaje.ebean.FutureRowCount;
-import com.avaje.ebean.OrderBy;
+import com.avaje.ebean.*;
 import com.avaje.ebean.OrderBy.Property;
-import com.avaje.ebean.PagedList;
-import com.avaje.ebean.PagingList;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.QueryResultVisitor;
-import com.avaje.ebean.RawSql;
 import com.avaje.ebean.bean.BeanCollectionTouched;
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.EntityBean;
@@ -909,6 +895,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public void findVisit(QueryResultVisitor<T> visitor) {
     server.findVisit(this, visitor, null);
+  }
+
+  @Override
+  public void findEachWhile(QueryEachWhileConsumer<T> consumer) {
+    server.findEachWhile(this, consumer, null);
+  }
+
+  @Override
+  public void findEach(QueryEachConsumer<T> consumer) {
+    server.findEach(this, consumer, null);
   }
 
   public QueryIterator<T> findIterate() {

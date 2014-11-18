@@ -45,12 +45,12 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, byte[] value) throws IOException {
     ctx.writeBinaryField(name, (byte[]) value);
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public byte[] jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream(500);
     ctx.readBinaryValue(out);
     return out.toByteArray();
@@ -64,7 +64,7 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
     throw new TextException("Not supported");
   }
 
-  public byte[] parseDateTime(long systemTimeMillis) {
+  public byte[] convertFromMillis(long systemTimeMillis) {
     throw new TextException("Not supported");
   }
 
@@ -72,7 +72,7 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
     return false;
   }
 
-  public Object readData(DataInput dataInput) throws IOException {
+  public byte[] readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
@@ -83,10 +83,11 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
     }
   }
 
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, byte[] v) throws IOException {
     if (v == null) {
       dataOutput.writeBoolean(false);
     } else {
+      dataOutput.writeBoolean(true);
       byte[] bytes = convertToBytes(v);
       dataOutput.writeInt(bytes.length);
       dataOutput.write(bytes);

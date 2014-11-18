@@ -265,14 +265,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         }
     }
 
-    @Override
-    public boolean isValueLoaded(Object value) {
-        if (value instanceof EntityBean) {
-            return ((EntityBean) value)._ebean_getIntercept().isLoaded();
-        }
-        return true;
-    }
-
     /**
      * Return meta data for the deployment of the embedded bean specific to this
      * property.

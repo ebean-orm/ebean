@@ -20,8 +20,8 @@ public class ScalarTypeJodaDateMidnight extends ScalarTypeBaseDate<DateMidnight>
   }
 
   @Override
-  public long convertToMillis(Object value) {
-    return ((DateMidnight) value).getMillis();
+  public long convertToMillis(DateMidnight value) {
+    return value.getMillis();
   }
 
   @Override

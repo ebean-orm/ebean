@@ -55,7 +55,7 @@ public class ScalarTypeString extends ScalarTypeBase<String> {
   }
 
   @Override
-  public String parseDateTime(long systemTimeMillis) {
+  public String convertFromMillis(long systemTimeMillis) {
     return String.valueOf(systemTimeMillis);
   }
 
@@ -65,7 +65,7 @@ public class ScalarTypeString extends ScalarTypeBase<String> {
   }
 
   @Override
-  public Object readData(DataInput dataInput) throws IOException {
+  public String readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
@@ -74,9 +74,8 @@ public class ScalarTypeString extends ScalarTypeBase<String> {
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, String value) throws IOException {
 
-    String value = (String) v;
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {
@@ -86,12 +85,12 @@ public class ScalarTypeString extends ScalarTypeBase<String> {
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public String jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     return ctx.getValueAsString();
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, String value) throws IOException {
     ctx.writeStringField(name, (String) value);
   }
 }

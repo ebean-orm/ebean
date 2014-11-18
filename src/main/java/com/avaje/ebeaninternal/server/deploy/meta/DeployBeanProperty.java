@@ -20,8 +20,8 @@ import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
-import com.avaje.ebeaninternal.server.reflect.BeanReflectGetter;
-import com.avaje.ebeaninternal.server.reflect.BeanReflectSetter;
+import com.avaje.ebeaninternal.server.properties.BeanPropertyGetter;
+import com.avaje.ebeaninternal.server.properties.BeanPropertySetter;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.ScalarTypeEnum;
 import com.avaje.ebeaninternal.server.type.ScalarTypeWrapper;
@@ -202,9 +202,9 @@ public class DeployBeanProperty {
 
     private int propertyIndex;
     
-    private BeanReflectGetter getter;
+    private BeanPropertyGetter getter;
 
-    private BeanReflectSetter setter;
+    private BeanPropertySetter setter;
 
     /**
      * Generator for insert or update timestamp etc.
@@ -414,7 +414,7 @@ public class DeployBeanProperty {
             ScalarTypeEnum etype = (ScalarTypeEnum) scalarType;
 
             // check dbColName IN ('A', 'I', 'D')
-            return "check (" + dbColumn + " in " + etype.getContraintInValues() + ")";
+            return "check (" + dbColumn + " in " + etype.getConstraintInValues() + ")";
         }
         return null;
     }
@@ -439,11 +439,11 @@ public class DeployBeanProperty {
       this.propertyIndex = propertyIndex;
     }
 
-    public BeanReflectGetter getGetter() {
+    public BeanPropertyGetter getGetter() {
         return getter;
     }
 
-    public BeanReflectSetter getSetter() {
+    public BeanPropertySetter getSetter() {
         return setter;
     }
 
@@ -482,14 +482,14 @@ public class DeployBeanProperty {
     /**
      * Set the getter used to read the property value from a bean.
      */
-    public void setGetter(BeanReflectGetter getter) {
+    public void setGetter(BeanPropertyGetter getter) {
         this.getter = getter;
     }
 
     /**
      * Set the setter used to set the property value to a bean.
      */
-    public void setSetter(BeanReflectSetter setter) {
+    public void setSetter(BeanPropertySetter setter) {
         this.setter = setter;
     }
 

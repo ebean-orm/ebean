@@ -3,7 +3,9 @@ package com.avaje.ebeaninternal.server.type;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.OffsetDateTime;
 
+import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 
 /**
@@ -11,13 +13,28 @@ import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
  */
 public class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
 
-  public ScalarTypeTimestamp() {
-    super(Timestamp.class, true, Types.TIMESTAMP);
+  public ScalarTypeTimestamp(JsonConfig.DateTime mode) {
+    super(mode, Timestamp.class, true, Types.TIMESTAMP);
   }
 
   @Override
-  public long convertToMillis(Object value) {
-    return ((Timestamp) value).getTime();
+  protected String toJsonNanos(Timestamp value) {
+    return String.valueOf(value.getTime());
+  }
+
+  @Override
+  protected String toJsonISO8601(Timestamp value) {
+    return dateTimeParser.format(value);
+  }
+
+  @Override
+  public long convertToMillis(Timestamp value) {
+    return value.getTime();
+  }
+
+  @Override
+  public Timestamp convertFromMillis(long systemTimeMillis) {
+    return new Timestamp(systemTimeMillis);
   }
 
   @Override
@@ -29,6 +46,8 @@ public class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
   public Timestamp convertToTimestamp(Timestamp t) {
     return t;
   }
+
+
 
   @Override
   public void bind(DataBind b, Timestamp value) throws SQLException {

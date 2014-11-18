@@ -27,8 +27,8 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
-import com.avaje.ebeaninternal.server.reflect.BeanReflectGetter;
-import com.avaje.ebeaninternal.server.reflect.BeanReflectSetter;
+import com.avaje.ebeaninternal.server.properties.BeanPropertyGetter;
+import com.avaje.ebeaninternal.server.properties.BeanPropertySetter;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
@@ -40,29 +40,6 @@ import com.fasterxml.jackson.core.JsonToken;
  * as database column mapping information.
  */
 public class BeanProperty implements ElPropertyValue {
-
-    /**
-     * Advanced bean deployment. To exclude this property from update where
-     * clause.
-     */
-    public static final String EXCLUDE_FROM_UPDATE_WHERE = "EXCLUDE_FROM_UPDATE_WHERE";
-
-    /**
-     * Advanced bean deployment. To exclude this property from delete where
-     * clause.
-     */
-    public static final String EXCLUDE_FROM_DELETE_WHERE = "EXCLUDE_FROM_DELETE_WHERE";
-
-    /**
-     * Advanced bean deployment. To exclude this property from insert.
-     */
-    public static final String EXCLUDE_FROM_INSERT = "EXCLUDE_FROM_INSERT";
-
-    /**
-     * Advanced bean deployment. To exclude this property from update set
-     * clause.
-     */
-    public static final String EXCLUDE_FROM_UPDATE = "EXCLUDE_FROM_UPDATE";
 
     /**
      * Flag to mark this at part of the unique id.
@@ -219,9 +196,9 @@ public class BeanProperty implements ElPropertyValue {
      */
     final GeneratedProperty generatedProperty;
 
-    final BeanReflectGetter getter;
+    final BeanPropertyGetter getter;
 
-    final BeanReflectSetter setter;
+    final BeanPropertySetter setter;
 
     final BeanDescriptor<?> descriptor;
 
@@ -488,15 +465,7 @@ public class BeanProperty implements ElPropertyValue {
      * Return true if the underlying type is mutable.
      */
     public boolean isMutableScalarType() {
-        if (scalarType == null) {
-            return false;
-        }
-        return scalarType.isMutable();
-    }
-
-    public void copyProperty(EntityBean sourceBean, EntityBean destBean) {
-        Object value = getValue(sourceBean);
-        setValue(destBean, value);
+      return scalarType != null && scalarType.isMutable();
     }
 
     /**
@@ -504,10 +473,6 @@ public class BeanProperty implements ElPropertyValue {
      */
     public EncryptKey getEncryptKey() {
         return descriptor.getEncryptKey(this);
-    }
-
-    public String getDecryptProperty() {
-        return dbEncryptFunction.getDecryptSql(this.getName());
     }
 
     public String getDecryptProperty(String propertyName) {
@@ -575,24 +540,6 @@ public class BeanProperty implements ElPropertyValue {
         return owningType.isAssignableFrom(type);
     }
 
-    public Object readSetOwning(DbReadContext ctx, EntityBean bean, Class<?> type) throws SQLException {
-
-        try {
-            Object value = scalarType.read(ctx.getDataReader());
-            if (value == null || bean == null) {
-                // not setting the value...
-            } else {
-                if (owningType.equals(type)) {
-                    setValue(bean, value);
-                }
-            }
-            return value;
-        } catch (Exception e) {
-            String msg = "Error readSet on " + descriptor + "." + name;
-            throw new PersistenceException(msg, e);
-        }
-    }
-
     public void loadIgnore(DbReadContext ctx) {
         scalarType.loadIgnore(ctx.getDataReader());
     }
@@ -616,16 +563,13 @@ public class BeanProperty implements ElPropertyValue {
     public Object readSet(DbReadContext ctx, EntityBean bean, Class<?> type) throws SQLException {
 
         try {
-            Object value = scalarType.read(ctx.getDataReader());
-            if (bean == null || (type != null && !owningType.isAssignableFrom(type))) {
-                // not setting the value...
-            } else {
-                setValue(bean, value);
-            }
-            return value;
+          Object value = scalarType.read(ctx.getDataReader());
+          if (bean != null && ((type == null || owningType.isAssignableFrom(type)))) {
+              setValue(bean, value);
+          }
+          return value;
         } catch (Exception e) {
-            String msg = "Error readSet on " + descriptor + "." + name;
-            throw new PersistenceException(msg, e);
+            throw new PersistenceException("Error readSet on " + descriptor + "." + name, e);
         }
     }
 
@@ -651,21 +595,6 @@ public class BeanProperty implements ElPropertyValue {
 
     public Object readData(DataInput dataInput) throws IOException {
         return scalarType.readData(dataInput);
-    }
-
-    public boolean isCascadeValidate() {
-        return cascadeValidate;
-    }
-
-    /**
-     * Checks to see if a bean is a reference (will be lazy loaded) or a
-     * BeanCollection that has not yet been populated.
-     * <p>
-     * For base types this returns true.
-     * </p>
-     */
-    public boolean isValueLoaded(Object value) {
-        return true;
     }
 
     public BeanProperty getBeanProperty() {
@@ -737,8 +666,6 @@ public class BeanProperty implements ElPropertyValue {
         }
     }
 
-    private static Object[] NO_ARGS = new Object[0];
-
     public Object getCacheDataValue(EntityBean bean) {
         return getValue(bean);
     }
@@ -746,26 +673,20 @@ public class BeanProperty implements ElPropertyValue {
     public void setCacheDataValue(EntityBean bean, Object cacheData) {
         setValue(bean, cacheData);
     }
-    
+
+    /**
+     * Get the property value from a compound value type.
+     */
+    public Object getValueObject(Object bean) {
+      throw new RuntimeException("Expected to be called only on BeanPropertyCompoundScalar");
+    }
+
     /**
      * Return the value of the property method.
      */
     public Object getValue(EntityBean bean) {
         try {
             return getter.get(bean);
-        } catch (Exception ex) {
-            String beanType = bean == null ? "null" : bean.getClass().getName();
-            String msg = "get " + name + " on [" + descriptor + "] type[" + beanType + "] threw error.";
-            throw new RuntimeException(msg, ex);
-        }
-    }
-    
-    /**
-     * Explicitly use reflection to get value.
-     */
-    public Object getValueViaReflection(Object bean) {
-    	try {
-            return readMethod.invoke(bean, NO_ARGS);
         } catch (Exception ex) {
             String beanType = bean == null ? "null" : bean.getClass().getName();
             String msg = "get " + name + " on [" + descriptor + "] type[" + beanType + "] threw error.";
@@ -824,13 +745,6 @@ public class BeanProperty implements ElPropertyValue {
 
     public String getElName() {
         return name;
-    }
-
-    /**
-     * This is a full ElGetValue.
-     */
-    public boolean isDeployOnly() {
-        return false;
     }
 
     @Override
@@ -902,7 +816,7 @@ public class BeanProperty implements ElPropertyValue {
     /**
      * Return the scalarType.
      */
-    public ScalarType<?> getScalarType() {
+    public ScalarType<Object> getScalarType() {
         return scalarType;
     }
 
@@ -923,7 +837,7 @@ public class BeanProperty implements ElPropertyValue {
     }
 
     public Object parseDateTime(long systemTimeMillis) {
-        return scalarType.parseDateTime(systemTimeMillis);
+        return scalarType.convertFromMillis(systemTimeMillis);
     }
 
     /**
@@ -1029,10 +943,6 @@ public class BeanProperty implements ElPropertyValue {
      */
     public boolean isVersion() {
         return version;
-    }
-
-    public String getDeployProperty() {
-        return dbColumn;
     }
 
     /**
@@ -1166,13 +1076,6 @@ public class BeanProperty implements ElPropertyValue {
      */
     public boolean isEmbedded() {
         return embedded;
-    }
-
-    /**
-     * Return an extra attribute set on this property.
-     */
-    public String getExtraAttribute(String key) {
-        return extraAttributeMap.get(key);
     }
 
     /**

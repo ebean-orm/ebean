@@ -3,9 +3,11 @@ package com.avaje.ebeaninternal.server.type;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.time.Instant;
 
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -61,7 +63,7 @@ public class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
   }
 
   @Override
-  public BigInteger parseDateTime(long systemTimeMillis) {
+  public BigInteger convertFromMillis(long systemTimeMillis) {
     return BigInteger.valueOf(systemTimeMillis);
   }
 
@@ -71,19 +73,18 @@ public class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
   }
 
   @Override
-  public Object readData(DataInput dataInput) throws IOException {
+  public BigInteger readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
       long val = dataInput.readLong();
-      return Long.valueOf(val);
+      return BigInteger.valueOf(val);
     }
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, BigInteger value) throws IOException {
 
-    Long value = (Long) v;
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {
@@ -93,12 +94,12 @@ public class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public BigInteger jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     return ctx.getDecimalValue().toBigInteger();
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, BigInteger value) throws IOException {
     ctx.writeNumberField(name, ((BigInteger) value).longValue());
   }
 

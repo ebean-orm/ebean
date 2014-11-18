@@ -8,6 +8,6 @@ public interface ScalarTypeEnum {
 	/**
 	 * Return the IN values for DB constraint construction.
 	 */
-	public String getContraintInValues();
+	public String getConstraintInValues();
 	
 }

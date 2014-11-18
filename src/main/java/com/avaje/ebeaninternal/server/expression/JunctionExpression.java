@@ -218,6 +218,16 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     return exprList.findIds();
   }
 
+  @Override
+  public void findEach(QueryEachConsumer<T> consumer) {
+    exprList.findEach(consumer);
+  }
+
+  @Override
+  public void findEachWhile(QueryEachWhileConsumer<T> consumer) {
+    exprList.findEachWhile(consumer);
+  }
+
   public void findVisit(QueryResultVisitor<T> visitor) {
     exprList.findVisit(visitor);
   }

@@ -17,36 +17,10 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avaje.ebean.AdminAutofetch;
-import com.avaje.ebean.BackgroundExecutor;
-import com.avaje.ebean.BeanState;
-import com.avaje.ebean.CallableSql;
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.ExpressionFactory;
-import com.avaje.ebean.Filter;
-import com.avaje.ebean.FutureIds;
-import com.avaje.ebean.FutureList;
-import com.avaje.ebean.FutureRowCount;
-import com.avaje.ebean.PagedList;
-import com.avaje.ebean.PagingList;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.QueryResultVisitor;
-import com.avaje.ebean.SqlFutureList;
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlRow;
-import com.avaje.ebean.SqlUpdate;
-import com.avaje.ebean.Transaction;
-import com.avaje.ebean.TxCallable;
-import com.avaje.ebean.TxIsolation;
-import com.avaje.ebean.TxRunnable;
-import com.avaje.ebean.TxScope;
-import com.avaje.ebean.TxType;
-import com.avaje.ebean.Update;
-import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.EntityBean;
@@ -273,17 +247,14 @@ public final class DefaultServer implements SpiEbeanServer {
     
     List<SpiEbeanPlugin> spiPlugins = new ArrayList<SpiEbeanPlugin>();
 
-    final Iterator<SpiEbeanPlugin> plugins = ServiceLoader.load(SpiEbeanPlugin.class).iterator();
-
-    while (plugins.hasNext()) {
-      SpiEbeanPlugin plugin = plugins.next();
+    for (SpiEbeanPlugin plugin : ServiceLoader.load(SpiEbeanPlugin.class)) {
       spiPlugins.add(plugin);
       plugin.setup(this, this.getDatabasePlatform(), config.getServerConfig());
 
       if (plugin instanceof DdlGenerator) {
         // backwards compatible
-        ddlGenerator = (DdlGenerator)plugin;
-      } 
+        ddlGenerator = (DdlGenerator) plugin;
+      }
     }
     
     if (ddlGenerator == null) {
@@ -1413,12 +1384,27 @@ public final class DefaultServer implements SpiEbeanServer {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
 
-    try {
-      request.initTransIfRequired();
-      request.findVisit(visitor);
-    } finally {
-      // do nothing - findVisit garuntee's cleanup of the transaction if required
-    }
+    request.initTransIfRequired();
+    request.findVisit(visitor);
+    // no try finally - findVisit guarantee's cleanup of the transaction if required
+  }
+
+  public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction t) {
+
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
+
+    request.initTransIfRequired();
+    request.findEach(consumer);
+    // no try finally - findVisit guarantee's cleanup of the transaction if required
+  }
+
+  public <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer, Transaction t) {
+
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
+
+    request.initTransIfRequired();
+    request.findEachWhile(consumer);
+    // no try finally - findVisit guarantee's cleanup of the transaction if required
   }
 
   public <T> QueryIterator<T> findIterate(Query<T> query, Transaction t) {
@@ -1542,7 +1528,7 @@ public final class DefaultServer implements SpiEbeanServer {
   
   @Override
   public void markAsDirty(Object bean) {
-    if (bean instanceof EntityBean == false) {
+    if (!(bean instanceof EntityBean)) {
       throw new IllegalArgumentException("This bean is not an EntityBean?");
     }
     // mark the bean as dirty (so that an update will not get skipped)
@@ -1650,7 +1636,7 @@ public final class DefaultServer implements SpiEbeanServer {
     if (bean == null) {
       throw new IllegalArgumentException(Message.msg("bean.isnull"));
     }
-    if (bean instanceof EntityBean == false) {
+    if (!(bean instanceof EntityBean)) {
       throw new IllegalArgumentException("Was expecting an EntityBean but got a "+bean.getClass());
     }
     return (EntityBean)bean;
@@ -1959,10 +1945,7 @@ public final class DefaultServer implements SpiEbeanServer {
   public boolean isSupportedType(java.lang.reflect.Type genericType) {
 
     TypeInfo typeInfo = ParamTypeHelper.getTypeInfo(genericType);
-    if (typeInfo == null) {
-      return false;
-    }
-    return getBeanDescriptor(typeInfo.getBeanType()) != null;
+    return typeInfo != null && getBeanDescriptor(typeInfo.getBeanType()) != null;
   }
 
   public Object getBeanId(Object bean) {

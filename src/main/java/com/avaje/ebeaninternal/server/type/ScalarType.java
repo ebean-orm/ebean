@@ -163,18 +163,10 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
 	public T parse(String value);
 
 	/**
-	 * Convert the systemTimeMillis into the appropriate java object.
-	 * <p>
-	 * For non dateTime types this will throw an exception.
-	 * </p>
-	 */
-	public T parseDateTime(long dateTime);
-
-	/**
 	 * Return true if the type can accept long systemTimeMillis input.
 	 * <p>
 	 * This is used to determine if is is sensible to use the
-	 * {@link #parseDateTime(long)} method.
+	 * {@link #convertFromMillis(long)} method.
 	 * </p>
 	 * <p>
 	 * This includes the Date, Calendar, sql Date, Time, Timestamp, JODA types
@@ -184,24 +176,32 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
 	 */
 	public boolean isDateTimeCapable();
 
-	/**
+  /**
+   * Convert the systemTimeMillis into the appropriate java object.
+   * <p>
+   * For non dateTime types this will throw an exception.
+   * </p>
+   */
+  public T convertFromMillis(long dateTime);
+
+  /**
 	 * Read the value from binary input.
 	 */
-  public Object readData(DataInput dataInput) throws IOException;
+  public T readData(DataInput dataInput) throws IOException;
 
   /**
    * Write the value to binary output.
    */
-  public void writeData(DataOutput dataOutput, Object v) throws IOException;
+  public void writeData(DataOutput dataOutput, T v) throws IOException;
 
   /**
    * Read the value from JsonParser.
    */
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException;
+  public T jsonRead(JsonParser ctx, JsonToken event) throws IOException;
 
   /**
    * Write the value to the JsonGenerator.
    */
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException;
+  public void jsonWrite(JsonGenerator ctx, String name, T value) throws IOException;
     
 }

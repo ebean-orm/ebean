@@ -67,12 +67,12 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, byte[] value) throws IOException {
     ctx.writeBinaryField(name, (byte[]) value);
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public byte[] jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream(500);
     ctx.readBinaryValue(out);
     return out.toByteArray();
@@ -90,8 +90,8 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
     return baseType.parse(value);
   }
 
-  public byte[] parseDateTime(long systemTimeMillis) {
-    return baseType.parseDateTime(systemTimeMillis);
+  public byte[] convertFromMillis(long systemTimeMillis) {
+    return baseType.convertFromMillis(systemTimeMillis);
   }
 
   public byte[] read(DataReader dataReader) throws SQLException {
@@ -113,17 +113,26 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
     baseType.accumulateScalarTypes(propName, list);
   }
 
-  public Object readData(DataInput dataInput) throws IOException {
-    int len = dataInput.readInt();
-    byte[] value = new byte[len];
-    dataInput.readFully(value);
-    return value;
+  public byte[] readData(DataInput dataInput) throws IOException {
+    if (!dataInput.readBoolean()) {
+      return null;
+    } else {
+      int len = dataInput.readInt();
+      byte[] value = new byte[len];
+      dataInput.readFully(value);
+      return value;
+    }
   }
 
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
-    byte[] value = (byte[]) v;
-    dataOutput.writeInt(value.length);
-    dataOutput.write(value);
+  public void writeData(DataOutput dataOutput, byte[] value) throws IOException {
+
+    if (value == null) {
+      dataOutput.writeBoolean(false);
+    } else {
+      dataOutput.writeBoolean(true);
+      dataOutput.writeInt(value.length);
+      dataOutput.write(value);
+    }
   }
 
 }

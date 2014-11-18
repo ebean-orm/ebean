@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import com.avaje.ebeaninternal.server.reflect.BeanReflectSetter;
+import com.avaje.ebeaninternal.server.properties.BeanPropertySetter;
 import com.avaje.ebeaninternal.server.type.CtCompoundProperty;
 
 /**
@@ -22,7 +22,7 @@ import com.avaje.ebeaninternal.server.type.CtCompoundProperty;
  */
 public class BeanPropertyCompoundRoot {
 
-    private final BeanReflectSetter setter;
+    private final BeanPropertySetter setter;
 
     /**
      * The method used to write the property.

@@ -1,39 +1,69 @@
 package com.avaje.ebeaninternal.server.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
-
+import com.avaje.ebean.config.JsonConfig;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.time.Instant;
 
 /**
  * Base type for DateTime types.
  */
 public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
 
-  protected DateTimeJsonParser dateTimeParser = new DateTimeJsonParser();
-  
-  public ScalarTypeBaseDateTime(Class<T> type, boolean jdbcNative, int jdbcType) {
+
+  protected final DateTimeJsonParser dateTimeParser = new DateTimeJsonParser();
+
+  protected final JsonConfig.DateTime mode;
+
+  public ScalarTypeBaseDateTime(JsonConfig.DateTime mode, Class<T> type, boolean jdbcNative, int jdbcType) {
     super(type, jdbcNative, jdbcType);
+    this.mode = mode;
   }
 
-  public abstract long convertToMillis(Object value);
-
+  /**
+   * Convert the value to a Timestamp.
+   */
   public abstract Timestamp convertToTimestamp(T t);
 
+  /**
+   * Convert to the value from a Timestamp.
+   */
   public abstract T convertFromTimestamp(Timestamp ts);
+
+  /**
+   * Convert from epoch millis to the value.
+   */
+  public abstract T convertFromMillis(long systemTimeMillis);
+
+  /**
+   * Convert from the value to epoch millis.
+   */
+  public abstract long convertToMillis(T value);
+
+  /**
+   * Convert the value to time with nanos format.
+   */
+  protected abstract String toJsonNanos(T value);
+
+  /**
+   * Convert the value to ISO8601 format.
+   */
+  protected abstract String toJsonISO8601(T value);
 
   public void bind(DataBind b, T value) throws SQLException {
     if (value == null) {
       b.setNull(Types.TIMESTAMP);
     } else {
-      Timestamp ts = convertToTimestamp(value);
-      b.setTimestamp(ts);
+      b.setTimestamp(convertToTimestamp(value));
     }
   }
 
@@ -47,23 +77,50 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
     }
   }
 
+  /**
+   * Helper method that given epoch seconds and nanos return a JSON nanos formatted string.
+   */
+  protected String toJsonNanos(long epochSecs, int nanos) {
+    return DecimalUtils.toDecimal(epochSecs, nanos);
+  }
+
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public T jsonRead(JsonParser ctx, JsonToken event) throws IOException {
 
-    if (JsonToken.VALUE_NUMBER_INT == event) {
-      long millis = ctx.getLongValue();
-      return parseDateTime(millis);
-
-    } else {
-      String jsonDateTime = ctx.getText();
-      return convertFromTimestamp(dateTimeParser.parse(jsonDateTime));
+    switch (event) {
+      case VALUE_NUMBER_INT: {
+        return convertFromMillis(ctx.getLongValue());
+      }
+      case VALUE_NUMBER_FLOAT: {
+        BigDecimal value = ctx.getDecimalValue();
+        Timestamp timestamp = DecimalUtils.toTimestamp(value);
+        return convertFromTimestamp(timestamp);
+      }
+      default: {
+        String jsonDateTime = ctx.getText();
+        return convertFromTimestamp(dateTimeParser.parse(jsonDateTime));        
+      }
     }
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
-    long millis = convertToMillis(value);
-    ctx.writeNumberField(name, millis);
+  public void jsonWrite(JsonGenerator generator, String name, T value) throws IOException {
+
+    switch (mode) {
+      case ISO8601: {
+        generator.writeFieldName(name);
+        generator.writeString(toJsonISO8601(value));
+        break;
+      }
+      case NANOS: {
+        generator.writeFieldName(name);
+        generator.writeNumber(toJsonNanos(value));
+        break;
+      }
+      default: {
+        generator.writeNumberField(name, convertToMillis(value));
+      }
+    }
   }
 
   public String formatValue(T t) {
@@ -76,16 +133,12 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
     return convertFromTimestamp(ts);
   }
 
-  public T parseDateTime(long systemTimeMillis) {
-    Timestamp ts = new Timestamp(systemTimeMillis);
-    return convertFromTimestamp(ts);
-  }
 
   public boolean isDateTimeCapable() {
     return true;
   }
 
-  public Object readData(DataInput dataInput) throws IOException {
+  public T readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
@@ -95,10 +148,8 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, T value) throws IOException {
 
-    T value = (T) v;
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

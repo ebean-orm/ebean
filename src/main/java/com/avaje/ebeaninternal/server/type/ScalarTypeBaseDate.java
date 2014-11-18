@@ -23,7 +23,7 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
   /**
    * Convert the target value to millis.
    */
-  public abstract long convertToMillis(Object value);
+  public abstract long convertToMillis(T value);
 
   /**
    * Convert to java.sql.Date from the target Date type.
@@ -39,19 +39,14 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
     if (value == null) {
       b.setNull(Types.DATE);
     } else {
-      Date date = convertToDate(value);
-      b.setDate(date);
+      b.setDate(convertToDate(value));
     }
   }
 
   public T read(DataReader dataReader) throws SQLException {
 
     Date ts = dataReader.getDate();
-    if (ts == null) {
-      return null;
-    } else {
-      return convertFromDate(ts);
-    }
+    return ts == null ? null : convertFromDate(ts);
   }
 
   public String formatValue(T t) {
@@ -64,7 +59,7 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
     return convertFromDate(date);
   }
 
-  public T parseDateTime(long systemTimeMillis) {
+  public T convertFromMillis(long systemTimeMillis) {
     Date ts = new Date(systemTimeMillis);
     return convertFromDate(ts);
   }
@@ -74,20 +69,20 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public T jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     if (JsonToken.VALUE_NUMBER_INT == event) {
-      return parseDateTime(ctx.getLongValue());
+      return convertFromMillis(ctx.getLongValue());
     } else {
       return convertFromDate(Date.valueOf(ctx.getText()));
     }
   }
 
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, T value) throws IOException {
     long millis = convertToMillis(value);
     ctx.writeNumberField(name, millis);
   }
 
-  public Object readData(DataInput dataInput) throws IOException {
+  public T readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
@@ -98,9 +93,8 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, T value) throws IOException {
 
-    T value = (T) v;
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {

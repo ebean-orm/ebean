@@ -86,7 +86,7 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public T parseDateTime(long systemTimeMillis) {
+  public T convertFromMillis(long systemTimeMillis) {
     throw new TextException("Not Supported");
   }
   
@@ -102,7 +102,7 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public Object readData(DataInput dataInput) throws IOException {
+  public T readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
@@ -111,10 +111,8 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public void writeData(DataOutput dataOutput, Object v) throws IOException {
+  public void writeData(DataOutput dataOutput, T value) throws IOException {
 
-    T value = (T) v;
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {
@@ -125,12 +123,12 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
   }
   
   @Override
-  public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public T jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     return parse(ctx.getValueAsString());
   }
   
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Object value) throws IOException {
+  public void jsonWrite(JsonGenerator ctx, String name, T value) throws IOException {
     ctx.writeStringField(name, format(value));
   }
 }

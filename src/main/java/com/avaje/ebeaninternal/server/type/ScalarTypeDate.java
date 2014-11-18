@@ -16,8 +16,8 @@ public class ScalarTypeDate extends ScalarTypeBaseDate<java.sql.Date> {
   }
 
   @Override
-  public long convertToMillis(Object value) {
-    return ((Date) value).getTime();
+  public long convertToMillis(Date value) {
+    return value.getTime();
   }
 
   @Override

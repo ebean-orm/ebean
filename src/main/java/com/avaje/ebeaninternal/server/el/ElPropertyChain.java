@@ -215,7 +215,7 @@ public class ElPropertyChain implements ElPropertyValue {
     }
 
 	public Object parseDateTime(long systemTimeMillis) {
-		return scalarType.parseDateTime(systemTimeMillis);
+		return scalarType.convertFromMillis(systemTimeMillis);
 	}
 
 	public StringParser getStringParser() {
