@@ -16,6 +16,8 @@ public class SomePeriodBean {
 
   Period period;
 
+  MonthDay anniversary;
+
   public Long getId() {
     return id;
   }
@@ -38,5 +40,13 @@ public class SomePeriodBean {
 
   public void setPeriod(Period period) {
     this.period = period;
+  }
+
+  public MonthDay getAnniversary() {
+    return anniversary;
+  }
+
+  public void setAnniversary(MonthDay anniversary) {
+    this.anniversary = anniversary;
   }
 }

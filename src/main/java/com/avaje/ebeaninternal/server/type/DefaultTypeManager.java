@@ -612,6 +612,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       typeMap.put(Month.class, new ScalarTypeMonth());
       typeMap.put(Year.class, new ScalarTypeYear());
       typeMap.put(YearMonth.class, new ScalarTypeYearMonthDate());
+      typeMap.put(MonthDay.class, new ScalarTypeMonthDay());
       typeMap.put(OffsetTime.class, new ScalarTypeOffsetTime());
       typeMap.put(ZoneId.class, new ScalarTypeZoneId());
       typeMap.put(ZoneOffset.class, new ScalarTypeZoneOffset());
