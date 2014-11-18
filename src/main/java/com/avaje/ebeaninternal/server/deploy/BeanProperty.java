@@ -27,8 +27,8 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
-import com.avaje.ebeaninternal.server.reflect.BeanReflectGetter;
-import com.avaje.ebeaninternal.server.reflect.BeanReflectSetter;
+import com.avaje.ebeaninternal.server.properties.BeanPropertyGetter;
+import com.avaje.ebeaninternal.server.properties.BeanPropertySetter;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
@@ -196,9 +196,9 @@ public class BeanProperty implements ElPropertyValue {
      */
     final GeneratedProperty generatedProperty;
 
-    final BeanReflectGetter getter;
+    final BeanPropertyGetter getter;
 
-    final BeanReflectSetter setter;
+    final BeanPropertySetter setter;
 
     final BeanDescriptor<?> descriptor;
 
@@ -673,7 +673,14 @@ public class BeanProperty implements ElPropertyValue {
     public void setCacheDataValue(EntityBean bean, Object cacheData) {
         setValue(bean, cacheData);
     }
-    
+
+    /**
+     * Get the property value from a compound value type.
+     */
+    public Object getValueObject(Object bean) {
+      throw new RuntimeException("Expected to be called only on BeanPropertyCompoundScalar");
+    }
+
     /**
      * Return the value of the property method.
      */

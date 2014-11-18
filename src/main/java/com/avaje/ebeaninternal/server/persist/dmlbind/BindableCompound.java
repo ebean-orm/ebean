@@ -14,40 +14,41 @@ import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
  */
 public class BindableCompound implements Bindable {
 
-    private final Bindable[] items;
+  private final BindableProperty[] items;
 
-    private final BeanPropertyCompound compound;
+  private final BeanPropertyCompound compound;
 
-    public BindableCompound(BeanPropertyCompound embProp, List<Bindable> list) {
-        this.compound = embProp;
-        this.items = list.toArray(new Bindable[list.size()]);
+  public BindableCompound(BeanPropertyCompound embProp, List<BindableProperty> list) {
+    this.compound = embProp;
+    this.items = list.toArray(new BindableProperty[list.size()]);
+  }
+
+  public String toString() {
+    return "BindableCompound " + compound + " items:" + Arrays.toString(items);
+  }
+
+  public void dmlAppend(GenerateDmlRequest request) {
+
+    for (int i = 0; i < items.length; i++) {
+      items[i].dmlAppend(request);
     }
+  }
 
-    public String toString() {
-        return "BindableCompound " + compound + " items:" + Arrays.toString(items);
+  public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
+    if (request.isAddToUpdate(compound)) {
+      list.add(this);
     }
+  }
 
-    public void dmlAppend(GenerateDmlRequest request) {
+  public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
 
-        for (int i = 0; i < items.length; i++) {
-            items[i].dmlAppend(request);
-        }
+    // get the compound type value
+    Object valueObject = compound.getValue(bean);
+
+    // bind each of the underlying scalar values for this compound type
+    for (int i = 0; i < items.length; i++) {
+      items[i].dmlBindObject(bindRequest, valueObject);
     }
-
-    public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
-        if (request.isAddToUpdate(compound)) {
-            list.add(this);
-        }
-    }
-
-    public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
-
-      throw new RuntimeException("This is broken, need to break out the scalar values!!");
-      
-        //Object valueObject = compound.getValue(bean);
-        //for (int i = 0; i < items.length; i++) {
-        //    items[i].dmlBind(bindRequest, valueObject);
-        //}
-    }
+  }
 
 }

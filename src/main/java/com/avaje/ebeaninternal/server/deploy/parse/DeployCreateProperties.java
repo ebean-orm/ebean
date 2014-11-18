@@ -93,7 +93,7 @@ public class DeployCreateProperties {
   }
 
   /**
-   * reflect the bean properties from Class. Some of these properties may not map to database
+   * properties the bean properties from Class. Some of these properties may not map to database
    * columns.
    */
   private void createProperties(DeployBeanDescriptor<?> desc, Class<?> beanType, int level) {

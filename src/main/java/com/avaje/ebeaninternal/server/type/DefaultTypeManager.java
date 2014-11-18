@@ -616,6 +616,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       typeMap.put(ZoneId.class, new ScalarTypeZoneId());
       typeMap.put(ZoneOffset.class, new ScalarTypeZoneOffset());
 
+      createCompoundScalarDataReader(Period.class, new CompoundTypePeriod(), "");
+
       boolean localTimeNanos = config.isLocalTimeWithNanos();
       typeMap.put(java.time.LocalTime.class, (localTimeNanos)? new ScalarTypeLocalTimeWithNanos() : new ScalarTypeLocalTime());
 

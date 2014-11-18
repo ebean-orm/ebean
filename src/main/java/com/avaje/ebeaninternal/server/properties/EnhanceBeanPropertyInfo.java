@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.reflect;
+package com.avaje.ebeaninternal.server.properties;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -11,13 +11,13 @@ import com.avaje.ebean.bean.EntityBean;
  * A BeanReflect implementation based on the enhancement that creates EntityBean
  * implementations.
  */
-public final class EnhanceBeanReflect implements BeanReflect {
+public final class EnhanceBeanPropertyInfo implements BeanPropertyInfo {
 
   private static final Object[] constuctorArgs = new Object[0];
 
   private final Constructor<?> constructor;
 
-  public EnhanceBeanReflect(Class<?> clazz) {
+  public EnhanceBeanPropertyInfo(Class<?> clazz) {
     try {
       if (Modifier.isAbstract(clazz.getModifiers())) {
         this.constructor = null;  
@@ -47,15 +47,15 @@ public final class EnhanceBeanReflect implements BeanReflect {
     }
   }
 
-  public BeanReflectGetter getGetter(String name, int position) {
+  public BeanPropertyGetter getGetter(String name, int position) {
     return new Getter(position);
   }
 
-  public BeanReflectSetter getSetter(String name, int position) {
+  public BeanPropertySetter getSetter(String name, int position) {
     return new Setter(position);
   }
 
-  static final class Getter implements BeanReflectGetter {
+  static final class Getter implements BeanPropertyGetter {
 
     private final int fieldIndex;
 
@@ -72,7 +72,7 @@ public final class EnhanceBeanReflect implements BeanReflect {
     }
   }
 
-  static final class Setter implements BeanReflectSetter {
+  static final class Setter implements BeanPropertySetter {
 
     private final int fieldIndex;
 

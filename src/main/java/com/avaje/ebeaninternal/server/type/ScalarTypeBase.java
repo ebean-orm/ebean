@@ -57,20 +57,6 @@ public abstract class ScalarTypeBase<T> implements ScalarType<T> {
     return formatValue((T) v);
   }
 
-  /**
-   * Return true if the value is null.
-   */
-  public boolean isDbNull(Object value) {
-    return value == null;
-  }
-
-  /**
-   * Returns the value that was passed in.
-   */
-  public Object getDbNullValue(Object value) {
-    return value;
-  }
-
   public void loadIgnore(DataReader dataReader) {
     dataReader.incrementPos(1);
   }

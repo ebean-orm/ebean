@@ -36,7 +36,7 @@ import com.avaje.ebeaninternal.server.deploy.DRawSqlMeta;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
-import com.avaje.ebeaninternal.server.reflect.BeanReflect;
+import com.avaje.ebeaninternal.server.properties.BeanPropertyInfo;
 
 /**
  * Describes Beans including their deployment information.
@@ -127,7 +127,7 @@ public class DeployBeanDescriptor<T> {
    * Used to provide mechanism to new EntityBean instances. Generated code
    * faster than reflection at this stage.
    */
-  private BeanReflect beanReflect;
+  private BeanPropertyInfo beanReflect;
   private String[] properties;
 
   /**
@@ -302,7 +302,7 @@ public class DeployBeanDescriptor<T> {
     this.properties = props;
   }
 
-  public BeanReflect getBeanReflect() {
+  public BeanPropertyInfo getBeanReflect() {
     return beanReflect;
   }
 
@@ -317,7 +317,7 @@ public class DeployBeanDescriptor<T> {
    * Set the BeanReflect used to create new instances of an EntityBean. This
    * could use reflection or code generation to do this.
    */
-  public void setBeanReflect(BeanReflect beanReflect) {
+  public void setBeanReflect(BeanPropertyInfo beanReflect) {
     this.beanReflect = beanReflect;
   }
 

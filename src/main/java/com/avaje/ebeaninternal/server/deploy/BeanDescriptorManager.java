@@ -62,10 +62,10 @@ import com.avaje.ebeaninternal.server.deploy.parse.ReadAnnotations;
 import com.avaje.ebeaninternal.server.deploy.parse.TransientProperties;
 import com.avaje.ebeaninternal.server.idgen.UuidIdGenerator;
 import com.avaje.ebeaninternal.server.lib.util.Dnode;
-import com.avaje.ebeaninternal.server.reflect.BeanReflect;
-import com.avaje.ebeaninternal.server.reflect.BeanReflectFactory;
-import com.avaje.ebeaninternal.server.reflect.BeanReflectProperties;
-import com.avaje.ebeaninternal.server.reflect.EnhanceBeanReflectFactory;
+import com.avaje.ebeaninternal.server.properties.BeanPropertyInfo;
+import com.avaje.ebeaninternal.server.properties.BeanPropertyInfoFactory;
+import com.avaje.ebeaninternal.server.properties.BeanPropertiesReader;
+import com.avaje.ebeaninternal.server.properties.EnhanceBeanPropertyInfoFactory;
 import com.avaje.ebeaninternal.server.type.TypeManager;
 
 /**
@@ -86,7 +86,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private final DeployInherit deplyInherit;
 
-  private final BeanReflectFactory reflectFactory;
+  private final BeanPropertyInfoFactory reflectFactory;
 
   private final DeployUtil deployUtil;
 
@@ -1274,9 +1274,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
-  private BeanReflectFactory createReflectionFactory() {
+  private BeanPropertyInfoFactory createReflectionFactory() {
 
-    return new EnhanceBeanReflectFactory();
+    return new EnhanceBeanPropertyInfoFactory();
   }
 
   /**
@@ -1295,9 +1295,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     Class<?> beanType = desc.getBeanType();
 
-    BeanReflectProperties reflectProps = new BeanReflectProperties(beanType);
+    BeanPropertiesReader reflectProps = new BeanPropertiesReader(beanType);
     
-    BeanReflect beanReflect = reflectFactory.create(beanType);
+    BeanPropertyInfo beanReflect = reflectFactory.create(beanType);
     desc.setBeanReflect(beanReflect);
     desc.setProperties(reflectProps.getProperties());
 

@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.reflect;
+package com.avaje.ebeaninternal.server.properties;
 
 /**
  * Provides getter setter and construction methods for beans.
@@ -7,7 +7,7 @@ package com.avaje.ebeaninternal.server.reflect;
  * code generation.
  * </p>
  */
-public interface BeanReflect {
+public interface BeanPropertyInfo {
 
 	/**
 	 * Create an EntityBean for this type.
@@ -17,10 +17,10 @@ public interface BeanReflect {
 	/**
 	 * Return the getter for a given bean property.
 	 */
-	public BeanReflectGetter getGetter(String name, int position);
+	public BeanPropertyGetter getGetter(String name, int position);
 	
 	/**
 	 * Return the setter for a given bean property.
 	 */
-	public BeanReflectSetter getSetter(String name, int position);
+	public BeanPropertySetter getSetter(String name, int position);
 }
