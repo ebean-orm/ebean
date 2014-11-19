@@ -38,7 +38,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private final BeanDescriptor<T> beanDescriptor;
 
-  private final BeanPersistListener<T> beanPersistListener;
+  private final BeanPersistListener beanPersistListener;
 
   /**
    * For per post insert update delete control.
@@ -90,6 +90,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Many properties that were cascade saved (and hence might need caches updated later).
    */
   private List<BeanPropertyAssocMany<?>> updatedManys;
+
+  /**
+   * Need to get and store the updated properties because the persist listener is notified
+   * later on a different thread and the bean has been reset at that point.
+   */
+  private Set<String> updatedProperties;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
       PersistExecute persistExecute, PersistRequest.Type type, boolean saveRecurse) {
@@ -188,7 +194,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         return beanPersistListener.inserted(bean);
 
       case UPDATE:
-        return beanPersistListener.updated(bean, intercept.getDirtyPropertyNames());
+        return beanPersistListener.updated(bean, updatedProperties);
 
       case DELETE:
         return beanPersistListener.deleted(bean);
@@ -372,6 +378,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       return -1;
 
     case UPDATE:
+      if (beanPersistListener != null) {
+        // store the updated properties for sending later
+        updatedProperties = getUpdatedProperties();
+      }
       persistExecute.executeUpdateBean(this);
       return -1;
 

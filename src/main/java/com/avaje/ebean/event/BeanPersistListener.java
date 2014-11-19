@@ -33,11 +33,17 @@ import com.avaje.ebean.config.ServerConfig;
  * </p>
  * <p>
  * A BeanPersistListener is either found automatically via class path search or
- * can be added programmatically via {@link ServerConfig#add(BeanPersistListener)}.
+ * can be added programmatically via {@link ServerConfig#add(BeanPersistListener<?>)}}.
  * </p>
  * @see ServerConfig#add(BeanPersistListener)
  */
-public interface BeanPersistListener<T> {
+public interface BeanPersistListener {
+
+  /**
+   * Return true if this BeanPersistListener should be registered for events
+   * on this entity type.
+   */
+  public boolean isRegisterFor(Class<?> cls);
 
   /**
    * Notified that a bean has been inserted locally. Return true if you want the
@@ -46,7 +52,7 @@ public interface BeanPersistListener<T> {
    * @param bean
    *          The bean that was inserted.
    */
-  public boolean inserted(T bean);
+  public boolean inserted(Object bean);
 
   /**
    * Notified that a bean has been updated locally. Return true if you want the
@@ -57,7 +63,7 @@ public interface BeanPersistListener<T> {
    * @param updatedProperties
    *          The properties that were modified by this update.
    */
-  public boolean updated(T bean, Set<String> updatedProperties);
+  public boolean updated(Object bean, Set<String> updatedProperties);
 
   /**
    * Notified that a bean has been deleted locally. Return true if you want the
@@ -66,7 +72,7 @@ public interface BeanPersistListener<T> {
    * @param bean
    *          The bean that was deleted.
    */
-  public boolean deleted(T bean);
+  public boolean deleted(Object bean);
 
   /**
    * Notify that a bean was inserted on another node of the cluster.

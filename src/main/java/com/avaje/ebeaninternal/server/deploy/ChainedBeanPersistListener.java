@@ -9,24 +9,30 @@ import com.avaje.ebean.event.BeanPersistListener;
 /**
  * Handles multiple BeanPersistListener's for a given entity type.
  */
-public class ChainedBeanPersistListener<T> implements BeanPersistListener<T> {
+public class ChainedBeanPersistListener implements BeanPersistListener {
 
-	private final List<BeanPersistListener<T>> list;
+	private final List<BeanPersistListener> list;
 	
-	private final BeanPersistListener<T>[] chain;
+	private final BeanPersistListener[] chain;
 	
 	/**
 	 * Construct adding 2 BeanPersistController's.
 	 */
-	public ChainedBeanPersistListener(BeanPersistListener<T> c1, BeanPersistListener<T> c2) {
+	public ChainedBeanPersistListener(BeanPersistListener c1, BeanPersistListener c2) {
 		this(addList(c1, c2));
 	}
-	
-	/**
+
+  @Override
+  public boolean isRegisterFor(Class<?> cls) {
+    // never called
+    return false;
+  }
+
+  /**
 	 * Helper method used to create a list from 2 BeanPersistListener.
 	 */
-	private static <T> List<BeanPersistListener<T>> addList(BeanPersistListener<T> c1, BeanPersistListener<T> c2) {
-		ArrayList<BeanPersistListener<T>> addList = new ArrayList<BeanPersistListener<T>>(2);
+	private static List<BeanPersistListener> addList(BeanPersistListener c1, BeanPersistListener c2) {
+		ArrayList<BeanPersistListener> addList = new ArrayList<BeanPersistListener>(2);
 		addList.add(c1);
 		addList.add(c2);
 		return addList;
@@ -36,8 +42,7 @@ public class ChainedBeanPersistListener<T> implements BeanPersistListener<T> {
 	 * Construct given the list of BeanPersistController's.
 	 * @param list
 	 */
-	@SuppressWarnings("unchecked")
-	public ChainedBeanPersistListener(List<BeanPersistListener<T>> list) {
+	public ChainedBeanPersistListener(List<BeanPersistListener> list) {
 		this.list = list;
 		this.chain = list.toArray(new BeanPersistListener[list.size()]);
 	}
@@ -45,35 +50,35 @@ public class ChainedBeanPersistListener<T> implements BeanPersistListener<T> {
 	/**
 	 * Register a new BeanPersistController and return the resulting chain.
 	 */
-	public ChainedBeanPersistListener<T> register(BeanPersistListener<T> c) {
+	public ChainedBeanPersistListener register(BeanPersistListener c) {
 		if (list.contains(c)){
 			return this;
 		} else {
-			List<BeanPersistListener<T>> newList = new ArrayList<BeanPersistListener<T>>();
+			List<BeanPersistListener> newList = new ArrayList<BeanPersistListener>();
 			newList.addAll(list);
 			newList.add(c);
 			
-			return new ChainedBeanPersistListener<T>(newList);
+			return new ChainedBeanPersistListener(newList);
 		}
 	}
 	
 	/**
 	 * De-register a BeanPersistController and return the resulting chain.
 	 */
-	public ChainedBeanPersistListener<T> deregister(BeanPersistListener<T> c) {
+	public ChainedBeanPersistListener deregister(BeanPersistListener c) {
 		if (!list.contains(c)){
 			return this;
 		} else {
-			ArrayList<BeanPersistListener<T>> newList = new ArrayList<BeanPersistListener<T>>();
+			ArrayList<BeanPersistListener> newList = new ArrayList<BeanPersistListener>();
 			newList.addAll(list);
 			newList.remove(c);
 			
-			return new ChainedBeanPersistListener<T>(newList);
+			return new ChainedBeanPersistListener(newList);
 		}
 	}
 
 
-	public boolean deleted(T bean) {
+	public boolean deleted(Object bean) {
 		boolean notifyCluster = false;
 		for (int i = 0; i < chain.length; i++) {
 			if (chain[i].deleted(bean)) {
@@ -83,7 +88,7 @@ public class ChainedBeanPersistListener<T> implements BeanPersistListener<T> {
 		return notifyCluster;
 	}
 
-	public boolean inserted(T bean) {
+	public boolean inserted(Object bean) {
 		boolean notifyCluster = false;
 		for (int i = 0; i < chain.length; i++) {
 			if (chain[i].inserted(bean)) {
@@ -111,7 +116,7 @@ public class ChainedBeanPersistListener<T> implements BeanPersistListener<T> {
 		}
 	}
 
-	public boolean updated(T bean, Set<String> updatedProperties) {
+	public boolean updated(Object bean, Set<String> updatedProperties) {
 		boolean notifyCluster = false;
 		for (int i = 0; i < chain.length; i++) {
 			if (chain[i].updated(bean, updatedProperties)) {

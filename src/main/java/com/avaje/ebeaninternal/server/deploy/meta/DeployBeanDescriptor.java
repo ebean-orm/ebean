@@ -113,11 +113,6 @@ public class DeployBeanDescriptor<T> {
   private List<CompoundUniqueContraint> compoundUniqueConstraints;
 
   /**
-   * Extra deployment attributes.
-   */
-  private HashMap<String, String> extraAttrMap = new HashMap<String, String>();
-
-  /**
    * The base database table.
    */
   private String baseTable;
@@ -136,7 +131,7 @@ public class DeployBeanDescriptor<T> {
   private Class<T> beanType;
 
   private List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>(2);
-  private List<BeanPersistListener<T>> persistListeners = new ArrayList<BeanPersistListener<T>>(2);
+  private List<BeanPersistListener> persistListeners = new ArrayList<BeanPersistListener>(2);
   private List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>(2);
 
   private CacheOptions cacheOptions = new CacheOptions();
@@ -445,13 +440,13 @@ public class DeployBeanDescriptor<T> {
   /**
    * Return the BeanPersistListener (could be a chain of them, 1 or null).
    */
-  public BeanPersistListener<T> getPersistListener() {
+  public BeanPersistListener getPersistListener() {
     if (persistListeners.size() == 0) {
       return null;
     } else if (persistListeners.size() == 1) {
       return persistListeners.get(0);
     } else {
-      return new ChainedBeanPersistListener<T>(persistListeners);
+      return new ChainedBeanPersistListener(persistListeners);
     }
   }
 
@@ -472,7 +467,7 @@ public class DeployBeanDescriptor<T> {
     persistControllers.add(controller);
   }
 
-  public void addPersistListener(BeanPersistListener<T> listener) {
+  public void addPersistListener(BeanPersistListener listener) {
     persistListeners.add(listener);
   }
 
@@ -540,29 +535,6 @@ public class DeployBeanDescriptor<T> {
    */
   public DeployBeanProperty getBeanProperty(String propName) {
     return propMap.get(propName);
-  }
-
-  public Map<String, String> getExtraAttributeMap() {
-    return extraAttrMap;
-  }
-
-  /**
-   * Get a named extra attribute.
-   */
-  public String getExtraAttribute(String key) {
-    return (String) extraAttrMap.get(key);
-  }
-
-  /**
-   * Set an extra attribute with a given name.
-   * 
-   * @param key
-   *          the name of the extra attribute
-   * @param value
-   *          the value of the extra attribute
-   */
-  public void setExtraAttribute(String key, String value) {
-    extraAttrMap.put(key, value);
   }
 
   /**

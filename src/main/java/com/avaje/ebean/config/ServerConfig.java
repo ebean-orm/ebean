@@ -225,7 +225,7 @@ public class ServerConfig {
 
 
   private List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>();
-  private List<BeanPersistListener<?>> persistListeners = new ArrayList<BeanPersistListener<?>>();
+  private List<BeanPersistListener> persistListeners = new ArrayList<BeanPersistListener>();
   private List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>();
   private List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<BulkTableEventListener>();
   private List<ServerConfigStartup> configStartupListeners = new ArrayList<ServerConfigStartup>();
@@ -1255,14 +1255,14 @@ public class ServerConfig {
    * all the BeanPersistListener instances.
    * </p>
    */
-  public void add(BeanPersistListener<?> beanPersistListener) {
+  public void add(BeanPersistListener beanPersistListener) {
     persistListeners.add(beanPersistListener);
   }
 
   /**
    * Return the BeanPersistListener instances.
    */
-  public List<BeanPersistListener<?>> getPersistListeners() {
+  public List<BeanPersistListener> getPersistListeners() {
     return persistListeners;
   }
 
@@ -1301,7 +1301,7 @@ public class ServerConfig {
    * BeanPersistListener instances one at a time.
    * </p>
    */
-  public void setPersistListeners(List<BeanPersistListener<?>> persistListeners) {
+  public void setPersistListeners(List<BeanPersistListener> persistListeners) {
     this.persistListeners = persistListeners;
   }
 

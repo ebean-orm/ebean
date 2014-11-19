@@ -135,11 +135,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   private final CompoundUniqueContraint[] compoundUniqueConstraints;
 
   /**
-   * Extra deployment attributes.
-   */
-  private final Map<String, String> extraAttrMap;
-
-  /**
    * The base database table.
    */
   private final String baseTable;
@@ -175,7 +170,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   /**
    * Listens for post commit insert update and delete events.
    */
-  private volatile BeanPersistListener<T> persistListener;
+  private volatile BeanPersistListener persistListener;
 
   private volatile BeanQueryAdapter queryAdapter;
 
@@ -224,17 +219,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
   
   private final BeanPropertyAssocOne<?> unidirectional;
-
-  /**
-   * A hashcode of all the many property names. This is used to efficiently
-   * create sets of loaded property names (for partial objects).
-   */
-  private final int namesOfManyPropsHash;
-
-  /**
-   * The set of names of the many properties.
-   */
-  private final Set<String> namesOfManyProps;
 
   /**
    * list of properties that are Lists/Sets/Maps (Derived).
@@ -376,8 +360,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.dependantTables = deploy.getDependantTables();
     this.compoundUniqueConstraints = deploy.getCompoundUniqueConstraints();
 
-    this.extraAttrMap = deploy.getExtraAttributeMap();
-
     this.baseTable = InternString.intern(deploy.getBaseTable());
 
     this.autoFetchTunable = EntityType.ORM.equals(entityType) && (beanFinder == null);
@@ -410,9 +392,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.propertiesManySave = listHelper.getManySave();
     this.propertiesManyDelete = listHelper.getManyDelete();
     this.propertiesManyToMany = listHelper.getManyToMany();
-
-    this.namesOfManyProps = deriveManyPropNames();
-    this.namesOfManyPropsHash = namesOfManyProps.hashCode();
 
     this.derivedTableJoins = listHelper.getTableJoin();
 
@@ -516,48 +495,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       // used for creating lazy loading lists etc
       propertiesMany[i].setLoader(ebeanServer);
     }
-  }
-
-  /**
-   * Determine the concurrency mode based on the existence of a non-null version
-   * property value.
-   */
-  public ConcurrencyMode determineConcurrencyMode(EntityBean bean) {
-
-    if (versionProperty == null) {
-      return ConcurrencyMode.NONE;
-    }
-    Object v = versionProperty.getValue(bean);
-    return (v == null) ? ConcurrencyMode.NONE : ConcurrencyMode.VERSION;
-  }
-
-  /**
-   * Return the Set of embedded beans that have changed.
-   */
-  public Set<String> getDirtyEmbeddedProperties(EntityBean bean) {
-
-    HashSet<String> dirtyProperties = null;
-
-    for (int i = 0; i < propertiesEmbedded.length; i++) {
-      Object embValue = propertiesEmbedded[i].getValue(bean);
-      if (embValue instanceof EntityBean) {
-        if (((EntityBean) embValue)._ebean_getIntercept().isDirty()) {
-          // this embedded is dirty so should be included in an update
-          if (dirtyProperties == null) {
-            dirtyProperties = new HashSet<String>();
-          }
-          dirtyProperties.add(propertiesEmbedded[i].getName());
-        }
-      } else {
-        // must assume it is dirty
-        if (dirtyProperties == null) {
-          dirtyProperties = new HashSet<String>();
-        }
-        dirtyProperties.add(propertiesEmbedded[i].getName());
-      }
-    }
-
-    return dirtyProperties;
   }
 
   /**
@@ -665,10 +602,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public void cacheInitialise() {
     cacheHelp.initialise();
-  }
-
-  protected boolean hasInheritance() {
-    return inheritInfo != null;
   }
 
   public SqlUpdate deleteById(Object id, List<Object> idList) {
@@ -837,8 +770,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   public void queryCachePut(Object id, BeanCollection<T> query) {
     cacheHelp.queryCachePut(id, query);
   }
-
-
 
   /**
    * Try to load the beanCollection from cache return true if successful.
@@ -1030,11 +961,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   /**
    * Execute the postLoad if a BeanPersistController exists for this bean.
    */
-  @SuppressWarnings("unchecked")
   public void postLoad(Object bean, Set<String> includedProperties) {
     BeanPersistController c = persistController;
     if (c != null) {
-      c.postLoad((T) bean, includedProperties);
+      c.postLoad(bean, includedProperties);
     }
   }
 
@@ -1058,13 +988,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public void putUpdatePlan(Integer key, SpiUpdatePlan plan) {
     updatePlanCache.put(key, plan);
-  }
-
-  /**
-   * Return the TypeManager.
-   */
-  public TypeManager getTypeManager() {
-    return typeManager;
   }
 
   /**
@@ -1194,7 +1117,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   public T createReference(Boolean readOnly, Object id) {
 
     if (cacheSharableBeans && !Boolean.FALSE.equals(readOnly)) {
-      CachedBeanData d = (CachedBeanData) cacheHelp.beanCacheGetData(id);
+      CachedBeanData d = cacheHelp.beanCacheGetData(id);
       if (d != null) {
         Object shareableBean = d.getSharableBean();
         if (shareableBean != null) {
@@ -1218,13 +1141,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     } catch (Exception ex) {
       throw new PersistenceException(ex);
     }
-  }
-
-  /**
-   * Return the BeanProperty for the given deployment name.
-   */
-  public BeanProperty getBeanPropertyFromDbColumn(String dbColumn) {
-    return propMapByDbColumn.get(dbColumn);
   }
 
   /**
@@ -1356,14 +1272,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * Return false if the id is a simple scalar and false if it is embedded or
-   * concatenated.
-   */
-  public boolean isComplexId() {
-    return idBinder.isComplexId();
-  }
-
-  /**
    * Return the default order by that may need to be added if a many property is
    * included in the query.
    */
@@ -1393,7 +1301,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Get a BeanProperty by its name.
    */
   public BeanProperty getBeanProperty(String propName) {
-    return (BeanProperty) propMap.get(propName);
+    return propMap.get(propName);
   }
 
   public void sort(List<T> list, String sortByClause) {
@@ -1572,13 +1480,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return prop;
   }
 
-  protected Object getBeanPropertyWithInheritance(EntityBean bean, String propName) {
-
-    BeanDescriptor<?> desc = getBeanDescriptor(bean.getClass());
-    BeanProperty beanProperty = desc.findBeanProperty(propName);
-    return beanProperty.getValue(bean);
-  }
-
   /**
    * Return the name of the server this BeanDescriptor belongs to.
    */
@@ -1619,17 +1520,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return EntityType.EMBEDDED.equals(entityType);
   }
 
-  public boolean isBaseTableType() {
-    return EntityType.ORM.equals(entityType);
-  }
-
-  /**
-   * Return the concurrency mode used for beans of this type.
-   */
-  public ConcurrencyMode getConcurrencyMode() {
-    return concurrencyMode;
-  }
-
   /**
    * Return the tables this bean is dependent on. This implies that if any of
    * these tables are modified then cached beans may be invalidated.
@@ -1648,7 +1538,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   /**
    * Return the beanListener.
    */
-  public BeanPersistListener<T> getPersistListener() {
+  public BeanPersistListener getPersistListener() {
     return persistListener;
   }
 
@@ -1670,16 +1560,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * De-register the BeanPersistListener.
    */
   @SuppressWarnings("unchecked")
-  public void deregister(BeanPersistListener<?> listener) {
+  public void deregister(BeanPersistListener listener) {
     // volatile read...
-    BeanPersistListener<T> currListener = persistListener;
+    BeanPersistListener currListener = persistListener;
     if (currListener == null) {
       // nothing to deregister
     } else {
-      BeanPersistListener<T> deregListener = (BeanPersistListener<T>) listener;
-      if (currListener instanceof ChainedBeanPersistListener<?>) {
+      BeanPersistListener deregListener = listener;
+      if (currListener instanceof ChainedBeanPersistListener) {
         // remove it from the existing chain
-        persistListener = ((ChainedBeanPersistListener<T>) currListener).deregister(deregListener);
+        persistListener = ((ChainedBeanPersistListener) currListener).deregister(deregListener);
       } else if (currListener.equals(deregListener)) {
         persistListener = null;
       }
@@ -1692,9 +1582,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   public void deregister(BeanPersistController controller) {
     // volatile read...
     BeanPersistController c = persistController;
-    if (c == null) {
-      // nothing to deregister
-    } else {
+    if (c != null) {
       if (c instanceof ChainedBeanPersistController) {
         // remove it from the existing chain
         persistController = ((ChainedBeanPersistController) c).deregister(controller);
@@ -1708,23 +1596,20 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Register the new BeanPersistController.
    */
   @SuppressWarnings("unchecked")
-  public void register(BeanPersistListener<?> newPersistListener) {
+  public void register(BeanPersistListener newPersistListener) {
 
-    if (!PersistListenerManager.isRegisterFor(beanType, newPersistListener)) {
-      // skip
-    } else {
-      BeanPersistListener<T> newListener = (BeanPersistListener<T>) newPersistListener;
+    if (newPersistListener.isRegisterFor(beanType)) {
       // volatile read...
-      BeanPersistListener<T> currListener = persistListener;
+      BeanPersistListener currListener = persistListener;
       if (currListener == null) {
-        persistListener = newListener;
+        persistListener = newPersistListener;
       } else {
-        if (currListener instanceof ChainedBeanPersistListener<?>) {
+        if (currListener instanceof ChainedBeanPersistListener) {
           // add it to the existing chain
-          persistListener = ((ChainedBeanPersistListener<T>) currListener).register(newListener);
+          persistListener = ((ChainedBeanPersistListener) currListener).register(newPersistListener);
         } else {
           // build new chain of the 2
-          persistListener = new ChainedBeanPersistListener<T>(currListener, newListener);
+          persistListener = new ChainedBeanPersistListener(currListener, newPersistListener);
         }
       }
     }
@@ -1735,9 +1620,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public void register(BeanPersistController newController) {
 
-    if (!newController.isRegisterFor(beanType)) {
-      // skip
-    } else {
+    if (newController.isRegisterFor(beanType)) {
       // volatile read...
       BeanPersistController c = persistController;
       if (c == null) {
@@ -1779,13 +1662,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public String getBaseTable() {
     return baseTable;
-  }
-
-  /**
-   * Get a named extra attribute.
-   */
-  public String getExtraAttribute(String key) {
-    return (String) extraAttrMap.get(key);
   }
 
   /**
@@ -1906,17 +1782,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
   
   public boolean hasIdProperty(EntityBeanIntercept ebi) {
-    if (idPropertyIndex > -1) {
-      return ebi.isLoadedProperty(idPropertyIndex);
-    }
-    return false;
+    return idPropertyIndex > -1 && ebi.isLoadedProperty(idPropertyIndex);
   }
 
   public boolean hasVersionProperty(EntityBeanIntercept ebi) {
-    if (versionPropertyIndex > -1) {
-      return ebi.isLoadedProperty(versionPropertyIndex);
-    }
-    return false;
+    return versionPropertyIndex > -1 && ebi.isLoadedProperty(versionPropertyIndex);
   }
 
   /**
@@ -1980,16 +1850,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * Returns OneToOnes that are on the exported side of a OneToOne.
-   * <p>
-   * These associations do not own the relationship.
-   * </p>
-   */
-  public BeanPropertyAssocOne<?>[] propertiesOneExported() {
-    return propertiesOneExported;
-  }
-
-  /**
    * Exported assoc ones with cascade save.
    */
   public BeanPropertyAssocOne<?>[] propertiesOneExportedSave() {
@@ -2001,32 +1861,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public BeanPropertyAssocOne<?>[] propertiesOneExportedDelete() {
     return propertiesOneExportedDelete;
-  }
-
-  private Set<String> deriveManyPropNames() {
-
-    LinkedHashSet<String> names = new LinkedHashSet<String>();
-    for (int i = 0; i < propertiesMany.length; i++) {
-      names.add(propertiesMany[i].getName());
-    }
-
-    return Collections.unmodifiableSet(names);
-  }
-
-  /**
-   * Return a hash of the names of the many properties on this bean type. This
-   * is used for efficient building of included properties sets for partial
-   * objects.
-   */
-  public int getNamesOfManyPropsHash() {
-    return namesOfManyPropsHash;
-  }
-
-  /**
-   * Returns the set of many property names for this bean type.
-   */
-  public Set<String> getNamesOfManyProps() {
-    return namesOfManyProps;
   }
 
   /**
@@ -2073,20 +1907,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public BeanProperty getVersionProperty() {
     return versionProperty;
-  }
-
-  /**
-   * Return true if this is an Update (rather than insert) given that the bean
-   * is involved in a stateless update.
-   */
-  public boolean isStatelessUpdate(EntityBean bean) {
-    if (versionProperty == null) {
-      Object versionValue = getId(bean);
-      return !DmlUtil.isNullOrZero(versionValue);
-    } else {
-      Object versionValue = versionProperty.getValue(bean);
-      return !DmlUtil.isNullOrZero(versionValue);
-    }
   }
 
   /**

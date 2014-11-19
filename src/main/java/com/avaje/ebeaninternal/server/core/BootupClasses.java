@@ -56,7 +56,7 @@ public class BootupClasses implements ClassPathSearchMatcher {
     private ArrayList<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<ServerConfigStartup>();
 
     private List<BeanPersistController> persistControllerInstances = new ArrayList<BeanPersistController>();
-    private List<BeanPersistListener<?>> persistListenerInstances = new ArrayList<BeanPersistListener<?>>();
+    private List<BeanPersistListener> persistListenerInstances = new ArrayList<BeanPersistListener>();
     private List<BeanQueryAdapter> queryAdapterInstances = new ArrayList<BeanQueryAdapter>();
     private List<TransactionEventListener> transactionEventListenerInstances = new ArrayList<TransactionEventListener>();
 
@@ -145,9 +145,9 @@ public class BootupClasses implements ClassPathSearchMatcher {
         }
     }
 
-    public void addPersistListeners(List<BeanPersistListener<?>> listenerInstances) {
+    public void addPersistListeners(List<BeanPersistListener> listenerInstances) {
         if (listenerInstances != null) {
-            for (BeanPersistListener<?> l : listenerInstances) {
+            for (BeanPersistListener l : listenerInstances) {
                 this.persistListenerInstances.add(l);
         		// don't automatically instantiate
 	            this.beanListenerList.remove(l.getClass());
@@ -181,12 +181,12 @@ public class BootupClasses implements ClassPathSearchMatcher {
         return queryAdapterInstances;
     }
 
-    public List<BeanPersistListener<?>> getBeanPersistListeners() {
+    public List<BeanPersistListener> getBeanPersistListeners() {
         // add class registered BeanPersistController to the
         // already created instances
         for (Class<?> cls : beanListenerList) {
             try {
-                BeanPersistListener<?> newInstance = (BeanPersistListener<?>) cls.newInstance();
+                BeanPersistListener newInstance = (BeanPersistListener) cls.newInstance();
                 persistListenerInstances.add(newInstance);
             } catch (Exception e) {
                 String msg = "Error creating BeanPersistController " + cls;

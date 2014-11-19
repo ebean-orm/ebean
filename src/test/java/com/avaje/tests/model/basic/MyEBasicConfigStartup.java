@@ -2,14 +2,22 @@ package com.avaje.tests.model.basic;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.event.BeanPersistListener;
-import com.avaje.ebean.event.BulkTableEvent;
-import com.avaje.ebean.event.BulkTableEventListener;
-import com.avaje.ebean.event.ServerConfigStartup;
+import com.avaje.ebean.event.*;
 
 public class MyEBasicConfigStartup implements ServerConfigStartup {
+
+  public static AtomicLong insertCount = new AtomicLong();
+  public static AtomicLong updateCount = new AtomicLong();
+  public static AtomicLong deleteCount = new AtomicLong();
+
+  public static void resetCounters() {
+    insertCount.set(0);
+    updateCount.set(0);
+    deleteCount.set(0);
+  }
 
   public void onStart(ServerConfig serverConfig) {
 
@@ -35,30 +43,29 @@ public class MyEBasicConfigStartup implements ServerConfigStartup {
 
   }
 
-  public static class EbasicPersistList implements BeanPersistListener<EBasic> {
+  public static class EbasicPersistList extends AbstractBeanPersistListener {
 
-    public boolean inserted(EBasic bean) {
-      System.out.println("-- EBasic inserted " + bean.getId());
+    @Override
+    public boolean isRegisterFor(Class<?> cls) {
+      return EBasic.class.isAssignableFrom(cls);
+    }
+
+    public boolean inserted(Object bean) {
+      insertCount.incrementAndGet();
+      System.out.println("-- EBasic inserted " + ((EBasic)bean).getId());
       return false;
     }
 
-    public boolean updated(EBasic bean, Set<String> updatedProperties) {
-      System.out.println("-- EBasic updated " + bean.getId()+" updatedProperties: "+updatedProperties);
+    public boolean updated(Object bean, Set<String> updatedProperties) {
+      updateCount.incrementAndGet();
+      System.out.println("-- EBasic updated " + ((EBasic)bean).getId()+" updatedProperties: "+updatedProperties);
       return false;
     }
 
-    public boolean deleted(EBasic bean) {
-      System.out.println("-- EBasic deleted " + bean.getId());
+    public boolean deleted(Object bean) {
+      deleteCount.incrementAndGet();
+      System.out.println("-- EBasic deleted " + ((EBasic)bean).getId());
       return false;
-    }
-
-    public void remoteInsert(Object id) {
-    }
-
-    public void remoteUpdate(Object id) {
-    }
-
-    public void remoteDelete(Object id) {
     }
 
   }
