@@ -4,6 +4,7 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebean.text.json.JsonContext;
+import com.avaje.ebean.text.json.JsonIOException;
 import com.avaje.ebean.text.json.JsonWriteOptions;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -23,7 +24,7 @@ import java.util.Map.Entry;
 public class DJsonContext implements JsonContext {
 
   private final SpiEbeanServer server;
-  
+
   private final JsonFactory jsonFactory;
 
   public DJsonContext(SpiEbeanServer server, JsonFactory jsonFactory) {
@@ -35,117 +36,141 @@ public class DJsonContext implements JsonContext {
     return server.isSupportedType(genericType);
   }
 
-  public JsonGenerator createGenerator(Writer writer) throws IOException {
-    return jsonFactory.createGenerator(writer);
-  }
-  
-  public JsonParser createParser(Reader reader) throws IOException {
-    return jsonFactory.createParser(reader);
+  public JsonGenerator createGenerator(Writer writer) throws JsonIOException {
+    try {
+      return jsonFactory.createGenerator(writer);
+    } catch (IOException e) {
+      throw new JsonIOException(e);
+    }
   }
 
-  public <T> T toBean(Class<T> cls, String json) throws IOException {
+  public JsonParser createParser(Reader reader) throws JsonIOException {
+    try {
+      return jsonFactory.createParser(reader);
+    } catch (IOException e) {
+      throw new JsonIOException(e);
+    }
+  }
+
+  public <T> T toBean(Class<T> cls, String json) throws JsonIOException {
     return toBean(cls, new StringReader(json));
   }
 
-  public <T> T toBean(Class<T> cls, Reader jsonReader) throws IOException {
+  public <T> T toBean(Class<T> cls, Reader jsonReader) throws JsonIOException {
     return toBean(cls, createParser(jsonReader));
   }
 
-  private <T> T toBean(Class<T> cls, JsonParser parser) throws IOException {
+  private <T> T toBean(Class<T> cls, JsonParser parser) throws JsonIOException {
 
-    BeanDescriptor<T> d = getDescriptor(cls);
-    return d.jsonRead(parser, null);
+    try {
+      BeanDescriptor<T> d = getDescriptor(cls);
+      return d.jsonRead(parser, null);
+    } catch (IOException e) {
+      throw new JsonIOException(e);
+    }
   }
 
-  public <T> List<T> toList(Class<T> cls, String json) throws IOException {
+  public <T> List<T> toList(Class<T> cls, String json) throws JsonIOException {
     return toList(cls, new StringReader(json));
   }
 
 
-  public <T> List<T> toList(Class<T> cls, Reader jsonReader) throws IOException {
+  public <T> List<T> toList(Class<T> cls, Reader jsonReader) throws JsonIOException {
     return toList(cls, createParser(jsonReader));
   }
 
-  private <T> List<T> toList(Class<T> cls, JsonParser src) throws IOException {
+  private <T> List<T> toList(Class<T> cls, JsonParser src) throws JsonIOException {
 
-    BeanDescriptor<T> d = getDescriptor(cls);
+    try {
+      BeanDescriptor<T> d = getDescriptor(cls);
 
-    List<T> list = new ArrayList<T>();
+      List<T> list = new ArrayList<T>();
 
-    JsonToken event = src.nextToken();
-    if (event != JsonToken.START_ARRAY) {
-      throw new JsonParseException("Expecting start_array event but got " + event ,src.getCurrentLocation());
-    }
-
-    do {
-      T bean = d.jsonRead(src, null);
-      if (bean == null) {
-        break;
-      } else {
-        list.add(bean);
+      JsonToken event = src.nextToken();
+      if (event != JsonToken.START_ARRAY) {
+        throw new JsonParseException("Expecting start_array event but got " + event, src.getCurrentLocation());
       }
-    } while (true);
 
-    return list;
+      do {
+        T bean = d.jsonRead(src, null);
+        if (bean == null) {
+          break;
+        } else {
+          list.add(bean);
+        }
+      } while (true);
+
+      return list;
+    } catch (IOException e) {
+      throw new JsonIOException(e);
+    }
   }
 
-  public Object toObject(Type genericType, String json) throws IOException {
+  public Object toObject(Type genericType, String json) throws JsonIOException {
 
     TypeInfo info = ParamTypeHelper.getTypeInfo(genericType);
     ManyType manyType = info.getManyType();
     switch (manyType) {
-    case NONE:
-      return toBean(info.getBeanType(), json);
+      case NONE:
+        return toBean(info.getBeanType(), json);
 
-    case LIST:
-      return toList(info.getBeanType(), json);
+      case LIST:
+        return toList(info.getBeanType(), json);
 
-    default:
-      throw new IOException("Type " + manyType + " not supported");
+      default:
+        throw new JsonIOException("Type " + manyType + " not supported");
     }
   }
 
-  public Object toObject(Type genericType, Reader json) throws IOException {
+  public Object toObject(Type genericType, Reader json) throws JsonIOException {
 
     TypeInfo info = ParamTypeHelper.getTypeInfo(genericType);
     ManyType manyType = info.getManyType();
     switch (manyType) {
-    case NONE:
-      return toBean(info.getBeanType(), json);
+      case NONE:
+        return toBean(info.getBeanType(), json);
 
-    case LIST:
-      return toList(info.getBeanType(), json);
+      case LIST:
+        return toList(info.getBeanType(), json);
 
-    default:
-      throw new IOException("Type " + manyType + " not supported");
+      default:
+        throw new JsonIOException("Type " + manyType + " not supported");
     }
   }
 
-  public void toJson(Object o, Writer writer) throws IOException {
+  public void toJson(Object o, Writer writer) throws JsonIOException {
     toJson(o, writer, null);
   }
 
 
-  public void toJson(Object o, Writer writer, JsonWriteOptions options) throws IOException {
-    JsonGenerator generator = createGenerator(writer);
-    toJsonInternal(o, generator, options);
-    generator.close();
+  public void toJson(Object o, Writer writer, JsonWriteOptions options) throws JsonIOException {
+    try {
+      JsonGenerator generator = createGenerator(writer);
+      toJsonInternal(o, generator, options);
+      generator.close();
+    } catch (IOException e) {
+      throw new JsonIOException(e);
+    }
   }
 
-  public String toJson(Object o) throws IOException {
+  public String toJson(Object o) throws JsonIOException {
     return toJsonString(o, null);
   }
 
-  public String toJson(Object o, JsonWriteOptions options) throws IOException {
+  public String toJson(Object o, JsonWriteOptions options) throws JsonIOException {
     return toJsonString(o, options);
   }
 
-  private String toJsonString(Object o, JsonWriteOptions options) throws IOException {
-    StringWriter writer = new StringWriter(500);
-    JsonGenerator gen = createGenerator(writer);
-    toJsonInternal(o, gen, options);
-    gen.close();
-    return writer.toString();
+  private String toJsonString(Object o, JsonWriteOptions options) throws JsonIOException {
+    try {
+      StringWriter writer = new StringWriter(500);
+      JsonGenerator gen = createGenerator(writer);
+      toJsonInternal(o, gen, options);
+      gen.close();
+      return writer.toString();
+    } catch (IOException e) {
+      throw new JsonIOException(e);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -171,7 +196,7 @@ public class DJsonContext implements JsonContext {
     } else if (o instanceof EntityBean) {
       BeanDescriptor<?> d = getDescriptor(o.getClass());
       WriteJson writeJson = createWriteJson(gen, options);
-      d.jsonWrite(writeJson, (EntityBean)o, null);
+      d.jsonWrite(writeJson, (EntityBean) o, null);
     }
   }
 
@@ -183,7 +208,7 @@ public class DJsonContext implements JsonContext {
   private <T> void toJsonFromCollection(Collection<T> collection, String key, JsonGenerator gen, JsonWriteOptions options) throws IOException {
 
     if (key != null) {
-      gen.writeFieldName(key);      
+      gen.writeFieldName(key);
     }
     gen.writeStartArray();
 
@@ -203,7 +228,7 @@ public class DJsonContext implements JsonContext {
 
     WriteJson writeJson = createWriteJson(gen, options);
     gen.writeStartObject();
-    
+
     while (it.hasNext()) {
       Entry<Object, Object> entry = it.next();
       String key = entry.getKey().toString();
@@ -216,7 +241,7 @@ public class DJsonContext implements JsonContext {
 
         } else if (value instanceof EntityBean) {
           BeanDescriptor<?> d = getDescriptor(value.getClass());
-          d.jsonWrite(writeJson,(EntityBean) value, key);
+          d.jsonWrite(writeJson, (EntityBean) value, key);
 
         } else {
           EJson.write(entry, gen);
