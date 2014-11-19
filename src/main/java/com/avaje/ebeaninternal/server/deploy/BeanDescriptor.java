@@ -726,6 +726,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
+   * Set the bean caching on or off.
+   */
+  public void setUseCache(boolean useCache) {
+    cacheHelp.setUseCache(useCache);
+  }
+
+  /**
    * Return true if there is currently query caching for this type of bean.
    */
   public boolean isQueryCaching() {

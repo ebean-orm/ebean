@@ -40,10 +40,13 @@ public class DefaultServerCacheManager implements ServerCacheManager {
 		cacheFactory.init(server);
 		this.ebeanServer = (SpiEbeanServer)server;
 	}
-	
-    public void setCaching(Class<?> beanType, boolean useCache) {
-		ebeanServer.getBeanDescriptor(beanType).getCacheOptions().setUseCache(useCache);
-    }
+
+  /**
+   * Set bean caching on or off for a given bean type.
+   */
+  public void setCaching(Class<?> beanType, boolean useCache) {
+    ebeanServer.getBeanDescriptor(beanType).setUseCache(useCache);
+  }
 
 	/**
 	 * Clear both the bean cache and the query cache for a 

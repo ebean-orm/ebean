@@ -302,6 +302,21 @@ public interface Query<T> extends Serializable {
   public Query<T> copy();
 
   /**
+   * Specify the PersistenceContextScope to use for this query.
+   * <p/>
+   * When this is not set the 'default' configured on {@link com.avaje.ebean.config.ServerConfig#setPersistenceContextScope(PersistenceContextScope)}
+   * is used - this value defaults to {@link com.avaje.ebean.PersistenceContextScope#TRANSACTION}.
+   * <p/>
+   * Note that the same persistence Context is used for subsequent lazy loading and query join queries.
+   * <p/>
+   * Note that #findEach uses a 'per object graph' PersistenceContext so this scope is ignored for
+   * queries executed as #findIterate, #findEach, #findEachWhile.
+   *
+   * @param scope The scope to use for this query and subsequent lazy loading.
+   */
+  public Query<T> setPersistenceContextScope(PersistenceContextScope scope);
+
+  /**
    * Return the ExpressionFactory used by this query.
    */
   public ExpressionFactory getExpressionFactory();

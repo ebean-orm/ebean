@@ -105,7 +105,16 @@ public final class BeanDescriptorCacheHelp<T> {
       }
     }
   }
-  
+
+  public void setUseCache(boolean useCache) {
+    if (useCache) {
+      getBeanCache();
+    } else {
+      beanCacheClear();
+      beanCache = null;
+    }
+  }
+
   /**
    * Return true if there is currently query caching for this type of bean.
    */

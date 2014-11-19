@@ -2,10 +2,7 @@ package com.avaje.ebeaninternal.api;
 
 import java.util.List;
 
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.Transaction;
-import com.avaje.ebean.TxScope;
+import com.avaje.ebean.*;
 import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.BeanLoader;
 import com.avaje.ebean.bean.CallStack;
@@ -62,6 +59,11 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * </p>
    */
   public CallStack createCallStack();
+
+  /**
+   * Return the PersistenceContextScope to use defined at query or server level.
+   */
+  public PersistenceContextScope getPersistenceContextScope(SpiQuery<?> query);
 
   /**
    * Return the DDL generator.

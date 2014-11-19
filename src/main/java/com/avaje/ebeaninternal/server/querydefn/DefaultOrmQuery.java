@@ -167,6 +167,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private Boolean readOnly;
 
+  private PersistenceContextScope persistenceContextScope;
+
   private boolean sqlSelect;
 
   /**
@@ -459,6 +461,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     if (havingExpressions != null) {
       copy.havingExpressions = havingExpressions.copy(copy);
     }
+    copy.persistenceContextScope = persistenceContextScope;
     copy.usageProfiling = usageProfiling;
     copy.autoFetch = autoFetch;
     copy.parentNode = parentNode;
@@ -466,6 +469,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.rawSql = rawSql;
     copy.rawWhereClause = rawWhereClause;
     return copy;
+  }
+
+  @Override
+  public Query<T> setPersistenceContextScope(PersistenceContextScope scope) {
+    this.persistenceContextScope = scope;
+    return this;
+  }
+
+  public PersistenceContextScope getPersistenceContextScope() {
+    return persistenceContextScope;
   }
 
   public Type getType() {

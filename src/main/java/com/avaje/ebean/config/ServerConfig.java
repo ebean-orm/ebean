@@ -1,26 +1,21 @@
 package com.avaje.ebean.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import com.avaje.ebean.EbeanServerFactory;
+import com.avaje.ebean.PersistenceContextScope;
 import com.avaje.ebean.annotation.Encrypted;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.GlobalProperties.PropertySource;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
-import com.avaje.ebean.event.BeanPersistController;
-import com.avaje.ebean.event.BeanPersistListener;
-import com.avaje.ebean.event.BeanQueryAdapter;
-import com.avaje.ebean.event.BulkTableEventListener;
-import com.avaje.ebean.event.ServerConfigStartup;
-import com.avaje.ebean.event.TransactionEventListener;
+import com.avaje.ebean.event.*;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.util.ClassUtil;
 import com.fasterxml.jackson.core.JsonFactory;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The configuration used for creating a EbeanServer.
@@ -247,6 +242,11 @@ public class ServerConfig {
 
   private boolean collectQueryOrigins;
 
+  /**
+   * The default PersistenceContextScope used if one is not explicitly set on a query.
+   */
+  private PersistenceContextScope persistenceContextScope = PersistenceContextScope.TRANSACTION;
+
   private JsonFactory jsonFactory;
 
   private boolean localTimeWithNanos;
@@ -254,8 +254,7 @@ public class ServerConfig {
   private boolean durationWithNanos;
 
   /**
-   * Construct a Server Configuration for programmatically creating an
-   * EbeanServer.
+   * Construct a Server Configuration for programmatically creating an EbeanServer.
    */
   public ServerConfig() {
 
@@ -1306,6 +1305,35 @@ public class ServerConfig {
   }
 
   /**
+   * Return the default PersistenceContextScope to be used if one is not explicitly set on a query.
+   * <p/>
+   * The PersistenceContextScope can specified on each query via {@link com.avaje.ebean
+   * .Query#setPersistenceContextScope(com.avaje.ebean.PersistenceContextScope)}. If it
+   * is not set on the query this default scope is used.
+   *
+   * @see com.avaje.ebean.Query#setPersistenceContextScope(com.avaje.ebean.PersistenceContextScope)
+   */
+  public PersistenceContextScope getPersistenceContextScope() {
+    // if somehow null return TRANSACTION scope
+    return persistenceContextScope == null ? PersistenceContextScope.TRANSACTION : persistenceContextScope;
+  }
+
+  /**
+   * Set the PersistenceContext scope to be used if one is not explicitly set on a query.
+   * <p/>
+   * This defaults to {@link PersistenceContextScope#TRANSACTION}.
+   * <p/>
+   * The PersistenceContextScope can specified on each query via {@link com.avaje.ebean
+   * .Query#setPersistenceContextScope(com.avaje.ebean.PersistenceContextScope)}. If it
+   * is not set on the query this scope is used.
+   *
+   * @see com.avaje.ebean.Query#setPersistenceContextScope(com.avaje.ebean.PersistenceContextScope)
+   */
+  public void setPersistenceContextScope(PersistenceContextScope persistenceContextScope) {
+    this.persistenceContextScope = persistenceContextScope;
+  }
+
+  /**
    * Load the settings from the ebean.properties file.
    */
   public void loadFromProperties() {
@@ -1359,8 +1387,6 @@ public class ServerConfig {
 
   /**
    * This is broken out for the same reason as above - preserve existing behaviour but let it be overridden.
-   *
-   * @param p
    */
   protected void loadAutofetchConfig(PropertySource p) {
     autofetchConfig.loadSettings(p);
@@ -1417,6 +1443,8 @@ public class ServerConfig {
 
     int batchSize = p.getInt("batch.size", 20);
     persistBatchSize = p.getInt("persistBatchSize", batchSize);
+
+    persistenceContextScope = PersistenceContextScope.valueOf(p.get("persistenceContextScope","TRANSACTION"));
 
     dataSourceJndiName = p.get("dataSourceJndiName", null);
     databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", 20);

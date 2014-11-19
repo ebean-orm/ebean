@@ -137,7 +137,6 @@ public final class DefaultServer implements SpiEbeanServer {
 
   private final CQueryEngine cqueryEngine;
 
-  //@Deprecated
   private DdlGenerator ddlGenerator;
 
   private final ExpressionFactory expressionFactory;
@@ -156,6 +155,11 @@ public final class DefaultServer implements SpiEbeanServer {
    * The MBean name used to register Ebean.
    */
   private String mbeanName;
+
+  /**
+   * The default PersistenceContextScope used if it is not explicitly set on a query.
+   */
+  private final PersistenceContextScope defaultPersistenceContextScope;
 
   /**
    * The MBeanServer Ebean is registered with.
@@ -215,6 +219,7 @@ public final class DefaultServer implements SpiEbeanServer {
     this.cqueryEngine = config.getCQueryEngine();
     this.expressionFactory = config.getExpressionFactory();
     this.encryptKeyManager = serverConfig.getEncryptKeyManager();
+    this.defaultPersistenceContextScope = serverConfig.getPersistenceContextScope();
 
     this.beanDescriptorManager = config.getBeanDescriptorManager();
     beanDescriptorManager.setEbeanServer(this);
@@ -1131,8 +1136,8 @@ public final class DefaultServer implements SpiEbeanServer {
       t = getCurrentServerTransaction();
     }
     PersistenceContext context = null;
-    if (t != null) {
-      // first look in the persistence context
+    if (t != null && useTransactionPersistenceContext(query)) {
+      // first look in the transaction scoped persistence context
       context = t.getPersistenceContext();
       if (context != null) {
         WithOption o = context.getWithOption(beanDescriptor.getBeanType(), query.getId());
@@ -1155,7 +1160,22 @@ public final class DefaultServer implements SpiEbeanServer {
     // Hit the L2 bean cache
     return beanDescriptor.cacheBeanGet(query, context);
   }
-    
+
+  /**
+   * Return true if transactions PersistenceContext should be used.
+   */
+  private <T> boolean useTransactionPersistenceContext(SpiQuery<T> query) {
+    return PersistenceContextScope.TRANSACTION.equals(getPersistenceContextScope(query));
+  }
+
+  /**
+   * Return the PersistenceContextScope to use defined at query or server level.
+   */
+  public PersistenceContextScope getPersistenceContextScope(SpiQuery<?> query) {
+    PersistenceContextScope scope = query.getPersistenceContextScope();
+    return (scope != null) ? scope : defaultPersistenceContextScope;
+  }
+
   @SuppressWarnings("unchecked")
   private <T> T findId(Query<T> query, Transaction t) {
 

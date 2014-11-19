@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.OrderBy;
+import com.avaje.ebean.PersistenceContextScope;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.bean.BeanCollectionTouched;
 import com.avaje.ebean.bean.CallStack;
@@ -79,7 +80,15 @@ public interface SpiQuery<T> extends Query<T> {
          */
         SUBQUERY
     }
-    
+
+  /**
+   * Return the PersistenceContextScope that this query should use.
+   * <p>
+   * This can be null and in that case use the default scope.
+   * </p>
+   */
+  public PersistenceContextScope getPersistenceContextScope();
+
     /**
      * Return true if select all properties was used to ensure the property
      * invoking a lazy load was included in the query.

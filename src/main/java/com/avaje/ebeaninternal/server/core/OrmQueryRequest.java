@@ -28,6 +28,7 @@ import com.avaje.ebeaninternal.server.loadcontext.DLoadContext;
 import com.avaje.ebeaninternal.server.query.CQueryPlan;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
+import com.avaje.ebeaninternal.server.transaction.NoopPersistenceContext;
 
 /**
  * Wraps the objects involved in executing a Query.
@@ -53,7 +54,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   private HashQuery cacheKey;
 
   private HashQueryPlan queryPlanHash;
-  
+
   /**
    * Create the InternalQueryRequest.
    */
@@ -69,7 +70,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     this.readOnly = query.isReadOnly();
   }
 
-  
+
   /**
    * Return the database platform like clause.
    */
@@ -183,18 +184,32 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     persistenceContext = new DefaultPersistenceContext();
     loadContext.setPersistenceContext(persistenceContext);
   }
-  
+
   /**
    * Get the TransactionContext either explicitly set on the query or
    * transaction scoped.
    */
   private PersistenceContext getPersistenceContext(SpiQuery<?> query, SpiTransaction t) {
 
+    // check if there is already a persistence context set which is the case
+    // when lazy loading or query joins are executed
     PersistenceContext ctx = query.getPersistenceContext();
-    if (ctx == null) {
-      ctx = t.getPersistenceContext();
+    if (ctx != null) return ctx;
+
+    // determine the scope (from the query and then server)
+    PersistenceContextScope scope = ebeanServer.getPersistenceContextScope(query);
+    switch (scope) {
+      case QUERY:
+        // Create a new PersistenceContext for this query
+        return new DefaultPersistenceContext();
+      case NONE:
+        // Effectively don't use a PersistenceContext
+        return new NoopPersistenceContext();
+      default: {
+        // Use the transaction scoped PersistenceContext
+        return t.getPersistenceContext();
+      }
     }
-    return ctx;
   }
 
   /**
