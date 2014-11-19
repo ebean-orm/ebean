@@ -114,6 +114,11 @@ public class JdbcTransaction implements SpiTransaction {
    */
   protected int depth;
 
+  /**
+   * Set to true if the connection has autoCommit=true initially.
+   */
+  protected final boolean autoCommit;
+
   protected IdentityHashMap<Object,Object> persistingBeans;
   
   protected HashSet<Integer> deletingBeansHash;
@@ -137,6 +142,10 @@ public class JdbcTransaction implements SpiTransaction {
       this.connection = connection;
       this.onQueryOnly = manager == null ? OnQueryOnly.ROLLBACK : manager.getOnQueryOnly();
       this.persistenceContext = new DefaultPersistenceContext();
+      this.autoCommit = connection.getAutoCommit();
+      if (this.autoCommit) {
+        connection.setAutoCommit(false);
+      }
 
     } catch (Exception e) {
       throw new PersistenceException(e);
@@ -210,11 +219,7 @@ public class JdbcTransaction implements SpiTransaction {
    * Return true if this is a bean that has already been saved/deleted.
    */
   public boolean isRegisteredDeleteBean(Integer persistingBean) {
-    if (deletingBeansHash == null) {
-      return false;
-    } else {
-      return deletingBeansHash.contains(persistingBean);
-    }
+    return deletingBeansHash != null && deletingBeansHash.contains(persistingBean);
   }
 
   /**
@@ -440,13 +445,6 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   /**
-   * Set whether transaction logging is on for this transaction.
-   */
-  public void setLoggingOn(boolean loggingOn) {
-    
-  }
-
-  /**
    * Return true if this was an explicitly created transaction.
    */
   public boolean isExplicit() {
@@ -499,6 +497,14 @@ public class JdbcTransaction implements SpiTransaction {
       if (localReadOnly) {
         // reset readOnly status prior to returning to pool
         connection.setReadOnly(false);
+      }
+    } catch (SQLException e) {
+      logger.error("Error setting to readOnly?", e);
+    }
+    try {
+      if (autoCommit) {
+        // reset the autoCommit status prior to returning to pool
+        connection.setAutoCommit(true);
       }
     } catch (SQLException e) {
       logger.error("Error setting to readOnly?", e);
@@ -700,10 +706,6 @@ public class JdbcTransaction implements SpiTransaction {
       return null;
     }
     return userObjects.get(name);
-  }
-
-  public final TransactionManager getTransactionManger() {
-    return manager;
   }
 
   /**
