@@ -13,40 +13,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.avaje.ebean.PersistenceContextScope.QUERY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TestPersistencContextNone extends BaseTestCase {
-
-  @Test
-  public void test_persistenceContextScopeNone() {
-
-    ResetBasicData.reset();
-
-
-    List<Order> orders = Ebean.find(Order.class)
-            .setPersistenceContextScope(PersistenceContextScope.NONE)
-            .fetch("customer", "id, name")
-            .where().istartsWith("customer.name", "rob").eq("customer.id", 1)
-            .orderBy().asc("customer.name")
-            .findList();
-
-    assertTrue(!orders.isEmpty());
-
-    // collect the customer instances
-    List<Customer> customers = new ArrayList<Customer>();
-    Set<Integer> identities = new HashSet<Integer>();
-
-    for (Order order : orders) {
-      Customer customer = order.getCustomer();
-      identities.add(System.identityHashCode(customer));
-      customers.add(customer);
-    }
-
-    // Many instances of 'logically the same Customer'
-    assertTrue(identities.size() > 1);
-    assertEquals(identities.size(), customers.size());
-  }
+public class TestPersistenceContextScopeUsingOrders extends BaseTestCase {
 
   @Test
   public void test_persistenceContextScopeQuery() {
@@ -55,7 +26,7 @@ public class TestPersistencContextNone extends BaseTestCase {
 
     List<Order> orders = Ebean.find(Order.class)
             // Use QUERY or TRANSACTION scope (just not NONE)
-            .setPersistenceContextScope(PersistenceContextScope.QUERY)
+            .setPersistenceContextScope(QUERY)
             .fetch("customer", "id, name")
             .where().istartsWith("customer.name", "rob").eq("customer.id", 1)
             .orderBy().asc("customer.name")

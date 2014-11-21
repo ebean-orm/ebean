@@ -31,22 +31,5 @@ public enum PersistenceContextScope {
    * <p/>
    * You may use QUERY scope on a query that is executed in a transaction and you want to get a 'fresh copy' of the bean.
    */
-  QUERY,
-
-  /**
-   * EXPERIMENTAL FEATURE - This is not expected to be used and somewhat experimental.
-   * This NONE option effectively means that a PersistenceContext is not used when building the object graph and
-   * subsequent lazy loading.
-   * <p/>
-   * You should ONLY use this when treating the resulting object graph as read only and even then you would be best
-   * to use QUERY (or TRANSACTION).
-   * <p/>
-   * A query executed with NONE can build a object graph where there are multiple instances that represent the same
-   * 'logical bean' by type and Id value (multiple instances of 'Customer 42'). Getting multiple instances that
-   * represent the same logical bean (same row in the database) means that it is potentially dangerous/confusing to
-   * use this scope when modifying the beans as multiple instances represent the same underlying rows in the database.
-   * <p/>
-   * Generally you would expect to always use TRANSACTION or QUERY scope.
-   */
-  NONE
+  QUERY
 }

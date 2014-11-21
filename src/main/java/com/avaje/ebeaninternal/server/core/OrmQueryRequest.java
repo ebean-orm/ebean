@@ -198,18 +198,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
     // determine the scope (from the query and then server)
     PersistenceContextScope scope = ebeanServer.getPersistenceContextScope(query);
-    switch (scope) {
-      case QUERY:
-        // Create a new PersistenceContext for this query
-        return new DefaultPersistenceContext();
-      case NONE:
-        // Effectively don't use a PersistenceContext
-        return new NoopPersistenceContext();
-      default: {
-        // Use the transaction scoped PersistenceContext
-        return t.getPersistenceContext();
-      }
-    }
+    return (scope == PersistenceContextScope.QUERY) ? new DefaultPersistenceContext() :  t.getPersistenceContext();
   }
 
   /**

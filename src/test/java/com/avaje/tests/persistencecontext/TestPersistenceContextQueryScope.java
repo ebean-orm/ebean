@@ -48,15 +48,6 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
               .setPersistenceContextScope(QUERY)
               .findUnique();
 
-      // NONE scope also hits the DB
-      // ... also explicitly not use bean cache
-      EBasicVer bean4 = Ebean.find(EBasicVer.class)
-              .setId(bean.getId())
-              .setUseCache(false) // ignore L2 cache
-              .setPersistenceContextScope(NONE)
-              .findUnique();
-
-
       // TRANsACTION scope ... same as bean2 and does not hit the DB
       EBasicVer bean5 = Ebean.find(EBasicVer.class)
               .setId(bean.getId())
@@ -72,9 +63,7 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
       assertSame(bean1, bean5);
 
       assertEquals("second", bean3.getName());
-      assertEquals("second", bean4.getName());
-
-      Ebean.delete(bean4);
+      Ebean.delete(bean3);
 
       Ebean.commitTransaction();
 
