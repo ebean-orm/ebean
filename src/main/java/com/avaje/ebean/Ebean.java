@@ -281,7 +281,7 @@ public final class Ebean {
    * Register the server with this Ebean singleton. Specify if the registered
    * server is the primary/default server.
    */
-  protected static void register(EbeanServer server, boolean isPrimaryServer) {
+  public static void register(EbeanServer server, boolean isPrimaryServer) {
     serverMgr.register(server, isPrimaryServer);
   }
 
@@ -370,6 +370,19 @@ public final class Ebean {
    */
   public static Transaction currentTransaction() {
     return serverMgr.getPrimaryServer().currentTransaction();
+  }
+
+  /**
+   * Register a TransactionCallback on the currently active transaction.
+   * <p/>
+   * If there is no currently active transaction then a PersistenceException is thrown.
+   *
+   * @param transactionCallback The transaction callback to be registered with the current transaction.
+   *
+   * @throws PersistenceException If there is no currently active transaction
+   */
+  public static void register(TransactionCallback transactionCallback) throws PersistenceException {
+    serverMgr.getPrimaryServer().register(transactionCallback);
   }
 
   /**

@@ -653,6 +653,15 @@ public final class DefaultServer implements SpiEbeanServer {
     return (T) ref;
   }
 
+  @Override
+  public void register(TransactionCallback transactionCallback) {
+    Transaction transaction = currentTransaction();
+    if (transaction == null) {
+      throw new PersistenceException("Not currently active transaction when trying to register transactionCallback");
+    }
+    transaction.register(transactionCallback);
+  }
+
   /**
    * Creates a new Transaction that is NOT stored in TransactionThreadLocal. Use
    * this when you want a thread to have a second independent transaction.

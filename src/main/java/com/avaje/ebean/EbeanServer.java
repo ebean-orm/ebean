@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.cache.ServerCacheManager;
@@ -306,6 +307,17 @@ public interface EbeanServer {
    * @see Ebean#createNamedSqlUpdate(String)
    */
   public SqlUpdate createNamedSqlUpdate(String namedQuery);
+
+  /**
+   * Register a TransactionCallback on the currently active transaction.
+   * <p/>
+   * If there is no currently active transaction then a PersistenceException is thrown.
+   *
+   * @param transactionCallback The transaction callback to be registered with the current transaction.
+   *
+   * @throws PersistenceException If there is no currently active transaction
+   */
+  public void register(TransactionCallback transactionCallback) throws PersistenceException;
 
   /**
    * Create a new transaction that is not held in TransactionThreadLocal.

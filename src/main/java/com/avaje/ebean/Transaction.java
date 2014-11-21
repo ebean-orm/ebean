@@ -36,6 +36,11 @@ public interface Transaction extends Closeable {
   public static final int SERIALIZABLE = java.sql.Connection.TRANSACTION_SERIALIZABLE;
 
   /**
+   * Register a TransactionCallback with this transaction.
+   */
+  public void register(TransactionCallback callback);
+
+  /**
    * Return true if this transaction is read only.
    */
   public boolean isReadOnly();

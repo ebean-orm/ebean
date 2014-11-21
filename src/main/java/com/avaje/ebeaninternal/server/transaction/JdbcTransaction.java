@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
 
+import com.avaje.ebean.TransactionCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,6 +130,8 @@ public class JdbcTransaction implements SpiTransaction {
   
   protected Map<String, Object> userObjects;
 
+  protected List<TransactionCallback> callbackList;
+
   /**
    * Create a new JdbcTransaction.
    */
@@ -170,6 +173,63 @@ public class JdbcTransaction implements SpiTransaction {
   public String toString() {
     return logPrefix;
   }
+
+  @Override
+  public void register(TransactionCallback callback) {
+    if (callbackList == null) {
+      callbackList = new ArrayList<TransactionCallback>(4);
+    }
+    callbackList.add(callback);
+  }
+
+  protected void firePreRollback() {
+    if (callbackList != null) {
+      for (TransactionCallback callback : callbackList) {
+        try {
+          callback.preRollback();
+        } catch (Exception e) {
+          logger.error("Error executing preRollback callback", e);
+        }
+      }
+    }
+  }
+
+  protected void firePostRollback() {
+    if (callbackList != null) {
+      for (TransactionCallback callback : callbackList) {
+        try {
+          callback.postRollback();
+        } catch (Exception e) {
+          logger.error("Error executing postRollback callback", e);
+        }
+      }
+    }
+  }
+
+  protected void firePreCommit() {
+    if (callbackList != null) {
+      for (TransactionCallback callback : callbackList) {
+        try {
+          callback.preCommit();
+        } catch (Exception e) {
+          logger.error("Error executing preCommit callback", e);
+        }
+      }
+    }
+  }
+
+  protected void firePostCommit() {
+    if (callbackList != null) {
+      for (TransactionCallback callback : callbackList) {
+        try {
+          callback.postCommit();
+        } catch (Exception e) {
+          logger.error("Error executing postCommit callback", e);
+        }
+      }
+    }
+  }
+
 
   public List<DerivedRelationshipData> getDerivedRelationship(Object bean) {
     if (derivedRelMap == null) {
@@ -603,6 +663,9 @@ public class JdbcTransaction implements SpiTransaction {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
+
+    firePreCommit();
+
     try {
       if (queryOnly) {
         // can rollback or just close for performance
@@ -620,6 +683,7 @@ public class JdbcTransaction implements SpiTransaction {
       
     } finally {
       // these will not throw an exception
+      firePostCommit();
       deactivate();
       notifyCommit();      
     }
@@ -653,6 +717,7 @@ public class JdbcTransaction implements SpiTransaction {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
+    firePreRollback();
     try {
       performRollback();
 
@@ -661,6 +726,7 @@ public class JdbcTransaction implements SpiTransaction {
       
     } finally {
       // these will not throw an exception
+      firePostRollback();
       deactivate();
       notifyRollback(cause);
     }

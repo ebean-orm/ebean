@@ -427,10 +427,9 @@ public class TransactionManager {
       for (TransactionEventListener listener : transactionEventListeners) {
         listener.postTransactionCommit(transaction);
       }
-      
-		} catch (Exception ex) {
-			String m = "NotifyOfCommit failed. L2 Cache potentially not notified.";
-			logger.error(m, ex);
+
+    } catch (Exception ex) {
+			logger.error("NotifyOfCommit failed. L2 Cache potentially not notified.", ex);
 		}
 	}
 
