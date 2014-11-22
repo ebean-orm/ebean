@@ -333,14 +333,6 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     return exprList.istartsWith(propertyName, value);
   }
 
-  public com.avaje.ebean.Query<T> join(String assocProperty, String assocProperties) {
-    return exprList.join(assocProperty, assocProperties);
-  }
-
-  public com.avaje.ebean.Query<T> join(String assocProperties) {
-    return exprList.join(assocProperties);
-  }
-
   public ExpressionList<T> le(String propertyName, Object value) {
     return exprList.le(propertyName, value);
   }

@@ -262,24 +262,6 @@ public interface ExpressionList<T> extends Serializable {
   public Query<T> select(String properties);
 
   /**
-   * Specify a property (associated bean) to join and <em>fetch</em> including
-   * all its properties.
-   * 
-   * @see Query#fetch(String)
-   * @deprecated
-   */
-  public Query<T> join(String assocProperties);
-
-  /**
-   * Specify a property (associated bean) to join and <em>fetch</em> with its
-   * specific properties to include (aka partial object).
-   * 
-   * @see Query#fetch(String,String)
-   * @deprecated
-   */
-  public Query<T> join(String assocProperty, String assocProperties);
-
-  /**
    * Set the first row to fetch.
    * 
    * @see Query#setFirstRow(int)
