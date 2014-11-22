@@ -47,7 +47,7 @@ public class Binder {
 
 		ArrayList<BindValues.Value> list = bindValues.values();
 		for (int i = 0; i < list.size(); i++) {
-			BindValues.Value bindValue = (BindValues.Value) list.get(i);
+			BindValues.Value bindValue = list.get(i);
 			if (bindValue.isComment()) {
 				if (bindBuf != null) {
 					bindBuf.append(bindValue.getName());
@@ -226,14 +226,12 @@ public class Binder {
 		try {
 			switch (dataType) {
 			case java.sql.Types.BOOLEAN:
-				Boolean bo = (Boolean) data;
-				b.setBoolean(bo.booleanValue());
+				b.setBoolean((Boolean) data);
 				break;
-            case java.sql.Types.BIT:
-                // Types.BIT should map to Java Boolean
-                Boolean bitBool = (Boolean) data;
-                b.setBoolean(bitBool.booleanValue());
-                break;				
+      case java.sql.Types.BIT:
+        // Types.BIT should map to Java Boolean
+        b.setBoolean((Boolean) data);
+        break;
 
 			case java.sql.Types.VARCHAR:
 				b.setString((String) data);
@@ -244,32 +242,32 @@ public class Binder {
 				break;
 				
 			case java.sql.Types.TINYINT:
-				b.setByte(((Byte) data).byteValue());
+				b.setByte((Byte) data);
 				break;
 
 			case java.sql.Types.SMALLINT:
-				b.setShort(((Short) data).shortValue());
+				b.setShort((Short) data);
 				break;
 
 			case java.sql.Types.INTEGER:
-				b.setInt(((Integer) data).intValue());
+				b.setInt((Integer) data);
 				break;
 
 			case java.sql.Types.BIGINT:
-				b.setLong(((Long) data).longValue());
+				b.setLong((Long) data);
 				break;
 
 			case java.sql.Types.REAL:
-				b.setFloat(((Float) data).floatValue());
+				b.setFloat((Float) data);
 				break;
 
 			case java.sql.Types.FLOAT:
 				// DB Float in theory maps to Java Double type
-				b.setDouble(((Double) data).doubleValue());
+				b.setDouble((Double) data);
 				break;
 
 			case java.sql.Types.DOUBLE:
-				b.setDouble(((Double) data).doubleValue());
+				b.setDouble((Double) data);
 				break;
 
 			case java.sql.Types.NUMERIC:

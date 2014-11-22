@@ -98,6 +98,7 @@ public class ExeUpdateSql {
         
     	// process named parameters if required
     	sql = BindParamsParser.parse(bindParams, sql);
+      updateSql.setGeneratedSql(sql);
         
     	boolean logSql = request.isLogSql();
     	

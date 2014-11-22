@@ -93,6 +93,11 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
 	 */
 	private final String sql;
 
+  /**
+   * The actual sql with named parameters converted.
+   */
+  private String generatedSql;
+
 	/**
 	 * Some descriptive text that can be put into the transaction log.
 	 */
@@ -170,7 +175,16 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
 		return this;
 	}
 
-	public String getSql() {
+  public String getGeneratedSql() {
+    return generatedSql;
+  }
+
+  @Override
+  public void setGeneratedSql(String generatedSql) {
+    this.generatedSql = generatedSql;
+  }
+
+  public String getSql() {
 		return sql;
 	}
 

@@ -31,6 +31,12 @@ public class BindParams implements Serializable {
 	 */
 	private String preparedSql;
 
+  /**
+   * Bind hash and count used to detect when the bind values have changed such
+   * that the generated SQL (with named parameters) needs to be recalculated.
+   */
+  private int[] bindHash;
+
 	public BindParams() {  
 	}
 	
@@ -51,20 +57,33 @@ public class BindParams implements Serializable {
    * </p>
    */
   public void buildQueryPlanHash(HashQueryPlanBuilder builder) {
+    int[] vals = calcQueryPlanHash();
+    builder.add(vals[0]).bind(vals[1]);
+  }
+
+  /**
+   * Calculate and return a query plan bind hash with total bind count.
+   */
+  public int[] calcQueryPlanHash() {
+    int tempBindCount;
+    int bc = 0;
     int hc = 31;
     for (Param param : positionedParameters) {
-      hc = hc * 31 + param.queryBindCount();
+      tempBindCount = param.queryBindCount();
+      bc += tempBindCount;
+      hc = hc * 31 + tempBindCount;
     }
 
     for (Map.Entry<String, Param> entry : namedParameters.entrySet()) {
+      tempBindCount = entry.getValue().queryBindCount();
+      bc += tempBindCount;
       hc = hc * 31 + entry.getKey().hashCode();
-      hc = hc * 31 + entry.getValue().queryBindCount();
+      hc = hc * 31 + tempBindCount;
     }
 
-    int bindCount = positionedParameters.size() + namedParameters.size();
-    builder.add(hc).bind(bindCount);
+    return new int[]{hc, bc};
   }
- 
+
 	/**
 	 * Return a deep copy of the BindParams.
 	 */
@@ -110,7 +129,7 @@ public class BindParams implements Serializable {
 	 * parameters ordered.
 	 */
 	public boolean requiresNamedParamsPrepare() {
-		return !namedParameters.isEmpty() && positionedParameters.isEmpty();
+		return !namedParameters.isEmpty();
 	}
 
 	/**
@@ -150,7 +169,7 @@ public class BindParams implements Serializable {
 	}
 
 	private Param getParam(String name) {
-		Param p = (Param) namedParameters.get(name);
+		Param p = namedParameters.get(name);
 		if (p == null) {
 			p = new Param();
 			namedParameters.put(name, p);
@@ -165,7 +184,7 @@ public class BindParams implements Serializable {
 				positionedParameters.add(new Param());
 			}
 		}
-		return (Param) positionedParameters.get(position - 1);
+		return positionedParameters.get(position - 1);
 	}
 
 	/**
@@ -253,7 +272,29 @@ public class BindParams implements Serializable {
 		return preparedSql;
 	}
 
-	/**
+  /**
+   * Return true if the bind hash and count has not changed.
+   */
+  public boolean isSameBindHash() {
+
+    if (bindHash == null) {
+      bindHash = calcQueryPlanHash();
+      return false;
+    }
+    int[] oldPlan = bindHash;
+    bindHash = calcQueryPlanHash();
+    return bindHash[0] == oldPlan[0] && bindHash[1] == oldPlan[1];
+  }
+
+  /**
+   * Create a new positioned parameters orderedList.
+   */
+  public OrderedList createOrderedList() {
+    positionedParameters.clear();
+    return new OrderedList(positionedParameters);
+  }
+
+  /**
 	 * The bind parameters in the correct binding order.
 	 * <p>
 	 * This is the result of converting sql with named parameters
@@ -327,8 +368,6 @@ public class BindParams implements Serializable {
 
 		private Object outValue;
 
-		private int textLocation;
-
 		/**
 		 * Construct a Parameter.
 		 */
@@ -368,17 +407,8 @@ public class BindParams implements Serializable {
 		}
 
 		public boolean equals(Object o) {
-			if (o == null) {
-				return false;
-			}
-			if (o == this) {
-				return true;
-			}
-			if (o instanceof Param) {
-				return hashCode() == o.hashCode();
-			}
-			return false;
-		}
+      return o != null && (o == this || (o instanceof Param) && hashCode() == o.hashCode());
+    }
 		
 		/**
 		 * Return true if this is an In parameter that needs to be bound before
@@ -461,21 +491,6 @@ public class BindParams implements Serializable {
 		 */
 		public void setOutValue(Object out) {
 			this.outValue = out;
-		}
-
-		/**
-		 * Return the location this parameter was found in the sql text.
-		 */
-		public int getTextLocation() {
-			return textLocation;
-		}
-
-		/**
-		 * Set the location in the sql text this parameter was located. This is
-		 * used to control order for named parameters.
-		 */
-		public void setTextLocation(int textLocation) {
-			this.textLocation = textLocation;
 		}
 
     /**

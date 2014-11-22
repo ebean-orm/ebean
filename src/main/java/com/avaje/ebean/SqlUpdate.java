@@ -92,6 +92,11 @@ public interface SqlUpdate {
   public String getSql();
 
   /**
+   * Return the generated sql that has named parameters converted to positioned parameters.
+   */
+  public String getGeneratedSql();
+
+  /**
    * Return the timeout used to execute this statement.
    */
   public int getTimeout();
