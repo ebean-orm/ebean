@@ -1,9 +1,15 @@
 package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 /**
@@ -11,11 +17,22 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
  */
 public class InsertTimestampFactory {
 
-	final GeneratedInsertTimestamp timestamp = new GeneratedInsertTimestamp();
-
-	final GeneratedInsertDate utilDate = new GeneratedInsertDate();
-
 	final GeneratedInsertLong longTime = new GeneratedInsertLong();
+
+  Map<Class<?>, GeneratedProperty> map = new HashMap<Class<?>, GeneratedProperty>();
+
+  public InsertTimestampFactory() {
+    map.put(Timestamp.class, new GeneratedInsertTimestamp());
+    map.put(java.util.Date.class, new GeneratedInsertDate());
+    map.put(Long.class, longTime);
+    map.put(long.class, longTime);
+
+    if (ClassUtil.isPresent("java.time.LocalDate", this.getClass())) {
+      map.put(LocalDateTime.class, new GeneratedInsertJavaTime.LocalDT());
+      map.put(OffsetDateTime.class, new GeneratedInsertJavaTime.OffsetDT());
+      map.put(ZonedDateTime.class, new GeneratedInsertJavaTime.ZonedDT());
+    }
+  }
 
 	public void setInsertTimestamp(DeployBeanProperty property) {
 
@@ -28,20 +45,12 @@ public class InsertTimestampFactory {
 	public GeneratedProperty createInsertTimestamp(DeployBeanProperty property) {
 		
 		Class<?> propType = property.getPropertyType();
-		if (propType.equals(Timestamp.class)) {
-			return timestamp;
-		}
-		if (propType.equals(java.util.Date.class)) {
-			return utilDate;
-		}
-		if (propType.equals(Long.class) || propType.equals(long.class)) {
-			return longTime;
-		}
-		
-		//TODO: Support JODA Time objects ... perhaps others?
-		
-		String msg = "Generated Insert Timestamp not supported on "+propType.getName();
-		throw new PersistenceException(msg);
+    GeneratedProperty generatedProperty = map.get(propType);
+    if (generatedProperty != null) {
+      return generatedProperty;
+    }
+
+		throw new PersistenceException("Generated Insert Timestamp not supported on "+propType.getName());
 	}
 	
 }
