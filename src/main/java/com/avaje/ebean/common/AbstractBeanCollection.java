@@ -38,12 +38,12 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   /**
    * The owning bean (used for lazy fetch).
    */
-  protected final EntityBean ownerBean;
+  protected EntityBean ownerBean;
 
   /**
    * The name of this property in the owning bean (used for lazy fetch).
    */
-  protected final String propertyName;
+  protected String propertyName;
 
   protected ModifyHolder<E> modifyHolder;
 
@@ -62,8 +62,6 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
    * Constructor not non-lazy loading collection.
    */
   public AbstractBeanCollection() {
-    this.ownerBean = null;
-    this.propertyName = null;
   }
 
   /**
@@ -83,10 +81,6 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   public String getPropertyName() {
     return propertyName;
-  }
-
-  public int getLoaderIndex() {
-    return loaderIndex;
   }
 
   public ExpressionList<?> getFilterMany() {

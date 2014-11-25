@@ -1,16 +1,18 @@
 package com.avaje.tests.query;
 
-import java.util.List;
-
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.avaje.ebeantest.LoggedSqlCollector;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestQueryFilterMany extends BaseTestCase {
 
@@ -19,20 +21,23 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = Ebean.find(Customer.class).fetch("orders", new FetchConfig().lazy())
-        .where().ilike("name", "Rob%").filterMany("orders").eq("status", Order.Status.NEW).where()
-        .gt("id", 0).query();
+    LoggedSqlCollector.start();
 
-    // query.filterMany("orders").eq("status", Order.Status.NEW);
+    Customer customer = Ebean.find(Customer.class)
+            .fetch("orders", new FetchConfig().lazy())
+            .filterMany("orders").eq("status", Order.Status.NEW)
+            .where().ieq("name", "Rob")
+            .order().asc("id").setMaxRows(1)
+            .findList().get(0);
 
-    List<Customer> list = query.findList();
-    for (Customer customer : list) {
-      customer.getOrders().size();
-    }
+    customer.getOrders().size();
 
-    Customer c0 = list.get(0);
-    System.out.println("......... refreshMany ...");
-    Ebean.refreshMany(c0, "orders");
+    List<String> sqlList = LoggedSqlCollector.stop();
+    assertEquals(2, sqlList.size());
+    assertTrue(sqlList.get(1).contains("status = ?"));
+
+    // Currently this does not include the query filter
+    Ebean.refreshMany(customer, "orders");
 
   }
 }

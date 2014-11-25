@@ -32,6 +32,13 @@ public interface BeanCollection<E> extends Serializable {
   }
 
   /**
+   * Reset the collection back to an empty state ready for reloading.
+   * <p>
+   * This is done as part of bean refresh.
+   */
+  public void reset(EntityBean ownerBean, String propertyName);
+
+  /**
    * Return true if the collection is empty and untouched. Used to detect if a
    * collection was 'cleared' deliberately or just un-initialised.
    */
@@ -46,14 +53,6 @@ public interface BeanCollection<E> extends Serializable {
    * Return the bean property name this collection represents.
    */
   public String getPropertyName();
-
-  /**
-   * Return the index position of this collection in the lazy/query loader.
-   * <p>
-   * Used for batch loading of collections.
-   * </p>
-   */
-  public int getLoaderIndex();
 
   /**
    * Check after the lazy load that the underlying collection is not null
@@ -107,11 +106,6 @@ public interface BeanCollection<E> extends Serializable {
    * </p>
    */
   public void internalAdd(Object bean);
-
-  /**
-   * Returns the underlying List Set or Map object.
-   */
-  public Object getActualCollection();
 
   /**
    * Return the number of elements in the List Set or Map.

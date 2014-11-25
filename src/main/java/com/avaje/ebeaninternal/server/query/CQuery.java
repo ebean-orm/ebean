@@ -1,29 +1,8 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.lang.ref.WeakReference;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import javax.persistence.PersistenceException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.bean.BeanCollection;
-import com.avaje.ebean.bean.BeanCollectionAdd;
-import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.bean.EntityBeanIntercept;
-import com.avaje.ebean.bean.NodeUsageCollector;
-import com.avaje.ebean.bean.NodeUsageListener;
-import com.avaje.ebean.bean.ObjectGraphNode;
-import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebean.bean.*;
 import com.avaje.ebean.config.GlobalProperties;
-import com.avaje.ebeaninternal.api.LoadContext;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
@@ -32,16 +11,23 @@ import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
-import com.avaje.ebeaninternal.server.deploy.BeanCollectionHelp;
-import com.avaje.ebeaninternal.server.deploy.BeanCollectionHelpFactory;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import com.avaje.ebeaninternal.server.deploy.DbReadContext;
+import com.avaje.ebeaninternal.server.deploy.*;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import java.lang.ref.WeakReference;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * An object that represents a SqlSelect statement.
@@ -220,6 +206,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   private long startNano;
 
   private long executionTimeMicros;
+
+  private BeanCollectionAdd currentDetailAdd;
+
   /**
    * Create the Sql select based on the request.
    */
@@ -253,7 +242,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       // get filter to put on the collection for reuse with refresh
       String manyPropertyName = sqlTree.getManyPropertyName();
       OrmQueryProperties chunk = query.getDetail().getChunk(manyPropertyName, false);
-      this.filterMany = chunk.getFilterMany();
+      this.filterMany = (chunk == null) ? null : chunk.getFilterMany();
     } else {
       this.filterMany = null;
     }
@@ -266,7 +255,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     this.predicates = predicates;
     this.maxRowsLimit = query.getMaxRows() > 0 ? query.getMaxRows() : GLOBAL_ROW_LIMIT;
     this.help = createHelp(request);
-    this.collection = (BeanCollection<T>) (help != null ? help.createEmpty(false) : null);
+    this.collection = (help != null ? help.createEmptyNoParent() : null);
   }
 
   private BeanCollectionHelp<T> createHelp(OrmQueryRequest<T> request) {
@@ -304,10 +293,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   public CQueryPredicates getPredicates() {
     return predicates;
-  }
-
-  public LoadContext getGraphContext() {
-    return request.getGraphContext();
   }
 
   public SpiOrmQueryRequest<?> getQueryRequest() {
@@ -470,12 +455,10 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   public EntityBean getLoadedBean() {
     if (manyIncluded) {
       if (prevDetailCollection instanceof BeanCollection<?>) {
-        ((BeanCollection<?>) prevDetailCollection).setModifyListening(manyProperty
-            .getModifyListenMode());
+        ((BeanCollection<?>) prevDetailCollection).setModifyListening(manyProperty.getModifyListenMode());
 
       } else if (currentDetailCollection instanceof BeanCollection<?>) {
-        ((BeanCollection<?>) currentDetailCollection).setModifyListening(manyProperty
-            .getModifyListenMode());
+        ((BeanCollection<?>) currentDetailCollection).setModifyListening(manyProperty.getModifyListenMode());
       }
     }
 
@@ -581,8 +564,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return false;
   }
 
-  private BeanCollectionAdd currentDetailAdd;
-
   private void createNewDetailCollection() {
     prevDetailCollection = currentDetailCollection;
     if (queryMode.equals(Mode.LAZYLOAD_MANY)) {
@@ -590,7 +571,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       currentDetailCollection = manyPropertyEl.elGetValue(loadedBean);
     } else {
       // create a new collection to populate and assign to the bean
-      currentDetailCollection = manyProperty.createEmpty(false);
+      currentDetailCollection = manyProperty.createEmpty(loadedBean);
       manyPropertyEl.elSetValue(loadedBean, currentDetailCollection, false);
     }
 
@@ -717,14 +698,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    */
   public String getSummary() {
     return sqlTree.getSummary();
-  }
-
-  /**
-   * Return the SqlSelectChain. This is the flattened structure that represents
-   * this query.
-   */
-  public SqlTree getSqlTree() {
-    return sqlTree;
   }
 
   public String getBindLog() {

@@ -395,13 +395,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         return getTargetDescriptor().createEntityBean();
     }
 
-    /**
-     * Return an empty reference object.
-     */
-    public Object createEmptyReference() {
-        return targetDescriptor.createEntityBean();
-    }
-
     @Override
     public Object elGetReference(EntityBean bean) {
         Object value = getValueIntercept(bean);
@@ -465,7 +458,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
             }
         }
 
-        return (ExportedProperty[]) list.toArray(new ExportedProperty[list.size()]);
+        return list.toArray(new ExportedProperty[list.size()]);
     }
 
     /**

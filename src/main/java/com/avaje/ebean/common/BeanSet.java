@@ -40,6 +40,14 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     super(loader, ownerBean, propertyName);
   }
 
+  @Override
+  public void reset(EntityBean ownerBean, String propertyName) {
+    this.ownerBean = ownerBean;
+    this.propertyName = propertyName;
+    this.set = null;
+    this.touched = false;
+  }
+
   public boolean isEmptyAndUntouched() {
     return !touched && (set == null || set.isEmpty());
   }

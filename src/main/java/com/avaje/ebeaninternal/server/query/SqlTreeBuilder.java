@@ -66,6 +66,8 @@ public class SqlTreeBuilder {
 
   private final boolean rawSql;
 
+  private SqlTreeNode rootNode;
+
   /**
    * Construct for RawSql query.
    */
@@ -111,34 +113,33 @@ public class SqlTreeBuilder {
    */
   public SqlTree build() {
 
-    SqlTree sqlTree = new SqlTree();
-
     summary.append(desc.getName());
 
     // build the appropriate chain of SelectAdapter's
-    buildRoot(desc, sqlTree);
+    buildRoot(desc);
 
     // build the actual String
-    SqlTreeNode rootNode = sqlTree.getRootNode();
-
+    String selectSql = null;
+    String fromSql = null;
+    String inheritanceWhereSql = null;
+    BeanProperty[] encryptedProps = null;
     if (!rawSql) {
-      sqlTree.setSelectSql(buildSelectClause(rootNode));
-      sqlTree.setFromSql(buildFromClause(rootNode));
-      sqlTree.setInheritanceWhereSql(buildWhereClause(rootNode));
-      sqlTree.setEncryptedProps(ctx.getEncryptedProps());
+      selectSql = buildSelectClause();
+      fromSql = buildFromClause();
+      inheritanceWhereSql = buildWhereClause();
+      encryptedProps = ctx.getEncryptedProps();
     }
-    sqlTree.setIncludes(queryDetail.getIncludes());
-    sqlTree.setSummary(summary.toString());
 
+    ElPropertyValue manyPropEl = null;
     if (manyPropertyName != null) {
-      ElPropertyValue manyPropEl = desc.getElGetValue(manyPropertyName);
-      sqlTree.setManyProperty(manyProperty, manyPropertyName, manyPropEl);
+      manyPropEl = desc.getElGetValue(manyPropertyName);
     }
 
-    return sqlTree;
+    return new SqlTree(summary.toString(), rootNode, selectSql, fromSql, inheritanceWhereSql, encryptedProps,
+                        manyProperty, manyPropertyName, manyPropEl, queryDetail.getIncludes());
   }
 
-  private String buildSelectClause(SqlTreeNode rootNode) {
+  private String buildSelectClause() {
 
     if (rawSql) {
       return "Not Used";
@@ -155,7 +156,7 @@ public class SqlTreeBuilder {
     return selectSql;
   }
 
-  private String buildWhereClause(SqlTreeNode rootNode) {
+  private String buildWhereClause() {
 
     if (rawSql) {
       return "Not Used";
@@ -164,7 +165,7 @@ public class SqlTreeBuilder {
     return ctx.getContent();
   }
 
-  private String buildFromClause(SqlTreeNode rootNode) {
+  private String buildFromClause() {
 
     if (rawSql) {
       return "Not Used";
@@ -173,10 +174,9 @@ public class SqlTreeBuilder {
     return ctx.getContent();
   }
 
-  private void buildRoot(BeanDescriptor<?> desc, SqlTree sqlTree) {
+  private void buildRoot(BeanDescriptor<?> desc) {
 
-    SqlTreeNode selectRoot = buildSelectChain(null, null, desc, null);
-    sqlTree.setRootNode(selectRoot);
+    rootNode = buildSelectChain(null, null, desc, null);
 
     if (!rawSql) {
       alias.addJoin(queryDetail.getIncludes(), desc);

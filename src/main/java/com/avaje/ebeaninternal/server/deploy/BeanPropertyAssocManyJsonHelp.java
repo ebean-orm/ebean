@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import java.io.IOException;
 
+import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.EntityBean;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -30,7 +31,7 @@ public class BeanPropertyAssocManyJsonHelp {
       throw new JsonParseException("Unexpected token " + event + " - expecting start_array ", parser.getCurrentLocation());
     }
 
-    Object collection = many.createEmpty(false);
+    BeanCollection<?> collection = many.createEmpty(parentBean);
     BeanCollectionAdd add = many.getBeanCollectionAdd(collection, null);
     do {
       EntityBean detailBean = (EntityBean) many.targetDescriptor.jsonRead(parser, many.name);

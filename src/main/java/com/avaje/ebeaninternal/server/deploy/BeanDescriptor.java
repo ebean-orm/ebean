@@ -1488,6 +1488,17 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
+   * Reset the many properties to empty state ready for reloading.
+   */
+  public void resetManyProperties(Object dbBean) {
+
+    EntityBean bean = (EntityBean)dbBean;
+    for (int i = 0; i < propertiesMany.length; i++) {
+      propertiesMany[i].resetMany(bean);
+    }
+  }
+
+  /**
    * Return the name of the server this BeanDescriptor belongs to.
    */
   public String getServerName() {

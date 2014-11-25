@@ -13,40 +13,71 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
  */
 public class SqlTree {
 
-  private SqlTreeNode rootNode;
+  private final SqlTreeNode rootNode;
 
   /**
    * Property if resultSet contains master and detail rows.
    */
-  private BeanPropertyAssocMany<?> manyProperty;
-  private String manyPropertyName;
-  private ElPropertyValue manyPropEl;
+  private final BeanPropertyAssocMany<?> manyProperty;
 
-  private Set<String> includes;
+  private final String manyPropertyName;
+
+  private final ElPropertyValue manyPropEl;
+
+  private final Set<String> includes;
 
   /**
    * Summary of the select being generated.
    */
-  private String summary;
+  private final String summary;
 
-  private String selectSql;
+  private final String selectSql;
 
-  private String fromSql;
+  private final String fromSql;
 
   /**
    * Encrypted Properties require additional binding.
    */
-  private BeanProperty[] encryptedProps;
+  private final BeanProperty[] encryptedProps;
 
   /**
    * Where clause for inheritance.
    */
-  private String inheritanceWhereSql;
+  private final String inheritanceWhereSql;
 
   /**
    * Create the SqlSelectClause.
    */
-  public SqlTree() {
+  public SqlTree(String summary, SqlTreeNode rootNode, String selectSql, String fromSql, String inheritanceWhereSql,
+                 BeanProperty[] encryptedProps, BeanPropertyAssocMany<?> manyProperty, String manyPropertyName,
+                 ElPropertyValue manyPropEl, Set<String> includes) {
+
+    this.summary = summary;
+    this.rootNode = rootNode;
+    this.selectSql = selectSql;
+    this.fromSql = fromSql;
+    this.inheritanceWhereSql = inheritanceWhereSql;
+    this.encryptedProps = encryptedProps;
+    this.manyProperty = manyProperty;
+    this.manyPropertyName = manyPropertyName;
+    this.manyPropEl = manyPropEl;
+    this.includes = includes;
+  }
+
+  /**
+   * Construct for RawSql.
+   */
+  public SqlTree(String summary, SqlTreeNode rootNode) {
+    this.summary = summary;
+    this.rootNode = rootNode;
+    this.selectSql = null;
+    this.fromSql = null;
+    this.inheritanceWhereSql = null;
+    this.encryptedProps = null;
+    this.manyProperty = null;
+    this.manyPropertyName = null;
+    this.manyPropEl = null;
+    this.includes = null;
   }
 
   public List<String> buildSelectExpressionChain() {
@@ -63,42 +94,14 @@ public class SqlTree {
   }
 
   /**
-   * Set the association includes (Ones and Many's).
-   */
-  public void setIncludes(Set<String> includes) {
-    this.includes = includes;
-  }
-
-  /**
-   * Set the manyProperty used for this query.
-   */
-  public void setManyProperty(BeanPropertyAssocMany<?> manyProperty, String manyPropertyName,
-      ElPropertyValue manyPropEl) {
-    this.manyProperty = manyProperty;
-    this.manyPropertyName = manyPropertyName;
-    this.manyPropEl = manyPropEl;
-  }
-
-  /**
    * Return the String for the actual SQL.
    */
   public String getSelectSql() {
     return selectSql;
   }
 
-  /**
-   * Set the select sql clause.
-   */
-  public void setSelectSql(String selectSql) {
-    this.selectSql = selectSql;
-  }
-
   public String getFromSql() {
     return fromSql;
-  }
-
-  public void setFromSql(String fromSql) {
-    this.fromSql = fromSql;
   }
 
   /**
@@ -106,20 +109,6 @@ public class SqlTree {
    */
   public String getInheritanceWhereSql() {
     return inheritanceWhereSql;
-  }
-
-  /**
-   * Set where clause(s) for inheritance.
-   */
-  public void setInheritanceWhereSql(String whereSql) {
-    this.inheritanceWhereSql = whereSql;
-  }
-
-  /**
-   * Set the summary description of the query.
-   */
-  public void setSummary(String summary) {
-    this.summary = summary;
   }
 
   /**
@@ -131,10 +120,6 @@ public class SqlTree {
 
   public SqlTreeNode getRootNode() {
     return rootNode;
-  }
-
-  public void setRootNode(SqlTreeNode rootNode) {
-    this.rootNode = rootNode;
   }
 
   /**
@@ -164,7 +149,4 @@ public class SqlTree {
     return encryptedProps;
   }
 
-  public void setEncryptedProps(BeanProperty[] encryptedProps) {
-    this.encryptedProps = encryptedProps;
-  }
 }

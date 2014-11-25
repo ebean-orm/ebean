@@ -39,7 +39,15 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   public BeanMap(BeanCollectionLoader ebeanServer, EntityBean ownerBean, String propertyName) {
     super(ebeanServer, ownerBean, propertyName);
   }
-  
+
+  @Override
+  public void reset(EntityBean ownerBean, String propertyName) {
+    this.ownerBean = ownerBean;
+    this.propertyName = propertyName;
+    this.map = null;
+    this.touched = false;
+  }
+
   public boolean isEmptyAndUntouched() {
     return !touched && (map == null || map.isEmpty());
   }
@@ -146,15 +154,8 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   }
 
-  /**
-   * Returns the underlying map.
-   */
-  public Object getActualCollection() {
-    return map;
-  }
-
   public String toString() {
-    StringBuffer sb = new StringBuffer(50);
+    StringBuilder sb = new StringBuilder(50);
     sb.append("BeanMap ");
     if (isReadOnly()) {
       sb.append("readOnly ");

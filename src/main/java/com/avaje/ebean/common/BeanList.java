@@ -47,6 +47,14 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   }
 
   @Override
+  public void reset(EntityBean ownerBean, String propertyName) {
+    this.ownerBean = ownerBean;
+    this.propertyName = propertyName;
+    this.list = null;
+    this.touched = false;
+  }
+
+  @Override
   public boolean isEmptyAndUntouched() {
     return !touched && (list == null || list.isEmpty());
   }
@@ -127,13 +135,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   
   @Override
   public Collection<?> getActualEntries() {
-    return list;
-  }
-
-  /**
-   * Returns the underlying list.
-   */
-  public Object getActualCollection() {
     return list;
   }
 

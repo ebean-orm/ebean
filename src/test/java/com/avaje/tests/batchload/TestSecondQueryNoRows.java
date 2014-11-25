@@ -1,12 +1,13 @@
 package com.avaje.tests.batchload;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.tests.model.basic.Customer;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TestSecondQueryNoRows extends BaseTestCase {
 
@@ -18,9 +19,13 @@ public class TestSecondQueryNoRows extends BaseTestCase {
 
     Ebean.save(cnew);
 
-    Customer c = Ebean.find(Customer.class).setAutofetch(false).setId(cnew.getId())
-        .fetch("contacts", new FetchConfig().query()).findUnique();
+    Customer c = Ebean.find(Customer.class)
+            .setAutofetch(false)
+            .setId(cnew.getId())
+            .fetch("contacts", new FetchConfig().query())
+            .findUnique();
 
-    Assert.assertNotNull(c);
+    assertNotNull(c);
+    assertEquals(0, c.getContacts().size());
   }
 }

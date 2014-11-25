@@ -1,8 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.io.IOException;
-import java.util.Iterator;
-
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Transaction;
@@ -11,6 +8,8 @@ import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
+
+import java.io.IOException;
 
 /**
  * Helper functions for performing tasks on Lists Sets or Maps.
@@ -30,15 +29,15 @@ public interface BeanCollectionHelp<T> {
 	 */
 	public BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey);
 
+  /**
+   * Create an empty collection of the correct type without a parent bean.
+   */
+  public BeanCollection<T> createEmptyNoParent();
+
 	/**
 	 * Create an empty collection of the correct type.
 	 */
-	public Object createEmpty(boolean vanilla);
-
-	/**
-	 * Create an iterator for reading the entries.
-	 */
-	public Iterator<?> getIterator(Object collection);
+	public BeanCollection<T> createEmpty(EntityBean bean);
 
 	/**
 	 * Add a bean to the List Set or Map.
@@ -48,7 +47,7 @@ public interface BeanCollectionHelp<T> {
 	/**
 	 * Create a lazy loading proxy for a List Set or Map.
 	 */
-	public BeanCollection<T> createReference(EntityBean parentBean, String propertyName);
+	public BeanCollection<T> createReference(EntityBean parentBean);
 
 	/**
 	 * Refresh the List Set or Map.

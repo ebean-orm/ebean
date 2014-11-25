@@ -122,10 +122,6 @@ public class DRawSqlSelect {
 	 */
 	private SqlTree buildSqlTree(BeanDescriptor<?> desc){
 
-
-		SqlTree sqlTree = new SqlTree();
-		sqlTree.setSummary(desc.getName());
-
 		LinkedHashSet<String> includedProps = new LinkedHashSet<String>();
 		SqlTreeProperties selectProps = new SqlTreeProperties();
 
@@ -157,9 +153,8 @@ public class DRawSqlSelect {
 		}
 
 		SqlTreeNode sqlRoot = new SqlTreeNodeRoot(desc, selectProps, null, withId);
-		sqlTree.setRootNode(sqlRoot);
 
-		return sqlTree;
+    return new SqlTree(desc.getName(), sqlRoot);
 	}
 
 	/**

@@ -174,7 +174,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   public void addBeanToCollectionWithCreate(EntityBean parentBean, EntityBean detailBean) {
     BeanCollection<?> bc = (BeanCollection<?>) super.getValue(parentBean);
     if (bc == null) {
-      bc = (BeanCollection<?>) help.createEmpty(false);
+      bc = help.createEmpty(parentBean);
       setValue(parentBean, bc);
     }
     help.add(bc, detailBean);
@@ -183,6 +183,22 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   public boolean isEmptyBeanCollection(EntityBean bean) {
     Object val = getValue(bean);
     return val == null || (val instanceof BeanCollection<?>) && ((BeanCollection<?>) val).isEmptyAndUntouched();
+  }
+
+  /**
+   * Reset the many properties to be empty and ready for reloading.
+   * <p>
+   * Used in bean refresh.
+   */
+  public void resetMany(EntityBean bean) {
+    Object value = getValue(bean);
+    if (value == null) {
+      // not expecting this - set an empty reference
+      createReference(bean);
+    } else {
+      // reset the collection back to empty
+      ((BeanCollection)value).reset(bean, name);
+    }
   }
 
   @Override
@@ -526,13 +542,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
   public BeanCollection<?> createReference(EntityBean parentBean) {
 
-    BeanCollection<?> ref = help.createReference(parentBean, name);
+    BeanCollection<?> ref = help.createReference(parentBean);
     setValue(parentBean, ref);
     return ref;
   }
 
-  public Object createEmpty(boolean vanilla) {
-    return help.createEmpty(vanilla);
+  public BeanCollection<T> createEmpty(EntityBean parentBean) {
+    return help.createEmpty(parentBean);
   }
 
   public BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {

@@ -40,7 +40,7 @@ public class DefaultBeanLoader {
     this.server = server;
   }
 
-	  /**
+  /**
    * Return a batch size that might be less than the requestedBatchSize.
    * <p>
    * This means we can have large and variable requestedBatchSizes.
@@ -51,7 +51,7 @@ public class DefaultBeanLoader {
    * </p>
    */
   private int getBatchSize(int batchSize) {
-    
+
     if (batchSize == 1) {
       // there is only one bean/collection to load
       return 1;
@@ -74,10 +74,10 @@ public class DefaultBeanLoader {
     }
     return batchSize;
   }
-	
-	public void refreshMany(EntityBean parentBean, String propertyName) {
-		refreshMany(parentBean, propertyName, null);
-	}
+
+  public void refreshMany(EntityBean parentBean, String propertyName) {
+    refreshMany(parentBean, propertyName, null);
+  }
 
   public void loadMany(LoadManyRequest loadRequest) {
 
@@ -113,7 +113,7 @@ public class DefaultBeanLoader {
     if (orderBy != null) {
       query.orderBy(orderBy);
     }
-    
+
     String extraWhere = many.getExtraWhere();
     if (extraWhere != null) {
       // replace special ${ta} placeholder with the base table alias 
@@ -121,7 +121,7 @@ public class DefaultBeanLoader {
       String ew = StringHelper.replaceString(extraWhere, "${ta}", "t0");
       query.where().raw(ew);
     }
-    
+
     query.setLazyLoadForParents(idList, many);
     many.addWhereParentIdIn(query, idList);
 
@@ -153,7 +153,7 @@ public class DefaultBeanLoader {
         desc.cacheManyPropPut(many, bc, parentId);
       }
     }
-    
+
     // log the query (for testing secondary queries)
     loadRequest.logSecondaryQuery(query);
   }
@@ -163,18 +163,17 @@ public class DefaultBeanLoader {
     EntityBean parentBean = bc.getOwnerBean();
     String propertyName = bc.getPropertyName();
 
-    //ObjectGraphNode node = ctx == null ? null : ctx.getObjectGraphNode();
-
     loadManyInternal(parentBean, propertyName, null, false, null, onlyIds);
   }
 
-	public void refreshMany(EntityBean parentBean, String propertyName, Transaction t) {
-		loadManyInternal(parentBean, propertyName, t, true, null, false);
-	}
+  public void refreshMany(EntityBean parentBean, String propertyName, Transaction t) {
+    loadManyInternal(parentBean, propertyName, t, true, null, false);
+  }
 
-	private void loadManyInternal(EntityBean parentBean, String propertyName, Transaction t, boolean refresh, ObjectGraphNode node, boolean onlyIds) {
+  private void loadManyInternal(EntityBean parentBean, String propertyName, Transaction t, boolean refresh,
+                                ObjectGraphNode node, boolean onlyIds) {
 
-    EntityBeanIntercept ebi = ((EntityBean) parentBean)._ebean_getIntercept();
+    EntityBeanIntercept ebi = parentBean._ebean_getIntercept();
     PersistenceContext pc = ebi.getPersistenceContext();
 
     BeanDescriptor<?> parentDesc = server.getBeanDescriptor(parentBean.getClass());
@@ -182,7 +181,7 @@ public class DefaultBeanLoader {
 
     BeanCollection<?> beanCollection = null;
     ExpressionList<?> filterMany = null;
-    
+
     Object currentValue = many.getValue(parentBean);
     if (currentValue instanceof BeanCollection<?>) {
       beanCollection = (BeanCollection<?>) currentValue;
@@ -211,7 +210,7 @@ public class DefaultBeanLoader {
 
     if (refresh) {
       // populate a new collection
-      Object emptyCollection = many.createEmpty(false);
+      BeanCollection<?> emptyCollection = many.createEmpty(parentBean);
       many.setValue(parentBean, emptyCollection);
       query.setLoadDescription("+refresh", null);
     } else {
@@ -329,7 +328,7 @@ public class DefaultBeanLoader {
 
     if (loadRequest.isLoadCache()) {
       for (int i = 0; i < list.size(); i++) {
-        desc.cacheBeanPutData((EntityBean)list.get(i));
+        desc.cacheBeanPutData((EntityBean) list.get(i));
       }
     }
 
@@ -338,33 +337,38 @@ public class DefaultBeanLoader {
       // necessary but allow processing to continue until it is accessed by client code
       ebis[i].checkLazyLoadFailure();
     }
-    
+
     // log the query (for testing secondary queries)
     loadRequest.logSecondaryQuery(query);
   }
 
-	public void refresh(EntityBean bean) {
-		refreshBeanInternal(bean, SpiQuery.Mode.REFRESH_BEAN, -1);
-	}
-	
-	public void loadBean(EntityBeanIntercept ebi) {
-		refreshBeanInternal(ebi.getOwner(), SpiQuery.Mode.LAZYLOAD_BEAN, -1);
-	}
+  public void refresh(EntityBean bean) {
+    refreshBeanInternal(bean, SpiQuery.Mode.REFRESH_BEAN, -1);
+  }
+
+  public void loadBean(EntityBeanIntercept ebi) {
+    refreshBeanInternal(ebi.getOwner(), SpiQuery.Mode.LAZYLOAD_BEAN, -1);
+  }
 
   private void refreshBeanInternal(EntityBean bean, SpiQuery.Mode mode, int embeddedOwnerIndex) {
 
-    EntityBeanIntercept ebi = ((EntityBean) bean)._ebean_getIntercept();;
+    EntityBeanIntercept ebi = bean._ebean_getIntercept();
+    ;
     PersistenceContext pc = ebi.getPersistenceContext();
+    if (Mode.REFRESH_BEAN == mode) {
+      // need a new PersistenceContext for REFRESH
+      pc = null;
+    }
 
     BeanDescriptor<?> desc = server.getBeanDescriptor(bean.getClass());
     if (EntityType.EMBEDDED == desc.getEntityType()) {
       // lazy loading on an embedded bean property
-      EntityBean embeddedOwner = (EntityBean)ebi.getEmbeddedOwner();
+      EntityBean embeddedOwner = (EntityBean) ebi.getEmbeddedOwner();
       int ownerIndex = ebi.getEmbeddedOwnerIndex();
 
       refreshBeanInternal(embeddedOwner, mode, ownerIndex);
     }
-    
+
     Object id = desc.getId(bean);
 
     if (pc == null) {
@@ -379,7 +383,7 @@ public class DefaultBeanLoader {
     if (embeddedOwnerIndex == -1) {
       if (SpiQuery.Mode.LAZYLOAD_BEAN.equals(mode) && desc.isBeanCaching()) {
         // lazy loading and the bean cache is active 
-        if (desc.cacheBeanLoad((EntityBean)bean, ebi, id)) {
+        if (desc.cacheBeanLoad(bean, ebi, id)) {
           return;
         }
       }
@@ -395,9 +399,9 @@ public class DefaultBeanLoader {
 
     if (embeddedOwnerIndex > -1) {
       String embeddedBeanPropertyName = ebi.getProperty(embeddedOwnerIndex);
-      query.select("id,"+embeddedBeanPropertyName);
+      query.select("id," + embeddedBeanPropertyName);
     }
-    
+
     // don't collect autoFetch usage profiling information
     // as we just copy the data out of these fetched beans
     // and put the data into the original bean
@@ -415,7 +419,7 @@ public class DefaultBeanLoader {
     if (ebi.isReadOnly()) {
       query.setReadOnly(true);
     }
-    
+
     if (SpiQuery.Mode.REFRESH_BEAN.equals(mode)) {
       // explicitly state to load all properties on REFRESH.
       // Lobs default to fetch lazy so this forces lobs to be 
@@ -428,6 +432,8 @@ public class DefaultBeanLoader {
       String msg = "Bean not found during lazy load or refresh." + " id[" + id + "] type[" + desc.getBeanType() + "]";
       throw new EntityNotFoundException(msg);
     }
+
+    desc.resetManyProperties(dbBean);
 
   }
 }

@@ -2,6 +2,7 @@ package com.avaje.tests.text.csv;
 
 import java.io.File;
 import java.io.FileReader;
+import java.net.URL;
 import java.util.Locale;
 
 import org.junit.Test;
@@ -20,7 +21,8 @@ public class TestCsvReader extends BaseTestCase {
     ResetBasicData.reset();
 
     try {
-      File f = new File("src/test/resources/test1.csv");
+      URL resource = TestCsvReaderWithCallback.class.getResource("/test1.csv");
+      File f = new File(resource.getFile());
 
       FileReader reader = new FileReader(f);
 

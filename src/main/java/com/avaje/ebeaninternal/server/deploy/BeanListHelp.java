@@ -22,18 +22,23 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
 
   private final BeanPropertyAssocMany<T> many;
   private final BeanDescriptor<T> targetDescriptor;
+  private final String propertyName;
+
   private BeanCollectionLoader loader;
 
   public BeanListHelp(BeanPropertyAssocMany<T> many) {
     this.many = many;
     this.targetDescriptor = many.getTargetDescriptor();
+    this.propertyName = many.getName();
   }
 
   public BeanListHelp() {
     this.many = null;
     this.targetDescriptor = null;
+    this.propertyName = null;
   }
 
+  @Override
   public void setLoader(BeanCollectionLoader loader) {
     this.loader = loader;
   }
@@ -41,10 +46,12 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
   /**
    * Internal add bypassing any modify listening.
    */
+  @Override
   public void add(BeanCollection<?> collection, EntityBean bean) {
     collection.internalAdd(bean);
   }
 
+  @Override
   public BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
 
     if (bc instanceof BeanList<?>) {
@@ -54,57 +61,42 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
         bl.setActualList(new ArrayList<Object>());
       }
       return bl;
-    } else if (bc instanceof List<?>) {
-      return new VanillaAdd((List<?>) bc);
 
     } else {
       throw new RuntimeException("Unhandled type " + bc);
     }
   }
 
-  @SuppressWarnings("unchecked")
-  static class VanillaAdd implements BeanCollectionAdd {
-
-    @SuppressWarnings("rawtypes")
-    private final List list;
-
-    private VanillaAdd(List<?> list) {
-      this.list = list;
-    }
-
-    public void addBean(EntityBean bean) {
-      list.add(bean);
-    }
+  @Override
+  public BeanCollection<T> createEmptyNoParent() {
+    return new BeanList<T>();
   }
 
-  public Iterator<?> getIterator(Object collection) {
-    return ((List<?>) collection).iterator();
-  }
-
-  public Object createEmpty(boolean vanilla) {
-    if (vanilla) {
-      return new ArrayList<T>();
-    }
-    BeanList<T> beanList = new BeanList<T>();
+  @Override
+  public BeanCollection<T> createEmpty(EntityBean parentBean) {
+    BeanList<T> beanList = new BeanList<T>(loader, parentBean, propertyName);
     if (many != null) {
       beanList.setModifyListening(many.getModifyListenMode());
     }
     return beanList;
   }
 
-  public BeanCollection<T> createReference(EntityBean parentBean, String propertyName) {
+  @Override
+  public BeanCollection<T> createReference(EntityBean parentBean) {
 
     BeanList<T> beanList = new BeanList<T>(loader, parentBean, propertyName);
     beanList.setModifyListening(many.getModifyListenMode());
     return beanList;
   }
 
+  @Override
   public void refresh(EbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
 
     BeanList<?> newBeanList = (BeanList<?>) server.findList(query, t);
     refresh(newBeanList, parentBean);
   }
 
+  @Override
   public void refresh(BeanCollection<?> bc, EntityBean parentBean) {
 
     BeanList<?> newBeanList = (BeanList<?>) bc;
@@ -129,6 +121,7 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
     }
   }
 
+  @Override
   public void jsonWrite(WriteJson ctx, String name, Object collection, boolean explicitInclude) throws IOException {
 
     List<?> list;
@@ -150,7 +143,7 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
 
     ctx.writeStartArray(name);
     for (int j = 0; j < list.size(); j++) {
-      targetDescriptor.jsonWrite(ctx, (EntityBean)list.get(j));
+      targetDescriptor.jsonWrite(ctx, (EntityBean) list.get(j));
     }
     ctx.writeEndArray();
   }

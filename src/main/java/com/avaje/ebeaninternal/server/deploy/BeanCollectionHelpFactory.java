@@ -9,6 +9,10 @@ import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
  */
 public class BeanCollectionHelpFactory {
 
+  static final BeanListHelp LIST_HELP = new BeanListHelp();
+
+  static final BeanSetHelp SET_HELP = new BeanSetHelp();
+
 	/**
 	 * Create the helper based on the many property.
 	 */
@@ -33,10 +37,10 @@ public class BeanCollectionHelpFactory {
 		SpiQuery.Type manyType = request.getQuery().getType();
 		
 		if (manyType.equals(SpiQuery.Type.LIST)){
-			return new BeanListHelp<T>();
+			return LIST_HELP;
 		
 		} else if (manyType.equals(SpiQuery.Type.SET)) {
-			return new BeanSetHelp<T>();
+			return SET_HELP;
 		
 		} else {
 			BeanDescriptor<T> target = request.getBeanDescriptor();
