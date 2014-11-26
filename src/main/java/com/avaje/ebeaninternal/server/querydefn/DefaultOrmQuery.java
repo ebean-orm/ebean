@@ -88,7 +88,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private int firstRow;
 
-  private int totalHits;
+  /**
+   * Lazy loading batch size (can override server wide default).
+   */
+  private int lazyLoadBatchSize;
 
   /**
    * The where clause from a parsed query string.
@@ -251,14 +254,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
   }
 
-  public int getTotalHits() {
-    return totalHits;
-  }
-
-  public void setTotalHits(int totalHits) {
-    this.totalHits = totalHits;
-  }
-
   @Override
   public Query<T> apply(PathProperties pathProperties) {
     pathProperties.apply(this);
@@ -292,6 +287,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public DefaultOrmQuery<T> setRawSql(RawSql rawSql) {
     this.rawSql = rawSql;
+    return this;
+  }
+
+  @Override
+  public int getLazyLoadBatchSize() {
+    return lazyLoadBatchSize;
+  }
+
+  public Query<T> setLazyLoadBatchSize(int lazyLoadBatchSize) {
+    this.lazyLoadBatchSize = lazyLoadBatchSize;
     return this;
   }
 
@@ -1168,18 +1173,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return query;
   }
 
-  public DefaultOrmQuery<T> addWhere(String addToWhereClause) {
-    return where(addToWhereClause);
-  }
-
-  public DefaultOrmQuery<T> addWhere(Expression expression) {
-    return where(expression);
-  }
-
-  public ExpressionList<T> addWhere() {
-    return where();
-  }
-
   public DefaultOrmQuery<T> where(String addToWhereClause) {
     if (additionalWhere == null) {
       additionalWhere = addToWhereClause;
@@ -1215,18 +1208,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       OrmQueryProperties chunk = detail.getChunk(prop, true);
       chunk.setFilterMany((SpiExpressionList<?>) filterMany);
     }
-  }
-
-  public DefaultOrmQuery<T> addHaving(String addToHavingClause) {
-    return having(addToHavingClause);
-  }
-
-  public DefaultOrmQuery<T> addHaving(Expression expression) {
-    return having(expression);
-  }
-
-  public ExpressionList<T> addHaving() {
-    return having();
   }
 
   public DefaultOrmQuery<T> having(String addToHavingClause) {

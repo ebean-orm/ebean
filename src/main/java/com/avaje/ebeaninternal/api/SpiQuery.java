@@ -27,7 +27,7 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
  */
 public interface SpiQuery<T> extends Query<T> {
 
-    public enum Mode {
+  public enum Mode {
         NORMAL(false), LAZYLOAD_MANY(false), LAZYLOAD_BEAN(true), REFRESH_BEAN(true);
         Mode(boolean loadContextBean) {
             this.loadContextBean = loadContextBean;
@@ -88,6 +88,11 @@ public interface SpiQuery<T> extends Query<T> {
    * </p>
    */
   public PersistenceContextScope getPersistenceContextScope();
+
+  /**
+   * Return the default lazy load batch size.
+   */
+  public int getLazyLoadBatchSize();
 
     /**
      * Return true if select all properties was used to ensure the property

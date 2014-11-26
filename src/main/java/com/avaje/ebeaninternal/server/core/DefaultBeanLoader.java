@@ -130,6 +130,11 @@ public class DefaultBeanLoader {
     String mode = loadRequest.isLazy() ? "+lazy" : "+query";
     query.setLoadDescription(mode, loadRequest.getDescription());
 
+    if (loadRequest.isLazy()) {
+      // cascade the batch size (if set) for further lazy loading
+      query.setLazyLoadBatchSize(loadRequest.getBatchSize());
+    }
+
     // potentially changes the joins and selected properties
     ctx.configureQuery(query);
 
@@ -198,7 +203,7 @@ public class DefaultBeanLoader {
     boolean useManyIdCache = beanCollection != null && parentDesc.isManyPropCaching();
     if (useManyIdCache) {
       Boolean readOnly = null;
-      if (ebi != null && ebi.isReadOnly()) {
+      if (ebi.isReadOnly()) {
         readOnly = Boolean.TRUE;
       }
       if (parentDesc.cacheManyPropLoad(many, beanCollection, parentId, readOnly)) {
@@ -240,10 +245,8 @@ public class DefaultBeanLoader {
     query.setLazyLoadManyPath(many.getName());
     query.setPersistenceContext(pc);
 
-    if (ebi != null) {
-      if (ebi.isReadOnly()) {
-        query.setReadOnly(true);
-      }
+    if (ebi.isReadOnly()) {
+      query.setReadOnly(true);
     }
 
     server.findUnique(query, t);
@@ -314,6 +317,11 @@ public class DefaultBeanLoader {
     String mode = loadRequest.isLazy() ? "+lazy" : "+query";
     query.setLoadDescription(mode, loadRequest.getDescription());
 
+    if (loadRequest.isLazy()) {
+      // cascade the batch size (if set) for further lazy loading
+      query.setLazyLoadBatchSize(loadRequest.getBatchSize());
+    }
+
     ctx.configureQuery(query, loadRequest.getLazyLoadProperty());
 
     // make sure the query doesn't use the cache
@@ -353,7 +361,6 @@ public class DefaultBeanLoader {
   private void refreshBeanInternal(EntityBean bean, SpiQuery.Mode mode, int embeddedOwnerIndex) {
 
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
-    ;
     PersistenceContext pc = ebi.getPersistenceContext();
     if (Mode.REFRESH_BEAN == mode) {
       // need a new PersistenceContext for REFRESH
@@ -375,9 +382,7 @@ public class DefaultBeanLoader {
       // a reference with no existing persistenceContext
       pc = new DefaultPersistenceContext();
       pc.put(id, bean);
-      if (ebi != null) {
-        ebi.setPersistenceContext(pc);
-      }
+      ebi.setPersistenceContext(pc);
     }
 
     if (embeddedOwnerIndex == -1) {
@@ -393,9 +398,7 @@ public class DefaultBeanLoader {
     }
 
     SpiQuery<?> query = (SpiQuery<?>) server.createQuery(desc.getBeanType());
-    if (ebi != null) {
-      query.setLazyLoadProperty(ebi.getLazyLoadProperty());
-    }
+    query.setLazyLoadProperty(ebi.getLazyLoadProperty());
 
     if (embeddedOwnerIndex > -1) {
       String embeddedBeanPropertyName = ebi.getProperty(embeddedOwnerIndex);

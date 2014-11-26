@@ -69,7 +69,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     return buffer;
 	}
 	
-  public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest, int requestedBatchSize, boolean all) {
+  public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest) {
 
     if (!queryFetch) {
       throw new IllegalStateException("Not expecting loadSecondaryQuery() to be called?");
@@ -111,7 +111,11 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
       this.batchSize = batchSize;
       this.list = new ArrayList<EntityBeanIntercept>(batchSize);
     }
-    
+
+    public int getBatchSize() {
+      return batchSize;
+    }
+
     /**
      * Return true if the buffer is full.
      */

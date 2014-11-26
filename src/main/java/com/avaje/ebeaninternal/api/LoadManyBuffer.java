@@ -13,6 +13,8 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
  */
 public interface LoadManyBuffer {
 
+  public int getBatchSize();
+
   public List<BeanCollection<?>> getBatch();
   
   public BeanPropertyAssocMany<?> getBeanProperty();

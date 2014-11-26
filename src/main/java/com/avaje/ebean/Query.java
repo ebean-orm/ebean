@@ -341,21 +341,31 @@ public interface Query<T> extends Serializable {
   public Query<T> setAutofetch(boolean autofetch);
 
   /**
+   * Set the default lazy loading batch size to use.
+   * <p>
+   * When lazy loading is invoked on beans loaded by this query then this sets the
+   * batch size used to load those beans.
+   *
+   * @param lazyLoadBatchSize the number of beans to lazy load in a single batch
+   */
+  public Query<T> setLazyLoadBatchSize(int lazyLoadBatchSize);
+
+  /**
    * Explicitly set a comma delimited list of the properties to fetch on the
    * 'main' entity bean (aka partial object). Note that '*' means all
    * properties.
-   * 
+   *
    * <pre class="code">
    * Query&lt;Customer&gt; query = Ebean.createQuery(Customer.class);
-   * 
+   *
    * // Only fetch the customer id, name and status.
    * // This is described as a &quot;Partial Object&quot;
    * query.select(&quot;name, status&quot;);
    * query.where(&quot;lower(name) like :custname&quot;).setParameter(&quot;custname&quot;, &quot;rob%&quot;);
-   * 
+   *
    * List&lt;Customer&gt; customerList = query.findList();
    * </pre>
-   * 
+   *
    * @param fetchProperties
    *          the properties to fetch for this bean (* = all properties).
    */

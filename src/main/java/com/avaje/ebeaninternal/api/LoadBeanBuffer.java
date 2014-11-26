@@ -11,6 +11,8 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
  */
 public interface LoadBeanBuffer {
 
+  public int getBatchSize();
+
   public List<EntityBeanIntercept> getBatch();
   
   public BeanDescriptor<?> getBeanDescriptor();

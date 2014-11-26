@@ -59,4 +59,7 @@ public class LoadBeanRequest extends LoadRequest {
     return lazyLoadProperty;
   }
 
+  public int getBatchSize() {
+    return getLoadContext().getBatchSize();
+  }
 }

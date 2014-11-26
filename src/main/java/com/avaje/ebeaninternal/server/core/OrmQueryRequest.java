@@ -28,7 +28,6 @@ import com.avaje.ebeaninternal.server.loadcontext.DLoadContext;
 import com.avaje.ebeaninternal.server.query.CQueryPlan;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
-import com.avaje.ebeaninternal.server.transaction.NoopPersistenceContext;
 
 /**
  * Wraps the objects involved in executing a Query.
@@ -79,8 +78,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     return ebeanServer.getDatabasePlatform().getLikeClause();
   }
 
-  public void executeSecondaryQueries(int defaultQueryBatch) {
-    loadContext.executeSecondaryQueries(this, defaultQueryBatch);
+  public void executeSecondaryQueries() {
+    loadContext.executeSecondaryQueries(this);
   }
 
   /**
@@ -405,4 +404,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     return query.isLogSecondaryQuery();
   }
 
+  /**
+   * Return the batch size for lazy loading on this bean query request.
+   */
+  public int getLazyLoadBatchSize() {
+
+    int batchSize = query.getLazyLoadBatchSize();
+    return (batchSize > 0) ? batchSize : ebeanServer.getLazyLoadBatchSize();
+  }
 }

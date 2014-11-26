@@ -18,12 +18,11 @@ public class LoadManyRequest extends LoadRequest {
 
   private final boolean loadCache;
 
-  public LoadManyRequest(LoadManyBuffer loadContext, int batchSize, boolean lazy,boolean onlyIds, boolean loadCache) {
-    this(loadContext, null, batchSize, lazy, onlyIds, loadCache);
+  public LoadManyRequest(LoadManyBuffer loadContext, boolean lazy, boolean onlyIds, boolean loadCache) {
+    this(loadContext, null, lazy, onlyIds, loadCache);
   }
   
-  public LoadManyRequest(LoadManyBuffer loadContext, OrmQueryRequest<?> parentRequest, int batchSize, boolean lazy,
-      boolean onlyIds, boolean loadCache) {
+  public LoadManyRequest(LoadManyBuffer loadContext, OrmQueryRequest<?> parentRequest,  boolean lazy, boolean onlyIds, boolean loadCache) {
 
     super(parentRequest, lazy);
     this.loadContext = loadContext;
@@ -69,4 +68,10 @@ public class LoadManyRequest extends LoadRequest {
     return loadCache;
   }
 
+  /**
+   * Return the batch size used for this load context.
+   */
+  public int getBatchSize() {
+    return loadContext.getBatchSize();
+  }
 }

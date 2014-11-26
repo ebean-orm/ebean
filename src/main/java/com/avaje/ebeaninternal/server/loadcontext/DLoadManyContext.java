@@ -83,8 +83,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
     bc.setLoader(0, currentBuffer);
 	}
 
-	
-	public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest, int requestedBatchSize, boolean all){
+  public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest) {
 
     if (!queryFetch) {
       throw new IllegalStateException("Not expecting loadSecondaryQuery() to be called?");
@@ -93,7 +92,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
       if (bufferList != null) {
         for (LoadBuffer loadBuffer : bufferList) {
           if (!loadBuffer.list.isEmpty()) {
-            LoadManyRequest req = new LoadManyRequest(loadBuffer, parentRequest, requestedBatchSize, false, false, false);
+            LoadManyRequest req = new LoadManyRequest(loadBuffer, parentRequest, false, false, false);
             parent.getEbeanServer().loadMany(req);  
             if (!queryProps.isQueryFetchAll()) {
               // Stop - only fetch the first batch ... the rest will be lazy loaded
@@ -126,6 +125,10 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
       this.persistenceContext = context.getPersistenceContext();
       this.batchSize = batchSize;
       this.list = new ArrayList<BeanCollection<?>>(batchSize);
+    }
+
+    public int getBatchSize() {
+      return batchSize;
     }
     
     /**
@@ -188,7 +191,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
         boolean useCache = context.hitCache && !onlyIds;
         if (useCache) {
           EntityBean ownerBean = bc.getOwnerBean();
-          BeanDescriptor<? extends Object> parentDesc = context.desc.getBeanDescriptor(ownerBean.getClass());
+          BeanDescriptor<?> parentDesc = context.desc.getBeanDescriptor(ownerBean.getClass());
           Object parentId = parentDesc.getId(ownerBean);
           if (parentDesc.cacheManyPropLoad(context.property, bc, parentId, context.parent.isReadOnly())) {
             // we loaded the bean from cache
@@ -199,7 +202,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
         
         // Should reduce the list by checking each beanCollection in the L2 first before executing the query
         
-        LoadManyRequest req = new LoadManyRequest(this, batchSize, true, onlyIds, useCache);
+        LoadManyRequest req = new LoadManyRequest(this, true, onlyIds, useCache);
         context.parent.getEbeanServer().loadMany(req);
       }
     }

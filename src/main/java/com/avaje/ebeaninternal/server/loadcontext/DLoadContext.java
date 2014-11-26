@@ -56,7 +56,7 @@ public class DLoadContext implements LoadContext {
 
 	  this.persistenceContext = request.getPersistenceContext();
     this.ebeanServer = request.getServer();
-    this.defaultBatchSize = ebeanServer.getLazyLoadBatchSize();
+    this.defaultBatchSize = request.getLazyLoadBatchSize();
     this.rootDescriptor = request.getBeanDescriptor();
     
     SpiQuery<?> query = request.getQuery();
@@ -104,18 +104,13 @@ public class DLoadContext implements LoadContext {
 	/**
 	 * Execute all the secondary queries.
 	 */
-	public void executeSecondaryQueries(OrmQueryRequest<?> parentRequest, int defaultQueryBatch) {
+	public void executeSecondaryQueries(OrmQueryRequest<?> parentRequest) {
 		
 		if (secQuery != null){
 			for (int i = 0; i < secQuery.size(); i++) {
 				OrmQueryProperties properties = secQuery.get(i);
-				
-				int batchSize = properties.getQueryFetchBatch();
-				if (batchSize == 0){
-					batchSize = defaultQueryBatch;
-				}
 				LoadSecondaryQuery load = getLoadSecondaryQuery(properties.getPath());
-				load.loadSecondaryQuery(parentRequest, batchSize, properties.isQueryFetchAll());
+				load.loadSecondaryQuery(parentRequest);
 			}
 		}
 	}
@@ -199,10 +194,6 @@ public class DLoadContext implements LoadContext {
 
 	public boolean isUseAutofetchManager() {
 		return useAutofetchManager;
-	}
-	
-	public String getRelativePath() {
-		return relativePath;
 	}
 	
 	protected String getFullPath(String path) {

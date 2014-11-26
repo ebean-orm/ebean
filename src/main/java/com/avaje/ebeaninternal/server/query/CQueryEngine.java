@@ -25,14 +25,14 @@ public class CQueryEngine {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryEngine.class);
 
-  private final DatabasePlatform dbPlatform;
-  
+  private static final int defaultSecondaryQueryBatchSize = 100;
+
+  private final boolean forwardOnlyHintOnFindIterate;
+
   private final CQueryBuilder queryBuilder;
 
-  private final int defaultSecondaryQueryBatchSize = 100;
-
   public CQueryEngine(DatabasePlatform dbPlatform, Binder binder) {
-    this.dbPlatform = dbPlatform;
+    this.forwardOnlyHintOnFindIterate = dbPlatform.isForwardOnlyHintOnFindIterate();
     this.queryBuilder = new CQueryBuilder(dbPlatform, binder);
   }
 
@@ -121,7 +121,7 @@ public class CQueryEngine {
 
     try {
 
-      if (!cquery.prepareBindExecuteQueryForwardOnly(dbPlatform.isForwardOnlyHintOnFindIterate())) {
+      if (!cquery.prepareBindExecuteQueryForwardOnly(forwardOnlyHintOnFindIterate)) {
         // query has been cancelled already
         logger.trace("Future fetch already cancelled");
         return null;
@@ -131,7 +131,15 @@ public class CQueryEngine {
         logSql(cquery);
       }
 
+      // first check batch sizes set on query joins
       int iterateBufferSize = request.getSecondaryQueriesMinBatchSize(defaultSecondaryQueryBatchSize);
+      if (iterateBufferSize < 1) {
+        // not set on query joins so check if batch size set on query itself
+        int queryBatch = request.getQuery().getLazyLoadBatchSize();
+        if (queryBatch > 0) {
+          iterateBufferSize = queryBatch;
+        }
+      }
 
       QueryIterator<T> readIterate = cquery.readIterate(iterateBufferSize, request);
 
@@ -178,7 +186,7 @@ public class CQueryEngine {
         logFindManySummary(cquery);
       }
 
-      request.executeSecondaryQueries(defaultSecondaryQueryBatchSize);
+      request.executeSecondaryQueries();
 
       return beanCollection;
 
@@ -223,7 +231,7 @@ public class CQueryEngine {
         logFindBeanSummary(cquery);
       }
 
-      request.executeSecondaryQueries(defaultSecondaryQueryBatchSize);
+      request.executeSecondaryQueries();
 
       return (T)bean;
 
