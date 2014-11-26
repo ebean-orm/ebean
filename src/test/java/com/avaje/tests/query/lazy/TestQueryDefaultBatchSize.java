@@ -77,8 +77,6 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
     for (Order order : orders) {
       doStuff(order);
     }
-
-    new ServerConfig().setLazyLoadBatchSize();
   }
 
   @Test
