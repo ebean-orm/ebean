@@ -26,7 +26,7 @@ public interface MAdminAutofetchMBean {
 
 	/**
 	 * This controls whether autoFetch is used when it has not
-	 * been explicitly set on a query via {@link Query#setAutoFetch(boolean)}.
+	 * been explicitly set on a query via {@link Query#setAutofetch(boolean)}.
 	 */
 	public String getMode();
 
@@ -36,7 +36,7 @@ public interface MAdminAutofetchMBean {
 	public String getModeOptions();
 	
 	/**
-	 * Set the auto fetch mode used when a query has not had {@link Query#setAutoFetch(boolean)}.
+	 * Set the auto fetch mode used when a query has not had {@link Query#setAutofetch(boolean)}.
 	 */
 	public void setMode(String mode);
 

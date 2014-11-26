@@ -8,8 +8,6 @@ import com.avaje.ebeaninternal.server.lib.DaemonThreadPool;
 
 /**
  * The default implementation of the BackgroundExecutor.
- * 
- * @author rbygrave
  */
 public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
@@ -20,7 +18,7 @@ public class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 	/**
 	 * Construct the default implementation of BackgroundExecutor.
 	 * 
-	 * @param mainPoolSize
+	 * @param corePoolSize
 	 *            the core size of the thread pool.
 	 * @param keepAliveSecs
 	 *            the time in seconds idle threads are keep alive

@@ -233,7 +233,6 @@
           </archive>
         </configuration>
       </plugin>
-<!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -241,7 +240,8 @@
         <configuration>
           <doctitle>Ebean 4</doctitle>
           <overview>src/main/java/com/avaje/ebean/overview.html</overview>
-          <excludePackageNames>com.avaje.ebeaninternal.*:com.avaje.ebean.util</excludePackageNames>
+         <!-- <excludePackageNames>com.avaje.ebeaninternal.*:com.avaje.ebean.util</excludePackageNames> -->
+          <additionalparam>-Xdoclint:none</additionalparam>
         </configuration>
         <executions>
           <execution>
@@ -253,7 +253,6 @@
           </execution>
         </executions>
       </plugin>
--->    
     </plugins>
 
   </build>
