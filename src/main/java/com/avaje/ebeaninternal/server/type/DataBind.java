@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
@@ -114,7 +115,15 @@ public class DataBind {
     public void setChar(char v) throws SQLException {
         pstmt.setString(++pos, String.valueOf(v));
     }
-    
+
+  public void setBlob(InputStream inputStream, long length) throws SQLException {
+    pstmt.setBlob(++pos, inputStream, length);
+  }
+
+  public void setBlob(InputStream inputStream) throws SQLException {
+    pstmt.setBlob(++pos, inputStream);
+  }
+
     public void setBlob(byte[] bytes) throws SQLException {
         ByteArrayInputStream is = new ByteArrayInputStream(bytes);
         pstmt.setBinaryStream(++pos, is, bytes.length);

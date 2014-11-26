@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.SQLException;
@@ -52,4 +53,5 @@ public interface DataReader {
     
     public Object getObject() throws SQLException;
 
+    public InputStream getBinaryStream() throws SQLException;
 }

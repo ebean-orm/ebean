@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -66,6 +67,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final DefaultTypeFactory extraTypeFactory;
 
+  private final ScalarTypeFile fileType = new ScalarTypeFile();
+
   private final ScalarType<?> charType = new ScalarTypeChar();
 
   private final ScalarType<?> charArrayType = new ScalarTypeCharArray();
@@ -127,8 +130,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    */
   public DefaultTypeManager(ServerConfig config, BootupClasses bootupClasses) {
 
-    int clobType = config == null ? Types.CLOB : config.getDatabasePlatform().getClobDbType();
-    int blobType = config == null ? Types.BLOB : config.getDatabasePlatform().getBlobDbType();
+    int clobType = config.getDatabasePlatform().getClobDbType();
+    int blobType = config.getDatabasePlatform().getBlobDbType();
 
     this.jsonDateTime = config.getJsonDateTime();
     this.checkImmutable = new CheckImmutable(this);
@@ -296,7 +299,12 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   @SuppressWarnings("unchecked")
   public <T> ScalarType<T> getScalarType(Class<T> type, int jdbcType) {
 
-    // check for Clob, LongVarchar etc first...
+    // File is a special Lob so check for that first
+    if (File.class.equals(type)) {
+      return (ScalarType<T>) fileType;
+    }
+
+    // check for Clob, LongVarchar etc ...
     // the reason being that String maps to multiple jdbc types
     // varchar, clob, longVarchar.
     ScalarType<?> scalarType = getLobTypes(jdbcType);
@@ -321,8 +329,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       return (ScalarType<T>) extraTypeFactory.createCalendar(jsonDateTime, jdbcType);
     }
 
-    String msg = "Unmatched ScalarType for " + type + " jdbcType:" + jdbcType;
-    throw new RuntimeException(msg);
+    throw new RuntimeException("Unmatched ScalarType for " + type + " jdbcType:" + jdbcType);
   }
 
   /**
@@ -650,7 +657,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * plus some other common types such as java.util.Date and java.util.Calendar.
    */
   protected void initialiseStandard(JsonConfig.DateTime mode, int platformClobType, int platformBlobType, boolean binaryUUID) {
-    
+
     ScalarType<?> utilDateType = extraTypeFactory.createUtilDate(mode);
     typeMap.put(java.util.Date.class, utilDateType);
 
@@ -675,6 +682,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     ScalarType<?> uuidType = (binaryUUID) ? new ScalarTypeUUIDBinary() : new ScalarTypeUUIDVarchar();
     typeMap.put(UUID.class, uuidType);
 
+    typeMap.put(File.class, fileType);
     typeMap.put(InetAddress.class, inetAddressType);
     typeMap.put(Locale.class, localeType);
     typeMap.put(Currency.class, currencyType);
