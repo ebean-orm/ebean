@@ -63,34 +63,38 @@ import com.avaje.ebean.text.json.JsonContext;
  * created automatically they are configured using information in the
  * ebean.properties file.
  * </p>
+ *
+ * <pre>{@code
+ *
+ *   // fetch shipped orders (and also their customer)
+ *   List<Order> list = Ebean.find(Order.class)
+ * 	  .fetch("customer")
+ * 	  .where()
+ * 	  .eq("status.code", Order.Status.SHIPPED)
+ * 	  .findList();
+ *
+ *   // read/use the order list ...
+ *   for (Order order : list) {
+ * 	   Customer customer = order.getCustomer();
+ * 	   ...
+ *   }
+ *
+ * }</pre>
  * 
- * <pre class="code">
- * // fetch shipped orders (and also their customer)
- * List&lt;Order&gt; list = Ebean.find(Order.class)
- * 	.fetch(&quot;customer&quot;)
- * 	.where() 
- * 	.eq(&quot;status.code&quot;, Order.Status.SHIPPED) 
- * 	.findList();
+ * <pre>{@code
+ *
+ *   // fetch order 10, modify and save
+ *   Order order = Ebean.find(Order.class, 10);
  * 
- * // read/use the order list ... 
- * for (Order order : list) { 
- * 	Customer customer = order.getCustomer(); 
- * 	... 
- * }
- * </pre>
+ *   OrderStatus shipped = Ebean.getReference(OrderStatus.class,"SHIPPED");
+ *   order.setStatus(shipped);
+ *   order.setShippedDate(shippedDate);
+ *   ...
  * 
- * <pre class="code">
- * // fetch order 10, modify and save 
- * Order order = Ebean.find(Order.class, 10);
- * 
- * OrderStatus shipped = Ebean.getReference(OrderStatus.class,&quot;SHIPPED&quot;); 
- * order.setStatus(shipped);
- * order.setShippedDate(shippedDate); 
- * ...
- * 
- * // implicitly creates a transaction and commits 
- * Ebean.save(order);
- * </pre>
+ *   // implicitly creates a transaction and commits
+ *   Ebean.save(order);
+ *
+ * }</pre>
  * 
  * <p>
  * When you have multiple databases and need access to a specific one the
@@ -98,20 +102,22 @@ import com.avaje.ebean.text.json.JsonContext;
  * specific database.
  * </p>
  * 
- * <pre class="code">
- * // Get access to the Human Resources EbeanServer/Database
- * EbeanServer hrDb = Ebean.getServer(&quot;hr&quot;);
+ * <pre> {@code
+ *
+ *   // Get access to the Human Resources EbeanServer/Database
+ *   EbeanServer hrDb = Ebean.getServer("hr");
  * 
  * 
- * // fetch contact 3 from the HR database 
- * Contact contact = hrDb.find(Contact.class, 3);
+ *   // fetch contact 3 from the HR database
+ *   Contact contact = hrDb.find(Contact.class, 3);
  * 
- * contact.setName(&quot;I'm going to change&quot;); 
- * ...
+ *   contact.setName("I'm going to change");
+ *   ...
  * 
- * // save the contact back to the HR database 
- * hrDb.save(contact);
- * </pre>
+ *   // save the contact back to the HR database
+ *   hrDb.save(contact);
+ *
+ * }</pre>
  */
 public final class Ebean {
   private static final Logger logger = LoggerFactory.getLogger(Ebean.class);
@@ -242,12 +248,12 @@ public final class Ebean {
    * Ebean.
    * </p>
    * 
-   * <pre class="code">
-   * // use the &quot;hr&quot; database
-   * EbeanServer hrDatabase = Ebean.getServer(&quot;hr&quot;);
+   * <pre>{@code
+   * // use the "hr" database
+   * EbeanServer hrDatabase = Ebean.getServer("hr");
    * 
    * Person person = hrDatabase.find(Person.class, 10);
-   * </pre>
+   * }</pre>
    * 
    * @param name
    *          the name of the server, use null for the 'default server'
@@ -323,22 +329,24 @@ public final class Ebean {
    * etc.
    * </p>
    * 
-   * <pre class="code">
-   * // start a transaction (stored in a ThreadLocal)
-   * Ebean.beginTransaction(); 
-   * try { 
-   * 	Order order = Ebean.find(Order.class,10); ...
+   * <pre>{@code
+   *
+   *   // start a transaction (stored in a ThreadLocal)
+   *   Ebean.beginTransaction();
+   *   try {
+   * 	   Order order = Ebean.find(Order.class,10); ...
+   *
+   * 	   Ebean.save(order);
    * 
-   * 	Ebean.save(order);
+   * 	   Ebean.commitTransaction();
    * 
-   * 	Ebean.commitTransaction();
-   * 
-   * } finally { 
-   * 	// rollback if we didn't commit 
-   * 	// i.e. an exception occurred before commitTransaction(). 
-   * 	Ebean.endTransaction(); 
-   * }
-   * </pre>
+   *   } finally {
+   * 	   // rollback if we didn't commit
+   * 	   // i.e. an exception occurred before commitTransaction().
+   * 	   Ebean.endTransaction();
+   *   }
+   *
+   * }</pre>
    * 
    * <p>
    * If you want to externalise the transaction management then you should be
@@ -377,9 +385,9 @@ public final class Ebean {
    * <p/>
    * If there is no currently active transaction then a PersistenceException is thrown.
    *
-   * @param transactionCallback The transaction callback to be registered with the current transaction.
+   * @param transactionCallback the transaction callback to be registered with the current transaction
    *
-   * @throws PersistenceException If there is no currently active transaction
+   * @throws PersistenceException if there is no currently active transaction
    */
   public static void register(TransactionCallback transactionCallback) throws PersistenceException {
     serverMgr.getPrimaryServer().register(transactionCallback);
@@ -410,17 +418,19 @@ public final class Ebean {
    * Code example:
    * </p>
    * 
-   * <pre class="code">
-   * Ebean.beginTransaction();
-   * try {
-   *   // do some fetching and or persisting
-   *   // commit at the end Ebean.commitTransaction();
+   * <pre>{@code
+   *   Ebean.beginTransaction();
+   *   try {
+   *     // do some fetching and or persisting
+   *
+   *     // commit at the end
+   *     Ebean.commitTransaction();
    * 
-   * } finally {
-   *   // if commit didn't occur then rollback the transaction
-   *   Ebean.endTransaction();
-   * }
-   * </pre>
+   *   } finally {
+   *     // if commit didn't occur then rollback the transaction
+   *     Ebean.endTransaction();
+   *   }
+   * }</pre>
    */
   public static void endTransaction() {
     serverMgr.getPrimaryServer().endTransaction();
@@ -453,15 +463,15 @@ public final class Ebean {
    * saving an order will also save all its details.
    * </p>
    * 
-   * <pre class="code">
-   * public class Order { ...
+   * <pre>{@code
+   *   public class Order { ...
    * 	
-   * 	&#064;OneToMany(cascade=CascadeType.ALL, mappedBy=&quot;order&quot;)
-   * 	&#064;JoinColumn(name=&quot;order_id&quot;) 
-   * 	List&lt;OrderDetail&gt; details; 
-   * 	... 
-   * }
-   * </pre>
+   * 	   @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
+   * 	   @JoinColumn(name="order_id")
+   * 	   List<OrderDetail> details;
+   * 	   ...
+   *   }
+   * }</pre>
    * 
    * <p>
    * When a save cascades via a OneToMany or ManyToMany Ebean will automatically
@@ -498,16 +508,16 @@ public final class Ebean {
    * An unmodified bean that is saved or updated is normally skipped and this marks the bean as
    * dirty so that it is not skipped.
    * 
-   * <pre class="code">
+   * <pre>{@code
    * 
-   * Customer customer = Ebean.find(Customer, id);
+   *   Customer customer = Ebean.find(Customer, id);
    * 
-   * // mark the bean as dirty so that a save() or update() will
-   * // increment the version property
-   * Ebean.markAsDirty(customer);
-   * Ebean.save(customer);
+   *   // mark the bean as dirty so that a save() or update() will
+   *   // increment the version property
+   *   Ebean.markAsDirty(customer);
+   *   Ebean.save(customer);
    * 
-   * </pre>
+   * }</pre>
    */
   public static void markAsDirty(Object bean) throws OptimisticLockException {
     serverMgr.getPrimaryServer().markAsDirty(bean);
@@ -536,15 +546,15 @@ public final class Ebean {
    * properties are included instead.
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
    * 
-   * // A 'stateless update' example
-   * Customer customer = new Customer();
-   * customer.setId(7);
-   * customer.setName(&quot;ModifiedNameNoOCC&quot;);
-   * ebeanServer.update(customer);
+   *   // A 'stateless update' example
+   *   Customer customer = new Customer();
+   *   customer.setId(7);
+   *   customer.setName("ModifiedNameNoOCC");
+   *   ebeanServer.update(customer);
    * 
-   * </pre>
+   * }</pre>
    * 
    * @see ServerConfig#setUpdatesDeleteMissingChildren(boolean)
    * @see ServerConfig#setUpdateChangesOnly(boolean)
@@ -678,12 +688,14 @@ public final class Ebean {
   /**
    * Refresh a 'many' property of a bean.
    * 
-   * <pre class="code">
-   * Order order = ...;
-   * ...
-   * // refresh the order details...
-   * Ebean.refreshMany(order, &quot;details&quot;);
-   * </pre>
+   * <pre>{@code
+   *
+   *   Order order = ...;
+   *   ...
+   *   // refresh the order details...
+   *   Ebean.refreshMany(order, "details");
+   *
+   * }</pre>
    * 
    * @param bean
    *          the entity bean containing the List Set or Map to refresh.
@@ -700,16 +712,18 @@ public final class Ebean {
    * This is sometimes described as a proxy (with lazy loading).
    * </p>
    * 
-   * <pre class="code">
-   * Product product = Ebean.getReference(Product.class, 1);
+   * <pre>{@code
+   *
+   *   Product product = Ebean.getReference(Product.class, 1);
    * 
-   * // You can get the id without causing a fetch/lazy load
-   * Integer productId = product.getId();
+   *   // You can get the id without causing a fetch/lazy load
+   *   Integer productId = product.getId();
    * 
-   * // If you try to get any other property a fetch/lazy loading will occur
-   * // This will cause a query to execute...
-   * String name = product.getName();
-   * </pre>
+   *   // If you try to get any other property a fetch/lazy loading will occur
+   *   // This will cause a query to execute...
+   *   String name = product.getName();
+   *
+   * }</pre>
    * 
    * @param beanType
    *          the type of entity bean
@@ -739,23 +753,23 @@ public final class Ebean {
    * not invoke a DB query.
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
    * 
-   * // find orders and their customers
-   * List&lt;Order&gt; list = Ebean.find(Order.class)
-   *     .fetch(&quot;customer&quot;)
-   *     .orderBy(&quot;id&quot;)
+   *   // find orders and their customers
+   *   List<Order> list = Ebean.find(Order.class)
+   *     .fetch("customer")
+   *     .orderBy("id")
    *     .findList();
    * 
-   * // sort by customer name ascending, then by order shipDate
-   * // ... then by the order status descending
-   * Ebean.sort(list, &quot;customer.name, shipDate, status desc&quot;);
+   *   // sort by customer name ascending, then by order shipDate
+   *   // ... then by the order status descending
+   *   Ebean.sort(list, "customer.name, shipDate, status desc");
    * 
-   * // sort by customer name descending (with nulls low)
-   * // ... then by the order id
-   * Ebean.sort(list, &quot;customer.name desc nullsLow, id&quot;);
+   *   // sort by customer name descending (with nulls low)
+   *   // ... then by the order id
+   *   Ebean.sort(list, "customer.name desc nullsLow, id");
    * 
-   * </pre>
+   * }</pre>
    * 
    * @param list
    *          the list of entity beans
@@ -769,41 +783,43 @@ public final class Ebean {
   /**
    * Find a bean using its unique id. This will not use caching.
    * 
-   * <pre class="code">
-   * // Fetch order 1
-   * Order order = Ebean.find(Order.class, 1);
-   * </pre>
+   * <pre>{@code
+   *   // Fetch order 1
+   *   Order order = Ebean.find(Order.class, 1);
+   * }</pre>
    * 
    * <p>
    * If you want more control over the query then you can use createQuery() and
    * Query.findUnique();
    * </p>
    * 
-   * <pre class="code">
-   * // ... additionally fetching customer, customer shipping address,
-   * // order details, and the product associated with each order detail.
-   * // note: only product id and name is fetch (its a &quot;partial object&quot;).
-   * // note: all other objects use &quot;*&quot; and have all their properties fetched.
+   * <pre>{@code
+   *   // ... additionally fetching customer, customer shipping address,
+   *   // order details, and the product associated with each order detail.
+   *   // note: only product id and name is fetch (its a "partial object").
+   *   // note: all other objects use "*" and have all their properties fetched.
    * 
-   * Query&lt;Order&gt; query = Ebean.createQuery(Order.class);
-   * query.setId(1);
-   * query.fetch(&quot;customer&quot;);
-   * query.fetch(&quot;customer.shippingAddress&quot;);
-   * query.fetch(&quot;details&quot;);
+   *   Query<Order> query = Ebean.find(Order.class)
+   *     .setId(1)
+   *     .fetch("customer")
+   *     .fetch("customer.shippingAddress")
+   *     .fetch("details")
+   *     .query();
    * 
-   * // fetch associated products but only fetch their product id and name
-   * query.fetch(&quot;details.product&quot;, &quot;name&quot;);
+   *   // fetch associated products but only fetch their product id and name
+   *   query.fetch("details.product", "name");
    * 
-   * // traverse the object graph...
+   *   // traverse the object graph...
    * 
-   * Order order = query.findUnique();
-   * Customer customer = order.getCustomer();
-   * Address shippingAddress = customer.getShippingAddress();
-   * List&lt;OrderDetail&gt; details = order.getDetails();
-   * OrderDetail detail0 = details.get(0);
-   * Product product = detail0.getProduct();
-   * String productName = product.getName();
-   * </pre>
+   *   Order order = query.findUnique();
+   *   Customer customer = order.getCustomer();
+   *   Address shippingAddress = customer.getShippingAddress();
+   *   List<OrderDetail> details = order.getDetails();
+   *   OrderDetail detail0 = details.get(0);
+   *   Product product = detail0.getProduct();
+   *   String productName = product.getName();
+   *
+   * }</pre>
    * 
    * @param beanType
    *          the type of entity bean to fetch
@@ -815,7 +831,7 @@ public final class Ebean {
   }
 
   /**
-   * Create a <a href="SqlQuery.html">SqlQuery</a> for executing native sql
+   * Create a SqlQuery for executing native sql
    * query statements.
    * <p>
    * Note that you can use raw SQL with entity beans, refer to the SqlSelect
@@ -873,15 +889,17 @@ public final class Ebean {
    * deployment orm xml file.
    * </p>
    * 
-   * <pre class="code">
-   * // Use a namedQuery
-   * UpdateSql update = Ebean.createNamedSqlUpdate(&quot;update.topic.count&quot;);
+   * <pre>{@code
+   *
+   *   // Use a namedQuery
+   *   UpdateSql update = Ebean.createNamedSqlUpdate("update.topic.count");
    * 
-   * update.setParameter(&quot;count&quot;, 1);
-   * update.setParameter(&quot;topicId&quot;, 50);
+   *   update.setParameter("count", 1);
+   *   update.setParameter("topicId", 50);
    * 
-   * int modifiedCount = update.execute();
-   * </pre>
+   *   int modifiedCount = update.execute();
+   *
+   * }</pre>
    */
   public static SqlUpdate createNamedSqlUpdate(String namedQuery) {
     return serverMgr.getPrimaryServer().createNamedSqlUpdate(namedQuery);
@@ -896,12 +914,14 @@ public final class Ebean {
    * need to bind required parameters and then execute the query.
    * </p>
    * 
-   * <pre class="code">
-   * // example
-   * Query&lt;Order&gt; query = Ebean.createNamedQuery(Order.class, &quot;new.for.customer&quot;);
-   * query.setParameter(&quot;customerId&quot;, 23);
-   * List&lt;Order&gt; newOrders = query.findList();
-   * </pre>
+   * <pre>{@code
+   *
+   *   // example
+   *   Query<Order> query = Ebean.createNamedQuery(Order.class, "new.for.customer");
+   *   query.setParameter("customerId", 23);
+   *   List<Order> newOrders = query.findList();
+   *
+   * }</pre>
    * 
    * @param beanType
    *          the class of entity to be fetched
@@ -924,14 +944,15 @@ public final class Ebean {
    * moved to {@link #createNamedQuery(Class, String)}.
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
    * 
-   * String q = &quot;find order fetch details where status = :st&quot;;
+   *   String q = "find order fetch details where status = :st";
    * 
-   * List&lt;Order&gt; newOrders = Ebean.createQuery(Order.class, q)
-   *     .setParameter(&quot;st&quot;, Order.Status.NEW)
+   *   List<Order> newOrders = Ebean.>findOrder.class, q)
+   *     .setParameter("st", Order.Status.NEW)
    *     .findList();
-   * </pre>
+   *
+   * }</pre>
    * 
    * @param query
    *          the object query
@@ -956,40 +977,43 @@ public final class Ebean {
    * Example named updates:
    * </p>
    * 
-   * <pre class="code">
-   * package app.data;
+   * <pre>{@code
+   *   package app.data;
    * 
-   * import ...
+   *   import ...
    * 
-   * &#064;NamedUpdates(value = { 
-   * 	&#064;NamedUpdate( name = &quot;setTitle&quot;, 
-   * 		isSql = false, 
-   * 		notifyCache = false, 
-   * 		update = &quot;update topic set title = :title, postCount = :postCount where id = :id&quot;), 
-   * 	&#064;NamedUpdate( name = &quot;setPostCount&quot;,
-   * 		notifyCache = false,
-   * 		update = &quot;update f_topic set post_count = :postCount where id = :id&quot;), 
-   * 	&#064;NamedUpdate( name = &quot;incrementPostCount&quot;, 
-   * 		notifyCache = false, 
-   * 		isSql = false,
-   * 		update = &quot;update Topic set postCount = postCount + 1 where id = :id&quot;) }) 
-   * &#064;Entity 
-   * &#064;Table(name = &quot;f_topic&quot;) 
-   * public class Topic { ...
-   * </pre>
+   *   @NamedUpdates(value = {
+   *    @NamedUpdate( name = "setTitle",
+   * 	    isSql = false,
+   * 		  notifyCache = false,
+   * 		  update = "update topic set title = :title, postCount = :postCount where id = :id"),
+   * 	  @NamedUpdate( name = "setPostCount",
+   * 		  notifyCache = false,
+   * 		  update = "update f_topic set post_count = :postCount where id = :id"),
+   * 	  @NamedUpdate( name = "incrementPostCount",
+   * 		  notifyCache = false,
+   * 		  isSql = false,
+   * 		  update = "update Topic set postCount = postCount + 1 where id = :id") })
+   *   @Entity
+   *   @Table(name = "f_topic")
+   *   public class Topic { ...
+   *
+   * }</pre>
    * 
    * <p>
    * Example using a named update:
    * </p>
    * 
-   * <pre class="code">
-   * Update&lt;Topic&gt; update = Ebean.createNamedUpdate(Topic.class, &quot;setPostCount&quot;);
-   * update.setParameter(&quot;postCount&quot;, 10);
-   * update.setParameter(&quot;id&quot;, 3);
+   * <pre>{@code
+   *
+   *   Update<Topic> update = Ebean.createNamedUpdate(Topic.class, "setPostCount");
+   *   update.setParameter("postCount", 10);
+   *   update.setParameter("id", 3);
    * 
-   * int rows = update.execute();
-   * System.out.println(&quot;rows updated: &quot; + rows);
-   * </pre>
+   *   int rows = update.execute();
+   *   System.out.println("rows updated: " + rows);
+   *
+   * }</pre>
    */
   public static <T> Update<T> createNamedUpdate(Class<T> beanType, String namedUpdate) {
 
@@ -1008,21 +1032,22 @@ public final class Ebean {
    * An example:
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
    * 
-   * // The bean name and properties - &quot;topic&quot;,&quot;postCount&quot; and &quot;id&quot;
+   *   // The bean name and properties - "topic","postCount" and "id"
    * 
-   * // will be converted into their associated table and column names
-   * String updStatement = &quot;update topic set postCount = :pc where id = :id&quot;;
+   *   // will be converted into their associated table and column names
+   *   String updStatement = "update topic set postCount = :pc where id = :id";
    * 
-   * Update&lt;Topic&gt; update = Ebean.createUpdate(Topic.class, updStatement);
+   *   Update<Topic> update = Ebean.createUpdate(Topic.class, updStatement);
    * 
-   * update.set(&quot;pc&quot;, 9);
-   * update.set(&quot;id&quot;, 3);
+   *   update.set("pc", 9);
+   *   update.set("id", 3);
    * 
-   * int rows = update.execute();
-   * System.out.println(&quot;rows updated:&quot; + rows);
-   * </pre>
+   *   int rows = update.execute();
+   *   System.out.println("rows updated:" + rows);
+   *
+   * }</pre>
    */
   public static <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate) {
 
@@ -1053,38 +1078,37 @@ public final class Ebean {
    * which is was created.
    * </p>
    * 
-   * <pre class="code">
-   * // Find order 2 additionally fetching the customer, details and details.product
-   * // name.
+   * <pre>{@code
+   *   // Find order 2 additionally fetching the customer, details and details.product
+   *   // name.
    * 
-   * Query&lt;Order&gt; query = Ebean.createQuery(Order.class);
-   * query.fetch(&quot;customer&quot;);
-   * query.fetch(&quot;details&quot;);
-   * query.fetch(&quot;detail.product&quot;, &quot;name&quot;);
-   * query.setId(2);
+   *   Order order = Ebean.find(Order.class)
+   *     .fetch("customer")
+   *     .fetch("details")
+   *     .fetch("detail.product", "name")
+   *     .setId(2)
+   *     .findUnique();
    * 
-   * Order order = query.findUnique();
+   *   // Find order 2 additionally fetching the customer, details and details.product
+   *   // name.
+   *   // Note: same query as above but using the query language
+   *   // Note: using a named query would be preferred practice
    * 
-   * // Find order 2 additionally fetching the customer, details and details.product
-   * // name.
-   * // Note: same query as above but using the query language
-   * // Note: using a named query would be preferred practice
+   *   String oql = "find order fetch customer fetch details fetch details.product (name) where id = :orderId ";
    * 
-   * String oql = &quot;find order fetch customer fetch details fetch details.product (name) where id = :orderId &quot;;
+   *   Query<Order> query = Ebean.find(Order.class);
+   *   query.setQuery(oql);
+   *   query.setParameter("orderId", 2);
    * 
-   * Query&lt;Order&gt; query = Ebean.createQuery(Order.class);
-   * query.setQuery(oql);
-   * query.setParameter(&quot;orderId&quot;, 2);
+   *   Order order = query.findUnique();
    * 
-   * Order order = query.findUnique();
+   *   // Using a named query
+   *   Query<Order> query = Ebean.find(Order.class, "with.details");
+   *   query.setParameter("orderId", 2);
    * 
-   * // Using a named query
-   * Query&lt;Order&gt; query = Ebean.createQuery(Order.class, &quot;with.details&quot;);
-   * query.setParameter(&quot;orderId&quot;, 2);
+   *   Order order = query.findUnique();
    * 
-   * Order order = query.findUnique();
-   * 
-   * </pre>
+   * }</pre>
    * 
    * @param beanType
    *          the class of entity to be fetched
@@ -1144,19 +1168,21 @@ public final class Ebean {
    * Example:
    * </p>
    * 
-   * <pre class="code">
-   * // example that uses 'named' parameters 
-   * String s = &quot;UPDATE f_topic set post_count = :count where id = :id&quot;
+   * <pre>{@code
+   *
+   *   // example that uses 'named' parameters
+   *   String s = "UPDATE f_topic set post_count = :count where id = :id"
    * 
-   * SqlUpdate update = Ebean.createSqlUpdate(s);
+   *   SqlUpdate update = Ebean.createSqlUpdate(s);
    * 
-   * update.setParameter(&quot;id&quot;, 1);
-   * update.setParameter(&quot;count&quot;, 50);
+   *   update.setParameter("id", 1);
+   *   update.setParameter("count", 50);
    * 
-   * int modifiedCount = Ebean.execute(update);
+   *   int modifiedCount = Ebean.execute(update);
    * 
-   * String msg = &quot;There where &quot; + modifiedCount + &quot;rows updated&quot;;
-   * </pre>
+   *   String msg = "There where " + modifiedCount + "rows updated";
+   *
+   * }</pre>
    * 
    * @param sqlUpdate
    *          the update sql potentially with bind values
@@ -1177,19 +1203,21 @@ public final class Ebean {
    * Example:
    * </p>
    * 
-   * <pre class="code">
-   * String sql = &quot;{call sp_order_modify(?,?,?)}&quot;;
+   * <pre>{@code
+   *
+   *   String sql = "{call sp_order_modify(?,?,?)}";
    * 
-   * CallableSql cs = Ebean.createCallableSql(sql);
-   * cs.setParameter(1, 27);
-   * cs.setParameter(2, &quot;SHIPPED&quot;);
-   * cs.registerOut(3, Types.INTEGER);
+   *   CallableSql cs = Ebean.createCallableSql(sql);
+   *   cs.setParameter(1, 27);
+   *   cs.setParameter(2, "SHIPPED");
+   *   cs.registerOut(3, Types.INTEGER);
    * 
-   * Ebean.execute(cs);
+   *   Ebean.execute(cs);
    * 
-   * // read the out parameter
-   * Integer returnValue = (Integer) cs.getObject(3);
-   * </pre>
+   *   // read the out parameter
+   *   Integer returnValue = (Integer) cs.getObject(3);
+   *
+   * }</pre>
    * 
    * @see CallableSql
    * @see Ebean#execute(SqlUpdate)
@@ -1205,18 +1233,19 @@ public final class Ebean {
    * semantics.
    * </p>
    * 
-   * <pre class="code">
-   * // set specific transactional scope settings 
-   * TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
-   * 
-   * Ebean.execute(scope, new TxRunnable() { 
-   * 	public void run() { 
-   * 		User u1 = Ebean.find(User.class, 1); 
-   * 		...
-   * 
-   * 	} 
-   * });
-   * </pre>
+   * <pre>{@code
+   *
+   *   // set specific transactional scope settings
+   *   TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
+   *
+   *   Ebean.execute(scope, new TxRunnable() {
+   * 	   public void run() {
+   * 		   User u1 = Ebean.find(User.class, 1);
+   * 		   ...
+   * 	   }
+   *   });
+   *
+   * }</pre>
    */
   public static void execute(TxScope scope, TxRunnable r) {
     serverMgr.getPrimaryServer().execute(scope, r);
@@ -1229,20 +1258,22 @@ public final class Ebean {
    * exception (checked or runtime).
    * </p>
    * 
-   * <pre class="code">
-   * Ebean.execute(new TxRunnable() {
-   *   public void run() {
-   *     User u1 = Ebean.find(User.class, 1);
-   *     User u2 = Ebean.find(User.class, 2);
+   * <pre>{@code
+   *
+   *   Ebean.execute(new TxRunnable() {
+   *     public void run() {
+   *       User u1 = Ebean.find(User.class, 1);
+   *       User u2 = Ebean.find(User.class, 2);
    * 
-   *     u1.setName(&quot;u1 mod&quot;);
-   *     u2.setName(&quot;u2 mod&quot;);
+   *       u1.setName("u1 mod");
+   *       u2.setName("u2 mod");
    * 
-   *     Ebean.save(u1);
-   *     Ebean.save(u2);
-   *   }
-   * });
-   * </pre>
+   *       Ebean.save(u1);
+   *       Ebean.save(u2);
+   *     }
+   *   });
+   *
+   * }</pre>
    */
   public static void execute(TxRunnable r) {
     serverMgr.getPrimaryServer().execute(r);
@@ -1255,18 +1286,20 @@ public final class Ebean {
    * semantics.
    * </p>
    * 
-   * <pre class="code">
-   * // set specific transactional scope settings 
-   * TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
-   * 
-   * Ebean.execute(scope, new TxCallable&lt;String&gt;() {
-   * 	public String call() { 
-   * 		User u1 = Ebean.find(User.class, 1); 
-   * 		...
-   * 		return u1.getEmail(); 
-   * 	} 
-   * });
-   * </pre>
+   * <pre>{@code
+   *
+   *   // set specific transactional scope settings
+   *   TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
+   *
+   *   Ebean.execute(scope, new TxCallable<String>() {
+   * 	   public String call() {
+   * 		   User u1 = Ebean.find(User.class, 1);
+   * 		   ...
+   * 		   return u1.getEmail();
+   * 	   }
+   *   });
+   *
+   * }</pre>
    * 
    */
   public static <T> T execute(TxScope scope, TxCallable<T> c) {
@@ -1284,22 +1317,24 @@ public final class Ebean {
    * (and you specify the return type via generics).
    * </p>
    * 
-   * <pre class="code">
-   * Ebean.execute(new TxCallable&lt;String&gt;() {
-   *   public String call() {
-   *     User u1 = Ebean.find(User.class, 1);
-   *     User u2 = Ebean.find(User.class, 2);
+   * <pre>{@code
+   *
+   *   Ebean.execute(new TxCallable<String>() {
+   *     public String call() {
+   *       User u1 = Ebean.find(User.class, 1);
+   *       User u2 = Ebean.find(User.class, 2);
    * 
-   *     u1.setName(&quot;u1 mod&quot;);
-   *     u2.setName(&quot;u2 mod&quot;);
+   *       u1.setName("u1 mod");
+   *       u2.setName("u2 mod");
    * 
-   *     Ebean.save(u1);
-   *     Ebean.save(u2);
+   *       Ebean.save(u1);
+   *       Ebean.save(u2);
    * 
-   *     return u1.getEmail();
-   *   }
-   * });
-   * </pre>
+   *       return u1.getEmail();
+   *     }
+   *   });
+   *
+   * }</pre>
    */
   public static <T> T execute(TxCallable<T> c) {
     return serverMgr.getPrimaryServer().execute(c);
@@ -1320,7 +1355,7 @@ public final class Ebean {
    * </p>
    * <p>
    * If there is a transaction then this information is placed into the current
-   * transactions event information. When the transaction is commited this
+   * transactions event information. When the transaction is committed this
    * information is registered (with the transaction manager). If this
    * transaction is rolled back then none of the transaction event information
    * registers including the information you put in via this method.

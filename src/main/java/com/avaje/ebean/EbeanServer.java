@@ -49,18 +49,18 @@ import com.avaje.ebean.text.json.JsonContext;
  * Example: Get a EbeanServer
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * // Get access to the Human Resources EbeanServer/Database
- * EbeanServer hrServer = Ebean.getServer(&quot;HR&quot;);
+ * EbeanServer hrServer = Ebean.getServer("HR");
  * 
  * 
  * // fetch contact 3 from the HR database Contact contact =
  * hrServer.find(Contact.class, new Integer(3));
  * 
- * contact.setStatus(&quot;INACTIVE&quot;); ...
+ * contact.setStatus("INACTIVE"); ...
  * 
  * // save the contact back to the HR database hrServer.save(contact);
- * </pre>
+ * }</pre>
  * 
  * <p>
  * <b>EbeanServer has more API than Ebean</b><br/>
@@ -128,7 +128,6 @@ public interface EbeanServer {
    */
   public MetaInfoManager getMetaInfoManager();
 
-
   /**
    * Return the BeanState for a given entity bean.
    * <p>
@@ -192,15 +191,15 @@ public interface EbeanServer {
    * moved to {@link #createNamedQuery(Class, String)}.
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
    *  EbeanServer ebeanServer = ... ;
    *  String q = "find order fetch details where status = :st";
    *  
-   *  List&lt;Order&gt; newOrders 
+   *  List<Order> newOrders
    *        = ebeanServer.createQuery(Order.class, q)
    *             .setParameter("st", Order.Status.NEW)
    *             .findList();
-   * </pre>
+   * }</pre>
    * 
    * @param query
    *          the object query
@@ -208,16 +207,14 @@ public interface EbeanServer {
   public <T> Query<T> createQuery(Class<T> beanType, String query);
 
   /**
-   * Create a query for an entity bean (refer {@link Ebean#createQuery(Class)}
-   * ).
+   * Create a query for an entity bean (refer {@link Ebean#createQuery(Class)}).
    * 
    * @see Ebean#createQuery(Class)
    */
   public <T> Query<T> createQuery(Class<T> beanType);
 
   /**
-   * Create a query for a type of entity bean (the same as
-   * {@link EbeanServer#createQuery(Class)}).
+   * Create a query for a type of entity bean (the same as {@link EbeanServer#createQuery(Class)}).
    */
   public <T> Query<T> find(Class<T> beanType);
 
@@ -273,8 +270,7 @@ public interface EbeanServer {
   public SqlQuery createSqlQuery(String sql);
 
   /**
-   * Create a named sql query (refer {@link Ebean#createNamedSqlQuery(String)}
-   * ).
+   * Create a named sql query (refer {@link Ebean#createNamedSqlQuery(String)}).
    * <p>
    * The query statement will be defined in a deployment orm xml file.
    * </p>
@@ -284,8 +280,7 @@ public interface EbeanServer {
   public SqlQuery createNamedSqlQuery(String namedQuery);
 
   /**
-   * Create a sql update for executing native dml statements (refer
-   * {@link Ebean#createSqlUpdate(String)}).
+   * Create a sql update for executing native dml statements (refer {@link Ebean#createSqlUpdate(String)}).
    * 
    * @see Ebean#createSqlUpdate(String)
    */
@@ -297,8 +292,7 @@ public interface EbeanServer {
   public CallableSql createCallableSql(String callableSql);
 
   /**
-   * Create a named sql update (refer {@link Ebean#createNamedSqlUpdate(String)}
-   * ).
+   * Create a named sql update (refer {@link Ebean#createNamedSqlUpdate(String)}).
    * <p>
    * The statement (an Insert Update or Delete statement) will be defined in a
    * deployment orm xml file.
@@ -350,8 +344,7 @@ public interface EbeanServer {
   public Transaction beginTransaction(TxIsolation isolation);
 
   /**
-   * Returns the current transaction or null if there is no current transaction
-   * in scope.
+   * Returns the current transaction or null if there is no current transaction in scope.
    */
   public Transaction currentTransaction();
 
@@ -379,15 +372,19 @@ public interface EbeanServer {
    * <p>
    * Code example:
    * 
-   * <pre class="code">
-   * Ebean.startTransaction(); try { // do some fetching
-   * and or persisting
+   * <pre>{@code
+   *   ebeanServer.startTransaction();
+   *   try {
+   *     // do some fetching and or persisting ...
    * 
-   * // commit at the end Ebean.commitTransaction();
+   *     // commit at the end
+   *     ebeanServer.commitTransaction();
    * 
-   * } finally { // if commit didn't occur then rollback the transaction
-   * Ebean.endTransaction(); }
-   * </pre>
+   *   } finally {
+   *     // if commit didn't occur then rollback the transaction
+   *     ebeanServer.endTransaction();
+   *   }
+   * }</pre>
    * 
    * </p>
    * 
@@ -429,7 +426,7 @@ public interface EbeanServer {
    * <p>
    * This will not perform a query against the database.
    * </p>
-   * <pre class="code">
+   * <pre>{@code
    * Product product = Ebean.getReference(Product.class, 1);
    * 
    * // You can get the id without causing a fetch/lazy load
@@ -438,7 +435,7 @@ public interface EbeanServer {
    * // If you try to get any other property a fetch/lazy loading will occur
    * // This will cause a query to execute...
    * String name = product.getName();
-   * </pre>
+   * }</pre>
    * 
    * @param beanType
    *          the type of entity bean
@@ -882,7 +879,7 @@ public interface EbeanServer {
    * An unmodified bean that is saved or updated is normally skipped and this marks the bean as
    * dirty so that it is not skipped.
    * 
-   * <pre class="code">
+   * <pre>{@code
    * 
    * Customer customer = ebeanServer.find(Customer, id);
    * 
@@ -891,7 +888,7 @@ public interface EbeanServer {
    * ebeanServer.markAsDirty(customer);
    * ebeanServer.save(customer);
    * 
-   * </pre>   
+   * }</pre>
    */
   public void markAsDirty(Object bean);
   
@@ -918,15 +915,15 @@ public interface EbeanServer {
    * properties are included instead.
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
    * 
    * // A 'stateless update' example
    * Customer customer = new Customer();
    * customer.setId(7);
-   * customer.setName(&quot;ModifiedNameNoOCC&quot;);
+   * customer.setName("ModifiedNameNoOCC");
    * ebeanServer.update(customer);
    * 
-   * </pre>
+   * }</pre>
    * 
    * @see ServerConfig#setUpdatesDeleteMissingChildren(boolean)
    * @see ServerConfig#setUpdateChangesOnly(boolean)
