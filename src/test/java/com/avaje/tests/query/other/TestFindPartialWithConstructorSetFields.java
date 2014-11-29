@@ -1,18 +1,16 @@
 package com.avaje.tests.query.other;
 
-import java.sql.Date;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.Order.Status;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.sql.Date;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
