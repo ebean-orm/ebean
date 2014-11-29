@@ -14,30 +14,44 @@ import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.Order.Status;
 import com.avaje.tests.model.basic.ResetBasicData;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class TestFindPartialWithConstructorSetFields extends BaseTestCase {
 
   @Test
   public void test() {
     
     ResetBasicData.reset();
-    
-    
+
     List<Order> list = Ebean.find(Order.class)
+      .setLazyLoadBatchSize(100)
       .select("shipDate")
       .findList();
-    
-    for (Order order : list) {
-      BeanState beanState = Ebean.getBeanState(order);
-      Set<String> loadedProps = beanState.getLoadedProps();
-      Assert.assertTrue(loadedProps.contains("shipDate"));
-      Assert.assertTrue(!loadedProps.contains("status"));
-      Assert.assertTrue(!loadedProps.contains("orderDate"));
-      
-      Status status = order.getStatus();
-      Date orderDate = order.getOrderDate();
-      System.out.println("-- order - "+order.getId()+" status:"+status+" date:"+orderDate);
+
+    assertTrue(list.size() > 2);
+
+    // assert first bean is partially loaded
+    Order order0 = list.get(0);
+    BeanState beanState = Ebean.getBeanState(order0);
+    Set<String> loadedProps = beanState.getLoadedProps();
+    assertTrue(loadedProps.contains("shipDate"));
+    assertTrue(!loadedProps.contains("status"));
+    assertTrue(!loadedProps.contains("orderDate"));
+
+    // invoke lazy loading
+    Status status = order0.getStatus();
+    Date orderDate = order0.getOrderDate();
+    System.out.println("-- order - "+order0.getId()+" status:"+status+" date:"+orderDate);
+
+    // assert that these beans are fully loaded
+    for (int i = 1; i < list.size(); i++) {
+      Order order1 = list.get(1);
+      beanState = Ebean.getBeanState(order1);
+      loadedProps = beanState.getLoadedProps();
+      assertNull(loadedProps);
     }
-    
+
   }
   
 }
