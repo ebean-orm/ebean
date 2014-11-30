@@ -1,13 +1,8 @@
 package com.avaje.ebeaninternal.server.core;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletContextEvent;
 
 /**
  * Listens for webserver server starting and stopping events.
@@ -19,8 +14,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ServletContextListener implements javax.servlet.ServletContextListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServletContextListener.class);
-
     /**
      * The servlet container is stopping.
      */
@@ -29,29 +22,10 @@ public class ServletContextListener implements javax.servlet.ServletContextListe
     }
 
     /**
-     * The servlet container is starting. 
-     * <p>
-     * Initialise the properties file using SystemProperties.initWebapp();
-     * and start Ebean.
-     * </p>
+     * Do nothing on startup.
      */
     public void contextInitialized(ServletContextEvent event) {
 
-        try {
-            ServletContext servletContext = event.getServletContext();
-            GlobalProperties.setServletContext(servletContext);
-
-            if (servletContext != null) {
-                String servletRealPath = servletContext.getRealPath("");
-                GlobalProperties.put("servlet.realpath", servletRealPath);
-                logger.info("servlet.realpath=[" + servletRealPath + "]");
-            }            
- 
-            Ebean.getServer(null);
-            
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
     
 }

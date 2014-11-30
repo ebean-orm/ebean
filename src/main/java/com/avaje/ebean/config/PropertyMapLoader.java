@@ -1,40 +1,30 @@
 package com.avaje.ebean.config;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.servlet.ServletContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.*;
+import java.util.Map;
+import java.util.Properties;
+
 /**
- * Helper used to load the PropertyMap.
+ * Helper used to load the ebean.properties into a PropertyMap.
  */
 final class PropertyMapLoader {
 
   private static final Logger logger = LoggerFactory.getLogger(PropertyMapLoader.class);
 
-  private static ServletContext servletContext;
+  public static PropertyMap loadGlobalProperties() {
 
-  /**
-   * Return the servlet context when in a web environment.
-   */
-  public static ServletContext getServletContext() {
-    return servletContext;
-  }
+    String fileName = System.getenv("EBEAN_PROPS_FILE");
+    if (fileName == null) {
+      fileName = System.getProperty("ebean.props.file");
+      if (fileName == null) {
+        fileName = "ebean.properties";
+      }
+    }
 
-  /**
-   * Set the ServletContext for when ebean.properties is in WEB-INF in a web
-   * application environment.
-   */
-  public static void setServletContext(ServletContext servletContext) {
-    PropertyMapLoader.servletContext = servletContext;
+    return load(null, fileName);
   }
 
   /**
@@ -64,15 +54,20 @@ final class PropertyMapLoader {
    * @param in
    *          the InputStream of the properties file to load.
    */
-  private static PropertyMap load(PropertyMap p, InputStream in) {
+  public static PropertyMap load(PropertyMap p, InputStream in) {
 
     Properties props = new Properties();
     try {
       props.load(in);
       in.close();
+      return load(p, props);
+
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public static PropertyMap load(PropertyMap p, Properties props) {
 
     if (p == null) {
       p = new PropertyMap();
@@ -115,18 +110,6 @@ final class PropertyMapLoader {
 
     if (fileName == null) {
       throw new NullPointerException("fileName is null?");
-    }
-
-    if (servletContext == null) {
-      logger.debug("No servletContext so not looking in WEB-INF for " + fileName);
-
-    } else {
-      // first look in WEB-INF ...
-      InputStream in = servletContext.getResourceAsStream("/WEB-INF/" + fileName);
-      if (in != null) {
-        logger.debug(fileName + " found in WEB-INF");
-        return in;
-      }
     }
 
     try {

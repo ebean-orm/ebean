@@ -1,11 +1,12 @@
 package com.avaje.ebean;
 
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.common.BootupEbeanManager;
-import com.avaje.ebean.config.GlobalProperties;
+import com.avaje.ebean.config.ContainerConfig;
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.util.ClassUtil;
+
+import javax.persistence.PersistenceException;
+import java.lang.reflect.Constructor;
+import java.util.Properties;
 
 /**
  * Creates EbeanServer instances.
@@ -27,31 +28,43 @@ import com.avaje.ebean.util.ClassUtil;
  */
 public class EbeanServerFactory {
 
-  private static BootupEbeanManager serverFactory = createServerFactory();
+
+  private static BootupEbeanManager bootupEbeanManager;
+
+  /**
+   * Initialise the container with clustering configuration.
+   *
+   * Call this prior to creating any EbeanServer instances or alternatively set the
+   * ContainerConfig on the ServerConfig when creating the first EbeanServer instance.
+   */
+  public static synchronized void initialiseContainer(ContainerConfig containerConfig) {
+    getServerFactory(containerConfig);
+  }
 
   /**
    * Create using ebean.properties to configure the server.
    */
-  public static EbeanServer create(String name) {
+  public static synchronized EbeanServer create(String name) {
 
-    EbeanServer server = serverFactory.createServer(name);
-
-    return server;
+    // construct based on loading properties files
+    // and if invoked by Ebean then it handles registration
+    BootupEbeanManager serverFactory = getServerFactory(null);
+    return serverFactory.createServer(name);
   }
 
   /**
    * Create using the ServerConfig object to configure the server.
    */
-  public static EbeanServer create(ServerConfig config) {
+  public static synchronized EbeanServer create(ServerConfig config) {
 
     if (config.getName() == null) {
       throw new PersistenceException("The name is null (it is required)");
     }
 
-    EbeanServer server = serverFactory.createServer(config);
+    EbeanServer server = createInternal(config);
 
     if (config.isDefaultServer()) {
-      GlobalProperties.setSkipPrimaryServer(true);
+      PrimaryServer.setSkip(true);
     }
     if (config.isRegister()) {
       Ebean.register(server, config.isDefaultServer());
@@ -60,13 +73,45 @@ public class EbeanServerFactory {
     return server;
   }
 
-  private static BootupEbeanManager createServerFactory() {
+
+  private static EbeanServer createInternal(ServerConfig config) {
+
+    return getServerFactory(config.getContainerConfig()).createServer(config);
+  }
+
+  /**
+   * Get the BootupEbeanManager initialising it if necessary.
+   *
+   * @param containerConfig the configuration controlling clustering communication
+   */
+  private static BootupEbeanManager getServerFactory(ContainerConfig containerConfig) {
+
+    if (bootupEbeanManager != null) {
+      return bootupEbeanManager;
+    }
+
+    if (containerConfig == null) {
+      // effectively load configuration from ebean.properties
+      Properties properties = PrimaryServer.getProperties();
+      containerConfig = new ContainerConfig();
+      containerConfig.loadFromProperties(properties);
+    }
+    bootupEbeanManager = createServerFactory(containerConfig);
+    return bootupEbeanManager;
+  }
+
+  /**
+   * Create the container instance using the configuration.
+   */
+  private static BootupEbeanManager createServerFactory(ContainerConfig containerConfig) {
 
     String dflt = "com.avaje.ebeaninternal.server.core.DefaultServerFactory";
     String implClassName = System.getProperty("ebean.serverfactory", dflt);
 
     try {
-      return (BootupEbeanManager) ClassUtil.newInstance(implClassName);
+      Class<?> cls = Class.forName(implClassName);
+      Constructor<?> constructor = cls.getConstructor(ContainerConfig.class);
+      return (BootupEbeanManager) constructor.newInstance(containerConfig);
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }

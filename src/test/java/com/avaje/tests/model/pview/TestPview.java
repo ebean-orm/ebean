@@ -1,22 +1,18 @@
 package com.avaje.tests.model.pview;
 
-import java.util.UUID;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.config.GlobalProperties;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.UUID;
 
 public class TestPview extends BaseTestCase {
 
   @Test
   public void test() {
-    
-    GlobalProperties.put("ebean.search.packages", "com.avaje.tests.model.odd");
-        
+
     Wview wview = Ebean.getReference(Wview.class, UUID.randomUUID());
         
     Query<Paggview> query = Ebean.find(Paggview.class);

@@ -21,15 +21,18 @@ class RequestProcessor implements Runnable {
   private final Socket clientSocket;
     
   private final SocketClusterBroadcast owner;
-    
-    /**
+
+  private final String hostPort;
+
+  /**
 	 *  Create including the Listener (used to lookup the Request Handler) and
 	 *  the socket itself. 
 	 */
 	public RequestProcessor(SocketClusterBroadcast owner, Socket clientSocket) {
 		this.clientSocket = clientSocket;
 		this.owner = owner;
-	}
+    this.hostPort = owner.getHostPort();
+  }
 	
 	/**
 	 *  This will parse out the command.  Lookup the appropriate Handler and 
@@ -39,22 +42,20 @@ class RequestProcessor implements Runnable {
 	 */
 	public void run() {
 		try {
-			SocketConnection sc = new SocketConnection(clientSocket);
-			
-			while(true){
-			    if (owner.process(sc)) {
-			        // got the offline message or timeout
-			        break;
-			    }
-			}
-			sc.disconnect();
-			
-		} catch (IOException e) {
-			logger.error(null, e);
-		} catch (ClassNotFoundException e) {
-            logger.error(null, e);
+      logger.trace("start listening for cluster messages");
+      SocketConnection sc = new SocketConnection(clientSocket);
+      while (true) {
+        if (owner.process(sc)) {
+          // got the offline message or timeout
+          break;
         }
-	}
+      }
+      logger.trace("disconnecting: {}", hostPort);
+			sc.disconnect();
 
+    } catch (Exception e) {
+      logger.error("Error listening for messages - "+owner.getHostPort(), e);
+    }
+  }
 
-}; 
+}

@@ -7,7 +7,6 @@ import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.transaction.BeanDelta;
 import com.avaje.ebeaninternal.server.transaction.BeanPersistIds;
-import com.avaje.ebeaninternal.server.transaction.IndexEvent;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
 /**
@@ -16,7 +15,6 @@ import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
  * Due to the hard limit for UDP packet sizes a RemoteTransactionEvent
  * is actually broken up into smaller messages.
  * </p>
- * @author rbygrave
  */
 public class PacketTransactionEvent extends Packet {
 
@@ -61,10 +59,6 @@ public class PacketTransactionEvent extends Packet {
 
         case BinaryMessage.TYPE_BEANDELTA:
             event.addBeanDelta(BeanDelta.readBinaryMessage(server, dataInput));
-            break;
-
-        case BinaryMessage.TYPE_INDEX:
-            event.addIndexEvent(IndexEvent.readBinaryMessage(dataInput));
             break;
 
         default:

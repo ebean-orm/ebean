@@ -1,21 +1,16 @@
 package com.avaje.tests.inheritance.company.domain;
 
-import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.junit.Assert;
-
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.config.GlobalProperties;
+import junit.framework.TestCase;
+import org.junit.Assert;
+
+import java.util.List;
 
 public class TestInheritAbstract extends TestCase {
 
 	public void testMe() {
-		
-		GlobalProperties.put("ebean.search.packages", "com.avaje.tests.inheritance.company.domain");
-		
+
 		EbeanServer server = Ebean.getServer(null);
 		
 		List<AbstractBar> list0 = server.find(AbstractBar.class)

@@ -1,7 +1,5 @@
 package com.avaje.ebean.config.dbplatform;
 
-import com.avaje.ebean.config.GlobalProperties;
-
 /**
  * Oracle encryption support.
  * 
@@ -48,12 +46,19 @@ import com.avaje.ebean.config.GlobalProperties;
 public class Oracle10DbEncrypt extends AbstractDbEncrypt {
 
   /**
-   * Constructs the Oracle10DbEncrypt.
+   * Constructs the Oracle10DbEncrypt with default encrypt and decrypt stored procedures.
    */
   public Oracle10DbEncrypt() {
+    this("eb_encrypt", "eb_decrypt");
+  }
 
-    String encryptfunction = GlobalProperties.get("ebean.oracle.encryptfunction", "eb_encrypt");
-    String decryptfunction = GlobalProperties.get("ebean.oracle.decryptfunction", "eb_decrypt");
+  /**
+   * Constructs the Oracle10DbEncrypt specifying encrypt and decrypt stored procedures.
+   *
+   * @param encryptfunction the encrypt stored procedure
+   * @param decryptfunction the decrypt stored procedure
+   */
+  public Oracle10DbEncrypt(String encryptfunction, String decryptfunction) {
 
     this.varcharEncryptFunction = new OraVarcharFunction(encryptfunction, decryptfunction);
     this.dateEncryptFunction = new OraDateFunction(encryptfunction, decryptfunction);

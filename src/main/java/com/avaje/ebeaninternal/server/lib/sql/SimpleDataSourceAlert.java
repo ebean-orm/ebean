@@ -1,13 +1,11 @@
 package com.avaje.ebeaninternal.server.lib.sql;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.server.lib.util.MailEvent;
 import com.avaje.ebeaninternal.server.lib.util.MailListener;
 import com.avaje.ebeaninternal.server.lib.util.MailMessage;
 import com.avaje.ebeaninternal.server.lib.util.MailSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simple smtp email alert that sends a email message on dataSourceDown and
@@ -23,7 +21,11 @@ public class SimpleDataSourceAlert implements DataSourceAlert, MailListener {
 
   private static final Logger logger = LoggerFactory.getLogger(SimpleDataSourceAlert.class);
 
-  // boolean sendInBackGround = true;
+  private static String alertMailServerName = System.getProperty("ebean.datasource.alert.mailserver");
+
+  private static String fromUser = System.getProperty("ebean.datasource.alert.fromUser");
+  private static String fromEmail = System.getProperty("ebean.datasource.alert.fromEmail");
+  private static String toEmail = System.getProperty("ebean.datasource.alert.toEmail");
 
   /**
    * Create a SimpleAlerter.
@@ -79,15 +81,10 @@ public class SimpleDataSourceAlert implements DataSourceAlert, MailListener {
 
   private void sendMessage(String subject, String msg) {
 
-    String mailServerName = GlobalProperties.get("datasource.alert.mailserver", null);
-    if (mailServerName == null) {
+    if (alertMailServerName == null) {
       return;
     }
 
-    String fromUser = GlobalProperties.get("datasource.alert.fromuser", null);
-    String fromEmail = GlobalProperties.get("datasource.alert.fromemail", null);
-    String toEmail = GlobalProperties.get("datasource.alert.toemail", null);
-    
     MailMessage data = new MailMessage();
     data.setSender(fromUser, fromEmail);
     data.addBodyLine(msg);
@@ -95,15 +92,15 @@ public class SimpleDataSourceAlert implements DataSourceAlert, MailListener {
 
     String[] toList = toEmail.split(",");
     if (toList.length == 0) {
-      throw new RuntimeException("alert.toemail has not been set?");
+      logger.error("alert.toemail has not been set?");
+    } else {
+      for (int i = 0; i < toList.length; i++) {
+        data.addRecipient(null, toList[i].trim());
+      }
+      MailSender sender = new MailSender(alertMailServerName);
+      sender.setMailListener(this);
+      sender.sendInBackground(data);
     }
-    for (int i = 0; i < toList.length; i++) {
-      data.addRecipient(null, toList[i].trim());
-    }
-
-    MailSender sender = new MailSender(mailServerName);
-    sender.setMailListener(this);
-    sender.sendInBackground(data);
   }
 
 }

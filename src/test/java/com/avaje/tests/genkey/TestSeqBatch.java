@@ -1,5 +1,6 @@
 package com.avaje.tests.genkey;
 
+import com.avaje.ebean.config.dbplatform.IdType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,10 +18,10 @@ public class TestSeqBatch extends BaseTestCase {
 		
 		EbeanServer server = Ebean.getServer(null);
 		SpiEbeanServer spiServer = (SpiEbeanServer)server;
-		
-		boolean seqSupport = spiServer.getDatabasePlatform().getDbIdentity().isSupportsSequence();
-		
-		if (seqSupport){
+
+    IdType idType = spiServer.getDatabasePlatform().getDbIdentity().getIdType();
+
+    if (IdType.SEQUENCE == idType){
 			BeanDescriptor<TOne> d = spiServer.getBeanDescriptor(TOne.class);
 	
 			Object id = d.nextId(null);

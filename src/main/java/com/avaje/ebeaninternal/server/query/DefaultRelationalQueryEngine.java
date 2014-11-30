@@ -1,21 +1,8 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
-import javax.persistence.PersistenceException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.SqlQueryListener;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.bean.BeanCollection;
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -27,6 +14,12 @@ import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * Perform native sql fetches.
@@ -35,7 +28,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultRelationalQueryEngine.class);
 
-	private final int defaultMaxRows;
+  private static final int GLOBAL_ROW_LIMIT = Integer.valueOf(System.getProperty("ebean.query.globallimit","1000000"));
 
 	private final Binder binder;
 	
@@ -43,7 +36,6 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 
 	public DefaultRelationalQueryEngine(Binder binder, String dbTrueValue) {
 		this.binder = binder;
-		this.defaultMaxRows = GlobalProperties.getInt("nativesql.defaultmaxrows",100000);
 		this.dbTrueValue = dbTrueValue == null ? "true" : dbTrueValue;
 	}
 
@@ -70,7 +62,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 		try {
 
 			String bindLog = "";
-			String[] propNames = null;
+			String[] propNames;
 			
 			synchronized (query) {
 				if (query.isCancelled()){
@@ -111,7 +103,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 			int estimateCapacity = (int) initCap + 1;
 
 			// determine the maxRows limit
-			int maxRows = defaultMaxRows;
+			int maxRows = GLOBAL_ROW_LIMIT;
 			if (query.getMaxRows() >= 1) {
 				maxRows = query.getMaxRows();
 			}
@@ -130,7 +122,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 				synchronized (query) {					
 					// synchronise for query.cancel() support		
 					if (!query.isCancelled()){
-						bean = readRow(request, rset, propNames, estimateCapacity);
+						bean = readRow(rset, propNames, estimateCapacity);
 					}
 				}
 				if (bean != null){
@@ -210,14 +202,13 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 			propNames.add(columnName);
 		}
 
-		return (String[]) propNames.toArray(new String[propNames.size()]);
+		return propNames.toArray(new String[propNames.size()]);
 	}
 
 	/**
 	 * Read the row from the ResultSet and return as a MapBean.
 	 */
-	protected SqlRow readRow(RelationalQueryRequest request, ResultSet rset,
-			String[] propNames, int initialCapacity) throws SQLException {
+	protected SqlRow readRow(ResultSet rset, String[] propNames, int initialCapacity) throws SQLException {
 
 		// by default a map will rehash on the 12th entry
 		// it will be pretty common to have 12 or more entries so

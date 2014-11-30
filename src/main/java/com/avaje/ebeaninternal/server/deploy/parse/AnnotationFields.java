@@ -1,21 +1,11 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import java.sql.Types;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import com.avaje.ebean.annotation.*;
 import com.avaje.ebean.config.EncryptDeploy;
 import com.avaje.ebean.config.EncryptDeploy.Mode;
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.IdType;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
@@ -23,12 +13,14 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.idgen.UuidIdGenerator;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
-import com.avaje.ebeaninternal.server.type.CtCompoundType;
-import com.avaje.ebeaninternal.server.type.DataEncryptSupport;
-import com.avaje.ebeaninternal.server.type.ScalarType;
-import com.avaje.ebeaninternal.server.type.ScalarTypeBytesBase;
-import com.avaje.ebeaninternal.server.type.ScalarTypeBytesEncrypted;
-import com.avaje.ebeaninternal.server.type.ScalarTypeEncryptedWrapper;
+import com.avaje.ebeaninternal.server.type.*;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.sql.Types;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Read the field level deployment annotations.
@@ -42,10 +34,10 @@ public class AnnotationFields extends AnnotationParser {
 
   private GeneratedPropertyFactory generatedPropFactory = new GeneratedPropertyFactory();
 
-  public AnnotationFields(DeployBeanInfo<?> info) {
+  public AnnotationFields(DeployBeanInfo<?> info, boolean eagerFetchLobs) {
     super(info);
 
-    if (GlobalProperties.getBoolean("ebean.lobEagerFetch", false)) {
+    if (eagerFetchLobs) {
       defaultLobFetchType = FetchType.EAGER;
     }
   }

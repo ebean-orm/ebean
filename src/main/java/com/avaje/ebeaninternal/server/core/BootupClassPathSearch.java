@@ -1,12 +1,12 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.util.List;
-import java.util.Set;
-
 import com.avaje.ebeaninternal.server.util.ClassPathSearch;
 import com.avaje.ebeaninternal.server.util.ClassPathSearchFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * Searches for interesting classes such as Entities, Embedded and ScalarTypes.
@@ -20,17 +20,21 @@ public class BootupClassPathSearch {
 	private final ClassLoader classLoader;
 
 	private final List<String> packages;
-    private final List<String> jars;
+
+  private final List<String> jars;
 	
 	private BootupClasses bootupClasses;
+
+  private final String classPathReaderClassName;
 
 	/**
 	 * Construct and search for interesting classes.
 	 */
-	public BootupClassPathSearch(ClassLoader classLoader, List<String> packages, List<String> jars) {
+	public BootupClassPathSearch(ClassLoader classLoader, List<String> packages, List<String> jars, String classPathReaderClassName) {
 		this.classLoader = (classLoader == null) ? getClass().getClassLoader() : classLoader;
 		this.packages = packages;
 		this.jars = jars;
+    this.classPathReaderClassName = classPathReaderClassName;
 	}
 
 	public BootupClasses getBootupClasses() {
@@ -57,7 +61,7 @@ public class BootupClassPathSearch {
 
 				ClassPathSearchFilter filter = createFilter();
 
-				ClassPathSearch finder = new ClassPathSearch(classLoader, filter, bc);
+				ClassPathSearch finder = new ClassPathSearch(classLoader, filter, bc, classPathReaderClassName);
 
 				finder.findClasses();
 				Set<String> jars = finder.getJarHits();

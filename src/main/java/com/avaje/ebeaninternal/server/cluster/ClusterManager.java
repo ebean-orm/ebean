@@ -3,8 +3,7 @@ package com.avaje.ebeaninternal.server.cluster;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.config.GlobalProperties;
-import com.avaje.ebeaninternal.api.ClassUtil;
+import com.avaje.ebean.config.ContainerConfig;
 import com.avaje.ebeaninternal.server.cluster.mcast.McastClusterManager;
 import com.avaje.ebeaninternal.server.cluster.socket.SocketClusterBroadcast;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
@@ -26,41 +25,36 @@ public class ClusterManager {
 
   private boolean started;
 
-  public ClusterManager() {
+  public ClusterManager(ContainerConfig containerConfig) {
 
-    String clusterType = GlobalProperties.get("ebean.cluster.type", null);
-    if (clusterType == null || clusterType.trim().length() == 0) {
-      // not clustering this instance
-      this.broadcast = null;
-
-    } else {
-
-      try {
-        if ("mcast".equalsIgnoreCase(clusterType)) {
-          this.broadcast = new McastClusterManager();
-
-        } else if ("socket".equalsIgnoreCase(clusterType)) {
-          this.broadcast = new SocketClusterBroadcast();
-
-        } else {
-          logger.info("Clustering using [" + clusterType + "]");
-          this.broadcast = (ClusterBroadcast) ClassUtil.newInstance(clusterType);
+    ContainerConfig.ClusterMode mode = containerConfig.getMode();
+    try {
+      switch (mode) {
+        case SOCKET: {
+          this.broadcast = new SocketClusterBroadcast(containerConfig);
+          break;
         }
-
-      } catch (Exception e) {
-        String msg = "Error initialising ClusterManager type [" + clusterType + "]";
-        logger.error(msg, e);
-        throw new RuntimeException(e);
+        case MULTICAST: {
+          this.broadcast = new McastClusterManager(containerConfig);
+          break;
+        }
+        default: {
+          this.broadcast = null;
+        }
       }
+
+    } catch (Exception e) {
+      logger.error("Error initialising ClusterManager type [" + mode + "]", e);
+      throw new RuntimeException(e);
     }
   }
 
   public void registerServer(EbeanServer server) {
     synchronized (monitor) {
+      serverMap.put(server.getName(), server);
       if (!started) {
         startup();
       }
-      serverMap.put(server.getName(), server);
     }
   }
 

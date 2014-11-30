@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.cache.ServerCacheManager;
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
@@ -155,25 +154,19 @@ public final class Ebean {
 
       // skipDefaultServer is set by EbeanServerFactory
       // ... when it is creating the primaryServer
-      if (GlobalProperties.isSkipPrimaryServer()) {
+      if (PrimaryServer.isSkip()) {
         // primary server being created by EbeanServerFactory
         // ... so we should not try and create it here
-        logger.debug("GlobalProperties.isSkipPrimaryServer()");
+        logger.debug("PrimaryServer.isSkip()");
 
       } else {
         // look to see if there is a default server defined
-        String primaryName = getPrimaryServerName();
+        String primaryName = PrimaryServer.getPrimaryServerName();
         logger.debug("primaryName:" + primaryName);
         if (primaryName != null && primaryName.trim().length() > 0) {
           primaryServer = getWithCreate(primaryName.trim());
         }
       }
-    }
-
-    private String getPrimaryServerName() {
-
-      String serverName = GlobalProperties.get("ebean.default.datasource", null);
-      return GlobalProperties.get("datasource.default", serverName);
     }
 
     private EbeanServer getPrimaryServer() {

@@ -1,18 +1,14 @@
 package com.avaje.ebeaninternal.server.resource;
 
-import java.io.File;
-
-import javax.servlet.ServletContext;
-
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.server.lib.resource.DirectoryFinder;
 import com.avaje.ebeaninternal.server.lib.resource.FileResourceSource;
 import com.avaje.ebeaninternal.server.lib.resource.ResourceSource;
-import com.avaje.ebeaninternal.server.lib.resource.UrlResourceSource;
 import com.avaje.ebeaninternal.server.lib.util.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 /**
  * Creates a ResourceManager for a server depending on the avaje.properties.
@@ -50,7 +46,7 @@ public class ResourceManagerFactory {
 
 		String dir = null;
 		if (serverConfig.getAutofetchConfig() != null) {
-			dir = serverConfig.getAutofetchConfig().getLogDirectoryWithEval();
+			dir = serverConfig.getAutofetchConfig().getLogDirectory();
 		}
 		if (dir != null) {
 			return new File(dir);
@@ -75,18 +71,7 @@ public class ResourceManagerFactory {
 
 		// default for web application, override this for file system
 		String defaultDir = serverConfig.getResourceDirectory();
-		
-		
-		// the default... check if a webapp first...
-		ServletContext sc = GlobalProperties.getServletContext();
-		if (sc != null) {
-			// servlet container so use ServletContext.getResource()
-			if (defaultDir == null) {
-				defaultDir = "WEB-INF/ebean";
-			}
-			return new UrlResourceSource(sc, defaultDir);
 
-		}
 		// use File System directory
 		return createFileSource(defaultDir);
 	}

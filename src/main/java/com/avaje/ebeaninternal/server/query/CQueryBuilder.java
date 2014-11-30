@@ -1,15 +1,9 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSql.ColumnMapping;
 import com.avaje.ebean.RawSql.ColumnMapping.Column;
 import com.avaje.ebean.RawSqlBuilder;
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.SqlLimitRequest;
 import com.avaje.ebean.config.dbplatform.SqlLimitResponse;
@@ -26,6 +20,10 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
+
+import javax.persistence.PersistenceException;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Generates the SQL SELECT statements taking into account the physical
@@ -53,8 +51,8 @@ public class CQueryBuilder implements Constants {
   public CQueryBuilder(DatabasePlatform dbPlatform, Binder binder) {
 
     this.binder = binder;
-    this.tableAliasPlaceHolder = GlobalProperties.get("ebean.tableAliasPlaceHolder", "${ta}");
-    this.columnAliasPrefix = GlobalProperties.get("ebean.columnAliasPrefix", "c");
+    this.tableAliasPlaceHolder = dbPlatform.getTableAliasPlaceHolder();
+    this.columnAliasPrefix = dbPlatform.getColumnAliasPrefix();
     this.sqlSelectBuilder = new RawSqlSelectClauseBuilder(dbPlatform, binder);
 
     this.sqlLimiter = dbPlatform.getSqlLimiter();

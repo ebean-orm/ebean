@@ -2,15 +2,12 @@ package com.avaje.tests.ddd.iud;
 
 import junit.framework.TestCase;
 
-import com.avaje.ebean.config.GlobalProperties;
-import com.avaje.tests.model.ddd.DPerson;
-
 public class TestDPersonIUD extends TestCase {
 
     
     public void test() {
         
-        GlobalProperties.put("classes", DPerson.class.toString());
+//        GlobalProperties.put("classes", DPerson.class.toString());
         
 //        Currency NZD = Currency.getInstance("NZD");
 //        

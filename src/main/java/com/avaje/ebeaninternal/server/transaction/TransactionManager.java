@@ -1,19 +1,6 @@
 package com.avaje.ebeaninternal.server.transaction;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-
-import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.BackgroundExecutor;
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.event.TransactionEventListener;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -24,6 +11,16 @@ import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Manages transactions.
@@ -97,8 +94,6 @@ public class TransactionManager {
 	 * Id's for transaction logging.
 	 */
 	protected AtomicLong transactionCounter = new AtomicLong(1000);
-	
-	protected int clusterDebugLevel;
 
 	protected final BulkEventListenerMap bulkEventListenerMap;
 
@@ -119,16 +114,12 @@ public class TransactionManager {
 
     List<TransactionEventListener> transactionEventListeners = bootupClasses.getTransactionEventListeners();
     this.transactionEventListeners = transactionEventListeners.toArray(new TransactionEventListener[transactionEventListeners.size()]);
-		
-    // log some transaction events using a java util logger
-    this.clusterDebugLevel = GlobalProperties.getInt("ebean.cluster.debuglevel", 0);
-		
+
 		this.defaultBatchMode = config.isPersistBatching();
+		this.prefix = "";
+		this.externalTransPrefix = "e";
 		
-		this.prefix = GlobalProperties.get("transaction.prefix", "");
-		this.externalTransPrefix = GlobalProperties.get("transaction.prefix", "e");
-		
-		String value = GlobalProperties.get("transaction.onqueryonly", "CLOSE").toUpperCase().trim();
+		String value = System.getProperty("ebean.transaction.onqueryonly", "CLOSE").toUpperCase().trim();
 		this.onQueryOnly = getOnQueryOnly(value, dataSource);
 		
 		initialiseHeartbeat();
@@ -218,20 +209,6 @@ public class TransactionManager {
 	public DataSource getDataSource() {
 		return dataSource;
 	}
-
-  /**
-   * Return the cluster debug level.
-   */
-  public int getClusterDebugLevel() {
-    return clusterDebugLevel;
-  }
-
-  /**
-   * Set the cluster debug level.
-   */
-  public void setClusterDebugLevel(int clusterDebugLevel) {
-    this.clusterDebugLevel = clusterDebugLevel;
-  }
 
   /**
    * Defines the type of behavior to use when closing a transaction that was used to query data only.
@@ -416,7 +393,7 @@ public class TransactionManager {
         TXN_LOGGER.debug(transaction.getLogPrefix()+"Commit");        
       }
       
-      PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction, transaction.getEvent());
+      PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction.getEvent());
 
       postCommit.notifyLocalCacheIndex();
       postCommit.notifyCluster();
@@ -445,7 +422,7 @@ public class TransactionManager {
 		TransactionEvent event = new TransactionEvent();
 		event.add(tableEvents);
 		
-		PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, null, event);
+		PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, event);
         
 		// invalidate parts of local cache and index
 		postCommit.notifyLocalCacheIndex();
@@ -458,8 +435,8 @@ public class TransactionManager {
    */
   public void remoteTransactionEvent(RemoteTransactionEvent remoteEvent) {
 
-    if (clusterDebugLevel > 0 || logger.isDebugEnabled()) {
-      logger.info("Cluster Received: " + remoteEvent.toString());
+    if (logger.isDebugEnabled()) {
+      logger.debug("Cluster Received: " + remoteEvent.toString());
     }
 
     List<TableIUD> tableIUDList = remoteEvent.getTableIUDList();

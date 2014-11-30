@@ -22,12 +22,16 @@ import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The manager of all the usage/query statistics as well as the tuned fetch
  * information.
  */
 public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
+
+  private static final Logger logger = LoggerFactory.getLogger(DefaultAutoFetchManager.class);
 
 	private static final long serialVersionUID = -6826119882781771722L;
 
@@ -551,16 +555,16 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 
 		Statistics stats = getQueryPointStats(origin);
 
-		if (logging.isTraceUsageCollection()){
-			System.out.println("... NodeUsageCollector "+usageCollector);
-		}
-		
-		stats.collectUsageInfo(usageCollector);
-		
-		if (logging.isTraceUsageCollection()){
-            System.out.println("stats\n"+stats);
-        }
-	}
+    if (logger.isTraceEnabled()) {
+      logger.trace("... NodeUsageCollector " + usageCollector);
+    }
+
+    stats.collectUsageInfo(usageCollector);
+
+    if (logger.isTraceEnabled()) {
+      logger.trace("stats\n" + stats);
+    }
+  }
 
 	private Statistics getQueryPointStats(ObjectGraphOrigin originQueryPoint) {
 		synchronized (statisticsMonitor) {

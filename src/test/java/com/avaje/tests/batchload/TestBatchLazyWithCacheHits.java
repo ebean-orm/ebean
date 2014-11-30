@@ -1,22 +1,20 @@
 package com.avaje.tests.batchload;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.cache.ServerCacheManager;
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.tests.model.basic.UUOne;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestBatchLazyWithCacheHits extends BaseTestCase {
 
   private UUOne insert(String name) {
     UUOne one = new UUOne();
-    one.setName("test-BLWCH-"+name);
+    one.setName("testBLWCH"+name);
     Ebean.save(one);
     return one;
   }
@@ -24,8 +22,6 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
   @Test
   public void testOnCacheHit() {
 
-    GlobalProperties.put("ebean.lazyLoadBatchSize", "5");
-    
     ArrayList<UUOne> inserted = new ArrayList<UUOne>();
     String[] names = "A,B,C,D,E,F,G,H,I,J".split(",");
     for (int i = 0; i < names.length; i++) {
@@ -62,18 +58,20 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
         .findUnique();
     
     Assert.assertNotNull(c2);
-  
-    
-    
+
     List<UUOne> list = Ebean.find(UUOne.class)
         //.setDefaultLazyLoadBatchSize(5)
         .setUseCache(true)
         .select("id")
-        .where().startsWith("name", "test-BLWCH-")
+        .where().startsWith("name", "testBLWCH")
         .order("name")
         .findList();
 
-   System.out.println(list);
+   int count0 = Ebean.createSqlQuery("select t0.id c0 from uuone t0 where t0.name like ? order by t0.name").setParameter(1,"testBLWCH%").findList().size();
+   int count1 = Ebean.createSqlQuery("select t0.id c0 from uuone t0 where t0.name like ? escape'x' order by t0.name").setParameter(1,"testBLWCH%").findList().size();
+   int count2 = Ebean.createSqlQuery("select t0.id c0 from uuone t0 where t0.name like ? escape'/'  order by t0.name").setParameter(1,"testBLWCH%").findList().size();
+   int count3 = Ebean.createSqlQuery("select t0.id c0 from uuone t0 where t0.name like ? escape''  order by t0.name").setParameter(1,"testBLWCH%").findList().size();
+    System.out.println("count0:" + count0 + " count1:" + count1 + " count2:" + count2 + " count3:" + count3 + "  List:" + list);
    for (UUOne uuOne : list) {
      System.out.println(uuOne.getName());
    }

@@ -5,7 +5,6 @@ import com.avaje.ebean.PersistenceContextScope;
 import com.avaje.ebean.annotation.Encrypted;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
-import com.avaje.ebean.config.GlobalProperties.PropertySource;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.event.*;
@@ -16,6 +15,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * The configuration used for creating a EbeanServer.
@@ -30,9 +30,9 @@ import java.util.List;
  * classes and listeners etc.
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * ServerConfig c = new ServerConfig();
- * c.setName(&quot;ordh2&quot;);
+ * c.setName("ordh2");
  * 
  * // read the ebean.properties and load
  * // those settings into this serverConfig object
@@ -43,18 +43,18 @@ import java.util.List;
  * c.setDdlRun(true);
  * 
  * // add any classes found in the app.data package
- * c.addPackage(&quot;app.data&quot;);
+ * c.addPackage("app.data");
  * 
  * // add the names of Jars that contain entities
- * c.addJar(&quot;myJarContainingEntities.jar&quot;);
- * c.addJar(&quot;someOtherJarContainingEntities.jar&quot;);
+ * c.addJar("myJarContainingEntities.jar");
+ * c.addJar("someOtherJarContainingEntities.jar");
  * 
  * // register as the 'Default' server
  * c.setDefaultServer(true);
  * 
  * EbeanServer server = EbeanServerFactory.create(c);
  * 
- * </pre>
+ * }</pre>
  * 
  * @see EbeanServerFactory
  * 
@@ -62,16 +62,13 @@ import java.util.List;
  * @author rbygrave
  */
 public class ServerConfig {
-  
-  /**
-   * The Constant DEFAULT_QUERY_BATCH_SIZE. Default: 100 
-   */
-  private final static int DEFAULT_QUERY_BATCH_SIZE = 100;
 
   /**
    * The EbeanServer name.
    */
   private String name;
+
+  private ContainerConfig containerConfig;
 
   /**
    * The resource directory.
@@ -111,6 +108,11 @@ public class ServerConfig {
    */
   private List<String> searchJars = new ArrayList<String>();
 
+  /**
+   * Class name of a classPathReader implementation.
+   */
+  private String classPathReaderClassName;
+
   /** 
    * Config controlling the autofetch behaviour.
    */
@@ -146,9 +148,11 @@ public class ServerConfig {
   private int lazyLoadBatchSize = 1;
 
   /** 
-   * The query batch size. 
+   * The default batch size for 'query joins'.
    */
-  private int queryBatchSize = -1;
+  private int queryBatchSize = 100;
+
+  private boolean eagerFetchLobs;
 
   private boolean ddlGenerate;
 
@@ -201,7 +205,7 @@ public class ServerConfig {
   /** 
    * The naming convention. 
    */
-  private NamingConvention namingConvention;
+  private NamingConvention namingConvention = new UnderscoreNamingConvention();
 
   /** 
    * Behaviour of update to include on the change properties. 
@@ -238,9 +242,9 @@ public class ServerConfig {
 
   private ServerCacheManager serverCacheManager;
 
-  private boolean collectQueryStatsByNode;
+  private boolean collectQueryStatsByNode = true;
 
-  private boolean collectQueryOrigins;
+  private boolean collectQueryOrigins = true;
 
   /**
    * The default PersistenceContextScope used if one is not explicitly set on a query.
@@ -252,6 +256,33 @@ public class ServerConfig {
   private boolean localTimeWithNanos;
 
   private boolean durationWithNanos;
+
+  private int maxCallStack = 5;
+
+  private boolean transactionRollbackOnChecked = true;
+
+  private boolean registerJmxMBeans = true;
+
+  // configuration for the background executor service (thread pool)
+
+  private int backgroundExecutorSchedulePoolSize = 1;
+  private int backgroundExecutorCorePoolSize = 1;
+  private int backgroundExecutorMaxPoolSize = 8;
+  private int backgroundExecutorIdleSecs = 60;
+  private int backgroundExecutorShutdownSecs = 30;
+
+  // defaults for the L2 bean caching
+
+  private int cacheWarmingDelay = 30;
+  private int cacheMaxSize = 10000;
+  private int cacheMaxIdleTime = 600;
+  private int cacheMaxTimeToLive = 60*60*6;
+
+  // defaults for the L2 query caching
+
+  private int queryCacheMaxSize = 1000;
+  private int queryCacheMaxIdleTime = 600;
+  private int queryCacheMaxTimeToLive = 60*60*6;
 
   /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
@@ -307,6 +338,26 @@ public class ServerConfig {
   }
 
   /**
+   * Return the container / clustering configuration.
+   * <p/>
+   * The container holds all the EbeanServer instances and provides clustering communication
+   * services to all the EbeanServer instances.
+   */
+  public ContainerConfig getContainerConfig() {
+    return containerConfig;
+  }
+
+  /**
+   * Set the container / clustering configuration.
+   * <p/>
+   * The container holds all the EbeanServer instances and provides clustering communication
+   * services to all the EbeanServer instances.
+   */
+  public void setContainerConfig(ContainerConfig containerConfig) {
+    this.containerConfig = containerConfig;
+  }
+
+  /**
    * Return true if this server should be registered with the Ebean singleton
    * when it is created.
    * <p>
@@ -359,15 +410,6 @@ public class ServerConfig {
    * </p>
    */
   public boolean isPersistBatching() {
-    return persistBatching;
-  }
-
-  /**
-   * Use isPersistBatching() instead.
-   * 
-   * @deprecated
-   */
-  public boolean isUsePersistBatching() {
     return persistBatching;
   }
 
@@ -530,6 +572,234 @@ public class ServerConfig {
    */
   public void setEnhanceLogLevel(int enhanceLogLevel) {
     this.enhanceLogLevel = enhanceLogLevel;
+  }
+
+  /**
+   * Return true if LOB's should default to fetch eager.
+   * By default this is set to false and LOB's must be explicitly fetched.
+   */
+  public boolean isEagerFetchLobs() {
+    return eagerFetchLobs;
+  }
+
+  /**
+   * Set to true if you want LOB's to be fetch eager by default.
+   * By default this is set to false and LOB's must be explicitly fetched.
+   */
+  public void setEagerFetchLobs(boolean eagerFetchLobs) {
+    this.eagerFetchLobs = eagerFetchLobs;
+  }
+
+  /**
+   * Return the max call stack to use for origin location.
+   */
+  public int getMaxCallStack() {
+    return maxCallStack;
+  }
+
+  /**
+   * Set the max call stack to use for origin location.
+   */
+  public void setMaxCallStack(int maxCallStack) {
+    this.maxCallStack = maxCallStack;
+  }
+
+  /**
+   * Return true if transactions should rollback on checked exceptions.
+   */
+  public boolean isTransactionRollbackOnChecked() {
+    return transactionRollbackOnChecked;
+  }
+
+  /**
+   * Set to true if transactions should by default rollback on checked exceptions.
+   */
+  public void setTransactionRollbackOnChecked(boolean transactionRollbackOnChecked) {
+    this.transactionRollbackOnChecked = transactionRollbackOnChecked;
+  }
+
+  /**
+   * Return true if the server should register JMX MBeans.
+   */
+  public boolean isRegisterJmxMBeans() {
+    return registerJmxMBeans;
+  }
+
+  /**
+   * Set if the server should register JMX MBeans.
+   */
+  public void setRegisterJmxMBeans(boolean registerJmxMBeans) {
+    this.registerJmxMBeans = registerJmxMBeans;
+  }
+
+  /**
+   * Return the Background executor schedule pool size. Defaults to 1.
+   */
+  public int getBackgroundExecutorSchedulePoolSize() {
+    return backgroundExecutorSchedulePoolSize;
+  }
+
+  /**
+   * Set the Background executor schedule pool size.
+   */
+  public void setBackgroundExecutorSchedulePoolSize(int backgroundExecutorSchedulePoolSize) {
+    this.backgroundExecutorSchedulePoolSize = backgroundExecutorSchedulePoolSize;
+  }
+
+  /**
+   * Return the Background executor core pool size.
+   */
+  public int getBackgroundExecutorCorePoolSize() {
+    return backgroundExecutorCorePoolSize;
+  }
+
+  /**
+   * Set the Background executor core pool size.
+   */
+  public void setBackgroundExecutorCorePoolSize(int backgroundExecutorCorePoolSize) {
+    this.backgroundExecutorCorePoolSize = backgroundExecutorCorePoolSize;
+  }
+
+  /**
+   * Return the Background executor max pool size.
+   */
+  public int getBackgroundExecutorMaxPoolSize() {
+    return backgroundExecutorMaxPoolSize;
+  }
+
+  /**
+   * Set the Background executor max pool size.
+   */
+  public void setBackgroundExecutorMaxPoolSize(int backgroundExecutorMaxPoolSize) {
+    this.backgroundExecutorMaxPoolSize = backgroundExecutorMaxPoolSize;
+  }
+
+  /**
+   * Return the Background executor idle seconds.
+   */
+  public int getBackgroundExecutorIdleSecs() {
+    return backgroundExecutorIdleSecs;
+  }
+
+  /**
+   * Set the Background executor idle seconds.
+   */
+  public void setBackgroundExecutorIdleSecs(int backgroundExecutorIdleSecs) {
+    this.backgroundExecutorIdleSecs = backgroundExecutorIdleSecs;
+  }
+
+  /**
+   * Return the Background executor shutdown seconds. This is the time allowed for the pool to shutdown nicely
+   * before it is forced shutdown.
+   */
+  public int getBackgroundExecutorShutdownSecs() {
+    return backgroundExecutorShutdownSecs;
+  }
+
+  /**
+   * Set the Background executor shutdown seconds. This is the time allowed for the pool to shutdown nicely
+   * before it is forced shutdown.
+   */
+  public void setBackgroundExecutorShutdownSecs(int backgroundExecutorShutdownSecs) {
+    this.backgroundExecutorShutdownSecs = backgroundExecutorShutdownSecs;
+  }
+
+  /**
+   * Return the cache warming delay in seconds.
+   */
+  public int getCacheWarmingDelay() {
+    return cacheWarmingDelay;
+  }
+
+  /**
+   * Set the cache warming delay in seconds.
+   */
+  public void setCacheWarmingDelay(int cacheWarmingDelay) {
+    this.cacheWarmingDelay = cacheWarmingDelay;
+  }
+
+  /**
+   * Return the L2 cache default max size.
+   */
+  public int getCacheMaxSize() {
+    return cacheMaxSize;
+  }
+
+  /**
+   * Set the L2 cache default max size.
+   */
+  public void setCacheMaxSize(int cacheMaxSize) {
+    this.cacheMaxSize = cacheMaxSize;
+  }
+
+  /**
+   * Return the L2 cache default max idle time in seconds.
+   */
+  public int getCacheMaxIdleTime() {
+    return cacheMaxIdleTime;
+  }
+
+  /**
+   * Set the L2 cache default max idle time in seconds.
+   */
+  public void setCacheMaxIdleTime(int cacheMaxIdleTime) {
+    this.cacheMaxIdleTime = cacheMaxIdleTime;
+  }
+
+  /**
+   * Return the L2 cache default max time to live in seconds.
+   */
+  public int getCacheMaxTimeToLive() {
+    return cacheMaxTimeToLive;
+  }
+
+  /**
+   * Set the L2 cache default max time to live in seconds.
+   */
+  public void setCacheMaxTimeToLive(int cacheMaxTimeToLive) {
+    this.cacheMaxTimeToLive = cacheMaxTimeToLive;
+  }
+
+  /**
+   * Return the L2 query cache default max size.
+   */
+  public int getQueryCacheMaxSize() {
+    return queryCacheMaxSize;
+  }
+
+  /**
+   * Set the L2 query cache default max size.
+   */
+  public void setQueryCacheMaxSize(int queryCacheMaxSize) {
+    this.queryCacheMaxSize = queryCacheMaxSize;
+  }
+
+  /**
+   * Return the L2 query cache default max idle time in seconds.
+   */
+  public int getQueryCacheMaxIdleTime() {
+    return queryCacheMaxIdleTime;
+  }
+
+  /**
+   * Set the L2 query cache default max idle time in seconds.
+   */
+  public void setQueryCacheMaxIdleTime(int queryCacheMaxIdleTime) {
+    this.queryCacheMaxIdleTime = queryCacheMaxIdleTime;
+  }
+
+  /**
+   * Return the L2 query cache default max time to live in seconds.
+   */
+  public int getQueryCacheMaxTimeToLive() {
+    return queryCacheMaxTimeToLive;
+  }
+
+  /**
+   * Set the L2 query cache default max time to live in seconds.
+   */
+  public void setQueryCacheMaxTimeToLive(int queryCacheMaxTimeToLive) {
+    this.queryCacheMaxTimeToLive = queryCacheMaxTimeToLive;
   }
 
   /**
@@ -1050,6 +1320,23 @@ public class ServerConfig {
   }
 
   /**
+   * Return the class name of a classPathReader implementation.
+   */
+  public String getClassPathReaderClassName() {
+    return classPathReaderClassName;
+  }
+
+  /**
+   * Set the class name of a classPathReader implementation.
+   *
+   * Refer to server.util.ClassPathReader, this should really by a plugin but doing this for now
+   * to be relatively compatible with current implementation.
+   */
+  public void setClassPathReaderClassName(String classPathReaderClassName) {
+    this.classPathReaderClassName = classPathReaderClassName;
+  }
+
+  /**
    * Set the list of classes (entities, listeners, scalarTypes etc) that should
    * be used for this server.
    * <p>
@@ -1334,44 +1621,26 @@ public class ServerConfig {
   }
 
   /**
-   * Load the settings from the ebean.properties file.
+   * Load settings from ebean.properties.
    */
   public void loadFromProperties() {
-    ConfigPropertyMap p = new ConfigPropertyMap(name);
+    loadFromProperties(PropertyMap.defaultProperties());
+  }
+
+  /**
+   * Load the settings from the given properties
+   */
+  public void loadFromProperties(Properties properties) {
+    PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties);
     loadSettings(p);
   }
 
-  /**
-   * Return a PropertySource for this server.
-   */
-  public PropertySource getPropertySource() {
-    return GlobalProperties.getPropertySource(name);
-  }
-
-  /**
-   * Return a configuration property using a default value.
-   */
-  public String getProperty(String propertyName, String defaultValue) {
-    PropertySource p = new ConfigPropertyMap(name);
-    return p.get(propertyName, defaultValue);
-  }
-
-  /**
-   * Return a configuration property.
-   */
-  public String getProperty(String propertyName) {
-    return getProperty(propertyName, null);
-  }
 
   @SuppressWarnings("unchecked")
-  private <T> T createInstance(PropertySource p, Class<T> type, String key) {
+  private <T> T createInstance(PropertiesWrapper p, Class<T> pluginType, String key) {
 
     String classname = p.get(key, null);
-    if (classname == null) {
-      return null;
-    }
-
-    return (T) ClassUtil.newInstance(classname);
+    return classname == null ? null : (T) ClassUtil.newInstance(classname);
   }
 
   /**
@@ -1381,36 +1650,37 @@ public class ServerConfig {
    *
    * @param p - The defined property source passed to load settings
    */
-  protected void loadDataSourceSettings(PropertySource p) {
-    dataSourceConfig.loadSettings(p.getServerName());
+  protected void loadDataSourceSettings(PropertiesWrapper p) {
+    dataSourceConfig.loadSettings(p.withPrefix("datasource"));
   }
 
   /**
    * This is broken out for the same reason as above - preserve existing behaviour but let it be overridden.
    */
-  protected void loadAutofetchConfig(PropertySource p) {
+  protected void loadAutofetchSettings(PropertiesWrapper p) {
     autofetchConfig.loadSettings(p);
   }
 
   /**
    * Load the configuration settings from the properties file.
    */
-  protected void loadSettings(PropertySource p) {
+  protected void loadSettings(PropertiesWrapper p) {
 
+    if (namingConvention != null) {
+      namingConvention.loadFromProperties(p);
+    }
     if (autofetchConfig == null) {
       autofetchConfig = new AutofetchConfig();
     }
-
-    loadAutofetchConfig(p);
+    loadAutofetchSettings(p);
 
     if (dataSourceConfig == null) {
       dataSourceConfig = new DataSourceConfig();
     }
-
     loadDataSourceSettings(p);
 
-    autoCommitMode = p.getBoolean("autoCommitMode", false);
-    useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", false);
+    autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
+    useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
     namingConvention = createNamingConvention(p);
     databasePlatform = createInstance(p, DatabasePlatform.class, "databasePlatform");
     encryptKeyManager = createInstance(p, EncryptKeyManager.class, "encryptKeyManager");
@@ -1425,37 +1695,37 @@ public class ServerConfig {
       searchJars = getSearchJarsPackages(jarsProp);
     }
 
-    String packagesProp = p.get("search.packages", p.get("packages", null));
     if (packages != null) {
+      String packagesProp = p.get("search.packages", p.get("packages", null));
       packages = getSearchJarsPackages(packagesProp);
     }
 
-    collectQueryStatsByNode = p.getBoolean("collectQueryStatsByNode", true);
-    collectQueryOrigins = p.getBoolean("collectQueryOrigins", true);
+    collectQueryStatsByNode = p.getBoolean("collectQueryStatsByNode", collectQueryStatsByNode);
+    collectQueryOrigins = p.getBoolean("collectQueryOrigins", collectQueryOrigins);
 
-    updateChangesOnly = p.getBoolean("updateChangesOnly", true);
+    updateChangesOnly = p.getBoolean("updateChangesOnly", updateChangesOnly);
     
-    boolean defaultDeleteMissingChildren = p.getBoolean("defaultDeleteMissingChildren", true);
+    boolean defaultDeleteMissingChildren = p.getBoolean("defaultDeleteMissingChildren", updatesDeleteMissingChildren);
     updatesDeleteMissingChildren = p.getBoolean("updatesDeleteMissingChildren", defaultDeleteMissingChildren);
 
-    boolean batchMode = p.getBoolean("batch.mode", false);
+    boolean batchMode = p.getBoolean("batch.mode", persistBatching);
     persistBatching = p.getBoolean("persistBatching", batchMode);
 
-    int batchSize = p.getInt("batch.size", 20);
+    int batchSize = p.getInt("batch.size", persistBatchSize);
     persistBatchSize = p.getInt("persistBatchSize", batchSize);
 
     persistenceContextScope = PersistenceContextScope.valueOf(p.get("persistenceContextScope","TRANSACTION"));
 
-    dataSourceJndiName = p.get("dataSourceJndiName", null);
-    databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", 20);
-    databaseBooleanTrue = p.get("databaseBooleanTrue", null);
-    databaseBooleanFalse = p.get("databaseBooleanFalse", null);
-    databasePlatformName = p.get("databasePlatformName", null);
-    uuidStoreAsBinary = p.getBoolean("uuidStoreAsBinary", false);
-    localTimeWithNanos = p.getBoolean("localTimeWithNanos", false);
+    dataSourceJndiName = p.get("dataSourceJndiName", dataSourceJndiName);
+    databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
+    databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
+    databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
+    databasePlatformName = p.get("databasePlatformName", databasePlatformName);
+    uuidStoreAsBinary = p.getBoolean("uuidStoreAsBinary", uuidStoreAsBinary);
+    localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
 
-    lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", 1);
-    queryBatchSize = p.getInt("queryBatchSize", DEFAULT_QUERY_BATCH_SIZE);
+    lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", lazyLoadBatchSize);
+    queryBatchSize = p.getInt("queryBatchSize", queryBatchSize);
 
     String jsonDateTimeFormat = p.get("jsonDateTime", null);
     if (jsonDateTimeFormat != null) {
@@ -1464,27 +1734,27 @@ public class ServerConfig {
       jsonDateTime = JsonConfig.DateTime.MILLIS;
     }
 
-    ddlGenerate = p.getBoolean("ddl.generate", false);
-    ddlRun = p.getBoolean("ddl.run", false);
+    ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
+    ddlRun = p.getBoolean("ddl.run", ddlRun);
 
     classes = getClasses(p);
   }
 
-  private NamingConvention createNamingConvention(PropertySource p) {
+  private NamingConvention createNamingConvention(PropertiesWrapper properties) {
 
-    NamingConvention nc = createInstance(p, NamingConvention.class, "namingconvention");
+    NamingConvention nc = createInstance(properties, NamingConvention.class, "namingconvention");
     if (nc == null) {
       return null;
     }
     if (nc instanceof AbstractNamingConvention) {
       AbstractNamingConvention anc = (AbstractNamingConvention) nc;
-      String v = p.get("namingConvention.useForeignKeyPrefix", null);
+      String v = properties.get("namingConvention.useForeignKeyPrefix", null);
       if (v != null) {
         boolean useForeignKeyPrefix = Boolean.valueOf(v);
         anc.setUseForeignKeyPrefix(useForeignKeyPrefix);
       }
 
-      String sequenceFormat = p.get("namingConvention.sequenceFormat", null);
+      String sequenceFormat = properties.get("namingConvention.sequenceFormat", null);
       if (sequenceFormat != null) {
         anc.setSequenceFormat(sequenceFormat);
       }
@@ -1495,20 +1765,20 @@ public class ServerConfig {
   /**
    * Build the list of classes from the comma delimited string.
    * 
-   * @param p
-   *          the p
+   * @param properties
+   *          the properties
    * 
    * @return the classes
    */
-  private ArrayList<Class<?>> getClasses(PropertySource p) {
+  private List<Class<?>> getClasses(PropertiesWrapper properties) {
 
-    String classNames = p.get("classes", null);
+    String classNames = properties.get("classes", null);
     if (classNames == null) {
 
       return null;
     }
 
-    ArrayList<Class<?>> classes = new ArrayList<Class<?>>();
+    List<Class<?>> classes = new ArrayList<Class<?>>();
 
     String[] split = classNames.split("[ ,;]");
     for (int i = 0; i < split.length; i++) {
@@ -1538,5 +1808,4 @@ public class ServerConfig {
     }
     return hitList;
   }
-
 }

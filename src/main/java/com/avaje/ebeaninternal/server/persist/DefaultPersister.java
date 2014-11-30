@@ -79,7 +79,7 @@ public final class DefaultPersister implements Persister {
 		this.server = server;
 		this.updatesDeleteMissingChildren = server.getServerConfig().isUpdatesDeleteMissingChildren();
 		this.beanDescriptorManager = descMgr;
-		this.persistExecute = new DefaultPersistExecute(binder, pstmtBatch);
+		this.persistExecute = new DefaultPersistExecute(binder, pstmtBatch, server.getServerConfig().getPersistBatchSize());
 	}
 
 	/**
@@ -182,7 +182,6 @@ public final class DefaultPersister implements Persister {
       }
       
       req.commitTransIfRequired();
-      return;
 
     } catch (RuntimeException ex) {
       req.rollbackTransIfRequired();
@@ -469,7 +468,7 @@ public final class DefaultPersister implements Persister {
 		int rows = executeSqlUpdate(deleteById, t);
 		
 		// Delete from the persistence context so that it can't be fetched again later
-		PersistenceContext persistenceContext = ((SpiTransaction)t).getPersistenceContext();
+		PersistenceContext persistenceContext = t.getPersistenceContext();
 		if (idList != null) {
 		  for (Object  idValue : idList) {
         persistenceContext.deleted(descriptor.getBeanType(), idValue);
@@ -879,7 +878,7 @@ public final class DefaultPersister implements Persister {
 		Collection<?> additions = null;
 		Collection<?> deletions = null;
 
-		boolean vanillaCollection = (value instanceof BeanCollection<?> == false);
+		boolean vanillaCollection = !(value instanceof BeanCollection<?>);
 
 		if (vanillaCollection || deleteMissingChildren) {
 			// delete all intersection rows and then treat all

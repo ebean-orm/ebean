@@ -2,6 +2,7 @@ package com.avaje.ebean.config;
 
 import java.sql.Connection;
 import java.util.Map;
+import java.util.Properties;
 
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.util.StringHelper;
@@ -448,48 +449,63 @@ public class DataSourceConfig {
     this.customProperties = customProperties;
   }
 
+  /**
+   * Load the settings by reading the ebean.properties file.
+   *
+   * @param serverName name of the server
+   */
   public void loadSettings(String serverName) {
-    loadSettingsCustomPrefix("datasource." + serverName + ".", new GlobalProperties.DelegatedGlobalPropertySource(serverName));
+    loadSettings(new PropertiesWrapper("datasource", serverName, PropertyMap.defaultProperties()));
   }
 
   /**
-   * Load the settings from ebean.properties.
+   * Load the settings from the properties supplied.
+   * <p>
+   * You can use this when you have your own properties to use for configuration.
+   * </p>
+   *
+   * @param properties the properties to configure the datasource
+   * @param serverName the name of the specific datasource (optional)
    */
-  public void loadSettingsCustomPrefix(String prefix, GlobalProperties.PropertySource properties) {
+  public void loadSettings(Properties properties, String serverName) {
+    PropertiesWrapper dbProps = new PropertiesWrapper("datasource", serverName, properties);
+    loadSettings(dbProps);
+  }
 
-    this.username = properties.get(prefix + "username", null);
-    this.password = properties.get(prefix + "password", null);
+  /**
+   * Load the settings from the PropertiesWrapper.
+   */
+  public void loadSettings(PropertiesWrapper properties) {
 
-    String dbDriver = properties.get(prefix + "databaseDriver", null);
-    this.driver = properties.get(prefix + "driver", dbDriver);
+    username = properties.get("username", username);
+    password = properties.get("password", password);
+    driver = properties.get("driver", properties.get("databaseDriver", driver));
+    url = properties.get("url", properties.get("databaseUrl", url));
 
-    String dbUrl = properties.get(prefix + "databaseUrl", null);
-    this.url = properties.get(prefix + "url", dbUrl);
+    autoCommit = properties.getBoolean("autoCommit", autoCommit);
+    captureStackTrace = properties.getBoolean("captureStackTrace", captureStackTrace);
+    maxStackTraceSize = properties.getInt("maxStackTraceSize", maxStackTraceSize);
+    leakTimeMinutes = properties.getInt("leakTimeMinutes", leakTimeMinutes);
+    maxInactiveTimeSecs = properties.getInt("maxInactiveTimeSecs", maxInactiveTimeSecs);
+    trimPoolFreqSecs = properties.getInt("trimPoolFreqSecs", trimPoolFreqSecs);
+    maxAgeMinutes = properties.getInt("maxAgeMinutes", maxAgeMinutes);
 
-    this.autoCommit = properties.getBoolean(prefix + "autoCommit", false);
-    this.captureStackTrace = properties.getBoolean(prefix + "captureStackTrace", false);
-    this.maxStackTraceSize = properties.getInt(prefix + "maxStackTraceSize", 5);
-    this.leakTimeMinutes = properties.getInt(prefix + "leakTimeMinutes", 30);
-    this.maxInactiveTimeSecs = properties.getInt(prefix + "maxInactiveTimeSecs", 720);
-    this.trimPoolFreqSecs = properties.getInt(prefix + "trimPoolFreqSecs", 59);
-    this.maxAgeMinutes = properties.getInt(prefix + "maxAgeMinutes", 0);
+    minConnections = properties.getInt("minConnections", minConnections);
+    maxConnections = properties.getInt("maxConnections", maxConnections);
+    pstmtCacheSize = properties.getInt("pstmtCacheSize", pstmtCacheSize);
+    cstmtCacheSize = properties.getInt("cstmtCacheSize", cstmtCacheSize);
 
-    this.minConnections = properties.getInt(prefix + "minConnections", 0);
-    this.maxConnections = properties.getInt(prefix + "maxConnections", 20);
-    this.pstmtCacheSize = properties.getInt(prefix + "pstmtCacheSize", 20);
-    this.cstmtCacheSize = properties.getInt(prefix + "cstmtCacheSize", 20);
+    waitTimeoutMillis = properties.getInt("waitTimeout", waitTimeoutMillis);
 
-    this.waitTimeoutMillis = properties.getInt(prefix + "waitTimeout", 1000);
+    heartbeatSql = properties.get("heartbeatSql", heartbeatSql);
+    heartbeatTimeoutSeconds =  properties.getInt("heartbeatTimeoutSeconds", heartbeatTimeoutSeconds);
+    poolListener = properties.get("poolListener", poolListener);
+    offline = properties.getBoolean("offline", offline);
 
-    this.heartbeatSql = properties.get(prefix + "heartbeatSql", null);
-    this.heartbeatTimeoutSeconds =  properties.getInt(prefix + "heartbeatTimeoutSeconds", 3);    
-    this.poolListener = properties.get(prefix + "poolListener", null);
-    this.offline = properties.getBoolean(prefix + "offline", false);
-
-    String isoLevel = properties.get(prefix + "isolationlevel", "READ_COMMITTED");
+    String isoLevel = properties.get("isolationlevel", getTransactionIsolationLevel(isolationLevel));
     this.isolationLevel = getTransactionIsolationLevel(isoLevel);
 
-    String customProperties = properties.get(prefix + "customProperties", null);
+    String customProperties = properties.get("customProperties", null);
     if (customProperties != null && customProperties.length() > 0) {
       Map<String, String> custProps = StringHelper.delimitedToMap(customProperties, ";", "=");
       this.customProperties = custProps;
@@ -498,7 +514,21 @@ public class DataSourceConfig {
   }
 
   /**
-   * return the isolation level for a given string description.
+   * Return the isolation level description from the associated Connection int value.
+   */
+  public String getTransactionIsolationLevel(int level) {
+    switch (level) {
+      case Connection.TRANSACTION_NONE : return "NONE";
+      case Connection.TRANSACTION_READ_COMMITTED : return "READ_COMMITTED";
+      case Connection.TRANSACTION_READ_UNCOMMITTED : return "READ_UNCOMMITTED";
+      case Connection.TRANSACTION_REPEATABLE_READ : return "REPEATABLE_READ";
+      case Connection.TRANSACTION_SERIALIZABLE : return "SERIALIZABLE";
+      default: throw new RuntimeException("Transaction Isolation level [" + level + "] is not known.");
+    }
+  }
+
+  /**
+   * Return the isolation level for a given string description.
    */
   public int getTransactionIsolationLevel(String level) {
     level = level.toUpperCase();
@@ -522,6 +552,6 @@ public class DataSourceConfig {
       return Connection.TRANSACTION_SERIALIZABLE;
     }
 
-    throw new RuntimeException("Transaction Isolaction level [" + level + "] is not known.");
+    throw new RuntimeException("Transaction Isolation level [" + level + "] is not known.");
   }
 }

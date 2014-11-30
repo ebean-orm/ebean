@@ -35,6 +35,10 @@ class SocketClient {
         this.hostPort = address.getHostName()+":"+address.getPort();
     }
 
+    public String toString() {
+      return address.toString();
+    }
+
     public String getHostPort() {
         return hostPort;
     }

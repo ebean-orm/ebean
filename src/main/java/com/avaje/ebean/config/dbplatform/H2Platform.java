@@ -1,7 +1,6 @@
 package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.BackgroundExecutor;
-import com.avaje.ebean.config.GlobalProperties;
 
 import javax.sql.DataSource;
 
@@ -14,15 +13,13 @@ public class H2Platform extends DatabasePlatform {
     super();
     this.name = "h2";
     this.dbEncrypt = new H2DbEncrypt();
-    this.likeClause = "like ? escape''";
+    // like ? escape'' not working in the latest version H2 so just using no
+    // escape clause for now noting that backslash is an escape char for like in H2
+    this.likeClause = "like ?";
 
     // only support getGeneratedKeys with non-batch JDBC
     // so generally use SEQUENCE instead of IDENTITY for H2
-    boolean useIdentity = GlobalProperties.getBoolean("ebean.h2platform.useIdentity", false);
-
-    IdType idType = useIdentity ? IdType.IDENTITY : IdType.SEQUENCE;
-    this.dbIdentity.setIdType(idType);
-
+    this.dbIdentity.setIdType(IdType.SEQUENCE);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
     this.dbIdentity.setSupportsIdentity(true);

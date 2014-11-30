@@ -112,4 +112,9 @@ public interface NamingConvention {
    */
   public boolean isUseForeignKeyPrefix();
 
+  /**
+   * Load setting from properties.
+   */
+  public void loadFromProperties(PropertiesWrapper properties);
+
 }

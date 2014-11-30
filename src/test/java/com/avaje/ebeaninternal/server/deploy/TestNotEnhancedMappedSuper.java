@@ -1,23 +1,19 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.tests.model.mappedsuper.ASimpleBean;
 import com.avaje.tests.model.mappedsuper.NotEnhancedMappedSuper;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestNotEnhancedMappedSuper extends BaseTestCase {
 
   @Test
   public void simpleBean_mappedSuperNotEnhanced_ok() {
-    
-    GlobalProperties.put("ebean.search.packages", "com.avaje.tests.model.mappedsuper");
-        
+
     ASimpleBean bean = new ASimpleBean();
     bean.setName("junk");
     

@@ -73,8 +73,8 @@ public class TestLimitQuery extends BaseTestCase {
 		boolean hasOffset = sql.indexOf("offset") > -1;
 
 		if (h2Db) {
-			Assert.assertTrue(hasLimit);
-			Assert.assertFalse(hasOffset);
+			Assert.assertTrue(sql, hasLimit);
+			Assert.assertFalse(sql, hasOffset);
 		}
 	}
 

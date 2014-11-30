@@ -1,9 +1,5 @@
 package com.avaje.ebeaninternal.server.transaction;
 
-import java.util.List;
-import java.util.Set;
-
-import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
 import com.avaje.ebeaninternal.api.TransactionEventBeans;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
@@ -13,6 +9,8 @@ import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Performs post commit processing using a background thread.
@@ -36,8 +34,6 @@ public final class PostCommitProcessing {
 
   private final BeanPersistIdMap beanPersistIdMap;
 
-//  private final BeanDeltaMap beanDeltaMap;
-
   private final RemoteTransactionEvent remoteTransactionEvent;
 
   private final DeleteByIdMap deleteByIdMap;
@@ -45,7 +41,7 @@ public final class PostCommitProcessing {
   /**
    * Create for a TransactionManager and event.
    */
-  public PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, SpiTransaction transaction, TransactionEvent event) {
+  public PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, TransactionEvent event) {
 
     this.clusterManager = clusterManager;
     this.manager = manager;
@@ -53,10 +49,7 @@ public final class PostCommitProcessing {
     this.event = event;
     this.deleteByIdMap = event.getDeleteByIdMap();
     this.persistBeanRequests = createPersistBeanRequests();
-
     this.beanPersistIdMap = createBeanPersistIdMap();
-    //this.beanDeltaMap = new BeanDeltaMap(event.getBeanDeltas());
-
     this.remoteTransactionEvent = createRemoteTransactionEvent();
   }
 
@@ -87,8 +80,8 @@ public final class PostCommitProcessing {
   public void notifyCluster() {
     if (remoteTransactionEvent != null && !remoteTransactionEvent.isEmpty()) {
       // send the interesting events to the cluster
-      if (manager.getClusterDebugLevel() > 0 || logger.isDebugEnabled()) {
-        logger.info("Cluster Send: " + remoteTransactionEvent.toString());
+      if (logger.isDebugEnabled()) {
+        logger.debug("Cluster Send: {}", remoteTransactionEvent);
       }
 
       clusterManager.broadcast(remoteTransactionEvent);
@@ -147,12 +140,6 @@ public final class PostCommitProcessing {
 
     RemoteTransactionEvent remoteTransactionEvent = new RemoteTransactionEvent(serverName);
 
-//    if (beanDeltaMap != null) {
-//      for (BeanDeltaList deltaList : beanDeltaMap.deltaLists()) {
-//        remoteTransactionEvent.addBeanDeltaList(deltaList);
-//      }
-//    }
-
     if (beanPersistIdMap != null) {
       for (BeanPersistIds beanPersist : beanPersistIdMap.values()) {
         remoteTransactionEvent.addBeanPersistIds(beanPersist);
@@ -167,13 +154,6 @@ public final class PostCommitProcessing {
     if (eventTables != null && !eventTables.isEmpty()) {
       for (TableIUD tableIUD : eventTables.values()) {
         remoteTransactionEvent.addTableIUD(tableIUD);
-      }
-    }
-
-    Set<IndexInvalidate> indexInvalidations = event.getIndexInvalidations();
-    if (indexInvalidations != null) {
-      for (IndexInvalidate indexInvalidate : indexInvalidations) {
-        remoteTransactionEvent.addIndexInvalidate(indexInvalidate);
       }
     }
 

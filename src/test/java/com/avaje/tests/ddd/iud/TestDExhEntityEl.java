@@ -2,14 +2,11 @@ package com.avaje.tests.ddd.iud;
 
 import junit.framework.TestCase;
 
-import com.avaje.ebean.config.GlobalProperties;
-import com.avaje.tests.model.ddd.DExhEntity;
-
 public class TestDExhEntityEl extends TestCase {
 
     public void test() {
         
-        GlobalProperties.put("classes", DExhEntity.class.toString());
+//        GlobalProperties.put("classes", DExhEntity.class.toString());
         
 //        Currency NZD = Currency.getInstance("NZD");
 //        

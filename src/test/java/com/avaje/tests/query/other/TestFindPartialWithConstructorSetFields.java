@@ -24,6 +24,7 @@ public class TestFindPartialWithConstructorSetFields extends BaseTestCase {
 
     List<Order> list = Ebean.find(Order.class)
       .setLazyLoadBatchSize(100)
+      .setUseCache(false)
       .select("shipDate")
       .findList();
 

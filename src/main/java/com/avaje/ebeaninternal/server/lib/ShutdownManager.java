@@ -1,19 +1,17 @@
 package com.avaje.ebeaninternal.server.lib;
 
+import com.avaje.ebean.common.BootupEbeanManager;
+import com.avaje.ebeaninternal.api.ClassUtil;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.avaje.ebean.common.BootupEbeanManager;
-import com.avaje.ebean.config.GlobalProperties;
-import com.avaje.ebeaninternal.api.ClassUtil;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
 
 /**
  * Manages the shutdown of the JVM Runtime.
@@ -33,12 +31,9 @@ public final class ShutdownManager {
 
 	static BootupEbeanManager serverFactory;	
 
-	static boolean whyShutdown;
-	
 	static {
 		// Register the Shutdown hook
 		registerShutdownHook();
-		whyShutdown = GlobalProperties.getBoolean("debug.shutdown.why",false);
 	}
 
 	/**
@@ -118,19 +113,11 @@ public final class ShutdownManager {
         logger.debug("Shutting down");
       }
 
-      if (whyShutdown) {
-        try {
-          throw new RuntimeException("debug.shutdown.why=true ...");
-        } catch (Throwable e) {
-          logger.warn("Stacktrace showing why shutdown was fired", e);
-        }
-      }
-
       stopping = true;
 
       deregisterShutdownHook();
 
-      String shutdownRunner = GlobalProperties.get("system.shutdown.runnable", null);
+      String shutdownRunner = System.getProperty("ebean.shutdown.runnable");
       if (shutdownRunner != null) {
         try {
           // A custom runnable executed at the start of shutdown
@@ -157,7 +144,7 @@ public final class ShutdownManager {
         }
       }
       
-      if (GlobalProperties.getBoolean("datasource.deregisterAllDrivers", false)) {
+      if ("true".equalsIgnoreCase(System.getProperty("ebean.datasource.deregisterAllDrivers", "false"))) {
         deregisterAllJdbcDrivers();
       }  
     }

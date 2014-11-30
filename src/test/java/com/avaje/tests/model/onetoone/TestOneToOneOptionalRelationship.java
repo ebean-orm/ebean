@@ -1,21 +1,17 @@
 package com.avaje.tests.model.onetoone;
 
-import java.util.List;
-
+import com.avaje.ebean.BaseTestCase;
 import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.config.GlobalProperties;
+import java.util.List;
 
 public class TestOneToOneOptionalRelationship extends BaseTestCase {
 
   @Test
   public void test() {
-    
-    GlobalProperties.put("ebean.search.packages", "com.avaje.tests.model.onetoone");
- 
+
     Account account = new Account();
     account.setName("AC234");
     account.save();    
@@ -42,8 +38,6 @@ public class TestOneToOneOptionalRelationship extends BaseTestCase {
   @Test
   public void testWithUser() {
     
-    GlobalProperties.put("ebean.search.packages", "com.avaje.tests.model.onetoone");
-
     Account account = new Account();
     account.setName("AC678");
     account.save();
@@ -81,8 +75,6 @@ public class TestOneToOneOptionalRelationship extends BaseTestCase {
 
   @Test
   public void testWithUserFetch() {
-    
-    GlobalProperties.put("ebean.search.packages", "com.avaje.tests.model.onetoone");
 
     Account account = new Account();
     account.setName("AC786");

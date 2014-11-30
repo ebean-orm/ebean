@@ -54,7 +54,7 @@ public class ClassPathSearchTests {
 			public boolean isMatch(Class<?> cls) {
 				return true;
 			}
-		});
+		}, null);
 
 		List<Class<?>> found = search.findClasses();
 
@@ -72,7 +72,7 @@ public class ClassPathSearchTests {
 			public boolean isMatch(Class<?> cls) {
 				return true;
 			}
-		});
+		},null);
 
 		runAsserts(search.findClasses(), cl, search, jar, jarBang);
 	}

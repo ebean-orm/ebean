@@ -156,14 +156,6 @@ public class AutofetchConfig {
   }
 
   /**
-   * Return the log directory substituting any expressions such as
-   * ${catalina.base} etc.
-   */
-  public String getLogDirectoryWithEval() {
-    return GlobalProperties.evaluateExpressions(logDirectory);
-  }
-
-  /**
    * Set the directory to put the autofetch log in.
    */
   public void setLogDirectory(String logDirectory) {
@@ -234,22 +226,20 @@ public class AutofetchConfig {
   /**
    * Load the settings from the properties file.
    */
-  public void loadSettings(GlobalProperties.PropertySource p) {
+  public void loadSettings(PropertiesWrapper p) {
 
-    logDirectory = p.get("autofetch.logDirectory", null);
-    queryTuning = p.getBoolean("autofetch.querytuning", false);
-    queryTuningAddVersion = p.getBoolean("autofetch.queryTuningAddVersion", false);
-    garbageCollectionOnShutdown = p.getBoolean("autofetch.garbageCollectionOnShutdown", false);
+    logDirectory = p.get("autofetch.logDirectory", logDirectory);
+    queryTuning = p.getBoolean("autofetch.querytuning", queryTuning);
+    queryTuningAddVersion = p.getBoolean("autofetch.queryTuningAddVersion", queryTuningAddVersion);
+    garbageCollectionOnShutdown = p.getBoolean("autofetch.garbageCollectionOnShutdown", garbageCollectionOnShutdown);
     
-    profiling = p.getBoolean("autofetch.profiling", false);
-    mode = p.getEnum(AutofetchMode.class, "autofetch.implicitmode", AutofetchMode.DEFAULT_ONIFEMPTY);
+    profiling = p.getBoolean("autofetch.profiling", profiling);
+    mode = p.getEnum(AutofetchMode.class, "autofetch.implicitmode", mode);
 
-    profilingMin = p.getInt("autofetch.profiling.min", 1);
-    profilingBase = p.getInt("autofetch.profiling.base", 10);
+    profilingMin = p.getInt("autofetch.profiling.min", profilingMin);
+    profilingBase = p.getInt("autofetch.profiling.base", profilingBase);
 
-    String rate = p.get("autofetch.profiling.rate", "0.05");
-    profilingRate = Double.parseDouble(rate);
-
-    profileUpdateFrequency = p.getInt("autofetch.profiling.updatefrequency", 60);
+    profilingRate = p.getDouble("autofetch.profiling.rate", profilingRate);
+    profileUpdateFrequency = p.getInt("autofetch.profiling.updatefrequency", profileUpdateFrequency);
   }
 }

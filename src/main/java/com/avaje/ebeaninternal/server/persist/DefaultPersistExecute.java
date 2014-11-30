@@ -1,13 +1,8 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebeaninternal.api.SpiTransaction;
-import com.avaje.ebeaninternal.server.core.PersistRequestBean;
-import com.avaje.ebeaninternal.server.core.PersistRequestCallableSql;
-import com.avaje.ebeaninternal.server.core.PersistRequestOrmUpdate;
-import com.avaje.ebeaninternal.server.core.PersistRequestUpdateSql;
-import com.avaje.ebeaninternal.server.core.PstmtBatch;
+import com.avaje.ebeaninternal.server.core.*;
 import com.avaje.ebeaninternal.server.deploy.BeanManager;
 
 /**
@@ -32,19 +27,17 @@ public final class DefaultPersistExecute implements PersistExecute {
   /**
    * Default for whether to call getGeneratedKeys after batch insert.
    */
-  private final boolean defaultBatchGenKeys;
+  private final boolean defaultBatchGenKeys = true;
 
   /**
    * Construct this DmlPersistExecute.
    */
-  public DefaultPersistExecute(Binder binder, PstmtBatch pstmtBatch) {
+  public DefaultPersistExecute(Binder binder, PstmtBatch pstmtBatch, int defaultBatchSize) {
 
     this.exeOrmUpdate = new ExeOrmUpdate(binder, pstmtBatch);
     this.exeUpdateSql = new ExeUpdateSql(binder, pstmtBatch);
     this.exeCallableSql = new ExeCallableSql(binder, pstmtBatch);
-
-    this.defaultBatchGenKeys = GlobalProperties.getBoolean("batch.getgeneratedkeys", true);
-    this.defaultBatchSize = GlobalProperties.getInt("batch.size", 20);
+    this.defaultBatchSize = defaultBatchSize;
   }
 
   public BatchControl createBatchControl(SpiTransaction t) {

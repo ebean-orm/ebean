@@ -1,29 +1,18 @@
 package com.avaje.ebeaninternal.server.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
-
+import com.avaje.ebeaninternal.api.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.avaje.ebean.config.GlobalProperties;
-import com.avaje.ebeaninternal.api.ClassUtil;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.*;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 /**
  * Can search the class path for classes using a ClassPathSearchMatcher. A
@@ -55,22 +44,21 @@ public class ClassPathSearch {
 
   private ArrayList<URI> scannedUris = new ArrayList<URI>();
 
-  public ClassPathSearch(ClassLoader classLoader, ClassPathSearchFilter filter, ClassPathSearchMatcher matcher) {
+  public ClassPathSearch(ClassLoader classLoader, ClassPathSearchFilter filter, ClassPathSearchMatcher matcher, String classPathReaderClassName) {
     this.classLoader = classLoader;
     this.filter = filter;
     this.matcher = matcher;
-    initClassPaths();
+    initClassPaths(classPathReaderClassName);
   }
 
-  private void initClassPaths() {
+  private void initClassPaths(String classPathReaderCN) {
 
     try {
 
-      String cn = GlobalProperties.get("ebean.classpathreader", null);
-      if (cn != null) {
+      if (classPathReaderCN != null) {
         // use a user defined classPathReader
-        logger.info("Using [" + cn + "] to read the searchable class path");
-        classPathReader = (ClassPathReader) ClassUtil.newInstance(cn, this.getClass());
+        logger.info("Using [" + classPathReaderCN + "] to read the searchable class path");
+        classPathReader = (ClassPathReader) ClassUtil.newInstance(classPathReaderCN, this.getClass());
       }
 
       Object[] rawClassPaths = classPathReader.readPath(classLoader);

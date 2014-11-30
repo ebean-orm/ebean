@@ -17,9 +17,6 @@ import java.io.DataOutputStream;
  * be common for many Ack, Resend and Control messages to all be contained in a
  * single packet.
  * </p>
- * 
- * @author rbygrave
- * 
  */
 public class BinaryMessage {
 
@@ -28,8 +25,7 @@ public class BinaryMessage {
     public static final int TYPE_TABLEIUD = 2;
     public static final int TYPE_BEANDELTA = 3;
     public static final int TYPE_BEANPATHUPDATE = 4;
-    public static final int TYPE_INDEX_INVALIDATE = 6;
-    public static final int TYPE_INDEX = 7;
+
     public static final int TYPE_MSGACK = 8;
     public static final int TYPE_MSGRESEND = 9;
 

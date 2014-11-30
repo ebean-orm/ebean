@@ -31,9 +31,9 @@ public final class DaemonThreadPool extends ThreadPoolExecutor {
    *          the time in seconds allowed for the pool to shutdown nicely. After
    *          this the pool is forced to shutdown.
    */
-  public DaemonThreadPool(int coreSize, long keepAliveSecs, int shutdownWaitSeconds, String namePrefix) {
+  public DaemonThreadPool(int coreSize, int maximumPoolSize, long keepAliveSecs, int shutdownWaitSeconds, String namePrefix) {
     
-    super(coreSize, coreSize, keepAliveSecs, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory(namePrefix));
+    super(coreSize, maximumPoolSize, keepAliveSecs, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadFactory(namePrefix));
     allowCoreThreadTimeOut(true);
     this.shutdownWaitSeconds = shutdownWaitSeconds;
     this.namePrefix = namePrefix;

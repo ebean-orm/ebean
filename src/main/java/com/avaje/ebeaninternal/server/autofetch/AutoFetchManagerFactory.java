@@ -1,17 +1,15 @@
 package com.avaje.ebeaninternal.server.autofetch;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-
-import javax.persistence.PersistenceException;
-
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.resource.ResourceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 
 public class AutoFetchManagerFactory {
 
@@ -37,7 +35,7 @@ public class AutoFetchManagerFactory {
 
 		AutoFetchManager autoFetchManager = null;
 
-		boolean readFile = GlobalProperties.getBoolean("autofetch.readfromfile", true);
+		boolean readFile = !"false".equalsIgnoreCase(System.getProperty("autofetch.readfromfile"));
 		if (readFile) {
 			autoFetchManager = deserializeAutoFetch(autoFetchFile);
 		}

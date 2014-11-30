@@ -1,17 +1,15 @@
 package com.avaje.tests.compositekeys;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.tests.model.composite.ROrder;
 import com.avaje.tests.model.composite.ROrderPK;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestCKeyIdInExpression extends BaseTestCase {
 
@@ -21,9 +19,9 @@ public class TestCKeyIdInExpression extends BaseTestCase {
   }
 
   // public void testRunManually() {
+  //@Test
   public void notRanAutomatically() {
 
-    GlobalProperties.put("datasource.default", "");
     EbeanServer server = CreateIdExpandedFormServer.create();
 
     ROrderPK k0 = new ROrderPK("compa", 100);

@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.query;
 
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.bean.*;
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
@@ -45,7 +44,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private static final Logger logger = LoggerFactory.getLogger(CQuery.class);
 
-  private static final int GLOBAL_ROW_LIMIT = GlobalProperties.getInt("query.globallimit",1000000);
+  private static final int GLOBAL_ROW_LIMIT = Integer.valueOf(System.getProperty("ebean.query.globallimit","1000000"));
 
   /**
    * The resultSet rows read.

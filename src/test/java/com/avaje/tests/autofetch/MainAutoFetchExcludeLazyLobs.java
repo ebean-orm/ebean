@@ -1,18 +1,13 @@
 package com.avaje.tests.autofetch;
 
-import java.util.List;
-
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.tests.model.basic.EBasicClob;
+
+import java.util.List;
 
 public class MainAutoFetchExcludeLazyLobs {
 
 	public static void main(String[] args) {
-	    
-		GlobalProperties.put("ebean.autofetch.queryTuning", "true");
-		GlobalProperties.put("ebean.autofetch.profiling", "true");
-		
 		
 		EBasicClob a = new EBasicClob();
 		a.setName("name 1");

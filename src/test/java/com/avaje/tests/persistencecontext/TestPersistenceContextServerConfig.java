@@ -1,11 +1,15 @@
 package com.avaje.tests.persistencecontext;
 
 import com.avaje.ebean.*;
+import com.avaje.ebean.config.ContainerConfig;
+import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.tests.model.basic.EBasicVer;
 import org.junit.Test;
+
+import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,10 +30,24 @@ public class TestPersistenceContextServerConfig extends BaseTestCase {
   static EbeanServer create() {
 
     ServerConfig config = new ServerConfig();
-    config.setName("h2");
-    config.loadFromProperties();
     config.setName("withPCQuery");
+
+    Properties properties = new Properties();
+    properties.setProperty("datasource.withPCQuery.username","sa");
+    properties.setProperty("datasource.withPCQuery.password","");
+    properties.setProperty("datasource.withPCQuery.databaseUrl","jdbc:h2:mem:withPCQuery;");
+    properties.setProperty("datasource.withPCQuery.databaseDriver","org.h2.Driver");
+
+    config.loadFromProperties(properties);
     config.setPersistenceContextScope(PersistenceContextScope.QUERY);
+    config.setContainerConfig(new ContainerConfig());
+
+//    DataSourceConfig dataSourceConfig = new DataSourceConfig();
+//    dataSourceConfig.setUsername("sa");
+//    dataSourceConfig.setPassword("");
+//    dataSourceConfig.setUrl("jdbc:h2:mem:withPCQuery;");
+//    dataSourceConfig.setDriver("org.h2.Driver");
+//    config.setDataSourceConfig(dataSourceConfig);
 
     config.addClass(EBasicVer.class);
 

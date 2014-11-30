@@ -1,25 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PersistenceException;
-import javax.persistence.Transient;
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.RawSql;
@@ -29,7 +9,6 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.EncryptKeyManager;
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.config.NamingConvention;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbIdentity;
@@ -38,35 +17,31 @@ import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.event.BeanFinder;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
-import com.avaje.ebeaninternal.server.core.BootupClasses;
-import com.avaje.ebeaninternal.server.core.InternString;
-import com.avaje.ebeaninternal.server.core.InternalConfiguration;
-import com.avaje.ebeaninternal.server.core.Message;
-import com.avaje.ebeaninternal.server.core.XmlConfig;
+import com.avaje.ebeaninternal.server.core.*;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinderEmbedded;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinderFactory;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanTable;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoin;
-import com.avaje.ebeaninternal.server.deploy.parse.DeployBeanInfo;
-import com.avaje.ebeaninternal.server.deploy.parse.DeployCreateProperties;
-import com.avaje.ebeaninternal.server.deploy.parse.DeployInherit;
-import com.avaje.ebeaninternal.server.deploy.parse.DeployUtil;
-import com.avaje.ebeaninternal.server.deploy.parse.ReadAnnotations;
-import com.avaje.ebeaninternal.server.deploy.parse.TransientProperties;
+import com.avaje.ebeaninternal.server.deploy.meta.*;
+import com.avaje.ebeaninternal.server.deploy.parse.*;
 import com.avaje.ebeaninternal.server.idgen.UuidIdGenerator;
 import com.avaje.ebeaninternal.server.lib.util.Dnode;
+import com.avaje.ebeaninternal.server.properties.BeanPropertiesReader;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfo;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfoFactory;
-import com.avaje.ebeaninternal.server.properties.BeanPropertiesReader;
 import com.avaje.ebeaninternal.server.properties.EnhanceBeanPropertyInfoFactory;
 import com.avaje.ebeaninternal.server.type.TypeManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.MappedSuperclass;
+import javax.persistence.PersistenceException;
+import javax.persistence.Transient;
+import javax.sql.DataSource;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.*;
 
 /**
  * Creates BeanDescriptors.
@@ -153,6 +128,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final BeanLifecycleAdapterFactory beanLifecycleAdapterFactory;
 
+  private final boolean eagerFetchLobs;
+
   /**
    * Create for a given database dbConfig.
    */
@@ -167,6 +144,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.encryptKeyManager = config.getServerConfig().getEncryptKeyManager();
     this.databasePlatform = config.getServerConfig().getDatabasePlatform();
     this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm());
+    this.eagerFetchLobs = config.getServerConfig().isEagerFetchLobs();
 
     this.bootupClasses = config.getBootupClasses();
     this.createProperties = config.getDeployCreateProperties();
@@ -397,12 +375,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     String msg = "SERIOUS ERROR: The hashCode() and equals() methods *MUST* be implemented ";
     msg += "on Embedded bean " + idType + " as it is used as an Id for " + beanType;
-
-    if (GlobalProperties.getBoolean("ebean.strict", true)) {
-      throw new PersistenceException(msg, source);
-    } else {
-      logger.error(msg, source);
-    }
+    throw new PersistenceException(msg, source);
   }
 
   /**
@@ -1017,7 +990,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     DeployBeanInfo<T> info = new DeployBeanInfo<T>(deployUtil, desc);
 
-    readAnnotations.readInitial(info);
+    readAnnotations.readInitial(info, eagerFetchLobs);
     return info;
   }
 

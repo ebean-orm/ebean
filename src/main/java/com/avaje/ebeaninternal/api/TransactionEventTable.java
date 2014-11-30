@@ -75,7 +75,7 @@ public final class TransactionEventTable implements Serializable {
 		private boolean update;
 		private boolean delete;
 		
-		private TableIUD(String table, boolean insert, boolean update, boolean delete){
+		public TableIUD(String table, boolean insert, boolean update, boolean delete){
 			this.table = table;
 			this.insert = insert;
 			this.update = update;

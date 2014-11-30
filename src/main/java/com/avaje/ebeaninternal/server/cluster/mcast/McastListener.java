@@ -19,6 +19,12 @@
  */
 package com.avaje.ebeaninternal.server.cluster.mcast;
 
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.server.cluster.Packet;
+import com.avaje.ebeaninternal.server.cluster.PacketTransactionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
@@ -27,13 +33,6 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
-
-import com.avaje.ebean.config.GlobalProperties;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.cluster.Packet;
-import com.avaje.ebeaninternal.server.cluster.PacketTransactionEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Listens for Incoming packets.
@@ -56,8 +55,6 @@ public class McastListener implements Runnable {
 
     private final InetAddress group;
 
-    private final boolean debugIgnore;
-
     private DatagramPacket pack;
 
     private byte[] receiveBuffer;
@@ -72,8 +69,6 @@ public class McastListener implements Runnable {
     public McastListener(McastClusterManager owner, McastPacketControl packetControl, int port, String address, 
             int bufferSize, int timeout, String localSenderHostPort, 
             boolean disableLoopback, int ttl, InetAddress mcastBindAddress) {
-
-        this.debugIgnore = GlobalProperties.getBoolean("ebean.debug.mcast.ignore", false);
 
         this.owner = owner;
         this.packetControl = packetControl;
@@ -96,7 +91,7 @@ public class McastListener implements Runnable {
             this.sock.setSoTimeout(timeout);
 
             if (disableLoopback){
-                sock.setLoopbackMode(disableLoopback);
+                sock.setLoopbackMode(true);
             }
             
             if (mcastBindAddress != null) {
@@ -173,7 +168,7 @@ public class McastListener implements Runnable {
                 String senderHostPort = senderAddr.getAddress().getHostAddress()+":"+senderAddr.getPort();                    
                 
                 if (senderHostPort.equals(localSenderHostPort)){
-                    if (debugIgnore || logger.isDebugEnabled()){
+                    if (logger.isTraceEnabled()){
                         logger.info("Ignoring message as sent by localSender: "+localSenderHostPort);
                     }
                 } else {
@@ -195,7 +190,7 @@ public class McastListener implements Runnable {
                     boolean processThisPacket = ackMsg || packetControl.isProcessPacket(senderHostPort, header.getPacketId());
                     
                     if (!processThisPacket){
-                        if (debugIgnore || logger.isDebugEnabled()){
+                        if (logger.isTraceEnabled()){
                             logger.info("Already processed packet: "+header.getPacketId()+" type:"+header.getPacketType()+" len:"+data.length);
                         }
                     } else {

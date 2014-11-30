@@ -1,15 +1,7 @@
 package com.avaje.tests.ddd.iud;
 
-import java.io.IOException;
-import java.util.Currency;
-
-import junit.framework.TestCase;
-
-import org.junit.Assert;
-
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.config.GlobalProperties;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -17,13 +9,16 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.tests.model.ddd.DPerson;
 import com.avaje.tests.model.ivo.CMoney;
 import com.avaje.tests.model.ivo.Money;
+import junit.framework.TestCase;
+import org.junit.Assert;
+
+import java.io.IOException;
+import java.util.Currency;
 
 public class TestDPersonEl extends TestCase {
 
     public void test() throws IOException {
-        
-        GlobalProperties.put("classes", DPerson.class.toString());
-        
+
         Currency NZD = Currency.getInstance("NZD");
         
         DPerson p = new DPerson();

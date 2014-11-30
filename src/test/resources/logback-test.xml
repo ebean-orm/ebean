@@ -39,7 +39,8 @@
     <logger name="org.avaje.ebean.cache.NATKEY" level="TRACE"/>
 
     <logger name="com.avaje.tests" level="DEBUG"/>
-    
+
+    <logger name="com.avaje.ebeaninternal.server.cluster" level="DEBUG"/>
     <logger name="com.avaje.ebeaninternal.server.lib" level="DEBUG"/>
     <logger name="com.avaje.ebeaninternal.server.lib.sql" level="TRACE"/>
     <logger name="com.avaje.ebeaninternal.server.transaction" level="TRACE"/>

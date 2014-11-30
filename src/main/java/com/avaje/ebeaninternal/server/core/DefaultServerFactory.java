@@ -2,10 +2,7 @@ package com.avaje.ebeaninternal.server.core;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.MBeanServer;
@@ -13,6 +10,7 @@ import javax.management.MBeanServerFactory;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 
+import com.avaje.ebean.config.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,11 +19,6 @@ import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.common.BootupEbeanManager;
-import com.avaje.ebean.config.DataSourceConfig;
-import com.avaje.ebean.config.GlobalProperties;
-import com.avaje.ebean.config.PstmtDelegate;
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.config.UnderscoreNamingConvention;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -38,7 +31,6 @@ import com.avaje.ebeaninternal.server.lib.ShutdownManager;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourceAlert;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
 import com.avaje.ebeaninternal.server.lib.sql.SimpleDataSourceAlert;
-import com.avaje.ebeaninternal.server.lib.thread.ThreadPool;
 
 /**
  * Default Server side implementation of ServerFactory.
@@ -51,44 +43,16 @@ public class DefaultServerFactory implements BootupEbeanManager {
 
   private final JndiDataSourceLookup jndiDataSourceFactory;
 
-  private final BootupClassPathSearch bootupClassSearch;
-
   private final AtomicInteger serverId = new AtomicInteger(1);
 
-  private final XmlConfigLoader xmlConfigLoader;
+  public DefaultServerFactory(ContainerConfig containerConfig) {
 
-  private final XmlConfig xmlConfig;
-
-  public DefaultServerFactory() {
-
-    this.clusterManager = new ClusterManager();
+    this.clusterManager = new ClusterManager(containerConfig);
     this.jndiDataSourceFactory = new JndiDataSourceLookup();
-
-    List<String> packages = getSearchJarsPackages(GlobalProperties.get("ebean.search.packages", null));
-    List<String> jars = getSearchJarsPackages(GlobalProperties.get("ebean.search.jars", null));
-
-    this.bootupClassSearch = new BootupClassPathSearch(null, packages, jars);
-    this.xmlConfigLoader = new XmlConfigLoader(null);
-
-    this.xmlConfig = xmlConfigLoader.load();
 
     // register so that we can shutdown any Ebean wide
     // resources such as clustering
     ShutdownManager.registerServerFactory(this);
-  }
-
-  private List<String> getSearchJarsPackages(String searchPackages) {
-
-    List<String> hitList = new ArrayList<String>();
-
-    if (searchPackages != null) {
-
-      String[] entries = searchPackages.split("[ ,;]");
-      for (int i = 0; i < entries.length; i++) {
-        hitList.add(entries[i].trim());
-      }
-    }
-    return hitList;
   }
 
   public void shutdown() {
@@ -100,35 +64,26 @@ public class DefaultServerFactory implements BootupEbeanManager {
    */
   public SpiEbeanServer createServer(String name) {
 
-    ConfigBuilder b = new ConfigBuilder();
-    ServerConfig config = b.build(name);
+    ServerConfig config = new ServerConfig();
+    config.setName(name);
+
+    Properties prop = PropertyMap.defaultProperties();
+    config.loadFromProperties(prop);
 
     return createServer(config);
   }
 
-  private SpiBackgroundExecutor createBackgroundExecutor(ServerConfig serverConfig, int uniqueServerId) {
+  private SpiBackgroundExecutor createBackgroundExecutor(ServerConfig serverConfig) {
 
-    String namePrefix = "Ebean-" + serverConfig.getName();
+    String namePrefix = "ebean-" + serverConfig.getName();
 
-    // the size of the pool for executing periodic tasks (such as cache flushing)
-    int schedulePoolSize = GlobalProperties.getInt("backgroundExecutor.schedulePoolsize", 1);
+    int schedulePoolSize = serverConfig.getBackgroundExecutorSchedulePoolSize();
+    int corePoolSize = serverConfig.getBackgroundExecutorCorePoolSize();
+    int maxPoolSize = serverConfig.getBackgroundExecutorMaxPoolSize();
+    int idleSecs = serverConfig.getBackgroundExecutorIdleSecs();
+    int shutdownSecs = serverConfig.getBackgroundExecutorShutdownSecs();
 
-    // the side of the main pool for immediate background task execution
-    int minPoolSize = GlobalProperties.getInt("backgroundExecutor.minPoolSize", 0);
-    int poolSize = GlobalProperties.getInt("backgroundExecutor.poolsize", 20);
-    int maxPoolSize = GlobalProperties.getInt("backgroundExecutor.maxPoolSize", poolSize);
-
-    int idleSecs = GlobalProperties.getInt("backgroundExecutor.idlesecs", 120);
-    int shutdownSecs = GlobalProperties.getInt("backgroundExecutor.shutdownSecs", 30);
-
-    boolean useTrad = GlobalProperties.getBoolean("backgroundExecutor.traditional", true);
-    if (useTrad) {
-      // this pool will use Idle seconds to maintain the thread count between min and max
-      ThreadPool pool = new ThreadPool(namePrefix, true, null, minPoolSize, maxPoolSize, idleSecs*1000);
-      return new TraditionalBackgroundExecutor(pool, schedulePoolSize, shutdownSecs, namePrefix);
-    } else {
-      return new DefaultBackgroundExecutor(schedulePoolSize, maxPoolSize, idleSecs, shutdownSecs, namePrefix);
-    }
+    return new DefaultBackgroundExecutor(schedulePoolSize, corePoolSize, maxPoolSize, idleSecs, shutdownSecs, namePrefix);
   }
 
   /**
@@ -163,8 +118,7 @@ public class DefaultServerFactory implements BootupEbeanManager {
           pstmtDelegate = getOraclePstmtDelegate(serverConfig.getDataSource());
         }
         if (pstmtDelegate != null) {
-          // We can support JDBC batching with Oracle
-          // via OraclePreparedStatement
+          // We can support JDBC batching with Oracle via OraclePreparedStatement
           pstmtBatch = new OraclePstmtBatch(pstmtDelegate);
         }
         if (pstmtBatch == null) {
@@ -180,26 +134,29 @@ public class DefaultServerFactory implements BootupEbeanManager {
       ServerCacheManager cacheManager = getCacheManager(serverConfig);
 
       int uniqueServerId = serverId.incrementAndGet();
-      SpiBackgroundExecutor bgExecutor = createBackgroundExecutor(serverConfig, uniqueServerId);
+      SpiBackgroundExecutor bgExecutor = createBackgroundExecutor(serverConfig);
 
-      InternalConfiguration c = new InternalConfiguration(xmlConfig, clusterManager, cacheManager, bgExecutor, serverConfig, bootupClasses,
-          pstmtBatch);
+      XmlConfigLoader xmlConfigLoader = new XmlConfigLoader(null);
+      XmlConfig xmlConfig = xmlConfigLoader.load();
+
+      InternalConfiguration c = new InternalConfiguration(xmlConfig, clusterManager, cacheManager, bgExecutor, serverConfig, bootupClasses, pstmtBatch);
 
       DefaultServer server = new DefaultServer(c, cacheManager);
 
       cacheManager.init(server);
 
-      MBeanServer mbeanServer;
-      ArrayList<?> list = MBeanServerFactory.findMBeanServer(null);
-      if (list.size() == 0) {
-        // probably not running in a server
-        mbeanServer = MBeanServerFactory.createMBeanServer();
-      } else {
-        // use the first MBeanServer
-        mbeanServer = (MBeanServer) list.get(0);
+      if (serverConfig.isRegisterJmxMBeans()) {
+        MBeanServer mbeanServer;
+        ArrayList<?> list = MBeanServerFactory.findMBeanServer(null);
+        if (list.size() == 0) {
+          // probably not running in a server
+          mbeanServer = MBeanServerFactory.createMBeanServer();
+        } else {
+          // use the first MBeanServer
+          mbeanServer = (MBeanServer) list.get(0);
+        }
+        server.registerMBeans(mbeanServer, uniqueServerId);
       }
-
-      server.registerMBeans(mbeanServer, uniqueServerId);
 
       // generate and run DDL if required
       // if there are any other tasks requiring action in their plugins, do them as well
@@ -215,9 +172,7 @@ public class DefaultServerFactory implements BootupEbeanManager {
         }
 
         // warm the cache in 30 seconds
-        int delaySecs = GlobalProperties.getInt("ebean.cacheWarmingDelay", 30);
-        long sleepMillis = 1000 * delaySecs;
-
+        long sleepMillis = 1000 * serverConfig.getCacheWarmingDelay();
         if (sleepMillis > 0) {
           Timer t = new Timer("EbeanCacheWarmer", true);
           t.schedule(new CacheWarmer(server), sleepMillis);
@@ -252,19 +207,15 @@ public class DefaultServerFactory implements BootupEbeanManager {
 
     // reasonable default settings are for a cache per bean type
     ServerCacheOptions beanOptions = new ServerCacheOptions();
-    beanOptions.setMaxSize(GlobalProperties.getInt("cache.maxSize", 1000));
-    // maxIdleTime 10 minutes
-    beanOptions.setMaxIdleSecs(GlobalProperties.getInt("cache.maxIdleTime", 60 * 10));
-    // maxTimeToLive 6 hrs
-    beanOptions.setMaxSecsToLive(GlobalProperties.getInt("cache.maxTimeToLive", 60 * 60 * 6));
+    beanOptions.setMaxSize(serverConfig.getCacheMaxSize());
+    beanOptions.setMaxIdleSecs(serverConfig.getCacheMaxIdleTime());
+    beanOptions.setMaxSecsToLive(serverConfig.getCacheMaxTimeToLive());
 
     // reasonable default settings for the query cache per bean type
     ServerCacheOptions queryOptions = new ServerCacheOptions();
-    queryOptions.setMaxSize(GlobalProperties.getInt("querycache.maxSize", 100));
-    // maxIdleTime 10 minutes
-    queryOptions.setMaxIdleSecs(GlobalProperties.getInt("querycache.maxIdleTime", 60 * 10));
-    // maxTimeToLive 6 hours
-    queryOptions.setMaxSecsToLive(GlobalProperties.getInt("querycache.maxTimeToLive", 60 * 60 * 6));
+    queryOptions.setMaxSize(serverConfig.getQueryCacheMaxSize());
+    queryOptions.setMaxIdleSecs(serverConfig.getQueryCacheMaxIdleTime());
+    queryOptions.setMaxSecsToLive(serverConfig.getQueryCacheMaxTimeToLive());
 
     ServerCacheFactory cacheFactory = serverConfig.getServerCacheFactory();
     if (cacheFactory == null) {
@@ -303,17 +254,8 @@ public class DefaultServerFactory implements BootupEbeanManager {
       return new BootupClasses(serverConfig.getClasses());
     }
 
-    List<String> jars = serverConfig.getJars();
-    List<String> packages = serverConfig.getPackages();
-
-    if ((packages != null && !packages.isEmpty()) || (jars != null && !jars.isEmpty())) {
-      // filter by package name
-      BootupClassPathSearch search = new BootupClassPathSearch(null, packages, jars);
-      return search.getBootupClasses();
-    }
-
-    // just use classes we can find via class path search
-    return bootupClassSearch.getBootupClasses().createCopy();
+    BootupClassPathSearch search = new BootupClassPathSearch(null, serverConfig.getPackages(), serverConfig.getJars(), serverConfig.getClassPathReaderClassName());
+    return search.getBootupClasses();
   }
 
   /**
@@ -323,22 +265,6 @@ public class DefaultServerFactory implements BootupEbeanManager {
     if (config.getNamingConvention() == null) {
       UnderscoreNamingConvention nc = new UnderscoreNamingConvention();
       config.setNamingConvention(nc);
-
-      String v = config.getProperty("namingConvention.useForeignKeyPrefix");
-      if (v != null) {
-        boolean useForeignKeyPrefix = Boolean.valueOf(v);
-        nc.setUseForeignKeyPrefix(useForeignKeyPrefix);
-      }
-
-      String sequenceFormat = config.getProperty("namingConvention.sequenceFormat");
-      if (sequenceFormat != null) {
-        nc.setSequenceFormat(sequenceFormat);
-      }
-      
-      String schema = config.getProperty("namingConvention.schema");
-      if (schema != null) {
-        nc.setSchema(schema);
-      }
     }
   }
 
@@ -351,7 +277,6 @@ public class DefaultServerFactory implements BootupEbeanManager {
     if (dbPlatform == null) {
 
       DatabasePlatformFactory factory = new DatabasePlatformFactory();
-
       DatabasePlatform db = factory.create(config);
       config.setDatabasePlatform(db);
       logger.info("DatabasePlatform name:" + config.getName() + " platform:" + db.getName());
@@ -370,7 +295,7 @@ public class DefaultServerFactory implements BootupEbeanManager {
 
   private DataSource getDataSourceFromConfig(ServerConfig config) {
 
-    DataSource ds = null;
+    DataSource ds;
 
     if (config.getDataSourceJndiName() != null) {
       ds = jndiDataSourceFactory.lookup(config.getDataSourceJndiName());

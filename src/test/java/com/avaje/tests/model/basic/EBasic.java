@@ -1,6 +1,6 @@
 package com.avaje.tests.model.basic;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -34,7 +34,7 @@ public class EBasic {
 
   String description;
 
-  Date someDate;
+  Timestamp someDate;
 
   public Integer getId() {
     return id;
@@ -68,11 +68,11 @@ public class EBasic {
     this.description = description;
   }
 
-  public Date getSomeDate() {
+  public Timestamp getSomeDate() {
     return someDate;
   }
 
-  public void setSomeDate(Date someDate) {
+  public void setSomeDate(Timestamp someDate) {
     this.someDate = someDate;
   }
 

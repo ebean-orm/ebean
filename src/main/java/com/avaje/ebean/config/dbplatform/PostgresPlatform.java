@@ -1,10 +1,8 @@
 package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.BackgroundExecutor;
-import com.avaje.ebean.config.GlobalProperties;
 
 import javax.sql.DataSource;
-
 import java.sql.Types;
 
 /**
@@ -38,11 +36,7 @@ public class PostgresPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
 
-    String colAlias = GlobalProperties.get("ebean.columnAliasPrefix", null);
-    if (colAlias == null) {
-      // Postgres requires the "as" keyword for column alias
-      GlobalProperties.put("ebean.columnAliasPrefix", "as c");
-    }
+    this.columnAliasPrefix = "as c";
 
     this.openQuote = "\"";
     this.closeQuote = "\"";

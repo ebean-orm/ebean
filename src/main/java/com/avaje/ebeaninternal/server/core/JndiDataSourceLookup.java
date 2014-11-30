@@ -6,9 +6,6 @@ import javax.naming.NamingException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 
-import com.avaje.ebean.config.GlobalProperties;
-
-
 /**
  * Helper to lookup a DataSource from JNDI.
  */
@@ -16,8 +13,6 @@ public class JndiDataSourceLookup {
 
 	private static final String DEFAULT_PREFIX = "java:comp/env/jdbc/";
 
-	String jndiPrefix = GlobalProperties.get("ebean.datasource.jndi.prefix", DEFAULT_PREFIX);
-	
 	public JndiDataSourceLookup() {
 	}
 	
@@ -32,7 +27,7 @@ public class JndiDataSourceLookup {
 		try {
 			
 			if (!jndiName.startsWith("java:")){
-				jndiName = jndiPrefix + jndiName;
+				jndiName = DEFAULT_PREFIX + jndiName;
 			}
 			
 			Context ctx = new InitialContext();

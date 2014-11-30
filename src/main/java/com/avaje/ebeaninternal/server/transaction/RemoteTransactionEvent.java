@@ -1,14 +1,12 @@
 package com.avaje.ebeaninternal.server.transaction;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cluster.BinaryMessageList;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RemoteTransactionEvent implements Runnable {
 
@@ -19,10 +17,6 @@ public class RemoteTransactionEvent implements Runnable {
     private List<BeanDeltaList> beanDeltaLists;
     
     private BeanDeltaMap beanDeltaMap;
-
-    private List<IndexEvent> indexEventList;
-    
-    private Set<IndexInvalidate> indexInvalidations;
     
     private DeleteByIdMap deleteByIdMap;
     
@@ -56,12 +50,6 @@ public class RemoteTransactionEvent implements Runnable {
     
     public void writeBinaryMessage(BinaryMessageList msgList) throws IOException {
         
-        if (indexInvalidations != null){
-            for (IndexInvalidate indexInvalidate : indexInvalidations) {
-                indexInvalidate.writeBinaryMessage(msgList);
-            }
-        }
-        
         if (tableList != null){
             for (int i = 0; i < tableList.size(); i++) {
                 tableList.get(i).writeBinaryMessage(msgList);
@@ -85,12 +73,6 @@ public class RemoteTransactionEvent implements Runnable {
                 beanDeltaLists.get(i).writeBinaryMessage(msgList);
             }
         }
-        
-        if (indexEventList != null){
-            for (int i = 0; i < indexEventList.size(); i++) {
-                indexEventList.get(i).writeBinaryMessage(msgList);
-            }
-        }
     }
     
     public boolean isEmpty() {
@@ -99,13 +81,6 @@ public class RemoteTransactionEvent implements Runnable {
     
     public void addBeanPersistIds(BeanPersistIds beanPersist){
         beanPersistList.add(beanPersist);
-    }
-
-    public void addIndexInvalidate(IndexInvalidate indexInvalidate){
-        if (indexInvalidations == null){
-            indexInvalidations = new HashSet<IndexInvalidate>();
-        }
-        indexInvalidations.add(indexInvalidate);
     }
 
     public void addTableIUD(TableIUD tableIud){
@@ -129,13 +104,6 @@ public class RemoteTransactionEvent implements Runnable {
         beanDeltaMap.addBeanDelta(beanDelta);
     }
     
-    public void addIndexEvent(IndexEvent indexEvent){
-        if (indexEventList == null){
-            indexEventList = new ArrayList<IndexEvent>(2);
-        }
-        indexEventList.add(indexEvent);
-    }
-    
     public String getServerName() {
         return serverName;
     }
@@ -154,14 +122,6 @@ public class RemoteTransactionEvent implements Runnable {
 
     public void setDeleteByIdMap(DeleteByIdMap deleteByIdMap) {
         this.deleteByIdMap = deleteByIdMap;
-    }
-
-    public Set<IndexInvalidate> getIndexInvalidations() {
-        return indexInvalidations;
-    }
-
-    public List<IndexEvent> getIndexEventList() {
-        return indexEventList;
     }
 
     public List<TableIUD> getTableIUDList() {

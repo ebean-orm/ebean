@@ -72,6 +72,10 @@ public class DatabasePlatform {
    */
   protected String name = "generic";
 
+  protected String columnAliasPrefix = "c";
+
+  protected String tableAliasPlaceHolder = "${ta}";
+
   /**
    * Use a BackTick ` at the beginning and end of table or column names that you
    * want to use quoted identifiers for. The backticks get converted to the
@@ -164,6 +168,34 @@ public class DatabasePlatform {
    */
   public DbDdlSyntax getDbDdlSyntax() {
     return dbDdlSyntax;
+  }
+
+  /**
+   * Return the column alias prefix.
+   */
+  public String getColumnAliasPrefix() {
+    return columnAliasPrefix;
+  }
+
+  /**
+   * Set the column alias prefix.
+   */
+  public void setColumnAliasPrefix(String columnAliasPrefix) {
+    this.columnAliasPrefix = columnAliasPrefix;
+  }
+
+  /**
+   * Return the table alias placeholder.
+   */
+  public String getTableAliasPlaceHolder() {
+    return tableAliasPlaceHolder;
+  }
+
+  /**
+   * Set the table alias placeholder.
+   */
+  public void setTableAliasPlaceHolder(String tableAliasPlaceHolder) {
+    this.tableAliasPlaceHolder = tableAliasPlaceHolder;
   }
 
   /**

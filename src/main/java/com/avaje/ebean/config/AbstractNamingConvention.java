@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides some base implementation for NamingConventions.
- * 
+ *
  * @author emcgreal
  */
 public abstract class AbstractNamingConvention implements NamingConvention {
@@ -41,7 +41,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
   /** Used to trim off extra prefix for M2M. */
   protected int rhsPrefixLength = 3;
 
-  protected boolean useForeignKeyPrefix = true;
+  protected boolean useForeignKeyPrefix;
 
   /**
    * Construct with a sequence format and useForeignKeyPrefix setting.
@@ -53,12 +53,12 @@ public abstract class AbstractNamingConvention implements NamingConvention {
 
   /**
    * Construct with a sequence format.
-   * 
-   * @param sequenceFormat
-   *          the sequence format
+   *
+   * @param sequenceFormat the sequence format
    */
   public AbstractNamingConvention(String sequenceFormat) {
     this.sequenceFormat = sequenceFormat;
+    this.useForeignKeyPrefix = true;
   }
 
   /**
@@ -125,10 +125,9 @@ public abstract class AbstractNamingConvention implements NamingConvention {
    * The format should include "{table}". When generating the sequence name
    * {table} is replaced with the actual table name.
    * </p>
-   * 
-   * @param sequenceFormat
-   *          string containing "{table}" which is replaced with the actual
-   *          table name to generate the sequence name.
+   *
+   * @param sequenceFormat string containing "{table}" which is replaced with the actual
+   *                       table name to generate the sequence name.
    */
   public void setSequenceFormat(String sequenceFormat) {
     this.sequenceFormat = sequenceFormat;
@@ -173,7 +172,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
    * This first checks for the @Table annotation and if not present uses the
    * naming convention to define the table name.
    * </p>
-   * 
+   *
    * @see #getTableNameFromAnnotation(Class)
    * @see #getTableNameByConvention(Class)
    */
@@ -240,8 +239,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
     if (t != null && !isEmpty(t.name())) {
       // Note: empty catalog and schema are converted to null
       // Only need to convert quoted identifiers from annotations
-      return new TableName(quoteIdentifiers(t.catalog()), quoteIdentifiers(t.schema()),
-          quoteIdentifiers(t.name()));
+      return new TableName(quoteIdentifiers(t.catalog()), quoteIdentifiers(t.schema()),  quoteIdentifiers(t.name()));
     }
 
     // No annotation
@@ -279,4 +277,16 @@ public abstract class AbstractNamingConvention implements NamingConvention {
     }
     return false;
   }
+
+  /**
+   * Load settings from properties.
+   */
+  @Override
+  public void loadFromProperties(PropertiesWrapper properties) {
+
+    useForeignKeyPrefix = properties.getBoolean("namingConvention.useForeignKeyPrefix", useForeignKeyPrefix);
+    sequenceFormat = properties.get("namingConvention.sequenceFormat", sequenceFormat);
+    schema = properties.get("namingConvention.schema", schema);
+  }
+
 }
