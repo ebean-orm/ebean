@@ -11,129 +11,144 @@ import java.util.Set;
 
 public class FilterExpressionList<T> extends DefaultExpressionList<T> {
 
-    private static final long serialVersionUID = 2226895827150099020L;
+  private static final long serialVersionUID = 2226895827150099020L;
 
-    private final Query<T> rootQuery;
-    
-    private final FilterExprPath pathPrefix;
+  private final Query<T> rootQuery;
 
-    public FilterExpressionList(FilterExprPath pathPrefix, FilterExpressionList<T> original) {
-      super(null, original.expr, null, original.getUnderlyingList());
-      this.pathPrefix = pathPrefix;
-      this.rootQuery = original.rootQuery;
-    }
-    
-    public FilterExpressionList(FilterExprPath pathPrefix, ExpressionFactory expr, Query<T> rootQuery) {
-        super(null, expr, null);
-        this.pathPrefix = pathPrefix;
-        this.rootQuery = rootQuery;
-    }
-    
-    public SpiExpressionList<?> trimPath(int prefixTrim) {
-        return new FilterExpressionList<T>(pathPrefix.trimPath(prefixTrim), this);
-    }
-    
-    public FilterExprPath getPathPrefix() {
-        return pathPrefix;
-    }
+  private final FilterExprPath pathPrefix;
 
-    private String notAllowedMessage = "This method is not allowed on a filter";
-        
-    public ExpressionList<T> filterMany(String prop) {
-        return rootQuery.filterMany(prop);
-    }
-    
-    public FutureIds<T> findFutureIds() {
-        return rootQuery.findFutureIds();
-    }
+  public FilterExpressionList(FilterExprPath pathPrefix, FilterExpressionList<T> original) {
+    super(null, original.expr, null, original.getUnderlyingList());
+    this.pathPrefix = pathPrefix;
+    this.rootQuery = original.rootQuery;
+  }
 
-    public FutureList<T> findFutureList() {
-        return rootQuery.findFutureList();
-    }
+  public FilterExpressionList(FilterExprPath pathPrefix, ExpressionFactory expr, Query<T> rootQuery) {
+    super(null, expr, null);
+    this.pathPrefix = pathPrefix;
+    this.rootQuery = rootQuery;
+  }
 
-    public FutureRowCount<T> findFutureRowCount() {
-        return rootQuery.findFutureRowCount();
-    }
+  @Override
+  public SpiExpressionList<?> trimPath(int prefixTrim) {
+    return new FilterExpressionList<T>(pathPrefix.trimPath(prefixTrim), this);
+  }
 
-    public List<T> findList() {
-        return rootQuery.findList();
-    }
+  public FilterExprPath getPathPrefix() {
+    return pathPrefix;
+  }
 
-    public Map<?, T> findMap() {
-        return rootQuery.findMap();
-    }
+  private String notAllowedMessage = "This method is not allowed on a filter";
 
-    public int findRowCount() {
-        return rootQuery.findRowCount();
-    }
+  @Override
+  public ExpressionList<T> filterMany(String prop) {
+    return rootQuery.filterMany(prop);
+  }
 
-    public Set<T> findSet() {
-        return rootQuery.findSet();
-    }
+  @Override
+  public FutureIds<T> findFutureIds() {
+    return rootQuery.findFutureIds();
+  }
 
-    public T findUnique() {
-        return rootQuery.findUnique();
-    }
+  @Override
+  public FutureList<T> findFutureList() {
+    return rootQuery.findFutureList();
+  }
 
-    public ExpressionList<T> having() {
-        throw new PersistenceException(notAllowedMessage);        
-    }
+  @Override
+  public FutureRowCount<T> findFutureRowCount() {
+    return rootQuery.findFutureRowCount();
+  }
 
-    public ExpressionList<T> idEq(Object value) {
-        throw new PersistenceException(notAllowedMessage);        
-    }
+  @Override
+  public List<T> findList() {
+    return rootQuery.findList();
+  }
 
-    public ExpressionList<T> idIn(List<?> idValues) {
-        throw new PersistenceException(notAllowedMessage);        
-    }
+  @Override
+  public Map<?, T> findMap() {
+    return rootQuery.findMap();
+  }
 
-    public Query<T> join(String assocProperty, String assocProperties) {
-        throw new PersistenceException(notAllowedMessage);        
-    }
+  @Override
+  public int findRowCount() {
+    return rootQuery.findRowCount();
+  }
 
-    public Query<T> join(String assocProperties) {
-        throw new PersistenceException(notAllowedMessage);        
-    }
+  @Override
+  public Set<T> findSet() {
+    return rootQuery.findSet();
+  }
 
-    public OrderBy<T> order() {
-        return rootQuery.order();
-    }
+  @Override
+  public T findUnique() {
+    return rootQuery.findUnique();
+  }
 
-    public Query<T> order(String orderByClause) {
-        return rootQuery.order(orderByClause);
-    }
+  @Override
+  public ExpressionList<T> having() {
+    throw new PersistenceException(notAllowedMessage);
+  }
 
-    public Query<T> orderBy(String orderBy) {
-        return rootQuery.orderBy(orderBy);
-    }
+  @Override
+  public ExpressionList<T> idEq(Object value) {
+    throw new PersistenceException(notAllowedMessage);
+  }
 
-    public Query<T> query() {
-        return rootQuery;
-    }
+  @Override
+  public ExpressionList<T> idIn(List<?> idValues) {
+    throw new PersistenceException(notAllowedMessage);
+  }
 
-    public Query<T> select(String properties) {
-        throw new PersistenceException(notAllowedMessage);        
-    }
+  @Override
+  public OrderBy<T> order() {
+    return rootQuery.order();
+  }
 
-    public Query<T> setFirstRow(int firstRow) {
-        return rootQuery.setFirstRow(firstRow);
-    }
+  @Override
+  public Query<T> order(String orderByClause) {
+    return rootQuery.order(orderByClause);
+  }
 
-    public Query<T> setMapKey(String mapKey) {
-        return rootQuery.setMapKey(mapKey);
-    }
+  @Override
+  public Query<T> orderBy(String orderBy) {
+    return rootQuery.orderBy(orderBy);
+  }
 
-    public Query<T> setMaxRows(int maxRows) {
-        return rootQuery.setMaxRows(maxRows);
-    }
+  @Override
+  public Query<T> query() {
+    return rootQuery;
+  }
 
-    public Query<T> setUseCache(boolean useCache) {
-        return rootQuery.setUseCache(useCache);
-    }
+  @Override
+  public Query<T> select(String properties) {
+    throw new PersistenceException(notAllowedMessage);
+  }
 
-    public ExpressionList<T> where() {
-        return rootQuery.where();
-    }
+  @Override
+  public Query<T> setFirstRow(int firstRow) {
+    return rootQuery.setFirstRow(firstRow);
+  }
 
-    
+  @Override
+  public Query<T> setMapKey(String mapKey) {
+    return rootQuery.setMapKey(mapKey);
+  }
+
+  @Override
+  public Query<T> setMaxRows(int maxRows) {
+    return rootQuery.setMaxRows(maxRows);
+  }
+
+  @Override
+  public Query<T> setUseCache(boolean useCache) {
+    return rootQuery.setUseCache(useCache);
+  }
+
+  @Override
+  public ExpressionList<T> where() {
+    return rootQuery.where();
+  }
+
+
 }

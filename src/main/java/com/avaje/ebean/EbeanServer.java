@@ -545,19 +545,20 @@ public interface EbeanServer {
   public <T> FutureIds<T> findFutureIds(Query<T> query, Transaction transaction);
 
   /**
-   * Execute find list query in a background thread.
+   * Execute find list query in a background thread returning a FutureList object.
    * <p>
    * This returns a Future object which can be used to cancel, check the
-   * execution status (isDone etc) and get the value (with or without a
-   * timeout).
-   * </p>
-   * 
+   * execution status (isDone etc) and get the value (with or without a timeout).
+   * <p>
+   * This query will execute in it's own PersistenceContext and using its own transaction.
+   * What that means is that it will not share any bean instances with other queries.
+   *
+   *
    * @param query
    *          the query to execute in the background
    * @param transaction
    *          the transaction (can be null).
    * @return a Future object for the list result of the query
-   * @deprecated
    */
   public <T> FutureList<T> findFutureList(Query<T> query, Transaction transaction);
 
@@ -568,13 +569,12 @@ public interface EbeanServer {
    * execution status (isDone etc) and get the value (with or without a
    * timeout).
    * </p>
-   * 
+   *
    * @param query
    *          the query to execute in the background
    * @param transaction
    *          the transaction (can be null).
    * @return a Future object for the list result of the query
-   * @deprecated 
    */
   public SqlFutureList findFutureList(SqlQuery query, Transaction transaction);
 

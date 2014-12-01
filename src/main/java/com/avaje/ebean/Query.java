@@ -676,11 +676,11 @@ public interface Query<T> extends Serializable {
   /**
    * Execute find list query in a background thread.
    * <p>
-   * Deprecated with a view to simplifying internals.
+   * This query will execute in it's own PersistenceContext and using its own transaction.
+   * What that means is that it will not share any bean instances with other queries.
    * </p>
-   * 
+   *
    * @return a Future object for the list result of the query
-   * @deprecated
    */
   public FutureList<T> findFutureList();
 

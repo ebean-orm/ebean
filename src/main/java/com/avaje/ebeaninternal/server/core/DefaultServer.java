@@ -1317,24 +1317,14 @@ public final class DefaultServer implements SpiEbeanServer {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setFutureFetch(true);
 
-    // transfer the persistence content from the transaction
-    if (spiQuery.getPersistenceContext() == null) {
-      if (t != null) {
-        spiQuery.setPersistenceContext(((SpiTransaction) t).getPersistenceContext());
-      } else {
-        SpiTransaction st = getCurrentServerTransaction();
-        if (st != null) {
-          spiQuery.setPersistenceContext(st.getPersistenceContext());
-        }
-      }
-    }
+    // FutureList query always run in it's own persistence content
+    spiQuery.setPersistenceContext(new DefaultPersistenceContext());
 
     // Create a new transaction solely to execute the findList() at some future time
     Transaction newTxn = createTransaction();
     CallableQueryList<T> call = new CallableQueryList<T>(this, spiQuery, newTxn);
     QueryFutureList<T> queryFuture = new QueryFutureList<T>(call);
     backgroundExecutor.execute(queryFuture.getFutureTask());
-
     return queryFuture;
   }
 

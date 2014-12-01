@@ -1,7 +1,11 @@
 package com.avaje.ebean;
 
+import javax.persistence.PersistenceException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * FutureList represents the result of a background query execution that will
@@ -15,13 +19,13 @@ import java.util.concurrent.Future;
  * A simple example:
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  *  // create a query to find all orders
- * Query&lt;Order&gt; query = Ebean.find(Order.class);
+ * Query<Order> query = Ebean.find(Order.class);
  * 
  *  // execute the query in a background thread
  *  // immediately returning the futureList
- * FutureList&lt;Order&gt; futureList = query.findFutureList();
+ * FutureList<Order> futureList = query.findFutureList();
  * 
  *  // do something else ... 
  * 
@@ -35,13 +39,11 @@ import java.util.concurrent.Future;
  * 
  * if (!futureList.isCancelled()){
  * 	// wait for the query to finish and return the list
- * 	List&lt;Order&gt; list = futureList.get();
+ * 	List<Order> list = futureList.get();
  * 	...
  * }
  * 
- * </pre>
- * 
- * @author rbygrave
+ * }</pre>
  */
 public interface FutureList<T> extends Future<List<T>> {
 
@@ -49,5 +51,26 @@ public interface FutureList<T> extends Future<List<T>> {
    * Return the query that is being executed by a background thread.
    */
   public Query<T> getQuery();
+
+  /**
+   * Same as {@link #get()} but wraps InterruptedException and ExecutionException in the
+   * unchecked PersistenceException.
+   *
+   * @return The query list result
+   *
+   * @throws PersistenceException when a InterruptedException or ExecutionException occurs.
+   */
+  public List<T> getUnchecked();
+
+  /**
+   * Same as {@link #get(long, java.util.concurrent.TimeUnit)} but wraps InterruptedException
+   * and ExecutionException in the unchecked PersistenceException.
+   *
+   * @return The query list result
+   *
+   * @throws TimeoutException if the wait timed out
+   * @throws PersistenceException if a InterruptedException or ExecutionException occurs.
+   */
+  public List<T> getUnchecked(long timeout, TimeUnit unit) throws TimeoutException;
 
 }
