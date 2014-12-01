@@ -76,11 +76,6 @@ public class ServerConfig {
   private String resourceDirectory;
 
   /**
-   * The enhance log level. Used with subclass generation.
-   */
-  private int enhanceLogLevel;
-
-  /**
    * Set to true to register this EbeanServer with the Ebean singleton.
    */
   private boolean register = true;
@@ -558,20 +553,6 @@ public class ServerConfig {
    */
   public void setServerCacheManager(ServerCacheManager serverCacheManager) {
     this.serverCacheManager = serverCacheManager;
-  }
-
-  /**
-   * Return the log level used for "subclassing" enhancement.
-   */
-  public int getEnhanceLogLevel() {
-    return enhanceLogLevel;
-  }
-
-  /**
-   * Set the log level used for "subclassing" enhancement.
-   */
-  public void setEnhanceLogLevel(int enhanceLogLevel) {
-    this.enhanceLogLevel = enhanceLogLevel;
   }
 
   /**
