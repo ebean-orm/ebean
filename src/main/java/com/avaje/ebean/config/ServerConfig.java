@@ -145,7 +145,7 @@ public class ServerConfig {
   /** 
    * The default batch size for lazy loading 
    */
-  private int lazyLoadBatchSize = 1;
+  private int lazyLoadBatchSize = 10;
 
   /** 
    * The default batch size for 'query joins'.
