@@ -40,7 +40,7 @@ public abstract class SequenceIdGenerator implements IdGenerator {
 
   protected final BackgroundExecutor backgroundExecutor;
 
-  protected final ArrayList<Integer> idList = new ArrayList<Integer>(50);
+  protected final ArrayList<Long> idList = new ArrayList<Long>(50);
 
   protected int batchSize;
 
@@ -117,7 +117,7 @@ public abstract class SequenceIdGenerator implements IdGenerator {
       if (idList.size() == 0) {
         loadMoreIds(batchSize, t);
       }
-      Integer nextId = idList.remove(0);
+      Long nextId = idList.remove(0);
 
       if (batchSize > 1) {
         if (idList.size() <= batchSize / 2) {
@@ -158,7 +158,7 @@ public abstract class SequenceIdGenerator implements IdGenerator {
 
   protected void loadMoreIds(final int numberToLoad, Transaction t) {
 
-    ArrayList<Integer> newIds = getMoreIds(numberToLoad, t);
+    ArrayList<Long> newIds = getMoreIds(numberToLoad, t);
 
     if (logger.isDebugEnabled()) {
       logger.debug("... seq:" + seqName + " loaded:" + numberToLoad + " ids:" + newIds);
@@ -174,11 +174,11 @@ public abstract class SequenceIdGenerator implements IdGenerator {
   /**
    * Get more Id's by executing a query and reading the Id's returned.
    */
-  protected ArrayList<Integer> getMoreIds(int loadSize, Transaction t) {
+  protected ArrayList<Long> getMoreIds(int loadSize, Transaction t) {
 
     String sql = getSql(loadSize);
 
-    ArrayList<Integer> newIds = new ArrayList<Integer>(loadSize);
+    ArrayList<Long> newIds = new ArrayList<Long>(loadSize);
 
     boolean useTxnConnection = t != null;
 
@@ -191,12 +191,10 @@ public abstract class SequenceIdGenerator implements IdGenerator {
       pstmt = c.prepareStatement(sql);
       rset = pstmt.executeQuery();
       while (rset.next()) {
-        int val = rset.getInt(1);
-        newIds.add(Integer.valueOf(val));
+        newIds.add(rset.getLong(1));
       }
       if (newIds.size() == 0) {
-        String m = "Always expecting more than 1 row from " + sql;
-        throw new PersistenceException(m);
+        throw new PersistenceException("Always expecting more than 1 row from " + sql);
       }
 
       return newIds;

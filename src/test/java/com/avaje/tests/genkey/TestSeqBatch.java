@@ -26,10 +26,12 @@ public class TestSeqBatch extends BaseTestCase {
 	
 			Object id = d.nextId(null);
 			Assert.assertNotNull(id);
-			
+      //System.out.println(id);
+
 			for (int i = 0; i < 16; i++) {
 				Object id2 = d.nextId(null);
-				Assert.assertNotNull(id2);		
+				Assert.assertNotNull(id2);
+        //System.out.println(id2);
 			}
 		}
 	}
