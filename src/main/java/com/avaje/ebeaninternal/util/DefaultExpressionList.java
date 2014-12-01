@@ -143,10 +143,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return query.findFutureList();
   }
 
-  public PagingList<T> findPagingList(int pageSize) {
-    return query.findPagingList(pageSize);
-  }
-
   @Override
   public PagedList<T> findPagedList(int pageIndex, int pageSize) {
     return query.findPagedList(pageIndex, pageSize);

@@ -963,10 +963,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return server.findFutureRowCount(this, null);
   }
 
-  public PagingList<T> findPagingList(int pageSize) {
-    return server.findPagingList(this, null, pageSize);
-  }
-
   @Override
   public PagedList<T> findPagedList(int pageIndex, int pageSize) {
     return server.findPagedList(this, null, pageIndex, pageSize);

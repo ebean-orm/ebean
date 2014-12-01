@@ -247,10 +247,6 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
     return exprList.findMap(keyProperty, keyType);
   }
-
-  public PagingList<T> findPagingList(int pageSize) {
-    return exprList.findPagingList(pageSize);
-  }
   
   @Override
   public PagedList<T> findPagedList(int pageIndex, int pageSize) {

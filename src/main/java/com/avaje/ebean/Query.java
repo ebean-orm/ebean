@@ -685,13 +685,6 @@ public interface Query<T> extends Serializable {
   public FutureList<T> findFutureList();
 
   /**
-   * This is being deprecated in favour of the simplier {@link Query#findPagedList(int, int)}.
-   * 
-   * @deprecated
-   */
-  public PagingList<T> findPagingList(int pageSize);
-
-  /**
    * Return a PagedList for this query.
    * <p>
    * The benefit of using this over just using the normal {@link Query#setFirstRow(int)} and

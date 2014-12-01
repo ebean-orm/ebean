@@ -579,13 +579,6 @@ public interface EbeanServer {
   public SqlFutureList findFutureList(SqlQuery query, Transaction transaction);
 
   /**
-   * Find using a PagingList with explicit transaction and pageSize.
-   * Deprecated in favour of findPagedList().
-   * @deprecated 
-   */  
-  public <T> PagingList<T> findPagingList(Query<T> query, Transaction transaction, int pageSize);
-
-  /**
    * Return a PagedList for this query.
    * <p>
    * The benefit of using this over just using the normal {@link Query#setFirstRow(int)} and

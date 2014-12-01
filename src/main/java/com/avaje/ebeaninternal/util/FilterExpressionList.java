@@ -1,21 +1,13 @@
 package com.avaje.ebeaninternal.util;
 
+import com.avaje.ebean.*;
+import com.avaje.ebeaninternal.api.SpiExpressionList;
+import com.avaje.ebeaninternal.server.expression.FilterExprPath;
+
+import javax.persistence.PersistenceException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.persistence.PersistenceException;
-
-import com.avaje.ebean.ExpressionFactory;
-import com.avaje.ebean.ExpressionList;
-import com.avaje.ebean.FutureIds;
-import com.avaje.ebean.FutureList;
-import com.avaje.ebean.FutureRowCount;
-import com.avaje.ebean.OrderBy;
-import com.avaje.ebean.PagingList;
-import com.avaje.ebean.Query;
-import com.avaje.ebeaninternal.api.SpiExpressionList;
-import com.avaje.ebeaninternal.server.expression.FilterExprPath;
 
 public class FilterExpressionList<T> extends DefaultExpressionList<T> {
 
@@ -69,10 +61,6 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
 
     public Map<?, T> findMap() {
         return rootQuery.findMap();
-    }
-
-    public PagingList<T> findPagingList(int pageSize) {
-        return rootQuery.findPagingList(pageSize);
     }
 
     public int findRowCount() {

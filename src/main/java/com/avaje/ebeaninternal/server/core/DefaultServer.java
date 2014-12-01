@@ -1338,28 +1338,6 @@ public final class DefaultServer implements SpiEbeanServer {
     return queryFuture;
   }
 
-  public <T> PagingList<T> findPagingList(Query<T> query, Transaction t, int pageSize) {
-
-    SpiQuery<T> spiQuery = (SpiQuery<T>) query;
-
-    // we want to use a single PersistenceContext to be used
-    // for all the paging queries so we make sure there is a
-    // PersistenceContext on the query
-    PersistenceContext pc = spiQuery.getPersistenceContext();
-    if (pc == null) {
-      SpiTransaction currentTransaction = getCurrentServerTransaction();
-      if (currentTransaction != null) {
-        pc = currentTransaction.getPersistenceContext();
-      }
-      if (pc == null) {
-        pc = new DefaultPersistenceContext();
-      }
-      spiQuery.setPersistenceContext(pc);
-    }
-
-    return new LimitOffsetPagingQuery<T>(this, spiQuery, pageSize);
-  }
-
   @Override
   public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction, int pageIndex, int pageSize) {
     

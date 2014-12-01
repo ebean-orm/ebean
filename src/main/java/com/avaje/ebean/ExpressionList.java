@@ -209,25 +209,6 @@ public interface ExpressionList<T> extends Serializable {
   public FutureList<T> findFutureList();
 
   /**
-   * Return a PagingList for this query.
-   * <p>
-   * This can be used to break up a query into multiple queries to fetch the
-   * data a page at a time.
-   * </p>
-   * <p>
-   * This typically works by using a query per page and setting
-   * {@link Query#setFirstRow(int)} and and {@link Query#setMaxRows(int)} on the
-   * query. This usually would translate into SQL that uses limit offset, rownum
-   * or row_number function to limit the result set.
-   * </p>
-   * 
-   * @param pageSize
-   *          the number of beans fetched per Page
-   * @deprecated
-   */
-  public PagingList<T> findPagingList(int pageSize);
-
-  /**
    * Return a PagedList for this query.
    * <p>
    * The benefit of using this over just using the normal {@link Query#setFirstRow(int)} and
