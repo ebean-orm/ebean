@@ -248,10 +248,12 @@ public abstract class Model {
       return new Finder<I, T>(server, idType, type);
     }
 
-    // Does not exist yet but I think should
-    // public void deleteById(I id) {
-    // return db().deleteById(type, id);
-    // }
+    /**
+     * Delete a bean by Id.
+     */
+    public void deleteById(I id) {
+      db().delete(type, id);
+    }
 
     /**
      * Retrieves all entities of the given type.

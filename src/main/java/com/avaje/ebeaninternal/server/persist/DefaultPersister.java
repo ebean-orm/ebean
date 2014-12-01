@@ -455,7 +455,11 @@ public final class DefaultPersister implements Persister {
 		// delete the bean(s)
 		SqlUpdate deleteById = descriptor.deleteById(id, idList);
 		if (t.isLogSummary()) {
-			t.logSummary("-- Deleting " + descriptor.getName() + " Ids" + idList);
+      if (idList != null) {
+        t.logSummary("-- Deleting " + descriptor.getName() + " Ids: " + idList);
+      } else {
+        t.logSummary("-- Deleting " + descriptor.getName() + " Id: " + id);
+      }
 		}
 
 		// use Id's to update L2 cache rather than Bulk table event
