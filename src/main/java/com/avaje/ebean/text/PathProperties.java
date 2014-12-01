@@ -19,9 +19,6 @@ import com.avaje.ebean.Query;
  * properties and applying that to both what to fetch (ORM query) and what to
  * render (JAX-RS JSON / XML).
  * </p>
- * 
- * @author rbygrave
- * 
  */
 public class PathProperties {
 

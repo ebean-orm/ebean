@@ -138,14 +138,52 @@ public class DJsonContext implements JsonContext {
     }
   }
 
-  public void toJson(Object o, Writer writer) throws JsonIOException {
-    toJson(o, writer, null);
+  @Override
+  public void toJson(Object value, JsonGenerator generator) throws JsonIOException {
+    // generator passed in so don't close it
+    toJsonNoClose(value, generator, null);
   }
 
+  @Override
+  public void toJson(Object value, JsonGenerator generator, PathProperties pathProperties) throws JsonIOException {
+    // generator passed in so don't close it
+    toJsonNoClose(value, generator, JsonWriteOptions.pathProperties(pathProperties));
+  }
 
+  @Override
+  public void toJson(Object o, JsonGenerator generator, JsonWriteOptions options) throws JsonIOException {
+    // generator passed in so don't close it
+    toJsonNoClose(o, generator, options);
+  }
+
+  @Override
+  public void toJson(Object o, Writer writer) throws JsonIOException {
+    // close generator
+    toJsonWithClose(o, createGenerator(writer), null);
+  }
+
+  @Override
+  public String toJson(Object value, PathProperties pathProperties) throws JsonIOException {
+    return toJson(value, JsonWriteOptions.pathProperties(pathProperties));
+  }
+
+  @Override
+  public void toJson(Object o, Writer writer, PathProperties pathProperties) throws JsonIOException {
+    // close generator
+    toJsonWithClose(o, createGenerator(writer), JsonWriteOptions.pathProperties(pathProperties));
+  }
+
+  @Override
   public void toJson(Object o, Writer writer, JsonWriteOptions options) throws JsonIOException {
+    // close generator
+    toJsonWithClose(o, createGenerator(writer), options);
+  }
+
+  /**
+   * Write to the JsonGenerator and close when complete.
+   */
+  private void toJsonWithClose(Object o, JsonGenerator generator, JsonWriteOptions options) throws JsonIOException {
     try {
-      JsonGenerator generator = createGenerator(writer);
       toJsonInternal(o, generator, options);
       generator.close();
     } catch (IOException e) {
@@ -153,19 +191,32 @@ public class DJsonContext implements JsonContext {
     }
   }
 
+  /**
+   * Write to the JsonGenerator and without closing it (as it was created externally).
+   */
+  private void toJsonNoClose(Object o, JsonGenerator generator, JsonWriteOptions options) throws JsonIOException {
+    try {
+      toJsonInternal(o, generator, options);
+    } catch (IOException e) {
+      throw new JsonIOException(e);
+    }
+  }
+
+  @Override
   public String toJson(Object o) throws JsonIOException {
     return toJsonString(o, null);
   }
 
+  @Override
   public String toJson(Object o, JsonWriteOptions options) throws JsonIOException {
     return toJsonString(o, options);
   }
 
-  private String toJsonString(Object o, JsonWriteOptions options) throws JsonIOException {
+  private String toJsonString(Object value, JsonWriteOptions options) throws JsonIOException {
     try {
       StringWriter writer = new StringWriter(500);
       JsonGenerator gen = createGenerator(writer);
-      toJsonInternal(o, gen, options);
+      toJsonInternal(value, gen, options);
       gen.close();
       return writer.toString();
     } catch (IOException e) {
@@ -174,29 +225,29 @@ public class DJsonContext implements JsonContext {
   }
 
   @SuppressWarnings("unchecked")
-  private void toJsonInternal(Object o, JsonGenerator gen, JsonWriteOptions options) throws IOException {
+  private void toJsonInternal(Object value, JsonGenerator gen, JsonWriteOptions options) throws IOException {
 
-    if (o == null) {
+    if (value == null) {
       gen.writeNull();
-    } else if (o instanceof Number) {
-      gen.writeNumber(((Number) o).doubleValue());
-    } else if (o instanceof Boolean) {
-      gen.writeBoolean((Boolean) o);
-    } else if (o instanceof String) {
-      gen.writeString((String) o);
+    } else if (value instanceof Number) {
+      gen.writeNumber(((Number) value).doubleValue());
+    } else if (value instanceof Boolean) {
+      gen.writeBoolean((Boolean) value);
+    } else if (value instanceof String) {
+      gen.writeString((String) value);
 
       // } else if (o instanceof JsonElement) {
 
-    } else if (o instanceof Map<?, ?>) {
-      toJsonFromMap((Map<Object, Object>) o, gen, options);
+    } else if (value instanceof Map<?, ?>) {
+      toJsonFromMap((Map<Object, Object>) value, gen, options);
 
-    } else if (o instanceof Collection<?>) {
-      toJsonFromCollection((Collection<?>) o, null, gen, options);
+    } else if (value instanceof Collection<?>) {
+      toJsonFromCollection((Collection<?>) value, null, gen, options);
 
-    } else if (o instanceof EntityBean) {
-      BeanDescriptor<?> d = getDescriptor(o.getClass());
+    } else if (value instanceof EntityBean) {
+      BeanDescriptor<?> d = getDescriptor(value.getClass());
       WriteJson writeJson = createWriteJson(gen, options);
-      d.jsonWrite(writeJson, (EntityBean) o, null);
+      d.jsonWrite(writeJson, (EntityBean) value, null);
     }
   }
 

@@ -67,15 +67,14 @@ public class TestJsonMap extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    PathProperties pathProperties = PathProperties.parse("(id,status,name,shippingAddress(id,line1,city),billingAddress(*),contacts(*))");
+    PathProperties pathProperties =
+            PathProperties.parse("(id,status,name,shippingAddress(id,line1,city),billingAddress(*),contacts(*))");
 
     List<Customer> customers = Ebean.find(Customer.class)
         .apply(pathProperties)
         .findList();
 
-    JsonWriteOptions options = JsonWriteOptions.parsePath("(id,status,name)");
-
-    String jsonString = Ebean.json().toJson(customers, options);
+    String jsonString = Ebean.json().toJson(customers, pathProperties);
     System.out.println(jsonString);
 
 

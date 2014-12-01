@@ -1,5 +1,6 @@
 package com.avaje.ebean.text.json;
 
+import com.avaje.ebean.text.PathProperties;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 
@@ -58,37 +59,68 @@ public interface JsonContext {
   public Object toObject(Type genericType, String json) throws JsonIOException;
 
   /**
-   * Write the bean or collection in JSON format to the writer with default
-   * options.
-   *
-   * @param value  the bean or collection of beans to write
-   * @param writer used to write the json output to
-   * @throws JsonIOException When IOException occurs
-   */
-  public void toJson(Object value, Writer writer) throws JsonIOException;
-
-  /**
-   * With additional options to specify JsonValueAdapter and
-   * JsonWriteBeanVisitor's.
-   *
-   * @param value   the bean or collection of beans to write
-   * @param writer  used to write the json output to
-   * @param options additional options to control the JSON output
-   * @throws JsonIOException When IOException occurs
-   */
-  public void toJson(Object value, Writer writer, JsonWriteOptions options) throws JsonIOException;
-
-  /**
-   * Convert a bean or collection to json string using default options.
+   * Return the bean or collection as JSON string.
    *
    * @throws JsonIOException When IOException occurs
    */
   public String toJson(Object value) throws JsonIOException;
 
   /**
+   * Write the bean or collection in JSON format to the writer.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  public void toJson(Object value, Writer writer) throws JsonIOException;
+
+  /**
+   * Write the bean or collection to the JsonGenerator.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  public void toJson(Object value, JsonGenerator generator) throws JsonIOException;
+
+  /**
+   * Return the bean or collection as JSON string using PathProperties.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  public String toJson(Object value, PathProperties pathProperties) throws JsonIOException;
+
+  /**
+   * Write the bean or collection as json to the writer using the PathProperties.
+   */
+  public void toJson(Object value, Writer writer, PathProperties pathProperties) throws JsonIOException;
+
+  /**
+   * Write the bean or collection to the JsonGenerator using the PathProperties.
+   */
+  public void toJson(Object value, JsonGenerator generator, PathProperties pathProperties) throws JsonIOException;
+
+  /**
+   * Deprecated in favour of using PathProperties by itself.
+   * Write json to the JsonGenerator using the JsonWriteOptions.
+   *
+   * @deprecated
+   */
+  public void toJson(Object value, JsonGenerator generator, JsonWriteOptions options) throws JsonIOException;
+
+  /**
+   * Deprecated in favour of using PathProperties by itself.
+   * With additional options.
+   *
+   * @throws JsonIOException When IOException occurs
+   *
+   * @deprecated
+   */
+  public void toJson(Object value, Writer writer, JsonWriteOptions options) throws JsonIOException;
+
+  /**
+   * Deprecated in favour of using PathProperties by itself.
    * Convert a bean or collection to json string.
    *
    * @throws JsonIOException When IOException occurs
+   *
+   * @deprecated
    */
   public String toJson(Object value, JsonWriteOptions options) throws JsonIOException;
 
