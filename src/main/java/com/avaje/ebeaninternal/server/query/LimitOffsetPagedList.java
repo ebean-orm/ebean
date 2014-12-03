@@ -28,6 +28,8 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
 
   private final Monitor monitor = new Monitor();
 
+  private int foregroundTotalRowCount = -1;
+
   private Future<Integer> futureRowCount;
 
   private List<T> list;
@@ -51,13 +53,12 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
       return futureRowCount;
     }
   }
-  
+
   public List<T> getList() {
     synchronized (monitor) {
       if (list == null) {
         query.setFirstRow(pageIndex * pageSize);
         query.setMaxRows(pageSize);
-
         list = server.findList(query, null);
       }
       return list;
@@ -75,10 +76,21 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
   }
 
   public int getTotalRowCount() {
-    try {
-      return getFutureRowCount().get();
-    } catch (Exception e) {
-      throw new PersistenceException(e);
+    synchronized (monitor) {
+      if (futureRowCount != null) {
+        try {
+          // background query already initiated so get it with a wait
+          return futureRowCount.get();
+        } catch (Exception e) {
+          throw new PersistenceException(e);
+        }
+      }
+      // already fetched?
+      if (foregroundTotalRowCount > -1) return foregroundTotalRowCount;
+
+      // just using foreground thread
+      foregroundTotalRowCount = server.findRowCount(query, null);
+      return foregroundTotalRowCount;
     }
   }
 

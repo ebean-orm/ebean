@@ -90,6 +90,13 @@
     </dependency>
 
     <dependency>
+      <groupId>com.squareup.okhttp</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>2.1.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.avaje</groupId>
       <artifactId>avaje-agentloader</artifactId>
       <version>1.1.1</version>
@@ -241,8 +248,27 @@
           <doctitle>Ebean 4</doctitle>
           <overview>src/main/java/com/avaje/ebean/overview.html</overview>
          <!-- <excludePackageNames>com.avaje.ebeaninternal.*:com.avaje.ebean.util</excludePackageNames> -->
-          <additionalparam>-Xdoclint:none</additionalparam>
+          <!--<additionalparam>-Xdoclint:none</additionalparam>-->
+          <source>1.8</source>
+          <doclet>org.avaje.doclet.PygmentsDoclet</doclet>
+          <excludePackageNames>com.avaje.ebeaninternal.*:com.avaje.ebean.util</excludePackageNames>
+          <docletArtifact>
+            <groupId>org.avaje</groupId>
+            <artifactId>pygments-doclet</artifactId>
+            <version>1.0.0</version>
+          </docletArtifact>
+          <additionalparam>
+            -Xdoclint:none
+            -include-basedir ${project.basedir}
+            -attributes "idseparator=-; project_name=${project.name}; \
+            project_version=${project.version}; \
+            project_desc=${project.description}"
+          </additionalparam>
+          <linksource>true</linksource>
+          <overview>src/main/java/com/avaje/ebean/overview.html</overview>
+
         </configuration>
+
         <executions>
           <execution>
             <id>attach-javadocs</id>
