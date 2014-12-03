@@ -523,20 +523,53 @@ public interface EbeanServer {
    *
    * <pre>{@code
    *
-   *   // start a transaction (stored in a ThreadLocal)
-   *   ebeanServer.beginTransaction();
-   *   try {
-   * 	   Order order = ebeanServer.find(Order.class,10); ...
+   *    // start a transaction (stored in a ThreadLocal)
+   *    ebeanServer.beginTransaction();
+   *    try {
+   * 	    Order order = ebeanServer.find(Order.class,10);
    *
-   * 	   ebeanServer.save(order);
+   * 	    ebeanServer.save(order);
    *
-   * 	   ebeanServer.commitTransaction();
+   * 	    ebeanServer.commitTransaction();
    *
-   *   } finally {
-   * 	   // rollback if we didn't commit
-   * 	   // i.e. an exception occurred before commitTransaction().
-   * 	   ebeanServer.endTransaction();
-   *   }
+   *    } finally {
+   * 	    // rollback if we didn't commit
+   * 	    // i.e. an exception occurred before commitTransaction().
+   * 	    ebeanServer.endTransaction();
+   *    }
+   *
+   * }</pre>
+   *
+   * <h3>Transaction options:</h3>
+   * <pre>{@code
+   *
+   *     Transaction txn = ebeanServer.beginTransaction();
+   *     try {
+   *       // explicitly turn on/off JDBC batch use
+   *       txn.setBatchMode(true);
+   *       txn.setBatchSize(50);
+   *
+   *       // control flushing when mixing save and queries
+   *       txn.setBatchFlushOnQuery(false);
+   *
+   *       // turn off persist cascade if needed
+   *       txn.setPersistCascade(false);
+   *
+   *       // for large batch insert processing when we do not
+   *       // ... need the generatedKeys, don't get them
+   *       txn.setBatchGetGeneratedKeys(false);
+   *
+   *       // explicitly flush the JDBC batch buffer
+   *       txn.flushBatch();
+   *
+   *       ...
+   *
+   *       txn.commit();
+   *
+   *    } finally {
+   *       // rollback if necessary
+   *       txn.end();
+   *    }
    *
    * }</pre>
    *
@@ -1587,18 +1620,18 @@ public interface EbeanServer {
    *
    * <pre>{@code
    *
-   *   ebeanServer.execute(new TxRunnable() {
-   *     public void run() {
-   *       User u1 = ebeanServer.find(User.class, 1);
-   *       User u2 = ebeanServer.find(User.class, 2);
+   *    ebeanServer.execute(new TxRunnable() {
+   *      public void run() {
+   *        User u1 = ebeanServer.find(User.class, 1);
+   *        User u2 = ebeanServer.find(User.class, 2);
    *
-   *       u1.setName("u1 mod");
-   *       u2.setName("u2 mod");
+   *        u1.setName("u1 mod");
+   *        u2.setName("u2 mod");
    *
-   *       ebeanServer.save(u1);
-   *       ebeanServer.save(u2);
-   *     }
-   *   });
+   *        ebeanServer.save(u1);
+   *        ebeanServer.save(u2);
+   *      }
+   *    });
    *
    * }</pre>
    */

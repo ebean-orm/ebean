@@ -33,28 +33,29 @@ import com.avaje.ebean.TxType;
  * change the setting to be consistent with EJB/Spring if people wish to do so.
  * </p>
  * 
- * <pre class="code">
- * 
+ * <pre>{@code
+ *
  *  // a normal class
- * public class MySimpleUserService {
+ *  public class MySimpleUserService {
  * 
- *  // this method is transactional automatically handling 
- *  // transaction begin, commit and rollback etc
- *  &#064;Transactional
- *  public void runInTrans() throws IOException {
+ *    // this method is transactional automatically handling
+ *    // transaction begin, commit and rollback etc
+ *    @Transactional
+ *    public void runInTrans() throws IOException {
  * 
- *    // tasks performed within the transaction
- *    ...
- *    // find some objects
- *    Customer cust = Ebean.find(Customer.class, 1);
+ *      // tasks performed within the transaction
+ *      ...
+ *      // find some objects
+ *      Customer cust = ebeanServer.find(Customer.class, 42);
  *    
- *    Order order = ...;
- *    ...
- *    // save some objects
- *    Ebean.save(customer);
- *    Ebean.save(order);
- *  }
- * </pre>
+ *      Order order = ...;
+ *      ...
+ *      // save some objects
+ *      ebeanServer.save(customer);
+ *      ebeanServer.save(order);
+ *    }
+ *
+ * }</pre>
  */
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
@@ -91,12 +92,12 @@ public @interface Transactional {
   // int timeout() default 0;
 
   /**
-   * The throwable's that will explicitly cause a rollback to occur.
+   * The Throwable's that will explicitly cause a rollback to occur.
    */
   Class<? extends Throwable>[] rollbackFor() default {};
 
   /**
-   * The throwable's that will explicitly NOT cause a rollback to occur.
+   * The Throwable's that will explicitly NOT cause a rollback to occur.
    */
   Class<? extends Throwable>[] noRollbackFor() default {};
 
