@@ -33,7 +33,7 @@ import com.avaje.ebean.config.ServerConfig;
  * </p>
  * <p>
  * A BeanPersistListener is either found automatically via class path search or
- * can be added programmatically via {@link ServerConfig#add(BeanPersistListener<?>)}}.
+ * can be added programmatically via {@link ServerConfig#add(BeanPersistListener)}}.
  * </p>
  * @see ServerConfig#add(BeanPersistListener)
  */

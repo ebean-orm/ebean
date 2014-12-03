@@ -81,10 +81,6 @@ public interface BeanState {
    * {@link EbeanServer#createEntityBean(Class)}, then populate its properties
    * and then call this method specifying which properties where loaded or null
    * for a fully loaded entity bean.
-   * 
-   * @param loadedProperties
-   *          the properties that where loaded or null for a fully loaded entity
-   *          bean.
    */
   public void setLoaded();
 }

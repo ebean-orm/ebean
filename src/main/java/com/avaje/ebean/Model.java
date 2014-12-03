@@ -24,11 +24,94 @@ import javax.persistence.MappedSuperclass;
  * <p>
  * You may choose not use this Model mapped superclass if you don't like the 'Active Record' style
  * or if you believe it 'pollutes' your entity beans.
- * 
+ *
+ * <p>
+ * You can use Dependency Injection like Guice or Spring to construct and wire a EbeanServer instance
+ * and have that same instance used with this Model and Finder. The way that works is that when the
+ * DI container creates the EbeanServer instance it can be registered with the Ebean singleton. In this
+ * way the EbeanServer instance can be injected as per normal Guice / Spring dependency injection and
+ * that same instance also used to support the Model and Finder active record style.
+ *
  * <p>
  * If you choose to use the Model mapped superclass you will probably also chose to additionally add
  * a {@link Finder} as a public static field to complete the active record pattern and provide a
  * relatively nice clean way to write queries.
+ *
+ * <h3>Typical common @MappedSuperclass</h3>
+ * <pre>{@code
+ *
+ *     // Typically there is a common base model that has some
+ *     // common properties like the ones below
+ *
+ *     @MappedSuperclass
+ *     public class BaseModel extends Model {
+ *
+ *       @Id Long id;
+ *
+ *       @Version Long version;
+ *
+ *       @CreatedTimestamp Timestamp whenCreated;
+ *
+ *       @UpdatedTimestamp Timestamp whenUpdated;
+ *
+ *       ...
+ *
+ * }</pre>
+ *
+ * <h3>Extend the Model</h3>
+ * <pre>{@code
+ *
+ *     // Extend the mappedSuperclass
+ *
+ *     @Entity @Table(name="oto_account")
+ *     public class Account extends BaseModel {
+ *
+ *       // add a static Finder
+ *       // ... with Long being the type of our ID property ...
+ *
+ *       public static final Finder<Long,Account> find =
+ *             new Finder<Long,Account>(Long.class, Account.class);
+ *
+ *       String name;
+ *
+ *       @OneToOne(mappedBy = "account",optional = true)
+ *       User user;
+ *
+ *       ...
+ *     }
+ *
+ * }</pre>
+ *
+ * <h3>Modal: save()</h3>
+ * <pre>{@code
+ *
+ *     // Active record style ... save(), delete() etc
+ *     Account account = new Account();
+ *     account.setName("AC234");
+ *
+ *     // save() method inherited from Model
+ *     account.save();
+ *
+ * }</pre>
+ *
+ * <h3>Finder: find byId</h3>
+ * <pre>{@code
+ *
+ *     // find byId
+ *     Account account = Account.find.byId(42);
+ *
+ * }</pre>
+ *
+ * <h3>Finder: find where</h3>
+ * <pre>{@code
+ *
+ *     // find where ...
+ *     List<Account> accounts =
+ *         Account.find
+ *         .where().gt("startDate", lastMonth)
+ *         .findList();
+ *
+ * }</pre>
  */
 @MappedSuperclass
 public abstract class Model {
@@ -105,7 +188,9 @@ public abstract class Model {
    * customer.markAsDirty();
    * customer.save();
    * 
-   * </pre>   
+   * </pre>
+   *
+   * @see EbeanServer#markAsDirty(Object)
    */
   public void markAsDirty() {
     db().markAsDirty(this);
@@ -117,6 +202,8 @@ public abstract class Model {
    * <p>
    * Ebean will detect if this is a new bean or a previously fetched bean and perform either an
    * insert or an update based on that.
+   *
+   * @see EbeanServer#save(Object)
    */
   public void save() {
     db().save(this);
@@ -124,6 +211,8 @@ public abstract class Model {
 
   /**
    * Update this entity.
+   *
+   * @see EbeanServer#update(Object)
    */
   public void update() {
     db().update(this);
@@ -131,6 +220,8 @@ public abstract class Model {
 
   /**
    * Insert this entity.
+   *
+   * @see EbeanServer#insert(Object)
    */
   public void insert() {
     db().insert(this);
@@ -138,6 +229,8 @@ public abstract class Model {
 
   /**
    * Delete this entity.
+   *
+   * @see EbeanServer#delete(Object)
    */
   public void delete() {
     db().delete(this);
@@ -166,6 +259,8 @@ public abstract class Model {
 
   /**
    * Refreshes this entity from the database.
+   *
+   * @see EbeanServer#refresh(Object)
    */
   public void refresh() {
     db().refresh(this);
@@ -250,6 +345,8 @@ public abstract class Model {
 
     /**
      * Delete a bean by Id.
+     * <p>
+     * Equivalent to {@link EbeanServer#delete(Class, Object)}
      */
     public void deleteById(I id) {
       db().delete(type, id);
@@ -306,6 +403,8 @@ public abstract class Model {
 
     /**
      * Creates a query applying the path properties to set the select and fetch clauses.
+     * <p>
+     * Equivalent to {@link Query#apply(com.avaje.ebean.text.PathProperties)}
      */
     public Query<T> apply(PathProperties pathProperties) {
       return db().find(type).apply(pathProperties);
@@ -345,6 +444,8 @@ public abstract class Model {
 
     /**
      * Execute the query consuming each bean one at a time.
+     * <p>
+     * Equivalent to {@link Query#findEachWhile(QueryEachWhileConsumer)}
      * <p>
      * This is similar to #findEach except that you return boolean
      * true to continue processing beans and return false to stop

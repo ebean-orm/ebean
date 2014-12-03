@@ -13,54 +13,57 @@ import java.util.Set;
  * Example: Create the query using the API.
  * </p>
  * 
- * <pre class="code">
- * List&lt;Order&gt; orderList = 
- *   Ebean.find(Order.class)
- *     .fetch(&quot;customer&quot;)
- *     .fetch(&quot;details&quot;)
+ * <pre>{@code
+ *
+ * List<Order> orderList = 
+ *   ebeanServer.find(Order.class)
+ *     .fetch("customer")
+ *     .fetch("details")
  *     .where()
- *       .like(&quot;customer.name&quot;,&quot;rob%&quot;)
- *       .gt(&quot;orderDate&quot;,lastWeek)
- *     .orderBy(&quot;customer.id, id desc&quot;)
+ *       .like("customer.name","rob%")
+ *       .gt("orderDate",lastWeek)
+ *     .orderBy("customer.id, id desc")
  *     .setMaxRows(50)
  *     .findList();
  *   
  * ...
- * </pre>
+ * }</pre>
  * 
  * <p>
  * Example: The same query using the query language
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
+ *
  * String oql = 
- *   	&quot;  find  order &quot;
- *   	+&quot; fetch customer &quot;
- *   	+&quot; fetch details &quot;
- *   	+&quot; where customer.name like :custName and orderDate &gt; :minOrderDate &quot;
- *   	+&quot; order by customer.id, id desc &quot;
- *   	+&quot; limit 50 &quot;;
+ *   	"  find  order "
+ *   	+" fetch customer "
+ *   	+" fetch details "
+ *   	+" where customer.name like :custName and orderDate > :minOrderDate "
+ *   	+" order by customer.id, id desc "
+ *   	+" limit 50 ";
  *   
- * Query&lt;Order&gt; query = Ebean.createQuery(Order.class, oql);
- * query.setParameter(&quot;custName&quot;, &quot;Rob%&quot;);
- * query.setParameter(&quot;minOrderDate&quot;, lastWeek);
+ * Query<Order> query = ebeanServer.createQuery(Order.class, oql);
+ * query.setParameter("custName", "Rob%");
+ * query.setParameter("minOrderDate", lastWeek);
  *   
- * List&lt;Order&gt; orderList = query.findList();
+ * List<Order> orderList = query.findList();
  * ...
- * </pre>
+ * }</pre>
  * 
  * <p>
  * Example: Using a named query called "with.cust.and.details"
  * </p>
  * 
- * <pre class="code">
- * Query&lt;Order&gt; query = Ebean.createNamedQuery(Order.class,&quot;with.cust.and.details&quot;);
- * query.setParameter(&quot;custName&quot;, &quot;Rob%&quot;);
- * query.setParameter(&quot;minOrderDate&quot;, lastWeek);
+ * <pre>{@code
+ *
+ * Query<Order> query = ebeanServer.createNamedQuery(Order.class,"with.cust.and.details");
+ * query.setParameter("custName", "Rob%");
+ * query.setParameter("minOrderDate", lastWeek);
  *   
- * List&lt;Order&gt; orderList = query.findList();
+ * List<Order> orderList = query.findList();
  * ...
- * </pre>
+ * }</pre>
  * 
  * <h3>Autofetch</h3>
  * <p>
@@ -98,13 +101,13 @@ import java.util.Set;
  * Refer to "ALL Properties/Columns" mode of Optimistic Concurrency checking.
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * [ find  {bean type} [ ( * | {fetch properties} ) ] ]
  * [ fetch {associated bean} [ ( * | {fetch properties} ) ] ]
  * [ where {predicates} ]
  * [ order by {order by properties} ]
  * [ limit {max rows} [ offset {first row} ] ]
- * </pre>
+ * }</pre>
  * 
  * <p>
  * <b>FIND</b> <b>{bean type}</b> [ ( <i>*</i> | <i>{fetch properties}</i> ) ]
@@ -160,17 +163,17 @@ import java.util.Set;
  * Find orders fetching all its properties
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * find order
- * </pre>
+ * }</pre>
  * 
  * <p>
  * Find orders fetching all its properties
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * find order (*)
- * </pre>
+ * }</pre>
  * 
  * <p>
  * Find orders fetching its id, shipDate and status properties. Note that the id
@@ -178,30 +181,30 @@ import java.util.Set;
  * properties.
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * find order (shipDate, status)
- * </pre>
+ * }</pre>
  * 
  * <p>
  * Find orders with a named bind variable (that will need to be bound via
  * {@link Query#setParameter(String, Object)}).
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * find order
  * where customer.name like :custLike
- * </pre>
+ * }</pre>
  * 
  * <p>
  * Find orders and also fetch the customer with a named bind parameter. This
  * will fetch and populate both the order and customer objects.
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * find  order
  * fetch customer
  * where customer.id = :custId
- * </pre>
+ * }</pre>
  * 
  * <p>
  * Find orders and also fetch the customer, customer shippingAddress, order
@@ -212,13 +215,13 @@ import java.util.Set;
  * populated.
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * find  order
  * fetch customer (name)
  * fetch customer.shippingAddress
  * fetch details
  * fetch details.product (sku, name)
- * </pre>
+ * }</pre>
  * 
  * <h3>Early parsing of the Query</h3>
  * <p>
@@ -352,19 +355,24 @@ public interface Query<T> extends Serializable {
 
   /**
    * Explicitly set a comma delimited list of the properties to fetch on the
-   * 'main' entity bean (aka partial object). Note that '*' means all
+   * 'main' root level entity bean (aka partial object). Note that '*' means all
    * properties.
+   * <p>
+   * You use {@link #fetch(String, String)} to specify specific properties to fetch
+   * on other non-root level paths of the object graph.
+   * </p>
    *
-   * <pre class="code">
-   * Query&lt;Customer&gt; query = Ebean.createQuery(Customer.class);
+   * <pre>{@code
    *
-   * // Only fetch the customer id, name and status.
-   * // This is described as a &quot;Partial Object&quot;
-   * query.select(&quot;name, status&quot;);
-   * query.where(&quot;lower(name) like :custname&quot;).setParameter(&quot;custname&quot;, &quot;rob%&quot;);
+   * List<Customer> customers =
+   *     ebeanServer.find(Customer.class)
+   *     // Only fetch the customer id, name and status.
+   *     // This is described as a "Partial Object"
+   *     .select("name, status")
+   *     .where.ilike("name", "rob%")
+   *     .findList();
    *
-   * List&lt;Customer&gt; customerList = query.findList();
-   * </pre>
+   * }</pre>
    *
    * @param fetchProperties
    *          the properties to fetch for this bean (* = all properties).
@@ -383,31 +391,35 @@ public interface Query<T> extends Serializable {
    * "Partial Object" - a bean that only has some of its properties populated.
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
+   *
    * // query orders...
-   * Query&lt;Order&gt; query = Ebean.createQuery(Order.class);
+   * List<Order> orders =
+   *     ebeanserver.find(Order.class)
+   *       // fetch the customer...
+   *       // ... getting the customers name and phone number
+   *       .fetch("customer", "name, phoneNumber")
    * 
-   * // fetch the customer...
-   * // ... getting the customer's name and phone number
-   * query.fetch(&quot;customer&quot;, &quot;name, phNumber&quot;);
-   * 
-   * // ... also fetch the customers billing address (* = all properties)
-   * query.fetch(&quot;customer.billingAddress&quot;, &quot;*&quot;);
-   * </pre>
+   *       // ... also fetch the customers billing address (* = all properties)
+   *       .fetch("customer.billingAddress", "*")
+   *       .findList();
+   * }</pre>
    * 
    * <p>
    * If columns is null or "*" then all columns/properties for that path are
    * fetched.
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
+   *
    * // fetch customers (their id, name and status)
-   * Query&lt;Customer&gt; query = Ebean.createQuery(Customer.class);
-   * 
-   * // only fetch some of the properties of the customers
-   * query.select(&quot;name, status&quot;);
-   * List&lt;Customer&gt; list = query.findList();
-   * </pre>
+   * List<Customer> customers =
+   *     ebeanServer.find(Customer.class)
+   *     .select("name, status")
+   *     .fetch("contacts", "firstName,lastName,email")
+   *     .findList();
+   *
+   * }</pre>
    * 
    * @param path
    *          the path of an associated (1-1,1-M,M-1,M-M) bean.
@@ -420,6 +432,17 @@ public interface Query<T> extends Serializable {
   /**
    * Additionally specify a FetchConfig to use a separate query or lazy loading
    * to load this path.
+   *
+   * <pre>{@code
+   *
+   * // fetch customers (their id, name and status)
+   * List<Customer> customers =
+   *     ebeanServer.find(Customer.class)
+   *     .select("name, status")
+   *     .fetch("contacts", "firstName,lastName,email", new FetchConfig().lazy(10))
+   *     .findList();
+   *
+   * }</pre>
    */
   public Query<T> fetch(String assocProperty, String fetchProperties, FetchConfig fetchConfig);
 
@@ -428,7 +451,17 @@ public interface Query<T> extends Serializable {
    * <p>
    * The same as {@link #fetch(String, String)} with the fetchProperties as "*".
    * </p>
-   * 
+   * <pre>{@code
+   *
+   * // fetch customers (their id, name and status)
+   * List<Customer> customers =
+   *     ebeanServer.find(Customer.class)
+   *     // eager fetch the contacts
+   *     .fetch("contacts")
+   *     .findList();
+   *
+   * }</pre>
+   *
    * @param path
    *          the property of an associated (1-1,1-M,M-1,M-M) bean.
    */
@@ -437,6 +470,18 @@ public interface Query<T> extends Serializable {
   /**
    * Additionally specify a JoinConfig to specify a "query join" and or define
    * the lazy loading query.
+   *
+   *
+   * <pre>{@code
+   *
+   * // fetch customers (their id, name and status)
+   * List<Customer> customers =
+   *     ebeanServer.find(Customer.class)
+   *     // lazy fetch contacts with a batch size of 100
+   *     .fetch("contacts", new FetchConfig().lazy(100))
+   *     .findList();
+   *
+   * }</pre>
    */
   public Query<T> fetch(String path, FetchConfig joinConfig);
 
@@ -466,6 +511,10 @@ public interface Query<T> extends Serializable {
    * (typically in a finally block).
    * </p>
    * <p>
+   * findEach() and findEachWhile() are preferred to findIterate() as they ensure
+   * the jdbc statement and resultSet are closed at the end of the iteration.
+   * </p>
+   * <p>
    * This query will execute against the EbeanServer that was used to create it.
    * </p>
    */
@@ -493,6 +542,12 @@ public interface Query<T> extends Serializable {
    * (unlike #findList #findSet etc)
    * </p>
    * <p>
+   * Note that internally Ebean can inform the JDBC driver that it is expecting larger
+   * resultSet and specifically for MySQL this hint is required to stop it's JDBC driver
+   * from buffering the entire resultSet. As such, for smaller resultSets findList() is
+   * generally preferable.
+   * </p>
+   * <p>
    * Compared with #findEachWhile this will always process all the beans where as
    * #findEachWhile provides a way to stop processing the query result early before
    * all the beans have been read.
@@ -503,19 +558,18 @@ public interface Query<T> extends Serializable {
    * with Java8 closures.
    * </p>
    *
-   * <pre class="code">
+   * <pre>{@code
    *
-   * Query&lt;Customer&gt; query = server.find(Customer.class)
-   *     .where().gt(&quot;id&quot;, 0)
-   *     .orderBy(&quot;id&quot;)
-   *     .setMaxRows(2);
+   *  ebeanServer.find(Customer.class)
+   *     .where().eq("status", Status.NEW)
+   *     .order().asc("id")
+   *     .findEach((Customer customer) -> {
    *
-   * query.findVisit((Customer customer) -> {
+   *       // do something with customer
+   *       System.out.println("-- visit " + customer);
+   *     });
    *
-   *     // do something with customer
-   *     System.out.println(&quot;-- visit &quot; + customer);
-   * });
-   * </pre>
+   * }</pre>
    *
    * @param consumer
    *          the consumer used to process the queried beans.
@@ -532,23 +586,23 @@ public interface Query<T> extends Serializable {
    * </p>
 
    *
-   * <pre class="code">
+   * <pre>{@code
    *
-   * Query&lt;Customer&gt; query = server.find(Customer.class)
-   *     .fetch(&quot;contacts&quot;, new FetchConfig().query(2))
-   *     .where().gt(&quot;id&quot;, 0)
-   *     .orderBy(&quot;id&quot;)
-   *     .setMaxRows(2);
+   *  ebeanServer.find(Customer.class)
+   *     .fetch("contacts", new FetchConfig().query(2))
+   *     .where().eq("status", Status.NEW)
+   *     .order().asc("id")
+   *     .setMaxRows(2000)
+   *     .findEachWhile((Customer customer) -> {
    *
-   * query.findEachWhile((Customer customer) -> {
+   *       // do something with customer
+   *       System.out.println("-- visit " + customer);
    *
-   *     // do something with customer
-   *     System.out.println(&quot;-- visit &quot; + customer);
+   *       // return true to continue processing or false to stop
+   *       return (customer.getId() < 40);
+   *     });
    *
-   *     // return true to continue processing or false to stop
-   *     return (customer.getId() < 40);
-   * });
-   * </pre>
+   * }</pre>
    *
    * @param consumer
    *          the consumer used to process the queried beans.
@@ -560,7 +614,16 @@ public interface Query<T> extends Serializable {
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
    * </p>
-   * 
+   *
+   * <pre>{@code
+   *
+   * List<Customer> customers =
+   *     ebeanServer.find(Customer.class)
+   *     .where().ilike("name", "rob%")
+   *     .findList();
+   *
+   * }</pre>
+   *
    * @see EbeanServer#findList(Query, Transaction)
    */
   public List<T> findList();
@@ -570,7 +633,16 @@ public interface Query<T> extends Serializable {
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
    * </p>
-   * 
+   *
+   * <pre>{@code
+   *
+   * Set<Customer> customers =
+   *     ebeanServer.find(Customer.class)
+   *     .where().ilike("name", "rob%")
+   *     .findSet();
+   *
+   * }</pre>
+   *
    * @see EbeanServer#findSet(Query, Transaction)
    */
   public Set<T> findSet();
@@ -585,11 +657,14 @@ public interface Query<T> extends Serializable {
    * on the map. If one is not specified then the id property is used.
    * </p>
    * 
-   * <pre class="code">
-   * Query&lt;Product&gt; query = Ebean.createQuery(Product.class);
-   * query.setMapKey(&quot;sku&quot;);
-   * Map&lt;?, Product&gt; map = query.findMap();
-   * </pre>
+   * <pre>{@code
+   *
+   * Map<?, Product> map =
+   *   ebeanServer.find(Product.class)
+   *     .setMapKey("sku")
+   *     .findMap();
+   *
+   * }</pre>
    * 
    * @see EbeanServer#findMap(Query, Transaction)
    */
@@ -612,32 +687,34 @@ public interface Query<T> extends Serializable {
    * return 0 or 1 results.
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
+   *
    * // assuming the sku of products is unique...
    * Product product =
-   *     Ebean.find(Product.class)
-   *         .where(&quot;sku = ?&quot;)
-   *         .set(1, &quot;aa113&quot;)
+   *     ebeanServer.find(Product.class)
+   *         .where().eq("sku", "aa113")
    *         .findUnique();
    * ...
-   * </pre>
+   * }</pre>
    * 
    * <p>
    * It is also useful with finding objects by their id when you want to specify
    * further join information.
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
+   *
    * // Fetch order 1 and additionally fetch join its order details...
    * Order order = 
-   *     Ebean.find(Order.class)
+   *     ebeanServer.find(Order.class)
    *       .setId(1)
-   *       .fetch(&quot;details&quot;)
+   *       .fetch("details")
    *       .findUnique();
-   *       
-   * List&lt;OrderDetail&gt; details = order.getDetails();
+   *
+   * // the order details were eagerly loaded
+   * List<OrderDetail> details = order.getDetails();
    * ...
-   * </pre>
+   * }</pre>
    */
   public T findUnique();
 
@@ -696,7 +773,32 @@ public interface Query<T> extends Serializable {
    * the query. This translates into SQL that uses limit offset, rownum or row_number function to
    * limit the result set.
    * </p>
-   * 
+   *
+   * <h4>Example: typical use including total row count</h4>
+   * <pre>{@code
+   *
+   *     // We want to find the first 100 new orders
+   *     //  ... 0 means first page
+   *     //  ... page size is 100
+   *
+   *     PagedList<Order> pagedList
+   *       = ebeanServer.find(Order.class)
+   *       .where().eq("status", Order.Status.NEW)
+   *       .order().asc("id")
+   *       .findPagedList(0, 100);
+   *
+   *     // Optional: initiate the loading of the total
+   *     // row count in a background thread
+   *     pagedList.loadRowCount();
+   *
+   *     // fetch and return the list in the foreground thread
+   *     List<Order> orders = pagedList.getList();
+   *
+   *     // get the total row count (from the future)
+   *     int totalRowCount = pagedList.getTotalRowCount();
+   *
+   * }</pre>
+   *
    * @param pageIndex
    *          The zero based index of the page.
    * @param pageSize
@@ -706,19 +808,20 @@ public interface Query<T> extends Serializable {
   public PagedList<T> findPagedList(int pageIndex, int pageSize);
 
   /**
-   * Set a named bind parameter. Named parameters have a colon to prefix the
-   * name.
+   * Set a named bind parameter. Named parameters have a colon to prefix the name.
    * 
-   * <pre class="code">
+   * <pre>{@code
+   *
    * // a query with a named parameter
-   * String oql = &quot;find order where status = :orderStatus&quot;;
+   * String oql = "find order where status = :orderStatus";
    * 
-   * Query&lt;Order&gt; query = Ebean.createQuery(Order.class, oql);
+   * Query<Order> query = ebeanServer.find(Order.class, oql);
    * 
    * // bind the named parameter
-   * query.bind(&quot;orderStatus&quot;, OrderStatus.NEW);
-   * List&lt;Order&gt; list = query.findList();
-   * </pre>
+   * query.bind("orderStatus", OrderStatus.NEW);
+   * List<Order> list = query.findList();
+   *
+   * }</pre>
    * 
    * @param name
    *          the parameter name
@@ -732,17 +835,19 @@ public interface Query<T> extends Serializable {
    * position starts at 1 to be consistent with JDBC PreparedStatement. You need
    * to set a parameter value for each ? you have in the query.
    * 
-   * <pre class="code">
+   * <pre>{@code
+   *
    * // a query with a positioned parameter
-   * String oql = &quot;where status = ? order by id desc&quot;;
+   * String oql = "where status = ? order by id desc";
    * 
-   * Query&lt;Order&gt; query = Ebean.createQuery(Order.class, oql);
+   * Query<Order> query = ebeanServer.createQuery(Order.class, oql);
    * 
    * // bind the parameter
    * query.setParameter(1, OrderStatus.NEW);
    * 
-   * List&lt;Order&gt; list = query.findList();
-   * </pre>
+   * List<Order> list = query.findList();
+   *
+   * }</pre>
    * 
    * @param position
    *          the parameter bind position starting from 1 (not 0)
@@ -758,12 +863,18 @@ public interface Query<T> extends Serializable {
    * fetch joins.
    * </p>
    * 
-   * <pre class="code">
-   * Query&lt;Order&gt; query = Ebean.createQuery(Order.class);
-   * Order order = query.setId(1).join(&quot;details&quot;).findUnique();
-   * List&lt;OrderDetail&gt; details = order.getDetails();
-   * ...
-   * </pre>
+   * <pre>{@code
+   *
+   * Order order =
+   *     ebeanServer.find(Order.class)
+   *     .setId(1)
+   *     .fetch("details")
+   *     .findUnique();
+   *
+   * // the order details were eagerly fetched
+   * List<OrderDetail> details = order.getDetails();
+   *
+   * }</pre>
    */
   public Query<T> setId(Object id);
 
@@ -774,15 +885,17 @@ public interface Query<T> extends Serializable {
    * {@link #setParameter(String, Object)}.
    * </p>
    * 
-   * <pre class="code">
-   * Query&lt;Order&gt; query = Ebean.createQuery(Order.class, &quot;top&quot;);
+   * <pre>{@code
+   *
+   * Query<Order> query = ebeanServer.createQuery(Order.class, "top");
    * ...
    * if (...) {
-   *   query.where(&quot;status = :status and lower(customer.name) like :custName&quot;);
-   *   query.setParameter(&quot;status&quot;, Order.NEW);
-   *   query.setParameter(&quot;custName&quot;, &quot;rob%&quot;);
+   *   query.where("status = :status and lower(customer.name) like :custName");
+   *   query.setParameter("status", Order.NEW);
+   *   query.setParameter("custName", "rob%");
    * }
-   * </pre>
+   *
+   * }</pre>
    * 
    * <p>
    * Internally the addToWhereClause string is processed by removing named
@@ -802,13 +915,15 @@ public interface Query<T> extends Serializable {
   /**
    * Add a single Expression to the where clause returning the query.
    * 
-   * <pre class="code">
-   * List&lt;Order&gt; newOrders = 
-   *     Ebean.find(Order.class)
-   * 		.where().eq(&quot;status&quot;, Order.NEW)
+   * <pre>{@code
+   *
+   * List<Order> newOrders = 
+   *     ebeanServer.find(Order.class)
+   * 		.where().eq("status", Order.NEW)
    * 		.findList();
    * ...
-   * </pre>
+   *
+   * }</pre>
    */
   public Query<T> where(Expression expression);
 
@@ -817,15 +932,16 @@ public interface Query<T> extends Serializable {
    * ExpressionList. You can use this for adding multiple expressions to the
    * where clause.
    * 
-   * <pre class="code">
-   * Query&lt;Order&gt; query = Ebean.createQuery(Order.class, &quot;top&quot;);
-   * ...
-   * if (...) {
-   *   query.where()
-   *     .eq(&quot;status&quot;, Order.NEW)
-   *     .ilike(&quot;customer.name&quot;,&quot;rob%&quot;);
-   * }
-   * </pre>
+   * <pre>{@code
+   *
+   * List<Order> orders =
+   *     ebeanServer.find(Order.class)
+   *     .where()
+   *       .eq("status", Order.NEW)
+   *       .ilike("customer.name","rob%")
+   *     .findList();
+   *
+   * }</pre>
    * 
    * @see Expr
    * @return The ExpressionList for adding expressions to.
@@ -843,17 +959,18 @@ public interface Query<T> extends Serializable {
    * week. In this case you can use filterMany() to filter the orders.
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
    * 
-   * List&lt;Customer&gt; list = Ebean
-   *     .find(Customer.class)
-   *     // .fetch(&quot;orders&quot;, new FetchConfig().lazy())
-   *     // .fetch(&quot;orders&quot;, new FetchConfig().query())
-   *     .fetch(&quot;orders&quot;).where().ilike(&quot;name&quot;, &quot;rob%&quot;).filterMany(&quot;orders&quot;)
-   *     .eq(&quot;status&quot;, Order.Status.NEW).gt(
-   *         &quot;orderDate&quot;, lastWeek).findList();
+   * List<Customer> list =
+   *     ebeanServer.find(Customer.class)
+   *     // .fetch("orders", new FetchConfig().lazy())
+   *     // .fetch("orders", new FetchConfig().query())
+   *     .fetch("orders")
+   *     .where().ilike("name", "rob%")
+   *     .filterMany("orders").eq("status", Order.Status.NEW).gt("orderDate", lastWeek)
+   *     .findList();
    * 
-   * </pre>
+   * }</pre>
    * 
    * <p>
    * Please note you have to be careful that you add expressions to the correct
@@ -891,14 +1008,14 @@ public interface Query<T> extends Serializable {
    * {@link #setParameter(String, Object)}.
    * </p>
    * 
-   * <pre class="code">
-   * Query&lt;ReportOrder&gt; query = Ebean.createQuery(ReportOrder.class);
-   * ...
-   * if (...) {
-   *   query.having(&quot;score &gt; :min&quot;);
-   *   query.setParameter(&quot;min&quot;, 1);
-   * }
-   * </pre>
+   * <pre>{@code
+   *
+   * List<ReportOrder> query =
+   *     ebeanServer.find(ReportOrder.class)
+   *     .having("score > :min").setParameter("min", 1)
+   *     .findList();
+   *
+   * }</pre>
    * 
    * @param addToHavingClause
    *          the clause to append to the having clause which typically contains
@@ -1030,17 +1147,17 @@ public interface Query<T> extends Serializable {
    * If no property is set then the id property is used.
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
+   *
    * // Assuming sku is unique for products...
    *    
-   * Query&lt;Product&gt; query = Ebean.createQuery(Product.class);
-   *   
-   * // use sku for keys...
-   * query.setMapKey(&quot;sku&quot;);
-   *   
-   * Map&lt;?,Product&gt; productMap = query.findMap();
-   * ...
-   * </pre>
+   * Map<?,Product> productMap =
+   *     ebeanServer.find(Product.class)
+   *     // use sku for keys...
+   *     .setMapKey("sku")
+   *     .findMap();
+   *
+   * }</pre>
    * 
    * @param mapKey
    *          the property to use as keys for a map.

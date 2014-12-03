@@ -73,7 +73,7 @@ public class WriteJson {
     return new WriteBean(desc, explicitAllProps, currentIncludeProps, bean);
   }
 
-  public class WriteBean {
+  public static class WriteBean {
     
     final boolean explicitAllProps;
     final Set<String> currentIncludeProps;

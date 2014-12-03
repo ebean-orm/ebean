@@ -671,7 +671,8 @@ public final class Ebean {
   /**
    * Refresh the values of a bean.
    * <p>
-   * Note that this does not refresh any OneToMany or ManyToMany properties.
+   * Note that this resets OneToMany and ManyToMany properties so that if they
+   * are accessed a lazy load will refresh the many property.
    * </p>
    */
   public static void refresh(Object bean) {
@@ -1376,8 +1377,7 @@ public final class Ebean {
   /**
    * Return the BeanState for a given entity bean.
    * <p>
-   * This will return null if the bean is not an enhanced (or subclassed) entity
-   * bean.
+   * This will return null if the bean is not an enhanced entity bean.
    * </p>
    */
   public static BeanState getBeanState(Object bean) {

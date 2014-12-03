@@ -20,7 +20,7 @@ import com.avaje.ebean.Query;
  * You may also put use the Transient annotation with the Formula annotation.
  * The effect of the Transient annotation in this case is that the formula will
  * <b>NOT</b> be included in queries by default - you have to explicitly include
- * it via {@link Query#select(String)} or {@link Query#join(String, String)}.
+ * it via {@link Query#select(String)} or {@link Query#fetch(String, String, com.avaje.ebean.FetchConfig)}.
  * You may want to do this if the Formula is relatively expensive and only want
  * it included in the query when you explicitly state it.
  * </p>
