@@ -13,7 +13,7 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
 
 	public enum Type {
 	  DETERMINE, INSERT, UPDATE, DELETE, ORMUPDATE, UPDATESQL, CALLABLESQL
-	};
+	}
 
 	protected boolean persistCascade;
 	
@@ -24,7 +24,7 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
 	
 	protected final PersistExecute persistExecute;
 
-	/**
+  /**
 	 * Used by CallableSqlRequest and UpdateSqlRequest.
 	 */
 	public PersistRequest(SpiEbeanServer server, SpiTransaction t, PersistExecute persistExecute) {
@@ -41,25 +41,33 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
 	 * Execute the request right now.
 	 */
 	public abstract int executeNow();
-		   
-    public PstmtBatch getPstmtBatch() {
-    	return ebeanServer.getPstmtBatch();
-    }
- 
-    public boolean isLogSql() {
-        return transaction.isLogSql();
-    }
-    
-    public boolean isLogSummary() {
-        return transaction.isLogSummary();
-    }
-    
+
+  public PstmtBatch getPstmtBatch() {
+    return ebeanServer.getPstmtBatch();
+  }
+
+  public boolean isLogSql() {
+    return transaction.isLogSql();
+  }
+
+  public boolean isLogSummary() {
+    return transaction.isLogSummary();
+  }
+
+
+  /**
+   * Return true if this persist request should use JDBC batch.
+   */
+  public boolean isBatchThisRequest() {
+    return transaction.isBatchThisRequest(type);
+  }
+
 	/**
-	 * Execute the Callable statement.
+	 * Execute the statement.
 	 */
 	public int executeStatement() {
 		
-		boolean batch = transaction.isBatchThisRequest();
+		boolean batch = isBatchThisRequest();
 
 		int rows;
 		BatchControl control = transaction.getBatchControl();
@@ -69,15 +77,15 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
 		} else if (batch) {
 			// need to create the BatchControl
 			control = persistExecute.createBatchControl(transaction);
-			rows = control.executeStatementOrBatch(this, batch);
+			rows = control.executeStatementOrBatch(this, true);
 		} else {
 			rows = executeNow();
 		}
 				
 		return rows;
 	}
-	
-	public void initTransIfRequired() {
+
+  public void initTransIfRequired() {
 		createImplicitTransIfRequired(false);
 		persistCascade = transaction.isPersistCascade();
 	}

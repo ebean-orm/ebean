@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebeaninternal.server.core.PersistRequest;
+import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 
 /**
@@ -120,6 +122,11 @@ public interface SpiTransaction extends Transaction {
   public int depth(int diff);
 
   /**
+   * Return the current depth.
+   */
+  public int depth();
+
+  /**
    * Return true if this transaction was created explicitly via
    * <code>Ebean.beginTransaction()</code>.
    */
@@ -144,7 +151,7 @@ public interface SpiTransaction extends Transaction {
    * Return true if this request should be batched. Conversely returns false
    * if this request should be executed immediately.
    */
-  public boolean isBatchThisRequest();
+  public boolean isBatchThisRequest(PersistRequest.Type type);
 
   /**
    * Return the queue used to batch up persist requests.
@@ -194,4 +201,25 @@ public interface SpiTransaction extends Transaction {
    * Return true if the manyToMany intersection should be persisted for this particular relationship direction.
    */
   public boolean isSaveAssocManyIntersection(String intersectionTable, String beanName);
+
+  /**
+   * Return true if batch mode got escalated for this request (and associated cascades).
+   */
+  public boolean checkBatchEscalationOnCascade(PersistRequestBean<?> request);
+
+  /**
+   * If batch mode was turned on for the request then flush the batch.
+   */
+  public void flushBatchOnCascade();
+
+  /**
+   * Potentially escalate batch mode on saving or deleting a collection.
+   */
+  public void checkBatchEscalationOnCollection();
+
+  /**
+   * Flush batch if we escalated batch mode on saving or deleting a collection.
+   */
+  public void flushBatchOnCollection();
+
 }

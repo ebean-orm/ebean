@@ -23,7 +23,7 @@ public class ScalarTypeLocalDateTimeTest {
     long now = System.currentTimeMillis();
     long toMillis = type.convertToMillis(LocalDateTime.now());
 
-    assertTrue(toMillis - now < 10);
+    assertTrue(toMillis - now < 30);
   }
 
   @Test

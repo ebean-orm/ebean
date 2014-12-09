@@ -23,6 +23,16 @@ final class TransWrapper {
 		wasCreated = created;
 	}
 
+  void batchEscalateOnCollection() {
+    transaction.checkBatchEscalationOnCollection();
+  }
+
+  void flushBatchOnCollection() {
+    if (!wasCreated) {
+      transaction.flushBatchOnCollection();
+    }
+  }
+
 	void commitIfCreated() {
 		if (wasCreated){
 			transaction.commit();

@@ -28,20 +28,16 @@ public class DeleteHandler extends DmlHandler {
 	public void bind() throws SQLException {
 		
 		sql = meta.getSql(persistRequest);
-		
 		SpiTransaction t = persistRequest.getTransaction();
-		boolean isBatch = t.isBatchThisRequest();
 
 		PreparedStatement pstmt;
-		if (isBatch) {
+		if (persistRequest.isBatched()) {
 			pstmt = getPstmt(t, sql, persistRequest, false);
 		} else {
 			pstmt = getPstmt(t, sql, false);
 		}
 		dataBind = new DataBind(pstmt);
-		
 		meta.bind(persistRequest, this);
-		
 		logSql(sql);
 	}
 
@@ -51,9 +47,6 @@ public class DeleteHandler extends DmlHandler {
 	public void execute() throws SQLException, OptimisticLockException {
 		int rowCount = dataBind.executeUpdate();
 		checkRowCount(rowCount);
-		
-		// Deletes the bean from the PersistenceContext
-		persistRequest.postDelete();
 	}
 
   public void registerDerivedRelationship(DerivedRelationshipData assocBean) {

@@ -1,5 +1,7 @@
 package com.avaje.ebean;
 
+import com.avaje.ebean.config.PersistBatch;
+
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
@@ -128,41 +130,82 @@ public interface Transaction extends Closeable {
    * Example: batch processing executing every 3 rows
    * </p>
    * 
-   * <pre class="code">
-   * String data = &quot;This is a simple test of the batch processing&quot;
-   *     + &quot; mode and the transaction execute batch method&quot;;
+   * <pre>{@code
+   *
+   * String data = "This is a simple test of the batch processing"
+   *             + " mode and the transaction execute batch method";
    * 
-   * String[] da = data.split(&quot; &quot;);
+   * String[] da = data.split(" ");
    * 
-   * String sql = &quot;{call sp_t3(?,?)}&quot;;
+   * String sql = "{call sp_t3(?,?)}";
    * 
    * CallableSql cs = new CallableSql(sql);
    * cs.registerOut(2, Types.INTEGER);
    * 
    * // (optional) inform eBean this stored procedure
    * // inserts into a table called sp_test
-   * cs.addModification(&quot;sp_test&quot;, true, false, false);
+   * cs.addModification("sp_test", true, false, false);
    * 
-   * Transaction t = Ebean.beginTransaction();
-   * t.setBatchMode(true);
-   * t.setBatchSize(3);
+   * Transaction txn = ebeanServer.beginTransaction();
+   * txn.setBatchMode(true);
+   * txn.setBatchSize(3);
    * try {
-   *   for (int i = 0; i &lt; da.length;) {
-   * 
+   *   for (int i = 0; i < da.length;) {
    *     cs.setParameter(1, da[i]);
-   *     Ebean.execute(cs);
+   *     ebeanServer.execute(cs);
    *   }
    * 
    *   // NB: commit implicitly flushes
-   *   Ebean.commitTransaction();
+   *   txn.commit();
    * 
    * } finally {
-   *   Ebean.endTransaction();
+   *   txn.end();
    * }
-   * </pre>
+   *
+   * }</pre>
    * 
    */
   public void setBatchMode(boolean useBatch);
+
+  /**
+   * The JDBC batch mode to use for this transaction.
+   * <p>
+   * If this is NONE then JDBC batch can still be used for each request - save(), insert(), update() or delete()
+   * and this would be useful if the request cascades to detail beans.
+   * </p>
+   *
+   * @param persistBatchMode the batch mode to use for this transaction
+   *
+   * @see com.avaje.ebean.config.ServerConfig#setPersistBatch(com.avaje.ebean.config.PersistBatch)
+   */
+  public void setBatch(PersistBatch persistBatchMode);
+
+  /**
+   * Return the batch mode at the transaction level.
+   */
+  public PersistBatch getBatch();
+
+  /**
+   * Set the JDBC batch mode to use for a save() or delete() request.
+   * <p>
+   * This only takes effect when batch mode on the transaction has not already meant that
+   * JDBC batch mode is being used.
+   * </p>
+   * <p>
+   * This is useful when the single save() or delete() cascades. For example, inserting a 'master' cascades
+   * and inserts a collection of 'detail' beans. The detail beans can be inserted using JDBC batch.
+   * </p>
+   *
+   * @param batchOnCascadeMode the batch mode to use per save(), insert(), update() or delete()
+   *
+   * @see com.avaje.ebean.config.ServerConfig#setPersistBatchOnCascade(com.avaje.ebean.config.PersistBatch)
+   */
+  public void setBatchOnCascade(PersistBatch batchOnCascadeMode);
+
+  /**
+   * Return the batch mode at the request level (for each save(), insert(), update() or delete()).
+   */
+  public PersistBatch getBatchOnCascade();
 
   /**
    * Specify the number of statements before a batch is flushed automatically.
@@ -228,19 +271,10 @@ public interface Transaction extends Closeable {
    * <li>the batch size is reached</li>
    * <li>A query is executed on the same transaction</li>
    * <li>UpdateSql or CallableSql are mixed with bean save and delete</li>
+   * <li>Transaction commit occurs</li>
    * </ul>
    */
   public void flushBatch() throws PersistenceException, OptimisticLockException;
-
-  /**
-   * Deprecated in favour of {@link #flushBatch()}.
-   * <p>
-   * Exactly the same as flushBatch. Deprecated as a name change.
-   * </p>
-   * 
-   * @deprecated Please use flushBatch
-   */
-  public void batchFlush() throws PersistenceException, OptimisticLockException;
 
   /**
    * Return the underlying Connection object.

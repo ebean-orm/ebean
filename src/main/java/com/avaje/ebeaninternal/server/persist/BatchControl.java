@@ -2,14 +2,14 @@ package com.avaje.ebeaninternal.server.persist;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 /**
  * Controls the batch ordering of persist requests.
@@ -27,23 +27,24 @@ import org.slf4j.LoggerFactory;
  */
 public final class BatchControl {
 
-  private static final Logger logger = LoggerFactory.getLogger(BatchControl.class);
-    
   /**
    * Used to sort queue entries by depth.
    */
   private static final BatchDepthComparator depthComparator = new BatchDepthComparator();
 
   /**
-   * The associated transaction.
-   */
-  private final SpiTransaction transaction;
-
-  /**
    * Controls batching of the PreparedStatements. This should be flushed after
    * each 'depth'.
    */
   private final BatchedPstmtHolder pstmtHolder = new BatchedPstmtHolder();
+
+  /**
+   * Map of the BatchedBeanHolder objects. They each have a depth and are later
+   * sorted by their depth to get the execution order.
+   */
+  private final HashMap<String, BatchedBeanHolder> beanHoldMap = new HashMap<String, BatchedBeanHolder>();
+
+  private final SpiTransaction transaction;
 
   /**
    * The size at which the batch queue will flush. This should be close to the
@@ -60,17 +61,13 @@ public final class BatchControl {
 
   private boolean batchFlushOnMixed = true;
 
-  private final BatchedBeanControl beanControl;
-
   /**
-   * Create for a given transaction, PersistExecute, default size and
-   * getGeneratedKeys.
+   * Create for a given transaction, PersistExecute, default size and getGeneratedKeys.
    */
   public BatchControl(SpiTransaction t, int batchSize, boolean getGenKeys) {
     this.transaction = t;
     this.batchSize = batchSize;
     this.getGeneratedKeys = getGenKeys;
-    this.beanControl = new BatchedBeanControl(t, this);
     transaction.setBatchControl(this);
   }
 
@@ -128,7 +125,7 @@ public final class BatchControl {
    * </p>
    */
   public int executeStatementOrBatch(PersistRequest request, boolean batch) {
-    if (!batch || (batchFlushOnMixed && !beanControl.isEmpty())) {
+    if (!batch || (batchFlushOnMixed && !isBeansEmpty())) {
       // flush when mixing beans and updateSql
       flush();
     }
@@ -161,29 +158,23 @@ public final class BatchControl {
     if (!batch) {
       return request.executeNow();
     }
-
-    // get the list we will add this request to
-    ArrayList<PersistRequest> persistList = beanControl.getPersistList(request);
-    if (persistList == null) {
-      // special case where the same bean instance has been added
-      // to the batch more than once
-      if (logger.isDebugEnabled()) {
-        logger.debug("Bean instance already in this batch: " + request.getEntityBean());
-      }
-      return -1;
-    }
-
-    if (persistList.size() >= batchSize) {
-      // flush everything that has been batched
+    if (addToBatch(request)) {
+      // flush as the top level has hit the batch size
       flush();
-
-      // we need to get the persistList again after the
-      // flush as the flush clears out the bean holders
-      persistList = beanControl.getPersistList(request);
     }
-
-    persistList.add(request);
     return -1;
+  }
+
+  /**
+   * Add the request to the batch and return true if we should flush.
+   */
+  private boolean addToBatch(PersistRequestBean<?> request) {
+
+    BatchedBeanHolder beanHolder = getBeanHolder(request);
+    int bufferSize = beanHolder.append(request);
+
+    // return true if top level has hit batch size
+    return bufferSize == batchSize && beanHolder.getOrder() == 100;
   }
 
   /**
@@ -197,7 +188,7 @@ public final class BatchControl {
    * Return true if the queue is empty.
    */
   public boolean isEmpty() {
-    return (beanControl.isEmpty() && pstmtHolder.isEmpty());
+    return (isBeansEmpty() && pstmtHolder.isEmpty());
   }
 
   /**
@@ -212,27 +203,45 @@ public final class BatchControl {
    */
   protected void executeNow(ArrayList<PersistRequest> list) {
     for (int i = 0; i < list.size(); i++) {
+      if (i % batchSize == 0) {
+        // hit the batch size so flush
+        flushPstmtHolder();
+      }
       list.get(i).executeNow();
     }
+    flushPstmtHolder();
+  }
+
+  /**
+   * Flush without resetting the topOrder (maintains the depth info).
+   */
+  public void flush() throws PersistenceException {
+    flush(false);
+  }
+
+  /**
+   * Flush with a reset the topOrder (fully empty the batch).
+   */
+  public void flushReset() throws PersistenceException {
+    flush(true);
   }
 
   /**
    * execute all the requests currently queued or batched.
    */
-  public void flush() throws PersistenceException {
+  private void flush(boolean resetTop) throws PersistenceException {
 
     if (!pstmtHolder.isEmpty()) {
       // Flush existing pstmts (updateSql or callableSql)
       flushPstmtHolder();
     }
-    if (beanControl.isEmpty()) {
+    if (isEmpty()) {
       // Nothing in queue to flush
       return;
     }
 
     // convert entry map to array for sorting
-    BatchedBeanHolder[] bsArray = beanControl.getArray();
-
+    BatchedBeanHolder[] bsArray = getBeanHolderArray();
     // sort the entries by depth
     Arrays.sort(bsArray, depthComparator);
 
@@ -240,11 +249,55 @@ public final class BatchControl {
       transaction.logSummary("BatchControl flush " + Arrays.toString(bsArray));
     }
     for (int i = 0; i < bsArray.length; i++) {
-      BatchedBeanHolder bs = bsArray[i];
-      bs.executeNow();
-      // flush all the batched Pstmts
-      flushPstmtHolder();
+      bsArray[i].executeNow();
+    }
+
+    if (resetTop) {
+      beanHoldMap.clear();
     }
   }
 
+  /**
+   * Return an entry for the given type description. The type description is
+   * typically the bean class name (or table name for MapBeans).
+   */
+  private BatchedBeanHolder getBeanHolder(PersistRequestBean<?> request) {
+
+    BeanDescriptor<?> beanDescriptor = request.getBeanDescriptor();
+    BatchedBeanHolder batchBeanHolder = beanHoldMap.get(beanDescriptor.getFullName());
+    if (batchBeanHolder == null) {
+      int relativeDepth = transaction.depth();
+      if (relativeDepth == 0 && !beanHoldMap.isEmpty()) {
+        // flush and reset the batch as we are changing the type of our top level
+        // bean so just keep it simple and flush and reset the top
+        flushReset();
+      }
+
+      batchBeanHolder = new BatchedBeanHolder(this, beanDescriptor, 100 + relativeDepth);
+      beanHoldMap.put(beanDescriptor.getFullName(), batchBeanHolder);
+    }
+    return batchBeanHolder;
+  }
+
+  /**
+   * Return true if this holds no persist requests.
+   */
+  private boolean isBeansEmpty() {
+    if (beanHoldMap.isEmpty()) {
+      return true;
+    }
+    for (BatchedBeanHolder beanHolder : beanHoldMap.values()) {
+      if (!beanHolder.isEmpty()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Return the BatchedBeanHolder's ready for sorting and executing.
+   */
+  private BatchedBeanHolder[] getBeanHolderArray() {
+    return beanHoldMap.values().toArray(new BatchedBeanHolder[beanHoldMap.size()]);
+  }
 }

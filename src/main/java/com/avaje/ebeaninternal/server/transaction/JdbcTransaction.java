@@ -1,29 +1,25 @@
 package com.avaje.ebeaninternal.server.transaction;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.persistence.PersistenceException;
-import javax.persistence.RollbackException;
-
 import com.avaje.ebean.TransactionCallback;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebean.config.PersistBatch;
 import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
+import com.avaje.ebeaninternal.server.core.PersistRequest;
+import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager.OnQueryOnly;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import javax.persistence.RollbackException;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * JDBC Connection based transaction.
@@ -95,10 +91,11 @@ public class JdbcTransaction implements SpiTransaction {
 
   protected boolean localReadOnly;
 
-  /**
-   * Set to true if using batch processing.
-   */
-  protected boolean batchMode;
+  protected PersistBatch oldBatchMode;
+
+  protected PersistBatch batchMode;
+
+  protected PersistBatch batchOnCascadeMode;
 
   protected int batchSize = -1;
 
@@ -109,7 +106,7 @@ public class JdbcTransaction implements SpiTransaction {
   protected Boolean batchFlushOnMixed;
 
   protected String logPrefix;
-  
+
   /**
    * The depth used by batch processing to help the ordering of statements.
    */
@@ -120,17 +117,19 @@ public class JdbcTransaction implements SpiTransaction {
    */
   protected final boolean autoCommit;
 
-  protected IdentityHashMap<Object,Object> persistingBeans;
-  
+  protected IdentityHashMap<Object, Object> persistingBeans;
+
   protected HashSet<Integer> deletingBeansHash;
-  
-  protected HashMap<String,String> m2mIntersectionSave;
-  
+
+  protected HashMap<String, String> m2mIntersectionSave;
+
   protected HashMap<Integer, List<DerivedRelationshipData>> derivedRelMap;
-  
+
   protected Map<String, Object> userObjects;
 
   protected List<TransactionCallback> callbackList;
+
+  protected boolean batchOnCascadeSet;
 
   /**
    * Create a new JdbcTransaction.
@@ -143,6 +142,8 @@ public class JdbcTransaction implements SpiTransaction {
       this.explicit = explicit;
       this.manager = manager;
       this.connection = connection;
+      this.batchMode = manager == null ? PersistBatch.NONE : manager.getPersistBatch();
+      this.batchOnCascadeMode = manager == null ? PersistBatch.NONE : manager.getPersistBatchOnCascade();
       this.onQueryOnly = manager == null ? OnQueryOnly.ROLLBACK : manager.getOnQueryOnly();
       this.persistenceContext = new DefaultPersistenceContext();
       this.autoCommit = connection.getAutoCommit();
@@ -156,7 +157,7 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   private static String deriveLogPrefix(String id) {
-    
+
     StringBuilder sb = new StringBuilder();
     sb.append("txn[");
     if (id != null) {
@@ -165,11 +166,12 @@ public class JdbcTransaction implements SpiTransaction {
     sb.append("] ");
     return sb.toString();
   }
-  
+
+  @Override
   public String getLogPrefix() {
     return logPrefix;
   }
-  
+
   public String toString() {
     return logPrefix;
   }
@@ -230,20 +232,20 @@ public class JdbcTransaction implements SpiTransaction {
     }
   }
 
-
+  @Override
   public List<DerivedRelationshipData> getDerivedRelationship(Object bean) {
     if (derivedRelMap == null) {
       return null;
     }
-    Integer key = Integer.valueOf(System.identityHashCode(bean));
-    return derivedRelMap.get(key);
+    return derivedRelMap.get(System.identityHashCode(bean));
   }
 
+  @Override
   public void registerDerivedRelationship(DerivedRelationshipData derivedRelationship) {
     if (derivedRelMap == null) {
       derivedRelMap = new HashMap<Integer, List<DerivedRelationshipData>>();
     }
-    Integer key = Integer.valueOf(System.identityHashCode(derivedRelationship.getAssocBean()));
+    Integer key = new Integer(System.identityHashCode(derivedRelationship.getAssocBean()));
 
     List<DerivedRelationshipData> list = derivedRelMap.get(key);
     if (list == null) {
@@ -259,6 +261,7 @@ public class JdbcTransaction implements SpiTransaction {
    * This is to handle bi-directional relationships where both sides Cascade.
    * </p>
    */
+  @Override
   public void registerDeleteBean(Integer persistingBean) {
     if (deletingBeansHash == null) {
       deletingBeansHash = new HashSet<Integer>();
@@ -269,6 +272,7 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * Unregister the persisted bean.
    */
+  @Override
   public void unregisterDeleteBean(Integer persistedBean) {
     if (deletingBeansHash != null) {
       deletingBeansHash.remove(persistedBean);
@@ -278,6 +282,7 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * Return true if this is a bean that has already been saved/deleted.
    */
+  @Override
   public boolean isRegisteredDeleteBean(Integer persistingBean) {
     return deletingBeansHash != null && deletingBeansHash.contains(persistingBean);
   }
@@ -285,19 +290,21 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * Unregister the persisted bean.
    */
+  @Override
   public void unregisterBean(Object bean) {
     persistingBeans.remove(bean);
   }
- 
+
   /**
    * Return true if this is a bean that has already been saved. This will
    * register the bean if it is not already.
    */
+  @Override
   public boolean isRegisteredBean(Object bean) {
     if (persistingBeans == null) {
-      persistingBeans = new IdentityHashMap<Object,Object>();
+      persistingBeans = new IdentityHashMap<Object, Object>();
     }
-    return (persistingBeans.put(bean,PLACEHOLDER) != null);
+    return (persistingBeans.put(bean, PLACEHOLDER) != null);
   }
 
   /**
@@ -317,8 +324,8 @@ public class JdbcTransaction implements SpiTransaction {
       // first time into this intersection table so allow
       m2mIntersectionSave.put(intersectionTable, beanName);
       return true;
-    } 
-    
+    }
+
     // only allow if save coming from the same bean type 
     // to stop saves coming from both directions of m2m 
     return existingBean.equals(beanName);
@@ -336,16 +343,25 @@ public class JdbcTransaction implements SpiTransaction {
    * <p>
    * The depth is used to help the ordering of batched statements.
    * </p>
-   * 
-   * @param diff
-   *          the amount to add or subtract from the depth.
+   *
+   * @param diff the amount to add or subtract from the depth.
    * @return the current depth plus the diff
    */
+  @Override
   public int depth(int diff) {
     depth += diff;
     return depth;
   }
 
+  /**
+   * Return the current depth.
+   */
+  @Override
+  public int depth() {
+    return depth;
+  }
+
+  @Override
   public boolean isReadOnly() {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
@@ -357,6 +373,7 @@ public class JdbcTransaction implements SpiTransaction {
     }
   }
 
+  @Override
   public void setReadOnly(boolean readOnly) {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
@@ -369,13 +386,41 @@ public class JdbcTransaction implements SpiTransaction {
     }
   }
 
+  @Override
   public void setBatchMode(boolean batchMode) {
+    if (!isActive()) {
+      throw new IllegalStateException(illegalStateMessage);
+    }
+    this.batchMode = (batchMode) ? PersistBatch.ALL : PersistBatch.NONE;
+  }
+
+  @Override
+  public void setBatch(PersistBatch batchMode) {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.batchMode = batchMode;
   }
 
+  @Override
+  public PersistBatch getBatch() {
+    return batchMode;
+  }
+
+  @Override
+  public void setBatchOnCascade(PersistBatch batchOnCascadeMode) {
+    if (!isActive()) {
+      throw new IllegalStateException(illegalStateMessage);
+    }
+    this.batchOnCascadeMode = batchOnCascadeMode;
+  }
+
+  @Override
+  public PersistBatch getBatchOnCascade() {
+    return batchOnCascadeMode;
+  }
+
+  @Override
   public void setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
     this.batchGetGeneratedKeys = getGeneratedKeys;
     if (batchControl != null) {
@@ -383,6 +428,7 @@ public class JdbcTransaction implements SpiTransaction {
     }
   }
 
+  @Override
   public void setBatchFlushOnMixed(boolean batchFlushOnMixed) {
     this.batchFlushOnMixed = batchFlushOnMixed;
     if (batchControl != null) {
@@ -396,10 +442,12 @@ public class JdbcTransaction implements SpiTransaction {
    * Returning 0 implies to use the system wide default batch size.
    * </p>
    */
+  @Override
   public int getBatchSize() {
     return batchSize;
   }
 
+  @Override
   public void setBatchSize(int batchSize) {
     this.batchSize = batchSize;
     if (batchControl != null) {
@@ -407,10 +455,12 @@ public class JdbcTransaction implements SpiTransaction {
     }
   }
 
+  @Override
   public boolean isBatchFlushOnQuery() {
     return batchFlushOnQuery;
   }
 
+  @Override
   public void setBatchFlushOnQuery(boolean batchFlushOnQuery) {
     this.batchFlushOnQuery = batchFlushOnQuery;
   }
@@ -419,15 +469,113 @@ public class JdbcTransaction implements SpiTransaction {
    * Return true if this request should be batched. Returning false means that
    * this request should be executed immediately.
    */
-  public boolean isBatchThisRequest() {
-    if (!explicit && depth <= 0) {
-      // implicit transaction ... no gain
-      // by batching where depth <= 0
+  @Override
+  public boolean isBatchThisRequest(PersistRequest.Type type) {
+    if (!batchOnCascadeSet && !explicit && depth <= 0) {
+      // implicit transaction, no gain by batching where depth <= 0
       return false;
     }
-    return batchMode;
+    switch (batchMode) {
+      case ALL:
+        return true;
+      case INSERT:
+        return type == PersistRequest.Type.INSERT;
+      default:
+        return false;
+    }
   }
 
+  /**
+   * Return true if JDBC batch should be used on cascade persist.
+   */
+  private boolean isBatchOnCascade(PersistRequest.Type type) {
+
+    switch (batchOnCascadeMode) {
+      case ALL:
+        return true;
+      case INSERT:
+        return type == PersistRequest.Type.INSERT;
+      default:
+        return false;
+    }
+  }
+
+  public void checkBatchEscalationOnCollection() {
+    if (batchMode == PersistBatch.NONE && batchOnCascadeMode != PersistBatch.NONE) {
+      batchMode = batchOnCascadeMode;
+      batchOnCascadeSet = true;
+    }
+  }
+
+  public void flushBatchOnCollection() {
+    if (batchOnCascadeSet) {
+      if (batchControl != null) {
+        if (logger.isTraceEnabled()) {
+          logger.trace("... flushBatchOnCollection");
+        }
+        batchControl.flushReset();
+      }
+      // restore the previous batch mode of NONE
+      batchMode = PersistBatch.NONE;
+    }
+  }
+
+  /**
+   * Flush after completing persist cascade.
+   */
+  @Override
+  public void flushBatchOnCascade() {
+    if (batchControl != null) {
+      if (logger.isTraceEnabled()) {
+        logger.trace("... flushBatchOnCascade");
+      }
+      batchControl.flushReset();
+    }
+    // restore the previous batch mode
+    batchMode = oldBatchMode;
+  }
+
+  private boolean isAlreadyBatching(PersistRequest.Type type) {
+    switch (batchMode) {
+      case ALL:
+        return true;
+      case INSERT:
+        return type == PersistRequest.Type.INSERT;
+      default:
+        return false;
+    }
+  }
+
+  public boolean checkBatchEscalationOnCascade(PersistRequestBean<?> request) {
+
+    if (isAlreadyBatching(request.getType())) {
+      // already batching (at top level)
+      return false;
+    }
+
+    if (isBatchOnCascade(request.getType())) {
+      // escalate up to batch mode for this request (and cascade)
+      oldBatchMode = batchMode;
+      batchMode = PersistBatch.ALL;
+      if (batchControl != null) {
+        // flush with reset so that this request goes into it's own batch buffer
+        batchControl.flushReset();
+      }
+      // skip using jdbc batch for the top level bean (no gain there)
+      request.setSkipBatchForTopLevel();
+      return true;
+    }
+
+    if (batchControl != null && !batchControl.isEmpty()) {
+      if (logger.isTraceEnabled()) {
+        logger.trace("... flush from batchOnCascade ");
+      }
+      batchControl.flushReset();
+    }
+    return false;
+  }
+
+  @Override
   public BatchControl getBatchControl() {
     return batchControl;
   }
@@ -436,6 +584,7 @@ public class JdbcTransaction implements SpiTransaction {
    * Set the BatchControl to the transaction. This is done once per transaction
    * on the first persist request.
    */
+  @Override
   public void setBatchControl(BatchControl batchControl) {
     queryOnly = false;
     this.batchControl = batchControl;
@@ -458,6 +607,7 @@ public class JdbcTransaction implements SpiTransaction {
    * executing.
    * </p>
    */
+  @Override
   public void flushBatch() {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
@@ -467,13 +617,10 @@ public class JdbcTransaction implements SpiTransaction {
     }
   }
 
-  public void batchFlush() {
-    flushBatch();
-  }
-
   /**
    * Return the persistence context associated with this transaction.
    */
+  @Override
   public PersistenceContext getPersistenceContext() {
     return persistenceContext;
   }
@@ -486,6 +633,7 @@ public class JdbcTransaction implements SpiTransaction {
    * then set it back later to a second transaction.
    * </p>
    */
+  @Override
   public void setPersistenceContext(PersistenceContext context) {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
@@ -496,6 +644,7 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * Return the underlying TransactionEvent.
    */
+  @Override
   public TransactionEvent getEvent() {
     queryOnly = false;
     if (event == null) {
@@ -507,29 +656,35 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * Return true if this was an explicitly created transaction.
    */
+  @Override
   public boolean isExplicit() {
     return explicit;
   }
 
+  @Override
   public boolean isLogSql() {
     return TransactionManager.SQL_LOGGER.isDebugEnabled();
   }
 
+  @Override
   public boolean isLogSummary() {
     return TransactionManager.SUM_LOGGER.isDebugEnabled();
   }
-  
+
+  @Override
   public void logSql(String msg) {
     TransactionManager.SQL_LOGGER.trace(Str.add(logPrefix, msg));
   }
-  
+
+  @Override
   public void logSummary(String msg) {
     TransactionManager.SUM_LOGGER.debug(Str.add(logPrefix, msg));
   }
-  
+
   /**
    * Return the transaction id.
    */
+  @Override
   public String getId() {
     return id;
   }
@@ -537,6 +692,7 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * Return the underlying connection for internal use.
    */
+  @Override
   public Connection getInternalConnection() {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
@@ -547,6 +703,7 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * Return the underlying connection for public use.
    */
+  @Override
   public Connection getConnection() {
     queryOnly = false;
     return getInternalConnection();
@@ -598,7 +755,7 @@ public class JdbcTransaction implements SpiTransaction {
       manager.notifyOfQueryOnly(true, this, null);
     }
   }
-  
+
   /**
    * Rollback, Commit or Close for query only transaction.
    * <p>
@@ -609,17 +766,17 @@ public class JdbcTransaction implements SpiTransaction {
   protected void connectionEndForQueryOnly() {
     try {
       switch (onQueryOnly) {
-      case ROLLBACK:
-        performRollback();
-        break;
-      case COMMIT:
-        performCommit();
-        break;
-      case CLOSE_ON_READCOMMITTED:
-        // valid at READ COMMITTED Isolation
-        break;
-      default:
-        performRollback();
+        case ROLLBACK:
+          performRollback();
+          break;
+        case COMMIT:
+          performCommit();
+          break;
+        case CLOSE_ON_READCOMMITTED:
+          // valid at READ COMMITTED Isolation
+          break;
+        default:
+          performRollback();
       }
     } catch (SQLException e) {
       logger.error("Error when ending a query only transaction via " + onQueryOnly, e);
@@ -643,6 +800,7 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * End the transaction on a query only request.
    */
+  @Override
   public void endQueryOnly() {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
@@ -652,13 +810,14 @@ public class JdbcTransaction implements SpiTransaction {
     } finally {
       // these will not throw an exception
       deactivate();
-      notifyQueryOnly();      
+      notifyQueryOnly();
     }
   }
-  
+
   /**
    * Commit the transaction.
    */
+  @Override
   public void commit() throws RollbackException {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
@@ -680,12 +839,12 @@ public class JdbcTransaction implements SpiTransaction {
 
     } catch (Exception e) {
       throw new RollbackException(e);
-      
+
     } finally {
       // these will not throw an exception
       firePostCommit();
       deactivate();
-      notifyCommit();      
+      notifyCommit();
     }
   }
 
@@ -705,6 +864,7 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * Rollback the transaction.
    */
+  @Override
   public void rollback() throws PersistenceException {
     rollback(null);
   }
@@ -713,6 +873,7 @@ public class JdbcTransaction implements SpiTransaction {
    * Rollback the transaction. If there is a throwable it is logged as the cause
    * in the transaction log.
    */
+  @Override
   public void rollback(Throwable cause) throws PersistenceException {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
@@ -723,7 +884,7 @@ public class JdbcTransaction implements SpiTransaction {
 
     } catch (Exception ex) {
       throw new PersistenceException(ex);
-      
+
     } finally {
       // these will not throw an exception
       firePostRollback();
@@ -735,6 +896,7 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * If the transaction is active then perform rollback.
    */
+  @Override
   public void end() throws PersistenceException {
     if (isActive()) {
       rollback();
@@ -744,29 +906,35 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * Return true if the transaction is active.
    */
+  @Override
   public boolean isActive() {
     return active;
   }
 
+  @Override
   public boolean isPersistCascade() {
     return persistCascade;
   }
 
+  @Override
   public void setPersistCascade(boolean persistCascade) {
     this.persistCascade = persistCascade;
   }
 
+  @Override
   public void addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
     getEvent().add(tableName, inserts, updates, deletes);
   }
 
+  @Override
   public void putUserObject(String name, Object value) {
     if (userObjects == null) {
-      userObjects = new HashMap<String,Object>();
+      userObjects = new HashMap<String, Object>();
     }
     userObjects.put(name, value);
   }
 
+  @Override
   public Object getUserObject(String name) {
     if (userObjects == null) {
       return null;
@@ -777,11 +945,12 @@ public class JdbcTransaction implements SpiTransaction {
   /**
    * Alias for end(), which enables this class to be used in try-with-resources.
    */
+  @Override
   public void close() throws IOException {
     try {
-        end();
+      end();
     } catch (PersistenceException ex) {
-        throw new IOException(ex);
+      throw new IOException(ex);
     }
   }
 }

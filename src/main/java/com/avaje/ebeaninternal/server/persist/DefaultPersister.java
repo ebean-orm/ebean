@@ -168,20 +168,19 @@ public final class DefaultPersister implements Persister {
     PersistRequestBean<?> req = createRequest(entityBean, t, null, PersistRequest.Type.UPDATE);
     req.setDeleteMissingChildren(deleteMissingChildren);
     try {
-      req.initTransIfRequired();
-      
+      req.initTransIfRequiredWithBatchCascade();
       if (req.isReference()) {
         // its a reference so see if there are manys to save...
         if (req.isPersistCascade()) {
           saveAssocMany(false, req, false);
         }        
         req.checkUpdatedManysOnly();
-
       } else {
         update(req);
       }
       
       req.commitTransIfRequired();
+      req.flushBatchOnCascade();
 
     } catch (RuntimeException ex) {
       req.rollbackTransIfRequired();
@@ -208,9 +207,10 @@ public final class DefaultPersister implements Persister {
 
 		PersistRequestBean<?> req = createRequest(bean, t, null, PersistRequest.Type.INSERT);
 		try {
-			req.initTransIfRequired();
+			req.initTransIfRequiredWithBatchCascade();
 			insert(req);
 			req.commitTransIfRequired();
+      req.flushBatchOnCascade();
 
 		} catch (RuntimeException ex) {
 			req.rollbackTransIfRequired();
@@ -323,9 +323,10 @@ public final class DefaultPersister implements Persister {
 		}
 
 		try {
-			req.initTransIfRequired();
+			req.initTransIfRequiredWithBatchCascade();
 			delete(req);
 			req.commitTransIfRequired();
+      req.flushBatchOnCascade();
 
 		} catch (RuntimeException ex) {
 			req.rollbackTransIfRequired();
@@ -558,9 +559,7 @@ public final class DefaultPersister implements Persister {
 			if (request.isLoadedProperty(prop)) {
 			  EntityBean detailBean = prop.getValueAsEntityBean(parentBean);
 				if (detailBean != null) {
-					if (prop.isSaveRecurseSkippable(detailBean)) {
-						// skip saving this bean
-					} else {
+					if (!prop.isSaveRecurseSkippable(detailBean)) {
 						t.depth(+1);
 						prop.setParentBeanToChild(parentBean, detailBean);
 						saveRecurse(detailBean, t, parentBean, insertMode);
@@ -748,11 +747,11 @@ public final class DefaultPersister implements Persister {
 		// set it to the appropriate property on the
 		// detail bean before we save it
 		boolean isMap = ManyType.JAVA_MAP.equals(prop.getManyType());
-		EntityBean parentBean = (EntityBean)saveMany.getParentBean();
+		EntityBean parentBean = saveMany.getParentBean();
 		Object mapKeyValue = null;
 
 		boolean saveSkippable = prop.isSaveRecurseSkippable();
-		boolean skipSavingThisBean = false;
+		boolean skipSavingThisBean;
 
 		for (Object detailBean : collection) {
 			if (isMap) {
@@ -762,11 +761,7 @@ public final class DefaultPersister implements Persister {
 				detailBean = entry.getValue();
 			}
 
-			if (detailBean instanceof EntityBean == false) {
-			  skipSavingThisBean = true;
-			  logger.debug("Skip non entity bean");
-			
-			} else {
+			if (detailBean instanceof EntityBean) {
 			  EntityBean detail = (EntityBean)detailBean;
         EntityBeanIntercept ebi = detail._ebean_getIntercept();
 			  if (prop.isManyToMany()) {
@@ -787,14 +782,7 @@ public final class DefaultPersister implements Persister {
           }
 	      }
 
-        if (skipSavingThisBean) {
-          // unmodified bean that does not recurse its save
-          // so we can skip the save for this bean.
-          // Reset skipSavingThisBean for the next detailBean
-          skipSavingThisBean = false;
-
-        } else {
-          // normal save recurse
+        if (!skipSavingThisBean) {
           saveRecurse(detail, t, parentBean, insertMode);
         }
         if (detailIds != null) {
@@ -879,9 +867,6 @@ public final class DefaultPersister implements Persister {
 		}
 
 		SpiTransaction t = saveManyPropRequest.getTransaction();
-		Collection<?> additions = null;
-		Collection<?> deletions = null;
-
 		boolean vanillaCollection = !(value instanceof BeanCollection<?>);
 
 		if (vanillaCollection || deleteMissingChildren) {
@@ -889,6 +874,9 @@ public final class DefaultPersister implements Persister {
 			// beans in the collection as additions
 			deleteAssocManyIntersection(saveManyPropRequest.getParentBean(), prop, t);
 		}
+
+    Collection<?> deletions = null;
+    Collection<?> additions;
 
 		if (saveManyPropRequest.isInsertedParent() || vanillaCollection || deleteMissingChildren) {
 			// treat everything in the list/set/map as an intersection addition
@@ -1098,30 +1086,24 @@ public final class DefaultPersister implements Persister {
 		// imported ones with save cascade
 		BeanPropertyAssocOne<?>[] ones = desc.propertiesOneImportedSave();
 
-		for (int i = 0; i < ones.length; i++) {
-			BeanPropertyAssocOne<?> prop = ones[i];
+    for (int i = 0; i < ones.length; i++) {
+      BeanPropertyAssocOne<?> prop = ones[i];
 
-			// check for partial objects
-			if (request.isLoadedProperty(prop)) {
-			  EntityBean detailBean = prop.getValueAsEntityBean(request.getEntityBean());
-				if (detailBean != null) {
-					if (prop.isReference(detailBean)) {
-						// skip saving a reference
-					} else if (request.isParent(detailBean)) {
-						// skip saving the parent as already saved
-					} else if (prop.isSaveRecurseSkippable(detailBean)) {
-						// we can skip saving this bean
-
-					} else {
-						SpiTransaction t = request.getTransaction();
-						t.depth(-1);
-						saveRecurse(detailBean, t, null, insertMode);
-						t.depth(+1);
-					}
-				}
-			}
-		}
-	}
+      // check for partial objects
+      if (request.isLoadedProperty(prop)) {
+        EntityBean detailBean = prop.getValueAsEntityBean(request.getEntityBean());
+        if (detailBean != null
+                && !prop.isSaveRecurseSkippable(detailBean)
+                && !prop.isReference(detailBean)
+                && !request.isParent(detailBean)) {
+          SpiTransaction t = request.getTransaction();
+          t.depth(-1);
+          saveRecurse(detailBean, t, null, insertMode);
+          t.depth(+1);
+        }
+      }
+    }
+  }
 
 	/**
 	 * Support for loading any Imported Associated One properties that are not
@@ -1156,10 +1138,7 @@ public final class DefaultPersister implements Persister {
 
 		for (int i = 0; i < ones.length; i++) {
 			BeanPropertyAssocOne<?> prop = ones[i];
-			if (!request.isLoadedProperty(prop)) {
-				// handled by DeleteUnloadedForeignKeys that was built
-				// via getDeleteUnloadedForeignKeys();
-			} else {
+			if (request.isLoadedProperty(prop)) {
 				Object detailBean = prop.getValue(request.getEntityBean());
 				if (detailBean != null) {
 				  EntityBean detail = (EntityBean)detailBean;

@@ -69,35 +69,28 @@ public final class DmlBeanPersister implements BeanPersister {
 	/**
 	 * execute request taking batching into account.
 	 */
-	private void execute(PersistRequest request, PersistHandler handler) {
+	private void execute(PersistRequestBean<?> request, PersistHandler handler) {
 
-		SpiTransaction trans = request.getTransaction();
-		boolean batchThisRequest = trans.isBatchThisRequest();
-
+    boolean batched = request.isBatched();
 		try {
-
 			handler.bind();
-
-			if (batchThisRequest) {
+			if (batched) {
 				handler.addBatch();
-
 			} else {
-				// immediate insert
 				handler.execute();
 			}
 
 		} catch (SQLException e) {
-	        // log the error to the transaction log
-	        String errMsg = StringHelper.replaceStringMulti(e.getMessage(), new String[]{"\r","\n"}, "\\n ");
-	        String msg = "ERROR executing DML bindLog["+handler.getBindLog()+"] error["+errMsg+"]";
-	        if (request.getTransaction().isLogSummary()) {
-	        	request.getTransaction().logSummary(msg);
-	        }
-	        
+      // log the error to the transaction log
+      String errMsg = StringHelper.replaceStringMulti(e.getMessage(), new String[]{"\r","\n"}, "\\n ");
+      String msg = "ERROR executing DML bindLog["+handler.getBindLog()+"] error["+errMsg+"]";
+      if (request.getTransaction().isLogSummary()) {
+        request.getTransaction().logSummary(msg);
+      }
 			throw new PersistenceException(msg, e);
 
 		} finally {
-			if (!batchThisRequest && handler != null) {
+			if (!batched && handler != null) {
 				try {
 					handler.close();
 				} catch (SQLException e) {

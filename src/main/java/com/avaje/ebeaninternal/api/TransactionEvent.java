@@ -94,7 +94,7 @@ public class TransactionEvent implements Serializable {
    */
   public void add(PersistRequestBean<?> request) {
 
-    if (request.isNotify(this)) {
+    if (request.isNotify()) {
       // either a BeanListener or Cache is interested
       if (eventBeans == null) {
         eventBeans = new TransactionEventBeans();

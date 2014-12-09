@@ -88,13 +88,12 @@ public class InsertHandler extends DmlHandler {
     }
 
     SpiTransaction t = persistRequest.getTransaction();
-    boolean isBatch = t.isBatchThisRequest();
 
     // get the appropriate sql
     sql = meta.getSql(withId);
 
     PreparedStatement pstmt;
-    if (isBatch) {
+    if (persistRequest.isBatched()) {
       pstmt = getPstmt(t, sql, persistRequest, useGeneratedKeys);
     } else {
       pstmt = getPstmt(t, sql, useGeneratedKeys);
@@ -137,9 +136,7 @@ public class InsertHandler extends DmlHandler {
     }
 
     checkRowCount(rc);
-    //setAdditionalProperties();
     executeDerivedRelationships();
-    
     persistRequest.postInsert();
   }
 

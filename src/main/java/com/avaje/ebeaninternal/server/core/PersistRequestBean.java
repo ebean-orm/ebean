@@ -97,6 +97,21 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private Set<String> updatedProperties;
 
+  /**
+   * Flag set when request is added to JDBC batch.
+   */
+  private boolean batched;
+
+  /**
+   * Flag set when batchOnCascade to avoid using batch on the top bean.
+   */
+  private boolean skipBatchForTopLevel;
+
+  /**
+   * Flag set when batch mode is turned on for a persist cascade.
+   */
+  private boolean batchOnCascadeSet;
+
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
       PersistExecute persistExecute, PersistRequest.Type type, boolean saveRecurse) {
 
@@ -128,6 +143,54 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
+   * Init the transaction and also check for batch on cascade escalation.
+   */
+  public void initTransIfRequiredWithBatchCascade() {
+    createImplicitTransIfRequired(false);
+    if (transaction.checkBatchEscalationOnCascade(this)) {
+      // we escalated to use batch mode so flush when done
+      // but if createdTransaction then commit will flush it
+      batchOnCascadeSet = !createdTransaction;
+    }
+    persistCascade = transaction.isPersistCascade();
+  }
+
+  /**
+   * If using batch on cascade flush if required.
+   */
+  public void flushBatchOnCascade() {
+    if (batchOnCascadeSet) {
+      // we escalated to batch mode for request so flush
+      transaction.flushBatchOnCascade();
+      batchOnCascadeSet = false;
+    }
+  }
+
+  /**
+   * Return true is this request was added to the JDBC batch.
+   */
+  public boolean isBatched() {
+    return batched;
+  }
+
+  /**
+   * Set when request is added to the JDBC batch.
+   */
+  public void setBatched() {
+    batched = true;
+  }
+
+
+  public void setSkipBatchForTopLevel() {
+    skipBatchForTopLevel = true;
+  }
+
+  @Override
+  public boolean isBatchThisRequest() {
+    return !skipBatchForTopLevel && super.isBatchThisRequest();
+  }
+
+  /**
    * Return true if this is an insert request.
    */
   public boolean isInsert() {
@@ -149,7 +212,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return intercept.getDirtyValues();
   }
 
-  public boolean isNotify(TransactionEvent txnEvent) {
+  public boolean isNotify() {
     this.notifyCache = beanDescriptor.isCacheNotify();
     return notifyCache || isNotifyPersistListener();
   }
@@ -234,7 +297,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       if (id != null) {
         hc += id.hashCode();
       }
-      beanHash = Integer.valueOf(hc);
+      beanHash = new Integer(hc);
     }
     return beanHash;
   }
@@ -397,7 +460,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   @Override
   public int executeOrQueue() {
 
-    boolean batch = transaction.isBatchThisRequest();
+    boolean batch = isBatchThisRequest();
 
     BatchControl control = transaction.getBatchControl();
     if (control != null) {
@@ -405,7 +468,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
     if (batch) {
       control = persistExecute.createBatchControl(transaction);
-      return control.executeOrQueue(this, batch);
+      return control.executeOrQueue(this, true);
 
     } else {
       return executeNow();
@@ -438,10 +501,15 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       String m = Message.msg("persist.conc2", "" + rowCount);
       throw new OptimisticLockException(m, null, bean);
     }
+    if (type == Type.DELETE) {
+      postDelete();
+    }
   }
 
-  public void postDelete() {
-
+  /**
+   * Aggressive L1 and L2 cache cleanup for deletes.
+   */
+  private void postDelete() {
     // Delete the bean from the PersistenceContent
     transaction.getPersistenceContext().clear(beanDescriptor.getBeanType(), idValue);
     // Delete from cache early even if transaction fails
@@ -457,10 +525,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       controllerPost();
     }
 
-    if (intercept != null) {
-      // if bean persisted again then should result in an update
-      intercept.setLoaded();
-    }
+    // if bean persisted again then should result in an update
+    intercept.setLoaded();
 
     addEvent();
 
@@ -528,9 +594,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (concurrencyMode.equals(ConcurrencyMode.VERSION)) {
       // check the version property was loaded
       BeanProperty prop = beanDescriptor.getVersionProperty();
-      if (prop != null && intercept.isLoadedProperty(prop.getPropertyIndex())) {
-        // OK to use version property
-      } else {
+      if (prop == null || !intercept.isLoadedProperty(prop.getPropertyIndex())) {
         concurrencyMode = ConcurrencyMode.NONE;
       }
     }

@@ -133,7 +133,15 @@ public class ServerConfig {
    */
   private int databaseSequenceBatchSize = 20;
 
-  private boolean persistBatching;
+  /**
+   * Use for transaction scoped batch mode.
+   */
+  private PersistBatch persistBatch = PersistBatch.NONE;
+
+  /**
+   * Use for per request batch mode.
+   */
+  private PersistBatch persistBatchOnCascade = PersistBatch.NONE;
 
   private int persistBatchSize = 20;
 
@@ -397,36 +405,74 @@ public class ServerConfig {
   }
 
   /**
-   * Returns true if by default JDBC batching is used for persisting or deleting
+   * Return the PersistBatch mode to use by default at the transaction level.
+   * <p>
+   * When INSERT or ALL is used then save(), delete() etc do not execute immediately but instead go into
+   * a JDBC batch execute buffer that is flushed. The buffer is flushed if a query is executed, transaction ends
+   * or the batch size is meet.
+   * </p>
+   */
+  public PersistBatch getPersistBatch() {
+    return persistBatch;
+  }
+
+  /**
+   * Set the JDBC batch mode to use at the transaction level.
+   * <p>
+   * When INSERT or ALL is used then save(), delete() etc do not execute immediately but instead go into
+   * a JDBC batch execute buffer that is flushed. The buffer is flushed if a query is executed, transaction ends
+   * or the batch size is meet.
+   * </p>
+   */
+  public void setPersistBatch(PersistBatch persistBatch) {
+    this.persistBatch = persistBatch;
+  }
+
+  /**
+   * Return the JDBC batch mode to use per save(), delete(), insert() or update() request.
+   * <p>
+   * This makes sense when a save() or delete() etc cascades and executes multiple child statements. The best caase
+   * for this is when saving a master/parent bean this cascade inserts many detail/child beans.
+   * </p>
+   * <p>
+   * This only takes effect when the persistBatch mode at the transaction level does not take effect.
+   * </p>
+   */
+  public PersistBatch getPersistBatchOnCascade() {
+    return persistBatchOnCascade;
+  }
+
+  /**
+   * Set the JDBC batch mode to use per save(), delete(), insert() or update() request.
+   * <p>
+   * This makes sense when a save() or delete() etc cascades and executes multiple child statements. The best caase
+   * for this is when saving a master/parent bean this cascade inserts many detail/child beans.
+   * </p>
+   * <p>
+   * This only takes effect when the persistBatch mode at the transaction level does not take effect.
+   * </p>
+   */
+  public void setPersistBatchOnCascade(PersistBatch persistBatchOnCascade) {
+    this.persistBatchOnCascade = persistBatchOnCascade;
+  }
+
+  /**
+   * Deprecated, please migrate to using setPersistBatch().
+   * <p>
+   * Set to true if you what to use JDBC batching for persisting and deleting
    * beans.
+   * </p>
    * <p>
    * With this Ebean will batch up persist requests and use the JDBC batch api.
    * This is a performance optimisation designed to reduce the network chatter.
    * </p>
-   */
-  public boolean isPersistBatching() {
-    return persistBatching;
-  }
-
-  /**
-   * Set to true if you what to use JDBC batching for persisting and deleting
-   * beans.
    * <p>
-   * With this Ebean will batch up persist requests and use the JDBC batch api.
-   * This is a performance optimisation designed to reduce the network chatter.
+   * When true this is equivalent to {@code setPersistBatch(PersistBatch.ALL)} or
+   * when false to {@code setPersistBatch(PersistBatch.NONE)}
    * </p>
    */
   public void setPersistBatching(boolean persistBatching) {
-    this.persistBatching = persistBatching;
-  }
-
-  /**
-   * Use setPersistBatching() instead.
-   * 
-   * @deprecated
-   */
-  public void setUsePersistBatching(boolean persistBatching) {
-    this.persistBatching = persistBatching;
+    this.persistBatch = (persistBatching) ? PersistBatch.ALL : PersistBatch.NONE;
   }
 
   /**
@@ -438,9 +484,32 @@ public class ServerConfig {
 
   /**
    * Set the batch size used for JDBC batching. If unset this defaults to 20.
+   * <p>
+   * You can also set the batch size on the transaction.
+   * </p>
+   * @see com.avaje.ebean.Transaction#setBatchSize(int)
    */
   public void setPersistBatchSize(int persistBatchSize) {
     this.persistBatchSize = persistBatchSize;
+  }
+
+  /**
+   * Gets the query batch size. This defaults to 100.
+   * 
+   * @return the query batch size
+   */
+  public int getQueryBatchSize() {
+    return queryBatchSize;
+  }
+
+  /**
+   * Sets the query batch size. This defaults to 100.
+   * 
+   * @param queryBatchSize
+   *          the new query batch size
+   */
+  public void setQueryBatchSize(int queryBatchSize) {
+    this.queryBatchSize = queryBatchSize;
   }
 
   /**
@@ -451,32 +520,13 @@ public class ServerConfig {
   }
 
   /**
-   * Gets the query batch size.
-   * 
-   * @return the query batch size
-   */
-  public int getQueryBatchSize() {
-    return queryBatchSize;
-  }
-
-  /**
-   * Sets the query batch size.
-   * 
-   * @param queryBatchSize
-   *          the new query batch size
-   */
-  public void setQueryBatchSize(int queryBatchSize) {
-    this.queryBatchSize = queryBatchSize;
-  }
-
-  /**
    * Set the default batch size for lazy loading.
    * <p>
    * This is the number of beans or collections loaded when lazy loading is
    * invoked by default.
    * </p>
    * <p>
-   * The default value is for this is 1 (load 1 bean or collection).
+   * The default value is for this is 10 (load 10 beans or collections).
    * </p>
    * <p>
    * You can explicitly control the lazy loading batch size for a given join on
@@ -1689,8 +1739,12 @@ public class ServerConfig {
     boolean defaultDeleteMissingChildren = p.getBoolean("defaultDeleteMissingChildren", updatesDeleteMissingChildren);
     updatesDeleteMissingChildren = p.getBoolean("updatesDeleteMissingChildren", defaultDeleteMissingChildren);
 
-    boolean batchMode = p.getBoolean("batch.mode", persistBatching);
-    persistBatching = p.getBoolean("persistBatching", batchMode);
+    if (p.get("batch.mode") != null || p.get("persistBatching") != null) {
+      throw new IllegalArgumentException("Property 'batch.mode' or 'persistBatching' is being set but no longer used. Please change to use 'persistBatchMode'");
+    }
+
+    persistBatch = p.getEnum(PersistBatch.class, "persistBatch", persistBatch);
+    persistBatchOnCascade = p.getEnum(PersistBatch.class, "persistBatchOnCascade", persistBatchOnCascade);
 
     int batchSize = p.getInt("batch.size", persistBatchSize);
     persistBatchSize = p.getInt("persistBatchSize", batchSize);

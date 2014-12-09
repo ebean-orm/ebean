@@ -1,53 +1,115 @@
 package com.avaje.tests.batchinsert;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Transaction;
+import com.avaje.ebean.config.PersistBatch;
 import com.avaje.tests.model.basic.UTDetail;
 import com.avaje.tests.model.basic.UTMaster;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class TestBatchInsertSimple extends BaseTestCase {
 
   Random random = new Random();
 
   @Test
-  public void testSimpleJdbcBatching() {
+  public void testJdbcBatchPerRequestWithMasterAndDetails() {
 
-    int numOfMasters = 10;// 2 + random.nextInt(8);
+    int numOfMasters = 4;// 2 + random.nextInt(8);
+
+    Transaction transaction = Ebean.beginTransaction();
+    try {
+      transaction.setBatch(PersistBatch.NONE);
+      transaction.setBatchOnCascade(PersistBatch.INSERT);
+      transaction.setBatchSize(30);
+
+      for (int i = 0; i < numOfMasters; i++) {
+        UTMaster master = createMasterAndDetails(i, 20);
+        Ebean.save(master);
+      }
+
+      transaction.commit();
+
+    } finally {
+      transaction.end();
+    }
+  }
+
+
+  @Test
+  public void testJdbcBatchPerRequestWithMasterOnly() {
+
+    int numOfMasters = 4;
+
+    Transaction transaction = Ebean.beginTransaction();
+    try {
+      transaction.setBatch(PersistBatch.NONE);
+      transaction.setBatchOnCascade(PersistBatch.INSERT);
+      transaction.setBatchSize(30);
+
+      for (int i = 0; i < numOfMasters; i++) {
+        UTMaster master = createMaster(i);
+        Ebean.save(master);
+      }
+
+      transaction.commit();
+
+    } finally {
+      transaction.end();
+    }
+  }
+
+  @Test
+  public void testJdbcBatchOnCollection() {
+
+    int numOfMasters = 3;
 
     List<UTMaster> masters = new ArrayList<UTMaster>();
     for (int i = 0; i < numOfMasters; i++) {
-      masters.add(createMasterAndDetails(i));
+      masters.add(createMasterAndDetails(i, 7));
     }
 
     Transaction transaction = Ebean.beginTransaction();
     try {
-      transaction.setBatchMode(true);
-      transaction.setBatchSize(4);
-      // transaction.setLogLevel(LogLevel.SUMMARY);
-      // transaction.setBatchGetGeneratedKeys(false);
+      transaction.setBatch(PersistBatch.NONE);
+      transaction.setBatchOnCascade(PersistBatch.ALL);
+      transaction.setBatchSize(20);
 
+      // escalate based on batchOnCascade value
       Ebean.save(masters);
 
       transaction.commit();
 
     } finally {
-      Ebean.endTransaction();
+      transaction.end();
     }
   }
 
-  private UTMaster createMasterAndDetails(int masterPos) {
+  @Test
+  public void testJdbcBatchOnCollectionNoTransaction() {
+
+    int numOfMasters = 3;
+
+    List<UTMaster> masters = new ArrayList<UTMaster>();
+    for (int i = 0; i < numOfMasters; i++) {
+      masters.add(createMasterAndDetails(i, 5));
+    }
+
+    // escalate based on batchOnCascade value
+    Ebean.save(masters);
+
+  }
+
+  private UTMaster createMasterAndDetails(int masterPos, int size) {
 
     UTMaster master = createMaster(masterPos);
     List<UTDetail> details = new ArrayList<UTDetail>();
 
-    int count = 2 + random.nextInt(20);
+    int count = 2 + random.nextInt(size);
 
     for (int i = 0; i < count; i++) {
 

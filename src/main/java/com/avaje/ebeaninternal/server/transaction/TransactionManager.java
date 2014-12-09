@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.transaction;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.config.PersistBatch;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.event.TransactionEventListener;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -37,8 +38,8 @@ public class TransactionManager {
   public static final Logger SUM_LOGGER = LoggerFactory.getLogger("org.avaje.ebean.SUM");
   
   public static final Logger TXN_LOGGER = LoggerFactory.getLogger("org.avaje.ebean.TXN");
-  
-	/**
+
+  /**
 	 * The behavior desired when ending a query only transaction.
 	 */
 	public enum OnQueryOnly {
@@ -79,32 +80,33 @@ public class TransactionManager {
 	 */
 	protected final OnQueryOnly onQueryOnly;
 
-	/**
-	 * The default batchMode for transactions.
-	 */
-	protected final boolean defaultBatchMode;
-
 	protected final BackgroundExecutor backgroundExecutor;
 			
 	protected final ClusterManager clusterManager;
 	
 	protected final String serverName;
-	
+
+  protected final PersistBatch persistBatch;
+
+  protected final PersistBatch persistBatchOnCascade;
+
 	/**
 	 * Id's for transaction logging.
 	 */
-	protected AtomicLong transactionCounter = new AtomicLong(1000);
+	protected final AtomicLong transactionCounter = new AtomicLong(1000);
 
 	protected final BulkEventListenerMap bulkEventListenerMap;
 
-	protected TransactionEventListener[] transactionEventListeners;
+	protected final TransactionEventListener[] transactionEventListeners;
 
 	/**
 	 * Create the TransactionManager
 	 */
 	public TransactionManager(ClusterManager clusterManager, BackgroundExecutor backgroundExecutor, ServerConfig config, 
 	      BeanDescriptorManager descMgr, BootupClasses bootupClasses) {
-		
+
+    this.persistBatch = config.getPersistBatch();
+    this.persistBatchOnCascade = config.getPersistBatchOnCascade();
 		this.beanDescriptorManager = descMgr;
 		this.clusterManager = clusterManager;
 		this.serverName = config.getName();		
@@ -115,7 +117,6 @@ public class TransactionManager {
     List<TransactionEventListener> transactionEventListeners = bootupClasses.getTransactionEventListeners();
     this.transactionEventListeners = transactionEventListeners.toArray(new TransactionEventListener[transactionEventListeners.size()]);
 
-		this.defaultBatchMode = config.isPersistBatching();
 		this.prefix = "";
 		this.externalTransPrefix = "e";
 		
@@ -145,8 +146,16 @@ public class TransactionManager {
   public BulkEventListenerMap getBulkEventListenerMap() {
     return bulkEventListenerMap;
   }
-	
-	/**
+
+  public PersistBatch getPersistBatch() {
+    return persistBatch;
+  }
+
+  public PersistBatch getPersistBatchOnCascade() {
+    return persistBatchOnCascade;
+  }
+
+  /**
 	 * Return the behaviour to use when a query only transaction is committed.
 	 * <p>
 	 * There is a potential optimisation available when read committed is the default 
@@ -232,12 +241,9 @@ public class TransactionManager {
 
 		ExternalJdbcTransaction t = new ExternalJdbcTransaction(id, true, c, this);
 
-		// set the default batch mode. This can be on for
-		// jdbc drivers that support getGeneratedKeys
-		if (defaultBatchMode){
-			t.setBatchMode(true);
-		}
-				
+		// set the default batch mode
+    t.setBatch(persistBatch);
+    t.setBatchOnCascade(persistBatchOnCascade);
 		return t;
 	}
 	
@@ -251,12 +257,6 @@ public class TransactionManager {
 		  long id = transactionCounter.incrementAndGet();
 
 			SpiTransaction t = createTransaction(explicit, c, id);
-
-			// set the default batch mode. This can be on for
-			// jdbc drivers that support getGeneratedKeys
-			if (defaultBatchMode){
-				t.setBatchMode(true);
-			}
 			if (isolationLevel > -1) {
 				c.setTransactionIsolation(isolationLevel);
 			}
@@ -286,16 +286,8 @@ public class TransactionManager {
       c = dataSource.getConnection();
 		  long id = transactionCounter.incrementAndGet();
 
-			SpiTransaction t = createTransaction(false, c, id);
-			
-			// set the default batch mode. Can be true for
-			// jdbc drivers that support getGeneratedKeys
-			if (defaultBatchMode){
-				t.setBatchMode(true);
-			}
-			
-			return t;
-			
+			return createTransaction(false, c, id);
+
 		} catch (PersistenceException ex) {
 		  // close the connection and re-throw the exception
       try {
@@ -454,8 +446,6 @@ public class TransactionManager {
         beanPersist.notifyCacheAndListener();
       }
     }
-
   }
-	
 
 }

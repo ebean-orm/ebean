@@ -2,17 +2,38 @@ package com.avaje.tests.query.joins;
 
 import java.util.List;
 
+import com.avaje.ebean.*;
+import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class TestQueryJoinManyNonRoot extends BaseTestCase {
+
+  @Test
+  public void test_manyPredicate() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    List<Order> orders = Ebean.find(Order.class)
+            .select("id, status, orderDate")
+            .where().gt("details.orderQty", 0)
+            .findList();
+
+    assertTrue(!orders.isEmpty());
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertEquals(1, loggedSql.size());
+    assertTrue(loggedSql.get(0).contains("select distinct "));
+    assertTrue(loggedSql.get(0).contains(" from o_order t0 join o_order_detail u1 on u1.order_id = t0.id "));
+  }
 
   @Test
   public void test_manyNonRoot() {
@@ -27,9 +48,9 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
     List<Order> list = q.findList();
     String sql = q.getGeneratedSql();
 
-    Assert.assertTrue(list.size() > 0);
-    Assert.assertTrue(sql.contains("join o_customer t1 on t1.id "));
-    Assert.assertTrue(sql.contains("left outer join contact t2 on"));
+    assertTrue(list.size() > 0);
+    assertTrue(sql.contains("join o_customer t1 on t1.id "));
+    assertTrue(sql.contains("left outer join contact t2 on"));
     
     // select t0.id c0, t0.status c1, t0.order_date c2, t0.ship_date c3, t1.name c4, t0.cretime c5, t0.updtime c6, 
     //        t1.id c7, t1.status c8, t1.name c9, t1.smallnote c10, t1.anniversary c11, t1.cretime c12, t1.updtime c13, t1.billing_address_id c14, t1.shipping_address_id c15, 
@@ -56,10 +77,10 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
     List<Order> list = q.findList();
     String sql = q.getGeneratedSql();
 
-    Assert.assertTrue(list.size() > 0);
-    Assert.assertTrue(sql.contains("join o_customer t1 on t1.id "));
-    Assert.assertTrue(sql.contains("left outer join o_order_detail "));
-    Assert.assertTrue(sql.contains("left outer join o_product "));
+    assertTrue(list.size() > 0);
+    assertTrue(sql.contains("join o_customer t1 on t1.id "));
+    assertTrue(sql.contains("left outer join o_order_detail "));
+    assertTrue(sql.contains("left outer join o_product "));
 
     Assert.assertFalse(sql.contains("left outer join contact"));
 
@@ -84,9 +105,9 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
       order.getCustomer().getContacts().size();
     }
 
-    Assert.assertTrue(list.size() > 0);
-    Assert.assertTrue(sql.contains("join o_customer t1 on t1.id "));
-    Assert.assertTrue(sql.contains("left outer join contact "));
+    assertTrue(list.size() > 0);
+    assertTrue(sql.contains("join o_customer t1 on t1.id "));
+    assertTrue(sql.contains("left outer join contact "));
 
     Assert.assertFalse(sql.contains("left outer join o_order_detail "));
     Assert.assertFalse(sql.contains("left outer join o_product "));

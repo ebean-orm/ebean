@@ -9,7 +9,6 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanQueryAdapter;
-import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
@@ -437,20 +436,6 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public ServerCacheManager getServerCacheManager() {
     return serverCacheManager;
-  }
-
-  /**
-   * Return the Profile Listener.
-   */
-  public AutoFetchManager getProfileListener() {
-    return autoFetchManager;
-  }
-
-  /**
-   * Return the Relational query engine.
-   */
-  public RelationalQueryEngine getRelationalQueryEngine() {
-    return relationalQueryEngine;
   }
 
   public void refreshMany(Object parentBean, String propertyName, Transaction t) {
@@ -1029,15 +1014,10 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> query, Transaction t) {
 
-    if (desc.isAutoFetchTunable() && !query.isSqlSelect()) {
-      // its a tunable query
-      if (autoFetchManager.tuneQuery(query)) {
-        // was automatically tuned by Autofetch
-      } else {
-        // use deployment FetchType.LAZY/EAGER annotations
-        // to define the 'default' select clause
-        query.setDefaultSelectClause();
-      }
+    if (desc.isAutoFetchTunable() && !query.isSqlSelect() && !autoFetchManager.tuneQuery(query)) {
+      // use deployment FetchType.LAZY/EAGER annotations
+      // to define the 'default' select clause
+      query.setDefaultSelectClause();
     }
 
     if (query.selectAllForLazyLoadProperty()) {
@@ -1048,12 +1028,9 @@ public final class DefaultServer implements SpiEbeanServer {
       }
     }
 
-    if (true) {
-      // if determine cost and no origin for Autofetch
-      if (query.getParentNode() == null) {
-        CallStack callStack = createCallStack();
-        query.setOrigin(callStack);
-      }
+    // if determine cost and no origin for Autofetch
+    if (query.getParentNode() == null) {
+      query.setOrigin(createCallStack());
     }
 
     // determine extra joins required to support where clause
@@ -1711,6 +1688,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
     TransWrapper wrap = initTransIfRequired(t);
     try {
+      wrap.batchEscalateOnCollection();
       SpiTransaction trans = wrap.transaction;
       int saveCount = 0;
       while (it.hasNext()) {
@@ -1720,7 +1698,7 @@ public final class DefaultServer implements SpiEbeanServer {
       }
 
       wrap.commitIfCreated();
-
+      wrap.flushBatchOnCollection();
       return saveCount;
 
     } catch (RuntimeException e) {
@@ -1804,6 +1782,7 @@ public final class DefaultServer implements SpiEbeanServer {
     TransWrapper wrap = initTransIfRequired(t);
 
     try {
+      wrap.batchEscalateOnCollection();
       SpiTransaction trans = wrap.transaction;
       int deleteCount = 0;
       while (it.hasNext()) {
@@ -1813,7 +1792,7 @@ public final class DefaultServer implements SpiEbeanServer {
       }
 
       wrap.commitIfCreated();
-
+      wrap.flushBatchOnCollection();
       return deleteCount;
 
     } catch (RuntimeException e) {
@@ -1864,10 +1843,6 @@ public final class DefaultServer implements SpiEbeanServer {
     return execute(update, null);
   }
 
-  public <T> BeanManager<T> getBeanManager(Class<T> beanClass) {
-    return beanDescriptorManager.getBeanManager(beanClass);
-  }
-
   /**
    * Return all the BeanDescriptors.
    */
@@ -1875,13 +1850,6 @@ public final class DefaultServer implements SpiEbeanServer {
     return beanDescriptorManager.getBeanDescriptorList();
   }
 
-  public List<MetaBeanInfo> getMetaBeanInfoList() {
-
-    List<MetaBeanInfo> list = new ArrayList<MetaBeanInfo>();
-    list.addAll(getBeanDescriptors());
-    return list;
-  }
-  
   public void register(BeanPersistController c) {
     List<BeanDescriptor<?>> list = beanDescriptorManager.getBeanDescriptorList();
     for (int i = 0; i < list.size(); i++) {
@@ -2006,7 +1974,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
     // create the 'interesting' part of the stackTrace
     StackTraceElement[] finalTrace = new StackTraceElement[stackLength];
-    System.arraycopy(stackTrace, 0 + startIndex, finalTrace, 0, stackLength);
+    System.arraycopy(stackTrace, startIndex, finalTrace, 0, stackLength);
 
     if (stackLength < 1) {
       // this should not really happen
