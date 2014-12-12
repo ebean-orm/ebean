@@ -1697,6 +1697,7 @@ public class ServerConfig {
    */
   protected void loadSettings(PropertiesWrapper p) {
 
+    namingConvention = createNamingConvention(p, namingConvention);
     if (namingConvention != null) {
       namingConvention.loadFromProperties(p);
     }
@@ -1712,7 +1713,7 @@ public class ServerConfig {
 
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
-    namingConvention = createNamingConvention(p);
+
     databasePlatform = createInstance(p, DatabasePlatform.class, "databasePlatform");
     encryptKeyManager = createInstance(p, EncryptKeyManager.class, "encryptKeyManager");
     encryptDeployManager = createInstance(p, EncryptDeployManager.class, "encryptDeployManager");
@@ -1775,26 +1776,10 @@ public class ServerConfig {
     classes = getClasses(p);
   }
 
-  private NamingConvention createNamingConvention(PropertiesWrapper properties) {
+  private NamingConvention createNamingConvention(PropertiesWrapper properties, NamingConvention namingConvention) {
 
     NamingConvention nc = createInstance(properties, NamingConvention.class, "namingconvention");
-    if (nc == null) {
-      return null;
-    }
-    if (nc instanceof AbstractNamingConvention) {
-      AbstractNamingConvention anc = (AbstractNamingConvention) nc;
-      String v = properties.get("namingConvention.useForeignKeyPrefix", null);
-      if (v != null) {
-        boolean useForeignKeyPrefix = Boolean.valueOf(v);
-        anc.setUseForeignKeyPrefix(useForeignKeyPrefix);
-      }
-
-      String sequenceFormat = properties.get("namingConvention.sequenceFormat", null);
-      if (sequenceFormat != null) {
-        anc.setSequenceFormat(sequenceFormat);
-      }
-    }
-    return nc;
+    return (nc != null) ? nc : namingConvention;
   }
 
   /**
