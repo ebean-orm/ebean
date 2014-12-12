@@ -3,6 +3,7 @@ package com.avaje.tests.batchinsert;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Transaction;
+import com.avaje.ebean.annotation.Transactional;
 import com.avaje.ebean.config.PersistBatch;
 import com.avaje.tests.model.basic.UTDetail;
 import com.avaje.tests.model.basic.UTMaster;
@@ -29,7 +30,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
       for (int i = 0; i < numOfMasters; i++) {
         UTMaster master = createMasterAndDetails(i, 20);
-        Ebean.save(master);
+        master.save();
       }
 
       transaction.commit();
@@ -39,6 +40,24 @@ public class TestBatchInsertSimple extends BaseTestCase {
     }
   }
 
+  @Test
+  public void testTransactional() {
+
+    saveWithFullBatchMode();
+  }
+
+  @Transactional(batch=PersistBatch.ALL, batchSize=50)
+  public void saveWithFullBatchMode() {
+
+    int numOfMasters = 4;
+
+    for (int i = 0; i < numOfMasters; i++) {
+      UTMaster master = createMasterAndDetails(i, 5);
+      // the save is 'batched' and does not execute immediately
+      // ... it now acts more like 'merge/persist'
+      master.save();
+    }
+  }
 
   @Test
   public void testJdbcBatchPerRequestWithMasterOnly() {
@@ -132,8 +151,8 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
     UTDetail detail = new UTDetail();
     detail.setName("batchInsert-detail-" + position);
-    detail.setQty(Integer.valueOf(qty));
-    detail.setAmount(Double.valueOf(amount));
+    detail.setQty(qty);
+    detail.setAmount(amount);
 
     // System.out.println("-- "+detail);
 

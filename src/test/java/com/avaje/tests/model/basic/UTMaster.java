@@ -1,5 +1,7 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.Model;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +14,7 @@ import javax.persistence.Version;
 
 @Entity
 @Table(name="ut_master")
-public class UTMaster {
+public class UTMaster extends Model {
 
     @Id
     Integer id;

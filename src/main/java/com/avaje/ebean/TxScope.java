@@ -1,5 +1,7 @@
 package com.avaje.ebean;
 
+import com.avaje.ebean.config.PersistBatch;
+
 import java.util.ArrayList;
 
 /**
@@ -28,11 +30,38 @@ public final class TxScope {
 
   TxIsolation isolation;
 
+  PersistBatch batch;
+
+  PersistBatch batchOnCascade;
+
+  int batchSize;
+
   boolean readOnly;
 
   ArrayList<Class<? extends Throwable>> rollbackFor;
 
   ArrayList<Class<? extends Throwable>> noRollbackFor;
+
+  /**
+   * Return true if PersistBatch has been set.
+   */
+  public boolean isBatchSet() {
+    return batch != null && batch != PersistBatch.INHERIT;
+  }
+
+  /**
+   * Return true if batch on cascade has been set.
+   */
+  public boolean isBatchOnCascadeSet() {
+    return batchOnCascade != null && batchOnCascade != PersistBatch.INHERIT;
+  }
+
+  /**
+   * Return true if batch size has been set.
+   */
+  public boolean isBatchSizeSet() {
+    return batchSize > 0;
+  }
 
   /**
    * Helper method to create a TxScope with REQUIRES.
@@ -111,6 +140,51 @@ public final class TxScope {
    */
   public TxScope setType(TxType type) {
     this.type = type;
+    return this;
+  }
+
+  /**
+   * Return the batch mode.
+   */
+  public PersistBatch getBatch() {
+    return batch;
+  }
+
+  /**
+   * Set the batch mode to use.
+   */
+  public TxScope setBatch(PersistBatch batch) {
+    this.batch = batch;
+    return this;
+  }
+
+  /**
+   * Return the batch on cascade mode.
+   */
+  public PersistBatch getBatchOnCascade() {
+    return batchOnCascade;
+  }
+
+  /**
+   * Set the batch on cascade mode.
+   */
+  public TxScope setBatchOnCascade(PersistBatch batchOnCascade) {
+    this.batchOnCascade = batchOnCascade;
+    return this;
+  }
+
+  /**
+   * Return the batch size. 0 means use the default value.
+   */
+  public int getBatchSize() {
+    return batchSize;
+  }
+
+  /**
+   * Set the batch size to use.
+   */
+  public TxScope setBatchSize(int batchSize) {
+    this.batchSize = batchSize;
     return this;
   }
 

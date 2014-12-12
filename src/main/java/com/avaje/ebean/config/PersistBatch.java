@@ -27,7 +27,14 @@ public enum PersistBatch {
   /**
    * Use JDBC Batch mode on Inserts, Updates and Deletes.
    */
-  ALL(true);
+  ALL(true),
+
+  /**
+   * You should not use this value explicitly. It should only used on the Transactional annotation
+   * to indicate that the value should inherit from the ServerConfig setting.
+   */
+  INHERIT(false);
+
 
   boolean forInsert;
 

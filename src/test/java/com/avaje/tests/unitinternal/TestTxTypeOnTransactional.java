@@ -19,6 +19,15 @@ public class TestTxTypeOnTransactional extends BaseTestCase {
   Logger logger = LoggerFactory.getLogger(TestTxTypeOnTransactional.class);
 
   @Test
+  public void testBatchOptionsAreSet() {
+
+    logger.info("-- test pre doOuterWithBatchOptionsSet");
+    DummyDao dao = new DummyDao();
+    dao.doOuterWithBatchOptionsSet();
+    logger.info("-- test post doOuterWithBatchOptionsSet");
+  }
+
+  @Test
   public void test() {
 
     logger.info("-- test pre dao.doSomething");

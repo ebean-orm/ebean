@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.api;
 import java.util.ArrayList;
 
 import com.avaje.ebean.TxScope;
+import com.avaje.ebean.config.PersistBatch;
 
 /**
  * Used internally to handle the scoping of transactions for methods.
@@ -10,14 +11,14 @@ import com.avaje.ebean.TxScope;
 public class ScopeTrans implements Thread.UncaughtExceptionHandler {
 
 	private static final int OPCODE_ATHROW = 191;
-	//private static final int OPCODE_ATHROW = com.avaje.ebean.enhance.asm.Opcodes.ATHROW;
-	
+
 	private final SpiTransactionScopeManager scopeMgr;
 
 	/**
 	 * The suspended transaction (can be null).
 	 */
 	private final SpiTransaction suspendedTransaction;
+
 	/**
 	 * The transaction in scope (can be null).
 	 */
@@ -44,7 +45,13 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
 	 */
 	private final ArrayList<Class<? extends Throwable>> rollbackFor;
 
-	/**
+  private PersistBatch restoreBatch;
+
+  private PersistBatch restoreBatchOnCascade;
+
+  private int restoreBatchSize;
+
+  /**
 	 * Flag set when a rollback has occurred.
 	 */
 	private boolean rolledBack;
@@ -61,6 +68,24 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
 		
 		this.noRollbackFor = txScope.getNoRollbackFor();
 		this.rollbackFor = txScope.getRollbackFor();
+
+    if (transaction != null) {
+      if (!created && txScope.isBatchSet() || txScope.isBatchOnCascadeSet() || txScope.isBatchSizeSet()) {
+        restoreBatch = transaction.getBatch();
+        restoreBatchOnCascade = transaction.getBatchOnCascade();
+        restoreBatchSize = transaction.getBatchSize();
+      }
+      if (txScope.isBatchSet()) {
+        transaction.setBatch(txScope.getBatch());
+      }
+      if (txScope.isBatchOnCascadeSet()) {
+        transaction.setBatchOnCascade(txScope.getBatchOnCascade());
+      }
+      if (txScope.isBatchSizeSet()) {
+        transaction.setBatchSize(txScope.getBatchSize());
+      }
+    }
+
 	}
 	
 	/**
@@ -97,10 +122,22 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
 	 */
 	public void onFinally() {
 		try {		
-			if (!rolledBack && created) {
-				transaction.commit();
+			if (!rolledBack) {
+        if (created) {
+          transaction.commit();
+        } else {
+          if (restoreBatch != null) {
+            transaction.setBatch(restoreBatch);
+          }
+          if (restoreBatchOnCascade != null) {
+            transaction.setBatchOnCascade(restoreBatchOnCascade);
+          }
+          if (restoreBatchSize > 0) {
+            transaction.setBatchSize(restoreBatchSize);
+          }
+        }
 			}
-		
+
 		} finally {
 			if (suspendedTransaction != null){
 				// put the previously suspended transaction 

@@ -213,6 +213,11 @@ public interface Transaction extends Closeable {
   public void setBatchSize(int batchSize);
 
   /**
+   * Return the current batch size.
+   */
+  public int getBatchSize();
+
+  /**
    * Specify if you want batched inserts to use getGeneratedKeys.
    * <p>
    * By default batched inserts will try to use getGeneratedKeys if it is

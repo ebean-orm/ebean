@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 import com.avaje.ebean.TxIsolation;
 import com.avaje.ebean.TxType;
+import com.avaje.ebean.config.PersistBatch;
 
 /**
  * Specify transaction scoping for a method.
@@ -65,6 +66,29 @@ public @interface Transactional {
    * The type of transaction scoping. Defaults to REQUIRED.
    */
   TxType type() default TxType.REQUIRED;
+
+  /**
+   * Persist batch mode for the transaction.
+   */
+  PersistBatch batch() default PersistBatch.INHERIT;
+
+  /**
+   * Persist batch mode for the request if not set on the transaction.
+   * <p>
+   * If batch is set to NONE then batchOnCascade can be set to INSERT or ALL
+   * and then each save(), delete(), insert(), update() request that cascades
+   * to child beans can use JDBC batch.
+   * </p>
+   */
+  PersistBatch batchOnCascade() default PersistBatch.INHERIT;
+
+  /**
+   * The batch size to use when using JDBC batch mode.
+   * <p>
+   * If unset this defaults to the value set in ServerConfig.
+   * </p>
+   */
+  int batchSize() default 0;
 
   /**
    * The transaction isolation level this transaction should have.
