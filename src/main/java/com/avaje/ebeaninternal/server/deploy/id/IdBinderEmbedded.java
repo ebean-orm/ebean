@@ -43,17 +43,21 @@ public final class IdBinderEmbedded implements IdBinder {
     this.idInValueSql = idInExpandedForm ? idInExpanded() : idInCompressed();
   }
 
+  public boolean isIdInExpandedForm() {
+    return idInExpandedForm;
+  }
+
   private String idInExpanded() {
 
-    StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new StringBuilder(30);
     sb.append("(");
     for (int i = 0; i < props.length; i++) {
       if (i > 0) {
         sb.append(" and ");
       }
-      sb.append(embIdProperty.getName());
+      sb.append(idDesc.getBaseTableAlias());
       sb.append(".");
-      sb.append(props[i].getName());
+      sb.append(props[i].getDbColumn());
       sb.append("=?");
     }
     sb.append(")");

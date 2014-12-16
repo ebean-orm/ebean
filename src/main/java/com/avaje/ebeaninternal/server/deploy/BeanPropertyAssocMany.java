@@ -278,9 +278,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       query.setIncludeTableJoin(inverseJoin);
     }
     String rawWhere = deriveWhereParentIdSql(true, tableAlias);
-    String inClause = descriptor.getIdBinder().getIdInValueExpr(parentIds.size());
-
-    String expr = rawWhere + inClause;
+    String expr = descriptor.getParentIdInExpr(parentIds.size(), rawWhere);
 
     // Flatten the bind values if needed (embeddedId)
     List<Object> bindValues = getBindParentIds(parentIds);

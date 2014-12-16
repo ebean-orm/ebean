@@ -30,6 +30,10 @@ public final class IdBinderEmpty implements IdBinder {
 
   }
 
+  public boolean isIdInExpandedForm() {
+    return false;
+  }
+
   public String getOrderBy(String pathPrefix, boolean ascending) {
     return pathPrefix;
   }

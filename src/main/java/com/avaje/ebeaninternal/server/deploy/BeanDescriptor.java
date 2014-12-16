@@ -1,24 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.io.IOException;
-import java.lang.reflect.Modifier;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.persistence.PersistenceException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.annotation.ConcurrencyMode;
@@ -35,11 +16,7 @@ import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaQueryPlanStatistic;
-import com.avaje.ebeaninternal.api.HashQueryPlan;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.api.SpiTransaction;
-import com.avaje.ebeaninternal.api.SpiUpdatePlan;
+import com.avaje.ebeaninternal.api.*;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cache.CachedBeanData;
 import com.avaje.ebeaninternal.server.cache.CachedManyIds;
@@ -50,13 +27,7 @@ import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyLists;
-import com.avaje.ebeaninternal.server.el.ElComparator;
-import com.avaje.ebeaninternal.server.el.ElComparatorCompound;
-import com.avaje.ebeaninternal.server.el.ElComparatorProperty;
-import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
-import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
-import com.avaje.ebeaninternal.server.el.ElPropertyValue;
-import com.avaje.ebeaninternal.server.persist.DmlUtil;
+import com.avaje.ebeaninternal.server.el.*;
 import com.avaje.ebeaninternal.server.query.CQueryPlan;
 import com.avaje.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import com.avaje.ebeaninternal.server.query.SplitName;
@@ -68,6 +39,15 @@ import com.avaje.ebeaninternal.util.SortByClause;
 import com.avaje.ebeaninternal.util.SortByClause.Property;
 import com.avaje.ebeaninternal.util.SortByClauseParser;
 import com.fasterxml.jackson.core.JsonParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Describes Beans including their deployment information.
@@ -1034,6 +1014,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     }
 
     return null;
+  }
+
+  /**
+   * Return a raw expression for 'where parent id in ...' clause.
+   */
+  public String getParentIdInExpr(int parentIdSize, String rawWhere) {
+    String inClause = idBinder.getIdInValueExpr(parentIdSize);
+    return idBinder.isIdInExpandedForm() ? inClause : rawWhere + inClause;
   }
 
   /**

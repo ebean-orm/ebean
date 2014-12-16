@@ -41,7 +41,11 @@ public final class IdBinderSimple implements IdBinder {
 	public void initialise(){
 		// do nothing
 	}
-	
+
+  public boolean isIdInExpandedForm() {
+    return false;
+  }
+
   public String getOrderBy(String pathPrefix, boolean ascending) {
 
     StringBuilder sb = new StringBuilder();

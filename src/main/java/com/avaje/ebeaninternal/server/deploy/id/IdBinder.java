@@ -26,6 +26,11 @@ public interface IdBinder {
   public void initialise();
 
   /**
+   * Return true if this is a compound key and must use expanded and or form.
+   */
+  public boolean isIdInExpandedForm();
+
+  /**
    * Write the Id value to binary DataOuput.
    */
   public void writeData(DataOutput dataOutput, Object idValue) throws IOException;
