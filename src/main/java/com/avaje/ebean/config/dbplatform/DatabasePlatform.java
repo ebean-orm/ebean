@@ -99,7 +99,14 @@ public class DatabasePlatform {
    * findIterate() and findVisit().
    */
   protected boolean forwardOnlyHintOnFindIterate;
-  
+
+  /**
+   * Flag set for SQL Server due to lack of support of getGeneratedKeys in
+   * batch mode (meaning for batch inserts you should explicitly turn off
+   * getGeneratedKeys - joy).
+   */
+  protected boolean disallowBatchOnCascade;
+
   /**
    * Instantiates a new database platform.
    */
@@ -366,5 +373,16 @@ public class DatabasePlatform {
    */
   public String getLikeClause() {
     return likeClause;
+  }
+
+  /**
+   * Return true if the persistBatchOnCascade setting should be ignored.
+   * <p>
+   * This is primarily for SQL Server which does not support getGeneratedKeys with jdbc batch mode
+   * so can't really be transparently used.
+   * </p>
+   */
+  public boolean isDisallowBatchOnCascade() {
+    return disallowBatchOnCascade;
   }
 }
