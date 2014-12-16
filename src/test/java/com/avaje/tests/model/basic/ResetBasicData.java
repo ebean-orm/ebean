@@ -97,25 +97,21 @@ public class ResetBasicData {
 	  server.execute(new TxRunnable() {
 			public void run() {
 				Product p = new Product();
-				p.setId(1);
 				p.setName("Chair");
 				p.setSku("C001");
 				server.save(p);
 		
 				p = new Product();
-				p.setId(2);
 				p.setName("Desk");
 				p.setSku("DSK1");
 				server.save(p);
 		
 				p = new Product();
-				p.setId(3);
 				p.setName("Computer");
 				p.setSku("C002");
 				server.save(p);
 		
 				p = new Product();
-				p.setId(4);
 				p.setName("Printer");
 				p.setSku("C003");
 				server.save(p);

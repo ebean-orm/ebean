@@ -41,9 +41,9 @@ public class TestQueryConversationRowCount extends BaseTestCase {
     // where t0.group_id = ?  and ((t0.open = ?  and u1.user_id = ? )  or t0.open = ? ) 
     // order by t0.when_created desc; 
 
-    Assert.assertTrue(generatedSql.contains("select distinct t0.id c0, t0.title c1, t0.open"));
+    Assert.assertTrue(generatedSql.contains("select distinct t0.id c0, t0.title c1, t0.isopen"));
     Assert.assertTrue(generatedSql.contains("left outer join c_participation u1 on u1.conversation_id = t0.id"));
-    Assert.assertTrue(generatedSql.contains("where t0.group_id = ?  and ((t0.open = ?  and u1.user_id = ? )  or t0.open = ? )"));
+    Assert.assertTrue(generatedSql.contains("where t0.group_id = ?  and ((t0.isopen = ?  and u1.user_id = ? )  or t0.isopen = ? )"));
 
     
     LoggedSqlCollector.start();
@@ -61,7 +61,7 @@ public class TestQueryConversationRowCount extends BaseTestCase {
     
     String countSql = loggedSql.get(0);
     
-    Assert.assertTrue(countSql.contains("select count(*) from ( select distinct t0.id c0 from c_conversation t0 left outer join c_participation u1 on u1.conversation_id = t0.id  where t0.group_id = ?  and ((t0.open = ?  and u1.user_id = ? )  or t0.open = ? )"));
+    Assert.assertTrue(countSql.contains("select count(*) from ( select distinct t0.id c0 from c_conversation t0 left outer join c_participation u1 on u1.conversation_id = t0.id  where t0.group_id = ?  and ((t0.isopen = ?  and u1.user_id = ? )  or t0.isopen = ? )"));
   }
   
   @Test
@@ -96,7 +96,7 @@ public class TestQueryConversationRowCount extends BaseTestCase {
     // where t0.group_id = ?  and ((t0.open = ?  and u1.user_id = ? )  or t0.open = ? ) 
     // order by t0.when_created desc; 
 
-    Assert.assertTrue(generatedSql.contains("select distinct t0.id c0, t0.title c1, t0.open"));
+    Assert.assertTrue(generatedSql.contains("select distinct t0.id c0, t0.title c1, t0.isopen"));
     
     
     // THE NEXT ASSERT CURRENTLY FAILS:

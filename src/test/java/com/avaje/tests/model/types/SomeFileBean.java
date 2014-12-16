@@ -45,7 +45,7 @@ public class SomeFileBean {
     return content;
   }
 
-  public void setContent(File file) {
+  public void setContent(File content) {
     this.content = content;
   }
 }

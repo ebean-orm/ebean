@@ -1,8 +1,11 @@
 package com.avaje.tests.compositekeys;
 
 import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Query;
+import com.avaje.tests.model.composite.RCustomer;
+import com.avaje.tests.model.composite.RCustomerKey;
 import com.avaje.tests.model.composite.ROrder;
 import com.avaje.tests.model.composite.ROrderPK;
 import org.junit.Assert;
@@ -18,11 +21,30 @@ public class TestCKeyIdInExpression extends BaseTestCase {
 
   }
 
-  // public void testRunManually() {
+  //@Test
+  public void notRanAuto_doInsert() {
+
+    RCustomerKey customerKey = new RCustomerKey("compa", "coa");
+    RCustomer rCustomer = new RCustomer();
+    rCustomer.setKey(customerKey);
+    rCustomer.setDescription("some foo for ms sql server");
+
+    Ebean.save(rCustomer);
+
+    ROrderPK k0 = new ROrderPK("compa", 100);
+    ROrder rOrder = new ROrder();
+    rOrder.setCustomer(rCustomer);
+    rOrder.setOrderPK(k0);
+    rOrder.setItem("Chair");
+
+    Ebean.save(rOrder);
+  }
+
   //@Test
   public void notRanAutomatically() {
 
-    EbeanServer server = CreateIdExpandedFormServer.create();
+    //EbeanServer server = CreateIdExpandedFormServer.create();
+    EbeanServer server = Ebean.getServer(null);
 
     ROrderPK k0 = new ROrderPK("compa", 100);
     ROrderPK k1 = new ROrderPK("compa", 101);
@@ -40,14 +62,14 @@ public class TestCKeyIdInExpression extends BaseTestCase {
     query.findList();
     String sql = query.getGeneratedSql();
 
-    Assert.assertTrue(sql.contains("(r.company=? and r.order_number=?) or"));
+    Assert.assertTrue(sql.contains("(t0.company=? and t0.order_number=?) or"));
 
     Query<ROrder> query2 = server.find(ROrder.class).setId(k0);
 
     query2.findUnique();
     sql = query2.getGeneratedSql();
-    Assert.assertTrue(sql.contains("r.company = ? "));
-    Assert.assertTrue(sql.contains(" and r.order_number = ?"));
+    Assert.assertTrue(sql.contains("t0.company = ? "));
+    Assert.assertTrue(sql.contains(" and t0.order_number = ?"));
 
     server.delete(ROrder.class, k0);
 
