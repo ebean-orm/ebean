@@ -7,30 +7,35 @@ import com.avaje.ebean.config.TableName;
  */
 public class DbDdlSyntax {
 
-  private boolean renderIndexForFkey = true;
+  protected boolean renderIndexForFkey = true;
 
-  private boolean inlinePrimaryKeyConstraint = false;
+  protected boolean inlinePrimaryKeyConstraint = false;
 
-  private boolean addOneToOneUniqueContraint = true;
+  protected boolean addOneToOneUniqueContraint = true;
 
-  private int maxConstraintNameLength = 32;
+  protected int maxConstraintNameLength = 32;
 
-  private int columnNameWidth = 25;
+  protected int columnNameWidth = 25;
 
-  private String dropTableCascade;
-  private String dropIfExists;
+  /**
+   * Flag set when we want to disable constraints on each table (rather than globally).
+   */
+  protected boolean dropKeyConstraints;
 
-  private String newLine = "\n";
+  protected String dropTableCascade;
+  protected String dropIfExists;
 
-  private String identity = "auto_increment";
-  private String identitySuffix = "";
+  protected String newLine = "\n";
 
-  private String pkPrefix = "pk_";
+  protected String identity = "auto_increment";
+  protected String identitySuffix = "";
 
-  private String disableReferentialIntegrity;
-  private String enableReferentialIntegrity;
+  protected String pkPrefix = "pk_";
 
-  private String foreignKeySuffix;
+  protected String disableReferentialIntegrity;
+  protected String enableReferentialIntegrity;
+
+  protected String foreignKeySuffix;
 
   /**
    * Return the primary key name for a given bean descriptor.
@@ -159,6 +164,20 @@ public class DbDdlSyntax {
   }
 
   /**
+   * Return true to is constraints are disabled on each table.
+   */
+  public boolean isDropKeyConstraints() {
+    return dropKeyConstraints;
+  }
+
+  /**
+   * Return some DDL to disable constraints on the given table.
+   */
+  public String dropKeyConstraintPrefix(String tableName, String fkName) {
+    return null;
+  }
+
+  /**
    * Return true if indexes should be created for the foreign keys.
    */
   public boolean isRenderIndexForFkey() {
@@ -186,6 +205,13 @@ public class DbDdlSyntax {
    */
   public void setDropIfExists(String dropIfExists) {
     this.dropIfExists = dropIfExists;
+  }
+
+  /**
+   * Return prefix text that goes before drop table.
+   */
+  public String dropTablePrefix(String tableName) {
+    return "";
   }
 
   /**

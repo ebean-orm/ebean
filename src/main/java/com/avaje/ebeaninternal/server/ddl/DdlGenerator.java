@@ -126,6 +126,13 @@ public class DdlGenerator implements SpiEbeanPlugin {
 
     DdlGenContext ctx = createContext();
 
+    if (ctx.getDdlSyntax().isDropKeyConstraints()) {
+      // generate drop foreign key constraint statements (sql server joy)
+      AddForeignKeysVisitor fkeys = new AddForeignKeysVisitor(false, ctx);
+      VisitorUtil.visit(server, fkeys);
+      ctx.writeNewLine();
+    }
+
     DropTableVisitor drop = new DropTableVisitor(ctx);
     VisitorUtil.visit(server, drop);
 
@@ -146,7 +153,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
     CreateSequenceVisitor createSequence = new CreateSequenceVisitor(ctx);
     VisitorUtil.visit(server, createSequence);
 
-    AddForeignKeysVisitor fkeys = new AddForeignKeysVisitor(ctx);
+    AddForeignKeysVisitor fkeys = new AddForeignKeysVisitor(true, ctx);
     VisitorUtil.visit(server, fkeys);
 
     CreateIndexVisitor indexes = new CreateIndexVisitor(ctx);
@@ -275,7 +282,6 @@ public class DdlGenerator implements SpiEbeanPlugin {
     } catch (Exception e) {
       if (expectErrors) {
         logger.info(" ... ignoring error executing " + getSummary(stmt) + "  error: " + e.getMessage());
-        e.printStackTrace();
       } else {
         String msg = "Error executing stmt[" + stmt + "] error[" + e.getMessage() + "]";
         throw new RuntimeException(msg, e);
