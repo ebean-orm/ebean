@@ -1828,4 +1828,16 @@ public class ServerConfig {
     }
     return hitList;
   }
+
+  /**
+   * Return the PersistBatch mode to use for 'batchOnCascade' taking into account if the database
+   * platform supports getGeneratedKeys in batch mode.
+   * <p>
+   * Used to effectively turn off batchOnCascade for SQL Server - still allows explicit batch mode.
+   * </p>
+   */
+  public PersistBatch appliedPersistBatchOnCascade() {
+
+    return databasePlatform.isDisallowBatchOnCascade() ? PersistBatch.NONE : persistBatchOnCascade;
+  }
 }

@@ -106,7 +106,7 @@ public class TransactionManager {
 	      BeanDescriptorManager descMgr, BootupClasses bootupClasses) {
 
     this.persistBatch = config.getPersistBatch();
-    this.persistBatchOnCascade = config.getPersistBatchOnCascade();
+    this.persistBatchOnCascade = config.appliedPersistBatchOnCascade();
 		this.beanDescriptorManager = descMgr;
 		this.clusterManager = clusterManager;
 		this.serverName = config.getName();		
