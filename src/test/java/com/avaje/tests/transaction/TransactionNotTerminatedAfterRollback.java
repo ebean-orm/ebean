@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.PersistenceException;
+import javax.persistence.Table;
 
 import org.avaje.agentloader.AgentLoader;
 import org.junit.BeforeClass;
@@ -49,7 +50,7 @@ public class TransactionNotTerminatedAfterRollback {
 		}
 	}
 
-	@Entity public static class User {
+	@Entity @Table(name="tx_user") public static class User {
 		@Id Long id;
 		String name;
 
