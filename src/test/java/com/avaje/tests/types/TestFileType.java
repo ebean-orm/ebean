@@ -31,9 +31,9 @@ public class TestFileType extends BaseTestCase {
             .findUnique();
 
     assertEquals("afile", bean1.getName());
-    assertNull(bean1.getFile());
+    assertNull(bean1.getContent());
 
-    bean1.setFile(file);
+    bean1.setContent(file);
     Ebean.save(bean1);
 
     SomeFileBean bean2 = Ebean.find(SomeFileBean.class)
@@ -42,8 +42,8 @@ public class TestFileType extends BaseTestCase {
             .findUnique();
 
     assertEquals("afile", bean2.getName());
-    assertNotNull(bean2.getFile());
-    System.out.println("test_insertNullFile: bean2: "+bean2.getFile());
+    assertNotNull(bean2.getContent());
+    System.out.println("test_insertNullFile: bean2: "+bean2.getContent());
 
     Ebean.delete(bean1);
   }
@@ -56,7 +56,7 @@ public class TestFileType extends BaseTestCase {
 
     SomeFileBean bean0 = new SomeFileBean();
     bean0.setName("afile");
-    bean0.setFile(file);
+    bean0.setContent(file);
 
     Ebean.save(bean0);
 
@@ -66,12 +66,12 @@ public class TestFileType extends BaseTestCase {
             .findUnique();
 
     assertEquals("afile", bean1.getName());
-    assertNotNull(bean1.getFile());
-    assertEquals(file.length(), bean1.getFile().length());
-    System.out.println("t2 bean1: " + bean1.getFile().getAbsoluteFile());
+    assertNotNull(bean1.getContent());
+    assertEquals(file.length(), bean1.getContent().length());
+    System.out.println("t2 bean1: " + bean1.getContent().getAbsoluteFile());
 
     bean1.setName("mod-file");
-    bean1.setFile(file2);
+    bean1.setContent(file2);
     // update to file2
     Ebean.save(bean1);
 
@@ -81,11 +81,11 @@ public class TestFileType extends BaseTestCase {
             .setId(bean0.getId())
             .findUnique();
 
-    assertEquals(file2.length(), bean2.getFile().length());
-    System.out.println("t2 bean3: " + bean2.getFile().getAbsoluteFile());
+    assertEquals(file2.length(), bean2.getContent().length());
+    System.out.println("t2 bean3: " + bean2.getContent().getAbsoluteFile());
 
     // update to null
-    bean2.setFile(null);
+    bean2.setContent(null);
     bean2.setName("setNull");
     Ebean.save(bean2);
 
@@ -94,8 +94,8 @@ public class TestFileType extends BaseTestCase {
             .setId(bean0.getId())
             .findUnique();
 
-    assertNull(bean3.getFile());
-    System.out.println("t2 bean3: " + bean3.getFile());
+    assertNull(bean3.getContent());
+    System.out.println("t2 bean3: " + bean3.getContent());
 
     bean3.setName("changeOnlyName");
     Ebean.save(bean3);

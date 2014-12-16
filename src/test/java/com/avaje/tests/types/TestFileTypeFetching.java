@@ -24,7 +24,7 @@ public class TestFileTypeFetching extends BaseTestCase {
 
     SomeFileBean bean0 = new SomeFileBean();
     bean0.setName("one");
-    bean0.setFile(file);
+    bean0.setContent(file);
     Ebean.save(bean0);
 
     SomeFileBean bean1 = Ebean.find(SomeFileBean.class)
@@ -34,15 +34,15 @@ public class TestFileTypeFetching extends BaseTestCase {
     BeanState beanState = Ebean.getBeanState(bean1);
     Set<String> loadedProps = beanState.getLoadedProps();
     assertTrue(loadedProps.contains("name"));
-    assertFalse(loadedProps.contains("file"));
+    assertFalse(loadedProps.contains("content"));
 
-    File file1 = bean1.getFile();
+    File file1 = bean1.getContent();
     assertEquals(file.length(), file1.length());
 
 
     SomeFileBean statelessUpdateBean = new SomeFileBean();
     statelessUpdateBean.setId(bean0.getId());
-    statelessUpdateBean.setFile(file2);
+    statelessUpdateBean.setContent(file2);
 
     // perform stateless update (handy)
     Ebean.update(statelessUpdateBean);
@@ -52,7 +52,7 @@ public class TestFileTypeFetching extends BaseTestCase {
             .setId(bean0.getId())
             .findUnique();
 
-    assertEquals(file2.length(), bean2.getFile().length());
+    assertEquals(file2.length(), bean2.getContent().length());
 
     Ebean.delete(bean1);
   }

@@ -15,7 +15,7 @@ public class SomeFileBean {
   String name;
 
   @Lob
-  File file;
+  File content;
 
   public Long getId() {
     return id;
@@ -41,11 +41,11 @@ public class SomeFileBean {
     this.name = name;
   }
 
-  public File getFile() {
-    return file;
+  public File getContent() {
+    return content;
   }
 
-  public void setFile(File file) {
-    this.file = file;
+  public void setContent(File file) {
+    this.content = content;
   }
 }

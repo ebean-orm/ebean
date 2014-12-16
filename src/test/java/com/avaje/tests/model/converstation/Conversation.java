@@ -2,10 +2,7 @@ package com.avaje.tests.model.converstation;
 
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.avaje.tests.model.BaseModel;
 
@@ -14,7 +11,8 @@ import com.avaje.tests.model.BaseModel;
 public class Conversation extends BaseModel {
 
   String title;
-  
+
+  @Column(name="isopen")
   boolean open;
   
   @ManyToOne
