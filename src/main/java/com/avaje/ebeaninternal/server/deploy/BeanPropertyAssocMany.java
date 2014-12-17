@@ -225,6 +225,10 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return createElPropertyValue(propName, remainder, chain, propertyDeploy);
   }
 
+  public void buildSelectExpressionChain(String prefix, List<String> selectChain) {
+    // do not add to the selectChain at the top level of the Many bean
+  }
+
   public SqlUpdate deleteByParentId(Object parentId, List<Object> parentIdist) {
     if (parentId != null) {
       return deleteByParentId(parentId);

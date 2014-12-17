@@ -80,6 +80,9 @@ public class SqlTree {
     this.includes = null;
   }
 
+  /**
+   * Build a select expression chain for RawSql.
+   */
   public List<String> buildSelectExpressionChain() {
     ArrayList<String> list = new ArrayList<String>();
     rootNode.buildSelectExpressionChain(list);

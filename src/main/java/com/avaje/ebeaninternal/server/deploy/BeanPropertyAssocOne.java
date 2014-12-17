@@ -287,7 +287,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         }
     }
 
-    
     /**
      * Return true if this a OneToOne property. Otherwise assumed ManyToOne.
      */
