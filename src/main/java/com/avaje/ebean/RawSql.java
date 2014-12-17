@@ -2,12 +2,7 @@ package com.avaje.ebean;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.avaje.ebean.util.CamelCaseHelper;
 
@@ -542,6 +537,22 @@ public final class RawSql implements Serializable {
     }
 
     /**
+     * Modify any column mappings with the given table alias to have the path prefix.
+     * <p>
+     * For example modify all mappings with table alias "c" to have the path prefix "customer".
+     * </p>
+     */
+    public void tableAliasMapping(String tableAlias, String path) {
+
+      String startMatch = tableAlias+".";
+      for (Map.Entry<String, Column> entry : dbColumnMap.entrySet()) {
+        if (entry.getKey().startsWith(startMatch)) {
+          entry.getValue().tableAliasMapping(path);
+        }
+      }
+    }
+
+    /**
      * A Column of the RawSql that is mapped to a bean property (or ignored).
      */
     public static class Column implements Serializable {
@@ -622,10 +633,23 @@ public final class RawSql implements Serializable {
         return propertyName;
       }
 
+      /**
+       * Set the property name mapped to this db column.
+       */
       private void setPropertyName(String propertyName) {
         this.propertyName = propertyName;
       }
 
+      /**
+       * Prepend the path to the property name.
+       * <p/>
+       * For example if path is "customer" then "name" becomes "customer.name".
+       */
+      public void tableAliasMapping(String path) {
+        if (path != null) {
+          propertyName = path + "." + propertyName;
+        }
+      }
     }
   }
 }

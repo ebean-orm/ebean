@@ -47,6 +47,64 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
 
   }
 
+  @Test
+  public void testWithTableAliasMapping() {
+
+    ResetBasicData.reset();
+
+    String rs = "select o.id, o.status, c.id, c.name, "+
+            " d.id, d.order_qty, p.id, p.name " +
+            "from o_order o join o_customer c on c.id = o.kcustomer_id " +
+            "join o_order_detail d on d.order_id = o.id  " +
+            "join o_product p on p.id = d.product_id  " +
+            "where o.id <= :maxOrderId  and p.id = :productId "+
+            "order by o.id, d.id asc";
+
+
+    RawSql rawSql = RawSqlBuilder.parse(rs)
+            .tableAliasMapping("c", "customer")
+            .tableAliasMapping("d", "details")
+            .tableAliasMapping("p", "details.product")
+            .create();
+
+    List<Order> ordersFromRaw = Ebean.find(Order.class)
+            .setRawSql(rawSql)
+            .setParameter("maxOrderId", 2)
+            .setParameter("productId", 1)
+            .findList();
+
+    printOrders(ordersFromRaw, "using RawSql with tableAlias mapping");
+
+  }
+
+
+  @Test
+  public void testWithMultipleManys() {
+
+    ResetBasicData.reset();
+
+    String rs = "select o.id, o.status, c.id, c.name, "+
+            " d.id, d.order_qty, p.id, p.name " +
+            "from o_order o join o_customer c on c.id = o.kcustomer_id " +
+            "join o_order_detail d on d.order_id = o.id  " +
+            "join o_product p on p.id = d.product_id  " +
+            "order by o.id, d.id asc";
+
+
+    RawSql rawSql = RawSqlBuilder.parse(rs)
+            .tableAliasMapping("c", "customer")
+            .tableAliasMapping("d", "details")
+            .tableAliasMapping("p", "details.product")
+            .create();
+
+    List<Order> ordersFromRaw = Ebean.find(Order.class)
+            .setRawSql(rawSql)
+            .findList();
+
+    printOrders(ordersFromRaw, "using RawSql with tableAlias mapping");
+
+  }
+
   private void printOrders(List<Order> orders, String heading) {
     System.out.println("-------------- "+heading);
     for (Order order : orders) {

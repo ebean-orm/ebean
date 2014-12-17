@@ -109,6 +109,17 @@ public class RawSqlBuilder {
   }
 
   /**
+   * Modify any column mappings with the given table alias to have the path prefix.
+   * <p>
+   * For example modify all mappings with table alias "c" to have the path prefix "customer".
+   * </p>
+   */
+  public RawSqlBuilder tableAliasMapping(String tableAlias, String path) {
+    columnMapping.tableAliasMapping(tableAlias, path);
+    return this;
+  }
+
+  /**
    * Create the immutable RawSql object. Do this after all the column mapping
    * has been defined.
    */
@@ -122,6 +133,7 @@ public class RawSqlBuilder {
   protected Sql getSql() {
     return sql;
   }
-  
+
+
 
 }
