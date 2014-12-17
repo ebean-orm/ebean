@@ -222,6 +222,8 @@ public final class RawSql implements Serializable {
 
     private final boolean andHavingExpr;
 
+    private final String orderByPrefix;
+
     private final String orderBy;
 
     private final boolean distinct;
@@ -240,6 +242,7 @@ public final class RawSql implements Serializable {
       this.preWhere = null;
       this.andHavingExpr = false;
       this.andWhereExpr = false;
+      this.orderByPrefix = null;
       this.orderBy = null;
       this.distinct = false;
     }
@@ -248,8 +251,7 @@ public final class RawSql implements Serializable {
      * Construct for parsed SQL.
      */
     protected Sql(int queryHashCode, String preFrom, String preWhere, boolean andWhereExpr,
-        String preHaving, boolean andHavingExpr,
-        String orderBy, boolean distinct) {
+        String preHaving, boolean andHavingExpr, String orderByPrefix, String orderBy, boolean distinct) {
 
       this.queryHashCode = queryHashCode;
       this.parsed = true;
@@ -259,6 +261,7 @@ public final class RawSql implements Serializable {
       this.preWhere = preWhere;
       this.andHavingExpr = andHavingExpr;
       this.andWhereExpr = andWhereExpr;
+      this.orderByPrefix = orderByPrefix;
       this.orderBy = orderBy;
       this.distinct = distinct;
     }
@@ -335,6 +338,14 @@ public final class RawSql implements Serializable {
      */
     public boolean isAndHavingExpr() {
       return andHavingExpr;
+    }
+
+    /**
+     * Return the 'order by' keywords.
+     * This can contain additional keywords, for example 'order siblings by' as Oracle syntax.
+     */
+    public String getOrderByPrefix() {
+      return (orderByPrefix == null) ? "order by" : orderByPrefix;
     }
 
     /**
@@ -429,9 +440,8 @@ public final class RawSql implements Serializable {
       for (Column c : dbColumnMap.values()) {
         pMap.put(c.getPropertyName(), c.getDbColumn());
         pcMap.put(c.getPropertyName(), c);
-
-        hc = 31 * hc + c.getPropertyName() == null ? 0 : c.getPropertyName().hashCode();
-        hc = 31 * hc + c.getDbColumn() == null ? 0 : c.getDbColumn().hashCode();
+        hc = 31 * hc + ((c.getPropertyName() == null) ? 0 : c.getPropertyName().hashCode());
+        hc = 31 * hc + ((c.getDbColumn() == null) ? 0 : c.getDbColumn().hashCode());
       }
       this.propertyMap = Collections.unmodifiableMap(pMap);
       this.propertyColumnMap = Collections.unmodifiableMap(pcMap);

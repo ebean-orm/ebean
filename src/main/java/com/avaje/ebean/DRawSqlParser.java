@@ -16,8 +16,6 @@ class DRawSqlParser {
 
   public static final String $_WHERE = "${where}";
 
-  private static final String ORDER_BY = "order by";
-
   private final SimpleTextParser textParser;
 
   private String sql;
@@ -35,6 +33,7 @@ class DRawSqlParser {
   private int groupByPos = -1;
   private int havingPos = -1;
   private int orderByPos = -1;
+  private int orderByStmtPos = -1;
 
   private boolean whereExprAnd;
   private int whereExprPos = -1;
@@ -66,12 +65,12 @@ class DRawSqlParser {
     String preFrom = removeWhitespace(findPreFromSql());
     String preWhere = removeWhitespace(findPreWhereSql());
     String preHaving = removeWhitespace(findPreHavingSql());
+    String orderByPrefix = findOrderByPrefixSql();
     String orderBySql = findOrderBySql();
 
     preFrom = trimSelectKeyword(preFrom);
 
-    return new Sql(sql.hashCode(), preFrom, preWhere, whereExprAnd, preHaving, havingExprAnd,
-        orderBySql, (distinctPos > -1));
+    return new Sql(sql.hashCode(), preFrom, preWhere, whereExprAnd, preHaving, havingExprAnd, orderByPrefix, orderBySql, (distinctPos > -1));
   }
 
   /**
@@ -142,12 +141,12 @@ class DRawSqlParser {
     return preWhereExprSql;
   }
 
+  private String findOrderByPrefixSql() {
+    return (orderByPos < 1) ? null : sql.substring(orderByPos, orderByStmtPos);
+  }
+
   private String findOrderBySql() {
-    if (orderByPos > -1) {
-      int pos = orderByPos + ORDER_BY.length();
-      return sql.substring(pos).trim();
-    }
-    return null;
+    return (orderByStmtPos < 1) ? null : sql.substring(orderByStmtPos).trim();
   }
 
   private String findPreHavingSql() {
@@ -226,6 +225,11 @@ class DRawSqlParser {
     }
 
     orderByPos = textParser.findWordLower("order", startOrderBy);
+    if (orderByPos > 1) {
+      // there might be keywords like siblings in between the order
+      // and by so search for the by keyword explicitly
+      orderByStmtPos = 2 + textParser.findWordLower("by", orderByPos);
+    }
   }
 
   private int findWhereExprPosition() {

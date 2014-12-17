@@ -38,6 +38,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     Assert.assertEquals("id", sql.getPreFrom());
     Assert.assertEquals("from t_cust where id > ?", sql.getPreWhere());
     Assert.assertEquals("", sql.getPreHaving());
+    Assert.assertEquals("order by", sql.getOrderByPrefix());
     Assert.assertEquals("id desc", sql.getOrderBy());
 
     r = RawSqlBuilder.parse("select id from t_cust order by id desc");
@@ -65,6 +66,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     Assert.assertEquals("id, sum(x)", sql.getPreFrom());
     Assert.assertEquals("from t_cust where id > ?", sql.getPreWhere());
     Assert.assertEquals("group by id having sum(x) > ?", sql.getPreHaving());
+    Assert.assertEquals("order by", sql.getOrderByPrefix());
     Assert.assertEquals("id desc", sql.getOrderBy());
 
     // no where
@@ -74,6 +76,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     Assert.assertEquals("id, sum(x)", sql.getPreFrom());
     Assert.assertEquals("from t_cust", sql.getPreWhere());
     Assert.assertEquals("group by id having sum(x) > ?", sql.getPreHaving());
+    Assert.assertEquals("order by", sql.getOrderByPrefix());
     Assert.assertEquals("id desc", sql.getOrderBy());
 
     // no where, no order by
@@ -83,6 +86,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     Assert.assertEquals("from t_cust", sql.getPreWhere());
     Assert.assertEquals("group by id having sum(x) > ?", sql.getPreHaving());
     Assert.assertNull(sql.getOrderBy());
+    Assert.assertEquals("order by", sql.getOrderByPrefix());
 
     // no order by
     r = RawSqlBuilder
@@ -92,5 +96,24 @@ public class TestRawSqlBuilder extends BaseTestCase {
     Assert.assertEquals("from t_cust where id > ?", sql.getPreWhere());
     Assert.assertEquals("group by id having sum(x) > ?", sql.getPreHaving());
     Assert.assertNull(sql.getOrderBy());
+    Assert.assertEquals("order by", sql.getOrderByPrefix());
+  }
+
+  /**
+   * test support for order siblings by ... Oracle syntax.
+   */
+  @Test
+  public void testWithOrderSiblingsByName() {
+
+    String s =  "SELECT ID, DESCRIPTION, NAME, PARENT_ID FROM SOME_TABLE WHERE lower(NAME) like :name START WITH ID = :parentId CONNECT BY PRIOR ID = PARENT_ID order siblings by NAME";
+
+    RawSql rawSql = RawSqlBuilder.parse(s).create();
+
+    Sql sql = rawSql.getSql();
+    Assert.assertEquals("ID, DESCRIPTION, NAME, PARENT_ID", sql.getPreFrom());
+    Assert.assertEquals("order siblings by", sql.getOrderByPrefix());
+    Assert.assertEquals("NAME", sql.getOrderBy());
+    Assert.assertEquals("FROM SOME_TABLE WHERE lower(NAME) like :name START WITH ID = :parentId CONNECT BY PRIOR ID = PARENT_ID", sql.getPreWhere());
+
   }
 }

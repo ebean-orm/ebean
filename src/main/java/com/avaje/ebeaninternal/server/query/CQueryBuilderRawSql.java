@@ -127,7 +127,7 @@ public class CQueryBuilderRawSql implements Constants {
         }
 
         if (!isEmpty(orderBy)) {
-            sb.append(" order by ").append(orderBy);
+            sb.append(" ").append(sql.getOrderByPrefix()).append(" ").append(orderBy);
         }
 
         return sb.toString().trim();

@@ -23,7 +23,7 @@ public class TestRawSqlOrmWrapper2 extends BaseTestCase {
     ResetBasicData.reset();
 
     String sql = " select order_id, 'ignoreMe', sum(d.order_qty*d.unit_price) as totalAmount "
-        + " from o_order_detail d" + " group by order_id ";
+        + " from o_order_detail d group by order_id ";
 
     RawSql rawSql = RawSqlBuilder.parse(sql).columnMapping("order_id", "order.id")
         .columnMappingIgnore("'ignoreMe'")
