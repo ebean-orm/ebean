@@ -17,25 +17,25 @@ import com.avaje.ebean.util.CamelCaseHelper;
  * <b>Unparsed RawSql:</b>
  * </p>
  * <p>
- * When RawSql is created via RawSqlBuilder.unparsed(sql) then Ebean can not
+ * When RawSql is created via {@link RawSqlBuilder#unparsed(String)} then Ebean can not
  * modify the SQL at all. It can't add any extra expressions into the SQL.
  * </p>
  * <p>
  * <b>Parsed RawSql:</b>
  * </p>
  * <p>
- * When RawSql is created via RawSqlBuilder.parse(sql) then Ebean will parse the
+ * When RawSql is created via {@link RawSqlBuilder#parse(String)} then Ebean will parse the
  * SQL and find places in the SQL where it can add extra where expressions, add
  * extra having expressions or replace the order by clause. If you want to
  * explicitly tell Ebean where these insertion points are you can place special
- * strings into your SQL (${where} or ${andWhere} and ${having} or
- * ${andHaving}).
+ * strings into your SQL ({@code ${where}} or {@code ${andWhere}} and {@code ${having}} or
+ * {@code ${andHaving})}.
  * </p>
  * <p>
- * If the SQL already includes a WHERE clause put in ${andWhere} in the location
+ * If the SQL already includes a WHERE clause put in {@code ${andWhere}} in the location
  * you want Ebean to add any extra where expressions. If the SQL doesn't have a
- * WHERE clause put ${where} in instead. Similarly you can put in ${having} or
- * ${andHaving} where you want Ebean put add extra having expressions.
+ * WHERE clause put {@code ${where}} in instead. Similarly you can put in {@code ${having}} or
+ * {@code ${andHaving}} where you want Ebean put add extra having expressions.
  * </p>
  * <p>
  * <b>Aggregates:</b>
@@ -51,23 +51,19 @@ import com.avaje.ebean.util.CamelCaseHelper;
  * to hold the values for the aggregate functions (sum etc) and a &#064;OneToOne
  * to Order.
  * </p>
- * <p>
- * &nbsp;
- * </p>
- * <p>
- * <b>Example OrderAggregate</b>
- * </p>
+ *
+ * <h3>Example OrderAggregate</h3>
  * 
- * <pre class="code">
+ * <pre>{@code
  *  ...
- *  // &#064;Sql indicates to that this bean
+ *  // @Sql indicates to that this bean
  *  // is based on RawSql rather than a table
  * 
- * &#064;Entity
- * &#064;Sql    
+ * @Entity
+ * @Sql
  * public class OrderAggregate {
  * 
- *  &#064;OneToOne
+ *  @OneToOne
  *  Order order;
  *      
  *  Double totalAmount;
@@ -76,35 +72,38 @@ import com.avaje.ebean.util.CamelCaseHelper;
  *  
  *  // getters and setters
  *  ...
- * </pre>
- * <p>
- * <b>Example 1:</b>
- * </p>
+ *
+ * }</pre>
+ *
+ * <h3>Example 1:</h3>
  * 
- * <pre class="code">
- * String sql = &quot; select order_id, o.status, c.id, c.name, sum(d.order_qty*d.unit_price) as totalAmount&quot;
- *     + &quot; from o_order o&quot;
- *     + &quot; join o_customer c on c.id = o.kcustomer_id &quot;
- *     + &quot; join o_order_detail d on d.order_id = o.id &quot; + &quot; group by order_id, o.status &quot;;
+ * <pre>{@code
+ *
+ *   String sql = " select order_id, o.status, c.id, c.name, sum(d.order_qty*d.unit_price) as totalAmount"
+ *     + " from o_order o"
+ *     + " join o_customer c on c.id = o.kcustomer_id "
+ *     + " join o_order_detail d on d.order_id = o.id " + " group by order_id, o.status ";
  * 
- * RawSql rawSql = RawSqlBuilder.parse(sql)
+ *   RawSql rawSql = RawSqlBuilder.parse(sql)
  *     // map the sql result columns to bean properties
- *     .columnMapping(&quot;order_id&quot;, &quot;order.id&quot;).columnMapping(&quot;o.status&quot;, &quot;order.status&quot;)
- *     .columnMapping(&quot;c.id&quot;, &quot;order.customer.id&quot;)
- *     .columnMapping(&quot;c.name&quot;, &quot;order.customer.name&quot;)
+ *     .columnMapping("order_id", "order.id")
+ *     .columnMapping("o.status", "order.status")
+ *     .columnMapping("c.id", "order.customer.id")
+ *     .columnMapping("c.name", "order.customer.name")
  *     // we don't need to map this one due to the sql column alias
- *     // .columnMapping(&quot;sum(d.order_qty*d.unit_price)&quot;, &quot;totalAmount&quot;)
+ *     // .columnMapping("sum(d.order_qty*d.unit_price)", "totalAmount")
  *     .create();
  * 
- * Query&lt;OrderAggregate&gt; query = Ebean.find(OrderAggregate.class);
- * query.setRawSql(rawSql).where().gt(&quot;order.id&quot;, 0).having().gt(&quot;totalAmount&quot;, 20);
+ *   List<OrderAggregate> list = Ebean.find(OrderAggregate.class)
+ *       .setRawSql(rawSql)
+ *       .where().gt("order.id", 0)
+ *       .having().gt("totalAmount", 20)
+ *       .findList();
  * 
- * List&lt;OrderAggregate&gt; list = query.findList();
- * </pre>
+ *
+ * }</pre>
  * 
- * <p>
- * <b>Example 2:</b>
- * </p>
+ * <h3>Example 2:</h3>
  * 
  * <p>
  * The following example uses a FetchConfig().query() so that after the initial
@@ -112,21 +111,59 @@ import com.avaje.ebean.util.CamelCaseHelper;
  * associated order status, orderDate along with the customer name.
  * </p>
  * 
- * <pre class="code">
- * String sql = &quot; select order_id, 'ignoreMe', sum(d.order_qty*d.unit_price) as totalAmount &quot;
- *     + &quot; from o_order_detail d&quot;
- *     + &quot; group by order_id &quot;;
+ * <pre>{@code
+ *
+ *  String sql = " select order_id, 'ignoreMe', sum(d.order_qty*d.unit_price) as totalAmount "
+ *     + " from o_order_detail d"
+ *     + " group by order_id ";
  * 
- * RawSql rawSql = RawSqlBuilder.parse(sql).columnMapping(&quot;order_id&quot;, &quot;order.id&quot;)
- *     .columnMappingIgnore(&quot;'ignoreMe'&quot;).create();
+ *   RawSql rawSql = RawSqlBuilder.parse(sql)
+ *     .columnMapping("order_id", "order.id")
+ *     .columnMappingIgnore("'ignoreMe'")
+ *     .create();
  * 
- * Query&lt;OrderAggregate&gt; query = Ebean.find(OrderAggregate.class);
- * query.setRawSql(rawSql).fetch(&quot;order&quot;, &quot;status,orderDate&quot;, new FetchConfig().query())
- *     .fetch(&quot;order.customer&quot;, &quot;name&quot;).where()
- *     .gt(&quot;order.id&quot;, 0).having().gt(&quot;totalAmount&quot;, 20).order().desc(&quot;totalAmount&quot;).setMaxRows(10);
+ *   List<OrderAggregate> orders = Ebean.find(OrderAggregate.class)
+ *     .setRawSql(rawSql)
+ *     .fetch("order", "status,orderDate", new FetchConfig().query())
+ *     .fetch("order.customer", "name")
+ *     .where().gt("order.id", 0)
+ *     .having().gt("totalAmount", 20)
+ *     .order().desc("totalAmount")
+ *     .setMaxRows(10)
+ *     .findList();
  * 
- * </pre>
- * 
+ * }</pre>
+ *
+ *
+ * <h3>Example 3: tableAliasMapping</h3>
+ * <p>
+ *   Instead of mapping each column you can map each table alias to a path using tableAliasMapping().
+ * </p>
+ * <pre>{@code
+ *
+ *   String rs = "select o.id, o.status, c.id, c.name, "+
+ *               " d.id, d.order_qty, p.id, p.name " +
+ *               "from o_order o join o_customer c on c.id = o.kcustomer_id " +
+ *               "join o_order_detail d on d.order_id = o.id  " +
+ *               "join o_product p on p.id = d.product_id  " +
+ *               "where o.id <= :maxOrderId  and p.id = :productId "+
+ *               "order by o.id, d.id asc";
+ *
+ *  RawSql rawSql = RawSqlBuilder.parse(rs)
+ *       .tableAliasMapping("c", "customer")
+ *       .tableAliasMapping("d", "details")
+ *       .tableAliasMapping("p", "details.product")
+ *       .create();
+ *
+ *  List<Order> ordersFromRaw = Ebean.find(Order.class)
+ *       .setRawSql(rawSql)
+ *       .setParameter("maxOrderId", 2)
+ *       .setParameter("productId", 1)
+ *       .findList();
+ *
+ * }</pre>
+ *
+ *
  * <p>
  * Note that lazy loading also works with object graphs built with RawSql.
  * </p>

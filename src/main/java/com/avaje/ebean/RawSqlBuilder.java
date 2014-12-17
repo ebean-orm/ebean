@@ -70,13 +70,6 @@ public class RawSqlBuilder {
     ColumnMapping mapping = DRawSqlColumnsParser.parse(select);
     return new RawSqlBuilder(sql2, mapping);
   }
-
-  
-  private RawSqlBuilder(ResultSet resultSet, ColumnMapping columnMapping) {
-    this.resultSet = resultSet;
-    this.columnMapping = columnMapping;
-    this.sql = null;
-  }
   
   private RawSqlBuilder(Sql sql, ColumnMapping columnMapping) {
     this.sql = sql;
