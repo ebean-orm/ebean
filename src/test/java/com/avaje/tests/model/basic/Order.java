@@ -98,7 +98,7 @@ public class Order implements Serializable {
 
     @Where(clause="${ta}.id > 0")
     @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
-	@OrderBy("id asc, orderQty asc, cretime desc")
+	  @OrderBy("id asc, orderQty asc, cretime desc")
     List<OrderDetail> details;
     
     @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
