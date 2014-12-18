@@ -118,15 +118,20 @@ class EJsonReader {
   private Object parseJson(JsonToken token) throws IOException {
 
     if (token == null) {
-      // no initial token so expect to read START_OBJECT or similar
       token = parser.nextToken();
-      if (JsonToken.VALUE_NULL == token) {
-        return null;
+      // if it is a simple value just return it
+      switch (token) {
+        case VALUE_NULL: return null;
+        case VALUE_FALSE: return Boolean.FALSE;
+        case VALUE_TRUE: return Boolean.TRUE;
+        case VALUE_STRING: return parser.getText();
+        case VALUE_NUMBER_INT: return parser.getLongValue();
+        case VALUE_NUMBER_FLOAT: return parser.getDecimalValue();
       }
     }
 
-    stack = new Stack();
     // it is a object or array, process the first JsonToken
+    stack = new Stack();
     processJsonToken(token);
 
     // process the rest of the object or array

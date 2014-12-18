@@ -51,6 +51,16 @@ public class JsonContextTest {
   }
 
   @Test
+  public void test_unknownProperty() {
+
+    String jsonWithUnknown = "{\"id\":42,\"unknownProp\":\"foo\",\"name\":\"rob\",\"version\":1}";
+
+    Customer customer = Ebean.json().toBean(Customer.class, jsonWithUnknown);
+    assertEquals(Integer.valueOf(42), customer.getId());
+    assertEquals("rob", customer.getName());
+  }
+
+  @Test
   public void testCreateGenerator() throws Exception {
 
     EbeanServer server = Ebean.getServer(null);

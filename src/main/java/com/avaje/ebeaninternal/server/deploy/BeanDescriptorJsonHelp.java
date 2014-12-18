@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson.WriteBean;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -50,13 +51,18 @@ public class BeanDescriptorJsonHelp<T> {
   
   @SuppressWarnings("unchecked")
   public T jsonRead(JsonParser parser, String path) throws IOException {
-    
-    JsonToken token = parser.nextToken();
-    if (JsonToken.VALUE_NULL == token || JsonToken.END_ARRAY == token) {
-      return null;
-    }
-    if (JsonToken.START_OBJECT != token) {
-      throw new JsonParseException("Unexpected token "+token+" - expecting start_object", parser.getCurrentLocation());
+
+    if (parser.getCurrentToken() == JsonToken.START_OBJECT) {
+      // start object token read by Jackson already
+    } else {
+      // check for null or start object
+      JsonToken token = parser.nextToken();
+      if (JsonToken.VALUE_NULL == token || JsonToken.END_ARRAY == token) {
+        return null;
+      }
+      if (JsonToken.START_OBJECT != token) {
+        throw new JsonParseException("Unexpected token "+token+" - expecting start_object", parser.getCurrentLocation());
+      }
     }
 
     if (desc.inheritInfo == null) {
@@ -66,8 +72,7 @@ public class BeanDescriptorJsonHelp<T> {
     // check for the discriminator value to determine the correct sub type
     String discColumn = inheritInfo.getRoot().getDiscriminatorColumn();
 
-    token = parser.nextToken();
-    if (token != JsonToken.FIELD_NAME) {
+    if (parser.nextToken() != JsonToken.FIELD_NAME) {
       String msg = "Error reading inheritance discriminator - expected [" + discColumn + "] but no json key?";
       throw new JsonParseException(msg, parser.getCurrentLocation());
     }
@@ -103,18 +108,16 @@ public class BeanDescriptorJsonHelp<T> {
   protected T jsonReadProperties(JsonParser parser, EntityBean bean) throws IOException {
 
     do {
-     
+
       JsonToken event = parser.nextToken();
       if (JsonToken.FIELD_NAME == event) {
         String key = parser.getCurrentName();
         BeanProperty p = desc.getBeanProperty(key);
         if (p != null) {
           p.jsonRead(parser, bean);
-
         } else {
-          // Object rawValue = EJson.parse(parser);
-          // unknown property key ...
-          // ctx.readUnmappedJson(propName);
+          // unknown property ... read and ignore
+          EJson.parse(parser);
         }
 
       } else if (JsonToken.END_OBJECT == event) {
