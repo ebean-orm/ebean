@@ -60,7 +60,7 @@ public class DJsonContext implements JsonContext {
     return toBean(cls, createParser(jsonReader));
   }
 
-  private <T> T toBean(Class<T> cls, JsonParser parser) throws JsonIOException {
+  public <T> T toBean(Class<T> cls, JsonParser parser) throws JsonIOException {
 
     try {
       BeanDescriptor<T> d = getDescriptor(cls);
@@ -79,7 +79,7 @@ public class DJsonContext implements JsonContext {
     return toList(cls, createParser(jsonReader));
   }
 
-  private <T> List<T> toList(Class<T> cls, JsonParser src) throws JsonIOException {
+  public <T> List<T> toList(Class<T> cls, JsonParser src) throws JsonIOException {
 
     try {
       BeanDescriptor<T> d = getDescriptor(cls);
@@ -108,30 +108,24 @@ public class DJsonContext implements JsonContext {
 
   public Object toObject(Type genericType, String json) throws JsonIOException {
 
-    TypeInfo info = ParamTypeHelper.getTypeInfo(genericType);
-    ManyType manyType = info.getManyType();
-    switch (manyType) {
-      case NONE:
-        return toBean(info.getBeanType(), json);
-
-      case LIST:
-        return toList(info.getBeanType(), json);
-
-      default:
-        throw new JsonIOException("Type " + manyType + " not supported");
-    }
+    return toObject(genericType, createParser(new StringReader(json)));
   }
 
   public Object toObject(Type genericType, Reader json) throws JsonIOException {
 
+    return toObject(genericType, createParser(json));
+  }
+
+  public Object toObject(Type genericType, JsonParser jsonParser) throws JsonIOException {
+
     TypeInfo info = ParamTypeHelper.getTypeInfo(genericType);
     ManyType manyType = info.getManyType();
     switch (manyType) {
       case NONE:
-        return toBean(info.getBeanType(), json);
+        return toBean(info.getBeanType(), jsonParser);
 
       case LIST:
-        return toList(info.getBeanType(), json);
+        return toList(info.getBeanType(), jsonParser);
 
       default:
         throw new JsonIOException("Type " + manyType + " not supported");

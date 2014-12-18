@@ -29,6 +29,13 @@ public interface JsonContext {
   public <T> T toBean(Class<T> rootType, Reader json) throws JsonIOException;
 
   /**
+   * Convert json parser input into a Bean of a specific type.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  public <T> T toBean(Class<T> cls, JsonParser parser) throws JsonIOException;
+
+  /**
    * Convert json string input into a list of beans of a specific type.
    *
    * @throws JsonIOException When IOException occurs
@@ -41,6 +48,13 @@ public interface JsonContext {
    * @throws JsonIOException When IOException occurs
    */
   public <T> List<T> toList(Class<T> rootType, Reader json) throws JsonIOException;
+
+  /**
+   * Convert json parser input into a list of beans of a specific type.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  public <T> List<T> toList(Class<T> cls, JsonParser src) throws JsonIOException;
 
   /**
    * Use the genericType to determine if this should be converted into a List or
@@ -57,6 +71,14 @@ public interface JsonContext {
    * @throws JsonIOException When IOException occurs
    */
   public Object toObject(Type genericType, String json) throws JsonIOException;
+
+  /**
+   * Use the genericType to determine if this should be converted into a List or
+   * bean.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  public Object toObject(Type genericType, JsonParser jsonParser) throws JsonIOException;
 
   /**
    * Return the bean or collection as JSON string.
@@ -109,7 +131,6 @@ public interface JsonContext {
    * With additional options.
    *
    * @throws JsonIOException When IOException occurs
-   *
    * @deprecated
    */
   public void toJson(Object value, Writer writer, JsonWriteOptions options) throws JsonIOException;
@@ -119,7 +140,6 @@ public interface JsonContext {
    * Convert a bean or collection to json string.
    *
    * @throws JsonIOException When IOException occurs
-   *
    * @deprecated
    */
   public String toJson(Object value, JsonWriteOptions options) throws JsonIOException;
