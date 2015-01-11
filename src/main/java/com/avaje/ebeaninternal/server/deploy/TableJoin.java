@@ -51,6 +51,11 @@ public final class TableJoin {
   private final TableJoinColumn[] columns;
 
   /**
+   * A hash that can be used with the query plan.
+   */
+  private final int queryHash;
+
+  /**
    * Create a TableJoin.
    */
   public TableJoin(DeployTableJoin deploy, LinkedHashMap<String, BeanProperty> propMap) {
@@ -77,7 +82,26 @@ public final class TableJoin {
       BeanProperty prop = propMap.get(deployProps[i].getName());
       this.properties[i] = prop;
     }
+    this.queryHash = calcQueryHash();
+  }
 
+  /**
+   * Calculate a hash value for adding to a query plan.
+   */
+  private int calcQueryHash() {
+    int hc = type.hashCode();
+    hc = hc * 31 + (table == null ? 0 : table.hashCode());
+    for (int i = 0; i < columns.length; i++) {
+      hc = hc * 31 + columns[i].queryHash();
+    }
+    return hc;
+  }
+
+  /**
+   * Return a hash value for adding to a query plan.
+   */
+  public int queryHash() {
+    return queryHash;
   }
 
   public String toString() {

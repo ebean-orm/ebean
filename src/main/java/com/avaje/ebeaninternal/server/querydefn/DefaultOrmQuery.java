@@ -666,8 +666,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private HashQueryPlan calculateHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
 
-    // exclude bind values and things unrelated to
-    // the sql being generated
+    // exclude bind values and things unrelated to the sql being generated
 
     if (builder == null) {
       builder = new HashQueryPlanBuilder();
@@ -680,6 +679,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     builder.add(mapKey);
     builder.add(id != null);
     builder.add(rawSql == null ? 0 : rawSql.queryHash());
+    builder.add(includeTableJoin != null ? includeTableJoin.queryHash() : 0);
 
     if (detail != null) {
       detail.queryPlanHash(request, builder);
