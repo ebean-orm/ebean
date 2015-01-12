@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.persist;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.avaje.ebean.PersistenceContextScope;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -63,6 +64,7 @@ public class DeleteUnloadedForeignKeys {
 
         // run query in a separate persistence context
         q.setPersistenceContext(new DefaultPersistenceContext());
+        q.setPersistenceContextScope(PersistenceContextScope.QUERY);
         q.setAutofetch(false);
         q.select(sb.toString());
         q.where().idEq(id);
