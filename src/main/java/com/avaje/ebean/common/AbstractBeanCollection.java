@@ -29,7 +29,10 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   protected transient ExpressionList<?> filterMany;
 
-  protected int loaderIndex;
+  /**
+   * Flag set when registered with the batch loading context.
+   */
+  protected boolean registeredWithLoadContext;
 
   protected String ebeanServerName;
 
@@ -125,8 +128,12 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     this.beanCollectionTouched = notify;
   }
 
-  public void setLoader(int beanLoaderIndex, BeanCollectionLoader loader) {
-    this.loaderIndex = beanLoaderIndex;
+  public boolean isRegisteredWithLoadContext() {
+    return registeredWithLoadContext;
+  }
+
+  public void setLoader(BeanCollectionLoader loader) {
+    this.registeredWithLoadContext = true;
     this.loader = loader;
     this.ebeanServerName = loader.getName();
   }

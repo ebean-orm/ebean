@@ -17,7 +17,6 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 
 /**
  * Default implementation of LoadBeanContext.
- *
  */
 public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext{
 	
@@ -33,7 +32,17 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     this.bufferList = (!queryFetch) ? null : new ArrayList<DLoadBeanContext.LoadBuffer>();
     this.currentBuffer = createBuffer(firstBatchSize);  
   }
-  
+
+  /**
+   * Reset the buffers after a query iterator reset.
+   */
+  public void clear() {
+    if (bufferList != null) {
+      bufferList.clear();
+    }
+    currentBuffer = createBuffer(secondaryBatchSize);
+  }
+
   protected void configureQuery(SpiQuery<?> query, String lazyLoadProperty) {
 
     // propagate the readOnly state

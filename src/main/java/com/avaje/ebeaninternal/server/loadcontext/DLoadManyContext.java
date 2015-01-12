@@ -43,7 +43,17 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
     }
     return buffer;
   }
- 
+
+  /**
+   * Reset the buffers for a query iterator reset.
+   */
+  public void clear() {
+    if (bufferList != null) {
+      bufferList.clear();
+    }
+    currentBuffer = createBuffer(secondaryBatchSize);
+  }
+
   public void configureQuery(SpiQuery<?> query){
 		
 		// propagate the readOnly state
@@ -80,7 +90,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
       currentBuffer = createBuffer(secondaryBatchSize);
 		}
 		currentBuffer.add(bc);
-    bc.setLoader(0, currentBuffer);
+    bc.setLoader(currentBuffer);
 	}
 
   public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest) {

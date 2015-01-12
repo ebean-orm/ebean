@@ -1,14 +1,6 @@
 package com.avaje.ebeaninternal.server.loadcontext;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.avaje.ebean.bean.BeanCollection;
-import com.avaje.ebean.bean.EntityBeanIntercept;
-import com.avaje.ebean.bean.ObjectGraphNode;
-import com.avaje.ebean.bean.ObjectGraphOrigin;
-import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebean.bean.*;
 import com.avaje.ebeaninternal.api.LoadContext;
 import com.avaje.ebeaninternal.api.LoadSecondaryQuery;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -20,6 +12,10 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Default implementation of LoadContext.
@@ -220,8 +216,16 @@ public class DLoadContext implements LoadContext {
 		return persistenceContext;
 	}
 
-	public void setPersistenceContext(PersistenceContext persistenceContext) {
+	public void resetPersistenceContext(PersistenceContext persistenceContext) {
 		this.persistenceContext = persistenceContext;
+		// clear the load contexts for beans and beanCollections
+		for (DLoadBeanContext beanContext : beanMap.values()) {
+			beanContext.clear();
+		}
+		for (DLoadManyContext manyContext : manyMap.values()) {
+			manyContext.clear();
+		}
+		this.rootBeanContext.clear();
 	}
 
 	public void register(String path, EntityBeanIntercept ebi){

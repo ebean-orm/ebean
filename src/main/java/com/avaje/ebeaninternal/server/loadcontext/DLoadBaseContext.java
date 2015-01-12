@@ -100,6 +100,6 @@ public abstract class DLoadBaseContext {
   
   protected PersistenceContext getPersistenceContext() {
     return parent.getPersistenceContext();
-  }  
+  }
 
 }

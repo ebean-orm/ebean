@@ -345,7 +345,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       } else {
         // create a proxy for the many (deferred fetching)
         BeanCollection<?> ref = manys[i].createReferenceIfNull(localBean);
-        if (ref != null) {
+        if (ref != null && !ref.isRegisteredWithLoadContext()) {
           ctx.register(manys[i].getName(), ref);
         }
       }

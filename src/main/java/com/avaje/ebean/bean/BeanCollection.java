@@ -83,9 +83,17 @@ public interface BeanCollection<E> extends Serializable {
   public void setBeanCollectionTouched(BeanCollectionTouched notify);
 
   /**
-   * Set the loader that will be used to lazy/query load this collection.
+   * Return true if the collection has been registered with the batch loading context.
    */
-  public void setLoader(int beanLoaderIndex, BeanCollectionLoader beanLoader);
+  public boolean isRegisteredWithLoadContext();
+
+  /**
+   * Set the loader that will be used to lazy/query load this collection.
+   * <p>
+   * This is effectively the batch loading context this collection is registered with.
+   * </p>
+   */
+  public void setLoader(BeanCollectionLoader beanLoader);
 
   /**
    * Set to true if you want the BeanCollection to be treated as read only. This

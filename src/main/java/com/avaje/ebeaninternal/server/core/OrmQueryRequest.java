@@ -181,7 +181,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   public void flushPersistenceContextOnIterate() {
     persistenceContext = new DefaultPersistenceContext();
-    loadContext.setPersistenceContext(persistenceContext);
+    loadContext.resetPersistenceContext(persistenceContext);
   }
 
   /**

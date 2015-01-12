@@ -44,8 +44,11 @@ public interface LoadContext {
 
 	/**
 	 * Set the persistence context used by this query and future lazy loading.
+	 * <p>
+	 * Used by query iterator when processing large result sets.
+	 * </p>
 	 */
-	public void setPersistenceContext(PersistenceContext persistenceContext);
+	public void resetPersistenceContext(PersistenceContext persistenceContext);
 
 	/**
 	 * Register a Bean for lazy loading.
