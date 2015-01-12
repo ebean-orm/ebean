@@ -1721,6 +1721,7 @@ public class ServerConfig {
     dbEncrypt = createInstance(p, DbEncrypt.class, "dbEncrypt");
     serverCacheFactory = createInstance(p, ServerCacheFactory.class, "serverCacheFactory");
     serverCacheManager = createInstance(p, ServerCacheManager.class, "serverCacheManager");
+    cacheWarmingDelay = p.getInt("cacheWarmingDelay", cacheWarmingDelay);
 
     String jarsProp = p.get("search.jars", p.get("jars", null));
     if (jarsProp != null) {

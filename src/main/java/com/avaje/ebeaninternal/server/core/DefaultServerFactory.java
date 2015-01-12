@@ -174,8 +174,8 @@ public class DefaultServerFactory implements BootupEbeanManager {
         // warm the cache in 30 seconds
         long sleepMillis = 1000 * serverConfig.getCacheWarmingDelay();
         if (sleepMillis > 0) {
-          Timer t = new Timer("EbeanCacheWarmer", true);
-          t.schedule(new CacheWarmer(server), sleepMillis);
+          Timer timer = new Timer("EbeanCacheWarmer", true);
+          timer.schedule(new CacheWarmer(server, timer), sleepMillis);
         }
       }
 
@@ -374,12 +374,16 @@ public class DefaultServerFactory implements BootupEbeanManager {
 
     private final EbeanServer server;
 
-    CacheWarmer(EbeanServer server) {
+    private final Timer timer;
+
+    CacheWarmer(EbeanServer server, Timer timer) {
       this.server = server;
+      this.timer = timer;
     }
 
     public void run() {
       server.runCacheWarming();
+      timer.cancel();
     }
 
   }
