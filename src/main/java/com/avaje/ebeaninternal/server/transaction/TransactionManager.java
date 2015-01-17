@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.transaction;
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.config.PersistBatch;
 import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import com.avaje.ebean.event.TransactionEventListener;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
@@ -39,27 +40,6 @@ public class TransactionManager {
   
   public static final Logger TXN_LOGGER = LoggerFactory.getLogger("org.avaje.ebean.TXN");
 
-  /**
-	 * The behavior desired when ending a query only transaction.
-	 */
-	public enum OnQueryOnly {
-		
-		/**
-		 * Rollback the transaction.
-		 */
-		ROLLBACK,
-		
-		/**
-		 * Just close the transaction.
-		 */
-		CLOSE_ON_READCOMMITTED,
-		
-		/**
-		 * Commit the transaction
-		 */
-		COMMIT
-	}
-    
 	protected final BeanDescriptorManager beanDescriptorManager;
 	
 	/**
@@ -120,8 +100,7 @@ public class TransactionManager {
 		this.prefix = "";
 		this.externalTransPrefix = "e";
 		
-		String value = System.getProperty("ebean.transaction.onqueryonly", "CLOSE").toUpperCase().trim();
-		this.onQueryOnly = getOnQueryOnly(value, dataSource);
+		this.onQueryOnly = initOnQueryOnly(config.getDatabasePlatform().getOnQueryOnly(), dataSource);
 		
 		initialiseHeartbeat();
 	}
@@ -158,8 +137,8 @@ public class TransactionManager {
   /**
 	 * Return the behaviour to use when a query only transaction is committed.
 	 * <p>
-	 * There is a potential optimisation available when read committed is the default 
-	 * isolation level. If it is, then Connections used only for queries do not require 
+	 * There is a potential optimisation available when read committed is the default
+	 * isolation level. If it is, then Connections used only for queries do not require
 	 * commit or rollback but instead can just be put back into the pool via close().
 	 * </p>
 	 * <p>
@@ -167,22 +146,28 @@ public class TransactionManager {
 	 * just for queries do need to be committed or rollback after the query.
 	 * </p>
 	 */
-	private OnQueryOnly getOnQueryOnly(String onQueryOnly, DataSource ds) {
-		
-		if (onQueryOnly.equals("COMMIT")){
-			return OnQueryOnly.COMMIT;
+	private OnQueryOnly initOnQueryOnly(OnQueryOnly dbPlatformOnQueryOnly, DataSource ds) {
+
+		// first check for a system property 'override'
+		String systemPropertyValue = System.getProperty("ebean.transaction.onqueryonly");
+		if (systemPropertyValue != null) {
+			return OnQueryOnly.valueOf(systemPropertyValue.trim().toUpperCase());
 		}
-		if (onQueryOnly.startsWith("CLOSE")){
+
+		if (OnQueryOnly.CLOSE.equals(dbPlatformOnQueryOnly)) {
+			// check for read committed isolation level
 			if (!isReadCommitedIsolation(ds)){
-				String m = "transaction.queryonlyclose is true but the transaction Isolation Level is not READ_COMMITTED";
-				throw new PersistenceException(m);
+				logger.warn("Ignoring DatabasePlatform.OnQueryOnly.CLOSE as the transaction Isolation Level is not READ_COMMITTED");
+				// we will just use ROLLBACK and ignore the desired optimisation
+				return OnQueryOnly.ROLLBACK;
 			} else {
-				return OnQueryOnly.CLOSE_ON_READCOMMITTED;				
+				// will use the OnQueryOnly.CLOSE optimisation
+				return OnQueryOnly.CLOSE;
 			}
 		}
-		// default to rollback
-		return OnQueryOnly.ROLLBACK;
-	}		
+		// default to rollback if not defined on the platform
+		return dbPlatformOnQueryOnly == null ? OnQueryOnly.ROLLBACK : dbPlatformOnQueryOnly;
+	}
 	
 	/**
 	 * Return true if the isolation level is read committed.

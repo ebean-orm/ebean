@@ -10,7 +10,7 @@ import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
-import com.avaje.ebeaninternal.server.transaction.TransactionManager.OnQueryOnly;
+import com.avaje.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -772,7 +772,7 @@ public class JdbcTransaction implements SpiTransaction {
         case COMMIT:
           performCommit();
           break;
-        case CLOSE_ON_READCOMMITTED:
+        case CLOSE:
           // valid at READ COMMITTED Isolation
           break;
         default:

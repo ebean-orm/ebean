@@ -13,8 +13,9 @@ public class Oracle10Platform extends DatabasePlatform {
   public Oracle10Platform() {
     super();
     this.name = "oracle";
+    // OnQueryOnly.CLOSE as a performance optimisation on Oracle
+    this.onQueryOnly = OnQueryOnly.CLOSE;
     this.dbEncrypt = new Oracle10DbEncrypt();
-
     this.sqlLimiter = new RownumSqlLimiter();
 
     // Not using getGeneratedKeys as instead we will

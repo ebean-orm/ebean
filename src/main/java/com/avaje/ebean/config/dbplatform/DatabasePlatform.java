@@ -17,6 +17,33 @@ public class DatabasePlatform {
 
   private static final Logger logger = LoggerFactory.getLogger(DatabasePlatform.class);
 
+  /**
+   * Behavior used when ending a query only transaction (at read committed isolation level).
+   */
+  public enum OnQueryOnly {
+
+    /**
+     * Rollback the transaction.
+     */
+    ROLLBACK,
+
+    /**
+     * Just close the transaction. Valid at READ_COMMITTED isolation and preferred on some Databases
+     * as a performance optimisation.
+     */
+    CLOSE,
+
+    /**
+     * Commit the transaction
+     */
+    COMMIT
+  }
+
+  /**
+   * The behaviour used when ending a read only transaction at read committed isolation level.
+   */
+  protected OnQueryOnly onQueryOnly = OnQueryOnly.ROLLBACK;
+
   /** 
    * The open quote used by quoted identifiers. 
    */
@@ -139,10 +166,22 @@ public class DatabasePlatform {
    * @param batchSize
    *          the number of sequences that should be loaded
    */
-  public IdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds,
-      String seqName, int batchSize) {
-
+  public IdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
     return null;
+  }
+
+  /**
+   * Return the behaviour to use when ending a read only transaction.
+   */
+  public OnQueryOnly getOnQueryOnly() {
+    return onQueryOnly;
+  }
+
+  /**
+   * Set the behaviour to use when ending a read only transaction.
+   */
+  public void setOnQueryOnly(OnQueryOnly onQueryOnly) {
+    this.onQueryOnly = onQueryOnly;
   }
 
   /**
