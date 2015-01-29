@@ -18,6 +18,23 @@ public class PropertiesWrapperTest {
   }
 
   @Test
+  public void testTrimPropertyValues() {
+
+    Properties properties = new Properties();
+    properties.put("someBasic"," hello ");
+    properties.put("someInt"," 42 ");
+    properties.put("noTrimReqr","jim");
+    properties.put("includeSpaces"," jim bob ");
+
+    PropertiesWrapper pw = new PropertiesWrapper("pref", "myserver", properties);
+    assertEquals("hello",pw.get("someBasic"));
+    assertEquals(42, pw.getInt("someInt", 1));
+    assertNull(pw.get("doesNotExist", null));
+    assertEquals("jim",pw.get("noTrimReqr"));
+    assertEquals("jim bob",pw.get("includeSpaces"));
+  }
+
+  @Test
   public void testGetProperties() throws Exception {
 
     String home = System.getenv("HOME");
