@@ -14,111 +14,110 @@ import com.avaje.ebeaninternal.api.TransactionEventTable;
 
 public class DefaultCallableSql implements Serializable, SpiCallableSql {
 
-	private static final long serialVersionUID = 8984272253185424701L;
+  private static final long serialVersionUID = 8984272253185424701L;
 
-	private transient final EbeanServer server;
-	
-	/**
-	 * The callable sql.
-	 */
-	private String sql;
+  private transient final EbeanServer server;
 
-	/**
-	 * To display in the transaction log to help identify the procedure.
-	 */
-	private String label;
+  /**
+   * The callable sql.
+   */
+  private String sql;
 
-	private int timeout;
-	
-	/**
-	 * Holds the table modification information. On commit this information is
-	 * used to manage the cache etc.
-	 */
-	private TransactionEventTable transactionEvent = new TransactionEventTable();
+  /**
+   * To display in the transaction log to help identify the procedure.
+   */
+  private String label;
 
-	private BindParams bindParameters = new BindParams();
+  private int timeout;
 
-	/**
-	 * Create with callable sql.
-	 */
-	public DefaultCallableSql(EbeanServer server, String sql) {
-		this.server = server;
-		this.sql = sql;
-	}
+  /**
+   * Holds the table modification information. On commit this information is
+   * used to manage the cache etc.
+   */
+  private final TransactionEventTable transactionEvent = new TransactionEventTable();
 
-	public void execute() {
-		server.execute(this, null);
-	}
+  private final BindParams bindParameters = new BindParams();
 
-	public String getLabel() {
-		return label;
-	}
+  /**
+   * Create with callable sql.
+   */
+  public DefaultCallableSql(EbeanServer server, String sql) {
+    this.server = server;
+    this.sql = sql;
+  }
 
-	public CallableSql setLabel(String label) {
-		this.label = label;
-		return this;
-	}
+  public void execute() {
+    server.execute(this, null);
+  }
 
-	public int getTimeout() {
-		return timeout;
-	}
+  public String getLabel() {
+    return label;
+  }
 
-	public String getSql() {
-		return sql;
-	}
+  public CallableSql setLabel(String label) {
+    this.label = label;
+    return this;
+  }
 
-	public CallableSql setTimeout(int secs) {
-		this.timeout = secs;
-		return this;
-	}
+  public int getTimeout() {
+    return timeout;
+  }
 
-	public CallableSql setSql(String sql) {
-		this.sql = sql;
-		return this;
-	}
+  public String getSql() {
+    return sql;
+  }
 
-	public CallableSql bind(int position, Object value) {
-		bindParameters.setParameter(position, value);
-		return this;
-	}
+  public CallableSql setTimeout(int secs) {
+    this.timeout = secs;
+    return this;
+  }
 
-	public CallableSql setParameter(int position, Object value) {
-		bindParameters.setParameter(position, value);
-		return this;
-	}
+  public CallableSql setSql(String sql) {
+    this.sql = sql;
+    return this;
+  }
 
-	public CallableSql registerOut(int position, int type) {
-		bindParameters.registerOut(position, type);
-		return this;
-	}
+  public CallableSql bind(int position, Object value) {
+    bindParameters.setParameter(position, value);
+    return this;
+  }
 
-	public Object getObject(int position) {
-		Param p = bindParameters.getParameter(position);
-		return p.getOutValue();
-	}
-	
-	public boolean executeOverride(CallableStatement cstmt) throws SQLException {
-		return false;
-	}
+  public CallableSql setParameter(int position, Object value) {
+    bindParameters.setParameter(position, value);
+    return this;
+  }
 
-	public CallableSql addModification(String tableName, boolean inserts, boolean updates,
-			boolean deletes) {
+  public CallableSql registerOut(int position, int type) {
+    bindParameters.registerOut(position, type);
+    return this;
+  }
 
-		transactionEvent.add(tableName, inserts, updates, deletes);
-		return this;
-	}
+  public Object getObject(int position) {
+    Param p = bindParameters.getParameter(position);
+    return p.getOutValue();
+  }
 
-	/**
-	 * Return the TransactionEvent which holds the table modification
-	 * information for this CallableSql. This information is merged into the
-	 * transaction after the transaction is commited.
-	 */
-	public TransactionEventTable getTransactionEventTable() {
-		return transactionEvent;
-	}
+  public boolean executeOverride(CallableStatement cstmt) throws SQLException {
+    return false;
+  }
 
-	public BindParams getBindParams() {
-		return bindParameters;
-	}
+  public CallableSql addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
+
+    transactionEvent.add(tableName, inserts, updates, deletes);
+    return this;
+  }
+
+  /**
+   * Return the TransactionEvent which holds the table modification
+   * information for this CallableSql. This information is merged into the
+   * transaction after the transaction is commited.
+   */
+  public TransactionEventTable getTransactionEventTable() {
+    return transactionEvent;
+  }
+
+  public BindParams getBindParams() {
+    return bindParameters;
+  }
 
 }
