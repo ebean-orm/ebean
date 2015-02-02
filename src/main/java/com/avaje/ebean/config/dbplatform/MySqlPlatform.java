@@ -37,7 +37,7 @@ public class MySqlPlatform extends DatabasePlatform {
 
     dbTypeMap.put(Types.BIT, new DbType("tinyint(1) default 0"));
     dbTypeMap.put(Types.BOOLEAN, new DbType("tinyint(1) default 0"));
-    dbTypeMap.put(Types.TIMESTAMP, new DbType("datetime"));
+    dbTypeMap.put(Types.TIMESTAMP, new DbType("datetime(6)"));
     dbTypeMap.put(Types.CLOB, new MySqlClob());
     dbTypeMap.put(Types.BLOB, new MySqlBlob());
     dbTypeMap.put(Types.BINARY, new DbType("binary", 255));
