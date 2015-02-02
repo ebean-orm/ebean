@@ -42,7 +42,7 @@ public class BindableProperty implements Bindable {
     if (bean != null) {
       value = prop.getValue(bean);
     }
-    request.bind(value, prop, prop.getName());
+    request.bind(value, prop);
   }
 
   /**
@@ -54,6 +54,6 @@ public class BindableProperty implements Bindable {
     if (bean != null) {
       value = prop.getValueObject(bean);
     }
-    request.bind(value, prop, prop.getName());
+    request.bind(value, prop);
   }
 }

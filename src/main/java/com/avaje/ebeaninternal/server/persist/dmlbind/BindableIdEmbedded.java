@@ -62,7 +62,7 @@ public final class BindableIdEmbedded implements BindableId {
     for (int i = 0; i < props.length; i++) {
 
       Object value = props[i].getValue(idValue);
-      request.bind(value, props[i], props[i].getDbColumn());
+      request.bind(value, props[i]);
     }
 
     request.setIdValue(idValue);

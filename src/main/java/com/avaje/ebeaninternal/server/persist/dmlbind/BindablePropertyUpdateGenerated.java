@@ -40,7 +40,7 @@ public class BindablePropertyUpdateGenerated extends BindableProperty {
       Object value = gen.getUpdateValue(prop, bean);
         
       // generated value should be the correct type
-        request.bind(value, prop, prop.getName());
+        request.bind(value, prop);
         
         // only register the update value if it was included
         // in the bean in the first place

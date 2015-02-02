@@ -77,7 +77,7 @@ public class ImportedIdMultiple implements ImportedId {
 		for (int i = 0; i < imported.length; i++) {
 		    if (imported[i].owner.isUpdateable()) {
     			Object scalarValue = imported[i].foreignProperty.getValue(bean);
-    			request.bind(scalarValue, imported[i].foreignProperty, imported[i].localDbColumn);
+    			request.bind(scalarValue, imported[i].foreignProperty);
 		    }
 		}
 		// hmmm, not worrying about this just yet

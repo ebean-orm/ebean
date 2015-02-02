@@ -32,7 +32,7 @@ public class BindablePropertyInsertGenerated extends BindableProperty {
 			//prop.setValueIntercept(bean, value);
 			prop.setValue(bean, value);
 		}
-    request.bind(value, prop, prop.getName());
+    request.bind(value, prop);
   }
 
 	/**

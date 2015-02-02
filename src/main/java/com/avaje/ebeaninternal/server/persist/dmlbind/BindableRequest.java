@@ -27,7 +27,7 @@ public interface BindableRequest {
    * logicalType to dbType.
    * </p>
    */
-  public Object bind(Object value, BeanProperty prop, String propName) throws SQLException;
+  public Object bind(Object value, BeanProperty prop) throws SQLException;
 
   /**
    * Bind a raw value. Used to bind the discriminator column.
@@ -42,7 +42,7 @@ public interface BindableRequest {
   /**
    * Bind the value to the preparedStatement without logging.
    */
-  public Object bindNoLog(Object value, BeanProperty prop, String propName) throws SQLException;
+  public Object bindNoLog(Object value, BeanProperty prop) throws SQLException;
 
 
   /**

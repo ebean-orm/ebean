@@ -135,7 +135,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 		if (bean != null){
 			value = getIdValue(bean);
 		}
-		request.bind(value, foreignProperty, localDbColumn);
+		request.bind(value, foreignProperty);
 		return value;
 	}
 

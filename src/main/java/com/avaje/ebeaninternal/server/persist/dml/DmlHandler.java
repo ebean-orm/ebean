@@ -176,18 +176,18 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Bind the value to the preparedStatement.
    */
-  public Object bind(Object value, BeanProperty prop, String propName) throws SQLException {
-    return bindInternal(logLevelSql, value, prop, propName);
+  public Object bind(Object value, BeanProperty prop) throws SQLException {
+    return bindInternal(logLevelSql, value, prop);
   }
 
   /**
    * Bind the value to the preparedStatement without logging.
    */
-  public Object bindNoLog(Object value, BeanProperty prop, String propName) throws SQLException {
-    return bindInternal(false, value, prop, propName);
+  public Object bindNoLog(Object value, BeanProperty prop) throws SQLException {
+    return bindInternal(false, value, prop);
   }
 
-  private Object bindInternal(boolean log, Object value, BeanProperty prop, String propName) throws SQLException {
+  private Object bindInternal(boolean log, Object value, BeanProperty prop) throws SQLException {
 
     if (log) {
       if (prop.isLob()) {

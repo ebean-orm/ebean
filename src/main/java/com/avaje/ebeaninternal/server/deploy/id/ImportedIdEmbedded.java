@@ -107,7 +107,7 @@ public class ImportedIdEmbedded implements ImportedId {
 		if (embeddedId == null){
 			for (int i = 0; i < imported.length; i++) {
 			    if (imported[i].owner.isUpdateable()) {
-			        request.bind(null, imported[i].foreignProperty, imported[i].localDbColumn);
+			        request.bind(null, imported[i].foreignProperty);
 			    }
 			}
 			
@@ -116,7 +116,7 @@ public class ImportedIdEmbedded implements ImportedId {
 			for (int i = 0; i < imported.length; i++) {
 			    if (imported[i].owner.isUpdateable()) {
     				Object scalarValue = imported[i].foreignProperty.getValue(embedded);
-    				request.bind(scalarValue, imported[i].foreignProperty, imported[i].localDbColumn);
+    				request.bind(scalarValue, imported[i].foreignProperty);
 			    }
 			}
 		}

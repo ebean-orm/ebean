@@ -1,5 +1,6 @@
 package com.avaje.tests.model.types;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
@@ -14,12 +15,16 @@ public class SomeNewTypesBean {
   @Version
   Long version;
 
+  @Column(name = "dow")
   DayOfWeek dayOfWeek;
 
+  @Column(name = "mth")
   Month month;
 
+  @Column(name = "yr")
   Year year;
 
+  @Column(name = "yr_mth")
   YearMonth yearMonth;
 
   LocalDate localDate;

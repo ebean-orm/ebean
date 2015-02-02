@@ -64,7 +64,7 @@ public final class BindableIdMap implements BindableId {
     for (int i = 0; i < uids.length; i++) {
       Object value = uids[i].getValue(bean);
 
-      request.bind(value, uids[i], uids[i].getName());
+      request.bind(value, uids[i]);
 
       // putting logicalType into map rather than
       // the dbType (which may have been converted).

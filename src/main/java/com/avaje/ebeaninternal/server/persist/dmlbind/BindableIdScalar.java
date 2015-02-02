@@ -61,7 +61,7 @@ public final class BindableIdScalar implements BindableId {
 
     Object value = uidProp.getValue(bean);
 
-    request.bind(value, uidProp, uidProp.getName());
+    request.bind(value, uidProp);
 
     // used for summary logging
     request.setIdValue(value);
