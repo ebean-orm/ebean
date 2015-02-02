@@ -77,13 +77,6 @@ public final class PersistRequestCallableSql extends PersistRequest {
 	}
 
 	/**
-	 * False for CallableSql.
-	 */
-	public boolean useGeneratedKeys() {
-		return false;
-	}
-
-	/**
 	 * Perform post execute processing for the CallableSql.
 	 */
 	public void postExecute() throws SQLException {
@@ -98,6 +91,8 @@ public final class PersistRequestCallableSql extends PersistRequest {
 		
 		if (tableEvents != null && !tableEvents.isEmpty()) {
 			transaction.getEvent().add(tableEvents);
+		} else {
+			transaction.markNotQueryOnly();
 		}
 
 	}
@@ -141,7 +136,7 @@ public final class PersistRequestCallableSql extends PersistRequest {
 
 		for (int i = 0; i < list.size(); i++) {
 			pos++;
-			BindParams.Param param = (BindParams.Param) list.get(i);
+			BindParams.Param param = list.get(i);
 			if (param.isOutParam()) {
 				Object outValue = cstmt.getObject(pos);
 				param.setOutValue(outValue);

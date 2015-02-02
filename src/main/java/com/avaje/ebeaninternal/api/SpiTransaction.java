@@ -213,6 +213,11 @@ public interface SpiTransaction extends Transaction {
   public void flushBatchOnCascade();
 
   /**
+   * Mark the transaction explicitly as not being query only.
+   */
+  public void markNotQueryOnly();
+
+  /**
    * Potentially escalate batch mode on saving or deleting a collection.
    */
   public void checkBatchEscalationOnCollection();
@@ -221,5 +226,6 @@ public interface SpiTransaction extends Transaction {
    * Flush batch if we escalated batch mode on saving or deleting a collection.
    */
   public void flushBatchOnCollection();
+
 
 }

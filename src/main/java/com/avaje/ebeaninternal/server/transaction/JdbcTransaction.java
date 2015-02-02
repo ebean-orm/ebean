@@ -362,6 +362,11 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   @Override
+  public void markNotQueryOnly() {
+    this.queryOnly = false;
+  }
+
+  @Override
   public boolean isReadOnly() {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
