@@ -84,7 +84,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
 
     assertTrue(orders.size() < totalRowCount);
-    assertEquals(2, loggedSql.size());
+    assertEquals("loggedSql: "+loggedSql, 2, loggedSql.size());
 
     String firstTxn = loggedSql.get(0).substring(0, 10);
     String secTxn = loggedSql.get(1).substring(0, 10);
