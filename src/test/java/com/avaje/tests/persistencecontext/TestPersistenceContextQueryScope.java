@@ -2,6 +2,7 @@ package com.avaje.tests.persistencecontext;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.SqlUpdate;
 import com.avaje.tests.model.basic.EBasicVer;
 import org.junit.Test;
 
@@ -25,13 +26,12 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
     try {
       EBasicVer bean1 = Ebean.find(EBasicVer.class, bean.getId());
 
-      // do an update of the name
-      EBasicVer updateBean = new EBasicVer();
-      updateBean.setId(bean.getId());
-      updateBean.setName("second");
-
-      // perform an update to the DB
-      Ebean.update(updateBean);
+      // do an update of the name in the DB
+      SqlUpdate sqlUpdate = Ebean.createSqlUpdate("update e_basicver set name=? where id=?");
+      sqlUpdate.setParameter(1, "second");
+      sqlUpdate.setParameter(2, bean.getId());
+      int rowCount = sqlUpdate.execute();
+      assertEquals(1, rowCount);
 
       // fetch the bean again... but doesn't hit DB as it
       // is in the PersistenceContext which is transaction scoped

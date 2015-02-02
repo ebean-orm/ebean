@@ -76,6 +76,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private Integer beanHash;
 
+  /**
+   * Flag set if this is a stateless update.
+   */
+  private boolean statelessUpdate;
+
   private boolean notifyCache;
 
   private boolean deleteMissingChildren;
@@ -134,6 +139,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       if (intercept.isNew()) {
         // 'stateless update' - set loaded properties as dirty
         intercept.setNewBeanForUpdate();
+        statelessUpdate = true;
       }
       // Mark Mutable scalar properties (like Hstore) as dirty where necessary
       beanDescriptor.checkMutableProperties(intercept);
@@ -501,8 +507,19 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       String m = Message.msg("persist.conc2", "" + rowCount);
       throw new OptimisticLockException(m, null, bean);
     }
-    if (type == Type.DELETE) {
-      postDelete();
+    switch (type) {
+      case DELETE: postDelete(); break;
+      case UPDATE: postUpdate(); break;
+      default: // do nothing
+    }
+  }
+
+  /**
+   * Clear the bean from the PersistenceContext (L1 cache) for stateless updates.
+   */
+  private void postUpdate() {
+    if (statelessUpdate) {
+      transaction.getPersistenceContext().clear(beanDescriptor.getBeanType(), idValue);
     }
   }
 
