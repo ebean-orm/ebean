@@ -32,6 +32,10 @@ public class UpdateTimestampFactory {
       map.put(OffsetDateTime.class, new GeneratedUpdateJavaTime.OffsetDT());
       map.put(ZonedDateTime.class, new GeneratedUpdateJavaTime.ZonedDT());
     }
+    if (ClassUtil.isPresent("org.joda.time.LocalDateTime", this.getClass())) {
+      map.put(org.joda.time.LocalDateTime.class, new GeneratedUpdateJodaTime.LocalDT());
+      map.put(org.joda.time.DateTime.class, new GeneratedUpdateJodaTime.DateTimeDT());
+    }
   }
 
 	public void setUpdateTimestamp(DeployBeanProperty property) {

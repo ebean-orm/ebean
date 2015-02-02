@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.type;
 
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.Date;
 
 import com.avaje.ebean.config.JsonConfig;
 import org.joda.time.LocalDateTime;

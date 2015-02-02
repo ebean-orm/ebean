@@ -32,6 +32,11 @@ public class InsertTimestampFactory {
       map.put(OffsetDateTime.class, new GeneratedInsertJavaTime.OffsetDT());
       map.put(ZonedDateTime.class, new GeneratedInsertJavaTime.ZonedDT());
     }
+    if (ClassUtil.isPresent("org.joda.time.LocalDateTime", this.getClass())) {
+      map.put(org.joda.time.LocalDateTime.class, new GeneratedInsertJodaTime.LocalDT());
+      map.put(org.joda.time.DateTime.class, new GeneratedInsertJodaTime.DateTimeDT());
+    }
+
   }
 
 	public void setInsertTimestamp(DeployBeanProperty property) {
