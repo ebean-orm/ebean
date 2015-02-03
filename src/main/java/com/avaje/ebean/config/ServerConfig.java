@@ -1722,7 +1722,8 @@ public class ServerConfig {
     serverCacheFactory = createInstance(p, ServerCacheFactory.class, "serverCacheFactory");
     serverCacheManager = createInstance(p, ServerCacheManager.class, "serverCacheManager");
     cacheWarmingDelay = p.getInt("cacheWarmingDelay", cacheWarmingDelay);
-
+    classPathReaderClassName = p.get("classpathreader");
+    
     String jarsProp = p.get("search.jars", p.get("jars", null));
     if (jarsProp != null) {
       searchJars = getSearchJarsPackages(jarsProp);
