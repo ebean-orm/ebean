@@ -1,8 +1,10 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
 
+import javax.persistence.PersistenceException;
 import javax.persistence.PostLoad;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
@@ -121,9 +123,13 @@ public class BeanLifecycleAdapterFactory {
     private void invoke(Method method, Object bean) {
       try {
         method.invoke(bean);
-      } catch (Exception e) {
-        logger.error("Error invoking lifecycle adapter", e);
-      }
+      } 
+      catch (InvocationTargetException e) {
+          throw new PersistenceException("Error invoking lifecycle method", e);
+      } 
+      catch (IllegalAccessException e) {
+          throw new PersistenceException("Error invoking lifecycle method", e);
+      } 
     }
 
     private void invoke(Method method, BeanPersistRequest<?> request) {
