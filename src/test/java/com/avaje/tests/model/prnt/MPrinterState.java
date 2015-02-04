@@ -13,6 +13,8 @@ public class MPrinterState {
 
   long flags;
 
+  @Column(name="dwid",nullable=false) MSomeOther dataWarehouseId;
+
   @JoinColumn(name="printer_id")
   @ManyToOne
   MPrinter printer;
@@ -47,5 +49,13 @@ public class MPrinterState {
 
   public void setPrinter(MPrinter printer) {
     this.printer = printer;
+  }
+
+  public MSomeOther getDataWarehouseId() {
+    return dataWarehouseId;
+  }
+
+  public void setDataWarehouseId(MSomeOther dataWarehouseId) {
+    this.dataWarehouseId = dataWarehouseId;
   }
 }

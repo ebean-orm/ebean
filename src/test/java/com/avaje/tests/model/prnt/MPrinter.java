@@ -16,6 +16,8 @@ public class MPrinter {
   @Column(name="flags", nullable=false)
   long allFlags=0L;
 
+  @Column(name="dwid",nullable=false) MSomeOther dataWarehouseId;
+
   @JoinColumn(name="current_state_id")
   @ManyToOne
   MPrinterState currentState;
@@ -95,5 +97,13 @@ public class MPrinter {
 
   public void setLastTonerSwapBlack(MPrinterState lastTonerSwapBlack) {
     this.lastTonerSwapBlack = lastTonerSwapBlack;
+  }
+
+  public MSomeOther getDataWarehouseId() {
+    return dataWarehouseId;
+  }
+
+  public void setDataWarehouseId(MSomeOther dataWarehouseId) {
+    this.dataWarehouseId = dataWarehouseId;
   }
 }
