@@ -123,13 +123,11 @@ public class BeanLifecycleAdapterFactory {
     private void invoke(Method method, Object bean) {
       try {
         method.invoke(bean);
-      } 
-      catch (InvocationTargetException e) {
-          throw new PersistenceException("Error invoking lifecycle method", e);
-      } 
-      catch (IllegalAccessException e) {
-          throw new PersistenceException("Error invoking lifecycle method", e);
-      } 
+      } catch (InvocationTargetException e) {
+        throw new PersistenceException("Error invoking lifecycle method", e);
+      } catch (IllegalAccessException e) {
+        throw new PersistenceException("Error invoking lifecycle method", e);
+      }
     }
 
     private void invoke(Method method, BeanPersistRequest<?> request) {
