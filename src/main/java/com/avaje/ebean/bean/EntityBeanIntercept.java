@@ -47,9 +47,6 @@ public final class EntityBeanIntercept implements Serializable {
    */
   private EntityBean owner;
 
-  /**
-   * The parent bean by relationship (1-1 or 1-M).
-   */
   private EntityBean embeddedOwner;
   private int embeddedOwnerIndex;
 
@@ -175,7 +172,7 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Return the parent bean (by relationship).
+   * Return the owning bean for an embedded bean.
    */
   public Object getEmbeddedOwner() {
     return embeddedOwner;
@@ -189,8 +186,7 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Special case for a OneToOne, Set the parent bean (by relationship). This is
-   * the owner of a 1-1.
+   * Set the embedded beans owning bean.
    */
   public void setEmbeddedOwner(EntityBean parentBean, int embeddedOwnerIndex) {
     this.embeddedOwner = parentBean;

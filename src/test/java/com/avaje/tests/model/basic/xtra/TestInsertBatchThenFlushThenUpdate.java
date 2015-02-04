@@ -53,9 +53,8 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
 
       // insert statements for EdExtendedParent
       List<String> loggedSql2 = LoggedSqlCollector.start();
-      assertEquals(2, loggedSql2.size());
+      assertEquals(1, loggedSql2.size());
       assertTrue(loggedSql2.get(0).contains(" update td_parent "));
-      assertTrue(loggedSql2.get(1).contains(" update td_child "));
 
     } finally {
       Ebean.endTransaction();

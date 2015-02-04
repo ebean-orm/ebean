@@ -519,7 +519,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     @Override
     public void setValue(EntityBean bean, Object value) {
       super.setValue(bean, value);
-      if (value instanceof EntityBean) {
+      if (embedded && value instanceof EntityBean) {
         EntityBean embedded = (EntityBean)value;
         embedded._ebean_getIntercept().setEmbeddedOwner(bean, propertyIndex);
       }
@@ -528,7 +528,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     @Override
     public void setValueIntercept(EntityBean bean, Object value) {
       super.setValueIntercept(bean, value);
-      if (value instanceof EntityBean) {
+      if (embedded && value instanceof EntityBean) {
         EntityBean embedded = (EntityBean)value;
         embedded._ebean_getIntercept().setEmbeddedOwner(bean, propertyIndex);
       }
