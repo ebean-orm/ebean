@@ -2,6 +2,8 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.PersistenceException;
@@ -23,7 +25,7 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 /**
  * Helper that looks for methods annotated with lifecycle events and registers an adapter for them.
  * <p>
- * This includes PrePerist, PostPerist, PreUpdate, PostUpdate, PreRemove, PostRemove and PostLoad
+ * This includes PrePersist, PostPersist, PreUpdate, PostUpdate, PreRemove, PostRemove and PostLoad
  * lifecycle events.
  * </p>
  */
@@ -38,7 +40,7 @@ public class BeanLifecycleAdapterFactory {
 
     Method[] methods = deployDesc.getBeanType().getMethods();
 
-    MethodHolder methodHolder = new MethodHolder();
+    MethodsHolder methodHolder = new MethodsHolder();
 
     for (Method m : methods) {
       methodHolder.checkMethod(m);
@@ -52,16 +54,16 @@ public class BeanLifecycleAdapterFactory {
   /**
    * Holds Methods for the lifecycle events.s
    */
-  private static class MethodHolder {
+  private static class MethodsHolder {
 
     private boolean hasListener;
-    private Method preInsert;
-    private Method postInsert;
-    private Method preUpdate;
-    private Method postUpdate;
-    private Method preDelete;
-    private Method postDelete;
-    private Method postLoad;
+    private List<Method> preInserts = new ArrayList<Method>();
+    private List<Method> postInserts = new ArrayList<Method>();
+    private List<Method> preUpdates = new ArrayList<Method>();
+    private List<Method> postUpdates = new ArrayList<Method>();
+    private List<Method> preDeletes = new ArrayList<Method>();
+    private List<Method> postDeletes = new ArrayList<Method>();
+    private List<Method> postLoads = new ArrayList<Method>();
 
     private boolean hasListener() {
       return hasListener;
@@ -69,37 +71,36 @@ public class BeanLifecycleAdapterFactory {
 
     private void checkMethod(Method method) {
       if (method.isAnnotationPresent(PrePersist.class)) {
-        preInsert = method;
+        preInserts.add(method);
         hasListener = true;
       }
       if (method.isAnnotationPresent(PostPersist.class)) {
-        postInsert = method;
+        postInserts.add(method);
         hasListener = true;
       }
 
       if (method.isAnnotationPresent(PreUpdate.class)) {
-        preUpdate = method;
+        preUpdates.add(method);
         hasListener = true;
       }
       if (method.isAnnotationPresent(PostUpdate.class)) {
-        postUpdate = method;
+        postUpdates.add(method);
         hasListener = true;
       }
 
       if (method.isAnnotationPresent(PreRemove.class)) {
-        preDelete = method;
+        preDeletes.add(method);
         hasListener = true;
       }
       if (method.isAnnotationPresent(PostRemove.class)) {
-        postDelete = method;
+        postDeletes.add(method);
         hasListener = true;
       }
 
       if (method.isAnnotationPresent(PostLoad.class)) {
-        postLoad = method;
+        postLoads.add(method);
         hasListener = true;
       }
-
     }
   }
 
@@ -108,9 +109,9 @@ public class BeanLifecycleAdapterFactory {
    */
   private static class Adapter extends BeanPersistAdapter {
 
-    private final MethodHolder methodHolder;
+    private final MethodsHolder methodHolder;
 
-    private Adapter(MethodHolder methodHolder) {
+    private Adapter(MethodsHolder methodHolder) {
       this.methodHolder = methodHolder;
     }
 
@@ -130,61 +131,52 @@ public class BeanLifecycleAdapterFactory {
       }
     }
 
-    private void invoke(Method method, BeanPersistRequest<?> request) {
-      invoke(method, request.getBean());
+    private void invoke(List<Method> methods, BeanPersistRequest<?> request) {
+      if (methods.isEmpty()) return;
+      for (Method method : methods) {
+        invoke(method, request.getBean());
+      }
     }
 
     @Override
     public boolean preDelete(BeanPersistRequest<?> request) {
-      if (methodHolder.preDelete != null) {
-        invoke(methodHolder.preDelete, request);
-      }
+      invoke(methodHolder.preDeletes, request);
       return true;
     }
 
     @Override
     public boolean preInsert(BeanPersistRequest<?> request) {
-      if (methodHolder.preInsert != null) {
-        invoke(methodHolder.preInsert, request);
-      }
+      invoke(methodHolder.preInserts, request);
       return true;
     }
 
     @Override
     public boolean preUpdate(BeanPersistRequest<?> request) {
-      if (methodHolder.preUpdate != null) {
-        invoke(methodHolder.preUpdate, request);
-      }
+      invoke(methodHolder.preUpdates, request);
       return true;
     }
 
     @Override
     public void postDelete(BeanPersistRequest<?> request) {
-      if (methodHolder.postDelete != null) {
-        invoke(methodHolder.postDelete, request);
-      }
+      invoke(methodHolder.postDeletes, request);
     }
 
     @Override
     public void postInsert(BeanPersistRequest<?> request) {
-      if (methodHolder.postInsert != null) {
-        invoke(methodHolder.postInsert, request);
-      }
+      invoke(methodHolder.postInserts, request);
     }
 
     @Override
     public void postUpdate(BeanPersistRequest<?> request) {
-      if (methodHolder.postUpdate != null) {
-        invoke(methodHolder.postUpdate, request);
-      }
+      invoke(methodHolder.postUpdates, request);
     }
 
     @Override
     public void postLoad(Object bean, Set<String> includedProperties) {
-      if (methodHolder.postLoad != null) {
-        invoke(methodHolder.postLoad, bean);
+      if (methodHolder.postLoads.isEmpty()) return;
+      for (Method method : methodHolder.postLoads) {
+        invoke(method, bean);
       }
     }
-
   }
 }
