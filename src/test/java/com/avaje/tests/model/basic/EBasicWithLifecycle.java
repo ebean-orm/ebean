@@ -27,38 +27,73 @@ public class EBasicWithLifecycle {
   transient StringBuilder buffer = new StringBuilder();
   
   @PrePersist
-  public void prePersist() {
-    buffer.append("prePersist,");
+  public void prePersist1() {
+    buffer.append("prePersist1");
+  }
+  
+  @PrePersist
+  public void prePersist2() {
+    buffer.append("prePersist2");
   }
   
   @PostPersist
-  public void postPersist() {
-    buffer.append("postPersist,");
+  public void postPersist1() {
+    buffer.append("postPersist1");
+  }
+
+  @PostPersist
+  public void postPersist2() {
+    buffer.append("postPersist2");
   }
   
   @PreUpdate
-  public void preUpdate() {
-    buffer.append("preUpdate,");
+  public void preUpdate1() {
+    buffer.append("preUpdate1");
+  }
+
+  @PreUpdate
+  public void preUpdate2() {
+    buffer.append("preUpdate2");
   }
   
   @PostUpdate
-  public void postUpdate() {
-    buffer.append("postUpdate,");
+  public void postUpdate1() {
+    buffer.append("postUpdate1");
+  }
+
+  @PostUpdate
+  public void postUpdate2() {
+    buffer.append("postUpdate2");
+  }
+  
+  @PreRemove
+  public void preRemove1() {
+    buffer.append("preRemove1");
   }
 
   @PreRemove
-  public void preRemove() {
-    buffer.append("preRemove,");
+  public void preRemove2() {
+    buffer.append("preRemove2");
   }
   
   @PostRemove
-  public void postRemove() {
-    buffer.append("postRemove");
+  public void postRemove1() {
+    buffer.append("postRemove1");
+  }
+
+  @PostRemove
+  public void postRemove2() {
+    buffer.append("postRemove2");
   }
   
   @PostLoad
-  public void postLoad() {
-    buffer.append("postLoad");
+  public void postLoad1() {
+    buffer.append("postLoad1");
+  }
+
+  @PostLoad
+  public void postLoad2() {
+    buffer.append("postLoad2");
   }
 
   public Long getId() {
