@@ -203,12 +203,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Map<?, T> findMap() {
+  public <M extends T> Map<?, M> findMap() {
     return query.findMap();
   }
 
   @Override
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
+  public <K, M extends T> Map<K, M> findMap(String keyProperty, Class<K> keyType) {
     return query.findMap(keyProperty, keyType);
   }
 

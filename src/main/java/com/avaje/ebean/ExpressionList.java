@@ -39,7 +39,7 @@ public interface ExpressionList<T> extends Serializable {
    * query so that further things can be added to it.
    * </p>
    */
-  public Query<T> query();
+  public <M extends T> Query<M> query();
 
   /**
    * Set the order by clause replacing the existing order by clause if there is
@@ -53,7 +53,7 @@ public interface ExpressionList<T> extends Serializable {
    * This is EXACTLY the same as {@link #orderBy(String)}.
    * </p>
    */
-  public Query<T> order(String orderByClause);
+  public <M extends T> Query<M> order(String orderByClause);
 
   /**
    * Return the OrderBy so that you can append an ascending or descending
@@ -63,7 +63,7 @@ public interface ExpressionList<T> extends Serializable {
    * OrderBy object is returned.
    * </p>
    */
-  public OrderBy<T> order();
+  public <M extends T> OrderBy<M> order();
 
   /**
    * Return the OrderBy so that you can append an ascending or descending
@@ -73,33 +73,33 @@ public interface ExpressionList<T> extends Serializable {
    * OrderBy object is returned.
    * </p>
    */
-  public OrderBy<T> orderBy();
+  public <M extends T> OrderBy<M> orderBy();
 
   /**
    * Add an orderBy clause to the query.
    * 
    * @see Query#orderBy(String)
    */
-  public Query<T> orderBy(String orderBy);
+  public <M extends T> Query<M> orderBy(String orderBy);
 
   /**
    * Add an orderBy clause to the query.
    * 
    * @see Query#orderBy(String)
    */
-  public Query<T> setOrderBy(String orderBy);
+  public <M extends T> Query<M> setOrderBy(String orderBy);
 
   /**
    * Apply the path properties to the query replacing the select and fetch clauses.
    */
-  public Query<T> apply(PathProperties pathProperties);
+  public <M extends T> Query<M> apply(PathProperties pathProperties);
 
   /**
    * Execute the query iterating over the results.
    * 
    * @see Query#findIterate()
    */
-  public QueryIterator<T> findIterate();
+  public <M extends T> QueryIterator<M> findIterate();
 
   /**
    * Execute the query process the beans one at a time.
@@ -129,7 +129,7 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @see Query#findList()
    */
-  public List<T> findList();
+  public <M extends T> List<M> findList();
 
   /**
    * Execute the query returning the list of Id's.
@@ -151,26 +151,26 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @see Query#findSet()
    */
-  public Set<T> findSet();
+  public <M extends T> Set<M> findSet();
 
   /**
    * Execute the query returning a map.
    * 
    * @see Query#findMap()
    */
-  public Map<?, T> findMap();
+  public <M extends T> Map<?, M> findMap();
 
   /**
    * Return a typed map specifying the key property and type.
    */
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType);
+  public <K, M extends T> Map<K, M> findMap(String keyProperty, Class<K> keyType);
 
   /**
    * Execute the query returning a single bean.
    * 
    * @see Query#findUnique()
    */
-  public T findUnique();
+  public <M extends T> M findUnique();
 
   /**
    * Execute find row count query in a background thread.
@@ -182,7 +182,7 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @return a Future object for the row count query
    */
-  public FutureRowCount<T> findFutureRowCount();
+  public <M extends T> FutureRowCount<M> findFutureRowCount();
 
   /**
    * Execute find Id's query in a background thread.
@@ -194,7 +194,7 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @return a Future object for the list of Id's
    */
-  public FutureIds<T> findFutureIds();
+  public <M extends T> FutureIds<M> findFutureIds();
 
   /**
    * Execute find list query in a background thread.
@@ -206,7 +206,7 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @return a Future object for the list result of the query
    */
-  public FutureList<T> findFutureList();
+  public <M extends T> FutureList<M> findFutureList();
 
   /**
    * Return a PagedList for this query.
@@ -227,7 +227,7 @@ public interface ExpressionList<T> extends Serializable {
    *          The number of beans to return per page.
    * @return The PagedList
    */
-  public PagedList<T> findPagedList(int pageIndex, int pageSize);
+  public <M extends T> PagedList<M> findPagedList(int pageIndex, int pageSize);
 
   /**
    * Add some filter predicate expressions to the many property.
@@ -240,35 +240,35 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @see Query#select(String)
    */
-  public Query<T> select(String properties);
+  public <M extends T> Query<M> select(String properties);
 
   /**
    * Set the first row to fetch.
    * 
    * @see Query#setFirstRow(int)
    */
-  public Query<T> setFirstRow(int firstRow);
+  public <M extends T> Query<M> setFirstRow(int firstRow);
 
   /**
    * Set the maximum number of rows to fetch.
    * 
    * @see Query#setMaxRows(int)
    */
-  public Query<T> setMaxRows(int maxRows);
+  public <M extends T> Query<M> setMaxRows(int maxRows);
 
   /**
    * Set the name of the property which values become the key of a map.
    * 
    * @see Query#setMapKey(String)
    */
-  public Query<T> setMapKey(String mapKey);
+  public <M extends T> Query<M> setMapKey(String mapKey);
 
   /**
    * Set to true to use the query for executing this query.
    * 
    * @see Query#setUseCache(boolean)
    */
-  public Query<T> setUseCache(boolean useCache);
+  public <M extends T> Query<M> setUseCache(boolean useCache);
 
   /**
    * Add expressions to the having clause.

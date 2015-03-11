@@ -937,14 +937,15 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return server.findSet(this, null);
   }
 
-  public Map<?, T> findMap() {
-    return server.findMap(this, null);
+  @SuppressWarnings("unchecked")
+  public <M extends T> Map<?, M> findMap() {
+    return (Map<?, M>) server.findMap(this, null);
   }
 
   @SuppressWarnings("unchecked")
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
+  public <K, M extends T> Map<K, M> findMap(String keyProperty, Class<K> keyType) {
     setMapKey(keyProperty);
-    return (Map<K, T>) findMap();
+    return (Map<K, M>) findMap();
   }
 
   public T findUnique() {
@@ -1014,33 +1015,35 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return orderBy;
   }
 
-  public DefaultOrmQuery<T> setOrderBy(String orderByClause) {
+  public <M extends T> DefaultOrmQuery<M> setOrderBy(String orderByClause) {
     return order(orderByClause);
   }
 
-  public DefaultOrmQuery<T> orderBy(String orderByClause) {
+  public <M extends T> DefaultOrmQuery<M> orderBy(String orderByClause) {
     return order(orderByClause);
   }
 
-  public DefaultOrmQuery<T> order(String orderByClause) {
+  @SuppressWarnings("unchecked")
+  public <M extends T> DefaultOrmQuery<M> order(String orderByClause) {
     if (orderByClause == null || orderByClause.trim().length() == 0) {
       this.orderBy = null;
     } else {
       this.orderBy = new OrderBy<T>(this, orderByClause);
     }
-    return this;
+    return (DefaultOrmQuery<M>) this;
   }
 
-  public DefaultOrmQuery<T> setOrderBy(OrderBy<T> orderBy) {
+  public <M extends T> DefaultOrmQuery<M> setOrderBy(OrderBy<M> orderBy) {
     return setOrder(orderBy);
   }
 
-  public DefaultOrmQuery<T> setOrder(OrderBy<T> orderBy) {
-    this.orderBy = orderBy;
+  @SuppressWarnings("unchecked")
+  public <M extends T> DefaultOrmQuery<M> setOrder(OrderBy<M> orderBy) {
+    this.orderBy = (OrderBy<T>) orderBy;
     if (orderBy != null) {
-      orderBy.setQuery(this);
+      orderBy.setQuery((Query<M>) this);
     }
-    return this;
+    return (DefaultOrmQuery<M>) this;
   }
 
   /**

@@ -50,7 +50,7 @@ public interface FutureList<T> extends Future<List<T>> {
   /**
    * Return the query that is being executed by a background thread.
    */
-  public Query<T> getQuery();
+  public <M extends T> Query<M> getQuery();
 
   /**
    * Same as {@link #get()} but wraps InterruptedException and ExecutionException in the
@@ -60,7 +60,7 @@ public interface FutureList<T> extends Future<List<T>> {
    *
    * @throws PersistenceException when a InterruptedException or ExecutionException occurs.
    */
-  public List<T> getUnchecked();
+  public <M extends T> List<M> getUnchecked();
 
   /**
    * Same as {@link #get(long, java.util.concurrent.TimeUnit)} but wraps InterruptedException
@@ -71,6 +71,6 @@ public interface FutureList<T> extends Future<List<T>> {
    * @throws TimeoutException if the wait timed out
    * @throws PersistenceException if a InterruptedException or ExecutionException occurs.
    */
-  public List<T> getUnchecked(long timeout, TimeUnit unit) throws TimeoutException;
+  public <M extends T> List<M> getUnchecked(long timeout, TimeUnit unit) throws TimeoutException;
 
 }

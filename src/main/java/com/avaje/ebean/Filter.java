@@ -192,6 +192,6 @@ public interface Filter<T> {
    * 
    * @return Returns a new list with the sorting and filters applied.
    */
-  public List<T> filter(List<T> sourceList);
+  public <M extends T> List<M> filter(List<T> sourceList);
 
 }
