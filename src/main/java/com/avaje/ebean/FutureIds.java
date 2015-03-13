@@ -17,7 +17,7 @@ public interface FutureIds<T> extends Future<List<Object>> {
   /**
    * Returns the original query used to fetch the Id's.
    */
-  public <M extends T> Query<M> getQuery();
+  public Query<T> getQuery();
 
   /**
    * Return the list of Id's which could be partially populated.

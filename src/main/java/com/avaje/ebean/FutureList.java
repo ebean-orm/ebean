@@ -50,7 +50,7 @@ public interface FutureList<T> extends Future<List<T>> {
   /**
    * Return the query that is being executed by a background thread.
    */
-  public <M extends T> Query<M> getQuery();
+  public Query<T> getQuery();
 
   /**
    * Same as {@link #get()} but wraps InterruptedException and ExecutionException in the

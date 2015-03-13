@@ -929,12 +929,14 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return server.findIterate(this, null);
   }
 
-  public List<T> findList() {
-    return server.findList(this, null);
+  @SuppressWarnings("unchecked")
+  public <M extends T> List<M> findList() {
+    return (List<M>) server.findList(this, null);
   }
 
-  public Set<T> findSet() {
-    return server.findSet(this, null);
+  @SuppressWarnings("unchecked")
+  public <M extends T> Set<M> findSet() {
+    return (Set<M>) server.findSet(this, null);
   }
 
   @SuppressWarnings("unchecked")
@@ -1015,35 +1017,33 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return orderBy;
   }
 
-  public <M extends T> DefaultOrmQuery<M> setOrderBy(String orderByClause) {
+  public DefaultOrmQuery<T> setOrderBy(String orderByClause) {
     return order(orderByClause);
   }
 
-  public <M extends T> DefaultOrmQuery<M> orderBy(String orderByClause) {
+  public DefaultOrmQuery<T> orderBy(String orderByClause) {
     return order(orderByClause);
   }
 
-  @SuppressWarnings("unchecked")
-  public <M extends T> DefaultOrmQuery<M> order(String orderByClause) {
+  public DefaultOrmQuery<T> order(String orderByClause) {
     if (orderByClause == null || orderByClause.trim().length() == 0) {
       this.orderBy = null;
     } else {
       this.orderBy = new OrderBy<T>(this, orderByClause);
     }
-    return (DefaultOrmQuery<M>) this;
+    return this;
   }
 
-  public <M extends T> DefaultOrmQuery<M> setOrderBy(OrderBy<M> orderBy) {
+  public DefaultOrmQuery<T> setOrderBy(OrderBy<T> orderBy) {
     return setOrder(orderBy);
   }
 
-  @SuppressWarnings("unchecked")
-  public <M extends T> DefaultOrmQuery<M> setOrder(OrderBy<M> orderBy) {
-    this.orderBy = (OrderBy<T>) orderBy;
+  public DefaultOrmQuery<T> setOrder(OrderBy<T> orderBy) {
+    this.orderBy = orderBy;
     if (orderBy != null) {
-      orderBy.setQuery((Query<M>) this);
+      orderBy.setQuery(this);
     }
-    return (DefaultOrmQuery<M>) this;
+    return this;
   }
 
   /**
