@@ -473,6 +473,16 @@ public interface ExpressionList<T> extends Serializable {
    * In - property has a value in the collection of values.
    */
   public ExpressionList<T> in(String propertyName, Collection<?> values);
+  
+  /**
+   * Exists expression
+   */
+  public ExpressionList<T> exists(Query<?> subQuery);
+  
+  /**
+   * Not exists expression
+   */
+  public ExpressionList<T> notExists(Query<?> subQuery);
 
   /**
    * Id IN a list of id values.

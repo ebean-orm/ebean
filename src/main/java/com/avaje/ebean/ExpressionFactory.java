@@ -169,6 +169,16 @@ public interface ExpressionFactory {
    * In - property has a value in the collection of values.
    */
   public Expression in(String propertyName, Collection<?> values);
+  
+  /**
+   * Exists expression
+   */
+  public Expression exists(Query<?> subQuery);
+  
+  /**
+   * Not exists expression
+   */
+  public Expression notExists(Query<?> subQuery);
 
   /**
    * Id Equal to - ID property is equal to the value.
