@@ -11,31 +11,31 @@ import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 
 public class TestQueryExists extends BaseTestCase {
-	@Test
-	public void testExists() {
-		ResetBasicData.reset();
 
-		Query<Order> subQuery=Ebean.find(Order.class).alias("sq").select("id").where().raw("sq.kcustomer_id = qt.id")
-				.query();
-		Query<Customer> query=Ebean.find(Customer.class).alias("qt").where().exists(subQuery).query();
+  @Test
+  public void testExists() {
+    ResetBasicData.reset();
 
-		query.findList();
-		String sql=query.getGeneratedSql();
+    Query<Order> subQuery = Ebean.find(Order.class).alias("sq").select("id").where().raw("sq.kcustomer_id = qt.id").query();
 
-		Assert.assertTrue(sql.indexOf("exists (")>0);
-	}
+    Query<Customer> query = Ebean.find(Customer.class).alias("qt").where().exists(subQuery).query();
 
-	@Test
-	public void testNotExists() {
-		ResetBasicData.reset();
+    query.findList();
+    String sql = query.getGeneratedSql();
 
-		Query<Order> subQuery=Ebean.find(Order.class).alias("sq").select("id").where().raw("sq.kcustomer_id = qt.id")
-				.query();
-		Query<Customer> query=Ebean.find(Customer.class).alias("qt").where().notExists(subQuery).query();
+    Assert.assertTrue(sql.indexOf("exists (") > 0);
+  }
 
-		query.findList();
-		String sql=query.getGeneratedSql();
+  @Test
+  public void testNotExists() {
+    ResetBasicData.reset();
 
-		Assert.assertTrue(sql.indexOf("not exists (")>0);
-	}
+    Query<Order> subQuery = Ebean.find(Order.class).alias("sq").select("id").where().raw("sq.kcustomer_id = qt.id").query();
+    Query<Customer> query = Ebean.find(Customer.class).alias("qt").where().notExists(subQuery).query();
+
+    query.findList();
+    String sql = query.getGeneratedSql();
+
+    Assert.assertTrue(sql.indexOf("not exists (") > 0);
+  }
 }

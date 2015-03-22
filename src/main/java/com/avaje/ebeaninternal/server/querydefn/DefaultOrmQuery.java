@@ -1290,13 +1290,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       this.cancelableQuery = cancelableQuery;
     }
   }
-  
+
   @Override
   public Query<T> alias(String alias) {
-	  this.rootTableAlias=alias;
-	  return this;
+    this.rootTableAlias = alias;
+    return this;
   }
-  
+
   @Override
   public String getAlias() {
     return rootTableAlias;

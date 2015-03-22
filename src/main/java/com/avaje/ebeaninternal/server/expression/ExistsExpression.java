@@ -14,74 +14,74 @@ import com.avaje.ebeaninternal.server.query.CQuery;
 
 public class ExistsExpression implements SpiExpression {
 
-	  private static final long serialVersionUID = 666990277309851644L;
+  private static final long serialVersionUID = 666990277309851644L;
 
-	  private final boolean not;
-	  private final SpiQuery<?> subQuery;
+  private final boolean not;
+  private final SpiQuery<?> subQuery;
 
-	  private transient CQuery<?> compiledSubQuery;
+  private transient CQuery<?> compiledSubQuery;
 
-	  public ExistsExpression(SpiQuery<?> subQuery, boolean not) {
-	    this.subQuery = subQuery;
-	    this.not=not;
-	  }
+  public ExistsExpression(SpiQuery<?> subQuery, boolean not) {
+    this.subQuery = subQuery;
+    this.not = not;
+  }
 
-	  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
-	    builder.add(ExistsExpression.class).add(not);
-	    
-	    subQuery.queryAutofetchHash(builder);
-	  }
+  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+    builder.add(ExistsExpression.class).add(not);
 
-	  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+    subQuery.queryAutofetchHash(builder);
+  }
 
-	    // queryPlanHash executes prior to addSql() or addBindValues()
-	    // ... so compiledQuery will exist
-	    compiledSubQuery = compileSubQuery(request);
+  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
 
-	    queryAutoFetchHash(builder);
-	  }
+    // queryPlanHash executes prior to addSql() or addBindValues()
+    // ... so compiledQuery will exist
+    compiledSubQuery = compileSubQuery(request);
 
-	  /**
-	   * Compile/build the sub query.
-	   */
-	  private CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
+    queryAutoFetchHash(builder);
+  }
 
-	    SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.getEbeanServer();
-	    return ebeanServer.compileQuery(subQuery, queryRequest.getTransaction());
-	  }
+  /**
+   * Compile/build the sub query.
+   */
+  private CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
 
-	  public int queryBindHash() {
-	    return subQuery.queryBindHash();
-	  }
+    SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.getEbeanServer();
+    return ebeanServer.compileQuery(subQuery, queryRequest.getTransaction());
+  }
 
-	  public void addSql(SpiExpressionRequest request) {
+  public int queryBindHash() {
+    return subQuery.queryBindHash();
+  }
 
-	    String subSelect = compiledSubQuery.getGeneratedSql();
-	    subSelect = subSelect.replace('\n', ' ');
+  public void addSql(SpiExpressionRequest request) {
 
+    String subSelect = compiledSubQuery.getGeneratedSql();
+    subSelect = subSelect.replace('\n', ' ');
 
-	    if(not) request.append(" not");
-	    request.append(" exists (");
-	    request.append(subSelect);
-	    request.append(") ");
-	  }
+    if (not) {
+      request.append(" not");
+    }
+    request.append(" exists (");
+    request.append(subSelect);
+    request.append(") ");
+  }
 
-	  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionRequest request) {
 
-	    List<Object> bindParams = compiledSubQuery.getPredicates().getWhereExprBindValues();
+    List<Object> bindParams = compiledSubQuery.getPredicates().getWhereExprBindValues();
 
-	    if (bindParams == null) {
-	      return;
-	    }
+    if (bindParams == null) {
+      return;
+    }
 
-	    for (int i = 0; i < bindParams.size(); i++) {
-	      request.addBindValue(bindParams.get(i));
-	    }
-	  }
+    for (int i = 0; i < bindParams.size(); i++) {
+      request.addBindValue(bindParams.get(i));
+    }
+  }
 
-	@Override
-	public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
-		// TODO Auto-generated method stub
-		
-	}
+  @Override
+  public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
+    // Nothing to do for exists expression
+  }
 }
