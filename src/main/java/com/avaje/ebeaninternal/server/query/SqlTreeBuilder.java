@@ -104,7 +104,7 @@ public class SqlTreeBuilder {
     this.queryDetail = query.getDetail();
 
     this.predicates = predicates;
-    this.alias = new SqlTreeAlias(request.getBeanDescriptor().getBaseTableAlias());
+    this.alias = new SqlTreeAlias(request.getQuery().getAlias()==null?request.getBeanDescriptor().getBaseTableAlias():request.getQuery().getAlias());
     this.ctx = new DefaultDbSqlContext(alias, tableAliasPlaceHolder, columnAliasPrefix, !subQuery);
   }
 

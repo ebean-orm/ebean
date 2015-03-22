@@ -1230,4 +1230,9 @@ public interface Query<T> extends Serializable {
    * Return true if this query has forUpdate set.
    */
   public boolean isForUpdate();
+  
+  /**
+   * Set root table alias.
+   */
+  public Query<T> alias(String alias);
 }

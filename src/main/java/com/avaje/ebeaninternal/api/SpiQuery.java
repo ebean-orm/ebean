@@ -611,4 +611,9 @@ public interface SpiQuery<T> extends Query<T> {
      * Return true if this query has been cancelled.
      */
     public boolean isCancelled();
+    
+    /**
+     * Return root table alias set by {@link #alias(String)} command.
+     */
+    public String getAlias();
 }

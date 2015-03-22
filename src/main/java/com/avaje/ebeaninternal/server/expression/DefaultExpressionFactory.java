@@ -241,6 +241,23 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   public Expression in(String propertyName, Collection<?> values) {
     return new InExpression(propertyName, values);
   }
+  
+  /**
+   * Exists subquery 
+   */
+  @Override
+  public Expression exists(Query<?> subQuery) {
+	return new ExistsExpression((SpiQuery<?>) subQuery, false);
+  }
+  
+  /**
+   * Not exists subquery 
+   */
+  @Override
+  public Expression notExists(Query<?> subQuery) {
+	return new ExistsExpression((SpiQuery<?>) subQuery, true);
+  }
+
 
   /**
    * Id Equal to - ID property is equal to the value.

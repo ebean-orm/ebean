@@ -361,6 +361,16 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   public ExpressionList<T> in(String propertyName, com.avaje.ebean.Query<?> subQuery) {
     return exprList.in(propertyName, subQuery);
   }
+  
+  @Override
+  public ExpressionList<T> exists(Query<?> subQuery) {
+	return exprList.exists(subQuery);
+  }
+  
+  @Override
+  public ExpressionList<T> notExists(Query<?> subQuery) {
+	return exprList.exists(subQuery);
+  }
 
   @Override
   public ExpressionList<T> isNotNull(String propertyName) {

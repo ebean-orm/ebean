@@ -190,6 +190,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private boolean autoFetchTuned;
 
   private boolean logSecondaryQuery;
+  
+  /**
+   * Root table alias. For {@link Query#alias(String)} command.
+   */
+  private String rootTableAlias=null;
 
   /**
    * The node of the bean or collection that fired lazy loading. Not null if profiling is on and
@@ -680,6 +685,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     builder.add(id != null);
     builder.add(rawSql == null ? 0 : rawSql.queryHash());
     builder.add(includeTableJoin != null ? includeTableJoin.queryHash() : 0);
+    builder.add(rootTableAlias);
 
     if (detail != null) {
       detail.queryPlanHash(request, builder);
@@ -1283,6 +1289,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     synchronized (this) {
       this.cancelableQuery = cancelableQuery;
     }
+  }
+  
+  @Override
+  public Query<T> alias(String alias) {
+	  this.rootTableAlias=alias;
+	  return this;
+  }
+  
+  @Override
+  public String getAlias() {
+    return rootTableAlias;
   }
 
   public void cancel() {
