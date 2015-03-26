@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.avaje.ebean.RawSql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -234,7 +235,8 @@ public class CQueryPredicates {
           // RawSql query hit cached query plan. Need to convert
           // named parameters into positioned parameters so that
           // the named parameters are bound
-          String s = query.getRawSql().getSql().getPreWhere();
+          RawSql.Sql sql = query.getRawSql().getSql();
+          String s = sql.isParsed() ? sql.getPreWhere() : sql.getUnparsedSql();
           if (bindParams.requiresNamedParamsPrepare()) {
             BindParamsParser.parse(bindParams, s);
           }
