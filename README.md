@@ -1,8 +1,8 @@
 [![Stories in Ready](https://badge.waffle.io/ebean-orm/avaje-ebeanorm.png?label=ready&title=Ready)](https://waffle.io/ebean-orm/avaje-ebeanorm)
-avaje-ebeanorm
+Ebean ORM
 ==============
 
-Ebean ORM Website
+Project Website
 ----------------
 [http://ebean-orm.github.io/](http://ebean-orm.github.io/ "Ebean ORM's Website")
 
