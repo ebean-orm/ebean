@@ -228,6 +228,13 @@
             <include>**/*Test.java</include>
             <include>**/*Tests.java</include>
           </includes>
+          <systemProperties>
+            <property>
+              <!-- transfer datasource.default parameter -->
+              <name>datasource.default</name>
+              <value>${datasource.default}</value>
+            </property>
+          </systemProperties>
         </configuration>
       </plugin>
  	 <plugin>
