@@ -152,20 +152,25 @@ public final class Ebean {
 
     private ServerManager() {
 
-      // skipDefaultServer is set by EbeanServerFactory
-      // ... when it is creating the primaryServer
-      if (PrimaryServer.isSkip()) {
-        // primary server being created by EbeanServerFactory
-        // ... so we should not try and create it here
-        logger.debug("PrimaryServer.isSkip()");
+      try {
+        // skipDefaultServer is set by EbeanServerFactory
+        // ... when it is creating the primaryServer
+        if (PrimaryServer.isSkip()) {
+          // primary server being created by EbeanServerFactory
+          // ... so we should not try and create it here
+          logger.debug("PrimaryServer.isSkip()");
 
-      } else {
-        // look to see if there is a default server defined
-        String primaryName = PrimaryServer.getPrimaryServerName();
-        logger.debug("primaryName:" + primaryName);
-        if (primaryName != null && primaryName.trim().length() > 0) {
-          primaryServer = getWithCreate(primaryName.trim());
+        } else {
+          // look to see if there is a default server defined
+          String primaryName = PrimaryServer.getPrimaryServerName();
+          logger.debug("primaryName:" + primaryName);
+          if (primaryName != null && primaryName.trim().length() > 0) {
+            primaryServer = getWithCreate(primaryName.trim());
+          }
         }
+      } catch (RuntimeException e) {
+        logger.error("Error trying to create the default EbeanServer", e);
+        throw e;
       }
     }
 
