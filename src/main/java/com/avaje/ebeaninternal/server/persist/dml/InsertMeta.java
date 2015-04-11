@@ -67,10 +67,16 @@ public final class InsertMeta {
 		} else {
 			// insert sql for db identity or sequence insert
 			this.concatinatedKey = false;
-			this.identityDbColumns = new String[]{id.getIdentityColumn()};
+			if (id.getIdentityColumn() == null) {
+				this.identityDbColumns = new String[]{};
+				this.supportsGetGeneratedKeys = false;
+				this.selectLastInsertedId = null;
+			} else {
+				this.identityDbColumns = new String[]{id.getIdentityColumn()};
+				this.supportsGetGeneratedKeys = dbPlatform.getDbIdentity().isSupportsGetGeneratedKeys();
+				this.selectLastInsertedId = desc.getSelectLastInsertedId();
+			}
 			this.sqlNullId = genSql(true);
-			this.supportsGetGeneratedKeys = dbPlatform.getDbIdentity().isSupportsGetGeneratedKeys();
-			this.selectLastInsertedId = desc.getSelectLastInsertedId();
 		}
 	}
 
