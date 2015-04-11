@@ -8,6 +8,8 @@ import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 
+import java.util.Arrays;
+
 
 /**
  * A ElGetValue based on a chain of properties.
@@ -41,9 +43,9 @@ public class ElPropertyChain implements ElPropertyValue {
 	private final ScalarType<?> scalarType;
 	
 	private final ElPropertyValue lastElPropertyValue;
-	
+
 	public ElPropertyChain(boolean containsMany, boolean embedded, String expression, ElPropertyValue[] chain) {
-		
+
 		this.containsMany = containsMany;
 		this.chain = chain;
 		this.expression = expression;
@@ -51,19 +53,19 @@ public class ElPropertyChain implements ElPropertyValue {
 		if (dotPos > -1){
 			this.name = expression.substring(dotPos+1);
 			if (embedded){
-				int embPos = expression.lastIndexOf('.',dotPos-1);				
+				int embPos = expression.lastIndexOf('.',dotPos-1);
 				this.prefix = embPos == -1 ? null : expression.substring(0, embPos);
-				
+
 			} else {
 				this.prefix = expression.substring(0, dotPos);
 			}
 		} else {
 			this.prefix = null;
 			this.name = expression;
-		}		
+		}
 
 		this.assocId = chain[chain.length-1].isAssocId();
-		
+
 		this.last = chain.length-1;
 		this.lastBeanProperty = chain[chain.length-1].getBeanProperty();
 		if (lastBeanProperty != null){
@@ -75,6 +77,10 @@ public class ElPropertyChain implements ElPropertyValue {
 		this.lastElPropertyValue = chain[chain.length-1];
 		this.placeHolder = getElPlaceHolder(prefix, lastElPropertyValue, false);
         this.placeHolderEncrypted = getElPlaceHolder(prefix, lastElPropertyValue, true);
+	}
+
+	public String toString() {
+		return "expr:"+expression+" chain:"+ Arrays.toString(chain);
 	}
 
 	private String getElPlaceHolder(String prefix, ElPropertyValue lastElPropertyValue, boolean encrypted) {

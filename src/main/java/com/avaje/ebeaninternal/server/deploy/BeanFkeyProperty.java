@@ -31,6 +31,10 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     this.placeHolder = calcPlaceHolder(prefix, dbColumn);
   }
 
+  public String toString() {
+    return "prefix:"+prefix+" name:"+name+" dbColumn:"+dbColumn+" ph:"+placeHolder;
+  }
+
   public int getDeployOrder() {
     return deployOrder;
   }

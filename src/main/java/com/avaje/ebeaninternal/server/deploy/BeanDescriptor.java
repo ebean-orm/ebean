@@ -60,11 +60,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
   private final ConcurrentHashMap<HashQueryPlan, CQueryPlan> queryPlanCache = new ConcurrentHashMap<HashQueryPlan, CQueryPlan>();
 
-  private final ConcurrentHashMap<String, ElPropertyValue> elGetCache = new ConcurrentHashMap<String, ElPropertyValue>();
+  private final ConcurrentHashMap<String, ElPropertyValue> elCache = new ConcurrentHashMap<String, ElPropertyValue>();
+
+  private final ConcurrentHashMap<String, ElPropertyDeploy> elDeployCache = new ConcurrentHashMap<String, ElPropertyDeploy>();
 
   private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<String, ElComparator<T>>();
-
-  private final ConcurrentHashMap<String, BeanFkeyProperty> fkeyMap = new ConcurrentHashMap<String, BeanFkeyProperty>();
 
   public enum EntityType {
     ORM, EMBEDDED, SQL
@@ -630,7 +630,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * foreign keys don't require an extra join.
    */
   public void add(BeanFkeyProperty fkey) {
-    fkeyMap.put(fkey.getName(), fkey);
+    elDeployCache.put(fkey.getName(), fkey);
   }
 
   public void initialiseFkeys() {
@@ -1379,7 +1379,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Get an Expression language Value object.
    */
   public ElPropertyValue getElGetValue(String propName) {
-    return getElPropertyValue(propName, false);
+    ElPropertyValue elGetValue = elCache.get(propName);
+    if (elGetValue != null) {
+      return elGetValue;
+    }
+    elGetValue = buildElGetValue(propName, null, false);
+    if (elGetValue != null) {
+      elCache.put(propName, elGetValue);
+    }
+    return elGetValue;
   }
 
   /**
@@ -1389,36 +1397,30 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * </p>
    */
   public ElPropertyDeploy getElPropertyDeploy(String propName) {
-    ElPropertyDeploy fk = fkeyMap.get(propName);
-    if (fk != null) {
-      return fk;
+    ElPropertyDeploy elProp = elDeployCache.get(propName);
+    if (elProp != null) {
+      return elProp;
     }
-    return getElPropertyValue(propName, true);
-  }
-
-  private ElPropertyValue getElPropertyValue(String propName, boolean propertyDeploy) {
-    ElPropertyValue elGetValue = elGetCache.get(propName);
-    if (elGetValue == null) {
-      // need to build it potentially navigating the BeanDescriptors
-      elGetValue = buildElGetValue(propName, null, propertyDeploy);
-      if (elGetValue == null) {
-        return null;
-      }
-      if (elGetValue instanceof BeanFkeyProperty) {
-        fkeyMap.put(propName, (BeanFkeyProperty) elGetValue);
-      } else {
-        elGetCache.put(propName, elGetValue);
-      }
+    if (!propName.contains(".")) {
+      // No period means simple property and no need to look for
+      // foreign key properties (in order to avoid an extra join)
+      elProp = getElGetValue(propName);
+    } else {
+      elProp = buildElGetValue(propName, null, true);
     }
-    return elGetValue;
+    if (elProp != null) {
+      elDeployCache.put(propName, elProp);
+    }
+    return elProp;
   }
 
   protected ElPropertyValue buildElGetValue(String propName, ElPropertyChainBuilder chain, boolean propertyDeploy) {
 
     if (propertyDeploy && chain != null) {
-      BeanFkeyProperty fk = fkeyMap.get(propName);
-      if (fk != null) {
-        return fk.create(chain.getExpression(), chain.isContainsMany());
+      ElPropertyDeploy fk = elDeployCache.get(propName);
+      if (fk != null && fk instanceof BeanFkeyProperty) {
+        // propertyDeploy chain for foreign key column
+        return ((BeanFkeyProperty)fk).create(chain.getExpression(), chain.isContainsMany());
       }
     }
 
