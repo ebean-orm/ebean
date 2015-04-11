@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.persist;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
@@ -20,6 +21,8 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
  * </p>
  */
 public class BatchedBeanHolder {
+
+  private static final Object DUMMY = new Object();
 
   /**
    * The owning queue.
@@ -48,7 +51,11 @@ public class BatchedBeanHolder {
    */
   private ArrayList<PersistRequest> deletes;
 
-  private HashSet<Integer> beanHashCodes = new HashSet<Integer>();
+  /**
+   * Set of beans in this batch. This is used to ensure that a single bean instance is not included
+   * in the batch twice (two separate insert requests etc).
+   */
+  private IdentityHashMap<Object,Object> persistedBeans = new IdentityHashMap<Object,Object>();
 
   /**
    * Create a new entry with a given type and depth.
@@ -90,7 +97,7 @@ public class BatchedBeanHolder {
       control.executeNow(deletes);
       deletes.clear();
     }
-    beanHashCodes.clear();
+    persistedBeans.clear();
   }
 
   public String toString() {
@@ -113,8 +120,8 @@ public class BatchedBeanHolder {
    */
   public int append(PersistRequestBean<?> request) {
 
-    Integer objHashCode = new Integer(System.identityHashCode(request.getEntityBean()));
-    if (!beanHashCodes.add(objHashCode)) {
+    Object alreadyInBatch = persistedBeans.put(request.getEntityBean(), DUMMY);
+    if (alreadyInBatch != null) {
       // special case where the same bean instance has already been
       // added to the batch (doesn't really occur with non-batching
       // as the bean gets changed from dirty to loaded earlier)
@@ -154,6 +161,6 @@ public class BatchedBeanHolder {
    * Return true if this is empty containing no batched beans.
    */
   public boolean isEmpty() {
-    return beanHashCodes.isEmpty();
+    return persistedBeans.isEmpty();
   }
 }
