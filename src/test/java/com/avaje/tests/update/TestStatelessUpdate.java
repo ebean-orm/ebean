@@ -18,6 +18,9 @@ import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.EBasic;
 import com.avaje.tests.model.basic.EBasic.Status;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 public class TestStatelessUpdate extends BaseTestCase {
 
   private EbeanServer server;
@@ -40,17 +43,38 @@ public class TestStatelessUpdate extends BaseTestCase {
 
     server.save(e);
 
+    // confirm saved as expected
+    EBasic eBasic = server.find(EBasic.class, e.getId());
+    assertEquals(e.getId(), eBasic.getId());
+    assertEquals(e.getName(), eBasic.getName());
+    assertEquals(e.getStatus(), eBasic.getStatus());
+    assertEquals(e.getDescription(), eBasic.getDescription());
+
+    // test updating just the name
     EBasic updateAll = new EBasic();
     updateAll.setId(e.getId());
     updateAll.setName("updAllProps");
 
     server.update(updateAll, null, false);
 
+    eBasic = server.find(EBasic.class, e.getId());
+    assertEquals(e.getStatus(), eBasic.getStatus());
+    assertEquals(e.getDescription(), eBasic.getDescription());
+    assertEquals(updateAll.getName(), eBasic.getName());
+
+
+    // test setting null
     EBasic updateDeflt = new EBasic();
     updateDeflt.setId(e.getId());
     updateDeflt.setName("updateDeflt");
-
+    updateDeflt.setDescription(null);
     server.update(updateDeflt);
+
+    // name and description changed (using null)
+    eBasic = server.find(EBasic.class, e.getId());
+    assertEquals(e.getStatus(), eBasic.getStatus());
+    assertEquals(updateDeflt.getName(), eBasic.getName());
+    assertNull(eBasic.getDescription());
 
   }
 
@@ -105,7 +129,7 @@ public class TestStatelessUpdate extends BaseTestCase {
     Customer result = Ebean.find(Customer.class, customer.getId());
 
     // assert
-    Assert.assertEquals(customer.getUpdtime().getTime(), result.getUpdtime().getTime());
+    assertEquals(customer.getUpdtime().getTime(), result.getUpdtime().getTime());
   }
 
   /**
@@ -297,7 +321,7 @@ public class TestStatelessUpdate extends BaseTestCase {
     // assert
     Customer assCustomer = server.find(Customer.class, customer.getId());
     List<Contact> assContacts = assCustomer.getContacts();
-    Assert.assertEquals(2, assContacts.size());
+    assertEquals(2, assContacts.size());
     Set<Integer> ids = new LinkedHashSet<Integer>();
     Set<String> names = new LinkedHashSet<String>();
     for (Contact contact : assContacts) {
@@ -354,7 +378,7 @@ public class TestStatelessUpdate extends BaseTestCase {
     List<Contact> assContacts = assCustomer.getContacts();
     
     // contact 2 was not deleted this time
-    Assert.assertEquals(3, assContacts.size());
+    assertEquals(3, assContacts.size());
     
     Set<Integer> ids = new LinkedHashSet<Integer>();
     Set<String> names = new LinkedHashSet<String>();
