@@ -46,7 +46,13 @@ class PrimaryServer {
     if (globalProperties == null) {
       globalProperties = PropertyMap.defaultProperties();
     }
-    defaultServerName = globalProperties.getProperty("datasource.default");
+    defaultServerName = System.getProperty("datasource.default");
+    if(defaultServerName == null) {
+      defaultServerName = System.getProperty("ebean.default.datasource");
+    }
+    if(defaultServerName == null) {
+      defaultServerName = globalProperties.getProperty("datasource.default");
+    }
     if (defaultServerName == null) {
       defaultServerName = globalProperties.getProperty("ebean.default.datasource");
     }
