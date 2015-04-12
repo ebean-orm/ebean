@@ -349,6 +349,8 @@ public class AnnotationFields extends AnnotationParser {
       if (sequenceGenerator.name().equals(genName)) {
         genName = sequenceGenerator.sequenceName();
       }
+      descriptor.setSequenceInitialValue(sequenceGenerator.initialValue());
+      descriptor.setSequenceAllocationSize(sequenceGenerator.allocationSize());
     }
 
     GenerationType strategy = gen.strategy();

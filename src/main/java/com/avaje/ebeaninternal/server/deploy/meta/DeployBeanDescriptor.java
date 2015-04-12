@@ -91,6 +91,10 @@ public class DeployBeanDescriptor<T> {
    */
   private String sequenceName;
 
+  private int sequenceInitialValue;
+
+  private int sequenceAllocationSize;
+
   /**
    * Used with Identity columns but no getGeneratedKeys support.
    */
@@ -261,6 +265,22 @@ public class DeployBeanDescriptor<T> {
       entityType = EntityType.ORM;
     }
     return entityType;
+  }
+
+  public void setSequenceInitialValue(int sequenceInitialValue) {
+    this.sequenceInitialValue = sequenceInitialValue;
+  }
+
+  public void setSequenceAllocationSize(int sequenceAllocationSize) {
+    this.sequenceAllocationSize = sequenceAllocationSize;
+  }
+
+  public int getSequenceInitialValue() {
+    return sequenceInitialValue;
+  }
+
+  public int getSequenceAllocationSize() {
+    return sequenceAllocationSize;
   }
 
   public void add(DRawSqlMeta rawSqlMeta) {

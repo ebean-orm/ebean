@@ -36,12 +36,14 @@ public class CreateSequenceVisitor implements BeanVisitor {
 				+" as DatabasePlatform does not support sequences";
 			logger.warn(msg);
 			return false;
-		} 
+		}
 
-		if (descriptor.getSequenceName() != null) {
-			ctx.write("create sequence ");
-			ctx.write(descriptor.getSequenceName());			
-			ctx.write(";").writeNewLine().writeNewLine();
+		String sequenceName = descriptor.getSequenceName();
+		if (sequenceName != null) {
+			int initialValue = descriptor.getSequenceInitialValue();
+			int allocationSize = descriptor.getSequenceAllocationSize();
+			String createSeq = ctx.getDbPlatform().ddlCreateSequence(sequenceName, initialValue, allocationSize);
+			ctx.write(createSeq).writeNewLine().writeNewLine();
 		}
 		return true;
 	}

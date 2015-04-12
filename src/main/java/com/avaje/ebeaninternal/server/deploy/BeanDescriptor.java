@@ -92,6 +92,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   private final String sequenceName;
 
+  private final int sequenceInitialValue;
+
+  private final int sequenceAllocationSize;
+
   /**
    * SQL used to return last inserted id. Used for Identity columns where
    * getGeneratedKeys is not supported.
@@ -332,6 +336,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.idType = deploy.getIdType();
     this.idGenerator = deploy.getIdGenerator();
     this.sequenceName = deploy.getSequenceName();
+    this.sequenceInitialValue = deploy.getSequenceInitialValue();
+    this.sequenceAllocationSize = deploy.getSequenceAllocationSize();
     this.selectLastInsertedId = deploy.getSelectLastInsertedId();
     this.lazyFetchIncludes = InternString.intern(deploy.getLazyFetchIncludes());
     this.concurrencyMode = deploy.getConcurrencyMode();
@@ -1684,6 +1690,20 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public String getSequenceName() {
     return sequenceName;
+  }
+
+  /**
+   * Return the sequence initial value.
+   */
+  public int getSequenceInitialValue() {
+    return sequenceInitialValue;
+  }
+
+  /**
+   * Return the sequence allocation size.
+   */
+  public int getSequenceAllocationSize() {
+    return sequenceAllocationSize;
   }
 
   /**
