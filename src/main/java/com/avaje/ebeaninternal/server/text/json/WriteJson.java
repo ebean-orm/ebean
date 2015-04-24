@@ -108,6 +108,16 @@ public class WriteJson {
       }
     }
 
+    private boolean isIncludeTransientProperty(BeanProperty prop) {
+      if (!explicitAllProps && currentIncludeProps != null) {
+        // explicitly controlled by pathProperties
+        return currentIncludeProps.contains(prop.getName());
+      } else {
+        // by default include transient properties
+        return true;
+      }
+    }
+
     public void write(WriteJson writeJson) throws IOException {
       
       BeanProperty beanProp = desc.getIdProperty();
@@ -127,7 +137,7 @@ public class WriteJson {
         }
         props = desc.propertiesTransient();
         for (int j = 0; j < props.length; j++) {
-          if (isIncludeProperty(props[j])) {
+          if (isIncludeTransientProperty(props[j])) {
             props[j].jsonWrite(writeJson, currentBean);
           }
         }
