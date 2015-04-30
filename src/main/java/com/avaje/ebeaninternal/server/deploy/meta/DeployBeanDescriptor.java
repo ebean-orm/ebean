@@ -729,6 +729,9 @@ public class DeployBeanDescriptor<T> {
       return null;
     }
     String selectClause = sb.toString();
+    if (selectClause.length() == 0) {
+      throw new IllegalStateException("Bean " + getFullName() + " has no properties?");
+    }
     return selectClause.substring(0, selectClause.length() - 1);
   }
 
