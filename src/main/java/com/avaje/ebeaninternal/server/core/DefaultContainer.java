@@ -18,7 +18,7 @@ import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.cache.ServerCacheOptions;
-import com.avaje.ebean.common.BootupEbeanManager;
+import com.avaje.ebean.common.SpiContainer;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -35,9 +35,9 @@ import com.avaje.ebeaninternal.server.lib.sql.SimpleDataSourceAlert;
 /**
  * Default Server side implementation of ServerFactory.
  */
-public class DefaultServerFactory implements BootupEbeanManager {
+public class DefaultContainer implements SpiContainer {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultServerFactory.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultContainer.class);
 
   private final ClusterManager clusterManager;
 
@@ -45,14 +45,14 @@ public class DefaultServerFactory implements BootupEbeanManager {
 
   private final AtomicInteger serverId = new AtomicInteger(1);
 
-  public DefaultServerFactory(ContainerConfig containerConfig) {
+  public DefaultContainer(ContainerConfig containerConfig) {
 
     this.clusterManager = new ClusterManager(containerConfig);
     this.jndiDataSourceFactory = new JndiDataSourceLookup();
 
     // register so that we can shutdown any Ebean wide
     // resources such as clustering
-    ShutdownManager.registerServerFactory(this);
+    ShutdownManager.registerContainer(this);
   }
 
   public void shutdown() {

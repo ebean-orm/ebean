@@ -1,6 +1,6 @@
 package com.avaje.ebean;
 
-import com.avaje.ebean.common.BootupEbeanManager;
+import com.avaje.ebean.common.SpiContainer;
 import com.avaje.ebean.config.ContainerConfig;
 import com.avaje.ebean.config.ServerConfig;
 
@@ -29,7 +29,9 @@ import java.util.Properties;
 public class EbeanServerFactory {
 
 
-  private static BootupEbeanManager bootupEbeanManager;
+  private static final String DEFAULT_CONTAINER = "com.avaje.ebeaninternal.server.core.DefaultContainer";
+
+  private static SpiContainer container;
 
   /**
    * Initialise the container with clustering configuration.
@@ -38,7 +40,7 @@ public class EbeanServerFactory {
    * ContainerConfig on the ServerConfig when creating the first EbeanServer instance.
    */
   public static synchronized void initialiseContainer(ContainerConfig containerConfig) {
-    getServerFactory(containerConfig);
+    getContainer(containerConfig);
   }
 
   /**
@@ -48,7 +50,7 @@ public class EbeanServerFactory {
 
     // construct based on loading properties files
     // and if invoked by Ebean then it handles registration
-    BootupEbeanManager serverFactory = getServerFactory(null);
+    SpiContainer serverFactory = getContainer(null);
     return serverFactory.createServer(name);
   }
 
@@ -76,18 +78,19 @@ public class EbeanServerFactory {
 
   private static EbeanServer createInternal(ServerConfig config) {
 
-    return getServerFactory(config.getContainerConfig()).createServer(config);
+    return getContainer(config.getContainerConfig()).createServer(config);
   }
 
   /**
-   * Get the BootupEbeanManager initialising it if necessary.
+   * Get the EbeanContainer initialising it if necessary.
    *
    * @param containerConfig the configuration controlling clustering communication
    */
-  private static BootupEbeanManager getServerFactory(ContainerConfig containerConfig) {
+  private static SpiContainer getContainer(ContainerConfig containerConfig) {
 
-    if (bootupEbeanManager != null) {
-      return bootupEbeanManager;
+    // thread safe in that all calling methods are synchronized
+    if (container != null) {
+      return container;
     }
 
     if (containerConfig == null) {
@@ -96,22 +99,21 @@ public class EbeanServerFactory {
       containerConfig = new ContainerConfig();
       containerConfig.loadFromProperties(properties);
     }
-    bootupEbeanManager = createServerFactory(containerConfig);
-    return bootupEbeanManager;
+    container = createContainer(containerConfig);
+    return container;
   }
 
   /**
    * Create the container instance using the configuration.
    */
-  private static BootupEbeanManager createServerFactory(ContainerConfig containerConfig) {
+  private static SpiContainer createContainer(ContainerConfig containerConfig) {
 
-    String dflt = "com.avaje.ebeaninternal.server.core.DefaultServerFactory";
-    String implClassName = System.getProperty("ebean.serverfactory", dflt);
+    String implClassName = System.getProperty("ebean.container", DEFAULT_CONTAINER);
 
     try {
       Class<?> cls = Class.forName(implClassName);
       Constructor<?> constructor = cls.getConstructor(ContainerConfig.class);
-      return (BootupEbeanManager) constructor.newInstance(containerConfig);
+      return (SpiContainer) constructor.newInstance(containerConfig);
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }

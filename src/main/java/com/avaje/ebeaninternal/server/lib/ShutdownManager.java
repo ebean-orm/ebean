@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.lib;
 
-import com.avaje.ebean.common.BootupEbeanManager;
+import com.avaje.ebean.common.SpiContainer;
 import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public final class ShutdownManager {
 
 	static boolean stopping;
 
-	static BootupEbeanManager serverFactory;	
+	static SpiContainer container;
 
 	static {
 		// Register the Shutdown hook
@@ -42,8 +42,8 @@ public final class ShutdownManager {
 	private ShutdownManager() {
 	}
 
-	public static void registerServerFactory(BootupEbeanManager factory){
-		serverFactory = factory;
+	public static void registerContainer(SpiContainer ebeanContainer){
+		container = ebeanContainer;
 	}
 	
 	/**
@@ -128,9 +128,9 @@ public final class ShutdownManager {
         }
       }
       
-      if (serverFactory != null) {
+      if (container != null) {
         // shutdown cluster networking if active
-        serverFactory.shutdown();
+        container.shutdown();
       }
 
       // shutdown any registered servers that have not
