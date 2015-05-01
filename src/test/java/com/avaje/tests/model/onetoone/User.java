@@ -10,7 +10,7 @@ import com.avaje.tests.model.BaseModel;
 @Table(name="oto_user")
 public class User extends BaseModel {
 
-  public static final Finder<Long,User> find = new Finder<Long,User>(Long.class, User.class);
+  public static final Find<Long,User> find = new Find<Long,User>(){};
 
   String name;
   

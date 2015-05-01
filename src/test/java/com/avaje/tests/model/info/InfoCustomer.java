@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Entity
 public class InfoCustomer extends Model {
 
-  public static Finder<Long,InfoCustomer> find = new Finder<Long,InfoCustomer>(Long.class, InfoCustomer.class);
+  public static Finder<Long,InfoCustomer> find = new Finder<Long,InfoCustomer>(InfoCustomer.class);
 
   @Id
   Long id;

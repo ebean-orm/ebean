@@ -1,11 +1,13 @@
 package com.avaje.ebean;
 
 import com.avaje.ebean.text.PathProperties;
+import com.avaje.ebean.util.ClassUtil;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
 
 import javax.persistence.MappedSuperclass;
 
@@ -34,7 +36,7 @@ import javax.persistence.MappedSuperclass;
  *
  * <p>
  * If you choose to use the Model mapped superclass you will probably also chose to additionally add
- * a {@link Finder} as a public static field to complete the active record pattern and provide a
+ * a {@link Find} as a public static field to complete the active record pattern and provide a
  * relatively nice clean way to write queries.
  *
  * <h3>Typical common @MappedSuperclass</h3>
@@ -64,19 +66,15 @@ import javax.persistence.MappedSuperclass;
  *     // Extend the mappedSuperclass
  *
  *     @Entity @Table(name="oto_account")
- *     public class Account extends BaseModel {
+ *     public class Customer extends BaseModel {
  *
- *       // add a static Finder
- *       // ... with Long being the type of our ID property ...
+ *       // Add a static Find
+ *       // ... with Long being the type of our @Id property.
+ *       // ... Note the {} at the end as Find is an abstract class.
  *
- *       public static final Finder<Long,Account> find =
- *             new Finder<Long,Account>(Long.class, Account.class);
+ *       public static final Find<Long,Account> find = new Find<Long,Account>(){};
  *
  *       String name;
- *
- *       @OneToOne(mappedBy = "account",optional = true)
- *       User user;
- *
  *       ...
  *     }
  *
@@ -86,28 +84,28 @@ import javax.persistence.MappedSuperclass;
  * <pre>{@code
  *
  *     // Active record style ... save(), delete() etc
- *     Account account = new Account();
- *     account.setName("AC234");
+ *     Customer customer = new Customer();
+ *     customer.setName("AC234");
  *
  *     // save() method inherited from Model
- *     account.save();
+ *     customer.save();
  *
  * }</pre>
  *
- * <h3>Finder: find byId</h3>
+ * <h3>Find byId</h3>
  * <pre>{@code
  *
  *     // find byId
- *     Account account = Account.find.byId(42);
+ *     Customer customer = Customer.find.byId(42);
  *
  * }</pre>
  *
- * <h3>Finder: find where</h3>
+ * <h3>Find where</h3>
  * <pre>{@code
  *
  *     // find where ...
- *     List<Account> accounts =
- *         Account.find
+ *     List<Customer> customers =
+ *         Customer.find
  *         .where().gt("startDate", lastMonth)
  *         .findList();
  *
@@ -124,7 +122,8 @@ public abstract class Model {
    * 
    * <p>
    * Example:
-   * <pre class="code">
+   * <pre>{@code
+   *
    * Transaction transaction = Customer.db().beginTransaction();
    * try {
    * 
@@ -141,7 +140,7 @@ public abstract class Model {
    *   customer.save();
    * 
    *   Customer otherCustomer = new Customer();
-   *   otherCustomer.setName(&quot;Franko&quot;);
+   *   otherCustomer.setName("Franko");
    *   otherCustomer.save();
    * 
    *   transaction.commit();
@@ -150,7 +149,7 @@ public abstract class Model {
    *   transaction.end();
    * }
    * 
-   * </pre>
+   * }</pre>
    */
   public static EbeanServer db() {
     return Ebean.getServer(null);
@@ -179,7 +178,7 @@ public abstract class Model {
    * An unmodified bean that is saved or updated is normally skipped and this marks the bean as
    * dirty so that it is not skipped.
    * 
-   * <pre class="code">
+   * <pre>{@code
    * 
    * Customer customer = Customer.find.byId(id);
    * 
@@ -188,7 +187,7 @@ public abstract class Model {
    * customer.markAsDirty();
    * customer.save();
    * 
-   * </pre>
+   * }</pre>
    *
    * @see EbeanServer#markAsDirty(Object)
    */
@@ -267,45 +266,192 @@ public abstract class Model {
   }
 
   /**
+   * A concrete implementation of Find.
+   * <p>
+   * It should be preferred to use {@link Find} instead of Finder as that can use reflection to determine the class
+   * literal type of the entity bean.
+   * </p>
+   * @param <I> type of the Id property
+   * @param <T> type of the entity bean
+   */
+  public static class Finder<I, T> extends Find<I, T> {
+
+    /**
+     * Create with the type of the entity bean.
+     *
+     * <pre>{@code
+     *
+     * @Entity
+     * public class Customer extends BaseModel {
+     *
+     *   public static final Finder<Long,Customer> find = new Finder<Long,Customer>(Customer.class);
+     *   ...
+     *
+     * }</pre>
+     *
+     * <p/>
+     * The preferred approach is to instead use <code>Find</code> as below. This approach is more DRY in that it does
+     * not require the class literal Customer.class to be passed into the constructor.
+     *
+     * <pre>{@code
+     *
+     * @Entity
+     * public class Customer extends BaseModel {
+     *
+     *   public static final Find<Long,Customer> find = new Find<Long,Customer>(){};
+     *   ...
+     *
+     * }</pre>
+     */
+    public Finder(Class<T> type) {
+      super(null, type);
+    }
+
+    /**
+     * Create with the type of the entity bean and specific server name.
+     */
+    public Finder(String serverName, Class<T> type) {
+      super(serverName, type);
+    }
+
+    /**
+     * Please migrate to use {@link Find} or constructor <code>Finder(Class)</code> that
+     * does not have the idType parameter.
+     * <p/>
+     * Create with the type of the ID property and entity bean and specific server name.
+     *
+     * @deprecated
+     */
+    public Finder(Class<I> idType, Class<T> type) {
+      super(null, type);
+    }
+
+    /**
+     * Please migrate to use the constructor <code>Finder(String, Class)</code> that
+     * does not have the idType parameter.
+     * <p/>
+     * Create with the type of the ID property and entity bean and specific server name.
+     *
+     * @deprecated
+     */
+    public Finder(String serverName, Class<I> idType, Class<T> type) {
+      super(serverName, type);
+    }
+  }
+
+  /**
    * Helper object for performing queries.
    * 
    * <p>
-   * Typically a Finder is defined as a public static field on an entity bean class to provide a
+   * Typically a Find instance is defined as a public static field on an entity bean class to provide a
    * nice way to write queries.
-   * 
+   *
+   * <h3>Example use:</h3>
+   *
+   * <pre>{@code
+   *
+   * @Entity
+   * public class Customer extends BaseModel {
+   *
+   *   public static final Find<Long,Customer> find = new Find<Long,Customer>(){};
+   *
+   *   ...
+   *
+   * }</pre>
+   * <p/>
+   * This enables you to write code like:
+   * <pre>{@code
+   *
+   * Customer customer = Customer.find.byId(42L);
+   *
+   * List<Customer> customers =
+   *     Customer.find
+   *         .select("name, dateOfBirth")
+   *         .findList();
+   *
+   * }</pre>
+   *
+   * <h3>Kotlin</h3>
+   * In Kotlin you would typically create Find as a companion object.
+   * <pre>{@code
+   *
+   *   // kotlin
+   *   companion object : Model.Find<Long, Product>() {}
+   *
+   * }</pre>
    * @param <I>
    *          The Id type. This is most often a {@link Long} but is also often a {@link UUID} or
    *          {@link String}.
    *
    * @param <T>
-   *          The bean type
+   *          The entity bean type
    */
-  public static class Finder<I, T> {
+  public static abstract class Find<I, T> {
 
-    private final Class<I> idType;
+    /**
+     * The entity bean type.
+     */
     private final Class<T> type;
+
+    /**
+     * The name of the EbeanServer, null for the default server.
+     */
     private final String serverName;
 
     /**
      * Creates a finder for entity of type <code>T</code> with ID of type <code>I</code>.
-     * 
-     * <p>
-     * Typically you use this constructor to have a static "find" field on each entity bean.
+     * <p/>
+     * Typically you create Find as a public static field on each entity bean as the example below.
+     *
+     * <p/>
+     * Note that Find is an abstract class and hence <code>{}</code> is required. This is done so
+     * that the type (class literal) of the entity bean can be derived from the generics parameter.
+     *
+     * <pre>{@code
+     *
+     * @Entity
+     * public class Customer extends BaseModel {
+     *
+     *   // Note the trailing {} as Find is an abstract class.
+     *   // We do this so that we can derive the type literal Customer.class
+     *   // via reflection
+     *   public static final Find<Long,Customer> find = new Find<Long,Customer>(){};
+     *   ...
+     *
+     * }</pre>
+     * <p/>
+     * This enables you to write code like:
+     * <pre>{@code
+     *
+     * Customer customer = Customer.find.byId(42L);
+     *
+     * List<Customer> customers =
+     *     Customer.find
+     *        .select("name, email, dateOfBirth")
+     *        .findList();
+     *
+     * }</pre>
+     *
+     * <h3>Kotlin</h3>
+     * In Kotlin you would typically create it as a companion object.
+     *
+     * <pre>{@code
+     *
+     *   // kotlin
+     *   companion object : Model.Find<Long, Product>() {}
+     *
+     * }</pre>
      */
-    public Finder(Class<I> idType, Class<T> type) {
-      this(null, idType, type);
+    public Find() {
+      this.serverName = null;
+      this.type = (Class<T>)ClassUtil.getSecondArgumentType(getClass());
     }
 
     /**
-     * Creates a finder for entity of type <code>T</code> with ID of type <code>I</code>, using a
-     * specific EbeanServer.
-     * 
-     * <p>
-     * Typically you don't need to use this method.
+     * Construct passing the class literal type of the entity type.
      */
-    public Finder(String serverName, Class<I> idType, Class<T> type) {
+    protected Find(String serverName, Class<T> type) {
       this.type = type;
-      this.idType = idType;
       this.serverName = serverName;
     }
 
@@ -335,12 +481,12 @@ public abstract class Model {
 
     /**
      * Creates a Finder for the named EbeanServer.
-     * 
+     *
      * <p>
      * Create and return a new Finder for a different server.
      */
     public Finder<I, T> on(String server) {
-      return new Finder<I, T>(server, idType, type);
+      return new Finder<I, T>(server, type);
     }
 
     /**
