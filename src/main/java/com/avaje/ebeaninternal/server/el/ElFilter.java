@@ -226,7 +226,7 @@ public final class ElFilter<T> implements Filter<T>  {
 		return this;
 	}
 
-	public List<T> filter(List<T> list) {
+	public <M extends T> List<M> filter(List<T> list) {
 
 		if (sortByClause != null){
 			// create shallow copy and sort 	
@@ -234,12 +234,12 @@ public final class ElFilter<T> implements Filter<T>  {
 			beanDescriptor.sort(list, sortByClause);
 		}
 		
-		ArrayList<T> filterList = new ArrayList<T>();
+		ArrayList<M> filterList = new ArrayList<M>();
 
 		for (int i = 0; i < list.size(); i++) {
 			T t = list.get(i);
 			if (isMatch(t)) {
-				filterList.add(t);
+				filterList.add((M) t);
 				if (maxRows > 0 && filterList.size() >= maxRows){
 					break;
 				}

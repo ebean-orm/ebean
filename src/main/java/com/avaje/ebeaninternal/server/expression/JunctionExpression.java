@@ -268,12 +268,12 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
-  public Map<?, T> findMap() {
+  public <M extends T> Map<?, M> findMap() {
     return exprList.findMap();
   }
 
   @Override
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
+  public <K, M extends T> Map<K, M> findMap(String keyProperty, Class<K> keyType) {
     return exprList.findMap(keyProperty, keyType);
   }
   

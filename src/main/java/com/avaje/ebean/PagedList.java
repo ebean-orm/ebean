@@ -116,7 +116,7 @@ public interface PagedList<T> {
   /**
    * Return the list of entities for this page.
    */
-  public List<T> getList();
+  public <M extends T> List<M> getList();
 
   /**
    * Return the total row count for all pages.

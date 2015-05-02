@@ -390,7 +390,7 @@ public interface Query<T> extends Serializable {
    * only those properties are fetched and populated resulting in a
    * "Partial Object" - a bean that only has some of its properties populated.
    * </p>
-   * 
+   *
    * <pre>{@code
    *
    * // query orders...
@@ -399,17 +399,17 @@ public interface Query<T> extends Serializable {
    *       // fetch the customer...
    *       // ... getting the customers name and phone number
    *       .fetch("customer", "name, phoneNumber")
-   * 
+   *
    *       // ... also fetch the customers billing address (* = all properties)
    *       .fetch("customer.billingAddress", "*")
    *       .findList();
    * }</pre>
-   * 
+   *
    * <p>
    * If columns is null or "*" then all columns/properties for that path are
    * fetched.
    * </p>
-   * 
+   *
    * <pre>{@code
    *
    * // fetch customers (their id, name and status)
@@ -420,7 +420,7 @@ public interface Query<T> extends Serializable {
    *     .findList();
    *
    * }</pre>
-   * 
+   *
    * @param path
    *          the path of an associated (1-1,1-M,M-1,M-M) bean.
    * @param fetchProperties
@@ -498,7 +498,7 @@ public interface Query<T> extends Serializable {
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
    * </p>
-   * 
+   *
    * @see EbeanServer#findIds(Query, Transaction)
    */
   public List<Object> findIds();
@@ -626,7 +626,7 @@ public interface Query<T> extends Serializable {
    *
    * @see EbeanServer#findList(Query, Transaction)
    */
-  public List<T> findList();
+  public <M extends T> List<M> findList();
 
   /**
    * Execute the query returning the set of objects.
@@ -645,7 +645,7 @@ public interface Query<T> extends Serializable {
    *
    * @see EbeanServer#findSet(Query, Transaction)
    */
-  public Set<T> findSet();
+  public <M extends T> Set<M> findSet();
 
   /**
    * Execute the query returning a map of the objects.
@@ -656,7 +656,7 @@ public interface Query<T> extends Serializable {
    * You can use setMapKey() so specify the property values to be used as keys
    * on the map. If one is not specified then the id property is used.
    * </p>
-   * 
+   *
    * <pre>{@code
    *
    * Map<?, Product> map =
@@ -665,15 +665,15 @@ public interface Query<T> extends Serializable {
    *     .findMap();
    *
    * }</pre>
-   * 
+   *
    * @see EbeanServer#findMap(Query, Transaction)
    */
-  public Map<?, T> findMap();
+  public <M extends T> Map<?, M> findMap();
 
   /**
    * Return a typed map specifying the key property and type.
    */
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType);
+  public <K, M extends T> Map<K, M> findMap(String keyProperty, Class<K> keyType);
 
   /**
    * Execute the query returning either a single bean or null (if no matching
@@ -686,7 +686,7 @@ public interface Query<T> extends Serializable {
    * This is useful when your predicates dictate that your query should only
    * return 0 or 1 results.
    * </p>
-   * 
+   *
    * <pre>{@code
    *
    * // assuming the sku of products is unique...
@@ -696,16 +696,16 @@ public interface Query<T> extends Serializable {
    *         .findUnique();
    * ...
    * }</pre>
-   * 
+   *
    * <p>
    * It is also useful with finding objects by their id when you want to specify
    * further join information.
    * </p>
-   * 
+   *
    * <pre>{@code
    *
    * // Fetch order 1 and additionally fetch join its order details...
-   * Order order = 
+   * Order order =
    *     ebeanServer.find(Order.class)
    *       .setId(1)
    *       .fetch("details")
@@ -716,7 +716,7 @@ public interface Query<T> extends Serializable {
    * ...
    * }</pre>
    */
-  public T findUnique();
+  public <M extends T> M findUnique();
 
   /**
    * Return the count of entities this query should return.
@@ -733,7 +733,7 @@ public interface Query<T> extends Serializable {
    * execution status (isDone etc) and get the value (with or without a
    * timeout).
    * </p>
-   * 
+   *
    * @return a Future object for the row count query
    */
   public FutureRowCount<T> findFutureRowCount();
@@ -745,7 +745,7 @@ public interface Query<T> extends Serializable {
    * execution status (isDone etc) and get the value (with or without a
    * timeout).
    * </p>
-   * 
+   *
    * @return a Future object for the list of Id's
    */
   public FutureIds<T> findFutureIds();
@@ -809,20 +809,20 @@ public interface Query<T> extends Serializable {
 
   /**
    * Set a named bind parameter. Named parameters have a colon to prefix the name.
-   * 
+   *
    * <pre>{@code
    *
    * // a query with a named parameter
    * String oql = "find order where status = :orderStatus";
-   * 
+   *
    * Query<Order> query = ebeanServer.find(Order.class, oql);
-   * 
+   *
    * // bind the named parameter
    * query.bind("orderStatus", OrderStatus.NEW);
    * List<Order> list = query.findList();
    *
    * }</pre>
-   * 
+   *
    * @param name
    *          the parameter name
    * @param value
@@ -834,21 +834,21 @@ public interface Query<T> extends Serializable {
    * Set an ordered bind parameter according to its position. Note that the
    * position starts at 1 to be consistent with JDBC PreparedStatement. You need
    * to set a parameter value for each ? you have in the query.
-   * 
+   *
    * <pre>{@code
    *
    * // a query with a positioned parameter
    * String oql = "where status = ? order by id desc";
-   * 
+   *
    * Query<Order> query = ebeanServer.createQuery(Order.class, oql);
-   * 
+   *
    * // bind the parameter
    * query.setParameter(1, OrderStatus.NEW);
-   * 
+   *
    * List<Order> list = query.findList();
    *
    * }</pre>
-   * 
+   *
    * @param position
    *          the parameter bind position starting from 1 (not 0)
    * @param value
@@ -862,7 +862,7 @@ public interface Query<T> extends Serializable {
    * You can use this to have further control over the query. For example adding
    * fetch joins.
    * </p>
-   * 
+   *
    * <pre>{@code
    *
    * Order order =
@@ -884,7 +884,7 @@ public interface Query<T> extends Serializable {
    * This typically contains named parameters which will need to be set via
    * {@link #setParameter(String, Object)}.
    * </p>
-   * 
+   *
    * <pre>{@code
    *
    * Query<Order> query = ebeanServer.createQuery(Order.class, "top");
@@ -896,7 +896,7 @@ public interface Query<T> extends Serializable {
    * }
    *
    * }</pre>
-   * 
+   *
    * <p>
    * Internally the addToWhereClause string is processed by removing named
    * parameters (replacing them with ?) and by converting logical property names
@@ -904,7 +904,7 @@ public interface Query<T> extends Serializable {
    * as is and it is completely acceptable and expected for the addToWhereClause
    * string to include sql functions and columns.
    * </p>
-   * 
+   *
    * @param addToWhereClause
    *          the clause to append to the where clause which typically contains
    *          named parameters.
@@ -914,10 +914,10 @@ public interface Query<T> extends Serializable {
 
   /**
    * Add a single Expression to the where clause returning the query.
-   * 
+   *
    * <pre>{@code
    *
-   * List<Order> newOrders = 
+   * List<Order> newOrders =
    *     ebeanServer.find(Order.class)
    * 		.where().eq("status", Order.NEW)
    * 		.findList();
@@ -931,7 +931,7 @@ public interface Query<T> extends Serializable {
    * Add Expressions to the where clause with the ability to chain on the
    * ExpressionList. You can use this for adding multiple expressions to the
    * where clause.
-   * 
+   *
    * <pre>{@code
    *
    * List<Order> orders =
@@ -942,7 +942,7 @@ public interface Query<T> extends Serializable {
    *     .findList();
    *
    * }</pre>
-   * 
+   *
    * @see Expr
    * @return The ExpressionList for adding expressions to.
    */
@@ -958,9 +958,9 @@ public interface Query<T> extends Serializable {
    * each customer you only want to get the new orders they placed since last
    * week. In this case you can use filterMany() to filter the orders.
    * </p>
-   * 
+   *
    * <pre>{@code
-   * 
+   *
    * List<Customer> list =
    *     ebeanServer.find(Customer.class)
    *     // .fetch("orders", new FetchConfig().lazy())
@@ -969,18 +969,18 @@ public interface Query<T> extends Serializable {
    *     .where().ilike("name", "rob%")
    *     .filterMany("orders").eq("status", Order.Status.NEW).gt("orderDate", lastWeek)
    *     .findList();
-   * 
+   *
    * }</pre>
-   * 
+   *
    * <p>
    * Please note you have to be careful that you add expressions to the correct
    * expression list - as there is one for the 'root level' and one for each
    * filterMany that you have.
    * </p>
-   * 
+   *
    * @param propertyName
    *          the name of the many property that you want to have a filter on.
-   * 
+   *
    * @return the expression list that you add filter expressions for the many
    *         to.
    */
@@ -995,7 +995,7 @@ public interface Query<T> extends Serializable {
    * Note that this returns the ExpressionList (so you can add multiple
    * expressions to the query in a fluent API way).
    * </p>
-   * 
+   *
    * @see Expr
    * @return The ExpressionList for adding more expressions to.
    */
@@ -1007,7 +1007,7 @@ public interface Query<T> extends Serializable {
    * This typically contains named parameters which will need to be set via
    * {@link #setParameter(String, Object)}.
    * </p>
-   * 
+   *
    * <pre>{@code
    *
    * List<ReportOrder> query =
@@ -1016,7 +1016,7 @@ public interface Query<T> extends Serializable {
    *     .findList();
    *
    * }</pre>
-   * 
+   *
    * @param addToHavingClause
    *          the clause to append to the having clause which typically contains
    *          named parameters.
@@ -1034,7 +1034,7 @@ public interface Query<T> extends Serializable {
    * than the ExpressionList. This is useful when you want to further specify
    * something on the query.
    * </p>
-   * 
+   *
    * @param addExpressionToHaving
    *          the expression to add to the having clause.
    * @return the Query object
@@ -1123,7 +1123,7 @@ public interface Query<T> extends Serializable {
 
   /**
    * Set the first row to return for this query.
-   * 
+   *
    * @param firstRow
    */
   public Query<T> setFirstRow(int firstRow);
@@ -1135,7 +1135,7 @@ public interface Query<T> extends Serializable {
 
   /**
    * Set the maximum number of rows to return in the query.
-   * 
+   *
    * @param maxRows
    *          the maximum number of rows to return in the query.
    */
@@ -1146,11 +1146,11 @@ public interface Query<T> extends Serializable {
    * <p>
    * If no property is set then the id property is used.
    * </p>
-   * 
+   *
    * <pre>{@code
    *
    * // Assuming sku is unique for products...
-   *    
+   *
    * Map<?,Product> productMap =
    *     ebeanServer.find(Product.class)
    *     // use sku for keys...
@@ -1158,7 +1158,7 @@ public interface Query<T> extends Serializable {
    *     .findMap();
    *
    * }</pre>
-   * 
+   *
    * @param mapKey
    *          the property to use as keys for a map.
    */
@@ -1196,7 +1196,7 @@ public interface Query<T> extends Serializable {
    * preparedStatement. If the timeout occurs an exception will be thrown - this
    * will be a SQLException wrapped up in a PersistenceException.
    * </p>
-   * 
+   *
    * @param secs
    *          the query timeout limit in seconds. Zero means there is no limit.
    */

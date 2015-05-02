@@ -129,7 +129,7 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @see Query#findList()
    */
-  public List<T> findList();
+  public <M extends T> List<M> findList();
 
   /**
    * Execute the query returning the list of Id's.
@@ -151,26 +151,26 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @see Query#findSet()
    */
-  public Set<T> findSet();
+  public <M extends T> Set<M> findSet();
 
   /**
    * Execute the query returning a map.
    * 
    * @see Query#findMap()
    */
-  public Map<?, T> findMap();
+  public <M extends T> Map<?, M> findMap();
 
   /**
    * Return a typed map specifying the key property and type.
    */
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType);
+  public <K, M extends T> Map<K, M> findMap(String keyProperty, Class<K> keyType);
 
   /**
    * Execute the query returning a single bean.
    * 
    * @see Query#findUnique()
    */
-  public T findUnique();
+  public <M extends T> M findUnique();
 
   /**
    * Execute find row count query in a background thread.

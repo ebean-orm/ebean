@@ -935,22 +935,25 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return server.findIterate(this, null);
   }
 
-  public List<T> findList() {
-    return server.findList(this, null);
-  }
-
-  public Set<T> findSet() {
-    return server.findSet(this, null);
-  }
-
-  public Map<?, T> findMap() {
-    return server.findMap(this, null);
+  @SuppressWarnings("unchecked")
+  public <M extends T> List<M> findList() {
+    return (List<M>) server.findList(this, null);
   }
 
   @SuppressWarnings("unchecked")
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
+  public <M extends T> Set<M> findSet() {
+    return (Set<M>) server.findSet(this, null);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <M extends T> Map<?, M> findMap() {
+    return (Map<?, M>) server.findMap(this, null);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <K, M extends T> Map<K, M> findMap(String keyProperty, Class<K> keyType) {
     setMapKey(keyProperty);
-    return (Map<K, T>) findMap();
+    return (Map<K, M>) findMap();
   }
 
   public T findUnique() {
