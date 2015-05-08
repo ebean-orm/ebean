@@ -35,5 +35,5 @@ public interface TxRunnable {
   /**
    * Run the method in a transaction sope.
    */
-  public void run();
+  void run();
 }

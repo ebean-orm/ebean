@@ -63,31 +63,31 @@ public interface ExampleExpression extends Expression {
    * primitive int and long types.
    * </p>
    */
-  public ExampleExpression includeZeros();
+  ExampleExpression includeZeros();
 
   /**
    * Set case insensitive to true.
    */
-  public ExampleExpression caseInsensitive();
+  ExampleExpression caseInsensitive();
 
   /**
    * Use startsWith expression for string properties.
    */
-  public ExampleExpression useStartsWith();
+  ExampleExpression useStartsWith();
 
   /**
    * Use contains expression for string properties.
    */
-  public ExampleExpression useContains();
+  ExampleExpression useContains();
 
   /**
    * Use endsWith expression for string properties.
    */
-  public ExampleExpression useEndsWith();
+  ExampleExpression useEndsWith();
 
   /**
    * Use equal to expression for string properties.
    */
-  public ExampleExpression useEqualTo();
+  ExampleExpression useEqualTo();
 
 }

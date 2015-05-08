@@ -41,5 +41,5 @@ public interface QueryEachWhileConsumer<T> {
    * @param bean the entity bean to process
    * @return true to continue processing more beans or false to stop.
    */
-  public boolean accept(T bean);
+  boolean accept(T bean);
 }

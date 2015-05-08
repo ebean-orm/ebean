@@ -17,50 +17,50 @@ public interface Transaction extends Closeable {
    * Read Committed transaction isolation. Same as
    * java.sql.Connection.TRANSACTION_READ_COMMITTED.
    */
-  public static final int READ_COMMITTED = java.sql.Connection.TRANSACTION_READ_COMMITTED;
+  static final int READ_COMMITTED = java.sql.Connection.TRANSACTION_READ_COMMITTED;
 
   /**
    * Read Uncommitted transaction isolation. Same as
    * java.sql.Connection.TRANSACTION_READ_UNCOMMITTED.
    */
-  public static final int READ_UNCOMMITTED = java.sql.Connection.TRANSACTION_READ_UNCOMMITTED;
+  static final int READ_UNCOMMITTED = java.sql.Connection.TRANSACTION_READ_UNCOMMITTED;
 
   /**
    * Repeatable read transaction isolation. Same as
    * java.sql.Connection.TRANSACTION_REPEATABLE_READ.
    */
-  public static final int REPEATABLE_READ = java.sql.Connection.TRANSACTION_REPEATABLE_READ;
+  static final int REPEATABLE_READ = java.sql.Connection.TRANSACTION_REPEATABLE_READ;
 
   /**
    * Serializable transaction isolation. Same as
    * java.sql.Connection.TRANSACTION_SERIALIZABLE.
    */
-  public static final int SERIALIZABLE = java.sql.Connection.TRANSACTION_SERIALIZABLE;
+  static final int SERIALIZABLE = java.sql.Connection.TRANSACTION_SERIALIZABLE;
 
   /**
    * Register a TransactionCallback with this transaction.
    */
-  public void register(TransactionCallback callback);
+  void register(TransactionCallback callback);
 
   /**
    * Return true if this transaction is read only.
    */
-  public boolean isReadOnly();
+  boolean isReadOnly();
 
   /**
    * Set whether this transaction should be readOnly.
    */
-  public void setReadOnly(boolean readOnly);
+  void setReadOnly(boolean readOnly);
 
   /**
    * Commit the transaction.
    */
-  public void commit() throws RollbackException;
+  void commit() throws RollbackException;
 
   /**
    * Rollback the transaction.
    */
-  public void rollback() throws PersistenceException;
+  void rollback() throws PersistenceException;
 
   /**
    * Rollback the transaction specifying a throwable that caused the rollback to
@@ -70,17 +70,17 @@ public interface Transaction extends Closeable {
    * transaction logs.
    * </p>
    */
-  public void rollback(Throwable e) throws PersistenceException;
+  void rollback(Throwable e) throws PersistenceException;
 
   /**
    * If the transaction is active then perform rollback. Otherwise do nothing.
    */
-  public void end() throws PersistenceException;
+  void end() throws PersistenceException;
 
   /**
    * Return true if the transaction is active.
    */
-  public boolean isActive();
+  boolean isActive();
 
   /**
    * Explicitly turn off or on the cascading nature of save() and delete(). This
@@ -95,7 +95,7 @@ public interface Transaction extends Closeable {
    * that do not support getGeneratedKeys.
    * </p>
    */
-  public void setPersistCascade(boolean persistCascade);
+  void setPersistCascade(boolean persistCascade);
 
   /**
    * Turn on or off statement batching. Statement batching can be transparent
@@ -165,7 +165,7 @@ public interface Transaction extends Closeable {
    * }</pre>
    * 
    */
-  public void setBatchMode(boolean useBatch);
+  void setBatchMode(boolean useBatch);
 
   /**
    * The JDBC batch mode to use for this transaction.
@@ -178,12 +178,12 @@ public interface Transaction extends Closeable {
    *
    * @see com.avaje.ebean.config.ServerConfig#setPersistBatch(com.avaje.ebean.config.PersistBatch)
    */
-  public void setBatch(PersistBatch persistBatchMode);
+  void setBatch(PersistBatch persistBatchMode);
 
   /**
    * Return the batch mode at the transaction level.
    */
-  public PersistBatch getBatch();
+  PersistBatch getBatch();
 
   /**
    * Set the JDBC batch mode to use for a save() or delete() request.
@@ -200,22 +200,22 @@ public interface Transaction extends Closeable {
    *
    * @see com.avaje.ebean.config.ServerConfig#setPersistBatchOnCascade(com.avaje.ebean.config.PersistBatch)
    */
-  public void setBatchOnCascade(PersistBatch batchOnCascadeMode);
+  void setBatchOnCascade(PersistBatch batchOnCascadeMode);
 
   /**
    * Return the batch mode at the request level (for each save(), insert(), update() or delete()).
    */
-  public PersistBatch getBatchOnCascade();
+  PersistBatch getBatchOnCascade();
 
   /**
    * Specify the number of statements before a batch is flushed automatically.
    */
-  public void setBatchSize(int batchSize);
+  void setBatchSize(int batchSize);
 
   /**
    * Return the current batch size.
    */
-  public int getBatchSize();
+  int getBatchSize();
 
   /**
    * Specify if you want batched inserts to use getGeneratedKeys.
@@ -228,7 +228,7 @@ public interface Transaction extends Closeable {
    * number of objects and you don't care about getting back the ids.
    * </p>
    */
-  public void setBatchGetGeneratedKeys(boolean getGeneratedKeys);
+  void setBatchGetGeneratedKeys(boolean getGeneratedKeys);
 
   /**
    * By default when mixing UpdateSql (or CallableSql) with Beans the batch is
@@ -245,7 +245,7 @@ public interface Transaction extends Closeable {
    * have a 2 step process (delayed binding).
    * </p>
    */
-  public void setBatchFlushOnMixed(boolean batchFlushOnMixed);
+  void setBatchFlushOnMixed(boolean batchFlushOnMixed);
 
   /**
    * By default executing a query will automatically flush any batched
@@ -255,7 +255,7 @@ public interface Transaction extends Closeable {
    * execute a query and the batch will not be automatically flushed.
    * </p>
    */
-  public void setBatchFlushOnQuery(boolean batchFlushOnQuery);
+  void setBatchFlushOnQuery(boolean batchFlushOnQuery);
 
   /**
    * Return true if the batch (of persisted beans or executed UpdateSql etc)
@@ -264,7 +264,7 @@ public interface Transaction extends Closeable {
    * The default is for this to be true.
    * </p>
    */
-  public boolean isBatchFlushOnQuery();
+  boolean isBatchFlushOnQuery();
 
   /**
    * The batch will be flushing automatically but you can use this to explicitly
@@ -279,7 +279,7 @@ public interface Transaction extends Closeable {
    * <li>Transaction commit occurs</li>
    * </ul>
    */
-  public void flushBatch() throws PersistenceException, OptimisticLockException;
+  void flushBatch() throws PersistenceException, OptimisticLockException;
 
   /**
    * Return the underlying Connection object.
@@ -294,7 +294,7 @@ public interface Transaction extends Closeable {
    * Savepoints, advanced CLOB BLOB use and advanced stored procedure calls.
    * </p>
    */
-  public Connection getConnection();
+  Connection getConnection();
 
   /**
    * Add table modification information to the TransactionEvent.
@@ -312,7 +312,7 @@ public interface Transaction extends Closeable {
    * caches in synch and maintain text indexes.
    * </p>
    */
-  public void addModification(String tableName, boolean inserts, boolean updates, boolean deletes);
+  void addModification(String tableName, boolean inserts, boolean updates, boolean deletes);
 
   /**
    * Add an arbitrary user object to the transaction. The objects added have no
@@ -320,10 +320,10 @@ public interface Transaction extends Closeable {
    * method push user information to e.g. the
    * {@link com.avaje.ebean.event.TransactionEventListener}.
    */
-  public void putUserObject(String name, Object value);
+  void putUserObject(String name, Object value);
 
   /**
    * Get an object added with {@link #putUserObject(String, Object)}.
    */
-  public Object getUserObject(String name);
+  Object getUserObject(String name);
 }

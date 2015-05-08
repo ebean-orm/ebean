@@ -37,5 +37,5 @@ public interface QueryEachConsumer<T> {
    * @param bean
    *          the entity bean to process
    */
-  public void accept(T bean);
+  void accept(T bean);
 }

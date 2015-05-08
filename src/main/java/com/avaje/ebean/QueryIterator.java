@@ -41,20 +41,20 @@ public interface QueryIterator<T> extends Iterator<T>, java.io.Closeable {
   /**
    * Returns <tt>true</tt> if the iteration has more elements.
    */
-  public boolean hasNext();
+  boolean hasNext();
 
   /**
    * Returns the next element in the iteration.
    */
-  public T next();
+  T next();
 
   /**
    * Remove is not allowed.
    */
-  public void remove();
+  void remove();
 
   /**
    * Close the underlying resources held by this iterator.
    */
-  public void close();
+  void close();
 }

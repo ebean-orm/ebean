@@ -85,17 +85,17 @@ public interface CallableSql {
   /**
    * Set the label that is put in the transaction log.
    */
-  public CallableSql setLabel(String label);
+  CallableSql setLabel(String label);
 
   /**
    * Return the statement execution timeout.
    */
-  public int getTimeout();
+  int getTimeout();
 
   /**
    * Return the callable sql.
    */
-  public String getSql();
+  String getSql();
 
   /**
    * Set the statement execution timeout. Zero implies unlimited time.
@@ -103,12 +103,12 @@ public interface CallableSql {
    * This is set to the underlying CallableStatement.
    * </p>
    */
-  public CallableSql setTimeout(int secs);
+  CallableSql setTimeout(int secs);
 
   /**
    * Set the callable sql.
    */
-  public CallableSql setSql(String sql);
+  CallableSql setSql(String sql);
 
   /**
    * Bind a parameter that is bound as a IN parameter.
@@ -125,7 +125,7 @@ public interface CallableSql {
    * @param value
    *          the value of the parameter.
    */
-  public CallableSql bind(int position, Object value);
+  CallableSql bind(int position, Object value);
 
   /**
    * Bind a positioned parameter (same as bind method).
@@ -135,7 +135,7 @@ public interface CallableSql {
    * @param value
    *          the value of the parameter.
    */
-  public CallableSql setParameter(int position, Object value);
+  CallableSql setParameter(int position, Object value);
 
   /**
    * Register an OUT parameter.
@@ -153,7 +153,7 @@ public interface CallableSql {
    * @param type
    *          the jdbc type of the OUT parameter that will be read.
    */
-  public CallableSql registerOut(int position, int type);
+  CallableSql registerOut(int position, int type);
 
   /**
    * Return an OUT parameter value.
@@ -165,7 +165,7 @@ public interface CallableSql {
    * in batch mode you effectively can't use this method.
    * </p>
    */
-  public Object getObject(int position);
+  Object getObject(int position);
 
   /**
    * 
@@ -173,7 +173,7 @@ public interface CallableSql {
    * stored procedure calls. This would be the case when ResultSets are returned
    * etc.
    */
-  public boolean executeOverride(CallableStatement cstmt) throws SQLException;
+  boolean executeOverride(CallableStatement cstmt) throws SQLException;
 
   /**
    * Add table modification information to the TransactionEvent.
@@ -188,7 +188,6 @@ public interface CallableSql {
    * delete.
    * </p>
    */
-  public CallableSql addModification(String tableName, boolean inserts, boolean updates,
-      boolean deletes);
+  CallableSql addModification(String tableName, boolean inserts, boolean updates, boolean deletes);
 
 }

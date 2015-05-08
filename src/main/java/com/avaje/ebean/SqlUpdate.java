@@ -50,7 +50,7 @@ public interface SqlUpdate {
    * 
    * @see com.avaje.ebean.Ebean#execute(SqlUpdate)
    */
-  public int execute();
+  int execute();
 
   /**
    * Return true if eBean should automatically deduce the table modification
@@ -60,7 +60,7 @@ public interface SqlUpdate {
    * of the modification.
    * </p>
    */
-  public boolean isAutoTableMod();
+  boolean isAutoTableMod();
 
   /**
    * Set this to false if you don't want eBean to automatically deduce the table
@@ -71,12 +71,12 @@ public interface SqlUpdate {
    * and you know that it is not important for cached objects or text indexes.
    * </p>
    */
-  public SqlUpdate setAutoTableMod(boolean isAutoTableMod);
+  SqlUpdate setAutoTableMod(boolean isAutoTableMod);
 
   /**
    * Return the label that can be seen in the transaction logs.
    */
-  public String getLabel();
+  String getLabel();
 
   /**
    * Set a descriptive text that can be put into the transaction log.
@@ -84,22 +84,22 @@ public interface SqlUpdate {
    * Useful when identifying the statement in the transaction log.
    * </p>
    */
-  public SqlUpdate setLabel(String label);
+  SqlUpdate setLabel(String label);
 
   /**
    * Return the sql statement.
    */
-  public String getSql();
+  String getSql();
 
   /**
    * Return the generated sql that has named parameters converted to positioned parameters.
    */
-  public String getGeneratedSql();
+  String getGeneratedSql();
 
   /**
    * Return the timeout used to execute this statement.
    */
-  public int getTimeout();
+  int getTimeout();
 
   /**
    * Set the timeout in seconds. Zero implies no limit.
@@ -109,38 +109,38 @@ public interface SqlUpdate {
    * PersistenceException.
    * </p>
    */
-  public SqlUpdate setTimeout(int secs);
+  SqlUpdate setTimeout(int secs);
 
   /**
    * Set a parameter via its index position.
    */
-  public SqlUpdate setParameter(int position, Object value);
+  SqlUpdate setParameter(int position, Object value);
 
   /**
    * Set a null parameter via its index position. Exactly the same as
    * {@link #setNull(int, int)}.
    */
-  public SqlUpdate setNull(int position, int jdbcType);
+  SqlUpdate setNull(int position, int jdbcType);
 
   /**
    * Set a null valued parameter using its index position.
    */
-  public SqlUpdate setNullParameter(int position, int jdbcType);
+  SqlUpdate setNullParameter(int position, int jdbcType);
 
   /**
    * Set a named parameter value.
    */
-  public SqlUpdate setParameter(String name, Object param);
+  SqlUpdate setParameter(String name, Object param);
 
   /**
    * Set a named parameter that has a null value. Exactly the same as
    * {@link #setNullParameter(String, int)}.
    */
-  public SqlUpdate setNull(String name, int jdbcType);
+  SqlUpdate setNull(String name, int jdbcType);
 
   /**
    * Set a named parameter that has a null value.
    */
-  public SqlUpdate setNullParameter(String name, int jdbcType);
+  SqlUpdate setNullParameter(String name, int jdbcType);
 
 }

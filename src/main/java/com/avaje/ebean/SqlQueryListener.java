@@ -29,5 +29,5 @@ public interface SqlQueryListener {
    * Note this bean will not be added to the List Set or Map.
    * </p>
    */
-  public void process(SqlRow bean);
+  void process(SqlRow bean);
 }

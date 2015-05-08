@@ -41,5 +41,5 @@ public interface TxCallable<T> {
    * instead.
    * </p>
    */
-  public T call();
+  T call();
 }

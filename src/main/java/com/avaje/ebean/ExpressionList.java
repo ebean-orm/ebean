@@ -39,7 +39,7 @@ public interface ExpressionList<T> extends Serializable {
    * query so that further things can be added to it.
    * </p>
    */
-  public Query<T> query();
+  Query<T> query();
 
   /**
    * Set the order by clause replacing the existing order by clause if there is
@@ -53,7 +53,7 @@ public interface ExpressionList<T> extends Serializable {
    * This is EXACTLY the same as {@link #orderBy(String)}.
    * </p>
    */
-  public Query<T> order(String orderByClause);
+  Query<T> order(String orderByClause);
 
   /**
    * Return the OrderBy so that you can append an ascending or descending
@@ -63,7 +63,7 @@ public interface ExpressionList<T> extends Serializable {
    * OrderBy object is returned.
    * </p>
    */
-  public OrderBy<T> order();
+  OrderBy<T> order();
 
   /**
    * Return the OrderBy so that you can append an ascending or descending
@@ -73,40 +73,40 @@ public interface ExpressionList<T> extends Serializable {
    * OrderBy object is returned.
    * </p>
    */
-  public OrderBy<T> orderBy();
+  OrderBy<T> orderBy();
 
   /**
    * Add an orderBy clause to the query.
    * 
    * @see Query#orderBy(String)
    */
-  public Query<T> orderBy(String orderBy);
+  Query<T> orderBy(String orderBy);
 
   /**
    * Add an orderBy clause to the query.
    * 
    * @see Query#orderBy(String)
    */
-  public Query<T> setOrderBy(String orderBy);
+  Query<T> setOrderBy(String orderBy);
 
   /**
    * Apply the path properties to the query replacing the select and fetch clauses.
    */
-  public Query<T> apply(PathProperties pathProperties);
+  Query<T> apply(PathProperties pathProperties);
 
   /**
    * Execute the query iterating over the results.
    * 
    * @see Query#findIterate()
    */
-  public QueryIterator<T> findIterate();
+  QueryIterator<T> findIterate();
 
   /**
    * Execute the query process the beans one at a time.
    *
    * @see Query#findEach(QueryEachConsumer)
    */
-  public void findEach(QueryEachConsumer<T> consumer);
+  void findEach(QueryEachConsumer<T> consumer);
 
   /**
    * Execute the query processing the beans one at a time with the ability to
@@ -114,7 +114,7 @@ public interface ExpressionList<T> extends Serializable {
    *
    * @see Query#findEachWhile(QueryEachWhileConsumer)
    */
-  public void findEachWhile(QueryEachWhileConsumer<T> consumer);
+  void findEachWhile(QueryEachWhileConsumer<T> consumer);
 
   /**
    * Deprecated in favor of #findEachWhile which is functionally exactly the same
@@ -122,21 +122,21 @@ public interface ExpressionList<T> extends Serializable {
    *
    * @deprecated
    */
-  public void findVisit(QueryResultVisitor<T> visitor);
+  void findVisit(QueryResultVisitor<T> visitor);
 
   /**
    * Execute the query returning a list.
    * 
    * @see Query#findList()
    */
-  public List<T> findList();
+  List<T> findList();
 
   /**
    * Execute the query returning the list of Id's.
    * 
    * @see Query#findIds()
    */
-  public List<Object> findIds();
+  List<Object> findIds();
 
   /**
    * Return the count of entities this query should return.
@@ -144,33 +144,33 @@ public interface ExpressionList<T> extends Serializable {
    * This is the number of 'top level' or 'root level' entities.
    * </p>
    */
-  public int findRowCount();
+  int findRowCount();
 
   /**
    * Execute the query returning a set.
    * 
    * @see Query#findSet()
    */
-  public Set<T> findSet();
+  Set<T> findSet();
 
   /**
    * Execute the query returning a map.
    * 
    * @see Query#findMap()
    */
-  public Map<?, T> findMap();
+  Map<?, T> findMap();
 
   /**
    * Return a typed map specifying the key property and type.
    */
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType);
+  <K> Map<K, T> findMap(String keyProperty, Class<K> keyType);
 
   /**
    * Execute the query returning a single bean.
    * 
    * @see Query#findUnique()
    */
-  public T findUnique();
+  T findUnique();
 
   /**
    * Execute find row count query in a background thread.
@@ -182,7 +182,7 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @return a Future object for the row count query
    */
-  public FutureRowCount<T> findFutureRowCount();
+  FutureRowCount<T> findFutureRowCount();
 
   /**
    * Execute find Id's query in a background thread.
@@ -194,7 +194,7 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @return a Future object for the list of Id's
    */
-  public FutureIds<T> findFutureIds();
+  FutureIds<T> findFutureIds();
 
   /**
    * Execute find list query in a background thread.
@@ -206,7 +206,7 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @return a Future object for the list result of the query
    */
-  public FutureList<T> findFutureList();
+  FutureList<T> findFutureList();
 
   /**
    * Return a PagedList for this query.
@@ -227,12 +227,12 @@ public interface ExpressionList<T> extends Serializable {
    *          The number of beans to return per page.
    * @return The PagedList
    */
-  public PagedList<T> findPagedList(int pageIndex, int pageSize);
+  PagedList<T> findPagedList(int pageIndex, int pageSize);
 
   /**
    * Add some filter predicate expressions to the many property.
    */
-  public ExpressionList<T> filterMany(String prop);
+  ExpressionList<T> filterMany(String prop);
 
   /**
    * Specify specific properties to fetch on the main/root bean (aka partial
@@ -240,35 +240,35 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @see Query#select(String)
    */
-  public Query<T> select(String properties);
+  Query<T> select(String properties);
 
   /**
    * Set the first row to fetch.
    * 
    * @see Query#setFirstRow(int)
    */
-  public Query<T> setFirstRow(int firstRow);
+  Query<T> setFirstRow(int firstRow);
 
   /**
    * Set the maximum number of rows to fetch.
    * 
    * @see Query#setMaxRows(int)
    */
-  public Query<T> setMaxRows(int maxRows);
+  Query<T> setMaxRows(int maxRows);
 
   /**
    * Set the name of the property which values become the key of a map.
    * 
    * @see Query#setMapKey(String)
    */
-  public Query<T> setMapKey(String mapKey);
+  Query<T> setMapKey(String mapKey);
 
   /**
    * Set to true to use the query for executing this query.
    * 
    * @see Query#setUseCache(boolean)
    */
-  public Query<T> setUseCache(boolean useCache);
+  Query<T> setUseCache(boolean useCache);
 
   /**
    * Add expressions to the having clause.
@@ -277,12 +277,12 @@ public interface ExpressionList<T> extends Serializable {
    * annotation etc).
    * </p>
    */
-  public ExpressionList<T> having();
+  ExpressionList<T> having();
 
   /**
    * Add another expression to the where clause.
    */
-  public ExpressionList<T> where();
+  ExpressionList<T> where();
 
   /**
    * Add an Expression to the list.
@@ -299,69 +299,69 @@ public interface ExpressionList<T> extends Serializable {
    * ...
    * </pre>
    */
-  public ExpressionList<T> add(Expression expr);
+  ExpressionList<T> add(Expression expr);
 
   /**
    * Add a list of Expressions to this ExpressionList.s
    */
-  public ExpressionList<T> addAll(ExpressionList<T> exprList);
+  ExpressionList<T> addAll(ExpressionList<T> exprList);
 
   /**
    * Equal To - property is equal to a given value.
    */
-  public ExpressionList<T> eq(String propertyName, Object value);
+  ExpressionList<T> eq(String propertyName, Object value);
 
   /**
    * Not Equal To - property not equal to the given value.
    */
-  public ExpressionList<T> ne(String propertyName, Object value);
+  ExpressionList<T> ne(String propertyName, Object value);
 
   /**
    * Case Insensitive Equal To - property equal to the given value (typically
    * using a lower() function to make it case insensitive).
    */
-  public ExpressionList<T> ieq(String propertyName, String value);
+  ExpressionList<T> ieq(String propertyName, String value);
 
   /**
    * Between - property between the two given values.
    */
-  public ExpressionList<T> between(String propertyName, Object value1, Object value2);
+  ExpressionList<T> between(String propertyName, Object value1, Object value2);
 
   /**
    * Between - value between the two properties.
    */
-  public ExpressionList<T> betweenProperties(String lowProperty, String highProperty, Object value);
+  ExpressionList<T> betweenProperties(String lowProperty, String highProperty, Object value);
 
   /**
    * Greater Than - property greater than the given value.
    */
-  public ExpressionList<T> gt(String propertyName, Object value);
+  ExpressionList<T> gt(String propertyName, Object value);
 
   /**
    * Greater Than or Equal to - property greater than or equal to the given
    * value.
    */
-  public ExpressionList<T> ge(String propertyName, Object value);
+  ExpressionList<T> ge(String propertyName, Object value);
 
   /**
    * Less Than - property less than the given value.
    */
-  public ExpressionList<T> lt(String propertyName, Object value);
+  ExpressionList<T> lt(String propertyName, Object value);
 
   /**
    * Less Than or Equal to - property less than or equal to the given value.
    */
-  public ExpressionList<T> le(String propertyName, Object value);
+  ExpressionList<T> le(String propertyName, Object value);
 
   /**
    * Is Null - property is null.
    */
-  public ExpressionList<T> isNull(String propertyName);
+  ExpressionList<T> isNull(String propertyName);
 
   /**
    * Is Not Null - property is not null.
    */
-  public ExpressionList<T> isNotNull(String propertyName);
+  ExpressionList<T> isNotNull(String propertyName);
 
   /**
    * A "Query By Example" type of expression.
@@ -406,93 +406,93 @@ public interface ExpressionList<T> extends Serializable {
    * List&lt;Customer&gt; list = Ebean.find(Customer.class).where().add(qbe).findList();
    * </pre>
    */
-  public ExpressionList<T> exampleLike(Object example);
+  ExpressionList<T> exampleLike(Object example);
 
   /**
    * Case insensitive version of {@link #exampleLike(Object)}
    */
-  public ExpressionList<T> iexampleLike(Object example);
+  ExpressionList<T> iexampleLike(Object example);
 
   /**
    * Like - property like value where the value contains the SQL wild card
    * characters % (percentage) and _ (underscore).
    */
-  public ExpressionList<T> like(String propertyName, String value);
+  ExpressionList<T> like(String propertyName, String value);
 
   /**
    * Case insensitive Like - property like value where the value contains the
    * SQL wild card characters % (percentage) and _ (underscore). Typically uses
    * a lower() function to make the expression case insensitive.
    */
-  public ExpressionList<T> ilike(String propertyName, String value);
+  ExpressionList<T> ilike(String propertyName, String value);
 
   /**
    * Starts With - property like value%.
    */
-  public ExpressionList<T> startsWith(String propertyName, String value);
+  ExpressionList<T> startsWith(String propertyName, String value);
 
   /**
    * Case insensitive Starts With - property like value%. Typically uses a
    * lower() function to make the expression case insensitive.
    */
-  public ExpressionList<T> istartsWith(String propertyName, String value);
+  ExpressionList<T> istartsWith(String propertyName, String value);
 
   /**
    * Ends With - property like %value.
    */
-  public ExpressionList<T> endsWith(String propertyName, String value);
+  ExpressionList<T> endsWith(String propertyName, String value);
 
   /**
    * Case insensitive Ends With - property like %value. Typically uses a lower()
    * function to make the expression case insensitive.
    */
-  public ExpressionList<T> iendsWith(String propertyName, String value);
+  ExpressionList<T> iendsWith(String propertyName, String value);
 
   /**
    * Contains - property like %value%.
    */
-  public ExpressionList<T> contains(String propertyName, String value);
+  ExpressionList<T> contains(String propertyName, String value);
 
   /**
    * Case insensitive Contains - property like %value%. Typically uses a lower()
    * function to make the expression case insensitive.
    */
-  public ExpressionList<T> icontains(String propertyName, String value);
+  ExpressionList<T> icontains(String propertyName, String value);
 
   /**
    * In - using a subQuery.
    */
-  public ExpressionList<T> in(String propertyName, Query<?> subQuery);
+  ExpressionList<T> in(String propertyName, Query<?> subQuery);
 
   /**
    * In - property has a value in the array of values.
    */
-  public ExpressionList<T> in(String propertyName, Object... values);
+  ExpressionList<T> in(String propertyName, Object... values);
 
   /**
    * In - property has a value in the collection of values.
    */
-  public ExpressionList<T> in(String propertyName, Collection<?> values);
+  ExpressionList<T> in(String propertyName, Collection<?> values);
   
   /**
    * Exists expression
    */
-  public ExpressionList<T> exists(Query<?> subQuery);
+  ExpressionList<T> exists(Query<?> subQuery);
   
   /**
    * Not exists expression
    */
-  public ExpressionList<T> notExists(Query<?> subQuery);
+  ExpressionList<T> notExists(Query<?> subQuery);
 
   /**
    * Id IN a list of id values.
    */
-  public ExpressionList<T> idIn(List<?> idValues);
+  ExpressionList<T> idIn(List<?> idValues);
 
   /**
    * Id Equal to - ID property is equal to the value.
    */
-  public ExpressionList<T> idEq(Object value);
+  ExpressionList<T> idEq(Object value);
 
   /**
    * All Equal - Map containing property names and their values.
@@ -504,7 +504,7 @@ public interface ExpressionList<T> extends Serializable {
    * @param propertyMap
    *          a map keyed by property names.
    */
-  public ExpressionList<T> allEq(Map<String, Object> propertyMap);
+  ExpressionList<T> allEq(Map<String, Object> propertyMap);
 
   /**
    * Add raw expression with a single parameter.
@@ -518,7 +518,7 @@ public interface ExpressionList<T> extends Serializable {
    * qualified) will still be translated to their physical name.
    * </p>
    */
-  public ExpressionList<T> raw(String raw, Object value);
+  ExpressionList<T> raw(String raw, Object value);
 
   /**
    * Add raw expression with an array of parameters.
@@ -532,7 +532,7 @@ public interface ExpressionList<T> extends Serializable {
    * qualified) will still be translated to their physical name.
    * </p>
    */
-  public ExpressionList<T> raw(String raw, Object[] values);
+  ExpressionList<T> raw(String raw, Object[] values);
 
   /**
    * Add raw expression with no parameters.
@@ -542,32 +542,32 @@ public interface ExpressionList<T> extends Serializable {
    * qualified) will still be translated to their physical name.
    * </p>
    */
-  public ExpressionList<T> raw(String raw);
+  ExpressionList<T> raw(String raw);
 
   /**
    * And - join two expressions with a logical and.
    */
-  public ExpressionList<T> and(Expression expOne, Expression expTwo);
+  ExpressionList<T> and(Expression expOne, Expression expTwo);
 
   /**
    * Or - join two expressions with a logical or.
    */
-  public ExpressionList<T> or(Expression expOne, Expression expTwo);
+  ExpressionList<T> or(Expression expOne, Expression expTwo);
 
   /**
    * Negate the expression (prefix it with NOT).
    */
-  public ExpressionList<T> not(Expression exp);
+  ExpressionList<T> not(Expression exp);
 
   /**
    * Return a list of expressions that will be joined by AND's.
    */
-  public Junction<T> conjunction();
+  Junction<T> conjunction();
 
   /**
    * Return a list of expressions that will be joined by OR's.
    */
-  public Junction<T> disjunction();
+  Junction<T> disjunction();
 
   /**
    * End a Conjunction or Disjunction returning the parent expression list.
@@ -576,6 +576,6 @@ public interface ExpressionList<T> extends Serializable {
    * list.
    * </p>
    */
-  public ExpressionList<T> endJunction();
+  ExpressionList<T> endJunction();
 
 }

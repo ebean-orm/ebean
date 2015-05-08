@@ -277,12 +277,12 @@ public interface Query<T> extends Serializable {
   /**
    * Return the RawSql that was set to use for this query.
    */
-  public RawSql getRawSql();
+  RawSql getRawSql();
 
   /**
    * Set RawSql to use for this query.
    */
-  public Query<T> setRawSql(RawSql rawSql);
+  Query<T> setRawSql(RawSql rawSql);
 
   /**
    * Cancel the query execution if supported by the underlying database and
@@ -291,7 +291,7 @@ public interface Query<T> extends Serializable {
    * This must be called from a different thread to the query executor.
    * </p>
    */
-  public void cancel();
+  void cancel();
 
   /**
    * Return a copy of the query.
@@ -302,7 +302,7 @@ public interface Query<T> extends Serializable {
    * instance that you can then add other expressions then execute.
    * </p>
    */
-  public Query<T> copy();
+  Query<T> copy();
 
   /**
    * Specify the PersistenceContextScope to use for this query.
@@ -317,17 +317,17 @@ public interface Query<T> extends Serializable {
    *
    * @param scope The scope to use for this query and subsequent lazy loading.
    */
-  public Query<T> setPersistenceContextScope(PersistenceContextScope scope);
+  Query<T> setPersistenceContextScope(PersistenceContextScope scope);
 
   /**
    * Return the ExpressionFactory used by this query.
    */
-  public ExpressionFactory getExpressionFactory();
+  ExpressionFactory getExpressionFactory();
 
   /**
    * Returns true if this query was tuned by autoFetch.
    */
-  public boolean isAutofetchTuned();
+  boolean isAutofetchTuned();
 
   /**
    * Explicitly specify whether to use Autofetch for this query.
@@ -341,7 +341,7 @@ public interface Query<T> extends Serializable {
    * fetch paths Autofetch will not remove.
    * </p>
    */
-  public Query<T> setAutofetch(boolean autofetch);
+  Query<T> setAutofetch(boolean autofetch);
 
   /**
    * Set the default lazy loading batch size to use.
@@ -351,7 +351,7 @@ public interface Query<T> extends Serializable {
    *
    * @param lazyLoadBatchSize the number of beans to lazy load in a single batch
    */
-  public Query<T> setLazyLoadBatchSize(int lazyLoadBatchSize);
+  Query<T> setLazyLoadBatchSize(int lazyLoadBatchSize);
 
   /**
    * Explicitly set a comma delimited list of the properties to fetch on the
@@ -377,7 +377,7 @@ public interface Query<T> extends Serializable {
    * @param fetchProperties
    *          the properties to fetch for this bean (* = all properties).
    */
-  public Query<T> select(String fetchProperties);
+  Query<T> select(String fetchProperties);
 
   /**
    * Specify a path to <em>fetch</em> with its specific properties to include
@@ -427,7 +427,7 @@ public interface Query<T> extends Serializable {
    *          properties of the associated bean that you want to include in the
    *          fetch (* means all properties, null also means all properties).
    */
-  public Query<T> fetch(String path, String fetchProperties);
+  Query<T> fetch(String path, String fetchProperties);
 
   /**
    * Additionally specify a FetchConfig to use a separate query or lazy loading
@@ -444,7 +444,7 @@ public interface Query<T> extends Serializable {
    *
    * }</pre>
    */
-  public Query<T> fetch(String assocProperty, String fetchProperties, FetchConfig fetchConfig);
+  Query<T> fetch(String assocProperty, String fetchProperties, FetchConfig fetchConfig);
 
   /**
    * Specify a path to load including all its properties.
@@ -465,7 +465,7 @@ public interface Query<T> extends Serializable {
    * @param path
    *          the property of an associated (1-1,1-M,M-1,M-M) bean.
    */
-  public Query<T> fetch(String path);
+  Query<T> fetch(String path);
 
   /**
    * Additionally specify a JoinConfig to specify a "query join" and or define
@@ -483,7 +483,7 @@ public interface Query<T> extends Serializable {
    *
    * }</pre>
    */
-  public Query<T> fetch(String path, FetchConfig joinConfig);
+  Query<T> fetch(String path, FetchConfig joinConfig);
 
   /**
    * Apply the path properties replacing the select and fetch clauses.
@@ -491,7 +491,7 @@ public interface Query<T> extends Serializable {
    * This is typically used when the PathProperties is applied to both the query and the JSON output.
    * </p>
    */
-  public Query<T> apply(PathProperties pathProperties);
+  Query<T> apply(PathProperties pathProperties);
 
   /**
    * Execute the query returning the list of Id's.
@@ -501,7 +501,7 @@ public interface Query<T> extends Serializable {
    * 
    * @see EbeanServer#findIds(Query, Transaction)
    */
-  public List<Object> findIds();
+  List<Object> findIds();
 
   /**
    * Execute the query iterating over the results.
@@ -518,7 +518,7 @@ public interface Query<T> extends Serializable {
    * This query will execute against the EbeanServer that was used to create it.
    * </p>
    */
-  public QueryIterator<T> findIterate();
+  QueryIterator<T> findIterate();
 
   /**
    * This is deprecated in favor of #findEachWhile.
@@ -532,7 +532,7 @@ public interface Query<T> extends Serializable {
    *
    * @deprecated
    */
-  public void findVisit(QueryResultVisitor<T> visitor);
+  void findVisit(QueryResultVisitor<T> visitor);
 
   /**
    * Execute the query processing the beans one at a time.
@@ -574,7 +574,7 @@ public interface Query<T> extends Serializable {
    * @param consumer
    *          the consumer used to process the queried beans.
    */
-  public void findEach(QueryEachConsumer<T> consumer);
+  void findEach(QueryEachConsumer<T> consumer);
 
   /**
    * Execute the query using callbacks to a visitor to process the resulting
@@ -607,7 +607,7 @@ public interface Query<T> extends Serializable {
    * @param consumer
    *          the consumer used to process the queried beans.
    */
-  public void findEachWhile(QueryEachWhileConsumer<T> consumer);
+  void findEachWhile(QueryEachWhileConsumer<T> consumer);
 
   /**
    * Execute the query returning the list of objects.
@@ -626,7 +626,7 @@ public interface Query<T> extends Serializable {
    *
    * @see EbeanServer#findList(Query, Transaction)
    */
-  public List<T> findList();
+  List<T> findList();
 
   /**
    * Execute the query returning the set of objects.
@@ -645,7 +645,7 @@ public interface Query<T> extends Serializable {
    *
    * @see EbeanServer#findSet(Query, Transaction)
    */
-  public Set<T> findSet();
+  Set<T> findSet();
 
   /**
    * Execute the query returning a map of the objects.
@@ -668,12 +668,12 @@ public interface Query<T> extends Serializable {
    * 
    * @see EbeanServer#findMap(Query, Transaction)
    */
-  public Map<?, T> findMap();
+  Map<?, T> findMap();
 
   /**
    * Return a typed map specifying the key property and type.
    */
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType);
+  <K> Map<K, T> findMap(String keyProperty, Class<K> keyType);
 
   /**
    * Execute the query returning either a single bean or null (if no matching
@@ -716,7 +716,7 @@ public interface Query<T> extends Serializable {
    * ...
    * }</pre>
    */
-  public T findUnique();
+  T findUnique();
 
   /**
    * Return the count of entities this query should return.
@@ -724,7 +724,7 @@ public interface Query<T> extends Serializable {
    * This is the number of 'top level' or 'root level' entities.
    * </p>
    */
-  public int findRowCount();
+  int findRowCount();
 
   /**
    * Execute find row count query in a background thread.
@@ -736,7 +736,7 @@ public interface Query<T> extends Serializable {
    * 
    * @return a Future object for the row count query
    */
-  public FutureRowCount<T> findFutureRowCount();
+  FutureRowCount<T> findFutureRowCount();
 
   /**
    * Execute find Id's query in a background thread.
@@ -748,7 +748,7 @@ public interface Query<T> extends Serializable {
    * 
    * @return a Future object for the list of Id's
    */
-  public FutureIds<T> findFutureIds();
+  FutureIds<T> findFutureIds();
 
   /**
    * Execute find list query in a background thread.
@@ -759,7 +759,7 @@ public interface Query<T> extends Serializable {
    *
    * @return a Future object for the list result of the query
    */
-  public FutureList<T> findFutureList();
+  FutureList<T> findFutureList();
 
   /**
    * Return a PagedList for this query.
@@ -805,7 +805,7 @@ public interface Query<T> extends Serializable {
    *          The number of beans to return per page.
    * @return The PagedList
    */
-  public PagedList<T> findPagedList(int pageIndex, int pageSize);
+  PagedList<T> findPagedList(int pageIndex, int pageSize);
 
   /**
    * Set a named bind parameter. Named parameters have a colon to prefix the name.
@@ -828,7 +828,7 @@ public interface Query<T> extends Serializable {
    * @param value
    *          the parameter value
    */
-  public Query<T> setParameter(String name, Object value);
+  Query<T> setParameter(String name, Object value);
 
   /**
    * Set an ordered bind parameter according to its position. Note that the
@@ -854,7 +854,7 @@ public interface Query<T> extends Serializable {
    * @param value
    *          the parameter bind value.
    */
-  public Query<T> setParameter(int position, Object value);
+  Query<T> setParameter(int position, Object value);
 
   /**
    * Set the Id value to query. This is used with findUnique().
@@ -876,7 +876,7 @@ public interface Query<T> extends Serializable {
    *
    * }</pre>
    */
-  public Query<T> setId(Object id);
+  Query<T> setId(Object id);
 
   /**
    * Add additional clause(s) to the where clause.
@@ -910,7 +910,7 @@ public interface Query<T> extends Serializable {
    *          named parameters.
    * @return The query object
    */
-  public Query<T> where(String addToWhereClause);
+  Query<T> where(String addToWhereClause);
 
   /**
    * Add a single Expression to the where clause returning the query.
@@ -925,7 +925,7 @@ public interface Query<T> extends Serializable {
    *
    * }</pre>
    */
-  public Query<T> where(Expression expression);
+  Query<T> where(Expression expression);
 
   /**
    * Add Expressions to the where clause with the ability to chain on the
@@ -946,7 +946,7 @@ public interface Query<T> extends Serializable {
    * @see Expr
    * @return The ExpressionList for adding expressions to.
    */
-  public ExpressionList<T> where();
+  ExpressionList<T> where();
 
   /**
    * This applies a filter on the 'many' property list rather than the root
@@ -984,7 +984,7 @@ public interface Query<T> extends Serializable {
    * @return the expression list that you add filter expressions for the many
    *         to.
    */
-  public ExpressionList<T> filterMany(String propertyName);
+  ExpressionList<T> filterMany(String propertyName);
 
   /**
    * Add Expressions to the Having clause return the ExpressionList.
@@ -999,7 +999,7 @@ public interface Query<T> extends Serializable {
    * @see Expr
    * @return The ExpressionList for adding more expressions to.
    */
-  public ExpressionList<T> having();
+  ExpressionList<T> having();
 
   /**
    * Add additional clause(s) to the having clause.
@@ -1022,7 +1022,7 @@ public interface Query<T> extends Serializable {
    *          named parameters.
    * @return The query object
    */
-  public Query<T> having(String addToHavingClause);
+  Query<T> having(String addToHavingClause);
 
   /**
    * Add an expression to the having clause returning the query.
@@ -1039,7 +1039,7 @@ public interface Query<T> extends Serializable {
    *          the expression to add to the having clause.
    * @return the Query object
    */
-  public Query<T> having(Expression addExpressionToHaving);
+  Query<T> having(Expression addExpressionToHaving);
 
   /**
    * Set the order by clause replacing the existing order by clause if there is
@@ -1053,7 +1053,7 @@ public interface Query<T> extends Serializable {
    * This is EXACTLY the same as {@link #order(String)}.
    * </p>
    */
-  public Query<T> orderBy(String orderByClause);
+  Query<T> orderBy(String orderByClause);
 
   /**
    * Set the order by clause replacing the existing order by clause if there is
@@ -1067,7 +1067,7 @@ public interface Query<T> extends Serializable {
    * This is EXACTLY the same as {@link #orderBy(String)}.
    * </p>
    */
-  public Query<T> order(String orderByClause);
+  Query<T> order(String orderByClause);
 
   /**
    * Return the OrderBy so that you can append an ascending or descending
@@ -1080,7 +1080,7 @@ public interface Query<T> extends Serializable {
    * This is EXACTLY the same as {@link #orderBy()}.
    * </p>
    */
-  public OrderBy<T> order();
+  OrderBy<T> order();
 
   /**
    * Return the OrderBy so that you can append an ascending or descending
@@ -1093,7 +1093,7 @@ public interface Query<T> extends Serializable {
    * This is EXACTLY the same as {@link #order()}.
    * </p>
    */
-  public OrderBy<T> orderBy();
+  OrderBy<T> orderBy();
 
   /**
    * Set an OrderBy object to replace any existing OrderBy clause.
@@ -1101,7 +1101,7 @@ public interface Query<T> extends Serializable {
    * This is EXACTLY the same as {@link #setOrderBy(OrderBy)}.
    * </p>
    */
-  public Query<T> setOrder(OrderBy<T> orderBy);
+  Query<T> setOrder(OrderBy<T> orderBy);
 
   /**
    * Set an OrderBy object to replace any existing OrderBy clause.
@@ -1109,29 +1109,29 @@ public interface Query<T> extends Serializable {
    * This is EXACTLY the same as {@link #setOrder(OrderBy)}.
    * </p>
    */
-  public Query<T> setOrderBy(OrderBy<T> orderBy);
+  Query<T> setOrderBy(OrderBy<T> orderBy);
 
   /**
    * Set whether this query uses DISTINCT.
    */
-  public Query<T> setDistinct(boolean isDistinct);
+  Query<T> setDistinct(boolean isDistinct);
 
   /**
    * Return the first row value.
    */
-  public int getFirstRow();
+  int getFirstRow();
 
   /**
    * Set the first row to return for this query.
    * 
    * @param firstRow
    */
-  public Query<T> setFirstRow(int firstRow);
+  Query<T> setFirstRow(int firstRow);
 
   /**
    * Return the max rows for this query.
    */
-  public int getMaxRows();
+  int getMaxRows();
 
   /**
    * Set the maximum number of rows to return in the query.
@@ -1139,7 +1139,7 @@ public interface Query<T> extends Serializable {
    * @param maxRows
    *          the maximum number of rows to return in the query.
    */
-  public Query<T> setMaxRows(int maxRows);
+  Query<T> setMaxRows(int maxRows);
 
   /**
    * Set the property to use as keys for a map.
@@ -1162,7 +1162,7 @@ public interface Query<T> extends Serializable {
    * @param mapKey
    *          the property to use as keys for a map.
    */
-  public Query<T> setMapKey(String mapKey);
+  Query<T> setMapKey(String mapKey);
 
   /**
    * Set this to true to use the bean cache.
@@ -1171,23 +1171,23 @@ public interface Query<T> extends Serializable {
    * returned. In this sense it should be treated as a read only object graph.
    * </p>
    */
-  public Query<T> setUseCache(boolean useBeanCache);
+  Query<T> setUseCache(boolean useBeanCache);
 
   /**
    * Set this to true to use the query cache.
    */
-  public Query<T> setUseQueryCache(boolean useQueryCache);
+  Query<T> setUseQueryCache(boolean useQueryCache);
 
   /**
    * When set to true when you want the returned beans to be read only.
    */
-  public Query<T> setReadOnly(boolean readOnly);
+  Query<T> setReadOnly(boolean readOnly);
 
   /**
    * When set to true all the beans from this query are loaded into the bean
    * cache.
    */
-  public Query<T> setLoadBeanCache(boolean loadBeanCache);
+  Query<T> setLoadBeanCache(boolean loadBeanCache);
 
   /**
    * Set a timeout on this query.
@@ -1200,7 +1200,7 @@ public interface Query<T> extends Serializable {
    * @param secs
    *          the query timeout limit in seconds. Zero means there is no limit.
    */
-  public Query<T> setTimeout(int secs);
+  Query<T> setTimeout(int secs);
 
   /**
    * A hint which for JDBC translates to the Statement.fetchSize().
@@ -1209,7 +1209,7 @@ public interface Query<T> extends Serializable {
    * fetched from the database when more rows are needed for ResultSet.
    * </p>
    */
-  public Query<T> setBufferFetchSizeHint(int fetchSize);
+  Query<T> setBufferFetchSizeHint(int fetchSize);
 
   /**
    * Return the sql that was generated for executing this query.
@@ -1218,21 +1218,21 @@ public interface Query<T> extends Serializable {
    * for informational purposes.
    * </p>
    */
-  public String getGeneratedSql();
+  String getGeneratedSql();
 
   /**
    * executed the select with "for update" which should lock the record
    * "on read"
    */
-  public Query<T> setForUpdate(boolean forUpdate);
+  Query<T> setForUpdate(boolean forUpdate);
 
   /**
    * Return true if this query has forUpdate set.
    */
-  public boolean isForUpdate();
+  boolean isForUpdate();
   
   /**
    * Set root table alias.
    */
-  public Query<T> alias(String alias);
+  Query<T> alias(String alias);
 }

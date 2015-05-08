@@ -51,7 +51,7 @@ public enum TxIsolation {
 
   final int level;
 
-  private TxIsolation(int level) {
+  TxIsolation(int level) {
     this.level = level;
   }
 

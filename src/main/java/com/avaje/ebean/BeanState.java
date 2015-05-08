@@ -16,22 +16,22 @@ public interface BeanState {
    * if any other property is get or set.
    * </p>
    */
-  public boolean isReference();
+  boolean isReference();
 
   /**
    * Return true if the bean is new (and not yet saved).
    */
-  public boolean isNew();
+  boolean isNew();
 
   /**
    * Return true if the bean is new or dirty (and probably needs to be saved).
    */
-  public boolean isNewOrDirty();
+  boolean isNewOrDirty();
 
   /**
    * Return true if the bean has been changed but not yet saved.
    */
-  public boolean isDirty();
+  boolean isDirty();
 
   /**
    * For partially populated beans returns the properties that are loaded on the
@@ -40,17 +40,17 @@ public interface BeanState {
    * Accessing another property will cause lazy loading to occur.
    * </p>
    */
-  public Set<String> getLoadedProps();
+  Set<String> getLoadedProps();
 
   /**
    * Return the set of changed properties.
    */
-  public Set<String> getChangedProps();
+  Set<String> getChangedProps();
 
   /**
    * Return a map of the updated properties and their new and old values.
    */
-  public Map<String,ValuePair> getDirtyValues();
+  Map<String,ValuePair> getDirtyValues();
   
   /**
    * Return true if the bean is readOnly.
@@ -58,22 +58,22 @@ public interface BeanState {
    * If a setter is called on a readOnly bean it will throw an exception.
    * </p>
    */
-  public boolean isReadOnly();
+  boolean isReadOnly();
 
   /**
    * Set the readOnly status for the bean.
    */
-  public void setReadOnly(boolean readOnly);
+  void setReadOnly(boolean readOnly);
 
   /**
    * Add a propertyChangeListener.
    */
-  public void addPropertyChangeListener(PropertyChangeListener listener);
+  void addPropertyChangeListener(PropertyChangeListener listener);
 
   /**
    * Remove a propertyChangeListener.
    */
-  public void removePropertyChangeListener(PropertyChangeListener listener);
+  void removePropertyChangeListener(PropertyChangeListener listener);
 
   /**
    * Advanced - Used to programmatically build a partially or fully loaded
@@ -82,5 +82,5 @@ public interface BeanState {
    * and then call this method specifying which properties where loaded or null
    * for a fully loaded entity bean.
    */
-  public void setLoaded();
+  void setLoaded();
 }

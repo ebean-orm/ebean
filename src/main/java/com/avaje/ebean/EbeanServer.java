@@ -103,30 +103,30 @@ public interface EbeanServer {
    *          if true then deregister the JDBC driver if it is the EbeanORM
    *          DataSource implementation.
    */
-  public void shutdown(boolean shutdownDataSource, boolean deregisterDriver);
+  void shutdown(boolean shutdownDataSource, boolean deregisterDriver);
   
   /**
    * Return the AdminAutofetch which is used to control and configure the
    * Autofetch service at runtime.
    */
-  public AdminAutofetch getAdminAutofetch();
+  AdminAutofetch getAdminAutofetch();
 
   /**
    * Return the name. This is used with {@link Ebean#getServer(String)} to get a
    * EbeanServer that was registered with the Ebean singleton.
    */
-  public String getName();
+  String getName();
 
   /**
    * Return the ExpressionFactory for this server.
    */
-  public ExpressionFactory getExpressionFactory();
+  ExpressionFactory getExpressionFactory();
 
   /**
    * Return the MetaInfoManager which is used to get meta data from the EbeanServer
    * such as query execution statistics.
    */
-  public MetaInfoManager getMetaInfoManager();
+  MetaInfoManager getMetaInfoManager();
 
   /**
    * Return the BeanState for a given entity bean.
@@ -134,12 +134,12 @@ public interface EbeanServer {
    * This will return null if the bean is not an enhanced entity bean.
    * </p>
    */
-  public BeanState getBeanState(Object bean);
+  BeanState getBeanState(Object bean);
 
   /**
    * Return the value of the Id property for a given bean.
    */
-  public Object getBeanId(Object bean);
+  Object getBeanId(Object bean);
 
   /**
    * Return a map of the differences between two objects of the same type.
@@ -148,7 +148,7 @@ public interface EbeanServer {
    * difference comparison.
    * </p>
    */
-  public Map<String, ValuePair> diff(Object a, Object b);
+  Map<String, ValuePair> diff(Object a, Object b);
 
   /**
    * Create a new instance of T that is an EntityBean.
@@ -157,12 +157,12 @@ public interface EbeanServer {
    * favour of always using enhancement).
    * </p>
    */
-  public <T> T createEntityBean(Class<T> type);
+  <T> T createEntityBean(Class<T> type);
 
   /**
    * Create a CsvReader for a given beanType.
    */
-  public <T> CsvReader<T> createCsvReader(Class<T> beanType);
+  <T> CsvReader<T> createCsvReader(Class<T> beanType);
 
   /**
    * Return a named Query that will have defined fetch paths, predicates etc.
@@ -182,7 +182,7 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  public <T> Query<T> createNamedQuery(Class<T> beanType, String namedQuery);
+  <T> Query<T> createNamedQuery(Class<T> beanType, String namedQuery);
 
   /**
    * Create a query using the query language.
@@ -208,14 +208,14 @@ public interface EbeanServer {
    * @param query
    *          the object query
    */
-  public <T> Query<T> createQuery(Class<T> beanType, String query);
+  <T> Query<T> createQuery(Class<T> beanType, String query);
 
   /**
    * Create a query for an entity bean and synonym for {@link #find(Class)}.
    *
    * @see #find(Class)
    */
-  public <T> Query<T> createQuery(Class<T> beanType);
+  <T> Query<T> createQuery(Class<T> beanType);
 
   /**
    * Create a query for a type of entity bean.
@@ -257,7 +257,7 @@ public interface EbeanServer {
    * }</pre>
    *
    */
-  public <T> Query<T> find(Class<T> beanType);
+  <T> Query<T> find(Class<T> beanType);
 
   /**
    * Return the next unique identity value for a given bean type.
@@ -271,7 +271,7 @@ public interface EbeanServer {
    * complex cases where it is useful to get an ID prior to some processing.
    * </p>
    */
-  public Object nextId(Class<?> beanType);
+  Object nextId(Class<?> beanType);
 
   /**
    * Create a filter for sorting and filtering lists of entities locally without
@@ -283,7 +283,7 @@ public interface EbeanServer {
    * Refer to {@link Filter} for an example of its use.
    * </p>
    */
-  public <T> Filter<T> filter(Class<T> beanType);
+  <T> Filter<T> filter(Class<T> beanType);
 
   /**
    * Sort the list in memory using the sortByClause which can contain a comma delimited
@@ -327,7 +327,7 @@ public interface EbeanServer {
    * @param sortByClause
    *          the properties to sort the list by
    */
-  public <T> void sort(List<T> list, String sortByClause);
+  <T> void sort(List<T> list, String sortByClause);
 
   /**
    * Create a named orm update. The update statement is specified via the
@@ -383,7 +383,7 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  public <T> Update<T> createNamedUpdate(Class<T> beanType, String namedUpdate);
+  <T> Update<T> createNamedUpdate(Class<T> beanType, String namedUpdate);
 
   /**
    * Create a orm update where you will supply the insert/update or delete
@@ -414,7 +414,7 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  public <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate);
+  <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate);
 
   /**
    * Create a SqlQuery for executing native sql
@@ -424,7 +424,7 @@ public interface EbeanServer {
    * annotation for examples.
    * </p>
    */
-  public SqlQuery createSqlQuery(String sql);
+  SqlQuery createSqlQuery(String sql);
 
   /**
    * Create a named sql query.
@@ -435,7 +435,7 @@ public interface EbeanServer {
    * @param namedQuery
    *          the name of the query
    */
-  public SqlQuery createNamedSqlQuery(String namedQuery);
+  SqlQuery createNamedSqlQuery(String namedQuery);
 
   /**
    * Create a sql update for executing native dml statements.
@@ -451,12 +451,12 @@ public interface EbeanServer {
    * xml file (named update) and use {@link #createNamedSqlUpdate(String)} .
    * </p>
    */
-  public SqlUpdate createSqlUpdate(String sql);
+  SqlUpdate createSqlUpdate(String sql);
 
   /**
    * Create a CallableSql to execute a given stored procedure.
    */
-  public CallableSql createCallableSql(String callableSql);
+  CallableSql createCallableSql(String callableSql);
 
   /**
    * Create a named sql update.
@@ -477,7 +477,7 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  public SqlUpdate createNamedSqlUpdate(String namedQuery);
+  SqlUpdate createNamedSqlUpdate(String namedQuery);
 
   /**
    * Register a TransactionCallback on the currently active transaction.
@@ -488,7 +488,7 @@ public interface EbeanServer {
    *
    * @throws PersistenceException If there is no currently active transaction
    */
-  public void register(TransactionCallback transactionCallback) throws PersistenceException;
+  void register(TransactionCallback transactionCallback) throws PersistenceException;
 
   /**
    * Create a new transaction that is not held in TransactionThreadLocal.
@@ -498,7 +498,7 @@ public interface EbeanServer {
    * management.
    * </p>
    */
-  public Transaction createTransaction();
+  Transaction createTransaction();
 
   /**
    * Create a new transaction additionally specifying the isolation level.
@@ -506,7 +506,7 @@ public interface EbeanServer {
    * Note that this transaction is NOT stored in a thread local.
    * </p>
    */
-  public Transaction createTransaction(TxIsolation isolation);
+  Transaction createTransaction(TxIsolation isolation);
 
   /**
    * Start a new explicit transaction putting it into a ThreadLocal.
@@ -579,12 +579,12 @@ public interface EbeanServer {
    * EbeanServer yourself.
    * </p>
    */
-  public Transaction beginTransaction();
+  Transaction beginTransaction();
 
   /**
    * Start a transaction additionally specifying the isolation level.
    */
-  public Transaction beginTransaction(TxIsolation isolation);
+  Transaction beginTransaction(TxIsolation isolation);
 
   /**
    * Start a transaction typically specifying REQUIRES_NEW or REQUIRED semantics.
@@ -637,22 +637,22 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  public Transaction beginTransaction(TxScope scope);
+  Transaction beginTransaction(TxScope scope);
 
   /**
    * Returns the current transaction or null if there is no current transaction in scope.
    */
-  public Transaction currentTransaction();
+  Transaction currentTransaction();
 
   /**
    * Commit the current transaction.
    */
-  public void commitTransaction();
+  void commitTransaction();
 
   /**
    * Rollback the current transaction.
    */
-  public void rollbackTransaction();
+  void rollbackTransaction();
 
   /**
    * If the current transaction has already been committed do nothing otherwise
@@ -683,7 +683,7 @@ public interface EbeanServer {
    * </p>
    *
    */
-  public void endTransaction();
+  void endTransaction();
 
   /**
    * Refresh the values of a bean.
@@ -692,7 +692,7 @@ public interface EbeanServer {
    * are accessed a lazy load will refresh the many property.
    * </p>
    */
-  public void refresh(Object bean);
+  void refresh(Object bean);
 
   /**
    * Refresh a many property of an entity bean.
@@ -703,7 +703,7 @@ public interface EbeanServer {
    *          the 'many' property to be refreshed
    *
    */
-  public void refreshMany(Object bean, String propertyName);
+  void refreshMany(Object bean, String propertyName);
 
   /**
    * Find a bean using its unique id.
@@ -753,7 +753,7 @@ public interface EbeanServer {
    * @param id
    *          the id value
    */
-  public <T> T find(Class<T> beanType, Object id);
+  <T> T find(Class<T> beanType, Object id);
 
   /**
    * Get a reference object.
@@ -798,7 +798,7 @@ public interface EbeanServer {
    * @param id
    *          the id value
    */
-  public <T> T getReference(Class<T> beanType, Object id);
+  <T> T getReference(Class<T> beanType, Object id);
 
   /**
    * Return the number of 'top level' or 'root' entities this query should
@@ -807,14 +807,14 @@ public interface EbeanServer {
    * @see Query#findRowCount()
    * @see com.avaje.ebean.Query#findFutureRowCount()
    */
-  public <T> int findRowCount(Query<T> query, Transaction transaction);
+  <T> int findRowCount(Query<T> query, Transaction transaction);
 
   /**
    * Return the Id values of the query as a List.
    *
    * @see com.avaje.ebean.Query#findIds()
    */
-  public <T> List<Object> findIds(Query<T> query, Transaction transaction);
+  <T> List<Object> findIds(Query<T> query, Transaction transaction);
 
   /**
    * Return a QueryIterator for the query.
@@ -832,7 +832,7 @@ public interface EbeanServer {
    * @see Query#findEach(QueryEachConsumer)
    * @see Query#findEachWhile(QueryEachWhileConsumer)
    */
-  public <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction);
+  <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction);
 
   /**
    * Execute the query visiting the each bean one at a time.
@@ -862,7 +862,7 @@ public interface EbeanServer {
    * @see Query#findEach(QueryEachConsumer)
    * @see Query#findEachWhile(QueryEachWhileConsumer)
    */
-  public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction transaction);
+  <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction transaction);
 
   /**
    * Execute the query visiting the each bean one at a time.
@@ -899,7 +899,7 @@ public interface EbeanServer {
    * @see Query#findEach(QueryEachConsumer)
    * @see Query#findEachWhile(QueryEachWhileConsumer)
    */
-  public <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer, Transaction transaction);
+  <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer, Transaction transaction);
 
   /**
    * Deprecated in favor of #findEachWhile which is functionally exactly the same
@@ -912,7 +912,7 @@ public interface EbeanServer {
    *
    * @deprecated
    */
-  public <T> void findVisit(Query<T> query, QueryResultVisitor<T> visitor, Transaction transaction);
+  <T> void findVisit(Query<T> query, QueryResultVisitor<T> visitor, Transaction transaction);
 
   /**
    * Execute a query returning a list of beans.
@@ -941,7 +941,7 @@ public interface EbeanServer {
    *
    * @see Query#findList()
    */
-  public <T> List<T> findList(Query<T> query, Transaction transaction);
+  <T> List<T> findList(Query<T> query, Transaction transaction);
 
   /**
    * Execute find row count query in a background thread.
@@ -959,7 +959,7 @@ public interface EbeanServer {
    *
    * @see com.avaje.ebean.Query#findFutureRowCount()
    */
-  public <T> FutureRowCount<T> findFutureRowCount(Query<T> query, Transaction transaction);
+  <T> FutureRowCount<T> findFutureRowCount(Query<T> query, Transaction transaction);
 
   /**
    * Execute find Id's query in a background thread.
@@ -977,7 +977,7 @@ public interface EbeanServer {
    *
    * @see com.avaje.ebean.Query#findFutureIds()
    */
-  public <T> FutureIds<T> findFutureIds(Query<T> query, Transaction transaction);
+  <T> FutureIds<T> findFutureIds(Query<T> query, Transaction transaction);
 
   /**
    * Execute find list query in a background thread returning a FutureList object.
@@ -997,7 +997,7 @@ public interface EbeanServer {
    *
    * @see Query#findFutureList()
    */
-  public <T> FutureList<T> findFutureList(Query<T> query, Transaction transaction);
+  <T> FutureList<T> findFutureList(Query<T> query, Transaction transaction);
 
   /**
    * Execute find list SQL query in a background thread.
@@ -1013,7 +1013,7 @@ public interface EbeanServer {
    *          the transaction (can be null).
    * @return a Future object for the list result of the query
    */
-  public SqlFutureList findFutureList(SqlQuery query, Transaction transaction);
+  SqlFutureList findFutureList(SqlQuery query, Transaction transaction);
 
   /**
    * Return a PagedList for this query.
@@ -1036,7 +1036,7 @@ public interface EbeanServer {
    *
    * @see Query#findPagedList(int, int)
    */
-  public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction, int pageIndex, int pageSize);
+  <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction, int pageIndex, int pageSize);
 
   /**
    * Execute the query returning a set of entity beans.
@@ -1065,7 +1065,7 @@ public interface EbeanServer {
    *
    * @see Query#findSet()
    */
-  public <T> Set<T> findSet(Query<T> query, Transaction transaction);
+  <T> Set<T> findSet(Query<T> query, Transaction transaction);
 
   /**
    * Execute the query returning the entity beans in a Map.
@@ -1085,7 +1085,7 @@ public interface EbeanServer {
    *
    * @see Query#findMap()
    */
-  public <T> Map<?, T> findMap(Query<T> query, Transaction transaction);
+  <T> Map<?, T> findMap(Query<T> query, Transaction transaction);
 
   /**
    * Execute the query returning at most one entity bean. This will throw a
@@ -1106,7 +1106,7 @@ public interface EbeanServer {
    *
    * @see Query#findUnique()
    */
-  public <T> T findUnique(Query<T> query, Transaction transaction);
+  <T> T findUnique(Query<T> query, Transaction transaction);
 
   /**
    * Execute the sql query returning a list of MapBean.
@@ -1124,7 +1124,7 @@ public interface EbeanServer {
    *
    * @see SqlQuery#findList()
    */
-  public List<SqlRow> findList(SqlQuery query, Transaction transaction);
+  List<SqlRow> findList(SqlQuery query, Transaction transaction);
 
   /**
    * Execute the sql query returning a set of MapBean.
@@ -1142,7 +1142,7 @@ public interface EbeanServer {
    *
    * @see SqlQuery#findSet()
    */
-  public Set<SqlRow> findSet(SqlQuery query, Transaction transaction);
+  Set<SqlRow> findSet(SqlQuery query, Transaction transaction);
 
   /**
    * Execute the sql query returning a map of MapBean.
@@ -1160,7 +1160,7 @@ public interface EbeanServer {
    *
    * @see SqlQuery#findMap()
    */
-  public Map<?, SqlRow> findMap(SqlQuery query, Transaction transaction);
+  Map<?, SqlRow> findMap(SqlQuery query, Transaction transaction);
 
   /**
    * Execute the sql query returning a single MapBean or null.
@@ -1182,7 +1182,7 @@ public interface EbeanServer {
    *
    * @see SqlQuery#findUnique()
    */
-  public SqlRow findUnique(SqlQuery query, Transaction transaction);
+  SqlRow findUnique(SqlQuery query, Transaction transaction);
 
   /**
    * Either Insert or Update the bean depending on its state.
@@ -1217,17 +1217,17 @@ public interface EbeanServer {
    * will be set against each order detail when it is saved.
    * </p>
    */
-  public void save(Object bean) throws OptimisticLockException;
+  void save(Object bean) throws OptimisticLockException;
 
   /**
    * Save all the beans in the iterator.
    */
-  public int save(Iterator<?> it) throws OptimisticLockException;
+  int save(Iterator<?> it) throws OptimisticLockException;
 
   /**
    * Save all the beans in the collection.
    */
-  public int save(Collection<?> beans) throws OptimisticLockException;
+  int save(Collection<?> beans) throws OptimisticLockException;
 
   /**
    * Delete the bean.
@@ -1236,38 +1236,38 @@ public interface EbeanServer {
    * you automatically.
    * </p>
    */
-  public void delete(Object bean) throws OptimisticLockException;
+  void delete(Object bean) throws OptimisticLockException;
 
   /**
    * Delete all the beans from an Iterator.
    */
-  public int delete(Iterator<?> it) throws OptimisticLockException;
+  int delete(Iterator<?> it) throws OptimisticLockException;
 
   /**
    * Delete all the beans in the collection.
    */
-  public int delete(Collection<?> c) throws OptimisticLockException;
+  int delete(Collection<?> c) throws OptimisticLockException;
 
   /**
    * Delete the bean given its type and id.
    */
-  public int delete(Class<?> beanType, Object id);
+  int delete(Class<?> beanType, Object id);
 
   /**
    * Delete the bean given its type and id with an explicit transaction.
    */
-  public int delete(Class<?> beanType, Object id, Transaction transaction);
+  int delete(Class<?> beanType, Object id, Transaction transaction);
 
   /**
    * Delete several beans given their type and id values.
    */
-  public void delete(Class<?> beanType, Collection<?> ids);
+  void delete(Class<?> beanType, Collection<?> ids);
 
   /**
    * Delete several beans given their type and id values with an explicit
    * transaction.
    */
-  public void delete(Class<?> beanType, Collection<?> ids, Transaction transaction);
+  void delete(Class<?> beanType, Collection<?> ids, Transaction transaction);
 
   /**
    * Execute a Sql Update Delete or Insert statement. This returns the number of
@@ -1310,7 +1310,7 @@ public interface EbeanServer {
    *
    * @see CallableSql
    */
-  public int execute(SqlUpdate sqlUpdate);
+  int execute(SqlUpdate sqlUpdate);
 
   /**
    * Execute a ORM insert update or delete statement using the current
@@ -1319,13 +1319,13 @@ public interface EbeanServer {
    * This returns the number of rows that where inserted, updated or deleted.
    * </p>
    */
-  public int execute(Update<?> update);
+  int execute(Update<?> update);
 
   /**
    * Execute a ORM insert update or delete statement with an explicit
    * transaction.
    */
-  public int execute(Update<?> update, Transaction t);
+  int execute(Update<?> update, Transaction t);
 
   /**
    * For making calls to stored procedures.
@@ -1352,7 +1352,7 @@ public interface EbeanServer {
    * @see CallableSql
    * @see Ebean#execute(SqlUpdate)
    */
-  public int execute(CallableSql callableSql);
+  int execute(CallableSql callableSql);
 
   /**
    * Inform Ebean that tables have been modified externally. These could be the
@@ -1388,7 +1388,7 @@ public interface EbeanServer {
    * @param deleted
    *          true if rows on the table where deleted
    */
-  public void externalModification(String tableName, boolean inserted, boolean updated, boolean deleted);
+  void externalModification(String tableName, boolean inserted, boolean updated, boolean deleted);
 
   /**
    * Find a entity bean with an explicit transaction.
@@ -1402,22 +1402,22 @@ public interface EbeanServer {
    * @param transaction
    *          the transaction to use (can be null)
    */
-  public <T> T find(Class<T> beanType, Object uid, Transaction transaction);
+  <T> T find(Class<T> beanType, Object uid, Transaction transaction);
 
   /**
    * Insert or update a bean with an explicit transaction.
    */
-  public void save(Object bean, Transaction transaction) throws OptimisticLockException;
+  void save(Object bean, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Save all the beans in the iterator with an explicit transaction.
    */
-  public int save(Iterator<?> it, Transaction transaction) throws OptimisticLockException;
+  int save(Iterator<?> it, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Save all the beans in the collection with an explicit transaction.
    */
-  public int save(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
+  int save(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Marks the entity bean as dirty.
@@ -1439,7 +1439,7 @@ public interface EbeanServer {
    * 
    * }</pre>
    */
-  public void markAsDirty(Object bean);
+  void markAsDirty(Object bean);
   
   /**
    * Saves the bean using an update. If you know you are updating a bean then it is preferrable to
@@ -1477,12 +1477,12 @@ public interface EbeanServer {
    * @see ServerConfig#setUpdatesDeleteMissingChildren(boolean)
    * @see ServerConfig#setUpdateChangesOnly(boolean)
    */
-  public void update(Object bean) throws OptimisticLockException;
+  void update(Object bean) throws OptimisticLockException;
 
   /**
    * Update a bean additionally specifying a transaction.
    */
-  public void update(Object bean, Transaction t) throws OptimisticLockException;
+  void update(Object bean, Transaction t) throws OptimisticLockException;
 
   /**
    * Update a bean additionally specifying a transaction and the deleteMissingChildren setting.
@@ -1496,18 +1496,18 @@ public interface EbeanServer {
    *          or ManyToMany to be automatically deleted.
 
    */
-  public void update(Object bean, Transaction transaction, boolean deleteMissingChildren) throws OptimisticLockException;
+  void update(Object bean, Transaction transaction, boolean deleteMissingChildren) throws OptimisticLockException;
 
   /**
    * Update a collection of beans. If there is no current transaction one is created and used to
    * update all the beans in the collection.
    */
-  public void update(Collection<?> beans) throws OptimisticLockException;
+  void update(Collection<?> beans) throws OptimisticLockException;
 
   /**
    * Update a collection of beans with an explicit transaction.
    */
-  public void update(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
+  void update(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
   
   /**
    * Insert the bean.
@@ -1517,23 +1517,23 @@ public interface EbeanServer {
    * and want to insert them into another database (and you want to explicitly insert them).
    * </p>
    */
-  public void insert(Object bean);
+  void insert(Object bean);
 
   /**
    * Insert the bean with a transaction.
    */
-  public void insert(Object bean, Transaction t);
+  void insert(Object bean, Transaction t);
 
   /**
    * Insert a collection of beans. If there is no current transaction one is created and used to
    * insert all the beans in the collection.
    */
-  public void insert(Collection<?> beans);
+  void insert(Collection<?> beans);
 
   /**
    * Insert a collection of beans with an explicit transaction.
    */
-  public void insert(Collection<?> beans, Transaction t);
+  void insert(Collection<?> beans, Transaction t);
 
   /**
    * Delete the associations (from the intersection table) of a ManyToMany given
@@ -1545,7 +1545,7 @@ public interface EbeanServer {
    * 
    * @return the number of associations deleted (from the intersection table).
    */
-  public int deleteManyToManyAssociations(Object ownerBean, String propertyName);
+  int deleteManyToManyAssociations(Object ownerBean, String propertyName);
 
   /**
    * Delete the associations (from the intersection table) of a ManyToMany given
@@ -1560,7 +1560,7 @@ public interface EbeanServer {
    * 
    * @return the number of associations deleted (from the intersection table).
    */
-  public int deleteManyToManyAssociations(Object ownerBean, String propertyName, Transaction t);
+  int deleteManyToManyAssociations(Object ownerBean, String propertyName, Transaction t);
 
   /**
    * Save the associations of a ManyToMany given the owner bean and the
@@ -1571,7 +1571,7 @@ public interface EbeanServer {
    * way to invoke those insertions directly.
    * </p>
    */
-  public void saveManyToManyAssociations(Object ownerBean, String propertyName);
+  void saveManyToManyAssociations(Object ownerBean, String propertyName);
 
   /**
    * Save the associations of a ManyToMany given the owner bean and the
@@ -1582,7 +1582,7 @@ public interface EbeanServer {
    * way to invoke those insertions directly.
    * </p>
    */
-  public void saveManyToManyAssociations(Object ownerBean, String propertyName, Transaction t);
+  void saveManyToManyAssociations(Object ownerBean, String propertyName, Transaction t);
 
   /**
    * Save the associated collection or bean given the property name.
@@ -1600,7 +1600,7 @@ public interface EbeanServer {
    * @param propertyName
    *          the property we want to save
    */
-  public void saveAssociation(Object ownerBean, String propertyName);
+  void saveAssociation(Object ownerBean, String propertyName);
 
   /**
    * Save the associated collection or bean given the property name with a
@@ -1619,27 +1619,27 @@ public interface EbeanServer {
    * @param propertyName
    *          the property we want to save
    */
-  public void saveAssociation(Object ownerBean, String propertyName, Transaction t);
+  void saveAssociation(Object ownerBean, String propertyName, Transaction t);
 
   /**
    * Delete the bean with an explicit transaction.
    */
-  public void delete(Object bean, Transaction t) throws OptimisticLockException;
+  void delete(Object bean, Transaction t) throws OptimisticLockException;
 
   /**
    * Delete all the beans from an iterator.
    */
-  public int delete(Iterator<?> it, Transaction t) throws OptimisticLockException;
+  int delete(Iterator<?> it, Transaction t) throws OptimisticLockException;
 
   /**
    * Execute explicitly passing a transaction.
    */
-  public int execute(SqlUpdate updSql, Transaction t);
+  int execute(SqlUpdate updSql, Transaction t);
 
   /**
    * Execute explicitly passing a transaction.
    */
-  public int execute(CallableSql callableSql, Transaction t);
+  int execute(CallableSql callableSql, Transaction t);
 
   /**
    * Execute a TxRunnable in a Transaction with an explicit scope.
@@ -1662,7 +1662,7 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  public void execute(TxScope scope, TxRunnable r);
+  void execute(TxScope scope, TxRunnable r);
 
   /**
    * Execute a TxRunnable in a Transaction with the default scope.
@@ -1688,7 +1688,7 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  public void execute(TxRunnable r);
+  void execute(TxRunnable r);
 
   /**
    * Execute a TxCallable in a Transaction with an explicit scope.
@@ -1712,7 +1712,7 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  public <T> T execute(TxScope scope, TxCallable<T> c);
+  <T> T execute(TxScope scope, TxCallable<T> c);
 
   /**
    * Execute a TxCallable in a Transaction with the default scope.
@@ -1744,19 +1744,19 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  public <T> T execute(TxCallable<T> c);
+  <T> T execute(TxCallable<T> c);
 
   /**
    * Return the manager of the server cache ("L2" cache).
    * 
    */
-  public ServerCacheManager getServerCacheManager();
+  ServerCacheManager getServerCacheManager();
 
   /**
    * Return the BackgroundExecutor service for asynchronous processing of
    * queries.
    */
-  public BackgroundExecutor getBackgroundExecutor();
+  BackgroundExecutor getBackgroundExecutor();
 
   /**
    * Run the cache warming queries on all bean types that have one defined.
@@ -1764,7 +1764,7 @@ public interface EbeanServer {
    * A cache warming query can be defined via {@link CacheStrategy}.
    * </p>
    */
-  public void runCacheWarming();
+  void runCacheWarming();
 
   /**
    * Run the cache warming query for a specific bean type.
@@ -1772,13 +1772,13 @@ public interface EbeanServer {
    * A cache warming query can be defined via {@link CacheStrategy}.
    * </p>
    */
-  public void runCacheWarming(Class<?> beanType);
+  void runCacheWarming(Class<?> beanType);
 
   /**
    * Return the JsonContext for reading/writing JSON.
    * @deprecated Please use #json instead.
    */
-  public JsonContext createJsonContext();
+  JsonContext createJsonContext();
 
   /**
    * Return the JsonContext for reading/writing JSON.
@@ -1818,6 +1818,6 @@ public interface EbeanServer {
    * @see com.avaje.ebean.text.PathProperties
    * @see Query#apply(com.avaje.ebean.text.PathProperties)
    */
-  public JsonContext json();
+  JsonContext json();
 
 }

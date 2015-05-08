@@ -23,7 +23,7 @@ public interface BackgroundExecutor {
   /**
    * Execute a task in the background.
    */
-  public void execute(Runnable r);
+  void execute(Runnable r);
 
   /**
    * Execute a task periodically with a fixed delay between each execution.
@@ -36,5 +36,5 @@ public interface BackgroundExecutor {
    * {@link ScheduledExecutorService#scheduleWithFixedDelay(Runnable, long, long, TimeUnit)}
    * </p>
    */
-  public void executePeriodically(Runnable r, long delay, TimeUnit unit);
+  void executePeriodically(Runnable r, long delay, TimeUnit unit);
 }

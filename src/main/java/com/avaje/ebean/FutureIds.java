@@ -17,7 +17,7 @@ public interface FutureIds<T> extends Future<List<Object>> {
   /**
    * Returns the original query used to fetch the Id's.
    */
-  public Query<T> getQuery();
+  Query<T> getQuery();
 
   /**
    * Return the list of Id's which could be partially populated.
@@ -30,5 +30,5 @@ public interface FutureIds<T> extends Future<List<Object>> {
    * {@link Future#get()} method instead of this one.
    * </p>
    */
-  public List<Object> getPartialIds();
+  List<Object> getPartialIds();
 }

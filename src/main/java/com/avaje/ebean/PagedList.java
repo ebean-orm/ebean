@@ -83,7 +83,7 @@ public interface PagedList<T> {
    * wrapped in the unchecked PersistenceException (which might be preferrable).
    * </p>
    */
-  public void loadRowCount();
+  void loadRowCount();
 
   /**
    * Return the Future row count. You might get this if you wish to cancel the total row count query
@@ -111,12 +111,12 @@ public interface PagedList<T> {
    *
    * }</pre>
    */
-  public Future<Integer> getFutureRowCount();
+  Future<Integer> getFutureRowCount();
 
   /**
    * Return the list of entities for this page.
    */
-  public List<T> getList();
+  List<T> getList();
 
   /**
    * Return the total row count for all pages.
@@ -143,7 +143,7 @@ public interface PagedList<T> {
    *
    * }</pre>
    */
-  public int getTotalRowCount();
+  int getTotalRowCount();
 
   /**
    * Return the total number of pages based on the page size and total row count.
@@ -152,12 +152,12 @@ public interface PagedList<T> {
    * the total row count query if it has not already been invoked.
    * </p>
    */
-  public int getTotalPageCount();
+  int getTotalPageCount();
 
   /**
    * Return the index position of this page. Zero based.
    */
-  public int getPageIndex();
+  int getPageIndex();
 
   /**
    * Return true if there is a next page.
@@ -166,12 +166,12 @@ public interface PagedList<T> {
    * the total row count query if it has not already been invoked.
    * </p>
    */
-  public boolean hasNext();
+  boolean hasNext();
 
   /**
    * Return true if there is a previous page.
    */
-  public boolean hasPrev();
+  boolean hasPrev();
 
   /**
    * Helper method to return a "X to Y of Z" string for this page where X is the first row, Y the
@@ -188,5 +188,5 @@ public interface PagedList<T> {
    * 
    * @return String of the format XtoYofZ.
    */
-  public String getDisplayXtoYofZ(String to, String of);
+  String getDisplayXtoYofZ(String to, String of);
 }

@@ -44,22 +44,22 @@ public interface SqlQuery extends Serializable {
    * This must be called from a different thread to the one executing the query.
    * </p>
    */
-  public void cancel();
+  void cancel();
 
   /**
    * Execute the query returning a list.
    */
-  public List<SqlRow> findList();
+  List<SqlRow> findList();
 
   /**
    * Execute the query returning a set.
    */
-  public Set<SqlRow> findSet();
+  Set<SqlRow> findSet();
 
   /**
    * Execute the query returning a map.
    */
-  public Map<?, SqlRow> findMap();
+  Map<?, SqlRow> findMap();
 
   /**
    * Execute the query returning a single row or null.
@@ -68,7 +68,7 @@ public interface SqlQuery extends Serializable {
    * PersistenceException.
    * </p>
    */
-  public SqlRow findUnique();
+  SqlRow findUnique();
 
   /**
    * Execute find list SQL query in a background thread.
@@ -81,17 +81,17 @@ public interface SqlQuery extends Serializable {
    * @return a Future object for the list result of the query
    * @deprecated
    */
-  public SqlFutureList findFutureList();
+  SqlFutureList findFutureList();
 
   /**
    * The same as bind for named parameters.
    */
-  public SqlQuery setParameter(String name, Object value);
+  SqlQuery setParameter(String name, Object value);
 
   /**
    * The same as bind for positioned parameters.
    */
-  public SqlQuery setParameter(int position, Object value);
+  SqlQuery setParameter(int position, Object value);
 
   /**
    * Set a listener to process the query on a row by row basis.
@@ -104,27 +104,27 @@ public interface SqlQuery extends Serializable {
    * entire query result in memory.
    * </p>
    */
-  public SqlQuery setListener(SqlQueryListener queryListener);
+  SqlQuery setListener(SqlQueryListener queryListener);
 
   /**
    * Set the index of the first row of the results to return.
    */
-  public SqlQuery setFirstRow(int firstRow);
+  SqlQuery setFirstRow(int firstRow);
 
   /**
    * Set the maximum number of query results to return.
    */
-  public SqlQuery setMaxRows(int maxRows);
+  SqlQuery setMaxRows(int maxRows);
 
   /**
    * Set the index after which fetching continues in a background thread.
    */
-  public SqlQuery setBackgroundFetchAfter(int backgroundFetchAfter);
+  SqlQuery setBackgroundFetchAfter(int backgroundFetchAfter);
 
   /**
    * Set the column to use to determine the keys for a Map.
    */
-  public SqlQuery setMapKey(String mapKey);
+  SqlQuery setMapKey(String mapKey);
 
   /**
    * Set a timeout on this query.
@@ -137,7 +137,7 @@ public interface SqlQuery extends Serializable {
    * @param secs
    *          the query timeout limit in seconds. Zero means there is no limit.
    */
-  public SqlQuery setTimeout(int secs);
+  SqlQuery setTimeout(int secs);
 
   /**
    * A hint which for JDBC translates to the Statement.fetchSize().
@@ -146,6 +146,6 @@ public interface SqlQuery extends Serializable {
    * fetched from the database when more rows are needed for ResultSet.
    * </p>
    */
-  public SqlQuery setBufferFetchSizeHint(int bufferFetchSizeHint);
+  SqlQuery setBufferFetchSizeHint(int bufferFetchSizeHint);
 
 }

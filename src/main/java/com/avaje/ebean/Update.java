@@ -54,7 +54,7 @@ public interface Update<T> {
   /**
    * Return the name if it is a named update.
    */
-  public String getName();
+  String getName();
 
   /**
    * Set this to false if you do not want the cache to invalidate related
@@ -64,7 +64,7 @@ public interface Update<T> {
    * parts of the "L2" server cache.
    * </p>
    */
-  public Update<T> setNotifyCache(boolean notifyCache);
+  Update<T> setNotifyCache(boolean notifyCache);
 
   /**
    * Set a timeout for statement execution.
@@ -77,12 +77,12 @@ public interface Update<T> {
    * @param secs
    *          the timeout in seconds. Zero implies unlimited.
    */
-  public Update<T> setTimeout(int secs);
+  Update<T> setTimeout(int secs);
 
   /**
    * Execute the statement returning the number of rows modified.
    */
-  public int execute();
+  int execute();
 
   /**
    * Set an ordered bind parameter.
@@ -98,7 +98,7 @@ public interface Update<T> {
    * @param value
    *          the parameter value to bind.
    */
-  public Update<T> set(int position, Object value);
+  Update<T> set(int position, Object value);
 
   /**
    * Set and ordered bind parameter (same as bind).
@@ -108,7 +108,7 @@ public interface Update<T> {
    * @param value
    *          the parameter value to bind.
    */
-  public Update<T> setParameter(int position, Object value);
+  Update<T> setParameter(int position, Object value);
 
   /**
    * Set an ordered parameter that is null. The JDBC type of the null must be
@@ -117,12 +117,12 @@ public interface Update<T> {
    * position starts at value 1 (not 0) to be consistent with PreparedStatement.
    * </p>
    */
-  public Update<T> setNull(int position, int jdbcType);
+  Update<T> setNull(int position, int jdbcType);
 
   /**
    * Set an ordered parameter that is null (same as bind).
    */
-  public Update<T> setNullParameter(int position, int jdbcType);
+  Update<T> setNullParameter(int position, int jdbcType);
 
   /**
    * Set a named parameter. Named parameters have a colon to prefix the name.
@@ -135,12 +135,12 @@ public interface Update<T> {
    * @param value
    *          the parameter value.
    */
-  public Update<T> set(String name, Object value);
+  Update<T> set(String name, Object value);
 
   /**
    * Bind a named parameter (same as bind).
    */
-  public Update<T> setParameter(String name, Object param);
+  Update<T> setParameter(String name, Object param);
 
   /**
    * Set a named parameter that is null. The JDBC type of the null must be
@@ -154,16 +154,16 @@ public interface Update<T> {
    * @param jdbcType
    *          the type of the property being bound.
    */
-  public Update<T> setNull(String name, int jdbcType);
+  Update<T> setNull(String name, int jdbcType);
 
   /**
    * Bind a named parameter that is null (same as bind).
    */
-  public Update<T> setNullParameter(String name, int jdbcType);
+  Update<T> setNullParameter(String name, int jdbcType);
 
   /**
    * Return the sql that is actually executed.
    */
-  public String getGeneratedSql();
+  String getGeneratedSql();
 
 }

@@ -42,6 +42,6 @@ import java.util.concurrent.Future;
  */
 public interface SqlFutureList extends Future<List<SqlRow>> {
 
-  public SqlQuery getQuery();
+  SqlQuery getQuery();
 
 }
