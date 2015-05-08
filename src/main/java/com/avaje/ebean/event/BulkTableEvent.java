@@ -10,21 +10,21 @@ public interface BulkTableEvent {
   /**
    * Return the name of the table that was involved.
    */
-  public String getTableName();
+  String getTableName();
 
   /**
    * Return true if rows were inserted.
    */
-  public boolean isInsert();
+  boolean isInsert();
 
   /**
    * Return true if rows were updated.
    */
-  public boolean isUpdate();
+  boolean isUpdate();
 
   /**
    * Return true if rows were deleted.
    */
-  public boolean isDelete();
+  boolean isDelete();
 
 }

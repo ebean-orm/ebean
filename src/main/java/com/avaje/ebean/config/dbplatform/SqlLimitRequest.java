@@ -11,35 +11,35 @@ public interface SqlLimitRequest {
   /**
    * Return true if the query uses distinct.
    */
-  public boolean isDistinct();
+  boolean isDistinct();
 
   /**
    * Return the first row value.
    */
-  public int getFirstRow();
+  int getFirstRow();
 
   /**
    * Return the max rows for this query.
    */
-  public int getMaxRows();
+  int getMaxRows();
 
   /**
    * Return the sql query.
    */
-  public String getDbSql();
+  String getDbSql();
 
   /**
    * Return the orderBy clause of the sql query.
    */
-  public String getDbOrderBy();
+  String getDbOrderBy();
 
   /**
    * return the query
    */
-  public Query<?> getOrmQuery();
+  Query<?> getOrmQuery();
 
   /**
    * return the database platform
    */
-  public DatabasePlatform getDbPlatform();
+  DatabasePlatform getDbPlatform();
 }

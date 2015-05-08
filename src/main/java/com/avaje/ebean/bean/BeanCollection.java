@@ -22,7 +22,7 @@ import com.avaje.ebean.ExpressionList;
  */
 public interface BeanCollection<E> extends Serializable {
 
-  public enum ModifyListenMode {
+  enum ModifyListenMode {
     /** The common mode */
     NONE,
     /** Mode used for PrivateOwned */
@@ -36,23 +36,23 @@ public interface BeanCollection<E> extends Serializable {
    * <p>
    * This is done as part of bean refresh.
    */
-  public void reset(EntityBean ownerBean, String propertyName);
+  void reset(EntityBean ownerBean, String propertyName);
 
   /**
    * Return true if the collection is empty and untouched. Used to detect if a
    * collection was 'cleared' deliberately or just un-initialised.
    */
-  public boolean isEmptyAndUntouched();
+  boolean isEmptyAndUntouched();
 
   /**
    * Return the bean that owns this collection.
    */
-  public EntityBean getOwnerBean();
+  EntityBean getOwnerBean();
 
   /**
    * Return the bean property name this collection represents.
    */
-  public String getPropertyName();
+  String getPropertyName();
 
   /**
    * Check after the lazy load that the underlying collection is not null
@@ -62,7 +62,7 @@ public interface BeanCollection<E> extends Serializable {
    * then make sure the collection is set to empty.
    * </p>
    */
-  public boolean checkEmptyLazyLoad();
+  boolean checkEmptyLazyLoad();
 
   /**
    * Return the filter (if any) that was used in building this collection.
@@ -70,22 +70,22 @@ public interface BeanCollection<E> extends Serializable {
    * This is so that the filter can be applied on refresh.
    * </p>
    */
-  public ExpressionList<?> getFilterMany();
+  ExpressionList<?> getFilterMany();
 
   /**
    * Set the filter that was used in building this collection.
    */
-  public void setFilterMany(ExpressionList<?> filterMany);
+  void setFilterMany(ExpressionList<?> filterMany);
 
   /**
    * Set a listener to be notified when the BeanCollection is first touched.
    */
-  public void setBeanCollectionTouched(BeanCollectionTouched notify);
+  void setBeanCollectionTouched(BeanCollectionTouched notify);
 
   /**
    * Return true if the collection has been registered with the batch loading context.
    */
-  public boolean isRegisteredWithLoadContext();
+  boolean isRegisteredWithLoadContext();
 
   /**
    * Set the loader that will be used to lazy/query load this collection.
@@ -93,19 +93,19 @@ public interface BeanCollection<E> extends Serializable {
    * This is effectively the batch loading context this collection is registered with.
    * </p>
    */
-  public void setLoader(BeanCollectionLoader beanLoader);
+  void setLoader(BeanCollectionLoader beanLoader);
 
   /**
    * Set to true if you want the BeanCollection to be treated as read only. This
    * means no elements can be added or removed etc.
    */
-  public void setReadOnly(boolean readOnly);
+  void setReadOnly(boolean readOnly);
 
   /**
    * Return true if the collection should be treated as readOnly and no elements
    * can be added or removed etc.
    */
-  public boolean isReadOnly();
+  boolean isReadOnly();
 
   /**
    * Add the bean to the collection.
@@ -113,22 +113,22 @@ public interface BeanCollection<E> extends Serializable {
    * This is disallowed for BeanMap.
    * </p>
    */
-  public void internalAdd(Object bean);
+  void internalAdd(Object bean);
 
   /**
    * Return the number of elements in the List Set or Map.
    */
-  public int size();
+  int size();
 
   /**
    * Return true if the List Set or Map is empty.
    */
-  public boolean isEmpty();
+  boolean isEmpty();
 
   /**
    * Returns the underlying collection of beans from the Set, Map or List.
    */
-  public Collection<E> getActualDetails();
+  Collection<E> getActualDetails();
 
   /**
    * Returns the underlying entries so for Maps this is a collection of
@@ -137,20 +137,20 @@ public interface BeanCollection<E> extends Serializable {
    * For maps this returns the entrySet as we need the keys of the map.
    * </p>
    */
-  public Collection<?> getActualEntries();
+  Collection<?> getActualEntries();
 
   /**
    * return true if there are real rows held. Return false is this is using
    * Deferred fetch to lazy load the rows and the rows have not yet been
    * fetched.
    */
-  public boolean isPopulated();
+  boolean isPopulated();
 
   /**
    * Return true if this is a reference (lazy loading) bean collection. This is
    * the same as !isPopulated();
    */
-  public boolean isReference();
+  boolean isReference();
 
   /**
    * Set modify listening on or off. This is used to keep track of objects that
@@ -161,7 +161,7 @@ public interface BeanCollection<E> extends Serializable {
    * Otherwise modifyListening is false.
    * </p>
    */
-  public void setModifyListening(ModifyListenMode modifyListenMode);
+  void setModifyListening(ModifyListenMode modifyListenMode);
 
   /**
    * Add an object to the additions list.
@@ -170,7 +170,7 @@ public interface BeanCollection<E> extends Serializable {
    * ManyToMany.
    * </p>
    */
-  public void modifyAddition(E bean);
+  void modifyAddition(E bean);
 
   /**
    * Add an object to the deletions list.
@@ -179,23 +179,23 @@ public interface BeanCollection<E> extends Serializable {
    * ManyToMany.
    * </p>
    */
-  public void modifyRemoval(Object bean);
+  void modifyRemoval(Object bean);
 
   /**
    * Return the list of objects added to the list set or map. These will used to
    * insert rows into the intersection table of a ManyToMany.
    */
-  public Set<E> getModifyAdditions();
+  Set<E> getModifyAdditions();
 
   /**
    * Return the list of objects removed from the list set or map. These will
    * used to delete rows from the intersection table of a ManyToMany.
    */
-  public Set<E> getModifyRemovals();
+  Set<E> getModifyRemovals();
 
   /**
    * Reset the set of additions and deletions. This is called after the
    * additions and removals have been processed.
    */
-  public void modifyReset();
+  void modifyReset();
 }

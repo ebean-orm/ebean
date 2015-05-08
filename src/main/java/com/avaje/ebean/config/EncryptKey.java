@@ -14,5 +14,5 @@ public interface EncryptKey {
   /**
    * Return the string key value.
    */
-  public String getStringValue();
+  String getStringValue();
 }

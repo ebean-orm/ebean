@@ -20,7 +20,7 @@ public interface BeanFinder<T> {
   /**
    * Find a bean using its id or unique predicate.
    */
-  public T find(BeanQueryRequest<T> request);
+  T find(BeanQueryRequest<T> request);
 
   /**
    * Return a List, Set or Map for the given find request.
@@ -29,6 +29,6 @@ public interface BeanFinder<T> {
    * get the return type right.
    * </p>
    */
-  public BeanCollection<T> findMany(BeanQueryRequest<T> request);
+  BeanCollection<T> findMany(BeanQueryRequest<T> request);
 
 }

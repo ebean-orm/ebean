@@ -37,10 +37,10 @@ public interface CompoundType<V> {
   /**
    * Create an instance of the compound type given its property values.
    */
-  public V create(Object[] propertyValues);
+  V create(Object[] propertyValues);
 
   /**
    * Return the properties in the order they appear in the constructor.
    */
-  public CompoundTypeProperty<V, ?>[] getProperties();
+  CompoundTypeProperty<V, ?>[] getProperties();
 }

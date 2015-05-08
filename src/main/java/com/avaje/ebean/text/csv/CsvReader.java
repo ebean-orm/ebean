@@ -48,22 +48,22 @@ public interface CsvReader<T> {
   /**
    * Explicitly set the default Locale.
    */
-  public void setDefaultLocale(Locale defaultLocale);
+  void setDefaultLocale(Locale defaultLocale);
 
   /**
    * Set the default format to use for Time types.
    */
-  public void setDefaultTimeFormat(String defaultTimeFormat);
+  void setDefaultTimeFormat(String defaultTimeFormat);
 
   /**
    * Set the default format to use for Date types.
    */
-  public void setDefaultDateFormat(String defaultDateFormat);
+  void setDefaultDateFormat(String defaultDateFormat);
 
   /**
    * Set the default format to use for Timestamp types.
    */
-  public void setDefaultTimestampFormat(String defaultTimestampFormat);
+  void setDefaultTimestampFormat(String defaultTimestampFormat);
 
   /**
    * Set the batch size for using JDBC statement batching.
@@ -72,7 +72,7 @@ public interface CsvReader<T> {
    * JDBC statement batching.
    * </p>
    */
-  public void setPersistBatchSize(int persistBatchSize);
+  void setPersistBatchSize(int persistBatchSize);
 
   /**
    * Set to true if there is a header row that should be ignored.
@@ -84,7 +84,7 @@ public interface CsvReader<T> {
    * add the properties yourself.
    * </p>
    */
-  public void setHasHeader(boolean hasHeader, boolean addPropertiesFromHeader);
+  void setHasHeader(boolean hasHeader, boolean addPropertiesFromHeader);
 
   /**
    * Same as setHasHeader(true,true);
@@ -93,7 +93,7 @@ public interface CsvReader<T> {
    * default formats for time, date and datetime types.
    * </p>
    */
-  public void setAddPropertiesFromHeader();
+  void setAddPropertiesFromHeader();
 
   /**
    * Same as setHasHeader(true, false);
@@ -101,7 +101,7 @@ public interface CsvReader<T> {
    * This indicates that there is a header but that it should be ignored.
    * </p>
    */
-  public void setIgnoreHeader();
+  void setIgnoreHeader();
 
   /**
    * Set the frequency with which a INFO message will be logged showing the
@@ -110,12 +110,12 @@ public interface CsvReader<T> {
    * If this is not set then no INFO messages will be logged.
    * </p>
    */
-  public void setLogInfoFrequency(int logInfoFrequency);
+  void setLogInfoFrequency(int logInfoFrequency);
 
   /**
    * Ignore the next column of data.
    */
-  public void addIgnore();
+  void addIgnore();
 
   /**
    * Define the property which will be loaded from the next column of data.
@@ -124,27 +124,27 @@ public interface CsvReader<T> {
    * String to object conversion automatically.
    * </p>
    */
-  public void addProperty(String propertyName);
+  void addProperty(String propertyName);
 
   /**
    * Define the next property and use a custom StringParser to convert the
    * string content into the appropriate type for the property.
    */
-  public void addProperty(String propertyName, StringParser parser);
+  void addProperty(String propertyName, StringParser parser);
 
   /**
    * Add a property with a custom Date/Time/Timestamp format using the default
    * Locale. This will convert the string into the appropriate java type for the
    * given property (Date, Calendar, SQL Date, Time, Timestamp, JODA etc).
    */
-  public void addDateTime(String propertyName, String dateTimeFormat);
+  void addDateTime(String propertyName, String dateTimeFormat);
 
   /**
    * Add a property with a custom Date/Time/Timestamp format. This will convert
    * the string into the appropriate java type for the given property (Date,
    * Calendar, SQL Date, Time, Timestamp, JODA etc).
    */
-  public void addDateTime(String propertyName, String dateTimeFormat, Locale locale);
+  void addDateTime(String propertyName, String dateTimeFormat, Locale locale);
 
   /**
    * Automatically create a transaction if required to process all the CSV
@@ -155,7 +155,7 @@ public interface CsvReader<T> {
    * processing. This will also set the persistBatchSize on the transaction.
    * </p>
    */
-  public void process(Reader reader) throws Exception;
+  void process(Reader reader) throws Exception;
 
   /**
    * Process the CSV content passing the bean to the CsvCallback after each row.
@@ -168,6 +168,6 @@ public interface CsvReader<T> {
    * create your own transaction and save the bean(s) yourself.
    * </p>
    */
-  public void process(Reader reader, CsvCallback<T> callback) throws Exception;
+  void process(Reader reader, CsvCallback<T> callback) throws Exception;
 
 }

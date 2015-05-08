@@ -26,38 +26,38 @@ public interface ServerCache {
    * is made available for use.
    * </p>
    */
-  public void init(EbeanServer ebeanServer);
+  void init(EbeanServer ebeanServer);
 
   /**
    * Return the configuration options for this cache.
    */
-  public ServerCacheOptions getOptions();
+  ServerCacheOptions getOptions();
 
   /**
    * Update the configuration options for this cache.
    */
-  public void setOptions(ServerCacheOptions options);
+  void setOptions(ServerCacheOptions options);
 
   /**
    * Return the value given the key.
    */
-  public Object get(Object id);
+  Object get(Object id);
 
   /**
    * Put the value in the cache with a given id.
    */
-  public Object put(Object id, Object value);
+  Object put(Object id, Object value);
 
   /**
    * Put the value in the cache but only if a matching value is not already in
    * the cache.
    */
-  public Object putIfAbsent(Object id, Object value);
+  Object putIfAbsent(Object id, Object value);
 
   /**
    * Remove a entry from the cache given its id.
    */
-  public Object remove(Object id);
+  Object remove(Object id);
 
   /**
    * Clear all entries from the cache.
@@ -67,17 +67,17 @@ public interface ServerCache {
    * be done via {@link ServerCacheManager#clear(Class)}.
    * </p>
    */
-  public void clear();
+  void clear();
 
   /**
    * Return the number of entries in the cache.
    */
-  public int size();
+  int size();
 
   /**
    * Return the hit ratio the cache is currently getting.
    */
-  public int getHitRatio();
+  int getHitRatio();
 
   /**
    * Return statistics for the cache.
@@ -85,5 +85,5 @@ public interface ServerCache {
    * @param reset
    *          if true the statistics are reset.
    */
-  public ServerCacheStatistics getStatistics(boolean reset);
+  ServerCacheStatistics getStatistics(boolean reset);
 }

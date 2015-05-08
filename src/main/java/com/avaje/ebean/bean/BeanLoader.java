@@ -11,11 +11,11 @@ public interface BeanLoader {
   /**
    * Return the name of the associated EbeanServer.
    */
-  public String getName();
+  String getName();
 
   /**
    * Invoke the lazy loading for this bean.
    */
-  public void loadBean(EntityBeanIntercept ebi);
+  void loadBean(EntityBeanIntercept ebi);
 
 }

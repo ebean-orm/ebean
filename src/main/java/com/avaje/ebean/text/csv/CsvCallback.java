@@ -23,7 +23,7 @@ public interface CsvCallback<T> {
    * size etc.
    * </p>
    */
-  public void begin(EbeanServer server);
+  void begin(EbeanServer server);
 
   /**
    * Read the header row.
@@ -35,14 +35,14 @@ public interface CsvCallback<T> {
    * @param line
    *          the header line content.
    */
-  public void readHeader(String[] line);
+  void readHeader(String[] line);
 
   /**
    * Check that the row should be processed - return true to process the row or
    * false to ignore the row. Gives ability to handle bad data... empty rows etc
    * and ignore it rather than fail.
    */
-  public boolean processLine(int row, String[] line);
+  boolean processLine(int row, String[] line);
 
   /**
    * Called for each bean after it has been loaded from the CSV content.
@@ -62,7 +62,7 @@ public interface CsvCallback<T> {
    * @param bean
    *          the entity bean after it has been loaded from the csv content
    */
-  public void processBean(int row, String[] line, T bean);
+  void processBean(int row, String[] line, T bean);
 
   /**
    * The processing has ended successfully.
@@ -70,7 +70,7 @@ public interface CsvCallback<T> {
    * Typically the callback will commit the transaction.
    * </p>
    */
-  public void end(int row);
+  void end(int row);
 
   /**
    * The processing has ended due to an error.
@@ -84,6 +84,6 @@ public interface CsvCallback<T> {
    * @param e
    *          the error that occured
    */
-  public void endWithError(int row, Exception e);
+  void endWithError(int row, Exception e);
 
 }

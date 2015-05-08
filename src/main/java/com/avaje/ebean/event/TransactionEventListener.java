@@ -9,10 +9,10 @@ public interface TransactionEventListener {
   /**
    * Called after the transaction has been committed
    */
-  public void postTransactionCommit(Transaction tx);
+  void postTransactionCommit(Transaction tx);
 
   /**
    * Called after the transaction has been rolled back
    */
-  public void postTransactionRollback(Transaction tx, Throwable cause);
+  void postTransactionRollback(Transaction tx, Throwable cause);
 }

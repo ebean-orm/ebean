@@ -7,11 +7,11 @@ public interface MetaBeanInfo {
   /**
    * Collect the current query plan statistics return the non-empty statistics.
    */
-  public List<MetaQueryPlanStatistic> collectQueryPlanStatistics(boolean reset);
+  List<MetaQueryPlanStatistic> collectQueryPlanStatistics(boolean reset);
   
   /**
    * Collect the current query plan statistics return all the statistics (include query plans that haven't had query executions).
    */  
-  public List<MetaQueryPlanStatistic> collectAllQueryPlanStatistics(boolean reset);
+  List<MetaQueryPlanStatistic> collectAllQueryPlanStatistics(boolean reset);
 
 }

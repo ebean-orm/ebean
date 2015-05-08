@@ -13,5 +13,5 @@ public interface StringParser {
   /**
    * Convert a String value into an Object value.
    */
-  public Object parse(String value);
+  Object parse(String value);
 }

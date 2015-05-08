@@ -20,11 +20,11 @@ public interface BulkTableEventListener {
   /**
    * Return the tables that this listener is interested in.
    */
-  public Set<String> registeredTables();
+  Set<String> registeredTables();
 
   /**
    * Process the event.
    */
-  public void process(BulkTableEvent bulkTableEvent);
+  void process(BulkTableEvent bulkTableEvent);
 
 }

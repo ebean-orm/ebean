@@ -14,9 +14,9 @@ import java.io.Serializable;
  */
 public interface EntityBean extends Serializable {
 
-  public String[] _ebean_getPropertyNames();
+  String[] _ebean_getPropertyNames();
   
-  public String _ebean_getPropertyName(int pos);
+  String _ebean_getPropertyName(int pos);
   
   /**
    * Return the enhancement marker value.
@@ -25,38 +25,38 @@ public interface EntityBean extends Serializable {
    * entity classes are enhanced (specifically not just a super class).
    * </p>
    */
-  public String _ebean_getMarker();
+  String _ebean_getMarker();
 
   /**
    * Create and return a new entity bean instance.
    */
-  public Object _ebean_newInstance();
+  Object _ebean_newInstance();
 
   /**
    * Add a PropertyChangeListener to this bean.
    */
-  public void addPropertyChangeListener(PropertyChangeListener listener);
+  void addPropertyChangeListener(PropertyChangeListener listener);
 
   /**
    * Remove a PropertyChangeListener from this bean.
    */
-  public void removePropertyChangeListener(PropertyChangeListener listener);
+  void removePropertyChangeListener(PropertyChangeListener listener);
 
   /**
    * Generated method that sets the loaded state on all the embedded beans on
    * this entity bean by using EntityBeanIntercept.setEmbeddedLoaded(Object o);
    */
-  public void _ebean_setEmbeddedLoaded();
+  void _ebean_setEmbeddedLoaded();
 
   /**
    * Return true if any embedded beans are new or dirty.
    */
-  public boolean _ebean_isEmbeddedNewOrDirty();
+  boolean _ebean_isEmbeddedNewOrDirty();
 
   /**
    * Return the intercept for this object.
    */
-  public EntityBeanIntercept _ebean_getIntercept();
+  EntityBeanIntercept _ebean_getIntercept();
 
   /**
    * Similar to _ebean_getIntercept() except it checks to see if the intercept
@@ -71,7 +71,7 @@ public interface EntityBean extends Serializable {
    * frameworks that can't take into account our ebean fields.
    * </p>
    */
-  public EntityBeanIntercept _ebean_intercept();
+  EntityBeanIntercept _ebean_intercept();
 
   /**
    * Create a copy of this entity bean.
@@ -81,7 +81,7 @@ public interface EntityBean extends Serializable {
    * optimistic concurrency control.
    * </p>
    */
-  public Object _ebean_createCopy();
+  Object _ebean_createCopy();
 
   /**
    * Set the value of a field of an entity bean of this type.
@@ -90,12 +90,12 @@ public interface EntityBean extends Serializable {
    * on entity beans. That means lazy loading and oldValues creation.
    * </p>
    */
-  public void _ebean_setField(int fieldIndex, Object value);
+  void _ebean_setField(int fieldIndex, Object value);
 
   /**
    * Set the field value with interception.
    */
-  public void _ebean_setFieldIntercept(int fieldIndex, Object value);
+  void _ebean_setFieldIntercept(int fieldIndex, Object value);
 
   /**
    * Return the value of a field from an entity bean of this type.
@@ -104,11 +104,11 @@ public interface EntityBean extends Serializable {
    * on entity beans. That means lazy loading.
    * </p>
    */
-  public Object _ebean_getField(int fieldIndex);
+  Object _ebean_getField(int fieldIndex);
 
   /**
    * Return the field value with interception.
    */
-  public Object _ebean_getFieldIntercept(int fieldIndex);
+  Object _ebean_getFieldIntercept(int fieldIndex);
 
 }

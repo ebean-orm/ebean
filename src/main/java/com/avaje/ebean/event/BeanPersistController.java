@@ -53,13 +53,13 @@ public interface BeanPersistController {
    * @return an int used to control the order BeanPersistController's are
    *         executed
    */
-  public int getExecutionOrder();
+  int getExecutionOrder();
 
   /**
    * Return true if this BeanPersistController should be registered for events
    * on this entity type.
    */
-  public boolean isRegisterFor(Class<?> cls);
+  boolean isRegisterFor(Class<?> cls);
 
   /**
    * Prior to the insert perform some action. Return true if you want the
@@ -69,7 +69,7 @@ public interface BeanPersistController {
    * do not want the default insert to be performed.
    * </p>
    */
-  public boolean preInsert(BeanPersistRequest<?> request);
+  boolean preInsert(BeanPersistRequest<?> request);
 
   /**
    * Prior to the update perform some action. Return true if you want the
@@ -79,7 +79,7 @@ public interface BeanPersistController {
    * do not want the default update to be performed.
    * </p>
    */
-  public boolean preUpdate(BeanPersistRequest<?> request);
+  boolean preUpdate(BeanPersistRequest<?> request);
 
   /**
    * Prior to the delete perform some action. Return true if you want the
@@ -89,27 +89,27 @@ public interface BeanPersistController {
    * do not want the default delete to be performed.
    * </p>
    */
-  public boolean preDelete(BeanPersistRequest<?> request);
+  boolean preDelete(BeanPersistRequest<?> request);
 
   /**
    * Called after the insert was performed.
    */
-  public void postInsert(BeanPersistRequest<?> request);
+  void postInsert(BeanPersistRequest<?> request);
 
   /**
    * Called after the update was performed.
    */
-  public void postUpdate(BeanPersistRequest<?> request);
+  void postUpdate(BeanPersistRequest<?> request);
 
   /**
    * Called after the delete was performed.
    */
-  public void postDelete(BeanPersistRequest<?> request);
+  void postDelete(BeanPersistRequest<?> request);
 
   /**
    * Called after every each bean is fetched and loaded from the database. You
    * can override this to derive some information to set to the bean.
    */
-  public void postLoad(Object bean, Set<String> includedProperties);
+  void postLoad(Object bean, Set<String> includedProperties);
 
 }

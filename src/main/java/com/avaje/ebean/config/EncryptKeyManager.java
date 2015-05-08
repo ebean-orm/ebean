@@ -13,11 +13,11 @@ public interface EncryptKeyManager {
    * This gives the EncryptKeyManager the opportunity to get keys etc.
    * </p>
    */
-  public void initialise();
+  void initialise();
 
   /**
    * Return the key used to encrypt and decrypt a property mapping to the given
    * table and column.
    */
-  public EncryptKey getEncryptKey(String tableName, String columnName);
+  EncryptKey getEncryptKey(String tableName, String columnName);
 }

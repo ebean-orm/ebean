@@ -12,5 +12,5 @@ public interface NodeUsageListener {
    * This information is used by autoFetch to tune queries.
    * </p>
    */
-  public void collectNodeUsage(NodeUsageCollector collector);
+  void collectNodeUsage(NodeUsageCollector collector);
 }

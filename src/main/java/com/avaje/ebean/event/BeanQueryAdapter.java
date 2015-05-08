@@ -24,18 +24,18 @@ public interface BeanQueryAdapter {
    * Return true if this adapter is interested in queries for the given entity
    * type.
    */
-  public boolean isRegisterFor(Class<?> cls);
+  boolean isRegisterFor(Class<?> cls);
 
   /**
    * Returns an int to to control the order in which BeanQueryAdapter are
    * executed when there is multiple of them registered for a given entity type
    * (class).
    */
-  public int getExecutionOrder();
+  int getExecutionOrder();
 
   /**
    * Modify the associated query prior to it being executed.
    */
-  public void preQuery(BeanQueryRequest<?> request);
+  void preQuery(BeanQueryRequest<?> request);
 
 }

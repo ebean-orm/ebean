@@ -12,16 +12,16 @@ public interface BeanQueryRequest<T> {
   /**
    * Return the server processing the request.
    */
-  public EbeanServer getEbeanServer();
+  EbeanServer getEbeanServer();
 
   /**
    * Return the Transaction associated with this request.
    */
-  public Transaction getTransaction();
+  Transaction getTransaction();
 
   /**
    * Returns the query.
    */
-  public Query<T> getQuery();
+  Query<T> getQuery();
 
 }

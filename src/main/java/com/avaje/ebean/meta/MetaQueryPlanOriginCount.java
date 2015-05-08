@@ -22,12 +22,12 @@ public interface MetaQueryPlanOriginCount {
    * navigation path that resulted in this query being executed.
    * </p>
    */
-  public ObjectGraphNode getObjectGraphNode();
+  ObjectGraphNode getObjectGraphNode();
 
   /**
    * The number of times a query was fired for this node since the counter was
    * last reset.
    */
-  public long getCount();
+  long getCount();
 
 }

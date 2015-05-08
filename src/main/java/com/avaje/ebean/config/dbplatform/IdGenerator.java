@@ -16,18 +16,18 @@ public interface IdGenerator {
   /**
    * The name of the default UUID generator.
    */
-  public static final String AUTO_UUID = "auto.uuid";
+  static final String AUTO_UUID = "auto.uuid";
 
   /**
    * Return the name of the IdGenerator. For sequences this is the sequence
    * name.
    */
-  public String getName();
+  String getName();
 
   /**
    * Return true if this is a DB sequence.
    */
-  public boolean isDbSequence();
+  boolean isDbSequence();
 
   /**
    * return the next unique identity value.
@@ -35,7 +35,7 @@ public interface IdGenerator {
    * Note the transaction passed in can be null.
    * </p>
    */
-  public Object nextId(Transaction transaction);
+  Object nextId(Transaction transaction);
 
   /**
    * Is called prior to inserting OneToMany's as an indication that a number of
@@ -45,6 +45,6 @@ public interface IdGenerator {
    * Especially when the allocateSize is very large.
    * </p>
    */
-  public void preAllocateIds(int allocateSize);
+  void preAllocateIds(int allocateSize);
 
 }

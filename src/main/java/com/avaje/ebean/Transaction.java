@@ -17,25 +17,25 @@ public interface Transaction extends Closeable {
    * Read Committed transaction isolation. Same as
    * java.sql.Connection.TRANSACTION_READ_COMMITTED.
    */
-  static final int READ_COMMITTED = java.sql.Connection.TRANSACTION_READ_COMMITTED;
+  int READ_COMMITTED = java.sql.Connection.TRANSACTION_READ_COMMITTED;
 
   /**
    * Read Uncommitted transaction isolation. Same as
    * java.sql.Connection.TRANSACTION_READ_UNCOMMITTED.
    */
-  static final int READ_UNCOMMITTED = java.sql.Connection.TRANSACTION_READ_UNCOMMITTED;
+  int READ_UNCOMMITTED = java.sql.Connection.TRANSACTION_READ_UNCOMMITTED;
 
   /**
    * Repeatable read transaction isolation. Same as
    * java.sql.Connection.TRANSACTION_REPEATABLE_READ.
    */
-  static final int REPEATABLE_READ = java.sql.Connection.TRANSACTION_REPEATABLE_READ;
+  int REPEATABLE_READ = java.sql.Connection.TRANSACTION_REPEATABLE_READ;
 
   /**
    * Serializable transaction isolation. Same as
    * java.sql.Connection.TRANSACTION_SERIALIZABLE.
    */
-  static final int SERIALIZABLE = java.sql.Connection.TRANSACTION_SERIALIZABLE;
+  int SERIALIZABLE = java.sql.Connection.TRANSACTION_SERIALIZABLE;
 
   /**
    * Register a TransactionCallback with this transaction.

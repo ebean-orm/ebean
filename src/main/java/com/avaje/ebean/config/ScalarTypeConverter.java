@@ -44,7 +44,7 @@ public interface ScalarTypeConverter<B, S> {
    * scala.Option and similar type converters this actually returns an instance
    * representing "None".
    */
-  public B getNullValue();
+  B getNullValue();
 
   /**
    * Convert the scalar type value into the value object.
@@ -56,7 +56,7 @@ public interface ScalarTypeConverter<B, S> {
    * @param scalarType
    *          the value from the data source
    */
-  public B wrapValue(S scalarType);
+  B wrapValue(S scalarType);
 
   /**
    * Convert the value object into a scalar value that Ebean knows how to
@@ -69,6 +69,6 @@ public interface ScalarTypeConverter<B, S> {
    * @param beanType
    *          the value object
    */
-  public S unwrapValue(B beanType);
+  S unwrapValue(B beanType);
 
 }

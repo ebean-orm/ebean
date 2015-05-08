@@ -20,5 +20,5 @@ public interface PstmtDelegate {
    *          the PreparedStatement coming out of the connection pool
    * @return the underlying PreparedStatement
    */
-  public PreparedStatement unwrap(PreparedStatement pstmt);
+  PreparedStatement unwrap(PreparedStatement pstmt);
 }

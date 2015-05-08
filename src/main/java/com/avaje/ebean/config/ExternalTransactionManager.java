@@ -11,11 +11,11 @@ public interface ExternalTransactionManager {
    * This will change when SPI is published but will do for now.
    * </p>
    */
-  public void setTransactionManager(Object transactionManager);
+  void setTransactionManager(Object transactionManager);
 
   /**
    * Return the current transaction or null if there is none.
    */
-  public Object getCurrentTransaction();
+  Object getCurrentTransaction();
 
 }

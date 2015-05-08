@@ -16,26 +16,26 @@ public interface MetaObjectGraphNodeStats {
   /**
    * Return the ObjectGraphNode which has the origin point and relative path.
    */
-  public ObjectGraphNode getNode();
+  ObjectGraphNode getNode();
 
   /**
    * Return the startTime of statistics collection.
    */
-  public long getStartTime();
+  long getStartTime();
 
   /**
    * Return the total count of queries executed for this node.
    */
-  public long getCount();
+  long getCount();
 
   /**
    * Return the total time of queries executed for this node.
    */
-  public long getTotalTime();
+  long getTotalTime();
 
   /**
    * Return the total beans loaded by queries for this node.
    */
-  public long getTotalBeans();
+  long getTotalBeans();
 
 }

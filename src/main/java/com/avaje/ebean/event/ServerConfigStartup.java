@@ -16,6 +16,6 @@ public interface ServerConfigStartup {
   /**
    * On starting configure the ServerConfig.
    */
-  public void onStart(ServerConfig serverConfig);
+  void onStart(ServerConfig serverConfig);
 
 }

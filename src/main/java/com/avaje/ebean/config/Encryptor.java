@@ -14,21 +14,21 @@ public interface Encryptor {
   /**
    * Encrypt the data using the key.
    */
-  public byte[] encrypt(byte[] data, EncryptKey key);
+  byte[] encrypt(byte[] data, EncryptKey key);
 
   /**
    * Decrypt the data using the key.
    */
-  public byte[] decrypt(byte[] data, EncryptKey key);
+  byte[] decrypt(byte[] data, EncryptKey key);
 
   /**
    * Encrypt the formatted string value using a key.
    */
-  public byte[] encryptString(String formattedValue, EncryptKey key);
+  byte[] encryptString(String formattedValue, EncryptKey key);
 
   /**
    * Decrypt the data returning a formatted string value using a key.
    */
-  public String decryptString(byte[] data, EncryptKey key);
+  String decryptString(byte[] data, EncryptKey key);
 
 }

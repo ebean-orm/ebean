@@ -23,7 +23,7 @@ public interface CompoundTypeProperty<V, P> {
   /**
    * The name of this property.
    */
-  public String getName();
+  String getName();
 
   /**
    * Return the property value from the containing compound value object.
@@ -32,7 +32,7 @@ public interface CompoundTypeProperty<V, P> {
    *          the compound value object
    * @return the property value.
    */
-  public P getValue(V valueObject);
+  P getValue(V valueObject);
 
   /**
    * This should <b>ONLY</b> be used when the persistence type is different from
@@ -47,5 +47,5 @@ public interface CompoundTypeProperty<V, P> {
    * @return Return the java.sql.Type that you want to use to persist this
    *         property or 0 and Ebean will use the logical type.
    */
-  public int getDbType();
+  int getDbType();
 }

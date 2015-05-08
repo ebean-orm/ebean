@@ -16,5 +16,5 @@ public interface BeanCollectionTouched {
   /**
    * Notify the listener that the bean collection has been used.
    */
-  public void notifyTouched(BeanCollection<?> c);
+  void notifyTouched(BeanCollection<?> c);
 }

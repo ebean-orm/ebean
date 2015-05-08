@@ -19,32 +19,32 @@ public interface BeanPersistRequest<T> {
   /**
    * Return the server processing the request.
    */
-  public EbeanServer getEbeanServer();
+  EbeanServer getEbeanServer();
 
   /**
    * Return the Transaction associated with this request.
    */
-  public Transaction getTransaction();
+  Transaction getTransaction();
 
   /**
    * For an update or delete of a partially populated bean this is the set of
    * loaded properties and otherwise returns null.
    */
-  public Set<String> getLoadedProperties();
+  Set<String> getLoadedProperties();
 
   /**
    * For an update this is the set of properties that where updated.
    */
-  public Set<String> getUpdatedProperties();
+  Set<String> getUpdatedProperties();
 
   /**
    * Returns the bean being inserted updated or deleted.
    */
-  public T getBean();
+  T getBean();
 
   /**
    * Returns a map of the properties that have changed and their new and old values.
    */
-  public Map<String,ValuePair> getUpdatedValues();
+  Map<String,ValuePair> getUpdatedValues();
 
 }

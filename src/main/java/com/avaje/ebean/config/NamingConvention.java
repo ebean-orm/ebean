@@ -30,7 +30,7 @@ public interface NamingConvention {
    * @param databasePlatform
    *          the database platform
    */
-  public void setDatabasePlatform(DatabasePlatform databasePlatform);
+  void setDatabasePlatform(DatabasePlatform databasePlatform);
 
   /**
    * Returns the table name for a given Class.
@@ -45,7 +45,7 @@ public interface NamingConvention {
    * 
    * @return the table name for the entity class
    */
-  public TableName getTableName(Class<?> beanClass);
+  TableName getTableName(Class<?> beanClass);
 
   /**
    * Returns the ManyToMany join table name (aka the intersection table).
@@ -57,14 +57,14 @@ public interface NamingConvention {
    * 
    * @return the many to many join table name
    */
-  public TableName getM2MJoinTableName(TableName lhsTable, TableName rhsTable);
+  TableName getM2MJoinTableName(TableName lhsTable, TableName rhsTable);
 
   /**
    * Return the column name given the property name.
    * 
    * @return the column name for a given property
    */
-  public String getColumnFromProperty(Class<?> beanClass, String propertyName);
+  String getColumnFromProperty(Class<?> beanClass, String propertyName);
 
   /**
    * Return the property name from the column name.
@@ -79,7 +79,7 @@ public interface NamingConvention {
    * 
    * @return the property name from the column name
    */
-  public String getPropertyFromColumn(Class<?> beanClass, String dbColumnName);
+  String getPropertyFromColumn(Class<?> beanClass, String dbColumnName);
 
   /**
    * Return the sequence name given the table name (for DB's that use
@@ -93,7 +93,7 @@ public interface NamingConvention {
    * 
    * @return the sequence name
    */
-  public String getSequenceName(String tableName, String pkColumn);
+  String getSequenceName(String tableName, String pkColumn);
 
   /**
    * Return true if a prefix should be used building a foreign key name.
@@ -110,11 +110,11 @@ public interface NamingConvention {
    * column names.
    * </p>
    */
-  public boolean isUseForeignKeyPrefix();
+  boolean isUseForeignKeyPrefix();
 
   /**
    * Load setting from properties.
    */
-  public void loadFromProperties(PropertiesWrapper properties);
+  void loadFromProperties(PropertiesWrapper properties);
 
 }

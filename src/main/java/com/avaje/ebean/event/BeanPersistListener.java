@@ -43,7 +43,7 @@ public interface BeanPersistListener {
    * Return true if this BeanPersistListener should be registered for events
    * on this entity type.
    */
-  public boolean isRegisterFor(Class<?> cls);
+  boolean isRegisterFor(Class<?> cls);
 
   /**
    * Notified that a bean has been inserted locally. Return true if you want the
@@ -52,7 +52,7 @@ public interface BeanPersistListener {
    * @param bean
    *          The bean that was inserted.
    */
-  public boolean inserted(Object bean);
+  boolean inserted(Object bean);
 
   /**
    * Notified that a bean has been updated locally. Return true if you want the
@@ -63,7 +63,7 @@ public interface BeanPersistListener {
    * @param updatedProperties
    *          The properties that were modified by this update.
    */
-  public boolean updated(Object bean, Set<String> updatedProperties);
+  boolean updated(Object bean, Set<String> updatedProperties);
 
   /**
    * Notified that a bean has been deleted locally. Return true if you want the
@@ -72,7 +72,7 @@ public interface BeanPersistListener {
    * @param bean
    *          The bean that was deleted.
    */
-  public boolean deleted(Object bean);
+  boolean deleted(Object bean);
 
   /**
    * Notify that a bean was inserted on another node of the cluster.
@@ -80,7 +80,7 @@ public interface BeanPersistListener {
    * @param id
    *          the id value of the inserted bean
    */
-  public void remoteInsert(Object id);
+  void remoteInsert(Object id);
 
   /**
    * Notify that a bean was updated on another node of the cluster.
@@ -88,7 +88,7 @@ public interface BeanPersistListener {
    * @param id
    *          the id value of the updated bean.
    */
-  public void remoteUpdate(Object id);
+  void remoteUpdate(Object id);
 
   /**
    * Notify that a bean was deleted on another node of the cluster.
@@ -96,6 +96,6 @@ public interface BeanPersistListener {
    * @param id
    *          the id value of the deleted bean.
    */
-  public void remoteDelete(Object id);
+  void remoteDelete(Object id);
 
 }

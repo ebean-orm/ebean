@@ -10,12 +10,12 @@ public interface MetaInfoManager {
   /**
    * Return the MetaBeanInfo for a bean type.
    */
-  public MetaBeanInfo getMetaBeanInfo(Class<?> beanClass);
+  MetaBeanInfo getMetaBeanInfo(Class<?> beanClass);
 
   /**
    * Return all the MetaBeanInfo.
    */
-  public List<MetaBeanInfo> getMetaBeanInfoList();
+  List<MetaBeanInfo> getMetaBeanInfoList();
 
   /**
    * Collect and return the query plan statistics for all the beans.
@@ -24,7 +24,7 @@ public interface MetaInfoManager {
    * executions (since the last collection with reset).
    * </p>
    */
-  public List<MetaQueryPlanStatistic> collectQueryPlanStatistics(boolean reset);
+  List<MetaQueryPlanStatistic> collectQueryPlanStatistics(boolean reset);
 
   /**
    * Collect and return the ObjectGraphNode statistics.
@@ -37,6 +37,6 @@ public interface MetaInfoManager {
    * @param reset
    *          Set to true to reset the underlying statistics after collection.
    */
-  public List<MetaObjectGraphNodeStats> collectNodeStatistics(boolean reset);
+  List<MetaObjectGraphNodeStats> collectNodeStatistics(boolean reset);
 
 }

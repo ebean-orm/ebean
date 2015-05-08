@@ -16,15 +16,15 @@ public interface DbEncrypt {
   // /**
   // * Return the SQL for decrypting a column returning a VARCHAR.
   // */
-  // public String getDecryptSql(String columnWithTableAlias);
+  // String getDecryptSql(String columnWithTableAlias);
   //
   // /**
   // * Return the DB function with bind variables used to encrypt a VARCHAR
   // * value.
   // */
-  // public String getEncryptBindSql();
+  // String getEncryptBindSql();
 
-  public DbEncryptFunction getDbEncryptFunction(int jdbcType);
+  DbEncryptFunction getDbEncryptFunction(int jdbcType);
 
   /**
    * Return the DB type that encrypted Strings are stored in.
@@ -32,10 +32,10 @@ public interface DbEncrypt {
    * This is VARCHAR for MySql and VARBINARY for most others.
    * </p>
    */
-  public int getEncryptDbType();
+  int getEncryptDbType();
 
   /**
    * Return true if the DB encrypt function binds the data before the key.
    */
-  public boolean isBindEncryptDataFirst();
+  boolean isBindEncryptDataFirst();
 }

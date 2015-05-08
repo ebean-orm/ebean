@@ -13,5 +13,5 @@ public interface StringFormatter {
   /**
    * Convert an Object value into a String value.
    */
-  public String format(Object value);
+  String format(Object value);
 }

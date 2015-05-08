@@ -11,5 +11,5 @@ public interface EncryptDeployManager {
   /**
    * Return true if the table column is encrypted.
    */
-  public EncryptDeploy getEncryptDeploy(TableName table, String column);
+  EncryptDeploy getEncryptDeploy(TableName table, String column);
 }

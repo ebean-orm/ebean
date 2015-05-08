@@ -12,7 +12,7 @@ public interface PersistenceContext {
   /**
    * Put the entity bean into the PersistanceContext.
    */
-  public void put(Object id, Object bean);
+  void put(Object id, Object bean);
 
   /**
    * Put the entity bean into the PersistanceContext if one is not already
@@ -22,44 +22,44 @@ public interface PersistenceContext {
    * returns null.
    * </p>
    */
-  public Object putIfAbsent(Object id, Object bean);
+  Object putIfAbsent(Object id, Object bean);
 
   /**
    * Return an object given its type and unique id.
    */
-  public Object get(Class<?> beanType, Object uid);
+  Object get(Class<?> beanType, Object uid);
 
   /**
    * Get the bean from the persistence context also checked to see if it had
    * been previously deleted (if so then you also can't hit the L2 cache to
    * fetch the bean for this particular persistence context).
    */
-  public WithOption getWithOption(Class<?> beanType, Object uid);
+  WithOption getWithOption(Class<?> beanType, Object uid);
 
   /**
    * Clear all the references.
    */
-  public void clear();
+  void clear();
 
   /**
    * Clear all the references for a given type of entity bean.
    */
-  public void clear(Class<?> beanType);
+  void clear(Class<?> beanType);
 
   /**
    * Clear the reference to a specific entity bean.
    */
-  public void clear(Class<?> beanType, Object uid);
+  void clear(Class<?> beanType, Object uid);
 
   /**
    * Clear the reference as a result of an entity being deleted.
    */
-  public void deleted(Class<?> beanType, Object id);
+  void deleted(Class<?> beanType, Object id);
 
   /**
    * Return the number of beans of the given type in the persistence context.
    */
-  public int size(Class<?> beanType);
+  int size(Class<?> beanType);
 
   /**
    * Wrapper on a bean to also indicate if a bean has been deleted.
@@ -68,7 +68,7 @@ public interface PersistenceContext {
    * not be able to be fetched from persistence context or L2 cache.
    * </p>
    */
-  public static class WithOption {
+  class WithOption {
 
     /**
      * The bean was previously deleted from this persistence context (can't hit

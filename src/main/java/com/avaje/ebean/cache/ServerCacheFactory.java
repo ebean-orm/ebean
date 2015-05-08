@@ -16,11 +16,11 @@ public interface ServerCacheFactory {
    * cache trimming/cleanup.
    * </p>
    */
-  public void init(EbeanServer ebeanServer);
+  void init(EbeanServer ebeanServer);
 
   /**
    * Create the cache for the given type with options.
    */
-  public ServerCache createCache(String cacheKey, ServerCacheOptions cacheOptions);
+  ServerCache createCache(String cacheKey, ServerCacheOptions cacheOptions);
 
 }
