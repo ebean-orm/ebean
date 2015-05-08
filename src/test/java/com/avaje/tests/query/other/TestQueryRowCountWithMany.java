@@ -67,4 +67,29 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
 
   }
 
+
+
+  @Test
+  public void testWithFirstRowsMaxRows() {
+
+    ResetBasicData.reset();
+
+    Long productId = 1L;
+
+    Query<Order> query = Ebean.find(Order.class)
+        .fetch("details")
+        .where().eq("details.product.id", productId)
+        .setFirstRow(2)
+        .setMaxRows(20)
+        .orderBy("cretime asc");
+
+    LoggedSqlCollector.start();
+    query.findRowCount();
+
+    List<String> sqlLogged = LoggedSqlCollector.stop();
+
+    Assert.assertEquals(1, sqlLogged.size());
+    Assert.assertTrue(sqlLogged.get(0).contains("select count(*) from ( select distinct t0.id c0 from o_order t0 join o_order_detail u1 on u1.order_id = t0.id  where u1.product_id = ? )"));
+
+  }
 }

@@ -123,10 +123,8 @@ public class CQueryBuilder implements Constants {
 
     // always set the order by to null for row count query
     query.setOrder(null);
-    if (query.isRawSql()) {
-      query.setFirstRow(0);
-      query.setMaxRows(0);
-    }
+    query.setFirstRow(0);
+    query.setMaxRows(0);
 
     ManyWhereJoins manyWhereJoins = query.getManyWhereJoins();
     
@@ -281,9 +279,7 @@ public class CQueryBuilder implements Constants {
     OrmQueryDetail detail = new OrmQueryDetail();
 
     // transfer PathProperties into OrmQueryDetail
-    Iterator<String> pathIt = pathProps.getPaths().iterator();
-    while (pathIt.hasNext()) {
-      String path = pathIt.next();
+    for (String path : pathProps.getPaths()) {
       Set<String> props = pathProps.get(path);
       detail.getChunk(path, true).setDefaultProperties(null, props);
     }
