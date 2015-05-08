@@ -371,6 +371,61 @@ public final class Ebean {
   }
 
   /**
+   * Start a transaction typically specifying REQUIRES_NEW or REQUIRED semantics.
+   *
+   * <p>
+   * Note that this provides an try finally alternative to using {@link #execute(TxScope, TxCallable)} or
+   * {@link #execute(TxScope, TxRunnable)}.
+   * </p>
+   *
+   * <h3>REQUIRES_NEW example:</h3>
+   * <pre>{@code
+   * // Start a new transaction. If there is a current transaction
+   * // suspend it until this transaction ends
+   * Transaction txn = Ebean.beginTransaction(TxScope.requiresNew());
+   * try {
+   *
+   *   ...
+   *
+   *   // commit the transaction
+   *   txn.commit();
+   *
+   * } finally {
+   *   // end this transaction which:
+   *   //  A) will rollback transaction if it has not been committed already
+   *   //  B) will restore a previously suspended transaction
+   *   txn.end();
+   * }
+   *
+   * }</pre>
+   *
+   * <h3>REQUIRED example:</h3>
+   * <pre>{@code
+   *
+   * // start a new transaction if there is not a current transaction
+   * Transaction txn = Ebean.beginTransaction(TxScope.required());
+   * try {
+   *
+   *   ...
+   *
+   *   // commit the transaction if it was created or
+   *   // do nothing if there was already a current transaction
+   *   txn.commit();
+   *
+   * } finally {
+   *   // end this transaction which will rollback the transaction
+   *   // if it was created for this try finally scope and has not
+   *   // already been committed
+   *   txn.end();
+   * }
+   *
+   * }</pre>
+   */
+  public static Transaction beginTransaction(TxScope scope){
+    return serverMgr.getPrimaryServer().beginTransaction(scope);
+  }
+
+  /**
    * Returns the current transaction or null if there is no current transaction
    * in scope.
    */

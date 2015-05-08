@@ -339,6 +339,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public Transaction beginTransaction(TxScope scope) {
+    return null;
+  }
+
+  @Override
   public Transaction beginTransaction(TxIsolation isolation) {
     return null;
   }

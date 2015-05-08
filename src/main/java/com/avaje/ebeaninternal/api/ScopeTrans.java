@@ -87,7 +87,14 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
     }
 
 	}
-	
+
+	/**
+	 * Return the current/active transaction.
+	 */
+	protected SpiTransaction getTransaction() {
+		return transaction;
+	}
+
 	/**
 	 * Called when the Thread catches any uncaught exception.
 	 * For example, an unexpected NullPointerException or Error.
@@ -121,30 +128,38 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
 	 * Also reinstate the suspended transaction if there was one.
 	 */
 	public void onFinally() {
+
 		try {		
 			if (!rolledBack) {
-        if (created) {
-          transaction.commit();
-        } else {
-          if (restoreBatch != null) {
-            transaction.setBatch(restoreBatch);
-          }
-          if (restoreBatchOnCascade != null) {
-            transaction.setBatchOnCascade(restoreBatchOnCascade);
-          }
-          if (restoreBatchSize > 0) {
-            transaction.setBatchSize(restoreBatchSize);
-          }
-        }
+				commitTransaction();
 			}
-
 		} finally {
-			if (suspendedTransaction != null){
-				// put the previously suspended transaction 
-				// back onto the ThreadLocal or equivalent
-				scopeMgr.replace(suspendedTransaction);
-			}
+			restoreSuspended();
 		}
+	}
+
+	protected void restoreSuspended() {
+		if (suspendedTransaction != null){
+      // put the previously suspended transaction
+      // back onto the ThreadLocal or equivalent
+      scopeMgr.replace(suspendedTransaction);
+    }
+	}
+
+	protected void commitTransaction() {
+		if (created) {
+      transaction.commit();
+    } else {
+      if (restoreBatch != null) {
+        transaction.setBatch(restoreBatch);
+      }
+      if (restoreBatchOnCascade != null) {
+        transaction.setBatchOnCascade(restoreBatchOnCascade);
+      }
+      if (restoreBatchSize > 0) {
+        transaction.setBatchSize(restoreBatchSize);
+      }
+    }
 	}
 
 	/**
@@ -168,7 +183,7 @@ public class ScopeTrans implements Thread.UncaughtExceptionHandler {
 		return e;
 	}
 
-	private void rollback(Throwable e) {
+	protected void rollback(Throwable e) {
 		if (transaction != null && transaction.isActive()) {
 			// transaction is null for NOT_SUPPORTED and sometimes SUPPORTS
 			// and Inactive (already rolled back) if nested REQUIRED

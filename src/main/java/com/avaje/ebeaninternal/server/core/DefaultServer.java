@@ -768,6 +768,11 @@ public final class DefaultServer implements SpiEbeanServer {
     return t;
   }
 
+  public Transaction beginTransaction(TxScope scope) {
+    ScopeTrans scopeTrans = createScopeTrans(scope);
+    return new ScopedTransaction(scopeTrans);
+  }
+
   /**
    * Start a transaction with a specific Isolation Level.
    * <p>
