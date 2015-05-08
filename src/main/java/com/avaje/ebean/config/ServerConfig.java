@@ -86,6 +86,11 @@ public class ServerConfig {
   private boolean defaultServer;
 
   /**
+   * Set this to true to disable class path search.
+   */
+  private boolean disableClasspathSearch;
+
+  /**
    * List of interesting classes such as entities, embedded, ScalarTypes,
    * Listeners, Finders, Controllers etc.
    */
@@ -1248,6 +1253,22 @@ public class ServerConfig {
   }
 
   /**
+   * Return true if the class path search should be disabled.
+   */
+  public boolean isDisableClasspathSearch() {
+    return disableClasspathSearch;
+  }
+
+  /**
+   * Set to true to disable the class path search even for the case where no entity bean classes
+   * have been registered. This can be used to start an EbeanServer instance just to use the
+   * SQL functions such as SqlQuery, SqlUpdate etc.
+   */
+  public void setDisableClasspathSearch(boolean disableClasspathSearch) {
+    this.disableClasspathSearch = disableClasspathSearch;
+  }
+
+  /**
    * Programmatically add classes (typically entities) that this server should
    * use.
    * <p>
@@ -1714,6 +1735,7 @@ public class ServerConfig {
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
 
+    disableClasspathSearch = p.getBoolean("disableClasspathSearch", disableClasspathSearch);
     databasePlatform = createInstance(p, DatabasePlatform.class, "databasePlatform");
     encryptKeyManager = createInstance(p, EncryptKeyManager.class, "encryptKeyManager");
     encryptDeployManager = createInstance(p, EncryptDeployManager.class, "encryptDeployManager");
