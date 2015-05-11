@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.core;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,27 +70,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
               isMatch(cls);
             }
         }
-    }
-
-    private BootupClasses(BootupClasses parent) {
-        this.embeddableList.addAll(parent.embeddableList);
-        this.entityList.addAll(parent.entityList);
-        this.scalarTypeList.addAll(parent.scalarTypeList);
-        this.scalarConverterList.addAll(parent.scalarConverterList);
-        this.compoundTypeList.addAll(parent.compoundTypeList);
-        this.beanControllerList.addAll(parent.beanControllerList);
-        this.transactionEventListenerList.addAll(parent.transactionEventListenerList);
-        this.beanFinderList.addAll(parent.beanFinderList);
-        this.beanListenerList.addAll(parent.beanListenerList);
-        this.beanQueryAdapterList.addAll(parent.beanQueryAdapterList);
-        this.serverConfigStartupList.addAll(parent.serverConfigStartupList);
-    }
-
-    /**
-     * Create a copy of this object so that classes can be added to it.
-     */
-    public BootupClasses createCopy() {
-        return new BootupClasses(this);
     }
 
     /**
@@ -300,11 +280,8 @@ public class BootupClasses implements ClassPathSearchMatcher {
         } else if (isEntity(cls)) {
             entityList.add(cls);
 
-        } else if (isInterestingInterface(cls)) {
-            return true;
-
         } else {
-            return false;
+            return isInterestingInterface(cls);
         }
 
         return true;
@@ -318,6 +295,11 @@ public class BootupClasses implements ClassPathSearchMatcher {
      */
     private boolean isInterestingInterface(Class<?> cls) {
 
+        if (Modifier.isAbstract(cls.getModifiers())) {
+            // do not include abstract classes as we can
+            // not instantiate them
+            return false;
+        }
         boolean interesting = false;
 
         if (BeanPersistController.class.isAssignableFrom(cls)) {
@@ -375,18 +357,12 @@ public class BootupClasses implements ClassPathSearchMatcher {
             return true;
         }
         ann = cls.getAnnotation(Table.class);
-        if (ann != null) {
-            return true;
-        }
-        return false;
+        return ann != null;
     }
 
     private boolean isEmbeddable(Class<?> cls) {
 
         Annotation ann = cls.getAnnotation(Embeddable.class);
-        if (ann != null) {
-            return true;
-        }
-        return false;
+        return ann != null;
     }
 }
