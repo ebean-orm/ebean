@@ -156,7 +156,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   }
 
   public String toString() {
-    StringBuffer sb = new StringBuffer(50);
+    StringBuilder sb = new StringBuilder(50);
     sb.append("BeanList ");
     if (isReadOnly()) {
       sb.append("readOnly ");
@@ -350,7 +350,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
       boolean changed = false;
       Iterator<?> it = c.iterator();
       while (it.hasNext()) {
-        Object o = (Object) it.next();
+        Object o = it.next();
         if (list.remove(o)) {
           modifyRemoval(o);
           changed = true;
@@ -368,7 +368,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
       boolean changed = false;
       Iterator<E> it = list.iterator();
       while (it.hasNext()) {
-        Object o = (Object) it.next();
+        Object o = it.next();
         if (!c.contains(o)) {
           it.remove();
           modifyRemoval(o);

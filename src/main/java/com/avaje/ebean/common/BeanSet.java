@@ -145,15 +145,8 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     return set;
   }
 
-  /**
-   * Returns the underlying set.
-   */
-  public Object getActualCollection() {
-    return set;
-  }
-
   public String toString() {
-    StringBuffer sb = new StringBuffer(50);
+    StringBuilder sb = new StringBuilder(50);
     sb.append("BeanSet ");
     if (isReadOnly()) {
       sb.append("readOnly ");
@@ -276,7 +269,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
       boolean changed = false;
       Iterator<?> it = c.iterator();
       while (it.hasNext()) {
-        Object o = (Object) it.next();
+        Object o = it.next();
         if (set.remove(o)) {
           modifyRemoval(o);
           changed = true;
