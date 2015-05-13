@@ -35,7 +35,6 @@ public interface SqlTreeNode {
    * At a high level this actually controls the reading of the data from the
    * jdbc resultSet and putting it into the bean etc.
    * </p>
-   * 
    */
   EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean contextBean) throws SQLException;
 

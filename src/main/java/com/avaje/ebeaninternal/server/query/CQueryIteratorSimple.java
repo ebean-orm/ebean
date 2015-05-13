@@ -13,6 +13,7 @@ import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 class CQueryIteratorSimple<T> implements QueryIterator<T> {
 
   private final CQuery<T> cquery;
+
   private final OrmQueryRequest<T> request;
 
   CQueryIteratorSimple(CQuery<T> cquery, OrmQueryRequest<T> request) {
@@ -31,7 +32,7 @@ class CQueryIteratorSimple<T> implements QueryIterator<T> {
 
   @SuppressWarnings("unchecked")
   public T next() {
-    return (T)cquery.next();
+    return (T) cquery.next();
   }
 
   public void close() {

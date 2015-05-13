@@ -37,7 +37,7 @@ class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
         int i = -1;
         while (moreToLoad && ++i < bufferSize) {
           if (cquery.hasNext()) {
-            buffer.add((T)cquery.next());
+            buffer.add((T) cquery.next());
           } else {
             moreToLoad = false;
           }

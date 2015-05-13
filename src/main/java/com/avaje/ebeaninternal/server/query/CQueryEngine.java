@@ -48,7 +48,6 @@ public class CQueryEngine {
     CQueryFetchIds rcQuery = queryBuilder.buildFetchIdsQuery(request);
     try {
 
-      
       BeanIdList list = rcQuery.findIds();
 
       if (request.isLogSql()) {
@@ -83,13 +82,13 @@ public class CQueryEngine {
 
     CQueryRowCount rcQuery = queryBuilder.buildRowCountQuery(request);
     try {
-     
+
       int rowCount = rcQuery.findRowCount();
 
       if (request.isLogSql()) {
         String logSql = rcQuery.getGeneratedSql();
         if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-          logSql= Str.add(logSql, "; --bind(", rcQuery.getBindLog(), ")");
+          logSql = Str.add(logSql, "; --bind(", rcQuery.getBindLog(), ")");
         }
         request.logSql(logSql);
       }
@@ -168,7 +167,7 @@ public class CQueryEngine {
         logger.trace("Future fetch already cancelled");
         return null;
       }
-      
+
       if (request.isLogSql()) {
         logSql(cquery);
       }
@@ -192,7 +191,7 @@ public class CQueryEngine {
 
     } catch (SQLException e) {
       throw cquery.createPersistenceException(e);
-      
+
     } finally {
       if (cquery != null) {
         cquery.close();
@@ -233,7 +232,7 @@ public class CQueryEngine {
 
       request.executeSecondaryQueries();
 
-      return (T)bean;
+      return (T) bean;
 
     } catch (SQLException e) {
       throw cquery.createPersistenceException(e);
@@ -250,7 +249,7 @@ public class CQueryEngine {
 
     String sql = query.getGeneratedSql();
     if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-      sql= Str.add(sql, "; --bind(", query.getBindLog(), ")");
+      sql = Str.add(sql, "; --bind(", query.getBindLog(), ")");
     }
     query.getTransaction().logSql(sql);
   }

@@ -264,11 +264,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       children[i].load(ctx, localBean, contextBean);
     }
 
-    if (lazyLoadMany) {
-      // special case where we load children
-
-    } else if (localBean != null) {
-
+    if (!lazyLoadMany && localBean != null) {
       ctx.setCurrentPrefix(prefix, pathMap);
       if (readId) {
         createListProxies(localDesc, ctx, localBean);
@@ -303,6 +299,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
         ctx.profileBean(ebi, prefix);
       }
     }
+
     if (parentBean != null) {
       // set this back to the parentBean
       nodeBeanProp.setValue(parentBean, contextBean);

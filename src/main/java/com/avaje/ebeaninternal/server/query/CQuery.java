@@ -44,7 +44,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private static final Logger logger = LoggerFactory.getLogger(CQuery.class);
 
-  private static final int GLOBAL_ROW_LIMIT = Integer.valueOf(System.getProperty("ebean.query.globallimit","1000000"));
+  private static final int GLOBAL_ROW_LIMIT = Integer.valueOf(System.getProperty("ebean.query.globallimit", "1000000"));
 
   /**
    * The resultSet rows read.
@@ -159,7 +159,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   private final ObjectGraphNode objectGraphNode;
 
   private final AutoFetchManager autoFetchManager;
-  
+
   private final WeakReference<NodeUsageListener> autoFetchManagerRef;
 
   private final Boolean readOnly;
@@ -288,7 +288,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       // prepare
       SpiTransaction t = request.getTransaction();
       Connection conn = t.getInternalConnection();
-            
+
       if (query.isRawSql()) {
         ResultSet suppliedResultSet = query.getRawSql().getResultSet();
         if (suppliedResultSet != null) {
@@ -298,13 +298,13 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
           return true;
         }
       }
-      
+
       if (forwardOnlyHint) {
         // Use forward only hints for large resultset processing (Issue 56, MySql specific)
         pstmt = conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         pstmt.setFetchSize(Integer.MIN_VALUE);
       } else {
-        pstmt = conn.prepareStatement(sql);        
+        pstmt = conn.prepareStatement(sql);
       }
 
       if (query.getTimeout() > 0) {
@@ -364,16 +364,16 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   public void setLazyLoadedChildBean(EntityBean bean, Object lazyLoadParentId) {
 
-      if (lazyLoadParentId != null) {
-        if (!lazyLoadParentId.equals(this.lazyLoadParentId)) {
-          // get the appropriate parent bean from the persistence context
-          this.lazyLoadParentBean = (EntityBean)getPersistenceContext().get(lazyLoadManyProperty.getBeanDescriptor().getBeanType(), lazyLoadParentId);
-          this.lazyLoadParentId = lazyLoadParentId;
-        }
-
-        // add the loadedBean to the appropriate collection of lazyLoadParentBean
-        lazyLoadManyProperty.addBeanToCollectionWithCreate(lazyLoadParentBean, bean);
+    if (lazyLoadParentId != null) {
+      if (!lazyLoadParentId.equals(this.lazyLoadParentId)) {
+        // get the appropriate parent bean from the persistence context
+        this.lazyLoadParentBean = (EntityBean) getPersistenceContext().get(lazyLoadManyProperty.getBeanDescriptor().getBeanType(), lazyLoadParentId);
+        this.lazyLoadParentId = lazyLoadParentId;
       }
+
+      // add the loadedBean to the appropriate collection of lazyLoadParentBean
+      lazyLoadManyProperty.addBeanToCollectionWithCreate(lazyLoadParentBean, bean);
+    }
   }
 
   /**
@@ -613,12 +613,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    * Create a PersistenceException including interesting information like the
    * bindLog and sql used.
    */
-  public static PersistenceException createPersistenceException(SQLException e, SpiTransaction t,
-      String bindLog, String sql) {
+  public static PersistenceException createPersistenceException(SQLException e, SpiTransaction t, String bindLog, String sql) {
 
     if (t.isLogSummary()) {
       // log the error to the transaction log
-      String errMsg = StringHelper.replaceStringMulti(e.getMessage(), new String[] { "\r", "\n" }, "\\n ");
+      String errMsg = StringHelper.replaceStringMulti(e.getMessage(), new String[]{"\r", "\n"}, "\\n ");
       String msg = "ERROR executing query:   bindLog[" + bindLog + "] error[" + errMsg + "]";
       t.logSummary(msg);
     }

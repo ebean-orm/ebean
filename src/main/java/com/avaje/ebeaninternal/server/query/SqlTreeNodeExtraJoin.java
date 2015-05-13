@@ -20,72 +20,72 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
  * </p>
  */
 public class SqlTreeNodeExtraJoin implements SqlTreeNode {
-	
-	private final BeanPropertyAssoc<?> assocBeanProperty;
-	
-	private final String prefix;
-	
-	private final boolean manyJoin;
-	
-	private List<SqlTreeNodeExtraJoin> children;
-	
-	public SqlTreeNodeExtraJoin(String prefix, BeanPropertyAssoc<?> assocBeanProperty) {
-		this.prefix = prefix;
-		this.assocBeanProperty = assocBeanProperty;
-		this.manyJoin = assocBeanProperty instanceof BeanPropertyAssocMany<?>;
-	}
 
-	public void buildSelectExpressionChain(List<String> selectChain) {
-	    // nothing to add
-	}
+  private final BeanPropertyAssoc<?> assocBeanProperty;
 
-	/**
-	 * Return true if the extra join is a many join.
-	 * <p>
-	 * This means we need to add distinct to the sql query.
-	 * </p>
-	 */
-	public boolean isManyJoin() {
-		return manyJoin;
-	}
+  private final String prefix;
+
+  private final boolean manyJoin;
+
+  private List<SqlTreeNodeExtraJoin> children;
+
+  public SqlTreeNodeExtraJoin(String prefix, BeanPropertyAssoc<?> assocBeanProperty) {
+    this.prefix = prefix;
+    this.assocBeanProperty = assocBeanProperty;
+    this.manyJoin = assocBeanProperty instanceof BeanPropertyAssocMany<?>;
+  }
+
+  public void buildSelectExpressionChain(List<String> selectChain) {
+    // nothing to add
+  }
+
+  /**
+   * Return true if the extra join is a many join.
+   * <p>
+   * This means we need to add distinct to the sql query.
+   * </p>
+   */
+  public boolean isManyJoin() {
+    return manyJoin;
+  }
 
 
-	public String getName() {
-		return prefix;
-	}
-	
-	public void addChild(SqlTreeNodeExtraJoin child){
-		if (children == null){
-			children = new ArrayList<SqlTreeNodeExtraJoin>();
-		}
-		children.add(child);
-	}
-	
-	public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
-		
-		boolean manyToMany = false;
-		
-		if (assocBeanProperty instanceof BeanPropertyAssocMany<?>){
-			BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>)assocBeanProperty;
-			if (manyProp.isManyToMany()){
-				
-				manyToMany = true;
-				
-				String alias = ctx.getTableAlias(prefix);
-				String[] split = SplitName.split(prefix);
-				String parentAlias = ctx.getTableAlias(split[0]);
-				String alias2 = alias+"z_";
-				
-				TableJoin manyToManyJoin = manyProp.getIntersectionTableJoin();
-				manyToManyJoin.addJoin(joinType, parentAlias, alias2, ctx);
-				
-				assocBeanProperty.addJoin(joinType, alias2, alias, ctx);
-			}
-		}
-        
-		if (!manyToMany){
-			assocBeanProperty.addJoin(joinType, prefix, ctx);
-		}
+  public String getName() {
+    return prefix;
+  }
+
+  public void addChild(SqlTreeNodeExtraJoin child) {
+    if (children == null) {
+      children = new ArrayList<SqlTreeNodeExtraJoin>();
+    }
+    children.add(child);
+  }
+
+  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
+
+    boolean manyToMany = false;
+
+    if (assocBeanProperty instanceof BeanPropertyAssocMany<?>) {
+      BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) assocBeanProperty;
+      if (manyProp.isManyToMany()) {
+
+        manyToMany = true;
+
+        String alias = ctx.getTableAlias(prefix);
+        String[] split = SplitName.split(prefix);
+        String parentAlias = ctx.getTableAlias(split[0]);
+        String alias2 = alias + "z_";
+
+        TableJoin manyToManyJoin = manyProp.getIntersectionTableJoin();
+        manyToManyJoin.addJoin(joinType, parentAlias, alias2, ctx);
+
+        assocBeanProperty.addJoin(joinType, alias2, alias, ctx);
+      }
+    }
+
+    if (!manyToMany) {
+      assocBeanProperty.addJoin(joinType, prefix, ctx);
+    }
 
     if (children != null) {
 
@@ -101,23 +101,23 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
     }
   }
 
-	/**
-	 * Does nothing.
-	 */
-	public void appendSelect(DbSqlContext ctx, boolean subQuery) {		
-	}
+  /**
+   * Does nothing.
+   */
+  public void appendSelect(DbSqlContext ctx, boolean subQuery) {
+  }
 
-	/**
-	 * Does nothing.
-	 */
-	public void appendWhere(DbSqlContext ctx) {
-	}
+  /**
+   * Does nothing.
+   */
+  public void appendWhere(DbSqlContext ctx) {
+  }
 
-	/**
-	 * Does nothing.
-	 */
-	public EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean parentBean) throws SQLException {
-		return null;
-	}
+  /**
+   * Does nothing.
+   */
+  public EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean parentBean) throws SQLException {
+    return null;
+  }
 
 }
