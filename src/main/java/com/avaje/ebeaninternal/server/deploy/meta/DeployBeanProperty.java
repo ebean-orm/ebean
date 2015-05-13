@@ -195,11 +195,6 @@ public class DeployBeanProperty {
      */
     private Method readMethod;
 
-    /**
-     * The method used to write the property.
-     */
-    private Method writeMethod;
-
     private int propertyIndex;
     
     private BeanPropertyGetter getter;
@@ -452,13 +447,6 @@ public class DeployBeanProperty {
      */
     public Method getReadMethod() {
         return readMethod;
-    }
-
-    /**
-     * Return the setter method.
-     */
-    public Method getWriteMethod() {
-        return writeMethod;
     }
 
     /**
@@ -848,17 +836,6 @@ public class DeployBeanProperty {
      */
     public void setReadMethod(Method readMethod) {
         this.readMethod = readMethod;
-    }
-
-    /**
-     * Set the bean write method.
-     * <p>
-     * NB: That a BeanReflectSetter is used to actually perform the setting of
-     * property values to a bean. This is due to performance considerations.
-     * </p>
-     */
-    public void setWriteMethod(Method writeMethod) {
-        this.writeMethod = writeMethod;
     }
 
     /**

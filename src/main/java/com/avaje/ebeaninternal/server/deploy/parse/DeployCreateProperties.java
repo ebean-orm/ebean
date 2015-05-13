@@ -56,20 +56,6 @@ public class DeployCreateProperties {
 
     createProperties(desc, desc.getBeanType(), 0);
     desc.sortProperties();
-
-    // check the transient properties...
-    for (DeployBeanProperty prop : desc.propertiesAll()) {
-      if (prop.isTransient()) {
-        if (prop.getWriteMethod() == null || prop.getReadMethod() == null) {
-          // Typically a helper method ... this is expected
-          logger.trace("... transient: " + prop.getFullBeanName());
-        } else {
-          // dubious, possible error...
-          String msg = Message.msg("deploy.property.nofield", desc.getFullName(), prop.getName());
-          logger.warn(msg);
-        }
-      }
-    }
   }
 
   /**
@@ -123,13 +109,9 @@ public class DeployCreateProperties {
           String initFieldName = initCap(fieldName);
 
           Method getter = findGetter(field, initFieldName, declaredMethods, scalaObject);
-          Method setter = findSetter(field, initFieldName, declaredMethods, scalaObject);
 
-          DeployBeanProperty prop = createProp(desc, field, beanType, getter, setter);
-          if (prop == null) {
-            // transient annotation on unsupported type
-
-          } else {
+          DeployBeanProperty prop = createProp(desc, field, beanType, getter);
+          if (prop != null) {
             // set a order that gives priority to inherited properties
             // push Id/EmbeddedId up and CreatedTimestamp/UpdatedTimestamp down
             int sortOverride = prop.getSortOverride();
@@ -264,7 +246,7 @@ public class DeployCreateProperties {
         return new DeployBeanPropertySimpleCollection(desc, targetType, manyType);
       }
     } catch (NullPointerException e) {
-      logger.debug("expected non-scalar type" + e.getMessage());
+      logger.debug("expected non-scalar type {}", e.getMessage());
     }
     // TODO: Handle Collection of CompoundType and Embedded Type
     return new DeployBeanPropertyAssocMany(desc, targetType, manyType);
@@ -282,7 +264,6 @@ public class DeployCreateProperties {
     	
     	if (tt != null && !tt.equals(void.class)){
     		propertyType = tt;
-    		logger.debug("target type" + tt);
     	}
     }
     Class<?> innerType = propertyType;
@@ -372,8 +353,7 @@ public class DeployCreateProperties {
     return (t != null);
   }
 
-  private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field, Class<?> beanType,
-      Method getter, Method setter) {
+  private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field, Class<?> beanType, Method getter) {
 
     DeployBeanProperty prop = createProp(desc, field);
     if (prop == null) {
@@ -383,11 +363,8 @@ public class DeployCreateProperties {
       prop.setOwningType(beanType);
       prop.setName(field.getName());
 
-      // the getter or setter could be null if we are using
-      // javaagent type enhancement. If we are using subclass
-      // generation then we do need to find the getter and setter
+      // interested in the getter for reading annotations
       prop.setReadMethod(getter);
-      prop.setWriteMethod(setter);
       prop.setField(field);
       return prop;
     }

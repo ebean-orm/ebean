@@ -219,34 +219,6 @@ public class DeployBeanDescriptor<T> {
     return beanTable;
   }
 
-  /**
-   * Check all the properties to see if they all have read and write methods
-   * (required if using "subclassing" but not for "enhancement").
-   */
-  public boolean checkReadAndWriteMethods() {
-
-    boolean missingMethods = false;
-
-    for (DeployBeanProperty prop : propMap.values()) {
-      if (!prop.isTransient()) {
-        String m = "";
-        if (prop.getReadMethod() == null) {
-          m += " missing readMethod ";
-        }
-        if (prop.getWriteMethod() == null) {
-          m += " missing writeMethod ";
-        }
-        if (!"".equals(m)) {
-          m += ". Should it be transient?";
-          String msg = "Bean property " + getFullName() + "." + prop.getName() + " has " + m;
-          logger.error(msg);
-          missingMethods = true;
-        }
-      }
-    }
-    return !missingMethods;
-  }
-
   public void setEntityType(EntityType entityType) {
     this.entityType = entityType;
   }
