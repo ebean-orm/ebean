@@ -120,7 +120,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Map of BeanProperty Linked so as to preserve order.
    */
   private final LinkedHashMap<String, BeanProperty> propMap;
-  private final LinkedHashMap<String, BeanProperty> propMapByDbColumn;
 
   /**
    * The type of bean this describes.
@@ -215,7 +214,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   private final BeanPropertyAssocOne<?>[] propertiesOneImportedSave;
   private final BeanPropertyAssocOne<?>[] propertiesOneImportedDelete;
 
-  private final BeanPropertyAssocOne<?>[] propertiesOneExported;
+  //private final BeanPropertyAssocOne<?>[] propertiesOneExported;
   private final BeanPropertyAssocOne<?>[] propertiesOneExportedSave;
   private final BeanPropertyAssocOne<?>[] propertiesOneExportedDelete;
 
@@ -346,7 +345,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.idProperty = listHelper.getId();
     this.versionProperty = listHelper.getVersionProperty();
     this.propMap = listHelper.getPropertyMap();
-    this.propMapByDbColumn = getReverseMap(propMap);
     this.propertiesTransient = listHelper.getTransients();
     this.propertiesNonTransient = listHelper.getNonTransients();
     this.propertiesBaseScalar = listHelper.getBaseScalar();
@@ -356,7 +354,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.propertiesMutable = listHelper.getMutable();
     this.unidirectional = listHelper.getUnidirectional();
     this.propertiesOne = listHelper.getOnes();
-    this.propertiesOneExported = listHelper.getOneExported();
+    //this.propertiesOneExported = listHelper.getOneExported();
     this.propertiesOneExportedSave = listHelper.getOneExportedSave();
     this.propertiesOneExportedDelete = listHelper.getOneExportedDelete();
     this.propertiesOneImported = listHelper.getOneImported();
@@ -639,10 +637,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return (queryUseCache != null) ? queryUseCache.booleanValue() : isBeanCaching();
   }
 
-  public T cacheNaturalKey(SpiQuery<T> query, SpiTransaction t) {
-    return cacheHelp.naturalKeyLookup(query, t);
-  }
-  
   /**
    * Return the cache options.
    */
@@ -709,13 +703,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * Return true if there is currently query caching for this type of bean.
-   */
-  public boolean isQueryCaching() {
-    return cacheHelp.isQueryCaching();
-  }
-
-  /**
    * Return true if there is currently bean caching for this type of bean.
    */
   public boolean isBeanCaching() {
@@ -774,20 +761,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
   public void cacheManyPropClear(String propertyName) {
     cacheHelp.manyPropClear(propertyName);    
-  }
-
-  /**
-   * Return the CachedManyIds for a given bean and property. Returns null if not in the cache.
-   */
-  public CachedManyIds cacheManyPropGet(Object parentId, String propertyName) {
-    return cacheHelp.manyPropGet(parentId, propertyName);
-  }
-
-  /**
-   * Clear the bean cache.
-   */
-  public void cacheBeanClear() {
-    cacheHelp.beanCacheClear();
   }
 
   public void cacheBeanPut(T bean) {
@@ -1553,26 +1526,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * De-register the BeanPersistListener.
-   */
-  @SuppressWarnings("unchecked")
-  public void deregister(BeanPersistListener listener) {
-    // volatile read...
-    BeanPersistListener currListener = persistListener;
-    if (currListener == null) {
-      // nothing to deregister
-    } else {
-      BeanPersistListener deregListener = listener;
-      if (currListener instanceof ChainedBeanPersistListener) {
-        // remove it from the existing chain
-        persistListener = ((ChainedBeanPersistListener) currListener).deregister(deregListener);
-      } else if (currListener.equals(deregListener)) {
-        persistListener = null;
-      }
-    }
-  }
-
-  /**
    * De-register the BeanPersistController.
    */
   public void deregister(BeanPersistController controller) {
@@ -1700,13 +1653,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * Return the IdGenerator.
-   */
-  public IdGenerator getIdGenerator() {
-    return idGenerator;
-  }
-
-  /**
    * Return the TableJoins.
    * <p>
    * For properties mapped to secondary tables rather than the base table.
@@ -1798,14 +1744,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   public void checkMutableProperties(EntityBeanIntercept ebi) {
     for (int i = 0; i < propertiesMutable.length; i++) {
       BeanProperty beanProperty = propertiesMutable[i];
-      if (ebi.isDirtyProperty(beanProperty.getPropertyIndex())) {
-        // already marked as dirty
-      } else if (ebi.isLoadedProperty(beanProperty.getPropertyIndex())) {
+      int propertyIndex = beanProperty.getPropertyIndex();
+      if (!ebi.isDirtyProperty(propertyIndex) && ebi.isLoadedProperty(propertyIndex)) {
         Object value = beanProperty.getValue(ebi.getOwner());
         if (value == null || beanProperty.isDirtyValue(value)) {
           // mutable scalar value which is considered dirty so mark
           // it as such so that it is included in an update
-          ebi.markPropertyAsChanged(beanProperty.getPropertyIndex());
+          ebi.markPropertyAsChanged(propertyIndex);
         }
       }
     }

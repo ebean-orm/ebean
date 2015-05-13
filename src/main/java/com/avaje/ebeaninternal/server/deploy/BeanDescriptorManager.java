@@ -104,8 +104,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private List<BeanDescriptor<?>> immutableDescriptorList;
 
-  private final Set<Integer> descriptorUniqueIds = new HashSet<Integer>();
-
   private final DbIdentity dbIdentity;
 
   private final DataSource dataSource;
@@ -286,9 +284,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     for (BeanDescriptor<?> desc : descMap.values()) {
       String baseTable = desc.getBaseTable();
-      if (baseTable == null) {
-
-      } else {
+      if (baseTable != null) {
         baseTable = baseTable.toLowerCase();
 
         List<BeanDescriptor<?>> list = tableToDescMap.get(baseTable);
@@ -363,8 +359,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       BeanDescriptor<?> idBeanDescriptor = embId.getIdBeanDescriptor();
       Class<?> idType = idBeanDescriptor.getBeanType();
       try {
-        idType.getDeclaredMethod("hashCode", new Class[] {});
-        idType.getDeclaredMethod("equals", new Class[] { Object.class });
+        idType.getDeclaredMethod("hashCode");
+        idType.getDeclaredMethod("equals", Object.class);
       } catch (NoSuchMethodException e) {
         checkMissingHashCodeOrEquals(e, idType, d.getBeanType());
       }
@@ -385,16 +381,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return immutableDescriptorList;
   }
 
-  public Map<Class<?>, BeanTable> getBeanTables() {
-    return beanTableMap;
-  }
-
   public BeanTable getBeanTable(Class<?> type) {
     return beanTableMap.get(type);
-  }
-
-  public Map<String, BeanDescriptor<?>> getBeanDescriptors() {
-    return descMap;
   }
 
   @SuppressWarnings("unchecked")
@@ -539,9 +527,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       BeanDescriptor<?> desc = getBeanDescriptor(deployDesc.getBeanType());
 
       for (DRawSqlMeta rawSqlMeta : deployDesc.getRawSqlMeta()) {
-        if (rawSqlMeta.getQuery() == null) {
-
-        } else {
+        if (rawSqlMeta.getQuery() != null) {
           DeployNamedQuery nq = new DRawSqlSelectBuilder(namingConvention, desc, rawSqlMeta).parse();
           desc.addNamedQuery(nq);
         }
@@ -603,15 +589,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   
   private Integer getUniqueHash(DeployBeanDescriptor<?> deployBeanDescriptor) {
 
-    int hashCode = deployBeanDescriptor.getFullName().hashCode();
-
-    for (int i = 0; i < 100000; i++) {
-      Integer key = Integer.valueOf(hashCode + i);
-      if (!descriptorUniqueIds.contains(key)) {
-        return key;
-      }
-    }
-    throw new RuntimeException("Failed to generate a unique hash for " + deployBeanDescriptor.getFullName());
+    return deployBeanDescriptor.getFullName().hashCode();
   }
 
   private void secondaryPropsJoins(DeployBeanInfo<?> info) {
@@ -646,7 +624,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     for (DeployBeanPropertyAssocOne<?> oneProp : info.getDescriptor().propertiesAssocOne()) {
       if (!oneProp.isTransient()) {
         if (oneProp.getMappedBy() != null) {
-          checkMappedByOneToOne(info, oneProp);
+          checkMappedByOneToOne(oneProp);
         }
       }
     }
@@ -654,7 +632,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     for (DeployBeanPropertyAssocMany<?> manyProp : info.getDescriptor().propertiesAssocMany()) {
       if (!manyProp.isTransient()) {
         if (manyProp.isManyToMany()) {
-          checkMappedByManyToMany(info, manyProp);
+          checkMappedByManyToMany(manyProp);
         } else {
           checkMappedByOneToMany(info, manyProp);
         }
@@ -724,7 +702,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         // search for this in the possible matches
         for (String possibleMappedBy : matchSet) {
           String possibleLower = possibleMappedBy.toLowerCase();
-          if (possibleLower.indexOf(searchName) > -1) {
+          if (possibleLower.contains(searchName)) {
             // we have a match..
             prop.setMappedBy(possibleMappedBy);
 
@@ -809,7 +787,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   }
 
-  private void checkMappedByOneToOne(DeployBeanInfo<?> info, DeployBeanPropertyAssocOne<?> prop) {
+  private void checkMappedByOneToOne(DeployBeanPropertyAssocOne<?> prop) {
 
     // check that the mappedBy property is valid and read
     // its associated join information if it is available
@@ -901,7 +879,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * For mappedBy copy the joins from the other side.
    */
-  private void checkMappedByManyToMany(DeployBeanInfo<?> info, DeployBeanPropertyAssocMany<?> prop) {
+  private void checkMappedByManyToMany(DeployBeanPropertyAssocMany<?> prop) {
 
     // get the bean descriptor that holds the mappedBy property
     String mappedBy = prop.getMappedBy();
@@ -1029,10 +1007,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private <T> IdType setIdGeneration(DeployBeanDescriptor<T> desc) {
 
     if (desc.propertiesId().size() == 0) {
-      // bean doen't have an Id property
-      if (!desc.isBaseTableType() || desc.getBeanFinder() != null) {
-        // using BeanFinder so perhaps valid without an id
-      } else {
+      // bean doesn't have an Id property
+      if (desc.isBaseTableType() && desc.getBeanFinder() == null) {
         // expecting an id property
         logger.warn(Message.msg("deploy.nouid", desc.getFullName()));
       }
@@ -1120,7 +1096,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private void setScalarType(DeployBeanDescriptor<?> deployDesc) {
 
     for (DeployBeanProperty prop : deployDesc.propertiesAll()) {
-      if (prop instanceof DeployBeanPropertyAssoc<?> == false) {
+      if (!(prop instanceof DeployBeanPropertyAssoc<?>)) {
         deployUtil.setScalarType(prop);
       }
     }
@@ -1228,7 +1204,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     for (Dnode namedQueryXml : namedQueries) {
 
-      String name = (String) namedQueryXml.getAttribute("name");
+      String name = namedQueryXml.getAttribute("name");
       Dnode query = namedQueryXml.find("query");
       if (query == null) {
         logger.warn("orm.xml " + deployDesc.getFullName() + " named-query missing query element?");
@@ -1282,7 +1258,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         }
         
       } else {
-        int propertyIndex = pos.intValue();
+        final int propertyIndex = pos;
         prop.setPropertyIndex(propertyIndex);
         prop.setGetter(beanReflect.getGetter(propName, propertyIndex));
         prop.setSetter(beanReflect.getSetter(propName, propertyIndex));
@@ -1294,16 +1270,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * Return true if this is a persistent field (not transient or static).
    */
   private boolean isPersistentField(DeployBeanProperty prop) {
-    
+
     Field field = prop.getField();
     int modifiers = field.getModifiers();
-    if (Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers)) {
-      return false;
-    }
-    if (field.isAnnotationPresent(Transient.class)) {
-      return false;
-    }
-    return true;
+    return !(Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers)) && !field.isAnnotationPresent(Transient.class);
   }
 
   /**
