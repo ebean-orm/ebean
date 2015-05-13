@@ -69,7 +69,9 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     if (list == null) {
       list = new ArrayList<E>();
     }
-    list.add((E) bean);
+    if (bean != null) {
+      list.add((E) bean);
+    }
   }
 
   public boolean checkEmptyLazyLoad() {

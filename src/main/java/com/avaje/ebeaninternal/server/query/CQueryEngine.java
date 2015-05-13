@@ -224,7 +224,7 @@ public class CQueryEngine {
       }
 
       if (cquery.readBean()) {
-        bean = cquery.getLoadedBean();
+        bean = cquery.next();
       }
 
       if (request.isLogSummary()) {

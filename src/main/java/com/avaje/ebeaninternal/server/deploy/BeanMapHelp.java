@@ -109,8 +109,12 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
   @Override
   public void add(BeanCollection<?> collection, EntityBean bean) {
 
-    Object keyValue = beanProperty.getValueIntercept(bean);
-    ((BeanMap<?, ?>) collection).internalPut(keyValue, bean);
+    if (bean == null) {
+      ((BeanMap<?, ?>) collection).internalPutNull();
+    } else {
+      Object keyValue = beanProperty.getValueIntercept(bean);
+      ((BeanMap<?, ?>) collection).internalPut(keyValue, bean);
+    }
   }
 
   @Override

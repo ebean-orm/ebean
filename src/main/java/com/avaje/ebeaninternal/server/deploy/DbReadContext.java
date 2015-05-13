@@ -73,13 +73,8 @@ public interface DbReadContext {
 	/**
 	 * Set back the bean that has just been loaded with its id.
 	 */
-	public void setLoadedBean(EntityBean loadedBean, Object id, Object lazyLoadParentId);
+	public void setLazyLoadedChildBean(EntityBean loadedBean, Object parentId);
 
-	/**
-	 * Set back the 'detail' bean that has just been loaded.
-	 */
-	public void setLoadedManyBean(EntityBean loadedBean);
-	
 	/**
 	 * Return the query mode.
 	 */

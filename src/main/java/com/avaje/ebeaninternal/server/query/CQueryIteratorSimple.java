@@ -23,7 +23,7 @@ class CQueryIteratorSimple<T> implements QueryIterator<T> {
   public boolean hasNext() {
     try {
       request.flushPersistenceContextOnIterate();
-      return cquery.hasNextBean();
+      return cquery.hasNext();
     } catch (SQLException e) {
       throw cquery.createPersistenceException(e);
     }
@@ -31,7 +31,7 @@ class CQueryIteratorSimple<T> implements QueryIterator<T> {
 
   @SuppressWarnings("unchecked")
   public T next() {
-    return (T)cquery.getLoadedBean();
+    return (T)cquery.next();
   }
 
   public void close() {

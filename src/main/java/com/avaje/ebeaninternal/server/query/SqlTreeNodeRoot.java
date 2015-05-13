@@ -28,14 +28,7 @@ public final class SqlTreeNodeRoot extends SqlTreeNodeBean {
 		super(null, null, desc, props, myList, withId, null);
 		this.includeJoin = null;
 	}
-	
-	@Override
-	protected void postLoad(DbReadContext cquery, EntityBean loadedBean, Object id, Object lazyLoadParentId) {
-		
-		// set the current bean with id...
-		cquery.setLoadedBean(loadedBean, id, lazyLoadParentId);
-	}
-	
+
   /**
    * For the root node there is no join type or on clause etc.
    */

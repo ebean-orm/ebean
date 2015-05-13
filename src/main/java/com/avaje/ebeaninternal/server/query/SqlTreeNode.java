@@ -9,31 +9,25 @@ import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 
 public interface SqlTreeNode {
 
-  public static final String PERIOD = ".";
+  String COMMA = ", ";
 
-  public static final String COMMA = ", ";
-
-  public static final int NORMAL = 0;
-  public static final int SHARED = 1;
-  public static final int READONLY = 2;
-
-  public void buildSelectExpressionChain(List<String> selectChain);
+  void buildSelectExpressionChain(List<String> selectChain);
 
   /**
    * Append the required column information to the SELECT part of the sql
    * statement.
    */
-  public void appendSelect(DbSqlContext ctx, boolean subQuery);
+  void appendSelect(DbSqlContext ctx, boolean subQuery);
 
   /**
    * Append to the FROM part of the sql.
    */
-  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType);
+  void appendFrom(DbSqlContext ctx, SqlJoinType joinType);
 
   /**
    * Append any where predicates for inheritance.
    */
-  public void appendWhere(DbSqlContext ctx);
+  void appendWhere(DbSqlContext ctx);
 
   /**
    * Load the appropriate information from the SqlSelectReader.
@@ -43,6 +37,6 @@ public interface SqlTreeNode {
    * </p>
    * 
    */
-  public void load(DbReadContext ctx, EntityBean parentBean) throws SQLException;
+  EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean contextBean) throws SQLException;
 
 }

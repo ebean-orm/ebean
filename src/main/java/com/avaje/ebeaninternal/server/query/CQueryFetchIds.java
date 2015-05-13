@@ -270,14 +270,10 @@ public class CQueryFetchIds {
 			// no-op
 		}
 
-		public void setLoadedBean(EntityBean loadedBean, Object id, Object lazyLoadParentId) {
+		public void setLazyLoadedChildBean(EntityBean loadedBean, Object lazyLoadParentId) {
 			// no-op
 		}
 
-		public void setLoadedManyBean(EntityBean loadedBean) {
-			// no-op
-		}
-		
 	}
 	
 }

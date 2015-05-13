@@ -62,7 +62,9 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     if (set == null) {
       set = new LinkedHashSet<E>();
     }
-    set.add((E) bean);
+    if (bean != null) {
+      set.add((E) bean);
+    }
   }
 
   /**

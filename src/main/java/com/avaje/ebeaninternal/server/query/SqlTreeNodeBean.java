@@ -69,7 +69,9 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   protected final Map<String, String> pathMap;
   
   protected final BeanPropertyAssocMany<?> lazyLoadParent;
-  
+
+  private final IdBinder lazyLoadParentIdBinder;
+
   public SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
       List<SqlTreeNode> myChildren, boolean withId) {
 
@@ -83,6 +85,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       SqlTreeProperties props, List<SqlTreeNode> myChildren, boolean withId,  BeanPropertyAssocMany<?> lazyLoadParent) {
 
     this.lazyLoadParent = lazyLoadParent;
+    this.lazyLoadParentIdBinder = (lazyLoadParent == null) ? null : lazyLoadParent.getBeanDescriptor().getIdBinder();
     this.prefix = prefix;
     this.nodeBeanProp = beanProp;
     this.desc = desc;
@@ -134,9 +137,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     }
   }
 
-  protected void postLoad(DbReadContext cquery, EntityBean loadedBean, Object id, Object lazyLoadParentId) {
-  }
-
   public void buildSelectExpressionChain(List<String> selectChain) {
     if (readId) {
       idBinder.buildSelectExpressionChain(prefix, selectChain);
@@ -155,11 +155,11 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * read the properties from the resultSet.
    */
-  public void load(DbReadContext ctx, EntityBean parentBean) throws SQLException {
+  public EntityBean load(DbReadContext ctx, EntityBean parentBean, EntityBean contextParent) throws SQLException {
 
     Object lazyLoadParentId = null;
-    if (lazyLoadParent != null) {
-      lazyLoadParentId = lazyLoadParent.getBeanDescriptor().getIdBinder().read(ctx);
+    if (lazyLoadParentIdBinder != null) {
+      lazyLoadParentId = lazyLoadParentIdBinder.read(ctx);
     }
     
     // bean already existing in the persistence context
@@ -196,12 +196,8 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     PersistenceContext persistenceContext = !readId ? null : ctx.getPersistenceContext();
 
-    Object id = null;
-    if (!readId) {
-      // report type bean... or perhaps excluding the id for SqlSelect?
-
-    } else {
-      id = localIdBinder.readSet(ctx, localBean);
+    if (readId) {
+      Object id = localIdBinder.readSet(ctx, localBean);
       if (id == null) {
         // bean must be null...
         localBean = null;
@@ -265,7 +261,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     for (int i = 0; i < children.length; i++) {
       // read each child... and let them set their
       // values back to this localBean
-      children[i].load(ctx, localBean);
+      children[i].load(ctx, localBean, contextBean);
     }
 
     if (lazyLoadMany) {
@@ -279,36 +275,33 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       }
       localDesc.postLoad(localBean, null);
 
-      if (localBean instanceof EntityBean) {
-        EntityBeanIntercept ebi = ((EntityBean) localBean)._ebean_getIntercept();
-        ebi.setPersistenceContext(persistenceContext);
-        if (Mode.LAZYLOAD_BEAN.equals(queryMode)) {
-          // Lazy Load does not reset the dirty state
-          ebi.setLoadedLazy();
-        } else {
-          // normal bean loading
-          ebi.setLoaded();
-        }
-
-        if (partialObject) {
-          if (readId) {
-            // register for lazy loading 
-            ctx.register(null, ebi);
-          }
-        } else {
-          ebi.setFullyLoadedBean(true);
-        }
-
-        if (disableLazyLoad) {
-          // bean does not have an Id or is SqlSelect based
-          ebi.setDisableLazyLoad(true);
-        }
-        if (ctx.isAutoFetchProfiling()) {
-          // collect autofetch profiling for this bean...
-          ctx.profileBean(ebi, prefix);
-        }
+      EntityBeanIntercept ebi = localBean._ebean_getIntercept();
+      ebi.setPersistenceContext(persistenceContext);
+      if (Mode.LAZYLOAD_BEAN.equals(queryMode)) {
+        // Lazy Load does not reset the dirty state
+        ebi.setLoadedLazy();
+      } else {
+        // normal bean loading
+        ebi.setLoaded();
       }
 
+      if (partialObject) {
+        if (readId) {
+          // register for lazy loading
+          ctx.register(null, ebi);
+        }
+      } else {
+        ebi.setFullyLoadedBean(true);
+      }
+
+      if (disableLazyLoad) {
+        // bean does not have an Id or is SqlSelect based
+        ebi.setDisableLazyLoad(true);
+      }
+      if (ctx.isAutoFetchProfiling()) {
+        // collect autofetch profiling for this bean...
+        ctx.profileBean(ebi, prefix);
+      }
     }
     if (parentBean != null) {
       // set this back to the parentBean
@@ -317,13 +310,13 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     if (!readId) {
       // a bean with no Id (never found in context)
-      postLoad(ctx, localBean, id, null);
+      return localBean;
 
     } else {
-      // return the contextBean which is either the localBean
-      // read from the resultSet and put into the context OR
-      // the 'matching' bean that already existed in the context
-      postLoad(ctx, contextBean, id, lazyLoadParentId);
+      if (lazyLoadParentId != null) {
+        ctx.setLazyLoadedChildBean(contextBean, lazyLoadParentId);
+      }
+      return contextBean;
     }
   }
 
@@ -339,10 +332,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     BeanPropertyAssocMany<?>[] manys = localDesc.propertiesMany();
     for (int i = 0; i < manys.length; i++) {
 
-      if (fetchedMany != null && fetchedMany.equals(manys[i])) {
-        // this many property is included in the query...
-        // it is being loaded with real row data (result[1])
-      } else {
+      if (fetchedMany == null || !fetchedMany.equals(manys[i])) {
         // create a proxy for the many (deferred fetching)
         BeanCollection<?> ref = manys[i].createReferenceIfNull(localBean);
         if (ref != null && !ref.isRegisteredWithLoadContext()) {
@@ -418,13 +408,9 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
   public void appendWhere(DbSqlContext ctx) {
 
-	// Only apply inheritance to root node as any join will alreay have the inheritance join include - see TableJoin
-	if (inheritInfo != null && nodeBeanProp == null) {
-      if (inheritInfo.isRoot()) {
-        // at root of hierarchy so don't bother
-        // adding a where clause because we want
-        // all the types...
-      } else {
+    // Only apply inheritance to root node as any join will alreay have the inheritance join include - see TableJoin
+    if (inheritInfo != null && nodeBeanProp == null) {
+      if (!inheritInfo.isRoot()) {
         // restrict to this type and
         // sub types of this type.
         if (ctx.length() > 0) {

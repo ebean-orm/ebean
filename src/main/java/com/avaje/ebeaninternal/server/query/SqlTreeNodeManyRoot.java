@@ -10,24 +10,22 @@ import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 
 public final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
 
+  final BeanPropertyAssocMany<?> manyProp;
+
   public SqlTreeNodeManyRoot(String prefix, BeanPropertyAssocMany<?> prop, SqlTreeProperties props, List<SqlTreeNode> myList) {
     super(prefix, prop, prop.getTargetDescriptor(), props, myList, true, null);
+    this.manyProp = prop;
   }
 
   @Override
-  protected void postLoad(DbReadContext cquery, EntityBean loadedBean, Object id, Object lazyLoadParentId) {
-
-    // put the localBean into the manyValue so that it
-    // is added to the collection/map
-    cquery.setLoadedManyBean(loadedBean);
-  }
-
-  @Override
-  public void load(DbReadContext cquery, EntityBean parentBean) throws SQLException {
+  public EntityBean load(DbReadContext cquery, EntityBean parentBean, EntityBean contextParent) throws SQLException {
     // pass in null for parentBean because the localBean
     // that is built is added to a collection rather than
     // being set to the parentBean directly
-    super.load(cquery, null);
+    EntityBean detailBean = super.load(cquery, null, null);
+    // initialise the collection and add detailBean if it is not null
+    manyProp.addBeanToCollectionWithCreate(contextParent, detailBean);
+    return detailBean;
   }
 
   /**

@@ -20,7 +20,6 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
  * </p>
  */
 public class SqlTreeNodeExtraJoin implements SqlTreeNode {
-
 	
 	private final BeanPropertyAssoc<?> assocBeanProperty;
 	
@@ -35,16 +34,12 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
 		this.assocBeanProperty = assocBeanProperty;
 		this.manyJoin = assocBeanProperty instanceof BeanPropertyAssocMany<?>;
 	}
-	
-	
-	
+
 	public void buildSelectExpressionChain(List<String> selectChain) {
 	    // nothing to add
 	}
 
-
-
-    /**
+	/**
 	 * Return true if the extra join is a many join.
 	 * <p>
 	 * This means we need to add distinct to the sql query.
@@ -95,7 +90,7 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
     if (children != null) {
 
       if (manyJoin) {
-        // if AUTO then make all decendants use OUTER JOIN
+        // if AUTO then make all descendants use OUTER JOIN
         joinType = joinType.autoToOuter();
       }
 
@@ -121,7 +116,8 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
 	/**
 	 * Does nothing.
 	 */
-	public void load(DbReadContext ctx, EntityBean parentBean) throws SQLException {
+	public EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean parentBean) throws SQLException {
+		return null;
 	}
 
 }

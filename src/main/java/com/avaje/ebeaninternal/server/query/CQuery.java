@@ -60,46 +60,22 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    * Flag set when no more rows are in the resultSet.
    */
   private boolean noMoreRows;
-  /**
-   * Id of loaded 'master' bean.
-   */
-  private Object loadedBeanId;
-  /**
-   * Flag set when 'master' bean changed.
-   */
-  private boolean loadedBeanChanged;
 
   /**
    * The 'master' bean just loaded.
    */
-  private EntityBean loadedBean;
+  private EntityBean nextBean;
+
+  /**
+   * Holds the previous loaded bean.
+   */
+  private EntityBean currentBean;
 
   private final BeanPropertyAssocMany<?> lazyLoadManyProperty;
 
   private Object lazyLoadParentId;
-  
+
   private EntityBean lazyLoadParentBean;
-    
-  /**
-   * Holds the previous loaded bean.
-   */
-  private EntityBean prevLoadedBean;
-
-  /**
-   * The detail bean just loaded.
-   */
-  private EntityBean loadedManyBean;
-
-  /**
-   * The previous 'detail' collection remembered so that for manyToMany we can
-   * turn on the modify listening.
-   */
-  private Object prevDetailCollection;
-
-  /**
-   * The current 'detail' collection being populated.
-   */
-  private Object currentDetailCollection;
 
   /**
    * The 'master' collection being populated.
@@ -122,11 +98,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   private Map<String, String> currentPathMap;
 
   private String currentPrefix;
-
-  /**
-   * Flag set true when reading 'master' and 'detail' beans.
-   */
-  private final boolean manyIncluded;
 
   /**
    * Where clause predicates.
@@ -166,11 +137,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    */
   private final BeanPropertyAssocMany<?> manyProperty;
 
-  /**
-   * The many property Expression language object.
-   */
-  private final ElPropertyValue manyPropertyEl;
-
   private final int maxRowsLimit;
 
   private DataReader dataReader;
@@ -186,7 +152,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private final CQueryPlan queryPlan;
 
-
   private final Mode queryMode;
 
   private final boolean autoFetchProfiling;
@@ -197,16 +162,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   
   private final WeakReference<NodeUsageListener> autoFetchManagerRef;
 
-
   private final Boolean readOnly;
-
-  private final SpiExpressionList<?> filterMany;
 
   private long startNano;
 
   private long executionTimeMicros;
-
-  private BeanCollectionAdd currentDetailAdd;
 
   /**
    * Create the Sql select based on the request.
@@ -233,19 +193,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
     this.sqlTree = queryPlan.getSqlTree();
     this.rootNode = sqlTree.getRootNode();
-
     this.manyProperty = sqlTree.getManyProperty();
-    this.manyPropertyEl = sqlTree.getManyPropertyEl();
-    this.manyIncluded = sqlTree.isManyIncluded();
-    if (manyIncluded) {
-      // get filter to put on the collection for reuse with refresh
-      String manyPropertyName = sqlTree.getManyPropertyName();
-      OrmQueryProperties chunk = query.getDetail().getChunk(manyPropertyName, false);
-      this.filterMany = (chunk == null) ? null : chunk.getFilterMany();
-    } else {
-      this.filterMany = null;
-    }
-
     this.sql = queryPlan.getSql();
     this.rawSql = queryPlan.isRawSql();
     this.rowNumberIncluded = queryPlan.isRowNumberIncluded();
@@ -414,58 +362,18 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return request.getPersistenceContext();
   }
 
-  public void setLoadedBean(EntityBean bean, Object id, Object lazyLoadParentId) {
-    if (id != null && id.equals(loadedBeanId)) {
-      // master/detail loading with master bean
-      // unchanged. NB Using id to avoid any issue
-      // with equals not being implemented
+  public void setLazyLoadedChildBean(EntityBean bean, Object lazyLoadParentId) {
 
-    } else {
-      if (manyIncluded) {
-        if (rowCount > 1) {
-          loadedBeanChanged = true;
-        }
-        this.prevLoadedBean = loadedBean;
-        this.loadedBeanId = id;
-      }
-     
-      this.loadedBean = bean;
-      
       if (lazyLoadParentId != null) {
         if (!lazyLoadParentId.equals(this.lazyLoadParentId)) {
           // get the appropriate parent bean from the persistence context
           this.lazyLoadParentBean = (EntityBean)getPersistenceContext().get(lazyLoadManyProperty.getBeanDescriptor().getBeanType(), lazyLoadParentId);
           this.lazyLoadParentId = lazyLoadParentId;
         }
-        
+
         // add the loadedBean to the appropriate collection of lazyLoadParentBean
-        lazyLoadManyProperty.addBeanToCollectionWithCreate(lazyLoadParentBean, loadedBean);
+        lazyLoadManyProperty.addBeanToCollectionWithCreate(lazyLoadParentBean, bean);
       }
-    }
-  }
-
-  public void setLoadedManyBean(EntityBean manyValue) {
-    this.loadedManyBean = manyValue;
-  }
-
-  /**
-   * Return the last read bean.
-   */
-  public EntityBean getLoadedBean() {
-    if (manyIncluded) {
-      if (prevDetailCollection instanceof BeanCollection<?>) {
-        ((BeanCollection<?>) prevDetailCollection).setModifyListening(manyProperty.getModifyListenMode());
-
-      } else if (currentDetailCollection instanceof BeanCollection<?>) {
-        ((BeanCollection<?>) currentDetailCollection).setModifyListening(manyProperty.getModifyListenMode());
-      }
-    }
-
-    if (prevLoadedBean != null) {
-      return prevLoadedBean;
-    } else {
-      return loadedBean;
-    }
   }
 
   /**
@@ -475,29 +383,78 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    * the one/master and the second the many/detail.
    * </p>
    */
-  private boolean readRow() throws SQLException {
+  private boolean readNextBean() throws SQLException {
 
-    synchronized (this) {
-      if (cancelled) {
+    if (!moveToNextRow()) {
+      if (currentBean == null) {
         return false;
+      } else {
+        // the last bean
+        nextBean = currentBean;
+        loadedBeanCount++;
+        return true;
       }
+    }
 
-      if (!dataReader.next()) {
-        return false;
-      }
+    loadedBeanCount++;
 
-      rowCount++;
-      dataReader.resetColumnPosition();
-
-      if (rowNumberIncluded) {
-        // row_number() column used for limit features
-        dataReader.incrementPos(1);
-      }
-
-      rootNode.load(this, null);
-
+    if (manyProperty == null) {
+      // only single resultSet row required to build object so we are done
+      // read a single resultSet row into single bean
+      nextBean = rootNode.load(this, null, null);
       return true;
     }
+
+    if (nextBean == null) {
+      // very first read
+      nextBean = rootNode.load(this, null, null);
+    } else {
+      // nextBean set to previously read currentBean
+      nextBean = currentBean;
+      // check the current row we have just moved to
+      if (checkForDifferentBean()) {
+        return true;
+      }
+    }
+    readUntilDifferentBeanStarted();
+    return true;
+  }
+
+  /**
+   * Read resultSet rows until we hit the end or get a different bean.
+   */
+  private void readUntilDifferentBeanStarted() throws SQLException {
+    while (moveToNextRow()) {
+      if (checkForDifferentBean()) return;
+    }
+  }
+
+  /**
+   * Read the currentBean from the row data returning true if the bean
+   * is different to the nextBean (false if we need to read more rows).
+   */
+  private boolean checkForDifferentBean() throws SQLException {
+    currentBean = rootNode.load(this, null, null);
+    return currentBean != nextBean;
+  }
+
+  /**
+   * Return true if we can move to the next resultSet row.
+   */
+  private boolean moveToNextRow() throws SQLException {
+
+    if (!dataReader.next()) {
+      noMoreRows = true;
+      return false;
+    }
+
+    rowCount++;
+    dataReader.resetColumnPosition();
+    if (rowNumberIncluded) {
+      // row_number() column used for limit features
+      dataReader.incrementPos(1);
+    }
+    return true;
   }
 
   public long getQueryExecutionTimeMicros() {
@@ -506,96 +463,33 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   public boolean readBean() throws SQLException {
 
-    boolean result = readBeanInternal();
-
+    boolean result = hasNext();
     updateExecutionStatistics();
-
     return result;
   }
 
-  private boolean readBeanInternal() throws SQLException {
+  protected EntityBean next() {
+    return nextBean;
+  }
 
-    if (loadedBeanCount >= maxRowsLimit) {
-      return false;
-    }
+  protected boolean hasNext() throws SQLException {
 
-    if (!manyIncluded) {
-      // simple query... no details...
-      return readRow();
-    }
-
-    if (noMoreRows) {
-      return false;
-    }
-
-    if (rowCount == 0) {
-      if (!readRow()) {
-        // no rows at all...
+    synchronized (this) {
+      if (noMoreRows || cancelled || loadedBeanCount >= maxRowsLimit) {
         return false;
-      } else {
-        createNewDetailCollection();
       }
-    }
-
-    if (readIntoCurrentDetailCollection()) {
-      createNewDetailCollection();
-      // return prevLoadedBean
-      return true;
-
-    } else {
-      // return loadedBean
-      prevDetailCollection = null;
-      prevLoadedBean = null;
-      noMoreRows = true;
-      return true;
-    }
-  }
-
-  private boolean readIntoCurrentDetailCollection() throws SQLException {
-    while (readRow()) {
-      if (loadedBeanChanged) {
-        loadedBeanChanged = false;
-        return true;
-      } else {
-        addToCurrentDetailCollection();
-      }
-    }
-    return false;
-  }
-
-  private void createNewDetailCollection() {
-    prevDetailCollection = currentDetailCollection;
-    if (queryMode.equals(Mode.LAZYLOAD_MANY)) {
-      // just populate the current collection
-      currentDetailCollection = manyPropertyEl.elGetValue(loadedBean);
-    } else {
-      // create a new collection to populate and assign to the bean
-      currentDetailCollection = manyProperty.createEmpty(loadedBean);
-      manyPropertyEl.elSetValue(loadedBean, currentDetailCollection, false);
-    }
-
-    if (filterMany != null) {
-      // remember the for use with a refresh
-      ((BeanCollection<?>) currentDetailCollection).setFilterMany(filterMany);
-    }
-
-    // the manyKey is always null for this case, just using default mapKey on the property
-    currentDetailAdd = manyProperty.getBeanCollectionAdd(currentDetailCollection, null);
-    addToCurrentDetailCollection();
-  }
-
-  private void addToCurrentDetailCollection() {
-    if (loadedManyBean != null) {
-      currentDetailAdd.addBean(loadedManyBean);
+      return readNextBean();
     }
   }
 
   public BeanCollection<T> readCollection() throws SQLException {
 
-    readTheRows();
+    while (hasNext()) {
+      EntityBean bean = next();
+      help.add(collection, bean);
+    }
 
     updateExecutionStatistics();
-
     return collection;
   }
 
@@ -605,13 +499,12 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       executionTimeMicros = TimeUnit.NANOSECONDS.toMicros(exeNano);
 
       if (autoFetchProfiling) {
-        autoFetchManager
-            .collectQueryInfo(objectGraphNode, loadedBeanCount, executionTimeMicros);
+        autoFetchManager.collectQueryInfo(objectGraphNode, loadedBeanCount, executionTimeMicros);
       }
       queryPlan.executionTime(loadedBeanCount, executionTimeMicros, objectGraphNode);
 
     } catch (Exception e) {
-      logger.error(null, e);
+      logger.error("Error updating execution statistics", e);
     }
   }
 
@@ -625,26 +518,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     }
   }
 
-  private void readTheRows() throws SQLException {
-    while (hasNextBean()) {
-      // add to the list/set/map
-      help.add(collection, getLoadedBean());
-    }
-  }
-
-  protected boolean hasNextBean() throws SQLException {
-
-    if (!readBeanInternal()) {
-      return false;
-
-    } else {
-      loadedBeanCount++;
-      return true;
-    }
-  }
-
   public String getLoadedRowDetail() {
-    if (!manyIncluded) {
+    if (manyProperty == null) {
       return String.valueOf(rowCount);
     } else {
       return loadedBeanCount + ":" + rowCount;
@@ -743,8 +618,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
     if (t.isLogSummary()) {
       // log the error to the transaction log
-      String errMsg = StringHelper.replaceStringMulti(e.getMessage(), new String[] { "\r", "\n" },
-          "\\n ");
+      String errMsg = StringHelper.replaceStringMulti(e.getMessage(), new String[] { "\r", "\n" }, "\\n ");
       String msg = "ERROR executing query:   bindLog[" + bindLog + "] error[" + errMsg + "]";
       t.logSummary(msg);
     }

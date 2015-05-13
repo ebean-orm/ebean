@@ -52,12 +52,20 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     return !touched && (map == null || map.isEmpty());
   }
 
-  @SuppressWarnings("unchecked")
+  public void internalPutNull() {
+    if (map == null) {
+      map = new LinkedHashMap<K, E>();
+    }
+  }
+
+    @SuppressWarnings("unchecked")
   public void internalPut(Object key, Object bean) {
     if (map == null) {
       map = new LinkedHashMap<K, E>();
     }
-    map.put((K)key, (E)bean);
+    if (key != null) {
+      map.put((K) key, (E) bean);
+    }
   }
   
   public void internalAdd(Object bean) {
