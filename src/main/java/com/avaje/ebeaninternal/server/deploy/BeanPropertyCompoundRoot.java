@@ -17,17 +17,10 @@ import com.avaje.ebeaninternal.server.type.CtCompoundProperty;
  * scalar properties match to DB columns and the non-scalar ones are here solely
  * to support EL expression language for nested compound types.
  * </p>
- * 
- * @author rbygrave
  */
 public class BeanPropertyCompoundRoot {
 
     private final BeanPropertySetter setter;
-
-    /**
-     * The method used to write the property.
-     */
-    private final Method writeMethod;
 
     private final String name;
     private final String fullBeanName;
@@ -42,7 +35,6 @@ public class BeanPropertyCompoundRoot {
         this.fullBeanName = deploy.getFullBeanName();
         this.name = deploy.getName();
         this.setter = deploy.getSetter();
-        this.writeMethod = deploy.getWriteMethod();
         this.propList = new ArrayList<BeanPropertyCompoundScalar>();
         this.propMap = new LinkedHashMap<String, BeanPropertyCompoundScalar>();
     }
@@ -75,13 +67,7 @@ public class BeanPropertyCompoundRoot {
      */
     public void setRootValue(EntityBean bean, Object value) {
         try {
-            if (bean instanceof EntityBean) {
-                setter.set(bean, value);
-            } else {
-                Object[] args = new Object[1];
-                args[0] = value;
-                writeMethod.invoke(bean, args);
-            }
+            setter.set(bean, value);
         } catch (Exception ex) {
             String beanType = bean == null ? "null" : bean.getClass().getName();
             String msg = "set " + name + " with arg[" + value + "] on ["+fullBeanName+"] with type[" + beanType + "] threw error";
@@ -94,13 +80,7 @@ public class BeanPropertyCompoundRoot {
      */
     public void setRootValueIntercept(EntityBean bean, Object value) {
         try {
-            if (bean instanceof EntityBean) {
-                setter.setIntercept(bean, value);
-            } else {
-                Object[] args = new Object[1];
-                args[0] = value;
-                writeMethod.invoke(bean, args);
-            }
+            setter.setIntercept(bean, value);
         } catch (Exception ex) {
             String beanType = bean == null ? "null" : bean.getClass().getName();
             String msg = "setIntercept " + name + " arg[" + value + "] on ["+fullBeanName+"] with type[" + beanType + "] threw error";

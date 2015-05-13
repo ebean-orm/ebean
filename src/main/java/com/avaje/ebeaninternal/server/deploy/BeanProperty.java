@@ -182,16 +182,6 @@ public class BeanProperty implements ElPropertyValue {
     final Map<String, String> extraAttributeMap;
 
     /**
-     * The method used to read the property.
-     */
-    final Method readMethod;
-
-    /**
-     * The method used to write the property.
-     */
-    final Method writeMethod;
-
-    /**
      * Generator for insert or update timestamp etc.
      */
     final GeneratedProperty generatedProperty;
@@ -290,8 +280,6 @@ public class BeanProperty implements ElPropertyValue {
         this.embedded = deploy.isEmbedded();
         this.id = deploy.isId();
         this.generatedProperty = deploy.getGeneratedProperty();
-        this.readMethod = deploy.getReadMethod();
-        this.writeMethod = deploy.getWriteMethod();
         this.getter = deploy.getGetter();
         this.setter = deploy.getSetter();
 
@@ -382,8 +370,6 @@ public class BeanProperty implements ElPropertyValue {
         this.embedded = source.isEmbedded();
         this.id = source.isId();
         this.generatedProperty = source.getGeneratedProperty();
-        this.readMethod = source.getReadMethod();
-        this.writeMethod = source.getWriteMethod();
         this.getter = source.getter;
         this.setter = source.setter;
         this.extraAttributeMap = source.extraAttributeMap;
@@ -607,20 +593,6 @@ public class BeanProperty implements ElPropertyValue {
 
     public String getIndexName() {
       return indexName;
-    }
-
-    /**
-     * Return the getter method.
-     */
-    public Method getReadMethod() {
-        return readMethod;
-    }
-
-    /**
-     * Return the setter method.
-     */
-    public Method getWriteMethod() {
-        return writeMethod;
     }
 
     /**
