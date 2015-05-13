@@ -104,17 +104,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
   private final boolean autoFetchTunable;
 
-  private final String lazyFetchIncludes;
-
   /**
    * The concurrency mode for beans of this type.
    */
   private final ConcurrencyMode concurrencyMode;
-
-  /**
-   * The tables this bean is dependent on.
-   */
-  private final String[] dependantTables;
 
   private final CompoundUniqueContraint[] compoundUniqueConstraints;
 
@@ -339,11 +332,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.sequenceInitialValue = deploy.getSequenceInitialValue();
     this.sequenceAllocationSize = deploy.getSequenceAllocationSize();
     this.selectLastInsertedId = deploy.getSelectLastInsertedId();
-    this.lazyFetchIncludes = InternString.intern(deploy.getLazyFetchIncludes());
     this.concurrencyMode = deploy.getConcurrencyMode();
     this.updateChangesOnly = deploy.isUpdateChangesOnly();
-
-    this.dependantTables = deploy.getDependantTables();
     this.compoundUniqueConstraints = deploy.getCompoundUniqueConstraints();
 
     this.baseTable = InternString.intern(deploy.getBaseTable());
@@ -1535,14 +1525,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * Return the tables this bean is dependent on. This implies that if any of
-   * these tables are modified then cached beans may be invalidated.
-   */
-  public String[] getDependantTables() {
-    return dependantTables;
-  }
-
-  /**
    * Return the compound unique constraints.
    */
   public CompoundUniqueContraint[] getCompoundUniqueConstraints() {
@@ -1722,13 +1704,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public IdGenerator getIdGenerator() {
     return idGenerator;
-  }
-
-  /**
-   * Return the includes for getReference().
-   */
-  public String getLazyFetchIncludes() {
-    return lazyFetchIncludes;
   }
 
   /**

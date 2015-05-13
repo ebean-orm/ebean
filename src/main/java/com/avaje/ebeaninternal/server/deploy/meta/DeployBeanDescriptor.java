@@ -1,23 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
@@ -28,15 +10,13 @@ import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
-import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistController;
-import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistListener;
-import com.avaje.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
-import com.avaje.ebeaninternal.server.deploy.CompoundUniqueContraint;
-import com.avaje.ebeaninternal.server.deploy.DRawSqlMeta;
-import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
-import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
-import com.avaje.ebeaninternal.server.deploy.InheritInfo;
+import com.avaje.ebeaninternal.server.deploy.*;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfo;
+
+import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
+import java.lang.reflect.Modifier;
+import java.util.*;
 
 /**
  * Describes Beans including their deployment information.
@@ -56,8 +36,6 @@ public class DeployBeanDescriptor<T> {
   private static final PropOrder PROP_ORDER = new PropOrder();
 
   private static final String I_SCALAOBJECT = "scala.ScalaObject";
-
-  private static final Logger logger = LoggerFactory.getLogger(DeployBeanDescriptor.class);
 
   /**
    * Map of BeanProperty Linked so as to preserve order.
@@ -100,19 +78,12 @@ public class DeployBeanDescriptor<T> {
    */
   private String selectLastInsertedId;
 
-  private String lazyFetchIncludes;
-
   /**
    * The concurrency mode for beans of this type.
    */
   private ConcurrencyMode concurrencyMode;
 
   private boolean updateChangesOnly;
-
-  /**
-   * The tables this bean is dependent on.
-   */
-  private String[] dependantTables;
 
   private List<CompoundUniqueContraint> compoundUniqueConstraints;
 
@@ -127,6 +98,7 @@ public class DeployBeanDescriptor<T> {
    * faster than reflection at this stage.
    */
   private BeanPropertyInfo beanReflect;
+
   private String[] properties;
 
   /**
@@ -289,10 +261,6 @@ public class DeployBeanDescriptor<T> {
     this.properties = props;
   }
 
-  public BeanPropertyInfo getBeanReflect() {
-    return beanReflect;
-  }
-
   /**
    * Return the class type this BeanDescriptor describes.
    */
@@ -330,10 +298,6 @@ public class DeployBeanDescriptor<T> {
     return cacheOptions;
   }
 
-  public boolean isNaturalKeyProperty(String name) {
-    return name.equals(cacheOptions.getNaturalKey());
-  }
-
   public DeployBeanPropertyAssocOne<?> getUnidirectional() {
     return unidirectional;
   }
@@ -365,14 +329,6 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Return the tables this bean is dependant on. This implies that if any of
-   * these tables are modified then cached beans may be invalidated.
-   */
-  public String[] getDependantTables() {
-    return dependantTables;
-  }
-
-  /**
    * Add a compound unique constraint.
    */
   public void addCompoundUniqueConstraint(CompoundUniqueContraint c) {
@@ -391,14 +347,6 @@ public class DeployBeanDescriptor<T> {
     } else {
       return compoundUniqueConstraints.toArray(new CompoundUniqueContraint[compoundUniqueConstraints.size()]);
     }
-  }
-
-  /**
-   * Set the tables this bean is dependant on. This implies that if any of these
-   * tables are modified then cached beans may be invalidated.
-   */
-  public void setDependantTables(String[] dependantTables) {
-    this.dependantTables = dependantTables;
   }
 
   /**
@@ -465,17 +413,6 @@ public class DeployBeanDescriptor<T> {
 
   public void addQueryAdapter(BeanQueryAdapter queryAdapter) {
     queryAdapters.add(queryAdapter);
-  }
-
-  /**
-   * Return true if this bean type should use IdGeneration.
-   * <p>
-   * If this is false and the Id is null it is assumed that a database auto
-   * increment feature is being used to populate the id.
-   * </p>
-   */
-  public boolean isUseIdGenerator() {
-    return idType == IdType.GENERATOR;
   }
 
   /**
@@ -632,24 +569,6 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Return the includes for getReference().
-   */
-  public String getLazyFetchIncludes() {
-    return lazyFetchIncludes;
-  }
-
-  /**
-   * Set includes to use for lazy loading by getReference(). Note queries also
-   * build references and includes on the actual association are used for those
-   * references.
-   */
-  public void setLazyFetchIncludes(String lazyFetchIncludes) {
-    if (lazyFetchIncludes != null && lazyFetchIncludes.length() > 0) {
-      this.lazyFetchIncludes = lazyFetchIncludes;
-    }
-  }
-
-  /**
    * Summary description.
    */
   public String toString() {
@@ -684,11 +603,7 @@ public class DeployBeanDescriptor<T> {
     boolean hasLazyFetch = false;
 
     for (DeployBeanProperty prop : propMap.values()) {
-      if (prop.isTransient()) {
-        // ignore transient props etc
-      } else if (prop instanceof DeployBeanPropertyAssocMany<?>) {
-        // ignore the associated many properties
-      } else {
+      if (!prop.isTransient() && !(prop instanceof DeployBeanPropertyAssocMany<?>)) {
         if (prop.isFetchEager()) {
           sb.append(prop.getName()).append(",");
         } else {
@@ -720,7 +635,7 @@ public class DeployBeanDescriptor<T> {
 
     LinkedHashSet<String> set = new LinkedHashSet<String>(res.length + 3);
 
-    String temp = null;
+    String temp;
     for (int i = 0; i < res.length; i++) {
       temp = res[i].trim();
       if (temp.length() > 0) {
@@ -817,26 +732,6 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Returns 'Version' properties on this bean. These are 'Counter' or 'Update
-   * Timestamp' type properties. Note version properties can also be on embedded
-   * beans rather than on the bean itself.
-   */
-  public List<DeployBeanProperty> propertiesVersion() {
-
-    ArrayList<DeployBeanProperty> list = new ArrayList<DeployBeanProperty>();
-
-    for (DeployBeanProperty prop : propMap.values()) {
-      if (prop instanceof DeployBeanPropertyAssoc<?> == false) {
-        if (!prop.isId() && prop.isVersionColumn()) {
-          list.add(prop);
-        }
-      }
-    }
-
-    return list;
-  }
-
-  /**
    * base properties without the unique id properties.
    */
   public List<DeployBeanProperty> propertiesBase() {
@@ -844,10 +739,8 @@ public class DeployBeanDescriptor<T> {
     ArrayList<DeployBeanProperty> list = new ArrayList<DeployBeanProperty>();
 
     for (DeployBeanProperty prop : propMap.values()) {
-      if (prop instanceof DeployBeanPropertyAssoc<?> == false) {
-        if (!prop.isId()) {
-          list.add(prop);
-        }
+      if (!(prop instanceof DeployBeanPropertyAssoc<?>) && !prop.isId()) {
+        list.add(prop);
       }
     }
 
