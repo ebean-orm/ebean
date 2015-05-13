@@ -93,12 +93,6 @@ public class DeployBeanDescriptor<T> {
   private String baseTable;
   private TableName baseTableFull;
 
-  /**
-   * Used to provide mechanism to new EntityBean instances. Generated code
-   * faster than reflection at this stage.
-   */
-  private BeanPropertyInfo beanReflect;
-
   private String[] properties;
 
   /**
@@ -266,14 +260,6 @@ public class DeployBeanDescriptor<T> {
    */
   public Class<T> getBeanType() {
     return beanType;
-  }
-
-  /**
-   * Set the BeanReflect used to create new instances of an EntityBean. This
-   * could use reflection or code generation to do this.
-   */
-  public void setBeanReflect(BeanPropertyInfo beanReflect) {
-    this.beanReflect = beanReflect;
   }
 
   /**

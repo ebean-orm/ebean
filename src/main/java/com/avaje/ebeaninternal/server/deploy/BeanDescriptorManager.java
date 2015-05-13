@@ -1271,7 +1271,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     BeanPropertiesReader reflectProps = new BeanPropertiesReader(beanType);
     
     BeanPropertyInfo beanReflect = reflectFactory.create(beanType);
-    desc.setBeanReflect(beanReflect);
     desc.setProperties(reflectProps.getProperties());
 
     for (DeployBeanProperty prop : desc.propertiesAll()) {
