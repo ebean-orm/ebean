@@ -23,50 +23,50 @@ import java.net.UnknownHostException;
 import java.util.Locale;
 
 /**
- * Rob Bygrave: This is a copy of the google guava InetAddresses class 
+ * Rob Bygrave: This is a copy of the google guava InetAddresses class
  * with some features removed.
- * 
- * 
+ * <p/>
+ * <p/>
  * Static utility methods pertaining to {@link InetAddress} instances.
- *
+ * <p/>
  * <p><b>Important note:</b> Unlike {@code InetAddress.getByName()}, the
  * methods of this class never cause DNS services to be accessed. For
  * this reason, you should prefer these methods as much as possible over
  * their JDK equivalents whenever you are expecting to handle only
  * IP address string literals -- there is no blocking DNS penalty for a
  * malformed string.
- *
+ * <p/>
  * <p>This class hooks into the {@code sun.net.util.IPAddressUtil} class
  * to make use of the {@code textToNumericFormatV4} and
  * {@code textToNumericFormatV6} methods directly as a means to avoid
  * accidentally traversing all nameservices (it can be vitally important
  * to avoid, say, blocking on DNS at times).
- *
+ * <p/>
  * <p>When dealing with {@link Inet4Address} and {@link Inet6Address}
  * objects as byte arrays (vis. {@code InetAddress.getAddress()}) they
  * are 4 and 16 bytes in length, respectively, and represent the address
  * in network byte order.
- *
+ * <p/>
  * <p>Examples of IP addresses and their byte representations:
  * <ul>
  * <li>The IPv4 loopback address, {@code "127.0.0.1"}.<br/>
- *     {@code 7f 00 00 01}
- *
+ * {@code 7f 00 00 01}
+ * <p/>
  * <li>The IPv6 loopback address, {@code "::1"}.<br/>
- *     {@code 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01}
- *
+ * {@code 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01}
+ * <p/>
  * <li>From the IPv6 reserved documentation prefix ({@code 2001:db8::/32}),
- *     {@code "2001:db8::1"}.<br/>
- *     {@code 20 01 0d b8 00 00 00 00 00 00 00 00 00 00 00 01}
- *
+ * {@code "2001:db8::1"}.<br/>
+ * {@code 20 01 0d b8 00 00 00 00 00 00 00 00 00 00 00 01}
+ * <p/>
  * <li>An IPv6 "IPv4 compatible" (or "compat") address,
- *     {@code "::192.168.0.1"}.<br/>
- *     {@code 00 00 00 00 00 00 00 00 00 00 00 00 c0 a8 00 01}
- *
+ * {@code "::192.168.0.1"}.<br/>
+ * {@code 00 00 00 00 00 00 00 00 00 00 00 00 c0 a8 00 01}
+ * <p/>
  * <li>An IPv6 "IPv4 mapped" address, {@code "::ffff:192.168.0.1"}.<br/>
- *     {@code 00 00 00 00 00 00 00 00 00 00 ff ff c0 a8 00 01}
+ * {@code 00 00 00 00 00 00 00 00 00 00 ff ff c0 a8 00 01}
  * </ul>
- *
+ * <p/>
  * <p>A few notes about IPv6 "IPv4 mapped" addresses and their observed
  * use in Java.
  * <br><br>
@@ -77,13 +77,13 @@ import java.util.Locale;
  * these "mapped" addresses were never supposed to be seen on the
  * wire.  That assumption was dropped, some say mistakenly, in later
  * RFCs with the apparent aim of making IPv4-to-IPv6 transition simpler.
- *
+ * <p/>
  * <p>Technically one <i>can</i> create a 128bit IPv6 address with the wire
  * format of a "mapped" address, as shown above, and transmit it in an
  * IPv6 packet header.  However, Java's InetAddress creation methods
  * appear to adhere doggedly to the original intent of the "mapped"
  * address: all "mapped" addresses return {@link Inet4Address} objects.
- *
+ * <p/>
  * <p>For added safety, it is common for IPv6 network operators to filter
  * all packets where either the source or destination address appears to
  * be a "compat" or "mapped" address.  Filtering suggestions usually
@@ -91,44 +91,44 @@ import java.util.Locale;
  * in the invalid range {@code ::/3}, which includes both of these bizarre
  * address formats.  For more information on "bogons", including lists
  * of IPv6 bogon space, see:
- *
+ * <p/>
  * <ul>
  * <li><a target="_parent"
- *        href="http://en.wikipedia.org/wiki/Bogon_filtering"
- *       >http://en.wikipedia.org/wiki/Bogon_filtering</a>
+ * href="http://en.wikipedia.org/wiki/Bogon_filtering"
+ * >http://en.wikipedia.org/wiki/Bogon_filtering</a>
  * <li><a target="_parent"
- *        href="http://www.cymru.com/Bogons/ipv6.txt"
- *       >http://www.cymru.com/Bogons/ipv6.txt</a>
+ * href="http://www.cymru.com/Bogons/ipv6.txt"
+ * >http://www.cymru.com/Bogons/ipv6.txt</a>
  * <li><a target="_parent"
- *        href="http://www.cymru.com/Bogons/v6bogon.html"
- *       >http://www.cymru.com/Bogons/v6bogon.html</a>
+ * href="http://www.cymru.com/Bogons/v6bogon.html"
+ * >http://www.cymru.com/Bogons/v6bogon.html</a>
  * <li><a target="_parent"
- *        href="http://www.space.net/~gert/RIPE/ipv6-filters.html"
- *       >http://www.space.net/~gert/RIPE/ipv6-filters.html</a>
+ * href="http://www.space.net/~gert/RIPE/ipv6-filters.html"
+ * >http://www.space.net/~gert/RIPE/ipv6-filters.html</a>
  * </ul>
  *
  * @author Erik Kline
  * @since 5
  */
-//@Beta
 public final class ConvertInetAddresses {
 
   private static final int IPV4_PART_COUNT = 4;
   private static final int IPV6_PART_COUNT = 8;
 
-  private ConvertInetAddresses() {}
+  private ConvertInetAddresses() {
+  }
 
   /**
    * Returns the {@link InetAddress} having the given string
    * representation.
-   *
+   * <p/>
    * <p>This deliberately avoids all nameservice lookups (e.g. no DNS).
    *
    * @param ipString {@code String} containing an IPv4 or IPv6 string literal,
    *                 e.g. {@code "192.168.0.1"} or {@code "2001:db8::1"}
    * @return {@link InetAddress} representing the argument
    * @throws IllegalArgumentException if the argument is not a valid
-   *         IP string literal
+   *                                  IP string literal
    */
   public static InetAddress forString(String ipString) {
     byte[] addr = textToNumericFormatV4(ipString);
@@ -299,19 +299,19 @@ public final class ConvertInetAddresses {
   /**
    * Returns the string representation of an {@link InetAddress} suitable
    * for inclusion in a URI.
-   *
+   * <p/>
    * <p>For IPv4 addresses, this is identical to
    * {@link InetAddress#getHostAddress()}, but for IPv6 addresses it
    * surrounds this text with square brackets; for example
    * {@code "[2001:db8::1]"}.
-   *
+   * <p/>
    * <p>Per section 3.2.2 of
    * <a target="_parent"
-   *    href="http://tools.ietf.org/html/rfc3986#section-3.2.2"
-   *  >http://tools.ietf.org/html/rfc3986</a>,
+   * href="http://tools.ietf.org/html/rfc3986#section-3.2.2"
+   * >http://tools.ietf.org/html/rfc3986</a>,
    * a URI containing an IPv6 string literal is of the form
    * {@code "http://[2001:db8::1]:8888/index.html"}.
-   *
+   * <p/>
    * <p>Use of either {@link InetAddress#getHostAddress()} or this
    * method is recommended over {@link InetAddress#toString()} when an
    * IP address string literal is desired.  This is because
@@ -331,22 +331,21 @@ public final class ConvertInetAddresses {
   /**
    * Returns an InetAddress representing the literal IPv4 or IPv6 host
    * portion of a URL, encoded in the format specified by RFC 3986 section 3.2.2.
-   *
+   * <p/>
    * <p>This function is similar to {@link ConvertInetAddresses#forString(String)},
    * however, it requires that IPv6 addresses are surrounded by square brackets.
-   *
+   * <p/>
    * <p>This function is the inverse of
    * {@link ConvertInetAddresses#toUriString(java.net.InetAddress)}.
    *
    * @param hostAddr A RFC 3986 section 3.2.2 encoded IPv4 or IPv6 address
    * @return an InetAddress representing the address in {@code hostAddr}
    * @throws IllegalArgumentException if {@code hostAddr} is not a valid
-   *     IPv4 address, or IPv6 address surrounded by square brackets
+   *                                  IPv4 address, or IPv6 address surrounded by square brackets
    */
   public static InetAddress forUriString(String hostAddr) {
-    //Preconditions.checkNotNull(hostAddr);
-    //Preconditions.checkArgument(hostAddr.length() > 0, "host string is empty");
-    InetAddress retval = null;
+
+    InetAddress retval;
 
     // IPv4 address?
     try {
