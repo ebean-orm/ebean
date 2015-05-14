@@ -119,9 +119,9 @@ public class AnnotationFields extends AnnotationParser {
       readGenValue(gen, prop);
     }
 
-    Id id = (Id) get(prop, Id.class);
+    Id id = get(prop, Id.class);
     if (id != null) {
-      readId(id, prop);
+      readId(prop);
     }
 
     // determine the JDBC type using Lob/Temporal
@@ -202,8 +202,7 @@ public class AnnotationFields extends AnnotationParser {
         }
 
       } else {
-        throw new RuntimeException("Can't use EmbeddedColumns on ScalarType "
-                + prop.getFullBeanName());
+        throw new RuntimeException("Can't use EmbeddedColumns on ScalarType " + prop.getFullBeanName());
       }
     }
 
@@ -219,8 +218,7 @@ public class AnnotationFields extends AnnotationParser {
 
     if (!prop.isTransient()) {
 
-      EncryptDeploy encryptDeploy = util.getEncryptDeploy(info.getDescriptor().getBaseTableFull(),
-              prop.getDbColumn());
+      EncryptDeploy encryptDeploy = util.getEncryptDeploy(info.getDescriptor().getBaseTableFull(), prop.getDbColumn());
       if (encryptDeploy == null || encryptDeploy.getMode().equals(Mode.MODE_ANNOTATION)) {
         Encrypted encrypted = get(prop, Encrypted.class);
         if (encrypted != null) {
@@ -233,7 +231,7 @@ public class AnnotationFields extends AnnotationParser {
 
     Index index = get(prop, Index.class);
     if (index != null) {
-      if(hasRelationshipItem(prop)) {
+      if (hasRelationshipItem(prop)) {
         throw new RuntimeException("Can't use Index on foreign key relationships.");
       }
       prop.setIndexed(true);
@@ -243,8 +241,8 @@ public class AnnotationFields extends AnnotationParser {
 
   private boolean hasRelationshipItem(DeployBeanProperty prop) {
     return get(prop, OneToMany.class) != null ||
-            get(prop, ManyToOne.class) != null ||
-            get(prop, OneToOne.class) != null;
+        get(prop, ManyToOne.class) != null ||
+        get(prop, OneToOne.class) != null;
   }
 
   /**
@@ -252,13 +250,7 @@ public class AnnotationFields extends AnnotationParser {
    * can be applied to DDL generation.
    */
   private boolean isNotNullOnAllValidationGroups(Class<?>[] groups) {
-    if (groups.length == 0) {
-      return true;
-    }
-    if (groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0])) {
-      return true;
-    }
-    return false;
+    return groups.length == 0 || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0]);
   }
 
   private void setEncryption(DeployBeanProperty prop, boolean dbEncString, int dbLen) {
@@ -324,7 +316,7 @@ public class AnnotationFields extends AnnotationParser {
     return util.createDataEncryptSupport(table, column);
   }
 
-  private void readId(Id id, DeployBeanProperty prop) {
+  private void readId(DeployBeanProperty prop) {
 
     prop.setId(true);
     prop.setNullable(false);
@@ -368,9 +360,6 @@ public class AnnotationFields extends AnnotationParser {
       if (prop.getPropertyType().equals(UUID.class)) {
         descriptor.setIdGeneratorName(UuidIdGenerator.AUTO_UUID);
         descriptor.setIdType(IdType.GENERATOR);
-
-      } else {
-        // use DatabasePlatform defaults
       }
     }
   }
@@ -414,13 +403,9 @@ public class AnnotationFields extends AnnotationParser {
 
     String baseTable = descriptor.getBaseTable();
     String tableName = columnAnn.table();
-    if (tableName.equals("") || tableName.equalsIgnoreCase(baseTable)) {
-      // its a base table property...
-    } else {
+    if (!"".equals(tableName) && !tableName.equalsIgnoreCase(baseTable)) {
       // its on a secondary table...
       prop.setSecondaryTable(tableName);
-      // DeployTableJoin tableJoin = info.getTableJoin(tableName);
-      // tableJoin.addProperty(prop);
     }
   }
 
