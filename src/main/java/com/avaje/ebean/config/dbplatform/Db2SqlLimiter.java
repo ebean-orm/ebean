@@ -7,6 +7,9 @@ public class Db2SqlLimiter implements SqlLimiter {
 
     StringBuilder sb = new StringBuilder(512);
     sb.append("select ");
+    if (request.isDistinct()) {
+      sb.append("distinct ");
+    }
     sb.append(request.getDbSql());
 
     int maxRows = request.getMaxRows();
