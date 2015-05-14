@@ -53,7 +53,7 @@ public class ScalarTypeBoolean {
 
   /**
    * The Class BitBoolean converts a JDBC type BIT to a java boolean
-   * 
+   * <p/>
    * <p>
    * Sometimes booleans may be mapped to the JDBC type BIT. To use the BitBoolean specify
    * type.boolean.dbtype="bit" in the ebean configuration
@@ -143,11 +143,7 @@ public class ScalarTypeBoolean {
         return null;
       }
       Boolean b = (Boolean) value;
-      if (b.booleanValue()) {
-        return trueValue;
-      } else {
-        return falseValue;
-      }
+      return b ? trueValue : falseValue;
     }
 
     /**
@@ -222,11 +218,7 @@ public class ScalarTypeBoolean {
         return null;
       }
       Boolean b = (Boolean) value;
-      if (b.booleanValue()) {
-        return trueValue;
-      } else {
-        return falseValue;
-      }
+      return b ? trueValue : falseValue;
     }
 
     /**
@@ -293,7 +285,7 @@ public class ScalarTypeBoolean {
     }
 
     public void jsonWrite(JsonGenerator ctx, String name, Boolean value) throws IOException {
-      ctx.writeBooleanField(name, (Boolean) value);
+      ctx.writeBooleanField(name, value);
     }
   }
 

@@ -7,26 +7,26 @@ import java.util.Set;
 /**
  * Map that is wraps an underlying map for the purpose of detecting changes.
  */
-public class ModifyAwareMap<K,V> implements Map<K,V>, ModifyAwareOwner {
+public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
 
   /**
    * Dirty flag set when the map has been modified.
    */
   private boolean dirty;
-  
+
   /**
    * The underlying map.
    */
-  private Map<K,V> map;
-  
-  public ModifyAwareMap(Map<K,V> underyling) {
+  private Map<K, V> map;
+
+  public ModifyAwareMap(Map<K, V> underyling) {
     this.map = underyling;
   }
 
   public String toString() {
     return map.toString();
   }
-  
+
   @Override
   public boolean isMarkedDirty() {
     return dirty;
@@ -36,7 +36,7 @@ public class ModifyAwareMap<K,V> implements Map<K,V>, ModifyAwareOwner {
   public void markAsModified() {
     dirty = true;
   }
-  
+
   @Override
   public int size() {
     return map.size();
@@ -72,7 +72,7 @@ public class ModifyAwareMap<K,V> implements Map<K,V>, ModifyAwareOwner {
   public V remove(Object key) {
     V value = map.remove(key);
     if (value != null) {
-      markAsModified();      
+      markAsModified();
     }
     return value;
   }
@@ -107,5 +107,4 @@ public class ModifyAwareMap<K,V> implements Map<K,V>, ModifyAwareOwner {
     return new ModifyAwareSet<Map.Entry<K, V>>(this, map.entrySet());
   }
 
-  
 }

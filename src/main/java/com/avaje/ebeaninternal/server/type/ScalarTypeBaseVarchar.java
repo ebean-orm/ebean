@@ -89,7 +89,7 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
   public T convertFromMillis(long systemTimeMillis) {
     throw new TextException("Not Supported");
   }
-  
+
   @Override
   public boolean isDateTimeCapable() {
     return false;
@@ -121,12 +121,12 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
       dataOutput.writeUTF(s);
     }
   }
-  
+
   @Override
   public T jsonRead(JsonParser ctx, JsonToken event) throws IOException {
     return parse(ctx.getValueAsString());
   }
-  
+
   @Override
   public void jsonWrite(JsonGenerator ctx, String name, T value) throws IOException {
     ctx.writeStringField(name, format(value));

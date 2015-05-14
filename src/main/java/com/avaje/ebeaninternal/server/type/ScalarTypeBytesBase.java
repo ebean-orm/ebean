@@ -20,10 +20,6 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
     super(byte[].class, jdbcNative, jdbcType);
   }
 
-  public Object convertFromBytes(byte[] bytes) {
-    return bytes;
-  }
-
   public byte[] convertToBytes(Object value) {
     return (byte[]) value;
   }
@@ -46,7 +42,7 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
 
   @Override
   public void jsonWrite(JsonGenerator ctx, String name, byte[] value) throws IOException {
-    ctx.writeBinaryField(name, (byte[]) value);
+    ctx.writeBinaryField(name, value);
   }
 
   @Override

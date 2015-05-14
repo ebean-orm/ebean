@@ -50,12 +50,12 @@ public class ScalarTypeOffsetDateTime extends ScalarTypeBaseDateTime<OffsetDateT
   @Override
   public Object toJdbcType(Object value) {
     if (value instanceof Timestamp) return value;
-    return convertToTimestamp((OffsetDateTime)value);
+    return convertToTimestamp((OffsetDateTime) value);
   }
 
   @Override
   public OffsetDateTime toBeanType(Object value) {
     if (value instanceof OffsetDateTime) return (OffsetDateTime) value;
-    return convertFromTimestamp((Timestamp)value);
+    return convertFromTimestamp((Timestamp) value);
   }
 }

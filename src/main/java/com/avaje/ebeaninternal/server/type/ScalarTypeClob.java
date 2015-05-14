@@ -9,11 +9,7 @@ import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
  * ScalarType for String.
  */
 public class ScalarTypeClob extends ScalarTypeBaseVarchar<String> {
-
-  static final int clobBufferSize = 512;
-
-  static final int stringInitialSize = 512;
-
+  
   protected ScalarTypeClob(boolean jdbcNative, int jdbcType) {
     super(String.class, jdbcNative, jdbcType);
   }

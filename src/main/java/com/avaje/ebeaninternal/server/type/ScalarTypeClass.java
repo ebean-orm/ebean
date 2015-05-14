@@ -4,11 +4,11 @@ import javax.persistence.PersistenceException;
 
 /**
  * ScalarType for Class that persists it to VARCHAR column.
- * 
+ *
  * @author emcgreal
  * @author rbygrave
  */
-@SuppressWarnings({ "rawtypes" })
+@SuppressWarnings({"rawtypes"})
 public class ScalarTypeClass extends ScalarTypeBaseVarchar<Class> {
 
   public ScalarTypeClass() {
@@ -41,5 +41,5 @@ public class ScalarTypeClass extends ScalarTypeBaseVarchar<Class> {
       throw new PersistenceException("Unable to find Class " + value, e);
     }
   }
-  
+
 }

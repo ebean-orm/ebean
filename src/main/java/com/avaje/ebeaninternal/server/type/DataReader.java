@@ -7,51 +7,51 @@ import java.sql.SQLException;
 
 public interface DataReader {
 
-    public void close() throws SQLException;
+  void close() throws SQLException;
 
-    public boolean next() throws SQLException;
+  boolean next() throws SQLException;
 
-    public void resetColumnPosition();
-    
-    public void incrementPos(int increment);
+  void resetColumnPosition();
 
-    public byte[] getBinaryBytes() throws SQLException;
+  void incrementPos(int increment);
 
-    public byte[] getBlobBytes() throws SQLException;
+  byte[] getBinaryBytes() throws SQLException;
 
-    public String getStringFromStream() throws SQLException;
+  byte[] getBlobBytes() throws SQLException;
 
-    public String getStringClob() throws SQLException;
-    
-    public String getString() throws SQLException;
+  String getStringFromStream() throws SQLException;
 
-    public Boolean getBoolean() throws SQLException;
+  String getStringClob() throws SQLException;
 
-    public Byte getByte() throws SQLException;
+  String getString() throws SQLException;
 
-    public Short getShort() throws SQLException;
+  Boolean getBoolean() throws SQLException;
 
-    public Integer getInt() throws SQLException;
+  Byte getByte() throws SQLException;
 
-    public Long getLong() throws SQLException;
+  Short getShort() throws SQLException;
 
-    public Float getFloat() throws SQLException;
+  Integer getInt() throws SQLException;
 
-    public Double getDouble() throws SQLException;
+  Long getLong() throws SQLException;
 
-    public byte[] getBytes() throws SQLException;
+  Float getFloat() throws SQLException;
 
-    public java.sql.Date getDate() throws SQLException;
+  Double getDouble() throws SQLException;
 
-    public java.sql.Time getTime() throws SQLException;
+  byte[] getBytes() throws SQLException;
 
-    public java.sql.Timestamp getTimestamp() throws SQLException;
+  java.sql.Date getDate() throws SQLException;
 
-    public BigDecimal getBigDecimal() throws SQLException;
+  java.sql.Time getTime() throws SQLException;
 
-    public Array getArray() throws SQLException;
-    
-    public Object getObject() throws SQLException;
+  java.sql.Timestamp getTimestamp() throws SQLException;
 
-    public InputStream getBinaryStream() throws SQLException;
+  BigDecimal getBigDecimal() throws SQLException;
+
+  Array getArray() throws SQLException;
+
+  Object getObject() throws SQLException;
+
+  InputStream getBinaryStream() throws SQLException;
 }

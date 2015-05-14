@@ -8,38 +8,37 @@ import java.sql.Types;
  */
 public class EnumToDbStringMap extends EnumToDbValueMap<String> {
 
-	
-	
-	@Override
-	public int getDbType() {
-		return Types.VARCHAR;
-	}
 
-	@Override
-	public EnumToDbStringMap add(Object beanValue, String dbValue) {
-		addInternal(beanValue, dbValue);
-		return this;
-	}
+  @Override
+  public int getDbType() {
+    return Types.VARCHAR;
+  }
 
-	@Override
-	public void bind(DataBind b, Object value) throws SQLException {
-		if (value == null){
-			b.setNull(Types.VARCHAR);
-		} else {
-			String s = getDbValue(value);
-			b.setString(s);
-		}
-		
-	}
+  @Override
+  public EnumToDbStringMap add(Object beanValue, String dbValue) {
+    addInternal(beanValue, dbValue);
+    return this;
+  }
 
-	@Override
-	public Object read(DataReader dataReader) throws SQLException {
-		String s = dataReader.getString();
-		if (s == null){
-			return null;
-		} else {
-			return getBeanValue(s);
-		}
-	}
-	
+  @Override
+  public void bind(DataBind b, Object value) throws SQLException {
+    if (value == null) {
+      b.setNull(Types.VARCHAR);
+    } else {
+      String s = getDbValue(value);
+      b.setString(s);
+    }
+
+  }
+
+  @Override
+  public Object read(DataReader dataReader) throws SQLException {
+    String s = dataReader.getString();
+    if (s == null) {
+      return null;
+    } else {
+      return getBeanValue(s);
+    }
+  }
+
 }

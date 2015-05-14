@@ -26,7 +26,7 @@ public class ScalarTypeShort extends ScalarTypeBase<Short> {
     if (value == null) {
       b.setNull(Types.SMALLINT);
     } else {
-      b.setShort(value.shortValue());
+      b.setShort(value);
     }
   }
 
@@ -92,6 +92,6 @@ public class ScalarTypeShort extends ScalarTypeBase<Short> {
 
   @Override
   public void jsonWrite(JsonGenerator ctx, String name, Short value) throws IOException {
-    ctx.writeNumberField(name, (Short) value);
+    ctx.writeNumberField(name, value);
   }
 }

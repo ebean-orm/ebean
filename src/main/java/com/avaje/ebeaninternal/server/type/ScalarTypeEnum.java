@@ -5,9 +5,9 @@ package com.avaje.ebeaninternal.server.type;
  */
 public interface ScalarTypeEnum {
 
-	/**
-	 * Return the IN values for DB constraint construction.
-	 */
-	public String getConstraintInValues();
-	
+  /**
+   * Return the IN values for DB constraint construction.
+   */
+  String getConstraintInValues();
+
 }

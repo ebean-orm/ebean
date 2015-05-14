@@ -22,7 +22,7 @@ public class ModifyAwareCollection<E> implements Collection<E> {
     this.owner = owner;
     this.c = c;
   }
-  
+
   public String toString() {
     return c.toString();
   }
@@ -37,9 +37,7 @@ public class ModifyAwareCollection<E> implements Collection<E> {
 
   public boolean addAll(Collection<? extends E> collection) {
     boolean changed = false;
-    Iterator<? extends E> it = collection.iterator();
-    while (it.hasNext()) {
-      E o = it.next();
+    for (E o : collection) {
       if (c.add(o)) {
         owner.markAsModified();
         changed = true;
@@ -68,7 +66,7 @@ public class ModifyAwareCollection<E> implements Collection<E> {
   }
 
   public Iterator<E> iterator() {
-    return new ModifyAwareIterator<E>(owner,  c.iterator());
+    return new ModifyAwareIterator<E>(owner, c.iterator());
   }
 
   public boolean remove(Object o) {
@@ -81,10 +79,8 @@ public class ModifyAwareCollection<E> implements Collection<E> {
 
   public boolean removeAll(Collection<?> collection) {
     boolean changed = false;
-    Iterator<?> it = collection.iterator();
-    while (it.hasNext()) {
-      Object o = (Object) it.next();
-      if (c.remove(o)) {
+    for (Object element : collection) {
+      if (c.remove(element)) {
         owner.markAsModified();
         changed = true;
       }
@@ -96,7 +92,7 @@ public class ModifyAwareCollection<E> implements Collection<E> {
     boolean changed = false;
     Iterator<?> it = c.iterator();
     while (it.hasNext()) {
-      Object o = (Object) it.next();
+      Object o = it.next();
       if (!collection.contains(o)) {
         it.remove();
         owner.markAsModified();

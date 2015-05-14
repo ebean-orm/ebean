@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.Instant;
 
 /**
  * Base type for DateTime types.
@@ -98,7 +97,7 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
       }
       default: {
         String jsonDateTime = ctx.getText();
-        return convertFromTimestamp(dateTimeParser.parse(jsonDateTime));        
+        return convertFromTimestamp(dateTimeParser.parse(jsonDateTime));
       }
     }
   }

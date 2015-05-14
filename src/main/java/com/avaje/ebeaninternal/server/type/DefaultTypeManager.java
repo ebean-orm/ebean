@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -25,6 +26,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.avaje.ebean.config.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -125,6 +127,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final JsonConfig.DateTime jsonDateTime;
 
+  private final boolean objectMapperPresent;
+
   /**
    * Create the DefaultTypeManager.
    */
@@ -144,6 +148,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     this.customTypeMap.put(ScalarTypePostgresHstore.KEY, new ScalarTypePostgresHstore());
 
+    this.objectMapperPresent = ClassUtil.isPresent("com.fasterxml.jackson.databind.ObjectMapper", this.getClass());
+
     this.extraTypeFactory = new DefaultTypeFactory(config);
 
     initialiseStandard(jsonDateTime, clobType, blobType, config.isUuidStoreAsBinary());
@@ -151,7 +157,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     initialiseJodaTypes(jsonDateTime);
 
     if (bootupClasses != null) {
-      initialiseCustomScalarTypes(jsonDateTime, bootupClasses);
+      initialiseCustomScalarTypes(jsonDateTime, bootupClasses, config);
       initialiseScalarConverters(bootupClasses);
       initialiseCompoundTypes(bootupClasses);
     }
@@ -468,7 +474,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * interface and register it with this TypeManager.
    * </p>
    */
-  protected void initialiseCustomScalarTypes(JsonConfig.DateTime mode, BootupClasses bootupClasses) {
+  protected void initialiseCustomScalarTypes(JsonConfig.DateTime mode, BootupClasses bootupClasses, ServerConfig serverConfig) {
 
     ScalarTypeLongToTimestamp longToTimestamp = new ScalarTypeLongToTimestamp(mode);
 
@@ -480,9 +486,22 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       Class<?> cls = foundTypes.get(i);
       try {
 
-        ScalarType<?> scalarType = (ScalarType<?>) cls.newInstance();
-        add(scalarType);
+        ScalarType<?> scalarType;
+        if (!objectMapperPresent) {
+          scalarType = (ScalarType<?>) cls.newInstance();
 
+        } else {
+          try {
+            // first try objectMapper constructor
+            Constructor<?> constructor = cls.getConstructor(ObjectMapper.class);
+            ObjectMapper objectMapper = getObjectMapper(serverConfig);
+            scalarType = (ScalarType<?>)constructor.newInstance(objectMapper);
+          } catch (NoSuchMethodException e) {
+            scalarType = (ScalarType<?>) cls.newInstance();
+          }
+        }
+
+        add(scalarType);
         customScalarTypes.add(scalarType);
 
       } catch (Exception e) {
@@ -490,6 +509,16 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
         logger.error(msg, e);
       }
     }
+  }
+
+  private ObjectMapper getObjectMapper(ServerConfig serverConfig) {
+
+    ObjectMapper objectMapper = (ObjectMapper)serverConfig.getObjectMapper();
+    if (objectMapper == null) {
+      objectMapper = new ObjectMapper();
+      serverConfig.setObjectMapper(objectMapper);
+    }
+    return objectMapper;
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })

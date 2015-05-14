@@ -25,7 +25,7 @@ public class ScalarTypeLong extends ScalarTypeBase<Long> {
     if (value == null) {
       b.setNull(Types.BIGINT);
     } else {
-      b.setLong(value.longValue());
+      b.setLong(value);
     }
   }
 
@@ -91,6 +91,6 @@ public class ScalarTypeLong extends ScalarTypeBase<Long> {
 
   @Override
   public void jsonWrite(JsonGenerator ctx, String name, Long value) throws IOException {
-    ctx.writeNumberField(name, (Long) value);
+    ctx.writeNumberField(name, value);
   }
 }

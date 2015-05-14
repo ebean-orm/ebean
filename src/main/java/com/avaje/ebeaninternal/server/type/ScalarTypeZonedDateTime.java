@@ -5,7 +5,6 @@ import com.avaje.ebean.config.JsonConfig;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -51,12 +50,12 @@ public class ScalarTypeZonedDateTime extends ScalarTypeBaseDateTime<ZonedDateTim
   @Override
   public Object toJdbcType(Object value) {
     if (value instanceof Timestamp) return value;
-    return convertToTimestamp((ZonedDateTime)value);
+    return convertToTimestamp((ZonedDateTime) value);
   }
 
   @Override
   public ZonedDateTime toBeanType(Object value) {
     if (value instanceof ZonedDateTime) return (ZonedDateTime) value;
-    return convertFromTimestamp((Timestamp)value);
+    return convertFromTimestamp((Timestamp) value);
   }
 }

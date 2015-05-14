@@ -1,18 +1,16 @@
 package com.avaje.ebeaninternal.server.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.time.Instant;
-
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.sql.SQLException;
+import java.sql.Types;
 
 /**
  * ScalarType for java.math.BigInteger.
@@ -100,7 +98,7 @@ public class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
 
   @Override
   public void jsonWrite(JsonGenerator ctx, String name, BigInteger value) throws IOException {
-    ctx.writeNumberField(name, ((BigInteger) value).longValue());
+    ctx.writeNumberField(name, value.longValue());
   }
 
 }

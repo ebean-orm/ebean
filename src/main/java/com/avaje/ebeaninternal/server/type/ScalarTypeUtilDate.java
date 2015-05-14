@@ -46,7 +46,7 @@ public class ScalarTypeUtilDate {
 
     @Override
     public void bind(DataBind b, java.util.Date value)
-            throws SQLException {
+        throws SQLException {
       if (value == null) {
         b.setNull(Types.TIMESTAMP);
       } else {

@@ -31,7 +31,7 @@ public class ScalarTypeMonth extends ScalarTypeEnumWithMapping {
       b.setNull(Types.INTEGER);
     } else {
       // avoiding the map lookup
-      b.setInt(((Month)value).getValue());
+      b.setInt(((Month) value).getValue());
     }
   }
 

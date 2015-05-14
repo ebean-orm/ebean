@@ -1,12 +1,11 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.config.JsonConfig;
+import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.OffsetDateTime;
-
-import com.avaje.ebean.config.JsonConfig;
-import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 
 /**
  * ScalarType for java.sql.Timestamp.
@@ -46,7 +45,6 @@ public class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
   public Timestamp convertToTimestamp(Timestamp t) {
     return t;
   }
-
 
 
   @Override

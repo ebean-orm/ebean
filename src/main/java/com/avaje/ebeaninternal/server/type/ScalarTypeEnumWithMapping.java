@@ -6,7 +6,7 @@ import java.util.Iterator;
 /**
  * Additional control over mapping to DB values.
  */
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase implements ScalarType, ScalarTypeEnum {
 
   private final EnumToDbValueMap beanDbMap;

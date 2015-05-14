@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 public class ScalarTypeLongToTimestamp extends ScalarTypeWrapper<Long, Timestamp> {
 
-    public ScalarTypeLongToTimestamp(JsonConfig.DateTime mode) {
-        super(Long.class, new ScalarTypeTimestamp(mode), new LongToTimestampConverter());
-    }
+  public ScalarTypeLongToTimestamp(JsonConfig.DateTime mode) {
+    super(Long.class, new ScalarTypeTimestamp(mode), new LongToTimestampConverter());
+  }
 }

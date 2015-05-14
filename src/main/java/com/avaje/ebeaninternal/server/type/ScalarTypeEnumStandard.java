@@ -25,7 +25,7 @@ import com.fasterxml.jackson.core.JsonToken;
  */
 public class ScalarTypeEnumStandard {
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   public static class StringEnum extends EnumBase implements ScalarTypeEnum {
 
     private final int length;
@@ -113,7 +113,7 @@ public class ScalarTypeEnumStandard {
 
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   public static class OrdinalEnum extends EnumBase implements ScalarTypeEnum {
 
     private final Object[] enumArray;
@@ -196,7 +196,7 @@ public class ScalarTypeEnumStandard {
 
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   public abstract static class EnumBase extends ScalarTypeBase {
 
     protected final Class enumType;

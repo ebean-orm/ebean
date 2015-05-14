@@ -7,24 +7,24 @@ import java.sql.SQLException;
  */
 public interface ScalarDataReader<T> {
 
-    /**
-     * Read and return the appropriate value from the dataReader.
-     */
-    public T read(DataReader dataReader) throws SQLException;
+  /**
+   * Read and return the appropriate value from the dataReader.
+   */
+  T read(DataReader dataReader) throws SQLException;
 
-    /**
-     * Ignore typically by moving the index position.
-     */
-    public void loadIgnore(DataReader dataReader);
+  /**
+   * Ignore typically by moving the index position.
+   */
+  void loadIgnore(DataReader dataReader);
 
-    /**
-     * Bind the value to the underlying preparedStatement.
-     */
-    public void bind(DataBind b, T value) throws SQLException;
+  /**
+   * Bind the value to the underlying preparedStatement.
+   */
+  void bind(DataBind b, T value) throws SQLException;
 
-    /**
-     * Accumulate all the scalar types used by an immutable compound value type.
-     */
-    public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list);
+  /**
+   * Accumulate all the scalar types used by an immutable compound value type.
+   */
+  void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list);
 
 }

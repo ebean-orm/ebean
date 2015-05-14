@@ -91,6 +91,6 @@ public class ScalarTypeString extends ScalarTypeBase<String> {
 
   @Override
   public void jsonWrite(JsonGenerator ctx, String name, String value) throws IOException {
-    ctx.writeStringField(name, (String) value);
+    ctx.writeStringField(name, value);
   }
 }

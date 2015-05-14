@@ -23,7 +23,7 @@ public class ScalarTypeLocale extends ScalarTypeBaseVarchar<Locale> {
 
   @Override
   public String convertToDbString(Locale beanValue) {
-    return ((Locale) beanValue).toString();
+    return beanValue.toString();
   }
 
   @Override

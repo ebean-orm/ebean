@@ -1,14 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebean.text.TextException;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -17,7 +10,7 @@ import java.time.Duration;
 /**
  * ScalarType for java.time.Duration (with Nanos precision).
  * <p>
- *  Stored in the DB as DECIMAL value.
+ * Stored in the DB as DECIMAL value.
  * </p>
  */
 public class ScalarTypeDurationWithNanos extends ScalarTypeDuration {
@@ -42,8 +35,8 @@ public class ScalarTypeDurationWithNanos extends ScalarTypeDuration {
 
   @Override
   public Object toJdbcType(Object value) {
-    if (value instanceof  BigDecimal) return value;
-    return convertToBigDecimal((Duration)value);
+    if (value instanceof BigDecimal) return value;
+    return convertToBigDecimal((Duration) value);
   }
 
   @Override

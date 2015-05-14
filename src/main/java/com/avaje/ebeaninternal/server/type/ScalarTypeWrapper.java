@@ -16,13 +16,9 @@ import com.fasterxml.jackson.core.JsonToken;
  * <p>
  * Enables the use of a simple interface to add additional scalarTypes.
  * </p>
- * 
- * @author rbygrave
- * 
- * @param <B>
- *          the logical type
- * @param <S>
- *          the underlying scalar type this is converted to
+ *
+ * @param <B> the logical type
+ * @param <S> the underlying scalar type this is converted to
  */
 public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
 

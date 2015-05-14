@@ -52,8 +52,8 @@ public class ScalarTypeDuration extends ScalarTypeBase<Duration> {
 
   @Override
   public Object toJdbcType(Object value) {
-    if (value instanceof  Long) return value;
-    return ((Duration)value).getSeconds();
+    if (value instanceof Long) return value;
+    return ((Duration) value).getSeconds();
   }
 
   @Override

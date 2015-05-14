@@ -83,7 +83,7 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
   }
 
   public void jsonWrite(JsonGenerator ctx, String name, BigDecimal value) throws IOException {
-    ctx.writeNumberField(name, (BigDecimal) value);
+    ctx.writeNumberField(name, value);
   }
 
 }

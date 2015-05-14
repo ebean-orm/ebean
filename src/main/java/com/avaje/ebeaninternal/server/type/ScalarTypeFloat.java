@@ -25,7 +25,7 @@ public class ScalarTypeFloat extends ScalarTypeBase<Float> {
     if (value == null) {
       b.setNull(Types.REAL);
     } else {
-      b.setFloat(value.floatValue());
+      b.setFloat(value);
     }
   }
 
@@ -56,7 +56,7 @@ public class ScalarTypeFloat extends ScalarTypeBase<Float> {
 
   @Override
   public Float convertFromMillis(long systemTimeMillis) {
-    return Float.valueOf(systemTimeMillis);
+    return (float) systemTimeMillis;
   }
 
   @Override
@@ -69,8 +69,7 @@ public class ScalarTypeFloat extends ScalarTypeBase<Float> {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      float val = dataInput.readFloat();
-      return Float.valueOf(val);
+      return dataInput.readFloat();
     }
   }
 
@@ -92,6 +91,6 @@ public class ScalarTypeFloat extends ScalarTypeBase<Float> {
 
   @Override
   public void jsonWrite(JsonGenerator ctx, String name, Float value) throws IOException {
-    ctx.writeNumberField(name, (Float) value);
+    ctx.writeNumberField(name, value);
   }
 }

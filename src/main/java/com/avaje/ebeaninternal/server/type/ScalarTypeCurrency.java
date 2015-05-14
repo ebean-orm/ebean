@@ -23,7 +23,7 @@ public class ScalarTypeCurrency extends ScalarTypeBaseVarchar<Currency> {
 
   @Override
   public String convertToDbString(Currency beanValue) {
-    return ((Currency) beanValue).getCurrencyCode();
+    return beanValue.getCurrencyCode();
   }
 
   @Override

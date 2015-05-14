@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.type;
 
-import java.time.OffsetTime;
 import java.time.ZoneId;
 
 /**

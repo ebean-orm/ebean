@@ -25,7 +25,7 @@ public class ScalarTypeDouble extends ScalarTypeBase<Double> {
     if (value == null) {
       b.setNull(Types.DOUBLE);
     } else {
-      b.setDouble(value.doubleValue());
+      b.setDouble(value);
     }
   }
 
@@ -56,7 +56,7 @@ public class ScalarTypeDouble extends ScalarTypeBase<Double> {
 
   @Override
   public Double convertFromMillis(long systemTimeMillis) {
-    return Double.valueOf(systemTimeMillis);
+    return (double) systemTimeMillis;
   }
 
   @Override

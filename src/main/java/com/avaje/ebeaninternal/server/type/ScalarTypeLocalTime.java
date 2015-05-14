@@ -44,8 +44,8 @@ public class ScalarTypeLocalTime extends ScalarTypeBase<LocalTime> {
 
   @Override
   public Object toJdbcType(Object value) {
-    if (value instanceof  Time) return value;
-    return Time.valueOf((LocalTime)value);
+    if (value instanceof Time) return value;
+    return Time.valueOf((LocalTime) value);
   }
 
   @Override

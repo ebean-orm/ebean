@@ -53,7 +53,7 @@ public class ScalarTypeYearMonthDate extends ScalarTypeBaseDate<YearMonth> {
   public Object toJdbcType(Object value) {
     if (value instanceof Date) return value;
     if (value instanceof YearMonth) return Date.valueOf(toLocalDate((YearMonth) value));
-    if (value instanceof LocalDate) return Date.valueOf((LocalDate)value);
+    if (value instanceof LocalDate) return Date.valueOf((LocalDate) value);
     return BasicTypeConverter.toDate(value);
   }
 

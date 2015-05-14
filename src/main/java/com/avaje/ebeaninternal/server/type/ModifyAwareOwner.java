@@ -8,10 +8,10 @@ public interface ModifyAwareOwner {
   /**
    * Return true if the value is considered dirty.
    */
-  public boolean isMarkedDirty();
-  
+  boolean isMarkedDirty();
+
   /**
    * Marks the object as modified.
    */
-  public void markAsModified();
+  void markAsModified();
 }

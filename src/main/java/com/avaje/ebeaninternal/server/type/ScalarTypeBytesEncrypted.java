@@ -12,9 +12,6 @@ import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Encrypted ScalarType that wraps a byte[] types.
- * 
- * @author rbygrave
- * 
  */
 public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
 
@@ -68,7 +65,7 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
 
   @Override
   public void jsonWrite(JsonGenerator ctx, String name, byte[] value) throws IOException {
-    ctx.writeBinaryField(name, (byte[]) value);
+    ctx.writeBinaryField(name, value);
   }
 
   @Override

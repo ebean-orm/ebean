@@ -23,7 +23,7 @@ public class ScalarTypeTimeZone extends ScalarTypeBaseVarchar<TimeZone> {
 
   @Override
   public String convertToDbString(TimeZone beanValue) {
-    return ((TimeZone) beanValue).getID();
+    return beanValue.getID();
   }
 
   @Override

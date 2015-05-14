@@ -26,7 +26,7 @@ public class ScalarTypeInteger extends ScalarTypeBase<Integer> {
     if (value == null) {
       b.setNull(Types.INTEGER);
     } else {
-      b.setInt(value.intValue());
+      b.setInt(value);
     }
   }
 
@@ -40,7 +40,7 @@ public class ScalarTypeInteger extends ScalarTypeBase<Integer> {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      return Integer.valueOf(dataInput.readInt());
+      return dataInput.readInt();
     }
   }
 

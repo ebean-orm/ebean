@@ -23,7 +23,7 @@ public class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
 
   @Override
   public LocalDate convertFromDate(Date ts) {
-    return new LocalDate(((java.util.Date) ts).getTime());
+    return new LocalDate(ts.getTime());
   }
 
   @Override

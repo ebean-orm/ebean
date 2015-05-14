@@ -58,7 +58,7 @@ public class ScalarTypeYear extends ScalarTypeBase<Year> {
 
   @Override
   public Object toJdbcType(Object value) {
-    if (value instanceof  Year) return ((Year)value).getValue();
+    if (value instanceof Year) return ((Year) value).getValue();
     return BasicTypeConverter.toInteger(value);
   }
 

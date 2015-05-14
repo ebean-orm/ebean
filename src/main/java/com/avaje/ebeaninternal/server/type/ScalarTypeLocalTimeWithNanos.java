@@ -32,8 +32,8 @@ public class ScalarTypeLocalTimeWithNanos extends ScalarTypeLocalTime {
 
   @Override
   public Object toJdbcType(Object value) {
-    if (value instanceof  Long) return value;
-    return ((LocalTime)value).toNanoOfDay();
+    if (value instanceof Long) return value;
+    return ((LocalTime) value).toNanoOfDay();
   }
 
   @Override

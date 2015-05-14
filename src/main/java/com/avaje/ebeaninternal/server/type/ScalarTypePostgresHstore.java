@@ -20,38 +20,35 @@ import com.fasterxml.jackson.core.JsonToken;
 public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
 
   public static final String KEY = "hstore";
-  
+
   public static final int HSTORE_TYPE = PostgresPlatform.TYPE_HSTORE;
-  
+
   public ScalarTypePostgresHstore() {
     super(Map.class, false, HSTORE_TYPE);
   }
-  
+
   @Override
   public boolean isMutable() {
     return true;
   }
-  
+
   @Override
   public boolean isDirty(Object value) {
-    if (value instanceof ModifyAwareOwner) {
-      return ((ModifyAwareOwner)value).isMarkedDirty();
-    }
-    return true;
+    return !(value instanceof ModifyAwareOwner) || ((ModifyAwareOwner) value).isMarkedDirty();
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Map read(DataReader dataReader) throws SQLException {
-    
+
     Object value = dataReader.getObject();
     if (value == null) {
       return null;
     }
     if (!(value instanceof Map)) {
-      throw new RuntimeException("Expecting Hstore to return as Map but got type "+value.getClass());
+      throw new RuntimeException("Expecting Hstore to return as Map but got type " + value.getClass());
     }
-    return new ModifyAwareMap((Map)value);
+    return new ModifyAwareMap((Map) value);
   }
 
   @Override
@@ -66,7 +63,7 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
 
   @Override
   public Map toBeanType(Object value) {
-    return (Map)value;
+    return (Map) value;
   }
 
   @Override
@@ -136,5 +133,5 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
     // the EJson parsing so that it knows the first token has been read
     return EJson.parseObject(ctx, event);
   }
-  
+
 }
