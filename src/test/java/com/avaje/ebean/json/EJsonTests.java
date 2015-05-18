@@ -42,14 +42,13 @@ public class EJsonTests {
 
     JsonParser jsonParser = factory.createParser(jsonInput);
 
-    Object result = EJson.parseObject(jsonParser);
+    Map<String,Object> map = EJson.parseObject(jsonParser);
 
-    Assert.assertTrue(result instanceof Map);
-    Map<?,?> map = (Map<?,?>)result;
+    Assert.assertNotNull(map);
     Assert.assertEquals("rob", map.get("name"));
     Assert.assertEquals(12L, map.get("age"));
 
-    String jsonOutput = EJson.write(result);
+    String jsonOutput = EJson.write(map);
     Assert.assertEquals(jsonInput, jsonOutput);
   }
 
@@ -60,14 +59,13 @@ public class EJsonTests {
 
     StringReader reader = new StringReader(jsonInput);
 
-    Object result = EJson.parseObject(reader);
+    Map<String, Object> map = EJson.parseObject(reader);
 
-    Assert.assertTrue(result instanceof Map);
-    Map<?,?> map = (Map<?,?>)result;
+    Assert.assertNotNull(map);
     Assert.assertEquals("rob", map.get("name"));
     Assert.assertEquals(12L, map.get("age"));
 
-    String jsonOutput = EJson.write(result);
+    String jsonOutput = EJson.write(map);
     Assert.assertEquals(jsonInput, jsonOutput);
   }
 
