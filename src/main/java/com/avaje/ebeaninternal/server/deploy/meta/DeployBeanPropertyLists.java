@@ -188,11 +188,11 @@ public class DeployBeanPropertyLists {
    * properties).
    */
   public BeanProperty[] getBaseScalar() {
-    return (BeanProperty[]) baseScalar.toArray(new BeanProperty[baseScalar.size()]);
+    return baseScalar.toArray(new BeanProperty[baseScalar.size()]);
   }
 
   public BeanPropertyCompound[] getBaseCompound() {
-    return (BeanPropertyCompound[]) baseCompound.toArray(new BeanPropertyCompound[baseCompound.size()]);
+    return baseCompound.toArray(new BeanPropertyCompound[baseCompound.size()]);
   }
 
   public BeanProperty getId() {
@@ -208,11 +208,11 @@ public class DeployBeanPropertyLists {
   }
 
   public BeanProperty[] getNonTransients() {
-    return (BeanProperty[]) nonTransients.toArray(new BeanProperty[nonTransients.size()]);
+    return nonTransients.toArray(new BeanProperty[nonTransients.size()]);
   }
 
   public BeanProperty[] getTransients() {
-    return (BeanProperty[]) transients.toArray(new BeanProperty[transients.size()]);
+    return transients.toArray(new BeanProperty[transients.size()]);
   }
 
   public BeanProperty getVersionProperty() {
@@ -220,27 +220,27 @@ public class DeployBeanPropertyLists {
   }
 
   public BeanProperty[] getLocal() {
-    return (BeanProperty[]) local.toArray(new BeanProperty[local.size()]);
+    return local.toArray(new BeanProperty[local.size()]);
   }
 
   public BeanProperty[] getMutable() {
-    return (BeanProperty[]) mutable.toArray(new BeanProperty[mutable.size()]);
+    return mutable.toArray(new BeanProperty[mutable.size()]);
   }
 
   public BeanPropertyAssocOne<?>[] getEmbedded() {
-    return (BeanPropertyAssocOne[]) embedded.toArray(new BeanPropertyAssocOne[embedded.size()]);
+    return embedded.toArray(new BeanPropertyAssocOne[embedded.size()]);
   }
 
   public BeanPropertyAssocOne<?>[] getOneExported() {
-    return (BeanPropertyAssocOne[]) onesExported.toArray(new BeanPropertyAssocOne[onesExported.size()]);
+    return onesExported.toArray(new BeanPropertyAssocOne[onesExported.size()]);
   }
 
   public BeanPropertyAssocOne<?>[] getOneImported() {
-    return (BeanPropertyAssocOne[]) onesImported.toArray(new BeanPropertyAssocOne[onesImported.size()]);
+    return onesImported.toArray(new BeanPropertyAssocOne[onesImported.size()]);
   }
 
   public BeanPropertyAssocOne<?>[] getOnes() {
-    return (BeanPropertyAssocOne[]) ones.toArray(new BeanPropertyAssocOne[ones.size()]);
+    return ones.toArray(new BeanPropertyAssocOne[ones.size()]);
   }
 
   public BeanPropertyAssocOne<?>[] getOneExportedSave() {
@@ -260,11 +260,11 @@ public class DeployBeanPropertyLists {
   }
 
   public BeanProperty[] getNonMany() {
-    return (BeanProperty[]) nonManys.toArray(new BeanProperty[nonManys.size()]);
+    return nonManys.toArray(new BeanProperty[nonManys.size()]);
   }
 
   public BeanPropertyAssocMany<?>[] getMany() {
-    return (BeanPropertyAssocMany[]) manys.toArray(new BeanPropertyAssocMany[manys.size()]);
+    return manys.toArray(new BeanPropertyAssocMany[manys.size()]);
   }
 
   public BeanPropertyAssocMany<?>[] getManySave() {
@@ -283,7 +283,7 @@ public class DeployBeanPropertyLists {
    * Mode used to determine which BeanPropertyAssoc to include.
    */
   private enum Mode {
-    Save, Delete, Validate;
+    Save, Delete, Validate
   }
 
   private BeanPropertyAssocOne<?>[] getOne(boolean imported, Mode mode) {
