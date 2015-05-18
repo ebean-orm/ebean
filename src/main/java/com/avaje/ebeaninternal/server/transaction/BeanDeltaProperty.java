@@ -9,28 +9,28 @@ import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
 public class BeanDeltaProperty {
 
-    private final BeanProperty beanProperty;
-    
-    private final Object value;
-    
-    public BeanDeltaProperty(BeanProperty beanProperty, Object value) {
-        this.beanProperty = beanProperty;
-        this.value = value;
-    }
-    
-    public String toString() {
-        return beanProperty.getName()+":"+value;
-    }
-    
-    public void apply(EntityBean bean) {
-        beanProperty.setValue(bean, value);
-    }
-    
-    public void writeBinaryMessage(BinaryMessage m) throws IOException {
+  private final BeanProperty beanProperty;
 
-        DataOutputStream os = m.getOs();
-        os.writeUTF(beanProperty.getName());
-        beanProperty.getScalarType().writeData(os, value);
-    }
-    
+  private final Object value;
+
+  public BeanDeltaProperty(BeanProperty beanProperty, Object value) {
+    this.beanProperty = beanProperty;
+    this.value = value;
+  }
+
+  public String toString() {
+    return beanProperty.getName() + ":" + value;
+  }
+
+  public void apply(EntityBean bean) {
+    beanProperty.setValue(bean, value);
+  }
+
+  public void writeBinaryMessage(BinaryMessage m) throws IOException {
+
+    DataOutputStream os = m.getOs();
+    os.writeUTF(beanProperty.getName());
+    beanProperty.getScalarType().writeData(os, value);
+  }
+
 }

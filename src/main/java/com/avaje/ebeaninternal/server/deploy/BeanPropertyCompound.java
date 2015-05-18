@@ -28,171 +28,169 @@ import com.fasterxml.jackson.core.JsonParser;
  */
 public class BeanPropertyCompound extends BeanProperty {
 
-    private final CtCompoundType<?> compoundType;
+  private final CtCompoundType<?> compoundType;
 
-    /**
-     * Type Converter for scala.Option and similar type wrapping.
-     */
-    @SuppressWarnings("rawtypes")
-    private final ScalarTypeConverter typeConverter;
-    
-    private final BeanProperty[] scalarProperties;
+  /**
+   * Type Converter for scala.Option and similar type wrapping.
+   */
+  @SuppressWarnings("rawtypes")
+  private final ScalarTypeConverter typeConverter;
 
-    private final LinkedHashMap<String, BeanProperty> propertyMap = new LinkedHashMap<String, BeanProperty>();
+  private final BeanProperty[] scalarProperties;
 
-    private final LinkedHashMap<String, CtCompoundPropertyElAdapter> nonScalarMap = new LinkedHashMap<String, CtCompoundPropertyElAdapter>();
+  private final LinkedHashMap<String, BeanProperty> propertyMap = new LinkedHashMap<String, BeanProperty>();
 
-    private final BeanPropertyCompoundRoot root;
-    
-    /**
-     * Create the property.
-     */
-    public BeanPropertyCompound(BeanDescriptorMap owner, BeanDescriptor<?> descriptor, DeployBeanPropertyCompound deploy) {
+  private final LinkedHashMap<String, CtCompoundPropertyElAdapter> nonScalarMap = new LinkedHashMap<String, CtCompoundPropertyElAdapter>();
 
-        super(owner, descriptor, deploy);
+  /**
+   * Create the property.
+   */
+  public BeanPropertyCompound(BeanDescriptorMap owner, BeanDescriptor<?> descriptor, DeployBeanPropertyCompound deploy) {
 
-        this.compoundType = deploy.getCompoundType();
-        this.typeConverter = deploy.getTypeConverter();
-        
-        this.root = deploy.getFlatProperties(owner, descriptor);
+    super(descriptor, deploy);
 
-        this.scalarProperties = root.getScalarProperties();
+    this.compoundType = deploy.getCompoundType();
+    this.typeConverter = deploy.getTypeConverter();
 
-        for (int i = 0; i < scalarProperties.length; i++) {
-            propertyMap.put(scalarProperties[i].getName(), scalarProperties[i]);
-        }
+    BeanPropertyCompoundRoot root = deploy.getFlatProperties(owner, descriptor);
 
-        List<CtCompoundProperty> nonScalarPropsList = root.getNonScalarProperties();
+    this.scalarProperties = root.getScalarProperties();
 
-        for (int i = 0; i < nonScalarPropsList.size(); i++) {
-            CtCompoundProperty ctProp = nonScalarPropsList.get(i);
-            CtCompoundPropertyElAdapter adapter = new CtCompoundPropertyElAdapter(ctProp);
-            nonScalarMap.put(ctProp.getRelativeName(), adapter);
-        }
-
+    for (int i = 0; i < scalarProperties.length; i++) {
+      propertyMap.put(scalarProperties[i].getName(), scalarProperties[i]);
     }
 
-    @Override
-    public void initialise() {
-        // do nothing for normal BeanProperty
-        if (!isTransient && compoundType == null) {
-            String msg = "No cvoInternalType assigned to " + descriptor.getFullName() + "." + getName();
-            throw new RuntimeException(msg);
-        }
+    List<CtCompoundProperty> nonScalarPropsList = root.getNonScalarProperties();
+
+    for (int i = 0; i < nonScalarPropsList.size(); i++) {
+      CtCompoundProperty ctProp = nonScalarPropsList.get(i);
+      CtCompoundPropertyElAdapter adapter = new CtCompoundPropertyElAdapter(ctProp);
+      nonScalarMap.put(ctProp.getRelativeName(), adapter);
     }
 
-    @Override
-    public void setDeployOrder(int deployOrder) {
-        this.deployOrder = deployOrder;
-        for (CtCompoundPropertyElAdapter adapter : nonScalarMap.values()) {
-            adapter.setDeployOrder(deployOrder);
-        }
+  }
+
+  @Override
+  public void initialise() {
+    // do nothing for normal BeanProperty
+    if (!isTransient && compoundType == null) {
+      String msg = "No cvoInternalType assigned to " + descriptor.getFullName() + "." + getName();
+      throw new RuntimeException(msg);
+    }
+  }
+
+  @Override
+  public void setDeployOrder(int deployOrder) {
+    this.deployOrder = deployOrder;
+    for (CtCompoundPropertyElAdapter adapter : nonScalarMap.values()) {
+      adapter.setDeployOrder(deployOrder);
+    }
+  }
+
+  public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
+
+    if (chain == null) {
+      chain = new ElPropertyChainBuilder(true, propName);
     }
 
-    public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
+    // first add this property
+    chain.add(this);
 
-        if (chain == null) {
-            chain = new ElPropertyChainBuilder(true, propName);
-        }
-
-        // first add this property
-        chain.add(this);
-
-        // handle all the rest of the chain handled by the
-        // BeanProperty (all depth for nested compound type)
-        BeanProperty p = propertyMap.get(remainder);
-        if (p != null) {
-            return chain.add(p).build();
-        }
-        CtCompoundPropertyElAdapter elAdapter = nonScalarMap.get(remainder);
-        if (elAdapter == null) {
-            throw new RuntimeException("property [" + remainder + "] not found in " + getFullBeanName());
-        }
-        return chain.add(elAdapter).build();
+    // handle all the rest of the chain handled by the
+    // BeanProperty (all depth for nested compound type)
+    BeanProperty p = propertyMap.get(remainder);
+    if (p != null) {
+      return chain.add(p).build();
     }
-
-    @Override
-    public void appendSelect(DbSqlContext ctx, boolean subQuery) {
-        if (!isTransient) {
-            for (int i = 0; i < scalarProperties.length; i++) {
-                scalarProperties[i].appendSelect(ctx, subQuery);
-            }
-        }
+    CtCompoundPropertyElAdapter elAdapter = nonScalarMap.get(remainder);
+    if (elAdapter == null) {
+      throw new RuntimeException("property [" + remainder + "] not found in " + getFullBeanName());
     }
+    return chain.add(elAdapter).build();
+  }
 
-    public BeanProperty[] getScalarProperties() {
-        return scalarProperties;
-    }
-
-    @Override
-    public Object readSet(DbReadContext ctx, EntityBean bean, Class<?> type) throws SQLException {
-
-        boolean assignable = (type == null || owningType.isAssignableFrom(type));
-
-        Object v = compoundType.read(ctx.getDataReader());
-        if (assignable) {
-            setValue(bean, v);
-        }
-
-        return v;
-    }
-
-    /**
-     * Read the data from the resultSet effectively ignoring it and returning
-     * null.
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public Object read(DbReadContext ctx) throws SQLException {
-
-        Object v = compoundType.read(ctx.getDataReader());
-        if (typeConverter != null){
-            v = typeConverter.wrapValue(v);
-        }
-        return v;
-    }
-
-    @Override
-    public void loadIgnore(DbReadContext ctx) {
-        compoundType.loadIgnore(ctx.getDataReader());
-    }
-
-    @Override
-    public void load(SqlBeanLoad sqlBeanLoad) throws SQLException {
-        sqlBeanLoad.load(this);
-    }
-
-    @Override
-    public Object elGetReference(EntityBean bean) {
-        return bean;
-    }
-
-    public void jsonWrite(WriteJson ctx, EntityBean bean) throws IOException {
-      if (!jsonSerialize) {
-        return;
-      }
-      Object value = getValueIntercept(bean);
-      if (value == null) {
-        ctx.writeNull(name);
-      } else {
-        compoundType.jsonWrite(ctx, value, name);
-      }        
-    }
-    
-    public void jsonRead(JsonParser ctx, EntityBean bean) throws IOException {
-      
-      if (!jsonDeserialize) {
-        return;
-      }
-      
-      Object value = EJson.parse(ctx);
-      if (value == null) {
-        setValue(bean, null);
-      } else {
-        @SuppressWarnings("unchecked")
-        Map<String,Object> map = (Map<String,Object>)value;
-        Object objValue = compoundType.jsonConvert(map);
-        setValue(bean, objValue);
+  @Override
+  public void appendSelect(DbSqlContext ctx, boolean subQuery) {
+    if (!isTransient) {
+      for (int i = 0; i < scalarProperties.length; i++) {
+        scalarProperties[i].appendSelect(ctx, subQuery);
       }
     }
+  }
+
+  public BeanProperty[] getScalarProperties() {
+    return scalarProperties;
+  }
+
+  @Override
+  public Object readSet(DbReadContext ctx, EntityBean bean, Class<?> type) throws SQLException {
+
+    boolean assignable = (type == null || owningType.isAssignableFrom(type));
+
+    Object v = compoundType.read(ctx.getDataReader());
+    if (assignable) {
+      setValue(bean, v);
+    }
+
+    return v;
+  }
+
+  /**
+   * Read the data from the resultSet effectively ignoring it and returning
+   * null.
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public Object read(DbReadContext ctx) throws SQLException {
+
+    Object v = compoundType.read(ctx.getDataReader());
+    if (typeConverter != null) {
+      v = typeConverter.wrapValue(v);
+    }
+    return v;
+  }
+
+  @Override
+  public void loadIgnore(DbReadContext ctx) {
+    compoundType.loadIgnore(ctx.getDataReader());
+  }
+
+  @Override
+  public void load(SqlBeanLoad sqlBeanLoad) throws SQLException {
+    sqlBeanLoad.load(this);
+  }
+
+  @Override
+  public Object elGetReference(EntityBean bean) {
+    return bean;
+  }
+
+  public void jsonWrite(WriteJson ctx, EntityBean bean) throws IOException {
+    if (!jsonSerialize) {
+      return;
+    }
+    Object value = getValueIntercept(bean);
+    if (value == null) {
+      ctx.writeNull(name);
+    } else {
+      compoundType.jsonWrite(ctx, value, name);
+    }
+  }
+
+  public void jsonRead(JsonParser ctx, EntityBean bean) throws IOException {
+
+    if (!jsonDeserialize) {
+      return;
+    }
+
+    Object value = EJson.parse(ctx);
+    if (value == null) {
+      setValue(bean, null);
+    } else {
+      @SuppressWarnings("unchecked")
+      Map<String, Object> map = (Map<String, Object>) value;
+      Object objValue = compoundType.jsonConvert(map);
+      setValue(bean, objValue);
+    }
+  }
 }

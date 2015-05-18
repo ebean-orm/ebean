@@ -74,7 +74,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	 * Construct the property.
 	 */
 	public BeanPropertyAssoc(BeanDescriptorMap owner, BeanDescriptor<?> descriptor, DeployBeanPropertyAssoc<T> deploy) {
-		super(owner, descriptor, deploy);
+		super(descriptor, deploy);
 		this.extraWhere = InternString.intern(deploy.getExtraWhere());
 		this.isOuterJoin = deploy.isOuterJoin();
 		this.beanTable = deploy.getBeanTable();
