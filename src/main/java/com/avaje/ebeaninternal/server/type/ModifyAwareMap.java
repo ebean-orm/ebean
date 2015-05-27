@@ -9,17 +9,20 @@ import java.util.Set;
  */
 public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
 
-  /**
-   * Dirty flag set when the map has been modified.
-   */
-  private boolean dirty;
+  final ModifyAwareOwner owner;
 
   /**
    * The underlying map.
    */
-  private Map<K, V> map;
+  final Map<K, V> map;
 
   public ModifyAwareMap(Map<K, V> underyling) {
+    this.map = underyling;
+    this.owner = new ModifyAwareFlag();
+  }
+
+  public ModifyAwareMap(ModifyAwareOwner owner, Map<K, V> underyling) {
+    this.owner = owner;
     this.map = underyling;
   }
 
@@ -29,12 +32,17 @@ public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareOwner {
 
   @Override
   public boolean isMarkedDirty() {
-    return dirty;
+    return owner.isMarkedDirty();
   }
 
   @Override
   public void markAsModified() {
-    dirty = true;
+    owner.markAsModified();
+  }
+
+  @Override
+  public void resetMarkedDirty() {
+    owner.resetMarkedDirty();
   }
 
   @Override

@@ -5,6 +5,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.annotation.DbJson;
+import com.avaje.ebean.annotation.DbJsonType;
 import com.avaje.ebean.config.EncryptDeploy;
 import com.avaje.ebean.config.EncryptDeployManager;
 import com.avaje.ebean.config.EncryptKeyManager;
@@ -13,6 +15,7 @@ import com.avaje.ebean.config.NamingConvention;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.type.DataEncryptSupport;
@@ -40,6 +43,8 @@ public class DeployUtil {
    * configurable.
    */
   private static final int dbBLOBType = Types.BLOB;
+
+  private static final int DEFAULT_JSON_VARCHAR_LENGTH = 3000;
 
   private final NamingConvention namingConvention;
 
@@ -181,6 +186,72 @@ public class DeployUtil {
       // this is ok...
       logger.trace("... transient property " + msg);
       return null;
+    }
+  }
+
+  /**
+   * Map to Postgres HSTORE type.
+   */
+  public void setDbHstore(DeployBeanProperty prop) {
+
+    ScalarType<?> scalarType = typeManager.getScalarType(DbType.HSTORE);
+    if (scalarType == null) {
+      // this should never occur actually
+      throw new RuntimeException("No ScalarType found for HSTORE on [" + prop.getFullBeanName() + "]");
+    }
+    prop.setDbType(DbType.HSTORE);
+    prop.setScalarType(scalarType);
+  }
+
+  /**
+   * This property is marked as a Lob object.
+   */
+  public void setDbJsonType(DeployBeanProperty prop, DbJson dbJsonType) {
+
+    int dbType = getDbJsonStorage(dbJsonType.storage());
+    setDbJsonType(prop, dbType, dbJsonType.length());
+  }
+
+  public void setDbJsonBType(DeployBeanProperty prop) {
+    setDbJsonType(prop, DbType.JSONB, 0);
+  }
+
+  private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength) {
+
+    Class<?> type = prop.getPropertyType();
+
+    ScalarType<?> scalarType = typeManager.getJsonScalarType(type, dbType);
+    if (scalarType == null) {
+      // this should never occur actually
+      throw new RuntimeException("No ScalarType for JSON type [" + type + "] [" + dbType + "]");
+    }
+    prop.setDbType(dbType);
+    prop.setScalarType(scalarType);
+    if (dbType == Types.VARCHAR) {
+      // determine the db column size
+      int columnLength = (dbLength > 0) ? dbLength : DEFAULT_JSON_VARCHAR_LENGTH;
+      prop.setDbLength(columnLength);
+    }
+  }
+
+  /**
+   * Return the JDBC type for the JSON storage type.
+   */
+  private int getDbJsonStorage(DbJsonType dbJsonType) {
+
+    switch (dbJsonType) {
+      case JSON:
+        return DbType.JSON;
+      case JSONB:
+        return DbType.JSONB;
+      case VARCHAR:
+        return Types.VARCHAR;
+      case CLOB:
+        return Types.CLOB;
+      case BLOB:
+        return Types.BLOB;
+      default:
+        return DbType.JSON;
     }
   }
 

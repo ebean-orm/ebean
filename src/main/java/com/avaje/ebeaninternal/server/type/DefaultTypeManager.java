@@ -1,5 +1,22 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.annotation.EnumMapping;
+import com.avaje.ebean.annotation.EnumValue;
+import com.avaje.ebean.config.*;
+import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebeaninternal.api.ClassUtil;
+import com.avaje.ebeaninternal.server.core.BootupClasses;
+import com.avaje.ebeaninternal.server.lib.util.StringHelper;
+import com.avaje.ebeaninternal.server.type.reflect.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.joda.time.*;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -13,41 +30,11 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.Period;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.avaje.ebean.config.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.avaje.ebean.annotation.EnumMapping;
-import com.avaje.ebean.annotation.EnumValue;
-import com.avaje.ebeaninternal.api.ClassUtil;
-import com.avaje.ebeaninternal.server.core.BootupClasses;
-import com.avaje.ebeaninternal.server.lib.util.StringHelper;
-import com.avaje.ebeaninternal.server.type.reflect.CheckImmutable;
-import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
-import com.avaje.ebeaninternal.server.type.reflect.ImmutableMeta;
-import com.avaje.ebeaninternal.server.type.reflect.ImmutableMetaFactory;
-import com.avaje.ebeaninternal.server.type.reflect.KnownImmutable;
-import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundType;
-import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundTypeProperty;
-import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedTypeBuilder;
 
 /**
  * Default implementation of TypeManager.
@@ -65,9 +52,15 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final ConcurrentHashMap<Integer, ScalarType<?>> nativeMap;
 
-  private final ConcurrentHashMap<String, ScalarType<?>> customTypeMap;
-
   private final DefaultTypeFactory extraTypeFactory;
+
+  private final ScalarTypeJsonMap JSON_MAP_CLOB = new ScalarTypeJsonMap.Clob();
+
+  private final ScalarTypeJsonMap jsonMapClob = JSON_MAP_CLOB;
+  private final ScalarTypeJsonMap jsonMapBlob = new ScalarTypeJsonMap.Blob();
+  private final ScalarTypeJsonMap jsonMapVarchar = new ScalarTypeJsonMap.Varchar();
+  private final ScalarTypeJsonMap jsonMapJson;
+  private final ScalarTypeJsonMap jsonMapJsonb;
 
   private final ScalarTypeFile fileType = new ScalarTypeFile();
 
@@ -134,9 +127,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    */
   public DefaultTypeManager(ServerConfig config, BootupClasses bootupClasses) {
 
-    int clobType = config.getDatabasePlatform().getClobDbType();
-    int blobType = config.getDatabasePlatform().getBlobDbType();
-
     this.jsonDateTime = config.getJsonDateTime();
     this.checkImmutable = new CheckImmutable(this);
     this.reflectScalarBuilder = new ReflectionBasedTypeBuilder(this);
@@ -144,17 +134,23 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     this.compoundTypeMap = new ConcurrentHashMap<Class<?>, CtCompoundType<?>>();
     this.typeMap = new ConcurrentHashMap<Class<?>, ScalarType<?>>();
     this.nativeMap = new ConcurrentHashMap<Integer, ScalarType<?>>();
-    this.customTypeMap = new ConcurrentHashMap<String, ScalarType<?>>();
-
-    this.customTypeMap.put(ScalarTypePostgresHstore.KEY, new ScalarTypePostgresHstore());
 
     this.objectMapperPresent = ClassUtil.isPresent("com.fasterxml.jackson.databind.ObjectMapper", this.getClass());
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
 
-    initialiseStandard(jsonDateTime, clobType, blobType, config.isUuidStoreAsBinary());
+    initialiseStandard(jsonDateTime, config);
     initialiseJavaTimeTypes(jsonDateTime, config);
     initialiseJodaTypes(jsonDateTime);
+
+    if (isPostgres(config.getDatabasePlatform())) {
+      // Postgres has special DB types for JSON/JSONB
+      this.jsonMapJson = new ScalarTypeJsonMapPostgres.JSON();
+      this.jsonMapJsonb = new ScalarTypeJsonMapPostgres.JSONB();
+    } else {
+      this.jsonMapJson = JSON_MAP_CLOB;
+      this.jsonMapJsonb = JSON_MAP_CLOB;
+    }
 
     if (bootupClasses != null) {
       initialiseCustomScalarTypes(jsonDateTime, bootupClasses, config);
@@ -163,12 +159,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     }
   }
 
-  /**
-   * Lookup a special or custom scalar type by key.
-   */
-  @Override
-  public ScalarType<?> getScalarTypeFromKey(String specialTypeKey) {
-    return customTypeMap.get(specialTypeKey);
+  private boolean isPostgres(DatabasePlatform databasePlatform) {
+    return databasePlatform.getName().toLowerCase().startsWith("postgre");
   }
 
   public boolean isKnownImmutable(Class<?> cls) {
@@ -295,6 +287,24 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return reader;
   }
 
+  @Override
+  public ScalarType<?> getJsonScalarType(Class<?> type, int dbType) {
+
+    if (type.equals(Map.class)) {
+      switch (dbType) {
+        case Types.VARCHAR : return jsonMapVarchar;
+        case Types.BLOB: return jsonMapBlob;
+        case Types.CLOB : return jsonMapClob;
+        case DbType.JSONB: return jsonMapJsonb;
+        case DbType.JSON: return jsonMapJson;
+        default:
+          return jsonMapJson;
+      }
+    }
+
+    throw new IllegalArgumentException("Type [" + type + "] unsupported for @DbJson mapping");
+  }
+
   /**
    * Return a ScalarType for a given class.
    * <p>
@@ -370,8 +380,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return value;
   }
 
+  @SuppressWarnings("ResultOfMethodCallIgnored")
   private boolean isIntegerType(String s) {
-
     try {
       Integer.parseInt(s);
       return true;
@@ -685,7 +695,14 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * Register all the standard types supported. This is the standard JDBC types
    * plus some other common types such as java.util.Date and java.util.Calendar.
    */
-  protected void initialiseStandard(JsonConfig.DateTime mode, int platformClobType, int platformBlobType, boolean binaryUUID) {
+  protected void initialiseStandard(JsonConfig.DateTime mode, ServerConfig config) {
+
+    boolean binaryUUID = config.isUuidStoreAsBinary();
+    DatabasePlatform databasePlatform = config.getDatabasePlatform();
+    int platformClobType = databasePlatform.getClobDbType();
+    int platformBlobType = databasePlatform.getBlobDbType();
+
+    nativeMap.put(DbType.HSTORE, new ScalarTypePostgresHstore());
 
     ScalarType<?> utilDateType = extraTypeFactory.createUtilDate(mode);
     typeMap.put(java.util.Date.class, utilDateType);

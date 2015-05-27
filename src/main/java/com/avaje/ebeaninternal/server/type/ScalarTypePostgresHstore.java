@@ -1,17 +1,17 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.text.TextException;
+import com.avaje.ebean.text.json.EJson;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
-
-import com.avaje.ebean.config.dbplatform.PostgresPlatform;
-import com.avaje.ebean.text.json.EJson;
-import com.avaje.ebean.text.TextException;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Postgres Hstore type which maps Map<String,String> to a single 'HStore column' in the DB.
@@ -21,10 +21,8 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
 
   public static final String KEY = "hstore";
 
-  public static final int HSTORE_TYPE = PostgresPlatform.TYPE_HSTORE;
-
   public ScalarTypePostgresHstore() {
-    super(Map.class, false, HSTORE_TYPE);
+    super(Map.class, false, DbType.HSTORE);
   }
 
   @Override

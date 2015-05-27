@@ -291,6 +291,7 @@ public class ServerConfig {
   private int queryCacheMaxSize = 1000;
   private int queryCacheMaxIdleTime = 600;
   private int queryCacheMaxTimeToLive = 60*60*6;
+  private Object objectMapper;
 
   /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
@@ -1863,5 +1864,13 @@ public class ServerConfig {
   public PersistBatch appliedPersistBatchOnCascade() {
 
     return databasePlatform.isDisallowBatchOnCascade() ? PersistBatch.NONE : persistBatchOnCascade;
+  }
+
+  public Object getObjectMapper() {
+    return objectMapper;
+  }
+
+  public void setObjectMapper(Object objectMapper) {
+    this.objectMapper = objectMapper;
   }
 }

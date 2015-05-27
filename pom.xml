@@ -57,10 +57,18 @@
 
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>2.4.3</version>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.5.3</version>
     </dependency>
-    
+
+    <!-- provided scope for JsonNode support -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.5.3</version>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>javax.transaction</groupId>
       <artifactId>jta</artifactId>
@@ -68,6 +76,7 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- provided scope to read validation annotations Size etc -->
     <dependency>
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
@@ -86,6 +95,14 @@
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
       <version>1.6</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Provided scope for Postgres JSON/JSONB support -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>9.4-1201-jdbc41</version>
       <scope>provided</scope>
     </dependency>
 
@@ -121,13 +138,6 @@
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
       <version>3.7.2</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>8.4-701.jdbc4</version>
       <scope>test</scope>
     </dependency>
 
@@ -254,8 +264,6 @@
         <configuration>
           <doctitle>Ebean 4</doctitle>
           <overview>src/main/java/com/avaje/ebean/overview.html</overview>
-         <!-- <excludePackageNames>com.avaje.ebeaninternal.*:com.avaje.ebean.util</excludePackageNames> -->
-          <!--<additionalparam>-Xdoclint:none</additionalparam>-->
           <source>1.8</source>
           <doclet>org.avaje.doclet.PygmentsDoclet</doclet>
           <excludePackageNames>com.avaje.ebeaninternal.*:com.avaje.ebean.util</excludePackageNames>

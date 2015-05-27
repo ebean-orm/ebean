@@ -1,6 +1,7 @@
 package com.avaje.ebean.json;
 
 import com.avaje.ebean.text.json.EJson;
+import com.avaje.ebeaninternal.server.type.ModifyAwareMap;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import org.junit.Assert;
@@ -202,5 +203,47 @@ public class EJsonTests {
 
   }
 
+
+  @Test
+  public void test_map_nested_modifyAware() throws IOException {
+
+    String jsonInput = "{\"name\":\"rob\",\"age\":12,\"org\":{\"name\":\"superorg\",\"rating\":4},\"nums\":[1,2,3]}";
+    ModifyAwareMap<String,Object> map = (ModifyAwareMap<String, Object>) EJson.parseObject(jsonInput, true);
+
+    Assert.assertFalse(map.isMarkedDirty());
+    Assert.assertEquals(4, map.size());
+
+    map.put("name", "jim");
+    Assert.assertTrue(map.isMarkedDirty());
+
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void test_map_nested_modifyAwareNestedList() throws IOException {
+
+    String jsonInput = "{\"name\":\"rob\",\"age\":12,\"org\":{\"name\":\"superorg\",\"rating\":4},\"nums\":[1,2,3]}";
+    ModifyAwareMap<String,Object> map = (ModifyAwareMap<String, Object>) EJson.parseObject(jsonInput, true);
+    Assert.assertFalse(map.isMarkedDirty());
+
+    List<Object> nums = (List<Object>) map.get("nums");
+    nums.add(4);
+    Assert.assertTrue(map.isMarkedDirty());
+
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void test_map_nested_modifyAwareNestedObject() throws IOException {
+
+    String jsonInput = "{\"name\":\"rob\",\"age\":12,\"org\":{\"name\":\"superorg\",\"rating\":4},\"nums\":[1,2,3]}";
+    ModifyAwareMap<String,Object> map = (ModifyAwareMap<String, Object>) EJson.parseObject(jsonInput, true);
+    Assert.assertFalse(map.isMarkedDirty());
+
+    Map<String,Object> org = (Map<String, Object>) map.get("org");
+    org.put("extra","foo");
+    Assert.assertTrue(map.isMarkedDirty());
+
+  }
 
 }

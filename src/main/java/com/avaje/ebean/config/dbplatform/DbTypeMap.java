@@ -36,6 +36,13 @@ public class DbTypeMap {
 
     put(Types.BLOB, new DbType("blob"));
     put(Types.CLOB, new DbType("clob"));
+
+    put(DbType.JSON, new DbType("clob")); // Postgres maps this to JSON
+    put(DbType.JSONB, new DbType("clob")); // Postgres maps this to JSONB
+    put(DbType.JSONClob, new DbType("clob"));
+    put(DbType.JSONBlob, new DbType("blob"));
+    put(DbType.JSONVarchar, new DbType("varchar", 1000));
+
     put(Types.LONGVARBINARY, new DbType("longvarbinary"));
     put(Types.LONGVARCHAR, new DbType("lonvarchar"));
     put(Types.VARBINARY, new DbType("varbinary", 255));

@@ -9,6 +9,36 @@ package com.avaje.ebean.config.dbplatform;
 public class DbType {
 
   /**
+   * Type to map Map content to Postgres HSTORE.
+   */
+  public static final int HSTORE = 5000;
+
+  /**
+   * Type to map JSON content to Clob or Postgres JSON type.
+   */
+  public static final int JSON = 5001;
+
+  /**
+   * Type to map JSON content to Clob or Postgres JSONB type.
+   */
+  public static final int JSONB = 5002;
+
+  /**
+   * Type to map JSON content to VARCHAR.
+   */
+  public static final int JSONVarchar = 5003;
+
+  /**
+   * Type to map JSON content to Clob.
+   */
+  public static final int JSONClob = 5004;
+
+  /**
+   * Type to map JSON content to Blob.
+   */
+  public static final int JSONBlob = 5005;
+
+  /**
    * The data type name (VARCHAR, INTEGER ...)
    */
   private final String name;

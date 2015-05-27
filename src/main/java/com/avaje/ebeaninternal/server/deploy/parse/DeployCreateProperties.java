@@ -1,33 +1,22 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import com.avaje.ebean.annotation.ColumnHstore;
+import com.avaje.ebean.annotation.DbJson;
+import com.avaje.ebean.annotation.DbJsonB;
+import com.avaje.ebeaninternal.server.deploy.DetermineManyType;
+import com.avaje.ebeaninternal.server.deploy.ManyType;
+import com.avaje.ebeaninternal.server.deploy.meta.*;
+import com.avaje.ebeaninternal.server.type.CtCompoundType;
+import com.avaje.ebeaninternal.server.type.ScalarType;
+import com.avaje.ebeaninternal.server.type.TypeManager;
+import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.ManyToOne;
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.avaje.ebean.annotation.ColumnHstore;
-import com.avaje.ebeaninternal.server.core.Message;
-import com.avaje.ebeaninternal.server.deploy.DetermineManyType;
-import com.avaje.ebeaninternal.server.deploy.ManyType;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertySimpleCollection;
-import com.avaje.ebeaninternal.server.type.CtCompoundType;
-import com.avaje.ebeaninternal.server.type.ScalarType;
-import com.avaje.ebeaninternal.server.type.ScalarTypePostgresHstore;
-import com.avaje.ebeaninternal.server.type.TypeManager;
-import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
+import java.lang.reflect.*;
 
 /**
  * Create the properties for a bean.
@@ -95,15 +84,13 @@ public class DeployCreateProperties {
         Field field = fields[i];
         if (Modifier.isStatic(field.getModifiers())) {
           // not interested in static fields
+          logger.trace("Skipping static field {} in {}", field.getName(), beanType.getName());
 
         } else if (Modifier.isTransient(field.getModifiers())) {
           // not interested in transient fields
-          logger.trace("Skipping transient field " + field.getName() + " in " + beanType.getName());
+          logger.trace("Skipping transient field {} in {}", field.getName(), beanType.getName());
 
-        } else if (ignoreFieldByName(field.getName())) {
-          // not interested this field (ebean or aspectJ field)
-
-        } else {
+        } else if (!ignoreFieldByName(field.getName())) {
 
           String fieldName = getFieldName(field, beanType);
           String initFieldName = initCap(fieldName);
@@ -118,14 +105,10 @@ public class DeployCreateProperties {
             prop.setSortOrder((level * 10000 + 100 - i + sortOverride));
 
             DeployBeanProperty replaced = desc.addBeanProperty(prop);
-            if (replaced != null) {
-              if (replaced.isTransient()) {
-                // expected for inheritance...
-              } else {
-                String msg = "Huh??? property " + prop.getFullBeanName() + " being defined twice";
-                msg += " but replaced property was not transient? This is not expected?";
-                logger.warn(msg);
-              }
+            if (replaced != null && !replaced.isTransient()) {
+              String msg = "Huh??? property " + prop.getFullBeanName() + " being defined twice";
+              msg += " but replaced property was not transient? This is not expected?";
+              logger.warn(msg);
             }
           }
         }
@@ -210,33 +193,6 @@ public class DeployCreateProperties {
     return null;
   }
 
-  /**
-   * Find a public non-static setter method that matches this field (according to bean-spec rules).
-   */
-  private Method findSetter(Field field, String initFieldName, Method[] declaredMethods, boolean scalaObject) {
-
-    String methSetName = "set" + initFieldName;
-    String scalaSetName = field.getName() + "_$eq";
-
-    for (int i = 0; i < declaredMethods.length; i++) {
-      Method m = declaredMethods[i];
-
-      if ((scalaObject && m.getName().equals(scalaSetName)) || m.getName().equals(methSetName)) {
-
-        Class<?>[] params = m.getParameterTypes();
-        if (params.length == 1 && field.getType().equals(params[0])) {
-          if (void.class.equals(m.getReturnType())) {
-            int modifiers = m.getModifiers();
-            if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)) {
-              return m;
-            }
-          }
-        }
-      }
-    }
-    return null;
-  }
-
   @SuppressWarnings({ "unchecked", "rawtypes" })
   private DeployBeanProperty createManyType(DeployBeanDescriptor<?> desc, Class<?> targetType, ManyType manyType) {
 
@@ -266,16 +222,8 @@ public class DeployCreateProperties {
     		propertyType = tt;
     	}
     }
-    Class<?> innerType = propertyType;
-
-    String specialTypeKey = getSpecialScalarType(field);
-    if (specialTypeKey != null) {
-      ScalarType<?> scalarType = typeManager.getScalarTypeFromKey(specialTypeKey);
-      if (scalarType == null) {
-        logger.error("Could not find ScalarType to match key ["+specialTypeKey+"]");
-      } else {
-        return new DeployBeanProperty(desc, propertyType, scalarType, null);
-      }
+    if (isMappedType(field)) {
+      return new DeployBeanProperty(desc, propertyType, null, null);
     }
     
     // check for Collection type (list, set or map)
@@ -295,16 +243,16 @@ public class DeployCreateProperties {
       return createManyType(desc, targetType, manyType);
     }
 
-    if (innerType.isEnum() || innerType.isPrimitive()) {
+    if (propertyType.isEnum() || propertyType.isPrimitive()) {
       return new DeployBeanProperty(desc, propertyType, null, null);
     }
 
-    ScalarType<?> scalarType = typeManager.getScalarType(innerType);
+    ScalarType<?> scalarType = typeManager.getScalarType(propertyType);
     if (scalarType != null) {
       return new DeployBeanProperty(desc, propertyType, scalarType, null);
     }
 
-    CtCompoundType<?> compoundType = typeManager.getCompoundType(innerType);
+    CtCompoundType<?> compoundType = typeManager.getCompoundType(propertyType);
     if (compoundType != null) {
       return new DeployBeanPropertyCompound(desc, propertyType, compoundType, null);
     }
@@ -313,19 +261,19 @@ public class DeployCreateProperties {
       return null;
     }
     try {
-      CheckImmutableResponse checkImmutable = typeManager.checkImmutable(innerType);
+      CheckImmutableResponse checkImmutable = typeManager.checkImmutable(propertyType);
       if (checkImmutable.isImmutable()) {
         if (checkImmutable.isCompoundType()) {
           // use reflection to support compound immutable value objects
-          typeManager.recursiveCreateScalarDataReader(innerType);
-          compoundType = typeManager.getCompoundType(innerType);
+          typeManager.recursiveCreateScalarDataReader(propertyType);
+          compoundType = typeManager.getCompoundType(propertyType);
           if (compoundType != null) {
             return new DeployBeanPropertyCompound(desc, propertyType, compoundType, null);
           }
 
         } else {
           // use reflection to support simple immutable value objects
-          scalarType = typeManager.recursiveCreateScalarTypes(innerType);
+          scalarType = typeManager.recursiveCreateScalarTypes(propertyType);
           return new DeployBeanProperty(desc, propertyType, scalarType, null);
         }
       }
@@ -338,13 +286,13 @@ public class DeployCreateProperties {
     }
   }
 
-  private String getSpecialScalarType(Field field) {
-
-    if (field.getAnnotation(ColumnHstore.class) != null) {
-      return ScalarTypePostgresHstore.KEY;
-    }
-    
-    return null;
+  /**
+   * Return true if the field has one of the special mappings.
+   */
+  private boolean isMappedType(Field field) {
+    return (field.getAnnotation(DbJson.class) != null)
+        || (field.getAnnotation(DbJsonB.class) != null)
+        || (field.getAnnotation(ColumnHstore.class) != null);
   }
   
   private boolean isTransientField(Field field) {

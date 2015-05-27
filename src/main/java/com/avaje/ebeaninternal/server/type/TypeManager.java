@@ -58,7 +58,10 @@ public interface TypeManager {
   ScalarType<?> createEnumScalarType(Class<?> enumType);
 
   /**
-   * Find a scalarType using a custom type key. Used for Hstore and similar special types.
+   * Return the ScalarType used to handle JSON content.
+   * <p>
+   * Note that type expected to be JsonNode or Map.
+   * </p>
    */
-  ScalarType<?> getScalarTypeFromKey(String specialTypeKey);
+  ScalarType<?> getJsonScalarType(Class<?> type, int dbType);
 }

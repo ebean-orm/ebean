@@ -168,6 +168,15 @@ public class RsetDataReader implements DataReader {
     return readStringLob(reader);
   }
 
+  @Override
+  public Reader getClobReader() throws SQLException {
+    Clob clob = rset.getClob(pos());
+    if (clob == null) {
+      return null;
+    }
+    return clob.getCharacterStream();
+  }
+
   public String getStringClob() throws SQLException {
 
     Clob clob = rset.getClob(pos());
@@ -210,6 +219,14 @@ public class RsetDataReader implements DataReader {
     }
     InputStream in = blob.getBinaryStream();
     return getBinaryLob(in);
+  }
+
+  public InputStream getBlobInputStream() throws SQLException {
+    Blob blob = rset.getBlob(pos());
+    if (blob == null) {
+      return null;
+    }
+    return blob.getBinaryStream();
   }
 
   protected byte[] getBinaryLob(InputStream in) throws SQLException {

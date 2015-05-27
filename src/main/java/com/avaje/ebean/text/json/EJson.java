@@ -35,14 +35,29 @@ public class EJson {
   public static void write(Object object, JsonGenerator jsonGenerator) throws IOException {
     EJsonWriter.write(object, jsonGenerator);
   }
-  
+
+  /**
+   * Parse the json and return as a Map additionally specifying if the returned map should
+   * be modify aware meaning that it can detect when it has been modified.
+   */
+  public static Map<String,Object> parseObject(String json, boolean modifyAware) throws IOException {
+    return EJsonReader.parseObject(json, modifyAware);
+  }
+
   /**
    * Parse the json and return as a Map.
    */
   public static Map<String,Object> parseObject(String json) throws IOException {
     return EJsonReader.parseObject(json);
   }
-  
+
+  /**
+   * Parse the json and return as a Map taking a reader.
+   */
+  public static Map<String,Object> parseObject(Reader reader, boolean modifyAware) throws IOException {
+    return EJsonReader.parseObject(reader, modifyAware);
+  }
+
   /**
    * Parse the json and return as a Map taking a reader.
    */

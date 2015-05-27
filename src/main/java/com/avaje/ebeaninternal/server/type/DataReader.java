@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
 import java.io.InputStream;
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.SQLException;
@@ -19,9 +20,13 @@ public interface DataReader {
 
   byte[] getBlobBytes() throws SQLException;
 
+  InputStream getBlobInputStream() throws SQLException;
+
   String getStringFromStream() throws SQLException;
 
   String getStringClob() throws SQLException;
+
+  Reader getClobReader() throws SQLException;
 
   String getString() throws SQLException;
 

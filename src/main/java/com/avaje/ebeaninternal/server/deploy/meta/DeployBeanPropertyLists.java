@@ -97,7 +97,7 @@ public class DeployBeanPropertyLists {
       discDeployProp.setDbColumn(discriminatorColumn);
       
       // create the discriminator BeanProperty and only register it in the propertyMap
-      BeanProperty dprop = new BeanProperty(owner, desc, discDeployProp);
+      BeanProperty dprop = new BeanProperty(desc, discDeployProp);
       propertyMap.put(dprop.getName(), dprop);
     }
     
@@ -382,6 +382,6 @@ public class DeployBeanPropertyLists {
       return new BeanPropertyCompound(owner, desc, (DeployBeanPropertyCompound) deployProp);
     }
 
-    return new BeanProperty(owner, desc, deployProp);
+    return new BeanProperty(desc, deployProp);
   }
 }

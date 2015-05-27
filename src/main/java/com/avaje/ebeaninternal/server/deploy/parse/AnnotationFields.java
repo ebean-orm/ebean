@@ -135,6 +135,18 @@ public class AnnotationFields extends AnnotationParser {
       util.setLobType(prop);
     }
 
+    DbJson dbJson = get(prop, DbJson.class);
+    if (dbJson != null) {
+      util.setDbJsonType(prop, dbJson);
+    } else {
+      if (get(prop, DbJsonB.class) != null) {
+        util.setDbJsonBType(prop);
+      }
+    }
+    if (get(prop, ColumnHstore.class) != null) {
+      util.setDbHstore(prop);
+    }
+    
     Formula formula = get(prop, Formula.class);
     if (formula != null) {
       prop.setSqlFormula(formula.select(), formula.join());

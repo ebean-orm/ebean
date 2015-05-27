@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.avaje.ebeaninternal.server.type.ModifyAwareFlag;
+import com.avaje.ebeaninternal.server.type.ModifyAwareList;
+import com.avaje.ebeaninternal.server.type.ModifyAwareMap;
+import com.avaje.ebeaninternal.server.type.ModifyAwareOwner;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -16,7 +20,12 @@ import com.fasterxml.jackson.core.JsonToken;
 class EJsonReader {
 
   static JsonFactory json = new JsonFactory();
-  
+
+  @SuppressWarnings("unchecked")
+  static Map<String, Object> parseObject(String json, boolean modifyAware) throws IOException  {
+    return (Map<String, Object>) parse(json, modifyAware);
+  }
+
   @SuppressWarnings("unchecked")
   static Map<String, Object> parseObject(String json) throws IOException  {
     return (Map<String, Object>) parse(json);
@@ -26,7 +35,12 @@ class EJsonReader {
   static Map<String, Object> parseObject(Reader reader) throws IOException {
     return (Map<String, Object>) parse(reader);
   }
-  
+
+  @SuppressWarnings("unchecked")
+  static Map<String, Object> parseObject(Reader reader, boolean modifyAware) throws IOException {
+    return (Map<String, Object>) parse(reader, modifyAware);
+  }
+
   @SuppressWarnings("unchecked")
   static Map<String, Object> parseObject(JsonParser parser) throws IOException {
     return (Map<String, Object>) parse(parser);
@@ -34,7 +48,7 @@ class EJsonReader {
 
   @SuppressWarnings("unchecked")
   static Map<String, Object> parseObject(JsonParser parser, JsonToken token) throws IOException {
-    return (Map<String, Object>)parse(parser, token);
+    return (Map<String, Object>)parse(parser, token, false);
   }
 
   @SuppressWarnings("unchecked")
@@ -56,19 +70,35 @@ class EJsonReader {
     return parse(new StringReader(json));
   }
 
+  static Object parse(String json, boolean modifyAware) throws IOException {
+    return parse(new StringReader(json), modifyAware);
+  }
+
   static Object parse(Reader reader) throws IOException {
     return parse(json.createParser(reader));
   }
 
-  static Object parse(JsonParser parser) throws IOException {
-    return parse(parser, null);
+  static Object parse(Reader reader, boolean modifyAware) throws IOException {
+    return parse(json.createParser(reader), modifyAware);
   }
 
-  static Object parse(JsonParser parser, JsonToken token) throws IOException {
-    return new EJsonReader(parser).parseJson(token);
+  static Object parse(JsonParser parser) throws IOException {
+    return parse(parser, null, false);
+  }
+
+  static Object parse(JsonParser parser, boolean modifyAware) throws IOException {
+    return parse(parser, null, modifyAware);
+  }
+
+  static Object parse(JsonParser parser, JsonToken token, boolean modifyAware) throws IOException {
+    return new EJsonReader(parser, modifyAware).parseJson(token);
   }
 
   private final JsonParser parser;
+
+  private final boolean modifyAware;
+
+  private final ModifyAwareFlag modifyAwareOwner;
 
   private int depth;
   
@@ -76,20 +106,22 @@ class EJsonReader {
 
   private Context currentContext;
 
-  EJsonReader(JsonParser parser) {
+ EJsonReader(JsonParser parser, boolean modifyAware) {
     this.parser = parser;
+    this.modifyAware = modifyAware;
+    this.modifyAwareOwner = (modifyAware) ? new ModifyAwareFlag() : null;
   }
 
   private void startArray() {
     depth++;
     stack.push(currentContext);
-    currentContext = new ArrayContext();
+    currentContext = modifyAware ? new ArrayContext(modifyAwareOwner) : new ArrayContext();
   }
 
   private void startObject() {
     depth++;
     stack.push(currentContext);
-    currentContext = new ObjectContext();
+    currentContext = modifyAware ? new ObjectContext(modifyAwareOwner) : new ObjectContext();
   }
 
   private void endArray() {
@@ -104,6 +136,9 @@ class EJsonReader {
     depth--;
     if (!stack.isEmpty()) {
       currentContext = stack.pop(currentContext);
+    }
+    if (modifyAwareOwner != null) {
+      modifyAwareOwner.resetMarkedDirty();
     }
   }
 
@@ -235,9 +270,17 @@ class EJsonReader {
   
   private static class ObjectContext extends Context {
         
-    private final Map<String, Object> map = new LinkedHashMap<String, Object>();
+    private final Map<String, Object> map;
 
     private String key;
+
+    ObjectContext() {
+      map = new LinkedHashMap<String, Object>();
+    }
+
+    ObjectContext(ModifyAwareOwner owner) {
+      map = new ModifyAwareMap<String, Object>(owner, new LinkedHashMap<String, Object>());
+    }
 
     public void popContext(Context temp) {
       setValue(temp.getValue());
@@ -262,7 +305,15 @@ class EJsonReader {
 
   private static class ArrayContext extends Context {
     
-    private final List<Object> values = new ArrayList<Object>();
+    private final List<Object> values;
+
+    ArrayContext() {
+      values = new ArrayList<Object>();
+    }
+
+    ArrayContext(ModifyAwareOwner owner) {
+      values = new ModifyAwareList<Object>(owner, new ArrayList<Object>());
+    }
 
     public void popContext(Context temp) {
       values.add(temp.getValue());
