@@ -19,8 +19,6 @@ import java.util.Map;
 @SuppressWarnings("rawtypes")
 public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
 
-  public static final String KEY = "hstore";
-
   public ScalarTypePostgresHstore() {
     super(Map.class, false, DbType.HSTORE);
   }

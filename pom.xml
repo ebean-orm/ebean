@@ -55,18 +55,19 @@
       <version>1.7.7</version>
     </dependency>
 
+    <!-- provided scope for JsonNode support -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>2.5.3</version>
+      <scope>provided</scope>
     </dependency>
 
-    <!-- provided scope for JsonNode support -->
+    <!-- Jackson core used internally by Ebean -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
       <version>2.5.3</version>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>

@@ -9,6 +9,7 @@ import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.type.reflect.*;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.*;
 import org.joda.time.LocalDate;
@@ -122,6 +123,29 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final boolean objectMapperPresent;
 
+  // OPTIONAL ScalarTypes registered if Jackson/JsonNode is in the classpath
+
+  /**
+   * Jackson's JsonNode storage to Clob.
+   */
+  private ScalarType<?> jsonNodeClob;
+  /**
+   * Jackson's JsonNode storage to Blob.
+   */
+  private ScalarType<?> jsonNodeBlob;
+  /**
+   * Jackson's JsonNode storage to Varchar.
+   */
+  private ScalarType<?> jsonNodeVarchar;
+  /**
+   * Jackson's JsonNode storage to Postgres JSON or Clob.
+   */
+  private ScalarType<?> jsonNodeJson;
+  /**
+   * Jackson's JsonNode storage to Postgres JSONB or Clob.
+   */
+  private ScalarType<?> jsonNodeJsonb;
+
   /**
    * Create the DefaultTypeManager.
    */
@@ -142,6 +166,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     initialiseStandard(jsonDateTime, config);
     initialiseJavaTimeTypes(jsonDateTime, config);
     initialiseJodaTypes(jsonDateTime);
+    initialiseJacksonTypes(config);
 
     if (isPostgres(config.getDatabasePlatform())) {
       // Postgres has special DB types for JSON/JSONB
@@ -291,6 +316,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   public ScalarType<?> getJsonScalarType(Class<?> type, int dbType) {
 
     if (type.equals(Map.class)) {
+      // @DbJson Map<String,Object> property
       switch (dbType) {
         case Types.VARCHAR : return jsonMapVarchar;
         case Types.BLOB: return jsonMapBlob;
@@ -299,6 +325,19 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
         case DbType.JSON: return jsonMapJson;
         default:
           return jsonMapJson;
+      }
+    }
+
+    if (type.equals(JsonNode.class)) {
+      // @DbJson JsonNode property (Jackson)
+      switch (dbType) {
+        case Types.VARCHAR : return jsonNodeVarchar;
+        case Types.BLOB: return jsonNodeBlob;
+        case Types.CLOB : return jsonNodeClob;
+        case DbType.JSONB: return jsonNodeJsonb;
+        case DbType.JSON: return jsonNodeJson;
+        default:
+          return jsonNodeJson;
       }
     }
 
@@ -643,6 +682,38 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     }
 
     return propParamTypes[1];
+  }
+
+
+  /**
+   * Add support for Jackson's JsonNode mapping to Clob, Blob, Varchar, JSON and JSONB.
+   */
+  protected void initialiseJacksonTypes(ServerConfig config) {
+
+    if (ClassUtil.isPresent("com.fasterxml.jackson.databind.ObjectMapper", this.getClass())) {
+
+      logger.trace("Registering JsonNode type support");
+
+      ObjectMapper objectMapper = (ObjectMapper)config.getObjectMapper();
+      if (objectMapper == null) {
+        objectMapper = new ObjectMapper();
+        config.setObjectMapper(objectMapper);
+      }
+
+      jsonNodeClob = new ScalarTypeJsonNode.Clob(objectMapper);
+      jsonNodeBlob = new ScalarTypeJsonNode.Blob(objectMapper);
+      jsonNodeVarchar = new ScalarTypeJsonNode.Varchar(objectMapper);
+      jsonNodeJson = jsonNodeClob;  // Default for non-Postgres databases
+      jsonNodeJsonb = jsonNodeClob; // Default for non-Postgres databases
+
+      if (isPostgres(config.getDatabasePlatform())) {
+        jsonNodeJson = new ScalarTypeJsonNodePostgres.JSON(objectMapper);
+        jsonNodeJsonb = new ScalarTypeJsonNodePostgres.JSONB(objectMapper);
+      }
+
+      // add as default mapping for JsonNode (when not annotated with @DbJson etc)
+      typeMap.put(JsonNode.class, jsonNodeJson);
+    }
   }
 
   protected void initialiseJavaTimeTypes(JsonConfig.DateTime mode, ServerConfig config) {
