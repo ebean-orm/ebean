@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.query;
 
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.bean.*;
-import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -11,9 +10,7 @@ import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.*;
-import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
-import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
 import org.slf4j.Logger;
