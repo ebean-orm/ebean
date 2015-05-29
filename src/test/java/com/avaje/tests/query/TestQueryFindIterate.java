@@ -160,7 +160,12 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     // this throws an exception immediately
     QueryIterator<Customer> it = query.findIterate();
-    it.hashCode();
+    it.close();
+
+    if (!server.getName().equals("h2")) {
+      // MySql allows the query with type conversion?
+      throw new PersistenceException("H2 does expected thing but MySql does not");
+    }
     assertTrue("Never get here as exception thrown", false);
   }
   
