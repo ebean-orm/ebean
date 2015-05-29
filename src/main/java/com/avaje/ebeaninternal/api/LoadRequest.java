@@ -48,4 +48,11 @@ public abstract class LoadRequest {
 		return transaction;
 	}
 
+	/**
+	 * Return true if the parent query is a findIterate() type query.
+	 * So one of - findIterate(), findEach(), findEachWhile() or findVisit().
+	 */
+	public boolean isParentFindIterate() {
+		return parentRequest != null && parentRequest.getQuery().getType() == SpiQuery.Type.ITERATE;
+	}
 }

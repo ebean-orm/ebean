@@ -39,6 +39,12 @@ public class DatabasePlatform {
     COMMIT
   }
 
+
+  /**
+   * Set to true for MySql, no other jdbc drivers need this workaround.
+   */
+  protected boolean useExtraTransactionOnIterateSecondaryQueries;
+
   /**
    * The behaviour used when ending a read only transaction at read committed isolation level.
    */
@@ -151,6 +157,17 @@ public class DatabasePlatform {
    */
   public String getName() {
     return name;
+  }
+
+  /**
+   * Return true if the JDBC driver does not allow additional queries to execute
+   * when a resultSet is being 'streamed' as is the case with findEach() etc.
+   * <p>
+   * Honestly, this is a workaround for a stupid MySql JDBC driver limitation.
+   * </p>
+   */
+  public boolean useExtraTransactionOnIterateSecondaryQueries() {
+    return useExtraTransactionOnIterateSecondaryQueries;
   }
 
   /**

@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.EntityNotFoundException;
 
+import com.avaje.ebeaninternal.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,11 +16,6 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
-import com.avaje.ebeaninternal.api.LoadBeanBuffer;
-import com.avaje.ebeaninternal.api.LoadBeanRequest;
-import com.avaje.ebeaninternal.api.LoadManyRequest;
-import com.avaje.ebeaninternal.api.LoadManyBuffer;
-import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -36,8 +32,11 @@ public class DefaultBeanLoader {
 
   private final DefaultServer server;
 
+  private final boolean onIterateUseExtraTxn;
+
   protected DefaultBeanLoader(DefaultServer server) {
     this.server = server;
+    this.onIterateUseExtraTxn = server.getDatabasePlatform().useExtraTransactionOnIterateSecondaryQueries();
   }
 
   /**
@@ -143,7 +142,17 @@ public class DefaultBeanLoader {
       query.select(many.getTargetIdProperty());
     }
 
-    server.findList(query, loadRequest.getTransaction());
+    if (onIterateUseExtraTxn && loadRequest.isParentFindIterate()) {
+      // MySql - we need a different transaction to execute the secondary query
+      SpiTransaction extraTxn = server.createQueryTransaction();
+      try {
+        server.findList(query, extraTxn);
+      } finally {
+        extraTxn.end();
+      }
+    } else {
+      server.findList(query, loadRequest.getTransaction());
+    }
 
     // check for BeanCollection's that where never processed
     // in the +query or +lazy load due to no rows (predicates)
@@ -332,7 +341,18 @@ public class DefaultBeanLoader {
       query.where().idIn(idList);
     }
 
-    List<?> list = server.findList(query, loadRequest.getTransaction());
+    List<?> list;
+    if (onIterateUseExtraTxn && loadRequest.isParentFindIterate()) {
+      // MySql - we need a different transaction to execute the secondary query
+      SpiTransaction extraTxn = server.createQueryTransaction();
+      try {
+        list = server.findList(query, extraTxn);
+      } finally {
+        extraTxn.end();
+      }
+    } else {
+      list = server.findList(query, loadRequest.getTransaction());
+    }
 
     if (loadRequest.isLoadCache()) {
       for (int i = 0; i < list.size(); i++) {

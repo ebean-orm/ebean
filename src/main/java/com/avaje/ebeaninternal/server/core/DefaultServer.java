@@ -1318,7 +1318,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public <T> void findVisit(Query<T> query, QueryResultVisitor<T> visitor, Transaction t) {
 
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
 
     request.initTransIfRequired();
     request.findVisit(visitor);
@@ -1327,7 +1327,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction t) {
 
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
 
     request.initTransIfRequired();
     request.findEach(consumer);
@@ -1336,7 +1336,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer, Transaction t) {
 
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
 
     request.initTransIfRequired();
     request.findEachWhile(consumer);
@@ -1345,7 +1345,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public <T> QueryIterator<T> findIterate(Query<T> query, Transaction t) {
 
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
 
     try {
       request.initTransIfRequired();

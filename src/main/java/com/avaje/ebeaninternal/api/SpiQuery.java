@@ -52,6 +52,11 @@ public interface SpiQuery<T> extends Query<T> {
     BEAN,
 
     /**
+     * Find iterate type query - findEach(), findIterate() etc.
+     */
+    ITERATE,
+
+    /**
      * Find returning a List.
      */
     LIST,
