@@ -785,18 +785,27 @@ public final class DefaultPersister implements Persister {
         if (!skipSavingThisBean) {
           saveRecurse(detail, t, parentBean, insertMode);
         }
-        if (detailIds != null) {
-          // remember the Id (other details not in the collection) will be removed
-          Object id = targetDescriptor.getId(detail);
-          if (!DmlUtil.isNullOrZero(id)) {
-            detailIds.add(id);
-          }
-        }
       }
 		}
 
 		if (detailIds != null) {
-		  // deleteMissingChildren is true so deleting children that were not just processed
+			// stateless update with deleteMissingChildren so first
+			// flushBatch to ensure that we have Id values from any inserts
+			t.flushBatch();
+			// now collect the Id values to determine the 'missing children'
+			for (Object detailBean : collection) {
+				if (isMap) {
+					detailBean = ((Map.Entry<?, ?>) detailBean).getValue();
+				}
+				if (detailBean instanceof EntityBean) {
+					Object id = targetDescriptor.getId((EntityBean) detailBean);
+					if (!DmlUtil.isNullOrZero(id)) {
+						// remember the Id (other details not in the collection) will be removed
+						detailIds.add(id);
+					}
+				}
+			}
+			// deleting missing children - children not in our collected detailIds
 			deleteManyDetails(t, prop.getBeanDescriptor(), parentBean, prop, detailIds);
 		}
 
