@@ -1,5 +1,6 @@
 package com.avaje.ebean;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Properties;
@@ -17,6 +18,7 @@ public class PrimaryServerTest {
     assertFalse(PrimaryServer.isSkip());
   }
 
+  @Ignore
   @Test
   public void testGetPrimaryServerName() throws Exception {
 
