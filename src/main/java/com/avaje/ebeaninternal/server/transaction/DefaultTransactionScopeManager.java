@@ -7,39 +7,39 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
  */
 public class DefaultTransactionScopeManager extends TransactionScopeManager {
 
-	
-	public DefaultTransactionScopeManager(TransactionManager transactionManager){
-		super(transactionManager);
-	}
 
-	public void commit() {
-		DefaultTransactionThreadLocal.commit(serverName);
-	}
+  public DefaultTransactionScopeManager(TransactionManager transactionManager) {
+    super(transactionManager);
+  }
 
-	public void end() {
-		DefaultTransactionThreadLocal.end(serverName);
-	}
+  public void commit() {
+    DefaultTransactionThreadLocal.commit(serverName);
+  }
 
-	public SpiTransaction get() {
-		SpiTransaction t = DefaultTransactionThreadLocal.get(serverName);
-		if (t == null || !t.isActive()){
-			return null;
-		} else {
-			return t;
-		}
-	}
+  public void end() {
+    DefaultTransactionThreadLocal.end(serverName);
+  }
 
-	public void replace(SpiTransaction trans) {
-		DefaultTransactionThreadLocal.replace(serverName, trans);
-	}
+  public SpiTransaction get() {
+    SpiTransaction t = DefaultTransactionThreadLocal.get(serverName);
+    if (t == null || !t.isActive()) {
+      return null;
+    } else {
+      return t;
+    }
+  }
 
-	public void rollback() {
-		DefaultTransactionThreadLocal.rollback(serverName);
-	}
+  public void replace(SpiTransaction trans) {
+    DefaultTransactionThreadLocal.replace(serverName, trans);
+  }
 
-	public void set(SpiTransaction trans) {
-		DefaultTransactionThreadLocal.set(serverName, trans);
-	}
+  public void rollback() {
+    DefaultTransactionThreadLocal.rollback(serverName);
+  }
 
-	
+  public void set(SpiTransaction trans) {
+    DefaultTransactionThreadLocal.set(serverName, trans);
+  }
+
+
 }
