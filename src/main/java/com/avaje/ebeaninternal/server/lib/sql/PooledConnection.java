@@ -326,7 +326,7 @@ public class PooledConnection extends ConnectionDelegator {
 			connection.close();
 		} catch (SQLException ex) {
 			if (logErrors || logger.isDebugEnabled()) {
-				logger.error("Error when fully closing connection [" + getNameSlot() + "]", ex);
+				logger.error("Error when fully closing connection [" + getFullDescription() + "]", ex);
 			}
 		}
 	}
