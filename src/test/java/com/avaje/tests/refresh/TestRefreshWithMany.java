@@ -30,7 +30,7 @@ public class TestRefreshWithMany extends BaseTestCase {
             .setParameter("id", customer.getId())
             .execute();
 
-    int rc2 = Ebean.createSqlUpdate("update contact set first_name = first_name || '-mod' where customer_id = :id")
+    int rc2 = Ebean.createSqlUpdate("update contact set first_name = concat(first_name,'-mod') where customer_id = :id")
             .setParameter("id", customer.getId())
             .execute();
 
