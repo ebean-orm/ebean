@@ -20,7 +20,7 @@ public class ResetBasicData {
 		if (runOnce){
 			return;
 		}
-		
+
 		final ResetBasicData me = new ResetBasicData();
 		
 		server.execute(new TxRunnable() {
@@ -33,42 +33,33 @@ public class ResetBasicData {
 		});
 		runOnce = true;
 	}
-	
-	
-	
-	
+
+
 	public void deleteAll() {
 		Ebean.execute(new TxRunnable() {
 			public void run() {
-				
-				//Ebean.currentTransaction().setBatchMode(false);
-				
+
 				// orm update use bean name and bean properties
-			  server.createUpdate(OrderShipment.class, "delete from orderShipment")
-					.execute();
-			
-			  server.createUpdate(OrderDetail.class, "delete from orderDetail")
-					.execute();
-				
-			  server.createUpdate(Order.class,"delete from order")
-					.execute();
+				server.createSqlUpdate("delete from o_cached_bean_child").execute();
+				server.createSqlUpdate("delete from o_cached_bean_country").execute();
+				server.createSqlUpdate("delete from o_cached_bean").execute();
 
-			  server.createUpdate(Contact.class,"delete from contact")
-					.execute();
-	
-			  server.createUpdate(Customer.class,"delete from Customer")
-					.execute();
+				server.createUpdate(OrderShipment.class, "delete from orderShipment").execute();
 
-			  server.createUpdate(Address.class,"delete from address")
-					.execute();
-	
+				server.createUpdate(OrderDetail.class, "delete from orderDetail").execute();
+
+				server.createUpdate(Order.class, "delete from order").execute();
+
+				server.createUpdate(Contact.class, "delete from contact").execute();
+
+				server.createUpdate(Customer.class, "delete from Customer").execute();
+
+				server.createUpdate(Address.class, "delete from address").execute();
+
 				// sql update uses table and column names
-			  server.createSqlUpdate("delete from o_country")
-					.execute();
-	
-			  server.createSqlUpdate("delete from o_product")
-					.execute();
-			
+				server.createSqlUpdate("delete from o_country").execute();
+				server.createSqlUpdate("delete from o_product").execute();
+
 			}
 		});
 	}
@@ -148,8 +139,7 @@ public class ResetBasicData {
 
         ResetBasicData me = new ResetBasicData();
         Customer cust1 = insertCustomer(custName);
-        Order o = me.createOrder1(cust1);
-        return o;
+        return me.createOrder1(cust1);
     }
 
     private static int contactEmailNum = 1;
