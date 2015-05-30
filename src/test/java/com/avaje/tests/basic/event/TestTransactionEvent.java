@@ -35,7 +35,6 @@ public class TestTransactionEvent extends TestCase {
     tx.commit();
 
     assertNotNull(MyTestTransactionEventListener.getLastCommitted());
-    assertSame(MyTestTransactionEventListener.getLastCommitted(), tx);
     assertNotNull(MyTestTransactionEventListener.getLastCommitted().getUserObject("myUserObject"));
     assertSame(MyTestTransactionEventListener.getLastCommitted().getUserObject("myUserObject"), myUserObject);
     assertNull(MyTestTransactionEventListener.getLastRollbacked());
@@ -54,11 +53,9 @@ public class TestTransactionEvent extends TestCase {
 
     assertNotSame(MyTestTransactionEventListener.getLastCommitted(), MyTestTransactionEventListener.getLastRollbacked());
 
-    assertSame(MyTestTransactionEventListener.getLastCommitted(), tx);
     assertNotNull(MyTestTransactionEventListener.getLastCommitted().getUserObject("myUserObject"));
     assertSame(MyTestTransactionEventListener.getLastCommitted().getUserObject("myUserObject"), myUserObject);
-
-    assertSame(MyTestTransactionEventListener.getLastRollbacked(), tx2);
+    
     assertNotNull(MyTestTransactionEventListener.getLastRollbacked().getUserObject("myUserObject2"));
     assertSame(MyTestTransactionEventListener.getLastRollbacked().getUserObject("myUserObject2"), myUserObject);
   }

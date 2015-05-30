@@ -315,7 +315,10 @@ public final class Ebean {
   }
 
   /**
-   * Start a new explicit transaction.
+   * Start a transaction with 'REQUIRED' semantics.
+   * <p>
+   * With REQUIRED semantics if an active transaction already exists that transaction will be used.
+   * </p>
    * <p>
    * The transaction is stored in a ThreadLocal variable and typically you only
    * need to use the returned Transaction <em>IF</em> you wish to do things like

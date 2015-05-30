@@ -756,16 +756,16 @@ public final class DefaultServer implements SpiEbeanServer {
   }
 
   /**
-   * Start a transaction.
+   * Start a transaction with 'REQUIRED' semantics.
+   * <p>
+   * If a transaction already exists that transaction will be used.
+   * </p>
    * <p>
    * Note that the transaction is stored in a ThreadLocal variable.
    * </p>
    */
   public Transaction beginTransaction() {
-    // start an explicit transaction
-    SpiTransaction t = transactionManager.createTransaction(true, -1);
-    transactionScopeManager.set(t);
-    return t;
+    return beginTransaction(TxScope.required());
   }
 
   public Transaction beginTransaction(TxScope scope) {

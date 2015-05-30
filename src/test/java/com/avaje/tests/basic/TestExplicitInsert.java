@@ -32,6 +32,9 @@ public class TestExplicitInsert extends BaseTestCase {
 
     Assert.assertNotNull(b.getId());
 
+    Assert.assertEquals(b.getId(), server.getBeanId(b));
+
+
     EBasic b2 = server.find(EBasic.class, b.getId());
     b2.setId(null);
 
