@@ -65,10 +65,10 @@ public class TransactionEvent implements Serializable {
   }
 
   /**
-   * For BeanListeners the requests they are interested in.
+   * Return the list of PersistRequestBean's for this transaction.
    */
-  public TransactionEventBeans getEventBeans() {
-    return eventBeans;
+  public List<PersistRequestBean<?>> getPersistRequestBeans() {
+    return (eventBeans == null) ? null : eventBeans.getRequests();
   }
 
   public TransactionEventTable getEventTables() {

@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.transaction;
 
 import com.avaje.ebeaninternal.api.TransactionEvent;
-import com.avaje.ebeaninternal.api.TransactionEventBeans;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
@@ -48,7 +47,7 @@ public final class PostCommitProcessing {
     this.serverName = manager.getServerName();
     this.event = event;
     this.deleteByIdMap = event.getDeleteByIdMap();
-    this.persistBeanRequests = createPersistBeanRequests();
+    this.persistBeanRequests = event.getPersistRequestBeans();
     this.beanPersistIdMap = createBeanPersistIdMap();
     this.remoteTransactionEvent = createRemoteTransactionEvent();
   }
@@ -109,14 +108,6 @@ public final class PostCommitProcessing {
         map.process(tableIUD);
       }
     }
-  }
-
-  private List<PersistRequestBean<?>> createPersistBeanRequests() {
-    TransactionEventBeans eventBeans = event.getEventBeans();
-    if (eventBeans != null) {
-      return eventBeans.getRequests();
-    }
-    return null;
   }
 
   private BeanPersistIdMap createBeanPersistIdMap() {
