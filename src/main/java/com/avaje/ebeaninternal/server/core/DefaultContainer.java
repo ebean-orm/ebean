@@ -300,8 +300,7 @@ public class DefaultContainer implements SpiContainer {
     if (config.getDataSourceJndiName() != null) {
       ds = jndiDataSourceFactory.lookup(config.getDataSourceJndiName());
       if (ds == null) {
-        String m = "JNDI lookup for DataSource " + config.getDataSourceJndiName() + " returned null.";
-        throw new PersistenceException(m);
+        throw new PersistenceException("JNDI lookup for DataSource " + config.getDataSourceJndiName() + " returned null.");
       } else {
         return ds;
       }
@@ -309,14 +308,13 @@ public class DefaultContainer implements SpiContainer {
 
     DataSourceConfig dsConfig = config.getDataSourceConfig();
     if (dsConfig == null) {
-      String m = "No DataSourceConfig definded for " + config.getName();
+      String m = "No DataSourceConfig defined for " + config.getName();
       throw new PersistenceException(m);
     }
 
     if (dsConfig.isOffline()) {
       if (config.getDatabasePlatformName() == null) {
-        String m = "You MUST specify a DatabasePlatformName on ServerConfig when offline";
-        throw new PersistenceException(m);
+        throw new PersistenceException("You MUST specify a DatabasePlatformName on ServerConfig when offline");
       }
       return null;
     }
