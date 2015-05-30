@@ -146,6 +146,9 @@ public class AnnotationFields extends AnnotationParser {
     if (get(prop, ColumnHstore.class) != null) {
       util.setDbHstore(prop);
     }
+    if (get(prop, DbHstore.class) != null) {
+      util.setDbHstore(prop);
+    }
     
     Formula formula = get(prop, Formula.class);
     if (formula != null) {
