@@ -11,34 +11,27 @@ import javax.sql.DataSource;
  */
 public class JndiDataSourceLookup {
 
-	private static final String DEFAULT_PREFIX = "java:comp/env/jdbc/";
+  public JndiDataSourceLookup() {
+  }
 
-	public JndiDataSourceLookup() {
-	}
-	
-	/**
-	 * Return the DataSource by JNDI lookup.
-	 * <p>
-	 * If name is null the 'default' dataSource is returned.
-	 * </p>
-	 */
-	public DataSource lookup(String jndiName) {
+  /**
+   * Return the DataSource by JNDI lookup.
+   * <p>
+   * If name is null the 'default' dataSource is returned.
+   * </p>
+   */
+  public DataSource lookup(String jndiName) {
 
-		try {
-			
-			if (!jndiName.startsWith("java:")){
-				jndiName = DEFAULT_PREFIX + jndiName;
-			}
-			
-			Context ctx = new InitialContext();
-			DataSource ds = (DataSource) ctx.lookup(jndiName);
-			if (ds == null) {
-				throw new PersistenceException("JNDI DataSource [" + jndiName + "] not found?");
-			}
-			return ds;
+    try {
+      Context ctx = new InitialContext();
+      DataSource ds = (DataSource) ctx.lookup(jndiName);
+      if (ds == null) {
+        throw new PersistenceException("JNDI DataSource [" + jndiName + "] not found?");
+      }
+      return ds;
 
-		} catch (NamingException ex) {
-			throw new PersistenceException(ex);
-		}
-	}
+    } catch (NamingException ex) {
+      throw new PersistenceException(ex);
+    }
+  }
 }
