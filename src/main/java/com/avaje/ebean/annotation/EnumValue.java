@@ -8,19 +8,21 @@ import java.lang.annotation.Target;
 /**
  * Enables you to specify a value to use to persist for an enum value.
  * 
- * <pre class="code">
+ * <pre>{@code
+ *
  * public enum Status {
- *   &#064;EnumValue(&quot;N&quot;)
+ *
+ *   @EnumValue("N")
  *   NEW,
  * 
- *   &#064;EnumValue(&quot;A&quot;)
+ *   @EnumValue("A")
  *   ACTIVE,
  * 
- *   &#064;EnumValue(&quot;I&quot;)
+ *   @EnumValue("I")
  *   INACTIVE,
  * }
  * 
- * </pre>
+ * }</pre>
  * <p>
  * This is an alternative to using the JPA standard approach or Ebean's
  * {@link EnumMapping} annotation.

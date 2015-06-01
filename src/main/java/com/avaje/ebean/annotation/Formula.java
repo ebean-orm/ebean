@@ -39,30 +39,31 @@ import com.avaje.ebean.Query;
  * queries - it needs to be explicitly included.
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
+ *
  * // find by Id
  * Order o1 = Ebean.find(Order.class)
- *     .select(&quot;id, totalAmount&quot;)
+ *     .select("id, totalAmount")
  *     .setId(1).findUnique();
  * 
  * // find list ... using totalAmount in the where clause
- * List&lt;Order&gt; list = Ebean.find(Order.class)
- *     .select(&quot;id, totalAmount&quot;)
+ * List<Order> list = Ebean.find(Order.class)
+ *     .select("id, totalAmount")
  *     .where()
- *     .eq(&quot;status&quot;, Order.Status.NEW)
- *     .gt(&quot;totalAmount&quot;, 10)
+ *     .eq("status", Order.Status.NEW)
+ *     .gt("totalAmount", 10)
  *     .findList();
  * 
  * // as a join from customer
- * List&lt;Customer&gt; l0 = Ebean.find(Customer.class)
- *     .select(&quot;id, name&quot;)
- *     .join(&quot;orders&quot;, &quot;status, totalAmount&quot;)
+ * List<Customer> l0 = Ebean.find(Customer.class)
+ *     .select("id, name")
+ *     .fetch("orders", "status, totalAmount")
  *     .where()
- *     .gt(&quot;id&quot;, 0)
- *     .gt(&quot;orders.totalAmount&quot;, 10)
+ *     .gt("id", 0)
+ *     .gt("orders.totalAmount", 10)
  *     .findList();
  * 
- * </pre>
+ * }</pre>
  */
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
@@ -94,9 +95,11 @@ public @interface Formula {
    * user.
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
+   *
    * join (select user_id, count(*) as topic_count from f_topic group by user_id) as _tc on _tc.user_id = ${ta}.id
-   * </pre>
+   *
+   * }</pre>
    */
   String join() default "";
 

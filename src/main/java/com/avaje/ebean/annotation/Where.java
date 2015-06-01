@@ -9,26 +9,29 @@ import java.lang.annotation.Target;
  * Add an Literal to add to the where clause when a many property (List, Set or
  * Map) is loaded or refreshed.
  * 
- * <pre class="code">
+ * <pre>{@code
+ *
  * // on a OneToMany property...
  * 
- * &#064;OneToMany
- * &#064;Where(clause = &quot;deleted='y'&quot;)
- * List&lt;Topic&gt; topics;
- * </pre>
+ * @OneToMany
+ * @Where(clause = "deleted='y'")
+ * List<Topic> topics;
+ *
+ * }</pre>
  * 
  * <p>
  * Note that you can include "${ta}" as a place holder for the table alias if
  * you need to include the table alias in the clause.
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * // ... including the ${ta} table alias placeholder...
  * 
- * &#064;OneToMany
- * &#064;Where(clause = &quot;${ta}.deleted='y'&quot;)
- * List&lt;Topic&gt; topics;
- * </pre>
+ * @OneToMany
+ * @Where(clause = "${ta}.deleted='y'")
+ * List<Topic> topics;
+ *
+ * }</pre>
  * 
  * <p>
  * This will be added to the where clause when lazy loading the OneToMany
