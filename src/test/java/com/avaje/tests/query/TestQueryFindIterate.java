@@ -100,7 +100,7 @@ public class TestQueryFindIterate extends BaseTestCase {
     assertEquals(3, loggedSql.size());
     assertTrue(loggedSql.get(0).contains("select t0.id c0, t0.status c1, t0.order_date c2, t1.id c3, t1.name c4 from o_order t0 join o_customer t1"));
     assertTrue(loggedSql.get(1).contains("select t0.order_id c0, t0.id c1, t0.order_qty c2, t0.ship_qty c3, t0.unit_price c4"));
-    assertTrue(loggedSql.get(2).contains("select t0.order_id c0, t0.id c1, t0.ship_time c2, t0.cretime c3, t0.updtime c4, t0.order_id c5 from or_order_ship"));
+    assertTrue(loggedSql.get(2).contains("select t0.order_id c0, t0.id c1, t0.ship_time c2, t0.cretime c3, t0.updtime c4, t0.version c5, t0.order_id c6 from or_order_ship"));
   }
 
   @Test
@@ -142,7 +142,7 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     assertEquals("Got SQL: "+loggedSql, 2, loggedSql.size());
     assertTrue(loggedSql.get(0).contains("select t0.id c0, t0.status c1, t0.order_date c2, t1.id c3, t1.name c4, t2.id c5, t2.order_qty c6, t2.ship_qty"));
-    assertTrue(loggedSql.get(1).contains("select t0.order_id c0, t0.id c1, t0.ship_time c2, t0.cretime c3, t0.updtime c4, t0.order_id c5 from or_order_ship"));
+    assertTrue(loggedSql.get(1).contains("select t0.order_id c0, t0.id c1, t0.ship_time c2, t0.cretime c3, t0.updtime c4, t0.version c5, t0.order_id c6 from or_order_ship"));
   }
 
   @Test(expected=PersistenceException.class)
