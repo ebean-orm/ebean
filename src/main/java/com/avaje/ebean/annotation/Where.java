@@ -48,4 +48,4 @@ public @interface Where {
    */
   String clause();
 
-};
+}

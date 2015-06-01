@@ -295,4 +295,4 @@ public @interface SqlSelect {
    * Set this to true to have debug output when Ebean parses the sql-select.
    */
   boolean debug() default false;
-};
+}

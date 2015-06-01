@@ -14,11 +14,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Index {
 
-    /**
-     * Name of the index
-     *
-     * @return index name
-     */
-    String value() default "";
+  /**
+   * Name of the index
+   *
+   * @return index name
+   */
+  String value() default "";
 
 }

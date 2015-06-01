@@ -17,4 +17,4 @@ public @interface NamedUpdates {
    */
   NamedUpdate[] value();
 
-};
+}

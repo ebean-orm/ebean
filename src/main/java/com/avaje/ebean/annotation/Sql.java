@@ -21,4 +21,4 @@ public @interface Sql {
    */
   SqlSelect[] select() default { @SqlSelect };
 
-};
+}

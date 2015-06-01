@@ -31,4 +31,4 @@ public @interface UpdateMode {
    */
   boolean updateChangesOnly() default true;
 
-};
+}

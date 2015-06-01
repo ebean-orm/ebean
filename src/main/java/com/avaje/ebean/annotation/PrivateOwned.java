@@ -31,4 +31,4 @@ public @interface PrivateOwned {
    */
   boolean cascadeRemove() default true;
 
-};
+}

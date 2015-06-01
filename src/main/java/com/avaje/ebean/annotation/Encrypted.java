@@ -21,4 +21,4 @@ public @interface Encrypted {
    * Used to specify the DB column length.
    */
   int dbLength() default 0;
-};
+}

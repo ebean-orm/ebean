@@ -87,4 +87,4 @@ public @interface EnumMapping {
    * The length of DB column if mapping to string values.
    */
   int length() default 0;
-};
+}

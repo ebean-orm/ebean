@@ -28,4 +28,4 @@ public @interface EmbeddedColumns {
    */
   String columns() default "";
 
-};
+}

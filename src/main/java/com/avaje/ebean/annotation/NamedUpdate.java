@@ -34,4 +34,4 @@ public @interface NamedUpdate {
    */
   boolean notifyCache() default true;
 
-};
+}

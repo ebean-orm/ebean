@@ -43,4 +43,4 @@ public @interface EnumValue {
    * </p>
    */
   String value();
-};
+}

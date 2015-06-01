@@ -55,4 +55,4 @@ public @interface CacheStrategy {
    */
   String warmingQuery() default "";
 
-};
+}

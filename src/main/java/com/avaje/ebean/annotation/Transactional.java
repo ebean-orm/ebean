@@ -125,4 +125,4 @@ public @interface Transactional {
    */
   Class<? extends Throwable>[] noRollbackFor() default {};
 
-};
+}
