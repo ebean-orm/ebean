@@ -3,6 +3,7 @@ package com.avaje.ebean;
 import com.avaje.ebean.common.SpiContainer;
 import com.avaje.ebean.config.ContainerConfig;
 import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebeaninternal.server.lib.ShutdownManager;
 
 import javax.persistence.PersistenceException;
 import java.lang.reflect.Constructor;
@@ -73,6 +74,32 @@ public class EbeanServerFactory {
     }
 
     return server;
+  }
+
+  /**
+   * Create using the ServerConfig additionally specifying a classLoader to use as the context class loader.
+   */
+  public static synchronized EbeanServer createWithContextClassLoader(ServerConfig config, ClassLoader classLoader) {
+
+    ClassLoader currentContextLoader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(classLoader);
+    try {
+      return EbeanServerFactory.create(config);
+
+    } finally {
+      // set the currentContextLoader back
+      Thread.currentThread().setContextClassLoader(currentContextLoader);
+    }
+  }
+
+  /**
+   * Shutdown gracefully all EbeanServers cleaning up any resources as required.
+   * <p>
+   * This is typically invoked via JVM shutdown hook and not explicitly called.
+   * </p>
+   */
+  public static synchronized void shutdown() {
+    ShutdownManager.shutdown();
   }
 
 

@@ -33,7 +33,7 @@ public class HelloMain {
     dataSourceConfig.setDriver("org.h2.Driver");
     dataSourceConfig.setUsername("howtouser");
     dataSourceConfig.setPassword("");
-    dataSourceConfig.setUrl("jdbc:h2:db/howto1");
+    dataSourceConfig.setUrl("jdbc:h2:~/db/howto1");
 
     // -> server
     serverConfig.setName("default");
@@ -46,7 +46,7 @@ public class HelloMain {
       serverConfig.addClass(TOne.class);
     }
 
-    EbeanServer eServer = EbeanServerFactory.create(serverConfig);
+    EbeanServer eServer = EbeanServerFactory.createWithContextClassLoader(serverConfig, HelloMain.class.getClassLoader());
 
     long id = 1;
     TOne data = eServer.find(TOne.class, id);
@@ -58,7 +58,8 @@ public class HelloMain {
     } else {
       System.out.println(String.format("############\n%s############", data.getName()));
     }
-    // ShutdownManager.shutdown();
+
+    EbeanServerFactory.shutdown();
   }
 
 }
