@@ -80,9 +80,9 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
   @Override
   public Object toJdbcType(Object value) {
     if (value instanceof String) {
-      return parse((String) value);
+      return value;
     }
-    return value;
+    return format(value);
   }
 
   @Override

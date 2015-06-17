@@ -19,7 +19,7 @@ import java.time.Year;
 public class ScalarTypeYear extends ScalarTypeBase<Year> {
 
   public ScalarTypeYear() {
-    super(Year.class, true, Types.INTEGER);
+    super(Year.class, false, Types.INTEGER);
   }
 
   @Override

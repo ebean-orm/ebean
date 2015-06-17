@@ -7,9 +7,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.time.*;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestNewTypes extends BaseTestCase {
 
@@ -36,6 +38,36 @@ public class TestNewTypes extends BaseTestCase {
     bean.setMonth(Month.SEPTEMBER);
 
     Ebean.save(bean);
+
+    List<SomeNewTypesBean> list = Ebean.find(SomeNewTypesBean.class).where().lt("instant", Instant.now()).findList();
+    assertTrue(!list.isEmpty());
+
+    list = Ebean.find(SomeNewTypesBean.class).where().le("localDate", LocalDate.now()).findList();
+    assertTrue(!list.isEmpty());
+
+    list = Ebean.find(SomeNewTypesBean.class).where().lt("localDateTime", LocalDateTime.now()).findList();
+    assertTrue(!list.isEmpty());
+
+    list = Ebean.find(SomeNewTypesBean.class).where().lt("offsetDateTime", OffsetDateTime.now()).findList();
+    assertTrue(!list.isEmpty());
+
+    list = Ebean.find(SomeNewTypesBean.class).where().lt("zonedDateTime", ZonedDateTime.now()).findList();
+    assertTrue(!list.isEmpty());
+
+    list = Ebean.find(SomeNewTypesBean.class).where().eq("zoneId", ZoneId.systemDefault().getId()).findList();
+    assertTrue(!list.isEmpty());
+
+    list = Ebean.find(SomeNewTypesBean.class).where().eq("zoneOffset", ZonedDateTime.now().getOffset()).findList();
+    assertTrue(!list.isEmpty());
+
+    list = Ebean.find(SomeNewTypesBean.class).where().le("yearMonth", YearMonth.of(2014, 9)).findList();
+    assertTrue(!list.isEmpty());
+
+    list = Ebean.find(SomeNewTypesBean.class).where().le("year", Year.now()).findList();
+    assertTrue(!list.isEmpty());
+
+    list = Ebean.find(SomeNewTypesBean.class).where().le("month", Month.SEPTEMBER).findList();
+    assertTrue(!list.isEmpty());
 
     SomeNewTypesBean fetched = Ebean.find(SomeNewTypesBean.class, bean.getId());
 

@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 public class ScalarTypeZonedDateTime extends ScalarTypeBaseDateTime<ZonedDateTime> {
 
   public ScalarTypeZonedDateTime(JsonConfig.DateTime mode) {
-    super(mode, ZonedDateTime.class, true, Types.TIMESTAMP);
+    super(mode, ZonedDateTime.class, false, Types.TIMESTAMP);
   }
 
   @Override
