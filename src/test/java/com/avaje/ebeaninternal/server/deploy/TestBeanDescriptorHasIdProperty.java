@@ -35,13 +35,13 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
     
     Order order = new Order();
     
-    Assert.assertFalse(beanDescriptor.hasIdProperty(getIntercept(order)));
+    Assert.assertFalse(beanDescriptor.hasIdValue(entityBean(order)));
     Assert.assertFalse(beanDescriptor.hasVersionProperty(getIntercept(order)));
     
     order.setId(23);
     order.setUpdtime(new Timestamp(System.currentTimeMillis()));
 
-    Assert.assertTrue(beanDescriptor.hasIdProperty(getIntercept(order)));
+    Assert.assertTrue(beanDescriptor.hasIdValue(entityBean(order)));
     Assert.assertTrue(beanDescriptor.hasVersionProperty(getIntercept(order)));
     
   }
@@ -61,7 +61,11 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
     order.setName("custName");
     Assert.assertFalse(beanDescriptor.hasIdPropertyOnly(ebi));
   }
-  
+
+  private EntityBean entityBean(Object bean) {
+    return (EntityBean)bean;
+  }
+
   private EntityBeanIntercept getIntercept(Object bean) {
     return ((EntityBean)bean)._ebean_getIntercept();
   }

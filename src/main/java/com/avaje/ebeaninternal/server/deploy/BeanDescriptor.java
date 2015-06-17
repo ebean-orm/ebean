@@ -28,6 +28,7 @@ import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyLists;
 import com.avaje.ebeaninternal.server.el.*;
+import com.avaje.ebeaninternal.server.persist.DmlUtil;
 import com.avaje.ebeaninternal.server.query.CQueryPlan;
 import com.avaje.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import com.avaje.ebeaninternal.server.query.SplitName;
@@ -1714,7 +1715,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       // not using Id generator so just base on isLoaded() 
       return !ebi.isLoaded();
     }
-    if (!hasIdProperty(ebi)) {
+    if (!hasIdValue(ebi.getOwner())) {
       // No Id property means it must be an insert
       return true;
     }
@@ -1729,9 +1730,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   public boolean hasIdPropertyOnly(EntityBeanIntercept ebi) {
     return ebi.hasIdOnly(idPropertyIndex);
   }
-  
-  public boolean hasIdProperty(EntityBeanIntercept ebi) {
-    return idPropertyIndex > -1 && ebi.isLoadedProperty(idPropertyIndex);
+
+  public boolean hasIdValue(EntityBean bean) {
+    return (idProperty != null && !DmlUtil.isNullOrZero(idProperty.getValue(bean)));
   }
 
   public boolean hasVersionProperty(EntityBeanIntercept ebi) {
