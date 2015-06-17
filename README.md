@@ -12,7 +12,7 @@ Maven Dependency
     <dependency>
       <groupId>org.avaje.ebeanorm</groupId>
       <artifactId>avaje-ebeanorm</artifactId>
-      <version>4.6.3</version>
+      <version>4.7.1</version>
     </dependency>
 
 
