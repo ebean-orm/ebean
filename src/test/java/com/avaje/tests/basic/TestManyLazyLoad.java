@@ -3,6 +3,8 @@ package com.avaje.tests.basic;
 import java.sql.Date;
 import java.util.List;
 
+import com.avaje.ebean.cache.ServerCache;
+import com.avaje.ebean.cache.ServerCacheManager;
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -19,7 +21,10 @@ public class TestManyLazyLoad extends BaseTestCase {
 	public void testLazyLoadRef() {
 	
 		ResetBasicData.reset();
-		
+
+		ServerCacheManager serverCacheManager = Ebean.getServerCacheManager();
+		serverCacheManager.clearAll();
+
 		List<Order> list = Ebean.find(Order.class).order().asc("id").findList();
 		Assert.assertTrue(list.size()+" > 0", list.size() > 0);
 		
@@ -40,8 +45,7 @@ public class TestManyLazyLoad extends BaseTestCase {
 		Assert.assertTrue(sz+" > 0", sz > 0);
 		
 		Order o = details.get(0).getOrder();
-		Assert.assertTrue("same instance", o == order1);
-		
+		Assert.assertSame("same instance", o, order1);
 
 		// change order... list before a scalar property
 		Order order2 = Ebean.getReference(Order.class, order.getId());

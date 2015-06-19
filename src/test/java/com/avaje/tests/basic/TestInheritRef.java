@@ -1,5 +1,6 @@
 package com.avaje.tests.basic;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -28,9 +29,14 @@ public class TestInheritRef extends BaseTestCase {
 		t.setLicenseNumber("T1098");
 		t.setCapacity(20D);
 		Ebean.save(t);
-		
+
+		List<Integer> ids = new ArrayList<Integer>();
+		ids.add(c.getId());
+		ids.add(t.getId());
+
 		List<Vehicle> list = Ebean.find(Vehicle.class)
 			.setAutofetch(false)
+			.where().idIn(ids)
 			.findList();
 		
 		Assert.assertTrue(list.size() > 0);
@@ -39,7 +45,6 @@ public class TestInheritRef extends BaseTestCase {
 				Truck truck = (Truck)vehicle;
 				Assert.assertTrue(truck.getLicenseNumber().equals("T1098"));
 				Assert.assertTrue(truck.getCapacity() == 20D);
-				
 			}
 		}
 		

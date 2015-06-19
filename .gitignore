@@ -7,3 +7,5 @@ target/
 logs/
 log/
 /mydb.db
+*.iml
+.idea
