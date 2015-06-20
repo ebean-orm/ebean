@@ -17,10 +17,10 @@ import com.avaje.ebeaninternal.server.properties.BeanPropertyGetter;
 import com.avaje.ebeaninternal.server.properties.BeanPropertySetter;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
+import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 import javax.persistence.PersistenceException;
@@ -1076,7 +1076,7 @@ public class BeanProperty implements ElPropertyValue {
     }
   }
 
-  public void jsonRead(JsonParser ctx, EntityBean bean) throws IOException {
+  public void jsonRead(ReadJson ctx, EntityBean bean) throws IOException {
     if (!jsonDeserialize) {
       return;
     }
@@ -1086,7 +1086,7 @@ public class BeanProperty implements ElPropertyValue {
       setValue(bean, null);
     } else {
       // expect to read non-null json value
-      Object objValue = scalarType.jsonRead(ctx, event);
+      Object objValue = scalarType.jsonRead(ctx.getParser(), event);
       setValue(bean, objValue);
     }
   }

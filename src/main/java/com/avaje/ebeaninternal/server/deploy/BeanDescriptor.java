@@ -19,7 +19,6 @@ import com.avaje.ebean.meta.MetaQueryPlanStatistic;
 import com.avaje.ebeaninternal.api.*;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cache.CachedBeanData;
-import com.avaje.ebeaninternal.server.cache.CachedManyIds;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.core.InternString;
@@ -33,13 +32,13 @@ import com.avaje.ebeaninternal.server.query.CQueryPlan;
 import com.avaje.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
+import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.util.SortByClause;
 import com.avaje.ebeaninternal.util.SortByClause.Property;
 import com.avaje.ebeaninternal.util.SortByClauseParser;
-import com.fasterxml.jackson.core.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1894,11 +1893,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     jsonHelp.jsonWriteProperties(writeJson, bean);
   }
     
-  public T jsonRead(JsonParser parser, String path) throws IOException {
-    return jsonHelp.jsonRead(parser, path);
+  public T jsonRead(ReadJson jsonRead, String path) throws IOException {
+    return jsonHelp.jsonRead(jsonRead, path);
   }
   
-  protected T jsonReadObject(JsonParser parser, String path) throws IOException {
-    return jsonHelp.jsonReadObject(parser, path);
+  protected T jsonReadObject(ReadJson jsonRead, String path) throws IOException {
+    return jsonHelp.jsonReadObject(jsonRead, path);
   }
 }

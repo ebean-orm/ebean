@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.json.EJson;
+import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson.WriteBean;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -9,6 +10,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class BeanDescriptorJsonHelp<T> {
 
@@ -50,8 +53,9 @@ public class BeanDescriptorJsonHelp<T> {
   
   
   @SuppressWarnings("unchecked")
-  public T jsonRead(JsonParser parser, String path) throws IOException {
+  public T jsonRead(ReadJson jsonRead, String path) throws IOException {
 
+    JsonParser parser = jsonRead.getParser();
     if (parser.getCurrentToken() == JsonToken.START_OBJECT) {
       // start object token read by Jackson already
     } else {
@@ -66,7 +70,7 @@ public class BeanDescriptorJsonHelp<T> {
     }
 
     if (desc.inheritInfo == null) {
-      return jsonReadObject(parser, path);
+      return jsonReadObject(jsonRead, path);
     } 
     
     // check for the discriminator value to determine the correct sub type
@@ -83,8 +87,8 @@ public class BeanDescriptorJsonHelp<T> {
       BeanProperty property = desc.getBeanProperty(propName);
       if (property != null) {
         EntityBean bean = desc.createEntityBean();
-        property.jsonRead(parser, bean);
-        return jsonReadProperties(parser, bean);
+        property.jsonRead(jsonRead, bean);
+        return jsonReadProperties(jsonRead, bean, path);
       }
       String msg = "Error reading inheritance discriminator, expected property ["+discColumn+"] but got [" + propName + "] ?";
       throw new JsonParseException(msg, parser.getCurrentLocation());
@@ -95,29 +99,39 @@ public class BeanDescriptorJsonHelp<T> {
     // determine the sub type for this particular json object
     InheritInfo localInheritInfo = inheritInfo.readType(discValue);
     BeanDescriptor<?> localDescriptor = localInheritInfo.getBeanDescriptor();
-    return (T) localDescriptor.jsonReadObject(parser, path);
+    return (T) localDescriptor.jsonReadObject(jsonRead, path);
   }
   
-  protected T jsonReadObject(JsonParser parser, String path) throws IOException {
+  protected T jsonReadObject(ReadJson readJson, String path) throws IOException {
 
     EntityBean bean = desc.createEntityBean();
-    return jsonReadProperties(parser, bean);
+    return jsonReadProperties(readJson, bean, path);
   }
   
   @SuppressWarnings("unchecked")
-  protected T jsonReadProperties(JsonParser parser, EntityBean bean) throws IOException {
+  protected T jsonReadProperties(ReadJson readJson, EntityBean bean, String path) throws IOException {
+
+    if (path != null) {
+      readJson.pushPath(path);
+    }
+
+    // unmapped properties, send to JsonReadBeanVisitor later
+    Map<String,Object> unmappedProperties = null;
 
     do {
-
+      JsonParser parser = readJson.getParser();
       JsonToken event = parser.nextToken();
       if (JsonToken.FIELD_NAME == event) {
         String key = parser.getCurrentName();
         BeanProperty p = desc.getBeanProperty(key);
         if (p != null) {
-          p.jsonRead(parser, bean);
+          p.jsonRead(readJson, bean);
         } else {
-          // unknown property ... read and ignore
-          EJson.parse(parser);
+          // read an unmapped property
+          if (unmappedProperties == null) {
+            unmappedProperties = new LinkedHashMap<String, Object>();
+          }
+          unmappedProperties.put(key, EJson.parse(parser));
         }
 
       } else if (JsonToken.END_OBJECT == event) {
@@ -128,6 +142,13 @@ public class BeanDescriptorJsonHelp<T> {
       }
       
     } while (true);
+
+    // visit JsonReadBeanVisitor (if registered for this path)
+    readJson.beanVisitor(bean, unmappedProperties);
+
+    if (path != null) {
+      readJson.popPath();
+    }
     return (T)bean;
   }
     

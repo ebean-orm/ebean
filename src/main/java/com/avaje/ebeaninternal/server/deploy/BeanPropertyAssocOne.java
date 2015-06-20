@@ -25,8 +25,8 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
+import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
-import com.fasterxml.jackson.core.JsonParser;
 
 /**
  * Property mapped to a joined bean.
@@ -843,9 +843,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public void jsonRead(JsonParser parser, EntityBean bean) throws IOException {
+  public void jsonRead(ReadJson readJson, EntityBean bean) throws IOException {
     if (jsonDeserialize && targetDescriptor != null) {
-      T assocBean = targetDescriptor.jsonRead(parser, name);
+      T assocBean = targetDescriptor.jsonRead(readJson, name);
       setValue(bean, assocBean);
     }
   }

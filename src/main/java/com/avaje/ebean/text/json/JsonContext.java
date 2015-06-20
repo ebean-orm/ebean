@@ -22,11 +22,25 @@ public interface JsonContext {
   <T> T toBean(Class<T> rootType, String json) throws JsonIOException;
 
   /**
+   * Convert json string input into a Bean of a specific type additionally using JsonReadOptions.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> T toBean(Class<T> rootType, String json, JsonReadOptions options) throws JsonIOException;
+
+  /**
    * Convert json reader input into a Bean of a specific type.
    *
    * @throws JsonIOException When IOException occurs
    */
   <T> T toBean(Class<T> rootType, Reader json) throws JsonIOException;
+
+  /**
+   * Convert json reader input into a Bean of a specific type additionally using JsonReadOptions.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> T toBean(Class<T> rootType, Reader json, JsonReadOptions options) throws JsonIOException;
 
   /**
    * Convert json parser input into a Bean of a specific type.
@@ -36,11 +50,25 @@ public interface JsonContext {
   <T> T toBean(Class<T> cls, JsonParser parser) throws JsonIOException;
 
   /**
+   * Convert json parser input into a Bean of a specific type additionally using JsonReadOptions..
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException;
+
+  /**
    * Convert json string input into a list of beans of a specific type.
    *
    * @throws JsonIOException When IOException occurs
    */
   <T> List<T> toList(Class<T> rootType, String json) throws JsonIOException;
+
+  /**
+   * Convert json string input into a list of beans of a specific type additionally using JsonReadOptions.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> List<T> toList(Class<T> rootType, String json, JsonReadOptions options) throws JsonIOException;
 
   /**
    * Convert json reader input into a list of beans of a specific type.
@@ -50,11 +78,25 @@ public interface JsonContext {
   <T> List<T> toList(Class<T> rootType, Reader json) throws JsonIOException;
 
   /**
+   * Convert json reader input into a list of beans of a specific type additionally using JsonReadOptions.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> List<T> toList(Class<T> rootType, Reader json, JsonReadOptions options) throws JsonIOException;
+
+  /**
    * Convert json parser input into a list of beans of a specific type.
    *
    * @throws JsonIOException When IOException occurs
    */
-  <T> List<T> toList(Class<T> cls, JsonParser src) throws JsonIOException;
+  <T> List<T> toList(Class<T> cls, JsonParser json) throws JsonIOException;
+
+  /**
+   * Convert json parser input into a list of beans of a specific type additionally using JsonReadOptions.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> List<T> toList(Class<T> cls, JsonParser json, JsonReadOptions options) throws JsonIOException;
 
   /**
    * Use the genericType to determine if this should be converted into a List or

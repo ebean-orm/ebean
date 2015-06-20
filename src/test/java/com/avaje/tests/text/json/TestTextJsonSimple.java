@@ -5,6 +5,10 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebean.text.json.JsonContext;
+import com.avaje.ebean.text.json.JsonReadBeanVisitor;
+import com.avaje.ebean.text.json.JsonReadOptions;
+import com.avaje.tests.model.basic.Address;
+import com.avaje.tests.model.basic.Contact;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Assert;
@@ -12,8 +16,44 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestTextJsonSimple extends BaseTestCase {
+
+  class CustJsonRead implements JsonReadBeanVisitor<Customer> {
+
+    Customer bean; Map<String, Object> unmapped;
+
+    @Override
+    public void visit(Customer bean, Map<String, Object> unmapped) {
+      this.bean = bean;
+      this.unmapped = unmapped;
+    }
+  }
+
+  class ContactJsonRead implements JsonReadBeanVisitor<Contact> {
+
+    Contact bean; Map<String, Object> unmapped;
+
+    @Override
+    public void visit(Contact bean, Map<String, Object> unmapped) {
+      this.bean = bean;
+      this.unmapped = unmapped;
+    }
+  }
+
+  class AddressJsonRead implements JsonReadBeanVisitor<Address> {
+
+    Address bean; Map<String, Object> unmapped;
+
+    @Override
+    public void visit(Address bean, Map<String, Object> unmapped) {
+      this.bean = bean;
+      this.unmapped = unmapped;
+    }
+  }
 
   @Test
   public void test() throws IOException {
@@ -37,7 +77,21 @@ public class TestTextJsonSimple extends BaseTestCase {
     Assert.assertTrue(jsonOutput.contains("\"selected\":"));
 
     List<Customer> mList = json.toList(Customer.class, jsonOutput);
-    Assert.assertEquals(list.size(), mList.size());
+    assertEquals(list.size(), mList.size());
+
+    CustJsonRead custJsonRead = new CustJsonRead();
+    ContactJsonRead contactJsonRead = new ContactJsonRead();
+    AddressJsonRead addressJsonRead = new AddressJsonRead();
+
+    JsonReadOptions options = new JsonReadOptions();
+    options.addRootVisitor(custJsonRead);
+    options.addVisitor("contacts", contactJsonRead);
+    options.addVisitor("billingAddress", addressJsonRead);
+
+    List<Customer> customers = json.toList(Customer.class, jsonOutput, options);
+
+    assertEquals(list.size(), customers.size());
+
   }
 
   @Test
@@ -61,7 +115,7 @@ public class TestTextJsonSimple extends BaseTestCase {
     Assert.assertTrue(jsonOutput.contains("\"selected\":"));
 
     List<Customer> mList = json.toList(Customer.class, jsonOutput);
-    Assert.assertEquals(list.size(), mList.size());
+    assertEquals(list.size(), mList.size());
   }
 
   @Test

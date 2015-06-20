@@ -13,8 +13,8 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
+import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
-import com.fasterxml.jackson.core.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -878,7 +878,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
   }
 
-  public void jsonRead(JsonParser parser, EntityBean parentBean) throws IOException {
-    jsonHelp.jsonRead(parser, parentBean);
+  public void jsonRead(ReadJson readJson, EntityBean parentBean) throws IOException {
+    jsonHelp.jsonRead(readJson, parentBean);
   }
 }

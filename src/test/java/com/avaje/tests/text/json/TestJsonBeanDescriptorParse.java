@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Set;
 
+import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,8 +28,10 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
     
     StringReader reader = new StringReader("{\"id\":123,\"name\":\"Hello rob\"}");
     JsonParser parser = server.json().createParser(reader);
+
+    ReadJson readJson = new ReadJson(parser, null);
     
-    Customer customer = (Customer)descriptor.jsonRead(parser, null);
+    Customer customer = descriptor.jsonRead(readJson, null);
     
     Assert.assertEquals(Integer.valueOf(123), customer.getId());
     Assert.assertEquals("Hello rob", customer.getName());

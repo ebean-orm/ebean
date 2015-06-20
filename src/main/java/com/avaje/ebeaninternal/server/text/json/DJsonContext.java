@@ -1,11 +1,8 @@
 package com.avaje.ebeaninternal.server.text.json;
 
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.text.json.EJson;
+import com.avaje.ebean.text.json.*;
 import com.avaje.ebean.text.PathProperties;
-import com.avaje.ebean.text.json.JsonContext;
-import com.avaje.ebean.text.json.JsonIOException;
-import com.avaje.ebean.text.json.JsonWriteOptions;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.util.ParamTypeHelper;
@@ -56,15 +53,29 @@ public class DJsonContext implements JsonContext {
     return toBean(cls, new StringReader(json));
   }
 
+  @Override
+  public <T> T toBean(Class<T> cls, String json, JsonReadOptions options) throws JsonIOException {
+    return toBean(cls, new StringReader(json), options);
+  }
+
   public <T> T toBean(Class<T> cls, Reader jsonReader) throws JsonIOException {
     return toBean(cls, createParser(jsonReader));
   }
 
-  public <T> T toBean(Class<T> cls, JsonParser parser) throws JsonIOException {
+  public <T> T toBean(Class<T> cls, Reader jsonReader, JsonReadOptions options) throws JsonIOException {
+    return toBean(cls, createParser(jsonReader), options);
+  }
 
+  public <T> T toBean(Class<T> cls, JsonParser parser) throws JsonIOException {
+    return toBean(cls, parser, null);
+  }
+
+  public <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
+
+    ReadJson readJson = new ReadJson(parser, options);
     try {
       BeanDescriptor<T> d = getDescriptor(cls);
-      return d.jsonRead(parser, null);
+      return d.jsonRead(readJson, null);
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
@@ -74,13 +85,26 @@ public class DJsonContext implements JsonContext {
     return toList(cls, new StringReader(json));
   }
 
+  @Override
+  public <T> List<T> toList(Class<T> cls, String json, JsonReadOptions options) throws JsonIOException {
+    return toList(cls, new StringReader(json), options);
+  }
 
   public <T> List<T> toList(Class<T> cls, Reader jsonReader) throws JsonIOException {
     return toList(cls, createParser(jsonReader));
   }
 
-  public <T> List<T> toList(Class<T> cls, JsonParser src) throws JsonIOException {
+  public <T> List<T> toList(Class<T> cls, Reader jsonReader, JsonReadOptions options) throws JsonIOException {
+    return toList(cls, createParser(jsonReader), options);
+  }
 
+  public <T> List<T> toList(Class<T> cls, JsonParser src) throws JsonIOException {
+    return toList(cls, src, null);
+  }
+
+  public <T> List<T> toList(Class<T> cls, JsonParser src, JsonReadOptions options) throws JsonIOException {
+
+    ReadJson readJson = new ReadJson(src, options);
     try {
       BeanDescriptor<T> d = getDescriptor(cls);
 
@@ -92,7 +116,7 @@ public class DJsonContext implements JsonContext {
       }
 
       do {
-        T bean = d.jsonRead(src, null);
+        T bean = d.jsonRead(readJson, null);
         if (bean == null) {
           break;
         } else {

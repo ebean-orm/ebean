@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -17,12 +18,13 @@ public class BeanPropertyAssocManyJsonHelp {
     this.many = many;
   }
 
-  public void jsonRead(JsonParser parser, EntityBean parentBean) throws IOException {
+  public void jsonRead(ReadJson readJson, EntityBean parentBean) throws IOException {
     
     if (!this.many.jsonDeserialize) {
       return;
     }
 
+    JsonParser parser = readJson.getParser();
     JsonToken event = parser.nextToken();
     if (JsonToken.VALUE_NULL == event) {
       return;
@@ -34,7 +36,7 @@ public class BeanPropertyAssocManyJsonHelp {
     BeanCollection<?> collection = many.createEmpty(parentBean);
     BeanCollectionAdd add = many.getBeanCollectionAdd(collection, null);
     do {
-      EntityBean detailBean = (EntityBean) many.targetDescriptor.jsonRead(parser, many.name);
+      EntityBean detailBean = (EntityBean) many.targetDescriptor.jsonRead(readJson, many.name);
       if (detailBean == null) {
         // read the entire array
         break;

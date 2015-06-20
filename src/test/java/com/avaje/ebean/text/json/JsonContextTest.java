@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -58,6 +59,57 @@ public class JsonContextTest {
     Customer customer = Ebean.json().toBean(Customer.class, jsonWithUnknown);
     assertEquals(Integer.valueOf(42), customer.getId());
     assertEquals("rob", customer.getName());
+  }
+
+  class CustReadVisitor implements JsonReadBeanVisitor<Customer> {
+
+    Customer bean;
+    Map<String, Object> unmapped;
+
+    @Override
+    public void visit(Customer bean, Map<String, Object> unmapped) {
+      this.bean = bean;
+      this.unmapped = unmapped;
+    }
+  }
+
+  @Test
+  public void test_unknownProperty_withVisitor() {
+
+    String jsonWithUnknown = "{\"id\":42,\"unknownProp\":\"foo\",\"name\":\"rob\",\"version\":1,\"extraProp\":{\"name\":\"foobie\",\"sim\":\"bo\"}}";
+
+    CustReadVisitor custReadVisitor = new CustReadVisitor();
+    JsonReadOptions options = new JsonReadOptions();
+    options.addRootVisitor(custReadVisitor);
+
+
+    Customer customer = Ebean.json().toBean(Customer.class, jsonWithUnknown, options);
+    assertEquals(Integer.valueOf(42), customer.getId());
+    assertEquals("rob", customer.getName());
+
+    assertSame(customer, custReadVisitor.bean);
+    assertEquals("foo", custReadVisitor.unmapped.get("unknownProp"));
+    assertEquals(2, custReadVisitor.unmapped.size());
+    assertEquals("foobie", ((Map<String,Object>)custReadVisitor.unmapped.get("extraProp")).get("name"));
+    assertEquals("bo", ((Map<String, Object>) custReadVisitor.unmapped.get("extraProp")).get("sim"));
+
+  }
+
+  @Test
+  public void test_withVisitor_noUnmapped() {
+
+    String someJsonAllKnown = "{\"id\":42,\"name\":\"rob\",\"version\":1}";
+
+    CustReadVisitor custReadVisitor = new CustReadVisitor();
+    JsonReadOptions options = new JsonReadOptions();
+    options.addRootVisitor(custReadVisitor);
+
+    Customer customer = Ebean.json().toBean(Customer.class, someJsonAllKnown, options);
+    assertEquals(Integer.valueOf(42), customer.getId());
+    assertEquals("rob", customer.getName());
+
+    assertSame(customer, custReadVisitor.bean);
+    assertNull(custReadVisitor.unmapped);
   }
 
   @Test
