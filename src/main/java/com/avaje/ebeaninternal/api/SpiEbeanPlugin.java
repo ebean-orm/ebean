@@ -9,6 +9,7 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
  * author: Richard Vowles - http://gplus.to/RichardVowles
  */
 public interface SpiEbeanPlugin {
+
   /**
    * initializes the plugin.
    *
@@ -16,7 +17,7 @@ public interface SpiEbeanPlugin {
    * @param dbPlatform - the database we are using - this is available from the server, but it is provided for convenience
    * @param serverConfig - the configured server information. It allows access to pre-collected information (but not the collector PropertySource, yet)
    */
-  public void setup(SpiEbeanServer server, DatabasePlatform dbPlatform, ServerConfig serverConfig);
+  void setup(SpiEbeanServer server, DatabasePlatform dbPlatform, ServerConfig serverConfig);
 
-  public void execute(boolean online);
+  void execute(boolean online);
 }

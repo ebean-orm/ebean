@@ -147,6 +147,8 @@ public final class DefaultServer implements SpiEbeanServer {
    */
   private List<SpiEbeanPlugin> ebeanPlugins;
 
+  private List<SpiEbeanPluginWithConfig> ebeanPluginsWithConfig;
+
   private final boolean collectQueryOrigins;
   
   private final boolean collectQueryStatsByNode;
@@ -161,6 +163,8 @@ public final class DefaultServer implements SpiEbeanServer {
    */
   public DefaultServer(InternalConfiguration config, ServerCacheManager cache) {
 
+    // load any plugins that modify the serverConfig early
+    this.ebeanPluginsWithConfig = loadPluginsWithConfig(config.getServerConfig());
     this.serverConfig = config.getServerConfig();
     this.objectGraphStats = new ConcurrentHashMap<ObjectGraphNode, CObjectGraphNodeStatistics>();
     this.metaInfoManager = new DefaultMetaInfoManager(this);
@@ -198,19 +202,33 @@ public final class DefaultServer implements SpiEbeanServer {
     this.beanLoader = new DefaultBeanLoader(this);
     this.jsonContext = config.createJsonContext(this);
 
-    loadAndInitializePlugins(config);
+    // load normal plugins late and call setup on all
+    loadAndInitializePlugins(config.getServerConfig());
     
     // Register with the JVM Shutdown hook
     ShutdownManager.registerEbeanServer(this);
   }
 
-  protected void loadAndInitializePlugins(InternalConfiguration config) {
+  /**
+   * load plugins with config adjustments. This occurs early
+   */
+  protected List<SpiEbeanPluginWithConfig> loadPluginsWithConfig(ServerConfig config) {
+
+    List<SpiEbeanPluginWithConfig> plugins = new ArrayList<SpiEbeanPluginWithConfig>();
+    for (SpiEbeanPluginWithConfig plugin : ServiceLoader.load(SpiEbeanPluginWithConfig.class)) {
+      plugins.add(plugin);
+      plugin.modifyServerConfig(config);
+    }
+    return plugins;
+  }
+
+  protected void loadAndInitializePlugins(ServerConfig config) {
     
     List<SpiEbeanPlugin> spiPlugins = new ArrayList<SpiEbeanPlugin>();
 
     for (SpiEbeanPlugin plugin : ServiceLoader.load(SpiEbeanPlugin.class)) {
       spiPlugins.add(plugin);
-      plugin.setup(this, this.getDatabasePlatform(), config.getServerConfig());
+      plugin.setup(this, this.getDatabasePlatform(), config);
 
       if (plugin instanceof DdlGenerator) {
         // backwards compatible
@@ -222,18 +240,30 @@ public final class DefaultServer implements SpiEbeanServer {
       // ServiceLoader not finding ddlGenerator (typically OSGi) 
       ddlGenerator = new DdlGenerator();
       spiPlugins.add(ddlGenerator);
-      ddlGenerator.setup(this, this.getDatabasePlatform(), config.getServerConfig());
+      ddlGenerator.setup(this, this.getDatabasePlatform(), config);
+    }
+
+    // also setup on any SpiEbeanPluginWithConfig
+    for (SpiEbeanPluginWithConfig plugin : ebeanPluginsWithConfig) {
+      plugin.setup(this, this.getDatabasePlatform(), config);
+      spiPlugins.add(plugin);
     }
 
     ebeanPlugins = Collections.unmodifiableList(spiPlugins);
   }
 
+  /**
+   * Return the list of registered plugins.
+   */
   public List<SpiEbeanPlugin> getSpiEbeanPlugins() {
     return ebeanPlugins;
   }
 
+  /**
+   * Execute all the plugins with an online flag indicating the DB is up or not.
+   */
   public void executePlugins(boolean online) {
-    for(SpiEbeanPlugin plugin : ebeanPlugins) {
+    for (SpiEbeanPlugin plugin : ebeanPlugins) {
       plugin.execute(online);
     }
   }

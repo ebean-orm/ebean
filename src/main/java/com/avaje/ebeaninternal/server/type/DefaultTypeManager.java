@@ -609,7 +609,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   protected void initialiseCompoundTypes(BootupClasses bootupClasses) {
 
-    ArrayList<Class<?>> compoundTypes = bootupClasses.getCompoundTypes();
+    List<Class<?>> compoundTypes = bootupClasses.getCompoundTypes();
     for (int j = 0; j < compoundTypes.size(); j++) {
 
       Class<?> type = compoundTypes.get(j);

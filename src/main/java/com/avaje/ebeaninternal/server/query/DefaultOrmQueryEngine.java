@@ -5,6 +5,7 @@ import java.util.Collection;
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanFinder;
 import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -70,11 +71,11 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     flushJdbcBatchOnQuery(request);
 
-    BeanFinder<T> finder = request.getBeanFinder();
+    BeanFindController finder = request.getBeanFinder();
 
     BeanCollection<T> result;
-    if (finder != null) {
-      // this bean type has its own specific finder
+    if (finder != null && finder.isInterceptFindMany(request)) {
+      // intercept this request
       result = finder.findMany(request);
     } else {
       result = queryEngine.findMany(request);
@@ -106,7 +107,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     flushJdbcBatchOnQuery(request);
 
-    BeanFinder<T> finder = request.getBeanFinder();
+    BeanFindController finder = request.getBeanFinder();
 
     T result;
     if (finder != null) {

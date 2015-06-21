@@ -80,7 +80,9 @@ public class DatabasePlatformFactory {
     if (dbName.equals("mysql")) {
       return new MySqlPlatform();
     }
-
+    if (dbName.equals("h2")) {
+      return new H2Platform();
+    }
     if (dbName.equals("sqlite")) {
       return new SQLitePlatform();
     }
