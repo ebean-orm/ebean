@@ -14,7 +14,6 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
-import com.avaje.ebean.event.BeanFinder;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.server.core.*;
@@ -161,8 +160,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.persistControllerManager = new PersistControllerManager(bootupClasses);
     this.persistListenerManager = new PersistListenerManager(bootupClasses);
     this.beanQueryAdapterManager = new BeanQueryAdapterManager(bootupClasses);
-
-    this.beanFinderManager = new DefaultBeanFinderManager();
+    this.beanFinderManager = new BeanFinderManager(bootupClasses);
 
     this.reflectFactory = createReflectionFactory();
     this.transientProperties = new TransientProperties();
@@ -407,7 +405,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     int qa = beanQueryAdapterManager.getRegisterCount();
     int cc = persistControllerManager.getRegisterCount();
     int lc = persistListenerManager.getRegisterCount();
-    int fc = beanFinderManager.createBeanFinders(bootupClasses.getBeanFinders());
+    int fc = beanFinderManager.getRegisterCount();
 
     logger.debug("BeanPersistControllers[" + cc + "] BeanFinders[" + fc + "] BeanPersistListeners[" + lc + "] BeanQueryAdapters[" + qa + "]");
   }
@@ -435,7 +433,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private void readEmbeddedDeployment() {
 
-    ArrayList<Class<?>> embeddedClasses = bootupClasses.getEmbeddables();
+    List<Class<?>> embeddedClasses = bootupClasses.getEmbeddables();
     for (int i = 0; i < embeddedClasses.size(); i++) {
       Class<?> cls = embeddedClasses.get(i);
       if (logger.isTraceEnabled()) {
@@ -456,7 +454,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private void readEntityDeploymentInitial() {
 
-    ArrayList<Class<?>> entityClasses = bootupClasses.getEntities();
+    List<Class<?>> entityClasses = bootupClasses.getEntities();
 
     for (Class<?> entityClass : entityClasses) {
       DeployBeanInfo<?> info = createDeployBeanInfo(entityClass);
@@ -935,17 +933,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private <T> void setBeanControllerFinderListener(DeployBeanDescriptor<T> descriptor) {
 
-    Class<T> beanType = descriptor.getBeanType();
-
     persistControllerManager.addPersistControllers(descriptor);
     persistListenerManager.addPersistListeners(descriptor);
     beanQueryAdapterManager.addQueryAdapter(descriptor);
-
-    BeanFinder<T> beanFinder = beanFinderManager.getBeanFinder(beanType);
-    if (beanFinder != null) {
-      descriptor.setBeanFinder(beanFinder);
-      logger.debug("BeanFinder on[" + descriptor.getFullName() + "] " + beanFinder.getClass().getName());
-    }
+    beanFinderManager.addFindControllers(descriptor);
   }
 
   /**

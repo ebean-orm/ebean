@@ -9,7 +9,7 @@ import javax.persistence.PersistenceException;
 import com.avaje.ebean.*;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.PersistenceContext;
-import com.avaje.ebean.event.BeanFinder;
+import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.HashQuery;
@@ -40,7 +40,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
   private final SpiQuery<T> query;
 
-  private final BeanFinder<T> finder;
+  private final BeanFindController finder;
 
   private final Boolean readOnly;
 
@@ -315,7 +315,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Return a bean specific finder if one has been set.
    */
-  public BeanFinder<T> getBeanFinder() {
+  public BeanFindController getBeanFinder() {
     return finder;
   }
 

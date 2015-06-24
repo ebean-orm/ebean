@@ -10,10 +10,7 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
-import com.avaje.ebean.event.BeanFinder;
-import com.avaje.ebean.event.BeanPersistController;
-import com.avaje.ebean.event.BeanPersistListener;
-import com.avaje.ebean.event.BeanQueryAdapter;
+import com.avaje.ebean.event.*;
 import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaQueryPlanStatistic;
 import com.avaje.ebeaninternal.api.*;
@@ -153,7 +150,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   /**
    * If set overrides the find implementation. Server side only.
    */
-  private final BeanFinder<T> beanFinder;
+  private final BeanFindController beanFinder;
 
   /**
    * The table joins for this bean.
@@ -1514,7 +1511,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   /**
    * Return the beanFinder. Usually null unless overriding the finder.
    */
-  public BeanFinder<T> getBeanFinder() {
+  public BeanFindController getBeanFinder() {
     return beanFinder;
   }
 

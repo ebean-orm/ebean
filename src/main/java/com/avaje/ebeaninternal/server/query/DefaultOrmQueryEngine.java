@@ -1,18 +1,17 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.util.Collection;
-
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.event.BeanFinder;
+import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.OrmQueryEngine;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
+
+import java.util.Collection;
 
 /**
  * Main Finder implementation.
@@ -27,7 +26,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
   /**
    * Create the Finder.
    */
-  public DefaultOrmQueryEngine(BeanDescriptorManager descMgr, CQueryEngine queryEngine) {
+  public DefaultOrmQueryEngine(CQueryEngine queryEngine) {
 
     this.queryEngine = queryEngine;
   }
@@ -70,11 +69,11 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     flushJdbcBatchOnQuery(request);
 
-    BeanFinder<T> finder = request.getBeanFinder();
+    BeanFindController finder = request.getBeanFinder();
 
     BeanCollection<T> result;
-    if (finder != null) {
-      // this bean type has its own specific finder
+    if (finder != null && finder.isInterceptFindMany(request)) {
+      // intercept this request
       result = finder.findMany(request);
     } else {
       result = queryEngine.findMany(request);
@@ -106,10 +105,10 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     flushJdbcBatchOnQuery(request);
 
-    BeanFinder<T> finder = request.getBeanFinder();
+    BeanFindController finder = request.getBeanFinder();
 
     T result;
-    if (finder != null) {
+    if (finder != null && finder.isInterceptFind(request)) {
       result = finder.find(request);
     } else {
       result = queryEngine.find(request);

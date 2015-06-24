@@ -9,18 +9,13 @@ import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import com.avaje.ebean.event.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.config.CompoundType;
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.event.BeanFinder;
-import com.avaje.ebean.event.BeanPersistController;
-import com.avaje.ebean.event.BeanPersistListener;
-import com.avaje.ebean.event.BeanQueryAdapter;
-import com.avaje.ebean.event.ServerConfigStartup;
-import com.avaje.ebean.event.TransactionEventListener;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.util.ClassPathSearchMatcher;
 
@@ -47,15 +42,15 @@ public class BootupClasses implements ClassPathSearchMatcher {
   private ArrayList<Class<?>> transactionEventListenerList = new ArrayList<Class<?>>();
 
   private ArrayList<Class<?>> beanFinderList = new ArrayList<Class<?>>();
-
-  private ArrayList<Class<?>> beanListenerList = new ArrayList<Class<?>>();
-
+  private ArrayList<Class<?>> beanFindControllerList = new ArrayList<Class<?>>();
   private ArrayList<Class<?>> beanQueryAdapterList = new ArrayList<Class<?>>();
 
+  private ArrayList<Class<?>> beanListenerList = new ArrayList<Class<?>>();
 
   private ArrayList<Class<?>> serverConfigStartupList = new ArrayList<Class<?>>();
   private ArrayList<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<ServerConfigStartup>();
 
+  private List<BeanFindController> findControllerInstances = new ArrayList<BeanFindController>();
   private List<BeanPersistController> persistControllerInstances = new ArrayList<BeanPersistController>();
   private List<BeanPersistListener> persistListenerInstances = new ArrayList<BeanPersistListener>();
   private List<BeanQueryAdapter> queryAdapterInstances = new ArrayList<BeanQueryAdapter>();
@@ -113,6 +108,19 @@ public class BootupClasses implements ClassPathSearchMatcher {
   }
 
   /**
+   * Add BeanFindController instances.
+   */
+  public void addFindControllers(List<BeanFindController> findControllers) {
+    if (findControllers != null) {
+      for (BeanFindController c : findControllers) {
+        this.findControllerInstances.add(c);
+        // don't automatically instantiate
+        this.beanFindControllerList.remove(c.getClass());
+      }
+    }
+  }
+
+  /**
    * Add TransactionEventListeners instances.
    */
   public void addTransactionEventListeners(List<TransactionEventListener> transactionEventListeners) {
@@ -159,6 +167,22 @@ public class BootupClasses implements ClassPathSearchMatcher {
     }
 
     return queryAdapterInstances;
+  }
+
+  public List<BeanFindController> getBeanFindControllers() {
+    // add class registered BeanFindController to the
+    // list of created instances
+    for (Class<?> cls : beanFindControllerList) {
+      try {
+        BeanFindController newInstance = (BeanFindController) cls.newInstance();
+        findControllerInstances.add(newInstance);
+      } catch (Exception e) {
+        String msg = "Error creating BeanPersistController " + cls;
+        logger.error(msg, e);
+      }
+    }
+
+    return findControllerInstances;
   }
 
   public List<BeanPersistListener> getBeanPersistListeners() {
@@ -212,63 +236,63 @@ public class BootupClasses implements ClassPathSearchMatcher {
   /**
    * Return the list of Embeddable classes.
    */
-  public ArrayList<Class<?>> getEmbeddables() {
+  public List<Class<?>> getEmbeddables() {
     return embeddableList;
   }
 
   /**
    * Return the list of entity classes.
    */
-  public ArrayList<Class<?>> getEntities() {
+  public List<Class<?>> getEntities() {
     return entityList;
   }
 
   /**
    * Return the list of ScalarTypes found.
    */
-  public ArrayList<Class<?>> getScalarTypes() {
+  public List<Class<?>> getScalarTypes() {
     return scalarTypeList;
   }
 
   /**
    * Return the list of ScalarConverters found.
    */
-  public ArrayList<Class<?>> getScalarConverters() {
+  public List<Class<?>> getScalarConverters() {
     return scalarConverterList;
   }
 
   /**
    * Return the list of ScalarConverters found.
    */
-  public ArrayList<Class<?>> getCompoundTypes() {
+  public List<Class<?>> getCompoundTypes() {
     return compoundTypeList;
   }
 
   /**
    * Return the list of BeanControllers found.
    */
-  public ArrayList<Class<?>> getBeanControllers() {
+  public List<Class<?>> getBeanControllers() {
     return beanControllerList;
   }
 
   /**
    * Return the list of TransactionEventListeners found
    */
-  public ArrayList<Class<?>> getTransactionEventListenerList() {
+  public List<Class<?>> getTransactionEventListenerList() {
     return transactionEventListenerList;
   }
 
   /**
    * Return the list of BeanFinders found.
    */
-  public ArrayList<Class<?>> getBeanFinders() {
+  public List<Class<?>> getBeanFinders() {
     return beanFinderList;
   }
 
   /**
    * Return the list of BeanListeners found.
    */
-  public ArrayList<Class<?>> getBeanListeners() {
+  public List<Class<?>> getBeanListeners() {
     return beanListenerList;
   }
 
@@ -329,6 +353,11 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
     if (BeanFinder.class.isAssignableFrom(cls)) {
       beanFinderList.add(cls);
+      interesting = true;
+    }
+
+    if (BeanFindController.class.isAssignableFrom(cls)) {
+      beanFindControllerList.add(cls);
       interesting = true;
     }
 
