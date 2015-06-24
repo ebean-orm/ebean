@@ -1,9 +1,10 @@
-[![Stories in Ready](https://badge.waffle.io/ebean-orm/avaje-ebeanorm.png?label=ready&title=Ready)](https://waffle.io/ebean-orm/avaje-ebeanorm)
+* [![Maven Central : avaje-ebeanorm](https://maven-badges.herokuapp.com/maven-central/org.avaje.ebeanorm/avaje-ebeanorm/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.avaje.ebeanorm/avaje-ebeanorm) - avaje-ebeanorm 
+* [![Maven Central : avaje-ebeanorm-agent](https://maven-badges.herokuapp.com/maven-central/org.avaje.ebeanorm/avaje-ebeanorm-agent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.avaje.ebeanorm/avaje-ebeanorm-agent) - avaje-ebeanorm-agent
+* [![Maven Central : avaje-ebeanorm-agent](https://maven-badges.herokuapp.com/maven-central/org.avaje.ebeanorm/avaje-ebeanorm-mavenenhancer/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.avaje.ebeanorm/avaje-ebeanorm-mavenenhancer) - avaje-ebeanorm-mavenenhancer
+
+
 Ebean ORM
 ==============
-
-Project Website
-----------------
 [http://ebean-orm.github.io/](http://ebean-orm.github.io/ "Ebean ORM's Website")
 
 
@@ -12,7 +13,7 @@ Maven Dependency
     <dependency>
       <groupId>org.avaje.ebeanorm</groupId>
       <artifactId>avaje-ebeanorm</artifactId>
-      <version>4.7.1</version>
+      <version>4.7.3</version>
     </dependency>
 
 
