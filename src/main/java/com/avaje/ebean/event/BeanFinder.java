@@ -3,6 +3,8 @@ package com.avaje.ebean.event;
 import com.avaje.ebean.bean.BeanCollection;
 
 /**
+ * Deprecated in favor of using BeanFindController.
+ *
  * Used to override the finding implementation for a bean.
  * <p>
  * For beans that are not in a JDBC data source you can implement this handle
@@ -14,6 +16,7 @@ import com.avaje.ebean.bean.BeanCollection;
  * Ebean at runtime such as query execution statistics etc. See the beans in
  * com.avaje.ebean.meta and finders in com.avaje.ebean.server.meta.
  * </p>
+ * @deprecated
  */
 public interface BeanFinder<T> {
 
