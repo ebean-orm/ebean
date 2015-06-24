@@ -1526,16 +1526,34 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
+   * De-register the BeanPersistListener.
+   */
+  public void deregister(BeanPersistListener listener) {
+
+    // volatile read...
+    BeanPersistListener currentListener = persistListener;
+    if (currentListener != null) {
+      if (currentListener instanceof ChainedBeanPersistListener) {
+        // remove it from the existing chain
+        persistListener = ((ChainedBeanPersistListener) currentListener).deregister(listener);
+      } else if (currentListener.equals(listener)) {
+        persistListener = null;
+      }
+    }
+  }
+
+  /**
    * De-register the BeanPersistController.
    */
   public void deregister(BeanPersistController controller) {
+
     // volatile read...
-    BeanPersistController c = persistController;
-    if (c != null) {
-      if (c instanceof ChainedBeanPersistController) {
+    BeanPersistController currentController = persistController;
+    if (currentController != null) {
+      if (currentController instanceof ChainedBeanPersistController) {
         // remove it from the existing chain
-        persistController = ((ChainedBeanPersistController) c).deregister(controller);
-      } else if (c.equals(controller)) {
+        persistController = ((ChainedBeanPersistController) currentController).deregister(controller);
+      } else if (currentController.equals(controller)) {
         persistController = null;
       }
     }
@@ -1549,16 +1567,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
     if (newPersistListener.isRegisterFor(beanType)) {
       // volatile read...
-      BeanPersistListener currListener = persistListener;
-      if (currListener == null) {
+      BeanPersistListener currentListener = persistListener;
+      if (currentListener == null) {
         persistListener = newPersistListener;
       } else {
-        if (currListener instanceof ChainedBeanPersistListener) {
+        if (currentListener instanceof ChainedBeanPersistListener) {
           // add it to the existing chain
-          persistListener = ((ChainedBeanPersistListener) currListener).register(newPersistListener);
+          persistListener = ((ChainedBeanPersistListener) currentListener).register(newPersistListener);
         } else {
           // build new chain of the 2
-          persistListener = new ChainedBeanPersistListener(currListener, newPersistListener);
+          persistListener = new ChainedBeanPersistListener(currentListener, newPersistListener);
         }
       }
     }
@@ -1571,16 +1589,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
 
     if (newController.isRegisterFor(beanType)) {
       // volatile read...
-      BeanPersistController c = persistController;
-      if (c == null) {
+      BeanPersistController currentController = persistController;
+      if (currentController == null) {
         persistController = newController;
       } else {
-        if (c instanceof ChainedBeanPersistController) {
+        if (currentController instanceof ChainedBeanPersistController) {
           // add it to the existing chain
-          persistController = ((ChainedBeanPersistController) c).register(newController);
+          persistController = ((ChainedBeanPersistController) currentController).register(newController);
         } else {
           // build new chain of the 2
-          persistController = new ChainedBeanPersistController(c, newController);
+          persistController = new ChainedBeanPersistController(currentController, newController);
         }
       }
     }

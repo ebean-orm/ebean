@@ -1819,8 +1819,7 @@ public class ServerConfig {
 
     String classNames = properties.get("classes", null);
     if (classNames == null) {
-
-      return null;
+      return classes;
     }
 
     List<Class<?>> classes = new ArrayList<Class<?>>();

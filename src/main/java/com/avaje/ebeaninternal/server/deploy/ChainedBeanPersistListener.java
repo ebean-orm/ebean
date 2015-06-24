@@ -22,6 +22,13 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 		this(addList(c1, c2));
 	}
 
+	/**
+	 * Return the size of the chain.
+	 */
+	protected int size() {
+		return chain.length;
+	}
+
   @Override
   public boolean isRegisterFor(Class<?> cls) {
     // never called
@@ -40,7 +47,6 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 	
 	/**
 	 * Construct given the list of BeanPersistController's.
-	 * @param list
 	 */
 	public ChainedBeanPersistListener(List<BeanPersistListener> list) {
 		this.list = list;

@@ -9,6 +9,11 @@ import java.util.Set;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistRequest;
 
+/**
+ * Chains multiple BeanPersistController's together.
+ *
+ * Used when multiple BeanPersistController register for the same bean type.
+ */
 public class ChainedBeanPersistController implements BeanPersistController {
 
 	private static final Sorter SORTER = new Sorter();
@@ -43,7 +48,14 @@ public class ChainedBeanPersistController implements BeanPersistController {
 		Arrays.sort(c, SORTER);
 		this.chain = c;
 	}
-	
+
+  /**
+   * Return the size of the chain.
+   */
+	protected int size() {
+		return chain.length;
+	}
+
 	/**
 	 * Register a new BeanPersistController and return the resulting chain.
 	 */
