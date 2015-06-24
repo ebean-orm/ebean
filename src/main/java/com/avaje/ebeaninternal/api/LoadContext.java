@@ -14,13 +14,13 @@ public interface LoadContext {
   /**
    * Return the minimum batch size when using QueryIterator with query joins.
    */
-  public int getSecondaryQueriesMinBatchSize(OrmQueryRequest<?> parentRequest, int defaultQueryBatch);
+  int getSecondaryQueriesMinBatchSize(OrmQueryRequest<?> parentRequest, int defaultQueryBatch);
 
 	/**
 	 * Execute any secondary (+query) queries if there are any defined.
 	 * @param parentRequest the originating query request
 	 */
-	public void executeSecondaryQueries(OrmQueryRequest<?> parentRequest);
+	void executeSecondaryQueries(OrmQueryRequest<?> parentRequest);
 
 	/**
 	 * Register any secondary queries (+query or +lazy) with their
@@ -30,17 +30,17 @@ public interface LoadContext {
 	 * defined query for +query and +lazy execution.
 	 * </p>
 	 */
-	public void registerSecondaryQueries(SpiQuery<?> query);
+	void registerSecondaryQueries(SpiQuery<?> query);
 	
 	/**
 	 * Return the node for a given path which is used by autofetch profiling.
 	 */
-	public ObjectGraphNode getObjectGraphNode(String path);
+	ObjectGraphNode getObjectGraphNode(String path);
 
 	/**
 	 * Return the persistence context used by this query and future lazy loading.
 	 */
-	public PersistenceContext getPersistenceContext();
+	PersistenceContext getPersistenceContext();
 
 	/**
 	 * Set the persistence context used by this query and future lazy loading.
@@ -48,16 +48,16 @@ public interface LoadContext {
 	 * Used by query iterator when processing large result sets.
 	 * </p>
 	 */
-	public void resetPersistenceContext(PersistenceContext persistenceContext);
+	void resetPersistenceContext(PersistenceContext persistenceContext);
 
 	/**
 	 * Register a Bean for lazy loading.
 	 */
-	public void register(String path, EntityBeanIntercept ebi);
+	void register(String path, EntityBeanIntercept ebi);
 
 	/**
 	 * Register a collection for lazy loading.
 	 */
-	public void register(String path, BeanCollection<?> bc);
+	void register(String path, BeanCollection<?> bc);
 
 }

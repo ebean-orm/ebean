@@ -26,22 +26,22 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   /**
    * For internal use, shutdown of the server invoked by JVM Shutdown.
    */
-  public void shutdownManaged();
+  void shutdownManaged();
 
   /**
    * Return true if query origins should be collected.
    */
-  public boolean isCollectQueryOrigins();
+  boolean isCollectQueryOrigins();
   
   /**
    * Return the server configuration.
    */
-  public ServerConfig getServerConfig();
+  ServerConfig getServerConfig();
 
   /**
    * Return the DatabasePlatform for this server.
    */
-  public DatabasePlatform getDatabasePlatform();
+  DatabasePlatform getDatabasePlatform();
 
   /**
    * Return a JDBC driver specific handler for batching.
@@ -49,7 +49,7 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Required for Oracle specific batch handling.
    * </p>
    */
-  public PstmtBatch getPstmtBatch();
+  PstmtBatch getPstmtBatch();
 
   /**
    * Create an object to represent the current CallStack.
@@ -58,47 +58,47 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * graph costing.
    * </p>
    */
-  public CallStack createCallStack();
+  CallStack createCallStack();
 
   /**
    * Return the PersistenceContextScope to use defined at query or server level.
    */
-  public PersistenceContextScope getPersistenceContextScope(SpiQuery<?> query);
+  PersistenceContextScope getPersistenceContextScope(SpiQuery<?> query);
 
   /**
    * Return the DDL generator.
    */
-  public DdlGenerator getDdlGenerator();
+  DdlGenerator getDdlGenerator();
 
   /**
    * Return the AutoFetchListener.
    */
-  public AutoFetchManager getAutoFetchManager();
+  AutoFetchManager getAutoFetchManager();
 
   /**
    * Clear the query execution statistics.
    */
-  public void clearQueryStatistics();
+  void clearQueryStatistics();
 
   /**
    * Return all the descriptors.
    */
-  public List<BeanDescriptor<?>> getBeanDescriptors();
+  List<BeanDescriptor<?>> getBeanDescriptors();
 
   /**
    * Return the BeanDescriptor for a given type of bean.
    */
-  public <T> BeanDescriptor<T> getBeanDescriptor(Class<T> type);
+  <T> BeanDescriptor<T> getBeanDescriptor(Class<T> type);
 
   /**
    * Return BeanDescriptor using it's unique id.
    */
-  public BeanDescriptor<?> getBeanDescriptorById(String descriptorId);
+  BeanDescriptor<?> getBeanDescriptorById(String descriptorId);
 
   /**
    * Return BeanDescriptors mapped to this table.
    */
-  public List<BeanDescriptor<?>> getBeanDescriptors(String tableName);
+  List<BeanDescriptor<?>> getBeanDescriptors(String tableName);
 
   /**
    * Process committed changes from another framework.
@@ -108,7 +108,7 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * this to maintain its cache and text indexes appropriately.
    * </p>
    */
-  public void externalModification(TransactionEventTable event);
+  void externalModification(TransactionEventTable event);
 
   /**
    * Create a ServerTransaction.
@@ -116,44 +116,44 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * To specify to use the default transaction isolation use a value of -1.
    * </p>
    */
-  public SpiTransaction createServerTransaction(boolean isExplicit, int isolationLevel);
+  SpiTransaction createServerTransaction(boolean isExplicit, int isolationLevel);
 
   /**
    * Return the current transaction or null if there is no current transaction.
    */
-  public SpiTransaction getCurrentServerTransaction();
+  SpiTransaction getCurrentServerTransaction();
 
   /**
    * Create a ScopeTrans for a method for the given scope definition.
    */
-  public ScopeTrans createScopeTrans(TxScope txScope);
+  ScopeTrans createScopeTrans(TxScope txScope);
 
   /**
    * Create a ServerTransaction for query purposes.
    */
-  public SpiTransaction createQueryTransaction();
+  SpiTransaction createQueryTransaction();
 
   /**
    * An event from another server in the cluster used to notify local
    * BeanListeners of remote inserts updates and deletes.
    */
-  public void remoteTransactionEvent(RemoteTransactionEvent event);
+  void remoteTransactionEvent(RemoteTransactionEvent event);
 
   /**
    * Create a query request object.
    */
-  public <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> q,
+  <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> q,
       Transaction t);
 
   /**
    * Compile a query.
    */
-  public <T> CQuery<T> compileQuery(Query<T> query, Transaction t);
+  <T> CQuery<T> compileQuery(Query<T> query, Transaction t);
 
   /**
    * Return the queryEngine for this server.
    */
-  public CQueryEngine getQueryEngine();
+  CQueryEngine getQueryEngine();
 
   /**
    * Execute the findId's query but without copying the query.
@@ -162,37 +162,37 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * the query has finished (if executing in a background thread).
    * </p>
    */
-  public <T> List<Object> findIdsWithCopy(Query<T> query, Transaction t);
+  <T> List<Object> findIdsWithCopy(Query<T> query, Transaction t);
 
   /**
    * Execute the findRowCount query but without copying the query.
    */
-  public <T> int findRowCountWithCopy(Query<T> query, Transaction t);
+  <T> int findRowCountWithCopy(Query<T> query, Transaction t);
 
   /**
    * Load a batch of Associated One Beans.
    */
-  public void loadBean(LoadBeanRequest loadRequest);
+  void loadBean(LoadBeanRequest loadRequest);
 
   /**
    * Lazy load a batch of Many's.
    */
-  public void loadMany(LoadManyRequest loadRequest);
+  void loadMany(LoadManyRequest loadRequest);
 
   /**
    * Return the default batch size for lazy loading.
    */
-  public int getLazyLoadBatchSize();
+  int getLazyLoadBatchSize();
 
   /**
    * Return true if the type is known as an Entity or Xml type or a List Set or
    * Map of known bean types.
    */
-  public boolean isSupportedType(java.lang.reflect.Type genericType);
+  boolean isSupportedType(java.lang.reflect.Type genericType);
 
   /**
    * Collect query statistics by ObjectGraphNode. Used for Lazy loading reporting.
    */
-  public void collectQueryStats(ObjectGraphNode objectGraphNode, long loadedBeanCount, long timeMicros);
+  void collectQueryStats(ObjectGraphNode objectGraphNode, long loadedBeanCount, long timeMicros);
 
 }

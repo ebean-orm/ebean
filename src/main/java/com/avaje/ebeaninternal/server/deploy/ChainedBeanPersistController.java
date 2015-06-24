@@ -40,7 +40,6 @@ public class ChainedBeanPersistController implements BeanPersistController {
 	
 	/**
 	 * Construct given the list of BeanPersistController's.
-	 * @param list
 	 */
 	public ChainedBeanPersistController(List<BeanPersistController> list) {
 		this.list = list;

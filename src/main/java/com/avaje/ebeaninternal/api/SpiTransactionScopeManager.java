@@ -2,5 +2,5 @@ package com.avaje.ebeaninternal.api;
 
 public interface SpiTransactionScopeManager {
 
-	public void replace(SpiTransaction t);
+	void replace(SpiTransaction t);
 }

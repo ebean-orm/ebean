@@ -14,5 +14,5 @@ public interface LoadSecondaryQuery {
 	/**
 	 * Execute the secondary query with a given batch size.
 	 */
-	public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest);
+	void loadSecondaryQuery(OrmQueryRequest<?> parentRequest);
 }

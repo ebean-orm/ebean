@@ -11,66 +11,66 @@ public interface SpiUpdate<T> extends Update<T> {
 	 * The type of the update request.
 	 */
 	enum OrmUpdateType {
-		INSERT{
+		INSERT {
 			public String toString() {
 				return "Insert";
 			}
 		},
-		UPDATE{
+		UPDATE {
 			public String toString() {
 				return "Update";
 			}
-		}, 
-		DELETE{
+		},
+		DELETE {
 			public String toString() {
 				return "Delete";
 			}
 		},
-		UNKNOWN{
+		UNKNOWN {
 			public String toString() {
 				return "Unknown";
 			}
-			
-		};
+
+		}
 	}
 	
 	/**
 	 * Return the type of bean being updated.
 	 */
-	public Class<?> getBeanType();
+	Class<?> getBeanType();
 
 	/**
 	 * Return the type of this - insert, update or delete.
 	 */
-	public OrmUpdateType getOrmUpdateType();
+	OrmUpdateType getOrmUpdateType();
 	
 	/**
 	 * Return the name of the table being modified.
 	 */
-	public String getBaseTable();
+	String getBaseTable();
 	
 	/**
 	 * Return the update statement. This could be either sql or an orm update with bean types and property names.
 	 */
-	public String getUpdateStatement();
+	String getUpdateStatement();
 	
 	/**
 	 * Return the timeout in seconds.
 	 */
-	public int getTimeout();
+	int getTimeout();
 	
 	/**
 	 * Return true if the cache should be notified to invalidate objects.
 	 */
-	public boolean isNotifyCache();
+	boolean isNotifyCache();
 	
 	/**
 	 * Return the bind parameters.
 	 */
-	public BindParams getBindParams();
+	BindParams getBindParams();
 	
 	/**
 	 * Set the generated sql used.
 	 */
-	public void setGeneratedSql(String sql);
+	void setGeneratedSql(String sql);
 }

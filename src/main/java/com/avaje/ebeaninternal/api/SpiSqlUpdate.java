@@ -4,7 +4,7 @@ import com.avaje.ebean.SqlUpdate;
 
 public interface SpiSqlUpdate extends SqlUpdate {
 
-	public BindParams getBindParams();
+	BindParams getBindParams();
 
-  public void setGeneratedSql(String sql);
+  void setGeneratedSql(String sql);
 }

@@ -16,8 +16,6 @@ import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
  * <p>
  * The plans are cached by the BeanDescriptors.
  * </>
- * 
- * @author rbygrave
  */
 public interface SpiUpdatePlan {
 
@@ -28,48 +26,42 @@ public interface SpiUpdatePlan {
    * deployment.
    * </p>
    */
-  public boolean isEmptySetClause();
+  boolean isEmptySetClause();
     
 	/**
 	 * Bind given the request and bean. The bean could be the oldValues bean
 	 * when binding a update or delete where clause with ALL concurrency mode.
 	 */
-	public void bindSet(DmlHandler bind, EntityBean bean) throws SQLException;
+	void bindSet(DmlHandler bind, EntityBean bean) throws SQLException;
 
 	/**
 	 * Return the time this plan was created.
 	 */
-	public long getTimeCreated();
+	long getTimeCreated();
 
 	/**
 	 * Return the time this plan was last used.
 	 */
-	public Long getTimeLastUsed();
+	Long getTimeLastUsed();
 
 	/**
 	 * Return the hash key for this plan.
 	 */
-	public Integer getKey();
+	Integer getKey();
 
 	/**
 	 * Return the concurrency mode for this plan.
 	 */
-	public ConcurrencyMode getMode();
+	ConcurrencyMode getMode();
 
 	/**
 	 * Return the update SQL statement.
 	 */
-	public String getSql();
+	String getSql();
 
 	/**
 	 * Return the set of bindable update properties.
 	 */
-	public Bindable getSet();
-
-//	/**
-//	 * Return the properties that where changed and should be included in the
-//	 * update statement.
-//	 */
-//	public Set<String> getProperties();
+	Bindable getSet();
 
 }

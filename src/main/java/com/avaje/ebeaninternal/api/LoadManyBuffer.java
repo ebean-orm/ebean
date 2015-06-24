@@ -13,20 +13,20 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
  */
 public interface LoadManyBuffer {
 
-  public int getBatchSize();
+  int getBatchSize();
 
-  public List<BeanCollection<?>> getBatch();
+  List<BeanCollection<?>> getBatch();
   
-  public BeanPropertyAssocMany<?> getBeanProperty();
+  BeanPropertyAssocMany<?> getBeanProperty();
 
-  public ObjectGraphNode getObjectGraphNode();
+  ObjectGraphNode getObjectGraphNode();
 
-  public BeanDescriptor<?> getBeanDescriptor();
+  BeanDescriptor<?> getBeanDescriptor();
 
-  public PersistenceContext getPersistenceContext();
+  PersistenceContext getPersistenceContext();
 
-  public String getFullPath();
+  String getFullPath();
 
-  public void configureQuery(SpiQuery<?> query);
+  void configureQuery(SpiQuery<?> query);
 
 }

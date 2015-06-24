@@ -20,45 +20,45 @@ public interface SpiTransaction extends Transaction {
   /**
    * End the transaction when had query only use.
    */
-  public void endQueryOnly();
+  void endQueryOnly();
 
   /**
    * Return the string prefix with the transactin id and label used in logging.
    */
-  public String getLogPrefix();
+  String getLogPrefix();
 
   /**
    * Return true if generated SQL and Bind values should be logged to the
    * transaction log.
    */
-  public boolean isLogSql();
+  boolean isLogSql();
 
   /**
    * Return true if summary level events should be logged to the transaction
    * log.
    */
-  public boolean isLogSummary();
+  boolean isLogSummary();
 
   /**
    * Log a message to the SQL logger.
    */
-  public void logSql(String msg);
+  void logSql(String msg);
 
   /**
    * Log a message to the SUMMARY logger.
    */
-  public void logSummary(String msg);
+  void logSummary(String msg);
 
   /**
    * Register a "Derived Relationship" (that requires an additional update).
    */
-  public void registerDerivedRelationship(DerivedRelationshipData assocBean);
+  void registerDerivedRelationship(DerivedRelationshipData assocBean);
 
   /**
    * Return the list of "Derived Relationships" that must be maintained after
    * insert.
    */
-  public List<DerivedRelationshipData> getDerivedRelationship(Object bean);
+  List<DerivedRelationshipData> getDerivedRelationship(Object bean);
 
   /**
    * Add a deleting bean to the registered list.
@@ -66,22 +66,22 @@ public interface SpiTransaction extends Transaction {
    * This is to handle bi-directional relationships where both sides Cascade.
    * </p>
    */
-  public void registerDeleteBean(Integer hash);
+  void registerDeleteBean(Integer hash);
 
   /**
    * Unregister the hash of the bean.
    */
-  public void unregisterDeleteBean(Integer hash);
+  void unregisterDeleteBean(Integer hash);
 
   /**
    * Return true if this is a bean that has already been saved/deleted.
    */
-  public boolean isRegisteredDeleteBean(Integer hash);
+  boolean isRegisteredDeleteBean(Integer hash);
 
   /**
    * Unregister the persisted bean.
    */
-  public void unregisterBean(Object bean);
+  void unregisterBean(Object bean);
 
   /**
    * Return true if this is a bean that has already been persisted in the
@@ -91,13 +91,13 @@ public interface SpiTransaction extends Transaction {
    * This will register the bean if it is not already.
    * </p>
    */
-  public boolean isRegisteredBean(Object bean);
+  boolean isRegisteredBean(Object bean);
 
   /**
    * Returns a String used to identify the transaction. This id is used for
    * Transaction logging.
    */
-  public String getId();
+  String getId();
 
   /**
    * Return the batchSize specifically set for this transaction or 0.
@@ -105,7 +105,7 @@ public interface SpiTransaction extends Transaction {
    * Returning 0 implies to use the system wide default batch size.
    * </p>
    */
-  public int getBatchSize();
+  int getBatchSize();
 
   /**
    * Modify and return the current 'depth' of the transaction.
@@ -119,18 +119,18 @@ public interface SpiTransaction extends Transaction {
    * executed first during save.
    * </p>
    */
-  public int depth(int diff);
+  int depth(int diff);
 
   /**
    * Return the current depth.
    */
-  public int depth();
+  int depth();
 
   /**
    * Return true if this transaction was created explicitly via
    * <code>Ebean.beginTransaction()</code>.
    */
-  public boolean isExplicit();
+  boolean isExplicit();
 
   /**
    * Get the object that holds the event details.
@@ -140,29 +140,29 @@ public interface SpiTransaction extends Transaction {
    * around the cluster (if you have a cluster).
    * </p>
    */
-  public TransactionEvent getEvent();
+  TransactionEvent getEvent();
 
   /**
    * Whether persistCascade is on for save and delete.
    */
-  public boolean isPersistCascade();
+  boolean isPersistCascade();
 
   /**
    * Return true if this request should be batched. Conversely returns false
    * if this request should be executed immediately.
    */
-  public boolean isBatchThisRequest(PersistRequest.Type type);
+  boolean isBatchThisRequest(PersistRequest.Type type);
 
   /**
    * Return the queue used to batch up persist requests.
    */
-  public BatchControl getBatchControl();
+  BatchControl getBatchControl();
 
   /**
    * Set the queue used to batch up persist requests. There should only be one
    * PersistQueue set per transaction.
    */
-  public void setBatchControl(BatchControl control);
+  void setBatchControl(BatchControl control);
 
   /**
    * Return the persistence context associated with this transaction.
@@ -172,7 +172,7 @@ public interface SpiTransaction extends Transaction {
    * behaviour.
    * </p>
    */
-  public PersistenceContext getPersistenceContext();
+  PersistenceContext getPersistenceContext();
 
   /**
    * Set the persistence context to this transaction.
@@ -185,47 +185,46 @@ public interface SpiTransaction extends Transaction {
    * PersistenceContext with multiple transactions.
    * </p>
    */
-  public void setPersistenceContext(PersistenceContext context);
+  void setPersistenceContext(PersistenceContext context);
 
   /**
    * Return the underlying Connection for internal use.
    * <p>
-   * If the connection is made public from Transaction and the user code calls
+   * If the connection is made from Transaction and the user code calls
    * that method we can no longer trust the query only status of a
    * Transaction.
    * </p>
    */
-  public Connection getInternalConnection();
+  Connection getInternalConnection();
 
   /**
    * Return true if the manyToMany intersection should be persisted for this particular relationship direction.
    */
-  public boolean isSaveAssocManyIntersection(String intersectionTable, String beanName);
+  boolean isSaveAssocManyIntersection(String intersectionTable, String beanName);
 
   /**
    * Return true if batch mode got escalated for this request (and associated cascades).
    */
-  public boolean checkBatchEscalationOnCascade(PersistRequestBean<?> request);
+  boolean checkBatchEscalationOnCascade(PersistRequestBean<?> request);
 
   /**
    * If batch mode was turned on for the request then flush the batch.
    */
-  public void flushBatchOnCascade();
+  void flushBatchOnCascade();
 
   /**
    * Mark the transaction explicitly as not being query only.
    */
-  public void markNotQueryOnly();
+  void markNotQueryOnly();
 
   /**
    * Potentially escalate batch mode on saving or deleting a collection.
    */
-  public void checkBatchEscalationOnCollection();
+  void checkBatchEscalationOnCollection();
 
   /**
    * Flush batch if we escalated batch mode on saving or deleting a collection.
    */
-  public void flushBatchOnCollection();
-
+  void flushBatchOnCollection();
 
 }

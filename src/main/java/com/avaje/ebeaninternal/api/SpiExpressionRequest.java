@@ -13,45 +13,45 @@ public interface SpiExpressionRequest {
   /**
    * Parse the logical property name to the deployment name.
    */
-  public String parseDeploy(String logicalProp);
+  String parseDeploy(String logicalProp);
 
 	/**
 	 * Return the bean descriptor for the root type.
 	 */
-	public BeanDescriptor<?> getBeanDescriptor();
+	BeanDescriptor<?> getBeanDescriptor();
 	
 	/**
 	 * Return the associated QueryRequest.
 	 */
-	public SpiOrmQueryRequest<?> getQueryRequest();
+	SpiOrmQueryRequest<?> getQueryRequest();
 	
 	/**
 	 * Append to the expression sql.
 	 */
-	public SpiExpressionRequest append(String sql);
+	SpiExpressionRequest append(String sql);
 	
 	/**
 	 * Add a bind value to this request.
 	 */
-	public void addBindValue(Object bindValue);
+	void addBindValue(Object bindValue);
 	
 	/**
 	 * Return the accumulated expression sql for all expressions in this request.
 	 */
-	public String getSql();
+	String getSql();
 	
 	/**
 	 * Return the ordered list of bind values for all expressions in this request.
 	 */
-	public ArrayList<Object> getBindValues();
+	ArrayList<Object> getBindValues();
 
   /**
    * Increments the parameter index and returns that value.
    */
-  public int nextParameter();
+  int nextParameter();
 
   /**
    * Append a DB Like clause.
    */
-  public void appendLike();
+  void appendLike();
 }

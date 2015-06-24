@@ -10,5 +10,5 @@ public interface SpiBackgroundExecutor extends BackgroundExecutor {
 	/**
 	 * Shutdown any associated thread pools.
 	 */
-	public void shutdown();
+	void shutdown();
 }

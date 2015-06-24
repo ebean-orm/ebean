@@ -7,6 +7,6 @@ public interface SpiExpressionFactory extends ExpressionFactory {
   /**
    * Create another expression factory with a given sub path.
    */
-  public ExpressionFactory createExpressionFactory();
+  ExpressionFactory createExpressionFactory();
 
 }

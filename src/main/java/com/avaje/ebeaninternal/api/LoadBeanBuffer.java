@@ -11,16 +11,16 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
  */
 public interface LoadBeanBuffer {
 
-  public int getBatchSize();
+  int getBatchSize();
 
-  public List<EntityBeanIntercept> getBatch();
+  List<EntityBeanIntercept> getBatch();
   
-  public BeanDescriptor<?> getBeanDescriptor();
+  BeanDescriptor<?> getBeanDescriptor();
 
-  public PersistenceContext getPersistenceContext();
+  PersistenceContext getPersistenceContext();
 
-  public String getFullPath();
+  String getFullPath();
 
-  public void configureQuery(SpiQuery<?> query, String lazyLoadProperty);
+  void configureQuery(SpiQuery<?> query, String lazyLoadProperty);
 
 }

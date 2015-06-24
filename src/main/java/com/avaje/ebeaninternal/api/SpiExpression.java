@@ -16,7 +16,7 @@ public interface SpiExpression extends Expression {
    * Predicates on Many properties require an extra independent join clause.
    * </p>
    */
-	public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins);
+	void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins);
 	
 	/**
 	 * Calculate a hash value used to identify a query for AutoFetch tuning.
@@ -25,7 +25,7 @@ public interface SpiExpression extends Expression {
 	 * from an AutoFetch perspective and get different tuning.
 	 * </p>
 	 */
-	public void queryAutoFetchHash(HashQueryPlanBuilder builder);
+	void queryAutoFetchHash(HashQueryPlanBuilder builder);
 	
 	/**
 	 * Calculate a hash value for the expression.
@@ -36,12 +36,12 @@ public interface SpiExpression extends Expression {
 	 * case the query execution plan can be reused.
 	 * </p>
 	 */
-	public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder);
+	void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder);
 	
 	/**
 	 * Return the hash value for the values that will be bound.
 	 */
-	public int queryBindHash();
+	int queryBindHash();
 	
 	/**
 	 * Add some sql to the query.
@@ -56,7 +56,7 @@ public interface SpiExpression extends Expression {
 	 * @param request
 	 *            the associated request.
 	 */
-	public void addSql(SpiExpressionRequest request);
+	void addSql(SpiExpressionRequest request);
 
 	/**
 	 * Add the parameter values to be set against query. For each ? place holder
@@ -65,5 +65,5 @@ public interface SpiExpression extends Expression {
 	 * @param request
 	 *            the associated request.
 	 */
-	public void addBindValues(SpiExpressionRequest request);
+	void addBindValues(SpiExpressionRequest request);
 }

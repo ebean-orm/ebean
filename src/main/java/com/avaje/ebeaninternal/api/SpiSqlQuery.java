@@ -10,68 +10,68 @@ import com.avaje.ebean.SqlQueryListener;
  */
 public interface SpiSqlQuery extends SqlQuery {
 
-	/**
-	 * Return the named or positioned parameters.
-	 */
-	public BindParams getBindParams();
+  /**
+   * Return the named or positioned parameters.
+   */
+  BindParams getBindParams();
 
-	/**
-	 * return the query.
-	 */
-	public String getQuery();
+  /**
+   * return the query.
+   */
+  String getQuery();
 
-	/**
-	 * Return the queryListener.
-	 */
-	public SqlQueryListener getListener();
-	
-	/**
-	 * Return the first row to fetch.
-	 */
-    public int getFirstRow();
-    
-    /**
-     * Return the maximum number of rows to fetch.
-     */
-	public int getMaxRows();
-	
-	/**
-	 * Return the number of rows after which background fetching occurs.
-	 */
-	public int getBackgroundFetchAfter();
-	
-	/**
-	 * Return the key property for maps.
-	 */
-	public String getMapKey();
-	
-	/**
-	 * Return the query timeout.
-	 */
-	public int getTimeout();
+  /**
+   * Return the queryListener.
+   */
+  SqlQueryListener getListener();
 
-	/**
-	 * Return the hint for Statement.setFetchSize().
-	 */
-	public int getBufferFetchSizeHint();
+  /**
+   * Return the first row to fetch.
+   */
+  int getFirstRow();
 
-	/**
-	 * Return true if this is a future fetch type query.
-	 */
-	public boolean isFutureFetch();
+  /**
+   * Return the maximum number of rows to fetch.
+   */
+  int getMaxRows();
 
-	/**
-	 * Set to true if this is a future fetch type query.
-	 */
-	public void setFutureFetch(boolean futureFetch);
+  /**
+   * Return the number of rows after which background fetching occurs.
+   */
+  int getBackgroundFetchAfter();
 
-	/**
-	 * Set the PreparedStatement for the purposes of supporting cancel.
-	 */
-	public void setPreparedStatement(PreparedStatement pstmt);
-	
-	/**
-	 * Return true if the query has been cancelled.
-	 */
-	public boolean isCancelled();
+  /**
+   * Return the key property for maps.
+   */
+  String getMapKey();
+
+  /**
+   * Return the query timeout.
+   */
+  int getTimeout();
+
+  /**
+   * Return the hint for Statement.setFetchSize().
+   */
+  int getBufferFetchSizeHint();
+
+  /**
+   * Return true if this is a future fetch type query.
+   */
+  boolean isFutureFetch();
+
+  /**
+   * Set to true if this is a future fetch type query.
+   */
+  void setFutureFetch(boolean futureFetch);
+
+  /**
+   * Set the PreparedStatement for the purposes of supporting cancel.
+   */
+  void setPreparedStatement(PreparedStatement pstmt);
+
+  /**
+   * Return true if the query has been cancelled.
+   */
+  boolean isCancelled();
 }
