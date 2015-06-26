@@ -631,7 +631,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   public boolean calculateUseCache(Boolean queryUseCache) {
-    return (queryUseCache != null) ? queryUseCache.booleanValue() : isBeanCaching();
+    return (queryUseCache != null) ? queryUseCache : isBeanCaching();
   }
 
   /**

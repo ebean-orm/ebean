@@ -303,7 +303,7 @@ public final class BeanDescriptorCacheHelp<T> {
     // try looking up into the bean cache using the id
     T cacheBean = beanCacheGetInternal(id, query.isReadOnly());
     if (cacheBean != null) {   
-      setupContext(cacheBean, query, getPersistenceContext(t));
+      setupContext(cacheBean, getPersistenceContext(t));
     }
     return cacheBean;  
   }
@@ -320,7 +320,7 @@ public final class BeanDescriptorCacheHelp<T> {
   }
 
   private boolean isNaturalKeyCaching(Boolean queryUseCache) {
-    return naturalKeyCache != null && (queryUseCache == null || queryUseCache.booleanValue());
+    return naturalKeyCache != null && (queryUseCache == null || queryUseCache);
   }
 
   private boolean isNaturalKey(String propName) {
@@ -332,7 +332,7 @@ public final class BeanDescriptorCacheHelp<T> {
   /**
    * For a bean built from the cache this sets up its persistence context for future lazy loading etc.
    */
-  private void setupContext(Object bean, SpiQuery<T> query, PersistenceContext context) {
+  private void setupContext(Object bean, PersistenceContext context) {
     if (context == null) {
       context = new DefaultPersistenceContext();
     }
@@ -408,7 +408,7 @@ public final class BeanDescriptorCacheHelp<T> {
   public T beanCacheGet(SpiQuery<T> query, PersistenceContext context) {
     T bean = beanCacheGetInternal(query.getId(), query.isReadOnly());
     if (bean != null) {
-      setupContext(bean, query, context);
+      setupContext(bean, context);
     }
     return bean;
   }
