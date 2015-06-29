@@ -10,6 +10,7 @@ public class ServerCacheOptions {
   private int maxSize;
   private int maxIdleSecs;
   private int maxSecsToLive;
+  private int trimFrequency;
 
   /**
    * Construct with no set options.
@@ -25,15 +26,17 @@ public class ServerCacheOptions {
     this.maxSize = cacheTuning.maxSize();
     this.maxIdleSecs = cacheTuning.maxIdleSecs();
     this.maxSecsToLive = cacheTuning.maxSecsToLive();
+    this.trimFrequency = cacheTuning.trimFrequency();
   }
 
   /**
    * Create merging default options with the deployment specified ones.
    */
-  public ServerCacheOptions(ServerCacheOptions d) {
-    this.maxSize = d.getMaxSize();
-    this.maxIdleSecs = d.getMaxIdleSecs();
-    this.maxSecsToLive = d.getMaxIdleSecs();
+  public ServerCacheOptions(ServerCacheOptions defaults) {
+    this.maxSize = defaults.getMaxSize();
+    this.maxIdleSecs = defaults.getMaxIdleSecs();
+    this.maxSecsToLive = defaults.getMaxIdleSecs();
+    this.trimFrequency = defaults.getTrimFrequency();
   }
 
   /**
@@ -50,6 +53,9 @@ public class ServerCacheOptions {
     if (maxSecsToLive == 0) {
       maxSecsToLive = defaults.getMaxSecsToLive();
     }
+    if (trimFrequency == 0) {
+      trimFrequency = defaults.getTrimFrequency();
+    }
   }
 
   /**
@@ -61,7 +67,7 @@ public class ServerCacheOptions {
     copy.maxSize = maxSize;
     copy.maxIdleSecs = maxIdleSecs;
     copy.maxSecsToLive = maxSecsToLive;
-
+    copy.trimFrequency = trimFrequency;
     return copy;
   }
 
@@ -107,4 +113,17 @@ public class ServerCacheOptions {
     this.maxSecsToLive = maxSecsToLive;
   }
 
+  /**
+   * Return the trim frequency in seconds.
+   */
+  public int getTrimFrequency() {
+    return trimFrequency;
+  }
+
+  /**
+   * Set the trim frequency in seconds.
+   */
+  public void setTrimFrequency(int trimFrequency) {
+    this.trimFrequency = trimFrequency;
+  }
 }

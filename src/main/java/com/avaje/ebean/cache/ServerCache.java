@@ -49,12 +49,6 @@ public interface ServerCache {
   Object put(Object id, Object value);
 
   /**
-   * Put the value in the cache but only if a matching value is not already in
-   * the cache.
-   */
-  Object putIfAbsent(Object id, Object value);
-
-  /**
    * Remove a entry from the cache given its id.
    */
   Object remove(Object id);

@@ -219,7 +219,16 @@ public class DefaultContainer implements SpiContainer {
 
     ServerCacheFactory cacheFactory = serverConfig.getServerCacheFactory();
     if (cacheFactory == null) {
-      cacheFactory = new DefaultServerCacheFactory();
+      ServiceLoader<ServerCacheFactory> cacheFactories = ServiceLoader.load(ServerCacheFactory.class);
+      Iterator<ServerCacheFactory> iterator = cacheFactories.iterator();
+      if (iterator.hasNext()) {
+        // use the cacheFactory (via classpath service loader)
+        cacheFactory = iterator.next();
+        logger.debug("using ServerCacheFactory {}", cacheFactory.getClass());
+      } else {
+        // use the built in default
+        cacheFactory = new DefaultServerCacheFactory();
+      }
     }
 
     return new DefaultServerCacheManager(cacheFactory, beanOptions, queryOptions);

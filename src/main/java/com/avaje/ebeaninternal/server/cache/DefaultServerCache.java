@@ -1,22 +1,18 @@
 package com.avaje.ebeaninternal.server.cache;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.cache.ServerCacheStatistics;
+import com.avaje.ebeaninternal.server.util.LongAdder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The default cache implementation.
@@ -27,375 +23,392 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultServerCache implements ServerCache {
 
-	private static final Logger logger = LoggerFactory.getLogger(DefaultServerCache.class);
+  protected static final Logger logger = LoggerFactory.getLogger(DefaultServerCache.class);
 
-	private static final CacheEntryComparator comparator = new CacheEntryComparator();
-		
-	private final ConcurrentHashMap<Object, CacheEntry> map = new ConcurrentHashMap<Object, CacheEntry>();
-
-	private final AtomicInteger missCount = new AtomicInteger();
-	
-	private final AtomicInteger removedHitCount = new AtomicInteger();
-	
-	private final Object monitor = new Object();
-
-	private final String name;
-
-	private int maxSize;
-
-	private long trimFrequency;
-
-	private int maxIdleSecs;
-
-	private int maxSecsToLive;
-
-	public DefaultServerCache(String name, ServerCacheOptions options) {
-		this(name, options.getMaxSize(), options.getMaxIdleSecs(), options.getMaxSecsToLive());
-	}
-
-	public DefaultServerCache(String name, int maxSize, int maxIdleSecs, int maxSecsToLive) {
-		this.name = name;
-		this.maxSize = maxSize;
-		this.maxIdleSecs = maxIdleSecs;
-		this.maxSecsToLive = maxSecsToLive;
-		this.trimFrequency = 60;
-
-	}
-	
-	public void init(EbeanServer server) {
-		
-		TrimTask trim = new TrimTask();
-		
-		BackgroundExecutor executor = server.getBackgroundExecutor();
-		executor.executePeriodically(trim, trimFrequency, TimeUnit.SECONDS);
-	}
-	
-	
-	
-	
-	public ServerCacheStatistics getStatistics(boolean reset) {
-
-		ServerCacheStatistics s = new ServerCacheStatistics();
-		s.setCacheName(name);
-		s.setMaxSize(maxSize);
-
-		// these counters won't necessarily be consistent with
-		// respect to each other as activity can occur while
-		// they are being calculated
-		int mc = reset ? missCount.getAndSet(0) : missCount.get();
-		int hc = getHitCount(reset);
-		int size = size();
-		
-		s.setSize(size);
-		s.setHitCount(hc);
-		s.setMissCount(mc);
-		
-		return s;
-	}
-	
-	public int getHitRatio() {
-
-		int mc = missCount.get();
-		int hc = getHitCount(false);
-		
-		int totalCount = hc + mc;
-		if (totalCount == 0){
-			return 0;
-		} else {
-			return hc * 100 / totalCount;
-		}
-
-	}
-	
-	private int getHitCount(boolean reset) {
-		
-		int hc = reset ? removedHitCount.getAndSet(0) : removedHitCount.get();
-		
-		for (CacheEntry cacheEntry : map.values()) {
-			hc += cacheEntry.getHitCount(reset);
-		}
-		
-		return hc;
-	}
+  /**
+   * Compare by last access time (for LRU eviction).
+   */
+  public static final CompareByLastAccess BY_LAST_ACCESS = new CompareByLastAccess();
 
 
-	public ServerCacheOptions getOptions() {
-		synchronized (monitor) {
-			ServerCacheOptions o = new ServerCacheOptions();
-			o.setMaxIdleSecs(maxIdleSecs);
-			o.setMaxSize(maxSize);
-			o.setMaxSecsToLive(maxSecsToLive);
-			return o;
-		}
-	}
-	
-	public void setOptions(ServerCacheOptions o) {
-		synchronized (monitor) {
-			maxIdleSecs = o.getMaxIdleSecs();
-			maxSize = o.getMaxSize();
-			maxSecsToLive = o.getMaxSecsToLive();
-		}
-	}
-	
-	
-	/**
-	 * Return the max cache size.
-	 */
-	public int getMaxSize() {
-		return maxSize;
-	}
+  /**
+   * The underlying map (ConcurrentHashMap or similar)
+   */
+  protected final Map<Object, CacheEntry> map;
 
-	/**
-	 * Set the max cache size.
-	 */
-	public void setMaxSize(int maxSize) {
-		synchronized (monitor) {
-			this.maxSize = maxSize;
-		}
-	}
+  // LongAdder is a highly concurrent low latency counter (back ported from Java8)
+  protected final LongAdder missCount = new LongAdder();
+  protected final LongAdder hitCount = new LongAdder();
+  protected final LongAdder insertCount = new LongAdder();
+  protected final LongAdder updateCount = new LongAdder();
+  protected final LongAdder removeCount = new LongAdder();
+  protected final LongAdder clearCount = new LongAdder();
 
-	/**
-	 * Return the max idle time.
-	 */
-	public long getMaxIdleSecs() {
-		return maxIdleSecs;
-	}
+  protected final LongAdder evictByIdle = new LongAdder();
+  protected final LongAdder evictByTTL = new LongAdder();
+  protected final LongAdder evictByLRU = new LongAdder();
+  protected final LongAdder evictCount = new LongAdder();
+  protected final LongAdder evictMicros = new LongAdder();
 
-	/**
-	 * Set the max idle time.
-	 */
-	public void setMaxIdleSecs(int maxIdleSecs) {
-		synchronized (monitor) {
-			this.maxIdleSecs = maxIdleSecs;
-		}
-	}
+  protected final Object monitor = new Object();
 
-	/**
-	 * Return the maximum time to live.
-	 */
-	public long getMaxSecsToLive() {
-		return maxSecsToLive;
-	}
+  protected final String name;
 
-	/**
-	 * Set the maximum time to live.
-	 */
-	public void setMaxSecsToLive(int maxSecsToLive) {
-		synchronized (monitor) {
-			this.maxSecsToLive = maxSecsToLive;
-		}
-	}
-	
-	/**
-	 * Return the name of the cache.
-	 */
-	public String getName() {
-		return name;
-	}
+  protected int maxSize;
 
-	/**
-	 * Clear the cache.
-	 */
-	public void clear() {
-		map.clear();
-	}
+  protected int trimFrequency;
 
-	/**
-	 * Return a value from the cache.
-	 */
-	public Object get(Object key) {
-		
-		CacheEntry entry = map.get(key);
-		
-		if (entry == null){
-			missCount.incrementAndGet();
-			return null;
-			
-		} else {
-			// get value incrementing last 
-			// access time and hitCount
-			return entry.getValue();
-		}
-	}
+  protected int maxIdleSecs;
 
-	/**
-	 * Put a value into the cache.
-	 */
-	public Object put(Object key, Object value) {
-		// put new entry with create time
-		CacheEntry entry = map.put(key, new CacheEntry(key, value));
-		if (entry == null){
-			return null;
-		} else {
-			int removedHits = entry.getHitCount(true);
-			removedHitCount.addAndGet(removedHits);
-			return entry.getValue();
-		}
-	}
+  protected int maxSecsToLive;
 
-	/**
-	 * Put a value into the cache but only if absent.
-	 */
-	public Object putIfAbsent(Object key, Object value) {
-		CacheEntry entry = map.putIfAbsent(key, new CacheEntry(key, value));
-		if (entry == null){
-			return null;
-		} else {
-			return entry.getValue();
-		}
-	}
+  /**
+   * Construct using a ConcurrentHashMap and cache options.
+   */
+  public DefaultServerCache(String name, ServerCacheOptions options) {
+    this(name, new ConcurrentHashMap<Object, CacheEntry>(), options);
+  }
 
-	/**
-	 * Remove an entry from the cache.
-	 */
-	public Object remove(Object key) {
-		CacheEntry entry = map.remove(key);
-		if (entry == null){
-			return null;
-		} else {
-			int removedHits = entry.getHitCount(true);
-			removedHitCount.addAndGet(removedHits);
-			return entry.getValue();
-		}
-	}
+  /**
+   * Construct passing in name, map and base eviction controls as ServerCacheOptions.
+   */
+  public DefaultServerCache(String name, Map<Object, CacheEntry> map, ServerCacheOptions options) {
+    this(name, map, options.getMaxSize(), options.getMaxIdleSecs(), options.getMaxSecsToLive(), options.getTrimFrequency());
+  }
 
-	/**
-	 * Return the number of elements in the cache.
-	 */
-	public int size() {
-		return map.size();
-	}
+  /**
+   * Construct passing in name, map and base eviction controls.
+   */
+  public DefaultServerCache(String name, Map<Object, CacheEntry> map, int maxSize, int maxIdleSecs, int maxSecsToLive, int trimFrequency) {
+    this.name = name;
+    this.map = map;
+    this.maxSize = maxSize;
+    this.maxIdleSecs = maxIdleSecs;
+    this.maxSecsToLive = maxSecsToLive;
+    this.trimFrequency = trimFrequency;
+  }
 
-	/**
-	 * The task used to periodically trim the cache.
-	 */
-	private class TrimTask implements Runnable {
+  @Override
+  public void init(EbeanServer server) {
 
-		public void run() {
+    EvictionRunnable trim = new EvictionRunnable();
 
-			long startTime = System.currentTimeMillis();
-			
-			if (logger.isTraceEnabled()){
-				logger.trace("trimming cache " + name);
-			}
-			
-			int trimmedByIdle = 0;
-			int trimmedByTTL = 0;
-			int trimmedByLRU = 0;
+    // default to trimming the cache every 60 seconds
+    long trimFreqSecs = (trimFrequency == 0) ? 60 : trimFrequency;
 
-			boolean trimMaxSize = maxSize > 0 && maxSize < size();
+    BackgroundExecutor executor = server.getBackgroundExecutor();
+    executor.executePeriodically(trim, trimFreqSecs, TimeUnit.SECONDS);
+  }
 
-			ArrayList<CacheEntry> activeList = new ArrayList<CacheEntry>();
+  @Override
+  public ServerCacheStatistics getStatistics(boolean reset) {
 
-			long idleExpire = System.currentTimeMillis() - (maxIdleSecs*1000);
-			long ttlExpire = System.currentTimeMillis() - (maxSecsToLive*1000);
+    ServerCacheStatistics cacheStats = new ServerCacheStatistics();
+    cacheStats.setCacheName(name);
+    cacheStats.setMaxSize(maxSize);
 
-			Iterator<CacheEntry> it = map.values().iterator();
-			while (it.hasNext()) {
-				CacheEntry cacheEntry = it.next();
-				if (maxIdleSecs > 0 && idleExpire > cacheEntry.getLastAccessTime()) {
-					it.remove();
-					trimmedByIdle++;
+    // these counters won't necessarily be consistent with
+    // respect to each other as activity can occur while
+    // they are being calculated here but they should be good enough
+    // and we don't want to reduce concurrent use to make them consistent
+    long clear = reset ? clearCount.sumThenReset() : clearCount.sum();
+    long remove = reset ? removeCount.sumThenReset() : removeCount.sum();
+    long update = reset ? updateCount.sumThenReset() : updateCount.sum();
+    long insert = reset ? insertCount.sumThenReset() : insertCount.sum();
+    long miss = reset ? missCount.sumThenReset() : missCount.sum();
+    long hit = reset ? hitCount.sumThenReset() : hitCount.sum();
 
-				} else if (maxSecsToLive > 0 && ttlExpire > cacheEntry.getCreateTime()) {
-					it.remove();
-					trimmedByTTL++;
+    long evict = reset ? evictCount.sumThenReset() : evictCount.sum();
+    long evictTime = reset ? evictMicros.sumThenReset() : evictMicros.sum();
+    long evictIdle = reset ? evictByIdle.sumThenReset() : evictByIdle.sum();
+    long evictTTL = reset ? evictByTTL.sumThenReset() : evictByTTL.sum();
+    long evictLRU = reset ? evictByLRU.sumThenReset() : evictByLRU.sum();
 
-				} else if (trimMaxSize) {
-					activeList.add(cacheEntry);
-				}
-			}
+    int size = size();
 
-			if (trimMaxSize) {
-				trimmedByLRU = activeList.size() - maxSize;
+    cacheStats.setSize(size);
+    cacheStats.setHitCount(hit);
+    cacheStats.setMissCount(miss);
+    cacheStats.setInsertCount(insert);
+    cacheStats.setUpdateCount(update);
+    cacheStats.setRemoveCount(remove);
+    cacheStats.setClearCount(clear);
 
-				if (trimmedByLRU > 0) {
-					// sort into last access time ascending
-					Collections.sort(activeList, comparator);
-					for (int i = maxSize; i < activeList.size(); i++) {
-						// remove if still in the cache
-						map.remove(activeList.get(i).getKey());
-					}
-				}
-			}
-			
-			long exeTime = System.currentTimeMillis() - startTime;
-			
-			if (logger.isDebugEnabled()){
-				logger.debug("Executed trim of cache " + name + " in ["+exeTime
-					+"]millis  idle[" + trimmedByIdle + "] timeToLive[" 
-					+ trimmedByTTL + "] accessTime["
-					+ trimmedByLRU + "]");
-			}
+    cacheStats.setEvictionRunCount(evict);
+    cacheStats.setEvictionRunMicros(evictTime);
+    cacheStats.setEvictByIdle(evictIdle);
+    cacheStats.setEvictByTTL(evictTTL);
+    cacheStats.setEvictByLRU(evictLRU);
 
-		}
+    return cacheStats;
+  }
 
-	}
+  @Override
+  public int getHitRatio() {
 
-	/**
-	 * Comparator for sorting by last access time.
-	 */
-	private static class CacheEntryComparator implements Comparator<CacheEntry>, Serializable {
+    long mc = missCount.sum();
+    long hc = hitCount.sum();
 
-		private static final long serialVersionUID = 1L;
+    long totalCount = hc + mc;
+    if (totalCount == 0) {
+      return 0;
+    } else {
+      return (int) (hc * 100 / totalCount);
+    }
+  }
 
-		public int compare(CacheEntry o1, CacheEntry o2) {
-			
-			return o1.getLastAccessLong().compareTo(o2.getLastAccessLong());
-		}
-	}
-	
-	/**
-	 * Wraps the values to additionally hold createTime and lastAccessTime.
-	 */
-	public static class CacheEntry {
+  /**
+   * Return the options controlling the cache.
+   */
+  @Override
+  public ServerCacheOptions getOptions() {
+    synchronized (monitor) {
+      ServerCacheOptions options = new ServerCacheOptions();
+      options.setMaxIdleSecs(maxIdleSecs);
+      options.setMaxSize(maxSize);
+      options.setMaxSecsToLive(maxSecsToLive);
+      options.setTrimFrequency(trimFrequency);
+      return options;
+    }
+  }
 
-		private final Object key;
-		private final Object value;
-		private final long createTime;
-		private final AtomicInteger hitCount = new AtomicInteger();
-		private Long lastAccessTime;
+  /**
+   * Set the options controlling the cache
+   */
+  @Override
+  public void setOptions(ServerCacheOptions options) {
+    synchronized (monitor) {
+      maxIdleSecs = options.getMaxIdleSecs();
+      maxSize = options.getMaxSize();
+      maxSecsToLive = options.getMaxSecsToLive();
+    }
+  }
 
-		public CacheEntry(Object key, Object value) {
-			this.key = key;
-			this.value = value;
-			this.createTime = System.currentTimeMillis();
-			this.lastAccessTime = Long.valueOf(createTime);
-		}
+  /**
+   * Return the name of the cache.
+   */
+  public String getName() {
+    return name;
+  }
 
-		public Object getKey() {
-			return key;
-		}
+  /**
+   * Clear the cache.
+   */
+  @Override
+  public void clear() {
+    clearCount.increment();
+    map.clear();
+  }
 
-		public Object getValue() {
-			// object assignment is atomic
-			hitCount.incrementAndGet();
-			this.lastAccessTime = Long.valueOf(System.currentTimeMillis());
-			return value;
-		}
+  /**
+   * Return a value from the cache.
+   */
+  @Override
+  public Object get(Object key) {
 
-		public long getCreateTime() {
-			return createTime;
-		}
+    CacheEntry entry = map.get(key);
+    if (entry == null) {
+      missCount.increment();
+      return null;
 
-		public long getLastAccessTime() {
-			return lastAccessTime.longValue();
-		}
+    } else {
+      // Important that hitCount.increment() MUST be low latency under concurrent
+      // use hence must use LongAdder or better here
+      hitCount.increment();
+      return entry.getValue();
+    }
+  }
 
-		public Long getLastAccessLong() {
-			return lastAccessTime;
-		}
+  /**
+   * Put a value into the cache.
+   */
+  @Override
+  public Object put(Object key, Object value) {
+    CacheEntry entry = map.put(key, new CacheEntry(key, value));
+    if (entry == null) {
+      insertCount.increment();
+      return null;
+    } else {
+      updateCount.increment();
+      return entry.getValue();
+    }
+  }
 
-		public int getHitCount(boolean reset) {
-			if (reset){
-				return hitCount.getAndSet(0);
+  /**
+   * Remove an entry from the cache.
+   */
+  @Override
+  public Object remove(Object key) {
+    CacheEntry entry = map.remove(key);
+    if (entry == null) {
+      return null;
+    } else {
+      removeCount.increment();
+      return entry.getValue();
+    }
+  }
 
-			} else {
-				return hitCount.get();				
-			}
-		}
-		public int getHitCount() {
-			return hitCount.get();
-		}
-	}
+  /**
+   * Return the number of elements in the cache.
+   */
+  @Override
+  public int size() {
+    return map.size();
+  }
+
+  /**
+   * Return the size to trim to based on the max size.
+   * <p>
+   * This returns 90% of the max size.
+   * </p>
+   */
+  protected int getTrimSize() {
+    return (maxSize * 90 / 100);
+  }
+
+  /**
+   * Run the eviction based on Idle time, Time to live and LRU last access.
+   */
+  public void runEviction() {
+
+    long trimForMaxSize;
+    if (maxSize == 0) {
+      trimForMaxSize = 0;
+    } else {
+      trimForMaxSize = size() - maxSize;
+    }
+
+    if (maxIdleSecs == 0 && maxSecsToLive == 0 && trimForMaxSize < 0) {
+      // nothing to trim on this cache
+      return;
+    }
+
+    long startNanos = System.nanoTime();
+
+    long trimmedByIdle = 0;
+    long trimmedByTTL = 0;
+    long trimmedByLRU = 0;
+
+    ArrayList<CacheEntry> activeList = new ArrayList<CacheEntry>();
+
+    long idleExpire = System.currentTimeMillis() - (maxIdleSecs * 1000);
+    long ttlExpire = System.currentTimeMillis() - (maxSecsToLive * 1000);
+
+    Iterator<CacheEntry> it = map.values().iterator();
+    while (it.hasNext()) {
+      CacheEntry cacheEntry = it.next();
+      if (maxIdleSecs > 0 && idleExpire > cacheEntry.getLastAccessTime()) {
+        it.remove();
+        trimmedByIdle++;
+
+      } else if (maxSecsToLive > 0 && ttlExpire > cacheEntry.getCreateTime()) {
+        it.remove();
+        trimmedByTTL++;
+
+      } else if (trimForMaxSize > 0) {
+        activeList.add(cacheEntry);
+      }
+    }
+
+    if (trimForMaxSize > 0) {
+      trimmedByLRU = activeList.size() - maxSize;
+      if (trimmedByLRU > 0) {
+        // sort into last access time ascending
+        Collections.sort(activeList, BY_LAST_ACCESS);
+        int trimSize = getTrimSize();
+        for (int i = trimSize; i < activeList.size(); i++) {
+          // remove if still in the cache
+          map.remove(activeList.get(i).getKey());
+        }
+      }
+    }
+
+    long exeNanos = System.nanoTime() - startNanos;
+    long exeMicros = TimeUnit.MICROSECONDS.convert(exeNanos, TimeUnit.NANOSECONDS);
+
+    // increment the eviction statistics
+    evictMicros.add(exeMicros);
+    evictCount.increment();
+    evictByIdle.add(trimmedByIdle);
+    evictByTTL.add(trimmedByTTL);
+    evictByLRU.add(trimmedByLRU);
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}]"
+          , name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU);
+    }
+  }
+
+  /**
+   * Runnable that calls the eviction routine.
+   */
+  public class EvictionRunnable implements Runnable {
+
+    @Override
+    public void run() {
+      runEviction();
+    }
+  }
+
+  /**
+   * Comparator for sorting by last access time.
+   */
+  public static class CompareByLastAccess implements Comparator<CacheEntry>, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public int compare(CacheEntry entry1, CacheEntry entry2) {
+      return Long.compare(entry1.getLastAccessTime(), entry2.getLastAccessTime());
+    }
+  }
+
+  /**
+   * Wraps the value to additionally hold createTime and lastAccessTime and hit counter.
+   */
+  public static class CacheEntry {
+
+    private final Object key;
+    private final Object value;
+    private final long createTime;
+    private long lastAccessTime;
+
+    public CacheEntry(Object key, Object value) {
+      this.key = key;
+      this.value = value;
+      this.createTime = System.currentTimeMillis();
+      this.lastAccessTime = createTime;
+    }
+
+    /**
+     * Return the entry key.
+     */
+    public Object getKey() {
+      return key;
+    }
+
+    /**
+     * Return the entry value.
+     */
+    public Object getValue() {
+      // long assignment should be atomic these days (Ref Cliff Click)
+      lastAccessTime = System.currentTimeMillis();
+      return value;
+    }
+
+    /**
+     * Return the time the entry was created.
+     */
+    public long getCreateTime() {
+      return createTime;
+    }
+
+    /**
+     * Return the time the entry was last accessed.
+     */
+    public long getLastAccessTime() {
+      return lastAccessTime;
+    }
+
+  }
+
 }

@@ -44,4 +44,12 @@ public @interface CacheTuning {
    * </p>
    */
   int maxSecsToLive() default 0;
+
+  /**
+   * The frequency (in seconds) that cache trimming should occur.
+   * <p>
+   * This is a hint for cache implementations that use background cache trimming.
+   * </p>
+   */
+  int trimFrequency() default 0;
 }

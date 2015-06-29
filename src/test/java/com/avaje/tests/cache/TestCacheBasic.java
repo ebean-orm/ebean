@@ -28,7 +28,7 @@ public class TestCacheBasic extends BaseTestCase {
 
     Country c0 = Ebean.getReference(Country.class, "NZ");
     ServerCacheStatistics statistics = countryCache.getStatistics(false);
-    int hc = statistics.getHitCount();
+    long hc = statistics.getHitCount();
     Assert.assertEquals(1, hc);
     Assert.assertNotNull(c0);
 
