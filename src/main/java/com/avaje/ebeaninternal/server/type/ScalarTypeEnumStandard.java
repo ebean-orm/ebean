@@ -66,7 +66,7 @@ public class ScalarTypeEnumStandard {
       Object[] ea = enumType.getEnumConstants();
       for (int i = 0; i < ea.length; i++) {
         Enum<?> e = (Enum<?>) ea[i];
-        maxLen = Math.max(maxLen, e.toString().length());
+        maxLen = Math.max(maxLen, e.name().length());
       }
 
       return maxLen;
