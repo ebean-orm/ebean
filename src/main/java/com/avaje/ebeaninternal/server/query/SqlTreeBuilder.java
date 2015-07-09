@@ -66,15 +66,21 @@ public class SqlTreeBuilder {
 
   private final boolean rawSql;
 
+  /**
+   * rawNoId true if the RawSql does not include the @Id property
+   */
+  private final boolean rawNoId;
+
   private SqlTreeNode rootNode;
 
   /**
    * Construct for RawSql query.
    */
-  public SqlTreeBuilder(OrmQueryRequest<?> request, CQueryPredicates predicates, OrmQueryDetail queryDetail) {
+  public SqlTreeBuilder(OrmQueryRequest<?> request, CQueryPredicates predicates, OrmQueryDetail queryDetail, boolean rawNoId) {
 
     this.rawSql = true;
     this.desc = request.getBeanDescriptor();
+    this.rawNoId = rawNoId;
     this.query = null;
     this.subQuery = false;
     this.queryDetail = queryDetail;
@@ -95,6 +101,7 @@ public class SqlTreeBuilder {
       OrmQueryRequest<?> request, CQueryPredicates predicates) {
 
     this.rawSql = false;
+    this.rawNoId = false;
     this.desc = request.getBeanDescriptor();
     this.query = request.getQuery();
 
@@ -257,7 +264,7 @@ public class SqlTreeBuilder {
 
       // Optional many property for lazy loading query
       BeanPropertyAssocMany<?> lazyLoadMany = (query == null) ? null : query.getLazyLoadForParentsProperty();
-      boolean withId = !subQuery && (query == null || !query.isDistinct());
+      boolean withId = !rawNoId && !subQuery && (query == null || !query.isDistinct());
       return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany);
 
     } else if (prop instanceof BeanPropertyAssocMany<?>) {

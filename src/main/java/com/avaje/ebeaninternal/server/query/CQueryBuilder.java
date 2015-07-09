@@ -265,7 +265,7 @@ public class CQueryBuilder implements Constants {
             propertyName = SplitName.parent(propertyName);
           } else if (beanProperty instanceof BeanPropertyAssocOne<?>) {
             String msg = "Column [" + column.getDbColumn() + "] mapped to complex Property[" + propertyName + "]";
-            msg += ". It should be mapped to a simple property (proably the Id property). ";
+            msg += ". It should be mapped to a simple property (probably the Id property). ";
             throw new PersistenceException(msg);
           }
           if (propertyName != null) {
@@ -284,8 +284,16 @@ public class CQueryBuilder implements Constants {
       detail.getChunk(path, true).setDefaultProperties(null, props);
     }
 
+    // check if @Id property included in RawSql
+    boolean rawNoId = true;
+    BeanProperty idProperty = descriptor.getIdProperty();
+    if (idProperty != null && columnMapping.contains(idProperty.getName())) {
+      // contains the @Id property for the root level bean
+      rawNoId = false;
+    }
+
     // build SqlTree based on OrmQueryDetail of the RawSql
-    return new SqlTreeBuilder(request, predicates, detail).build();
+    return new SqlTreeBuilder(request, predicates, detail, rawNoId).build();
   }
 
   private SqlLimitResponse buildSql(String selectClause, OrmQueryRequest<?> request, CQueryPredicates predicates, SqlTree select) {

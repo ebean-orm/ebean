@@ -481,6 +481,13 @@ public final class RawSql implements Serializable {
     }
 
     /**
+     * Return true if the property is mapped.
+     */
+    public boolean contains(String property) {
+      return this.propertyColumnMap.containsKey(property);
+    }
+
+    /**
      * Creates an immutable copy of this ColumnMapping.
      * 
      * @throws IllegalStateException

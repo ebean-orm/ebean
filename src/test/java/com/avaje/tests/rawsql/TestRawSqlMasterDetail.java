@@ -4,12 +4,17 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
+import com.avaje.tests.model.basic.EBasic;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class TestRawSqlMasterDetail extends BaseTestCase {
 
@@ -77,6 +82,48 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
 
   }
 
+  @Test
+  public void testWithNoIdPropertyWithInsert() {
+
+    EBasic basic = new EBasic();
+    basic.setName("RawSql-NoIdTest");
+    basic.setStatus(EBasic.Status.ACTIVE);
+
+    Ebean.save(basic);
+
+    String rs = "select b.status, b.name from e_basic b ";
+
+    RawSql rawSql = RawSqlBuilder.parse(rs).create();
+
+    List<EBasic> list = Ebean.find(EBasic.class)
+        .setRawSql(rawSql)
+        .where().eq("name", "RawSql-NoIdTest")
+        .findList();
+
+    assertEquals(1, list.size());
+    EBasic basic1 = list.get(0);
+    basic1.setDescription("insertAfterRawFetch");
+
+    Ebean.insert(basic1);
+  }
+
+  @Test
+  public void testWithNoIdProperty() {
+
+    ResetBasicData.reset();
+
+    String rs = "select o.status, o.order_date from o_order o ";
+
+    RawSql rawSql = RawSqlBuilder.parse(rs)
+        .create();
+
+    List<Order> ordersFromRaw = Ebean.find(Order.class)
+        .setRawSql(rawSql)
+        .findList();
+
+    assertNotNull(ordersFromRaw);
+    assertFalse(ordersFromRaw.isEmpty());
+  }
 
   @Test
   public void testWithMultipleManys() {
