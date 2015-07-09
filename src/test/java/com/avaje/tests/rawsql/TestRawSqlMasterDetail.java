@@ -104,7 +104,7 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
     EBasic basic1 = list.get(0);
     basic1.setDescription("insertAfterRawFetch");
 
-    Ebean.insert(basic1);
+    Ebean.save(basic1);
   }
 
   @Test

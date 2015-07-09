@@ -276,7 +276,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       if (Mode.LAZYLOAD_BEAN.equals(queryMode)) {
         // Lazy Load does not reset the dirty state
         ebi.setLoadedLazy();
-      } else {
+      } else if (readId) {
         // normal bean loading
         ebi.setLoaded();
       }
