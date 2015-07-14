@@ -1,15 +1,15 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The purpose is to add an extra join to the query.
@@ -35,7 +35,8 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
     this.manyJoin = assocBeanProperty instanceof BeanPropertyAssocMany<?>;
   }
 
-  public void buildSelectExpressionChain(List<String> selectChain) {
+  @Override
+  public void buildRawSqlSelectChain(List<String> selectChain) {
     // nothing to add
   }
 
@@ -48,7 +49,6 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
   public boolean isManyJoin() {
     return manyJoin;
   }
-
 
   public String getName() {
     return prefix;

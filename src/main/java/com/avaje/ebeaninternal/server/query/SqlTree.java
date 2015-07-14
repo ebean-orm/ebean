@@ -1,12 +1,12 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Represents the SELECT clause part of the SQL query.
@@ -83,9 +83,9 @@ public class SqlTree {
   /**
    * Build a select expression chain for RawSql.
    */
-  public List<String> buildSelectExpressionChain() {
+  public List<String> buildRawSqlSelectChain() {
     ArrayList<String> list = new ArrayList<String>();
-    rootNode.buildSelectExpressionChain(list);
+    rootNode.buildRawSqlSelectChain(list);
     return list;
   }
 

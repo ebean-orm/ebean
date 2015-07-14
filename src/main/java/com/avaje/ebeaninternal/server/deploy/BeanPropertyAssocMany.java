@@ -225,7 +225,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return createElPropertyValue(propName, remainder, chain, propertyDeploy);
   }
 
-  public void buildSelectExpressionChain(String prefix, List<String> selectChain) {
+  @Override
+  public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
     // do not add to the selectChain at the top level of the Many bean
   }
 

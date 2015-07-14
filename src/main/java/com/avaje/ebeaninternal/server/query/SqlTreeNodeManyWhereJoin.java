@@ -1,9 +1,5 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -11,6 +7,9 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
+
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Join to Many (or child of a many) to support where clause predicates on many properties.
@@ -76,7 +75,7 @@ public class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
     }
   }
 
-  public void buildSelectExpressionChain(List<String> selectChain) {
+  public void buildRawSqlSelectChain(List<String> selectChain) {
     // nothing to add
   }
 

@@ -1,19 +1,18 @@
 package com.avaje.ebeaninternal.server.deploy.id;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-
 import com.avaje.ebean.bean.EntityBean;
-
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 import com.avaje.ebeaninternal.server.type.DataBind;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Binds id values to prepared statements.
@@ -135,7 +134,7 @@ public interface IdBinder {
    */
   public String getIdInValueExprDelete(int size);
 
-  public void buildSelectExpressionChain(String prefix, List<String> selectChain);
+  public void buildRawSqlSelectChain(String prefix, List<String> selectChain);
 
   /**
    * Read the id value from the result set and set it to the bean also returning

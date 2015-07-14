@@ -1,11 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.id;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
@@ -16,6 +10,12 @@ import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.type.DataBind;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Bind an Id that is an Embedded bean.
@@ -115,12 +115,12 @@ public final class IdBinderEmbedded implements IdBinder {
     return embIdProperty.getName();
   }
 
-  public void buildSelectExpressionChain(String prefix, List<String> selectChain) {
+  public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
 
     prefix = SplitName.add(prefix, embIdProperty.getName());
 
     for (int i = 0; i < props.length; i++) {
-      props[i].buildSelectExpressionChain(prefix, selectChain);
+      props[i].buildRawSqlSelectChain(prefix, selectChain);
     }
   }
 

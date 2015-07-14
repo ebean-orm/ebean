@@ -1,13 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.id;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-
 import com.avaje.ebean.bean.EntityBean;
-
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.core.InternString;
@@ -16,6 +9,12 @@ import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Bind an Id where the Id is made of a single property (not embedded).
@@ -59,9 +58,9 @@ public final class IdBinderSimple implements IdBinder {
     return sb.toString();
   }
     
-  public void buildSelectExpressionChain(String prefix, List<String> selectChain) {
+  public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
     
-    idProperty.buildSelectExpressionChain(prefix, selectChain);
+    idProperty.buildRawSqlSelectChain(prefix, selectChain);
   }
 
   /**

@@ -533,7 +533,7 @@ public class BeanProperty implements ElPropertyValue {
     sqlBeanLoad.load(this);
   }
 
-  public void buildSelectExpressionChain(String prefix, List<String> selectChain) {
+  public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
     if (prefix == null) {
       selectChain.add(name);
     } else {

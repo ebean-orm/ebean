@@ -1,13 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlUpdate;
@@ -27,6 +19,13 @@ import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
 import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
+
+import javax.persistence.PersistenceException;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Property mapped to a joined bean.
@@ -273,17 +272,27 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         return embeddedProps;
     }
 
-    public void buildSelectExpressionChain(String prefix, List<String> selectChain) {
+    @Override
+    public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
 
         prefix = SplitName.add(prefix, name);
 
         if (!embedded){
-            targetIdBinder.buildSelectExpressionChain(prefix, selectChain);
-            
+            InheritInfo inheritInfo = targetDescriptor.getInheritInfo();
+            if (inheritInfo != null) {
+              // expect the discriminator column to be included in order
+              // to determine the inheritance type so we add it to the
+              // selectChain (so that it takes a position in the resultSet)
+              String discriminatorColumn = inheritInfo.getDiscriminatorColumn();
+              String discProperty = prefix + "." + discriminatorColumn;
+              selectChain.add(discProperty);
+            }
+            targetIdBinder.buildRawSqlSelectChain(prefix, selectChain);
+
         } else {
             for (int i = 0; i < embeddedProps.length; i++) {
-                embeddedProps[i].buildSelectExpressionChain(prefix, selectChain);
-            }       
+                embeddedProps[i].buildRawSqlSelectChain(prefix, selectChain);
+            }
         }
     }
 

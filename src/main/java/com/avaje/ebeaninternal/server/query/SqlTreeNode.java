@@ -1,17 +1,20 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
+
+import java.sql.SQLException;
+import java.util.List;
 
 public interface SqlTreeNode {
 
   String COMMA = ", ";
 
-  void buildSelectExpressionChain(List<String> selectChain);
+  /**
+   * Build the select chain for a RawSql query.
+   */
+  void buildRawSqlSelectChain(List<String> selectChain);
 
   /**
    * Append the required column information to the SELECT part of the sql

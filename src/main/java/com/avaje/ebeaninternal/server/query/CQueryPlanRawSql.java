@@ -31,9 +31,11 @@ public class CQueryPlanRawSql extends CQueryPlan {
 
   private int[] createIndexPositions(OrmQueryRequest<?> request, SqlTree sqlTree) {
 
-    List<String> chain = sqlTree.buildSelectExpressionChain();
+    List<String> chain = sqlTree.buildRawSqlSelectChain();
     ColumnMapping columnMapping = request.getQuery().getRawSql().getColumnMapping();
 
+    // if the top level bean has inheritance expect first column
+    // to be the discriminator type column (and use offset 1)
     InheritInfo inheritInfo = request.getBeanDescriptor().getInheritInfo();
     boolean addDiscriminator = inheritInfo != null;
     int offset = addDiscriminator ? 1 : 0;
@@ -43,10 +45,23 @@ public class CQueryPlanRawSql extends CQueryPlan {
       // discriminator column must always be first in the query
       indexPositions[0] = 1;
     }
+
+    // set the resultSet index positions for the property expressions
     for (int i = 0; i < chain.size(); i++) {
       String expr = chain.get(i);
       int indexPos = 1 + columnMapping.getIndexPosition(expr);
       indexPositions[i + offset] = indexPos;
+    }
+
+    // check and handle the case where a discriminator column for
+    // an associated bean is in the raw SQL but is mapped columnIgnore
+    for (int i = 0; i <indexPositions.length ; i++) {
+      if (indexPositions[i] == 0) {
+        if (i < indexPositions.length) {
+          // expect discriminator column to immediately proceed id column
+          indexPositions[i] = indexPositions[i+1] - 1;
+        }
+      }
     }
 
     return indexPositions;
