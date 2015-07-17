@@ -152,7 +152,7 @@ public abstract class Model {
    * }</pre>
    */
   public static EbeanServer db() {
-    return Ebean.getServer(null);
+    return Ebean.getDefaultServer();
   }
 
   /**
@@ -451,8 +451,8 @@ public abstract class Model {
      * Construct passing the class literal type of the entity type.
      */
     protected Find(String serverName, Class<T> type) {
-      this.type = type;
       this.serverName = serverName;
+      this.type = type;
     }
 
     /**

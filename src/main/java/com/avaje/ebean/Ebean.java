@@ -254,10 +254,20 @@ public final class Ebean {
    * }</pre>
    * 
    * @param name
-   *          the name of the server, use null for the 'default server'
+   *          the name of the server, can use null for the 'default server'
    */
   public static EbeanServer getServer(String name) {
     return serverMgr.get(name);
+  }
+
+  /**
+   * Returns the default EbeanServer.
+   * <p>
+   * This is equivalent to <code>Ebean.getServer(null);</code>
+   * </p>
+   */
+  public static EbeanServer getDefaultServer() {
+    return getServer(null);
   }
 
   /**
