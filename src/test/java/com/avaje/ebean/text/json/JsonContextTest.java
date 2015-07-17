@@ -18,7 +18,7 @@ public class JsonContextTest {
   @Test
   public void testIsSupportedType() throws Exception {
 
-    EbeanServer server = Ebean.getServer(null);
+    EbeanServer server = Ebean.getDefaultServer();
 
     JsonContext json = server.json();
     assertTrue(json.isSupportedType(Customer.class));
@@ -28,7 +28,7 @@ public class JsonContextTest {
   @Test
   public void test_toObject() throws Exception {
 
-    EbeanServer server = Ebean.getServer(null);
+    EbeanServer server = Ebean.getDefaultServer();
 
     JsonContext json = server.json();
 
@@ -115,7 +115,7 @@ public class JsonContextTest {
   @Test
   public void testCreateGenerator() throws Exception {
 
-    EbeanServer server = Ebean.getServer(null);
+    EbeanServer server = Ebean.getDefaultServer();
 
     StringWriter writer = new StringWriter();
     JsonContext json = server.json();
@@ -142,7 +142,7 @@ public class JsonContextTest {
   @Test
   public void testCreateGenerator_writeRaw() throws Exception {
 
-    EbeanServer server = Ebean.getServer(null);
+    EbeanServer server = Ebean.getDefaultServer();
 
     StringWriter writer = new StringWriter();
     JsonContext json = server.json();
