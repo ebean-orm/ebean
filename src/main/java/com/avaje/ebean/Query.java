@@ -483,7 +483,7 @@ public interface Query<T> extends Serializable {
    *
    * }</pre>
    */
-  Query<T> fetch(String path, FetchConfig joinConfig);
+  Query<T> fetch(String path, FetchConfig fetchConfig);
 
   /**
    * Apply the path properties replacing the select and fetch clauses.

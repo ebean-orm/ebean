@@ -1328,7 +1328,7 @@ public interface EbeanServer {
    * Execute a ORM insert update or delete statement with an explicit
    * transaction.
    */
-  int execute(Update<?> update, Transaction t);
+  int execute(Update<?> update, Transaction transaction);
 
   /**
    * For making calls to stored procedures.
@@ -1400,12 +1400,12 @@ public interface EbeanServer {
    *          the type of entity bean to find
    * @param beanType
    *          the type of entity bean to find
-   * @param uid
+   * @param id
    *          the bean id value
    * @param transaction
    *          the transaction to use (can be null)
    */
-  <T> T find(Class<T> beanType, Object uid, Transaction transaction);
+  <T> T find(Class<T> beanType, Object id, Transaction transaction);
 
   /**
    * Insert or update a bean with an explicit transaction.
@@ -1485,7 +1485,7 @@ public interface EbeanServer {
   /**
    * Update a bean additionally specifying a transaction.
    */
-  void update(Object bean, Transaction t) throws OptimisticLockException;
+  void update(Object bean, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Update a bean additionally specifying a transaction and the deleteMissingChildren setting.
@@ -1525,7 +1525,7 @@ public interface EbeanServer {
   /**
    * Insert the bean with a transaction.
    */
-  void insert(Object bean, Transaction t);
+  void insert(Object bean, Transaction transaction);
 
   /**
    * Insert a collection of beans. If there is no current transaction one is created and used to
@@ -1536,7 +1536,7 @@ public interface EbeanServer {
   /**
    * Insert a collection of beans with an explicit transaction.
    */
-  void insert(Collection<?> beans, Transaction t);
+  void insert(Collection<?> beans, Transaction transaction);
 
   /**
    * Delete the associations (from the intersection table) of a ManyToMany given
@@ -1563,7 +1563,7 @@ public interface EbeanServer {
    * 
    * @return the number of associations deleted (from the intersection table).
    */
-  int deleteManyToManyAssociations(Object ownerBean, String propertyName, Transaction t);
+  int deleteManyToManyAssociations(Object ownerBean, String propertyName, Transaction transaction);
 
   /**
    * Save the associations of a ManyToMany given the owner bean and the
@@ -1585,7 +1585,7 @@ public interface EbeanServer {
    * way to invoke those insertions directly.
    * </p>
    */
-  void saveManyToManyAssociations(Object ownerBean, String propertyName, Transaction t);
+  void saveManyToManyAssociations(Object ownerBean, String propertyName, Transaction transaction);
 
   /**
    * Save the associated collection or bean given the property name.
@@ -1622,27 +1622,27 @@ public interface EbeanServer {
    * @param propertyName
    *          the property we want to save
    */
-  void saveAssociation(Object ownerBean, String propertyName, Transaction t);
+  void saveAssociation(Object ownerBean, String propertyName, Transaction transaction);
 
   /**
    * Delete the bean with an explicit transaction.
    */
-  void delete(Object bean, Transaction t) throws OptimisticLockException;
+  void delete(Object bean, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Delete all the beans from an iterator.
    */
-  int delete(Iterator<?> it, Transaction t) throws OptimisticLockException;
+  int delete(Iterator<?> it, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Execute explicitly passing a transaction.
    */
-  int execute(SqlUpdate updSql, Transaction t);
+  int execute(SqlUpdate updSql, Transaction transaction);
 
   /**
    * Execute explicitly passing a transaction.
    */
-  int execute(CallableSql callableSql, Transaction t);
+  int execute(CallableSql callableSql, Transaction transaction);
 
   /**
    * Execute a TxRunnable in a Transaction with an explicit scope.
@@ -1665,7 +1665,7 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  void execute(TxScope scope, TxRunnable r);
+  void execute(TxScope scope, TxRunnable runnable);
 
   /**
    * Execute a TxRunnable in a Transaction with the default scope.
@@ -1691,7 +1691,7 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  void execute(TxRunnable r);
+  void execute(TxRunnable runnable);
 
   /**
    * Execute a TxCallable in a Transaction with an explicit scope.
@@ -1715,7 +1715,7 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  <T> T execute(TxScope scope, TxCallable<T> c);
+  <T> T execute(TxScope scope, TxCallable<T> callable);
 
   /**
    * Execute a TxCallable in a Transaction with the default scope.
@@ -1747,7 +1747,7 @@ public interface EbeanServer {
    *
    * }</pre>
    */
-  <T> T execute(TxCallable<T> c);
+  <T> T execute(TxCallable<T> callable);
 
   /**
    * Return the manager of the server cache ("L2" cache).
