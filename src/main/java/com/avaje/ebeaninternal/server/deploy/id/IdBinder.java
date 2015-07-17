@@ -22,22 +22,22 @@ public interface IdBinder {
   /**
    * Initialise the binder.
    */
-  public void initialise();
+  void initialise();
 
   /**
    * Return true if this is a compound key and must use expanded and or form.
    */
-  public boolean isIdInExpandedForm();
+  boolean isIdInExpandedForm();
 
   /**
    * Write the Id value to binary DataOuput.
    */
-  public void writeData(DataOutput dataOutput, Object idValue) throws IOException;
+  void writeData(DataOutput dataOutput, Object idValue) throws IOException;
 
   /**
    * Read the Id value from the binary DataInput.
    */
-  public Object readData(DataInput dataInput) throws IOException;
+  Object readData(DataInput dataInput) throws IOException;
 
   /**
    * Return the name(s) of the Id property(s). Comma delimited if there is more
@@ -46,36 +46,36 @@ public interface IdBinder {
    * This can be used to include in a query.
    * </p>
    */
-  public String getIdProperty();
+  String getIdProperty();
 
   /**
    * Return the Id BeanProperty.
    */
-  public BeanProperty getBeanProperty();
+  BeanProperty getBeanProperty();
 
   /**
    * Find a BeanProperty that is mapped to the database column.
    */
-  public BeanProperty findBeanProperty(String dbColumnName);
+  BeanProperty findBeanProperty(String dbColumnName);
 
   /**
    * Return the number of scalar properties for this id.
    */
-  public int getPropertyCount();
+  int getPropertyCount();
 
   /**
    * Return false if the id is a simple scalar and false if it is embedded or
    * concatenated.
    */
-  public boolean isComplexId();
+  boolean isComplexId();
 
   /**
    * Return the default order by that may need to be used if the query includes
    * a many property.
    */
-  public String getDefaultOrderBy();
+  String getDefaultOrderBy();
 
-  public String getOrderBy(String pathPrefix, boolean ascending);
+  String getOrderBy(String pathPrefix, boolean ascending);
 
   /**
    * Return the values as an array of scalar bindable values.
@@ -87,12 +87,12 @@ public interface IdBinder {
    * Added primarily for Query.addWhere().add(Expr.idEq()) support.
    * </p>
    */
-  public Object[] getBindValues(Object idValue);
+  Object[] getBindValues(Object idValue);
 
   /**
    * Return the id values for a given bean.
    */
-  public Object[] getIdValues(EntityBean bean);
+  Object[] getIdValues(EntityBean bean);
 
   /**
    * Build a string of the logical expressions.
@@ -100,68 +100,68 @@ public interface IdBinder {
    * Typically used to build a id = ? string.
    * </p>
    */
-  public String getAssocOneIdExpr(String prefix, String operator);
+  String getAssocOneIdExpr(String prefix, String operator);
 
   /**
    * Return the logical id in expression taking into account embedded id's.
    */
-  public String getAssocIdInExpr(String prefix);
+  String getAssocIdInExpr(String prefix);
 
   /**
    * Binds an id value to a prepared statement.
    */
-  public void bindId(DataBind dataBind, Object value) throws SQLException;
+  void bindId(DataBind dataBind, Object value) throws SQLException;
 
   /**
    * Bind the id value to a SqlUpdate statement.
    */
-  public void bindId(DefaultSqlUpdate sqlUpdate, Object value);
+  void bindId(DefaultSqlUpdate sqlUpdate, Object value);
 
-  public void addIdInBindValue(SpiExpressionRequest request, Object value);
+  void addIdInBindValue(SpiExpressionRequest request, Object value);
 
   /**
    * Return the sql for binding the id using an IN clause.
    */
-  public String getBindIdInSql(String baseTableAlias);
+  String getBindIdInSql(String baseTableAlias);
 
   /**
    * Return the binding expression (like "?" or "(?,?)")for the Id.
    */
-  public String getIdInValueExpr(int size);
+  String getIdInValueExpr(int size);
 
   /**
    * Same as getIdInValueExpr but for delete by id.
    */
-  public String getIdInValueExprDelete(int size);
+  String getIdInValueExprDelete(int size);
 
-  public void buildRawSqlSelectChain(String prefix, List<String> selectChain);
+  void buildRawSqlSelectChain(String prefix, List<String> selectChain);
 
   /**
    * Read the id value from the result set and set it to the bean also returning
    * it.
    */
-  public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException;
+  Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException;
 
   /**
    * Ignore the appropriate number of scalar properties for this id.
    */
-  public void loadIgnore(DbReadContext ctx);
+  void loadIgnore(DbReadContext ctx);
 
   /**
    * Read the id value from the result set and return it.
    */
-  public Object read(DbReadContext ctx) throws SQLException;
+  Object read(DbReadContext ctx) throws SQLException;
 
   /**
    * Append to the select clause.
    */
-  public void appendSelect(DbSqlContext ctx, boolean subQuery);
+  void appendSelect(DbSqlContext ctx, boolean subQuery);
 
   /**
    * Return the sql for binding the id to. This includes table alias and columns
    * that make up the id.
    */
-  public String getBindIdSql(String baseTableAlias);
+  String getBindIdSql(String baseTableAlias);
 
   /**
    * Cast or convert the Id value if necessary and optionally set it.
@@ -174,6 +174,6 @@ public interface IdBinder {
    * If the bean is not null, then the value is set to the bean.
    * </p>
    */
-  public Object convertSetId(Object idValue, EntityBean bean);
+  Object convertSetId(Object idValue, EntityBean bean);
 
 }
