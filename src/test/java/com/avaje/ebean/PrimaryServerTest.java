@@ -22,7 +22,7 @@ public class PrimaryServerTest {
   @Test
   public void testGetPrimaryServerName() throws Exception {
 
-    String primaryServerName = PrimaryServer.getPrimaryServerName();
+    String primaryServerName = PrimaryServer.getDefaultServerName();
     assertEquals("h2", primaryServerName);
   }
 

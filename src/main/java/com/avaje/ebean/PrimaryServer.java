@@ -34,7 +34,7 @@ class PrimaryServer {
   /**
    * Return the default server name.
    */
-  static synchronized String getPrimaryServerName() {
+  static synchronized String getDefaultServerName() {
     getProperties();
     return defaultServerName;
   }
