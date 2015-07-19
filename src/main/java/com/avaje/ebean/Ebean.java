@@ -671,6 +671,7 @@ public final class Ebean {
    *
    * Save all the beans from a Collection.
    */
+  @Deprecated
   public static int save(Collection<?> beans) throws OptimisticLockException {
     return serverMgr.getDefaultServer().saveAll(beans);
   }
@@ -763,8 +764,16 @@ public final class Ebean {
   }
 
   /**
+   * Delete several beans given their type and id values.
+   */
+  public static void deleteAll(Class<?> beanType, Collection<?> ids) {
+    serverMgr.getDefaultServer().deleteAll(beanType, ids);
+  }
+
+  /**
    * Delete all the beans from an Iterator.
    */
+  @Deprecated
   public static int delete(Iterator<?> it) throws OptimisticLockException {
     return serverMgr.getDefaultServer().delete(it);
   }
