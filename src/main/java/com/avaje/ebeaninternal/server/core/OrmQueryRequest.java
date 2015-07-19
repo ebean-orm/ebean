@@ -259,19 +259,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     }
   }
 
-  public void findVisit(QueryResultVisitor<T> visitor) {
-    QueryIterator<T> it = queryEngine.findIterate(this);
-    try {
-      while (it.hasNext()) {
-        if (!visitor.accept(it.next())) {
-          break;
-        }
-      }
-    } finally {
-      it.close();
-    }
-  }
-
   public QueryIterator<T> findIterate() {
     return queryEngine.findIterate(this);
   }

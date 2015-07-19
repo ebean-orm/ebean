@@ -253,11 +253,6 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
-  public void findVisit(QueryResultVisitor<T> visitor) {
-    exprList.findVisit(visitor);
-  }
-
-  @Override
   public QueryIterator<T> findIterate() {
     return exprList.findIterate();
   }

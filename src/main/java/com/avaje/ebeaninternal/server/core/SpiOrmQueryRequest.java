@@ -1,16 +1,15 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.QueryResultVisitor;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Defines the ORM query request api.
@@ -61,11 +60,6 @@ public interface SpiOrmQueryRequest<T> {
      * Execute the find ids query.
      */
     public List<Object> findIds();
-
-    /**
-     * Execute the find returning a QueryIterator and visitor pattern.
-     */
-    public void findVisit(QueryResultVisitor<T> visitor);
 
   /**
    * Execute the find returning a QueryIterator and visitor pattern.

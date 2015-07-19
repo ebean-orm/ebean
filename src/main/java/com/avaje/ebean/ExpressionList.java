@@ -117,14 +117,6 @@ public interface ExpressionList<T> extends Serializable {
   void findEachWhile(QueryEachWhileConsumer<T> consumer);
 
   /**
-   * Deprecated in favor of #findEachWhile which is functionally exactly the same
-   * but has a much better name.
-   *
-   * @deprecated
-   */
-  void findVisit(QueryResultVisitor<T> visitor);
-
-  /**
    * Execute the query returning a list.
    * 
    * @see Query#findList()

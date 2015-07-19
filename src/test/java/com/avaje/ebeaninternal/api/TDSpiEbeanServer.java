@@ -414,11 +414,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> void findVisit(Query<T> query, QueryResultVisitor<T> visitor, Transaction transaction) {
-
-  }
-
-  @Override
   public <T> List<T> findList(Query<T> query, Transaction transaction) {
     return null;
   }

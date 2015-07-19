@@ -905,19 +905,6 @@ public interface EbeanServer {
   <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer, Transaction transaction);
 
   /**
-   * Deprecated in favor of #findEachWhile which is functionally exactly the same
-   * but has a much better name.
-   * <p>
-   * Execute the query visiting the results. This is similar to findIterate in
-   * that not all the result beans need to be held in memory at the same time
-   * and as such is go for processing large queries.
-   * </p>
-   *
-   * @deprecated
-   */
-  <T> void findVisit(Query<T> query, QueryResultVisitor<T> visitor, Transaction transaction);
-
-  /**
    * Execute a query returning a list of beans.
    * <p>
    * Generally you are able to use {@link Query#findList()} rather than

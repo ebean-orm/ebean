@@ -1,18 +1,17 @@
 package com.avaje.tests.query;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryResultVisitor;
+import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestQueryFindVisit extends BaseTestCase {
 
@@ -29,11 +28,9 @@ public class TestQueryFindVisit extends BaseTestCase {
 
     final AtomicInteger counter = new AtomicInteger(0);
 
-    query.findVisit(new QueryResultVisitor<Customer>() {
-
-      public boolean accept(Customer bean) {
+    query.findEach(new QueryEachConsumer<Customer>() {
+      public void accept(Customer bean) {
         counter.incrementAndGet();
-        return true;
       }
     });
 
@@ -56,14 +53,13 @@ public class TestQueryFindVisit extends BaseTestCase {
 
     final AtomicInteger counter = new AtomicInteger(0);
 
-    query.findVisit(new QueryResultVisitor<Customer>() {
+    query.findEach(new QueryEachConsumer<Customer>() {
 
-      public boolean accept(Customer bean) {
+      public void accept(Customer bean) {
         counter.incrementAndGet();
         if (counter.intValue() > 0) {
           throw new IllegalStateException("cause a failure");
         }
-        return true;
       }
     });
 

@@ -1324,15 +1324,6 @@ public final class DefaultServer implements SpiEbeanServer {
     return new LimitOffsetPagedList<T>(this, (SpiQuery<T>)query, pageIndex, pageSize);
   }
 
-  public <T> void findVisit(Query<T> query, QueryResultVisitor<T> visitor, Transaction t) {
-
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
-
-    request.initTransIfRequired();
-    request.findVisit(visitor);
-    // no try finally - findVisit guarantee's cleanup of the transaction if required
-  }
-
   public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction t) {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);

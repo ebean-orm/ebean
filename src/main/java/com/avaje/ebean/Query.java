@@ -521,20 +521,6 @@ public interface Query<T> extends Serializable {
   QueryIterator<T> findIterate();
 
   /**
-   * This is deprecated in favor of #findEachWhile.
-   * <p>
-   * This is functionally exactly the same as #findEachWhile.  It is
-   * replaced by findEachWhile because the method name is much better.
-   * </p>
-   *
-   * @param visitor
-   *          the visitor used to process the queried beans.
-   *
-   * @deprecated
-   */
-  void findVisit(QueryResultVisitor<T> visitor);
-
-  /**
    * Execute the query processing the beans one at a time.
    * <p>
    * This method is appropriate to process very large query results as the

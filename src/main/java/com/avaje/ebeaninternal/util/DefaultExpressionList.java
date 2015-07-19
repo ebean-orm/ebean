@@ -183,11 +183,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public void findVisit(QueryResultVisitor<T> visitor) {
-    query.findVisit(visitor);
-  }
-
-  @Override
   public QueryIterator<T> findIterate() {
     return query.findIterate();
   }

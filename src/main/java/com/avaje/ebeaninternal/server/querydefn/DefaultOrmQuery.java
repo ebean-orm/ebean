@@ -917,10 +917,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return server.findRowCount(this, null);
   }
 
-  public void findVisit(QueryResultVisitor<T> visitor) {
-    server.findVisit(this, visitor, null);
-  }
-
   @Override
   public void findEachWhile(QueryEachWhileConsumer<T> consumer) {
     server.findEachWhile(this, consumer, null);
