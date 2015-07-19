@@ -22,57 +22,57 @@ import java.io.Serializable;
  * efficient loaded as 2 SQL queries.
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * // Normal fetch join results in a single SQL query
- * List&lt;Order&gt; list = Ebean.find(Order.class).fetch(&quot;details&quot;).findList();
+ * List<Order> list = Ebean.find(Order.class).fetch("details").findList();
  * 
  * // Find Orders join details using a single SQL query
- * </pre>
+ * }</pre>
  * <p>
  * Example: Using a "query join" instead of a "fetch join" we instead use 2 SQL
  * queries
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * // This will use 2 SQL queries to build this object graph
- * List&lt;Order&gt; list =
+ * List<Order> list =
  *     Ebean.find(Order.class)
- *         .fetch(&quot;details&quot;, new FetchConfig().query())
+ *         .fetch("details", new FetchConfig().query())
  *         .findList();
  * 
  * // query 1) find order
  * // query 2) find orderDetails where order.id in (?,?...) // first 100 order id's
- * </pre>
+ * }</pre>
  * <p>
  * Example: Using 2 "query joins"
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * // This will use 3 SQL queries to build this object graph
- * List&lt;Order&gt; list =
+ * List<Order> list =
  *     Ebean.find(Order.class)
- *         .fetch(&quot;details&quot;, new FetchConfig().query())
- *         .fetch(&quot;customer&quot;, new FetchConfig().queryFirst(5))
+ *         .fetch("details", new FetchConfig().query())
+ *         .fetch("customer", new FetchConfig().queryFirst(5))
  *         .findList();
  * 
  * // query 1) find order
  * // query 2) find orderDetails where order.id in (?,?...) // first 100 order id's
  * // query 3) find customer where id in (?,?,?,?,?) // first 5 customers
- * </pre>
+ * }</pre>
  * <p>
  * Example: Using "query joins" and partial objects
  * </p>
  * 
- * <pre class="code">
+ * <pre>{@code
  * // This will use 3 SQL queries to build this object graph
- * List&lt;Order&gt; list =
+ * List<Order> list =
  *     Ebean.find(Order.class)
- *         .select(&quot;status, shipDate&quot;)
- *         .fetch(&quot;details&quot;, &quot;quantity, price&quot;, new FetchConfig().query())
- *         .fetch(&quot;details.product&quot;, &quot;sku, name&quot;)
- *         .fetch(&quot;customer&quot;, &quot;name&quot;, new FetchConfig().queryFirst(5))
- *         .fetch(&quot;customer.contacts&quot;)
- *         .fetch(&quot;customer.shippingAddress&quot;)
+ *         .select("status, shipDate")
+ *         .fetch("details", "quantity, price", new FetchConfig().query())
+ *         .fetch("details.product", "sku, name")
+ *         .fetch("customer", "name", new FetchConfig().queryFirst(5))
+ *         .fetch("customer.contacts")
+ *         .fetch("customer.shippingAddress")
  *         .findList();
  * 
  * // query 1) find order (status, shipDate)
@@ -81,22 +81,22 @@ import java.io.Serializable;
  * // query 3) find customer (name) fetch contacts (*) fetch shippingAddress (*)
  * // where id in (?,?,?,?,?)
  * 
- * // Note: the fetch of &quot;details.product&quot; is automatically included into the
- * // fetch of &quot;details&quot;
+ * // Note: the fetch of "details.product" is automatically included into the
+ * // fetch of "details"
  * //
- * // Note: the fetch of &quot;customer.contacts&quot; and &quot;customer.shippingAddress&quot;
- * // are automatically included in the fetch of &quot;customer&quot;
- * </pre>
+ * // Note: the fetch of "customer.contacts" and "customer.shippingAddress"
+ * // are automatically included in the fetch of "customer"
+ * }</pre>
  * <p>
  * You can use query() and lazy together on a single join. The query is executed
  * immediately and the lazy defines the batch size to use for further lazy
  * loading (if lazy loading is invoked).
  * </p>
  * 
- * <pre class="code">
- * List&lt;Order&gt; list =
+ * <pre>{@code
+ * List<Order> list =
  *     Ebean.find(Order.class)
- *         .fetch(&quot;customer&quot;, new FetchConfig().query(10).lazy(5))
+ *         .fetch("customer", new FetchConfig().query(10).lazy(5))
  *         .findList();
  * 
  * // query 1) find order
@@ -104,7 +104,7 @@ import java.io.Serializable;
  * // .. then if lazy loading of customers is invoked
  * // .. use a batch size of 5 to load the customers
  * 
- * </pre>
+ * }</pre>
  * 
  * <p>
  * Example of controlling the lazy loading query:
@@ -114,12 +114,12 @@ import java.io.Serializable;
  * case.
  * </p>
  * 
- * <pre class="code">
- * List&lt;Order&gt; list = Ebean.find(Order.class)
- *   .fetch(&quot;customer&quot;,&quot;name&quot;, new FetchConfig().lazy(5))
- *   .fetch(&quot;customer.contacts&quot;,&quotcontactName, phone, email&quot)
- *   .fetch(&quot;customer.shippingAddress&quot;)
- *   .where().eq(&quot;status&quot;,Order.Status.NEW)
+ * <pre>{@code
+ * List<Order> list = Ebean.find(Order.class)
+ *   .fetch("customer","name", new FetchConfig().lazy(5))
+ *   .fetch("customer.contacts",&quotcontactName, phone, email&quot)
+ *   .fetch("customer.shippingAddress")
+ *   .where().eq("status",Order.Status.NEW)
  *   .findList();
  * 
  * // query 1) find order where status = Order.Status.NEW
@@ -132,7 +132,7 @@ import java.io.Serializable;
  *       fetch customer.shippingAddress (*) 
  *       where id in (?,?,?,?,?)
  * 
- * </pre>
+ * }</pre>
  * 
  * @author mario
  * @author rbygrave
