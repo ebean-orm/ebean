@@ -44,7 +44,7 @@ public class TestM2MDeleteWithCascade extends BaseTestCase {
 
     Assert.assertEquals("roles not deleted", 2, rc);
 
-    Ebean.delete(roles);
+    Ebean.deleteAll(roles);
 
     rc = Ebean.find(MRole.class).where().idIn(roleIds).findRowCount();
 

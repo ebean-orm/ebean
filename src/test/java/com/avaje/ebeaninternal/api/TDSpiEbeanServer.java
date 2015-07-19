@@ -489,11 +489,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public int delete(Collection<?> c) throws OptimisticLockException {
-    return 0;
-  }
-
-  @Override
   public int delete(Class<?> beanType, Object id) {
     return 0;
   }

@@ -1224,14 +1224,6 @@ public interface EbeanServer {
   void delete(Object bean) throws OptimisticLockException;
 
   /**
-   * Deprecated - please migrate to deleteAll().
-   *
-   * Delete all the beans in the collection.
-   */
-  @Deprecated
-  int delete(Collection<?> beans) throws OptimisticLockException;
-
-  /**
    * Delete all the beans in the collection.
    */
   int deleteAll(Collection<?> beans) throws OptimisticLockException;

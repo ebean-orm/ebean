@@ -32,7 +32,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
   @Before public void before() {
     // remove all the User records first
-    Ebean.delete(Ebean.find(User.class).findList());
+    Ebean.deleteAll(Ebean.find(User.class).findList());
 
     // insert 2 User records
     Ebean.save(new User(1L));

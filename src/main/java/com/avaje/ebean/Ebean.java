@@ -751,14 +751,6 @@ public final class Ebean {
   }
 
   /**
-   * Delete all the beans from a Collection.
-   */
-  @Deprecated
-  public static int delete(Collection<?> beans) throws OptimisticLockException {
-    return serverMgr.getDefaultServer().deleteAll(beans);
-  }
-
-  /**
    * Delete all the beans in the Collection.
    */
   public static int deleteAll(Collection<?> beans) throws OptimisticLockException {
