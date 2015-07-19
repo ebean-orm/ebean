@@ -1491,23 +1491,11 @@ public final class DefaultServer implements SpiEbeanServer {
     persister.update(checkEntityBean(bean), t, deleteMissingChildren);
   }
 
-  /**
-   * Update all beans in the collection.
-   */
-  public void update(Collection<?> beans) {
-    updateAll(beans, null);
-  }
-
   @Override
   public void updateAll(Collection<?> beans) throws OptimisticLockException {
     updateAll(beans, null);
   }
-
-  @Override
-  public void update(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
-    updateAll(beans, transaction);
-  }
-
+  
   /**
    * Update all beans in the collection with an explicit transaction.
    */

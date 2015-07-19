@@ -554,16 +554,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void update(Collection<?> beans) throws OptimisticLockException {
-
-  }
-
-  @Override
-  public void update(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
-
-  }
-
-  @Override
   public void insert(Object bean) {
 
   }

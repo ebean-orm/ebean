@@ -1479,27 +1479,10 @@ public interface EbeanServer {
   void update(Object bean, Transaction transaction, boolean deleteMissingChildren) throws OptimisticLockException;
 
   /**
-   * Deprecated - please migrate to updateAll().
-   *
-   * Update a collection of beans. If there is no current transaction one is created and used to
-   * update all the beans in the collection.
-   */
-  @Deprecated
-  void update(Collection<?> beans) throws OptimisticLockException;
-
-  /**
    * Update a collection of beans. If there is no current transaction one is created and used to
    * update all the beans in the collection.
    */
   void updateAll(Collection<?> beans) throws OptimisticLockException;
-
-  /**
-   * Deprecated - please migrate to updateAll().
-   *
-   * Update a collection of beans with an explicit transaction.
-   */
-  @Deprecated
-  void update(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Update a collection of beans with an explicit transaction.

@@ -640,16 +640,6 @@ public final class Ebean {
   }
 
   /**
-   * Deprecate - please migrate to updateAll().
-   *
-   * Update the beans in the collection.
-   */
-  @Deprecated
-  public static void update(Collection<?> beans) throws OptimisticLockException {
-    serverMgr.getDefaultServer().updateAll(beans);
-  }
-
-  /**
    * Update the beans in the collection.
    */
   public static void updateAll(Collection<?> beans) throws OptimisticLockException {
