@@ -84,19 +84,19 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public T jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public T jsonRead(JsonParser parser, JsonToken event) throws IOException {
 
     switch (event) {
       case VALUE_NUMBER_INT: {
-        return convertFromMillis(ctx.getLongValue());
+        return convertFromMillis(parser.getLongValue());
       }
       case VALUE_NUMBER_FLOAT: {
-        BigDecimal value = ctx.getDecimalValue();
+        BigDecimal value = parser.getDecimalValue();
         Timestamp timestamp = DecimalUtils.toTimestamp(value);
         return convertFromTimestamp(timestamp);
       }
       default: {
-        String jsonDateTime = ctx.getText();
+        String jsonDateTime = parser.getText();
         return convertFromTimestamp(dateTimeParser.parse(jsonDateTime));
       }
     }

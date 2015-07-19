@@ -232,8 +232,8 @@ public class ScalarTypeEnumStandard {
     }
 
     @Override
-    public Object jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-      return parse(ctx.getValueAsString());
+    public Object jsonRead(JsonParser parser, JsonToken event) throws IOException {
+      return parse(parser.getValueAsString());
     }
 
     @Override

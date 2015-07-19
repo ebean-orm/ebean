@@ -69,9 +69,9 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public byte[] jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public byte[] jsonRead(JsonParser parser, JsonToken event) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream(500);
-    ctx.readBinaryValue(out);
+    parser.readBinaryValue(out);
     return out.toByteArray();
   }
 

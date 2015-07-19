@@ -85,8 +85,8 @@ public class ScalarTypeLong extends ScalarTypeBase<Long> {
   }
 
   @Override
-  public Long jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-    return ctx.getLongValue();
+  public Long jsonRead(JsonParser parser, JsonToken event) throws IOException {
+    return parser.getLongValue();
   }
 
   @Override

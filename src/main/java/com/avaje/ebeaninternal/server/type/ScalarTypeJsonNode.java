@@ -218,10 +218,10 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
   }
 
   @Override
-  public JsonNode jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public JsonNode jsonRead(JsonParser parser, JsonToken event) throws IOException {
     // at this point the BeanProperty has read the START_OBJECT token
     // to check for a null value.
-    return objectMapper.readValue(ctx, JsonNode.class);
+    return objectMapper.readValue(parser, JsonNode.class);
   }
 
 }

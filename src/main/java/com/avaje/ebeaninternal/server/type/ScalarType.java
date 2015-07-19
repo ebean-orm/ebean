@@ -197,7 +197,7 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   /**
    * Read the value from JsonParser.
    */
-  T jsonRead(JsonParser ctx, JsonToken event) throws IOException;
+  T jsonRead(JsonParser parser, JsonToken event) throws IOException;
 
   /**
    * Write the value to the JsonGenerator.

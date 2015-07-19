@@ -85,8 +85,8 @@ public class ScalarTypeInteger extends ScalarTypeBase<Integer> {
   }
 
   @Override
-  public Integer jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-    return ctx.getIntValue();
+  public Integer jsonRead(JsonParser parser, JsonToken event) throws IOException {
+    return parser.getIntValue();
   }
 
   @Override

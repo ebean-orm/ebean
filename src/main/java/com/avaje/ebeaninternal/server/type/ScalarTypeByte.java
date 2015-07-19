@@ -47,7 +47,7 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
   }
 
   @Override
-  public Byte jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public Byte jsonRead(JsonParser parser, JsonToken event) throws IOException {
     throw new IOException("Not supported");
   }
 

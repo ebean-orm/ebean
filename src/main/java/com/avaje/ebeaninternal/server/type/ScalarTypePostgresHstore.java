@@ -123,11 +123,11 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public Map jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public Map jsonRead(JsonParser parser, JsonToken event) throws IOException {
     // at this point the BeanProperty has read the START_OBJECT token
     // to check for a null value. Pass the START_OBJECT token through to
     // the EJson parsing so that it knows the first token has been read
-    return EJson.parseObject(ctx, event);
+    return EJson.parseObject(parser, event);
   }
 
 }

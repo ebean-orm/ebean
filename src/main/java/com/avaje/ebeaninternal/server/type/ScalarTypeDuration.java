@@ -102,8 +102,8 @@ public class ScalarTypeDuration extends ScalarTypeBase<Duration> {
   }
 
   @Override
-  public Duration jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-    return Duration.parse(ctx.getValueAsString());
+  public Duration jsonRead(JsonParser parser, JsonToken event) throws IOException {
+    return Duration.parse(parser.getValueAsString());
   }
 
   @Override

@@ -1,16 +1,15 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Types;
-
-import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for BigDecimal.
@@ -78,8 +77,8 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
   }
 
   @Override
-  public BigDecimal jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-    return ctx.getDecimalValue();
+  public BigDecimal jsonRead(JsonParser parser, JsonToken event) throws IOException {
+    return parser.getDecimalValue();
   }
 
   @Override

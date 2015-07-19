@@ -1,15 +1,14 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
-
-import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for Float and float.
@@ -85,8 +84,8 @@ public class ScalarTypeFloat extends ScalarTypeBase<Float> {
   }
 
   @Override
-  public Float jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-    return ctx.getFloatValue();
+  public Float jsonRead(JsonParser parser, JsonToken event) throws IOException {
+    return parser.getFloatValue();
   }
 
   @Override

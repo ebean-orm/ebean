@@ -123,8 +123,8 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public T jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-    return parse(ctx.getValueAsString());
+  public T jsonRead(JsonParser parser, JsonToken event) throws IOException {
+    return parse(parser.getValueAsString());
   }
 
   @Override

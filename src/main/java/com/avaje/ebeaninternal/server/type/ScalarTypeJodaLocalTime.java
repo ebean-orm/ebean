@@ -77,12 +77,12 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
   }
 
   @Override
-  public LocalTime jsonRead(JsonParser ctx, JsonToken event) throws IOException {
+  public LocalTime jsonRead(JsonParser parser, JsonToken event) throws IOException {
     if (JsonToken.VALUE_NUMBER_INT == event) {
-      long millis = ctx.getLongValue();
+      long millis = parser.getLongValue();
       return convertFromMillis(millis);
     } else {
-      String string = ctx.getValueAsString();
+      String string = parser.getValueAsString();
       throw new RuntimeException("convert " + string);
     }
   }

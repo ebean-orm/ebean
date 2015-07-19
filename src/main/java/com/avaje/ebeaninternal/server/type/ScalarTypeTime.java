@@ -87,8 +87,8 @@ public class ScalarTypeTime extends ScalarTypeBase<Time> {
   }
 
   @Override
-  public Time jsonRead(JsonParser ctx, JsonToken event) throws IOException {
-    return parse(ctx.getValueAsString());
+  public Time jsonRead(JsonParser parser, JsonToken event) throws IOException {
+    return parse(parser.getValueAsString());
   }
 
   @Override
