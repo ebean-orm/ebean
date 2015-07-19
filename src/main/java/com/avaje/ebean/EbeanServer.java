@@ -1505,27 +1505,10 @@ public interface EbeanServer {
   void insert(Object bean, Transaction transaction);
 
   /**
-   * Deprecated - please migrate to insertAll().
-   *
-   * Insert a collection of beans. If there is no current transaction one is created and used to
-   * insert all the beans in the collection.
-   */
-  @Deprecated
-  void insert(Collection<?> beans);
-
-  /**
    * Insert a collection of beans. If there is no current transaction one is created and used to
    * insert all the beans in the collection.
    */
   void insertAll(Collection<?> beans);
-
-  /**
-   * Deprecated - please migrate to insertAll().
-   *
-   * Insert a collection of beans with an explicit transaction.
-   */
-  @Deprecated
-  void insert(Collection<?> beans, Transaction transaction);
 
   /**
    * Insert a collection of beans with an explicit transaction.

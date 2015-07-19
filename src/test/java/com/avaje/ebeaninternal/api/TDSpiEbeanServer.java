@@ -564,16 +564,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void insert(Collection<?> beans) {
-
-  }
-
-  @Override
-  public void insert(Collection<?> beans, Transaction t) {
-
-  }
-
-  @Override
   public int deleteManyToManyAssociations(Object ownerBean, String propertyName) {
     return 0;
   }

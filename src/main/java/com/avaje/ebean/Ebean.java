@@ -557,16 +557,6 @@ public final class Ebean {
   public static void insert(Object bean) {
     serverMgr.getDefaultServer().insert(bean);
   }
-  
-  /**
-   * Deprecated - please migrate to insertAll().
-   *
-   * Insert a collection of beans.
-   */
-  @Deprecated
-  public static void insert(Collection<?> beans) {
-    serverMgr.getDefaultServer().insertAll(beans);
-  }
 
   /**
    * Insert a collection of beans.

@@ -1495,7 +1495,7 @@ public final class DefaultServer implements SpiEbeanServer {
   public void updateAll(Collection<?> beans) throws OptimisticLockException {
     updateAll(beans, null);
   }
-  
+
   /**
    * Update all beans in the collection with an explicit transaction.
    */
@@ -1539,16 +1539,6 @@ public final class DefaultServer implements SpiEbeanServer {
    */
   public void insertAll(Collection<?> beans) {
     insertAll(beans, null);
-  }
-
-  @Override
-  public void insert(Collection<?> beans) {
-    insertAll(beans, null);
-  }
-
-  @Override
-  public void insert(Collection<?> beans, Transaction transaction) {
-    insertAll(beans, transaction);
   }
 
   /**
