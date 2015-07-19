@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import com.avaje.ebean.annotation.ColumnHstore;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.DbHstore;
 import com.avaje.ebean.annotation.DbJson;
@@ -180,9 +179,7 @@ public class AnnotationFields extends AnnotationParser {
         util.setDbJsonBType(prop);
       }
     }
-    if (get(prop, ColumnHstore.class) != null) {
-      util.setDbHstore(prop);
-    }
+
     if (get(prop, DbHstore.class) != null) {
       util.setDbHstore(prop);
     }

@@ -1,12 +1,16 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import com.avaje.ebean.annotation.ColumnHstore;
 import com.avaje.ebean.annotation.DbHstore;
 import com.avaje.ebean.annotation.DbJson;
 import com.avaje.ebean.annotation.DbJsonB;
 import com.avaje.ebeaninternal.server.deploy.DetermineManyType;
 import com.avaje.ebeaninternal.server.deploy.ManyType;
-import com.avaje.ebeaninternal.server.deploy.meta.*;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertySimpleCollection;
 import com.avaje.ebeaninternal.server.type.CtCompoundType;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.TypeManager;
@@ -17,7 +21,11 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.ManyToOne;
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 /**
  * Create the properties for a bean.
@@ -294,8 +302,7 @@ public class DeployCreateProperties {
   private boolean isMappedType(Field field) {
     return (field.getAnnotation(DbJson.class) != null)
         || (field.getAnnotation(DbJsonB.class) != null)
-        || (field.getAnnotation(DbHstore.class) != null)
-        || (field.getAnnotation(ColumnHstore.class) != null);
+        || (field.getAnnotation(DbHstore.class) != null);
   }
   
   private boolean isTransientField(Field field) {
