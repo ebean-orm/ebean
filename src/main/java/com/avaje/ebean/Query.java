@@ -520,6 +520,8 @@ public interface Query<T> extends Serializable {
    */
   QueryIterator<T> findIterate();
 
+
+
   /**
    * Execute the query processing the beans one at a time.
    * <p>
@@ -1109,8 +1111,8 @@ public interface Query<T> extends Serializable {
 
   /**
    * Set the first row to return for this query.
-   * 
-   * @param firstRow
+   *
+   * @param firstRow the first row to include in the query result.
    */
   Query<T> setFirstRow(int firstRow);
 
