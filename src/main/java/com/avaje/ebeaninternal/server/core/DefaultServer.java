@@ -1796,14 +1796,6 @@ public final class DefaultServer implements SpiEbeanServer {
   }
 
   /**
-   * Delete all the beans in the iterator.
-   */
-  @Override
-  public int delete(Iterator<?> it) {
-    return deleteAllInternal(it, null);
-  }
-
-  /**
    * Delete all the beans in the collection.
    */
   @Override

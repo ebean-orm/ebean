@@ -751,14 +751,6 @@ public final class Ebean {
   }
 
   /**
-   * Delete all the beans from an Iterator.
-   */
-  @Deprecated
-  public static int delete(Iterator<?> it) throws OptimisticLockException {
-    return serverMgr.getDefaultServer().delete(it);
-  }
-
-  /**
    * Delete all the beans from a Collection.
    */
   @Deprecated
