@@ -559,10 +559,20 @@ public final class Ebean {
   }
   
   /**
+   * Deprecated - please migrate to insertAll().
+   *
    * Insert a collection of beans.
    */
+  @Deprecated
   public static void insert(Collection<?> beans) {
-    serverMgr.getDefaultServer().insert(beans);
+    serverMgr.getDefaultServer().insertAll(beans);
+  }
+
+  /**
+   * Insert a collection of beans.
+   */
+  public static void insertAll(Collection<?> beans) {
+    serverMgr.getDefaultServer().insertAll(beans);
   }
 
   /**
@@ -630,24 +640,46 @@ public final class Ebean {
   }
 
   /**
+   * Deprecate - please migrate to updateAll().
+   *
    * Update the beans in the collection.
    */
+  @Deprecated
   public static void update(Collection<?> beans) throws OptimisticLockException {
-    serverMgr.getDefaultServer().update(beans);
+    serverMgr.getDefaultServer().updateAll(beans);
   }
 
   /**
+   * Update the beans in the collection.
+   */
+  public static void updateAll(Collection<?> beans) throws OptimisticLockException {
+    serverMgr.getDefaultServer().updateAll(beans);
+  }
+
+  /**
+   * Deprecated - please change to iterate yourself and save().
+   *
    * Save all the beans from an Iterator.
    */
+  @Deprecated
   public static int save(Iterator<?> iterator) throws OptimisticLockException {
     return serverMgr.getDefaultServer().save(iterator);
   }
 
   /**
+   * Deprecated - please migrate to saveAll().
+   *
    * Save all the beans from a Collection.
    */
   public static int save(Collection<?> beans) throws OptimisticLockException {
-    return serverMgr.getDefaultServer().save(beans);
+    return serverMgr.getDefaultServer().saveAll(beans);
+  }
+
+  /**
+   * Save all the beans from a Collection.
+   */
+  public static int saveAll(Collection<?> beans) throws OptimisticLockException {
+    return serverMgr.getDefaultServer().saveAll(beans);
   }
 
   /**
@@ -721,10 +753,13 @@ public final class Ebean {
   }
 
   /**
+   * Deprecated - please migrate to deleteAll().
+   *
    * Delete several beans given their type and id values.
    */
+  @Deprecated
   public static void delete(Class<?> beanType, Collection<?> ids) {
-    serverMgr.getDefaultServer().delete(beanType, ids);
+    serverMgr.getDefaultServer().deleteAll(beanType, ids);
   }
 
   /**
@@ -737,8 +772,16 @@ public final class Ebean {
   /**
    * Delete all the beans from a Collection.
    */
-  public static int delete(Collection<?> c) throws OptimisticLockException {
-    return delete(c.iterator());
+  @Deprecated
+  public static int delete(Collection<?> beans) throws OptimisticLockException {
+    return serverMgr.getDefaultServer().deleteAll(beans);
+  }
+
+  /**
+   * Delete all the beans in the Collection.
+   */
+  public static int deleteAll(Collection<?> beans) throws OptimisticLockException {
+    return serverMgr.getDefaultServer().deleteAll(beans);
   }
 
   /**
@@ -1441,8 +1484,7 @@ public final class Ebean {
    * @param deletes
    *          true if rows on the table where deleted
    */
-  public static void externalModification(String tableName, boolean inserts, boolean updates,
-      boolean deletes) {
+  public static void externalModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
 
     serverMgr.getDefaultServer().externalModification(tableName, inserts, updates, deletes);
   }

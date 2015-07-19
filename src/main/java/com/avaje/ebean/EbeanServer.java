@@ -1223,14 +1223,25 @@ public interface EbeanServer {
   void save(Object bean) throws OptimisticLockException;
 
   /**
+   * Deprecated - please change to iterate yourself and save.
+   *
    * Save all the beans in the iterator.
    */
+  @Deprecated
   int save(Iterator<?> it) throws OptimisticLockException;
+
+  /**
+   * Deprecated - please migrate to saveAll().
+   *
+   * Save all the beans in the collection.
+   */
+  @Deprecated
+  int save(Collection<?> beans) throws OptimisticLockException;
 
   /**
    * Save all the beans in the collection.
    */
-  int save(Collection<?> beans) throws OptimisticLockException;
+  int saveAll(Collection<?> beans) throws OptimisticLockException;
 
   /**
    * Delete the bean.
@@ -1242,14 +1253,25 @@ public interface EbeanServer {
   void delete(Object bean) throws OptimisticLockException;
 
   /**
+   * Deprecated - please change to iterate yourself and delete.
+   *
    * Delete all the beans from an Iterator.
    */
+  @Deprecated
   int delete(Iterator<?> it) throws OptimisticLockException;
+
+  /**
+   * Deprecated - please migrate to deleteAll().
+   *
+   * Delete all the beans in the collection.
+   */
+  @Deprecated
+  int delete(Collection<?> beans) throws OptimisticLockException;
 
   /**
    * Delete all the beans in the collection.
    */
-  int delete(Collection<?> c) throws OptimisticLockException;
+  int deleteAll(Collection<?> beans) throws OptimisticLockException;
 
   /**
    * Delete the bean given its type and id.
@@ -1262,15 +1284,45 @@ public interface EbeanServer {
   int delete(Class<?> beanType, Object id, Transaction transaction);
 
   /**
+   * Deprecated - please migrate to deleteAll().
+   *
    * Delete several beans given their type and id values.
    */
+  @Deprecated
   void delete(Class<?> beanType, Collection<?> ids);
+
+  /**
+   * Delete several beans given their type and id values.
+   */
+  void deleteAll(Class<?> beanType, Collection<?> ids);
+
+  /**
+   * Deprecated - please migrate to deleteAll().
+   *
+   * Delete several beans given their type and id values with an explicit
+   * transaction.
+   */
+  @Deprecated
+  void delete(Class<?> beanType, Collection<?> ids, Transaction transaction);
 
   /**
    * Delete several beans given their type and id values with an explicit
    * transaction.
    */
-  void delete(Class<?> beanType, Collection<?> ids, Transaction transaction);
+  void deleteAll(Class<?> beanType, Collection<?> ids, Transaction transaction);
+
+  /**
+   * Delete the bean with an explicit transaction.
+   */
+  void delete(Object bean, Transaction transaction) throws OptimisticLockException;
+
+  /**
+   * Deprecated - please migrate to iterate yourself and delete().
+   *
+   * Delete all the beans from an iterator.
+   */
+  @Deprecated
+  int delete(Iterator<?> it, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Execute a Sql Update Delete or Insert statement. This returns the number of
@@ -1413,14 +1465,24 @@ public interface EbeanServer {
   void save(Object bean, Transaction transaction) throws OptimisticLockException;
 
   /**
+   * Deprecated - please change to iterate yourself and save.
    * Save all the beans in the iterator with an explicit transaction.
    */
+  @Deprecated
   int save(Iterator<?> it, Transaction transaction) throws OptimisticLockException;
+
+  /**
+   * Deprecated - please migrate to saveAll().
+   *
+   * Save all the beans in the collection with an explicit transaction.
+   */
+  @Deprecated
+  int save(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Save all the beans in the collection with an explicit transaction.
    */
-  int save(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
+  int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Marks the entity bean as dirty.
@@ -1502,16 +1564,33 @@ public interface EbeanServer {
   void update(Object bean, Transaction transaction, boolean deleteMissingChildren) throws OptimisticLockException;
 
   /**
+   * Deprecated - please migrate to updateAll().
+   *
    * Update a collection of beans. If there is no current transaction one is created and used to
    * update all the beans in the collection.
    */
+  @Deprecated
   void update(Collection<?> beans) throws OptimisticLockException;
+
+  /**
+   * Update a collection of beans. If there is no current transaction one is created and used to
+   * update all the beans in the collection.
+   */
+  void updateAll(Collection<?> beans) throws OptimisticLockException;
+
+  /**
+   * Deprecated - please migrate to updateAll().
+   *
+   * Update a collection of beans with an explicit transaction.
+   */
+  @Deprecated
+  void update(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Update a collection of beans with an explicit transaction.
    */
-  void update(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
-  
+  void updateAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
+
   /**
    * Insert the bean.
    * <p>
@@ -1528,15 +1607,32 @@ public interface EbeanServer {
   void insert(Object bean, Transaction transaction);
 
   /**
+   * Deprecated - please migrate to insertAll().
+   *
    * Insert a collection of beans. If there is no current transaction one is created and used to
    * insert all the beans in the collection.
    */
+  @Deprecated
   void insert(Collection<?> beans);
+
+  /**
+   * Insert a collection of beans. If there is no current transaction one is created and used to
+   * insert all the beans in the collection.
+   */
+  void insertAll(Collection<?> beans);
+
+  /**
+   * Deprecated - please migrate to insertAll().
+   *
+   * Insert a collection of beans with an explicit transaction.
+   */
+  @Deprecated
+  void insert(Collection<?> beans, Transaction transaction);
 
   /**
    * Insert a collection of beans with an explicit transaction.
    */
-  void insert(Collection<?> beans, Transaction transaction);
+  void insertAll(Collection<?> beans, Transaction transaction);
 
   /**
    * Delete the associations (from the intersection table) of a ManyToMany given
@@ -1545,7 +1641,7 @@ public interface EbeanServer {
    * Typically these deletions occur automatically when persisting a ManyToMany
    * collection and this provides a way to invoke those deletions directly.
    * </p>
-   * 
+   *
    * @return the number of associations deleted (from the intersection table).
    */
   int deleteManyToManyAssociations(Object ownerBean, String propertyName);
@@ -1560,7 +1656,7 @@ public interface EbeanServer {
    * Typically these deletions occur automatically when persisting a ManyToMany
    * collection and this provides a way to invoke those deletions directly.
    * </p>
-   * 
+   *
    * @return the number of associations deleted (from the intersection table).
    */
   int deleteManyToManyAssociations(Object ownerBean, String propertyName, Transaction transaction);
@@ -1624,15 +1720,6 @@ public interface EbeanServer {
    */
   void saveAssociation(Object ownerBean, String propertyName, Transaction transaction);
 
-  /**
-   * Delete the bean with an explicit transaction.
-   */
-  void delete(Object bean, Transaction transaction) throws OptimisticLockException;
-
-  /**
-   * Delete all the beans from an iterator.
-   */
-  int delete(Iterator<?> it, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Execute explicitly passing a transaction.

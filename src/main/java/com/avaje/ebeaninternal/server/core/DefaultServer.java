@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1171,7 +1172,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
     BeanDescriptor<T> desc = beanDescriptorManager.getBeanDescriptor(q.getBeanType());
 
-    T bean = desc.cacheNaturalKeyLookup(q, (SpiTransaction)t);
+    T bean = desc.cacheNaturalKeyLookup(q, (SpiTransaction) t);
     if (bean != null) {
       return bean;
     }
@@ -1503,13 +1504,23 @@ public final class DefaultServer implements SpiEbeanServer {
    * Update all beans in the collection.
    */
   public void update(Collection<?> beans) {
-    update(beans, null);
+    updateAll(beans, null);
   }
-  
+
+  @Override
+  public void updateAll(Collection<?> beans) throws OptimisticLockException {
+    updateAll(beans, null);
+  }
+
+  @Override
+  public void update(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
+    updateAll(beans, transaction);
+  }
+
   /**
    * Update all beans in the collection with an explicit transaction.
    */
-  public void update(Collection<?> beans, Transaction t) {
+  public void updateAll(Collection<?> beans, Transaction t) {
 
     if (beans == null || beans.isEmpty()) {
       // Nothing to update?
@@ -1547,14 +1558,24 @@ public final class DefaultServer implements SpiEbeanServer {
   /**
    * Insert all beans in the collection.
    */
-  public void insert(Collection<?> beans) {
-    insert(beans, null);
+  public void insertAll(Collection<?> beans) {
+    insertAll(beans, null);
   }
-  
+
+  @Override
+  public void insert(Collection<?> beans) {
+    insertAll(beans, null);
+  }
+
+  @Override
+  public void insert(Collection<?> beans, Transaction transaction) {
+    insertAll(beans, transaction);
+  }
+
   /**
    * Insert all beans in the collection with a transaction.
    */
-  public void insert(Collection<?> beans, Transaction t) {
+  public void insertAll(Collection<?> beans, Transaction t) {
 
     if (beans == null || beans.isEmpty()) {
       // Nothing to insert?
@@ -1674,7 +1695,7 @@ public final class DefaultServer implements SpiEbeanServer {
    * number of beans that where saved.
    */
   public int save(Iterator<?> it) {
-    return save(it, null);
+    return saveAllInternal(it, null);
   }
 
   /**
@@ -1682,7 +1703,7 @@ public final class DefaultServer implements SpiEbeanServer {
    * number of beans that where saved.
    */
   public int save(Collection<?> c) {
-    return save(c.iterator(), null);
+    return saveAllInternal(c.iterator(), null);
   }
 
   /**
@@ -1690,13 +1711,28 @@ public final class DefaultServer implements SpiEbeanServer {
    * number of beans that where saved.
    */
   public int save(Collection<?> c, Transaction t) {
-    return save(c.iterator(), t);
+    return saveAllInternal(c.iterator(), t);
   }
-  
+
+  @Override
+  public int save(Iterator<?> it, Transaction transaction) throws OptimisticLockException {
+    return saveAllInternal(it, transaction);
+  }
+
+  @Override
+  public int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
+    return saveAllInternal(beans.iterator(), transaction);
+  }
+
+  @Override
+  public int saveAll(Collection<?> beans) throws OptimisticLockException {
+    return saveAllInternal(beans.iterator(), null);
+  }
+
   /**
    * Save all beans in the iterator with an explicit transaction.
    */
-  public int save(Iterator<?> it, Transaction t) {
+  public int saveAllInternal(Iterator<?> it, Transaction t) {
 
     TransWrapper wrap = initTransIfRequired(t);
     try {
@@ -1739,11 +1775,23 @@ public final class DefaultServer implements SpiEbeanServer {
     }
   }
 
+  @Override
   public void delete(Class<?> beanType, Collection<?> ids) {
-    delete(beanType, ids, null);
+    deleteAll(beanType, ids, null);
   }
 
-  public void delete(Class<?> beanType, Collection<?> ids, Transaction t) {
+  @Override
+  public void delete(Class<?> beanType, Collection<?> ids, Transaction transaction) {
+    deleteAll(beanType, ids, transaction);
+  }
+
+  @Override
+  public void deleteAll(Class<?> beanType, Collection<?> ids) {
+    deleteAll(beanType, ids, null);
+  }
+
+  @Override
+  public void deleteAll(Class<?> beanType, Collection<?> ids, Transaction t) {
 
     TransWrapper wrap = initTransIfRequired(t);
     try {
@@ -1775,21 +1823,36 @@ public final class DefaultServer implements SpiEbeanServer {
   /**
    * Delete all the beans in the iterator.
    */
+  @Override
   public int delete(Iterator<?> it) {
-    return delete(it, null);
+    return deleteAllInternal(it, null);
   }
 
   /**
    * Delete all the beans in the collection.
    */
-  public int delete(Collection<?> c) {
-    return delete(c.iterator(), null);
+  @Override
+  public int delete(Collection<?> beans) {
+    return deleteAllInternal(beans.iterator(), null);
+  }
+
+  @Override
+  public int delete(Iterator<?> it, Transaction transaction) throws OptimisticLockException {
+    return deleteAllInternal(it, transaction);
+  }
+
+  /**
+   * Delete all the beans in the collection.
+   */
+  @Override
+  public int deleteAll(Collection<?> beans) {
+    return deleteAllInternal(beans.iterator(), null);
   }
 
   /**
    * Delete all the beans in the iterator with an explicit transaction.
    */
-  public int delete(Iterator<?> it, Transaction t) {
+  private int deleteAllInternal(Iterator<?> it, Transaction t) {
 
     TransWrapper wrap = initTransIfRequired(t);
 

@@ -727,4 +727,49 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   public JsonContext json() {
     return null;
   }
+
+  @Override
+  public int saveAll(Collection<?> beans) throws OptimisticLockException {
+    return 0;
+  }
+
+  @Override
+  public int deleteAll(Collection<?> beans) throws OptimisticLockException {
+    return 0;
+  }
+
+  @Override
+  public void deleteAll(Class<?> beanType, Collection<?> ids) {
+
+  }
+
+  @Override
+  public void deleteAll(Class<?> beanType, Collection<?> ids, Transaction transaction) {
+
+  }
+
+  @Override
+  public int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
+    return 0;
+  }
+
+  @Override
+  public void updateAll(Collection<?> beans) throws OptimisticLockException {
+
+  }
+
+  @Override
+  public void updateAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
+
+  }
+
+  @Override
+  public void insertAll(Collection<?> beans) {
+
+  }
+
+  @Override
+  public void insertAll(Collection<?> beans, Transaction transaction) {
+
+  }
 }
