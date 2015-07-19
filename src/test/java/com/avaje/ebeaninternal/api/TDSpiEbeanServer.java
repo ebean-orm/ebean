@@ -532,12 +532,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   public void save(Object bean, Transaction transaction) throws OptimisticLockException {
 
   }
-
-  @Override
-  public int save(Iterator<?> it, Transaction transaction) throws OptimisticLockException {
-    return 0;
-  }
-
+  
   @Override
   public int save(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
     return 0;

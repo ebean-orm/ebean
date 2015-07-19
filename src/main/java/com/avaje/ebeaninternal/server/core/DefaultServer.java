@@ -1690,11 +1690,6 @@ public final class DefaultServer implements SpiEbeanServer {
   }
 
   @Override
-  public int save(Iterator<?> it, Transaction transaction) throws OptimisticLockException {
-    return saveAllInternal(it, transaction);
-  }
-
-  @Override
   public int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
     return saveAllInternal(beans.iterator(), transaction);
   }
