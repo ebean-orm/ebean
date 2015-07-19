@@ -90,7 +90,7 @@ public class ScalarTypeFloat extends ScalarTypeBase<Float> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Float value) throws IOException {
-    ctx.writeNumberField(name, value);
+  public void jsonWrite(JsonWriter writer, String name, Float value) throws IOException {
+    writer.writeNumberField(name, value);
   }
 }

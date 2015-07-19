@@ -830,7 +830,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     Object value = getValueIntercept(bean);
     if (value == null) {
-      writeJson.writeNull(name);
+      writeJson.writeNullField(name);
 
     } else {
       if (writeJson.isParentBean(value)) {

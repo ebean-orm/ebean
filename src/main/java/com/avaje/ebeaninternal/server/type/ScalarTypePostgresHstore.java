@@ -112,13 +112,13 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Map value) throws IOException {
+  public void jsonWrite(JsonWriter writer, String name, Map value) throws IOException {
     // write the field name followed by the Map/JSON Object
     if (value == null) {
-      ctx.writeNullField(name);
+      writer.writeNullField(name);
     } else {
-      ctx.writeFieldName(name);
-      EJson.write(value, ctx);
+      writer.writeFieldName(name);
+      EJson.write(value, writer.gen());
     }
   }
 

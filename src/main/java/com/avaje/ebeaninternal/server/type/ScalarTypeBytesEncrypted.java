@@ -64,8 +64,8 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, byte[] value) throws IOException {
-    ctx.writeBinaryField(name, value);
+  public void jsonWrite(JsonWriter writer, String name, byte[] value) throws IOException {
+    writer.writeBinaryField(name, value);
   }
 
   @Override

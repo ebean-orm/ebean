@@ -90,7 +90,7 @@ public class ScalarTypeDouble extends ScalarTypeBase<Double> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Double value) throws IOException {
-    ctx.writeNumberField(name, value);
+  public void jsonWrite(JsonWriter writer, String name, Double value) throws IOException {
+    writer.writeNumberField(name, value);
   }
 }

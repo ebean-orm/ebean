@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.config.JsonConfig;
+import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -29,7 +31,9 @@ public class JsonTester<T> {
 
     JsonGenerator generator = factory.createGenerator(writer);
     generator.writeStartObject();
-    type.jsonWrite(generator, "key", value);
+
+    WriteJson writeJson = new WriteJson(generator, JsonConfig.Include.ALL);
+    type.jsonWrite(writeJson, "key", value);
     generator.writeEndObject();
     generator.flush();
 

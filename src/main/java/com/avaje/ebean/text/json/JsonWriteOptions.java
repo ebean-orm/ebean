@@ -1,5 +1,6 @@
 package com.avaje.ebean.text.json;
 
+import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.text.PathProperties;
 
 /**
@@ -14,6 +15,8 @@ public class JsonWriteOptions {
   protected PathProperties pathProperties;
 
   protected Object objectMapper;
+
+  protected JsonConfig.Include include;
 
   /**
    * Parse and return a PathProperties from nested string format like
@@ -48,6 +51,20 @@ public class JsonWriteOptions {
    */
   public PathProperties getPathProperties() {
     return pathProperties;
+  }
+
+  /**
+   * Return the include mode for this request.
+   */
+  public JsonConfig.Include getInclude() {
+    return include;
+  }
+
+  /**
+   * Set the include mode for this request.
+   */
+  public void setInclude(JsonConfig.Include include) {
+    this.include = include;
   }
 
   /**

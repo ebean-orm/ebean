@@ -92,8 +92,8 @@ public class ScalarTypeTime extends ScalarTypeBase<Time> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Time value) throws IOException {
-    ctx.writeStringField(name, format(value));
+  public void jsonWrite(JsonWriter writer, String name, Time value) throws IOException {
+    writer.writeStringField(name, format(value));
   }
 
 }

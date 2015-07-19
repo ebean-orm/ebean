@@ -1,19 +1,24 @@
 package com.avaje.ebeaninternal.server.text.json;
 
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+import com.avaje.ebeaninternal.server.type.JsonWriter;
 import com.avaje.ebeaninternal.server.util.ArrayStack;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
-public class WriteJson {
+public class WriteJson implements JsonWriter {
 
   private final SpiEbeanServer server;
   
@@ -27,15 +32,103 @@ public class WriteJson {
 
   private final Object objectMapper;
 
-  public WriteJson(SpiEbeanServer server, JsonGenerator generator, PathProperties pathProperties, Object objectMapper){
+  private final JsonConfig.Include include;
+
+  public WriteJson(SpiEbeanServer server, JsonGenerator generator, PathProperties pathProperties, Object objectMapper, JsonConfig.Include include){
     this.server = server;
     this.generator = generator;
     this.pathProperties = pathProperties;
     this.objectMapper = objectMapper;
+    this.include = include;
+  }
+
+  /**
+   * Construct for testing purposes only.
+   */
+  public WriteJson(JsonGenerator generator, JsonConfig.Include include) {
+    this(null, generator, null, null, include);
+  }
+
+  /**
+   * Return true if null values should be included in JSON output.
+   */
+  public boolean isIncludeNull() {
+    return include == JsonConfig.Include.ALL;
+  }
+
+  /**
+   * Return true if empty collections should be included in the JSON output.
+   */
+  public boolean isIncludeEmpty() {
+    return include != JsonConfig.Include.NON_EMPTY;
   }
 
   public JsonGenerator gen() {
     return generator;
+  }
+
+  @Override
+  public void writeFieldName(String name) throws IOException {
+    generator.writeFieldName(name);
+  }
+
+  @Override
+  public void writeNullField(String name) throws IOException {
+    if (isIncludeNull()) {
+      generator.writeNullField(name);
+    }
+  }
+
+  @Override
+  public void writeNumberField(String name, Long value) throws IOException {
+    generator.writeNumberField(name, value);
+  }
+
+  @Override
+  public void writeNumberField(String name, Double value) throws IOException {
+    generator.writeNumberField(name, value);
+  }
+
+  @Override
+  public void writeNumberField(String name, int value) throws IOException {
+    generator.writeNumberField(name, value);
+  }
+
+  @Override
+  public void writeNumberField(String name, Short value) throws IOException {
+    generator.writeNumberField(name, value);
+  }
+
+
+  @Override
+  public void writeNumberField(String name, Float value) throws IOException {
+    generator.writeNumberField(name, value);
+  }
+
+
+  @Override
+  public void writeNumberField(String name, BigDecimal value) throws IOException {
+    generator.writeNumberField(name, value);
+  }
+
+  @Override
+  public void writeStringField(String name, String value) throws IOException {
+    generator.writeStringField(name, value);
+  }
+
+  @Override
+  public void writeBinary(InputStream is, int length) throws IOException {
+    generator.writeBinary(is, length);
+  }
+
+  @Override
+  public void writeBinaryField(String name, byte[] value) throws IOException {
+    generator.writeBinaryField(name, value);
+  }
+
+  @Override
+  public void writeBooleanField(String name, Boolean value) throws IOException {
+    generator.writeBooleanField(name, value);
   }
 
   public boolean isParentBean(Object bean) {
@@ -78,6 +171,17 @@ public class WriteJson {
   }
 
   public void writeValueUsingObjectMapper(String name, Object value) throws IOException {
+
+    if (!isIncludeEmpty()) {
+      // check for suppression of empty collection or map
+      if (value instanceof Collection && ((Collection)value).isEmpty()) {
+        // suppress empty collection
+        return;
+      } else if (value instanceof Map && ((Map)value).isEmpty()) {
+        // suppress empty map
+        return;
+      }
+    }
     generator.writeFieldName(name);
     objectMapper().writeValue(generator, value);
   }
@@ -214,10 +318,6 @@ public class WriteJson {
       generator.writeFieldName(key);
     }
     generator.writeStartObject();
-  }
-  
-  public void writeNull(String name) throws IOException {
-    generator.writeNullField(name);
   }
 
   public void writeEndObject() throws IOException {

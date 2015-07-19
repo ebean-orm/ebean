@@ -876,7 +876,10 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
         if (isTransient) {
           ctx.writeValueUsingObjectMapper(name, value);
         } else {
-          ctx.toJson(name, (Collection<?>) value);
+          Collection<?> collection = (Collection<?>)value;
+          if (!collection.isEmpty() || ctx.isIncludeEmpty()) {
+            ctx.toJson(name, collection);
+          }
         }
       }
       ctx.popParentBeanMany();

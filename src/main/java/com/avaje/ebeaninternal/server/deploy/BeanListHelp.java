@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.avaje.ebean.EbeanServer;
@@ -141,11 +140,13 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
       list = (List<?>) collection;
     }
 
-    ctx.writeStartArray(name);
-    for (int j = 0; j < list.size(); j++) {
-      targetDescriptor.jsonWrite(ctx, (EntityBean) list.get(j));
+    if (!list.isEmpty() || ctx.isIncludeEmpty()) {
+      ctx.writeStartArray(name);
+      for (int j = 0; j < list.size(); j++) {
+        targetDescriptor.jsonWrite(ctx, (EntityBean) list.get(j));
+      }
+      ctx.writeEndArray();
     }
-    ctx.writeEndArray();
   }
 
 }

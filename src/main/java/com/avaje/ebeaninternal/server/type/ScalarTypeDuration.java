@@ -107,7 +107,7 @@ public class ScalarTypeDuration extends ScalarTypeBase<Duration> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Duration value) throws IOException {
-    ctx.writeStringField(name, value.toString());
+  public void jsonWrite(JsonWriter writer, String name, Duration value) throws IOException {
+    writer.writeStringField(name, value.toString());
   }
 }

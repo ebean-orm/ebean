@@ -202,6 +202,6 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   /**
    * Write the value to the JsonGenerator.
    */
-  void jsonWrite(JsonGenerator ctx, String name, T value) throws IOException;
+  void jsonWrite(JsonWriter writer, String name, T value) throws IOException;
 
 }

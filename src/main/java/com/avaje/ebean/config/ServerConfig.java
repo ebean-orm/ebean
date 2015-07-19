@@ -123,6 +123,12 @@ public class ServerConfig {
    */
   private JsonConfig.DateTime jsonDateTime = JsonConfig.DateTime.MILLIS;
 
+  /**
+   * For writing JSON specify if null values or empty collections should be exluded.
+   * By default all values are included.
+   */
+  private JsonConfig.Include jsonInclude = JsonConfig.Include.ALL;
+
   /** 
    * The database platform name. Used to imply a DatabasePlatform to use.  
    */
@@ -304,7 +310,7 @@ public class ServerConfig {
   /**
    * Return the Jackson JsonFactory to use.
    * <p>
-   * If not set a default implmentation will be used.
+   * If not set a default implementation will be used.
    */
   public JsonFactory getJsonFactory() {
     return jsonFactory;
@@ -313,7 +319,7 @@ public class ServerConfig {
   /**
    * Set the Jackson JsonFactory to use.
    * <p>
-   * If not set a default implmentation will be used.
+   * If not set a default implementation will be used.
    */
   public void setJsonFactory(JsonFactory jsonFactory) {
     this.jsonFactory = jsonFactory;
@@ -331,6 +337,23 @@ public class ServerConfig {
    */
   public void setJsonDateTime(JsonConfig.DateTime jsonDateTime) {
     this.jsonDateTime = jsonDateTime;
+  }
+
+  /**
+   * Return the JSON include mode used when writing JSON.
+   */
+  public JsonConfig.Include getJsonInclude() {
+    return jsonInclude;
+  }
+
+  /**
+   * Set the JSON include mode used when writing JSON.
+   * <p>
+   * Set to NON_NULL or NON_EMPTY to suppress nulls or null & empty collections respectively.
+   * </p>
+   */
+  public void setJsonInclude(JsonConfig.Include jsonInclude) {
+    this.jsonInclude = jsonInclude;
   }
 
   /**
@@ -1784,7 +1807,7 @@ public class ServerConfig {
     int batchSize = p.getInt("batch.size", persistBatchSize);
     persistBatchSize = p.getInt("persistBatchSize", batchSize);
 
-    persistenceContextScope = PersistenceContextScope.valueOf(p.get("persistenceContextScope","TRANSACTION"));
+    persistenceContextScope = PersistenceContextScope.valueOf(p.get("persistenceContextScope", "TRANSACTION"));
 
     dataSourceJndiName = p.get("dataSourceJndiName", dataSourceJndiName);
     databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
@@ -1797,6 +1820,7 @@ public class ServerConfig {
     lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", lazyLoadBatchSize);
     queryBatchSize = p.getInt("queryBatchSize", queryBatchSize);
 
+    jsonInclude = p.getEnum(JsonConfig.Include.class, "jsonInclude", jsonInclude);
     String jsonDateTimeFormat = p.get("jsonDateTime", null);
     if (jsonDateTimeFormat != null) {
       jsonDateTime = JsonConfig.DateTime.valueOf(jsonDateTimeFormat);

@@ -284,8 +284,9 @@ public class ScalarTypeBoolean {
       return JsonToken.VALUE_TRUE == event ? Boolean.TRUE : Boolean.FALSE;
     }
 
-    public void jsonWrite(JsonGenerator ctx, String name, Boolean value) throws IOException {
-      ctx.writeBooleanField(name, value);
+    @Override
+    public void jsonWrite(JsonWriter writer, String name, Boolean value) throws IOException {
+      writer.writeBooleanField(name, value);
     }
   }
 

@@ -171,7 +171,7 @@ public class BeanPropertyCompound extends BeanProperty {
     }
     Object value = getValueIntercept(bean);
     if (value == null) {
-      ctx.writeNull(name);
+      ctx.writeNullField(name);
     } else {
       compoundType.jsonWrite(ctx, value, name);
     }

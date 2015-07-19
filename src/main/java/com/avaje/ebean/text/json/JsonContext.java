@@ -163,8 +163,6 @@ public interface JsonContext {
   /**
    * Deprecated in favour of using PathProperties by itself.
    * Write json to the JsonGenerator using the JsonWriteOptions.
-   *
-   * @deprecated
    */
   void toJson(Object value, JsonGenerator generator, JsonWriteOptions options) throws JsonIOException;
 
@@ -173,7 +171,6 @@ public interface JsonContext {
    * With additional options.
    *
    * @throws JsonIOException When IOException occurs
-   * @deprecated
    */
   void toJson(Object value, Writer writer, JsonWriteOptions options) throws JsonIOException;
 
@@ -182,7 +179,6 @@ public interface JsonContext {
    * Convert a bean or collection to json string.
    *
    * @throws JsonIOException When IOException occurs
-   * @deprecated
    */
   String toJson(Object value, JsonWriteOptions options) throws JsonIOException;
 

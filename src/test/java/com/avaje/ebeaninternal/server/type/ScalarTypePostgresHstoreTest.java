@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.config.JsonConfig;
+import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -100,7 +102,8 @@ public class ScalarTypePostgresHstoreTest {
     // wrap in an object to form proper json
     generator.writeStartObject();
 
-    hstore.jsonWrite(generator, "key", map);
+    WriteJson writeJson = new WriteJson(generator, JsonConfig.Include.ALL);
+    hstore.jsonWrite(writeJson, "key", map);
 
     generator.writeEndObject();
     generator.flush();

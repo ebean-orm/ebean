@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.text.json;
 
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.text.json.*;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -26,10 +27,13 @@ public class DJsonContext implements JsonContext {
 
   private final Object defaultObjectMapper;
 
+  private final JsonConfig.Include defaultInclude;
+
   public DJsonContext(SpiEbeanServer server, JsonFactory jsonFactory) {
     this.server = server;
     this.jsonFactory = (jsonFactory != null) ? jsonFactory : new JsonFactory();
     this.defaultObjectMapper = this.server.getServerConfig().getObjectMapper();
+    this.defaultInclude = this.server.getServerConfig().getJsonInclude();
   }
 
   public boolean isSupportedType(Type genericType) {
@@ -274,7 +278,7 @@ public class DJsonContext implements JsonContext {
 
   private WriteJson createWriteJson(JsonGenerator gen, JsonWriteOptions options) {
     PathProperties pathProps = (options == null) ? null : options.getPathProperties();
-    return new WriteJson(server, gen, pathProps, determineObjectMapper(options));
+    return new WriteJson(server, gen, pathProps, determineObjectMapper(options), determineInclude(options));
   }
 
   private <T> void toJsonFromCollection(Collection<T> collection, String key, JsonGenerator gen, JsonWriteOptions options) throws IOException {
@@ -354,5 +358,16 @@ public class DJsonContext implements JsonContext {
     }
     Object mapper = options.getObjectMapper();
     return (mapper != null) ? mapper : defaultObjectMapper;
+  }
+
+  /**
+   * Determine the include mode to use for a JSON write request.
+   */
+  private JsonConfig.Include determineInclude(JsonWriteOptions options) {
+    if (options == null) {
+      return defaultInclude;
+    }
+    JsonConfig.Include include = options.getInclude();
+    return (include != null) ? include : defaultInclude;
   }
 }

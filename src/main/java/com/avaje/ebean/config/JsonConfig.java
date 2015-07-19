@@ -26,4 +26,22 @@ public abstract class JsonConfig {
     ISO8601
   }
 
+
+  public enum Include {
+
+    /**
+     * Include all values including null and empty collections.
+     */
+    ALL,
+
+    /**
+     * Exclude null values (include empty collections).
+     */
+    NON_NULL,
+
+    /**
+     * Exclude null values and empty collections.
+     */
+    NON_EMPTY
+  }
 }

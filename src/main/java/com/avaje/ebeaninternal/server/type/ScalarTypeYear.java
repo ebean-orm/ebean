@@ -94,7 +94,7 @@ public class ScalarTypeYear extends ScalarTypeBase<Year> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, Year value) throws IOException {
-    ctx.writeNumberField(name, value.getValue());
+  public void jsonWrite(JsonWriter writer, String name, Year value) throws IOException {
+    writer.writeNumberField(name, value.getValue());
   }
 }

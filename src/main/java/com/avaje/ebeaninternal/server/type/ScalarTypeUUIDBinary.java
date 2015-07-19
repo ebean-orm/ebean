@@ -149,8 +149,8 @@ public class ScalarTypeUUIDBinary extends ScalarTypeBase<UUID> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, UUID value) throws IOException {
-    ctx.writeStringField(name, value.toString());
+  public void jsonWrite(JsonWriter writer, String name, UUID value) throws IOException {
+    writer.writeStringField(name, value.toString());
   }
 
 }

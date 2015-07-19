@@ -1074,10 +1074,10 @@ public class BeanProperty implements ElPropertyValue {
     }
     Object value = getValueIntercept(bean);
     if (value == null) {
-      writeJson.writeNull(name);
+      writeJson.writeNullField(name);
     } else {
       if (scalarType != null) {
-        scalarType.jsonWrite(writeJson.gen(), name, value);
+        scalarType.jsonWrite(writeJson, name, value);
       } else {
         writeJson.writeValueUsingObjectMapper(name, value);
       }

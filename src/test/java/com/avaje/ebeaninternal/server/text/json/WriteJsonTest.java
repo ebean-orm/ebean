@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.text.json;
 
+import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.text.PathProperties;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -19,7 +20,7 @@ public class WriteJsonTest {
     JsonGenerator generator = jsonFactory.createGenerator(new StringWriter());
 
     PathProperties pathProperties = PathProperties.parse("id,status,name,customer(id,name,address(street,city)),orders(qty,product(sku,prodName))");
-    WriteJson writeJson = new WriteJson(null, generator, pathProperties, null);
+    WriteJson writeJson = new WriteJson(null, generator, pathProperties, null, JsonConfig.Include.ALL);
 
     WriteJson.WriteBean rootLevel = writeJson.createWriteBean(null, null);
     assertTrue(rootLevel.currentIncludeProps.contains("id"));

@@ -188,9 +188,9 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, B beanValue) throws IOException {
+  public void jsonWrite(JsonWriter writer, String name, B beanValue) throws IOException {
     S unwrapValue = converter.unwrapValue(beanValue);
-    scalarType.jsonWrite(ctx, name, unwrapValue);
+    scalarType.jsonWrite(writer, name, unwrapValue);
   }
 
 }

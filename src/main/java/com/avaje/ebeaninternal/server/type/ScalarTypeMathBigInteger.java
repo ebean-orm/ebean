@@ -97,8 +97,8 @@ public class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator ctx, String name, BigInteger value) throws IOException {
-    ctx.writeNumberField(name, value.longValue());
+  public void jsonWrite(JsonWriter writer, String name, BigInteger value) throws IOException {
+    writer.writeNumberField(name, value.longValue());
   }
 
 }
