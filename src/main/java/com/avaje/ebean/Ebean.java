@@ -101,7 +101,7 @@ import com.avaje.ebean.text.json.JsonContext;
  * specific database.
  * </p>
  * 
- * <pre> {@code
+ * <pre>{@code
  *
  *   // Get access to the Human Resources EbeanServer/Database
  *   EbeanServer hrDb = Ebean.getServer("hr");
@@ -533,7 +533,6 @@ public final class Ebean {
    *   public class Order { ...
    * 	
    * 	   @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
-   * 	   @JoinColumn(name="order_id")
    * 	   List<OrderDetail> details;
    * 	   ...
    *   }
