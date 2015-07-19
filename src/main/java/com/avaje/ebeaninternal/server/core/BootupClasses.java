@@ -41,7 +41,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
   private ArrayList<Class<?>> transactionEventListenerList = new ArrayList<Class<?>>();
 
-  private ArrayList<Class<?>> beanFinderList = new ArrayList<Class<?>>();
   private ArrayList<Class<?>> beanFindControllerList = new ArrayList<Class<?>>();
   private ArrayList<Class<?>> beanQueryAdapterList = new ArrayList<Class<?>>();
 
@@ -283,13 +282,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
   }
 
   /**
-   * Return the list of BeanFinders found.
-   */
-  public List<Class<?>> getBeanFinders() {
-    return beanFinderList;
-  }
-
-  /**
    * Return the list of BeanListeners found.
    */
   public List<Class<?>> getBeanListeners() {
@@ -348,11 +340,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
     if (CompoundType.class.isAssignableFrom(cls)) {
       compoundTypeList.add(cls);
-      interesting = true;
-    }
-
-    if (BeanFinder.class.isAssignableFrom(cls)) {
-      beanFinderList.add(cls);
       interesting = true;
     }
 
