@@ -1218,14 +1218,6 @@ public interface EbeanServer {
   int save(Iterator<?> it) throws OptimisticLockException;
 
   /**
-   * Deprecated - please migrate to saveAll().
-   *
-   * Save all the beans in the collection.
-   */
-  @Deprecated
-  int save(Collection<?> beans) throws OptimisticLockException;
-
-  /**
    * Save all the beans in the collection.
    */
   int saveAll(Collection<?> beans) throws OptimisticLockException;

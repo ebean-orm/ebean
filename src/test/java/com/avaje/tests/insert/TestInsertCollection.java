@@ -54,7 +54,7 @@ public class TestInsertCollection extends BaseTestCase {
     saveList.add(cust1Check2);
     saveList.add(cust3);
     
-    Ebean.save(saveList);
+    Ebean.saveAll(saveList);
     
 
     Customer cust1Check3 = Ebean.find(Customer.class, cust1.getId());

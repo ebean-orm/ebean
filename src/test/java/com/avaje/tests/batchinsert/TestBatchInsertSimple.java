@@ -99,7 +99,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
       transaction.setBatchSize(20);
 
       // escalate based on batchOnCascade value
-      Ebean.save(masters);
+      Ebean.saveAll(masters);
 
       transaction.commit();
 
@@ -119,7 +119,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
     }
 
     // escalate based on batchOnCascade value
-    Ebean.save(masters);
+    Ebean.saveAll(masters);
 
   }
 

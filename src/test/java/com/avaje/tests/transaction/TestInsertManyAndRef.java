@@ -51,6 +51,6 @@ public class TestInsertManyAndRef extends BaseTestCase {
     bookmarks.add(b1);
     bookmarks.add(b2);
 
-    Ebean.save(bookmarks);
+    Ebean.saveAll(bookmarks);
   }
 }
