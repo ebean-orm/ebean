@@ -7,6 +7,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.util.ArrayStack;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -24,10 +25,13 @@ public class WriteJson {
 
   private final ArrayStack<Object> parentBeans = new ArrayStack<Object>();
 
-  public WriteJson(SpiEbeanServer server, JsonGenerator generator, PathProperties pathProperties){
+  private final Object objectMapper;
+
+  public WriteJson(SpiEbeanServer server, JsonGenerator generator, PathProperties pathProperties, Object objectMapper){
     this.server = server;
     this.generator = generator;
     this.pathProperties = pathProperties;
+    this.objectMapper = objectMapper;
   }
 
   public JsonGenerator gen() {
@@ -71,6 +75,20 @@ public class WriteJson {
       }
     }
     return new WriteBean(desc, explicitAllProps, currentIncludeProps, bean);
+  }
+
+  public void writeValueUsingObjectMapper(String name, Object value) throws IOException {
+    generator.writeFieldName(name);
+    objectMapper().writeValue(generator, value);
+  }
+
+  private ObjectMapper objectMapper() {
+    if (objectMapper == null) {
+      throw new IllegalStateException(
+          "Jackson ObjectMapper required but not set. Expected to be set on either"
+          +" serverConfig");
+    }
+    return (ObjectMapper)objectMapper;
   }
 
   public static class WriteBean {

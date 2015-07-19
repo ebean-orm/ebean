@@ -173,19 +173,27 @@ public class DeployUtil {
     // Note that Temporal types already have dbType
     // set via annotations
     Class<?> propType = property.getPropertyType();
-    ScalarType<?> scalarType = typeManager.getScalarType(propType, property.getDbType());
-    if (scalarType != null) {
-      return scalarType;
-    }
+    try {
+      ScalarType<?> scalarType = typeManager.getScalarType(propType, property.getDbType());
+      if (scalarType != null) {
+        return scalarType;
+      }
 
-    String msg = property.getFullBeanName() + " has no ScalarType - type[" + propType.getName() + "]";
-    if (!property.isTransient()) {
-      throw new PersistenceException(msg);
+      String msg = property.getFullBeanName() + " has no ScalarType - type[" + propType.getName() + "]";
+      if (!property.isTransient()) {
+        throw new PersistenceException(msg);
 
-    } else {
-      // this is ok...
-      logger.trace("... transient property " + msg);
-      return null;
+      } else {
+        // this is ok...
+        logger.trace("... transient property " + msg);
+        return null;
+      }
+    } catch (IllegalArgumentException e) {
+      if (property.isTransient()) {
+        // expected for transient properties with unknown/non-mapped types
+        return null;
+      }
+      throw e;
     }
   }
 

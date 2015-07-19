@@ -1,9 +1,8 @@
 package com.avaje.tests.model.basic;
 
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
+import com.avaje.ebean.annotation.EnumValue;
+import com.avaje.ebean.annotation.JsonIgnore;
+import com.avaje.ebean.annotation.Where;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -13,9 +12,10 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import com.avaje.ebean.annotation.EnumValue;
-import com.avaje.ebean.annotation.Where;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Customer entity bean.
@@ -43,6 +43,9 @@ public class Customer extends BasicDomain {
   @Transient
   Boolean selected;
 
+
+  @JsonIgnore
+  //@Expose(deserialize = false, serialize = false)
   @Transient
   ReentrantLock lock = new ReentrantLock();
 

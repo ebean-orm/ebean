@@ -159,7 +159,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     this.typeMap = new ConcurrentHashMap<Class<?>, ScalarType<?>>();
     this.nativeMap = new ConcurrentHashMap<Integer, ScalarType<?>>();
 
-    this.objectMapperPresent = ClassUtil.isPresent("com.fasterxml.jackson.databind.ObjectMapper", this.getClass());
+    this.objectMapperPresent = ClassUtil.isJacksonObjectMapperPresent();
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
 
@@ -384,7 +384,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       return (ScalarType<T>) extraTypeFactory.createCalendar(jsonDateTime, jdbcType);
     }
 
-    throw new RuntimeException("Unmatched ScalarType for " + type + " jdbcType:" + jdbcType);
+    throw new IllegalArgumentException("Unmatched ScalarType for " + type + " jdbcType:" + jdbcType);
   }
 
   /**

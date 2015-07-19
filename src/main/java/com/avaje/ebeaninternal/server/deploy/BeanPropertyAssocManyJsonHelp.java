@@ -1,23 +1,42 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.io.IOException;
-
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
+import java.io.IOException;
+
+/**
+ * Help BeanPropertyAssocMany with JSON processing.
+ */
 public class BeanPropertyAssocManyJsonHelp {
 
+  /**
+   * The associated many property.
+   */
   private final BeanPropertyAssocMany<?> many;
 
+  /**
+   * Helper used to read json for transient 'many' properties.
+   */
+  private final BeanPropertyAssocManyJsonTransient jsonTransient;
+
+  /**
+   * Construct for the owning many property.
+   */
   public BeanPropertyAssocManyJsonHelp(BeanPropertyAssocMany<?> many) {
     this.many = many;
+    this.jsonTransient = !ClassUtil.isJacksonObjectMapperPresent() ? null : new BeanPropertyAssocManyJsonTransient();
   }
 
+  /**
+   * Read the JSON for this property.
+   */
   public void jsonRead(ReadJson readJson, EntityBean parentBean) throws IOException {
     
     if (!this.many.jsonDeserialize) {
@@ -31,6 +50,11 @@ public class BeanPropertyAssocManyJsonHelp {
     }
     if (JsonToken.START_ARRAY != event) {
       throw new JsonParseException("Unexpected token " + event + " - expecting start_array ", parser.getCurrentLocation());
+    }
+
+    if (many.isTransient()) {
+      jsonReadTransientUsingObjectMapper(readJson, parentBean);
+      return;
     }
 
     BeanCollection<?> collection = many.createEmpty(parentBean);
@@ -50,5 +74,16 @@ public class BeanPropertyAssocManyJsonHelp {
     } while (true);
 
     many.setValue(parentBean, collection);
+  }
+
+  /**
+   * Read a Transient property using Jackson ObjectMapper.
+   */
+  private void jsonReadTransientUsingObjectMapper(ReadJson readJson, EntityBean parentBean) throws IOException {
+
+    if (jsonTransient == null) {
+      throw new IllegalStateException("Jackson ObjectMapper is required to read this Transient property "+many.getFullBeanName());
+    }
+    jsonTransient.jsonReadUsingObjectMapper(many, readJson, parentBean);
   }
 }

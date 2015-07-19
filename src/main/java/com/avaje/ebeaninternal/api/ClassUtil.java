@@ -49,6 +49,21 @@ public class ClassUtil {
         return classLoader;
     }
 
+  /**
+   * Return true if Jackson annotations like JsonIgnore are present.
+   */
+  public static boolean isJacksonAnnotationsPresent() {
+    return isPresent("com.fasterxml.jackson.annotation.JsonIgnore", null);
+  }
+
+  /**
+   * Return true if Jackson ObjectMapper is present.
+   */
+  public static boolean isJacksonObjectMapperPresent() {
+    return isPresent("com.fasterxml.jackson.databind.ObjectMapper", null);
+  }
+
+
     /**
      * Return true if the given class is present.
      */

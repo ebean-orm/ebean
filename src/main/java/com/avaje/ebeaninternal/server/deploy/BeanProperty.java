@@ -22,6 +22,8 @@ import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.fasterxml.jackson.core.JsonToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.io.DataInput;
@@ -38,6 +40,8 @@ import java.util.Map;
  * as database column mapping information.
  */
 public class BeanProperty implements ElPropertyValue {
+
+  private static final Logger logger = LoggerFactory.getLogger(BeanProperty.class);
 
   /**
    * Flag to mark this at part of the unique id.
@@ -299,8 +303,8 @@ public class BeanProperty implements ElPropertyValue {
     this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), false, null);
     this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), dbEncrypted, dbColumn);
 
-    this.jsonSerialize = deploy.isExposeSerialize();
-    this.jsonDeserialize = deploy.isExposeDeserialize();
+    this.jsonSerialize = deploy.isJsonSerialize();
+    this.jsonDeserialize = deploy.isJsonDeserialize();
   }
 
   private String tableAliasIntern(BeanDescriptor<?> descriptor, String s, boolean dbEncrypted, String dbColumn) {
@@ -1072,22 +1076,40 @@ public class BeanProperty implements ElPropertyValue {
     if (value == null) {
       writeJson.writeNull(name);
     } else {
-      scalarType.jsonWrite(writeJson.gen(), name, value);
+      if (scalarType != null) {
+        scalarType.jsonWrite(writeJson.gen(), name, value);
+      } else {
+        writeJson.writeValueUsingObjectMapper(name, value);
+      }
     }
   }
 
   public void jsonRead(ReadJson ctx, EntityBean bean) throws IOException {
-    if (!jsonDeserialize) {
-      return;
-    }
 
     JsonToken event = ctx.nextToken();
     if (JsonToken.VALUE_NULL == event) {
-      setValue(bean, null);
+      if (jsonDeserialize) {
+        setValue(bean, null);
+      }
     } else {
       // expect to read non-null json value
-      Object objValue = scalarType.jsonRead(ctx.getParser(), event);
-      setValue(bean, objValue);
+      Object objValue;
+      if (scalarType != null) {
+        objValue = scalarType.jsonRead(ctx.getParser(), event);
+      } else {
+        try {
+          objValue = ctx.readValueUsingObjectMapper(propertyType);
+        } catch (IOException e) {
+          // change in behavior for #318
+          objValue = null;
+          String msg = "Error trying to use Jackson ObjectMapper to read transient property "
+              + getFullBeanName() +" - consider marking this property with @JsonIgnore";
+          logger.error(msg, e);
+        }
+      }
+      if (jsonDeserialize) {
+        setValue(bean, objValue);
+      }
     }
   }
 }

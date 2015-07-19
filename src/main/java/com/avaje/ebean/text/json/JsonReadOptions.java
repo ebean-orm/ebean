@@ -15,6 +15,8 @@ public class JsonReadOptions {
 
   protected Map<String, JsonReadBeanVisitor<?>> visitorMap;
 
+  protected Object objectMapper;
+
   /**
    * Default constructor.
    */
@@ -44,4 +46,17 @@ public class JsonReadOptions {
     return this;
   }
 
+  /**
+   * Return the Jackson ObjectMapper to use (if not wanted to use the objectMapper set on the ServerConfig).
+   */
+  public Object getObjectMapper() {
+    return objectMapper;
+  }
+
+  /**
+   * Set the Jackson ObjectMapper to use (if not wanted to use the objectMapper set on the ServerConfig).
+   */
+  public void setObjectMapper(Object objectMapper) {
+    this.objectMapper = objectMapper;
+  }
 }

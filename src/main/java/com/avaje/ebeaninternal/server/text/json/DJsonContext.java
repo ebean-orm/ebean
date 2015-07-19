@@ -24,9 +24,12 @@ public class DJsonContext implements JsonContext {
 
   private final JsonFactory jsonFactory;
 
+  private final Object defaultObjectMapper;
+
   public DJsonContext(SpiEbeanServer server, JsonFactory jsonFactory) {
     this.server = server;
     this.jsonFactory = (jsonFactory != null) ? jsonFactory : new JsonFactory();
+    this.defaultObjectMapper = this.server.getServerConfig().getObjectMapper();
   }
 
   public boolean isSupportedType(Type genericType) {
@@ -72,7 +75,7 @@ public class DJsonContext implements JsonContext {
 
   public <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
-    ReadJson readJson = new ReadJson(parser, options);
+    ReadJson readJson = new ReadJson(parser, options, determineObjectMapper(options));
     try {
       BeanDescriptor<T> d = getDescriptor(cls);
       return d.jsonRead(readJson, null);
@@ -104,7 +107,7 @@ public class DJsonContext implements JsonContext {
 
   public <T> List<T> toList(Class<T> cls, JsonParser src, JsonReadOptions options) throws JsonIOException {
 
-    ReadJson readJson = new ReadJson(src, options);
+    ReadJson readJson = new ReadJson(src, options, determineObjectMapper(options));
     try {
       BeanDescriptor<T> d = getDescriptor(cls);
 
@@ -271,7 +274,7 @@ public class DJsonContext implements JsonContext {
 
   private WriteJson createWriteJson(JsonGenerator gen, JsonWriteOptions options) {
     PathProperties pathProps = (options == null) ? null : options.getPathProperties();
-    return new WriteJson(server, gen, pathProps);
+    return new WriteJson(server, gen, pathProps, determineObjectMapper(options));
   }
 
   private <T> void toJsonFromCollection(Collection<T> collection, String key, JsonGenerator gen, JsonWriteOptions options) throws IOException {
@@ -320,11 +323,36 @@ public class DJsonContext implements JsonContext {
     gen.writeEndObject();
   }
 
-  private <T> BeanDescriptor<T> getDescriptor(Class<T> cls) {
-    BeanDescriptor<T> d = server.getBeanDescriptor(cls);
+  /**
+   * Return the BeanDescriptor for the given bean type.
+   */
+  private <T> BeanDescriptor<T> getDescriptor(Class<T> beanType) {
+    BeanDescriptor<T> d = server.getBeanDescriptor(beanType);
     if (d == null) {
-      throw new RuntimeException("No BeanDescriptor found for " + cls);
+      throw new RuntimeException("No BeanDescriptor found for " + beanType);
     }
     return d;
+  }
+
+  /**
+   * Determine the object mapper to use for a JSON read request.
+   */
+  private Object determineObjectMapper(JsonReadOptions options) {
+    if (options == null) {
+      return defaultObjectMapper;
+    }
+    Object mapper = options.getObjectMapper();
+    return (mapper != null) ? mapper : defaultObjectMapper;
+  }
+
+  /**
+   * Determine the object mapper to use for a JSON write request.
+   */
+  private Object determineObjectMapper(JsonWriteOptions options) {
+    if (options == null) {
+      return defaultObjectMapper;
+    }
+    Object mapper = options.getObjectMapper();
+    return (mapper != null) ? mapper : defaultObjectMapper;
   }
 }

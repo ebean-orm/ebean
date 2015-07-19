@@ -1,11 +1,23 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import com.avaje.ebean.annotation.*;
+import com.avaje.ebean.annotation.ColumnHstore;
+import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.DbHstore;
+import com.avaje.ebean.annotation.DbJson;
+import com.avaje.ebean.annotation.DbJsonB;
+import com.avaje.ebean.annotation.EmbeddedColumns;
+import com.avaje.ebean.annotation.Encrypted;
+import com.avaje.ebean.annotation.Expose;
+import com.avaje.ebean.annotation.Formula;
+import com.avaje.ebean.annotation.Index;
+import com.avaje.ebean.annotation.JsonIgnore;
+import com.avaje.ebean.annotation.UpdatedTimestamp;
 import com.avaje.ebean.config.EncryptDeploy;
 import com.avaje.ebean.config.EncryptDeploy.Mode;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.IdType;
+import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
@@ -13,7 +25,12 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.idgen.UuidIdGenerator;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
-import com.avaje.ebeaninternal.server.type.*;
+import com.avaje.ebeaninternal.server.type.CtCompoundType;
+import com.avaje.ebeaninternal.server.type.DataEncryptSupport;
+import com.avaje.ebeaninternal.server.type.ScalarType;
+import com.avaje.ebeaninternal.server.type.ScalarTypeBytesBase;
+import com.avaje.ebeaninternal.server.type.ScalarTypeBytesEncrypted;
+import com.avaje.ebeaninternal.server.type.ScalarTypeEncryptedWrapper;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -26,6 +43,11 @@ import java.util.UUID;
  * Read the field level deployment annotations.
  */
 public class AnnotationFields extends AnnotationParser {
+
+  /**
+   * If present read Jackson JsonIgnore.
+   */
+  private boolean jacksonAnnotationsPresent = ClassUtil.isJacksonAnnotationsPresent();
 
   /**
    * By default we lazy load Lob properties.
@@ -101,10 +123,25 @@ public class AnnotationFields extends AnnotationParser {
     if (column != null) {
       readColumn(column, prop);
     }
+
+    if (jacksonAnnotationsPresent) {
+      com.fasterxml.jackson.annotation.JsonIgnore jsonIgnore = get(prop, com.fasterxml.jackson.annotation.JsonIgnore.class);
+      if (jsonIgnore != null) {
+        prop.setJsonSerialize(!jsonIgnore.value());
+        prop.setJsonDeserialize(!jsonIgnore.value());
+      }
+    }
+
     Expose expose = get(prop, Expose.class);
     if (expose != null) {
-      prop.setExposeSerialize(expose.serialize());
-      prop.setExposeDeserialize(expose.deserialize());
+      prop.setJsonSerialize(expose.serialize());
+      prop.setJsonDeserialize(expose.deserialize());
+    }
+
+    JsonIgnore jsonIgnore = get(prop, JsonIgnore.class);
+    if (jsonIgnore != null) {
+      prop.setJsonSerialize(jsonIgnore.serialize());
+      prop.setJsonDeserialize(jsonIgnore.deserialize());
     }
 
     if (prop.getDbColumn() == null) {

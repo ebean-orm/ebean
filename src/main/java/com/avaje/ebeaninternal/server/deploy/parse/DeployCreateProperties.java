@@ -259,7 +259,8 @@ public class DeployCreateProperties {
     }
 
     if (isTransientField(field)) {
-      return null;
+      // return with no ScalarType (still support JSON features)
+      return new DeployBeanProperty(desc, propertyType, null, null);
     }
     try {
       CheckImmutableResponse checkImmutable = typeManager.checkImmutable(propertyType);

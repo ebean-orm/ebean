@@ -4,6 +4,7 @@ import com.avaje.ebean.text.json.JsonReadBeanVisitor;
 import com.avaje.ebean.text.json.JsonReadOptions;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Map;
@@ -28,15 +29,31 @@ public class ReadJson {
    */
   final Map<String, JsonReadBeanVisitor<?>> visitorMap;
 
+  final Object objectMapper;
+
   /**
    * Construct with parser and readOptions.
    */
-  public ReadJson(JsonParser parser, JsonReadOptions readOptions) {
+  public ReadJson(JsonParser parser, JsonReadOptions readOptions, Object objectMapper) {
+
     this.parser = parser;
+    this.objectMapper = objectMapper;
 
     // only create visitorMap, pathStack if needed ...
     this.visitorMap = (readOptions == null) ? null : readOptions.getVisitorMap();
     this.pathStack = (visitorMap == null) ? null : new PathStack();
+  }
+
+  /**
+   * Return the objectMapper used for this request.
+   */
+  public ObjectMapper getObjectMapper() {
+    if (objectMapper == null) {
+      throw new IllegalStateException(
+          "Jackson ObjectMapper required but has not set. The ObjectMapper can be set on"
+          +" either the ServerConfig or on JsonReadOptions.");
+    }
+    return (ObjectMapper)objectMapper;
   }
 
   /**
@@ -83,5 +100,14 @@ public class ReadJson {
         visitor.visit(bean, unmappedProperties);
       }
     }
+  }
+
+  /**
+   * Read the property value using Jackson ObjectMapper.
+   * <p/>
+   * Typically this is used to read Transient properties where the type is unknown to Ebean.
+   */
+  public Object readValueUsingObjectMapper(Class<?> propertyType) throws IOException {
+      return getObjectMapper().readValue(parser, propertyType);
   }
 }
