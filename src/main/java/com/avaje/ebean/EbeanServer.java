@@ -1272,14 +1272,6 @@ public interface EbeanServer {
   void delete(Object bean, Transaction transaction) throws OptimisticLockException;
 
   /**
-   * Deprecated - please migrate to iterate yourself and delete().
-   *
-   * Delete all the beans from an iterator.
-   */
-  @Deprecated
-  int delete(Iterator<?> it, Transaction transaction) throws OptimisticLockException;
-
-  /**
    * Execute a Sql Update Delete or Insert statement. This returns the number of
    * rows that where updated, deleted or inserted. If is executed in batch then
    * this returns -1. You can get the actual rowCount after commit() from

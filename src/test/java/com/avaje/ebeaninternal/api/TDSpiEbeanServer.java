@@ -637,12 +637,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   public void delete(Object bean, Transaction t) throws OptimisticLockException {
 
   }
-
-  @Override
-  public int delete(Iterator<?> it, Transaction t) throws OptimisticLockException {
-    return 0;
-  }
-
+  
   @Override
   public int execute(SqlUpdate updSql, Transaction t) {
     return 0;

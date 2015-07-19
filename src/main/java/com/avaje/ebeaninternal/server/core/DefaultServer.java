@@ -1795,11 +1795,6 @@ public final class DefaultServer implements SpiEbeanServer {
     persister.delete(checkEntityBean(bean), t);
   }
 
-  @Override
-  public int delete(Iterator<?> it, Transaction transaction) throws OptimisticLockException {
-    return deleteAllInternal(it, transaction);
-  }
-
   /**
    * Delete all the beans in the collection.
    */
