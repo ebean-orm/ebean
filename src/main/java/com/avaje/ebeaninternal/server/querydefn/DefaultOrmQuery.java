@@ -194,7 +194,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Root table alias. For {@link Query#alias(String)} command.
    */
-  private String rootTableAlias=null;
+  private String rootTableAlias;
 
   /**
    * The node of the bean or collection that fired lazy loading. Not null if profiling is on and
