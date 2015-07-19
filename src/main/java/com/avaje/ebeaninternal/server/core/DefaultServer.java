@@ -1681,14 +1681,6 @@ public final class DefaultServer implements SpiEbeanServer {
     }
   }
 
-  /**
-   * Perform an update or insert on each bean in the collection. Returns the
-   * number of beans that where saved.
-   */
-  public int save(Collection<?> c, Transaction t) {
-    return saveAllInternal(c.iterator(), t);
-  }
-
   @Override
   public int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
     return saveAllInternal(beans.iterator(), transaction);
