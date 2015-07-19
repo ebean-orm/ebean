@@ -3,18 +3,17 @@ package com.avaje.ebean.text.json;
 import com.avaje.ebean.text.PathProperties;
 
 /**
- * Deprecated in favour of just using PathProperties.
- *
  * Provides options for customising the JSON write process.
  * <p>
  * You can explicitly state which properties to include in the JSON output for
  * the root level and each path.
  * </p>
- * @deprecated
  */
 public class JsonWriteOptions {
 
   protected PathProperties pathProperties;
+
+  protected Object objectMapper;
 
   /**
    * Parse and return a PathProperties from nested string format like
@@ -51,4 +50,21 @@ public class JsonWriteOptions {
     return pathProperties;
   }
 
+  /**
+   * Return the jackson object mapper to use.
+   * <p/>
+   * If null the ObjectMapper from serverConfig will be used.
+   */
+  public Object getObjectMapper() {
+    return objectMapper;
+  }
+
+  /**
+   * Set the jackson object mapper to use.
+   * <p/>
+   * If null the ObjectMapper from serverConfig will be used.
+   */
+  public void setObjectMapper(Object objectMapper) {
+    this.objectMapper = objectMapper;
+  }
 }
