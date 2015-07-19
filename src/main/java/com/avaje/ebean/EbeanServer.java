@@ -1747,12 +1747,6 @@ public interface EbeanServer {
 
   /**
    * Return the JsonContext for reading/writing JSON.
-   * @deprecated Please use #json instead.
-   */
-  JsonContext createJsonContext();
-
-  /**
-   * Return the JsonContext for reading/writing JSON.
    * <p>
    * This instance is safe to be used concurrently by multiple threads and this
    * method is cheap to call.

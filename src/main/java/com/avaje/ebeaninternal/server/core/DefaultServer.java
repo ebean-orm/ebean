@@ -1974,12 +1974,6 @@ public final class DefaultServer implements SpiEbeanServer {
     // immutable thread safe so return shared instance
     return jsonContext;
   }
-
-  @Override
-  public JsonContext createJsonContext() {
-    return json();
-  }
-
   
   @Override
   public void collectQueryStats(ObjectGraphNode node, long loadedBeanCount, long timeMicros) {

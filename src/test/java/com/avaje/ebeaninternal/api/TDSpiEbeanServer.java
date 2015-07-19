@@ -649,11 +649,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public JsonContext createJsonContext() {
-    return null;
-  }
-
-  @Override
   public JsonContext json() {
     return null;
   }

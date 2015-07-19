@@ -1487,13 +1487,5 @@ public final class Ebean {
   public static JsonContext json() {
     return serverMgr.getDefaultServer().json();
   }
-  
-  /**
-   * Return the JsonContext for reading/writing JSON.
-   * @deprecated Please use #json instead.
-   */
-  public static JsonContext createJsonContext() {
-    return json();
-  }
 
 }
