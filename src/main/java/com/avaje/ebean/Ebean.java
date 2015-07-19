@@ -734,16 +734,6 @@ public final class Ebean {
   }
 
   /**
-   * Deprecated - please migrate to deleteAll().
-   *
-   * Delete several beans given their type and id values.
-   */
-  @Deprecated
-  public static void delete(Class<?> beanType, Collection<?> ids) {
-    serverMgr.getDefaultServer().deleteAll(beanType, ids);
-  }
-
-  /**
    * Delete several beans given their type and id values.
    */
   public static void deleteAll(Class<?> beanType, Collection<?> ids) {

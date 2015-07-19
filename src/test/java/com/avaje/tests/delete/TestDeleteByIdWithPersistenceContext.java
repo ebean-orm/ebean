@@ -29,7 +29,7 @@ public class TestDeleteByIdWithPersistenceContext extends BaseTestCase {
     server.find(Product.class, prod1.getId());
     server.find(Product.class, prod2.getId());
     
-    server.delete(Product.class, Arrays.asList(prod1.getId(), prod2.getId()));
+    server.deleteAll(Product.class, Arrays.asList(prod1.getId(), prod2.getId()));
     
     // are these found in the persistence context?
     Product shadow1 = server.find(Product.class, prod1.getId());

@@ -33,7 +33,7 @@ public class TestDeleteByIdList extends BaseTestCase {
 
     Assert.assertEquals(2, orderIds.size());
 
-    Ebean.delete(Order.class, orderIds);
+    Ebean.deleteAll(Order.class, orderIds);
 
   }
 }

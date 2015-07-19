@@ -30,6 +30,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
  * @see https://groups.google.com/forum/#!topic/ebean/VD1MV2-LrOc
  */
 public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
+
   @Before public void before() {
     // remove all the User records first
     Ebean.deleteAll(Ebean.find(User.class).findList());
@@ -59,7 +60,7 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
     ids.add(1L);
     ids.add(2L);
 
-    Ebean.delete(User.class, ids); // PersistenceException would be thrown here
+    Ebean.deleteAll(User.class, ids); // PersistenceException would be thrown here
     assertEquals(0, Ebean.find(User.class).findList().size());
   }
   

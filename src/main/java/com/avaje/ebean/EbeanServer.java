@@ -1239,26 +1239,9 @@ public interface EbeanServer {
   int delete(Class<?> beanType, Object id, Transaction transaction);
 
   /**
-   * Deprecated - please migrate to deleteAll().
-   *
-   * Delete several beans given their type and id values.
-   */
-  @Deprecated
-  void delete(Class<?> beanType, Collection<?> ids);
-
-  /**
    * Delete several beans given their type and id values.
    */
   void deleteAll(Class<?> beanType, Collection<?> ids);
-
-  /**
-   * Deprecated - please migrate to deleteAll().
-   *
-   * Delete several beans given their type and id values with an explicit
-   * transaction.
-   */
-  @Deprecated
-  void delete(Class<?> beanType, Collection<?> ids, Transaction transaction);
 
   /**
    * Delete several beans given their type and id values with an explicit

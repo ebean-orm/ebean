@@ -1751,16 +1751,6 @@ public final class DefaultServer implements SpiEbeanServer {
   }
 
   @Override
-  public void delete(Class<?> beanType, Collection<?> ids) {
-    deleteAll(beanType, ids, null);
-  }
-
-  @Override
-  public void delete(Class<?> beanType, Collection<?> ids, Transaction transaction) {
-    deleteAll(beanType, ids, transaction);
-  }
-
-  @Override
   public void deleteAll(Class<?> beanType, Collection<?> ids) {
     deleteAll(beanType, ids, null);
   }
