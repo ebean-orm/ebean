@@ -1210,14 +1210,6 @@ public interface EbeanServer {
   void save(Object bean) throws OptimisticLockException;
 
   /**
-   * Deprecated - please change to iterate yourself and save.
-   *
-   * Save all the beans in the iterator.
-   */
-  @Deprecated
-  int save(Iterator<?> it) throws OptimisticLockException;
-
-  /**
    * Save all the beans in the collection.
    */
   int saveAll(Collection<?> beans) throws OptimisticLockException;

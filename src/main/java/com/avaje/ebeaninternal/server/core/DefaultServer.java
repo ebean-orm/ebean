@@ -1682,14 +1682,6 @@ public final class DefaultServer implements SpiEbeanServer {
   }
 
   /**
-   * Perform an update or insert on each bean in the iterator. Returns the
-   * number of beans that where saved.
-   */
-  public int save(Iterator<?> it) {
-    return saveAllInternal(it, null);
-  }
-
-  /**
    * Perform an update or insert on each bean in the collection. Returns the
    * number of beans that where saved.
    */

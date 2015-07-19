@@ -657,16 +657,6 @@ public final class Ebean {
   }
 
   /**
-   * Deprecated - please change to iterate yourself and save().
-   *
-   * Save all the beans from an Iterator.
-   */
-  @Deprecated
-  public static int save(Iterator<?> iterator) throws OptimisticLockException {
-    return serverMgr.getDefaultServer().save(iterator);
-  }
-
-  /**
    * Save all the beans from a Collection.
    */
   public static int saveAll(Collection<?> beans) throws OptimisticLockException {

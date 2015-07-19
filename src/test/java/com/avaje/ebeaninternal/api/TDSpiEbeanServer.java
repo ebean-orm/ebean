@@ -484,11 +484,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public int save(Iterator<?> it) throws OptimisticLockException {
-    return 0;
-  }
-
-  @Override
   public void delete(Object bean) throws OptimisticLockException {
 
   }
