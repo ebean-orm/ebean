@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.PersistenceContextScope;
@@ -149,6 +150,11 @@ public interface SpiQuery<T> extends Query<T> {
   SpiQuery<T> copy();
 
   /**
+   * Return a copy of the query attaching to a different EbeanServer.
+   */
+  SpiQuery<T> copy(EbeanServer server);
+
+  /**
    * Return the type of query (List, Set, Map, Bean, rowCount etc).
    */
   Type getType();
@@ -202,11 +208,6 @@ public interface SpiQuery<T> extends Query<T> {
    * Return the joins required to support predicates on the many properties.
    */
   ManyWhereJoins getManyWhereJoins();
-
-  /**
-   * Convert this natural key query into a find by id query.
-   */
-  void convertWhereNaturalKeyToId(Object idValue);
 
   /**
    * Return a Natural Key bind parameter if supported by this query.

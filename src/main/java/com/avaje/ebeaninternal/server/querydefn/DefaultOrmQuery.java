@@ -389,11 +389,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     select(beanDescriptor.getIdBinder().getIdProperty());
   }
 
-  public void convertWhereNaturalKeyToId(Object idValue) {
-    whereExpressions = new DefaultExpressionList<T>(this, null);
-    setId(idValue);
-  }
-
   public NaturalKeyBindParam getNaturalKeyBindParam() {
     NaturalKeyBindParam namedBind = null;
     if (bindParams != null) {
@@ -426,6 +421,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   public DefaultOrmQuery<T> copy() {
+    return copy(server);
+  }
+
+  public DefaultOrmQuery<T> copy(EbeanServer server) {
     // Not including these in the copy:
     // contextAdditions
     // queryListener
