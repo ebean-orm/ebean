@@ -1163,16 +1163,15 @@ public final class DefaultServer implements SpiEbeanServer {
   public <T> T findUnique(Query<T> query, Transaction t) {
 
     // actually a find by Id type of query...
-    // ... perhaps with joins and cache hints?
-    SpiQuery<T> q = (SpiQuery<T>) query;
-    Object id = q.getId();
+    // ... perhaps with joins and cache hints
+    Object id = query.getId();
     if (id != null) {
       return findId(query, t);
     }
 
-    BeanDescriptor<T> desc = beanDescriptorManager.getBeanDescriptor(q.getBeanType());
+    BeanDescriptor<T> desc = beanDescriptorManager.getBeanDescriptor(query.getBeanType());
 
-    T bean = desc.cacheNaturalKeyLookup(q, (SpiTransaction) t);
+    T bean = desc.cacheNaturalKeyLookup((SpiQuery<T>)query, (SpiTransaction) t);
     if (bean != null) {
       return bean;
     }

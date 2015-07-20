@@ -867,6 +867,11 @@ public interface Query<T> extends Serializable {
   Query<T> setId(Object id);
 
   /**
+   * Return the Id value.
+   */
+  Object getId();
+
+  /**
    * Add additional clause(s) to the where clause.
    * <p>
    * This typically contains named parameters which will need to be set via
@@ -1223,4 +1228,10 @@ public interface Query<T> extends Serializable {
    * Set root table alias.
    */
   Query<T> alias(String alias);
+
+  /**
+   * Return the type of beans being queried.
+   */
+  Class<T> getBeanType();
+
 }

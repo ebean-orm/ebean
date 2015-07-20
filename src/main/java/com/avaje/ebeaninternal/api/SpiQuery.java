@@ -482,11 +482,6 @@ public interface SpiQuery<T> extends Query<T> {
   void contextAdd(EntityBean bean);
 
   /**
-   * Return the type of beans queries.
-   */
-  Class<T> getBeanType();
-
-  /**
    * Return the query timeout.
    */
   int getTimeout();
@@ -579,11 +574,6 @@ public interface SpiQuery<T> extends Query<T> {
    * Return the where clause from a parsed string query.
    */
   String getRawWhereClause();
-
-  /**
-   * Return the Id value.
-   */
-  Object getId();
 
   /**
    * Set the generated sql for debug purposes.
