@@ -343,11 +343,6 @@ public interface SpiQuery<T> extends Query<T> {
   String getLazyLoadProperty();
 
   /**
-   * Return the lazy load path.
-   */
-  String getLazyLoadManyPath();
-
-  /**
    * Used to hook back a lazy loading query to the original query (query
    * point).
    * <p>
@@ -478,20 +473,9 @@ public interface SpiQuery<T> extends Query<T> {
   Boolean isReadOnly();
 
   /**
-   * Adds this bean to the persistence context prior to executing the query.
-   */
-  void contextAdd(EntityBean bean);
-
-  /**
    * Return the query timeout.
    */
   int getTimeout();
-
-  /**
-   * Return the objects that should be added to the persistence context prior
-   * to executing the query.
-   */
-  ArrayList<EntityBean> getContextAdditions();
 
   /**
    * Return the bind parameters.

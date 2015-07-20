@@ -52,11 +52,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private transient final ExpressionFactory expressionFactory;
 
   /**
-   * Used to add beans to the PersistanceContext prior to query.
-   */
-  private transient ArrayList<EntityBean> contextAdditions;
-
-  /**
    * For lazy loading of ManyToMany we need to add a join to the intersection table. This is that
    * join to the intersection table.
    */
@@ -311,10 +306,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public void setLazyLoadProperty(String lazyLoadProperty) {
     this.lazyLoadProperty = lazyLoadProperty;
-  }
-
-  public String getLazyLoadManyPath() {
-    return lazyLoadManyPath;
   }
 
   public ExpressionFactory getExpressionFactory() {
@@ -752,8 +743,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     hc = hc * 31 + (whereExpressions == null ? 0 : whereExpressions.queryBindHash());
     hc = hc * 31 + (havingExpressions == null ? 0 : havingExpressions.queryBindHash());
     hc = hc * 31 + (bindParams == null ? 0 : bindParams.queryBindHash());
-    hc = hc * 31 + (contextAdditions == null ? 0 : contextAdditions.hashCode());
-
     return hc;
   }
 
@@ -1089,26 +1078,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public OrmQueryDetail getDetail() {
     return detail;
-  }
-
-  /**
-   * Return any beans that should be added to the persistence context prior to executing the query.
-   */
-  public final ArrayList<EntityBean> getContextAdditions() {
-    return contextAdditions;
-  }
-
-  /**
-   * Add a bean to the context additions.
-   * <p>
-   * These are added to the persistence context before executing the query.
-   * </p>
-   */
-  public void contextAdd(EntityBean bean) {
-    if (contextAdditions == null) {
-      contextAdditions = new ArrayList<EntityBean>();
-    }
-    contextAdditions.add(bean);
   }
 
   public String toString() {
