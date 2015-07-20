@@ -132,7 +132,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private List<Object> partialIds;
 
-  private int timeout = -1;
+  private int timeout;
 
   /**
    * The property used to get the key value for a Map.
