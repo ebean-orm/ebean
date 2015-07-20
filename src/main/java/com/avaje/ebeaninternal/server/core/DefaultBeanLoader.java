@@ -121,7 +121,7 @@ public class DefaultBeanLoader {
       query.where().raw(ew);
     }
 
-    query.setLazyLoadForParents(idList, many);
+    query.setLazyLoadForParents(many);
     many.addWhereParentIdIn(query, idList);
 
     query.setPersistenceContext(pc);

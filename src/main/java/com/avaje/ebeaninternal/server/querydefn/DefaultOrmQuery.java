@@ -200,8 +200,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private BeanPropertyAssocMany<?> lazyLoadForParentsProperty;
 
-  private List<Object> lazyLoadForParentsIds;
-
   /**
    * Hash of final query after AutoFetch tuning.
    */
@@ -525,14 +523,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public void setLazyLoadForParents(List<Object> parentIds, BeanPropertyAssocMany<?> many) {
-    this.lazyLoadForParentsIds = parentIds;
+  public void setLazyLoadForParents(BeanPropertyAssocMany<?> many) {
     this.lazyLoadForParentsProperty = many;
-  }
-
-  @Override
-  public List<Object> getLazyLoadForParentIds() {
-    return lazyLoadForParentsIds;
   }
 
   @Override

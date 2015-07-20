@@ -50,7 +50,7 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
       
       SpiQuery<?> query0 = (SpiQuery<?>)Ebean.find(OrderDetail.class);
       
-      query0.setLazyLoadForParents(parentIds, beanProperty);
+      query0.setLazyLoadForParents(beanProperty);
       
       beanProperty.addWhereParentIdIn(query0, parentIds);
       

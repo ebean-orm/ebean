@@ -177,17 +177,12 @@ public interface SpiQuery<T> extends Query<T> {
   /**
    * This becomes a lazy loading query for a many relationship.
    */
-  void setLazyLoadForParents(List<Object> parentIds, BeanPropertyAssocMany<?> many);
+  void setLazyLoadForParents(BeanPropertyAssocMany<?> many);
 
   /**
    * Return the lazy loading 'many' property.
    */
   BeanPropertyAssocMany<?> getLazyLoadForParentsProperty();
-
-  /**
-   * Return the list of parent Id's for lazy loading.
-   */
-  List<Object> getLazyLoadForParentIds();
 
   /**
    * Set the load mode (+lazy or +query) and the load description.
