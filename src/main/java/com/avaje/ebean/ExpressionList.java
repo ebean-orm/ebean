@@ -1,6 +1,7 @@
 package com.avaje.ebean;
 
 import com.avaje.ebean.text.PathProperties;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -162,6 +163,7 @@ public interface ExpressionList<T> extends Serializable {
    * 
    * @see Query#findUnique()
    */
+  @Nullable
   T findUnique();
 
   /**

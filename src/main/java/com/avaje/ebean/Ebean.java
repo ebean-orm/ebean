@@ -2,7 +2,6 @@ package com.avaje.ebean;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -878,6 +878,7 @@ public final class Ebean {
    * @param id
    *          the id value
    */
+  @Nullable
   public static <T> T find(Class<T> beanType, Object id) {
     return serverMgr.getDefaultServer().find(beanType, id);
   }

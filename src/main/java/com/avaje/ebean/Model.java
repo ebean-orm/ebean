@@ -2,14 +2,13 @@ package com.avaje.ebean;
 
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebean.util.ClassUtil;
-
-import java.lang.reflect.Array;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.*;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.MappedSuperclass;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * A MappedSuperclass base class that provides convenience methods for inserting, updating and
@@ -514,6 +513,7 @@ public abstract class Model {
      * <p>
      * Equivalent to {@link EbeanServer#find(Class, Object)}
      */
+    @Nullable
     public T byId(I id) {
       return db().find(type, id);
     }

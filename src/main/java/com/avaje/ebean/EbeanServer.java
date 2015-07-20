@@ -1,7 +1,6 @@
 package com.avaje.ebean;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +14,7 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Provides the API for fetching and saving beans to a particular DataSource.
@@ -1096,6 +1096,7 @@ public interface EbeanServer {
    *
    * @see Query#findUnique()
    */
+  @Nullable
   <T> T findUnique(Query<T> query, Transaction transaction);
 
   /**
@@ -1172,6 +1173,7 @@ public interface EbeanServer {
    *
    * @see SqlQuery#findUnique()
    */
+  @Nullable
   SqlRow findUnique(SqlQuery query, Transaction transaction);
 
   /**

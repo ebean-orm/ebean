@@ -16,7 +16,7 @@ public class TestNotEnhancedMappedSuper extends BaseTestCase {
 
     ASimpleBean bean = new ASimpleBean();
     bean.setName("junk");
-    
+
     Ebean.save(bean);
     Assert.assertNotNull(bean.getId());
     
