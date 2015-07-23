@@ -173,6 +173,8 @@ public class BeanProperty implements ElPropertyValue {
    */
   final int dbType;
 
+  final boolean excludedFromHistory;
+
   /**
    * The default value to insert if null.
    */
@@ -256,6 +258,7 @@ public class BeanProperty implements ElPropertyValue {
     this.dbRead = deploy.isDbRead();
     this.dbInsertable = deploy.isDbInsertable();
     this.dbUpdatable = deploy.isDbUpdateable();
+    this.excludedFromHistory = deploy.isExcludedFromHistory();
 
     this.secondaryTable = deploy.isSecondaryTable();
     if (secondaryTable) {
@@ -341,6 +344,7 @@ public class BeanProperty implements ElPropertyValue {
     this.sqlFormulaSelect = InternString.intern(override.getSqlFormulaSelect());
     this.formula = sqlFormulaSelect != null;
 
+    this.excludedFromHistory = source.excludedFromHistory;
     this.fetchEager = source.fetchEager;
     this.unidirectionalShadow = source.unidirectionalShadow;
     this.discriminator = source.discriminator;
@@ -1002,6 +1006,13 @@ public class BeanProperty implements ElPropertyValue {
 
   public int getDbEncryptedType() {
     return dbEncryptedType;
+  }
+
+  /**
+   * Return true if this property is excluded from history.
+   */
+  public boolean isExcludedFromHistory() {
+    return excludedFromHistory;
   }
 
   /**

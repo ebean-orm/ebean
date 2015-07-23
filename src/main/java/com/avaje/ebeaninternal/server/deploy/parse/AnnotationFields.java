@@ -8,6 +8,7 @@ import com.avaje.ebean.annotation.EmbeddedColumns;
 import com.avaje.ebean.annotation.Encrypted;
 import com.avaje.ebean.annotation.Expose;
 import com.avaje.ebean.annotation.Formula;
+import com.avaje.ebean.annotation.HistoryExclude;
 import com.avaje.ebean.annotation.Index;
 import com.avaje.ebean.annotation.JsonIgnore;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
@@ -215,6 +216,10 @@ public class AnnotationFields extends AnnotationParser {
     UpdatedTimestamp ut = get(prop, UpdatedTimestamp.class);
     if (ut != null) {
       generatedPropFactory.setUpdateTimestamp(prop);
+    }
+
+    if (get(prop, HistoryExclude.class) != null) {
+      prop.setExcludedFromHistory(true);
     }
 
     if (validationAnnotations) {

@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.query;
 
+import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
@@ -78,6 +79,13 @@ public class SqlTree {
     this.manyPropertyName = null;
     this.manyPropEl = null;
     this.includes = null;
+  }
+
+  /**
+   * Recurse through the tree adding an table alias' for @History entity beans.
+   */
+  public void addAsOfTableAlias(SpiQuery<?> query) {
+    rootNode.addAsOfTableAlias(query);
   }
 
   /**

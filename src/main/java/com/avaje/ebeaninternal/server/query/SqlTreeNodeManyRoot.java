@@ -13,7 +13,7 @@ public final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
   final BeanPropertyAssocMany<?> manyProp;
 
   public SqlTreeNodeManyRoot(String prefix, BeanPropertyAssocMany<?> prop, SqlTreeProperties props, List<SqlTreeNode> myList) {
-    super(prefix, prop, prop.getTargetDescriptor(), props, myList, true, null);
+    super(prefix, prop, prop.getTargetDescriptor(), props, myList, true, null, null);
     this.manyProp = prop;
   }
 

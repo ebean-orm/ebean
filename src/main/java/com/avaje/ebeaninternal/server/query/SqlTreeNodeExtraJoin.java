@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.query;
 
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
@@ -38,6 +39,11 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
   @Override
   public void buildRawSqlSelectChain(List<String> selectChain) {
     // nothing to add
+  }
+
+  @Override
+  public void addAsOfTableAlias(SpiQuery<?> query) {
+    // nothing to do here
   }
 
   /**

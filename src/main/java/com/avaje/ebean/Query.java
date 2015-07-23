@@ -4,6 +4,7 @@ import com.avaje.ebean.text.PathProperties;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -284,6 +285,17 @@ public interface Query<T> extends Serializable {
    * Set RawSql to use for this query.
    */
   Query<T> setRawSql(RawSql rawSql);
+
+  /**
+   * Perform an 'As of' query using history tables to return the object graph
+   * as of a time in the past.
+   * <p>
+   *   To perform this query the DB must have underlying history tables.
+   * </p>
+   *
+   * @param asOf the date time in the past at which you want to view the data
+   */
+  Query<T> asOf(Timestamp asOf);
 
   /**
    * Cancel the query execution if supported by the underlying database and

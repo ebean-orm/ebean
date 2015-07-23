@@ -13,6 +13,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,8 @@ public class DLoadContext implements LoadContext {
 	private final Map<String, DLoadManyContext> manyMap = new HashMap<String, DLoadManyContext>();
 	
 	private final DLoadBeanContext rootBeanContext;
-	
+
+  private final Timestamp asOf;
 	private final Boolean readOnly;
 	private final boolean excludeBeanCache;	
 	private final int defaultBatchSize;
@@ -56,6 +58,7 @@ public class DLoadContext implements LoadContext {
     this.rootDescriptor = request.getBeanDescriptor();
     
     SpiQuery<?> query = request.getQuery();
+    this.asOf = query.getAsOf();
     this.readOnly = query.isReadOnly();	  
 		this.excludeBeanCache = Boolean.FALSE.equals(query.isUseBeanCache());
 		this.useAutofetchManager = query.getAutoFetchManager() != null;		
@@ -211,8 +214,12 @@ public class DLoadContext implements LoadContext {
 	protected Boolean isReadOnly() {
 		return readOnly;
 	}
-	
-	public PersistenceContext getPersistenceContext() {
+
+  protected Timestamp getAsOf() {
+    return asOf;
+  }
+
+  public PersistenceContext getPersistenceContext() {
 		return persistenceContext;
 	}
 

@@ -215,6 +215,8 @@ public class DeployBeanProperty {
   private boolean indexed;
   private String indexName;
 
+  private boolean excludedFromHistory;
+
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     this.desc = desc;
     this.propertyType = propertyType;
@@ -911,5 +913,13 @@ public class DeployBeanProperty {
 
   public void setIndexName(String indexName) {
     this.indexName = indexName;
+  }
+
+  public boolean isExcludedFromHistory() {
+    return excludedFromHistory;
+  }
+
+  public void setExcludedFromHistory(boolean excludedFromHistory) {
+    this.excludedFromHistory = excludedFromHistory;
   }
 }

@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.util;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -105,6 +106,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public Query<T> query() {
     return query;
+  }
+
+  @Override
+  public Query<T> asOf(Timestamp asOf) {
+    return query.asOf(asOf);
   }
 
   @Override

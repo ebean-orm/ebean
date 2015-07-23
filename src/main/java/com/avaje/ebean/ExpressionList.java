@@ -4,6 +4,7 @@ import com.avaje.ebean.text.PathProperties;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,17 @@ public interface ExpressionList<T> extends Serializable {
    * Apply the path properties to the query replacing the select and fetch clauses.
    */
   Query<T> apply(PathProperties pathProperties);
+
+  /**
+   * Perform an 'As of' query using history tables to return the object graph
+   * as of a time in the past.
+   * <p>
+   *   To perform this query the DB must have underlying history tables.
+   * </p>
+   *
+   * @param asOf the date time in the past at which you want to view the data
+   */
+  Query<T> asOf(Timestamp asOf);
 
   /**
    * Execute the query iterating over the results.

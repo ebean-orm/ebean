@@ -442,6 +442,10 @@ public class DatabasePlatform {
     return disallowBatchOnCascade;
   }
 
+  public String getAsOfPredicate(String asOfTableAlias, String asOfSysPeriod) {
+    throw new RuntimeException("AsOf query not support of this database platform yet");
+  }
+
   /**
    * Generate and return the create sequence DDL.
    */

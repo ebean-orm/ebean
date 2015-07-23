@@ -49,6 +49,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     if (parent.isReadOnly() != null) {
       query.setReadOnly(parent.isReadOnly());
     }
+    query.asOf(parent.getAsOf());
     query.setParentNode(objectGraphNode);
     query.setLazyLoadProperty(lazyLoadProperty);
 

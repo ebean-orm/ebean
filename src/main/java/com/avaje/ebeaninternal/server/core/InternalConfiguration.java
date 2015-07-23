@@ -41,6 +41,8 @@ import com.avaje.ebeaninternal.server.type.DefaultTypeManager;
 import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.fasterxml.jackson.core.JsonFactory;
 
+import java.util.Map;
+
 /**
  * Used to extend the ServerConfig with additional objects used to configure and
  * construct an EbeanServer.
@@ -116,11 +118,11 @@ public class InternalConfiguration {
     this.deployUtil = new DeployUtil(typeManager, serverConfig);
 
     this.beanDescriptorManager = new BeanDescriptorManager(this);
-    beanDescriptorManager.deploy();
+    Map<String, String> asOfTableMapping = beanDescriptorManager.deploy();
 
     this.transactionManager = createTransactionManager();
 
-    this.cQueryEngine = new CQueryEngine(serverConfig.getDatabasePlatform(), binder);
+    this.cQueryEngine = new CQueryEngine(serverConfig.getDatabasePlatform(), binder, asOfTableMapping, serverConfig.getAsOfSysPeriod());
 
     ExternalTransactionManager externalTransactionManager = serverConfig.getExternalTransactionManager();
     if (externalTransactionManager == null && serverConfig.isUseJtaTransactionManager()) {

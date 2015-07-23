@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.query;
 
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
@@ -35,6 +36,11 @@ public class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
 
     String[] split = SplitName.split(prefix);
     this.parentPrefix = split[0];
+  }
+
+  @Override
+  public void addAsOfTableAlias(SpiQuery<?> query) {
+    // do nothing here ...
   }
 
   /**

@@ -87,6 +87,11 @@ public class DeployBeanDescriptor<T> {
    * The base database table.
    */
   private String baseTable;
+
+  private String baseTableAsOf;
+
+  private boolean historySupport;
+
   private TableName baseTableFull;
 
   private String[] properties;
@@ -133,6 +138,20 @@ public class DeployBeanDescriptor<T> {
    */
   public boolean isAbstract() {
     return Modifier.isAbstract(beanType.getModifiers());
+  }
+
+  /**
+   * Set to true for @History entity beans that have history.
+   */
+  public void setHistorySupport(boolean historySupport) {
+    this.historySupport = historySupport;
+  }
+
+  /**
+   * Return true if this is an @History entity bean.
+   */
+  public boolean isHistorySupport() {
+    return historySupport;
   }
 
   public boolean isScalaObject() {
@@ -405,6 +424,10 @@ public class DeployBeanDescriptor<T> {
     return baseTable;
   }
 
+  public String getBaseTableAsOf() {
+    return baseTableAsOf;
+  }
+
   /**
    * Return the base table with full structure.
    */
@@ -413,12 +436,12 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Set the base table. Only properties mapped to the base table are by default
-   * persisted.
+   * Set the base table. Only properties mapped to the base table are by default persisted.
    */
-  public void setBaseTable(TableName baseTableFull) {
+  public void setBaseTable(TableName baseTableFull, String asOfSuffix) {
     this.baseTableFull = baseTableFull;
     this.baseTable = baseTableFull == null ? null : baseTableFull.getQualifiedName();
+    this.baseTableAsOf = baseTable + asOfSuffix;
   }
 
   public void sortProperties() {

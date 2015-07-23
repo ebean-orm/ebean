@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.query;
 
+import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
@@ -17,13 +18,14 @@ public final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   /**
    * Specify for SqlSelect to include an Id property or not.
    */
-  public SqlTreeNodeRoot(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId, TableJoin includeJoin, BeanPropertyAssocMany<?> many) {
-    super(null, null, desc, props, myList, withId, many);
+  public SqlTreeNodeRoot(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
+                         TableJoin includeJoin, BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode) {
+    super(null, null, desc, props, myList, withId, many, temporalMode);
     this.includeJoin = includeJoin;
   }
 
   public SqlTreeNodeRoot(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId) {
-    super(null, null, desc, props, myList, withId, null);
+    super(null, null, desc, props, myList, withId, null, null);
     this.includeJoin = null;
   }
 
@@ -33,11 +35,11 @@ public final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   @Override
   public SqlJoinType appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
 
-    ctx.append(desc.getBaseTable());
-    ctx.append(" ").append(ctx.getTableAlias(null));
+    ctx.append(desc.getBaseTable(temporalMode));
+    ctx.append(" ").append(baseTableAlias);
 
     if (includeJoin != null) {
-      String a1 = ctx.getTableAlias(null);
+      String a1 = baseTableAlias;
       String a2 = "int_"; // unique alias for intersection join
       includeJoin.addJoin(joinType, a1, a2, ctx);
     }

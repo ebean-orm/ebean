@@ -1,8 +1,10 @@
 package com.avaje.ebeaninternal.server.query;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.avaje.ebean.RawSql;
@@ -171,6 +173,17 @@ public class CQueryPredicates {
           bindLog.append(",");
         }
         bindLog.append(bindValue);
+      }
+    }
+
+    List<String> historyTableAlias = query.getAsOfTableAlias();
+    if (historyTableAlias != null) {
+      // bind the asAt value for each table alias
+      // there is one effective date predicate per table alias
+      Timestamp asOf = query.getAsOf();
+      bindLog.append(" asOf ").append(asOf);
+      for (int i = 0; i < historyTableAlias.size(); i++) {
+        binder.bindObject(dataBind, asOf);
       }
     }
 

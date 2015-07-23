@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.query;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +32,9 @@ public class CQueryEngine {
 
   private final CQueryBuilder queryBuilder;
 
-  public CQueryEngine(DatabasePlatform dbPlatform, Binder binder) {
+  public CQueryEngine(DatabasePlatform dbPlatform, Binder binder, Map<String,String> asOfTableMapping, String asOfSysPeriod) {
     this.forwardOnlyHintOnFindIterate = dbPlatform.isForwardOnlyHintOnFindIterate();
-    this.queryBuilder = new CQueryBuilder(dbPlatform, binder);
+    this.queryBuilder = new CQueryBuilder(dbPlatform, binder, asOfTableMapping, asOfSysPeriod);
   }
 
   public <T> CQuery<T> buildQuery(OrmQueryRequest<T> request) {

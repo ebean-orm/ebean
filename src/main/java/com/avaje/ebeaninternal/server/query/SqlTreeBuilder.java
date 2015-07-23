@@ -98,7 +98,7 @@ public class SqlTreeBuilder {
    * to the root node.
    */
   public SqlTreeBuilder(String tableAliasPlaceHolder, String columnAliasPrefix,
-      OrmQueryRequest<?> request, CQueryPredicates predicates) {
+      OrmQueryRequest<?> request, CQueryPredicates predicates, Map<String,String> asOfTables) {
 
     this.rawSql = false;
     this.rawNoId = false;
@@ -112,7 +112,7 @@ public class SqlTreeBuilder {
 
     this.predicates = predicates;
     this.alias = new SqlTreeAlias(request.getQuery().getAlias()==null?request.getBeanDescriptor().getBaseTableAlias():request.getQuery().getAlias());
-    this.ctx = new DefaultDbSqlContext(alias, tableAliasPlaceHolder, columnAliasPrefix, !subQuery);
+    this.ctx = new DefaultDbSqlContext(alias, tableAliasPlaceHolder, columnAliasPrefix, !subQuery, asOfTables);
   }
 
   /**
@@ -265,7 +265,8 @@ public class SqlTreeBuilder {
       // Optional many property for lazy loading query
       BeanPropertyAssocMany<?> lazyLoadMany = (query == null) ? null : query.getLazyLoadForParentsProperty();
       boolean withId = !rawNoId && !subQuery && (query == null || !query.isDistinct());
-      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany);
+
+      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, SpiQuery.TemporalMode.of(query));
 
     } else if (prop instanceof BeanPropertyAssocMany<?>) {
       return new SqlTreeNodeManyRoot(prefix, (BeanPropertyAssocMany<?>) prop, props, myList);

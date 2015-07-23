@@ -19,6 +19,7 @@ import com.avaje.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -86,6 +87,30 @@ public interface SpiQuery<T> extends Query<T> {
     SUBQUERY
   }
 
+  enum TemporalMode {
+    /**
+     * Query runs against current data (normal).
+     */
+    CURRENT,
+
+    /**
+     * Query runs potentially returning many versions of the same bean.
+     */
+    VERSIONS,
+
+    /**
+     * Query runs 'As Of' a given date time.
+     */
+    AS_OF;
+
+    /**
+     * Return the mode of the query of if null return CURRENT mode.
+     */
+    public static TemporalMode of(SpiQuery<?> query) {
+      return (query != null) ? query.getTemporalMode() : TemporalMode.CURRENT;
+    }
+  }
+
   /**
    * Return the PersistenceContextScope that this query should use.
    * <p>
@@ -114,6 +139,31 @@ public interface SpiQuery<T> extends Query<T> {
    * Return the query mode.
    */
   Mode getMode();
+
+  /**
+   * Return the Temporal mode for the query.
+   */
+  TemporalMode getTemporalMode();
+
+  /**
+   * Return true if this is a 'As Of' query.
+   */
+  boolean isAsOfQuery();
+
+  /**
+   * Return the asOf Timestamp which the query should run as.
+   */
+  Timestamp getAsOf();
+
+  /**
+   * Add a table alias for a @History entity involved in a 'As Of' query.
+   */
+  void addAsOfTableAlias(String tableAlias);
+
+  /**
+   * Return the list of table alias involved in a 'As Of' query that have @History support.
+   */
+  List<String> getAsOfTableAlias();
 
   /**
    * Return a listener that wants to be notified when the bean collection is

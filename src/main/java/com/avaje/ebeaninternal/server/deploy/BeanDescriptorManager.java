@@ -10,6 +10,7 @@ import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.EncryptKeyManager;
 import com.avaje.ebean.config.NamingConvention;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
@@ -51,7 +52,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private static final BeanDescComparator beanDescComparator = new BeanDescComparator();
 
-  private final ReadAnnotations readAnnotations = new ReadAnnotations();
+  private final ReadAnnotations readAnnotations;
 
   private final TransientProperties transientProperties;
 
@@ -127,34 +128,45 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final boolean eagerFetchLobs;
 
+  private final String asOfViewSuffix;
+
+  /**
+   * Map of base tables to 'with history views' used to support 'as of' queries.
+   */
+  private final Map<String,String> asOfTableMap = new HashMap<String, String>();
+
   /**
    * Create for a given database dbConfig.
    */
   public BeanDescriptorManager(InternalConfiguration config) {
 
-    this.serverName = InternString.intern(config.getServerConfig().getName());
+    ServerConfig serverConfig = config.getServerConfig();
+
+    this.serverName = InternString.intern(serverConfig.getName());
     this.cacheManager = config.getCacheManager();
     this.xmlConfig = config.getXmlConfig();
-    this.dbSequenceBatchSize = config.getServerConfig().getDatabaseSequenceBatchSize();
+    this.dbSequenceBatchSize = serverConfig.getDatabaseSequenceBatchSize();
     this.backgroundExecutor = config.getBackgroundExecutor();
-    this.dataSource = config.getServerConfig().getDataSource();
-    this.encryptKeyManager = config.getServerConfig().getEncryptKeyManager();
-    this.databasePlatform = config.getServerConfig().getDatabasePlatform();
+    this.dataSource = serverConfig.getDataSource();
+    this.encryptKeyManager = serverConfig.getEncryptKeyManager();
+    this.databasePlatform = serverConfig.getDatabasePlatform();
     this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm());
-    this.eagerFetchLobs = config.getServerConfig().isEagerFetchLobs();
+    this.eagerFetchLobs = serverConfig.isEagerFetchLobs();
 
+    this.asOfViewSuffix = serverConfig.getAsOfViewSuffix();
+    this.readAnnotations = new ReadAnnotations(asOfViewSuffix);
     this.bootupClasses = config.getBootupClasses();
     this.createProperties = config.getDeployCreateProperties();
     this.typeManager = config.getTypeManager();
-    this.namingConvention = config.getServerConfig().getNamingConvention();
+    this.namingConvention = serverConfig.getNamingConvention();
     this.dbIdentity = config.getDatabasePlatform().getDbIdentity();
     this.deplyInherit = config.getDeployInherit();
     this.deployOrmXml = config.getDeployOrmXml();
     this.deployUtil = config.getDeployUtil();
 
-    this.beanManagerFactory = new BeanManagerFactory(config.getServerConfig(), config.getDatabasePlatform());
+    this.beanManagerFactory = new BeanManagerFactory(serverConfig, config.getDatabasePlatform());
 
-    this.updateChangesOnly = config.getServerConfig().isUpdateChangesOnly();
+    this.updateChangesOnly = serverConfig.isUpdateChangesOnly();
 
     this.beanLifecycleAdapterFactory = new BeanLifecycleAdapterFactory();
     this.persistControllerManager = new PersistControllerManager(bootupClasses);
@@ -205,7 +217,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return idBinderFactory.createIdBinder(idProperty);
   }
 
-  public void deploy() {
+  /**
+   * Deploy returning the asOfTableMap (which is required by the SQL builders).
+   */
+  public Map<String,String> deploy() {
 
     try {
       createListeners();
@@ -237,6 +252,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
       deplyInfoMap.clear();
       deplyInfoMap = null;
+
+      return asOfTableMap;
+
     } catch (RuntimeException e) {
       String msg = "Error in deployment";
       logger.error(msg, e);
@@ -324,7 +342,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // first (as they are needed to initialise the
     // associated properties in the second pass).
     for (BeanDescriptor<?> d : descMap.values()) {
-      d.initialiseId();
+      d.initialiseId(asOfTableMap);
     }
 
     // PASS 2:
@@ -336,7 +354,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // PASS 3:
     // now initialise all the associated properties
     for (BeanDescriptor<?> d : descMap.values()) {
-      d.initialiseOther();
+      // also look for intersection tables with
+      // associated history support and register them
+      // into the asOfTableMap
+      d.initialiseOther(asOfTableMap, asOfViewSuffix);
     }
 
     // create BeanManager for each non-embedded entity bean
@@ -973,7 +994,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     if (!EntityType.ORM.equals(desc.getEntityType())) {
       // not using base table
-      desc.setBaseTable(null);
+      desc.setBaseTable(null, null);
     }
 
     // mark transient properties

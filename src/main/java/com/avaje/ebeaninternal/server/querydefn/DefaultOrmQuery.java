@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.querydefn;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -12,7 +13,6 @@ import com.avaje.ebean.*;
 import com.avaje.ebean.OrderBy.Property;
 import com.avaje.ebean.bean.BeanCollectionTouched;
 import com.avaje.ebean.bean.CallStack;
-import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.bean.PersistenceContext;
@@ -153,6 +153,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private DefaultExpressionList<T> havingExpressions;
 
+  /**
+   * The list of table alias associated with @History entity beans.
+   */
+  private List<String> asOfTableAlias;
+
+  /**
+   * Set for flashback style 'as of' query.
+   */
+  private Timestamp asOf;
+
   private int bufferFetchSizeHint;
 
   private boolean usageProfiling = true;
@@ -255,6 +265,30 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public Query<T> apply(PathProperties pathProperties) {
     pathProperties.apply(this);
+    return this;
+  }
+
+  /**
+   * This table alias is for a @History entity involved in the query and as
+   * such we need to add a 'as of predicate' to the query using this alias.
+   */
+  public void addAsOfTableAlias(String tableAlias) {
+    if (asOfTableAlias == null) {
+      asOfTableAlias = new ArrayList<String>();
+    }
+    asOfTableAlias.add(tableAlias);
+  }
+
+  public List<String> getAsOfTableAlias() {
+    return asOfTableAlias;
+  }
+
+  public Timestamp getAsOf() {
+    return asOf;
+  }
+
+  public DefaultOrmQuery<T> asOf(Timestamp asOfDateTime) {
+    this.asOf = asOfDateTime;
     return this;
   }
 
@@ -581,6 +615,15 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return mode;
   }
 
+  @Override
+  public TemporalMode getTemporalMode() {
+    return asOf == null ? TemporalMode.CURRENT : TemporalMode.AS_OF;
+  }
+
+  public boolean isAsOfQuery() {
+    return asOf != null;
+  }
+
   public void setMode(Mode mode) {
     this.mode = mode;
   }
@@ -665,6 +708,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     builder.add(rawWhereClause).add(additionalWhere).add(additionalHaving);
     builder.add(mapKey);
     builder.add(id != null);
+    builder.add(asOf != null);
     builder.add(rawSql == null ? 0 : rawSql.queryHash());
     builder.add(includeTableJoin != null ? includeTableJoin.queryHash() : 0);
     builder.add(rootTableAlias);
@@ -735,6 +779,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     hc = hc * 31 + (whereExpressions == null ? 0 : whereExpressions.queryBindHash());
     hc = hc * 31 + (havingExpressions == null ? 0 : havingExpressions.queryBindHash());
     hc = hc * 31 + (bindParams == null ? 0 : bindParams.queryBindHash());
+    hc = hc * 31 + (asOf == null ? 0 : asOf.hashCode());
     return hc;
   }
 

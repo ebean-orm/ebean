@@ -10,6 +10,7 @@ import javax.persistence.UniqueConstraint;
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.CacheTuning;
 import com.avaje.ebean.annotation.EntityConcurrencyMode;
+import com.avaje.ebean.annotation.History;
 import com.avaje.ebean.annotation.NamedUpdate;
 import com.avaje.ebean.annotation.NamedUpdates;
 import com.avaje.ebean.annotation.UpdateMode;
@@ -26,8 +27,11 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
  */
 public class AnnotationClass extends AnnotationParser {
 
-  public AnnotationClass(DeployBeanInfo<?> info) {
+  private final String asOfViewSuffix;
+
+  public AnnotationClass(DeployBeanInfo<?> info, String asOfViewSuffix) {
     super(info);
+    this.asOfViewSuffix = asOfViewSuffix;
   }
 
   /**
@@ -48,7 +52,7 @@ public class AnnotationClass extends AnnotationParser {
       // default the TableName using NamingConvention.
       TableName tableName = namingConvention.getTableName(descriptor.getBeanType());
 
-      descriptor.setBaseTable(tableName);
+      descriptor.setBaseTable(tableName, asOfViewSuffix);
     }
   }
 
@@ -82,6 +86,11 @@ public class AnnotationClass extends AnnotationParser {
           descriptor.addCompoundUniqueConstraint(new CompoundUniqueContraint(c.columnNames()));
         }
       }
+    }
+
+    History history = cls.getAnnotation(History.class);
+    if (history != null) {
+      descriptor.setHistorySupport(true);
     }
 
     UpdateMode updateMode = cls.getAnnotation(UpdateMode.class);

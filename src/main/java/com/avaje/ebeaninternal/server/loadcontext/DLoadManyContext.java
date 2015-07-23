@@ -60,6 +60,8 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
   	if (parent.isReadOnly() != null){
   		query.setReadOnly(parent.isReadOnly());
   	}
+
+    query.asOf(parent.getAsOf());
 		query.setParentNode(objectGraphNode);
 		
 		if (queryProps != null){

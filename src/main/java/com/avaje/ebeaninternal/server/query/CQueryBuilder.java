@@ -23,6 +23,8 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
 
 import javax.persistence.PersistenceException;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -43,14 +45,20 @@ public class CQueryBuilder implements Constants {
 
   private final boolean selectCountWithAlias;
 
+  private final Map<String,String> asOfTableMapping;
+
+  private final String asOfSysPeriod;
+
   private DatabasePlatform dbPlatform;
 
   /**
    * Create the SqlGenSelect.
    */
-  public CQueryBuilder(DatabasePlatform dbPlatform, Binder binder) {
+  public CQueryBuilder(DatabasePlatform dbPlatform, Binder binder, Map<String,String> asOfTableMapping, String asOfSysPeriod) {
 
     this.binder = binder;
+    this.asOfTableMapping = asOfTableMapping;
+    this.asOfSysPeriod = asOfSysPeriod;
     this.tableAliasPlaceHolder = dbPlatform.getTableAliasPlaceHolder();
     this.columnAliasPrefix = dbPlatform.getColumnAliasPrefix();
     this.sqlSelectBuilder = new RawSqlSelectClauseBuilder(dbPlatform, binder);
@@ -103,7 +111,8 @@ public class CQueryBuilder implements Constants {
     // use RawSql or generated Sql
     predicates.prepare(true);
 
-    SqlTree sqlTree = createSqlTree(request, predicates);
+    Map<String,String> asOfMap = query.isAsOfQuery() ? asOfTableMapping : null;
+    SqlTree sqlTree = createSqlTree(request, predicates, asOfMap);
     SqlLimitResponse s = buildSql(null, request, predicates, sqlTree);
     String sql = s.getSql();
 
@@ -155,7 +164,8 @@ public class CQueryBuilder implements Constants {
 
     predicates.prepare(true);
 
-    SqlTree sqlTree = createSqlTree(request, predicates);
+    Map<String,String> asOfMap = query.isAsOfQuery() ? asOfTableMapping : null;
+    SqlTree sqlTree = createSqlTree(request, predicates, asOfMap);
     SqlLimitResponse s = buildSql(sqlSelect, request, predicates, sqlTree);
     String sql = s.getSql();
     if (hasMany || query.isRawSql()) {
@@ -203,7 +213,14 @@ public class CQueryBuilder implements Constants {
     predicates.prepare(true);
 
     // Build the tree structure that represents the query.
-    SqlTree sqlTree = createSqlTree(request, predicates);
+    SpiQuery<T> query = request.getQuery();
+
+    Map<String,String> asOfMap = query.isAsOfQuery() ? asOfTableMapping : null;
+    SqlTree sqlTree = createSqlTree(request, predicates, asOfMap);
+    if (query.isAsOfQuery()) {
+      sqlTree.addAsOfTableAlias(query);
+    }
+
     SqlLimitResponse res = buildSql(null, request, predicates, sqlTree);
 
     boolean rawSql = request.isRawSql();
@@ -232,13 +249,13 @@ public class CQueryBuilder implements Constants {
    * order by clauses that are not already included for the select clause.
    * </p>
    */
-  private SqlTree createSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates) {
+  private SqlTree createSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates, Map<String,String> withHistoryTables) {
 
     if (request.isRawSql()) {
       return createRawSqlSqlTree(request, predicates);
     }
 
-    return new SqlTreeBuilder(tableAliasPlaceHolder, columnAliasPrefix, request, predicates).build();
+    return new SqlTreeBuilder(tableAliasPlaceHolder, columnAliasPrefix, request, predicates, withHistoryTables).build();
   }
 
   private SqlTree createRawSqlSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates) {
@@ -380,6 +397,7 @@ public class CQueryBuilder implements Constants {
     String dbFilterMany = predicates.getDbFilterMany();
     if (!isEmpty(dbFilterMany)) {
       if (!hasWhere) {
+        hasWhere = true;
         sb.append(" where ");
       } else {
         sb.append("and ");
@@ -387,7 +405,23 @@ public class CQueryBuilder implements Constants {
       sb.append(dbFilterMany);
     }
 
-    
+    List<String> asOfTableAlias = query.getAsOfTableAlias();
+    if (asOfTableAlias != null) {
+      // append the effective date predicates for each table alias
+      // that maps to a @History entity involved in this query
+      if (!hasWhere) {
+        sb.append(" where ");
+      } else {
+        sb.append("and ");
+      }
+      for (int i = 0; i < asOfTableAlias.size(); i++) {
+        if (i > 0) {
+          sb.append(" and ");
+        }
+        sb.append(dbPlatform.getAsOfPredicate(asOfTableAlias.get(i), asOfSysPeriod));
+      }
+    }
+
     if (dbOrderBy != null) {
       sb.append(" order by ").append(dbOrderBy);
     }

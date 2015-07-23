@@ -145,6 +145,18 @@ public class ServerConfig {
   private int databaseSequenceBatchSize = 20;
 
   /**
+   * Suffix appended to the base table to derive the view that contains the union
+   * of the base table and the history table in order to support asOf queries.
+   */
+  private String asOfViewSuffix = "_with_history";
+
+  /**
+   * Column used to support history and 'As of' queries. This column is a timestamp range
+   * or equivalent.
+   */
+  private String asOfSysPeriod = "sys_period";
+
+  /**
    * Use for transaction scoped batch mode.
    */
   private PersistBatch persistBatch = PersistBatch.NONE;
@@ -577,6 +589,38 @@ public class ServerConfig {
    */
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
     this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+  }
+
+  /**
+   * Return the suffix appended to the base table to derive the view that contains the union
+   * of the base table and the history table in order to support asOf queries.
+   */
+  public String getAsOfViewSuffix() {
+    return asOfViewSuffix;
+  }
+
+  /**
+   * Set the suffix appended to the base table to derive the view that contains the union
+   * of the base table and the history table in order to support asOf queries.
+   */
+  public void setAsOfViewSuffix(String asOfViewSuffix) {
+    this.asOfViewSuffix = asOfViewSuffix;
+  }
+
+  /**
+   * Return the database column used to support history and 'As of' queries. This column is a timestamp range
+   * or equivalent.
+   */
+  public String getAsOfSysPeriod() {
+    return asOfSysPeriod;
+  }
+
+  /**
+   * Set the database column used to support history and 'As of' queries. This column is a timestamp range
+   * or equivalent.
+   */
+  public void setAsOfSysPeriod(String asOfSysPeriod) {
+    this.asOfSysPeriod = asOfSysPeriod;
   }
 
   /**
@@ -1809,6 +1853,8 @@ public class ServerConfig {
 
     persistenceContextScope = PersistenceContextScope.valueOf(p.get("persistenceContextScope", "TRANSACTION"));
 
+    asOfViewSuffix = p.get("asOfViewSuffix", asOfViewSuffix);
+    asOfSysPeriod = p.get("asOfSysPeriod", asOfSysPeriod);
     dataSourceJndiName = p.get("dataSourceJndiName", dataSourceJndiName);
     databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
     databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);

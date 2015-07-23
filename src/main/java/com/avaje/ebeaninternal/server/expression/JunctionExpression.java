@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.expression;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -215,6 +216,11 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   @Override
   public ExpressionList<T> filterMany(String prop) {
     throw new RuntimeException("filterMany not allowed on Junction expression list");
+  }
+
+  @Override
+  public Query<T> asOf(Timestamp asOf) {
+    return exprList.asOf(asOf);
   }
 
   @Override

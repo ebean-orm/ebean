@@ -8,7 +8,17 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
  */
 public class ReadAnnotations {
 
-	/**
+  /**
+   * Typically _with_history and when appended to the base table derives the name of
+   * the view that unions the base table with the history table to support asOf queries.
+   */
+  private final String asOfViewSuffix;
+
+  public ReadAnnotations(String asOfViewSuffix) {
+    this.asOfViewSuffix = asOfViewSuffix;
+  }
+
+  /**
 	 * Read the initial non-relationship annotations included Id and EmbeddedId.
 	 * <p>
 	 * We then have enough to create BeanTables which are used in readAssociations
@@ -18,7 +28,7 @@ public class ReadAnnotations {
     public void readInitial(DeployBeanInfo<?> info, boolean eagerFetchLobs){
 
     	try { 		
-    		new AnnotationClass(info).parse();
+    		new AnnotationClass(info, asOfViewSuffix).parse();
 	      new AnnotationFields(info, eagerFetchLobs).parse();
 	       
     	} catch (RuntimeException e){

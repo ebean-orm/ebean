@@ -8,6 +8,7 @@ import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
+import com.avaje.ebean.annotation.HistoryExclude;
 import com.avaje.ebean.annotation.PrivateOwned;
 import com.avaje.ebean.annotation.Where;
 import com.avaje.ebean.bean.BeanCollection.ModifyListenMode;
@@ -65,7 +66,11 @@ public class AnnotationAssocManys extends AnnotationParser {
 			readToMany(manyToMany, prop);
 		}
 
-		OrderBy orderBy = get(prop, OrderBy.class);
+    if (get(prop, HistoryExclude.class) != null) {
+      prop.setExcludedFromHistory(true);
+    }
+
+    OrderBy orderBy = get(prop, OrderBy.class);
 		if (orderBy != null) {
 			prop.setFetchOrderBy(orderBy.value());
 		}

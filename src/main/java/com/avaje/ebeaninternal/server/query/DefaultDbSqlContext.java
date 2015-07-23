@@ -1,13 +1,14 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 import com.avaje.ebeaninternal.server.deploy.TableJoinColumn;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.util.ArrayStack;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Map;
 
 public class DefaultDbSqlContext implements DbSqlContext {
 
@@ -45,25 +46,22 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
   private ArrayList<BeanProperty> encryptedProps;
 
-  /**
-   * Construct for FROM clause (no column alias used).
-   */
-  public DefaultDbSqlContext(SqlTreeAlias alias, String tableAliasPlaceHolder) {
-    this.tableAliasPlaceHolder = tableAliasPlaceHolder;
-    this.columnAliasPrefix = null;
-    this.useColumnAlias = false;
-    this.alias = alias;
-  }
+  private final Map<String,String> asOfTableMap;
+
+  private final boolean asOfQuery;
 
   /**
    * Construct for SELECT clause (with column alias settings).
    */
   public DefaultDbSqlContext(SqlTreeAlias alias, String tableAliasPlaceHolder,
-      String columnAliasPrefix, boolean alwaysUseColumnAlias) {
+      String columnAliasPrefix, boolean alwaysUseColumnAlias, Map<String,String> asOfTableMap) {
+
     this.alias = alias;
     this.tableAliasPlaceHolder = tableAliasPlaceHolder;
     this.columnAliasPrefix = columnAliasPrefix;
     this.useColumnAlias = alwaysUseColumnAlias;
+    this.asOfTableMap = asOfTableMap;
+    this.asOfQuery = (asOfTableMap != null);
   }
 
   public void addEncryptedProp(BeanProperty p) {
@@ -108,7 +106,21 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
     sb.append(" ");
     sb.append(type);
-    sb.append(" ").append(table).append(" ");
+    if (!asOfQuery) {
+      sb.append(" ").append(table).append(" ");
+
+    } else {
+      // check if there is an associated history table and if so
+      // use the unionAll view - we expect an additional predicate to match
+      String withHistoryTable = asOfTableMap.get(table);
+      if (withHistoryTable != null) {
+        // there is an associated history table and view so use that
+        sb.append(" ").append(withHistoryTable).append(" ");
+
+      } else {
+        sb.append(" ").append(table).append(" ");
+      }
+    }
     sb.append(a2);
     sb.append(" on ");
 
@@ -222,7 +234,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
   public void appendColumn(String tableAlias, String column) {
     sb.append(COMMA);
 
-    if (column.indexOf("${}") > -1) {
+    if (column.contains("${}")) {
       // support DB functions such as lower() etc
       // with the use of secondary columns
       String x = StringHelper.replaceString(column, "${}", tableAlias);

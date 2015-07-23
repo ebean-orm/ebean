@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.query;
 
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 
@@ -31,6 +32,11 @@ public interface SqlTreeNode {
    * Append any where predicates for inheritance.
    */
   void appendWhere(DbSqlContext ctx);
+
+  /**
+   * Recurse through the tree adding an table alias' for @History entity beans.
+   */
+  void addAsOfTableAlias(SpiQuery<?> query);
 
   /**
    * Load the appropriate information from the SqlSelectReader.
