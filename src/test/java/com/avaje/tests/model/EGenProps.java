@@ -2,6 +2,8 @@ package com.avaje.tests.model;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
+import com.avaje.ebean.annotation.WhenCreated;
+import com.avaje.ebean.annotation.WhenModified;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -21,6 +23,12 @@ public class EGenProps {
 
   @Version
   Long version;
+
+  @WhenCreated
+  Timestamp whenCreated;
+
+  @WhenModified
+  Timestamp whenModified;
 
   @CreatedTimestamp
   Timestamp tsCreated;
@@ -74,6 +82,22 @@ public class EGenProps {
 
   public void setVersion(Long version) {
     this.version = version;
+  }
+
+  public Timestamp getWhenCreated() {
+    return whenCreated;
+  }
+
+  public void setWhenCreated(Timestamp whenCreated) {
+    this.whenCreated = whenCreated;
+  }
+
+  public Timestamp getWhenModified() {
+    return whenModified;
+  }
+
+  public void setWhenModified(Timestamp whenModified) {
+    this.whenModified = whenModified;
   }
 
   public Timestamp getTsCreated() {

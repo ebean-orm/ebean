@@ -22,8 +22,8 @@ import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlType;
 
-import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.Formula;
+import com.avaje.ebean.annotation.WhenCreated;
 import com.avaje.ebean.annotation.Where;
 
 /**
@@ -90,7 +90,7 @@ public class Order implements Serializable {
   @Column(name = "name", table = "o_customer")
   String customerName;
 
-  @CreatedTimestamp
+  @WhenCreated
   Timestamp cretime;
 
   @Version

@@ -12,6 +12,8 @@ import com.avaje.ebean.annotation.HistoryExclude;
 import com.avaje.ebean.annotation.Index;
 import com.avaje.ebean.annotation.JsonIgnore;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
+import com.avaje.ebean.annotation.WhenCreated;
+import com.avaje.ebean.annotation.WhenModified;
 import com.avaje.ebean.config.EncryptDeploy;
 import com.avaje.ebean.config.EncryptDeploy.Mode;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
@@ -208,13 +210,11 @@ public class AnnotationFields extends AnnotationParser {
       prop.setFetchType(defaultLobFetchType);
     }
 
-    CreatedTimestamp ct = get(prop, CreatedTimestamp.class);
-    if (ct != null) {
+    if (get(prop, WhenCreated.class) != null || get(prop, CreatedTimestamp.class) != null) {
       generatedPropFactory.setInsertTimestamp(prop);
     }
 
-    UpdatedTimestamp ut = get(prop, UpdatedTimestamp.class);
-    if (ut != null) {
+    if (get(prop, WhenModified.class) != null || get(prop, UpdatedTimestamp.class) != null) {
       generatedPropFactory.setUpdateTimestamp(prop);
     }
 

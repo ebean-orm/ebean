@@ -18,6 +18,8 @@ public class TestGeneratedProperties extends BaseTestCase {
 
     assertNotNull(bean.getId());
     assertNotNull(bean.getVersion());
+    assertNotNull(bean.getWhenCreated());
+    assertNotNull(bean.getWhenModified());
     assertNotNull(bean.getTsCreated());
     assertNotNull(bean.getTsUpdated());
     assertNotNull(bean.getLdtCreated());

@@ -7,8 +7,8 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.annotation.UpdatedTimestamp;
+import com.avaje.ebean.annotation.WhenCreated;
+import com.avaje.ebean.annotation.WhenModified;
 
 @MappedSuperclass
 public class BasicDomain implements Serializable {
@@ -18,10 +18,10 @@ public class BasicDomain implements Serializable {
 	@Id
 	Integer id;
 
-	@CreatedTimestamp
+	@WhenCreated
 	Timestamp cretime;
 	
-	@UpdatedTimestamp
+	@WhenModified
 	Timestamp updtime;
 
 	@Version

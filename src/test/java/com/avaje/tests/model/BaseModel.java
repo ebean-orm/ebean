@@ -7,8 +7,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
 import com.avaje.ebean.Model;
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.annotation.UpdatedTimestamp;
+import com.avaje.ebean.annotation.WhenCreated;
+import com.avaje.ebean.annotation.WhenModified;
 
 @MappedSuperclass
 public class BaseModel extends Model {
@@ -19,11 +19,11 @@ public class BaseModel extends Model {
   @Version
   Long version;
   
-  @CreatedTimestamp
+  @WhenCreated
   Timestamp whenCreated;
 
-  @UpdatedTimestamp
-  Timestamp whenUpdated;
+  @WhenModified
+  Timestamp whenModified;
 
   public Long getId() {
     return id;
@@ -49,12 +49,12 @@ public class BaseModel extends Model {
     this.whenCreated = whenCreated;
   }
 
-  public Timestamp getWhenUpdated() {
-    return whenUpdated;
+  public Timestamp getWhenModified() {
+    return whenModified;
   }
 
-  public void setWhenUpdated(Timestamp whenUpdated) {
-    this.whenUpdated = whenUpdated;
+  public void setWhenModified(Timestamp whenModified) {
+    this.whenModified = whenModified;
   }
 
 }
