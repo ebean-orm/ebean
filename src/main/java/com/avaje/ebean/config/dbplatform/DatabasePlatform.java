@@ -442,6 +442,13 @@ public class DatabasePlatform {
     return disallowBatchOnCascade;
   }
 
+  /**
+   * Return the 'as of' predicate added for the given table alias.
+   *
+   * @param asOfTableAlias The table alias this predicate is added for
+   * @param asOfSysPeriod  The name of the 'sys_period' column used for effective date time range.
+   * @return The predicate containing a single ? bind parameter which will be bound to the 'as at' timestamp value
+   */
   public String getAsOfPredicate(String asOfTableAlias, String asOfSysPeriod) {
     throw new RuntimeException("AsOf query not support of this database platform yet");
   }
