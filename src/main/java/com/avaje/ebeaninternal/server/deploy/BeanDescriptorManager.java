@@ -154,7 +154,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.eagerFetchLobs = serverConfig.isEagerFetchLobs();
 
     this.asOfViewSuffix = serverConfig.getAsOfViewSuffix();
-    this.readAnnotations = new ReadAnnotations(asOfViewSuffix);
+    this.readAnnotations = new ReadAnnotations(config.getGeneratedPropertyFactory(), asOfViewSuffix);
     this.bootupClasses = config.getBootupClasses();
     this.createProperties = config.getDeployCreateProperties();
     this.typeManager = config.getTypeManager();

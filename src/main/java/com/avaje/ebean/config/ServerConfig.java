@@ -113,6 +113,12 @@ public class ServerConfig {
    */
   private String classPathReaderClassName;
 
+  /**
+   * This is used to populate @WhoCreated, @WhoModified and
+   * support other audit features (who executed a query etc).
+   */
+  private CurrentUserProvider currentUserProvider;
+
   /** 
    * Config controlling the autofetch behaviour.
    */
@@ -444,6 +450,22 @@ public class ServerConfig {
    */
   public void setDefaultServer(boolean defaultServer) {
     this.defaultServer = defaultServer;
+  }
+
+  /**
+   * Return the CurrentUserProvider. This is used to populate @WhoCreated, @WhoModified and
+   * support other audit features (who executed a query etc).
+   */
+  public CurrentUserProvider getCurrentUserProvider() {
+    return currentUserProvider;
+  }
+
+  /**
+   * Set the CurrentUserProvider. This is used to populate @WhoCreated, @WhoModified and
+   * support other audit features (who executed a query etc).
+   */
+  public void setCurrentUserProvider(CurrentUserProvider currentUserProvider) {
+    this.currentUserProvider = currentUserProvider;
   }
 
   /**
@@ -1812,6 +1834,7 @@ public class ServerConfig {
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
 
+    currentUserProvider = createInstance(p, CurrentUserProvider.class, "currentUserProvider");
     disableClasspathSearch = p.getBoolean("disableClasspathSearch", disableClasspathSearch);
     databasePlatform = createInstance(p, DatabasePlatform.class, "databasePlatform");
     encryptKeyManager = createInstance(p, EncryptKeyManager.class, "encryptKeyManager");

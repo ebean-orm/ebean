@@ -34,8 +34,8 @@ public class AnnotationAssocManys extends AnnotationParser {
 	/**
 	 * Create with the DeployInfo.
 	 */
-	public AnnotationAssocManys(DeployBeanInfo<?> info, BeanDescriptorManager factory) {
-		super(info);
+	public AnnotationAssocManys(DeployBeanInfo<?> info, boolean javaxValidationAnnotations, BeanDescriptorManager factory) {
+		super(info, javaxValidationAnnotations);
 		this.factory = factory;
 	}
 

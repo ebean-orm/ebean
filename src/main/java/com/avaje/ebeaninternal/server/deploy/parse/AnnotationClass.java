@@ -29,8 +29,8 @@ public class AnnotationClass extends AnnotationParser {
 
   private final String asOfViewSuffix;
 
-  public AnnotationClass(DeployBeanInfo<?> info, String asOfViewSuffix) {
-    super(info);
+  public AnnotationClass(DeployBeanInfo<?> info, boolean validationAnnotations, String asOfViewSuffix) {
+    super(info, validationAnnotations);
     this.asOfViewSuffix = asOfViewSuffix;
   }
 

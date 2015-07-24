@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.core;
 
 import javax.sql.DataSource;
 
+import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +93,7 @@ public class InternalConfiguration {
   private final XmlConfig xmlConfig;
 
   private final JsonFactory jsonFactory;
-  
+
   public InternalConfiguration(XmlConfig xmlConfig, ClusterManager clusterManager,
       ServerCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
       ServerConfig serverConfig, BootupClasses bootupClasses, PstmtBatch pstmtBatch) {
@@ -267,4 +268,7 @@ public class InternalConfiguration {
     return backgroundExecutor;
   }
 
+  public GeneratedPropertyFactory getGeneratedPropertyFactory() {
+    return new GeneratedPropertyFactory(serverConfig.getCurrentUserProvider());
+  }
 }

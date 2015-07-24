@@ -9,8 +9,8 @@ import com.avaje.ebeaninternal.server.deploy.DRawSqlMeta;
  */
 public class AnnotationSql extends AnnotationParser {
 
-  public AnnotationSql(DeployBeanInfo<?> info) {
-    super(info);
+  public AnnotationSql(DeployBeanInfo<?> info, boolean javaxValidationAnnotations) {
+    super(info, javaxValidationAnnotations);
   }
 
   public void parse() {

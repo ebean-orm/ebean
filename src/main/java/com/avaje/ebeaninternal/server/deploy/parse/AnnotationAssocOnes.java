@@ -33,8 +33,8 @@ public class AnnotationAssocOnes extends AnnotationParser {
     /**
      * Create with the deploy Info.
      */
-    public AnnotationAssocOnes(DeployBeanInfo<?> info, BeanDescriptorManager factory) {
-        super(info);
+    public AnnotationAssocOnes(DeployBeanInfo<?> info, boolean javaxValidationAnnotations, BeanDescriptorManager factory) {
+        super(info, javaxValidationAnnotations);
         this.factory = factory;
     }
 

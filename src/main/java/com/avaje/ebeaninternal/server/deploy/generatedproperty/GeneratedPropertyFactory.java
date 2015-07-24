@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 import java.math.BigDecimal;
 import java.util.HashSet;
 
+import com.avaje.ebean.config.CurrentUserProvider;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 /**
@@ -10,19 +11,27 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
  */
 public class GeneratedPropertyFactory {
 
-	CounterFactory counterFactory;
+	private final CounterFactory counterFactory = new CounterFactory();;
 
-	InsertTimestampFactory insertFactory;
+  private final InsertTimestampFactory insertFactory = new InsertTimestampFactory();
 
-	UpdateTimestampFactory updateFactory;
+  private final UpdateTimestampFactory updateFactory = new UpdateTimestampFactory();
 
-	HashSet<String> numberTypes = new HashSet<String>();
+  private final HashSet<String> numberTypes = new HashSet<String>();
 
-	public GeneratedPropertyFactory() {
-		counterFactory = new CounterFactory();
-		insertFactory = new InsertTimestampFactory();
-		updateFactory = new UpdateTimestampFactory();
-		
+  private final GeneratedWhoModified generatedWhoModified;
+
+  private final GeneratedWhoCreated generatedWhoCreated;
+
+  public GeneratedPropertyFactory(CurrentUserProvider currentUserProvider) {
+
+	  if (currentUserProvider != null) {
+      generatedWhoCreated = new GeneratedWhoCreated(currentUserProvider);
+      generatedWhoModified = new GeneratedWhoModified(currentUserProvider);
+    } else {
+      generatedWhoCreated = null;
+      generatedWhoModified = null;
+    }
 
 		numberTypes.add(Integer.class.getName());
 		numberTypes.add(int.class.getName());
@@ -61,5 +70,19 @@ public class GeneratedPropertyFactory {
 		
 		updateFactory.setUpdateTimestamp(property);
 	}
+
+  public void setWhoCreated(DeployBeanProperty property) {
+    if (generatedWhoCreated == null) {
+      throw new IllegalStateException("No CurrentUserProvider has been set so @WhoCreated is not supported");
+    }
+    property.setGeneratedProperty(generatedWhoCreated);
+  }
+
+  public void setWhoModified(DeployBeanProperty property) {
+    if (generatedWhoModified == null) {
+      throw new IllegalStateException("No CurrentUserProvider has been set so @WhoModified is not supported");
+    }
+    property.setGeneratedProperty(generatedWhoModified);
+  }
 
 }

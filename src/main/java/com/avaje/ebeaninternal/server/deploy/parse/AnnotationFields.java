@@ -1,25 +1,11 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.annotation.DbHstore;
-import com.avaje.ebean.annotation.DbJson;
-import com.avaje.ebean.annotation.DbJsonB;
-import com.avaje.ebean.annotation.EmbeddedColumns;
-import com.avaje.ebean.annotation.Encrypted;
-import com.avaje.ebean.annotation.Expose;
-import com.avaje.ebean.annotation.Formula;
-import com.avaje.ebean.annotation.HistoryExclude;
-import com.avaje.ebean.annotation.Index;
-import com.avaje.ebean.annotation.JsonIgnore;
-import com.avaje.ebean.annotation.UpdatedTimestamp;
-import com.avaje.ebean.annotation.WhenCreated;
-import com.avaje.ebean.annotation.WhenModified;
+import com.avaje.ebean.annotation.*;
 import com.avaje.ebean.config.EncryptDeploy;
 import com.avaje.ebean.config.EncryptDeploy.Mode;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.IdType;
-import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
@@ -49,17 +35,22 @@ public class AnnotationFields extends AnnotationParser {
   /**
    * If present read Jackson JsonIgnore.
    */
-  private boolean jacksonAnnotationsPresent = ClassUtil.isJacksonAnnotationsPresent();
+  private final boolean jacksonAnnotationsPresent;
+
+  private final GeneratedPropertyFactory generatedPropFactory;
 
   /**
    * By default we lazy load Lob properties.
    */
   private FetchType defaultLobFetchType = FetchType.LAZY;
 
-  private GeneratedPropertyFactory generatedPropFactory = new GeneratedPropertyFactory();
+  public AnnotationFields(GeneratedPropertyFactory generatedPropFactory, DeployBeanInfo<?> info,
+                          boolean javaxValidationAnnotations, boolean jacksonAnnotationsPresent, boolean eagerFetchLobs) {
 
-  public AnnotationFields(DeployBeanInfo<?> info, boolean eagerFetchLobs) {
-    super(info);
+    super(info, javaxValidationAnnotations);
+
+    this.jacksonAnnotationsPresent = jacksonAnnotationsPresent;
+    this.generatedPropFactory = generatedPropFactory;
 
     if (eagerFetchLobs) {
       defaultLobFetchType = FetchType.EAGER;
@@ -216,6 +207,13 @@ public class AnnotationFields extends AnnotationParser {
 
     if (get(prop, WhenModified.class) != null || get(prop, UpdatedTimestamp.class) != null) {
       generatedPropFactory.setUpdateTimestamp(prop);
+    }
+
+    if (get(prop, WhoCreated.class) != null) {
+      generatedPropFactory.setWhoCreated(prop);
+    }
+    if (get(prop, WhoModified.class) != null) {
+      generatedPropFactory.setWhoModified(prop);
     }
 
     if (get(prop, HistoryExclude.class) != null) {

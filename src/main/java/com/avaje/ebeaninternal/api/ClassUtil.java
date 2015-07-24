@@ -48,6 +48,13 @@ public class ClassUtil {
   }
 
   /**
+   * Return true if javax validation annotations like Size and NotNull are present.
+   */
+  public static boolean isJavaxValidationAnnotationsPresent() {
+    return isPresent("javax.validation.constraints.NotNull", null);
+  }
+
+  /**
    * Return true if Jackson annotations like JsonIgnore are present.
    */
   public static boolean isJacksonAnnotationsPresent() {
