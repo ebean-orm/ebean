@@ -16,7 +16,7 @@ import com.avaje.tests.model.embedded.Eembeddable;
 
 public class TestDiffHelpWithEmbedded extends BaseTestCase {
 
-  DiffHelp diffHelp = new DiffHelp();
+  DiffHelp diffHelp = new DiffHelp(false);
 
   EbeanServer server;
   BeanDescriptor<EMain> emainDesc;
@@ -99,6 +99,23 @@ public class TestDiffHelpWithEmbedded extends BaseTestCase {
     Assert.assertNull(valuePair.getOldValue());
     Assert.assertTrue(valuePair.getNewValue() instanceof Eembeddable);
     Assert.assertEquals("bar",((Eembeddable)valuePair.getNewValue()).getDescription());
+  }
+
+  @Test
+  public void testSecondEmbeddedIsNull_given_flatMode() {
+
+    EMain emain1 = createEMain();
+    EMain emain2 = createEMain();
+    emain2.setEmbeddable(null);
+
+    DiffHelp diffHelp = new DiffHelp(true);
+    Map<String, ValuePair> diff = diffHelp.diff(emain1, emain2, emainDesc);
+    Assert.assertEquals(1, diff.size());
+    ValuePair valuePair = diff.get("embeddable.description");
+
+    Assert.assertNotNull(valuePair);
+    Assert.assertNull(valuePair.getOldValue());
+    Assert.assertEquals("bar", valuePair.getNewValue());
   }
 
   @Test

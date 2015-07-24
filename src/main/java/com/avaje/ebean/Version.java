@@ -1,6 +1,7 @@
 package com.avaje.ebean;
 
 import java.sql.Timestamp;
+import java.util.Map;
 
 /**
  * Wraps a version of a @History bean.
@@ -10,17 +11,22 @@ public class Version<T> {
   /**
    * The version of the bean.
    */
-  T bean;
+  protected T bean;
 
   /**
    * The effective start date time of this version.
    */
-  Timestamp start;
+  protected Timestamp start;
 
   /**
    * The effective end date time of this version.
    */
-  Timestamp end;
+  protected Timestamp end;
+
+  /**
+   * The map of changed properties.
+   */
+  protected Map<String, ValuePair> diff;
 
   /**
    * Construct with bean and an effective date time range.
@@ -77,5 +83,19 @@ public class Version<T> {
    */
   public void setEnd(Timestamp end) {
     this.end = end;
+  }
+
+  /**
+   * Set the map of differences from this bean to the prior version.
+   */
+  public void setDiff(Map<String, ValuePair> diff) {
+    this.diff = diff;
+  }
+
+  /**
+   * Return the map of differences from this bean to the prior version.
+   */
+  public Map<String, ValuePair> getDiff() {
+    return diff;
   }
 }

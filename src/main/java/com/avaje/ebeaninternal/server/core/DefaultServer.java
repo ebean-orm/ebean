@@ -88,7 +88,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
   private final BeanDescriptorManager beanDescriptorManager;
 
-  private final DiffHelp diffHelp = new DiffHelp();
+  private final DiffHelp diffHelp;
 
   private final AutoFetchManager autoFetchManager;
 
@@ -171,6 +171,7 @@ public final class DefaultServer implements SpiEbeanServer {
     this.backgroundExecutor = config.getBackgroundExecutor();
     
     this.serverName = serverConfig.getName();
+    this.diffHelp = new DiffHelp(serverConfig.isDiffFlatMode());
     this.lazyLoadBatchSize = serverConfig.getLazyLoadBatchSize();
     this.queryBatchSize = serverConfig.getQueryBatchSize();
     this.cqueryEngine = config.getCQueryEngine();

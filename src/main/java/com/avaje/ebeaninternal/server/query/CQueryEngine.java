@@ -1,10 +1,14 @@
 package com.avaje.ebeaninternal.server.query;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.Version;
+import com.avaje.ebeaninternal.server.core.DiffHelp;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +35,8 @@ public class CQueryEngine {
   private static final int defaultSecondaryQueryBatchSize = 100;
 
   private static final String T0 = "t0";
+
+  private final DiffHelp diffHelp = new DiffHelp(true);
 
   private final boolean forwardOnlyHintOnFindIterate;
 
@@ -180,6 +186,8 @@ public class CQueryEngine {
       }
 
       List<Version<T>> versions = cquery.readVersions();
+      deriveVersionDiffs(versions, request);
+
       if (request.isLogSummary()) {
         logFindManySummary(cquery);
       }
@@ -194,6 +202,26 @@ public class CQueryEngine {
         cquery.close();
       }
     }
+  }
+
+  private <T> void deriveVersionDiffs(List<Version<T>> versions, OrmQueryRequest<T> request) {
+
+    BeanDescriptor<T> descriptor = request.getBeanDescriptor();
+
+    Version<T> current = versions.get(0);
+    for (int i = 1; i < versions.size(); i++) {
+      Version<T> next = versions.get(i);
+      deriveVersionDiff(current, next, descriptor);
+      current = next;
+    }
+    // put an empty map into the last one
+    current.setDiff(Collections.EMPTY_MAP);
+  }
+
+  private <T> void deriveVersionDiff(Version<T> current, Version<T> prior, BeanDescriptor<T> descriptor) {
+
+    Map<String, ValuePair> diff = diffHelp.diff(current.getBean(), prior.getBean(), descriptor);
+    current.setDiff(diff);
   }
 
   /**

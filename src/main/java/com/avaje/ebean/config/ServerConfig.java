@@ -317,6 +317,7 @@ public class ServerConfig {
   private int queryCacheMaxIdleTime = 600;
   private int queryCacheMaxTimeToLive = 60*60*6;
   private Object objectMapper;
+  private boolean diffFlatMode;
 
   /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
@@ -1876,6 +1877,7 @@ public class ServerConfig {
 
     persistenceContextScope = PersistenceContextScope.valueOf(p.get("persistenceContextScope", "TRANSACTION"));
 
+    diffFlatMode = p.getBoolean("diffFlatMode", diffFlatMode);
     asOfViewSuffix = p.get("asOfViewSuffix", asOfViewSuffix);
     asOfSysPeriod = p.get("asOfSysPeriod", asOfSysPeriod);
     dataSourceJndiName = p.get("dataSourceJndiName", dataSourceJndiName);
@@ -1967,11 +1969,39 @@ public class ServerConfig {
     return databasePlatform.isDisallowBatchOnCascade() ? PersistBatch.NONE : persistBatchOnCascade;
   }
 
+  /**
+   * Return the Jackson ObjectMapper.
+   * <p>
+   * Note that this is not strongly typed as Jackson ObjectMapper is an optional dependency.
+   * </p>
+   */
   public Object getObjectMapper() {
     return objectMapper;
   }
 
+  /**
+   * Set the Jackson ObjectMapper.
+   * <p>
+   * Note that this is not strongly typed as Jackson ObjectMapper is an optional dependency.
+   * </p>
+   */
   public void setObjectMapper(Object objectMapper) {
     this.objectMapper = objectMapper;
+  }
+
+  /**
+   * Return true if diff should return flat properties with dot notation rather than
+   * embedded beans or reference beans (when the associated bean id is different).
+   */
+  public boolean isDiffFlatMode() {
+    return diffFlatMode;
+  }
+
+  /**
+   * Set to true if diff should return flat properties with dot notation rather than
+   * embedded beans or reference beans (when the associated bean id is different).
+   */
+  public void setDiffFlatMode(boolean diffFlatMode) {
+    this.diffFlatMode = diffFlatMode;
   }
 }

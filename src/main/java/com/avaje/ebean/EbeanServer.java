@@ -148,7 +148,7 @@ public interface EbeanServer {
    * difference comparison.
    * </p>
    */
-  Map<String, ValuePair> diff(Object a, Object b);
+  Map<String, ValuePair> diff(Object newBean, Object oldBean);
 
   /**
    * Create a new instance of T that is an EntityBean.

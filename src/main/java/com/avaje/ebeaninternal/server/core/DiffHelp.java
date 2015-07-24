@@ -18,7 +18,12 @@ import com.avaje.ebeaninternal.util.ValueUtil;
  */
 public class DiffHelp {
 
-	
+  private final boolean flatMode;
+
+  public DiffHelp(boolean flatMode) {
+    this.flatMode = flatMode;
+  }
+
   /**
    * Return a map of the differences between a and b.
    * <p>
@@ -29,45 +34,45 @@ public class DiffHelp {
    * This intentionally does not include as OneToMany or ManyToMany properties.
    * </p>
    */
-	public Map<String, ValuePair> diff(Object a, Object b, BeanDescriptor<?> desc) {
+	public Map<String, ValuePair> diff(Object newBean, Object oldBean, BeanDescriptor<?> desc) {
 
-    if (a instanceof EntityBean == false) {
-      throw new IllegalArgumentException("First bean expected to be an enhanced EntityBean? bean:"+a);
+    if (!(newBean instanceof EntityBean)) {
+      throw new IllegalArgumentException("First bean expected to be an enhanced EntityBean? bean:"+newBean);
     }
 
-    if (b != null) {
-      if (b instanceof EntityBean == false) {
-        throw new IllegalArgumentException("Second bean expected to be an enhanced EntityBean? bean:"+b);
+    if (oldBean != null) {
+      if (!(oldBean instanceof EntityBean)) {
+        throw new IllegalArgumentException("Second bean expected to be an enhanced EntityBean? bean:"+oldBean);
       }
-      if (!a.getClass().isAssignableFrom(b.getClass())) {
+      if (!newBean.getClass().isAssignableFrom(oldBean.getClass())) {
         throw new IllegalArgumentException("Second bean not assignable to the first bean?");
       }
     }
     
-		if (b == null) {
-			return ((EntityBean) a)._ebean_getIntercept().getDirtyValues();
+		if (oldBean == null) {
+			return ((EntityBean) newBean)._ebean_getIntercept().getDirtyValues();
 		}
 
     Map<String, ValuePair> map = new LinkedHashMap<String, ValuePair>();
-    diff(null, map, (EntityBean)a, (EntityBean)b, desc);
+    diff(null, map, (EntityBean) newBean, (EntityBean) oldBean, desc);
     return map;
 	}
 	
-	public void diff(String prefix, Map<String, ValuePair> map, EntityBean first, EntityBean sec, BeanDescriptor<?> desc) {
+	public void diff(String prefix, Map<String, ValuePair> map, EntityBean newBean, EntityBean oldBean, BeanDescriptor<?> desc) {
 
 		// check the simple properties
 		BeanProperty[] base = desc.propertiesBaseScalar();
 		for (int i = 0; i < base.length; i++) {
-			Object aval = base[i].getValue(first);
-			Object bval = base[i].getValue(sec);
-			if (!ValueUtil.areEqual(aval, bval)) {
+			Object newVal = (newBean == null) ? null : base[i].getValue(newBean);
+			Object oldVal = (oldBean == null) ? null : base[i].getValue(oldBean);
+			if (!ValueUtil.areEqual(newVal, oldVal)) {
 			  String propName = (prefix == null) ? base[i].getName() : prefix + base[i].getName();
-				map.put(propName, new ValuePair(aval, bval));
+				map.put(propName, new ValuePair(newVal, oldVal));
 			}
 		}
 
-		diffAssocOne(prefix, first, sec, desc, map);
-		diffEmbedded(prefix, first, sec, desc, map);
+		diffAssocOne(prefix, newBean, oldBean, desc, map);
+		diffEmbedded(prefix, newBean, oldBean, desc, map);
 	}
 
 	/**
@@ -77,24 +82,29 @@ public class DiffHelp {
 	 * determined to be different as is added to the map.
 	 * </p>
 	 */
-	private void diffEmbedded(String prefix, EntityBean a, EntityBean b, BeanDescriptor<?> desc, Map<String, ValuePair> map) {
+	private void diffEmbedded(String prefix, EntityBean newBean, EntityBean oldBean, BeanDescriptor<?> desc, Map<String, ValuePair> map) {
 
 		BeanPropertyAssocOne<?>[] emb = desc.propertiesEmbedded();
 
 		for (int i = 0; i < emb.length; i++) {
-			EntityBean aval = (EntityBean)emb[i].getValue(a);
-			EntityBean bval = (EntityBean)emb[i].getValue(b);
+			EntityBean newVal = (EntityBean)emb[i].getValue(newBean);
+			EntityBean oldVal = (EntityBean)emb[i].getValue(oldBean);
 			
-			if (!isBothNull(aval, bval)) {
+			if (!isBothNull(newVal, oldVal)) {
         String propName = (prefix == null) ? emb[i].getName() : prefix + emb[i].getName();
-				if (isDiffNull(aval, bval)) {
+				if (isDiffNull(newVal, oldVal)) {
 					// one of the embedded beans is null
-					map.put(propName, new ValuePair(aval, bval));
+          if (flatMode) {
+            BeanDescriptor<?> embDesc = emb[i].getTargetDescriptor();
+            diff(emb[i].getName()+".", map, newVal, oldVal, embDesc);
+          } else {
+            map.put(propName, new ValuePair(newVal, oldVal));
+          }
 
 				} else {
 				  // recursively diff into the embedded bean
 				  BeanDescriptor<?> embDesc = emb[i].getTargetDescriptor();
-				  diff(emb[i].getName()+".", map, aval, bval, embDesc);
+				  diff(emb[i].getName()+".", map, newVal, oldVal, embDesc);
 				}
 			}
 		}
@@ -104,45 +114,43 @@ public class DiffHelp {
 	 * If the properties are different by null OR if the id value is different,
 	 * then add the Assoc One bean to the map.
 	 */
-	private void diffAssocOne(String prefix, EntityBean a, EntityBean b, BeanDescriptor<?> desc, Map<String, ValuePair> map) {
+	private void diffAssocOne(String prefix, EntityBean newBean, EntityBean oldBean, BeanDescriptor<?> desc, Map<String, ValuePair> map) {
 
 		BeanPropertyAssocOne<?>[] ones = desc.propertiesOne();
 
 		for (int i = 0; i < ones.length; i++) {
-			Object aval = ones[i].getValue(a);
-			Object bval = ones[i].getValue(b);
+			Object newVal = ones[i].getValue(newBean);
+			Object oldVal = ones[i].getValue(oldBean);
 
-			if (!isBothNull(aval, bval)) {
-        String propName = (prefix == null) ? ones[i].getName() : prefix + ones[i].getName();
-				if (isDiffNull(aval, bval)) {
-					// one of them is/was null
-					map.put(propName, new ValuePair(aval, bval));
+			if (!isBothNull(newVal, oldVal)) {
+        BeanDescriptor<?> oneDesc = ones[i].getTargetDescriptor();
+        Object newId = (newVal == null) ? null : oneDesc.getId((EntityBean)newVal);
+        Object oldId = (oldVal == null) ? null : oneDesc.getId((EntityBean)oldVal);
 
-				} else {
-					// check to see if the Id properties
-					// are different
-					BeanDescriptor<?> oneDesc = ones[i].getTargetDescriptor();
-					Object aOneId = oneDesc.getId((EntityBean)aval);
-					Object bOneId = oneDesc.getId((EntityBean)bval);
+        if (!ValueUtil.areEqual(newId, oldId)) {
+          String propName = (prefix == null) ? ones[i].getName() : prefix + ones[i].getName();
+          // the ids are different
+          if (flatMode) {
+            String idName =  oneDesc.getIdProperty().getName();
+            map.put(propName + "." + idName, new ValuePair(newId, oldId));
 
-					if (!ValueUtil.areEqual(aOneId, bOneId)) {
-						// the ids are different
-						map.put(propName, new ValuePair(aval, bval));
-					}
-				}
-			}
+          } else {
+            map.put(propName, new ValuePair(newVal, oldVal));
+          }
+        }
+      }
 		}
 	}
 
-	private boolean isBothNull(Object aval, Object bval) {
-		return aval == null && bval == null;
+	private boolean isBothNull(Object newVal, Object oldVal) {
+		return newVal == null && oldVal == null;
 	}
 
-	private boolean isDiffNull(Object aval, Object bval) {
-		if (aval == null) {
-			return bval != null;
+	private boolean isDiffNull(Object newVal, Object oldVal) {
+		if (newVal == null) {
+			return oldVal != null;
 		} else {
-			return bval == null;
+			return oldVal == null;
 		}
 	}
 }

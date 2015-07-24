@@ -20,7 +20,7 @@ import com.avaje.tests.model.basic.Order.Status;
 
 public class TestDiffHelpSimple extends BaseTestCase {
 
-  DiffHelp diffHelp = new DiffHelp();
+  DiffHelp diffHelp = new DiffHelp(false);
 
   long firstTime = System.currentTimeMillis()-10000;
   long secondTime = System.currentTimeMillis();
@@ -71,6 +71,34 @@ public class TestDiffHelpSimple extends BaseTestCase {
     Assert.assertTrue(keySet.contains("customer"));
   }
 
+  @Test
+  public void testBasicChanges_given_flatMode() {
+
+
+    Order order1 = createBaseOrder(server);
+
+    Order order2 = new Order();
+    order2.setId(14);
+    order2.setCretime(new Timestamp(secondTime));
+    order2.setCustomer(server.getReference(Customer.class, 2133));
+    order2.setStatus(Status.COMPLETE);
+    order2.setShipDate(new Date(secondTime));
+    order2.setOrderDate(new Date(secondTime));
+
+    DiffHelp diffHelp = new DiffHelp(true);
+    Map<String, ValuePair> diff = diffHelp.diff(order1, order2, orderDesc);
+
+    Assert.assertEquals(5, diff.size());
+
+    Set<String> keySet = diff.keySet();
+    Assert.assertTrue(keySet.contains("cretime"));
+    Assert.assertTrue(keySet.contains("status"));
+    Assert.assertTrue(keySet.contains("shipDate"));
+    Assert.assertTrue(keySet.contains("orderDate"));
+    Assert.assertTrue(keySet.contains("customer.id"));
+    Assert.assertEquals(2133, diff.get("customer.id").getOldValue());
+    Assert.assertEquals(1234, diff.get("customer.id").getNewValue());
+  }
 
   @Test
   public void testIdIgnored() {
