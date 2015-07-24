@@ -46,10 +46,6 @@ public class CQueryBuilder implements Constants {
 
   private final boolean selectCountWithAlias;
 
-  private final Map<String,String> asOfTableMapping;
-
-  private final String asOfSysPeriod;
-  private final DbHistorySupport dbHistorySupport;
   private final CQueryHistorySupport historySupport;
 
   private final DatabasePlatform dbPlatform;
@@ -57,23 +53,17 @@ public class CQueryBuilder implements Constants {
   /**
    * Create the SqlGenSelect.
    */
-  public CQueryBuilder(DatabasePlatform dbPlatform, Binder binder, Map<String,String> asOfTableMapping, String asOfSysPeriod) {
+  public CQueryBuilder(DatabasePlatform dbPlatform, Binder binder, CQueryHistorySupport historySupport) {
 
+    this.dbPlatform = dbPlatform;
     this.binder = binder;
-    this.asOfTableMapping = asOfTableMapping;
-    this.asOfSysPeriod = asOfSysPeriod;
+    this.historySupport = historySupport;
     this.tableAliasPlaceHolder = dbPlatform.getTableAliasPlaceHolder();
     this.columnAliasPrefix = dbPlatform.getColumnAliasPrefix();
     this.sqlSelectBuilder = new RawSqlSelectClauseBuilder(dbPlatform, binder);
-
-    this.dbHistorySupport = dbPlatform.getHistorySupport();
-    this.historySupport = new CQueryHistorySupport(dbHistorySupport, asOfTableMapping, asOfSysPeriod);
     this.sqlLimiter = dbPlatform.getSqlLimiter();
     this.rawSqlHandler = new CQueryBuilderRawSql(sqlLimiter, dbPlatform);
-
     this.selectCountWithAlias = dbPlatform.isSelectCountWithAlias();
-
-    this.dbPlatform = dbPlatform;
   }
 
   /**
@@ -427,7 +417,7 @@ public class CQueryBuilder implements Constants {
         if (i > 0) {
           sb.append(" and ");
         }
-        sb.append(dbHistorySupport.getAsOfPredicate(asOfTableAlias.get(i), asOfSysPeriod));
+        sb.append(historySupport.getAsOfPredicate(asOfTableAlias.get(i)));
       }
     }
 

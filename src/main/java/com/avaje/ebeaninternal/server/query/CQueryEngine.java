@@ -30,13 +30,18 @@ public class CQueryEngine {
 
   private static final int defaultSecondaryQueryBatchSize = 100;
 
+  private static final String T0 = "t0";
+
   private final boolean forwardOnlyHintOnFindIterate;
 
   private final CQueryBuilder queryBuilder;
 
+  private final CQueryHistorySupport historySupport;
+
   public CQueryEngine(DatabasePlatform dbPlatform, Binder binder, Map<String,String> asOfTableMapping, String asOfSysPeriod) {
     this.forwardOnlyHintOnFindIterate = dbPlatform.isForwardOnlyHintOnFindIterate();
-    this.queryBuilder = new CQueryBuilder(dbPlatform, binder, asOfTableMapping, asOfSysPeriod);
+    this.historySupport = new CQueryHistorySupport(dbPlatform.getHistorySupport(), asOfTableMapping, asOfSysPeriod);
+    this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport);
   }
 
   public <T> CQuery<T> buildQuery(OrmQueryRequest<T> request) {
@@ -161,6 +166,12 @@ public class CQueryEngine {
    */
   public <T> List<Version<T>> findVersions(OrmQueryRequest<T> request) {
 
+    SpiQuery<T> query = request.getQuery();
+
+    // order by id asc, lower sys period desc
+    query.orderBy().asc(request.getBeanDescriptor().getIdProperty().getName());
+    query.orderBy().desc(getSysPeriodLower(query));
+
     CQuery<T> cquery = queryBuilder.buildQuery(request);
     try {
       cquery.prepareBindExecuteQuery();
@@ -183,6 +194,17 @@ public class CQueryEngine {
         cquery.close();
       }
     }
+  }
+
+  /**
+   * Return the lower sys_period given the table alias of the query or default.
+   */
+  private <T> String getSysPeriodLower(SpiQuery<T> query) {
+    String rootTableAlias = query.getAlias();
+    if (rootTableAlias == null) {
+      rootTableAlias = T0;
+    }
+    return historySupport.getSysPeriodLower(rootTableAlias);
   }
 
   /**

@@ -22,12 +22,12 @@ public class CQueryHistorySupport {
   /**
    * The sys period column.
    */
-  private final String asOfSysPeriod;
+  private final String sysPeriod;
 
-  public CQueryHistorySupport(DbHistorySupport dbHistorySupport, Map<String, String> asOfTableMap, String asOfSysPeriod) {
+  public CQueryHistorySupport(DbHistorySupport dbHistorySupport, Map<String, String> asOfTableMap, String sysPeriod) {
     this.dbHistorySupport = dbHistorySupport;
     this.asOfTableMap = asOfTableMap;
-    this.asOfSysPeriod = asOfSysPeriod;
+    this.sysPeriod = sysPeriod;
   }
 
   public String getAsOfView(String table) {
@@ -36,12 +36,16 @@ public class CQueryHistorySupport {
 
   public String getSysPeriodLower(String tableAlias) {
 
-    return dbHistorySupport.getSysPeriodLower(tableAlias, asOfSysPeriod);
+    return dbHistorySupport.getSysPeriodLower(tableAlias, sysPeriod);
   }
 
   public String getSysPeriodUpper(String tableAlias) {
 
-    return dbHistorySupport.getSysPeriodUpper(tableAlias, asOfSysPeriod);
+    return dbHistorySupport.getSysPeriodUpper(tableAlias, sysPeriod);
   }
 
+  public String getAsOfPredicate(String tableAlias) {
+
+    return dbHistorySupport.getAsOfPredicate(tableAlias, sysPeriod);
+  }
 }
