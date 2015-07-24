@@ -36,22 +36,6 @@ public class ValuePair {
   public Object getOldValue() {
     return oldValue;
   }
-  
-  /**
-   * Return the new value.
-   */
-  @Deprecated
-  public Object getValue1() {
-    return newValue;
-  }
-
-  /**
-   * Return the old value.
-   */
-  @Deprecated
-  public Object getValue2() {
-    return oldValue;
-  }
 
   /**
    * Set the new value.
