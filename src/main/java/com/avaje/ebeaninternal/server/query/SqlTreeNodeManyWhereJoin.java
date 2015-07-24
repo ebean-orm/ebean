@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.query;
 
+import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
@@ -98,4 +99,9 @@ public class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
     return null;
   }
 
+  @Override
+  public <T> Version<T> loadVersion(DbReadContext ctx) throws SQLException {
+    // nothing to do here
+    return null;
+  }
 }

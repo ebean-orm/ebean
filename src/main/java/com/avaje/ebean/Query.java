@@ -721,6 +721,15 @@ public interface Query<T> extends Serializable {
   T findUnique();
 
   /**
+   * Return versions of a @History entity bean.
+   * <p>
+   *   Generally this query is expected to be a find by id or unique predicates query.
+   *   It will execute the query against the history returning the versions of the bean.
+   * </p>
+   */
+  List<Version<T>> findVersions();
+
+  /**
    * Return the count of entities this query should return.
    * <p>
    * This is the number of 'top level' or 'root level' entities.

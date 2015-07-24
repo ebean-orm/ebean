@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.query;
 
 import com.avaje.ebean.QueryIterator;
+import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.event.BeanFindController;
@@ -12,6 +13,7 @@ import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Main Finder implementation.
@@ -63,6 +65,13 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
 
     flushJdbcBatchOnQuery(request);
     return queryEngine.findIterate(request);
+  }
+
+  @Override
+  public <T> List<Version<T>> findVersions(OrmQueryRequest<T> request) {
+
+    flushJdbcBatchOnQuery(request);
+    return queryEngine.findVersions(request);
   }
 
   public <T> BeanCollection<T> findMany(OrmQueryRequest<T> request) {

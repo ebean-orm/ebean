@@ -154,6 +154,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction) {
+    return null;
+  }
+
+  @Override
   public <T> List<Object> findIdsWithCopy(Query<T> query, Transaction t) {
     return null;
   }

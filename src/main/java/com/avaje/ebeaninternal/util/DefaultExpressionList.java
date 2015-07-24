@@ -114,6 +114,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public List<Version<T>> findVersions() {
+    return query.findVersions();
+  }
+
+  @Override
   public ExpressionList<T> where() {
     return query.where();
   }

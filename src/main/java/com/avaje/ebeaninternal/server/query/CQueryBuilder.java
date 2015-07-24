@@ -5,6 +5,7 @@ import com.avaje.ebean.RawSql.ColumnMapping;
 import com.avaje.ebean.RawSql.ColumnMapping.Column;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebean.config.dbplatform.DbHistorySupport;
 import com.avaje.ebean.config.dbplatform.SqlLimitRequest;
 import com.avaje.ebean.config.dbplatform.SqlLimitResponse;
 import com.avaje.ebean.config.dbplatform.SqlLimiter;
@@ -48,8 +49,10 @@ public class CQueryBuilder implements Constants {
   private final Map<String,String> asOfTableMapping;
 
   private final String asOfSysPeriod;
+  private final DbHistorySupport dbHistorySupport;
+  private final CQueryHistorySupport historySupport;
 
-  private DatabasePlatform dbPlatform;
+  private final DatabasePlatform dbPlatform;
 
   /**
    * Create the SqlGenSelect.
@@ -63,6 +66,8 @@ public class CQueryBuilder implements Constants {
     this.columnAliasPrefix = dbPlatform.getColumnAliasPrefix();
     this.sqlSelectBuilder = new RawSqlSelectClauseBuilder(dbPlatform, binder);
 
+    this.dbHistorySupport = dbPlatform.getHistorySupport();
+    this.historySupport = new CQueryHistorySupport(dbHistorySupport, asOfTableMapping, asOfSysPeriod);
     this.sqlLimiter = dbPlatform.getSqlLimiter();
     this.rawSqlHandler = new CQueryBuilderRawSql(sqlLimiter, dbPlatform);
 
@@ -111,8 +116,7 @@ public class CQueryBuilder implements Constants {
     // use RawSql or generated Sql
     predicates.prepare(true);
 
-    Map<String,String> asOfMap = query.isAsOfQuery() ? asOfTableMapping : null;
-    SqlTree sqlTree = createSqlTree(request, predicates, asOfMap);
+    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query));
     SqlLimitResponse s = buildSql(null, request, predicates, sqlTree);
     String sql = s.getSql();
 
@@ -121,6 +125,13 @@ public class CQueryBuilder implements Constants {
 
     request.putQueryPlan(queryPlan);
     return new CQueryFetchIds(request, predicates, sql);
+  }
+
+  /**
+   * Return the history support if this query needs it (is a 'as of' type query).
+   */
+  private <T> CQueryHistorySupport getHistorySupport(SpiQuery<T> query) {
+    return query.getTemporalMode() != SpiQuery.TemporalMode.CURRENT ? historySupport : null;
   }
 
   /**
@@ -164,8 +175,7 @@ public class CQueryBuilder implements Constants {
 
     predicates.prepare(true);
 
-    Map<String,String> asOfMap = query.isAsOfQuery() ? asOfTableMapping : null;
-    SqlTree sqlTree = createSqlTree(request, predicates, asOfMap);
+    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query));
     SqlLimitResponse s = buildSql(sqlSelect, request, predicates, sqlTree);
     String sql = s.getSql();
     if (hasMany || query.isRawSql()) {
@@ -215,8 +225,7 @@ public class CQueryBuilder implements Constants {
     // Build the tree structure that represents the query.
     SpiQuery<T> query = request.getQuery();
 
-    Map<String,String> asOfMap = query.isAsOfQuery() ? asOfTableMapping : null;
-    SqlTree sqlTree = createSqlTree(request, predicates, asOfMap);
+    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query));
     if (query.isAsOfQuery()) {
       sqlTree.addAsOfTableAlias(query);
     }
@@ -249,13 +258,13 @@ public class CQueryBuilder implements Constants {
    * order by clauses that are not already included for the select clause.
    * </p>
    */
-  private SqlTree createSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates, Map<String,String> withHistoryTables) {
+  private SqlTree createSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryHistorySupport historySupport) {
 
     if (request.isRawSql()) {
       return createRawSqlSqlTree(request, predicates);
     }
 
-    return new SqlTreeBuilder(tableAliasPlaceHolder, columnAliasPrefix, request, predicates, withHistoryTables).build();
+    return new SqlTreeBuilder(tableAliasPlaceHolder, columnAliasPrefix, request, predicates, historySupport).build();
   }
 
   private SqlTree createRawSqlSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates) {
@@ -418,7 +427,7 @@ public class CQueryBuilder implements Constants {
         if (i > 0) {
           sb.append(" and ");
         }
-        sb.append(dbPlatform.getAsOfPredicate(asOfTableAlias.get(i), asOfSysPeriod));
+        sb.append(dbHistorySupport.getAsOfPredicate(asOfTableAlias.get(i), asOfSysPeriod));
       }
     }
 

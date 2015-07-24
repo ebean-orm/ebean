@@ -114,4 +114,10 @@ public interface DbSqlContext {
 
   String getRelativePrefix(String propName);
 
+  /**
+   * Append the lower and upper bound columns into the select clause
+   * for findVersions() queries.
+   */
+  void appendHistorySysPeriod();
+
 }

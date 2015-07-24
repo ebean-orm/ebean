@@ -163,6 +163,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private Timestamp asOf;
 
+  private TemporalMode temporalMode = TemporalMode.CURRENT;
+
   private int bufferFetchSizeHint;
 
   private boolean usageProfiling = true;
@@ -288,6 +290,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   public DefaultOrmQuery<T> asOf(Timestamp asOfDateTime) {
+    this.temporalMode = (asOfDateTime != null) ? TemporalMode.AS_OF : TemporalMode.CURRENT;
     this.asOf = asOfDateTime;
     return this;
   }
@@ -617,7 +620,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public TemporalMode getTemporalMode() {
-    return asOf == null ? TemporalMode.CURRENT : TemporalMode.AS_OF;
+    return temporalMode;
   }
 
   public boolean isAsOfQuery() {
@@ -950,6 +953,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public void findEach(QueryEachConsumer<T> consumer) {
     server.findEach(this, consumer, null);
+  }
+
+  @Override
+  public List<Version<T>> findVersions() {
+    this.temporalMode = TemporalMode.VERSIONS;
+    return server.findVersions(this, null);
   }
 
   public QueryIterator<T> findIterate() {

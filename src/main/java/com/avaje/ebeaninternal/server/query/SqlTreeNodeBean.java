@@ -1,10 +1,12 @@
 package com.avaje.ebeaninternal.server.query;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
@@ -73,6 +75,8 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
   protected final SpiQuery.TemporalMode temporalMode;
 
+  protected final boolean temporalVersions;
+
   private final IdBinder lazyLoadParentIdBinder;
 
   protected String baseTableAlias;
@@ -101,6 +105,8 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     this.nodeBeanProp = beanProp;
     this.desc = desc;
     this.temporalMode = temporalMode;
+    this.temporalVersions = temporalMode == SpiQuery.TemporalMode.VERSIONS;
+
     this.inheritInfo = desc.getInheritInfo();
     this.extraWhere = (beanProp == null) ? null : beanProp.getExtraWhere();
 
@@ -108,7 +114,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     // the bean has an Id property and we want to use it
     this.readId = withId && (desc.getIdProperty() != null);
-    this.disableLazyLoad = !readId || desc.isSqlSelectBased();
+    this.disableLazyLoad = !readId || desc.isSqlSelectBased() || temporalVersions;
 
     this.tableJoins = props.getTableJoins();
 
@@ -165,6 +171,20 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   /**
+   * Read the version bean.
+   */
+  public <T> Version<T> loadVersion(DbReadContext ctx) throws SQLException {
+
+    // read the sys period lower and upper bounds
+    // these are always the first 2 columns in the resultSet
+    Timestamp start = ctx.getDataReader().getTimestamp();
+    Timestamp end = ctx.getDataReader().getTimestamp();
+    T bean = (T)load(ctx, null, null);
+
+    return new Version(bean, start, end);
+  }
+
+  /**
    * read the properties from the resultSet.
    */
   public EntityBean load(DbReadContext ctx, EntityBean parentBean, EntityBean contextParent) throws SQLException {
@@ -206,14 +226,14 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     Mode queryMode = ctx.getQueryMode();
 
-    PersistenceContext persistenceContext = !readId ? null : ctx.getPersistenceContext();
+    PersistenceContext persistenceContext = (!readId || temporalVersions) ? null : ctx.getPersistenceContext();
 
     if (readId) {
       Object id = localIdBinder.readSet(ctx, localBean);
       if (id == null) {
         // bean must be null...
         localBean = null;
-      } else {
+      } else if (!temporalVersions) {
         // check the PersistenceContext to see if the bean already exists
         contextBean = (EntityBean)persistenceContext.putIfAbsent(id, localBean);
         if (contextBean == null) {
@@ -278,7 +298,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     if (!lazyLoadMany && localBean != null) {
       ctx.setCurrentPrefix(prefix, pathMap);
-      if (readId) {
+      if (readId && !temporalVersions) {
         createListProxies(localDesc, ctx, localBean);
       }
       localDesc.postLoad(localBean, null);
@@ -293,7 +313,11 @@ public class SqlTreeNodeBean implements SqlTreeNode {
         ebi.setLoaded();
       }
 
-      if (partialObject) {
+      if (disableLazyLoad) {
+        // bean does not have an Id or is SqlSelect based
+        ebi.setDisableLazyLoad(true);
+
+      } else if (partialObject) {
         if (readId) {
           // register for lazy loading
           ctx.register(null, ebi);
@@ -302,11 +326,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
         ebi.setFullyLoadedBean(true);
       }
 
-      if (disableLazyLoad) {
-        // bean does not have an Id or is SqlSelect based
-        ebi.setDisableLazyLoad(true);
-      }
-      if (ctx.isAutoFetchProfiling()) {
+      if (ctx.isAutoFetchProfiling() && !disableLazyLoad) {
         // collect autofetch profiling for this bean...
         ctx.profileBean(ebi, prefix);
       }
@@ -317,7 +337,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       nodeBeanProp.setValue(parentBean, contextBean);
     }
 
-    if (!readId) {
+    if (!readId || temporalVersions) {
       // a bean with no Id (never found in context)
       return localBean;
 
@@ -358,7 +378,12 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     ctx.pushJoin(prefix);
     ctx.pushTableAlias(prefix);
-    
+
+    if (temporalVersions) {
+      // select sys_period lower and upper columns
+      ctx.appendHistorySysPeriod();
+    }
+
     if (lazyLoadParent != null) {
       lazyLoadParent.addSelectExported(ctx, prefix);
     }

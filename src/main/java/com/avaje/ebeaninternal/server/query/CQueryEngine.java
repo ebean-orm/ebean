@@ -1,8 +1,10 @@
 package com.avaje.ebeaninternal.server.query;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
+import com.avaje.ebean.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,6 +153,35 @@ public class CQueryEngine {
 
     } catch (SQLException e) {
       throw cquery.createPersistenceException(e);
+    }
+  }
+
+  /**
+   * Execute the find versions query returning version beans.
+   */
+  public <T> List<Version<T>> findVersions(OrmQueryRequest<T> request) {
+
+    CQuery<T> cquery = queryBuilder.buildQuery(request);
+    try {
+      cquery.prepareBindExecuteQuery();
+      if (request.isLogSql()) {
+        logSql(cquery);
+      }
+
+      List<Version<T>> versions = cquery.readVersions();
+      if (request.isLogSummary()) {
+        logFindManySummary(cquery);
+      }
+
+      return versions;
+
+    } catch (SQLException e) {
+      throw cquery.createPersistenceException(e);
+
+    } finally {
+      if (cquery != null) {
+        cquery.close();
+      }
     }
   }
 

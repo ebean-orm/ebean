@@ -271,6 +271,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     return (List<T>) queryEngine.findMany(this);
   }
 
+  public List<Version<T>> findVersions() {
+    return queryEngine.findVersions(this);
+  }
+
   /**
    * Execute the query as findSet.
    */

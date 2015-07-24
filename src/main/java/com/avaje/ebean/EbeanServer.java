@@ -905,6 +905,15 @@ public interface EbeanServer {
   <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer, Transaction transaction);
 
   /**
+   * Return versions of a @History entity bean.
+   * <p>
+   *   Generally this query is expected to be a find by id or unique predicates query.
+   *   It will execute the query against the history returning the versions of the bean.
+   * </p>
+   */
+  <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction);
+
+  /**
    * Execute a query returning a list of beans.
    * <p>
    * Generally you are able to use {@link Query#findList()} rather than

@@ -236,6 +236,15 @@ public interface ExpressionList<T> extends Serializable {
   PagedList<T> findPagedList(int pageIndex, int pageSize);
 
   /**
+   * Return versions of a @History entity bean.
+   * <p>
+   *   Generally this query is expected to be a find by id or unique predicates query.
+   *   It will execute the query against the history returning the versions of the bean.
+   * </p>
+   */
+  List<Version<T>> findVersions();
+
+  /**
    * Add some filter predicate expressions to the many property.
    */
   ExpressionList<T> filterMany(String prop);

@@ -27,6 +27,7 @@ public class PostgresPlatform extends DatabasePlatform {
     this.clobDbType = Types.VARCHAR;
 
     this.dbEncrypt = new PostgresDbEncrypt();
+    this.historySupport = new PostgresHistorySupport();
 
     // Use Identity and getGeneratedKeys
     this.dbIdentity.setIdType(IdType.IDENTITY);
@@ -57,23 +58,8 @@ public class PostgresPlatform extends DatabasePlatform {
 
     dbDdlSyntax.setDropTableCascade("cascade");
     dbDdlSyntax.setDropIfExists("if exists");
-
   }
 
-  /**
-   * Build and return the 'as of' predicate for a given table alias.
-   * <p>
-   * Each @History entity involved in the query has this predicate added using the related table alias.
-   * </p>
-   */
-  public String getAsOfPredicate(String asOfTableAlias, String asOfSysPeriod) {
-
-    // for Postgres we are using the 'timestamp with timezone range' data type
-    // as our sys_period column so hence the predicate below
-    StringBuilder sb = new StringBuilder(40);
-    sb.append(asOfTableAlias).append(".").append(asOfSysPeriod).append(" @> ?::timestamptz");
-    return sb.toString();
-  }
 
   /**
    * Create a Postgres specific sequence IdGenerator.

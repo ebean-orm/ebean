@@ -224,6 +224,11 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
+  public List<Version<T>> findVersions() {
+    return exprList.findVersions();
+  }
+
+  @Override
   public Query<T> apply(PathProperties pathProperties) {
     return exprList.apply(pathProperties);
   }

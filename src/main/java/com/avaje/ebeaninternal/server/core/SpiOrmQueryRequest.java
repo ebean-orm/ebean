@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.core;
 import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.QueryIterator;
+import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -75,6 +76,11 @@ public interface SpiOrmQueryRequest<T> {
    * Execute the find returning a QueryIterator.
    */
   QueryIterator<T> findIterate();
+
+  /**
+   * Execute the finVersions() query.
+   */
+  List<Version<T>> findVersions();
 
   /**
    * Execute the query as findList.

@@ -1355,6 +1355,19 @@ public final class DefaultServer implements SpiEbeanServer {
     }
   }
 
+  @Override
+  public <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction) {
+
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, transaction);
+    try {
+      request.initTransIfRequired();
+      return request.findVersions();
+
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public <T> List<T> findList(Query<T> query, Transaction t) {
 

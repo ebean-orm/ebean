@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.query;
 
 import com.avaje.ebean.QueryIterator;
+import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.*;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
@@ -22,6 +23,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -477,6 +480,30 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       }
       return readNextBean();
     }
+  }
+
+  /**
+   * Read version beans and their effective dates.
+   */
+  public List<Version<T>> readVersions() throws SQLException {
+
+    List<Version<T>> versionList = new ArrayList<Version<T>>();
+
+    Version version;
+    while ((version = readNextVersion()) != null) {
+      versionList.add(version);
+    }
+
+    updateExecutionStatistics();
+    return versionList;
+  }
+
+  private Version readNextVersion() throws SQLException {
+
+    if (moveToNextRow()) {
+      return rootNode.loadVersion(this);
+    }
+    return null;
   }
 
   public BeanCollection<T> readCollection() throws SQLException {

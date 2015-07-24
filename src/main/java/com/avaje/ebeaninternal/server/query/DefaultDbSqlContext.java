@@ -8,7 +8,6 @@ import com.avaje.ebeaninternal.server.util.ArrayStack;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
 
 public class DefaultDbSqlContext implements DbSqlContext {
 
@@ -46,22 +45,22 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
   private ArrayList<BeanProperty> encryptedProps;
 
-  private final Map<String,String> asOfTableMap;
+  private final CQueryHistorySupport historySupport;
 
-  private final boolean asOfQuery;
+  private final boolean historyQuery;
 
   /**
    * Construct for SELECT clause (with column alias settings).
    */
   public DefaultDbSqlContext(SqlTreeAlias alias, String tableAliasPlaceHolder,
-      String columnAliasPrefix, boolean alwaysUseColumnAlias, Map<String,String> asOfTableMap) {
+      String columnAliasPrefix, boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport) {
 
     this.alias = alias;
     this.tableAliasPlaceHolder = tableAliasPlaceHolder;
     this.columnAliasPrefix = columnAliasPrefix;
     this.useColumnAlias = alwaysUseColumnAlias;
-    this.asOfTableMap = asOfTableMap;
-    this.asOfQuery = (asOfTableMap != null);
+    this.historySupport = historySupport;
+    this.historyQuery = (historySupport != null);
   }
 
   public void addEncryptedProp(BeanProperty p) {
@@ -106,13 +105,14 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
     sb.append(" ");
     sb.append(type);
-    if (!asOfQuery) {
+    if (!historyQuery) {
       sb.append(" ").append(table).append(" ");
 
     } else {
       // check if there is an associated history table and if so
       // use the unionAll view - we expect an additional predicate to match
-      String withHistoryTable = asOfTableMap.get(table);
+      String withHistoryTable = historySupport.getAsOfView(table);
+
       if (withHistoryTable != null) {
         // there is an associated history table and view so use that
         sb.append(" ").append(withHistoryTable).append(" ");
@@ -227,6 +227,29 @@ public class DefaultDbSqlContext implements DbSqlContext {
     sb.append(converted);
   }
 
+  @Override
+  public void appendHistorySysPeriod() {
+
+    String tableAlias = tableAliasStack.peek();
+
+    sb.append(COMMA);
+    sb.append(historySupport.getSysPeriodLower(tableAlias));
+    appendColumnAlias();
+
+    sb.append(COMMA);
+    sb.append(historySupport.getSysPeriodUpper(tableAlias));
+    appendColumnAlias();
+  }
+
+  private void appendColumnAlias() {
+    if (useColumnAlias) {
+      sb.append(" ");
+      sb.append(columnAliasPrefix);
+      sb.append(columnIndex);
+    }
+    columnIndex++;
+  }
+
   public void appendColumn(String column) {
     appendColumn(tableAliasStack.peek(), column);
   }
@@ -244,12 +267,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
       sb.append(PERIOD);
       sb.append(column);
     }
-    if (useColumnAlias) {
-      sb.append(" ");
-      sb.append(columnAliasPrefix);
-      sb.append(columnIndex);
-    }
-    columnIndex++;
+    appendColumnAlias();
   }
 
   public String peekTableAlias() {
@@ -260,12 +278,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
     sb.append(COMMA);
     sb.append(rawcolumnWithTableAlias);
 
-    if (useColumnAlias) {
-      sb.append(" ");
-      sb.append(columnAliasPrefix);
-      sb.append(columnIndex);
-    }
-    columnIndex++;
+    appendColumnAlias();
   }
 
   public int length() {

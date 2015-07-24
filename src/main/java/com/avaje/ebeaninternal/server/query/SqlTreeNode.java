@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.query;
 
+import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
@@ -47,4 +48,8 @@ public interface SqlTreeNode {
    */
   EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean contextBean) throws SQLException;
 
+  /**
+   * Load a version of a @History bean with effective dates.
+   */
+  <T> Version<T> loadVersion(DbReadContext ctx) throws SQLException;
 }
