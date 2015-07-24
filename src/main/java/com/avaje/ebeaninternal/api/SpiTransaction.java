@@ -100,6 +100,11 @@ public interface SpiTransaction extends Transaction {
   String getId();
 
   /**
+   * Return true if this transaction has updateAllLoadedProperties set.
+   */
+  boolean isUpdateAllLoadedProperties();
+
+  /**
    * Return the batchSize specifically set for this transaction or 0.
    * <p>
    * Returning 0 implies to use the system wide default batch size.

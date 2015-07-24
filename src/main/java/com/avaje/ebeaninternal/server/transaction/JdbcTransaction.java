@@ -91,6 +91,8 @@ public class JdbcTransaction implements SpiTransaction {
 
   protected boolean localReadOnly;
 
+  protected boolean updateAllLoadedProperties;
+
   protected PersistBatch oldBatchMode;
 
   protected PersistBatch batchMode;
@@ -391,6 +393,15 @@ public class JdbcTransaction implements SpiTransaction {
     } catch (SQLException e) {
       throw new PersistenceException(e);
     }
+  }
+
+  @Override
+  public void setUpdateAllLoadedProperties(boolean updateAllLoadedProperties) {
+    this.updateAllLoadedProperties = updateAllLoadedProperties;
+  }
+
+  public boolean isUpdateAllLoadedProperties() {
+    return updateAllLoadedProperties;
   }
 
   @Override

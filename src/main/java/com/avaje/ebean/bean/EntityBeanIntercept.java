@@ -608,7 +608,7 @@ public final class EntityBeanIntercept implements Serializable {
       } else if (embeddedDirty != null && embeddedDirty[i]) {
         // an embedded property has been changed - recurse
         EntityBean embeddedBean = (EntityBean)owner._ebean_getField(i);
-        embeddedBean._ebean_getIntercept().addDirtyPropertyValues(dirtyValues, getProperty(i)+".");
+        embeddedBean._ebean_getIntercept().addDirtyPropertyValues(dirtyValues, getProperty(i) + ".");
       }
     }
   }
@@ -633,6 +633,20 @@ public final class EntityBeanIntercept implements Serializable {
         // an embedded property has been changed - recurse
         EntityBean embeddedBean = (EntityBean)owner._ebean_getField(i);
         hash = hash * 31 + embeddedBean._ebean_getIntercept().addDirtyPropertyHash(hash);
+      }
+    }
+    return hash;
+  }
+
+  /**
+   * Return a loaded property hash.
+   */
+  public int getLoadedPropertyHash() {
+    int hash = 37;
+    int len = getPropertyLength();
+    for (int i = 0; i < len; i++) {
+      if (isLoadedProperty(i)) {
+        hash = hash * 31 + (i+1);
       }
     }
     return hash;

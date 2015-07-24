@@ -641,10 +641,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
-   * Test if the property value has changed and if so include it in the update.
+   * Return true if the property should be included in the update.
    */
   public boolean isAddToUpdate(BeanProperty prop) {
-    return intercept.isDirtyProperty(prop.getPropertyIndex());
+    if (transaction.isUpdateAllLoadedProperties()) {
+      return intercept.isLoadedProperty(prop.getPropertyIndex());
+    } else {
+      return intercept.isDirtyProperty(prop.getPropertyIndex());
+    }
   }
 
   public List<DerivedRelationshipData> getDerivedRelationships() {

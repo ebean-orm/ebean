@@ -8,49 +8,59 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 @Entity
-@Table(name="e_basicver")
+@Table(name = "e_basicver")
 public class EBasicVer {
-    
-    @Id
-    Integer id;
-    
-    String name;
-    
-    String description;
-    
-    @Version
-    Timestamp lastUpdate;
-    
-    public Integer getId() {
-        return id;
-    }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  @Id
+  Integer id;
 
-    public String getName() {
-        return name;
-    }
+  String name;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  String description;
 
-    public String getDescription() {
-        return description;
-    }
+  String other;
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  @Version
+  Timestamp lastUpdate;
 
-    public Timestamp getLastUpdate() {
-        return lastUpdate;
-    }
+  public Integer getId() {
+    return id;
+  }
 
-    public void setLastUpdate(Timestamp lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getOther() {
+    return other;
+  }
+
+  public void setOther(String other) {
+    this.other = other;
+  }
+
+  public Timestamp getLastUpdate() {
+    return lastUpdate;
+  }
+
+  public void setLastUpdate(Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
 
 }

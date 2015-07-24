@@ -110,12 +110,17 @@ public final class UpdateMeta {
 
   private SpiUpdatePlan getDynamicUpdatePlan(ConcurrencyMode mode, PersistRequestBean<?> persistRequest) {
 
-
     // we can use a cached UpdatePlan for the changed properties
-    
+
     EntityBeanIntercept ebi = persistRequest.getEntityBeanIntercept();
-    int hash = ebi.getDirtyPropertyHash();
-    
+
+    int hash;
+    if (persistRequest.getTransaction().isUpdateAllLoadedProperties()) {
+      hash = ebi.getLoadedPropertyHash();
+    } else {
+      hash = ebi.getDirtyPropertyHash();
+    }
+
     BeanDescriptor<?> beanDescriptor = persistRequest.getBeanDescriptor();
     
     BeanProperty versionProperty = beanDescriptor.getVersionProperty();

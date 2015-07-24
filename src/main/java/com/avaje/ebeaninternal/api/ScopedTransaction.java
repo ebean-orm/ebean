@@ -153,6 +153,16 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
+  public void setUpdateAllLoadedProperties(boolean updateAllLoaded) {
+    transaction.setUpdateAllLoadedProperties(updateAllLoaded);
+  }
+
+  @Override
+  public boolean isUpdateAllLoadedProperties() {
+    return transaction.isUpdateAllLoadedProperties();
+  }
+
+  @Override
   public void setBatchMode(boolean useBatch) {
     transaction.setBatchMode(useBatch);
   }

@@ -98,6 +98,17 @@ public interface Transaction extends Closeable {
   void setPersistCascade(boolean persistCascade);
 
   /**
+   * Set to true when you want all loaded properties to be included in the update
+   * (rather than just the changed properties).
+   * <p>
+   *   You might set this when using JDBC batch in order to get multiple updates
+   *   with slightly different sets of changed properties into the same statement
+   *   and hence better JDBC batch performance.
+   * </p>
+   */
+  void setUpdateAllLoadedProperties(boolean updateAllLoadedProperties);
+
+  /**
    * Turn on or off statement batching. Statement batching can be transparent
    * for drivers and databases that support getGeneratedKeys. Otherwise you may
    * wish to specifically control when batching is used via this method.
