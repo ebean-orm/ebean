@@ -476,6 +476,24 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> notIn(String propertyName, Object... values) {
+    add(expr.notIn(propertyName, values));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> notIn(String propertyName, Collection<?> values) {
+    add(expr.notIn(propertyName, values));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> notIn(String propertyName, Query<?> subQuery) {
+    add(expr.notIn(propertyName, subQuery));
+    return this;
+  }
+
+  @Override
   public ExpressionList<T> exists(Query<?> subQuery) {
     add(expr.exists(subQuery));
     return this;

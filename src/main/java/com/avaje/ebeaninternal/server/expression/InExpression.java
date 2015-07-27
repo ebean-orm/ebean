@@ -12,16 +12,20 @@ class InExpression extends AbstractExpression {
 
   private static final long serialVersionUID = 3150665801693551260L;
 
+  private final boolean not;
+
   private final Object[] values;
 
-  InExpression(String propertyName, Collection<?> coll) {
+  InExpression(String propertyName, Collection<?> coll, boolean not) {
     super(propertyName);
-    values = coll.toArray(new Object[coll.size()]);
+    this.values = coll.toArray(new Object[coll.size()]);
+    this.not = not;
   }
 
-  InExpression(String propertyName, Object[] array) {
+  InExpression(String propertyName, Object[] array, boolean not) {
     super(propertyName);
     this.values = array;
+    this.not = not;
   }
 
   public void addBindValues(SpiExpressionRequest request) {
@@ -50,8 +54,10 @@ class InExpression extends AbstractExpression {
   public void addSql(SpiExpressionRequest request) {
 
     if (values.length == 0) {
-      // 'no match' for in empty collection
-      request.append("1=0");
+      if (!not) {
+        // 'no match' for in empty collection
+        request.append("1=0");
+      }
       return;
     }
 
@@ -69,6 +75,9 @@ class InExpression extends AbstractExpression {
 
     } else {
       request.append(propertyName);
+      if (not) {
+        request.append(" not");
+      }
       request.append(" in (?");
       for (int i = 1; i < values.length; i++) {
         request.append(", ").append("?");
@@ -82,7 +91,7 @@ class InExpression extends AbstractExpression {
    * Based on the number of values in the in clause.
    */
   public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
-    builder.add(InExpression.class).add(propName).add(values.length);
+    builder.add(InExpression.class).add(propName).add(values.length).add(not);
     builder.bind(values.length);
   }
 

@@ -488,7 +488,22 @@ public interface ExpressionList<T> extends Serializable {
    * In - property has a value in the collection of values.
    */
   ExpressionList<T> in(String propertyName, Collection<?> values);
-  
+
+  /**
+   * Not In - property has a value in the array of values.
+   */
+  ExpressionList<T> notIn(String propertyName, Object... values);
+
+  /**
+   * Not In - property has a value in the collection of values.
+   */
+  ExpressionList<T> notIn(String propertyName, Collection<?> values);
+
+  /**
+   * Not In - using a subQuery.
+   */
+  ExpressionList<T> notIn(String propertyName, Query<?> subQuery);
+
   /**
    * Exists expression
    */

@@ -18,18 +18,20 @@ class InQueryExpression extends AbstractExpression {
 
   private static final long serialVersionUID = 666990277309851644L;
 
+  private final boolean not;
+
   private final SpiQuery<?> subQuery;
 
   private transient CQuery<?> compiledSubQuery;
 
-  public InQueryExpression(String propertyName, SpiQuery<?> subQuery) {
+  public InQueryExpression(String propertyName, SpiQuery<?> subQuery, boolean not) {
     super(propertyName);
     this.subQuery = subQuery;
+    this.not = not;
   }
 
   public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
-    builder.add(InQueryExpression.class).add(propName);
-    
+    builder.add(InQueryExpression.class).add(propName).add(not);
     subQuery.queryAutofetchHash(builder);
   }
 
@@ -61,9 +63,11 @@ class InQueryExpression extends AbstractExpression {
     subSelect = subSelect.replace('\n', ' ');
 
     String propertyName = getPropertyName();
-    request.append(" (");
-    request.append(propertyName);
-    request.append(") in (");
+    request.append(" (").append(propertyName).append(")");
+    if (not) {
+      request.append(" not");
+    }
+    request.append(" in (");
     request.append(subSelect);
     request.append(") ");
   }

@@ -225,23 +225,44 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * In - property has a value in the array of values.
    */
   public Expression in(String propertyName, Object[] values) {
-    return new InExpression(propertyName, values);
+    return new InExpression(propertyName, values, false);
   }
 
   /**
    * In - using a subQuery.
    */
   public Expression in(String propertyName, Query<?> subQuery) {
-    return new InQueryExpression(propertyName, (SpiQuery<?>) subQuery);
+    return new InQueryExpression(propertyName, (SpiQuery<?>) subQuery, false);
   }
 
   /**
    * In - property has a value in the collection of values.
    */
   public Expression in(String propertyName, Collection<?> values) {
-    return new InExpression(propertyName, values);
+    return new InExpression(propertyName, values, false);
   }
-  
+
+  /**
+   * In - property has a value in the array of values.
+   */
+  public Expression notIn(String propertyName, Object[] values) {
+    return new InExpression(propertyName, values, true);
+  }
+
+  /**
+   * Not In - property has a value in the collection of values.
+   */
+  public Expression notIn(String propertyName, Collection<?> values) {
+    return new InExpression(propertyName, values, true);
+  }
+
+  /**
+   * In - using a subQuery.
+   */
+  public Expression notIn(String propertyName, Query<?> subQuery) {
+    return new InQueryExpression(propertyName, (SpiQuery<?>) subQuery, true);
+  }
+
   /**
    * Exists subquery 
    */

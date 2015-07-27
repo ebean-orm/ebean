@@ -169,7 +169,22 @@ public interface ExpressionFactory {
    * In - property has a value in the collection of values.
    */
   Expression in(String propertyName, Collection<?> values);
-  
+
+  /**
+   * Not In - property has a value in the array of values.
+   */
+  Expression notIn(String propertyName, Object[] values);
+
+  /**
+   * Not In - property has a value in the collection of values.
+   */
+  Expression notIn(String propertyName, Collection<?> values);
+
+  /**
+   * Not In - using a subQuery.
+   */
+  Expression notIn(String propertyName, Query<?> subQuery);
+
   /**
    * Exists expression
    */
