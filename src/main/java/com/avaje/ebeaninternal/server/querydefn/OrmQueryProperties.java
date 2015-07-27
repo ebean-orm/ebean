@@ -362,11 +362,7 @@ public class OrmQueryProperties implements Serializable {
    * </p>
    */
   public boolean isIncludedBeanJoin(String propertyName) {
-    if (includedBeanJoin == null) {
-      return false;
-    } else {
-      return includedBeanJoin.contains(propertyName);
-    }
+    return includedBeanJoin != null && includedBeanJoin.contains(propertyName);
   }
 
   /**
@@ -440,11 +436,8 @@ public class OrmQueryProperties implements Serializable {
     if (includedBeanJoin != null && includedBeanJoin.contains(propName)) {
       return false;
     }
-    if (included == null) {
-      // all properties included
-      return true;
-    }
-    return included.contains(propName);
+    // all properties included
+    return included == null || included.contains(propName);
   }
 
   public OrmQueryProperties setQueryFetch(int batch, boolean queryFetchAll) {
