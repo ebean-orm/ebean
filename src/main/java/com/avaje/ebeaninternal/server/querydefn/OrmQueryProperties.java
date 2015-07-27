@@ -447,33 +447,9 @@ public class OrmQueryProperties implements Serializable {
     return included.contains(propName);
   }
 
-  /**
-   * Used to convert this join to a query join.
-   * 
-   * @param queryJoinBatch
-   *          where -1 means not a query join and 0 means use the default batch size.
-   */
-  public OrmQueryProperties setQueryFetchBatch(int queryFetchBatch) {
-    this.queryFetchBatch = queryFetchBatch;
-    return this;
-  }
-
-  public OrmQueryProperties setQueryFetchAll(boolean queryFetchAll) {
-    this.queryFetchAll = queryFetchAll;
-    return this;
-  }
-
   public OrmQueryProperties setQueryFetch(int batch, boolean queryFetchAll) {
     this.queryFetchBatch = batch;
     this.queryFetchAll = queryFetchAll;
-    return this;
-  }
-
-  /**
-   * Set the lazy loading batch size.
-   */
-  public OrmQueryProperties setLazyFetchBatch(int lazyFetchBatch) {
-    this.lazyFetchBatch = lazyFetchBatch;
     return this;
   }
 
@@ -592,16 +568,12 @@ public class OrmQueryProperties implements Serializable {
 
     LinkedHashSet<String> set = new LinkedHashSet<String>(res.length + 3);
 
-    String temp = null;
+    String temp;
     for (int i = 0; i < res.length; i++) {
       temp = res[i].trim();
       if (temp.length() > 0) {
         set.add(temp);
       }
-    }
-
-    if (set.isEmpty()) {
-      return null;
     }
 
     return Collections.unmodifiableSet(set);
