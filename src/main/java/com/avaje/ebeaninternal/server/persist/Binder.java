@@ -142,11 +142,12 @@ public class Binder {
   /**
    * Bind an Object with unknown data type.
    */
-  public void bindObject(DataBind dataBind, Object value) throws SQLException {
+  public Object bindObject(DataBind dataBind, Object value) throws SQLException {
 
     if (value == null) {
       // null of unknown type
       bindObject(dataBind, null, Types.OTHER);
+      return null;
 
     } else {
 
@@ -163,6 +164,7 @@ public class Binder {
 
       int dbType = type.getJdbcType();
       bindObject(dataBind, value, dbType);
+      return value;
     }
   }
 

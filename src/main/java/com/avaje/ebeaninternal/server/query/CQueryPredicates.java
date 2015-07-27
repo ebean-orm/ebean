@@ -156,7 +156,7 @@ public class CQueryPredicates {
 
       for (int i = 0; i < whereExprBindValues.size(); i++) {
         Object bindValue = whereExprBindValues.get(i);
-        binder.bindObject(dataBind, bindValue);
+        bindValue = binder.bindObject(dataBind, bindValue);
         if (i > 0 || idValue != null) {
           bindLog.append(",");
         }
@@ -168,7 +168,7 @@ public class CQueryPredicates {
 
       for (int i = 0; i < filterManyExprBindValues.size(); i++) {
         Object bindValue = filterManyExprBindValues.get(i);
-        binder.bindObject(dataBind, bindValue);
+        bindValue = binder.bindObject(dataBind, bindValue);
         if (i > 0 || idValue != null) {
           bindLog.append(",");
         }
@@ -198,7 +198,7 @@ public class CQueryPredicates {
       bindLog.append(" having ");
       for (int i = 0; i < havingExprBindValues.size(); i++) {
         Object bindValue = havingExprBindValues.get(i);
-        binder.bindObject(dataBind, bindValue);
+        bindValue = binder.bindObject(dataBind, bindValue);
         if (i > 0) {
           bindLog.append(",");
         }
