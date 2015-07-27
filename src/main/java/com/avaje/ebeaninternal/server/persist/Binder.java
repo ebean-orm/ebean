@@ -24,359 +24,339 @@ public class Binder {
 
   private static final Logger logger = LoggerFactory.getLogger(Binder.class);
 
-	//private final Calendar calendar;
+  private final TypeManager typeManager;
 
-	private final TypeManager typeManager;
+  /**
+   * Set the PreparedStatement with which to bind variables to.
+   */
+  public Binder(TypeManager typeManager) {
+    this.typeManager = typeManager;
+  }
 
-	/**
-	 * Set the PreparedStatement with which to bind variables to.
-	 */
-	public Binder(TypeManager typeManager) {
+  /**
+   * Bind the values to the Prepared Statement.
+   */
+  public void bind(BindValues bindValues, DataBind dataBind, StringBuilder bindBuf) throws SQLException {
 
-		this.typeManager = typeManager;
-		//this.calendar = new GregorianCalendar();
-	}
+    String logPrefix = "";
 
-	/**
-	 * Bind the values to the Prepared Statement.
-	 */
-	public void bind(BindValues bindValues, DataBind dataBind, StringBuilder bindBuf)
-			throws SQLException {
+    ArrayList<BindValues.Value> list = bindValues.values();
+    for (int i = 0; i < list.size(); i++) {
+      BindValues.Value bindValue = list.get(i);
+      if (bindValue.isComment()) {
+        if (bindBuf != null) {
+          bindBuf.append(bindValue.getName());
+          if (logPrefix.equals("")) {
+            logPrefix = ", ";
+          }
+        }
+      } else {
+        Object val = bindValue.getValue();
+        int dt = bindValue.getDbType();
+        bindObject(dataBind, val, dt);
 
-		String logPrefix = "";
+        if (bindBuf != null) {
+          bindBuf.append(logPrefix);
+          if (logPrefix.equals("")) {
+            logPrefix = ", ";
+          }
+          bindBuf.append(bindValue.getName());
+          bindBuf.append("=");
+          if (isLob(dt)) {
+            bindBuf.append("[LOB]");
+          } else {
+            bindBuf.append(String.valueOf(val));
+          }
+        }
+      }
+    }
+  }
 
-		ArrayList<BindValues.Value> list = bindValues.values();
-		for (int i = 0; i < list.size(); i++) {
-			BindValues.Value bindValue = list.get(i);
-			if (bindValue.isComment()) {
-				if (bindBuf != null) {
-					bindBuf.append(bindValue.getName());
-					if (logPrefix.equals("")) {
-						logPrefix = ", ";
-					}
-				}
-			} else {
-				Object val = bindValue.getValue();
-				int dt = bindValue.getDbType();
-				bindObject(dataBind, val, dt);
+  /**
+   * Bind the list of positionedParameters in BindParams.
+   */
+  public String bind(BindParams bindParams, DataBind dataBind) throws SQLException {
 
-				if (bindBuf != null) {
-					bindBuf.append(logPrefix);
-					if (logPrefix.equals("")) {
-						logPrefix = ", ";
-					}
-					bindBuf.append(bindValue.getName());
-					bindBuf.append("=");
-					if (isLob(dt)) {
-						bindBuf.append("[LOB]");
-					} else {
-						bindBuf.append(String.valueOf(val));
-					}
-				}
-			}
-		}
-	}
+    StringBuilder bindLog = new StringBuilder();
+    bind(bindParams, dataBind, bindLog);
+    return bindLog.toString();
+  }
 
-	/**
-	 * Bind the list of positionedParameters in BindParams.
-	 */
-	public String bind(BindParams bindParams, DataBind dataBind)
-		throws SQLException {
+  /**
+   * Bind the list of positionedParameters in BindParams.
+   */
+  public void bind(BindParams bindParams, DataBind dataBind, StringBuilder bindLog) throws SQLException {
 
-		StringBuilder bindLog = new StringBuilder();
-		bind(bindParams, dataBind, bindLog);
-		return bindLog.toString();
-	}
+    bind(bindParams.positionedParameters(), dataBind, bindLog);
+  }
 
-	/**
-	 * Bind the list of positionedParameters in BindParams.
-	 */
-	public void bind(BindParams bindParams, DataBind dataBind, StringBuilder bindLog)
-		throws SQLException {
+  /**
+   * Bind the list of parameters..
+   */
+  public void bind(List<BindParams.Param> list, DataBind dataBind, StringBuilder bindLog) throws SQLException {
 
-		bind(bindParams.positionedParameters(), dataBind, bindLog);
-	}
-	
-	/**
-	 * Bind the list of parameters..
-	 */
-	public void bind(List<BindParams.Param> list, DataBind dataBind, StringBuilder bindLog)
-			throws SQLException {
+    CallableStatement cstmt = null;
 
-		CallableStatement cstmt = null;
+    if (dataBind.getPstmt() instanceof CallableStatement) {
+      cstmt = (CallableStatement) dataBind.getPstmt();
+    }
 
-		if (dataBind.getPstmt() instanceof CallableStatement) {
-			cstmt = (CallableStatement) dataBind.getPstmt();
-		}
+    // the iterator is assumed to be in the correct order
+    Object value = null;
+    try {
+      for (int i = 0; i < list.size(); i++) {
 
-		// the iterator is assumed to be in the correct order
-		Object value = null;
-		try {
-			for (int i = 0; i < list.size(); i++) {
+        BindParams.Param param = list.get(i);
 
-				BindParams.Param param = list.get(i);
+        if (param.isOutParam() && cstmt != null) {
+          cstmt.registerOutParameter(dataBind.nextPos(), param.getType());
+          if (param.isInParam()) {
+            dataBind.decrementPos();
+          }
+        }
+        if (param.isInParam()) {
+          value = param.getInValue();
+          if (bindLog != null) {
+            if (param.isEncryptionKey()) {
+              bindLog.append("****");
+            } else {
+              bindLog.append(value);
+            }
+            bindLog.append(", ");
+          }
+          if (value == null) {
+            // this doesn't work for query predicates
+            bindObject(dataBind, null, param.getType());
+          } else {
+            bindObject(dataBind, value);
+          }
+        }
+      }
 
-				if (param.isOutParam() && cstmt != null){
-					cstmt.registerOutParameter(dataBind.nextPos(), param.getType());
-					if (param.isInParam()) {
-					    dataBind.decrementPos();
-					}
-				}
-				if (param.isInParam()) {
-					value = param.getInValue();
-					if (bindLog != null) {
-					    if (param.isEncryptionKey()){
-		                    bindLog.append("****");
-					    } else {
-	                        bindLog.append(value);					        
-					    }
-						bindLog.append(", ");
-					}
-					if (value == null) {
-						// this doesn't work for query predicates
-						bindObject(dataBind, null, param.getType());
-					} else {
-						bindObject(dataBind, value);
-					}
-				}
-			}
+    } catch (SQLException ex) {
+      logger.warn(Message.msg("fetch.bind.error", "" + (dataBind.currentPos() - 1), value));
+      throw ex;
+    }
+  }
 
-		} catch (SQLException ex) {
-			logger.warn(Message.msg("fetch.bind.error", "" + (dataBind.currentPos() - 1), value));
-			throw ex;
-		}
-	}
+  /**
+   * Bind an Object with unknown data type.
+   */
+  public void bindObject(DataBind dataBind, Object value) throws SQLException {
 
-	/**
-	 * Bind an Object with unknown data type.
-	 */
-	public void bindObject(DataBind dataBind, Object value) throws SQLException {
+    if (value == null) {
+      // null of unknown type
+      bindObject(dataBind, null, Types.OTHER);
 
-		if (value == null) {
-			// null of unknown type
-			bindObject(dataBind, null, Types.OTHER);
+    } else {
 
-		} else {
+      ScalarType<?> type = typeManager.getScalarType(value.getClass());
+      if (type == null) {
+        // the type is not registered with the TypeManager.
+        String msg = "No ScalarType registered for " + value.getClass();
+        throw new PersistenceException(msg);
 
-			ScalarType<?> type = typeManager.getScalarType(value.getClass());
-			if (type == null){
-				// the type is not registered with the TypeManager.
-				String msg = "No ScalarType registered for "+value.getClass();
-				throw new PersistenceException(msg);
-				
-			} else if (!type.isJdbcNative()) {
-				// convert to a JDBC native type
-				value = type.toJdbcType(value);
-			}
+      } else if (!type.isJdbcNative()) {
+        // convert to a JDBC native type
+        value = type.toJdbcType(value);
+      }
 
-			int dbType = type.getJdbcType();
-			bindObject(dataBind, value, dbType);
-		}
-	}
+      int dbType = type.getJdbcType();
+      bindObject(dataBind, value, dbType);
+    }
+  }
 
-	/**
-	 * bind a single value.
-	 * <p>
-	 * Note that java.math.BigInteger is supported by converting it to a Long.
-	 * </p>
-	 * <p>
-	 * Note if we get a java.util.Date or java.util.Calendar then these have
-	 * been anonymously passed in (UpdateSql etc). There is a global setting to
-	 * convert then to a java.sql.Date or java.sql.Timestamp for binding. The
-	 * default is that both are converted to java.sql.Timestamp.
-	 * </p>
-	 */
-	public void bindObject(DataBind dataBind, Object data, int dbType)
-			throws SQLException {
+  /**
+   * bind a single value.
+   * <p>
+   * Note that java.math.BigInteger is supported by converting it to a Long.
+   * </p>
+   * <p>
+   * Note if we get a java.util.Date or java.util.Calendar then these have
+   * been anonymously passed in (UpdateSql etc). There is a global setting to
+   * convert then to a java.sql.Date or java.sql.Timestamp for binding. The
+   * default is that both are converted to java.sql.Timestamp.
+   * </p>
+   */
+  public void bindObject(DataBind dataBind, Object data, int dbType) throws SQLException {
 
-		if (data == null){
-		    dataBind.setNull(dbType);
-			return;
-		}
-		
-		switch (dbType) {
-		case java.sql.Types.LONGVARCHAR:
-			bindLongVarChar(dataBind, data);
-			break;
+    if (data == null) {
+      dataBind.setNull(dbType);
+      return;
+    }
 
-		case java.sql.Types.LONGVARBINARY:
-			bindLongVarBinary(dataBind, data);
-			break;
-
-		case java.sql.Types.CLOB:
-			bindClob(dataBind, data);
-			break;
-
-		case java.sql.Types.BLOB:
-			bindBlob(dataBind, data);
-			break;
-
-		default:
-
-			bindSimpleData(dataBind, dbType, data);
-		}
-	}
-
-	/**
-	 * Binds the value to the statement according to the data type.
-	 */
-	private void bindSimpleData(DataBind b, int dataType, Object data)
-			throws SQLException {
-
-		try {
-			switch (dataType) {
-			case java.sql.Types.BOOLEAN:
-				b.setBoolean((Boolean) data);
-				break;
-      case java.sql.Types.BIT:
-        // Types.BIT should map to Java Boolean
-        b.setBoolean((Boolean) data);
+    switch (dbType) {
+      case java.sql.Types.LONGVARCHAR:
+        bindLongVarChar(dataBind, data);
         break;
 
-			case java.sql.Types.VARCHAR:
-				b.setString((String) data);
-				break;
+      case java.sql.Types.LONGVARBINARY:
+        bindLongVarBinary(dataBind, data);
+        break;
 
-			case java.sql.Types.CHAR:
-				b.setString(data.toString());
-				break;
-				
-			case java.sql.Types.TINYINT:
-				b.setByte((Byte) data);
-				break;
+      case java.sql.Types.CLOB:
+        bindClob(dataBind, data);
+        break;
 
-			case java.sql.Types.SMALLINT:
-				b.setShort((Short) data);
-				break;
+      case java.sql.Types.BLOB:
+        bindBlob(dataBind, data);
+        break;
 
-			case java.sql.Types.INTEGER:
-				b.setInt((Integer) data);
-				break;
+      default:
+        bindSimpleData(dataBind, dbType, data);
+    }
+  }
 
-			case java.sql.Types.BIGINT:
-				b.setLong((Long) data);
-				break;
+  /**
+   * Binds the value to the statement according to the data type.
+   */
+  private void bindSimpleData(DataBind b, int dataType, Object data) throws SQLException {
 
-			case java.sql.Types.REAL:
-				b.setFloat((Float) data);
-				break;
+    try {
+      switch (dataType) {
+        case java.sql.Types.BOOLEAN:
+          b.setBoolean((Boolean) data);
+          break;
+        case java.sql.Types.BIT:
+          // Types.BIT should map to Java Boolean
+          b.setBoolean((Boolean) data);
+          break;
 
-			case java.sql.Types.FLOAT:
-				// DB Float in theory maps to Java Double type
-				b.setDouble((Double) data);
-				break;
+        case java.sql.Types.VARCHAR:
+          b.setString((String) data);
+          break;
 
-			case java.sql.Types.DOUBLE:
-				b.setDouble((Double) data);
-				break;
+        case java.sql.Types.CHAR:
+          b.setString(data.toString());
+          break;
 
-			case java.sql.Types.NUMERIC:
-				b.setBigDecimal((BigDecimal) data);
-				break;
+        case java.sql.Types.TINYINT:
+          b.setByte((Byte) data);
+          break;
 
-			case java.sql.Types.DECIMAL:
-				b.setBigDecimal((BigDecimal) data);
-				break;
+        case java.sql.Types.SMALLINT:
+          b.setShort((Short) data);
+          break;
 
-			case java.sql.Types.TIME:
-				//pstmt.setTime(index, (java.sql.Time) data, calendar);
-				b.setTime((java.sql.Time) data);
-				break;
+        case java.sql.Types.INTEGER:
+          b.setInt((Integer) data);
+          break;
 
-			case java.sql.Types.DATE:
-				//pstmt.setDate(index, (java.sql.Date) data, calendar);
-				b.setDate((java.sql.Date) data);
-				break;
+        case java.sql.Types.BIGINT:
+          b.setLong((Long) data);
+          break;
 
-			case java.sql.Types.TIMESTAMP:
-				//pstmt.setTimestamp(index, (java.sql.Timestamp) data, calendar);
-				b.setTimestamp((java.sql.Timestamp) data);
-				break;
+        case java.sql.Types.REAL:
+          b.setFloat((Float) data);
+          break;
 
-			case java.sql.Types.BINARY:
-				b.setBytes((byte[]) data);
-				break;
+        case java.sql.Types.FLOAT:
+          // DB Float in theory maps to Java Double type
+          b.setDouble((Double) data);
+          break;
 
-			case java.sql.Types.VARBINARY:
-				b.setBytes((byte[]) data);
-				break;
+        case java.sql.Types.DOUBLE:
+          b.setDouble((Double) data);
+          break;
 
-			case java.sql.Types.OTHER:
-				b.setObject(data);
-				break;
+        case java.sql.Types.NUMERIC:
+          b.setBigDecimal((BigDecimal) data);
+          break;
 
-			case java.sql.Types.JAVA_OBJECT:
-				// Not too sure about this.
-				b.setObject(data);
-				break;
+        case java.sql.Types.DECIMAL:
+          b.setBigDecimal((BigDecimal) data);
+          break;
 
-			default:
-				String msg = Message.msg("persist.bind.datatype", "" + dataType, "" + b.currentPos());
-				throw new SQLException(msg);
-			}
+        case java.sql.Types.TIME:
+          b.setTime((java.sql.Time) data);
+          break;
 
-		} catch (Exception e) {
-			String dataClass = "Data is null?";
-			if (data != null) {
-				dataClass = data.getClass().getName();
-			}
-			String m = "Error with property[" + b.currentPos() + "] dt[" + dataType + "]";
-			m += "data[" + data + "][" + dataClass + "]";
-			throw new PersistenceException(m, e);
-		}
-	}
+        case java.sql.Types.DATE:
+          b.setDate((java.sql.Date) data);
+          break;
 
-	/**
-	 * Bind String data to a LONGVARCHAR column.
-	 */
-	private void bindLongVarChar(DataBind b, Object data)
-			throws SQLException {
+        case java.sql.Types.TIMESTAMP:
+          b.setTimestamp((java.sql.Timestamp) data);
+          break;
 
-		String sd = (String) data;
-		b.setClob(sd);
-	}
+        case java.sql.Types.BINARY:
+          b.setBytes((byte[]) data);
+          break;
 
-	/**
-	 * Bind byte[] data to a LONGVARBINARY column.
-	 */
-	private void bindLongVarBinary(DataBind b, Object data)
-			throws SQLException {
+        case java.sql.Types.VARBINARY:
+          b.setBytes((byte[]) data);
+          break;
 
-		byte[] bytes = (byte[]) data;
-		b.setBlob(bytes);
-	}
+        case java.sql.Types.OTHER:
+          b.setObject(data);
+          break;
 
-	/**
-	 * Bind String data to a CLOB column.
-	 */
-	private void bindClob(DataBind b, Object data) throws SQLException {
+        case java.sql.Types.JAVA_OBJECT:
+          // Not too sure about this.
+          b.setObject(data);
+          break;
 
-		String sd = (String) data;
-		b.setClob(sd);
-	}
+        default:
+          String msg = Message.msg("persist.bind.datatype", "" + dataType, "" + b.currentPos());
+          throw new SQLException(msg);
+      }
 
-	/**
-	 * Bind byte[] data to a BLOB column.
-	 */
-	private void bindBlob(DataBind b, Object data) throws SQLException {
+    } catch (Exception e) {
+      String dataClass = "Data is null?";
+      if (data != null) {
+        dataClass = data.getClass().getName();
+      }
+      String m = "Error with property[" + b.currentPos() + "] dt[" + dataType + "]";
+      m += "data[" + data + "][" + dataClass + "]";
+      throw new PersistenceException(m, e);
+    }
+  }
 
-		byte[] bytes = (byte[]) data;
-		b.setBlob(bytes);
-	}
+  /**
+   * Bind String data to a LONGVARCHAR column.
+   */
+  private void bindLongVarChar(DataBind dataBind, Object data) throws SQLException {
 
-	private boolean isLob(int dbType) {
-		switch (dbType) {
-		case Types.CLOB:
-			return true;
-		case Types.LONGVARCHAR:
-			return true;
-		case Types.BLOB:
-			return true;
-		case Types.LONGVARBINARY:
-			return true;
+    dataBind.setClob((String) data);
+  }
 
-		default:
-			return false;
-		}
-	}
+  /**
+   * Bind byte[] data to a LONGVARBINARY column.
+   */
+  private void bindLongVarBinary(DataBind dataBind, Object data) throws SQLException {
+
+    dataBind.setBlob((byte[]) data);
+  }
+
+  /**
+   * Bind String data to a CLOB column.
+   */
+  private void bindClob(DataBind dataBind, Object data) throws SQLException {
+
+    dataBind.setClob((String) data);
+  }
+
+  /**
+   * Bind byte[] data to a BLOB column.
+   */
+  private void bindBlob(DataBind dataBind, Object data) throws SQLException {
+
+    dataBind.setBlob((byte[]) data);
+  }
+
+  private boolean isLob(int dbType) {
+    switch (dbType) {
+      case Types.CLOB:
+        return true;
+      case Types.LONGVARCHAR:
+        return true;
+      case Types.BLOB:
+        return true;
+      case Types.LONGVARBINARY:
+        return true;
+
+      default:
+        return false;
+    }
+  }
 }
