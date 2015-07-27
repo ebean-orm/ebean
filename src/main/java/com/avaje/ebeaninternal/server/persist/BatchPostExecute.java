@@ -12,25 +12,24 @@ import java.sql.SQLException;
  */
 public interface BatchPostExecute {
 
+  /**
+   * Check that the rowCount is correct for this execute. This is for
+   * performing concurrency checking in batch execution.
+   */
+  void checkRowCount(int rowCount) throws SQLException;
 
-    /**
-     * Check that the rowCount is correct for this execute. This is for
-     * performing concurrency checking in batch execution.
-     */
-    public void checkRowCount(int rowCount) throws SQLException;
+  /**
+   * For inserts with generated keys. Otherwise not used.
+   */
+  void setGeneratedKey(Object idValue);
 
-    /**
-     * For inserts with generated keys. Otherwise not used.
-     */
-    public void setGeneratedKey(Object idValue);
-
-    /**
-     * Execute the post execute processing.
-     * <p>
-     * This includes transaction logging, transaction event table modification
-     * and for beans resetting their 'loaded' status.
-     * </p>
-     */
-    public void postExecute() throws SQLException;
+  /**
+   * Execute the post execute processing.
+   * <p>
+   * This includes transaction logging, transaction event table modification
+   * and for beans resetting their 'loaded' status.
+   * </p>
+   */
+  void postExecute() throws SQLException;
 
 }
