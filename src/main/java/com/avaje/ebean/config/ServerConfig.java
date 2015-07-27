@@ -243,7 +243,12 @@ public class ServerConfig {
    * Behaviour of update to include on the change properties. 
    */
   private boolean updateChangesOnly = true;
-  
+
+  /**
+   * Behaviour of updates in JDBC batch to by default include all properties.
+   */
+  private boolean updateAllPropertiesInBatch = true;
+
   /**
    * Default behaviour for updates when cascade save on a O2M or M2M to delete any missing children.
    */
@@ -1516,7 +1521,26 @@ public class ServerConfig {
   public void setUpdateChangesOnly(boolean updateChangesOnly) {
     this.updateChangesOnly = updateChangesOnly;
   }
-    
+
+  /**
+   * Returns true if updates in JDBC batch default to include all properties by default.
+   */
+  public boolean isUpdateAllPropertiesInBatch() {
+    return updateAllPropertiesInBatch;
+  }
+
+  /**
+   * Set to false if by default updates in JDBC batch should not include all properties.
+   * <p>
+   *   This mode can be explicitly set per transaction.
+   * </p>
+   *
+   * @see com.avaje.ebean.Transaction#setUpdateAllLoadedProperties(boolean)
+   */
+  public void setUpdateAllPropertiesInBatch(boolean updateAllPropertiesInBatch) {
+    this.updateAllPropertiesInBatch = updateAllPropertiesInBatch;
+  }
+
   /**
    * Return true if updates by default delete missing children when cascading save to a OneToMany or
    * ManyToMany. When not set this defaults to true.
@@ -1860,6 +1884,7 @@ public class ServerConfig {
     collectQueryStatsByNode = p.getBoolean("collectQueryStatsByNode", collectQueryStatsByNode);
     collectQueryOrigins = p.getBoolean("collectQueryOrigins", collectQueryOrigins);
 
+    updateAllPropertiesInBatch = p.getBoolean("updateAllPropertiesInBatch", updateAllPropertiesInBatch);
     updateChangesOnly = p.getBoolean("updateChangesOnly", updateChangesOnly);
     
     boolean defaultDeleteMissingChildren = p.getBoolean("defaultDeleteMissingChildren", updatesDeleteMissingChildren);

@@ -148,6 +148,8 @@ public final class DefaultServer implements SpiEbeanServer {
    */
   private List<SpiEbeanPlugin> ebeanPlugins;
 
+  private final boolean updateAllPropertiesInBatch;
+
   private final boolean collectQueryOrigins;
   
   private final boolean collectQueryStatsByNode;
@@ -182,6 +184,7 @@ public final class DefaultServer implements SpiEbeanServer {
     this.beanDescriptorManager = config.getBeanDescriptorManager();
     beanDescriptorManager.setEbeanServer(this);
 
+    this.updateAllPropertiesInBatch = serverConfig.isUpdateAllPropertiesInBatch();
     this.collectQueryOrigins = serverConfig.isCollectQueryOrigins();
     this.collectQueryStatsByNode = serverConfig.isCollectQueryStatsByNode();
     this.maxCallStack = serverConfig.getMaxCallStack();
@@ -250,6 +253,11 @@ public final class DefaultServer implements SpiEbeanServer {
   @Override
   public boolean isCollectQueryOrigins() {
     return collectQueryOrigins;
+  }
+
+  @Override
+  public boolean isUpdateAllPropertiesInBatch() {
+    return updateAllPropertiesInBatch;
   }
 
   public int getLazyLoadBatchSize() {

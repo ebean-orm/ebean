@@ -101,8 +101,9 @@ public interface SpiTransaction extends Transaction {
 
   /**
    * Return true if this transaction has updateAllLoadedProperties set.
+   * If null is returned the server default is used (set on ServerConfig).
    */
-  boolean isUpdateAllLoadedProperties();
+  Boolean isUpdateAllLoadedProperties();
 
   /**
    * Return the batchSize specifically set for this transaction or 0.

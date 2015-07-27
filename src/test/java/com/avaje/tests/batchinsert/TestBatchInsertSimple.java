@@ -121,6 +121,16 @@ public class TestBatchInsertSimple extends BaseTestCase {
     // escalate based on batchOnCascade value
     Ebean.saveAll(masters);
 
+    for (int i = 0; i < masters.size() ; i++) {
+      UTMaster utMaster = masters.get(i);
+      utMaster.setName(utMaster.getName()+"-Mod");
+      if (i % 2 == 0) {
+        // make the updates a little bit different
+        utMaster.setDescription("Blah");
+      }
+    }
+
+    Ebean.saveAll(masters);
   }
 
   private UTMaster createMasterAndDetails(int masterPos, int size) {

@@ -117,6 +117,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private boolean batchOnCascadeSet;
 
+  /**
+   * Set for updates to determine if all loaded properties are included in the update.
+   */
+  private boolean requestUpdateAllLoadedProps;
+
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
       PersistExecute persistExecute, PersistRequest.Type type, boolean saveRecurse) {
 
@@ -544,6 +549,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
     // if bean persisted again then should result in an update
     intercept.setLoaded();
+    if (isInsert()) {
+      postInsert();
+    }
 
     addEvent();
 
@@ -644,7 +652,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return true if the property should be included in the update.
    */
   public boolean isAddToUpdate(BeanProperty prop) {
-    if (transaction.isUpdateAllLoadedProperties()) {
+    if (requestUpdateAllLoadedProps) {
       return intercept.isLoadedProperty(prop.getPropertyIndex());
     } else {
       return intercept.isDirtyProperty(prop.getPropertyIndex());
@@ -655,7 +663,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return transaction.getDerivedRelationship(bean);
   }
 
-  public void postInsert() {
+  private void postInsert() {
     // mark all properties as loaded after an insert to support immediate update
     int len = intercept.getPropertyLength();
     for (int i = 0; i < len; i++) {
@@ -710,4 +718,24 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return updatedManysOnly;
   }
 
+
+  /**
+   * Determine if all loaded properties should be used for an update.
+   * <p>
+   *   Takes into account transaction setting and JDBC batch.
+   * </p>
+   */
+  public boolean determineUpdateAllLoadedProperties() {
+
+    Boolean txnUpdateAll = transaction.isUpdateAllLoadedProperties();
+    if (txnUpdateAll != null) {
+      // use the setting explicitly set on the transaction
+      requestUpdateAllLoadedProps = txnUpdateAll;
+    } else {
+      // if using batch use the server default setting
+      requestUpdateAllLoadedProps = isBatchThisRequest() && ebeanServer.isUpdateAllPropertiesInBatch();
+    }
+
+    return requestUpdateAllLoadedProps;
+  }
 }

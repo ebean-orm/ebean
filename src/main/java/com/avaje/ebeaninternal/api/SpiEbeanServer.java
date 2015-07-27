@@ -32,7 +32,12 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Return true if query origins should be collected.
    */
   boolean isCollectQueryOrigins();
-  
+
+  /**
+   * Return true if updates in JDBC batch should include all columns if unspecified on the transaction.
+   */
+  boolean isUpdateAllPropertiesInBatch();
+
   /**
    * Return the server configuration.
    */

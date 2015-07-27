@@ -90,12 +90,12 @@ public final class UpdateMeta {
    */
   public SpiUpdatePlan getUpdatePlan(PersistRequestBean<?> request) {
 
-    ConcurrencyMode mode = request.determineConcurrencyMode();
     if (request.isDynamicUpdateSql()) {
-      return getDynamicUpdatePlan(mode, request);
+      return getDynamicUpdatePlan(request);
     }
 
     // 'full bean' update...
+    ConcurrencyMode mode = request.determineConcurrencyMode();
     switch (mode) {
     case NONE:
       return modeNoneUpdatePlan;
@@ -108,14 +108,12 @@ public final class UpdateMeta {
     }
   }
 
-  private SpiUpdatePlan getDynamicUpdatePlan(ConcurrencyMode mode, PersistRequestBean<?> persistRequest) {
-
-    // we can use a cached UpdatePlan for the changed properties
+  private SpiUpdatePlan getDynamicUpdatePlan(PersistRequestBean<?> persistRequest) {
 
     EntityBeanIntercept ebi = persistRequest.getEntityBeanIntercept();
 
     int hash;
-    if (persistRequest.getTransaction().isUpdateAllLoadedProperties()) {
+    if (persistRequest.determineUpdateAllLoadedProperties()) {
       hash = ebi.getLoadedPropertyHash();
     } else {
       hash = ebi.getDirtyPropertyHash();
@@ -132,6 +130,7 @@ public final class UpdateMeta {
 
     Integer key = Integer.valueOf(hash);
 
+    // check if we can use a cached UpdatePlan
     SpiUpdatePlan updatePlan = beanDescriptor.getUpdatePlan(key);
     if (updatePlan != null) {
       return updatePlan;
@@ -143,6 +142,8 @@ public final class UpdateMeta {
     List<Bindable> list = new ArrayList<Bindable>();
     set.addToUpdate(persistRequest, list);  
     BindableList bindableList = new BindableList(list);
+
+    ConcurrencyMode mode = persistRequest.determineConcurrencyMode();
 
     // build the SQL for this update statement
     String sql = genSql(mode, persistRequest, bindableList);

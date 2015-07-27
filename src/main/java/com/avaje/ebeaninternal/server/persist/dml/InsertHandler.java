@@ -137,7 +137,6 @@ public class InsertHandler extends DmlHandler {
 
     checkRowCount(rc);
     executeDerivedRelationships();
-    persistRequest.postInsert();
   }
 
   protected void executeDerivedRelationships() {

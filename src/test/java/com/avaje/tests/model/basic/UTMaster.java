@@ -13,56 +13,66 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 @Entity
-@Table(name="ut_master")
+@Table(name = "ut_master")
 public class UTMaster extends Model {
 
-    @Id
-    Integer id;
-    
-    String name;
-    
-    @Version
-    Integer version;
-    
-    @OneToMany(cascade=CascadeType.ALL)
-    List<UTDetail> details;
+  @Id
+  Integer id;
 
-    public Integer getId() {
-        return id;
-    }
+  String name;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  String description;
 
-    public String getName() {
-        return name;
-    }
+  @Version
+  Integer version;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  @OneToMany(cascade = CascadeType.ALL)
+  List<UTDetail> details;
 
-    public Integer getVersion() {
-        return version;
-    }
+  public Integer getId() {
+    return id;
+  }
 
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-    public List<UTDetail> getDetails() {
-        return details;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setDetails(List<UTDetail> details) {
-        this.details = details;
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
+  public List<UTDetail> getDetails() {
+    return details;
+  }
+
+  public void setDetails(List<UTDetail> details) {
+    this.details = details;
+  }
+
+  public void addDetail(UTDetail detail) {
+    if (details == null) {
+      details = new ArrayList<UTDetail>();
     }
-    
-    public void addDetail(UTDetail detail) {
-        if (details == null){
-            details = new ArrayList<UTDetail>();
-        }
-        details.add(detail);
-    }
+    details.add(detail);
+  }
 }

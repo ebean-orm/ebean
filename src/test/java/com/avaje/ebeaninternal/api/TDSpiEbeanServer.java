@@ -49,6 +49,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public boolean isUpdateAllPropertiesInBatch() {
+    return false;
+  }
+
+  @Override
   public ServerConfig getServerConfig() {
     return null;
   }

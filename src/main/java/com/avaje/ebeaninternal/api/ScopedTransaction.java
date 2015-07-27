@@ -158,7 +158,7 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
-  public boolean isUpdateAllLoadedProperties() {
+  public Boolean isUpdateAllLoadedProperties() {
     return transaction.isUpdateAllLoadedProperties();
   }
 
