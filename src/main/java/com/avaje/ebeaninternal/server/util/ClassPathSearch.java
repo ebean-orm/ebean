@@ -297,7 +297,8 @@ public class ClassPathSearch implements ClassPathSearchService {
     if (files == null) {
       return;
     }
-  /*
+
+    /*
      * Strips the first character off as all entries in a jar file have no /
      * prefix. We want to come out with a name like WEB-INF/classes/ to ensure
      * we filter the contents of the war/jar file by this.
@@ -498,4 +499,5 @@ public class ClassPathSearch implements ClassPathSearchService {
       return (jarOffset == null) ? classPath.getName() : classPath.getName() + "!" + jarOffset;
     }
   }
+
 }
