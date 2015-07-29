@@ -70,5 +70,9 @@ public class DefaultBeanState implements BeanState {
 	public void setLoaded() {
 	  intercept.setLoaded();
 	}
-	
+
+  @Override
+  public void setDisableLazyLoad(boolean disableLazyLoading) {
+    intercept.setDisableLazyLoad(disableLazyLoading);
+  }
 }

@@ -43,4 +43,22 @@ public class TestLoadOnDirty extends BaseTestCase {
     Assert.assertEquals(2, beanState.getChangedProps().size());
 
   }
+
+  @Test
+  public void testDisableLazyLoad() {
+
+    ResetBasicData.reset();
+
+    List<Customer> custs = Ebean.find(Customer.class).order("id").findList();
+
+    Customer customer = Ebean.find(Customer.class)
+        .setId(custs.get(0).getId())
+        .select("id")
+        .setUseCache(false)
+        .findUnique();
+
+    BeanState beanState = Ebean.getBeanState(customer);
+    beanState.setDisableLazyLoad(true);
+    Assert.assertNull(customer.getName());
+  }
 }

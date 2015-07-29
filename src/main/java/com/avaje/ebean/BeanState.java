@@ -34,6 +34,11 @@ public interface BeanState {
   boolean isDirty();
 
   /**
+   * This can be called with true to disable lazy loading on the bean.
+   */
+  void setDisableLazyLoad(boolean disableLazyLoading);
+
+  /**
    * For partially populated beans returns the properties that are loaded on the
    * bean.
    * <p>
