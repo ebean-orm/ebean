@@ -15,32 +15,32 @@ import java.util.Set;
  */
 public interface ClassPathSearchService {
 
-	/**
-	 * Initialize this ClassPathSearchService with given parameters
-	 *
-	 * @param classLoader is current classLoader
-	 * @param filter is filter
-	 * @param matcher
-	 * @param classPathReaderClassName
-	 */
-	void init(ClassLoader classLoader, ClassPathSearchFilter filter, ClassPathSearchMatcher matcher, String classPathReaderClassName);
+  /**
+   * Initialize this ClassPathSearchService with given parameters
+   *
+   * @param classLoader              is current classLoader
+   * @param filter                   is filter
+   * @param matcher
+   * @param classPathReaderClassName
+   */
+  void init(ClassLoader classLoader, ClassPathSearchFilter filter, ClassPathSearchMatcher matcher, String classPathReaderClassName);
 
-	/**
-	 * Searches the class path for all matching classes.
-	 *
-	 * @return a collection of all matching classes
-	 * @throws IOException if a resource is un-reachable
-	 */
-	List<Class<?>> findClasses() throws IOException;
+  /**
+   * Searches the class path for all matching classes.
+   *
+   * @return a collection of all matching classes
+   * @throws IOException if a resource is un-reachable
+   */
+  List<Class<?>> findClasses() throws IOException;
 
-	/**
-	 * Return the set of jars that contained classes that matched.
-	 */
-	Set<String> getJarHits();
+  /**
+   * Return the set of jars that contained classes that matched.
+   */
+  Set<String> getJarHits();
 
-	/**
-	 * Return the set of packages that contained classes that matched.
-	 */
-	Set<String> getPackageHits();
+  /**
+   * Return the set of packages that contained classes that matched.
+   */
+  Set<String> getPackageHits();
 
 }
