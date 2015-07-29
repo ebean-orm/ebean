@@ -15,32 +15,32 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class AgentLoaderSupport implements InitializingBean {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+  private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private int debug;
-    private String packages;
+  private int debug;
+  private String packages;
 
-    public int getDebug() {
-        return debug;
+  public int getDebug() {
+    return debug;
+  }
+
+  public void setDebug(int debug) {
+    this.debug = debug;
+  }
+
+  public String getPackages() {
+    return packages;
+  }
+
+  public void setPackages(String packages) {
+    this.packages = packages;
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    String args = "debug=" + getDebug() + ";packages=" + getPackages();
+    if (!AgentLoader.loadAgentFromClasspath("avaje-ebeanorm-agent", args)) {
+      logger.info("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
     }
-
-    public void setDebug(int debug) {
-        this.debug = debug;
-    }
-
-    public String getPackages() {
-        return packages;
-    }
-
-    public void setPackages(String packages) {
-        this.packages = packages;
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        String args = "debug=" + getDebug() + ";packages=" + getPackages();
-        if (!AgentLoader.loadAgentFromClasspath("avaje-ebeanorm-agent", args)) {
-            logger.info("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
-        }
-    }
+  }
 }
