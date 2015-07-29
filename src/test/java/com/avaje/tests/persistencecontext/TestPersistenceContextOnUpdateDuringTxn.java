@@ -1,8 +1,7 @@
 package com.avaje.tests.persistencecontext;
 
 import org.junit.Test;
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.MatcherAssert.*;
+import static org.assertj.core.api.Assertions.*;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
@@ -33,7 +32,7 @@ public class TestPersistenceContextOnUpdateDuringTxn extends BaseTestCase {
       // actually the bean is not in the persistence context so ...  the assert is fine
       EBasic loadedEntity = server.find(EBasic.class,bean1.getId());
 
-      assertThat(loadedEntity.getName(), is("hello-changed")); 
+      assertThat(loadedEntity.getName()).isEqualTo("hello-changed");
 
     } finally {
       server.endTransaction();

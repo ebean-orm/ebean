@@ -1,12 +1,11 @@
 package com.avaje.tests.lifecycle;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.EBasicWithLifecycle;
+import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestLifecyleAnnotatedBean extends BaseTestCase {
 
@@ -18,8 +17,8 @@ public class TestLifecyleAnnotatedBean extends BaseTestCase {
     Ebean.getServerCacheManager();
     Ebean.save(bean);
     
-    Assert.assertThat(bean.getBuffer(), Matchers.containsString("prePersist1"));
-    Assert.assertThat(bean.getBuffer(), Matchers.containsString("prePersist2"));
+    assertThat(bean.getBuffer()).contains("prePersist1");
+    assertThat(bean.getBuffer()).contains("prePersist2");
   }
 
   @Test
@@ -30,8 +29,8 @@ public class TestLifecyleAnnotatedBean extends BaseTestCase {
     Ebean.getServerCacheManager();
     Ebean.save(bean);
 
-    Assert.assertThat(bean.getBuffer(), Matchers.containsString("postPersist1"));
-    Assert.assertThat(bean.getBuffer(), Matchers.containsString("postPersist2"));
+    assertThat(bean.getBuffer()).contains("postPersist1");
+    assertThat(bean.getBuffer()).contains("postPersist2");
   }
 
   @Test
@@ -43,8 +42,8 @@ public class TestLifecyleAnnotatedBean extends BaseTestCase {
     Ebean.save(bean);
 
     EBasicWithLifecycle loaded = Ebean.find(EBasicWithLifecycle.class, bean.getId());
-    Assert.assertThat(loaded.getBuffer(), Matchers.containsString("postLoad1"));
-    Assert.assertThat(loaded.getBuffer(), Matchers.containsString("postLoad2"));
+    assertThat(loaded.getBuffer()).contains("postLoad1");
+    assertThat(loaded.getBuffer()).contains("postLoad2");
   }
 
   @Test
@@ -58,8 +57,8 @@ public class TestLifecyleAnnotatedBean extends BaseTestCase {
     bean.setName("PreUpdate");
     Ebean.save(bean);
 
-    Assert.assertThat(bean.getBuffer(), Matchers.containsString("preUpdate1"));
-    Assert.assertThat(bean.getBuffer(), Matchers.containsString("preUpdate2"));
+    assertThat(bean.getBuffer()).contains("preUpdate1");
+    assertThat(bean.getBuffer()).contains("preUpdate2");
   }
 
   @Test
@@ -73,8 +72,8 @@ public class TestLifecyleAnnotatedBean extends BaseTestCase {
     bean.setName("PostUpdate");
     Ebean.save(bean);
 
-    Assert.assertThat(bean.getBuffer(), Matchers.containsString("postUpdate1"));
-    Assert.assertThat(bean.getBuffer(), Matchers.containsString("postUpdate2"));
+    assertThat(bean.getBuffer()).contains("postUpdate1");
+    assertThat(bean.getBuffer()).contains("postUpdate2");
   }
 
   @Test
@@ -86,8 +85,8 @@ public class TestLifecyleAnnotatedBean extends BaseTestCase {
     Ebean.save(bean);
     Ebean.delete(bean);
 
-    Assert.assertThat(bean.getBuffer(), Matchers.containsString("preRemove1"));
-    Assert.assertThat(bean.getBuffer(), Matchers.containsString("preRemove2"));
+    assertThat(bean.getBuffer()).contains("preRemove1");
+    assertThat(bean.getBuffer()).contains("preRemove2");
   }
 
   @Test
@@ -99,7 +98,7 @@ public class TestLifecyleAnnotatedBean extends BaseTestCase {
     Ebean.save(bean);
     Ebean.delete(bean);
 
-    Assert.assertThat(bean.getBuffer(), Matchers.containsString("postRemove1"));
-    Assert.assertThat(bean.getBuffer(), Matchers.containsString("postRemove2"));
+    assertThat(bean.getBuffer()).contains("postRemove1");
+    assertThat(bean.getBuffer()).contains("postRemove2");
   }
 }
