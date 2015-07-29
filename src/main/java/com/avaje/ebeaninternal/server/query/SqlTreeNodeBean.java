@@ -181,7 +181,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     Timestamp end = ctx.getDataReader().getTimestamp();
     T bean = (T)load(ctx, null, null);
 
-    return new Version(bean, start, end);
+    return new Version<T>(bean, start, end);
   }
 
   /**
