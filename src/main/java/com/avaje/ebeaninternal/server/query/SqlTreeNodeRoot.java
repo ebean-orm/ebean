@@ -19,13 +19,17 @@ public final class SqlTreeNodeRoot extends SqlTreeNodeBean {
    * Specify for SqlSelect to include an Id property or not.
    */
   public SqlTreeNodeRoot(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
-                         TableJoin includeJoin, BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode) {
-    super(null, null, desc, props, myList, withId, many, temporalMode);
+                         TableJoin includeJoin, BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
+
+    super(desc, props, myList, withId, many, temporalMode, disableLazyLoad);
     this.includeJoin = includeJoin;
   }
 
-  public SqlTreeNodeRoot(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId) {
-    super(null, null, desc, props, myList, withId, null, null);
+  /**
+   * Construct for raw sql.
+   */
+  public SqlTreeNodeRoot(BeanDescriptor<?> desc, SqlTreeProperties props, boolean withId, boolean disableLazyLoad) {
+    super(desc, props, withId, disableLazyLoad);
     this.includeJoin = null;
   }
 

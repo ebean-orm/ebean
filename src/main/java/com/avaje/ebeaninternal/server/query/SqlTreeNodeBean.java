@@ -87,49 +87,58 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    */
   protected String intersectionAsOfTableAlias;
 
-  public SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
-      List<SqlTreeNode> myChildren, boolean withId) {
+  /**
+   * Construct for Raw SQL.
+   */
+  public SqlTreeNodeBean(BeanDescriptor<?> desc, SqlTreeProperties props, boolean withId, boolean disableLazyLoad) {
+    this(null, null, desc, props, null, withId, null, null, disableLazyLoad);
+  }
 
-    this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, withId, null, SpiQuery.TemporalMode.CURRENT);
+  /**
+   * Construct for leaf node.
+   */
+  public SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
+      List<SqlTreeNode> myChildren, boolean withId, boolean disableLazyLoad) {
+
+    this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, withId, null, SpiQuery.TemporalMode.CURRENT, disableLazyLoad);
+  }
+
+  /**
+   * Construct for root node.
+   */
+  public SqlTreeNodeBean(BeanDescriptor<?> desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
+                         BeanPropertyAssocMany<?> many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
+    this(null, null, desc, props, myList, withId, many, temporalMode, disableLazyLoad);
   }
 
   /**
    * Create with the appropriate node.
    */
-  public SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, BeanDescriptor<?> desc,
-      SqlTreeProperties props, List<SqlTreeNode> myChildren, boolean withId,  BeanPropertyAssocMany<?> lazyLoadParent, SpiQuery.TemporalMode temporalMode) {
+  private SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, BeanDescriptor<?> desc, SqlTreeProperties props,
+                          List<SqlTreeNode> myChildren, boolean withId,  BeanPropertyAssocMany<?> lazyLoadParent,
+                          SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
 
     this.lazyLoadParent = lazyLoadParent;
     this.lazyLoadParentIdBinder = (lazyLoadParent == null) ? null : lazyLoadParent.getBeanDescriptor().getIdBinder();
     this.prefix = prefix;
-    this.nodeBeanProp = beanProp;
     this.desc = desc;
+    this.inheritInfo = desc.getInheritInfo();
+    this.idBinder = desc.getIdBinder();
     this.temporalMode = temporalMode;
     this.temporalVersions = temporalMode == SpiQuery.TemporalMode.VERSIONS;
 
-    this.inheritInfo = desc.getInheritInfo();
+    this.nodeBeanProp = beanProp;
     this.extraWhere = (beanProp == null) ? null : beanProp.getExtraWhere();
-
-    this.idBinder = desc.getIdBinder();
 
     // the bean has an Id property and we want to use it
     this.readId = withId && (desc.getIdProperty() != null);
-    this.disableLazyLoad = !readId || desc.isSqlSelectBased() || temporalVersions;
+    this.disableLazyLoad = disableLazyLoad || !readId || desc.isSqlSelectBased() || temporalVersions;
 
     this.tableJoins = props.getTableJoins();
-
     this.partialObject = props.isPartialObject();
-
     this.readOnlyLeaf = props.isReadOnly();
-
     this.properties = props.getProps();
-
-
-    if (myChildren == null) {
-      children = NO_CHILDREN;
-    } else {
-      children = myChildren.toArray(new SqlTreeNode[myChildren.size()]);
-    }
+    this.children = myChildren == null ? NO_CHILDREN : myChildren.toArray(new SqlTreeNode[myChildren.size()]);
 
     pathMap = createPathMap(prefix, desc);
   }

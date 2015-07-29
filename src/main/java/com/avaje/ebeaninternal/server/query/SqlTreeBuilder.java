@@ -71,6 +71,8 @@ public class SqlTreeBuilder {
    */
   private final boolean rawNoId;
 
+  private final boolean disableLazyLoad;
+
   private SqlTreeNode rootNode;
 
   /**
@@ -81,6 +83,7 @@ public class SqlTreeBuilder {
     this.rawSql = true;
     this.desc = request.getBeanDescriptor();
     this.rawNoId = rawNoId;
+    this.disableLazyLoad = request.getQuery().isDisableLazyLoading();
     this.query = null;
     this.subQuery = false;
     this.queryDetail = queryDetail;
@@ -104,6 +107,7 @@ public class SqlTreeBuilder {
     this.rawNoId = false;
     this.desc = request.getBeanDescriptor();
     this.query = request.getQuery();
+    this.disableLazyLoad = (query == null) ? false : query.isDisableLazyLoading();
 
     this.subQuery = Type.SUBQUERY.equals(query.getType()) || Type.ID_LIST.equals(query.getType());
     this.includeJoin = query.getIncludeTableJoin();
@@ -252,8 +256,7 @@ public class SqlTreeBuilder {
     }
   }
 
-  private SqlTreeNode buildNode(String prefix, BeanPropertyAssoc<?> prop, BeanDescriptor<?> desc,
-      List<SqlTreeNode> myList) {
+  private SqlTreeNode buildNode(String prefix, BeanPropertyAssoc<?> prop, BeanDescriptor<?> desc, List<SqlTreeNode> myList) {
 
     OrmQueryProperties queryProps = queryDetail.getChunk(prefix, false);
 
@@ -265,14 +268,13 @@ public class SqlTreeBuilder {
       // Optional many property for lazy loading query
       BeanPropertyAssocMany<?> lazyLoadMany = (query == null) ? null : query.getLazyLoadForParentsProperty();
       boolean withId = !rawNoId && !subQuery && (query == null || !query.isDistinct());
-
-      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, SpiQuery.TemporalMode.of(query));
+      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, SpiQuery.TemporalMode.of(query), disableLazyLoad);
 
     } else if (prop instanceof BeanPropertyAssocMany<?>) {
-      return new SqlTreeNodeManyRoot(prefix, (BeanPropertyAssocMany<?>) prop, props, myList);
+      return new SqlTreeNodeManyRoot(prefix, (BeanPropertyAssocMany<?>) prop, props, myList, disableLazyLoad);
 
     } else {
-      return new SqlTreeNodeBean(prefix, prop, props, myList, true);
+      return new SqlTreeNodeBean(prefix, prop, props, myList, true, disableLazyLoad);
     }
   }
 

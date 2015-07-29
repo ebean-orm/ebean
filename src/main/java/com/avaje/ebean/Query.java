@@ -1257,4 +1257,11 @@ public interface Query<T> extends Serializable {
    */
   Class<T> getBeanType();
 
+  /**
+   * Set true if you want to disable lazy loading.
+   * <p>
+   *   That is, once the object graph is returned further lazy loading is disabled.
+   * </p>
+   */
+  Query<T> setDisableLazyLoading(boolean disableLazyLoading);
 }

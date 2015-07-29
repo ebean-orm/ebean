@@ -61,6 +61,8 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
   		query.setReadOnly(parent.isReadOnly());
   	}
 
+    // propagate the asOf and lazy loading mode
+    query.setDisableLazyLoading(parent.isDisableLazyLoading());
     query.asOf(parent.getAsOf());
 		query.setParentNode(objectGraphNode);
 		

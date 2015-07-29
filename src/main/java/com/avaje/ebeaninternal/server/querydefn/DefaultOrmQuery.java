@@ -84,6 +84,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private int firstRow;
 
   /**
+   * Set to true to disable lazy loading on the object graph returned.
+   */
+  private boolean disableLazyLoading;
+
+  /**
    * Lazy loading batch size (can override server wide default).
    */
   private int lazyLoadBatchSize;
@@ -710,6 +715,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     builder.add(firstRow).add(maxRows).add(orderBy).add(forUpdate);
     builder.add(rawWhereClause).add(additionalWhere).add(additionalHaving);
     builder.add(mapKey);
+    builder.add(disableLazyLoading);
     builder.add(id != null);
     builder.add(asOf != null);
     builder.add(rawSql == null ? 0 : rawSql.queryHash());
@@ -1136,6 +1142,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public void setIncludeTableJoin(TableJoin includeTableJoin) {
     this.includeTableJoin = includeTableJoin;
+  }
+
+  @Override
+  public Query<T> setDisableLazyLoading(boolean disableLazyLoading) {
+    this.disableLazyLoading = disableLazyLoading;
+    return this;
+  }
+
+  public boolean isDisableLazyLoading() {
+    return disableLazyLoading;
   }
 
   public int getFirstRow() {

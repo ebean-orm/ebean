@@ -577,8 +577,13 @@ public interface SpiQuery<T> extends Query<T> {
   int getFirstRow();
 
   /**
+   * Return true if lazy loading has been disabled on the query.
+   */
+  boolean isDisableLazyLoading();
+
+  /**
    * Internally set by Ebean when this query must use the DISTINCT keyword.
-   * <p/>
+   * <p>
    * This does not exclude/remove the use of the id property.
    */
   Query<T> setSqlDistinct(boolean sqlDistinct);

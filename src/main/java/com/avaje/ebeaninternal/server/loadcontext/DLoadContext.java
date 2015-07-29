@@ -36,8 +36,9 @@ public class DLoadContext implements LoadContext {
 	private final Boolean readOnly;
 	private final boolean excludeBeanCache;	
 	private final int defaultBatchSize;
-	
-	/**
+  private final boolean disableLazyLoading;
+
+  /**
 	 * The path relative to the root of the object graph.
 	 */
 	private final String relativePath;	
@@ -59,7 +60,8 @@ public class DLoadContext implements LoadContext {
     
     SpiQuery<?> query = request.getQuery();
     this.asOf = query.getAsOf();
-    this.readOnly = query.isReadOnly();	  
+    this.readOnly = query.isReadOnly();
+    this.disableLazyLoading = query.isDisableLazyLoading();
 		this.excludeBeanCache = Boolean.FALSE.equals(query.isUseBeanCache());
 		this.useAutofetchManager = query.getAutoFetchManager() != null;		
 				
@@ -217,6 +219,10 @@ public class DLoadContext implements LoadContext {
 
   protected Timestamp getAsOf() {
     return asOf;
+  }
+
+  protected boolean isDisableLazyLoading() {
+    return disableLazyLoading;
   }
 
   public PersistenceContext getPersistenceContext() {

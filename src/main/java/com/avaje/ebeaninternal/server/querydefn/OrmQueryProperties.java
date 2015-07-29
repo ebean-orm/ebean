@@ -341,6 +341,9 @@ public class OrmQueryProperties implements Serializable {
     if (filterMany != null) {
       filterMany.queryPlanHash(request, builder);
     }
+    builder.add(lazyFetchBatch);
+    builder.add(queryFetchBatch);
+    builder.add(queryFetchAll);
   }
 
   public String getProperties() {
