@@ -325,6 +325,11 @@ public class ServerConfig {
   private boolean diffFlatMode;
 
   /**
+   * Set to true if you want eq("someProperty", null) to generate 1=1 rather than "is null" sql expression.
+   */
+  private boolean expressionEqualsWithNullAsNoop;
+
+  /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
    */
   public ServerConfig() {
@@ -1902,6 +1907,7 @@ public class ServerConfig {
 
     persistenceContextScope = PersistenceContextScope.valueOf(p.get("persistenceContextScope", "TRANSACTION"));
 
+    expressionEqualsWithNullAsNoop = p.getBoolean("expressionEqualsWithNullAsNoop", expressionEqualsWithNullAsNoop);
     diffFlatMode = p.getBoolean("diffFlatMode", diffFlatMode);
     asOfViewSuffix = p.get("asOfViewSuffix", asOfViewSuffix);
     asOfSysPeriod = p.get("asOfSysPeriod", asOfSysPeriod);
@@ -2028,5 +2034,24 @@ public class ServerConfig {
    */
   public void setDiffFlatMode(boolean diffFlatMode) {
     this.diffFlatMode = diffFlatMode;
+  }
+
+  /**
+   * Return true if eq("someProperty", null) should to generate "1=1" rather than "is null" sql expression.
+   */
+  public boolean isExpressionEqualsWithNullAsNoop() {
+    return expressionEqualsWithNullAsNoop;
+  }
+
+  /**
+   * Set to true if you want eq("someProperty", null) to generate "1=1" rather than "is null" sql expression.
+   * <p>
+   *   Setting this to true has the effect that eq(propertyName, value), ieq(propertyName, value) and
+   *   ne(propertyName, value) have no effect when the value is null. The expression factory adds a NoopExpression
+   *   which will add "1=1" into the SQL rather than "is null".
+   * </p>
+   */
+  public void setExpressionEqualsWithNullAsNoop(boolean expressionEqualsWithNullAsNoop) {
+    this.expressionEqualsWithNullAsNoop = expressionEqualsWithNullAsNoop;
   }
 }

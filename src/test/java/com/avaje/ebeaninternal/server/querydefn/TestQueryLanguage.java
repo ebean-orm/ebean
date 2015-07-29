@@ -87,7 +87,7 @@ public class TestQueryLanguage extends BaseTestCase {
     OrmQueryDetailParser p = new OrmQueryDetailParser(q);
     p.parse();
     DefaultOrmQuery<Order> qry = new DefaultOrmQuery<Order>(Order.class, server,
-        new DefaultExpressionFactory(), (String) null);
+        new DefaultExpressionFactory(false), (String) null);
     p.assign(qry);
 
     return qry;

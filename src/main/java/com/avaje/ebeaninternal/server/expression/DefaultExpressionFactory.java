@@ -22,8 +22,10 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
 
   private static final Object[] EMPTY_ARRAY = new Object[] {};
 
+  private final boolean equalsWithNullAsNoop;
 
-  public DefaultExpressionFactory() {
+  public DefaultExpressionFactory(boolean equalsWithNullAsNoop) {
+    this.equalsWithNullAsNoop = equalsWithNullAsNoop;
   }
 
   public ExpressionFactory createExpressionFactory(){
@@ -39,7 +41,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   public Expression eq(String propertyName, Object value) {
     if (value == null) {
-      return isNull(propertyName);
+      return equalsWithNullAsNoop ? NoopExpression.INSTANCE : isNull(propertyName);
     }
     return new SimpleExpression(propertyName, SimpleExpression.Op.EQ, value);
   }
@@ -49,7 +51,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   public Expression ne(String propertyName, Object value) {
     if (value == null) {
-      return isNotNull(propertyName);
+      return equalsWithNullAsNoop ? NoopExpression.INSTANCE : isNotNull(propertyName);
     }
     return new SimpleExpression(propertyName, SimpleExpression.Op.NOT_EQ, value);
   }
@@ -60,7 +62,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   public Expression ieq(String propertyName, String value) {
     if (value == null) {
-      return isNull(propertyName);
+      return equalsWithNullAsNoop ? NoopExpression.INSTANCE : isNull(propertyName);
     }
     return new CaseInsensitiveEqualExpression(propertyName, value);
   }

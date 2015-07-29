@@ -106,7 +106,7 @@ public class InternalConfiguration {
     this.cacheManager = cacheManager;
     this.serverConfig = serverConfig;
     this.bootupClasses = bootupClasses;
-    this.expressionFactory = new DefaultExpressionFactory();
+    this.expressionFactory = new DefaultExpressionFactory(serverConfig.isExpressionEqualsWithNullAsNoop());
 
     this.typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
     this.binder = new Binder(typeManager);
