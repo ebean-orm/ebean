@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Property mapped to a List Set or Map.
@@ -180,9 +181,27 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     help.add(bc, detailBean);
   }
 
-  public boolean isEmptyBeanCollection(EntityBean bean) {
+  /**
+   * Return true if this is considered 'empty' from a save perspective.
+   */
+  public boolean isEmptyBeanCollection(EntityBean bean, boolean insertedParent) {
     Object val = getValue(bean);
-    return val == null || (val instanceof BeanCollection<?>) && ((BeanCollection<?>) val).isEmptyAndUntouched();
+    if (val == null) {
+      return true;
+    }
+    if ((val instanceof BeanCollection<?>)) {
+      return ((BeanCollection<?>) val).isEmptyAndUntouched();
+    }
+    if (insertedParent) {
+      // check 'vanilla' collection types
+      if (val instanceof Collection<?>){
+        return ((Collection<?>) val).isEmpty();
+      }
+      if (val instanceof Map<?,?>) {
+        return ((Map<?,?>) val).isEmpty();
+      }
+    }
+    return false;
   }
 
   /**
