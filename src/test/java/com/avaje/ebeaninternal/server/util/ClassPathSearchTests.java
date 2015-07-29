@@ -49,7 +49,8 @@ public class ClassPathSearchTests {
 		filter.includeJar("WEB-INF");
 		filter.setDefaultJarMatch(false);
 
-		ClassPathSearch search = new ClassPathSearch(cl, filter, new ClassPathSearchMatcher() {
+		ClassPathSearch search = new ClassPathSearch();
+		search.init(cl, filter, new ClassPathSearchMatcher() {
 			@Override
 			public boolean isMatch(Class<?> cls) {
 				return true;
@@ -67,7 +68,8 @@ public class ClassPathSearchTests {
 		filter.includePackage("com.avaje.ebeaninternal.server");
 		filter.includeJar("bang");
 
-		search = new ClassPathSearch(cl, filter, new ClassPathSearchMatcher() {
+		search = new ClassPathSearch();
+		search.init(cl, filter, new ClassPathSearchMatcher() {
 			@Override
 			public boolean isMatch(Class<?> cls) {
 				return true;

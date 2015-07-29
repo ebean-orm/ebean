@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.util;
 
+import com.avaje.ebeaninternal.api.ClassPathSearchService;
 import com.avaje.ebeaninternal.api.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +23,14 @@ import java.util.jar.Manifest;
  * For example, used to find all the Entity beans and ScalarTypes for Ebean.
  * </p>
  */
-public class ClassPathSearch {
+public class ClassPathSearch implements ClassPathSearchService {
 
   private static final Logger logger = LoggerFactory.getLogger(ClassPathSearch.class);
 
   private ClassLoader classLoader;
 
   private List<Object> classPath = new ArrayList<Object>();
-  
+
   private ClassPathSearchFilter filter;
 
   private ClassPathSearchMatcher matcher;
@@ -44,7 +45,12 @@ public class ClassPathSearch {
 
   private ArrayList<URI> scannedUris = new ArrayList<URI>();
 
-  public ClassPathSearch(ClassLoader classLoader, ClassPathSearchFilter filter, ClassPathSearchMatcher matcher, String classPathReaderClassName) {
+  public ClassPathSearch() {
+    // Default Construct
+  }
+
+  @Override
+  public void init(ClassLoader classLoader, ClassPathSearchFilter filter, ClassPathSearchMatcher matcher, String classPathReaderClassName) {
     this.classLoader = classLoader;
     this.filter = filter;
     this.matcher = matcher;
@@ -66,7 +72,7 @@ public class ClassPathSearch {
       if (rawClassPaths == null || rawClassPaths.length == 0) {
         logger.warn("ClassPath is EMPTY using ClassPathReader [" + classPathReader + "]");
         return;
-      } 
+      }
 
       for (int i = 0; i < rawClassPaths.length; i++) {
         // check for a jarfile with a manifest classpath (e.g. maven surefire)
@@ -77,17 +83,17 @@ public class ClassPathSearch {
           classPath.addAll(classPathFromManifest);
         }
       }
-      
+
       if (rawClassPaths.length == 1) {
         // look to add an 'outer' jar when it contains a manifest classpath
         if (!classPath.contains(rawClassPaths[0])) {
           classPath.add(rawClassPaths[0]);
         }
       }
-      
+
       if (logger.isDebugEnabled()) {
         for (Object entry : classPath) {
-          logger.debug("Classpath Entry: {}",entry);
+          logger.debug("Classpath Entry: {}", entry);
         }
       }
 
@@ -99,6 +105,7 @@ public class ClassPathSearch {
   /**
    * Return the set of jars that contained classes that matched.
    */
+  @Override
   public Set<String> getJarHits() {
     return jarHits;
   }
@@ -106,6 +113,7 @@ public class ClassPathSearch {
   /**
    * Return the set of packages that contained classes that matched.
    */
+  @Override
   public Set<String> getPackageHits() {
     return packageHits;
   }
@@ -131,6 +139,7 @@ public class ClassPathSearch {
   /**
    * Searches the class path for all matching classes.
    */
+  @Override
   public List<Class<?>> findClasses() throws IOException {
 
     if (classPath.isEmpty()) {
@@ -153,7 +162,7 @@ public class ClassPathSearch {
         }
 
       } else {
-        logger.error("Error: expected classPath entry [" + element+ "] to be a directory or a .jar file but it is not either of those?");
+        logger.error("Error: expected classPath entry [" + element + "] to be a directory or a .jar file but it is not either of those?");
       }
     }
 
@@ -167,18 +176,18 @@ public class ClassPathSearch {
   private ClassPathElement getClassPathElement(Object classPathEntry) throws MalformedURLException {
 
     URL fileUrl = null;
-    
+
     if (URI.class.isInstance(classPathEntry)) {
-      fileUrl = ((URI)classPathEntry).toURL();
-      
+      fileUrl = ((URI) classPathEntry).toURL();
+
     } else if (!URL.class.isInstance(classPathEntry)) {
       // assumed to be a file path
       return new ClassPathElement(classPathEntry.toString());
-    
+
     } else {
       fileUrl = (URL) classPathEntry;
     }
-    
+
     if (!fileUrl.getPath().contains("!")) {
       return new ClassPathElement(new File(fileUrl.getFile()));
     }
@@ -229,7 +238,7 @@ public class ClassPathSearch {
       for (URI uri : classPathFromManifest) {
         scanUri(uri);
       }
-      
+
       searchFiles(module.entries(), classPathEntry.getJarName(), classPathEntry.jarOffset);
 
     } catch (MalformedURLException ex) {
@@ -275,22 +284,20 @@ public class ClassPathSearch {
   /**
    * Searches through the Java Archive (jar or war file) looking for classes
    * that match our requirements.
-   * 
-   * @param files
-   *          - all of the files in the Java Archive, this is an enumeration
-   *          provided by the Jar file
-   * @param jarFileName
-   *          - the name of the java archive
-   * @param jarOffset
-   *          - an offset inside the archive to chop off the name of the class -
-   *          this is used when we have bang path offsets (e.g.
-   *          file:///myfile.war!/WEB-INF/classes)
+   *
+   * @param files       - all of the files in the Java Archive, this is an enumeration
+   *                    provided by the Jar file
+   * @param jarFileName - the name of the java archive
+   * @param jarOffset   - an offset inside the archive to chop off the name of the class -
+   *                    this is used when we have bang path offsets (e.g.
+   *                    file:///myfile.war!/WEB-INF/classes)
    */
   private void searchFiles(Enumeration<?> files, String jarFileName, String jarOffset) {
 
     if (files == null) {
       return;
     }
+
     /*
      * Strips the first character off as all entries in a jar file have no /
      * prefix. We want to come out with a name like WEB-INF/classes/ to ensure
@@ -381,7 +388,7 @@ public class ClassPathSearch {
 
     try {
       if (classPathElement instanceof URL) {
-        File file = new File(((URL)classPathElement).getFile());
+        File file = new File(((URL) classPathElement).getFile());
         if (file.isDirectory()) {
           return Collections.emptyList();
         }
@@ -393,12 +400,12 @@ public class ClassPathSearch {
         }
       }
       return Collections.emptyList();
-      
+
     } catch (IOException e) {
       return Collections.emptyList();
     }
   }
-  
+
   /**
    * If a jarfile with a manifest claspath return that.
    */
@@ -492,4 +499,5 @@ public class ClassPathSearch {
       return (jarOffset == null) ? classPath.getName() : classPath.getName() + "!" + jarOffset;
     }
   }
+
 }
