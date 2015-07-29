@@ -53,7 +53,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
    * If true then a disjunction which means outer joins are required.
    */
   private final boolean disjunction;
-  
+
   JunctionExpression(boolean disjunction, String joinType, com.avaje.ebean.Query<T> query, ExpressionList<T> parent) {
     this.disjunction = disjunction;
     this.joinType = joinType;
@@ -71,7 +71,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
       // turn on outer joins required for disjunction expressions
       manyWhereJoin.setRequireOuterJoins(true);
     }
-    
+
     for (int i = 0; i < list.size(); i++) {
       list.get(i).containsMany(desc, manyWhereJoin);
     }
@@ -282,7 +282,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
     return exprList.findMap(keyProperty, keyType);
   }
-  
+
   @Override
   public PagedList<T> findPagedList(int pageIndex, int pageSize) {
     return exprList.findPagedList(pageIndex, pageSize);
@@ -385,12 +385,12 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
 
   @Override
   public ExpressionList<T> exists(Query<?> subQuery) {
-	return exprList.exists(subQuery);
+    return exprList.exists(subQuery);
   }
-  
+
   @Override
   public ExpressionList<T> notExists(Query<?> subQuery) {
-	return exprList.exists(subQuery);
+    return exprList.exists(subQuery);
   }
 
   @Override

@@ -79,19 +79,19 @@ class LikeExpression extends AbstractExpression {
       value = value.toLowerCase();
     }
     switch (type) {
-    case RAW:
-      return value;
-    case STARTS_WITH:
-      return value + "%";
-    case ENDS_WITH:
-      return "%" + value;
-    case CONTAINS:
-      return "%" + value + "%";
-    case EQUAL_TO:
-      return value;
+      case RAW:
+        return value;
+      case STARTS_WITH:
+        return value + "%";
+      case ENDS_WITH:
+        return "%" + value;
+      case CONTAINS:
+        return "%" + value + "%";
+      case EQUAL_TO:
+        return value;
 
-    default:
-      throw new RuntimeException("LikeType " + type + " missed?");
+      default:
+        throw new RuntimeException("LikeType " + type + " missed?");
     }
   }
 

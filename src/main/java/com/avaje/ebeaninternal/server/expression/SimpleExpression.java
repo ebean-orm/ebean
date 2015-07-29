@@ -11,22 +11,16 @@ public class SimpleExpression extends AbstractExpression {
   private static final long serialVersionUID = -382881395755603790L;
 
   enum Op {
-    EQ(" = ? ", " = "), NOT_EQ(" <> ? ", " <> "), LT(" < ? ", " < "), LT_EQ(" <= ? ", " <= "), GT(" > ? ", " > "), GT_EQ(" >= ? ", " >= ");
+    EQ(" = ? "), NOT_EQ(" <> ? "), LT(" < ? "), LT_EQ(" <= ? "), GT(" > ? "), GT_EQ(" >= ? ");
 
     String exp;
-    String shortDesc;
 
-    Op(String exp, String shortDesc) {
+    Op(String exp) {
       this.exp = exp;
-      this.shortDesc = shortDesc;
     }
 
     public String bind() {
       return exp;
-    }
-
-    public String shortDesc() {
-      return shortDesc;
     }
   }
 
@@ -61,11 +55,10 @@ public class SimpleExpression extends AbstractExpression {
         // bind the key as well as the value
         String encryptKey = prop.getBeanProperty().getEncryptKey().getStringValue();
         request.addBindValue(encryptKey);
-      } else if (prop.isLocalEncrypted()) {
-        // not supporting this for equals (but probably could)
-        // prop.getBeanProperty().getScalarType();
-
       }
+      //else if (prop.isLocalEncrypted()) {
+      // not supporting this for equals (but probably could)
+      // prop.getBeanProperty().getScalarType();
     }
 
     request.addBindValue(value);

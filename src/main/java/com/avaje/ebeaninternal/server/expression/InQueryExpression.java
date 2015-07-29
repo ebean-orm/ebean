@@ -11,8 +11,6 @@ import com.avaje.ebeaninternal.server.query.CQuery;
 
 /**
  * In expression using a sub query.
- * 
- * @authors Mario and Rob
  */
 class InQueryExpression extends AbstractExpression {
 

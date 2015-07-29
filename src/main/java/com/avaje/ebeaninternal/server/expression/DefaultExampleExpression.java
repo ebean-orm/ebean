@@ -215,10 +215,9 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
         if (value instanceof String) {
           list.add(new LikeExpression(propName, (String) value, caseInsensitive, likeType));
         } else {
-          if (!includeZeros && isZero(value)) {
-            // exclude the zero values typically to weed out
-            // primitive int and long that initialise to 0
-          } else {
+          // exclude the zero values typically to weed out
+          // primitive int and long that initialise to 0
+          if (includeZeros || !isZero(value)) {
             list.add(new SimpleExpression(propName, SimpleExpression.Op.EQ, value));
           }
         }

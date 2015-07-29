@@ -9,8 +9,6 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
 /**
  * Base class for simple expressions.
- * 
- * @author rbygrave
  */
 public abstract class AbstractExpression implements SpiExpression {
 

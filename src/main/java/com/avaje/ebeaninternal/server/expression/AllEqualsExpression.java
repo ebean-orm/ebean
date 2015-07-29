@@ -42,10 +42,9 @@ class AllEqualsExpression implements SpiExpression {
       return;
     }
     for (Object value : propMap.values()) {
+      // null value uses is null clause
       if (value != null) {
         request.addBindValue(value);
-      } else {
-        // null value uses is null clause
       }
     }
   }
@@ -59,8 +58,8 @@ class AllEqualsExpression implements SpiExpression {
     request.append("(");
 
     int count = 0;
-    for (Map.Entry<String,Object> entry : propMap.entrySet()) {
-       
+    for (Map.Entry<String, Object> entry : propMap.entrySet()) {
+
       Object value = entry.getValue();
       String propName = entry.getKey();
 
@@ -89,12 +88,12 @@ class AllEqualsExpression implements SpiExpression {
 
     builder.add(AllEqualsExpression.class);
 
-    for (Entry<String, Object> entry :  propMap.entrySet()) {
+    for (Entry<String, Object> entry : propMap.entrySet()) {
       Object value = entry.getValue();
       String propName = entry.getKey();
       builder.add(propName).add(value == null ? 0 : 1);
-      builder.bind(value == null ? 0 : 1);      
-    }    
+      builder.bind(value == null ? 0 : 1);
+    }
   }
 
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
@@ -102,7 +101,7 @@ class AllEqualsExpression implements SpiExpression {
   }
 
   public int queryBindHash() {
-    
+
     int hc = 31;
     for (Object value : propMap.values()) {
       hc = hc * 31 + (value == null ? 0 : value.hashCode());
