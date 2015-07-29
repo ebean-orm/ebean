@@ -26,6 +26,10 @@ package com.avaje.test.springsupport;
  * @author E Mc Greal
  */
 public interface UserService {
-	public void save(User user);
-	public User find(long oid);
+
+  void save(User user);
+
+	User find(long id);
+
+  void batchInsert();
 }

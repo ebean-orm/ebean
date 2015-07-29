@@ -20,11 +20,16 @@
 
 package com.avaje.test.springsupport;
 
+import com.avaje.ebean.Transaction;
+import com.avaje.ebean.config.PersistBatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.avaje.ebean.EbeanServer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The Class UserServiceImpl.
@@ -47,15 +52,35 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
-	public User find(long oid) {
-		return ebeanServer.find(User.class, oid);
+	public User find(long id) {
+		return ebeanServer.find(User.class, id);
 	}
 
 
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+  public void batchInsert(){
+
+    List<User> users = new ArrayList<User>();
+    for(int i=0 ;i<5;i++){
+      User user = new User();
+      user.setName("user"+i);
+      users.add(user);
+    }
+
+    System.out.println("---------before batch-------");
+
+    Transaction tx = ebeanServer.beginTransaction();
+    tx.setBatch(PersistBatch.NONE);
+    tx.setBatchOnCascade(PersistBatch.ALL);
+    tx.setBatchSize(20);
+    ebeanServer.saveAll(users);//
+
+    System.out.println("---------after batch-------");
+  }
+
+
 	/**
-	 * Gets the ebean server.
-	 *
-	 * @return the ebeanServer
+	 * Return the ebean server.
 	 */
 	public EbeanServer getEbeanServer() {
 		return ebeanServer;
@@ -63,8 +88,6 @@ public class UserServiceImpl implements UserService {
 
 	/**
 	 * Sets the ebean server.
-	 *
-	 * @param ebeanServer the ebeanServer to set
 	 */
 	public void setEbeanServer(EbeanServer ebeanServer) {
 		this.ebeanServer = ebeanServer;

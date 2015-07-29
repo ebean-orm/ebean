@@ -14,11 +14,15 @@
 	<tx:annotation-driven transaction-manager="transactionManager" />
 	<context:annotation-config />
 
-	<!-- The real DataSource  -->
-	<bean id="dataSource"
-		class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName" value="java:comp/env/jdbc/ebeantest" />
-	</bean>
+  <bean id="dataSource" class="org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy">
+    <constructor-arg>
+      <bean class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="org.h2.Driver" />
+        <property name="url"
+                  value="jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1" />
+      </bean>
+    </constructor-arg>
+  </bean>
 
 	<!--  Transaction Manager -->
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
