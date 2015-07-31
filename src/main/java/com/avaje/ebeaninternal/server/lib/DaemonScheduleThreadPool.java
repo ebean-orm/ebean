@@ -20,7 +20,7 @@ public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor 
 
   private final String namePrefix;
 
-  private int shutdownWaitSeconds;
+  private final int shutdownWaitSeconds;
 
   /**
    * Construct the DaemonScheduleThreadPool.

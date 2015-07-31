@@ -27,33 +27,33 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
   private static final Logger logger = LoggerFactory.getLogger(BootupClasses.class);
 
-  private ArrayList<Class<?>> embeddableList = new ArrayList<Class<?>>();
+  private final ArrayList<Class<?>> embeddableList = new ArrayList<Class<?>>();
 
-  private ArrayList<Class<?>> entityList = new ArrayList<Class<?>>();
+  private final ArrayList<Class<?>> entityList = new ArrayList<Class<?>>();
 
-  private ArrayList<Class<?>> scalarTypeList = new ArrayList<Class<?>>();
+  private final ArrayList<Class<?>> scalarTypeList = new ArrayList<Class<?>>();
 
-  private ArrayList<Class<?>> scalarConverterList = new ArrayList<Class<?>>();
+  private final ArrayList<Class<?>> scalarConverterList = new ArrayList<Class<?>>();
 
-  private ArrayList<Class<?>> compoundTypeList = new ArrayList<Class<?>>();
+  private final ArrayList<Class<?>> compoundTypeList = new ArrayList<Class<?>>();
 
-  private ArrayList<Class<?>> beanControllerList = new ArrayList<Class<?>>();
+  private final ArrayList<Class<?>> beanControllerList = new ArrayList<Class<?>>();
 
-  private ArrayList<Class<?>> transactionEventListenerList = new ArrayList<Class<?>>();
+  private final ArrayList<Class<?>> transactionEventListenerList = new ArrayList<Class<?>>();
 
-  private ArrayList<Class<?>> beanFindControllerList = new ArrayList<Class<?>>();
-  private ArrayList<Class<?>> beanQueryAdapterList = new ArrayList<Class<?>>();
+  private final ArrayList<Class<?>> beanFindControllerList = new ArrayList<Class<?>>();
+  private final ArrayList<Class<?>> beanQueryAdapterList = new ArrayList<Class<?>>();
 
-  private ArrayList<Class<?>> beanListenerList = new ArrayList<Class<?>>();
+  private final ArrayList<Class<?>> beanListenerList = new ArrayList<Class<?>>();
 
-  private ArrayList<Class<?>> serverConfigStartupList = new ArrayList<Class<?>>();
-  private ArrayList<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<ServerConfigStartup>();
+  private final ArrayList<Class<?>> serverConfigStartupList = new ArrayList<Class<?>>();
+  private final ArrayList<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<ServerConfigStartup>();
 
-  private List<BeanFindController> findControllerInstances = new ArrayList<BeanFindController>();
-  private List<BeanPersistController> persistControllerInstances = new ArrayList<BeanPersistController>();
-  private List<BeanPersistListener> persistListenerInstances = new ArrayList<BeanPersistListener>();
-  private List<BeanQueryAdapter> queryAdapterInstances = new ArrayList<BeanQueryAdapter>();
-  private List<TransactionEventListener> transactionEventListenerInstances = new ArrayList<TransactionEventListener>();
+  private final List<BeanFindController> findControllerInstances = new ArrayList<BeanFindController>();
+  private final List<BeanPersistController> persistControllerInstances = new ArrayList<BeanPersistController>();
+  private final List<BeanPersistListener> persistListenerInstances = new ArrayList<BeanPersistListener>();
+  private final List<BeanQueryAdapter> queryAdapterInstances = new ArrayList<BeanQueryAdapter>();
+  private final List<TransactionEventListener> transactionEventListenerInstances = new ArrayList<TransactionEventListener>();
 
   public BootupClasses() {
   }

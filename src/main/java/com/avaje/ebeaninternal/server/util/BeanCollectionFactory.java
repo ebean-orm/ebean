@@ -19,7 +19,7 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 public class BeanCollectionFactory {
 
 	private static class BeanCollectionFactoryHolder {
-		private static BeanCollectionFactory me = new BeanCollectionFactory();
+		private static final BeanCollectionFactory me = new BeanCollectionFactory();
 	}
 	
     private static final int defaultListInitialCapacity = 20;

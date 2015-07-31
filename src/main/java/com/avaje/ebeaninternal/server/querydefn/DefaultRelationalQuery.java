@@ -22,7 +22,7 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
 
 	private static final long serialVersionUID = -1098305779779591068L;
 
-	private transient EbeanServer server;
+	private final transient EbeanServer server;
 
 	private transient SqlQueryListener queryListener;
 
@@ -58,7 +58,7 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
     /**
      * Bind parameters when using the query language.
      */
-	private BindParams bindParams = new BindParams();
+	private final BindParams bindParams = new BindParams();
     
 	/**
 	 * Additional supply a query detail object.

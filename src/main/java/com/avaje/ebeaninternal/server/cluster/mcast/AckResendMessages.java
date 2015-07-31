@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class AckResendMessages {
 
-    ArrayList<Message> messages = new ArrayList<Message>();
+    final ArrayList<Message> messages = new ArrayList<Message>();
     
     public String toString() {
         return messages.toString();

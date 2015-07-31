@@ -18,13 +18,13 @@ public class ClassPathSearchFilter {
 
 	private String ebeanJarPrefix = "ebean";
 
-	private HashSet<String> includePackageSet = new HashSet<String>();
+	private final HashSet<String> includePackageSet = new HashSet<String>();
 
-	private HashSet<String> excludePackageSet = new HashSet<String>();
+	private final HashSet<String> excludePackageSet = new HashSet<String>();
 
-	private HashSet<String> includeJarSet = new HashSet<String>();
+	private final HashSet<String> includeJarSet = new HashSet<String>();
 
-	private HashSet<String> excludeJarSet = new HashSet<String>();
+	private final HashSet<String> excludeJarSet = new HashSet<String>();
 
 	public ClassPathSearchFilter() {
 		addDefaultExcludePackages();

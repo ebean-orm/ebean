@@ -15,11 +15,11 @@ import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 
 public class BeanPathUpdateIds {
     
-    private transient BeanDescriptor<?> beanDescriptor;
+    private final transient BeanDescriptor<?> beanDescriptor;
 
     private final String descriptorId;
 
-    private String path;
+    private final String path;
     
     private ArrayList<Serializable> ids;
     

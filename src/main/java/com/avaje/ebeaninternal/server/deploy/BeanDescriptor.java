@@ -147,7 +147,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   private volatile BeanPersistListener persistListener;
 
-  private volatile BeanQueryAdapter queryAdapter;
+  private final BeanQueryAdapter queryAdapter;
 
   /**
    * If set overrides the find implementation. Server side only.

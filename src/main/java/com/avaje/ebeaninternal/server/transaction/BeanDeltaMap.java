@@ -9,7 +9,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 public class BeanDeltaMap {
 
-    private Map<String,BeanDeltaList> deltaMap = new HashMap<String,BeanDeltaList>();
+    private final Map<String,BeanDeltaList> deltaMap = new HashMap<String,BeanDeltaList>();
 
     public BeanDeltaMap() {
     }

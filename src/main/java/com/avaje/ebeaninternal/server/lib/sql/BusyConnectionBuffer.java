@@ -27,7 +27,7 @@ class BusyConnectionBuffer {
   
     private PooledConnection[] slots;
     
-    private int growBy;
+    private final int growBy;
     
     private int size;
     

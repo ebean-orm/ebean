@@ -42,12 +42,12 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 	/**
 	 * Map of the usage and query statistics gathered.
 	 */
-	private Map<String, Statistics> statisticsMap = new ConcurrentHashMap<String, Statistics>();
+	private final Map<String, Statistics> statisticsMap = new ConcurrentHashMap<String, Statistics>();
 
 	/**
 	 * Map of the tuned query details per profile query point.
 	 */
-	private Map<String, TunedQueryInfo> tunedQueryInfoMap = new ConcurrentHashMap<String, TunedQueryInfo>();
+	private final Map<String, TunedQueryInfo> tunedQueryInfoMap = new ConcurrentHashMap<String, TunedQueryInfo>();
 
 	private transient long defaultGarbageCollectionWait = 100;
 

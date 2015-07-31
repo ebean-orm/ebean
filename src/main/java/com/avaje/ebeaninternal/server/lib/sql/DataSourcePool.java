@@ -111,7 +111,7 @@ public class DataSourcePool implements DataSource {
     /**
      * The max size of the stack trace to report.
      */
-    private int maxStackTraceSize;
+    private final int maxStackTraceSize;
 
     /**
      * flag to indicate we have sent an alert message.

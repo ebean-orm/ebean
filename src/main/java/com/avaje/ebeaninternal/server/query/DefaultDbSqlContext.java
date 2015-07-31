@@ -39,7 +39,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
   private HashSet<String> tableJoins;
 
-  private SqlTreeAlias alias;
+  private final SqlTreeAlias alias;
 
   private String currentPrefix;
 

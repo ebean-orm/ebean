@@ -56,7 +56,7 @@ public class DefaultServerCache implements ServerCache {
 
   protected int maxSize;
 
-  protected int trimFrequency;
+  protected final int trimFrequency;
 
   protected int maxIdleSecs;
 

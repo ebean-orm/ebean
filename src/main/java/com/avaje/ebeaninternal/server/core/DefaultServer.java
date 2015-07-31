@@ -131,17 +131,17 @@ public final class DefaultServer implements SpiEbeanServer {
   /**
    * The default batch size for lazy loading beans or collections.
    */
-  private int lazyLoadBatchSize;
+  private final int lazyLoadBatchSize;
 
   /** 
    * The query batch size 
    */
-  private int queryBatchSize;
+  private final int queryBatchSize;
 
   /**
    * JDBC driver specific handling for JDBC batch execution.
    */
-  private PstmtBatch pstmtBatch;
+  private final PstmtBatch pstmtBatch;
 
   /**
    * holds plugins (e.g. ddl generator) detected by the service loader

@@ -29,21 +29,21 @@ public class ClassPathSearch implements ClassPathSearchService {
 
   private ClassLoader classLoader;
 
-  private List<Object> classPath = new ArrayList<Object>();
+  private final List<Object> classPath = new ArrayList<Object>();
 
   private ClassPathSearchFilter filter;
 
   private ClassPathSearchMatcher matcher;
 
-  private ArrayList<Class<?>> matchList = new ArrayList<Class<?>>();
+  private final ArrayList<Class<?>> matchList = new ArrayList<Class<?>>();
 
-  private HashSet<String> jarHits = new HashSet<String>();
+  private final HashSet<String> jarHits = new HashSet<String>();
 
-  private HashSet<String> packageHits = new HashSet<String>();
+  private final HashSet<String> packageHits = new HashSet<String>();
 
   private ClassPathReader classPathReader = new DefaultClassPathReader();
 
-  private ArrayList<URI> scannedUris = new ArrayList<URI>();
+  private final ArrayList<URI> scannedUris = new ArrayList<URI>();
 
   public ClassPathSearch() {
     // Default Construct

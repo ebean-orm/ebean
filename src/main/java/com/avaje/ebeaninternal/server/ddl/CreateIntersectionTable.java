@@ -21,13 +21,13 @@ public class CreateIntersectionTable {
 	private final TableJoin intersectionTableJoin;
 	private final TableJoin tableJoin;
 
-	private StringBuilder sb = new StringBuilder();
+	private final StringBuilder sb = new StringBuilder();
 
-	private StringBuilder pkeySb = new StringBuilder();
+	private final StringBuilder pkeySb = new StringBuilder();
 
 	private int foreignKeyCount;
 	
-	private int maxFkeyLength;
+	private final int maxFkeyLength;
 	
 	public CreateIntersectionTable(DdlGenContext ctx, BeanPropertyAssocMany<?> manyProp) {
 		this.ctx = ctx;

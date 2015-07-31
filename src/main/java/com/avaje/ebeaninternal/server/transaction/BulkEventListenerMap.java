@@ -47,8 +47,8 @@ public class BulkEventListenerMap {
     }
 
 	private static class Entry {
-		
-		List<BulkTableEventListener> listeners = new ArrayList<BulkTableEventListener>();
+
+    final List<BulkTableEventListener> listeners = new ArrayList<BulkTableEventListener>();
 		private void add(BulkTableEventListener l) {
 			listeners.add(l);
 		}

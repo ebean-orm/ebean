@@ -25,7 +25,7 @@ public class BatchedPstmtHolder {
    * A Map of the statements using a String key. This is used so that the same
    * Statement,Prepared,Callable is reused.
    */
-  private LinkedHashMap<String, BatchedPstmt> stmtMap = new LinkedHashMap<String, BatchedPstmt>();
+  private final LinkedHashMap<String, BatchedPstmt> stmtMap = new LinkedHashMap<String, BatchedPstmt>();
 
   /**
    * The Max size across all the BatchedPstmt.

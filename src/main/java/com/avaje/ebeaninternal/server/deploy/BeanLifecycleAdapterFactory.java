@@ -57,13 +57,13 @@ public class BeanLifecycleAdapterFactory {
   private static class MethodsHolder {
 
     private boolean hasListener;
-    private List<Method> preInserts = new ArrayList<Method>();
-    private List<Method> postInserts = new ArrayList<Method>();
-    private List<Method> preUpdates = new ArrayList<Method>();
-    private List<Method> postUpdates = new ArrayList<Method>();
-    private List<Method> preDeletes = new ArrayList<Method>();
-    private List<Method> postDeletes = new ArrayList<Method>();
-    private List<Method> postLoads = new ArrayList<Method>();
+    private final List<Method> preInserts = new ArrayList<Method>();
+    private final List<Method> postInserts = new ArrayList<Method>();
+    private final List<Method> preUpdates = new ArrayList<Method>();
+    private final List<Method> postUpdates = new ArrayList<Method>();
+    private final List<Method> preDeletes = new ArrayList<Method>();
+    private final List<Method> postDeletes = new ArrayList<Method>();
+    private final List<Method> postLoads = new ArrayList<Method>();
 
     private boolean hasListener() {
       return hasListener;

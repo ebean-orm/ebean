@@ -43,10 +43,10 @@ public class DdlGenContext {
 	 */
 	private final List<String> contentBuffer = new ArrayList<String>();
 
-	private Set<String> intersectionTables = new HashSet<String>();
+	private final Set<String> intersectionTables = new HashSet<String>();
 
-	private List<String> intersectionTablesCreateDdl = new ArrayList<String>();
-	private List<String> intersectionTablesFkDdl = new ArrayList<String>();
+	private final List<String> intersectionTablesCreateDdl = new ArrayList<String>();
+	private final List<String> intersectionTablesFkDdl = new ArrayList<String>();
 
 	private final DatabasePlatform dbPlatform;
 	

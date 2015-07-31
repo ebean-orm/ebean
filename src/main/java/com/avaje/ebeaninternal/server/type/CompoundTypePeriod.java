@@ -13,7 +13,7 @@ import java.time.Period;
  */
 public class CompoundTypePeriod implements CompoundType<Period> {
 
-  CompoundTypeProperty[] properties = new CompoundTypeProperty[3];
+  final CompoundTypeProperty[] properties = new CompoundTypeProperty[3];
 
   public CompoundTypePeriod() {
     properties[0] = new CTPeriodYear();

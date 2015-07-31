@@ -20,9 +20,9 @@ public class BindParams implements Serializable {
 
 	private static final long serialVersionUID = 4541081933302086285L;
 
-	private List<Param> positionedParameters = new ArrayList<Param>();
+	private final List<Param> positionedParameters = new ArrayList<Param>();
 
-	private Map<String, Param> namedParameters = new LinkedHashMap<String, Param>();
+	private final Map<String, Param> namedParameters = new LinkedHashMap<String, Param>();
 	
 	/**
 	 * This is the sql. For named parameters this is the sql after the named

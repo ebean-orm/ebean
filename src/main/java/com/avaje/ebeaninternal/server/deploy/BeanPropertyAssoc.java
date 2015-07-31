@@ -64,7 +64,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	 */
 	final boolean isOuterJoin;
 
-	String extraWhere;
+	final String extraWhere;
 
 	boolean saveRecurseSkippable;
 

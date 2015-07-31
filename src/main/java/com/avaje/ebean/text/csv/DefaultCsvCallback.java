@@ -42,12 +42,12 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
   /**
    * Used to log a message to indicate progress through large files.
    */
-  protected int logInfoFrequency;
+  protected final int logInfoFrequency;
 
   /**
    * The batch size used when saving the beans.
    */
-  protected int persistBatchSize;
+  protected final int persistBatchSize;
 
   /**
    * The time the process started.

@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class BinaryMessageList {
 
-    ArrayList<BinaryMessage> list = new ArrayList<BinaryMessage>();
+    final ArrayList<BinaryMessage> list = new ArrayList<BinaryMessage>();
     
     public void add(BinaryMessage msg) {
         list.add(msg);

@@ -16,7 +16,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   private final String dbColumn;
   private final boolean containsMany;
 
-  private int deployOrder;
+  private final int deployOrder;
 
   public BeanFkeyProperty(String prefix, String name, String dbColumn, int deployOrder) {
     this(prefix, name, dbColumn, deployOrder, false);
