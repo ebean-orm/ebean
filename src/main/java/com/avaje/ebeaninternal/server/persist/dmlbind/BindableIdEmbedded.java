@@ -57,7 +57,7 @@ public final class BindableIdEmbedded implements BindableId {
 
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
-    EntityBean idValue = (EntityBean)embId.getValue(bean);
+    EntityBean idValue = (EntityBean) embId.getValue(bean);
 
     for (int i = 0; i < props.length; i++) {
 
@@ -86,7 +86,7 @@ public final class BindableIdEmbedded implements BindableId {
     EntityBean bean = persist.getEntityBean();
 
     // create the new id
-    EntityBean newId = (EntityBean)embId.createEmbeddedId();
+    EntityBean newId = (EntityBean) embId.createEmbeddedId();
 
     // populate it from the assoc one id values...
     for (int i = 0; i < matches.length; i++) {

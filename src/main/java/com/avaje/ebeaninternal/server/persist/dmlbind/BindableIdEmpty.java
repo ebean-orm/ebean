@@ -8,7 +8,7 @@ import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 
 public class BindableIdEmpty implements BindableId {
-  
+
   public boolean isEmpty() {
     return true;
   }

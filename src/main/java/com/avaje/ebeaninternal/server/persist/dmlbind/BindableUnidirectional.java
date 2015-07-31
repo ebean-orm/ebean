@@ -21,48 +21,48 @@ import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
  */
 public class BindableUnidirectional implements Bindable {
 
-    private final BeanPropertyAssocOne<?> unidirectional;
+  private final BeanPropertyAssocOne<?> unidirectional;
 
-    private final ImportedId importedId;
+  private final ImportedId importedId;
 
-    private final BeanDescriptor<?> desc;
+  private final BeanDescriptor<?> desc;
 
-    public BindableUnidirectional(BeanDescriptor<?> desc, BeanPropertyAssocOne<?> unidirectional) {
-        this.desc = desc;
-        this.unidirectional = unidirectional;
-        this.importedId = unidirectional.getImportedId();
+  public BindableUnidirectional(BeanDescriptor<?> desc, BeanPropertyAssocOne<?> unidirectional) {
+    this.desc = desc;
+    this.unidirectional = unidirectional;
+    this.importedId = unidirectional.getImportedId();
 
+  }
+
+  public String toString() {
+    return "BindableShadowFKey " + unidirectional;
+  }
+
+  public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
+    throw new PersistenceException("Never called (for insert only)");
+  }
+
+  public void dmlAppend(GenerateDmlRequest request) {
+    // always included (in insert)
+    importedId.dmlAppend(request);
+  }
+
+
+  public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
+
+    PersistRequestBean<?> persistRequest = request.getPersistRequest();
+    Object parentBean = persistRequest.getParentBean();
+
+    if (parentBean == null) {
+      Class<?> localType = desc.getBeanType();
+      Class<?> targetType = unidirectional.getTargetType();
+
+      String msg = "Error inserting bean [" + localType + "] with unidirectional relationship. ";
+      msg += "For inserts you must use cascade save on the master bean [" + targetType + "].";
+      throw new PersistenceException(msg);
     }
 
-    public String toString() {
-        return "BindableShadowFKey " + unidirectional;
-    }
-
-    public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
-        throw new PersistenceException("Never called (for insert only)");
-    }
-
-    public void dmlAppend(GenerateDmlRequest request) {
-        // always included (in insert)
-        importedId.dmlAppend(request);
-    }
-
-
-    public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
-
-        PersistRequestBean<?> persistRequest = request.getPersistRequest();
-        Object parentBean = persistRequest.getParentBean();
-
-        if (parentBean == null) {
-            Class<?> localType = desc.getBeanType();
-            Class<?> targetType = unidirectional.getTargetType();
-            
-            String msg = "Error inserting bean [" + localType + "] with unidirectional relationship. ";
-            msg += "For inserts you must use cascade save on the master bean [" + targetType + "].";
-            throw new PersistenceException(msg);
-        }
-
-        importedId.bind(request, (EntityBean)parentBean);
-    }
+    importedId.bind(request, (EntityBean) parentBean);
+  }
 
 }

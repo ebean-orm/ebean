@@ -19,24 +19,24 @@ public interface BindableId extends Bindable {
    * Return true if there is no Id properties at all.
    */
   boolean isEmpty();
-  
-	/**
-	 * Return true if this is a concatenated key.
-	 */
-	boolean isConcatenated();
-	
-	/**
-	 * Return the DB Column to use with genGeneratedKeys.
-	 */
-	String getIdentityColumn();
-	
-	/**
-	 * Create the concatenated id for inserts with PFK relationships.
-	 * <p>
-	 * Really only where there are ManyToOne assoc beans that make up the
-	 * primary key and the values can be got from those.
-	 * </p>
-	 */
-	boolean deriveConcatenatedId(PersistRequestBean<?> persist);
+
+  /**
+   * Return true if this is a concatenated key.
+   */
+  boolean isConcatenated();
+
+  /**
+   * Return the DB Column to use with genGeneratedKeys.
+   */
+  String getIdentityColumn();
+
+  /**
+   * Create the concatenated id for inserts with PFK relationships.
+   * <p>
+   * Really only where there are ManyToOne assoc beans that make up the
+   * primary key and the values can be got from those.
+   * </p>
+   */
+  boolean deriveConcatenatedId(PersistRequestBean<?> persist);
 
 }

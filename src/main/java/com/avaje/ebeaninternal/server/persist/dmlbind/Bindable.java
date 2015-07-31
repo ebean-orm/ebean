@@ -22,21 +22,21 @@ import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
  */
 public interface Bindable {
 
-    /**
-     * For Updates including only changed properties add the Bindable to the
-     * list if it should be included in the 'update set'.
-     */
-    void addToUpdate(PersistRequestBean<?> request, List<Bindable> list);
+  /**
+   * For Updates including only changed properties add the Bindable to the
+   * list if it should be included in the 'update set'.
+   */
+  void addToUpdate(PersistRequestBean<?> request, List<Bindable> list);
 
-    /**
-     * append sql to the buffer with prefix and suffix options.
-     */
-    void dmlAppend(GenerateDmlRequest request);
+  /**
+   * append sql to the buffer with prefix and suffix options.
+   */
+  void dmlAppend(GenerateDmlRequest request);
 
-    /**
-     * Bind given the request and bean. The bean could be the oldValues bean
-     * when binding a update or delete where clause with ALL concurrency mode.
-     */
-    void dmlBind(BindableRequest request, EntityBean bean) throws SQLException;
+  /**
+   * Bind given the request and bean. The bean could be the oldValues bean
+   * when binding a update or delete where clause with ALL concurrency mode.
+   */
+  void dmlBind(BindableRequest request, EntityBean bean) throws SQLException;
 
 }

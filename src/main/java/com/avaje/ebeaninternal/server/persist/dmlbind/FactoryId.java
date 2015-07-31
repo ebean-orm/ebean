@@ -21,7 +21,7 @@ public class FactoryId {
     if (id == null) {
       return new BindableIdEmpty();
 
-    }     
+    }
     if (!id.isEmbedded()) {
       return new BindableIdScalar(id);
 

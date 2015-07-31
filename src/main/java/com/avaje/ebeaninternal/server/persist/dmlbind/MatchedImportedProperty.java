@@ -18,69 +18,69 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
  */
 class MatchedImportedProperty {
 
-	private final BeanPropertyAssocOne<?> assocOne;
+  private final BeanPropertyAssocOne<?> assocOne;
 
-	private final BeanProperty foreignProp;
+  private final BeanProperty foreignProp;
 
-	private final BeanProperty localProp;
+  private final BeanProperty localProp;
 
-	protected MatchedImportedProperty(BeanPropertyAssocOne<?> assocOne, BeanProperty foreignProp,
-			BeanProperty localProp) {
-		this.assocOne = assocOne;
-		this.foreignProp = foreignProp;
-		this.localProp = localProp;
-	}
+  protected MatchedImportedProperty(BeanPropertyAssocOne<?> assocOne, BeanProperty foreignProp,
+                                    BeanProperty localProp) {
+    this.assocOne = assocOne;
+    this.foreignProp = foreignProp;
+    this.localProp = localProp;
+  }
 
-	protected void populate(EntityBean sourceBean, EntityBean destBean) {
-		Object assocBean = assocOne.getValue(sourceBean);
-		if (assocBean == null) {
-			String msg = "The assoc bean for " + assocOne + " is null?";
-			throw new NullPointerException(msg);
-		}
+  protected void populate(EntityBean sourceBean, EntityBean destBean) {
+    Object assocBean = assocOne.getValue(sourceBean);
+    if (assocBean == null) {
+      String msg = "The assoc bean for " + assocOne + " is null?";
+      throw new NullPointerException(msg);
+    }
 
-		Object value = foreignProp.getValue((EntityBean)assocBean);
-		localProp.setValue(destBean, value);
-	}
+    Object value = foreignProp.getValue((EntityBean) assocBean);
+    localProp.setValue(destBean, value);
+  }
 
-	/**
-	 * Create the array of matchedImportedProperty based on the properties and descriptor.
-	 */
-	 protected static MatchedImportedProperty[] build(BeanProperty[] props, BeanDescriptor<?> desc) {
+  /**
+   * Create the array of matchedImportedProperty based on the properties and descriptor.
+   */
+  protected static MatchedImportedProperty[] build(BeanProperty[] props, BeanDescriptor<?> desc) {
 
-		MatchedImportedProperty[] matches = new MatchedImportedProperty[props.length];
+    MatchedImportedProperty[] matches = new MatchedImportedProperty[props.length];
 
-		for (int i = 0; i < props.length; i++) {
-			// find matching assoc one property for dbColumn
-			matches[i] = MatchedImportedProperty.findMatch(props[i], desc);
-			if (matches[i] == null) {
-				// ok, the assoc ones are not on the bean?
-				return null;
-			}
-		}
-		return matches;
-	}
-	
-	private static MatchedImportedProperty findMatch(BeanProperty prop, BeanDescriptor<?> desc) {
+    for (int i = 0; i < props.length; i++) {
+      // find matching assoc one property for dbColumn
+      matches[i] = MatchedImportedProperty.findMatch(props[i], desc);
+      if (matches[i] == null) {
+        // ok, the assoc ones are not on the bean?
+        return null;
+      }
+    }
+    return matches;
+  }
 
-		// find matching against the local database column
-		String dbColumn = prop.getDbColumn();
+  private static MatchedImportedProperty findMatch(BeanProperty prop, BeanDescriptor<?> desc) {
 
-		BeanPropertyAssocOne<?>[] assocOnes = desc.propertiesOne();
-		for (int i = 0; i < assocOnes.length; i++) {
-			if (assocOnes[i].isImportedPrimaryKey()) {
-				
-				// search using the ImportedId from the assoc one
-				BeanProperty foreignMatch = assocOnes[i].getImportedId().findMatchImport(dbColumn);
+    // find matching against the local database column
+    String dbColumn = prop.getDbColumn();
 
-				if (foreignMatch != null) {
-					return new MatchedImportedProperty(assocOnes[i], foreignMatch, prop);
-				}
-			}
-		}
-		
-		// there was no matching assoc one property.
-		// example UserRole bean missing assoc one to User?
-		return null;
-	}
+    BeanPropertyAssocOne<?>[] assocOnes = desc.propertiesOne();
+    for (int i = 0; i < assocOnes.length; i++) {
+      if (assocOnes[i].isImportedPrimaryKey()) {
+
+        // search using the ImportedId from the assoc one
+        BeanProperty foreignMatch = assocOnes[i].getImportedId().findMatchImport(dbColumn);
+
+        if (foreignMatch != null) {
+          return new MatchedImportedProperty(assocOnes[i], foreignMatch, prop);
+        }
+      }
+    }
+
+    // there was no matching assoc one property.
+    // example UserRole bean missing assoc one to User?
+    return null;
+  }
 
 }

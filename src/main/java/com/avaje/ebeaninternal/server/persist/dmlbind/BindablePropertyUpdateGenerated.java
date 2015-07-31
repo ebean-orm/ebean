@@ -16,17 +16,17 @@ import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
  * </p>
  */
 public class BindablePropertyUpdateGenerated extends BindableProperty {
-	
-	private final GeneratedProperty gen;
-	
-	public BindablePropertyUpdateGenerated(BeanProperty prop, GeneratedProperty gen) {
-		super(prop);
-		this.gen = gen;
-	}
-	
-	/**
-	 * Add BindablePropertyUpdateGenerated if the property is loaded.
-	 */	
+
+  private final GeneratedProperty gen;
+
+  public BindablePropertyUpdateGenerated(BeanProperty prop, GeneratedProperty gen) {
+    super(prop);
+    this.gen = gen;
+  }
+
+  /**
+   * Add BindablePropertyUpdateGenerated if the property is loaded.
+   */
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     if (gen.includeInAllUpdates()) {
       list.add(this);
@@ -37,28 +37,28 @@ public class BindablePropertyUpdateGenerated extends BindableProperty {
 
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
-      Object value = gen.getUpdateValue(prop, bean);
-        
-      // generated value should be the correct type
-        request.bind(value, prop);
-        
-        // only register the update value if it was included
-        // in the bean in the first place
-        if (request.getPersistRequest().isLoadedProperty(prop)) {
-        //if (request.isIncluded(prop)) {
-	        // need to set the generated value to the bean later
-	        // after the where clause has been generated
-	        request.registerUpdateGenValue(prop, bean, value);
-        }
+    Object value = gen.getUpdateValue(prop, bean);
+
+    // generated value should be the correct type
+    request.bind(value, prop);
+
+    // only register the update value if it was included
+    // in the bean in the first place
+    if (request.getPersistRequest().isLoadedProperty(prop)) {
+      //if (request.isIncluded(prop)) {
+      // need to set the generated value to the bean later
+      // after the where clause has been generated
+      request.registerUpdateGenValue(prop, bean, value);
     }
-	
-	/**
-	 * Always bind on Insert SET.
-	 */
-	@Override
-	public void dmlAppend(GenerateDmlRequest request){
-		request.appendColumn(prop.getDbColumn());
-	}
-	
-	
+  }
+
+  /**
+   * Always bind on Insert SET.
+   */
+  @Override
+  public void dmlAppend(GenerateDmlRequest request) {
+    request.appendColumn(prop.getDbColumn());
+  }
+
+
 }

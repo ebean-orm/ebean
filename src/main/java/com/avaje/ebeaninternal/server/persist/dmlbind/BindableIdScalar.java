@@ -57,7 +57,7 @@ public final class BindableIdScalar implements BindableId {
     request.appendColumn(uidProp.getDbColumn());
   }
 
-  public void dmlBind(BindableRequest request,  EntityBean bean) throws SQLException {
+  public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     Object value = uidProp.getValue(bean);
 

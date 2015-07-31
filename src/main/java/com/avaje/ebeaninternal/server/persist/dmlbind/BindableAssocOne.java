@@ -40,7 +40,7 @@ public class BindableAssocOne implements Bindable {
 
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
-    EntityBean assocBean = (EntityBean)assocOne.getValue(bean);
+    EntityBean assocBean = (EntityBean) assocOne.getValue(bean);
     Object boundValue = importedId.bind(request, assocBean);
     if (boundValue == null && assocBean != null) {
       // this is the scenario for a derived foreign key
