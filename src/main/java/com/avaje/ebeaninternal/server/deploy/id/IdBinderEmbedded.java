@@ -78,7 +78,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
     return sb.toString();
   }
-  
+
   @Override
   public BeanProperty getBeanProperty() {
     return embIdProperty;

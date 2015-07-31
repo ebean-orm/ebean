@@ -21,25 +21,25 @@ import java.util.List;
  */
 public final class IdBinderSimple implements IdBinder {
 
-	private final BeanProperty idProperty;
+  private final BeanProperty idProperty;
 
-	private final String bindIdSql;
-	
-	private final Class<?> expectedType;
-	
-	@SuppressWarnings("rawtypes")
-    private final ScalarType scalarType;
-	
-	public IdBinderSimple(BeanProperty idProperty) {
-		this.idProperty = idProperty;
-		this.scalarType = idProperty.getScalarType();
-		this.expectedType = idProperty.getPropertyType();
-		bindIdSql = InternString.intern(idProperty.getDbColumn()+" = ? ");
-	}
-	
-	public void initialise(){
-		// do nothing
-	}
+  private final String bindIdSql;
+
+  private final Class<?> expectedType;
+
+  @SuppressWarnings("rawtypes")
+  private final ScalarType scalarType;
+
+  public IdBinderSimple(BeanProperty idProperty) {
+    this.idProperty = idProperty;
+    this.scalarType = idProperty.getScalarType();
+    this.expectedType = idProperty.getPropertyType();
+    bindIdSql = InternString.intern(idProperty.getDbColumn() + " = ? ");
+  }
+
+  public void initialise() {
+    // do nothing
+  }
 
   public boolean isIdInExpandedForm() {
     return false;
@@ -57,9 +57,9 @@ public final class IdBinderSimple implements IdBinder {
     }
     return sb.toString();
   }
-    
+
   public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
-    
+
     idProperty.buildRawSqlSelectChain(prefix, selectChain);
   }
 
@@ -69,30 +69,30 @@ public final class IdBinderSimple implements IdBinder {
   public int getPropertyCount() {
     return 1;
   }
-  
-	@Override
+
+  @Override
   public BeanProperty getBeanProperty() {
     return idProperty;
   }
 
   public String getIdProperty() {
-		return idProperty.getName();
-	}
+    return idProperty.getName();
+  }
 
-	public BeanProperty findBeanProperty(String dbColumnName) {
-		if (dbColumnName.equalsIgnoreCase(idProperty.getDbColumn())){
-			return idProperty;
-		}
-		return null;
-	}
+  public BeanProperty findBeanProperty(String dbColumnName) {
+    if (dbColumnName.equalsIgnoreCase(idProperty.getDbColumn())) {
+      return idProperty;
+    }
+    return null;
+  }
 
-	public boolean isComplexId(){
-		return false;
-	}
-	
-	public String getDefaultOrderBy() {
-		return idProperty.getName();
-	}
+  public boolean isComplexId() {
+    return false;
+  }
+
+  public String getDefaultOrderBy() {
+    return idProperty.getName();
+  }
 
   public String getBindIdInSql(String baseTableAlias) {
     if (baseTableAlias == null) {
@@ -111,11 +111,11 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   public Object[] getIdValues(EntityBean bean) {
-    return new Object[] { idProperty.getValue(bean) };
+    return new Object[]{idProperty.getValue(bean)};
   }
 
   public Object[] getBindValues(Object idValue) {
-    return new Object[] { idValue };
+    return new Object[]{idValue};
   }
 
   public String getIdInValueExprDelete(int size) {

@@ -99,7 +99,7 @@ public final class IdBinderEmpty implements IdBinder {
   }
 
   public Object[] getBindValues(Object idValue) {
-    return new Object[] { idValue };
+    return new Object[]{idValue};
   }
 
   public void bindId(DefaultSqlUpdate sqlUpdate, Object value) {
@@ -133,6 +133,6 @@ public final class IdBinderEmpty implements IdBinder {
   }
 
   public void writeData(DataOutput dataOutput, Object idValue) throws IOException {
-    
+
   }
 }
