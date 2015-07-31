@@ -267,27 +267,6 @@ public class BootupClasses implements ClassPathSearchMatcher {
     return compoundTypeList;
   }
 
-  /**
-   * Return the list of BeanControllers found.
-   */
-  public List<Class<?>> getBeanControllers() {
-    return beanControllerList;
-  }
-
-  /**
-   * Return the list of TransactionEventListeners found
-   */
-  public List<Class<?>> getTransactionEventListenerList() {
-    return transactionEventListenerList;
-  }
-
-  /**
-   * Return the list of BeanListeners found.
-   */
-  public List<Class<?>> getBeanListeners() {
-    return beanListenerList;
-  }
-
   public boolean isMatch(Class<?> cls) {
 
     if (isEmbeddable(cls)) {
