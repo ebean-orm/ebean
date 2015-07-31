@@ -160,6 +160,11 @@ public interface PagedList<T> {
   int getPageIndex();
 
   /**
+   * Return the page size used for this query.
+   */
+  int getPageSize();
+
+  /**
    * Return true if there is a next page.
    * <p>
    * This method requires that the total row count has been fetched and will invoke
