@@ -114,16 +114,11 @@ class SocketClient {
         }
     }
     
-    public boolean send(SocketClusterMessage msg) throws IOException {
+    public void send(SocketClusterMessage msg) throws IOException {
 
         if (online){
             writeObject(msg);
-            return true;
-            
-        } else {
-            return false;
         }
-        
     }
     
     private void writeObject(Object object) throws IOException {

@@ -888,15 +888,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
-  public DefaultOrmQuery<T> setQuery(String queryString) throws PersistenceException {
+  public void setQuery(String queryString) throws PersistenceException {
 
     this.query = queryString;
 
     OrmQueryDetailParser parser = new OrmQueryDetailParser(queryString);
     parser.parse();
     parser.assign(this);
-
-    return this;
   }
 
   protected void setOrmQueryDetail(OrmQueryDetail detail) {
@@ -1111,9 +1109,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Internally set to use SQL DISTINCT on the query but still have id property included.
    */
-  public DefaultOrmQuery<T> setSqlDistinct(boolean sqlDistinct) {
+  public void setSqlDistinct(boolean sqlDistinct) {
     this.sqlDistinct = sqlDistinct;
-    return this;
   }
 
   public Class<T> getBeanType() {

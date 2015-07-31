@@ -258,23 +258,22 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     beanPersistMap.add(beanDescriptor, type, idValue);
   }
 
-  public boolean notifyLocalPersistListener() {
-    if (beanPersistListener == null) {
-      return false;
-
-    } else {
+  public void notifyLocalPersistListener() {
+    if (beanPersistListener != null) {
       switch (type) {
-      case INSERT:
-        return beanPersistListener.inserted(bean);
+        case INSERT:
+          beanPersistListener.inserted(bean);
+          break;
 
-      case UPDATE:
-        return beanPersistListener.updated(bean, updatedProperties);
+        case UPDATE:
+          beanPersistListener.updated(bean, updatedProperties);
+          break;
 
-      case DELETE:
-        return beanPersistListener.deleted(bean);
+        case DELETE:
+          beanPersistListener.deleted(bean);
+          break;
 
-      default:
-        return false;
+        default:
       }
     }
   }

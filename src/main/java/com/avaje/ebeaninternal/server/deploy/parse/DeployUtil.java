@@ -103,7 +103,7 @@ public class DeployUtil {
     return new DataEncryptSupport(encryptKeyManager, bytesEncryptor, table, column);
   }
 
-  public ScalarType<?> setEnumScalarType(Enumerated enumerated, DeployBeanProperty prop) {
+  public void setEnumScalarType(Enumerated enumerated, DeployBeanProperty prop) {
 
     Class<?> enumType = prop.getPropertyType();
     if (!enumType.isEnum()) {
@@ -123,7 +123,6 @@ public class DeployUtil {
     }
     prop.setScalarType(scalarType);
     prop.setDbType(scalarType.getJdbcType());
-    return scalarType;
   }
 
   private ScalarType<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type, int dbType) {

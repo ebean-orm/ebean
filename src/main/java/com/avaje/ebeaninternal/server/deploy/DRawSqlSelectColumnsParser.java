@@ -215,17 +215,16 @@ public final class DRawSqlSelectColumnsParser {
     return columnLabel.equalsIgnoreCase(prop.getDbColumn()) || columnLabel.equalsIgnoreCase(prop.getName());
   }
 
-	private int nextComma() {
+	private void nextComma() {
 		boolean inQuote = false;
 		while (pos < end) {
 			char c = sqlSelect.charAt(pos);
 			if (c == '\'') {
 				inQuote = !inQuote;
 			} else if (!inQuote && c == ',') {
-				return pos;
+				return;
 			}
 			pos++;
 		}
-		return pos;
 	}
 }

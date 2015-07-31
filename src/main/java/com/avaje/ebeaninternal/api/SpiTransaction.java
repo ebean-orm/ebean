@@ -125,7 +125,7 @@ public interface SpiTransaction extends Transaction {
    * executed first during save.
    * </p>
    */
-  int depth(int diff);
+  void depth(int diff);
 
   /**
    * Return the current depth.

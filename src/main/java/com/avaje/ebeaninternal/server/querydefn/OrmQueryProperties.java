@@ -443,10 +443,9 @@ public class OrmQueryProperties implements Serializable {
     return included == null || included.contains(propName);
   }
 
-  public OrmQueryProperties setQueryFetch(int batch, boolean queryFetchAll) {
+  public void setQueryFetch(int batch, boolean queryFetchAll) {
     this.queryFetchBatch = batch;
     this.queryFetchAll = queryFetchAll;
-    return this;
   }
 
   public boolean isFetchJoin() {

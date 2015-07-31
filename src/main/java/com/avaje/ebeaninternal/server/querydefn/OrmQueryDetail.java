@@ -258,12 +258,11 @@ public class OrmQueryDetail implements Serializable {
    * @param partialProps
    *          the properties on the join property to include
    */
-  public OrmQueryProperties addFetch(String path, String partialProps, FetchConfig fetchConfig) {
+  public void addFetch(String path, String partialProps, FetchConfig fetchConfig) {
 
     OrmQueryProperties chunk = getChunk(path, true);
     chunk.setProperties(partialProps);
     chunk.setFetchConfig(fetchConfig);
-    return chunk;
   }
 
   public void sortFetchPaths(BeanDescriptor<?> d) {

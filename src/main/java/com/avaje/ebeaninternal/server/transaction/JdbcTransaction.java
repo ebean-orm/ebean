@@ -352,9 +352,8 @@ public class JdbcTransaction implements SpiTransaction {
    * @return the current depth plus the diff
    */
   @Override
-  public int depth(int diff) {
+  public void depth(int diff) {
     depth += diff;
-    return depth;
   }
 
   /**

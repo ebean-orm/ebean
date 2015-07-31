@@ -194,8 +194,8 @@ public final class DefaultPersistenceContext implements PersistenceContext {
       map.clear();
     }
 
-    private Object remove(Object id) {
-      return map.remove(id);
+    private void remove(Object id) {
+      map.remove(id);
     }
 
     private void deleted(Object id) {

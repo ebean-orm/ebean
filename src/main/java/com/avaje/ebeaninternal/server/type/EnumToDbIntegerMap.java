@@ -15,9 +15,8 @@ public class EnumToDbIntegerMap extends EnumToDbValueMap<Integer> {
     return Types.INTEGER;
   }
 
-  public EnumToDbIntegerMap add(Object beanValue, Integer dbValue) {
+  public void add(Object beanValue, Integer dbValue) {
     addInternal(beanValue, dbValue);
-    return this;
   }
 
   @Override

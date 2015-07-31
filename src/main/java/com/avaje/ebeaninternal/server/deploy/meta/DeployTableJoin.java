@@ -183,12 +183,12 @@ public class DeployTableJoin {
     return copyInternal(inverse, true, tableName, true);
   }
 
-  public DeployTableJoin copyTo(DeployTableJoin destJoin, boolean reverse, String tableName) {
-    return copyInternal(destJoin, reverse, tableName, true);
+  public void copyTo(DeployTableJoin destJoin, boolean reverse, String tableName) {
+    copyInternal(destJoin, reverse, tableName, true);
   }
 
-  public DeployTableJoin copyWithoutType(DeployTableJoin destJoin, boolean reverse, String tableName) {
-    return copyInternal(destJoin, reverse, tableName, false);
+  public void copyWithoutType(DeployTableJoin destJoin, boolean reverse, String tableName) {
+    copyInternal(destJoin, reverse, tableName, false);
   }
 
   private DeployTableJoin copyInternal(DeployTableJoin destJoin, boolean reverse, String tableName, boolean withType) {

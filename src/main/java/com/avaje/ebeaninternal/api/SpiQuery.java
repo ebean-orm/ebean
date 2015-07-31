@@ -586,7 +586,7 @@ public interface SpiQuery<T> extends Query<T> {
    * <p>
    * This does not exclude/remove the use of the id property.
    */
-  Query<T> setSqlDistinct(boolean sqlDistinct);
+  void setSqlDistinct(boolean sqlDistinct);
 
   /**
    * Return true if this query has been specified by a user or internally by Ebean to use DISTINCT.

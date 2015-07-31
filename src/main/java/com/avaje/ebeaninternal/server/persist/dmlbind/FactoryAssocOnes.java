@@ -17,7 +17,7 @@ public class FactoryAssocOnes {
 	/**
 	 * Add foreign key columns from associated one beans.
 	 */
-	public List<Bindable> create(List<Bindable> list, BeanDescriptor<?> desc, DmlMode mode) {
+	public void create(List<Bindable> list, BeanDescriptor<?> desc, DmlMode mode) {
 
 		BeanPropertyAssocOne<?>[] ones = desc.propertiesOneImported();
 
@@ -41,7 +41,5 @@ public class FactoryAssocOnes {
 				list.add(new BindableAssocOne(ones[i]));
 			}
 		}
-
-		return list;
 	}
 }

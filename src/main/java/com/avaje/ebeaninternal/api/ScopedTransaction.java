@@ -243,8 +243,8 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
-  public int depth(int diff) {
-    return transaction.depth();
+  public void depth(int diff) {
+    transaction.depth();
   }
 
   @Override

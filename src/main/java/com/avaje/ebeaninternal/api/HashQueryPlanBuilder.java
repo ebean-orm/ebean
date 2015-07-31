@@ -54,17 +54,15 @@ public class HashQueryPlanBuilder {
   /**
    * Add a number to the bind count for the hash.
    */
-  public HashQueryPlanBuilder bind(int extraBindCount) {
+  public void bind(int extraBindCount) {
     bindCount += extraBindCount;
-    return this;
   }
 
   /**
    * Add raw sql to the hash.
    */
-  public HashQueryPlanBuilder addRawSql(String rawSql) {
+  public void addRawSql(String rawSql) {
     this.rawSql = rawSql;
-    return this;
   }
 
   /**

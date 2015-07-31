@@ -78,7 +78,7 @@ public class DeployInherit {
 		}
 	}
 
-	private InheritInfo createFinalInfo(InheritInfo root, InheritInfo parent, DeployInheritInfo deploy) {
+	private void createFinalInfo(InheritInfo root, InheritInfo parent, DeployInheritInfo deploy) {
 
 		InheritInfo node = new InheritInfo(root, parent, deploy);
 		if (parent != null) {
@@ -94,8 +94,6 @@ public class DeployInherit {
 		for (DeployInheritInfo childDeploy : deploy.children()) {
 			createFinalInfo(root, node, childDeploy);
 		}
-
-		return node;
 	}
 
 	/**

@@ -196,10 +196,10 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
 		this.timeout = secs;
 		return this;
 	}
-    
-	public SqlUpdate addParameter(Object value) {
-        return setParameter(++addPos, value);
-    }
+
+  public void addParameter(Object value) {
+    setParameter(++addPos, value);
+  }
     
 	public SqlUpdate setParameter(int position, Object value) {
 		bindParams.setParameter(position, value);

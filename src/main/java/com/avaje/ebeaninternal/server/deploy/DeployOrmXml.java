@@ -103,7 +103,7 @@ public class DeployOrmXml {
 		return ormXmlList;
 	}
 
-	private boolean readOrmXml(String ormXmlName, ArrayList<Dnode> ormXmlList) {
+	private void readOrmXml(String ormXmlName, ArrayList<Dnode> ormXmlList) {
 
 		try {
 			Dnode ormXml = null;
@@ -120,14 +120,10 @@ public class DeployOrmXml {
 			if (ormXml != null) {
 				ormXml.setAttribute("ebean.filename", ormXmlName);
 				ormXmlList.add(ormXml);
-				return true;
-
-			} else {
-				return false;
 			}
+
 		} catch (IOException e) {
 			logger.error("error reading orm xml deployment " + ormXmlName, e);
-			return false;
 		}
 	}
 

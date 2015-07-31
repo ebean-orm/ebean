@@ -114,11 +114,10 @@ public class SqlTreeAlias {
     return alias;
   }
 
-  private String calcAliasManyWhere(String prefix) {
+  private void calcAliasManyWhere(String prefix) {
 
     String alias = nextManyWhereTableAlias();
     manyWhereAliasMap.put(prefix, alias);
-    return alias;
   }
 
   /**
