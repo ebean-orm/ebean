@@ -54,7 +54,7 @@ public class DeployBeanInfo<T> {
 
 		String key = tableName.toLowerCase();
 
-		DeployTableJoin tableJoin = (DeployTableJoin) tableJoinMap.get(key);
+		DeployTableJoin tableJoin = tableJoinMap.get(key);
 		if (tableJoin == null) {
 			tableJoin = new DeployTableJoin();
 			tableJoin.setTable(tableName);

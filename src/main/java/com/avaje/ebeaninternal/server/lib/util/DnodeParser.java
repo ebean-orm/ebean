@@ -192,7 +192,7 @@ public class DnodeParser extends DefaultHandler {
         stack.pop();
         if (!stack.isEmpty()) {
             // get the new currentNode
-            currentNode = (Dnode) stack.pop();
+            currentNode = stack.pop();
             stack.push(currentNode);
         }
     }

@@ -116,11 +116,11 @@ public class DeployInherit {
 			// its the root of inheritance tree...
 		}
 
-		Inheritance ia = (Inheritance) cls.getAnnotation(Inheritance.class);
+		Inheritance ia = cls.getAnnotation(Inheritance.class);
 		if (ia != null) {
 			ia.strategy();
 		}
-		DiscriminatorColumn da = (DiscriminatorColumn) cls.getAnnotation(DiscriminatorColumn.class);
+		DiscriminatorColumn da = cls.getAnnotation(DiscriminatorColumn.class);
 		if (da != null) {
 		  // lowercase the discriminator column for RawSql and JSON
 			info.setDiscriminatorColumn(da.name().toLowerCase());
@@ -133,7 +133,7 @@ public class DeployInherit {
 			info.setDiscriminatorLength(da.length());
 		}
 
-		DiscriminatorValue dv = (DiscriminatorValue) cls.getAnnotation(DiscriminatorValue.class);
+		DiscriminatorValue dv = cls.getAnnotation(DiscriminatorValue.class);
 		if (dv != null) {
 			info.setDiscriminatorValue(dv.value());
 		}

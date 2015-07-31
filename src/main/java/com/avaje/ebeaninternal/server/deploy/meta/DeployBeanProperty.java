@@ -873,7 +873,7 @@ public class DeployBeanProperty {
    * Return an extra attribute set on this property.
    */
   public String getExtraAttribute(String key) {
-    return (String) extraAttributeMap.get(key);
+    return extraAttributeMap.get(key);
   }
 
   /**

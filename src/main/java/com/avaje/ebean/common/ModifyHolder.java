@@ -58,7 +58,7 @@ class ModifyHolder<E> implements Serializable {
   void modifyRemoval(Object bean) {
     if (bean != null) {
       // If it is to be added then just remove the addition
-      if (!modifyAdditions.remove((E) bean)) {
+      if (!modifyAdditions.remove(bean)) {
         modifyDeletions.add((E) bean);
       }
     }

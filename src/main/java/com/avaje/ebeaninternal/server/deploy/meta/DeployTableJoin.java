@@ -135,14 +135,14 @@ public class DeployTableJoin {
    * Return the join columns.
    */
   public DeployTableJoinColumn[] columns() {
-    return (DeployTableJoinColumn[]) columns.toArray(new DeployTableJoinColumn[columns.size()]);
+    return columns.toArray(new DeployTableJoinColumn[columns.size()]);
   }
 
   /**
    * For secondary table joins returns the properties mapped to that table.
    */
   public DeployBeanProperty[] properties() {
-    return (DeployBeanProperty[]) properties.toArray(new DeployBeanProperty[properties.size()]);
+    return properties.toArray(new DeployBeanProperty[properties.size()]);
   }
 
   /**

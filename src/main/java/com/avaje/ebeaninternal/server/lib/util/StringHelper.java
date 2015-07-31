@@ -241,7 +241,7 @@ public class StringHelper {
 		int startPos = 0;
 		delimiter(str, delimiter, keepEmpties, startPos, list);
 		String[] result = new String[list.size()];
-		return (String[]) list.toArray(result);
+		return list.toArray(result);
 	}
 
 	private static void delimiter(String str, String delimiter, boolean keepEmpties, int startPos,

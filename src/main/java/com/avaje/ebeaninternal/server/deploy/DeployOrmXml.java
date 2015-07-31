@@ -62,7 +62,7 @@ public class DeployOrmXml {
 				Dnode nqQueryNode = nqNode.find("query");
 				if (nqQueryNode != null) {
 					String queryContent = nqQueryNode.getNodeContent();
-					String queryName = (String) nqNode.getAttribute("name");
+					String queryName = nqNode.getAttribute("name");
 
 					if (queryName != null && queryContent != null) {
 						DNativeQuery query = new DNativeQuery(queryContent);
