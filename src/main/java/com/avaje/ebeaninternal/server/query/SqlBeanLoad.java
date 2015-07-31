@@ -54,7 +54,7 @@ public class SqlBeanLoad {
     ctx.getDataReader().incrementPos(increment);
   }
 
-  public Object load(BeanProperty prop) throws SQLException {
+  public Object load(BeanProperty prop) {
 
     if (!rawSql && !prop.isLoadProperty()) {
       return null;
@@ -88,11 +88,5 @@ public class SqlBeanLoad {
       throw new PersistenceException(msg, e);
     }
   }
-	
-	public void loadAssocMany(BeanPropertyAssocMany<?> prop) {
-		
-	    // do nothing, as a lazy loading BeanCollection 'reference'
-	    // is created and registered with the loading context
-	    // in SqlTreeNodeBean.createListProxies()	    
-	}
+
 }
