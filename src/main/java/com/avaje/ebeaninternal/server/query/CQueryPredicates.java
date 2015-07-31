@@ -115,11 +115,6 @@ public class CQueryPredicates {
    */
   private String dbFilterMany;
 
-  /**
-   * The order by clause.
-   */
-  private String logicalOrderBy;
-
   private String dbOrderBy;
 
   /**
@@ -336,7 +331,7 @@ public class CQueryPredicates {
   private void parsePropertiesToDbColumns(DeployParser deployParser) {
 
     // order by is dependent on the manyProperty (if there is one)
-    logicalOrderBy = deriveOrderByWithMany(request.getManyProperty());
+    String logicalOrderBy = deriveOrderByWithMany(request.getManyProperty());
     if (logicalOrderBy != null) {
       dbOrderBy = deployParser.parse(logicalOrderBy);
     }

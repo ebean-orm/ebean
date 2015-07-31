@@ -33,8 +33,6 @@ public class DRawSqlSelectBuilder {
 
 	private final SimpleTextParser textParser;
 
-	private List<DRawSqlColumnInfo> selectColumns;
-
 	private int placeHolderWhere;
 	private int placeHolderAndWhere;
 	private int placeHolderHaving;
@@ -100,7 +98,7 @@ public class DRawSqlSelectBuilder {
 			parseSqlFindKeywords(true);
 		}
 
-		selectColumns = findSelectColumns(meta.getColumnMapping());
+    List<DRawSqlColumnInfo> selectColumns = findSelectColumns(meta.getColumnMapping());
 		whereExprPos = findWhereExprPosition();
 		havingExprPos = findHavingExprPosition();
 

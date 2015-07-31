@@ -14,8 +14,6 @@ public class JtaTransaction extends JdbcTransaction {
 
     private UserTransaction userTransaction;
 
-    private DataSource dataSource;
-
     private boolean commmitted = false;
 
     private boolean newTransaction = false;
@@ -27,8 +25,6 @@ public class JtaTransaction extends JdbcTransaction {
     public JtaTransaction(String id, boolean explicit, UserTransaction utx, DataSource ds, TransactionManager manager) {
         super(id, explicit, null, manager);
         userTransaction = utx;
-        dataSource = ds;
-
         try {
             newTransaction = userTransaction.getStatus() == Status.STATUS_NO_TRANSACTION;
             if (newTransaction) {
@@ -40,7 +36,7 @@ public class JtaTransaction extends JdbcTransaction {
 
         try {
             // Open JDBC Connection
-            this.connection = dataSource.getConnection();
+            this.connection = ds.getConnection();
             if (connection == null) {
                 throw new PersistenceException("The DataSource returned a null connection.");
             }

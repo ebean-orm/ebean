@@ -22,13 +22,13 @@ public class ExeUpdateSql {
 
   private static final Logger logger = LoggerFactory.getLogger(ExeUpdateSql.class);
 
+  private static final int defaultBatchSize = 20;
+
   private final Binder binder;
 
   private final PstmtFactory pstmtFactory;
 
   private final PstmtBatch pstmtBatch;
-
-  private int defaultBatchSize = 20;
 
   /**
    * Create with a given binder.

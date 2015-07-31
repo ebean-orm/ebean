@@ -10,8 +10,6 @@ public class SimpleTextParser {
   private String word;
   private String lowerWord;
 
-  private int openParenthesisCount;
-
   public SimpleTextParser(String oql) {
     this.oql = oql;
     this.chars = oql.toCharArray();
@@ -104,7 +102,7 @@ public class SimpleTextParser {
   private void moveToClose() {
 
     pos++;
-    openParenthesisCount = 0;
+    int openParenthesisCount = 0;
 
     for (; pos < eof; pos++) {
       char c = chars[pos];

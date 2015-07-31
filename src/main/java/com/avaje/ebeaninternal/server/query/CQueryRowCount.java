@@ -54,8 +54,6 @@ public class CQueryRowCount {
 
 	private String bindLog;
 
-	private long startNano;
-	
 	private int executionTimeMicros;
 
 	private int rowCount;
@@ -112,7 +110,7 @@ public class CQueryRowCount {
 	 */
 	public int findRowCount() throws SQLException {
 
-		startNano = System.nanoTime();
+		long startNano = System.nanoTime();
 		try {
 			
 			SpiTransaction t = request.getTransaction();

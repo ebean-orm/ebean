@@ -21,10 +21,6 @@ import com.avaje.ebeaninternal.server.persist.dmlbind.BindableList;
  */
 public final class UpdateMeta {
 
-  private final String sqlVersion;
-
-  private final String sqlNone;
-
   private final BindableList set;
   private final BindableId id;
   private final Bindable version;
@@ -43,8 +39,8 @@ public final class UpdateMeta {
     this.id = id;
     this.version = version;
 
-    this.sqlNone = genSql(ConcurrencyMode.NONE, null, set);
-    this.sqlVersion = genSql(ConcurrencyMode.VERSION, null, set);
+    String sqlNone = genSql(ConcurrencyMode.NONE, null, set);
+    String sqlVersion = genSql(ConcurrencyMode.VERSION, null, set);
 
     this.modeNoneUpdatePlan = new UpdatePlan(ConcurrencyMode.NONE, sqlNone, set);
     this.modeVersionUpdatePlan = new UpdatePlan(ConcurrencyMode.VERSION, sqlVersion, set);

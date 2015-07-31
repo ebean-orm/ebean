@@ -25,11 +25,6 @@ public final class DefaultPersistExecute implements PersistExecute {
   private final int defaultBatchSize;
 
   /**
-   * Default for whether to call getGeneratedKeys after batch insert.
-   */
-  private final boolean defaultBatchGenKeys = true;
-
-  /**
    * Construct this DmlPersistExecute.
    */
   public DefaultPersistExecute(Binder binder, PstmtBatch pstmtBatch, int defaultBatchSize) {
@@ -43,7 +38,7 @@ public final class DefaultPersistExecute implements PersistExecute {
   public BatchControl createBatchControl(SpiTransaction t) {
 
     // create a BatchControl and set its defaults
-    return new BatchControl(t, defaultBatchSize, defaultBatchGenKeys);
+    return new BatchControl(t, defaultBatchSize, true);
   }
 
   /**

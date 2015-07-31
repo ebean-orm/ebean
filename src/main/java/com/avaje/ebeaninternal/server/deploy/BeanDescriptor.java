@@ -254,11 +254,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   private boolean deleteRecurseSkippable;
 
-  /**
-   * Make the TypeManager available for helping SqlSelect.
-   */
-  private final TypeManager typeManager;
-
   private final EntityBean prototypeEntityBean;
   
   private final IdBinder idBinder;
@@ -307,7 +302,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.fullName = InternString.intern(deploy.getFullName());
     this.descriptorId = descriptorId;
 
-    this.typeManager = typeManager;
     this.beanType = deploy.getBeanType();
     this.prototypeEntityBean = createPrototypeEntityBean(beanType);
     

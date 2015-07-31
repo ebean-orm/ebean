@@ -39,8 +39,6 @@ public class TCsvReader<T> implements CsvReader<T> {
 
 	private final CsvColumn ignoreColumn = new CsvColumn();
 
-	private boolean treatEmptyStringAsNull = true;
-
 	private boolean hasHeader;
 
 	private int logInfoFrequency = 1000;
@@ -277,7 +275,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 
 		strValue = strValue.trim();
 
-		if (strValue.length() == 0 && treatEmptyStringAsNull) {
+		if (strValue.length() == 0) {
 			return;
 		}
 

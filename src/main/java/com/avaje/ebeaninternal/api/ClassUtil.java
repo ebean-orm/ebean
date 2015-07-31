@@ -11,8 +11,6 @@ public class ClassUtil {
 
   private static final Logger logger = LoggerFactory.getLogger(ClassUtil.class);
 
-  private static boolean preferContext = true;
-
   /**
    * Load a class taking into account a context class loader (if present).
    */
@@ -28,7 +26,7 @@ public class ClassUtil {
     if (caller == null) {
       caller = ClassUtil.class;
     }
-    ClassLoadContext ctx = ClassLoadContext.of(caller, preferContext);
+    ClassLoadContext ctx = ClassLoadContext.of(caller, true);
 
     return ctx.forName(name);
   }

@@ -36,8 +36,6 @@ public class DdlGenerator implements SpiEbeanPlugin {
 
   private DatabasePlatform dbPlatform;
 
-  private int summaryLength = 80;
-
   private boolean generateDdl;
   private boolean runDdl;
 
@@ -340,8 +338,8 @@ public class DdlGenerator implements SpiEbeanPlugin {
   }
 
   private String getSummary(String s) {
-    if (s.length() > summaryLength) {
-      return s.substring(0, summaryLength).trim() + "...";
+    if (s.length() > 80) {
+      return s.substring(0, 80).trim() + "...";
     }
     return s;
   }
