@@ -1,13 +1,11 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
-import java.util.ArrayList;
-
-import javax.persistence.JoinColumn;
-
-import com.avaje.ebeaninternal.server.deploy.BeanCascadeInfo;
 import com.avaje.ebeaninternal.server.deploy.BeanTable;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
+
+import javax.persistence.JoinColumn;
+import java.util.ArrayList;
 
 /**
  * Represents a join to another table during deployment phase.
@@ -16,12 +14,6 @@ import com.avaje.ebeaninternal.server.query.SqlJoinType;
  * </p>
  */
 public class DeployTableJoin {
-
-  /**
-   * Flag set when the imported key maps to the primary key. This occurs for intersection tables
-   * (ManyToMany).
-   */
-  private boolean importedPrimaryKey;
 
   /**
    * The joined table.
@@ -34,19 +26,9 @@ public class DeployTableJoin {
   private SqlJoinType type = SqlJoinType.INNER;
 
   /**
-   * The list of properties mapped to this joined table.
-   */
-  private final ArrayList<DeployBeanProperty> properties = new ArrayList<DeployBeanProperty>();
-
-  /**
    * The list of join column pairs. Used to generate the on clause.
    */
   private ArrayList<DeployTableJoinColumn> columns = new ArrayList<DeployTableJoinColumn>(4);
-
-  /**
-   * The persist cascade info.
-   */
-  private final BeanCascadeInfo cascadeInfo = new BeanCascadeInfo();
 
   private InheritInfo inheritInfo;
 
@@ -61,32 +43,10 @@ public class DeployTableJoin {
   }
 
   /**
-   * Return true if the imported foreign key maps to the primary key.
-   */
-  public boolean isImportedPrimaryKey() {
-    return importedPrimaryKey;
-  }
-
-  /**
-   * Flag set when the imported key maps to the primary key. This occurs for intersection tables
-   * (ManyToMany).
-   */
-  public void setImportedPrimaryKey(boolean importedPrimaryKey) {
-    this.importedPrimaryKey = importedPrimaryKey;
-  }
-
-  /**
    * Return true if the JoinOnPair have been set.
    */
   public boolean hasJoinColumns() {
     return columns.size() > 0;
-  }
-
-  /**
-   * Return the persist info.
-   */
-  public BeanCascadeInfo getCascadeInfo() {
-    return cascadeInfo;
   }
 
   /**
@@ -139,13 +99,6 @@ public class DeployTableJoin {
   }
 
   /**
-   * For secondary table joins returns the properties mapped to that table.
-   */
-  public DeployBeanProperty[] properties() {
-    return properties.toArray(new DeployBeanProperty[properties.size()]);
-  }
-
-  /**
    * Return the joined table name.
    */
   public String getTable() {
@@ -164,13 +117,6 @@ public class DeployTableJoin {
    */
   public SqlJoinType getType() {
     return type;
-  }
-
-  /**
-   * Return true if this join is a left outer join.
-   */
-  public boolean isOuterJoin() {
-    return type == SqlJoinType.OUTER;
   }
 
   public void setType(SqlJoinType type) {

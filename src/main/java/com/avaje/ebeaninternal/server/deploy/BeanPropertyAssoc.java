@@ -80,7 +80,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 		this.beanTable = deploy.getBeanTable();
 		this.mappedBy = InternString.intern(deploy.getMappedBy());
 
-		this.tableJoin = new TableJoin(deploy.getTableJoin(), null);
+		this.tableJoin = new TableJoin(deploy.getTableJoin());
 
 		this.targetType = deploy.getTargetType();
 		this.cascadeInfo = deploy.getCascadeInfo();

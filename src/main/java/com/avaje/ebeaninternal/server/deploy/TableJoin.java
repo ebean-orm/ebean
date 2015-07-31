@@ -29,11 +29,6 @@ public final class TableJoin {
   private final InheritInfo inheritInfo;
     
   /**
-   * Properties as an array.
-   */
-  private final BeanProperty[] properties;
-
-  /**
    * Columns as an array.
    */
   private final TableJoinColumn[] columns;
@@ -46,7 +41,7 @@ public final class TableJoin {
   /**
    * Create a TableJoin.
    */
-  public TableJoin(DeployTableJoin deploy, LinkedHashMap<String, BeanProperty> propMap) {
+  public TableJoin(DeployTableJoin deploy) {
 
     this.table = InternString.intern(deploy.getTable());
     this.type = deploy.getType();
@@ -58,16 +53,6 @@ public final class TableJoin {
       this.columns[i] = new TableJoinColumn(deployCols[i]);
     }
 
-    DeployBeanProperty[] deployProps = deploy.properties();
-    if (deployProps.length > 0 && propMap == null) {
-      throw new NullPointerException("propMap is null?");
-    }
-
-    this.properties = new BeanProperty[deployProps.length];
-    for (int i = 0; i < deployProps.length; i++) {
-      BeanProperty prop = propMap.get(deployProps[i].getName());
-      this.properties[i] = prop;
-    }
     this.queryHash = calcQueryHash();
   }
 
@@ -99,30 +84,11 @@ public final class TableJoin {
     return sb.toString();
   }
 
-  public void appendSelect(DbSqlContext ctx, boolean subQuery) {
-    for (int i = 0, x = properties.length; i < x; i++) {
-      properties[i].appendSelect(ctx, subQuery);
-    }
-  }
-
-  public void load(SqlBeanLoad sqlBeanLoad) throws SQLException {
-    for (int i = 0, x = properties.length; i < x; i++) {
-      properties[i].load(sqlBeanLoad);
-    }
-  }
-
   /**
    * Return the join columns.
    */
   public TableJoinColumn[] columns() {
     return columns;
-  }
-
-  /**
-   * For secondary table joins returns the properties mapped to that table.
-   */
-  public BeanProperty[] properties() {
-    return properties;
   }
 
   /**

@@ -78,13 +78,6 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
 	}
 
 	/**
-	 * Specify that this bean should use an outer join.
-	 */
-	public void setOuterJoin(boolean isOuterJoin) {
-		this.isOuterJoin = isOuterJoin;
-	}
-
-	/**
 	 * Return a literal expression that is added to the query that lazy loads
 	 * the collection.
 	 */

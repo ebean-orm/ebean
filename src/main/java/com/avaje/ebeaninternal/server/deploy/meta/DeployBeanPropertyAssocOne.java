@@ -77,11 +77,4 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 		return importedPrimaryKey;
 	}
 
-	/**
-	 * Set to true if the bean maps to the primary key.
-	 */
-	public void setImportedPrimaryKey(boolean importedPrimaryKey) {
-		this.importedPrimaryKey = importedPrimaryKey;
-	}
-
 }

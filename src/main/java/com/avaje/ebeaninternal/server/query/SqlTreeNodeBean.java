@@ -288,10 +288,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       }
     }
 
-    for (int i = 0, x = tableJoins.length; i < x; i++) {
-      tableJoins[i].load(sqlBeanLoad);
-    }
-
     boolean lazyLoadMany = false;
     if (localBean == null && queryMode.equals(Mode.LAZYLOAD_MANY)) {
       // batch lazy load many into existing contextBean
@@ -406,7 +402,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       appendSelect(ctx, false, idBinder.getBeanProperty());
     }
     appendSelect(ctx, subQuery, properties);
-    appendSelectTableJoins(ctx);
 
     for (int i = 0; i < children.length; i++) {
       // read each child... and let them set their
@@ -416,21 +411,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     ctx.popTableAlias();
     ctx.popJoin();
-  }
-
-  private void appendSelectTableJoins(DbSqlContext ctx) {
-
-    String baseAlias = ctx.getTableAlias(prefix);
-
-    for (int i = 0; i < tableJoins.length; i++) {
-      TableJoin join = tableJoins[i];
-
-      String alias = baseAlias + i;
-
-      ctx.pushSecondaryTableAlias(alias);
-      join.appendSelect(ctx, false);
-      ctx.popTableAlias();
-    }
   }
 
   /**

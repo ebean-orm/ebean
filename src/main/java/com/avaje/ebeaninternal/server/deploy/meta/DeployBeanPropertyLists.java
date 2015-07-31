@@ -104,9 +104,8 @@ public class DeployBeanPropertyLists {
     List<DeployTableJoin> deployTableJoins = deploy.getTableJoins();
     tableJoins = new TableJoin[deployTableJoins.size()];
     for (int i = 0; i < deployTableJoins.size(); i++) {
-      tableJoins[i] = new TableJoin(deployTableJoins.get(i), propertyMap);
+      tableJoins[i] = new TableJoin(deployTableJoins.get(i));
     }
-
   }
 
   /**
@@ -229,10 +228,6 @@ public class DeployBeanPropertyLists {
 
   public BeanPropertyAssocOne<?>[] getEmbedded() {
     return embedded.toArray(new BeanPropertyAssocOne[embedded.size()]);
-  }
-
-  public BeanPropertyAssocOne<?>[] getOneExported() {
-    return onesExported.toArray(new BeanPropertyAssocOne[onesExported.size()]);
   }
 
   public BeanPropertyAssocOne<?>[] getOneImported() {

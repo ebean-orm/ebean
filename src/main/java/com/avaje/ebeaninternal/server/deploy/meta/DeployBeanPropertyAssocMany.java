@@ -115,7 +115,7 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
 	 */
 	public TableJoin createIntersectionTableJoin() {
 		if (intersectionJoin != null){
-			return new TableJoin(intersectionJoin, null);
+			return new TableJoin(intersectionJoin);
 		} else {
 			return null;
 		}
@@ -126,7 +126,7 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
 	 */
 	public TableJoin createInverseTableJoin() {
 		if (inverseJoin != null){
-			return new TableJoin(inverseJoin, null);
+			return new TableJoin(inverseJoin);
 		} else {
 			return null;
 		}

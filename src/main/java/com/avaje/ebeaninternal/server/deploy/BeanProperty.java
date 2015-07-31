@@ -248,7 +248,7 @@ public class BeanProperty implements ElPropertyValue {
 
     this.secondaryTable = deploy.isSecondaryTable();
     if (secondaryTable) {
-      this.secondaryTableJoin = new TableJoin(deploy.getSecondaryTableJoin(), null);
+      this.secondaryTableJoin = new TableJoin(deploy.getSecondaryTableJoin());
       this.secondaryTableJoinPrefix = deploy.getSecondaryTableJoinPrefix();
     } else {
       this.secondaryTableJoin = null;
