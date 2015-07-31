@@ -18,8 +18,8 @@ public final class BeanFkeyProperty implements ElPropertyValue {
 
   private final int deployOrder;
 
-  public BeanFkeyProperty(String prefix, String name, String dbColumn, int deployOrder) {
-    this(prefix, name, dbColumn, deployOrder, false);
+  public BeanFkeyProperty(String name, String dbColumn, int deployOrder) {
+    this(null, name, dbColumn, deployOrder, false);
   }
   
   private BeanFkeyProperty(String prefix, String name, String dbColumn, int deployOrder, boolean containsMany) {
@@ -66,13 +66,6 @@ public final class BeanFkeyProperty implements ElPropertyValue {
    */
   public boolean isLocalEncrypted() {
     return false;
-  }
-
-  /**
-   * Only usable as ElPropertyDeploy.
-   */
-  public boolean isDeployOnly() {
-    return true;
   }
 
   @Override

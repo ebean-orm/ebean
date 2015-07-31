@@ -37,7 +37,7 @@ public class ImportedIdEmbedded implements ImportedId {
 		
 		for (int i = 0; i < imported.length; i++) {
 			String n = name+"."+foreignAssocOne.getName()+"."+embeddedProps[i].getName();
-			BeanFkeyProperty fkey = new BeanFkeyProperty(null, n, imported[i].localDbColumn, foreignAssocOne.getDeployOrder());
+			BeanFkeyProperty fkey = new BeanFkeyProperty(n, imported[i].localDbColumn, foreignAssocOne.getDeployOrder());
 			owner.getBeanDescriptor().add(fkey);
 		}
 	}
