@@ -26,6 +26,6 @@ public enum IdType {
    * id properties of type UUID.
    * </p>
    */
-  GENERATOR;
+  GENERATOR
 
 }

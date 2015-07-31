@@ -75,5 +75,5 @@ public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor 
     public void run() {
       shutdown();
     }
-  };
+  }
 }

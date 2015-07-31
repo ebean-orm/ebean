@@ -15,7 +15,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
 
 	public enum SqlType {
 		SQL_UPDATE, SQL_DELETE, SQL_INSERT, SQL_UNKNOWN
-	};
+	}
 
 	private final SpiSqlUpdate updateSql;
 

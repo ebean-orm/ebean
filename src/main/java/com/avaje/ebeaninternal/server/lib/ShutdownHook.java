@@ -19,4 +19,4 @@ class ShutdownHook extends Thread {
 		ShutdownManager.shutdown();
 	}
 
-}; 
+}

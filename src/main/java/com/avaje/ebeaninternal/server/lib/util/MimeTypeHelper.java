@@ -37,4 +37,4 @@ public class MimeTypeHelper {
 	private static ResourceBundle resources = ResourceBundle.getBundle("com.avaje.lib.util.mimetypes");
 
 
-};
+}

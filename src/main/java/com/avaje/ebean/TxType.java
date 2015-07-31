@@ -46,5 +46,5 @@ public enum TxType {
    * If there is an existing transaction throws an Exception. Method runs
    * without a transaction.
    */
-  NEVER;
+  NEVER
 }

@@ -82,5 +82,5 @@ public final class DaemonThreadPool extends ThreadPoolExecutor {
     public void run() {
       shutdown();
     }
-  };
+  }
 }

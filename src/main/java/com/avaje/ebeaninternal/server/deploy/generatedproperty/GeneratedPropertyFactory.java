@@ -11,7 +11,7 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
  */
 public class GeneratedPropertyFactory {
 
-	private final CounterFactory counterFactory = new CounterFactory();;
+	private final CounterFactory counterFactory = new CounterFactory();
 
   private final InsertTimestampFactory insertFactory = new InsertTimestampFactory();
 
