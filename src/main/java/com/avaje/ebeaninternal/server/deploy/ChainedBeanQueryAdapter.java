@@ -19,13 +19,6 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 	private final BeanQueryAdapter[] chain;
 	
 	/**
-	 * Construct adding 2 BeanQueryAdapter's.
-	 */
-	public ChainedBeanQueryAdapter(BeanQueryAdapter c1, BeanQueryAdapter c2) {
-		this(addList(c1, c2));
-	}
-	
-	/**
 	 * Helper method used to create a list from 2 BeanQueryAdapter.
 	 */
 	private static List<BeanQueryAdapter> addList(BeanQueryAdapter c1, BeanQueryAdapter c2) {
