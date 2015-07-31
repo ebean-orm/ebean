@@ -11,60 +11,60 @@ import java.util.Date;
  */
 public class FileResourceContent implements ResourceContent {
 
-    /**
-     * The underlying file.
-     */
-    final File file;
+  /**
+   * The underlying file.
+   */
+  final File file;
 
   final String entryName;
 
-    /**
-     * Create with a File and the entryName.
-     */
-    public FileResourceContent(File file, String entryName) {
-        this.file = file;
-        this.entryName = entryName;
-    }
+  /**
+   * Create with a File and the entryName.
+   */
+  public FileResourceContent(File file, String entryName) {
+    this.file = file;
+    this.entryName = entryName;
+  }
 
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[").append(getName());
-        sb.append("] size[").append(size());
-        sb.append("] lastModified[").append(new Date(lastModified()));
-        sb.append("]");
-        return sb.toString();
-    }
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("[").append(getName());
+    sb.append("] size[").append(size());
+    sb.append("] lastModified[").append(new Date(lastModified()));
+    sb.append("]");
+    return sb.toString();
+  }
 
-    /**
-     * Returns the entry name which contains the path from the base directory.
-     * <p>
-     * This does not return the full path of the file, but the path relative to
-     * the FileIoSource directory.
-     * </p>
-     */
-    public String getName() {
-        return entryName;
-    }
+  /**
+   * Returns the entry name which contains the path from the base directory.
+   * <p>
+   * This does not return the full path of the file, but the path relative to
+   * the FileIoSource directory.
+   * </p>
+   */
+  public String getName() {
+    return entryName;
+  }
 
-    /**
-     * Return the time the file was last modified.
-     */
-    public long lastModified() {
-        return file.lastModified();
-    }
+  /**
+   * Return the time the file was last modified.
+   */
+  public long lastModified() {
+    return file.lastModified();
+  }
 
-    /**
-     * Return the size of the file.
-     */
-    public long size() {
-        return file.length();
-    }
+  /**
+   * Return the size of the file.
+   */
+  public long size() {
+    return file.length();
+  }
 
-    /**
-     * Return the input stream for this file.
-     */
-    public InputStream getInputStream() throws IOException {
+  /**
+   * Return the input stream for this file.
+   */
+  public InputStream getInputStream() throws IOException {
 
-        return new FileInputStream(file);
-    }
+    return new FileInputStream(file);
+  }
 }

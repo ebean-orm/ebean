@@ -11,24 +11,24 @@ import java.io.InputStream;
  */
 public interface ResourceContent {
 
-    /**
-     * The name of the content.
-     */
-    String getName();
+  /**
+   * The name of the content.
+   */
+  String getName();
 
-    /**
-     * The size of the content in bytes.
-     */
-    long size();
+  /**
+   * The size of the content in bytes.
+   */
+  long size();
 
-    /**
-     * The last modified timestamp of the content.
-     */
-    long lastModified();
+  /**
+   * The last modified timestamp of the content.
+   */
+  long lastModified();
 
-    /**
-     * The content itself.
-     */
-    InputStream getInputStream() throws IOException;
+  /**
+   * The content itself.
+   */
+  InputStream getInputStream() throws IOException;
 
 }

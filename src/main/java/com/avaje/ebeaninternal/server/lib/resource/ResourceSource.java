@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.lib.resource;
 
-import java.io.IOException;
-
 /**
  * A Source for ResourceManager.
  * <p>
@@ -25,13 +23,4 @@ public interface ResourceSource {
 	 */
 	ResourceContent getContent(String entry);
 
-    /**
-     * Return the content as a String.
-     */
-	String readString(ResourceContent content, int bufSize) throws IOException;
-
-	/**
-	 * Return the content as a byte[].
-	 */
-	byte[] readBytes(ResourceContent content, int bufSize) throws IOException;
 }
