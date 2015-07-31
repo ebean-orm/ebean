@@ -28,11 +28,11 @@ public class DeployInheritInfo {
 
 	private String discriminatorWhere;
 
-	private Class<?> type;
+	private final Class<?> type;
 
 	private Class<?> parent;
     
-	private ArrayList<DeployInheritInfo> children = new ArrayList<DeployInheritInfo>();
+	private final ArrayList<DeployInheritInfo> children = new ArrayList<DeployInheritInfo>();
         
     /**
      * Create for a given type.

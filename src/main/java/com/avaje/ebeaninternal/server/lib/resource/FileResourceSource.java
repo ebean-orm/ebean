@@ -10,9 +10,9 @@ public class FileResourceSource extends AbstractResourceSource implements Resour
     /**
      * The directory name.
      */
-    String directory;
-    
-    String baseDir;
+    final String directory;
+
+  final String baseDir;
         
     /**
      * Create the source based on a directory name.

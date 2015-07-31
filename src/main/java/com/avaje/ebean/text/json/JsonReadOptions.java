@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class JsonReadOptions {
 
-  protected Map<String, JsonReadBeanVisitor<?>> visitorMap;
+  protected final Map<String, JsonReadBeanVisitor<?>> visitorMap;
 
   protected Object objectMapper;
 

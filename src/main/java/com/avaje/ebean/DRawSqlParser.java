@@ -24,7 +24,7 @@ class DRawSqlParser {
   private int placeHolderAndWhere;
   private int placeHolderHaving;
   private int placeHolderAndHaving;
-  private boolean hasPlaceHolders;
+  private final boolean hasPlaceHolders;
 
   private int selectPos = -1;
   private int distinctPos = -1;

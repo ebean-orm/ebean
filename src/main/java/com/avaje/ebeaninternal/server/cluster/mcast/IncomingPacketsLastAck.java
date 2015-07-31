@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class IncomingPacketsLastAck {
 
-    private HashMap<String,MessageAck> lastAckMap = new HashMap<String, MessageAck>();
+    private final HashMap<String,MessageAck> lastAckMap = new HashMap<String, MessageAck>();
 
     public String toString() {
         return lastAckMap.values().toString();

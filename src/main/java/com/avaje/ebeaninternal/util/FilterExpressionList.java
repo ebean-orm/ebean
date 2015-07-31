@@ -38,7 +38,7 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
     return pathPrefix;
   }
 
-  private String notAllowedMessage = "This method is not allowed on a filter";
+  private final String notAllowedMessage = "This method is not allowed on a filter";
 
   @Override
   public ExpressionList<T> filterMany(String prop) {

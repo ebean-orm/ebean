@@ -57,7 +57,7 @@ public class McastListener implements Runnable {
 
     private DatagramPacket pack;
 
-    private byte[] receiveBuffer;
+    private final byte[] receiveBuffer;
 
     private volatile boolean shutdown;
     private volatile boolean shutdownComplete;

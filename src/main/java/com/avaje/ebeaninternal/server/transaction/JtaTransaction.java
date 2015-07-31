@@ -12,12 +12,11 @@ import javax.transaction.UserTransaction;
  */
 public class JtaTransaction extends JdbcTransaction {
 
-    private UserTransaction userTransaction;
+    private final UserTransaction userTransaction;
 
-    private boolean commmitted = false;
+    private boolean commmitted;
 
-    private boolean newTransaction = false;
-
+    private boolean newTransaction;
 
     /**
      * Create the JtaTransaction.

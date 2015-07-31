@@ -74,7 +74,7 @@ public interface PersistenceContext {
      * The bean was previously deleted from this persistence context (can't hit
      * L2 cache).
      */
-    public static WithOption DELETED = new WithOption(true);
+    public static final WithOption DELETED = new WithOption(true);
 
     private final boolean deleted;
     private final Object bean;

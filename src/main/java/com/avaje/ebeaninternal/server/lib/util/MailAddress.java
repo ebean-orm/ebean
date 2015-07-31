@@ -5,10 +5,10 @@ package com.avaje.ebeaninternal.server.lib.util;
  */
 public class MailAddress {
 
-    
-    String alias;
-    
-    String emailAddress;
+
+  final String alias;
+
+  final String emailAddress;
     
     /**
      * Create an address with an optional alias.

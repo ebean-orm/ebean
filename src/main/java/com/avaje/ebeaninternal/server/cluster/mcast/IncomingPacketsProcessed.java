@@ -103,9 +103,9 @@ public class IncomingPacketsProcessed {
         /**
          * Packets received out of order.
          */
-        private ArrayList<Long> outOfOrderList = new ArrayList<Long>();
+        private final ArrayList<Long> outOfOrderList = new ArrayList<Long>();
 
-        private HashMap<Long,Integer> resendCountMap = new HashMap<Long,Integer>();
+        private final HashMap<Long,Integer> resendCountMap = new HashMap<Long,Integer>();
 
         public GotAllPoint(String memberKey, int maxResendIncoming) {
             this.memberKey = memberKey;

@@ -9,7 +9,7 @@ import com.avaje.ebeaninternal.server.transaction.TransactionMap.State;
  */
 public final class DefaultTransactionThreadLocal {
 
-  private static ThreadLocal<TransactionMap> local = new ThreadLocal<TransactionMap>() {
+  private static final ThreadLocal<TransactionMap> local = new ThreadLocal<TransactionMap>() {
     protected synchronized TransactionMap initialValue() {
       return new TransactionMap();
     }

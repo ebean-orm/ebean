@@ -16,13 +16,13 @@ import java.util.Map;
  */
 public final class ImmutableCompoundTypeBuilder {
 
-    private static ThreadLocal<ImmutableCompoundTypeBuilder> local = new ThreadLocal<ImmutableCompoundTypeBuilder>() {
+    private static final ThreadLocal<ImmutableCompoundTypeBuilder> local = new ThreadLocal<ImmutableCompoundTypeBuilder>() {
         protected synchronized ImmutableCompoundTypeBuilder initialValue() {
             return new ImmutableCompoundTypeBuilder();
         }
     };
 
-    private Map<Class<?>, Entry> entryMap = new HashMap<Class<?>, Entry>();
+    private final Map<Class<?>, Entry> entryMap = new HashMap<Class<?>, Entry>();
 
     /**
      * Clear the cache of partial compound objects.

@@ -99,13 +99,13 @@ public class DeployBeanDescriptor<T> {
   /**
    * The EntityBean type used to create new EntityBeans.
    */
-  private Class<T> beanType;
+  private final Class<T> beanType;
 
-  private List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>(2);
-  private List<BeanPersistListener> persistListeners = new ArrayList<BeanPersistListener>(2);
-  private List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>(2);
+  private final List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>(2);
+  private final List<BeanPersistListener> persistListeners = new ArrayList<BeanPersistListener>(2);
+  private final List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>(2);
 
-  private CacheOptions cacheOptions = new CacheOptions();
+  private final CacheOptions cacheOptions = new CacheOptions();
 
   /**
    * If set overrides the find implementation. Server side only.
@@ -115,7 +115,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * The table joins for this bean. Server side only.
    */
-  private ArrayList<DeployTableJoin> tableJoinList = new ArrayList<DeployTableJoin>(2);
+  private final ArrayList<DeployTableJoin> tableJoinList = new ArrayList<DeployTableJoin>(2);
 
   /**
    * Inheritance information. Server side only.

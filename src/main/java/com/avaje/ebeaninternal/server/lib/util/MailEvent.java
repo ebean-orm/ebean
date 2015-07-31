@@ -9,12 +9,12 @@ public class MailEvent {
     /**
      * The error indicating a send failure.
      */
-    Throwable error;
+    final Throwable error;
     
     /**
      * The message that was sent.
      */
-    MailMessage message;
+    final MailMessage message;
     
     
     /**

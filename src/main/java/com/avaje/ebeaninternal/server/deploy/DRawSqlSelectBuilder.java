@@ -37,7 +37,7 @@ public class DRawSqlSelectBuilder {
 	private int placeHolderAndWhere;
 	private int placeHolderHaving;
 	private int placeHolderAndHaving;
-	private boolean hasPlaceHolders;
+	private final boolean hasPlaceHolders;
 
 	private int selectPos = -1;
 	private int fromPos = -1;
@@ -51,7 +51,7 @@ public class DRawSqlSelectBuilder {
 	private boolean havingExprAnd;
 	private int havingExprPos = -1;
 
-	private String tableAlias;
+	private final String tableAlias;
 	
 	public DRawSqlSelectBuilder(NamingConvention namingConvention, BeanDescriptor<?> desc, DRawSqlMeta sqlSelectMeta) {
 

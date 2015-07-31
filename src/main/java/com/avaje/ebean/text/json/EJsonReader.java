@@ -19,7 +19,7 @@ import com.fasterxml.jackson.core.JsonToken;
 
 class EJsonReader {
 
-  static JsonFactory json = new JsonFactory();
+  static final JsonFactory json = new JsonFactory();
 
   @SuppressWarnings("unchecked")
   static Map<String, Object> parseObject(String json, boolean modifyAware) throws IOException  {

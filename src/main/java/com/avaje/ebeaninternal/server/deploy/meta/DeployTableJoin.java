@@ -36,7 +36,7 @@ public class DeployTableJoin {
   /**
    * The list of properties mapped to this joined table.
    */
-  private ArrayList<DeployBeanProperty> properties = new ArrayList<DeployBeanProperty>();
+  private final ArrayList<DeployBeanProperty> properties = new ArrayList<DeployBeanProperty>();
 
   /**
    * The list of join column pairs. Used to generate the on clause.
@@ -46,7 +46,7 @@ public class DeployTableJoin {
   /**
    * The persist cascade info.
    */
-  private BeanCascadeInfo cascadeInfo = new BeanCascadeInfo();
+  private final BeanCascadeInfo cascadeInfo = new BeanCascadeInfo();
 
   private InheritInfo inheritInfo;
 

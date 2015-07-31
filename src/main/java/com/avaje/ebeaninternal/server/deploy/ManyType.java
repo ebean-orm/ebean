@@ -21,7 +21,7 @@ public class ManyType {
     SET(Set.class),
     MAP(null);
 
-    Class<? extends Collection> type;
+    final Class<? extends Collection> type;
 
     Underlying(Class<? extends Collection> type) {
       this.type = type;

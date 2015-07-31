@@ -27,7 +27,7 @@ public class Dnode {
 
 	ArrayList<Dnode> children;
 
-	LinkedHashMap<String, String> attrList = new LinkedHashMap<String, String>();
+  final LinkedHashMap<String, String> attrList = new LinkedHashMap<String, String>();
 
 	/**
 	 * Create a node.

@@ -162,7 +162,7 @@ public class DeployBeanProperty {
   /**
    * The bean type.
    */
-  private Class<?> propertyType;
+  private final Class<?> propertyType;
 
   /**
    * Set for Non-JDBC types to provide logical to db type conversion.
@@ -190,7 +190,7 @@ public class DeployBeanProperty {
   /**
    * Extra deployment parameters.
    */
-  private HashMap<String, String> extraAttributeMap = new HashMap<String, String>();
+  private final HashMap<String, String> extraAttributeMap = new HashMap<String, String>();
 
   /**
    * The method used to read the property.

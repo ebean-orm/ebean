@@ -14,9 +14,9 @@ public class FileResourceContent implements ResourceContent {
     /**
      * The underlying file.
      */
-    File file;
+    final File file;
 
-    String entryName;
+  final String entryName;
 
     /**
      * Create with a File and the entryName.

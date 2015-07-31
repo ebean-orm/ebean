@@ -15,7 +15,7 @@ public class DeployBeanEmbedded {
 	/**
 	 * A map of property names to dbColumns.
 	 */
-	Map<String,String> propMap = new HashMap<String, String>();
+  final Map<String,String> propMap = new HashMap<String, String>();
 	
 	/**
 	 * Set a property name to use a specific dbColumn.

@@ -16,7 +16,7 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
 	/**
 	 * Persist settings.
 	 */
-	BeanCascadeInfo cascadeInfo = new BeanCascadeInfo();
+  final BeanCascadeInfo cascadeInfo = new BeanCascadeInfo();
 
 	/**
 	 * The join table information.
@@ -26,7 +26,7 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
 	/**
 	 * Join between the beans.
 	 */
-	DeployTableJoin tableJoin = new DeployTableJoin();
+  final DeployTableJoin tableJoin = new DeployTableJoin();
 
 	/**
 	 * Whether the associated join type should be an outer join.

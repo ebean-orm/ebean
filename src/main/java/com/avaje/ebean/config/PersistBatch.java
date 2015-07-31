@@ -36,7 +36,7 @@ public enum PersistBatch {
   INHERIT(false);
 
 
-  boolean forInsert;
+  final boolean forInsert;
 
   PersistBatch(boolean forInsert) {
     this.forInsert = forInsert;

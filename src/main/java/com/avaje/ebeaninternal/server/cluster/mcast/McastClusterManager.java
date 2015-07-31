@@ -102,12 +102,12 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
    * Packets are cleared from the outgoingPacketsCache quicker at the cost of
    * sending more packets.
    */
-  private long managerSleepMillis;
+  private final long managerSleepMillis;
 
   /**
    * When true then packets are still sent out even when the cluster has no other online members.
    */
-  private boolean sendWithNoMembers;
+  private final boolean sendWithNoMembers;
 
   /**
    * The current minAcked packetId processed by the managerThread.
@@ -143,7 +143,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
   /**
    * The max time we go without sending any packets.
    */
-  private int lastSendTimeFreqMillis;
+  private final int lastSendTimeFreqMillis;
 
   /**
    * The last time the cluster status was logged.
@@ -153,7 +153,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
   /**
    * The max time we go before logging the cluster status.
    */
-  private int lastStatusTimeFreqMillis;
+  private final int lastStatusTimeFreqMillis;
 
 
   private long totalTxnEventsSent;

@@ -19,7 +19,7 @@ class EJsonWriter {
   /**
    * Base jsonFactory implementation used when it is not passed in.
    */
-  static JsonFactory jsonFactory = new JsonFactory();
+  static final JsonFactory jsonFactory = new JsonFactory();
 
   static String write(Object object) throws IOException {
     StringWriter writer = new StringWriter(200);

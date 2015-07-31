@@ -15,7 +15,7 @@ public final class ElFilter<T> implements Filter<T>  {
 
 	private final BeanDescriptor<T> beanDescriptor;
 	
-	private ArrayList<ElMatcher<T>> matches = new ArrayList<ElMatcher<T>>();
+	private final ArrayList<ElMatcher<T>> matches = new ArrayList<ElMatcher<T>>();
 
 	private int maxRows;
 	

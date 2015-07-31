@@ -11,7 +11,7 @@ import java.util.HashMap;
  */
 public final class InternString {
 
-	private static HashMap<String,String> map = new HashMap<String,String>();
+	private static final HashMap<String,String> map = new HashMap<String,String>();
 	
 	
 	/**

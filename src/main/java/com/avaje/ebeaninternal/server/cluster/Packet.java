@@ -34,22 +34,22 @@ public class Packet {
     /**
      * The type of Packet.
      */
-    protected short packetType;
+    protected final short packetType;
     
     /**
      * The PacketId.
      */
-    protected long packetId;
+    protected final long packetId;
     
     /**
      * The timestamp the Packet was created.
      */
-    protected long timestamp;
+    protected final long timestamp;
     
     /**
      * The EbeanServer name this relates to if relevant.
      */
-    protected String serverName;
+    protected final String serverName;
     
     protected ByteArrayOutputStream buffer;
     protected DataOutputStream dataOut;

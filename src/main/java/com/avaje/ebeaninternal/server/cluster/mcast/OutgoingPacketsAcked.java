@@ -7,7 +7,7 @@ public class OutgoingPacketsAcked {
 
     private long minimumGotAllPacketId;
 
-    private Map<String, GroupMemberAck> recievedByMap = new HashMap<String, GroupMemberAck>();
+    private final Map<String, GroupMemberAck> recievedByMap = new HashMap<String, GroupMemberAck>();
 
     public int getGroupSize() {
         synchronized (this) {

@@ -6,8 +6,8 @@ import java.util.LinkedHashMap;
  * Utility String class that supports String manipulation functions. 
  */
 public class MapFromString {
-    
-    LinkedHashMap<String,String> map = new LinkedHashMap<String,String>();
+
+  final LinkedHashMap<String,String> map = new LinkedHashMap<String,String>();
     
     String mapToString;
         

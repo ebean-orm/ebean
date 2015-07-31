@@ -21,7 +21,7 @@ public class MailSender implements Runnable {
   int traceLevel = 0;
 
   Socket sserver;
-  String server;
+  final String server;
 
   BufferedReader in;
 

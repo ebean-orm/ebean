@@ -10,16 +10,11 @@ import java.util.List;
  * A simple test message that can be sent via smtp.
  */
 public class MailMessage {
-    
-//    /**
-//     * The subject text.
-//     */
-//    String subject;
 
     /**
      * The body content.
      */
-    ArrayList<String> bodylines; 
+    final ArrayList<String> bodylines;
 
     /**
      * The sender email address.
@@ -29,7 +24,7 @@ public class MailMessage {
     /**
      * The headers.
      */
-    HashMap<String,String> header = new HashMap<String, String>();
+    final HashMap<String,String> header = new HashMap<String, String>();
 
     /**
      * the recipient of the email.
@@ -39,7 +34,7 @@ public class MailMessage {
     /**
      * The list of recipients.
      */
-    ArrayList<MailAddress> recipientList = new ArrayList<MailAddress>();
+    final ArrayList<MailAddress> recipientList = new ArrayList<MailAddress>();
     
     /**
      * Create the message.

@@ -29,7 +29,7 @@ public class DnodeParser extends DefaultHandler {
     /**
      * Used to stack the nodes.
      */
-    Stack<Dnode> stack = new Stack<Dnode>();
+    final Stack<Dnode> stack = new Stack<Dnode>();
 
     /**
      * The class used to construct new nodes. Should be Dnode or a subtype of

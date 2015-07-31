@@ -45,7 +45,7 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * The actual entity bean that 'owns' this intercept.
    */
-  private EntityBean owner;
+  private final EntityBean owner;
 
   private EntityBean embeddedOwner;
   private int embeddedOwnerIndex;
@@ -72,7 +72,7 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Used when a bean is partially filled.
    */
-  private boolean[] loadedProps;
+  private final boolean[] loadedProps;
   
   private boolean fullyLoadedBean;
 

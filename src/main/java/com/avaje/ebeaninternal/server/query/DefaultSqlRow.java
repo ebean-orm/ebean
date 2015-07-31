@@ -38,7 +38,7 @@ public class DefaultSqlRow implements SqlRow {
     /**
      * The underlying map of property data.
      */
-    Map<String, Object> map;
+    final Map<String, Object> map;
 
     /**
      * Create with a specific Map implementation.

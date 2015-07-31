@@ -38,7 +38,7 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
 	/**
 	 * The type of the many, set, list or map.
 	 */
-	ManyType manyType;
+  final ManyType manyType;
 
 	/**
 	 * Create this property.

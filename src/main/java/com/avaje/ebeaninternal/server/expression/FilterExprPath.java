@@ -16,7 +16,7 @@ public class FilterExprPath implements Serializable {
   /**
    * The path of the filterMany.
    */
-  private String path;
+  private final String path;
 
   public FilterExprPath(String path) {
     this.path = path;

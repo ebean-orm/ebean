@@ -20,9 +20,9 @@ public class DeployTableJoinColumn {
 	 */
 	String foreignDbColumn;
 
-	boolean insertable;
-	
-	boolean updateable;
+  final boolean insertable;
+
+  final boolean updateable;
 	
 	/**
 	 * Construct when automatically determining the join.
