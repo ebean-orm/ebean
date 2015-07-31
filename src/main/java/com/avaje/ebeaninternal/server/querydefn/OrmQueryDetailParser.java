@@ -155,7 +155,7 @@ public class OrmQueryDetailParser {
 
     String props = null;
     String path = parser.nextWord();
-    String token = null;
+    String token;
     while ((token = parser.nextWord()) != null) {
       if (!readAlias && parser.isMatch("as")) {
         // next token is alias

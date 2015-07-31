@@ -297,9 +297,8 @@ public class OrmQueryDetail implements Serializable {
           BeanPropertyAssoc<?> assocOne = (BeanPropertyAssoc<?>) el.getBeanProperty();
           parentProp = new OrmQueryProperties(parentPath, assocOne.getTargetIdProperty());
         }
-        if (parentProp != null) {
-          sortFetchPaths(d, parentProp, sorted);
-        }
+
+        sortFetchPaths(d, parentProp, sorted);
         sorted.put(path, p);
       }
     }
@@ -366,10 +365,8 @@ public class OrmQueryDetail implements Serializable {
     } else {
       if (lazyLoadManyPath != null && lazyLoadManyPath.equals(parent.getPath())) {
         return false;
-      } else if (!parent.isFetchJoin()) {
-        return true;
       } else {
-        return hasParentSecJoin(lazyLoadManyPath, parent);
+        return !parent.isFetchJoin() || hasParentSecJoin(lazyLoadManyPath, parent);
       }
     }
   }
