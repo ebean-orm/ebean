@@ -4,7 +4,6 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.text.json.EJson;
 import com.avaje.tests.model.json.EBasicJsonMapBlob;
-import com.avaje.tests.model.json.EBasicJsonMapVarchar;
 import org.junit.Test;
 
 import java.io.IOException;

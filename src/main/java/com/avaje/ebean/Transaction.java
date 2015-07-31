@@ -2,7 +2,6 @@ package com.avaje.ebean;
 
 import com.avaje.ebean.config.PersistBatch;
 
-import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
 import java.io.Closeable;

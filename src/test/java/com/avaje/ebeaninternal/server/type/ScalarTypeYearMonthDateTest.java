@@ -3,12 +3,10 @@ package com.avaje.ebeaninternal.server.type;
 import org.junit.Test;
 
 import java.sql.Date;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ScalarTypeYearMonthDateTest {
 

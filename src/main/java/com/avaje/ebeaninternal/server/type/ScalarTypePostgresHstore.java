@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.type;
 import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.EJson;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 

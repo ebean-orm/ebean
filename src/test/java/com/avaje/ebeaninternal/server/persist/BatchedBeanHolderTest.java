@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.TDSpiEbeanServer;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;

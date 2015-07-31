@@ -1,12 +1,12 @@
 package com.avaje.tests.persistencecontext;
 
-import org.junit.Test;
-import static org.assertj.core.api.Assertions.*;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.tests.model.basic.EBasic;
+import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestPersistenceContextOnUpdateDuringTxn extends BaseTestCase {
 

@@ -3,8 +3,11 @@ package com.avaje.tests.query.lazy;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.QueryEachConsumer;
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.tests.model.basic.*;
+import com.avaje.tests.model.basic.Customer;
+import com.avaje.tests.model.basic.Order;
+import com.avaje.tests.model.basic.OrderDetail;
+import com.avaje.tests.model.basic.Product;
+import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
 import java.util.List;

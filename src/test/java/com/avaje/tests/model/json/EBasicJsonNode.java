@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
-import java.util.Map;
 
 @Entity
 public class EBasicJsonNode {

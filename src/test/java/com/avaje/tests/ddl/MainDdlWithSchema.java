@@ -3,7 +3,6 @@ package com.avaje.tests.ddl;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.config.UnderscoreNamingConvention;
 import com.avaje.tests.model.basic.EBasic;
 
 public class MainDdlWithSchema {

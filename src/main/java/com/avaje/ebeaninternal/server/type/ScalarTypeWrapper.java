@@ -1,14 +1,13 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.config.ScalarTypeConverter;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
-
-import com.avaje.ebean.config.ScalarTypeConverter;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * A ScalarType that uses a ScalarTypeConverter to convert to and from another underlying

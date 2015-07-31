@@ -1,12 +1,11 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
 
 /**
  * Holds lists of persist requests for beans of a given type.

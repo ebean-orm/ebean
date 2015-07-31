@@ -1,19 +1,17 @@
 package com.avaje.tests.text.json;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import com.avaje.ebean.Query;
-import com.avaje.ebean.text.PathProperties;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebean.text.json.JsonWriteOptions;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 

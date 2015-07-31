@@ -1,11 +1,12 @@
 package com.avaje.tests.model.map;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.*;
+import javax.persistence.MapKey;
+import javax.persistence.OneToMany;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 public class MpUser {

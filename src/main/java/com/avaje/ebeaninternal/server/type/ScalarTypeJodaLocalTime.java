@@ -1,19 +1,17 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalTime;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Types;
-
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalTime;
-
-import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * ScalarType for Joda LocalTime. This maps to a JDBC Time.

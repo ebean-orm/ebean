@@ -4,10 +4,11 @@ import com.avaje.ebean.config.JsonConfig;
 import org.junit.Test;
 
 import java.sql.Timestamp;
-import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ScalarTypeZonedDateTimeTest {
 

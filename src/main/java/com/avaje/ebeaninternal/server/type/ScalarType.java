@@ -1,15 +1,14 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.text.StringFormatter;
+import com.avaje.ebean.text.StringParser;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
-
-import com.avaje.ebean.text.StringFormatter;
-import com.avaje.ebean.text.StringParser;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Describes a scalar type.

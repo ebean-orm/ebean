@@ -1,8 +1,11 @@
 package com.avaje.tests.persistencecontext;
 
-import com.avaje.ebean.*;
+import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.EbeanServerFactory;
+import com.avaje.ebean.PersistenceContextScope;
+import com.avaje.ebean.Query;
 import com.avaje.ebean.config.ContainerConfig;
-import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;

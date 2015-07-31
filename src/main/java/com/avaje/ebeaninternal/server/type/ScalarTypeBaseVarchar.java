@@ -1,15 +1,14 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.text.TextException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
-
-import com.avaje.ebean.text.TextException;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Base ScalarType for types which converts to and from a VARCHAR database

@@ -1,16 +1,13 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import java.sql.SQLException;
-
-import javax.persistence.PersistenceException;
-
-import com.avaje.ebeaninternal.api.SpiTransaction;
-import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.persist.BeanPersister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import java.sql.SQLException;
 
 /**
  * Bean persister that uses the Handler and Meta objects.

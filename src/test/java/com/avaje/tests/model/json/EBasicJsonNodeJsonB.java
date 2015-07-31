@@ -1,8 +1,6 @@
 package com.avaje.tests.model.json;
 
-import com.avaje.ebean.annotation.DbJson;
 import com.avaje.ebean.annotation.DbJsonB;
-import com.avaje.ebean.annotation.DbJsonType;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import javax.persistence.Entity;

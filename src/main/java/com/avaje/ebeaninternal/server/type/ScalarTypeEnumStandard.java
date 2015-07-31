@@ -1,16 +1,15 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.text.TextException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.EnumSet;
-
-import com.avaje.ebean.text.TextException;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * JPA standard based Enum scalar type.

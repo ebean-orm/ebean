@@ -1,14 +1,12 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.util.List;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Manages the assignment/registration of BeanPersistListener with their
