@@ -59,11 +59,6 @@ public interface IdBinder {
   BeanProperty findBeanProperty(String dbColumnName);
 
   /**
-   * Return the number of scalar properties for this id.
-   */
-  int getPropertyCount();
-
-  /**
    * Return false if the id is a simple scalar and false if it is embedded or
    * concatenated.
    */

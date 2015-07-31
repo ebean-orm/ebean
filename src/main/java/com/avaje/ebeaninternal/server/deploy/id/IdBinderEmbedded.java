@@ -107,10 +107,6 @@ public final class IdBinderEmbedded implements IdBinder {
     return idDesc;
   }
 
-  public int getPropertyCount() {
-    return props.length;
-  }
-
   public String getIdProperty() {
     return embIdProperty.getName();
   }
@@ -209,10 +205,6 @@ public final class IdBinderEmbedded implements IdBinder {
     }
     sb.append(") ");
     return sb.toString();
-  }
-
-  public String getIdInValueExpr() {
-    return idInValueSql;
   }
 
   public Object[] getIdValues(EntityBean bean) {

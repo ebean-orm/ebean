@@ -40,10 +40,6 @@ public final class IdBinderEmpty implements IdBinder {
   public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
   }
 
-  public int getPropertyCount() {
-    return 0;
-  }
-
   @Override
   public BeanProperty getBeanProperty() {
     return null;

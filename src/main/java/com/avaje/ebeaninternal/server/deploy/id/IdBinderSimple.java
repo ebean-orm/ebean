@@ -63,13 +63,6 @@ public final class IdBinderSimple implements IdBinder {
     idProperty.buildRawSqlSelectChain(prefix, selectChain);
   }
 
-  /**
-   * Returns 1.
-   */
-  public int getPropertyCount() {
-    return 1;
-  }
-
   @Override
   public BeanProperty getBeanProperty() {
     return idProperty;
