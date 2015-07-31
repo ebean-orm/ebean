@@ -31,157 +31,157 @@ import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
  */
 public class DefaultSqlRow implements SqlRow {
 
-    static final long serialVersionUID = -3120927797041336242L;
+  static final long serialVersionUID = -3120927797041336242L;
 
-    private final String dbTrueValue;
-    
-    /**
-     * The underlying map of property data.
-     */
-    final Map<String, Object> map;
+  private final String dbTrueValue;
 
-    /**
-     * Create with an initialCapacity and loadFactor.
-     * <p>
-     * The defaults of these are 16 and 0.75.
-     * </p>
-     * <p>
-     * Note that the Map will rehash the contents when the number of keys in
-     * this map reaches its threshold (initialCapacity * loadFactor).
-     * </p>
-     */
-    public DefaultSqlRow(int initialCapacity, float loadFactor, String dbTrueValue) {
-        this.map = new LinkedHashMap<String, Object>(initialCapacity, loadFactor);
-        this.dbTrueValue = dbTrueValue;
-    }
+  /**
+   * The underlying map of property data.
+   */
+  final Map<String, Object> map;
 
-    public Iterator<String> keys() {
-        return map.keySet().iterator();
-    }
+  /**
+   * Create with an initialCapacity and loadFactor.
+   * <p>
+   * The defaults of these are 16 and 0.75.
+   * </p>
+   * <p>
+   * Note that the Map will rehash the contents when the number of keys in
+   * this map reaches its threshold (initialCapacity * loadFactor).
+   * </p>
+   */
+  public DefaultSqlRow(int initialCapacity, float loadFactor, String dbTrueValue) {
+    this.map = new LinkedHashMap<String, Object>(initialCapacity, loadFactor);
+    this.dbTrueValue = dbTrueValue;
+  }
 
-    public Object remove(Object name) {
-        name = ((String) name).toLowerCase();
-        return map.remove(name);
-    }
+  public Iterator<String> keys() {
+    return map.keySet().iterator();
+  }
 
-    public Object get(Object name) {
-        name = ((String) name).toLowerCase();
-        return map.get(name);
-    }
+  public Object remove(Object name) {
+    name = ((String) name).toLowerCase();
+    return map.remove(name);
+  }
 
-    public Object put(String name, Object value) {
-        return setInternal(name, value);
-    }
+  public Object get(Object name) {
+    name = ((String) name).toLowerCase();
+    return map.get(name);
+  }
 
-    public Object set(String name, Object value) {
-        return setInternal(name, value);
-    }
+  public Object put(String name, Object value) {
+    return setInternal(name, value);
+  }
 
-    private Object setInternal(String name, Object newValue) {
-        // MapBean properties are always lowercase
-        name = name.toLowerCase();
+  public Object set(String name, Object value) {
+    return setInternal(name, value);
+  }
 
-        // valueList = null;
-        return map.put(name, newValue);
-    }
+  private Object setInternal(String name, Object newValue) {
+    // MapBean properties are always lowercase
+    name = name.toLowerCase();
 
-    public UUID getUUID(String name) {
-        Object val = get(name);
-        return BasicTypeConverter.toUUID(val);
-    }
+    // valueList = null;
+    return map.put(name, newValue);
+  }
 
-    public Boolean getBoolean(String name) {
-        Object val = get(name);
-        return BasicTypeConverter.toBoolean(val, dbTrueValue);
-    }
+  public UUID getUUID(String name) {
+    Object val = get(name);
+    return BasicTypeConverter.toUUID(val);
+  }
 
-    public Integer getInteger(String name) {
-        Object val = get(name);
-        return BasicTypeConverter.toInteger(val);
-    }
+  public Boolean getBoolean(String name) {
+    Object val = get(name);
+    return BasicTypeConverter.toBoolean(val, dbTrueValue);
+  }
 
-    public BigDecimal getBigDecimal(String name) {
-        Object val = get(name);
-        return BasicTypeConverter.toBigDecimal(val);
-    }
+  public Integer getInteger(String name) {
+    Object val = get(name);
+    return BasicTypeConverter.toInteger(val);
+  }
 
-    public Long getLong(String name) {
-        Object val = get(name);
-        return BasicTypeConverter.toLong(val);
-    }
+  public BigDecimal getBigDecimal(String name) {
+    Object val = get(name);
+    return BasicTypeConverter.toBigDecimal(val);
+  }
 
-    public Double getDouble(String name) {
-        Object val = get(name);
-        return BasicTypeConverter.toDouble(val);
-    }
+  public Long getLong(String name) {
+    Object val = get(name);
+    return BasicTypeConverter.toLong(val);
+  }
 
-    public Float getFloat(String name) {
-        Object val = get(name);
-        return BasicTypeConverter.toFloat(val);
-    }
+  public Double getDouble(String name) {
+    Object val = get(name);
+    return BasicTypeConverter.toDouble(val);
+  }
 
-    public String getString(String name) {
-        Object val = get(name);
-        return BasicTypeConverter.toString(val);
-    }
+  public Float getFloat(String name) {
+    Object val = get(name);
+    return BasicTypeConverter.toFloat(val);
+  }
 
-    public java.util.Date getUtilDate(String name) {
-        Object val = get(name);
-        return BasicTypeConverter.toUtilDate(val);
-    }
+  public String getString(String name) {
+    Object val = get(name);
+    return BasicTypeConverter.toString(val);
+  }
 
-    public Date getDate(String name) {
-        Object val = get(name);
-        return BasicTypeConverter.toDate(val);
-    }
+  public java.util.Date getUtilDate(String name) {
+    Object val = get(name);
+    return BasicTypeConverter.toUtilDate(val);
+  }
 
-    public Timestamp getTimestamp(String name) {
-        Object val = get(name);
-        return BasicTypeConverter.toTimestamp(val);
-    }
+  public Date getDate(String name) {
+    Object val = get(name);
+    return BasicTypeConverter.toDate(val);
+  }
 
-    public String toString() {
-        return map.toString();
-    }
+  public Timestamp getTimestamp(String name) {
+    Object val = get(name);
+    return BasicTypeConverter.toTimestamp(val);
+  }
 
-    // ------------------------------------
-    // Normal map methods...
+  public String toString() {
+    return map.toString();
+  }
 
-    public void clear() {
-        map.clear();
-    }
+  // ------------------------------------
+  // Normal map methods...
 
-    public boolean containsKey(Object key) {
-        key = ((String) key).toLowerCase();
-        return map.containsKey(key);
-    }
+  public void clear() {
+    map.clear();
+  }
 
-    public boolean containsValue(Object value) {
-        return map.containsValue(value);
-    }
+  public boolean containsKey(Object key) {
+    key = ((String) key).toLowerCase();
+    return map.containsKey(key);
+  }
 
-    public Set<Map.Entry<String, Object>> entrySet() {
-        return map.entrySet();
-    }
+  public boolean containsValue(Object value) {
+    return map.containsValue(value);
+  }
 
-    public boolean isEmpty() {
-        return map.isEmpty();
-    }
+  public Set<Map.Entry<String, Object>> entrySet() {
+    return map.entrySet();
+  }
 
-    public Set<String> keySet() {
-        return map.keySet();
-    }
+  public boolean isEmpty() {
+    return map.isEmpty();
+  }
 
-    public void putAll(Map<? extends String, ?> t) {
-        map.putAll(t);
-    }
+  public Set<String> keySet() {
+    return map.keySet();
+  }
 
-    public int size() {
-        return map.size();
-    }
+  public void putAll(Map<? extends String, ?> t) {
+    map.putAll(t);
+  }
 
-    public Collection<Object> values() {
-        return map.values();
-    }
+  public int size() {
+    return map.size();
+  }
+
+  public Collection<Object> values() {
+    return map.values();
+  }
 
 }

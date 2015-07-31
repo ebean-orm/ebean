@@ -37,33 +37,33 @@ import com.avaje.ebeaninternal.server.type.RsetDataReader;
 public class CQueryPlan {
 
   private final SpiEbeanServer server;
-  
-	private final boolean autofetchTuned;
-		
-	private final HashQueryPlan hash;
-	
-	private final boolean rawSql;
 
-	private final boolean rowNumberIncluded;
+  private final boolean autofetchTuned;
 
-	private final String sql;
+  private final HashQueryPlan hash;
 
-	private final String logWhereSql;
+  private final boolean rawSql;
 
-	private final SqlTree sqlTree;
+  private final boolean rowNumberIncluded;
 
-	/**
-	 * Encrypted properties required additional binding.
-	 */
-	private final BeanProperty[] encryptedProps;
-	
-	private final CQueryPlanStats stats;
+  private final String sql;
+
+  private final String logWhereSql;
+
+  private final SqlTree sqlTree;
+
+  /**
+   * Encrypted properties required additional binding.
+   */
+  private final BeanProperty[] encryptedProps;
+
+  private final CQueryPlanStats stats;
 
   private final Class<?> beanType;
 
-	/**
-	 * Create a query plan based on a OrmQueryRequest.
-	 */
+  /**
+   * Create a query plan based on a OrmQueryRequest.
+   */
   public CQueryPlan(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, boolean rawSql, String logWhereSql) {
 
     this.server = request.getServer();
@@ -84,38 +84,38 @@ public class CQueryPlan {
     this.encryptedProps = sqlTree.getEncryptedProps();
   }
 
-	/**
-	 * Create a query plan for a raw sql query.
-	 */
-	public CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, 
-			boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
-			  
-	  this.server = request.getServer();
-	  this.beanType = request.getBeanDescriptor().getBeanType();
-	  this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
-		this.hash = buildHash(sql, rawSql, rowNumberIncluded, logWhereSql);
-		this.autofetchTuned = false;
-		this.sql = sql;
-		this.sqlTree = sqlTree;
-		this.rawSql = rawSql;
-		this.rowNumberIncluded = rowNumberIncluded;
-		this.logWhereSql = logWhereSql;
-		this.encryptedProps = sqlTree.getEncryptedProps();
-	}
+  /**
+   * Create a query plan for a raw sql query.
+   */
+  public CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree,
+                    boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
+
+    this.server = request.getServer();
+    this.beanType = request.getBeanDescriptor().getBeanType();
+    this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
+    this.hash = buildHash(sql, rawSql, rowNumberIncluded, logWhereSql);
+    this.autofetchTuned = false;
+    this.sql = sql;
+    this.sqlTree = sqlTree;
+    this.rawSql = rawSql;
+    this.rowNumberIncluded = rowNumberIncluded;
+    this.logWhereSql = logWhereSql;
+    this.encryptedProps = sqlTree.getEncryptedProps();
+  }
 
 
   private HashQueryPlan buildHash(String sql, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
-	  HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
-	  builder.add(sql).add(rawSql).add(rowNumberIncluded).add(logWhereSql);
-	  builder.addRawSql(sql);
-	  return builder.build();
-	}
+    HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
+    builder.add(sql).add(rawSql).add(rowNumberIncluded).add(logWhereSql);
+    builder.addRawSql(sql);
+    return builder.build();
+  }
 
-	public String toString() {
-	  return beanType+" hash:"+hash;
-	}
-	
-	public Class<?> getBeanType() {
+  public String toString() {
+    return beanType + " hash:" + hash;
+  }
+
+  public Class<?> getBeanType() {
     return beanType;
   }
 
@@ -132,70 +132,70 @@ public class CQueryPlan {
       }
     }
   }
-	
-	public boolean isAutofetchTuned() {
-		return autofetchTuned;
-	}
 
-	public HashQueryPlan getHash() {
-		return hash;
-	}
+  public boolean isAutofetchTuned() {
+    return autofetchTuned;
+  }
 
-	public String getSql() {
-		return sql;
-	}
+  public HashQueryPlan getHash() {
+    return hash;
+  }
 
-	public SqlTree getSqlTree() {
-		return sqlTree;
-	}
+  public String getSql() {
+    return sql;
+  }
 
-	public boolean isRawSql() {
-		return rawSql;
-	}
+  public SqlTree getSqlTree() {
+    return sqlTree;
+  }
 
-	public boolean isRowNumberIncluded() {
-		return rowNumberIncluded;
-	}
+  public boolean isRawSql() {
+    return rawSql;
+  }
 
-	public String getLogWhereSql() {
-		return logWhereSql;
-	}
+  public boolean isRowNumberIncluded() {
+    return rowNumberIncluded;
+  }
 
-	/**
-	 * Reset the query statistics.
-	 */
-	public void resetStatistics() {
-		stats.reset();
-	}
-	
-	/**
-	 * Register an execution time against this query plan;
-	 */
-	public void executionTime(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
+  public String getLogWhereSql() {
+    return logWhereSql;
+  }
 
-		stats.add(loadedBeanCount, timeMicros, objectGraphNode);
-		if (objectGraphNode != null) {
-  		// collect stats based on objectGraphNode for lazy loading reporting
-  		server.collectQueryStats(objectGraphNode, loadedBeanCount, timeMicros);
-		}
-	}
+  /**
+   * Reset the query statistics.
+   */
+  public void resetStatistics() {
+    stats.reset();
+  }
+
+  /**
+   * Register an execution time against this query plan;
+   */
+  public void executionTime(long loadedBeanCount, long timeMicros, ObjectGraphNode objectGraphNode) {
+
+    stats.add(loadedBeanCount, timeMicros, objectGraphNode);
+    if (objectGraphNode != null) {
+      // collect stats based on objectGraphNode for lazy loading reporting
+      server.collectQueryStats(objectGraphNode, loadedBeanCount, timeMicros);
+    }
+  }
 
   public Snapshot getSnapshot(boolean reset) {
     return stats.getSnapshot(reset);
   }
-  
-	/**
-	 * Return the current query statistics.
-	 */
-	public CQueryPlanStats getQueryStats() {
-		return stats;
-	}
-	
-	/**
-	 * Return the time this query plan was last used.
-	 */
-	public long getLastQueryTime(){
-	    return stats.getLastQueryTime();
-	}
-	
+
+  /**
+   * Return the current query statistics.
+   */
+  public CQueryPlanStats getQueryStats() {
+    return stats;
+  }
+
+  /**
+   * Return the time this query plan was last used.
+   */
+  public long getLastQueryTime() {
+    return stats.getLastQueryTime();
+  }
+
 }

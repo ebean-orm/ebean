@@ -11,7 +11,7 @@ import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 
 /**
  * Special Map of the logical property joins to table alias.
- * 
+ *
  * @author rbygrave
  */
 public class SqlTreeAlias {
@@ -147,7 +147,7 @@ public class SqlTreeAlias {
       s = aliasMap.get(prefix);
     }
     if (s == null) {
-      String msg = "Could not determine table alias for [" + prefix + "] manyMap[" + manyWhereAliasMap + "] aliasMap["+ aliasMap + "]";
+      String msg = "Could not determine table alias for [" + prefix + "] manyMap[" + manyWhereAliasMap + "] aliasMap[" + aliasMap + "]";
       throw new RuntimeException(msg);
     }
     return s;

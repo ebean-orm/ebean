@@ -6,24 +6,23 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 
 /**
  * Base object for making query execution into Callable's.
- * 
- * @author rbygrave
  *
  * @param <T> the entity bean type
+ * @author rbygrave
  */
 public abstract class CallableQuery<T> {
 
-	protected final SpiQuery<T> query;
-	
-	protected final SpiEbeanServer server;
-	
-	protected final Transaction transaction;
-	
-	public CallableQuery(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
-		this.server = server;
-		this.query = query;
-		this.transaction = t;
-	}
+  protected final SpiQuery<T> query;
+
+  protected final SpiEbeanServer server;
+
+  protected final Transaction transaction;
+
+  public CallableQuery(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
+    this.server = server;
+    this.query = query;
+    this.transaction = t;
+  }
 
   public SpiQuery<T> getQuery() {
     return query;
@@ -32,5 +31,5 @@ public abstract class CallableQuery<T> {
   public Transaction getTransaction() {
     return transaction;
   }
-	
+
 }

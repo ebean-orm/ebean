@@ -135,7 +135,7 @@ public class CQueryBuilder {
     query.setMaxRows(0);
 
     ManyWhereJoins manyWhereJoins = query.getManyWhereJoins();
-    
+
     boolean hasMany = manyWhereJoins.isHasMany();
     if (manyWhereJoins.isSelectId()) {
       // just select the id property
@@ -271,7 +271,7 @@ public class CQueryBuilder {
 
         ElPropertyValue el = descriptor.getElGetValue(propertyName);
         if (el == null) {
-            throw new PersistenceException("Property [" + propertyName + "] not found on " + descriptor.getFullName());
+          throw new PersistenceException("Property [" + propertyName + "] not found on " + descriptor.getFullName());
         } else {
           BeanProperty beanProperty = el.getBeanProperty();
           if (beanProperty.isId() || beanProperty.isDiscriminator()) {
@@ -326,7 +326,7 @@ public class CQueryBuilder {
     StringBuilder sb = new StringBuilder(500);
 
     String dbOrderBy = predicates.getDbOrderBy();
-    
+
     if (selectClause != null) {
       sb.append(selectClause);
 
@@ -442,7 +442,7 @@ public class CQueryBuilder {
     // just remove the ASC and DESC keywords
     return dbOrderBy.replaceAll("(?i)\\b asc\\b|\\b desc\\b", "");
   }
-  
+
   private boolean isEmpty(String s) {
     return s == null || s.length() == 0;
   }

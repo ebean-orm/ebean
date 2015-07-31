@@ -9,11 +9,11 @@ package com.avaje.ebeaninternal.server.query;
  */
 public interface CancelableQuery {
 
-	/**
-	 * Cancel the query.
-	 * <p>
-	 * For JDBC this translates to calling cancel on the PreparedStatement.
-	 * </p>
-	 */
-	void cancel();
+  /**
+   * Cancel the query.
+   * <p>
+   * For JDBC this translates to calling cancel on the PreparedStatement.
+   * </p>
+   */
+  void cancel();
 }

@@ -99,7 +99,7 @@ public class SqlTreeBuilder {
    * to the root node.
    */
   public SqlTreeBuilder(String tableAliasPlaceHolder, String columnAliasPrefix,
-      OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryHistorySupport historySupport) {
+                        OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryHistorySupport historySupport) {
 
     this.rawSql = false;
     this.rawNoId = false;
@@ -112,7 +112,7 @@ public class SqlTreeBuilder {
     this.queryDetail = query.getDetail();
 
     this.predicates = predicates;
-    this.alias = new SqlTreeAlias(request.getQuery().getAlias()==null?request.getBeanDescriptor().getBaseTableAlias():request.getQuery().getAlias());
+    this.alias = new SqlTreeAlias(request.getQuery().getAlias() == null ? request.getBeanDescriptor().getBaseTableAlias() : request.getQuery().getAlias());
     this.ctx = new DefaultDbSqlContext(alias, tableAliasPlaceHolder, columnAliasPrefix, !subQuery, historySupport);
   }
 
@@ -139,7 +139,7 @@ public class SqlTreeBuilder {
     }
 
     return new SqlTree(summary.toString(), rootNode, selectSql, fromSql, inheritanceWhereSql, encryptedProps,
-                        manyProperty, queryDetail.getIncludes());
+        manyProperty, queryDetail.getIncludes());
   }
 
   private String buildSelectClause() {
@@ -198,7 +198,7 @@ public class SqlTreeBuilder {
    * should be included.
    */
   private SqlTreeNode buildSelectChain(String prefix, BeanPropertyAssoc<?> prop,
-      BeanDescriptor<?> desc, List<SqlTreeNode> joinList) {
+                                       BeanDescriptor<?> desc, List<SqlTreeNode> joinList) {
 
     List<SqlTreeNode> myJoinList = new ArrayList<SqlTreeNode>();
 
@@ -303,7 +303,7 @@ public class SqlTreeBuilder {
     if (!extraJoins.isEmpty()) {
       // add extra joins required to support predicates
       // and/or order by clause
-      for (SqlTreeNodeExtraJoin extraJoin: extraJoins) {
+      for (SqlTreeNodeExtraJoin extraJoin : extraJoins) {
         myList.add(extraJoin);
         if (extraJoin.isManyJoin()) {
           // as we are now going to join to the many then we need
@@ -342,7 +342,7 @@ public class SqlTreeBuilder {
   }
 
   private void addProperty(SqlTreeProperties selectProps, BeanDescriptor<?> desc,
-      OrmQueryProperties queryProps, String propName) {
+                           OrmQueryProperties queryProps, String propName) {
 
     if (subQuery) {
       addPropertyToSubQuery(selectProps, desc, propName);
@@ -379,7 +379,7 @@ public class SqlTreeBuilder {
       BeanProperty p = desc.findBeanProperty(propName);
       if (p == null) {
         logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
-        p =  desc.findBeanProperty("id");
+        p = desc.findBeanProperty("id");
         selectProps.add(p);
 
       } else if (p.isId()) {
@@ -533,7 +533,7 @@ public class SqlTreeBuilder {
     private final BeanDescriptor<?> desc;
 
     private IncludesDistiller(BeanDescriptor<?> desc, Set<String> selectIncludes,
-        Set<String> predicateIncludes) {
+                              Set<String> predicateIncludes) {
       this.desc = desc;
       this.selectIncludes = selectIncludes;
       this.predicateIncludes = predicateIncludes;
@@ -617,7 +617,7 @@ public class SqlTreeBuilder {
      * </p>
      */
     private SqlTreeNodeExtraJoin findExtraJoinRoot(String includeProp,
-        SqlTreeNodeExtraJoin childJoin) {
+                                                   SqlTreeNodeExtraJoin childJoin) {
 
       int dotPos = includeProp.lastIndexOf('.');
       if (dotPos == -1) {

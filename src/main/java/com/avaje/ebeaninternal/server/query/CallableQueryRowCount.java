@@ -8,9 +8,8 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 
 /**
  * Represent the findRowCount query as a Callable.
- * 
- * @param <T>
- *          the entity bean type
+ *
+ * @param <T> the entity bean type
  */
 public class CallableQueryRowCount<T> extends CallableQuery<T> implements Callable<Integer> {
 

@@ -89,7 +89,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
     }
 
     SpiQuery<T> query = request.getQuery();
-    
+
     if (query.isLoadBeanCache()) {
       // load the individual beans into the bean cache
       BeanDescriptor<T> descriptor = request.getBeanDescriptor();

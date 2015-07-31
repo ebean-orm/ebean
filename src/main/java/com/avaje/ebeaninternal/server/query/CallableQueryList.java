@@ -14,23 +14,22 @@ import com.avaje.ebeaninternal.api.SpiQuery;
  */
 public class CallableQueryList<T> extends CallableQuery<T> implements Callable<List<T>> {
 
-	
-	public CallableQueryList(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
-		super(server, query, t);
-	}
-	
-	/**
-	 * Execute the query returning the resulting List.
-	 */
-	public List<T> call() throws Exception {
-	  try {
-	    return server.findList(query, transaction);
-	  } finally {
-	    // cleanup the underlying connection
-	    transaction.end();
-	  }
-	}
 
-	
-	
+  public CallableQueryList(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
+    super(server, query, t);
+  }
+
+  /**
+   * Execute the query returning the resulting List.
+   */
+  public List<T> call() throws Exception {
+    try {
+      return server.findList(query, transaction);
+    } finally {
+      // cleanup the underlying connection
+      transaction.end();
+    }
+  }
+
+
 }

@@ -4,17 +4,17 @@ package com.avaje.ebeaninternal.server.query;
  * Inner join, Outer join or automatic determination based on cardinality and optionality.
  */
 public enum SqlJoinType {
-  
+
   /**
    * It is an inner join.
    */
   INNER("join"),
-  
+
   /**
    * It is an outer join.
    */
   OUTER("left outer join"),
-  
+
   /**
    * It is automatically determined based on cardinality and optionality.
    */
@@ -43,7 +43,7 @@ public enum SqlJoinType {
     }
     return this.getLiteral();
   }
-  
+
   /**
    * If this is an AUTO join set it to OUTER as we are joining to a Many.
    */
@@ -54,7 +54,7 @@ public enum SqlJoinType {
       return this;
     }
   }
-  
+
   /**
    * If join is AUTO but deploymentJoinType is OUTER then go into OUTER join mode.
    */

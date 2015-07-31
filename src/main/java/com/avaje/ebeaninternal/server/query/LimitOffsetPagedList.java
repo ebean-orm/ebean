@@ -12,9 +12,8 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 
 /**
  * PagedList implementation based on limit offset types of queries.
- * 
- * @param <T>
- *          the entity bean type
+ *
+ * @param <T> the entity bean type
  */
 public class LimitOffsetPagedList<T> implements PagedList<T> {
 
@@ -44,7 +43,7 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
   public void loadRowCount() {
     getFutureRowCount();
   }
-  
+
   public Future<Integer> getFutureRowCount() {
     synchronized (monitor) {
       if (futureRowCount == null) {

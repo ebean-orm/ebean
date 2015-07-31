@@ -14,23 +14,23 @@ import com.avaje.ebeaninternal.api.SpiQuery;
  */
 public class CallableQueryIds<T> extends CallableQuery<T> implements Callable<List<Object>> {
 
-	
-	public CallableQueryIds(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
-		super(server, query, t);
-	}
-	
-	/**
-	 * Execute the find Id's query returning the list of Id's.
-	 */
-	public List<Object> call() throws Exception {
-		// we have already made a copy of the query
-		// this way the same query instance is available to the
-		// QueryFutureIds (as so has access to the List before it is done)
-	  try {
-	    return server.findIdsWithCopy(query, transaction);
-	  } finally {
-	    transaction.end();
-	  }
-	}
+
+  public CallableQueryIds(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
+    super(server, query, t);
+  }
+
+  /**
+   * Execute the find Id's query returning the list of Id's.
+   */
+  public List<Object> call() throws Exception {
+    // we have already made a copy of the query
+    // this way the same query instance is available to the
+    // QueryFutureIds (as so has access to the List before it is done)
+    try {
+      return server.findIdsWithCopy(query, transaction);
+    } finally {
+      transaction.end();
+    }
+  }
 
 }

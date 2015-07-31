@@ -53,7 +53,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
    * Construct for SELECT clause (with column alias settings).
    */
   public DefaultDbSqlContext(SqlTreeAlias alias, String tableAliasPlaceHolder,
-      String columnAliasPrefix, boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport) {
+                             String columnAliasPrefix, boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport) {
 
     this.alias = alias;
     this.tableAliasPlaceHolder = tableAliasPlaceHolder;
@@ -139,11 +139,11 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
 
     // add on any inheritance where clause
-    if (inheritance != null && inheritance.length() > 0){
-    	sb.append(" and ");
-    	sb.append(a2);
-    	sb.append(".");
-    	sb.append(inheritance);
+    if (inheritance != null && inheritance.length() > 0) {
+      sb.append(" and ");
+      sb.append(a2);
+      sb.append(".");
+      sb.append(inheritance);
     }
 
     sb.append(" ");

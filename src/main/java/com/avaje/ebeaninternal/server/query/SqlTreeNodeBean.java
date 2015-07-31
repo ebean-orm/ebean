@@ -70,7 +70,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   protected final String prefix;
 
   protected final Map<String, String> pathMap;
-  
+
   protected final BeanPropertyAssocMany<?> lazyLoadParent;
 
   protected final SpiQuery.TemporalMode temporalMode;
@@ -98,7 +98,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    * Construct for leaf node.
    */
   public SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
-      List<SqlTreeNode> myChildren, boolean withId, boolean disableLazyLoad) {
+                         List<SqlTreeNode> myChildren, boolean withId, boolean disableLazyLoad) {
 
     this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, withId, null, SpiQuery.TemporalMode.CURRENT, disableLazyLoad);
   }
@@ -115,7 +115,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    * Create with the appropriate node.
    */
   private SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, BeanDescriptor<?> desc, SqlTreeProperties props,
-                          List<SqlTreeNode> myChildren, boolean withId,  BeanPropertyAssocMany<?> lazyLoadParent,
+                          List<SqlTreeNode> myChildren, boolean withId, BeanPropertyAssocMany<?> lazyLoadParent,
                           SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
 
     this.lazyLoadParent = lazyLoadParent;
@@ -189,7 +189,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     // these are always the first 2 columns in the resultSet
     Timestamp start = ctx.getDataReader().getTimestamp();
     Timestamp end = ctx.getDataReader().getTimestamp();
-    T bean = (T)load(ctx, null, null);
+    T bean = (T) load(ctx, null, null);
 
     return new Version<T>(bean, start, end);
   }
@@ -203,7 +203,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     if (lazyLoadParentIdBinder != null) {
       lazyLoadParentId = lazyLoadParentIdBinder.read(ctx);
     }
-    
+
     // bean already existing in the persistence context
     EntityBean contextBean = null;
 
@@ -245,13 +245,13 @@ public class SqlTreeNodeBean implements SqlTreeNode {
         localBean = null;
       } else if (!temporalVersions) {
         // check the PersistenceContext to see if the bean already exists
-        contextBean = (EntityBean)persistenceContext.putIfAbsent(id, localBean);
+        contextBean = (EntityBean) persistenceContext.putIfAbsent(id, localBean);
         if (contextBean == null) {
           // bean just added to the persistenceContext
           contextBean = localBean;
         } else {
           // bean already exists in persistenceContext
-          if (isLoadContextBeanNeeded(queryMode, contextBean)){ 
+          if (isLoadContextBeanNeeded(queryMode, contextBean)) {
             // refresh it anyway (lazy loading for example)
             localBean = contextBean;
           } else {
@@ -537,7 +537,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   public String toString() {
     return "SqlTreeNodeBean: " + desc;
   }
-  
+
   private boolean isLoadContextBeanNeeded(Mode queryMode, EntityBean contextBean) {
     // if explicitly set loadContextBean to true, then reload
     if (queryMode.isLoadContextBean()) {
@@ -552,5 +552,5 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     // return true by default
     return true;
   }
-   
+
 }

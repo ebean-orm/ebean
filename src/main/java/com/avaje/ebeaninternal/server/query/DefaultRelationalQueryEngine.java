@@ -26,206 +26,206 @@ import java.util.ArrayList;
  */
 public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 
-	private static final Logger logger = LoggerFactory.getLogger(DefaultRelationalQueryEngine.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultRelationalQueryEngine.class);
 
-  private static final int GLOBAL_ROW_LIMIT = Integer.valueOf(System.getProperty("ebean.query.globallimit","1000000"));
+  private static final int GLOBAL_ROW_LIMIT = Integer.valueOf(System.getProperty("ebean.query.globallimit", "1000000"));
 
-	private final Binder binder;
-	
-	private final String dbTrueValue;
+  private final Binder binder;
 
-	public DefaultRelationalQueryEngine(Binder binder, String dbTrueValue) {
-		this.binder = binder;
-		this.dbTrueValue = dbTrueValue == null ? "true" : dbTrueValue;
-	}
+  private final String dbTrueValue;
 
-	public Object findMany(RelationalQueryRequest request) {
+  public DefaultRelationalQueryEngine(Binder binder, String dbTrueValue) {
+    this.binder = binder;
+    this.dbTrueValue = dbTrueValue == null ? "true" : dbTrueValue;
+  }
 
-		SpiSqlQuery query = request.getQuery();
+  public Object findMany(RelationalQueryRequest request) {
 
-		long startTime = System.currentTimeMillis();
+    SpiSqlQuery query = request.getQuery();
 
-		SpiTransaction t = request.getTransaction();
-		Connection conn = t.getInternalConnection();
-		ResultSet rset = null;
-		PreparedStatement pstmt = null;
+    long startTime = System.currentTimeMillis();
 
-		String sql = query.getQuery();
+    SpiTransaction t = request.getTransaction();
+    Connection conn = t.getInternalConnection();
+    ResultSet rset = null;
+    PreparedStatement pstmt = null;
 
-		BindParams bindParams = query.getBindParams();
+    String sql = query.getQuery();
 
-		if (!bindParams.isEmpty()) {
-			// convert any named parameters if required
-			sql = BindParamsParser.parse(bindParams, sql);
-		}
+    BindParams bindParams = query.getBindParams();
 
-		try {
+    if (!bindParams.isEmpty()) {
+      // convert any named parameters if required
+      sql = BindParamsParser.parse(bindParams, sql);
+    }
 
-			String bindLog = "";
-			String[] propNames;
-			
-			synchronized (query) {
-				if (query.isCancelled()){
-					logger.trace("Query already cancelled");
-					return null;
-				}
-				
-				// synchronise for query.cancel() support		
-				pstmt = conn.prepareStatement(sql);
-	
-				if (query.getTimeout() > 0){
-					pstmt.setQueryTimeout(query.getTimeout());
-				}
-				if (query.getBufferFetchSizeHint() > 0){
-					pstmt.setFetchSize(query.getBufferFetchSizeHint());
-				}
-				
-				if (!bindParams.isEmpty()) {
-					bindLog = binder.bind(bindParams, new DataBind(pstmt));
-				}
-	
-				if (request.isLogSql()) {
-				  String logSql = sql;
-				  if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-				    logSql = Str.add(logSql, "; --bind(", bindLog, ")");
-				  }
-					t.logSql(logSql);
-				}
-	
-				rset = pstmt.executeQuery();
-	
-				propNames = getPropertyNames(rset);
-			}
-			
-			// calculate the initialCapacity of the Map to reduce
-			// rehashing for queries with 12+ columns
-			float initCap = (propNames.length) / 0.7f;
-			int estimateCapacity = (int) initCap + 1;
+    try {
 
-			// determine the maxRows limit
-			int maxRows = GLOBAL_ROW_LIMIT;
-			if (query.getMaxRows() >= 1) {
-				maxRows = query.getMaxRows();
-			}
+      String bindLog = "";
+      String[] propNames;
 
-			int loadRowCount = 0;
+      synchronized (query) {
+        if (query.isCancelled()) {
+          logger.trace("Query already cancelled");
+          return null;
+        }
 
-			SqlQueryListener listener = query.getListener();
+        // synchronise for query.cancel() support
+        pstmt = conn.prepareStatement(sql);
 
-			BeanCollectionWrapper wrapper = new BeanCollectionWrapper(request);
-			boolean isMap = wrapper.isMap();
-			String mapKey = query.getMapKey();
-			
-			SqlRow bean = null;
-			
-			while (rset.next()) {
-				synchronized (query) {					
-					// synchronise for query.cancel() support		
-					if (!query.isCancelled()){
-						bean = readRow(rset, propNames, estimateCapacity);
-					}
-				}
-				if (bean != null){
-					// bean can be null if query cancelled
-					if (listener != null) {
-						listener.process(bean);
-	
-					} else {
-						if (isMap) {
-							Object keyValue = bean.get(mapKey);
-							wrapper.addToMap(bean, keyValue);
-						} else {
-							wrapper.addToCollection(bean);
-						}
-					}
-	
-					loadRowCount++;
-	
-					if (loadRowCount == maxRows) {
-						// break, as we have hit the max rows to fetch...
-						break;
-					}
-				}
-			}
+        if (query.getTimeout() > 0) {
+          pstmt.setQueryTimeout(query.getTimeout());
+        }
+        if (query.getBufferFetchSizeHint() > 0) {
+          pstmt.setFetchSize(query.getBufferFetchSizeHint());
+        }
 
-			BeanCollection<?> beanColl = wrapper.getBeanCollection();
+        if (!bindParams.isEmpty()) {
+          bindLog = binder.bind(bindParams, new DataBind(pstmt));
+        }
 
-			if (request.isLogSummary()) {
-				long exeTime = System.currentTimeMillis() - startTime;
-				String msg = "SqlQuery  rows[" + loadRowCount + "] time[" + exeTime + "] bind[" + bindLog + "]";
-				t.logSummary(msg);
-			}
-			
-			if (query.isCancelled()){
-				logger.debug("Query was cancelled during execution rows:"+loadRowCount);
-			}
-			
-			return beanColl;
+        if (request.isLogSql()) {
+          String logSql = sql;
+          if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
+            logSql = Str.add(logSql, "; --bind(", bindLog, ")");
+          }
+          t.logSql(logSql);
+        }
 
-		} catch (Exception e) {
-			String m = Message.msg("fetch.error", e.getMessage(), sql);
-			throw new PersistenceException(m, e);
+        rset = pstmt.executeQuery();
 
-		} finally {
-			try {
-				if (rset != null) {
-					rset.close();
-				}
-			} catch (SQLException e) {
-				logger.error(null, e);
-			}
-			try {
-				if (pstmt != null) {
-					pstmt.close();
-				}
-			} catch (SQLException e) {
-				logger.error(null, e);
-			}
-		}
-	}
+        propNames = getPropertyNames(rset);
+      }
 
-	/**
-	 * Build the list of property names.
-	 */
-	protected String[] getPropertyNames(ResultSet rset) throws SQLException {
+      // calculate the initialCapacity of the Map to reduce
+      // rehashing for queries with 12+ columns
+      float initCap = (propNames.length) / 0.7f;
+      int estimateCapacity = (int) initCap + 1;
 
-		ArrayList<String> propNames = new ArrayList<String>();
+      // determine the maxRows limit
+      int maxRows = GLOBAL_ROW_LIMIT;
+      if (query.getMaxRows() >= 1) {
+        maxRows = query.getMaxRows();
+      }
 
-		ResultSetMetaData rsmd = rset.getMetaData();
+      int loadRowCount = 0;
 
-		int columnsPlusOne = rsmd.getColumnCount()+1;
+      SqlQueryListener listener = query.getListener();
 
-		
-		for (int i = 1; i < columnsPlusOne; i++) {
-			String columnName = rsmd.getColumnLabel(i);
-			// will convert columnName to lower case
-			propNames.add(columnName);
-		}
+      BeanCollectionWrapper wrapper = new BeanCollectionWrapper(request);
+      boolean isMap = wrapper.isMap();
+      String mapKey = query.getMapKey();
 
-		return propNames.toArray(new String[propNames.size()]);
-	}
+      SqlRow bean = null;
 
-	/**
-	 * Read the row from the ResultSet and return as a MapBean.
-	 */
-	protected SqlRow readRow(ResultSet rset, String[] propNames, int initialCapacity) throws SQLException {
+      while (rset.next()) {
+        synchronized (query) {
+          // synchronise for query.cancel() support
+          if (!query.isCancelled()) {
+            bean = readRow(rset, propNames, estimateCapacity);
+          }
+        }
+        if (bean != null) {
+          // bean can be null if query cancelled
+          if (listener != null) {
+            listener.process(bean);
 
-		// by default a map will rehash on the 12th entry
-		// it will be pretty common to have 12 or more entries so
-		// to reduce rehashing I am trying to estimate a good
-		// initial capacity for the MapBean to use.
-		SqlRow bean = new DefaultSqlRow(initialCapacity, 0.75f, dbTrueValue);
-		
-		int index = 0;
+          } else {
+            if (isMap) {
+              Object keyValue = bean.get(mapKey);
+              wrapper.addToMap(bean, keyValue);
+            } else {
+              wrapper.addToCollection(bean);
+            }
+          }
 
-		for (int i = 0; i < propNames.length; i++) {
-			index++;
-			Object value = rset.getObject(index);
-			bean.set(propNames[i], value);
-		}
+          loadRowCount++;
 
-		return bean;
+          if (loadRowCount == maxRows) {
+            // break, as we have hit the max rows to fetch...
+            break;
+          }
+        }
+      }
 
-	}
+      BeanCollection<?> beanColl = wrapper.getBeanCollection();
+
+      if (request.isLogSummary()) {
+        long exeTime = System.currentTimeMillis() - startTime;
+        String msg = "SqlQuery  rows[" + loadRowCount + "] time[" + exeTime + "] bind[" + bindLog + "]";
+        t.logSummary(msg);
+      }
+
+      if (query.isCancelled()) {
+        logger.debug("Query was cancelled during execution rows:" + loadRowCount);
+      }
+
+      return beanColl;
+
+    } catch (Exception e) {
+      String m = Message.msg("fetch.error", e.getMessage(), sql);
+      throw new PersistenceException(m, e);
+
+    } finally {
+      try {
+        if (rset != null) {
+          rset.close();
+        }
+      } catch (SQLException e) {
+        logger.error(null, e);
+      }
+      try {
+        if (pstmt != null) {
+          pstmt.close();
+        }
+      } catch (SQLException e) {
+        logger.error(null, e);
+      }
+    }
+  }
+
+  /**
+   * Build the list of property names.
+   */
+  protected String[] getPropertyNames(ResultSet rset) throws SQLException {
+
+    ArrayList<String> propNames = new ArrayList<String>();
+
+    ResultSetMetaData rsmd = rset.getMetaData();
+
+    int columnsPlusOne = rsmd.getColumnCount() + 1;
+
+
+    for (int i = 1; i < columnsPlusOne; i++) {
+      String columnName = rsmd.getColumnLabel(i);
+      // will convert columnName to lower case
+      propNames.add(columnName);
+    }
+
+    return propNames.toArray(new String[propNames.size()]);
+  }
+
+  /**
+   * Read the row from the ResultSet and return as a MapBean.
+   */
+  protected SqlRow readRow(ResultSet rset, String[] propNames, int initialCapacity) throws SQLException {
+
+    // by default a map will rehash on the 12th entry
+    // it will be pretty common to have 12 or more entries so
+    // to reduce rehashing I am trying to estimate a good
+    // initial capacity for the MapBean to use.
+    SqlRow bean = new DefaultSqlRow(initialCapacity, 0.75f, dbTrueValue);
+
+    int index = 0;
+
+    for (int i = 0; i < propNames.length; i++) {
+      index++;
+      Object value = rset.getObject(index);
+      bean.set(propNames[i], value);
+    }
+
+    return bean;
+
+  }
 
 }

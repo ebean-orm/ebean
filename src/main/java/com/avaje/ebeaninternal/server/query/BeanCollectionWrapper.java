@@ -19,147 +19,145 @@ import java.util.Map;
  */
 public final class BeanCollectionWrapper {
 
-	/**
-	 * Flag set if this builds a Map rather than a Collection.
-	 */
-	private final boolean isMap;
+  /**
+   * Flag set if this builds a Map rather than a Collection.
+   */
+  private final boolean isMap;
 
-	/**
-	 * The type.
-	 */
-	private final SpiQuery.Type queryType;
+  /**
+   * The type.
+   */
+  private final SpiQuery.Type queryType;
 
-	/**
-	 * A property name used as key for a Map.
-	 */
-	private final String mapKey;
+  /**
+   * A property name used as key for a Map.
+   */
+  private final String mapKey;
 
-	/**
-	 * The actual BeanCollection.
-	 */
-	private final BeanCollection<?> beanCollection;
+  /**
+   * The actual BeanCollection.
+   */
+  private final BeanCollection<?> beanCollection;
 
-	/**
-	 * Collection type of BeanCollection.
-	 */
-	private final Collection<Object> collection;
+  /**
+   * Collection type of BeanCollection.
+   */
+  private final Collection<Object> collection;
 
-	/**
-	 * Map type of BeanCollection.
-	 */
-	private final Map<Object,Object> map;
+  /**
+   * Map type of BeanCollection.
+   */
+  private final Map<Object, Object> map;
 
-	/**
-	 * The associated BeanDescriptor.
-	 */
-	private final BeanDescriptor<?> desc;
+  /**
+   * The associated BeanDescriptor.
+   */
+  private final BeanDescriptor<?> desc;
 
-	/**
-	 * The number of rows added.
-	 */
-	private int rowCount;
-	
-	public BeanCollectionWrapper(RelationalQueryRequest request) {
+  /**
+   * The number of rows added.
+   */
+  private int rowCount;
 
-		this.desc = null;
-		this.queryType = request.getQueryType();
-		this.mapKey = request.getQuery().getMapKey();
-		this.isMap = SpiQuery.Type.MAP.equals(queryType);
-		
-		this.beanCollection = createBeanCollection(queryType);
-		this.collection = getCollection(isMap);
-		this.map = getMap(isMap);
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Map<Object,Object> getMap(boolean isMap) {
-		return isMap ? (Map)beanCollection : null;
-	}
+  public BeanCollectionWrapper(RelationalQueryRequest request) {
 
-	@SuppressWarnings("unchecked")
-	private Collection<Object> getCollection(boolean isMap) {
-		return isMap ? null : (Collection<Object>)beanCollection ;
-	}
+    this.desc = null;
+    this.queryType = request.getQueryType();
+    this.mapKey = request.getQuery().getMapKey();
+    this.isMap = SpiQuery.Type.MAP.equals(queryType);
 
-	/**
-	 * Return the underlying BeanCollection.
-	 */
-	public BeanCollection<?> getBeanCollection() {
-		return beanCollection;
-	}
+    this.beanCollection = createBeanCollection(queryType);
+    this.collection = getCollection(isMap);
+    this.map = getMap(isMap);
+  }
 
-	/**
-	 * Create a BeanCollection of the correct type.
-	 */
-	private BeanCollection<?> createBeanCollection(SpiQuery.Type manyType) {
-		BeanCollectionParams p = new BeanCollectionParams(manyType);
-		return BeanCollectionFactory.create(p);
-	}
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private Map<Object, Object> getMap(boolean isMap) {
+    return isMap ? (Map) beanCollection : null;
+  }
 
-	/**
-	 * Return true if this wraps a Map rather than a set or list.
-	 */
-	public boolean isMap() {
-		return isMap;
-	}
+  @SuppressWarnings("unchecked")
+  private Collection<Object> getCollection(boolean isMap) {
+    return isMap ? null : (Collection<Object>) beanCollection;
+  }
 
-	/**
-	 * Return the number of rows added to this wrapper.
-	 */
-	public int size() {
-		return rowCount;
-	}
+  /**
+   * Return the underlying BeanCollection.
+   */
+  public BeanCollection<?> getBeanCollection() {
+    return beanCollection;
+  }
 
-	/**
-	 * Add the bean to the collection held in this wrapper.
-	 */
-	public void add(EntityBean bean) {
-		add(bean, beanCollection);
-	}
+  /**
+   * Create a BeanCollection of the correct type.
+   */
+  private BeanCollection<?> createBeanCollection(SpiQuery.Type manyType) {
+    BeanCollectionParams p = new BeanCollectionParams(manyType);
+    return BeanCollectionFactory.create(p);
+  }
 
-	/**
-	 * Add the bean to the collection passed.
-	 * 
-	 * @param bean
-	 *            the bean to add
-	 * @param collection
-	 *            the collection or map to add the bean to
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void add(EntityBean bean, Object collection) {
-		if (bean == null) {
-			return;
-		}
-		rowCount++;
-		if (isMap) {
-			Object keyValue;
-			if (mapKey != null) {
-				// use the value for the property
-				keyValue = desc.getValue(bean, mapKey);
-			} else {
-				// use the uniqueId for this
-				keyValue = desc.getId(bean);
-			}
+  /**
+   * Return true if this wraps a Map rather than a set or list.
+   */
+  public boolean isMap() {
+    return isMap;
+  }
 
-			Map mapColl = (Map) collection;
-			mapColl.put(keyValue, bean);
-		} else {
-			((Collection) collection).add(bean);
-		}
-	}
+  /**
+   * Return the number of rows added to this wrapper.
+   */
+  public int size() {
+    return rowCount;
+  }
 
-	/**
-	 * Specifically add to a Collection.
-	 */
-	public void addToCollection(Object bean) {
-		collection.add(bean);
-	}
+  /**
+   * Add the bean to the collection held in this wrapper.
+   */
+  public void add(EntityBean bean) {
+    add(bean, beanCollection);
+  }
 
-	/**
-	 * Specifically add to this as a Map with a known key.
-	 */
-	public void addToMap(Object bean, Object key) {
-		map.put(key, bean);
-	}
+  /**
+   * Add the bean to the collection passed.
+   *
+   * @param bean       the bean to add
+   * @param collection the collection or map to add the bean to
+   */
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public void add(EntityBean bean, Object collection) {
+    if (bean == null) {
+      return;
+    }
+    rowCount++;
+    if (isMap) {
+      Object keyValue;
+      if (mapKey != null) {
+        // use the value for the property
+        keyValue = desc.getValue(bean, mapKey);
+      } else {
+        // use the uniqueId for this
+        keyValue = desc.getId(bean);
+      }
+
+      Map mapColl = (Map) collection;
+      mapColl.put(keyValue, bean);
+    } else {
+      ((Collection) collection).add(bean);
+    }
+  }
+
+  /**
+   * Specifically add to a Collection.
+   */
+  public void addToCollection(Object bean) {
+    collection.add(bean);
+  }
+
+  /**
+   * Specifically add to this as a Map with a known key.
+   */
+  public void addToMap(Object bean, Object key) {
+    map.put(key, bean);
+  }
 
 }

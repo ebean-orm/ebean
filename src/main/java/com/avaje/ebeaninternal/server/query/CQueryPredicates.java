@@ -116,7 +116,7 @@ public class CQueryPredicates {
    * Includes from where and order by clauses.
    */
   private Set<String> predicateIncludes;
-  
+
   private Set<String> orderByIncludes;
 
   public CQueryPredicates(Binder binder, OrmQueryRequest<?> request) {
@@ -330,7 +330,7 @@ public class CQueryPredicates {
     if (logicalOrderBy != null) {
       dbOrderBy = deployParser.parse(logicalOrderBy);
     }
-    
+
     // create a copy of the includes required to support the orderBy
     orderByIncludes = new HashSet<String>(deployParser.getIncludes());
 

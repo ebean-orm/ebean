@@ -17,34 +17,34 @@ import javax.persistence.PersistenceException;
  */
 public class QueryFutureList<T> extends BaseFuture<List<T>> implements FutureList<T> {
 
-	private final CallableQueryList<T> call;
-	
-	public QueryFutureList(CallableQueryList<T> call) {
-		super(new FutureTask<List<T>>(call));
-		this.call = call;
-	}
-	
-	public FutureTask<List<T>> getFutureTask() {
-	  return futureTask;
-	}
-	
-	public Transaction getTransaction() {
-	  return call.transaction;
-	}
+  private final CallableQueryList<T> call;
+
+  public QueryFutureList(CallableQueryList<T> call) {
+    super(new FutureTask<List<T>>(call));
+    this.call = call;
+  }
+
+  public FutureTask<List<T>> getFutureTask() {
+    return futureTask;
+  }
+
+  public Transaction getTransaction() {
+    return call.transaction;
+  }
 
   @Override
-	public Query<T> getQuery() {
-		return call.query;
-	}
+  public Query<T> getQuery() {
+    return call.query;
+  }
 
   @Override
-	public boolean cancel(boolean mayInterruptIfRunning) {
-	  call.query.cancel();
-		return super.cancel(mayInterruptIfRunning);
-	}
+  public boolean cancel(boolean mayInterruptIfRunning) {
+    call.query.cancel();
+    return super.cancel(mayInterruptIfRunning);
+  }
 
   @Override
-  public List<T> getUnchecked()  {
+  public List<T> getUnchecked() {
     try {
       return get();
     } catch (InterruptedException e) {
@@ -64,5 +64,5 @@ public class QueryFutureList<T> extends BaseFuture<List<T>> implements FutureLis
       throw new PersistenceException(e);
     }
   }
-	
+
 }

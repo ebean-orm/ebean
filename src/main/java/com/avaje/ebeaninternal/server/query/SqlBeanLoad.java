@@ -17,15 +17,15 @@ import javax.persistence.PersistenceException;
  */
 public class SqlBeanLoad {
 
-	private final DbReadContext ctx;
-	private final EntityBean bean;
-	private final EntityBeanIntercept ebi;
-  
-	private final Class<?> type;
-	private final boolean lazyLoading;	
-	private final boolean refreshLoading;
+  private final DbReadContext ctx;
+  private final EntityBean bean;
+  private final EntityBeanIntercept ebi;
+
+  private final Class<?> type;
+  private final boolean lazyLoading;
+  private final boolean refreshLoading;
   private final boolean rawSql;
-	
+
   public SqlBeanLoad(DbReadContext ctx, Class<?> type, EntityBean bean, Mode queryMode) {
 
     this.ctx = ctx;
@@ -36,7 +36,7 @@ public class SqlBeanLoad {
     this.bean = bean;
     this.ebi = bean == null ? null : bean._ebean_getIntercept();
   }
-	
+
   /**
    * Return true if this is a lazy loading.
    */
@@ -57,7 +57,7 @@ public class SqlBeanLoad {
       return null;
     }
 
-    if ((bean == null) 
+    if ((bean == null)
         || (lazyLoading && ebi.isLoadedProperty(prop.getPropertyIndex()))
         || (type != null && !prop.isAssignableFrom(type))) {
 

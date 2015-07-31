@@ -13,29 +13,28 @@ import com.avaje.ebean.Transaction;
  */
 public class CallableSqlQueryList implements Callable<List<SqlRow>> {
 
-	private final SqlQuery query;
-	
-	private final EbeanServer server;
-	
-	private final Transaction transaction;
-	
-	public CallableSqlQueryList(EbeanServer server, SqlQuery query, Transaction t) {
-		this.server = server;
-		this.query = query;
-		this.transaction = t;
-	}
+  private final SqlQuery query;
 
-	/**
-	 * Execute the query returning the resulting list.
-	 */
-	public List<SqlRow> call() throws Exception {
-	  try {
-		return server.findList(query, transaction);
-	  } finally {
-	    transaction.end();
-	  }
-	}
+  private final EbeanServer server;
 
-	
-	
+  private final Transaction transaction;
+
+  public CallableSqlQueryList(EbeanServer server, SqlQuery query, Transaction t) {
+    this.server = server;
+    this.query = query;
+    this.transaction = t;
+  }
+
+  /**
+   * Execute the query returning the resulting list.
+   */
+  public List<SqlRow> call() throws Exception {
+    try {
+      return server.findList(query, transaction);
+    } finally {
+      transaction.end();
+    }
+  }
+
+
 }

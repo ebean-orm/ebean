@@ -17,7 +17,7 @@ public class CQueryHistorySupport {
   /**
    * The mapping of base tables to their matching 'with history' views.
    */
-  private final Map<String,String> asOfTableMap;
+  private final Map<String, String> asOfTableMap;
 
   /**
    * The sys period column.
