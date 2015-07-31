@@ -54,7 +54,7 @@ public abstract class BeanRequest {
 	 * not then create one implicitly to handle the request.
 	 * </p>
 	 */
-	public void createImplicitTransIfRequired(boolean readOnlyTransaction) {
+	public void createImplicitTransIfRequired() {
 		if (transaction == null) {
 			transaction = ebeanServer.getCurrentServerTransaction();
 			if (transaction == null || !transaction.isActive()) {

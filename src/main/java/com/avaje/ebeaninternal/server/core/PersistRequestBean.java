@@ -157,7 +157,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Init the transaction and also check for batch on cascade escalation.
    */
   public void initTransIfRequiredWithBatchCascade() {
-    createImplicitTransIfRequired(false);
+    createImplicitTransIfRequired();
     if (transaction.checkBatchEscalationOnCascade(this)) {
       // we escalated to use batch mode so flush when done
       // but if createdTransaction then commit will flush it

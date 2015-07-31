@@ -30,7 +30,7 @@ public class BeanPropertyAssocManyJsonTransient {
       // read map using Jackson object mapper with unknown key type
       TypeFactory typeFactory = mapper.getTypeFactory();
       JavaType target = typeFactory.constructType(many.getTargetType());
-      MapType jacksonType = typeFactory.constructMapType(LinkedHashMap.class, typeFactory.unknownType(), target);
+      MapType jacksonType = typeFactory.constructMapType(LinkedHashMap.class, TypeFactory.unknownType(), target);
       value = mapper.readValue(readJson.getParser(), jacksonType);
 
     } else {
