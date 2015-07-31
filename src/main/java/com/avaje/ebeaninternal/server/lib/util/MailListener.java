@@ -5,9 +5,9 @@ package com.avaje.ebeaninternal.server.lib.util;
  */
 public interface MailListener {
 
-    /**
-     * Handle the message event.
-     */
-    void handleEvent(MailEvent event);
-    
+  /**
+   * Handle the message event.
+   */
+  void handleEvent(MailEvent event);
+
 }
