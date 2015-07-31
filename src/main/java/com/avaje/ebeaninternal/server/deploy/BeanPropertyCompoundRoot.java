@@ -18,63 +18,63 @@ import java.util.List;
  */
 public class BeanPropertyCompoundRoot {
 
-    private final BeanPropertySetter setter;
+  private final BeanPropertySetter setter;
 
-    private final String name;
-    private final String fullBeanName;
+  private final String name;
+  private final String fullBeanName;
 
-    private final ArrayList<BeanPropertyCompoundScalar> propList;
+  private final ArrayList<BeanPropertyCompoundScalar> propList;
 
-    private List<CtCompoundProperty> nonScalarProperties;
+  private List<CtCompoundProperty> nonScalarProperties;
 
-    public BeanPropertyCompoundRoot(DeployBeanProperty deploy) {
-        this.fullBeanName = deploy.getFullBeanName();
-        this.name = deploy.getName();
-        this.setter = deploy.getSetter();
-        this.propList = new ArrayList<BeanPropertyCompoundScalar>();
+  public BeanPropertyCompoundRoot(DeployBeanProperty deploy) {
+    this.fullBeanName = deploy.getFullBeanName();
+    this.name = deploy.getName();
+    this.setter = deploy.getSetter();
+    this.propList = new ArrayList<BeanPropertyCompoundScalar>();
+  }
+
+  public BeanProperty[] getScalarProperties() {
+
+    return propList.toArray(new BeanProperty[propList.size()]);
+  }
+
+  public void register(BeanPropertyCompoundScalar prop) {
+    propList.add(prop);
+  }
+
+  public List<CtCompoundProperty> getNonScalarProperties() {
+    return nonScalarProperties;
+  }
+
+  public void setNonScalarProperties(List<CtCompoundProperty> nonScalarProperties) {
+    this.nonScalarProperties = nonScalarProperties;
+  }
+
+  /**
+   * Set the value of the property without interception or
+   * PropertyChangeSupport.
+   */
+  public void setRootValue(EntityBean bean, Object value) {
+    try {
+      setter.set(bean, value);
+    } catch (Exception ex) {
+      String beanType = bean == null ? "null" : bean.getClass().getName();
+      String msg = "set " + name + " with arg[" + value + "] on [" + fullBeanName + "] with type[" + beanType + "] threw error";
+      throw new RuntimeException(msg, ex);
     }
+  }
 
-    public BeanProperty[] getScalarProperties() {
-
-        return propList.toArray(new BeanProperty[propList.size()]);
+  /**
+   * Set the value of the property.
+   */
+  public void setRootValueIntercept(EntityBean bean, Object value) {
+    try {
+      setter.setIntercept(bean, value);
+    } catch (Exception ex) {
+      String beanType = bean == null ? "null" : bean.getClass().getName();
+      String msg = "setIntercept " + name + " arg[" + value + "] on [" + fullBeanName + "] with type[" + beanType + "] threw error";
+      throw new RuntimeException(msg, ex);
     }
-
-    public void register(BeanPropertyCompoundScalar prop) {
-        propList.add(prop);
-    }
-
-    public List<CtCompoundProperty> getNonScalarProperties() {
-        return nonScalarProperties;
-    }
-
-    public void setNonScalarProperties(List<CtCompoundProperty> nonScalarProperties) {
-        this.nonScalarProperties = nonScalarProperties;
-    }
-
-    /**
-     * Set the value of the property without interception or
-     * PropertyChangeSupport.
-     */
-    public void setRootValue(EntityBean bean, Object value) {
-        try {
-            setter.set(bean, value);
-        } catch (Exception ex) {
-            String beanType = bean == null ? "null" : bean.getClass().getName();
-            String msg = "set " + name + " with arg[" + value + "] on ["+fullBeanName+"] with type[" + beanType + "] threw error";
-            throw new RuntimeException(msg, ex);
-        }
-    }
-
-    /**
-     * Set the value of the property.
-     */
-    public void setRootValueIntercept(EntityBean bean, Object value) {
-        try {
-            setter.setIntercept(bean, value);
-        } catch (Exception ex) {
-            String beanType = bean == null ? "null" : bean.getClass().getName();
-            String msg = "setIntercept " + name + " arg[" + value + "] on ["+fullBeanName+"] with type[" + beanType + "] threw error";
-            throw new RuntimeException(msg, ex);
-        }
-    }
+  }
 }
