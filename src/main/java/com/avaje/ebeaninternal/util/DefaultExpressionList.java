@@ -43,7 +43,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   public DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList) {
     this(query, expr, parentExprList, new ArrayList<SpiExpression>());
   }
-  
+
   protected DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
     this.list = list;
     this.query = query;
@@ -266,7 +266,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public ExpressionList<T> addAll(ExpressionList<T> exprList) {
-    SpiExpressionList<T> spiList = (SpiExpressionList<T>)exprList;
+    SpiExpressionList<T> spiList = (SpiExpressionList<T>) exprList;
     list.addAll(spiList.getUnderlyingList());
     return this;
   }

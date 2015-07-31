@@ -8,97 +8,97 @@ import java.util.Set;
 
 public class ParamTypeHelper {
 
-    public enum ManyType {
-        LIST, SET, MAP, NONE
+  public enum ManyType {
+    LIST, SET, MAP, NONE
+  }
+
+  public static class TypeInfo {
+
+    private final ManyType manyType;
+    private final Class<?> beanType;
+
+    private TypeInfo(ManyType manyType, Class<?> beanType) {
+      this.manyType = manyType;
+      this.beanType = beanType;
     }
 
-    public static class TypeInfo {
-
-        private final ManyType manyType;
-        private final Class<?> beanType;
-
-        private TypeInfo(ManyType manyType, Class<?> beanType) {
-            this.manyType = manyType;
-            this.beanType = beanType;
-        }
-
-        public boolean isManyType() {
-            return !ManyType.NONE.equals(manyType);
-        }
-
-        public ManyType getManyType() {
-            return manyType;
-        }
-
-        public Class<?> getBeanType() {
-            return beanType;
-        }
-
-        public String toString() {
-            if (isManyType()) {
-                return manyType + " " + beanType;
-            } else {
-                return beanType.toString();
-            }
-        }
-
+    public boolean isManyType() {
+      return !ManyType.NONE.equals(manyType);
     }
 
-    public static TypeInfo getTypeInfo(Type genericType) {
-
-        if (genericType instanceof ParameterizedType) {
-            return getParamTypeInfo((ParameterizedType) genericType);
-        }
-
-        Class<?> entityType = getBeanType(genericType);
-        if (entityType != null) {
-            return new TypeInfo(ManyType.NONE, entityType);
-        }
-        return null;
+    public ManyType getManyType() {
+      return manyType;
     }
 
-    /**
-     * For Lists Sets and Maps of beans.
-     */
-    private static TypeInfo getParamTypeInfo(ParameterizedType paramType) {
-
-        Type rawType = paramType.getRawType();
-
-        ManyType manyType = getManyType(rawType);
-        if (ManyType.NONE.equals(manyType)) {
-            return null;
-        }
-
-        Type[] typeArguments = paramType.getActualTypeArguments();
-
-        if (typeArguments.length == 1) {
-            Type argType = typeArguments[0];
-            Class<?> beanType = getBeanType(argType);
-            if (beanType != null) {
-                return new TypeInfo(manyType, beanType);
-            }
-        }
-
-        return null;
+    public Class<?> getBeanType() {
+      return beanType;
     }
 
-    private static Class<?> getBeanType(Type argType) {
-        if (argType instanceof Class<?>) {
-            return (Class<?>) argType;
-        }
-        return null;
+    public String toString() {
+      if (isManyType()) {
+        return manyType + " " + beanType;
+      } else {
+        return beanType.toString();
+      }
     }
 
-    private static ManyType getManyType(Type rawType) {
-        if (List.class.equals(rawType)) {
-            return ManyType.LIST;
-        }
-        if (Set.class.equals(rawType)) {
-            return ManyType.SET;
-        }
-        if (Map.class.equals(rawType)) {
-            return ManyType.MAP;
-        }
-        return ManyType.NONE;
+  }
+
+  public static TypeInfo getTypeInfo(Type genericType) {
+
+    if (genericType instanceof ParameterizedType) {
+      return getParamTypeInfo((ParameterizedType) genericType);
     }
+
+    Class<?> entityType = getBeanType(genericType);
+    if (entityType != null) {
+      return new TypeInfo(ManyType.NONE, entityType);
+    }
+    return null;
+  }
+
+  /**
+   * For Lists Sets and Maps of beans.
+   */
+  private static TypeInfo getParamTypeInfo(ParameterizedType paramType) {
+
+    Type rawType = paramType.getRawType();
+
+    ManyType manyType = getManyType(rawType);
+    if (ManyType.NONE.equals(manyType)) {
+      return null;
+    }
+
+    Type[] typeArguments = paramType.getActualTypeArguments();
+
+    if (typeArguments.length == 1) {
+      Type argType = typeArguments[0];
+      Class<?> beanType = getBeanType(argType);
+      if (beanType != null) {
+        return new TypeInfo(manyType, beanType);
+      }
+    }
+
+    return null;
+  }
+
+  private static Class<?> getBeanType(Type argType) {
+    if (argType instanceof Class<?>) {
+      return (Class<?>) argType;
+    }
+    return null;
+  }
+
+  private static ManyType getManyType(Type rawType) {
+    if (List.class.equals(rawType)) {
+      return ManyType.LIST;
+    }
+    if (Set.class.equals(rawType)) {
+      return ManyType.SET;
+    }
+    if (Map.class.equals(rawType)) {
+      return ManyType.MAP;
+    }
+    return ManyType.NONE;
+  }
 }
