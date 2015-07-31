@@ -68,7 +68,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   public BeanPropertyAssocOne(BeanDescriptorMap owner, BeanDescriptor<?> descriptor,
                               DeployBeanPropertyAssocOne<T> deploy) {
 
-    super(owner, descriptor, deploy);
+    super(descriptor, deploy);
 
     importedPrimaryKey = deploy.isImportedPrimaryKey();
     oneToOne = deploy.isOneToOne();

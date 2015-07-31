@@ -73,7 +73,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	/**
 	 * Construct the property.
 	 */
-	public BeanPropertyAssoc(BeanDescriptorMap owner, BeanDescriptor<?> descriptor, DeployBeanPropertyAssoc<T> deploy) {
+	public BeanPropertyAssoc(BeanDescriptor<?> descriptor, DeployBeanPropertyAssoc<T> deploy) {
 		super(descriptor, deploy);
 		this.extraWhere = InternString.intern(deploy.getExtraWhere());
 		this.isOuterJoin = deploy.isOuterJoin();
@@ -172,18 +172,9 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	}
 	
 	public boolean isSaveRecurseSkippable(Object bean) {
-		if (!saveRecurseSkippable){
-			// we have to saveRecurse even if the bean is not dirty
-			// as this bean has cascade save on some of its properties
-			return false;
-		}
-		if (bean instanceof EntityBean){
-			return !((EntityBean)bean)._ebean_getIntercept().isNewOrDirty();
-		} else {
-			// we don't know so we say no
-			return false;
-		}
-	}
+
+    return saveRecurseSkippable && bean instanceof EntityBean && !((EntityBean) bean)._ebean_getIntercept().isNewOrDirty();
+  }
 
 	/**
 	 * Return true if save can be skipped for unmodified bean(s) of this
@@ -196,13 +187,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	 */
 	public boolean isSaveRecurseSkippable() {
 		return saveRecurseSkippable;
-	}
-
-	/**
-	 * Similar to isSaveRecurseSkippable but in terms of delete.
-	 */
-	public boolean isDeleteRecurseSkippable() {
-		return deleteRecurseSkippable;
 	}
 
 	/**
@@ -242,33 +226,18 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	}
 
 	/**
-	 * Return if this association should use an Outer join.
-	 */
-	public boolean isOuterJoin() {
-		return isOuterJoin;
-	}
-
-	/**
 	 * Return true if this association is updateable.
 	 */
 	public boolean isUpdateable() {
-		if (tableJoin.columns().length > 0) {
-			return tableJoin.columns()[0].isUpdateable();
-		}
-
-		return true;
-	}
+    return tableJoin.columns().length <= 0 || tableJoin.columns()[0].isUpdateable();
+  }
 
 	/**
 	 * Return true if this association is insertable.
 	 */
 	public boolean isInsertable() {
-		if (tableJoin.columns().length > 0) {
-			return tableJoin.columns()[0].isInsertable();
-		}
-
-		return true;
-	}
+    return tableJoin.columns().length <= 0 || tableJoin.columns()[0].isInsertable();
+  }
 
 	/**
 	 * return the join to use for the bean.
