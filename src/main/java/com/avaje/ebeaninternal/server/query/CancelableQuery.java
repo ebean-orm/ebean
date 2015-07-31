@@ -15,5 +15,5 @@ public interface CancelableQuery {
 	 * For JDBC this translates to calling cancel on the PreparedStatement.
 	 * </p>
 	 */
-	public void cancel();
+	void cancel();
 }

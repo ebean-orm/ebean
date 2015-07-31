@@ -12,13 +12,13 @@ public interface BeanVisitor {
 	/**
 	 * Starting.
 	 */
-	public void visitBegin();
+	void visitBegin();
 
 	/**
 	 * Visit a BeanDescriptor and return true to continue visiting the bean
 	 * (return false to skip visiting this bean).
 	 */
-	public boolean visitBean(BeanDescriptor<?> descriptor);
+	boolean visitBean(BeanDescriptor<?> descriptor);
 
 	/**
 	 * Visit a property potentially return a specific PropertyVisitor.
@@ -27,16 +27,16 @@ public interface BeanVisitor {
 	 * by their specific type.
 	 * </p>
 	 */
-	public PropertyVisitor visitProperty(BeanProperty p);
+	PropertyVisitor visitProperty(BeanProperty p);
 
 	/**
 	 * Finished visiting the BeanDescriptor.
 	 */
-	public void visitBeanEnd(BeanDescriptor<?> descriptor);
+	void visitBeanEnd(BeanDescriptor<?> descriptor);
 
 	/**
 	 * Finished all visiting.
 	 */
-	public void visitEnd();
+	void visitEnd();
 
 }

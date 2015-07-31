@@ -12,15 +12,15 @@ public interface BeanPropertyInfo {
 	/**
 	 * Create an EntityBean for this type.
 	 */
-	public Object createEntityBean();
+	Object createEntityBean();
 	
 	/**
 	 * Return the getter for a given bean property.
 	 */
-	public BeanPropertyGetter getGetter(String name, int position);
+	BeanPropertyGetter getGetter(String name, int position);
 	
 	/**
 	 * Return the setter for a given bean property.
 	 */
-	public BeanPropertySetter getSetter(String name, int position);
+	BeanPropertySetter getSetter(String name, int position);
 }

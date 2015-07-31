@@ -10,8 +10,8 @@ public interface BeanPropertyGetter {
 	/**
 	 * Return the value of a given bean property.
 	 */
-	public Object get(EntityBean bean);
+	Object get(EntityBean bean);
 
-	public Object getIntercept(EntityBean bean);
+	Object getIntercept(EntityBean bean);
 
 }

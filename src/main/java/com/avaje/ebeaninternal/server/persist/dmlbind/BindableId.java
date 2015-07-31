@@ -18,17 +18,17 @@ public interface BindableId extends Bindable {
   /**
    * Return true if there is no Id properties at all.
    */
-  public boolean isEmpty();
+  boolean isEmpty();
   
 	/**
 	 * Return true if this is a concatenated key.
 	 */
-	public boolean isConcatenated();
+	boolean isConcatenated();
 	
 	/**
 	 * Return the DB Column to use with genGeneratedKeys.
 	 */
-	public String getIdentityColumn();
+	String getIdentityColumn();
 	
 	/**
 	 * Create the concatenated id for inserts with PFK relationships.
@@ -37,6 +37,6 @@ public interface BindableId extends Bindable {
 	 * primary key and the values can be got from those.
 	 * </p>
 	 */
-	public boolean deriveConcatenatedId(PersistRequestBean<?> persist);
+	boolean deriveConcatenatedId(PersistRequestBean<?> persist);
 
 }

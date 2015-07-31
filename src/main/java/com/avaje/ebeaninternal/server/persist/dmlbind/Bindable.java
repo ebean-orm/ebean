@@ -26,17 +26,17 @@ public interface Bindable {
      * For Updates including only changed properties add the Bindable to the
      * list if it should be included in the 'update set'.
      */
-    public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list);
+    void addToUpdate(PersistRequestBean<?> request, List<Bindable> list);
 
     /**
      * append sql to the buffer with prefix and suffix options.
      */
-    public void dmlAppend(GenerateDmlRequest request);
+    void dmlAppend(GenerateDmlRequest request);
 
     /**
      * Bind given the request and bean. The bean could be the oldValues bean
      * when binding a update or delete where clause with ALL concurrency mode.
      */
-    public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException;
+    void dmlBind(BindableRequest request, EntityBean bean) throws SQLException;
 
 }

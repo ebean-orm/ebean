@@ -15,5 +15,5 @@ public interface ClassPathReader {
 	 * class path.
 	 * </p>
 	 */
-	public Object[] readPath(ClassLoader classLoader);
+	Object[] readPath(ClassLoader classLoader);
 }

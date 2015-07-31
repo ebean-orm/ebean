@@ -15,7 +15,7 @@ public interface BindableRequest {
   /**
    * Set the id for use with summary level logging.
    */
-  public void setIdValue(Object idValue);
+  void setIdValue(Object idValue);
 
   /**
    * Bind the value to a PreparedStatement.
@@ -27,34 +27,34 @@ public interface BindableRequest {
    * logicalType to dbType.
    * </p>
    */
-  public Object bind(Object value, BeanProperty prop) throws SQLException;
+  Object bind(Object value, BeanProperty prop) throws SQLException;
 
   /**
    * Bind a raw value. Used to bind the discriminator column.
    */
-  public Object bind(String propName, Object value, int sqlType) throws SQLException;
+  Object bind(String propName, Object value, int sqlType) throws SQLException;
 
   /**
    * Bind a raw value with a placeHolder to put into the transaction log.
    */
-  public Object bindNoLog(Object value, int sqlType, String logPlaceHolder) throws SQLException;
+  Object bindNoLog(Object value, int sqlType, String logPlaceHolder) throws SQLException;
 
   /**
    * Bind the value to the preparedStatement without logging.
    */
-  public Object bindNoLog(Object value, BeanProperty prop) throws SQLException;
+  Object bindNoLog(Object value, BeanProperty prop) throws SQLException;
 
 
   /**
    * Register the value from a update GeneratedValue. This can only be set to
    * the bean property after the where clause has bean built.
    */
-  public void registerUpdateGenValue(BeanProperty prop, EntityBean bean, Object value);
+  void registerUpdateGenValue(BeanProperty prop, EntityBean bean, Object value);
 
   /**
    * Return the original PersistRequest.
    */
-  public PersistRequestBean<?> getPersistRequest();
+  PersistRequestBean<?> getPersistRequest();
 
-  public void registerDerivedRelationship(DerivedRelationshipData assocBean);
+  void registerDerivedRelationship(DerivedRelationshipData assocBean);
 }

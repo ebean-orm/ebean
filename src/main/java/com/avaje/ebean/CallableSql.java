@@ -80,7 +80,7 @@ public interface CallableSql {
   /**
    * Return the label that is put into the transaction log.
    */
-  public String getLabel();
+  String getLabel();
 
   /**
    * Set the label that is put in the transaction log.

@@ -10,5 +10,5 @@ public interface BeanPropertyInfoFactory {
 	/**
 	 * Create the BeanReflect for the given plain bean and its EntityBean equivalent.
 	 */
-	public BeanPropertyInfo create(Class<?> entityBeanType);
+	BeanPropertyInfo create(Class<?> entityBeanType);
 }

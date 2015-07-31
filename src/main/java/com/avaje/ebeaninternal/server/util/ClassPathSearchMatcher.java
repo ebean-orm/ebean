@@ -12,5 +12,5 @@ public interface ClassPathSearchMatcher {
 	 * used to make future searches faster.
 	 * </p>
 	 */
-	public boolean isMatch(Class<?> cls);
+	boolean isMatch(Class<?> cls);
 }
