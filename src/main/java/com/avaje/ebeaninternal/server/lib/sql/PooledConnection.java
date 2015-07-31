@@ -173,7 +173,7 @@ public class PooledConnection extends ConnectionDelegator {
    * closeDestroy() will close() the underlining connection properly.
    * </p>
    */
-  public PooledConnection(DataSourcePool pool, int uniqueId, Connection connection) throws SQLException {
+  public PooledConnection(DataSourcePool pool, int uniqueId, Connection connection) {
     super(connection);
 
     this.pool = pool;
