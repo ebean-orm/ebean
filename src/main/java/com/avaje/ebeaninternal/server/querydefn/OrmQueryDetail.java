@@ -127,11 +127,7 @@ public class OrmQueryDetail implements Serializable {
   }
 
   public boolean containsProperty(String property) {
-    if (baseProps == null) {
-      return true;
-    } else {
-      return baseProps.isIncluded(property);
-    }
+    return baseProps == null || baseProps.isIncluded(property);
   }
 
   /**

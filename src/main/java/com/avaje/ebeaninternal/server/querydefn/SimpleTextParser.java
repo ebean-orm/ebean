@@ -135,17 +135,7 @@ public class SimpleTextParser {
   }
 
   private boolean isWordTerminator(char c, boolean isOperator) {
-    if (Character.isWhitespace(c)) {
-      return true;
-    }
-    if (isOperator(c)) {
-      return !isOperator;
-    }
-    if (c == '(') {
-      return true;
-    }
-
-    return isOperator;
+    return Character.isWhitespace(c) || (isOperator(c) ? !isOperator : c == '(' || isOperator);
   }
 
   private boolean isOperator(char c) {

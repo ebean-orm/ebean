@@ -161,14 +161,8 @@ public abstract class DeployParser {
 	 * return true if the char is a letter, digit or underscore.
 	 */
 	private boolean isWordPart(char ch) {
-		if (Character.isLetterOrDigit(ch)) {
-			return true;
-
-		} else if (ch == UNDERSCORE) {
-			return true;
-
-		} else return ch == PERIOD;
-	}
+    return Character.isLetterOrDigit(ch) || ch == UNDERSCORE || ch == PERIOD;
+  }
 
 	private boolean isWordStart(char ch) {
     return Character.isLetter(ch);

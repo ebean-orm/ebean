@@ -212,10 +212,7 @@ public final class DRawSqlSelectColumnsParser {
 	}
 
 	private boolean isMatch(BeanProperty prop, String columnLabel) {
-		if (columnLabel.equalsIgnoreCase(prop.getDbColumn())) {
-			return true;
-		}
-    return columnLabel.equalsIgnoreCase(prop.getName());
+    return columnLabel.equalsIgnoreCase(prop.getDbColumn()) || columnLabel.equalsIgnoreCase(prop.getName());
   }
 
 	private int nextComma() {

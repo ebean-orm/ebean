@@ -90,13 +90,11 @@ public class DRawSqlSelectBuilder {
 			debug("Parsing sql-select in " + getErrName());
 		}
 
-		if (hasPlaceHolders()) {
-
-		} else {
-			// parse the sql for the keywords...
-			// select, from, where, having, group by, order by
-			parseSqlFindKeywords(true);
-		}
+    if (!hasPlaceHolders()) {
+      // parse the sql for the keywords...
+      // select, from, where, having, group by, order by
+      parseSqlFindKeywords(true);
+    }
 
     List<DRawSqlColumnInfo> selectColumns = findSelectColumns(meta.getColumnMapping());
 		whereExprPos = findWhereExprPosition();
@@ -140,16 +138,7 @@ public class DRawSqlSelectBuilder {
 	}
 
 	private boolean hasPlaceHolders() {
-		if (placeHolderWhere > -1) {
-			return true;
-		}
-		if (placeHolderAndWhere > -1) {
-			return true;
-		}
-		if (placeHolderHaving > -1) {
-			return true;
-		}
-    return placeHolderAndHaving > -1;
+    return placeHolderWhere > -1 || placeHolderAndWhere > -1 || placeHolderHaving > -1 || placeHolderAndHaving > -1;
   }
 
 	/**

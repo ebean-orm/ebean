@@ -98,16 +98,7 @@ class DRawSqlParser {
   }
 
   private boolean hasPlaceHolders() {
-    if (placeHolderWhere > -1) {
-      return true;
-    }
-    if (placeHolderAndWhere > -1) {
-      return true;
-    }
-    if (placeHolderHaving > -1) {
-      return true;
-    }
-    return placeHolderAndHaving > -1;
+    return placeHolderWhere > -1 || placeHolderAndWhere > -1 || placeHolderHaving > -1 || placeHolderAndHaving > -1;
   }
 
   /**

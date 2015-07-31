@@ -94,11 +94,8 @@ public class TunedQueryInfo implements Serializable {
 	 * Return true if the fetches are essentially the same.
 	 */
 	public boolean isSame(OrmQueryDetail newQueryDetail) {
-		if (tunedDetail == null) {
-			return false;
-		}
-		return tunedDetail.isAutoFetchEqual(newQueryDetail);
-	}
+    return tunedDetail != null && tunedDetail.isAutoFetchEqual(newQueryDetail);
+  }
 
 	/**
 	 * Tune the query by replacing its OrmQueryDetail with a tuned one.
