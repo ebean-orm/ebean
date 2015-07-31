@@ -107,7 +107,7 @@ public class SqlTreeBuilder {
     this.rawNoId = false;
     this.desc = request.getBeanDescriptor();
     this.query = request.getQuery();
-    this.disableLazyLoad = (query == null) ? false : query.isDisableLazyLoading();
+    this.disableLazyLoad = (query != null) && query.isDisableLazyLoading();
 
     this.subQuery = Type.SUBQUERY.equals(query.getType()) || Type.ID_LIST.equals(query.getType());
     this.includeJoin = query.getIncludeTableJoin();

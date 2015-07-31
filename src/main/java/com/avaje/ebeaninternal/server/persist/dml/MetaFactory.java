@@ -45,7 +45,7 @@ public class MetaFactory {
 
     // to bind encryption data before or after the encryption key
     DbEncrypt dbEncrypt = dbPlatform.getDbEncrypt();
-    boolean bindEncryptDataFirst = dbEncrypt == null ? true : dbEncrypt.isBindEncryptDataFirst();
+    boolean bindEncryptDataFirst = dbEncrypt == null || dbEncrypt.isBindEncryptDataFirst();
 
     this.baseFact = new FactoryBaseProperties(bindEncryptDataFirst);
     this.embeddedFact = new FactoryEmbedded(bindEncryptDataFirst);
