@@ -1,15 +1,12 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.sql.Connection;
-
-import javax.persistence.PersistenceException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiTransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
 
 /**
  * Base class for find and persist requests.
@@ -23,8 +20,6 @@ public abstract class BeanRequest {
 	 */
 	protected final SpiEbeanServer ebeanServer;
 
-	protected final String serverName;
-
 	/**
 	 * The transaction this is part of.
 	 */
@@ -34,18 +29,8 @@ public abstract class BeanRequest {
 
 	public BeanRequest(SpiEbeanServer ebeanServer, SpiTransaction t) {
 		this.ebeanServer = ebeanServer;
-		this.serverName = ebeanServer.getName();
 		this.transaction = t;
 	}
-
-	/**
-	 * initialise an implicit transaction if one is not currently supplied.
-	 * <p>
-	 * A transaction may have been passed in or active in the thread local. If
-	 * not then create one implicitly to handle the request.
-	 * </p>
-	 */
-	public abstract void initTransIfRequired();
 
 	/**
 	 * A helper method for creating an implicit transaction is it is required.
@@ -107,13 +92,6 @@ public abstract class BeanRequest {
 	 */
 	public SpiTransaction getTransaction() {
 		return transaction;
-	}
-
-	/**
-	 * Returns the connection from the Transaction.
-	 */
-	public Connection getConnection() {
-		return transaction.getInternalConnection();
 	}
 
   /**
