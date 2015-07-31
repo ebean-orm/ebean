@@ -64,13 +64,6 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
 	}
 
 	/**
-	 * Always false.
-	 */
-	public boolean useGeneratedKeys() {
-		return false;
-	}
-
-	/**
 	 * Not called for this type of request.
 	 */
 	public void setGeneratedKey(Object idValue) {

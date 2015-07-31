@@ -1,9 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.sql.SQLException;
-import java.util.LinkedHashMap;
-
-import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoin;
@@ -12,16 +8,13 @@ import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.query.SqlBeanLoad;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
+import java.sql.SQLException;
+import java.util.LinkedHashMap;
+
 /**
  * Represents a join to another table.
  */
 public final class TableJoin {
-
-  /**
-   * Flag set when the imported key maps to the primary key. This occurs for
-   * intersection tables (ManyToMany).
-   */
-  private final boolean importedPrimaryKey;
 
   /**
    * The joined table.
@@ -32,11 +25,6 @@ public final class TableJoin {
    * The type of join as per deployment (cardinality and optionality).
    */
   private final SqlJoinType type;
-
-  /**
-   * The persist cascade info.
-   */
-  private final BeanCascadeInfo cascadeInfo;
 
   private final InheritInfo inheritInfo;
     
@@ -60,10 +48,8 @@ public final class TableJoin {
    */
   public TableJoin(DeployTableJoin deploy, LinkedHashMap<String, BeanProperty> propMap) {
 
-    this.importedPrimaryKey = deploy.isImportedPrimaryKey();
     this.table = InternString.intern(deploy.getTable());
     this.type = deploy.getType();
-    this.cascadeInfo = deploy.getCascadeInfo();
     this.inheritInfo = deploy.getInheritInfo();
 
     DeployTableJoinColumn[] deployCols = deploy.columns();
@@ -125,27 +111,6 @@ public final class TableJoin {
     }
   }
 
-  public Object readSet(DbReadContext ctx, EntityBean bean, Class<?> type) throws SQLException {
-    for (int i = 0, x = properties.length; i < x; i++) {
-      properties[i].readSet(ctx, bean, type);
-    }
-    return null;
-  }
-
-  /**
-   * Return true if the imported foreign key maps to the primary key.
-   */
-  public boolean isImportedPrimaryKey() {
-    return importedPrimaryKey;
-  }
-
-  /**
-   * Return the persist info.
-   */
-  public BeanCascadeInfo getCascadeInfo() {
-    return cascadeInfo;
-  }
-
   /**
    * Return the join columns.
    */
@@ -172,13 +137,6 @@ public final class TableJoin {
    */
   public SqlJoinType getType() {
     return type;
-  }
-
-  /**
-   * Return true if this join is a left outer join.
-   */
-  public boolean isOuterJoin() {
-    return type == SqlJoinType.OUTER;
   }
 
   public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {
