@@ -29,7 +29,7 @@ public class UrlResourceContent implements ResourceContent {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("[").append(getName());
         sb.append("] size[").append(size());
         sb.append("] lastModified[").append(new Date(lastModified()));

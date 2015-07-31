@@ -203,7 +203,7 @@ public class DdlGenContext {
 
 	private String padding(int length){
 
-		StringBuffer sb = new StringBuffer(length);
+		StringBuilder sb = new StringBuilder(length);
 		for (int i = 0; i < length; i++) {
 			sb.append(" ");
 		}

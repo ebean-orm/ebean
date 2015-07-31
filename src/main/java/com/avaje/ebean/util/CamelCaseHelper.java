@@ -12,7 +12,7 @@ public class CamelCaseHelper {
    */
   public static String toCamelFromUnderscore(String underscore) {
 
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     String[] vals = underscore.split("_");
 
     for (int i = 0; i < vals.length; i++) {

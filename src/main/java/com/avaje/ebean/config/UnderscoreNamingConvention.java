@@ -110,7 +110,7 @@ public class UnderscoreNamingConvention extends AbstractNamingConvention {
   protected String toUnderscoreFromCamel(String camelCase) {
 
     int lastUpper = -1;
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     for (int i = 0; i < camelCase.length(); i++) {
       char c = camelCase.charAt(i);
 
@@ -153,7 +153,7 @@ public class UnderscoreNamingConvention extends AbstractNamingConvention {
    */
   protected String toCamelFromUnderscore(String underscore) {
 
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     String[] vals = underscore.split("_");
 
     for (int i = 0; i < vals.length; i++) {

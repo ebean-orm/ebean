@@ -37,7 +37,7 @@ public class MailAddress {
     }
     
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(getAlias()).append(" ").append("<").append(getEmailAddress()).append(">");
         return sb.toString();
     }
