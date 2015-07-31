@@ -17,7 +17,7 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
 
 	private final BeanDescriptor<?> beanDescriptor;
 	
-	private SpiUpdate<?> ormUpdate;
+	private final SpiUpdate<?> ormUpdate;
 
 	private int rowCount;
 

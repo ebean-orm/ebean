@@ -24,12 +24,12 @@ public class SqlTreeProperties {
   /**
    * The bean properties in order.
    */
-  private List<BeanProperty> propsList = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> propsList = new ArrayList<BeanProperty>();
 
   /**
    * Maintain a list of property names to detect embedded bean additions.
    */
-  private LinkedHashSet<String> propNames = new LinkedHashSet<String>();
+  private final LinkedHashSet<String> propNames = new LinkedHashSet<String>();
 
   private boolean allProperties;
 

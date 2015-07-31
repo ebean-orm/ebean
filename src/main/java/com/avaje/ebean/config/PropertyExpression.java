@@ -27,12 +27,12 @@ final class PropertyExpression {
   /**
    * Used to detect the start of an expression.
    */
-  private static String START = "${";
+  private static final String START = "${";
 
   /**
    * Used to detect the end of an expression.
    */
-  private static String END = "}";
+  private static final String END = "}";
 
   /**
    * Specify the PropertyHolder.

@@ -19,8 +19,8 @@ public enum SqlJoinType {
    * It is automatically determined based on cardinality and optionality.
    */
   AUTO("JOIN-TYPE-AUTO-LITERAL-NOT-USED");
-  
-  String literal;
+
+  final String literal;
 
   SqlJoinType(String literal) {
     this.literal = literal;

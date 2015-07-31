@@ -11,12 +11,7 @@ import java.util.Date;
  */
 public class UrlResourceContent implements ResourceContent {
 
-    /**
-     * The underlying resource.
-     */
-    //URL url;
-
-    String entryName;
+    final String entryName;
 
     URLConnection con;
     

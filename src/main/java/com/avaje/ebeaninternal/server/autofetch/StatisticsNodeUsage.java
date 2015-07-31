@@ -37,7 +37,7 @@ public class StatisticsNodeUsage implements Serializable {
 	
 	private boolean modified;
 	
-	private Set<String> aggregateUsed = new LinkedHashSet<String>();
+	private final Set<String> aggregateUsed = new LinkedHashSet<String>();
 
 	public StatisticsNodeUsage(String path, boolean queryTuningAddVersion) {
 		this.path = path;

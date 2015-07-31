@@ -32,7 +32,7 @@ public class SocketClusterBroadcast implements ClusterBroadcast {
 
   private final SocketClusterListener listener;
 
-  private SocketClient[] members;
+  private final SocketClient[] members;
 
   private ClusterManager clusterManager;
 

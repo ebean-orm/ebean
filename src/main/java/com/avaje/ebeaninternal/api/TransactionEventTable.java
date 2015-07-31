@@ -70,7 +70,7 @@ public final class TransactionEventTable implements Serializable {
 		
 		private static final long serialVersionUID = -1958317571064162089L;
 		
-		private String table;
+		private final String table;
 		private boolean insert;
 		private boolean update;
 		private boolean delete;

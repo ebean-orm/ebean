@@ -14,7 +14,7 @@ import com.avaje.ebeaninternal.server.core.PersistRequestBean;
  */
 public class TransactionEventBeans {
 
-	ArrayList<PersistRequestBean<?>> requests = new ArrayList<PersistRequestBean<?>>();
+  final ArrayList<PersistRequestBean<?>> requests = new ArrayList<PersistRequestBean<?>>();
 
 	/**
 	 * Return the list of PersistRequests that BeanListeners are interested in.

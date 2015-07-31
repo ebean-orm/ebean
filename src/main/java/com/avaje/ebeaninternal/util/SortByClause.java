@@ -27,7 +27,7 @@ public class SortByClause {
 	public static final String DESC = "desc";
 	
 	
-	private List<Property> properties = new ArrayList<Property>();
+	private final List<Property> properties = new ArrayList<Property>();
 	
 	/**
 	 * Return the number of properties in the clause.

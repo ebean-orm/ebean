@@ -10,7 +10,7 @@ import java.util.List;
 
 public class RemoteTransactionEvent implements Runnable {
 
-    private List<BeanPersistIds> beanPersistList = new ArrayList<BeanPersistIds>();
+    private final List<BeanPersistIds> beanPersistList = new ArrayList<BeanPersistIds>();
     
     private List<TableIUD> tableList;
 

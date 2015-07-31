@@ -45,7 +45,7 @@ public class SqlReservedWords {
 		+",WHERE,WITH";
 
 	
-	private static HashSet<String> keywords = new HashSet<String>();
+	private static final HashSet<String> keywords = new HashSet<String>();
 	static {
 		
 		String[] initialKeywords = baseKeyWords.split(",");

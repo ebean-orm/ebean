@@ -42,7 +42,7 @@ public abstract class SequenceIdGenerator implements IdGenerator {
 
   protected final ArrayList<Long> idList = new ArrayList<Long>(50);
 
-  protected int batchSize;
+  protected final int batchSize;
 
   protected int currentlyBackgroundLoading;
 

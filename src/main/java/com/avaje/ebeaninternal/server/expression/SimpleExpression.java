@@ -13,7 +13,7 @@ public class SimpleExpression extends AbstractExpression {
   enum Op {
     EQ(" = ? "), NOT_EQ(" <> ? "), LT(" < ? "), LT_EQ(" <= ? "), GT(" > ? "), GT_EQ(" >= ? ");
 
-    String exp;
+    final String exp;
 
     Op(String exp) {
       this.exp = exp;

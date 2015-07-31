@@ -15,7 +15,7 @@ public class TransactionMap {
     /**
      * Map of State by serverName. 
      */
-    private HashMap<String,State> map = new HashMap<String, State>();
+    private final HashMap<String,State> map = new HashMap<String, State>();
     
     public String toString() {
     	return map.toString();

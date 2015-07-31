@@ -21,7 +21,7 @@ import java.time.MonthDay;
  */
 public class ScalarTypeMonthDay extends ScalarTypeBase<MonthDay> {
 
-  protected int year;
+  protected final int year;
 
   /**
    * Construct with a year of 2000 (which is a leap year).

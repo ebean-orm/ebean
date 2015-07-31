@@ -20,15 +20,15 @@ public class SqlTreeAlias {
 
   private int manyWhereCounter;
 
-  private TreeSet<String> joinProps = new TreeSet<String>();
+  private final TreeSet<String> joinProps = new TreeSet<String>();
 
   private HashSet<String> embeddedPropertyJoins;
 
-  private TreeSet<String> manyWhereJoinProps = new TreeSet<String>();
+  private final TreeSet<String> manyWhereJoinProps = new TreeSet<String>();
 
-  private HashMap<String, String> aliasMap = new HashMap<String, String>();
+  private final HashMap<String, String> aliasMap = new HashMap<String, String>();
 
-  private HashMap<String, String> manyWhereAliasMap = new HashMap<String, String>();
+  private final HashMap<String, String> manyWhereAliasMap = new HashMap<String, String>();
 
   private final String rootTableAlias;
 

@@ -21,11 +21,11 @@ public class SimpleDataSourceAlert implements DataSourceAlert, MailListener {
 
   private static final Logger logger = LoggerFactory.getLogger(SimpleDataSourceAlert.class);
 
-  private static String alertMailServerName = System.getProperty("ebean.datasource.alert.mailserver");
+  private static final String alertMailServerName = System.getProperty("ebean.datasource.alert.mailserver");
 
-  private static String fromUser = System.getProperty("ebean.datasource.alert.fromUser");
-  private static String fromEmail = System.getProperty("ebean.datasource.alert.fromEmail");
-  private static String toEmail = System.getProperty("ebean.datasource.alert.toEmail");
+  private static final String fromUser = System.getProperty("ebean.datasource.alert.fromUser");
+  private static final String fromEmail = System.getProperty("ebean.datasource.alert.fromEmail");
+  private static final String toEmail = System.getProperty("ebean.datasource.alert.toEmail");
 
   /**
    * Create a SimpleAlerter.

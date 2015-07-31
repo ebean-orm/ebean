@@ -156,7 +156,7 @@ public class PooledConnection extends ConnectionDelegator {
    */
   private StackTraceElement[] stackTrace;
 
-  private int maxStackTrace;
+  private final int maxStackTrace;
 
   /**
    * Slot position in the BusyConnectionBuffer.

@@ -16,7 +16,7 @@ import java.sql.Types;
  */
 public class ScalarTypeFile extends ScalarTypeBase<File> {
 
-  private static Logger logger = LoggerFactory.getLogger(ScalarTypeFile.class);
+  private static final Logger logger = LoggerFactory.getLogger(ScalarTypeFile.class);
 
   private final String prefix;
 

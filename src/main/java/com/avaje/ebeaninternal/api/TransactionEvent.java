@@ -23,7 +23,7 @@ public class TransactionEvent implements Serializable {
    * Flag indicating this is a local transaction (not from another server in
    * the cluster).
    */
-  private transient boolean local;
+  private final transient boolean local;
 
   private TransactionEventTable eventTables;
 
