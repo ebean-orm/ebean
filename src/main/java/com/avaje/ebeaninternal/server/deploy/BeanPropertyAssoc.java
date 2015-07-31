@@ -101,8 +101,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 			saveRecurseSkippable = targetDescriptor.isSaveRecurseSkippable();
 			deleteRecurseSkippable = targetDescriptor.isDeleteRecurseSkippable();
 
-			cascadeValidate = cascadeInfo.isValidate();
-
 			if (!targetIdBinder.isComplexId()){
 				targetIdProperty = targetIdBinder.getIdProperty();
 			}

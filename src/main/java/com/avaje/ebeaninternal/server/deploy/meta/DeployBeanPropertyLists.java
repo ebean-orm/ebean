@@ -283,7 +283,7 @@ public class DeployBeanPropertyLists {
    * Mode used to determine which BeanPropertyAssoc to include.
    */
   private enum Mode {
-    Save, Delete, Validate
+    Save, Delete
   }
 
   private BeanPropertyAssocOne<?>[] getOne(boolean imported, Mode mode) {
@@ -299,11 +299,6 @@ public class DeployBeanPropertyLists {
           break;
         case Delete:
           if (prop.getCascadeInfo().isDelete()) {
-            list.add(prop);
-          }
-          break;
-        case Validate:
-          if (prop.getCascadeInfo().isValidate()) {
             list.add(prop);
           }
           break;
@@ -349,15 +344,9 @@ public class DeployBeanPropertyLists {
           list.add(prop);
         }
         break;
-      case Validate:
-        if (prop.getCascadeInfo().isValidate()) {
-          list.add(prop);
-        }
-        break;
       default:
         break;
       }
-
     }
 
     return (BeanPropertyAssocMany[]) list.toArray(new BeanPropertyAssocMany[list.size()]);

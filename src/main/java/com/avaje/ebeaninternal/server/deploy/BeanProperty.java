@@ -7,7 +7,6 @@ import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
 import com.avaje.ebeaninternal.server.core.InternString;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
@@ -33,7 +32,6 @@ import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Description of a property of a bean. Includes its deployment information such
@@ -192,8 +190,6 @@ public class BeanProperty implements ElPropertyValue {
    */
   @SuppressWarnings("rawtypes")
   final ScalarType scalarType;
-
-  boolean cascadeValidate;
 
   /**
    * The length or precision for DB column.

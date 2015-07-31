@@ -19,12 +19,7 @@ public class BeanCascadeInfo {
      * Should save cascade.
      */
     boolean save;
-    
-    /**
-     * Should validate cascade.
-     */
-    boolean validate;
-    
+
     /**
      * Set the raw deployment attribute.
      */
@@ -43,14 +38,10 @@ public class BeanCascadeInfo {
             // same as EJB3 persist
             save = (attr.contains("persist"));
         }
-        if (attr.contains("validate")){
-        	validate = true;
-        }
         
         if (attr.contains("all")){
             delete = true;
             save = true;
-            validate = true;
         }
     }
 
@@ -74,9 +65,6 @@ public class BeanCascadeInfo {
         if (type.equals(CascadeType.MERGE)){
             save = true;
         }
-        if (save || delete){
-        	validate = true;
-        }        
     }
     
     /**
@@ -104,19 +92,5 @@ public class BeanCascadeInfo {
     public void setSave(boolean isUpdate) {
         this.save = isUpdate;
     }
-
-    /**
-     * Return true if validate should be cascaded.
-     */
-	public boolean isValidate() {
-		return validate;
-	}
-
-	/**
-	 * Set validate to cascade or not.
-	 */
-	public void setValidate(boolean isValidate) {
-		this.validate = isValidate;
-	}
 
 }
