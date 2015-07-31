@@ -290,7 +290,7 @@ public interface Transaction extends Closeable {
    * <li>Transaction commit occurs</li>
    * </ul>
    */
-  void flushBatch() throws PersistenceException, OptimisticLockException;
+  void flushBatch() throws PersistenceException;
 
   /**
    * Return the underlying Connection object.
