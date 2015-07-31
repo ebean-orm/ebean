@@ -40,9 +40,7 @@ class ModifyCollection<E> implements Collection<E> {
 
   public boolean addAll(Collection<? extends E> collection) {
     boolean changed = false;
-    Iterator<? extends E> it = collection.iterator();
-    while (it.hasNext()) {
-      E o = it.next();
+    for (E o : collection) {
       if (c.add(o)) {
         owner.modifyAddition(o);
         changed = true;
@@ -51,27 +49,33 @@ class ModifyCollection<E> implements Collection<E> {
     return changed;
   }
 
+  @Override
   public void clear() {
     c.clear();
   }
 
+  @Override
   public boolean contains(Object o) {
     return c.contains(o);
   }
 
+  @Override
   public boolean containsAll(Collection<?> collection) {
     return c.containsAll(collection);
   }
 
+  @Override
   public boolean isEmpty() {
     return c.isEmpty();
   }
 
+  @Override
   public Iterator<E> iterator() {
     Iterator<E> it = c.iterator();
     return new ModifyIterator<E>(owner, it);
   }
 
+  @Override
   public boolean remove(Object o) {
     if (c.remove(o)) {
       owner.modifyRemoval(o);
@@ -80,41 +84,45 @@ class ModifyCollection<E> implements Collection<E> {
     return false;
   }
 
+  @Override
   public boolean removeAll(Collection<?> collection) {
     boolean changed = false;
-    Iterator<?> it = collection.iterator();
-    while (it.hasNext()) {
-      Object o = (Object) it.next();
-      if (c.remove(o)) {
-        owner.modifyRemoval(o);
+    for (Object bean : collection) {
+      if (c.remove(bean)) {
+        owner.modifyRemoval(bean);
         changed = true;
       }
     }
     return changed;
   }
 
+  @Override
   public boolean retainAll(Collection<?> collection) {
     boolean changed = false;
     Iterator<?> it = c.iterator();
     while (it.hasNext()) {
-      Object o = (Object) it.next();
-      if (!collection.contains(o)) {
+      Object bean = it.next();
+      if (!collection.contains(bean)) {
+        // not retaining this bean so add to removals
         it.remove();
-        owner.modifyRemoval(o);
+        owner.modifyRemoval(bean);
         changed = true;
       }
     }
     return changed;
   }
 
+  @Override
   public int size() {
     return c.size();
   }
 
+  @Override
   public Object[] toArray() {
     return c.toArray();
   }
 
+  @Override
   public <T> T[] toArray(T[] a) {
     return c.toArray(a);
   }

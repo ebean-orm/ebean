@@ -343,41 +343,41 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list.remove(o);
   }
 
-  public boolean removeAll(Collection<?> c) {
+  public boolean removeAll(Collection<?> beans) {
     checkReadOnly();
     init();
     if (modifyRemoveListening) {
       boolean changed = false;
-      Iterator<?> it = c.iterator();
-      while (it.hasNext()) {
-        Object o = it.next();
-        if (list.remove(o)) {
-          modifyRemoval(o);
+      for (Object bean : beans) {
+        if (list.remove(bean)) {
+          // register this bean as having been removed
+          modifyRemoval(bean);
           changed = true;
         }
       }
       return changed;
     }
-    return list.removeAll(c);
+    return list.removeAll(beans);
   }
 
-  public boolean retainAll(Collection<?> c) {
+  public boolean retainAll(Collection<?> retainBeans) {
     checkReadOnly();
     init();
     if (modifyRemoveListening) {
       boolean changed = false;
       Iterator<E> it = list.iterator();
       while (it.hasNext()) {
-        Object o = it.next();
-        if (!c.contains(o)) {
+        Object bean = it.next();
+        if (!retainBeans.contains(bean)) {
+          // removing this bean
           it.remove();
-          modifyRemoval(o);
+          modifyRemoval(bean);
           changed = true;
         }
       }
       return changed;
     }
-    return list.retainAll(c);
+    return list.retainAll(retainBeans);
   }
 
   public E set(int index, E element) {

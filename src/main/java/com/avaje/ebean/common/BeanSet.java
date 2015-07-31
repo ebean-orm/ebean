@@ -192,32 +192,29 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     return set.add(o);
   }
 
-  public boolean addAll(Collection<? extends E> c) {
+  public boolean addAll(Collection<? extends E> addCollection) {
     checkReadOnly();
     init();
     if (modifyAddListening) {
       boolean changed = false;
-      Iterator<? extends E> it = c.iterator();
-      while (it.hasNext()) {
-        E o = it.next();
-        if (set.add(o)) {
-          modifyAddition(o);
+      for (E bean : addCollection) {
+        if (set.add(bean)) {
+          // register the addition of the bean
+          modifyAddition(bean);
           changed = true;
         }
       }
       return changed;
     }
-    return set.addAll(c);
+    return set.addAll(addCollection);
   }
 
   public void clear() {
     checkReadOnly();
     initClear();
     if (modifyRemoveListening) {
-      Iterator<E> it = set.iterator();
-      while (it.hasNext()) {
-        E e = it.next();
-        modifyRemoval(e);
+      for (E bean : set) {
+        modifyRemoval(bean);
       }
     }
     set.clear();
@@ -262,41 +259,40 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     return set.remove(o);
   }
 
-  public boolean removeAll(Collection<?> c) {
+  public boolean removeAll(Collection<?> beans) {
     checkReadOnly();
     init();
     if (modifyRemoveListening) {
       boolean changed = false;
-      Iterator<?> it = c.iterator();
-      while (it.hasNext()) {
-        Object o = it.next();
-        if (set.remove(o)) {
-          modifyRemoval(o);
+      for (Object bean : beans) {
+        if (set.remove(bean)) {
+          modifyRemoval(bean);
           changed = true;
         }
       }
       return changed;
     }
-    return set.removeAll(c);
+    return set.removeAll(beans);
   }
 
-  public boolean retainAll(Collection<?> c) {
+  public boolean retainAll(Collection<?> beans) {
     checkReadOnly();
     init();
     if (modifyRemoveListening) {
       boolean changed = false;
       Iterator<?> it = set.iterator();
       while (it.hasNext()) {
-        Object o = it.next();
-        if (!c.contains(o)) {
+        Object bean = it.next();
+        if (!beans.contains(bean)) {
+          // not retaining this bean so add it to the removal list
           it.remove();
-          modifyRemoval(o);
+          modifyRemoval(bean);
           changed = true;
         }
       }
       return changed;
     }
-    return set.retainAll(c);
+    return set.retainAll(beans);
   }
 
   public int size() {

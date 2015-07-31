@@ -195,9 +195,9 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     checkReadOnly();
     initClear();
     if (modifyRemoveListening) {
-      for (K key : map.keySet()) {
-        E o = map.remove(key);
-        modifyRemoval(o);
+      // add all beans to the removal list
+      for (E bean : map.values()) {
+        modifyRemoval(bean);
       }
     }
     map.clear();
@@ -249,9 +249,12 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     checkReadOnly();
     init();
     if (modifyListening) {
-      Object o = map.put(key, value);
-      modifyAddition(value);
-      modifyRemoval(o);
+      Object oldBean = map.put(key, value);
+      if (value != oldBean) {
+        // register the add of the new and the removal of the old
+        modifyAddition(value);
+        modifyRemoval(oldBean);
+      }
     }
     return map.put(key, value);
   }

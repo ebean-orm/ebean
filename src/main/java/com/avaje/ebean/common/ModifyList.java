@@ -39,12 +39,10 @@ class ModifyList<E> extends ModifyCollection<E> implements List<E> {
     owner.modifyAddition(element);
   }
 
-  public boolean addAll(int index, Collection<? extends E> co) {
-    if (list.addAll(index, co)) {
-      Iterator<? extends E> it = co.iterator();
-      while (it.hasNext()) {
-        E o = it.next();
-        owner.modifyAddition(o);
+  public boolean addAll(int index, Collection<? extends E> addCollection) {
+    if (list.addAll(index, addCollection)) {
+      for (E bean : addCollection) {
+        owner.modifyAddition(bean);
       }
       return true;
     }
