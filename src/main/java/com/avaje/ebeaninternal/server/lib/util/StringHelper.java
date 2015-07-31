@@ -252,24 +252,20 @@ public class StringHelper {
 			if (startPos <= str.length()) {
 				String lastValue = str.substring(startPos, str.length());
 				// dp("lastValue="+lastValue);
-				if (!keepEmpties && lastValue.length() == 0) {
-					// dp("not keeping...");
-				} else {
-					list.add(lastValue);
-				}
-			}
+        if (keepEmpties || lastValue.length() != 0) {
+          list.add(lastValue);
+        }
+      }
 			// we have finished parsing the string...
-			return;
+
 		} else {
 			// get the delimited value... add it..
 			String value = str.substring(startPos, endPos);
 			// dp(startPos+","+endPos+" value="+value);
-			if (!keepEmpties && value.length() == 0) {
-				// dp("not keeping...");
-			} else {
-				list.add(value);
-			}
-			// recursively search as we are not at the end yet...
+      if (keepEmpties || value.length() != 0) {
+        list.add(value);
+      }
+      // recursively search as we are not at the end yet...
 			delimiter(str, delimiter, keepEmpties, endPos + 1, list);
 		}
 	}

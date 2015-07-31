@@ -308,10 +308,7 @@ public class SqlTreeBuilder {
     IncludesDistiller extraJoinDistill = new IncludesDistiller(desc, selectIncludes, predicateIncludes);
 
     Collection<SqlTreeNodeExtraJoin> extraJoins = extraJoinDistill.getExtraJoinRootNodes();
-    if (extraJoins.isEmpty()) {
-      return;
-
-    } else {
+    if (!extraJoins.isEmpty()) {
       // add extra joins required to support predicates
       // and/or order by clause
       for (SqlTreeNodeExtraJoin extraJoin: extraJoins) {

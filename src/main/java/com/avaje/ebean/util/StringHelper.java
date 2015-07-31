@@ -259,7 +259,7 @@ public class StringHelper {
         }
       }
       // we have finished parsing the string...
-      return;
+
     } else {
       // get the delimited value... add it..
       String value = str.substring(startPos, endPos);
