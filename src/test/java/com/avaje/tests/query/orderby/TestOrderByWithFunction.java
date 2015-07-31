@@ -21,13 +21,13 @@ public class TestOrderByWithFunction extends BaseTestCase {
     query.findList();
     String sql = query.getGeneratedSql();
 
-    Assert.assertTrue(sql.indexOf("order by length(t0.name)") > -1);
+    Assert.assertTrue(sql.contains("order by length(t0.name)"));
 
     String oq = "find customer ORDER BY LENGTH(name),name";
     query = Ebean.createQuery(Customer.class, oq);
     query.findList();
 
     sql = query.getGeneratedSql();
-    Assert.assertTrue(sql.indexOf("order by LENGTH(t0.name)") > -1);
+    Assert.assertTrue(sql.contains("order by LENGTH(t0.name)"));
   }
 }

@@ -34,9 +34,9 @@ public class TestManyWhereJoin extends BaseTestCase {
     // join o_order u1 on u1.kcustomer_id = t0.id  
     // where u1.status = ? ; --bind(NEW)
 
-    Assert.assertTrue(sql.indexOf("select distinct ") > -1);
-    Assert.assertTrue(sql.indexOf("join o_order ") > -1);
-    Assert.assertTrue(sql.indexOf(".status = ?") > -1);
+    Assert.assertTrue(sql.contains("select distinct "));
+    Assert.assertTrue(sql.contains("join o_order "));
+    Assert.assertTrue(sql.contains(".status = ?"));
     Assert.assertTrue(sql.contains("select distinct t0.id c0, t0.status c1 from o_customer t0 join o_order u1 on u1.kcustomer_id = t0.id  where u1.status = ?"));
   }
   
@@ -66,10 +66,10 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where t1.order_date is not null  and u1.status = ?
     // order by t0.id; --bind(NEW)
 
-    Assert.assertTrue(sql.indexOf("select distinct t0.id c0, t0.status c1, t1.id c2, t1.status c3,") > -1);
-    Assert.assertTrue(sql.indexOf("left outer join o_order t1 on ") > -1);
-    Assert.assertTrue(sql.indexOf("join o_order u1 on ") > -1);
-    Assert.assertTrue(sql.indexOf(" u1.status = ?") > -1);
+    Assert.assertTrue(sql.contains("select distinct t0.id c0, t0.status c1, t1.id c2, t1.status c3,"));
+    Assert.assertTrue(sql.contains("left outer join o_order t1 on "));
+    Assert.assertTrue(sql.contains("join o_order u1 on "));
+    Assert.assertTrue(sql.contains(" u1.status = ?"));
   }
   
   @Test
@@ -93,9 +93,9 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where u1.product_id = ?  
     // order by t0.cretime; --bind(1)
     
-    Assert.assertTrue(sql.indexOf("select distinct t0.id c0, t0.status c1,") > -1);
-    Assert.assertTrue(sql.indexOf(" join o_order_detail u1 on u1.order_id = t0.id") > -1);
-    Assert.assertTrue(sql.indexOf(" where u1.product_id = ?") > -1);
+    Assert.assertTrue(sql.contains("select distinct t0.id c0, t0.status c1,"));
+    Assert.assertTrue(sql.contains(" join o_order_detail u1 on u1.order_id = t0.id"));
+    Assert.assertTrue(sql.contains(" where u1.product_id = ?"));
   }
   
   /**
@@ -123,9 +123,9 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where u1.product_id = ?  
     // order by t0.cretime
     
-    Assert.assertTrue(sql.indexOf("select distinct t0.id c0, t0.status c1,") > -1);
-    Assert.assertTrue(sql.indexOf(" join o_order_detail u1 on u1.order_id = t0.id") > -1);
-    Assert.assertTrue(sql.indexOf(" where u1.product_id = ?") > -1);
+    Assert.assertTrue(sql.contains("select distinct t0.id c0, t0.status c1,"));
+    Assert.assertTrue(sql.contains(" join o_order_detail u1 on u1.order_id = t0.id"));
+    Assert.assertTrue(sql.contains(" where u1.product_id = ?"));
   }
   
   /**
@@ -155,11 +155,11 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where t1.id > 0  and u1.product_id = ? 
     // order by t0.cretime, t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc; --bind(1)
 
-    Assert.assertTrue(sql.indexOf("select distinct t0.id c0, t0.status c1,") > -1);
-    Assert.assertTrue(sql.indexOf(" join o_order_detail u1 on u1.order_id = t0.id") > -1);
-    Assert.assertTrue(sql.indexOf(" u1.product_id = ?") > -1);
+    Assert.assertTrue(sql.contains("select distinct t0.id c0, t0.status c1,"));
+    Assert.assertTrue(sql.contains(" join o_order_detail u1 on u1.order_id = t0.id"));
+    Assert.assertTrue(sql.contains(" u1.product_id = ?"));
     
     // additional join for fetching the many details
-    Assert.assertTrue(sql.indexOf(" left outer join o_order_detail t1 on t1.order_id = t0.id") > -1);
+    Assert.assertTrue(sql.contains(" left outer join o_order_detail t1 on t1.order_id = t0.id"));
   }
 }

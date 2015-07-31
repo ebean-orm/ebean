@@ -59,7 +59,7 @@ public class TestSubQuery extends BaseTestCase {
 
     String golden = "(t0.one_key) in (select t0.one_key from ckey_parent t0) ";
 
-    if (sql.indexOf(golden) < 0) {
+    if (!sql.contains(golden)) {
       System.out.println("failed sql:" + sql);
       Assert.fail("golden string not found");
     }
@@ -108,7 +108,7 @@ public class TestSubQuery extends BaseTestCase {
     // know now, in our case, it is not necessary if not
     // using it in the where clause
     String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id )";
-    if (sql.indexOf(golden) < 0) {
+    if (!sql.contains(golden)) {
       System.out.println("failed sql:" + sql);
       Assert.fail("golden string not found");
     }
@@ -134,7 +134,7 @@ public class TestSubQuery extends BaseTestCase {
     System.err.println(sql);
 
     String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id  where t1.license_number = ? )";
-    if (sql.indexOf(golden) < 0) {
+    if (!sql.contains(golden)) {
       System.out.println("failed sql:" + sql);
       Assert.fail("golden string not found");
     }
@@ -163,7 +163,7 @@ public class TestSubQuery extends BaseTestCase {
     // OR without join
     // String golden =
     // "(t0.id) in (select t0.vehicle_id  from vehicle_driver t0)";
-    if (sql.indexOf(golden) < 0) {
+    if (!sql.contains(golden)) {
       System.out.println("failed sql:" + sql);
       Assert.fail("golden string not found");
     }

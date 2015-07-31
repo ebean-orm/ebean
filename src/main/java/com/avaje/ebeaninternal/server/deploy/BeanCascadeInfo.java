@@ -33,21 +33,21 @@ public class BeanCascadeInfo {
             return;
         }
         attr = attr.toLowerCase();
-        delete = (attr.indexOf("delete")>-1);
+        delete = (attr.contains("delete"));
         if (!delete){
             // same as EJB3 remove
-            delete = (attr.indexOf("remove")>-1);
+            delete = (attr.contains("remove"));
         }
-        save = (attr.indexOf("save")>-1);
+        save = (attr.contains("save"));
         if (!save){
             // same as EJB3 persist
-            save = (attr.indexOf("persist")>-1);
+            save = (attr.contains("persist"));
         }
-        if (attr.indexOf("validate")>-1){
+        if (attr.contains("validate")){
         	validate = true;
         }
         
-        if (attr.indexOf("all")>-1){
+        if (attr.contains("all")){
             delete = true;
             save = true;
             validate = true;

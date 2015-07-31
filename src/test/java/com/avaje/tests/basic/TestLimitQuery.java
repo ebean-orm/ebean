@@ -43,8 +43,8 @@ public class TestLimitQuery extends BaseTestCase {
 		query.findList();
 
 		String sql = query.getGeneratedSql();
-		boolean hasLimit = sql.indexOf("limit 0") > -1;
-		boolean hasOffset = sql.indexOf("offset 3") > -1;
+		boolean hasLimit = sql.contains("limit 0");
+		boolean hasOffset = sql.contains("offset 3");
 
 		if (h2Db) {
 			Assert.assertTrue(hasLimit);
@@ -69,8 +69,8 @@ public class TestLimitQuery extends BaseTestCase {
 		query.findList();
 
 		String sql = query.getGeneratedSql();
-		boolean hasLimit = sql.indexOf("limit 3") > -1;
-		boolean hasOffset = sql.indexOf("offset") > -1;
+		boolean hasLimit = sql.contains("limit 3");
+		boolean hasOffset = sql.contains("offset");
 
 		if (h2Db) {
 			Assert.assertTrue(sql, hasLimit);
@@ -94,8 +94,8 @@ public class TestLimitQuery extends BaseTestCase {
 		query.findList();
 
 		String sql = query.getGeneratedSql();
-		boolean hasLimit = sql.indexOf("limit") > -1;
-		boolean hasOffset = sql.indexOf("offset") > -1;
+		boolean hasLimit = sql.contains("limit");
+		boolean hasOffset = sql.contains("offset");
 
 		if (h2Db) {
 			Assert.assertFalse(hasLimit);
@@ -121,10 +121,10 @@ public class TestLimitQuery extends BaseTestCase {
 		Assert.assertTrue("sz > 0", list.size() > 0);
 
 		String sql = query.getGeneratedSql();
-		boolean hasDetailsJoin = sql.indexOf("join o_order_detail") > -1;
-		boolean hasLimit = sql.indexOf("limit 10") > -1;
-		boolean hasSelectedDetails = sql.indexOf("od.id,") > -1;
-		boolean hasDistinct = sql.indexOf("select distinct") > -1;
+		boolean hasDetailsJoin = sql.contains("join o_order_detail");
+		boolean hasLimit = sql.contains("limit 10");
+		boolean hasSelectedDetails = sql.contains("od.id,");
+		boolean hasDistinct = sql.contains("select distinct");
 		
 		Assert.assertTrue(hasDetailsJoin);
 		Assert.assertFalse(hasSelectedDetails);
@@ -141,10 +141,10 @@ public class TestLimitQuery extends BaseTestCase {
 		query.findList();
 		
 		sql = query.getGeneratedSql();
-		hasDetailsJoin = sql.indexOf("left outer join o_order_detail") > -1;
-		hasLimit = sql.indexOf("limit 10") > -1;
-		hasSelectedDetails = sql.indexOf("od.id") > -1;
-		hasDistinct = sql.indexOf("select distinct") > -1;
+		hasDetailsJoin = sql.contains("left outer join o_order_detail");
+		hasLimit = sql.contains("limit 10");
+		hasSelectedDetails = sql.contains("od.id");
+		hasDistinct = sql.contains("select distinct");
 
 		Assert.assertFalse("no join with maxRows",hasDetailsJoin);
 		Assert.assertFalse(hasSelectedDetails);

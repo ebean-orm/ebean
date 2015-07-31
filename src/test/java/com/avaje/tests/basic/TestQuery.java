@@ -36,13 +36,13 @@ public class TestQuery extends BaseTestCase {
 
     int rc = query.findList().size();
     Assert.assertTrue(rc > 0);
-    Assert.assertTrue(query.getGeneratedSql().toLowerCase().indexOf("for update") < 0);
+    Assert.assertTrue(!query.getGeneratedSql().toLowerCase().contains("for update"));
 
     query = Ebean.find(Order.class).setAutofetch(false).setForUpdate(true).setMaxRows(1).order()
         .asc("orderDate").order().desc("id");
 
     rc = query.findList().size();
     Assert.assertTrue(rc > 0);
-    Assert.assertTrue(query.getGeneratedSql().toLowerCase().indexOf("for update") > -1);
+    Assert.assertTrue(query.getGeneratedSql().toLowerCase().contains("for update"));
   }
 }

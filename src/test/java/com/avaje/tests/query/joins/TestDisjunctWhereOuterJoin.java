@@ -56,9 +56,9 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
       System.out.println(list);
 
       String sql = query.getGeneratedSql();
-      Assert.assertTrue(sql.indexOf("select distinct") > -1);
-      Assert.assertTrue(sql.indexOf("outer join mrole ") > -1);
-      Assert.assertTrue(sql.indexOf(".role_name = ?") > -1);
+      Assert.assertTrue(sql.contains("select distinct"));
+      Assert.assertTrue(sql.contains("outer join mrole "));
+      Assert.assertTrue(sql.contains(".role_name = ?"));
 
     } finally {
       Ebean.rollbackTransaction();
