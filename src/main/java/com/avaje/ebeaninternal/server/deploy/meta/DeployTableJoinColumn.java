@@ -99,37 +99,6 @@ public class DeployTableJoinColumn {
 	}
 
 	/**
-	 * Return true if either the local or foreign column is null.
-	 * <p>
-	 * Both columns need to be defined. If one is null then typically it is
-	 * derived as the primary key column.
-	 * </p>
-	 */
-	public boolean hasNullColumn() {
-		return localDbColumn == null || foreignDbColumn == null;
-	}
-
-	/**
-	 * When only ONE column has been set by deployment information return that one.
-	 * <p>
-	 * Used with hasNullColumn() to set the foreignDbColumn for OneToMany joins.
-	 * </p>
-	 */
-	public String getNonNullColumn() {
-		if (localDbColumn == null && foreignDbColumn == null) {
-			throw new IllegalStateException("expecting only one null column?");
-			
-		} else if (localDbColumn != null && foreignDbColumn != null) {
-			throw new IllegalStateException("expecting one null column?");			
-		}
-		if (localDbColumn != null) {
-			return localDbColumn;
-		} else {			
-			return foreignDbColumn;
-		}
-	}
-
-	/**
 	 * Return true if this column should be insertable.
 	 */
 	public boolean isInsertable() {
@@ -151,28 +120,10 @@ public class DeployTableJoinColumn {
 	}
 
 	/**
-	 * Set the foreign database column name.
-	 * <p>
-	 * Used when this is derived from Primary Key and not set explicitly in the
-	 * deployment information.
-	 * </p>
-	 */
-	public void setForeignDbColumn(String foreignDbColumn) {
-		this.foreignDbColumn = foreignDbColumn;
-	}
-
-	/**
 	 * Return the local database column name.
 	 */
 	public String getLocalDbColumn() {
 		return localDbColumn;
-	}
-
-	/**
-	 * Set the local database column name.
-	 */
-	public void setLocalDbColumn(String localDbColumn) {
-		this.localDbColumn = localDbColumn;
 	}
 
 }
