@@ -30,7 +30,6 @@ class ClassLoadContext {
 
     /**
      * This constructor is package-private to restrict instantiation to
-     * {@link ClassLoadContextFactory} only.
      */
     ClassLoadContext(final Class<?> caller, boolean preferContext) {
         if (caller == null){
@@ -135,18 +134,6 @@ class ClassLoadContext {
      * 'loader1'=='loader2'].
      */
     private boolean isChild(final ClassLoader loader1, ClassLoader loader2) {
-//        if (loader1 == loader2) {
-//            logger.info("Context and Caller ClassLoader's same "+loader1.getClass().getName());
-//            return true;
-//        }
-//        if (loader2 == null) {
-//            logger.info(msg+" ClassLoader is null");
-//            return false;
-//        }
-//        if (loader1 == null) {
-//            logger.info("Using "+msg+" ClassLoader as other is null");
-//            return true;
-//        }
 
         for (; loader2 != null; loader2 = loader2.getParent()) {
             if (loader2 == loader1) {

@@ -26,10 +26,6 @@ public class CheckImmutableResponse {
         this.compoundType = compoundType;
     }
 
-    public String getReasonNotImmutable() {
-        return reasonNotImmutable;
-    }
-
     public void setReasonNotImmutable(String error) {
         this.immutable = false;
         this.reasonNotImmutable = error;
