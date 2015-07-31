@@ -75,7 +75,7 @@ class SocketClusterListener implements Runnable {
   /**
    * Start listening for requests.
    */
-  public void startListening() throws IOException {
+  public void startListening() {
     logger.trace("... startListening()");
     this.listenerThread.setDaemon(true);
     this.listenerThread.start();

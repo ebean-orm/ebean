@@ -10,7 +10,6 @@ import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.PersistenceException;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -91,13 +90,8 @@ public class SocketClusterBroadcast implements ClusterBroadcast {
   public void startup(ClusterManager clusterManager) {
 
     this.clusterManager = clusterManager;
-    try {
-      listener.startListening();
-      register();
-
-    } catch (IOException e) {
-      throw new PersistenceException(e);
-    }
+    listener.startListening();
+    register();
   }
 
   public void shutdown() {
@@ -184,7 +178,7 @@ public class SocketClusterBroadcast implements ClusterBroadcast {
   /**
    * Process an incoming Cluster message.
    */
-  protected boolean process(SocketConnection request) throws IOException, ClassNotFoundException {
+  protected boolean process(SocketConnection request) throws ClassNotFoundException {
 
     try {
       SocketClusterMessage h = (SocketClusterMessage) request.readObject();
