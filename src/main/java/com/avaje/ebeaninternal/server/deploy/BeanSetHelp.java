@@ -141,9 +141,8 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
 
     if (!set.isEmpty() || ctx.isIncludeEmpty()) {
       ctx.writeStartArray(name);
-      Iterator<?> it = set.iterator();
-      while (it.hasNext()) {
-        targetDescriptor.jsonWrite(ctx, (EntityBean) it.next());
+      for (Object bean : set) {
+        targetDescriptor.jsonWrite(ctx, (EntityBean) bean);
       }
       ctx.writeEndArray();
     }
