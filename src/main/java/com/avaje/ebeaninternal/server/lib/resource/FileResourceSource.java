@@ -43,8 +43,7 @@ public class FileResourceSource extends AbstractResourceSource implements Resour
         
         File f = new File(fullPath);
         if (f.exists()){
-            FileResourceContent content = new FileResourceContent(f, entry);
-            return content;
+            return new FileResourceContent(f, entry);
         }
         return null;
     }

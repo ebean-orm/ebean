@@ -77,8 +77,7 @@ public class UpdatePlan implements SpiUpdatePlan {
     set.dmlBind(bind, bean);
 
     // not strictly 'thread safe' but object assignment is atomic
-    Long touched = Long.valueOf(System.currentTimeMillis());
-    this.timeLastUsed = touched;
+    this.timeLastUsed = System.currentTimeMillis();
   }
 
   /**

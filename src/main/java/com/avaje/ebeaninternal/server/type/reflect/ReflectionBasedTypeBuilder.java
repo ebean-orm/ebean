@@ -33,9 +33,7 @@ public class ReflectionBasedTypeBuilder {
         
         ReflectionBasedScalarTypeConverter r = new ReflectionBasedScalarTypeConverter(constructor, readers[0]);
         
-        ScalarTypeWrapper st = new ScalarTypeWrapper(logicalType, scalarType, r);
-        
-        return st;
+        return new ScalarTypeWrapper(logicalType, scalarType, r);
     }
     
     public ReflectionBasedCompoundType buildCompound(ImmutableMeta meta) {

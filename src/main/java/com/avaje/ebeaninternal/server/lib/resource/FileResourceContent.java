@@ -65,7 +65,6 @@ public class FileResourceContent implements ResourceContent {
      */
     public InputStream getInputStream() throws IOException {
 
-        FileInputStream is = new FileInputStream(file);
-        return is;
+        return new FileInputStream(file);
     }
 }

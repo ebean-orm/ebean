@@ -507,8 +507,7 @@ public class DataSourceConfig {
 
     String customProperties = properties.get("customProperties", null);
     if (customProperties != null && customProperties.length() > 0) {
-      Map<String, String> custProps = StringHelper.delimitedToMap(customProperties, ";", "=");
-      this.customProperties = custProps;
+      this.customProperties = StringHelper.delimitedToMap(customProperties, ";", "=");;
     }
 
   }

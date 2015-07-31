@@ -17,8 +17,7 @@ public class Prefix {
 	public static String getProp(String prop) {
 		String v = dec(prop);
 		int p = v.indexOf(":");
-		String r = v.substring(1, p);
-		return r;
+		return v.substring(1, p);
 	}
 
 	public static void main(String[] args) {
@@ -63,9 +62,8 @@ public class Prefix {
 
 		encbytes[0] = az((byte) k, oa[0]);
 		// dp("key:"+key+" encbytes[0]:"+(byte)encbytes[0]);
-		int ios = key;
-		for (int i = 1; i < (msgbytes.length + 1); i++) {
-			encbytes[i] = az(msgbytes[i - 1], (oa[(i + ios) % oa.length]));
+    for (int i = 1; i < (msgbytes.length + 1); i++) {
+			encbytes[i] = az(msgbytes[i - 1], (oa[(i + key) % oa.length]));
 		}
 		return new String(encbytes);
 	}
