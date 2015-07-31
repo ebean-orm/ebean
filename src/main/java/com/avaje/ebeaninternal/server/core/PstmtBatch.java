@@ -8,10 +8,10 @@ import java.sql.SQLException;
  */
 public interface PstmtBatch {
 
-	public void setBatchSize(PreparedStatement pstmt, int batchSize);
+	void setBatchSize(PreparedStatement pstmt, int batchSize);
 
-	public void addBatch(PreparedStatement pstmt) throws SQLException;
+	void addBatch(PreparedStatement pstmt) throws SQLException;
 
-    public int executeBatch(PreparedStatement pstmt, int expectedRows, String sql, boolean occCheck) throws SQLException;
+  int executeBatch(PreparedStatement pstmt, int expectedRows, String sql, boolean occCheck) throws SQLException;
 
 }

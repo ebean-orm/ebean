@@ -17,21 +17,21 @@ public interface ResourceSource {
 	 * This will return null IF the ResourceSource is an unpacked WAR file.
 	 * </p>
 	 */
-	public String getRealPath();
+	String getRealPath();
 	
 	/**
 	 * Find the content with a given entry name. This will return null if no
 	 * matching content was found.
 	 */
-	public ResourceContent getContent(String entry);
+	ResourceContent getContent(String entry);
 
     /**
      * Return the content as a String.
      */
-	public String readString(ResourceContent content, int bufSize) throws IOException;
+	String readString(ResourceContent content, int bufSize) throws IOException;
 
 	/**
 	 * Return the content as a byte[].
 	 */
-	public byte[] readBytes(ResourceContent content, int bufSize) throws IOException;
+	byte[] readBytes(ResourceContent content, int bufSize) throws IOException;
 }

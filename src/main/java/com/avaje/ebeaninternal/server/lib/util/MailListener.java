@@ -8,6 +8,6 @@ public interface MailListener {
     /**
      * Handle the message event.
      */
-    public void handleEvent(MailEvent event);
+    void handleEvent(MailEvent event);
     
 }

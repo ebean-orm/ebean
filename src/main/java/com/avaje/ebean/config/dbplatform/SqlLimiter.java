@@ -11,12 +11,12 @@ public interface SqlLimiter {
    * Note that this is removed for logging sql to the transaction log.
    * </p>
    */
-  static final char NEW_LINE = '\n';
+  char NEW_LINE = '\n';
 
   /**
    * The carriage return character.
    */
-  static final char CARRIAGE_RETURN = '\r';
+  char CARRIAGE_RETURN = '\r';
 
   /**
    * Add the SQL limiting statements around the query.

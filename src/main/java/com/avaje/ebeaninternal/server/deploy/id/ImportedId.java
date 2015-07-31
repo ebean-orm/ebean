@@ -14,18 +14,18 @@ import com.avaje.ebeaninternal.server.persist.dmlbind.BindableRequest;
  */
 public interface ImportedId {
 
-	public void addFkeys(String name);
+	void addFkeys(String name);
 	
 	/**
 	 * Return true if this id is a simple single scalar value. False if it is a
 	 * compound id (embedded or multiple).
 	 */
-	public boolean isScalar();
+	boolean isScalar();
 
 	/**
 	 * Return the logical property name.
 	 */
-	public String getLogicalName();
+	String getLogicalName();
 
 	/**
 	 * For scalar id return the related single db column.
@@ -34,35 +34,35 @@ public interface ImportedId {
 	 * one).
 	 * </p>
 	 */
-	public String getDbColumn();
+	String getDbColumn();
 
 	/**
 	 * Append the the SQL query statement.
 	 */
-	public void sqlAppend(DbSqlContext ctx);
+	void sqlAppend(DbSqlContext ctx);
 
 	/**
 	 * Append to the DML statement.
 	 */
-	public void dmlAppend(GenerateDmlRequest request);
+	void dmlAppend(GenerateDmlRequest request);
 
 	/**
 	 * Append to the DML statement to the where clause.
 	 */
-	public void dmlWhere(GenerateDmlRequest request, EntityBean bean);
+	void dmlWhere(GenerateDmlRequest request, EntityBean bean);
 	
 	/**
 	 * Bind the value from the bean.
 	 */
-	public Object bind(BindableRequest request, EntityBean bean) throws SQLException;
+	Object bind(BindableRequest request, EntityBean bean) throws SQLException;
 
 	/**
 	 * For inserting into ManyToMany intersection.
 	 */
-	public void buildImport(IntersectionRow row, EntityBean other);
+	void buildImport(IntersectionRow row, EntityBean other);
 
 	/**
 	 * Used to derive a missing concatenated key from multiple imported keys.
 	 */
-	public BeanProperty findMatchImport(String matchDbColumn);
+	BeanProperty findMatchImport(String matchDbColumn);
 }

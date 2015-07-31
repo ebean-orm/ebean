@@ -14,21 +14,21 @@ public interface ResourceContent {
     /**
      * The name of the content.
      */
-    public String getName();
+    String getName();
 
     /**
      * The size of the content in bytes.
      */
-    public long size();
+    long size();
 
     /**
      * The last modified timestamp of the content.
      */
-    public long lastModified();
+    long lastModified();
 
     /**
      * The content itself.
      */
-    public InputStream getInputStream() throws IOException;
+    InputStream getInputStream() throws IOException;
 
 }

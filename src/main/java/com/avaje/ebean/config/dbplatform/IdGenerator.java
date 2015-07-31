@@ -16,7 +16,7 @@ public interface IdGenerator {
   /**
    * The name of the default UUID generator.
    */
-  static final String AUTO_UUID = "auto.uuid";
+  String AUTO_UUID = "auto.uuid";
 
   /**
    * Return the name of the IdGenerator. For sequences this is the sequence

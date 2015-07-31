@@ -19,36 +19,36 @@ public interface PersistExecute {
 	/**
 	 * Create a BatchControl for the current transaction.
 	 */
-	public BatchControl createBatchControl(SpiTransaction t);
+	BatchControl createBatchControl(SpiTransaction t);
 	
 	/**
 	 * Execute a Bean (or MapBean) insert.
 	 */
-	public <T> void executeInsertBean(PersistRequestBean<T> request);
+	<T> void executeInsertBean(PersistRequestBean<T> request);
 
 	/**
 	 * Execute a Bean (or MapBean) update.
 	 */
-	public <T> void executeUpdateBean(PersistRequestBean<T> request);
+	<T> void executeUpdateBean(PersistRequestBean<T> request);
 
 	/**
 	 * Execute a Bean (or MapBean) delete.
 	 */
-	public <T> void executeDeleteBean(PersistRequestBean<T> request);
+	<T> void executeDeleteBean(PersistRequestBean<T> request);
 
 	/**
 	 * Execute a Update.
 	 */
-	public int executeOrmUpdate(PersistRequestOrmUpdate request);
+	int executeOrmUpdate(PersistRequestOrmUpdate request);
 	
 	/**
 	 * Execute a CallableSql.
 	 */
-	public int executeSqlCallable(PersistRequestCallableSql request);
+	int executeSqlCallable(PersistRequestCallableSql request);
 
 	/**
 	 * Execute a UpdateSql.
 	 */
-	public int executeSqlUpdate(PersistRequestUpdateSql request);
+	int executeSqlUpdate(PersistRequestUpdateSql request);
 
 }

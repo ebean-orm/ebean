@@ -8,6 +8,6 @@ public interface InheritInfoVisitor {
 	/**
  	 * visit the InheritInfo for this node.
 	 */
-	public void visit(InheritInfo inheritInfo);
+	void visit(InheritInfo inheritInfo);
 	
 }

@@ -6,9 +6,9 @@ import com.avaje.ebeaninternal.server.cluster.BinaryMessageList;
 
 public interface Message {
 
-    public void writeBinaryMessage(BinaryMessageList msgList) throws IOException;
+    void writeBinaryMessage(BinaryMessageList msgList) throws IOException;
 
-    public boolean isControlMessage();
+    boolean isControlMessage();
     
-    public String getToHostPort();
+    String getToHostPort();
 }

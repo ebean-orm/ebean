@@ -94,7 +94,7 @@ public class PacketWriter {
 
     interface PacketFactory {
 
-        public Packet createPacket(long packetId, long timestamp, String serverName) throws IOException;
+        Packet createPacket(long packetId, long timestamp, String serverName) throws IOException;
     }
 
     private static class TransPacketFactory implements PacketFactory {
