@@ -4,7 +4,6 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.server.lib.resource.DirectoryFinder;
 import com.avaje.ebeaninternal.server.lib.resource.FileResourceSource;
 import com.avaje.ebeaninternal.server.lib.resource.ResourceSource;
-import com.avaje.ebeaninternal.server.lib.util.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +85,7 @@ public class ResourceManagerFactory {
 				return new FileResourceSource(fileDir);
 			} else {
 				String msg = "ResourceManager could not find directory [" + fileDir + "]";
-				throw new NotFoundException(msg);
+				throw new IllegalArgumentException(msg);
 			}
 		}
 
