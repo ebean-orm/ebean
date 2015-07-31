@@ -12,16 +12,16 @@ public interface BeanPersister {
 	/**
 	 * execute the insert bean request.
 	 */
-	public void insert(PersistRequestBean<?>  request) throws PersistenceException;
+	 void insert(PersistRequestBean<?>  request) throws PersistenceException;
 
 	/**
 	 * execute the update bean request.
 	 */
-	public void update(PersistRequestBean<?>  request) throws PersistenceException;
+	 void update(PersistRequestBean<?>  request) throws PersistenceException;
 
 	/**
 	 * execute the delete bean request.
 	 */
-	public void delete(PersistRequestBean<?> request) throws PersistenceException;
+	 void delete(PersistRequestBean<?> request) throws PersistenceException;
 
 }

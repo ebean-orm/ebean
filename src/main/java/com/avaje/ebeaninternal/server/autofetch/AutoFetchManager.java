@@ -27,12 +27,12 @@ public interface AutoFetchManager extends NodeUsageListener {
 	/**
 	 * Set the owning ebean server.
 	 */
-	public void setOwner(SpiEbeanServer server, ServerConfig serverConfig);
+	void setOwner(SpiEbeanServer server, ServerConfig serverConfig);
 
 	/**
 	 * Clear the query execution statistics.
 	 */
-	public void clearQueryStatistics();
+	void clearQueryStatistics();
 	
 	/**
 	 * Clear all the tuned query info.
@@ -40,7 +40,7 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * Should only need do this for testing and playing around.
 	 * </p>
 	 */
-	public int clearTunedQueryInfo();
+	int clearTunedQueryInfo();
 
 	/**
 	 * Clear all the profiling information.
@@ -51,7 +51,7 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * Should only need do this for testing and playing around.
 	 * </p>
 	 */
-	public int clearProfilingInfo();
+	int clearProfilingInfo();
 
 	/**
 	 * On shutdown fire garbage collection and collect statistics. Note that
@@ -59,17 +59,17 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * collector plenty of time to do its thing and collect the profile
 	 * information.
 	 */
-	public void shutdown();
+	void shutdown();
 
 	/**
 	 * Return the current tuned fetch information for a given queryPoint key.
 	 */
-	public TunedQueryInfo getTunedQueryInfo(String queryPointKey);
+	TunedQueryInfo getTunedQueryInfo(String queryPointKey);
 
 	/**
 	 * Return the current Statistics for a given queryPoint key.
 	 */
-	public Statistics getStatistics(String queryPointKey);
+	Statistics getStatistics(String queryPointKey);
 
 	/**
 	 * Iterate the tuned fetch info.
@@ -77,7 +77,7 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * This should be a read only iteration.
 	 * </p>
 	 */
-	public Iterator<TunedQueryInfo> iterateTunedQueryInfo();
+	Iterator<TunedQueryInfo> iterateTunedQueryInfo();
 
 	/**
 	 * Iterate the node usage statistics.
@@ -85,12 +85,12 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * This should be a read only iteration.
 	 * </p>
 	 */
-	public Iterator<Statistics> iterateStatistics();
+	Iterator<Statistics> iterateStatistics();
 
 	/**
 	 * Return true if profiling is enabled.
 	 */
-	public boolean isProfiling();
+	boolean isProfiling();
 
 	/**
 	 * Set to true to enable profiling.
@@ -107,39 +107,39 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * profiling information.
 	 * </p>
 	 */
-	public void setProfiling(boolean enable);
+	void setProfiling(boolean enable);
 
 	/**
 	 * Return true if automatic query tuning is enabled.
 	 */
-	public boolean isQueryTuning();
+	boolean isQueryTuning();
 
 	/**
 	 * Set to true to enable automatic query tuning.
 	 */
-	public void setQueryTuning(boolean enable);
+	void setQueryTuning(boolean enable);
 
 	/**
 	 * This controls whether autoFetch is used when it has not been explicitly
-	 * set on a query via {@link Query#setAutoFetch(boolean)}.
+	 * set on a query via {@link Query#setAutofetch(boolean)}.
 	 */
-	public AutofetchMode getMode();
+	AutofetchMode getMode();
 
 	/**
 	 * Set the auto fetch mode used when a query has not had
-	 * {@link Query#setAutoFetch(boolean)}.
+	 * {@link Query#setAutofetch(boolean)}.
 	 */
-	public void setMode(AutofetchMode Mode);
+	void setMode(AutofetchMode Mode);
 
 	/**
 	 * Return the profiling rate (int between 0 and 100).
 	 */
-	public double getProfilingRate();
+	double getProfilingRate();
 
 	/**
 	 * Set the profiling rate (int between 0 and 100).
 	 */
-	public void setProfilingRate(double rate);
+	void setProfilingRate(double rate);
 
 	/**
 	 * Return the max number of queries profiled (per query point).
@@ -148,7 +148,7 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * point has profiled this number of queries it does not profile any more.
 	 * </p>
 	 */
-	public int getProfilingBase();
+	int getProfilingBase();
 
 	/**
 	 * Set a max number of queries to profile per query point.
@@ -157,7 +157,7 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * is required for this query point.
 	 * </p>
 	 */
-	public void setProfilingBase(int profilingMax);
+	void setProfilingBase(int profilingMax);
 
 	/**
 	 * Return the minimum number of queries profiled before autoFetch will start
@@ -167,7 +167,7 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * profiling information is collected.
 	 * </p>
 	 */
-	public int getProfilingMin();
+	int getProfilingMin();
 
 	/**
 	 * Set the minimum number of queries profiled per query point before
@@ -177,13 +177,13 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * autoFetch starts tuning the query.
 	 * </p>
 	 */
-	public void setProfilingMin(int autoFetchMinThreshold);
+	void setProfilingMin(int autoFetchMinThreshold);
 
 	/**
 	 * Fire a garbage collection (hint to the JVM). Assuming garbage collection
 	 * fires this will gather the usage profiling information.
 	 */
-	public String collectUsageViaGC(long waitMillis);
+	String collectUsageViaGC(long waitMillis);
 
 	/**
 	 * This will take the current profiling information and update the "tuned
@@ -195,7 +195,7 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * This returns a string summary of the updates that occurred.
 	 * </p>
 	 */
-	public String updateTunedQueryInfo();
+	String updateTunedQueryInfo();
 
 	/**
 	 * Called when a query thinks it should be automatically tuned by autoFetch.
@@ -208,7 +208,7 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * This will also determine if the query should be profiled.
 	 * </p>
 	 */
-	public boolean tuneQuery(SpiQuery<?> query);
+	boolean tuneQuery(SpiQuery<?> query);
 
 	/**
 	 * Collect query profiling information.
@@ -224,21 +224,21 @@ public interface AutoFetchManager extends NodeUsageListener {
 	 * @param micros
 	 *            the query executing time in microseconds
 	 */
-	public void collectQueryInfo(ObjectGraphNode node, long beans, long micros);
+	void collectQueryInfo(ObjectGraphNode node, long beans, long micros);
 
 	
 	/**
 	 * Return the number of queries tuned by AutoFetch.
 	 */
-	public int getTotalTunedQueryCount();
+	int getTotalTunedQueryCount();
 	
 	/**
 	 * Return the size of the TuneQuery map.
 	 */
-	public int getTotalTunedQuerySize();
+	int getTotalTunedQuerySize();
 	
 	/**
 	 * Return the size of the profile map.
 	 */
-	public int getTotalProfileSize();
+	int getTotalProfileSize();
 }

@@ -153,7 +153,7 @@ public interface SqlRow extends Serializable, Map<String, Object> {
   /**
    * Put all the values from t into this map.
    */
-  void putAll(Map<? extends String, ? extends Object> t);
+  void putAll(Map<? extends String, ?> t);
 
   /**
    * Return the size of the map.

@@ -15,23 +15,23 @@ public interface BeanDescriptorMap {
     /**
      * Return the name of the server/database.
      */
-    public String getServerName();
+    String getServerName();
 
     /**
      * Return the Cache Manager.
      */
-    public ServerCacheManager getCacheManager();
+    ServerCacheManager getCacheManager();
 
     /**
      * Return the BeanDescriptor for a given class.
      */
-    public <T> BeanDescriptor<T> getBeanDescriptor(Class<T> entityType);
+    <T> BeanDescriptor<T> getBeanDescriptor(Class<T> entityType);
 
     /**
      * Return the Encrypt key given the table and column name.
      */
-    public EncryptKey getEncryptKey(String tableName, String columnName);
+    EncryptKey getEncryptKey(String tableName, String columnName);
     
-    public IdBinder createIdBinder(BeanProperty id);
+    IdBinder createIdBinder(BeanProperty id);
 
 }

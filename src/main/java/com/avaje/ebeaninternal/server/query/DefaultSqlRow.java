@@ -192,7 +192,7 @@ public class DefaultSqlRow implements SqlRow {
         return map.keySet();
     }
 
-    public void putAll(Map<? extends String, ? extends Object> t) {
+    public void putAll(Map<? extends String, ?> t) {
         map.putAll(t);
     }
 
