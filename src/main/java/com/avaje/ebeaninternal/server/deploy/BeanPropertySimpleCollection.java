@@ -8,8 +8,4 @@ public class BeanPropertySimpleCollection<T> extends BeanPropertyAssocMany<T> {
     super(owner, descriptor, deploy);
   }
 
-  public void initialise() {
-    super.initialise();
-  }
-
 }

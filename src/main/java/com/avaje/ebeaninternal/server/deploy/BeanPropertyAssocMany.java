@@ -220,26 +220,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
   }
 
-  @Override
-  public Object getValue(EntityBean bean) {
-    return super.getValue(bean);
-  }
-
-  @Override
-  public Object getValueIntercept(EntityBean bean) {
-    return super.getValueIntercept(bean);
-  }
-
-  @Override
-  public void setValue(EntityBean bean, Object value) {
-    super.setValue(bean, value);
-  }
-
-  @Override
-  public void setValueIntercept(EntityBean bean, Object value) {
-    super.setValueIntercept(bean, value);
-  }
-
   public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
     return createElPropertyValue(propName, remainder, chain, propertyDeploy);
   }

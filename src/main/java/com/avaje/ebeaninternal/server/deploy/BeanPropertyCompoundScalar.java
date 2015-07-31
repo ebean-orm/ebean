@@ -97,9 +97,4 @@ public class BeanPropertyCompoundScalar extends BeanProperty {
     return getValue(bean);
   }
 
-  @Override
-  public void elSetValue(EntityBean bean, Object value, boolean populate) {//, boolean reference) {
-    super.elSetValue(bean, value, populate);
-  }
-
 }

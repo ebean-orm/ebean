@@ -1,8 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
-
-
 /**
  * Property mapped to a joined bean.
  */
@@ -42,11 +39,6 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 			return columns[0].getLocalDbColumn();
 		}
 	    return super.getDbColumn();
-    }
-
-	@Override
-    public String getElPlaceHolder(EntityType et) {
-	    return super.getElPlaceHolder(et);
     }
 
 	/**
