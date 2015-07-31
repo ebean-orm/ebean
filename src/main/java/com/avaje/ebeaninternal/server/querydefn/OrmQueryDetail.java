@@ -252,11 +252,9 @@ public class OrmQueryDetail implements Serializable {
 
   /**
    * Set the fetch properties and configuration for a given path.
-   * 
-   * @param path
-   *          the property to join
-   * @param partialProps
-   *          the properties on the join property to include
+   *
+   * @param path         the property to join
+   * @param partialProps the properties on the join property to include
    */
   public void addFetch(String path, String partialProps, FetchConfig fetchConfig) {
 
@@ -277,7 +275,7 @@ public class OrmQueryDetail implements Serializable {
   }
 
   private void sortFetchPaths(BeanDescriptor<?> d, OrmQueryProperties p,
-      LinkedHashMap<String, OrmQueryProperties> sorted) {
+                              LinkedHashMap<String, OrmQueryProperties> sorted) {
 
     String path = p.getPath();
     if (!sorted.containsKey(path)) {
@@ -308,7 +306,7 @@ public class OrmQueryDetail implements Serializable {
    * Convert 'fetch joins' to 'many' properties over to 'query joins'.
    */
   public void convertManyFetchJoinsToQueryJoins(BeanDescriptor<?> beanDescriptor, String lazyLoadManyPath,
-      boolean allowOne, int queryBatch) {
+                                                boolean allowOne, int queryBatch) {
 
     ArrayList<OrmQueryProperties> manyChunks = new ArrayList<OrmQueryProperties>(3);
 

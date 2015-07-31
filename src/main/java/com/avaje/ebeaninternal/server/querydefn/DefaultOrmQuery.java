@@ -202,7 +202,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private boolean autoFetchTuned;
 
   private boolean logSecondaryQuery;
-  
+
   /**
    * Root table alias. For {@link Query#alias(String)} command.
    */
@@ -243,7 +243,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Additional supply a query which is parsed.
    */
   public DefaultOrmQuery(Class<T> beanType, EbeanServer server, ExpressionFactory expressionFactory,
-      DeployNamedQuery namedQuery) throws PersistenceException {
+                         DeployNamedQuery namedQuery) throws PersistenceException {
 
     this.beanType = beanType;
     this.server = server;

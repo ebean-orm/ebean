@@ -140,17 +140,17 @@ public class SimpleTextParser {
 
   private boolean isOperator(char c) {
     switch (c) {
-    case '<':
-      return true;
-    case '>':
-      return true;
-    case '=':
-      return true;
-    case '!':
-      return true;
+      case '<':
+        return true;
+      case '>':
+        return true;
+      case '=':
+        return true;
+      case '!':
+        return true;
 
-    default:
-      return false;
+      default:
+        return false;
     }
   }
 

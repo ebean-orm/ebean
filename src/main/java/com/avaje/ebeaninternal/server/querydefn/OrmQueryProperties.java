@@ -163,7 +163,7 @@ public class OrmQueryProperties implements Serializable {
    * Return the expressions used to filter on this path. This should be a many path to use this
    * method.
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({"rawtypes", "unchecked"})
   public <T> SpiExpressionList<T> filterMany(Query<T> rootQuery) {
     if (filterMany == null) {
       FilterExprPath exprPath = new FilterExprPath(path);
