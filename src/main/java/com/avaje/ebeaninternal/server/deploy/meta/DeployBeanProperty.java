@@ -23,8 +23,6 @@ import javax.persistence.Version;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Types;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Description of a property of a bean. Includes its deployment information such
@@ -156,11 +154,6 @@ public class DeployBeanProperty {
    * The jdbc data type this maps to.
    */
   private int dbType;
-
-  /**
-   * Extra deployment parameters.
-   */
-  private final HashMap<String, String> extraAttributeMap = new HashMap<String, String>();
 
   /**
    * The method used to read the property.
@@ -812,10 +805,6 @@ public class DeployBeanProperty {
    */
   public void setEmbedded(boolean embedded) {
     this.embedded = embedded;
-  }
-
-  public Map<String, String> getExtraAttributeMap() {
-    return extraAttributeMap;
   }
 
   public String toString() {

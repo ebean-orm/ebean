@@ -176,11 +176,6 @@ public class BeanProperty implements ElPropertyValue {
   final boolean excludedFromHistory;
 
   /**
-   * Extra deployment parameters.
-   */
-  final Map<String, String> extraAttributeMap;
-
-  /**
    * Generator for insert or update timestamp etc.
    */
   final GeneratedProperty generatedProperty;
@@ -289,7 +284,6 @@ public class BeanProperty implements ElPropertyValue {
     this.sqlFormulaSelect = InternString.intern(deploy.getSqlFormulaSelect());
     this.formula = sqlFormulaSelect != null;
 
-    this.extraAttributeMap = deploy.getExtraAttributeMap();
     this.dbType = deploy.getDbType();
     this.scalarType = deploy.getScalarType();
     this.lob = isLobType(dbType);
@@ -372,7 +366,6 @@ public class BeanProperty implements ElPropertyValue {
     this.generatedProperty = source.getGeneratedProperty();
     this.getter = source.getter;
     this.setter = source.setter;
-    this.extraAttributeMap = source.extraAttributeMap;
     this.dbType = source.getDbType();
     this.scalarType = source.scalarType;
     this.lob = isLobType(dbType);
