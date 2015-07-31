@@ -41,26 +41,6 @@ public class DefaultSqlRow implements SqlRow {
     final Map<String, Object> map;
 
     /**
-     * Create with a specific Map implementation.
-     * <p>
-     * The default Map implementation is LinkedHashMap.
-     * </p>
-     */
-    public DefaultSqlRow(Map<String, Object> map, String dbTrueValue) {
-        this.map = map;
-        this.dbTrueValue = dbTrueValue;
-    }
-
-    /**
-     * Create a new MapBean based on a LinkedHashMap with default
-     * initialCapacity (of 16).
-     */
-    public DefaultSqlRow(String dbTrueValue) {
-        this.map = new LinkedHashMap<String, Object>();
-        this.dbTrueValue = dbTrueValue;
-    }
-
-    /**
      * Create with an initialCapacity and loadFactor.
      * <p>
      * The defaults of these are 16 and 0.75.
