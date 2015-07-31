@@ -39,8 +39,8 @@ public final class UpdateMeta {
     this.id = id;
     this.version = version;
 
-    String sqlNone = genSql(ConcurrencyMode.NONE, null, set);
-    String sqlVersion = genSql(ConcurrencyMode.VERSION, null, set);
+    String sqlNone = genSql(ConcurrencyMode.NONE, set);
+    String sqlVersion = genSql(ConcurrencyMode.VERSION, set);
 
     this.modeNoneUpdatePlan = new UpdatePlan(ConcurrencyMode.NONE, sqlNone, set);
     this.modeVersionUpdatePlan = new UpdatePlan(ConcurrencyMode.VERSION, sqlVersion, set);
@@ -142,7 +142,7 @@ public final class UpdateMeta {
     ConcurrencyMode mode = persistRequest.determineConcurrencyMode();
 
     // build the SQL for this update statement
-    String sql = genSql(mode, persistRequest, bindableList);
+    String sql = genSql(mode, bindableList);
 
     updatePlan = new UpdatePlan(key, mode, sql, bindableList);
 
@@ -152,18 +152,11 @@ public final class UpdateMeta {
     return updatePlan;
   }
 
-  private String genSql(ConcurrencyMode conMode, PersistRequestBean<?> persistRequest, BindableList bindableList) {
+  private String genSql(ConcurrencyMode conMode, BindableList bindableList) {
 
     // update set col0=?, col1=?, col2=? where bcol=? and bc1=? and bc2=?
 
-    GenerateDmlRequest request;
-    if (persistRequest == null) {
-      // For generation of None and Version DML/SQL
-      request = new GenerateDmlRequest(emptyStringAsNull);
-    } else {
-      request = persistRequest.createGenerateDmlRequest(emptyStringAsNull);
-    }
-
+    GenerateDmlRequest request = new GenerateDmlRequest();
     request.append("update ").append(tableName).append(" set ");
 
     request.setUpdateSetMode();

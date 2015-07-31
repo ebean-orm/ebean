@@ -1,8 +1,5 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import com.avaje.ebean.bean.EntityBeanIntercept;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-
 /**
  * Helper to support the generation of DML statements.
  */
@@ -10,12 +7,7 @@ public class GenerateDmlRequest {
 
     private static final String IS_NULL = " is null";
 
-    private final boolean emptyStringAsNull;
-
     private final StringBuilder sb = new StringBuilder(100);
-
-    private final EntityBeanIntercept ebi;
-    private final boolean changesOnly;
 
     private StringBuilder insertBindBuffer;
 
@@ -29,47 +21,12 @@ public class GenerateDmlRequest {
     /**
      * Create from a PersistRequestBean.
      */
-    public GenerateDmlRequest(boolean emptyStringAsNull, EntityBeanIntercept ebi, boolean changesOnly) {//, Object oldValues) {
-        this.emptyStringAsNull = emptyStringAsNull;
-        this.ebi = ebi;
-        this.changesOnly = changesOnly;
-    }
-
-    /**
-     * Create for generating standard all properties DML/SQL.
-     */
-    public GenerateDmlRequest(boolean emptyStringAsNull) {
-        this(emptyStringAsNull, null, false);
+    public GenerateDmlRequest() {
     }
 
     public GenerateDmlRequest append(String s) {
         sb.append(s);
         return this;
-    }
-
-    public boolean isDbNull(Object v) {
-        return v == null || (emptyStringAsNull && (v instanceof String) && ((String) v).length() == 0);
-    }
-
-    /**
-     * Return true if this property should be included in the set clause.
-     */
-    public boolean isIncluded(BeanProperty prop) {
-      if (ebi == null) {
-        return true;
-      }
-      if (changesOnly) {
-        return ebi.isDirtyProperty(prop.getPropertyIndex());
-      } else {
-        return ebi.isLoadedProperty(prop.getPropertyIndex());
-      }
-    }
-    
-    /**
-     * Return true if this property should be included in the where clause.
-     */
-    public boolean isIncludedWhere(BeanProperty prop) {
-      return ebi == null || ebi.isLoadedProperty(prop.getPropertyIndex());
     }
 
     public void appendColumnIsNull(String column) {
@@ -82,11 +39,7 @@ public class GenerateDmlRequest {
     }
 
     public void appendColumn(String column, String bind) {
-        appendColumn(column, "", bind);
-    }
 
-    public void appendColumn(String column, String expr, String bind) {
-        
         ++bindColumnCount;
         
         sb.append(prefix);
@@ -118,11 +71,6 @@ public class GenerateDmlRequest {
 
     public String toString() {
         return sb.toString();
-    }
-
-    public void setWhereMode() {
-        this.prefix = " and ";
-        this.prefix2 = " and ";
     }
 
     public void setWhereIdMode() {

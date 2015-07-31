@@ -17,8 +17,6 @@ import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 import com.avaje.ebeaninternal.server.persist.PersistExecute;
-import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
-import com.avaje.ebeaninternal.server.transaction.BeanDelta;
 import com.avaje.ebeaninternal.server.transaction.BeanPersistIdMap;
 
 import javax.persistence.OptimisticLockException;
@@ -408,10 +406,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return beanDescriptor.getId(entityBean);
   }
 
-  public BeanDelta createDeltaBean() {
-    return new BeanDelta(beanDescriptor, getBeanId());
-  }
-
   /**
    * Return the parent bean for cascading save with unidirectional relationship.
    */
@@ -632,17 +626,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public boolean isDynamicUpdateSql() {
     return beanDescriptor.isUpdateChangesOnly() || !intercept.isFullyLoadedBean();
-  }
-
-  /**
-   * Create a GenerateDmlRequest used to generate the DML.
-   * <p>
-   * Will used changed properties or loaded properties depending on the
-   * BeanDescriptor.isUpdateChangesOnly() value.
-   * </p>
-   */
-  public GenerateDmlRequest createGenerateDmlRequest(boolean emptyStringAsNull) {
-    return new GenerateDmlRequest(emptyStringAsNull, intercept, beanDescriptor.isUpdateChangesOnly());
   }
 
   /**

@@ -165,7 +165,7 @@ public final class InsertMeta {
 
 	private String genSql(boolean nullId) {
 
-		GenerateDmlRequest request = new GenerateDmlRequest(emptyStringToNull, null, true);
+		GenerateDmlRequest request = new GenerateDmlRequest();
 		request.setInsertSetMode();
 		
 		request.append("insert into ").append(tableName);

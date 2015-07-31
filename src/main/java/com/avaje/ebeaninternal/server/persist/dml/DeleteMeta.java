@@ -91,7 +91,7 @@ public final class DeleteMeta {
 
     // delete ... where bcol=? and bc1=? and bc2 is null and ...
 
-    GenerateDmlRequest request = new GenerateDmlRequest(emptyStringAsNull);
+    GenerateDmlRequest request = new GenerateDmlRequest();
 
     request.append("delete from ").append(tableName);
     request.append(" where ");
