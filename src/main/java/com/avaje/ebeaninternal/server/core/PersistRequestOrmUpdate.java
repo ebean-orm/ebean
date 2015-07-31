@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.sql.SQLException;
-
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.SpiUpdate;
@@ -59,7 +57,7 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
 	/**
 	 * No concurrency checking so just note the rowCount.
 	 */
-	public void checkRowCount(int count) throws SQLException {
+	public void checkRowCount(int count) {
 		this.rowCount = count;
 	}
 
@@ -79,7 +77,7 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
 	/**
 	 * Perform post execute processing.
 	 */
-	public void postExecute() throws SQLException {
+	public void postExecute() {
 
 		OrmUpdateType ormUpdateType = ormUpdate.getOrmUpdateType();
 		String tableName = ormUpdate.getBaseTable();

@@ -66,7 +66,7 @@ public final class PersistRequestCallableSql extends PersistRequest {
 	/**
 	 * Note the rowCount of the execution.
 	 */
-	public void checkRowCount(int count) throws SQLException {
+	public void checkRowCount(int count) {
 		this.rowCount = count;
 	}
 
@@ -79,7 +79,7 @@ public final class PersistRequestCallableSql extends PersistRequest {
 	/**
 	 * Perform post execute processing for the CallableSql.
 	 */
-	public void postExecute() throws SQLException {
+	public void postExecute() {
 
 		if (transaction.isLogSummary()) {
 			String m = "CallableSql label[" + callableSql.getLabel() + "]" + " rows[" + rowCount+ "]" + " bind[" + bindLog + "]";

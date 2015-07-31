@@ -16,7 +16,7 @@ public interface BatchPostExecute {
    * Check that the rowCount is correct for this execute. This is for
    * performing concurrency checking in batch execution.
    */
-  void checkRowCount(int rowCount) throws SQLException;
+  void checkRowCount(int rowCount);
 
   /**
    * For inserts with generated keys. Otherwise not used.
@@ -30,6 +30,6 @@ public interface BatchPostExecute {
    * and for beans resetting their 'loaded' status.
    * </p>
    */
-  void postExecute() throws SQLException;
+  void postExecute();
 
 }

@@ -1,13 +1,5 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.OptimisticLockException;
-
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.bean.EntityBean;
@@ -28,6 +20,12 @@ import com.avaje.ebeaninternal.server.persist.PersistExecute;
 import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 import com.avaje.ebeaninternal.server.transaction.BeanDelta;
 import com.avaje.ebeaninternal.server.transaction.BeanPersistIdMap;
+
+import javax.persistence.OptimisticLockException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * PersistRequest for insert update or delete of a bean.
@@ -506,7 +504,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Check for optimistic concurrency exception.
    */
-  public final void checkRowCount(int rowCount) throws SQLException {
+  public final void checkRowCount(int rowCount) {
     if (rowCount != 1) {
       String m = Message.msg("persist.conc2", "" + rowCount);
       throw new OptimisticLockException(m, null, bean);
@@ -540,7 +538,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Post processing.
    */
-  public void postExecute() throws SQLException {
+  public void postExecute() {
 
     if (controller != null) {
       controllerPost();

@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.sql.SQLException;
-
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiSqlUpdate;
@@ -13,107 +11,108 @@ import com.avaje.ebeaninternal.server.persist.PersistExecute;
  */
 public final class PersistRequestUpdateSql extends PersistRequest {
 
-	public enum SqlType {
-		SQL_UPDATE, SQL_DELETE, SQL_INSERT, SQL_UNKNOWN
-	}
+  public enum SqlType {
+    SQL_UPDATE, SQL_DELETE, SQL_INSERT, SQL_UNKNOWN
+  }
 
-	private final SpiSqlUpdate updateSql;
+  private final SpiSqlUpdate updateSql;
 
-	private int rowCount;
+  private int rowCount;
 
-	private String bindLog;
+  private String bindLog;
 
-	private SqlType sqlType;
+  private SqlType sqlType;
 
-	private String tableName;
+  private String tableName;
 
-	private String description;
+  private String description;
 
-	/**
-	 * Create.
-	 */
-	public PersistRequestUpdateSql(SpiEbeanServer server, SqlUpdate updateSql,
-			SpiTransaction t, PersistExecute persistExecute) {
-		super(server, t, persistExecute);
-		this.type = Type.UPDATESQL;
-		this.updateSql = (SpiSqlUpdate)updateSql;
-	}
+  /**
+   * Create.
+   */
+  public PersistRequestUpdateSql(SpiEbeanServer server, SqlUpdate updateSql,
+                                 SpiTransaction t, PersistExecute persistExecute) {
 
-	@Override
-	public int executeNow() {
-		return persistExecute.executeSqlUpdate(this);
-	}
+    super(server, t, persistExecute);
+    this.type = Type.UPDATESQL;
+    this.updateSql = (SpiSqlUpdate) updateSql;
+  }
 
-	@Override
-	public int executeOrQueue() {
-		return executeStatement();
-	}
+  @Override
+  public int executeNow() {
+    return persistExecute.executeSqlUpdate(this);
+  }
 
-	/**
-	 * Return the UpdateSql.
-	 */
-	public SpiSqlUpdate getUpdateSql() {
-		return updateSql;
-	}
+  @Override
+  public int executeOrQueue() {
+    return executeStatement();
+  }
 
-	/**
-	 * No concurrency checking so just note the rowCount.
-	 */
-	public void checkRowCount(int count) throws SQLException {
-		this.rowCount = count;
-	}
+  /**
+   * Return the UpdateSql.
+   */
+  public SpiSqlUpdate getUpdateSql() {
+    return updateSql;
+  }
 
-	/**
-	 * Not called for this type of request.
-	 */
-	public void setGeneratedKey(Object idValue) {
-	}
+  /**
+   * No concurrency checking so just note the rowCount.
+   */
+  public void checkRowCount(int count) {
+    this.rowCount = count;
+  }
 
-	/**
-	 * Specify the type of statement executed. Used to automatically register
-	 * with the transaction event.
-	 */
-	public void setType(SqlType sqlType, String tableName, String description) {
-		this.sqlType = sqlType;
-		this.tableName = tableName;
-		this.description = description;
-	}
+  /**
+   * Not called for this type of request.
+   */
+  public void setGeneratedKey(Object idValue) {
+  }
 
-	/**
-	 * Set the bound values.
-	 */
-	public void setBindLog(String bindLog) {
-		this.bindLog = bindLog;
-	}
+  /**
+   * Specify the type of statement executed. Used to automatically register
+   * with the transaction event.
+   */
+  public void setType(SqlType sqlType, String tableName, String description) {
+    this.sqlType = sqlType;
+    this.tableName = tableName;
+    this.description = description;
+  }
 
-	/**
-	 * Perform post execute processing.
-	 */
-	public void postExecute() throws SQLException {
+  /**
+   * Set the bound values.
+   */
+  public void setBindLog(String bindLog) {
+    this.bindLog = bindLog;
+  }
 
-		if (transaction.isLogSummary()) {
-			String m = description + " table[" + tableName + "] rows["+ rowCount + "] bind[" + bindLog + "]";
-			transaction.logSummary(m);
-		}
+  /**
+   * Perform post execute processing.
+   */
+  public void postExecute() {
 
-		if (updateSql.isAutoTableMod()) {
-			// add the modification info to the TransactionEvent
-			// this is used to invalidate cached objects etc
-			switch (sqlType) {
-			case SQL_INSERT:
-				transaction.getEvent().add(tableName, true, false, false);
-				break;
-			case SQL_UPDATE:
-				transaction.getEvent().add(tableName, false, true, false);
-				break;
-			case SQL_DELETE:
-				transaction.getEvent().add(tableName, false, false, true);
-				break;
-								
-			default:
-				break;
-			}
-		}
-	}
+    if (transaction.isLogSummary()) {
+      String m = description + " table[" + tableName + "] rows[" + rowCount + "] bind[" + bindLog + "]";
+      transaction.logSummary(m);
+    }
+
+    if (updateSql.isAutoTableMod()) {
+      // add the modification info to the TransactionEvent
+      // this is used to invalidate cached objects etc
+      switch (sqlType) {
+        case SQL_INSERT:
+          transaction.getEvent().add(tableName, true, false, false);
+          break;
+        case SQL_UPDATE:
+          transaction.getEvent().add(tableName, false, true, false);
+          break;
+        case SQL_DELETE:
+          transaction.getEvent().add(tableName, false, false, true);
+          break;
+
+        default:
+          break;
+      }
+    }
+  }
 
 }
