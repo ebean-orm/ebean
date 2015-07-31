@@ -31,7 +31,8 @@ public class BeanCollectionHelpFactory {
 		}
 		
 	}
-		
+
+  @SuppressWarnings("unchecked")
 	public static <T> BeanCollectionHelp<T> create(OrmQueryRequest<T> request) {
 
 		SpiQuery.Type manyType = request.getQuery().getType();

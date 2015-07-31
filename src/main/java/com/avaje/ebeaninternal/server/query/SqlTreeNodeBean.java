@@ -182,6 +182,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Read the version bean.
    */
+  @SuppressWarnings("unchecked")
   public <T> Version<T> loadVersion(DbReadContext ctx) throws SQLException {
 
     // read the sys period lower and upper bounds

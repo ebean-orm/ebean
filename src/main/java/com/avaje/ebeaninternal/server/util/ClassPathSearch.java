@@ -250,7 +250,7 @@ public class ClassPathSearch implements ClassPathSearchService {
           // close the jar if it was used
           module.close();
         } catch (IOException e) {
-          throw new IOException("Error closing jar", e);
+          logger.error("Error closing jar", e);
         }
       }
     }

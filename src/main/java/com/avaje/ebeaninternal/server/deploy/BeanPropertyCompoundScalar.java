@@ -30,6 +30,7 @@ public class BeanPropertyCompoundScalar extends BeanProperty {
   /**
    * Return one of the scalar values from a compound type.
    */
+  @SuppressWarnings("unchecked")
   public Object getValueObject(Object compoundValue) {
     if (typeConverter != null) {
       compoundValue = typeConverter.unwrapValue(compoundValue);
