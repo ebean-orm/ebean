@@ -216,22 +216,6 @@ public class BeanPersistIds implements Serializable {
         return beanDescriptor;
     }
 
-    /**
-     * Return the Descriptor Id. A more compact alternative to using the
-     * beanType.
-     */
-    public String getDescriptorId() {
-        return descriptorId;
-    }
-
-    public List<Serializable> getInsertIds() {
-        return insertIds;
-    }
-
-    public List<Serializable> getUpdateIds() {
-        return updateIds;
-    }
-
     public List<Serializable> getDeleteIds() {
         return deleteIds;
     }
