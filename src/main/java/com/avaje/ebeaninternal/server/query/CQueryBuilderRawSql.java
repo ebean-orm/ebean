@@ -11,7 +11,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
 
-public class CQueryBuilderRawSql implements Constants {
+public class CQueryBuilderRawSql {
 
     private final SqlLimiter sqlLimiter;
     private final DatabasePlatform dbPlatform;

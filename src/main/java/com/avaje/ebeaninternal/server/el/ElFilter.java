@@ -160,12 +160,11 @@ public final class ElFilter<T> implements Filter<T>  {
 		matches.add(new ElMatchBuilder.Lt<T>(value, comparator));
 		return this;
 	}
-	
-	
+
 	public Filter<T> regex(String propertyName, String regEx) {
 		return regex(propertyName, regEx, 0);
 	}
-	
+
 	public Filter<T> regex(String propertyName, String regEx, int options) {
 		
 		ElPropertyValue elGetValue = getElGetValue(propertyName);

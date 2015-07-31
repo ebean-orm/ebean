@@ -14,11 +14,6 @@ public interface SqlLimiter {
   char NEW_LINE = '\n';
 
   /**
-   * The carriage return character.
-   */
-  char CARRIAGE_RETURN = '\r';
-
-  /**
    * Add the SQL limiting statements around the query.
    */
   SqlLimitResponse limit(SqlLimitRequest request);

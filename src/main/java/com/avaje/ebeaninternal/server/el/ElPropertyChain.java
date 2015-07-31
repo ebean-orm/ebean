@@ -97,13 +97,6 @@ public class ElPropertyChain implements ElPropertyValue {
 	        return StringHelper.replaceString(el, ROOT_ELPREFIX, "${"+prefix+"}");
 	    }
 	}
-		
-	/**
-	 * Full ElGetValue support.
-	 */
-	public boolean isDeployOnly() {
-		return false;
-	}
 
 	/**
      * Return true if there is a many property from sinceProperty to 
@@ -262,18 +255,18 @@ public class ElPropertyChain implements ElPropertyValue {
 	
 
 	public void elSetLoaded(EntityBean bean) {
-		
+
 		for (int i = 0; i < last; i++) {
 			bean = (EntityBean)chain[i].elGetValue(bean);
 			if (bean == null){
 				break;
 			}
-		}				
+		}
 		if (bean != null){
-			((EntityBean)bean)._ebean_getIntercept().setLoaded();
+			bean._ebean_getIntercept().setLoaded();
 		}
 	}
-	
+
 	public void elSetValue(EntityBean bean, Object value, boolean populate) {
 
 		EntityBean prevBean = bean;

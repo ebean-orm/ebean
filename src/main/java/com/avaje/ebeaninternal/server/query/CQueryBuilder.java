@@ -25,14 +25,13 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
 import javax.persistence.PersistenceException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * Generates the SQL SELECT statements taking into account the physical
  * deployment properties.
  */
-public class CQueryBuilder implements Constants {
+public class CQueryBuilder {
 
   private final String tableAliasPlaceHolder;
   private final String columnAliasPrefix;

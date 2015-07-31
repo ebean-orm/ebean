@@ -175,15 +175,11 @@ class ElMatchBuilder {
 
 		public boolean isMatch(T bean) {
 
-			Object value = elGetValue.elGetValue((EntityBean)bean);
-			if (value == null){
-				return false;
-			}
-			
-			return set.contains(value);
-		}
-
+      Object value = elGetValue.elGetValue((EntityBean) bean);
+      return value != null && set.contains(value);
+    }
 	}
+
 	/**
 	 * Equal To.
 	 */
