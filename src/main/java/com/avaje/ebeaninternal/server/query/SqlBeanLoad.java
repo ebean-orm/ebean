@@ -1,15 +1,12 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.sql.SQLException;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
+
+import javax.persistence.PersistenceException;
 
 /**
  * Controls the loading of property data into a bean.

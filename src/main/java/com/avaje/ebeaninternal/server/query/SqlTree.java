@@ -21,10 +21,6 @@ public class SqlTree {
    */
   private final BeanPropertyAssocMany<?> manyProperty;
 
-  private final String manyPropertyName;
-
-  private final ElPropertyValue manyPropEl;
-
   private final Set<String> includes;
 
   /**
@@ -50,8 +46,7 @@ public class SqlTree {
    * Create the SqlSelectClause.
    */
   public SqlTree(String summary, SqlTreeNode rootNode, String selectSql, String fromSql, String inheritanceWhereSql,
-                 BeanProperty[] encryptedProps, BeanPropertyAssocMany<?> manyProperty, String manyPropertyName,
-                 ElPropertyValue manyPropEl, Set<String> includes) {
+                 BeanProperty[] encryptedProps, BeanPropertyAssocMany<?> manyProperty, Set<String> includes) {
 
     this.summary = summary;
     this.rootNode = rootNode;
@@ -60,8 +55,6 @@ public class SqlTree {
     this.inheritanceWhereSql = inheritanceWhereSql;
     this.encryptedProps = encryptedProps;
     this.manyProperty = manyProperty;
-    this.manyPropertyName = manyPropertyName;
-    this.manyPropEl = manyPropEl;
     this.includes = includes;
   }
 
@@ -76,8 +69,6 @@ public class SqlTree {
     this.inheritanceWhereSql = null;
     this.encryptedProps = null;
     this.manyProperty = null;
-    this.manyPropertyName = null;
-    this.manyPropEl = null;
     this.includes = null;
   }
 
@@ -139,21 +130,6 @@ public class SqlTree {
    */
   public BeanPropertyAssocMany<?> getManyProperty() {
     return manyProperty;
-  }
-
-  public String getManyPropertyName() {
-    return manyPropertyName;
-  }
-
-  public ElPropertyValue getManyPropertyEl() {
-    return manyPropEl;
-  }
-
-  /**
-   * Return true if this query includes a Many association.
-   */
-  public boolean isManyIncluded() {
-    return (manyProperty != null);
   }
 
   public BeanProperty[] getEncryptedProps() {

@@ -1,18 +1,8 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
+import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.Version;
-import com.avaje.ebeaninternal.server.core.DiffHelp;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionTouched;
 import com.avaje.ebean.bean.EntityBean;
@@ -20,10 +10,19 @@ import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.server.core.DiffHelp;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.SQLException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Handles the Object Relational fetching.
@@ -215,7 +214,7 @@ public class CQueryEngine {
       current = next;
     }
     // put an empty map into the last one
-    current.setDiff(Collections.EMPTY_MAP);
+    current.setDiff(new LinkedHashMap<String, ValuePair>());
   }
 
   private <T> void deriveVersionDiff(Version<T> current, Version<T> prior, BeanDescriptor<T> descriptor) {

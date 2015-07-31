@@ -1,17 +1,15 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.util.Collection;
-import java.util.Map;
-
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.core.RelationalQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.util.BeanCollectionFactory;
 import com.avaje.ebeaninternal.server.util.BeanCollectionParams;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Wraps a BeanCollection with helper methods to add beans.
@@ -73,41 +71,6 @@ public final class BeanCollectionWrapper {
 		this.map = getMap(isMap);
 	}
 	
-	/**
-	 * Create based on a Find.
-	 */
-	public BeanCollectionWrapper(OrmQueryRequest<?> request) {
-
-		this.desc = request.getBeanDescriptor();
-		this.queryType = request.getQueryType();
-		this.mapKey = request.getQuery().getMapKey();
-		this.isMap = SpiQuery.Type.MAP.equals(queryType);
-		
-		this.beanCollection = createBeanCollection(queryType);
-		this.collection = getCollection(isMap);
-		this.map = getMap(isMap);
-	}
-
-	/**
-	 * Create based on a ManyType and mapKey. Note the mapKey is only used if
-	 * the manyType is a Map.
-	 * <p>
-	 * modifyListening is set to true if this is a collection used to hold
-	 * ManyToMany associated objects.
-	 * </p>
-	 */
-	public BeanCollectionWrapper(BeanPropertyAssocMany<?> manyProp) {
-		
-		this.queryType = manyProp.getManyType().getQueryType();
-		this.mapKey = manyProp.getMapKey();
-		this.desc = manyProp.getTargetDescriptor();
-		this.isMap = SpiQuery.Type.MAP.equals(queryType);
-		
-		this.beanCollection = createBeanCollection(queryType);
-		this.collection = getCollection(isMap);
-		this.map = getMap(isMap);
-	}
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Map<Object,Object> getMap(boolean isMap) {
 		return isMap ? (Map)beanCollection : null;
@@ -169,7 +132,7 @@ public final class BeanCollectionWrapper {
 		}
 		rowCount++;
 		if (isMap) {
-			Object keyValue = null;
+			Object keyValue;
 			if (mapKey != null) {
 				// use the value for the property
 				keyValue = desc.getValue(bean, mapKey);

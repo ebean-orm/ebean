@@ -485,6 +485,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Read version beans and their effective dates.
    */
+  @SuppressWarnings("unchecked")
   public List<Version<T>> readVersions() throws SQLException {
 
     List<Version<T>> versionList = new ArrayList<Version<T>>();

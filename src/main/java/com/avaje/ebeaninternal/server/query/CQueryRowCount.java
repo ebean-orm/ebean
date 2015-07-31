@@ -1,20 +1,18 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
-import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Executes the select row count query.
@@ -99,10 +97,6 @@ public class CQueryRowCount {
 	 */
 	public String getGeneratedSql() {
 		return sql;
-	}
-	
-	public SpiOrmQueryRequest<?> getQueryRequest() {
-		return request;
 	}
 
 	/**

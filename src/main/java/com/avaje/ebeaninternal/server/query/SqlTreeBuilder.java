@@ -52,8 +52,6 @@ public class SqlTreeBuilder {
    */
   private BeanPropertyAssocMany<?> manyProperty;
 
-  private String manyPropertyName;
-
   private final SqlTreeAlias alias;
 
   private final DefaultDbSqlContext ctx;
@@ -141,13 +139,8 @@ public class SqlTreeBuilder {
       encryptedProps = ctx.getEncryptedProps();
     }
 
-    ElPropertyValue manyPropEl = null;
-    if (manyPropertyName != null) {
-      manyPropEl = desc.getElGetValue(manyPropertyName);
-    }
-
     return new SqlTree(summary.toString(), rootNode, selectSql, fromSql, inheritanceWhereSql, encryptedProps,
-                        manyProperty, manyPropertyName, manyPropEl, queryDetail.getIncludes());
+                        manyProperty, queryDetail.getIncludes());
   }
 
   private String buildSelectClause() {
@@ -213,7 +206,7 @@ public class SqlTreeBuilder {
     BeanPropertyAssocOne<?>[] ones = desc.propertiesOne();
     for (int i = 0; i < ones.length; i++) {
       String propPrefix = SplitName.add(prefix, ones[i].getName());
-      if (isIncludeBean(propPrefix, ones[i])) {
+      if (isIncludeBean(propPrefix)) {
         selectIncludes.add(propPrefix);
         buildSelectChain(propPrefix, ones[i], ones[i].getTargetDescriptor(), myJoinList);
       }
@@ -222,7 +215,7 @@ public class SqlTreeBuilder {
     BeanPropertyAssocMany<?>[] manys = desc.propertiesMany();
     for (int i = 0; i < manys.length; i++) {
       String propPrefix = SplitName.add(prefix, manys[i].getName());
-      if (isIncludeMany(prefix, propPrefix, manys[i])) {
+      if (isIncludeMany(propPrefix, manys[i])) {
         selectIncludes.add(propPrefix);
         buildSelectChain(propPrefix, manys[i], manys[i].getTargetDescriptor(), myJoinList);
       }
@@ -331,8 +324,7 @@ public class SqlTreeBuilder {
    * This means it can included individual properties of an embedded bean.
    * </p>
    */
-  private void addPropertyToSubQuery(SqlTreeProperties selectProps, BeanDescriptor<?> desc,
-      OrmQueryProperties queryProps, String propName) {
+  private void addPropertyToSubQuery(SqlTreeProperties selectProps, BeanDescriptor<?> desc, String propName) {
 
     BeanProperty p = desc.findBeanProperty(propName);
     if (p == null) {
@@ -354,7 +346,7 @@ public class SqlTreeBuilder {
       OrmQueryProperties queryProps, String propName) {
 
     if (subQuery) {
-      addPropertyToSubQuery(selectProps, desc, queryProps, propName);
+      addPropertyToSubQuery(selectProps, desc, propName);
       return;
     }
 
@@ -472,7 +464,7 @@ public class SqlTreeBuilder {
   /**
    * Return true if this many node should be included in the query.
    */
-  private boolean isIncludeMany(String prefix, String propName, BeanPropertyAssocMany<?> manyProp) {
+  private boolean isIncludeMany(String propName, BeanPropertyAssocMany<?> manyProp) {
 
     if (queryDetail.isJoinsEmpty()) {
       return false;
@@ -489,7 +481,6 @@ public class SqlTreeBuilder {
       }
 
       manyProperty = manyProp;
-      manyPropertyName = propName;
       summary.append(" +many:").append(propName);
       return true;
     }
@@ -504,7 +495,7 @@ public class SqlTreeBuilder {
    * is added and false is returned.
    * </p>
    */
-  private boolean isIncludeBean(String prefix, BeanPropertyAssocOne<?> prop) {
+  private boolean isIncludeBean(String prefix) {
 
     if (queryDetail.includes(prefix)) {
       // explicitly included

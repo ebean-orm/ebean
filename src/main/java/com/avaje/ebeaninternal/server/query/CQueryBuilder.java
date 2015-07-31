@@ -225,7 +225,7 @@ public class CQueryBuilder {
       queryPlan = new CQueryPlanRawSql(request, res, sqlTree, predicates.getLogWhereSql());
 
     } else {
-      queryPlan = new CQueryPlan(request, res, sqlTree, rawSql, predicates.getLogWhereSql());
+      queryPlan = new CQueryPlan(request, res, sqlTree, false, predicates.getLogWhereSql());
     }
 
     // cache the query plan because we can reuse it and also

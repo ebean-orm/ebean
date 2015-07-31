@@ -49,11 +49,6 @@ public class CQueryPredicates {
   private final Object idValue;
 
   /**
-   * Flag set if this is a SqlSelect type query.
-   */
-  private boolean rawSql;
-
-  /**
    * Named bind parameters.
    */
   private final BindParams bindParams;
@@ -459,10 +454,7 @@ public class CQueryPredicates {
       return orderBy;
     }
 
-    if (idPos > -1 && idPos < manyPos) {
-      // its all ok, id property appears before a many property
-
-    } else {
+    if (idPos <= -1 || idPos >= manyPos) {
       if (idPos > manyPos) {
         // there was an error with the order by...
         String msg = "A Query on [" + desc + "] includes a join to a 'many' association [" + manyProp.getName();
@@ -529,38 +521,8 @@ public class CQueryPredicates {
     return orderByIncludes;
   }
 
-  /**
-   * The where sql with named bind parameters converted to ?.
-   */
-  public String getWhereRawSql() {
-    return whereRawSql;
-  }
-
-  /**
-   * The where sql from the expression objects.
-   */
-  public String getWhereExpressionSql() {
-    return whereExprSql;
-  }
-
-  /**
-   * The having sql with named bind parameters converted to ?.
-   */
-  public String getHavingRawSql() {
-    return havingRawSql;
-  }
-
-  /**
-   * The having sql from the expression objects.
-   */
-  public String getHavingExpressionSql() {
-    return havingExprSql;
-  }
-
   public String getLogWhereSql() {
-    if (rawSql) {
-      return "";
-    }
+
     if (dbWhere == null && dbFilterMany == null) {
       return "";
     }
