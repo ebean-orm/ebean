@@ -44,9 +44,7 @@ public class CachedBeanData {
    */
   public boolean[] copyLoaded() {
     boolean[] dest = new boolean[data.length];
-    for (int i = 0; i < dest.length; i++) {
-      dest[i] = loaded[i];
-    }
+    System.arraycopy(loaded, 0, dest, 0, dest.length);
     return dest;
   }
 

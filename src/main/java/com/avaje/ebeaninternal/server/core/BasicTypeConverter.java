@@ -223,7 +223,7 @@ public final class BasicTypeConverter implements Serializable {
 			return (Float) value;
 		}
 		if (value instanceof Number) {
-			return Float.valueOf(((Number) value).floatValue());
+			return ((Number) value).floatValue();
 		}
 		return Float.valueOf(value.toString());
 	}
@@ -237,7 +237,7 @@ public final class BasicTypeConverter implements Serializable {
 			return (Short) value;
 		}
 		if (value instanceof Number) {
-			return Short.valueOf(((Number) value).shortValue());
+			return ((Number) value).shortValue();
 		}
 		return Short.valueOf(value.toString());
 	}
@@ -266,7 +266,7 @@ public final class BasicTypeConverter implements Serializable {
 			return (Integer) value;
 		}
 		if (value instanceof Number) {
-			return Integer.valueOf(((Number) value).intValue());
+			return ((Number) value).intValue();
 		}
 		return Integer.valueOf(value.toString());
 	}
@@ -286,13 +286,13 @@ public final class BasicTypeConverter implements Serializable {
 			return Long.valueOf((String) value);
 		}
 		if (value instanceof Number) {
-			return Long.valueOf(((Number) value).longValue());
+			return ((Number) value).longValue();
 		}
 		if (value instanceof java.util.Date) {
-			return Long.valueOf(((java.util.Date) value).getTime());
+			return ((java.util.Date) value).getTime();
 		}
 		if (value instanceof Calendar) {
-			return Long.valueOf(((Calendar) value).getTime().getTime());
+			return ((Calendar) value).getTime().getTime();
 		}
 		return Long.valueOf(value.toString());
 	}
@@ -320,7 +320,7 @@ public final class BasicTypeConverter implements Serializable {
 			return (Double) value;
 		}
 		if (value instanceof Number) {
-			return Double.valueOf(((Number) value).doubleValue());
+			return ((Number) value).doubleValue();
 		}
 		return Double.valueOf(value.toString());
 	}

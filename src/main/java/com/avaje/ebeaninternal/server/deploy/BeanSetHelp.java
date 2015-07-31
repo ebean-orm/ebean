@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

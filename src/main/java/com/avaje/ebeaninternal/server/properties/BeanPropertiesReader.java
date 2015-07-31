@@ -17,7 +17,7 @@ public class BeanPropertiesReader {
   public BeanPropertiesReader(Class<?> clazz) {
     this.props = getProperties(clazz);
     for (int i=0; i<props.length; i++) {
-      propertyIndexMap.put(props[i], Integer.valueOf(i));
+      propertyIndexMap.put(props[i], i);
     }  
   }
   

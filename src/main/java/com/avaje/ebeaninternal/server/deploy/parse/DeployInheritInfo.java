@@ -194,7 +194,7 @@ public class DeployInheritInfo {
             	discriminatorStringValue = value;
         		// convert the value if desired
 	        	if (discriminatorType == Types.INTEGER){
-	        		this.discriminatorObjectValue = Integer.valueOf(value.toString());
+	        		this.discriminatorObjectValue = Integer.valueOf(value);
 	        	} else {
 	        		this.discriminatorObjectValue = value;
 	        	}
@@ -253,11 +253,7 @@ public class DeployInheritInfo {
     }
     
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("InheritInfo[").append(type.getName()).append("]");
-        sb.append(" root[").append(parent.getName()).append("]");
-        sb.append(" disValue[").append(discriminatorStringValue).append("]");
-        return sb.toString();
+      return "InheritInfo[" + type.getName() + "]" + " root[" + parent.getName() + "]" + " disValue[" + discriminatorStringValue + "]";
     }
     
 }

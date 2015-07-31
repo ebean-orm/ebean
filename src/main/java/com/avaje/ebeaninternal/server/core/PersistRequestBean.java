@@ -308,7 +308,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       if (id != null) {
         hc += id.hashCode();
       }
-      beanHash = new Integer(hc);
+      beanHash = hc;
     }
     return beanHash;
   }

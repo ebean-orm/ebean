@@ -12,14 +12,14 @@ public class GeneratedUpdateLong implements GeneratedProperty {
      * Return now as a Timestamp.
      */
     public Object getInsertValue(BeanProperty prop, EntityBean bean) {
-        return Long.valueOf(System.currentTimeMillis());
+        return System.currentTimeMillis();
     }
 
     /**
      * Return now as a Timestamp.
      */
     public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
-        return Long.valueOf(System.currentTimeMillis());
+        return System.currentTimeMillis();
     }
 
     /**

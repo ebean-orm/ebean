@@ -32,12 +32,7 @@ public class BeanDelta {
     }
     
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("BeanDelta[");
-        sb.append(beanDescriptor.getName()).append(":");
-        sb.append(properties);
-        sb.append("]");
-        return sb.toString();
+      return "BeanDelta[" + beanDescriptor.getName() + ":" + properties + "]";
     }
 
     public Object getId() {

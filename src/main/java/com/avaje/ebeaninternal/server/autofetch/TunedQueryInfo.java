@@ -26,7 +26,7 @@ public class TunedQueryInfo implements Serializable {
 	 */
 	private int profileCount;
 	
-	private Long lastTuneTime = Long.valueOf(0);
+	private Long lastTuneTime = (long) 0;
 
 	private final String rateMonitor = new String();
 
@@ -87,7 +87,7 @@ public class TunedQueryInfo implements Serializable {
 	public void setTunedDetail(OrmQueryDetail tunedDetail) {
 		// assignment is atomic
 		this.tunedDetail = tunedDetail;
-		this.lastTuneTime = Long.valueOf(System.currentTimeMillis());
+		this.lastTuneTime = System.currentTimeMillis();
 	}
 
 	/**

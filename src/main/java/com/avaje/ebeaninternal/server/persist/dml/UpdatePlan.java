@@ -58,7 +58,7 @@ public class UpdatePlan implements SpiUpdatePlan {
    */
   private UpdatePlan() {
     this.emptySetClause = true;
-    this.key = Integer.valueOf(0);
+    this.key = 0;
     this.mode = ConcurrencyMode.NONE;
     this.sql = null;
     this.set = null;

@@ -100,7 +100,7 @@ public class OraclePstmtBatch implements PstmtBatch {
 		int rows;
 		try {
 		    // invoke sendBatch();
-			rows = ((Integer) METHOD_SEND_BATCH.invoke(pstmtDelegate.unwrap(pstmt))).intValue();
+			rows = (Integer) METHOD_SEND_BATCH.invoke(pstmtDelegate.unwrap(pstmt));
 		
 		} catch (IllegalAccessException e) {
             String msg = "Error invoking Oracle sendBatch method via reflection";

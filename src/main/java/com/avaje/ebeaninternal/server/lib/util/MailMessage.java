@@ -135,7 +135,7 @@ public class MailMessage {
 
     public String toString() {
         StringBuilder sb = new StringBuilder(100);
-        sb.append("Sender: " + senderAddress + "\tRecipient: " + recipientList + "\n");
+        sb.append("Sender: ").append(senderAddress ).append("\tRecipient: ").append(recipientList).append("\n");
         for (String key : header.keySet()) {
             String hline = key + ": " + header.get(key) + "\n";
             sb.append(hline);

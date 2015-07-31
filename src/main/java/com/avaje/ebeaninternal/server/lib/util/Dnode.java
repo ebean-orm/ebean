@@ -316,9 +316,7 @@ public class Dnode {
 	}
 
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("[").append(getNodeName()).append(" ").append(attrList).append("]");
-		return sb.toString();
+    return "[" + getNodeName() + " " + attrList + "]";
 	}
 
 }

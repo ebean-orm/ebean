@@ -124,7 +124,7 @@ public final class UpdateMeta {
       }
     }
 
-    Integer key = Integer.valueOf(hash);
+    Integer key = hash;
 
     // check if we can use a cached UpdatePlan
     SpiUpdatePlan updatePlan = beanDescriptor.getUpdatePlan(key);

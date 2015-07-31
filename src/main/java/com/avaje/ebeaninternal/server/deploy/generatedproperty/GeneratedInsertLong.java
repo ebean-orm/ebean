@@ -12,7 +12,7 @@ public class GeneratedInsertLong implements GeneratedProperty {
      * Return the current time as a Timestamp.
      */
     public Object getInsertValue(BeanProperty prop, EntityBean bean) {
-        return Long.valueOf(System.currentTimeMillis());
+        return System.currentTimeMillis();
     }
 
     /**

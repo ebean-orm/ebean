@@ -19,8 +19,7 @@ public class GeneratedCounter implements GeneratedProperty {
      * Always returns a 1.
      */
     public Object getInsertValue(BeanProperty prop, EntityBean bean) {
-        Integer i = Integer.valueOf(1);
-        return BasicTypeConverter.convert(i, numberType);
+        return BasicTypeConverter.convert(1, numberType);
     }
 
     /**
@@ -28,7 +27,7 @@ public class GeneratedCounter implements GeneratedProperty {
      */
     public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
         Number currVal = (Number) prop.getValue(bean);
-        Integer nextVal = Integer.valueOf(currVal.intValue() + 1);
+        Integer nextVal = currVal.intValue() + 1;
         return BasicTypeConverter.convert(nextVal, numberType);
     }
 

@@ -61,8 +61,7 @@ public class SimpleSequenceIdGenerator implements IdGenerator {
       pstmt = c.prepareStatement(sql);
       rset = pstmt.executeQuery();
       if (rset.next()) {
-        int val = rset.getInt(1);
-        return Integer.valueOf(val);
+        return rset.getInt(1);
       } else {
         String m = "Always expecting 1 row from " + sql;
         throw new PersistenceException(m);

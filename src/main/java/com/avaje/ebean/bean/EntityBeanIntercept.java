@@ -891,7 +891,7 @@ public final class EntityBeanIntercept implements Serializable {
     } else {
       return null;
     }
-    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Boolean.valueOf(oldValue), Boolean.valueOf(newValue));
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
   }
 
   /**
@@ -906,7 +906,7 @@ public final class EntityBeanIntercept implements Serializable {
     } else {
       return null;
     }
-    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Integer.valueOf(oldValue), Integer.valueOf(newValue));
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
   }
 
   /**
@@ -922,7 +922,7 @@ public final class EntityBeanIntercept implements Serializable {
       return null;
     }
     
-    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Long.valueOf(oldValue), Long.valueOf(newValue));
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
   }
 
   /**
@@ -937,7 +937,7 @@ public final class EntityBeanIntercept implements Serializable {
     } else {
       return null;
     }
-    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Double.valueOf(oldValue), Double.valueOf(newValue));
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
   }
 
   /**
@@ -952,7 +952,7 @@ public final class EntityBeanIntercept implements Serializable {
     } else {
       return null;
     }
-    return (pcs == null) ? null :  new PropertyChangeEvent(owner, getProperty(propertyIndex), Float.valueOf(oldValue), Float.valueOf(newValue));
+    return (pcs == null) ? null :  new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
   }
 
   /**
@@ -967,7 +967,7 @@ public final class EntityBeanIntercept implements Serializable {
     } else {
       return null;
     }
-    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Short.valueOf(oldValue), Short.valueOf(newValue));
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
   }
 
   /**
@@ -982,7 +982,7 @@ public final class EntityBeanIntercept implements Serializable {
     } else {
       return null;
     }
-    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Character.valueOf(oldValue), Character.valueOf(newValue));
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
   }
 
   /**
@@ -997,7 +997,7 @@ public final class EntityBeanIntercept implements Serializable {
     } else {
       return null;
     }
-    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), Byte.valueOf(oldValue), Byte.valueOf(newValue));
+    return (pcs == null) ? null : new PropertyChangeEvent(owner, getProperty(propertyIndex), oldValue, newValue);
   }
 
   /**

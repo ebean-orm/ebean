@@ -442,7 +442,7 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 		Boolean autoFetch = query.isAutofetch();
 		if (autoFetch != null) {
 			// explicitly set...
-			return autoFetch.booleanValue();
+			return autoFetch;
 
 		} else {
 			// determine using implicit mode...

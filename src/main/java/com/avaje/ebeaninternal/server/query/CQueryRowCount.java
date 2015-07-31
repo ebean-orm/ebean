@@ -77,7 +77,7 @@ public class CQueryRowCount {
 	 * Return a summary description of this query.
 	 */
 	public String getSummary() {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder(80);
 			sb.append("FindRowCount exeMicros[").append(executionTimeMicros)
 			.append("] rows[").append(rowCount)
 			.append("] type[").append(desc.getFullName())

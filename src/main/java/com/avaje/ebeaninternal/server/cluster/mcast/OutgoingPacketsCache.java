@@ -57,7 +57,7 @@ public class OutgoingPacketsCache {
         Iterator<Long> it = packetMap.keySet().iterator();
         while (it.hasNext()) {
             Long pktId = it.next();
-            if (minAcked >= pktId.longValue()) {
+            if (minAcked >= pktId) {
                 it.remove();
             }
         }

@@ -37,7 +37,7 @@ public class MessageResend implements Message {
     }
 
     public void add(long packetId){
-        resendPacketIds.add(Long.valueOf(packetId));
+        resendPacketIds.add(packetId);
     }
     
     public List<Long> getResendPacketIds() {

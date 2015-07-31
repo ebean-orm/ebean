@@ -421,9 +421,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     
     // populate a smaller/minimal array
     int[] unload = new int[pos];
-    for (int i = 0; i < pos; i++) {
-      unload[i] = props[i];
-    }
+    System.arraycopy(props, 0, unload, 0, pos);
     return unload;
   }
   

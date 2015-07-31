@@ -16,7 +16,7 @@ public class GeneratedCounterInteger implements GeneratedProperty {
      * Always returns a 1.
      */
     public Object getInsertValue(BeanProperty prop, EntityBean bean) {
-        return Integer.valueOf(1);
+        return 1;
     }
 
     /**
@@ -24,7 +24,7 @@ public class GeneratedCounterInteger implements GeneratedProperty {
      */
     public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
         Integer i = (Integer) prop.getValue(bean);
-        return Integer.valueOf(i.intValue() + 1);
+        return i.intValue() + 1;
     }
 
     /**

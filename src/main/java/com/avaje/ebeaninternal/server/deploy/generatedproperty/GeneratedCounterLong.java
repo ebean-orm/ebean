@@ -16,7 +16,7 @@ public class GeneratedCounterLong implements GeneratedProperty {
      * Always returns a 1.
      */
     public Object getInsertValue(BeanProperty prop, EntityBean bean) {
-        return Long.valueOf(1);
+        return (long) 1;
     }
 
     /**
@@ -24,7 +24,7 @@ public class GeneratedCounterLong implements GeneratedProperty {
      */
     public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
         Long i = (Long) prop.getValue(bean);
-        return Long.valueOf(i.longValue() + 1);
+        return i.longValue() + 1;
     }
 
     /**

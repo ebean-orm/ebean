@@ -170,7 +170,7 @@ public class IncomingPacketsProcessed {
                 boolean lostPacket = false;
                 
                 for (long i = gotAllPoint + 1; i < gotMaxPoint; i++) {
-                    Long packetId = Long.valueOf(i);
+                    Long packetId = i;
                     if (!outOfOrderList.contains(packetId)) {
                         if (incrementResendCount(packetId)) {
                             // request this packet be resent
@@ -195,7 +195,7 @@ public class IncomingPacketsProcessed {
         private boolean incrementResendCount(Long packetId){
             Integer resendCount = resendCountMap.get(packetId);
             if (resendCount != null){
-                int i = resendCount.intValue() + 1;
+                int i = resendCount + 1;
                 if (i > maxResendIncoming){
                     // we are going to give up trying to get this packet now
                     logger.warn("Exceeded maxResendIncoming["+maxResendIncoming+"] for packet["+packetId+"]. Giving up on requesting it.");
@@ -203,7 +203,7 @@ public class IncomingPacketsProcessed {
                     outOfOrderList.add(packetId);
                     return false;
                 }
-                resendCount = Integer.valueOf(i);
+                resendCount = i;
                 resendCountMap.put(packetId, resendCount);
             } else {
                 resendCountMap.put(packetId, ONE);   
@@ -211,7 +211,7 @@ public class IncomingPacketsProcessed {
             return true;
         }
         
-        private static final Integer ONE = Integer.valueOf(1);
+        private static final Integer ONE = 1;
 
         public boolean processPacket(long packetId) {
             synchronized (this) {
@@ -235,7 +235,7 @@ public class IncomingPacketsProcessed {
                     if (packetId > gotMaxPoint) {
                         gotMaxPoint = packetId;
                     }
-                    outOfOrderList.add(Long.valueOf(packetId));
+                    outOfOrderList.add(packetId);
                 }
                 checkOutOfOrderList();
                 return true;
@@ -256,7 +256,7 @@ public class IncomingPacketsProcessed {
                 Iterator<Long> it = outOfOrderList.iterator();
                 while (it.hasNext()) {
                     Long id = it.next();
-                    if (id.longValue() == nextPoint) {
+                    if (id == nextPoint) {
                         // we found the next one in the outOfOrderList
                         it.remove();
                         gotAllPoint = nextPoint;

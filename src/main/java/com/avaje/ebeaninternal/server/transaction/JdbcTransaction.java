@@ -249,7 +249,7 @@ public class JdbcTransaction implements SpiTransaction {
     if (derivedRelMap == null) {
       derivedRelMap = new HashMap<Integer, List<DerivedRelationshipData>>();
     }
-    Integer key = new Integer(System.identityHashCode(derivedRelationship.getAssocBean()));
+    Integer key = System.identityHashCode(derivedRelationship.getAssocBean());
 
     List<DerivedRelationshipData> list = derivedRelMap.get(key);
     if (list == null) {

@@ -58,7 +58,7 @@ public class DbTypeMap {
    * Override the type for a given JDBC type.
    */
   public void put(int jdbcType, DbType dbType) {
-    typeMap.put(Integer.valueOf(jdbcType), dbType);
+    typeMap.put(jdbcType, dbType);
   }
 
   /**
@@ -66,7 +66,7 @@ public class DbTypeMap {
    */
   public DbType get(int jdbcType) {
 
-    DbType dbType = typeMap.get(Integer.valueOf(jdbcType));
+    DbType dbType = typeMap.get(jdbcType);
     if (dbType == null) {
       String m = "No DB type for JDBC type " + jdbcType;
       throw new RuntimeException(m);
