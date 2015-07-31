@@ -76,7 +76,7 @@ public class CQueryEngine {
         request.getTransaction().logSummary(rcQuery.getSummary());
       }
 
-      if (!list.isFetchingInBackground() && request.getQuery().isFutureFetch()) {
+      if (request.getQuery().isFutureFetch()) {
         // end the transaction for futureFindIds (it had it's own one)
         logger.debug("Future findIds completed!");
         request.getTransaction().end();
