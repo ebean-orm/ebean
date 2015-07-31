@@ -22,24 +22,21 @@ public class FactoryAssocOnes {
 		BeanPropertyAssocOne<?>[] ones = desc.propertiesOneImported();
 
 		for (int i = 0; i < ones.length; i++) {
-			if (ones[i].isImportedPrimaryKey()){
-				// excluded as already part of the primary key
-				
-			} else {
-				switch (mode) {
-				case INSERT:
-					if (!ones[i].isInsertable()) {
-						continue;
-					}
-					break;
-				case UPDATE:
-					if (!ones[i].isUpdateable()) {
-						continue;
-					}
-					break;
-				}
-				list.add(new BindableAssocOne(ones[i]));
-			}
-		}
+      if (!ones[i].isImportedPrimaryKey()) {
+        switch (mode) {
+        case INSERT:
+          if (!ones[i].isInsertable()) {
+            continue;
+          }
+          break;
+        case UPDATE:
+          if (!ones[i].isUpdateable()) {
+            continue;
+          }
+          break;
+        }
+        list.add(new BindableAssocOne(ones[i]));
+      }
+    }
 	}
 }

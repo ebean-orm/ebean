@@ -28,14 +28,14 @@ public class FactoryBaseProperties {
    */
   public void create(List<Bindable> list, BeanDescriptor<?> desc, DmlMode mode, boolean withLobs) {
 
-    add(desc.propertiesBaseScalar(), list, desc, mode, withLobs);
+    add(desc.propertiesBaseScalar(), list, mode, withLobs);
 
     BeanPropertyCompound[] compoundProps = desc.propertiesBaseCompound();
     for (int i = 0; i < compoundProps.length; i++) {
       BeanProperty[] props = compoundProps[i].getScalarProperties();
 
       List<BindableProperty> newList = new ArrayList<BindableProperty>(props.length);
-      addCompound(props, newList, desc, mode, withLobs);
+      addCompound(props, newList, mode, withLobs);
 
       BindableCompound compoundBindable = new BindableCompound(compoundProps[i], newList);
 
@@ -43,7 +43,7 @@ public class FactoryBaseProperties {
     }
   }
 
-  private void add(BeanProperty[] props, List<Bindable> list, BeanDescriptor<?> desc, DmlMode mode, boolean withLobs) {
+  private void add(BeanProperty[] props, List<Bindable> list, DmlMode mode, boolean withLobs) {
 
     for (int i = 0; i < props.length; i++) {
       Bindable item = factoryProperty.create(props[i], mode, withLobs);
@@ -53,7 +53,7 @@ public class FactoryBaseProperties {
     }
   }
 
-  private void addCompound(BeanProperty[] props, List<BindableProperty> list, BeanDescriptor<?> desc, DmlMode mode, boolean withLobs) {
+  private void addCompound(BeanProperty[] props, List<BindableProperty> list, DmlMode mode, boolean withLobs) {
 
     for (int i = 0; i < props.length; i++) {
       BindableProperty item = (BindableProperty) factoryProperty.create(props[i], mode, withLobs);
