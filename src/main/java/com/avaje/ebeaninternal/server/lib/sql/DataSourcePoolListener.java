@@ -24,11 +24,11 @@ public interface DataSourcePoolListener {
 	/**
 	 * Called after a connection has been retrieved from the connection pool
 	 */
-	public void onAfterBorrowConnection(Connection c);
+	void onAfterBorrowConnection(Connection c);
 
 	/**
 	 * Called before a connection will be put back to the connection pool
 	 */
-	public void onBeforeReturnConnection(Connection c);
+	void onBeforeReturnConnection(Connection c);
 
 }

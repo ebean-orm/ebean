@@ -8,5 +8,5 @@ public interface ElMatcher<T> {
 	/**
 	 * Return true if the bean matches the expression.
 	 */
-	public boolean isMatch(T bean);
+	boolean isMatch(T bean);
 }

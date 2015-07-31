@@ -8,20 +8,20 @@ public interface Constants {
 	/**
 	 * literal used for SQL LIMIT in MySql and Postgres.
 	 */
-	public static final String LIMIT = "limit";
+	static final String LIMIT = "limit";
 
 	/**
 	 * Literal used for SQL LIMIT OFFSET clause in MySql and Postgres.
 	 */
-	public static final String OFFSET = "offset";
+	static final String OFFSET = "offset";
 	
 	/**
 	 * ROW_NUMBER() OVER (ORDER BY 
 	 */
-	public static final String ROW_NUMBER_OVER = "row_number() over (order by ";
+	static final String ROW_NUMBER_OVER = "row_number() over (order by ";
 	
 	/**
 	 * ) as rn, 
 	 */
-	public static final String ROW_NUMBER_AS = ") as rn, ";
+	static final String ROW_NUMBER_AS = ") as rn, ";
 }

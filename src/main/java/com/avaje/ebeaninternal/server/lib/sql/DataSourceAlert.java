@@ -13,15 +13,15 @@ public interface DataSourceAlert {
 	/**
 	 * Send an alert to say the dataSource is back up.
 	 */
-	public void dataSourceUp(String dataSourceName);
+	void dataSourceUp(String dataSourceName);
 
 	/**
 	 * Send an alert to say the dataSource is down.
 	 */
-	public void dataSourceDown(String dataSourceName);
+	void dataSourceDown(String dataSourceName);
 
 	/**
 	 * Send an alert to say the dataSource is getting close to its max size.
 	 */
-	public void dataSourceWarning(String subject, String msg);
+	void dataSourceWarning(String subject, String msg);
 }
