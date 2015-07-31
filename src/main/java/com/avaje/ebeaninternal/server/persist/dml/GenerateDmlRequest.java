@@ -5,89 +5,89 @@ package com.avaje.ebeaninternal.server.persist.dml;
  */
 public class GenerateDmlRequest {
 
-    private static final String IS_NULL = " is null";
+  private static final String IS_NULL = " is null";
 
-    private final StringBuilder sb = new StringBuilder(100);
+  private final StringBuilder sb = new StringBuilder(100);
 
-    private StringBuilder insertBindBuffer;
+  private StringBuilder insertBindBuffer;
 
-    private String prefix;
-    private String prefix2;
+  private String prefix;
+  private String prefix2;
 
-    private int insertMode;
-    
-    private int bindColumnCount;
-    
-    /**
-     * Create from a PersistRequestBean.
-     */
-    public GenerateDmlRequest() {
+  private int insertMode;
+
+  private int bindColumnCount;
+
+  /**
+   * Create from a PersistRequestBean.
+   */
+  public GenerateDmlRequest() {
+  }
+
+  public GenerateDmlRequest append(String s) {
+    sb.append(s);
+    return this;
+  }
+
+  public void appendColumnIsNull(String column) {
+    appendColumn(column, IS_NULL);
+  }
+
+  public void appendColumn(String column) {
+    //String bind = (insertMode > 0) ? "?" : "=?";
+    appendColumn(column, "?");
+  }
+
+  public void appendColumn(String column, String bind) {
+
+    ++bindColumnCount;
+
+    sb.append(prefix);
+    sb.append(column);
+    //sb.append(expr);
+    if (insertMode > 0) {
+      if (insertMode++ > 1) {
+        insertBindBuffer.append(",");
+      }
+      insertBindBuffer.append(bind);
+    } else {
+      sb.append("=");
+      sb.append(bind);
     }
 
-    public GenerateDmlRequest append(String s) {
-        sb.append(s);
-        return this;
+    if (prefix2 != null) {
+      prefix = prefix2;
+      prefix2 = null;
     }
+  }
 
-    public void appendColumnIsNull(String column) {
-        appendColumn(column, IS_NULL);
-    }
+  public int getBindColumnCount() {
+    return bindColumnCount;
+  }
 
-    public void appendColumn(String column) {
-        //String bind = (insertMode > 0) ? "?" : "=?";
-        appendColumn(column, "?");
-    }
+  public String getInsertBindBuffer() {
+    return insertBindBuffer.toString();
+  }
 
-    public void appendColumn(String column, String bind) {
+  public String toString() {
+    return sb.toString();
+  }
 
-        ++bindColumnCount;
-        
-        sb.append(prefix);
-        sb.append(column);
-        //sb.append(expr);
-        if (insertMode > 0) {
-            if (insertMode++ > 1) {
-                insertBindBuffer.append(",");
-            }
-            insertBindBuffer.append(bind);
-        } else {
-            sb.append("=");
-            sb.append(bind);
-        }
+  public void setWhereIdMode() {
+    this.prefix = "";
+    this.prefix2 = " and ";
+  }
 
-        if (prefix2 != null) {
-            prefix = prefix2;
-            prefix2 = null;
-        }
-    }
+  public void setInsertSetMode() {
+    this.insertBindBuffer = new StringBuilder(100);
+    this.insertMode = 1;
+    this.prefix = "";
+    this.prefix2 = ", ";
+  }
 
-    public int getBindColumnCount() {
-        return bindColumnCount;
-    }
-    
-    public String getInsertBindBuffer() {
-        return insertBindBuffer.toString();
-    }
-
-    public String toString() {
-        return sb.toString();
-    }
-
-    public void setWhereIdMode() {
-        this.prefix = "";
-        this.prefix2 = " and ";
-    }
-
-    public void setInsertSetMode() {
-        this.insertBindBuffer = new StringBuilder(100);
-        this.insertMode = 1;
-        this.prefix = "";
-        this.prefix2 = ", ";
-    }
-
-    public void setUpdateSetMode() {
-        this.prefix = "";
-        this.prefix2 = ", ";
-    }
+  public void setUpdateSetMode() {
+    this.prefix = "";
+    this.prefix2 = ", ";
+  }
 
 }

@@ -1,22 +1,16 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import java.sql.SQLException;
-
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
 
+import java.sql.SQLException;
+
 /**
  * Plan for executing bean updates for a given set of changed properties.
  */
 public class UpdatePlan implements SpiUpdatePlan {
-
-  /**
-   * Special plan used when there is nothing in the set clause and the update should in fact be
-   * skipped. Occurs when the updated properties have updatable=false in their deployment.
-   */
-  public static final UpdatePlan EMPTY_SET_CLAUSE = new UpdatePlan();
 
   private final Integer key;
 
@@ -51,18 +45,6 @@ public class UpdatePlan implements SpiUpdatePlan {
     this.sql = sql;
     this.set = set;
     this.timeCreated = System.currentTimeMillis();
-  }
-
-  /**
-   * Special constructor for emptySetClause=true instance.
-   */
-  private UpdatePlan() {
-    this.emptySetClause = true;
-    this.key = 0;
-    this.mode = ConcurrencyMode.NONE;
-    this.sql = null;
-    this.set = null;
-    this.timeCreated = 0;
   }
 
   public boolean isEmptySetClause() {

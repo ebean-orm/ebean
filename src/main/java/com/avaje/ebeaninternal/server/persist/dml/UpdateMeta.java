@@ -1,9 +1,5 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
@@ -14,6 +10,10 @@ import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableId;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableList;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Meta data for update handler. The meta data is for a particular bean type. It
@@ -72,12 +72,12 @@ public final class UpdateMeta {
     id.dmlBind(bind, bean);
 
     switch (persist.getConcurrencyMode()) {
-    case VERSION:
-      version.dmlBind(bind, bean);
-      break;
+      case VERSION:
+        version.dmlBind(bind, bean);
+        break;
 
-    default:
-      break;
+      default:
+        break;
     }
   }
 
@@ -93,14 +93,14 @@ public final class UpdateMeta {
     // 'full bean' update...
     ConcurrencyMode mode = request.determineConcurrencyMode();
     switch (mode) {
-    case NONE:
-      return modeNoneUpdatePlan;
+      case NONE:
+        return modeNoneUpdatePlan;
 
-    case VERSION:
-      return modeVersionUpdatePlan;
+      case VERSION:
+        return modeVersionUpdatePlan;
 
-    default:
-      throw new RuntimeException("Invalid mode " + mode);
+      default:
+        throw new RuntimeException("Invalid mode " + mode);
     }
   }
 
@@ -116,7 +116,7 @@ public final class UpdateMeta {
     }
 
     BeanDescriptor<?> beanDescriptor = persistRequest.getBeanDescriptor();
-    
+
     BeanProperty versionProperty = beanDescriptor.getVersionProperty();
     if (versionProperty != null) {
       if (ebi.isLoadedProperty(versionProperty.getPropertyIndex())) {
@@ -136,7 +136,7 @@ public final class UpdateMeta {
 
     // build a bindableList that only contains the changed properties
     List<Bindable> list = new ArrayList<Bindable>();
-    set.addToUpdate(persistRequest, list);  
+    set.addToUpdate(persistRequest, list);
     BindableList bindableList = new BindableList(list);
 
     ConcurrencyMode mode = persistRequest.determineConcurrencyMode();
@@ -161,7 +161,7 @@ public final class UpdateMeta {
 
     request.setUpdateSetMode();
     bindableList.dmlAppend(request);
-    
+
     if (request.getBindColumnCount() == 0) {
       // update properties must have been updatable=false
       // with the result that nothing is in the set clause
@@ -179,7 +179,7 @@ public final class UpdateMeta {
       }
       version.dmlAppend(request);
     }
-    
+
     return request.toString();
   }
 

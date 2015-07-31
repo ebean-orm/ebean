@@ -1,8 +1,5 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -16,6 +13,9 @@ import com.avaje.ebeaninternal.server.persist.dmlbind.FactoryBaseProperties;
 import com.avaje.ebeaninternal.server.persist.dmlbind.FactoryEmbedded;
 import com.avaje.ebeaninternal.server.persist.dmlbind.FactoryId;
 import com.avaje.ebeaninternal.server.persist.dmlbind.FactoryVersion;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Factory for creating InsertMeta UpdateMeta and DeleteMeta.

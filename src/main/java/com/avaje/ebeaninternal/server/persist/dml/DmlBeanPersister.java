@@ -20,8 +20,6 @@ import java.sql.SQLException;
  */
 public final class DmlBeanPersister implements BeanPersister {
 
-	private static final Logger logger = LoggerFactory.getLogger(DmlBeanPersister.class);
-
 	private final UpdateMeta updateMeta;
 
 	private final InsertMeta insertMeta;

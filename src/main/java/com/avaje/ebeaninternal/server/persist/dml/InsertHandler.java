@@ -1,17 +1,5 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -22,11 +10,22 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.persist.DmlUtil;
 import com.avaje.ebeaninternal.server.type.DataBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Insert bean handler.
  */
 public class InsertHandler extends DmlHandler {
+
   private static final Logger logger = LoggerFactory.getLogger(InsertHandler.class);
 
   /**
@@ -143,18 +142,18 @@ public class InsertHandler extends DmlHandler {
     List<DerivedRelationshipData> derivedRelationships = persistRequest.getDerivedRelationships();
     if (derivedRelationships != null) {
 
-      SpiEbeanServer ebeanServer = (SpiEbeanServer)persistRequest.getEbeanServer();
+      SpiEbeanServer ebeanServer = (SpiEbeanServer) persistRequest.getEbeanServer();
 
       for (int i = 0; i < derivedRelationships.size(); i++) {
         DerivedRelationshipData derivedRelationshipData = derivedRelationships.get(i);
 
         BeanDescriptor<?> beanDescriptor = ebeanServer.getBeanDescriptor(derivedRelationshipData.getBean().getClass());
-        
+
         BeanProperty prop = beanDescriptor.getBeanProperty(derivedRelationshipData.getLogicalName());
-        EntityBean entityBean = (EntityBean)derivedRelationshipData.getBean();
+        EntityBean entityBean = (EntityBean) derivedRelationshipData.getBean();
         entityBean._ebean_getIntercept().markPropertyAsChanged(prop.getPropertyIndex());
-        
-        ebeanServer.update(entityBean, transaction);        
+
+        ebeanServer.update(entityBean, transaction);
       }
     }
   }
