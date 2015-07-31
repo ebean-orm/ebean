@@ -15,9 +15,6 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.event.BeanPersistAdapter;
 import com.avaje.ebean.event.BeanPersistRequest;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
@@ -30,8 +27,6 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
  * </p>
  */
 public class BeanLifecycleAdapterFactory {
-
-  private static final Logger logger = LoggerFactory.getLogger(BeanLifecycleAdapterFactory.class);
 
   /**
    * Register a BeanPersistController for methods annotated with lifecycle events.
