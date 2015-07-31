@@ -1,16 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.sql.Types;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.persistence.EmbeddedId;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.Version;
-
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
 import com.avaje.ebean.annotation.WhenCreated;
@@ -19,7 +8,6 @@ import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebeaninternal.server.core.InternString;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyGetter;
@@ -27,6 +15,16 @@ import com.avaje.ebeaninternal.server.properties.BeanPropertySetter;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.ScalarTypeEnum;
 import com.avaje.ebeaninternal.server.type.ScalarTypeWrapper;
+
+import javax.persistence.EmbeddedId;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.Version;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.sql.Types;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Description of a property of a bean. Includes its deployment information such
@@ -38,29 +36,6 @@ public class DeployBeanProperty {
   private static final int UNIDIRECTIONAL_ORDER = 100000;
   private static final int AUDITCOLUMN_ORDER = -1000000;
   private static final int VERSIONCOLUMN_ORDER = -1000000;
-
-  /**
-   * Advanced bean deployment. To exclude this property from update where
-   * clause.
-   */
-  public static final String EXCLUDE_FROM_UPDATE_WHERE = "EXCLUDE_FROM_UPDATE_WHERE";
-
-  /**
-   * Advanced bean deployment. To exclude this property from delete where
-   * clause.
-   */
-  public static final String EXCLUDE_FROM_DELETE_WHERE = "EXCLUDE_FROM_DELETE_WHERE";
-
-  /**
-   * Advanced bean deployment. To exclude this property from insert.
-   */
-  public static final String EXCLUDE_FROM_INSERT = "EXCLUDE_FROM_INSERT";
-
-  /**
-   * Advanced bean deployment. To exclude this property from update set
-   * clause.
-   */
-  public static final String EXCLUDE_FROM_UPDATE = "EXCLUDE_FROM_UPDATE";
 
   /**
    * Flag to mark this at part of the unique id.
@@ -181,11 +156,6 @@ public class DeployBeanProperty {
    * The jdbc data type this maps to.
    */
   private int dbType;
-
-  /**
-   * The default value to insert if null.
-   */
-  private Object defaultValue;
 
   /**
    * Extra deployment parameters.
@@ -608,7 +578,7 @@ public class DeployBeanProperty {
     this.dbUpdateable = false;
   }
 
-  public String getElPlaceHolder(EntityType et) {
+  public String getElPlaceHolder() {
     if (sqlFormulaSelect != null) {
       return sqlFormulaSelect;
     } else {
@@ -724,25 +694,11 @@ public class DeployBeanProperty {
   }
 
   /**
-   * Set the DB bind parameter (if different from "?").
-   */
-  public void setDbBind(String dbBind) {
-    this.dbBind = dbBind;
-  }
-
-  /**
    * Return true if this property is encrypted in the DB.
    */
   public boolean isDbEncrypted() {
     return dbEncrypted;
   }
-
-//    /**
-//     * Set true if this property should be encrypted in the DB.
-//     */
-//    public void setDbEncrypted(boolean dbEncrypted) {
-//        this.dbEncrypted = dbEncrypted;
-//    }
 
   public DbEncryptFunction getDbEncryptFunction() {
     return dbEncryptFunction;
@@ -765,13 +721,6 @@ public class DeployBeanProperty {
    */
   public int getDbEncryptedType() {
     return dbEncryptedType;
-  }
-
-  /**
-   * Set the DB type used to store the encrypted value.
-   */
-  public void setDbEncryptedType(int dbEncryptedType) {
-    this.dbEncryptedType = dbEncryptedType;
   }
 
   /**
@@ -867,34 +816,6 @@ public class DeployBeanProperty {
 
   public Map<String, String> getExtraAttributeMap() {
     return extraAttributeMap;
-  }
-
-  /**
-   * Return an extra attribute set on this property.
-   */
-  public String getExtraAttribute(String key) {
-    return extraAttributeMap.get(key);
-  }
-
-  /**
-   * Set an extra attribute set on this property.
-   */
-  public void setExtraAttribute(String key, String value) {
-    extraAttributeMap.put(key, value);
-  }
-
-  /**
-   * Return the default value.
-   */
-  public Object getDefaultValue() {
-    return defaultValue;
-  }
-
-  /**
-   * Set the default value. Inserted if the value is null.
-   */
-  public void setDefaultValue(Object defaultValue) {
-    this.defaultValue = defaultValue;
   }
 
   public String toString() {

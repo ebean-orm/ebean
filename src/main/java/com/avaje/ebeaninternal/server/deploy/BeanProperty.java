@@ -176,11 +176,6 @@ public class BeanProperty implements ElPropertyValue {
   final boolean excludedFromHistory;
 
   /**
-   * The default value to insert if null.
-   */
-  final Object defaultValue;
-
-  /**
    * Extra deployment parameters.
    */
   final Map<String, String> extraAttributeMap;
@@ -295,16 +290,14 @@ public class BeanProperty implements ElPropertyValue {
     this.formula = sqlFormulaSelect != null;
 
     this.extraAttributeMap = deploy.getExtraAttributeMap();
-    this.defaultValue = deploy.getDefaultValue();
     this.dbType = deploy.getDbType();
     this.scalarType = deploy.getScalarType();
     this.lob = isLobType(dbType);
     this.propertyType = deploy.getPropertyType();
     this.field = deploy.getField();
 
-    EntityType et = descriptor == null ? null : descriptor.getEntityType();
-    this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), false, null);
-    this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(et), dbEncrypted, dbColumn);
+    this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), false, null);
+    this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), dbEncrypted, dbColumn);
 
     this.jsonSerialize = deploy.isJsonSerialize();
     this.jsonDeserialize = deploy.isJsonDeserialize();
@@ -380,7 +373,6 @@ public class BeanProperty implements ElPropertyValue {
     this.getter = source.getter;
     this.setter = source.setter;
     this.extraAttributeMap = source.extraAttributeMap;
-    this.defaultValue = source.getDefaultValue();
     this.dbType = source.getDbType();
     this.scalarType = source.scalarType;
     this.lob = isLobType(dbType);
@@ -1064,13 +1056,6 @@ public class BeanProperty implements ElPropertyValue {
    */
   public boolean isEmbedded() {
     return embedded;
-  }
-
-  /**
-   * Return the default value.
-   */
-  public Object getDefaultValue() {
-    return defaultValue;
   }
 
   public String toString() {
