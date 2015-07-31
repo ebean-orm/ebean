@@ -41,10 +41,6 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
         return prop.getValue(bean);
     }
 
-    public void elSetReference(EntityBean bean) {
-        // Do nothing
-    }
-
     public void elSetValue(EntityBean bean, Object value, boolean populate) {
         prop.setValue(bean, value);
     }

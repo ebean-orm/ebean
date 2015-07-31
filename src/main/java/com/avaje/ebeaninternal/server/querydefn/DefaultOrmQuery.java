@@ -597,10 +597,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return forUpdate;
   }
 
-  public DefaultOrmQuery<T> setAutoFetch(boolean autoFetch) {
-    return setAutofetch(autoFetch);
-  }
-
   public DefaultOrmQuery<T> setAutofetch(boolean autoFetch) {
     this.autoFetch = autoFetch;
     return this;
@@ -905,10 +901,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     this.rawWhereClause = rawWhereClause;
   }
 
-  public DefaultOrmQuery<T> setProperties(String columns) {
-    return select(columns);
-  }
-
   public void setDefaultSelectClause() {
     detail.setDefaultSelectClause(beanDescriptor);
   }
@@ -1052,10 +1044,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       orderBy = new OrderBy<T>(this, null);
     }
     return orderBy;
-  }
-
-  public DefaultOrmQuery<T> setOrderBy(String orderByClause) {
-    return order(orderByClause);
   }
 
   public DefaultOrmQuery<T> orderBy(String orderByClause) {
