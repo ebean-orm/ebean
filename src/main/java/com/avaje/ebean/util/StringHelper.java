@@ -155,10 +155,7 @@ public class StringHelper {
    * Return true if the value is null or an empty string.
    */
   public static boolean isNull(String value) {
-    if (value == null || value.trim().length() == 0) {
-      return true;
-    }
-    return false;
+    return value == null || value.trim().length() == 0;
   }
 
   /**

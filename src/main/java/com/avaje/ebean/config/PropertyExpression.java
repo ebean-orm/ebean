@@ -144,13 +144,7 @@ final class PropertyExpression {
   }
 
   private static boolean isJndiExpression(String exp) {
-    if (exp.startsWith("JNDI:")) {
-      return true;
-    }
-    if (exp.startsWith("jndi:")) {
-      return true;
-    }
-    return false;
+    return exp.startsWith("JNDI:") || exp.startsWith("jndi:");
   }
 
   /**

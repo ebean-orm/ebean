@@ -149,11 +149,8 @@ public class DRawSqlSelectBuilder {
 		if (placeHolderHaving > -1) {
 			return true;
 		}
-		if (placeHolderAndHaving > -1) {
-			return true;
-		}
-		return false;
-	}
+    return placeHolderAndHaving > -1;
+  }
 
 	/**
 	 * Trim off the select keyword (to support row_number() limit function).

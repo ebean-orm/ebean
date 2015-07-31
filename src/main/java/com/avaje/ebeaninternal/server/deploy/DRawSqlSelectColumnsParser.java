@@ -215,11 +215,8 @@ public final class DRawSqlSelectColumnsParser {
 		if (columnLabel.equalsIgnoreCase(prop.getDbColumn())) {
 			return true;
 		}
-		if (columnLabel.equalsIgnoreCase(prop.getName())) {
-			return true;
-		}
-		return false;
-	}
+    return columnLabel.equalsIgnoreCase(prop.getName());
+  }
 
 	private int nextComma() {
 		boolean inQuote = false;

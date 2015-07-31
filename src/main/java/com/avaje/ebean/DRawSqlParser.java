@@ -107,10 +107,7 @@ class DRawSqlParser {
     if (placeHolderHaving > -1) {
       return true;
     }
-    if (placeHolderAndHaving > -1) {
-      return true;
-    }
-    return false;
+    return placeHolderAndHaving > -1;
   }
 
   /**

@@ -272,10 +272,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
    * Checks string is null or empty .
    */
   protected boolean isEmpty(String s) {
-    if (s == null || s.trim().length() == 0) {
-      return true;
-    }
-    return false;
+    return s == null || s.trim().length() == 0;
   }
 
   /**

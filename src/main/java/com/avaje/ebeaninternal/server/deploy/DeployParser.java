@@ -167,20 +167,10 @@ public abstract class DeployParser {
 		} else if (ch == UNDERSCORE) {
 			return true;
 
-		} else if (ch == PERIOD) {
-			return true;
-
-		} else {
-			return false;
-		}
+		} else return ch == PERIOD;
 	}
 
 	private boolean isWordStart(char ch) {
-		if (Character.isLetter(ch)) {
-			return true;
-
-		} else {
-			return false;
-		}
+    return Character.isLetter(ch);
 	}
 }

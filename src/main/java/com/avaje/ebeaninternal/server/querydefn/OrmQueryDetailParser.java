@@ -184,15 +184,6 @@ public class OrmQueryDetailParser {
   }
 
   private boolean isFindFetchEnd() {
-    if (isFetch()) {
-      return true;
-    }
-    if (parser.isMatch("where")) {
-      return true;
-    }
-    if (parser.isMatch("order", "by")) {
-      return true;
-    }
-    return false;
+    return isFetch() || parser.isMatch("where") || parser.isMatch("order", "by");
   }
 }

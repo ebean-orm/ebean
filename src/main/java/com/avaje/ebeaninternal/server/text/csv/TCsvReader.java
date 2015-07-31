@@ -245,11 +245,8 @@ public class TCsvReader<T> implements CsvReader<T> {
 	}
 
 	private boolean isDateTimeType(int t) {
-		if (t == Types.TIMESTAMP || t == Types.DATE || t == Types.TIME) {
-			return true;
-		}
-		return false;
-	}
+    return t == Types.TIMESTAMP || t == Types.DATE || t == Types.TIME;
+  }
 
 	@SuppressWarnings("unchecked")
 	protected T buildBeanFromLineContent(int row, String[] line) {

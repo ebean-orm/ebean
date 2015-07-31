@@ -23,11 +23,7 @@ public class AddForeignKeysVisitor extends AbstractBeanVisitor {
 	}
 
   public boolean visitBean(BeanDescriptor<?> descriptor) {
-    if (!descriptor.isInheritanceRoot()) {
-      // ignore/skip if not a top level BeanDescriptor
-      return false;
-    }
-    return true;
+    return descriptor.isInheritanceRoot();
   }
 
   public void visitBeanEnd(BeanDescriptor<?> descriptor) {

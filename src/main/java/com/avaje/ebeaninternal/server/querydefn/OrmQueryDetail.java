@@ -357,10 +357,7 @@ public class OrmQueryDetail implements Serializable {
    * Return true if this is actually the root level of a +query/+lazy loading query.
    */
   private boolean isLazyLoadManyRoot(String lazyLoadManyPath, OrmQueryProperties chunk) {
-    if (lazyLoadManyPath != null && lazyLoadManyPath.equals(chunk.getPath())) {
-      return true;
-    }
-    return false;
+    return lazyLoadManyPath != null && lazyLoadManyPath.equals(chunk.getPath());
   }
 
   /**

@@ -160,11 +160,7 @@ public class InternalConfiguration {
       return true;
     }
     DataSource dataSource = serverConfig.getDataSource();
-    if (dataSource instanceof DataSourcePool && ((DataSourcePool)dataSource).getAutoCommit()) {
-      // We know the DataSourcePool is using autoCommit
-      return true;
-    }
-    return false;
+    return dataSource instanceof DataSourcePool && ((DataSourcePool) dataSource).getAutoCommit();
   }
 
   public JsonContext createJsonContext(SpiEbeanServer server) {
