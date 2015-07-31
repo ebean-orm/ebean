@@ -31,6 +31,7 @@ import com.avaje.ebeaninternal.server.properties.BeanPropertyInfo;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfoFactory;
 import com.avaje.ebeaninternal.server.properties.EnhanceBeanPropertyInfoFactory;
 import com.avaje.ebeaninternal.server.type.TypeManager;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1393,11 +1394,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
     Field[] fields = beanClass.getDeclaredFields();
     for (Field field : fields) {
-      if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
-        // ignore this field
-      } else if (field.isAnnotationPresent(Transient.class)) {
-        // ignore this field
-      } else {
+      if (!Modifier.isStatic(field.getModifiers())
+          && !Modifier.isTransient(field.getModifiers())
+          && !field.isAnnotationPresent(Transient.class)) {
         return false;
       }
     }
