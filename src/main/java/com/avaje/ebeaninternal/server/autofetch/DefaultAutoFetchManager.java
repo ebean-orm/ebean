@@ -329,17 +329,15 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 		synchronized (statisticsMonitor) {
 
 		    Counters counters = new Counters();
-		    
-			Iterator<Statistics> it = statisticsMap.values().iterator();
-			while (it.hasNext()) {
-				Statistics queryPointStatistics = it.next();
-				if (!queryPointStatistics.hasUsage()){
-				    // no usage statistics collected yet...
-				    counters.incrementNoUsage();
-				} else {
-				    updateTunedQueryFromUsage(counters, queryPointStatistics);
-				}
-			}
+
+      for (Statistics queryPointStatistics : statisticsMap.values()) {
+        if (!queryPointStatistics.hasUsage()) {
+          // no usage statistics collected yet...
+          counters.incrementNoUsage();
+        } else {
+          updateTunedQueryFromUsage(counters, queryPointStatistics);
+        }
+      }
 
 			String summaryInfo = counters.toString();
 

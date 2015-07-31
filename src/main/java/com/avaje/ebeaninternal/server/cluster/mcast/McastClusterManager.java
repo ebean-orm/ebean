@@ -376,13 +376,11 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
 
       totalPacketsResent += s.size();
 
-      Iterator<Long> it = s.iterator();
-      while (it.hasNext()) {
-        Long resendPacketId = it.next();
+      for (Long resendPacketId : s) {
         Packet packet = outgoingPacketsCache.getPacket(resendPacketId);
         if (packet == null) {
           String msg = "Cluster unable to resend packet[" + resendPacketId + "] as it is no longer in the " +
-                  "outgoingPacketsCache";
+              "outgoingPacketsCache";
           logger.error(msg);
         } else {
           int resendCount = packet.incrementResendCount();
@@ -390,7 +388,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
             resendPacket(packet);
           } else {
             String msg = "Cluster maxResendOutgoing [" + maxResendOutgoing + "] hit for packet " + resendPacketId
-                    + ". We will not try to send it anymore, removing it from the outgoingPacketsCache.";
+                + ". We will not try to send it anymore, removing it from the outgoingPacketsCache.";
             logger.error(msg);
             outgoingPacketsCache.remove(packet);
           }

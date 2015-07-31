@@ -76,12 +76,10 @@ public class Statistics implements Serializable {
 			}
 		    
 			PathProperties pathProps = new PathProperties();
-			
-			Iterator<StatisticsNodeUsage> it = nodeUsageMap.values().iterator();
-			while (it.hasNext()) {
-				StatisticsNodeUsage statsNode = it.next();
-				statsNode.buildTunedFetch(pathProps, rootDesc);
-			}
+
+      for (StatisticsNodeUsage statsNode : nodeUsageMap.values()) {
+        statsNode.buildTunedFetch(pathProps, rootDesc);
+      }
 
 	        OrmQueryDetail detail = new OrmQueryDetail();
 
