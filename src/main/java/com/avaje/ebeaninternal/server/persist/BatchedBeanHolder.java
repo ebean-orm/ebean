@@ -54,7 +54,7 @@ public class BatchedBeanHolder {
    * Set of beans in this batch. This is used to ensure that a single bean instance is not included
    * in the batch twice (two separate insert requests etc).
    */
-  private final IdentityHashMap<Object,Object> persistedBeans = new IdentityHashMap<Object,Object>();
+  private final IdentityHashMap<Object, Object> persistedBeans = new IdentityHashMap<Object, Object>();
 
   /**
    * Create a new entry with a given type and depth.
@@ -100,7 +100,7 @@ public class BatchedBeanHolder {
   }
 
   public String toString() {
-    StringBuilder sb = new StringBuilder(shortDesc.length()+18);
+    StringBuilder sb = new StringBuilder(shortDesc.length() + 18);
     sb.append(shortDesc);
     if (inserts != null) {
       sb.append(" i:").append(inserts.size());

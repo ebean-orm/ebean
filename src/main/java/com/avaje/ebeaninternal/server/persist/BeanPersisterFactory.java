@@ -6,10 +6,10 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
  * Factory for creating BeanPersister implementations.
  */
 public interface BeanPersisterFactory {
-	
-	/**
-	 * Create the BeanPersister implemenation for a given type.
-	 */
-	BeanPersister create(BeanDescriptor<?> desc);
+
+  /**
+   * Create the BeanPersister implemenation for a given type.
+   */
+  BeanPersister create(BeanDescriptor<?> desc);
 
 }

@@ -1066,7 +1066,7 @@ public final class DefaultPersister implements Persister {
 
   /**
    * Cascade delete child entities by Id.
-   * <p/>
+   * <p>
    * Will use delete by object if the child entity has manyToMany relationships.
    */
   private void deleteChildrenById(SpiTransaction t, BeanDescriptor<?> targetDesc, List<Object> childIds) {
@@ -1202,7 +1202,7 @@ public final class DefaultPersister implements Persister {
 
   /**
    * Create an Insert or Update PersistRequestBean when cascading.
-   * <p/>
+   * <p>
    * This call determines the PersistRequest.Type based on bean state and the insert flag (root persist type).
    */
   private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, boolean insertMode) {

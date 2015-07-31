@@ -9,19 +9,19 @@ import com.avaje.ebeaninternal.server.core.PersistRequestBean;
  */
 public interface BeanPersister {
 
-	/**
-	 * execute the insert bean request.
-	 */
-	 void insert(PersistRequestBean<?>  request) throws PersistenceException;
+  /**
+   * execute the insert bean request.
+   */
+  void insert(PersistRequestBean<?> request) throws PersistenceException;
 
-	/**
-	 * execute the update bean request.
-	 */
-	 void update(PersistRequestBean<?>  request) throws PersistenceException;
+  /**
+   * execute the update bean request.
+   */
+  void update(PersistRequestBean<?> request) throws PersistenceException;
 
-	/**
-	 * execute the delete bean request.
-	 */
-	 void delete(PersistRequestBean<?> request) throws PersistenceException;
+  /**
+   * execute the delete bean request.
+   */
+  void delete(PersistRequestBean<?> request) throws PersistenceException;
 
 }

@@ -18,79 +18,79 @@ import com.avaje.ebeaninternal.server.core.PstmtBatch;
 public class PstmtFactory {
 
 
-	private final PstmtBatch pstmtBatch;
-	
-	public PstmtFactory(PstmtBatch pstmtBatch) {
-		this.pstmtBatch = pstmtBatch;
-	}
-	
-	/**
-	 * Get a callable statement without any batching.
-	 */
-	public CallableStatement getCstmt(SpiTransaction t, String sql) throws SQLException {
-		Connection conn = t.getInternalConnection();
-		return conn.prepareCall(sql);
-	}
+  private final PstmtBatch pstmtBatch;
 
-	/**
-	 * Get a prepared statement without any batching.
-	 */
-	public PreparedStatement getPstmt(SpiTransaction t, String sql) throws SQLException {
-		Connection conn = t.getInternalConnection();
-		return conn.prepareStatement(sql);
-	}
+  public PstmtFactory(PstmtBatch pstmtBatch) {
+    this.pstmtBatch = pstmtBatch;
+  }
 
-	/**
-	 * Return a prepared statement taking into account batch requirements.
-	 */
-	public PreparedStatement getPstmt(SpiTransaction t, boolean logSql, String sql, BatchPostExecute batchExe)
-			throws SQLException {
+  /**
+   * Get a callable statement without any batching.
+   */
+  public CallableStatement getCstmt(SpiTransaction t, String sql) throws SQLException {
+    Connection conn = t.getInternalConnection();
+    return conn.prepareCall(sql);
+  }
 
-		BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
-		PreparedStatement stmt = batch.getStmt(sql, batchExe);
+  /**
+   * Get a prepared statement without any batching.
+   */
+  public PreparedStatement getPstmt(SpiTransaction t, String sql) throws SQLException {
+    Connection conn = t.getInternalConnection();
+    return conn.prepareStatement(sql);
+  }
 
-		if (stmt != null) {
-			return stmt;
-		}
+  /**
+   * Return a prepared statement taking into account batch requirements.
+   */
+  public PreparedStatement getPstmt(SpiTransaction t, boolean logSql, String sql, BatchPostExecute batchExe)
+      throws SQLException {
 
-		if (logSql){
-		    t.logSql(sql);
-		}
-		
-		Connection conn = t.getInternalConnection();
-		stmt = conn.prepareStatement(sql);
+    BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
+    PreparedStatement stmt = batch.getStmt(sql, batchExe);
 
-		if (pstmtBatch != null){
-        	pstmtBatch.setBatchSize(stmt, t.getBatchControl().getBatchSize());
-        }
-		
-		BatchedPstmt bs = new BatchedPstmt(stmt, false, sql, pstmtBatch, false);
-		batch.addStmt(bs, batchExe);
-		return stmt;
-	}
+    if (stmt != null) {
+      return stmt;
+    }
 
-	/**
-	 * Return a callable statement taking into account batch requirements.
-	 */
-	public CallableStatement getCstmt(SpiTransaction t, boolean logSql, String sql, BatchPostExecute batchExe)
-			throws SQLException {
+    if (logSql) {
+      t.logSql(sql);
+    }
 
-		BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
-		CallableStatement stmt = (CallableStatement) batch.getStmt(sql, batchExe);
+    Connection conn = t.getInternalConnection();
+    stmt = conn.prepareStatement(sql);
 
-		if (stmt != null) {
-			return stmt;
-		}
-		
-		if (logSql){
-		    t.logSql(sql);
-		}
+    if (pstmtBatch != null) {
+      pstmtBatch.setBatchSize(stmt, t.getBatchControl().getBatchSize());
+    }
 
-		Connection conn = t.getInternalConnection();
-		stmt = conn.prepareCall(sql);
+    BatchedPstmt bs = new BatchedPstmt(stmt, false, sql, pstmtBatch, false);
+    batch.addStmt(bs, batchExe);
+    return stmt;
+  }
 
-		BatchedPstmt bs = new BatchedPstmt(stmt, false, sql, pstmtBatch, false);
-		batch.addStmt(bs, batchExe);
-		return stmt;
-	}
+  /**
+   * Return a callable statement taking into account batch requirements.
+   */
+  public CallableStatement getCstmt(SpiTransaction t, boolean logSql, String sql, BatchPostExecute batchExe)
+      throws SQLException {
+
+    BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
+    CallableStatement stmt = (CallableStatement) batch.getStmt(sql, batchExe);
+
+    if (stmt != null) {
+      return stmt;
+    }
+
+    if (logSql) {
+      t.logSql(sql);
+    }
+
+    Connection conn = t.getInternalConnection();
+    stmt = conn.prepareCall(sql);
+
+    BatchedPstmt bs = new BatchedPstmt(stmt, false, sql, pstmtBatch, false);
+    batch.addStmt(bs, batchExe);
+    return stmt;
+  }
 }

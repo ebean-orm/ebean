@@ -20,76 +20,76 @@ import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
  * This bean effectively holds the foreign properties that where not loaded, and
  * helps fetch the foreign keys and delete the appropriate rows.
  * </p>
- * 
+ *
  * @author rbygrave
  */
 public class DeleteUnloadedForeignKeys {
 
-    private final List<BeanPropertyAssocOne<?>> propList = new ArrayList<BeanPropertyAssocOne<?>>(4);
-    
-    private final SpiEbeanServer server; 
-    
-    private final PersistRequestBean<?> request;
+  private final List<BeanPropertyAssocOne<?>> propList = new ArrayList<BeanPropertyAssocOne<?>>(4);
 
-    private EntityBean beanWithForeignKeys;
-    
-    public DeleteUnloadedForeignKeys(SpiEbeanServer server, PersistRequestBean<?> request) {
-        this.server = server;
-        this.request = request;
-    }
-    
-    public boolean isEmpty() {
-        return propList.isEmpty();
-    }
-    
-    public void add(BeanPropertyAssocOne<?> prop) {
-        propList.add(prop);
-    }
+  private final SpiEbeanServer server;
 
-    /**
-     * Execute a query fetching the missing (unloaded) foreign keys. We need to
-     * fetch these key values before the parent bean is deleted.
-     */
-    public void queryForeignKeys() {
+  private final PersistRequestBean<?> request;
 
-        BeanDescriptor<?> descriptor = request.getBeanDescriptor();
-        SpiQuery<?> q = (SpiQuery<?>) server.createQuery(descriptor.getBeanType());
+  private EntityBean beanWithForeignKeys;
 
-        Object id = request.getBeanId();
+  public DeleteUnloadedForeignKeys(SpiEbeanServer server, PersistRequestBean<?> request) {
+    this.server = server;
+    this.request = request;
+  }
 
-        StringBuilder sb = new StringBuilder(30);
-        for (int i = 0; i < propList.size(); i++) {
-            sb.append(propList.get(i).getName()).append(",");
-        }
+  public boolean isEmpty() {
+    return propList.isEmpty();
+  }
 
-        // run query in a separate persistence context
-        q.setPersistenceContext(new DefaultPersistenceContext());
-        q.setPersistenceContextScope(PersistenceContextScope.QUERY);
-        q.setAutofetch(false);
-        q.select(sb.toString());
-        q.where().idEq(id);
+  public void add(BeanPropertyAssocOne<?> prop) {
+    propList.add(prop);
+  }
 
-        SpiTransaction t = request.getTransaction();
-        if (t.isLogSummary()) {
-        	t.logSummary("-- Ebean fetching foreign key values for delete of " + descriptor.getName() + " id:" + id);
-        }
-        beanWithForeignKeys = (EntityBean)server.findUnique(q, t);
+  /**
+   * Execute a query fetching the missing (unloaded) foreign keys. We need to
+   * fetch these key values before the parent bean is deleted.
+   */
+  public void queryForeignKeys() {
+
+    BeanDescriptor<?> descriptor = request.getBeanDescriptor();
+    SpiQuery<?> q = (SpiQuery<?>) server.createQuery(descriptor.getBeanType());
+
+    Object id = request.getBeanId();
+
+    StringBuilder sb = new StringBuilder(30);
+    for (int i = 0; i < propList.size(); i++) {
+      sb.append(propList.get(i).getName()).append(",");
     }
 
-    /**
-     * Delete the rows relating to the foreign keys. These deletions occur after
-     * the parent bean has been deleted.
-     */
-    public void deleteCascade() {
+    // run query in a separate persistence context
+    q.setPersistenceContext(new DefaultPersistenceContext());
+    q.setPersistenceContextScope(PersistenceContextScope.QUERY);
+    q.setAutofetch(false);
+    q.select(sb.toString());
+    q.where().idEq(id);
 
-        for (int i = 0; i < propList.size(); i++) {
-            BeanPropertyAssocOne<?> prop = propList.get(i);
-            Object detailBean = prop.getValue(beanWithForeignKeys);
-
-            // if bean exists with a unique id then delete it
-            if (detailBean != null && prop.hasId((EntityBean)detailBean)) {
-                server.delete(detailBean, request.getTransaction());
-            }
-        }
+    SpiTransaction t = request.getTransaction();
+    if (t.isLogSummary()) {
+      t.logSummary("-- Ebean fetching foreign key values for delete of " + descriptor.getName() + " id:" + id);
     }
+    beanWithForeignKeys = (EntityBean) server.findUnique(q, t);
+  }
+
+  /**
+   * Delete the rows relating to the foreign keys. These deletions occur after
+   * the parent bean has been deleted.
+   */
+  public void deleteCascade() {
+
+    for (int i = 0; i < propList.size(); i++) {
+      BeanPropertyAssocOne<?> prop = propList.get(i);
+      Object detailBean = prop.getValue(beanWithForeignKeys);
+
+      // if bean exists with a unique id then delete it
+      if (detailBean != null && prop.hasId((EntityBean) detailBean)) {
+        server.delete(detailBean, request.getTransaction());
+      }
+    }
+  }
 }
