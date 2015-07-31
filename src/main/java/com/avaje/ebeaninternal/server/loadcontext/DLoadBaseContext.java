@@ -14,9 +14,7 @@ public abstract class DLoadBaseContext {
 	protected final DLoadContext parent;
 
 	protected final BeanDescriptor<?> desc;
-	
-	protected final String path;
-	
+
 	protected final String fullPath;
 
 	protected final OrmQueryProperties queryProps;
@@ -40,7 +38,6 @@ public abstract class DLoadBaseContext {
     this.serverName = parent.getEbeanServer().getName();
     this.desc = desc;
     this.queryProps = queryProps;
-    this.path = path;
     this.fullPath = parent.getFullPath(path);
 
     this.hitCache = !parent.isExcludeBeanCache() && desc.isBeanCaching();    

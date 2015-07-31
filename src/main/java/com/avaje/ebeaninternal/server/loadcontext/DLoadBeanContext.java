@@ -91,9 +91,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
       if (bufferList != null) {
         for (LoadBuffer loadBuffer : bufferList) {
           if (!loadBuffer.list.isEmpty()) {
-            boolean loadCache = false;
-            LoadBeanRequest req = new LoadBeanRequest(loadBuffer, parentRequest, false, null, loadCache);
-    
+            LoadBeanRequest req = new LoadBeanRequest(loadBuffer, parentRequest, false, null, false);
             parent.getEbeanServer().loadBean(req);  
             if (!queryProps.isQueryFetchAll()) {
               // Stop - only fetch the first batch ... the rest will be lazy loaded
