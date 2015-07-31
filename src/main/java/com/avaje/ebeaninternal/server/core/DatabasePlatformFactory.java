@@ -50,7 +50,7 @@ public class DatabasePlatformFactory {
   /**
    * Lookup the platform by name.
    */
-  private DatabasePlatform byDatabaseName(String dbName) throws SQLException {
+  private DatabasePlatform byDatabaseName(String dbName) {
 
     dbName = dbName.toLowerCase();
     if (dbName.equals("postgres") || dbName.equals("postgres9")) {

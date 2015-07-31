@@ -88,11 +88,7 @@ public final class DmlBeanPersister implements BeanPersister {
 
 		} finally {
 			if (!batched && handler != null) {
-				try {
-					handler.close();
-				} catch (SQLException e) {
-					logger.error(null, e);
-				}
+        handler.close();
 			}
 		}
 	}

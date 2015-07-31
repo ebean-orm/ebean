@@ -212,7 +212,7 @@ public class Binder {
   /**
    * Binds the value to the statement according to the data type.
    */
-  private void bindSimpleData(DataBind b, int dataType, Object data) throws SQLException {
+  private void bindSimpleData(DataBind b, int dataType, Object data) {
 
     try {
       switch (dataType) {
