@@ -253,20 +253,6 @@ public class ElPropertyChain implements ElPropertyValue {
 		return chain[last].elGetValue(prevBean);
 	}
 	
-
-	public void elSetLoaded(EntityBean bean) {
-
-		for (int i = 0; i < last; i++) {
-			bean = (EntityBean)chain[i].elGetValue(bean);
-			if (bean == null){
-				break;
-			}
-		}
-		if (bean != null){
-			bean._ebean_getIntercept().setLoaded();
-		}
-	}
-
 	public void elSetValue(EntityBean bean, Object value, boolean populate) {
 
 		EntityBean prevBean = bean;
