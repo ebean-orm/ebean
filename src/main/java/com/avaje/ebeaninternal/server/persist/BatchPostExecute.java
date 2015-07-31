@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import java.sql.SQLException;
-
 /**
  * Handles the processing required after batch execution.
  * <p>

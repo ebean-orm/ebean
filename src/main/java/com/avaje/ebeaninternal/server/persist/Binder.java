@@ -43,30 +43,22 @@ public class Binder {
     ArrayList<BindValues.Value> list = bindValues.values();
     for (int i = 0; i < list.size(); i++) {
       BindValues.Value bindValue = list.get(i);
-      if (bindValue.isComment()) {
-        if (bindBuf != null) {
-          bindBuf.append(bindValue.getName());
-          if (logPrefix.equals("")) {
-            logPrefix = ", ";
-          }
-        }
-      } else {
-        Object val = bindValue.getValue();
-        int dt = bindValue.getDbType();
-        bindObject(dataBind, val, dt);
 
-        if (bindBuf != null) {
-          bindBuf.append(logPrefix);
-          if (logPrefix.equals("")) {
-            logPrefix = ", ";
-          }
-          bindBuf.append(bindValue.getName());
-          bindBuf.append("=");
-          if (isLob(dt)) {
-            bindBuf.append("[LOB]");
-          } else {
-            bindBuf.append(String.valueOf(val));
-          }
+      Object val = bindValue.getValue();
+      int dt = bindValue.getDbType();
+      bindObject(dataBind, val, dt);
+
+      if (bindBuf != null) {
+        bindBuf.append(logPrefix);
+        if (logPrefix.equals("")) {
+          logPrefix = ", ";
+        }
+        bindBuf.append(bindValue.getName());
+        bindBuf.append("=");
+        if (isLob(dt)) {
+          bindBuf.append("[LOB]");
+        } else {
+          bindBuf.append(String.valueOf(val));
         }
       }
     }
