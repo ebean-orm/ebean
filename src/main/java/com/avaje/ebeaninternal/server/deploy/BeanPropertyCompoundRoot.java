@@ -6,7 +6,6 @@ import com.avaje.ebeaninternal.server.properties.BeanPropertySetter;
 import com.avaje.ebeaninternal.server.type.CtCompoundProperty;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -24,8 +23,6 @@ public class BeanPropertyCompoundRoot {
     private final String name;
     private final String fullBeanName;
 
-    private final LinkedHashMap<String, BeanPropertyCompoundScalar> propMap;
-
     private final ArrayList<BeanPropertyCompoundScalar> propList;
 
     private List<CtCompoundProperty> nonScalarProperties;
@@ -35,7 +32,6 @@ public class BeanPropertyCompoundRoot {
         this.name = deploy.getName();
         this.setter = deploy.getSetter();
         this.propList = new ArrayList<BeanPropertyCompoundScalar>();
-        this.propMap = new LinkedHashMap<String, BeanPropertyCompoundScalar>();
     }
 
     public BeanProperty[] getScalarProperties() {
@@ -45,11 +41,6 @@ public class BeanPropertyCompoundRoot {
 
     public void register(BeanPropertyCompoundScalar prop) {
         propList.add(prop);
-        propMap.put(prop.getName(), prop);
-    }
-
-    public BeanPropertyCompoundScalar getCompoundScalarProperty(String propName) {
-        return propMap.get(propName);
     }
 
     public List<CtCompoundProperty> getNonScalarProperties() {
