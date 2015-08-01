@@ -110,7 +110,7 @@ public class ElPropertyChain implements ElPropertyValue {
 	        return containsMany;
 	    }
 	    
-	    int i = 1 + SplitName.count('.', sinceProperty);
+	    int i = 1 + SplitName.count(sinceProperty);
 	    
 	    for (; i < chain.length; i++) {
             if (chain[i].getBeanProperty().containsMany()) {

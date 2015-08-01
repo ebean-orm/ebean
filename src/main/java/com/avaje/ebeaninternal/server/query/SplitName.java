@@ -2,6 +2,8 @@ package com.avaje.ebeaninternal.server.query;
 
 public class SplitName {
 
+  private static final char PERIOD = '.';
+
   public static String add(String prefix, String name) {
     if (prefix != null) {
       return prefix + "." + name;
@@ -13,11 +15,11 @@ public class SplitName {
   /**
    * Return the number of occurrences of char in name.
    */
-  public static int count(char c, String name) {
+  public static int count(String name) {
 
     int count = 0;
     for (int i = 0; i < name.length(); i++) {
-      if (c == name.charAt(i)) {
+      if (PERIOD == name.charAt(i)) {
         count++;
       }
     }
