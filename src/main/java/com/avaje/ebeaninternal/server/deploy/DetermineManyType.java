@@ -14,13 +14,13 @@ public class DetermineManyType {
 
   public ManyType getManyType(Class<?> type) {
     if (type.equals(List.class)) {
-      return ManyType.JAVA_LIST;
+      return ManyType.LIST;
     }
     if (type.equals(Set.class)) {
-      return ManyType.JAVA_SET;
+      return ManyType.SET;
     }
     if (type.equals(Map.class)) {
-      return ManyType.JAVA_MAP;
+      return ManyType.MAP;
     }
     return null;
   }

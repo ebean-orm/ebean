@@ -746,7 +746,7 @@ public final class DefaultPersister implements Persister {
     // if a map, then we get the key value and
     // set it to the appropriate property on the
     // detail bean before we save it
-    boolean isMap = ManyType.JAVA_MAP.equals(prop.getManyType());
+    boolean isMap = ManyType.MAP.equals(prop.getManyType());
     EntityBean parentBean = saveMany.getParentBean();
     Object mapKeyValue = null;
 

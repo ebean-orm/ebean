@@ -19,7 +19,7 @@ public class BeanCollectionHelpFactory {
 	public static <T> BeanCollectionHelp<T> create(BeanPropertyAssocMany<T> manyProperty) {
 
 		ManyType manyType = manyProperty.getManyType();
-		switch (manyType.getUnderlying()) {
+		switch (manyType) {
 		case LIST:
 			return new BeanListHelp<T>(manyProperty);
 		case SET:
