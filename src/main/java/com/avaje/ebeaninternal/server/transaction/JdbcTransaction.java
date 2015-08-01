@@ -349,7 +349,6 @@ public class JdbcTransaction implements SpiTransaction {
    * </p>
    *
    * @param diff the amount to add or subtract from the depth.
-   * @return the current depth plus the diff
    */
   @Override
   public void depth(int diff) {
@@ -760,7 +759,7 @@ public class JdbcTransaction implements SpiTransaction {
   protected void notifyCommit() {
     if (manager != null) {
       if (queryOnly) {
-        manager.notifyOfQueryOnly(true, this, null);
+        manager.notifyOfQueryOnly(this);
       } else {
         manager.notifyOfCommit(this);
       }
@@ -769,7 +768,7 @@ public class JdbcTransaction implements SpiTransaction {
 
   protected void notifyQueryOnly() {
     if (manager != null) {
-      manager.notifyOfQueryOnly(true, this, null);
+      manager.notifyOfQueryOnly(this);
     }
   }
 
@@ -871,7 +870,7 @@ public class JdbcTransaction implements SpiTransaction {
   protected void notifyRollback(Throwable cause) {
     if (manager != null) {
       if (queryOnly) {
-        manager.notifyOfQueryOnly(false, this, cause);
+        manager.notifyOfQueryOnly(this);
       } else {
         manager.notifyOfRollback(this, cause);
       }

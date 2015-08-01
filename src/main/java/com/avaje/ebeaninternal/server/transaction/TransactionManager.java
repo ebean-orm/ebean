@@ -325,7 +325,7 @@ public class TransactionManager {
   /**
    * Query only transaction in read committed isolation.
    */
-  public void notifyOfQueryOnly(boolean onCommit, SpiTransaction transaction, Throwable cause) {
+  public void notifyOfQueryOnly(SpiTransaction transaction) {
 
     // Nothing that interesting here
     if (TXN_LOGGER.isTraceEnabled()) {
