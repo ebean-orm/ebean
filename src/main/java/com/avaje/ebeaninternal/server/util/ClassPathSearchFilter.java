@@ -16,8 +16,6 @@ public class ClassPathSearchFilter {
 
 	private boolean defaultJarMatch = false;
 
-	private String ebeanJarPrefix = "ebean";
-
 	private final HashSet<String> includePackageSet = new HashSet<String>();
 
 	private final HashSet<String> excludePackageSet = new HashSet<String>();
@@ -28,18 +26,6 @@ public class ClassPathSearchFilter {
 
 	public ClassPathSearchFilter() {
 		addDefaultExcludePackages();
-	}
-
-	/**
-	 * Set the name of the ebean jar file. Used with class path search to find
-	 * the "Meta" entity beans that are contained within the ebean jar.
-	 * <p>
-	 * You only need to set this if the ebean jar file name starts with
-	 * something other than ebean.
-	 * </p>
-	 */
-	public void setEbeanJarPrefix(String ebeanJarPrefix) {
-		this.ebeanJarPrefix = ebeanJarPrefix;
 	}
 
 	/**
@@ -76,17 +62,6 @@ public class ClassPathSearchFilter {
 	}
 
 	/**
-	 * Clear all entries from the exclude packages list.
-	 * <p>
-	 * This includes the entries added by addDefaultExcludePackages() which is
-	 * done on construction.
-	 * </p>
-	 */
-	public void clearExcludePackages() {
-		excludePackageSet.clear();
-	}
-
-	/**
 	 * Set the default for jar matching when a jar is neither explicitly
 	 * included or excluded.
 	 */
@@ -114,13 +89,6 @@ public class ClassPathSearchFilter {
 	 */
 	public void excludePackage(String pckgName) {
 		excludePackageSet.add(pckgName);
-	}
-
-	/**
-	 * Add a jar to explicitly exclude in the search.
-	 */
-	public void excludeJar(String jarName) {
-		excludeJarSet.add(jarName);
 	}
 
 	/**
@@ -155,9 +123,6 @@ public class ClassPathSearchFilter {
 	 * Return true if the jar should be included in the search.
 	 */
 	public boolean isSearchJar(String jarName) {
-		if (jarName.startsWith(ebeanJarPrefix)) {
-			return true;
-		}
 
 		if (containedIn(includeJarSet, jarName)) {
 			return true;
