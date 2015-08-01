@@ -63,6 +63,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     }
   }
 
+  @Override
   public PersistRequestBean<?> getPersistRequest() {
     return persistRequest;
   }
@@ -70,11 +71,13 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Get the sql and bind the statement.
    */
+  @Override
   public abstract void bind() throws SQLException;
 
   /**
    * Execute now for non-batch execution.
    */
+  @Override
   public abstract void execute() throws SQLException;
 
   /**
@@ -95,6 +98,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Add this for batch execution.
    */
+  @Override
   public void addBatch() throws SQLException {
     PstmtBatch pstmtBatch = persistRequest.getPstmtBatch();
     if (pstmtBatch != null) {
@@ -107,6 +111,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Close the underlying statement.
    */
+  @Override
   public void close() {
     try {
       if (dataBind != null) {
@@ -120,6 +125,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Return the bind log.
    */
+  @Override
   public String getBindLog() {
     return bindLog == null ? "" : bindLog.toString();
   }
@@ -128,6 +134,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Set the Id value that was bound. This value is used for logging summary
    * level information.
    */
+  @Override
   public void setIdValue(Object idValue) {
     persistRequest.setBoundId(idValue);
   }
@@ -147,7 +154,8 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Bind a raw value. Used to bind the discriminator column.
    */
-  public void bind(String propName, Object value, int sqlType) throws SQLException {
+  @Override
+  public void bind(Object value, int sqlType) throws SQLException {
     if (logLevelSql) {
       if (value == null) {
         bindLog.append("null");
@@ -164,6 +172,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     dataBind.setObject(value, sqlType);
   }
 
+  @Override
   public void bindNoLog(Object value, int sqlType, String logPlaceHolder) throws SQLException {
     if (logLevelSql) {
       bindLog.append(logPlaceHolder).append(" ");
@@ -174,6 +183,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Bind the value to the preparedStatement.
    */
+  @Override
   public void bind(Object value, BeanProperty prop) throws SQLException {
     bindInternal(logLevelSql, value, prop);
   }
@@ -181,6 +191,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Bind the value to the preparedStatement without logging.
    */
+  @Override
   public void bindNoLog(Object value, BeanProperty prop) throws SQLException {
     bindInternal(false, value, prop);
   }
@@ -212,6 +223,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * generation.
    * </p>
    */
+  @Override
   public void registerUpdateGenValue(BeanProperty prop, EntityBean bean, Object value) {
     if (updateGenValues == null) {
       updateGenValues = new ArrayList<UpdateGenValue>();

@@ -27,6 +27,7 @@ public class UpdateHandler extends DmlHandler {
   /**
    * Generate and bind the update statement.
    */
+  @Override
   public void bind() throws SQLException {
 
     SpiUpdatePlan updatePlan = meta.getUpdatePlan(persistRequest);
@@ -73,6 +74,7 @@ public class UpdateHandler extends DmlHandler {
     }
   }
 
+  @Override
   public void registerDerivedRelationship(DerivedRelationshipData derivedRelationship) {
     persistRequest.getTransaction().registerDerivedRelationship(derivedRelationship);
   }

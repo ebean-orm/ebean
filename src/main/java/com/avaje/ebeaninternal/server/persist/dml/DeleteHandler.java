@@ -25,6 +25,7 @@ public class DeleteHandler extends DmlHandler {
 	/**
 	 * Generate and bind the delete statement.
 	 */
+  @Override
 	public void bind() throws SQLException {
 		
 		sql = meta.getSql(persistRequest);
@@ -44,11 +45,13 @@ public class DeleteHandler extends DmlHandler {
 	/**
 	 * Execute the delete non-batch.
 	 */
+  @Override
 	public void execute() throws SQLException, OptimisticLockException {
 		int rowCount = dataBind.executeUpdate();
 		checkRowCount(rowCount);
 	}
 
+  @Override
   public void registerDerivedRelationship(DerivedRelationshipData assocBean) {
     throw new RuntimeException("Never called on delete");
   }

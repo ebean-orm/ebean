@@ -29,17 +29,20 @@ public class BindableDiscriminator implements Bindable {
     return columnName + " = " + discValue;
   }
 
+  @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     throw new PersistenceException("Never called (only for inserts)");
   }
 
+  @Override
   public void dmlAppend(GenerateDmlRequest request) {
     request.appendColumn(columnName);
   }
 
+  @Override
   public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
 
-    bindRequest.bind(columnName, discValue, sqlType);
+    bindRequest.bind(discValue, sqlType);
   }
 
 }

@@ -61,6 +61,7 @@ public class InsertHandler extends DmlHandler {
   /**
    * Generate and bind the insert statement.
    */
+  @Override
   public void bind() throws SQLException {
 
     BeanDescriptor<?> desc = persistRequest.getBeanDescriptor();
@@ -123,6 +124,7 @@ public class InsertHandler extends DmlHandler {
    * Execute the insert in a normal non batch fashion. Additionally using
    * getGeneratedKeys if required.
    */
+  @Override
   public void execute() throws SQLException, OptimisticLockException {
     int rc = dataBind.executeUpdate();
     if (useGeneratedKeys) {
@@ -225,6 +227,7 @@ public class InsertHandler extends DmlHandler {
     }
   }
 
+  @Override
   public void registerDerivedRelationship(DerivedRelationshipData derivedRelationship) {
     persistRequest.getTransaction().registerDerivedRelationship(derivedRelationship);
   }

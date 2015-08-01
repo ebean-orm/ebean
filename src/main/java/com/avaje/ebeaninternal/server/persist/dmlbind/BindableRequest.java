@@ -32,7 +32,7 @@ public interface BindableRequest {
   /**
    * Bind a raw value. Used to bind the discriminator column.
    */
-  void bind(String propName, Object value, int sqlType) throws SQLException;
+  void bind(Object value, int sqlType) throws SQLException;
 
   /**
    * Bind a raw value with a placeHolder to put into the transaction log.
