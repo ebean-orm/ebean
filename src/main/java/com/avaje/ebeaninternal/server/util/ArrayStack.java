@@ -83,6 +83,7 @@ public class ArrayStack<E> {
     }
     
     public boolean contains(Object o){
-    	return list.contains(o);
+      //noinspection SuspiciousMethodCalls
+      return list.contains(o);
     }
 }

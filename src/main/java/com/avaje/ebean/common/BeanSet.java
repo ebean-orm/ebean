@@ -307,6 +307,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   public <T> T[] toArray(T[] a) {
     init();
+    //noinspection SuspiciousToArrayCall
     return set.toArray(a);
   }
 

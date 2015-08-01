@@ -124,6 +124,7 @@ class ModifyCollection<E> implements Collection<E> {
 
   @Override
   public <T> T[] toArray(T[] a) {
+    //noinspection SuspiciousToArrayCall
     return c.toArray(a);
   }
 

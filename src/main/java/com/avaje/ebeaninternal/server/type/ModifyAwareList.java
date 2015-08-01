@@ -66,6 +66,7 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
 
   @Override
   public <T> T[] toArray(T[] a) {
+    //noinspection SuspiciousToArrayCall
     return list.toArray(a);
   }
 

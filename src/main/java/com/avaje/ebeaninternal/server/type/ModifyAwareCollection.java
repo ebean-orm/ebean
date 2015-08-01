@@ -111,6 +111,7 @@ public class ModifyAwareCollection<E> implements Collection<E> {
   }
 
   public <T> T[] toArray(T[] a) {
+    //noinspection SuspiciousToArrayCall
     return c.toArray(a);
   }
 

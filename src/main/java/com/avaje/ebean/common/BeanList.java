@@ -415,6 +415,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   public <T> T[] toArray(T[] a) {
     init();
+    //noinspection SuspiciousToArrayCall
     return list.toArray(a);
   }
 
