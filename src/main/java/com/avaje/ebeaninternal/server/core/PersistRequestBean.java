@@ -235,7 +235,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (notifyCache) {
       switch (type) {
       case INSERT:
-        beanDescriptor.cacheHandleInsert(idValue, this);
+        beanDescriptor.cacheHandleInsert(this);
         break;
       case UPDATE:
         beanDescriptor.cacheHandleUpdate(idValue, this);

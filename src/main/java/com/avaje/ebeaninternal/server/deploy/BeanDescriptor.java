@@ -858,8 +858,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     cacheHelp.handleDelete(id, deleteRequest);
   }
 
-  public void cacheHandleInsert(Object id, PersistRequestBean<T> insertRequest) {
-    cacheHelp.handleInsert(id, insertRequest);
+  public void cacheHandleInsert(PersistRequestBean<T> insertRequest) {
+    cacheHelp.handleInsert(insertRequest);
   }
 
   /**

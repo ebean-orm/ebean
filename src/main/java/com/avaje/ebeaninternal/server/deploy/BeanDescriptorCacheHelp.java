@@ -519,7 +519,7 @@ public final class BeanDescriptorCacheHelp<T> {
     }
   }
 
-  public void handleInsert(Object id, PersistRequestBean<T> insertRequest) {
+  public void handleInsert(PersistRequestBean<T> insertRequest) {
     if (queryCache != null) {
       if (queryLog.isDebugEnabled()) {
         queryLog.debug("   CLEAR {}(*) - insert trigger", cacheName);
