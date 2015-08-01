@@ -13,6 +13,8 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
 
   private static final long serialVersionUID = 2226895827150099020L;
 
+  private static final String notAllowedMessage = "This method is not allowed on a filter";
+
   private final Query<T> rootQuery;
 
   private final FilterExprPath pathPrefix;
@@ -33,12 +35,6 @@ public class FilterExpressionList<T> extends DefaultExpressionList<T> {
   public SpiExpressionList<?> trimPath(int prefixTrim) {
     return new FilterExpressionList<T>(pathPrefix.trimPath(prefixTrim), this);
   }
-
-  public FilterExprPath getPathPrefix() {
-    return pathPrefix;
-  }
-
-  private final String notAllowedMessage = "This method is not allowed on a filter";
 
   @Override
   public ExpressionList<T> filterMany(String prop) {

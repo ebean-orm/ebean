@@ -221,10 +221,6 @@ public class ElPropertyChain implements ElPropertyValue {
     return scalarType;
   }
 
-  public StringFormatter getStringFormatter() {
-    return scalarType;
-  }
-
   public Object elConvertType(Object value) {
     // just convert using the last one in the chain
     return lastElPropertyValue.elConvertType(value);

@@ -47,14 +47,6 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
 	}
 
 	/**
-	 * Return false.
-	 */
-	@Override
-	public boolean isScalar() {
-		return false;
-	}
-
-	/**
 	 * Return the type of the target.
 	 * <p>
 	 * This is the class of the associated bean, or beans contained in a list,
