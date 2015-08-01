@@ -278,7 +278,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
   /**
    * Get the overall status and activity of this cluster node.
    */
-  public McastStatus getStatus(boolean reset) {
+  public McastStatus getStatus() {
 
     synchronized (managerThread) {
       long currentPacketId = packetWriter.currentPacketId();
@@ -347,7 +347,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
 
           if (lastStatusTimeFreqMillis > 0) {
             if (lastStatusTime < System.currentTimeMillis() - lastStatusTimeFreqMillis) {
-              McastStatus status = getStatus(false);
+              McastStatus status = getStatus();
               logger.info("Cluster Status: " + status.getSummary());
               lastStatusTime = System.currentTimeMillis();
             }
