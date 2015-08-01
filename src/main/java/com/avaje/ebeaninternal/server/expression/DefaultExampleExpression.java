@@ -122,13 +122,6 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   }
 
   /**
-   * This will return null for this example expression.
-   */
-  public String getPropertyName() {
-    return null;
-  }
-
-  /**
    * Adds bind values to the request.
    */
   public void addBindValues(SpiExpressionRequest request) {

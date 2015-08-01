@@ -69,10 +69,6 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
         return null;
     }
 
-    public StringFormatter getStringFormatter() {
-        return null;
-    }
-
     public StringParser getStringParser() {
         return null;
     }

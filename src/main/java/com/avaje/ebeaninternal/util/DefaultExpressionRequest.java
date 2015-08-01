@@ -73,10 +73,6 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
     bindValues.add(bindValue);
   }
 
-  public boolean includeProperty(String propertyName) {
-    return true;
-  }
-
   public String getSql() {
     return sb.toString();
   }
