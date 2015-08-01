@@ -40,8 +40,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    */
   protected final SqlTreeNode[] children;
 
-  protected final boolean readOnlyLeaf;
-
   /**
    * Set to true if this is a partial object fetch.
    */
@@ -55,8 +53,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   protected final String extraWhere;
 
   protected final BeanPropertyAssoc<?> nodeBeanProp;
-
-  protected final TableJoin[] tableJoins;
 
   /**
    * False if report bean and has no id property.
@@ -134,9 +130,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     this.readId = withId && (desc.getIdProperty() != null);
     this.disableLazyLoad = disableLazyLoad || !readId || desc.isSqlSelectBased() || temporalVersions;
 
-    this.tableJoins = props.getTableJoins();
     this.partialObject = props.isPartialObject();
-    this.readOnlyLeaf = props.isReadOnly();
     this.properties = props.getProps();
     this.children = myChildren == null ? NO_CHILDREN : myChildren.toArray(new SqlTreeNode[myChildren.size()]);
 
