@@ -76,7 +76,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     if (embedded) {
       // Overriding of the columns and use table alias of owning BeanDescriptor
-      BeanEmbeddedMeta overrideMeta = BeanEmbeddedMetaFactory.create(owner, deploy, descriptor);
+      BeanEmbeddedMeta overrideMeta = BeanEmbeddedMetaFactory.create(owner, deploy);
       embeddedProps = overrideMeta.getProperties();
       embeddedPropsMap = new HashMap<String, BeanProperty>();
       for (int i = 0; i < embeddedProps.length; i++) {
@@ -563,7 +563,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     } else if (oneToOneExported) {
       return new ReferenceExported();
     } else {
-      return new Reference(this);
+      return new Reference();
     }
   }
 
@@ -643,7 +643,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
    */
   private final class Reference extends LocalHelp {
 
-    Reference(BeanPropertyAssocOne<?> beanProp) {
+    Reference() {
     }
 
     void loadIgnore(DbReadContext ctx) {

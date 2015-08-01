@@ -15,8 +15,7 @@ public class BeanEmbeddedMetaFactory {
 	/**
 	 * Create BeanProperties for embedded beans using the deployment specific DB column name and table alias. 
 	 */
-	public static BeanEmbeddedMeta create(BeanDescriptorMap owner, DeployBeanPropertyAssocOne<?> prop,
-			BeanDescriptor<?> descriptor) {
+	public static BeanEmbeddedMeta create(BeanDescriptorMap owner, DeployBeanPropertyAssocOne<?> prop) {
 
 		// we can get a BeanDescriptor for an Embedded bean
 		// and know that it is NOT recursive, as Embedded beans are
