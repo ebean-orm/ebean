@@ -16,21 +16,11 @@ public class ChainedBeanQueryAdapter implements BeanQueryAdapter {
 	private static final Sorter SORTER = new Sorter();
 	
 	private final List<BeanQueryAdapter> list;
+
 	private final BeanQueryAdapter[] chain;
-	
-	/**
-	 * Helper method used to create a list from 2 BeanQueryAdapter.
-	 */
-	private static List<BeanQueryAdapter> addList(BeanQueryAdapter c1, BeanQueryAdapter c2) {
-		ArrayList<BeanQueryAdapter> addList = new ArrayList<BeanQueryAdapter>(2);
-		addList.add(c1);
-		addList.add(c2);
-		return addList;
-	}
-	
+
 	/**
 	 * Construct given the list of BeanQueryAdapter's.
-	 * @param list
 	 */
 	public ChainedBeanQueryAdapter(List<BeanQueryAdapter> list) {
 		this.list = list;

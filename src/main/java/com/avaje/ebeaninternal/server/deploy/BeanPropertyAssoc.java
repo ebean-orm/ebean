@@ -63,8 +63,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 
 	boolean saveRecurseSkippable;
 
-	boolean deleteRecurseSkippable;
-
 	/**
 	 * Construct the property.
 	 */
@@ -91,9 +89,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 			targetDescriptor = descriptor.getBeanDescriptor(targetType);
 			targetIdBinder = targetDescriptor.getIdBinder();
 			targetInheritInfo = targetDescriptor.getInheritInfo();
-
 			saveRecurseSkippable = targetDescriptor.isSaveRecurseSkippable();
-			deleteRecurseSkippable = targetDescriptor.isDeleteRecurseSkippable();
 
 			if (!targetIdBinder.isComplexId()){
 				targetIdProperty = targetIdBinder.getIdProperty();
@@ -238,17 +234,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	 */
 	public TableJoin getTableJoin() {
 		return tableJoin;
-	}
-
-	/**
-	 * Return the BeanTable for this association.
-	 * <p>
-	 * This has the table name which is used to determine the relationship for
-	 * this association.
-	 * </p>
-	 */
-	public BeanTable getBeanTable() {
-		return beanTable;
 	}
 
 	/**

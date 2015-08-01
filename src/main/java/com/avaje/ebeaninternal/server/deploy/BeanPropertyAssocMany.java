@@ -410,20 +410,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   /**
-   * Refresh the appropriate list set or map.
-   */
-  public void refresh(EbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
-    help.refresh(server, query, t, parentBean);
-  }
-
-  /**
-   * Apply the refreshed BeanCollection to the property of the parentBean.
-   */
-  public void refresh(BeanCollection<?> bc, EntityBean parentBean) {
-    help.refresh(bc, parentBean);
-  }
-
-  /**
    * Return the Id values from the given bean.
    */
   @Override

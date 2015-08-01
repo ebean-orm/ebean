@@ -547,17 +547,6 @@ public class BeanProperty implements ElPropertyValue {
     }
   }
 
-  /**
-   * Convert the type to the bean type if required.
-   * <p>
-   * Generally only used to ensure id properties are converted for
-   * Query.setId() use.
-   * </p>
-   */
-  public Object toBeanType(Object value) {
-    return scalarType.toBeanType(value);
-  }
-
   @SuppressWarnings("unchecked")
   public void bind(DataBind b, Object value) throws SQLException {
     scalarType.bind(b, value);
