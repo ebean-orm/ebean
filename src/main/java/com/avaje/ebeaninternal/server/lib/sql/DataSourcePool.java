@@ -221,7 +221,7 @@ public class DataSourcePool implements DataSource {
         try {
             initialise();
         } catch (SQLException ex) {
-            throw new DataSourceException(ex);
+            throw new RuntimeException(ex);
         }
     }
     
@@ -248,7 +248,7 @@ public class DataSourcePool implements DataSource {
         try {
             return (DataSourcePoolListener)ClassUtil.newInstance(cn, this.getClass());
         } catch (Exception e) {
-            throw new DataSourceException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 
