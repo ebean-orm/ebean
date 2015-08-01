@@ -17,10 +17,10 @@ public interface BeanPropertyInfo {
 	/**
 	 * Return the getter for a given bean property.
 	 */
-	BeanPropertyGetter getGetter(String name, int position);
+	BeanPropertyGetter getGetter(int position);
 	
 	/**
 	 * Return the setter for a given bean property.
 	 */
-	BeanPropertySetter getSetter(String name, int position);
+	BeanPropertySetter getSetter(int position);
 }

@@ -1288,8 +1288,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       } else {
         final int propertyIndex = pos;
         prop.setPropertyIndex(propertyIndex);
-        prop.setGetter(beanReflect.getGetter(propName, propertyIndex));
-        prop.setSetter(beanReflect.getSetter(propName, propertyIndex));
+        prop.setGetter(beanReflect.getGetter(propertyIndex));
+        prop.setSetter(beanReflect.getSetter(propertyIndex));
       }
     }
   }

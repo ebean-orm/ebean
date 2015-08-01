@@ -47,11 +47,11 @@ public final class EnhanceBeanPropertyInfo implements BeanPropertyInfo {
     }
   }
 
-  public BeanPropertyGetter getGetter(String name, int position) {
+  public BeanPropertyGetter getGetter(int position) {
     return new Getter(position);
   }
 
-  public BeanPropertySetter getSetter(String name, int position) {
+  public BeanPropertySetter getSetter(int position) {
     return new Setter(position);
   }
 
