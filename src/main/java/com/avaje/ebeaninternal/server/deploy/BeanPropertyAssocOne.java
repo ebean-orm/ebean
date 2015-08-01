@@ -512,7 +512,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
   @Override
   public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
-    return localHelp.readSet(ctx, bean, true);
+    return localHelp.readSet(ctx, bean);
   }
 
   /**
@@ -578,7 +578,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     abstract Object read(DbReadContext ctx) throws SQLException;
 
-    abstract Object readSet(DbReadContext ctx, EntityBean bean, boolean assignAble) throws SQLException;
+    abstract Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException;
 
     abstract void appendSelect(DbSqlContext ctx, boolean subQuery);
 
@@ -595,9 +595,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
 
     @Override
-    Object readSet(DbReadContext ctx, EntityBean bean, boolean assignable) throws SQLException {
+    Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
       Object dbVal = read(ctx);
-      if (bean != null && assignable) {
+      if (bean != null) {
         // set back to the parent bean
         setValue(bean, dbVal);
         ctx.propagateState(dbVal);
@@ -608,6 +608,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       }
     }
 
+    @Override
     Object read(DbReadContext ctx) throws SQLException {
 
       EntityBean embeddedBean = targetDescriptor.createEntityBean();
@@ -647,6 +648,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     Reference() {
     }
 
+    @Override
     void loadIgnore(DbReadContext ctx) {
       targetIdBinder.loadIgnore(ctx);
       if (targetInheritInfo != null) {
@@ -654,9 +656,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       }
     }
 
-    Object readSet(DbReadContext ctx, EntityBean bean, boolean assignable) throws SQLException {
+    @Override
+    Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
       Object val = read(ctx);
-      if (bean != null && assignable) {
+      if (bean != null) {
         setValue(bean, val);
         ctx.propagateState(val);
       }
@@ -759,10 +762,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
      * Read and set a Reference bean.
      */
     @Override
-    Object readSet(DbReadContext ctx, EntityBean bean, boolean assignable) throws SQLException {
+    Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
 
       Object dbVal = read(ctx);
-      if (bean != null && assignable) {
+      if (bean != null) {
         setValue(bean, dbVal);
         ctx.propagateState(dbVal);
       }
