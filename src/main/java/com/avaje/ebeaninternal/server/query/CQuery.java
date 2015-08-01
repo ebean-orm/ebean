@@ -104,11 +104,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    */
   private final CQueryPredicates predicates;
 
-  /**
-   * Object handling the SELECT generation and reading.
-   */
-  private final SqlTree sqlTree;
-
   private final boolean rawSql;
 
   /**
@@ -191,7 +186,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     // so its available to the user...
     query.setGeneratedSql(queryPlan.getSql());
 
-    this.sqlTree = queryPlan.getSqlTree();
+    SqlTree sqlTree = queryPlan.getSqlTree();
     this.rootNode = sqlTree.getRootNode();
     this.manyProperty = sqlTree.getManyProperty();
     this.sql = queryPlan.getSql();
@@ -592,23 +587,12 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     return manyProperty;
   }
 
-  /**
-   * Get the summary of the sql.
-   */
-  public String getSummary() {
-    return sqlTree.getSummary();
-  }
-
   public String getBindLog() {
     return bindLog;
   }
 
   public SpiTransaction getTransaction() {
     return request.getTransaction();
-  }
-
-  public String getBeanType() {
-    return desc.getFullName();
   }
 
   /**

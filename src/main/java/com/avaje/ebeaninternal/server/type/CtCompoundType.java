@@ -66,11 +66,6 @@ public final class CtCompoundType<V> implements ScalarDataReader<V> {
     return create(propertyValues);
   }
 
-  public CompoundTypeProperty<V, ?>[] getProperties() {
-
-    return cvoType.getProperties();
-  }
-
   public V read(DataReader source) throws SQLException {
 
     boolean nullValue = false;
