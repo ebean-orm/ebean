@@ -1057,8 +1057,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return namedQueries.get(name);
   }
 
-  public DeployNamedQuery addNamedQuery(DeployNamedQuery deployNamedQuery) {
-    return namedQueries.put(deployNamedQuery.getName(), deployNamedQuery);
+  public void addNamedQuery(DeployNamedQuery deployNamedQuery) {
+    namedQueries.put(deployNamedQuery.getName(), deployNamedQuery);
   }
 
   /**

@@ -55,7 +55,7 @@ public class Dnode {
 	/**
 	 * Generate this node as xml to the buffer.
 	 */
-	public StringBuilder generate(StringBuilder sb) {
+	public void generate(StringBuilder sb) {
 		if (sb == null) {
 			sb = new StringBuilder();
 		}
@@ -85,7 +85,6 @@ public class Dnode {
 			}
 			sb.append("</").append(nodeName).append(">");
 		}
-		return sb;
 	}
 
 	/**

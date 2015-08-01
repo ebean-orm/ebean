@@ -1038,7 +1038,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Set the Identity generation mechanism.
    */
-  private <T> IdType setIdGeneration(DeployBeanDescriptor<T> desc) {
+  private <T> void setIdGeneration(DeployBeanDescriptor<T> desc) {
 
     if (desc.propertiesId().size() == 0) {
       // bean doesn't have an Id property
@@ -1046,7 +1046,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         // expecting an id property
         logger.warn(Message.msg("deploy.nouid", desc.getFullName()));
       }
-      return null;
+      return;
     }
 
     if (IdType.SEQUENCE.equals(desc.getIdType()) && !dbIdentity.isSupportsSequence()) {
@@ -1069,21 +1069,21 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       String genName = desc.getIdGeneratorName();
       if (UuidIdGenerator.AUTO_UUID.equals(genName)) {
         desc.setIdGenerator(uuidIdGenerator);
-        return IdType.GENERATOR;
+        return;
       }
     }
 
     if (desc.getBaseTable() == null) {
       // no base table so not going to set Identity
       // of sequence information
-      return null;
+      return;
     }
 
     if (IdType.IDENTITY.equals(desc.getIdType())) {
       // used when getGeneratedKeys is not supported (SQL Server 2000)
       String selectLastInsertedId = dbIdentity.getSelectLastInsertedId(desc.getBaseTable());
       desc.setSelectLastInsertedId(selectLastInsertedId);
-      return IdType.IDENTITY;
+      return;
     }
 
     String seqName = desc.getIdGeneratorName();
@@ -1098,8 +1098,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // create the sequence based IdGenerator
     IdGenerator seqIdGen = createSequenceIdGenerator(seqName);
     desc.setIdGenerator(seqIdGen);
-
-    return IdType.SEQUENCE;
   }
 
   private IdGenerator createSequenceIdGenerator(String seqName) {

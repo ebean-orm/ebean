@@ -27,23 +27,22 @@ public interface BindableRequest {
    * logicalType to dbType.
    * </p>
    */
-  Object bind(Object value, BeanProperty prop) throws SQLException;
+  void bind(Object value, BeanProperty prop) throws SQLException;
 
   /**
    * Bind a raw value. Used to bind the discriminator column.
    */
-  Object bind(String propName, Object value, int sqlType) throws SQLException;
+  void bind(String propName, Object value, int sqlType) throws SQLException;
 
   /**
    * Bind a raw value with a placeHolder to put into the transaction log.
    */
-  Object bindNoLog(Object value, int sqlType, String logPlaceHolder) throws SQLException;
+  void bindNoLog(Object value, int sqlType, String logPlaceHolder) throws SQLException;
 
   /**
    * Bind the value to the preparedStatement without logging.
    */
-  Object bindNoLog(Object value, BeanProperty prop) throws SQLException;
-
+  void bindNoLog(Object value, BeanProperty prop) throws SQLException;
 
   /**
    * Register the value from a update GeneratedValue. This can only be set to

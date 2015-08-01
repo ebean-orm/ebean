@@ -147,7 +147,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Bind a raw value. Used to bind the discriminator column.
    */
-  public Object bind(String propName, Object value, int sqlType) throws SQLException {
+  public void bind(String propName, Object value, int sqlType) throws SQLException {
     if (logLevelSql) {
       if (value == null) {
         bindLog.append("null");
@@ -162,32 +162,30 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
       bindLog.append(",");
     }
     dataBind.setObject(value, sqlType);
-    return value;
   }
 
-  public Object bindNoLog(Object value, int sqlType, String logPlaceHolder) throws SQLException {
+  public void bindNoLog(Object value, int sqlType, String logPlaceHolder) throws SQLException {
     if (logLevelSql) {
       bindLog.append(logPlaceHolder).append(" ");
     }
     dataBind.setObject(value, sqlType);
-    return value;
   }
 
   /**
    * Bind the value to the preparedStatement.
    */
-  public Object bind(Object value, BeanProperty prop) throws SQLException {
-    return bindInternal(logLevelSql, value, prop);
+  public void bind(Object value, BeanProperty prop) throws SQLException {
+    bindInternal(logLevelSql, value, prop);
   }
 
   /**
    * Bind the value to the preparedStatement without logging.
    */
-  public Object bindNoLog(Object value, BeanProperty prop) throws SQLException {
-    return bindInternal(false, value, prop);
+  public void bindNoLog(Object value, BeanProperty prop) throws SQLException {
+    bindInternal(false, value, prop);
   }
 
-  private Object bindInternal(boolean log, Object value, BeanProperty prop) throws SQLException {
+  private void bindInternal(boolean log, Object value, BeanProperty prop) throws SQLException {
 
     if (log) {
       if (prop.isLob()) {
@@ -203,7 +201,6 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     }
     // do the actual binding to PreparedStatement
     prop.bind(dataBind, value);
-    return value;
   }
 
   /**
