@@ -322,9 +322,10 @@ public class BeanProperty implements ElPropertyValue {
     this.indexed = source.isIndexed();
     this.indexName = source.getIndexName();
     this.dbColumn = InternString.intern(override.getDbColumn());
-    this.sqlFormulaJoin = InternString.intern(override.getSqlFormulaJoin());
-    this.sqlFormulaSelect = InternString.intern(override.getSqlFormulaSelect());
-    this.formula = sqlFormulaSelect != null;
+    // override with sqlFormula not currently supported
+    this.sqlFormulaJoin = null;
+    this.sqlFormulaSelect = null;
+    this.formula = false;
 
     this.excludedFromHistory = source.excludedFromHistory;
     this.fetchEager = source.fetchEager;
