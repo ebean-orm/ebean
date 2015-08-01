@@ -67,9 +67,7 @@ class ModifyListIterator<E> implements ListIterator<E> {
   }
 
   public void set(E o) {
-    if (last == null) {
-      // in theory this is not allowed
-    } else {
+    if (last != null) {
       owner.modifyRemoval(last);
       owner.modifyAddition(o);
     }

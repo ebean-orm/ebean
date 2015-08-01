@@ -251,10 +251,7 @@ public class StringHelper {
     if (endPos == -1) {
       if (startPos <= str.length()) {
         String lastValue = str.substring(startPos, str.length());
-        // dp("lastValue="+lastValue);
-        if (!keepEmpties && lastValue.length() == 0) {
-          // dp("not keeping...");
-        } else {
+        if (keepEmpties || lastValue.length() != 0) {
           list.add(lastValue);
         }
       }
@@ -263,10 +260,7 @@ public class StringHelper {
     } else {
       // get the delimited value... add it..
       String value = str.substring(startPos, endPos);
-      // dp(startPos+","+endPos+" value="+value);
-      if (!keepEmpties && value.length() == 0) {
-        // dp("not keeping...");
-      } else {
+      if (keepEmpties || value.length() != 0) {
         list.add(value);
       }
       // recursively search as we are not at the end yet...

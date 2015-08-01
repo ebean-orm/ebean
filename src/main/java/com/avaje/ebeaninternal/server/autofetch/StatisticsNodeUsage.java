@@ -76,7 +76,8 @@ public class StatisticsNodeUsage implements Serializable {
                         String manyPath = SplitName.add(path, assocProp.getName());
                         pathProps.addToPath(manyPath, targetIdProp);
                     } else {
-                    	if (beanProp.isLob() && !beanProp.isFetchEager()) {
+                      //noinspection StatementWithEmptyBody
+                      if (beanProp.isLob() && !beanProp.isFetchEager()) {
                     		// AutoFetch will not include Lob's marked FetchLazy 
                     		// (which is the default for Lob's so typical). 
                     	} else {

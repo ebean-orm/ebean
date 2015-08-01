@@ -162,24 +162,22 @@ public class ImmutableMetaFactory {
     private Method findGetter(Class<?> paramType, Method[] methods) {
         
         for (int i = 0; i < methods.length; i++) {
-            if (Modifier.isStatic(methods[i].getModifiers())) {
-                
-            } else {
-                if (methods[i].getParameterTypes().length == 0) {
-                    // could be a getter
-                    String methName = methods[i].getName();
-                    if (methName.equals("hashCode")){
-                        
-                    } else if (methName.equals("toString")) {
-                        
-                    } else {
-                        Class<?> returnType = methods[i].getReturnType();
-                        if (paramType.equals(returnType)){
-                            return methods[i];
-                        }
-                    }
-                }
-            }
+          if (!Modifier.isStatic(methods[i].getModifiers())) {
+              if (methods[i].getParameterTypes().length == 0) {
+                  // could be a getter
+                  String methName = methods[i].getName();
+                  if (methName.equals("hashCode")){
+
+                  } else if (methName.equals("toString")) {
+
+                  } else {
+                      Class<?> returnType = methods[i].getReturnType();
+                      if (paramType.equals(returnType)){
+                          return methods[i];
+                      }
+                  }
+              }
+          }
         }
         return null;
     }

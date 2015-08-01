@@ -386,14 +386,12 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
         try {
             Class<?> beanClass = ClassUtil.forName(beanType, this.getClass());
             BeanDescriptor<?> beanDescriptor = server.getBeanDescriptor(beanClass);
-            if (beanDescriptor == null){
-                // previously was an entity but not longer
-                
-            } else {
+            if (beanDescriptor != null){
+
                 // Determine the fetch plan from the latest statistics.
                 // Use this to compare with current "tuned fetch plan".
                 OrmQueryDetail newFetchDetail = statistics.buildTunedFetch(beanDescriptor);
-                
+
                 // get the current tuned fetch info...
                 TunedQueryInfo currentFetch = tunedQueryInfoMap.get(queryPoint.getKey());
 
@@ -408,7 +406,7 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
                 } else if (!currentFetch.isSame(newFetchDetail)) {
                     // the fetch plan has changed, update it.
                     counters.incrementModified();
-                    
+
                     logging.logChanged(currentFetch, newFetchDetail);
                     currentFetch.setTunedDetail(newFetchDetail);
 

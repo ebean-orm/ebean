@@ -41,6 +41,7 @@ public class CreateTableColumnVisitor extends BaseTablePropertyVisitor {
   @Override
   public void visitMany(BeanPropertyAssocMany<?> p) {
     if (p.isManyToMany()) {
+      //noinspection StatementWithEmptyBody
       if (p.getMappedBy() != null) {
         // only create on other 'owning' side
 

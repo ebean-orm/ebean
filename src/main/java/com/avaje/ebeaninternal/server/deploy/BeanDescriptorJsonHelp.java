@@ -56,6 +56,7 @@ public class BeanDescriptorJsonHelp<T> {
   public T jsonRead(ReadJson jsonRead, String path) throws IOException {
 
     JsonParser parser = jsonRead.getParser();
+    //noinspection StatementWithEmptyBody
     if (parser.getCurrentToken() == JsonToken.START_OBJECT) {
       // start object token read by Jackson already
     } else {

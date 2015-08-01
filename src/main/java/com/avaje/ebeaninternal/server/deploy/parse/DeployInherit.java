@@ -110,8 +110,6 @@ public class DeployInherit {
 		Class<?> parent = findParent(cls);
 		if (parent != null) {
 			info.setParent(parent);
-		} else {
-			// its the root of inheritance tree...
 		}
 
 		Inheritance ia = cls.getAnnotation(Inheritance.class);

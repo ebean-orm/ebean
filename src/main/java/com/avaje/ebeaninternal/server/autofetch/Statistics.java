@@ -123,15 +123,13 @@ public class Statistics implements Serializable {
 	 */
 	public void collectUsageInfo(NodeUsageCollector profile) {
 
-	    if (profile.isEmpty()){
-	        // no usage was collected
-	    } else {
-    		ObjectGraphNode node = profile.getNode();
-    
-    		StatisticsNodeUsage nodeStats = getNodeStats(node.getPath());
-    		nodeStats.publish(profile);
-	    }
-	}
+    if (!profile.isEmpty()) {
+      ObjectGraphNode node = profile.getNode();
+
+      StatisticsNodeUsage nodeStats = getNodeStats(node.getPath());
+      nodeStats.publish(profile);
+    }
+  }
 
 	private StatisticsNodeUsage getNodeStats(String path) {
 		

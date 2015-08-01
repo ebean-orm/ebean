@@ -127,6 +127,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
 
     if (!prop.getTableJoin().hasJoinColumns() && beanTable != null) {
 
+      //noinspection StatementWithEmptyBody
       if (prop.getMappedBy() != null) {
         // the join is derived by reversing the join information
         // from the mapped by property.

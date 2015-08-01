@@ -441,6 +441,7 @@ public class SqlTreeBuilder {
 
     BeanPropertyAssocOne<?>[] propertiesOne = desc.propertiesOne();
     for (int i = 0; i < propertiesOne.length; i++) {
+      //noinspection StatementWithEmptyBody
       if (queryProps != null && queryProps.isIncludedBeanJoin(propertiesOne[i].getName())) {
         // if it is a joined bean... then don't add the property
         // as it will have its own entire Node in the SqlTree

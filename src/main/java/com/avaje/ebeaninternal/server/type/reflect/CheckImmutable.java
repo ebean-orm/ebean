@@ -91,18 +91,16 @@ public class CheckImmutable {
         // Check all fields defined in the class for type and if they are final
         Field[] objFields = cls.getDeclaredFields();
         for (int i = 0; i < objFields.length; i++) {
-            if (Modifier.isStatic(objFields[i].getModifiers())) {
-                // ignore static fields
-            } else {
-                if (!Modifier.isFinal(objFields[i].getModifiers())) {
-                    res.setReasonNotImmutable("Non final field " + cls + "." + objFields[i].getName());
-                    return false;
-                }
-                if (!isImmutable(objFields[i].getType(), res)) {
-                    res.setReasonNotImmutable("Non Immutable field type " + objFields[i].getType());
-                    return false;
-                }
-            }
+          if (!Modifier.isStatic(objFields[i].getModifiers())) {
+              if (!Modifier.isFinal(objFields[i].getModifiers())) {
+                  res.setReasonNotImmutable("Non final field " + cls + "." + objFields[i].getName());
+                  return false;
+              }
+              if (!isImmutable(objFields[i].getType(), res)) {
+                  res.setReasonNotImmutable("Non Immutable field type " + objFields[i].getType());
+                  return false;
+              }
+          }
         }
 
         return true;

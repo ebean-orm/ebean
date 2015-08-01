@@ -37,6 +37,7 @@ public class CachedBeanDataToBean {
 
     int propertyIndex = prop.getPropertyIndex();
     if (cacheBeanData.isLoaded(propertyIndex)) {
+      //noinspection StatementWithEmptyBody
       if (ebi.isLoadedProperty(propertyIndex)) {
         // already loaded (lazy load on partially loaded bean)
       } else {

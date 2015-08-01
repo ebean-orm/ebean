@@ -94,6 +94,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   public void initialise() {
     super.initialise();
     if (!isTransient) {
+      //noinspection StatementWithEmptyBody
       if (embedded) {
         // no imported or exported information
       } else if (!oneToOneExported) {
@@ -832,6 +833,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       writeJson.writeNullField(name);
 
     } else {
+      //noinspection StatementWithEmptyBody
       if (writeJson.isParentBean(value)) {
         // bi-directional and already rendered parent
 
