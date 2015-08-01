@@ -1,14 +1,13 @@
 package com.avaje.ebean.common;
 
+import com.avaje.ebean.bean.BeanCollectionLoader;
+import com.avaje.ebean.bean.EntityBean;
+
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-
-import com.avaje.ebean.bean.BeanCollectionLoader;
-import com.avaje.ebean.bean.EntityBean;
 
 /**
  * Map capable of lazy loading.
@@ -260,19 +259,19 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public void putAll(Map<? extends K, ? extends E> t) {
+  public void putAll(Map<? extends K, ? extends E> puts) {
     checkReadOnly();
     init();
     if (modifyListening) {
-      Iterator it = t.entrySet().iterator();
-      while (it.hasNext()) {
-        Map.Entry entry = (Map.Entry) it.next();
-        Object o = map.put((K) entry.getKey(), (E) entry.getValue());
-        modifyAddition((E) entry.getValue());
-        modifyRemoval(o);
+      for (Entry<? extends K, ? extends E> entry : puts.entrySet()) {
+        Object oldBean = map.put(entry.getKey(), entry.getValue());
+        if (entry.getValue() != oldBean) {
+          modifyAddition(entry.getValue());
+          modifyRemoval(oldBean);
+        }
       }
     }
-    map.putAll(t);
+    map.putAll(puts);
   }
 
   public E remove(Object key) {
