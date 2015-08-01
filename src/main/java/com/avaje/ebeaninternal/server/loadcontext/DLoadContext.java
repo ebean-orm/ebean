@@ -89,7 +89,7 @@ public class DLoadContext implements LoadContext {
   /**
    * Return the minimum batch size when using QueryIterator with query joins.
    */
-  public int getSecondaryQueriesMinBatchSize(OrmQueryRequest<?> parentRequest, int defaultQueryBatch) {
+  public int getSecondaryQueriesMinBatchSize(int defaultQueryBatch) {
 
     if (secQuery == null) {
       return -1;

@@ -91,7 +91,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    * </p>
    */
   public int getSecondaryQueriesMinBatchSize(int defaultQueryBatch) {
-    return loadContext.getSecondaryQueriesMinBatchSize(this, defaultQueryBatch);
+    return loadContext.getSecondaryQueriesMinBatchSize(defaultQueryBatch);
   }
 
   /**

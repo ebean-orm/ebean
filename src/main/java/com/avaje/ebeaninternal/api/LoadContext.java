@@ -14,7 +14,7 @@ public interface LoadContext {
   /**
    * Return the minimum batch size when using QueryIterator with query joins.
    */
-  int getSecondaryQueriesMinBatchSize(OrmQueryRequest<?> parentRequest, int defaultQueryBatch);
+  int getSecondaryQueriesMinBatchSize(int defaultQueryBatch);
 
 	/**
 	 * Execute any secondary (+query) queries if there are any defined.
