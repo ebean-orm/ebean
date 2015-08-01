@@ -37,7 +37,7 @@ public class McastSender {
             this.port = port;
             this.inetAddress = InetAddress.getByName(address);
 
-            InetAddress sendInetAddress = null;
+            InetAddress sendInetAddress;
             if (sendAddress != null) {
                 sendInetAddress = InetAddress.getByName(sendAddress);
             } else {

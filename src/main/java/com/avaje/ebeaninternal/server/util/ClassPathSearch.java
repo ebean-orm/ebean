@@ -175,7 +175,7 @@ public class ClassPathSearch implements ClassPathSearchService {
 
   private ClassPathElement getClassPathElement(Object classPathEntry) throws MalformedURLException {
 
-    URL fileUrl = null;
+    URL fileUrl;
 
     if (URI.class.isInstance(classPathEntry)) {
       fileUrl = ((URI) classPathEntry).toURL();

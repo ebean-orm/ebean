@@ -108,7 +108,7 @@ public class TunedQueryInfo implements Serializable {
 		    return false;
 		}
 		
-		boolean tuned = false;
+		boolean tuned;
 		//Note: tunedDetail is immutable by convention
 	    if (query.isDetailEmpty()) {
             tuned = true;

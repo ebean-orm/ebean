@@ -51,7 +51,7 @@ public class OutgoingPacketsAcked {
         
         synchronized (this) {
             
-            boolean checkMin = false;
+            boolean checkMin;
             
             GroupMemberAck groupMemberAck = recievedByMap.get(groupMember);
             if (groupMemberAck == null) {

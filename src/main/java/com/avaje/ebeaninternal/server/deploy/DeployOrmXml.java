@@ -106,7 +106,7 @@ public class DeployOrmXml {
 	private void readOrmXml(String ormXmlName, ArrayList<Dnode> ormXmlList) {
 
 		try {
-			Dnode ormXml = null;
+			Dnode ormXml;
 			ResourceContent content = resSource.getContent(ormXmlName);
 			if (content != null) {
 				// servlet resource or file system...

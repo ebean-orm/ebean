@@ -150,7 +150,7 @@ public class InheritInfo {
    */
   public BeanProperty findSubTypeProperty(String propertyName) {
 
-    BeanProperty prop = null;
+    BeanProperty prop;
 
     for (int i = 0, x = children.size(); i < x; i++) {
       InheritInfo childInfo = children.get(i);

@@ -512,7 +512,7 @@ public class StringHelper {
       sb.append(source.substring(0, startPos));
     }
 
-    int matchCount = 0;
+    int matchCount;
 
     for (int i = startPos; i < len; i++) {
       sourceChar = source.charAt(i);

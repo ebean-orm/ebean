@@ -74,8 +74,8 @@ public final class DRawSqlSelectColumnsParser {
 		if (lastSpace > -1) {
 			secLastSpace = colInfo.lastIndexOf(' ', lastSpace - 1);
 		}
-		String colName = null;
-		String colLabel = null;
+		String colName;
+		String colLabel;
 		if (lastSpace == -1) {
 			// no column alias
 			colName = colInfo;
