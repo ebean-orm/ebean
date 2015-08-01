@@ -104,7 +104,7 @@ public class BatchedPstmt {
     }
   }
 
-  private void postExecute() throws SQLException {
+  private void postExecute() {
     for (int i = 0; i < list.size(); i++) {
       list.get(i).postExecute();
     }

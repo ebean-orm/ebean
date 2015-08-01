@@ -518,7 +518,7 @@ public class BeanProperty implements ElPropertyValue {
     scalarType.loadIgnore(ctx.getDataReader());
   }
 
-  public void load(SqlBeanLoad sqlBeanLoad) throws SQLException {
+  public void load(SqlBeanLoad sqlBeanLoad) {
     sqlBeanLoad.load(this);
   }
 

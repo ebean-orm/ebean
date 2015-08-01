@@ -80,7 +80,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Check the rowCount.
    */
-  protected void checkRowCount(int rowCount) throws SQLException, OptimisticLockException {
+  protected void checkRowCount(int rowCount) throws OptimisticLockException {
     try {
       persistRequest.checkRowCount(rowCount);
       persistRequest.postExecute();
