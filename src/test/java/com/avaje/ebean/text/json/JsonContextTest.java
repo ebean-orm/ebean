@@ -73,6 +73,7 @@ public class JsonContextTest {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void test_unknownProperty_withVisitor() {
 
