@@ -27,27 +27,27 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
   private static final Logger logger = LoggerFactory.getLogger(BootupClasses.class);
 
-  private final ArrayList<Class<?>> embeddableList = new ArrayList<Class<?>>();
+  private final List<Class<?>> embeddableList = new ArrayList<Class<?>>();
 
-  private final ArrayList<Class<?>> entityList = new ArrayList<Class<?>>();
+  private final List<Class<?>> entityList = new ArrayList<Class<?>>();
 
-  private final ArrayList<Class<?>> scalarTypeList = new ArrayList<Class<?>>();
+  private final List<Class<?>> scalarTypeList = new ArrayList<Class<?>>();
 
-  private final ArrayList<Class<?>> scalarConverterList = new ArrayList<Class<?>>();
+  private final List<Class<?>> scalarConverterList = new ArrayList<Class<?>>();
 
-  private final ArrayList<Class<?>> compoundTypeList = new ArrayList<Class<?>>();
+  private final List<Class<?>> compoundTypeList = new ArrayList<Class<?>>();
 
-  private final ArrayList<Class<?>> beanControllerList = new ArrayList<Class<?>>();
+  private final List<Class<?>> beanControllerList = new ArrayList<Class<?>>();
 
-  private final ArrayList<Class<?>> transactionEventListenerList = new ArrayList<Class<?>>();
+  private final List<Class<?>> transactionEventListenerList = new ArrayList<Class<?>>();
 
-  private final ArrayList<Class<?>> beanFindControllerList = new ArrayList<Class<?>>();
-  private final ArrayList<Class<?>> beanQueryAdapterList = new ArrayList<Class<?>>();
+  private final List<Class<?>> beanFindControllerList = new ArrayList<Class<?>>();
+  private final List<Class<?>> beanQueryAdapterList = new ArrayList<Class<?>>();
 
-  private final ArrayList<Class<?>> beanListenerList = new ArrayList<Class<?>>();
+  private final List<Class<?>> beanListenerList = new ArrayList<Class<?>>();
 
-  private final ArrayList<Class<?>> serverConfigStartupList = new ArrayList<Class<?>>();
-  private final ArrayList<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<ServerConfigStartup>();
+  private final List<Class<?>> serverConfigStartupList = new ArrayList<Class<?>>();
+  private final List<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<ServerConfigStartup>();
 
   private final List<BeanFindController> findControllerInstances = new ArrayList<BeanFindController>();
   private final List<BeanPersistController> persistControllerInstances = new ArrayList<BeanPersistController>();
@@ -75,10 +75,17 @@ public class BootupClasses implements ClassPathSearchMatcher {
       try {
         ServerConfigStartup newInstance = (ServerConfigStartup) cls.newInstance();
         newInstance.onStart(serverConfig);
-
       } catch (Exception e) {
-        String msg = "Error creating BeanQueryAdapter " + cls;
-        logger.error(msg, e);
+        // assume that the desired behavior is to fail - add your own try catch if needed
+        throw new IllegalStateException("Error running ServerConfigStartup " + cls, e);
+      }
+    }
+    for (ServerConfigStartup startup : serverConfigStartupInstances) {
+      try {
+        startup.onStart(serverConfig);
+      } catch (Exception e) {
+        // assume that the desired behavior is to fail - add your own try catch if needed
+        throw new IllegalStateException("Error running ServerConfigStartup " + startup.getClass(), e);
       }
     }
   }
