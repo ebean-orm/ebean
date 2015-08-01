@@ -182,7 +182,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.deployOrmXml = config.getDeployOrmXml();
     this.deployUtil = config.getDeployUtil();
 
-    this.beanManagerFactory = new BeanManagerFactory(serverConfig, config.getDatabasePlatform());
+    this.beanManagerFactory = new BeanManagerFactory(config.getDatabasePlatform());
 
     this.updateChangesOnly = serverConfig.isUpdateChangesOnly();
 

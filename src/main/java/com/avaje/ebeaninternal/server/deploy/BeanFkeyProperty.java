@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
@@ -159,15 +158,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 
-  public StringFormatter getStringFormatter() {
-    throw new RuntimeException("ElPropertyDeploy only - not implemented");
-  }
-
   public StringParser getStringParser() {
-    throw new RuntimeException("ElPropertyDeploy only - not implemented");
-  }
-
-  public void elSetReference(EntityBean bean) {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 
@@ -184,10 +175,6 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   public Object elGetReference(EntityBean bean) {
-    throw new RuntimeException("ElPropertyDeploy only - not implemented");
-  }
-
-  public String getDeployProperty() {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 
