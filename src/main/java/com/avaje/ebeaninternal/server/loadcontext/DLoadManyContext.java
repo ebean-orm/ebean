@@ -106,7 +106,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
       if (bufferList != null) {
         for (LoadBuffer loadBuffer : bufferList) {
           if (!loadBuffer.list.isEmpty()) {
-            LoadManyRequest req = new LoadManyRequest(loadBuffer, parentRequest, false, false, false);
+            LoadManyRequest req = new LoadManyRequest(loadBuffer, parentRequest);
             parent.getEbeanServer().loadMany(req);
             if (!queryProps.isQueryFetchAll()) {
               // Stop - only fetch the first batch ... the rest will be lazy loaded
@@ -216,7 +216,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 
         // Should reduce the list by checking each beanCollection in the L2 first before executing the query
 
-        LoadManyRequest req = new LoadManyRequest(this, true, onlyIds, useCache);
+        LoadManyRequest req = new LoadManyRequest(this, onlyIds, useCache);
         context.parent.getEbeanServer().loadMany(req);
       }
     }

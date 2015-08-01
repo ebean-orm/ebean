@@ -18,12 +18,21 @@ public class LoadManyRequest extends LoadRequest {
 
   private final boolean loadCache;
 
-  public LoadManyRequest(LoadManyBuffer loadContext, boolean lazy, boolean onlyIds, boolean loadCache) {
-    this(loadContext, null, lazy, onlyIds, loadCache);
+  /**
+   * Construct for lazy loading.
+   */
+  public LoadManyRequest(LoadManyBuffer loadContext, boolean onlyIds, boolean loadCache) {
+    this(loadContext, null, true, onlyIds, loadCache);
   }
-  
-  public LoadManyRequest(LoadManyBuffer loadContext, OrmQueryRequest<?> parentRequest,  boolean lazy, boolean onlyIds, boolean loadCache) {
 
+  /**
+   * Construct for secondary query.
+   */
+  public LoadManyRequest(LoadManyBuffer loadContext, OrmQueryRequest<?> parentRequest) {
+    this(loadContext, parentRequest, false, false, false);
+  }
+
+  private LoadManyRequest(LoadManyBuffer loadContext, OrmQueryRequest<?> parentRequest,  boolean lazy, boolean onlyIds, boolean loadCache) {
     super(parentRequest, lazy);
     this.loadContext = loadContext;
     this.batch = loadContext.getBatch();

@@ -18,11 +18,21 @@ public class LoadBeanRequest extends LoadRequest {
 
   private final boolean loadCache;
 
-  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, boolean lazy, String lazyLoadProperty, boolean loadCache) {
-    this(LoadBuffer, null, lazy, lazyLoadProperty, loadCache);
+  /**
+   * Construct for lazy load request.
+   */
+  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, String lazyLoadProperty, boolean loadCache) {
+    this(LoadBuffer, null, true, lazyLoadProperty, loadCache);
   }
-  
-  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, OrmQueryRequest<?> parentRequest, boolean lazy, String lazyLoadProperty, boolean loadCache) {
+
+  /**
+   * Construct for secondary query.
+   */
+  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, OrmQueryRequest<?> parentRequest) {
+    this(LoadBuffer, parentRequest, false, null, false);
+  }
+
+  private LoadBeanRequest(LoadBeanBuffer LoadBuffer, OrmQueryRequest<?> parentRequest, boolean lazy, String lazyLoadProperty, boolean loadCache) {
     super(parentRequest, lazy);
     this.LoadBuffer = LoadBuffer;
     this.batch = LoadBuffer.getBatch();

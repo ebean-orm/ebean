@@ -91,7 +91,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
       if (bufferList != null) {
         for (LoadBuffer loadBuffer : bufferList) {
           if (!loadBuffer.list.isEmpty()) {
-            LoadBeanRequest req = new LoadBeanRequest(loadBuffer, parentRequest, false, null, false);
+            LoadBeanRequest req = new LoadBeanRequest(loadBuffer, parentRequest);
             parent.getEbeanServer().loadBean(req);
             if (!queryProps.isQueryFetchAll()) {
               // Stop - only fetch the first batch ... the rest will be lazy loaded
@@ -200,7 +200,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
         }
       }
 
-      LoadBeanRequest req = new LoadBeanRequest(this, true, ebi.getLazyLoadProperty(), context.hitCache);
+      LoadBeanRequest req = new LoadBeanRequest(this, ebi.getLazyLoadProperty(), context.hitCache);
       context.desc.getEbeanServer().loadBean(req);
     }
 
