@@ -29,11 +29,6 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
   final DeployTableJoin tableJoin = new DeployTableJoin();
 
 	/**
-	 * Whether the associated join type should be an outer join.
-	 */
-	boolean isOuterJoin = false;
-
-	/**
 	 * Literal added to where clause of lazy loading query.
 	 */
 	String extraWhere;
@@ -68,13 +63,6 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
 	 */
 	public Class<T> getTargetType() {
 		return targetType;
-	}
-
-	/**
-	 * Return if this association should use an Outer join.
-	 */
-	public boolean isOuterJoin() {
-		return isOuterJoin;
 	}
 
 	/**

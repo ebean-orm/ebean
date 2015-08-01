@@ -59,11 +59,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	
 	final String mappedBy;
 
-	/**
-	 * Whether the associated join type should be an outer join.
-	 */
-	final boolean isOuterJoin;
-
 	final String extraWhere;
 
 	boolean saveRecurseSkippable;
@@ -76,7 +71,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	public BeanPropertyAssoc(BeanDescriptor<?> descriptor, DeployBeanPropertyAssoc<T> deploy) {
 		super(descriptor, deploy);
 		this.extraWhere = InternString.intern(deploy.getExtraWhere());
-		this.isOuterJoin = deploy.isOuterJoin();
 		this.beanTable = deploy.getBeanTable();
 		this.mappedBy = InternString.intern(deploy.getMappedBy());
 
