@@ -165,7 +165,7 @@ public final class DefaultPersister implements Persister {
    */
   public void update(EntityBean entityBean, Transaction t, boolean deleteMissingChildren) {
 
-    PersistRequestBean<?> req = createRequest(entityBean, t, null, PersistRequest.Type.UPDATE);
+    PersistRequestBean<?> req = createRequest(entityBean, t, PersistRequest.Type.UPDATE);
     req.setDeleteMissingChildren(deleteMissingChildren);
     try {
       req.initTransIfRequiredWithBatchCascade();
@@ -205,7 +205,7 @@ public final class DefaultPersister implements Persister {
    */
   public void insert(EntityBean bean, Transaction t) {
 
-    PersistRequestBean<?> req = createRequest(bean, t, null, PersistRequest.Type.INSERT);
+    PersistRequestBean<?> req = createRequest(bean, t, PersistRequest.Type.INSERT);
     try {
       req.initTransIfRequiredWithBatchCascade();
       insert(req);
@@ -312,7 +312,7 @@ public final class DefaultPersister implements Persister {
    */
   public void delete(EntityBean bean, Transaction t) {
 
-    PersistRequestBean<?> req = createRequest(bean, t, null, PersistRequest.Type.DELETE);
+    PersistRequestBean<?> req = createRequest(bean, t, PersistRequest.Type.DELETE);
     if (req.isRegisteredForDeleteBean()) {
       // skip deleting bean. Used where cascade is on
       // both sides of a relationship
@@ -1192,12 +1192,12 @@ public final class DefaultPersister implements Persister {
    * Create the Persist Request Object that wraps all the objects used to
    * perform an insert, update or delete.
    */
-  private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, PersistRequest.Type type) {
+  private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, PersistRequest.Type type) {
     BeanManager<T> mgr = getBeanManager(bean);
     if (mgr == null) {
       throw new PersistenceException(errNotRegistered(bean.getClass()));
     }
-    return createRequest(bean, t, parentBean, mgr, type, false);
+    return createRequest(bean, t, null, mgr, type, false);
   }
 
   /**
