@@ -505,7 +505,9 @@ public class PooledConnection extends ConnectionDelegator {
 
   private void resetIsolationReadOnly() throws SQLException {
     // reset the transaction isolation if the client code changed it
+    //noinspection MagicConstant
     if (connection.getTransactionIsolation() != pool.getTransactionIsolation()) {
+      //noinspection MagicConstant
       connection.setTransactionIsolation(pool.getTransactionIsolation());
     }
     // reset readonly to false
