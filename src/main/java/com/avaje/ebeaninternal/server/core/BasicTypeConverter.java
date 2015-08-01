@@ -30,16 +30,6 @@ public final class BasicTypeConverter implements Serializable {
 	 */
 	public static final int UTIL_DATE = -999998988;
 
-	/**
-	 * Type code for java.math.BigInteger.
-	 */
-	public static final int MATH_BIGINTEGER = -999998987;
-
-	/**
-	 * Type code for an Enum type.
-	 */
-	public static final int ENUM = -999998989;
-	
 	private BasicTypeConverter() {
 	}
 

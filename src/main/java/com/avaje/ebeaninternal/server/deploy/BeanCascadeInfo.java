@@ -20,31 +20,6 @@ public class BeanCascadeInfo {
      */
     boolean save;
 
-    /**
-     * Set the raw deployment attribute.
-     */
-    public void setAttribute(String attr) {
-        if (attr == null){
-            return;
-        }
-        attr = attr.toLowerCase();
-        delete = (attr.contains("delete"));
-        if (!delete){
-            // same as EJB3 remove
-            delete = (attr.contains("remove"));
-        }
-        save = (attr.contains("save"));
-        if (!save){
-            // same as EJB3 persist
-            save = (attr.contains("persist"));
-        }
-        
-        if (attr.contains("all")){
-            delete = true;
-            save = true;
-        }
-    }
-
     public void setTypes(CascadeType[] types) {
         for (int i = 0; i < types.length; i++) {
             setType(types[i]);
@@ -86,11 +61,4 @@ public class BeanCascadeInfo {
         return save;
     }
     	
-    /**
-     * Set to true if save should cascade.
-     */
-    public void setSave(boolean isUpdate) {
-        this.save = isUpdate;
-    }
-
 }
