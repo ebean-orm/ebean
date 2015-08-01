@@ -219,13 +219,6 @@ public class DeployBeanProperty {
     return 0;
   }
 
-  /**
-   * Return true is this is a simple scalar property.
-   */
-  public boolean isScalar() {
-    return true;
-  }
-
   public String getFullBeanName() {
     return desc.getFullName() + "." + name;
   }
@@ -469,14 +462,6 @@ public class DeployBeanProperty {
 
   public void setNaturalKey(boolean naturalKey) {
     this.naturalKey = naturalKey;
-  }
-
-  /**
-   * Return true if this is a generated property like update timestamp and
-   * create timestamp.
-   */
-  public boolean isGenerated() {
-    return generatedProperty != null;
   }
 
   /**
