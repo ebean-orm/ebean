@@ -116,7 +116,7 @@ public class DeployUtil {
       if (scalarType == null) {
         // use JPA normal Enum type (without mapping)
         EnumType type = enumerated != null ? enumerated.value() : null;
-        scalarType = createEnumScalarTypePerSpec(enumType, type, prop.getDbType());
+        scalarType = createEnumScalarTypePerSpec(enumType, type);
       }
 
       typeManager.add(scalarType);
@@ -125,7 +125,7 @@ public class DeployUtil {
     prop.setDbType(scalarType.getJdbcType());
   }
 
-  private ScalarType<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type, int dbType) {
+  private ScalarType<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
 
     if (type == null) {
       // default as per spec is ORDINAL
