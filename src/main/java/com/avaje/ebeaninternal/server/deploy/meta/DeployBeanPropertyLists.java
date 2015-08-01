@@ -363,7 +363,7 @@ public class DeployBeanPropertyLists {
     }
     
     if (deployProp instanceof DeployBeanPropertyCompound) {
-      return new BeanPropertyCompound(owner, desc, (DeployBeanPropertyCompound) deployProp);
+      return new BeanPropertyCompound(desc, (DeployBeanPropertyCompound) deployProp);
     }
 
     return new BeanProperty(desc, deployProp);

@@ -38,7 +38,7 @@ public class DeployBeanPropertyCompound extends DeployBeanProperty {
     this.typeConverter = typeConverter;
   }
 
-  public BeanPropertyCompoundRoot getFlatProperties(BeanDescriptorMap owner, BeanDescriptor<?> descriptor) {
+  public BeanPropertyCompoundRoot getFlatProperties() {
 
     // get a 'flat' list of all the scalar types, their relative property names
     // and also set their matching dbColumn

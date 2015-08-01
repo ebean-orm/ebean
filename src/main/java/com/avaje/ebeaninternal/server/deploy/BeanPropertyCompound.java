@@ -45,14 +45,14 @@ public class BeanPropertyCompound extends BeanProperty {
   /**
    * Create the property.
    */
-  public BeanPropertyCompound(BeanDescriptorMap owner, BeanDescriptor<?> descriptor, DeployBeanPropertyCompound deploy) {
+  public BeanPropertyCompound(BeanDescriptor<?> descriptor, DeployBeanPropertyCompound deploy) {
 
     super(descriptor, deploy);
 
     this.compoundType = deploy.getCompoundType();
     this.typeConverter = deploy.getTypeConverter();
 
-    BeanPropertyCompoundRoot root = deploy.getFlatProperties(owner, descriptor);
+    BeanPropertyCompoundRoot root = deploy.getFlatProperties();
 
     this.scalarProperties = root.getScalarProperties();
 
