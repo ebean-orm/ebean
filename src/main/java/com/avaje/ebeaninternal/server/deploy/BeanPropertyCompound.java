@@ -152,7 +152,7 @@ public class BeanPropertyCompound extends BeanProperty {
   }
 
   @Override
-  public void load(SqlBeanLoad sqlBeanLoad) throws SQLException {
+  public void load(SqlBeanLoad sqlBeanLoad) {
     sqlBeanLoad.load(this);
   }
 

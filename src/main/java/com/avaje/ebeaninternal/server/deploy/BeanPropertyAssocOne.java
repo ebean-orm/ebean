@@ -548,7 +548,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public void load(SqlBeanLoad sqlBeanLoad) throws SQLException {
+  public void load(SqlBeanLoad sqlBeanLoad) {
     Object dbVal = sqlBeanLoad.load(this);
     if (embedded && sqlBeanLoad.isLazyLoad()) {
       if (dbVal instanceof EntityBean) {

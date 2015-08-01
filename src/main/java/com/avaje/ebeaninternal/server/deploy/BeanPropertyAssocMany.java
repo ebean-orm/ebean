@@ -389,7 +389,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public void load(SqlBeanLoad sqlBeanLoad) throws SQLException {
+  public void load(SqlBeanLoad sqlBeanLoad) {
     // do nothing, as a lazy loading BeanCollection 'reference'
     // is created and registered with the loading context
     // in SqlTreeNodeBean.createListProxies()
