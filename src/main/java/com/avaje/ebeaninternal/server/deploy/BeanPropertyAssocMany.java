@@ -396,7 +396,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public Object readSet(DbReadContext ctx, EntityBean bean, Class<?> type) throws SQLException {
+  public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
     return null;
   }
 

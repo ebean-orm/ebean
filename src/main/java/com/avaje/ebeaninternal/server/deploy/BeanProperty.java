@@ -4,7 +4,6 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.DbType;
-import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
@@ -534,11 +533,11 @@ public class BeanProperty implements ElPropertyValue {
     return scalarType.read(ctx.getDataReader());
   }
 
-  public Object readSet(DbReadContext ctx, EntityBean bean, Class<?> type) throws SQLException {
+  public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
 
     try {
       Object value = scalarType.read(ctx.getDataReader());
-      if (bean != null && ((type == null || owningType.isAssignableFrom(type)))) {
+      if (bean != null) {
         setValue(bean, value);
       }
       return value;
@@ -779,10 +778,6 @@ public class BeanProperty implements ElPropertyValue {
    */
   @SuppressWarnings(value = "unchecked")
   public ScalarType<Object> getScalarType() {
-    return scalarType;
-  }
-
-  public StringFormatter getStringFormatter() {
     return scalarType;
   }
 

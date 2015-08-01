@@ -123,14 +123,10 @@ public class BeanPropertyCompound extends BeanProperty {
   }
 
   @Override
-  public Object readSet(DbReadContext ctx, EntityBean bean, Class<?> type) throws SQLException {
-
-    boolean assignable = (type == null || owningType.isAssignableFrom(type));
+  public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
 
     Object v = compoundType.read(ctx.getDataReader());
-    if (assignable) {
-      setValue(bean, v);
-    }
+    setValue(bean, v);
 
     return v;
   }

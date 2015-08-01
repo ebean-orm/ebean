@@ -510,9 +510,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public Object readSet(DbReadContext ctx, EntityBean bean, Class<?> type) throws SQLException {
-    boolean assignable = (type == null || owningType.isAssignableFrom(type));
-    return localHelp.readSet(ctx, bean, assignable);
+  public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
+    return localHelp.readSet(ctx, bean, true);
   }
 
   /**
@@ -614,7 +613,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
       boolean notNull = false;
       for (int i = 0; i < embeddedProps.length; i++) {
-        Object value = embeddedProps[i].readSet(ctx, embeddedBean, null);
+        Object value = embeddedProps[i].readSet(ctx, embeddedBean);
         if (value != null) {
           notNull = true;
         }

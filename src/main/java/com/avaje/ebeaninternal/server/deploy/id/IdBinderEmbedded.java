@@ -279,7 +279,7 @@ public final class IdBinderEmbedded implements IdBinder {
     boolean notNull = true;
 
     for (int i = 0; i < props.length; i++) {
-      Object value = props[i].readSet(ctx, embId, null);
+      Object value = props[i].readSet(ctx, embId);
       if (value == null) {
         notNull = false;
       }
