@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.query;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
 import java.util.ArrayList;
 import java.util.List;
