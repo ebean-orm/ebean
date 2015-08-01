@@ -35,8 +35,8 @@ public class ElPropertyChainBuilder {
     return containsMany;
   }
 
-  public void setContainsMany(boolean containsMany) {
-    this.containsMany = containsMany;
+  public void setContainsMany() {
+    this.containsMany = true;
   }
 
   public String getExpression() {

@@ -1433,7 +1433,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       throw new PersistenceException("No property found for [" + propName + "] in expression " + chain.getExpression());
     }
     if (property.containsMany()) {
-      chain.setContainsMany(true);
+      chain.setContainsMany();
     }
     return chain.add(property).build();
   }

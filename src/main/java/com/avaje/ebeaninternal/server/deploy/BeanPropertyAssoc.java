@@ -114,7 +114,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
         }
         chain.add(this);
         if (containsMany()) {
-            chain.setContainsMany(true);
+            chain.setContainsMany();
         }
         return embDesc.buildElGetValue(remainder, chain, propertyDeploy);
     }
