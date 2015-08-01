@@ -9,8 +9,6 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 	
 	boolean oneToOneExported;
 
-	boolean importedPrimaryKey;
-
 	DeployBeanEmbedded deployEmbedded;
 	
 	/**
@@ -68,13 +66,6 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 	 */
 	public void setOneToOneExported(boolean oneToOneExported) {
 		this.oneToOneExported = oneToOneExported;
-	}
-
-	/**
-	 * If true this bean maps to the primary key.
-	 */
-	public boolean isImportedPrimaryKey() {
-		return importedPrimaryKey;
 	}
 
 }

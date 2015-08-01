@@ -70,7 +70,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     super(descriptor, deploy);
 
-    importedPrimaryKey = deploy.isImportedPrimaryKey();
+    importedPrimaryKey = false;//TODO: Review this - deploy.isImportedPrimaryKey();
     oneToOne = deploy.isOneToOne();
     oneToOneExported = deploy.isOneToOneExported();
 
