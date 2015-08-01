@@ -152,7 +152,7 @@ public class DRawSqlSelect {
 			}
 		}
 
-		SqlTreeNode sqlRoot = new SqlTreeNodeRoot(desc, selectProps, withId, false);
+		SqlTreeNode sqlRoot = new SqlTreeNodeRoot(desc, selectProps, withId);
 
     return new SqlTree(desc.getName(), sqlRoot);
 	}

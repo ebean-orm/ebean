@@ -26,10 +26,10 @@ public final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   }
 
   /**
-   * Construct for raw sql.
+   * Construct for raw sql named queries.
    */
-  public SqlTreeNodeRoot(BeanDescriptor<?> desc, SqlTreeProperties props, boolean withId, boolean disableLazyLoad) {
-    super(desc, props, withId, disableLazyLoad);
+  public SqlTreeNodeRoot(BeanDescriptor<?> desc, SqlTreeProperties props, boolean withId) {
+    super(desc, props, withId, false);
     this.includeJoin = null;
   }
 

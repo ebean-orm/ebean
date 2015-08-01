@@ -266,7 +266,7 @@ public class SqlTreeBuilder {
       return new SqlTreeNodeManyRoot(prefix, (BeanPropertyAssocMany<?>) prop, props, myList, disableLazyLoad);
 
     } else {
-      return new SqlTreeNodeBean(prefix, prop, props, myList, true, disableLazyLoad);
+      return new SqlTreeNodeBean(prefix, prop, props, myList, disableLazyLoad);
     }
   }
 
@@ -432,7 +432,7 @@ public class SqlTreeBuilder {
     }
 
     SqlTreeProperties selectProps = new SqlTreeProperties();
-    selectProps.setAllProperties(true);
+    selectProps.setAllProperties();
 
     // normal simple properties of the bean
     selectProps.add(desc.propertiesBaseScalar());

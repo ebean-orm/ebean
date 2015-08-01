@@ -76,8 +76,8 @@ public class SqlTreeProperties {
     this.tableJoins = tableJoins;
   }
 
-  public void setAllProperties(boolean allProperties) {
-    this.allProperties = allProperties;
+  public void setAllProperties() {
+    this.allProperties = true;
   }
 
 }

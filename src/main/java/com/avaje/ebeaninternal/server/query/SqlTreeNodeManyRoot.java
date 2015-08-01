@@ -13,7 +13,7 @@ public final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
   private final BeanPropertyAssocMany<?> manyProp;
 
   public SqlTreeNodeManyRoot(String prefix, BeanPropertyAssocMany<?> prop, SqlTreeProperties props, List<SqlTreeNode> myList, boolean disableLazyLoad) {
-    super(prefix, prop, props, myList, true, disableLazyLoad);
+    super(prefix, prop, props, myList, disableLazyLoad);
     this.manyProp = prop;
   }
 

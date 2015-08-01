@@ -98,9 +98,9 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    * Construct for leaf node.
    */
   public SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
-                         List<SqlTreeNode> myChildren, boolean withId, boolean disableLazyLoad) {
+                         List<SqlTreeNode> myChildren, boolean disableLazyLoad) {
 
-    this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, withId, null, SpiQuery.TemporalMode.CURRENT, disableLazyLoad);
+    this(prefix, beanProp, beanProp.getTargetDescriptor(), props, myChildren, true, null, SpiQuery.TemporalMode.CURRENT, disableLazyLoad);
   }
 
   /**
@@ -399,7 +399,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     }
 
     if (readId) {
-      appendSelect(ctx, false, idBinder.getBeanProperty());
+      appendSelectId(ctx, idBinder.getBeanProperty());
     }
     appendSelect(ctx, subQuery, properties);
 
@@ -423,10 +423,10 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     }
   }
 
-  private void appendSelect(DbSqlContext ctx, boolean subQuery, BeanProperty prop) {
+  private void appendSelectId(DbSqlContext ctx, BeanProperty prop) {
 
     if (prop != null) {
-      prop.appendSelect(ctx, subQuery);
+      prop.appendSelect(ctx, false);
     }
   }
 
