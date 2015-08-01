@@ -62,7 +62,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     }
     Embedded embedded = get(prop, Embedded.class);
     if (embedded != null) {
-      readEmbedded(embedded, prop);
+      readEmbedded(prop);
     }
     EmbeddedId emId = get(prop, EmbeddedId.class);
     if (emId != null) {
@@ -191,7 +191,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
     prop.setBeanTable(assoc);
   }
 
-  private void readEmbedded(Embedded propAnn, DeployBeanPropertyAssocOne<?> prop) {
+  private void readEmbedded(DeployBeanPropertyAssocOne<?> prop) {
 
     prop.setEmbedded(true);
     prop.setDbInsertable(true);

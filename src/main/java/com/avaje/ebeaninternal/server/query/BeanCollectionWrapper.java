@@ -6,7 +6,6 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.RelationalQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.util.BeanCollectionFactory;
-import com.avaje.ebeaninternal.server.util.BeanCollectionParams;
 
 import java.util.Collection;
 import java.util.Map;
@@ -23,11 +22,6 @@ public final class BeanCollectionWrapper {
    * Flag set if this builds a Map rather than a Collection.
    */
   private final boolean isMap;
-
-  /**
-   * The type.
-   */
-  private final SpiQuery.Type queryType;
 
   /**
    * A property name used as key for a Map.
@@ -62,7 +56,7 @@ public final class BeanCollectionWrapper {
   public BeanCollectionWrapper(RelationalQueryRequest request) {
 
     this.desc = null;
-    this.queryType = request.getQueryType();
+    SpiQuery.Type queryType = request.getQueryType();
     this.mapKey = request.getQuery().getMapKey();
     this.isMap = SpiQuery.Type.MAP.equals(queryType);
 
@@ -92,8 +86,7 @@ public final class BeanCollectionWrapper {
    * Create a BeanCollection of the correct type.
    */
   private BeanCollection<?> createBeanCollection(SpiQuery.Type manyType) {
-    BeanCollectionParams p = new BeanCollectionParams(manyType);
-    return BeanCollectionFactory.create(p);
+    return BeanCollectionFactory.create(manyType);
   }
 
   /**
