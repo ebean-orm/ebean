@@ -1,19 +1,14 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-
 import com.avaje.ebean.config.ScalarTypeConverter;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptorMap;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompoundRoot;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompoundScalar;
 import com.avaje.ebeaninternal.server.type.CtCompoundProperty;
 import com.avaje.ebeaninternal.server.type.CtCompoundType;
 import com.avaje.ebeaninternal.server.type.CtCompoundTypeScalarList;
 import com.avaje.ebeaninternal.server.type.ScalarType;
+
+import java.util.Map.Entry;
 
 
 /**
@@ -52,8 +47,6 @@ public class DeployBeanPropertyCompound extends DeployBeanProperty {
 
     compoundType.accumulateScalarTypes(null, ctMeta);
 
-    List<BeanProperty> beanPropertyList = new ArrayList<BeanProperty>();
-
 
     // for each of the scalar types inside a compound value object
     // build a BeanPropertyCompoundScalar with appropriate deployment
@@ -79,8 +72,6 @@ public class DeployBeanPropertyCompound extends DeployBeanProperty {
       deploy.setDbRead(true);
 
       BeanPropertyCompoundScalar bp = new BeanPropertyCompoundScalar(rootProperty, deploy, ctProp, typeConverter);
-      beanPropertyList.add(bp);
-
       rootProperty.register(bp);
     }
 
