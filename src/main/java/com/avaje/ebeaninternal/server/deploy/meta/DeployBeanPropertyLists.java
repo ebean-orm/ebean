@@ -32,31 +32,29 @@ public class DeployBeanPropertyLists {
 
   private final LinkedHashMap<String, BeanProperty> propertyMap;
 
-  private final ArrayList<BeanProperty> ids = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> ids = new ArrayList<BeanProperty>();
 
-  private final ArrayList<BeanProperty> local = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> local = new ArrayList<BeanProperty>();
 
-  private final ArrayList<BeanProperty> mutable = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> mutable = new ArrayList<BeanProperty>();
 
-  private final ArrayList<BeanProperty> manys = new ArrayList<BeanProperty>();
+  private final List<BeanPropertyAssocMany<?>> manys = new ArrayList<BeanPropertyAssocMany<?>>();
   
-  private final ArrayList<BeanProperty> nonManys = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> nonManys = new ArrayList<BeanProperty>();
 
-  private final ArrayList<BeanProperty> ones = new ArrayList<BeanProperty>();
+  private final List<BeanPropertyAssocOne<?>> ones = new ArrayList<BeanPropertyAssocOne<?>>();
 
-  private final ArrayList<BeanProperty> onesExported = new ArrayList<BeanProperty>();
+  private final List<BeanPropertyAssocOne<?>> onesImported = new ArrayList<BeanPropertyAssocOne<?>>();
 
-  private final ArrayList<BeanProperty> onesImported = new ArrayList<BeanProperty>();
+  private final List<BeanPropertyAssocOne<?>> embedded = new ArrayList<BeanPropertyAssocOne<?>>();
 
-  private final ArrayList<BeanProperty> embedded = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> baseScalar = new ArrayList<BeanProperty>();
 
-  private final ArrayList<BeanProperty> baseScalar = new ArrayList<BeanProperty>();
+  private final List<BeanPropertyCompound> baseCompound = new ArrayList<BeanPropertyCompound>();
 
-  private final ArrayList<BeanPropertyCompound> baseCompound = new ArrayList<BeanPropertyCompound>();
+  private final List<BeanProperty> transients = new ArrayList<BeanProperty>();
 
-  private final ArrayList<BeanProperty> transients = new ArrayList<BeanProperty>();
-
-  private final ArrayList<BeanProperty> nonTransients = new ArrayList<BeanProperty>();
+  private final List<BeanProperty> nonTransients = new ArrayList<BeanProperty>();
 
   private final TableJoin[] tableJoins;
 
@@ -139,20 +137,18 @@ public class DeployBeanPropertyLists {
     }
 
     if (prop instanceof BeanPropertyAssocMany<?>) {
-      manys.add(prop);
+      manys.add((BeanPropertyAssocMany<?>)prop);
 
     } else {
       nonManys.add(prop);
       if (prop instanceof BeanPropertyAssocOne<?>) {
+        BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) prop;
         if (prop.isEmbedded()) {
-          embedded.add(prop);
+          embedded.add(assocOne);
         } else {
-          ones.add(prop);
-          BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) prop;
-          if (assocOne.isOneToOneExported()) {
-            onesExported.add(prop);
-          } else {
-            onesImported.add(prop);
+          ones.add(assocOne);
+          if (!assocOne.isOneToOneExported()) {
+            onesImported.add(assocOne);
           }
         }
       } else {
@@ -284,7 +280,7 @@ public class DeployBeanPropertyLists {
   private BeanPropertyAssocOne<?>[] getOne(boolean imported, Mode mode) {
     ArrayList<BeanPropertyAssocOne<?>> list = new ArrayList<BeanPropertyAssocOne<?>>();
     for (int i = 0; i < ones.size(); i++) {
-      BeanPropertyAssocOne<?> prop = (BeanPropertyAssocOne<?>) ones.get(i);
+      BeanPropertyAssocOne<?> prop = ones.get(i);
       if (imported != prop.isOneToOneExported()) {
         switch (mode) {
         case Save:
@@ -309,7 +305,7 @@ public class DeployBeanPropertyLists {
   private BeanPropertyAssocMany<?>[] getMany2Many() {
     ArrayList<BeanPropertyAssocMany<?>> list = new ArrayList<BeanPropertyAssocMany<?>>();
     for (int i = 0; i < manys.size(); i++) {
-      BeanPropertyAssocMany<?> prop = (BeanPropertyAssocMany<?>) manys.get(i);
+      BeanPropertyAssocMany<?> prop = manys.get(i);
       if (prop.isManyToMany()) {
         list.add(prop);
       }
@@ -321,7 +317,7 @@ public class DeployBeanPropertyLists {
   private BeanPropertyAssocMany<?>[] getMany(Mode mode) {
     ArrayList<BeanPropertyAssocMany<?>> list = new ArrayList<BeanPropertyAssocMany<?>>();
     for (int i = 0; i < manys.size(); i++) {
-      BeanPropertyAssocMany<?> prop = (BeanPropertyAssocMany<?>) manys.get(i);
+      BeanPropertyAssocMany<?> prop = manys.get(i);
 
       switch (mode) {
       case Save:
