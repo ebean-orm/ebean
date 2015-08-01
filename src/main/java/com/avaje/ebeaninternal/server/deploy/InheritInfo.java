@@ -255,13 +255,6 @@ public class InheritInfo {
   }
 
   /**
-   * Return true if this is abstract node.
-   */
-  public boolean isAbstract() {
-    return (discriminatorValue == null);
-  }
-
-  /**
    * Return true if this is the root node.
    */
   public boolean isRoot() {
