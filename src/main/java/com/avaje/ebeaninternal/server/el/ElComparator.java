@@ -7,14 +7,14 @@ import java.util.Comparator;
  */
 public interface ElComparator<T> extends Comparator<T> {
 
-	/**
-	 * Compare given 2 beans.
-	 */
-	int compare(T o1, T o2);
+  /**
+   * Compare given 2 beans.
+   */
+  int compare(T o1, T o2);
 
-	/**
-	 * Compare with a fixed value to a given bean.
-	 */
-	int compareValue(Object value, T o2);
+  /**
+   * Compare with a fixed value to a given bean.
+   */
+  int compareValue(Object value, T o2);
 
 }

@@ -5,8 +5,8 @@ package com.avaje.ebeaninternal.server.el;
  */
 public interface ElMatcher<T> {
 
-	/**
-	 * Return true if the bean matches the expression.
-	 */
-	boolean isMatch(T bean);
+  /**
+   * Return true if the bean matches the expression.
+   */
+  boolean isMatch(T bean);
 }

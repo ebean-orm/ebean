@@ -15,50 +15,50 @@ import java.util.List;
  */
 public class ElPropertyChainBuilder {
 
-	private final String expression;
+  private final String expression;
 
-	private final List<ElPropertyValue> chain = new ArrayList<ElPropertyValue>();
+  private final List<ElPropertyValue> chain = new ArrayList<ElPropertyValue>();
 
-	private final boolean embedded;
-	
-	private boolean containsMany;
-	
-	/**
-	 * Create with the original expression.
-	 */
-	public ElPropertyChainBuilder(boolean embedded, String expression) {
-		this.embedded = embedded;
-		this.expression = expression;
-	}
-	
-	public boolean isContainsMany() {
-		return containsMany;
-	}
+  private final boolean embedded;
 
-	public void setContainsMany(boolean containsMany) {
-		this.containsMany = containsMany;
-	}
+  private boolean containsMany;
 
-	public String getExpression() {
-		return expression;
-	}
+  /**
+   * Create with the original expression.
+   */
+  public ElPropertyChainBuilder(boolean embedded, String expression) {
+    this.embedded = embedded;
+    this.expression = expression;
+  }
 
-	/**
-	 * Add a ElGetValue element to the chain.
-	 */
-	public ElPropertyChainBuilder add(ElPropertyValue element) {
-	    if (element == null){
-	        throw new NullPointerException("element null in expression "+expression);
-	    }
-		chain.add(element);
-		return this;
-	}
+  public boolean isContainsMany() {
+    return containsMany;
+  }
 
-	/**
-	 * Build the immutable ElGetChain from the build information.
-	 */
-	public ElPropertyChain build() {
-		return new ElPropertyChain(containsMany, embedded, expression, chain.toArray(new ElPropertyValue[chain.size()]));
-	}
+  public void setContainsMany(boolean containsMany) {
+    this.containsMany = containsMany;
+  }
+
+  public String getExpression() {
+    return expression;
+  }
+
+  /**
+   * Add a ElGetValue element to the chain.
+   */
+  public ElPropertyChainBuilder add(ElPropertyValue element) {
+    if (element == null) {
+      throw new NullPointerException("element null in expression " + expression);
+    }
+    chain.add(element);
+    return this;
+  }
+
+  /**
+   * Build the immutable ElGetChain from the build information.
+   */
+  public ElPropertyChain build() {
+    return new ElPropertyChain(containsMany, embedded, expression, chain.toArray(new ElPropertyValue[chain.size()]));
+  }
 
 }
