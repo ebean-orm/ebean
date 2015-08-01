@@ -7,13 +7,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * Collects load statistics for a PooledConnection.
  */
 public class PooledConnectionStatistics {
-  
+
   private final AtomicLong count = new AtomicLong();
-  
+
   private final AtomicLong errorCount = new AtomicLong();
-  
+
   private final AtomicLong hwmNanos = new AtomicLong();
-  
+
   private final AtomicLong totalNanos = new AtomicLong();
 
   private final AtomicLong collectionStart;
@@ -21,22 +21,22 @@ public class PooledConnectionStatistics {
   public PooledConnectionStatistics() {
     this.collectionStart = new AtomicLong(System.currentTimeMillis());
   }
-  
+
   /**
    * Add statistics from another collector.
    */
   public void add(PooledConnectionStatistics other) {
-    
+
     errorCount.addAndGet(other.getErrorCount());
     totalNanos.addAndGet(other.totalNanos.get());
     count.addAndGet(other.getCount());
-    
+
     final long otherHwm = other.hwmNanos.get();
     if (otherHwm > hwmNanos.get()) {
       hwmNanos.set(otherHwm);
     }
   }
-  
+
   /**
    * Add some time duration to the statistics.
    */
@@ -44,7 +44,7 @@ public class PooledConnectionStatistics {
 
     // This will be done in pretty much single threaded fashion 
     // as the Connections generally are not shared across threads
-    
+
     if (hasError) {
       errorCount.incrementAndGet();
     }
@@ -54,11 +54,11 @@ public class PooledConnectionStatistics {
       hwmNanos.set(durationNanos);
     }
   }
-  
+
   public String toString() {
-    return "count["+count+"] errors["+errorCount+"] totalMicros["+getTotalMicros()+"] hwmMicros["+getHwmMicros()+"]";
+    return "count[" + count + "] errors[" + errorCount + "] totalMicros[" + getTotalMicros() + "] hwmMicros[" + getHwmMicros() + "]";
   }
-  
+
   public long getCollectionStart() {
     return collectionStart.get();
   }
@@ -74,7 +74,7 @@ public class PooledConnectionStatistics {
   public long getTotalMicros() {
     return TimeUnit.MICROSECONDS.convert(totalNanos.get(), TimeUnit.NANOSECONDS);
   }
-  
+
   public long getHwmMicros() {
     return TimeUnit.MICROSECONDS.convert(hwmNanos.get(), TimeUnit.NANOSECONDS);
   }
@@ -101,16 +101,16 @@ public class PooledConnectionStatistics {
    * </p>
    */
   public static class LoadValues {
-    
+
     private long collectionStart;
     private long count;
     private long errorCount;
     private long hwmMicros;
     private long totalMicros;
-    
+
     public LoadValues() {
     }
-    
+
     public LoadValues(long collectionStart, long count, long errorCount, long hwmMicros, long totalMicros) {
       this.collectionStart = collectionStart;
       this.count = count;
@@ -128,7 +128,7 @@ public class PooledConnectionStatistics {
     }
 
     public String toString() {
-      return "count["+count+"] errors["+errorCount+"] totalMicros["+totalMicros+"] hwmMicros["+hwmMicros+"] avgMicros["+getAvgMicros()+"]";
+      return "count[" + count + "] errors[" + errorCount + "] totalMicros[" + totalMicros + "] hwmMicros[" + hwmMicros + "] avgMicros[" + getAvgMicros() + "]";
     }
 
     public long getCollectionStart() {
@@ -150,13 +150,11 @@ public class PooledConnectionStatistics {
     public long getTotalMicros() {
       return totalMicros;
     }
-    
+
     public long getAvgMicros() {
-      return (count == 0) ? 0 : totalMicros/count;
+      return (count == 0) ? 0 : totalMicros / count;
     }
   }
 
 
-
-  
 }

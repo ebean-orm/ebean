@@ -10,18 +10,18 @@ package com.avaje.ebeaninternal.server.lib.sql;
  */
 public interface DataSourceAlert {
 
-	/**
-	 * Send an alert to say the dataSource is back up.
-	 */
-	void dataSourceUp(String dataSourceName);
+  /**
+   * Send an alert to say the dataSource is back up.
+   */
+  void dataSourceUp(String dataSourceName);
 
-	/**
-	 * Send an alert to say the dataSource is down.
-	 */
-	void dataSourceDown(String dataSourceName);
+  /**
+   * Send an alert to say the dataSource is down.
+   */
+  void dataSourceDown(String dataSourceName);
 
-	/**
-	 * Send an alert to say the dataSource is getting close to its max size.
-	 */
-	void dataSourceWarning(String subject, String msg);
+  /**
+   * Send an alert to say the dataSource is getting close to its max size.
+   */
+  void dataSourceWarning(String subject, String msg);
 }

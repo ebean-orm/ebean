@@ -19,7 +19,7 @@ import com.avaje.ebeaninternal.server.lib.sql.PooledConnectionStatistics.LoadVal
 class FreeConnectionBuffer {
 
   private static final Logger logger = LoggerFactory.getLogger(FreeConnectionBuffer.class);
-  
+
   /**
    * Buffer oriented for add and remove.
    */
@@ -57,7 +57,7 @@ class FreeConnectionBuffer {
 
     // create a temporary list
     List<PooledConnection> tempList = new ArrayList<PooledConnection>(freeBuffer.size());
-    
+
     // add all the connections into it
     for (PooledConnection c : freeBuffer) {
       tempList.add(c);
@@ -65,15 +65,15 @@ class FreeConnectionBuffer {
 
     // clear the buffer (in case it takes some time to close these connections).
     freeBuffer.clear();
-    
+
     logger.debug("... closing all {} connections from the free list with logErrors: {}", tempList.size(), logErrors);
     for (int i = 0; i < tempList.size(); i++) {
       PooledConnection pooledConnection = tempList.get(i);
-      logger.debug("... closing {} of {} connections from the free list", i, tempList.size());      
+      logger.debug("... closing {} of {} connections from the free list", i, tempList.size());
       pooledConnection.closeConnectionFully(logErrors);
     }
   }
-  
+
   /**
    * Trim any inactive connections that have not been used since usedSince.
    */

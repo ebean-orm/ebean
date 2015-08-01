@@ -16,13 +16,13 @@ package com.avaje.ebeaninternal.server.lib.sql;
 public class DataSourcePoolStatistics {
 
   private final long collectionStart;
-  
+
   private final long count;
-  
+
   private final long errorCount;
-  
+
   private final long hwmMicros;
-  
+
   private final long totalMicros;
 
   /**

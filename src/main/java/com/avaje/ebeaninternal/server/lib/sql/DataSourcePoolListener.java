@@ -13,7 +13,7 @@ import java.sql.Connection;
  * <p>
  * Example: datasource.ora10.poolListener=my.very.fancy.PoolListener
  * </p>
- * 
+ * <p>
  * <p>
  * Notice: This listener only works if you are using the default Avaje
  * {@link DataSourcePool}.
@@ -21,14 +21,14 @@ import java.sql.Connection;
  */
 public interface DataSourcePoolListener {
 
-	/**
-	 * Called after a connection has been retrieved from the connection pool
-	 */
-	void onAfterBorrowConnection(Connection c);
+  /**
+   * Called after a connection has been retrieved from the connection pool
+   */
+  void onAfterBorrowConnection(Connection c);
 
-	/**
-	 * Called before a connection will be put back to the connection pool
-	 */
-	void onBeforeReturnConnection(Connection c);
+  /**
+   * Called before a connection will be put back to the connection pool
+   */
+  void onBeforeReturnConnection(Connection c);
 
 }
