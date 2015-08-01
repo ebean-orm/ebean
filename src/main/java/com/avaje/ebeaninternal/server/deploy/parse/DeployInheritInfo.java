@@ -188,17 +188,15 @@ public class DeployInheritInfo {
     public void setDiscriminatorValue(String value) {
         if (value != null){
         	value = value.trim();
-        	if (value.length() == 0){
-        		value = null;
-        	} else {
-            	discriminatorStringValue = value;
-        		// convert the value if desired
-	        	if (discriminatorType == Types.INTEGER){
-	        		this.discriminatorObjectValue = Integer.valueOf(value);
-	        	} else {
-	        		this.discriminatorObjectValue = value;
-	        	}
-        	}
+          if (value.length() != 0) {
+              discriminatorStringValue = value;
+            // convert the value if desired
+            if (discriminatorType == Types.INTEGER){
+              this.discriminatorObjectValue = Integer.valueOf(value);
+            } else {
+              this.discriminatorObjectValue = value;
+            }
+          }
         }
     }
     
