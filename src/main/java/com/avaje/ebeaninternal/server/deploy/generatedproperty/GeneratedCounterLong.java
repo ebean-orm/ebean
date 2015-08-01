@@ -24,7 +24,7 @@ public class GeneratedCounterLong implements GeneratedProperty {
      */
     public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
         Long i = (Long) prop.getValue(bean);
-        return i.longValue() + 1;
+        return i + 1;
     }
 
     /**

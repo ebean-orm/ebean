@@ -24,7 +24,7 @@ public class GeneratedCounterInteger implements GeneratedProperty {
      */
     public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
         Integer i = (Integer) prop.getValue(bean);
-        return i.intValue() + 1;
+        return i + 1;
     }
 
     /**
