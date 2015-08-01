@@ -83,9 +83,7 @@ public class CacheOptions {
    * Set the natural key property.
    */
   public void setNaturalKey(String naturalKey) {
-    if (naturalKey == null || naturalKey.length() == 0) {
-      naturalKey = null;
-    } else {
+    if (naturalKey != null && naturalKey.length() != 0) {
       this.naturalKey = naturalKey.trim();
     }
   }
