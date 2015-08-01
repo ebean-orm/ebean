@@ -1,27 +1,29 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.EntityNotFoundException;
-
-import com.avaje.ebeaninternal.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
-import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebeaninternal.api.LoadBeanBuffer;
+import com.avaje.ebeaninternal.api.LoadBeanRequest;
+import com.avaje.ebeaninternal.api.LoadManyBuffer;
+import com.avaje.ebeaninternal.api.LoadManyRequest;
+import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
+import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
+import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper to handle lazy loading and refreshing of beans.
@@ -177,15 +179,14 @@ public class DefaultBeanLoader {
     EntityBean parentBean = bc.getOwnerBean();
     String propertyName = bc.getPropertyName();
 
-    loadManyInternal(parentBean, propertyName, null, false, null, onlyIds);
+    loadManyInternal(parentBean, propertyName, null, false, onlyIds);
   }
 
   public void refreshMany(EntityBean parentBean, String propertyName, Transaction t) {
-    loadManyInternal(parentBean, propertyName, t, true, null, false);
+    loadManyInternal(parentBean, propertyName, t, true, false);
   }
 
-  private void loadManyInternal(EntityBean parentBean, String propertyName, Transaction t, boolean refresh,
-                                ObjectGraphNode node, boolean onlyIds) {
+  private void loadManyInternal(EntityBean parentBean, String propertyName, Transaction t, boolean refresh, boolean onlyIds) {
 
     EntityBeanIntercept ebi = parentBean._ebean_getIntercept();
     PersistenceContext pc = ebi.getPersistenceContext();
@@ -229,11 +230,6 @@ public class DefaultBeanLoader {
       query.setLoadDescription("+refresh", null);
     } else {
       query.setLoadDescription("+lazy", null);
-    }
-
-    if (node != null) {
-      // so we can hook back to the root query
-      query.setParentNode(node);
     }
 
     String idProperty = parentDesc.getIdBinder().getIdProperty();
