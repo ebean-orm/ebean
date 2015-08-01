@@ -355,11 +355,11 @@ public class DeployBeanPropertyLists {
     }
     
     if (deployProp instanceof DeployBeanPropertySimpleCollection<?>) {
-      return new BeanPropertySimpleCollection(owner, desc, (DeployBeanPropertySimpleCollection) deployProp);
+      return new BeanPropertySimpleCollection(desc, (DeployBeanPropertySimpleCollection) deployProp);
     }
     
     if (deployProp instanceof DeployBeanPropertyAssocMany) {
-      return new BeanPropertyAssocMany(owner, desc, (DeployBeanPropertyAssocMany) deployProp);
+      return new BeanPropertyAssocMany(desc, (DeployBeanPropertyAssocMany) deployProp);
     }
     
     if (deployProp instanceof DeployBeanPropertyCompound) {

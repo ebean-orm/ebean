@@ -101,7 +101,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   /**
    * Create this property.
    */
-  public BeanPropertyAssocMany(BeanDescriptorMap owner, BeanDescriptor<?> descriptor, DeployBeanPropertyAssocMany<T> deploy) {
+  public BeanPropertyAssocMany(BeanDescriptor<?> descriptor, DeployBeanPropertyAssocMany<T> deploy) {
     super(descriptor, deploy);
     this.unidirectional = deploy.isUnidirectional();
     this.manyToMany = deploy.isManyToMany();

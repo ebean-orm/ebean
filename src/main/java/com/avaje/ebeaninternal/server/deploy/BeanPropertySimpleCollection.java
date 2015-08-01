@@ -4,8 +4,8 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertySimpleCollec
 
 public class BeanPropertySimpleCollection<T> extends BeanPropertyAssocMany<T> {
 
-  public BeanPropertySimpleCollection(BeanDescriptorMap owner, BeanDescriptor<?> descriptor, DeployBeanPropertySimpleCollection<T> deploy) {
-    super(owner, descriptor, deploy);
+  public BeanPropertySimpleCollection(BeanDescriptor<?> descriptor, DeployBeanPropertySimpleCollection<T> deploy) {
+    super(descriptor, deploy);
   }
 
 }
