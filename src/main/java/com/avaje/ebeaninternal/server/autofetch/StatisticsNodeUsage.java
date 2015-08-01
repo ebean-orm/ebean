@@ -25,7 +25,8 @@ public class StatisticsNodeUsage implements Serializable {
 
 	private static final Logger logger = LoggerFactory.getLogger(StatisticsNodeUsage.class);
 
-	private final String monitor = new String();
+	@SuppressWarnings("RedundantStringConstructorCall")
+  private final String monitor = new String();
 	
 	private final String path;
 	

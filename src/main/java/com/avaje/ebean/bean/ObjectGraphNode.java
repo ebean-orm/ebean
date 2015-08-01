@@ -82,6 +82,7 @@ public final class ObjectGraphNode implements Serializable {
     }
     
     ObjectGraphNode e = (ObjectGraphNode) obj;
+    //noinspection StringEquality
     return  ((e.path == path) || (e.path != null && e.path.equals(path)))
         && e.originQueryPoint.equals(originQueryPoint);
   }

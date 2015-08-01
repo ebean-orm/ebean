@@ -28,7 +28,8 @@ public class Statistics implements Serializable {
 
 	private final Map<String, StatisticsNodeUsage> nodeUsageMap = new LinkedHashMap<String, StatisticsNodeUsage>();
 
-	private final String monitor = new String();
+	@SuppressWarnings("RedundantStringConstructorCall")
+  private final String monitor = new String();
 
 	public Statistics(ObjectGraphOrigin origin, boolean queryTuningAddVersion) {
 		this.origin = origin;

@@ -31,6 +31,7 @@ public class Str {
    * Append two strings together.
    */
   public static String add(String s0, String s1) {
+    //noinspection StringBufferReplaceableByString
     StringBuilder sb = new StringBuilder(s0.length() + s1.length() + 5);
     return sb.append(s0).append(s1).toString();
   }

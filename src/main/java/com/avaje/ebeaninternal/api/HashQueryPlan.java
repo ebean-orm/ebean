@@ -37,7 +37,8 @@ public class HashQueryPlan {
     }
     
     HashQueryPlan e = (HashQueryPlan) obj;
-    return e.planHash == planHash 
+    //noinspection StringEquality
+    return e.planHash == planHash
         && e.bindCount == bindCount
         &&  ((e.rawSql == rawSql) || (e.rawSql != null && e.rawSql.equals(rawSql)));
   }

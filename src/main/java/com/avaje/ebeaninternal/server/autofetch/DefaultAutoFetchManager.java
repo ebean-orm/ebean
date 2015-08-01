@@ -35,7 +35,8 @@ public class DefaultAutoFetchManager implements AutoFetchManager, Serializable {
 
 	private static final long serialVersionUID = -6826119882781771722L;
 
-	private final String statisticsMonitor = new String();
+	@SuppressWarnings("RedundantStringConstructorCall")
+  private final String statisticsMonitor = new String();
 
 	private final String fileName;
 

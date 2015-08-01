@@ -30,8 +30,9 @@ public class McastStatus {
     private final String lastOutgoingAcks;
     
     public String getSummary() {
-        
-        StringBuilder sb = new StringBuilder(80);
+
+      //noinspection StringBufferReplaceableByString
+      StringBuilder sb = new StringBuilder(80);
         sb.append("txnOut:").append(totalTxnEventsSent).append("; ");
         sb.append("txnIn:").append(totalTxnEventsReceived).append("; ");
         sb.append("outPackets:").append(totalPacketsSent).append("; ");

@@ -40,6 +40,7 @@ public class ServerCacheStatistics {
   protected long evictByLRU;
 
   public String toString() {
+    //noinspection StringBufferReplaceableByString
     StringBuilder sb = new StringBuilder(80);
     sb.append(cacheName);
     sb.append(" maxSize:").append(maxSize);

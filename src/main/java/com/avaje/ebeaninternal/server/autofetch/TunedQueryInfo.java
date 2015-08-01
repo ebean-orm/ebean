@@ -28,7 +28,8 @@ public class TunedQueryInfo implements Serializable {
 	
 	private Long lastTuneTime = (long) 0;
 
-	private final String rateMonitor = new String();
+	@SuppressWarnings("RedundantStringConstructorCall")
+  private final String rateMonitor = new String();
 
 	/**
 	 * The number of queries tuned by this object.

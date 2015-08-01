@@ -41,6 +41,7 @@ public class SqlTreeProperties {
   }
 
   public void add(BeanProperty[] props) {
+    //noinspection ManualArrayToCollectionCopy
     for (int i = 0; i < props.length; i++) {
       propsList.add(props[i]);
     }

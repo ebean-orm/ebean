@@ -263,7 +263,8 @@ public class DataSourcePool implements DataSource {
         }
 
         String transIsolation = TransactionIsolation.getLevelDescription(transactionIsolation);
-        StringBuilder sb = new StringBuilder(70);
+      //noinspection StringBufferReplaceableByString
+      StringBuilder sb = new StringBuilder(70);
         sb.append("DataSourcePool [").append(name);
         sb.append("] autoCommit[").append(autoCommit);
         sb.append("] transIsolation[").append(transIsolation);
