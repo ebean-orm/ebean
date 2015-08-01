@@ -1,13 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.query.CQueryPredicates;
 import com.avaje.ebeaninternal.server.query.SqlTree;
@@ -16,6 +8,12 @@ import com.avaje.ebeaninternal.server.query.SqlTreeNodeRoot;
 import com.avaje.ebeaninternal.server.query.SqlTreeProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a SqlSelect raw sql query.
@@ -122,7 +120,6 @@ public class DRawSqlSelect {
 	 */
 	private SqlTree buildSqlTree(BeanDescriptor<?> desc){
 
-		LinkedHashSet<String> includedProps = new LinkedHashSet<String>();
 		SqlTreeProperties selectProps = new SqlTreeProperties();
 
 		for (int i = 0; i < selectColumns.length; i++) {
@@ -139,7 +136,6 @@ public class DRawSqlSelect {
 						withId = true;
 					}
 				} else {
-					includedProps.add(beanProperty.getName());
 					selectProps.add(beanProperty);
 				}
 				
@@ -240,10 +236,6 @@ public class DRawSqlSelect {
 		return sqlTree;
 	}
 
-	public boolean isWithId() {
-		return withId;
-	}
-
 	public String getQuery() {
 		return query;
 	}
@@ -268,8 +260,8 @@ public class DRawSqlSelect {
         return desc;
     }
 
-    public DeployParser createDeployPropertyParser() {
-		return new DeployPropertyParserRawSql(this);
-	}
-	
+  public DeployParser createDeployPropertyParser() {
+    return new DeployPropertyParserRawSql(this);
+  }
+
 }
