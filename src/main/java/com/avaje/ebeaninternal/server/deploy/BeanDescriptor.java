@@ -10,10 +10,17 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
-import com.avaje.ebean.event.*;
+import com.avaje.ebean.event.BeanFindController;
+import com.avaje.ebean.event.BeanPersistController;
+import com.avaje.ebean.event.BeanPersistListener;
+import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaQueryPlanStatistic;
-import com.avaje.ebeaninternal.api.*;
+import com.avaje.ebeaninternal.api.HashQueryPlan;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.api.SpiTransaction;
+import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cache.CachedBeanData;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
@@ -23,7 +30,12 @@ import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyLists;
-import com.avaje.ebeaninternal.server.el.*;
+import com.avaje.ebeaninternal.server.el.ElComparator;
+import com.avaje.ebeaninternal.server.el.ElComparatorCompound;
+import com.avaje.ebeaninternal.server.el.ElComparatorProperty;
+import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
+import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
+import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.persist.DmlUtil;
 import com.avaje.ebeaninternal.server.query.CQueryPlan;
 import com.avaje.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
@@ -32,7 +44,6 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
-import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.util.SortByClause;
 import com.avaje.ebeaninternal.util.SortByClause.Property;
 import com.avaje.ebeaninternal.util.SortByClauseParser;
@@ -43,7 +54,13 @@ import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -290,7 +307,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   /**
    * Construct the BeanDescriptor.
    */
-  public BeanDescriptor(BeanDescriptorMap owner, TypeManager typeManager, DeployBeanDescriptor<T> deploy, String descriptorId) {
+  public BeanDescriptor(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy, String descriptorId) {
 
     this.owner = owner;
     this.serverName = owner.getServerName();
@@ -437,19 +454,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     } catch (Exception e) {
       throw new IllegalStateException("Error trying to create the prototypeEntityBean for "+beanType, e);
     }
-  }
-  
-  private LinkedHashMap<String, BeanProperty> getReverseMap(LinkedHashMap<String, BeanProperty> propMap) {
-
-    LinkedHashMap<String, BeanProperty> revMap = new LinkedHashMap<String, BeanProperty>(propMap.size() * 2);
-
-    for (BeanProperty prop : propMap.values()) {
-      if (prop.getDbColumn() != null) {
-        revMap.put(prop.getDbColumn(), prop);
-      }
-    }
-
-    return revMap;
   }
 
   /**

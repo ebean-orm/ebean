@@ -45,7 +45,6 @@ import com.avaje.ebeaninternal.server.properties.BeanPropertiesReader;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfo;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfoFactory;
 import com.avaje.ebeaninternal.server.properties.EnhanceBeanPropertyInfoFactory;
-import com.avaje.ebeaninternal.server.type.TypeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,8 +85,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final BeanPropertyInfoFactory reflectFactory;
 
   private final DeployUtil deployUtil;
-
-  private final TypeManager typeManager;
 
   private final PersistControllerManager persistControllerManager;
 
@@ -179,7 +176,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.readAnnotations = new ReadAnnotations(config.getGeneratedPropertyFactory(), asOfViewSuffix);
     this.bootupClasses = config.getBootupClasses();
     this.createProperties = config.getDeployCreateProperties();
-    this.typeManager = config.getTypeManager();
     this.namingConvention = serverConfig.getNamingConvention();
     this.dbIdentity = config.getDatabasePlatform().getDbIdentity();
     this.deplyInherit = config.getDeployInherit();
@@ -464,7 +460,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     Integer key = getUniqueHash(info.getDescriptor());
 
-    return new BeanDescriptor<T>(this, typeManager, info.getDescriptor(), key.toString());
+    return new BeanDescriptor<T>(this, info.getDescriptor(), key.toString());
   }
 
   private void registerBeanDescriptor(BeanDescriptor<?> desc) {
@@ -598,7 +594,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
       DeployBeanDescriptor<?> deployBeanDescriptor = info.getDescriptor();
       Integer key = getUniqueHash(deployBeanDescriptor);
-      registerBeanDescriptor(new BeanDescriptor(this, typeManager, info.getDescriptor(), key.toString()));
+      registerBeanDescriptor(new BeanDescriptor(this, info.getDescriptor(), key.toString()));
     }
   }
 
