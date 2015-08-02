@@ -45,7 +45,7 @@ public class DataBind {
   }
 
   public void decrementPos() {
-    ++pos;
+    --pos;
   }
 
   public int executeUpdate() throws SQLException {
