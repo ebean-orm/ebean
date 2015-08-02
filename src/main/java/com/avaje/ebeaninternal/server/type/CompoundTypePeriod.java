@@ -27,6 +27,7 @@ public class CompoundTypePeriod implements CompoundType<Period> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public CompoundTypeProperty<Period, ?>[] getProperties() {
     return properties;
   }

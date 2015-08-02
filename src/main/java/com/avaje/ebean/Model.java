@@ -441,6 +441,7 @@ public abstract class Model {
      *
      * }</pre>
      */
+    @SuppressWarnings("unchecked")
     public Find() {
       this.serverName = null;
       this.type = (Class<T>)ClassUtil.getSecondArgumentType(getClass());

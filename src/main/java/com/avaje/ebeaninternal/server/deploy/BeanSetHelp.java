@@ -66,6 +66,7 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public BeanCollection<T> createEmptyNoParent() {
     return new BeanSet();
   }

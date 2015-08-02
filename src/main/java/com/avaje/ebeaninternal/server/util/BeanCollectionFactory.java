@@ -25,6 +25,7 @@ public class BeanCollectionFactory {
   /**
    * Create a BeanCollection for the given parameters.
    */
+  @SuppressWarnings("unchecked")
   public static BeanCollection<?> create(SpiQuery.Type manyType) {
 
     switch (manyType) {

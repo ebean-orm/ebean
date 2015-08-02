@@ -91,12 +91,13 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public BeanCollection<T> createEmptyNoParent() {
     return new BeanMap();
   }
 
   @Override
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings("unchecked")
   public BeanCollection<T> createEmpty(EntityBean ownerBean) {
 
     BeanMap beanMap = new BeanMap(loader, ownerBean, propertyName);
