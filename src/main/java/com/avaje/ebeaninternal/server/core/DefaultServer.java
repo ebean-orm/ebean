@@ -1180,7 +1180,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
     BeanDescriptor<T> desc = beanDescriptorManager.getBeanDescriptor(query.getBeanType());
 
-    T bean = desc.cacheNaturalKeyLookup((SpiQuery<T>)query, (SpiTransaction) t);
+    T bean = desc.cacheNaturalKeyLookup((SpiQuery<T>) query, (SpiTransaction) t);
     if (bean != null) {
       return bean;
     }
@@ -1777,6 +1777,14 @@ public final class DefaultServer implements SpiEbeanServer {
   @Override
   public int deleteAll(Collection<?> beans) {
     return deleteAllInternal(beans.iterator(), null);
+  }
+
+  /**
+   * Delete all the beans in the collection.
+   */
+  @Override
+  public int deleteAll(Collection<?> beans, Transaction t) {
+    return deleteAllInternal(beans.iterator(), t);
   }
 
   /**

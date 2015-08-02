@@ -1205,7 +1205,6 @@ public interface EbeanServer {
    *   public class Order { ...
    *
    * 	   @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
-   * 	   @JoinColumn(name="order_id")
    * 	   List<OrderDetail> details;
    * 	   ...
    *   }
@@ -1235,9 +1234,9 @@ public interface EbeanServer {
   void delete(Object bean) throws OptimisticLockException;
 
   /**
-   * Delete all the beans in the collection.
+   * Delete the bean with an explicit transaction.
    */
-  int deleteAll(Collection<?> beans) throws OptimisticLockException;
+  void delete(Object bean, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Delete the bean given its type and id.
@@ -1250,6 +1249,16 @@ public interface EbeanServer {
   int delete(Class<?> beanType, Object id, Transaction transaction);
 
   /**
+   * Delete all the beans in the collection.
+   */
+  int deleteAll(Collection<?> beans) throws OptimisticLockException;
+
+  /**
+   * Delete all the beans in the collection using an explicit transaction.
+   */
+  int deleteAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
+
+  /**
    * Delete several beans given their type and id values.
    */
   void deleteAll(Class<?> beanType, Collection<?> ids);
@@ -1259,11 +1268,6 @@ public interface EbeanServer {
    * transaction.
    */
   void deleteAll(Class<?> beanType, Collection<?> ids, Transaction transaction);
-
-  /**
-   * Delete the bean with an explicit transaction.
-   */
-  void delete(Object bean, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Execute a Sql Update Delete or Insert statement. This returns the number of
