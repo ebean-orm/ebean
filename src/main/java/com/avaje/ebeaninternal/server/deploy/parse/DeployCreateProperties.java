@@ -263,7 +263,7 @@ public class DeployCreateProperties {
 
     CtCompoundType<?> compoundType = typeManager.getCompoundType(propertyType);
     if (compoundType != null) {
-      return new DeployBeanPropertyCompound(desc, propertyType, compoundType, null);
+      return new DeployBeanPropertyCompound(desc, propertyType, compoundType);
     }
 
     if (isTransientField(field)) {
@@ -278,7 +278,7 @@ public class DeployCreateProperties {
           typeManager.recursiveCreateScalarDataReader(propertyType);
           compoundType = typeManager.getCompoundType(propertyType);
           if (compoundType != null) {
-            return new DeployBeanPropertyCompound(desc, propertyType, compoundType, null);
+            return new DeployBeanPropertyCompound(desc, propertyType, compoundType);
           }
 
         } else {

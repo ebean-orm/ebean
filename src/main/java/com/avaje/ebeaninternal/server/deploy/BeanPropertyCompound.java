@@ -1,13 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
@@ -19,6 +12,12 @@ import com.avaje.ebeaninternal.server.type.CtCompoundProperty;
 import com.avaje.ebeaninternal.server.type.CtCompoundPropertyElAdapter;
 import com.avaje.ebeaninternal.server.type.CtCompoundType;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Property mapped to an Immutable Compound Value Object.
  * <p>
@@ -29,12 +28,6 @@ import com.avaje.ebeaninternal.server.type.CtCompoundType;
 public class BeanPropertyCompound extends BeanProperty {
 
   private final CtCompoundType<?> compoundType;
-
-  /**
-   * Type Converter for scala.Option and similar type wrapping.
-   */
-  @SuppressWarnings("rawtypes")
-  private final ScalarTypeConverter typeConverter;
 
   private final BeanProperty[] scalarProperties;
 
@@ -48,12 +41,9 @@ public class BeanPropertyCompound extends BeanProperty {
   public BeanPropertyCompound(BeanDescriptor<?> descriptor, DeployBeanPropertyCompound deploy) {
 
     super(descriptor, deploy);
-
     this.compoundType = deploy.getCompoundType();
-    this.typeConverter = deploy.getTypeConverter();
 
     BeanPropertyCompoundRoot root = deploy.getFlatProperties();
-
     this.scalarProperties = root.getScalarProperties();
 
     for (int i = 0; i < scalarProperties.length; i++) {
@@ -139,11 +129,7 @@ public class BeanPropertyCompound extends BeanProperty {
   @Override
   public Object read(DbReadContext ctx) throws SQLException {
 
-    Object v = compoundType.read(ctx.getDataReader());
-    if (typeConverter != null) {
-      v = typeConverter.wrapValue(v);
-    }
-    return v;
+    return compoundType.read(ctx.getDataReader());
   }
 
   @Override

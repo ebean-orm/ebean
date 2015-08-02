@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
-import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompoundRoot;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompoundScalar;
 import com.avaje.ebeaninternal.server.type.CtCompoundProperty;
@@ -16,21 +15,17 @@ import java.util.Map.Entry;
  */
 public class DeployBeanPropertyCompound extends DeployBeanProperty {
 
-  final CtCompoundType<?> compoundType;
+  private final CtCompoundType<?> compoundType;
 
-  final ScalarTypeConverter<?, ?> typeConverter;
-
-  DeployBeanEmbedded deployEmbedded;
+  private DeployBeanEmbedded deployEmbedded;
 
   /**
    * Create the property.
    */
-  public DeployBeanPropertyCompound(DeployBeanDescriptor<?> desc, Class<?> targetType,
-                                    CtCompoundType<?> compoundType, ScalarTypeConverter<?, ?> typeConverter) {
+  public DeployBeanPropertyCompound(DeployBeanDescriptor<?> desc, Class<?> targetType, CtCompoundType<?> compoundType) {
 
     super(desc, targetType, null, null);
     this.compoundType = compoundType;
-    this.typeConverter = typeConverter;
   }
 
   public BeanPropertyCompoundRoot getFlatProperties() {
@@ -71,8 +66,7 @@ public class DeployBeanPropertyCompound extends DeployBeanProperty {
       deploy.setDbUpdateable(true);
       deploy.setDbRead(true);
 
-      BeanPropertyCompoundScalar bp = new BeanPropertyCompoundScalar(rootProperty, deploy, ctProp, typeConverter);
-      rootProperty.register(bp);
+      rootProperty.register(new BeanPropertyCompoundScalar(rootProperty, deploy, ctProp));
     }
 
     rootProperty.setNonScalarProperties(ctMeta.getNonScalarProperties());
@@ -97,10 +91,6 @@ public class DeployBeanPropertyCompound extends DeployBeanProperty {
       deployEmbedded = new DeployBeanEmbedded();
     }
     return deployEmbedded;
-  }
-
-  public ScalarTypeConverter<?, ?> getTypeConverter() {
-    return typeConverter;
   }
 
   public CtCompoundType<?> getCompoundType() {

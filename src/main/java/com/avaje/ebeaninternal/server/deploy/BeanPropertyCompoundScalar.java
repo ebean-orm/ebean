@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.type.CtCompoundProperty;
 
@@ -15,16 +14,10 @@ public class BeanPropertyCompoundScalar extends BeanProperty {
 
   private final CtCompoundProperty ctProperty;
 
-  @SuppressWarnings("rawtypes")
-  private final ScalarTypeConverter typeConverter;
-
-  public BeanPropertyCompoundScalar(BeanPropertyCompoundRoot rootProperty, DeployBeanProperty scalarDeploy,
-                                    CtCompoundProperty ctProperty, ScalarTypeConverter<?, ?> typeConverter) {
-
+  public BeanPropertyCompoundScalar(BeanPropertyCompoundRoot rootProperty, DeployBeanProperty scalarDeploy, CtCompoundProperty ctProperty) {
     super(scalarDeploy);
     this.rootProperty = rootProperty;
     this.ctProperty = ctProperty;
-    this.typeConverter = typeConverter;
   }
 
   /**
@@ -32,20 +25,13 @@ public class BeanPropertyCompoundScalar extends BeanProperty {
    */
   @SuppressWarnings("unchecked")
   public Object getValueObject(Object compoundValue) {
-    if (typeConverter != null) {
-      compoundValue = typeConverter.unwrapValue(compoundValue);
-    }
     return ctProperty.getValue(compoundValue);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Object getValue(EntityBean valueObject) {
-    Object val = valueObject;
-    if (typeConverter != null) {
-      val = typeConverter.unwrapValue(val);
-    }
-    return ctProperty.getValue(val);
+    return ctProperty.getValue(valueObject);
   }
 
   @Override
@@ -59,9 +45,6 @@ public class BeanPropertyCompoundScalar extends BeanProperty {
     Object compoundValue = ctProperty.setValue(bean, value);
 
     if (compoundValue != null) {
-      if (typeConverter != null) {
-        compoundValue = typeConverter.wrapValue(compoundValue);
-      }
       // we are at the top level and we have a compound value
       // that we can set using the root property
       if (intercept) {
