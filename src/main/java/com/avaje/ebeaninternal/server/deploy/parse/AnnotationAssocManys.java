@@ -67,7 +67,7 @@ public class AnnotationAssocManys extends AnnotationParser {
 		}
 
     if (get(prop, HistoryExclude.class) != null) {
-      prop.setExcludedFromHistory(true);
+      prop.setExcludedFromHistory();
     }
 
     OrderBy orderBy = get(prop, OrderBy.class);
@@ -280,7 +280,7 @@ public class AnnotationAssocManys extends AnnotationParser {
         	throw new RuntimeException(msg);
 		}
 
-		manyProp.setManyToMany(true);
+		manyProp.setManyToMany();
 		manyProp.setModifyListenMode(ModifyListenMode.ALL);
 		manyProp.setBeanTable(assoc);
 		manyProp.getTableJoin().setType(SqlJoinType.OUTER);

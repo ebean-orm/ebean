@@ -143,8 +143,8 @@ public class DeployBeanDescriptor<T> {
   /**
    * Set to true for @History entity beans that have history.
    */
-  public void setHistorySupport(boolean historySupport) {
-    this.historySupport = historySupport;
+  public void setHistorySupport() {
+    this.historySupport = true;
   }
 
   /**

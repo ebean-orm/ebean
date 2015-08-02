@@ -78,20 +78,20 @@ public class AnnotationFields extends AnnotationParser {
 
     Id id = get(prop, Id.class);
     if (id != null) {
-      prop.setId(true);
+      prop.setId();
       prop.setNullable(false);
     }
 
     EmbeddedId embeddedId = get(prop, EmbeddedId.class);
     if (embeddedId != null) {
-      prop.setId(true);
+      prop.setId();
       prop.setNullable(false);
-      prop.setEmbedded(true);
+      prop.setEmbedded();
     }
 
     if (prop instanceof DeployBeanPropertyAssocOne<?>) {
       if (prop.isId() && !prop.isEmbedded()) {
-        prop.setEmbedded(true);
+        prop.setEmbedded();
       }
       readEmbeddedAttributeOverrides((DeployBeanPropertyAssocOne<?>) prop);
     }
@@ -186,7 +186,7 @@ public class AnnotationFields extends AnnotationParser {
     Version version = get(prop, Version.class);
     if (version != null) {
       // explicitly specify a version column
-      prop.setVersionColumn(true);
+      prop.setVersionColumn();
       generatedPropFactory.setVersion(prop);
     }
 
@@ -217,7 +217,7 @@ public class AnnotationFields extends AnnotationParser {
     }
 
     if (get(prop, HistoryExclude.class) != null) {
-      prop.setExcludedFromHistory(true);
+      prop.setExcludedFromHistory();
     }
 
     if (validationAnnotations) {
@@ -265,7 +265,7 @@ public class AnnotationFields extends AnnotationParser {
       prop.setDbRead(false);
       prop.setDbInsertable(false);
       prop.setDbUpdateable(false);
-      prop.setTransient(true);
+      prop.setTransient();
     }
 
     if (!prop.isTransient()) {
@@ -286,7 +286,7 @@ public class AnnotationFields extends AnnotationParser {
       if (hasRelationshipItem(prop)) {
         throw new RuntimeException("Can't use Index on foreign key relationships.");
       }
-      prop.setIndexed(true);
+      prop.setIndexed();
       prop.setIndexName(index.value());
     }
   }
@@ -318,7 +318,7 @@ public class AnnotationFields extends AnnotationParser {
       DataEncryptSupport support = createDataEncryptSupport(prop);
       ScalarTypeBytesEncrypted encryptedScalarType = new ScalarTypeBytesEncrypted(baseType, support);
       prop.setScalarType(encryptedScalarType);
-      prop.setLocalEncrypted(true);
+      prop.setLocalEncrypted();
       return;
 
     }
@@ -339,7 +339,7 @@ public class AnnotationFields extends AnnotationParser {
     }
 
     prop.setScalarType(createScalarType(prop, st));
-    prop.setLocalEncrypted(true);
+    prop.setLocalEncrypted();
     if (dbLen > 0) {
       prop.setDbLength(dbLen);
     }
@@ -370,7 +370,7 @@ public class AnnotationFields extends AnnotationParser {
 
   private void readId(DeployBeanProperty prop) {
 
-    prop.setId(true);
+    prop.setId();
     prop.setNullable(false);
 
     if (prop.getPropertyType().equals(UUID.class)) {

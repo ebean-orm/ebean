@@ -90,7 +90,7 @@ public class AnnotationClass extends AnnotationParser {
 
     History history = cls.getAnnotation(History.class);
     if (history != null) {
-      descriptor.setHistorySupport(true);
+      descriptor.setHistorySupport();
     }
 
     UpdateMode updateMode = cls.getAnnotation(UpdateMode.class);
@@ -144,7 +144,7 @@ public class AnnotationClass extends AnnotationParser {
         String propName = cacheStrategy.naturalKey().trim();
         DeployBeanProperty beanProperty = descriptor.getBeanProperty(propName);
         if (beanProperty != null) {
-          beanProperty.setNaturalKey(true);
+          beanProperty.setNaturalKey();
           cacheOptions.setNaturalKey(propName);
         }
       }

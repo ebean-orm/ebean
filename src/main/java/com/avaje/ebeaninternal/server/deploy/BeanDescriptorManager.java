@@ -792,12 +792,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
 
     // mark this property as unidirectional
-    oneToMany.setUnidirectional(true);
+    oneToMany.setUnidirectional();
 
     // create the 'shadow' unidirectional property
     // which is put on the target descriptor
     DeployBeanPropertyAssocOne<?> unidirectional = new DeployBeanPropertyAssocOne(targetDesc, owningType);
-    unidirectional.setUndirectionalShadow(true);
+    unidirectional.setUndirectionalShadow();
     unidirectional.setNullable(false);
     unidirectional.setDbRead(true);
     unidirectional.setDbInsertable(true);

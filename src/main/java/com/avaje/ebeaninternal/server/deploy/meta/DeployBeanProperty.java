@@ -279,15 +279,15 @@ public class DeployBeanProperty {
   /**
    * Mark this property as a placeholder for a unidirectional relationship.
    */
-  public void setUndirectionalShadow(boolean undirectionalShadow) {
-    this.undirectionalShadow = undirectionalShadow;
+  public void setUndirectionalShadow() {
+    this.undirectionalShadow = true;
   }
 
   /**
    * Mark this property as mapping to the discriminator column.
    */
-  public void setDiscriminator(boolean discriminator) {
-    this.discriminator = discriminator;
+  public void setDiscriminator() {
+    this.discriminator = true;
   }
 
   /**
@@ -307,8 +307,8 @@ public class DeployBeanProperty {
   /**
    * Set to true when the property is encrypted in java rather than in the DB.
    */
-  public void setLocalEncrypted(boolean localEncrypted) {
-    this.localEncrypted = localEncrypted;
+  public void setLocalEncrypted() {
+    this.localEncrypted = true;
   }
 
   /**
@@ -460,8 +460,8 @@ public class DeployBeanProperty {
     return naturalKey;
   }
 
-  public void setNaturalKey(boolean naturalKey) {
-    this.naturalKey = naturalKey;
+  public void setNaturalKey() {
+    this.naturalKey = true;
   }
 
   /**
@@ -516,8 +516,8 @@ public class DeployBeanProperty {
   /**
    * Set if this is a version column used for concurrency checking.
    */
-  public void setVersionColumn(boolean isVersionColumn) {
-    this.versionColumn = isVersionColumn;
+  public void setVersionColumn() {
+    this.versionColumn = true;
   }
 
   /**
@@ -741,8 +741,8 @@ public class DeployBeanProperty {
   /**
    * Mark the property explicitly as a transient property.
    */
-  public void setTransient(boolean isTransient) {
-    this.isTransient = isTransient;
+  public void setTransient() {
+    this.isTransient = true;
   }
 
   /**
@@ -773,8 +773,8 @@ public class DeployBeanProperty {
   /**
    * Set to true if this is included in the unique id.
    */
-  public void setId(boolean id) {
-    this.id = id;
+  public void setId() {
+    this.id = true;
   }
 
   /**
@@ -788,8 +788,8 @@ public class DeployBeanProperty {
   /**
    * Set to true if this is an embedded property.
    */
-  public void setEmbedded(boolean embedded) {
-    this.embedded = embedded;
+  public void setEmbedded() {
+    this.embedded = true;
   }
 
   public String toString() {
@@ -800,8 +800,8 @@ public class DeployBeanProperty {
     return indexed;
   }
 
-  public void setIndexed(boolean indexed) {
-    this.indexed = indexed;
+  public void setIndexed() {
+    this.indexed = true;
   }
 
   public String getIndexName() {
@@ -816,7 +816,7 @@ public class DeployBeanProperty {
     return excludedFromHistory;
   }
 
-  public void setExcludedFromHistory(boolean excludedFromHistory) {
-    this.excludedFromHistory = excludedFromHistory;
+  public void setExcludedFromHistory() {
+    this.excludedFromHistory = true;
   }
 }

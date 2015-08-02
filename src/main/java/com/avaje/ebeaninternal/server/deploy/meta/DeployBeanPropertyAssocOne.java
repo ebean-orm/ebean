@@ -49,8 +49,8 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 	/**
 	 * Set to true if this is a OneToOne.
 	 */
-	public void setOneToOne(boolean oneToOne) {
-		this.oneToOne = oneToOne;
+	public void setOneToOne() {
+		this.oneToOne = true;
 	}
 
 	/**
@@ -64,8 +64,8 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 	 * Set to true if this is the exported side of a OneToOne. This means
 	 * it doesn't 'own' the foreign key column. A OneToMany without the many.
 	 */
-	public void setOneToOneExported(boolean oneToOneExported) {
-		this.oneToOneExported = oneToOneExported;
+	public void setOneToOneExported() {
+		this.oneToOneExported = true;
 	}
 
 }

@@ -78,8 +78,8 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
 	/**
 	 * Set to true if this is a many to many.
 	 */
-	public void setManyToMany(boolean isManyToMany) {
-		this.manyToMany = isManyToMany;
+	public void setManyToMany() {
+		this.manyToMany = true;
 	}
 
 	/**
@@ -106,8 +106,8 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
 	/**
 	 * Set to true if this is a unidirectional relationship.
 	 */
-	public void setUnidirectional(boolean unidirectional) {
-		this.unidirectional = unidirectional;
+	public void setUnidirectional() {
+		this.unidirectional = true;
 	}
 
 	/**

@@ -25,7 +25,7 @@ public class TransientProperties {
         	DeployBeanProperty prop = props.get(i);
             if (!prop.isDbRead() && !prop.isDbInsertable() && !prop.isDbUpdateable()) {
             	// non-transient...
-            	prop.setTransient(true);
+            	prop.setTransient();
             }
 		}
 
@@ -34,7 +34,7 @@ public class TransientProperties {
         	DeployBeanPropertyAssocOne<?> prop = ones.get(i);
             if (prop.getBeanTable() == null) {
                 if (!prop.isEmbedded()) {
-                	prop.setTransient(true);
+                	prop.setTransient();
                 }
             }
         }
@@ -43,7 +43,7 @@ public class TransientProperties {
         for (int i = 0; i < manys.size(); i++) {
         	DeployBeanPropertyAssocMany<?> prop = manys.get(i);
         	if (prop.getBeanTable() == null) {
-            	prop.setTransient(true);
+            	prop.setTransient();
             }
         }
                 

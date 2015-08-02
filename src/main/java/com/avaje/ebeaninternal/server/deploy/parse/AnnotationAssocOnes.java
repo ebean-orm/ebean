@@ -66,8 +66,8 @@ public class AnnotationAssocOnes extends AnnotationParser {
     }
     EmbeddedId emId = get(prop, EmbeddedId.class);
     if (emId != null) {
-      prop.setEmbedded(true);
-      prop.setId(true);
+      prop.setEmbedded();
+      prop.setId();
       prop.setNullable(false);
     }
     Column column = get(prop, Column.class);
@@ -80,8 +80,8 @@ public class AnnotationAssocOnes extends AnnotationParser {
     // May as well check for Id. Makes sense to me.
     Id id = get(prop, Id.class);
     if (id != null) {
-      prop.setEmbedded(true);
-      prop.setId(true);
+      prop.setEmbedded();
+      prop.setId();
       prop.setNullable(false);
     }
 
@@ -171,14 +171,14 @@ public class AnnotationAssocOnes extends AnnotationParser {
 
   private void readOneToOne(OneToOne propAnn, DeployBeanPropertyAssocOne<?> prop) {
 
-    prop.setOneToOne(true);
+    prop.setOneToOne();
     prop.setDbInsertable(true);
     prop.setDbUpdateable(true);
     prop.setNullable(propAnn.optional());
     prop.setFetchType(propAnn.fetch());
     prop.setMappedBy(propAnn.mappedBy());
     if (!"".equals(propAnn.mappedBy())) {
-      prop.setOneToOneExported(true);
+      prop.setOneToOneExported();
     }
 
     setCascadeTypes(propAnn.cascade(), prop.getCascadeInfo());
@@ -194,7 +194,7 @@ public class AnnotationAssocOnes extends AnnotationParser {
 
   private void readEmbedded(DeployBeanPropertyAssocOne<?> prop) {
 
-    prop.setEmbedded(true);
+    prop.setEmbedded();
     prop.setDbInsertable(true);
     prop.setDbUpdateable(true);
 

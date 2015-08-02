@@ -90,7 +90,7 @@ public class DeployBeanPropertyLists {
       // using RawSql queries with inheritance
       String discriminatorColumn = inheritInfo.getDiscriminatorColumn();
       DeployBeanProperty discDeployProp = new DeployBeanProperty(deploy, String.class, new ScalarTypeString(), null);
-      discDeployProp.setDiscriminator(true);
+      discDeployProp.setDiscriminator();
       discDeployProp.setName(discriminatorColumn);
       discDeployProp.setDbColumn(discriminatorColumn);
       
