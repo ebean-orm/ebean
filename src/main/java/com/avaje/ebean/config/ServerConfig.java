@@ -262,6 +262,7 @@ public class ServerConfig {
 
   private List<BeanFindController> findControllers = new ArrayList<BeanFindController>();
   private List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>();
+  private List<BeanPostLoad> postLoaders = new ArrayList<BeanPostLoad>();
   private List<BeanPersistListener> persistListeners = new ArrayList<BeanPersistListener>();
   private List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>();
   private List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<BulkTableEventListener>();
@@ -1660,12 +1661,43 @@ public class ServerConfig {
     persistControllers.add(beanPersistController);
   }
 
+  /**
+   * Register a BeanPostLoad instance.
+   * <p>
+   * Note alternatively you can use {@link #setPostLoaders(List)} to set
+   * all the BeanPostLoad instances.
+   * </p>
+   */
+  public void add(BeanPostLoad postLoad) {
+    postLoaders.add(postLoad);
+  }
+
+  /**
+   * Return the list of BeanFindController instances.
+   */
   public List<BeanFindController> getFindControllers() {
     return findControllers;
   }
 
+  /**
+   * Set the list of BeanFindController instances.
+   */
   public void setFindControllers(List<BeanFindController> findControllers) {
     this.findControllers = findControllers;
+  }
+
+  /**
+   * Return the list of BeanPostLoader instances.
+   */
+  public List<BeanPostLoad> getPostLoaders() {
+    return postLoaders;
+  }
+
+  /**
+   * Set the list of BeanPostLoader instances.
+   */
+  public void setPostLoaders(List<BeanPostLoad> postLoaders) {
+    this.postLoaders = postLoaders;
   }
 
   /**

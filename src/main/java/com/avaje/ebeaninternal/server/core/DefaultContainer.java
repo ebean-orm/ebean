@@ -242,6 +242,7 @@ public class DefaultContainer implements SpiContainer {
 
     BootupClasses bootupClasses = getBootupClasses1(serverConfig);
     bootupClasses.addPersistControllers(serverConfig.getPersistControllers());
+    bootupClasses.addPostLoaders(serverConfig.getPostLoaders());
     bootupClasses.addFindControllers(serverConfig.getFindControllers());
     bootupClasses.addTransactionEventListeners(serverConfig.getTransactionEventListeners());
     bootupClasses.addPersistListeners(serverConfig.getPersistListeners());

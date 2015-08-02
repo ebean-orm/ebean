@@ -1,13 +1,12 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import com.avaje.ebean.event.BeanPersistController;
+import com.avaje.ebean.event.BeanPersistRequest;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-
-import com.avaje.ebean.event.BeanPersistController;
-import com.avaje.ebean.event.BeanPersistRequest;
 
 /**
  * Chains multiple BeanPersistController's together.
@@ -19,6 +18,7 @@ public class ChainedBeanPersistController implements BeanPersistController {
 	private static final Sorter SORTER = new Sorter();
 	
 	private final List<BeanPersistController> list;
+
 	private final BeanPersistController[] chain;
 	
 	/**
@@ -88,6 +88,7 @@ public class ChainedBeanPersistController implements BeanPersistController {
 	/**
 	 * Always returns 0 (not used for this object).
 	 */
+  @Override
 	public int getExecutionOrder() {
 		return 0;
 	}
@@ -95,34 +96,33 @@ public class ChainedBeanPersistController implements BeanPersistController {
 	/**
 	 * Always returns false (not used for this object).
 	 */
+  @Override
 	public boolean isRegisterFor(Class<?> cls) {
 		return false;
 	}
 
+  @Override
 	public void postDelete(BeanPersistRequest<?> request) {
 		for (int i = 0; i < chain.length; i++) {
 			chain[i].postDelete(request);
 		}
 	}
 
+  @Override
 	public void postInsert(BeanPersistRequest<?> request) {
 		for (int i = 0; i < chain.length; i++) {
 			chain[i].postInsert(request);
 		}
 	}
 
-	public void postLoad(Object bean, Set<String> includedProperties) {
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].postLoad(bean, includedProperties);
-		}
-	}
-
+  @Override
 	public void postUpdate(BeanPersistRequest<?> request) {
 		for (int i = 0; i < chain.length; i++) {
 			chain[i].postUpdate(request);
 		}
 	}
 
+  @Override
 	public boolean preDelete(BeanPersistRequest<?> request) {
 		for (int i = 0; i < chain.length; i++) {
 			if (!chain[i].preDelete(request)) {
@@ -132,6 +132,7 @@ public class ChainedBeanPersistController implements BeanPersistController {
 		return true;
 	}
 
+  @Override
 	public boolean preInsert(BeanPersistRequest<?> request) {
 		for (int i = 0; i < chain.length; i++) {
 			if (!chain[i].preInsert(request)) {
@@ -141,6 +142,7 @@ public class ChainedBeanPersistController implements BeanPersistController {
 		return true;
 	}
 
+  @Override
 	public boolean preUpdate(BeanPersistRequest<?> request) {
 		for (int i = 0; i < chain.length; i++) {
 			if (!chain[i].preUpdate(request)) {

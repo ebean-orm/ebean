@@ -7,14 +7,14 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestLifecyleAnnotatedBean extends BaseTestCase {
+public class TestLifecycleAnnotatedBean extends BaseTestCase {
 
   @Test
   public void shouldExecutePrePersistMethodsWhenSavingBean() {
+
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("PrePersist");
 
-    Ebean.getServerCacheManager();
     Ebean.save(bean);
     
     assertThat(bean.getBuffer()).contains("prePersist1");
@@ -23,10 +23,10 @@ public class TestLifecyleAnnotatedBean extends BaseTestCase {
 
   @Test
   public void shouldExecutePostPersistMethodsWhenSavingBean() {
+
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("PostPersist");
 
-    Ebean.getServerCacheManager();
     Ebean.save(bean);
 
     assertThat(bean.getBuffer()).contains("postPersist1");
@@ -35,10 +35,10 @@ public class TestLifecyleAnnotatedBean extends BaseTestCase {
 
   @Test
   public void shouldExecutePostLoadMethodsWhenFindingBean() {
+
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("PostLoad");
 
-    Ebean.getServerCacheManager();
     Ebean.save(bean);
 
     EBasicWithLifecycle loaded = Ebean.find(EBasicWithLifecycle.class, bean.getId());
@@ -48,10 +48,10 @@ public class TestLifecyleAnnotatedBean extends BaseTestCase {
 
   @Test
   public void shouldExecutePreUpdateMethodsWhenUpdatingBean() {
+
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("Persisted");
 
-    Ebean.getServerCacheManager();
     Ebean.save(bean);
     
     bean.setName("PreUpdate");
@@ -63,10 +63,10 @@ public class TestLifecyleAnnotatedBean extends BaseTestCase {
 
   @Test
   public void shouldExecutePostUpdateMethodsWhenUpdatingBean() {
+
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("Persisted");
 
-    Ebean.getServerCacheManager();
     Ebean.save(bean);
 
     bean.setName("PostUpdate");
@@ -78,10 +78,10 @@ public class TestLifecyleAnnotatedBean extends BaseTestCase {
 
   @Test
   public void shouldExecutePreRemoveMethodsWhenRemovingBean() {
+
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("Persisted");
 
-    Ebean.getServerCacheManager();
     Ebean.save(bean);
     Ebean.delete(bean);
 
@@ -91,10 +91,10 @@ public class TestLifecyleAnnotatedBean extends BaseTestCase {
 
   @Test
   public void shouldExecutePostRemoveMethodsWhenRemovingBean() {
+
     EBasicWithLifecycle bean = new EBasicWithLifecycle();
     bean.setName("Persisted");
 
-    Ebean.getServerCacheManager();
     Ebean.save(bean);
     Ebean.delete(bean);
 

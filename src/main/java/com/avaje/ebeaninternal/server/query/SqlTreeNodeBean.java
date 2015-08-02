@@ -301,7 +301,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       if (readId && !temporalVersions) {
         createListProxies(localDesc, ctx, localBean);
       }
-      localDesc.postLoad(localBean, null);
+      localDesc.postLoad(localBean);
 
       EntityBeanIntercept ebi = localBean._ebean_getIntercept();
       ebi.setPersistenceContext(persistenceContext);

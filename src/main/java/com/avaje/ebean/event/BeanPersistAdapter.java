@@ -66,10 +66,4 @@ public abstract class BeanPersistAdapter implements BeanPersistController {
   public void postUpdate(BeanPersistRequest<?> request) {
   }
 
-  /**
-   * Does nothing by default.
-   */
-  public void postLoad(Object bean, Set<String> includedProperties) {
-  }
-
 }

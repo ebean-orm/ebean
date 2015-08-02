@@ -4,15 +4,35 @@ import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
-import com.avaje.ebean.event.*;
+import com.avaje.ebean.event.BeanFindController;
+import com.avaje.ebean.event.BeanPersistController;
+import com.avaje.ebean.event.BeanPersistListener;
+import com.avaje.ebean.event.BeanPostLoad;
+import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
-import com.avaje.ebeaninternal.server.deploy.*;
+import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistController;
+import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistListener;
+import com.avaje.ebeaninternal.server.deploy.ChainedBeanPostLoad;
+import com.avaje.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
+import com.avaje.ebeaninternal.server.deploy.CompoundUniqueContraint;
+import com.avaje.ebeaninternal.server.deploy.DRawSqlMeta;
+import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
+import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
+import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Describes Beans including their deployment information.
@@ -101,9 +121,10 @@ public class DeployBeanDescriptor<T> {
    */
   private final Class<T> beanType;
 
-  private final List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>(2);
-  private final List<BeanPersistListener> persistListeners = new ArrayList<BeanPersistListener>(2);
-  private final List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>(2);
+  private final List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>();
+  private final List<BeanPersistListener> persistListeners = new ArrayList<BeanPersistListener>();
+  private final List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>();
+  private final List<BeanPostLoad> postLoaders = new ArrayList<BeanPostLoad>();
 
   private final CacheOptions cacheOptions = new CacheOptions();
 
@@ -402,8 +423,18 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Set the Controller.
+   * Return the BeanPostLoad (could be a chain of them, 1 or null).
    */
+  public BeanPostLoad getPostLoad() {
+    if (postLoaders.size() == 0) {
+      return null;
+    } else if (postLoaders.size() == 1) {
+      return postLoaders.get(0);
+    } else {
+      return new ChainedBeanPostLoad(postLoaders);
+    }
+  }
+
   public void addPersistController(BeanPersistController controller) {
     persistControllers.add(controller);
   }
@@ -414,6 +445,10 @@ public class DeployBeanDescriptor<T> {
 
   public void addQueryAdapter(BeanQueryAdapter queryAdapter) {
     queryAdapters.add(queryAdapter);
+  }
+
+  public void addPostLoad(BeanPostLoad postLoad) {
+    postLoaders.add(postLoad);
   }
 
   /**

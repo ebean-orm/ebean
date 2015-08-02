@@ -13,6 +13,7 @@ import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
+import com.avaje.ebean.event.BeanPostLoad;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaQueryPlanStatistic;
@@ -151,13 +152,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   private final String[] properties;
   
   private final int propertyCount;
-  
 
   /**
-   * Intercept pre post on insert,update,delete and postLoad(). Server side
-   * only.
+   * Intercept pre post on insert,update, and delete .
    */
   private volatile BeanPersistController persistController;
+
+  private final BeanPostLoad beanPostLoad;
 
   /**
    * Listens for post commit insert update and delete events.
@@ -185,6 +186,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * Derived list of properties that make up the unique id.
    */
   protected final BeanProperty idProperty;
+
   private final int idPropertyIndex;
 
   /**
@@ -330,6 +332,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.beanFinder = deploy.getBeanFinder();
     this.persistController = deploy.getPersistController();
     this.persistListener = deploy.getPersistListener();
+    this.beanPostLoad = deploy.getPostLoad();
     this.queryAdapter = deploy.getQueryAdapter();
 
     this.defaultSelectClause = deploy.getDefaultSelectClause();
@@ -934,12 +937,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * Execute the postLoad if a BeanPersistController exists for this bean.
+   * Execute the postLoad if a BeanPostLoad exists for this bean.
    */
-  public void postLoad(Object bean, Set<String> includedProperties) {
-    BeanPersistController c = persistController;
-    if (c != null) {
-      c.postLoad(bean, includedProperties);
+  public void postLoad(Object bean) {
+    if (beanPostLoad != null) {
+      beanPostLoad.postLoad(bean);
     }
   }
 

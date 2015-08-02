@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.PostLoad;
@@ -17,6 +16,7 @@ import javax.persistence.PreUpdate;
 
 import com.avaje.ebean.event.BeanPersistAdapter;
 import com.avaje.ebean.event.BeanPersistRequest;
+import com.avaje.ebean.event.BeanPostLoad;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
 /**
@@ -35,14 +35,20 @@ public class BeanLifecycleAdapterFactory {
 
     Method[] methods = deployDesc.getBeanType().getMethods();
 
+    // look for annotated methods
     MethodsHolder methodHolder = new MethodsHolder();
-
     for (Method m : methods) {
       methodHolder.checkMethod(m);
     }
 
-    if (methodHolder.hasListener()) {
-      deployDesc.addPersistController(new Adapter(methodHolder));
+    if (methodHolder.hasPersistMethods()) {
+      // has pre/post persist annotated methods
+      deployDesc.addPersistController(new PersistAdapter(new PersistMethodsHolder(methodHolder)));
+    }
+
+    if (!methodHolder.postLoads.isEmpty()) {
+      // has postLoad methods
+      deployDesc.addPostLoad(new PostLoadAdapter(methodHolder.postLoads));
     }
   }
 
@@ -51,7 +57,7 @@ public class BeanLifecycleAdapterFactory {
    */
   private static class MethodsHolder {
 
-    private boolean hasListener;
+    private boolean hasPersistMethods;
     private final List<Method> preInserts = new ArrayList<Method>();
     private final List<Method> postInserts = new ArrayList<Method>();
     private final List<Method> preUpdates = new ArrayList<Method>();
@@ -60,53 +66,88 @@ public class BeanLifecycleAdapterFactory {
     private final List<Method> postDeletes = new ArrayList<Method>();
     private final List<Method> postLoads = new ArrayList<Method>();
 
-    private boolean hasListener() {
-      return hasListener;
+    /**
+     * Has one of the pre or post insert update delete annotated methods.
+     */
+    private boolean hasPersistMethods() {
+      return hasPersistMethods;
     }
 
+    /**
+     * Check the method for all the annotations we are interested in.
+     */
     private void checkMethod(Method method) {
       if (method.isAnnotationPresent(PrePersist.class)) {
         preInserts.add(method);
-        hasListener = true;
+        hasPersistMethods = true;
       }
       if (method.isAnnotationPresent(PostPersist.class)) {
         postInserts.add(method);
-        hasListener = true;
+        hasPersistMethods = true;
       }
 
       if (method.isAnnotationPresent(PreUpdate.class)) {
         preUpdates.add(method);
-        hasListener = true;
+        hasPersistMethods = true;
       }
       if (method.isAnnotationPresent(PostUpdate.class)) {
         postUpdates.add(method);
-        hasListener = true;
+        hasPersistMethods = true;
       }
 
       if (method.isAnnotationPresent(PreRemove.class)) {
         preDeletes.add(method);
-        hasListener = true;
+        hasPersistMethods = true;
       }
       if (method.isAnnotationPresent(PostRemove.class)) {
         postDeletes.add(method);
-        hasListener = true;
+        hasPersistMethods = true;
       }
 
       if (method.isAnnotationPresent(PostLoad.class)) {
         postLoads.add(method);
-        hasListener = true;
       }
+    }
+  }
+
+
+  /**
+   * Utility method to covert List of Method into array (because we care about performance here).
+   */
+  static Method[] toArray(List<Method> methodList) {
+    return methodList.toArray(new Method[methodList.size()]);
+  }
+
+  /**
+   * Holds Methods for the lifecycle events.s
+   */
+  private static class PersistMethodsHolder {
+
+    private final Method[] preInserts;
+    private final Method[] postInserts;
+    private final Method[] preUpdates;
+    private final Method[] postUpdates;
+    private final Method[] preDeletes;
+    private final Method[] postDeletes;
+
+    PersistMethodsHolder(MethodsHolder methodsHolder) {
+      this.preInserts = toArray(methodsHolder.preInserts);
+      this.preUpdates = toArray(methodsHolder.preUpdates);
+      this.preDeletes = toArray(methodsHolder.preDeletes);
+      this.postInserts = toArray(methodsHolder.postInserts);
+      this.postUpdates = toArray(methodsHolder.postUpdates);
+      this.postDeletes = toArray(methodsHolder.postDeletes);
     }
   }
 
   /**
    * BeanPersistAdapter using reflection to invoke lifecycle methods.
    */
-  private static class Adapter extends BeanPersistAdapter {
+  private static class PersistAdapter extends BeanPersistAdapter {
 
-    private final MethodsHolder methodHolder;
+    private final PersistMethodsHolder methodHolder;
 
-    private Adapter(MethodsHolder methodHolder) {
+    private PersistAdapter(PersistMethodsHolder methodHolder) {
       this.methodHolder = methodHolder;
     }
 
@@ -126,10 +167,9 @@ public class BeanLifecycleAdapterFactory {
       }
     }
 
-    private void invoke(List<Method> methods, BeanPersistRequest<?> request) {
-      if (methods.isEmpty()) return;
-      for (Method method : methods) {
-        invoke(method, request.getBean());
+    private void invoke(Method[] methods, BeanPersistRequest<?> request) {
+      for (int i = 0; i < methods.length; i++) {
+        invoke(methods[i], request.getBean());
       }
     }
 
@@ -165,12 +205,39 @@ public class BeanLifecycleAdapterFactory {
     public void postUpdate(BeanPersistRequest<?> request) {
       invoke(methodHolder.postUpdates, request);
     }
+  }
+
+  /**
+   * BeanPostLoad using reflection to invoke lifecycle methods.
+   */
+  private static class PostLoadAdapter implements BeanPostLoad {
+
+    private final Method[] postLoadMethods;
+
+    private PostLoadAdapter(List<Method> postLoadMethods) {
+      this.postLoadMethods = toArray(postLoadMethods);
+    }
 
     @Override
-    public void postLoad(Object bean, Set<String> includedProperties) {
-      if (methodHolder.postLoads.isEmpty()) return;
-      for (Method method : methodHolder.postLoads) {
-        invoke(method, bean);
+    public boolean isRegisterFor(Class<?> cls) {
+      // Not used
+      return false;
+    }
+
+    private void invoke(Method method, Object bean) {
+      try {
+        method.invoke(bean);
+      } catch (InvocationTargetException e) {
+        throw new PersistenceException("Error invoking lifecycle method", e);
+      } catch (IllegalAccessException e) {
+        throw new PersistenceException("Error invoking lifecycle method", e);
+      }
+    }
+
+    @Override
+    public void postLoad(Object bean) {
+      for (int i = 0; i < postLoadMethods.length; i++) {
+        invoke(postLoadMethods[i], bean);
       }
     }
   }

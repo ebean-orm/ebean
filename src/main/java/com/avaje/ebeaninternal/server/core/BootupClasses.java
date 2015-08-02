@@ -39,6 +39,8 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
   private final List<Class<?>> beanControllerList = new ArrayList<Class<?>>();
 
+  private final List<Class<?>> beanPostLoadList = new ArrayList<Class<?>>();
+
   private final List<Class<?>> transactionEventListenerList = new ArrayList<Class<?>>();
 
   private final List<Class<?>> beanFindControllerList = new ArrayList<Class<?>>();
@@ -51,6 +53,7 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
   private final List<BeanFindController> findControllerInstances = new ArrayList<BeanFindController>();
   private final List<BeanPersistController> persistControllerInstances = new ArrayList<BeanPersistController>();
+  private final List<BeanPostLoad> beanPostLoadInstances = new ArrayList<BeanPostLoad>();
   private final List<BeanPersistListener> persistListenerInstances = new ArrayList<BeanPersistListener>();
   private final List<BeanQueryAdapter> queryAdapterInstances = new ArrayList<BeanQueryAdapter>();
   private final List<TransactionEventListener> transactionEventListenerInstances = new ArrayList<TransactionEventListener>();
@@ -109,6 +112,19 @@ public class BootupClasses implements ClassPathSearchMatcher {
         this.persistControllerInstances.add(c);
         // don't automatically instantiate
         this.beanControllerList.remove(c.getClass());
+      }
+    }
+  }
+
+  /**
+   * Add BeanPostLoad instances.
+   */
+  public void addPostLoaders(List<BeanPostLoad> postLoadInstances) {
+    if (postLoadInstances != null) {
+      for (BeanPostLoad c : postLoadInstances) {
+        this.beanPostLoadInstances.add(c);
+        // don't automatically instantiate
+        this.beanPostLoadList.remove(c.getClass());
       }
     }
   }
@@ -223,6 +239,21 @@ public class BootupClasses implements ClassPathSearchMatcher {
     return persistControllerInstances;
   }
 
+  public List<BeanPostLoad> getBeanPostLoaders() {
+    // add class registered BeanPostLoad to the already created instances
+    for (Class<?> cls : beanPostLoadList) {
+      try {
+        BeanPostLoad newInstance = (BeanPostLoad) cls.newInstance();
+        beanPostLoadInstances.add(newInstance);
+      } catch (Exception e) {
+        String msg = "Error creating BeanPersistController " + cls;
+        logger.error(msg, e);
+      }
+    }
+
+    return beanPostLoadInstances;
+  }
+
   public List<TransactionEventListener> getTransactionEventListeners() {
     // add class registered TransactionEventListener to the
     // already created instances
@@ -306,6 +337,11 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
     if (BeanPersistController.class.isAssignableFrom(cls)) {
       beanControllerList.add(cls);
+      interesting = true;
+    }
+
+    if (BeanPostLoad.class.isAssignableFrom(cls)) {
+      beanPostLoadList.add(cls);
       interesting = true;
     }
 

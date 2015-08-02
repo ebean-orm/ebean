@@ -106,10 +106,4 @@ public interface BeanPersistController {
    */
   void postDelete(BeanPersistRequest<?> request);
 
-  /**
-   * Called after every each bean is fetched and loaded from the database. You
-   * can override this to derive some information to set to the bean.
-   */
-  void postLoad(Object bean, Set<String> includedProperties);
-
 }
