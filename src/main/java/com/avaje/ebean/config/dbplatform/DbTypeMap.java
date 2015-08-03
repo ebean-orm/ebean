@@ -9,16 +9,76 @@ import java.util.Map;
  */
 public class DbTypeMap {
 
+  /**
+   * A map to reverse lookup the type by name.
+   * <p>
+   * Used when converting from logical types to platform types which we
+   * want to do with 2 phase DDL generation.
+   */
+  static Map<String, Integer> lookup = new HashMap<String, Integer>();
+
+  static {
+    lookup.put("BOOLEAN", Types.BOOLEAN);
+    lookup.put("BIT", Types.BIT);
+    lookup.put("INTEGER", Types.INTEGER);
+    lookup.put("BIGINT", Types.BIGINT);
+    lookup.put("REAL", Types.REAL);
+    // Float is most common REAL mapping to have that as well
+    lookup.put("FLOAT", Types.REAL);
+
+    lookup.put("DOUBLE", Types.DOUBLE);
+    lookup.put("SMALLINT", Types.SMALLINT);
+    lookup.put("TINYINT", Types.TINYINT);
+    lookup.put("DECIMAL", Types.DECIMAL);
+    lookup.put("VARCHAR", Types.VARCHAR);
+    // VARCHAR2 - extra for Oracle specific column definition
+    lookup.put("VARCHAR2", Types.VARCHAR);
+    lookup.put("CHAR", Types.CHAR);
+    lookup.put("BLOB", Types.BLOB);
+    lookup.put("CLOB", Types.CLOB);
+
+    lookup.put("LONGVARBINARY", Types.LONGVARBINARY);
+    lookup.put("LONGVARCHAR", Types.LONGVARCHAR);
+    lookup.put("VARBINARY", Types.VARBINARY);
+    lookup.put("BINARY", Types.BINARY);
+    lookup.put("DATE", Types.DATE);
+    lookup.put("TIME", Types.TIME);
+    lookup.put("TIMESTAMP", Types.TIMESTAMP);
+
+    // Not standard java.sql.Types
+    // logical JSON storage types
+    lookup.put("JSON", DbType.JSON);
+    lookup.put("JSONB", DbType.JSONB);
+    lookup.put("JSONCLOB", DbType.JSONClob);
+    lookup.put("JSONBLOB", DbType.JSONBlob);
+    lookup.put("JSONVARCHAR", DbType.JSONVarchar);
+  }
+
+
   private final Map<Integer, DbType> typeMap = new HashMap<Integer, DbType>();
 
+  /**
+   * Return the DbTypeMap with standard (not platform specific) types.
+   *
+   * This has some extended JSON types (JSON, JSONB, JSONVarchar, JSONClob, JSONBlob).
+   * These types get translated to specific database platform types during DDL generation.
+   */
+  public static DbTypeMap logicalTypes() {
+    return new DbTypeMap(true);
+  }
+
   public DbTypeMap() {
-    loadDefaults();
+    loadDefaults(false);
+  }
+
+  private DbTypeMap(boolean logicalTypes) {
+    loadDefaults(logicalTypes);
   }
 
   /**
    * Load the standard types. These can be overridden by DB specific platform.
    */
-  private void loadDefaults() {
+  private void loadDefaults(boolean logicalTypes) {
 
     put(Types.BOOLEAN, new DbType("boolean"));
     put(Types.BIT, new DbType("bit"));
@@ -37,11 +97,21 @@ public class DbTypeMap {
     put(Types.BLOB, new DbType("blob"));
     put(Types.CLOB, new DbType("clob"));
 
-    put(DbType.JSON, new DbType("clob")); // Postgres maps this to JSON
-    put(DbType.JSONB, new DbType("clob")); // Postgres maps this to JSONB
-    put(DbType.JSONClob, new DbType("clob"));
-    put(DbType.JSONBlob, new DbType("blob"));
-    put(DbType.JSONVarchar, new DbType("varchar", 1000));
+    if (logicalTypes) {
+      // keep it logical for 2 layer DDL generation
+      put(DbType.JSON, new DbType("json"));
+      put(DbType.JSONB, new DbType("jsonb"));
+      put(DbType.JSONClob, new DbType("jsonclob"));
+      put(DbType.JSONBlob, new DbType("jsonblob"));
+      put(DbType.JSONVarchar, new DbType("jsonvarchar", 1000));
+
+    } else {
+      put(DbType.JSON, new DbType("clob")); // Postgres maps this to JSON
+      put(DbType.JSONB, new DbType("clob")); // Postgres maps this to JSONB
+      put(DbType.JSONClob, new DbType("clob"));
+      put(DbType.JSONBlob, new DbType("blob"));
+      put(DbType.JSONVarchar, new DbType("varchar", 1000));
+    }
 
     put(Types.LONGVARBINARY, new DbType("longvarbinary"));
     put(Types.LONGVARCHAR, new DbType("lonvarchar"));
@@ -55,6 +125,28 @@ public class DbTypeMap {
   }
 
   /**
+   * Lookup the platform specific DbType given the standard sql type name.
+   */
+  public DbType lookup(String name) {
+    name = name.trim().toUpperCase();
+    Integer typeKey = lookup.get(name);
+    if (typeKey == null) {
+      throw new IllegalArgumentException("Unknown type [" + name + "] - not standard sql type");
+    }
+    // handle JSON types mapped to clob, blob and varchar
+    switch (typeKey) {
+      case DbType.JSONBlob:
+        return get(Types.BLOB);
+      case DbType.JSONClob:
+        return get(Types.CLOB);
+      case DbType.JSONVarchar:
+        return get(Types.VARCHAR);
+      default:
+        return get(typeKey);
+    }
+  }
+
+  /**
    * Override the type for a given JDBC type.
    */
   public void put(int jdbcType, DbType dbType) {
@@ -65,13 +157,6 @@ public class DbTypeMap {
    * Return the type for a given jdbc type.
    */
   public DbType get(int jdbcType) {
-
-    DbType dbType = typeMap.get(jdbcType);
-    if (dbType == null) {
-      String m = "No DB type for JDBC type " + jdbcType;
-      throw new RuntimeException(m);
-    }
-
-    return dbType;
+    return typeMap.get(jdbcType);
   }
 }

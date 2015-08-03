@@ -39,6 +39,9 @@ public class PostgresPlatform extends DatabasePlatform {
     this.openQuote = "\"";
     this.closeQuote = "\"";
 
+    DbType dbTypeText = new DbType("text");
+    DbType dbBytea = new DbType("bytea", false);
+
     dbTypeMap.put(DbType.HSTORE, new DbType("hstore"));
     dbTypeMap.put(DbType.JSON, new DbType("json"));
     dbTypeMap.put(DbType.JSONB, new DbType("jsonb"));
@@ -48,13 +51,13 @@ public class PostgresPlatform extends DatabasePlatform {
     dbTypeMap.put(Types.TINYINT, new DbType("smallint"));
     dbTypeMap.put(Types.DECIMAL, new DbType("decimal", 38));
 
-    dbTypeMap.put(Types.BINARY, new DbType("bytea", false));
-    dbTypeMap.put(Types.VARBINARY, new DbType("bytea", false));
+    dbTypeMap.put(Types.BINARY, dbBytea);
+    dbTypeMap.put(Types.VARBINARY, dbBytea);
 
-    dbTypeMap.put(Types.BLOB, new DbType("bytea", false));
-    dbTypeMap.put(Types.CLOB, new DbType("text"));
-    dbTypeMap.put(Types.LONGVARBINARY, new DbType("bytea", false));
-    dbTypeMap.put(Types.LONGVARCHAR, new DbType("text"));
+    dbTypeMap.put(Types.BLOB, dbBytea);
+    dbTypeMap.put(Types.CLOB, dbTypeText);
+    dbTypeMap.put(Types.LONGVARBINARY, dbBytea);
+    dbTypeMap.put(Types.LONGVARCHAR, dbTypeText);
 
     dbDdlSyntax.setDropTableCascade("cascade");
     dbDdlSyntax.setDropIfExists("if exists");

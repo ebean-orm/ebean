@@ -186,6 +186,7 @@ public class DeployBeanProperty {
     this.desc = desc;
     this.propertyType = propertyType;
     this.scalarType = wrapScalarType(propertyType, scalarType, typeConverter);
+    this.dbType = (scalarType == null) ? 0 : scalarType.getJdbcType();
   }
 
   /**
