@@ -5,6 +5,8 @@ import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.TableDdl;
 import com.avaje.ebean.dbmigration.migration.Column;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
+import com.avaje.ebean.dbmigration.migration.ForeignKey;
+import com.avaje.ebean.dbmigration.migration.PrimaryKey;
 import com.avaje.ebean.dbmigration.model.MTable;
 
 import java.io.IOException;
@@ -50,7 +52,15 @@ public class BaseTableDdl implements TableDdl {
     writeUniqueConstraints(apply, createTable);
     writeCompoundUniqueConstraints(apply, createTable);
     if (!pk.isEmpty()) {
-      writePrimaryKeyConstraint(apply, tableName, pk);
+      // defined on the columns
+      writePrimaryKeyConstraint(apply, tableName, toColumnNames(pk));
+    } else {
+      // defined on the table
+      if (createTable.getPrimaryKey() == null) {
+        System.out.print("asd");
+      } else {
+        writePrimaryKeyConstraint(apply, tableName, createTable.getPrimaryKey());
+      }
     }
 
     apply.newLine().append(")").endOfStatement();
@@ -75,14 +85,32 @@ public class BaseTableDdl implements TableDdl {
 
   protected void writeAddForeignKeys(DdlWrite write, CreateTable createTable) throws IOException {
 
+    String tableName = createTable.getName();
     List<Column> columns = createTable.getColumn();
     for (Column column : columns) {
       String references = column.getReferences();
       if (hasValue(references)) {
-        writeForeignKey(write, createTable.getName(), column.getName(), references);
+        writeForeignKey(write, tableName, column.getName(), references);
       }
     }
-    //createTable.
+
+    writeAddCompoundForeignKeys(write, createTable);
+  }
+
+  protected void writeAddCompoundForeignKeys(DdlWrite write, CreateTable createTable) throws IOException {
+
+    String tableName = createTable.getName();
+
+    List<ForeignKey> foreignKey = createTable.getForeignKey();
+    for (ForeignKey key : foreignKey) {
+
+      String refTableName = key.getRefTableName();
+      String fkName = determineForeignKeyConstraintName(tableName, refTableName);
+      String[] cols = toColumnNamesSplit(key.getColumnNames());
+      String[] refColumns = toColumnNamesSplit(key.getRefColumnNames());
+
+      writeForeignKey(write, fkName, tableName, cols, refTableName, refColumns);
+    }
 
   }
 
@@ -109,10 +137,10 @@ public class BaseTableDdl implements TableDdl {
     fkeyBuffer
         .append("alter table ").append(tableName)
         .append(" add constraint ").append(fkName)
-        .append(" foreign key (");
+        .append(" foreign key");
     appendColumns(columns, fkeyBuffer);
     fkeyBuffer
-        .append(") references ")
+        .append(" references ")
         .append(refTable);
     appendColumns(refColumns, fkeyBuffer);
     fkeyBuffer.appendWithSpace(platformDdl.getForeignKeyRestrict())
@@ -144,7 +172,7 @@ public class BaseTableDdl implements TableDdl {
       if (i > 0) {
         buffer.append(",");
       }
-      buffer.append(columns[i]);
+      buffer.append(columns[i].trim());
     }
     buffer.append(")");
   }
@@ -215,23 +243,23 @@ public class BaseTableDdl implements TableDdl {
     buffer.append(")");
   }
 
+  protected void writePrimaryKeyConstraint(DdlBuffer buffer, String tableName, PrimaryKey pk) throws IOException {
+
+    String columnNames = pk.getColumnNames();
+    String[] cols = columnNames.split(",");
+    writePrimaryKeyConstraint(buffer, tableName, cols);
+  }
+
   /**
    * Write the primary key constraint inline with the create table statement.
    */
-  protected void writePrimaryKeyConstraint(DdlBuffer buffer, String tableName, List<Column> pk) throws IOException {
+  protected void writePrimaryKeyConstraint(DdlBuffer buffer, String tableName, String[] pkColumns) throws IOException {
 
-    String pkName = determinePrimaryKeyName(tableName, pk);
+    String pkName = determinePrimaryKeyName(tableName, pkColumns);
 
     buffer.append(",").newLine();
-    buffer.append("  constraint ").append(pkName).append(" primary key ");
-    buffer.append("(");
-    for (int i = 0; i < pk.size(); i++) {
-      if (i > 0) {
-        buffer.append(",");
-      }
-      buffer.append(pk.get(i).getName());
-    }
-    buffer.append(")");
+    buffer.append("  constraint ").append(pkName).append(" primary key");
+    appendColumns(pkColumns, buffer);
   }
 
   /**
@@ -239,17 +267,32 @@ public class BaseTableDdl implements TableDdl {
    */
   public void alterTableAddPrimaryKey(DdlBuffer buffer, String tableName, List<Column> pk) throws IOException {
 
-    String pkName = determinePrimaryKeyName(tableName, pk);
+    String[] pkColumns = toColumnNames(pk);
+    String pkName = determinePrimaryKeyName(tableName, pkColumns);
 
     buffer.append("alter table ").append(tableName);
-    buffer.append(" add primary key ").append(pkName).append(" (");
-    for (int i = 0; i < pk.size(); i++) {
-      if (i > 0) {
-        buffer.append(",");
-      }
-      buffer.append(pk.get(i).getName());
-    }
+    buffer.append(" add primary key ").append(pkName);
+    appendColumns(pkColumns, buffer);
     buffer.append(")").endOfStatement();
+  }
+
+  /**
+   * Return as an array of string column names.
+   */
+  private String[] toColumnNames(List<Column> columns) {
+
+    String[] cols = new String[columns.size()];
+    for (int i = 0; i < cols.length; i++) {
+      cols[i] = columns.get(i).getName();
+    }
+    return cols;
+  }
+
+  /**
+   * Return as an array of string column names.
+   */
+  private String[] toColumnNamesSplit(String columns) {
+    return columns.split(",");
   }
 
   /**
@@ -283,14 +326,9 @@ public class BaseTableDdl implements TableDdl {
   /**
    * Return the primary key constraint name.
    */
-  protected String determinePrimaryKeyName(String tableName, List<Column> pkColumns) {
+  protected String determinePrimaryKeyName(String tableName, String[] pkColumns) {
 
-    // collect the primary key column names
-    List<String> pkColumnNames = new ArrayList<String>(pkColumns.size());
-    for (int i = 0; i < pkColumns.size(); i++) {
-      pkColumnNames.add(pkColumns.get(i).getName());
-    }
-    return namingConvention.primaryKeyName(tableName, pkColumnNames);
+    return namingConvention.primaryKeyName(tableName, pkColumns);
   }
 
   /**

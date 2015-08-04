@@ -1,14 +1,14 @@
 
 package com.avaje.ebean.dbmigration.migration;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -23,6 +23,8 @@ import java.util.List;
  *       &lt;sequence>
  *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}column" maxOccurs="unbounded"/>
  *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}uniqueConstraint" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}foreignKey" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}primaryKey" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attGroup ref="{http://ebean-orm.github.io/xml/ns/dbmigration}tablespaceAttributes"/>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -37,7 +39,9 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "column",
-    "uniqueConstraint"
+    "uniqueConstraint",
+    "foreignKey",
+    "primaryKey"
 })
 @XmlRootElement(name = "createTable")
 public class CreateTable {
@@ -45,6 +49,8 @@ public class CreateTable {
     @XmlElement(required = true)
     protected List<Column> column;
     protected List<UniqueConstraint> uniqueConstraint;
+    protected List<ForeignKey> foreignKey;
+    protected PrimaryKey primaryKey;
     @XmlAttribute(name = "name", required = true)
     protected String name;
     @XmlAttribute(name = "withHistory")
@@ -112,6 +118,59 @@ public class CreateTable {
             uniqueConstraint = new ArrayList<UniqueConstraint>();
         }
         return this.uniqueConstraint;
+    }
+
+    /**
+     * Gets the value of the foreignKey property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the foreignKey property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getForeignKey().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link ForeignKey }
+     * 
+     * 
+     */
+    public List<ForeignKey> getForeignKey() {
+        if (foreignKey == null) {
+            foreignKey = new ArrayList<ForeignKey>();
+        }
+        return this.foreignKey;
+    }
+
+    /**
+     * Gets the value of the primaryKey property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link PrimaryKey }
+     *     
+     */
+    public PrimaryKey getPrimaryKey() {
+        return primaryKey;
+    }
+
+    /**
+     * Sets the value of the primaryKey property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link PrimaryKey }
+     *     
+     */
+    public void setPrimaryKey(PrimaryKey value) {
+        this.primaryKey = value;
     }
 
     /**

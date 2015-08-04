@@ -49,6 +49,10 @@ public class CurrentModel {
     return model;
   }
 
+  public void setChangeSet(ChangeSet changeSet) {
+   this.changeSet = changeSet;
+  }
+
   public ChangeSet getChangeSet() {
     read();
     if (changeSet == null) {
@@ -88,6 +92,16 @@ public class CurrentModel {
     ddl.append(write.rollback().getBuffer());
 
     return ddl.toString();
+  }
+
+  public DdlWrite generateDdl(ChangeSet changeSet) throws IOException {
+
+    DdlWrite write = new DdlWrite();
+
+    BaseDdlHandler handler = handler();
+    handler.generate(write, changeSet);
+
+    return write;
   }
 
   private void createDdl() throws IOException {

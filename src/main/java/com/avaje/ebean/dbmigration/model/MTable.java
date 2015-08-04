@@ -4,6 +4,7 @@ import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.Column;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
+import com.avaje.ebean.dbmigration.migration.ForeignKey;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -81,6 +82,11 @@ public class MTable {
     for (MColumn column : this.columns.values()) {
       createTable.getColumn().add(column.createColumn());
     }
+
+    for (MCompoundForeignKey compoundKey : compoundKeys) {
+      createTable.getForeignKey().add(compoundKey.createForeignKey());
+    }
+
     return createTable;
   }
 
@@ -142,6 +148,19 @@ public class MTable {
     return compoundKeys;
   }
 
+  /**
+   * Return the list of columns that make the primary key.
+   */
+  public List<MColumn> primaryKeyColumns() {
+    List<MColumn> pk = new ArrayList<MColumn>(3);
+    for (MColumn column : columns.values()) {
+      if (column.isPrimaryKey()) {
+        pk.add(column);
+      }
+    }
+    return pk;
+  }
+
   private void checkTableName(String tableName) {
     if (!name.equals(tableName)) {
       throw new IllegalArgumentException("addColumn tableName ["+tableName+"] does not match ["+name+"]");
@@ -183,4 +202,5 @@ public class MTable {
   public void addForeignKey(MCompoundForeignKey compoundKey) {
     compoundKeys.add(compoundKey);
   }
+
 }

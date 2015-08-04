@@ -35,7 +35,7 @@ public class DdlNamingConvention {
   /**
    * Return the primary key constraint name.
    */
-  public String primaryKeyName(String tableName, List<String> pkColumns) {
+  public String primaryKeyName(String tableName, String[] pkColumns) {
 
     return pkPrefix + normalise(tableName) + pkSuffix;
   }
@@ -62,7 +62,7 @@ public class DdlNamingConvention {
     StringBuilder sb = new StringBuilder(30);
     for (int i = 0; i < columns.length; i++) {
       if (i > 0) {
-        sb.append("-");
+        sb.append("_");
       }
       sb.append(columns[i]);
     }

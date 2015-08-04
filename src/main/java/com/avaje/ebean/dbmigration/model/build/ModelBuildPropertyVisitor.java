@@ -24,6 +24,8 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
   private final MTable table;
 
+  private MColumn lastColumn;
+
   public ModelBuildPropertyVisitor(ModelBuildContext ctx, MTable table) {
     this.ctx = ctx;
     this.table = table;
@@ -59,8 +61,11 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   @Override
   public void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded) {
 
-    //this.embedded = embedded;
     visitScalar(p);
+    if (embedded.isId()) {
+      // compound primary key
+      lastColumn.setPrimaryKey(true);
+    }
   }
 
   @Override
@@ -141,6 +146,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     }
     col.setCheckConstraint(p.getDbConstraintExpression());
 
+    lastColumn = col;
     table.addColumn(col);
 	}
 

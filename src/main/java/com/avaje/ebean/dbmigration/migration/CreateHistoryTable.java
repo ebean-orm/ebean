@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
-@XmlRootElement(name = "addHistoryTable")
+@XmlRootElement(name = "createHistoryTable")
 public class CreateHistoryTable {
 
     @XmlAttribute(name = "baseTable", required = true)

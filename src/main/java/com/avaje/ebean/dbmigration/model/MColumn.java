@@ -109,16 +109,14 @@ public class MColumn {
     Column c = new Column();
     c.setName(name);
     c.setType(type);
-    c.setNotnull(notnull);
+    if (notnull) c.setNotnull(notnull);
+    if (unique) c.setUnique(unique);
+    if (primaryKey) c.setPrimaryKey(primaryKey);
+    if (identity) c.setIdentity(identity);
+
     c.setCheckConstraint(checkConstraint);
-    c.setUnique(unique);
-    c.setPrimaryKey(primaryKey);
-    c.setIdentity(identity);
     c.setReferences(references);
     c.setDefaultValue(defaultValue);
-
-    //c.setDeleteCascade();
-    //c.setDeferrable(deferrable);
 
     return c;
   }

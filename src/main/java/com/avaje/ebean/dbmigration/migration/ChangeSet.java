@@ -1,6 +1,9 @@
 
 package com.avaje.ebean.dbmigration.migration;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -9,9 +12,6 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -50,7 +50,7 @@ public class ChangeSet {
         @XmlElement(name = "createTable", type = CreateTable.class),
         @XmlElement(name = "dropTable", type = DropTable.class),
         @XmlElement(name = "renameTable", type = RenameTable.class),
-        @XmlElement(name = "addHistoryTable", type = CreateHistoryTable.class),
+        @XmlElement(name = "createHistoryTable", type = CreateHistoryTable.class),
         @XmlElement(name = "createView", type = CreateView.class),
         @XmlElement(name = "dropView", type = DropView.class),
         @XmlElement(name = "renameView", type = RenameView.class),

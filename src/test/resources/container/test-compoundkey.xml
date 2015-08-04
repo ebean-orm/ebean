@@ -4,11 +4,17 @@
 
   <changeSet id="1">
 
+    <createTable name="ckey_assoc">
+      <column name="id"         type="integer"          primaryKey="true" identity="true"/>
+      <column name="assoc_one"  type="varchar(255)"     />
+    </createTable>
+
     <createTable name="ckey_detail">
       <column name="id"         type="integer"          primaryKey="true" identity="true"/>
       <column name="something"  type="varchar(255)"     />
       <column name="one_key"    type="integer"          />
       <column name="two_key"    type="varchar(255)"     />
+      <foreignKey columnNames="one_key,two_key" refColumnNames="one_key,two_key" refTableName="ckey_parent"/>
     </createTable>
     
     <createTable name="ckey_parent">

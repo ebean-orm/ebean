@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRegistry;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the org.avaje.ebean.dbmigration.migration package. 
+ * generated in the com.avaje.ebean.dbmigration.migration package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -23,34 +23,10 @@ public class ObjectFactory {
 
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.avaje.ebean.dbmigration.migration
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.avaje.ebean.dbmigration.migration
      * 
      */
     public ObjectFactory() {
-    }
-
-    /**
-     * Create an instance of {@link Rollback }
-     * 
-     */
-    public Rollback createRollback() {
-        return new Rollback();
-    }
-
-    /**
-     * Create an instance of {@link AddColumn }
-     * 
-     */
-    public AddColumn createAddColumn() {
-        return new AddColumn();
-    }
-
-    /**
-     * Create an instance of {@link Column }
-     * 
-     */
-    public Column createColumn() {
-        return new Column();
     }
 
     /**
@@ -62,6 +38,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Column }
+     * 
+     */
+    public Column createColumn() {
+        return new Column();
+    }
+
+    /**
      * Create an instance of {@link UniqueConstraint }
      * 
      */
@@ -70,19 +54,27 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ForeignKey }
+     * 
+     */
+    public ForeignKey createForeignKey() {
+        return new ForeignKey();
+    }
+
+    /**
+     * Create an instance of {@link PrimaryKey }
+     * 
+     */
+    public PrimaryKey createPrimaryKey() {
+        return new PrimaryKey();
+    }
+
+    /**
      * Create an instance of {@link DropForeignKey }
      * 
      */
     public DropForeignKey createDropForeignKey() {
         return new DropForeignKey();
-    }
-
-    /**
-     * Create an instance of {@link Apply }
-     * 
-     */
-    public Apply createApply() {
-        return new Apply();
     }
 
     /**
@@ -118,22 +110,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link RenameView }
-     * 
-     */
-    public RenameView createRenameView() {
-        return new RenameView();
-    }
-
-    /**
-     * Create an instance of {@link AddForeignKey }
-     * 
-     */
-    public AddForeignKey createAddForeignKey() {
-        return new AddForeignKey();
-    }
-
-    /**
      * Create an instance of {@link DropColumn }
      * 
      */
@@ -150,14 +126,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ChangeSet }
-     * 
-     */
-    public ChangeSet createChangeSet() {
-        return new ChangeSet();
-    }
-
-    /**
      * Create an instance of {@link Sql }
      * 
      */
@@ -166,11 +134,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DropTable }
+     * Create an instance of {@link Apply }
      * 
      */
-    public DropTable createDropTable() {
-        return new DropTable();
+    public Apply createApply() {
+        return new Apply();
+    }
+
+    /**
+     * Create an instance of {@link Rollback }
+     * 
+     */
+    public Rollback createRollback() {
+        return new Rollback();
     }
 
     /**
@@ -182,6 +158,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link RenameColumn }
+     * 
+     */
+    public RenameColumn createRenameColumn() {
+        return new RenameColumn();
+    }
+
+    /**
      * Create an instance of {@link CreateView }
      * 
      */
@@ -190,11 +174,43 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link RenameColumn }
+     * Create an instance of {@link DropTable }
      * 
      */
-    public RenameColumn createRenameColumn() {
-        return new RenameColumn();
+    public DropTable createDropTable() {
+        return new DropTable();
+    }
+
+    /**
+     * Create an instance of {@link AddColumn }
+     * 
+     */
+    public AddColumn createAddColumn() {
+        return new AddColumn();
+    }
+
+    /**
+     * Create an instance of {@link RenameView }
+     * 
+     */
+    public RenameView createRenameView() {
+        return new RenameView();
+    }
+
+    /**
+     * Create an instance of {@link AddForeignKey }
+     * 
+     */
+    public AddForeignKey createAddForeignKey() {
+        return new AddForeignKey();
+    }
+
+    /**
+     * Create an instance of {@link ChangeSet }
+     * 
+     */
+    public ChangeSet createChangeSet() {
+        return new ChangeSet();
     }
 
     /**

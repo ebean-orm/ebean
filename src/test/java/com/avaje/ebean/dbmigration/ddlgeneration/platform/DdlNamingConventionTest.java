@@ -2,9 +2,6 @@ package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DdlNamingConventionTest {
@@ -14,9 +11,7 @@ public class DdlNamingConventionTest {
   @Test
   public void testPrimaryKeyName() throws Exception {
 
-    List<String> cols = new ArrayList<String>();
-    cols.add("[jim]");
-    cols.add("`jack`");
+    String[] cols = {"[jim]","`jack`"};
     assertThat(defaultNaming.primaryKeyName("[cat].[sce].[foo_bar]", cols)).isEqualTo("pk_foo_bar");
   }
 
