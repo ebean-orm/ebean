@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://ebean-orm.github.io/xml/ns/dbmigration http://ebean-orm.github.io/xml/ns/dbmigration-1.0.xsd">
+
+  <changeSet id="1">
+
+    <createTable name="foo" withHistory="true" tablespace="fooSpace" indexTablespace="fooIndexSpace" remarks="comment">
+      <column name="col1" type="varchar(4)" notnull="true" primaryKey="true"/>
+      <column name="col2" type="varchar(30)" notnull="true"/>
+      <column name="col3" type="varchar(30)" notnull="true"/>
+    </createTable>
+
+    <addColumn tableName="foo">
+      <column name="added_to_foo" type="varchar(20)"/>
+    </addColumn>
+
+    <dropColumn columnName="col2" tableName="foo"/>
+
+  </changeSet>
+
+</migration>

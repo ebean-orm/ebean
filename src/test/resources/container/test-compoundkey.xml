@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://ebean-orm.github.io/xml/ns/dbmigration http://ebean-orm.github.io/xml/ns/dbmigration-1.0.xsd">
+
+  <changeSet id="1">
+
+    <createTable name="ckey_detail">
+      <column name="id"         type="integer"          primaryKey="true" identity="true"/>
+      <column name="something"  type="varchar(255)"     />
+      <column name="one_key"    type="integer"          />
+      <column name="two_key"    type="varchar(255)"     />
+    </createTable>
+    
+    <createTable name="ckey_parent">
+      <column name="one_key"    type="integer"         primaryKey="true" />
+      <column name="two_key"    type="varchar(255)"    primaryKey="true" />
+      <column name="name"       type="varchar(255)"    />
+      <column name="assoc_id"   type="integer"         references="ckey_assoc.id"/>
+      <column name="version"    type="integer"         notnull="true" />
+    </createTable>
+
+  </changeSet>
+
+</migration>

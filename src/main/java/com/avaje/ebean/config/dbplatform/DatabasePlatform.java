@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.Query;
 
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,6 +146,8 @@ public class DatabasePlatform {
    */
   protected boolean disallowBatchOnCascade;
 
+  protected PlatformDdl platformDdl;
+
   /**
    * Instantiates a new database platform.
    */
@@ -162,6 +165,10 @@ public class DatabasePlatform {
    */
   public String getName() {
     return name;
+  }
+
+  public PlatformDdl getPlatformDdl() {
+    return platformDdl;
   }
 
   /**

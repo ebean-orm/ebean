@@ -1,6 +1,7 @@
 package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.H2Ddl;
 
 import javax.sql.DataSource;
 
@@ -12,6 +13,7 @@ public class H2Platform extends DatabasePlatform {
   public H2Platform() {
     super();
     this.name = "h2";
+    this.platformDdl = new H2Ddl(this.dbTypeMap);
     this.dbEncrypt = new H2DbEncrypt();
     // like ? escape'' not working in the latest version H2 so just using no
     // escape clause for now noting that backslash is an escape char for like in H2

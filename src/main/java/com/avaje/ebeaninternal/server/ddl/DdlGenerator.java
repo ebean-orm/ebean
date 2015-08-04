@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.dbmigration.model.CurrentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
   private boolean generateDdl;
   private boolean runDdl;
 
+  private CurrentModel currentModel;
   private String dropContent;
   private String createContent;
 
@@ -70,6 +72,10 @@ public class DdlGenerator implements SpiEbeanPlugin {
     if (generateDdl) {
       writeDrop(getDropFileName());
       writeCreate(getCreateFileName());
+
+      String mn = server.getName() + "-migration.xml";
+      File migrationXml = new File(mn);
+      writeMigration(migrationXml);
     }
   }
 
@@ -122,44 +128,60 @@ public class DdlGenerator implements SpiEbeanPlugin {
 
   public String generateDropDdl() {
 
-    DdlGenContext ctx = createContext();
-
-    if (ctx.getDdlSyntax().isDropKeyConstraints()) {
-      // generate drop foreign key constraint statements (sql server joy)
-      AddForeignKeysVisitor fkeys = new AddForeignKeysVisitor(false, ctx);
-      VisitorUtil.visit(server, fkeys);
-      ctx.writeNewLine();
+    try {
+      dropContent = currentModel().getDropDdl();
+      return dropContent;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+//    DdlGenContext ctx = createContext();
+//
+//    if (ctx.getDdlSyntax().isDropKeyConstraints()) {
+//      // generate drop foreign key constraint statements (sql server joy)
+//      AddForeignKeysVisitor fkeys = new AddForeignKeysVisitor(false, ctx);
+//      VisitorUtil.visit(server, fkeys);
+//      ctx.writeNewLine();
+//    }
+//
+//    DropTableVisitor drop = new DropTableVisitor(ctx);
+//    VisitorUtil.visit(server, drop);
+//
+//    DropSequenceVisitor dropSequence = new DropSequenceVisitor(ctx);
+//    VisitorUtil.visit(server, dropSequence);
+//
+//    ctx.flush();
+//    dropContent = ctx.getContent();
+//    return dropContent;
+  }
+  public void writeMigration(File file) {
 
-    DropTableVisitor drop = new DropTableVisitor(ctx);
-    VisitorUtil.visit(server, drop);
-
-    DropSequenceVisitor dropSequence = new DropSequenceVisitor(ctx);
-    VisitorUtil.visit(server, dropSequence);
-
-    ctx.flush();
-    dropContent = ctx.getContent();
-    return dropContent;
+    currentModel().writeMigration(file);
   }
 
   public String generateCreateDdl() {
 
-    DdlGenContext ctx = createContext();
-    CreateTableVisitor create = new CreateTableVisitor(ctx);
-    VisitorUtil.visit(server, create);
-
-    CreateSequenceVisitor createSequence = new CreateSequenceVisitor(ctx);
-    VisitorUtil.visit(server, createSequence);
-
-    AddForeignKeysVisitor fkeys = new AddForeignKeysVisitor(true, ctx);
-    VisitorUtil.visit(server, fkeys);
-
-    CreateIndexVisitor indexes = new CreateIndexVisitor(ctx);
-    VisitorUtil.visit(server, indexes);
-
-    ctx.flush();
-    createContent = ctx.getContent();
-    return createContent;
+    try {
+      createContent = currentModel().getCreateDdl();
+      return createContent;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+//    DdlGenContext ctx = createContext();
+//    CreateTableVisitor create = new CreateTableVisitor(ctx);
+//    VisitorUtil.visit(server, create);
+//
+//    CreateSequenceVisitor createSequence = new CreateSequenceVisitor(ctx);
+//    VisitorUtil.visit(server, createSequence);
+//
+//    AddForeignKeysVisitor fkeys = new AddForeignKeysVisitor(true, ctx);
+//    VisitorUtil.visit(server, fkeys);
+//
+//    CreateIndexVisitor indexes = new CreateIndexVisitor(ctx);
+//    VisitorUtil.visit(server, indexes);
+//
+//    ctx.flush();
+//    createContent = ctx.getContent();
+//    return createContent;
   }
 
   protected String getDropFileName() {
@@ -172,6 +194,15 @@ public class DdlGenerator implements SpiEbeanPlugin {
 
   protected DdlGenContext createContext() {
     return new DdlGenContext(dbPlatform, namingConvention);
+  }
+
+
+
+  protected CurrentModel currentModel() {
+    if (currentModel == null) {
+      currentModel = new CurrentModel(server);
+    }
+    return currentModel;
   }
 
   protected void writeFile(String fileName, String fileContent) throws IOException {
@@ -199,7 +230,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
     FileReader fr = new FileReader(f);
     LineNumberReader lr = new LineNumberReader(fr);
     try {
-      String s = null;
+      String s;
       while ((s = lr.readLine()) != null) {
         buf.append(s).append("\n");
       }

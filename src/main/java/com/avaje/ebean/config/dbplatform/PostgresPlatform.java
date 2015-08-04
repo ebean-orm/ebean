@@ -1,6 +1,8 @@
 package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.H2Ddl;
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.PostgresDdl;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -16,6 +18,8 @@ public class PostgresPlatform extends DatabasePlatform {
   public PostgresPlatform() {
     super();
     this.name = "postgres";
+    this.platformDdl = new PostgresDdl(this.dbTypeMap);
+
     // OnQueryOnly.CLOSE as a performance optimisation on Postgres
     this.onQueryOnly = OnQueryOnly.CLOSE;
     this.likeClause = "like ? escape''";

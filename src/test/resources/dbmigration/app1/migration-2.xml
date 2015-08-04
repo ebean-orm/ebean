@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://ebean-orm.github.io/xml/ns/dbmigration http://ebean-orm.github.io/xml/ns/dbmigration-1.0.xsd">
+
+  <changeSet id="1">
+
+    <sql>
+      <apply>
+        create table foo;
+      </apply>
+      <rollback>
+        drop table if exists foo;
+      </rollback>
+    </sql>
+
+    <createTable name="dbmigration">
+      <column name="application" type="varchar(30)" notnull="true"/>
+      <column name="change_log"  type="integer"     notnull="true"/>
+      <column name="change_set"  type="integer"     notnull="true"/>
+      <column name="locked_by"   type="varchar(30)"/>
+      <column name="locked_at"   type="timestamp"/>
+    </createTable>
+
+    <createTable name="dbmigration_changeset">
+      <column name="id"          type="integer"      primaryKey="true"/>
+      <column name="application" type="varchar(30)"  notnull="true" references="dbmigration.application"/>
+      <column name="change_log"  type="integer"      notnull="true"/>
+      <column name="change_set"  type="integer"      notnull="true"/>
+      <column name="run_at"      type="timestamp"    notnull="true"/>
+      <column name="run_by"      type="varchar(30)"  notnull="true"/>
+      <column name="run_ddl"     type="clob"/>
+      <column name="run_log"     type="clob"/>
+    </createTable>
+
+    <createTable name="hello_world" withHistory="true">
+      <column name="id" type="integer" primaryKey="true"/>
+      <column name="name" type="varchar(20)" notnull="true"/>
+      <column name="description" type="varchar(20)" notnull="true"/>
+    </createTable>
+
+    <addColumn tableName="hello_world">
+      <column name="fooe" type="varchar(20)"/>
+    </addColumn>
+
+    <dropColumn columnName="fooe" tableName="hello_world"/>
+
+    <createHistoryTable baseTable="hello_world"/>
+
+  </changeSet>
+
+</migration>

@@ -1,0 +1,7 @@
+create table foo (
+  col1                          varchar(4) not null,
+  col2                          varchar(30) not null,
+  col3                          varchar(30) not null,
+  constraint pk_foo primary key (col1)
+);
+
