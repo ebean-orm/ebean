@@ -35,6 +35,10 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
 
     MTable table = new MTable(descriptor.getBaseTable());
 
+    table.setSequenceName(descriptor.getSequenceName());
+    table.setSequenceInitial(descriptor.getSequenceInitialValue());
+    table.setSequenceAllocate(descriptor.getSequenceAllocationSize());
+
     // add the table to the model
     ctx.addTable(table);
 

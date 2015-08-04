@@ -6,6 +6,7 @@ import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
 import com.avaje.ebean.dbmigration.migration.ForeignKey;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,6 +41,9 @@ public class MTable {
   private String tablespace;
 
   private String indexTablespace;
+  private String sequenceName;
+  private int sequenceInitial;
+  private int sequenceAllocate;
 
   private Boolean withHistory;
 
@@ -57,11 +61,15 @@ public class MTable {
     this.tablespace = createTable.getTablespace();
     this.indexTablespace = createTable.getIndexTablespace();
     this.withHistory = createTable.isWithHistory();
+    this.sequenceName = createTable.getSequenceName();
+    this.sequenceInitial = toInt(createTable.getSequenceInitial());
+    this.sequenceAllocate = toInt(createTable.getSequenceAllocate());
     List<Column> cols = createTable.getColumn();
     for (Column column : cols) {
       addColumn(column);
     }
   }
+
 
   /**
    * Construct typically from EbeanServer meta data.
@@ -78,6 +86,9 @@ public class MTable {
     createTable.setTablespace(tablespace);
     createTable.setIndexTablespace(indexTablespace);
     createTable.setWithHistory(withHistory);
+    createTable.setSequenceName(sequenceName);
+    createTable.setSequenceInitial(toBigInteger(sequenceInitial));
+    createTable.setSequenceAllocate(toBigInteger(sequenceAllocate));
 
     for (MColumn column : this.columns.values()) {
       createTable.getColumn().add(column.createColumn());
@@ -148,6 +159,30 @@ public class MTable {
     return compoundKeys;
   }
 
+  public String getSequenceName() {
+    return sequenceName;
+  }
+
+  public void setSequenceName(String sequenceName) {
+    this.sequenceName = sequenceName;
+  }
+
+  public int getSequenceInitial() {
+    return sequenceInitial;
+  }
+
+  public void setSequenceInitial(int sequenceInitial) {
+    this.sequenceInitial = sequenceInitial;
+  }
+
+  public int getSequenceAllocate() {
+    return sequenceAllocate;
+  }
+
+  public void setSequenceAllocate(int sequenceAllocate) {
+    this.sequenceAllocate = sequenceAllocate;
+  }
+
   /**
    * Return the list of columns that make the primary key.
    */
@@ -203,4 +238,30 @@ public class MTable {
     compoundKeys.add(compoundKey);
   }
 
+  private int toInt(BigInteger value) {
+    return (value == null) ? 0 : value.intValue();
+  }
+
+  private BigInteger toBigInteger(int value) {
+    return (value == 0) ? null : BigInteger.valueOf(value);
+  }
+
+  /**
+   * Add a column checking if it already exists and if so return the existing column.
+   * Sometimes the case for a primaryKey that is also a foreign key.
+   */
+  public MColumn addColumn(String dbCol, String columnDefn, boolean notnull) {
+
+    MColumn existingColumn = columns.get(dbCol);
+    if (existingColumn != null) {
+      if (notnull) {
+        existingColumn.setNotnull(true);
+      }
+      return existingColumn;
+    }
+
+    MColumn newCol = new MColumn(dbCol, columnDefn, notnull);
+    addColumn(newCol);
+    return newCol;
+  }
 }

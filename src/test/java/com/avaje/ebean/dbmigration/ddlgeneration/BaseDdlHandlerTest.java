@@ -21,7 +21,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
   private BaseDdlHandler h2Handler() {
     DbTypeMap types = new H2Platform().getDbTypeMap();
-    return new BaseDdlHandler(new DdlNamingConvention(), new H2Ddl(types));
+    return new BaseDdlHandler(new DdlNamingConvention(), new H2Ddl(types, true));
   }
 
   private BaseDdlHandler postgresHandler() {

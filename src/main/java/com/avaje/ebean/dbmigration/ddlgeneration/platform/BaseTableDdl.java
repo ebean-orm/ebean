@@ -6,10 +6,10 @@ import com.avaje.ebean.dbmigration.ddlgeneration.TableDdl;
 import com.avaje.ebean.dbmigration.migration.Column;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.ForeignKey;
-import com.avaje.ebean.dbmigration.migration.PrimaryKey;
 import com.avaje.ebean.dbmigration.model.MTable;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,27 +54,38 @@ public class BaseTableDdl implements TableDdl {
     if (!pk.isEmpty()) {
       // defined on the columns
       writePrimaryKeyConstraint(apply, tableName, toColumnNames(pk));
-    } else {
-      // defined on the table
-      if (createTable.getPrimaryKey() == null) {
-        System.out.print("asd");
-      } else {
-        writePrimaryKeyConstraint(apply, tableName, createTable.getPrimaryKey());
-      }
     }
 
     apply.newLine().append(")").endOfStatement();
+
+    // add drop table to the rollback buffer - do this before
+    // we drop the related sequence (if sequences are used)
+    dropTable(writer.rollback(), tableName);
+
+    writeSequence(writer, createTable);
+
+    // add blank line for a bit of whitespace between tables
     apply.end();
+    writer.rollback().end();
 
     writeAddForeignKeys(writer, createTable);
-
-    // add drop table to the rollback buffer
-    dropTable(writer.rollback(), tableName);
 
     if (isTrue(createTable.isWithHistory())) {
       createWithHistory(writer, createTable.getName());
     }
 
+  }
+
+  private void writeSequence(DdlWrite writer, CreateTable createTable) throws IOException {
+    String name = createTable.getSequenceName();
+    int initial = toInt(createTable.getSequenceInitial());
+    int allocate = toInt(createTable.getSequenceAllocate());
+
+    String createSeq = platformDdl.createSequence(name, initial, allocate);
+    if (createSeq != null) {
+      writer.apply().append(createSeq).newLine();
+      writer.rollback().append(platformDdl.dropSequence(name));
+    }
   }
 
   private void createWithHistory(DdlWrite writer, String name) throws IOException {
@@ -183,7 +194,7 @@ public class BaseTableDdl implements TableDdl {
    */
   protected void dropTable(DdlBuffer buffer, String tableName) throws IOException {
 
-    buffer.append("drop table ").append(tableName).endOfStatement().end();
+    buffer.append("drop table ").append(tableName).endOfStatement();
   }
 
   /**
@@ -241,13 +252,6 @@ public class BaseTableDdl implements TableDdl {
     buffer.append("(");
     buffer.append(column.getName());
     buffer.append(")");
-  }
-
-  protected void writePrimaryKeyConstraint(DdlBuffer buffer, String tableName, PrimaryKey pk) throws IOException {
-
-    String columnNames = pk.getColumnNames();
-    String[] cols = columnNames.split(",");
-    writePrimaryKeyConstraint(buffer, tableName, cols);
   }
 
   /**
@@ -390,5 +394,8 @@ public class BaseTableDdl implements TableDdl {
     return Boolean.TRUE.equals(value);
   }
 
+  private int toInt(BigInteger value) {
+    return (value == null) ? 0 : value.intValue();
+  }
 
 }

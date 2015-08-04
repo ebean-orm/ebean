@@ -99,16 +99,20 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       String columnDefn = ctx.getColumnDefn(importedProperty);
       String refColumn = importedProperty.getDbColumn();
 
-      MColumn col = new MColumn(dbCol, columnDefn, !p.isNullable());
+      MColumn col = table.addColumn(dbCol, columnDefn, !p.isNullable());
+
       if (columns.length == 1) {
         // single references column (put it on the column)
         String refTable = importedProperty.getBeanDescriptor().getBaseTable();
+        if (refTable == null) {
+          // odd case where an EmbeddedId only has 1 property
+          refTable = p.getTargetDescriptor().getBaseTable();
+        }
         col.setReferences(refTable + "." + refColumn);
       } else {
         compoundKey.addColumnPair(dbCol, refColumn);
       }
       modelColumns.add(col);
-      table.addColumn(col);
     }
 
 
@@ -127,6 +131,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 	public void visitScalar(BeanProperty p) {
 
     if (p.isSecondaryTable()) {
+      lastColumn = null;
       return;
     }
 

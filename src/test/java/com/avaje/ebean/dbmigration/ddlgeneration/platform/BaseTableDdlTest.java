@@ -18,7 +18,7 @@ public class BaseTableDdlTest {
   @Test
   public void testGenerate() throws Exception {
 
-    BaseTableDdl ddlGen = new BaseTableDdl(new DdlNamingConvention(), new H2Ddl(new DbTypeMap()));
+    BaseTableDdl ddlGen = new BaseTableDdl(new DdlNamingConvention(), new H2Ddl(new DbTypeMap(), true));
 
     DdlWrite write = new DdlWrite();
 

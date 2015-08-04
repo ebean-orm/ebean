@@ -13,7 +13,8 @@ public class H2Platform extends DatabasePlatform {
   public H2Platform() {
     super();
     this.name = "h2";
-    this.platformDdl = new H2Ddl(this.dbTypeMap);
+    boolean useSequences = true;
+    this.platformDdl = new H2Ddl(this.dbTypeMap, useSequences);
     this.dbEncrypt = new H2DbEncrypt();
     // like ? escape'' not working in the latest version H2 so just using no
     // escape clause for now noting that backslash is an escape char for like in H2

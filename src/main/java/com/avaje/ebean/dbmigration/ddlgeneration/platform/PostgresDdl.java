@@ -8,8 +8,13 @@ import com.avaje.ebean.config.dbplatform.DbTypeMap;
 public class PostgresDdl extends PlatformDdl {
 
   public PostgresDdl(DbTypeMap platformTypes) {
+    this(platformTypes, false);
+  }
+
+  public PostgresDdl(DbTypeMap platformTypes, boolean useSequences) {
     super(platformTypes, new PostgresHistoryDdl());
     this.foreignKeyRestrict = "on delete restrict on update restrict";
+    this.useSequences = useSequences;
   }
 
   /**

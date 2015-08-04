@@ -1,6 +1,7 @@
 
 package com.avaje.ebean.dbmigration.migration;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -8,6 +9,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -24,11 +26,13 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}column" maxOccurs="unbounded"/>
  *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}uniqueConstraint" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}foreignKey" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}primaryKey" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attGroup ref="{http://ebean-orm.github.io/xml/ns/dbmigration}tablespaceAttributes"/>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="withHistory" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="sequenceName" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="sequenceInitial" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
+ *       &lt;attribute name="sequenceAllocate" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -40,8 +44,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
     "column",
     "uniqueConstraint",
-    "foreignKey",
-    "primaryKey"
+    "foreignKey"
 })
 @XmlRootElement(name = "createTable")
 public class CreateTable {
@@ -50,11 +53,18 @@ public class CreateTable {
     protected List<Column> column;
     protected List<UniqueConstraint> uniqueConstraint;
     protected List<ForeignKey> foreignKey;
-    protected PrimaryKey primaryKey;
     @XmlAttribute(name = "name", required = true)
     protected String name;
     @XmlAttribute(name = "withHistory")
     protected Boolean withHistory;
+    @XmlAttribute(name = "sequenceName")
+    protected String sequenceName;
+    @XmlAttribute(name = "sequenceInitial")
+    @XmlSchemaType(name = "positiveInteger")
+    protected BigInteger sequenceInitial;
+    @XmlAttribute(name = "sequenceAllocate")
+    @XmlSchemaType(name = "positiveInteger")
+    protected BigInteger sequenceAllocate;
     @XmlAttribute(name = "tablespace")
     protected String tablespace;
     @XmlAttribute(name = "indexTablespace")
@@ -150,30 +160,6 @@ public class CreateTable {
     }
 
     /**
-     * Gets the value of the primaryKey property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link PrimaryKey }
-     *     
-     */
-    public PrimaryKey getPrimaryKey() {
-        return primaryKey;
-    }
-
-    /**
-     * Sets the value of the primaryKey property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link PrimaryKey }
-     *     
-     */
-    public void setPrimaryKey(PrimaryKey value) {
-        this.primaryKey = value;
-    }
-
-    /**
      * Gets the value of the name property.
      * 
      * @return
@@ -219,6 +205,78 @@ public class CreateTable {
      */
     public void setWithHistory(Boolean value) {
         this.withHistory = value;
+    }
+
+    /**
+     * Gets the value of the sequenceName property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getSequenceName() {
+        return sequenceName;
+    }
+
+    /**
+     * Sets the value of the sequenceName property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setSequenceName(String value) {
+        this.sequenceName = value;
+    }
+
+    /**
+     * Gets the value of the sequenceInitial property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link BigInteger }
+     *     
+     */
+    public BigInteger getSequenceInitial() {
+        return sequenceInitial;
+    }
+
+    /**
+     * Sets the value of the sequenceInitial property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link BigInteger }
+     *     
+     */
+    public void setSequenceInitial(BigInteger value) {
+        this.sequenceInitial = value;
+    }
+
+    /**
+     * Gets the value of the sequenceAllocate property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link BigInteger }
+     *     
+     */
+    public BigInteger getSequenceAllocate() {
+        return sequenceAllocate;
+    }
+
+    /**
+     * Sets the value of the sequenceAllocate property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link BigInteger }
+     *     
+     */
+    public void setSequenceAllocate(BigInteger value) {
+        this.sequenceAllocate = value;
     }
 
     /**

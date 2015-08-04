@@ -107,10 +107,12 @@
         <xsd:element ref="column" minOccurs="1" maxOccurs="unbounded"/>
         <xsd:element ref="uniqueConstraint" minOccurs="0" maxOccurs="unbounded"/>
         <xsd:element ref="foreignKey" minOccurs="0" maxOccurs="unbounded"/>
-        <xsd:element ref="primaryKey" minOccurs="0" maxOccurs="1"/>
       </xsd:sequence>
       <xsd:attribute name="name" type="xsd:string" use="required"/>
       <xsd:attribute name="withHistory" type="xsd:boolean"/>
+      <xsd:attribute name="sequenceName" type="xsd:string"/>
+      <xsd:attribute name="sequenceInitial" type="xsd:positiveInteger"/>
+      <xsd:attribute name="sequenceAllocate" type="xsd:positiveInteger"/>
       <xsd:attributeGroup ref="tablespaceAttributes"/>
     </xsd:complexType>
   </xsd:element>
@@ -129,13 +131,6 @@
       <xsd:attribute name="columnNames" type="xsd:string" use="required"/>
       <xsd:attribute name="refColumnNames" type="xsd:string" use="required"/>
       <xsd:attribute name="refTableName" type="xsd:string" use="required"/>
-    </xsd:complexType>
-  </xsd:element>
-
-  <!-- Only expected to be used for compound primary key -->
-  <xsd:element name="primaryKey">
-    <xsd:complexType>
-      <xsd:attribute name="columnNames" type="xsd:string" use="required"/>
     </xsd:complexType>
   </xsd:element>
 

@@ -105,6 +105,11 @@ public class ModelContainer {
    * Add a table (typically from reading EbeanServer meta data).
    */
   public void addTable(MTable table) {
+
+    if (table.getName().equalsIgnoreCase("item")) {
+      System.out.println();
+    }
+
     tables.put(table.getName(), table);
   }
 }

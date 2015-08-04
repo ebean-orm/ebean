@@ -1,5 +1,7 @@
 package com.avaje.ebean.dbmigration.model.build;
 
+import com.avaje.ebean.dbmigration.migration.ForeignKey;
+import com.avaje.ebean.dbmigration.model.MCompoundForeignKey;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -20,6 +22,8 @@ public class ModelBuildIntersectionTable {
 	private final TableJoin intersectionTableJoin;
 	private final TableJoin tableJoin;
 
+  private MTable intersectionTable;
+
 	public ModelBuildIntersectionTable(ModelBuildContext ctx, BeanPropertyAssocMany<?> manyProp) {
 		this.ctx = ctx;
 		this.manyProp = manyProp;
@@ -29,44 +33,49 @@ public class ModelBuildIntersectionTable {
 
 	public void build() {
 
-    MTable table = createTable();
-    ctx.addTable(table);
+    intersectionTable = createTable();
+    ctx.addTable(intersectionTable);
 
-    //buildFkConstraints();
+    buildFkConstraints();
 	}
 
-//	private void buildFkConstraints(MTable table) {
-//
-//		BeanDescriptor<?> localDesc = manyProp.getBeanDescriptor();
-//		String fk1 = buildFkConstraints(localDesc, intersectionTableJoin.columns(), true);
-//		ctx.addIntersectionTableFk(fk1);
-//
-//		BeanDescriptor<?> targetDesc = manyProp.getTargetDescriptor();
-//		String fk2 = buildFkConstraints(targetDesc, tableJoin.columns(), false);
-//		ctx.addIntersectionTableFk(fk2);
-//	}
+	private void buildFkConstraints() {
+
+		BeanDescriptor<?> localDesc = manyProp.getBeanDescriptor();
+		buildFkConstraints(localDesc, intersectionTableJoin.columns(), true);
+		//ctx.addIntersectionTableFk(fk1);
+
+		BeanDescriptor<?> targetDesc = manyProp.getTargetDescriptor();
+		buildFkConstraints(targetDesc, tableJoin.columns(), false);
+		//ctx.addIntersectionTableFk(fk2);
+	}
 
 	
-//	private String buildFkConstraints(BeanDescriptor<?> desc, TableJoinColumn[] columns, boolean direction) {
-//
-//
+	private void buildFkConstraints(BeanDescriptor<?> desc, TableJoinColumn[] columns, boolean direction) {
+
+
 //		String fkName = "fk_"+intersectionTableJoin.getTable()+"_"+desc.getBaseTable();
 //
 //		fkName = getFkNameWithSuffix(fkName);
-//
+
+    MCompoundForeignKey foreignKey = new MCompoundForeignKey(desc.getBaseTable());
+    intersectionTable.addForeignKey(foreignKey);
+
+
 //		fkBuf.append("alter table ");
 //		fkBuf.append(intersectionTableJoin.getTable());
 //		fkBuf.append(" add constraint ").append(fkName);
 //
 //		fkBuf.append(" foreign key (");
-//
-//		for (int i = 0; i < columns.length; i++) {
+
+		for (int i = 0; i < columns.length; i++) {
 //			if (i > 0) {
 //				fkBuf.append(", ");
 //			}
-//			String col = direction ? columns[i].getForeignDbColumn() : columns[i].getLocalDbColumn();
-//			fkBuf.append(col);
-//		}
+			String localCol = direction ? columns[i].getForeignDbColumn() : columns[i].getLocalDbColumn();
+      String refCol = !direction ? columns[i].getForeignDbColumn() : columns[i].getLocalDbColumn();
+      foreignKey.addColumnPair(localCol, refCol);
+		}
 //		fkBuf.append(") references ").append(desc.getBaseTable()).append(" (");
 //
 //		for (int i = 0; i < columns.length; i++) {
@@ -86,7 +95,7 @@ public class ModelBuildIntersectionTable {
 //		fkBuf.append(";").append(NEW_LINE);
 //
 //		return fkBuf.toString();
-//	}
+	}
 
 	private MTable createTable() {
 

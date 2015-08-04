@@ -62,14 +62,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PrimaryKey }
-     * 
-     */
-    public PrimaryKey createPrimaryKey() {
-        return new PrimaryKey();
-    }
-
-    /**
      * Create an instance of {@link DropForeignKey }
      * 
      */

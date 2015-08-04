@@ -17,7 +17,7 @@ public class ModelContainerApplyTest {
   @Test
   public void testApply() throws Exception {
 
-    Migration migration = MigrationXmlReader.read("/test/container/test-create-table.xml");
+    Migration migration = MigrationXmlReader.read("/container/test-create-table.xml");
 
     List<ChangeSet> changeSets = migration.getChangeSet();
     ChangeSet changeSet = changeSets.get(0);

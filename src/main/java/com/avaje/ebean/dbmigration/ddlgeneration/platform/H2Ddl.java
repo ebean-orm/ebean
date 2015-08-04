@@ -7,8 +7,10 @@ import com.avaje.ebean.config.dbplatform.DbTypeMap;
  */
 public class H2Ddl extends PlatformDdl {
 
-  public H2Ddl(DbTypeMap platformTypes) {
+  public H2Ddl(DbTypeMap platformTypes, boolean useSequences) {
     super(platformTypes, new H2HistoryDdl());
     this.foreignKeyRestrict = "on delete restrict on update restrict";
+    this.useSequences = useSequences;
   }
+
 }

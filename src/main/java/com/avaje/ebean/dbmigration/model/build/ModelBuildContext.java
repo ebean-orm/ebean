@@ -5,6 +5,7 @@ import com.avaje.ebean.config.dbplatform.DbTypeMap;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebean.dbmigration.model.MTable;
 import com.avaje.ebean.dbmigration.model.ModelContainer;
+import com.avaje.ebeaninternal.server.type.ScalarType;
 
 /**
  * The context used during DDL generation.
@@ -49,14 +50,23 @@ public class ModelBuildContext {
     if (p.isDbEncrypted()) {
       return dbTypeMap.get(p.getDbEncryptedType());
     }
+    if (p.isLocalEncrypted()) {
+      // scalar type potentially wrapping varbinary db type
+      ScalarType<Object> scalarType = p.getScalarType();
+      int jdbcType = scalarType.getJdbcType();
+      return dbTypeMap.get(jdbcType);
+    }
 
+//    ScalarType<Object> scalarType = p.getScalarType();
+//    if (scalarType == null) {
+//      throw new RuntimeException("No scalarType for " + p.getFullBeanName());
+//    }
+//    return dbTypeMap.get(scalarType.getJdbcType());
+
+    // can be the logical JSON types (JSON, JSONB, JSONClob, JSONBlob, JSONVarchar)
     int dbType = p.getDbType();
     if (dbType == 0) {
-//      ScalarType<Object> scalarType = p.getScalarType();
-//      if (scalarType == null) {
-        throw new RuntimeException("No scalarType for " + p.getFullBeanName());
-//      }
-//      dbType = scalarType.getJdbcType();
+      throw new RuntimeException("No scalarType defined for " + p.getFullBeanName());
     }
     return dbTypeMap.get(dbType);
   }
