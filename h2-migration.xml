@@ -136,7 +136,7 @@
             <column references="configuration.id" name="product_configuration_id" type="integer"/>
             <column references="configuration.id" name="group_configuration_id" type="integer"/>
         </createTable>
-        <createTable name="cao_bean" identityType="SEQUENCE">
+        <createTable name="cao_bean" identityType="EXTERNAL">
             <column primaryKey="true" name="x_cust_id" type="integer"/>
             <column primaryKey="true" name="x_type_id" type="integer"/>
             <column name="description" type="varchar(255)"/>
@@ -213,7 +213,7 @@
             <column notnull="true" name="when_created" type="timestamp"/>
             <column notnull="true" name="when_modified" type="timestamp"/>
         </createTable>
-        <createTable name="o_country" identityType="SEQUENCE">
+        <createTable name="o_country" identityType="EXTERNAL">
             <column primaryKey="true" name="code" type="varchar(2)"/>
             <column name="name" type="varchar(60)"/>
         </createTable>
@@ -248,7 +248,7 @@
         </createTable>
         <createTable name="rawinherit_data">
             <column primaryKey="true" identity="true" name="id" type="bigint"/>
-            <column name="number" type="integer"/>
+            <column name="val" type="integer"/>
         </createTable>
         <createTable name="e_basic">
             <column primaryKey="true" identity="true" name="id" type="integer"/>
@@ -291,7 +291,7 @@
             <column name="some_time" type="varbinary(255)"/>
             <column notnull="true" name="last_update" type="timestamp"/>
         </createTable>
-        <createTable name="e_basic_enum_id" identityType="SEQUENCE">
+        <createTable name="e_basic_enum_id" identityType="EXTERNAL">
             <column checkConstraint="check (status in ('N','A','I'))" primaryKey="true" name="status" type="varchar(1)"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
@@ -406,7 +406,7 @@
         </createTable>
         <createTable name="einvoice">
             <column primaryKey="true" identity="true" name="id" type="bigint"/>
-            <column name="date" type="timestamp"/>
+            <column name="invoice_date" type="timestamp"/>
             <column checkConstraint="check (state in (0,1,2))" name="state" type="integer"/>
             <column references="eperson.id" name="person_id" type="bigint"/>
             <column name="ship_street" type="varchar(255)"/>
@@ -827,10 +827,10 @@
             <column name="cretime" type="timestamp"/>
             <column notnull="true" name="updtime" type="timestamp"/>
         </createTable>
-        <createTable name="s_orders" identityType="SEQUENCE">
+        <createTable name="s_orders" identityType="EXTERNAL">
             <column primaryKey="true" name="uuid" type="varchar(255)"/>
         </createTable>
-        <createTable name="s_order_items" identityType="SEQUENCE">
+        <createTable name="s_order_items" identityType="EXTERNAL">
             <column primaryKey="true" name="uuid" type="varchar(255)"/>
             <column name="product_variant_uuid" type="varchar(255)"/>
             <column references="s_orders.uuid" name="order_uuid" type="varchar(255)"/>
@@ -892,7 +892,7 @@
         <createTable name="rawinherit_parent">
             <column notnull="true" name="type" type="varchar(31)"/>
             <column primaryKey="true" identity="true" name="id" type="bigint"/>
-            <column name="number" type="integer"/>
+            <column name="val" type="integer"/>
         </createTable>
         <createTable name="rawinherit_parent_rawinherit_dat">
             <column notnull="true" primaryKey="true" name="rawinherit_parent_id" type="bigint"/>
@@ -980,7 +980,7 @@
             <column name="description" type="varchar(255)"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
-        <createTable name="ResourceFile" identityType="SEQUENCE">
+        <createTable name="ResourceFile" identityType="EXTERNAL">
             <column primaryKey="true" name="id" type="varchar(64)"/>
             <column references="ResourceFile.id" name="parentResourceFileId" type="varchar(64)"/>
             <column notnull="true" name="name" type="varchar(128)"/>
@@ -1087,7 +1087,7 @@
             <column primaryKey="true" identity="true" name="id" type="integer"/>
             <column name="content" type="blob"/>
         </createTable>
-        <createTable name="tcar" identityType="SEQUENCE">
+        <createTable name="tcar" identityType="EXTERNAL">
             <column notnull="true" name="type" type="varchar(31)"/>
             <column primaryKey="true" name="plate_no" type="varchar(255)"/>
             <column name="truckLoad" type="bigint"/>
