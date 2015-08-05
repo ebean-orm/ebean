@@ -14,14 +14,11 @@ import com.avaje.tests.sp.model.car.Wheel;
 public class TestManyToManySaveTwice extends BaseTestCase {
 
   @Test
-  public void testNothing() {
-  }
-
-  @Test
   public void testInsertCarTwice() {
 
-    Ebean.deleteAll(Ebean.find(Car.class).findList());
-    Ebean.deleteAll(Ebean.find(Wheel.class).findList());
+    Ebean.createSqlUpdate("delete from sp_car_car_wheels").execute();
+    Ebean.createSqlUpdate("delete from sp_car_wheel").execute();
+    Ebean.createSqlUpdate("delete from sp_car_car").execute();
 
     List<Wheel> wheels = new LinkedList<Wheel>();
     wheels.add(new Wheel());

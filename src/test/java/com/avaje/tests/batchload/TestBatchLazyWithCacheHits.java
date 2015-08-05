@@ -67,11 +67,6 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
         .order("name")
         .findList();
 
-   int count0 = Ebean.createSqlQuery("select t0.id c0 from uuone t0 where t0.name like ? order by t0.name").setParameter(1,"testBLWCH%").findList().size();
-   int count1 = Ebean.createSqlQuery("select t0.id c0 from uuone t0 where t0.name like ? escape'x' order by t0.name").setParameter(1,"testBLWCH%").findList().size();
-   int count2 = Ebean.createSqlQuery("select t0.id c0 from uuone t0 where t0.name like ? escape'/'  order by t0.name").setParameter(1,"testBLWCH%").findList().size();
-   int count3 = Ebean.createSqlQuery("select t0.id c0 from uuone t0 where t0.name like ? escape''  order by t0.name").setParameter(1,"testBLWCH%").findList().size();
-    System.out.println("count0:" + count0 + " count1:" + count1 + " count2:" + count2 + " count3:" + count3 + "  List:" + list);
    for (UUOne uuOne : list) {
      System.out.println(uuOne.getName());
    }

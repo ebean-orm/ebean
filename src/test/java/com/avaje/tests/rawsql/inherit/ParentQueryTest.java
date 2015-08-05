@@ -36,9 +36,9 @@ public class ParentQueryTest extends BaseTestCase {
     c.setData(exampleData);
     Ebean.save(c);
 
-    List<Parent> partial = Ebean.find(Parent.class).where().ge("number", 1).findList();
+    List<Parent> partial = Ebean.find(Parent.class).where().ge("val", 1).findList();
     assertNotNull(partial.get(0).getData());
-    assertEquals(partial.get(0).getData().get(0).getNumber().intValue(), 0);
+    assertEquals(partial.get(0).getData().get(0).getVal().intValue(), 0);
   }
 
 }

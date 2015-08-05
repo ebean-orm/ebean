@@ -14,21 +14,21 @@ public class Data {
     @Id
     private Long id;
 
-    private Integer number;
+    private Integer val;
 
     @ManyToMany(mappedBy = "data")
     public List<Parent> parents = new ArrayList<Parent>();
 
     public Data(int number) {
-        this.number = number;
+        this.val = number;
     }
 
     public Long getId() {
         return id;
     }
 
-    public Integer getNumber() {
-        return number;
+    public Integer getVal() {
+        return val;
     }
 
 }

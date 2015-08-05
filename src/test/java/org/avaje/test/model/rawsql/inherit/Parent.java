@@ -20,13 +20,13 @@ public abstract class Parent {
     @Id
     private Long id;
 
-    private Integer number;
+    private Integer val;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     private List<Data> data = new ArrayList<Data>();
 
-    protected Parent(Integer number) {
-        this.number = number;
+    protected Parent(Integer val) {
+        this.val = val;
     }
 
     public abstract String getName();
@@ -35,8 +35,8 @@ public abstract class Parent {
         return id;
     }
 
-    public Integer getNumber() {
-        return number;
+    public Integer getVal() {
+        return val;
     }
 
     public List<Data> getData() {

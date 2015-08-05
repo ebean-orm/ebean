@@ -41,7 +41,7 @@ public class ParentRawSqlTest extends BaseTestCase {
     Ebean.save(c);
 
     RawSql rawSql = RawSqlBuilder
-        .parse("select type, id, number from rawinherit_parent where number > 1")
+        .parse("select type, id, val from rawinherit_parent where val > 1")
         .create();
 
     List<Parent> partial = Ebean.find(Parent.class)
@@ -49,7 +49,7 @@ public class ParentRawSqlTest extends BaseTestCase {
         .findList();
 
     assertNotNull(partial.get(0).getData());
-    assertEquals(partial.get(0).getData().get(0).getNumber().intValue(), 0);
+    assertEquals(partial.get(0).getData().get(0).getVal().intValue(), 0);
   }
 
   @Test
@@ -85,7 +85,7 @@ public class ParentRawSqlTest extends BaseTestCase {
   private void useColumnMappingWithDiscriminator() {
 
     RawSql rawSql = RawSqlBuilder
-        .unparsed("select type, id from rawinherit_parent where number > 1")
+        .unparsed("select type, id from rawinherit_parent where val > 1")
         .columnMapping("type", "parent.type") // can map the discriminator column 'type'
         .columnMapping("id", "parent.id")
         .create();
@@ -100,7 +100,7 @@ public class ParentRawSqlTest extends BaseTestCase {
     }
 
     assertNotNull(partial.get(0).getData());
-    assertEquals(partial.get(0).getData().get(0).getNumber().intValue(), 0);
+    assertEquals(partial.get(0).getData().get(0).getVal().intValue(), 0);
   }
 
   /**
@@ -109,7 +109,7 @@ public class ParentRawSqlTest extends BaseTestCase {
   private void useColumnMappingIgnore() {
 
     RawSql rawSql = RawSqlBuilder
-        .unparsed("select type, id from rawinherit_parent where number > 1")
+        .unparsed("select type, id from rawinherit_parent where val > 1")
         .columnMappingIgnore("type") // can ignore the discriminator 'type'
         .columnMapping("id", "parent.id")
         .create();
@@ -124,7 +124,7 @@ public class ParentRawSqlTest extends BaseTestCase {
     }
 
     assertNotNull(partial.get(0).getData());
-    assertEquals(partial.get(0).getData().get(0).getNumber().intValue(), 0);
+    assertEquals(partial.get(0).getData().get(0).getVal().intValue(), 0);
   }
 
   /**
@@ -133,7 +133,7 @@ public class ParentRawSqlTest extends BaseTestCase {
   private void useExtraColumnMappingIgnore() {
 
     RawSql rawSql = RawSqlBuilder
-        .unparsed("select 'a', type, id, 'b' from rawinherit_parent where number > 1")
+        .unparsed("select 'a', type, id, 'b' from rawinherit_parent where val > 1")
         .columnMappingIgnore("a") // extra ignore before
         .columnMappingIgnore("type")
         .columnMapping("id", "parent.id")
@@ -149,7 +149,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       partial.add(aggregate.parent);
     }
     assertNotNull(partial.get(0).getData());
-    assertEquals(partial.get(0).getData().get(0).getNumber().intValue(), 0);
+    assertEquals(partial.get(0).getData().get(0).getVal().intValue(), 0);
   }
 
 }

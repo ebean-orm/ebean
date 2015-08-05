@@ -24,7 +24,7 @@ public class EInvoice {
   @Version
   Long version;
   
-  Date date;
+  Date invoiceDate;
   
   State state;
   
@@ -66,12 +66,12 @@ public class EInvoice {
     this.state = state;
   }
 
-  public Date getDate() {
-    return date;
+  public Date getInvoiceDate() {
+    return invoiceDate;
   }
 
-  public void setDate(Date date) {
-    this.date = date;
+  public void setInvoiceDate(Date invoiceDate) {
+    this.invoiceDate = invoiceDate;
   }
 
   public EPerson getPerson() {

@@ -32,7 +32,7 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     bill.setCity("Auckland");
 
     EInvoice invoice = new EInvoice();
-    invoice.setDate(new Date(System.currentTimeMillis()));
+    invoice.setInvoiceDate(new Date(System.currentTimeMillis()));
     invoice.setState(State.New);
     invoice.setShipAddress(ship);
     invoice.setBillAddress(bill);
@@ -47,7 +47,7 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     // assert fetched bean populated as expected
     Assert.assertEquals(invoice.getId(), invoice2.getId());
     Assert.assertEquals(invoice.getState(), invoice2.getState());
-    Assert.assertEquals(invoice.getDate(), invoice2.getDate());
+    Assert.assertEquals(invoice.getInvoiceDate(), invoice2.getInvoiceDate());
     Assert.assertEquals("2 Apple St", invoice.getBillAddress().getStreet());
     Assert.assertEquals("2 Apple St", invoice2.getBillAddress().getStreet());
     
