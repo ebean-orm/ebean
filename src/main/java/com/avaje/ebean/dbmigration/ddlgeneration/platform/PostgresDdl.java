@@ -11,6 +11,7 @@ public class PostgresDdl extends PlatformDdl {
   public PostgresDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
     super(platformTypes, dbIdentity);
     this.historyDdl = new PostgresHistoryDdl(this.namingConvention.normalise);
+    this.dropTableCascade = " cascade";
   }
 
   /**
