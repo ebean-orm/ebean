@@ -1,6 +1,7 @@
 package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.Oracle10Ddl;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -52,6 +53,8 @@ public class Oracle10Platform extends DatabasePlatform {
     dbDdlSyntax.setDropTableCascade("cascade constraints purge");
     dbDdlSyntax.setIdentity(null);
     dbDdlSyntax.setMaxConstraintNameLength(30);
+
+    this.platformDdl = new Oracle10Ddl(this.dbTypeMap, this.dbIdentity);
   }
 
   @Override

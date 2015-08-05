@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
@@ -17,6 +18,7 @@ import com.avaje.tests.model.basic.EBasicEncrypt;
 
 public class TestEncrypt extends BaseTestCase {
 
+  @Ignore
   @Test
   public void test() {
 
