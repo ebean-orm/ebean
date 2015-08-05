@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 @Entity
 public class SelfRefExample {
@@ -20,6 +21,7 @@ public class SelfRefExample {
   @ManyToOne
   private SelfRefExample parent;
 
+  @OrderBy("id")
   @OneToMany(mappedBy = "parent")
   private List<SelfRefExample> children;
 
