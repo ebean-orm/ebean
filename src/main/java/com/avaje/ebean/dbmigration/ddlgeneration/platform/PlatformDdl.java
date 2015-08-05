@@ -70,6 +70,10 @@ public class PlatformDdl {
     return foreignKeyRestrict;
   }
 
+  public String dropForeignKeyConstraint(String fkName) {
+    return "drop constraint "+fkName;
+  }
+
   /**
    * Convert the standard type to the platform specific type.
    */

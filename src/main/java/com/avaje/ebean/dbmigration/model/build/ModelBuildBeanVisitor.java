@@ -74,6 +74,11 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
       table.setIdentityType(IdentityType.GENERATOR);
       return;
     }
+    if (IdType.EXTERNAL == descriptor.getIdType()) {
+      // externally defined code (lookup table, ISO country code etc)
+      table.setIdentityType(IdentityType.EXTERNAL);
+      return;
+    }
 
     int initialValue = descriptor.getSequenceInitialValue();
     int allocationSize = descriptor.getSequenceAllocationSize();

@@ -222,7 +222,8 @@ public class BaseTableDdl implements TableDdl {
     }
 
     write.rollbackForeignKeys()
-        .append("alter table ").append(tableName).append(" drop constraint ").append(fkName)
+        .append("alter table ").append(tableName).append(" ")
+        .append(platformDdl.dropForeignKeyConstraint(fkName))
         .endOfStatement();
 
     write.rollbackForeignKeys().end();

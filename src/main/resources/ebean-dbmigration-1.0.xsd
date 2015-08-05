@@ -123,6 +123,7 @@
       <xsd:enumeration value="IDENTITY"/>
       <xsd:enumeration value="SEQUENCE"/>
       <xsd:enumeration value="GENERATOR"/>
+      <xsd:enumeration value="EXTERNAL"/>
       <xsd:enumeration value="DEFAULT"/>
     </xsd:restriction>
   </xsd:simpleType>

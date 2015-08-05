@@ -1,6 +1,7 @@
 package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.MySqlDdl;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -24,6 +25,7 @@ public class MySqlPlatform extends DatabasePlatform {
     this.likeClause = "like ? escape''";
     this.selectCountWithAlias = true;
     this.dbEncrypt = new MySqlDbEncrypt();
+    this.platformDdl = new MySqlDdl(this.dbTypeMap, this.dbIdentity);
 
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);

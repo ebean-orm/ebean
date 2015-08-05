@@ -129,6 +129,8 @@ public class DbIdentity {
     switch (identityType) {
       case GENERATOR:
         return IdType.GENERATOR;
+      case EXTERNAL:
+        return IdType.EXTERNAL;
       case SEQUENCE:
         return supportsSequence ? IdType.SEQUENCE : idType;
       case IDENTITY:

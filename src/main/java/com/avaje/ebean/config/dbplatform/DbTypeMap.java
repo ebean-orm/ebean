@@ -9,6 +9,10 @@ import java.util.Map;
  */
 public class DbTypeMap {
 
+  private static final DbType JSON_CLOB_PLACEHOLDER = new DbType("jsonClobPlaceholder");
+  private static final DbType JSON_BLOB_PLACEHOLDER = new DbType("jsonBlobPlaceholder");
+  private static final DbType JSON_VARCHAR_PLACEHOLDER = new DbType("jsonVarcharPlaceholder");
+
   /**
    * A map to reverse lookup the type by name.
    * <p>
@@ -106,11 +110,11 @@ public class DbTypeMap {
       put(DbType.JSONVarchar, new DbType("jsonvarchar", 1000));
 
     } else {
-      put(DbType.JSON, new DbType("clob")); // Postgres maps this to JSON
-      put(DbType.JSONB, new DbType("clob")); // Postgres maps this to JSONB
-      put(DbType.JSONClob, new DbType("clob"));
-      put(DbType.JSONBlob, new DbType("blob"));
-      put(DbType.JSONVarchar, new DbType("varchar", 1000));
+      put(DbType.JSON, JSON_CLOB_PLACEHOLDER); // Postgres maps this to JSON
+      put(DbType.JSONB, JSON_CLOB_PLACEHOLDER); // Postgres maps this to JSONB
+      put(DbType.JSONClob, JSON_CLOB_PLACEHOLDER);
+      put(DbType.JSONBlob, JSON_BLOB_PLACEHOLDER);
+      put(DbType.JSONVarchar, JSON_VARCHAR_PLACEHOLDER);
     }
 
     put(Types.LONGVARBINARY, new DbType("longvarbinary"));
@@ -141,9 +145,28 @@ public class DbTypeMap {
         return get(Types.CLOB);
       case DbType.JSONVarchar:
         return get(Types.VARCHAR);
+      case DbType.JSON:
+        return getJsonType(DbType.JSON);
+      case DbType.JSONB:
+        return getJsonType(DbType.JSONB);
       default:
         return get(typeKey);
     }
+  }
+
+  private DbType getJsonType(int type) {
+    DbType dbType = get(type);
+    if (dbType == JSON_CLOB_PLACEHOLDER) {
+      return get(Types.CLOB);
+    }
+    if (dbType == JSON_BLOB_PLACEHOLDER) {
+      return get(Types.BLOB);
+    }
+    if (dbType == JSON_VARCHAR_PLACEHOLDER) {
+      return get(Types.VARCHAR);
+    }
+    // Postgres has specific type
+    return get(type);
   }
 
   /**

@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="IDENTITY"/>
  *     &lt;enumeration value="SEQUENCE"/>
  *     &lt;enumeration value="GENERATOR"/>
+ *     &lt;enumeration value="EXTERNAL"/>
  *     &lt;enumeration value="DEFAULT"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
@@ -29,6 +30,7 @@ public enum IdentityType {
     IDENTITY,
     SEQUENCE,
     GENERATOR,
+    EXTERNAL,
     DEFAULT;
 
     public String value() {

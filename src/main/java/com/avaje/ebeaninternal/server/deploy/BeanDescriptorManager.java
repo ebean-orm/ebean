@@ -1065,6 +1065,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       if (desc.isPrimaryKeyCompoundOrNonNumeric()) {
         // assuming that this is a user supplied key like ISO country code or ISO currency code or lookup table code
         logger.debug("Expecting user defined identity on " + desc.getFullName() + " - not using db sequence or autoincrement");
+        desc.setIdType(IdType.EXTERNAL);
         return;
       }
       // use the default. IDENTITY or SEQUENCE.

@@ -26,6 +26,15 @@ public enum IdType {
    * id properties of type UUID.
    * </p>
    */
-  GENERATOR
+  GENERATOR,
+
+  /**
+   * Expected that the identity is externally set (for example a ISO code for
+   * country or currency or a user defined code for lookup tables).
+   * <p>
+   * Used when the key is a compound key or lookup table code.
+   * </p>
+   */
+  EXTERNAL
 
 }
