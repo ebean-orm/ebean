@@ -88,19 +88,16 @@ public class InternalConfiguration {
 
   private final SpiBackgroundExecutor backgroundExecutor;
 
-  private final PstmtBatch pstmtBatch;
-
   private final XmlConfig xmlConfig;
 
   private final JsonFactory jsonFactory;
 
   public InternalConfiguration(XmlConfig xmlConfig, ClusterManager clusterManager,
       ServerCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
-      ServerConfig serverConfig, BootupClasses bootupClasses, PstmtBatch pstmtBatch) {
+      ServerConfig serverConfig, BootupClasses bootupClasses) {
 
     this.jsonFactory = serverConfig.getJsonFactory();
     this.xmlConfig = xmlConfig;
-    this.pstmtBatch = pstmtBatch;
     this.clusterManager = clusterManager;
     this.backgroundExecutor = backgroundExecutor;
     this.cacheManager = cacheManager;
@@ -185,12 +182,9 @@ public class InternalConfiguration {
   }
 
   public Persister createPersister(SpiEbeanServer server) {
-    return new DefaultPersister(server, binder, beanDescriptorManager, pstmtBatch);
+    return new DefaultPersister(server, binder, beanDescriptorManager);
   }
 
-  public PstmtBatch getPstmtBatch() {
-    return pstmtBatch;
-  }
 
   public ServerCacheManager getCacheManager() {
     return cacheManager;

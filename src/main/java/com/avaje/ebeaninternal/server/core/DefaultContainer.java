@@ -1,36 +1,44 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
-
-import com.avaje.ebean.config.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.common.SpiContainer;
+import com.avaje.ebean.config.ContainerConfig;
+import com.avaje.ebean.config.DataSourceConfig;
+import com.avaje.ebean.config.PropertyMap;
+import com.avaje.ebean.config.PstmtDelegate;
+import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.config.UnderscoreNamingConvention;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.cache.DefaultServerCacheFactory;
 import com.avaje.ebeaninternal.server.cache.DefaultServerCacheManager;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
-import com.avaje.ebeaninternal.server.jdbc.OraclePstmtBatch;
 import com.avaje.ebeaninternal.server.jdbc.StandardPstmtDelegate;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourceAlert;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
 import com.avaje.ebeaninternal.server.lib.sql.SimpleDataSourceAlert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.ServiceLoader;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Default Server side implementation of ServerFactory.
@@ -109,24 +117,6 @@ public class DefaultContainer implements SpiContainer {
 
       DatabasePlatform dbPlatform = serverConfig.getDatabasePlatform();
 
-      PstmtBatch pstmtBatch = null;
-
-      if (dbPlatform.getName().startsWith("oracle")) {
-        PstmtDelegate pstmtDelegate = serverConfig.getPstmtDelegate();
-        if (pstmtDelegate == null) {
-          // try to provide the
-          pstmtDelegate = getOraclePstmtDelegate(serverConfig.getDataSource());
-        }
-        if (pstmtDelegate != null) {
-          // We can support JDBC batching with Oracle via OraclePreparedStatement
-          pstmtBatch = new OraclePstmtBatch(pstmtDelegate);
-        }
-        if (pstmtBatch == null) {
-          // We can not support JDBC batching with Oracle
-          logger.warn("Can not support JDBC batching with Oracle without a PstmtDelegate");
-          serverConfig.setPersistBatching(false);
-        }
-      }
 
       // inform the NamingConvention of the associated DatabasePlaform
       serverConfig.getNamingConvention().setDatabasePlatform(serverConfig.getDatabasePlatform());
@@ -139,7 +129,7 @@ public class DefaultContainer implements SpiContainer {
       XmlConfigLoader xmlConfigLoader = new XmlConfigLoader(null);
       XmlConfig xmlConfig = xmlConfigLoader.load();
 
-      InternalConfiguration c = new InternalConfiguration(xmlConfig, clusterManager, cacheManager, bgExecutor, serverConfig, bootupClasses, pstmtBatch);
+      InternalConfiguration c = new InternalConfiguration(xmlConfig, clusterManager, cacheManager, bgExecutor, serverConfig, bootupClasses);
 
       DefaultServer server = new DefaultServer(c, cacheManager);
 

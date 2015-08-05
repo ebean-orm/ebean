@@ -5,7 +5,6 @@ import com.avaje.ebeaninternal.api.SpiSqlUpdate;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequestUpdateSql;
 import com.avaje.ebeaninternal.server.core.PersistRequestUpdateSql.SqlType;
-import com.avaje.ebeaninternal.server.core.PstmtBatch;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
 import org.slf4j.Logger;
@@ -22,21 +21,16 @@ public class ExeUpdateSql {
 
   private static final Logger logger = LoggerFactory.getLogger(ExeUpdateSql.class);
 
-  private static final int defaultBatchSize = 20;
-
   private final Binder binder;
 
   private final PstmtFactory pstmtFactory;
 
-  private final PstmtBatch pstmtBatch;
-
   /**
    * Create with a given binder.
    */
-  public ExeUpdateSql(Binder binder, PstmtBatch pstmtBatch) {
+  public ExeUpdateSql(Binder binder) {
     this.binder = binder;
-    this.pstmtBatch = pstmtBatch;
-    this.pstmtFactory = new PstmtFactory(pstmtBatch);
+    this.pstmtFactory = new PstmtFactory();
   }
 
   /**
@@ -52,11 +46,7 @@ public class ExeUpdateSql {
       pstmt = bindStmt(request, batchThisRequest);
 
       if (batchThisRequest) {
-        if (pstmtBatch != null) {
-          pstmtBatch.addBatch(pstmt);
-        } else {
-          pstmt.addBatch();
-        }
+        pstmt.addBatch();
         // return -1 to indicate batch mode
         return -1;
       } else {
@@ -97,14 +87,6 @@ public class ExeUpdateSql {
     PreparedStatement pstmt;
     if (batchThisRequest) {
       pstmt = pstmtFactory.getPstmt(t, logSql, sql, request);
-      if (pstmtBatch != null) {
-        // oracle specific JDBC setting batch size ahead of time
-        int batchSize = t.getBatchSize();
-        if (batchSize < 1) {
-          batchSize = defaultBatchSize;
-        }
-        pstmtBatch.setBatchSize(pstmt, batchSize);
-      }
     } else {
       if (logSql) {
         t.logSql(sql);

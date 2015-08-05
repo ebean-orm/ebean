@@ -1,7 +1,12 @@
 package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.*;
-import com.avaje.ebean.bean.*;
+import com.avaje.ebean.bean.BeanCollection;
+import com.avaje.ebean.bean.CallStack;
+import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.bean.EntityBeanIntercept;
+import com.avaje.ebean.bean.ObjectGraphNode;
+import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.bean.PersistenceContext.WithOption;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.EncryptKeyManager;
@@ -12,16 +17,42 @@ import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
-import com.avaje.ebeaninternal.api.*;
+import com.avaje.ebeaninternal.api.LoadBeanRequest;
+import com.avaje.ebeaninternal.api.LoadManyRequest;
+import com.avaje.ebeaninternal.api.ScopeTrans;
+import com.avaje.ebeaninternal.api.ScopedTransaction;
+import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
+import com.avaje.ebeaninternal.api.SpiEbeanPlugin;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.api.SpiQuery.Type;
+import com.avaje.ebeaninternal.api.SpiSqlQuery;
+import com.avaje.ebeaninternal.api.SpiTransaction;
+import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
-import com.avaje.ebeaninternal.server.deploy.*;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+import com.avaje.ebeaninternal.server.deploy.DNativeQuery;
+import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
+import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
+import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.el.ElFilter;
 import com.avaje.ebeaninternal.server.jmx.MAdminAutofetch;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
-import com.avaje.ebeaninternal.server.query.*;
+import com.avaje.ebeaninternal.server.query.CQuery;
+import com.avaje.ebeaninternal.server.query.CQueryEngine;
+import com.avaje.ebeaninternal.server.query.CallableQueryIds;
+import com.avaje.ebeaninternal.server.query.CallableQueryList;
+import com.avaje.ebeaninternal.server.query.CallableQueryRowCount;
+import com.avaje.ebeaninternal.server.query.CallableSqlQueryList;
+import com.avaje.ebeaninternal.server.query.LimitOffsetPagedList;
+import com.avaje.ebeaninternal.server.query.QueryFutureIds;
+import com.avaje.ebeaninternal.server.query.QueryFutureList;
+import com.avaje.ebeaninternal.server.query.QueryFutureRowCount;
+import com.avaje.ebeaninternal.server.query.SqlQueryFutureList;
 import com.avaje.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import com.avaje.ebeaninternal.server.querydefn.DefaultOrmUpdate;
 import com.avaje.ebeaninternal.server.querydefn.DefaultRelationalQuery;
@@ -40,7 +71,15 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
 
@@ -139,11 +178,6 @@ public final class DefaultServer implements SpiEbeanServer {
   private final int queryBatchSize;
 
   /**
-   * JDBC driver specific handling for JDBC batch execution.
-   */
-  private final PstmtBatch pstmtBatch;
-
-  /**
    * holds plugins (e.g. ddl generator) detected by the service loader
    */
   private List<SpiEbeanPlugin> ebeanPlugins;
@@ -168,7 +202,6 @@ public final class DefaultServer implements SpiEbeanServer {
     this.objectGraphStats = new ConcurrentHashMap<ObjectGraphNode, CObjectGraphNodeStatistics>();
     this.metaInfoManager = new DefaultMetaInfoManager(this);
     this.serverCacheManager = cache;
-    this.pstmtBatch = config.getPstmtBatch();
     this.databasePlatform = config.getDatabasePlatform();
     this.backgroundExecutor = config.getBackgroundExecutor();
     
@@ -262,10 +295,6 @@ public final class DefaultServer implements SpiEbeanServer {
 
   public int getLazyLoadBatchSize() {
     return lazyLoadBatchSize;
-  }
-
-  public PstmtBatch getPstmtBatch() {
-    return pstmtBatch;
   }
 
   public ServerConfig getServerConfig() {

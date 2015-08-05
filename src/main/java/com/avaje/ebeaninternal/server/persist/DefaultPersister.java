@@ -1,16 +1,5 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.PersistenceException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.CallableSql;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlUpdate;
@@ -26,13 +15,12 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.SpiUpdate;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
+import com.avaje.ebeaninternal.server.core.PersistRequest.Type;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestCallableSql;
 import com.avaje.ebeaninternal.server.core.PersistRequestOrmUpdate;
 import com.avaje.ebeaninternal.server.core.PersistRequestUpdateSql;
 import com.avaje.ebeaninternal.server.core.Persister;
-import com.avaje.ebeaninternal.server.core.PstmtBatch;
-import com.avaje.ebeaninternal.server.core.PersistRequest.Type;
 import com.avaje.ebeaninternal.server.deploy.BeanCollectionUtil;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
@@ -42,6 +30,15 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.IntersectionRow;
 import com.avaje.ebeaninternal.server.deploy.ManyType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Persister implementation using DML.
@@ -74,12 +71,11 @@ public final class DefaultPersister implements Persister {
 
   private final boolean updatesDeleteMissingChildren;
 
-  public DefaultPersister(SpiEbeanServer server, Binder binder, BeanDescriptorManager descMgr, PstmtBatch pstmtBatch) {
-
+  public DefaultPersister(SpiEbeanServer server, Binder binder, BeanDescriptorManager descMgr) {
     this.server = server;
     this.updatesDeleteMissingChildren = server.getServerConfig().isUpdatesDeleteMissingChildren();
     this.beanDescriptorManager = descMgr;
-    this.persistExecute = new DefaultPersistExecute(binder, pstmtBatch, server.getServerConfig().getPersistBatchSize());
+    this.persistExecute = new DefaultPersistExecute(binder, server.getServerConfig().getPersistBatchSize());
   }
 
   /**

@@ -1,12 +1,11 @@
 package com.avaje.ebeaninternal.server.persist;
 
+import com.avaje.ebeaninternal.api.SpiTransaction;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import com.avaje.ebeaninternal.api.SpiTransaction;
-import com.avaje.ebeaninternal.server.core.PstmtBatch;
 
 /**
  * Factory for creating Statements.
@@ -17,11 +16,7 @@ import com.avaje.ebeaninternal.server.core.PstmtBatch;
  */
 public class PstmtFactory {
 
-
-  private final PstmtBatch pstmtBatch;
-
-  public PstmtFactory(PstmtBatch pstmtBatch) {
-    this.pstmtBatch = pstmtBatch;
+  public PstmtFactory() {
   }
 
   /**
@@ -60,11 +55,7 @@ public class PstmtFactory {
     Connection conn = t.getInternalConnection();
     stmt = conn.prepareStatement(sql);
 
-    if (pstmtBatch != null) {
-      pstmtBatch.setBatchSize(stmt, t.getBatchControl().getBatchSize());
-    }
-
-    BatchedPstmt bs = new BatchedPstmt(stmt, false, sql, pstmtBatch, false);
+    BatchedPstmt bs = new BatchedPstmt(stmt, false, sql);
     batch.addStmt(bs, batchExe);
     return stmt;
   }
@@ -89,7 +80,7 @@ public class PstmtFactory {
     Connection conn = t.getInternalConnection();
     stmt = conn.prepareCall(sql);
 
-    BatchedPstmt bs = new BatchedPstmt(stmt, false, sql, pstmtBatch, false);
+    BatchedPstmt bs = new BatchedPstmt(stmt, false, sql);
     batch.addStmt(bs, batchExe);
     return stmt;
   }

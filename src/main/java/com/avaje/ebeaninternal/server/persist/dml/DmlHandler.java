@@ -1,19 +1,8 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
-import javax.persistence.OptimisticLockException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
-import com.avaje.ebeaninternal.server.core.PstmtBatch;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.BatchedPstmt;
@@ -21,6 +10,14 @@ import com.avaje.ebeaninternal.server.persist.BatchedPstmtHolder;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableRequest;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 import com.avaje.ebeaninternal.server.type.DataBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.OptimisticLockException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * Base class for Handler implementations.
@@ -100,12 +97,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    */
   @Override
   public void addBatch() throws SQLException {
-    PstmtBatch pstmtBatch = persistRequest.getPstmtBatch();
-    if (pstmtBatch != null) {
-      pstmtBatch.addBatch(dataBind.getPstmt());
-    } else {
-      dataBind.getPstmt().addBatch();
-    }
+    dataBind.getPstmt().addBatch();
   }
 
   /**
@@ -277,12 +269,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
 
     stmt = getPstmt(t, sql, genKeys);
 
-    PstmtBatch pstmtBatch = request.getPstmtBatch();
-    if (pstmtBatch != null) {
-      pstmtBatch.setBatchSize(stmt, t.getBatchControl().getBatchSize());
-    }
-
-    BatchedPstmt bs = new BatchedPstmt(stmt, genKeys, sql, request.getPstmtBatch(), true);
+    BatchedPstmt bs = new BatchedPstmt(stmt, genKeys, sql);
     batch.addStmt(bs, request);
     return stmt;
   }

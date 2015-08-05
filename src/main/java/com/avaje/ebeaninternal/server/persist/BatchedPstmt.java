@@ -5,8 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.avaje.ebeaninternal.server.core.PstmtBatch;
-
 /**
  * A batched statement that is held in BatchedPstmtHolder. It has a list of
  * BatchPostExecute which it will process after the statement is executed.
@@ -33,23 +31,13 @@ public class BatchedPstmt {
 
   private final String sql;
 
-  private final PstmtBatch pstmtBatch;
-
-  private final boolean occCheck;
-
-
   /**
    * Create with a given statement.
-   *
-   * @param isGenKeys true if an insert that uses generatedKeys
    */
-  public BatchedPstmt(PreparedStatement pstmt, boolean isGenKeys, String sql, PstmtBatch pstmtBatch, boolean occCheck) {
-
+  public BatchedPstmt(PreparedStatement pstmt, boolean isGenKeys, String sql) {
     this.pstmt = pstmt;
     this.isGenKeys = isGenKeys;
     this.sql = sql;
-    this.pstmtBatch = pstmtBatch;
-    this.occCheck = occCheck;
   }
 
   /**
@@ -112,21 +100,7 @@ public class BatchedPstmt {
 
   private void executeAndCheckRowCounts() throws SQLException {
 
-    if (pstmtBatch != null) {
-      // oracle specific JDBC batch processing
-      int rc = pstmtBatch.executeBatch(pstmt, list.size(), sql, occCheck);
-      if (list.size() == 1) {
-        list.get(0).checkRowCount(rc);
-      }
-      // the optimistic concurrency row count check
-      // has already been done by pstmtBatch so just return
-      return;
-
-    }
-
-    // normal JDBC batch processing
     int[] results = pstmt.executeBatch();
-
     if (results.length != list.size()) {
       String s = "results array error " + results.length + " " + list.size();
       throw new SQLException(s);

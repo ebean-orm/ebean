@@ -1,20 +1,18 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.SpiUpdate;
 import com.avaje.ebeaninternal.server.core.PersistRequestOrmUpdate;
-import com.avaje.ebeaninternal.server.core.PstmtBatch;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * Executes the UpdateSql requests.
@@ -30,8 +28,8 @@ public class ExeOrmUpdate {
   /**
    * Create with a given binder.
    */
-  public ExeOrmUpdate(Binder binder, PstmtBatch pstmtBatch) {
-    this.pstmtFactory = new PstmtFactory(pstmtBatch);
+  public ExeOrmUpdate(Binder binder) {
+    this.pstmtFactory = new PstmtFactory();
     this.binder = binder;
   }
 
@@ -46,12 +44,7 @@ public class ExeOrmUpdate {
     try {
       pstmt = bindStmt(request, batchThisRequest);
       if (batchThisRequest) {
-        PstmtBatch pstmtBatch = request.getPstmtBatch();
-        if (pstmtBatch != null) {
-          pstmtBatch.addBatch(pstmt);
-        } else {
-          pstmt.addBatch();
-        }
+        pstmt.addBatch();
         // return -1 to indicate batch mode
         return -1;
       } else {

@@ -12,7 +12,6 @@ import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
-import com.avaje.ebeaninternal.server.core.PstmtBatch;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -60,11 +59,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public DatabasePlatform getDatabasePlatform() {
-    return null;
-  }
-
-  @Override
-  public PstmtBatch getPstmtBatch() {
     return null;
   }
 

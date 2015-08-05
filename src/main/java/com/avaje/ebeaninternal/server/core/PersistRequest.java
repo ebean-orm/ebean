@@ -42,10 +42,6 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
 	 */
 	public abstract int executeNow();
 
-  public PstmtBatch getPstmtBatch() {
-    return ebeanServer.getPstmtBatch();
-  }
-
   public boolean isLogSql() {
     return transaction.isLogSql();
   }

@@ -27,11 +27,11 @@ public final class DefaultPersistExecute implements PersistExecute {
   /**
    * Construct this DmlPersistExecute.
    */
-  public DefaultPersistExecute(Binder binder, PstmtBatch pstmtBatch, int defaultBatchSize) {
+  public DefaultPersistExecute(Binder binder, int defaultBatchSize) {
 
-    this.exeOrmUpdate = new ExeOrmUpdate(binder, pstmtBatch);
-    this.exeUpdateSql = new ExeUpdateSql(binder, pstmtBatch);
-    this.exeCallableSql = new ExeCallableSql(binder, pstmtBatch);
+    this.exeOrmUpdate = new ExeOrmUpdate(binder);
+    this.exeUpdateSql = new ExeUpdateSql(binder);
+    this.exeCallableSql = new ExeCallableSql(binder);
     this.defaultBatchSize = defaultBatchSize;
   }
 

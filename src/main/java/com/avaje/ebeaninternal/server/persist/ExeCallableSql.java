@@ -1,19 +1,17 @@
 package com.avaje.ebeaninternal.server.persist;
 
-import java.sql.CallableStatement;
-import java.sql.SQLException;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiCallableSql;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequestCallableSql;
-import com.avaje.ebeaninternal.server.core.PstmtBatch;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import java.sql.CallableStatement;
+import java.sql.SQLException;
 
 /**
  * Handles the execution of CallableSql requests.
@@ -26,10 +24,9 @@ public class ExeCallableSql {
 
   private final PstmtFactory pstmtFactory;
 
-  public ExeCallableSql(Binder binder, PstmtBatch pstmtBatch) {
+  public ExeCallableSql(Binder binder) {
     this.binder = binder;
-    // no batch support for CallableStatement in Oracle anyway
-    this.pstmtFactory = new PstmtFactory(null);
+    this.pstmtFactory = new PstmtFactory();
   }
 
   /**

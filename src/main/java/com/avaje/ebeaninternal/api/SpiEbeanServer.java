@@ -1,8 +1,10 @@
 package com.avaje.ebeaninternal.api;
 
-import java.util.List;
-
-import com.avaje.ebean.*;
+import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.PersistenceContextScope;
+import com.avaje.ebean.Query;
+import com.avaje.ebean.Transaction;
+import com.avaje.ebean.TxScope;
 import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.BeanLoader;
 import com.avaje.ebean.bean.CallStack;
@@ -10,13 +12,14 @@ import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
-import com.avaje.ebeaninternal.server.core.PstmtBatch;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.query.CQuery;
 import com.avaje.ebeaninternal.server.query.CQueryEngine;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
+
+import java.util.List;
 
 /**
  * Service Provider extension to EbeanServer.
@@ -47,14 +50,6 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Return the DatabasePlatform for this server.
    */
   DatabasePlatform getDatabasePlatform();
-
-  /**
-   * Return a JDBC driver specific handler for batching.
-   * <p>
-   * Required for Oracle specific batch handling.
-   * </p>
-   */
-  PstmtBatch getPstmtBatch();
 
   /**
    * Create an object to represent the current CallStack.
