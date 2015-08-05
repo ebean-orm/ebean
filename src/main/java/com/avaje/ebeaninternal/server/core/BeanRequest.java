@@ -6,8 +6,6 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.PersistenceException;
-
 /**
  * Base class for find and persist requests.
  */
@@ -66,11 +64,11 @@ public abstract class BeanRequest {
 		if (createdTransaction) {
 		  try {
 		    transaction.rollback();
-		  } catch (PersistenceException e) {
+		  } catch (Exception e) {
 		    // Just log this and carry on. A previous exception has been
 		    // thrown and if this rollback throws exception it likely means
 		    // that the connection is broken (and the datasource and db will cleanup)
-		    log.error("Error trying to rollack a transaction (after a prior exception thrown)", e);
+		    log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
 		  }
 		}
 	}
