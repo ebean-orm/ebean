@@ -17,13 +17,13 @@ public class DdlNamingConventionTest {
   @Test
   public void testUniqueConstraintName() throws Exception {
 
-    assertThat(defaultNaming.uniqueConstraintName("[foo_bar]", "[jim]")).isEqualTo("uq_foo_bar_jim");
+    assertThat(defaultNaming.uniqueConstraintName("[foo_bar]", "[jim]", 1)).isEqualTo("uq_foo_bar_jim");
   }
 
   @Test
   public void testCheckConstraintName() throws Exception {
 
-    assertThat(defaultNaming.checkConstraintName("[foo_bar]", "[jim]")).isEqualTo("ck_foo_bar_jim");
+    assertThat(defaultNaming.checkConstraintName("[foo_bar]", "[jim]", 1)).isEqualTo("ck_foo_bar_jim");
   }
 
   @Test

@@ -30,6 +30,8 @@ public class PlatformDdl {
    */
   protected String dropTableIfExists = "drop table if exists ";
 
+  protected String dropTableCascade = "";
+
   /**
    * Default assumes if exists is supported.
    */
@@ -107,7 +109,7 @@ public class PlatformDdl {
   }
 
   public String dropTable(String tableName) {
-    return dropTableIfExists + tableName;
+    return dropTableIfExists + tableName + dropTableCascade;
   }
 
   public String lowerName(String name) {

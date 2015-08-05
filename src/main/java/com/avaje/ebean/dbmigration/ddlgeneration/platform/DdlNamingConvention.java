@@ -22,6 +22,8 @@ public class DdlNamingConvention {
   protected String ckPrefix = "ck_";
   protected String ckSuffix = "";
 
+  protected int maxConstraintNameLength = 32;
+
   protected boolean lowerCaseNames = true;
 
   protected DdlNameNormalise normalise = new DdlNameNormalise();
@@ -34,20 +36,20 @@ public class DdlNamingConvention {
    */
   public String primaryKeyName(String tableName) {
 
-    return pkPrefix + normaliseTable(tableName) + pkSuffix;
+    return maxLength(pkPrefix + normaliseTable(tableName) + pkSuffix, 0);
   }
 
   /**
    * Return the foreign key constraint name given a single column foreign key.
    */
-  public String foreignKeyConstraintName(String tableName, String columnName) {
-    return fkPrefix + normaliseTable(tableName) + fkMiddle + normaliseColumn(columnName) + fkSuffix;
+  public String foreignKeyConstraintName(String tableName, String columnName, int foreignKeyCount) {
+    return maxLength(fkPrefix + normaliseTable(tableName) + fkMiddle + normaliseColumn(columnName) + fkSuffix, foreignKeyCount);
   }
 
   /**
    * Return the index name associated with a foreign key constraint given a single column foreign key.
    */
-  public String foreignKeyIndexName(String tableName, String[] columns) {
+  public String foreignKeyIndexName(String tableName, String[] columns, int indexCount) {
 
     String colPart;
     if (columns.length == 1) {
@@ -62,24 +64,23 @@ public class DdlNamingConvention {
       }
       colPart = sb.toString();
     }
-    //FIXME: apply max length
-    return fkIndexPrefix + normaliseTable(tableName) + fkIndexMiddle + colPart + fkIndexSuffix;
+    return maxLength(fkIndexPrefix + normaliseTable(tableName) + fkIndexMiddle + colPart + fkIndexSuffix, indexCount);
   }
 
   /**
    * Return the unique constraint name.
    */
-  public String uniqueConstraintName(String tableName, String columnName) {
+  public String uniqueConstraintName(String tableName, String columnName, int indexCount) {
 
-    return uqPrefix + normaliseTable(tableName) + "_" + normaliseColumn(columnName) + uqSuffix;
+    return maxLength(uqPrefix + normaliseTable(tableName) + "_" + normaliseColumn(columnName) + uqSuffix, indexCount);
   }
 
   /**
    * Return the check constraint name.
    */
-  public String checkConstraintName(String tableName, String columnName) {
+  public String checkConstraintName(String tableName, String columnName, int checkCount) {
 
-    return ckPrefix + normaliseTable(tableName) + "_" + normaliseColumn(columnName) + ckSuffix;
+    return maxLength(ckPrefix + normaliseTable(tableName) + "_" + normaliseColumn(columnName) + ckSuffix, checkCount);
   }
 
   /**
@@ -93,6 +94,18 @@ public class DdlNamingConvention {
   public String sequenceName(String tableName, String sequenceName) {
 
     return (sequenceName != null) ? lowerName(sequenceName) : normaliseTable(tableName) + "_seq";
+  }
+
+  /**
+   * Apply a maximum length to the constraint name.
+   */
+  protected String maxLength(String constraintName, int count) {
+    if (constraintName.length() < maxConstraintNameLength) {
+      return constraintName;
+    }
+    // add the count to ensure the constraint name is unique
+    // (relying on the prefix having the table name to be globally unique)
+    return constraintName.substring(0,maxConstraintNameLength-3)+"_"+count;
   }
 
   /**

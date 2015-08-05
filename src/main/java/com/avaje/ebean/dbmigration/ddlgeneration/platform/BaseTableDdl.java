@@ -23,9 +23,36 @@ public class BaseTableDdl implements TableDdl {
 
   protected final PlatformDdl platformDdl;
 
+  /**
+   * Used to check that indexes on foreign keys should be skipped as a unique index on the columns
+   * already exists.
+   */
+  protected IndexSet indexSet = new IndexSet();
+
+  // counters used when constraint names are truncated due to maximum length
+  // and these counters are used to keep the constraint name unique
+  protected int countCheck;
+  protected int countUnique;
+  protected int countForeignKey;
+  protected int countIndex;
+
+  /**
+   * Construct with a naming convention and platform specific DDL.
+   */
   public BaseTableDdl(DdlNamingConvention namingConvention, PlatformDdl platformDdl) {
     this.namingConvention = namingConvention;
     this.platformDdl = platformDdl;
+  }
+
+  /**
+   * Reset counters and index set for each table.
+   */
+  protected void reset() {
+    indexSet.clear();
+    countCheck = 0;
+    countUnique = 0;
+    countForeignKey = 0;
+    countIndex = 0;
   }
 
   /**
@@ -34,6 +61,8 @@ public class BaseTableDdl implements TableDdl {
    */
   @Override
   public void generate(DdlWrite writer, CreateTable createTable) throws IOException {
+
+    reset();
 
     String tableName = lowerName(createTable.getName());
     List<Column> columns = createTable.getColumn();
@@ -176,15 +205,21 @@ public class BaseTableDdl implements TableDdl {
 
     String indexName = determineForeignKeyIndexName(tableName, columns);
 
-    fkeyBuffer.append("create index ").append(indexName).append(" on ").append(tableName);
-    appendColumns(columns, fkeyBuffer);
-    fkeyBuffer.endOfStatement();
+    boolean addIndex = indexSet.add(columns);
+    if (addIndex) {
+      // no matching unique constraint so add the index
+      fkeyBuffer.append("create index ").append(indexName).append(" on ").append(tableName);
+      appendColumns(columns, fkeyBuffer);
+      fkeyBuffer.endOfStatement();
+    }
 
     fkeyBuffer.end();
 
-    write.rollbackForeignKeys()
-        .append("drop index ").append(indexName)
-        .endOfStatement();
+    if (addIndex) {
+      write.rollbackForeignKeys()
+          .append("drop index ").append(indexName)
+          .endOfStatement();
+    }
 
     write.rollbackForeignKeys()
         .append("alter table ").append(tableName).append(" drop constraint ").append(fkName)
@@ -253,6 +288,7 @@ public class BaseTableDdl implements TableDdl {
     for (Column column : columns) {
       if (isTrue(column.isUnique())) {
         inlineUniqueConstraintSingle(apply, createTable.getName(), column);
+        indexSet.add(column);
       }
     }
   }
@@ -369,7 +405,7 @@ public class BaseTableDdl implements TableDdl {
    */
   protected String determineForeignKeyConstraintName(String tableName, String columnName) {
 
-    return namingConvention.foreignKeyConstraintName(tableName, columnName);
+    return namingConvention.foreignKeyConstraintName(tableName, columnName, ++countForeignKey);
   }
 
   /**
@@ -377,7 +413,7 @@ public class BaseTableDdl implements TableDdl {
    */
   protected String determineForeignKeyIndexName(String tableName, String[] columns) {
 
-    return namingConvention.foreignKeyIndexName(tableName, columns);
+    return namingConvention.foreignKeyIndexName(tableName, columns, ++countIndex);
   }
 
   /**
@@ -385,7 +421,7 @@ public class BaseTableDdl implements TableDdl {
    */
   protected String determineUniqueConstraintName(String tableName, String columnName) {
 
-    return namingConvention.uniqueConstraintName(tableName, columnName);
+    return namingConvention.uniqueConstraintName(tableName, columnName, ++countUnique);
   }
 
   /**
@@ -393,7 +429,7 @@ public class BaseTableDdl implements TableDdl {
    */
   protected String determineCheckConstraintName(String tableName, String columnName) {
 
-    return namingConvention.checkConstraintName(tableName, columnName);
+    return namingConvention.checkConstraintName(tableName, columnName, ++countCheck);
   }
 
   /**
@@ -427,4 +463,82 @@ public class BaseTableDdl implements TableDdl {
     return (value == null) ? 0 : value.intValue();
   }
 
+
+  /**
+   * The indexes held on the table.
+   * <p>
+   * Used to detect when we don't need to add an index on the foreign key columns
+   * when there is an existing unique constraint with the same columns.
+   */
+  protected static class IndexSet {
+
+    private List<IndexColumns> indexes = new ArrayList<IndexColumns>();
+
+    /**
+     * Clear the indexes (for each table).
+     */
+    public void clear() {
+      indexes.clear();
+    }
+
+    /**
+     * Add an index for the given column.
+     */
+    public void add(Column column) {
+      indexes.add(new IndexColumns(column));
+    }
+
+    /**
+     * Return true if an index should be added for the given columns.
+     * <p>
+     * Returning false indicates there is an existing index (unique constraint) with these columns
+     * and that an extra index should not be added.
+     * </p>
+     */
+    public boolean add(String[] columns) {
+      IndexColumns newIndex = new IndexColumns(columns);
+      for (int i = 0; i <indexes.size() ; i++) {
+        if (indexes.get(i).isMatch(newIndex)) {
+          return false;
+        }
+      }
+      indexes.add(newIndex);
+      return true;
+    }
+  }
+
+  /**
+   * Set of columns making up a particular index (column order is important).
+   */
+  protected static class IndexColumns {
+
+    List<String> columns = new ArrayList<String>(4);
+
+    /**
+     * Construct representing as a single column index.
+     */
+    public IndexColumns(Column column) {
+      columns.add(column.getName());
+    }
+
+    /**
+     * Construct representing index.
+     */
+    public IndexColumns(String[] columnNames) {
+      for (int i = 0; i <columnNames.length; i++) {
+        columns.add(columnNames[i]);
+      }
+    }
+
+    /**
+     * Return true if there this index match (same columns same order).
+     */
+    public boolean isMatch(IndexColumns other) {
+      return columns.equals(other.columns);
+    }
+
+    protected void add(String column) {
+      columns.add(column);
+    }
+  }
 }
