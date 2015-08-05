@@ -18,15 +18,7 @@ public interface DataReader {
 
   byte[] getBinaryBytes() throws SQLException;
 
-  byte[] getBlobBytes() throws SQLException;
-
-  InputStream getBlobInputStream() throws SQLException;
-
   String getStringFromStream() throws SQLException;
-
-  String getStringClob() throws SQLException;
-
-  Reader getClobReader() throws SQLException;
 
   String getString() throws SQLException;
 

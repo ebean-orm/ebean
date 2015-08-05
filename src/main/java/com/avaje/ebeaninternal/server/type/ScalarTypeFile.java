@@ -38,7 +38,7 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
    * Construct with reasonable defaults of Blob and 8096 buffer size.
    */
   public ScalarTypeFile() {
-    this(Types.BLOB, "db-", null, null, 8096);
+    this(Types.LONGVARBINARY, "db-", null, null, 8096);
   }
 
   /**
@@ -92,7 +92,7 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
       try {
         // stream from our file to the db
         InputStream fi = getInputStream(value);
-        b.setBlob(fi, value.length());
+        b.setBinaryStream(fi, value.length());
       } catch (IOException e) {
         throw new SQLException("Error trying to set file inputStream", e);
       }

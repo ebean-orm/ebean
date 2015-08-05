@@ -2,24 +2,24 @@
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet>
         <createTable name="asimple_bean">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="bar">
             <column notnull="true" name="bar_type" type="varchar(31)"/>
-            <column primaryKey="true" identity="true" name="bar_id" type="integer"/>
+            <column primaryKey="true" name="bar_id" type="integer"/>
             <column notnull="true" references="foo.foo_id" name="foo_id" type="integer"/>
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="oto_account">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="version" type="bigint"/>
             <column notnull="true" name="when_created" type="timestamp"/>
             <column notnull="true" name="when_modified" type="timestamp"/>
         </createTable>
         <createTable name="o_address">
-            <column primaryKey="true" identity="true" name="id" type="smallint"/>
+            <column primaryKey="true" name="id" type="smallint"/>
             <column name="line_1" type="varchar(100)"/>
             <column name="line_2" type="varchar(100)"/>
             <column name="city" type="varchar(100)"/>
@@ -28,13 +28,13 @@
             <column notnull="true" name="updtime" type="timestamp"/>
         </createTable>
         <createTable name="address">
-            <column primaryKey="true" identity="true" name="oid" type="bigint"/>
+            <column primaryKey="true" name="oid" type="bigint"/>
             <column name="street" type="varchar(255)"/>
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="animals">
             <column notnull="true" name="species" type="varchar(31)"/>
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column references="animal_shelter.id" name="shelter_id" type="bigint"/>
             <column notnull="true" name="version" type="bigint"/>
             <column name="name" type="varchar(255)"/>
@@ -42,12 +42,12 @@
             <column name="date_of_birth" type="date"/>
         </createTable>
         <createTable name="animal_shelter">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="article">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="author" type="varchar(255)"/>
             <column notnull="true" name="cretime" type="timestamp"/>
@@ -56,53 +56,53 @@
         </createTable>
         <createTable name="attribute">
             <column notnull="true" name="option_type" type="integer(31)"/>
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column references="attribute_holder.id" name="attribute_holder_id" type="integer"/>
             <column notnull="true" name="cretime" type="timestamp"/>
             <column notnull="true" name="updtime" type="timestamp"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="attribute_holder">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column notnull="true" name="cretime" type="timestamp"/>
             <column notnull="true" name="updtime" type="timestamp"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="audit_log">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="description" type="varchar(255)"/>
             <column name="modified_description" type="varchar(255)"/>
         </createTable>
         <createTable name="bbookmark">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="bookmark_reference" type="varchar(255)"/>
             <column references="bbookmark_user.id" name="user_id" type="integer"/>
         </createTable>
         <createTable name="bbookmark_user">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="password" type="varchar(255)"/>
             <column name="email_address" type="varchar(255)"/>
             <column name="country" type="varchar(255)"/>
         </createTable>
         <createTable name="bsimple_with_gen">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="bwith_qident">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column unique="true" name="&quot;Name&quot;" type="varchar(255)"/>
             <column notnull="true" name="last_updated" type="timestamp"/>
         </createTable>
         <createTable name="basic_joda_entity">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="created" type="timestamp"/>
             <column notnull="true" name="updated" type="timestamp"/>
             <column notnull="true" name="version" type="timestamp"/>
         </createTable>
         <createTable name="bean_with_time_zone">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="timezone" type="varchar(20)"/>
         </createTable>
@@ -113,11 +113,11 @@
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="ckey_assoc">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="assoc_one" type="varchar(255)"/>
         </createTable>
         <createTable name="ckey_detail">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="something" type="varchar(255)"/>
             <column name="one_key" type="integer"/>
             <column name="two_key" type="varchar(255)"/>
@@ -131,7 +131,7 @@
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="calculation_result">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="charge" type="double"/>
             <column references="configuration.id" name="product_configuration_id" type="integer"/>
             <column references="configuration.id" name="group_configuration_id" type="integer"/>
@@ -157,7 +157,7 @@
             <foreignKey columnNames="wheel" refColumnNames="id" refTableName="sp_car_wheel"/>
         </createTable>
         <createTable name="car_accessory">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column references="vehicle.id" name="car_id" type="integer"/>
             <column notnull="true" name="cretime" type="timestamp"/>
@@ -166,18 +166,18 @@
         </createTable>
         <createTable name="configuration">
             <column notnull="true" name="type" type="varchar(31)"/>
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column references="configurations.id" name="configurations_id" type="integer"/>
             <column name="group_name" type="varchar(255)"/>
             <column name="product_name" type="varchar(255)"/>
         </createTable>
         <createTable name="configurations">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="contact">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="first_name" type="varchar(255)"/>
             <column name="last_name" type="varchar(255)"/>
             <column name="phone" type="varchar(255)"/>
@@ -189,14 +189,14 @@
             <column notnull="true" name="updtime" type="timestamp"/>
         </createTable>
         <createTable name="contact_group">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="cretime" type="timestamp"/>
             <column notnull="true" name="updtime" type="timestamp"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="contact_note">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column references="contact.id" name="contact_id" type="integer"/>
             <column name="title" type="varchar(255)"/>
             <column name="note" type="clob"/>
@@ -205,7 +205,7 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="c_conversation">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="title" type="varchar(255)"/>
             <column name="isopen" type="boolean"/>
             <column references="c_group.id" name="group_id" type="bigint"/>
@@ -218,7 +218,7 @@
             <column name="name" type="varchar(60)"/>
         </createTable>
         <createTable name="o_customer">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column checkConstraint="check (status in ('N','A','I'))" name="status" type="varchar(1)"/>
             <column notnull="true" name="name" type="varchar(40)"/>
             <column name="smallnote" type="varchar(100)"/>
@@ -230,14 +230,14 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="dexh_entity">
-            <column primaryKey="true" identity="true" name="oid" type="bigint"/>
+            <column primaryKey="true" name="oid" type="bigint"/>
             <column name="exhange_rate" type="decimal(38)"/>
             <column name="exhange_cmoney_amount" type="decimal(38)"/>
             <column name="exhange_cmoney_currency" type="varchar(3)"/>
             <column notnull="true" name="last_updated" type="timestamp"/>
         </createTable>
         <createTable name="dperson">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="first_name" type="varchar(255)"/>
             <column name="last_name" type="varchar(255)"/>
             <column name="salary" type="decimal(38)"/>
@@ -247,47 +247,47 @@
             <column name="i_end" type="timestamp"/>
         </createTable>
         <createTable name="rawinherit_data">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="number" type="integer"/>
         </createTable>
         <createTable name="e_basic">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column checkConstraint="check (status in ('N','A','I'))" name="status" type="varchar(1)"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
             <column name="some_date" type="timestamp"/>
         </createTable>
         <createTable name="ebasic_clob">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="title" type="varchar(255)"/>
             <column name="description" type="clob"/>
             <column notnull="true" name="last_update" type="timestamp"/>
         </createTable>
         <createTable name="ebasic_clob_fetch_eager">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="title" type="varchar(255)"/>
             <column name="description" type="clob"/>
             <column notnull="true" name="last_update" type="timestamp"/>
         </createTable>
         <createTable name="ebasic_clob_no_ver">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="clob"/>
         </createTable>
         <createTable name="e_basicenc">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varbinary(80)"/>
             <column name="dob" type="varbinary(20)"/>
             <column name="last_update" type="timestamp"/>
         </createTable>
         <createTable name="e_basicenc_bin">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
-            <column name="data" type="blob"/>
+            <column name="data" type="longvarbinary"/>
             <column name="some_time" type="varbinary(255)"/>
             <column notnull="true" name="last_update" type="timestamp"/>
         </createTable>
@@ -297,77 +297,77 @@
             <column name="description" type="varchar(255)"/>
         </createTable>
         <createTable name="ebasic_json_map">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="content" type="json"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="ebasic_json_map_blob">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="content" type="blob"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="ebasic_json_map_clob">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="content" type="clob"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="ebasic_json_map_json_b">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="content" type="jsonb"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="ebasic_json_map_varchar">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="content" type="varchar(3000)"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="ebasic_json_node">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="content" type="json"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="ebasic_json_node_blob">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="content" type="blob"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="ebasic_json_node_json_b">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="content" type="jsonb"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="ebasic_json_node_varchar">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="content" type="varchar(1000)"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="e_basic_ndc">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="e_basicver">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
             <column name="other" type="varchar(255)"/>
             <column notnull="true" name="last_update" type="timestamp"/>
         </createTable>
         <createTable name="e_basic_withlife">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="e_basicverucon">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column unique="true" name="name" type="varchar(255)"/>
             <column name="other" type="varchar(255)"/>
             <column name="other_one" type="varchar(255)"/>
@@ -375,20 +375,20 @@
             <column notnull="true" name="last_update" type="timestamp"/>
         </createTable>
         <createTable name="eemb_inner">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="nome_inner" type="varchar(255)"/>
             <column references="eemb_outer.id" name="outer_id" type="integer"/>
             <column notnull="true" name="update_count" type="integer"/>
         </createTable>
         <createTable name="eemb_outer">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="nome_outer" type="varchar(255)"/>
             <column name="date1" type="timestamp"/>
             <column name="date2" type="timestamp"/>
             <column notnull="true" name="update_count" type="integer"/>
         </createTable>
         <createTable name="egen_props">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="version" type="bigint"/>
             <column notnull="true" name="when_created" type="timestamp"/>
@@ -405,7 +405,7 @@
             <column notnull="true" name="long_updated" type="bigint"/>
         </createTable>
         <createTable name="einvoice">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="date" type="timestamp"/>
             <column checkConstraint="check (state in (0,1,2))" name="state" type="integer"/>
             <column references="eperson.id" name="person_id" type="bigint"/>
@@ -418,22 +418,22 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="e_main">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="enull_collection">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="enull_collection_detail">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column notnull="true" references="enull_collection.id" name="enull_collection_id" type="integer"/>
             <column name="something" type="varchar(255)"/>
         </createTable>
         <createTable name="eopt_one_a">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name_for_a" type="varchar(255)"/>
             <column references="eopt_one_b.id" name="b_id" type="integer"/>
             <column notnull="true" name="cretime" type="timestamp"/>
@@ -441,7 +441,7 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="eopt_one_b">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name_for_b" type="varchar(255)"/>
             <column notnull="true" references="eopt_one_c.id" name="c_id" type="integer"/>
             <column notnull="true" name="cretime" type="timestamp"/>
@@ -449,14 +449,14 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="eopt_one_c">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name_for_c" type="varchar(255)"/>
             <column notnull="true" name="cretime" type="timestamp"/>
             <column notnull="true" name="updtime" type="timestamp"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="eperson">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="notes" type="varchar(255)"/>
             <column name="street" type="varchar(255)"/>
@@ -464,31 +464,31 @@
             <column name="city" type="varchar(255)"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
-        <createTable name="esimple" identityType="IDENTITY">
+        <createTable name="esimple">
             <column primaryKey="true" name="usertypeid" type="integer"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="esome_type">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="currency" type="varchar(3)"/>
             <column name="locale" type="varchar(20)"/>
             <column name="time_zone" type="varchar(20)"/>
         </createTable>
         <createTable name="etrans_many">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="evanilla_collection">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="evanilla_collection_detail">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column notnull="true" references="evanilla_collection.id" name="evanilla_collection_id" type="integer"/>
             <column name="something" type="varchar(255)"/>
         </createTable>
         <createTable name="ewho_props">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="who_created" type="varchar(255)"/>
             <column notnull="true" name="who_modified" type="varchar(255)"/>
@@ -497,37 +497,37 @@
             <column notnull="true" name="when_modified" type="timestamp"/>
         </createTable>
         <createTable name="e_withinet">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="inet_address" type="varchar(50)"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="td_child">
-            <column primaryKey="true" identity="true" name="child_id" type="integer"/>
+            <column primaryKey="true" name="child_id" type="integer"/>
             <column name="child_name" type="varchar(255)"/>
             <column notnull="true" references="td_parent.parent_id" name="parent_id" type="integer"/>
         </createTable>
         <createTable name="td_parent">
             <column notnull="true" name="parent_type" type="varchar(31)"/>
-            <column primaryKey="true" identity="true" name="parent_id" type="integer"/>
+            <column primaryKey="true" name="parent_id" type="integer"/>
             <column name="parent_name" type="varchar(255)"/>
             <column name="extended_name" type="varchar(255)"/>
         </createTable>
         <createTable name="feature_desc">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
         </createTable>
         <createTable name="f_first">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="foo">
-            <column primaryKey="true" identity="true" name="foo_id" type="integer"/>
+            <column primaryKey="true" name="foo_id" type="integer"/>
             <column name="important_text" type="varchar(255)"/>
             <column notnull="true" name="version" type="integer"/>
         </createTable>
-        <createTable name="gen_key_identity" identityType="IDENTITY">
+        <createTable name="gen_key_identity">
             <column primaryKey="true" name="id" type="bigint"/>
             <column name="description" type="varchar(255)"/>
         </createTable>
@@ -536,11 +536,11 @@
             <column name="description" type="varchar(255)"/>
         </createTable>
         <createTable name="gen_key_table">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="description" type="varchar(255)"/>
         </createTable>
         <createTable name="c_group">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="inactive" type="boolean"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="version" type="bigint"/>
@@ -548,13 +548,13 @@
             <column notnull="true" name="when_modified" type="timestamp"/>
         </createTable>
         <createTable name="imrelated">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" references="imroot.id" name="owner_id" type="bigint"/>
         </createTable>
         <createTable name="imroot">
             <column notnull="true" name="dtype" type="varchar(10)"/>
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="title" type="varchar(255)"/>
             <column name="when_title" type="timestamp"/>
             <column name="name" type="varchar(255)"/>
@@ -565,24 +565,24 @@
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="info_company">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="info_contact">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" references="info_company.id" name="company_id" type="bigint"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="info_customer">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column unique="true" references="info_company.id" name="company_id" type="bigint"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="inner_report">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column unique="true" references="stockforecast.id" name="forecast_id" type="bigint"/>
         </createTable>
@@ -607,7 +607,7 @@
             <foreignKey columnNames="customer,region" refColumnNames="customer,type" refTableName="region"/>
         </createTable>
         <createTable name="level1">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="level1_level4">
@@ -623,7 +623,7 @@
             <foreignKey columnNames="level2_id" refColumnNames="id" refTableName="level2"/>
         </createTable>
         <createTable name="level2">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="level2_level3">
@@ -633,15 +633,15 @@
             <foreignKey columnNames="level3_id" refColumnNames="id" refTableName="level3"/>
         </createTable>
         <createTable name="level3">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="level4">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="la_attr_value">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="cretime" type="timestamp"/>
             <column notnull="true" name="updtime" type="timestamp"/>
@@ -655,18 +655,18 @@
         </createTable>
         <createTable name="mmedia">
             <column notnull="true" name="type" type="varchar(31)"/>
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="url" type="varchar(255)"/>
             <column name="note" type="varchar(255)"/>
         </createTable>
         <createTable name="non_updateprop">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column checkConstraint="check (non_enum in ('BEGIN','END'))" name="non_enum" type="varchar(5)"/>
             <column name="name" type="varchar(255)"/>
             <column name="note" type="varchar(255)"/>
         </createTable>
         <createTable name="mprinter">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="flags" type="bigint"/>
             <column references="mprinter_state.id" name="current_state_id" type="bigint"/>
@@ -677,22 +677,22 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="mprinter_state">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="flags" type="bigint"/>
             <column references="mprinter.id" name="printer_id" type="bigint"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="mprofile">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column references="mmedia.id" name="picture_id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="mprotected_construct_bean">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="mrole">
-            <column primaryKey="true" identity="true" name="roleid" type="integer"/>
+            <column primaryKey="true" name="roleid" type="integer"/>
             <column name="role_name" type="varchar(255)"/>
         </createTable>
         <createTable name="mrole_muser">
@@ -702,26 +702,26 @@
             <foreignKey columnNames="muser_userid" refColumnNames="userid" refTableName="muser"/>
         </createTable>
         <createTable name="msome_other">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="muser">
-            <column primaryKey="true" identity="true" name="userid" type="integer"/>
+            <column primaryKey="true" name="userid" type="integer"/>
             <column name="user_name" type="varchar(255)"/>
             <column references="muser_type.id" name="user_type_id" type="integer"/>
         </createTable>
         <createTable name="muser_type">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="map_super_actual">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="when_created" type="timestamp"/>
             <column notnull="true" name="when_updated" type="timestamp"/>
         </createTable>
         <createTable name="c_message">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="title" type="varchar(255)"/>
             <column name="body" type="varchar(255)"/>
             <column references="c_conversation.id" name="conversation_id" type="bigint"/>
@@ -731,12 +731,12 @@
             <column notnull="true" name="when_modified" type="timestamp"/>
         </createTable>
         <createTable name="mnoc_role">
-            <column primaryKey="true" identity="true" name="role_id" type="integer"/>
+            <column primaryKey="true" name="role_id" type="integer"/>
             <column name="role_name" type="varchar(255)"/>
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="mnoc_user">
-            <column primaryKey="true" identity="true" name="user_id" type="integer"/>
+            <column primaryKey="true" name="user_id" type="integer"/>
             <column name="user_name" type="varchar(255)"/>
             <column notnull="true" name="version" type="integer"/>
         </createTable>
@@ -747,23 +747,23 @@
             <foreignKey columnNames="mnoc_role_role_id" refColumnNames="role_id" refTableName="mnoc_role"/>
         </createTable>
         <createTable name="mp_role">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column notnull="true" references="mp_user.id" name="mp_user_id" type="bigint"/>
             <column name="code" type="varchar(255)"/>
             <column name="organization_id" type="bigint"/>
         </createTable>
         <createTable name="mp_user">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="my_lob_size">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="my_count" type="integer"/>
             <column name="my_lob" type="clob"/>
         </createTable>
         <createTable name="my_lob_size_join_many">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="something" type="varchar(255)"/>
             <column name="other" type="varchar(255)"/>
             <column references="my_lob_size.id" name="parent_id" type="integer"/>
@@ -774,7 +774,7 @@
             <column notnull="true" name="when_created" type="timestamp"/>
         </createTable>
         <createTable name="o_cached_bean">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="o_cached_bean_country">
@@ -784,11 +784,11 @@
             <foreignKey columnNames="o_country_code" refColumnNames="code" refTableName="o_country"/>
         </createTable>
         <createTable name="o_cached_bean_child">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column references="o_cached_bean.id" name="cached_bean_id" type="bigint"/>
         </createTable>
         <createTable name="ocar">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="vin" type="varchar(255)"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="cretime" type="timestamp"/>
@@ -809,7 +809,7 @@
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="o_order">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column checkConstraint="check (status in (0,1,2,3))" name="status" type="integer"/>
             <column name="order_date" type="date"/>
             <column name="ship_date" type="date"/>
@@ -818,7 +818,7 @@
             <column notnull="true" name="updtime" type="timestamp"/>
         </createTable>
         <createTable name="o_order_detail">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column references="o_order.id" name="order_id" type="integer"/>
             <column name="order_qty" type="integer"/>
             <column name="ship_qty" type="integer"/>
@@ -838,7 +838,7 @@
             <column name="amount" type="decimal(38)"/>
         </createTable>
         <createTable name="or_order_ship">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column references="o_order.id" name="order_id" type="integer"/>
             <column name="ship_time" type="timestamp"/>
             <column notnull="true" name="cretime" type="timestamp"/>
@@ -846,16 +846,16 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="oto_child">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column unique="true" references="oto_master.id" name="master_id" type="bigint"/>
         </createTable>
         <createTable name="oto_master">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="pfile">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column unique="true" references="pfile_content.id" name="file_content_id" type="integer"/>
             <column unique="true" references="pfile_content.id" name="file_content2_id" type="integer"/>
@@ -864,7 +864,7 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="pfile_content">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="content" type="blob"/>
             <column notnull="true" name="cretime" type="timestamp"/>
             <column notnull="true" name="updtime" type="timestamp"/>
@@ -876,22 +876,22 @@
         </createTable>
         <createTable name="pallet_location">
             <column notnull="true" name="type" type="varchar(31)"/>
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column notnull="true" references="zones.id" name="ZONE_SID" type="integer"/>
             <column name="attribute" type="varchar(255)"/>
         </createTable>
         <createTable name="parcel">
-            <column primaryKey="true" identity="true" name="parcelId" type="bigint"/>
+            <column primaryKey="true" name="parcelId" type="bigint"/>
             <column name="description" type="varchar(255)"/>
         </createTable>
         <createTable name="parcel_location">
-            <column primaryKey="true" identity="true" name="parcelLocId" type="bigint"/>
+            <column primaryKey="true" name="parcelLocId" type="bigint"/>
             <column name="location" type="varchar(255)"/>
             <column unique="true" references="parcel.parcelId" name="parcelId" type="bigint"/>
         </createTable>
         <createTable name="rawinherit_parent">
             <column notnull="true" name="type" type="varchar(31)"/>
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="number" type="integer"/>
         </createTable>
         <createTable name="rawinherit_parent_rawinherit_dat">
@@ -901,7 +901,7 @@
             <foreignKey columnNames="rawinherit_data_id" refColumnNames="id" refTableName="rawinherit_data"/>
         </createTable>
         <createTable name="c_participation">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="rating" type="integer"/>
             <column checkConstraint="check (type in (0,1))" name="type" type="integer"/>
             <column notnull="true" references="c_conversation.id" name="conversation_id" type="bigint"/>
@@ -915,37 +915,37 @@
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="persistent_file">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="cretime" type="timestamp"/>
             <column notnull="true" name="updtime" type="timestamp"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="persistent_file_content">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column unique="true" references="persistent_file.id" name="persistent_file_id" type="integer"/>
             <column name="content" type="blob"/>
             <column notnull="true" name="cretime" type="timestamp"/>
             <column notnull="true" name="updtime" type="timestamp"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
-        <createTable name="PERSONS" identityType="SEQUENCE" sequenceName="PERSONS_seq" sequenceInitial="1000" sequenceAllocate="40">
-            <column primaryKey="true" identity="true" name="ID" type="bigint"/>
+        <createTable name="PERSONS" identityType="IDENTITY">
+            <column primaryKey="true" name="ID" type="bigint"/>
             <column notnull="true" name="SURNAME" type="varchar(64)"/>
             <column notnull="true" name="NAME" type="varchar(64)"/>
         </createTable>
         <createTable name="person">
-            <column primaryKey="true" identity="true" name="oid" type="bigint"/>
+            <column primaryKey="true" name="oid" type="bigint"/>
             <column references="address.oid" name="default_address_oid" type="bigint"/>
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="PHONES">
-            <column primaryKey="true" identity="true" name="ID" type="bigint"/>
+            <column primaryKey="true" name="ID" type="bigint"/>
             <column notnull="true" unique="true" name="PHONE_NUMBER" type="varchar(7)"/>
             <column notnull="true" references="PERSONS.ID" name="PERSON_ID" type="bigint"/>
         </createTable>
         <createTable name="o_product">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="sku" type="varchar(20)"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="cretime" type="timestamp"/>
@@ -998,16 +998,16 @@
             <foreignKey columnNames="mt_permission_id" refColumnNames="id" refTableName="mt_permission"/>
         </createTable>
         <createTable name="em_role">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="f_second">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column unique="true" references="f_first.id" name="first" type="bigint"/>
             <column name="title" type="varchar(255)"/>
         </createTable>
         <createTable name="section">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column references="article.id" name="article_id" type="integer"/>
             <column checkConstraint="check (type in (0,1))" name="type" type="integer"/>
             <column name="content" type="clob"/>
@@ -1016,34 +1016,34 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="self_parent">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column references="self_parent.id" name="parent_id" type="bigint"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="self_ref_customer">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column references="self_ref_customer.id" name="referred_by_id" type="bigint"/>
         </createTable>
         <createTable name="self_ref_example">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column notnull="true" name="name" type="varchar(255)"/>
             <column references="self_ref_example.id" name="parent_id" type="bigint"/>
         </createTable>
         <createTable name="some_enum_bean">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column checkConstraint="check (some_enum in (0,1))" name="some_enum" type="integer"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="some_file_bean">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column name="content" type="blob"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="some_new_types_bean">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column checkConstraint="check (dow in ('1','2','3','4','5','6','7'))" name="dow" type="integer(1)"/>
             <column checkConstraint="check (mth in ('1','2','3','4','5','6','7','8','9','10','11','12'))" name="mth" type="integer(1)"/>
             <column name="yr" type="integer"/>
@@ -1058,7 +1058,7 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="some_period_bean">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="period_years" type="integer"/>
             <column name="period_months" type="integer"/>
             <column name="period_days" type="integer"/>
@@ -1067,11 +1067,11 @@
         </createTable>
         <createTable name="stockforecast">
             <column notnull="true" name="type" type="varchar(31)"/>
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column references="inner_report.id" name="inner_report_id" type="bigint"/>
         </createTable>
         <createTable name="sub_section">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column references="section.id" name="section_id" type="integer"/>
             <column name="title" type="varchar(255)"/>
             <column notnull="true" name="cretime" type="timestamp"/>
@@ -1084,7 +1084,7 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="tbytes_only">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="content" type="blob"/>
         </createTable>
         <createTable name="tcar" identityType="SEQUENCE">
@@ -1094,22 +1094,22 @@
         </createTable>
         <createTable name="tint_root">
             <column notnull="true" name="my_type" type="integer(3)"/>
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="child_property" type="varchar(255)"/>
         </createTable>
         <createTable name="tjoda_entity">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="local_time" type="time"/>
         </createTable>
         <createTable name="t_mapsuper1">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="something" type="varchar(255)"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="t_oneb">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
             <column name="active" type="boolean"/>
@@ -1122,7 +1122,7 @@
             <column references="t_atable_thatisrelatively.id" name="master_id" type="integer"/>
         </createTable>
         <createTable name="ts_detail_two">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
             <column name="active" type="boolean"/>
@@ -1135,7 +1135,7 @@
             <column name="active" type="boolean"/>
         </createTable>
         <createTable name="ts_master_two">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
             <column name="active" type="boolean"/>
@@ -1145,11 +1145,11 @@
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="twheel">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column notnull="true" references="tcar.plate_no" name="owner_plate_no" type="varchar(255)"/>
         </createTable>
         <createTable name="twith_pre_insert">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column notnull="true" name="name" type="varchar(255)"/>
             <column name="title" type="varchar(255)"/>
         </createTable>
@@ -1168,7 +1168,7 @@
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="trip">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column references="vehicle_driver.id" name="vehicle_driver_id" type="integer"/>
             <column name="destination" type="varchar(255)"/>
             <column references="o_address.id" name="address_id" type="smallint"/>
@@ -1178,7 +1178,7 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="truck_ref">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="something" type="varchar(255)"/>
         </createTable>
         <createTable name="type">
@@ -1189,7 +1189,7 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="ut_detail">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column notnull="true" references="ut_master.id" name="utmaster_id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="qty" type="integer"/>
@@ -1197,7 +1197,7 @@
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="ut_master">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
             <column notnull="true" name="version" type="integer"/>
@@ -1212,15 +1212,15 @@
             <column references="uuone.id" name="master_id" type="binary(16)"/>
         </createTable>
         <createTable name="em_user">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="tx_user">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="c_user">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="inactive" type="boolean"/>
             <column name="name" type="varchar(255)"/>
             <column name="email" type="varchar(255)"/>
@@ -1230,7 +1230,7 @@
             <column notnull="true" name="when_modified" type="timestamp"/>
         </createTable>
         <createTable name="oto_user">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column notnull="true" unique="true" references="oto_account.id" name="account_id" type="bigint"/>
             <column notnull="true" name="version" type="bigint"/>
@@ -1243,7 +1243,7 @@
         </createTable>
         <createTable name="vehicle">
             <column notnull="true" name="dtype" type="varchar(3)"/>
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="license_number" type="varchar(255)"/>
             <column name="registration_date" type="timestamp"/>
             <column notnull="true" name="cretime" type="timestamp"/>
@@ -1255,7 +1255,7 @@
             <column references="truck_ref.id" name="car_ref_id" type="integer"/>
         </createTable>
         <createTable name="vehicle_driver">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
             <column references="vehicle.id" name="vehicle_id" type="integer"/>
             <column references="o_address.id" name="address_id" type="smallint"/>
@@ -1265,7 +1265,7 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="warehouses">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column references="zones.id" name="officeZoneId" type="integer"/>
         </createTable>
         <createTable name="WarehousesShippingZones">
@@ -1289,13 +1289,13 @@
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="with_zero">
-            <column primaryKey="true" identity="true" name="id" type="bigint"/>
+            <column primaryKey="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
             <column references="parent.id" name="parent_id" type="integer"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="parent">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
         </createTable>
         <createTable name="wview" identityType="GENERATOR">
@@ -1304,7 +1304,7 @@
         </createTable>
         <createTable name="zones">
             <column notnull="true" name="type" type="varchar(31)"/>
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column primaryKey="true" name="id" type="integer"/>
             <column name="attribute" type="varchar(255)"/>
         </createTable>
     </changeSet>

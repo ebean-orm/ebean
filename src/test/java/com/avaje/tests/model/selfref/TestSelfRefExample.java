@@ -13,7 +13,12 @@ public class TestSelfRefExample extends BaseTestCase {
 
   @Test
   public void test() {
-    
+
+    if (Ebean.find(SelfRefExample.class).findRowCount() > 0) {
+      // skip test when running multiple times (non memory only db testing)
+      return;
+    }
+
     SelfRefExample e1 = new SelfRefExample("test1", null);
     SelfRefExample e2 = new SelfRefExample("test1", e1);
     SelfRefExample e3 = new SelfRefExample("test2", e2);

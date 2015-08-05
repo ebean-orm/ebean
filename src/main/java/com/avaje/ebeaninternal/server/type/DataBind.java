@@ -112,12 +112,8 @@ public class DataBind {
     pstmt.setString(++pos, String.valueOf(v));
   }
 
-  public void setBlob(InputStream inputStream, long length) throws SQLException {
-    pstmt.setBlob(++pos, inputStream, length);
-  }
-
-  public void setBlob(InputStream inputStream) throws SQLException {
-    pstmt.setBlob(++pos, inputStream);
+  public void setBinaryStream(InputStream inputStream, long length) throws SQLException {
+    pstmt.setBinaryStream(++pos, inputStream, length);
   }
 
   public void setBlob(byte[] bytes) throws SQLException {

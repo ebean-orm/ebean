@@ -3,6 +3,7 @@ package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
 import com.avaje.ebean.config.dbplatform.H2Platform;
 import com.avaje.ebean.config.dbplatform.PostgresPlatform;
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

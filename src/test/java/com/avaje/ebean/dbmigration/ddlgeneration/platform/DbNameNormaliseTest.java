@@ -6,14 +6,14 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class DbNameNormaliseTest {
 
-  DbNameNormalise normalise = new DbNameNormalise();
+  DdlNameNormalise normalise = new DdlNameNormalise();
 
   @Test
   public void testNormalise() throws Exception {
 
-    assertThat(normalise.normalise("cat.sch.foo_bar]")).isEqualTo("foo_bar");
-    assertThat(normalise.normalise("sch.foo_bar]")).isEqualTo("foo_bar");
-    assertThat(normalise.normalise("foo_bar]")).isEqualTo("foo_bar");
+    assertThat(normalise.normaliseTable("cat.sch.foo_bar]")).isEqualTo("foo_bar");
+    assertThat(normalise.normaliseTable("sch.foo_bar]")).isEqualTo("foo_bar");
+    assertThat(normalise.normaliseTable("foo_bar]")).isEqualTo("foo_bar");
   }
 
   @Test

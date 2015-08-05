@@ -14,6 +14,11 @@ public class TestSelfParent extends BaseTestCase {
   @Test
   public void test() {
 
+    if (Ebean.find(SelfParent.class).findRowCount() > 0) {
+      // only run once
+      return;
+    }
+
     SelfParent root = new SelfParent("root", null);
     SelfParent child1 = new SelfParent("child1", root);
     SelfParent child11 = new SelfParent("child11", child1);

@@ -2,10 +2,8 @@ package com.avaje.ebean.dbmigration.model.build;
 
 
 import com.avaje.ebean.BaseTestCase;
-import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.Helper;
 import com.avaje.ebean.dbmigration.migration.Migration;
 import com.avaje.ebean.dbmigration.migrationreader.MigrationXmlReader;

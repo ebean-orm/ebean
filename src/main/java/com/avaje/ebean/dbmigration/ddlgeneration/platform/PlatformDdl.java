@@ -1,7 +1,13 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
+import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.config.dbplatform.IdType;
+import com.avaje.ebean.dbmigration.ddlgeneration.BaseDdlHandler;
+import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
+import com.avaje.ebean.dbmigration.migration.IdentityType;
 import com.avaje.ebean.dbmigration.model.MTable;
 
 import java.io.IOException;
@@ -11,24 +17,48 @@ import java.io.IOException;
  */
 public class PlatformDdl {
 
-  protected final PlatformHistoryDdl historyDdl;
+  protected PlatformHistoryDdl historyDdl = new NoHistorySupportDdl();
 
-  protected final PlatformTypeConverter typeConverter;
+  protected DdlNamingConvention namingConvention = new DdlNamingConvention();
 
-  protected String foreignKeyRestrict = "";
+  private final PlatformTypeConverter typeConverter;
 
-  protected boolean useSequences;
+  private final DbIdentity dbIdentity;
 
-  public PlatformDdl(DbTypeMap platformTypes, PlatformHistoryDdl historyDdl) {
+  /**
+   * Default assumes if exists is supported.
+   */
+  protected String dropTableIfExists = "drop table if exists ";
+
+  /**
+   * Default assumes if exists is supported.
+   */
+  protected String dropSequenceIfExists = "drop sequence if exists ";
+
+  protected String foreignKeyRestrict = "on delete restrict on update restrict";
+
+  protected String identitySuffix = " auto_increment";
+
+
+  public PlatformDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
+    this.dbIdentity = dbIdentity;
     this.typeConverter = new PlatformTypeConverter(platformTypes);
-    this.historyDdl = historyDdl;
+  }
+
+  public DdlHandler createDdlHandler() {
+    return new BaseDdlHandler(namingConvention, this);
+  }
+
+  public IdType useIdentityType(IdentityType modelIdentityType) {
+
+    return dbIdentity.useIdentityType(modelIdentityType);
   }
 
   /**
    * Modify and return the column definition for autoincrement or identity definition.
    */
   public String asIdentityColumn(String columnDefn) {
-    return columnDefn;
+    return columnDefn + identitySuffix;
   }
 
   /**
@@ -58,10 +88,6 @@ public class PlatformDdl {
    */
   public String createSequence(String sequenceName, int initialValue, int allocationSize) {
 
-    if (!useSequences || sequenceName == null || sequenceName.trim().length() == 0) {
-      return null;
-    }
-
     StringBuilder sb = new StringBuilder("create sequence ");
     sb.append(sequenceName);
     if (initialValue > 1) {
@@ -77,6 +103,15 @@ public class PlatformDdl {
   }
 
   public String dropSequence(String sequenceName) {
-    return "drop sequence "+sequenceName+";";
+    return dropSequenceIfExists + sequenceName;
   }
+
+  public String dropTable(String tableName) {
+    return dropTableIfExists + tableName;
+  }
+
+  public String lowerName(String name) {
+    return namingConvention.lowerName(name);
+  }
+
 }

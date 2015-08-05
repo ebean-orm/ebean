@@ -11,7 +11,9 @@ public class TestCaoCompositeKeyWithAnnotationOverrides extends BaseTestCase {
 
   @Test
   public void test() {
-    
+
+    Ebean.deleteAll(Ebean.find(CaoBean.class).findList());
+
     CaoKey key = new CaoKey();
     key.setCustomer(123);
     key.setType(1);

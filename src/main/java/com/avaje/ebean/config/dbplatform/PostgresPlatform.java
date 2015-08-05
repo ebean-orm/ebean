@@ -1,7 +1,7 @@
 package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.BackgroundExecutor;
-import com.avaje.ebean.dbmigration.ddlgeneration.platform.H2Ddl;
+import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PostgresDdl;
 
 import javax.sql.DataSource;
@@ -18,14 +18,13 @@ public class PostgresPlatform extends DatabasePlatform {
   public PostgresPlatform() {
     super();
     this.name = "postgres";
-    this.platformDdl = new PostgresDdl(this.dbTypeMap);
 
     // OnQueryOnly.CLOSE as a performance optimisation on Postgres
     this.onQueryOnly = OnQueryOnly.CLOSE;
     this.likeClause = "like ? escape''";
-    
+
     this.dbDdlSyntax = new PostgresDdlSyntax();
-    
+
     this.selectCountWithAlias = true;
     this.blobDbType = Types.LONGVARBINARY;
     this.clobDbType = Types.VARCHAR;
@@ -38,7 +37,9 @@ public class PostgresPlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
 
-    this.columnAliasPrefix = "as c";
+    this.platformDdl = new PostgresDdl(this.dbTypeMap, this.dbIdentity);
+
+    //this.columnAliasPrefix = "as c";
 
     this.openQuote = "\"";
     this.closeQuote = "\"";
@@ -67,6 +68,12 @@ public class PostgresPlatform extends DatabasePlatform {
     dbDdlSyntax.setDropIfExists("if exists");
   }
 
+  /**
+   * Return a DdlHandler instance for generating DDL for the specific platform.
+   */
+  public DdlHandler createDdlHandler() {
+    return this.platformDdl.createDdlHandler();
+  }
 
   /**
    * Create a Postgres specific sequence IdGenerator.

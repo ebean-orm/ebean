@@ -43,7 +43,8 @@ public class TestBatchInsertWithInitialisedCollection extends BaseTestCase {
     assertThat(loggedSql).hasSize(3);
 
     for (String sql : loggedSql) {
-      assertThat(sql).contains("insert into o_cached_bean (id, name) values (?,?);");
+      assertThat(sql).contains("insert into o_cached_bean (");
+      assertThat(sql).contains("name) values (?");
     }
 
   }

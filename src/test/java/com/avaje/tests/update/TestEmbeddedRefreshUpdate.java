@@ -25,7 +25,7 @@ public class TestEmbeddedRefreshUpdate extends BaseTestCase {
 
     Ebean.save(outer);
 
-    EEmbOuter loaded = Ebean.find(EEmbOuter.class).findUnique();
+    EEmbOuter loaded = Ebean.find(EEmbOuter.class).where().idEq(outer.getId()).findUnique();
 
     // if commented Ebean saves correctly
     Ebean.refresh(loaded);

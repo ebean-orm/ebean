@@ -13,7 +13,11 @@ import java.util.Collection;
  */
 public class PostgresHistoryDdl implements PlatformHistoryDdl {
 
-  DbNameNormalise normalise = new DbNameNormalise();
+  private final DdlNameNormalise normalise;
+
+  public PostgresHistoryDdl(DdlNameNormalise normalise) {
+    this.normalise = normalise;
+  }
 
   protected String historyTableName(String baseTableName) {
     return baseTableName + "_history";
@@ -38,7 +42,7 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
 
   public void addHistoryTable(DdlWrite writer, MTable table) throws IOException {
 
-    String baseTableName = this.normalise.normalise(table.getName());
+    String baseTableName = this.normalise.normaliseTable(table.getName());
 
     DdlBuffer buffer = writer.applyHistory();
 
@@ -62,7 +66,7 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
 
   public void addTrigger(DdlWrite writer, MTable table) throws IOException {
 
-    String baseTableName = this.normalise.normalise(table.getName());
+    String baseTableName = this.normalise.normaliseTable(table.getName());
     String procedureName = procedureName(baseTableName);
     String triggerName = triggerName(baseTableName);
 
@@ -77,7 +81,7 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
 
   public void addStoredFunction(DdlWrite writer, MTable table) throws IOException {
 
-    String baseTableName = this.normalise.normalise(table.getName());
+    String baseTableName = this.normalise.normaliseTable(table.getName());
     String procedureName = procedureName(baseTableName);
     DdlBuffer buffer = writer.applyHistory();
 

@@ -40,7 +40,7 @@ public class ScalarTypeClob extends ScalarTypeBaseVarchar<String> {
   @Override
   public String read(DataReader dataReader) throws SQLException {
 
-    return dataReader.getStringClob();
+    return dataReader.getStringFromStream();
   }
 
   @Override

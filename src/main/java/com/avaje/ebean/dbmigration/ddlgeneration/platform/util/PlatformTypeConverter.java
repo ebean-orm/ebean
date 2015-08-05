@@ -1,4 +1,4 @@
-package com.avaje.ebean.dbmigration.ddlgeneration.platform;
+package com.avaje.ebean.dbmigration.ddlgeneration.platform.util;
 
 import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;

@@ -1,6 +1,7 @@
 package com.avaje.ebean.event;
 
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
@@ -14,7 +15,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BeanPostLoadTest {
+public class BeanPostLoadTest extends BaseTestCase {
 
   PostLoad postLoad = new PostLoad(false);
 
@@ -48,8 +49,10 @@ public class BeanPostLoadTest {
 
     ServerConfig config = new ServerConfig();
 
-    config.setName("h2other");
+    config.setName("h2ebasicver");
     config.loadFromProperties();
+    config.setDdlGenerate(true);
+    config.setDdlRun(true);
 
     config.setRegister(false);
     config.setDefaultServer(false);

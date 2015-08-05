@@ -1,13 +1,19 @@
 package com.avaje.ebean.dbmigration.model.build;
 
 import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.config.dbplatform.IdType;
+import com.avaje.ebean.dbmigration.migration.IdentityType;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.CompoundUniqueContraint;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebean.dbmigration.model.MColumn;
 import com.avaje.ebean.dbmigration.model.MTable;
 import com.avaje.ebean.dbmigration.model.visitor.BeanPropertyVisitor;
 import com.avaje.ebean.dbmigration.model.visitor.BeanVisitor;
+import com.avaje.ebeaninternal.server.type.ScalarType;
+
+import java.sql.Types;
 
 /**
  * Used to build the Model objects MTable etc.
@@ -35,9 +41,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
 
     MTable table = new MTable(descriptor.getBaseTable());
 
-    table.setSequenceName(descriptor.getSequenceName());
-    table.setSequenceInitial(descriptor.getSequenceInitialValue());
-    table.setSequenceAllocate(descriptor.getSequenceAllocationSize());
+    setIdentity(descriptor, table);
 
     // add the table to the model
     ctx.addTable(table);
@@ -60,6 +64,45 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
     }
 
     return new ModelBuildPropertyVisitor(ctx, table);
+  }
+
+  private void setIdentity(BeanDescriptor<?> descriptor, MTable table) {
+
+
+    if (IdType.GENERATOR == descriptor.getIdType()) {
+      // explicit generator like UUID
+      table.setIdentityType(IdentityType.GENERATOR);
+      return;
+    }
+
+    int initialValue = descriptor.getSequenceInitialValue();
+    int allocationSize = descriptor.getSequenceAllocationSize();
+
+    if (!descriptor.isIdTypePlatformDefault() || initialValue > 0 || allocationSize > 0) {
+      // explicitly set to use sequence or identity (generally not recommended practice)
+      if (IdType.IDENTITY == descriptor.getIdType()) {
+        table.setIdentityType(IdentityType.IDENTITY);
+      } else {
+        // explicit sequence defined
+        table.setIdentityType(IdentityType.SEQUENCE);
+        table.setSequenceName(descriptor.getSequenceName());
+        table.setSequenceInitial(initialValue);
+        table.setSequenceAllocate(allocationSize);
+      }
+      return;
+    }
+
+    BeanProperty idProperty = descriptor.getIdProperty();
+    if (idProperty != null) {
+      ScalarType<Object> scalarType = idProperty.getScalarType();
+      if (scalarType != null) {
+        int jdbcType = scalarType.getJdbcType();
+        if (jdbcType == Types.VARCHAR) {
+          System.out.println("asd");
+        }
+      }
+    }
+
   }
 
 }

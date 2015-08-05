@@ -625,6 +625,35 @@ public class DeployBeanProperty {
     }
   }
 
+  public boolean isDbNumberType() {
+    return isNumericType(dbType);
+  }
+
+  private boolean isNumericType(int type) {
+    switch (type) {
+      case Types.BIGINT:
+        return true;
+      case Types.DECIMAL:
+        return true;
+      case Types.DOUBLE:
+        return true;
+      case Types.FLOAT:
+        return true;
+      case Types.INTEGER:
+        return true;
+      case Types.NUMERIC:
+        return true;
+      case Types.REAL:
+        return true;
+      case Types.SMALLINT:
+        return true;
+      case Types.TINYINT:
+        return true;
+
+      default:
+        return false;
+    }
+  }
   /**
    * Return true if this property is based on a secondary table.
    */

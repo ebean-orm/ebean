@@ -19,10 +19,14 @@ public class TestCKeyLazyLoad extends BaseTestCase {
   @Test
   public void test() {
 
-    CKeyAssoc assoc = new CKeyAssoc();
-    assoc.setAssocOne("assocOne");
+    Ebean.deleteAll(Ebean.find(CKeyDetail.class).findList());
+    Ebean.deleteAll(Ebean.find(CKeyParent.class).findList());
+    Ebean.deleteAll(Ebean.find(CKeyAssoc.class).findList());
 
     CKeyParentId id = new CKeyParentId(1, "one");
+
+    CKeyAssoc assoc = new CKeyAssoc();
+    assoc.setAssocOne("assocOne");
 
     CKeyParent p = new CKeyParent();
     p.setId(id);

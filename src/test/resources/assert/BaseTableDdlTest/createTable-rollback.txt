@@ -1,2 +1,3 @@
-drop table mytable;
+drop table if exists mytable;
+drop sequence if exists mytable_seq;
 

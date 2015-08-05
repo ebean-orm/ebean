@@ -13,6 +13,9 @@ public class TestSaveSamePK extends BaseTestCase {
   @Test
   public void test() {
 
+    // delete in case we are running multiple times without full db drop
+    Ebean.delete(TSMaster.class, 10000);
+
     TSMaster m0 = new TSMaster();
     m0.setId(10000);
     m0.setName("master1");

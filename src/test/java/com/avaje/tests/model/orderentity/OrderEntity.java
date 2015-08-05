@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "s_orders")
-public class OrderEntity {
+public class  OrderEntity {
 
   /**
    * Rob Note: Ideally this would be a UUID rather than a String type - then Ebean would automatically 

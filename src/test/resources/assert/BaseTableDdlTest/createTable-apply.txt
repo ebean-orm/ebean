@@ -5,4 +5,5 @@ create table mytable (
   constraint ck_mytable_status check (status in ('A','B')),
   constraint pk_mytable primary key (id)
 );
+create sequence mytable_seq;
 

@@ -1,5 +1,6 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
+import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
 
 /**
@@ -7,19 +8,15 @@ import com.avaje.ebean.config.dbplatform.DbTypeMap;
  */
 public class PostgresDdl extends PlatformDdl {
 
-  public PostgresDdl(DbTypeMap platformTypes) {
-    this(platformTypes, false);
-  }
-
-  public PostgresDdl(DbTypeMap platformTypes, boolean useSequences) {
-    super(platformTypes, new PostgresHistoryDdl());
-    this.foreignKeyRestrict = "on delete restrict on update restrict";
-    this.useSequences = useSequences;
+  public PostgresDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
+    super(platformTypes, dbIdentity);
+    this.historyDdl = new PostgresHistoryDdl(this.namingConvention.normalise);
   }
 
   /**
    * Map bigint, integer and smallint into their equivalent serial types.
    */
+  @Override
   public String asIdentityColumn(String columnDefn) {
 
     if ("bigint".equalsIgnoreCase(columnDefn)) {

@@ -25,7 +25,12 @@ public class ResetBasicData {
 		
 		server.execute(new TxRunnable() {
 			public void run() {
-				me.deleteAll();
+        if (server.find(Product.class).findRowCount() > 0) {
+          // we can't really delete this base data as
+          // the test rely on the products being in there
+          return;
+        }
+				//me.deleteAll();
 				me.insertCountries();
 				me.insertProducts();
 				me.insertTestCustAndOrders();
@@ -66,8 +71,12 @@ public class ResetBasicData {
 	
 	
 	public void insertCountries() {
-		
-	  server.execute(new TxRunnable() {
+
+    if (server.find(Country.class).findRowCount() > 0) {
+      return;
+    }
+
+    server.execute(new TxRunnable() {
 			public void run() {
 				Country c = new Country();
 				c.setCode("NZ");
@@ -84,7 +93,10 @@ public class ResetBasicData {
 	
 
 	public void insertProducts() {
-		
+
+    if (server.find(Product.class).findRowCount() > 0) {
+      return;
+    }
 	  server.execute(new TxRunnable() {
 			public void run() {
 				Product p = new Product();

@@ -1,21 +1,19 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeaninternal.server.core.Message;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.sql.Array;
-import java.sql.Blob;
-import java.sql.Clob;
 import java.sql.Date;
 import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-
-import com.avaje.ebeaninternal.server.core.Message;
 
 public class RsetDataReader implements DataReader {
 
@@ -55,10 +53,6 @@ public class RsetDataReader implements DataReader {
 
   public Array getArray() throws SQLException {
     return rset.getArray(pos());
-  }
-
-  public InputStream getAsciiStream() throws SQLException {
-    return rset.getAsciiStream(pos());
   }
 
   public Object getObject() throws SQLException {
@@ -168,28 +162,6 @@ public class RsetDataReader implements DataReader {
     return readStringLob(reader);
   }
 
-  @Override
-  public Reader getClobReader() throws SQLException {
-    Clob clob = rset.getClob(pos());
-    if (clob == null) {
-      return null;
-    }
-    return clob.getCharacterStream();
-  }
-
-  public String getStringClob() throws SQLException {
-
-    Clob clob = rset.getClob(pos());
-    if (clob == null) {
-      return null;
-    }
-    Reader reader = clob.getCharacterStream();
-    if (reader == null) {
-      return null;
-    }
-    return readStringLob(reader);
-  }
-
   protected String readStringLob(Reader reader) throws SQLException {
 
     char[] buffer = new char[clobBufferSize];
@@ -210,23 +182,6 @@ public class RsetDataReader implements DataReader {
   public byte[] getBinaryBytes() throws SQLException {
     InputStream in = rset.getBinaryStream(pos());
     return getBinaryLob(in);
-  }
-
-  public byte[] getBlobBytes() throws SQLException {
-    Blob blob = rset.getBlob(pos());
-    if (blob == null) {
-      return null;
-    }
-    InputStream in = blob.getBinaryStream();
-    return getBinaryLob(in);
-  }
-
-  public InputStream getBlobInputStream() throws SQLException {
-    Blob blob = rset.getBlob(pos());
-    if (blob == null) {
-      return null;
-    }
-    return blob.getBinaryStream();
   }
 
   protected byte[] getBinaryLob(InputStream in) throws SQLException {

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -34,17 +33,11 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
     @Override
     public JsonNode read(DataReader dataReader) throws SQLException {
 
-      Reader reader = dataReader.getClobReader();
-      if (reader == null) {
+      String content = dataReader.getStringFromStream();
+      if (content == null) {
         return null;
       }
-      try {
-        JsonNode tree = parse(reader);
-        reader.close();
-        return tree;
-      } catch (IOException e) {
-        throw new SQLException("Error reading Clob stream from DB", e);
-      }
+      return parse(content);
     }
   }
 
@@ -70,7 +63,7 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
     @Override
     public JsonNode read(DataReader dataReader) throws SQLException {
 
-      InputStream is = dataReader.getBlobInputStream();
+      InputStream is = dataReader.getBinaryStream();
       if (is == null) {
         return null;
       }
@@ -91,8 +84,7 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
         dataBind.setNull(Types.BLOB);
       } else {
         String rawJson = formatValue(value);
-        InputStream stream = new ByteArrayInputStream(rawJson.getBytes(StandardCharsets.UTF_8));
-        dataBind.setBlob(stream);
+        dataBind.setBlob(rawJson.getBytes(StandardCharsets.UTF_8));
       }
     }
   }

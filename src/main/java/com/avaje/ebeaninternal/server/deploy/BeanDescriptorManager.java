@@ -1062,8 +1062,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
 
     if (desc.getIdType() == null) {
+      if (desc.isPrimaryKeyCompoundOrNonNumeric()) {
+        // assuming that this is a user supplied key like ISO country code or ISO currency code or lookup table code
+        logger.debug("Expecting user defined identity on " + desc.getFullName() + " - not using db sequence or autoincrement");
+        return;
+      }
       // use the default. IDENTITY or SEQUENCE.
       desc.setIdType(dbIdentity.getIdType());
+      desc.setIdTypePlatformDefault();
     }
 
     if (IdType.GENERATOR.equals(desc.getIdType())) {

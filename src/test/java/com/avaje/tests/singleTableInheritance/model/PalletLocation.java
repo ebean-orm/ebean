@@ -17,7 +17,7 @@ import javax.persistence.ManyToOne;
 public class PalletLocation
 {
 	@Id
-	@Column(name="ID")
+	@Column(name="id")
 	private Integer id;
 
 	@ManyToOne(fetch= FetchType.LAZY, optional=false)

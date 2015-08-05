@@ -18,6 +18,9 @@ public class TestBatchLazyWithDeleted extends BaseTestCase {
   @Test
   public void testOnDeleted() {
 
+    Ebean.deleteAll(Ebean.find(UUTwo.class).findList());
+    Ebean.deleteAll(Ebean.find(UUOne.class).findList());
+
     UUOne oneA = new UUOne();
     oneA.setName("oneA");
 

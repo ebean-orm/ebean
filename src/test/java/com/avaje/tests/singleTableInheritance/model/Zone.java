@@ -16,7 +16,7 @@ import javax.persistence.Table;
 public class Zone
 {
 	@Id
-	@Column(name="ID")
+	@Column(name="id")
 	private Integer id;
 
 	public Integer getId()

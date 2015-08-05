@@ -23,6 +23,7 @@ public class BeanPersistControllerTest {
 
     EbeanServer ebeanServer = getEbeanServer(continuePersistingAdapter);
 
+
     EBasicVer bean = new EBasicVer();
     bean.setName("testController");
 
@@ -65,21 +66,23 @@ public class BeanPersistControllerTest {
     ebeanServer.delete(bean);
     assertThat(stopPersistingAdapter.methodsCalled).hasSize(1);
     assertThat(stopPersistingAdapter.methodsCalled).containsExactly("preDelete");
+
   }
 
   private EbeanServer getEbeanServer(PersistAdapter persistAdapter) {
 
     ServerConfig config = new ServerConfig();
 
-    config.setName("h2other");
+    config.setName("h2ebasicver");
     config.loadFromProperties();
+    config.setDdlGenerate(true);
+    config.setDdlRun(true);
 
     config.setRegister(false);
     config.setDefaultServer(false);
     config.getClasses().add(EBasicVer.class);
 
     config.add(persistAdapter);
-
 
     return EbeanServerFactory.create(config);
   }

@@ -40,6 +40,14 @@ public class TestInheritQuery extends BaseTestCase {
   
   @Test
   public void testDiscriminator_bug417() {
+
+
+    Ebean.deleteAll(Ebean.find(Warehouse.class).findList());
+    Ebean.deleteAll(Ebean.find(PalletLocation.class).findList());
+    Ebean.deleteAll(Ebean.find(Zone.class).findList());
+    Ebean.deleteAll(Ebean.find(ZoneInternal.class).findList());
+    Ebean.deleteAll(Ebean.find(ZoneInternal.class).findList());
+
 		ZoneInternal zoneInt = new ZoneInternal();
 		zoneInt.setAttribute("some zone 1");
 		Ebean.save(zoneInt);

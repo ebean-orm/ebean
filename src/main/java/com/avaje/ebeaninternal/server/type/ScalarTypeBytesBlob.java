@@ -14,7 +14,7 @@ public class ScalarTypeBytesBlob extends ScalarTypeBytesBase {
 
   public byte[] read(DataReader dataReader) throws SQLException {
 
-    return dataReader.getBlobBytes();
+    return dataReader.getBinaryBytes();
   }
 
 }

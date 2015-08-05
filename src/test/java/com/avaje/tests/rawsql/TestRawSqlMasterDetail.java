@@ -11,6 +11,7 @@ import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -85,8 +86,9 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
   @Test
   public void testWithNoIdPropertyWithInsert() {
 
+    String name = "RawSql-NoIdTest"+new Random().nextInt();
     EBasic basic = new EBasic();
-    basic.setName("RawSql-NoIdTest");
+    basic.setName(name);
     basic.setStatus(EBasic.Status.ACTIVE);
 
     Ebean.save(basic);
@@ -97,7 +99,7 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
 
     List<EBasic> list = Ebean.find(EBasic.class)
         .setRawSql(rawSql)
-        .where().eq("name", "RawSql-NoIdTest")
+        .where().eq("name", name)
         .findList();
 
     assertEquals(1, list.size());

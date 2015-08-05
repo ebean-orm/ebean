@@ -82,6 +82,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
         .select("status, shipDate")
         .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
         .fetch("details.product", "sku, name")
+        .order().asc("id")
         .findList();
 
     assertThat(l0).isNotEmpty();

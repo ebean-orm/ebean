@@ -19,7 +19,7 @@ import javax.persistence.NamedQuery;
 public class CalculationResult {
 	
 	@Id
-	@Column(name="ID")
+	@Column(name="id")
 	private Integer id;
 	
 	private double charge;

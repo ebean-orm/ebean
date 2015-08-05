@@ -1,5 +1,7 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.dbmigration.migration.IdentityType;
+
 /**
  * Defines the identity/sequence behaviour for the database.
  */
@@ -114,4 +116,26 @@ public class DbIdentity {
     this.idType = idType;
   }
 
+  /**
+   * Determine the id type to use based on requested identityType and
+   * the support for that in the database platform.
+   */
+  public IdType useIdentityType(IdentityType identityType) {
+
+    if (identityType == null) {
+      // use the default
+      return idType;
+    }
+    switch (identityType) {
+      case GENERATOR:
+        return IdType.GENERATOR;
+      case SEQUENCE:
+        return supportsSequence ? IdType.SEQUENCE : idType;
+      case IDENTITY:
+        return supportsIdentity ? IdType.IDENTITY : idType;
+    }
+
+    // use the default
+    return idType;
+  }
 }

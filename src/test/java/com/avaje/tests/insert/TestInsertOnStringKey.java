@@ -3,6 +3,7 @@ package com.avaje.tests.insert;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -18,10 +19,10 @@ public class TestInsertOnStringKey extends BaseTestCase {
     
     
     OrderEntity orderEntity = new OrderEntity();
-    orderEntity.setId("anyOrderId");
+    orderEntity.setId("anyOrderId"+new Random().nextInt());
     
     OrderItemEntity orderItemEntity = new OrderItemEntity();
-    orderItemEntity.setId("anyOrderItemId");
+    orderItemEntity.setId("anyOrderItemId"+new Random().nextInt());
     orderItemEntity.setVariantId("anyVariantId");
     orderItemEntity.setAmount(BigDecimal.ONE);
     

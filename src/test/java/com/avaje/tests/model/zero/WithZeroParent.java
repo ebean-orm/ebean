@@ -10,8 +10,25 @@ public class WithZeroParent {
   @Column(name = "id")
   private int id;
 
+  String name;
+
   @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
   private List<WithZero> children;
+
+  public void setId(int id) {
+    this.id = id;
+  }
+  public int getId() {
+    return id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
 
   public List<WithZero> getChildren() {
     return children;
@@ -21,7 +38,4 @@ public class WithZeroParent {
     this.children = children;
   }
 
-  public int getId() {
-    return id;
-  }
 }

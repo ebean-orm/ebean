@@ -10,28 +10,38 @@ import javax.persistence.OneToMany;
 @Entity
 public class ENullCollection {
 
-    @Id
-    Integer id;
-    
-    @OneToMany(cascade=CascadeType.PERSIST)
-    List<ENullCollectionDetail> details;
-    
-    public ENullCollection() {
-    }
+  @Id
+  Integer id;
 
-    public Integer getId() {
-        return id;
-    }
+  String name;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  @OneToMany(cascade = CascadeType.PERSIST)
+  List<ENullCollectionDetail> details;
 
-    public List<ENullCollectionDetail> getDetails() {
-        return details;
-    }
+  public ENullCollection() {
+  }
 
-    public void setDetails(List<ENullCollectionDetail> details) {
-        this.details = details;
-    }
+  public Integer getId() {
+    return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public List<ENullCollectionDetail> getDetails() {
+    return details;
+  }
+
+  public void setDetails(List<ENullCollectionDetail> details) {
+    this.details = details;
+  }
 }

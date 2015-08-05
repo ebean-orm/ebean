@@ -7,13 +7,15 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 
+import java.util.Random;
+
 public class TestMediaInheritanceJoinToMany extends BaseTestCase {
 
   @Test
   public void test() {
     
     
-    String name = "nopic";
+    String name = "nopic"+new Random().nextInt();
     
     MProfile profileWithNoPic = new MProfile();
     profileWithNoPic.setName(name);

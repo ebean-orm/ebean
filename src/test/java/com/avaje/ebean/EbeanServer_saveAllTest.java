@@ -10,7 +10,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class EbeanServer_saveAllTest {
+public class EbeanServer_saveAllTest extends BaseTestCase {
 
   @Test
   public void saveAll() {
@@ -24,7 +24,8 @@ public class EbeanServer_saveAllTest {
     // assert
     List<String> loggedSql = LoggedSqlCollector.stop();
     for (String insertSql : loggedSql) {
-      assertThat(insertSql).contains("insert into e_basicver (id, name, description, other, last_update) values (");
+      assertThat(insertSql).contains("insert into e_basicver (");
+      assertThat(insertSql).contains("name, description, other, last_update) values (");
     }
 
     for (EBasicVer someBean : someBeans) {
@@ -72,7 +73,8 @@ public class EbeanServer_saveAllTest {
     // assert
     List<String> loggedSql = LoggedSqlCollector.stop();
     for (String insertSql : loggedSql) {
-      assertThat(insertSql).contains("insert into e_basicver (id, name, description, other, last_update) values (");
+      assertThat(insertSql).contains("insert into e_basicver (");
+      assertThat(insertSql).contains("name, description, other, last_update) values (");
     }
 
     for (EBasicVer someBean : someBeans) {

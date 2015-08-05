@@ -11,8 +11,7 @@ public class DdlNamingConventionTest {
   @Test
   public void testPrimaryKeyName() throws Exception {
 
-    String[] cols = {"[jim]","`jack`"};
-    assertThat(defaultNaming.primaryKeyName("[cat].[sce].[foo_bar]", cols)).isEqualTo("pk_foo_bar");
+    assertThat(defaultNaming.primaryKeyName("[cat].[sce].[foo_bar]")).isEqualTo("pk_foo_bar");
   }
 
   @Test
@@ -30,9 +29,9 @@ public class DdlNamingConventionTest {
   @Test
   public void testNormalise() throws Exception {
 
-    assertThat(defaultNaming.normalise("cat.sch.foo_bar]")).isEqualTo("foo_bar");
-    assertThat(defaultNaming.normalise("sch.foo_bar]")).isEqualTo("foo_bar");
-    assertThat(defaultNaming.normalise("foo_bar]")).isEqualTo("foo_bar");
+    assertThat(defaultNaming.normaliseTable("cat.sch.foo_bar]")).isEqualTo("foo_bar");
+    assertThat(defaultNaming.normaliseTable("sch.foo_bar]")).isEqualTo("foo_bar");
+    assertThat(defaultNaming.normaliseTable("foo_bar]")).isEqualTo("foo_bar");
   }
 
 }

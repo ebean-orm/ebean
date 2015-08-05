@@ -1,5 +1,6 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
+import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
 
 /**
@@ -7,10 +8,9 @@ import com.avaje.ebean.config.dbplatform.DbTypeMap;
  */
 public class H2Ddl extends PlatformDdl {
 
-  public H2Ddl(DbTypeMap platformTypes, boolean useSequences) {
-    super(platformTypes, new H2HistoryDdl());
-    this.foreignKeyRestrict = "on delete restrict on update restrict";
-    this.useSequences = useSequences;
+  public H2Ddl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
+    super(platformTypes, dbIdentity);
+    this.historyDdl = new H2HistoryDdl();
   }
 
 }

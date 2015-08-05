@@ -30,6 +30,14 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 		return deployEmbedded;
 	}
 
+  /**
+   * Return true if this has multiple properties (expected for embedded id).
+   */
+  public boolean isCompound() {
+    // just checking for compound and not doing numeric check at this stage
+    return getDeployEmbedded().getPropertyColumnMap().size() > 1;
+  }
+
 	@Override
     public String getDbColumn() {
 		DeployTableJoinColumn[] columns = tableJoin.columns();

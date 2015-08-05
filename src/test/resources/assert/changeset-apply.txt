@@ -190,14 +190,13 @@ create table ckey_parent (
   version                       integer not null,
   constraint pk_ckey_parent primary key (one_key,two_key)
 );
-create sequence ckey_parent_seq;
 
 create table calculation_result (
-  ID                            integer not null,
+  id                            integer not null,
   charge                        double,
-  product_configuration_ID      integer,
-  group_configuration_ID        integer,
-  constraint pk_calculation_result primary key (ID)
+  product_configuration_id      integer,
+  group_configuration_id        integer,
+  constraint pk_calculation_result primary key (id)
 );
 create sequence calculation_result_seq;
 
@@ -208,7 +207,6 @@ create table cao_bean (
   version                       bigint not null,
   constraint pk_cao_bean primary key (x_cust_id,x_type_id)
 );
-create sequence cao_bean_seq;
 
 create table sa_car (
   id                            bigint not null,
@@ -243,18 +241,19 @@ create sequence car_accessory_seq;
 
 create table configuration (
   type                          varchar(31) not null,
-  ID                            integer not null,
+  id                            integer not null,
   name                          varchar(255),
-  configurations_ID             integer,
+  configurations_id             integer,
   group_name                    varchar(255),
   product_name                  varchar(255),
-  constraint pk_configuration primary key (ID)
+  constraint pk_configuration primary key (id)
 );
 create sequence configuration_seq;
 
 create table configurations (
-  ID                            integer not null,
-  constraint pk_configurations primary key (ID)
+  id                            integer not null,
+  name                          varchar(255),
+  constraint pk_configurations primary key (id)
 );
 create sequence configurations_seq;
 
@@ -413,8 +412,8 @@ create table e_basicenc_bin (
   id                            integer not null,
   name                          varchar(255),
   description                   varchar(255),
-  data                          blob,
-  some_time                     timestamp,
+  data                          longvarbinary,
+  some_time                     varbinary(255),
   last_update                   timestamp not null,
   constraint pk_e_basicenc_bin primary key (id)
 );
@@ -446,6 +445,15 @@ create table ebasic_json_map_blob (
   constraint pk_ebasic_json_map_blob primary key (id)
 );
 create sequence ebasic_json_map_blob_seq;
+
+create table ebasic_json_map_clob (
+  id                            bigint not null,
+  name                          varchar(255),
+  content                       clob,
+  version                       bigint not null,
+  constraint pk_ebasic_json_map_clob primary key (id)
+);
+create sequence ebasic_json_map_clob_seq;
 
 create table ebasic_json_map_json_b (
   id                            bigint not null,
@@ -605,6 +613,7 @@ create sequence e_main_seq;
 
 create table enull_collection (
   id                            integer not null,
+  name                          varchar(255),
   constraint pk_enull_collection primary key (id)
 );
 create sequence enull_collection_seq;
@@ -662,10 +671,11 @@ create table eperson (
 create sequence eperson_seq;
 
 create table esimple (
-  usertypeid                    integer not null,
+  usertypeid                    integer auto not null,
   name                          varchar(255),
   constraint pk_esimple primary key (usertypeid)
 );
+create sequence esimple_seq;
 
 create table esome_type (
   id                            integer not null,
@@ -685,6 +695,7 @@ create sequence etrans_many_seq;
 
 create table evanilla_collection (
   id                            integer not null,
+  name                          varchar(255),
   constraint pk_evanilla_collection primary key (id)
 );
 create sequence evanilla_collection_seq;
@@ -763,6 +774,7 @@ create table gen_key_identity (
   description                   varchar(255),
   constraint pk_gen_key_identity primary key (id)
 );
+create sequence gen_key_identity_seq;
 
 create table gen_key_sequence (
   id                            bigint not null,
@@ -859,7 +871,7 @@ create table drel_invoice (
 create sequence drel_invoice_seq;
 
 create table item (
-  customer                      integer,
+  customer                      integer not null,
   itemNumber                    varchar(255) not null,
   description                   varchar(255),
   units                         varchar(255),
@@ -870,9 +882,8 @@ create table item (
   MODIFIED_BY                   varchar(255),
   CREATED_BY                    varchar(255),
   version                       bigint not null,
-  constraint pk_item primary key (itemNumber)
+  constraint pk_item primary key (customer,itemNumber)
 );
-create sequence item_seq;
 
 create table level1 (
   id                            bigint not null,
@@ -1267,10 +1278,10 @@ create table paggview (
 
 create table pallet_location (
   type                          varchar(31) not null,
-  ID                            integer not null,
+  id                            integer not null,
   ZONE_SID                      integer not null,
   attribute                     varchar(255),
-  constraint pk_pallet_location primary key (ID)
+  constraint pk_pallet_location primary key (id)
 );
 create sequence pallet_location_seq;
 
@@ -1352,7 +1363,7 @@ create table PERSONS (
   NAME                          varchar(64) not null,
   constraint pk_persons primary key (ID)
 );
-create sequence PERSONS_seq start with 1000 increment by 40;
+create seq;
 
 create table person (
   oid                           bigint not null,
@@ -1369,7 +1380,7 @@ create table PHONES (
   constraint uq_phones_phone_number unique (PHONE_NUMBER),
   constraint pk_phones primary key (ID)
 );
-create sequence PHONES_seq;
+create sequence phones_seq;
 
 create table o_product (
   id                            integer not null,
@@ -1400,16 +1411,14 @@ create table rcustomer (
   description                   varchar(255),
   constraint pk_rcustomer primary key (company,name)
 );
-create sequence rcustomer_seq;
 
 create table r_orders (
-  company                       varchar(255),
+  company                       varchar(255) not null,
   order_number                  integer not null,
   customerName                  varchar(255),
   item                          varchar(255),
-  constraint pk_r_orders primary key (order_number)
+  constraint pk_r_orders primary key (company,order_number)
 );
-create sequence r_orders_seq;
 
 create table region (
   customer                      integer not null,
@@ -1418,7 +1427,6 @@ create table region (
   version                       bigint not null,
   constraint pk_region primary key (customer,type)
 );
-create sequence region_seq;
 
 create table ResourceFile (
   id                            varchar(64) not null,
@@ -1426,7 +1434,7 @@ create table ResourceFile (
   name                          varchar(128) not null,
   constraint pk_resourcefile primary key (id)
 );
-create sequence ResourceFile_seq;
+create sequence resourcefile_seq;
 
 create table mt_role (
   id                            binary(16) not null,
@@ -1731,7 +1739,6 @@ create table type (
   version                       bigint not null,
   constraint pk_type primary key (customer,type)
 );
-create sequence type_seq;
 
 create table ut_detail (
   id                            integer not null,
@@ -1807,9 +1814,9 @@ create sequence oto_user_seq;
 
 create table em_user_role (
   user_id                       bigint not null,
-  role_id                       bigint not null
+  role_id                       bigint not null,
+  constraint pk_em_user_role primary key (user_id,role_id)
 );
-create sequence em_user_role_seq;
 
 create table vehicle (
   dtype                         varchar(3) not null,
@@ -1841,9 +1848,9 @@ create table vehicle_driver (
 create sequence vehicle_driver_seq;
 
 create table warehouses (
-  ID                            integer not null,
+  id                            integer not null,
   officeZoneId                  integer,
-  constraint pk_warehouses primary key (ID)
+  constraint pk_warehouses primary key (id)
 );
 create sequence warehouses_seq;
 
@@ -1887,6 +1894,7 @@ create sequence with_zero_seq;
 
 create table parent (
   id                            integer not null,
+  name                          varchar(255),
   constraint pk_parent primary key (id)
 );
 create sequence parent_seq;
@@ -1900,9 +1908,9 @@ create table wview (
 
 create table zones (
   type                          varchar(31) not null,
-  ID                            integer not null,
+  id                            integer not null,
   attribute                     varchar(255),
-  constraint pk_zones primary key (ID)
+  constraint pk_zones primary key (id)
 );
 create sequence zones_seq;
 

@@ -74,6 +74,11 @@ public class DeployBeanDescriptor<T> {
   private IdType idType;
 
   /**
+   * Set to true if the identity is default for the platform.
+   */
+  private boolean idTypePlatformDefault;
+
+  /**
    * The name of an IdGenerator (optional).
    */
   private String idGeneratorName;
@@ -546,6 +551,20 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
+   * Set when the identity type is the platform default.
+   */
+  public void setIdTypePlatformDefault() {
+    this.idTypePlatformDefault = true;
+  }
+
+  /**
+   * Return true when the identity is the platform default.
+   */
+  public boolean isIdTypePlatformDefault() {
+    return idTypePlatformDefault;
+  }
+
+  /**
    * Return the DB sequence name (can be null).
    */
   public String getSequenceName() {
@@ -683,6 +702,25 @@ public class DeployBeanDescriptor<T> {
       }
     }
     return Collections.unmodifiableSet(set);
+  }
+
+  /**
+   * Return true if the primary key is a compound key or if it's database type
+   * is non-numeric (and hence not suitable for db identity or sequence.
+   */
+  public boolean isPrimaryKeyCompoundOrNonNumeric() {
+
+    List<DeployBeanProperty> ids = propertiesId();
+    if (ids.size() != 1) {
+      // compound key
+      return true;
+    }
+    DeployBeanProperty p = ids.get(0);
+    if (p instanceof DeployBeanPropertyAssocOne<?>) {
+      return ((DeployBeanPropertyAssocOne<?>)p).isCompound();
+    } else {
+      return !p.isDbNumberType();
+    }
   }
 
   /**

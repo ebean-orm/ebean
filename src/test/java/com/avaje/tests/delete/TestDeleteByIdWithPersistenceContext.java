@@ -17,7 +17,10 @@ public class TestDeleteByIdWithPersistenceContext extends BaseTestCase {
   public void test() {
     
     ResetBasicData.reset();
-    
+
+    Ebean.delete(Product.class, 100);
+    Ebean.delete(Product.class, 101);
+
     EbeanServer server = Ebean.getServer(null);
     Product prod1 = createProduct(100,"apples");
     server.insert(prod1);

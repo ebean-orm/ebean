@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Table(name="warehouses")
 public class Warehouse {
 	@Id
-	@Column(name="ID")
+	@Column(name="id")
 	private Integer id;
 	
 	@ManyToOne//(optional = false) //todo: should this be nullable with assertions made?

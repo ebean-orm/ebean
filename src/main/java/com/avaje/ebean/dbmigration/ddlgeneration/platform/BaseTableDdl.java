@@ -1,5 +1,6 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
+import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.TableDdl;
@@ -34,15 +35,25 @@ public class BaseTableDdl implements TableDdl {
   @Override
   public void generate(DdlWrite writer, CreateTable createTable) throws IOException {
 
-    String tableName = createTable.getName();
+    String tableName = lowerName(createTable.getName());
     List<Column> columns = createTable.getColumn();
     List<Column> pk = determinePrimaryKeyColumns(columns);
+
+    boolean singleColumnPrimaryKey = pk.size() == 1;
+    boolean useIdentity = false;
+    boolean useSequence = false;
+
+    if (singleColumnPrimaryKey) {
+      IdType useDbIdentityType = platformDdl.useIdentityType(createTable.getIdentityType());
+      useIdentity = (IdType.IDENTITY == useDbIdentityType);
+      useSequence = (IdType.SEQUENCE == useDbIdentityType);
+    }
 
     DdlBuffer apply = writer.apply();
     apply.append("create table ").append(tableName).append(" (");
     for (int i = 0; i < columns.size(); i++) {
       apply.newLine();
-      writeColumnDefinition(apply, columns.get(i));
+      writeColumnDefinition(apply, columns.get(i), useIdentity);
       if (i < columns.size() - 1) {
         apply.append(",");
       }
@@ -62,7 +73,9 @@ public class BaseTableDdl implements TableDdl {
     // we drop the related sequence (if sequences are used)
     dropTable(writer.rollback(), tableName);
 
-    writeSequence(writer, createTable);
+    if (useSequence) {
+      writeSequence(writer, createTable);
+    }
 
     // add blank line for a bit of whitespace between tables
     apply.end();
@@ -77,14 +90,17 @@ public class BaseTableDdl implements TableDdl {
   }
 
   private void writeSequence(DdlWrite writer, CreateTable createTable) throws IOException {
-    String name = createTable.getSequenceName();
+
+    // explicit sequence use or platform decides
+    String explicitSequenceName = createTable.getSequenceName();
     int initial = toInt(createTable.getSequenceInitial());
     int allocate = toInt(createTable.getSequenceAllocate());
 
-    String createSeq = platformDdl.createSequence(name, initial, allocate);
+    String seqName = namingConvention.sequenceName(createTable.getName(), explicitSequenceName);
+    String createSeq = platformDdl.createSequence(seqName, initial, allocate);
     if (createSeq != null) {
       writer.apply().append(createSeq).newLine();
-      writer.rollback().append(platformDdl.dropSequence(name));
+      writer.rollback().append(platformDdl.dropSequence(seqName)).endOfStatement();
     }
   }
 
@@ -144,6 +160,7 @@ public class BaseTableDdl implements TableDdl {
 
   protected void writeForeignKey(DdlWrite write, String fkName, String tableName, String[] columns, String refTable, String[] refColumns) throws IOException {
 
+    tableName = lowerName(tableName);
     DdlBuffer fkeyBuffer = write.applyForeignKeys();
     fkeyBuffer
         .append("alter table ").append(tableName)
@@ -152,7 +169,7 @@ public class BaseTableDdl implements TableDdl {
     appendColumns(columns, fkeyBuffer);
     fkeyBuffer
         .append(" references ")
-        .append(refTable);
+        .append(lowerName(refTable));
     appendColumns(refColumns, fkeyBuffer);
     fkeyBuffer.appendWithSpace(platformDdl.getForeignKeyRestrict())
         .endOfStatement();
@@ -183,7 +200,7 @@ public class BaseTableDdl implements TableDdl {
       if (i > 0) {
         buffer.append(",");
       }
-      buffer.append(columns[i].trim());
+      buffer.append(lowerName(columns[i].trim()));
     }
     buffer.append(")");
   }
@@ -194,7 +211,7 @@ public class BaseTableDdl implements TableDdl {
    */
   protected void dropTable(DdlBuffer buffer, String tableName) throws IOException {
 
-    buffer.append("drop table ").append(tableName).endOfStatement();
+    buffer.append(platformDdl.dropTable(tableName)).endOfStatement();
   }
 
   /**
@@ -250,7 +267,7 @@ public class BaseTableDdl implements TableDdl {
     buffer.append(",").newLine();
     buffer.append("  constraint ").append(uqName).append(" unique ");
     buffer.append("(");
-    buffer.append(column.getName());
+    buffer.append(lowerName(column.getName()));
     buffer.append(")");
   }
 
@@ -259,7 +276,7 @@ public class BaseTableDdl implements TableDdl {
    */
   protected void writePrimaryKeyConstraint(DdlBuffer buffer, String tableName, String[] pkColumns) throws IOException {
 
-    String pkName = determinePrimaryKeyName(tableName, pkColumns);
+    String pkName = determinePrimaryKeyName(tableName);
 
     buffer.append(",").newLine();
     buffer.append("  constraint ").append(pkName).append(" primary key");
@@ -272,7 +289,7 @@ public class BaseTableDdl implements TableDdl {
   public void alterTableAddPrimaryKey(DdlBuffer buffer, String tableName, List<Column> pk) throws IOException {
 
     String[] pkColumns = toColumnNames(pk);
-    String pkName = determinePrimaryKeyName(tableName, pkColumns);
+    String pkName = determinePrimaryKeyName(tableName);
 
     buffer.append("alter table ").append(tableName);
     buffer.append(" add primary key ").append(pkName);
@@ -300,14 +317,26 @@ public class BaseTableDdl implements TableDdl {
   }
 
   /**
+   * Convert the table or column name to lower case.
+   * <p>
+   * This is passed up to the platformDdl to override as desired.
+   * Generally lower case with underscore is a good cross database
+   * choice for column/table names.
+   */
+  protected String lowerName(String name) {
+    return platformDdl.lowerName(name);
+  }
+
+  /**
    * Write the column definition to the create table statement.
    */
-  protected void writeColumnDefinition(DdlBuffer buffer, Column column) throws IOException {
+  protected void writeColumnDefinition(DdlBuffer buffer, Column column, boolean useIdentity) throws IOException {
 
-    String platformType = convertToPlatformType(column.getType(), isTrue(column.isIdentity()));
+    boolean identityColumn = useIdentity && isTrue(column.isPrimaryKey());
+    String platformType = convertToPlatformType(column.getType(), identityColumn);
 
     buffer.append("  ");
-    buffer.append(column.getName(), 30);
+    buffer.append(lowerName(column.getName()), 30);
     buffer.append(platformType);
     if (isTrue(column.isNotnull()) || isTrue(column.isPrimaryKey())) {
       buffer.append(" not null");
@@ -330,9 +359,9 @@ public class BaseTableDdl implements TableDdl {
   /**
    * Return the primary key constraint name.
    */
-  protected String determinePrimaryKeyName(String tableName, String[] pkColumns) {
+  protected String determinePrimaryKeyName(String tableName) {
 
-    return namingConvention.primaryKeyName(tableName, pkColumns);
+    return namingConvention.primaryKeyName(tableName);
   }
 
   /**

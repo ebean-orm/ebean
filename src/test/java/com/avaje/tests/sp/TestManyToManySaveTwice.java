@@ -20,6 +20,9 @@ public class TestManyToManySaveTwice extends BaseTestCase {
   @Test
   public void testInsertCarTwice() {
 
+    Ebean.deleteAll(Ebean.find(Car.class).findList());
+    Ebean.deleteAll(Ebean.find(Wheel.class).findList());
+
     List<Wheel> wheels = new LinkedList<Wheel>();
     wheels.add(new Wheel());
     wheels.add(new Wheel());

@@ -4,4 +4,5 @@ create table foo (
   col3                          varchar(30) not null,
   constraint pk_foo primary key (col1)
 );
+create sequence foo_seq;
 

@@ -1,5 +1,6 @@
 package com.avaje.tests.rawsql;
 
+import com.avaje.tests.idkeys.db.AuditLog;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
@@ -11,7 +12,7 @@ public class TestInsertSqlLogging extends BaseTestCase {
   @Test
   public void test() {
 
-    // Ebean.getServer(null);
+    Ebean.delete(AuditLog.class, 10000);
 
     String sql = "insert into audit_log (id, description, modified_description) values (?,?,?)";
     SqlUpdate sqlUpdate = Ebean.createSqlUpdate(sql);

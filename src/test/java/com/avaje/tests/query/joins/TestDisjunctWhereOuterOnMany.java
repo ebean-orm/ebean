@@ -15,7 +15,10 @@ public class TestDisjunctWhereOuterOnMany extends BaseTestCase {
 
   @Test
   public void test() {
-    
+
+    Ebean.deleteAll(Ebean.find(UUTwo.class).select("id").findList());
+    Ebean.deleteAll(Ebean.find(UUOne.class).select("id").findList());
+
     // setup
     UUOne master1 = new UUOne();
     master1.setName("testDisjOuter_1_name");

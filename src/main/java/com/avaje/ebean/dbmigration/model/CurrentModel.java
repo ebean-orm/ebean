@@ -1,13 +1,8 @@
 package com.avaje.ebean.dbmigration.model;
 
-import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebean.config.dbplatform.DbTypeMap;
-import com.avaje.ebean.config.dbplatform.PostgresPlatform;
-import com.avaje.ebean.dbmigration.ddlgeneration.BaseDdlHandler;
+import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.DdlNamingConvention;
-import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
-import com.avaje.ebean.dbmigration.ddlgeneration.platform.PostgresDdl;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
 import com.avaje.ebean.dbmigration.migration.Migration;
 import com.avaje.ebean.dbmigration.migrationreader.MigrationXmlWriter;
@@ -98,7 +93,7 @@ public class CurrentModel {
 
     DdlWrite write = new DdlWrite();
 
-    BaseDdlHandler handler = handler();
+    DdlHandler handler = handler();
     handler.generate(write, changeSet);
 
     return write;
@@ -111,17 +106,14 @@ public class CurrentModel {
 
       write = new DdlWrite();
 
-      BaseDdlHandler handler = handler();
+      DdlHandler handler = handler();
       handler.generate(write, createChangeSet);
     }
   }
 
-  private BaseDdlHandler handler() {
+  private DdlHandler handler() {
 
-    DatabasePlatform databasePlatform = server.getDatabasePlatform();
-    PlatformDdl platformDdl = databasePlatform.getPlatformDdl();
-
-    return new BaseDdlHandler(namingConvention, platformDdl);
+    return server.getDatabasePlatform().createDdlHandler();
   }
 
   /**

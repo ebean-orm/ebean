@@ -39,11 +39,11 @@ drop sequence ckey_assoc_seq;
 drop table ckey_detail;
 drop sequence ckey_detail_seq;
 drop table ckey_parent;
-drop sequence ckey_parent_seq;
+
 drop table calculation_result;
 drop sequence calculation_result_seq;
 drop table cao_bean;
-drop sequence cao_bean_seq;
+
 drop table sa_car;
 drop sequence sa_car_seq;
 drop table sp_car_car;
@@ -183,7 +183,7 @@ drop sequence inner_report_seq;
 drop table drel_invoice;
 drop sequence drel_invoice_seq;
 drop table item;
-drop sequence item_seq;
+
 drop table level1;
 drop sequence level1_seq;
 drop table level1_level4;
@@ -299,7 +299,7 @@ drop sequence PERSONS_seq;
 drop table person;
 drop sequence person_seq;
 drop table PHONES;
-drop sequence PHONES_seq;
+drop sequence phones_seq;
 drop table o_product;
 drop sequence o_product_seq;
 drop table pp;
@@ -307,13 +307,13 @@ drop table pp;
 drop table pp_to_ww;
 
 drop table rcustomer;
-drop sequence rcustomer_seq;
+
 drop table r_orders;
-drop sequence r_orders_seq;
+
 drop table region;
-drop sequence region_seq;
+
 drop table ResourceFile;
-drop sequence ResourceFile_seq;
+drop sequence resourcefile_seq;
 drop table mt_role;
 
 drop table mt_role_permission;
@@ -381,7 +381,7 @@ drop sequence trip_seq;
 drop table truck_ref;
 drop sequence truck_ref_seq;
 drop table type;
-drop sequence type_seq;
+
 drop table ut_detail;
 drop sequence ut_detail_seq;
 drop table ut_master;
@@ -399,7 +399,7 @@ drop sequence c_user_seq;
 drop table oto_user;
 drop sequence oto_user_seq;
 drop table em_user_role;
-drop sequence em_user_role_seq;
+
 drop table vehicle;
 drop sequence vehicle_seq;
 drop table vehicle_driver;

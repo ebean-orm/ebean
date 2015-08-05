@@ -100,6 +100,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   private final IdType idType;
 
+  private final boolean idTypePlatformDefault;
+
   private final IdGenerator idGenerator;
 
   /**
@@ -339,6 +341,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.defaultSelectClauseSet = deploy.parseDefaultSelectClause(defaultSelectClause);
 
     this.idType = deploy.getIdType();
+    this.idTypePlatformDefault = deploy.isIdTypePlatformDefault();
     this.idGenerator = deploy.getIdGenerator();
     this.sequenceName = deploy.getSequenceName();
     this.sequenceInitialValue = deploy.getSequenceInitialValue();
@@ -1675,6 +1678,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public IdType getIdType() {
     return idType;
+  }
+
+  /**
+   * Return true if the identity is the platform default (not explicitly set).
+   */
+  public boolean isIdTypePlatformDefault() {
+    return idTypePlatformDefault;
   }
 
   /**

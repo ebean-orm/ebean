@@ -11,30 +11,40 @@ import javax.persistence.OneToMany;
 @Entity
 public class EVanillaCollection {
 
-    @Id
-    Integer id;
-    
-    @OneToMany(cascade=CascadeType.PERSIST)
-    List<EVanillaCollectionDetail> details;
-    
-    public EVanillaCollection() {
-        details = new ArrayList<EVanillaCollectionDetail>();
-    }
+  @Id
+  Integer id;
 
-    public Integer getId() {
-        return id;
-    }
+  String name;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  @OneToMany(cascade = CascadeType.PERSIST)
+  List<EVanillaCollectionDetail> details;
 
-    public List<EVanillaCollectionDetail> getDetails() {
-        return details;
-    }
+  public EVanillaCollection() {
+    details = new ArrayList<EVanillaCollectionDetail>();
+  }
 
-    public void setDetails(List<EVanillaCollectionDetail> details) {
-        this.details = details;
-    }
-    
+  public Integer getId() {
+    return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public List<EVanillaCollectionDetail> getDetails() {
+    return details;
+  }
+
+  public void setDetails(List<EVanillaCollectionDetail> details) {
+    this.details = details;
+  }
+
 }

@@ -1,14 +1,13 @@
 package com.avaje.ebean.dbmigration.model.build;
 
-import com.avaje.ebean.dbmigration.migration.ForeignKey;
+import com.avaje.ebean.dbmigration.model.MColumn;
 import com.avaje.ebean.dbmigration.model.MCompoundForeignKey;
+import com.avaje.ebean.dbmigration.model.MTable;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.deploy.TableJoinColumn;
-import com.avaje.ebean.dbmigration.model.MColumn;
-import com.avaje.ebean.dbmigration.model.MTable;
 
 
 /**

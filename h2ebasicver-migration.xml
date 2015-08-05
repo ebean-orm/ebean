@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet>
-        <createTable name="e_basic">
+        <createTable name="e_basicver">
             <column primaryKey="true" identity="true" name="id" type="integer"/>
-            <column checkConstraint="check (status in ('N','A','I'))" name="status" type="varchar(1)"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
-            <column name="some_date" type="timestamp"/>
+            <column name="other" type="varchar(255)"/>
+            <column notnull="true" name="last_update" type="timestamp"/>
         </createTable>
     </changeSet>
 </migration>

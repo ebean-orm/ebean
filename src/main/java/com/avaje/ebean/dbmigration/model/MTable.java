@@ -4,7 +4,7 @@ import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.Column;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
-import com.avaje.ebean.dbmigration.migration.ForeignKey;
+import com.avaje.ebean.dbmigration.migration.IdentityType;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -15,16 +15,16 @@ import java.util.Map;
 /**
  * Holds the logical model for a given Table and everything associated to it.
  * <p>
- *   This effectively represents a table, its columns and all associated
- *   constraints, foreign keys and indexes.
+ * This effectively represents a table, its columns and all associated
+ * constraints, foreign keys and indexes.
  * </p>
  * <p>
- *   Migrations can be applied to this such that it represents the state
- *   of a given table after various migrations have been applied.
+ * Migrations can be applied to this such that it represents the state
+ * of a given table after various migrations have been applied.
  * </p>
  * <p>
- *   This table model can also be derived from the EbeanServer bean descriptor
- *   and associated properties.
+ * This table model can also be derived from the EbeanServer bean descriptor
+ * and associated properties.
  * </p>
  */
 public class MTable {
@@ -41,17 +41,25 @@ public class MTable {
   private String tablespace;
 
   private String indexTablespace;
+
+  /**
+   * If set then this overrides the platform default so for UUID generated values
+   * or DB's supporting both sequences and autoincrement.
+   */
+  private IdentityType identityType;
+
   private String sequenceName;
   private int sequenceInitial;
   private int sequenceAllocate;
 
   private Boolean withHistory;
 
-  private Map<String,MColumn> columns = new LinkedHashMap<String,MColumn>();
+  private Map<String, MColumn> columns = new LinkedHashMap<String, MColumn>();
 
   private List<MCompoundUniqueConstraint> compoundUniqueConstraints = new ArrayList<MCompoundUniqueConstraint>();
 
   private List<MCompoundForeignKey> compoundKeys = new ArrayList<MCompoundForeignKey>();
+
   /**
    * Construct for migration.
    */
@@ -89,6 +97,7 @@ public class MTable {
     createTable.setSequenceName(sequenceName);
     createTable.setSequenceInitial(toBigInteger(sequenceInitial));
     createTable.setSequenceAllocate(toBigInteger(sequenceAllocate));
+    createTable.setIdentityType(identityType);
 
     for (MColumn column : this.columns.values()) {
       createTable.getColumn().add(column.createColumn());
@@ -184,6 +193,26 @@ public class MTable {
   }
 
   /**
+   * Set the identity type to use for this table.
+   * <p>
+   * If set then this overrides the platform default so for UUID generated values
+   * or DB's supporting both sequences and autoincrement.
+   */
+  public void setIdentityType(IdentityType identityType) {
+    this.identityType = identityType;
+  }
+
+  /**
+   * Returns the identity type to use for this table.
+   * <p>
+   * If set then this overrides the platform default so for UUID generated values
+   * or DB's supporting both sequences and autoincrement.
+   */
+  public IdentityType getIdentityType() {
+    return identityType;
+  }
+
+  /**
    * Return the list of columns that make the primary key.
    */
   public List<MColumn> primaryKeyColumns() {
@@ -198,7 +227,7 @@ public class MTable {
 
   private void checkTableName(String tableName) {
     if (!name.equals(tableName)) {
-      throw new IllegalArgumentException("addColumn tableName ["+tableName+"] does not match ["+name+"]");
+      throw new IllegalArgumentException("addColumn tableName [" + tableName + "] does not match [" + name + "]");
     }
   }
 
@@ -220,7 +249,7 @@ public class MTable {
    * Add a compound unique constraint.
    */
   public void addCompoundUniqueConstraint(String[] columns) {
-   compoundUniqueConstraints.add(new MCompoundUniqueConstraint(columns));
+    compoundUniqueConstraints.add(new MCompoundUniqueConstraint(columns));
   }
 
   /**

@@ -5,13 +5,15 @@ import org.junit.Test;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 
+import java.util.Random;
+
 public class TestTruckCarWheelInhertiance extends BaseTestCase {
 
   @Test
   public void test() {
 
     TTruck truck = new TTruck();
-    truck.setPlateNo("foo");
+    truck.setPlateNo("foo-"+new Random().nextInt());
 
     TWheel wheel = new TWheel();
     wheel.setOwner(truck);

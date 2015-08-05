@@ -1,7 +1,7 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
 
-import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.config.dbplatform.H2Platform;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.Helper;
 import com.avaje.ebean.dbmigration.migration.Column;
@@ -18,10 +18,9 @@ public class BaseTableDdlTest {
   @Test
   public void testGenerate() throws Exception {
 
-    BaseTableDdl ddlGen = new BaseTableDdl(new DdlNamingConvention(), new H2Ddl(new DbTypeMap(), true));
+    BaseTableDdl ddlGen = new BaseTableDdl(new DdlNamingConvention(), new H2Platform().getPlatformDdl());
 
     DdlWrite write = new DdlWrite();
-
 
     ddlGen.generate(write, createTable());
     String apply = write.apply().getBuffer();
@@ -30,12 +29,10 @@ public class BaseTableDdlTest {
     String rollbackFirst = write.rollbackForeignKeys().getBuffer();
     String rollbackLast = write.rollback().getBuffer();
 
-    assertThat(apply).isEqualTo( Helper.asText(this, "/assert/BaseTableDdlTest/createTable-apply.txt"));
-    assertThat(applyLast).isEqualTo( Helper.asText(this, "/assert/BaseTableDdlTest/createTable-applyLast.txt"));
-    assertThat(rollbackFirst).isEqualTo( Helper.asText(this, "/assert/BaseTableDdlTest/createTable-rollbackFirst.txt"));
-    assertThat(rollbackLast).isEqualTo( Helper.asText(this, "/assert/BaseTableDdlTest/createTable-rollback.txt"));
-
-
+    assertThat(apply).isEqualTo(Helper.asText(this, "/assert/BaseTableDdlTest/createTable-apply.txt"));
+    assertThat(applyLast).isEqualTo(Helper.asText(this, "/assert/BaseTableDdlTest/createTable-applyLast.txt"));
+    assertThat(rollbackFirst).isEqualTo(Helper.asText(this, "/assert/BaseTableDdlTest/createTable-rollbackFirst.txt"));
+    assertThat(rollbackLast).isEqualTo(Helper.asText(this, "/assert/BaseTableDdlTest/createTable-rollback.txt"));
   }
 
   private CreateTable createTable() {

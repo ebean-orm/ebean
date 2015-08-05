@@ -13,8 +13,6 @@ public class H2Platform extends DatabasePlatform {
   public H2Platform() {
     super();
     this.name = "h2";
-    boolean useSequences = true;
-    this.platformDdl = new H2Ddl(this.dbTypeMap, useSequences);
     this.dbEncrypt = new H2DbEncrypt();
     // like ? escape'' not working in the latest version H2 so just using no
     // escape clause for now noting that backslash is an escape char for like in H2
@@ -26,6 +24,8 @@ public class H2Platform extends DatabasePlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
     this.dbIdentity.setSupportsIdentity(true);
+
+    this.platformDdl = new H2Ddl(this.dbTypeMap, dbIdentity);
 
     this.openQuote = "\"";
     this.closeQuote = "\"";

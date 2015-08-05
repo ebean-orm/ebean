@@ -1,5 +1,6 @@
 package com.avaje.ebean.event;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.bean.BeanCollection;
@@ -14,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class BeanFindControllerTest {
+public class BeanFindControllerTest extends BaseTestCase {
 
   @Test
   public void test() {
@@ -23,6 +24,8 @@ public class BeanFindControllerTest {
 
     config.setName("h2other");
     config.loadFromProperties();
+    config.setDdlGenerate(true);
+    config.setDdlRun(true);
     config.setRegister(false);
     config.setDefaultServer(false);
     config.getClasses().add(EBasic.class);

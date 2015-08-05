@@ -14,7 +14,7 @@ import javax.persistence.ManyToOne;
 @DiscriminatorColumn(name="type", discriminatorType=DiscriminatorType.STRING)
 public class Configuration extends AbstractBaseClass{
 	@Id
-	@Column(name="ID")
+	@Column(name="id")
 	private Integer id;
 	
 	
