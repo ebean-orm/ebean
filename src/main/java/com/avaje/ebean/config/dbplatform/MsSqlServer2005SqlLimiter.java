@@ -31,10 +31,11 @@ public class MsSqlServer2005SqlLimiter implements SqlLimiter {
 
     if (firstRow < 1) {
       // just use top n
-      sb.append(" select top ").append(lastRow).append(" ");
+      sb.append(" select ");
       if (request.isDistinct()) {
         sb.append("distinct ");
       }
+      sb.append(" top ").append(lastRow).append(" ");
       sb.append(request.getDbSql());
       return new SqlLimitResponse(sb.toString(), false);
     }
