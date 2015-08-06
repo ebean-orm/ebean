@@ -1,5 +1,14 @@
 package com.avaje.ebeaninternal.server.ddl;
 
+import com.avaje.ebean.Transaction;
+import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.dbmigration.model.CurrentModel;
+import com.avaje.ebeaninternal.api.SpiEbeanPlugin;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -13,19 +22,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.PersistenceException;
-
-import com.avaje.ebean.dbmigration.model.CurrentModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.avaje.ebean.Transaction;
-import com.avaje.ebean.config.NamingConvention;
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebeaninternal.api.SpiEbeanPlugin;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
-
 /**
  * Controls the generation of DDL and potentially runs the resulting scripts.
  */
@@ -35,8 +31,6 @@ public class DdlGenerator implements SpiEbeanPlugin {
 
   private SpiEbeanServer server;
 
-  private DatabasePlatform dbPlatform;
-
   private boolean generateDdl;
   private boolean runDdl;
 
@@ -44,14 +38,10 @@ public class DdlGenerator implements SpiEbeanPlugin {
   private String dropContent;
   private String createContent;
 
-  private NamingConvention namingConvention;
-
-  public void setup(SpiEbeanServer server, DatabasePlatform dbPlatform, ServerConfig serverConfig) {
+  public void setup(SpiEbeanServer server, ServerConfig serverConfig) {
     this.server = server;
-    this.dbPlatform = dbPlatform;
     this.generateDdl = serverConfig.isDdlGenerate();
     this.runDdl = serverConfig.isDdlRun();
-    this.namingConvention = serverConfig.getNamingConvention();
   }
 
   /**
@@ -134,25 +124,8 @@ public class DdlGenerator implements SpiEbeanPlugin {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-//    DdlGenContext ctx = createContext();
-//
-//    if (ctx.getDdlSyntax().isDropKeyConstraints()) {
-//      // generate drop foreign key constraint statements (sql server joy)
-//      AddForeignKeysVisitor fkeys = new AddForeignKeysVisitor(false, ctx);
-//      VisitorUtil.visit(server, fkeys);
-//      ctx.writeNewLine();
-//    }
-//
-//    DropTableVisitor drop = new DropTableVisitor(ctx);
-//    VisitorUtil.visit(server, drop);
-//
-//    DropSequenceVisitor dropSequence = new DropSequenceVisitor(ctx);
-//    VisitorUtil.visit(server, dropSequence);
-//
-//    ctx.flush();
-//    dropContent = ctx.getContent();
-//    return dropContent;
   }
+
   public void writeMigration(File file) {
 
     currentModel().writeMigration(file);
@@ -166,22 +139,6 @@ public class DdlGenerator implements SpiEbeanPlugin {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-//    DdlGenContext ctx = createContext();
-//    CreateTableVisitor create = new CreateTableVisitor(ctx);
-//    VisitorUtil.visit(server, create);
-//
-//    CreateSequenceVisitor createSequence = new CreateSequenceVisitor(ctx);
-//    VisitorUtil.visit(server, createSequence);
-//
-//    AddForeignKeysVisitor fkeys = new AddForeignKeysVisitor(true, ctx);
-//    VisitorUtil.visit(server, fkeys);
-//
-//    CreateIndexVisitor indexes = new CreateIndexVisitor(ctx);
-//    VisitorUtil.visit(server, indexes);
-//
-//    ctx.flush();
-//    createContent = ctx.getContent();
-//    return createContent;
   }
 
   protected String getDropFileName() {
@@ -191,12 +148,6 @@ public class DdlGenerator implements SpiEbeanPlugin {
   protected String getCreateFileName() {
     return server.getName() + "-create.sql";
   }
-
-  protected DdlGenContext createContext() {
-    return new DdlGenContext(dbPlatform, namingConvention);
-  }
-
-
 
   protected CurrentModel currentModel() {
     if (currentModel == null) {

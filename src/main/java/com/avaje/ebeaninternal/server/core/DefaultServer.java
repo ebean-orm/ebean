@@ -249,7 +249,7 @@ public final class DefaultServer implements SpiEbeanServer {
 
     for (SpiEbeanPlugin plugin : ServiceLoader.load(SpiEbeanPlugin.class)) {
       spiPlugins.add(plugin);
-      plugin.setup(this, this.getDatabasePlatform(), config);
+      plugin.setup(this, config);
 
       if (plugin instanceof DdlGenerator) {
         // backwards compatible
@@ -261,7 +261,7 @@ public final class DefaultServer implements SpiEbeanServer {
       // ServiceLoader not finding ddlGenerator (typically OSGi) 
       ddlGenerator = new DdlGenerator();
       spiPlugins.add(ddlGenerator);
-      ddlGenerator.setup(this, this.getDatabasePlatform(), config);
+      ddlGenerator.setup(this, config);
     }
 
     ebeanPlugins = Collections.unmodifiableList(spiPlugins);
