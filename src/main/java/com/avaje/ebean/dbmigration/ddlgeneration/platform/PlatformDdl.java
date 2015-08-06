@@ -79,8 +79,8 @@ public class PlatformDdl {
   /**
    * Return the drop foreign key clause.
    */
-  public String dropForeignKeyConstraint(String fkName) {
-    return "drop constraint "+fkName;
+  public String alterTableDropForeignKey(String tableName, String fkName) {
+    return "alter table " + tableName + " drop constraint " + fkName;
   }
 
   /**
@@ -132,6 +132,13 @@ public class PlatformDdl {
   }
 
   /**
+   * Return the drop index statement.
+   */
+  public String dropIndex(String indexName, String tableName) {
+    return "drop index "+indexName;
+  }
+
+  /**
    * Support lower naming tables and columns in DDL generation.
    * Tables/Columns with quoted identifiers are exempt.
    */
@@ -148,4 +155,6 @@ public class PlatformDdl {
   public int getMaxTableNameLength() {
     return namingConvention.getMaxTableNameLength();
   }
+
+
 }

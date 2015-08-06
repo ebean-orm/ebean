@@ -215,16 +215,15 @@ public class BaseTableDdl implements TableDdl {
 
     fkeyBuffer.end();
 
+    write.rollbackForeignKeys()
+        .append(platformDdl.alterTableDropForeignKey(tableName, fkName))
+        .endOfStatement();
+
     if (addIndex) {
       write.rollbackForeignKeys()
-          .append("drop index ").append(indexName)
+          .append(platformDdl.dropIndex(indexName, tableName))
           .endOfStatement();
     }
-
-    write.rollbackForeignKeys()
-        .append("alter table ").append(tableName).append(" ")
-        .append(platformDdl.dropForeignKeyConstraint(fkName))
-        .endOfStatement();
 
     write.rollbackForeignKeys().end();
 

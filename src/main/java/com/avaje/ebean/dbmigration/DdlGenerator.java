@@ -254,7 +254,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
         stmt = stmt.substring(0, stmt.length() - 1);
       }
 
-      logger.trace("executing " + oneOf + " " + getSummary(stmt));
+      logger.info("executing " + oneOf + " " + getSummary(stmt));
 
       pstmt = c.prepareStatement(stmt);
       pstmt.execute();

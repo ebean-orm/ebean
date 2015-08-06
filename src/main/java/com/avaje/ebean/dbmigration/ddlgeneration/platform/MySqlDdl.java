@@ -13,9 +13,19 @@ public class MySqlDdl extends PlatformDdl {
     this.namingConvention.maxConstraintNameLength = 64;
   }
 
-
+  /**
+   * Return the drop index statement.
+   */
   @Override
-  public String dropForeignKeyConstraint(String fkName) {
-    return "drop foreign key " + fkName;
+  public String dropIndex(String indexName, String tableName) {
+    return "drop index " + indexName + " on " + tableName;
   }
+
+  /**
+   * Return the drop foreign key clause.
+   */
+  public String alterTableDropForeignKey(String tableName, String fkName) {
+    return "alter table " + tableName + " drop foreign key " + fkName;
+  }
+
 }
