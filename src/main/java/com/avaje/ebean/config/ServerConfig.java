@@ -198,11 +198,6 @@ public class ServerConfig {
   private ExternalTransactionManager externalTransactionManager;
 
   /**
-   * Used to unwrap PreparedStatements to perform JDBC Driver specific functions
-   */
-  private PstmtDelegate pstmtDelegate;
-
-  /** 
    * The data source (if programmatically provided). 
    */
   private DataSource dataSource;
@@ -973,24 +968,6 @@ public class ServerConfig {
    */
   public void setAutofetchConfig(AutofetchConfig autofetchConfig) {
     this.autofetchConfig = autofetchConfig;
-  }
-
-  /**
-   * Return the PreparedStatementDelegate.
-   */
-  public PstmtDelegate getPstmtDelegate() {
-    return pstmtDelegate;
-  }
-
-  /**
-   * Set the PstmtDelegate which can be used to support JDBC driver specific
-   * features.
-   * <p>
-   * Typically this means Oracle JDBC driver specific workarounds.
-   * </p>
-   */
-  public void setPstmtDelegate(PstmtDelegate pstmtDelegate) {
-    this.pstmtDelegate = pstmtDelegate;
   }
 
   /**

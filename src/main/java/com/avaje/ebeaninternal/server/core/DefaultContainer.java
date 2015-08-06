@@ -8,7 +8,6 @@ import com.avaje.ebean.common.SpiContainer;
 import com.avaje.ebean.config.ContainerConfig;
 import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.PropertyMap;
-import com.avaje.ebean.config.PstmtDelegate;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.UnderscoreNamingConvention;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
@@ -17,7 +16,6 @@ import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.cache.DefaultServerCacheFactory;
 import com.avaje.ebeaninternal.server.cache.DefaultServerCacheManager;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
-import com.avaje.ebeaninternal.server.jdbc.StandardPstmtDelegate;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourceAlert;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
@@ -173,16 +171,6 @@ public class DefaultContainer implements SpiContainer {
       server.start();
       return server;
     }
-  }
-
-  private PstmtDelegate getOraclePstmtDelegate(DataSource ds) {
-
-    if (ds instanceof DataSourcePool) {
-      // Using Ebean's own DataSource implementation
-      return new StandardPstmtDelegate();
-    }
-
-    return null;
   }
 
   /**
