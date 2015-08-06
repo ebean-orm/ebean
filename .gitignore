@@ -9,6 +9,7 @@ logs/
 log/
 /db
 /mydb.db
+!src/test/ddl-review/*.sql
 
 
 # Intellij project files
