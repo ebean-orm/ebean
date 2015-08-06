@@ -70,7 +70,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
 
   @Test
-  public void test_countInBackground_withLoadRowCount() {
+  public void test_countInBackground_withLoadRowCount() throws InterruptedException {
 
     ResetBasicData.reset();
 
@@ -78,6 +78,10 @@ public class TestQueryFindPagedList extends BaseTestCase {
     PagedList<Order> pagedList = Ebean.find(Order.class).findPagedList(0, 3);
 
     LoggedSqlCollector.start();
+    // sleep a little to give the logger registration time
+    // as sometimes the first query executes too fast to
+    // be captured in this multithreaded test
+    Thread.sleep(10);
 
     pagedList.loadRowCount();
     List<Order> orders = pagedList.getList();
