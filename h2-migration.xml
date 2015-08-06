@@ -108,8 +108,8 @@
         </createTable>
         <createTable name="drel_booking" identityType="SEQUENCE" sequenceName="drel_booking_seq">
             <column primaryKey="true" identity="true" name="id" type="bigint"/>
-            <column unique="true" references="drel_invoice.id" name="agent_invoice" type="bigint"/>
-            <column unique="true" references="drel_invoice.id" name="client_invoice" type="bigint"/>
+            <column uniqueOneToOne="true" references="drel_invoice.id" name="agent_invoice" type="bigint"/>
+            <column uniqueOneToOne="true" references="drel_invoice.id" name="client_invoice" type="bigint"/>
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="ckey_assoc">
@@ -578,13 +578,13 @@
         <createTable name="info_customer">
             <column primaryKey="true" identity="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
-            <column unique="true" references="info_company.id" name="company_id" type="bigint"/>
+            <column uniqueOneToOne="true" references="info_company.id" name="company_id" type="bigint"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="inner_report">
             <column primaryKey="true" identity="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
-            <column unique="true" references="stockforecast.id" name="forecast_id" type="bigint"/>
+            <column uniqueOneToOne="true" references="stockforecast.id" name="forecast_id" type="bigint"/>
         </createTable>
         <createTable name="drel_invoice" identityType="SEQUENCE" sequenceName="drel_invoice_seq">
             <column primaryKey="true" identity="true" name="id" type="bigint"/>
@@ -670,10 +670,10 @@
             <column name="name" type="varchar(255)"/>
             <column notnull="true" name="flags" type="bigint"/>
             <column references="mprinter_state.id" name="current_state_id" type="bigint"/>
-            <column unique="true" references="mprinter_state.id" name="last_swap_cyan_id" type="bigint"/>
-            <column unique="true" references="mprinter_state.id" name="last_swap_magenta_id" type="bigint"/>
-            <column unique="true" references="mprinter_state.id" name="last_swap_yellow_id" type="bigint"/>
-            <column unique="true" references="mprinter_state.id" name="last_swap_black_id" type="bigint"/>
+            <column uniqueOneToOne="true" references="mprinter_state.id" name="last_swap_cyan_id" type="bigint"/>
+            <column uniqueOneToOne="true" references="mprinter_state.id" name="last_swap_magenta_id" type="bigint"/>
+            <column uniqueOneToOne="true" references="mprinter_state.id" name="last_swap_yellow_id" type="bigint"/>
+            <column uniqueOneToOne="true" references="mprinter_state.id" name="last_swap_black_id" type="bigint"/>
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="mprinter_state">
@@ -798,14 +798,14 @@
         <createTable name="oengine" identityType="GENERATOR">
             <column primaryKey="true" identity="true" name="engine_id" type="binary(16)"/>
             <column name="short_desc" type="varchar(255)"/>
-            <column unique="true" references="ocar.id" name="car_id" type="integer"/>
+            <column uniqueOneToOne="true" references="ocar.id" name="car_id" type="integer"/>
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="ogear_box" identityType="GENERATOR">
             <column primaryKey="true" identity="true" name="id" type="binary(16)"/>
             <column name="box_desc" type="varchar(255)"/>
             <column name="box_size" type="integer"/>
-            <column unique="true" references="ocar.id" name="car_id" type="integer"/>
+            <column uniqueOneToOne="true" references="ocar.id" name="car_id" type="integer"/>
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="o_order">
@@ -848,7 +848,7 @@
         <createTable name="oto_child">
             <column primaryKey="true" identity="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
-            <column unique="true" references="oto_master.id" name="master_id" type="bigint"/>
+            <column uniqueOneToOne="true" references="oto_master.id" name="master_id" type="bigint"/>
         </createTable>
         <createTable name="oto_master">
             <column primaryKey="true" identity="true" name="id" type="bigint"/>
@@ -857,8 +857,8 @@
         <createTable name="pfile">
             <column primaryKey="true" identity="true" name="id" type="integer"/>
             <column name="name" type="varchar(255)"/>
-            <column unique="true" references="pfile_content.id" name="file_content_id" type="integer"/>
-            <column unique="true" references="pfile_content.id" name="file_content2_id" type="integer"/>
+            <column uniqueOneToOne="true" references="pfile_content.id" name="file_content_id" type="integer"/>
+            <column uniqueOneToOne="true" references="pfile_content.id" name="file_content2_id" type="integer"/>
             <column notnull="true" name="cretime" type="timestamp"/>
             <column notnull="true" name="updtime" type="timestamp"/>
             <column notnull="true" name="version" type="bigint"/>
@@ -871,7 +871,7 @@
             <column notnull="true" name="version" type="bigint"/>
         </createTable>
         <createTable name="paggview" identityType="SEQUENCE">
-            <column unique="true" references="pp.id" name="pview_id" type="binary(16)"/>
+            <column uniqueOneToOne="true" references="pp.id" name="pview_id" type="binary(16)"/>
             <column notnull="true" name="amount" type="integer"/>
         </createTable>
         <createTable name="pallet_location">
@@ -887,7 +887,7 @@
         <createTable name="parcel_location">
             <column primaryKey="true" identity="true" name="parcelLocId" type="bigint"/>
             <column name="location" type="varchar(255)"/>
-            <column unique="true" references="parcel.parcelId" name="parcelId" type="bigint"/>
+            <column uniqueOneToOne="true" references="parcel.parcelId" name="parcelId" type="bigint"/>
         </createTable>
         <createTable name="rawinherit_parent">
             <column notnull="true" name="type" type="varchar(31)"/>
@@ -923,7 +923,7 @@
         </createTable>
         <createTable name="persistent_file_content">
             <column primaryKey="true" identity="true" name="id" type="integer"/>
-            <column unique="true" references="persistent_file.id" name="persistent_file_id" type="integer"/>
+            <column uniqueOneToOne="true" references="persistent_file.id" name="persistent_file_id" type="integer"/>
             <column name="content" type="blob"/>
             <column notnull="true" name="cretime" type="timestamp"/>
             <column notnull="true" name="updtime" type="timestamp"/>
@@ -1003,7 +1003,7 @@
         </createTable>
         <createTable name="f_second">
             <column primaryKey="true" identity="true" name="id" type="bigint"/>
-            <column unique="true" references="f_first.id" name="first" type="bigint"/>
+            <column uniqueOneToOne="true" references="f_first.id" name="first" type="bigint"/>
             <column name="title" type="varchar(255)"/>
         </createTable>
         <createTable name="section">
@@ -1164,7 +1164,7 @@
         </createTable>
         <createTable name="tire" identityType="SEQUENCE" sequenceName="tire_seq">
             <column primaryKey="true" identity="true" name="id" type="bigint"/>
-            <column unique="true" references="wheel.id" name="wheel" type="bigint"/>
+            <column uniqueOneToOne="true" references="wheel.id" name="wheel" type="bigint"/>
             <column notnull="true" name="version" type="integer"/>
         </createTable>
         <createTable name="trip">
@@ -1232,7 +1232,7 @@
         <createTable name="oto_user">
             <column primaryKey="true" identity="true" name="id" type="bigint"/>
             <column name="name" type="varchar(255)"/>
-            <column notnull="true" unique="true" references="oto_account.id" name="account_id" type="bigint"/>
+            <column notnull="true" uniqueOneToOne="true" references="oto_account.id" name="account_id" type="bigint"/>
             <column notnull="true" name="version" type="bigint"/>
             <column notnull="true" name="when_created" type="timestamp"/>
             <column notnull="true" name="when_modified" type="timestamp"/>
