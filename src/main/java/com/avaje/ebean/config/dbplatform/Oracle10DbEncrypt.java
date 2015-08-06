@@ -55,13 +55,13 @@ public class Oracle10DbEncrypt extends AbstractDbEncrypt {
   /**
    * Constructs the Oracle10DbEncrypt specifying encrypt and decrypt stored procedures.
    *
-   * @param encryptfunction the encrypt stored procedure
-   * @param decryptfunction the decrypt stored procedure
+   * @param encryptFunction the encrypt stored procedure
+   * @param decryptFunction the decrypt stored procedure
    */
-  public Oracle10DbEncrypt(String encryptfunction, String decryptfunction) {
+  public Oracle10DbEncrypt(String encryptFunction, String decryptFunction) {
 
-    this.varcharEncryptFunction = new OraVarcharFunction(encryptfunction, decryptfunction);
-    this.dateEncryptFunction = new OraDateFunction(encryptfunction, decryptfunction);
+    this.varcharEncryptFunction = new OraVarcharFunction(encryptFunction, decryptFunction);
+    this.dateEncryptFunction = new OraDateFunction(encryptFunction, decryptFunction);
   }
 
   /**
