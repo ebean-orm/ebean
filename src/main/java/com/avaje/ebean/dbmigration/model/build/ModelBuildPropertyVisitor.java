@@ -115,14 +115,13 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       modelColumns.add(col);
     }
 
-
-
     if (p.isOneToOne()) {
-      // Adding the unique constraint restricts the cardinality from OneToMany down to OneToOne
+      // adding the unique constraint restricts the cardinality from OneToMany down to OneToOne
+      // for MsSqlServer we need different DDL to handle NULL values on this constraint
       if (modelColumns.size() == 1) {
-        modelColumns.get(0).setUnique(true);
+        modelColumns.get(0).setUniqueOneToOne(true);
       } else {
-        table.addCompoundUniqueConstraint(modelColumns);
+        table.addCompoundUniqueConstraint(modelColumns, true);
       }
     }
   }

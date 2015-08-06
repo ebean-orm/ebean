@@ -42,6 +42,8 @@ public class Column {
     protected String checkConstraint;
     @XmlAttribute(name = "unique")
     protected Boolean unique;
+    @XmlAttribute(name = "uniqueOneToOne")
+    protected Boolean uniqueOneToOne;
     @XmlAttribute(name = "primaryKey")
     protected Boolean primaryKey;
     @XmlAttribute(name = "identity")
@@ -151,6 +153,30 @@ public class Column {
      */
     public void setUnique(Boolean value) {
         this.unique = value;
+    }
+
+    /**
+     * Gets the value of the uniqueOneToOne property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isUniqueOneToOne() {
+        return uniqueOneToOne;
+    }
+
+    /**
+     * Sets the value of the uniqueOneToOne property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setUniqueOneToOne(Boolean value) {
+        this.uniqueOneToOne = value;
     }
 
     /**

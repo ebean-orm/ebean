@@ -18,6 +18,8 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
   @Test
   public void test() {
 
+    if (isMsSqlServer()) return;
+
     LoggedSqlCollector.start();
     Transaction txn = Ebean.beginTransaction();
     try {

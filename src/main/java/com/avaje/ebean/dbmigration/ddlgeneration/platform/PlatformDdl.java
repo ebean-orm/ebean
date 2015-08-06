@@ -47,6 +47,10 @@ public class PlatformDdl {
 
   protected String identitySuffix = " auto_increment";
 
+  /**
+   * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
+   */
+  protected boolean inlineUniqueOneToOne = true;
 
   public PlatformDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
     this.dbIdentity = dbIdentity;
@@ -157,4 +161,19 @@ public class PlatformDdl {
   }
 
 
+  /**
+   * Return true if unique constraints for OneToOne can be inlined as normal.
+   * Returns false for MsSqlServer due to it's null handling for unique constraints.
+   */
+  public boolean isInlineUniqueOneToOne() {
+    return inlineUniqueOneToOne;
+  }
+
+  /**
+   * Overridden by MsSqlServer for specific null handling on unique constraints.
+   */
+  public String createExternalUniqueForOneToOne(String uqName, String tableName, String[] columns) {
+    // does nothing by default, really this is a MsSqlServer specific requirement
+    return "";
+  }
 }

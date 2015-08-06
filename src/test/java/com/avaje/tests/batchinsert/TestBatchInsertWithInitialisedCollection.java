@@ -18,6 +18,8 @@ public class TestBatchInsertWithInitialisedCollection extends BaseTestCase {
   @Test
   public void test() {
 
+    if (isMsSqlServer()) return;
+
     List<OCachedBean> list = new ArrayList();
 
     for (int i = 0; i < 3; i++) {

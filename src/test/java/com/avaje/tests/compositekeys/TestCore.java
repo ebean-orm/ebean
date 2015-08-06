@@ -22,141 +22,147 @@ import com.avaje.tests.lib.EbeanTestCase;
  * <li>find</li>
  * </ul>
  */
-public class TestCore extends EbeanTestCase
-{
-	//private boolean setup;
+public class TestCore extends EbeanTestCase {
 
-    @Override
-    public void setUp() throws Exception
-    {
-		Ebean.createUpdate(Item.class, "delete from Item").execute();
-		Ebean.createUpdate(Region.class, "delete from Region").execute();
-		Ebean.createUpdate(Type.class, "delete from Type").execute();
-		Ebean.createUpdate(SubType.class, "delete from SubType").execute();
+  @Override
+  public void setUp() throws Exception {
+    if (isMsSqlServer()) return;
 
-        Transaction tx = getServer().beginTransaction();
+    Ebean.createUpdate(Item.class, "delete from Item").execute();
+    Ebean.createUpdate(Region.class, "delete from Region").execute();
+    Ebean.createUpdate(Type.class, "delete from Type").execute();
+    Ebean.createUpdate(SubType.class, "delete from SubType").execute();
 
-		SubType subType = new SubType();
-		SubTypeKey subTypeKey = new SubTypeKey();
-		subTypeKey.setSubTypeId(1);
-		subType.setKey(subTypeKey);
-		subType.setDescription("ANY SUBTYPE");
-		getServer().save(subType);
+    Transaction tx = getServer().beginTransaction();
 
-        Type type = new Type();
-        TypeKey typeKey = new TypeKey();
-        typeKey.setCustomer(1);
-        typeKey.setType(10);
-        type.setKey(typeKey);
-        type.setDescription("Type Old-Item - Customer 1");
-		type.setSubType(subType);
-        getServer().save(type);
+    SubType subType = new SubType();
+    SubTypeKey subTypeKey = new SubTypeKey();
+    subTypeKey.setSubTypeId(1);
+    subType.setKey(subTypeKey);
+    subType.setDescription("ANY SUBTYPE");
+    getServer().save(subType);
 
-        type = new Type();
-        typeKey = new TypeKey();
-        typeKey.setCustomer(2);
-        typeKey.setType(10);
-        type.setKey(typeKey);
-        type.setDescription("Type Old-Item - Customer 2");
-		type.setSubType(subType);
-        getServer().save(type);
+    Type type = new Type();
+    TypeKey typeKey = new TypeKey();
+    typeKey.setCustomer(1);
+    typeKey.setType(10);
+    type.setKey(typeKey);
+    type.setDescription("Type Old-Item - Customer 1");
+    type.setSubType(subType);
+    getServer().save(type);
 
-        Region region = new Region();
-        RegionKey regionKey = new RegionKey();
-        regionKey.setCustomer(1);
-        regionKey.setType(500);
-        region.setKey(regionKey);
-        region.setDescription("Region West - Customer 1");
-        getServer().save(region);
+    type = new Type();
+    typeKey = new TypeKey();
+    typeKey.setCustomer(2);
+    typeKey.setType(10);
+    type.setKey(typeKey);
+    type.setDescription("Type Old-Item - Customer 2");
+    type.setSubType(subType);
+    getServer().save(type);
 
-        region = new Region();
-        regionKey = new RegionKey();
-        regionKey.setCustomer(2);
-        regionKey.setType(500);
-        region.setKey(regionKey);
-        region.setDescription("Region West - Customer 2");
-        getServer().save(region);
+    Region region = new Region();
+    RegionKey regionKey = new RegionKey();
+    regionKey.setCustomer(1);
+    regionKey.setType(500);
+    region.setKey(regionKey);
+    region.setDescription("Region West - Customer 1");
+    getServer().save(region);
 
-        Item item = new Item();
-        ItemKey itemKey = new ItemKey();
-        itemKey.setCustomer(1);
-        itemKey.setItemNumber("ITEM1");
-        item.setKey(itemKey);
-		item.setUnits("P");
-        item.setDescription("Fancy Car - Customer 1");
-        item.setRegion(500);
-        item.setType(10);
-        getServer().save(item);
+    region = new Region();
+    regionKey = new RegionKey();
+    regionKey.setCustomer(2);
+    regionKey.setType(500);
+    region.setKey(regionKey);
+    region.setDescription("Region West - Customer 2");
+    getServer().save(region);
 
-        item = new Item();
-        itemKey = new ItemKey();
-        itemKey.setCustomer(2);
-        itemKey.setItemNumber("ITEM1");
-        item.setKey(itemKey);
-		item.setUnits("P");
-        item.setDescription("Another Fancy Car - Customer 2");
-        item.setRegion(500);
-        item.setType(10);
-        getServer().save(item);
+    Item item = new Item();
+    ItemKey itemKey = new ItemKey();
+    itemKey.setCustomer(1);
+    itemKey.setItemNumber("ITEM1");
+    item.setKey(itemKey);
+    item.setUnits("P");
+    item.setDescription("Fancy Car - Customer 1");
+    item.setRegion(500);
+    item.setType(10);
+    getServer().save(item);
 
-        tx.commit();
-    }
+    item = new Item();
+    itemKey = new ItemKey();
+    itemKey.setCustomer(2);
+    itemKey.setItemNumber("ITEM1");
+    item.setKey(itemKey);
+    item.setUnits("P");
+    item.setDescription("Another Fancy Car - Customer 2");
+    item.setRegion(500);
+    item.setType(10);
+    getServer().save(item);
 
-    public void testFind()
-    {
-        List<Item> items = getServer().find(Item.class).findList();
+    tx.commit();
+  }
 
-        assertNotNull(items);
-        assertEquals(2, items.size());
+  public void testFind() {
+    if (isMsSqlServer()) return;
 
-        Query<Item> qItems = getServer().find(Item.class);
+    List<Item> items = getServer().find(Item.class).findList();
+
+    assertNotNull(items);
+    assertEquals(2, items.size());
+
+    Query<Item> qItems = getServer().find(Item.class);
 //        qItems.where(Expr.eq("key.customer", Integer.valueOf(1)));
-        
-        // I want to discourage the direct use of Expr
-        qItems.where().eq("key.customer", Integer.valueOf(1));
-        items = qItems.findList();
 
-        assertNotNull(items);
-        assertEquals(1, items.size());
-    }
+    // I want to discourage the direct use of Expr
+    qItems.where().eq("key.customer", Integer.valueOf(1));
+    items = qItems.findList();
 
-	/**
-	 * This partially loads the item and then lazy loads the ManyToOne assoc
-	 */
-	public void testDoubleLazyLoad()
-	{
-		ItemKey itemKey = new ItemKey();
-		itemKey.setCustomer(2);
-		itemKey.setItemNumber("ITEM1");
-		
-		Item item = getServer().find(Item.class).select("description").where().idEq(itemKey).findUnique();
-		assertNotNull(item);
-		assertNotNull(item.getUnits());
-		assertEquals("P", item.getUnits());
+    assertNotNull(items);
+    assertEquals(1, items.size());
+  }
 
-		Type type = item.getEType();
-		assertNotNull(type);
-		assertNotNull(type.getDescription());
+  /**
+   * This partially loads the item and then lazy loads the ManyToOne assoc
+   */
+  public void testDoubleLazyLoad() {
 
-		SubType subType = type.getSubType();
-		assertNotNull(subType);
-		assertNotNull(subType.getDescription());
-	}
+    if (isMsSqlServer()) return;
 
-	public void testEmbeddedWithOrder()
-	{
-		List<Item> items = getServer().find(Item.class).order("auditInfo.created asc, type asc").findList();
+    ItemKey itemKey = new ItemKey();
+    itemKey.setCustomer(2);
+    itemKey.setItemNumber("ITEM1");
 
-		assertNotNull(items);
-		assertEquals(2, items.size());
-	}
-	
-	
-    public void testFindAndOrderByEType() {
-        
-        List<Item> items = getServer().find(Item.class).order("eType").findList();
+    Item item = getServer().find(Item.class).select("description").where().idEq(itemKey).findUnique();
+    assertNotNull(item);
+    assertNotNull(item.getUnits());
+    assertEquals("P", item.getUnits());
 
-        assertNotNull(items);
-        assertEquals(2, items.size());
-    }
+    Type type = item.getEType();
+    assertNotNull(type);
+    assertNotNull(type.getDescription());
+
+    SubType subType = type.getSubType();
+    assertNotNull(subType);
+    assertNotNull(subType.getDescription());
+  }
+
+  public void testEmbeddedWithOrder() {
+
+    if (isMsSqlServer()) return;
+
+    List<Item> items = getServer().find(Item.class).order("auditInfo.created asc, type asc").findList();
+
+    assertNotNull(items);
+    assertEquals(2, items.size());
+  }
+
+
+  public void testFindAndOrderByEType() {
+
+    if (isMsSqlServer()) return;
+
+    List<Item> items = getServer().find(Item.class).order("eType").findList();
+
+    assertNotNull(items);
+    assertEquals(2, items.size());
+  }
 }

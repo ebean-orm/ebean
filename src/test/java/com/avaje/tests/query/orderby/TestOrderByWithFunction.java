@@ -14,6 +14,8 @@ public class TestOrderByWithFunction extends BaseTestCase {
   @Test
   public void testWithFunction() {
 
+    if (isMsSqlServer()) return;
+
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class).order("length(name),name");

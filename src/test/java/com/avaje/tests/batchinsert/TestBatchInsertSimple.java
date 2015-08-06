@@ -27,6 +27,8 @@ public class TestBatchInsertSimple extends BaseTestCase {
       transaction.setBatch(PersistBatch.NONE);
       transaction.setBatchOnCascade(PersistBatch.INSERT);
       transaction.setBatchSize(30);
+      // setBatchGetGeneratedKeys MUST be turned off for MS SQL Server because :(
+      transaction.setBatchGetGeneratedKeys(false);
 
       for (int i = 0; i < numOfMasters; i++) {
         UTMaster master = createMasterAndDetails(i, 20);
@@ -42,6 +44,8 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
   @Test
   public void testTransactional() {
+
+    if (isMsSqlServer()) return;
 
     saveWithFullBatchMode();
   }
@@ -69,6 +73,8 @@ public class TestBatchInsertSimple extends BaseTestCase {
       transaction.setBatch(PersistBatch.NONE);
       transaction.setBatchOnCascade(PersistBatch.INSERT);
       transaction.setBatchSize(30);
+      // setBatchGetGeneratedKeys MUST be turned off for MS SQL Server because :(
+      transaction.setBatchGetGeneratedKeys(false);
 
       for (int i = 0; i < numOfMasters; i++) {
         UTMaster master = createMaster(i);
@@ -84,6 +90,9 @@ public class TestBatchInsertSimple extends BaseTestCase {
 
   @Test
   public void testJdbcBatchOnCollection() {
+
+    // MS SQL Server doesn't like batch inserts when we need getGeneratedKeys
+    if (isMsSqlServer()) return;
 
     int numOfMasters = 3;
 

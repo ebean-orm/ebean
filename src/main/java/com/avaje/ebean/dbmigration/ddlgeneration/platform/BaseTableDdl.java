@@ -29,6 +29,11 @@ public class BaseTableDdl implements TableDdl {
    */
   protected IndexSet indexSet = new IndexSet();
 
+  /**
+   * Used when unique constraints specifically for OneToOne can't be created normally (MsSqlServer).
+   */
+  protected IndexSet externalUnique = new IndexSet();
+
   // counters used when constraint names are truncated due to maximum length
   // and these counters are used to keep the constraint name unique
   protected int countCheck;
@@ -45,10 +50,11 @@ public class BaseTableDdl implements TableDdl {
   }
 
   /**
-   * Reset counters and index set for each table.
+   * Reset counters and index set for each table processed.
    */
   protected void reset() {
     indexSet.clear();
+    externalUnique.clear();
     countCheck = 0;
     countUnique = 0;
     countForeignKey = 0;
@@ -57,7 +63,7 @@ public class BaseTableDdl implements TableDdl {
 
   /**
    * Generate the appropriate 'create table' and matching 'drop table' statements
-   * and add them to the 'apply' and 'rollback' buffers.
+   * and add them to the appropriate 'apply' and 'rollback' buffers.
    */
   @Override
   public void generate(DdlWrite writer, CreateTable createTable) throws IOException {
@@ -98,6 +104,8 @@ public class BaseTableDdl implements TableDdl {
 
     apply.newLine().append(")").endOfStatement();
 
+    writeUniqueOneToOneConstraints(writer, createTable);
+
     // add drop table to the rollback buffer - do this before
     // we drop the related sequence (if sequences are used)
     dropTable(writer.rollback(), tableName);
@@ -116,6 +124,29 @@ public class BaseTableDdl implements TableDdl {
       createWithHistory(writer, createTable.getName());
     }
 
+  }
+
+  /**
+   * Specific handling of OneToOne unique constraints for MsSqlServer.
+   * For all other DB platforms these unique constraints are done inline as per normal.
+   */
+  private void writeUniqueOneToOneConstraints(DdlWrite write, CreateTable createTable) throws IOException {
+
+    String tableName = createTable.getName();
+    for (IndexColumns index : externalUnique.indexes) {
+      String uqName = determineUniqueConstraintName(tableName, index.joinedNames());
+      write.apply()
+          .append(platformDdl.createExternalUniqueForOneToOne(uqName, tableName, index.columnsArray()))
+          .endOfStatement();
+
+      // register it so we check against effective duplication
+      // when creating the foreign key indexes
+      indexSet.add(index);
+
+      write.rollbackForeignKeys()
+          .append(platformDdl.dropIndex(uqName, tableName))
+          .endOfStatement();
+    }
   }
 
   private void writeSequence(DdlWrite writer, CreateTable createTable) throws IOException {
@@ -231,7 +262,7 @@ public class BaseTableDdl implements TableDdl {
 
   private void appendColumns(String[] columns, DdlBuffer buffer) throws IOException {
     buffer.append(" (");
-    for (int i = 0; i <columns.length ; i++) {
+    for (int i = 0; i < columns.length; i++) {
       if (i > 0) {
         buffer.append(",");
       }
@@ -284,11 +315,17 @@ public class BaseTableDdl implements TableDdl {
    */
   protected void writeUniqueConstraints(DdlBuffer apply, CreateTable createTable) throws IOException {
 
+    boolean inlineUniqueOneToOne = platformDdl.isInlineUniqueOneToOne();
+
     List<Column> columns = createTable.getColumn();
     for (Column column : columns) {
-      if (isTrue(column.isUnique())) {
+      if (isTrue(column.isUnique()) || (inlineUniqueOneToOne && isTrue(column.isUniqueOneToOne()))) {
+        // normal mechanism for adding unique constraint
         inlineUniqueConstraintSingle(apply, createTable.getName(), column);
         indexSet.add(column);
+      } else if (!inlineUniqueOneToOne && isTrue(column.isUniqueOneToOne())) {
+        // MsSqlServer specific mechanism for adding unique constraints (that allow nulls)
+        externalUnique.add(column);
       }
     }
   }
@@ -459,7 +496,10 @@ public class BaseTableDdl implements TableDdl {
     return Boolean.TRUE.equals(value);
   }
 
-  private int toInt(BigInteger value) {
+  /**
+   * Return as an int value with 0 when it is null.
+   */
+  protected int toInt(BigInteger value) {
     return (value == null) ? 0 : value.intValue();
   }
 
@@ -497,13 +537,21 @@ public class BaseTableDdl implements TableDdl {
      */
     public boolean add(String[] columns) {
       IndexColumns newIndex = new IndexColumns(columns);
-      for (int i = 0; i <indexes.size() ; i++) {
+      for (int i = 0; i < indexes.size(); i++) {
         if (indexes.get(i).isMatch(newIndex)) {
           return false;
         }
       }
       indexes.add(newIndex);
       return true;
+    }
+
+    /**
+     * Add the externally created unique constraint here so that we check later if foreign key indexes
+     * don't need to be created (as the columns match this unique constraint).
+     */
+    public void add(IndexColumns index) {
+      indexes.add(index);
     }
   }
 
@@ -525,7 +573,7 @@ public class BaseTableDdl implements TableDdl {
      * Construct representing index.
      */
     public IndexColumns(String[] columnNames) {
-      for (int i = 0; i <columnNames.length; i++) {
+      for (int i = 0; i < columnNames.length; i++) {
         columns.add(columnNames[i]);
       }
     }
@@ -537,8 +585,36 @@ public class BaseTableDdl implements TableDdl {
       return columns.equals(other.columns);
     }
 
+    /**
+     * Add a unique index based on the single column.
+     */
     protected void add(String column) {
       columns.add(column);
+    }
+
+    /**
+     * Return the columns as a string array.
+     */
+    public String[] columnsArray() {
+      return columns.toArray(new String[columns.size()]);
+    }
+
+    /**
+     * Return the column names all joined with underscore.
+     */
+    public String joinedNames() {
+      if (columns.size() == 1) {
+        return columns.get(0);
+      } else {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < columns.size(); i++) {
+          if (i > 0) {
+            sb.append("_");
+          }
+          sb.append(columns.get(i));
+        }
+        return sb.toString();
+      }
     }
   }
 }

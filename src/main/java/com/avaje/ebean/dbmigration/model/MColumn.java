@@ -15,7 +15,14 @@ public class MColumn {
   private boolean notnull;
   private boolean primaryKey;
   private boolean identity;
+
   private boolean unique;
+
+  /**
+   * Special unique for OneToOne as we need to handle that different
+   * specifically for MsSqlServer.
+   */
+  private boolean uniqueOneToOne;
 
   public MColumn(Column column) {
     this.name = column.getName();
@@ -104,15 +111,31 @@ public class MColumn {
     return unique;
   }
 
+  /**
+   * Set unique specifically for OneToOne mapping.
+   * We need special DDL for this case for MsSqlServer.
+   */
+  public void setUniqueOneToOne(boolean uniqueOneToOne) {
+    this.uniqueOneToOne = uniqueOneToOne;
+  }
+
+  /**
+   * Return true if this is unique for a OneToOne.
+   */
+  public boolean isUniqueOneToOne() {
+    return uniqueOneToOne;
+  }
+
   public Column createColumn() {
 
     Column c = new Column();
     c.setName(name);
     c.setType(type);
-    if (notnull) c.setNotnull(notnull);
-    if (unique) c.setUnique(unique);
-    if (primaryKey) c.setPrimaryKey(primaryKey);
-    if (identity) c.setIdentity(identity);
+    if (notnull) c.setNotnull(true);
+    if (unique) c.setUnique(true);
+    if (uniqueOneToOne) c.setUniqueOneToOne(true);
+    if (primaryKey) c.setPrimaryKey(true);
+    if (identity) c.setIdentity(true);
 
     c.setCheckConstraint(checkConstraint);
     c.setReferences(references);

@@ -1,5 +1,6 @@
 package com.avaje.tests.lib;
 
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 
@@ -28,7 +29,16 @@ public abstract class EbeanTestCase extends TestCase {
 	}
 
 	public EbeanServer getServer() {
-		
 		return Ebean.getServer(null);
 	}
+
+  /**
+   * MS SQL Server does not allow setting explicit values on identity columns
+   * so tests that do this need to be skipped for SQL Server.
+   */
+  public boolean isMsSqlServer() {
+    SpiEbeanServer spi = (SpiEbeanServer)Ebean.getDefaultServer();
+    return spi.getDatabasePlatform().getName().startsWith("mssqlserver");
+  }
+
 }

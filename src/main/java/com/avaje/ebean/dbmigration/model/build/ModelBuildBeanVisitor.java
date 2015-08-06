@@ -3,34 +3,30 @@ package com.avaje.ebean.dbmigration.model.build;
 import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.dbmigration.migration.IdentityType;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-import com.avaje.ebeaninternal.server.deploy.CompoundUniqueContraint;
-import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebean.dbmigration.model.MColumn;
 import com.avaje.ebean.dbmigration.model.MTable;
 import com.avaje.ebean.dbmigration.model.visitor.BeanPropertyVisitor;
 import com.avaje.ebean.dbmigration.model.visitor.BeanVisitor;
-import com.avaje.ebeaninternal.server.type.ScalarType;
-
-import java.sql.Types;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.CompoundUniqueContraint;
+import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 
 /**
  * Used to build the Model objects MTable etc.
  */
 public class ModelBuildBeanVisitor implements BeanVisitor {
 
-	private final ModelBuildContext ctx;
+  private final ModelBuildContext ctx;
 
-	public ModelBuildBeanVisitor(ModelBuildContext ctx) {
-		this.ctx = ctx;
-	}
+  public ModelBuildBeanVisitor(ModelBuildContext ctx) {
+    this.ctx = ctx;
+  }
 
   /**
    * Return the PropertyVisitor used to read all the property meta data
    * and in this case add MColumn objects to the model.
    * <p>
-   *   This creates an MTable and adds it to the model.
+   * This creates an MTable and adds it to the model.
    * </p>
    */
   public BeanPropertyVisitor visitBean(BeanDescriptor<?> descriptor) {
@@ -59,7 +55,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
     CompoundUniqueContraint[] compoundUniqueConstraints = descriptor.getCompoundUniqueConstraints();
     if (compoundUniqueConstraints != null) {
       for (int i = 0; i < compoundUniqueConstraints.length; i++) {
-        table.addCompoundUniqueConstraint(compoundUniqueConstraints[i].getColumns());
+        table.addCompoundUniqueConstraint(compoundUniqueConstraints[i].getColumns(), false);
       }
     }
 
@@ -67,7 +63,6 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
   }
 
   private void setIdentity(BeanDescriptor<?> descriptor, MTable table) {
-
 
     if (IdType.GENERATOR == descriptor.getIdType()) {
       // explicit generator like UUID
@@ -94,20 +89,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
         table.setSequenceInitial(initialValue);
         table.setSequenceAllocate(allocationSize);
       }
-      return;
     }
-
-    BeanProperty idProperty = descriptor.getIdProperty();
-    if (idProperty != null) {
-      ScalarType<Object> scalarType = idProperty.getScalarType();
-      if (scalarType != null) {
-        int jdbcType = scalarType.getJdbcType();
-        if (jdbcType == Types.VARCHAR) {
-          System.out.println("asd");
-        }
-      }
-    }
-
   }
 
 }

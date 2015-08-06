@@ -248,19 +248,19 @@ public class MTable {
   /**
    * Add a compound unique constraint.
    */
-  public void addCompoundUniqueConstraint(String[] columns) {
-    compoundUniqueConstraints.add(new MCompoundUniqueConstraint(columns));
+  public void addCompoundUniqueConstraint(String[] columns, boolean oneToOne) {
+    compoundUniqueConstraints.add(new MCompoundUniqueConstraint(columns, oneToOne));
   }
 
   /**
    * Add a compound unique constraint.
    */
-  public void addCompoundUniqueConstraint(List<MColumn> columns) {
+  public void addCompoundUniqueConstraint(List<MColumn> columns, boolean oneToOne) {
     String[] cols = new String[columns.size()];
     for (int i = 0; i < columns.size(); i++) {
       cols[i] = columns.get(i).getName();
     }
-    addCompoundUniqueConstraint(cols);
+    addCompoundUniqueConstraint(cols, oneToOne);
   }
 
   public void addForeignKey(MCompoundForeignKey compoundKey) {

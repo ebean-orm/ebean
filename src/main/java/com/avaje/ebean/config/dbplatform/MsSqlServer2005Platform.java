@@ -23,6 +23,7 @@ public class MsSqlServer2005Platform extends DatabasePlatform {
     // due to lack of support for getGeneratedKeys in batch mode
     this.disallowBatchOnCascade = true;
     this.idInExpandedForm = true;
+    this.selectCountWithAlias = true;
     this.sqlLimiter = new MsSqlServer2005SqlLimiter();
     this.platformDdl = new MsSqlServerDdl(dbTypeMap, dbIdentity);
     this.dbIdentity.setIdType(IdType.IDENTITY);
@@ -46,9 +47,9 @@ public class MsSqlServer2005Platform extends DatabasePlatform {
     dbTypeMap.put(Types.LONGVARBINARY, new DbType("image"));
     dbTypeMap.put(Types.LONGVARCHAR, new DbType("text"));
 
-    dbTypeMap.put(Types.DATE, new DbType("datetime"));
-    dbTypeMap.put(Types.TIME, new DbType("datetime"));
-    dbTypeMap.put(Types.TIMESTAMP, new DbType("datetime"));
+    dbTypeMap.put(Types.DATE, new DbType("date"));
+    dbTypeMap.put(Types.TIME, new DbType("time"));
+    dbTypeMap.put(Types.TIMESTAMP, new DbType("datetime2"));
 
   }
 

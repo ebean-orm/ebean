@@ -10,15 +10,32 @@ package com.avaje.ebean.dbmigration.model;
 public class MCompoundUniqueConstraint {
 
   /**
+   * Flag if true indicates this was specifically created for a OneToOne mapping.
+   */
+  private final boolean oneToOne;
+
+  /**
    * The columns combined to be unique.
    */
   private final String[] columns;
 
-  public MCompoundUniqueConstraint(String[] columns) {
+  public MCompoundUniqueConstraint(String[] columns, boolean oneToOne) {
     this.columns = columns;
+    this.oneToOne = oneToOne;
   }
 
+  /**
+   * Return the columns for this unique constraint.
+   */
   public String[] getColumns() {
     return columns;
   }
+
+  /**
+   * Return true if this unqiue constraint is specifically for OneToOne mapping.
+   */
+  public boolean isOneToOne() {
+    return oneToOne;
+  }
+
 }
