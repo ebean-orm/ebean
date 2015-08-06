@@ -35,9 +35,6 @@ public abstract class AbstractNamingConvention implements NamingConvention {
   /** The database platform. */
   protected DatabasePlatform databasePlatform;
 
-  /** The max length of constraint names. */
-  protected int maxConstraintNameLength;
-
   /** Used to trim off extra prefix for M2M. */
   protected int rhsPrefixLength = 3;
 
@@ -71,9 +68,6 @@ public abstract class AbstractNamingConvention implements NamingConvention {
 
   public void setDatabasePlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
-    this.maxConstraintNameLength = databasePlatform.getDbDdlSyntax().getMaxConstraintNameLength();
-
-    logger.trace("Using maxConstraintNameLength of " + maxConstraintNameLength);
   }
 
   public String getSequenceName(String tableName, String pkColumn) {
@@ -218,11 +212,11 @@ public abstract class AbstractNamingConvention implements NamingConvention {
     }
     buffer.append(rhsTableName);
 
-    int maxConstraintNameLength = databasePlatform.getDbDdlSyntax().getMaxConstraintNameLength();
+    int maxTableNameLength = databasePlatform.getMaxTableNameLength();
 
     // maxConstraintNameLength is used as the max table name length.
-    if (buffer.length() > maxConstraintNameLength) {
-      buffer.setLength(maxConstraintNameLength);
+    if (buffer.length() > maxTableNameLength) {
+      buffer.setLength(maxTableNameLength);
     }
 
     return new TableName(lhsTable.getCatalog(), lhsTable.getSchema(), buffer.toString());

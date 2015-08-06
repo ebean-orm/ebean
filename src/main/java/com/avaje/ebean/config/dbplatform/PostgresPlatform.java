@@ -23,21 +23,18 @@ public class PostgresPlatform extends DatabasePlatform {
     this.onQueryOnly = OnQueryOnly.CLOSE;
     this.likeClause = "like ? escape''";
 
-    this.dbDdlSyntax = new PostgresDdlSyntax();
-
     this.selectCountWithAlias = true;
     this.blobDbType = Types.LONGVARBINARY;
     this.clobDbType = Types.VARCHAR;
 
     this.dbEncrypt = new PostgresDbEncrypt();
     this.historySupport = new PostgresHistorySupport();
+    this.platformDdl = new PostgresDdl(this.dbTypeMap, this.dbIdentity);
 
     // Use Identity and getGeneratedKeys
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
-
-    this.platformDdl = new PostgresDdl(this.dbTypeMap, this.dbIdentity);
 
     //this.columnAliasPrefix = "as c";
 
@@ -64,8 +61,6 @@ public class PostgresPlatform extends DatabasePlatform {
     dbTypeMap.put(Types.LONGVARBINARY, dbBytea);
     dbTypeMap.put(Types.LONGVARCHAR, dbTypeText);
 
-    dbDdlSyntax.setDropTableCascade("cascade");
-    dbDdlSyntax.setDropIfExists("if exists");
   }
 
   /**

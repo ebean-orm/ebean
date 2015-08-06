@@ -10,11 +10,12 @@ public class MySqlDdl extends PlatformDdl {
 
   public MySqlDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
     super(platformTypes, dbIdentity);
+    this.namingConvention.maxConstraintNameLength = 64;
   }
 
 
   @Override
   public String dropForeignKeyConstraint(String fkName) {
-    return "drop foreign key "+fkName;
+    return "drop foreign key " + fkName;
   }
 }

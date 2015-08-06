@@ -18,6 +18,7 @@ public class Oracle10Platform extends DatabasePlatform {
     this.onQueryOnly = OnQueryOnly.CLOSE;
     this.dbEncrypt = new Oracle10DbEncrypt();
     this.sqlLimiter = new RownumSqlLimiter();
+    this.platformDdl = new Oracle10Ddl(this.dbTypeMap, this.dbIdentity);
 
     // Not using getGeneratedKeys as instead we will
     // batch load sequences which enables JDBC batch execution
@@ -49,12 +50,6 @@ public class Oracle10Platform extends DatabasePlatform {
     dbTypeMap.put(Types.BINARY, new DbType("raw", 255));
 
     dbTypeMap.put(Types.TIME, new DbType("timestamp"));
-
-    dbDdlSyntax.setDropTableCascade("cascade constraints purge");
-    dbDdlSyntax.setIdentity(null);
-    dbDdlSyntax.setMaxConstraintNameLength(30);
-
-    this.platformDdl = new Oracle10Ddl(this.dbTypeMap, this.dbIdentity);
   }
 
   @Override

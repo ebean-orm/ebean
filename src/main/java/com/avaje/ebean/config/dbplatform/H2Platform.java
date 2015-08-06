@@ -14,9 +14,7 @@ public class H2Platform extends DatabasePlatform {
     super();
     this.name = "h2";
     this.dbEncrypt = new H2DbEncrypt();
-    // like ? escape'' not working in the latest version H2 so just using no
-    // escape clause for now noting that backslash is an escape char for like in H2
-    this.likeClause = "like ?";
+    this.platformDdl = new H2Ddl(this.dbTypeMap, dbIdentity);
 
     // only support getGeneratedKeys with non-batch JDBC
     // so generally use SEQUENCE instead of IDENTITY for H2
@@ -25,18 +23,12 @@ public class H2Platform extends DatabasePlatform {
     this.dbIdentity.setSupportsSequence(true);
     this.dbIdentity.setSupportsIdentity(true);
 
-    this.platformDdl = new H2Ddl(this.dbTypeMap, dbIdentity);
-
-    this.openQuote = "\"";
-    this.closeQuote = "\"";
+    // like ? escape'' not working in the latest version H2 so just using no
+    // escape clause for now noting that backslash is an escape char for like in H2
+    this.likeClause = "like ?";
 
     // H2 data types match default JDBC types
     // so no changes to dbTypeMap required
-
-    this.dbDdlSyntax.setDropIfExists("if exists");
-    this.dbDdlSyntax.setDisableReferentialIntegrity("SET REFERENTIAL_INTEGRITY FALSE");
-    this.dbDdlSyntax.setEnableReferentialIntegrity("SET REFERENTIAL_INTEGRITY TRUE");
-    this.dbDdlSyntax.setForeignKeySuffix("on delete restrict on update restrict");
   }
 
   /**

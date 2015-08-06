@@ -56,7 +56,7 @@ public class DdlNamingConvention {
       colPart = normaliseColumn(columns[0]);
     } else {
       StringBuilder sb = new StringBuilder();
-      for (int i = 0; i <columns.length; i++) {
+      for (int i = 0; i < columns.length; i++) {
         if (i > 0) {
           sb.append("_");
         }
@@ -97,6 +97,16 @@ public class DdlNamingConvention {
   }
 
   /**
+   * Return the maximum table name length.
+   * <p>
+   * This is used when deriving names of intersection tables.
+   * </p>
+   */
+  public int getMaxTableNameLength() {
+    return maxConstraintNameLength;
+  }
+
+  /**
    * Apply a maximum length to the constraint name.
    */
   protected String maxLength(String constraintName, int count) {
@@ -105,7 +115,7 @@ public class DdlNamingConvention {
     }
     // add the count to ensure the constraint name is unique
     // (relying on the prefix having the table name to be globally unique)
-    return constraintName.substring(0,maxConstraintNameLength-3)+"_"+count;
+    return constraintName.substring(0, maxConstraintNameLength - 3) + "_" + count;
   }
 
   /**

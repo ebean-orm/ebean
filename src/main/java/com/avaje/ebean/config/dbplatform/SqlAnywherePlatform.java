@@ -11,7 +11,6 @@ import java.sql.Types;
  * </ul>
  * </p>
  */
-
 public class SqlAnywherePlatform extends DatabasePlatform {
 
   public SqlAnywherePlatform() {

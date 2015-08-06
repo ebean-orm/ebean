@@ -1,5 +1,7 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.MsSqlServerDdl;
+
 import java.sql.Types;
 
 /**
@@ -22,7 +24,7 @@ public class MsSqlServer2005Platform extends DatabasePlatform {
     this.disallowBatchOnCascade = true;
     this.idInExpandedForm = true;
     this.sqlLimiter = new MsSqlServer2005SqlLimiter();
-    this.dbDdlSyntax = new MsDdlSyntax();
+    this.platformDdl = new MsSqlServerDdl(dbTypeMap, dbIdentity);
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);
@@ -47,32 +49,6 @@ public class MsSqlServer2005Platform extends DatabasePlatform {
     dbTypeMap.put(Types.DATE, new DbType("datetime"));
     dbTypeMap.put(Types.TIME, new DbType("datetime"));
     dbTypeMap.put(Types.TIMESTAMP, new DbType("datetime"));
-
-  }
-
-  /**
-   * MS SQL Server specific DDL Syntax.
-   */
-  public class MsDdlSyntax extends DbDdlSyntax {
-
-    MsDdlSyntax() {
-      this.identity = "identity(1,1)";
-      this.dropKeyConstraints = true;
-    }
-
-    /**
-     * Return some DDL to disable constraints on the given table.
-     */
-    public String dropKeyConstraintPrefix(String tableName, String fkName) {
-      return "IF OBJECT_ID('"+fkName+"', 'F') IS NOT NULL";
-    }
-
-    /**
-     * Return prefix text that goes before drop table.
-     */
-    public String dropTablePrefix(String tableName) {
-      return "IF OBJECT_ID('"+tableName+"', 'U') IS NOT NULL ";
-    }
 
   }
 

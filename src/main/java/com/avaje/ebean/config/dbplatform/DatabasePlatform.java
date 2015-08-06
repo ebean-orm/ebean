@@ -19,6 +19,7 @@ public class DatabasePlatform {
 
   private static final Logger logger = LoggerFactory.getLogger(DatabasePlatform.class);
 
+
   /**
    * Behavior used when ending a query only transaction (at read committed isolation level).
    */
@@ -72,12 +73,7 @@ public class DatabasePlatform {
    */
   protected DbTypeMap dbTypeMap = new DbTypeMap();
 
-  /** 
-   * DB specific DDL syntax. 
-   */
-  protected DbDdlSyntax dbDdlSyntax = new DbDdlSyntax();
-
-  /** 
+  /**
    * Defines DB identity/sequence features. 
    */
   protected DbIdentity dbIdentity = new DbIdentity();
@@ -161,17 +157,31 @@ public class DatabasePlatform {
    * "generic" is returned when no specific database platform has been set or
    * found.
    * </p>
-   * 
-   * @return the name
    */
   public String getName() {
     return name;
   }
 
+  /**
+   * Return the maximum table name length.
+   * <p>
+   * This is used when deriving names of intersection tables.
+   * </p>
+   */
+  public int getMaxTableNameLength() {
+    return platformDdl.getMaxTableNameLength();
+  }
+
+  /**
+   * Return the platform specific DDL.
+   */
   public PlatformDdl getPlatformDdl() {
     return platformDdl;
   }
 
+  /**
+   * Create and return a DDL handler for generating DDL scripts.
+   */
   public DdlHandler createDdlHandler() {
     return platformDdl.createDdlHandler();
   }
@@ -253,15 +263,6 @@ public class DatabasePlatform {
    */
   public DbTypeMap getDbTypeMap() {
     return dbTypeMap;
-  }
-
-  /**
-   * Return the DDL syntax for this platform.
-   * 
-   * @return the db ddl syntax
-   */
-  public DbDdlSyntax getDbDdlSyntax() {
-    return dbDdlSyntax;
   }
 
   /**
@@ -473,22 +474,4 @@ public class DatabasePlatform {
     return disallowBatchOnCascade;
   }
 
-  /**
-   * Generate and return the create sequence DDL.
-   */
-  public String ddlCreateSequence(String sequenceName, int initialValue, int allocationSize) {
-
-    StringBuilder sb = new StringBuilder("create sequence ");
-    sb.append(sequenceName);
-    if (initialValue > 1) {
-      sb.append(" start with ").append(initialValue);
-    }
-    if (allocationSize > 0 && allocationSize != 50) {
-      // at this stage ignoring allocationSize 50 as this is the 'default' and
-      // not consistent with the way Ebean batch fetches sequence values
-      sb.append(" increment by ").append(allocationSize);
-    }
-    sb.append(";");
-    return sb.toString();
-  }
 }

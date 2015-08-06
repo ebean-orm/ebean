@@ -46,11 +46,6 @@ public class MySqlPlatform extends DatabasePlatform {
     dbTypeMap.put(Types.BINARY, new DbType("binary", 255));
     dbTypeMap.put(Types.VARBINARY, new DbType("varbinary", 255));
 
-    dbDdlSyntax.setMaxConstraintNameLength(64);
-    dbDdlSyntax.setDisableReferentialIntegrity("SET FOREIGN_KEY_CHECKS=0");
-    dbDdlSyntax.setEnableReferentialIntegrity("SET FOREIGN_KEY_CHECKS=1");
-    dbDdlSyntax.setForeignKeySuffix("on delete restrict on update restrict");
-
   }
 
   /**

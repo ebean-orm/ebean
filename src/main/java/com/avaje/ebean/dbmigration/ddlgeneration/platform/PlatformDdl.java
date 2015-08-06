@@ -13,7 +13,7 @@ import com.avaje.ebean.dbmigration.model.MTable;
 import java.io.IOException;
 
 /**
- *
+ * Controls the DDL generation for a specific database platform.
  */
 public class PlatformDdl {
 
@@ -21,8 +21,14 @@ public class PlatformDdl {
 
   protected DdlNamingConvention namingConvention = new DdlNamingConvention();
 
+  /**
+   * Converter for logical/standard types to platform specific types. (eg. clob -> text)
+   */
   private final PlatformTypeConverter typeConverter;
 
+  /**
+   * For handling support of sequences and autoincrement.
+   */
   private final DbIdentity dbIdentity;
 
   /**
@@ -70,6 +76,9 @@ public class PlatformDdl {
     return foreignKeyRestrict;
   }
 
+  /**
+   * Return the drop foreign key clause.
+   */
   public String dropForeignKeyConstraint(String fkName) {
     return "drop constraint "+fkName;
   }
@@ -108,16 +117,35 @@ public class PlatformDdl {
     return sb.toString();
   }
 
+  /**
+   * Return the drop sequence statement (potentially with if exists clause).
+   */
   public String dropSequence(String sequenceName) {
     return dropSequenceIfExists + sequenceName;
   }
 
+  /**
+   * Return the drop table statement (potentially with if exists clause).
+   */
   public String dropTable(String tableName) {
     return dropTableIfExists + tableName + dropTableCascade;
   }
 
+  /**
+   * Support lower naming tables and columns in DDL generation.
+   * Tables/Columns with quoted identifiers are exempt.
+   */
   public String lowerName(String name) {
     return namingConvention.lowerName(name);
   }
 
+  /**
+   * Return the maximum table name length.
+   * <p>
+   * This is used when deriving names of intersection tables.
+   * </p>
+   */
+  public int getMaxTableNameLength() {
+    return namingConvention.getMaxTableNameLength();
+  }
 }
