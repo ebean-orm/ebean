@@ -13,7 +13,7 @@ import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
-import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
+import com.avaje.ebean.dbmigration.DdlGenerator;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.query.CQuery;
 import com.avaje.ebeaninternal.server.query.CQueryEngine;

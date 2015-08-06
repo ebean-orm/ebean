@@ -1,1 +1,1 @@
-com.avaje.ebeaninternal.server.ddl.DdlGenerator
+com.avaje.ebean.dbmigration.DdlGenerator

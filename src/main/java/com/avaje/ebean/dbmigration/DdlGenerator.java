@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.ddl;
+package com.avaje.ebean.dbmigration;
 
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.config.ServerConfig;
