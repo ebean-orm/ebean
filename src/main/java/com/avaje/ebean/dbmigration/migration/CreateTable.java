@@ -72,6 +72,8 @@ public class CreateTable {
     protected String tablespace;
     @XmlAttribute(name = "indexTablespace")
     protected String indexTablespace;
+    @XmlAttribute(name = "comment")
+    protected String comment;
 
     /**
      * Gets the value of the column property.
@@ -350,6 +352,30 @@ public class CreateTable {
      */
     public void setIndexTablespace(String value) {
         this.indexTablespace = value;
+    }
+
+    /**
+     * Gets the value of the comment property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Sets the value of the comment property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setComment(String value) {
+        this.comment = value;
     }
 
 }

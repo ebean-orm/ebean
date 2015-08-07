@@ -36,7 +36,7 @@ public class MTable {
 
   private final String name;
 
-  private String remarks;
+  private String comment;
 
   private String tablespace;
 
@@ -65,7 +65,7 @@ public class MTable {
    */
   public MTable(CreateTable createTable) {
     this.name = createTable.getName();
-    this.remarks = createTable.getRemarks();
+    this.comment = createTable.getComment();
     this.tablespace = createTable.getTablespace();
     this.indexTablespace = createTable.getIndexTablespace();
     this.withHistory = createTable.isWithHistory();
@@ -90,7 +90,7 @@ public class MTable {
 
     CreateTable createTable = new CreateTable();
     createTable.setName(name);
-    createTable.setRemarks(remarks);
+    createTable.setComment(comment);
     createTable.setTablespace(tablespace);
     createTable.setIndexTablespace(indexTablespace);
     createTable.setWithHistory(withHistory);
@@ -140,8 +140,8 @@ public class MTable {
     return name;
   }
 
-  public String getRemarks() {
-    return remarks;
+  public String getComment() {
+    return comment;
   }
 
   public String getTablespace() {
