@@ -2,8 +2,8 @@
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet>
         <createTable name="e_basic">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
-            <column checkConstraint="check (status in ('N','A','I'))" name="status" type="varchar(1)"/>
+            <column name="id" type="integer" primaryKey="true" identity="true"/>
+            <column name="status" type="varchar(1)" checkConstraint="check (status in ('N','A','I'))"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
             <column name="some_date" type="timestamp"/>

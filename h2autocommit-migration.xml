@@ -2,11 +2,11 @@
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet>
         <createTable name="ut_detail">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column name="id" type="integer" primaryKey="true" identity="true"/>
             <column name="name" type="varchar(255)"/>
             <column name="qty" type="integer"/>
             <column name="amount" type="double"/>
-            <column notnull="true" name="version" type="integer"/>
+            <column name="version" type="integer" notnull="true"/>
         </createTable>
     </changeSet>
 </migration>

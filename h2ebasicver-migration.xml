@@ -2,11 +2,11 @@
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet>
         <createTable name="e_basicver">
-            <column primaryKey="true" identity="true" name="id" type="integer"/>
+            <column name="id" type="integer" primaryKey="true" identity="true"/>
             <column name="name" type="varchar(255)"/>
             <column name="description" type="varchar(255)"/>
             <column name="other" type="varchar(255)"/>
-            <column notnull="true" name="last_update" type="timestamp"/>
+            <column name="last_update" type="timestamp" notnull="true"/>
         </createTable>
     </changeSet>
 </migration>
