@@ -2,7 +2,7 @@
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://ebean-orm.github.io/xml/ns/dbmigration http://ebean-orm.github.io/xml/ns/dbmigration-1.0.xsd">
 
-  <changeSet id="1">
+  <changeSet type="apply" generated="true">
 
     <sql>
       <apply>
@@ -44,11 +44,16 @@
       <column name="fooe" type="varchar(20)"/>
     </addColumn>
 
-    <dropColumn columnName="fooe" tableName="hello_world"/>
 
     <createHistoryTable baseTable="hello_world"/>
 
     <addForeignKey name="fk_hello_world_x" columns="x" references="asdsad.asd"/>
+
+  </changeSet>
+
+  <changeSet type="drop" generated="true">
+
+    <dropColumn columnName="fooe" tableName="hello_world"/>
 
   </changeSet>
 

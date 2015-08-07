@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+
+  <changeSet type="apply" generated="true">
+
+    <createTable name="mig_account">
+      <column name="id" type="bigint" primaryKey="true" identity="true"/>
+      <column name="name" type="varchar(255)"/>
+      <column name="when_created" type="timestamp" notnull="true" />
+      <column name="when_modified" type="timestamp" notnull="true" />
+      <column name="version" type="bigint" notnull="true" />
+    </createTable>
+
+    <createTable name="mig_address" withHistory="true">
+      <column name="id" type="integer" primaryKey="true" identity="true"/>
+      <column name="line_1" type="varchar(100)"/>
+      <column name="line_2" type="varchar(100)"/>
+      <column name="city" type="varchar(100)"/>
+      <column name="country_code" type="varchar(2)" references="o_country.code" />
+      <column name="when_created" type="timestamp" notnull="true"/>
+      <column name="when_updated" type="timestamp" notnull="true"/>
+      <column name="version" type="bigint" notnull="true"/>
+    </createTable>
+
+    <addColumn tableName="mig_country">
+      <column name="status" type="varchar(5)"/>
+    </addColumn>
+
+    <createHistoryTable baseTable="mig_country" whenCreatedColumn="when_created"/>
+
+  </changeSet>
+
+
+  <changeSet type="drop" generated="true">
+
+    <dropColumn columnName="longName" tableName="mig_address"/>
+
+  </changeSet>
+
+</migration>

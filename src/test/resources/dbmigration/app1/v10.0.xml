@@ -2,7 +2,7 @@
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://ebean-orm.github.io/xml/ns/dbmigration http://ebean-orm.github.io/xml/ns/dbmigration-1.0.xsd">
 
-  <changeSet id="1">
+  <changeSet type="apply">
 
     <sql>
       <apply>
@@ -13,21 +13,19 @@
       </rollback>
     </sql>
 
-    <createTable name="dbmigration">
+    <createTable name="dbmigration_lock">
       <column name="application" type="varchar(30)" notnull="true"/>
-      <column name="change_log"  type="integer"     notnull="true"/>
-      <column name="change_set"  type="integer"     notnull="true"/>
       <column name="locked_by"   type="varchar(30)"/>
       <column name="locked_at"   type="timestamp"/>
     </createTable>
 
-    <createTable name="dbmigration_changeset">
+    <createTable name="dbmigration_run">
       <column name="id"          type="integer"      primaryKey="true"/>
       <column name="application" type="varchar(30)"  notnull="true" references="dbmigration.application"/>
-      <column name="change_log"  type="integer"      notnull="true"/>
-      <column name="change_set"  type="integer"      notnull="true"/>
+      <column name="version"     type="varchar(3)"   notnull="true"/>
       <column name="run_at"      type="timestamp"    notnull="true"/>
       <column name="run_by"      type="varchar(30)"  notnull="true"/>
+      <column name="run_status"  type="varchar(30)"  notnull="true"/>
       <column name="run_ddl"     type="clob"/>
       <column name="run_log"     type="clob"/>
     </createTable>
@@ -46,6 +44,10 @@
 
     <createHistoryTable baseTable="hello_world"/>
 
+  </changeSet>
+
+  <changeSet type="drop" generated="true">
+    <!-- no drops to do -->
   </changeSet>
 
 </migration>

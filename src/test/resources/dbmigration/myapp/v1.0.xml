@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+
+  <changeSet type="baseline">
+
+    <createTable name="mig_country">
+      <column name="code" type="varchar(2)" primaryKey="true" />
+      <column name="name" type="varchar(255)"/>
+      <column name="longName" type="varchar(1000)"/>
+    </createTable>
+
+  </changeSet>
+
+  <changeSet type="drop" generated="true">
+    <!-- no drops to do -->
+  </changeSet>
+
+</migration>
