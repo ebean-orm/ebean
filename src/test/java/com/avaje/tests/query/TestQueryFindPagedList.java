@@ -46,6 +46,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     PagedList<Order> pagedList = Ebean.find(Order.class).findPagedList(0, 3);
 
     LoggedSqlCollector.start();
+    Thread.sleep(1); // give slf4j a little time in this multithreaded test case
 
     Future<Integer> rowCount = pagedList.getFutureRowCount();
     List<Order> orders = pagedList.getList();
