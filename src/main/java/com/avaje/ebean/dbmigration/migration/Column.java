@@ -18,8 +18,17 @@ import javax.xml.bind.annotation.XmlValue;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attGroup ref="{http://ebean-orm.github.io/xml/ns/dbmigration}columnAttributes"/>
- *       &lt;attGroup ref="{http://ebean-orm.github.io/xml/ns/dbmigration}column"/>
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="type" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="defaultValue" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="notnull" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="checkConstraint" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="unique" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="uniqueOneToOne" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="primaryKey" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="identity" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="references" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -36,6 +45,12 @@ public class Column {
 
     @XmlValue
     protected String content;
+    @XmlAttribute(name = "name", required = true)
+    protected String name;
+    @XmlAttribute(name = "type", required = true)
+    protected String type;
+    @XmlAttribute(name = "defaultValue")
+    protected String defaultValue;
     @XmlAttribute(name = "notnull")
     protected Boolean notnull;
     @XmlAttribute(name = "checkConstraint")
@@ -50,14 +65,8 @@ public class Column {
     protected Boolean identity;
     @XmlAttribute(name = "references")
     protected String references;
-    @XmlAttribute(name = "name", required = true)
-    protected String name;
-    @XmlAttribute(name = "type", required = true)
-    protected String type;
-    @XmlAttribute(name = "defaultValue")
-    protected String defaultValue;
-    @XmlAttribute(name = "remarks")
-    protected String remarks;
+    @XmlAttribute(name = "comment")
+    protected String comment;
 
     /**
      * Gets the value of the content property.
@@ -81,6 +90,78 @@ public class Column {
      */
     public void setContent(String value) {
         this.content = value;
+    }
+
+    /**
+     * Gets the value of the name property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the value of the name property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setName(String value) {
+        this.name = value;
+    }
+
+    /**
+     * Gets the value of the type property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * Sets the value of the type property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setType(String value) {
+        this.type = value;
+    }
+
+    /**
+     * Gets the value of the defaultValue property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    /**
+     * Sets the value of the defaultValue property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setDefaultValue(String value) {
+        this.defaultValue = value;
     }
 
     /**
@@ -252,99 +333,27 @@ public class Column {
     }
 
     /**
-     * Gets the value of the name property.
+     * Gets the value of the comment property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getName() {
-        return name;
+    public String getComment() {
+        return comment;
     }
 
     /**
-     * Sets the value of the name property.
+     * Sets the value of the comment property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setName(String value) {
-        this.name = value;
-    }
-
-    /**
-     * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setType(String value) {
-        this.type = value;
-    }
-
-    /**
-     * Gets the value of the defaultValue property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    /**
-     * Sets the value of the defaultValue property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setDefaultValue(String value) {
-        this.defaultValue = value;
-    }
-
-    /**
-     * Gets the value of the remarks property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getRemarks() {
-        return remarks;
-    }
-
-    /**
-     * Sets the value of the remarks property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setRemarks(String value) {
-        this.remarks = value;
+    public void setComment(String value) {
+        this.comment = value;
     }
 
 }

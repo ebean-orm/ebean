@@ -45,10 +45,20 @@
           <xsd:group ref="changeSetChildren" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
       </xsd:sequence>
-      <xsd:attribute name="id" type="xsd:positiveInteger" use="required"/>
+      <xsd:attribute name="type" type="changeSetType" use="required"/>
+      <xsd:attribute name="generated" type="xsd:boolean"/>
+      <xsd:attribute name="author" type="xsd:string"/>
       <xsd:attribute name="comment" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
+
+  <xsd:simpleType name="changeSetType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="apply"/>
+      <xsd:enumeration value="drop"/>
+      <xsd:enumeration value="baseline"/>
+    </xsd:restriction>
+  </xsd:simpleType>
 
   <!-- =========================================================== -->
   <!-- CHANGE SET CHILDREN                                         -->
@@ -120,11 +130,11 @@
 
   <xsd:simpleType name="identityType">
     <xsd:restriction base="xsd:string">
-      <xsd:enumeration value="IDENTITY"/>
-      <xsd:enumeration value="SEQUENCE"/>
-      <xsd:enumeration value="GENERATOR"/>
-      <xsd:enumeration value="EXTERNAL"/>
-      <xsd:enumeration value="DEFAULT"/>
+      <xsd:enumeration value="identity"/>
+      <xsd:enumeration value="sequence"/>
+      <xsd:enumeration value="generator"/>
+      <xsd:enumeration value="external"/>
+      <xsd:enumeration value="default"/>
     </xsd:restriction>
   </xsd:simpleType>
 
@@ -163,6 +173,7 @@
   <xsd:element name="createHistoryTable">
     <xsd:complexType>
       <xsd:attribute name="baseTable" type="xsd:string" use="required"/>
+      <xsd:attribute name="whenCreatedColumn" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
 
@@ -249,36 +260,25 @@
 
   <xsd:element name="column">
     <xsd:complexType mixed="true">
-      <xsd:attributeGroup ref="column"/>
-      <xsd:attributeGroup ref="columnAttributes"/>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+      <xsd:attribute name="type" type="xsd:string" use="required"/>
+      <xsd:attribute name="defaultValue" type="xsd:string"/>
+      <!--<xsd:attributeGroup ref="columnAttributes"/>-->
+      <xsd:attribute name="notnull" type="xsd:boolean"/>
+      <xsd:attribute name="checkConstraint" type="xsd:string"/>
+      <xsd:attribute name="unique" type="xsd:boolean"/>
+      <xsd:attribute name="uniqueOneToOne" type="xsd:boolean"/>
+      <xsd:attribute name="primaryKey" type="xsd:boolean"/>
+      <xsd:attribute name="identity" type="xsd:boolean"/> <!-- aka autoincrement/identity -->
+      <xsd:attribute name="references" type="xsd:string"/>
+      <xsd:attribute name="comment" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
 
   <xsd:attributeGroup name="tablespaceAttributes">
     <xsd:attribute name="tablespace" type="xsd:string"/>
     <xsd:attribute name="indexTablespace" type="xsd:string"/>
-    <xsd:attribute name="remarks" type="xsd:string"/>
-  </xsd:attributeGroup>
 
-  <xsd:attributeGroup name="columnAttributes">
-    <xsd:attribute name="notnull" type="xsd:boolean"/>
-    <xsd:attribute name="checkConstraint" type="xsd:string"/>
-    <xsd:attribute name="unique" type="xsd:boolean"/>
-    <xsd:attribute name="uniqueOneToOne" type="xsd:boolean"/>
-    <xsd:attribute name="primaryKey" type="xsd:boolean"/>
-    <xsd:attribute name="identity" type="xsd:boolean"/> <!-- aka autoincrement/identity -->
-    <xsd:attribute name="references" type="xsd:string"/>
-    <!--<xsd:attribute name="primaryKeyTablespace" type="xsd:string"/>-->
-    <!--<xsd:attribute name="deleteCascade" type="xsd:boolean"/>-->
-    <!--<xsd:attribute name="deferrable" type="xsd:boolean"/>-->
-    <!--<xsd:attribute name="initiallyDeferred" type="xsd:boolean"/>-->
-  </xsd:attributeGroup>
-
-  <xsd:attributeGroup name="column">
-    <xsd:attribute name="name" type="xsd:string" use="required"/>
-    <xsd:attribute name="type" type="xsd:string" use="required"/>
-    <xsd:attribute name="defaultValue" type="xsd:string"/>
-    <xsd:attribute name="remarks" type="xsd:string"/>
   </xsd:attributeGroup>
 
   <!--  Children for changeSet  -->
@@ -314,7 +314,6 @@
 
       <!--<xsd:element ref="addNotNullConstraint" maxOccurs="unbounded"/>-->
       <!--<xsd:element ref="dropNotNullConstraint" maxOccurs="unbounded"/>-->
-
 
       <!--<xsd:element ref="addPrimaryKey" maxOccurs="unbounded"/>-->
       <!--<xsd:element ref="dropPrimaryKey" maxOccurs="unbounded"/>-->

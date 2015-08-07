@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;attribute name="baseTable" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="whenCreatedColumn" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -32,6 +33,8 @@ public class CreateHistoryTable {
 
     @XmlAttribute(name = "baseTable", required = true)
     protected String baseTable;
+    @XmlAttribute(name = "whenCreatedColumn")
+    protected String whenCreatedColumn;
 
     /**
      * Gets the value of the baseTable property.
@@ -55,6 +58,30 @@ public class CreateHistoryTable {
      */
     public void setBaseTable(String value) {
         this.baseTable = value;
+    }
+
+    /**
+     * Gets the value of the whenCreatedColumn property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getWhenCreatedColumn() {
+        return whenCreatedColumn;
+    }
+
+    /**
+     * Sets the value of the whenCreatedColumn property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setWhenCreatedColumn(String value) {
+        this.whenCreatedColumn = value;
     }
 
 }

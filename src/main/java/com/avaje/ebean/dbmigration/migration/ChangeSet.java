@@ -1,7 +1,6 @@
 
 package com.avaje.ebean.dbmigration.migration;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -10,7 +9,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -28,7 +26,9 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;group ref="{http://ebean-orm.github.io/xml/ns/dbmigration}changeSetChildren" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;/choice>
  *       &lt;/sequence>
- *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
+ *       &lt;attribute name="type" use="required" type="{http://ebean-orm.github.io/xml/ns/dbmigration}changeSetType" />
+ *       &lt;attribute name="generated" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="author" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -61,9 +61,12 @@ public class ChangeSet {
         @XmlElement(name = "dropForeignKey", type = DropForeignKey.class)
     })
     protected List<Object> changeSetChildren;
-    @XmlAttribute(name = "id", required = true)
-    @XmlSchemaType(name = "positiveInteger")
-    protected BigInteger id;
+    @XmlAttribute(name = "type", required = true)
+    protected ChangeSetType type;
+    @XmlAttribute(name = "generated")
+    protected Boolean generated;
+    @XmlAttribute(name = "author")
+    protected String author;
     @XmlAttribute(name = "comment")
     protected String comment;
 
@@ -110,27 +113,75 @@ public class ChangeSet {
     }
 
     /**
-     * Gets the value of the id property.
+     * Gets the value of the type property.
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link ChangeSetType }
      *     
      */
-    public BigInteger getId() {
-        return id;
+    public ChangeSetType getType() {
+        return type;
     }
 
     /**
-     * Sets the value of the id property.
+     * Sets the value of the type property.
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link ChangeSetType }
      *     
      */
-    public void setId(BigInteger value) {
-        this.id = value;
+    public void setType(ChangeSetType value) {
+        this.type = value;
+    }
+
+    /**
+     * Gets the value of the generated property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isGenerated() {
+        return generated;
+    }
+
+    /**
+     * Sets the value of the generated property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setGenerated(Boolean value) {
+        this.generated = value;
+    }
+
+    /**
+     * Gets the value of the author property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getAuthor() {
+        return author;
+    }
+
+    /**
+     * Sets the value of the author property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setAuthor(String value) {
+        this.author = value;
     }
 
     /**
