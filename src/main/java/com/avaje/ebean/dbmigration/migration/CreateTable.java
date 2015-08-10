@@ -34,6 +34,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="sequenceName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="sequenceInitial" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
  *       &lt;attribute name="sequenceAllocate" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
+ *       &lt;attribute name="pkName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -68,6 +69,8 @@ public class CreateTable {
     @XmlAttribute(name = "sequenceAllocate")
     @XmlSchemaType(name = "positiveInteger")
     protected BigInteger sequenceAllocate;
+    @XmlAttribute(name = "pkName")
+    protected String pkName;
     @XmlAttribute(name = "tablespace")
     protected String tablespace;
     @XmlAttribute(name = "indexTablespace")
@@ -304,6 +307,30 @@ public class CreateTable {
      */
     public void setSequenceAllocate(BigInteger value) {
         this.sequenceAllocate = value;
+    }
+
+    /**
+     * Gets the value of the pkName property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getPkName() {
+        return pkName;
+    }
+
+    /**
+     * Sets the value of the pkName property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setPkName(String value) {
+        this.pkName = value;
     }
 
     /**

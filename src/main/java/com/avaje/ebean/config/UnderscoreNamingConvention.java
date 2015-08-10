@@ -3,23 +3,26 @@ package com.avaje.ebean.config;
 /**
  * Converts between Camel Case and Underscore based names for both table and
  * column names (and is the default naming convention in Ebean).
- * 
+ *
  * @author emcgreal
  * @author rbygrave
  */
 public class UnderscoreNamingConvention extends AbstractNamingConvention {
 
-  /** Force toUnderscore to return in upper case. */
+  /**
+   * Force toUnderscore to return in upper case.
+   */
   private boolean forceUpperCase = false;
 
-  /** The digits compressed. */
+  /**
+   * The digits compressed.
+   */
   private boolean digitsCompressed = true;
 
   /**
    * Create with a given sequence format.
-   * 
-   * @param sequenceFormat
-   *          the sequence format
+   *
+   * @param sequenceFormat the sequence format
    */
   public UnderscoreNamingConvention(String sequenceFormat) {
     super(sequenceFormat);
@@ -34,39 +37,30 @@ public class UnderscoreNamingConvention extends AbstractNamingConvention {
 
   /**
    * Returns the last part of the class name.
-   * 
-   * @param beanClass
-   *          the bean class
-   * 
+   *
+   * @param beanClass the bean class
    * @return the table name from class
    */
   public TableName getTableNameByConvention(Class<?> beanClass) {
 
-    return new TableName(getCatalog(),
-        getSchema(),
-        toUnderscoreFromCamel(beanClass.getSimpleName()));
+    return new TableName(getCatalog(), getSchema(), toUnderscoreFromCamel(beanClass.getSimpleName()));
   }
 
   /**
    * Converts Camel case property name to underscore based column name.
-   * 
+   *
    * @return the column from property
    */
-  public String getColumnFromProperty(Class<?> beanClass, String propertyName) {// Field
-                                                                                // field)
-                                                                                // {
+  public String getColumnFromProperty(Class<?> beanClass, String propertyName) {
 
     return toUnderscoreFromCamel(propertyName);
   }
 
   /**
    * Converts underscore based column name to Camel case property name.
-   * 
-   * @param beanClass
-   *          the bean class
-   * @param dbColumnName
-   *          the db column name
-   * 
+   *
+   * @param beanClass    the bean class
+   * @param dbColumnName the db column name
    * @return the property from column
    */
   public String getPropertyFromColumn(Class<?> beanClass, String dbColumnName) {
@@ -110,7 +104,7 @@ public class UnderscoreNamingConvention extends AbstractNamingConvention {
   protected String toUnderscoreFromCamel(String camelCase) {
 
     int lastUpper = -1;
-    StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new StringBuilder(camelCase.length()+4);
     for (int i = 0; i < camelCase.length(); i++) {
       char c = camelCase.charAt(i);
 
@@ -144,16 +138,11 @@ public class UnderscoreNamingConvention extends AbstractNamingConvention {
   }
 
   /**
-   * To camel from underscore.
-   * 
-   * @param underscore
-   *          the underscore
-   * 
-   * @return the string
+   * Convert and return the from string from underscore to camel case.
    */
   protected String toCamelFromUnderscore(String underscore) {
 
-    StringBuilder result = new StringBuilder();
+    StringBuilder result = new StringBuilder(underscore.length());
     String[] vals = underscore.split("_");
 
     for (int i = 0; i < vals.length; i++) {

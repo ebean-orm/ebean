@@ -82,8 +82,7 @@ public interface NamingConvention {
   String getPropertyFromColumn(Class<?> beanClass, String dbColumnName);
 
   /**
-   * Return the sequence name given the table name (for DB's that use
-   * sequences).
+   * Return the sequence name given the table name (for DB's that use sequences).
    * <p>
    * Typically you might append "_seq" to the table name as an example.
    * </p>
@@ -99,14 +98,14 @@ public interface NamingConvention {
    * Return true if a prefix should be used building a foreign key name.
    * <p>
    * This by default is true and this works well when the primary key column
-   * names are simply "ID". In this case a prefix (such as "ORDER" and
-   * "CUSTOMER" etc) is added to the foreign key column producing "ORDER_ID" and
-   * "CUSTOMER_ID".
+   * names are simply "id". In this case a prefix (such as "order" and
+   * "customer" etc) is added to the foreign key column producing "order_id" and
+   * "customer_id".
    * </p>
    * <p>
    * This should return false when your primary key columns are the same as the
    * foreign key columns. For example, when the primary key columns are
-   * "ORDER_ID", "CUST_ID" etc ... and they are the same as the foreign key
+   * "order_id", "cust_id" etc ... and they are the same as the foreign key
    * column names.
    * </p>
    */

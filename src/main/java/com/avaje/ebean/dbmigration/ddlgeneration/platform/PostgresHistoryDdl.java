@@ -1,5 +1,7 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
+import com.avaje.ebean.config.DbConstraintNaming;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.model.MColumn;
@@ -9,18 +11,38 @@ import java.io.IOException;
 import java.util.Collection;
 
 /**
- *
+ * Uses DB triggers to maintain a history table.
  */
 public class PostgresHistoryDdl implements PlatformHistoryDdl {
 
-  private final DdlNameNormalise normalise;
+  private DbConstraintNaming constraintNaming;
 
-  public PostgresHistoryDdl(DdlNameNormalise normalise) {
-    this.normalise = normalise;
+  private String sysPeriod;
+
+  private String viewSuffix;
+
+  private String historySuffix = "_history";
+
+  public PostgresHistoryDdl() {
+  }
+
+  @Override
+  public void configure(ServerConfig serverConfig) {
+    this.sysPeriod = serverConfig.getAsOfSysPeriod();
+    this.viewSuffix = serverConfig.getAsOfViewSuffix();
+    this.constraintNaming = serverConfig.getConstraintNaming();
+  }
+
+  @Override
+  public void createWithHistory(DdlWrite writer, MTable table) throws IOException {
+
+    addHistoryTable(writer, table);
+    addStoredFunction(writer, table);
+    addTrigger(writer, table);
   }
 
   protected String historyTableName(String baseTableName) {
-    return baseTableName + "_history";
+    return baseTableName + historySuffix;
   }
 
   protected String procedureName(String baseTableName) {
@@ -31,42 +53,33 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
     return baseTableName + "_history_upd";
   }
 
-  public void createWithHistory(DdlWrite writer, MTable table) throws IOException {
-
-    // naming convention
-
-    addHistoryTable(writer, table);
-    addStoredFunction(writer, table);
-    addTrigger(writer, table);
-  }
-
   public void addHistoryTable(DdlWrite writer, MTable table) throws IOException {
 
-    String baseTableName = this.normalise.normaliseTable(table.getName());
+    String baseTableName = constraintNaming.normaliseTable(table.getName());
 
     DdlBuffer buffer = writer.applyHistory();
 
     buffer
         .append("alter table ").append(baseTableName)
-        .append(" add column sys_period tstzrange not null")
+        .append(" add column ").append(sysPeriod).append(" tstzrange not null")
         .endOfStatement().end();
 
     buffer
-        .append("create table ").append(baseTableName).append("_history")
+        .append("create table ").append(baseTableName).append(historySuffix)
         .append(" (like ").append(baseTableName).append(")")
         .endOfStatement().end();
 
     buffer
-        .append("create view ").append(baseTableName).append("_with_history")
+        .append("create view ").append(baseTableName).append(viewSuffix)
         .append(" as select * from").append(baseTableName)
-        .append(" union all select * from").append(baseTableName).append("_history")
+        .append(" union all select * from").append(baseTableName).append(historySuffix)
         .endOfStatement().end();
 
   }
 
   public void addTrigger(DdlWrite writer, MTable table) throws IOException {
 
-    String baseTableName = this.normalise.normaliseTable(table.getName());
+    String baseTableName = constraintNaming.normaliseTable(table.getName());
     String procedureName = procedureName(baseTableName);
     String triggerName = triggerName(baseTableName);
 
@@ -81,7 +94,7 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
 
   public void addStoredFunction(DdlWrite writer, MTable table) throws IOException {
 
-    String baseTableName = this.normalise.normaliseTable(table.getName());
+    String baseTableName = constraintNaming.normaliseTable(table.getName());
     String procedureName = procedureName(baseTableName);
     DdlBuffer buffer = writer.applyHistory();
 
@@ -90,13 +103,13 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
         .append("begin").newLine();
     buffer
         .append("  if (TG_OP = 'INSERT') then").newLine()
-        .append("    NEW.sys_period = tstzrange(CURRENT_TIMESTAMP,null);").newLine()
+        .append("    NEW.").append(sysPeriod).append(" = tstzrange(CURRENT_TIMESTAMP,null);").newLine()
         .append("    return new;").newLine().newLine();
     buffer
         .append("  elsif (TG_OP = 'UPDATE') then").newLine();
     appendInsertIntoHistory(buffer, table);
     buffer
-        .append("    NEW.sys_period = tstzrange(CURRENT_TIMESTAMP,null);").newLine()
+        .append("    NEW.").append(sysPeriod).append(" = tstzrange(CURRENT_TIMESTAMP,null);").newLine()
         .append("    return new;").newLine().newLine();
     buffer
         .append("  elsif (TG_OP = 'DELETE') then").newLine();
@@ -116,9 +129,9 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
 
     String historyTable  = historyTableName(table.getName());
 
-    buffer.append("    insert into ").append(historyTable).append(" (sys_period,");
+    buffer.append("    insert into ").append(historyTable).append(" (").append(sysPeriod).append(",");
     appendColumnNames(buffer, table, "");
-    buffer.append(") values (tstzrange(lower(OLD.sys_period), CURRENT_TIMESTAMP), ");
+    buffer.append(") values (tstzrange(lower(OLD.").append(sysPeriod).append("), CURRENT_TIMESTAMP), ");
     appendColumnNames(buffer, table, "OLD.");
     buffer.append(");").newLine();
   }

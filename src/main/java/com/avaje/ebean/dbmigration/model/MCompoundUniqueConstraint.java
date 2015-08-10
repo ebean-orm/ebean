@@ -9,6 +9,8 @@ package com.avaje.ebean.dbmigration.model;
  */
 public class MCompoundUniqueConstraint {
 
+  private final String name;
+
   /**
    * Flag if true indicates this was specifically created for a OneToOne mapping.
    */
@@ -19,7 +21,8 @@ public class MCompoundUniqueConstraint {
    */
   private final String[] columns;
 
-  public MCompoundUniqueConstraint(String[] columns, boolean oneToOne) {
+  public MCompoundUniqueConstraint(String[] columns, boolean oneToOne, String name) {
+    this.name = name;
     this.columns = columns;
     this.oneToOne = oneToOne;
   }
@@ -38,4 +41,10 @@ public class MCompoundUniqueConstraint {
     return oneToOne;
   }
 
+  /**
+   * Return the constraint name.
+   */
+  public String getName() {
+    return name;
+  }
 }

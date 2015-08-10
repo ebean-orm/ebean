@@ -8,7 +8,6 @@ import com.avaje.ebean.dbmigration.model.MTable;
 import com.avaje.ebean.dbmigration.model.visitor.BeanPropertyVisitor;
 import com.avaje.ebean.dbmigration.model.visitor.BeanVisitor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.CompoundUniqueContraint;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 
 /**
@@ -52,14 +51,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
       table.addColumn(new MColumn(discColumn, discDbType, true));
     }
 
-    CompoundUniqueContraint[] compoundUniqueConstraints = descriptor.getCompoundUniqueConstraints();
-    if (compoundUniqueConstraints != null) {
-      for (int i = 0; i < compoundUniqueConstraints.length; i++) {
-        table.addCompoundUniqueConstraint(compoundUniqueConstraints[i].getColumns(), false);
-      }
-    }
-
-    return new ModelBuildPropertyVisitor(ctx, table);
+    return new ModelBuildPropertyVisitor(ctx, table, descriptor.getCompoundUniqueConstraints());
   }
 
   private void setIdentity(BeanDescriptor<?> descriptor, MTable table) {

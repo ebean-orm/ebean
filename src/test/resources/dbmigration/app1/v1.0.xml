@@ -26,7 +26,7 @@
       <column name="name" type="varchar(20)" notnull="true"/>
       <column name="type" type="varchar(20)" notnull="true"/>
       <column name="description" type="varchar(20)" notnull="true"/>
-      <uniqueConstraint columnNames="name,type"/>
+      <uniqueConstraint name="uq_hello_world_name_type" columnNames="name,type"/>
     </createTable>
 
     <addColumn tableName="hello_world">

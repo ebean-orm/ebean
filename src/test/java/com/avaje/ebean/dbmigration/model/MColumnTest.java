@@ -53,9 +53,9 @@ public class MColumnTest {
     assertThat(alterColumn.isNotnull()).isEqualTo(true);
 
     assertThat(alterColumn.getType()).isNull();
-    assertThat(alterColumn.isUnique()).isNull();
-    assertThat(alterColumn.isUniqueOneToOne()).isNull();
-    assertThat(alterColumn.getNewDefaultValue()).isNull();
+    assertThat(alterColumn.getUnique()).isNull();
+    assertThat(alterColumn.getUniqueOneToOne()).isNull();
+    assertThat(alterColumn.getDefaultValue()).isNull();
   }
 
   @Test
@@ -67,8 +67,8 @@ public class MColumnTest {
     basic().compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).getNewCheckConstraint()).isEqualTo("abc");
-    assertThat(getAlterColumn(diff).getOldCheckConstraint()).isNull();
+    assertThat(getAlterColumn(diff).getCheckConstraint()).isEqualTo("abc");
+    assertThat(getAlterColumn(diff).getDropCheckConstraint()).isNull();
   }
 
   @Test
@@ -77,12 +77,13 @@ public class MColumnTest {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     MColumn oldCol = basic();
-    oldCol.setCheckConstraint("abc");
+    oldCol.setCheckConstraint("z");
+    oldCol.setCheckConstraintName("abc");
     oldCol.compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).getNewCheckConstraint()).isNull();
-    assertThat(getAlterColumn(diff).getOldCheckConstraint()).isEqualTo("abc");
+    assertThat(getAlterColumn(diff).getCheckConstraint()).isNull();
+    assertThat(getAlterColumn(diff).getDropCheckConstraint()).isEqualTo("abc");
   }
 
   @Test
@@ -92,12 +93,13 @@ public class MColumnTest {
     MColumn newCol = basic();
     newCol.setCheckConstraint("abc");
     MColumn oldCol = basic();
-    oldCol.setCheckConstraint("d");
+    oldCol.setCheckConstraint("z");
+    oldCol.setCheckConstraintName("d");
     oldCol.compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).getNewCheckConstraint()).isEqualTo("abc");
-    assertThat(getAlterColumn(diff).getOldCheckConstraint()).isEqualTo("d");
+    assertThat(getAlterColumn(diff).getCheckConstraint()).isEqualTo("abc");
+    assertThat(getAlterColumn(diff).getDropCheckConstraint()).isEqualTo("d");
   }
 
   @Test
@@ -109,8 +111,7 @@ public class MColumnTest {
     basic().compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).getNewDefaultValue()).isEqualTo("abc");
-    assertThat(getAlterColumn(diff).getOldDefaultValue()).isNull();
+    assertThat(getAlterColumn(diff).getDefaultValue()).isEqualTo("abc");
   }
 
   @Test
@@ -123,8 +124,7 @@ public class MColumnTest {
     oldCol.compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).getNewDefaultValue()).isNull();
-    assertThat(getAlterColumn(diff).getOldDefaultValue()).isEqualTo("abc");
+    assertThat(getAlterColumn(diff).getDefaultValue()).isNull();
   }
 
   @Test
@@ -138,8 +138,7 @@ public class MColumnTest {
     oldCol.compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).getNewDefaultValue()).isEqualTo("abc");
-    assertThat(getAlterColumn(diff).getOldDefaultValue()).isEqualTo("d");
+    assertThat(getAlterColumn(diff).getDefaultValue()).isEqualTo("abc");
   }
 
   @Test
@@ -151,8 +150,8 @@ public class MColumnTest {
     basic().compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).getNewReferences()).isEqualTo("abc");
-    assertThat(getAlterColumn(diff).getOldReferences()).isNull();
+    assertThat(getAlterColumn(diff).getReferences()).isEqualTo("abc");
+    assertThat(getAlterColumn(diff).getDropForeignKey()).isNull();
   }
 
 
@@ -163,11 +162,17 @@ public class MColumnTest {
     MColumn newCol = basic();
     MColumn oldCol = basic();
     oldCol.setReferences("abc");
+    oldCol.setForeignKeyName("fk_ab");
+    oldCol.setForeignKeyIndex("ix_ab");
     oldCol.compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).getNewReferences()).isNull();
-    assertThat(getAlterColumn(diff).getOldReferences()).isEqualTo("abc");
+    assertThat(getAlterColumn(diff).getReferences()).isNull();
+    assertThat(getAlterColumn(diff).getForeignKeyName()).isNull();
+    assertThat(getAlterColumn(diff).getForeignKeyIndex()).isNull();
+
+    assertThat(getAlterColumn(diff).getDropForeignKey()).isEqualTo("fk_ab");
+    assertThat(getAlterColumn(diff).getDropForeignKeyIndex()).isEqualTo("ix_ab");
   }
 
   @Test
@@ -175,14 +180,24 @@ public class MColumnTest {
 
     ModelDiff diff = diff();
     MColumn newCol = basic();
-    newCol.setReferences("abc");
+    newCol.setReferences("ab");
+    newCol.setForeignKeyName("fk_ab");
+    newCol.setForeignKeyIndex("ix_ab");
+
     MColumn oldCol = basic();
     oldCol.setReferences("d");
+    oldCol.setForeignKeyName("fk_d");
+    oldCol.setForeignKeyIndex("ix_d");
     oldCol.compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).getNewReferences()).isEqualTo("abc");
-    assertThat(getAlterColumn(diff).getOldReferences()).isEqualTo("d");
+
+    assertThat(getAlterColumn(diff).getReferences()).isEqualTo("ab");
+    assertThat(getAlterColumn(diff).getForeignKeyName()).isEqualTo("fk_ab");
+    assertThat(getAlterColumn(diff).getForeignKeyIndex()).isEqualTo("ix_ab");
+
+    assertThat(getAlterColumn(diff).getDropForeignKey()).isEqualTo("fk_d");
+    assertThat(getAlterColumn(diff).getDropForeignKeyIndex()).isEqualTo("ix_d");
   }
 
   @Test
@@ -190,11 +205,11 @@ public class MColumnTest {
 
     ModelDiff diff = diff();
     MColumn newCol = basic();
-    newCol.setUnique(true);
+    newCol.setUnique("uq_one");
     basic().compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).isUnique()).isEqualTo(true);
+    assertThat(getAlterColumn(diff).getUnique()).isEqualTo("uq_one");
   }
 
   @Test
@@ -203,11 +218,11 @@ public class MColumnTest {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     MColumn oldCol = basic();
-    oldCol.setUnique(true);
+    oldCol.setUnique("uq_one");
     oldCol.compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).isUnique()).isEqualTo(false);
+    assertThat(getAlterColumn(diff).getDropUnique()).isEqualTo("uq_one");
   }
 
   @Test
@@ -215,11 +230,14 @@ public class MColumnTest {
 
     ModelDiff diff = diff();
     MColumn newCol = basic();
-    newCol.setUniqueOneToOne(true);
-    basic().compare(diff, table, newCol);
+    newCol.setUniqueOneToOne("uq_new");
+    MColumn oldCol = basic();
+    oldCol.setUniqueOneToOne("uq_old");
+    oldCol.compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).isUniqueOneToOne()).isEqualTo(true);
+    assertThat(getAlterColumn(diff).getUniqueOneToOne()).isEqualTo("uq_new");
+    assertThat(getAlterColumn(diff).getDropUnique()).isEqualTo("uq_old");
   }
 
   @Test
@@ -228,11 +246,11 @@ public class MColumnTest {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     MColumn oldCol = basic();
-    oldCol.setUniqueOneToOne(true);
+    oldCol.setUniqueOneToOne("uq_new");
     oldCol.compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).isUniqueOneToOne()).isEqualTo(false);
+    assertThat(getAlterColumn(diff).getDropUnique()).isEqualTo("uq_new");
   }
 
   @Test

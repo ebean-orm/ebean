@@ -100,9 +100,9 @@ public class MTableTest {
     assertThat(alterColumn.getColumnName()).isEqualTo("name");
     assertThat(alterColumn.getType()).isEqualTo("varchar(30)");
     assertThat(alterColumn.isNotnull()).isEqualTo(true);
-    assertThat(alterColumn.isUnique()).isNull();
-    assertThat(alterColumn.getNewCheckConstraint()).isNull();
-    assertThat(alterColumn.getNewReferences()).isNull();
+    assertThat(alterColumn.getUnique()).isNull();
+    assertThat(alterColumn.getCheckConstraint()).isNull();
+    assertThat(alterColumn.getReferences()).isNull();
 
     assertThat(diff.getDropChanges()).hasSize(0);
 

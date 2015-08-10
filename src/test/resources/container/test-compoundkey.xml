@@ -2,26 +2,26 @@
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://ebean-orm.github.io/xml/ns/dbmigration http://ebean-orm.github.io/xml/ns/dbmigration-1.0.xsd">
 
-  <changeSet id="1">
+  <changeSet type="baseline">
 
-    <createTable name="ckey_assoc">
+    <createTable name="ckey_assoc" pkName="pk_ckey_assoc">
       <column name="id"         type="integer"          primaryKey="true" identity="true"/>
       <column name="assoc_one"  type="varchar(255)"     />
     </createTable>
 
-    <createTable name="ckey_detail">
+    <createTable name="ckey_detail" pkName="pk_ckey_detail">
       <column name="id"         type="integer"          primaryKey="true" identity="true"/>
       <column name="something"  type="varchar(255)"     />
       <column name="one_key"    type="integer"          />
       <column name="two_key"    type="varchar(255)"     />
-      <foreignKey columnNames="one_key,two_key" refColumnNames="one_key,two_key" refTableName="ckey_parent"/>
+      <foreignKey name="fk_ckey_detail_parent" columnNames="one_key,two_key" refColumnNames="one_key,two_key" refTableName="ckey_parent" indexName="ix_ckey_detail_parent"/>
     </createTable>
     
-    <createTable name="ckey_parent">
+    <createTable name="ckey_parent" pkName="pk_ckey_parent">
       <column name="one_key"    type="integer"         primaryKey="true" />
       <column name="two_key"    type="varchar(255)"    primaryKey="true" />
       <column name="name"       type="varchar(255)"    />
-      <column name="assoc_id"   type="integer"         references="ckey_assoc.id"/>
+      <column name="assoc_id"   type="integer"         references="ckey_assoc.id" foreignKeyName="fk_ckey_parent_assoc_id" foreignKeyIndex="ix_ckey_parent_assoc_id"/>
       <column name="version"    type="integer"         notnull="true" />
     </createTable>
 

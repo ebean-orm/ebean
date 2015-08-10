@@ -13,7 +13,6 @@ public class MsSqlServerDdl extends PlatformDdl {
     this.identitySuffix = " identity(1,1)";
     this.foreignKeyRestrict = "";
     this.inlineUniqueOneToOne = false;
-    this.namingConvention.maxConstraintNameLength = 62; //Actually 128
   }
 
   @Override

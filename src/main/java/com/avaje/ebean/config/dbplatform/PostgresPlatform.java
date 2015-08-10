@@ -1,6 +1,7 @@
 package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PostgresDdl;
 
@@ -66,8 +67,8 @@ public class PostgresPlatform extends DatabasePlatform {
   /**
    * Return a DdlHandler instance for generating DDL for the specific platform.
    */
-  public DdlHandler createDdlHandler() {
-    return this.platformDdl.createDdlHandler();
+  public DdlHandler createDdlHandler(ServerConfig serverConfig) {
+    return this.platformDdl.createDdlHandler(serverConfig);
   }
 
   /**

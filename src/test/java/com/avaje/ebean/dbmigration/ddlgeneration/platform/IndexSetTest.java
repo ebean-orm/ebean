@@ -1,5 +1,6 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.IndexSet;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -11,7 +12,7 @@ public class IndexSetTest {
   @Test
   public void test() {
 
-    BaseTableDdl.IndexSet set = new BaseTableDdl.IndexSet();
+    IndexSet set = new IndexSet();
     assertTrue(set.add(new String[]{"one_column"}));
     assertTrue(set.add(new String[]{"two_column"}));
     assertFalse(set.add(new String[]{"one_column"}));

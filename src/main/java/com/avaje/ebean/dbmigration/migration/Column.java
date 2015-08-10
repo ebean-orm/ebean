@@ -22,13 +22,16 @@ import javax.xml.bind.annotation.XmlValue;
  *       &lt;attribute name="type" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="defaultValue" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="notnull" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="checkConstraint" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="historyExclude" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="unique" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="uniqueOneToOne" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="primaryKey" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="identity" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="checkConstraint" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="checkConstraintName" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="unique" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="uniqueOneToOne" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="references" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="foreignKeyName" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="foreignKeyIndex" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -54,20 +57,26 @@ public class Column {
     protected String defaultValue;
     @XmlAttribute(name = "notnull")
     protected Boolean notnull;
-    @XmlAttribute(name = "checkConstraint")
-    protected String checkConstraint;
     @XmlAttribute(name = "historyExclude")
     protected Boolean historyExclude;
-    @XmlAttribute(name = "unique")
-    protected Boolean unique;
-    @XmlAttribute(name = "uniqueOneToOne")
-    protected Boolean uniqueOneToOne;
     @XmlAttribute(name = "primaryKey")
     protected Boolean primaryKey;
     @XmlAttribute(name = "identity")
     protected Boolean identity;
+    @XmlAttribute(name = "checkConstraint")
+    protected String checkConstraint;
+    @XmlAttribute(name = "checkConstraintName")
+    protected String checkConstraintName;
+    @XmlAttribute(name = "unique")
+    protected String unique;
+    @XmlAttribute(name = "uniqueOneToOne")
+    protected String uniqueOneToOne;
     @XmlAttribute(name = "references")
     protected String references;
+    @XmlAttribute(name = "foreignKeyName")
+    protected String foreignKeyName;
+    @XmlAttribute(name = "foreignKeyIndex")
+    protected String foreignKeyIndex;
     @XmlAttribute(name = "comment")
     protected String comment;
 
@@ -192,30 +201,6 @@ public class Column {
     }
 
     /**
-     * Gets the value of the checkConstraint property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getCheckConstraint() {
-        return checkConstraint;
-    }
-
-    /**
-     * Sets the value of the checkConstraint property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setCheckConstraint(String value) {
-        this.checkConstraint = value;
-    }
-
-    /**
      * Gets the value of the historyExclude property.
      * 
      * @return
@@ -237,54 +222,6 @@ public class Column {
      */
     public void setHistoryExclude(Boolean value) {
         this.historyExclude = value;
-    }
-
-    /**
-     * Gets the value of the unique property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public Boolean isUnique() {
-        return unique;
-    }
-
-    /**
-     * Sets the value of the unique property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setUnique(Boolean value) {
-        this.unique = value;
-    }
-
-    /**
-     * Gets the value of the uniqueOneToOne property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public Boolean isUniqueOneToOne() {
-        return uniqueOneToOne;
-    }
-
-    /**
-     * Sets the value of the uniqueOneToOne property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setUniqueOneToOne(Boolean value) {
-        this.uniqueOneToOne = value;
     }
 
     /**
@@ -336,6 +273,102 @@ public class Column {
     }
 
     /**
+     * Gets the value of the checkConstraint property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCheckConstraint() {
+        return checkConstraint;
+    }
+
+    /**
+     * Sets the value of the checkConstraint property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setCheckConstraint(String value) {
+        this.checkConstraint = value;
+    }
+
+    /**
+     * Gets the value of the checkConstraintName property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCheckConstraintName() {
+        return checkConstraintName;
+    }
+
+    /**
+     * Sets the value of the checkConstraintName property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setCheckConstraintName(String value) {
+        this.checkConstraintName = value;
+    }
+
+    /**
+     * Gets the value of the unique property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getUnique() {
+        return unique;
+    }
+
+    /**
+     * Sets the value of the unique property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setUnique(String value) {
+        this.unique = value;
+    }
+
+    /**
+     * Gets the value of the uniqueOneToOne property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getUniqueOneToOne() {
+        return uniqueOneToOne;
+    }
+
+    /**
+     * Sets the value of the uniqueOneToOne property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setUniqueOneToOne(String value) {
+        this.uniqueOneToOne = value;
+    }
+
+    /**
      * Gets the value of the references property.
      * 
      * @return
@@ -357,6 +390,54 @@ public class Column {
      */
     public void setReferences(String value) {
         this.references = value;
+    }
+
+    /**
+     * Gets the value of the foreignKeyName property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getForeignKeyName() {
+        return foreignKeyName;
+    }
+
+    /**
+     * Sets the value of the foreignKeyName property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setForeignKeyName(String value) {
+        this.foreignKeyName = value;
+    }
+
+    /**
+     * Gets the value of the foreignKeyIndex property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getForeignKeyIndex() {
+        return foreignKeyIndex;
+    }
+
+    /**
+     * Sets the value of the foreignKeyIndex property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setForeignKeyIndex(String value) {
+        this.foreignKeyIndex = value;
     }
 
     /**

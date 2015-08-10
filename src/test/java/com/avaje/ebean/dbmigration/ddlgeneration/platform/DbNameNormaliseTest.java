@@ -1,12 +1,13 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
+import com.avaje.ebean.config.DbConstraintNormalise;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class DbNameNormaliseTest {
 
-  DdlNameNormalise normalise = new DdlNameNormalise();
+  DbConstraintNormalise normalise = new DbConstraintNormalise();
 
   @Test
   public void testNormalise() throws Exception {

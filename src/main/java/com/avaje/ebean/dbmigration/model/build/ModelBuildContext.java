@@ -2,6 +2,8 @@ package com.avaje.ebean.dbmigration.model.build;
 
 import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.config.DbConstraintNaming;
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebean.dbmigration.model.MTable;
 import com.avaje.ebean.dbmigration.model.ModelContainer;
@@ -20,12 +22,50 @@ public class ModelBuildContext {
 
   private final ModelContainer model;
 
-  public ModelBuildContext(ModelContainer model) {
+  private final DbConstraintNaming constraintNaming;
+
+  private final PlatformDdl platformDdl;
+
+  public ModelBuildContext(ModelContainer model, DbConstraintNaming constraintNaming, PlatformDdl platformDdl) {
     this.model = model;
+    this.constraintNaming = constraintNaming;
+    this.platformDdl = platformDdl;
+  }
+
+  public String primaryKeyName(String tableName) {
+    return maxLength(constraintNaming.primaryKeyName(tableName), 0);
+  }
+
+  public String foreignKeyConstraintName(String tableName, String columnName, int foreignKeyCount) {
+    return maxLength(constraintNaming.foreignKeyConstraintName(tableName, columnName), foreignKeyCount);
+  }
+
+  public String foreignKeyIndexName(String tableName, String[] columns, int indexCount) {
+    return maxLength(constraintNaming.foreignKeyIndexName(tableName, columns), indexCount);
+  }
+
+  public String foreignKeyIndexName(String tableName, String column, int indexCount) {
+    return maxLength(constraintNaming.foreignKeyIndexName(tableName, column), indexCount);
+  }
+
+  public String uniqueConstraintName(String tableName, String columnName, int indexCount) {
+    return maxLength(constraintNaming.uniqueConstraintName(tableName, columnName), indexCount);
+  }
+
+  public String uniqueConstraintName(String tableName, String[] columnNames, int indexCount) {
+    return maxLength(constraintNaming.uniqueConstraintName(tableName, columnNames), indexCount);
+  }
+
+  public String checkConstraintName(String tableName, String columnName, int checkCount) {
+    return maxLength(constraintNaming.checkConstraintName(tableName, columnName), checkCount);
   }
 
   public void addTable(MTable table) {
     model.addTable(table);
+  }
+
+  private String maxLength(String constraintName, int indexCount) {
+    return platformDdl.maxLength(constraintName, indexCount);
   }
 
   /**
@@ -56,12 +96,6 @@ public class ModelBuildContext {
       int jdbcType = scalarType.getJdbcType();
       return dbTypeMap.get(jdbcType);
     }
-
-//    ScalarType<Object> scalarType = p.getScalarType();
-//    if (scalarType == null) {
-//      throw new RuntimeException("No scalarType for " + p.getFullBeanName());
-//    }
-//    return dbTypeMap.get(scalarType.getJdbcType());
 
     // can be the logical JSON types (JSON, JSONB, JSONClob, JSONBlob, JSONVarchar)
     int dbType = p.getDbType();

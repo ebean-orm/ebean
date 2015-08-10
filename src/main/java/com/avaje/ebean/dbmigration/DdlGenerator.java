@@ -97,10 +97,8 @@ public class DdlGenerator implements SpiEbeanPlugin {
     try {
       String c = generateDropDdl();
       writeFile(dropFile, c);
-
     } catch (IOException e) {
-      String msg = "Error generating Drop DDL";
-      throw new PersistenceException(msg, e);
+      throw new PersistenceException("Error generating Drop DDL", e);
     }
   }
 
@@ -109,10 +107,8 @@ public class DdlGenerator implements SpiEbeanPlugin {
     try {
       String c = generateCreateDdl();
       writeFile(createFile, c);
-
     } catch (IOException e) {
-      String msg = "Error generating Create DDL";
-      throw new PersistenceException(msg, e);
+      throw new PersistenceException("Error generating Create DDL", e);
     }
   }
 
@@ -213,8 +209,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
       t.commit();
 
     } catch (Exception e) {
-      String msg = "Error: " + e.getMessage();
-      throw new PersistenceException(msg, e);
+      throw new PersistenceException("Error: " + e.getMessage(), e);
     } finally {
       t.end();
     }

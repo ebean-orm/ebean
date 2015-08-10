@@ -1,11 +1,9 @@
 package com.avaje.ebean.config;
 
+import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+
 import javax.persistence.Inheritance;
 import javax.persistence.Table;
-
-import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Provides some base implementation for NamingConventions.
@@ -14,28 +12,39 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractNamingConvention implements NamingConvention {
 
-  /** The Constant logger. */
-  private static final Logger logger = LoggerFactory.getLogger(AbstractNamingConvention.class);
-
-  /** The Constant DEFAULT_SEQ_FORMAT. */
+  /**
+   * The Constant DEFAULT_SEQ_FORMAT.
+   */
   public static final String DEFAULT_SEQ_FORMAT = "{table}_seq";
 
-  /** Sequence Format that includes the Primary Key column */
+  /**
+   * Sequence Format that includes the Primary Key column
+   */
   public static final String TABLE_PKCOLUMN_SEQ_FORMAT = "{table}_{column}_seq";
 
-  /** The catalog. */
+  /**
+   * The catalog.
+   */
   private String catalog;
 
-  /** The schema. */
+  /**
+   * The schema.
+   */
   private String schema;
 
-  /** The sequence format. */
+  /**
+   * The sequence format.
+   */
   private String sequenceFormat;
 
-  /** The database platform. */
+  /**
+   * The database platform.
+   */
   protected DatabasePlatform databasePlatform;
 
-  /** Used to trim off extra prefix for M2M. */
+  /**
+   * Used to trim off extra prefix for M2M.
+   */
   protected int rhsPrefixLength = 3;
 
   protected boolean useForeignKeyPrefix;
@@ -59,8 +68,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
   }
 
   /**
-   * Construct with the default sequence format ("{table}_seq") and
-   * useForeignKeyPrefix as true.
+   * Construct with the default sequence format ("{table}_seq") and useForeignKeyPrefix as true.
    */
   public AbstractNamingConvention() {
     this(DEFAULT_SEQ_FORMAT);
@@ -233,7 +241,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
     if (t != null && !isEmpty(t.name())) {
       // Note: empty catalog and schema are converted to null
       // Only need to convert quoted identifiers from annotations
-      return new TableName(quoteIdentifiers(t.catalog()), quoteIdentifiers(t.schema()),  quoteIdentifiers(t.name()));
+      return new TableName(quoteIdentifiers(t.catalog()), quoteIdentifiers(t.schema()), quoteIdentifiers(t.name()));
     }
 
     // No annotation

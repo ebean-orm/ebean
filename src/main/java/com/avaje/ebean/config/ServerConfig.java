@@ -239,6 +239,11 @@ public class ServerConfig {
    */
   private NamingConvention namingConvention = new UnderscoreNamingConvention();
 
+  /**
+   * Naming convention used in DDL generation for primary keys, foreign keys etc.
+   */
+  private DbConstraintNaming constraintNaming = new DbConstraintNaming();
+
   /** 
    * Behaviour of update to include on the change properties. 
    */
@@ -973,6 +978,20 @@ public class ServerConfig {
    */
   public void setNamingConvention(NamingConvention namingConvention) {
     this.namingConvention = namingConvention;
+  }
+
+  /**
+   * Return the constraint naming convention used in DDL generation.
+   */
+  public DbConstraintNaming getConstraintNaming() {
+    return constraintNaming;
+  }
+
+  /**
+   * Set the constraint naming convention used in DDL generation.
+   */
+  public void setConstraintNaming(DbConstraintNaming constraintNaming) {
+    this.constraintNaming = constraintNaming;
   }
 
   /**

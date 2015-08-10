@@ -13,4 +13,5 @@ public interface BeanVisitor {
    * property on the entity bean (return null to skip visiting this bean).
 	 */
   BeanPropertyVisitor visitBean(BeanDescriptor<?> descriptor);
+
 }

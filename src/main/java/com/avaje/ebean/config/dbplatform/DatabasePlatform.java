@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.Query;
 
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.slf4j.Logger;
@@ -146,6 +147,12 @@ public class DatabasePlatform {
   protected PlatformDdl platformDdl;
 
   /**
+   * The maximum length of table names - used specifically when derived
+   * default table names for intersection tables.
+   */
+  protected int maxTableNameLength = 60;
+
+  /**
    * Instantiates a new database platform.
    */
   public DatabasePlatform() {
@@ -169,7 +176,7 @@ public class DatabasePlatform {
    * </p>
    */
   public int getMaxTableNameLength() {
-    return platformDdl.getMaxTableNameLength();
+    return maxTableNameLength;
   }
 
   /**
@@ -182,8 +189,8 @@ public class DatabasePlatform {
   /**
    * Create and return a DDL handler for generating DDL scripts.
    */
-  public DdlHandler createDdlHandler() {
-    return platformDdl.createDdlHandler();
+  public DdlHandler createDdlHandler(ServerConfig serverConfig) {
+    return platformDdl.createDdlHandler(serverConfig);
   }
 
   /**

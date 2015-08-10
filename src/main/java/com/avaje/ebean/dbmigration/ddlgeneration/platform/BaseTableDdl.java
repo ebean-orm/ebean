@@ -1,9 +1,13 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
+import com.avaje.ebean.config.DbConstraintNaming;
+import com.avaje.ebean.config.NamingConvention;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.TableDdl;
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.IndexSet;
 import com.avaje.ebean.dbmigration.migration.Column;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.ForeignKey;
@@ -19,7 +23,9 @@ import java.util.List;
  */
 public class BaseTableDdl implements TableDdl {
 
-  protected final DdlNamingConvention namingConvention;
+  protected final DbConstraintNaming naming;
+
+  protected final NamingConvention namingConvention;
 
   protected final PlatformDdl platformDdl;
 
@@ -32,7 +38,7 @@ public class BaseTableDdl implements TableDdl {
   /**
    * Used when unique constraints specifically for OneToOne can't be created normally (MsSqlServer).
    */
-  protected IndexSet externalUnique = new IndexSet();
+  protected List<Column> externalUnique = new ArrayList<Column>();
 
   // counters used when constraint names are truncated due to maximum length
   // and these counters are used to keep the constraint name unique
@@ -41,11 +47,16 @@ public class BaseTableDdl implements TableDdl {
   protected int countForeignKey;
   protected int countIndex;
 
+  public BaseTableDdl(ServerConfig serverConfig, PlatformDdl platformDdl) {
+    this(serverConfig.getNamingConvention(), serverConfig.getConstraintNaming(), platformDdl);
+  }
+
   /**
    * Construct with a naming convention and platform specific DDL.
    */
-  public BaseTableDdl(DdlNamingConvention namingConvention, PlatformDdl platformDdl) {
+  public BaseTableDdl(NamingConvention namingConvention, DbConstraintNaming naming, PlatformDdl platformDdl) {
     this.namingConvention = namingConvention;
+    this.naming = naming;
     this.platformDdl = platformDdl;
   }
 
@@ -74,7 +85,7 @@ public class BaseTableDdl implements TableDdl {
     List<Column> columns = createTable.getColumn();
     List<Column> pk = determinePrimaryKeyColumns(columns);
 
-    boolean singleColumnPrimaryKey = pk.size() == 1;
+    boolean singleColumnPrimaryKey = (pk.size() == 1);
     boolean useIdentity = false;
     boolean useSequence = false;
 
@@ -99,7 +110,7 @@ public class BaseTableDdl implements TableDdl {
     writeCompoundUniqueConstraints(apply, createTable);
     if (!pk.isEmpty()) {
       // defined on the columns
-      writePrimaryKeyConstraint(apply, tableName, toColumnNames(pk));
+      writePrimaryKeyConstraint(apply, createTable.getPkName(), toColumnNames(pk));
     }
 
     apply.newLine().append(")").endOfStatement();
@@ -111,7 +122,8 @@ public class BaseTableDdl implements TableDdl {
     dropTable(writer.rollback(), tableName);
 
     if (useSequence) {
-      writeSequence(writer, createTable);
+      String pkCol = singleColumnPrimaryKey ? pk.get(0).getName() : null;
+      writeSequence(writer, createTable, pkCol);
     }
 
     // add blank line for a bit of whitespace between tables
@@ -133,15 +145,12 @@ public class BaseTableDdl implements TableDdl {
   private void writeUniqueOneToOneConstraints(DdlWrite write, CreateTable createTable) throws IOException {
 
     String tableName = createTable.getName();
-    for (IndexColumns index : externalUnique.indexes) {
-      String uqName = determineUniqueConstraintName(tableName, index.joinedNames());
+    for (Column col : externalUnique) {
+      String uqName = col.getUniqueOneToOne();
+      String[] columnNames = {col.getName()};
       write.apply()
-          .append(platformDdl.createExternalUniqueForOneToOne(uqName, tableName, index.columnsArray()))
+          .append(platformDdl.createExternalUniqueForOneToOne(uqName, tableName, columnNames))
           .endOfStatement();
-
-      // register it so we check against effective duplication
-      // when creating the foreign key indexes
-      indexSet.add(index);
 
       write.rollbackForeignKeys()
           .append(platformDdl.dropIndex(uqName, tableName))
@@ -149,14 +158,18 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
-  private void writeSequence(DdlWrite writer, CreateTable createTable) throws IOException {
+  private void writeSequence(DdlWrite writer, CreateTable createTable, String pk) throws IOException {
 
     // explicit sequence use or platform decides
     String explicitSequenceName = createTable.getSequenceName();
     int initial = toInt(createTable.getSequenceInitial());
     int allocate = toInt(createTable.getSequenceAllocate());
 
-    String seqName = namingConvention.sequenceName(createTable.getName(), explicitSequenceName);
+    String seqName = explicitSequenceName;
+    if (seqName == null) {
+      seqName = namingConvention.getSequenceName(createTable.getName(), pk);
+    }
+
     String createSeq = platformDdl.createSequence(seqName, initial, allocate);
     if (createSeq != null) {
       writer.apply().append(createSeq).newLine();
@@ -177,7 +190,7 @@ public class BaseTableDdl implements TableDdl {
     for (Column column : columns) {
       String references = column.getReferences();
       if (hasValue(references)) {
-        writeForeignKey(write, tableName, column.getName(), references);
+        writeForeignKey(write, tableName, column);
       }
     }
 
@@ -192,19 +205,19 @@ public class BaseTableDdl implements TableDdl {
     for (ForeignKey key : foreignKey) {
 
       String refTableName = key.getRefTableName();
-      String fkName = determineForeignKeyConstraintName(tableName, refTableName);
+      String fkName = key.getName();
       String[] cols = toColumnNamesSplit(key.getColumnNames());
       String[] refColumns = toColumnNamesSplit(key.getRefColumnNames());
 
-      writeForeignKey(write, fkName, tableName, cols, refTableName, refColumns);
+      writeForeignKey(write, fkName, tableName, cols, refTableName, refColumns, key.getIndexName());
     }
 
   }
 
-  protected void writeForeignKey(DdlWrite write, String tableName, String columnName, String references) throws IOException {
+  protected void writeForeignKey(DdlWrite write, String tableName, Column column) throws IOException {
 
-    String fkName = determineForeignKeyConstraintName(tableName, columnName);
-
+    String fkName = column.getForeignKeyName();
+    String references = column.getReferences();
     int pos = references.lastIndexOf('.');
     if (pos == -1) {
       throw new IllegalStateException("Expecting period '.' character for table.column split but not found in [" + references + "]");
@@ -212,13 +225,13 @@ public class BaseTableDdl implements TableDdl {
     String refTableName = references.substring(0, pos);
     String refColumnName = references.substring(pos + 1);
 
-    String[] cols = {columnName};
+    String[] cols = {column.getName()};
     String[] refCols = {refColumnName};
 
-    writeForeignKey(write, fkName, tableName, cols, refTableName, refCols);
+    writeForeignKey(write, fkName, tableName, cols, refTableName, refCols, column.getForeignKeyIndex());
   }
 
-  protected void writeForeignKey(DdlWrite write, String fkName, String tableName, String[] columns, String refTable, String[] refColumns) throws IOException {
+  protected void writeForeignKey(DdlWrite write, String fkName, String tableName, String[] columns, String refTable, String[] refColumns, String indexName) throws IOException {
 
     tableName = lowerName(tableName);
     DdlBuffer fkeyBuffer = write.applyForeignKeys();
@@ -234,10 +247,7 @@ public class BaseTableDdl implements TableDdl {
     fkeyBuffer.appendWithSpace(platformDdl.getForeignKeyRestrict())
         .endOfStatement();
 
-    String indexName = determineForeignKeyIndexName(tableName, columns);
-
-    boolean addIndex = indexSet.add(columns);
-    if (addIndex) {
+    if (indexName != null) {
       // no matching unique constraint so add the index
       fkeyBuffer.append("create index ").append(indexName).append(" on ").append(tableName);
       appendColumns(columns, fkeyBuffer);
@@ -250,7 +260,7 @@ public class BaseTableDdl implements TableDdl {
         .append(platformDdl.alterTableDropForeignKey(tableName, fkName))
         .endOfStatement();
 
-    if (addIndex) {
+    if (indexName != null) {
       write.rollbackForeignKeys()
           .append(platformDdl.dropIndex(indexName, tableName))
           .endOfStatement();
@@ -289,7 +299,7 @@ public class BaseTableDdl implements TableDdl {
     for (Column column : columns) {
       String checkConstraint = column.getCheckConstraint();
       if (hasValue(checkConstraint)) {
-        writeCheckConstraint(apply, createTable.getName(), column, checkConstraint);
+        writeCheckConstraint(apply, column, checkConstraint);
       }
     }
   }
@@ -297,9 +307,9 @@ public class BaseTableDdl implements TableDdl {
   /**
    * Write a check constraint.
    */
-  protected void writeCheckConstraint(DdlBuffer buffer, String tableName, Column column, String checkConstraint) throws IOException {
+  protected void writeCheckConstraint(DdlBuffer buffer, Column column, String checkConstraint) throws IOException {
 
-    String ckName = determineCheckConstraintName(tableName, column.getName());
+    String ckName = column.getCheckConstraintName();
 
     buffer.append(",").newLine();
     buffer.append("  constraint ").append(ckName);
@@ -319,11 +329,11 @@ public class BaseTableDdl implements TableDdl {
 
     List<Column> columns = createTable.getColumn();
     for (Column column : columns) {
-      if (isTrue(column.isUnique()) || (inlineUniqueOneToOne && isTrue(column.isUniqueOneToOne()))) {
+      if (hasValue(column.getUnique()) || (inlineUniqueOneToOne && hasValue(column.getUniqueOneToOne()))) {
         // normal mechanism for adding unique constraint
-        inlineUniqueConstraintSingle(apply, createTable.getName(), column);
-        indexSet.add(column);
-      } else if (!inlineUniqueOneToOne && isTrue(column.isUniqueOneToOne())) {
+        inlineUniqueConstraintSingle(apply, column);
+
+      } else if (!inlineUniqueOneToOne && hasValue(column.getUniqueOneToOne())) {
         // MsSqlServer specific mechanism for adding unique constraints (that allow nulls)
         externalUnique.add(column);
       }
@@ -333,9 +343,12 @@ public class BaseTableDdl implements TableDdl {
   /**
    * Write the unique constraint inline with the create table statement.
    */
-  protected void inlineUniqueConstraintSingle(DdlBuffer buffer, String tableName, Column column) throws IOException {
+  protected void inlineUniqueConstraintSingle(DdlBuffer buffer, Column column) throws IOException {
 
-    String uqName = determineUniqueConstraintName(tableName, column.getName());
+    String uqName = column.getUnique();
+    if (uqName == null) {
+      uqName = column.getUniqueOneToOne();
+    }
 
     buffer.append(",").newLine();
     buffer.append("  constraint ").append(uqName).append(" unique ");
@@ -347,9 +360,7 @@ public class BaseTableDdl implements TableDdl {
   /**
    * Write the primary key constraint inline with the create table statement.
    */
-  protected void writePrimaryKeyConstraint(DdlBuffer buffer, String tableName, String[] pkColumns) throws IOException {
-
-    String pkName = determinePrimaryKeyName(tableName);
+  protected void writePrimaryKeyConstraint(DdlBuffer buffer, String pkName, String[] pkColumns) throws IOException {
 
     buffer.append(",").newLine();
     buffer.append("  constraint ").append(pkName).append(" primary key");
@@ -383,7 +394,7 @@ public class BaseTableDdl implements TableDdl {
    * choice for column/table names.
    */
   protected String lowerName(String name) {
-    return platformDdl.lowerName(name);
+    return naming.lowerName(name);
   }
 
   /**
@@ -413,46 +424,6 @@ public class BaseTableDdl implements TableDdl {
    */
   protected String convertToPlatformType(String type, boolean identity) {
     return platformDdl.convert(type, identity);
-  }
-
-  /**
-   * Return the primary key constraint name.
-   */
-  protected String determinePrimaryKeyName(String tableName) {
-
-    return namingConvention.primaryKeyName(tableName);
-  }
-
-  /**
-   * Return the foreign key constraint name given a single column foreign key.
-   */
-  protected String determineForeignKeyConstraintName(String tableName, String columnName) {
-
-    return namingConvention.foreignKeyConstraintName(tableName, columnName, ++countForeignKey);
-  }
-
-  /**
-   * Return the foreign key constraint name given a single column foreign key.
-   */
-  protected String determineForeignKeyIndexName(String tableName, String[] columns) {
-
-    return namingConvention.foreignKeyIndexName(tableName, columns, ++countIndex);
-  }
-
-  /**
-   * Return the unique constraint name.
-   */
-  protected String determineUniqueConstraintName(String tableName, String columnName) {
-
-    return namingConvention.uniqueConstraintName(tableName, columnName, ++countUnique);
-  }
-
-  /**
-   * Return the constraint name.
-   */
-  protected String determineCheckConstraintName(String tableName, String columnName) {
-
-    return namingConvention.checkConstraintName(tableName, columnName, ++countCheck);
   }
 
   /**
@@ -489,118 +460,4 @@ public class BaseTableDdl implements TableDdl {
     return (value == null) ? 0 : value.intValue();
   }
 
-
-  /**
-   * The indexes held on the table.
-   * <p>
-   * Used to detect when we don't need to add an index on the foreign key columns
-   * when there is an existing unique constraint with the same columns.
-   */
-  protected static class IndexSet {
-
-    private List<IndexColumns> indexes = new ArrayList<IndexColumns>();
-
-    /**
-     * Clear the indexes (for each table).
-     */
-    public void clear() {
-      indexes.clear();
-    }
-
-    /**
-     * Add an index for the given column.
-     */
-    public void add(Column column) {
-      indexes.add(new IndexColumns(column));
-    }
-
-    /**
-     * Return true if an index should be added for the given columns.
-     * <p>
-     * Returning false indicates there is an existing index (unique constraint) with these columns
-     * and that an extra index should not be added.
-     * </p>
-     */
-    public boolean add(String[] columns) {
-      IndexColumns newIndex = new IndexColumns(columns);
-      for (int i = 0; i < indexes.size(); i++) {
-        if (indexes.get(i).isMatch(newIndex)) {
-          return false;
-        }
-      }
-      indexes.add(newIndex);
-      return true;
-    }
-
-    /**
-     * Add the externally created unique constraint here so that we check later if foreign key indexes
-     * don't need to be created (as the columns match this unique constraint).
-     */
-    public void add(IndexColumns index) {
-      indexes.add(index);
-    }
-  }
-
-  /**
-   * Set of columns making up a particular index (column order is important).
-   */
-  protected static class IndexColumns {
-
-    List<String> columns = new ArrayList<String>(4);
-
-    /**
-     * Construct representing as a single column index.
-     */
-    public IndexColumns(Column column) {
-      columns.add(column.getName());
-    }
-
-    /**
-     * Construct representing index.
-     */
-    public IndexColumns(String[] columnNames) {
-      for (int i = 0; i < columnNames.length; i++) {
-        columns.add(columnNames[i]);
-      }
-    }
-
-    /**
-     * Return true if there this index match (same columns same order).
-     */
-    public boolean isMatch(IndexColumns other) {
-      return columns.equals(other.columns);
-    }
-
-    /**
-     * Add a unique index based on the single column.
-     */
-    protected void add(String column) {
-      columns.add(column);
-    }
-
-    /**
-     * Return the columns as a string array.
-     */
-    public String[] columnsArray() {
-      return columns.toArray(new String[columns.size()]);
-    }
-
-    /**
-     * Return the column names all joined with underscore.
-     */
-    public String joinedNames() {
-      if (columns.size() == 1) {
-        return columns.get(0);
-      } else {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < columns.size(); i++) {
-          if (i > 0) {
-            sb.append("_");
-          }
-          sb.append(columns.get(i));
-        }
-        return sb.toString();
-      }
-    }
-  }
 }

@@ -2,6 +2,7 @@ package com.avaje.ebean.dbmigration.ddlgeneration;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.H2Platform;
 import com.avaje.ebean.config.dbplatform.PostgresPlatform;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
@@ -15,13 +16,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BaseDdlHandlerTest extends BaseTestCase {
 
+  ServerConfig serverConfig = new ServerConfig();
 
   private DdlHandler h2Handler() {
-    return new H2Platform().createDdlHandler();
+    return new H2Platform().createDdlHandler(serverConfig);
   }
 
   private DdlHandler postgresHandler() {
-    return new PostgresPlatform().createDdlHandler();
+    return new PostgresPlatform().createDdlHandler(serverConfig);
   }
 
   @Test

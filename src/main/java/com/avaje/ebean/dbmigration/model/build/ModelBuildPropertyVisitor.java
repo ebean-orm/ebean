@@ -1,15 +1,17 @@
 package com.avaje.ebean.dbmigration.model.build;
 
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.IndexSet;
+import com.avaje.ebean.dbmigration.model.MColumn;
 import com.avaje.ebean.dbmigration.model.MCompoundForeignKey;
+import com.avaje.ebean.dbmigration.model.MTable;
+import com.avaje.ebean.dbmigration.model.visitor.BaseTablePropertyVisitor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
+import com.avaje.ebeaninternal.server.deploy.CompoundUniqueContraint;
 import com.avaje.ebeaninternal.server.deploy.TableJoinColumn;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
-import com.avaje.ebean.dbmigration.model.MColumn;
-import com.avaje.ebean.dbmigration.model.MTable;
-import com.avaje.ebean.dbmigration.model.visitor.BaseTablePropertyVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,16 +22,68 @@ import java.util.List;
  */
 public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
-  private final ModelBuildContext ctx;
+  protected final ModelBuildContext ctx;
 
   private final MTable table;
 
+  private final IndexSet indexSet = new IndexSet();
+
   private MColumn lastColumn;
 
-  public ModelBuildPropertyVisitor(ModelBuildContext ctx, MTable table) {
+  private int countForeignKey;
+  private int countIndex;
+  private int countUnique;
+  private int countCheck;
+
+
+  public ModelBuildPropertyVisitor(ModelBuildContext ctx, MTable table, CompoundUniqueContraint[] compoundUniqueConstraints) {
     this.ctx = ctx;
     this.table = table;
+
+    addCompoundUniqueConstraint(compoundUniqueConstraints);
   }
+
+  /**
+   * Add unique constraints defined via JPA UniqueConstraint annotations.
+   */
+  private void addCompoundUniqueConstraint(CompoundUniqueContraint[] compoundUniqueConstraints) {
+
+    if (compoundUniqueConstraints != null) {
+      for (int i = 0; i < compoundUniqueConstraints.length; i++) {
+        String[] columns = compoundUniqueConstraints[i].getColumns();
+        String uqName = determineUniqueConstraintName(columns);
+        table.addCompoundUniqueConstraint(columns, false, uqName);
+        indexSet.add(columns);
+      }
+    }
+  }
+
+  @Override
+  public void visitEnd() {
+
+    // set the primary key name
+    table.setPkName(determinePrimaryKeyName());
+
+    // check if indexes on foreign keys should be suppressed
+    for (MColumn column : table.getColumns().values()) {
+      if (hasValue(column.getForeignKeyIndex())) {
+        if (indexSet.contains(column.getName())) {
+          // suppress index on foreign key as there is already
+          // effectively an index (probably via unique constraint)
+          column.setForeignKeyIndex(null);
+        }
+      }
+    }
+
+    for (MCompoundForeignKey compoundKey : table.getCompoundKeys()) {
+      if (indexSet.contains(compoundKey.getColumns())) {
+        // suppress index on foreign key as there is already
+        // effectively an index (probably via unique constraint)
+        compoundKey.setIndexName(null);
+      }
+    }
+  }
+
 
   @Override
   public void visitMany(BeanPropertyAssocMany<?> p) {
@@ -85,7 +139,9 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     if (columns.length > 1) {
       // compound foreign key
       String refTable = p.getTargetDescriptor().getBaseTable();
-      compoundKey = new MCompoundForeignKey(refTable);
+      String fkName = determineForeignKeyConstraintName(p.getName());
+      String fkIndex = determineForeignKeyIndexName(p.getName());
+      compoundKey = new MCompoundForeignKey(fkName, refTable, fkIndex);
       table.addForeignKey(compoundKey);
     }
 
@@ -109,6 +165,8 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
           refTable = p.getTargetDescriptor().getBaseTable();
         }
         col.setReferences(refTable + "." + refColumn);
+        col.setForeignKeyName(determineForeignKeyConstraintName(col.getName()));
+        col.setForeignKeyIndex(determineForeignKeyIndexName(col.getName()));
       } else {
         compoundKey.addColumnPair(dbCol, refColumn);
       }
@@ -119,14 +177,19 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       // adding the unique constraint restricts the cardinality from OneToMany down to OneToOne
       // for MsSqlServer we need different DDL to handle NULL values on this constraint
       if (modelColumns.size() == 1) {
-        modelColumns.get(0).setUniqueOneToOne(true);
+        MColumn col = modelColumns.get(0);
+        col.setUniqueOneToOne(determineUniqueConstraintName(col.getName()));
+        indexSetAdd(col.getName());
+
       } else {
-        table.addCompoundUniqueConstraint(modelColumns, true);
+        String uqName = determineUniqueConstraintName(p.getName());
+        table.addCompoundUniqueConstraint(modelColumns, true, uqName);
+        indexSetAdd(modelColumns);
       }
     }
   }
 
-	@Override
+  @Override
 	public void visitScalar(BeanProperty p) {
 
     if (p.isSecondaryTable()) {
@@ -146,12 +209,89 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 		}
 
     if (p.isUnique() && !p.isId()) {
-      col.setUnique(true);
+      col.setUnique(determineUniqueConstraintName(col.getName()));
+      indexSetAdd(col.getName());
     }
-    col.setCheckConstraint(p.getDbConstraintExpression());
+    String checkConstraint = p.getDbConstraintExpression();
+    if (checkConstraint != null) {
+      col.setCheckConstraint(checkConstraint);
+      col.setCheckConstraintName(determineCheckConstraintName(col.getName()));
+    }
 
     lastColumn = col;
     table.addColumn(col);
 	}
+
+
+  private void indexSetAdd(String column) {
+    indexSet.add(column);
+  }
+
+  private void indexSetAdd(List<MColumn> modelColumns) {
+    String[] cols = new String[modelColumns.size()];
+    for (int i = 0; i < modelColumns.size(); i++) {
+      cols[i] = modelColumns.get(i).getName();
+    }
+    indexSet.add(cols);
+  }
+
+  /**
+   * Return the primary key constraint name.
+   */
+  protected String determinePrimaryKeyName() {
+
+    return ctx.primaryKeyName(table.getName());
+  }
+
+  /**
+   * Return the foreign key constraint name given a single column foreign key.
+   */
+  protected String determineForeignKeyConstraintName(String columnName) {
+
+    return ctx.foreignKeyConstraintName(table.getName(), columnName, ++countForeignKey);
+  }
+
+  protected String determineForeignKeyIndexName(String column) {
+
+    String[] cols = {column};
+    return determineForeignKeyIndexName(cols);
+  }
+
+  /**
+   * Return the foreign key constraint name given a single column foreign key.
+   */
+  protected String determineForeignKeyIndexName(String[] columns) {
+
+    return ctx.foreignKeyIndexName(table.getName(), columns, ++countIndex);
+  }
+
+  /**
+   * Return the unique constraint name.
+   */
+  protected String determineUniqueConstraintName(String columnName) {
+
+    return ctx.uniqueConstraintName(table.getName(), columnName, ++countUnique);
+  }
+
+  /**
+   * Return the unique constraint name.
+   */
+  protected String determineUniqueConstraintName(String[] columnNames) {
+
+    return ctx.uniqueConstraintName(table.getName(), columnNames, ++countUnique);
+  }
+
+  /**
+   * Return the constraint name.
+   */
+  protected String determineCheckConstraintName(String columnName) {
+
+    return ctx.checkConstraintName(table.getName(), columnName, ++countCheck);
+  }
+
+
+  private boolean hasValue(String val) {
+    return val != null && !val.isEmpty();
+  }
 
 }

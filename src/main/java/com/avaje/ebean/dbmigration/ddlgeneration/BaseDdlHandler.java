@@ -1,8 +1,9 @@
 package com.avaje.ebean.dbmigration.ddlgeneration;
 
+import com.avaje.ebean.config.DbConstraintNaming;
+import com.avaje.ebean.config.NamingConvention;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.BaseColumnDdl;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.BaseTableDdl;
-import com.avaje.ebean.dbmigration.ddlgeneration.platform.DdlNamingConvention;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
@@ -22,8 +23,8 @@ public class BaseDdlHandler implements DdlHandler {
 
   protected final TableDdl tableDdl;
 
-  public BaseDdlHandler(DdlNamingConvention namingConvention, PlatformDdl platformDdl) {
-    this.tableDdl = new BaseTableDdl(namingConvention, platformDdl);
+  public BaseDdlHandler(NamingConvention namingConvention, DbConstraintNaming naming, PlatformDdl platformDdl) {
+    this.tableDdl = new BaseTableDdl(namingConvention, naming, platformDdl);
     this.columnDdl = new BaseColumnDdl(platformDdl);
   }
 

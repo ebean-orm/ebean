@@ -11,6 +11,11 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
 public interface BeanPropertyVisitor {
 
   /**
+   * Completed visiting all the properties on the bean.
+   */
+  void visitEnd();
+
+  /**
    * Visit a OneToMany or ManyToMany property.
    */
   void visitMany(BeanPropertyAssocMany<?> p);

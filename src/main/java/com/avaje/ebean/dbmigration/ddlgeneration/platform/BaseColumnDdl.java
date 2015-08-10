@@ -55,23 +55,22 @@ public class BaseColumnDdl implements ColumnDdl {
       historyIncludeColumn(writer, alterColumn);
     }
 
-    if (hasValue(alterColumn.getOldReferences())) {
+    if (hasValue(alterColumn.getDropForeignKey())) {
       dropForeignKey(writer, alterColumn);
     }
-    if (hasValue(alterColumn.getNewReferences())) {
+    if (hasValue(alterColumn.getReferences())) {
       addForeignKey(writer, alterColumn);
     }
 
-    if (isTrue(alterColumn.isUnique())) {
-      addUniqueConstraint(writer, alterColumn);
-    } else if (isFalse(alterColumn.isUnique())) {
+    if (hasValue(alterColumn.getDropUnique())) {
       dropUniqueConstraint(writer, alterColumn);
     }
+    if (hasValue(alterColumn.getUnique())) {
+      addUniqueConstraint(writer, alterColumn);
+    }
 
-    if (isTrue(alterColumn.isUniqueOneToOne())) {
+    if (hasValue(alterColumn.getUniqueOneToOne())) {
       addUniqueOneToOneConstraint(writer, alterColumn);
-    } else if (isFalse(alterColumn.isUniqueOneToOne())) {
-      dropUniqueOneToOneConstraint(writer, alterColumn);
     }
 
   }
@@ -82,34 +81,41 @@ public class BaseColumnDdl implements ColumnDdl {
 
   }
 
-  protected void dropForeignKey(DdlWrite writer, AlterColumn alterColumn) {
+  protected void dropForeignKey(DdlWrite writer, AlterColumn alter) throws IOException {
 
+    String tableName = alter.getTableName();
+    String fkName = alter.getDropForeignKey();
+
+    writer.apply()
+        .append(platformDdl.alterTableDropForeignKey(tableName, fkName))
+        .endOfStatement();
   }
 
-  protected void dropUniqueOneToOneConstraint(DdlWrite writer, AlterColumn alterColumn) {
-
-  }
-
-  protected void addUniqueOneToOneConstraint(DdlWrite writer, AlterColumn alterColumn) {
-
-  }
 
   protected void dropUniqueConstraint(DdlWrite writer, AlterColumn alter) throws IOException {
 
     String tableName = alter.getTableName();
-    String columnName = alter.getColumnName();
-    String uqName = platformDdl.namingConvention.uniqueConstraintName(tableName, columnName, 50);
+    String uqName = alter.getDropUnique();
 
     writer.apply()
         .append(platformDdl.dropIndex(uqName, tableName))
         .endOfStatement();
   }
 
+  protected void addUniqueOneToOneConstraint(DdlWrite writer, AlterColumn alter) throws IOException {
+
+    addUniqueConstraint(writer, alter, alter.getUniqueOneToOne());
+  }
+
   protected void addUniqueConstraint(DdlWrite writer, AlterColumn alter) throws IOException {
+
+    addUniqueConstraint(writer, alter, alter.getUnique());
+  }
+
+  protected void addUniqueConstraint(DdlWrite writer, AlterColumn alter, String uqName) throws IOException {
 
     String tableName = alter.getTableName();
     String columnName = alter.getColumnName();
-    String uqName = platformDdl.namingConvention.uniqueConstraintName(tableName, columnName, 50);
 
     String[] cols = {columnName};
     writer.apply()

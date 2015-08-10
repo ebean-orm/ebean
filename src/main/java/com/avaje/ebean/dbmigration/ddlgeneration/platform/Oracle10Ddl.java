@@ -10,11 +10,10 @@ public class Oracle10Ddl extends PlatformDdl {
 
   public Oracle10Ddl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
     super(platformTypes, dbIdentity);
-    this.historyDdl = new H2HistoryDdl();
     this.dropTableIfExists = "drop table ";
     this.dropSequenceIfExists = "drop sequence ";
     this.dropTableCascade = " cascade constraints purge";
-    this.namingConvention.maxConstraintNameLength = 30;
+    this.maxConstraintNameLength = 30;
     this.foreignKeyRestrict = "";
   }
 

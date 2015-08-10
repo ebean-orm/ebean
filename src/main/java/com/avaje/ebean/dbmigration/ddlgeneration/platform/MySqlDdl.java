@@ -10,7 +10,6 @@ public class MySqlDdl extends PlatformDdl {
 
   public MySqlDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
     super(platformTypes, dbIdentity);
-    this.namingConvention.maxConstraintNameLength = 64;
   }
 
   /**
@@ -24,6 +23,7 @@ public class MySqlDdl extends PlatformDdl {
   /**
    * Return the drop foreign key clause.
    */
+  @Override
   public String alterTableDropForeignKey(String tableName, String fkName) {
     return "alter table " + tableName + " drop foreign key " + fkName;
   }

@@ -1,24 +1,19 @@
-package com.avaje.ebean.dbmigration.ddlgeneration.platform;
-
-import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.DbQuotes;
+package com.avaje.ebean.config;
 
 /**
  * Used to normalise table and column names which means stripping out
  * quoted identifier characters and any catalog or schema prefix.
  */
-public class DdlNameNormalise {
+public class DbConstraintNormalise {
+
+  protected final String[] quotedIdentifiers;
 
   protected boolean lowerCaseTables = true;
 
   protected boolean lowerCaseColumns = true;
 
-  protected DbQuotes quotes = new DbQuotes();
-
-  public DdlNameNormalise() {
-  }
-
-  public boolean notQuoted(String tableName) {
-    return quotes.notQuoted(tableName);
+  public DbConstraintNormalise() {
+    this.quotedIdentifiers = new String[]{"\"", "'", "[", "]", "`"};
   }
 
   /**
@@ -54,9 +49,31 @@ public class DdlNameNormalise {
   /**
    * Trim off the platform quoted identifier quotes like [ ' and ".
    */
-  protected String trimQuotes(String tableName) {
+  public boolean notQuoted(String tableName) {
 
-    return quotes.trimQuotes(tableName);
+    // remove quoted identifier characters
+    for (int i = 0; i < quotedIdentifiers.length; i++) {
+      if (tableName.contains(quotedIdentifiers[i])) {
+        return false;
+      }
+    }
+    return true;
   }
+
+  /**
+   * Trim off the platform quoted identifier quotes like [ ' and ".
+   */
+  public String trimQuotes(String tableName) {
+
+    if (tableName == null) {
+      return "";
+    }
+    // remove quoted identifier characters
+    for (int i = 0; i < quotedIdentifiers.length; i++) {
+      tableName = tableName.replace(quotedIdentifiers[i], "");
+    }
+    return tableName;
+  }
+
 
 }

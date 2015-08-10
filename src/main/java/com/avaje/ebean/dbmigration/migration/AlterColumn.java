@@ -20,16 +20,20 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="columnName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="tableName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="type" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="defaultValue" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="notnull" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="historyExclude" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="unique" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="uniqueOneToOne" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="oldDefaultValue" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="newDefaultValue" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="oldCheckConstraint" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="newCheckConstraint" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="oldReferences" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="newReferences" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="checkConstraint" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="checkConstraintName" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="dropCheckConstraint" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="unique" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="uniqueOneToOne" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="dropUnique" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="references" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="foreignKeyName" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="foreignKeyIndex" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="dropForeignKey" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="dropForeignKeyIndex" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -48,26 +52,34 @@ public class AlterColumn {
     protected String tableName;
     @XmlAttribute(name = "type")
     protected String type;
+    @XmlAttribute(name = "defaultValue")
+    protected String defaultValue;
     @XmlAttribute(name = "notnull")
     protected Boolean notnull;
     @XmlAttribute(name = "historyExclude")
     protected Boolean historyExclude;
+    @XmlAttribute(name = "checkConstraint")
+    protected String checkConstraint;
+    @XmlAttribute(name = "checkConstraintName")
+    protected String checkConstraintName;
+    @XmlAttribute(name = "dropCheckConstraint")
+    protected String dropCheckConstraint;
     @XmlAttribute(name = "unique")
-    protected Boolean unique;
+    protected String unique;
     @XmlAttribute(name = "uniqueOneToOne")
-    protected Boolean uniqueOneToOne;
-    @XmlAttribute(name = "oldDefaultValue")
-    protected String oldDefaultValue;
-    @XmlAttribute(name = "newDefaultValue")
-    protected String newDefaultValue;
-    @XmlAttribute(name = "oldCheckConstraint")
-    protected String oldCheckConstraint;
-    @XmlAttribute(name = "newCheckConstraint")
-    protected String newCheckConstraint;
-    @XmlAttribute(name = "oldReferences")
-    protected String oldReferences;
-    @XmlAttribute(name = "newReferences")
-    protected String newReferences;
+    protected String uniqueOneToOne;
+    @XmlAttribute(name = "dropUnique")
+    protected String dropUnique;
+    @XmlAttribute(name = "references")
+    protected String references;
+    @XmlAttribute(name = "foreignKeyName")
+    protected String foreignKeyName;
+    @XmlAttribute(name = "foreignKeyIndex")
+    protected String foreignKeyIndex;
+    @XmlAttribute(name = "dropForeignKey")
+    protected String dropForeignKey;
+    @XmlAttribute(name = "dropForeignKeyIndex")
+    protected String dropForeignKeyIndex;
 
     /**
      * Gets the value of the columnName property.
@@ -142,6 +154,30 @@ public class AlterColumn {
     }
 
     /**
+     * Gets the value of the defaultValue property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    /**
+     * Sets the value of the defaultValue property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setDefaultValue(String value) {
+        this.defaultValue = value;
+    }
+
+    /**
      * Gets the value of the notnull property.
      * 
      * @return
@@ -190,14 +226,86 @@ public class AlterColumn {
     }
 
     /**
+     * Gets the value of the checkConstraint property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCheckConstraint() {
+        return checkConstraint;
+    }
+
+    /**
+     * Sets the value of the checkConstraint property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setCheckConstraint(String value) {
+        this.checkConstraint = value;
+    }
+
+    /**
+     * Gets the value of the checkConstraintName property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCheckConstraintName() {
+        return checkConstraintName;
+    }
+
+    /**
+     * Sets the value of the checkConstraintName property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setCheckConstraintName(String value) {
+        this.checkConstraintName = value;
+    }
+
+    /**
+     * Gets the value of the dropCheckConstraint property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getDropCheckConstraint() {
+        return dropCheckConstraint;
+    }
+
+    /**
+     * Sets the value of the dropCheckConstraint property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setDropCheckConstraint(String value) {
+        this.dropCheckConstraint = value;
+    }
+
+    /**
      * Gets the value of the unique property.
      * 
      * @return
      *     possible object is
-     *     {@link Boolean }
+     *     {@link String }
      *     
      */
-    public Boolean isUnique() {
+    public String getUnique() {
         return unique;
     }
 
@@ -206,10 +314,10 @@ public class AlterColumn {
      * 
      * @param value
      *     allowed object is
-     *     {@link Boolean }
+     *     {@link String }
      *     
      */
-    public void setUnique(Boolean value) {
+    public void setUnique(String value) {
         this.unique = value;
     }
 
@@ -218,10 +326,10 @@ public class AlterColumn {
      * 
      * @return
      *     possible object is
-     *     {@link Boolean }
+     *     {@link String }
      *     
      */
-    public Boolean isUniqueOneToOne() {
+    public String getUniqueOneToOne() {
         return uniqueOneToOne;
     }
 
@@ -230,155 +338,155 @@ public class AlterColumn {
      * 
      * @param value
      *     allowed object is
-     *     {@link Boolean }
+     *     {@link String }
      *     
      */
-    public void setUniqueOneToOne(Boolean value) {
+    public void setUniqueOneToOne(String value) {
         this.uniqueOneToOne = value;
     }
 
     /**
-     * Gets the value of the oldDefaultValue property.
+     * Gets the value of the dropUnique property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getOldDefaultValue() {
-        return oldDefaultValue;
+    public String getDropUnique() {
+        return dropUnique;
     }
 
     /**
-     * Sets the value of the oldDefaultValue property.
+     * Sets the value of the dropUnique property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setOldDefaultValue(String value) {
-        this.oldDefaultValue = value;
+    public void setDropUnique(String value) {
+        this.dropUnique = value;
     }
 
     /**
-     * Gets the value of the newDefaultValue property.
+     * Gets the value of the references property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getNewDefaultValue() {
-        return newDefaultValue;
+    public String getReferences() {
+        return references;
     }
 
     /**
-     * Sets the value of the newDefaultValue property.
+     * Sets the value of the references property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setNewDefaultValue(String value) {
-        this.newDefaultValue = value;
+    public void setReferences(String value) {
+        this.references = value;
     }
 
     /**
-     * Gets the value of the oldCheckConstraint property.
+     * Gets the value of the foreignKeyName property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getOldCheckConstraint() {
-        return oldCheckConstraint;
+    public String getForeignKeyName() {
+        return foreignKeyName;
     }
 
     /**
-     * Sets the value of the oldCheckConstraint property.
+     * Sets the value of the foreignKeyName property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setOldCheckConstraint(String value) {
-        this.oldCheckConstraint = value;
+    public void setForeignKeyName(String value) {
+        this.foreignKeyName = value;
     }
 
     /**
-     * Gets the value of the newCheckConstraint property.
+     * Gets the value of the foreignKeyIndex property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getNewCheckConstraint() {
-        return newCheckConstraint;
+    public String getForeignKeyIndex() {
+        return foreignKeyIndex;
     }
 
     /**
-     * Sets the value of the newCheckConstraint property.
+     * Sets the value of the foreignKeyIndex property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setNewCheckConstraint(String value) {
-        this.newCheckConstraint = value;
+    public void setForeignKeyIndex(String value) {
+        this.foreignKeyIndex = value;
     }
 
     /**
-     * Gets the value of the oldReferences property.
+     * Gets the value of the dropForeignKey property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getOldReferences() {
-        return oldReferences;
+    public String getDropForeignKey() {
+        return dropForeignKey;
     }
 
     /**
-     * Sets the value of the oldReferences property.
+     * Sets the value of the dropForeignKey property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setOldReferences(String value) {
-        this.oldReferences = value;
+    public void setDropForeignKey(String value) {
+        this.dropForeignKey = value;
     }
 
     /**
-     * Gets the value of the newReferences property.
+     * Gets the value of the dropForeignKeyIndex property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getNewReferences() {
-        return newReferences;
+    public String getDropForeignKeyIndex() {
+        return dropForeignKeyIndex;
     }
 
     /**
-     * Sets the value of the newReferences property.
+     * Sets the value of the dropForeignKeyIndex property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setNewReferences(String value) {
-        this.newReferences = value;
+    public void setDropForeignKeyIndex(String value) {
+        this.dropForeignKeyIndex = value;
     }
 
 }

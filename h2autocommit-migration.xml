@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet>
-        <createTable name="ut_detail">
+        <createTable name="ut_detail" pkName="pk_ut_detail">
             <column name="id" type="integer" primaryKey="true" identity="true"/>
             <column name="name" type="varchar(255)"/>
             <column name="qty" type="integer"/>

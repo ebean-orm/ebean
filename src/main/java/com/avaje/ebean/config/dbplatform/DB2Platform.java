@@ -15,6 +15,7 @@ public class DB2Platform extends DatabasePlatform {
   public DB2Platform() {
     super();
     this.name = "db2";
+    this.maxTableNameLength = 18;
     this.sqlLimiter = new Db2SqlLimiter();
     this.platformDdl = new DB2Ddl(dbTypeMap, dbIdentity);
 

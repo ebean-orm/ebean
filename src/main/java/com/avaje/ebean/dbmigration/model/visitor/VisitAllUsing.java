@@ -72,6 +72,7 @@ public class VisitAllUsing {
       }
 
       visitInheritanceProperties(desc, propertyVisitor);
+      propertyVisitor.visitEnd();
     }
   }
 

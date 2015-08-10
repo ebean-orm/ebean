@@ -2,6 +2,8 @@ package com.avaje.ebean.dbmigration.model;
 
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
+import com.avaje.ebean.config.DbConstraintNaming;
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
 import com.avaje.ebean.dbmigration.migration.Migration;
 import com.avaje.ebean.dbmigration.migrationreader.MigrationXmlWriter;
@@ -21,6 +23,10 @@ public class CurrentModel {
 
   private final SpiEbeanServer server;
 
+  private final DbConstraintNaming constraintNaming;
+
+  private final PlatformDdl platformDdl;
+
   private ModelContainer model;
 
   private ChangeSet changeSet;
@@ -32,6 +38,8 @@ public class CurrentModel {
    */
   public CurrentModel(SpiEbeanServer server) {
     this.server = server;
+    this.platformDdl = server.getDatabasePlatform().getPlatformDdl();
+    this.constraintNaming = server.getServerConfig().getConstraintNaming();
   }
 
   /**
@@ -40,7 +48,7 @@ public class CurrentModel {
   public ModelContainer read() {
     if (model == null) {
       model = new ModelContainer();
-      ModelBuildContext context = new ModelBuildContext(model);
+      ModelBuildContext context = new ModelBuildContext(model, constraintNaming, platformDdl);
       ModelBuildBeanVisitor visitor = new ModelBuildBeanVisitor(context);
       VisitAllUsing visit = new VisitAllUsing(visitor, server);
       visit.visitAllBeans();
@@ -124,7 +132,7 @@ public class CurrentModel {
    * Return the platform specific DdlHandler (to generate DDL).
    */
   private DdlHandler handler() {
-    return server.getDatabasePlatform().createDdlHandler();
+    return server.getDatabasePlatform().createDdlHandler(server.getServerConfig());
   }
 
   /**

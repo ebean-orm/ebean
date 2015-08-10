@@ -124,6 +124,7 @@
       <xsd:attribute name="sequenceName" type="xsd:string"/>
       <xsd:attribute name="sequenceInitial" type="xsd:positiveInteger"/>
       <xsd:attribute name="sequenceAllocate" type="xsd:positiveInteger"/>
+      <xsd:attribute name="pkName" type="xsd:string"/>
       <xsd:attributeGroup ref="tablespaceAttributes"/>
     </xsd:complexType>
   </xsd:element>
@@ -141,17 +142,19 @@
   <!-- Only expected to be used for compound unique constraint -->
   <xsd:element name="uniqueConstraint">
     <xsd:complexType>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
       <xsd:attribute name="columnNames" type="xsd:string" use="required"/>
-      <xsd:attribute name="constraintName" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
 
   <!-- Only expected to be used for compound foreign keys -->
   <xsd:element name="foreignKey">
     <xsd:complexType>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
       <xsd:attribute name="columnNames" type="xsd:string" use="required"/>
       <xsd:attribute name="refColumnNames" type="xsd:string" use="required"/>
       <xsd:attribute name="refTableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="indexName" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
 
@@ -206,16 +209,20 @@
       <xsd:attribute name="columnName" type="xsd:string" use="required"/>
       <xsd:attribute name="tableName" type="xsd:string" use="required"/>
       <xsd:attribute name="type" type="xsd:string"/>
+      <xsd:attribute name="defaultValue" type="xsd:string"/>
       <xsd:attribute name="notnull" type="xsd:boolean"/>
       <xsd:attribute name="historyExclude" type="xsd:boolean"/>
-      <xsd:attribute name="unique" type="xsd:boolean"/>
-      <xsd:attribute name="uniqueOneToOne" type="xsd:boolean"/>
-      <xsd:attribute name="oldDefaultValue" type="xsd:string"/>
-      <xsd:attribute name="newDefaultValue" type="xsd:string"/>
-      <xsd:attribute name="oldCheckConstraint" type="xsd:string"/>
-      <xsd:attribute name="newCheckConstraint" type="xsd:string"/>
-      <xsd:attribute name="oldReferences" type="xsd:string"/>
-      <xsd:attribute name="newReferences" type="xsd:string"/>
+      <xsd:attribute name="checkConstraint" type="xsd:string"/>
+      <xsd:attribute name="checkConstraintName" type="xsd:string"/>
+      <xsd:attribute name="dropCheckConstraint" type="xsd:string"/>
+      <xsd:attribute name="unique" type="xsd:string"/>
+      <xsd:attribute name="uniqueOneToOne" type="xsd:string"/>
+      <xsd:attribute name="dropUnique" type="xsd:string"/>
+      <xsd:attribute name="references" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyName" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyIndex" type="xsd:string"/>
+      <xsd:attribute name="dropForeignKey" type="xsd:string"/>
+      <xsd:attribute name="dropForeignKeyIndex" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
 
@@ -282,13 +289,16 @@
       <xsd:attribute name="type" type="xsd:string" use="required"/>
       <xsd:attribute name="defaultValue" type="xsd:string"/>
       <xsd:attribute name="notnull" type="xsd:boolean"/>
-      <xsd:attribute name="checkConstraint" type="xsd:string"/>
       <xsd:attribute name="historyExclude" type="xsd:boolean"/>
-      <xsd:attribute name="unique" type="xsd:boolean"/>
-      <xsd:attribute name="uniqueOneToOne" type="xsd:boolean"/>
       <xsd:attribute name="primaryKey" type="xsd:boolean"/>
       <xsd:attribute name="identity" type="xsd:boolean"/>
+      <xsd:attribute name="checkConstraint" type="xsd:string"/>
+      <xsd:attribute name="checkConstraintName" type="xsd:string"/>
+      <xsd:attribute name="unique" type="xsd:string"/>
+      <xsd:attribute name="uniqueOneToOne" type="xsd:string"/>
       <xsd:attribute name="references" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyName" type="xsd:string"/>
+      <xsd:attribute name="foreignKeyIndex" type="xsd:string"/>
       <xsd:attribute name="comment" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>

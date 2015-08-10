@@ -23,6 +23,8 @@ public class ModelBuildIntersectionTable {
 
   private MTable intersectionTable;
 
+  private int countForeignKey;
+
 	public ModelBuildIntersectionTable(ModelBuildContext ctx, BeanPropertyAssocMany<?> manyProp) {
 		this.ctx = ctx;
 		this.manyProp = manyProp;
@@ -30,7 +32,7 @@ public class ModelBuildIntersectionTable {
 		this.tableJoin = manyProp.getTableJoin();
 	}
 
-	public void build() {
+  public void build() {
 
     intersectionTable = createTable();
     ctx.addTable(intersectionTable);
@@ -42,66 +44,38 @@ public class ModelBuildIntersectionTable {
 
 		BeanDescriptor<?> localDesc = manyProp.getBeanDescriptor();
 		buildFkConstraints(localDesc, intersectionTableJoin.columns(), true);
-		//ctx.addIntersectionTableFk(fk1);
 
 		BeanDescriptor<?> targetDesc = manyProp.getTargetDescriptor();
 		buildFkConstraints(targetDesc, tableJoin.columns(), false);
-		//ctx.addIntersectionTableFk(fk2);
 	}
 
 	
 	private void buildFkConstraints(BeanDescriptor<?> desc, TableJoinColumn[] columns, boolean direction) {
 
+    String tableName = intersectionTableJoin.getTable();
+    String baseTable = desc.getBaseTable();
 
-//		String fkName = "fk_"+intersectionTableJoin.getTable()+"_"+desc.getBaseTable();
-//
-//		fkName = getFkNameWithSuffix(fkName);
+    String fkName = ctx.foreignKeyConstraintName(tableName, baseTable, ++countForeignKey);
+    String fkIndex = ctx.foreignKeyIndexName(tableName, baseTable, countForeignKey);
 
-    MCompoundForeignKey foreignKey = new MCompoundForeignKey(desc.getBaseTable());
+    MCompoundForeignKey foreignKey = new MCompoundForeignKey(fkName, desc.getBaseTable(), fkIndex);
     intersectionTable.addForeignKey(foreignKey);
 
-
-//		fkBuf.append("alter table ");
-//		fkBuf.append(intersectionTableJoin.getTable());
-//		fkBuf.append(" add constraint ").append(fkName);
-//
-//		fkBuf.append(" foreign key (");
-
 		for (int i = 0; i < columns.length; i++) {
-//			if (i > 0) {
-//				fkBuf.append(", ");
-//			}
 			String localCol = direction ? columns[i].getForeignDbColumn() : columns[i].getLocalDbColumn();
       String refCol = !direction ? columns[i].getForeignDbColumn() : columns[i].getLocalDbColumn();
       foreignKey.addColumnPair(localCol, refCol);
 		}
-//		fkBuf.append(") references ").append(desc.getBaseTable()).append(" (");
-//
-//		for (int i = 0; i < columns.length; i++) {
-//			if (i > 0) {
-//				fkBuf.append(", ");
-//			}
-//			String col = !direction ? columns[i].getForeignDbColumn() : columns[i].getLocalDbColumn();
-//			fkBuf.append(col);
-//		}
-//		fkBuf.append(")");
-//
-//		String fkeySuffix = ctx.getDdlSyntax().getForeignKeySuffix();
-//		if (fkeySuffix != null){
-//			fkBuf.append(" ");
-//			fkBuf.append(fkeySuffix);
-//		}
-//		fkBuf.append(";").append(NEW_LINE);
-//
-//		return fkBuf.toString();
-	}
+  }
 
 	private MTable createTable() {
 
 		BeanDescriptor<?> localDesc = manyProp.getBeanDescriptor();
 		BeanDescriptor<?> targetDesc = manyProp.getTargetDescriptor();
 
-    MTable table = new MTable(intersectionTableJoin.getTable());
+    String tableName = intersectionTableJoin.getTable();
+    MTable table = new MTable(tableName);
+    table.setPkName(ctx.primaryKeyName(tableName));
 
 		TableJoinColumn[] columns = intersectionTableJoin.columns();
 		for (int i = 0; i < columns.length; i++) {
@@ -125,7 +99,6 @@ public class ModelBuildIntersectionTable {
 
     MColumn col = new MColumn(column, ctx.getColumnDefn(p), true);
     col.setPrimaryKey(true);
-
     table.addColumn(col);
 	}
 

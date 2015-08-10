@@ -30,8 +30,6 @@ public class DbMigration {
     this.migrationConfig = server.getServerConfig().getMigrationConfig();
   }
 
-
-
   public void writeCurrent() {
 
     CurrentModel currentModel = new CurrentModel(server);

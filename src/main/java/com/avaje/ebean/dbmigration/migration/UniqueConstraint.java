@@ -17,8 +17,8 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="columnNames" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="constraintName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -31,10 +31,34 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "uniqueConstraint")
 public class UniqueConstraint {
 
+    @XmlAttribute(name = "name", required = true)
+    protected String name;
     @XmlAttribute(name = "columnNames", required = true)
     protected String columnNames;
-    @XmlAttribute(name = "constraintName")
-    protected String constraintName;
+
+    /**
+     * Gets the value of the name property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the value of the name property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setName(String value) {
+        this.name = value;
+    }
 
     /**
      * Gets the value of the columnNames property.
@@ -58,30 +82,6 @@ public class UniqueConstraint {
      */
     public void setColumnNames(String value) {
         this.columnNames = value;
-    }
-
-    /**
-     * Gets the value of the constraintName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getConstraintName() {
-        return constraintName;
-    }
-
-    /**
-     * Sets the value of the constraintName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setConstraintName(String value) {
-        this.constraintName = value;
     }
 
 }

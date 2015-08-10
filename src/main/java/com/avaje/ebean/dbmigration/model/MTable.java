@@ -34,6 +34,8 @@ public class MTable {
 
   private final String name;
 
+  private String pkName;
+
   private String comment;
 
   private String tablespace;
@@ -65,6 +67,7 @@ public class MTable {
    */
   public MTable(CreateTable createTable) {
     this.name = createTable.getName();
+    this.pkName = createTable.getPkName();
     this.comment = createTable.getComment();
     this.tablespace = createTable.getTablespace();
     this.indexTablespace = createTable.getIndexTablespace();
@@ -90,6 +93,7 @@ public class MTable {
 
     CreateTable createTable = new CreateTable();
     createTable.setName(name);
+    createTable.setPkName(pkName);
     createTable.setComment(comment);
     createTable.setTablespace(tablespace);
     createTable.setIndexTablespace(indexTablespace);
@@ -163,6 +167,14 @@ public class MTable {
 
   public String getName() {
     return name;
+  }
+
+  public String getPkName() {
+    return pkName;
+  }
+
+  public void setPkName(String pkName) {
+    this.pkName = pkName;
   }
 
   public String getComment() {
@@ -273,19 +285,19 @@ public class MTable {
   /**
    * Add a compound unique constraint.
    */
-  public void addCompoundUniqueConstraint(String[] columns, boolean oneToOne) {
-    compoundUniqueConstraints.add(new MCompoundUniqueConstraint(columns, oneToOne));
+  public void addCompoundUniqueConstraint(String[] columns, boolean oneToOne, String constraintName) {
+    compoundUniqueConstraints.add(new MCompoundUniqueConstraint(columns, oneToOne, constraintName));
   }
 
   /**
    * Add a compound unique constraint.
    */
-  public void addCompoundUniqueConstraint(List<MColumn> columns, boolean oneToOne) {
+  public void addCompoundUniqueConstraint(List<MColumn> columns, boolean oneToOne, String constraintName) {
     String[] cols = new String[columns.size()];
     for (int i = 0; i < columns.size(); i++) {
       cols[i] = columns.get(i).getName();
     }
-    addCompoundUniqueConstraint(cols, oneToOne);
+    addCompoundUniqueConstraint(cols, oneToOne, constraintName);
   }
 
   public void addForeignKey(MCompoundForeignKey compoundKey) {

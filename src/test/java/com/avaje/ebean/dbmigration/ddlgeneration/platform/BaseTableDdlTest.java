@@ -1,6 +1,7 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
 
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.H2Platform;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.Helper;
@@ -15,10 +16,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BaseTableDdlTest {
 
+  ServerConfig serverConfig = new ServerConfig();
+
   @Test
   public void testGenerate() throws Exception {
 
-    BaseTableDdl ddlGen = new BaseTableDdl(new DdlNamingConvention(), new H2Platform().getPlatformDdl());
+    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, new H2Platform().getPlatformDdl());
 
     DdlWrite write = new DdlWrite();
 
@@ -38,6 +41,7 @@ public class BaseTableDdlTest {
   private CreateTable createTable() {
     CreateTable createTable = new CreateTable();
     createTable.setName("mytable");
+    createTable.setPkName("pk_mytable");
     List<Column> columns = createTable.getColumn();
     Column col = new Column();
     col.setName("id");
@@ -51,6 +55,7 @@ public class BaseTableDdlTest {
     col2.setType("varchar(1)");
     col2.setNotnull(true);
     col2.setCheckConstraint("check (status in ('A','B'))");
+    col2.setCheckConstraintName("ck_mytable_status");
 
     columns.add(col2);
 
@@ -59,6 +64,8 @@ public class BaseTableDdlTest {
     col3.setType("integer");
     col3.setNotnull(true);
     col3.setReferences("orders.id");
+    col3.setForeignKeyName("fk_mytable_order_id");
+    col3.setForeignKeyIndex("ix_mytable_order_id");
 
     columns.add(col3);
 

@@ -17,9 +17,11 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="columnNames" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="refColumnNames" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="refTableName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="indexName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -32,12 +34,40 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "foreignKey")
 public class ForeignKey {
 
+    @XmlAttribute(name = "name", required = true)
+    protected String name;
     @XmlAttribute(name = "columnNames", required = true)
     protected String columnNames;
     @XmlAttribute(name = "refColumnNames", required = true)
     protected String refColumnNames;
     @XmlAttribute(name = "refTableName", required = true)
     protected String refTableName;
+    @XmlAttribute(name = "indexName")
+    protected String indexName;
+
+    /**
+     * Gets the value of the name property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the value of the name property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setName(String value) {
+        this.name = value;
+    }
 
     /**
      * Gets the value of the columnNames property.
@@ -109,6 +139,30 @@ public class ForeignKey {
      */
     public void setRefTableName(String value) {
         this.refTableName = value;
+    }
+
+    /**
+     * Gets the value of the indexName property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getIndexName() {
+        return indexName;
+    }
+
+    /**
+     * Sets the value of the indexName property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setIndexName(String value) {
+        this.indexName = value;
     }
 
 }

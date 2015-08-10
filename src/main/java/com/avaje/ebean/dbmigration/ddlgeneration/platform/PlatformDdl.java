@@ -1,5 +1,6 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
 import com.avaje.ebean.config.dbplatform.IdType;
@@ -7,6 +8,7 @@ import com.avaje.ebean.dbmigration.ddlgeneration.BaseDdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.VowelRemover;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.IdentityType;
 import com.avaje.ebean.dbmigration.model.MTable;
@@ -19,8 +21,6 @@ import java.io.IOException;
 public class PlatformDdl {
 
   protected PlatformHistoryDdl historyDdl = new NoHistorySupportDdl();
-
-  protected DdlNamingConvention namingConvention = new DdlNamingConvention();
 
   /**
    * Converter for logical/standard types to platform specific types. (eg. clob -> text)
@@ -48,18 +48,50 @@ public class PlatformDdl {
 
   protected String identitySuffix = " auto_increment";
 
+  protected String dropConstraintIfExists = "drop constraint if exists";
+
+  protected String dropIndexIfExists = "drop index if exists ";
+
   /**
    * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
    */
   protected boolean inlineUniqueOneToOne = true;
+
+  /**
+   * A value of 60 is a reasonable default for all databases except
+   * Oracle (limited to 30) and DB2 (limited to 18).
+   */
+  protected int maxConstraintNameLength = 60;
 
   public PlatformDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
     this.dbIdentity = dbIdentity;
     this.typeConverter = new PlatformTypeConverter(platformTypes);
   }
 
-  public DdlHandler createDdlHandler() {
-    return new BaseDdlHandler(namingConvention, this);
+  public DdlHandler createDdlHandler(ServerConfig serverConfig) {
+    historyDdl.configure(serverConfig);
+    return new BaseDdlHandler(serverConfig.getNamingConvention(), serverConfig.getConstraintNaming(), this);
+  }
+
+  /**
+   * Apply a maximum length to the constraint name.
+   * <p>
+   * This implementation should work well apart from perhaps DB2 where the limit is 18.
+   */
+  public String maxLength(String constraintName, int count) {
+    if (constraintName.length() < maxConstraintNameLength) {
+      return constraintName;
+    }
+    if (maxConstraintNameLength < 60) {
+      // trim out vowels for Oracle / DB2 with short max lengths
+      constraintName = VowelRemover.trim(constraintName, 4);
+      if (constraintName.length() < maxConstraintNameLength) {
+        return constraintName;
+      }
+    }
+    // add the count to ensure the constraint name is unique
+    // (relying on the prefix having the table name to be globally unique)
+    return constraintName.substring(0, maxConstraintNameLength - 3) + "_" + count;
   }
 
   public IdType useIdentityType(IdentityType modelIdentityType) {
@@ -85,7 +117,7 @@ public class PlatformDdl {
    * Return the drop foreign key clause.
    */
   public String alterTableDropForeignKey(String tableName, String fkName) {
-    return "alter table " + tableName + " drop constraint " + fkName;
+    return "alter table " + tableName + " " + dropConstraintIfExists + " " + fkName;
   }
 
   /**
@@ -140,27 +172,8 @@ public class PlatformDdl {
    * Return the drop index statement.
    */
   public String dropIndex(String indexName, String tableName) {
-    return "drop index "+indexName;
+    return dropIndexIfExists + indexName;
   }
-
-  /**
-   * Support lower naming tables and columns in DDL generation.
-   * Tables/Columns with quoted identifiers are exempt.
-   */
-  public String lowerName(String name) {
-    return namingConvention.lowerName(name);
-  }
-
-  /**
-   * Return the maximum table name length.
-   * <p>
-   * This is used when deriving names of intersection tables.
-   * </p>
-   */
-  public int getMaxTableNameLength() {
-    return namingConvention.getMaxTableNameLength();
-  }
-
 
   /**
    * Return true if unique constraints for OneToOne can be inlined as normal.
