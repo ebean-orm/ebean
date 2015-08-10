@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.*;
+import com.avaje.ebean.dbmigration.DbOffline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,11 +31,17 @@ public class DatabasePlatformFactory {
 
     try {
 
+      String offlinePlatform = DbOffline.getPlatform();
+      if (offlinePlatform != null) {
+        logger.info("offline platform [{}]", offlinePlatform);
+        return byDatabaseName(offlinePlatform);
+      }
+
       if (serverConfig.getDatabasePlatformName() != null) {
         // choose based on dbName
         return byDatabaseName(serverConfig.getDatabasePlatformName());
-
       }
+
       if (serverConfig.getDataSourceConfig().isOffline()) {
         String m = "You must specify a DatabasePlatformName when you are offline";
         throw new PersistenceException(m);

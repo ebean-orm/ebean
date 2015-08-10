@@ -5,6 +5,7 @@ import com.avaje.ebean.dbmigration.ddlgeneration.platform.BaseTableDdl;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.DdlNamingConvention;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import com.avaje.ebean.dbmigration.migration.AddColumn;
+import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
@@ -23,7 +24,7 @@ public class BaseDdlHandler implements DdlHandler {
 
   public BaseDdlHandler(DdlNamingConvention namingConvention, PlatformDdl platformDdl) {
     this.tableDdl = new BaseTableDdl(namingConvention, platformDdl);
-    this.columnDdl = new BaseColumnDdl();
+    this.columnDdl = new BaseColumnDdl(platformDdl);
   }
 
   @Override
@@ -37,6 +38,8 @@ public class BaseDdlHandler implements DdlHandler {
         generate(writer, (AddColumn) change);
       } else if (change instanceof DropColumn) {
         generate(writer, (DropColumn) change);
+      } else if (change instanceof AlterColumn) {
+        generate(writer, (AlterColumn) change);
       }
     }
   }
@@ -56,4 +59,8 @@ public class BaseDdlHandler implements DdlHandler {
     columnDdl.generate(writer, dropColumn);
   }
 
+  @Override
+  public void generate(DdlWrite writer, AlterColumn alterColumn) throws IOException {
+    columnDdl.generate(writer, alterColumn);
+  }
 }

@@ -1,5 +1,9 @@
 package com.avaje.ebean.dbmigration.model;
 
+import com.avaje.ebean.dbmigration.migration.AddColumn;
+import com.avaje.ebean.dbmigration.migration.AlterColumn;
+import com.avaje.ebean.dbmigration.migration.DropColumn;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,17 +16,17 @@ public class ModelDiff {
   /**
    * The base model to which we compare the newer model.
    */
-  protected final ModelContainer baseModel;
+  private final ModelContainer baseModel;
 
   /**
    * List of 'create' type changes.
    */
-  protected final List<Object> createChanges = new ArrayList<Object>();
+  private final List<Object> createChanges = new ArrayList<Object>();
 
   /**
-   * List of 'drop' type changes. Potential for putting into a separate changeSet.
+   * List of 'drop' type changes. Expected to be placed into a separate DDL script.
    */
-  protected final List<Object> dropChanges = new ArrayList<Object>();
+  private final List<Object> dropChanges = new ArrayList<Object>();
 
   /**
    * Construct with a base model.
@@ -77,7 +81,6 @@ public class ModelDiff {
   protected void addNewTable(MTable newTable) {
 
     createChanges.add(newTable.createTable());
-//    createChanges.add(newTable.createForeignKeys());
   }
 
   /**
@@ -85,14 +88,19 @@ public class ModelDiff {
    */
   protected void compareTables(MTable currentTable, MTable newTable) {
 
-    //TODO: compareTables()
-    // changed columns
-    // find additional columns
-    // find removed columns
-    // changes to indexes?
-    // changes to primary key
-    // changes to foreign key
-    // changes to unique constraints?
+    currentTable.compare(this, newTable);
 
+  }
+
+  public void addAlterColumn(AlterColumn alterColumn) {
+    createChanges.add(alterColumn);
+  }
+
+  public void addDropColumn(DropColumn dropColumn) {
+    dropChanges.add(dropColumn);
+  }
+
+  public void addAddColumn(AddColumn addColumn) {
+    createChanges.add(addColumn);
   }
 }

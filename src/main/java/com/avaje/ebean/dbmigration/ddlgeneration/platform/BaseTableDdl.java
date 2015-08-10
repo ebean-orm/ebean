@@ -357,20 +357,6 @@ public class BaseTableDdl implements TableDdl {
   }
 
   /**
-   * Write alter table add primary key statement.
-   */
-  public void alterTableAddPrimaryKey(DdlBuffer buffer, String tableName, List<Column> pk) throws IOException {
-
-    String[] pkColumns = toColumnNames(pk);
-    String pkName = determinePrimaryKeyName(tableName);
-
-    buffer.append("alter table ").append(tableName);
-    buffer.append(" add primary key ").append(pkName);
-    appendColumns(pkColumns, buffer);
-    buffer.append(")").endOfStatement();
-  }
-
-  /**
    * Return as an array of string column names.
    */
   private String[] toColumnNames(List<Column> columns) {

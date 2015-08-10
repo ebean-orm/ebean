@@ -7,6 +7,7 @@ import com.avaje.ebean.dbmigration.ddlgeneration.BaseDdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
+import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.IdentityType;
 import com.avaje.ebean.dbmigration.model.MTable;
 
@@ -175,5 +176,13 @@ public class PlatformDdl {
   public String createExternalUniqueForOneToOne(String uqName, String tableName, String[] columns) {
     // does nothing by default, really this is a MsSqlServer specific requirement
     return "";
+  }
+
+  public void historyExcludeColumn(DdlWrite writer, AlterColumn alterColumn) {
+
+  }
+
+  public void historyIncludeColumn(DdlWrite writer, AlterColumn alterColumn) {
+
   }
 }

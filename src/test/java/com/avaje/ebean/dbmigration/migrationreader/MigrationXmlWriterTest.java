@@ -12,7 +12,7 @@ public class MigrationXmlWriterTest {
   Logger logger = LoggerFactory.getLogger(MigrationXmlWriterTest.class);
 
   @Test
-  public void testWrite() throws Exception {
+  public void testReadWrite() throws Exception {
 
     Migration migration = MigrationXmlReader.read("/container/test-create-table.xml");
 

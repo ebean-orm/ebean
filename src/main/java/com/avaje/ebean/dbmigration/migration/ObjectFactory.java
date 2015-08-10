@@ -30,11 +30,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link CreateTable }
+     * Create an instance of {@link Rollback }
      * 
      */
-    public CreateTable createCreateTable() {
-        return new CreateTable();
+    public Rollback createRollback() {
+        return new Rollback();
+    }
+
+    /**
+     * Create an instance of {@link AddColumn }
+     * 
+     */
+    public AddColumn createAddColumn() {
+        return new AddColumn();
     }
 
     /**
@@ -43,6 +51,14 @@ public class ObjectFactory {
      */
     public Column createColumn() {
         return new Column();
+    }
+
+    /**
+     * Create an instance of {@link CreateTable }
+     * 
+     */
+    public CreateTable createCreateTable() {
+        return new CreateTable();
     }
 
     /**
@@ -62,11 +78,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DropForeignKey }
+     * Create an instance of {@link Apply }
      * 
      */
-    public DropForeignKey createDropForeignKey() {
-        return new DropForeignKey();
+    public Apply createApply() {
+        return new Apply();
     }
 
     /**
@@ -102,6 +118,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link AlterColumn }
+     * 
+     */
+    public AlterColumn createAlterColumn() {
+        return new AlterColumn();
+    }
+
+    /**
      * Create an instance of {@link DropColumn }
      * 
      */
@@ -110,11 +134,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DropView }
+     * Create an instance of {@link ChangeSet }
      * 
      */
-    public DropView createDropView() {
-        return new DropView();
+    public ChangeSet createChangeSet() {
+        return new ChangeSet();
     }
 
     /**
@@ -126,19 +150,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Apply }
+     * Create an instance of {@link DropTable }
      * 
      */
-    public Apply createApply() {
-        return new Apply();
-    }
-
-    /**
-     * Create an instance of {@link Rollback }
-     * 
-     */
-    public Rollback createRollback() {
-        return new Rollback();
+    public DropTable createDropTable() {
+        return new DropTable();
     }
 
     /**
@@ -158,75 +174,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link CreateView }
-     * 
-     */
-    public CreateView createCreateView() {
-        return new CreateView();
-    }
-
-    /**
-     * Create an instance of {@link DropTable }
-     * 
-     */
-    public DropTable createDropTable() {
-        return new DropTable();
-    }
-
-    /**
-     * Create an instance of {@link AddColumn }
-     * 
-     */
-    public AddColumn createAddColumn() {
-        return new AddColumn();
-    }
-
-    /**
-     * Create an instance of {@link RenameView }
-     * 
-     */
-    public RenameView createRenameView() {
-        return new RenameView();
-    }
-
-    /**
-     * Create an instance of {@link AddForeignKey }
-     * 
-     */
-    public AddForeignKey createAddForeignKey() {
-        return new AddForeignKey();
-    }
-
-    /**
-     * Create an instance of {@link ChangeSet }
-     * 
-     */
-    public ChangeSet createChangeSet() {
-        return new ChangeSet();
-    }
-
-    /**
-     * Create an instance of {@link Application }
-     * 
-     */
-    public Application createApplication() {
-        return new Application();
-    }
-
-    /**
      * Create an instance of {@link Migration }
      * 
      */
     public Migration createMigration() {
         return new Migration();
-    }
-
-    /**
-     * Create an instance of {@link Applications }
-     * 
-     */
-    public Applications createApplications() {
-        return new Applications();
     }
 
 }

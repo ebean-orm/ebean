@@ -32,7 +32,7 @@ public class ModelContainerApplyTest {
     model.apply(migration);
 
     MTable foo = model.getTable("foo");
-    assertThat(foo.getRemarks()).isEqualTo("comment");
+    assertThat(foo.getComment()).isEqualTo("comment");
     assertThat(foo.getTablespace()).isEqualTo("fooSpace");
     assertThat(foo.getIndexTablespace()).isEqualTo("fooIndexSpace");
     assertThat(foo.getWithHistory()).isEqualTo(true);

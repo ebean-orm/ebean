@@ -208,6 +208,11 @@ public class ServerConfig {
   private DataSourceConfig dataSourceConfig = new DataSourceConfig();
 
   /**
+   * The db migration config (migration resource path etc).
+   */
+  private DbMigrationConfig migrationConfig = new DbMigrationConfig();
+
+  /**
    * Set to true if the DataSource uses autoCommit.
    * <p>
    * Indicates that Ebean should use autoCommit friendly Transactions and TransactionManager.
@@ -502,7 +507,7 @@ public class ServerConfig {
   /**
    * Return the JDBC batch mode to use per save(), delete(), insert() or update() request.
    * <p>
-   * This makes sense when a save() or delete() etc cascades and executes multiple child statements. The best caase
+   * This makes sense when a save() or delete() cascades and executes multiple child statements. The best case
    * for this is when saving a master/parent bean this cascade inserts many detail/child beans.
    * </p>
    * <p>
@@ -618,6 +623,20 @@ public class ServerConfig {
    */
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
     this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+  }
+
+  /**
+   * Return the DB migration configuration.
+   */
+  public DbMigrationConfig getMigrationConfig() {
+    return migrationConfig;
+  }
+
+  /**
+   * Set the DB migration configuration.
+   */
+  public void setMigrationConfig(DbMigrationConfig migrationConfig) {
+    this.migrationConfig = migrationConfig;
   }
 
   /**
@@ -1855,6 +1874,8 @@ public class ServerConfig {
    * Load the configuration settings from the properties file.
    */
   protected void loadSettings(PropertiesWrapper p) {
+
+    migrationConfig.loadSettings(p);
 
     namingConvention = createNamingConvention(p, namingConvention);
     if (namingConvention != null) {

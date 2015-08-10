@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<applications xmlns="http://ebean-orm.github.io/xml/ns/dbmigration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://ebean-orm.github.io/xml/ns/dbmigration http://ebean-orm.github.io/xml/ns/dbmigration-1.0.xsd">
-
-  <application name="myapp" resourcePath="dbmigration/app1"/>
-
-</applications>

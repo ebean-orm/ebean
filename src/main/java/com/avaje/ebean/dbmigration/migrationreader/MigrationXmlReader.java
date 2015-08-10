@@ -18,6 +18,19 @@ public class MigrationXmlReader {
   /**
    * Read and return a Migration from an xml document at the given resource path.
    */
+  public static Migration readMaybe(String resourcePath) {
+
+    InputStream is = MigrationXmlReader.class.getResourceAsStream(resourcePath);
+    if (is == null) {
+      return null;
+    }
+
+    return INSTANCE.read(is);
+  }
+
+  /**
+   * Read and return a Migration from an xml document at the given resource path.
+   */
   public static Migration read(String resourcePath) {
 
     InputStream is = MigrationXmlReader.class.getResourceAsStream(resourcePath);

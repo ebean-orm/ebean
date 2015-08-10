@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlValue;
  *       &lt;attribute name="defaultValue" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="notnull" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="checkConstraint" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="historyExclude" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="unique" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="uniqueOneToOne" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="primaryKey" type="{http://www.w3.org/2001/XMLSchema}boolean" />
@@ -55,6 +56,8 @@ public class Column {
     protected Boolean notnull;
     @XmlAttribute(name = "checkConstraint")
     protected String checkConstraint;
+    @XmlAttribute(name = "historyExclude")
+    protected Boolean historyExclude;
     @XmlAttribute(name = "unique")
     protected Boolean unique;
     @XmlAttribute(name = "uniqueOneToOne")
@@ -210,6 +213,30 @@ public class Column {
      */
     public void setCheckConstraint(String value) {
         this.checkConstraint = value;
+    }
+
+    /**
+     * Gets the value of the historyExclude property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isHistoryExclude() {
+        return historyExclude;
+    }
+
+    /**
+     * Sets the value of the historyExclude property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setHistoryExclude(Boolean value) {
+        this.historyExclude = value;
     }
 
     /**

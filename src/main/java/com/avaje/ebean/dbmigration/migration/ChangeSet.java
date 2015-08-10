@@ -51,14 +51,10 @@ public class ChangeSet {
         @XmlElement(name = "dropTable", type = DropTable.class),
         @XmlElement(name = "renameTable", type = RenameTable.class),
         @XmlElement(name = "createHistoryTable", type = CreateHistoryTable.class),
-        @XmlElement(name = "createView", type = CreateView.class),
-        @XmlElement(name = "dropView", type = DropView.class),
-        @XmlElement(name = "renameView", type = RenameView.class),
         @XmlElement(name = "addColumn", type = AddColumn.class),
         @XmlElement(name = "dropColumn", type = DropColumn.class),
-        @XmlElement(name = "renameColumn", type = RenameColumn.class),
-        @XmlElement(name = "addForeignKey", type = AddForeignKey.class),
-        @XmlElement(name = "dropForeignKey", type = DropForeignKey.class)
+        @XmlElement(name = "alterColumn", type = AlterColumn.class),
+        @XmlElement(name = "renameColumn", type = RenameColumn.class)
     })
     protected List<Object> changeSetChildren;
     @XmlAttribute(name = "type", required = true)
@@ -94,14 +90,10 @@ public class ChangeSet {
      * {@link DropTable }
      * {@link RenameTable }
      * {@link CreateHistoryTable }
-     * {@link CreateView }
-     * {@link DropView }
-     * {@link RenameView }
      * {@link AddColumn }
      * {@link DropColumn }
+     * {@link AlterColumn }
      * {@link RenameColumn }
-     * {@link AddForeignKey }
-     * {@link DropForeignKey }
      * 
      * 
      */

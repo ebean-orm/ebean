@@ -11,6 +11,7 @@ import com.avaje.ebean.config.PropertyMap;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.UnderscoreNamingConvention;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebean.dbmigration.DbOffline;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.cache.DefaultServerCacheFactory;
@@ -113,9 +114,6 @@ public class DefaultContainer implements SpiContainer {
         serverConfig.getDatabasePlatform().setDbEncrypt(serverConfig.getDbEncrypt());
       }
 
-      DatabasePlatform dbPlatform = serverConfig.getDatabasePlatform();
-
-
       // inform the NamingConvention of the associated DatabasePlaform
       serverConfig.getNamingConvention().setDatabasePlatform(serverConfig.getDatabasePlatform());
 
@@ -169,6 +167,7 @@ public class DefaultContainer implements SpiContainer {
 
       // start any services after registering with clusterManager
       server.start();
+      DbOffline.reset();
       return server;
     }
   }
@@ -284,6 +283,11 @@ public class DefaultContainer implements SpiContainer {
 
   private DataSource getDataSourceFromConfig(ServerConfig config) {
 
+    if (DbOffline.isSet()) {
+      logger.trace("... DbOffline using platform [{}]", DbOffline.getPlatform());
+      return null;
+    }
+
     DataSource ds;
 
     if (config.getDataSourceJndiName() != null) {
@@ -323,6 +327,10 @@ public class DefaultContainer implements SpiContainer {
    * </p>
    */
   private boolean checkDataSource(ServerConfig serverConfig) {
+
+    if (DbOffline.isSet()) {
+      return false;
+    }
 
     if (serverConfig.getDataSource() == null) {
       if (serverConfig.getDataSourceConfig().isOffline()) {

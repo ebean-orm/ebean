@@ -185,7 +185,6 @@ public final class ConvertInetAddresses {
     boolean isIpv6 = false;
 
     // handle IPv6 forms of IPv4 addresses
-    // TODO: use Ascii.toUpperCase() when available
     if (ipString.toUpperCase(Locale.US).startsWith("::FFFF:")) {
       ipString = ipString.substring(7);
     } else if (ipString.startsWith("::")) {

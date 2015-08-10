@@ -33,7 +33,7 @@
     <logger name="org.avaje.ebean.TXN" level="TRACE"/>
     <logger name="org.avaje.ebean.SUM" level="TRACE"/>
 
-    <logger name="com.avaje.ebeaninternal.server.ddl" level="TRACE"/>
+    <logger name="com.avaje.ebeaninternal.server.core" level="DEBUG"/>
 
     <logger name="org.avaje.ebean.cache.QUERY" level="TRACE"/>
     <logger name="org.avaje.ebean.cache.BEAN" level="TRACE"/>

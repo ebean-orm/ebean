@@ -8,20 +8,20 @@
   <!-- =========================================================== -->
 
   <!-- Root level type : applications -->
-  <xsd:element name="applications">
-    <xsd:complexType>
-      <xsd:sequence>
-        <xsd:element ref="application" minOccurs="0" maxOccurs="unbounded"/>
-      </xsd:sequence>
-    </xsd:complexType>
-  </xsd:element>
+  <!--<xsd:element name="applications">-->
+    <!--<xsd:complexType>-->
+      <!--<xsd:sequence>-->
+        <!--<xsd:element ref="application" minOccurs="0" maxOccurs="unbounded"/>-->
+      <!--</xsd:sequence>-->
+    <!--</xsd:complexType>-->
+  <!--</xsd:element>-->
 
-  <xsd:element name="application">
-    <xsd:complexType>
-      <xsd:attribute name="name" type="xsd:string" use="required"/>
-      <xsd:attribute name="resourcePath" type="xsd:string" use="required"/>
-    </xsd:complexType>
-  </xsd:element>
+  <!--<xsd:element name="application">-->
+    <!--<xsd:complexType>-->
+      <!--<xsd:attribute name="name" type="xsd:string" use="required"/>-->
+      <!--<xsd:attribute name="resourcePath" type="xsd:string" use="required"/>-->
+    <!--</xsd:complexType>-->
+  <!--</xsd:element>-->
 
 
   <!-- =========================================================== -->
@@ -201,6 +201,24 @@
     </xsd:complexType>
   </xsd:element>
 
+  <xsd:element name="alterColumn">
+    <xsd:complexType>
+      <xsd:attribute name="columnName" type="xsd:string" use="required"/>
+      <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="type" type="xsd:string"/>
+      <xsd:attribute name="notnull" type="xsd:boolean"/>
+      <xsd:attribute name="historyExclude" type="xsd:boolean"/>
+      <xsd:attribute name="unique" type="xsd:boolean"/>
+      <xsd:attribute name="uniqueOneToOne" type="xsd:boolean"/>
+      <xsd:attribute name="oldDefaultValue" type="xsd:string"/>
+      <xsd:attribute name="newDefaultValue" type="xsd:string"/>
+      <xsd:attribute name="oldCheckConstraint" type="xsd:string"/>
+      <xsd:attribute name="newCheckConstraint" type="xsd:string"/>
+      <xsd:attribute name="oldReferences" type="xsd:string"/>
+      <xsd:attribute name="newReferences" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
   <xsd:element name="renameColumn">
     <xsd:complexType>
       <xsd:attribute name="oldName" type="xsd:string" use="required"/>
@@ -212,49 +230,49 @@
 
   <!-- VIEW  -->
 
-  <xsd:element name="createView">
-    <xsd:complexType>
-      <xsd:simpleContent>
-        <xsd:extension base="xsd:string">
-          <xsd:attribute name="name" type="xsd:string" use="required"/>
-          <xsd:attribute name="replaceIfExists" type="xsd:boolean"/>
-        </xsd:extension>
-      </xsd:simpleContent>
-    </xsd:complexType>
-  </xsd:element>
+  <!--<xsd:element name="createView">-->
+    <!--<xsd:complexType>-->
+      <!--<xsd:simpleContent>-->
+        <!--<xsd:extension base="xsd:string">-->
+          <!--<xsd:attribute name="name" type="xsd:string" use="required"/>-->
+          <!--<xsd:attribute name="replaceIfExists" type="xsd:boolean"/>-->
+        <!--</xsd:extension>-->
+      <!--</xsd:simpleContent>-->
+    <!--</xsd:complexType>-->
+  <!--</xsd:element>-->
 
-  <xsd:element name="dropView">
-    <xsd:complexType>
-      <xsd:attribute name="name" type="xsd:string" use="required"/>
-    </xsd:complexType>
-  </xsd:element>
+  <!--<xsd:element name="dropView">-->
+    <!--<xsd:complexType>-->
+      <!--<xsd:attribute name="name" type="xsd:string" use="required"/>-->
+    <!--</xsd:complexType>-->
+  <!--</xsd:element>-->
 
-  <xsd:element name="renameView">
-    <xsd:complexType>
-      <xsd:attribute name="oldName" type="xsd:string" use="required"/>
-      <xsd:attribute name="newName" type="xsd:string" use="required"/>
-    </xsd:complexType>
-  </xsd:element>
+  <!--<xsd:element name="renameView">-->
+    <!--<xsd:complexType>-->
+      <!--<xsd:attribute name="oldName" type="xsd:string" use="required"/>-->
+      <!--<xsd:attribute name="newName" type="xsd:string" use="required"/>-->
+    <!--</xsd:complexType>-->
+  <!--</xsd:element>-->
 
   <!-- FOREIGN KEY -->
 
-  <xsd:element name="addForeignKey">
-    <xsd:complexType>
-      <xsd:simpleContent>
-        <xsd:extension base="xsd:string">
-          <xsd:attribute name="name" type="xsd:string" use="required"/>
-          <xsd:attribute name="columns" type="xsd:string" use="required"/>
-          <xsd:attribute name="references" type="xsd:string" use="required"/>
-        </xsd:extension>
-      </xsd:simpleContent>
-    </xsd:complexType>
-  </xsd:element>
+  <!--<xsd:element name="addForeignKey">-->
+    <!--<xsd:complexType>-->
+      <!--<xsd:simpleContent>-->
+        <!--<xsd:extension base="xsd:string">-->
+          <!--<xsd:attribute name="name" type="xsd:string" use="required"/>-->
+          <!--<xsd:attribute name="columns" type="xsd:string" use="required"/>-->
+          <!--<xsd:attribute name="references" type="xsd:string" use="required"/>-->
+        <!--</xsd:extension>-->
+      <!--</xsd:simpleContent>-->
+    <!--</xsd:complexType>-->
+  <!--</xsd:element>-->
 
-  <xsd:element name="dropForeignKey">
-    <xsd:complexType mixed="true">
-      <xsd:attribute name="name" type="xsd:string" use="required"/>
-    </xsd:complexType>
-  </xsd:element>
+  <!--<xsd:element name="dropForeignKey">-->
+    <!--<xsd:complexType mixed="true">-->
+      <!--<xsd:attribute name="name" type="xsd:string" use="required"/>-->
+    <!--</xsd:complexType>-->
+  <!--</xsd:element>-->
 
   <!-- ============================================ -->
 
@@ -263,13 +281,13 @@
       <xsd:attribute name="name" type="xsd:string" use="required"/>
       <xsd:attribute name="type" type="xsd:string" use="required"/>
       <xsd:attribute name="defaultValue" type="xsd:string"/>
-      <!--<xsd:attributeGroup ref="columnAttributes"/>-->
       <xsd:attribute name="notnull" type="xsd:boolean"/>
       <xsd:attribute name="checkConstraint" type="xsd:string"/>
+      <xsd:attribute name="historyExclude" type="xsd:boolean"/>
       <xsd:attribute name="unique" type="xsd:boolean"/>
       <xsd:attribute name="uniqueOneToOne" type="xsd:boolean"/>
       <xsd:attribute name="primaryKey" type="xsd:boolean"/>
-      <xsd:attribute name="identity" type="xsd:boolean"/> <!-- aka autoincrement/identity -->
+      <xsd:attribute name="identity" type="xsd:boolean"/>
       <xsd:attribute name="references" type="xsd:string"/>
       <xsd:attribute name="comment" type="xsd:string"/>
     </xsd:complexType>
@@ -285,7 +303,6 @@
   <xsd:group name="changeSetChildren">
     <xsd:choice>
       <xsd:element ref="configuration" maxOccurs="1"/>
-
       <xsd:element ref="sql" maxOccurs="unbounded"/>
 
       <xsd:element ref="createTable" maxOccurs="unbounded"/>
@@ -294,16 +311,17 @@
 
       <xsd:element ref="createHistoryTable" maxOccurs="unbounded"/>
 
-      <xsd:element ref="createView" maxOccurs="unbounded"/>
-      <xsd:element ref="dropView" maxOccurs="unbounded"/>
-      <xsd:element ref="renameView" maxOccurs="unbounded"/>
-
       <xsd:element ref="addColumn" maxOccurs="unbounded"/>
       <xsd:element ref="dropColumn" maxOccurs="unbounded"/>
+      <xsd:element ref="alterColumn" maxOccurs="unbounded"/>
       <xsd:element ref="renameColumn" maxOccurs="unbounded"/>
 
-      <xsd:element ref="addForeignKey" maxOccurs="unbounded"/>
-      <xsd:element ref="dropForeignKey" maxOccurs="unbounded"/>
+      <!--<xsd:element ref="createView" maxOccurs="unbounded"/>-->
+      <!--<xsd:element ref="dropView" maxOccurs="unbounded"/>-->
+      <!--<xsd:element ref="renameView" maxOccurs="unbounded"/>-->
+
+      <!--<xsd:element ref="addForeignKey" maxOccurs="unbounded"/>-->
+      <!--<xsd:element ref="dropForeignKey" maxOccurs="unbounded"/>-->
 
       <!--<xsd:element ref="createIndex" maxOccurs="unbounded"/>-->
       <!--<xsd:element ref="dropIndex" maxOccurs="unbounded"/>-->
@@ -312,23 +330,13 @@
       <!--<xsd:element ref="alterSequence" maxOccurs="unbounded"/>-->
       <!--<xsd:element ref="dropSequence" maxOccurs="unbounded"/>-->
 
-      <!--<xsd:element ref="addNotNullConstraint" maxOccurs="unbounded"/>-->
-      <!--<xsd:element ref="dropNotNullConstraint" maxOccurs="unbounded"/>-->
-
       <!--<xsd:element ref="addPrimaryKey" maxOccurs="unbounded"/>-->
       <!--<xsd:element ref="dropPrimaryKey" maxOccurs="unbounded"/>-->
 
       <!--<xsd:element ref="addUniqueConstraint" maxOccurs="unbounded"/>-->
       <!--<xsd:element ref="dropUniqueConstraint" maxOccurs="unbounded"/>-->
 
-      <!--<xsd:element ref="addDefaultValue" maxOccurs="unbounded"/>-->
-      <!--<xsd:element ref="dropDefaultValue" maxOccurs="unbounded"/>-->
-
-      <!--<xsd:element ref="sql" maxOccurs="unbounded"/>-->
-      <!--<xsd:element ref="createProcedure" maxOccurs="unbounded"/>-->
-
     </xsd:choice>
   </xsd:group>
-
 
 </xsd:schema>

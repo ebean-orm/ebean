@@ -23,6 +23,9 @@ public class ModelContainer {
    */
   private Map<String, MTable> tables = new LinkedHashMap<String, MTable>();
 
+  public ModelContainer() {
+
+  }
 
   /**
    * Return the map of all the tables.
@@ -73,7 +76,7 @@ public class ModelContainer {
   protected void applyChange(CreateTable createTable) {
     String tableName = createTable.getName();
     if (tables.containsKey(tableName)) {
-      throw new IllegalStateException("Table [" + tableName + "] already exists?");
+      throw new IllegalStateException("Table [" + tableName + "] already exists in model?");
     }
     MTable table = new MTable(createTable);
     tables.put(tableName, table);
@@ -85,7 +88,7 @@ public class ModelContainer {
   protected void applyChange(AddColumn addColumn) {
     MTable table = tables.get(addColumn.getTableName());
     if (table == null) {
-      throw new IllegalStateException("Table [" + addColumn.getTableName() + "] does not exist?");
+      throw new IllegalStateException("Table [" + addColumn.getTableName() + "] does not exist in model?");
     }
     table.apply(addColumn);
   }
@@ -96,7 +99,7 @@ public class ModelContainer {
   protected void applyChange(DropColumn dropColumn) {
     MTable table = tables.get(dropColumn.getTableName());
     if (table == null) {
-      throw new IllegalStateException("Table [" + dropColumn.getTableName() + "] does not exist?");
+      throw new IllegalStateException("Table [" + dropColumn.getTableName() + "] does not exist in model?");
     }
     table.apply(dropColumn);
   }

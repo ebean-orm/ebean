@@ -2,7 +2,6 @@ package com.avaje.ebean.dbmigration.model;
 
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
-import com.avaje.ebean.dbmigration.ddlgeneration.platform.DdlNamingConvention;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
 import com.avaje.ebean.dbmigration.migration.Migration;
 import com.avaje.ebean.dbmigration.migrationreader.MigrationXmlWriter;
@@ -22,17 +21,22 @@ public class CurrentModel {
 
   private final SpiEbeanServer server;
 
-  private DdlNamingConvention namingConvention;
-
   private ModelContainer model;
+
   private ChangeSet changeSet;
+
   private DdlWrite write;
 
+  /**
+   * Construct with a given EbeanServer instance.
+   */
   public CurrentModel(SpiEbeanServer server) {
     this.server = server;
-    this.namingConvention = new DdlNamingConvention();
   }
 
+  /**
+   * Return the current model by reading all the bean descriptors and properties.
+   */
   public ModelContainer read() {
     if (model == null) {
       model = new ModelContainer();
@@ -48,6 +52,9 @@ public class CurrentModel {
    this.changeSet = changeSet;
   }
 
+  /**
+   * Return as a ChangeSet.
+   */
   public ChangeSet getChangeSet() {
     read();
     if (changeSet == null) {
@@ -56,6 +63,9 @@ public class CurrentModel {
     return changeSet;
   }
 
+  /**
+   * Write as migration xml to the given file.
+   */
   public void writeMigration(File file) {
 
     ChangeSet changeSet = getChangeSet();
@@ -66,6 +76,9 @@ public class CurrentModel {
     writer.write(migration, file);
   }
 
+  /**
+   * Return the 'Create' DDL.
+   */
   public String getCreateDdl() throws IOException {
 
     createDdl();
@@ -78,6 +91,9 @@ public class CurrentModel {
     return ddl.toString();
   }
 
+  /**
+   * Return the 'Drop' DDL.
+   */
   public String getDropDdl() throws IOException {
 
     createDdl();
@@ -89,16 +105,9 @@ public class CurrentModel {
     return ddl.toString();
   }
 
-  public DdlWrite generateDdl(ChangeSet changeSet) throws IOException {
-
-    DdlWrite write = new DdlWrite();
-
-    DdlHandler handler = handler();
-    handler.generate(write, changeSet);
-
-    return write;
-  }
-
+  /**
+   * Create all the DDL based on the changeSet.
+   */
   private void createDdl() throws IOException {
 
     if (write == null) {
@@ -111,8 +120,10 @@ public class CurrentModel {
     }
   }
 
+  /**
+   * Return the platform specific DdlHandler (to generate DDL).
+   */
   private DdlHandler handler() {
-
     return server.getDatabasePlatform().createDdlHandler();
   }
 

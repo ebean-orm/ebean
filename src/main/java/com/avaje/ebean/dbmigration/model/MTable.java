@@ -8,9 +8,12 @@ import com.avaje.ebean.dbmigration.migration.IdentityType;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Holds the logical model for a given Table and everything associated to it.
@@ -28,11 +31,6 @@ import java.util.Map;
  * </p>
  */
 public class MTable {
-
-  /**
-   * Flag set to indicate
-   */
-  private boolean matched;
 
   private final String name;
 
@@ -59,6 +57,8 @@ public class MTable {
   private List<MCompoundUniqueConstraint> compoundUniqueConstraints = new ArrayList<MCompoundUniqueConstraint>();
 
   private List<MCompoundForeignKey> compoundKeys = new ArrayList<MCompoundForeignKey>();
+
+  private AddColumn addColumn;
 
   /**
    * Construct for migration.
@@ -110,12 +110,37 @@ public class MTable {
     return createTable;
   }
 
-  public boolean isMatched() {
-    return matched;
-  }
+  public void compare(ModelDiff modelDiff, MTable newTable) {
 
-  public void setMatched(boolean matched) {
-    this.matched = matched;
+    // TODO: compare indexes?
+    // TODO: compare primary key
+
+    addColumn = null;
+
+    Set<String> mappedColumns = new LinkedHashSet<String>();
+
+    Collection<MColumn> newColumns = newTable.getColumns().values();
+    for (MColumn newColumn : newColumns) {
+      MColumn localColumn = columns.get(newColumn.getName());
+      if (localColumn == null) {
+        diffNewColumn(newColumn);
+      } else {
+        localColumn.compare(modelDiff, this, newColumn);
+        mappedColumns.add(newColumn.getName());
+      }
+    }
+
+    Collection<MColumn> existingColumns = columns.values();
+    for (MColumn existingColumn : existingColumns) {
+      if (!mappedColumns.contains(existingColumn.getName())) {
+        diffDropColumn(modelDiff, existingColumn);
+      }
+    }
+
+    if (addColumn != null) {
+      modelDiff.addAddColumn(addColumn);
+    }
+
   }
 
   /**
@@ -292,5 +317,25 @@ public class MTable {
     MColumn newCol = new MColumn(dbCol, columnDefn, notnull);
     addColumn(newCol);
     return newCol;
+  }
+
+
+  private void diffNewColumn(MColumn newColumn) {
+
+    if (addColumn == null) {
+      addColumn = new AddColumn();
+      addColumn.setTableName(name);
+    }
+
+    addColumn.getColumn().add(newColumn.createColumn());
+  }
+
+  private void diffDropColumn(ModelDiff modelDiff, MColumn existingColumn) {
+
+    DropColumn dropColumn = new DropColumn();
+    dropColumn.setTableName(name);
+    dropColumn.setColumnName(existingColumn.getName());
+
+    modelDiff.addDropColumn(dropColumn);
   }
 }

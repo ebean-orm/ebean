@@ -12,6 +12,7 @@ public class PostgresDdl extends PlatformDdl {
     super(platformTypes, dbIdentity);
     this.historyDdl = new PostgresHistoryDdl(this.namingConvention.normalise);
     this.dropTableCascade = " cascade";
+    this.namingConvention.maxConstraintNameLength = 62;
   }
 
   /**

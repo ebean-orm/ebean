@@ -1,5 +1,6 @@
 package com.avaje.ebean.dbmigration.model;
 
+import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.Column;
 
 /**
@@ -12,6 +13,7 @@ public class MColumn {
   private String checkConstraint;
   private String defaultValue;
   private String references;
+  private boolean historyExclude;
   private boolean notnull;
   private boolean primaryKey;
   private boolean identity;
@@ -34,6 +36,7 @@ public class MColumn {
     this.primaryKey = Boolean.TRUE.equals(column.isPrimaryKey());
     this.identity = Boolean.TRUE.equals(column.isIdentity());
     this.unique = Boolean.TRUE.equals(column.isUnique());
+    this.historyExclude = Boolean.TRUE.equals(column.isHistoryExclude());
   }
 
   public MColumn(String name, String type) {
@@ -103,6 +106,14 @@ public class MColumn {
     this.notnull = notnull;
   }
 
+  public boolean isHistoryExclude() {
+    return historyExclude;
+  }
+
+  public void setHistoryExclude(boolean historyExclude) {
+    this.historyExclude = historyExclude;
+  }
+
   public void setUnique(boolean unique) {
     this.unique = unique;
   }
@@ -136,11 +147,72 @@ public class MColumn {
     if (uniqueOneToOne) c.setUniqueOneToOne(true);
     if (primaryKey) c.setPrimaryKey(true);
     if (identity) c.setIdentity(true);
+    if (historyExclude) c.setHistoryExclude(true);
 
     c.setCheckConstraint(checkConstraint);
     c.setReferences(references);
     c.setDefaultValue(defaultValue);
 
     return c;
+  }
+
+  private boolean different(String val1, String val2) {
+    return (val1 == null) ? val2 != null : !val1.equals(val2);
+  }
+
+  AlterColumn alterColumn;
+
+  private AlterColumn getAlterColumn(String tableName) {
+    if (alterColumn == null) {
+      alterColumn = new AlterColumn();
+      alterColumn.setColumnName(name);
+      alterColumn.setTableName(tableName);
+    }
+    return alterColumn;
+  }
+
+  public void compare(ModelDiff modelDiff, MTable table, MColumn newColumn) {
+
+    String tableName = table.getName();
+
+    this.alterColumn = null;
+
+    if (different(type, newColumn.type)) {
+      getAlterColumn(tableName).setType(newColumn.type);
+    }
+    if (historyExclude != newColumn.historyExclude) {
+      getAlterColumn(tableName).setHistoryExclude(newColumn.historyExclude);
+    }
+    if (notnull != newColumn.notnull) {
+      getAlterColumn(tableName).setNotnull(newColumn.notnull);
+    }
+    if (different(defaultValue, newColumn.defaultValue)) {
+      AlterColumn alter = getAlterColumn(tableName);
+      alter.setOldDefaultValue(defaultValue);
+      alter.setNewDefaultValue(newColumn.defaultValue);
+    }
+    if (different(checkConstraint, newColumn.checkConstraint)) {
+      AlterColumn alter = getAlterColumn(tableName);
+      alter.setOldCheckConstraint(checkConstraint);
+      alter.setNewCheckConstraint(newColumn.checkConstraint);
+    }
+    if (different(references, newColumn.references)) {
+      AlterColumn alter = getAlterColumn(tableName);
+      alter.setOldReferences(references);
+      alter.setNewReferences(newColumn.references);
+    }
+
+    if (unique != newColumn.unique) {
+      AlterColumn alter = getAlterColumn(tableName);
+      alter.setUnique(newColumn.unique);
+    }
+    if (uniqueOneToOne != newColumn.uniqueOneToOne) {
+      AlterColumn alter = getAlterColumn(tableName);
+      alter.setUniqueOneToOne(newColumn.uniqueOneToOne);
+    }
+
+    if (alterColumn != null) {
+      modelDiff.addAlterColumn(alterColumn);
+    }
   }
 }
