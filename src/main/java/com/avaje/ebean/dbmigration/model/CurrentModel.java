@@ -133,7 +133,7 @@ public class CurrentModel {
     if (write == null) {
       ChangeSet createChangeSet = getChangeSet();
 
-      write = new DdlWrite();
+      write = new DdlWrite(new MConfiguration(), model);
 
       DdlHandler handler = handler();
       handler.generate(write, createChangeSet);

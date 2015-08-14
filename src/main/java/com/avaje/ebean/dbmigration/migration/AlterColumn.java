@@ -19,9 +19,13 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;attribute name="columnName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="tableName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="withHistory" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="type" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="currentType" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="defaultValue" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="currentDefaultValue" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="notnull" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="currentNotnull" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="historyExclude" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="checkConstraint" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="checkConstraintName" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -50,12 +54,20 @@ public class AlterColumn {
     protected String columnName;
     @XmlAttribute(name = "tableName", required = true)
     protected String tableName;
+    @XmlAttribute(name = "withHistory")
+    protected Boolean withHistory;
     @XmlAttribute(name = "type")
     protected String type;
+    @XmlAttribute(name = "currentType")
+    protected String currentType;
     @XmlAttribute(name = "defaultValue")
     protected String defaultValue;
+    @XmlAttribute(name = "currentDefaultValue")
+    protected String currentDefaultValue;
     @XmlAttribute(name = "notnull")
     protected Boolean notnull;
+    @XmlAttribute(name = "currentNotnull")
+    protected Boolean currentNotnull;
     @XmlAttribute(name = "historyExclude")
     protected Boolean historyExclude;
     @XmlAttribute(name = "checkConstraint")
@@ -130,6 +142,30 @@ public class AlterColumn {
     }
 
     /**
+     * Gets the value of the withHistory property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isWithHistory() {
+        return withHistory;
+    }
+
+    /**
+     * Sets the value of the withHistory property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setWithHistory(Boolean value) {
+        this.withHistory = value;
+    }
+
+    /**
      * Gets the value of the type property.
      * 
      * @return
@@ -151,6 +187,30 @@ public class AlterColumn {
      */
     public void setType(String value) {
         this.type = value;
+    }
+
+    /**
+     * Gets the value of the currentType property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCurrentType() {
+        return currentType;
+    }
+
+    /**
+     * Sets the value of the currentType property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setCurrentType(String value) {
+        this.currentType = value;
     }
 
     /**
@@ -178,6 +238,30 @@ public class AlterColumn {
     }
 
     /**
+     * Gets the value of the currentDefaultValue property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCurrentDefaultValue() {
+        return currentDefaultValue;
+    }
+
+    /**
+     * Sets the value of the currentDefaultValue property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setCurrentDefaultValue(String value) {
+        this.currentDefaultValue = value;
+    }
+
+    /**
      * Gets the value of the notnull property.
      * 
      * @return
@@ -199,6 +283,30 @@ public class AlterColumn {
      */
     public void setNotnull(Boolean value) {
         this.notnull = value;
+    }
+
+    /**
+     * Gets the value of the currentNotnull property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isCurrentNotnull() {
+        return currentNotnull;
+    }
+
+    /**
+     * Sets the value of the currentNotnull property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setCurrentNotnull(Boolean value) {
+        this.currentNotnull = value;
     }
 
     /**

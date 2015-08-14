@@ -14,8 +14,10 @@ import com.avaje.ebean.config.dbplatform.MySqlPlatform;
 import com.avaje.ebean.config.dbplatform.Oracle10Platform;
 import com.avaje.ebean.config.dbplatform.PostgresPlatform;
 import com.avaje.ebean.config.dbplatform.SQLitePlatform;
+import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.migration.Migration;
 import com.avaje.ebean.dbmigration.model.CurrentModel;
+import com.avaje.ebean.dbmigration.model.MConfiguration;
 import com.avaje.ebean.dbmigration.model.MigrationModel;
 import com.avaje.ebean.dbmigration.model.ModelContainer;
 import com.avaje.ebean.dbmigration.model.ModelDdlWriter;
@@ -83,6 +85,9 @@ public class DbMigration {
 
   public void runMigration() throws IOException {
 
+    // use this flag to stop other plugins like full DDL generation
+    DbOffline.setRunningMigration();
+
     setDefaults();
 
     try {
@@ -99,13 +104,20 @@ public class DbMigration {
       diff.compareTo(current);
       Migration dbMigration = diff.getMigration();
 
+      // writer needs the current model to provide table/column details for
+      // history ddl generation (triggers, history tables etc)
+      DdlWrite write = new DdlWrite(new MConfiguration(), currentModel.read());
+
       ModelDdlWriter writer = new ModelDdlWriter(databasePlatform, serverConfig);
-      writer.processMigration(dbMigration);
+      if (!writer.processMigration(dbMigration, write)) {
+        logger.info("no changes detected - no migration written");
 
-      File writePath = getWritePath();
-
-      logger.info("migration writing version {} to {}", nextMajorVersion, writePath.getAbsolutePath());
-      writer.writeMigration(writePath, nextMajorVersion);
+      } else {
+        // there were actually changes to write
+        File writePath = getWritePath();
+        logger.info("migration writing version {} to {}", nextMajorVersion, writePath.getAbsolutePath());
+        writer.writeMigration(writePath, nextMajorVersion);
+      }
 
     } finally {
       DbOffline.reset();
@@ -114,7 +126,6 @@ public class DbMigration {
 
   protected void setDefaults() {
     if (server == null) {
-      String set = DbOffline.getPlatform();
       setServer(Ebean.getDefaultServer());
     }
     if (databasePlatform == null) {

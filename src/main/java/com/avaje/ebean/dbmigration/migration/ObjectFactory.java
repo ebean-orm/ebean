@@ -158,11 +158,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link CreateHistoryTable }
+     * Create an instance of {@link AddHistoryTable }
      * 
      */
-    public CreateHistoryTable createCreateHistoryTable() {
-        return new CreateHistoryTable();
+    public AddHistoryTable createAddHistoryTable() {
+        return new AddHistoryTable();
     }
 
     /**
@@ -171,6 +171,14 @@ public class ObjectFactory {
      */
     public RenameColumn createRenameColumn() {
         return new RenameColumn();
+    }
+
+    /**
+     * Create an instance of {@link AlterHistoryTable }
+     * 
+     */
+    public AlterHistoryTable createAlterHistoryTable() {
+        return new AlterHistoryTable();
     }
 
     /**

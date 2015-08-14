@@ -146,7 +146,9 @@ public class DefaultContainer implements SpiContainer {
 
       // generate and run DDL if required
       // if there are any other tasks requiring action in their plugins, do them as well
-      server.executePlugins(online);
+      if (!DbOffline.isRunningMigration()) {
+        server.executePlugins(online);
+      }
 
       // initialise prior to registering with clusterManager
       server.initialise();

@@ -13,6 +13,8 @@ public class DbOffline {
 
   private static final String KEY = "ebean.dboffline";
 
+  private static boolean runningMigration;
+
   public static void setPlatform(DbPlatformName dbPlatform) {
     System.setProperty(KEY, dbPlatform.name());
   }
@@ -33,8 +35,29 @@ public class DbOffline {
     return getPlatform() != null;
   }
 
+  /**
+   * Return true if the migration is runing. This typically means don't run the
+   * plugins like full DDL generation.
+   */
+  public static boolean isRunningMigration() {
+    return runningMigration;
+  }
+
+  /**
+   * Called when the migration is running is order to stop other plugins
+   * like the full DDL generation from executing.
+   */
+  public static void setRunningMigration() {
+    runningMigration = true;
+  }
+
+  /**
+   * Reset the offline platform and runningMigration flag.
+   */
   public static void reset() {
+    runningMigration = false;
     System.clearProperty(KEY);
     logger.info("reset");
   }
+
 }

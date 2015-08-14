@@ -1,9 +1,12 @@
 package com.avaje.ebean.dbmigration.model;
 
 import com.avaje.ebean.dbmigration.migration.AddColumn;
+import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
+import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.Column;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
+import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
 import com.avaje.ebean.dbmigration.migration.IdentityType;
 
 import java.math.BigInteger;
@@ -52,7 +55,7 @@ public class MTable {
   private int sequenceInitial;
   private int sequenceAllocate;
 
-  private Boolean withHistory;
+  private boolean withHistory;
 
   private Map<String, MColumn> columns = new LinkedHashMap<String, MColumn>();
 
@@ -71,7 +74,7 @@ public class MTable {
     this.comment = createTable.getComment();
     this.tablespace = createTable.getTablespace();
     this.indexTablespace = createTable.getIndexTablespace();
-    this.withHistory = createTable.isWithHistory();
+    this.withHistory = Boolean.TRUE.equals(createTable.isWithHistory());
     this.sequenceName = createTable.getSequenceName();
     this.sequenceInitial = toInt(createTable.getSequenceInitial());
     this.sequenceAllocate = toInt(createTable.getSequenceAllocate());
@@ -97,11 +100,13 @@ public class MTable {
     createTable.setComment(comment);
     createTable.setTablespace(tablespace);
     createTable.setIndexTablespace(indexTablespace);
-    createTable.setWithHistory(withHistory);
     createTable.setSequenceName(sequenceName);
     createTable.setSequenceInitial(toBigInteger(sequenceInitial));
     createTable.setSequenceAllocate(toBigInteger(sequenceAllocate));
     createTable.setIdentityType(identityType);
+    if (withHistory) {
+      createTable.setWithHistory(Boolean.TRUE);
+    }
 
     for (MColumn column : this.columns.values()) {
       createTable.getColumn().add(column.createColumn());
@@ -116,6 +121,20 @@ public class MTable {
 
   public void compare(ModelDiff modelDiff, MTable newTable) {
 
+    if (withHistory != newTable.withHistory) {
+      if (withHistory) {
+        DropHistoryTable dropHistoryTable = new DropHistoryTable();
+        dropHistoryTable.setBaseTable(name);
+        modelDiff.addDropHistoryTable(dropHistoryTable);
+
+      } else {
+        AddHistoryTable addHistoryTable = new AddHistoryTable();
+        addHistoryTable.setBaseTable(name);
+        //addHistoryTable.setWhenCreatedColumn();
+        modelDiff.addAddHistoryTable(addHistoryTable);
+      }
+    }
+
     // TODO: compare indexes?
     // TODO: compare primary key
 
@@ -129,6 +148,8 @@ public class MTable {
       if (localColumn == null) {
         diffNewColumn(newColumn);
       } else {
+        // note that if there are alter column changes in here then
+        // the table withHistory is taken into account
         localColumn.compare(modelDiff, this, newColumn);
         mappedColumns.add(newColumn.getName());
       }
@@ -142,9 +163,13 @@ public class MTable {
     }
 
     if (addColumn != null) {
+      if (withHistory) {
+        // These addColumns need to occur on the history
+        // table as well as the base table
+        addColumn.setWithHistory(Boolean.TRUE);
+      }
       modelDiff.addAddColumn(addColumn);
     }
-
   }
 
   /**
@@ -155,6 +180,19 @@ public class MTable {
     for (Column column : addColumn.getColumn()) {
       addColumn(column);
     }
+  }
+
+  /**
+   * Apply AddColumn migration.
+   */
+  public void apply(AlterColumn alterColumn) {
+    checkTableName(alterColumn.getTableName());
+    String columnName = alterColumn.getColumnName();
+    MColumn existingColumn = columns.get(columnName);
+    if (existingColumn == null) {
+      throw new IllegalStateException("Column ["+columnName+"] does not exist for AlterColumn change?");
+    }
+    existingColumn.apply(alterColumn);
   }
 
   /**
@@ -189,8 +227,12 @@ public class MTable {
     return indexTablespace;
   }
 
-  public Boolean getWithHistory() {
+  public boolean isWithHistory() {
     return withHistory;
+  }
+
+  public void setWithHistory() {
+    withHistory = true;
   }
 
   public Map<String, MColumn> getColumns() {

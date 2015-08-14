@@ -1,6 +1,7 @@
 package com.avaje.ebean.dbmigration.model;
 
 import com.avaje.ebean.dbmigration.migration.AddColumn;
+import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
@@ -62,6 +63,8 @@ public class ModelContainer {
     for (Object change : changeSetChildren) {
       if (change instanceof CreateTable) {
         applyChange((CreateTable) change);
+      } else if (change instanceof AlterColumn) {
+        applyChange((AlterColumn) change);
       } else if (change instanceof AddColumn) {
         applyChange((AddColumn) change);
       } else if (change instanceof DropColumn) {
@@ -91,6 +94,17 @@ public class ModelContainer {
       throw new IllegalStateException("Table [" + addColumn.getTableName() + "] does not exist in model?");
     }
     table.apply(addColumn);
+  }
+
+  /**
+   * Apply a AddColumn change to the model.
+   */
+  protected void applyChange(AlterColumn alterColumn) {
+    MTable table = tables.get(alterColumn.getTableName());
+    if (table == null) {
+      throw new IllegalStateException("Table [" + alterColumn.getTableName() + "] does not exist in model?");
+    }
+    table.apply(alterColumn);
   }
 
   /**

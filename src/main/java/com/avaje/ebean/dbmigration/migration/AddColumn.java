@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}column" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *       &lt;attribute name="tableName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="withHistory" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -42,6 +43,8 @@ public class AddColumn {
     protected List<Column> column;
     @XmlAttribute(name = "tableName", required = true)
     protected String tableName;
+    @XmlAttribute(name = "withHistory")
+    protected Boolean withHistory;
 
     /**
      * Gets the value of the column property.
@@ -94,6 +97,30 @@ public class AddColumn {
      */
     public void setTableName(String value) {
         this.tableName = value;
+    }
+
+    /**
+     * Gets the value of the withHistory property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isWithHistory() {
+        return withHistory;
+    }
+
+    /**
+     * Sets the value of the withHistory property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setWithHistory(Boolean value) {
+        this.withHistory = value;
     }
 
 }

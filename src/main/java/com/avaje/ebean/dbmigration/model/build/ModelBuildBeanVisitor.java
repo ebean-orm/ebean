@@ -35,7 +35,9 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
     }
 
     MTable table = new MTable(descriptor.getBaseTable());
-
+    if (descriptor.isHistorySupport()) {
+      table.setWithHistory();
+    }
     setIdentity(descriptor, table);
 
     // add the table to the model

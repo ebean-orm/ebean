@@ -27,22 +27,30 @@ public class ModelDdlWriter {
 
   private DdlWrite write;
 
+  int changeSetCount;
+
   public ModelDdlWriter(DatabasePlatform platform, ServerConfig serverConfig) {
     this.platform = platform;
     this.serverConfig = serverConfig;
   }
 
-  public void processMigration(Migration dbMigration) throws IOException {
+  public boolean processMigration(Migration dbMigration, DdlWrite write) throws IOException {
+
+    this.changeSetCount = 0;
     this.dbMigration = dbMigration;
-    this.write = new DdlWrite();
+    this.write = write;
 
     DdlHandler handler = handler();
 
     List<ChangeSet> changeSets = dbMigration.getChangeSet();
     for (ChangeSet changeSet : changeSets) {
-      handler.generate(write, changeSet);
+      if (!changeSet.getChangeSetChildren().isEmpty()) {
+        changeSetCount++;
+        handler.generate(write, changeSet);
+      }
     }
 
+    return changeSetCount > 0;
   }
 
   /**

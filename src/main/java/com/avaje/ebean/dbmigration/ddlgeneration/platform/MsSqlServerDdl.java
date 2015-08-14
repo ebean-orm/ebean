@@ -2,6 +2,7 @@ package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
 import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.dbmigration.migration.AlterColumn;
 
 /**
  * MS SQL Server platform specific DDL.
@@ -48,4 +49,27 @@ public class MsSqlServerDdl extends PlatformDdl {
     return sb.toString();
   }
 
+  public String alterColumnBaseAttributes(AlterColumn alter) {
+
+    String tableName = alter.getTableName();
+    String columnName = alter.getColumnName();
+    String type = alter.getType() != null ? alter.getType() : alter.getCurrentType();
+    boolean notnull = (alter.isNotnull() != null) ? alter.isNotnull() : Boolean.TRUE.equals(alter.isCurrentNotnull());
+    String notnullClause = notnull ? " not null" : "";
+
+    return "alter table " + tableName + " alter column " + columnName + " " + type + notnullClause;
+  }
+
+  @Override
+  public String alterColumnType(String tableName, String columnName, String type) {
+
+    // can't alter itself - done in alterColumnBaseAttributes()
+    return null;
+  }
+
+  public String alterColumnNotnull(String tableName, String columnName, boolean notnull) {
+
+    // can't alter itself - done in alterColumnBaseAttributes()
+    return null;
+  }
 }

@@ -9,7 +9,7 @@ import com.avaje.ebean.dbmigration.migration.Column;
 public class MColumn {
 
   private final String name;
-  private final String type;
+  private String type;
   private String checkConstraint;
   private String checkConstraintName;
   private String defaultValue;
@@ -29,6 +29,11 @@ public class MColumn {
    * specifically for MsSqlServer.
    */
   private String uniqueOneToOne;
+
+  /**
+   * Temporary variable used when building the alter column changes.
+   */
+  private AlterColumn alterColumn;
 
   public MColumn(Column column) {
     this.name = column.getName();
@@ -200,40 +205,57 @@ public class MColumn {
     return val != null && !val.isEmpty();
   }
 
-  AlterColumn alterColumn;
-
-  private AlterColumn getAlterColumn(String tableName) {
+  private AlterColumn getAlterColumn(String tableName, boolean tableWithHistory) {
     if (alterColumn == null) {
       alterColumn = new AlterColumn();
       alterColumn.setColumnName(name);
       alterColumn.setTableName(tableName);
+      if (tableWithHistory) {
+        alterColumn.setWithHistory(Boolean.TRUE);
+      }
     }
     return alterColumn;
   }
 
+  /**
+   * Compare the column meta data and return true if there is a change that means
+   * the history table column needs
+
+   */
   public void compare(ModelDiff modelDiff, MTable table, MColumn newColumn) {
 
+    boolean tableWithHistory = table.isWithHistory();
     String tableName = table.getName();
 
     // set to null and check at the end
     this.alterColumn = null;
 
-    if (different(type, newColumn.type)) {
-      getAlterColumn(tableName).setType(newColumn.type);
-    }
+    boolean changeType = false;
+    boolean changeNotnull = false;
+
     if (historyExclude != newColumn.historyExclude) {
-      getAlterColumn(tableName).setHistoryExclude(newColumn.historyExclude);
+      getAlterColumn(tableName, tableWithHistory).setHistoryExclude(newColumn.historyExclude);
+    }
+
+    if (different(type, newColumn.type)) {
+      changeType = true;
+      getAlterColumn(tableName, tableWithHistory).setType(newColumn.type);
     }
     if (notnull != newColumn.notnull) {
-      getAlterColumn(tableName).setNotnull(newColumn.notnull);
+      changeNotnull = true;
+      getAlterColumn(tableName, tableWithHistory).setNotnull(newColumn.notnull);
     }
     if (different(defaultValue, newColumn.defaultValue)) {
-      AlterColumn alter = getAlterColumn(tableName);
-      alter.setDefaultValue(newColumn.defaultValue);
+      AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
+      if (newColumn.defaultValue == null) {
+        alter.setDefaultValue("DROP DEFAULT");
+      } else {
+        alter.setDefaultValue(newColumn.defaultValue);
+      }
     }
 
     if (different(checkConstraint, newColumn.checkConstraint)) {
-      AlterColumn alter = getAlterColumn(tableName);
+      AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
       if (hasValue(checkConstraint)) {
         alter.setDropCheckConstraint(checkConstraintName);
       }
@@ -244,7 +266,7 @@ public class MColumn {
     }
     if (different(references, newColumn.references)) {
       // foreign key change
-      AlterColumn alter = getAlterColumn(tableName);
+      AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
       if (hasValue(foreignKeyName)) {
         alter.setDropForeignKey(foreignKeyName);
       }
@@ -260,7 +282,7 @@ public class MColumn {
     }
 
     if (different(unique, newColumn.unique)) {
-      AlterColumn alter = getAlterColumn(tableName);
+      AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
       if (hasValue(unique)) {
         alter.setDropUnique(unique);
       }
@@ -269,7 +291,7 @@ public class MColumn {
       }
     }
     if (different(uniqueOneToOne, newColumn.uniqueOneToOne)) {
-      AlterColumn alter = getAlterColumn(tableName);
+      AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
       if (hasValue(uniqueOneToOne)) {
         alter.setDropUnique(uniqueOneToOne);
       }
@@ -280,6 +302,62 @@ public class MColumn {
 
     if (alterColumn != null) {
       modelDiff.addAlterColumn(alterColumn);
+      // we need the current type, notnull together for some db's
+      if (!changeType) {
+        alterColumn.setCurrentType(type);
+      }
+      if (!changeNotnull) {
+        alterColumn.setCurrentNotnull(notnull);
+      }
     }
+  }
+
+  /**
+   * Apply changes based on the AlterColumn request.
+   */
+  public void apply(AlterColumn alterColumn) {
+
+    if (hasValue(alterColumn.getDropCheckConstraint())) {
+      checkConstraint = null;
+    }
+    if (hasValue(alterColumn.getDropForeignKey())) {
+      foreignKeyName = null;
+    }
+    if (hasValue(alterColumn.getDropForeignKeyIndex())) {
+      foreignKeyIndex = null;
+    }
+    if (hasValue(alterColumn.getDropUnique())) {
+      unique = null;
+      uniqueOneToOne = null;
+    }
+
+    if (hasValue(alterColumn.getType())) {
+      type = alterColumn.getType();
+    }
+    if (hasValue(alterColumn.getDefaultValue())) {
+      defaultValue = alterColumn.getDefaultValue();
+    }
+    if (hasValue(alterColumn.getCheckConstraint())) {
+      checkConstraint = alterColumn.getCheckConstraint();
+    }
+    if (hasValue(alterColumn.getCheckConstraintName())) {
+      checkConstraintName = alterColumn.getCheckConstraintName();
+    }
+    if (hasValue(alterColumn.getUnique())) {
+      unique = alterColumn.getUnique();
+    }
+    if (hasValue(alterColumn.getUniqueOneToOne())) {
+      uniqueOneToOne = alterColumn.getUniqueOneToOne();
+    }
+    if (hasValue(alterColumn.getReferences())) {
+      references = alterColumn.getReferences();
+    }
+    if (hasValue(alterColumn.getForeignKeyName())) {
+      foreignKeyName = alterColumn.getForeignKeyName();
+    }
+    if (hasValue(alterColumn.getForeignKeyIndex())) {
+      foreignKeyIndex = alterColumn.getForeignKeyIndex();
+    }
+
   }
 }

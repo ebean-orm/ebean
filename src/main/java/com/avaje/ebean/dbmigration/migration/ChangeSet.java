@@ -50,7 +50,8 @@ public class ChangeSet {
         @XmlElement(name = "createTable", type = CreateTable.class),
         @XmlElement(name = "dropTable", type = DropTable.class),
         @XmlElement(name = "renameTable", type = RenameTable.class),
-        @XmlElement(name = "createHistoryTable", type = CreateHistoryTable.class),
+        @XmlElement(name = "addHistoryTable", type = AddHistoryTable.class),
+        @XmlElement(name = "dropHistoryTable", type = DropHistoryTable.class),
         @XmlElement(name = "addColumn", type = AddColumn.class),
         @XmlElement(name = "dropColumn", type = DropColumn.class),
         @XmlElement(name = "alterColumn", type = AlterColumn.class),
@@ -89,7 +90,8 @@ public class ChangeSet {
      * {@link CreateTable }
      * {@link DropTable }
      * {@link RenameTable }
-     * {@link CreateHistoryTable }
+     * {@link AddHistoryTable }
+     * {@link DropHistoryTable }
      * {@link AddColumn }
      * {@link DropColumn }
      * {@link AlterColumn }

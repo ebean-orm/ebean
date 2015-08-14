@@ -121,6 +121,12 @@ public class BaseTableDdl implements TableDdl {
 
     writeUniqueOneToOneConstraints(writer, createTable);
 
+    if (isTrue(createTable.isWithHistory())) {
+      // create history with rollback before the
+      // associated drop table is written to rollback
+      createWithHistory(writer, createTable.getName());
+    }
+
     // add drop table to the rollback buffer - do this before
     // we drop the related sequence (if sequences are used)
     dropTable(writer.rollback(), tableName);
@@ -135,10 +141,6 @@ public class BaseTableDdl implements TableDdl {
     writer.rollback().end();
 
     writeAddForeignKeys(writer, createTable);
-
-    if (isTrue(createTable.isWithHistory())) {
-      createWithHistory(writer, createTable.getName());
-    }
 
   }
 
@@ -503,6 +505,70 @@ public class BaseTableDdl implements TableDdl {
       alterColumnAddUniqueOneToOneConstraint(writer, alterColumn);
     }
 
+    boolean alterBaseAttributes = false;
+    if (hasValue(alterColumn.getType())) {
+      alterColumnType(writer, alterColumn);
+      alterBaseAttributes = true;
+    }
+    if (hasValue(alterColumn.getDefaultValue())) {
+      alterColumnDefaultValue(writer, alterColumn);
+      alterBaseAttributes = true;
+    }
+    if (alterColumn.isNotnull() != null) {
+      alterColumnNotnull(writer, alterColumn);
+      alterBaseAttributes = true;
+    }
+
+    if (alterBaseAttributes) {
+      alterColumnBaseAttributes(writer, alterColumn);
+    }
+  }
+
+  /**
+   * This is mysql specific - alter all the base attributes of the column together.
+   */
+  protected void alterColumnBaseAttributes(DdlWrite writer, AlterColumn alter) throws IOException {
+
+    String ddl = platformDdl.alterColumnBaseAttributes(alter);
+    if (hasValue(ddl)) {
+      writer.apply().append(ddl).endOfStatement();
+    }
+  }
+
+  protected void alterColumnDefaultValue(DdlWrite writer, AlterColumn alter) throws IOException {
+
+    String tableName = alter.getTableName();
+    String columnName = alter.getColumnName();
+    String defaultValue = alter.getDefaultValue();
+
+    String ddl = platformDdl.alterColumnDefaultValue(tableName, columnName, defaultValue);
+    if (hasValue(ddl)) {
+      writer.apply().append(ddl).endOfStatement();
+    }
+  }
+
+  protected void alterColumnNotnull(DdlWrite writer, AlterColumn alter) throws IOException {
+
+    String tableName = alter.getTableName();
+    String columnName = alter.getColumnName();
+    Boolean notnull = alter.isNotnull();
+
+    String ddl = platformDdl.alterColumnNotnull(tableName, columnName, notnull);
+    if (hasValue(ddl)) {
+      writer.apply().append(ddl).endOfStatement();
+    }
+  }
+
+  protected void alterColumnType(DdlWrite writer, AlterColumn alter) throws IOException {
+
+    String tableName = alter.getTableName();
+    String columnName = alter.getColumnName();
+    String type = alter.getType();
+
+    String ddl = platformDdl.alterColumnType(tableName, columnName, type);
+    if (hasValue(ddl)) {
+      writer.apply().append(ddl).endOfStatement();
+    }
   }
 
   protected void alterColumnAddForeignKey(DdlWrite writer, AlterColumn alterColumn) throws IOException {

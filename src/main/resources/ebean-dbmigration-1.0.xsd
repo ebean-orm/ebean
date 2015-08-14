@@ -14,7 +14,6 @@
         <!--<xsd:element ref="application" minOccurs="0" maxOccurs="unbounded"/>-->
       <!--</xsd:sequence>-->
     <!--</xsd:complexType>-->
-  <!--</xsd:element>-->
 
   <!--<xsd:element name="application">-->
     <!--<xsd:complexType>-->
@@ -173,10 +172,16 @@
 
   <!-- HISTORY -->
 
-  <xsd:element name="createHistoryTable">
+  <xsd:element name="addHistoryTable">
     <xsd:complexType>
       <xsd:attribute name="baseTable" type="xsd:string" use="required"/>
       <xsd:attribute name="whenCreatedColumn" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="alterHistoryTable">
+    <xsd:complexType>
+      <xsd:attribute name="baseTable" type="xsd:string" use="required"/>
     </xsd:complexType>
   </xsd:element>
 
@@ -194,6 +199,7 @@
         <xsd:element ref="column" minOccurs="1" maxOccurs="unbounded"/>
       </xsd:sequence>
       <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="withHistory" type="xsd:boolean"/>
     </xsd:complexType>
   </xsd:element>
 
@@ -208,9 +214,13 @@
     <xsd:complexType>
       <xsd:attribute name="columnName" type="xsd:string" use="required"/>
       <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="withHistory" type="xsd:boolean"/>
       <xsd:attribute name="type" type="xsd:string"/>
+      <xsd:attribute name="currentType" type="xsd:string"/>
       <xsd:attribute name="defaultValue" type="xsd:string"/>
+      <xsd:attribute name="currentDefaultValue" type="xsd:string"/>
       <xsd:attribute name="notnull" type="xsd:boolean"/>
+      <xsd:attribute name="currentNotnull" type="xsd:boolean"/>
       <xsd:attribute name="historyExclude" type="xsd:boolean"/>
       <xsd:attribute name="checkConstraint" type="xsd:string"/>
       <xsd:attribute name="checkConstraintName" type="xsd:string"/>
@@ -319,7 +329,8 @@
       <xsd:element ref="dropTable" maxOccurs="unbounded"/>
       <xsd:element ref="renameTable" maxOccurs="unbounded"/>
 
-      <xsd:element ref="createHistoryTable" maxOccurs="unbounded"/>
+      <xsd:element ref="addHistoryTable" maxOccurs="unbounded"/>
+      <xsd:element ref="dropHistoryTable" maxOccurs="unbounded"/>
 
       <xsd:element ref="addColumn" maxOccurs="unbounded"/>
       <xsd:element ref="dropColumn" maxOccurs="unbounded"/>

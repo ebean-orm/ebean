@@ -36,93 +36,108 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
   @Override
   public void createWithHistory(DdlWrite writer, MTable table) throws IOException {
 
+
+    String baseTable = table.getName();
+
+    // rollback trigger then function
+    DdlBuffer rollback = writer.rollback();
+    rollback.append("drop trigger if exists ").append(triggerName(baseTable)).append(" on ").append(baseTable).append(" cascade").endOfStatement();
+    rollback.append("drop function if exists ").append(procedureName(baseTable)).append("()").endOfStatement();
+    rollback.end();
+
     addHistoryTable(writer, table);
     addStoredFunction(writer, table);
     addTrigger(writer, table);
   }
 
+  protected String normalise(String tableName) {
+    return constraintNaming.normaliseTable(tableName);
+  }
+
   protected String historyTableName(String baseTableName) {
-    return baseTableName + historySuffix;
+    return normalise(baseTableName) + historySuffix;
   }
 
   protected String procedureName(String baseTableName) {
-    return baseTableName + "_history_version";
+    return normalise(baseTableName) + "_history_version";
   }
 
   protected String triggerName(String baseTableName) {
-    return baseTableName + "_history_upd";
+    return normalise(baseTableName) + "_history_upd";
   }
 
   public void addHistoryTable(DdlWrite writer, MTable table) throws IOException {
 
-    String baseTableName = constraintNaming.normaliseTable(table.getName());
+    String baseTableName = table.getName();
 
-    DdlBuffer buffer = writer.applyHistory();
+    DdlBuffer apply = writer.applyHistory();
 
-    buffer
+    apply
         .append("alter table ").append(baseTableName)
         .append(" add column ").append(sysPeriod).append(" tstzrange not null")
-        .endOfStatement().end();
+        .endOfStatement();
 
-    buffer
+    apply
         .append("create table ").append(baseTableName).append(historySuffix)
         .append(" (like ").append(baseTableName).append(")")
-        .endOfStatement().end();
+        .endOfStatement();
 
-    buffer
+    apply
         .append("create view ").append(baseTableName).append(viewSuffix)
-        .append(" as select * from").append(baseTableName)
-        .append(" union all select * from").append(baseTableName).append(historySuffix)
+        .append(" as select * from ").append(baseTableName)
+        .append(" union all select * from ").append(baseTableName).append(historySuffix)
         .endOfStatement().end();
 
+    // rollback changes in appropriate order
+    DdlBuffer rollback = writer.rollback();
+    rollback.append("drop view ").append(baseTableName).append(viewSuffix).endOfStatement();
+    rollback.append("alter table ").append(baseTableName).append(" drop column ").append(sysPeriod).endOfStatement();
+    rollback.append("drop table ").append(baseTableName).append(historySuffix).endOfStatement().end();
   }
 
   public void addTrigger(DdlWrite writer, MTable table) throws IOException {
 
-    String baseTableName = constraintNaming.normaliseTable(table.getName());
+    String baseTableName = table.getName();
     String procedureName = procedureName(baseTableName);
     String triggerName = triggerName(baseTableName);
 
-    DdlBuffer buffer = writer.applyHistory();
-    buffer
+    DdlBuffer apply = writer.applyHistory();
+    apply
         .append("create trigger ").append(triggerName).newLine()
         .append("  before insert or update or delete on ").append(baseTableName).newLine()
         .append("  for each row execute procedure ").append(procedureName).append("();").newLine().newLine();
-
   }
-
 
   public void addStoredFunction(DdlWrite writer, MTable table) throws IOException {
 
-    String baseTableName = constraintNaming.normaliseTable(table.getName());
-    String procedureName = procedureName(baseTableName);
-    DdlBuffer buffer = writer.applyHistory();
+    String procedureName = procedureName(table.getName());
 
-    buffer
+    DdlBuffer apply = writer.applyHistory();
+    apply
         .append("create or replace function ").append(procedureName).append("() returns trigger as $$").newLine()
         .append("begin").newLine();
-    buffer
+    apply
         .append("  if (TG_OP = 'INSERT') then").newLine()
         .append("    NEW.").append(sysPeriod).append(" = tstzrange(CURRENT_TIMESTAMP,null);").newLine()
         .append("    return new;").newLine().newLine();
-    buffer
+    apply
         .append("  elsif (TG_OP = 'UPDATE') then").newLine();
-    appendInsertIntoHistory(buffer, table);
-    buffer
+    appendInsertIntoHistory(apply, table);
+    apply
         .append("    NEW.").append(sysPeriod).append(" = tstzrange(CURRENT_TIMESTAMP,null);").newLine()
         .append("    return new;").newLine().newLine();
-    buffer
+    apply
         .append("  elsif (TG_OP = 'DELETE') then").newLine();
-    appendInsertIntoHistory(buffer, table);
-    buffer
+    appendInsertIntoHistory(apply, table);
+    apply
         .append("    return old;").newLine().newLine();
 
-    buffer
+    apply
         .append("  end if;").newLine()
         .append("end;").newLine()
         .append("$$ LANGUAGE plpgsql;").newLine();
 
-    buffer.end();
+    apply.end();
   }
 
   protected void appendInsertIntoHistory(DdlBuffer buffer, MTable table) throws IOException {
@@ -138,7 +153,6 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
 
   protected void appendColumnNames(DdlBuffer buffer, MTable table, String columnPrefix) throws IOException {
 
-    //id, line1, line2, city, country_code, version, when_created, when_updated
     Collection<MColumn> columns = table.getColumns().values();
     int i = 0;
     for (MColumn column : columns) {

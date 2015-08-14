@@ -14,6 +14,10 @@ public class Oracle10Ddl extends PlatformDdl {
     this.dropSequenceIfExists = "drop sequence ";
     this.dropTableCascade = " cascade constraints purge";
     this.foreignKeyRestrict = "";
+    this.alterColumn =  "modify";
+    this.columnSetNotnull = "not null";
+    this.columnSetNull = "null";
+    this.columnSetDefault = "default";
   }
 
 }

@@ -8,7 +8,6 @@ import com.avaje.ebean.dbmigration.ddlgeneration.BaseDdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
-import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.VowelRemover;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.IdentityType;
 import com.avaje.ebean.dbmigration.model.MTable;
@@ -51,6 +50,19 @@ public class PlatformDdl {
   protected String dropConstraintIfExists = "drop constraint if exists";
 
   protected String dropIndexIfExists = "drop index if exists ";
+
+
+  protected String alterColumn =  "alter column";
+
+  protected String columnSetType = "";
+
+  protected String columnSetDefault = "set default";
+
+  protected String columnDropDefault = "drop default";
+
+  protected String columnSetNotnull = "set not null";
+
+  protected String columnSetNull = "set null";
 
   /**
    * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
@@ -170,5 +182,33 @@ public class PlatformDdl {
 
   public void historyIncludeColumn(DdlWrite writer, AlterColumn alterColumn) {
 
+  }
+
+
+  public String alterColumnType(String tableName, String columnName, String type) {
+
+    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + columnSetType + type;
+  }
+
+  public String alterColumnNotnull(String tableName, String columnName, boolean notnull) {
+
+    String suffix = notnull ? columnSetNotnull : columnSetNull;
+    return  "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix;
+  }
+
+  public boolean isDropDefault(String defaultValue) {
+    return "DROP DEFAULT".equals(defaultValue);
+  }
+
+  public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
+
+    String suffix = isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + defaultValue;
+    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix;
+  }
+
+  public String alterColumnBaseAttributes(AlterColumn alter) {
+    // by default do nothing, only used by mysql as it can only modify the column with the
+    // full column definition
+    return null;
   }
 }
