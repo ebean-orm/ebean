@@ -62,28 +62,4 @@ public class IndexColumns {
     columns.add(column);
   }
 
-  /**
-   * Return the columns as a string array.
-   */
-  public String[] columnsArray() {
-    return columns.toArray(new String[columns.size()]);
-  }
-
-  /**
-   * Return the column names all joined with underscore.
-   */
-  public String joinedNames() {
-    if (columns.size() == 1) {
-      return columns.get(0);
-    } else {
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < columns.size(); i++) {
-        if (i > 0) {
-          sb.append("_");
-        }
-        sb.append(columns.get(i));
-      }
-      return sb.toString();
-    }
-  }
 }

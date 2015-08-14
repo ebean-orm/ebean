@@ -2,7 +2,6 @@ package com.avaje.ebean.dbmigration.ddlgeneration;
 
 import com.avaje.ebean.config.DbConstraintNaming;
 import com.avaje.ebean.config.NamingConvention;
-import com.avaje.ebean.dbmigration.ddlgeneration.platform.BaseColumnDdl;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.BaseTableDdl;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import com.avaje.ebean.dbmigration.migration.AddColumn;
@@ -19,13 +18,10 @@ import java.util.List;
  */
 public class BaseDdlHandler implements DdlHandler {
 
-  protected final ColumnDdl columnDdl;
-
   protected final TableDdl tableDdl;
 
   public BaseDdlHandler(NamingConvention namingConvention, DbConstraintNaming naming, PlatformDdl platformDdl) {
     this.tableDdl = new BaseTableDdl(namingConvention, naming, platformDdl);
-    this.columnDdl = new BaseColumnDdl(platformDdl);
   }
 
   @Override
@@ -52,16 +48,16 @@ public class BaseDdlHandler implements DdlHandler {
 
   @Override
   public void generate(DdlWrite writer, AddColumn addColumn) throws IOException {
-    columnDdl.generate(writer, addColumn);
+    tableDdl.generate(writer, addColumn);
   }
 
   @Override
   public void generate(DdlWrite writer, DropColumn dropColumn) throws IOException {
-    columnDdl.generate(writer, dropColumn);
+    tableDdl.generate(writer, dropColumn);
   }
 
   @Override
   public void generate(DdlWrite writer, AlterColumn alterColumn) throws IOException {
-    columnDdl.generate(writer, alterColumn);
+    tableDdl.generate(writer, alterColumn);
   }
 }

@@ -14,9 +14,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TestQueryFindPagedList extends BaseTestCase {
@@ -67,25 +66,11 @@ public class TestQueryFindPagedList extends BaseTestCase {
     // fetch less that total orders (page size 3)
     PagedList<Order> pagedList = Ebean.find(Order.class).findPagedList(0, 3);
 
-    LoggedSqlCollector.start();
-    // sleep a little to give the logger registration time
-    // as sometimes the first query executes too fast to
-    // be captured in this multithreaded test
-    Thread.sleep(10);
-
     pagedList.loadRowCount();
     List<Order> orders = pagedList.getList();
     int totalRowCount = pagedList.getTotalRowCount();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
-
     assertThat(orders.size()).isLessThan(totalRowCount);
-    assertThat(loggedSql).hasSize(2);
-
-    String firstTxn = loggedSql.get(0).substring(0, 10);
-    String secTxn = loggedSql.get(1).substring(0, 10);
-
-    assertNotEquals(firstTxn, secTxn);
   }
 
 

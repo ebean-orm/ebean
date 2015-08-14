@@ -1,7 +1,5 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform.util;
 
-import com.avaje.ebean.dbmigration.migration.Column;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +77,4 @@ public class IndexSet {
     return indexes;
   }
 
-  public void addIndex(Column column) {
-
-  }
 }

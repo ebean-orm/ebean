@@ -14,7 +14,7 @@ public class Oracle10Platform extends DatabasePlatform {
   public Oracle10Platform() {
     super();
     this.name = "oracle";
-    this.maxIntersectionTableName = 30;
+    this.maxTableNameLength = 30;
     // OnQueryOnly.CLOSE as a performance optimisation on Oracle
     this.onQueryOnly = OnQueryOnly.CLOSE;
     this.dbEncrypt = new Oracle10DbEncrypt();

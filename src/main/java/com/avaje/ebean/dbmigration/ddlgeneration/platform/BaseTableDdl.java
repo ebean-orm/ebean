@@ -8,8 +8,11 @@ import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.TableDdl;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.IndexSet;
+import com.avaje.ebean.dbmigration.migration.AddColumn;
+import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.Column;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
+import com.avaje.ebean.dbmigration.migration.DropColumn;
 import com.avaje.ebean.dbmigration.migration.ForeignKey;
 import com.avaje.ebean.dbmigration.model.MTable;
 
@@ -122,7 +125,7 @@ public class BaseTableDdl implements TableDdl {
     dropTable(writer.rollback(), tableName);
 
     if (useSequence) {
-      String pkCol = singleColumnPrimaryKey ? pk.get(0).getName() : null;
+      String pkCol = pk.get(0).getName();
       writeSequence(writer, createTable, pkCol);
     }
 
@@ -211,7 +214,6 @@ public class BaseTableDdl implements TableDdl {
 
       writeForeignKey(write, fkName, tableName, cols, refTableName, refColumns, key.getIndexName());
     }
-
   }
 
   protected void writeForeignKey(DdlWrite write, String tableName, Column column) throws IOException {
@@ -235,17 +237,7 @@ public class BaseTableDdl implements TableDdl {
 
     tableName = lowerName(tableName);
     DdlBuffer fkeyBuffer = write.applyForeignKeys();
-    fkeyBuffer
-        .append("alter table ").append(tableName)
-        .append(" add constraint ").append(fkName)
-        .append(" foreign key");
-    appendColumns(columns, fkeyBuffer);
-    fkeyBuffer
-        .append(" references ")
-        .append(lowerName(refTable));
-    appendColumns(refColumns, fkeyBuffer);
-    fkeyBuffer.appendWithSpace(platformDdl.getForeignKeyRestrict())
-        .endOfStatement();
+    alterTableAddForeignKey(fkeyBuffer, fkName, tableName, columns, refTable, refColumns);
 
     if (indexName != null) {
       // no matching unique constraint so add the index
@@ -268,6 +260,21 @@ public class BaseTableDdl implements TableDdl {
 
     write.rollbackForeignKeys().end();
 
+  }
+
+  protected void alterTableAddForeignKey(DdlBuffer buffer, String fkName, String tableName, String[] columns, String refTable, String[] refColumns) throws IOException {
+
+    buffer
+        .append("alter table ").append(tableName)
+        .append(" add constraint ").append(fkName)
+        .append(" foreign key");
+    appendColumns(columns, buffer);
+    buffer
+        .append(" references ")
+        .append(lowerName(refTable));
+    appendColumns(refColumns, buffer);
+    buffer.appendWithSpace(platformDdl.getForeignKeyRestrict())
+        .endOfStatement();
   }
 
   private void appendColumns(String[] columns, DdlBuffer buffer) throws IOException {
@@ -437,6 +444,156 @@ public class BaseTableDdl implements TableDdl {
       }
     }
     return pk;
+  }
+
+  @Override
+  public void generate(DdlWrite writer, AddColumn addColumn) throws IOException {
+
+    String tableName = addColumn.getTableName();
+    List<Column> columns = addColumn.getColumn();
+    for (Column column : columns) {
+      // apply
+      alterTableAddColumn(writer.apply(), tableName, column);
+
+      // rollback
+      alterTableDropColumn(writer.rollback(), tableName, column.getName());
+    }
+  }
+
+  @Override
+  public void generate(DdlWrite writer, DropColumn dropColumn) throws IOException {
+
+    String tableName = dropColumn.getTableName();
+
+    alterTableDropColumn(writer.apply(), tableName, dropColumn.getColumnName());
+
+    // no good rollback option here, it is best if drop columns
+    // are put into a separate changeSet that is run last
+  }
+
+  @Override
+  public void generate(DdlWrite writer, AlterColumn alterColumn) throws IOException {
+
+    if (isTrue(alterColumn.isHistoryExclude())) {
+      historyExcludeColumn(writer, alterColumn);
+    } else if (isFalse(alterColumn.isHistoryExclude())) {
+      historyIncludeColumn(writer, alterColumn);
+    }
+
+    if (hasValue(alterColumn.getDropForeignKey())) {
+      alterColumnDropForeignKey(writer, alterColumn);
+    }
+    if (hasValue(alterColumn.getReferences())) {
+      alterColumnAddForeignKey(writer, alterColumn);
+    }
+
+    if (hasValue(alterColumn.getDropUnique())) {
+      alterColumnDropUniqueConstraint(writer, alterColumn);
+    }
+    if (hasValue(alterColumn.getUnique())) {
+      alterColumnAddUniqueConstraint(writer, alterColumn);
+    }
+    if (hasValue(alterColumn.getUniqueOneToOne())) {
+      alterColumnAddUniqueOneToOneConstraint(writer, alterColumn);
+    }
+
+  }
+
+  protected void alterColumnAddForeignKey(DdlWrite writer, AlterColumn alterColumn) throws IOException {
+
+    String tableName = alterColumn.getTableName();
+    String fkName = alterColumn.getForeignKeyName();
+    String[] cols = {alterColumn.getColumnName()};
+    String references = alterColumn.getReferences();
+    int pos = references.lastIndexOf('.');
+    if (pos == -1) {
+      throw new IllegalStateException("Expecting period '.' character for table.column split but not found in [" + references + "]");
+    }
+    String refTableName = references.substring(0, pos);
+    String refColumnName = references.substring(pos + 1);
+    String[] refCols = {refColumnName};
+
+    alterTableAddForeignKey(writer.apply(), fkName, tableName, cols, refTableName, refCols);
+  }
+
+  protected void alterColumnDropForeignKey(DdlWrite writer, AlterColumn alter) throws IOException {
+
+    String tableName = alter.getTableName();
+    String fkName = alter.getDropForeignKey();
+    writer.apply()
+        .append(platformDdl.alterTableDropForeignKey(tableName, fkName))
+        .endOfStatement();
+  }
+
+
+  protected void alterColumnDropUniqueConstraint(DdlWrite writer, AlterColumn alter) throws IOException {
+
+    String tableName = alter.getTableName();
+    String uqName = alter.getDropUnique();
+
+    writer.apply()
+        .append(platformDdl.dropIndex(uqName, tableName))
+        .endOfStatement();
+  }
+
+  protected void alterColumnAddUniqueOneToOneConstraint(DdlWrite writer, AlterColumn alter) throws IOException {
+
+    addUniqueConstraint(writer, alter, alter.getUniqueOneToOne());
+  }
+
+  protected void alterColumnAddUniqueConstraint(DdlWrite writer, AlterColumn alter) throws IOException {
+
+    addUniqueConstraint(writer, alter, alter.getUnique());
+  }
+
+  protected void addUniqueConstraint(DdlWrite writer, AlterColumn alter, String uqName) throws IOException {
+
+    String tableName = alter.getTableName();
+    String columnName = alter.getColumnName();
+
+    String[] cols = {columnName};
+    writer.apply()
+        .append(platformDdl.createExternalUniqueForOneToOne(uqName, tableName, cols))
+        .endOfStatement();
+
+    writer.rollbackForeignKeys()
+        .append(platformDdl.dropIndex(uqName, tableName))
+        .endOfStatement();
+  }
+
+
+  protected void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
+
+    buffer.append("alter table ").append(tableName)
+        .append(" drop column ").append(columnName)
+        .endOfStatement().end();
+  }
+
+  protected void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column) throws IOException {
+
+    buffer.append("alter table ").append(tableName)
+        .append(" add column ").append(column.getName())
+        .append(" ").append(column.getType());
+
+    if (isTrue(column.isNotnull())) {
+      buffer.append(" not null");
+    }
+    if (hasValue(column.getCheckConstraint())) {
+      buffer.append(" ").append(column.getCheckConstraint());
+    }
+    buffer.endOfStatement().end();
+  }
+
+  protected void historyIncludeColumn(DdlWrite writer, AlterColumn alterColumn) {
+    platformDdl.historyIncludeColumn(writer, alterColumn);
+  }
+
+  protected void historyExcludeColumn(DdlWrite writer, AlterColumn alterColumn) {
+    platformDdl.historyExcludeColumn(writer, alterColumn);
+  }
+
+  protected boolean isFalse(Boolean value) {
+    return value != null && !value;
   }
 
   /**
