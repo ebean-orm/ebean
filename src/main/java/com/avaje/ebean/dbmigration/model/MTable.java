@@ -163,11 +163,6 @@ public class MTable {
     }
 
     if (addColumn != null) {
-      if (withHistory) {
-        // These addColumns need to occur on the history
-        // table as well as the base table
-        addColumn.setWithHistory(Boolean.TRUE);
-      }
       modelDiff.addAddColumn(addColumn);
     }
   }
@@ -379,6 +374,11 @@ public class MTable {
     if (addColumn == null) {
       addColumn = new AddColumn();
       addColumn.setTableName(name);
+      if (withHistory) {
+        // These addColumns need to occur on the history
+        // table as well as the base table
+        addColumn.setWithHistory(Boolean.TRUE);
+      }
     }
 
     addColumn.getColumn().add(newColumn.createColumn());
@@ -389,6 +389,11 @@ public class MTable {
     DropColumn dropColumn = new DropColumn();
     dropColumn.setTableName(name);
     dropColumn.setColumnName(existingColumn.getName());
+    if (withHistory) {
+      // These dropColumns should occur on the history
+      // table as well as the base table
+      dropColumn.setWithHistory(Boolean.TRUE);
+    }
 
     modelDiff.addDropColumn(dropColumn);
   }

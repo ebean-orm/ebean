@@ -8,7 +8,9 @@ import com.avaje.ebean.dbmigration.ddlgeneration.BaseDdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
+import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
+import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
 import com.avaje.ebean.dbmigration.migration.IdentityType;
 import com.avaje.ebean.dbmigration.model.MTable;
 
@@ -76,7 +78,7 @@ public class PlatformDdl {
 
   public DdlHandler createDdlHandler(ServerConfig serverConfig) {
     historyDdl.configure(serverConfig);
-    return new BaseDdlHandler(serverConfig.getNamingConvention(), serverConfig.getConstraintNaming(), this);
+    return new BaseDdlHandler(serverConfig, this);
   }
 
   public IdType useIdentityType(IdentityType modelIdentityType) {
@@ -118,6 +120,18 @@ public class PlatformDdl {
    */
   public void createWithHistory(DdlWrite writer, MTable table) throws IOException {
     historyDdl.createWithHistory(writer, table);
+  }
+
+  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
+    historyDdl.dropHistoryTable(writer, dropHistoryTable);
+  }
+
+  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException {
+    historyDdl.addHistoryTable(writer, addHistoryTable);
+  }
+
+  public void regenerateHistoryTriggers(DdlWrite write, String baseTable) throws IOException {
+    historyDdl.regenerateHistoryTriggers(write, baseTable);
   }
 
   /**
@@ -175,15 +189,6 @@ public class PlatformDdl {
     // does nothing by default, really this is a MsSqlServer specific requirement
     return "";
   }
-
-  public void historyExcludeColumn(DdlWrite writer, AlterColumn alterColumn) {
-
-  }
-
-  public void historyIncludeColumn(DdlWrite writer, AlterColumn alterColumn) {
-
-  }
-
 
   public String alterColumnType(String tableName, String columnName, String type) {
 

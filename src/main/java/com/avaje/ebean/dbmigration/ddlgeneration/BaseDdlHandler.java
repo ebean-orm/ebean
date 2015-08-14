@@ -1,14 +1,15 @@
 package com.avaje.ebean.dbmigration.ddlgeneration;
 
-import com.avaje.ebean.config.DbConstraintNaming;
-import com.avaje.ebean.config.NamingConvention;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.BaseTableDdl;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import com.avaje.ebean.dbmigration.migration.AddColumn;
+import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
+import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,8 +21,8 @@ public class BaseDdlHandler implements DdlHandler {
 
   protected final TableDdl tableDdl;
 
-  public BaseDdlHandler(NamingConvention namingConvention, DbConstraintNaming naming, PlatformDdl platformDdl) {
-    this.tableDdl = new BaseTableDdl(namingConvention, naming, platformDdl);
+  public BaseDdlHandler(ServerConfig serverConfig, PlatformDdl platformDdl) {
+    this.tableDdl = new BaseTableDdl(serverConfig, platformDdl);
   }
 
   @Override
@@ -29,7 +30,7 @@ public class BaseDdlHandler implements DdlHandler {
 
     List<Object> changeSetChildren = changeSet.getChangeSetChildren();
     for (Object change : changeSetChildren) {
-      if (change instanceof  CreateTable) {
+      if (change instanceof CreateTable) {
         generate(writer, (CreateTable) change);
       } else if (change instanceof AddColumn) {
         generate(writer, (AddColumn) change);
@@ -37,8 +38,17 @@ public class BaseDdlHandler implements DdlHandler {
         generate(writer, (DropColumn) change);
       } else if (change instanceof AlterColumn) {
         generate(writer, (AlterColumn) change);
+      } else if (change instanceof AddHistoryTable) {
+        generate(writer, (AddHistoryTable) change);
+      } else if (change instanceof DropHistoryTable) {
+        generate(writer, (DropHistoryTable) change);
       }
     }
+  }
+
+  @Override
+  public void generateExtra(DdlWrite write) throws IOException {
+    tableDdl.generateExtra(write);
   }
 
   @Override
@@ -59,5 +69,15 @@ public class BaseDdlHandler implements DdlHandler {
   @Override
   public void generate(DdlWrite writer, AlterColumn alterColumn) throws IOException {
     tableDdl.generate(writer, alterColumn);
+  }
+
+  @Override
+  public void generate(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException {
+    tableDdl.generate(writer, addHistoryTable);
+  }
+
+  @Override
+  public void generate(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
+    tableDdl.generate(writer, dropHistoryTable);
   }
 }

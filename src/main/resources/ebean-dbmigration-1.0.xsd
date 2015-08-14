@@ -207,6 +207,7 @@
     <xsd:complexType>
       <xsd:attribute name="columnName" type="xsd:string" use="required"/>
       <xsd:attribute name="tableName" type="xsd:string" use="required"/>
+      <xsd:attribute name="withHistory" type="xsd:boolean"/>
     </xsd:complexType>
   </xsd:element>
 

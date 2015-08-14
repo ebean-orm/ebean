@@ -49,6 +49,7 @@ public class ModelDdlWriter {
         handler.generate(write, changeSet);
       }
     }
+    handler.generateExtra(write);
 
     return changeSetCount > 0;
   }

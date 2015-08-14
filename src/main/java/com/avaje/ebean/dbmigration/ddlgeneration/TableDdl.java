@@ -1,9 +1,11 @@
 package com.avaje.ebean.dbmigration.ddlgeneration;
 
 import com.avaje.ebean.dbmigration.migration.AddColumn;
+import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
+import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
 import com.avaje.ebean.dbmigration.migration.DropTable;
 
 import java.io.IOException;
@@ -37,4 +39,19 @@ public interface TableDdl {
    * Write the drop column change.
    */
   void generate(DdlWrite writer, DropColumn dropColumn) throws IOException;
+
+  /**
+   * Write the AddHistoryTable change.
+   */
+  void generate(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException;
+
+  /**
+   * Write the DropHistoryTable change.
+   */
+  void generate(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException;
+
+  /**
+   * Generate any extra DDL such as regeneration of history triggers.
+   */
+  void generateExtra(DdlWrite write) throws IOException;
 }

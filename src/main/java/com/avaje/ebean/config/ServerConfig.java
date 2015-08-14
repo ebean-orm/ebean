@@ -163,6 +163,12 @@ public class ServerConfig {
   private String asOfSysPeriod = "sys_period";
 
   /**
+   * Suffix appended to the base table to derive the view that contains the union
+   * of the base table and the history table in order to support asOf queries.
+   */
+  private String historyTableSuffix = "_history";
+
+  /**
    * Use for transaction scoped batch mode.
    */
   private PersistBatch persistBatch = PersistBatch.NONE;
@@ -674,6 +680,20 @@ public class ServerConfig {
    */
   public void setAsOfSysPeriod(String asOfSysPeriod) {
     this.asOfSysPeriod = asOfSysPeriod;
+  }
+
+  /**
+   * Return the history table suffix (defaults to _history).
+   */
+  public String getHistoryTableSuffix() {
+    return historyTableSuffix;
+  }
+
+  /**
+   * Set the history table suffix.
+   */
+  public void setHistoryTableSuffix(String historyTableSuffix) {
+    this.historyTableSuffix = historyTableSuffix;
   }
 
   /**
@@ -1960,6 +1980,7 @@ public class ServerConfig {
     diffFlatMode = p.getBoolean("diffFlatMode", diffFlatMode);
     asOfViewSuffix = p.get("asOfViewSuffix", asOfViewSuffix);
     asOfSysPeriod = p.get("asOfSysPeriod", asOfSysPeriod);
+    historyTableSuffix = p.get("historyTableSuffix", historyTableSuffix);
     dataSourceJndiName = p.get("dataSourceJndiName", dataSourceJndiName);
     databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
     databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);

@@ -4,6 +4,8 @@ import com.avaje.ebean.config.DbConstraintNaming;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
+import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
+import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
 import com.avaje.ebean.dbmigration.model.MColumn;
 import com.avaje.ebean.dbmigration.model.MTable;
 
@@ -21,7 +23,7 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
 
   private String viewSuffix;
 
-  private String historySuffix = "_history";
+  private String historySuffix;
 
   public PostgresHistoryDdl() {
   }
@@ -30,20 +32,51 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
   public void configure(ServerConfig serverConfig) {
     this.sysPeriod = serverConfig.getAsOfSysPeriod();
     this.viewSuffix = serverConfig.getAsOfViewSuffix();
+    this.historySuffix = serverConfig.getHistoryTableSuffix();
     this.constraintNaming = serverConfig.getConstraintNaming();
+  }
+
+  @Override
+  public void regenerateHistoryTriggers(DdlWrite writer, String baseTable) throws IOException {
+
+    MTable table = writer.getTable(baseTable);
+    if (table == null) {
+      throw new IllegalStateException("MTable "+baseTable+" not found in writer? (required for history DDL)");
+    }
+    addStoredFunction(writer, table);
+  }
+
+  @Override
+  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
+
+    String baseTable = dropHistoryTable.getBaseTable();
+
+    // drop in appropriate order
+    dropTriggersEtc(writer.dropHistory(), baseTable);
+    dropHistoryTableEtc(writer.dropHistory(), baseTable);
+  }
+
+
+  @Override
+  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException {
+
+    String baseTable = addHistoryTable.getBaseTable();
+    MTable table = writer.getTable(baseTable);
+    if (table == null) {
+      throw new IllegalStateException("MTable "+baseTable+" not found in writer? (required for history DDL)");
+    }
+
+    createWithHistory(writer, table);
   }
 
   @Override
   public void createWithHistory(DdlWrite writer, MTable table) throws IOException {
 
-
     String baseTable = table.getName();
 
-    // rollback trigger then function
-    DdlBuffer rollback = writer.rollback();
-    rollback.append("drop trigger if exists ").append(triggerName(baseTable)).append(" on ").append(baseTable).append(" cascade").endOfStatement();
-    rollback.append("drop function if exists ").append(procedureName(baseTable)).append("()").endOfStatement();
-    rollback.end();
+    // rollback changes in appropriate order
+    dropTriggersEtc(writer.rollback(), baseTable);
+    dropHistoryTableEtc(writer.rollback(), baseTable);
 
     addHistoryTable(writer, table);
     addStoredFunction(writer, table);
@@ -66,7 +99,15 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
     return normalise(baseTableName) + "_history_upd";
   }
 
-  public void addHistoryTable(DdlWrite writer, MTable table) throws IOException {
+  protected void dropTriggersEtc(DdlBuffer buffer, String baseTable) throws IOException {
+
+    // rollback trigger then function
+    buffer.append("drop trigger if exists ").append(triggerName(baseTable)).append(" on ").append(baseTable).append(" cascade").endOfStatement();
+    buffer.append("drop function if exists ").append(procedureName(baseTable)).append("()").endOfStatement();
+    buffer.end();
+  }
+
+  protected void addHistoryTable(DdlWrite writer, MTable table) throws IOException {
 
     String baseTableName = table.getName();
 
@@ -87,15 +128,16 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
         .append(" as select * from ").append(baseTableName)
         .append(" union all select * from ").append(baseTableName).append(historySuffix)
         .endOfStatement().end();
-
-    // rollback changes in appropriate order
-    DdlBuffer rollback = writer.rollback();
-    rollback.append("drop view ").append(baseTableName).append(viewSuffix).endOfStatement();
-    rollback.append("alter table ").append(baseTableName).append(" drop column ").append(sysPeriod).endOfStatement();
-    rollback.append("drop table ").append(baseTableName).append(historySuffix).endOfStatement().end();
   }
 
-  public void addTrigger(DdlWrite writer, MTable table) throws IOException {
+  protected void dropHistoryTableEtc(DdlBuffer buffer, String baseTableName) throws IOException {
+
+    buffer.append("drop view ").append(baseTableName).append(viewSuffix).endOfStatement();
+    buffer.append("alter table ").append(baseTableName).append(" drop column ").append(sysPeriod).endOfStatement();
+    buffer.append("drop table ").append(baseTableName).append(historySuffix).endOfStatement().end();
+  }
+
+  protected void addTrigger(DdlWrite writer, MTable table) throws IOException {
 
     String baseTableName = table.getName();
     String procedureName = procedureName(baseTableName);
@@ -108,7 +150,7 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
         .append("  for each row execute procedure ").append(procedureName).append("();").newLine().newLine();
   }
 
-  public void addStoredFunction(DdlWrite writer, MTable table) throws IOException {
+  protected void addStoredFunction(DdlWrite writer, MTable table) throws IOException {
 
     String procedureName = procedureName(table.getName());
 
@@ -142,7 +184,7 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
 
   protected void appendInsertIntoHistory(DdlBuffer buffer, MTable table) throws IOException {
 
-    String historyTable  = historyTableName(table.getName());
+    String historyTable = historyTableName(table.getName());
 
     buffer.append("    insert into ").append(historyTable).append(" (").append(sysPeriod).append(",");
     appendColumnNames(buffer, table, "");
@@ -156,11 +198,13 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
     Collection<MColumn> columns = table.getColumns().values();
     int i = 0;
     for (MColumn column : columns) {
-      if (++i > 1) {
-        buffer.append(", ");
+      if (!column.isHistoryExclude()) {
+        if (++i > 1) {
+          buffer.append(", ");
+        }
+        buffer.append(columnPrefix);
+        buffer.append(column.getName());
       }
-      buffer.append(columnPrefix);
-      buffer.append(column.getName());
     }
   }
 }
