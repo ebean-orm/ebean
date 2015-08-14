@@ -21,6 +21,8 @@ public class MigrationModel {
 
   private final String resourcePath;
 
+  int nextMajorVersion;
+
   public MigrationModel(String resourcePath) {
     this.resourcePath = normaliseResourcePath(resourcePath);
   }
@@ -55,10 +57,16 @@ public class MigrationModel {
     return readVersions;
   }
 
+  public int getNextMajorVersion() {
+    return nextMajorVersion;
+  }
+
   private void readMigrations() {
+
     for (int majorVersion = 1; majorVersion < 100; majorVersion++) {
       if (!readMinorVersions(majorVersion)){
         // no major.0 version so stopping
+        nextMajorVersion = majorVersion;
         return;
       }
     }
@@ -82,6 +90,7 @@ public class MigrationModel {
 
     Migration migration = MigrationXmlReader.readMaybe(path);
     if (migration == null) {
+      logger.info("... no migration at path:{}", path);
       return false;
     }
     readVersions.add(version);

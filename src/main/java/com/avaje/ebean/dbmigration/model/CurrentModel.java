@@ -1,18 +1,15 @@
 package com.avaje.ebean.dbmigration.model;
 
+import com.avaje.ebean.config.DbConstraintNaming;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
-import com.avaje.ebean.config.DbConstraintNaming;
-import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.DefaultConstraintMaxLength;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
-import com.avaje.ebean.dbmigration.migration.Migration;
-import com.avaje.ebean.dbmigration.migrationreader.MigrationXmlWriter;
 import com.avaje.ebean.dbmigration.model.build.ModelBuildBeanVisitor;
 import com.avaje.ebean.dbmigration.model.build.ModelBuildContext;
 import com.avaje.ebean.dbmigration.model.visitor.VisitAllUsing;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -25,7 +22,7 @@ public class CurrentModel {
 
   private final DbConstraintNaming constraintNaming;
 
-  private final PlatformDdl platformDdl;
+  private final DbConstraintNaming.MaxLength maxLength;
 
   private ModelContainer model;
 
@@ -37,9 +34,36 @@ public class CurrentModel {
    * Construct with a given EbeanServer instance.
    */
   public CurrentModel(SpiEbeanServer server) {
+    this(server, server.getServerConfig().getConstraintNaming());
+  }
+
+  /**
+   * Construct with a given EbeanServer, platformDdl and constraintNaming convention.
+   * <p>
+   *   Note the EbeanServer is just used to read the BeanDescriptors and platformDdl supplies
+   *   the platform specific handling on
+   * </p>
+   */
+  public CurrentModel(SpiEbeanServer server, DbConstraintNaming constraintNaming) {
     this.server = server;
-    this.platformDdl = server.getDatabasePlatform().getPlatformDdl();
-    this.constraintNaming = server.getServerConfig().getConstraintNaming();
+    this.constraintNaming = constraintNaming;
+    this.maxLength = maxLength(server, constraintNaming);
+  }
+
+  public CurrentModel(SpiEbeanServer server, DbConstraintNaming constraintNaming, int maxConstraintLength) {
+    this.server = server;
+    this.constraintNaming = constraintNaming;
+    this.maxLength = new DefaultConstraintMaxLength(maxConstraintLength);
+  }
+
+  private DbConstraintNaming.MaxLength maxLength(SpiEbeanServer server, DbConstraintNaming naming) {
+
+    if (naming.getMaxLength() != null) {
+      return naming.getMaxLength();
+    }
+
+    int maxConstraintNameLength = server.getDatabasePlatform().getMaxConstraintNameLength();
+    return new DefaultConstraintMaxLength(maxConstraintNameLength);
   }
 
   /**
@@ -48,7 +72,8 @@ public class CurrentModel {
   public ModelContainer read() {
     if (model == null) {
       model = new ModelContainer();
-      ModelBuildContext context = new ModelBuildContext(model, constraintNaming, platformDdl);
+
+      ModelBuildContext context = new ModelBuildContext(model, constraintNaming, maxLength);
       ModelBuildBeanVisitor visitor = new ModelBuildBeanVisitor(context);
       VisitAllUsing visit = new VisitAllUsing(visitor, server);
       visit.visitAllBeans();
@@ -69,19 +94,6 @@ public class CurrentModel {
       changeSet = asChangeSet();
     }
     return changeSet;
-  }
-
-  /**
-   * Write as migration xml to the given file.
-   */
-  public void writeMigration(File file) {
-
-    ChangeSet changeSet = getChangeSet();
-    Migration migration = new Migration();
-    migration.getChangeSet().add(changeSet);
-
-    MigrationXmlWriter writer = new MigrationXmlWriter();
-    writer.write(migration, file);
   }
 
   /**

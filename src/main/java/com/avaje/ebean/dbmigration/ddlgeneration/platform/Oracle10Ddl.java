@@ -13,7 +13,6 @@ public class Oracle10Ddl extends PlatformDdl {
     this.dropTableIfExists = "drop table ";
     this.dropSequenceIfExists = "drop sequence ";
     this.dropTableCascade = " cascade constraints purge";
-    this.maxConstraintNameLength = 30;
     this.foreignKeyRestrict = "";
   }
 

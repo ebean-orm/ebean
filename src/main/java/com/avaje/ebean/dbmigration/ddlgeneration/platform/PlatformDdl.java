@@ -57,12 +57,6 @@ public class PlatformDdl {
    */
   protected boolean inlineUniqueOneToOne = true;
 
-  /**
-   * A value of 60 is a reasonable default for all databases except
-   * Oracle (limited to 30) and DB2 (limited to 18).
-   */
-  protected int maxConstraintNameLength = 60;
-
   public PlatformDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
     this.dbIdentity = dbIdentity;
     this.typeConverter = new PlatformTypeConverter(platformTypes);
@@ -71,27 +65,6 @@ public class PlatformDdl {
   public DdlHandler createDdlHandler(ServerConfig serverConfig) {
     historyDdl.configure(serverConfig);
     return new BaseDdlHandler(serverConfig.getNamingConvention(), serverConfig.getConstraintNaming(), this);
-  }
-
-  /**
-   * Apply a maximum length to the constraint name.
-   * <p>
-   * This implementation should work well apart from perhaps DB2 where the limit is 18.
-   */
-  public String maxLength(String constraintName, int count) {
-    if (constraintName.length() < maxConstraintNameLength) {
-      return constraintName;
-    }
-    if (maxConstraintNameLength < 60) {
-      // trim out vowels for Oracle / DB2 with short max lengths
-      constraintName = VowelRemover.trim(constraintName, 4);
-      if (constraintName.length() < maxConstraintNameLength) {
-        return constraintName;
-      }
-    }
-    // add the count to ensure the constraint name is unique
-    // (relying on the prefix having the table name to be globally unique)
-    return constraintName.substring(0, maxConstraintNameLength - 3) + "_" + count;
   }
 
   public IdType useIdentityType(IdentityType modelIdentityType) {

@@ -62,10 +62,6 @@ public class DdlGenerator implements SpiEbeanPlugin {
     if (generateDdl) {
       writeDrop(getDropFileName());
       writeCreate(getCreateFileName());
-
-      String mn = server.getName() + "-migration.xml";
-      File migrationXml = new File(mn);
-      writeMigration(migrationXml);
     }
   }
 
@@ -122,11 +118,6 @@ public class DdlGenerator implements SpiEbeanPlugin {
     }
   }
 
-  public void writeMigration(File file) {
-
-    currentModel().writeMigration(file);
-  }
-
   public String generateCreateDdl() {
 
     try {
@@ -138,11 +129,11 @@ public class DdlGenerator implements SpiEbeanPlugin {
   }
 
   protected String getDropFileName() {
-    return server.getName() + "-drop.sql";
+    return server.getName() + "-drop-all.sql";
   }
 
   protected String getCreateFileName() {
-    return server.getName() + "-create.sql";
+    return server.getName() + "-create-all.sql";
   }
 
   protected CurrentModel currentModel() {

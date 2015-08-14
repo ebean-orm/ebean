@@ -1,5 +1,6 @@
 package com.avaje.ebean.dbmigration;
 
+import com.avaje.ebean.config.dbplatform.DbPlatformName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +13,9 @@ public class DbOffline {
 
   private static final String KEY = "ebean.dboffline";
 
-  public static final String H2 = "H2";
+  public static void setPlatform(DbPlatformName dbPlatform) {
+    System.setProperty(KEY, dbPlatform.name());
+  }
 
   public static void setPlatform(String platformName) {
     System.setProperty(KEY, platformName);
@@ -23,7 +26,7 @@ public class DbOffline {
   }
 
   public static void asH2() {
-    setPlatform(H2);
+    setPlatform(DbPlatformName.H2);
   }
 
   public static boolean isSet() {

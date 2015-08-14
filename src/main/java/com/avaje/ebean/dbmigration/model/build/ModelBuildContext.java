@@ -1,12 +1,11 @@
 package com.avaje.ebean.dbmigration.model.build;
 
+import com.avaje.ebean.config.DbConstraintNaming;
 import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
-import com.avaje.ebean.config.DbConstraintNaming;
-import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebean.dbmigration.model.MTable;
 import com.avaje.ebean.dbmigration.model.ModelContainer;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 
 /**
@@ -24,12 +23,12 @@ public class ModelBuildContext {
 
   private final DbConstraintNaming constraintNaming;
 
-  private final PlatformDdl platformDdl;
+  private final DbConstraintNaming.MaxLength maxLength;
 
-  public ModelBuildContext(ModelContainer model, DbConstraintNaming constraintNaming, PlatformDdl platformDdl) {
+  public ModelBuildContext(ModelContainer model, DbConstraintNaming naming, DbConstraintNaming.MaxLength maxLength) {
     this.model = model;
-    this.constraintNaming = constraintNaming;
-    this.platformDdl = platformDdl;
+    this.constraintNaming = naming;
+    this.maxLength = maxLength;
   }
 
   public String primaryKeyName(String tableName) {
@@ -65,7 +64,7 @@ public class ModelBuildContext {
   }
 
   private String maxLength(String constraintName, int indexCount) {
-    return platformDdl.maxLength(constraintName, indexCount);
+    return maxLength.maxLength(constraintName, indexCount);
   }
 
   /**

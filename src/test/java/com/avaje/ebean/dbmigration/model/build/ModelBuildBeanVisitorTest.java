@@ -4,7 +4,7 @@ package com.avaje.ebean.dbmigration.model.build;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.config.DbConstraintNaming;
-import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
+import com.avaje.ebean.dbmigration.ddlgeneration.platform.DefaultConstraintMaxLength;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebean.dbmigration.model.MTable;
 import com.avaje.ebean.dbmigration.model.ModelContainer;
@@ -22,9 +22,10 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
 
     ModelContainer model = new ModelContainer();
 
-    PlatformDdl platformDdl = defaultServer.getDatabasePlatform().getPlatformDdl();
     DbConstraintNaming constraintNaming = defaultServer.getServerConfig().getConstraintNaming();
-    ModelBuildContext ctx = new ModelBuildContext(model, constraintNaming, platformDdl);
+
+    DefaultConstraintMaxLength maxLength = new DefaultConstraintMaxLength(60);
+    ModelBuildContext ctx = new ModelBuildContext(model, constraintNaming, maxLength);
 
     ModelBuildBeanVisitor addTable = new ModelBuildBeanVisitor(ctx);
 

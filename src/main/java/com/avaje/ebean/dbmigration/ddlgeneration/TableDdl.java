@@ -4,6 +4,7 @@ import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
+import com.avaje.ebean.dbmigration.migration.DropTable;
 
 import java.io.IOException;
 
@@ -23,13 +24,17 @@ public interface TableDdl {
   void generate(DdlWrite writer, AddColumn addColumn) throws IOException;
 
   /**
-   * Write the drop column change.
-   */
-  void generate(DdlWrite writer, DropColumn dropColumn) throws IOException;
-
-  /**
    * Write the alter column changes.
    */
   void generate(DdlWrite writer, AlterColumn alterColumn) throws IOException;
 
+  /**
+   * Write the drop column change.
+   */
+  void generate(DdlWrite writer, DropTable dropTable) throws IOException;
+
+  /**
+   * Write the drop column change.
+   */
+  void generate(DdlWrite writer, DropColumn dropColumn) throws IOException;
 }

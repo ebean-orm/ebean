@@ -15,6 +15,7 @@ public class Oracle10Platform extends DatabasePlatform {
     super();
     this.name = "oracle";
     this.maxTableNameLength = 30;
+    this.maxConstraintNameLength = 30;
     // OnQueryOnly.CLOSE as a performance optimisation on Oracle
     this.onQueryOnly = OnQueryOnly.CLOSE;
     this.dbEncrypt = new Oracle10DbEncrypt();
@@ -54,8 +55,7 @@ public class Oracle10Platform extends DatabasePlatform {
   }
 
   @Override
-  public IdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds,
-      String seqName, int batchSize) {
+  public IdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
 
     return new OracleSequenceIdGenerator(be, ds, seqName, batchSize);
   }

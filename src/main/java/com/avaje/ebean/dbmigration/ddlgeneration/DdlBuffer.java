@@ -15,6 +15,11 @@ public interface DdlBuffer {
   MConfiguration getConfiguration();
 
   /**
+   * Return true if the buffer is empty.
+   */
+  boolean isEmpty();
+
+  /**
    * Append DDL content to the buffer.
    */
   DdlBuffer append(String content) throws IOException;

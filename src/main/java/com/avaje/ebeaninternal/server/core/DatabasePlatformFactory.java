@@ -60,6 +60,12 @@ public class DatabasePlatformFactory {
   private DatabasePlatform byDatabaseName(String dbName) {
 
     dbName = dbName.toLowerCase();
+    if (dbName.equals("h2")) {
+      return new H2Platform();
+    }
+    if (dbName.equals("mysql")) {
+      return new MySqlPlatform();
+    }
     if (dbName.equals("postgres") || dbName.equals("postgres9")) {
       return new PostgresPlatform();
     }
@@ -72,6 +78,9 @@ public class DatabasePlatformFactory {
     if (dbName.equals("oracle") || dbName.equals("oracle10")) {
       return new Oracle10Platform();
     }
+    if (dbName.equals("sqlserver")) {
+      return new MsSqlServer2005Platform();
+    }
     if (dbName.equals("sqlserver2005")) {
       return new MsSqlServer2005Platform();
     }
@@ -83,12 +92,6 @@ public class DatabasePlatformFactory {
     }
     if (dbName.equals("db2")) {
       return new DB2Platform();
-    }
-    if (dbName.equals("mysql")) {
-      return new MySqlPlatform();
-    }
-    if (dbName.equals("h2")) {
-      return new H2Platform();
     }
     if (dbName.equals("sqlite")) {
       return new SQLitePlatform();

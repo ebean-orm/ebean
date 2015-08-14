@@ -5,14 +5,13 @@ import com.avaje.ebean.dbmigration.model.MConfiguration;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 
 /**
  * Base implementation of DdlBuffer using an underlying writer.
  */
 public class BaseDdlBuffer implements DdlBuffer {
 
-  protected final Writer writer;
+  protected final StringWriter writer;
 
   protected final MConfiguration configuration;
 
@@ -24,6 +23,11 @@ public class BaseDdlBuffer implements DdlBuffer {
   @Override
   public MConfiguration getConfiguration() {
     return configuration;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return writer.getBuffer().length() == 0;
   }
 
   @Override

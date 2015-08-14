@@ -13,6 +13,7 @@ import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.Column;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
+import com.avaje.ebean.dbmigration.migration.DropTable;
 import com.avaje.ebean.dbmigration.migration.ForeignKey;
 import com.avaje.ebean.dbmigration.model.MTable;
 
@@ -461,14 +462,19 @@ public class BaseTableDdl implements TableDdl {
   }
 
   @Override
+  public void generate(DdlWrite writer, DropTable dropTable) throws IOException {
+
+    String tableName = dropTable.getName();
+
+    dropTable(writer.drop(), tableName);
+  }
+
+  @Override
   public void generate(DdlWrite writer, DropColumn dropColumn) throws IOException {
 
     String tableName = dropColumn.getTableName();
 
-    alterTableDropColumn(writer.apply(), tableName, dropColumn.getColumnName());
-
-    // no good rollback option here, it is best if drop columns
-    // are put into a separate changeSet that is run last
+    alterTableDropColumn(writer.drop(), tableName, dropColumn.getColumnName());
   }
 
   @Override

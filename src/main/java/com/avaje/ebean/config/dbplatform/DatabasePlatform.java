@@ -153,6 +153,12 @@ public class DatabasePlatform {
   protected int maxTableNameLength = 60;
 
   /**
+   * A value of 60 is a reasonable default for all databases except
+   * Oracle (limited to 30) and DB2 (limited to 18).
+   */
+  protected int maxConstraintNameLength = 60;
+
+  /**
    * Instantiates a new database platform.
    */
   public DatabasePlatform() {
@@ -177,6 +183,13 @@ public class DatabasePlatform {
    */
   public int getMaxTableNameLength() {
     return maxTableNameLength;
+  }
+
+  /**
+   * Return the maximum constraint name allowed for the platform.
+   */
+  public int getMaxConstraintNameLength() {
+    return maxConstraintNameLength;
   }
 
   /**

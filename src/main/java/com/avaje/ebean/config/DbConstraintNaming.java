@@ -9,6 +9,21 @@ package com.avaje.ebean.config;
  */
 public class DbConstraintNaming {
 
+  /**
+   * Defines how constraint names are shortened if required based on platform limitations.
+   */
+  public interface MaxLength {
+
+    /**
+     * Truncate or shorten the constraint name to support DB platform limitations.
+     * <p>
+     * There is a default implementation of this which is used if an implementation is
+     * not specified.
+     * </p>
+     */
+    String maxLength(String constraintName, int count);
+  }
+
   protected String pkPrefix = "pk_";
   protected String pkSuffix = "";
 
@@ -28,9 +43,25 @@ public class DbConstraintNaming {
 
   protected boolean lowerCaseNames = true;
 
+  protected MaxLength maxLength;
+
   protected DbConstraintNormalise normalise = new DbConstraintNormalise();
 
   public DbConstraintNaming() {
+  }
+
+  /**
+   * Return the MaxLength implementation used to truncate/shorten db constraint names as necessary.
+   */
+  public MaxLength getMaxLength() {
+    return maxLength;
+  }
+
+  /**
+   * Set the MaxLength implementation used to truncate/shorten db constraint names as necessary.
+   */
+  public void setMaxLength(MaxLength maxLength) {
+    this.maxLength = maxLength;
   }
 
   /**

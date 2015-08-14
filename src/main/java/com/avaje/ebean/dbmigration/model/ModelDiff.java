@@ -2,7 +2,10 @@ package com.avaje.ebean.dbmigration.model;
 
 import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
+import com.avaje.ebean.dbmigration.migration.ChangeSet;
+import com.avaje.ebean.dbmigration.migration.ChangeSetType;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
+import com.avaje.ebean.dbmigration.migration.Migration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +50,30 @@ public class ModelDiff {
    */
   public List<Object> getCreateChanges() {
     return createChanges;
+  }
+
+  public ChangeSet getApplyChangeSet() {
+    // put the changes into a ChangeSet
+    ChangeSet createChangeSet = new ChangeSet();
+    createChangeSet.setType(ChangeSetType.APPLY);
+    createChangeSet.getChangeSetChildren().addAll(createChanges);
+    return createChangeSet;
+  }
+
+  public ChangeSet getDropChangeSet() {
+    // put the changes into a ChangeSet
+    ChangeSet createChangeSet = new ChangeSet();
+    createChangeSet.setType(ChangeSetType.DROP);
+    createChangeSet.getChangeSetChildren().addAll(dropChanges);
+    return createChangeSet;
+  }
+
+  public Migration getMigration() {
+
+    Migration migration = new Migration();
+    migration.getChangeSet().add(getApplyChangeSet());
+    migration.getChangeSet().add(getDropChangeSet());
+    return migration;
   }
 
   /**
