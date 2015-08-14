@@ -4,6 +4,7 @@ import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.config.PersistBatch;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
+import com.avaje.ebean.dbmigration.DbOffline;
 import com.avaje.ebean.event.TransactionEventListener;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
@@ -157,7 +158,7 @@ public class TransactionManager {
 
     if (OnQueryOnly.CLOSE.equals(dbPlatformOnQueryOnly)) {
       // check for read committed isolation level
-      if (!isReadCommitedIsolation(ds)) {
+      if (!isReadCommittedIsolation(ds)) {
         logger.warn("Ignoring DatabasePlatform.OnQueryOnly.CLOSE as the transaction Isolation Level is not " +
 								"READ_COMMITTED");
         // we will just use ROLLBACK and ignore the desired optimisation
@@ -174,8 +175,11 @@ public class TransactionManager {
   /**
    * Return true if the isolation level is read committed.
    */
-  private boolean isReadCommitedIsolation(DataSource ds) {
+  private boolean isReadCommittedIsolation(DataSource ds) {
 
+    if (DbOffline.isSet()) {
+      return true;
+    }
     Connection c = null;
     try {
       c = ds.getConnection();
