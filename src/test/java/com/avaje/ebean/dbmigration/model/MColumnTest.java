@@ -124,7 +124,7 @@ public class MColumnTest {
     oldCol.compare(diff, table, newCol);
 
     assertChanges(diff);
-    assertThat(getAlterColumn(diff).getDefaultValue()).isNull();
+    assertThat(getAlterColumn(diff).getDefaultValue()).isEqualTo("DROP DEFAULT");
   }
 
   @Test

@@ -69,13 +69,13 @@ public class PlatformDdl_AlterColumnTest {
     sql = pgDdl.alterColumnType("mytab", "acol", "varchar(20)");
     assertEquals("alter table mytab alter column acol type varchar(20)", sql);
 
-    sql = sqlServerDdl.alterColumnType("mytab", "acol", "varchar(20)");
-    assertEquals("alter table mytab alter column acol varchar(20)", sql);
-
     sql = oraDdl.alterColumnType("mytab", "acol", "varchar(20)");
     assertEquals("alter table mytab modify acol varchar(20)", sql);
 
     sql = mysqlDdl.alterColumnType("mytab", "acol", "varchar(20)");
+    assertNull(sql);
+
+    sql = sqlServerDdl.alterColumnType("mytab", "acol", "varchar(20)");
     assertNull(sql);
   }
 
