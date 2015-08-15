@@ -14,6 +14,7 @@ public class MsSqlServerDdl extends PlatformDdl {
     this.identitySuffix = " identity(1,1)";
     this.foreignKeyRestrict = "";
     this.inlineUniqueOneToOne = false;
+    this.columnSetDefault = "add default";
   }
 
   @Override
@@ -47,6 +48,17 @@ public class MsSqlServerDdl extends PlatformDdl {
       sb.append(" ").append(columns[i]).append(" is not null");
     }
     return sb.toString();
+  }
+
+
+  @Override
+  public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
+
+    if (isDropDefault(defaultValue)) {
+      return "-- alter table " + tableName + " drop constraint <unknown>  -- find the appropriate constraint for default value on column " + columnName;
+    } else {
+      return "alter table " + tableName + " add default " + defaultValue + " for " + columnName;
+    }
   }
 
   public String alterColumnBaseAttributes(AlterColumn alter) {

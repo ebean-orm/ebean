@@ -19,7 +19,6 @@ public class PlatformDdl_AlterColumnTest {
   PlatformDdl oraDdl = new Oracle10Platform().getPlatformDdl();
   PlatformDdl sqlServerDdl = new MsSqlServer2005Platform().getPlatformDdl();
 
-
   AlterColumn alterNotNull() {
     AlterColumn alterColumn = new AlterColumn();
     alterColumn.setTableName("mytab");
@@ -57,7 +56,6 @@ public class PlatformDdl_AlterColumnTest {
     alterColumn.setCurrentNotnull(Boolean.TRUE);
     sql = mysqlDdl.alterColumnBaseAttributes(alterColumn);
     assertEquals("alter table mytab modify acol varchar(100) not null", sql);
-
   }
 
   @Test
@@ -93,6 +91,9 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = mysqlDdl.alterColumnNotnull("mytab", "acol", true);
     assertNull(sql);
+
+    sql = sqlServerDdl.alterColumnNotnull("mytab", "acol", true);
+    assertNull(sql);
   }
 
   @Test
@@ -108,6 +109,9 @@ public class PlatformDdl_AlterColumnTest {
     assertEquals("alter table mytab modify acol null", sql);
 
     sql = mysqlDdl.alterColumnNotnull("mytab", "acol", false);
+    assertNull(sql);
+
+    sql = sqlServerDdl.alterColumnNotnull("mytab", "acol", false);
     assertNull(sql);
   }
 
@@ -126,6 +130,8 @@ public class PlatformDdl_AlterColumnTest {
     sql = mysqlDdl.alterColumnDefaultValue("mytab", "acol", "'hi'");
     assertEquals("alter table mytab alter acol set default 'hi'", sql);
 
+    sql = sqlServerDdl.alterColumnDefaultValue("mytab", "acol", "'hi'");
+    assertEquals("alter table mytab add default 'hi' for acol", sql);
   }
 
   @Test
@@ -143,6 +149,8 @@ public class PlatformDdl_AlterColumnTest {
     sql = mysqlDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
     assertEquals("alter table mytab alter acol drop default", sql);
 
+    sql = sqlServerDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
+    assertTrue(sql, sql.startsWith("-- alter"));
   }
 
 }
