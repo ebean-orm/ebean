@@ -65,6 +65,8 @@ public class MTable {
 
   private AddColumn addColumn;
 
+  private String whenCreatedColumn;
+
   /**
    * Construct for migration.
    */
@@ -266,6 +268,14 @@ public class MTable {
     this.sequenceAllocate = sequenceAllocate;
   }
 
+  public void setWhenCreatedColumn(String whenCreatedColumn) {
+    this.whenCreatedColumn = whenCreatedColumn;
+  }
+
+  public String getWhenCreatedColumn() {
+    return whenCreatedColumn;
+  }
+
   /**
    * Set the identity type to use for this table.
    * <p>
@@ -397,4 +407,5 @@ public class MTable {
 
     modelDiff.addDropColumn(dropColumn);
   }
+
 }

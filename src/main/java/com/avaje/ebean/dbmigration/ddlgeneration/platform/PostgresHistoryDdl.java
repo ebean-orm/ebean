@@ -73,12 +73,13 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
   public void createWithHistory(DdlWrite writer, MTable table) throws IOException {
 
     String baseTable = table.getName();
+    String whenCreatedColumn = table.getWhenCreatedColumn();
 
     // rollback changes in appropriate order
     dropTriggersEtc(writer.rollback(), baseTable);
     dropHistoryTableEtc(writer.rollback(), baseTable);
 
-    addHistoryTable(writer, table);
+    addHistoryTable(writer, table, whenCreatedColumn);
     addStoredFunction(writer, table);
     addTrigger(writer, table);
   }
@@ -107,15 +108,20 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
     buffer.end();
   }
 
-  protected void addHistoryTable(DdlWrite writer, MTable table) throws IOException {
+  protected void addHistoryTable(DdlWrite writer, MTable table, String whenCreatedColumn) throws IOException {
 
     String baseTableName = table.getName();
 
     DdlBuffer apply = writer.applyHistory();
 
+    if (whenCreatedColumn == null) {
+      // effective history start as at current timestamp
+      whenCreatedColumn = "current_timestamp";
+    }
+
     apply
         .append("alter table ").append(baseTableName)
-        .append(" add column ").append(sysPeriod).append(" tstzrange not null")
+        .append(" add column ").append(sysPeriod).append(" tstzrange not null default tstzrange(").append(whenCreatedColumn).append(", null)")
         .endOfStatement();
 
     apply

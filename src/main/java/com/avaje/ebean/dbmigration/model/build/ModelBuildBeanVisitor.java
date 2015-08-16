@@ -8,6 +8,7 @@ import com.avaje.ebean.dbmigration.model.MTable;
 import com.avaje.ebean.dbmigration.model.visitor.BeanPropertyVisitor;
 import com.avaje.ebean.dbmigration.model.visitor.BeanVisitor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 
 /**
@@ -37,6 +38,10 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
     MTable table = new MTable(descriptor.getBaseTable());
     if (descriptor.isHistorySupport()) {
       table.setWithHistory();
+      BeanProperty whenCreated = descriptor.findWhenCreatedProperty();
+      if (whenCreated != null) {
+        table.setWhenCreatedColumn(whenCreated.getDbColumn());
+      }
     }
     setIdentity(descriptor, table);
 

@@ -175,7 +175,6 @@
   <xsd:element name="addHistoryTable">
     <xsd:complexType>
       <xsd:attribute name="baseTable" type="xsd:string" use="required"/>
-      <xsd:attribute name="whenCreatedColumn" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
 
