@@ -38,7 +38,7 @@ public class BaseTableDdl implements TableDdl {
 
   protected final PlatformDdl platformDdl;
 
-  private final String historyTableSuffix;
+  protected final String historyTableSuffix;
 
   /**
    * Used to check that indexes on foreign keys should be skipped as a unique index on the columns
@@ -159,7 +159,7 @@ public class BaseTableDdl implements TableDdl {
    * Specific handling of OneToOne unique constraints for MsSqlServer.
    * For all other DB platforms these unique constraints are done inline as per normal.
    */
-  private void writeUniqueOneToOneConstraints(DdlWrite write, CreateTable createTable) throws IOException {
+  protected void writeUniqueOneToOneConstraints(DdlWrite write, CreateTable createTable) throws IOException {
 
     String tableName = createTable.getName();
     for (Column col : externalUnique) {
@@ -175,7 +175,7 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
-  private void writeSequence(DdlWrite writer, CreateTable createTable, String pk) throws IOException {
+  protected void writeSequence(DdlWrite writer, CreateTable createTable, String pk) throws IOException {
 
     // explicit sequence use or platform decides
     String explicitSequenceName = createTable.getSequenceName();
@@ -194,7 +194,7 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
-  private void createWithHistory(DdlWrite writer, String name) throws IOException {
+  protected void createWithHistory(DdlWrite writer, String name) throws IOException {
 
     MTable table = writer.getTable(name);
     platformDdl.createWithHistory(writer, table);
