@@ -17,6 +17,7 @@ import com.avaje.ebean.dbmigration.migration.DropColumn;
 import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
 import com.avaje.ebean.dbmigration.migration.DropTable;
 import com.avaje.ebean.dbmigration.migration.ForeignKey;
+import com.avaje.ebean.dbmigration.migration.UniqueConstraint;
 import com.avaje.ebean.dbmigration.model.MTable;
 
 import java.io.IOException;
@@ -58,8 +59,8 @@ public class BaseTableDdl implements TableDdl {
   protected int countIndex;
 
   /**
-   * Base tables that have associated history tables that need their triggers
-   * regenerated as columns have been added or removed.
+   * Base tables that have associated history tables that need their triggers/functions regenerated as
+   * columns have been added, removed, included or excluded.
    */
   protected Map<String,HistoryTableUpdate> regenerateHistoryTriggers = new LinkedHashMap<String,HistoryTableUpdate>();
 
@@ -69,8 +70,9 @@ public class BaseTableDdl implements TableDdl {
   public BaseTableDdl(ServerConfig serverConfig, PlatformDdl platformDdl) {
     this.namingConvention = serverConfig.getNamingConvention();
     this.naming = serverConfig.getConstraintNaming();
-    this.platformDdl = platformDdl;
     this.historyTableSuffix = serverConfig.getHistoryTableSuffix();
+    this.platformDdl = platformDdl;
+    this.platformDdl.configure(serverConfig);
   }
 
   /**
@@ -253,21 +255,17 @@ public class BaseTableDdl implements TableDdl {
 
     if (indexName != null) {
       // no matching unique constraint so add the index
-      fkeyBuffer.append("create index ").append(indexName).append(" on ").append(tableName);
-      appendColumns(columns, fkeyBuffer);
-      fkeyBuffer.endOfStatement();
+      fkeyBuffer.append(platformDdl.createIndex(indexName, tableName, columns)).endOfStatement();
     }
 
     fkeyBuffer.end();
 
     write.rollbackForeignKeys()
-        .append(platformDdl.alterTableDropForeignKey(tableName, fkName))
-        .endOfStatement();
+        .append(platformDdl.alterTableDropForeignKey(tableName, fkName)).endOfStatement();
 
     if (indexName != null) {
       write.rollbackForeignKeys()
-          .append(platformDdl.dropIndex(indexName, tableName))
-          .endOfStatement();
+          .append(platformDdl.dropIndex(indexName, tableName)).endOfStatement();
     }
 
     write.rollbackForeignKeys().end();
@@ -276,17 +274,7 @@ public class BaseTableDdl implements TableDdl {
 
   protected void alterTableAddForeignKey(DdlBuffer buffer, String fkName, String tableName, String[] columns, String refTable, String[] refColumns) throws IOException {
 
-    buffer
-        .append("alter table ").append(tableName)
-        .append(" add constraint ").append(fkName)
-        .append(" foreign key");
-    appendColumns(columns, buffer);
-    buffer
-        .append(" references ")
-        .append(lowerName(refTable));
-    appendColumns(refColumns, buffer);
-    buffer.appendWithSpace(platformDdl.getForeignKeyRestrict())
-        .endOfStatement();
+    buffer.append(platformDdl.alterTableAddForeignKey(tableName, fkName, columns, refTable, refColumns)).endOfStatement();
   }
 
   protected void appendColumns(String[] columns, DdlBuffer buffer) throws IOException {
@@ -335,8 +323,17 @@ public class BaseTableDdl implements TableDdl {
     buffer.append(" ").append(checkConstraint);
   }
 
-  protected void writeCompoundUniqueConstraints(DdlBuffer apply, CreateTable createTable) {
-    //TODO: Write compound unique constraints
+  protected void writeCompoundUniqueConstraints(DdlBuffer apply, CreateTable createTable) throws IOException {
+
+    String tableName = createTable.getName();
+
+    List<UniqueConstraint> uniqueConstraints = createTable.getUniqueConstraint();
+    for (UniqueConstraint uniqueConstraint : uniqueConstraints) {
+      String[] columns = toColumnNamesSplit(uniqueConstraint.getColumnNames());
+      apply
+          .append(platformDdl.alterTableAddUniqueConstraint(tableName, uniqueConstraint.getName(), columns))
+          .endOfStatement();
+    }
   }
 
   /**
@@ -715,8 +712,7 @@ public class BaseTableDdl implements TableDdl {
 
   protected void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
 
-    buffer.append("alter table ").append(tableName)
-        .append(" drop column ").append(columnName)
+    buffer.append("alter table ").append(tableName).append(" drop column ").append(columnName)
         .endOfStatement();
   }
 

@@ -1,5 +1,6 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
+import com.avaje.ebean.config.DbConstraintNaming;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
@@ -53,7 +54,6 @@ public class PlatformDdl {
 
   protected String dropIndexIfExists = "drop index if exists ";
 
-
   protected String alterColumn = "alter column";
 
   protected String dropUniqueConstraint = "drop constraint";
@@ -73,16 +73,25 @@ public class PlatformDdl {
    */
   protected boolean inlineUniqueOneToOne = true;
 
+  protected DbConstraintNaming naming;
+
   public PlatformDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
     this.dbIdentity = dbIdentity;
     this.typeConverter = new PlatformTypeConverter(platformTypes);
   }
 
   /**
+   * Set configuration options.
+   */
+  public void configure(ServerConfig serverConfig) {
+    historyDdl.configure(serverConfig);
+    naming = serverConfig.getConstraintNaming();
+  }
+
+  /**
    * Create a DdlHandler for the specific database platform.
    */
   public DdlHandler createDdlHandler(ServerConfig serverConfig) {
-    historyDdl.configure(serverConfig);
     return new BaseDdlHandler(serverConfig, this);
   }
 
@@ -100,13 +109,6 @@ public class PlatformDdl {
    */
   public String asIdentityColumn(String columnDefn) {
     return columnDefn + identitySuffix;
-  }
-
-  /**
-   * Return the foreign key on delete on update restrict clause.
-   */
-  public String getForeignKeyRestrict() {
-    return foreignKeyRestrict;
   }
 
   /**
@@ -193,6 +195,38 @@ public class PlatformDdl {
   }
 
   /**
+   * Return the create index statement.
+   */
+  public String createIndex(String indexName, String tableName, String[] columns) {
+
+    StringBuilder buffer = new StringBuilder();
+    buffer.append("create index ").append(indexName).append(" on ").append(tableName);
+    appendColumns(columns, buffer);
+
+    return buffer.toString();
+  }
+
+  /**
+   * Add foreign key.
+   */
+  public String alterTableAddForeignKey(String tableName, String fkName, String[] columns, String refTable, String[] refColumns) {
+
+    StringBuilder buffer = new StringBuilder(90);
+    buffer
+        .append("alter table ").append(tableName)
+        .append(" add constraint ").append(fkName)
+        .append(" foreign key");
+    appendColumns(columns, buffer);
+    buffer
+        .append(" references ")
+        .append(lowerName(refTable));
+    appendColumns(refColumns, buffer);
+    appendWithSpace(foreignKeyRestrict, buffer);
+
+    return buffer.toString();
+  }
+
+  /**
    * Drop a unique constraint from the table.
    */
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
@@ -206,15 +240,10 @@ public class PlatformDdl {
    */
   public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns) {
 
-    String base = "alter table " + tableName + " add constraint " + uqName + " unique (";
-    for (int i = 0; i < columns.length; i++) {
-      if (i > 0) {
-        base += ",";
-      }
-      base += columns[i];
-    }
-    base += ")";
-    return base;
+    StringBuilder buffer = new StringBuilder(90);
+    buffer.append("alter table ").append(tableName).append(" add constraint ").append(uqName).append(" unique ");
+    appendColumns(columns, buffer);
+    return buffer.toString();
   }
 
   /**
@@ -274,6 +303,34 @@ public class PlatformDdl {
     // by default do nothing, only used by mysql and sql server as they can only
     // modify the column with the full column definition
     return null;
+  }
+
+  protected void appendColumns(String[] columns, StringBuilder buffer) {
+    buffer.append(" (");
+    for (int i = 0; i < columns.length; i++) {
+      if (i > 0) {
+        buffer.append(",");
+      }
+      buffer.append(lowerName(columns[i].trim()));
+    }
+    buffer.append(")");
+  }
+
+  protected void appendWithSpace(String content, StringBuilder buffer) {
+    if (content != null && !content.isEmpty()) {
+      buffer.append(" ").append(content);
+    }
+  }
+
+  /**
+   * Convert the table or column name to lower case.
+   * <p>
+   * This is passed up to the platformDdl to override as desired.
+   * Generally lower case with underscore is a good cross database
+   * choice for column/table names.
+   */
+  protected String lowerName(String name) {
+    return naming.lowerName(name);
   }
 
 }
