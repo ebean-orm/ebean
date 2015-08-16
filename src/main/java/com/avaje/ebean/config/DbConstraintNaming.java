@@ -35,6 +35,10 @@ public class DbConstraintNaming {
   protected String fkIndexMiddle = "_";
   protected String fkIndexSuffix = "";
 
+  protected String indexPrefix = "ix_";
+  protected String indexMiddle = "_";
+  protected String indexSuffix = "";
+
   protected String uqPrefix = "uq_";
   protected String uqSuffix = "";
 
@@ -80,7 +84,7 @@ public class DbConstraintNaming {
   }
 
   /**
-   * Return the index name associated with a foreign key constraint given a single column foreign key.
+   * Return the index name associated with a foreign key constraint given multiple columns.
    */
   public String foreignKeyIndexName(String tableName, String[] columns) {
 
@@ -88,10 +92,31 @@ public class DbConstraintNaming {
     return fkIndexPrefix + normaliseTable(tableName) + fkIndexMiddle + colPart + fkIndexSuffix;
   }
 
+  /**
+   * Return the index name associated with a foreign key constraint given a single column foreign key.
+   */
   public String foreignKeyIndexName(String tableName, String column) {
 
     String colPart = normaliseTable(column);
     return fkIndexPrefix + normaliseTable(tableName) + fkIndexMiddle + colPart + fkIndexSuffix;
+  }
+
+  /**
+   * Return the index name for a general index (not associated with a foreign key).
+   */
+  public String indexName(String tableName, String column) {
+
+    String colPart = normaliseTable(column);
+    return indexPrefix + normaliseTable(tableName) + indexMiddle + colPart + indexSuffix;
+  }
+
+  /**
+   * Return the index name for a general index (not associated with a foreign key).
+   */
+  public String indexName(String tableName, String[] columns) {
+
+    String colPart = joinColumnNames(columns);
+    return indexPrefix + normaliseTable(tableName) + indexMiddle + colPart + indexSuffix;
   }
 
   /**
