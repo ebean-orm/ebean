@@ -355,7 +355,7 @@
       <!--<xsd:element ref="dropPrimaryKey" maxOccurs="unbounded"/>-->
 
       <!--<xsd:element ref="addUniqueConstraint" maxOccurs="unbounded"/>-->
-      <!--<xsd:element ref="dropUniqueConstraint" maxOccurs="unbounded"/>-->
+      <!--<xsd:element ref="alterTableDropUniqueConstraint" maxOccurs="unbounded"/>-->
 
     </xsd:choice>
   </xsd:group>

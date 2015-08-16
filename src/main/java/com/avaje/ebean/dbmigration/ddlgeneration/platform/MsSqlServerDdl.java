@@ -31,7 +31,7 @@ public class MsSqlServerDdl extends PlatformDdl {
    * MsSqlServer specific null handling on unique constraints.
    */
   @Override
-  public String createExternalUniqueForOneToOne(String uqName, String tableName, String[] columns) {
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns) {
 
     // issues#233
     String start = "create unique nonclustered index " + uqName + " on " + tableName+ "(";
@@ -49,7 +49,6 @@ public class MsSqlServerDdl extends PlatformDdl {
     }
     return sb.toString();
   }
-
 
   @Override
   public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {

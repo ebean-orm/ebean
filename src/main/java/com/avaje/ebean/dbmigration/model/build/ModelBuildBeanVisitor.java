@@ -61,6 +61,13 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
     return new ModelBuildPropertyVisitor(ctx, table, descriptor.getCompoundUniqueConstraints());
   }
 
+  /**
+   * Set the identity type to use for this table.
+   * <p>
+   * Takes into account the requested identity type and the underlying support in the
+   * database platform.
+   * </p>
+   */
   private void setIdentity(BeanDescriptor<?> descriptor, MTable table) {
 
     if (IdType.GENERATOR == descriptor.getIdType()) {

@@ -22,9 +22,9 @@ import com.avaje.ebean.dbmigration.model.MTable;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * Base implementation for 'create table' and 'alter table' statements.
@@ -61,7 +61,7 @@ public class BaseTableDdl implements TableDdl {
    * Base tables that have associated history tables that need their triggers
    * regenerated as columns have been added or removed.
    */
-  protected Set<String> regenerateHistoryTriggers = new LinkedHashSet<String>();
+  protected Map<String,HistoryTableUpdate> regenerateHistoryTriggers = new LinkedHashMap<String,HistoryTableUpdate>();
 
   /**
    * Construct with a naming convention and platform specific DDL.
@@ -164,7 +164,7 @@ public class BaseTableDdl implements TableDdl {
       String uqName = col.getUniqueOneToOne();
       String[] columnNames = {col.getName()};
       write.apply()
-          .append(platformDdl.createExternalUniqueForOneToOne(uqName, tableName, columnNames))
+          .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames))
           .endOfStatement();
 
       write.rollbackForeignKeys()
@@ -289,7 +289,7 @@ public class BaseTableDdl implements TableDdl {
         .endOfStatement();
   }
 
-  private void appendColumns(String[] columns, DdlBuffer buffer) throws IOException {
+  protected void appendColumns(String[] columns, DdlBuffer buffer) throws IOException {
     buffer.append(" (");
     for (int i = 0; i < columns.length; i++) {
       if (i > 0) {
@@ -389,7 +389,7 @@ public class BaseTableDdl implements TableDdl {
   /**
    * Return as an array of string column names.
    */
-  private String[] toColumnNames(List<Column> columns) {
+  protected String[] toColumnNames(List<Column> columns) {
 
     String[] cols = new String[columns.size()];
     for (int i = 0; i < cols.length; i++) {
@@ -401,7 +401,7 @@ public class BaseTableDdl implements TableDdl {
   /**
    * Return as an array of string column names.
    */
-  private String[] toColumnNamesSplit(String columns) {
+  protected String[] toColumnNamesSplit(String columns) {
     return columns.split(",");
   }
 
@@ -458,23 +458,35 @@ public class BaseTableDdl implements TableDdl {
     return pk;
   }
 
+  /**
+   * Add add history table DDL.
+   */
   @Override
   public void generate(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException {
     platformDdl.addHistoryTable(writer, addHistoryTable);
   }
 
+  /**
+   * Add drop history table DDL.
+   */
   @Override
   public void generate(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
     platformDdl.dropHistoryTable(writer, dropHistoryTable);
   }
 
+  /**
+   * Called at the end to generate additional ddl such as regenerate history triggers.
+   */
   @Override
   public void generateExtra(DdlWrite write) throws IOException {
-    for (String baseTable : this.regenerateHistoryTriggers) {
-      platformDdl.regenerateHistoryTriggers(write, baseTable);
+    for (HistoryTableUpdate update : this.regenerateHistoryTriggers.values()) {
+      platformDdl.regenerateHistoryTriggers(write, update);
     }
   }
 
+  /**
+   * Add add column DDL.
+   */
   @Override
   public void generate(DdlWrite writer, AddColumn addColumn) throws IOException {
 
@@ -488,8 +500,8 @@ public class BaseTableDdl implements TableDdl {
     if (isTrue(addColumn.isWithHistory())) {
       // make same changes to the history table
       String historyTable = historyTable(tableName);
-      regenerateHistoryTriggers(tableName);
       for (Column column : columns) {
+        regenerateHistoryTriggers(tableName, "added " + column.getName());
         alterTableAddColumn(writer.apply(), historyTable, column, true);
         alterTableDropColumn(writer.rollback(), historyTable, column.getName());
       }
@@ -500,12 +512,18 @@ public class BaseTableDdl implements TableDdl {
     writer.rollback().end();
   }
 
+  /**
+   * Add drop table DDL.
+   */
   @Override
   public void generate(DdlWrite writer, DropTable dropTable) throws IOException {
 
     dropTable(writer.drop(), dropTable.getName());
   }
 
+  /**
+   * Add drop column DDL.
+   */
   @Override
   public void generate(DdlWrite writer, DropColumn dropColumn) throws IOException {
 
@@ -514,21 +532,24 @@ public class BaseTableDdl implements TableDdl {
     alterTableDropColumn(writer.drop(), tableName, dropColumn.getColumnName());
     if (isTrue(dropColumn.isWithHistory())) {
       // also drop from the history table
-      regenerateHistoryTriggers(tableName);
+      regenerateHistoryTriggers(tableName, "dropped "+dropColumn.getColumnName());
       alterTableDropColumn(writer.drop(), historyTable(tableName), dropColumn.getColumnName());
     }
 
     writer.drop().end();
   }
 
+  /**
+   * Add all the appropriate changes based on the column changes.
+   */
   @Override
   public void generate(DdlWrite writer, AlterColumn alterColumn) throws IOException {
 
-//    if (isTrue(alterColumn.isHistoryExclude())) {
-//      historyExcludeColumn(writer, alterColumn);
-//    } else if (isFalse(alterColumn.isHistoryExclude())) {
-//      historyIncludeColumn(writer, alterColumn);
-//    }
+    if (isTrue(alterColumn.isHistoryExclude())) {
+      regenerateHistoryTriggers(alterColumn.getTableName(), "exclude " + alterColumn.getColumnName());
+    } else if (isFalse(alterColumn.isHistoryExclude())) {
+      regenerateHistoryTriggers(alterColumn.getTableName(), "include " + alterColumn.getColumnName());
+    }
 
     if (hasValue(alterColumn.getDropForeignKey())) {
       alterColumnDropForeignKey(writer, alterColumn);
@@ -566,6 +587,9 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
+  /**
+   * Return the name of the history table given the base table name.
+   */
   protected String historyTable(String baseTable) {
     return baseTable + historyTableSuffix;
   }
@@ -573,8 +597,14 @@ public class BaseTableDdl implements TableDdl {
   /**
    * Register the base table that we need to regenerate the history triggers on.
    */
-  protected void regenerateHistoryTriggers(String baseTableName) {
-    regenerateHistoryTriggers.add(baseTableName);
+  protected void regenerateHistoryTriggers(String baseTableName, String columnComment) {
+
+    HistoryTableUpdate update = regenerateHistoryTriggers.get(baseTableName);
+    if (update == null) {
+      update = new HistoryTableUpdate(baseTableName);
+      regenerateHistoryTriggers.put(baseTableName, update);
+    }
+    update.addComment(columnComment);
   }
 
   /**
@@ -586,7 +616,7 @@ public class BaseTableDdl implements TableDdl {
     if (hasValue(ddl)) {
       writer.apply().append(ddl).endOfStatement();
       if (isTrue(alter.isWithHistory()) && alter.getType() != null) {
-        // mysql and sqlserver column type change allowing nulls in the history table column
+        // mysql and sql server column type change allowing nulls in the history table column
         AlterColumn alterHistoryColumn = new AlterColumn();
         alterHistoryColumn.setTableName(historyTable(alter.getTableName()));
         alterHistoryColumn.setColumnName(alter.getColumnName());
@@ -655,7 +685,7 @@ public class BaseTableDdl implements TableDdl {
   protected void alterColumnDropUniqueConstraint(DdlWrite writer, AlterColumn alter) throws IOException {
 
     writer.apply()
-        .append(platformDdl.dropIndex(alter.getDropUnique(), alter.getTableName()))
+        .append(platformDdl.alterTableDropUniqueConstraint(alter.getTableName(), alter.getDropUnique()))
         .endOfStatement();
   }
 
@@ -674,7 +704,7 @@ public class BaseTableDdl implements TableDdl {
     String[] cols = {alter.getColumnName()};
 
     writer.apply()
-        .append(platformDdl.createExternalUniqueForOneToOne(uqName, alter.getTableName(), cols))
+        .append(platformDdl.alterTableAddUniqueConstraint(alter.getTableName(), uqName, cols))
         .endOfStatement();
 
     writer.rollbackForeignKeys()

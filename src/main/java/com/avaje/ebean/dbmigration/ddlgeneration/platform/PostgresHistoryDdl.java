@@ -11,6 +11,7 @@ import com.avaje.ebean.dbmigration.model.MTable;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Uses DB triggers to maintain a history table.
@@ -37,13 +38,13 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void regenerateHistoryTriggers(DdlWrite writer, String baseTable) throws IOException {
+  public void regenerateHistoryTriggers(DdlWrite writer, HistoryTableUpdate update) throws IOException {
 
-    MTable table = writer.getTable(baseTable);
+    MTable table = writer.getTable(update.getBaseTable());
     if (table == null) {
-      throw new IllegalStateException("MTable "+baseTable+" not found in writer? (required for history DDL)");
+      throw new IllegalStateException("MTable "+update.getBaseTable()+" not found in writer? (required for history DDL)");
     }
-    addStoredFunction(writer, table);
+    addStoredFunction(writer, table, update.getComments());
   }
 
   @Override
@@ -80,7 +81,7 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
     dropHistoryTableEtc(writer.rollback(), baseTable);
 
     addHistoryTable(writer, table, whenCreatedColumn);
-    addStoredFunction(writer, table);
+    addStoredFunction(writer, table, null);
     addTrigger(writer, table);
   }
 
@@ -156,11 +157,24 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
         .append("  for each row execute procedure ").append(procedureName).append("();").newLine().newLine();
   }
 
-  protected void addStoredFunction(DdlWrite writer, MTable table) throws IOException {
+  protected void addStoredFunction(DdlWrite writer, MTable table, List<String> comments) throws IOException {
 
     String procedureName = procedureName(table.getName());
 
     DdlBuffer apply = writer.applyHistory();
+
+    if (comments != null && !comments.isEmpty()) {
+      apply.append("-- Regenerated ").append(procedureName).newLine();
+      apply.append("-- changes: ");
+      for (int i = 0; i < comments.size(); i++) {
+        if (i > 0) {
+          apply.append(", ");
+        }
+        apply.append(comments.get(i));
+      }
+      apply.newLine();
+    }
+
     apply
         .append("create or replace function ").append(procedureName).append("() returns trigger as $$").newLine()
         .append("begin").newLine();

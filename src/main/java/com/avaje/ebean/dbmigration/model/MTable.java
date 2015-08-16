@@ -35,14 +35,29 @@ import java.util.Set;
  */
 public class MTable {
 
+  /**
+   * Table name.
+   */
   private final String name;
 
+  /**
+   * Primary key name.
+   */
   private String pkName;
 
+  /**
+   * Table comment.
+   */
   private String comment;
 
+  /**
+   * Tablespace to use.
+   */
   private String tablespace;
 
+  /**
+   * Tablespace to use for indexes on this table.
+   */
   private String indexTablespace;
 
   /**
@@ -51,21 +66,44 @@ public class MTable {
    */
   private IdentityType identityType;
 
+  /**
+   * DB sequence name.
+   */
   private String sequenceName;
   private int sequenceInitial;
   private int sequenceAllocate;
 
+  /**
+   * If set to true this table should has history support.
+   */
   private boolean withHistory;
 
+  /**
+   * The columns on the table.
+   */
   private Map<String, MColumn> columns = new LinkedHashMap<String, MColumn>();
 
+  /**
+   * Compound unique constraints.
+   */
   private List<MCompoundUniqueConstraint> compoundUniqueConstraints = new ArrayList<MCompoundUniqueConstraint>();
 
+  /**
+   * Compound foreign keys.
+   */
   private List<MCompoundForeignKey> compoundKeys = new ArrayList<MCompoundForeignKey>();
 
+  /**
+   * Column name for the 'When created' column. This can be used for the initial effective start date when adding
+   * history to an existing table and maps to a @WhenCreated or @CreatedTimestamp column.
+   */
+  private String whenCreatedColumn;
+
+  /**
+   * Temporary - holds addColumn settings.
+   */
   private AddColumn addColumn;
 
-  private String whenCreatedColumn;
 
   /**
    * Construct for migration.
@@ -94,6 +132,9 @@ public class MTable {
     this.name = name;
   }
 
+  /**
+   * Return the CreateTable migration for this table.
+   */
   public CreateTable createTable() {
 
     CreateTable createTable = new CreateTable();
@@ -121,6 +162,9 @@ public class MTable {
     return createTable;
   }
 
+  /**
+   * Compare to another version of the same table to perform a diff.
+   */
   public void compare(ModelDiff modelDiff, MTable newTable) {
 
     if (withHistory != newTable.withHistory) {
@@ -187,7 +231,7 @@ public class MTable {
     String columnName = alterColumn.getColumnName();
     MColumn existingColumn = columns.get(columnName);
     if (existingColumn == null) {
-      throw new IllegalStateException("Column ["+columnName+"] does not exist for AlterColumn change?");
+      throw new IllegalStateException("Column [" + columnName + "] does not exist for AlterColumn change?");
     }
     existingColumn.apply(alterColumn);
   }
@@ -347,16 +391,11 @@ public class MTable {
     addCompoundUniqueConstraint(cols, oneToOne, constraintName);
   }
 
+  /**
+   * Add a compound foreign key.
+   */
   public void addForeignKey(MCompoundForeignKey compoundKey) {
     compoundKeys.add(compoundKey);
-  }
-
-  private int toInt(BigInteger value) {
-    return (value == null) ? 0 : value.intValue();
-  }
-
-  private BigInteger toBigInteger(int value) {
-    return (value == 0) ? null : BigInteger.valueOf(value);
   }
 
   /**
@@ -378,7 +417,9 @@ public class MTable {
     return newCol;
   }
 
-
+  /**
+   * Add a 'new column' to the AddColumn migration object.
+   */
   private void diffNewColumn(MColumn newColumn) {
 
     if (addColumn == null) {
@@ -394,6 +435,9 @@ public class MTable {
     addColumn.getColumn().add(newColumn.createColumn());
   }
 
+  /**
+   * Add a 'drop column' to the diff.
+   */
   private void diffDropColumn(ModelDiff modelDiff, MColumn existingColumn) {
 
     DropColumn dropColumn = new DropColumn();
@@ -406,6 +450,14 @@ public class MTable {
     }
 
     modelDiff.addDropColumn(dropColumn);
+  }
+
+  private int toInt(BigInteger value) {
+    return (value == null) ? 0 : value.intValue();
+  }
+
+  private BigInteger toBigInteger(int value) {
+    return (value == 0) ? null : BigInteger.valueOf(value);
   }
 
 }

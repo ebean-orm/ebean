@@ -23,9 +23,18 @@ public interface PlatformHistoryDdl {
    */
   void createWithHistory(DdlWrite writer, MTable table) throws IOException;
 
+  /**
+   * Drop history support for the given table.
+   */
   void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException;
 
+  /**
+   * Add history support to the given table.
+   */
   void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException;
 
-  void regenerateHistoryTriggers(DdlWrite write, String baseTable) throws IOException;
+  /**
+   * Regenerate the history triggers/stored function due to column added/dropped/included or excluded.
+   */
+  void regenerateHistoryTriggers(DdlWrite write, HistoryTableUpdate baseTable) throws IOException;
 }
