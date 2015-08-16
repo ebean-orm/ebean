@@ -11,7 +11,7 @@ import org.joda.time.DateTime;
  */
 public class GeneratedUpdateJodaTime {
 
-  public static abstract class Base implements GeneratedProperty {
+  public static abstract class Base implements GeneratedProperty, GeneratedWhenModified {
 
     @Override
     public boolean includeInUpdate() {

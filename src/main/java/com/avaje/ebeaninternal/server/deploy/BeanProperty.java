@@ -7,6 +7,8 @@ import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.text.StringParser;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
+import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenCreated;
+import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenModified;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
@@ -862,6 +864,20 @@ public class BeanProperty implements ElPropertyValue {
    */
   public boolean isDDLNotNull() {
     return isVersion() || (generatedProperty != null && generatedProperty.isDDLNotNullable());
+  }
+
+  /**
+   * Return true if this is a generated property mapping to @WhenCreated or @CreatedTimestamp.
+   */
+  public boolean isGeneratedWhenCreated() {
+    return generatedProperty instanceof GeneratedWhenCreated;
+  }
+
+  /**
+   * Return true if this is a generated property mapping to @WhenModified or @UpdatedTimestamp.
+   */
+  public boolean isGeneratedWhenModified() {
+    return generatedProperty instanceof GeneratedWhenModified;
   }
 
   /**

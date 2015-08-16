@@ -12,7 +12,7 @@ import java.time.ZonedDateTime;
  */
 public class GeneratedInsertJavaTime {
 
-  public static abstract class Base implements GeneratedProperty {
+  public static abstract class Base implements GeneratedProperty, GeneratedWhenCreated {
 
     @Override
     public boolean includeInUpdate() {

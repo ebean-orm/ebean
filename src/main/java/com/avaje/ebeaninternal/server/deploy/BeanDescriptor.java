@@ -995,6 +995,32 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
+   * Find a property annotated with @WhenCreated or @CreatedTimestamp.
+   */
+  public BeanProperty findWhenCreatedProperty() {
+
+    for (int i = 0; i < propertiesBaseScalar.length; i++) {
+      if (propertiesBaseScalar[i].isGeneratedWhenCreated()) {
+        return propertiesBaseScalar[i];
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Find a property annotated with @WhenModified or @UpdatedTimestamp.
+   */
+  public BeanProperty findWhenModifiedProperty() {
+
+    for (int i = 0; i < propertiesBaseScalar.length; i++) {
+      if (propertiesBaseScalar[i].isGeneratedWhenModified()) {
+        return propertiesBaseScalar[i];
+      }
+    }
+    return null;
+  }
+
+  /**
    * Return the many property included in the query or null if one is not.
    */
   public BeanPropertyAssocMany<?> getManyProperty(SpiQuery<?> query) {

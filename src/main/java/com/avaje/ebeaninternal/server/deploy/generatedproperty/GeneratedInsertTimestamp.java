@@ -8,7 +8,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 /**
  * Used to generate a timestamp when a bean is inserted.
  */
-public class GeneratedInsertTimestamp implements GeneratedProperty {
+public class GeneratedInsertTimestamp implements GeneratedProperty, GeneratedWhenCreated {
 
     /**
      * Return the current time as a Timestamp.
