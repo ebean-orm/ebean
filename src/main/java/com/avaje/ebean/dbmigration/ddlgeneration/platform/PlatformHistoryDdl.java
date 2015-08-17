@@ -16,7 +16,7 @@ public interface PlatformHistoryDdl {
   /**
    * Configure typically reading the
    */
-  void configure(ServerConfig serverConfig);
+  void configure(ServerConfig serverConfig, PlatformDdl platformDdl);
 
   /**
    * Add history support to the table using platform specific mechanism.

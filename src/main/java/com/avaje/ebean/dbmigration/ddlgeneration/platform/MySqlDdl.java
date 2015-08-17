@@ -13,6 +13,7 @@ public class MySqlDdl extends PlatformDdl {
     super(platformTypes, dbIdentity);
     this.alterColumn =  "modify";
     this.dropUniqueConstraint = "drop index";
+    this.historyDdl = new MySqlHistoryDdl();
   }
 
   /**

@@ -6,16 +6,19 @@ import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.dbmigration.ddlgeneration.BaseDdlHandler;
+import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
 import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
+import com.avaje.ebean.dbmigration.migration.Column;
 import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
 import com.avaje.ebean.dbmigration.migration.IdentityType;
 import com.avaje.ebean.dbmigration.model.MTable;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Controls the DDL generation for a specific database platform.
@@ -84,7 +87,7 @@ public class PlatformDdl {
    * Set configuration options.
    */
   public void configure(ServerConfig serverConfig) {
-    historyDdl.configure(serverConfig);
+    historyDdl.configure(serverConfig, this);
     naming = serverConfig.getConstraintNaming();
   }
 
@@ -109,6 +112,38 @@ public class PlatformDdl {
    */
   public String asIdentityColumn(String columnDefn) {
     return columnDefn + identitySuffix;
+  }
+
+  /**
+   * Write all the table columns converting to platform types as necessary.
+   */
+  public void writeTableColumns(DdlBuffer apply, List<Column> columns, boolean useIdentity) throws IOException {
+    for (int i = 0; i < columns.size(); i++) {
+      apply.newLine();
+      writeColumnDefinition(apply, columns.get(i), useIdentity);
+      if (i < columns.size() - 1) {
+        apply.append(",");
+      }
+    }
+  }
+
+  /**
+   * Write the column definition to the create table statement.
+   */
+  protected void writeColumnDefinition(DdlBuffer buffer, Column column, boolean useIdentity) throws IOException {
+
+    boolean identityColumn = useIdentity && isTrue(column.isPrimaryKey());
+    String platformType = convert(column.getType(), identityColumn);
+
+    buffer.append("  ");
+    buffer.append(lowerName(column.getName()), 30);
+    buffer.append(platformType);
+    if (isTrue(column.isNotnull()) || isTrue(column.isPrimaryKey())) {
+      buffer.append(" not null");
+    }
+
+    // add check constraints later as we really want to give them a nice name
+    // so that the database can potentially provide a nice SQL error
   }
 
   /**
@@ -333,4 +368,10 @@ public class PlatformDdl {
     return naming.lowerName(name);
   }
 
+  /**
+   * Null safe Boolean true test.
+   */
+  protected boolean isTrue(Boolean value) {
+    return Boolean.TRUE.equals(value);
+  }
 }

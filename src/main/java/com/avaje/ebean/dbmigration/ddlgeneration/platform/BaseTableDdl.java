@@ -64,7 +64,7 @@ public class BaseTableDdl implements TableDdl {
    * Base tables that have associated history tables that need their triggers/functions regenerated as
    * columns have been added, removed, included or excluded.
    */
-  protected Map<String,HistoryTableUpdate> regenerateHistoryTriggers = new LinkedHashMap<String,HistoryTableUpdate>();
+  protected Map<String, HistoryTableUpdate> regenerateHistoryTriggers = new LinkedHashMap<String, HistoryTableUpdate>();
 
   /**
    * Construct with a naming convention and platform specific DDL.
@@ -114,14 +114,7 @@ public class BaseTableDdl implements TableDdl {
 
     DdlBuffer apply = writer.apply();
     apply.append("create table ").append(tableName).append(" (");
-    for (int i = 0; i < columns.size(); i++) {
-      apply.newLine();
-      writeColumnDefinition(apply, columns.get(i), useIdentity);
-      if (i < columns.size() - 1) {
-        apply.append(",");
-      }
-    }
-
+    writeTableColumns(apply, columns, useIdentity);
     writeCheckConstraints(apply, createTable);
     writeUniqueConstraints(apply, createTable);
     writeCompoundUniqueConstraints(apply, createTable);
@@ -155,6 +148,10 @@ public class BaseTableDdl implements TableDdl {
 
     writeAddForeignKeys(writer, createTable);
 
+  }
+
+  private void writeTableColumns(DdlBuffer apply, List<Column> columns, boolean useIdentity) throws IOException {
+    platformDdl.writeTableColumns(apply, columns, useIdentity);
   }
 
   /**
@@ -413,35 +410,6 @@ public class BaseTableDdl implements TableDdl {
    */
   protected String lowerName(String name) {
     return naming.lowerName(name);
-  }
-
-  /**
-   * Write the column definition to the create table statement.
-   */
-  protected void writeColumnDefinition(DdlBuffer buffer, Column column, boolean useIdentity) throws IOException {
-
-    boolean identityColumn = useIdentity && isTrue(column.isPrimaryKey());
-    String platformType = convertToPlatformType(column.getType(), identityColumn);
-
-    buffer.append("  ");
-    buffer.append(lowerName(column.getName()), 30);
-    buffer.append(platformType);
-    if (isTrue(column.isNotnull()) || isTrue(column.isPrimaryKey())) {
-      buffer.append(" not null");
-    }
-
-    // add check constraints later as we really want to give them a nice name
-    // so that the database can potentially provide a nice SQL error
-  }
-
-  /**
-   * Convert the expected logical type into a platform specific one.
-   * <p>
-   * For example clob -> text for postgres.
-   * </p>
-   */
-  protected String convertToPlatformType(String type, boolean identity) {
-    return platformDdl.convert(type, identity);
   }
 
   /**

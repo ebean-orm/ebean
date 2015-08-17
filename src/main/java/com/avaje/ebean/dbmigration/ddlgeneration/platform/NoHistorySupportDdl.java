@@ -15,7 +15,7 @@ import java.io.IOException;
 public class NoHistorySupportDdl implements PlatformHistoryDdl {
 
   @Override
-  public void configure(ServerConfig serverConfig) {
+  public void configure(ServerConfig serverConfig, PlatformDdl platformDdl) {
     // does nothing
   }
 
