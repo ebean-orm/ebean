@@ -432,6 +432,10 @@ public class BaseTableDdl implements TableDdl {
     writer.apply()
         .append(platformDdl.createIndex(createIndex.getIndexName(), createIndex.getTableName(), cols))
         .endOfStatement();
+
+    writer.rollback()
+        .append(platformDdl.dropIndex(createIndex.getIndexName(), createIndex.getTableName()))
+        .endOfStatement();
   }
 
   @Override
