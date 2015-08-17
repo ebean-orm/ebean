@@ -26,11 +26,21 @@ public class Binder {
 
   private final TypeManager typeManager;
 
+  private final int asOfBindCount;
+
   /**
    * Set the PreparedStatement with which to bind variables to.
    */
-  public Binder(TypeManager typeManager) {
+  public Binder(TypeManager typeManager, int asOfBindCount) {
     this.typeManager = typeManager;
+    this.asOfBindCount = asOfBindCount;
+  }
+
+  /**
+   * Return the bind count per predicate for 'As Of' query predicates.
+   */
+  public int getAsOfBindCount() {
+    return asOfBindCount;
   }
 
   /**

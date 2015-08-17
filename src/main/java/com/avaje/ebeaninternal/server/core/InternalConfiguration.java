@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.core;
 
 import javax.sql.DataSource;
 
+import com.avaje.ebean.config.dbplatform.DbHistorySupport;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +107,6 @@ public class InternalConfiguration {
     this.expressionFactory = new DefaultExpressionFactory(serverConfig.isExpressionEqualsWithNullAsNoop());
 
     this.typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
-    this.binder = new Binder(typeManager);
 
     this.resourceManager = ResourceManagerFactory.createResourceManager(serverConfig);
     this.deployOrmXml = new DeployOrmXml(resourceManager.getResourceSource());
@@ -120,7 +120,10 @@ public class InternalConfiguration {
 
     this.transactionManager = createTransactionManager();
 
-    this.cQueryEngine = new CQueryEngine(serverConfig.getDatabasePlatform(), binder, asOfTableMapping, serverConfig.getAsOfSysPeriod());
+    DatabasePlatform databasePlatform = serverConfig.getDatabasePlatform();
+
+    this.binder = new Binder(typeManager, getAsOfBindCount(databasePlatform));
+    this.cQueryEngine = new CQueryEngine(databasePlatform, binder, asOfTableMapping, serverConfig.getAsOfSysPeriod());
 
     ExternalTransactionManager externalTransactionManager = serverConfig.getExternalTransactionManager();
     if (externalTransactionManager == null && serverConfig.isUseJtaTransactionManager()) {
@@ -135,7 +138,15 @@ public class InternalConfiguration {
     }
 
   }
-  
+
+  /**
+   * For 'As Of' queries return the number of bind variables per predicate.
+   */
+  private int getAsOfBindCount(DatabasePlatform databasePlatform) {
+    DbHistorySupport historySupport = databasePlatform.getHistorySupport();
+    return historySupport == null ? 0 : historySupport.getBindCount();
+  }
+
   /**
    * Create the TransactionManager taking into account autoCommit mode.
    */

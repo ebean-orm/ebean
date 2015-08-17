@@ -6,6 +6,14 @@ package com.avaje.ebean.config.dbplatform;
 public class PostgresHistorySupport implements DbHistorySupport {
 
   /**
+   * Return 1 as we are using the range type and hence don't need 2 bind variables.
+   */
+  @Override
+  public int getBindCount() {
+    return 1;
+  }
+
+  /**
    * Build and return the 'as of' predicate for a given table alias.
    * <p>
    * Each @History entity involved in the query has this predicate added using the related table alias.

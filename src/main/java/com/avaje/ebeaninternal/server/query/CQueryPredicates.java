@@ -172,7 +172,7 @@ public class CQueryPredicates {
       // there is one effective date predicate per table alias
       Timestamp asOf = query.getAsOf();
       bindLog.append(" asOf ").append(asOf);
-      for (int i = 0; i < historyTableAlias.size(); i++) {
+      for (int i = 0; i < historyTableAlias.size() * binder.getAsOfBindCount(); i++) {
         binder.bindObject(dataBind, asOf);
       }
     }

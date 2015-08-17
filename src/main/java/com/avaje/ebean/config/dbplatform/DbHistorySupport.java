@@ -6,6 +6,14 @@ package com.avaje.ebean.config.dbplatform;
 public interface DbHistorySupport {
 
   /**
+   * Return the number of columns bound in a 'As Of' predicate.
+   * <p>
+   * Typically this is 2 but 1 for postgres using it's range type.
+   * </p>
+   */
+  int getBindCount();
+
+  /**
    * Return the 'as of' predicate added for the given table alias.
    *
    * @param tableAlias The table alias this predicate is added for

@@ -26,6 +26,7 @@ public class MySqlPlatform extends DatabasePlatform {
     this.selectCountWithAlias = true;
     this.dbEncrypt = new MySqlDbEncrypt();
     this.platformDdl = new MySqlDdl(this.dbTypeMap, this.dbIdentity);
+    this.historySupport = new MySqlHistorySupport();
 
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
@@ -45,7 +46,6 @@ public class MySqlPlatform extends DatabasePlatform {
     dbTypeMap.put(Types.BLOB, new MySqlBlob());
     dbTypeMap.put(Types.BINARY, new DbType("binary", 255));
     dbTypeMap.put(Types.VARBINARY, new DbType("varbinary", 255));
-
   }
 
   /**
