@@ -1,0 +1,4 @@
+-- CONTAINS --
+-- recreate history procedures to ignore certain column(s)
+-- drop history view
+-- drop history table
