@@ -66,7 +66,6 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
     addBeforeUpdate(rollback, updateTriggerName(baseTableName), baseTableName, historyTableName, includedColumns);
     addBeforeDelete(rollback, deleteTriggerName(baseTableName), baseTableName, historyTableName, includedColumns);
     rollback.append("unlock tables").endOfStatement();
-
   }
 
   private void addBeforeUpdate(DdlBuffer apply, String triggerName, String baseTable, String historyTable, List<String> includedColumns) throws IOException {
@@ -77,7 +76,7 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
         .append(" for each row begin").newLine();
     appendInsertIntoHistory(apply, historyTable, includedColumns);
     apply
-        .append("    set NEW.").append(sysPeriod).append("_start = now(6)").endOfStatement().newLine()
+        .append("    set NEW.").append(sysPeriod).append("_start = now(6)").endOfStatement()
         .append("end$$").newLine();
   }
 

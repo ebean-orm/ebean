@@ -603,6 +603,22 @@ public class BaseTableDdl implements TableDdl {
     String ddl = platformDdl.alterColumnBaseAttributes(alter);
     if (hasValue(ddl)) {
       writer.apply().append(ddl).endOfStatement();
+
+      // reverse and generate the rollback statement
+      String currentType = alter.getCurrentType();
+      String type = alter.getType();
+      Boolean currentNotnull = alter.isCurrentNotnull();
+      Boolean notnull = alter.isNotnull();
+
+      alter.setCurrentType(type);
+      alter.setType(currentType);
+      alter.setNotnull(currentNotnull);
+      alter.setCurrentNotnull(notnull);
+
+      // write the rollback
+      ddl = platformDdl.alterColumnBaseAttributes(alter);
+      writer.rollback().append(ddl).endOfStatement();
+
       if (isTrue(alter.isWithHistory()) && alter.getType() != null) {
         // mysql and sql server column type change allowing nulls in the history table column
         AlterColumn alterHistoryColumn = new AlterColumn();
@@ -610,7 +626,14 @@ public class BaseTableDdl implements TableDdl {
         alterHistoryColumn.setColumnName(alter.getColumnName());
         alterHistoryColumn.setType(alter.getType());
         String histColumnDdl = platformDdl.alterColumnBaseAttributes(alterHistoryColumn);
+
+        // write the apply to history table
         writer.apply().append(histColumnDdl).endOfStatement();
+
+        // write the rollback from history table
+        alterHistoryColumn.setType(currentType);
+        histColumnDdl = platformDdl.alterColumnBaseAttributes(alterHistoryColumn);
+        writer.rollback().append(histColumnDdl).endOfStatement();
       }
     }
   }
@@ -628,6 +651,8 @@ public class BaseTableDdl implements TableDdl {
     String ddl = platformDdl.alterColumnNotnull(alter.getTableName(), alter.getColumnName(), alter.isNotnull());
     if (hasValue(ddl)) {
       writer.apply().append(ddl).endOfStatement();
+      ddl = platformDdl.alterColumnNotnull(alter.getTableName(), alter.getColumnName(), alter.isCurrentNotnull());
+      writer.rollback().append(ddl).endOfStatement();
     }
   }
 
@@ -636,10 +661,14 @@ public class BaseTableDdl implements TableDdl {
     String ddl = platformDdl.alterColumnType(alter.getTableName(), alter.getColumnName(), alter.getType());
     if (hasValue(ddl)) {
       writer.apply().append(ddl).endOfStatement();
+      ddl = platformDdl.alterColumnType(alter.getTableName(), alter.getColumnName(), alter.getCurrentType());
+      writer.rollback().append(ddl).endOfStatement();
       if (isTrue(alter.isWithHistory())) {
         // apply same type change to matching column in the history table
         ddl = platformDdl.alterColumnType(historyTable(alter.getTableName()), alter.getColumnName(), alter.getType());
         writer.apply().append(ddl).endOfStatement();
+        ddl = platformDdl.alterColumnType(historyTable(alter.getTableName()), alter.getColumnName(), alter.getCurrentType());
+        writer.rollback().append(ddl).endOfStatement();
       }
     }
   }

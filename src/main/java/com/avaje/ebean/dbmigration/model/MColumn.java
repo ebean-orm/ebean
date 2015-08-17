@@ -230,19 +230,18 @@ public class MColumn {
     // set to null and check at the end
     this.alterColumn = null;
 
-    boolean changeType = false;
-    boolean changeNotnull = false;
+    boolean changeBaseAttribute = false;
 
     if (historyExclude != newColumn.historyExclude) {
       getAlterColumn(tableName, tableWithHistory).setHistoryExclude(newColumn.historyExclude);
     }
 
     if (different(type, newColumn.type)) {
-      changeType = true;
+      changeBaseAttribute = true;
       getAlterColumn(tableName, tableWithHistory).setType(newColumn.type);
     }
     if (notnull != newColumn.notnull) {
-      changeNotnull = true;
+      changeBaseAttribute = true;
       getAlterColumn(tableName, tableWithHistory).setNotnull(newColumn.notnull);
     }
     if (different(defaultValue, newColumn.defaultValue)) {
@@ -302,11 +301,9 @@ public class MColumn {
 
     if (alterColumn != null) {
       modelDiff.addAlterColumn(alterColumn);
-      // we need the current type, notnull together for some db's
-      if (!changeType) {
+      if (changeBaseAttribute) {
+        // support reverting these changes
         alterColumn.setCurrentType(type);
-      }
-      if (!changeNotnull) {
         alterColumn.setCurrentNotnull(notnull);
       }
     }
