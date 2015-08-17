@@ -29,17 +29,12 @@ public class ModelDiff {
   /**
    * List of 'create' type changes.
    */
-  private final List<Object> createChanges = new ArrayList<Object>();
+  private final List<Object> applyChanges = new ArrayList<Object>();
 
   /**
    * List of 'drop' type changes. Expected to be placed into a separate DDL script.
    */
   private final List<Object> dropChanges = new ArrayList<Object>();
-
-  /**
-   * List of 'drop' type changes. Expected to be placed into a separate DDL script.
-   */
-  private final List<Object> dropHistoryChanges = new ArrayList<Object>();
 
   /**
    * Construct with a base model.
@@ -77,10 +72,10 @@ public class ModelDiff {
   }
 
   /**
-   * Return the list of 'create' changes.
+   * Return the list of 'apply' changes.
    */
-  public List<Object> getCreateChanges() {
-    return createChanges;
+  public List<Object> getApplyChanges() {
+    return applyChanges;
   }
 
   /**
@@ -95,10 +90,10 @@ public class ModelDiff {
    */
   public ChangeSet getApplyChangeSet() {
     // put the changes into a ChangeSet
-    ChangeSet createChangeSet = new ChangeSet();
-    createChangeSet.setType(ChangeSetType.APPLY);
-    createChangeSet.getChangeSetChildren().addAll(createChanges);
-    return createChangeSet;
+    ChangeSet applyChangeSet = new ChangeSet();
+    applyChangeSet.setType(ChangeSetType.APPLY);
+    applyChangeSet.getChangeSetChildren().addAll(applyChanges);
+    return applyChangeSet;
   }
 
   /**
@@ -162,7 +157,7 @@ public class ModelDiff {
    * Add CreateTable to the 'apply' changes.
    */
   protected void addNewTable(MTable newTable) {
-    createChanges.add(newTable.createTable());
+    applyChanges.add(newTable.createTable());
   }
 
   /**
@@ -185,14 +180,14 @@ public class ModelDiff {
    * Add the AlterColumn to the 'apply' changes.
    */
   public void addAlterColumn(AlterColumn alterColumn) {
-    createChanges.add(alterColumn);
+    applyChanges.add(alterColumn);
   }
 
   /**
    * Add the AlterColumn to the 'apply' changes.
    */
   public void addAddColumn(AddColumn addColumn) {
-    createChanges.add(addColumn);
+    applyChanges.add(addColumn);
   }
 
   /**
@@ -206,27 +201,27 @@ public class ModelDiff {
    * Add the AddHistoryTable to apply changes.
    */
   public void addAddHistoryTable(AddHistoryTable addHistoryTable) {
-    createChanges.add(addHistoryTable);
+    applyChanges.add(addHistoryTable);
   }
 
   /**
    * Add the DropHistoryTable to the 'drop history' changes.
    */
   public void addDropHistoryTable(DropHistoryTable dropHistoryTable) {
-    dropHistoryChanges.add(dropHistoryTable);
+    dropChanges.add(dropHistoryTable);
   }
 
   /**
    * Add the DropIndex to the 'apply' changes.
    */
   public void addDropIndex(DropIndex dropIndex) {
-    createChanges.add(dropIndex);
+    applyChanges.add(dropIndex);
   }
 
   /**
    * Add the CreateIndex to the 'apply' changes.
    */
   public void addCreateIndex(CreateIndex createIndex) {
-    createChanges.add(createIndex);
+    applyChanges.add(createIndex);
   }
 }

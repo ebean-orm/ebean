@@ -517,7 +517,7 @@ public class BaseTableDdl implements TableDdl {
       // make same changes to the history table
       String historyTable = historyTable(tableName);
       for (Column column : columns) {
-        regenerateHistoryTriggers(tableName, "added " + column.getName());
+        regenerateHistoryTriggers(tableName, HistoryTableUpdate.Change.ADD, column.getName());
         alterTableAddColumn(writer.apply(), historyTable, column, true);
         alterTableDropColumn(writer.rollback(), historyTable, column.getName());
       }
@@ -548,7 +548,7 @@ public class BaseTableDdl implements TableDdl {
     alterTableDropColumn(writer.drop(), tableName, dropColumn.getColumnName());
     if (isTrue(dropColumn.isWithHistory())) {
       // also drop from the history table
-      regenerateHistoryTriggers(tableName, "dropped "+dropColumn.getColumnName());
+      regenerateHistoryTriggers(tableName, HistoryTableUpdate.Change.DROP, dropColumn.getColumnName());
       alterTableDropColumn(writer.drop(), historyTable(tableName), dropColumn.getColumnName());
     }
 
@@ -562,9 +562,9 @@ public class BaseTableDdl implements TableDdl {
   public void generate(DdlWrite writer, AlterColumn alterColumn) throws IOException {
 
     if (isTrue(alterColumn.isHistoryExclude())) {
-      regenerateHistoryTriggers(alterColumn.getTableName(), "exclude " + alterColumn.getColumnName());
+      regenerateHistoryTriggers(alterColumn.getTableName(), HistoryTableUpdate.Change.EXCLUDE, alterColumn.getColumnName());
     } else if (isFalse(alterColumn.isHistoryExclude())) {
-      regenerateHistoryTriggers(alterColumn.getTableName(), "include " + alterColumn.getColumnName());
+      regenerateHistoryTriggers(alterColumn.getTableName(), HistoryTableUpdate.Change.INCLUDE, alterColumn.getColumnName());
     }
 
     if (hasValue(alterColumn.getDropForeignKey())) {
@@ -613,14 +613,14 @@ public class BaseTableDdl implements TableDdl {
   /**
    * Register the base table that we need to regenerate the history triggers on.
    */
-  protected void regenerateHistoryTriggers(String baseTableName, String columnComment) {
+  protected void regenerateHistoryTriggers(String baseTableName, HistoryTableUpdate.Change change, String column) {
 
     HistoryTableUpdate update = regenerateHistoryTriggers.get(baseTableName);
     if (update == null) {
       update = new HistoryTableUpdate(baseTableName);
       regenerateHistoryTriggers.put(baseTableName, update);
     }
-    update.addComment(columnComment);
+    update.add(change, column);
   }
 
   /**

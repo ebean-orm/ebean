@@ -156,12 +156,12 @@ public class CurrentModel {
     ModelDiff diff = new ModelDiff();
     diff.compareTo(model);
 
-    List<Object> createChanges = diff.getCreateChanges();
+    List<Object> applyChanges = diff.getApplyChanges();
 
     // put the changes into a ChangeSet
-    ChangeSet createChangeSet = new ChangeSet();
-    createChangeSet.getChangeSetChildren().addAll(createChanges);
-    return createChangeSet;
+    ChangeSet applyChangeSet = new ChangeSet();
+    applyChangeSet.getChangeSetChildren().addAll(applyChanges);
+    return applyChangeSet;
   }
 
 }

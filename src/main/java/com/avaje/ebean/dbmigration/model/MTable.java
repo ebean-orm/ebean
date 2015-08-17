@@ -278,8 +278,8 @@ public class MTable {
     return withHistory;
   }
 
-  public void setWithHistory() {
-    withHistory = true;
+  public void setWithHistory(boolean withHistory) {
+    this.withHistory = withHistory;
   }
 
   public Map<String, MColumn> getColumns() {

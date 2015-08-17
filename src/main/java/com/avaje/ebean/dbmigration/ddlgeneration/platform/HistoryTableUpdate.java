@@ -10,9 +10,51 @@ import java.util.List;
  */
 public class HistoryTableUpdate {
 
+
+  /**
+   * Column change type.
+   */
+  public enum Change {
+    ADD,
+    DROP,
+    INCLUDE,
+    EXCLUDE
+  }
+
+  public static class Column {
+
+    public final Change change;
+    public final String column;
+    public Column(Change change, String column) {
+      this.change = change;
+      this.column = column;
+    }
+
+    public String description() {
+      return change.name().toLowerCase()+" "+column;
+    }
+
+    public void apply(List<String> includedColumns) {
+      switch (change) {
+        case ADD:
+        case INCLUDE: {
+          includedColumns.remove(column);
+          break;
+        }
+        case DROP:
+        case EXCLUDE: {
+          includedColumns.add(column);
+          break;
+        }
+        default:
+          throw new IllegalStateException("Unexpected change "+change);
+      }
+    }
+  }
+
   private final String baseTable;
 
-  private final List<String> comments = new ArrayList<String>();
+  private final List<Column> columnChanges = new ArrayList<Column>();
 
   /**
    * Construct with a given base table name.
@@ -22,10 +64,33 @@ public class HistoryTableUpdate {
   }
 
   /**
+   * Return a description of the changes that cause the history trigger/function
+   * to be regenerated (added, dropped, included or excluded columns).
+   */
+  public String description() {
+    StringBuilder sb = new StringBuilder(90);
+    for (int i = 0; i < columnChanges.size(); i++) {
+      if (i > 0) {
+        sb.append(", ");
+      }
+      sb.append(columnChanges.get(i).description());
+    }
+    return sb.toString();
+  }
+
+  public void toRevertedColumns(List<String> includedColumns) {
+
+    for (Column columnChange : columnChanges) {
+      columnChange.apply(includedColumns);
+    }
+  }
+
+
+  /**
    * Add a comment for column added, dropped, included or excluded.
    */
-  public void addComment(String comment) {
-    comments.add(comment);
+  public void add(Change change, String column) {
+    columnChanges.add(new Column(change, column));
   }
 
   /**
@@ -38,7 +103,7 @@ public class HistoryTableUpdate {
   /**
    * Return the comments.
    */
-  public List<String> getComments() {
-    return comments;
+  public List<Column> getColumnChanges() {
+    return columnChanges;
   }
 }

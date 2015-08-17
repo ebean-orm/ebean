@@ -56,7 +56,7 @@ public class MTableTest {
     ModelDiff diff = new ModelDiff();
     diff.compareTables(base(), newTable());
 
-    List<Object> createChanges = diff.getCreateChanges();
+    List<Object> createChanges = diff.getApplyChanges();
     assertThat(createChanges).hasSize(1);
     AddColumn addColumn = (AddColumn)createChanges.get(0);
     assertThat(addColumn.getColumn()).extracting("name").contains("comment");
@@ -76,7 +76,7 @@ public class MTableTest {
     ModelDiff diff = new ModelDiff();
     diff.compareTables(base(), newTableAdd2Columns());
 
-    List<Object> createChanges = diff.getCreateChanges();
+    List<Object> createChanges = diff.getApplyChanges();
     assertThat(createChanges).hasSize(1);
 
     AddColumn addColumn = (AddColumn)createChanges.get(0);
@@ -93,7 +93,7 @@ public class MTableTest {
     ModelDiff diff = new ModelDiff();
     diff.compareTables(base(), newTableModifiedColumn());
 
-    List<Object> createChanges = diff.getCreateChanges();
+    List<Object> createChanges = diff.getApplyChanges();
     assertThat(createChanges).hasSize(1);
 
     AlterColumn alterColumn = (AlterColumn)createChanges.get(0);

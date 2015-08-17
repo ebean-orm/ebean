@@ -90,7 +90,7 @@ public class MigrationModel {
 
     Migration migration = MigrationXmlReader.readMaybe(path);
     if (migration == null) {
-      logger.info("... no migration at path:{}", path);
+      logger.debug("... no migration at path:{}", path);
       return false;
     }
     readVersions.add(version);

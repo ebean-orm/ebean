@@ -57,7 +57,7 @@ public class DbOffline {
   public static void reset() {
     runningMigration = false;
     System.clearProperty(KEY);
-    logger.info("reset");
+    logger.debug("reset");
   }
 
 }

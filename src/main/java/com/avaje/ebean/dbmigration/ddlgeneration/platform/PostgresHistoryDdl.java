@@ -10,6 +10,7 @@ import com.avaje.ebean.dbmigration.model.MColumn;
 import com.avaje.ebean.dbmigration.model.MTable;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
     if (table == null) {
       throw new IllegalStateException("MTable "+update.getBaseTable()+" not found in writer? (required for history DDL)");
     }
-    addStoredFunction(writer, table, update.getComments());
+    addStoredFunction(writer, table, update);
   }
 
   @Override
@@ -157,24 +158,36 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
         .append("  for each row execute procedure ").append(procedureName).append("();").newLine().newLine();
   }
 
-  protected void addStoredFunction(DdlWrite writer, MTable table, List<String> comments) throws IOException {
+  protected void addStoredFunction(DdlWrite writer, MTable table, HistoryTableUpdate update) throws IOException {
 
     String procedureName = procedureName(table.getName());
+    String historyTable = historyTableName(table.getName());
+
+    List<String> includedColumns = includedColumnNames(table);
 
     DdlBuffer apply = writer.applyHistory();
 
-    if (comments != null && !comments.isEmpty()) {
+    if (update != null) {
       apply.append("-- Regenerated ").append(procedureName).newLine();
-      apply.append("-- changes: ");
-      for (int i = 0; i < comments.size(); i++) {
-        if (i > 0) {
-          apply.append(", ");
-        }
-        apply.append(comments.get(i));
-      }
-      apply.newLine();
+      apply.append("-- changes: ").append(update.description()).newLine();
     }
 
+    addFunction(apply, procedureName, historyTable, includedColumns);
+
+
+    if (update != null) {
+      // put a reverted version into the rollback buffer
+      update.toRevertedColumns(includedColumns);
+
+      DdlBuffer rollback = writer.rollback();
+      rollback.append("-- Revert regenerated ").append(procedureName).newLine();
+      rollback.append("-- revert changes: ").append(update.description()).newLine();
+
+      addFunction(rollback, procedureName, historyTable, includedColumns);
+    }
+  }
+
+  private void addFunction(DdlBuffer apply, String procedureName, String historyTable, List<String> includedColumns) throws IOException {
     apply
         .append("create or replace function ").append(procedureName).append("() returns trigger as $$").newLine()
         .append("begin").newLine();
@@ -184,13 +197,13 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
         .append("    return new;").newLine().newLine();
     apply
         .append("  elsif (TG_OP = 'UPDATE') then").newLine();
-    appendInsertIntoHistory(apply, table);
+    appendInsertIntoHistory(apply, historyTable, includedColumns);
     apply
         .append("    NEW.").append(sysPeriod).append(" = tstzrange(CURRENT_TIMESTAMP,null);").newLine()
         .append("    return new;").newLine().newLine();
     apply
         .append("  elsif (TG_OP = 'DELETE') then").newLine();
-    appendInsertIntoHistory(apply, table);
+    appendInsertIntoHistory(apply, historyTable, includedColumns);
     apply
         .append("    return old;").newLine().newLine();
 
@@ -202,29 +215,39 @@ public class PostgresHistoryDdl implements PlatformHistoryDdl {
     apply.end();
   }
 
-  protected void appendInsertIntoHistory(DdlBuffer buffer, MTable table) throws IOException {
-
-    String historyTable = historyTableName(table.getName());
+  protected void appendInsertIntoHistory(DdlBuffer buffer, String historyTable, List<String> columns) throws IOException {
 
     buffer.append("    insert into ").append(historyTable).append(" (").append(sysPeriod).append(",");
-    appendColumnNames(buffer, table, "");
+    appendColumnNames(buffer, columns, "");
     buffer.append(") values (tstzrange(lower(OLD.").append(sysPeriod).append("), CURRENT_TIMESTAMP), ");
-    appendColumnNames(buffer, table, "OLD.");
+    appendColumnNames(buffer, columns, "OLD.");
     buffer.append(");").newLine();
   }
 
-  protected void appendColumnNames(DdlBuffer buffer, MTable table, String columnPrefix) throws IOException {
+  protected void appendColumnNames(DdlBuffer buffer, List<String> columns, String columnPrefix) throws IOException {
+
+    for (int i=0; i< columns.size(); i++) {
+      if (i > 0) {
+        buffer.append(", ");
+      }
+      buffer.append(columnPrefix);
+      buffer.append(columns.get(i));
+    }
+  }
+
+  /**
+   * Return the list of included columns in order.
+   */
+  protected List<String> includedColumnNames(MTable table) throws IOException {
 
     Collection<MColumn> columns = table.getColumns().values();
-    int i = 0;
+    List<String> includedColumns = new ArrayList<String>(columns.size());
+
     for (MColumn column : columns) {
       if (!column.isHistoryExclude()) {
-        if (++i > 1) {
-          buffer.append(", ");
-        }
-        buffer.append(columnPrefix);
-        buffer.append(column.getName());
+        includedColumns.add(column.getName());
       }
     }
+    return includedColumns;
   }
 }

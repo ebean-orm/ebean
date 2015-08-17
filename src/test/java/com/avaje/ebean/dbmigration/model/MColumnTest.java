@@ -25,7 +25,7 @@ public class MColumnTest {
     ModelDiff diff = diff();
     basic().compare(diff, table, basic());
 
-    assertThat(diff.getCreateChanges()).isEmpty();
+    assertThat(diff.getApplyChanges()).isEmpty();
     assertThat(diff.getDropChanges()).isEmpty();
   }
 
@@ -280,12 +280,12 @@ public class MColumnTest {
 
   @NotNull
   private AlterColumn getAlterColumn(ModelDiff diff) {
-    return (AlterColumn) diff.getCreateChanges().get(0);
+    return (AlterColumn) diff.getApplyChanges().get(0);
   }
 
   private void assertChanges(ModelDiff diff) {
     assertThat(diff.getDropChanges()).isEmpty();
-    assertThat(diff.getCreateChanges()).hasSize(1);
+    assertThat(diff.getApplyChanges()).hasSize(1);
   }
 
 }

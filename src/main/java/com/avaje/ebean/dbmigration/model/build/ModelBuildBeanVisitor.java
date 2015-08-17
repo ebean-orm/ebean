@@ -37,7 +37,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
 
     MTable table = new MTable(descriptor.getBaseTable());
     if (descriptor.isHistorySupport()) {
-      table.setWithHistory();
+      table.setWithHistory(true);
       BeanProperty whenCreated = descriptor.findWhenCreatedProperty();
       if (whenCreated != null) {
         table.setWhenCreatedColumn(whenCreated.getDbColumn());
