@@ -50,6 +50,15 @@ public class ModelDiff {
     this.baseModel = new ModelContainer();
   }
 
+
+  /**
+   * Return true if the apply and drop changes are both empty.
+   * This means there are no migration changes.
+   */
+  public boolean isEmpty() {
+    return applyChanges.isEmpty() && dropChanges.isEmpty();
+  }
+
   /**
    * Return the diff as a migration potentially containing
    * an apply changeSet and a drop changeSet.

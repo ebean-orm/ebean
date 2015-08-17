@@ -16,11 +16,12 @@ import com.avaje.ebean.config.dbplatform.PostgresPlatform;
 import com.avaje.ebean.config.dbplatform.SQLitePlatform;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.migration.Migration;
+import com.avaje.ebean.dbmigration.migrationreader.MigrationXmlWriter;
 import com.avaje.ebean.dbmigration.model.CurrentModel;
 import com.avaje.ebean.dbmigration.model.MConfiguration;
 import com.avaje.ebean.dbmigration.model.MigrationModel;
 import com.avaje.ebean.dbmigration.model.ModelContainer;
-import com.avaje.ebean.dbmigration.model.ModelDdlWriter;
+import com.avaje.ebean.dbmigration.model.PlatformDdlWriter;
 import com.avaje.ebean.dbmigration.model.ModelDiff;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import org.slf4j.Logger;
@@ -28,25 +29,29 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  */
 public class DbMigration {
 
-  private static final Logger logger = LoggerFactory.getLogger(DbMigration.class);
+  protected static final Logger logger = LoggerFactory.getLogger(DbMigration.class);
 
-  private SpiEbeanServer server;
+  protected SpiEbeanServer server;
 
-  private DbMigrationConfig migrationConfig;
+  protected DbMigrationConfig migrationConfig;
 
-  private String pathToResources = "src/main/resources";
+  protected String pathToResources = "src/main/resources";
 
-  private DatabasePlatform databasePlatform;
+  protected DatabasePlatform databasePlatform;
 
-  private ServerConfig serverConfig;
+  protected List<Pair> platforms = new ArrayList<Pair>();
 
-  private DbConstraintNaming constraintNaming;
+  protected ServerConfig serverConfig;
+
+  protected DbConstraintNaming constraintNaming;
 
   public DbMigration() {
     DbOffline.asH2();
@@ -82,6 +87,16 @@ public class DbMigration {
     DbOffline.setPlatform(databasePlatform.getName());
   }
 
+  /**
+   * Add an additional platform to write the migration DDL.
+   */
+  public void addPlatform(DbPlatformName platform, String prefix) {
+    if (!prefix.endsWith("-")) {
+      prefix+="-";
+    }
+    platforms.add(new Pair(getPlatform(platform), prefix));
+  }
+
 
   public void runMigration() throws IOException {
 
@@ -102,34 +117,57 @@ public class DbMigration {
 
       ModelDiff diff = new ModelDiff(migrated);
       diff.compareTo(current);
+
+      if (diff.isEmpty()) {
+        logger.info("no changes detected - no migration written");
+        return;
+      }
+
+      // there were actually changes to write
       Migration dbMigration = diff.getMigration();
 
-      // writer needs the current model to provide table/column details for
-      // history ddl generation (triggers, history tables etc)
-      DdlWrite write = new DdlWrite(new MConfiguration(), currentModel.read());
+      File writePath = getWritePath();
+      logger.info("migration writing version {} to {}", nextMajorVersion, writePath.getAbsolutePath());
+      writeMigrationXml(dbMigration, writePath, nextMajorVersion);
 
-      ModelDdlWriter writer = new ModelDdlWriter(databasePlatform, serverConfig);
-      if (!writer.processMigration(dbMigration, write)) {
-        logger.info("no changes detected - no migration written");
-
-      } else {
-        // there were actually changes to write
-        File writePath = getWritePath();
-        logger.info("migration writing version {} to {}", nextMajorVersion, writePath.getAbsolutePath());
-        writer.writeMigration(writePath, nextMajorVersion);
+      if (databasePlatform != null) {
+        // writer needs the current model to provide table/column details for
+        // history ddl generation (triggers, history tables etc)
+        DdlWrite write = new DdlWrite(new MConfiguration(), currentModel.read());
+        PlatformDdlWriter writer = new PlatformDdlWriter(databasePlatform, serverConfig);
+        writer.processMigration(dbMigration, write, writePath, nextMajorVersion);
       }
+
+      writeExtraPlatformDdl(nextMajorVersion, currentModel, dbMigration, writePath);
 
     } finally {
       DbOffline.reset();
     }
   }
 
+  /**
+   * Write any extra platform ddl.
+   */
+  protected void writeExtraPlatformDdl(int nextMajorVersion, CurrentModel currentModel, Migration dbMigration, File writePath) throws IOException {
+
+    for (Pair pair : platforms) {
+      DdlWrite platformBuffer = new DdlWrite(new MConfiguration(), currentModel.read());
+
+      PlatformDdlWriter platformWriter = new PlatformDdlWriter(pair.platform, serverConfig, pair.prefix);
+      platformWriter.processMigration(dbMigration, platformBuffer, writePath, nextMajorVersion);
+    }
+  }
+
+  protected void writeMigrationXml(Migration dbMigration, File resourcePath, int migrationVersion) {
+    File file = new File(resourcePath, "v"+migrationVersion+".0.xml");
+
+    MigrationXmlWriter xmlWriter = new MigrationXmlWriter();
+    xmlWriter.write(dbMigration, file);
+  }
+
   protected void setDefaults() {
     if (server == null) {
       setServer(Ebean.getDefaultServer());
-    }
-    if (databasePlatform == null) {
-      databasePlatform = server.getDatabasePlatform();
     }
   }
 
@@ -169,6 +207,28 @@ public class DbMigration {
 
       default:
         throw new IllegalArgumentException("Platform missing? " + platform);
+    }
+  }
+
+  /**
+   * Holds a platform and prefix. Used to generate multiple platform specific DDL
+   * for a single migration.
+   */
+  public static class Pair {
+
+    /**
+     * The platform to generate the DDL for.
+     */
+    public final DatabasePlatform platform;
+
+    /**
+     * A prefix included into the file/resource names indicating the platform.
+     */
+    public final String prefix;
+
+    public Pair(DatabasePlatform platform, String prefix) {
+      this.platform = platform;
+      this.prefix = prefix;
     }
   }
 

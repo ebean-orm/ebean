@@ -81,17 +81,18 @@ public class DdlWrite {
   }
 
   /**
-   * Return true the drop buffer is empty.
+   * Return true if the apply rollback buffers are all empty.
    */
-  public boolean isDropEmpty() {
-    return drop.getBuffer().isEmpty();
+  public boolean isApplyRollbackEmpty() {
+    return rollback.getBuffer().isEmpty()
+        && rollbackForeignKeys.getBuffer().isEmpty();
   }
 
   /**
-   * Return true the drop history buffer is empty.
+   * Return true the drop buffers are empty.
    */
-  public boolean isDropHistoryEmpty() {
-    return dropHistory.getBuffer().isEmpty();
+  public boolean isDropEmpty() {
+    return drop.getBuffer().isEmpty() && dropHistory.getBuffer().isEmpty();
   }
 
   /**
