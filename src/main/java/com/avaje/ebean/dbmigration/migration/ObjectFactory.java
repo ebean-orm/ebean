@@ -134,6 +134,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link CreateIndex }
+     * 
+     */
+    public CreateIndex createCreateIndex() {
+        return new CreateIndex();
+    }
+
+    /**
      * Create an instance of {@link ChangeSet }
      * 
      */
@@ -171,6 +179,14 @@ public class ObjectFactory {
      */
     public RenameColumn createRenameColumn() {
         return new RenameColumn();
+    }
+
+    /**
+     * Create an instance of {@link DropIndex }
+     * 
+     */
+    public DropIndex createDropIndex() {
+        return new DropIndex();
     }
 
     /**

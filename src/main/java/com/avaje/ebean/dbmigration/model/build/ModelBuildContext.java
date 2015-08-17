@@ -47,6 +47,14 @@ public class ModelBuildContext {
     return maxLength(constraintNaming.foreignKeyIndexName(tableName, column), indexCount);
   }
 
+  public String indexName(String tableName, String column, int indexCount) {
+    return maxLength(constraintNaming.indexName(tableName, column), indexCount);
+  }
+
+  public String indexName(String tableName, String[] columns, int indexCount) {
+    return maxLength(constraintNaming.indexName(tableName, columns), indexCount);
+  }
+
   public String uniqueConstraintName(String tableName, String columnName, int indexCount) {
     return maxLength(constraintNaming.uniqueConstraintName(tableName, columnName), indexCount);
   }
@@ -61,6 +69,10 @@ public class ModelBuildContext {
 
   public void addTable(MTable table) {
     model.addTable(table);
+  }
+
+  public void addIndex(String indexName, String tableName, String columnName) {
+    model.addIndex(indexName, tableName, columnName);
   }
 
   private String maxLength(String constraintName, int indexCount) {

@@ -55,7 +55,9 @@ public class ChangeSet {
         @XmlElement(name = "addColumn", type = AddColumn.class),
         @XmlElement(name = "dropColumn", type = DropColumn.class),
         @XmlElement(name = "alterColumn", type = AlterColumn.class),
-        @XmlElement(name = "renameColumn", type = RenameColumn.class)
+        @XmlElement(name = "renameColumn", type = RenameColumn.class),
+        @XmlElement(name = "createIndex", type = CreateIndex.class),
+        @XmlElement(name = "dropIndex", type = DropIndex.class)
     })
     protected List<Object> changeSetChildren;
     @XmlAttribute(name = "type", required = true)
@@ -96,6 +98,8 @@ public class ChangeSet {
      * {@link DropColumn }
      * {@link AlterColumn }
      * {@link RenameColumn }
+     * {@link CreateIndex }
+     * {@link DropIndex }
      * 
      * 
      */

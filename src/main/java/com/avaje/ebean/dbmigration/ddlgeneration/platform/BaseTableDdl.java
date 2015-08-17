@@ -12,9 +12,11 @@ import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.Column;
+import com.avaje.ebean.dbmigration.migration.CreateIndex;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
 import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
+import com.avaje.ebean.dbmigration.migration.DropIndex;
 import com.avaje.ebean.dbmigration.migration.DropTable;
 import com.avaje.ebean.dbmigration.migration.ForeignKey;
 import com.avaje.ebean.dbmigration.migration.UniqueConstraint;
@@ -453,6 +455,23 @@ public class BaseTableDdl implements TableDdl {
       }
     }
     return pk;
+  }
+
+  @Override
+  public void generate(DdlWrite writer, CreateIndex createIndex) throws IOException {
+
+    String[] cols = toColumnNamesSplit(createIndex.getColumns());
+    writer.apply()
+        .append(platformDdl.createIndex(createIndex.getIndexName(), createIndex.getTableName(), cols))
+        .endOfStatement();
+  }
+
+  @Override
+  public void generate(DdlWrite writer, DropIndex dropIndex) throws IOException {
+
+    writer.apply()
+        .append(platformDdl.dropIndex(dropIndex.getIndexName(), dropIndex.getTableName()))
+        .endOfStatement();
   }
 
   /**

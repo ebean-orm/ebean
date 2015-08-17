@@ -3,8 +3,11 @@ package com.avaje.ebean.dbmigration.model;
 import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
+import com.avaje.ebean.dbmigration.migration.CreateIndex;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
+import com.avaje.ebean.dbmigration.migration.DropIndex;
+import com.avaje.ebean.dbmigration.migration.DropTable;
 import com.avaje.ebean.dbmigration.migration.Migration;
 
 import java.util.LinkedHashMap;
@@ -24,6 +27,11 @@ public class ModelContainer {
    */
   private Map<String, MTable> tables = new LinkedHashMap<String, MTable>();
 
+  /**
+   * All the non unique non foreign key indexes.
+   */
+  private Map<String, MIndex> indexes = new LinkedHashMap<String, MIndex>();
+
   public ModelContainer() {
 
   }
@@ -36,12 +44,25 @@ public class ModelContainer {
   }
 
   /**
+   * Return the map of all the non unique non fk indexes.
+   */
+  public Map<String, MIndex> getIndexes() {
+    return indexes;
+  }
+
+  /**
    * Return the table by name.
    */
   public MTable getTable(String tableName) {
     return tables.get(tableName);
   }
 
+  /**
+   * Return the index by name.
+   */
+  public MIndex getIndex(String indexName) {
+    return indexes.get(indexName);
+  }
 
   /**
    * Apply a migration with associated changeSets to the model.
@@ -63,12 +84,18 @@ public class ModelContainer {
     for (Object change : changeSetChildren) {
       if (change instanceof CreateTable) {
         applyChange((CreateTable) change);
+      } else if (change instanceof DropTable) {
+        applyChange((DropTable) change);
       } else if (change instanceof AlterColumn) {
         applyChange((AlterColumn) change);
       } else if (change instanceof AddColumn) {
         applyChange((AddColumn) change);
       } else if (change instanceof DropColumn) {
         applyChange((DropColumn) change);
+      } else if (change instanceof CreateIndex) {
+        applyChange((CreateIndex) change);
+      } else if (change instanceof DropIndex) {
+        applyChange((DropIndex) change);
       }
     }
   }
@@ -84,6 +111,41 @@ public class ModelContainer {
     MTable table = new MTable(createTable);
     tables.put(tableName, table);
   }
+
+  /**
+   * Apply a DropTable change to the model.
+   */
+  protected void applyChange(DropTable dropTable) {
+    String tableName = dropTable.getName();
+    if (!tables.containsKey(tableName)) {
+      throw new IllegalStateException("Table [" + tableName + "] does not exists in model?");
+    }
+    tables.remove(tableName);
+  }
+
+  /**
+   * Apply a CreateTable change to the model.
+   */
+  protected void applyChange(CreateIndex createIndex) {
+    String indexName = createIndex.getIndexName();
+    if (indexes.containsKey(indexName)) {
+      throw new IllegalStateException("Index [" + indexName + "] already exists in model?");
+    }
+    MIndex index = new MIndex(createIndex);
+    indexes.put(createIndex.getIndexName(), index);
+  }
+
+  /**
+   * Apply a DropTable change to the model.
+   */
+  protected void applyChange(DropIndex dropIndex) {
+    String name = dropIndex.getIndexName();
+    if (!indexes.containsKey(name)) {
+      throw new IllegalStateException("Index [" + name + "] does not exist in model?");
+    }
+    indexes.remove(name);
+  }
+
 
   /**
    * Apply a AddColumn change to the model.
@@ -123,5 +185,13 @@ public class ModelContainer {
    */
   public void addTable(MTable table) {
     tables.put(table.getName(), table);
+  }
+
+  /**
+   * Add a single column index.
+   */
+  public void addIndex(String indexName, String tableName, String columnName) {
+
+    indexes.put(indexName, new MIndex(indexName, tableName, columnName));
   }
 }

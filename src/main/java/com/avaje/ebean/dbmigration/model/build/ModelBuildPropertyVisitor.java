@@ -199,14 +199,14 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
     MColumn col = new MColumn(p.getDbColumn(), ctx.getColumnDefn(p));
 
-		if (p.isId()){
+    if (p.isId()) {
       col.setPrimaryKey(true);
       if (p.getBeanDescriptor().isUseIdGenerator()) {
         col.setIdentity(true);
       }
-		} else if (!p.isNullable() || p.isDDLNotNull()) {
+    } else if (!p.isNullable() || p.isDDLNotNull()) {
       col.setNotnull(true);
-		}
+    }
 
     if (p.isUnique() && !p.isId()) {
       col.setUnique(determineUniqueConstraintName(col.getName()));
@@ -216,6 +216,15 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     if (checkConstraint != null) {
       col.setCheckConstraint(checkConstraint);
       col.setCheckConstraintName(determineCheckConstraintName(col.getName()));
+    }
+
+    String indexName = p.getIndexName();
+    if (indexName != null) {
+      // single column non-unique index
+      if (indexName.trim().isEmpty()) {
+        indexName = determineIndexName(col.getName());
+      }
+      ctx.addIndex(indexName, table.getName(), p.getDbColumn());
     }
 
     lastColumn = col;
@@ -263,6 +272,22 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   protected String determineForeignKeyIndexName(String[] columns) {
 
     return ctx.foreignKeyIndexName(table.getName(), columns, ++countIndex);
+  }
+
+  /**
+   * Return the index name given a single column foreign key.
+   */
+  protected String determineIndexName(String column) {
+
+    return ctx.indexName(table.getName(), column, ++countIndex);
+  }
+
+  /**
+   * Return the index name given multiple columns.
+   */
+  protected String determineIndexName(String[] columns) {
+
+    return ctx.indexName(table.getName(), columns, ++countIndex);
   }
 
   /**

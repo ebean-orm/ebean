@@ -5,12 +5,15 @@ import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
 import com.avaje.ebean.dbmigration.migration.ChangeSetType;
+import com.avaje.ebean.dbmigration.migration.CreateIndex;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
 import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
+import com.avaje.ebean.dbmigration.migration.DropIndex;
 import com.avaje.ebean.dbmigration.migration.Migration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Used to prepare a diff in terms of changes required to migrate from
@@ -114,7 +117,8 @@ public class ModelDiff {
    */
   public void compareTo(ModelContainer newModel) {
 
-    for (MTable newTable : newModel.getTables().values()) {
+    Map<String, MTable> newTables = newModel.getTables();
+    for (MTable newTable : newTables.values()) {
 
       MTable currentTable = baseModel.getTable(newTable.getName());
       if (currentTable == null) {
@@ -124,15 +128,40 @@ public class ModelDiff {
       }
     }
 
-    //TODO: other parts of the model? views, indexes etc
+    // search for tables that are no longer used
+    for (MTable existingTable : baseModel.getTables().values()) {
+      if (!newTables.containsKey(existingTable.getName())) {
+        addDropTable(existingTable);
+      }
+    }
+
+    Map<String, MIndex> newIndexes = newModel.getIndexes();
+    for (MIndex newIndex : newIndexes.values()) {
+      MIndex currentIndex = baseModel.getIndex(newIndex.getIndexName());
+      if (currentIndex == null) {
+        addCreateIndex(newIndex.createIndex());
+      } else {
+        compareIndexes(currentIndex, newIndex);
+      }
+    }
+
+    // search for indexes that are no longer used
+    for (MIndex existingIndex : baseModel.getIndexes().values()) {
+      if (!newIndexes.containsKey(existingIndex.getIndexName())) {
+        addDropIndex(existingIndex.dropIndex());
+      }
+    }
 
   }
 
+  protected void addDropTable(MTable existingTable) {
+    dropChanges.add(existingTable.dropTable());
+  }
+
   /**
-   * Add CreateTable to the 'creation' changes.
+   * Add CreateTable to the 'apply' changes.
    */
   protected void addNewTable(MTable newTable) {
-
     createChanges.add(newTable.createTable());
   }
 
@@ -142,6 +171,14 @@ public class ModelDiff {
   protected void compareTables(MTable currentTable, MTable newTable) {
 
     currentTable.compare(this, newTable);
+  }
+
+  /**
+   * Compare tables looking for add/drop/modify columns etc.
+   */
+  protected void compareIndexes(MIndex currentIndex, MIndex newIndex) {
+
+    currentIndex.compare(this, newIndex);
   }
 
   /**
@@ -179,4 +216,17 @@ public class ModelDiff {
     dropHistoryChanges.add(dropHistoryTable);
   }
 
+  /**
+   * Add the DropIndex to the 'apply' changes.
+   */
+  public void addDropIndex(DropIndex dropIndex) {
+    createChanges.add(dropIndex);
+  }
+
+  /**
+   * Add the CreateIndex to the 'apply' changes.
+   */
+  public void addCreateIndex(CreateIndex createIndex) {
+    createChanges.add(createIndex);
+  }
 }

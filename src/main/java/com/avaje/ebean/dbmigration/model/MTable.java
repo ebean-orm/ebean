@@ -7,6 +7,7 @@ import com.avaje.ebean.dbmigration.migration.Column;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
 import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
+import com.avaje.ebean.dbmigration.migration.DropTable;
 import com.avaje.ebean.dbmigration.migration.IdentityType;
 
 import java.math.BigInteger;
@@ -133,6 +134,15 @@ public class MTable {
   }
 
   /**
+   * Return the DropTable migration for this table.
+   */
+  public DropTable dropTable() {
+    DropTable dropTable = new DropTable();
+    dropTable.setName(name);
+    return dropTable;
+  }
+
+  /**
    * Return the CreateTable migration for this table.
    */
   public CreateTable createTable() {
@@ -176,13 +186,9 @@ public class MTable {
       } else {
         AddHistoryTable addHistoryTable = new AddHistoryTable();
         addHistoryTable.setBaseTable(name);
-        //addHistoryTable.setWhenCreatedColumn();
         modelDiff.addAddHistoryTable(addHistoryTable);
       }
     }
-
-    // TODO: compare indexes?
-    // TODO: compare primary key
 
     addColumn = null;
 
