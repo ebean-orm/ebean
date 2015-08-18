@@ -21,6 +21,7 @@ public class Oracle10Platform extends DatabasePlatform {
     this.dbEncrypt = new Oracle10DbEncrypt();
     this.sqlLimiter = new RownumSqlLimiter();
     this.platformDdl = new Oracle10Ddl(this.dbTypeMap, this.dbIdentity);
+    this.historySupport = new OracleDbHistorySupport();
 
     // Not using getGeneratedKeys as instead we will
     // batch load sequences which enables JDBC batch execution

@@ -30,22 +30,42 @@ public class CQueryHistorySupport {
     this.sysPeriod = sysPeriod;
   }
 
+  /**
+   * Return true if the bind of 'as of' timestamp occurs with the from clause
+   * rather than at the end.
+   */
+  public boolean isBindAtFromClause() {
+    return dbHistorySupport.isBindWithFromClause();
+  }
+
+  /**
+   * Return the 'as of' history view for the given base table.
+   */
   public String getAsOfView(String table) {
     return asOfTableMap.get(table);
   }
 
+  /**
+   * Return the lower bound column.
+   */
   public String getSysPeriodLower(String tableAlias) {
-
     return dbHistorySupport.getSysPeriodLower(tableAlias, sysPeriod);
   }
 
+  /**
+   * Return the upper bound column.
+   */
   public String getSysPeriodUpper(String tableAlias) {
-
     return dbHistorySupport.getSysPeriodUpper(tableAlias, sysPeriod);
   }
 
+  /**
+   * Return the predicate appended to the end of the query.
+   *
+   * Note used for Oracle total recall etc with the more standard approach.
+   */
   public String getAsOfPredicate(String tableAlias) {
-
     return dbHistorySupport.getAsOfPredicate(tableAlias, sysPeriod);
   }
+
 }

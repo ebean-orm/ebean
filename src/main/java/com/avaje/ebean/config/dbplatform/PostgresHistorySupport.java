@@ -3,10 +3,10 @@ package com.avaje.ebean.config.dbplatform;
 /**
  * Postgres support for history features.
  */
-public class PostgresHistorySupport implements DbHistorySupport {
+public class PostgresHistorySupport extends DbViewHistorySupport {
 
   /**
-   * Return 1 as we are using the range type and hence don't need 2 bind variables.
+   * Return 1 as we are using the postgres range type and hence don't need 2 bind variables.
    */
   @Override
   public int getBindCount() {
@@ -24,19 +24,16 @@ public class PostgresHistorySupport implements DbHistorySupport {
 
     // for Postgres we are using the 'timestamp with timezone range' data type
     // as our sys_period column so hence the predicate below
-    //noinspection StringBufferReplaceableByString
-    StringBuilder sb = new StringBuilder(40);
-    sb.append(asOfTableAlias).append(".").append(asOfSysPeriod).append(" @> ?::timestamptz");
-    return sb.toString();
+    return asOfTableAlias + "." + asOfSysPeriod + " @> ?::timestamptz";
   }
 
   @Override
   public String getSysPeriodLower(String tableAlias, String sysPeriod) {
-    return "lower("+tableAlias+"."+sysPeriod+")";
+    return "lower(" + tableAlias + "." + sysPeriod + ")";
   }
 
   @Override
   public String getSysPeriodUpper(String tableAlias, String sysPeriod) {
-    return "upper("+tableAlias+"."+sysPeriod+")";
+    return "upper(" + tableAlias + "." + sysPeriod + ")";
   }
 }

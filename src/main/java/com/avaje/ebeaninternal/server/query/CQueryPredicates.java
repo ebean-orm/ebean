@@ -131,6 +131,18 @@ public class CQueryPredicates {
 
     StringBuilder bindLog = new StringBuilder();
 
+    List<String> historyTableAlias = query.getAsOfTableAlias();
+    if (historyTableAlias != null && binder.isBindAsOfWithFromClause()) {
+      // bind the asOf value for each table alias as part of the from/join clauses
+      // there is one effective date predicate per table alias
+      Timestamp asOf = query.getAsOf();
+      bindLog.append("asOf ").append(asOf);
+      for (int i = 0; i < historyTableAlias.size() * binder.getAsOfBindCount(); i++) {
+        binder.bindObject(dataBind, asOf);
+      }
+      bindLog.append(", ");
+    }
+
     if (idValue != null) {
       // this is a find by id type query...
       request.getBeanDescriptor().bindId(dataBind, idValue);
@@ -143,7 +155,6 @@ public class CQueryPredicates {
     }
 
     if (whereExprBindValues != null) {
-
       for (int i = 0; i < whereExprBindValues.size(); i++) {
         Object bindValue = whereExprBindValues.get(i);
         bindValue = binder.bindObject(dataBind, bindValue);
@@ -155,7 +166,6 @@ public class CQueryPredicates {
     }
 
     if (filterManyExprBindValues != null) {
-
       for (int i = 0; i < filterManyExprBindValues.size(); i++) {
         Object bindValue = filterManyExprBindValues.get(i);
         bindValue = binder.bindObject(dataBind, bindValue);
@@ -166,9 +176,8 @@ public class CQueryPredicates {
       }
     }
 
-    List<String> historyTableAlias = query.getAsOfTableAlias();
-    if (historyTableAlias != null) {
-      // bind the asAt value for each table alias
+    if (historyTableAlias != null && !binder.isBindAsOfWithFromClause()) {
+      // bind the asOf value for each table alias after all the normal predicates
       // there is one effective date predicate per table alias
       Timestamp asOf = query.getAsOf();
       bindLog.append(" asOf ").append(asOf);

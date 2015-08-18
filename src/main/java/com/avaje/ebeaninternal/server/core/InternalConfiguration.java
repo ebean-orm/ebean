@@ -122,7 +122,7 @@ public class InternalConfiguration {
 
     DatabasePlatform databasePlatform = serverConfig.getDatabasePlatform();
 
-    this.binder = new Binder(typeManager, getAsOfBindCount(databasePlatform));
+    this.binder = getBinder(typeManager, databasePlatform);
     this.cQueryEngine = new CQueryEngine(databasePlatform, binder, asOfTableMapping, serverConfig.getAsOfSysPeriod());
 
     ExternalTransactionManager externalTransactionManager = serverConfig.getExternalTransactionManager();
@@ -142,9 +142,12 @@ public class InternalConfiguration {
   /**
    * For 'As Of' queries return the number of bind variables per predicate.
    */
-  private int getAsOfBindCount(DatabasePlatform databasePlatform) {
+  private Binder getBinder(TypeManager typeManager, DatabasePlatform databasePlatform) {
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
-    return historySupport == null ? 0 : historySupport.getBindCount();
+    if (historySupport == null) {
+      return new Binder(typeManager, 0, false);
+    }
+    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isBindWithFromClause());
   }
 
   /**

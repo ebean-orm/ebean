@@ -403,9 +403,10 @@ public class CQueryBuilder {
     }
 
     List<String> asOfTableAlias = query.getAsOfTableAlias();
-    if (asOfTableAlias != null) {
+    if (asOfTableAlias != null && !historySupport.isBindAtFromClause()) {
       // append the effective date predicates for each table alias
       // that maps to a @History entity involved in this query
+      // Do this when history using separate tables/views (PG, MySql etc)
       if (!hasWhere) {
         sb.append(" where ");
       } else {

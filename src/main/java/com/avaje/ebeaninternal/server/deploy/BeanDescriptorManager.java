@@ -12,6 +12,7 @@ import com.avaje.ebean.config.EncryptKeyManager;
 import com.avaje.ebean.config.NamingConvention;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebean.config.dbplatform.DbHistorySupport;
 import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
@@ -174,7 +175,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm());
     this.eagerFetchLobs = serverConfig.isEagerFetchLobs();
 
-    this.asOfViewSuffix = serverConfig.getAsOfViewSuffix();
+    this.asOfViewSuffix = getAsOfViewSuffix(databasePlatform, serverConfig);
     this.readAnnotations = new ReadAnnotations(config.getGeneratedPropertyFactory(), asOfViewSuffix);
     this.bootupClasses = config.getBootupClasses();
     this.createProperties = config.getDeployCreateProperties();
@@ -197,6 +198,17 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     this.reflectFactory = createReflectionFactory();
     this.transientProperties = new TransientProperties();
+  }
+
+  /**
+   * Return the AsOfViewSuffix allowing the DbHistorySupport to override the value in
+   * the case where there is no view (Oracle, DB2, MS SQL Server).
+   */
+  private String getAsOfViewSuffix(DatabasePlatform databasePlatform, ServerConfig serverConfig) {
+
+    DbHistorySupport historySupport = databasePlatform.getHistorySupport();
+    // with historySupport returns a simple view suffix or the sql2011 as of timestamp suffix
+    return (historySupport == null ) ? serverConfig.getAsOfViewSuffix() : historySupport.getAsOfViewSuffix(serverConfig.getAsOfViewSuffix());
   }
 
   public BeanDescriptor<?> getBeanDescriptorById(String descriptorId) {

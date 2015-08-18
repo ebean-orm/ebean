@@ -28,12 +28,15 @@ public class Binder {
 
   private final int asOfBindCount;
 
+  private final boolean bindAsOfWithFromClause;
+
   /**
    * Set the PreparedStatement with which to bind variables to.
    */
-  public Binder(TypeManager typeManager, int asOfBindCount) {
+  public Binder(TypeManager typeManager, int asOfBindCount, boolean bindAsOfWithFromClause) {
     this.typeManager = typeManager;
     this.asOfBindCount = asOfBindCount;
+    this.bindAsOfWithFromClause = bindAsOfWithFromClause;
   }
 
   /**
@@ -41,6 +44,15 @@ public class Binder {
    */
   public int getAsOfBindCount() {
     return asOfBindCount;
+  }
+
+  /**
+   * Return true if the 'as of' predicates are in the from/join clause in which case the timestamp is
+   * bound early (before all the other predicates ala Oracle). Return false if the 'as of' predicates are
+   * appended to the end of the predicates and the timestamp is bound last (Postgres, MySql).
+   */
+  public boolean isBindAsOfWithFromClause() {
+    return bindAsOfWithFromClause;
   }
 
   /**
