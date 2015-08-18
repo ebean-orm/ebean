@@ -72,11 +72,8 @@ public class DatabasePlatformFactory {
     if (dbName.equals("postgres8") || dbName.equals("postgres83")) {
       return new Postgres8Platform();
     }
-    if (dbName.equals("oracle9")) {
-      return new Oracle9Platform();
-    }
-    if (dbName.equals("oracle") || dbName.equals("oracle10")) {
-      return new Oracle10Platform();
+    if (dbName.equals("oracle") || dbName.equals("oracle10") || dbName.equals("oracle9")) {
+      return new OraclePlatform();
     }
     if (dbName.equals("sqlserver")) {
       return new MsSqlServer2005Platform();
@@ -137,11 +134,7 @@ public class DatabasePlatformFactory {
     int majorVersion = metaData.getDatabaseMajorVersion();
 
     if (dbProductName.contains("oracle")) {
-      if (majorVersion > 9) {
-        return new Oracle10Platform();
-      } else {
-        return new Oracle9Platform();
-      }
+      return new OraclePlatform();
     }
     else if (dbProductName.contains("microsoft")) {
       if (majorVersion > 8) {

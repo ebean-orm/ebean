@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class OraclePlatformTest {
 
-  Oracle10Platform platform = new Oracle10Platform();
+  OraclePlatform platform = new OraclePlatform();
 
   @Test
   public void testTypeConversion() {

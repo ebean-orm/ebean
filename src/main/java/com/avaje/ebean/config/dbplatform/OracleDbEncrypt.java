@@ -43,12 +43,12 @@ package com.avaje.ebean.config.dbplatform;
  * 
  * @author rbygrave
  */
-public class Oracle10DbEncrypt extends AbstractDbEncrypt {
+public class OracleDbEncrypt extends AbstractDbEncrypt {
 
   /**
    * Constructs the Oracle10DbEncrypt with default encrypt and decrypt stored procedures.
    */
-  public Oracle10DbEncrypt() {
+  public OracleDbEncrypt() {
     this("eb_encrypt", "eb_decrypt");
   }
 
@@ -58,7 +58,7 @@ public class Oracle10DbEncrypt extends AbstractDbEncrypt {
    * @param encryptFunction the encrypt stored procedure
    * @param decryptFunction the decrypt stored procedure
    */
-  public Oracle10DbEncrypt(String encryptFunction, String decryptFunction) {
+  public OracleDbEncrypt(String encryptFunction, String decryptFunction) {
 
     this.varcharEncryptFunction = new OraVarcharFunction(encryptFunction, decryptFunction);
     this.dateEncryptFunction = new OraDateFunction(encryptFunction, decryptFunction);

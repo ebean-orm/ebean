@@ -9,16 +9,16 @@ import java.sql.Types;
 /**
  * Oracle10 and greater specific platform.
  */
-public class Oracle10Platform extends DatabasePlatform {
+public class OraclePlatform extends DatabasePlatform {
 
-  public Oracle10Platform() {
+  public OraclePlatform() {
     super();
     this.name = "oracle";
     this.maxTableNameLength = 30;
     this.maxConstraintNameLength = 30;
     // OnQueryOnly.CLOSE as a performance optimisation on Oracle
     this.onQueryOnly = OnQueryOnly.CLOSE;
-    this.dbEncrypt = new Oracle10DbEncrypt();
+    this.dbEncrypt = new OracleDbEncrypt();
     this.sqlLimiter = new RownumSqlLimiter();
     this.platformDdl = new Oracle10Ddl(this.dbTypeMap, this.dbIdentity);
     this.historySupport = new OracleDbHistorySupport();
