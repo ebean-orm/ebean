@@ -21,6 +21,8 @@ public class ReadAnnotations {
    */
   private final String asOfViewSuffix;
 
+  private final String versionsBetweenSuffix;
+
   /**
    * True if the javax validation annotations are present in the classpath.
    */
@@ -31,9 +33,10 @@ public class ReadAnnotations {
    */
   private final boolean jacksonAnnotations;
 
-  public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix) {
+  public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix) {
     this.generatedPropFactory = generatedPropFactory;
     this.asOfViewSuffix = asOfViewSuffix;
+    this.versionsBetweenSuffix = versionsBetweenSuffix;
     this.javaxValidationAnnotations = ClassUtil.isJavaxValidationAnnotationsPresent();
     this.jacksonAnnotations = ClassUtil.isJacksonAnnotationsPresent();
   }
@@ -48,12 +51,11 @@ public class ReadAnnotations {
   public void readInitial(DeployBeanInfo<?> info, boolean eagerFetchLobs) {
 
     try {
-      new AnnotationClass(info, javaxValidationAnnotations, asOfViewSuffix).parse();
+      new AnnotationClass(info, javaxValidationAnnotations, asOfViewSuffix, versionsBetweenSuffix).parse();
       new AnnotationFields(generatedPropFactory, info, javaxValidationAnnotations, jacksonAnnotations, eagerFetchLobs).parse();
 
     } catch (RuntimeException e) {
-      String msg = "Error reading annotations for " + info;
-      throw new RuntimeException(msg, e);
+      throw new RuntimeException("Error reading annotations for " + info, e);
     }
   }
 

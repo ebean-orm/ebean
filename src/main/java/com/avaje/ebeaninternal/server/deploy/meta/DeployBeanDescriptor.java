@@ -115,6 +115,8 @@ public class DeployBeanDescriptor<T> {
 
   private String baseTableAsOf;
 
+  private String baseTableVersionsBetween;
+
   private boolean historySupport;
 
   private TableName baseTableFull;
@@ -464,8 +466,18 @@ public class DeployBeanDescriptor<T> {
     return baseTable;
   }
 
+  /**
+   * Return the base table with as of suffix.
+   */
   public String getBaseTableAsOf() {
     return baseTableAsOf;
+  }
+
+  /**
+   * Return the base table with versions between suffix.
+   */
+  public String getBaseTableVersionsBetween() {
+    return baseTableVersionsBetween;
   }
 
   /**
@@ -478,10 +490,11 @@ public class DeployBeanDescriptor<T> {
   /**
    * Set the base table. Only properties mapped to the base table are by default persisted.
    */
-  public void setBaseTable(TableName baseTableFull, String asOfSuffix) {
+  public void setBaseTable(TableName baseTableFull, String asOfSuffix, String versionsBetweenSuffix) {
     this.baseTableFull = baseTableFull;
     this.baseTable = baseTableFull == null ? null : baseTableFull.getQualifiedName();
     this.baseTableAsOf = baseTable + asOfSuffix;
+    this.baseTableVersionsBetween = baseTable + versionsBetweenSuffix;
   }
 
   public void sortProperties() {

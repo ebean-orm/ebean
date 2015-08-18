@@ -29,9 +29,12 @@ public class AnnotationClass extends AnnotationParser {
 
   private final String asOfViewSuffix;
 
-  public AnnotationClass(DeployBeanInfo<?> info, boolean validationAnnotations, String asOfViewSuffix) {
+  private final String versionsBetweenSuffix;
+
+  public AnnotationClass(DeployBeanInfo<?> info, boolean validationAnnotations, String asOfViewSuffix, String versionsBetweenSuffix) {
     super(info, validationAnnotations);
     this.asOfViewSuffix = asOfViewSuffix;
+    this.versionsBetweenSuffix = versionsBetweenSuffix;
   }
 
   /**
@@ -52,7 +55,7 @@ public class AnnotationClass extends AnnotationParser {
       // default the TableName using NamingConvention.
       TableName tableName = namingConvention.getTableName(descriptor.getBeanType());
 
-      descriptor.setBaseTable(tableName, asOfViewSuffix);
+      descriptor.setBaseTable(tableName, asOfViewSuffix, versionsBetweenSuffix);
     }
   }
 

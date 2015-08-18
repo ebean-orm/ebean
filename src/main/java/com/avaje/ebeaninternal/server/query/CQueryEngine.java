@@ -173,6 +173,12 @@ public class CQueryEngine {
 
     SpiQuery<T> query = request.getQuery();
 
+    if (query.isVersionsBetween() && !historySupport.isBindAtFromClause()) {
+      // just add as normal predicates using the lower bound
+      query.where().gt(getSysPeriodLower(query), query.getVersionStart());
+      query.where().lt(getSysPeriodLower(query), query.getVersionEnd());
+    }
+
     // order by id asc, lower sys period desc
     query.orderBy().asc(request.getBeanDescriptor().getIdProperty().getName());
     query.orderBy().desc(getSysPeriodLower(query));
@@ -207,14 +213,18 @@ public class CQueryEngine {
 
     BeanDescriptor<T> descriptor = request.getBeanDescriptor();
 
-    Version<T> current = versions.get(0);
-    for (int i = 1; i < versions.size(); i++) {
-      Version<T> next = versions.get(i);
-      deriveVersionDiff(current, next, descriptor);
-      current = next;
+    if (!versions.isEmpty()) {
+      Version<T> current = versions.get(0);
+      if (versions.size() > 1) {
+        for (int i = 1; i < versions.size(); i++) {
+          Version<T> next = versions.get(i);
+          deriveVersionDiff(current, next, descriptor);
+          current = next;
+        }
+      }
+      // put an empty map into the last one
+      current.setDiff(new LinkedHashMap<String, ValuePair>());
     }
-    // put an empty map into the last one
-    current.setDiff(new LinkedHashMap<String, ValuePair>());
   }
 
   private <T> void deriveVersionDiff(Version<T> current, Version<T> prior, BeanDescriptor<T> descriptor) {

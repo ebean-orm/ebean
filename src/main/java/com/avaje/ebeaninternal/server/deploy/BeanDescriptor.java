@@ -133,6 +133,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   private final String baseTable;
   private final String baseTableAsOf;
+  private final String baseTableVersionsBetween;
   private final boolean historySupport;
 
   /**
@@ -354,6 +355,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.historySupport = deploy.isHistorySupport();
     this.baseTable = InternString.intern(deploy.getBaseTable());
     this.baseTableAsOf = deploy.getBaseTableAsOf();
+    this.baseTableVersionsBetween = deploy.getBaseTableVersionsBetween();
     this.autoFetchTunable = EntityType.ORM.equals(entityType) && (beanFinder == null);
 
     // helper object used to derive lists of properties
@@ -1686,7 +1688,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    */
   public String getBaseTable(SpiQuery.TemporalMode mode) {
     switch (mode) {
-      case VERSIONS: return baseTableAsOf;
+      case VERSIONS: return baseTableVersionsBetween;
       case AS_OF: return baseTableAsOf;
         default: return baseTable;
     }

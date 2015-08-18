@@ -32,6 +32,11 @@ public interface DbHistorySupport {
   String getAsOfViewSuffix(String asOfViewSuffix);
 
   /**
+   * Return the 'versions between timestamp' suffix.
+   */
+  String getVersionsBetweenSuffix(String asOfViewSuffix);
+
+  /**
    * Return the 'as of' predicate added for the given table alias.
    *
    * @param tableAlias The table alias this predicate is added for

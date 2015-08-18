@@ -723,11 +723,25 @@ public interface Query<T> extends Serializable {
   /**
    * Return versions of a @History entity bean.
    * <p>
+   *   Note that this query will work against view based history implementations
+   *   but not sql2011 standards based implementations that require a start and
+   *   end timestamp to be specified.
+   * </p>
+   * <p>
    *   Generally this query is expected to be a find by id or unique predicates query.
    *   It will execute the query against the history returning the versions of the bean.
    * </p>
    */
   List<Version<T>> findVersions();
+
+  /**
+   * Return versions of a @History entity bean between the 2 timestamps.
+   * <p>
+   *   Generally this query is expected to be a find by id or unique predicates query.
+   *   It will execute the query against the history returning the versions of the bean.
+   * </p>
+   */
+  List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end);
 
   /**
    * Return the count of entities this query should return.

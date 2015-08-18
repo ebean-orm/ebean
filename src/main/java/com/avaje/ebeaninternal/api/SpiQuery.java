@@ -146,6 +146,21 @@ public interface SpiQuery<T> extends Query<T> {
   TemporalMode getTemporalMode();
 
   /**
+   * Return true if this is a find versions between query.
+   */
+  boolean isVersionsBetween();
+
+  /**
+   * Return the find versions start timestamp.
+   */
+  Timestamp getVersionStart();
+
+  /**
+   * Return the find versions end timestamp.
+   */
+  Timestamp getVersionEnd();
+
+  /**
    * Return true if this is a 'As Of' query.
    */
   boolean isAsOfQuery();

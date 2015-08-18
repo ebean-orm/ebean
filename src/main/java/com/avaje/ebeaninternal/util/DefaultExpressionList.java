@@ -119,6 +119,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end) {
+    return query.findVersionsBetween(start, end);
+  }
+
+  @Override
   public ExpressionList<T> where() {
     return query.where();
   }

@@ -170,6 +170,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private TemporalMode temporalMode = TemporalMode.CURRENT;
 
+  private Timestamp versionsStart;
+  private Timestamp versionsEnd;
+
   private int bufferFetchSizeHint;
 
   private boolean usageProfiling = true;
@@ -714,6 +717,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     builder.add(disableLazyLoading);
     builder.add(id != null);
     builder.add(asOf != null);
+    builder.add(versionsStart != null);
     builder.add(rawSql == null ? 0 : rawSql.queryHash());
     builder.add(includeTableJoin != null ? includeTableJoin.queryHash() : 0);
     builder.add(rootTableAlias);
@@ -785,6 +789,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     hc = hc * 31 + (havingExpressions == null ? 0 : havingExpressions.queryBindHash());
     hc = hc * 31 + (bindParams == null ? 0 : bindParams.queryBindHash());
     hc = hc * 31 + (asOf == null ? 0 : asOf.hashCode());
+    hc = hc * 31 + (versionsStart == null ? 0 : versionsStart.hashCode());
+    hc = hc * 31 + (versionsEnd == null ? 0 : versionsEnd.hashCode());
     return hc;
   }
 
@@ -841,6 +847,21 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public boolean hasMaxRowsOrFirstRow() {
     return maxRows > 0 || firstRow > 0;
+  }
+
+  @Override
+  public boolean isVersionsBetween() {
+    return versionsStart != null;
+  }
+
+  @Override
+  public Timestamp getVersionStart() {
+    return versionsStart;
+  }
+
+  @Override
+  public Timestamp getVersionEnd() {
+    return versionsEnd;
   }
 
   public Boolean isReadOnly() {
@@ -954,6 +975,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public List<Version<T>> findVersions() {
     this.temporalMode = TemporalMode.VERSIONS;
+    return server.findVersions(this, null);
+  }
+
+  @Override
+  public List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end) {
+    if (start == null || end == null) {
+      throw new IllegalArgumentException("start and end must not be null");
+    }
+    this.temporalMode = TemporalMode.VERSIONS;
+    this.versionsStart = start;
+    this.versionsEnd = end;
     return server.findVersions(this, null);
   }
 

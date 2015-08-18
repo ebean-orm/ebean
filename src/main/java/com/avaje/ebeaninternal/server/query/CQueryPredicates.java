@@ -131,6 +131,16 @@ public class CQueryPredicates {
 
     StringBuilder bindLog = new StringBuilder();
 
+    if (query.isVersionsBetween() && binder.isBindAsOfWithFromClause()) {
+      // sql2011 based versions between timestamp syntax
+      Timestamp start = query.getVersionStart();
+      Timestamp end = query.getVersionEnd();
+      bindLog.append("between ").append(start).append(" and ").append(end);
+      binder.bindObject(dataBind, start);
+      binder.bindObject(dataBind, end);
+      bindLog.append(", ");
+    }
+
     List<String> historyTableAlias = query.getAsOfTableAlias();
     if (historyTableAlias != null && binder.isBindAsOfWithFromClause()) {
       // bind the asOf value for each table alias as part of the from/join clauses

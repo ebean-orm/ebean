@@ -29,6 +29,17 @@ public abstract class DbViewHistorySupport implements DbHistorySupport {
   }
 
   /**
+   * Returns the configured view suffix (same as getAsOfViewSuffix()).
+   *
+   * @param asOfViewSuffix the configured view suffix (typically "_with_history").
+   */
+  @Override
+  public String getVersionsBetweenSuffix(String asOfViewSuffix) {
+    // just return the configured asOfViewSuffix (using the view for versions between query)
+    return asOfViewSuffix;
+  }
+
+  /**
    * Return 2 if we have effective start and effective end as 2 columns.
    * Note that for postgres we can use a single range type so that returns 1.
    */

@@ -229,6 +229,11 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
+  public List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end) {
+    return exprList.findVersionsBetween(start, end);
+  }
+
+  @Override
   public Query<T> apply(PathProperties pathProperties) {
     return exprList.apply(pathProperties);
   }

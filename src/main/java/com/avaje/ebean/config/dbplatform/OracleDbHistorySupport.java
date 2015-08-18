@@ -13,6 +13,11 @@ public class OracleDbHistorySupport extends DbStandardHistorySupport {
     return " as of TIMESTAMP ?";
   }
 
+  @Override
+  public String getVersionsBetweenSuffix(String asOfViewSuffix) {
+    return " versions between timestamp ? and ?";
+  }
+
   /**
    * Returns the Oracle specific effective start column.
    */

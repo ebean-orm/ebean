@@ -176,7 +176,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.eagerFetchLobs = serverConfig.isEagerFetchLobs();
 
     this.asOfViewSuffix = getAsOfViewSuffix(databasePlatform, serverConfig);
-    this.readAnnotations = new ReadAnnotations(config.getGeneratedPropertyFactory(), asOfViewSuffix);
+    String versionsBetweenSuffix = getVersionsBetweenSuffix(databasePlatform, serverConfig);
+    this.readAnnotations = new ReadAnnotations(config.getGeneratedPropertyFactory(), asOfViewSuffix, versionsBetweenSuffix);
     this.bootupClasses = config.getBootupClasses();
     this.createProperties = config.getDeployCreateProperties();
     this.namingConvention = serverConfig.getNamingConvention();
@@ -201,14 +202,23 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   /**
-   * Return the AsOfViewSuffix allowing the DbHistorySupport to override the value in
-   * the case where there is no view (Oracle, DB2, MS SQL Server).
+   * Return the AsOfViewSuffix based on the DbHistorySupport.
    */
   private String getAsOfViewSuffix(DatabasePlatform databasePlatform, ServerConfig serverConfig) {
 
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     // with historySupport returns a simple view suffix or the sql2011 as of timestamp suffix
     return (historySupport == null ) ? serverConfig.getAsOfViewSuffix() : historySupport.getAsOfViewSuffix(serverConfig.getAsOfViewSuffix());
+  }
+
+  /**
+   * Return the versions between timestamp suffix based on the DbHistorySupport.
+   */
+  private String getVersionsBetweenSuffix(DatabasePlatform databasePlatform, ServerConfig serverConfig) {
+
+    DbHistorySupport historySupport = databasePlatform.getHistorySupport();
+    // with historySupport returns a simple view suffix or the sql2011 versions between timestamp suffix
+    return (historySupport == null ) ? serverConfig.getAsOfViewSuffix() : historySupport.getVersionsBetweenSuffix(serverConfig.getAsOfViewSuffix());
   }
 
   public BeanDescriptor<?> getBeanDescriptorById(String descriptorId) {
@@ -1029,7 +1039,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     if (!EntityType.ORM.equals(desc.getEntityType())) {
       // not using base table
-      desc.setBaseTable(null, null);
+      desc.setBaseTable(null, null, null);
     }
 
     // mark transient properties
