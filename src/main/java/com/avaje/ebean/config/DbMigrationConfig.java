@@ -6,27 +6,26 @@ package com.avaje.ebean.config;
 public class DbMigrationConfig {
 
   /**
-   * The application name which is used as the unique code when applying migrations.
+   * Resource path for the migration xml and sql.
+   * Typically you would change 'app' to be a better/more unique.
    */
-  private String appName;
+  private String resourcePath = "dbmigration/app";
 
   /**
-   * Path where migration
+   * Return the resource path for db migrations.
    */
-  private String resourcePath;
-
-  public String getAppName() {
-    return appName;
-  }
-
-  public void setAppName(String appName) {
-    this.appName = appName;
-  }
-
   public String getResourcePath() {
     return resourcePath;
   }
 
+  /**
+   * Set the resource path for db migrations.
+   * <p>
+   * Typically this would be something like "dbmigration/myapp" where myapp gives it a
+   * unique resource path in the case there are multiple EbeanServer applications in the
+   * single classpath.
+   * </p>
+   */
   public void setResourcePath(String resourcePath) {
     this.resourcePath = resourcePath;
   }
@@ -35,8 +34,6 @@ public class DbMigrationConfig {
    * Load the settings from the PropertiesWrapper.
    */
   public void loadSettings(PropertiesWrapper properties) {
-
-    appName = properties.get("migration.appName", appName);
     resourcePath = properties.get("migration.resourcePath", resourcePath);
   }
 }

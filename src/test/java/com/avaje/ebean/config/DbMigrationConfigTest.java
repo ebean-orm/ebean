@@ -17,7 +17,6 @@ public class DbMigrationConfigTest {
 
     DbMigrationConfig migrationConfig = config.getMigrationConfig();
 
-    assertThat(migrationConfig.getAppName()).isEqualTo("myapp");
     assertThat(migrationConfig.getResourcePath()).isEqualTo("dbmigration/myapp");
   }
 }

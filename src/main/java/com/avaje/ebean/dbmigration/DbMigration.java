@@ -33,7 +33,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Generates DB Migration xml and sql scripts.
+ * <p>
+ * Reads the prior migrations and compares with the current model of the EbeanServer
+ * and generates a migration 'diff' in the form of xml document with the logical schema
+ * changes and a series of sql scripts to apply, rollback the applied changes if necessary
+ * and drop objects (drop tables, drop columns).
+ * </p>
  */
 public class DbMigration {
 
@@ -54,18 +60,29 @@ public class DbMigration {
   protected DbConstraintNaming constraintNaming;
 
   public DbMigration() {
-    DbOffline.asH2();
   }
 
+  /**
+   * Set the path from the current working directory to the application resources.
+   *
+   * This defaults to maven style 'src/main/resources'.
+   */
   public void setPathToResources(String pathToResources) {
     this.pathToResources = pathToResources;
   }
 
+  /**
+   * Set the server to use to determine the current model.
+   * Typically this is not called explicitly.
+   */
   public void setServer(EbeanServer ebeanServer) {
     this.server = (SpiEbeanServer) ebeanServer;
     setServerConfig(server.getServerConfig());
   }
 
+  /**
+   * Set the serverConfig to use. Typically this is not called explicitly.
+   */
   public void setServerConfig(ServerConfig config) {
     if (this.serverConfig == null) {
       this.serverConfig = config;
@@ -78,10 +95,22 @@ public class DbMigration {
     }
   }
 
+  /**
+   * Set the specific platform to generate DDL for.
+   * <p>
+   * If not set this defaults to the platform of the default server.
+   * </p>
+   */
   public void setPlatform(DbPlatformName platform) {
     setPlatform(getPlatform(platform));
   }
 
+  /**
+   * Set the specific platform to generate DDL for.
+   * <p>
+   * If not set this defaults to the platform of the default server.
+   * </p>
+   */
   public void setPlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
     DbOffline.setPlatform(databasePlatform.getName());
@@ -89,15 +118,21 @@ public class DbMigration {
 
   /**
    * Add an additional platform to write the migration DDL.
+   * <p>
+   * Use this when you want to generate sql scripts for multiple database platforms
+   * from the migration (e.g. generate migration sql for MySql, Postgres and Oracle).
+   * </p>
    */
   public void addPlatform(DbPlatformName platform, String prefix) {
     if (!prefix.endsWith("-")) {
-      prefix+="-";
+      prefix += "-";
     }
     platforms.add(new Pair(getPlatform(platform), prefix));
   }
 
-
+  /**
+   * Run the migration generating the next migration xml file and associated apply and rollback sql scripts.
+   */
   public void runMigration() throws IOException {
 
     // use this flag to stop other plugins like full DDL generation
@@ -158,19 +193,34 @@ public class DbMigration {
     }
   }
 
+  /**
+   * Write the migration xml.
+   */
   protected void writeMigrationXml(Migration dbMigration, File resourcePath, int migrationVersion) {
-    File file = new File(resourcePath, "v"+migrationVersion+".0.xml");
 
+    File file = new File(resourcePath, "v"+migrationVersion+".0.xml");
     MigrationXmlWriter xmlWriter = new MigrationXmlWriter();
     xmlWriter.write(dbMigration, file);
   }
 
+  /**
+   * Set default server and platform if necessary.
+   */
   protected void setDefaults() {
     if (server == null) {
       setServer(Ebean.getDefaultServer());
     }
+    if (databasePlatform == null && platforms.isEmpty()) {
+      // not explicitly set not set a list of platforms so
+      // default to the platform of the default server
+      databasePlatform = server.getDatabasePlatform();
+      logger.debug("set platform to {}", databasePlatform.getName());
+    }
   }
 
+  /**
+   * Return the file path to write the xml and sql to.
+   */
   protected File getWritePath() {
 
     // path to src/main/resources in typical maven project
@@ -188,6 +238,9 @@ public class DbMigration {
     return path;
   }
 
+  /**
+   * Return the DatabasePlatform given the platform key.
+   */
   protected DatabasePlatform getPlatform(DbPlatformName platform) {
     switch (platform) {
       case H2:
