@@ -13,6 +13,7 @@ public class Postgres8Platform extends PostgresPlatform {
     this.dbIdentity.setSupportsGetGeneratedKeys(false);
     this.dbIdentity.setIdType(IdType.SEQUENCE);
     this.dbIdentity.setSupportsSequence(true);
+    this.dbIdentity.setSupportsIdentity(true);
     this.columnAliasPrefix = "as c";
   }
 
