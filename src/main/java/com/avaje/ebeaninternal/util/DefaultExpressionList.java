@@ -239,6 +239,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public Query<T> setDistinct(boolean distinct) {
+    return query.setDistinct(distinct);
+  }
+
+  @Override
   public Query<T> setFirstRow(int firstRow) {
     return query.setFirstRow(firstRow);
   }

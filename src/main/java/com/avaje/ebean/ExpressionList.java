@@ -267,6 +267,24 @@ public interface ExpressionList<T> extends Serializable {
   Query<T> select(String properties);
 
   /**
+   * Set whether this query uses DISTINCT.
+   * <p>
+   * The select() clause MUST be specified when setDistinct(true) is set. The reason for this is that
+   * generally ORM queries include the "id" property and this doesn't make sense for distinct queries.
+   * </p>
+   * <pre>{@code
+   *
+   *   List<Customer> customers =
+   *       Ebean.find(Customer.class)
+   *          .setDistinct(true)
+   *          .select("name")     // only select the customer name
+   *          .findList();
+   *
+   * }</pre>
+   */
+  Query<T> setDistinct(boolean distinct);
+
+  /**
    * Set the first row to fetch.
    * 
    * @see Query#setFirstRow(int)

@@ -41,7 +41,22 @@ public class TestQueryDistinct extends BaseTestCase {
       Assert.assertNull(customer.getAnniversary());
     }
   }
-  
+
+  @Test
+  public void test_onWhere() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.find(Customer.class)
+        .setUseCache(false)
+        .where().setDistinct(true)
+        .select("name");
+
+    query.findList();
+
+    String generatedSql = query.getGeneratedSql();
+    Assert.assertTrue(generatedSql.contains("select distinct t0.name c0 from o_customer t0"));
+  }
   
   @Test
   public void testDistinctStatus() {

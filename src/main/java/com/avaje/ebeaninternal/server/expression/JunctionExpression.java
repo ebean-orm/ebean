@@ -489,6 +489,11 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
+  public Query<T> setDistinct(boolean distinct) {
+    return exprList.setDistinct(distinct);
+  }
+
+  @Override
   public com.avaje.ebean.Query<T> setFirstRow(int firstRow) {
     return exprList.setFirstRow(firstRow);
   }
