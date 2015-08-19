@@ -168,9 +168,9 @@ public final class Ebean {
             defaultServer = getWithCreate(defaultName.trim());
           }
         }
-      } catch (RuntimeException e) {
+      } catch (Throwable e) {
         logger.error("Error trying to create the default EbeanServer", e);
-        throw e;
+        throw new RuntimeException(e);
       }
     }
 
