@@ -334,7 +334,7 @@ public class ServerConfig {
   private int queryCacheMaxIdleTime = 600;
   private int queryCacheMaxTimeToLive = 60*60*6;
   private Object objectMapper;
-  private boolean diffFlatMode;
+  private boolean diffFlatMode = true;
 
   /**
    * Set to true if you want eq("someProperty", null) to generate 1=1 rather than "is null" sql expression.
