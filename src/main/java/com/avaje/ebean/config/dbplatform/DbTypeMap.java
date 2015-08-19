@@ -103,6 +103,7 @@ public class DbTypeMap {
 
     if (logicalTypes) {
       // keep it logical for 2 layer DDL generation
+      put(DbType.HSTORE, new DbType("hstore"));
       put(DbType.JSON, new DbType("json"));
       put(DbType.JSONB, new DbType("jsonb"));
       put(DbType.JSONClob, new DbType("jsonclob"));
