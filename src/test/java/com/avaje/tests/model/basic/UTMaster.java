@@ -29,6 +29,13 @@ public class UTMaster extends Model {
   @OneToMany(cascade = CascadeType.ALL)
   List<UTDetail> details;
 
+  public UTMaster() {
+
+  }
+  public UTMaster(String name) {
+    this.name = name;
+  }
+
   public Integer getId() {
     return id;
   }

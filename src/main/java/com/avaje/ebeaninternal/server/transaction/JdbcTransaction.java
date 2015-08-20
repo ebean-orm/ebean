@@ -157,15 +157,23 @@ public class JdbcTransaction implements SpiTransaction {
       this.batchOnCascadeMode = manager == null ? PersistBatch.NONE : manager.getPersistBatchOnCascade();
       this.onQueryOnly = manager == null ? OnQueryOnly.ROLLBACK : manager.getOnQueryOnly();
       this.persistenceContext = new DefaultPersistenceContext();
-      
-      if (connection != null) {
-        this.autoCommit = connection.getAutoCommit();
-        if (this.autoCommit) {
-          connection.setAutoCommit(false);
-        }
-      }
+
+      checkAutoCommit(connection);
+
     } catch (Exception e) {
       throw new PersistenceException(e);
+    }
+  }
+
+  /**
+   * Overridden in AutoCommitJdbcTransaction as that expects to run/operate with autocommit true.
+   */
+  protected void checkAutoCommit(Connection connection) throws SQLException {
+    if (connection != null) {
+      this.autoCommit = connection.getAutoCommit();
+      if (this.autoCommit) {
+        connection.setAutoCommit(false);
+      }
     }
   }
 

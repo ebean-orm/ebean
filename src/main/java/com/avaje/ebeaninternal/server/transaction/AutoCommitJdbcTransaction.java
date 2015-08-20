@@ -15,6 +15,11 @@ public class AutoCommitJdbcTransaction extends JdbcTransaction {
   }
 
   @Override
+  protected void checkAutoCommit(Connection connection) throws SQLException {
+    // do nothing as autoCommit
+  }
+
+  @Override
   protected void performRollback() throws SQLException {
     // do nothing as autoCommit
   }
