@@ -140,11 +140,11 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
     }
 
     if (!set.isEmpty() || ctx.isIncludeEmpty()) {
-      ctx.writeStartArray(name);
+      ctx.beginAssocMany(name);
       for (Object bean : set) {
         targetDescriptor.jsonWrite(ctx, (EntityBean) bean);
       }
-      ctx.writeEndArray();
+      ctx.endAssocMany();
     }
   }
 }

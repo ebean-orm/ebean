@@ -141,11 +141,11 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
     }
 
     if (!list.isEmpty() || ctx.isIncludeEmpty()) {
-      ctx.writeStartArray(name);
+      ctx.beginAssocMany(name);
       for (int j = 0; j < list.size(); j++) {
         targetDescriptor.jsonWrite(ctx, (EntityBean) list.get(j));
       }
-      ctx.writeEndArray();
+      ctx.endAssocMany();
     }
   }
 

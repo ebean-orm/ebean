@@ -3,6 +3,9 @@ package com.avaje.ebean.text.json;
 import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.text.PathProperties;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Provides options for customising the JSON write process.
  * <p>
@@ -17,6 +20,8 @@ public class JsonWriteOptions {
   protected Object objectMapper;
 
   protected JsonConfig.Include include;
+
+  protected Map<String, JsonWriteBeanVisitor<?>> visitorMap;
 
   /**
    * Parse and return a PathProperties from nested string format like
@@ -65,6 +70,31 @@ public class JsonWriteOptions {
    */
   public void setInclude(JsonConfig.Include include) {
     this.include = include;
+  }
+
+  /**
+   * Register a JsonWriteBeanVisitor for the root level.
+   */
+  public JsonWriteOptions setRootPathVisitor(JsonWriteBeanVisitor<?> visitor) {
+    return setPathVisitor(null, visitor);
+  }
+
+  /**
+   * Register a JsonWriteBeanVisitor for the given path.
+   */
+  public JsonWriteOptions setPathVisitor(String path, JsonWriteBeanVisitor<?> visitor) {
+    if (visitorMap == null) {
+      visitorMap = new HashMap<String, JsonWriteBeanVisitor<?>>();
+    }
+    visitorMap.put(path, visitor);
+    return this;
+  }
+
+  /**
+   * Return the Map of registered JsonWriteBeanVisitor's by path.
+   */
+  public Map<String, JsonWriteBeanVisitor<?>> getVisitorMap() {
+    return visitorMap;
   }
 
   /**

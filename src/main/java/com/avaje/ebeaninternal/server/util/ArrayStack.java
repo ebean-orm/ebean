@@ -26,6 +26,10 @@ public class ArrayStack<E> {
     this.list = new ArrayList<E>();
   }
 
+  public String toString() {
+    return list.toString();
+  }
+
   /**
    * Pushes an item onto the top of this stack.
    */

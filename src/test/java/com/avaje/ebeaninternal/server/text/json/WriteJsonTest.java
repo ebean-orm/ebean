@@ -20,7 +20,7 @@ public class WriteJsonTest {
     JsonGenerator generator = jsonFactory.createGenerator(new StringWriter());
 
     PathProperties pathProperties = PathProperties.parse("id,status,name,customer(id,name,address(street,city)),orders(qty,product(sku,prodName))");
-    WriteJson writeJson = new WriteJson(null, generator, pathProperties, null, JsonConfig.Include.ALL);
+    WriteJson writeJson = new WriteJson(null, generator, pathProperties, null, null, JsonConfig.Include.ALL);
 
     WriteJson.WriteBean rootLevel = writeJson.createWriteBean(null, null);
     assertTrue(rootLevel.currentIncludeProps.contains("id"));

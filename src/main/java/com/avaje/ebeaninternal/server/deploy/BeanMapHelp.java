@@ -179,12 +179,12 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
     }
 
     if (!map.isEmpty() || ctx.isIncludeEmpty()) {
-      ctx.writeStartArray(name);
+      ctx.beginAssocMany(name);
       for (Entry<?, ?> entry : map.entrySet()) {
         //FIXME: json write map key ...
         targetDescriptor.jsonWrite(ctx, (EntityBean) entry.getValue());
       }
-      ctx.writeEndArray();
+      ctx.endAssocMany();
     }
   }
 

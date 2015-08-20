@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
+import com.avaje.ebean.text.json.JsonWriter;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
