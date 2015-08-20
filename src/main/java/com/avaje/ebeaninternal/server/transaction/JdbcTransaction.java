@@ -3,6 +3,9 @@ package com.avaje.ebeaninternal.server.transaction;
 import com.avaje.ebean.TransactionCallback;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.config.PersistBatch;
+import com.avaje.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
+import com.avaje.ebean.event.changelog.BeanChange;
+import com.avaje.ebean.event.changelog.ChangeSet;
 import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
@@ -10,7 +13,6 @@ import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
-import com.avaje.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +21,12 @@ import javax.persistence.RollbackException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * JDBC Connection based transaction.
@@ -133,6 +140,8 @@ public class JdbcTransaction implements SpiTransaction {
 
   protected boolean batchOnCascadeSet;
 
+  protected TChangeLogHolder changeLogHolder;
+
   /**
    * Create a new JdbcTransaction.
    */
@@ -181,6 +190,19 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   @Override
+  public void addBeanChange(BeanChange beanChange) {
+    if (changeLogHolder == null) {
+      changeLogHolder = new TChangeLogHolder(this, 100);
+    }
+    changeLogHolder.addBeanChange(beanChange);
+  }
+
+  @Override
+  public void sendChangeLog(ChangeSet changesRequest) {
+    manager.sendChangeLog(changesRequest);
+  }
+
+  @Override
   public void register(TransactionCallback callback) {
     if (callbackList == null) {
       callbackList = new ArrayList<TransactionCallback>(4);
@@ -210,6 +232,9 @@ public class JdbcTransaction implements SpiTransaction {
         }
       }
     }
+    if (changeLogHolder != null) {
+      changeLogHolder.postRollback();
+    }
   }
 
   protected void firePreCommit() {
@@ -233,6 +258,9 @@ public class JdbcTransaction implements SpiTransaction {
           logger.error("Error executing postCommit callback", e);
         }
       }
+    }
+    if (changeLogHolder != null) {
+      changeLogHolder.postCommit();
     }
   }
 

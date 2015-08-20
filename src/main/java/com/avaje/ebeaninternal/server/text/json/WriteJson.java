@@ -26,27 +26,38 @@ public class WriteJson implements JsonWriter {
   
   private final PathProperties pathProperties;
 
-  private final PathStack pathStack = new PathStack();
+  private final PathStack pathStack;
 
-  private final ArrayStack<Object> parentBeans = new ArrayStack<Object>();
+  private final ArrayStack<Object> parentBeans;
 
   private final Object objectMapper;
 
   private final JsonConfig.Include include;
 
+  /**
+   * Construct for full bean use (normal).
+   */
   public WriteJson(SpiEbeanServer server, JsonGenerator generator, PathProperties pathProperties, Object objectMapper, JsonConfig.Include include){
     this.server = server;
     this.generator = generator;
     this.pathProperties = pathProperties;
     this.objectMapper = objectMapper;
     this.include = include;
+    this.parentBeans = new ArrayStack<Object>();
+    this.pathStack = new PathStack();
   }
 
   /**
-   * Construct for testing purposes only.
+   * Construct for Json scalar use.
    */
-  public WriteJson(JsonGenerator generator, JsonConfig.Include include) {
-    this(null, generator, null, null, include);
+  public WriteJson(JsonGenerator generator, JsonConfig.Include include){
+    this.generator = generator;
+    this.include = include;
+    this.server = null;
+    this.pathProperties = null;
+    this.objectMapper = null;
+    this.parentBeans = null;
+    this.pathStack = null;
   }
 
   /**

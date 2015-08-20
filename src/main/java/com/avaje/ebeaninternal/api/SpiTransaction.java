@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebean.event.changelog.BeanChange;
+import com.avaje.ebean.event.changelog.ChangeSet;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
@@ -233,4 +235,13 @@ public interface SpiTransaction extends Transaction {
    */
   void flushBatchOnCollection();
 
+  /**
+   * Add a bean change to the change log.
+   */
+  void addBeanChange(BeanChange beanChange);
+
+  /**
+   * Send the change set to be prepared and then logged.
+   */
+  void sendChangeLog(ChangeSet changeSet);
 }

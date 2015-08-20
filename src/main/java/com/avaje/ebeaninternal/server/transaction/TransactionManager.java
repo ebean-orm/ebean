@@ -6,6 +6,9 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import com.avaje.ebean.dbmigration.DbOffline;
 import com.avaje.ebean.event.TransactionEventListener;
+import com.avaje.ebean.event.changelog.ChangeLogListener;
+import com.avaje.ebean.event.changelog.ChangeLogPrepare;
+import com.avaje.ebean.event.changelog.ChangeSet;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
@@ -81,6 +84,17 @@ public class TransactionManager {
   protected final TransactionEventListener[] transactionEventListeners;
 
   /**
+   * Used to prepare the change set setting user context information in the
+   * foreground thread before logging.
+   */
+  private final ChangeLogPrepare changeLogPrepare;
+
+  /**
+   * Performs the actual logging of the change set in background.
+   */
+  private final ChangeLogListener changeLogListener;
+
+  /**
    * Create the TransactionManager
    */
   public TransactionManager(ClusterManager clusterManager, BackgroundExecutor backgroundExecutor, ServerConfig config,
@@ -89,6 +103,8 @@ public class TransactionManager {
     this.persistBatch = config.getPersistBatch();
     this.persistBatchOnCascade = config.appliedPersistBatchOnCascade();
     this.beanDescriptorManager = descMgr;
+    this.changeLogPrepare = descMgr.getChangeLogPrepare();
+    this.changeLogListener = descMgr.getChangeLogListener();
     this.clusterManager = clusterManager;
     this.serverName = config.getName();
     this.backgroundExecutor = backgroundExecutor;
@@ -439,4 +455,21 @@ public class TransactionManager {
     }
   }
 
+  /**
+   * Prepare and then send/log the changeSet.
+   */
+  public void sendChangeLog(final ChangeSet changeSet) {
+
+    // can set userId, userIpAddress & userContext if desired
+    if (changeLogPrepare.prepare(changeSet)) {
+
+      // call the log method in background
+      backgroundExecutor.execute(new Runnable() {
+        @Override
+        public void run() {
+          changeLogListener.log(changeSet);
+        }
+      });
+    }
+  }
 }

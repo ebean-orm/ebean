@@ -6,6 +6,7 @@ import com.avaje.ebean.text.json.*;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.avaje.ebeaninternal.util.ParamTypeHelper;
 import com.avaje.ebeaninternal.util.ParamTypeHelper.ManyType;
 import com.avaje.ebeaninternal.util.ParamTypeHelper.TypeInfo;
@@ -25,15 +26,22 @@ public class DJsonContext implements JsonContext {
 
   private final JsonFactory jsonFactory;
 
+  private final TypeManager typeManager;
+
   private final Object defaultObjectMapper;
 
   private final JsonConfig.Include defaultInclude;
 
-  public DJsonContext(SpiEbeanServer server, JsonFactory jsonFactory) {
+  public DJsonContext(SpiEbeanServer server, JsonFactory jsonFactory, TypeManager typeManager) {
     this.server = server;
+    this.typeManager = typeManager;
     this.jsonFactory = (jsonFactory != null) ? jsonFactory : new JsonFactory();
     this.defaultObjectMapper = this.server.getServerConfig().getObjectMapper();
     this.defaultInclude = this.server.getServerConfig().getJsonInclude();
+  }
+
+  public JsonScalar getScalar(JsonGenerator generator) {
+    return  new DefaultJsonScalar(typeManager, new WriteJson(generator, defaultInclude));
   }
 
   public boolean isSupportedType(Type genericType) {

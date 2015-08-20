@@ -8,6 +8,9 @@ import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.event.*;
+import com.avaje.ebean.event.changelog.ChangeLogListener;
+import com.avaje.ebean.event.changelog.ChangeLogPrepare;
+import com.avaje.ebean.event.changelog.ChangeLogRegister;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.util.ClassUtil;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -279,6 +282,12 @@ public class ServerConfig {
   private List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<BulkTableEventListener>();
   private List<ServerConfigStartup> configStartupListeners = new ArrayList<ServerConfigStartup>();
   private List<TransactionEventListener> transactionEventListeners = new ArrayList<TransactionEventListener>();
+
+  private ChangeLogPrepare changeLogPrepare;
+
+  private ChangeLogListener changeLogListener;
+
+  private ChangeLogRegister changeLogRegister;
 
   private EncryptKeyManager encryptKeyManager;
 
@@ -634,6 +643,62 @@ public class ServerConfig {
    */
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
     this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+  }
+
+  /**
+   * Return the ChangeLogPrepare.
+   * <p>
+   *   This is used to set user context information to the ChangeSet in the
+   *   foreground thread prior to the logging occurring in a background thread.
+   * </p>
+   */
+  public ChangeLogPrepare getChangeLogPrepare() {
+    return changeLogPrepare;
+  }
+
+  /**
+   * Set the ChangeLogPrepare.
+   * <p>
+   *   This is used to set user context information to the ChangeSet in the
+   *   foreground thread prior to the logging occurring in a background thread.
+   * </p>
+   */
+  public void setChangeLogPrepare(ChangeLogPrepare changeLogPrepare) {
+    this.changeLogPrepare = changeLogPrepare;
+  }
+
+  /**
+   * Return the ChangeLogListener which actually performs the logging of change sets
+   * in the background.
+   */
+  public ChangeLogListener getChangeLogListener() {
+    return changeLogListener;
+  }
+
+  /**
+   * Set the ChangeLogListener which actually performs the logging of change sets
+   * in the background.
+   */
+  public void setChangeLogListener(ChangeLogListener changeLogListener) {
+    this.changeLogListener = changeLogListener;
+  }
+
+  /**
+   * Return the ChangeLogRegister which controls which ChangeLogFilter is used for each
+   * bean type and in this way provide fine grained control over which persist requests
+   * are included in the change log.
+   */
+  public ChangeLogRegister getChangeLogRegister() {
+    return changeLogRegister;
+  }
+
+  /**
+   * Set the ChangeLogRegister which controls which ChangeLogFilter is used for each
+   * bean type and in this way provide fine grained control over which persist requests
+   * are included in the change log.
+   */
+  public void setChangeLogRegister(ChangeLogRegister changeLogRegister) {
+    this.changeLogRegister = changeLogRegister;
   }
 
   /**

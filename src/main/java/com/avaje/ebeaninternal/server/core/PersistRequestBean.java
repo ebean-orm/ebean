@@ -7,6 +7,7 @@ import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanPersistRequest;
+import com.avaje.ebean.event.changelog.BeanChange;
 import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -529,10 +530,19 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     beanDescriptor.cacheHandleDelete(idValue, this);
   }
 
+  private void changeLog() {
+    BeanChange changeLogBean = beanDescriptor.getChangeLogBean(this);
+    if (changeLogBean != null) {
+      transaction.addBeanChange(changeLogBean);
+    }
+  }
+
   /**
    * Post processing.
    */
   public void postExecute() {
+
+    changeLog();
 
     if (controller != null) {
       controllerPost();

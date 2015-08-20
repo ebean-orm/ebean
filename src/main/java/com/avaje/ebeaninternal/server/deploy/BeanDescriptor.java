@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
+import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
@@ -15,6 +16,9 @@ import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanPostLoad;
 import com.avaje.ebean.event.BeanQueryAdapter;
+import com.avaje.ebean.event.changelog.BeanChange;
+import com.avaje.ebean.event.changelog.ChangeLogFilter;
+import com.avaje.ebean.event.changelog.ChangeType;
 import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaQueryPlanStatistic;
 import com.avaje.ebeaninternal.api.HashQueryPlan;
@@ -26,7 +30,9 @@ import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cache.CachedBeanData;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
+import com.avaje.ebeaninternal.server.core.DiffHelpInsert;
 import com.avaje.ebeaninternal.server.core.InternString;
+import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
@@ -174,6 +180,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
    * If set overrides the find implementation. Server side only.
    */
   private final BeanFindController beanFinder;
+
+  /**
+   * Used for fine grain filtering for the change log.
+   */
+  private final ChangeLogFilter changeLogFilter;
 
   /**
    * The table joins for this bean.
@@ -337,6 +348,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     this.persistListener = deploy.getPersistListener();
     this.beanPostLoad = deploy.getPostLoad();
     this.queryAdapter = deploy.getQueryAdapter();
+    this.changeLogFilter = deploy.getChangeLogFilter();
 
     this.defaultSelectClause = deploy.getDefaultSelectClause();
     this.defaultSelectClauseSet = deploy.parseDefaultSelectClause(defaultSelectClause);
@@ -421,7 +433,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
       this.unloadProperties = derivePropertiesToUnload(prototypeEntityBean);
     }
   }
-  
+
   /**
    * Derive an array of property positions for properties that are initialised in the constructor.
    * These properties need to be unloaded when populating beans for queries.
@@ -596,6 +608,60 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
         deleteRecurseSkippable = inheritInfo.isDeleteRecurseSkippable();
       }
     }
+  }
+
+  /**
+   * Return true if this request should be included in the change log.
+   */
+  public BeanChange getChangeLogBean(PersistRequestBean<T> request) {
+
+    if (changeLogFilter == null) {
+      return null;
+    }
+    PersistRequest.Type type = request.getType();
+    switch (type) {
+      case INSERT:
+        return changeLogFilter.includeInsert(request) ? insertBeanChange(request): null;
+      case UPDATE:
+        return changeLogFilter.includeUpdate(request) ? updateBeanChange(request): null;
+      case DELETE:
+        return changeLogFilter.includeDelete(request) ? deleteBeanChange(request) :null;
+      default:
+        throw new IllegalStateException("Unhandled request type " + type);
+    }
+  }
+
+  /**
+   * Return the bean change for a delete.
+   */
+  @SuppressWarnings("unchecked")
+  private BeanChange deleteBeanChange(PersistRequestBean<T> request) {
+    return newBeanChange(request.getBeanId(), ChangeType.DELETE, Collections.EMPTY_MAP);
+  }
+
+  /**
+   * Return the bean change for an update.
+   */
+  private BeanChange updateBeanChange(PersistRequestBean<T> request) {
+    return newBeanChange(request.getBeanId(), ChangeType.UPDATE, request.getEntityBeanIntercept().getDirtyValues());
+  }
+
+  /**
+   * Return the bean change for an insert.
+   */
+  private BeanChange insertBeanChange(PersistRequestBean<T> request) {
+    return newBeanChange(request.getBeanId(), ChangeType.INSERT, insertDiff(request.getEntityBean()));
+  }
+
+  private BeanChange newBeanChange(Object id, ChangeType changeType, Map<String, ValuePair> values) {
+    return new BeanChange(getBaseTable(), id, changeType, values);
+  }
+
+  /**
+   * For insert we create a Map of ValuePair to have the same structure as update.
+   */
+  private Map<String, ValuePair> insertDiff(EntityBean entityBean) {
+    return DiffHelpInsert.diff(entityBean, this);
   }
 
   /**

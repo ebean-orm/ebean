@@ -16,6 +16,10 @@ import com.avaje.ebean.config.dbplatform.DbHistorySupport;
 import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
+import com.avaje.ebean.event.changelog.ChangeLogFilter;
+import com.avaje.ebean.event.changelog.ChangeLogListener;
+import com.avaje.ebean.event.changelog.ChangeLogPrepare;
+import com.avaje.ebean.event.changelog.ChangeLogRegister;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
@@ -104,6 +108,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final DeployOrmXml deployOrmXml;
 
   private final BeanManagerFactory beanManagerFactory;
+
+  private final ChangeLogListener changeLogListener;
+
+  private final ChangeLogRegister changeLogRegister;
+
+  private final ChangeLogPrepare changeLogPrepare;
 
   private int enhancedClassCount;
   
@@ -199,6 +209,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     this.reflectFactory = createReflectionFactory();
     this.transientProperties = new TransientProperties();
+    this.changeLogPrepare = bootupClasses.getChangeLogPrepare();
+    this.changeLogListener = bootupClasses.getChangeLogListener();
+    this.changeLogRegister = bootupClasses.getChangeLogRegister();
   }
 
   /**
@@ -1003,6 +1016,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     persistListenerManager.addPersistListeners(descriptor);
     beanQueryAdapterManager.addQueryAdapter(descriptor);
     beanFinderManager.addFindControllers(descriptor);
+
+    if (changeLogRegister != null) {
+      ChangeLogFilter changeFilter = changeLogRegister.getChangeFilter(descriptor.getBeanType());
+      if (changeFilter != null) {
+        descriptor.setChangeLogFilter(changeFilter);
+      }
+    }
+
   }
 
   /**
@@ -1451,7 +1472,22 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
     return true;
   }
-  
+
+  /**
+   * Return the changeLogPrepare (for setting user context into the ChangeSet
+   * in the foreground thread).
+   */
+  public ChangeLogPrepare getChangeLogPrepare() {
+    return changeLogPrepare;
+  }
+
+  /**
+   * Return the changeLogListener (that actually does the logging).
+   */
+  public ChangeLogListener getChangeLogListener() {
+    return changeLogListener;
+  }
+
   /**
    * Comparator to sort the BeanDescriptors by name.
    */

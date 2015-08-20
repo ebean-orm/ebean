@@ -227,6 +227,7 @@ public class DefaultContainer implements SpiContainer {
     bootupClasses.addPersistListeners(serverConfig.getPersistListeners());
     bootupClasses.addQueryAdapters(serverConfig.getQueryAdapters());
     bootupClasses.addServerConfigStartup(serverConfig.getServerConfigStartupListeners());
+    bootupClasses.addChangeLogInstances(serverConfig);
 
     // run any ServerConfigStartup instances
     bootupClasses.runServerConfigStartup(serverConfig);

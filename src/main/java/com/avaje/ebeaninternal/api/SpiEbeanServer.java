@@ -25,7 +25,7 @@ import java.util.List;
  * Service Provider extension to EbeanServer.
  */
 public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionLoader {
-  
+
   /**
    * For internal use, shutdown of the server invoked by JVM Shutdown.
    */

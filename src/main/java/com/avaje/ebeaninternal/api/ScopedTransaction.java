@@ -3,6 +3,8 @@ package com.avaje.ebeaninternal.api;
 import com.avaje.ebean.TransactionCallback;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.config.PersistBatch;
+import com.avaje.ebean.event.changelog.BeanChange;
+import com.avaje.ebean.event.changelog.ChangeSet;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
@@ -85,6 +87,16 @@ public class ScopedTransaction implements SpiTransaction {
   @Override
   public void logSummary(String msg) {
     transaction.logSummary(msg);
+  }
+
+  @Override
+  public void addBeanChange(BeanChange beanChange) {
+    transaction.addBeanChange(beanChange);
+  }
+
+  @Override
+  public void sendChangeLog(ChangeSet changes) {
+    transaction.sendChangeLog(changes);
   }
 
   @Override

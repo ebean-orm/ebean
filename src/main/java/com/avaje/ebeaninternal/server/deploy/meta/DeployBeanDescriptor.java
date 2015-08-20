@@ -9,6 +9,7 @@ import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanPostLoad;
 import com.avaje.ebean.event.BeanQueryAdapter;
+import com.avaje.ebean.event.changelog.ChangeLogFilter;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistController;
@@ -153,6 +154,8 @@ public class DeployBeanDescriptor<T> {
   private String name;
 
   private boolean processedRawSqlExtend;
+
+  private ChangeLogFilter changeLogFilter;
 
   /**
    * Construct the BeanDescriptor.
@@ -303,6 +306,14 @@ public class DeployBeanDescriptor<T> {
    */
   public Class<T> getBeanType() {
     return beanType;
+  }
+
+  public void setChangeLogFilter(ChangeLogFilter changeLogFilter) {
+    this.changeLogFilter = changeLogFilter;
+  }
+
+  public ChangeLogFilter getChangeLogFilter() {
+    return changeLogFilter;
   }
 
   /**

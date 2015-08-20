@@ -1,23 +1,31 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
+import com.avaje.ebean.config.CompoundType;
+import com.avaje.ebean.config.ScalarTypeConverter;
+import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.event.BeanFindController;
+import com.avaje.ebean.event.BeanPersistController;
+import com.avaje.ebean.event.BeanPersistListener;
+import com.avaje.ebean.event.BeanPostLoad;
+import com.avaje.ebean.event.BeanQueryAdapter;
+import com.avaje.ebean.event.ServerConfigStartup;
+import com.avaje.ebean.event.TransactionEventListener;
+import com.avaje.ebean.event.changelog.ChangeLogListener;
+import com.avaje.ebean.event.changelog.ChangeLogPrepare;
+import com.avaje.ebean.event.changelog.ChangeLogRegister;
+import com.avaje.ebeaninternal.server.type.ScalarType;
+import com.avaje.ebeaninternal.server.util.ClassPathSearchMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-
-import com.avaje.ebean.event.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.avaje.ebean.config.CompoundType;
-import com.avaje.ebean.config.ScalarTypeConverter;
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebeaninternal.server.type.ScalarType;
-import com.avaje.ebeaninternal.server.util.ClassPathSearchMatcher;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Interesting classes for a EbeanServer such as Embeddable, Entity,
@@ -57,6 +65,14 @@ public class BootupClasses implements ClassPathSearchMatcher {
   private final List<BeanPersistListener> persistListenerInstances = new ArrayList<BeanPersistListener>();
   private final List<BeanQueryAdapter> queryAdapterInstances = new ArrayList<BeanQueryAdapter>();
   private final List<TransactionEventListener> transactionEventListenerInstances = new ArrayList<TransactionEventListener>();
+
+  private Class<?> changeLogPrepareClass;
+  private Class<?> changeLogListenerClass;
+  private Class<?> changeLogRegisterClass;
+
+  private ChangeLogPrepare changeLogPrepare;
+  private ChangeLogListener changeLogListener;
+  private ChangeLogRegister changeLogRegister;
 
   public BootupClasses() {
   }
@@ -175,98 +191,122 @@ public class BootupClasses implements ClassPathSearchMatcher {
     }
   }
 
-  public List<BeanQueryAdapter> getBeanQueryAdapters() {
-    // add class registered BeanQueryAdapter to the
-    // already created instances
-    for (Class<?> cls : beanQueryAdapterList) {
-      try {
-        BeanQueryAdapter newInstance = (BeanQueryAdapter) cls.newInstance();
-        queryAdapterInstances.add(newInstance);
-      } catch (Exception e) {
-        String msg = "Error creating BeanQueryAdapter " + cls;
-        logger.error(msg, e);
+  public void addChangeLogInstances(ServerConfig serverConfig) {
+    changeLogListener = serverConfig.getChangeLogListener();
+    changeLogRegister = serverConfig.getChangeLogRegister();
+    changeLogPrepare = serverConfig.getChangeLogPrepare();
+
+    // if not already set create the implementations found
+    // via classpath scanning
+    if (changeLogPrepare == null && changeLogPrepareClass != null) {
+      changeLogPrepare = (ChangeLogPrepare)create(changeLogPrepareClass, false);
+    }
+    if (changeLogListener == null && changeLogListenerClass != null) {
+      changeLogListener = (ChangeLogListener)create(changeLogListenerClass, false);
+    }
+    if (changeLogRegister == null && changeLogRegisterClass != null) {
+      changeLogRegister = (ChangeLogRegister)create(changeLogRegisterClass, false);
+    }
+  }
+
+  /**
+   * Create an instance using the default constructor returning null if there
+   * is no default constructor (implying the class was not intended to be instantiated
+   * automatically via classpath scanning.
+   * <p>
+   * Use logOnException = true to log the error and carry on.
+   */
+  private Object create(Class<?> cls, boolean logOnException) {
+    try {
+      // instantiate via found class
+      Constructor constructor = cls.getConstructor();
+      return constructor.newInstance();
+
+    } catch (NoSuchMethodException e) {
+      logger.debug("Ignore/expected - no default constructor", e);
+      return null;
+
+    } catch (Exception e) {
+      if (logOnException) {
+        // not expected but we log and carry on
+        logger.error("Error creating " + cls, e);
+        return null;
+
+      } else {
+        // ok, stop the bus
+        throw new IllegalStateException("Error creating " + cls, e);
       }
     }
+  }
 
+  /**
+   * Create the instance if it has a default constructor and add it to the list of instances.
+   */
+  @SuppressWarnings(value = "unchecked")
+  private <T> void createAdd(Class<?> cls, List<T> instances) {
+    Object newInstance = create(cls, true);
+    if (newInstance != null) {
+      instances.add((T)newInstance);
+    }
+  }
+
+  public ChangeLogPrepare getChangeLogPrepare() {
+    return changeLogPrepare;
+  }
+
+  public ChangeLogListener getChangeLogListener() {
+    return changeLogListener;
+  }
+
+  public ChangeLogRegister getChangeLogRegister() {
+    return changeLogRegister;
+  }
+
+  public List<BeanQueryAdapter> getBeanQueryAdapters() {
+    // add class registered BeanQueryAdapter to the already created instances
+    for (Class<?> cls : beanQueryAdapterList) {
+      createAdd(cls, queryAdapterInstances);
+    }
     return queryAdapterInstances;
   }
 
   public List<BeanFindController> getBeanFindControllers() {
-    // add class registered BeanFindController to the
-    // list of created instances
+    // add class registered BeanFindController to the list of created instances
     for (Class<?> cls : beanFindControllerList) {
-      try {
-        BeanFindController newInstance = (BeanFindController) cls.newInstance();
-        findControllerInstances.add(newInstance);
-      } catch (Exception e) {
-        String msg = "Error creating BeanPersistController " + cls;
-        logger.error(msg, e);
-      }
+      createAdd(cls, findControllerInstances);
     }
-
     return findControllerInstances;
   }
 
   public List<BeanPersistListener> getBeanPersistListeners() {
-    // add class registered BeanPersistController to the
-    // already created instances
+    // add class registered BeanPersistController to the already created instances
     for (Class<?> cls : beanListenerList) {
-      try {
-        BeanPersistListener newInstance = (BeanPersistListener) cls.newInstance();
-        persistListenerInstances.add(newInstance);
-      } catch (Exception e) {
-        String msg = "Error creating BeanPersistController " + cls;
-        logger.error(msg, e);
-      }
+      createAdd(cls, persistListenerInstances);
     }
-
     return persistListenerInstances;
   }
 
   public List<BeanPersistController> getBeanPersistControllers() {
-    // add class registered BeanPersistController to the
-    // already created instances
+    // add class registered BeanPersistController to the already created instances
     for (Class<?> cls : beanControllerList) {
-      try {
-        BeanPersistController newInstance = (BeanPersistController) cls.newInstance();
-        persistControllerInstances.add(newInstance);
-      } catch (Exception e) {
-        String msg = "Error creating BeanPersistController " + cls;
-        logger.error(msg, e);
-      }
+      createAdd(cls, persistControllerInstances);
     }
-
     return persistControllerInstances;
   }
 
   public List<BeanPostLoad> getBeanPostLoaders() {
     // add class registered BeanPostLoad to the already created instances
     for (Class<?> cls : beanPostLoadList) {
-      try {
-        BeanPostLoad newInstance = (BeanPostLoad) cls.newInstance();
-        beanPostLoadInstances.add(newInstance);
-      } catch (Exception e) {
-        String msg = "Error creating BeanPersistController " + cls;
-        logger.error(msg, e);
-      }
+      createAdd(cls, beanPostLoadInstances);
     }
-
     return beanPostLoadInstances;
   }
 
   public List<TransactionEventListener> getTransactionEventListeners() {
-    // add class registered TransactionEventListener to the
-    // already created instances
+    // add class registered TransactionEventListener to the already created instances
     for (Class<?> cls : transactionEventListenerList) {
-      try {
-        TransactionEventListener newInstance = (TransactionEventListener) cls.newInstance();
-        transactionEventListenerInstances.add(newInstance);
-      } catch (Exception e) {
-        String msg = "Error creating TransactionEventListener " + cls;
-        logger.error(msg, e);
-      }
+      createAdd(cls, transactionEventListenerInstances);
     }
-
     return transactionEventListenerInstances;
   }
 
@@ -382,6 +422,21 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
     if (ServerConfigStartup.class.isAssignableFrom(cls)) {
       serverConfigStartupList.add(cls);
+      interesting = true;
+    }
+
+    if (ChangeLogListener.class.isAssignableFrom(cls)) {
+      changeLogListenerClass = cls;
+      interesting = true;
+    }
+
+    if (ChangeLogRegister.class.isAssignableFrom(cls)) {
+      changeLogRegisterClass = cls;
+      interesting = true;
+    }
+
+    if (ChangeLogPrepare.class.isAssignableFrom(cls)) {
+      changeLogPrepareClass = cls;
       interesting = true;
     }
 

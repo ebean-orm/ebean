@@ -176,7 +176,7 @@ public class InternalConfiguration {
 
   public JsonContext createJsonContext(SpiEbeanServer server) {
 
-    return new DJsonContext(server, jsonFactory);
+    return new DJsonContext(server, jsonFactory, typeManager);
   }
 
   public XmlConfig getXmlConfig() {

@@ -204,7 +204,7 @@ public final class DefaultServer implements SpiEbeanServer {
     this.serverCacheManager = cache;
     this.databasePlatform = config.getDatabasePlatform();
     this.backgroundExecutor = config.getBackgroundExecutor();
-    
+
     this.serverName = serverConfig.getName();
     this.diffHelp = new DiffHelp(serverConfig.isDiffFlatMode());
     this.lazyLoadBatchSize = serverConfig.getLazyLoadBatchSize();
