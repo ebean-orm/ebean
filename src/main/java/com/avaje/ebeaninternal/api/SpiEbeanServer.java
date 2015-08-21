@@ -93,7 +93,7 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   /**
    * Return BeanDescriptor using it's unique id.
    */
-  BeanDescriptor<?> getBeanDescriptorById(String descriptorId);
+  BeanDescriptor<?> getBeanDescriptorById(String className);
 
   /**
    * Return BeanDescriptors mapped to this table.

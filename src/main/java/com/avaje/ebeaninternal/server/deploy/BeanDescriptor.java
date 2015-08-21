@@ -317,14 +317,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   private final String defaultSelectClause;
   private final Set<String> defaultSelectClauseSet;
 
-  private final String descriptorId;
-
   private SpiEbeanServer ebeanServer;
 
   /**
    * Construct the BeanDescriptor.
    */
-  public BeanDescriptor(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy, String descriptorId) {
+  public BeanDescriptor(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy) {
 
     this.owner = owner;
     this.serverName = owner.getServerName();
@@ -334,7 +332,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());
-    this.descriptorId = descriptorId;
 
     this.beanType = deploy.getBeanType();
     this.prototypeEntityBean = createPrototypeEntityBean(beanType);
@@ -854,7 +851,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   }
 
   public void cacheManyPropClear(String propertyName) {
-    cacheHelp.manyPropClear(propertyName);    
+    cacheHelp.manyPropClear(propertyName);
   }
 
   public void cacheBeanPut(T bean) {
@@ -874,7 +871,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   public void cacheBeanLoadData(EntityBean bean, CachedBeanData data) {
     cacheHelp.beanLoadData(bean, data);
   }
-  
+
   /**
    * Put a bean into the bean cache.
    */
@@ -902,7 +899,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   public boolean cacheBeanLoad(EntityBean bean, EntityBeanIntercept ebi, Object id) {
     return cacheHelp.beanCacheLoad(bean, ebi, id);
   }
-  
+
   /**
    * Returns true if it managed to populate/load the bean from the cache.
    */
@@ -923,7 +920,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    * Invalidate parts of cache due to SqlUpdate or external modification etc.
    */
   public void cacheHandleBulkUpdate(TableIUD tableIUD) {
-    cacheHelp.handleBulkUpdate(tableIUD);    
+    cacheHelp.handleBulkUpdate(tableIUD);
   }
 
   /**
@@ -1305,11 +1302,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   }
 
   /**
-   * Return the alternate "Id" that identifies this BeanDescriptor. This is an
-   * alternative to using the bean class name.
+   * Return bean class name.
    */
   public String getDescriptorId() {
-    return descriptorId;
+    return fullName;
   }
 
   /**

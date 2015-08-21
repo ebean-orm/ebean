@@ -129,7 +129,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final Map<Class<?>, BeanTable> beanTableMap = new HashMap<Class<?>, BeanTable>();
 
   private final Map<String, BeanDescriptor<?>> descMap = new HashMap<String, BeanDescriptor<?>>();
-  private final Map<String, BeanDescriptor<?>> idDescMap = new HashMap<String, BeanDescriptor<?>>();
 
   private final Map<String, BeanManager<?>> beanManagerMap = new HashMap<String, BeanManager<?>>();
 
@@ -235,17 +234,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return (historySupport == null ) ? serverConfig.getAsOfViewSuffix() : historySupport.getVersionsBetweenSuffix(serverConfig.getAsOfViewSuffix());
   }
 
-  public BeanDescriptor<?> getBeanDescriptorById(String descriptorId) {
-    return idDescMap.get(descriptorId);
-  }
-
   @SuppressWarnings("unchecked")
   public <T> BeanDescriptor<T> getBeanDescriptor(Class<T> entityType) {
     return (BeanDescriptor<T>) descMap.get(entityType.getName());
   }
 
   @SuppressWarnings("unchecked")
-  public <T> BeanDescriptor<T> getBeanDescriptor(String entityClassName) {
+  public <T> BeanDescriptor<T> getBeanDescriptorByClassName(String entityClassName) {
     return (BeanDescriptor<T>) descMap.get(entityClassName);
   }
 
@@ -294,11 +289,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       List<BeanDescriptor<?>> list = new ArrayList<BeanDescriptor<?>>(descMap.values());
       Collections.sort(list, beanDescComparator);
       immutableDescriptorList = Collections.unmodifiableList(list);
-
-      // put into map using the "desriptorId" (alternative to class name)
-      for (BeanDescriptor<?> d : list) {
-        idDescMap.put(d.getDescriptorId(), d);
-      }
 
       initialiseAll();
       readForeignKeys();
@@ -504,10 +494,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     DeployBeanInfo<T> info = createDeployBeanInfo(beanClass);
     readDeployAssociations(info);
-
-    Integer key = getUniqueHash(info.getDescriptor());
-
-    return new BeanDescriptor<T>(this, info.getDescriptor(), key.toString());
+    return new BeanDescriptor<T>(this, info.getDescriptor());
   }
 
   private void registerBeanDescriptor(BeanDescriptor<?> desc) {
@@ -639,9 +626,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
     
     for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
-      DeployBeanDescriptor<?> deployBeanDescriptor = info.getDescriptor();
-      Integer key = getUniqueHash(deployBeanDescriptor);
-      registerBeanDescriptor(new BeanDescriptor(this, info.getDescriptor(), key.toString()));
+      registerBeanDescriptor(new BeanDescriptor(this, info.getDescriptor()));
     }
   }
 
@@ -669,11 +654,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 				}
 			}
 		}
-  }
-  
-  private Integer getUniqueHash(DeployBeanDescriptor<?> deployBeanDescriptor) {
-
-    return deployBeanDescriptor.getFullName().hashCode();
   }
 
   private void secondaryPropsJoins(DeployBeanInfo<?> info) {

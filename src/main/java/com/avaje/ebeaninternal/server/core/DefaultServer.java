@@ -1967,10 +1967,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   /**
-   * Return the BeanDescriptor using its unique id.
+   * Return the BeanDescriptor using its class name.
    */
-  public BeanDescriptor<?> getBeanDescriptorById(String descriptorId) {
-    return beanDescriptorManager.getBeanDescriptorById(descriptorId);
+  public BeanDescriptor<?> getBeanDescriptorById(String beanClassName) {
+    return beanDescriptorManager.getBeanDescriptorByClassName(beanClassName);
   }
 
   /**
