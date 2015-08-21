@@ -5,19 +5,19 @@ import java.util.List;
 
 /**
  * Holds a List of BinaryMessage's.
- * 
+ *
  * @author rbygrave
  */
 public class BinaryMessageList {
 
-    final ArrayList<BinaryMessage> list = new ArrayList<BinaryMessage>();
-    
-    public void add(BinaryMessage msg) {
-        list.add(msg);
-    }
+  final ArrayList<BinaryMessage> list = new ArrayList<BinaryMessage>();
 
-    public List<BinaryMessage> getList() {
-        return list;
-    }
-    
+  public void add(BinaryMessage msg) {
+    list.add(msg);
+  }
+
+  public List<BinaryMessage> getList() {
+    return list;
+  }
+
 }

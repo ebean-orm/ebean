@@ -9,16 +9,16 @@ import java.io.Serializable;
  */
 public class DataHolder implements Serializable {
 
-    private static final long serialVersionUID = 9090748723571322192L;
+  private static final long serialVersionUID = 9090748723571322192L;
 
-    private final byte[] data;
-    
-    public DataHolder(byte[] data) {
-        this.data = data;
-    }
+  private final byte[] data;
 
-    public byte[] getData() {
-        return data;
-    }
-    
+  public DataHolder(byte[] data) {
+    this.data = data;
+  }
+
+  public byte[] getData() {
+    return data;
+  }
+
 }

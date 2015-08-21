@@ -1,14 +1,14 @@
 package com.avaje.ebeaninternal.server.cluster.socket;
 
+import com.avaje.ebeaninternal.server.lib.DaemonThreadPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-
-import com.avaje.ebeaninternal.server.lib.DaemonThreadPool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**

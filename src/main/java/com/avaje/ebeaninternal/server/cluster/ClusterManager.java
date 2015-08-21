@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.cluster;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.config.ContainerConfig;
 import com.avaje.ebeaninternal.server.cluster.mcast.McastClusterManager;
@@ -9,6 +7,8 @@ import com.avaje.ebeaninternal.server.cluster.socket.SocketClusterBroadcast;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages the cluster service.

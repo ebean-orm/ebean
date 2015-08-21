@@ -20,39 +20,39 @@ import java.io.DataOutputStream;
  */
 public class BinaryMessage {
 
-    public static final int TYPE_MSGCONTROL = 0;
-    public static final int TYPE_BEANIUD = 1;
-    public static final int TYPE_TABLEIUD = 2;
+  public static final int TYPE_MSGCONTROL = 0;
+  public static final int TYPE_BEANIUD = 1;
+  public static final int TYPE_TABLEIUD = 2;
 
-    public static final int TYPE_MSGACK = 8;
-    public static final int TYPE_MSGRESEND = 9;
+  public static final int TYPE_MSGACK = 8;
+  public static final int TYPE_MSGRESEND = 9;
 
-    private final ByteArrayOutputStream buffer;
-    private final DataOutputStream os;
-    private byte[] bytes;
+  private final ByteArrayOutputStream buffer;
+  private final DataOutputStream os;
+  private byte[] bytes;
 
-    /**
-     * Create with an estimated buffer size.
-     */
-    public BinaryMessage(int bufSize) {
-        this.buffer = new ByteArrayOutputStream(bufSize);
-        this.os = new DataOutputStream(buffer);
+  /**
+   * Create with an estimated buffer size.
+   */
+  public BinaryMessage(int bufSize) {
+    this.buffer = new ByteArrayOutputStream(bufSize);
+    this.os = new DataOutputStream(buffer);
+  }
+
+  /**
+   * Return the DataOutputStream to write content to.
+   */
+  public DataOutputStream getOs() {
+    return os;
+  }
+
+  /**
+   * Return all the content as a byte array.
+   */
+  public byte[] getByteArray() {
+    if (bytes == null) {
+      bytes = buffer.toByteArray();
     }
-
-    /**
-     * Return the DataOutputStream to write content to.
-     */
-    public DataOutputStream getOs() {
-        return os;
-    }
-
-    /**
-     * Return all the content as a byte array.
-     */
-    public byte[] getByteArray() {
-        if (bytes == null) {
-            bytes = buffer.toByteArray();
-        }
-        return bytes;
-    }
+    return bytes;
+  }
 }

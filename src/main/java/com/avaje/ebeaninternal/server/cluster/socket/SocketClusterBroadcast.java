@@ -156,7 +156,7 @@ public class SocketClusterBroadcast implements ClusterBroadcast {
   protected void broadcast(SocketClusterMessage msg) {
 
     if (logger.isTraceEnabled()) {
-      logger.trace("... broadcast msg: "+msg);
+      logger.trace("... broadcast msg: " + msg);
     }
     for (int i = 0; i < members.length; i++) {
       send(members[i], msg);

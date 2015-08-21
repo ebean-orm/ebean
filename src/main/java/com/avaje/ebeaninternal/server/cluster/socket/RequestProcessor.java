@@ -8,39 +8,39 @@ import java.net.Socket;
 /**
  * This parses and dispatches a request to the appropriate handler.
  * <p>
- * Looks up the appropriate RequestHandler 
+ * Looks up the appropriate RequestHandler
  * and then gets it to process the Client request.<P>
  * </p>
  * Note that this is a Runnable because it is assigned to the ThreadPool.
  */
 class RequestProcessor implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(RequestProcessor.class);
-	
+  private static final Logger logger = LoggerFactory.getLogger(RequestProcessor.class);
+
   private final Socket clientSocket;
-    
+
   private final SocketClusterBroadcast owner;
 
   private final String hostPort;
 
   /**
-	 *  Create including the Listener (used to lookup the Request Handler) and
-	 *  the socket itself. 
-	 */
-	public RequestProcessor(SocketClusterBroadcast owner, Socket clientSocket) {
-		this.clientSocket = clientSocket;
-		this.owner = owner;
+   * Create including the Listener (used to lookup the Request Handler) and
+   * the socket itself.
+   */
+  public RequestProcessor(SocketClusterBroadcast owner, Socket clientSocket) {
+    this.clientSocket = clientSocket;
+    this.owner = owner;
     this.hostPort = owner.getHostPort();
   }
-	
-	/**
-	 *  This will parse out the command.  Lookup the appropriate Handler and 
-	 *  pass the information to the handler for processing.
-	 *  <P>Dev Note: the command parsing is processed here so that it is preformed
-	 *  by the assigned thread rather than the listeners thread.</P>
-	 */
-	public void run() {
-		try {
+
+  /**
+   * This will parse out the command.  Lookup the appropriate Handler and
+   * pass the information to the handler for processing.
+   * <P>Dev Note: the command parsing is processed here so that it is preformed
+   * by the assigned thread rather than the listeners thread.</P>
+   */
+  public void run() {
+    try {
       logger.trace("start listening for cluster messages");
       SocketConnection sc = new SocketConnection(clientSocket);
       while (true) {
@@ -50,10 +50,10 @@ class RequestProcessor implements Runnable {
         }
       }
       logger.trace("disconnecting: {}", hostPort);
-			sc.disconnect();
+      sc.disconnect();
 
     } catch (Exception e) {
-      logger.error("Error listening for messages - "+owner.getHostPort(), e);
+      logger.error("Error listening for messages - " + owner.getHostPort(), e);
     }
   }
 

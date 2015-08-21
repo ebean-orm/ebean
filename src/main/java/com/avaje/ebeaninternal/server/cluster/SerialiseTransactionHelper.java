@@ -1,14 +1,14 @@
 package com.avaje.ebeaninternal.server.cluster;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.util.List;
-
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Mechanism to convert RemoteTransactionEvent to/from byte[] content.

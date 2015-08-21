@@ -17,48 +17,48 @@ import java.io.IOException;
  */
 public class PacketTransactionEvent extends Packet {
 
-    private final SpiEbeanServer server;
-    
-    private final RemoteTransactionEvent event;
+  private final SpiEbeanServer server;
 
-    public static PacketTransactionEvent forWrite(long packetId, long timestamp, String serverName) throws IOException {
-        return new PacketTransactionEvent(true, packetId, timestamp, serverName);
-    }
-    
-    private PacketTransactionEvent(boolean write, long packetId, long timestamp, String serverName) throws IOException {
-        super(write, TYPE_TRANSEVENT, packetId, timestamp, serverName);
-        this.server = null;
-        this.event = null;
-    }
+  private final RemoteTransactionEvent event;
 
-    private PacketTransactionEvent(Packet header, SpiEbeanServer server) throws IOException {
-        super(false, TYPE_TRANSEVENT, header.packetId, header.timestamp, header.serverName);
-        this.server = server;
-        this.event = new RemoteTransactionEvent(server);
-    }
+  public static PacketTransactionEvent forWrite(long packetId, long timestamp, String serverName) throws IOException {
+    return new PacketTransactionEvent(true, packetId, timestamp, serverName);
+  }
 
-    public static PacketTransactionEvent forRead(Packet header, SpiEbeanServer server) throws IOException {
-        return new PacketTransactionEvent(header, server);
-    }
- 
-    public RemoteTransactionEvent getEvent() {
-        return event;
-    }
+  private PacketTransactionEvent(boolean write, long packetId, long timestamp, String serverName) throws IOException {
+    super(write, TYPE_TRANSEVENT, packetId, timestamp, serverName);
+    this.server = null;
+    this.event = null;
+  }
 
-    protected void readMessage(DataInput dataInput, int msgType) throws IOException {
-        
-        switch (msgType) {
-        case BinaryMessage.TYPE_BEANIUD:
-            event.addBeanPersistIds(BeanPersistIds.readBinaryMessage(server, dataInput));
-            break;
-            
-        case BinaryMessage.TYPE_TABLEIUD:
-            event.addTableIUD(TableIUD.readBinaryMessage(dataInput));
-            break;
+  private PacketTransactionEvent(Packet header, SpiEbeanServer server) throws IOException {
+    super(false, TYPE_TRANSEVENT, header.packetId, header.timestamp, header.serverName);
+    this.server = server;
+    this.event = new RemoteTransactionEvent(server);
+  }
 
-        default:
-            throw new RuntimeException("Invalid Transaction msgType "+msgType);
-        }
+  public static PacketTransactionEvent forRead(Packet header, SpiEbeanServer server) throws IOException {
+    return new PacketTransactionEvent(header, server);
+  }
+
+  public RemoteTransactionEvent getEvent() {
+    return event;
+  }
+
+  protected void readMessage(DataInput dataInput, int msgType) throws IOException {
+
+    switch (msgType) {
+      case BinaryMessage.TYPE_BEANIUD:
+        event.addBeanPersistIds(BeanPersistIds.readBinaryMessage(server, dataInput));
+        break;
+
+      case BinaryMessage.TYPE_TABLEIUD:
+        event.addTableIUD(TableIUD.readBinaryMessage(dataInput));
+        break;
+
+      default:
+        throw new RuntimeException("Invalid Transaction msgType " + msgType);
     }
-    
+  }
+
 }
