@@ -69,6 +69,13 @@ public class ChangeSet {
   }
 
   /**
+   * Return the number of changes in the change set.
+   */
+  public int size() {
+    return changes.size();
+  }
+
+  /**
    * Add a bean change to the change set.
    */
   public void addBeanChange(BeanChange beanChange) {
