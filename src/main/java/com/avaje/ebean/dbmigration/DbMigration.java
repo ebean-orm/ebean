@@ -40,6 +40,18 @@ import java.util.List;
  * changes and a series of sql scripts to apply, rollback the applied changes if necessary
  * and drop objects (drop tables, drop columns).
  * </p>
+ * <p>
+ *   This does not run the migration or ddl scripts but just generates them.
+ * </p>
+ * <pre>{@code
+ *
+ *       DbMigration migration = new DbMigration();
+ *       migration.setPathToResources("src/main/resources");
+ *       migration.setPlatform(DbPlatformName.ORACLE);
+ *
+ *       migration.generateMigration();
+ *
+ * }</pre>
  */
 public class DbMigration {
 
@@ -131,9 +143,36 @@ public class DbMigration {
   }
 
   /**
-   * Run the migration generating the next migration xml file and associated apply and rollback sql scripts.
+   * Generate the next migration xml file and associated apply and rollback sql scripts.
+   * <p>
+   *   This does not run the migration or ddl scripts but just generates them.
+   * </p>
+   * <h3>Example: Run for a single specific platform</h3>
+   * <pre>{@code
+   *
+   *       DbMigration migration = new DbMigration();
+   *       migration.setPathToResources("src/main/resources");
+   *       migration.setPlatform(DbPlatformName.ORACLE);
+   *
+   *       migration.generateMigration();
+   *
+   * }</pre>
+   *
+   * <h3>Example: Run migration generating DDL for multiple platforms</h3>
+   * <pre>{@code
+   *
+   *       DbMigration migration = new DbMigration();
+   *       migration.setPathToResources("src/main/resources");
+   *
+   *       migration.addPlatform(DbPlatformName.POSTGRES, "pg");
+   *       migration.addPlatform(DbPlatformName.MYSQL, "mysql");
+   *       migration.addPlatform(DbPlatformName.ORACLE, "mysql");
+   *
+   *       migration.generateMigration();
+   *
+   * }</pre>
    */
-  public void runMigration() throws IOException {
+  public void generateMigration() throws IOException {
 
     // use this flag to stop other plugins like full DDL generation
     DbOffline.setRunningMigration();
