@@ -17,6 +17,8 @@ public class ServerConfigTest {
 
     assertEquals(PersistBatch.NONE, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatchOnCascade());
+
+    assertNotNull(serverConfig.getProperties());
   }
 
   @Test

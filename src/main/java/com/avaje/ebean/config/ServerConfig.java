@@ -74,6 +74,11 @@ public class ServerConfig {
   private ContainerConfig containerConfig;
 
   /**
+   * The underlying properties that were used during configuration.
+   */
+  private Properties properties;
+
+  /**
    * The resource directory.
    */
   private String resourceDirectory;
@@ -1944,10 +1949,18 @@ public class ServerConfig {
    * Load the settings from the given properties
    */
   public void loadFromProperties(Properties properties) {
+    // keep the properties used for configuration so that these are available for plugins
+    this.properties = properties;
     PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties);
     loadSettings(p);
   }
 
+  /**
+   * Return the properties that we used for configuration and were set via a call to loadFromProperties().
+   */
+  public Properties getProperties() {
+    return properties;
+  }
 
   @SuppressWarnings("unchecked")
   private <T> T createInstance(PropertiesWrapper p, Class<T> pluginType, String key) {
