@@ -11,43 +11,41 @@ import java.util.List;
  * </p>
  * Thread Safety note: Object only used by McastClusterBroadcast Manager thread.
  * So Single Threaded access.
- * 
- * @author rbygrave
  */
 public class IncomingPacketsLastAck {
 
-    private final HashMap<String,MessageAck> lastAckMap = new HashMap<String, MessageAck>();
+  private final HashMap<String, MessageAck> lastAckMap = new HashMap<String, MessageAck>();
 
-    public String toString() {
-        return lastAckMap.values().toString();
+  public String toString() {
+    return lastAckMap.values().toString();
+  }
+
+  /**
+   * Remove a member of the cluster who has left.
+   */
+  public void remove(String memberHostPort) {
+    lastAckMap.remove(memberHostPort);
+  }
+
+  /**
+   * Get the last Ack point for a given member of the cluster.
+   */
+  public MessageAck getLastAck(String memberHostPort) {
+    return lastAckMap.get(memberHostPort);
+  }
+
+  /**
+   * For the ACK messages in AckResendMessages update the
+   * last Ack packetId.
+   */
+  public void updateLastAck(AckResendMessages ackResendMessages) {
+    List<Message> messages = ackResendMessages.getMessages();
+    for (int i = 0; i < messages.size(); i++) {
+      Message msg = messages.get(i);
+      if (msg instanceof MessageAck) {
+        MessageAck lastAck = (MessageAck) msg;
+        lastAckMap.put(lastAck.getToHostPort(), lastAck);
+      }
     }
-    
-    /**
-     * Remove a member of the cluster who has left.
-     */
-    public void remove(String memberHostPort) {
-        lastAckMap.remove(memberHostPort);
-    }
-    
-    /**
-     * Get the last Ack point for a given member of the cluster.
-     */
-    public MessageAck getLastAck(String memberHostPort) {
-        return lastAckMap.get(memberHostPort);
-    }
-    
-    /**
-     * For the ACK messages in AckResendMessages update the
-     * last Ack packetId.
-     */
-    public void updateLastAck(AckResendMessages ackResendMessages) {
-        List<Message> messages = ackResendMessages.getMessages();
-        for (int i = 0; i < messages.size(); i++) {
-            Message msg = messages.get(i);
-            if (msg instanceof MessageAck){
-                MessageAck lastAck = (MessageAck)msg;
-                lastAckMap.put(lastAck.getToHostPort(), lastAck);
-            }
-        }
-    }
+  }
 }

@@ -215,7 +215,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
 
     if (port == 0 || addr == null) {
       String msg = "One of these Multicast settings has not been set. " + "ebean.cluster.mcast.listen.port="
-              + port + ", ebean.cluster.mcast.listen.address=" + addr;
+          + port + ", ebean.cluster.mcast.listen.address=" + addr;
 
       throw new IllegalArgumentException(msg);
     }
@@ -229,7 +229,7 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
     this.packageControl = new McastPacketControl(this, localSenderHostPort, maxResendIncoming);
 
     this.listener = new McastListener(this, packageControl, port, addr, bufferSize, timeout, localSenderHostPort,
-            disableLoopback, ttl, mcastBindAddress);
+        disableLoopback, ttl, mcastBindAddress);
   }
 
 
@@ -285,9 +285,9 @@ public class McastClusterManager implements ClusterBroadcast, Runnable {
       String lastAcks = incomingPacketsLastAck.toString();
 
       return new McastStatus(currentGroupSize, outgoingPacketsCache.size(), currentPacketId, minAcked, lastAcks,
-              totalTxnEventsSent, totalTxnEventsReceived, totalPacketsSent, totalPacketsResent,
-              totalPacketsReceived,
-              totalBytesSent, totalBytesResent, totalBytesReceived);
+          totalTxnEventsSent, totalTxnEventsReceived, totalPacketsSent, totalPacketsResent,
+          totalPacketsReceived,
+          totalBytesSent, totalBytesResent, totalBytesReceived);
 
     }
   }
