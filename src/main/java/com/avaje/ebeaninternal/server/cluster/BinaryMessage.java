@@ -23,8 +23,6 @@ public class BinaryMessage {
     public static final int TYPE_MSGCONTROL = 0;
     public static final int TYPE_BEANIUD = 1;
     public static final int TYPE_TABLEIUD = 2;
-    public static final int TYPE_BEANDELTA = 3;
-    public static final int TYPE_BEANPATHUPDATE = 4;
 
     public static final int TYPE_MSGACK = 8;
     public static final int TYPE_MSGRESEND = 9;

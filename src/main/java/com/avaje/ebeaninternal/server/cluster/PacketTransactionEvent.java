@@ -1,13 +1,12 @@
 package com.avaje.ebeaninternal.server.cluster;
 
-import java.io.DataInput;
-import java.io.IOException;
-
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
-import com.avaje.ebeaninternal.server.transaction.BeanDelta;
 import com.avaje.ebeaninternal.server.transaction.BeanPersistIds;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
+
+import java.io.DataInput;
+import java.io.IOException;
 
 /**
  * A Packet holding TransactionEvent data.
@@ -55,10 +54,6 @@ public class PacketTransactionEvent extends Packet {
             
         case BinaryMessage.TYPE_TABLEIUD:
             event.addTableIUD(TableIUD.readBinaryMessage(dataInput));
-            break;
-
-        case BinaryMessage.TYPE_BEANDELTA:
-            event.addBeanDelta(BeanDelta.readBinaryMessage(server, dataInput));
             break;
 
         default:

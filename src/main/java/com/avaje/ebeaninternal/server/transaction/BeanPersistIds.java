@@ -19,7 +19,7 @@ import java.util.List;
  * Wraps the information representing a Inserted Updated or Deleted Bean.
  * <p>
  * This information is broadcast across the cluster so that remote BeanListeners
- * are notified of the inserts updates and deletes that occured.
+ * are notified of the inserts updates and deletes that occurred.
  * </p>
  * <p>
  * You control it the data is broadcast and what data is broadcast by the

@@ -14,10 +14,6 @@ public class RemoteTransactionEvent implements Runnable {
 
   private List<TableIUD> tableList;
 
-  private List<BeanDeltaList> beanDeltaLists;
-
-  private BeanDeltaMap beanDeltaMap;
-
   private DeleteByIdMap deleteByIdMap;
 
   private String serverName;
@@ -38,9 +34,6 @@ public class RemoteTransactionEvent implements Runnable {
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    if (beanDeltaMap != null) {
-      sb.append(beanDeltaMap);
-    }
     sb.append(beanPersistList);
     if (tableList != null) {
       sb.append(tableList);
@@ -67,12 +60,6 @@ public class RemoteTransactionEvent implements Runnable {
         beanPersistList.get(i).writeBinaryMessage(msgList);
       }
     }
-
-    if (beanDeltaLists != null) {
-      for (int i = 0; i < beanDeltaLists.size(); i++) {
-        beanDeltaLists.get(i).writeBinaryMessage(msgList);
-      }
-    }
   }
 
   public boolean isEmpty() {
@@ -88,20 +75,6 @@ public class RemoteTransactionEvent implements Runnable {
       tableList = new ArrayList<TableIUD>(4);
     }
     tableList.add(tableIud);
-  }
-
-  public void addBeanDeltaList(BeanDeltaList deltaList) {
-    if (beanDeltaLists == null) {
-      beanDeltaLists = new ArrayList<BeanDeltaList>();
-    }
-    beanDeltaLists.add(deltaList);
-  }
-
-  public void addBeanDelta(BeanDelta beanDelta) {
-    if (beanDeltaMap == null) {
-      beanDeltaMap = new BeanDeltaMap();
-    }
-    beanDeltaMap.addBeanDelta(beanDelta);
   }
 
   public String getServerName() {
@@ -132,10 +105,4 @@ public class RemoteTransactionEvent implements Runnable {
     return beanPersistList;
   }
 
-  public List<BeanDeltaList> getBeanDeltaLists() {
-    if (beanDeltaMap != null) {
-      beanDeltaLists.addAll(beanDeltaMap.deltaLists());
-    }
-    return beanDeltaLists;
-  }
 }
