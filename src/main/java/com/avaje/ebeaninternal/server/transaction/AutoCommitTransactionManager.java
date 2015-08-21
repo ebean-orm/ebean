@@ -1,13 +1,13 @@
 package com.avaje.ebeaninternal.server.transaction;
 
-import java.sql.Connection;
-
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
+
+import java.sql.Connection;
 
 /**
  * AutoCommit based TransactionManager.
@@ -17,8 +17,8 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 public class AutoCommitTransactionManager extends TransactionManager {
 
   public AutoCommitTransactionManager(ClusterManager clusterManager, BackgroundExecutor backgroundExecutor,
-      ServerConfig config, BeanDescriptorManager descMgr, BootupClasses bootupClasses) {
-    
+                                      ServerConfig config, BeanDescriptorManager descMgr, BootupClasses bootupClasses) {
+
     super(clusterManager, backgroundExecutor, config, descMgr, bootupClasses);
   }
 
@@ -27,10 +27,8 @@ public class AutoCommitTransactionManager extends TransactionManager {
    */
   @Override
   protected SpiTransaction createTransaction(boolean explicit, Connection c, long id) {
-    
+
     return new AutoCommitJdbcTransaction(prefix + id, explicit, c, this);
   }
 
-  
-  
 }

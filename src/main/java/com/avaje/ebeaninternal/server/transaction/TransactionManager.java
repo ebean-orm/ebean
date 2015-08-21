@@ -113,7 +113,7 @@ public class TransactionManager {
 
     List<TransactionEventListener> transactionEventListeners = bootupClasses.getTransactionEventListeners();
     this.transactionEventListeners = transactionEventListeners.toArray(new
-            TransactionEventListener[transactionEventListeners.size()]);
+        TransactionEventListener[transactionEventListeners.size()]);
 
     this.prefix = "";
     this.externalTransPrefix = "e";
@@ -175,8 +175,7 @@ public class TransactionManager {
     if (OnQueryOnly.CLOSE.equals(dbPlatformOnQueryOnly)) {
       // check for read committed isolation level
       if (!isReadCommittedIsolation(ds)) {
-        logger.warn("Ignoring DatabasePlatform.OnQueryOnly.CLOSE as the transaction Isolation Level is not " +
-								"READ_COMMITTED");
+        logger.warn("Ignoring DatabasePlatform.OnQueryOnly.CLOSE as the transaction Isolation Level is not READ_COMMITTED");
         // we will just use ROLLBACK and ignore the desired optimisation
         return OnQueryOnly.ROLLBACK;
       } else {

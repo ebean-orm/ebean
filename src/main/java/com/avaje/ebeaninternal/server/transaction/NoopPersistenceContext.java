@@ -4,7 +4,7 @@ import com.avaje.ebean.bean.PersistenceContext;
 
 /**
  * PersistenceContext used with scope of NONE.
- * <p/>
+ * <p>
  * When used effectively means no PersistenceContext is used at all. This is not expected to be used much and
  * actually is not recommended.
  */

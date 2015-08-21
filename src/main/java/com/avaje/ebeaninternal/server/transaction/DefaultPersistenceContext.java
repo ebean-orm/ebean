@@ -1,14 +1,13 @@
 package com.avaje.ebeaninternal.server.transaction;
 
+import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebeaninternal.api.Monitor;
+
+import javax.persistence.Entity;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import javax.persistence.Entity;
-
-import com.avaje.ebean.bean.PersistenceContext;
-import com.avaje.ebeaninternal.api.Monitor;
 
 /**
  * Default implementation of PersistenceContext.
@@ -134,7 +133,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     }
     return classMap;
   }
-  
+
   private Class<?> getBeanBaseType(Class<?> beanType) {
     Class<?> parent = beanType.getSuperclass();
 
@@ -206,5 +205,5 @@ public final class DefaultPersistenceContext implements PersistenceContext {
       map.remove(id);
     }
   }
-    
+
 }

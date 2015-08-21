@@ -97,20 +97,20 @@ public final class DefaultTransactionThreadLocal {
    * <p>
    * Designed to be put in a finally block instead of a rollback() in each catch
    * block.
-   * 
+   * <p>
    * <pre>
    * Ebean.beingTransaction();
    * try {
    *   // ... perform some actions in a single transaction
-   * 
+   *
    *   Ebean.commitTransaction();
-   * 
+   *
    * } finally {
    *   // ensure transaction ended. If some error occurred then rollback()
    *   Ebean.endTransaction();
    * }
    * </pre>
-   * 
+   * <p>
    * </p>
    */
   public static void end(String serverName) {

@@ -1,13 +1,13 @@
 package com.avaje.ebeaninternal.server.transaction;
 
+import com.avaje.ebeaninternal.server.core.PersistRequest;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.avaje.ebeaninternal.server.core.PersistRequest;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 /**
  * Beans deleted by Id used for updating L2 Cache.

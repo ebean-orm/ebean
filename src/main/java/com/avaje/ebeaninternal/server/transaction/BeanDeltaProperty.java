@@ -1,11 +1,11 @@
 package com.avaje.ebeaninternal.server.transaction;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.cluster.BinaryMessage;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class BeanDeltaProperty {
 
