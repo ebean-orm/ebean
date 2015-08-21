@@ -21,6 +21,7 @@ import com.avaje.ebean.event.changelog.ChangeLogFilter;
 import com.avaje.ebean.event.changelog.ChangeType;
 import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaQueryPlanStatistic;
+import com.avaje.ebean.plugin.SpiBeanType;
 import com.avaje.ebeaninternal.api.HashQueryPlan;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -73,7 +74,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Describes Beans including their deployment information.
  */
-public class BeanDescriptor<T> implements MetaBeanInfo {
+public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptor.class);
 
@@ -1353,6 +1354,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
     return (idProperty == null) ? null : idProperty.getValue(bean);
   }
 
+  @Override
+  public Object getBeanId(T bean) {
+    return getId((EntityBean)bean);
+  }
+
   /**
    * Return the default order by that may need to be added if a many property is
    * included in the query.
@@ -1630,9 +1636,17 @@ public class BeanDescriptor<T> implements MetaBeanInfo {
   }
 
   /**
-   * Return the beanFinder. Usually null unless overriding the finder.
+   * Return the beanFinder (Migrate over to getFindController).
    */
   public BeanFindController getBeanFinder() {
+    return beanFinder;
+  }
+
+  /**
+   * Return the find controller (SPI interface).
+   */
+  @Override
+  public BeanFindController getFindController() {
     return beanFinder;
   }
 

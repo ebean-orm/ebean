@@ -15,6 +15,8 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.meta.MetaInfoManager;
+import com.avaje.ebean.plugin.SpiBeanType;
+import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.api.LoadBeanRequest;
@@ -86,7 +88,7 @@ import java.util.concurrent.FutureTask;
 /**
  * The default server side implementation of EbeanServer.
  */
-public final class DefaultServer implements SpiEbeanServer {
+public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultServer.class);
 
@@ -308,6 +310,11 @@ public final class DefaultServer implements SpiEbeanServer {
   @Override
   public MetaInfoManager getMetaInfoManager() {
     return metaInfoManager;
+  }
+
+  @Override
+  public SpiServer getPluginApi() {
+    return this;
   }
 
   public BackgroundExecutor getBackgroundExecutor() {
@@ -1935,6 +1942,28 @@ public final class DefaultServer implements SpiEbeanServer {
    */
   public List<BeanDescriptor<?>> getBeanDescriptors(String tableName) {
     return beanDescriptorManager.getBeanDescriptors(tableName);
+  }
+
+  /**
+   * Return all the SPI BeanTypes.
+   */
+  public List<? extends SpiBeanType<?>> getBeanTypes() {
+    return getBeanDescriptors();
+  }
+
+  /**
+   * Return the SPI bean types mapped to the given table.
+   */
+  public List<? extends SpiBeanType<?>> getBeanTypes(String tableName) {
+    return beanDescriptorManager.getBeanTypes(tableName);
+  }
+
+  /**
+   * Return the SPI bean types for the given bean class.
+   */
+  @Override
+  public <T> SpiBeanType<T> getBeanType(Class<T> beanType) {
+    return getBeanDescriptor(beanType);
   }
 
   /**

@@ -9,6 +9,7 @@ import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.meta.MetaInfoManager;
+import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
@@ -40,6 +41,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public void shutdownManaged() {
 
+  }
+
+  @Override
+  public SpiServer getPluginApi() {
+    return null;
   }
 
   @Override

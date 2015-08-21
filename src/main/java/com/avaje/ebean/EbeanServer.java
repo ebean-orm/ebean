@@ -12,6 +12,7 @@ import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.meta.MetaInfoManager;
+import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
 import org.jetbrains.annotations.Nullable;
@@ -127,6 +128,11 @@ public interface EbeanServer {
    * such as query execution statistics.
    */
   MetaInfoManager getMetaInfoManager();
+
+  /**
+   * Return the extended API intended for use by plugins.
+   */
+  SpiServer getPluginApi();
 
   /**
    * Return the BeanState for a given entity bean.
