@@ -1,5 +1,6 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.ChangeLog;
 import com.avaje.ebean.annotation.EnumValue;
 import com.avaje.ebean.annotation.JsonIgnore;
 import com.avaje.ebean.annotation.Where;
@@ -20,6 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Customer entity bean.
  */
+@ChangeLog(excludeInserts = true, updatesThatInclude = {"name","status"})
 @Entity
 @Table(name = "o_customer")
 public class Customer extends BasicDomain {

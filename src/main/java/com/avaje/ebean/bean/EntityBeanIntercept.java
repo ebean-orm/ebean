@@ -581,7 +581,29 @@ public final class EntityBeanIntercept implements Serializable {
       }
     }
   }
-  
+
+  /**
+   * Return true if any of the given property names are dirty.
+   */
+  public boolean hasDirtyProperty(Set<String> propertyNames) {
+
+    String[] names = owner._ebean_getPropertyNames();
+    int len = getPropertyLength();
+    for (int i = 0; i < len; i++) {
+      if (changedProps != null && changedProps[i]) {
+        // the property has been changed on this bean
+        if (propertyNames.contains(names[i])) {
+          return true;
+        }
+      } else if (embeddedDirty != null && embeddedDirty[i]) {
+        if (propertyNames.contains(names[i])) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   /**
    * Return a map of dirty properties with their new and old values.
    */

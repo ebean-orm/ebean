@@ -22,7 +22,7 @@ public class BeanFindControllerTest extends BaseTestCase {
 
     ServerConfig config = new ServerConfig();
 
-    config.setName("h2other");
+    config.setName("h2otherfind");
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);

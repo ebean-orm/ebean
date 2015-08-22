@@ -17,6 +17,7 @@ import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.plugin.SpiBeanType;
 import com.avaje.ebean.plugin.SpiServer;
+import com.avaje.ebean.plugin.SpiServerPlugin;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.api.LoadBeanRequest;
@@ -135,6 +136,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final CQueryEngine cqueryEngine;
 
+  private final List<SpiServerPlugin> serverPlugins;
+
   private DdlGenerator ddlGenerator;
 
   private final ExpressionFactory expressionFactory;
@@ -237,12 +240,22 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     this.beanLoader = new DefaultBeanLoader(this);
     this.jsonContext = config.createJsonContext(this);
+    this.serverPlugins = config.getPlugins();
 
     // load normal plugins late and call setup on all
     loadAndInitializePlugins(config.getServerConfig());
+
+    configureServerPlugins();
     
     // Register with the JVM Shutdown hook
     ShutdownManager.registerEbeanServer(this);
+  }
+
+  private void configureServerPlugins() {
+
+    for (SpiServerPlugin plugin : serverPlugins) {
+      plugin.configure(this);
+    }
   }
 
   protected void loadAndInitializePlugins(ServerConfig config) {
@@ -282,6 +295,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public void executePlugins(boolean online) {
     for (SpiEbeanPlugin plugin : ebeanPlugins) {
       plugin.execute(online);
+    }
+    for (SpiServerPlugin plugin : serverPlugins) {
+      plugin.online(online);
     }
   }
 

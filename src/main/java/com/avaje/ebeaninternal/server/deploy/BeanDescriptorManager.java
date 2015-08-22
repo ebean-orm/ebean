@@ -209,9 +209,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     this.reflectFactory = createReflectionFactory();
     this.transientProperties = new TransientProperties();
-    this.changeLogPrepare = bootupClasses.getChangeLogPrepare();
-    this.changeLogListener = bootupClasses.getChangeLogListener();
-    this.changeLogRegister = bootupClasses.getChangeLogRegister();
+    this.changeLogPrepare = config.changeLogPrepare(bootupClasses.getChangeLogPrepare());
+    this.changeLogListener = config.changeLogListener(bootupClasses.getChangeLogListener());
+    this.changeLogRegister = config.changeLogRegister(bootupClasses.getChangeLogRegister());
   }
 
   /**

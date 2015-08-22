@@ -215,6 +215,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return intercept.getDirtyPropertyNames();
   }
 
+  /**
+   * Return true if any of the given property names are dirty.
+   */
+  @Override
+  public boolean hasDirtyProperty(Set<String> propertyNames) {
+    return intercept.hasDirtyProperty(propertyNames);
+  }
+
   @Override
   public Map<String, ValuePair> getUpdatedValues() {
     return intercept.getDirtyValues();

@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 /**
  *
  */
-@ChangeLog
+@ChangeLog(updatesThatInclude = {"name","shortDescription"})
 @Entity
 public class EBasicChangeLog {
 

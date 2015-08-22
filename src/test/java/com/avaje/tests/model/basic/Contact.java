@@ -10,8 +10,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.Version;
 
 import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.ChangeLog;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 
+@ChangeLog
 @Entity
 @CacheStrategy(naturalKey="email")
 public class Contact {

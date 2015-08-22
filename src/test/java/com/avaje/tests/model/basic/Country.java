@@ -7,10 +7,12 @@ import javax.validation.constraints.Size;
 
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.CacheTuning;
+import com.avaje.ebean.annotation.ChangeLog;
 
 /**
  * Country entity bean.
  */
+@ChangeLog(excludeInserts = true)
 @CacheStrategy(readOnly=true,warmingQuery="order by name")
 @CacheTuning(maxSize=500)
 @Entity

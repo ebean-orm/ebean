@@ -1,25 +1,27 @@
 package com.avaje.ebeaninternal.server.core;
 
-import javax.sql.DataSource;
-
-import com.avaje.ebean.config.dbplatform.DbHistorySupport;
-import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.ExpressionFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.ExternalTransactionManager;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebean.config.dbplatform.DbHistorySupport;
+import com.avaje.ebean.event.changelog.ChangeLogListener;
+import com.avaje.ebean.event.changelog.ChangeLogPrepare;
+import com.avaje.ebean.event.changelog.ChangeLogRegister;
+import com.avaje.ebean.plugin.SpiServerPlugin;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManagerFactory;
+import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogPrepare;
+import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogRegister;
+import com.avaje.ebeaninternal.server.changelog.ElasticChangeLogListener;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.DeployOrmXml;
+import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployCreateProperties;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployInherit;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployUtil;
@@ -42,7 +44,12 @@ import com.avaje.ebeaninternal.server.transaction.TransactionScopeManager;
 import com.avaje.ebeaninternal.server.type.DefaultTypeManager;
 import com.avaje.ebeaninternal.server.type.TypeManager;
 import com.fasterxml.jackson.core.JsonFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -93,6 +100,11 @@ public class InternalConfiguration {
 
   private final JsonFactory jsonFactory;
 
+  /**
+   * List of plugins (that ultimately the DefaultServer configures late in construction).
+   */
+  private final List<SpiServerPlugin> plugins = new ArrayList<SpiServerPlugin>();
+
   public InternalConfiguration(XmlConfig xmlConfig, ClusterManager clusterManager,
       ServerCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
       ServerConfig serverConfig, BootupClasses bootupClasses) {
@@ -137,6 +149,45 @@ public class InternalConfiguration {
       this.transactionScopeManager = new DefaultTransactionScopeManager(transactionManager);
     }
 
+  }
+
+  /**
+   * Check if this is a SpiServerPlugin and if so 'collect' it to give the complete list
+   * later on the DefaultServer for late call to configure().
+   */
+  public <T> T plugin(T maybePlugin) {
+    if (maybePlugin instanceof SpiServerPlugin) {
+      plugins.add((SpiServerPlugin)maybePlugin);
+    }
+    return maybePlugin;
+  }
+
+  /**
+   * Return the list of plugins we collected during construction.
+   */
+  public List<SpiServerPlugin> getPlugins() {
+    return plugins;
+  }
+
+  /**
+   * Return the ChangeLogPrepare to use with a default implementation if none defined.
+   */
+  public ChangeLogPrepare changeLogPrepare(ChangeLogPrepare prepare) {
+    return plugin((prepare != null) ? prepare : new DefaultChangeLogPrepare());
+  }
+
+  /**
+   * Return the ChangeLogRegister to use with a default implementation if none defined.
+   */
+  public ChangeLogRegister changeLogRegister(ChangeLogRegister register) {
+    return plugin((register != null) ? register : new DefaultChangeLogRegister());
+  }
+
+  /**
+   * Return the ChangeLogListener to use with a default implementation if none defined.
+   */
+  public ChangeLogListener changeLogListener(ChangeLogListener listener) {
+    return plugin((listener != null) ? listener : new ElasticChangeLogListener());
   }
 
   /**
