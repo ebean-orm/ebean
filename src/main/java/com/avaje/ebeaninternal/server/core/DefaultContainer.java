@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class DefaultContainer implements SpiContainer {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultContainer.class);
+  private static final Logger logger = LoggerFactory.getLogger("com.avaje.ebean.internal.DefaultContainer");
 
   private final ClusterManager clusterManager;
 
@@ -287,7 +287,7 @@ public class DefaultContainer implements SpiContainer {
   private DataSource getDataSourceFromConfig(ServerConfig config) {
 
     if (DbOffline.isSet()) {
-      logger.trace("... DbOffline using platform [{}]", DbOffline.getPlatform());
+      logger.debug("... DbOffline using platform [{}]", DbOffline.getPlatform());
       return null;
     }
 
@@ -304,8 +304,7 @@ public class DefaultContainer implements SpiContainer {
 
     DataSourceConfig dsConfig = config.getDataSourceConfig();
     if (dsConfig == null) {
-      String m = "No DataSourceConfig defined for " + config.getName();
-      throw new PersistenceException(m);
+      throw new PersistenceException("No DataSourceConfig defined for " + config.getName());
     }
 
     if (dsConfig.isOffline()) {
