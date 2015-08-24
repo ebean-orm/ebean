@@ -438,6 +438,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       // Already shutdown
       return;
     }
+    shutdownPlugins();
     try {
       if (mbeanServer != null) {
         mbeanServer.unregisterMBean(new ObjectName(mbeanName + ",key=AutoFetch"));
@@ -454,7 +455,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     transactionManager.shutdown(shutdownDataSource, deregisterDriver);
     shutdown = true;
   }
-  
+
+  private void shutdownPlugins() {
+
+    for (SpiServerPlugin plugin : serverPlugins) {
+      try {
+        plugin.shutdown();
+      } catch (Throwable e) {
+        logger.error("Error when shutting down plugin", e);
+      }
+    }
+  }
+
   /**
    * Return the server name.
    */
