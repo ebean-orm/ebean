@@ -1,59 +1,59 @@
 <configuration scan="true" scanPeriod="10 seconds">
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>TRACE</level>
-        </filter>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>TRACE</level>
+    </filter>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
 
-    <appender name="APPLICATION" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>log/application.log</File>
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>TRACE</level>
-        </filter>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>log/application.log.%d{yyyy-MM-dd}</FileNamePattern>
-            <MaxHistory>90</MaxHistory>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
+  <appender name="APPLICATION" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>log/application.log</File>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>TRACE</level>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <FileNamePattern>log/application.log.%d{yyyy-MM-dd}</FileNamePattern>
+      <MaxHistory>90</MaxHistory>
+    </rollingPolicy>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
 
-    <appender name="ELASTIC_CHANGE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
-      <File>log/changeLog.log</File>
-      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <FileNamePattern>log/changeLog.log.%d{yyyy-MM-dd}</FileNamePattern>
-        <MaxHistory>90</MaxHistory>
-      </rollingPolicy>
-      <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-        <pattern>-- %d{HH:mm:ss.SSS} %msg%n</pattern>
-      </encoder>
-    </appender>
+  <appender name="ELASTIC_CHANGE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>log/changeLog.log</File>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <FileNamePattern>log/changeLog.log.%d{yyyy-MM-dd}</FileNamePattern>
+      <MaxHistory>90</MaxHistory>
+    </rollingPolicy>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>-- %d{HH:mm:ss.SSS} %msg%n</pattern>
+    </encoder>
+  </appender>
 
-    <logger name="org.avaje.ebean.ElasticChangeLog" level="TRACE" additivity="false">
-      <appender-ref ref="ELASTIC_CHANGE_LOG" />
-    </logger>
+  <logger name="org.avaje.ebean.ElasticChangeLog" level="TRACE" additivity="false">
+    <appender-ref ref="ELASTIC_CHANGE_LOG"/>
+  </logger>
 
-    <root level="WARN">
-        <appender-ref ref="APPLICATION"/>
-        <appender-ref ref="STDOUT"/>
-    </root>
+  <root level="WARN">
+    <appender-ref ref="APPLICATION"/>
+    <appender-ref ref="STDOUT"/>
+  </root>
 
-    <logger name="com.avaje.ebean" level="INFO"/>
-    <logger name="org.avaje.ebean" level="INFO"/>
-    <logger name="org.avaje.ebean.SQL" level="TRACE"/>
-    <logger name="org.avaje.ebean.TXN" level="TRACE"/>
-    <logger name="org.avaje.ebean.SUM" level="TRACE"/>
+  <logger name="com.avaje.ebean" level="INFO"/>
+  <logger name="org.avaje.ebean" level="INFO"/>
+  <logger name="org.avaje.ebean.SQL" level="TRACE"/>
+  <logger name="org.avaje.ebean.TXN" level="TRACE"/>
+  <logger name="org.avaje.ebean.SUM" level="TRACE"/>
 
-    <logger name="org.avaje.ebean.cache.QUERY" level="TRACE"/>
-    <logger name="org.avaje.ebean.cache.BEAN" level="TRACE"/>
-    <logger name="org.avaje.ebean.cache.COLL" level="TRACE"/>
-    <logger name="org.avaje.ebean.cache.NATKEY" level="TRACE"/>
+  <logger name="org.avaje.ebean.cache.QUERY" level="TRACE"/>
+  <logger name="org.avaje.ebean.cache.BEAN" level="TRACE"/>
+  <logger name="org.avaje.ebean.cache.COLL" level="TRACE"/>
+  <logger name="org.avaje.ebean.cache.NATKEY" level="TRACE"/>
 
-    <logger name="com.avaje.tests" level="DEBUG"/>
+  <logger name="com.avaje.tests" level="DEBUG"/>
 
 
 </configuration>
