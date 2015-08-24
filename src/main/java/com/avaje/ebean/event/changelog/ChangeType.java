@@ -26,6 +26,12 @@ public enum ChangeType {
     this.code = code;
   }
 
+  /**
+   * Return the short code for the ChangeType.
+   * <p>
+   * I - Insert, U - Update and D - Delete.
+   * </p>
+   */
   public String getCode() {
     return code;
   }

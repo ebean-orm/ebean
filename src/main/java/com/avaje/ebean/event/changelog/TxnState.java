@@ -34,6 +34,12 @@ public enum TxnState {
     this.code = code;
   }
 
+  /**
+   * Return the short code for the transaction state.
+   * <p>
+   * C - Committed, R - Rollback and I for In progress.
+   * </p>
+   */
   public String getCode() {
     return code;
   }
