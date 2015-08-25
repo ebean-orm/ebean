@@ -1,6 +1,7 @@
 package com.avaje.ebean.plugin;
 
 import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 
 import java.util.List;
@@ -9,6 +10,11 @@ import java.util.List;
  * Extensions to EbeanServer API made available to plugins.
  */
 public interface SpiServer extends EbeanServer {
+
+  /**
+   * Return the serverConfig.
+   */
+  ServerConfig getServerConfig();
 
   /**
    * Return the DatabasePlatform for this server.
