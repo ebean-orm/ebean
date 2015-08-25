@@ -1,7 +1,9 @@
 package com.avaje.ebean.event.changelog;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Holds a set of changes.
@@ -42,7 +44,7 @@ public class ChangeSet {
   /**
    * Arbitrary user context information expected to be optionally populated by ChangeLogPrepare.
    */
-  String userContext;
+  Map<String,String> userContext;
 
   /**
    * The bean changes.
@@ -178,7 +180,10 @@ public class ChangeSet {
   /**
    * Return a user context value - anything you set yourself in ChangeLogListener prepare().
    */
-  public String getUserContext() {
+  public Map<String,String> getUserContext() {
+    if (userContext == null) {
+      userContext = new LinkedHashMap<String, String>();
+    }
     return userContext;
   }
 
@@ -189,7 +194,7 @@ public class ChangeSet {
    * in the foreground thread.
    * </p>
    */
-  public void setUserContext(String userContext) {
+  public void setUserContext(Map<String,String> userContext) {
     this.userContext = userContext;
   }
 

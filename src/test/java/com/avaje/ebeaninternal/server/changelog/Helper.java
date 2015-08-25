@@ -24,7 +24,7 @@ public class Helper {
     cs.setSource("myApp");
     cs.setUserId("user234");
     cs.setUserIpAddress("123.4.5.6");
-    cs.setUserContext("user defined input");
+    cs.getUserContext().put("someKey","user defined input");
 
     List<BeanChange> changes = cs.getChanges();
 

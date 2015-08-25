@@ -67,14 +67,25 @@ public class ChangeJsonBuilder {
     gen.writeStringField("txnState", changeSet.getTxnState().getCode());
     gen.writeNumberField("txnBatch", changeSet.getTxnBatch());
     gen.writeNumberField("txnPosition", position);
-    gen.writeStringField("userId", changeSet.getUserId());
+    String source = changeSet.getSource();
+    if (source != null) {
+      gen.writeStringField("source", source);
+    }
+    String userId = changeSet.getUserId();
+    if (userId != null) {
+      gen.writeStringField("userId", userId);
+    }
     String userIpAddress = changeSet.getUserIpAddress();
     if (userIpAddress != null) {
       gen.writeStringField("userIpAddress", userIpAddress);
     }
-    String userContext = changeSet.getUserContext();
-    if (userContext != null) {
-      gen.writeStringField("userContext", userContext);
+    Map<String, String> userContext = changeSet.getUserContext();
+    if (userContext != null && !userContext.isEmpty()) {
+      gen.writeObjectFieldStart("userContext");
+      for (Map.Entry<String, String> entry : userContext.entrySet()) {
+        gen.writeStringField(entry.getKey(), entry.getValue());
+      }
+      gen.writeEndObject();
     }
   }
 
