@@ -13,10 +13,13 @@ import java.lang.annotation.Target;
 public @interface ChangeLog {
 
   /**
-   * Set this to true to exclude inserts on the associated bean type
-   * from being included in the change log.
+   * Specify if inserts should be explicitly Included or Excluded.
+   * <p>
+   * If not defined explicitly then the server default behaviour defined
+   * on ServerConfig is used.
+   * </p>
    */
-  boolean excludeInserts() default false;
+  ChangeLogInsertMode inserts() default ChangeLogInsertMode.DEFAULT;
 
   /**
    * When specified only include update requests that have at least one

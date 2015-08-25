@@ -1,22 +1,23 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.CacheTuning;
+import com.avaje.ebean.annotation.ChangeLog;
+import com.avaje.ebean.annotation.ChangeLogInsertMode;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
-import com.avaje.ebean.annotation.CacheStrategy;
-import com.avaje.ebean.annotation.CacheTuning;
-import com.avaje.ebean.annotation.ChangeLog;
-
 /**
  * Country entity bean.
  */
-@ChangeLog(excludeInserts = true)
-@CacheStrategy(readOnly=true,warmingQuery="order by name")
-@CacheTuning(maxSize=500)
+@ChangeLog(inserts = ChangeLogInsertMode.INCLUDE)
+@CacheStrategy(readOnly = true, warmingQuery = "order by name")
+@CacheTuning(maxSize = 500)
 @Entity
-@Table(name="o_country")
+@Table(name = "o_country")
 public class Country {
 
     @Id

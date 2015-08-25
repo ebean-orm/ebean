@@ -180,7 +180,8 @@ public class InternalConfiguration {
    * Return the ChangeLogRegister to use with a default implementation if none defined.
    */
   public ChangeLogRegister changeLogRegister(ChangeLogRegister register) {
-    return plugin((register != null) ? register : new DefaultChangeLogRegister());
+    boolean includeInserts = serverConfig.isChangeLogIncludeInserts();
+    return plugin((register != null) ? register : new DefaultChangeLogRegister(includeInserts));
   }
 
   /**

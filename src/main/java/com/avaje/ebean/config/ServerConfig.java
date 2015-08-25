@@ -288,6 +288,11 @@ public class ServerConfig {
   private List<ServerConfigStartup> configStartupListeners = new ArrayList<ServerConfigStartup>();
   private List<TransactionEventListener> transactionEventListeners = new ArrayList<TransactionEventListener>();
 
+  /**
+   * By default inserts are included in the change log.
+   */
+  private boolean changeLogIncludeInserts = true;
+
   private ChangeLogPrepare changeLogPrepare;
 
   private ChangeLogListener changeLogListener;
@@ -704,6 +709,20 @@ public class ServerConfig {
    */
   public void setChangeLogRegister(ChangeLogRegister changeLogRegister) {
     this.changeLogRegister = changeLogRegister;
+  }
+
+  /**
+   * Return true if inserts should be included in the change log by default.
+   */
+  public boolean isChangeLogIncludeInserts() {
+    return changeLogIncludeInserts;
+  }
+
+  /**
+   * Set if inserts should be included in the change log by default.
+   */
+  public void setChangeLogIncludeInserts(boolean changeLogIncludeInserts) {
+    this.changeLogIncludeInserts = changeLogIncludeInserts;
   }
 
   /**
@@ -2054,6 +2073,7 @@ public class ServerConfig {
 
     persistenceContextScope = PersistenceContextScope.valueOf(p.get("persistenceContextScope", "TRANSACTION"));
 
+    changeLogIncludeInserts = p.getBoolean("changeLogIncludeInserts", changeLogIncludeInserts);
     expressionEqualsWithNullAsNoop = p.getBoolean("expressionEqualsWithNullAsNoop", expressionEqualsWithNullAsNoop);
     diffFlatMode = p.getBoolean("diffFlatMode", diffFlatMode);
     asOfViewSuffix = p.get("asOfViewSuffix", asOfViewSuffix);

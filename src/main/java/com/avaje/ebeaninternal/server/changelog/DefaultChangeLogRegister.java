@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.changelog;
 
 import com.avaje.ebean.annotation.ChangeLog;
+import com.avaje.ebean.annotation.ChangeLogInsertMode;
 import com.avaje.ebean.event.BeanPersistRequest;
 import com.avaje.ebean.event.changelog.ChangeLogFilter;
 import com.avaje.ebean.event.changelog.ChangeLogRegister;
@@ -17,6 +18,14 @@ public class DefaultChangeLogRegister implements ChangeLogRegister {
 
   private static final BasicFilter EXCLUDE_INSERTS = new BasicFilter(false);
 
+  private final boolean defaultInsertsInclude;
+
+  /**
+   * Create with the default insertsIncluded from ServerConfig.
+   */
+  public DefaultChangeLogRegister(boolean defaultInsertsInclude) {
+    this.defaultInsertsInclude = defaultInsertsInclude;
+  }
 
   @Override
   public ChangeLogFilter getChangeFilter(Class<?> beanType) {
@@ -28,7 +37,7 @@ public class DefaultChangeLogRegister implements ChangeLogRegister {
 
     String[] updatesThatInclude = changeLog.updatesThatInclude();
     if (updatesThatInclude.length == 0) {
-      return changeLog.excludeInserts() ? EXCLUDE_INSERTS : INCLUDE_INSERTS;
+      return insertModeInclude(changeLog.inserts()) ? INCLUDE_INSERTS : EXCLUDE_INSERTS;
     }
 
     Set<String> updateProps = new HashSet<String>();
@@ -36,7 +45,18 @@ public class DefaultChangeLogRegister implements ChangeLogRegister {
       updateProps.add(updatesThatInclude[i]);
     }
 
-    return new UpdateFilter(!changeLog.excludeInserts(), updateProps);
+    return new UpdateFilter(insertModeInclude(changeLog.inserts()), updateProps);
+  }
+
+  /**
+   * Return true if inserts should be included in the change log.
+   */
+  private boolean insertModeInclude(ChangeLogInsertMode inserts) {
+    if (inserts == ChangeLogInsertMode.DEFAULT) {
+      // return the default as per the ServerConfig
+      return defaultInsertsInclude;
+    }
+    return ChangeLogInsertMode.INCLUDE == inserts;
   }
 
   /**

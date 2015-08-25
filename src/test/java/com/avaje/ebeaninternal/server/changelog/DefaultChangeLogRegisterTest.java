@@ -15,10 +15,11 @@ import static org.junit.Assert.assertTrue;
 
 public class DefaultChangeLogRegisterTest extends BaseTestCase {
 
-  DefaultChangeLogRegister register = new DefaultChangeLogRegister();
 
   @Test
-  public void test() {
+  public void test_defaultInsertTrue() {
+
+    DefaultChangeLogRegister register = new DefaultChangeLogRegister(true);
 
     assertNull(register.getChangeFilter(Address.class));
 
@@ -27,13 +28,37 @@ public class DefaultChangeLogRegisterTest extends BaseTestCase {
     assertFalse(updateFilter.includeInserts);
     assertThat(updateFilter.updateProperties).containsExactly("name", "status");
 
+    changeFilter = register.getChangeFilter(Country.class);
+    DefaultChangeLogRegister.BasicFilter countryFilter = (DefaultChangeLogRegister.BasicFilter)changeFilter;
+    assertTrue(countryFilter.includeInserts);
+
+    // use default setting
     changeFilter = register.getChangeFilter(Contact.class);
     DefaultChangeLogRegister.BasicFilter contactFilter = (DefaultChangeLogRegister.BasicFilter)changeFilter;
     assertTrue(contactFilter.includeInserts);
 
+  }
+
+  @Test
+  public void test_defaultInsertFalse() {
+
+    DefaultChangeLogRegister register = new DefaultChangeLogRegister(false);
+
+    assertNull(register.getChangeFilter(Address.class));
+
+    ChangeLogFilter changeFilter = register.getChangeFilter(Customer.class);
+    DefaultChangeLogRegister.UpdateFilter updateFilter = (DefaultChangeLogRegister.UpdateFilter)changeFilter;
+    assertFalse(updateFilter.includeInserts);
+    assertThat(updateFilter.updateProperties).containsExactly("name", "status");
+
     changeFilter = register.getChangeFilter(Country.class);
     DefaultChangeLogRegister.BasicFilter countryFilter = (DefaultChangeLogRegister.BasicFilter)changeFilter;
-    assertFalse(countryFilter.includeInserts);
+    assertTrue(countryFilter.includeInserts);
+
+    // use default setting
+    changeFilter = register.getChangeFilter(Contact.class);
+    DefaultChangeLogRegister.BasicFilter contactFilter = (DefaultChangeLogRegister.BasicFilter)changeFilter;
+    assertFalse(contactFilter.includeInserts);
 
   }
 
