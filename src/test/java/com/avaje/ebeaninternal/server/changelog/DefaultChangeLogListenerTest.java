@@ -6,14 +6,14 @@ import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.event.changelog.ChangeSet;
 import org.junit.Test;
 
-public class ElasticChangeLogListenerTest extends BaseTestCase {
+public class DefaultChangeLogListenerTest extends BaseTestCase {
 
   Helper helper = new Helper();
 
   @Test
   public void test() {
 
-    ElasticChangeLogListener changeLogListener = new ElasticChangeLogListener();
+    DefaultChangeLogListener changeLogListener = new DefaultChangeLogListener();
 
     EbeanServer defaultServer = Ebean.getDefaultServer();
     changeLogListener.configure(defaultServer.getPluginApi());

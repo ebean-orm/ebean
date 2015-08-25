@@ -17,7 +17,7 @@ import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManagerFactory;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogPrepare;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogRegister;
-import com.avaje.ebeaninternal.server.changelog.ElasticChangeLogListener;
+import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogListener;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.DeployOrmXml;
@@ -187,7 +187,7 @@ public class InternalConfiguration {
    * Return the ChangeLogListener to use with a default implementation if none defined.
    */
   public ChangeLogListener changeLogListener(ChangeLogListener listener) {
-    return plugin((listener != null) ? listener : new ElasticChangeLogListener());
+    return plugin((listener != null) ? listener : new DefaultChangeLogListener());
   }
 
   /**

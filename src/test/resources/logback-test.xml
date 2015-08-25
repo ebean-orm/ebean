@@ -22,19 +22,19 @@
     </encoder>
   </appender>
 
-  <appender name="ELASTIC_CHANGE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <appender name="CHANGE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <File>log/changeLog.log</File>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <FileNamePattern>log/changeLog.log.%d{yyyy-MM-dd}</FileNamePattern>
       <MaxHistory>90</MaxHistory>
     </rollingPolicy>
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-      <pattern>-- %d{HH:mm:ss.SSS} %msg%n</pattern>
+      <pattern>%d{HH:mm:ss.SSS} %msg%n</pattern>
     </encoder>
   </appender>
 
-  <logger name="org.avaje.ebean.ElasticChangeLog" level="TRACE" additivity="false">
-    <appender-ref ref="ELASTIC_CHANGE_LOG"/>
+  <logger name="org.avaje.ebean.ChangeLog" level="TRACE" additivity="false">
+    <appender-ref ref="CHANGE_LOG"/>
   </logger>
 
   <root level="WARN">

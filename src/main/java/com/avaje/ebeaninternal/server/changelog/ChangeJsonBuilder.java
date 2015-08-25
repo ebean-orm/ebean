@@ -11,67 +11,42 @@ import com.fasterxml.jackson.core.JsonGenerator;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 import java.util.Map;
 
 /**
- * Builds JSON appropriate for loading into ElasticS via the bulk API.
+ * Builds JSON document for a bean change.
  */
-public class BulkJsonBuilder {
+public class ChangeJsonBuilder {
 
   protected final JsonFactory jsonFactory = new JsonFactory();
 
-  protected final String indexName;
-
-  protected final String indexType;
-
   protected final JsonContext json;
 
-  protected BulkJsonBuilder(JsonContext json, String indexName, String indexType) {
+  protected ChangeJsonBuilder(JsonContext json) {
     this.json = json;
-    this.indexName = indexName;
-    this.indexType = indexType;
   }
 
   /**
-   * Write the change set into Elastic bulk API JSON form (so contains special new line
-   * characters and bulk API header etc.
+   * Write the bean change as JSON.
    */
-  public void writeJson(ChangeSet changeSet, Writer writer) throws IOException {
+  public void writeBeanJson(Writer writer, BeanChange bean, ChangeSet changeSet, int position) throws IOException {
 
     JsonGenerator generator = jsonFactory.createGenerator(writer);
 
-    List<BeanChange> changes = changeSet.getChanges();
-    for (int i = 0; i < changes.size(); i++) {
-      write(generator, changes.get(i), changeSet, i);
-    }
+    writeBeanChange(generator, bean, changeSet, position);
 
     generator.flush();
     generator.close();
   }
 
   /**
-   * Write the bean change as a single JSON document for storage into Elastic.
-   * <p>
-   * Note that for ease of search/use we effectively denormalise by including the transaction header
-   * information in each bean document.
-   * </p>
-   */
-  protected void write(JsonGenerator gen, BeanChange bean, ChangeSet changeSet, int position) throws IOException {
-
-    writeBulkHeader(gen, changeSet, position);
-    writeBeanChange(gen, bean, changeSet);
-    writeBeanChangeEnd(gen);
-  }
-
-  /**
    * Write the bean change as JSON document containing the transaction header details.
    */
-  protected void writeBeanChange(JsonGenerator gen, BeanChange bean, ChangeSet changeSet) throws IOException {
+  protected void writeBeanChange(JsonGenerator gen, BeanChange bean, ChangeSet changeSet, int position) throws IOException {
 
     gen.writeStartObject();
 
-    writeBeanTransactionDetails(gen, changeSet);
+    writeBeanTransactionDetails(gen, changeSet, position);
 
     gen.writeStringField("object", bean.getTable());
     gen.writeStringField("objectId", bean.getId().toString());
@@ -84,20 +59,14 @@ public class BulkJsonBuilder {
   }
 
   /**
-   * For Elastic bulk we append raw new line character.
-   */
-  protected void writeBeanChangeEnd(JsonGenerator gen) throws IOException {
-    gen.writeRawValue("\n");
-  }
-
-  /**
    * Denormalise by writing the transaction header details.
    */
-  protected void writeBeanTransactionDetails(JsonGenerator gen, ChangeSet changeSet) throws IOException {
+  protected void writeBeanTransactionDetails(JsonGenerator gen, ChangeSet changeSet, int position) throws IOException {
 
     gen.writeStringField("txnId", changeSet.getTxnId());
     gen.writeStringField("txnState", changeSet.getTxnState().getCode());
     gen.writeNumberField("txnBatch", changeSet.getTxnBatch());
+    gen.writeNumberField("txnPosition", position);
     gen.writeStringField("userId", changeSet.getUserId());
     String userIpAddress = changeSet.getUserIpAddress();
     if (userIpAddress != null) {
@@ -107,28 +76,6 @@ public class BulkJsonBuilder {
     if (userContext != null) {
       gen.writeStringField("userContext", userContext);
     }
-  }
-
-  /**
-   * Write the elastic bulk API header.
-   */
-  protected void writeBulkHeader(JsonGenerator gen, ChangeSet changeSet, int position) throws IOException {
-
-    // we index with an 'id' value so that we can process/reprocess the JSON and
-    // avoid duplicates being inserted. Appending the batch and position give us
-    // an effectively unique id value for the change
-    String uid = changeSet.getTxnId() + "_" + changeSet.getTxnBatch() + "." + position;
-
-    // the 'header' for elastic bulk API
-    gen.writeStartObject();
-    gen.writeFieldName("index");
-    gen.writeStartObject();
-    gen.writeStringField("_index", indexName);
-    gen.writeStringField("_type", indexType);
-    gen.writeStringField("_id", uid);
-    gen.writeEndObject();
-    gen.writeEndObject();
-    gen.writeRawValue("\n");
   }
 
   /**
