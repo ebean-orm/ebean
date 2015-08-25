@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.changelog;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.event.changelog.ChangeLogFilter;
+import com.avaje.tests.inheritance.model.ProductConfiguration;
 import com.avaje.tests.model.basic.Address;
 import com.avaje.tests.model.basic.Contact;
 import com.avaje.tests.model.basic.Country;
@@ -10,6 +11,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -60,6 +62,16 @@ public class DefaultChangeLogRegisterTest extends BaseTestCase {
     DefaultChangeLogRegister.BasicFilter contactFilter = (DefaultChangeLogRegister.BasicFilter)changeFilter;
     assertFalse(contactFilter.includeInserts);
 
+  }
+
+  @Test
+  public void test_inheritance() {
+
+    DefaultChangeLogRegister register = new DefaultChangeLogRegister(true);
+    ChangeLogFilter changeFilter = register.getChangeFilter(ProductConfiguration.class);
+    assertNotNull(changeFilter);
+    DefaultChangeLogRegister.BasicFilter basicFilter = (DefaultChangeLogRegister.BasicFilter)changeFilter;
+    assertTrue(basicFilter.includeInserts);
   }
 
 }

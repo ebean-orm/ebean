@@ -30,7 +30,7 @@ public class DefaultChangeLogRegister implements ChangeLogRegister {
   @Override
   public ChangeLogFilter getChangeFilter(Class<?> beanType) {
 
-    ChangeLog changeLog = beanType.getAnnotation(ChangeLog.class);
+    ChangeLog changeLog = getChangeLog(beanType);
     if (changeLog == null) {
       return null;
     }
@@ -46,6 +46,20 @@ public class DefaultChangeLogRegister implements ChangeLogRegister {
     }
 
     return new UpdateFilter(insertModeInclude(changeLog.inserts()), updateProps);
+  }
+
+  /**
+   * Find and return the ChangeLog annotation in the inheritance hierarchy.
+   */
+  private ChangeLog getChangeLog(Class<?> beanType) {
+    ChangeLog changeLog = beanType.getAnnotation(ChangeLog.class);
+    if (changeLog != null) {
+      return changeLog;
+    }
+    if (Object.class.equals(beanType.getSuperclass())) {
+      return null;
+    }
+    return getChangeLog(beanType.getSuperclass());
   }
 
   /**
