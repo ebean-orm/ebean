@@ -147,8 +147,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   public Collection<E> getActualDetails() {
     return map.values();
   }
-  
-  
+
   /**
    * Returns the map entrySet.
    * <p>
@@ -158,7 +157,6 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
    */
   public Collection<?> getActualEntries() {
     return map.entrySet();
-
   }
 
   public String toString() {
