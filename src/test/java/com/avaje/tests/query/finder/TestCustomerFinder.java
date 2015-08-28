@@ -38,22 +38,22 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(customer.getId()).isEqualTo(customer1.getId());
     assertThat(customer.getName()).isEqualTo(customer1.getName());
 
-    Customer customer2 = Customer.find.byName(customer.getName());
-    assertThat(customer.getId()).isEqualTo(customer2.getId());
-    assertThat(customer.getName()).isEqualTo(customer2.getName());
-
     assertThat(Customer.find.db().getName()).isEqualTo(Ebean.getDefaultServer().getName());
 
   }
 
   @Test
-  public void test_deleteById() {
+  public void test_byName_deleteById() {
 
     Customer customer = new Customer();
-    customer.setName("Newbie");
+    customer.setName("Newbie-879879897");
 
     Ebean.save(customer);
     assertThat(customer.getId()).isNotNull();
+
+    Customer customer2 = Customer.find.byName(customer.getName());
+    assertThat(customer.getId()).isEqualTo(customer2.getId());
+    assertThat(customer.getName()).isEqualTo(customer2.getName());
 
     Customer.find.deleteById(customer.getId());
 
