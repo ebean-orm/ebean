@@ -26,6 +26,17 @@ public class MIndex {
     this.columns.add(columnName);
   }
 
+  /**
+   * Create a multi column non unique index.
+   */
+  public MIndex(String indexName, String tableName, String[] columnNames) {
+    this.tableName = tableName;
+    this.indexName = indexName;
+    for (int i = 0; i < columnNames.length; i++) {
+      this.columns.add(columnNames[i]);
+    }
+  }
+
   public MIndex(CreateIndex createIndex) {
     this.indexName = createIndex.getIndexName();
     this.tableName = createIndex.getTableName();

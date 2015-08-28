@@ -10,15 +10,24 @@ import java.lang.annotation.Target;
  *
  * @author rvbiljouw
  */
-@Target({ElementType.FIELD})
+@Target({ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Index {
 
   /**
-   * Name of the index
-   *
-   * @return index name
+   * Name of the index. If left blank a name is derived using the built in naming convention.
    */
-  String value() default "";
+  String name() default "";
+
+  /**
+   * If set true indicates this is a unique index.
+   */
+  boolean unique() default false;
+
+  /**
+   * When placed on the class (rather than field) you can specify the columns
+   * to include in the index in order.
+   */
+  String[] columnNames() default {};
 
 }

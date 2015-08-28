@@ -324,14 +324,13 @@ public class BaseTableDdl implements TableDdl {
 
   protected void writeCompoundUniqueConstraints(DdlBuffer apply, CreateTable createTable) throws IOException {
 
-    String tableName = createTable.getName();
-
     List<UniqueConstraint> uniqueConstraints = createTable.getUniqueConstraint();
     for (UniqueConstraint uniqueConstraint : uniqueConstraints) {
+      String uqName = uniqueConstraint.getName();
       String[] columns = toColumnNamesSplit(uniqueConstraint.getColumnNames());
-      apply
-          .append(platformDdl.alterTableAddUniqueConstraint(tableName, uniqueConstraint.getName(), columns))
-          .endOfStatement();
+      apply.append(",").newLine();
+      apply.append("  constraint ").append(uqName).append(" unique");
+      appendColumns(columns, apply);
     }
   }
 

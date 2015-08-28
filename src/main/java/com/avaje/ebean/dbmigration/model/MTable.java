@@ -9,6 +9,7 @@ import com.avaje.ebean.dbmigration.migration.DropColumn;
 import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
 import com.avaje.ebean.dbmigration.migration.DropTable;
 import com.avaje.ebean.dbmigration.migration.IdentityType;
+import com.avaje.ebean.dbmigration.migration.UniqueConstraint;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -167,6 +168,21 @@ public class MTable {
 
     for (MCompoundForeignKey compoundKey : compoundKeys) {
       createTable.getForeignKey().add(compoundKey.createForeignKey());
+    }
+
+    for (MCompoundUniqueConstraint constraint : compoundUniqueConstraints) {
+      UniqueConstraint uq = new UniqueConstraint();
+      uq.setName(constraint.getName());
+      String[] columns = constraint.getColumns();
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < columns.length; i++) {
+        if (i > 0) {
+          sb.append(",");
+        }
+        sb.append(columns[i]);
+      }
+      uq.setColumnNames(sb.toString());
+      createTable.getUniqueConstraint().add(uq);
     }
 
     return createTable;

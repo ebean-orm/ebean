@@ -9,7 +9,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
-import com.avaje.ebeaninternal.server.deploy.CompoundUniqueContraint;
+import com.avaje.ebeaninternal.server.deploy.CompoundUniqueConstraint;
 import com.avaje.ebeaninternal.server.deploy.TableJoinColumn;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
 
@@ -36,24 +36,39 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   private int countCheck;
 
 
-  public ModelBuildPropertyVisitor(ModelBuildContext ctx, MTable table, CompoundUniqueContraint[] compoundUniqueConstraints) {
+  public ModelBuildPropertyVisitor(ModelBuildContext ctx, MTable table, CompoundUniqueConstraint[] constraints) {
     this.ctx = ctx;
     this.table = table;
 
-    addCompoundUniqueConstraint(compoundUniqueConstraints);
+    addCompoundUniqueConstraint(constraints);
   }
 
   /**
    * Add unique constraints defined via JPA UniqueConstraint annotations.
    */
-  private void addCompoundUniqueConstraint(CompoundUniqueContraint[] compoundUniqueConstraints) {
+  private void addCompoundUniqueConstraint(CompoundUniqueConstraint[] constraints) {
 
-    if (compoundUniqueConstraints != null) {
-      for (int i = 0; i < compoundUniqueConstraints.length; i++) {
-        String[] columns = compoundUniqueConstraints[i].getColumns();
-        String uqName = determineUniqueConstraintName(columns);
-        table.addCompoundUniqueConstraint(columns, false, uqName);
+    if (constraints != null) {
+      for (int i = 0; i < constraints.length; i++) {
+        CompoundUniqueConstraint constraint = constraints[i];
+        String[] columns = constraint.getColumns();
         indexSet.add(columns);
+
+        if (constraint.isUnique()) {
+          String uqName = constraint.getName();
+          if (uqName == null || uqName.trim().isEmpty()) {
+            uqName = determineUniqueConstraintName(columns);
+          }
+          table.addCompoundUniqueConstraint(columns, false, uqName);
+
+        } else {
+          // 'just' an index (not a unique constraint)
+          String idxName = constraint.getName();
+          if (idxName == null || idxName.trim().isEmpty()) {
+            idxName = determineIndexName(columns);
+          }
+          ctx.addIndex(idxName, table.getName(), columns);
+        }
       }
     }
   }

@@ -133,7 +133,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    */
   private final ConcurrencyMode concurrencyMode;
 
-  private final CompoundUniqueContraint[] compoundUniqueConstraints;
+  private final CompoundUniqueConstraint[] compoundUniqueConstraints;
 
   /**
    * The base database table.
@@ -1352,7 +1352,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
 
   @Override
   public Object getBeanId(T bean) {
-    return getId((EntityBean)bean);
+    return getId((EntityBean) bean);
   }
 
   /**
@@ -1620,7 +1620,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   /**
    * Return the compound unique constraints.
    */
-  public CompoundUniqueContraint[] getCompoundUniqueConstraints() {
+  public CompoundUniqueConstraint[] getCompoundUniqueConstraints() {
     return compoundUniqueConstraints;
   }
 

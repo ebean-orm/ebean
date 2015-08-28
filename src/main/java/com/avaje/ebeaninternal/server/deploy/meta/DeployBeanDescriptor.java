@@ -16,7 +16,7 @@ import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistController;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistListener;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanPostLoad;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
-import com.avaje.ebeaninternal.server.deploy.CompoundUniqueContraint;
+import com.avaje.ebeaninternal.server.deploy.CompoundUniqueConstraint;
 import com.avaje.ebeaninternal.server.deploy.DRawSqlMeta;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
@@ -107,7 +107,7 @@ public class DeployBeanDescriptor<T> {
 
   private boolean updateChangesOnly;
 
-  private List<CompoundUniqueContraint> compoundUniqueConstraints;
+  private List<CompoundUniqueConstraint> compoundUniqueConstraints;
 
   /**
    * The base database table.
@@ -371,9 +371,9 @@ public class DeployBeanDescriptor<T> {
   /**
    * Add a compound unique constraint.
    */
-  public void addCompoundUniqueConstraint(CompoundUniqueContraint c) {
+  public void addCompoundUniqueConstraint(CompoundUniqueConstraint c) {
     if (compoundUniqueConstraints == null) {
-      compoundUniqueConstraints = new ArrayList<CompoundUniqueContraint>();
+      compoundUniqueConstraints = new ArrayList<CompoundUniqueConstraint>();
     }
     compoundUniqueConstraints.add(c);
   }
@@ -381,11 +381,11 @@ public class DeployBeanDescriptor<T> {
   /**
    * Return the compound unique constraints (can be null).
    */
-  public CompoundUniqueContraint[] getCompoundUniqueConstraints() {
+  public CompoundUniqueConstraint[] getCompoundUniqueConstraints() {
     if (compoundUniqueConstraints == null) {
       return null;
     } else {
-      return compoundUniqueConstraints.toArray(new CompoundUniqueContraint[compoundUniqueConstraints.size()]);
+      return compoundUniqueConstraints.toArray(new CompoundUniqueConstraint[compoundUniqueConstraints.size()]);
     }
   }
 

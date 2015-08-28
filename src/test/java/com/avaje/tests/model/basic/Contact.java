@@ -12,7 +12,9 @@ import javax.persistence.Version;
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.ChangeLog;
 import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.Index;
 
+@Index(columnNames = {"last_name","first_name"})
 @ChangeLog
 @Entity
 @CacheStrategy(naturalKey="email")

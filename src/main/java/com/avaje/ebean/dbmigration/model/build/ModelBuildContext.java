@@ -75,6 +75,10 @@ public class ModelBuildContext {
     model.addIndex(indexName, tableName, columnName);
   }
 
+  public void addIndex(String indexName, String tableName, String[] columnNames) {
+    model.addIndex(indexName, tableName, columnNames);
+  }
+
   private String maxLength(String constraintName, int indexCount) {
     return maxLength.maxLength(constraintName, indexCount);
   }

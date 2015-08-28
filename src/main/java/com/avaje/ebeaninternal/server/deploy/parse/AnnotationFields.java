@@ -287,7 +287,7 @@ public class AnnotationFields extends AnnotationParser {
         throw new RuntimeException("Can't use Index on foreign key relationships.");
       }
       prop.setIndexed();
-      prop.setIndexName(index.value());
+      prop.setIndexName(index.name());
     }
   }
 

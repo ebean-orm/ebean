@@ -224,4 +224,12 @@ public class ModelContainer {
 
     indexes.put(indexName, new MIndex(indexName, tableName, columnName));
   }
+
+  /**
+   * Add a multi column index.
+   */
+  public void addIndex(String indexName, String tableName, String[] columnNames) {
+
+    indexes.put(indexName, new MIndex(indexName, tableName, columnNames));
+  }
 }

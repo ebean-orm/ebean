@@ -11,13 +11,14 @@ import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.CacheTuning;
 import com.avaje.ebean.annotation.EntityConcurrencyMode;
 import com.avaje.ebean.annotation.History;
+import com.avaje.ebean.annotation.Index;
 import com.avaje.ebean.annotation.NamedUpdate;
 import com.avaje.ebean.annotation.NamedUpdates;
 import com.avaje.ebean.annotation.UpdateMode;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
-import com.avaje.ebeaninternal.server.deploy.CompoundUniqueContraint;
+import com.avaje.ebeaninternal.server.deploy.CompoundUniqueConstraint;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
@@ -76,9 +77,14 @@ public class AnnotationClass extends AnnotationParser {
       descriptor.setName("Embeddable:" + cls.getSimpleName());
     }
 
+    Index index = cls.getAnnotation(Index.class);
+    if (index != null) {
+      descriptor.addCompoundUniqueConstraint(new CompoundUniqueConstraint(index.columnNames(), index.name(), index.unique()));
+    }
+
     UniqueConstraint uc = cls.getAnnotation(UniqueConstraint.class);
     if (uc != null) {
-      descriptor.addCompoundUniqueConstraint(new CompoundUniqueContraint(uc.columnNames()));
+      descriptor.addCompoundUniqueConstraint(new CompoundUniqueConstraint(uc.columnNames()));
     }
 
     Table table = cls.getAnnotation(Table.class);
@@ -86,7 +92,7 @@ public class AnnotationClass extends AnnotationParser {
       UniqueConstraint[] uniqueConstraints = table.uniqueConstraints();
       if (uniqueConstraints != null) {
         for (UniqueConstraint c : uniqueConstraints) {
-          descriptor.addCompoundUniqueConstraint(new CompoundUniqueContraint(c.columnNames()));
+          descriptor.addCompoundUniqueConstraint(new CompoundUniqueConstraint(c.columnNames()));
         }
       }
     }
