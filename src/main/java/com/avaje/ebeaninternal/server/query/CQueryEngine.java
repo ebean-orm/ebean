@@ -53,6 +53,27 @@ public class CQueryEngine {
     return queryBuilder.buildQuery(request);
   }
 
+  public <T> int delete(OrmQueryRequest<T> request) {
+
+    CQueryDelete query = queryBuilder.buildDeleteQuery(request);
+    try {
+      int rows = query.delete();
+
+      if (request.isLogSql()) {
+        String logSql = query.getGeneratedSql();
+        if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
+          logSql = Str.add(logSql, "; --bind(", query.getBindLog(), ") rows:", String.valueOf(rows));
+        }
+        request.logSql(logSql);
+      }
+
+      return rows;
+
+    } catch (SQLException e) {
+      throw CQuery.createPersistenceException(e, request.getTransaction(), query.getBindLog(), query.getGeneratedSql());
+    }
+  }
+
   /**
    * Build and execute the find Id's query.
    */

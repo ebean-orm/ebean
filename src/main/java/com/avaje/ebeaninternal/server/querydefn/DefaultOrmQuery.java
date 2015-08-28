@@ -414,6 +414,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   /**
+   * Setup to be a delete query.
+   */
+  public void setDelete() {
+    // unset any paging and select on the id in the case where the query
+    // includes joins and we use - delete ... where id in (...)
+    maxRows = 0;
+    firstRow = 0;
+    setSelectId();
+  }
+
+  /**
    * Set the select clause to select the Id property.
    */
   public void setSelectId() {
@@ -946,6 +957,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public DefaultOrmQuery<T> fetch(String property, String columns, FetchConfig config) {
     detail.addFetch(property, columns, config);
     return this;
+  }
+
+  @Override
+  public int delete() {
+    return server.delete(this, null);
   }
 
   public List<Object> findIds() {

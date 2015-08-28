@@ -48,6 +48,11 @@ public interface SpiOrmQueryRequest<T> {
   void endTransIfRequired();
 
   /**
+   * Execute the query as a delete.
+   */
+  int delete();
+
+  /**
    * Execute the query as findById.
    */
   Object findId();

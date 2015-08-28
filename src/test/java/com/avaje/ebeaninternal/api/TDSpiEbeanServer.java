@@ -162,6 +162,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> int delete(Query<T> query, Transaction t) {
+    return 0;
+  }
+
+  @Override
   public <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction) {
     return null;
   }

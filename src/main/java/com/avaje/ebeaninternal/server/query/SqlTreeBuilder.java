@@ -1,17 +1,5 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.PropertyJoin;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -27,6 +15,17 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Factory for SqlTree.
@@ -138,8 +137,10 @@ public class SqlTreeBuilder {
       encryptedProps = ctx.getEncryptedProps();
     }
 
+    boolean includeJoins = (alias == null) ? false : alias.isIncludeJoins();
+
     return new SqlTree(summary.toString(), rootNode, selectSql, fromSql, inheritanceWhereSql, encryptedProps,
-        manyProperty, queryDetail.getIncludes());
+        manyProperty, queryDetail.getIncludes(), includeJoins);
   }
 
   private String buildSelectClause() {

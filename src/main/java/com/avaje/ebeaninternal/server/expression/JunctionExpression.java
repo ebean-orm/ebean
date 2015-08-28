@@ -219,6 +219,11 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
+  public int delete() {
+    return exprList.delete();
+  }
+
+  @Override
   public Query<T> asOf(Timestamp asOf) {
     return exprList.asOf(asOf);
   }

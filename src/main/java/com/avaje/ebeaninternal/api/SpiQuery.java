@@ -84,7 +84,12 @@ public interface SpiQuery<T> extends Query<T> {
     /**
      * A subquery used as part of a where clause.
      */
-    SUBQUERY
+    SUBQUERY,
+
+    /**
+     * Delete query.
+     */
+    DELETE,
   }
 
   enum TemporalMode {
@@ -271,6 +276,11 @@ public interface SpiQuery<T> extends Query<T> {
    * Return a Natural Key bind parameter if supported by this query.
    */
   NaturalKeyBindParam getNaturalKeyBindParam();
+
+  /**
+   * Set the query to be a delete query.
+   */
+  void setDelete();
 
   /**
    * Set the query to select the id property only.

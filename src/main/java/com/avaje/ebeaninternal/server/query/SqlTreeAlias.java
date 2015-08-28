@@ -205,4 +205,11 @@ public class SqlTreeAlias {
   private String nextManyWhereTableAlias() {
     return "u" + (++manyWhereCounter);
   }
+
+  /**
+   * Return true if there are joins included in the query.
+   */
+  public boolean isIncludeJoins() {
+    return !aliasMap.isEmpty() || !manyWhereAliasMap.isEmpty();
+  }
 }

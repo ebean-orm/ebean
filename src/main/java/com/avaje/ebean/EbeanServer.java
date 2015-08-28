@@ -1,13 +1,5 @@
 package com.avaje.ebean;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.ServerConfig;
@@ -16,6 +8,13 @@ import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
 import org.jetbrains.annotations.Nullable;
+
+import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Provides the API for fetching and saving beans to a particular DataSource.
@@ -1113,6 +1112,21 @@ public interface EbeanServer {
    */
   @Nullable
   <T> T findUnique(Query<T> query, Transaction transaction);
+
+  /**
+   * Execute as a delete query deleting the 'root level' beans that match the predicates
+   * in the query.
+   * <p>
+   * Note that if the query includes joins then the generated delete statement may not be
+   * optimal depending on the database platform.
+   * </p>
+   *
+   * @param query       the query used for the delete
+   * @param transaction the transaction to use (can be null)
+   * @param <T>         the type of entity bean to fetch.
+   * @return the number of beans/rows that were deleted
+   */
+  <T> int delete(Query<T> query, Transaction transaction);
 
   /**
    * Execute the sql query returning a list of MapBean.

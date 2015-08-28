@@ -678,6 +678,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   }
 
   /**
+   * Return the "delete by id" sql.
+   */
+  public String getDeleteByIdInSql() {
+    return deleteByIdInSql;
+  }
+
+  /**
    * Return SQL that can be used to delete a list of Id's without any optimistic
    * concurrency checking.
    */

@@ -744,6 +744,18 @@ public interface Query<T> extends Serializable {
   List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end);
 
   /**
+   * Execute as a delete query deleting the 'root level' beans that match the predicates
+   * in the query.
+   * <p>
+   * Note that if the query includes joins then the generated delete statement may not be
+   * optimal depending on the database platform.
+   * </p>
+   *
+   * @return the number of beans/rows that were deleted.
+   */
+  int delete();
+
+  /**
    * Return the count of entities this query should return.
    * <p>
    * This is the number of 'top level' or 'root level' entities.

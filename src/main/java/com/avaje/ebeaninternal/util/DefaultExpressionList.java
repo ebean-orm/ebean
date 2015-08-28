@@ -159,6 +159,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public int delete() {
+    return query.delete();
+  }
+
+  @Override
   public FutureIds<T> findFutureIds() {
     return query.findFutureIds();
   }

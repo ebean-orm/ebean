@@ -1338,6 +1338,17 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  public <T> int delete(Query<T> query, Transaction t) {
+
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.DELETE, query, t);
+    try {
+      request.initTransIfRequired();
+      return request.delete();
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
   public <T> FutureRowCount<T> findFutureRowCount(Query<T> q, Transaction t) {
 
     SpiQuery<T> copy = ((SpiQuery<T>) q).copy();

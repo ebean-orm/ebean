@@ -84,6 +84,47 @@ public class CQueryBuilder {
   }
 
   /**
+   * Build the delete query.
+   */
+  public <T> CQueryDelete buildDeleteQuery(OrmQueryRequest<T> request) {
+
+    SpiQuery<T> query = request.getQuery();
+    query.setDelete();
+
+    CQueryPredicates predicates = new CQueryPredicates(binder, request);
+    CQueryPlan queryPlan = request.getQueryPlan();
+    if (queryPlan != null) {
+      // skip building the SqlTree and Sql string
+      predicates.prepare(false);
+      String sql = queryPlan.getSql();
+      return new CQueryDelete(request, predicates, sql);
+    }
+
+    predicates.prepare(true);
+
+    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query));
+
+    boolean includeJoins = sqlTree.isIncludeJoins();
+
+    String sql;
+    if (!includeJoins) {
+      // simple - delete from table ...
+      sql = buildSql("delete", request, predicates, sqlTree).getSql();
+
+    } else {
+      // wrap as - delete from table where id in (select id ...)
+      sql = buildSql(null, request, predicates, sqlTree).getSql();
+      sql = request.getBeanDescriptor().getDeleteByIdInSql() + "in (" + sql + ")";
+    }
+
+    // cache the query plan
+    queryPlan = new CQueryPlan(request, sql, sqlTree, false, false, predicates.getLogWhereSql());
+
+    request.putQueryPlan(queryPlan);
+    return new CQueryDelete(request, predicates, sql);
+  }
+
+  /**
    * Build the row count query.
    */
   public <T> CQueryFetchIds buildFetchIdsQuery(OrmQueryRequest<T> request) {

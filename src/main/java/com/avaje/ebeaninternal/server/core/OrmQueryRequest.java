@@ -218,7 +218,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public boolean isFindById() {
     return query.getType() == Type.BEAN;
   }
-  
+
+  /**
+   * Execute the query as a delete.
+   */
+  public int delete() {
+    return queryEngine.delete(this);
+  }
+
   /**
    * Execute the query as findById.
    */
