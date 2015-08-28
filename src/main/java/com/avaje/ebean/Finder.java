@@ -82,16 +82,16 @@ public class Finder<I, T> {
    * }</pre>
    */
   public Finder(Class<T> type) {
-    this.serverName = null;
     this.type = type;
+    this.serverName = null;
   }
 
   /**
    * Create with the type of the entity bean and specific server name.
    */
-  public Finder(String serverName, Class<T> type) {
-    this.serverName = serverName;
+  public Finder(Class<T> type, String serverName) {
     this.type = type;
+    this.serverName = serverName;
   }
 
   /**
@@ -164,22 +164,4 @@ public class Finder<I, T> {
     return db().find(type);
   }
 
-//  /**
-//   * Creates a Finder for the named EbeanServer.
-//   *
-//   * <p>
-//   * Create and return a new Finder for a different server.
-//   */
-//  public Finder<I, T> on(String server) {
-//    return new Finder<I, T>(server, type);
-//  }
-
-//  /**
-//   * Create and return a new query using the OQL.
-//   * <p>
-//   * Equivalent to {@link EbeanServer#createQuery(Class, String)}
-//   */
-//  public Query<T> createQuery(String oql) {
-//    return db().createQuery(type, oql);
-//  }
 }

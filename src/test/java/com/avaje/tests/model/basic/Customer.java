@@ -5,6 +5,7 @@ import com.avaje.ebean.annotation.ChangeLogInsertMode;
 import com.avaje.ebean.annotation.EnumValue;
 import com.avaje.ebean.annotation.JsonIgnore;
 import com.avaje.ebean.annotation.Where;
+import com.avaje.tests.model.basic.finder.CustomerFinder;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -28,6 +29,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Customer extends BasicDomain {
 
   private static final long serialVersionUID = 1L;
+
+  public static final CustomerFinder find = new CustomerFinder();
 
   /**
    * EnumValue is an Ebean specific mapping for enums.
