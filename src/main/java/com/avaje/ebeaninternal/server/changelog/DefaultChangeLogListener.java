@@ -59,9 +59,11 @@ public class DefaultChangeLogListener implements ChangeLogListener, SpiServerPlu
     jsonBuilder = new ChangeJsonBuilder(server.json());
 
     Properties properties = server.getServerConfig().getProperties();
-    String bufferSize = properties.getProperty("ebean.changeLog.bufferSize");
-    if (bufferSize != null) {
-      defaultBufferSize = Integer.parseInt(bufferSize);
+    if (properties != null) {
+      String bufferSize = properties.getProperty("ebean.changeLog.bufferSize");
+      if (bufferSize != null) {
+        defaultBufferSize = Integer.parseInt(bufferSize);
+      }
     }
   }
 
