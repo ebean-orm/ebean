@@ -1325,7 +1325,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       Integer pos = reflectProps.getPropertyIndex(propName);
       if (pos == null) {
         if (isPersistentField(prop)) {
-          throw new IllegalStateException("Property "+propName+" not found in "+reflectProps);
+          throw new IllegalStateException("Property " + propName + " not found in " + reflectProps + " for type " + beanType);
         }
         
       } else {
