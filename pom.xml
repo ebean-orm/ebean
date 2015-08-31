@@ -130,7 +130,7 @@
     <dependency>
       <groupId>org.avaje.ebeanorm</groupId>
       <artifactId>avaje-ebeanorm-agent</artifactId>
-      <version>4.5.1</version>
+      <version>4.7.1</version>
       <scope>test</scope>
     </dependency>
         
@@ -195,7 +195,7 @@
       <plugin>
         <groupId>org.avaje.ebeanorm</groupId>
         <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
-        <version>4.5.1</version>
+        <version>4.7.1</version>
         <executions>
           <!--   Not going to enhance Model bean -->
           <execution>
@@ -204,7 +204,7 @@
             <configuration>
               <classSource>target/test-classes</classSource>
               <packages>com.avaje.tests.**</packages>
-              <transformArgs>debug=1</transformArgs>
+              <transformArgs>debug=2</transformArgs>
             </configuration>
             <goals>
               <goal>enhance</goal>
