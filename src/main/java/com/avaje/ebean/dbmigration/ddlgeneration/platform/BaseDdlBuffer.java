@@ -58,6 +58,7 @@ public class BaseDdlBuffer implements DdlBuffer {
         append(" ");
       }
     }
+    append(" ");
   }
 
   @Override
