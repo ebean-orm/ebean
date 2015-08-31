@@ -17,27 +17,27 @@ import java.util.concurrent.TimeUnit;
  */
 public class DefaultAutoFetchManagerLogging {
 
-	private static final Logger logger = LoggerFactory.getLogger(DefaultAutoFetchManagerLogging.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultAutoFetchManagerLogging.class);
 
-	private final DefaultAutoFetchManager manager;
+  private final DefaultAutoFetchManager manager;
 
-	private final int updateFreqInSecs;
-	
-	public DefaultAutoFetchManagerLogging(ServerConfig serverConfig, DefaultAutoFetchManager profileListener) {
+  private final int updateFreqInSecs;
 
-		this.manager = profileListener;
-		this.updateFreqInSecs = serverConfig.getAutofetchConfig().getProfileUpdateFrequency();
-	}
-	
-	public void init(SpiEbeanServer ebeanServer) {
-	  ebeanServer.getBackgroundExecutor().executePeriodically(new UpdateProfile(), updateFreqInSecs, TimeUnit.SECONDS);
-	}
+  public DefaultAutoFetchManagerLogging(ServerConfig serverConfig, DefaultAutoFetchManager profileListener) {
 
-	private final class UpdateProfile implements Runnable {
-		public void run() {
-			manager.updateTunedQueryInfo();
-		}
-	}
+    this.manager = profileListener;
+    this.updateFreqInSecs = serverConfig.getAutofetchConfig().getProfileUpdateFrequency();
+  }
+
+  public void init(SpiEbeanServer ebeanServer) {
+    ebeanServer.getBackgroundExecutor().executePeriodically(new UpdateProfile(), updateFreqInSecs, TimeUnit.SECONDS);
+  }
+
+  private final class UpdateProfile implements Runnable {
+    public void run() {
+      manager.updateTunedQueryInfo();
+    }
+  }
 
   public void logInfo(String msg, Throwable e) {
     logger.info(msg, e);
@@ -47,21 +47,21 @@ public class DefaultAutoFetchManagerLogging {
     logger.error(msg, e);
   }
 
-	public void logSummary(String summaryInfo) {
-		
-		String msg = "\"Summary\",\""+summaryInfo+"\",,,,";		
-		logger.debug(msg);
-	}
+  public void logSummary(String summaryInfo) {
 
-	public void logChanged(TunedQueryInfo tunedFetch, OrmQueryDetail newQueryDetail) {
-		
-		String msg = tunedFetch.getLogOutput(newQueryDetail);
-		logger.debug(msg);
-	}
+    String msg = "\"Summary\",\"" + summaryInfo + "\",,,,";
+    logger.debug(msg);
+  }
 
-	public void logNew(TunedQueryInfo tunedFetch) {
+  public void logChanged(TunedQueryInfo tunedFetch, OrmQueryDetail newQueryDetail) {
 
-		String msg = tunedFetch.getLogOutput(null);
-	  logger.debug(msg);
-	}
+    String msg = tunedFetch.getLogOutput(newQueryDetail);
+    logger.debug(msg);
+  }
+
+  public void logNew(TunedQueryInfo tunedFetch) {
+
+    String msg = tunedFetch.getLogOutput(null);
+    logger.debug(msg);
+  }
 }

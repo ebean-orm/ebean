@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.server.autofetch;
 
-import java.io.Serializable;
-
 import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
+
+import java.io.Serializable;
 
 /**
  * Holds tuned query information. Is immutable so this represents the tuning at
@@ -12,172 +12,172 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
  */
 public class TunedQueryInfo implements Serializable {
 
-	private static final long serialVersionUID = 7381493228797997282L;
+  private static final long serialVersionUID = 7381493228797997282L;
 
-	private final ObjectGraphOrigin origin;
+  private final ObjectGraphOrigin origin;
 
-	/**
-	 * The tuned query details with joins and properties.
-	 */
-	private OrmQueryDetail tunedDetail;
+  /**
+   * The tuned query details with joins and properties.
+   */
+  private OrmQueryDetail tunedDetail;
 
-	/**
-	 * The number of times profiling has been collected for this query point.
-	 */
-	private int profileCount;
-	
-	private Long lastTuneTime = (long) 0;
+  /**
+   * The number of times profiling has been collected for this query point.
+   */
+  private int profileCount;
 
-	@SuppressWarnings("RedundantStringConstructorCall")
+  private Long lastTuneTime = (long) 0;
+
+  @SuppressWarnings("RedundantStringConstructorCall")
   private final String rateMonitor = new String();
 
-	/**
-	 * The number of queries tuned by this object.
-	 * Could use AtomicInteger perhaps.
-	 */
-	private transient int tunedCount;
+  /**
+   * The number of queries tuned by this object.
+   * Could use AtomicInteger perhaps.
+   */
+  private transient int tunedCount;
 
-	private transient int rateTotal;
+  private transient int rateTotal;
 
-	private transient int rateHits;
+  private transient int rateHits;
 
-	private transient double lastRate;
+  private transient double lastRate;
 
-	public TunedQueryInfo(ObjectGraphOrigin queryPoint, OrmQueryDetail tunedDetail, int profileCount) {
-		this.origin = queryPoint;
-		this.tunedDetail = tunedDetail;
-		this.profileCount = profileCount;
-	}
+  public TunedQueryInfo(ObjectGraphOrigin queryPoint, OrmQueryDetail tunedDetail, int profileCount) {
+    this.origin = queryPoint;
+    this.tunedDetail = tunedDetail;
+    this.profileCount = profileCount;
+  }
 
-	/**
-	 * Return true if this query should be profiled based on a percentage rate.
-	 */
-	public boolean isPercentageProfile(double rate) {
-		
-		synchronized (rateMonitor) {
+  /**
+   * Return true if this query should be profiled based on a percentage rate.
+   */
+  public boolean isPercentageProfile(double rate) {
 
-			if (lastRate != rate) {
-				// the rate has changed so resetting
-				lastRate = rate;
-				rateTotal = 0;
-				rateHits = 0;
-			}
+    synchronized (rateMonitor) {
 
-			rateTotal++;
-			if (rate > (double) rateHits / rateTotal) {
-				rateHits++;
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}
+      if (lastRate != rate) {
+        // the rate has changed so resetting
+        lastRate = rate;
+        rateTotal = 0;
+        rateHits = 0;
+      }
 
-	/**
-	 * Set the number of times profiling has been collected for this query
-	 * point.
-	 */
-	public void setProfileCount(int profileCount) {
-		// int assignment is atomic
-		this.profileCount = profileCount;
-	}
+      rateTotal++;
+      if (rate > (double) rateHits / rateTotal) {
+        rateHits++;
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
 
-	/**
-	 * Set the tuned query detail.
-	 */
-	public void setTunedDetail(OrmQueryDetail tunedDetail) {
-		// assignment is atomic
-		this.tunedDetail = tunedDetail;
-		this.lastTuneTime = System.currentTimeMillis();
-	}
+  /**
+   * Set the number of times profiling has been collected for this query
+   * point.
+   */
+  public void setProfileCount(int profileCount) {
+    // int assignment is atomic
+    this.profileCount = profileCount;
+  }
 
-	/**
-	 * Return true if the fetches are essentially the same.
-	 */
-	public boolean isSame(OrmQueryDetail newQueryDetail) {
+  /**
+   * Set the tuned query detail.
+   */
+  public void setTunedDetail(OrmQueryDetail tunedDetail) {
+    // assignment is atomic
+    this.tunedDetail = tunedDetail;
+    this.lastTuneTime = System.currentTimeMillis();
+  }
+
+  /**
+   * Return true if the fetches are essentially the same.
+   */
+  public boolean isSame(OrmQueryDetail newQueryDetail) {
     return tunedDetail != null && tunedDetail.isAutoFetchEqual(newQueryDetail);
   }
 
-	/**
-	 * Tune the query by replacing its OrmQueryDetail with a tuned one.
-	 * 
-	 * @return true if the query was tuned, otherwise false.
-	 */
-	public boolean autoFetchTune(SpiQuery<?> query) {
-		if (tunedDetail == null) {
-		    return false;
-		}
-		
-		boolean tuned;
-		//Note: tunedDetail is immutable by convention
-	    if (query.isDetailEmpty()) {
-            tuned = true;
-            // tune by 'replacement'
-            query.setDetail(tunedDetail.copy());  
-	    } else {
-	        // tune by 'addition'
-	        tuned = query.tuneFetchProperties(tunedDetail);
-	    }
-	    if (tuned){
-            query.setAutoFetchTuned(true);
-    		// a case for AtomicInteger but good enough for statistics
-    		tunedCount++;	
-	    }
-		return tuned;
-	}
-	
-	/**
-	 * Return the time of the last tune.
-	 */
-	public Long getLastTuneTime() {
-		return lastTuneTime;
-	}
+  /**
+   * Tune the query by replacing its OrmQueryDetail with a tuned one.
+   *
+   * @return true if the query was tuned, otherwise false.
+   */
+  public boolean autoFetchTune(SpiQuery<?> query) {
+    if (tunedDetail == null) {
+      return false;
+    }
 
-	/**
-	 * Return the number of queries tuned by this object.
-	 */
-	public int getTunedCount() {
-		return tunedCount;
-	}
+    boolean tuned;
+    //Note: tunedDetail is immutable by convention
+    if (query.isDetailEmpty()) {
+      tuned = true;
+      // tune by 'replacement'
+      query.setDetail(tunedDetail.copy());
+    } else {
+      // tune by 'addition'
+      tuned = query.tuneFetchProperties(tunedDetail);
+    }
+    if (tuned) {
+      query.setAutoFetchTuned(true);
+      // a case for AtomicInteger but good enough for statistics
+      tunedCount++;
+    }
+    return tuned;
+  }
 
-	/**
-	 * Return the number of times profiling has been collected for this query
-	 * point.
-	 */
-	public int getProfileCount() {
-		return profileCount;
-	}
+  /**
+   * Return the time of the last tune.
+   */
+  public Long getLastTuneTime() {
+    return lastTuneTime;
+  }
 
-	public OrmQueryDetail getTunedDetail() {
-		return tunedDetail;
-	}
+  /**
+   * Return the number of queries tuned by this object.
+   */
+  public int getTunedCount() {
+    return tunedCount;
+  }
 
-	public ObjectGraphOrigin getOrigin() {
-		return origin;
-	}
+  /**
+   * Return the number of times profiling has been collected for this query
+   * point.
+   */
+  public int getProfileCount() {
+    return profileCount;
+  }
 
-	public String getLogOutput(OrmQueryDetail newQueryDetail) {
-		
-		boolean changed = newQueryDetail != null;
-		
-		StringBuilder sb = new StringBuilder(150);
-		sb.append( changed ? "\"Changed\",":"\"New\",");
-		sb.append("\"").append(origin.getBeanType()).append("\",");
-		sb.append("\"").append(origin.getKey()).append("\",");
-		if (changed){
-			sb.append("\"to: ").append(newQueryDetail.toString()).append("\",");
-			sb.append("\"from: ").append(tunedDetail.toString()).append("\",");
-		} else {
-			sb.append("\"to: ").append(tunedDetail.toString()).append("\",");			
-			sb.append("\"\",");
-		}
-		sb.append("\"").append(origin.getFirstStackElement()).append("\"");
-		
-		return sb.toString();
-	}
-	
-	public String toString() {
-		return origin.getBeanType()+" "+origin.getKey()+" " + tunedDetail;
-	}
+  public OrmQueryDetail getTunedDetail() {
+    return tunedDetail;
+  }
+
+  public ObjectGraphOrigin getOrigin() {
+    return origin;
+  }
+
+  public String getLogOutput(OrmQueryDetail newQueryDetail) {
+
+    boolean changed = newQueryDetail != null;
+
+    StringBuilder sb = new StringBuilder(150);
+    sb.append(changed ? "\"Changed\"," : "\"New\",");
+    sb.append("\"").append(origin.getBeanType()).append("\",");
+    sb.append("\"").append(origin.getKey()).append("\",");
+    if (changed) {
+      sb.append("\"to: ").append(newQueryDetail.toString()).append("\",");
+      sb.append("\"from: ").append(tunedDetail.toString()).append("\",");
+    } else {
+      sb.append("\"to: ").append(tunedDetail.toString()).append("\",");
+      sb.append("\"\",");
+    }
+    sb.append("\"").append(origin.getFirstStackElement()).append("\"");
+
+    return sb.toString();
+  }
+
+  public String toString() {
+    return origin.getBeanType() + " " + origin.getKey() + " " + tunedDetail;
+  }
 
 }

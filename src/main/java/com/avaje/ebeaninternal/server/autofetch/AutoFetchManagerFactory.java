@@ -13,83 +13,83 @@ import java.io.ObjectInputStream;
 
 public class AutoFetchManagerFactory {
 
-	private static final Logger logger = LoggerFactory.getLogger(AutoFetchManagerFactory.class);
+  private static final Logger logger = LoggerFactory.getLogger(AutoFetchManagerFactory.class);
 
-	public static AutoFetchManager create(SpiEbeanServer server, ServerConfig serverConfig, ResourceManager resourceManager) {
-		
-		AutoFetchManagerFactory me = new AutoFetchManagerFactory();
-		return me.createAutoFetchManager(server, serverConfig, resourceManager);
-	}
-	
-	private AutoFetchManager createAutoFetchManager(SpiEbeanServer server, ServerConfig serverConfig, ResourceManager resourceManager){
-		
-		AutoFetchManager manager = createAutoFetchManager(server.getName(), resourceManager);
-		manager.setOwner(server, serverConfig);
-		
-		return manager;
-	}
-	
-	private AutoFetchManager createAutoFetchManager(String serverName, ResourceManager resourceManager) {
+  public static AutoFetchManager create(SpiEbeanServer server, ServerConfig serverConfig, ResourceManager resourceManager) {
 
-		File autoFetchFile = getAutoFetchFile(serverName, resourceManager);
+    AutoFetchManagerFactory me = new AutoFetchManagerFactory();
+    return me.createAutoFetchManager(server, serverConfig, resourceManager);
+  }
 
-		AutoFetchManager autoFetchManager = null;
+  private AutoFetchManager createAutoFetchManager(SpiEbeanServer server, ServerConfig serverConfig, ResourceManager resourceManager) {
 
-		boolean readFile = !"false".equalsIgnoreCase(System.getProperty("autofetch.readfromfile"));
-		if (readFile) {
-			autoFetchManager = deserializeAutoFetch(autoFetchFile);
-		}
+    AutoFetchManager manager = createAutoFetchManager(server.getName(), resourceManager);
+    manager.setOwner(server, serverConfig);
 
-		if (autoFetchManager == null) {
-			// not deserialized from file so create as empty
-			// It will be populated automatically by querying the
-			// database meta data
-			autoFetchManager = new DefaultAutoFetchManager(autoFetchFile.getAbsolutePath());
-		}
-		
-		return autoFetchManager;
-	}
-	
-	private AutoFetchManager deserializeAutoFetch(File autoFetchFile) {
-		try {
-			
-			if (!autoFetchFile.exists()) {
-				return null;
-			}
-			FileInputStream fi = new FileInputStream(autoFetchFile);
-			ObjectInputStream ois = new ObjectInputStream(fi);
-			AutoFetchManager profListener = (AutoFetchManager) ois.readObject();
-			ois.close();
-			
-			logger.info("AutoFetch deserialized from file ["+autoFetchFile.getAbsolutePath()+"]");
-			
-			return profListener;
+    return manager;
+  }
 
-		} catch (Exception ex) {
-			logger.error("Error loading autofetch file "+autoFetchFile.getAbsolutePath(), ex);
-			return null;
-		}
-	}
-	
-	/**
-	 * Return the file name of the autoFetch meta data.
-	 */
-	private File getAutoFetchFile(String serverName, ResourceManager resourceManager) {
+  private AutoFetchManager createAutoFetchManager(String serverName, ResourceManager resourceManager) {
 
-		String fileName = ".ebean."+serverName+".autofetch";
+    File autoFetchFile = getAutoFetchFile(serverName, resourceManager);
 
-		File dir = resourceManager.getAutofetchDirectory();
+    AutoFetchManager autoFetchManager = null;
 
-		if (!dir.exists()) {
-			// automatically create the directory if it does not exist.
-			// this is probably a fairly reasonable thing to do
-			if (!dir.mkdirs()) {
-				String m = "Unable to create directory [" + dir + "] for autofetch file ["+ fileName + "]";
-				throw new PersistenceException(m);
-			}
-		}
+    boolean readFile = !"false".equalsIgnoreCase(System.getProperty("autofetch.readfromfile"));
+    if (readFile) {
+      autoFetchManager = deserializeAutoFetch(autoFetchFile);
+    }
 
-		return new File(dir, fileName);
-	}
+    if (autoFetchManager == null) {
+      // not deserialized from file so create as empty
+      // It will be populated automatically by querying the
+      // database meta data
+      autoFetchManager = new DefaultAutoFetchManager(autoFetchFile.getAbsolutePath());
+    }
+
+    return autoFetchManager;
+  }
+
+  private AutoFetchManager deserializeAutoFetch(File autoFetchFile) {
+    try {
+
+      if (!autoFetchFile.exists()) {
+        return null;
+      }
+      FileInputStream fi = new FileInputStream(autoFetchFile);
+      ObjectInputStream ois = new ObjectInputStream(fi);
+      AutoFetchManager profListener = (AutoFetchManager) ois.readObject();
+      ois.close();
+
+      logger.info("AutoFetch deserialized from file [" + autoFetchFile.getAbsolutePath() + "]");
+
+      return profListener;
+
+    } catch (Exception ex) {
+      logger.error("Error loading autofetch file " + autoFetchFile.getAbsolutePath(), ex);
+      return null;
+    }
+  }
+
+  /**
+   * Return the file name of the autoFetch meta data.
+   */
+  private File getAutoFetchFile(String serverName, ResourceManager resourceManager) {
+
+    String fileName = ".ebean." + serverName + ".autofetch";
+
+    File dir = resourceManager.getAutofetchDirectory();
+
+    if (!dir.exists()) {
+      // automatically create the directory if it does not exist.
+      // this is probably a fairly reasonable thing to do
+      if (!dir.mkdirs()) {
+        String m = "Unable to create directory [" + dir + "] for autofetch file [" + fileName + "]";
+        throw new PersistenceException(m);
+      }
+    }
+
+    return new File(dir, fileName);
+  }
 
 }
