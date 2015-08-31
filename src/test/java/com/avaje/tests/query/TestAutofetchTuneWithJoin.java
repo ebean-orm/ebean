@@ -28,8 +28,11 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> q = Ebean.find(Order.class).setAutofetch(true).fetch("customer")
-        .fetch("customer.contacts").where().lt("id", 3).query();
+    Query<Order> q = Ebean.find(Order.class)
+        .setAutofetch(true)
+        .fetch("customer")
+        .fetch("customer.contacts")
+        .where().lt("id", 3).query();
 
     List<Order> list = q.findList();
 

@@ -13,7 +13,6 @@ import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
-import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.query.CQuery;
@@ -83,11 +82,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public DdlGenerator getDdlGenerator() {
-    return null;
-  }
-
-  @Override
-  public AutoFetchManager getAutoFetchManager() {
     return null;
   }
 

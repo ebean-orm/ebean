@@ -1,14 +1,5 @@
 package com.avaje.ebeaninternal.server.querydefn;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.*;
 import com.avaje.ebean.OrderBy.Property;
 import com.avaje.ebean.bean.BeanCollectionTouched;
@@ -26,7 +17,7 @@ import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
+import com.avaje.ebeaninternal.server.autofetch.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DRawSqlSelect;
@@ -35,6 +26,14 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.expression.SimpleExpression;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
 import com.avaje.ebeaninternal.util.DefaultExpressionList;
+
+import javax.persistence.PersistenceException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Default implementation of an Object Relational query.
@@ -57,7 +56,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private transient TableJoin includeTableJoin;
 
-  private transient AutoFetchManager autoFetchManager;
+  private transient ProfilingListener profilingListener;
 
   private transient BeanDescriptor<?> beanDescriptor;
 
@@ -481,7 +480,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     DefaultOrmQuery<T> copy = new DefaultOrmQuery<T>(beanType, server, expressionFactory, (String) null);
     copy.name = name;
     copy.includeTableJoin = includeTableJoin;
-    copy.autoFetchManager = autoFetchManager;
+    copy.profilingListener = profilingListener;
 
     copy.query = query;
     copy.additionalWhere = additionalWhere;
@@ -616,19 +615,23 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
   public DefaultOrmQuery<T> setForUpdate(boolean forUpdate) {
     this.forUpdate = forUpdate;
     return this;
   }
 
-  public AutoFetchManager getAutoFetchManager() {
-    return autoFetchManager;
+  @Override
+  public ProfilingListener getProfilingListener() {
+    return profilingListener;
   }
 
-  public void setAutoFetchManager(AutoFetchManager autoFetchManager) {
-    this.autoFetchManager = autoFetchManager;
+  @Override
+  public void setProfilingListener(ProfilingListener profilingListener) {
+    this.profilingListener = profilingListener;
   }
 
+  @Override
   public Mode getMode() {
     return mode;
   }

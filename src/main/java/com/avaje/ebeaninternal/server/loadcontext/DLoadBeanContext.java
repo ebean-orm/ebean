@@ -58,7 +58,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     if (queryProps != null) {
       queryProps.configureBeanQuery(query);
     }
-    if (parent.isUseAutofetchManager()) {
+    if (parent.isUseAutoTune()) {
       query.setAutofetch(true);
     }
   }

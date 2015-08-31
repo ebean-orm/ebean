@@ -10,7 +10,7 @@ import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
-import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
+import com.avaje.ebeaninternal.server.autofetch.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
@@ -370,16 +370,16 @@ public interface SpiQuery<T> extends Query<T> {
   void logSecondaryQuery(SpiQuery<?> query);
 
   /**
-   * If return null then no autoFetch profiling for this query. If a
-   * AutoFetchManager is returned this implies that profiling is turned on for
-   * this query (and all the objects this query creates).
+   * If return null then no profiling for this query. If a ProfilingListener is
+   * returned this implies that profiling is turned on for this query (and all
+   * the objects this query creates).
    */
-  AutoFetchManager getAutoFetchManager();
+  ProfilingListener getProfilingListener();
 
   /**
-   * This has the effect of turning on autoFetch profiling for this query.
+   * This has the effect of turning on profiling for this query.
    */
-  void setAutoFetchManager(AutoFetchManager manager);
+  void setProfilingListener(ProfilingListener manager);
 
   /**
    * Return the origin point for the query.

@@ -1,7 +1,8 @@
-package com.avaje.ebeaninternal.server.autofetch;
+package com.avaje.ebeaninternal.server.autofetch.service;
 
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.server.autofetch.AutoTuneService;
 import com.avaje.ebeaninternal.server.resource.ResourceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,29 +12,29 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 
-public class AutoFetchManagerFactory {
+public class AutoTuneServiceFactory {
 
-  private static final Logger logger = LoggerFactory.getLogger(AutoFetchManagerFactory.class);
+  private static final Logger logger = LoggerFactory.getLogger(AutoTuneServiceFactory.class);
 
-  public static AutoFetchManager create(SpiEbeanServer server, ServerConfig serverConfig, ResourceManager resourceManager) {
+  public static AutoTuneService create(SpiEbeanServer server, ServerConfig serverConfig, ResourceManager resourceManager) {
 
-    AutoFetchManagerFactory me = new AutoFetchManagerFactory();
+    AutoTuneServiceFactory me = new AutoTuneServiceFactory();
     return me.createAutoFetchManager(server, serverConfig, resourceManager);
   }
 
-  private AutoFetchManager createAutoFetchManager(SpiEbeanServer server, ServerConfig serverConfig, ResourceManager resourceManager) {
+  private AutoTuneService createAutoFetchManager(SpiEbeanServer server, ServerConfig serverConfig, ResourceManager resourceManager) {
 
-    AutoFetchManager manager = createAutoFetchManager(server.getName(), resourceManager);
+    AutoTuneService manager = createAutoFetchManager(server.getName(), resourceManager);
     manager.setOwner(server, serverConfig);
 
     return manager;
   }
 
-  private AutoFetchManager createAutoFetchManager(String serverName, ResourceManager resourceManager) {
+  private AutoTuneService createAutoFetchManager(String serverName, ResourceManager resourceManager) {
 
     File autoFetchFile = getAutoFetchFile(serverName, resourceManager);
 
-    AutoFetchManager autoFetchManager = null;
+    AutoTuneService autoFetchManager = null;
 
     boolean readFile = !"false".equalsIgnoreCase(System.getProperty("autofetch.readfromfile"));
     if (readFile) {
@@ -44,13 +45,13 @@ public class AutoFetchManagerFactory {
       // not deserialized from file so create as empty
       // It will be populated automatically by querying the
       // database meta data
-      autoFetchManager = new DefaultAutoFetchManager(autoFetchFile.getAbsolutePath());
+      autoFetchManager = new BaseAutoTuneService(autoFetchFile.getAbsolutePath());
     }
 
     return autoFetchManager;
   }
 
-  private AutoFetchManager deserializeAutoFetch(File autoFetchFile) {
+  private AutoTuneService deserializeAutoFetch(File autoFetchFile) {
     try {
 
       if (!autoFetchFile.exists()) {
@@ -58,7 +59,7 @@ public class AutoFetchManagerFactory {
       }
       FileInputStream fi = new FileInputStream(autoFetchFile);
       ObjectInputStream ois = new ObjectInputStream(fi);
-      AutoFetchManager profListener = (AutoFetchManager) ois.readObject();
+      AutoTuneService profListener = (AutoTuneService) ois.readObject();
       ois.close();
 
       logger.info("AutoFetch deserialized from file [" + autoFetchFile.getAbsolutePath() + "]");

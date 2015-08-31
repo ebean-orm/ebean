@@ -11,7 +11,6 @@ import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
 import com.avaje.ebean.dbmigration.DdlGenerator;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -69,11 +68,6 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Return the DDL generator.
    */
   DdlGenerator getDdlGenerator();
-
-  /**
-   * Return the AutoFetchListener.
-   */
-  AutoFetchManager getAutoFetchManager();
 
   /**
    * Clear the query execution statistics.

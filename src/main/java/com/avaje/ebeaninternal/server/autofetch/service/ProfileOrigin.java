@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.autofetch;
+package com.avaje.ebeaninternal.server.autofetch.service;
 
 import com.avaje.ebean.bean.NodeUsageCollector;
 import com.avaje.ebean.bean.ObjectGraphNode;
@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class Statistics implements Serializable {
+public class ProfileOrigin implements Serializable {
 
 
   private static final long serialVersionUID = -5586783791097230766L;
@@ -24,14 +24,14 @@ public class Statistics implements Serializable {
 
   private int counter;
 
-  private final Map<String, StatisticsQuery> queryStatsMap = new LinkedHashMap<String, StatisticsQuery>();
+  private final Map<String, ProfileOriginQuery> queryStatsMap = new LinkedHashMap<String, ProfileOriginQuery>();
 
-  private final Map<String, StatisticsNodeUsage> nodeUsageMap = new LinkedHashMap<String, StatisticsNodeUsage>();
+  private final Map<String, ProfileOriginNodeUsage> nodeUsageMap = new LinkedHashMap<String, ProfileOriginNodeUsage>();
 
   @SuppressWarnings("RedundantStringConstructorCall")
   private final String monitor = new String();
 
-  public Statistics(ObjectGraphOrigin origin, boolean queryTuningAddVersion) {
+  public ProfileOrigin(ObjectGraphOrigin origin, boolean queryTuningAddVersion) {
     this.origin = origin;
     this.queryTuningAddVersion = queryTuningAddVersion;
   }
@@ -40,13 +40,13 @@ public class Statistics implements Serializable {
     return origin;
   }
 
-  public TunedQueryInfo createTunedFetch(OrmQueryDetail newFetchDetail) {
-    synchronized (monitor) {
-      // NB: create a copy of queryPoint allowing garbage
-      // collection of source...
-      return new TunedQueryInfo(origin, newFetchDetail, counter);
-    }
-  }
+//  public TunedQueryInfo createTunedFetch(OrmQueryDetail newFetchDetail) {
+//    synchronized (monitor) {
+//      // NB: create a copy of queryPoint allowing garbage
+//      // collection of source...
+//      return new TunedQueryInfo(origin, newFetchDetail, counter);
+//    }
+//  }
 
   /**
    * Return the number of times the root query has executed.
@@ -77,7 +77,7 @@ public class Statistics implements Serializable {
 
       PathProperties pathProps = new PathProperties();
 
-      for (StatisticsNodeUsage statsNode : nodeUsageMap.values()) {
+      for (ProfileOriginNodeUsage statsNode : nodeUsageMap.values()) {
         statsNode.buildTunedFetch(pathProps, rootDesc);
       }
 
@@ -98,23 +98,22 @@ public class Statistics implements Serializable {
 
   public void collectQueryInfo(ObjectGraphNode node, long beansLoaded, long micros) {
 
-    synchronized (monitor) {
-      String key = node.getPath();
-      if (key == null) {
-        key = "";
-        // this is basically the number of times the root query
-        // has executed which gives us an indication of how
-        // much profiling information we have gathered.
-        counter++;
-      }
-
-      StatisticsQuery stats = queryStatsMap.get(key);
-      if (stats == null) {
-        stats = new StatisticsQuery(key);
-        queryStatsMap.put(key, stats);
-      }
-      stats.add(beansLoaded, micros);
+    String key = node.getPath();
+    if (key == null) {
+      key = "";
+      // this is basically the number of times the root query
+      // has executed which gives us an indication of how
+      // much profiling information we have gathered.
+      counter++;
     }
+
+    ProfileOriginQuery stats = queryStatsMap.get(key);
+    if (stats == null) {
+      // a race condition but we don't care
+      stats = new ProfileOriginQuery(key);
+      queryStatsMap.put(key, stats);
+    }
+    stats.add(beansLoaded, micros);
   }
 
 
@@ -126,49 +125,49 @@ public class Statistics implements Serializable {
     if (!profile.isEmpty()) {
       ObjectGraphNode node = profile.getNode();
 
-      StatisticsNodeUsage nodeStats = getNodeStats(node.getPath());
+      ProfileOriginNodeUsage nodeStats = getNodeStats(node.getPath());
       nodeStats.publish(profile);
     }
   }
 
-  private StatisticsNodeUsage getNodeStats(String path) {
+  private ProfileOriginNodeUsage getNodeStats(String path) {
 
     synchronized (monitor) {
-      StatisticsNodeUsage nodeStats = nodeUsageMap.get(path);
+      ProfileOriginNodeUsage nodeStats = nodeUsageMap.get(path);
       if (nodeStats == null) {
-        nodeStats = new StatisticsNodeUsage(path, queryTuningAddVersion);
+        nodeStats = new ProfileOriginNodeUsage(path, queryTuningAddVersion);
         nodeUsageMap.put(path, nodeStats);
       }
       return nodeStats;
     }
   }
 
-  public String getUsageDebug() {
-    synchronized (monitor) {
-      StringBuilder sb = new StringBuilder();
-      sb.append("root[").append(origin.getBeanType()).append("] ");
-      for (StatisticsNodeUsage node : nodeUsageMap.values()) {
-        sb.append(node.toString()).append("\n");
-      }
-      return sb.toString();
-    }
-  }
-
-  public String getQueryStatDebug() {
-    synchronized (monitor) {
-      StringBuilder sb = new StringBuilder();
-      for (StatisticsQuery queryStat : queryStatsMap.values()) {
-        sb.append(queryStat.toString()).append("\n");
-      }
-      return sb.toString();
-    }
-  }
-
-  public String toString() {
-
-    synchronized (monitor) {
-      return getUsageDebug();
-    }
-  }
+//  public String getUsageDebug() {
+//    synchronized (monitor) {
+//      StringBuilder sb = new StringBuilder();
+//      sb.append("root[").append(origin.getBeanType()).append("] ");
+//      for (ProfileOriginNodeUsage node : nodeUsageMap.values()) {
+//        sb.append(node.toString()).append("\n");
+//      }
+//      return sb.toString();
+//    }
+//  }
+//
+//  public String getQueryStatDebug() {
+//    synchronized (monitor) {
+//      StringBuilder sb = new StringBuilder();
+//      for (ProfileOriginQuery queryStat : queryStatsMap.values()) {
+//        sb.append(queryStat.toString()).append("\n");
+//      }
+//      return sb.toString();
+//    }
+//  }
+//
+//  public String toString() {
+//
+//    synchronized (monitor) {
+//      return getUsageDebug();
+//    }
+//  }
 
 }

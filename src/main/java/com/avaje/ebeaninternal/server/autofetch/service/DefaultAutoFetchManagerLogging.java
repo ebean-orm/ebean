@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.autofetch;
+package com.avaje.ebeaninternal.server.autofetch.service;
 
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -19,11 +19,11 @@ public class DefaultAutoFetchManagerLogging {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultAutoFetchManagerLogging.class);
 
-  private final DefaultAutoFetchManager manager;
+  private final BaseAutoTuneService manager;
 
   private final int updateFreqInSecs;
 
-  public DefaultAutoFetchManagerLogging(ServerConfig serverConfig, DefaultAutoFetchManager profileListener) {
+  public DefaultAutoFetchManagerLogging(ServerConfig serverConfig, BaseAutoTuneService profileListener) {
 
     this.manager = profileListener;
     this.updateFreqInSecs = serverConfig.getAutofetchConfig().getProfileUpdateFrequency();

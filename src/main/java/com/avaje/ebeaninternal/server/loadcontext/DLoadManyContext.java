@@ -70,7 +70,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
       queryProps.configureBeanQuery(query);
     }
 
-    if (parent.isUseAutofetchManager()) {
+    if (parent.isUseAutoTune()) {
       query.setAutofetch(true);
     }
   }

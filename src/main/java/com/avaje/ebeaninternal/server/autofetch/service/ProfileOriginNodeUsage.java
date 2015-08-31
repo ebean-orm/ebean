@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.autofetch;
+package com.avaje.ebeaninternal.server.autofetch.service;
 
 import com.avaje.ebean.bean.NodeUsageCollector;
 import com.avaje.ebean.text.PathProperties;
@@ -18,11 +18,11 @@ import java.util.Set;
 /**
  * Collects usages statistics for a given node in the object graph.
  */
-public class StatisticsNodeUsage implements Serializable {
+public class ProfileOriginNodeUsage implements Serializable {
 
   private static final long serialVersionUID = -1663951463963779547L;
 
-  private static final Logger logger = LoggerFactory.getLogger(StatisticsNodeUsage.class);
+  private static final Logger logger = LoggerFactory.getLogger(ProfileOriginNodeUsage.class);
 
   @SuppressWarnings("RedundantStringConstructorCall")
   private final String monitor = new String();
@@ -39,7 +39,7 @@ public class StatisticsNodeUsage implements Serializable {
 
   private final Set<String> aggregateUsed = new LinkedHashSet<String>();
 
-  public StatisticsNodeUsage(String path, boolean queryTuningAddVersion) {
+  public ProfileOriginNodeUsage(String path, boolean queryTuningAddVersion) {
     this.path = path;
     this.queryTuningAddVersion = queryTuningAddVersion;
   }
@@ -99,7 +99,7 @@ public class StatisticsNodeUsage implements Serializable {
 
     synchronized (monitor) {
 
-      HashSet<String> used = profile.getUsed();
+      Set<String> used = profile.getUsed();
 
       profileCount++;
       if (!used.isEmpty()) {

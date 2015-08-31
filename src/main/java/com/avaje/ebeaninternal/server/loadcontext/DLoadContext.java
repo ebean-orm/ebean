@@ -47,7 +47,7 @@ public class DLoadContext implements LoadContext {
    */
   private final String relativePath;
   private final ObjectGraphOrigin origin;
-  private final boolean useAutofetchManager;
+  private final boolean useProfiling;
 
   private final Map<String, ObjectGraphNode> nodePathMap = new HashMap<String, ObjectGraphNode>();
 
@@ -67,7 +67,7 @@ public class DLoadContext implements LoadContext {
     this.readOnly = query.isReadOnly();
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.excludeBeanCache = Boolean.FALSE.equals(query.isUseBeanCache());
-    this.useAutofetchManager = query.getAutoFetchManager() != null;
+    this.useProfiling = query.getProfilingListener() != null;
 
     ObjectGraphNode parentNode = query.getParentNode();
     if (parentNode != null) {
@@ -197,8 +197,8 @@ public class DLoadContext implements LoadContext {
     return new ObjectGraphNode(origin, path);
   }
 
-  public boolean isUseAutofetchManager() {
-    return useAutofetchManager;
+  public boolean isUseAutoTune() {
+    return useProfiling;
   }
 
   protected String getFullPath(String path) {

@@ -2,6 +2,8 @@ package com.avaje.ebean.bean;
 
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Collects profile information for a bean (or reference/proxy bean) at a given
@@ -29,7 +31,7 @@ public final class NodeUsageCollector {
   /**
    * The properties used at this profile point.
    */
-  private final HashSet<String> used = new HashSet<String>();
+  private final Set<String> used = new LinkedHashSet<String>();
 
   /**
    * set to true if the bean is modified (setter called)
@@ -105,7 +107,7 @@ public final class NodeUsageCollector {
   /**
    * Return the set of used properties.
    */
-  public HashSet<String> getUsed() {
+  public Set<String> getUsed() {
     return used;
   }
 

@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.autofetch;
+package com.avaje.ebeaninternal.server.autofetch.service;
 
 import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebeaninternal.api.SpiQuery;

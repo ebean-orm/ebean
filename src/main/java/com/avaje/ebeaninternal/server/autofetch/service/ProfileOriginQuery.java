@@ -1,11 +1,11 @@
-package com.avaje.ebeaninternal.server.autofetch;
+package com.avaje.ebeaninternal.server.autofetch.service;
 
 import java.io.Serializable;
 
 /**
  * Used to accumulate query execution statistics.
  */
-public class StatisticsQuery implements Serializable {
+public class ProfileOriginQuery implements Serializable {
 
   private static final long serialVersionUID = -1133958958072778811L;
 
@@ -17,7 +17,7 @@ public class StatisticsQuery implements Serializable {
 
   private long totalMicros;
 
-  public StatisticsQuery(String path) {
+  public ProfileOriginQuery(String path) {
     this.path = path;
   }
 

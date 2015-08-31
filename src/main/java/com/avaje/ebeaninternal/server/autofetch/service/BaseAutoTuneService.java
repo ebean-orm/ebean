@@ -1,0 +1,207 @@
+package com.avaje.ebeaninternal.server.autofetch.service;
+
+import com.avaje.ebean.config.AutofetchConfig;
+import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.server.autofetch.AutoTuneService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+/**
+ * Implementation of the AutoTuneService which is comprised of profiling and query tuning.
+ */
+public class BaseAutoTuneService implements AutoTuneService {
+
+  private static final Logger logger = LoggerFactory.getLogger(BaseAutoTuneService.class);
+
+  private final long defaultGarbageCollectionWait;
+
+  private final boolean garbageCollectionOnShutdown;
+
+  private final BaseQueryTuner queryTuner;
+
+  public BaseAutoTuneService(SpiEbeanServer server, ServerConfig serverConfig) {
+
+    AutofetchConfig config = serverConfig.getAutofetchConfig();
+
+    ProfileManager profileManager = new ProfileManager(config, server);
+    this.queryTuner = new BaseQueryTuner(config, server, profileManager);
+
+    this.garbageCollectionOnShutdown = config.isGarbageCollectionOnShutdown();
+    this.defaultGarbageCollectionWait = (long) config.getGarbageCollectionWait();
+  }
+
+  /**
+   * Load the query tuning information from it's data store.
+   */
+  public void startup() {
+
+//    File autoFetchFile = new File(fileName);
+//
+//    try {
+//      FileOutputStream fout = new FileOutputStream(autoFetchFile);
+//
+//      ObjectOutputStream oout = new ObjectOutputStream(fout);
+//      oout.writeObject(this);
+//      oout.flush();
+//      oout.close();
+//
+//    } catch (Exception e) {
+//      String msg = "Error serializing autofetch file";
+//      logging.logError(msg, e);
+//    }
+  }
+
+  private void saveProfiling() {
+
+  }
+
+  /**
+   * Shutdown the listener.
+   * <p>
+   * We should try to collect the usage statistics by calling a System.gc().
+   * This is necessary for use with short lived applications where garbage
+   * collection may not otherwise occur at all.
+   * </p>
+   */
+  public void shutdown() {
+    if (garbageCollectionOnShutdown) {
+      collectUsageViaGC(-1);
+      saveProfiling();
+    }
+  }
+
+  /**
+   * Ask for a System.gc() so that we gather node usage information.
+   * <p>
+   * Really only want to do this sparingly but useful just prior to shutdown
+   * for short run application where garbage collection may otherwise not
+   * occur at all.
+   * </p>
+   * <p>
+   * waitMillis will do a thread sleep to give the garbage collection a little
+   * time to do its thing assuming we are shutting down the VM.
+   * </p>
+   * <p>
+   * If waitMillis is -1 then the defaultGarbageCollectionWait is used which
+   * defaults to 100 milliseconds.
+   * </p>
+   */
+  public void collectUsageViaGC() {
+    collectUsageViaGC(-1);
+  }
+
+  public void collectUsageViaGC(long waitMillis) {
+    System.gc();
+    try {
+      if (waitMillis < 0) {
+        waitMillis = defaultGarbageCollectionWait;
+      }
+      Thread.sleep(waitMillis);
+    } catch (InterruptedException e) {
+      logger.warn("Error while sleeping after System.gc() request.", e);
+    }
+    updateTunedQueryInfo();
+  }
+
+  /**
+   * Update the tuned fetch plans from the current usage information.
+   */
+  public void updateTunedQueryInfo() {
+
+//    if (!profiling) {
+//      // we are not collecting any profiling information at
+//      // the moment so don't try updating the tuned query plans.
+//      return "Not profiling";
+//    }
+//
+//    synchronized (statisticsMonitor) {
+//
+//      Counters counters = new Counters();
+//
+//      for (ProfileOrigin queryPointStatistics : statisticsMap.values()) {
+//        if (!queryPointStatistics.hasUsage()) {
+//          // no usage statistics collected yet...
+//          counters.incrementNoUsage();
+//        } else {
+//          updateTunedQueryFromUsage(counters, queryPointStatistics);
+//        }
+//      }
+//
+//      String summaryInfo = counters.toString();
+//
+//      if (counters.isInteresting()) {
+//        // only log it if its interesting
+//        logging.logSummary(summaryInfo);
+//      }
+//
+//      return summaryInfo;
+//    }
+  }
+
+
+//
+//  private void updateTunedQueryFromUsage(Counters counters, ProfileOrigin statistics) {
+//
+//    ObjectGraphOrigin queryPoint = statistics.getOrigin();
+//    String beanType = queryPoint.getBeanType();
+//
+//    try {
+//      Class<?> beanClass = ClassUtil.forName(beanType, this.getClass());
+//      BeanDescriptor<?> beanDescriptor = server.getBeanDescriptor(beanClass);
+//      if (beanDescriptor != null) {
+//
+//        // Determine the fetch plan from the latest statistics.
+//        // Use this to compare with current "tuned fetch plan".
+//        OrmQueryDetail newFetchDetail = statistics.buildTunedFetch(beanDescriptor);
+//
+//        // get the current tuned fetch info...
+//        TunedQueryInfo currentFetch = tunedQueryInfoMap.get(queryPoint.getKey());
+//
+//        if (currentFetch == null) {
+//          // its a new fetch plan, add it.
+//          counters.incrementNew();
+//
+//          currentFetch = statistics.createTunedFetch(newFetchDetail);
+//          logging.logNew(currentFetch);
+//          tunedQueryInfoMap.put(queryPoint.getKey(), currentFetch);
+//
+//        } else if (!currentFetch.isSame(newFetchDetail)) {
+//          // the fetch plan has changed, update it.
+//          counters.incrementModified();
+//
+//          logging.logChanged(currentFetch, newFetchDetail);
+//          currentFetch.setTunedDetail(newFetchDetail);
+//
+//        } else {
+//          // the fetch plan has not changed...
+//          counters.incrementUnchanged();
+//        }
+//
+//        currentFetch.setProfileCount(statistics.getCounter());
+//      }
+//
+//    } catch (ClassNotFoundException e) {
+//      // expected after renaming/moving an entity bean
+//      String msg = e.toString() + " updating autoFetch tuned query for " + beanType
+//          + ". It isLikely this bean has been renamed or moved";
+//      logging.logInfo(msg, null);
+//      statisticsMap.remove(statistics.getOrigin().getKey());
+//    }
+//  }
+//
+
+  /**
+   * Auto tune the query and enable profiling.
+   */
+  public boolean tuneQuery(SpiQuery<?> query) {
+    return queryTuner.tuneQuery(query);
+  }
+
+}
