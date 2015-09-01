@@ -236,7 +236,7 @@ public class InternalConfiguration {
   }
 
   public AutoTuneService createAutoFetchManager(SpiEbeanServer server) {
-    return AutoTuneServiceFactory.create(server, serverConfig, resourceManager);
+    return AutoTuneServiceFactory.create(server, serverConfig);
   }
 
   public RelationalQueryEngine createRelationalQueryEngine() {

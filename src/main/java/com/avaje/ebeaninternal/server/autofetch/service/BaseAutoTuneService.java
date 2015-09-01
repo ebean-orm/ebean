@@ -5,13 +5,9 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.autofetch.AutoTuneService;
+import com.avaje.ebeaninternal.server.autofetch.AutoTuneCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 
 /**
  * Implementation of the AutoTuneService which is comprised of profiling and query tuning.
@@ -26,11 +22,13 @@ public class BaseAutoTuneService implements AutoTuneService {
 
   private final BaseQueryTuner queryTuner;
 
+  private final ProfileManager profileManager;
+
   public BaseAutoTuneService(SpiEbeanServer server, ServerConfig serverConfig) {
 
     AutofetchConfig config = serverConfig.getAutofetchConfig();
 
-    ProfileManager profileManager = new ProfileManager(config, server);
+    this.profileManager = new ProfileManager(config, server);
     this.queryTuner = new BaseQueryTuner(config, server, profileManager);
 
     this.garbageCollectionOnShutdown = config.isGarbageCollectionOnShutdown();
@@ -42,23 +40,11 @@ public class BaseAutoTuneService implements AutoTuneService {
    */
   public void startup() {
 
-//    File autoFetchFile = new File(fileName);
-//
-//    try {
-//      FileOutputStream fout = new FileOutputStream(autoFetchFile);
-//
-//      ObjectOutputStream oout = new ObjectOutputStream(fout);
-//      oout.writeObject(this);
-//      oout.flush();
-//      oout.close();
-//
-//    } catch (Exception e) {
-//      String msg = "Error serializing autofetch file";
-//      logging.logError(msg, e);
-//    }
   }
 
   private void saveProfiling() {
+
+    AutoTuneCollection autoTuneCollection = profileManager.profilingCollection(false);
 
   }
 

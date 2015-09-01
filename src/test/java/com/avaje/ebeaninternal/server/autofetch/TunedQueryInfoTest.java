@@ -41,11 +41,11 @@ public class TunedQueryInfoTest extends BaseTestCase {
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select(null);
     
-    TunedQueryInfo tunedInfo = new TunedQueryInfo(null, tunedDetail, 0);
+    TunedQueryInfo tunedInfo = new TunedQueryInfo(null, tunedDetail);
       
     Query<Order> query = server.find(Order.class).setId(1);
     
-    tunedInfo.autoFetchTune((SpiQuery<?>)query);
+    tunedInfo.tuneQuery((SpiQuery<?>) query);
     
     Order order = query.findUnique();
     EntityBean eb = (EntityBean)order;
@@ -69,11 +69,11 @@ public class TunedQueryInfoTest extends BaseTestCase {
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("");
     
-    TunedQueryInfo tunedInfo = new TunedQueryInfo(null, tunedDetail, 0);
+    TunedQueryInfo tunedInfo = new TunedQueryInfo(null, tunedDetail);
       
     Query<Order> query = server.find(Order.class).setId(1);
     
-    tunedInfo.autoFetchTune((SpiQuery<?>)query);
+    tunedInfo.tuneQuery((SpiQuery<?>) query);
     
     Order order = query.findUnique();
     EntityBean eb = (EntityBean)order;
@@ -96,11 +96,11 @@ public class TunedQueryInfoTest extends BaseTestCase {
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("somethingThatDoesNotExist");
     
-    TunedQueryInfo tunedInfo = new TunedQueryInfo(null, tunedDetail, 0);
+    TunedQueryInfo tunedInfo = new TunedQueryInfo(null, tunedDetail);
       
     Query<Order> query = server.find(Order.class).setId(1);
     
-    tunedInfo.autoFetchTune((SpiQuery<?>)query);
+    tunedInfo.tuneQuery((SpiQuery<?>) query);
     
     LoggedSqlCollector.start();
     
@@ -132,11 +132,11 @@ public class TunedQueryInfoTest extends BaseTestCase {
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("status, customer");
     
-    TunedQueryInfo tunedInfo = new TunedQueryInfo(null, tunedDetail, 0);
+    TunedQueryInfo tunedInfo = new TunedQueryInfo(null, tunedDetail);
       
     Query<Order> query = server.find(Order.class).setId(1);
     
-    tunedInfo.autoFetchTune((SpiQuery<?>)query);
+    tunedInfo.tuneQuery((SpiQuery<?>) query);
     
     LoggedSqlCollector.start();
     
@@ -167,11 +167,11 @@ public class TunedQueryInfoTest extends BaseTestCase {
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("status");
     
-    TunedQueryInfo tunedInfo = new TunedQueryInfo(null, tunedDetail, 0);
+    TunedQueryInfo tunedInfo = new TunedQueryInfo(null, tunedDetail);
       
     Query<Order> query = server.find(Order.class).setId(1);
     
-    tunedInfo.autoFetchTune((SpiQuery<?>)query);
+    tunedInfo.tuneQuery((SpiQuery<?>) query);
     
     LoggedSqlCollector.start();
     

@@ -5,9 +5,9 @@ import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.config.AutofetchConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.server.autofetch.AutoTuneCollection;
 import com.avaje.ebeaninternal.server.autofetch.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,13 @@ public class ProfileManager implements ProfilingListener {
 
   private final boolean queryTuningAddVersion;
 
-  private final boolean profiling;
+  /**
+   * Converted from a 0-100 int to a double. Effectively a percentage rate at
+   * which to collect profiling information.
+   */
+  private final double profilingRate;
+
+  private final int profilingBase;
 
   /**
    * Map of the usage and query statistics gathered.
@@ -36,8 +42,16 @@ public class ProfileManager implements ProfilingListener {
 
   public ProfileManager(AutofetchConfig config, SpiEbeanServer server) {
     this.server = server;
-    this.profiling = config.isProfiling();
+    this.profilingRate = config.getProfilingRate();
+    this.profilingBase = config.getProfilingBase();
     this.queryTuningAddVersion = config.isQueryTuningAddVersion();
+  }
+
+  @Override
+  public boolean isProfileRequest(ObjectGraphNode origin) {
+
+    ProfileOrigin profileOrigin = profileMap.get(origin.getOriginQueryPoint().getKey());
+    return profileOrigin == null || profileOrigin.isProfile();
   }
 
   /**
@@ -73,40 +87,29 @@ public class ProfileManager implements ProfilingListener {
     synchronized (monitor) {
       ProfileOrigin stats = profileMap.get(originQueryPoint.getKey());
       if (stats == null) {
-        stats = new ProfileOrigin(originQueryPoint, queryTuningAddVersion);
+        stats = new ProfileOrigin(originQueryPoint, queryTuningAddVersion, profilingBase, profilingRate);
         profileMap.put(originQueryPoint.getKey(), stats);
       }
       return stats;
     }
   }
 
-
   /**
-   * Update the tuned fetch plans from the current usage information.
+   * Collect all the profiling information.
    */
-  public void updateTunedQueryInfo() {
+  public AutoTuneCollection profilingCollection(boolean reset) {
 
-    if (!profiling) {
-      // we are not collecting any profiling information at
-      // the moment so don't try updating the tuned query plans.
-      return;// "Not profiling";
-    }
+    AutoTuneCollection req = new AutoTuneCollection();
 
-    synchronized (monitor) {
+    for (ProfileOrigin origin : profileMap.values()) {
 
-      for (ProfileOrigin origin : profileMap.values()) {
-        if (origin.hasUsage()) {
-          OrmQueryDetail ormQueryDetail = updateTunedQueryFromUsage(origin);
-
-        }
+      BeanDescriptor<?> desc = server.getBeanDescriptorById(origin.getOrigin().getBeanType());
+      if (desc != null) {
+        origin.profilingCollection(desc, req, reset);
       }
     }
+
+    return req;
   }
 
-
-  private OrmQueryDetail updateTunedQueryFromUsage(ProfileOrigin statistics) {
-
-    BeanDescriptor<?> desc = server.getBeanDescriptorById(statistics.getOrigin().getBeanType());
-    return desc == null ? null : statistics.buildTunedFetch(desc);
-  }
 }

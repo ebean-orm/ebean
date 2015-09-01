@@ -82,7 +82,7 @@ public class OrmQueryDetail implements Serializable {
   /**
    * Return true if equal in terms of autofetch (select and joins).
    */
-  public boolean isAutoFetchEqual(OrmQueryDetail otherDetail) {
+  public boolean isAutoTuneEqual(OrmQueryDetail otherDetail) {
     return autofetchPlanHash() == otherDetail.autofetchPlanHash();
   }
 

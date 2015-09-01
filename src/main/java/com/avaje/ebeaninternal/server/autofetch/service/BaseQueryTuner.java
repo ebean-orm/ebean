@@ -19,16 +19,6 @@ public class BaseQueryTuner {
 
   private final boolean queryTuning;
 
-  /**
-   * Converted from a 0-100 int to a double. Effectively a percentage rate at
-   * which to collect profiling information.
-   */
-  private final double profilingRate;
-
-  private final int profilingBase;
-
-  private final int profilingMin;
-
   private boolean profiling;
 
   private final AutofetchMode mode;
@@ -49,9 +39,6 @@ public class BaseQueryTuner {
     this.mode = config.getMode();
     this.queryTuning = config.isQueryTuning();
     this.profiling = config.isProfiling();
-    this.profilingRate = config.getProfilingRate();
-    this.profilingBase = config.getProfilingBase();
-    this.profilingMin = config.getProfilingMin();
   }
 
   /**
@@ -70,13 +57,12 @@ public class BaseQueryTuner {
       return false;
     }
 
-    if (!useAutoFetch(query)) {
+    if (!useAutoTune(query)) {
       // not using autoFetch for this query
       return false;
     }
 
-    ObjectGraphNode parentAutoFetchNode = query.getParentNode();
-    if (parentAutoFetchNode != null) {
+    if (query.getParentNode() != null) {
       // This is a +lazy/+query query with profiling on.
       // We continue to collect the profiling information.
       query.setProfilingListener(profilingListener);
@@ -87,37 +73,25 @@ public class BaseQueryTuner {
     CallStack stack = server.createCallStack();
     ObjectGraphNode origin = query.setOrigin(stack);
 
-    // get current "tuned fetch" for this query point
-    TunedQueryInfo tunedFetch = tunedQueryInfoMap.get(origin.getOriginQueryPoint().getKey());
-
-    // get the number of times we have collected profiling information
-    int profileCount = tunedFetch == null ? 0 : tunedFetch.getProfileCount();
-
     if (profiling) {
-      // we want more profiling information?
-      if (tunedFetch == null) {
-        query.setProfilingListener(profilingListener);
-
-      } else if (profileCount < profilingBase) {
-        query.setProfilingListener(profilingListener);
-
-      } else if (tunedFetch.isPercentageProfile(profilingRate)) {
+      if (profilingListener.isProfileRequest(origin)) {
+        // collect more profiling based on profiling rate etc
         query.setProfilingListener(profilingListener);
       }
     }
 
-    if (queryTuning && tunedFetch != null && profileCount >= profilingMin) {
-      // deemed to have enough profiling information for automatic tuning
-      return tunedFetch.autoFetchTune(query);
+    if (queryTuning) {
+      // get current "tuned fetch" for this query point
+      TunedQueryInfo tuneInfo = tunedQueryInfoMap.get(origin.getOriginQueryPoint().getKey());
+      return tuneInfo != null && tuneInfo.tuneQuery(query);
     }
-
     return false;
   }
 
   /**
-   * Return true if we should try to use autoFetch for this query.
+   * Return true if we should try to tune this query.
    */
-  private boolean useAutoFetch(SpiQuery<?> query) {
+  private boolean useAutoTune(SpiQuery<?> query) {
 
     if (query.isLoadBeanCache()) {
       // when loading the cache don't tune the query

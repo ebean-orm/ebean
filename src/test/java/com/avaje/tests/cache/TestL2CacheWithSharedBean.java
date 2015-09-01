@@ -28,11 +28,11 @@ public class TestL2CacheWithSharedBean extends BaseTestCase {
 
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("name");
-    TunedQueryInfo tunedInfo = new TunedQueryInfo(null, tunedDetail, 0);
+    TunedQueryInfo tunedInfo = new TunedQueryInfo(null, tunedDetail);
 
     Query<FeatureDescription> query = Ebean.find(FeatureDescription.class).setId(f1.getId());
 
-    tunedInfo.autoFetchTune((SpiQuery<?>) query);
+    tunedInfo.tuneQuery((SpiQuery<?>) query);
 
     query.findUnique(); // PUT into cache
 

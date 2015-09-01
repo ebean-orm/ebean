@@ -10,22 +10,17 @@ import com.avaje.ebeaninternal.server.query.SplitName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
  * Collects usages statistics for a given node in the object graph.
  */
-public class ProfileOriginNodeUsage implements Serializable {
-
-  private static final long serialVersionUID = -1663951463963779547L;
+public class ProfileOriginNodeUsage {
 
   private static final Logger logger = LoggerFactory.getLogger(ProfileOriginNodeUsage.class);
 
-  @SuppressWarnings("RedundantStringConstructorCall")
-  private final String monitor = new String();
+  private final Object monitor = new Object();
 
   private final String path;
 
@@ -53,7 +48,7 @@ public class ProfileOriginNodeUsage implements Serializable {
         ElPropertyValue elGetValue = rootDesc.getElGetValue(path);
         if (elGetValue == null) {
           desc = null;
-          logger.warn("Autofetch: Can't find join for path[" + path + "] for " + rootDesc.getName());
+          logger.warn("AutoTune: Can't find join for path[" + path + "] for " + rootDesc.getName());
 
         } else {
           BeanProperty beanProperty = elGetValue.getBeanProperty();
@@ -66,7 +61,7 @@ public class ProfileOriginNodeUsage implements Serializable {
       for (String propName : aggregateUsed) {
         BeanProperty beanProp = desc.getBeanPropertyFromPath(propName);
         if (beanProp == null) {
-          logger.warn("Autofetch: Can't find property[" + propName + "] for " + desc.getName());
+          logger.warn("AutoTune: Can't find property[" + propName + "] for " + desc.getName());
 
         } else {
           if (beanProp instanceof BeanPropertyAssoc<?>) {
@@ -95,7 +90,10 @@ public class ProfileOriginNodeUsage implements Serializable {
     }
   }
 
-  public void publish(NodeUsageCollector profile) {
+  /**
+   * Collect usage from a node.
+   */
+  public void collectUsageInfo(NodeUsageCollector profile) {
 
     synchronized (monitor) {
 
