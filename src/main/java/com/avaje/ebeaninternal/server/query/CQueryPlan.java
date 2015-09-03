@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.query;
 
+import java.security.MessageDigest;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -14,6 +15,8 @@ import com.avaje.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
 import com.avaje.ebeaninternal.server.type.RsetDataReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a query for a given SQL statement.
@@ -35,6 +38,8 @@ import com.avaje.ebeaninternal.server.type.RsetDataReader;
  * </p>
  */
 public class CQueryPlan {
+
+  private static final Logger logger = LoggerFactory.getLogger(CQueryPlan.class);
 
   private final SpiEbeanServer server;
 
@@ -60,6 +65,11 @@ public class CQueryPlan {
   private final CQueryPlanStats stats;
 
   private final Class<?> beanType;
+
+  /**
+   * Key used to identify the query plan in audit logging.
+   */
+  private volatile String auditQueryHash;
 
   /**
    * Create a query plan based on a OrmQueryRequest.
@@ -139,6 +149,48 @@ public class CQueryPlan {
 
   public HashQueryPlan getHash() {
     return hash;
+  }
+
+  /**
+   * Return a key used in audit logging to identify the query.
+   */
+  public String getAuditQueryKey() {
+    if (auditQueryHash == null) {
+      // volatile object assignment (so happy for multithreaded access)
+      auditQueryHash = calcAuditQueryKey();
+    }
+    return auditQueryHash;
+  }
+
+  private String calcAuditQueryKey() {
+    // rawSql needs to include the MD5 hash of the sql
+    return rawSql ? hash.getPartialKey() + "_" + getSqlMd5Hash() : hash.getPartialKey();
+  }
+
+  /**
+   * Return the MD5 hash of the underlying sql.
+   */
+  private String getSqlMd5Hash() {
+    try {
+      MessageDigest md = MessageDigest.getInstance("MD5");
+      byte[] digest = md.digest(sql.getBytes("UTF-8"));
+      return digestToHex(digest);
+    } catch (Exception e) {
+      logger.error("Failed to MD5 hash the rawSql query", e);
+      return "error";
+    }
+  }
+
+  /**
+   * Convert the digest into a hex value.
+   */
+  private String digestToHex(byte[] digest) {
+
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < digest.length; i++) {
+      sb.append(Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1));
+    }
+    return sb.toString();
   }
 
   public String getSql() {

@@ -4,6 +4,7 @@ import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
+import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
@@ -26,6 +27,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Property mapped to a joined bean.
@@ -316,6 +318,53 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
    */
   public boolean isImportedPrimaryKey() {
     return importedPrimaryKey;
+  }
+
+  @Override
+  public void diffForInsert(String prefix, Map<String, ValuePair> map, EntityBean newBean) {
+    Object newEmb = (newBean == null) ? null : getValue(newBean);
+    if (newEmb != null) {
+      prefix = (prefix == null) ? name : prefix + "." + name;
+      if (embedded) {
+        getTargetDescriptor().diffForInsert(prefix, map, (EntityBean) newEmb);
+      } else {
+        // we are only interested in the Id value
+        BeanDescriptor<T> targetDescriptor = getTargetDescriptor();
+        BeanProperty idProperty = targetDescriptor.getIdProperty();
+        idProperty.diffForInsert(prefix, map, (EntityBean) newEmb);
+      }
+    }
+  }
+
+  @Override
+  public void diff(String prefix, Map<String, ValuePair> map, EntityBean newBean, EntityBean oldBean) {
+
+    Object newEmb = (newBean == null) ? null : getValue(newBean);
+    Object oldEmb = (oldBean == null) ? null : getValue(oldBean);
+    if (newEmb == null && oldEmb == null) {
+      return;
+    }
+
+    if (embedded) {
+      prefix = (prefix == null) ? name : prefix + "." + name;
+      BeanDescriptor<T> targetDescriptor = getTargetDescriptor();
+      targetDescriptor.diff(prefix, map, (EntityBean) newEmb, (EntityBean) oldEmb);
+
+    } else {
+      // we are only interested in the Id value
+      newBean = (EntityBean)newEmb;
+      oldBean = (EntityBean)oldEmb;
+
+      BeanDescriptor<T> targetDescriptor = getTargetDescriptor();
+      BeanProperty idProperty = targetDescriptor.getIdProperty();
+
+      Object newId = (newBean == null) ? null : idProperty.getValue(newBean);
+      Object oldId = (oldBean == null) ? null : idProperty.getValue(oldBean);
+      if (newId != null || oldId != null) {
+        prefix = (prefix == null) ? name : prefix + "." + name;
+        idProperty.diffVal(prefix, map, newId, oldId);
+      }
+    }
   }
 
   /**

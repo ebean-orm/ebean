@@ -51,6 +51,10 @@ public class BeanChange {
   public BeanChange() {
   }
 
+  public String toString() {
+    return "table:" + table + " id:" + id+" values:"+values;
+  }
+
   /**
    * Return the object type (typically table name).
    */

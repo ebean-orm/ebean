@@ -37,6 +37,10 @@ class EJsonWriter {
     new EJsonWriter(jsonGenerator).writeJson(object);
   }
 
+  static void writeCollection(Collection<Object> collection, JsonGenerator jsonGenerator) throws IOException {
+    new EJsonWriter(jsonGenerator).writeCollection(null, collection);
+  }
+
   private final JsonGenerator jsonGenerator;
 
   private EJsonWriter(JsonGenerator jsonGenerator) {
@@ -53,6 +57,12 @@ class EJsonWriter {
       if (object == null) {
         writeNull(name);
 
+      } else if (object instanceof Number) {
+        writeNumber(name, (Number) object);
+
+      } else if (object instanceof String) {
+        writeString(name, (String) object);
+
       } else if (object instanceof Map) {
         writeMap(name, (Map<Object, Object>) object);
 
@@ -62,14 +72,8 @@ class EJsonWriter {
       } else if (object instanceof Boolean) {
         writeBoolean(name, (Boolean) object);
 
-      } else if (object instanceof Number) {
-        writeNumber(name, (Number) object);
-
       } else if (object instanceof Date) {
         writeDate(name, (Date) object);
-
-      } else if (object instanceof String) {
-        writeString(name, (String) object);
 
       } else if (object instanceof Map.Entry<?, ?>) {
         Map.Entry<?, ?> entry = (Map.Entry<?, ?>) object;

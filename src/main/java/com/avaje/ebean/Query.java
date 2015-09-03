@@ -367,6 +367,16 @@ public interface Query<T> extends Serializable {
   Query<T> setLazyLoadBatchSize(int lazyLoadBatchSize);
 
   /**
+   * Disable read auditing for this query.
+   * <p>
+   * This is intended to be used when the query is not a user initiated query and instead
+   * part of the internal processing in an application to load a cache or document store etc.
+   * In these cases we don't want the query to be part of read auditing.
+   * </p>
+   */
+  Query<T> setDisableReadAuditing();
+
+  /**
    * Explicitly set a comma delimited list of the properties to fetch on the
    * 'main' root level entity bean (aka partial object). Note that '*' means all
    * properties.

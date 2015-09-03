@@ -98,6 +98,16 @@ public final class IdBinderEmpty implements IdBinder {
     return new Object[]{idValue};
   }
 
+  @Override
+  public Object getIdForJson(EntityBean bean) {
+    return null;
+  }
+
+  @Override
+  public Object convertIdFromJson(Object value) {
+    return value;
+  }
+
   public void bindId(DefaultSqlUpdate sqlUpdate, Object value) {
 
   }
@@ -121,6 +131,11 @@ public final class IdBinderEmpty implements IdBinder {
   }
 
   public Object convertSetId(Object idValue, EntityBean bean) {
+    return idValue;
+  }
+
+  @Override
+  public Object convertId(Object idValue) {
     return idValue;
   }
 

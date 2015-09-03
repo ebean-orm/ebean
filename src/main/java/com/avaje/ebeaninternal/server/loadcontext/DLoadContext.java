@@ -41,6 +41,7 @@ public class DLoadContext implements LoadContext {
   private final boolean excludeBeanCache;
   private final int defaultBatchSize;
   private final boolean disableLazyLoading;
+  private final boolean disableReadAudit;
 
   /**
    * The path relative to the root of the object graph.
@@ -65,6 +66,7 @@ public class DLoadContext implements LoadContext {
     SpiQuery<?> query = request.getQuery();
     this.asOf = query.getAsOf();
     this.readOnly = query.isReadOnly();
+    this.disableReadAudit = query.isDisableReadAudit();
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.excludeBeanCache = Boolean.FALSE.equals(query.isUseBeanCache());
     this.useAutofetchManager = query.getAutoFetchManager() != null;
@@ -221,10 +223,23 @@ public class DLoadContext implements LoadContext {
     return readOnly;
   }
 
+  /**
+   * Return the 'as of' timestamp that should propagate to secondary queries.
+   */
   protected Timestamp getAsOf() {
     return asOf;
   }
 
+  /**
+   * Return true if disable read auditing should propagate to secondary queries.
+   */
+  protected boolean isDisableReadAudit() {
+    return disableReadAudit;
+  }
+
+  /**
+   * Return true if disable lazy loading should propagate to secondary queries.
+   */
   protected boolean isDisableLazyLoading() {
     return disableLazyLoading;
   }

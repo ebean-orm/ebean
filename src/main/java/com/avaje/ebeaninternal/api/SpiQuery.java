@@ -10,6 +10,7 @@ import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -644,8 +645,13 @@ public interface SpiQuery<T> extends Query<T> {
   int getBufferFetchSizeHint();
 
   /**
-   * Return true if this is a query executing in the background.
+   * Return true if read auditing is disabled on this query.
    */
+  boolean isDisableReadAudit();
+
+    /**
+     * Return true if this is a query executing in the background.
+     */
   boolean isFutureFetch();
 
   /**
@@ -653,6 +659,16 @@ public interface SpiQuery<T> extends Query<T> {
    * asynchronously.
    */
   void setFutureFetch(boolean futureFetch);
+
+  /**
+   * Set the readEvent for future queries (as prepared in foreground thread).
+   */
+  void setFutureFetchAudit(ReadEvent event);
+
+  /**
+   * Read the readEvent for future queries (null otherwise).
+   */
+  ReadEvent getFutureFetchAudit();
 
   /**
    * Set the underlying cancelable query (with the PreparedStatement).

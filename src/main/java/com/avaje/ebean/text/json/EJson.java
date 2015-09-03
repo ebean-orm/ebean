@@ -3,6 +3,7 @@ package com.avaje.ebean.text.json;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +35,13 @@ public class EJson {
    */
   public static void write(Object object, JsonGenerator jsonGenerator) throws IOException {
     EJsonWriter.write(object, jsonGenerator);
+  }
+
+  /**
+   * Write the collection as json array to the jsonGenerator.
+   */
+  public static void writeCollection(Collection<Object> collection, JsonGenerator jsonGenerator) throws IOException {
+    EJsonWriter.writeCollection(collection, jsonGenerator);
   }
 
   /**

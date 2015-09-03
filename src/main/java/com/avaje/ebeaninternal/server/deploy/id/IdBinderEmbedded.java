@@ -15,7 +15,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Bind an Id that is an Embedded bean.
@@ -225,6 +227,36 @@ public final class IdBinderEmbedded implements IdBinder {
     return bindvalues;
   }
 
+  /**
+   * Convert from embedded bean to Map.
+   */
+  @Override
+  public Object getIdForJson(EntityBean bean) {
+
+    EntityBean ebValue = (EntityBean)embIdProperty.getValue(bean);
+    Map<String,Object> map = new LinkedHashMap<String, Object>();
+    for (int i = 0; i < props.length; i++) {
+      map.put(props[i].getName(), props[i].getValue(ebValue));
+    }
+    return map;
+  }
+
+  /**
+   * Convert back from a Map to embedded bean.
+   */
+  public Object convertIdFromJson(Object value) {
+
+    Map<String,Object> map = (Map<String, Object>)value;
+
+    EntityBean idValue = idDesc.createEntityBean();
+    for (int i = 0; i < props.length; i++) {
+      Object val  = map.get(props[i].getName());
+      props[i].setValue(idValue, val);
+    }
+    return idValue;
+  }
+
+
   public void bindId(DefaultSqlUpdate sqlUpdate, Object value) {
     for (int i = 0; i < props.length; i++) {
       Object embFieldValue = props[i].getValue((EntityBean) value);
@@ -384,6 +416,12 @@ public final class IdBinderEmbedded implements IdBinder {
     }
     sb.append(")");
     return sb.toString();
+  }
+
+  @Override
+  public Object convertId(Object idValue) {
+    // can not cast/convert if it is embedded
+    return idValue;
   }
 
   public Object convertSetId(Object idValue, EntityBean bean) {

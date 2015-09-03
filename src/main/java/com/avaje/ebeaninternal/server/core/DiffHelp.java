@@ -60,19 +60,19 @@ public class DiffHelp {
 	
 	public void diff(String prefix, Map<String, ValuePair> map, EntityBean newBean, EntityBean oldBean, BeanDescriptor<?> desc) {
 
-		// check the simple properties
-		BeanProperty[] base = desc.propertiesBaseScalar();
-		for (int i = 0; i < base.length; i++) {
-			Object newVal = (newBean == null) ? null : base[i].getValue(newBean);
-			Object oldVal = (oldBean == null) ? null : base[i].getValue(oldBean);
-			if (!ValueUtil.areEqual(newVal, oldVal)) {
-			  String propName = (prefix == null) ? base[i].getName() : prefix + base[i].getName();
-				map.put(propName, new ValuePair(newVal, oldVal));
-			}
-		}
+    if (flatMode) {
+      desc.diff(prefix, map, newBean, oldBean);
+    } else {
 
-		diffAssocOne(prefix, newBean, oldBean, desc, map);
-		diffEmbedded(prefix, newBean, oldBean, desc, map);
+      // check the simple properties
+      BeanProperty[] base = desc.propertiesBaseScalar();
+      for (int i = 0; i < base.length; i++) {
+        base[i].diff(prefix, map, newBean, oldBean);
+      }
+
+      diffAssocOne(prefix, newBean, oldBean, desc, map);
+      diffEmbedded(prefix, newBean, oldBean, desc, map);
+    }
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class DiffHelp {
 					// one of the embedded beans is null
           if (flatMode) {
             BeanDescriptor<?> embDesc = emb[i].getTargetDescriptor();
-            diff(emb[i].getName()+".", map, newVal, oldVal, embDesc);
+            diff(propName, map, newVal, oldVal, embDesc);
           } else {
             map.put(propName, new ValuePair(newVal, oldVal));
           }
@@ -104,7 +104,7 @@ public class DiffHelp {
 				} else {
 				  // recursively diff into the embedded bean
 				  BeanDescriptor<?> embDesc = emb[i].getTargetDescriptor();
-				  diff(emb[i].getName()+".", map, newVal, oldVal, embDesc);
+				  diff(propName, map, newVal, oldVal, embDesc);
 				}
 			}
 		}

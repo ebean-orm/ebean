@@ -432,6 +432,9 @@ public final class BeanDescriptorCacheHelp<T> {
         if (beanLog.isTraceEnabled()) {
           beanLog.trace("   GET {}({}) - hit shared bean", cacheName, id);
         }
+        if (desc.isReadAuditing()) {
+          desc.readAuditBean("l2", "", bean);
+        }
         return (T) bean;
       }
     }
@@ -449,6 +452,9 @@ public final class BeanDescriptorCacheHelp<T> {
     
     if (beanLog.isTraceEnabled()) {
       beanLog.trace("   GET {}({}) - hit", cacheName, id);
+    }
+    if (desc.isReadAuditing()) {
+      desc.readAuditBean("l2", "", bean);
     }
     return (T) bean;
   }

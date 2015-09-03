@@ -34,7 +34,7 @@ public class TestDiffHelpInsertWithEmbedded extends BaseTestCase {
 
     EMain emain1 = createEMain();
 
-    Map<String, ValuePair> diff = DiffHelpInsert.diff((EntityBean) emain1, emainDesc);
+    Map<String, ValuePair> diff = emainDesc.diffForInsert((EntityBean) emain1);
     assertEquals(3, diff.size());
     assertEquals("foo", diff.get("name").getNewValue());
     assertEquals(13L, diff.get("version").getNewValue());
@@ -51,7 +51,7 @@ public class TestDiffHelpInsertWithEmbedded extends BaseTestCase {
     EMain emain1 = createEMain();
     emain1.setName(null);
 
-    Map<String, ValuePair> diff = DiffHelpInsert.diff((EntityBean) emain1, emainDesc);
+    Map<String, ValuePair> diff = emainDesc.diffForInsert((EntityBean) emain1);
     assertEquals(2, diff.size());
     assertNull(diff.get("name"));
     assertEquals(13L, diff.get("version").getNewValue());
@@ -68,7 +68,7 @@ public class TestDiffHelpInsertWithEmbedded extends BaseTestCase {
     EMain emain1 = createEMain();
     emain1.setEmbeddable(null);
 
-    Map<String, ValuePair> diff = DiffHelpInsert.diff((EntityBean) emain1, emainDesc);
+    Map<String, ValuePair> diff = emainDesc.diffForInsert((EntityBean) emain1);
     assertEquals(2, diff.size());
     assertEquals("foo", diff.get("name").getNewValue());
     assertEquals(13L, diff.get("version").getNewValue());
@@ -83,7 +83,7 @@ public class TestDiffHelpInsertWithEmbedded extends BaseTestCase {
     EMain emain1 = createEMain();
     emain1.getEmbeddable().setDescription(null);
 
-    Map<String, ValuePair> diff = DiffHelpInsert.diff((EntityBean) emain1, emainDesc);
+    Map<String, ValuePair> diff = emainDesc.diffForInsert((EntityBean) emain1);
     assertEquals(2, diff.size());
     assertEquals("foo", diff.get("name").getNewValue());
     assertEquals(13L, diff.get("version").getNewValue());

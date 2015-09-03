@@ -136,7 +136,7 @@ public class PlatformDdl {
     String platformType = convert(column.getType(), identityColumn);
 
     buffer.append("  ");
-    buffer.append(lowerName(column.getName()), 30);
+    buffer.append(lowerName(column.getName()), 29);
     buffer.append(platformType);
     if (isTrue(column.isNotnull()) || isTrue(column.isPrimaryKey())) {
       buffer.append(" not null");

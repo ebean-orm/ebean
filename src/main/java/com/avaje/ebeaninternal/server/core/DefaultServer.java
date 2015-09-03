@@ -12,8 +12,11 @@ import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.EncryptKeyManager;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebean.dbmigration.DdlGenerator;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanQueryAdapter;
+import com.avaje.ebean.event.readaudit.ReadAuditLogger;
+import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.plugin.SpiBeanType;
 import com.avaje.ebean.plugin.SpiServer;
@@ -34,7 +37,6 @@ import com.avaje.ebeaninternal.api.SpiSqlQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
-import com.avaje.ebean.dbmigration.DdlGenerator;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -133,6 +135,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final DiffHelp diffHelp;
 
   private final AutoFetchManager autoFetchManager;
+
+  private final ReadAuditPrepare readAuditPrepare;
+
+  private final ReadAuditLogger readAuditLogger;
 
   private final CQueryEngine cqueryEngine;
 
@@ -237,6 +243,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     this.autoFetchManager = config.createAutoFetchManager(this);
     this.adminAutofetch = new MAdminAutofetch(autoFetchManager);
+    this.readAuditPrepare = config.getReadAuditPrepare();
+    this.readAuditLogger = config.getReadAuditLogger();
 
     this.beanLoader = new DefaultBeanLoader(this);
     this.jsonContext = config.createJsonContext(this);
@@ -351,6 +359,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   public AutoFetchManager getAutoFetchManager() {
     return autoFetchManager;
+  }
+
+  @Override
+  public ReadAuditPrepare getReadAuditPrepare() {
+    return readAuditPrepare;
+  }
+
+  @Override
+  public ReadAuditLogger getReadAuditLogger() {
+    return readAuditLogger;
   }
 
   /**
@@ -1392,6 +1410,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     // FutureList query always run in it's own persistence content
     spiQuery.setPersistenceContext(new DefaultPersistenceContext());
+
+    if (!spiQuery.isDisableReadAudit()) {
+      BeanDescriptor<T> desc = beanDescriptorManager.getBeanDescriptor(spiQuery.getBeanType());
+      desc.readAuditFutureList(spiQuery);
+    }
 
     // Create a new transaction solely to execute the findList() at some future time
     Transaction newTxn = createTransaction();

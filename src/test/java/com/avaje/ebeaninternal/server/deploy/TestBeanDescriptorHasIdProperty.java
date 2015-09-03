@@ -1,10 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.sql.Timestamp;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
@@ -13,6 +8,17 @@ import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
+import com.avaje.tests.model.composite.RCustomer;
+import com.avaje.tests.model.composite.RCustomerKey;
+import org.junit.Test;
+
+import java.sql.Timestamp;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
 
@@ -27,22 +33,22 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
   public void testHasId() {
   
     BeanDescriptor<Order> beanDescriptor = spiServer.getBeanDescriptor(Order.class);
-    Assert.assertNotNull(beanDescriptor.getIdProperty());
-    Assert.assertEquals("id", beanDescriptor.getIdProperty().getName());
+    assertNotNull(beanDescriptor.getIdProperty());
+    assertEquals("id", beanDescriptor.getIdProperty().getName());
     
-    Assert.assertNotNull(beanDescriptor.getVersionProperty());
-    Assert.assertEquals("updtime", beanDescriptor.getVersionProperty().getName());
+    assertNotNull(beanDescriptor.getVersionProperty());
+    assertEquals("updtime", beanDescriptor.getVersionProperty().getName());
     
     Order order = new Order();
     
-    Assert.assertFalse(beanDescriptor.hasIdValue(entityBean(order)));
-    Assert.assertFalse(beanDescriptor.hasVersionProperty(getIntercept(order)));
+    assertFalse(beanDescriptor.hasIdValue(entityBean(order)));
+    assertFalse(beanDescriptor.hasVersionProperty(getIntercept(order)));
     
     order.setId(23);
     order.setUpdtime(new Timestamp(System.currentTimeMillis()));
 
-    Assert.assertTrue(beanDescriptor.hasIdValue(entityBean(order)));
-    Assert.assertTrue(beanDescriptor.hasVersionProperty(getIntercept(order)));
+    assertTrue(beanDescriptor.hasIdValue(entityBean(order)));
+    assertTrue(beanDescriptor.hasVersionProperty(getIntercept(order)));
     
   }
 
@@ -53,13 +59,47 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
     
     Customer order = new Customer();
     EntityBeanIntercept ebi = getIntercept(order);
-    Assert.assertFalse(beanDescriptor.hasIdPropertyOnly(ebi));
+    assertFalse(beanDescriptor.hasIdPropertyOnly(ebi));
     
     order.setId(23);
-    Assert.assertTrue(beanDescriptor.hasIdPropertyOnly(ebi));
+    assertTrue(beanDescriptor.hasIdPropertyOnly(ebi));
 
     order.setName("custName");
-    Assert.assertFalse(beanDescriptor.hasIdPropertyOnly(ebi));
+    assertFalse(beanDescriptor.hasIdPropertyOnly(ebi));
+  }
+
+  @Test
+  public void test_getIdForJson() {
+
+    BeanDescriptor<Order> orderDesc = spiServer.getBeanDescriptor(Order.class);
+
+    Order order = new Order();
+    order.setId(42);
+    assertEquals(42, orderDesc.getIdForJson(order));
+
+    assertEquals(42, orderDesc.convertIdFromJson(42));
+    assertEquals(42, orderDesc.convertIdFromJson("42"));
+    assertEquals(42, orderDesc.convertIdFromJson(42L));
+
+
+    RCustomerKey key = new RCustomerKey();
+    key.setCompany("comp");
+    key.setName("fred");
+
+    RCustomer rCustomer = new RCustomer();
+    rCustomer.setKey(key);
+
+    BeanDescriptor<RCustomer> rcustDesc = spiServer.getBeanDescriptor(RCustomer.class);
+
+    Map<String,Object> idForJson = (Map<String,Object>)rcustDesc.getIdForJson(rCustomer);
+    assertEquals("comp",idForJson.get("company"));
+    assertEquals("fred",idForJson.get("name"));
+    assertEquals(2, idForJson.size());
+
+    RCustomerKey keyVal = (RCustomerKey)rcustDesc.convertIdFromJson(idForJson);
+    assertEquals("comp",keyVal.getCompany());
+    assertEquals("fred",keyVal.getName());
+
   }
 
   private EntityBean entityBean(Object bean) {

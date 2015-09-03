@@ -20,7 +20,16 @@ public class HashQueryPlan {
   public String toString() {
     return planHash+":"+bindCount+(rawSql != null ? ":r" : "");
   }
-  
+
+  /**
+   * Return as a partial key. For rawSql hash the sql is part of the key and as such
+   * needs to be included in order to have a complete key. Typically the MD5 of the sql
+   * can be used as a shot form proxy for the actual sql.
+   */
+  public String getPartialKey() {
+    return planHash+"_"+bindCount;
+  }
+
   public int hashCode() {
     int hc = planHash;
     hc = hc * 31 + bindCount;

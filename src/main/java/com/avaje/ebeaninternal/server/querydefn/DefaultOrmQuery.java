@@ -17,6 +17,7 @@ import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.HashQuery;
@@ -135,6 +136,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private boolean futureFetch;
 
+  /**
+   * Only used for read auditing with findFutureList() query.
+   */
+  private ReadEvent futureFetchAudit;
+
   private List<Object> partialIds;
 
   private int timeout;
@@ -172,6 +178,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private Timestamp versionsStart;
   private Timestamp versionsEnd;
+
+  private boolean disableReadAudit;
 
   private int bufferFetchSizeHint;
 
@@ -1320,6 +1328,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return bufferFetchSizeHint;
   }
 
+  @Override
+  public Query<T> setDisableReadAuditing() {
+    this.disableReadAudit = true;
+    return this;
+  }
+
+  public boolean isDisableReadAudit() {
+    return disableReadAudit;
+  }
+
   public void setBeanCollectionTouched(BeanCollectionTouched notify) {
     this.beanCollectionTouched = notify;
   }
@@ -1342,6 +1360,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public void setFutureFetch(boolean backgroundFetch) {
     this.futureFetch = backgroundFetch;
+  }
+
+  @Override
+  public void setFutureFetchAudit(ReadEvent event) {
+    this.futureFetchAudit = event;
+  }
+
+  @Override
+  public ReadEvent getFutureFetchAudit() {
+    return futureFetchAudit;
   }
 
   public void setCancelableQuery(CancelableQuery cancelableQuery) {

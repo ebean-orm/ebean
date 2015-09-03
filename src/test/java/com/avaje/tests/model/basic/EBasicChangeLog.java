@@ -1,6 +1,7 @@
 package com.avaje.tests.model.basic;
 
 import com.avaje.ebean.annotation.ChangeLog;
+import com.avaje.ebean.annotation.ReadAudit;
 import com.avaje.ebean.annotation.WhenCreated;
 import com.avaje.ebean.annotation.WhenModified;
 import com.avaje.ebean.annotation.WhoCreated;
@@ -12,9 +13,7 @@ import javax.persistence.Version;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
-/**
- *
- */
+@ReadAudit
 @ChangeLog(updatesThatInclude = {"name","shortDescription"})
 @Entity
 public class EBasicChangeLog {

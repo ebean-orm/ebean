@@ -65,6 +65,9 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
     query.setDisableLazyLoading(parent.isDisableLazyLoading());
     query.asOf(parent.getAsOf());
     query.setParentNode(objectGraphNode);
+    if (parent.isDisableReadAudit()) {
+      query.setDisableReadAuditing();
+    }
 
     if (queryProps != null) {
       queryProps.configureBeanQuery(query);

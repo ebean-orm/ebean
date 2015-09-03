@@ -120,6 +120,8 @@ public class DeployBeanDescriptor<T> {
 
   private boolean historySupport;
 
+  private boolean readAuditing;
+
   private TableName baseTableFull;
 
   private String[] properties;
@@ -183,6 +185,20 @@ public class DeployBeanDescriptor<T> {
    */
   public boolean isHistorySupport() {
     return historySupport;
+  }
+
+  /**
+   * Set read auditing on for this entity bean.
+   */
+  public void setReadAuditing() {
+    readAuditing = true;
+  }
+
+  /**
+   * Return true if read auditing is on for this entity bean.
+   */
+  public boolean isReadAuditing() {
+    return readAuditing;
   }
 
   public boolean isScalaObject() {
@@ -741,7 +757,7 @@ public class DeployBeanDescriptor<T> {
     }
     DeployBeanProperty p = ids.get(0);
     if (p instanceof DeployBeanPropertyAssocOne<?>) {
-      return ((DeployBeanPropertyAssocOne<?>)p).isCompound();
+      return ((DeployBeanPropertyAssocOne<?>) p).isCompound();
     } else {
       return !p.isDbNumberType();
     }
@@ -859,17 +875,17 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Check valid mapping annotations on the class hierarchy. 
+   * Check valid mapping annotations on the class hierarchy.
    */
   private void checkInheritance(Class<?> beanType) {
-    
+
     Class<?> parent = beanType.getSuperclass();
     if (parent == null || Object.class.equals(parent)) {
       // all good
       return;
     }
     if (parent.isAnnotationPresent(Entity.class)) {
-      String msg = "Checking "+getBeanType()+" and found "+parent+" that has @Entity annotation rather than MappedSuperclass?";
+      String msg = "Checking " + getBeanType() + " and found " + parent + " that has @Entity annotation rather than MappedSuperclass?";
       throw new IllegalStateException(msg);
     }
     if (parent.isAnnotationPresent(MappedSuperclass.class)) {

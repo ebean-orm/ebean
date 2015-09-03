@@ -19,6 +19,9 @@ import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.changelog.BeanChange;
 import com.avaje.ebean.event.changelog.ChangeLogFilter;
 import com.avaje.ebean.event.changelog.ChangeType;
+import com.avaje.ebean.event.readaudit.ReadAuditLogger;
+import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
+import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaQueryPlanStatistic;
 import com.avaje.ebean.plugin.SpiBeanType;
@@ -31,7 +34,7 @@ import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cache.CachedBeanData;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
-import com.avaje.ebeaninternal.server.core.DiffHelpInsert;
+import com.avaje.ebeaninternal.server.core.DiffHelpUpdate;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
@@ -142,6 +145,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   private final String baseTableAsOf;
   private final String baseTableVersionsBetween;
   private final boolean historySupport;
+
+  /**
+   * Set to true if read auditing is on for this bean type.
+   */
+  private final boolean readAuditing;
 
   /**
    * Map of BeanProperty Linked so as to preserve order.
@@ -362,6 +370,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     this.updateChangesOnly = deploy.isUpdateChangesOnly();
     this.compoundUniqueConstraints = deploy.getCompoundUniqueConstraints();
 
+    this.readAuditing = deploy.isReadAuditing();
     this.historySupport = deploy.isHistorySupport();
     this.baseTable = InternString.intern(deploy.getBaseTable());
     this.baseTableAsOf = deploy.getBaseTableAsOf();
@@ -609,6 +618,20 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   }
 
   /**
+   * Return the ReadAuditLogger for logging read audit events.
+   */
+  public ReadAuditLogger getReadAuditLogger() {
+    return ebeanServer.getReadAuditLogger();
+  }
+
+  /**
+   * Return the ReadAuditPrepare for preparing read audit events prior to logging.
+   */
+  public ReadAuditPrepare getReadAuditPrepare() {
+    return ebeanServer.getReadAuditPrepare();
+  }
+
+  /**
    * Return true if this request should be included in the change log.
    */
   public BeanChange getChangeLogBean(PersistRequestBean<T> request) {
@@ -641,25 +664,18 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    * Return the bean change for an update.
    */
   private BeanChange updateBeanChange(PersistRequestBean<T> request) {
-    return newBeanChange(request.getBeanId(), ChangeType.UPDATE, request.getEntityBeanIntercept().getDirtyValues());
+    return newBeanChange(request.getBeanId(), ChangeType.UPDATE, diffFlatten(request.getEntityBeanIntercept().getDirtyValues()));
   }
 
   /**
    * Return the bean change for an insert.
    */
   private BeanChange insertBeanChange(PersistRequestBean<T> request) {
-    return newBeanChange(request.getBeanId(), ChangeType.INSERT, insertDiff(request.getEntityBean()));
+    return newBeanChange(request.getBeanId(), ChangeType.INSERT, diffForInsert(request.getEntityBean()));
   }
 
   private BeanChange newBeanChange(Object id, ChangeType changeType, Map<String, ValuePair> values) {
     return new BeanChange(getBaseTable(), id, changeType, values);
-  }
-
-  /**
-   * For insert we create a Map of ValuePair to have the same structure as update.
-   */
-  private Map<String, ValuePair> insertDiff(EntityBean entityBean) {
-    return DiffHelpInsert.diff(entityBean, this);
   }
 
   /**
@@ -947,10 +963,55 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   public void cacheHandleUpdate(Object id, PersistRequestBean<T> updateRequest) {
     cacheHelp.handleUpdate(id, updateRequest);
   }
-  
+
   /**
-   * Return the base table alias. This is always the first letter of the bean
-   * name.
+   * Prepare the read audit of a findFutureList() query.
+   */
+  public void readAuditFutureList(SpiQuery<T> spiQuery) {
+    if (isReadAuditing()) {
+      ReadEvent event = new ReadEvent(fullName);
+      // prepare in the foreground thread while we have the user context
+      // information (query is processed/executed later in bg thread)
+      readAuditPrepare(event);
+      spiQuery.setFutureFetchAudit(event);
+    }
+  }
+
+  /**
+   * Write a bean read to the read audit log.
+   */
+  public void readAuditBean(String queryKey, String bindLog, Object bean) {
+    ReadEvent event = new ReadEvent(fullName, queryKey, bindLog, getIdForJson(bean));
+    readAuditPrepare(event);
+    getReadAuditLogger().auditBean(event);
+  }
+
+  private void readAuditPrepare(ReadEvent event) {
+    ReadAuditPrepare prepare = getReadAuditPrepare();
+    if (prepare != null) {
+      prepare.prepare(event);
+    }
+  }
+
+  /**
+   * Write a many bean read to the read audit log.
+   */
+  public void readAuditMany(String queryKey, String bindLog, List<Object> ids) {
+    ReadEvent event = new ReadEvent(fullName, queryKey, bindLog, ids);
+    readAuditPrepare(event);
+    getReadAuditLogger().auditMany(event);
+  }
+
+  /**
+   * Write a futureList many read to the read audit log.
+   */
+  public void readAuditFutureMany(ReadEvent event) {
+    // this has already been prepared (in foreground thread)
+    getReadAuditLogger().auditMany(event);
+  }
+
+  /**
+   * Return the base table alias. This is always the first letter of the bean name.
    */
   public String getBaseTableAlias() {
     return baseTableAlias;
@@ -1208,6 +1269,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
       if (d != null) {
         Object shareableBean = d.getSharableBean();
         if (shareableBean != null) {
+          if (isReadAuditing()) {
+            readAuditBean("ref", "", shareableBean);
+          }
           return (T) shareableBean;
         }
       }
@@ -1363,6 +1427,26 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   }
 
   /**
+   * Return the Id value for the bean with embeddedId beans converted into maps.
+   * <p>
+   * The usage is to provide simple id types for JSON processing (for embeddedId's).
+   * </p>
+   */
+  public Object getIdForJson(Object bean) {
+    return idBinder.getIdForJson((EntityBean) bean);
+  }
+
+  /**
+   * Convert the idValue assuming embeddedId values are Maps.
+   * <p>
+   * The usage is to provide simple id types for JSON processing (for embeddedId's).
+   * </p>
+   */
+  public Object convertIdFromJson(Object idValue) {
+    return idBinder.convertIdFromJson(idValue);
+  }
+  
+  /**
    * Return the default order by that may need to be added if a many property is
    * included in the query.
    */
@@ -1374,7 +1458,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    * Convert the type of the idValue if required.
    */
   public Object convertId(Object idValue) {
-    return idBinder.convertSetId(idValue, null);
+    return idBinder.convertId(idValue);
   }
 
   /**
@@ -1778,6 +1862,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   }
 
   /**
+   * Return true if read auditing is on this entity bean.
+   */
+  public boolean isReadAuditing() {
+    return readAuditing;
+  }
+
+  /**
    * Return true if this entity bean has history support.
    */
   public boolean isHistorySupport() {
@@ -1940,6 +2031,61 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
       return ConcurrencyMode.NONE;
     } else {
       return concurrencyMode;     
+    }
+  }
+
+  /**
+   * Flatten the diff that comes from the entity bean intercept.
+   */
+  Map<String, ValuePair> diffFlatten(Map<String, ValuePair> diff) {
+    return DiffHelpUpdate.flatten(diff, this);
+  }
+
+  /**
+   * Return a map of the differences between a and b.
+   * <p>
+   * A and B must be of the same type. B can be null, in which case the 'dirty
+   * diff' of a is returned.
+   * </p>
+   * <p>
+   * This intentionally does not include as OneToMany or ManyToMany properties.
+   * </p>
+   */
+  public Map<String, ValuePair> diffForInsert(EntityBean newBean) {
+
+    Map<String, ValuePair> map = new LinkedHashMap<String, ValuePair>();
+    diffForInsert(null, map, newBean);
+    return map;
+  }
+
+  /**
+   * Populate the diff for inserts with flattened non-null property values.
+   */
+  public void diffForInsert(String prefix, Map<String, ValuePair> map, EntityBean newBean) {
+    for (int i = 0; i < propertiesBaseScalar.length; i++) {
+      propertiesBaseScalar[i].diffForInsert(prefix, map, newBean);
+    }
+    for (int i = 0; i < propertiesOne.length; i++) {
+      propertiesOne[i].diffForInsert(prefix, map, newBean);
+    }
+    for (int i = 0; i < propertiesEmbedded.length; i++) {
+      propertiesEmbedded[i].diffForInsert(prefix, map, newBean);
+    }
+  }
+
+  /**
+   * Populate the diff for updates with flattened non-null property values.
+   */
+  public void diff(String prefix, Map<String, ValuePair> map, EntityBean newBean, EntityBean oldBean) {
+
+    for (int i = 0; i < propertiesBaseScalar.length; i++) {
+      propertiesBaseScalar[i].diff(prefix, map, newBean, oldBean);
+    }
+    for (int i = 0; i < propertiesOne.length; i++) {
+      propertiesOne[i].diff(prefix, map, newBean, oldBean);
+    }
+    for (int i = 0; i < propertiesEmbedded.length; i++) {
+      propertiesEmbedded[i].diff(prefix, map, newBean, oldBean);
     }
   }
 

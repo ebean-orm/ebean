@@ -9,7 +9,6 @@ import com.avaje.ebean.plugin.SpiServerPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Properties;
@@ -80,17 +79,17 @@ public class DefaultChangeLogListener implements ChangeLogListener, SpiServerPlu
   @Override
   public void log(ChangeSet changeSet) {
 
-    try {
-      List<BeanChange> changes = changeSet.getChanges();
-      for (int i = 0; i < changes.size(); i++) {
-        // log each bean change as a separate log entry
-        BeanChange beanChange = changes.get(i);
+    List<BeanChange> changes = changeSet.getChanges();
+    for (int i = 0; i < changes.size(); i++) {
+      // log each bean change as a separate log entry
+      BeanChange beanChange = changes.get(i);
+      try {
         StringWriter writer = new StringWriter(getBufferSize(beanChange));
         jsonBuilder.writeBeanJson(writer, beanChange, changeSet, i);
         changeLog.info(writer.toString());
+      } catch (Exception e) {
+        logger.error("Exception logging beanChange " + beanChange.toString(), e);
       }
-    } catch (IOException e) {
-      logger.error("Exception sending changeSet " + changeSet.toString(), e);
     }
   }
 

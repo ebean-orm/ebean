@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
@@ -21,6 +22,7 @@ import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
+import com.avaje.ebeaninternal.util.ValueUtil;
 import com.fasterxml.jackson.core.JsonToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,7 @@ import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Description of a property of a bean. Includes its deployment information such
@@ -1096,6 +1099,36 @@ public class BeanProperty implements ElPropertyValue {
       if (jsonDeserialize) {
         setValue(bean, objValue);
       }
+    }
+  }
+
+  /**
+   * Populate diff map for insert if the property is not null.
+   */
+  public void diffForInsert(String prefix, Map<String, ValuePair> map, EntityBean newBean) {
+    Object newVal = (newBean == null) ? null : getValue(newBean);
+    if (newVal != null) {
+      String propName = (prefix == null) ? name : prefix + "." + name;
+      map.put(propName, new ValuePair(newVal, null));
+    }
+  }
+
+  /**
+   * Populate diff map comparing the property values between the beans.
+   */
+  public void diff(String prefix, Map<String, ValuePair> map, EntityBean newBean, EntityBean oldBean) {
+    Object newVal = (newBean == null) ? null : getValue(newBean);
+    Object oldVal = (oldBean == null) ? null : getValue(oldBean);
+    diffVal(prefix, map, newVal, oldVal);
+  }
+
+  /**
+   * Populate diff map comparing the property values.
+   */
+  public void diffVal(String prefix, Map<String, ValuePair> map, Object newVal, Object oldVal) {
+    if (!ValueUtil.areEqual(newVal, oldVal)) {
+      String propName = (prefix == null) ? name : prefix + "." + name;
+      map.put(propName, new ValuePair(newVal, oldVal));
     }
   }
 }

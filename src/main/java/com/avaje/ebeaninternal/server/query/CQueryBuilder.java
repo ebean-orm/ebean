@@ -8,6 +8,7 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.SqlLimitRequest;
 import com.avaje.ebean.config.dbplatform.SqlLimitResponse;
 import com.avaje.ebean.config.dbplatform.SqlLimiter;
+import com.avaje.ebean.event.readaudit.ReadAuditQueryPlan;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -267,6 +268,12 @@ public class CQueryBuilder {
 
     } else {
       queryPlan = new CQueryPlan(request, res, sqlTree, false, predicates.getLogWhereSql());
+    }
+
+    BeanDescriptor<T> desc = request.getBeanDescriptor();
+    if (desc.isReadAuditing()) {
+      // log the query plan based bean type (i.e. ignoring query disabling for logging the sql/plan)
+      desc.getReadAuditLogger().queryPlan(new ReadAuditQueryPlan(desc.getFullName(), queryPlan.getAuditQueryKey(), queryPlan.getSql()));
     }
 
     // cache the query plan because we can reuse it and also

@@ -11,6 +11,8 @@ import com.avaje.ebean.event.*;
 import com.avaje.ebean.event.changelog.ChangeLogListener;
 import com.avaje.ebean.event.changelog.ChangeLogPrepare;
 import com.avaje.ebean.event.changelog.ChangeLogRegister;
+import com.avaje.ebean.event.readaudit.ReadAuditLogger;
+import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.util.ClassUtil;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -298,6 +300,10 @@ public class ServerConfig {
   private ChangeLogListener changeLogListener;
 
   private ChangeLogRegister changeLogRegister;
+
+  private ReadAuditLogger readAuditLogger;
+
+  private ReadAuditPrepare readAuditPrepare;
 
   private EncryptKeyManager encryptKeyManager;
 
@@ -723,6 +729,41 @@ public class ServerConfig {
    */
   public void setChangeLogIncludeInserts(boolean changeLogIncludeInserts) {
     this.changeLogIncludeInserts = changeLogIncludeInserts;
+  }
+
+  /**
+   * Return the ReadAuditLogger to use.
+   */
+  public ReadAuditLogger getReadAuditLogger() {
+    return readAuditLogger;
+  }
+
+  /**
+   * Set the ReadAuditLogger to use. If not set the default implementation is used
+   * which logs the read events in JSON format to a standard named SLF4J logger
+   * (which can be configured in say logback to log to a separate log file).
+   */
+  public void setReadAuditLogger(ReadAuditLogger readAuditLogger) {
+    this.readAuditLogger = readAuditLogger;
+  }
+
+  /**
+   * Return the ReadAuditPrepare to use.
+   */
+  public ReadAuditPrepare getReadAuditPrepare() {
+    return readAuditPrepare;
+  }
+
+  /**
+   * Set the ReadAuditPrepare to use.
+   * <p>
+   * It is expected that an implementation is used that read user context information
+   * (user id, user ip address etc) and sets it on the ReadEvent bean before it is sent
+   * to the ReadAuditLogger.
+   * </p>
+   */
+  public void setReadAuditPrepare(ReadAuditPrepare readAuditPrepare) {
+    this.readAuditPrepare = readAuditPrepare;
   }
 
   /**

@@ -93,6 +93,7 @@ public class ChangeJsonBuilder {
    * For insert and update write the new/old values.
    */
   protected void writeBeanValues(JsonGenerator gen, BeanChange bean) throws IOException {
+
     if (bean.getType() != ChangeType.DELETE) {
       gen.writeFieldName("values");
       gen.writeStartObject();

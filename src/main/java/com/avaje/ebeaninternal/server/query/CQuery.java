@@ -2,7 +2,14 @@ package com.avaje.ebeaninternal.server.query;
 
 import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.Version;
-import com.avaje.ebean.bean.*;
+import com.avaje.ebean.bean.BeanCollection;
+import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.bean.EntityBeanIntercept;
+import com.avaje.ebean.bean.NodeUsageCollector;
+import com.avaje.ebean.bean.NodeUsageListener;
+import com.avaje.ebean.bean.ObjectGraphNode;
+import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -10,7 +17,11 @@ import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
-import com.avaje.ebeaninternal.server.deploy.*;
+import com.avaje.ebeaninternal.server.deploy.BeanCollectionHelp;
+import com.avaje.ebeaninternal.server.deploy.BeanCollectionHelpFactory;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
@@ -24,6 +35,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -164,6 +176,16 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   private long executionTimeMicros;
 
   /**
+   * Flag set when findIterate is being read audited.
+   */
+  private boolean auditFindIterate;
+
+  /**
+   * A buffer of Ids collected for findIterate auditing.
+   */
+  private List<Object> auditFindIterateIds;
+
+  /**
    * Create the Sql select based on the request.
    */
   @SuppressWarnings("unchecked")
@@ -295,7 +317,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       }
 
       if (forwardOnlyHint) {
-        // Use forward only hints for large resultset processing (Issue 56, MySql specific)
+        // Use forward only hints for large resultSet processing (Issue 56, MySql specific)
         pstmt = conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         pstmt.setFetchSize(Integer.MIN_VALUE);
       } else {
@@ -327,18 +349,24 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   /**
    * Close the resources.
    * <p>
-   * The jdbc resultSet and statement need to be closed. Its important that this
-   * method is called.
+   * The JDBC resultSet and statement need to be closed. Its important that this method is called.
    * </p>
    */
   public void close() {
+    try {
+      if (auditFindIterateIds != null && !auditFindIterateIds.isEmpty()) {
+        auditIterateLogMessage();
+      }
+    } catch (Throwable e) {
+      logger.error("Error logging read audit logs", e);
+    }
     try {
       if (dataReader != null) {
         dataReader.close();
         dataReader = null;
       }
     } catch (SQLException e) {
-      logger.error(null, e);
+      logger.error("Error closing dataReader", e);
     }
     try {
       if (pstmt != null) {
@@ -346,7 +374,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
         pstmt = null;
       }
     } catch (SQLException e) {
-      logger.error(null, e);
+      logger.error("Error closing preparedStatement", e);
     }
   }
 
@@ -464,6 +492,9 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   }
 
   protected EntityBean next() {
+    if (auditFindIterate) {
+      auditIterateNextBean();
+    }
     return nextBean;
   }
 
@@ -610,8 +641,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   }
 
   /**
-   * Create a PersistenceException including interesting information like the
-   * bindLog and sql used.
+   * Create a PersistenceException including interesting information like the bindLog and sql used.
    */
   public PersistenceException createPersistenceException(SQLException e) {
 
@@ -619,8 +649,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   }
 
   /**
-   * Create a PersistenceException including interesting information like the
-   * bindLog and sql used.
+   * Create a PersistenceException including interesting information like the bindLog and sql used.
    */
   public static PersistenceException createPersistenceException(SQLException e, SpiTransaction t, String bindLog, String sql) {
 
@@ -678,6 +707,73 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   public void setCurrentPrefix(String currentPrefix, Map<String, String> currentPathMap) {
     this.currentPrefix = currentPrefix;
     this.currentPathMap = currentPathMap;
+  }
+
+  /**
+   * A find bean query with read auditing so build and log the ReadEvent.
+   */
+  public void auditFind(EntityBean bean) {
+    if (bean != null) {
+      // only audit when a bean was actually found
+      desc.readAuditBean(queryPlan.getAuditQueryKey(), bindLog, bean);
+    }
+  }
+
+  /**
+   * a find many query with read auditing so build the ReadEvent and log it.
+   */
+  public void auditFindMany() {
+
+    if (!collection.isEmpty()) {
+      // get the id values of the underlying collection
+      List<Object> ids = new ArrayList<Object>(collection.size());
+      Collection<T> underlyingBeans = collection.getActualDetails();
+      for (T underlyingBean : underlyingBeans) {
+        ids.add(desc.getIdForJson(underlyingBean));
+      }
+      ReadEvent futureReadEvent = query.getFutureFetchAudit();
+      if (futureReadEvent == null) {
+        // normal query execution
+        desc.readAuditMany(queryPlan.getAuditQueryKey(), bindLog, ids);
+      } else {
+        // this query was executed via findFutureList() and the prepare()
+        // has already been called so set the details and log
+        futureReadEvent.setQueryKey(queryPlan.getAuditQueryKey());
+        futureReadEvent.setBindLog(bindLog);
+        futureReadEvent.setIds(ids);
+        desc.readAuditFutureMany(futureReadEvent);
+      }
+    }
+  }
+
+  /**
+   * Indicate that read auditing is occurring on a this findIterate query.
+   */
+  public void auditFindIterate() {
+    auditFindIterate = true;
+  }
+
+  /**
+   * Send the current buffer of findIterate collected ids to the audit log.
+   */
+  private void auditIterateLogMessage() {
+    desc.readAuditMany(queryPlan.getAuditQueryKey(), bindLog, auditFindIterateIds);
+    // create a new list on demand with the next bean/id
+    auditFindIterateIds = null;
+  }
+
+  /**
+   * Add the id to the audit id buffer and flush if needed in batches of 100.
+   */
+  private void auditIterateNextBean() {
+
+    if (auditFindIterateIds == null) {
+      auditFindIterateIds = new ArrayList<Object>(100);
+    }
+    auditFindIterateIds.add(desc.getIdForJson(nextBean));
+    if (auditFindIterateIds.size() >= 100) {
+      auditIterateLogMessage();
+    }
   }
 
 }

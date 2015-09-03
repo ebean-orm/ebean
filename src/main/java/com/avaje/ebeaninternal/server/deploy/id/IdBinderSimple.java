@@ -131,6 +131,17 @@ public final class IdBinderSimple implements IdBinder {
     request.addBindValue(value);
   }
 
+  @Override
+  public Object getIdForJson(EntityBean bean) {
+    return idProperty.getValue(bean);
+  }
+
+  @Override
+  public Object convertIdFromJson(Object value) {
+    // handle simple type conversion if required
+    return convertId(value);
+  }
+
   public void bindId(DefaultSqlUpdate sqlUpdate, Object value) {
     sqlUpdate.addParameter(value);
   }
@@ -191,6 +202,14 @@ public final class IdBinderSimple implements IdBinder {
     }
     sb.append(idProperty.getName());
     return sb.toString();
+  }
+
+  public Object convertId(Object idValue) {
+
+    if (!idValue.getClass().equals(expectedType)) {
+      return scalarType.toBeanType(idValue);
+    }
+    return idValue;
   }
 
   public Object convertSetId(Object idValue, EntityBean bean) {

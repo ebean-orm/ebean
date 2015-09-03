@@ -13,6 +13,8 @@ import com.avaje.ebean.event.TransactionEventListener;
 import com.avaje.ebean.event.changelog.ChangeLogListener;
 import com.avaje.ebean.event.changelog.ChangeLogPrepare;
 import com.avaje.ebean.event.changelog.ChangeLogRegister;
+import com.avaje.ebean.event.readaudit.ReadAuditLogger;
+import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.util.ClassPathSearchMatcher;
 import org.slf4j.Logger;
@@ -69,10 +71,14 @@ public class BootupClasses implements ClassPathSearchMatcher {
   private Class<?> changeLogPrepareClass;
   private Class<?> changeLogListenerClass;
   private Class<?> changeLogRegisterClass;
+  private Class<?> readAuditPrepareClass;
+  private Class<?> readAuditLoggerClass;
 
   private ChangeLogPrepare changeLogPrepare;
   private ChangeLogListener changeLogListener;
   private ChangeLogRegister changeLogRegister;
+  private ReadAuditPrepare readAuditPrepare;
+  private ReadAuditLogger readAuditLogger;
 
   public BootupClasses() {
   }
@@ -192,6 +198,17 @@ public class BootupClasses implements ClassPathSearchMatcher {
   }
 
   public void addChangeLogInstances(ServerConfig serverConfig) {
+
+    readAuditPrepare = serverConfig.getReadAuditPrepare();
+    readAuditLogger = serverConfig.getReadAuditLogger();
+
+    if (readAuditPrepare == null && readAuditPrepareClass != null) {
+      readAuditPrepare = (ReadAuditPrepare)create(readAuditPrepareClass, false);
+    }
+    if (readAuditLogger == null && readAuditLoggerClass != null) {
+      readAuditLogger = (ReadAuditLogger)create(readAuditLoggerClass, false);
+    }
+
     changeLogListener = serverConfig.getChangeLogListener();
     changeLogRegister = serverConfig.getChangeLogRegister();
     changeLogPrepare = serverConfig.getChangeLogPrepare();
@@ -260,6 +277,14 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
   public ChangeLogRegister getChangeLogRegister() {
     return changeLogRegister;
+  }
+
+  public ReadAuditPrepare getReadAuditPrepare() {
+    return readAuditPrepare;
+  }
+
+  public ReadAuditLogger getReadAuditLogger() {
+    return readAuditLogger;
   }
 
   public List<BeanQueryAdapter> getBeanQueryAdapters() {
@@ -437,6 +462,15 @@ public class BootupClasses implements ClassPathSearchMatcher {
 
     if (ChangeLogPrepare.class.isAssignableFrom(cls)) {
       changeLogPrepareClass = cls;
+      interesting = true;
+    }
+
+    if (ReadAuditPrepare.class.isAssignableFrom(cls)) {
+      readAuditPrepareClass = cls;
+      interesting = true;
+    }
+    if (ReadAuditLogger.class.isAssignableFrom(cls)) {
+      readAuditLoggerClass = cls;
       interesting = true;
     }
 

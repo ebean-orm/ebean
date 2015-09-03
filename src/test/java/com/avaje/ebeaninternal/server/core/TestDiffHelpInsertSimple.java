@@ -51,7 +51,7 @@ public class TestDiffHelpInsertSimple extends BaseTestCase {
 
     Order order1 = createBaseOrder(server);
 
-    Map<String, ValuePair> diff = DiffHelpInsert.diff((EntityBean) order1, orderDesc);
+    Map<String, ValuePair> diff = orderDesc.diffForInsert((EntityBean) order1);
 
     assertEquals(4, diff.size());
 

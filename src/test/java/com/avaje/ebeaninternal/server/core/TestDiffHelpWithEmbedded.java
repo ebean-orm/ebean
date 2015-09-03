@@ -66,7 +66,25 @@ public class TestDiffHelpWithEmbedded extends BaseTestCase {
     Assert.assertEquals("bar",valuePair.getNewValue());
     Assert.assertEquals("baz",valuePair.getOldValue());
   }
-  
+
+  @Test
+  public void testDiffEmbedded_flatMode() {
+
+    EMain emain1 = createEMain();
+    EMain emain2 = createEMain();
+    emain2.getEmbeddable().setDescription("baz");
+
+    DiffHelp diffHelp = new DiffHelp(true);
+
+    Map<String, ValuePair> diff = diffHelp.diff(emain1, emain2, emainDesc);
+    Assert.assertEquals(1, diff.size());
+    ValuePair valuePair = diff.get("embeddable.description");
+
+    Assert.assertNotNull(valuePair);
+    Assert.assertEquals("bar",valuePair.getNewValue());
+    Assert.assertEquals("baz",valuePair.getOldValue());
+  }
+
   @Test
   public void testFirstEmbeddedIsNull() {
     

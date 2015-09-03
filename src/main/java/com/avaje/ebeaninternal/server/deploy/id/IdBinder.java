@@ -84,6 +84,28 @@ public interface IdBinder {
    */
   Object[] getBindValues(Object idValue);
 
+
+  /**
+   * For EmbeddedId convert the idValue into a simple map.
+   * Otherwise the idValue is just returned as is.
+   * <p>
+   * This is used to provide a simple JSON serializable version of the id value.
+   * </p>
+   */
+  Object getIdForJson(EntityBean idValue);
+
+  /**
+   * For EmbeddedId the value is assumed to be a Map and this is
+   * takes the values from the map and builds an embedded id bean.
+   * <p>
+   * For other simple id's this just returns the value (no conversion required).
+   * </p>
+   * <p>
+   * This is used to provide a simple JSON serializable version of the id value.
+   * </p>
+   */
+  Object convertIdFromJson(Object value);
+
   /**
    * Return the id values for a given bean.
    */
@@ -171,4 +193,8 @@ public interface IdBinder {
    */
   Object convertSetId(Object idValue, EntityBean bean);
 
+  /**
+   * Cast or convert the Id value if necessary.
+   */
+  Object convertId(Object idValue);
 }

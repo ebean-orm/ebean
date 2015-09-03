@@ -9,15 +9,17 @@ import com.avaje.ebean.config.dbplatform.DbHistorySupport;
 import com.avaje.ebean.event.changelog.ChangeLogListener;
 import com.avaje.ebean.event.changelog.ChangeLogPrepare;
 import com.avaje.ebean.event.changelog.ChangeLogRegister;
+import com.avaje.ebean.event.readaudit.ReadAuditLogger;
+import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.plugin.SpiServerPlugin;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
 import com.avaje.ebeaninternal.server.autofetch.AutoFetchManagerFactory;
+import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogListener;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogPrepare;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogRegister;
-import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogListener;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.DeployOrmXml;
@@ -32,6 +34,8 @@ import com.avaje.ebeaninternal.server.persist.DefaultPersister;
 import com.avaje.ebeaninternal.server.query.CQueryEngine;
 import com.avaje.ebeaninternal.server.query.DefaultOrmQueryEngine;
 import com.avaje.ebeaninternal.server.query.DefaultRelationalQueryEngine;
+import com.avaje.ebeaninternal.server.readaudit.DefaultReadAuditLogger;
+import com.avaje.ebeaninternal.server.readaudit.DefaultReadAuditPrepare;
 import com.avaje.ebeaninternal.server.resource.ResourceManager;
 import com.avaje.ebeaninternal.server.resource.ResourceManagerFactory;
 import com.avaje.ebeaninternal.server.text.json.DJsonContext;
@@ -55,8 +59,6 @@ import java.util.Map;
 /**
  * Used to extend the ServerConfig with additional objects used to configure and
  * construct an EbeanServer.
- * 
- * @author rbygrave
  */
 public class InternalConfiguration {
 
@@ -106,8 +108,8 @@ public class InternalConfiguration {
   private final List<SpiServerPlugin> plugins = new ArrayList<SpiServerPlugin>();
 
   public InternalConfiguration(XmlConfig xmlConfig, ClusterManager clusterManager,
-      ServerCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
-      ServerConfig serverConfig, BootupClasses bootupClasses) {
+                               ServerCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
+                               ServerConfig serverConfig, BootupClasses bootupClasses) {
 
     this.jsonFactory = serverConfig.getJsonFactory();
     this.xmlConfig = xmlConfig;
@@ -157,7 +159,7 @@ public class InternalConfiguration {
    */
   public <T> T plugin(T maybePlugin) {
     if (maybePlugin instanceof SpiServerPlugin) {
-      plugins.add((SpiServerPlugin)maybePlugin);
+      plugins.add((SpiServerPlugin) maybePlugin);
     }
     return maybePlugin;
   }
@@ -192,6 +194,22 @@ public class InternalConfiguration {
   }
 
   /**
+   * Return the ReadAuditLogger implementation to use.
+   */
+  public ReadAuditLogger getReadAuditLogger() {
+    ReadAuditLogger found = bootupClasses.getReadAuditLogger();
+    return plugin(found != null ? found : new DefaultReadAuditLogger());
+  }
+
+  /**
+   * Return the ReadAuditPrepare implementation to use.
+   */
+  public ReadAuditPrepare getReadAuditPrepare() {
+    ReadAuditPrepare found = bootupClasses.getReadAuditPrepare();
+    return plugin(found != null ? found : new DefaultReadAuditPrepare());
+  }
+
+  /**
    * For 'As Of' queries return the number of bind variables per predicate.
    */
   private Binder getBinder(TypeManager typeManager, DatabasePlatform databasePlatform) {
@@ -206,14 +224,14 @@ public class InternalConfiguration {
    * Create the TransactionManager taking into account autoCommit mode.
    */
   private TransactionManager createTransactionManager() {
-    
+
     if (isAutoCommitMode()) {
       return new AutoCommitTransactionManager(clusterManager, backgroundExecutor, serverConfig, beanDescriptorManager, this.getBootupClasses());
     }
-    
+
     return new TransactionManager(clusterManager, backgroundExecutor, serverConfig, beanDescriptorManager, this.getBootupClasses());
   }
-  
+
   /**
    * Return true if autoCommit mode is on.
    */
@@ -250,7 +268,6 @@ public class InternalConfiguration {
   public Persister createPersister(SpiEbeanServer server) {
     return new DefaultPersister(server, binder, beanDescriptorManager);
   }
-
 
   public ServerCacheManager getCacheManager() {
     return cacheManager;

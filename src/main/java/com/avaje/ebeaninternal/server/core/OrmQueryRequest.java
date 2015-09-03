@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.server.core;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -374,7 +376,37 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
     cacheKey = query.queryHash();
 
-    return beanDescriptor.queryCacheGet(cacheKey);
+    BeanCollection<T> cached = beanDescriptor.queryCacheGet(cacheKey);
+
+    if (cached != null && isAuditReads() && readAuditQueryType()) {
+      // raw sql can't use L2 cache so normal queries only in here
+      Collection<T> actualDetails = cached.getActualDetails();
+      List<Object> ids = new ArrayList<Object>(actualDetails.size());
+      for (T bean : actualDetails) {
+        ids.add(beanDescriptor.getIdForJson(bean));
+      }
+      beanDescriptor.readAuditMany(queryPlanHash.getPartialKey(), "l2-query-cache", ids);
+    }
+
+    return cached;
+  }
+
+  /**
+   * Return true if the query type contains bean data (not just ids etc) and hence we want to include
+   * it in read auditing.  Return false for row count and find ids queries.
+   */
+  private boolean readAuditQueryType() {
+    Type type = query.getType();
+    switch (type) {
+      case BEAN:
+      case ITERATE:
+      case LIST:
+      case SET:
+      case MAP:
+        return true;
+      default:
+        return false;
+    }
   }
 
   public void putToQueryCache(BeanCollection<T> queryResult) {
@@ -409,5 +441,15 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
     int batchSize = query.getLazyLoadBatchSize();
     return (batchSize > 0) ? batchSize : ebeanServer.getLazyLoadBatchSize();
+  }
+
+  /**
+   * Return true if read auditing is on for this query request.
+   * <p>
+   * This means that read audit is on for this bean type and that query has not explicitly disabled it.
+   * </p>
+   */
+  public boolean isAuditReads() {
+    return !query.isDisableReadAudit() && beanDescriptor.isReadAuditing();
   }
 }
