@@ -81,6 +81,7 @@ public class ParentRawSqlTest extends BaseTestCase {
 
     joinToInheritanceHierarchy_withAliasMapping();
     joinToInheritanceHierarchy();
+    joinToInheritanceHierarchy_withIgnore();
 
     useColumnMappingIgnore();
 
@@ -97,6 +98,25 @@ public class ParentRawSqlTest extends BaseTestCase {
         .columnMapping("id", "id")
         .columnMapping("name", "name")
         .columnMapping("ptype", "parent.type")
+        .columnMapping("pid", "parent.id")
+        .create();
+
+    List<EUncle> uncles = Ebean.find(EUncle.class).setRawSql(rawSql)
+        .fetch("parent", new FetchConfig().query())
+        .findList();
+
+    assertNotNull(uncles.get(0));
+    Parent parent = uncles.get(0).getParent();
+    assertTrue(parent instanceof ChildB);
+  }
+
+  private void joinToInheritanceHierarchy_withIgnore() {
+
+    RawSql rawSql = RawSqlBuilder
+        .unparsed("select u.id, u.name, p.type as ptype, p.id as pid from rawinherit_uncle u join rawinherit_parent p where p.id = u.parent_id")
+        .columnMapping("id", "id")
+        .columnMapping("name", "name")
+        .columnMappingIgnore("ptype")
         .columnMapping("pid", "parent.id")
         .create();
 
