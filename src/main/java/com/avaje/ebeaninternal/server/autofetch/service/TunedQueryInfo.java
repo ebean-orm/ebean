@@ -21,6 +21,18 @@ public class TunedQueryInfo implements Serializable {
     this.tunedDetail = tunedDetail;
   }
 
+  public TunedQueryInfo(OrmQueryDetail tunedDetail) {
+    this.origin = null;
+    this.tunedDetail = tunedDetail;
+  }
+
+  /**
+   * Return the tuned detail (for comparison with profiling information).
+   */
+  public OrmQueryDetail getTunedDetail() {
+    return tunedDetail;
+  }
+
   /**
    * Tune the query by replacing its OrmQueryDetail with a tuned one.
    *
@@ -47,7 +59,7 @@ public class TunedQueryInfo implements Serializable {
   }
 
   public String toString() {
-    return origin.getBeanType() + " " + origin.getKey() + " " + tunedDetail;
+    return tunedDetail.toString();
   }
 
 }

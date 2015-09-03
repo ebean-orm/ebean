@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
@@ -83,24 +84,47 @@ public class OrmQueryDetail implements Serializable {
    * Return true if equal in terms of autofetch (select and joins).
    */
   public boolean isAutoTuneEqual(OrmQueryDetail otherDetail) {
-    return autofetchPlanHash() == otherDetail.autofetchPlanHash();
-  }
 
-  /**
-   * Calculate the hash for the query plan.
-   */
-  private int autofetchPlanHash() {
-
-    int hc = (baseProps == null ? 1 : baseProps.autofetchPlanHash());
-
-    if (fetchPaths != null) {
-      for (OrmQueryProperties p : fetchPaths.values()) {
-        hc = hc * 31 + p.autofetchPlanHash();
+    if (!isSame(baseProps, otherDetail.baseProps)) {
+      return false;
+    }
+    if (fetchPaths == null) {
+      return otherDetail.fetchPaths == null;
+    }
+    Set<Map.Entry<String, OrmQueryProperties>> entries = fetchPaths.entrySet();
+    for (Map.Entry<String, OrmQueryProperties> entry : entries) {
+      OrmQueryProperties chunk = otherDetail.getChunk(entry.getKey(), false);
+      if (!isSame(entry.getValue(), chunk)) {
+        return false;
       }
     }
 
-    return hc;
+    return true;
+    //return autofetchPlanHash() == otherDetail.autofetchPlanHash();
   }
+
+  private boolean isSame(OrmQueryProperties p1, OrmQueryProperties p2) {
+    if (p1 == null) {
+      return p2 == null;
+    }
+    return p1.isSame(p2);
+  }
+
+//  /**
+//   * Calculate the hash for the query plan.
+//   */
+//  private int autofetchPlanHash() {
+//
+//    int hc = (baseProps == null ? 1 : baseProps.autofetchPlanHash());
+//
+//    if (fetchPaths != null) {
+//      for (OrmQueryProperties p : fetchPaths.values()) {
+//        hc = hc * 31 + p.autofetchPlanHash();
+//      }
+//    }
+//
+//    return hc;
+//  }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();

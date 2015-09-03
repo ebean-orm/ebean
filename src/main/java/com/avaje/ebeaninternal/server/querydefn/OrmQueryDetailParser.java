@@ -27,10 +27,11 @@ public class OrmQueryDetailParser {
     this.parser = new SimpleTextParser(oql);
   }
 
-  public void parse() throws PersistenceException {
+  public OrmQueryDetail parse() throws PersistenceException {
 
     parser.nextWord();
     processInitial();
+    return detail;
   }
 
   protected void assign(DefaultOrmQuery<?> query) {
@@ -42,7 +43,9 @@ public class OrmQueryDetailParser {
   }
 
   private void processInitial() {
-    if (parser.isMatch("find")) {
+    if (parser.isMatch("select")) {
+      readSelect();
+    } else if (parser.isMatch("find")) {
       OrmQueryProperties props = readFindFetch();
       detail.setBase(props);
     } else {
@@ -146,6 +149,19 @@ public class OrmQueryDetailParser {
       readOrderBy();
     } else if (nextMode == 2) {
       readLimit();
+    }
+  }
+
+  private void readSelect() {
+    String path = null;
+    String props = parser.nextWord();
+    if (props.startsWith("(")) {
+      props = props.substring(1, props.length() - 1);
+      OrmQueryProperties base = new OrmQueryProperties(path, props);
+      detail.setBase(base);
+      parser.nextWord();
+    } else {
+      process();
     }
   }
 

@@ -24,8 +24,6 @@ public class ProfileOriginNodeUsage {
 
   private final String path;
 
-  private final boolean queryTuningAddVersion;
-
   private int profileCount;
 
   private int profileUsedCount;
@@ -34,12 +32,12 @@ public class ProfileOriginNodeUsage {
 
   private final Set<String> aggregateUsed = new LinkedHashSet<String>();
 
-  public ProfileOriginNodeUsage(String path, boolean queryTuningAddVersion) {
-    this.path = path;
-    this.queryTuningAddVersion = queryTuningAddVersion;
+  public ProfileOriginNodeUsage(String path) {
+    // handle null paths as using ConcurrentHashMap
+    this.path = "".equals(path) ? null : path;
   }
 
-  public void buildTunedFetch(PathProperties pathProps, BeanDescriptor<?> rootDesc) {
+  protected void buildTunedFetch(PathProperties pathProps, BeanDescriptor<?> rootDesc, boolean addVersionProperty) {
 
     synchronized (monitor) {
 
@@ -59,6 +57,7 @@ public class ProfileOriginNodeUsage {
       }
 
       for (String propName : aggregateUsed) {
+        //propName = "".equals(propName) ? null : propName;
         BeanProperty beanProp = desc.getBeanPropertyFromPath(propName);
         if (beanProp == null) {
           logger.warn("AutoTune: Can't find property[" + propName + "] for " + desc.getName());
@@ -81,7 +80,7 @@ public class ProfileOriginNodeUsage {
         }
       }
 
-      if ((modified || queryTuningAddVersion) && desc != null) {
+      if ((modified || addVersionProperty) && desc != null) {
         BeanProperty versionProp = desc.getVersionProperty();
         if (versionProp != null) {
           pathProps.addToPath(path, versionProp.getName());
@@ -93,7 +92,7 @@ public class ProfileOriginNodeUsage {
   /**
    * Collect usage from a node.
    */
-  public void collectUsageInfo(NodeUsageCollector profile) {
+  protected void collectUsageInfo(NodeUsageCollector profile) {
 
     synchronized (monitor) {
 

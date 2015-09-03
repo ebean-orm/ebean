@@ -1,0 +1,46 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://ebean-orm.github.io/xml/ns/autotune"
+            targetNamespace="http://ebean-orm.github.io/xml/ns/autotune" elementFormDefault="qualified">
+
+
+  <!-- Root level type : profiling -->
+
+  <xsd:element name="autotune">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="origin" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="profileDiff" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="profileNew" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="origin">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="callStack" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:attribute name="key" type="xsd:string" use="required"/>
+      <xsd:attribute name="beanType" type="xsd:string"/>
+      <xsd:attribute name="detail" type="xsd:string"/>
+      <xsd:attribute name="tuneDetail" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="profileDiff">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="origin" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="profileNew">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="origin" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+</xsd:schema>

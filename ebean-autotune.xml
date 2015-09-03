@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<autotune xmlns="http://ebean-orm.github.io/xml/ns/autotune">
+  <origin key="B0dP9I.DWeHD4.DigF0q" beanType="com.avaje.tests.model.basic.Order"
+          detail="select (orderDate,shipDate)  fetch customer (id,name)  fetch customer.shippingAddress (line1,city,id) ">
+    <callStack>
+      com.avaje.tests.query.autotune.TestAutoTuneProfiling.findById(TestAutoTuneProfiling.java:45)
+      com.avaje.tests.query.autotune.TestAutoTuneProfiling.useLots(TestAutoTuneProfiling.java:62)
+      com.avaje.tests.query.autotune.TestAutoTuneProfiling.execute(TestAutoTuneProfiling.java:37)
+      com.avaje.tests.query.autotune.TestAutoTuneProfiling.test(TestAutoTuneProfiling.java:26)
+      sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+    </callStack>
+  </origin>
+  <origin key="B0dP9I.DWeHD4.DKE89p" beanType="com.avaje.tests.model.basic.Order" detail="select (shipDate) ">
+    <callStack>com.avaje.tests.query.autotune.TestAutoTuneProfiling.findById(TestAutoTuneProfiling.java:45)
+      com.avaje.tests.query.autotune.TestAutoTuneProfiling.useOrderDate(TestAutoTuneProfiling.java:49)
+      com.avaje.tests.query.autotune.TestAutoTuneProfiling.execute(TestAutoTuneProfiling.java:35)
+      com.avaje.tests.query.autotune.TestAutoTuneProfiling.test(TestAutoTuneProfiling.java:26)
+      sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+    </callStack>
+  </origin>
+  <!--<origin key="B0dP9I.DWeHD4.DCmfLb" beanType="com.avaje.tests.model.basic.Order"-->
+          <!--detail="select (orderDate)  fetch customer (id,name) ">-->
+    <!--<callStack>com.avaje.tests.query.autotune.TestAutoTuneProfiling.findById(TestAutoTuneProfiling.java:45)-->
+      <!--com.avaje.tests.query.autotune.TestAutoTuneProfiling.useOrderDateCustomerName(TestAutoTuneProfiling.java:55)-->
+      <!--com.avaje.tests.query.autotune.TestAutoTuneProfiling.execute(TestAutoTuneProfiling.java:36)-->
+      <!--com.avaje.tests.query.autotune.TestAutoTuneProfiling.test(TestAutoTuneProfiling.java:26)-->
+      <!--sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)-->
+    <!--</callStack>-->
+  <!--</origin>-->
+
+</autotune>

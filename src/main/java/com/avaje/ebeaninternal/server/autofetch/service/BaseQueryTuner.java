@@ -7,6 +7,7 @@ import com.avaje.ebean.config.AutofetchMode;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.autofetch.ProfilingListener;
+import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 
 import javax.persistence.PersistenceException;
 import java.util.Map;
@@ -49,6 +50,17 @@ public class BaseQueryTuner {
   }
 
   /**
+   * Return the detail currently used for tuning.
+   * This returns null if there is currently no matching tuning.
+   */
+  public OrmQueryDetail get(String key) {
+    TunedQueryInfo info = tunedQueryInfoMap.get(key);
+    return (info == null) ? null : info.getTunedDetail();
+  }
+
+  boolean fullProfiling = true;
+
+  /**
    * Auto tune the query and enable profiling.
    */
   public boolean tuneQuery(SpiQuery<?> query) {
@@ -58,7 +70,11 @@ public class BaseQueryTuner {
     }
 
     if (!useAutoTune(query)) {
-      // not using autoFetch for this query
+      // not tuning this query but maybe profiling
+      if (fullProfiling) {
+        CallStack stack = server.createCallStack();
+        profiling(query, stack);
+      }
       return false;
     }
 
@@ -86,6 +102,16 @@ public class BaseQueryTuner {
       return tuneInfo != null && tuneInfo.tuneQuery(query);
     }
     return false;
+  }
+
+  private void profiling(SpiQuery<?> query, CallStack stack) {
+
+    // create a query point to identify the query
+    ObjectGraphNode origin = query.setOrigin(stack);
+    if (profilingListener.isProfileRequest(origin)) {
+      // collect more profiling based on profiling rate etc
+      query.setProfilingListener(profilingListener);
+    }
   }
 
   /**

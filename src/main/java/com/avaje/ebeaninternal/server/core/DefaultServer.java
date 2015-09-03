@@ -236,6 +236,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private void configureServerPlugins() {
 
+    autoTuneService.startup();
+
     for (SpiServerPlugin plugin : serverPlugins) {
       plugin.configure(this);
     }

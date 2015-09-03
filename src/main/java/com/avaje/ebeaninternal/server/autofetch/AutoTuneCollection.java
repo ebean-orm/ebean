@@ -19,6 +19,10 @@ public class AutoTuneCollection {
     return entry;
   }
 
+  public List<Entry> getEntries() {
+    return entries;
+  }
+
   /**
    * Profiling entry at a given origin point.
    */

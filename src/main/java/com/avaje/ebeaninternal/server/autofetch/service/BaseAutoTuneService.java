@@ -1,13 +1,24 @@
 package com.avaje.ebeaninternal.server.autofetch.service;
 
+import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.config.AutofetchConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.server.autofetch.AutoTuneService;
 import com.avaje.ebeaninternal.server.autofetch.AutoTuneCollection;
+import com.avaje.ebeaninternal.server.autofetch.AutoTuneService;
+import com.avaje.ebeaninternal.server.autofetch.model.Autotune;
+import com.avaje.ebeaninternal.server.autofetch.model.Origin;
+import com.avaje.ebeaninternal.server.autofetch.model.ProfileDiff;
+import com.avaje.ebeaninternal.server.autofetch.model.ProfileNew;
+import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
+import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetailParser;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * Implementation of the AutoTuneService which is comprised of profiling and query tuning.
@@ -40,12 +51,65 @@ public class BaseAutoTuneService implements AutoTuneService {
    */
   public void startup() {
 
+    File file = new File("ebean-autotune.xml");
+    AutoTuneXmlReader reader = new AutoTuneXmlReader();
+    Autotune profiling = reader.read(file);
+    List<Origin> originList = profiling.getOrigin();
+    for (Origin origin : originList) {
+      String key = origin.getKey();
+      String detail = origin.getDetail();
+      OrmQueryDetailParser parser = new OrmQueryDetailParser(detail);
+      OrmQueryDetail fetchDetail = parser.parse();
+      TunedQueryInfo tunedQueryInfo = new TunedQueryInfo(fetchDetail);
+      queryTuner.load(key, tunedQueryInfo);
+    }
   }
 
   private void saveProfiling() {
 
+    Autotune document = new Autotune();
+
     AutoTuneCollection autoTuneCollection = profileManager.profilingCollection(false);
 
+    List<AutoTuneCollection.Entry> entries = autoTuneCollection.getEntries();
+    for (AutoTuneCollection.Entry entry : entries) {
+      ObjectGraphOrigin point = entry.getOrigin();
+      OrmQueryDetail profileDetail = entry.getDetail();
+
+      OrmQueryDetail tuneDetail = queryTuner.get(point.getKey());
+      if (tuneDetail == null) {
+        ProfileNew profileNew = document.getProfileNew();
+        if (profileNew == null) {
+          profileNew = new ProfileNew();
+          document.setProfileNew(profileNew);
+        }
+        profileNew.getOrigin().add( createOrigin(entry, point));
+
+      } else if (!tuneDetail.isAutoTuneEqual(profileDetail)) {
+        Origin origin1 = createOrigin(entry, point);
+        origin1.setTuneDetail(tuneDetail.toString());
+        ProfileDiff diff = document.getProfileDiff();
+        if (diff == null) {
+          diff = new ProfileDiff();
+          document.setProfileDiff(diff);
+        }
+        diff.getOrigin().add(origin1);
+      }
+    }
+
+    File file = new File("ebean-autotune-profiling.xml");
+    AutoTuneXmlWriter writer = new AutoTuneXmlWriter();
+    writer.write(document, file);
+  }
+
+  @NotNull
+  private Origin createOrigin(AutoTuneCollection.Entry entry, ObjectGraphOrigin point) {
+    Origin origin1 = new Origin();
+    origin1.setKey(point.getKey());
+    origin1.setBeanType(point.getBeanType());
+    origin1.setDetail(entry.getDetail().toString());
+    origin1.setCallStack(point.getCallStack().description("\n"));
+    return origin1;
   }
 
   /**

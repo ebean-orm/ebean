@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class ProfileOrigin {
 
+  //private static final Logger logger = LoggerFactory.getLogger(ProfileOrigin.class);
+
   private static final long RESET_COUNT = -1000000000L;
 
   private final ObjectGraphOrigin origin;
@@ -89,10 +91,10 @@ public class ProfileOrigin {
   }
 
   private OrmQueryDetail buildDetail(BeanDescriptor<?> rootDesc) {
-    PathProperties pathProps = new PathProperties();
 
+    PathProperties pathProps = new PathProperties();
     for (ProfileOriginNodeUsage statsNode : nodeUsageMap.values()) {
-      statsNode.buildTunedFetch(pathProps, rootDesc);
+      statsNode.buildTunedFetch(pathProps, rootDesc, queryTuningAddVersion);
     }
 
     OrmQueryDetail detail = new OrmQueryDetail();
@@ -142,10 +144,10 @@ public class ProfileOrigin {
    */
   public void collectUsageInfo(NodeUsageCollector profile) {
 
-    if (!profile.isEmpty()) {
-      ObjectGraphNode node = profile.getNode();
+    //logger.info("COLLECT USAGE {}", profile.toString());
 
-      ProfileOriginNodeUsage nodeStats = getNodeStats(node.getPath());
+    if (!profile.isEmpty()) {
+      ProfileOriginNodeUsage nodeStats = getNodeStats(profile.getNode().getPath());
       nodeStats.collectUsageInfo(profile);
     }
   }
@@ -153,9 +155,11 @@ public class ProfileOrigin {
   private ProfileOriginNodeUsage getNodeStats(String path) {
 
     synchronized (monitor) {
+      // handle null paths as using ConcurrentHashMap
+      path = (path == null) ? "" : path;
       ProfileOriginNodeUsage nodeStats = nodeUsageMap.get(path);
       if (nodeStats == null) {
-        nodeStats = new ProfileOriginNodeUsage(path, queryTuningAddVersion);
+        nodeStats = new ProfileOriginNodeUsage(path);
         nodeUsageMap.put(path, nodeStats);
       }
       return nodeStats;

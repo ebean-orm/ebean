@@ -573,4 +573,11 @@ public class OrmQueryProperties implements Serializable {
 
     return Collections.unmodifiableSet(set);
   }
+
+  public boolean isSame(OrmQueryProperties p2) {
+    if (included == null) {
+      return p2.included == null;
+    }
+    return included.equals(p2.included);
+  }
 }

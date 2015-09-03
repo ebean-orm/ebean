@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiling xmlns="http://ebean-orm.github.io/xml/ns/autotune" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://ebean-orm.github.io/xml/ns/autotune http://ebean-orm.github.io/xml/ns/autotune-1.0.xsd">
+
+  <origin type="baseline">
+
+
+  </origin>
+
+</profiling>
