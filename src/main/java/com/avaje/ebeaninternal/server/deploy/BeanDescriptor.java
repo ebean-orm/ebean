@@ -2074,6 +2074,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   }
 
   /**
+   * Return the diff comparing the bean values.
+   */
+  public Map<String, ValuePair> diff(EntityBean newBean, EntityBean oldBean) {
+    Map<String, ValuePair> map = new LinkedHashMap<String, ValuePair>();
+    diff(null, map, newBean, oldBean);
+    return map;
+  }
+
+  /**
    * Populate the diff for updates with flattened non-null property values.
    */
   public void diff(String prefix, Map<String, ValuePair> map, EntityBean newBean, EntityBean oldBean) {

@@ -359,7 +359,6 @@ public class ServerConfig {
   private int queryCacheMaxIdleTime = 600;
   private int queryCacheMaxTimeToLive = 60*60*6;
   private Object objectMapper;
-  private boolean diffFlatMode = true;
 
   /**
    * Set to true if you want eq("someProperty", null) to generate 1=1 rather than "is null" sql expression.
@@ -2116,7 +2115,7 @@ public class ServerConfig {
 
     changeLogIncludeInserts = p.getBoolean("changeLogIncludeInserts", changeLogIncludeInserts);
     expressionEqualsWithNullAsNoop = p.getBoolean("expressionEqualsWithNullAsNoop", expressionEqualsWithNullAsNoop);
-    diffFlatMode = p.getBoolean("diffFlatMode", diffFlatMode);
+
     asOfViewSuffix = p.get("asOfViewSuffix", asOfViewSuffix);
     asOfSysPeriod = p.get("asOfSysPeriod", asOfSysPeriod);
     historyTableSuffix = p.get("historyTableSuffix", historyTableSuffix);
@@ -2227,22 +2226,6 @@ public class ServerConfig {
    */
   public void setObjectMapper(Object objectMapper) {
     this.objectMapper = objectMapper;
-  }
-
-  /**
-   * Return true if diff should return flat properties with dot notation rather than
-   * embedded beans or reference beans (when the associated bean id is different).
-   */
-  public boolean isDiffFlatMode() {
-    return diffFlatMode;
-  }
-
-  /**
-   * Set to true if diff should return flat properties with dot notation rather than
-   * embedded beans or reference beans (when the associated bean id is different).
-   */
-  public void setDiffFlatMode(boolean diffFlatMode) {
-    this.diffFlatMode = diffFlatMode;
   }
 
   /**

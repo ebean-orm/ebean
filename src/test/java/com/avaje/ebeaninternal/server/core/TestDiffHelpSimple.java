@@ -20,8 +20,6 @@ import com.avaje.tests.model.basic.Order.Status;
 
 public class TestDiffHelpSimple extends BaseTestCase {
 
-  DiffHelp diffHelp = new DiffHelp(false);
-
   long firstTime = System.currentTimeMillis()-10000;
   long secondTime = System.currentTimeMillis();
 
@@ -59,7 +57,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
     order2.setShipDate(new Date(secondTime));
     order2.setOrderDate(new Date(secondTime));
     
-    Map<String, ValuePair> diff = diffHelp.diff(order1, order2, orderDesc);
+    Map<String, ValuePair> diff = DiffHelp.diff(order1, order2, orderDesc);
     
     Assert.assertEquals(5, diff.size());
     
@@ -68,7 +66,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
     Assert.assertTrue(keySet.contains("status"));
     Assert.assertTrue(keySet.contains("shipDate"));
     Assert.assertTrue(keySet.contains("orderDate"));
-    Assert.assertTrue(keySet.contains("customer"));
+    Assert.assertTrue(keySet.contains("customer.id"));
   }
 
   @Test
@@ -85,8 +83,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
     order2.setShipDate(new Date(secondTime));
     order2.setOrderDate(new Date(secondTime));
 
-    DiffHelp diffHelp = new DiffHelp(true);
-    Map<String, ValuePair> diff = diffHelp.diff(order1, order2, orderDesc);
+    Map<String, ValuePair> diff = DiffHelp.diff(order1, order2, orderDesc);
 
     Assert.assertEquals(5, diff.size());
 
@@ -107,7 +104,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
     Order order2 = createBaseOrder(server);
     order2.setId(14);
     
-    Map<String, ValuePair> diff = diffHelp.diff(order1, order2, orderDesc);
+    Map<String, ValuePair> diff = DiffHelp.diff(order1, order2, orderDesc);
     
     Assert.assertEquals(0, diff.size());    
   }
@@ -122,13 +119,13 @@ public class TestDiffHelpSimple extends BaseTestCase {
     order2.setStatus(Status.COMPLETE);
     order2.setShipDate(null);
     
-    Map<String, ValuePair> diff = diffHelp.diff(order1, order2, orderDesc);
+    Map<String, ValuePair> diff = DiffHelp.diff(order1, order2, orderDesc);
     
     Assert.assertEquals(3, diff.size());
     
     Set<String> keySet = diff.keySet();
     Assert.assertTrue(keySet.contains("status"));
-    Assert.assertTrue(keySet.contains("customer"));
+    Assert.assertTrue(keySet.contains("customer.id"));
     Assert.assertTrue(keySet.contains("shipDate"));
     
     ValuePair shipDatePair = diff.get("shipDate");
@@ -147,7 +144,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
     Order order2 = createBaseOrder(server);    
     order2.setShipDate(new Date(secondTime));
     
-    Map<String, ValuePair> diff = diffHelp.diff(order1, order2, orderDesc);
+    Map<String, ValuePair> diff = DiffHelp.diff(order1, order2, orderDesc);
     
     Assert.assertEquals(1, diff.size());    
     Set<String> keySet = diff.keySet();
@@ -168,7 +165,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
     Order order2 = createBaseOrder(server);    
     order2.setShipDate(null);
     
-    Map<String, ValuePair> diff = diffHelp.diff(order1, order2, orderDesc);
+    Map<String, ValuePair> diff = DiffHelp.diff(order1, order2, orderDesc);
     
     Assert.assertEquals(0, diff.size());    
   }

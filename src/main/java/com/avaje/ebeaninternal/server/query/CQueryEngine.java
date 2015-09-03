@@ -35,8 +35,6 @@ public class CQueryEngine {
 
   private static final String T0 = "t0";
 
-  private final DiffHelp diffHelp = new DiffHelp(true);
-
   private final boolean forwardOnlyHintOnFindIterate;
 
   private final CQueryBuilder queryBuilder;
@@ -259,7 +257,7 @@ public class CQueryEngine {
 
   private <T> void deriveVersionDiff(Version<T> current, Version<T> prior, BeanDescriptor<T> descriptor) {
 
-    Map<String, ValuePair> diff = diffHelp.diff(current.getBean(), prior.getBean(), descriptor);
+    Map<String, ValuePair> diff = DiffHelp.diff(current.getBean(), prior.getBean(), descriptor);
     current.setDiff(diff);
   }
 
