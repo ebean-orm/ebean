@@ -8,6 +8,7 @@ import com.avaje.ebean.RawSqlBuilder;
 import org.avaje.test.model.rawsql.inherit.ChildA;
 import org.avaje.test.model.rawsql.inherit.ChildB;
 import org.avaje.test.model.rawsql.inherit.Data;
+import org.avaje.test.model.rawsql.inherit.EUncle;
 import org.avaje.test.model.rawsql.inherit.Parent;
 import org.avaje.test.model.rawsql.inherit.ParentAggregate;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ParentRawSqlTest extends BaseTestCase {
 
@@ -72,11 +74,54 @@ public class ParentRawSqlTest extends BaseTestCase {
     c.setData(exampleData);
     Ebean.save(c);
 
+    EUncle e1 = new EUncle();
+    e1.setParent(b);
+    e1.setName("fester");
+    Ebean.save(e1);
+
+    joinToInheritanceHierarchy_withAliasMapping();
+    joinToInheritanceHierarchy();
+
     useColumnMappingIgnore();
 
     useColumnMappingWithDiscriminator();
 
     useExtraColumnMappingIgnore();
+  }
+
+
+  private void joinToInheritanceHierarchy() {
+
+    RawSql rawSql = RawSqlBuilder
+        .unparsed("select u.id, u.name, p.type as ptype, p.id as pid from rawinherit_uncle u join rawinherit_parent p where p.id = u.parent_id")
+        .columnMapping("id", "id")
+        .columnMapping("name", "name")
+        .columnMapping("ptype", "parent.type")
+        .columnMapping("pid", "parent.id")
+        .create();
+
+    List<EUncle> uncles = Ebean.find(EUncle.class).setRawSql(rawSql)
+        .fetch("parent", new FetchConfig().query())
+        .findList();
+
+    assertNotNull(uncles.get(0));
+    Parent parent = uncles.get(0).getParent();
+    assertTrue(parent instanceof ChildB);
+  }
+
+  private void joinToInheritanceHierarchy_withAliasMapping() {
+
+    RawSql rawSql = RawSqlBuilder
+        .parse("select u.id, u.name, p.type, p.id from rawinherit_uncle u join rawinherit_parent p where p.id = u.parent_id")
+        .tableAliasMapping("p", "parent")
+        .create();
+
+    List<EUncle> uncles = Ebean.find(EUncle.class).setRawSql(rawSql)
+        .findList();
+
+    assertNotNull(uncles.get(0));
+    Parent parent = uncles.get(0).getParent();
+    assertTrue(parent instanceof ChildB);
   }
 
   /**
