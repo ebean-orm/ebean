@@ -34,7 +34,7 @@ import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cache.CachedBeanData;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
-import com.avaje.ebeaninternal.server.core.DiffHelpUpdate;
+import com.avaje.ebeaninternal.server.core.DiffHelp;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
@@ -2038,7 +2038,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    * Flatten the diff that comes from the entity bean intercept.
    */
   Map<String, ValuePair> diffFlatten(Map<String, ValuePair> diff) {
-    return DiffHelpUpdate.flatten(diff, this);
+    return DiffHelp.flatten(diff, this);
   }
 
   /**
