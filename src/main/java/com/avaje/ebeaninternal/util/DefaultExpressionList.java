@@ -269,6 +269,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public Query<T> setUseQueryCache(boolean useCache) {
+    return query.setUseQueryCache(useCache);
+  }
+
+  @Override
   public ExpressionList<T> having() {
     return query.having();
   }

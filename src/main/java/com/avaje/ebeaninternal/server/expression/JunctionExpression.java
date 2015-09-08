@@ -524,6 +524,11 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
+  public Query<T> setUseQueryCache(boolean useCache) {
+    return exprList.setUseQueryCache(useCache);
+  }
+
+  @Override
   public ExpressionList<T> startsWith(String propertyName, String value) {
     return exprList.startsWith(propertyName, value);
   }

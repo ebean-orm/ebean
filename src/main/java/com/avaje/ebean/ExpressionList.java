@@ -325,6 +325,13 @@ public interface ExpressionList<T> extends Serializable {
   Query<T> setUseCache(boolean useCache);
 
   /**
+   * Set to true to use the query for executing this query.
+   *
+   * @see Query#setUseQueryCache(boolean)
+   */
+  Query<T> setUseQueryCache(boolean useCache);
+
+  /**
    * Add expressions to the having clause.
    * <p>
    * The having clause is only used for queries based on raw sql (via SqlSelect
