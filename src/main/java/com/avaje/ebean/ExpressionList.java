@@ -351,14 +351,17 @@ public interface ExpressionList<T> extends Serializable {
    * This returns the list so that add() can be chained.
    * </p>
    * 
-   * <pre class="code">
-   * Query&lt;Customer&gt; query = Ebean.createQuery(Customer.class);
+   * <pre>{@code
+   *
+   * Query<Customer> query = Ebean.find(Customer.class);
    * query.where()
-   *     .like(&quot;name&quot;,&quot;Rob%&quot;)
-   *     .eq(&quot;status&quot;, Customer.ACTIVE);
-   * List&lt;Customer&gt; list = query.findList();
+   *     .like("name","Rob%")
+   *     .eq("status", Customer.ACTIVE);
+   *
+   * List<Customer> list = query.findList();
    * ...
-   * </pre>
+   *
+   * }</pre>
    */
   ExpressionList<T> add(Expression expr);
 
@@ -439,33 +442,36 @@ public interface ExpressionList<T> extends Serializable {
    * those options such as case insensitive etc.
    * </p>
    * 
-   * <pre class="code">
+   * <pre>{@code
+   *
    * // create an example bean and set the properties
    * // with the query parameters you want
    * Customer example = new Customer();
-   * example.setName(&quot;Rob%&quot;);
-   * example.setNotes(&quot;%something%&quot;);
+   * example.setName("Rob%");
+   * example.setNotes("%something%");
    * 
    * List&lt;Customer&gt; list = Ebean.find(Customer.class).where()
    *     // pass the bean into the where() clause
    *     .exampleLike(example)
    *     // you can add other expressions to the same query
-   *     .gt(&quot;id&quot;, 2).findList();
+   *     .gt("id", 2).findList();
    * 
-   * </pre>
+   * }</pre>
    * 
    * Similarly you can create an ExampleExpression
    * 
-   * <pre>
+   * <pre>{@code
+   *
    * Customer example = new Customer();
-   * example.setName(&quot;Rob%&quot;);
-   * example.setNotes(&quot;%something%&quot;);
+   * example.setName("Rob%");
+   * example.setNotes("%something%");
    * 
    * // create a ExampleExpression with more control
    * ExampleExpression qbe = new ExampleExpression(example, true, LikeType.EQUAL_TO).includeZeros();
    * 
-   * List&lt;Customer&gt; list = Ebean.find(Customer.class).where().add(qbe).findList();
-   * </pre>
+   * List<Customer> list = Ebean.find(Customer.class).where().add(qbe).findList();
+   *
+   * }</pre>
    */
   ExpressionList<T> exampleLike(Object example);
 
@@ -593,6 +599,14 @@ public interface ExpressionList<T> extends Serializable {
    * then they are not translated. logical property name names (not fully
    * qualified) will still be translated to their physical name.
    * </p>
+   *
+   * <h4>Example:</h4>
+   * <pre>{@code
+   *
+   *   // use a database function
+   *   raw("add_days(orderDate, 10) < ?", someDate)
+   *
+   * }</pre>
    */
   ExpressionList<T> raw(String raw, Object value);
 
@@ -617,6 +631,12 @@ public interface ExpressionList<T> extends Serializable {
    * then they are not translated. logical property name names (not fully
    * qualified) will still be translated to their physical name.
    * </p>
+   *
+   * <pre>{@code
+   *
+   *   raw("orderQty < shipQty")
+   *
+   * }</pre>
    */
   ExpressionList<T> raw(String raw);
 
