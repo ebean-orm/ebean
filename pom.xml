@@ -9,7 +9,7 @@
 
   <groupId>org.avaje.ebeanorm</groupId>
   <artifactId>avaje-ebeanorm</artifactId>
-  <version>6.6.1-SNAPSHOT</version>
+  <version>6.6.1</version>
   <packaging>jar</packaging>
 
   <name>avaje-ebeanorm</name>
