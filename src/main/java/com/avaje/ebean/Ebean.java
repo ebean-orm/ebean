@@ -22,7 +22,7 @@ import com.avaje.ebean.text.json.JsonContext;
 /**
  * This Ebean object is effectively a singleton that holds a map of registered
  * {@link EbeanServer}s. It additionally provides a convenient way to use the
- * 'default/primary' EbeanServer.
+ * 'default' EbeanServer.
  * <p>
  * If you are using a Dependency Injection framework such as
  * <strong>Spring</strong> or <strong>Guice</strong> you will probably
@@ -178,7 +178,7 @@ public final class Ebean {
       if (defaultServer == null) {
         String msg = "The default EbeanServer has not been defined?";
         msg += " This is normally set via the ebean.datasource.default property.";
-        msg += " Otherwise it should be registered programatically via registerServer()";
+        msg += " Otherwise it should be registered programmatically via registerServer()";
         throw new PersistenceException(msg);
       }
       return defaultServer;
@@ -217,8 +217,8 @@ public final class Ebean {
     /**
      * Register a server so we can get it by its name.
      */
-    private void register(EbeanServer server, boolean isPrimaryServer) {
-      registerWithName(server.getName(), server, isPrimaryServer);
+    private void register(EbeanServer server, boolean isDefaultServer) {
+      registerWithName(server.getName(), server, isDefaultServer);
     }
     
     private void registerWithName(String name, EbeanServer server, boolean isDefaultServer) {
