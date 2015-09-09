@@ -24,8 +24,8 @@ public class TestByteOnly extends BaseTestCase {
 
     Ebean.save(e2);
 
-    // Ebean.getServer(null).getAdminAutofetch().collectUsageViaGC();
-    // Ebean.getServer(null).getAdminAutofetch().updateTunedQueryInfo();
+    // Ebean.getServer(null).getAutoTune().collectProfiling();
+    // Ebean.getServer(null).getAutoTune().updateTunedQueryInfo();
     System.out.println("done");
   }
 

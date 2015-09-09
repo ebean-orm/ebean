@@ -130,7 +130,7 @@ public class ServerConfig {
   /** 
    * Config controlling the autofetch behaviour.
    */
-  private AutofetchConfig autofetchConfig = new AutofetchConfig();
+  private AutoTuneConfig autoTuneConfig = new AutoTuneConfig();
 
   /**
    * The JSON format used for DateTime types. Default to millis.
@@ -1106,15 +1106,15 @@ public class ServerConfig {
   /**
    * Return the configuration for the Autofetch feature.
    */
-  public AutofetchConfig getAutofetchConfig() {
-    return autofetchConfig;
+  public AutoTuneConfig getAutoTuneConfig() {
+    return autoTuneConfig;
   }
 
   /**
    * Set the configuration for the Autofetch feature.
    */
-  public void setAutofetchConfig(AutofetchConfig autofetchConfig) {
-    this.autofetchConfig = autofetchConfig;
+  public void setAutoTuneConfig(AutoTuneConfig autoTuneConfig) {
+    this.autoTuneConfig = autoTuneConfig;
   }
 
   /**
@@ -2003,7 +2003,7 @@ public class ServerConfig {
    * This is broken out for the same reason as above - preserve existing behaviour but let it be overridden.
    */
   protected void loadAutofetchSettings(PropertiesWrapper p) {
-    autofetchConfig.loadSettings(p);
+    autoTuneConfig.loadSettings(p);
   }
 
   /**
@@ -2017,8 +2017,8 @@ public class ServerConfig {
     if (namingConvention != null) {
       namingConvention.loadFromProperties(p);
     }
-    if (autofetchConfig == null) {
-      autofetchConfig = new AutofetchConfig();
+    if (autoTuneConfig == null) {
+      autoTuneConfig = new AutoTuneConfig();
     }
     loadAutofetchSettings(p);
 

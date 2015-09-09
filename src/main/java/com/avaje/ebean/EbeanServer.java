@@ -106,10 +106,9 @@ public interface EbeanServer {
   void shutdown(boolean shutdownDataSource, boolean deregisterDriver);
   
   /**
-   * Return the AdminAutofetch which is used to control and configure the
-   * Autofetch service at runtime.
+   * Return AutoTune which is used to control the AutoTune service at runtime.
    */
-  AdminAutofetch getAdminAutofetch();
+  AutoTune getAutoTune();
 
   /**
    * Return the name. This is used with {@link Ebean#getServer(String)} to get a

@@ -215,9 +215,13 @@ public class OrmQueryProperties implements Serializable {
    * Set the properties from a matching autofetch tuned properties.
    */
   public void setTunedProperties(OrmQueryProperties tunedProperties) {
-    this.properties = tunedProperties.properties;
-    this.trimmedProperties = tunedProperties.trimmedProperties;
-    this.included = tunedProperties.included;
+    if (tunedProperties.hasProperties()) {
+      this.properties = tunedProperties.properties;
+      this.trimmedProperties = tunedProperties.trimmedProperties;
+      this.included = tunedProperties.included;
+      this.queryFetchBatch = Math.max(queryFetchBatch, tunedProperties.queryFetchBatch);
+      this.lazyFetchBatch = Math.max(lazyFetchBatch, tunedProperties.lazyFetchBatch);
+    }
   }
 
   /**
@@ -262,6 +266,7 @@ public class OrmQueryProperties implements Serializable {
     copy.parentPath = parentPath;
     copy.path = path;
     copy.properties = properties;
+    copy.trimmedProperties = trimmedProperties;
     copy.cache = cache;
     copy.readOnly = readOnly;
     copy.queryFetchAll = queryFetchAll;

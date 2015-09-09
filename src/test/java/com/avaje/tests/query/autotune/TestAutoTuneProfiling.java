@@ -1,15 +1,11 @@
 package com.avaje.tests.query.autotune;
 
-import com.avaje.ebean.AdminAutofetch;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.bean.ObjectGraphNode;
-import com.avaje.ebean.bean.ObjectGraphOrigin;
-import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.tests.model.basic.Address;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
+import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
@@ -35,12 +31,12 @@ public class TestAutoTuneProfiling extends BaseTestCase {
     useOrderDate();
     useOrderDateCustomerName();
     useLots();
+    useLotUntuned();
   }
-
 
   private Order findById(long id) {
     return Ebean.find(Order.class)
-        .setAutofetch(true)
+        .select("status, orderDate, shipDate")
         .setId(id)
         .findUnique();
   }
@@ -72,11 +68,29 @@ public class TestAutoTuneProfiling extends BaseTestCase {
     }
   }
 
+  private void useLotUntuned() {
+    Order order = findById(3);
+    List<OrderDetail> details = order.getDetails();
+    for (OrderDetail detail : details) {
+      detail.getProduct().getName();
+      detail.getOrderQty();
+      detail.getShipQty();
+      detail.getUnitPrice();
+    }
+
+    Customer customer = order.getCustomer();
+    customer.getName();
+    Address billingAddress = customer.getBillingAddress();
+    if (billingAddress != null) {
+      billingAddress.getCity();
+      billingAddress.getLine1();
+      billingAddress.getLine2();
+    }
+  }
+
   private static void collectUsage() {
 
-    AdminAutofetch adminAutofetch = Ebean.getServer(null).getAdminAutofetch();
-    adminAutofetch.collectUsageViaGC();
-
+    Ebean.getDefaultServer().getAutoTune().collectProfiling();
   }
 
 }

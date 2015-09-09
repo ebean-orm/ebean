@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="key" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="beanType" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="detail" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="tuneDetail" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="original" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -45,8 +45,8 @@ public class Origin {
     protected String beanType;
     @XmlAttribute(name = "detail")
     protected String detail;
-    @XmlAttribute(name = "tuneDetail")
-    protected String tuneDetail;
+    @XmlAttribute(name = "original")
+    protected String original;
 
     /**
      * Gets the value of the callStack property.
@@ -145,27 +145,27 @@ public class Origin {
     }
 
     /**
-     * Gets the value of the tuneDetail property.
+     * Gets the value of the original property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getTuneDetail() {
-        return tuneDetail;
+    public String getOriginal() {
+        return original;
     }
 
     /**
-     * Sets the value of the tuneDetail property.
+     * Sets the value of the original property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setTuneDetail(String value) {
-        this.tuneDetail = value;
+    public void setOriginal(String value) {
+        this.original = value;
     }
 
 }

@@ -3,8 +3,9 @@ package com.avaje.ebeaninternal.server.autofetch.service;
 import com.avaje.ebean.bean.NodeUsageCollector;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.ObjectGraphOrigin;
-import com.avaje.ebean.config.AutofetchConfig;
+import com.avaje.ebean.config.AutoTuneConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.autofetch.AutoTuneCollection;
 import com.avaje.ebeaninternal.server.autofetch.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -40,7 +41,7 @@ public class ProfileManager implements ProfilingListener {
 
   private final SpiEbeanServer server;
 
-  public ProfileManager(AutofetchConfig config, SpiEbeanServer server) {
+  public ProfileManager(AutoTuneConfig config, SpiEbeanServer server) {
     this.server = server;
     this.profilingRate = config.getProfilingRate();
     this.profilingBase = config.getProfilingBase();
@@ -48,10 +49,17 @@ public class ProfileManager implements ProfilingListener {
   }
 
   @Override
-  public boolean isProfileRequest(ObjectGraphNode origin) {
+  public boolean isProfileRequest(ObjectGraphNode origin, SpiQuery<?> query) {
 
     ProfileOrigin profileOrigin = profileMap.get(origin.getOriginQueryPoint().getKey());
-    return profileOrigin == null || profileOrigin.isProfile();
+    if (profileOrigin == null) {
+      profileOrigin = new ProfileOrigin(origin.getOriginQueryPoint(), queryTuningAddVersion, profilingBase, profilingRate);
+      profileOrigin.setOriginalQuery(query.getDetail().toString());
+      profileMap.put(origin.getOriginQueryPoint().getKey(), profileOrigin);
+      return true;
+    } else {
+      return profileOrigin.isProfile();
+    }
   }
 
   /**

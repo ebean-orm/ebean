@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.autofetch;
 
 import com.avaje.ebean.bean.NodeUsageListener;
 import com.avaje.ebean.bean.ObjectGraphNode;
+import com.avaje.ebeaninternal.api.SpiQuery;
 
 /**
  * Profiling listener gets call backs for node usage and the associated query executions.
@@ -21,5 +22,5 @@ public interface ProfilingListener extends NodeUsageListener {
    * Return true if this request should be profiled (based on the
    * profiling ratio and collection count for this origin).
    */
-  boolean isProfileRequest(ObjectGraphNode origin);
+  boolean isProfileRequest(ObjectGraphNode origin, SpiQuery<?> query);
 }

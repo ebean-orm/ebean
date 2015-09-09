@@ -38,11 +38,21 @@ public class ProfileOrigin {
 
   private final AtomicLong profileCount = new AtomicLong();
 
+  private String originalQuery;
+
   public ProfileOrigin(ObjectGraphOrigin origin, boolean queryTuningAddVersion, int profilingBase, double profilingRate) {
     this.origin = origin;
     this.queryTuningAddVersion = queryTuningAddVersion;
     this.profilingBase = profilingBase;
     this.profilingRate = profilingRate;
+  }
+
+  public String getOriginalQuery() {
+    return originalQuery;
+  }
+
+  public void setOriginalQuery(String originalQuery) {
+    this.originalQuery = originalQuery;
   }
 
   /**
@@ -74,7 +84,7 @@ public class ProfileOrigin {
       }
 
       OrmQueryDetail detail = buildDetail(rootDesc);
-      AutoTuneCollection.Entry entry = req.add(origin, detail);
+      AutoTuneCollection.Entry entry = req.add(origin, detail, originalQuery);
 
       Collection<ProfileOriginQuery> values = queryStatsMap.values();
       for (ProfileOriginQuery queryEntry : values) {

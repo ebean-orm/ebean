@@ -77,4 +77,43 @@ public class OrmQueryDetailParserTest extends BaseTestCase {
     assertThat(chunk.getAllIncludedProperties()).contains("sku","description");
   }
 
+  @Test
+  public void testParseWithPlusQuery() throws Exception {
+
+    OrmQueryDetailParser p = new OrmQueryDetailParser("select (id,name) fetch customer (+query,id,name,email)");
+    OrmQueryDetail detail = p.parse();
+
+    OrmQueryProperties root = detail.getChunk(null, false);
+    assertNull(root.getPath());
+    assertThat(root.getAllIncludedProperties()).contains("id", "name");
+
+    OrmQueryProperties chunk = detail.getChunk("customer", false);
+    assertThat(chunk.getPath()).isEqualTo("customer");
+    assertThat(chunk.getAllIncludedProperties()).contains("id", "name", "email");
+    assertThat(chunk.isQueryFetch()).isTrue();
+
+  }
+
+  @Test
+  public void testTuneApply() {
+
+    OrmQueryDetailParser p = new OrmQueryDetailParser("select (status) fetch customer (email)");
+    OrmQueryDetail detail = p.parse();
+
+    OrmQueryDetailParser p2 = new OrmQueryDetailParser("select (id,name) fetch customer (+query,id,name,email)");
+    OrmQueryDetail tune = p2.parse();
+
+
+    detail.tuneFetchProperties(tune);
+
+    OrmQueryProperties root = detail.getChunk(null, false);
+    assertNull(root.getPath());
+    assertThat(root.getAllIncludedProperties()).contains("id", "name");
+
+    OrmQueryProperties chunk = detail.getChunk("customer", false);
+    assertThat(chunk.getPath()).isEqualTo("customer");
+    assertThat(chunk.getAllIncludedProperties()).contains("id", "name", "email");
+    assertThat(chunk.isQueryFetch()).isTrue();
+  }
+
 }

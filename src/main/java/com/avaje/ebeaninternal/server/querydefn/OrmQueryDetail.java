@@ -81,7 +81,7 @@ public class OrmQueryDetail implements Serializable {
   }
 
   /**
-   * Return true if equal in terms of autofetch (select and joins).
+   * Return true if equal in terms of autoTune (select and fetch).
    */
   public boolean isAutoTuneEqual(OrmQueryDetail otherDetail) {
 
@@ -90,6 +90,9 @@ public class OrmQueryDetail implements Serializable {
     }
     if (fetchPaths == null) {
       return otherDetail.fetchPaths == null;
+    }
+    if (fetchPaths.size() != otherDetail.fetchPaths.size()) {
+      return false;
     }
     Set<Map.Entry<String, OrmQueryProperties>> entries = fetchPaths.entrySet();
     for (Map.Entry<String, OrmQueryProperties> entry : entries) {
@@ -100,7 +103,6 @@ public class OrmQueryDetail implements Serializable {
     }
 
     return true;
-    //return autofetchPlanHash() == otherDetail.autofetchPlanHash();
   }
 
   private boolean isSame(OrmQueryProperties p1, OrmQueryProperties p2) {
@@ -109,22 +111,6 @@ public class OrmQueryDetail implements Serializable {
     }
     return p1.isSame(p2);
   }
-
-//  /**
-//   * Calculate the hash for the query plan.
-//   */
-//  private int autofetchPlanHash() {
-//
-//    int hc = (baseProps == null ? 1 : baseProps.autofetchPlanHash());
-//
-//    if (fetchPaths != null) {
-//      for (OrmQueryProperties p : fetchPaths.values()) {
-//        hc = hc * 31 + p.autofetchPlanHash();
-//      }
-//    }
-//
-//    return hc;
-//  }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
@@ -236,7 +222,7 @@ public class OrmQueryDetail implements Serializable {
     boolean tuned = false;
 
     OrmQueryProperties tunedRoot = tunedDetail.getChunk(null, false);
-    if (tunedRoot != null && tunedRoot.hasProperties()) {
+    if (tunedRoot != null) {
       tuned = true;
       baseProps.setTunedProperties(tunedRoot);
 
