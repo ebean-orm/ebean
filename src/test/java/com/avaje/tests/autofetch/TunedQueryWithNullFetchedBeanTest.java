@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.autofetch;
+package com.avaje.tests.autofetch;
 
 import java.util.List;
 import java.util.Set;

@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +41,8 @@ public class DefaultAutoTuneService implements AutoTuneService {
 
   private final boolean profiling;
 
+  private final String serverName;
+
   public DefaultAutoTuneService(SpiEbeanServer server, ServerConfig serverConfig) {
 
     AutoTuneConfig config = serverConfig.getAutoTuneConfig();
@@ -46,7 +50,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
     this.profiling = config.isProfiling();
     this.profileManager = new ProfileManager(config, server);
     this.queryTuner = new BaseQueryTuner(config, server, profileManager);
-
+    this.serverName = server.getName();
     this.skipCollectionOnShutdown = config.isSkipCollectionOnShutdown();
     this.defaultGarbageCollectionWait = (long) config.getGarbageCollectionWait();
   }
@@ -78,16 +82,48 @@ public class DefaultAutoTuneService implements AutoTuneService {
     AutoTuneCollection autoTuneCollection = profileManager.profilingCollection(reset);
 
     List<AutoTuneCollection.Entry> entries = autoTuneCollection.getEntries();
+
     for (AutoTuneCollection.Entry entry : entries) {
       saveProfilingEntry(document, entry);
     }
 
+    sortDocument(document);
+
     SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss");
     String now = df.format(new Date());
 
-    File file = new File("ebean-autotune-profiling"+"-"+now+".xml");
+    File file = new File("ebean-profiling"+"-"+serverName+"-"+now+".xml");
     AutoTuneXmlWriter writer = new AutoTuneXmlWriter();
     writer.write(document, file);
+
+    logger.debug("profiling entries:{}", entries.size());
+  }
+
+  /**
+   * Set the diff and new entries by bean type followed by key.
+   */
+  private void sortDocument(Autotune document) {
+
+    ProfileDiff profileDiff = document.getProfileDiff();
+    if (profileDiff != null) {
+      Collections.sort(profileDiff.getOrigin(), new OriginNameKeySort());
+    }
+    ProfileNew profileNew = document.getProfileNew();
+    if (profileNew != null) {
+      Collections.sort(profileNew.getOrigin(), new OriginNameKeySort());
+    }
+  }
+
+  class OriginNameKeySort implements Comparator<Origin> {
+
+    @Override
+    public int compare(Origin o1, Origin o2) {
+      int comp = o1.getBeanType().compareTo(o2.getBeanType());
+      if (comp == 0) {
+        comp = o1.getKey().compareTo(o2.getKey());
+      }
+      return comp;
+    }
   }
 
   private void saveProfilingEntry(Autotune document, AutoTuneCollection.Entry entry) {

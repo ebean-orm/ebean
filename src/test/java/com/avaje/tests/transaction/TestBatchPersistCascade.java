@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.transaction;
+package com.avaje.tests.transaction;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
