@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implementation of the AutoTuneService which is comprised of profiling and query tuning.
@@ -41,16 +42,25 @@ public class DefaultAutoTuneService implements AutoTuneService {
 
   private final boolean profiling;
 
+  private final boolean queryTuning;
+
+  private final String tuningFile;
+
+  private final String profilingFile;
+
   private final String serverName;
 
   public DefaultAutoTuneService(SpiEbeanServer server, ServerConfig serverConfig) {
 
     AutoTuneConfig config = serverConfig.getAutoTuneConfig();
 
+    this.queryTuning = config.isQueryTuning();
     this.profiling = config.isProfiling();
+    this.tuningFile = config.getQueryTuningFile();
+    this.profilingFile = config.getProfilingFile();
+    this.serverName = server.getName();
     this.profileManager = new ProfileManager(config, server);
     this.queryTuner = new BaseQueryTuner(config, server, profileManager);
-    this.serverName = server.getName();
     this.skipCollectionOnShutdown = config.isSkipCollectionOnShutdown();
     this.defaultGarbageCollectionWait = (long) config.getGarbageCollectionWait();
   }
@@ -61,11 +71,19 @@ public class DefaultAutoTuneService implements AutoTuneService {
   @Override
   public void startup() {
 
-    File file = new File("ebean-autotune.xml");
-    AutoTuneXmlReader reader = new AutoTuneXmlReader();
-    Autotune profiling = reader.read(file);
-    for (Origin origin : profiling.getOrigin()) {
-      queryTuner.load(origin.getKey(), createTunedQueryInfo(origin));
+    if (queryTuning) {
+      File file = new File(tuningFile);
+      if (!file.exists()) {
+        logger.warn("AutoTune file {} not found - no automatic tuning will be applied", file.getAbsolutePath());
+
+      } else {
+        AutoTuneXmlReader reader = new AutoTuneXmlReader();
+        Autotune profiling = reader.read(file);
+        logger.info("AutoTune loading {} tuning entries", profiling.getOrigin().size());
+        for (Origin origin : profiling.getOrigin()) {
+          queryTuner.load(origin.getKey(), createTunedQueryInfo(origin));
+        }
+      }
     }
   }
 
@@ -83,20 +101,32 @@ public class DefaultAutoTuneService implements AutoTuneService {
 
     List<AutoTuneCollection.Entry> entries = autoTuneCollection.getEntries();
 
+    // count "new" and "diff" profiling entries
+    AtomicInteger newCounter = new AtomicInteger();
+    AtomicInteger diffCounter = new AtomicInteger();
+
     for (AutoTuneCollection.Entry entry : entries) {
-      saveProfilingEntry(document, entry);
+      saveProfilingEntry(document, entry, newCounter, diffCounter);
     }
 
-    sortDocument(document);
+    int totalNew = newCounter.get();
+    int totalDiff = diffCounter.get();
+    if (totalNew == 0 && totalDiff == 0) {
+      logger.debug("No new or diff entries for profiling server:{}", serverName);
 
-    SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss");
-    String now = df.format(new Date());
+    } else {
+      sortDocument(document);
 
-    File file = new File("ebean-profiling"+"-"+serverName+"-"+now+".xml");
-    AutoTuneXmlWriter writer = new AutoTuneXmlWriter();
-    writer.write(document, file);
+      SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss");
+      String now = df.format(new Date());
 
-    logger.debug("profiling entries:{}", entries.size());
+      // write the file with serverName and now suffix as we can output the profiling many times
+      File file = new File(profilingFile + "-" + serverName + "-" + now + ".xml");
+      AutoTuneXmlWriter writer = new AutoTuneXmlWriter();
+      writer.write(document, file);
+
+      logger.debug("writing new:{} diff:{} profiling entries for server:{}", totalNew, totalDiff, serverName);
+    }
   }
 
   /**
@@ -114,6 +144,9 @@ public class DefaultAutoTuneService implements AutoTuneService {
     }
   }
 
+  /**
+   * Comparator sort by bean type then key.
+   */
   class OriginNameKeySort implements Comparator<Origin> {
 
     @Override
@@ -126,7 +159,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
     }
   }
 
-  private void saveProfilingEntry(Autotune document, AutoTuneCollection.Entry entry) {
+  private void saveProfilingEntry(Autotune document, AutoTuneCollection.Entry entry, AtomicInteger newCount, AtomicInteger diffCount) {
 
     ObjectGraphOrigin point = entry.getOrigin();
     OrmQueryDetail profileDetail = entry.getDetail();
@@ -135,6 +168,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
     OrmQueryDetail tuneDetail = queryTuner.get(point.getKey());
     if (tuneDetail == null) {
       // New entry
+      newCount.incrementAndGet();
       ProfileNew profileNew = document.getProfileNew();
       if (profileNew == null) {
         profileNew = new ProfileNew();
@@ -146,6 +180,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
 
     } else if (!tuneDetail.isAutoTuneEqual(profileDetail)) {
       // Diff entry
+      diffCount.incrementAndGet();
       Origin origin = createOrigin(entry, point);
       origin.setOriginal(tuneDetail.toString());
       ProfileDiff diff = document.getProfileDiff();
@@ -218,7 +253,6 @@ public class DefaultAutoTuneService implements AutoTuneService {
       logger.warn("Error while sleeping after System.gc() request.", e);
     }
   }
-
 
   /**
    * Auto tune the query and enable profiling.

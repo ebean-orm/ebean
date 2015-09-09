@@ -7,11 +7,15 @@ public class AutoTuneConfig {
 
   private AutoTuneMode mode = AutoTuneMode.DEFAULT_ON;
 
+  private String queryTuningFile = "ebean-autotune.xml";
+
   private boolean queryTuning;
 
   private boolean queryTuningAddVersion;
 
   private boolean profiling;
+
+  private String profilingFile = "ebean-profiling";
 
   private int profilingBase = 5;
 
@@ -22,6 +26,34 @@ public class AutoTuneConfig {
   private boolean skipCollectionOnShutdown;
 
   public AutoTuneConfig() {
+  }
+
+  /**
+   * Return the name of the file that holds the query tuning information.
+   */
+  public String getQueryTuningFile() {
+    return queryTuningFile;
+  }
+
+  /**
+   * Set the name of the file that holds the query tuning information.
+   */
+  public void setQueryTuningFile(String queryTuningFile) {
+    this.queryTuningFile = queryTuningFile;
+  }
+
+  /**
+   * Return the name of the file that profiling information is written to.
+   */
+  public String getProfilingFile() {
+    return profilingFile;
+  }
+
+  /**
+   * Set the name of the file that profiling information is written to.
+   */
+  public void setProfilingFile(String profilingFile) {
+    this.profilingFile = profilingFile;
   }
 
   /**
@@ -172,6 +204,8 @@ public class AutoTuneConfig {
 
     queryTuning = p.getBoolean("autoTune.queryTuning", queryTuning);
     queryTuningAddVersion = p.getBoolean("autoTune.queryTuningAddVersion", queryTuningAddVersion);
+    queryTuningFile = p.get("autoTune.queryTuningFile", queryTuningFile);
+
     skipCollectionOnShutdown = p.getBoolean("autoTune.skipCollectionOnShutdown", skipCollectionOnShutdown);
     
     mode = p.getEnum(AutoTuneMode.class, "autoTune.mode", mode);
@@ -179,5 +213,6 @@ public class AutoTuneConfig {
     profiling = p.getBoolean("autoTune.profiling", profiling);
     profilingBase = p.getInt("autoTune.profilingBase", profilingBase);
     profilingRate = p.getDouble("autoTune.profilingRate", profilingRate);
+    profilingFile = p.get("autoTune.profilingFile", profilingFile);
   }
 }
