@@ -7,6 +7,7 @@
 target/
 logs/
 log/
+ebean-profiling*.xml
 /db
 /mydb.db
 !src/test/ddl-review/*.sql

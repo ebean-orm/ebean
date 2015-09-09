@@ -36,7 +36,7 @@ import com.avaje.ebeaninternal.api.SpiQuery.Type;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
-import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
+import com.avaje.ebeaninternal.server.autofetch.AutoTuneService;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -45,7 +45,6 @@ import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.el.ElFilter;
-import com.avaje.ebeaninternal.server.jmx.MAdminAutofetch;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
 import com.avaje.ebeaninternal.server.query.CQuery;
 import com.avaje.ebeaninternal.server.query.CQueryEngine;
@@ -71,9 +70,6 @@ import com.avaje.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
@@ -105,8 +101,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final DatabasePlatform databasePlatform;
 
-  private final AdminAutofetch adminAutofetch;
-
   private final TransactionManager transactionManager;
 
   private final TransactionScopeManager transactionScopeManager;
@@ -132,7 +126,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final BeanDescriptorManager beanDescriptorManager;
 
-  private final AutoFetchManager autoFetchManager;
+  private final AutoTuneService autoTuneService;
 
   private final ReadAuditPrepare readAuditPrepare;
 
@@ -157,19 +151,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final MetaInfoManager metaInfoManager;
   
   /**
-   * The MBean name used to register Ebean.
-   */
-  private String mbeanName;
-
-  /**
    * The default PersistenceContextScope used if it is not explicitly set on a query.
    */
   private final PersistenceContextScope defaultPersistenceContextScope;
-
-  /**
-   * The MBeanServer Ebean is registered with.
-   */
-  private MBeanServer mbeanServer;
 
   /**
    * Flag set when the server has shutdown.
@@ -238,8 +222,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.queryEngine = config.createOrmQueryEngine();
     this.relationalQueryEngine = config.createRelationalQueryEngine();
 
-    this.autoFetchManager = config.createAutoFetchManager(this);
-    this.adminAutofetch = new MAdminAutofetch(autoFetchManager);
+    this.autoTuneService = config.createAutoFetchManager(this);
     this.readAuditPrepare = config.getReadAuditPrepare();
     this.readAuditLogger = config.getReadAuditLogger();
 
@@ -257,6 +240,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   private void configureServerPlugins() {
+
+    autoTuneService.startup();
 
     for (SpiServerPlugin plugin : serverPlugins) {
       plugin.configure(this);
@@ -350,12 +335,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return ddlGenerator;
   }
 
-  public AdminAutofetch getAdminAutofetch() {
-    return adminAutofetch;
-  }
-
-  public AutoFetchManager getAutoFetchManager() {
-    return autoFetchManager;
+  @Override
+  public AutoTune getAutoTune() {
+    return autoTuneService;
   }
 
   @Override
@@ -386,41 +368,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Start any services after registering with the ClusterManager.
    */
   public void start() {
-  }
-
-  public void registerMBeans(MBeanServer mbeanServer, int uniqueServerId) {
-
-    this.mbeanServer = mbeanServer;
-    this.mbeanName = "Ebean:server=" + serverName + uniqueServerId;
-
-    ObjectName autofetchName;
-    try {
-      autofetchName = new ObjectName(mbeanName + ",key=AutoFetch");
-    } catch (Exception e) {
-      String msg = "Failed to register the JMX beans for Ebean server [" + serverName + "].";
-      logger.error(msg, e);
-      return;
-    }
-
-    try {
-      mbeanServer.registerMBean(adminAutofetch, autofetchName);
-
-    } catch (InstanceAlreadyExistsException e) {
-      // tomcat webapp reloading
-      String msg = "JMX beans for Ebean server [" + serverName + "] already registered. Will try unregister/register" + e.getMessage();
-      logger.warn(msg);
-      try {
-        mbeanServer.unregisterMBean(autofetchName);
-        mbeanServer.registerMBean(adminAutofetch, autofetchName);
-
-      } catch (Exception ae) {
-        String amsg = "Unable to unregister/register the JMX beans for Ebean server [" + serverName + "].";
-        logger.error(amsg, ae);
-      }
-    } catch (Exception e) {
-      String msg = "Error registering MBean[" + mbeanName + "]";
-      logger.error(msg, e);
-    }
   }
 
   /**
@@ -454,16 +401,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return;
     }
     shutdownPlugins();
-    try {
-      if (mbeanServer != null) {
-        mbeanServer.unregisterMBean(new ObjectName(mbeanName + ",key=AutoFetch"));
-      }
-    } catch (Exception e) {
-      logger.error("Error unregistering Ebean " + mbeanName, e);
-    }
 
     // shutdown autofetch profile collection
-    autoFetchManager.shutdown();
+    autoTuneService.shutdown();
     // shutdown background threads
     backgroundExecutor.shutdown();
     // shutdown DataSource (if its an Ebean one)
@@ -1115,7 +1055,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   public <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> query, Transaction t) {
 
-    if (desc.isAutoFetchTunable() && !query.isSqlSelect() && !autoFetchManager.tuneQuery(query)) {
+    if (desc.isAutoTunable() && !query.isSqlSelect() && !autoTuneService.tuneQuery(query)) {
       // use deployment FetchType.LAZY/EAGER annotations
       // to define the 'default' select clause
       query.setDefaultSelectClause();
@@ -1123,13 +1063,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     if (query.selectAllForLazyLoadProperty()) {
       // we need to select all properties to ensure the lazy load property
-      // was included (was not included by default or via autofetch).
+      // was included (was not included by default or via autoTune).
       if (logger.isDebugEnabled()) {
         logger.debug("Using selectAllForLazyLoadProperty");
       }
     }
 
-    // if determine cost and no origin for Autofetch
+    // if determine cost and no origin for AutoTune
     if (query.getParentNode() == null) {
       query.setOrigin(createCallStack());
     }

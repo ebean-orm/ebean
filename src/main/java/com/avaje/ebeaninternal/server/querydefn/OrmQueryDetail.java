@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
@@ -80,26 +81,35 @@ public class OrmQueryDetail implements Serializable {
   }
 
   /**
-   * Return true if equal in terms of autofetch (select and joins).
+   * Return true if equal in terms of autoTune (select and fetch).
    */
-  public boolean isAutoFetchEqual(OrmQueryDetail otherDetail) {
-    return autofetchPlanHash() == otherDetail.autofetchPlanHash();
-  }
+  public boolean isAutoTuneEqual(OrmQueryDetail otherDetail) {
 
-  /**
-   * Calculate the hash for the query plan.
-   */
-  private int autofetchPlanHash() {
-
-    int hc = (baseProps == null ? 1 : baseProps.autofetchPlanHash());
-
-    if (fetchPaths != null) {
-      for (OrmQueryProperties p : fetchPaths.values()) {
-        hc = hc * 31 + p.autofetchPlanHash();
+    if (!isSame(baseProps, otherDetail.baseProps)) {
+      return false;
+    }
+    if (fetchPaths == null) {
+      return otherDetail.fetchPaths == null;
+    }
+    if (fetchPaths.size() != otherDetail.fetchPaths.size()) {
+      return false;
+    }
+    Set<Map.Entry<String, OrmQueryProperties>> entries = fetchPaths.entrySet();
+    for (Map.Entry<String, OrmQueryProperties> entry : entries) {
+      OrmQueryProperties chunk = otherDetail.getChunk(entry.getKey(), false);
+      if (!isSame(entry.getValue(), chunk)) {
+        return false;
       }
     }
 
-    return hc;
+    return true;
+  }
+
+  private boolean isSame(OrmQueryProperties p1, OrmQueryProperties p2) {
+    if (p1 == null) {
+      return p2 == null;
+    }
+    return p1.isSame(p2);
   }
 
   public String toString() {
@@ -212,7 +222,7 @@ public class OrmQueryDetail implements Serializable {
     boolean tuned = false;
 
     OrmQueryProperties tunedRoot = tunedDetail.getChunk(null, false);
-    if (tunedRoot != null && tunedRoot.hasProperties()) {
+    if (tunedRoot != null) {
       tuned = true;
       baseProps.setTunedProperties(tunedRoot);
 

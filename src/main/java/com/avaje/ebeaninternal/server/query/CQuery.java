@@ -13,7 +13,7 @@ import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.api.SpiTransaction;
-import com.avaje.ebeaninternal.server.autofetch.AutoFetchManager;
+import com.avaje.ebeaninternal.server.autofetch.ProfilingListener;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
@@ -161,13 +161,13 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private final Mode queryMode;
 
-  private final boolean autoFetchProfiling;
+  private final boolean autoTuneProfiling;
 
   private final ObjectGraphNode objectGraphNode;
 
-  private final AutoFetchManager autoFetchManager;
+  private final ProfilingListener profilingListener;
 
-  private final WeakReference<NodeUsageListener> autoFetchManagerRef;
+  private final WeakReference<NodeUsageListener> profilingListenerRef;
 
   private final Boolean readOnly;
 
@@ -198,11 +198,10 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
     this.readOnly = request.isReadOnly();
 
-    this.autoFetchManager = query.getAutoFetchManager();
-    this.autoFetchProfiling = autoFetchManager != null;
     this.objectGraphNode = query.getParentNode();
-    this.autoFetchManagerRef = autoFetchProfiling ? new WeakReference<NodeUsageListener>(
-        autoFetchManager) : null;
+    this.profilingListener = query.getProfilingListener();
+    this.autoTuneProfiling = profilingListener != null;
+    this.profilingListenerRef = autoTuneProfiling ? new WeakReference<NodeUsageListener>(profilingListener) : null;
 
     // set the generated sql back to the query
     // so its available to the user...
@@ -549,8 +548,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       long exeNano = System.nanoTime() - startNano;
       executionTimeMicros = TimeUnit.NANOSECONDS.toMicros(exeNano);
 
-      if (autoFetchProfiling) {
-        autoFetchManager.collectQueryInfo(objectGraphNode, loadedBeanCount, executionTimeMicros);
+      if (autoTuneProfiling) {
+        profilingListener.collectQueryInfo(objectGraphNode, loadedBeanCount, executionTimeMicros);
       }
       queryPlan.executionTime(loadedBeanCount, executionTimeMicros, objectGraphNode);
 
@@ -678,7 +677,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     // need query.isProfiling() because we just take the data
     // from the lazy loaded or refreshed beans and put it into the already
     // existing beans which are already collecting usage information
-    return autoFetchProfiling && query.isUsageProfiling();
+    return autoTuneProfiling && query.isUsageProfiling();
   }
 
   private String getPath(String propertyName) {
@@ -700,8 +699,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   public void profileBean(EntityBeanIntercept ebi, String prefix) {
 
     ObjectGraphNode node = request.getGraphContext().getObjectGraphNode(prefix);
-
-    ebi.setNodeUsageCollector(new NodeUsageCollector(node, autoFetchManagerRef));
+    ebi.setNodeUsageCollector(new NodeUsageCollector(node, profilingListenerRef));
   }
 
   public void setCurrentPrefix(String currentPrefix, Map<String, String> currentPathMap) {

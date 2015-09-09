@@ -129,7 +129,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    */
   private final String selectLastInsertedId;
 
-  private final boolean autoFetchTunable;
+  private final boolean autoTunable;
 
   /**
    * The concurrency mode for beans of this type.
@@ -375,7 +375,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     this.baseTable = InternString.intern(deploy.getBaseTable());
     this.baseTableAsOf = deploy.getBaseTableAsOf();
     this.baseTableVersionsBetween = deploy.getBaseTableVersionsBetween();
-    this.autoFetchTunable = EntityType.ORM.equals(entityType) && (beanFinder == null);
+    this.autoTunable = EntityType.ORM.equals(entityType) && (beanFinder == null);
 
     // helper object used to derive lists of properties
     DeployBeanPropertyLists listHelper = new DeployBeanPropertyLists(owner, this, deploy);
@@ -1687,10 +1687,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   }
 
   /**
-   * Return true if queries for beans of this type are autoFetch tunable.
+   * Return true if queries for beans of this type are auto tunable.
    */
-  public boolean isAutoFetchTunable() {
-    return autoFetchTunable;
+  public boolean isAutoTunable() {
+    return autoTunable;
   }
 
   /**

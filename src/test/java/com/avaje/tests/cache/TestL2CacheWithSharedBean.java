@@ -8,7 +8,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.server.autofetch.TunedQueryInfo;
+import com.avaje.ebeaninternal.server.autofetch.service.TunedQueryInfo;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.tests.model.basic.FeatureDescription;
 
@@ -28,11 +28,11 @@ public class TestL2CacheWithSharedBean extends BaseTestCase {
 
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("name");
-    TunedQueryInfo tunedInfo = new TunedQueryInfo(null, tunedDetail, 0);
+    TunedQueryInfo tunedInfo = new TunedQueryInfo(tunedDetail);
 
     Query<FeatureDescription> query = Ebean.find(FeatureDescription.class).setId(f1.getId());
 
-    tunedInfo.autoFetchTune((SpiQuery<?>) query);
+    tunedInfo.tuneQuery((SpiQuery<?>) query);
 
     query.findUnique(); // PUT into cache
 

@@ -1,17 +1,15 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import com.avaje.ebeaninternal.server.lib.util.Dnode;
+import com.avaje.ebeaninternal.server.lib.util.DnodeReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import com.avaje.ebeaninternal.server.lib.resource.ResourceContent;
-import com.avaje.ebeaninternal.server.lib.resource.ResourceSource;
-import com.avaje.ebeaninternal.server.lib.util.Dnode;
-import com.avaje.ebeaninternal.server.lib.util.DnodeReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Controls the creation and caching of BeanManager's, BeanDescriptors,
@@ -27,15 +25,10 @@ public class DeployOrmXml {
 	private final HashMap<String, DNativeQuery> nativeQueryCache;
 
 	private final ArrayList<Dnode> ormXmlList;
-
-	private final ResourceSource resSource;
 	
-	public DeployOrmXml(ResourceSource resSource) {
-
-		this.resSource = resSource;
+	public DeployOrmXml() {
 		this.nativeQueryCache = new HashMap<String, DNativeQuery>();
 		this.ormXmlList = findAllOrmXml();
-
 		
 		initialiseNativeQueries();
 	}
@@ -106,17 +99,7 @@ public class DeployOrmXml {
 	private void readOrmXml(String ormXmlName, ArrayList<Dnode> ormXmlList) {
 
 		try {
-			Dnode ormXml;
-			ResourceContent content = resSource.getContent(ormXmlName);
-			if (content != null) {
-				// servlet resource or file system...
-				ormXml = readOrmXml(content.getInputStream());
-
-			} else {
-				// try the classpath...
-				ormXml = readOrmXmlFromClasspath(ormXmlName);
-			}
-
+			Dnode ormXml = readOrmXmlFromClasspath(ormXmlName);
 			if (ormXml != null) {
 				ormXml.setAttribute("ebean.filename", ormXmlName);
 				ormXmlList.add(ormXml);

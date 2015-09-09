@@ -24,20 +24,16 @@ import com.avaje.ebeaninternal.server.lib.sql.SimpleDataSourceAlert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Default Server side implementation of ServerFactory.
@@ -50,7 +46,7 @@ public class DefaultContainer implements SpiContainer {
 
   private final JndiDataSourceLookup jndiDataSourceFactory;
 
-  private final AtomicInteger serverId = new AtomicInteger(1);
+//  private final AtomicInteger serverId = new AtomicInteger(1);
 
   public DefaultContainer(ContainerConfig containerConfig) {
 
@@ -119,7 +115,7 @@ public class DefaultContainer implements SpiContainer {
 
       ServerCacheManager cacheManager = getCacheManager(serverConfig);
 
-      int uniqueServerId = serverId.incrementAndGet();
+//      int uniqueServerId = serverId.incrementAndGet();
       SpiBackgroundExecutor bgExecutor = createBackgroundExecutor(serverConfig);
 
       XmlConfigLoader xmlConfigLoader = new XmlConfigLoader(null);
@@ -131,18 +127,18 @@ public class DefaultContainer implements SpiContainer {
 
       cacheManager.init(server);
 
-      if (serverConfig.isRegisterJmxMBeans()) {
-        MBeanServer mbeanServer;
-        ArrayList<?> list = MBeanServerFactory.findMBeanServer(null);
-        if (list.size() == 0) {
-          // probably not running in a server
-          mbeanServer = MBeanServerFactory.createMBeanServer();
-        } else {
-          // use the first MBeanServer
-          mbeanServer = (MBeanServer) list.get(0);
-        }
-        server.registerMBeans(mbeanServer, uniqueServerId);
-      }
+//      if (serverConfig.isRegisterJmxMBeans()) {
+//        MBeanServer mbeanServer;
+//        ArrayList<?> list = MBeanServerFactory.findMBeanServer(null);
+//        if (list.size() == 0) {
+//          // probably not running in a server
+//          mbeanServer = MBeanServerFactory.createMBeanServer();
+//        } else {
+//          // use the first MBeanServer
+//          mbeanServer = (MBeanServer) list.get(0);
+//        }
+//        server.registerMBeans(mbeanServer, uniqueServerId);
+//      }
 
       // generate and run DDL if required
       // if there are any other tasks requiring action in their plugins, do them as well

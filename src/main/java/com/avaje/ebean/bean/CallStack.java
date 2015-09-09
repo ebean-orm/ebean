@@ -87,6 +87,17 @@ public final class CallStack implements Serializable {
     return zeroHash + ":" + pathHash + ":" + callStack[0];
   }
 
+  /**
+   * Return the call stack lines appended with the given newLine string.
+   */
+  public String description(String newLine) {
+    StringBuilder sb = new StringBuilder(400);
+    for (int i = 0; i < callStack.length; i++) {
+      sb.append(callStack[i].toString()).append(newLine);
+    }
+    return sb.toString();
+  }
+
   public String getOriginKey(int queryHash) {
     return zeroHash + "." + enc(queryHash) + "." + pathHash;
   }

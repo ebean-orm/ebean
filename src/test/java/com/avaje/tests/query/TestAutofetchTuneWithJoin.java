@@ -1,10 +1,5 @@
 package com.avaje.tests.query;
 
-import java.util.List;
-
-import org.junit.Test;
-
-import com.avaje.ebean.AdminAutofetch;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
@@ -15,6 +10,9 @@ import com.avaje.tests.model.basic.Address;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.util.List;
 
 public class TestAutofetchTuneWithJoin extends BaseTestCase {
 
@@ -28,8 +26,11 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> q = Ebean.find(Order.class).setAutofetch(true).fetch("customer")
-        .fetch("customer.contacts").where().lt("id", 3).query();
+    Query<Order> q = Ebean.find(Order.class)
+        .setAutofetch(true)
+        //.fetch("customer")
+        //.fetch("customer.contacts")
+        .where().lt("id", 3).query();
 
     List<Order> list = q.findList();
 
@@ -71,9 +72,7 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
 
   private static void collectUsage() {
 
-    AdminAutofetch adminAutofetch = Ebean.getServer(null).getAdminAutofetch();
-    adminAutofetch.collectUsageViaGC();
-
+    Ebean.getDefaultServer().getAutoTune().collectProfiling();
   }
 
 }
