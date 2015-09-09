@@ -8,7 +8,7 @@ public class AutoTuneServiceFactory {
 
   public static AutoTuneService create(SpiEbeanServer server, ServerConfig serverConfig) {
 
-    return new BaseAutoTuneService(server, serverConfig);
+    return new DefaultAutoTuneService(server, serverConfig);
   }
 
 }

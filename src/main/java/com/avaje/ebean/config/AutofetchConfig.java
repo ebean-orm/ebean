@@ -7,19 +7,15 @@ public class AutofetchConfig {
 
   private AutofetchMode mode = AutofetchMode.DEFAULT_ONIFEMPTY;
 
-  private boolean queryTuning = false;
+  private boolean queryTuning;
 
-  private boolean queryTuningAddVersion = false;
+  private boolean queryTuningAddVersion;
 
-  private boolean profiling = false;
+  private boolean profiling;
 
-  private int profilingMin = 1;
+  private int profilingBase = 5;
 
-  private int profilingBase = 10;
-
-  private double profilingRate = 0.05;
-
-  private String logDirectory;
+  private double profilingRate = 0.01;
 
   private int profileUpdateFrequency = 60;
 
@@ -102,22 +98,6 @@ public class AutofetchConfig {
   }
 
   /**
-   * Return the minimum number of queries to profile before autofetch will start
-   * tuning the queries.
-   */
-  public int getProfilingMin() {
-    return profilingMin;
-  }
-
-  /**
-   * Set the minimum number of queries to profile before autofetch will start
-   * tuning the queries.
-   */
-  public void setProfilingMin(int profilingMin) {
-    this.profilingMin = profilingMin;
-  }
-
-  /**
    * Return the base number of queries to profile before changing to profile
    * only a percentage of following queries (profileRate).
    */
@@ -146,20 +126,6 @@ public class AutofetchConfig {
    */
   public void setProfilingRate(double profilingRate) {
     this.profilingRate = profilingRate;
-  }
-
-  /**
-   * Return the log directory to put the autofetch log.
-   */
-  public String getLogDirectory() {
-    return logDirectory;
-  }
-
-  /**
-   * Set the directory to put the autofetch log in.
-   */
-  public void setLogDirectory(String logDirectory) {
-    this.logDirectory = logDirectory;
   }
 
   /**
@@ -228,18 +194,16 @@ public class AutofetchConfig {
    */
   public void loadSettings(PropertiesWrapper p) {
 
-    logDirectory = p.get("autofetch.logDirectory", logDirectory);
-    queryTuning = p.getBoolean("autofetch.querytuning", queryTuning);
-    queryTuningAddVersion = p.getBoolean("autofetch.queryTuningAddVersion", queryTuningAddVersion);
-    garbageCollectionOnShutdown = p.getBoolean("autofetch.garbageCollectionOnShutdown", garbageCollectionOnShutdown);
+    queryTuning = p.getBoolean("autotune.querytuning", queryTuning);
+    queryTuningAddVersion = p.getBoolean("autotune.queryTuningAddVersion", queryTuningAddVersion);
+    garbageCollectionOnShutdown = p.getBoolean("autotune.garbageCollectionOnShutdown", garbageCollectionOnShutdown);
     
-    profiling = p.getBoolean("autofetch.profiling", profiling);
-    mode = p.getEnum(AutofetchMode.class, "autofetch.implicitmode", mode);
+    profiling = p.getBoolean("autotune.profiling", profiling);
+    mode = p.getEnum(AutofetchMode.class, "autotune.implicitmode", mode);
 
-    profilingMin = p.getInt("autofetch.profiling.min", profilingMin);
-    profilingBase = p.getInt("autofetch.profiling.base", profilingBase);
+    profilingBase = p.getInt("autotune.profiling.base", profilingBase);
 
-    profilingRate = p.getDouble("autofetch.profiling.rate", profilingRate);
-    profileUpdateFrequency = p.getInt("autofetch.profiling.updatefrequency", profileUpdateFrequency);
+    profilingRate = p.getDouble("autotune.profiling.rate", profilingRate);
+    profileUpdateFrequency = p.getInt("autotune.profiling.updatefrequency", profileUpdateFrequency);
   }
 }

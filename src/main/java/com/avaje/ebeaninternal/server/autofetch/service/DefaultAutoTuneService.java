@@ -23,9 +23,9 @@ import java.util.List;
 /**
  * Implementation of the AutoTuneService which is comprised of profiling and query tuning.
  */
-public class BaseAutoTuneService implements AutoTuneService {
+public class DefaultAutoTuneService implements AutoTuneService {
 
-  private static final Logger logger = LoggerFactory.getLogger(BaseAutoTuneService.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultAutoTuneService.class);
 
   private final long defaultGarbageCollectionWait;
 
@@ -35,7 +35,7 @@ public class BaseAutoTuneService implements AutoTuneService {
 
   private final ProfileManager profileManager;
 
-  public BaseAutoTuneService(SpiEbeanServer server, ServerConfig serverConfig) {
+  public DefaultAutoTuneService(SpiEbeanServer server, ServerConfig serverConfig) {
 
     AutofetchConfig config = serverConfig.getAutofetchConfig();
 

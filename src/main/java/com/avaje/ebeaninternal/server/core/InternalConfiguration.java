@@ -15,9 +15,9 @@ import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.autofetch.AutoTuneService;
 import com.avaje.ebeaninternal.server.autofetch.service.AutoTuneServiceFactory;
+import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogListener;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogPrepare;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogRegister;
-import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogListener;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.DeployOrmXml;
@@ -32,8 +32,6 @@ import com.avaje.ebeaninternal.server.persist.DefaultPersister;
 import com.avaje.ebeaninternal.server.query.CQueryEngine;
 import com.avaje.ebeaninternal.server.query.DefaultOrmQueryEngine;
 import com.avaje.ebeaninternal.server.query.DefaultRelationalQueryEngine;
-import com.avaje.ebeaninternal.server.resource.ResourceManager;
-import com.avaje.ebeaninternal.server.resource.ResourceManagerFactory;
 import com.avaje.ebeaninternal.server.text.json.DJsonContext;
 import com.avaje.ebeaninternal.server.transaction.AutoCommitTransactionManager;
 import com.avaje.ebeaninternal.server.transaction.DefaultTransactionScopeManager;
@@ -67,8 +65,6 @@ public class InternalConfiguration {
   private final BootupClasses bootupClasses;
 
   private final DeployInherit deployInherit;
-
-  private final ResourceManager resourceManager;
 
   private final DeployOrmXml deployOrmXml;
 
@@ -120,8 +116,7 @@ public class InternalConfiguration {
 
     this.typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
 
-    this.resourceManager = ResourceManagerFactory.createResourceManager(serverConfig);
-    this.deployOrmXml = new DeployOrmXml(resourceManager.getResourceSource());
+    this.deployOrmXml = new DeployOrmXml();
     this.deployInherit = new DeployInherit(bootupClasses);
 
     this.deployCreateProperties = new DeployCreateProperties(typeManager);
@@ -286,10 +281,6 @@ public class InternalConfiguration {
 
   public DeployInherit getDeployInherit() {
     return deployInherit;
-  }
-
-  public ResourceManager getResourceManager() {
-    return resourceManager;
   }
 
   public DeployOrmXml getDeployOrmXml() {

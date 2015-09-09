@@ -10,10 +10,10 @@ public class OrmQueryDetailTest {
   @Test
   public void test_isAutoTuneEqual() {
 
-    OrmQueryDetailParser parser1 = new OrmQueryDetailParser("select order (id,name) fetch customer (name) fetch details (code)");
+    OrmQueryDetailParser parser1 = new OrmQueryDetailParser("select (id,name) fetch customer (name) fetch details (code)");
     OrmQueryDetail detail1 = parser1.parse();
 
-    OrmQueryDetailParser parser2 = new OrmQueryDetailParser("select order (id,name)  fetch details (code) fetch customer (name)");
+    OrmQueryDetailParser parser2 = new OrmQueryDetailParser("select (id,name)  fetch details (code) fetch customer (name)");
     OrmQueryDetail detail2 = parser2.parse();
 
     assertTrue(detail1.isAutoTuneEqual(detail2));
