@@ -1,11 +1,11 @@
 package com.avaje.ebean.config;
 
 /**
- * Defines the Autofetch behaviour for a EbeanServer.
+ * Defines the AutoTune behaviour for a EbeanServer.
  */
-public class AutofetchConfig {
+public class AutoTuneConfig {
 
-  private AutofetchMode mode = AutofetchMode.DEFAULT_ONIFEMPTY;
+  private AutoTuneMode mode = AutoTuneMode.DEFAULT_ON;
 
   private boolean queryTuning;
 
@@ -17,27 +17,25 @@ public class AutofetchConfig {
 
   private double profilingRate = 0.01;
 
-  private int profileUpdateFrequency = 60;
-
   private int garbageCollectionWait = 100;
   
-  private boolean garbageCollectionOnShutdown;
+  private boolean skipCollectionOnShutdown;
 
-  public AutofetchConfig() {
+  public AutoTuneConfig() {
   }
 
   /**
-   * Return the mode used when autofetch has not been explicit defined on a
+   * Return the mode used when autoTune has not been explicit defined on a
    * query.
    */
-  public AutofetchMode getMode() {
+  public AutoTuneMode getMode() {
     return mode;
   }
 
   /**
-   * Set the mode used when autofetch has not been explicit defined on a query.
+   * Set the mode used when autoTune has not been explicit defined on a query.
    */
-  public void setMode(AutofetchMode mode) {
+  public void setMode(AutoTuneMode mode) {
     this.mode = mode;
   }
 
@@ -73,6 +71,9 @@ public class AutofetchConfig {
    * <p>
    * If this is false then the version property will be added when profiling
    * detects that the bean is possibly going to be modified.
+   * </p>
+   * <p>
+   * Generally this is not expected to be turned on.
    * </p>
    */
   public void setQueryTuningAddVersion(boolean queryTuningAddVersion) {
@@ -129,28 +130,12 @@ public class AutofetchConfig {
   }
 
   /**
-   * Return the frequency in seconds to update the autofetch tuned queries from
-   * the profiled information.
-   */
-  public int getProfileUpdateFrequency() {
-    return profileUpdateFrequency;
-  }
-
-  /**
-   * Set the frequency in seconds to update the autofetch tuned queries from the
-   * profiled information.
-   */
-  public void setProfileUpdateFrequency(int profileUpdateFrequency) {
-    this.profileUpdateFrequency = profileUpdateFrequency;
-  }
-
-  /**
    * Return the time in millis to wait after a system gc to collect profiling
    * information.
    * <p>
    * The profiling information is collected on object finalise. As such we
    * generally don't want to trigger GC (let the JVM do its thing) but on
-   * shutdown the autofetch manager will trigger System.gc() and then wait
+   * shutdown the autoTune manager will trigger System.gc() and then wait
    * (default 100 millis) to hopefully collect profiling information -
    * especially for short run unit tests.
    * </p>
@@ -160,33 +145,24 @@ public class AutofetchConfig {
   }
 
   /**
-   * Set the time in millis to wait after a System.gc() to collect profiling
-   * information.
+   * Set the time in millis to wait after a System.gc() to collect profiling information.
    */
   public void setGarbageCollectionWait(int garbageCollectionWait) {
     this.garbageCollectionWait = garbageCollectionWait;
   }
 
-  
   /**
-   * Return true if GC should be trigger on shutdown.
-   * <p>
-   * Autofetch profiling information is collected as part of garbage collection. 
-   * </p>
+   * Return true if profiling collection should be skipped on shutdown.
    */
-  public boolean isGarbageCollectionOnShutdown() {
-    return garbageCollectionOnShutdown;
+  public boolean isSkipCollectionOnShutdown() {
+    return skipCollectionOnShutdown;
   }
 
   /**
-   * Set to true if you want GC to trigger on shutdown.
-   * <p>
-   *  This would be done if you want to try and collect Autofetch profiling information
-   *  on shutdown.
-   * </p>
+   * Set to true if profiling collection should be skipped on shutdown.
    */
-  public void setGarbageCollectionOnShutdown(boolean garbageCollectionOnShutdown) {
-    this.garbageCollectionOnShutdown = garbageCollectionOnShutdown;
+  public void setSkipCollectionOnShutdown(boolean skipCollectionOnShutdown) {
+    this.skipCollectionOnShutdown = skipCollectionOnShutdown;
   }
 
   /**
@@ -194,16 +170,14 @@ public class AutofetchConfig {
    */
   public void loadSettings(PropertiesWrapper p) {
 
-    queryTuning = p.getBoolean("autotune.querytuning", queryTuning);
-    queryTuningAddVersion = p.getBoolean("autotune.queryTuningAddVersion", queryTuningAddVersion);
-    garbageCollectionOnShutdown = p.getBoolean("autotune.garbageCollectionOnShutdown", garbageCollectionOnShutdown);
+    queryTuning = p.getBoolean("autoTune.queryTuning", queryTuning);
+    queryTuningAddVersion = p.getBoolean("autoTune.queryTuningAddVersion", queryTuningAddVersion);
+    skipCollectionOnShutdown = p.getBoolean("autoTune.skipCollectionOnShutdown", skipCollectionOnShutdown);
     
-    profiling = p.getBoolean("autotune.profiling", profiling);
-    mode = p.getEnum(AutofetchMode.class, "autotune.implicitmode", mode);
+    mode = p.getEnum(AutoTuneMode.class, "autoTune.mode", mode);
 
-    profilingBase = p.getInt("autotune.profiling.base", profilingBase);
-
-    profilingRate = p.getDouble("autotune.profiling.rate", profilingRate);
-    profileUpdateFrequency = p.getInt("autotune.profiling.updatefrequency", profileUpdateFrequency);
+    profiling = p.getBoolean("autoTune.profiling", profiling);
+    profilingBase = p.getInt("autoTune.profilingBase", profilingBase);
+    profilingRate = p.getDouble("autoTune.profilingRate", profilingRate);
   }
 }

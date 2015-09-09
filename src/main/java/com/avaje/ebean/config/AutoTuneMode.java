@@ -11,7 +11,7 @@ import com.avaje.ebean.Query;
  * query.
  * </p>
  */
-public enum AutofetchMode {
+public enum AutoTuneMode {
 
   /**
    * Don't implicitly use Autofetch. Must explicitly turn it on.

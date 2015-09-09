@@ -2,8 +2,8 @@ package com.avaje.ebeaninternal.server.autofetch.service;
 
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.ObjectGraphNode;
-import com.avaje.ebean.config.AutofetchConfig;
-import com.avaje.ebean.config.AutofetchMode;
+import com.avaje.ebean.config.AutoTuneConfig;
+import com.avaje.ebean.config.AutoTuneMode;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.autofetch.ProfilingListener;
@@ -22,7 +22,7 @@ public class BaseQueryTuner {
 
   private boolean profiling;
 
-  private final AutofetchMode mode;
+  private final AutoTuneMode mode;
 
   /**
    * Map of the tuned query details per profile query point.
@@ -34,7 +34,9 @@ public class BaseQueryTuner {
 
   private final ProfilingListener profilingListener;
 
-  public BaseQueryTuner(AutofetchConfig config, SpiEbeanServer server, ProfilingListener profilingListener) {
+  boolean fullProfiling = true;
+
+  public BaseQueryTuner(AutoTuneConfig config, SpiEbeanServer server, ProfilingListener profilingListener) {
     this.server = server;
     this.profilingListener = profilingListener;
     this.mode = config.getMode();
@@ -57,8 +59,6 @@ public class BaseQueryTuner {
     TunedQueryInfo info = tunedQueryInfoMap.get(key);
     return (info == null) ? null : info.getTunedDetail();
   }
-
-  boolean fullProfiling = true;
 
   /**
    * Auto tune the query and enable profiling.
@@ -90,7 +90,7 @@ public class BaseQueryTuner {
     ObjectGraphNode origin = query.setOrigin(stack);
 
     if (profiling) {
-      if (profilingListener.isProfileRequest(origin)) {
+      if (profilingListener.isProfileRequest(origin, query)) {
         // collect more profiling based on profiling rate etc
         query.setProfilingListener(profilingListener);
       }
@@ -108,7 +108,7 @@ public class BaseQueryTuner {
 
     // create a query point to identify the query
     ObjectGraphNode origin = query.setOrigin(stack);
-    if (profilingListener.isProfileRequest(origin)) {
+    if (profilingListener.isProfileRequest(origin, query)) {
       // collect more profiling based on profiling rate etc
       query.setProfilingListener(profilingListener);
     }

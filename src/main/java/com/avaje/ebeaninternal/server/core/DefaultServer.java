@@ -330,7 +330,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return ddlGenerator;
   }
 
-  public AdminAutofetch getAdminAutofetch() {
+  public AutoTune getAutoTune() {
     return autoTuneService;
   }
 
@@ -1039,7 +1039,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   public <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> query, Transaction t) {
 
-    if (desc.isAutoFetchTunable() && !query.isSqlSelect() && !autoTuneService.tuneQuery(query)) {
+    if (desc.isAutoTunable() && !query.isSqlSelect() && !autoTuneService.tuneQuery(query)) {
       // use deployment FetchType.LAZY/EAGER annotations
       // to define the 'default' select clause
       query.setDefaultSelectClause();
@@ -1047,13 +1047,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     if (query.selectAllForLazyLoadProperty()) {
       // we need to select all properties to ensure the lazy load property
-      // was included (was not included by default or via autofetch).
+      // was included (was not included by default or via autoTune).
       if (logger.isDebugEnabled()) {
         logger.debug("Using selectAllForLazyLoadProperty");
       }
     }
 
-    // if determine cost and no origin for Autofetch
+    // if determine cost and no origin for AutoTune
     if (query.getParentNode() == null) {
       query.setOrigin(createCallStack());
     }

@@ -1,8 +1,6 @@
 package com.avaje.ebeaninternal.server.autofetch;
 
-import com.avaje.ebean.AdminAutofetch;
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebean.AutoTune;
 import com.avaje.ebeaninternal.api.SpiQuery;
 
 /**
@@ -17,7 +15,7 @@ import com.avaje.ebeaninternal.api.SpiQuery;
  * etc). These are applied to the query when tuneQuery() is called.
  * </p>
  */
-public interface AutoTuneService extends AdminAutofetch {
+public interface AutoTuneService extends AutoTune {
 
   /**
    * Load the query tuning information.
@@ -41,16 +39,7 @@ public interface AutoTuneService extends AdminAutofetch {
    * Fire a garbage collection (hint to the JVM). Assuming garbage collection
    * fires this will gather the usage profiling information.
    */
-  void collectUsageViaGC();
-
-  /**
-   * This will take the current profiling information and update the "tuned
-   * query detail".
-   * <p>
-   * This is done periodically and can also be manually invoked.
-   * </p>
-   */
-  void updateTunedQueryInfo();
+  void collectProfiling();
 
   /**
    * On shutdown fire garbage collection and collect statistics. Note that

@@ -13,8 +13,8 @@ public class AutoTuneCollection {
 
   List<Entry> entries = new ArrayList<Entry>();
 
-  public Entry add(ObjectGraphOrigin origin, OrmQueryDetail detail) {
-    Entry entry = new Entry(origin, detail);
+  public Entry add(ObjectGraphOrigin origin, OrmQueryDetail detail, String sourceQuery) {
+    Entry entry = new Entry(origin, detail, sourceQuery);
     entries.add(entry);
     return entry;
   }
@@ -39,13 +39,19 @@ public class AutoTuneCollection {
     private final OrmQueryDetail detail;
 
     /**
+     * The original/existing query detail.
+     */
+    private final String originalQuery;
+
+    /**
      * Summary execution statistics for queries related to this origin point.
      */
     private final List<EntryQuery> queries = new ArrayList<EntryQuery>();
 
-    public Entry(ObjectGraphOrigin origin, OrmQueryDetail detail) {
+    public Entry(ObjectGraphOrigin origin, OrmQueryDetail detail, String originalQuery) {
       this.origin = origin;
       this.detail = detail;
+      this.originalQuery = originalQuery;
     }
 
     public void addQuery(EntryQuery entryQuery) {
@@ -58,6 +64,10 @@ public class AutoTuneCollection {
 
     public OrmQueryDetail getDetail() {
       return detail;
+    }
+
+    public String getOriginalQuery() {
+      return originalQuery;
     }
 
     public List<EntryQuery> getQueries() {

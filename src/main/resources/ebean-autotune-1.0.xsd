@@ -23,7 +23,7 @@
       <xsd:attribute name="key" type="xsd:string" use="required"/>
       <xsd:attribute name="beanType" type="xsd:string"/>
       <xsd:attribute name="detail" type="xsd:string"/>
-      <xsd:attribute name="tuneDetail" type="xsd:string"/>
+      <xsd:attribute name="original" type="xsd:string"/>
     </xsd:complexType>
   </xsd:element>
 

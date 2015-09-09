@@ -37,9 +37,9 @@ public class AutofetchEmbeddedTest extends BaseTestCase {
   
   @Test
   public void testEmbeddedBeanQueryTuning() {
-//    Ebean.getServer(null).getAdminAutofetch().setProfiling(true);
-//    Ebean.getServer(null).getAdminAutofetch().setQueryTuning(true);
-//    Ebean.getServer(null).getAdminAutofetch().setProfilingBase(1);
+//    Ebean.getServer(null).getAutoTune().setProfiling(true);
+//    Ebean.getServer(null).getAutoTune().setQueryTuning(true);
+//    Ebean.getServer(null).getAutoTune().setProfilingBase(1);
 //
 //    EMain testBean = new EMain();
 //    testBean.setName("test");
@@ -58,7 +58,7 @@ public class AutofetchEmbeddedTest extends BaseTestCase {
 //        Ebean.commitTransaction();
 //      } finally {
 //        Ebean.endTransaction();
-//        logger.debug(Ebean.getServer(null).getAdminAutofetch().collectUsageViaGC());
+//        logger.debug(Ebean.getServer(null).getAutoTune().collectProfiling());
 //      }
 //    }
   }
