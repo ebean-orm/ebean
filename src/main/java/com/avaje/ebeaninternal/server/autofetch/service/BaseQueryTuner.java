@@ -20,7 +20,7 @@ public class BaseQueryTuner {
 
   private final boolean queryTuning;
 
-  private boolean profiling;
+  private final boolean profiling;
 
   private final AutoTuneMode mode;
 
@@ -29,12 +29,14 @@ public class BaseQueryTuner {
    */
   private final Map<String, TunedQueryInfo> tunedQueryInfoMap = new ConcurrentHashMap<String, TunedQueryInfo>();
 
-
   private final SpiEbeanServer server;
 
   private final ProfilingListener profilingListener;
 
-  boolean fullProfiling = true;
+  /**
+   * Flag set true when there is no profiling or query tuning.
+   */
+  private final boolean skipAll;
 
   public BaseQueryTuner(AutoTuneConfig config, SpiEbeanServer server, ProfilingListener profilingListener) {
     this.server = server;
@@ -42,6 +44,7 @@ public class BaseQueryTuner {
     this.mode = config.getMode();
     this.queryTuning = config.isQueryTuning();
     this.profiling = config.isProfiling();
+    this.skipAll = !queryTuning && !profiling;
   }
 
   /**
@@ -65,15 +68,13 @@ public class BaseQueryTuner {
    */
   public boolean tuneQuery(SpiQuery<?> query) {
 
-    if (!queryTuning && !profiling) {
+    if (skipAll || !tunableQuery(query)) {
       return false;
     }
 
-    if (!useAutoTune(query)) {
-      // not tuning this query but maybe profiling
-      if (fullProfiling) {
-        CallStack stack = server.createCallStack();
-        profiling(query, stack);
+    if (!useTuning(query)) {
+      if (profiling) {
+        profiling(query, server.createCallStack());
       }
       return false;
     }
@@ -104,6 +105,31 @@ public class BaseQueryTuner {
     return false;
   }
 
+  /**
+   * Return false for row count, find ids, subQuery, delete and Versions queries.
+   * <p>
+   * These queries are not applicable for autoTune in that they don't have a select/fetch (fetch group).
+   * </p>
+   * <p>
+   * We also exclude queries that are explicitly set to load the L2 bean cache as we want full beans
+   * in that case.
+   * </p>
+   */
+  private boolean tunableQuery(SpiQuery<?> query) {
+    SpiQuery.Type type = query.getType();
+    switch (type) {
+      case ROWCOUNT:
+      case ID_LIST:
+      case DELETE:
+      case SUBQUERY:
+        return false;
+      default:
+        // not using autoTune when explicitly loading the l2 bean cache
+        // or when using Versions query
+        return !query.isLoadBeanCache() && SpiQuery.TemporalMode.VERSIONS != query.getTemporalMode();
+    }
+  }
+
   private void profiling(SpiQuery<?> query, CallStack stack) {
 
     // create a query point to identify the query
@@ -117,13 +143,7 @@ public class BaseQueryTuner {
   /**
    * Return true if we should try to tune this query.
    */
-  private boolean useAutoTune(SpiQuery<?> query) {
-
-    if (query.isLoadBeanCache()) {
-      // when loading the cache don't tune the query
-      // as we want full objects loaded into the cache
-      return false;
-    }
+  private boolean useTuning(SpiQuery<?> query) {
 
     Boolean autoFetch = query.isAutofetch();
     if (autoFetch != null) {

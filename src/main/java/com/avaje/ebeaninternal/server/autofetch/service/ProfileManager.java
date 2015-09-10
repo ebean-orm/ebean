@@ -9,18 +9,14 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.autofetch.AutoTuneCollection;
 import com.avaje.ebeaninternal.server.autofetch.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
+ * Manages the collection of object graph usage profiling.
  */
 public class ProfileManager implements ProfilingListener {
-
-  private static final Logger logger = LoggerFactory.getLogger(ProfileManager.class);
 
   private final boolean queryTuningAddVersion;
 
@@ -53,13 +49,25 @@ public class ProfileManager implements ProfilingListener {
 
     ProfileOrigin profileOrigin = profileMap.get(origin.getOriginQueryPoint().getKey());
     if (profileOrigin == null) {
-      profileOrigin = new ProfileOrigin(origin.getOriginQueryPoint(), queryTuningAddVersion, profilingBase, profilingRate);
-      profileOrigin.setOriginalQuery(query.getDetail().toString());
-      profileMap.put(origin.getOriginQueryPoint().getKey(), profileOrigin);
+      profileMap.put(origin.getOriginQueryPoint().getKey(), createProfileOrigin(origin, query));
       return true;
     } else {
       return profileOrigin.isProfile();
     }
+  }
+
+  /**
+   * Create the profile origin noting the query detail currently being used.
+   * <p>
+   * For new profiling entries it is useful to compare the profiling against the current
+   * query detail that is specified in the code (as the query might already be manually optimised).
+   * </p>
+   */
+  private ProfileOrigin createProfileOrigin(ObjectGraphNode origin, SpiQuery<?> query) {
+    ProfileOrigin profileOrigin = new ProfileOrigin(origin.getOriginQueryPoint(), queryTuningAddVersion, profilingBase, profilingRate);
+    // set the current query detail (fetch group) so that we can compare against profiling for new entries
+    profileOrigin.setOriginalQuery(query.getDetail().toString());
+    return profileOrigin;
   }
 
   /**

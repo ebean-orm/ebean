@@ -29,6 +29,9 @@ public class TestRowCount extends BaseTestCase {
 
     List<Order> list = query.findList();
     System.out.println(list);
+    for (Order order : list) {
+      order.getStatus();
+    }
 
     Assert.assertEquals("same rc to ids.size() ", rc, ids.size());
     Assert.assertEquals("same rc to list.size()", rc, list.size());
