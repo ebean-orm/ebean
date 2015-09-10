@@ -19,7 +19,7 @@ public class TestCacheCustomer extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = Ebean.find(Customer.class).setAutofetch(false).setLoadBeanCache(true)
+    List<Customer> list = Ebean.find(Customer.class).setAutoTune(false).setLoadBeanCache(true)
         .findList();
 
     Assert.assertTrue(list.size() > 1);

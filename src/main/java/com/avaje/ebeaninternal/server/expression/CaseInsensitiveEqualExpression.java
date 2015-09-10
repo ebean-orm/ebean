@@ -41,13 +41,13 @@ class CaseInsensitiveEqualExpression extends AbstractExpression {
     request.append("lower(").append(pname).append(") =? ");
   }
 
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     builder.add(CaseInsensitiveEqualExpression.class).add(propName);
     builder.bind(1);
   }
 
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoFetchHash(builder);
+    queryAutoTuneHash(builder);
   }
 
   public int queryBindHash() {

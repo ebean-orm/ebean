@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.autofetch;
+package com.avaje.ebeaninternal.server.autotune;
 
 import com.avaje.ebean.AutoTune;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -7,7 +7,7 @@ import com.avaje.ebeaninternal.api.SpiQuery;
  * Collects and manages the the profile information.
  * <p>
  * The profile information is periodically converted into "tuned query details" -
- * which is used to automatically tune the queries that use autoFetch.
+ * which is used to automatically tune the queries that use AutoTune.
  * </p>
  * <p>
  * The "tuned query details" effectively are part of the query that has the
@@ -23,14 +23,9 @@ public interface AutoTuneService extends AutoTune {
   void startup();
 
   /**
-   * Called when a query thinks it should be automatically tuned by autoFetch.
+   * Called when a query thinks it should be automatically tuned by AutoTune.
    * <p>
-   * This internally checks that autoFetch is enabled, there is a "tuned query
-   * detail" to tune the query with and that the autoFetchMinThreshold has
-   * been reached.
-   * </p>
-   * <p>
-   * This will also determine if the query should be profiled.
+   * Returns true if the query was tuned.
    * </p>
    */
   boolean tuneQuery(SpiQuery<?> query);

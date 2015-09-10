@@ -9,7 +9,7 @@ import java.io.Serializable;
  * The call stack is included so that the query can have different tuned fetches
  * for each unique call stack. For example, a query to fetch a customer could be
  * called by three different methods and each can be treated as a separate
- * origin point (and autoFetch can tune each one separately).
+ * origin point (and autoTune can tune each one separately).
  * </p>
  */
 public final class ObjectGraphOrigin implements Serializable {

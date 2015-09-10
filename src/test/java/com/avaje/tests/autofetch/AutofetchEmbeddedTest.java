@@ -50,7 +50,7 @@ public class AutofetchEmbeddedTest extends BaseTestCase {
 //    for (int i = 0; i < 5; i++) {
 //      Ebean.beginTransaction();
 //      try {
-//        List<EMain> result = Ebean.find(EMain.class).setAutofetch(true).findList();
+//        List<EMain> result = Ebean.find(EMain.class).setAutoTune(true).findList();
 //        for (EMain e : result) {
 //          e.getEmbeddable().setDescription("Test" + i);
 //          Ebean.save(e);

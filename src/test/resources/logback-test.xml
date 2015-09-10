@@ -72,7 +72,7 @@
     <appender-ref ref="STDOUT"/>
   </root>
 
-  <logger name="com.avaje.ebeaninternal.server.autofetch" level="TRACE"/>
+  <logger name="com.avaje.ebeaninternal.server.autotune" level="TRACE"/>
 
   <logger name="com.avaje.ebean" level="INFO"/>
   <logger name="org.avaje.ebean" level="INFO"/>

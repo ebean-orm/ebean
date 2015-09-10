@@ -1,5 +1,5 @@
 
-package com.avaje.ebeaninternal.server.autofetch.model;
+package com.avaje.ebeaninternal.server.autotune.model;
 
 import java.util.ArrayList;
 import java.util.List;

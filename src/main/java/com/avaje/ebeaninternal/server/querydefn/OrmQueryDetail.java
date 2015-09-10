@@ -28,7 +28,7 @@ import com.avaje.ebeaninternal.server.query.SplitName;
  * Holds the select() and join() details of a ORM query.
  * </p>
  * <p>
- * It is worth noting that for autoFetch a "tuned fetch info" builds an instance of OrmQueryDetail.
+ * It is worth noting that for AutoTune a "tuned fetch info" builds an instance of OrmQueryDetail.
  * Tuning a query is a matter of replacing an instance of this class with one that has been tuned
  * with select() and join() set.
  * </p>

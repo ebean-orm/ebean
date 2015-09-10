@@ -23,7 +23,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
 
     // test that join to order.details is not included in the initial query (included in query join)
     Query<Customer> query = Ebean.find(Customer.class)
-        .setAutofetch(false)
+        .setAutoTune(false)
         .fetch("orders")
         .fetch("orders.details");
 
@@ -66,7 +66,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     
     // test that join to order.details is not included
     Query<OrderShipment> shipQuery = Ebean.find(OrderShipment.class)
-        .setAutofetch(false)
+        .setAutoTune(false)
         .fetch("order")
         .fetch("order.details");
 
@@ -107,7 +107,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     
     // test that join to order.details is not included
     Query<Contact> query = Ebean.find(Contact.class)
-        .setAutofetch(false)
+        .setAutoTune(false)
         .fetch("customer")
         .fetch("customer.orders");
 
@@ -138,7 +138,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     
     // test that join to order.details is not included
     Query<Contact> query = Ebean.find(Contact.class)
-        .setAutofetch(false)
+        .setAutoTune(false)
         .fetch("customer")
         .where().ilike("customer.name", "Rob%")
         .query();

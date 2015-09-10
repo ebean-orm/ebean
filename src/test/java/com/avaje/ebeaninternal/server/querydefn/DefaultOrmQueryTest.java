@@ -22,7 +22,7 @@ public class DefaultOrmQueryTest {
         .fetch("details.product", "sku, name");
 
     HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
-    query1.queryAutofetchHash(b1);
+    query1.queryAutoTuneHash(b1);
     HashQueryPlan hash1 = b1.build();
 
     SpiQuery<?> query2 = (SpiQuery<?>)Ebean.find(Order.class)
@@ -31,7 +31,7 @@ public class DefaultOrmQueryTest {
         .fetch("details.product", "sku, name");
 
     HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
-    query2.queryAutofetchHash(b2);
+    query2.queryAutoTuneHash(b2);
     HashQueryPlan hash2 = b2.build();
 
     assertThat(hash1).isNotEqualTo(hash2);

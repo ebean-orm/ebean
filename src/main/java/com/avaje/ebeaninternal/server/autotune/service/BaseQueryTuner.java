@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.autofetch.service;
+package com.avaje.ebeaninternal.server.autotune.service;
 
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.ObjectGraphNode;
@@ -6,7 +6,7 @@ import com.avaje.ebean.config.AutoTuneConfig;
 import com.avaje.ebean.config.AutoTuneMode;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.server.autofetch.ProfilingListener;
+import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 
 import javax.persistence.PersistenceException;
@@ -145,10 +145,10 @@ public class BaseQueryTuner {
    */
   private boolean useTuning(SpiQuery<?> query) {
 
-    Boolean autoFetch = query.isAutofetch();
-    if (autoFetch != null) {
+    Boolean autoTune = query.isAutoTune();
+    if (autoTune != null) {
       // explicitly set...
-      return autoFetch;
+      return autoTune;
 
     } else {
       // determine using implicit mode...
@@ -163,7 +163,7 @@ public class BaseQueryTuner {
           return query.isDetailEmpty();
 
         default:
-          throw new PersistenceException("Invalid autoFetchMode " + mode);
+          throw new PersistenceException("Invalid AutoTuneMode " + mode);
       }
     }
   }

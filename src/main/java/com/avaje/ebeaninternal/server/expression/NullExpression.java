@@ -42,12 +42,12 @@ class NullExpression extends AbstractExpression {
   /**
    * Based on notNull flag and the propertyName.
    */
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     builder.add(NullExpression.class).add(notNull).add(propName);
   }
 
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoFetchHash(builder);
+    queryAutoTuneHash(builder);
   }
 
   public int queryBindHash() {

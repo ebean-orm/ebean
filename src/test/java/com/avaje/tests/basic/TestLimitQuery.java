@@ -30,7 +30,7 @@ public class TestLimitQuery extends BaseTestCase {
     boolean h2Db = "h2".equals(server.getDatabasePlatform().getName());
 
     Query<Order> query = Ebean.find(Order.class)
-        .setAutofetch(false)
+        .setAutoTune(false)
         .fetch("details")
         .where().gt("details.id", 0)
         .setMaxRows(0)
@@ -57,7 +57,7 @@ public class TestLimitQuery extends BaseTestCase {
     boolean h2Db = "h2".equals(server.getDatabasePlatform().getName());
 
     Query<Order> query = Ebean.find(Order.class)
-        .setAutofetch(false)
+        .setAutoTune(false)
         .fetch("details")
         .where().gt("details.id", 0)
         .setMaxRows(3)
@@ -83,7 +83,7 @@ public class TestLimitQuery extends BaseTestCase {
     boolean h2Db = "h2".equals(server.getDatabasePlatform().getName());
 
     Query<Order> query = Ebean.find(Order.class)
-        .setAutofetch(false)
+        .setAutoTune(false)
         .fetch("details")
         .where().gt("details.id", 0)
         .query();
@@ -107,7 +107,7 @@ public class TestLimitQuery extends BaseTestCase {
     boolean h2Db = "h2".equals(server.getDatabasePlatform().getName());
 
     Query<Order> query = Ebean.find(Order.class)
-        .setAutofetch(false)
+        .setAutoTune(false)
         .fetch("details")
         .where().gt("details.id", 0)
         .setMaxRows(10);
@@ -131,7 +131,7 @@ public class TestLimitQuery extends BaseTestCase {
     }
 
     query = Ebean.find(Order.class)
-        .setAutofetch(false)
+        .setAutoTune(false)
         .fetch("details")
         .setMaxRows(10);
 

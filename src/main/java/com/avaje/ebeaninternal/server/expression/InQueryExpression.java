@@ -28,9 +28,9 @@ class InQueryExpression extends AbstractExpression {
     this.not = not;
   }
 
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     builder.add(InQueryExpression.class).add(propName).add(not);
-    subQuery.queryAutofetchHash(builder);
+    subQuery.queryAutoTuneHash(builder);
   }
 
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
@@ -39,7 +39,7 @@ class InQueryExpression extends AbstractExpression {
     // ... so compiledQuery will exist
     compiledSubQuery = compileSubQuery(request);
 
-    queryAutoFetchHash(builder);
+    queryAutoTuneHash(builder);
   }
 
   /**

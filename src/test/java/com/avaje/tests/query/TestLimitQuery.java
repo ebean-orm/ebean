@@ -17,7 +17,7 @@ public class TestLimitQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> customers = Ebean.find(Customer.class)
-            .setAutofetch(false)
+            .setAutoTune(false)
             .setFirstRow(0)
             .setMaxRows(10)
             .where().like("name", "%A%")

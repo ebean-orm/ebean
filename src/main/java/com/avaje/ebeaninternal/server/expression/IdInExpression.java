@@ -68,13 +68,13 @@ public class IdInExpression implements SpiExpression {
   /**
    * Incorporates the number of Id values to bind.
    */
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     builder.add(IdInExpression.class).add(idList.size());
     builder.bind(idList.size());
   }
 
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoFetchHash(builder);
+    queryAutoTuneHash(builder);
   }
 
   public int queryBindHash() {

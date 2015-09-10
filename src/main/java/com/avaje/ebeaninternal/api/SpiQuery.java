@@ -11,7 +11,7 @@ import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.event.readaudit.ReadEvent;
-import com.avaje.ebeaninternal.server.autofetch.ProfilingListener;
+import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
@@ -345,10 +345,10 @@ public interface SpiQuery<T> extends Query<T> {
   boolean isDetailEmpty();
 
   /**
-   * Return explicit autoFetch setting or null. If null then not explicitly
+   * Return explicit AutoTune setting or null. If null then not explicitly
    * set so we use the default behaviour.
    */
-  Boolean isAutofetch();
+  Boolean isAutoTune();
 
   /**
    * Set to true if you want to capture executed secondary queries.
@@ -423,14 +423,14 @@ public interface SpiQuery<T> extends Query<T> {
   /**
    * Return false when this is a lazy load or refresh query for a bean.
    * <p>
-   * We just take/copy the data from those beans and don't collect autoFetch
+   * We just take/copy the data from those beans and don't collect AutoTune
    * usage profiling on those lazy load or refresh beans.
    * </p>
    */
   boolean isUsageProfiling();
 
   /**
-   * Set to false if this query should not be included in the autoFetch usage
+   * Set to false if this query should not be included in the AutoTune usage
    * profiling information.
    */
   void setUsageProfiling(boolean usageProfiling);
@@ -441,19 +441,19 @@ public interface SpiQuery<T> extends Query<T> {
   String getName();
 
   /**
-   * Calculate a hash used by AutoFetch to identify when a query has changed
+   * Calculate a hash used by AutoTune to identify when a query has changed
    * (and hence potentially needs a new tuned query plan to be developed).
    * <p>
-   * Excludes bind values and occurs prior to AutoFetch potentially
+   * Excludes bind values and occurs prior to AutoTune potentially
    * tuning/modifying the query.
    * </p>
    */
-  HashQueryPlan queryAutofetchHash(HashQueryPlanBuilder builder);
+  HashQueryPlan queryAutoTuneHash(HashQueryPlanBuilder builder);
 
   /**
    * Identifies queries that are the same bar the bind variables.
    * <p>
-   * This is used AFTER AutoFetch has potentially tuned the query. This is
+   * This is used AFTER AutoTune has potentially tuned the query. This is
    * used to identify and reused query plans (the final SQL string and
    * associated SqlTree object).
    * </p>
@@ -558,7 +558,7 @@ public interface SpiQuery<T> extends Query<T> {
   String getQuery();
 
   /**
-   * Replace the query detail. This is used by the autoFetch feature to as a
+   * Replace the query detail. This is used by the AutoTune feature to as a
    * fast way to set the query properties and joins.
    * <p>
    * Note care must be taken to keep the where, orderBy, firstRows and maxRows
@@ -568,15 +568,15 @@ public interface SpiQuery<T> extends Query<T> {
   void setDetail(OrmQueryDetail detail);
 
   /**
-   * Autofetch tune the detail specifying properties to select on already defined joins
+   * AutoTune tune the detail specifying properties to select on already defined joins
    * and adding extra joins where they are missing.
    */
   boolean tuneFetchProperties(OrmQueryDetail detail);
 
   /**
-   * Set to true if this query has been tuned by autoFetch.
+   * Set to true if this query has been tuned by autoTune.
    */
-  void setAutoFetchTuned(boolean autoFetchTuned);
+  void setAutoTuned(boolean autoTuned);
 
   /**
    * Return the query detail.

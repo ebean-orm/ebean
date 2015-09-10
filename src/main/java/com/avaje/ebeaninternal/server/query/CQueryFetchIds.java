@@ -250,7 +250,7 @@ public class CQueryFetchIds {
       return null;
     }
 
-    public boolean isAutoFetchProfiling() {
+    public boolean isAutoTuneProfiling() {
       return false;
     }
 

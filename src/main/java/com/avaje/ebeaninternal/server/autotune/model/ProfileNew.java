@@ -1,5 +1,5 @@
 
-package com.avaje.ebeaninternal.server.autofetch.model;
+package com.avaje.ebeaninternal.server.autotune.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +32,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
     "origin"
 })
-@XmlRootElement(name = "profileDiff")
-public class ProfileDiff {
+@XmlRootElement(name = "profileNew")
+public class ProfileNew {
 
     protected List<Origin> origin;
 

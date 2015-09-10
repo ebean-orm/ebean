@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.autofetch.service;
+package com.avaje.ebeaninternal.server.autotune.service;
 
 import com.avaje.ebean.bean.NodeUsageCollector;
 import com.avaje.ebean.bean.ObjectGraphNode;
@@ -6,8 +6,8 @@ import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.config.AutoTuneConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.server.autofetch.AutoTuneCollection;
-import com.avaje.ebeaninternal.server.autofetch.ProfilingListener;
+import com.avaje.ebeaninternal.server.autotune.AutoTuneCollection;
+import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.util.Map;

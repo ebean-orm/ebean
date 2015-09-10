@@ -21,8 +21,8 @@ public class TestQueryFetchSkipPath extends BaseTestCase {
 
     List<Order> list = Ebean.find(Order.class)
 
-    // .setAutofetch(true)
-        .setAutofetch(false).select("status")
+    // .setAutoTune(true)
+        .setAutoTune(false).select("status")
         // .fetch("customer","id")
         // .fetch("customer.contacts","id")
         .fetch("customer.contacts.notes", "title").findList();

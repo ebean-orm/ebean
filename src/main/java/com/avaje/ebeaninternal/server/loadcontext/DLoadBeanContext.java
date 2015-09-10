@@ -62,7 +62,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
       queryProps.configureBeanQuery(query);
     }
     if (parent.isUseAutoTune()) {
-      query.setAutofetch(true);
+      query.setAutoTune(true);
     }
   }
 

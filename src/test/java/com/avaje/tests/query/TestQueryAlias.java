@@ -18,7 +18,7 @@ public class TestQueryAlias extends BaseTestCase {
 
     Query<CKeyParent> sq = Ebean.createQuery(CKeyParent.class)
             .select("id.oneKey").alias("st0")
-            .setAutofetch(false).where().query();
+            .setAutoTune(false).where().query();
 
     Query<CKeyParent> pq = Ebean.find(CKeyParent.class).alias("myt0").where().in("id.oneKey", sq).query();
 
@@ -44,7 +44,7 @@ public class TestQueryAlias extends BaseTestCase {
 
     Query<CKeyParent> sq = Ebean.createQuery(CKeyParent.class)
         .select("id.oneKey").alias("st0")
-        .setAutofetch(false).where().query();
+        .setAutoTune(false).where().query();
 
     Query<CKeyParent> pq = Ebean.find(CKeyParent.class).alias("myt0").where().notIn("id.oneKey", sq).query();
 

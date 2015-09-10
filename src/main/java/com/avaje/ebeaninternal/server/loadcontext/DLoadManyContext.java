@@ -74,7 +74,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
     }
 
     if (parent.isUseAutoTune()) {
-      query.setAutofetch(true);
+      query.setAutoTune(true);
     }
   }
 

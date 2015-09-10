@@ -9,7 +9,7 @@ public interface NodeUsageListener {
    * Collect node usage "profiling" information.
    * <p>
    * This is the properties that are used for a given bean in the object graph.
-   * This information is used by autoFetch to tune queries.
+   * This information is used by autoTune to tune queries.
    * </p>
    */
   void collectNodeUsage(NodeUsageCollector collector);

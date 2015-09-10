@@ -1,16 +1,16 @@
-package com.avaje.ebeaninternal.server.autofetch.service;
+package com.avaje.ebeaninternal.server.autotune.service;
 
 import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.config.AutoTuneConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.server.autofetch.AutoTuneCollection;
-import com.avaje.ebeaninternal.server.autofetch.AutoTuneService;
-import com.avaje.ebeaninternal.server.autofetch.model.Autotune;
-import com.avaje.ebeaninternal.server.autofetch.model.Origin;
-import com.avaje.ebeaninternal.server.autofetch.model.ProfileDiff;
-import com.avaje.ebeaninternal.server.autofetch.model.ProfileNew;
+import com.avaje.ebeaninternal.server.autotune.AutoTuneCollection;
+import com.avaje.ebeaninternal.server.autotune.AutoTuneService;
+import com.avaje.ebeaninternal.server.autotune.model.Autotune;
+import com.avaje.ebeaninternal.server.autotune.model.Origin;
+import com.avaje.ebeaninternal.server.autotune.model.ProfileDiff;
+import com.avaje.ebeaninternal.server.autotune.model.ProfileNew;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetailParser;
 import org.jetbrains.annotations.NotNull;

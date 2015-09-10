@@ -36,7 +36,7 @@ import java.util.Set;
  *         .sort(&quot;avgTimeMicros desc&quot;)
  *         .gt(&quot;executionCount&quot;, 0)
  *         .gt(&quot;lastQueryTime&quot;, nowMinus24Hrs)
- *         .eq(&quot;autofetchTuned&quot;, true)
+ *         .eq(&quot;autoTuned&quot;, true)
  *         .maxRows(10)
  *         .filter(list);
  * 

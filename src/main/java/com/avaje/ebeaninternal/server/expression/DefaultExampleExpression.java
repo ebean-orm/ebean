@@ -153,9 +153,9 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   }
 
   /**
-   * Return a hash for autoFetch query identification.
+   * Return a hash for AutoTune query identification.
    */
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     // we have not yet built the list of expressions
     // so just based on the class name
     builder.add(DefaultExampleExpression.class);

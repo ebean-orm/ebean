@@ -5,7 +5,7 @@ import javax.persistence.PersistenceException;
 /**
  * Parses a Object relational query statement into a OrmQueryDetail and OrmQueryAttributes.
  * <p>
- * The reason they are split into detail and attributes is that the autoFetch feature is used to
+ * The reason they are split into detail and attributes is that the AutoTune feature is used to
  * replace the OrmQueryDetail leaving the attributes unchanged.
  * </p>
  */

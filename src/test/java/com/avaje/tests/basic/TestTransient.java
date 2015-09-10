@@ -19,7 +19,7 @@ public class TestTransient extends BaseTestCase {
     Ebean.save(cnew);
     Integer custId = cnew.getId();
 
-    Customer c = Ebean.find(Customer.class).setAutofetch(false).setId(custId).findUnique();
+    Customer c = Ebean.find(Customer.class).setAutoTune(false).setId(custId).findUnique();
 
     Assert.assertNotNull(c);
 

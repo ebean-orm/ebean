@@ -404,7 +404,7 @@ public class CQueryEngine {
       msg.append("mode[").append(loadMode).append("] ");
     }
     msg.append("type[").append(q.getBeanName()).append("] ");
-    if (query.isAutofetchTuned()) {
+    if (query.isAutoTuned()) {
       msg.append("tuned[true] ");
     }
     if (originKey != null) {
@@ -447,7 +447,7 @@ public class CQueryEngine {
       msg.append("mode[").append(loadMode).append("] ");
     }
     msg.append("type[").append(q.getBeanName()).append("] ");
-    if (query.isAutofetchTuned()) {
+    if (query.isAutoTuned()) {
       msg.append("tuned[true] ");
     }
     if (originKey != null) {

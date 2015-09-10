@@ -90,13 +90,13 @@ class InExpression extends AbstractExpression {
   /**
    * Based on the number of values in the in clause.
    */
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     builder.add(InExpression.class).add(propName).add(values.length).add(not);
     builder.bind(values.length);
   }
 
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoFetchHash(builder);
+    queryAutoTuneHash(builder);
   }
 
   public int queryBindHash() {

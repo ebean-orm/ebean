@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.autofetch.service;
+package com.avaje.ebeaninternal.server.autotune.service;
 
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
@@ -44,7 +44,7 @@ public class TunedQueryInfo implements Serializable {
       tuned = query.tuneFetchProperties(tunedDetail);
     }
     if (tuned) {
-      query.setAutoFetchTuned(true);
+      query.setAutoTuned(true);
     }
     return tuned;
   }

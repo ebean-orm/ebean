@@ -33,7 +33,7 @@ public interface LoadContext {
 	void registerSecondaryQueries(SpiQuery<?> query);
 	
 	/**
-	 * Return the node for a given path which is used by autofetch profiling.
+	 * Return the node for a given path which is used by AutoTune profiling.
 	 */
 	ObjectGraphNode getObjectGraphNode(String path);
 

@@ -13,7 +13,7 @@ import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.api.SpiTransaction;
-import com.avaje.ebeaninternal.server.autofetch.ProfilingListener;
+import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
@@ -673,7 +673,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
    * This is true for all queries except lazy load bean queries.
    * </p>
    */
-  public boolean isAutoFetchProfiling() {
+  public boolean isAutoTuneProfiling() {
     // need query.isProfiling() because we just take the data
     // from the lazy loaded or refreshed beans and put it into the already
     // existing beans which are already collecting usage information

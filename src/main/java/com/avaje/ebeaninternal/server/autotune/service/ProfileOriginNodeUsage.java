@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.autofetch.service;
+package com.avaje.ebeaninternal.server.autotune.service;
 
 import com.avaje.ebean.bean.NodeUsageCollector;
 import com.avaje.ebean.text.PathProperties;
@@ -70,7 +70,7 @@ public class ProfileOriginNodeUsage {
           } else {
             //noinspection StatementWithEmptyBody
             if (beanProp.isLob() && !beanProp.isFetchEager()) {
-              // AutoFetch will not include Lob's marked FetchLazy
+              // AutoTune will not include Lob's marked FetchLazy
               // (which is the default for Lob's so typical).
             } else {
               pathProps.addToPath(path, beanProp.getName());

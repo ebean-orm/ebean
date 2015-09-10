@@ -1,6 +1,6 @@
-package com.avaje.ebeaninternal.server.autofetch.service;
+package com.avaje.ebeaninternal.server.autotune.service;
 
-import com.avaje.ebeaninternal.server.autofetch.AutoTuneCollection;
+import com.avaje.ebeaninternal.server.autotune.AutoTuneCollection;
 import com.avaje.ebeaninternal.server.util.LongAdder;
 
 import java.io.Serializable;

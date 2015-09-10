@@ -22,7 +22,7 @@ public class TestTextJsonInheritance extends BaseTestCase {
 
     setupData();
 
-    List<Vehicle> list = Ebean.find(Vehicle.class).setAutofetch(false).findList();
+    List<Vehicle> list = Ebean.find(Vehicle.class).setAutoTune(false).findList();
 
     Assert.assertEquals(2, list.size());
 

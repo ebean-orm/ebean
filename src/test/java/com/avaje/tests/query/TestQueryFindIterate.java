@@ -26,7 +26,7 @@ public class TestQueryFindIterate extends BaseTestCase {
     EbeanServer server = Ebean.getServer(null);
 
     Query<Customer> query = server.find(Customer.class)
-        .setAutofetch(false)
+        .setAutoTune(false)
         //.fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
         .setMaxRows(2);
 
@@ -154,7 +154,7 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     // intentionally a query with incorrect type binding
     Query<Customer> query = server.find(Customer.class)
-        .setAutofetch(false)
+        .setAutoTune(false)
         .where().gt("id","JUNK_NOT_A_LONG")
         .setMaxRows(2);
 
@@ -178,7 +178,7 @@ public class TestQueryFindIterate extends BaseTestCase {
     EbeanServer server = Ebean.getServer(null);
 
     Query<Customer> query = server.find(Customer.class)
-        .setAutofetch(false)
+        .setAutoTune(false)
         .where().gt("id", 0)
         .setMaxRows(2);
 

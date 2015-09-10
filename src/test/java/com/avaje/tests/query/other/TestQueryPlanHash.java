@@ -17,12 +17,12 @@ public class TestQueryPlanHash {
     HashQueryPlanBuilder builder1 = new HashQueryPlanBuilder();
     
     SpiQuery<Order> squery = (SpiQuery<Order>)Ebean.find(Order.class);
-    squery.queryAutofetchHash(builder1);
+    squery.queryAutoTuneHash(builder1);
     
     squery.where().in("id", 1,2,3);
 
     HashQueryPlanBuilder builder2 = new HashQueryPlanBuilder();
-    squery.queryAutofetchHash(builder2);
+    squery.queryAutoTuneHash(builder2);
     int q1BindHash = squery.queryBindHash();
     
     Assert.assertNotSame(builder1.build(), builder2.build());
@@ -31,7 +31,7 @@ public class TestQueryPlanHash {
     SpiQuery<Order> squery2 = (SpiQuery<Order>)Ebean.find(Order.class);
     squery2.where().in("id", 2,2,3);
 
-    squery2.queryAutofetchHash(builder3);
+    squery2.queryAutoTuneHash(builder3);
     int q2BindHash = squery2.queryBindHash();
 
     Assert.assertEquals(builder3.build(), builder2.build());    
@@ -42,7 +42,7 @@ public class TestQueryPlanHash {
     SpiQuery<Order> squery4 = (SpiQuery<Order>)Ebean.find(Order.class);
     squery4.where().in("name", 2,2,3);
 
-    squery4.queryAutofetchHash(builder4);
+    squery4.queryAutoTuneHash(builder4);
     int q4BindHash = squery4.queryBindHash();
 
     //different query plan

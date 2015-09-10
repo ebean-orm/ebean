@@ -330,11 +330,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * Calculate a hash based on the expressions but excluding the actual bind
    * values.
    */
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     builder.add(DefaultExpressionList.class);
     for (int i = 0, size = list.size(); i < size; i++) {
       SpiExpression expression = list.get(i);
-      expression.queryAutoFetchHash(builder);
+      expression.queryAutoTuneHash(builder);
     }
   }
 

@@ -70,10 +70,10 @@ abstract class LogicExpression implements SpiExpression {
   /**
    * Based on the joinType plus the two expressions.
    */
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     builder.add(LogicExpression.class).add(joinType);
-    expOne.queryAutoFetchHash(builder);
-    expTwo.queryAutoFetchHash(builder);
+    expOne.queryAutoTuneHash(builder);
+    expTwo.queryAutoTuneHash(builder);
   }
 
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {

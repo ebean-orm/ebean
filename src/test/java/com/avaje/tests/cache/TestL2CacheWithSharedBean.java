@@ -8,7 +8,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.server.autofetch.service.TunedQueryInfo;
+import com.avaje.ebeaninternal.server.autotune.service.TunedQueryInfo;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.tests.model.basic.FeatureDescription;
 

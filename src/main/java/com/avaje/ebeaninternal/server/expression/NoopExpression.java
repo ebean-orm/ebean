@@ -20,13 +20,13 @@ class NoopExpression implements SpiExpression {
   }
 
   @Override
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     builder.add(NoopExpression.class);
   }
 
   @Override
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoFetchHash(builder);
+    queryAutoTuneHash(builder);
   }
 
   @Override

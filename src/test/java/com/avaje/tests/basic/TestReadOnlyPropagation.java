@@ -24,7 +24,7 @@ public class TestReadOnlyPropagation extends BaseTestCase {
 		ResetBasicData.reset();
 		
 		Order order = Ebean.find(Order.class)
-			.setAutofetch(false)
+			.setAutoTune(false)
 			.setUseCache(false)
 			.setReadOnly(true)
 			.setId(1)

@@ -1,7 +1,7 @@
-package com.avaje.ebeaninternal.server.autofetch.service;
+package com.avaje.ebeaninternal.server.autotune.service;
 
 
-import com.avaje.ebeaninternal.server.autofetch.model.Autotune;
+import com.avaje.ebeaninternal.server.autotune.model.Autotune;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

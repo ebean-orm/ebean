@@ -55,7 +55,7 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   /**
    * Create an object to represent the current CallStack.
    * <p>
-   * Typically used to identify the origin of queries for Autofetch and object
+   * Typically used to identify the origin of queries for AutoTune and object
    * graph costing.
    * </p>
    */

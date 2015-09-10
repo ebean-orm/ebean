@@ -20,7 +20,7 @@ public class TestQueryWhereBetween extends BaseTestCase {
 
     Timestamp t = new Timestamp(System.currentTimeMillis());
 
-    Query<Order> query = Ebean.find(Order.class).setAutofetch(false).where()
+    Query<Order> query = Ebean.find(Order.class).setAutoTune(false).where()
         .betweenProperties("cretime", "updtime", t).order().asc("orderDate").order().desc("id");
 
     query.findList();

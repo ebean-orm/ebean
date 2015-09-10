@@ -22,7 +22,7 @@ public class TestQueryFindVisit extends BaseTestCase {
 
     EbeanServer server = Ebean.getServer(null);
 
-    Query<Customer> query = server.find(Customer.class).setAutofetch(false)
+    Query<Customer> query = server.find(Customer.class).setAutoTune(false)
         .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
         .setMaxRows(2);
 
@@ -47,7 +47,7 @@ public class TestQueryFindVisit extends BaseTestCase {
 
     EbeanServer server = Ebean.getServer(null);
 
-    Query<Customer> query = server.find(Customer.class).setAutofetch(false)
+    Query<Customer> query = server.find(Customer.class).setAutoTune(false)
         .fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
         .setMaxRows(2);
 

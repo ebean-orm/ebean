@@ -15,8 +15,8 @@ import com.avaje.ebean.plugin.SpiServerPlugin;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.autofetch.AutoTuneService;
-import com.avaje.ebeaninternal.server.autofetch.service.AutoTuneServiceFactory;
+import com.avaje.ebeaninternal.server.autotune.AutoTuneService;
+import com.avaje.ebeaninternal.server.autotune.service.AutoTuneServiceFactory;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogListener;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogPrepare;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogRegister;
@@ -248,7 +248,7 @@ public class InternalConfiguration {
     return xmlConfig;
   }
 
-  public AutoTuneService createAutoFetchManager(SpiEbeanServer server) {
+  public AutoTuneService createAutoTuneService(SpiEbeanServer server) {
     return AutoTuneServiceFactory.create(server, serverConfig);
   }
 

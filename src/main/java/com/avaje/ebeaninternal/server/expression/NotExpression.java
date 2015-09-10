@@ -37,9 +37,9 @@ final class NotExpression implements SpiExpression {
   /**
    * Based on the expression.
    */
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     builder.add(NotExpression.class);
-    exp.queryAutoFetchHash(builder);
+    exp.queryAutoTuneHash(builder);
   }
 
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {

@@ -31,7 +31,7 @@ public class TestInheritRef extends BaseTestCase {
       Ebean.save(t);
 
       List<Vehicle> list = Ebean.find(Vehicle.class)
-              .setAutofetch(false)
+              .setAutoTune(false)
               .findList();
 
       Assert.assertTrue(list.size() > 0);

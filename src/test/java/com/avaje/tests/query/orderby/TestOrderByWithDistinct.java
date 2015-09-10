@@ -73,7 +73,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 		// still need them to be present for purpose of order by
 		// so here I'm "simulating" a scenario where autofetch has dropped userType.name
 		query = Ebean.find(MUser.class)
-				.setAutofetch(false)
+				.setAutoTune(false)
 				.select("userName")
 				.fetch("userType","name")
 				.where()

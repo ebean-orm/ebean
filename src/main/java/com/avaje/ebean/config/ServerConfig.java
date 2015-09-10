@@ -130,7 +130,7 @@ public class ServerConfig {
   private CurrentUserProvider currentUserProvider;
 
   /** 
-   * Config controlling the autofetch behaviour.
+   * Config controlling the AutoTune behaviour.
    */
   private AutoTuneConfig autoTuneConfig = new AutoTuneConfig();
 

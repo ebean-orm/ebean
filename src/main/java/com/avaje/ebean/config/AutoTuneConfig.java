@@ -79,7 +79,7 @@ public class AutoTuneConfig {
   }
 
   /**
-   * Set to true if the queries should be tuned by autofetch.
+   * Set to true if the queries should be tuned by autoTune.
    */
   public void setQueryTuning(boolean queryTuning) {
     this.queryTuning = queryTuning;
@@ -123,7 +123,7 @@ public class AutoTuneConfig {
    * Set to true if profiling information should be collected.
    * <p>
    * The profiling information is collected and then used to generate the tuned
-   * queries for autofetch.
+   * queries for autoTune.
    * </p>
    */
   public void setProfiling(boolean profiling) {

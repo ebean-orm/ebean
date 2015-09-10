@@ -36,7 +36,7 @@ import com.avaje.ebeaninternal.api.SpiQuery.Type;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
-import com.avaje.ebeaninternal.server.autofetch.AutoTuneService;
+import com.avaje.ebeaninternal.server.autotune.AutoTuneService;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -222,7 +222,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.queryEngine = config.createOrmQueryEngine();
     this.relationalQueryEngine = config.createRelationalQueryEngine();
 
-    this.autoTuneService = config.createAutoFetchManager(this);
+    this.autoTuneService = config.createAutoTuneService(this);
     this.readAuditPrepare = config.getReadAuditPrepare();
     this.readAuditLogger = config.getReadAuditLogger();
 
@@ -402,7 +402,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     shutdownPlugins();
 
-    // shutdown autofetch profile collection
     autoTuneService.shutdown();
     // shutdown background threads
     backgroundExecutor.shutdown();

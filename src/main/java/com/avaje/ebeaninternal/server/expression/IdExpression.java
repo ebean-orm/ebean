@@ -50,13 +50,13 @@ class IdExpression implements SpiExpression {
   /**
    * No properties so this is just a unique static number.
    */
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     builder.add(IdExpression.class);
     builder.bind(1);
   }
 
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoFetchHash(builder);
+    queryAutoTuneHash(builder);
   }
 
   public int queryBindHash() {

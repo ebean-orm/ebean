@@ -42,10 +42,10 @@ public interface DbReadContext {
   /**
    * Return true if we are profiling this query.
    */
-  boolean isAutoFetchProfiling();
+  boolean isAutoTuneProfiling();
 
   /**
-   * Add autoFetch profiling for a loaded entity bean.
+   * Add AutoTune profiling for a loaded entity bean.
    */
   void profileBean(EntityBeanIntercept ebi, String prefix);
 

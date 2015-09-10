@@ -35,7 +35,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     custCache.clear();
     custManyIdsCache.clear();
 
-    List<Customer> list = Ebean.find(Customer.class).setAutofetch(false).setLoadBeanCache(true)
+    List<Customer> list = Ebean.find(Customer.class).setAutoTune(false).setLoadBeanCache(true)
         .order().asc("id").findList();
 
     Assert.assertTrue(list.size() > 1);

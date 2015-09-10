@@ -5,10 +5,9 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Collects profile information for a bean (or reference/proxy bean) at a given
- * AutoFetchNode.
+ * Collects profile information for a bean (or reference/proxy bean) at a given node.
  * <p>
- * The AutoFetchNode identifies the location of the bean in the object graph.
+ * The node identifies the location of the bean in the object graph.
  * </p>
  * <p>
  * It has to use a weak reference so as to ensure that it does not stop the

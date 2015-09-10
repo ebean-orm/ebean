@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.autofetch;
+package com.avaje.ebeaninternal.server.autotune;
 
 import com.avaje.ebean.bean.NodeUsageListener;
 import com.avaje.ebean.bean.ObjectGraphNode;

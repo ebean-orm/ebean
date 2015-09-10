@@ -1,8 +1,8 @@
-package com.avaje.ebeaninternal.server.autofetch.service;
+package com.avaje.ebeaninternal.server.autotune.service;
 
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.autofetch.AutoTuneService;
+import com.avaje.ebeaninternal.server.autotune.AutoTuneService;
 
 public class AutoTuneServiceFactory {
 

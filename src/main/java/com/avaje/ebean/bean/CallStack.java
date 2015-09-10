@@ -6,7 +6,7 @@ import java.util.Arrays;
 /**
  * Represent the call stack (stack trace elements).
  * <p>
- * Used with a query to identify a CallStackQuery for AutoFetch automatic query
+ * Used with a query to identify a CallStackQuery for AutoTune automatic query
  * tuning.
  * </p>
  * <p>

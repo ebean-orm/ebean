@@ -84,7 +84,7 @@ class AllEqualsExpression implements SpiExpression {
    * The null check is required due to the "is null" sql being generated.
    * </p>
    */
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
 
     builder.add(AllEqualsExpression.class);
 
@@ -97,7 +97,7 @@ class AllEqualsExpression implements SpiExpression {
   }
 
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoFetchHash(builder);
+    queryAutoTuneHash(builder);
   }
 
   public int queryBindHash() {

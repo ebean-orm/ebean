@@ -836,10 +836,10 @@ public abstract class Model {
     }
 
     /**
-     * Create a query with explicit 'Autofetch' use.
+     * Create a query with explicit 'AutoTune' use.
      */
-    public Query<T> setAutofetch(boolean autofetch) {
-      return query().setAutofetch(autofetch);
+    public Query<T> setAutoTune(boolean autoTune) {
+      return query().setAutoTune(autoTune);
     }
 
     /**

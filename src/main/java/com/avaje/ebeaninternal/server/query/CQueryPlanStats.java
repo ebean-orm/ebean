@@ -226,8 +226,8 @@ public final class CQueryPlanStats {
     }
 
     @Override
-    public boolean isAutofetchTuned() {
-      return queryPlan.isAutofetchTuned();
+    public boolean isAutoTuned() {
+      return queryPlan.isAutoTuned();
     }
 
 

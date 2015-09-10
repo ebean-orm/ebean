@@ -49,7 +49,7 @@ public class TestSubQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<CKeyParent> sq = Ebean.createQuery(CKeyParent.class).select("id.oneKey")
-        .setAutofetch(false).where().query();
+        .setAutoTune(false).where().query();
 
     Query<CKeyParent> pq = Ebean.find(CKeyParent.class).where().in("id.oneKey", sq).query();
 
@@ -71,7 +71,7 @@ public class TestSubQuery extends BaseTestCase {
    * public void testInheritance1() { ResetBasicData.reset();
    * 
    * Query<Vehicle> sq = Ebean.createQuery(Vehicle.class) .select("id")
-   * .setAutofetch(false) .where() .query();
+   * .setAutoTune(false) .where() .query();
    * 
    * Query<VehicleDriver> pq = Ebean.find(VehicleDriver.class)
    * .where().in("vehicle.id", sq) .query();
@@ -95,7 +95,7 @@ public class TestSubQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<VehicleDriver> sq = Ebean.createQuery(VehicleDriver.class).select("vehicle")
-        .setAutofetch(false).where().query();
+        .setAutoTune(false).where().query();
 
     Query<Vehicle> pq = Ebean.find(Vehicle.class).where().in("id", sq).query();
 
@@ -124,7 +124,7 @@ public class TestSubQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<VehicleDriver> sq = Ebean.createQuery(VehicleDriver.class).select("vehicle")
-        .setAutofetch(false).where().eq("vehicle.licenseNumber", "abc").query();
+        .setAutoTune(false).where().eq("vehicle.licenseNumber", "abc").query();
 
     Query<Vehicle> pq = Ebean.find(Vehicle.class).where().in("id", sq).query();
 
@@ -150,7 +150,7 @@ public class TestSubQuery extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<VehicleDriver> sq = Ebean.createQuery(VehicleDriver.class).select("vehicle.id")
-        .setAutofetch(false).where().query();
+        .setAutoTune(false).where().query();
 
     Query<Vehicle> pq = Ebean.find(Vehicle.class).where().in("id", sq).query();
 

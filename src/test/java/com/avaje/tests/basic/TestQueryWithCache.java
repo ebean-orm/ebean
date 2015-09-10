@@ -22,7 +22,7 @@ public class TestQueryWithCache extends BaseTestCase {
   // Ebean.getServer(null).runCacheWarming();
   //
   // Query<Order> query = Ebean.createQuery(Order.class)
-  // .setAutofetch(false)
+  // .setAutoTune(false)
   // .fetch("customer","+cache +readonly")
   // .setId(1);
   //
@@ -107,7 +107,7 @@ public class TestQueryWithCache extends BaseTestCase {
 
     Country nz3 = Ebean.find(Country.class, "NZ");
 
-    Country nz4 = Ebean.find(Country.class).setId("NZ").setAutofetch(false).setUseCache(false)
+    Country nz4 = Ebean.find(Country.class).setId("NZ").setAutoTune(false).setUseCache(false)
         .findUnique();
 
     Assert.assertTrue(nz2 == nz2b);

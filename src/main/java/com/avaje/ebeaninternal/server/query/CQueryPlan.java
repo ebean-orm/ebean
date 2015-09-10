@@ -43,7 +43,7 @@ public class CQueryPlan {
 
   private final SpiEbeanServer server;
 
-  private final boolean autofetchTuned;
+  private final boolean autoTuned;
 
   private final HashQueryPlan hash;
 
@@ -80,7 +80,7 @@ public class CQueryPlan {
     this.beanType = request.getBeanDescriptor().getBeanType();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.hash = request.getQueryPlanHash();
-    this.autofetchTuned = request.getQuery().isAutofetchTuned();
+    this.autoTuned = request.getQuery().isAutoTuned();
     if (sqlRes != null) {
       this.sql = sqlRes.getSql();
       this.rowNumberIncluded = sqlRes.isIncludesRowNumberColumn();
@@ -104,7 +104,7 @@ public class CQueryPlan {
     this.beanType = request.getBeanDescriptor().getBeanType();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.hash = buildHash(sql, rawSql, rowNumberIncluded, logWhereSql);
-    this.autofetchTuned = false;
+    this.autoTuned = false;
     this.sql = sql;
     this.sqlTree = sqlTree;
     this.rawSql = rawSql;
@@ -143,8 +143,8 @@ public class CQueryPlan {
     }
   }
 
-  public boolean isAutofetchTuned() {
-    return autofetchTuned;
+  public boolean isAutoTuned() {
+    return autoTuned;
   }
 
   public HashQueryPlan getHash() {

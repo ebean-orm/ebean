@@ -25,7 +25,7 @@ public class TestDPersonIUD extends TestCase {
 //        Assert.assertNotNull(id);
 //        
 //        DPerson p2 = Ebean.find(DPerson.class)
-//            .setAutofetch(false)
+//            .setAutoTune(false)
 //            .where().idEq(id)
 //            .findUnique();
 //        
@@ -38,7 +38,7 @@ public class TestDPersonIUD extends TestCase {
 //        
 //        
 //        Query<DPerson> query = Ebean.find(DPerson.class)
-//            .setAutofetch(false)
+//            .setAutoTune(false)
 //            .where().gt("cmoney.amount",1)
 //            .query();
 //        

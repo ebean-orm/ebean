@@ -1,5 +1,5 @@
 
-package com.avaje.ebeaninternal.server.autofetch.model;
+package com.avaje.ebeaninternal.server.autotune.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

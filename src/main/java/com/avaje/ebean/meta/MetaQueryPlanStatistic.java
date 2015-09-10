@@ -15,9 +15,9 @@ public interface MetaQueryPlanStatistic {
   Class<?> getBeanType();
 
   /**
-   * Return true if this query plan was tuned by Autofetch.
+   * Return true if this query plan was tuned by AutoTune.
    */
-  boolean isAutofetchTuned();
+  boolean isAutoTuned();
 
   /**
    * Return a string representation of the query plan hash.

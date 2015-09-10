@@ -120,7 +120,7 @@ public class MainDbBoolean {
 
 		
 		List<TOne> list = server.find(TOne.class)
-			.setAutofetch(false)
+			.setAutoTune(false)
 			.order("id")
 			.findList();
 		
@@ -140,7 +140,7 @@ public class MainDbBoolean {
 		
 
 		Query<TOne> query = server.find(TOne.class)
-			.setAutofetch(false)
+			.setAutoTune(false)
 			.order("id");
 	
 		int rc = query.findRowCount();

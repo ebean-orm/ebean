@@ -17,7 +17,7 @@ public class MainAutoFetchExcludeLazyLobs {
 		Ebean.save(a);
 		
 		List<EBasicClob> list = Ebean.find(EBasicClob.class)
-			.setAutofetch(true)
+			.setAutoTune(true)
 			.findList();
 		
 		for (EBasicClob bean : list) {

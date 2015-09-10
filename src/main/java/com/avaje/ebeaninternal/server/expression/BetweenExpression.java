@@ -31,13 +31,13 @@ class BetweenExpression extends AbstractExpression {
     request.append(getPropertyName()).append(BETWEEN).append(" ? and ? ");
   }
 
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     builder.add(BetweenExpression.class).add(propName);
     builder.bind(2);
   }
 
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoFetchHash(builder);
+    queryAutoTuneHash(builder);
   }
 
   public int queryBindHash() {

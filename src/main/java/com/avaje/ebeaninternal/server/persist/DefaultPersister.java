@@ -491,7 +491,7 @@ public final class DefaultPersister implements Persister {
     for (int i = 0; i < propImportDelete.length; i++) {
       sb.append(propImportDelete[i].getName()).append(",");
     }
-    q.setAutofetch(false);
+    q.setAutoTune(false);
     q.select(sb.toString());
     return q;
   }

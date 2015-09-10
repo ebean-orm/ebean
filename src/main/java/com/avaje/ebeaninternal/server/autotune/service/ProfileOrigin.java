@@ -1,11 +1,11 @@
-package com.avaje.ebeaninternal.server.autofetch.service;
+package com.avaje.ebeaninternal.server.autotune.service;
 
 import com.avaje.ebean.bean.NodeUsageCollector;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebean.text.PathProperties.Props;
-import com.avaje.ebeaninternal.server.autofetch.AutoTuneCollection;
+import com.avaje.ebeaninternal.server.autotune.AutoTuneCollection;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 
@@ -15,8 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ProfileOrigin {
-
-  //private static final Logger logger = LoggerFactory.getLogger(ProfileOrigin.class);
 
   private static final long RESET_COUNT = -1000000000L;
 

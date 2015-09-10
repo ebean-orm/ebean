@@ -24,7 +24,7 @@ public class TestLazyLoadEmptyOneToMany extends BaseTestCase {
     Ebean.save(c);
 
     Customer c1 = Ebean.find(Customer.class)
-        .setAutofetch(false)
+        .setAutoTune(false)
         .select("id")
         .fetch("contacts", "id")
         .where().idEq(c.getId())

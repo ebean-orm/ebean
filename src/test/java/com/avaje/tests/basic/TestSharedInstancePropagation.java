@@ -27,7 +27,7 @@ public class TestSharedInstancePropagation extends BaseTestCase {
 		Ebean.getServerCacheManager().clearAll();
 
 		Order order = Ebean.find(Order.class)
-			.setAutofetch(false)
+			.setAutoTune(false)
 			.setUseCache(true)
 			.setReadOnly(true)
 			.setId(1)

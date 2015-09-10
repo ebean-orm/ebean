@@ -129,11 +129,11 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
    * Based on Junction type and all the expression contained.
    */
   @Override
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     builder.add(JunctionExpression.class).add(joinType);
     List<SpiExpression> list = exprList.internalList();
     for (int i = 0; i < list.size(); i++) {
-      list.get(i).queryAutoFetchHash(builder);
+      list.get(i).queryAutoTuneHash(builder);
     }
   }
 

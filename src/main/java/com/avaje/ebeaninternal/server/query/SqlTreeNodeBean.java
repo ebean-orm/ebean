@@ -326,8 +326,8 @@ public class SqlTreeNodeBean implements SqlTreeNode {
         ebi.setFullyLoadedBean(true);
       }
 
-      if (ctx.isAutoFetchProfiling() && !disableLazyLoad) {
-        // collect autofetch profiling for this bean...
+      if (ctx.isAutoTuneProfiling() && !disableLazyLoad) {
+        // collect autoTune profiling for this bean...
         ctx.profileBean(ebi, prefix);
       }
     }

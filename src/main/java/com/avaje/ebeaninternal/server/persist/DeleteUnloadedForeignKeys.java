@@ -65,7 +65,7 @@ public class DeleteUnloadedForeignKeys {
     // run query in a separate persistence context
     q.setPersistenceContext(new DefaultPersistenceContext());
     q.setPersistenceContextScope(PersistenceContextScope.QUERY);
-    q.setAutofetch(false);
+    q.setAutoTune(false);
     q.select(sb.toString());
     q.where().idEq(id);
 

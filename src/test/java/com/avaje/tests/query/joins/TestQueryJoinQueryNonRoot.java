@@ -47,7 +47,7 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
     // String oq =
     // "find order join customer join customer.contacts join details (+query(4),+lazy(5))";
     // Query<Order> q = Ebean.createQuery(Order.class, oq);
-    // q.setAutofetch(false);
+    // q.setAutoTune(false);
     // List<Order> list2 = q.findList();
     //
     // Assert.assertTrue(list2.size() > 0);

@@ -19,13 +19,13 @@ public interface SpiExpression extends Expression {
 	void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins);
 	
 	/**
-	 * Calculate a hash value used to identify a query for AutoFetch tuning.
+	 * Calculate a hash value used to identify a query for AutoTune tuning.
 	 * <p>
 	 * That is, if the hash changes then the query will be considered different
-	 * from an AutoFetch perspective and get different tuning.
+	 * from an AutoTune perspective and get different tuning.
 	 * </p>
 	 */
-	void queryAutoFetchHash(HashQueryPlanBuilder builder);
+	void queryAutoTuneHash(HashQueryPlanBuilder builder);
 	
 	/**
 	 * Calculate a hash value for the expression.

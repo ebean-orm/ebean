@@ -421,7 +421,7 @@ public class DefaultBeanLoader {
       query.select("id," + embeddedBeanPropertyName);
     }
 
-    // don't collect autoFetch usage profiling information
+    // don't collect AutoTune usage profiling information
     // as we just copy the data out of these fetched beans
     // and put the data into the original bean
     query.setUsageProfiling(false);

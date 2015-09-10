@@ -30,14 +30,14 @@ public class TestExtraScalarTypes extends BaseTestCase {
 
     Ebean.save(e);
 
-    ESomeType e2 = Ebean.find(ESomeType.class).setAutofetch(false).setId(e.getId()).findUnique();
+    ESomeType e2 = Ebean.find(ESomeType.class).setAutoTune(false).setId(e.getId()).findUnique();
 
     Assert.assertNotNull(e2.getCurrency());
     Assert.assertNotNull(e2.getLocale());
     Assert.assertNotNull(e2.getTimeZone());
 
     List<ESomeType> list = Ebean.find(ESomeType.class)
-        .setAutofetch(false).where()
+        .setAutoTune(false).where()
         .eq("locale", locale)
         .eq("timeZone", tz.getID())
         .eq("currency", currency)

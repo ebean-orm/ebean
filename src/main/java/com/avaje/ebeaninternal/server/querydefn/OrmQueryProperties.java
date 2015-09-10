@@ -212,7 +212,7 @@ public class OrmQueryProperties implements Serializable {
   }
 
   /**
-   * Set the properties from a matching autofetch tuned properties.
+   * Set the properties from a matching AutoTune tuned properties.
    */
   public void setTunedProperties(OrmQueryProperties tunedProperties) {
     if (tunedProperties.hasProperties()) {
@@ -318,7 +318,7 @@ public class OrmQueryProperties implements Serializable {
     secondaryChildren.add(child);
   }
 
-  public int autofetchPlanHash() {
+  public int autoTunePlanHash() {
 
     int hc = (path != null ? path.hashCode() : 1);
     if (properties != null) {

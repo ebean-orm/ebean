@@ -118,7 +118,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   /**
-   * Calculate the query plan hash AFTER any potential AutoFetch tuning.
+   * Calculate the query plan hash AFTER any potential AutoTune tuning.
    */
   public void calculateQueryPlanHash() {
     this.queryPlanHash = query.queryPlanHash(this);

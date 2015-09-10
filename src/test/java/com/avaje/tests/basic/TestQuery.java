@@ -16,7 +16,7 @@ public class TestQuery extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class).setAutofetch(false).order().asc("orderDate")
+    Query<Order> query = Ebean.find(Order.class).setAutoTune(false).order().asc("orderDate")
         .order().desc("id");
     // .orderBy("orderDate");
 
@@ -31,14 +31,14 @@ public class TestQuery extends BaseTestCase {
   public void testForUpdate() {
     ResetBasicData.reset();
 
-    Query<Order> query = Ebean.find(Order.class).setAutofetch(false).setForUpdate(false)
+    Query<Order> query = Ebean.find(Order.class).setAutoTune(false).setForUpdate(false)
         .setMaxRows(1).order().asc("orderDate").order().desc("id");
 
     int rc = query.findList().size();
     Assert.assertTrue(rc > 0);
     Assert.assertTrue(!query.getGeneratedSql().toLowerCase().contains("for update"));
 
-    query = Ebean.find(Order.class).setAutofetch(false).setForUpdate(true).setMaxRows(1).order()
+    query = Ebean.find(Order.class).setAutoTune(false).setForUpdate(true).setMaxRows(1).order()
         .asc("orderDate").order().desc("id");
 
     rc = query.findList().size();

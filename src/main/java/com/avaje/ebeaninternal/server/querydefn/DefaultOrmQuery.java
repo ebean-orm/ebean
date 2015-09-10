@@ -18,7 +18,7 @@ import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.server.autofetch.ProfilingListener;
+import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DRawSqlSelect;
@@ -199,7 +199,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Allow for explicit on off or null for default.
    */
-  private Boolean autoFetch;
+  private Boolean autoTune;
 
   /**
    * Allow to fetch a record "for update" which should lock it on read
@@ -207,9 +207,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private boolean forUpdate;
 
   /**
-   * Set to true if this query has been tuned by autoFetch.
+   * Set to true if this query has been tuned by autoTune.
    */
-  private boolean autoFetchTuned;
+  private boolean autoTuned;
 
   private boolean logSecondaryQuery;
 
@@ -228,7 +228,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private BeanPropertyAssocMany<?> lazyLoadForParentsProperty;
 
   /**
-   * Hash of final query after AutoFetch tuning.
+   * Hash of final query after AutoTune tuning.
    */
   private HashQueryPlan queryPlanHash;
 
@@ -477,13 +477,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   public DefaultOrmQuery<T> copy(EbeanServer server) {
-    // Not including these in the copy:
-    // contextAdditions
-    // queryListener
-    // transactionContext
-    // autoFetchTuned
-    // autoFetchQueryPlanHash
-    // copy.generatedSql
 
     DefaultOrmQuery<T> copy = new DefaultOrmQuery<T>(beanType, server, expressionFactory, (String) null);
     copy.name = name;
@@ -524,7 +517,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
     copy.persistenceContextScope = persistenceContextScope;
     copy.usageProfiling = usageProfiling;
-    copy.autoFetch = autoFetch;
+    copy.autoTune = autoTune;
     copy.parentNode = parentNode;
     copy.forUpdate = forUpdate;
     copy.rawSql = rawSql;
@@ -602,24 +595,24 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return detail.isEmpty();
   }
 
-  public boolean isAutofetchTuned() {
-    return autoFetchTuned;
+  public boolean isAutoTuned() {
+    return autoTuned;
   }
 
-  public void setAutoFetchTuned(boolean autoFetchTuned) {
-    this.autoFetchTuned = autoFetchTuned;
+  public void setAutoTuned(boolean autoTuned) {
+    this.autoTuned = autoTuned;
   }
 
-  public Boolean isAutofetch() {
-    return sqlSelect ? Boolean.FALSE : autoFetch;
+  public Boolean isAutoTune() {
+    return sqlSelect ? Boolean.FALSE : autoTune;
   }
 
   public boolean isForUpdate() {
     return forUpdate;
   }
 
-  public DefaultOrmQuery<T> setAutofetch(boolean autoFetch) {
-    this.autoFetch = autoFetch;
+  public DefaultOrmQuery<T> setAutoTune(boolean autoTune) {
+    this.autoTune = autoTune;
     return this;
   }
 
@@ -721,7 +714,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   /**
-   * Calculate the query hash for either AutoFetch query tuning or Query Plan caching.
+   * Calculate the query hash for either AutoTune query tuning or Query Plan caching.
    */
   private HashQueryPlan calculateHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
 
@@ -732,7 +725,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
 
     builder.add((type == null ? 0 : type.ordinal() + 1));
-    builder.add(autoFetchTuned).add(distinct).add(sqlDistinct).add(query);
+    builder.add(autoTuned).add(distinct).add(sqlDistinct).add(query);
     builder.add(firstRow).add(maxRows).add(orderBy).add(forUpdate);
     builder.add(rawWhereClause).add(additionalWhere).add(additionalHaving);
     builder.add(mapKey);
@@ -752,13 +745,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
 
     if (request == null) {
-      // for AutoFetch...
+      // for AutoTune...
       builder.add(true);
       if (whereExpressions != null) {
-        whereExpressions.queryAutoFetchHash(builder);
+        whereExpressions.queryAutoTuneHash(builder);
       }
       if (havingExpressions != null) {
-        havingExpressions.queryAutoFetchHash(builder);
+        havingExpressions.queryAutoTuneHash(builder);
       }
 
     } else {
@@ -776,10 +769,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   /**
-   * Calculate a hash used by AutoFetch to identify when a query has changed (and hence potentially
+   * Calculate a hash used by AutoTune to identify when a query has changed (and hence potentially
    * needs a new tuned query plan to be developed).
    */
-  public HashQueryPlan queryAutofetchHash(HashQueryPlanBuilder builder) {
+  public HashQueryPlan queryAutoTuneHash(HashQueryPlanBuilder builder) {
 
     return calculateHash(null, builder);
   }
@@ -790,7 +783,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * This can used to enable the caching and reuse of a 'query plan'.
    * </p>
    * <p>
-   * This is calculated AFTER AutoFetch query tuning has occurred.
+   * This is calculated AFTER AutoTune query tuning has occurred.
    * </p>
    */
   public HashQueryPlan queryPlanHash(BeanQueryRequest<?> request) {
@@ -824,7 +817,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * </p>
    */
   public HashQuery queryHash() {
-    // calculateQueryPlanHash is called just after potential AutoFetch tuning
+    // calculateQueryPlanHash is called just after potential AutoTune tuning
     // so queryPlanHash is calculated well before this method is called
     int hc = queryBindHash();
 

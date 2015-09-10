@@ -27,10 +27,10 @@ public class ExistsExpression implements SpiExpression {
     this.not = not;
   }
 
-  public void queryAutoFetchHash(HashQueryPlanBuilder builder) {
+  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
     builder.add(ExistsExpression.class).add(not);
 
-    subQuery.queryAutofetchHash(builder);
+    subQuery.queryAutoTuneHash(builder);
   }
 
   public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
@@ -39,7 +39,7 @@ public class ExistsExpression implements SpiExpression {
     // ... so compiledQuery will exist
     compiledSubQuery = compileSubQuery(request);
 
-    queryAutoFetchHash(builder);
+    queryAutoTuneHash(builder);
   }
 
   /**

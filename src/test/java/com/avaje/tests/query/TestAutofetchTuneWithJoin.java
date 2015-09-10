@@ -27,7 +27,7 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> q = Ebean.find(Order.class)
-        .setAutofetch(true)
+        .setAutoTune(true)
         //.fetch("customer")
         //.fetch("customer.contacts")
         .where().lt("id", 3).query();
@@ -65,7 +65,7 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
     // System.out.println(queryStats);
     // }
 
-    if (q.isAutofetchTuned()) {
+    if (q.isAutoTuned()) {
       System.out.println("TUNED...");
     }
   }
