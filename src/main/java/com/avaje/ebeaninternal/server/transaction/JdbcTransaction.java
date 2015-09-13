@@ -725,7 +725,7 @@ public class JdbcTransaction implements SpiTransaction {
 
   @Override
   public void logSql(String msg) {
-    TransactionManager.SQL_LOGGER.trace(Str.add(logPrefix, msg));
+    TransactionManager.SQL_LOGGER.debug(Str.add(logPrefix, msg));
   }
 
   @Override
