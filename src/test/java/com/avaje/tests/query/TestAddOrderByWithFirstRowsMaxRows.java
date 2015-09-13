@@ -50,6 +50,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
 
     assertThat(loggedSql).hasSize(1);
+    assertThat(loggedSql.get(0)).contains("order by t0.id");
   }
 
 
@@ -70,6 +71,25 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).contains("order by t0.id");
+  }
+
+  @Test
+  public void test_maxRows1() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    // maxRows 1 with no first rows means Ebean does not automatically
+    // add the order by id to the query
+    Ebean.find(Order.class)
+        .setMaxRows(1)
+        .findList();
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+
+    assertThat(loggedSql).hasSize(1);
+    assertThat(loggedSql.get(0)).doesNotContain("order by t0.id");
   }
 
   @Test
@@ -106,5 +126,43 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).contains("order by t0.id");
+  }
+
+
+  @Test
+  public void test_pagingAppendToExistingOrderBy() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Ebean.find(Order.class)
+        .order().asc("orderDate")
+        .findPagedList(0, 10)
+        .getList();
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+
+    assertThat(loggedSql).hasSize(1);
+    assertThat(loggedSql.get(0)).contains("order by t0.order_date, t0.id");
+  }
+
+  @Test
+  public void test_pagingExistingOrderByWithId() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    Ebean.find(Order.class)
+        .order().asc("orderDate")
+        .order().desc("id")
+        .findPagedList(0, 10)
+        .getList();
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+
+    assertThat(loggedSql).hasSize(1);
+    assertThat(loggedSql.get(0)).contains("order by t0.order_date, t0.id desc");
   }
 }

@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.ValuePair;
@@ -2095,6 +2096,26 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     }
     for (int i = 0; i < propertiesEmbedded.length; i++) {
       propertiesEmbedded[i].diff(prefix, map, newBean, oldBean);
+    }
+  }
+
+  /**
+   * Appends the Id property to the OrderBy clause if it is not believed
+   * to be already contained in the order by.
+   * <p>
+   * This is primarily used for paging queries to ensure that an order by clause is provided and that the order by
+   * provides unique ordering of the rows (so that the paging is predicable).
+   * </p>
+   */
+  public void appendOrderById(SpiQuery<T> query) {
+
+    if (idProperty != null) {
+      OrderBy<T> orderBy = query.getOrderBy();
+      if (orderBy == null || orderBy.isEmpty()) {
+        query.order().asc(idProperty.getName());
+      } else if (!orderBy.containsProperty(idProperty.getName())){
+        query.order().asc(idProperty.getName());
+      }
     }
   }
 

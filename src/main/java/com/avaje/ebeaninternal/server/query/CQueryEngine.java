@@ -277,6 +277,14 @@ public class CQueryEngine {
    */
   public <T> BeanCollection<T> findMany(OrmQueryRequest<T> request) {
 
+
+    SpiQuery<T> query = request.getQuery();
+    if (query.getMaxRows() > 1 || query.getFirstRow() > 0) {
+      // deemed to be a be a paging query - check that the order by contains
+      // the id property to ensure unique row ordering for predicable paging
+      request.getBeanDescriptor().appendOrderById(query);
+    }
+
     CQuery<T> cquery = queryBuilder.buildQuery(request);
     request.setCancelableQuery(cquery);
 
@@ -293,7 +301,7 @@ public class CQueryEngine {
 
       BeanCollection<T> beanCollection = cquery.readCollection();
 
-      BeanCollectionTouched collectionTouched = request.getQuery().getBeanCollectionTouched();
+      BeanCollectionTouched collectionTouched = query.getBeanCollectionTouched();
       if (collectionTouched != null) {
         // register a listener that wants to be notified when the
         // bean collection is first used
@@ -319,7 +327,7 @@ public class CQueryEngine {
       if (cquery != null) {
         cquery.close();
       }
-      if (request.getQuery().isFutureFetch()) {
+      if (query.isFutureFetch()) {
         // end the transaction for futureFindIds
         // as it had it's own transaction
         logger.debug("Future fetch completed!");

@@ -28,7 +28,7 @@ public final class OrderBy<T> implements Serializable {
    * Create an empty OrderBy with no associated query.
    */
   public OrderBy() {
-    this.list = new ArrayList<Property>(2);
+    this.list = new ArrayList<Property>(3);
   }
   
   private OrderBy(List<Property> list) {
@@ -52,7 +52,7 @@ public final class OrderBy<T> implements Serializable {
    */
   public OrderBy(Query<T> query, String orderByClause) {
     this.query = query;
-    this.list = new ArrayList<Property>(2);
+    this.list = new ArrayList<Property>(3);
     parse(orderByClause);
   }
 
@@ -81,6 +81,19 @@ public final class OrderBy<T> implements Serializable {
 
     list.add(new Property(propertyName, false));
     return query;
+  }
+
+  /**
+   * Return true if the property is known to be contained in the order by clause.
+   */
+  public boolean containsProperty(String propertyName) {
+
+    for (int i = 0; i < list.size(); i++) {
+      if (propertyName.equals(list.get(i).getProperty())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
