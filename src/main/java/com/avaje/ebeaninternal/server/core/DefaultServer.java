@@ -1362,8 +1362,15 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction, int pageIndex, int pageSize) {
-    
-    return new LimitOffsetPagedList<T>(this, (SpiQuery<T>)query, pageIndex, pageSize);
+
+    SpiQuery spiQuery = (SpiQuery<T>)query;
+    OrderBy orderBy = spiQuery.getOrderBy();
+    if (orderBy == null || orderBy.isEmpty()) {
+      // add a default order by for paging queries
+      BeanDescriptor<T> desc = beanDescriptorManager.getBeanDescriptor(spiQuery.getBeanType());
+      query.orderBy(desc.getDefaultOrderBy());
+    }
+    return new LimitOffsetPagedList<T>(this, spiQuery, pageIndex, pageSize);
   }
 
   public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction t) {

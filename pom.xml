@@ -113,6 +113,20 @@
       <scope>provided</scope>
     </dependency>
 
+    <!--<dependency>-->
+      <!--<groupId>oracle</groupId>-->
+      <!--<artifactId>oracle-jdbc</artifactId>-->
+      <!--<version>7.0</version>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+
+    <!--<dependency>-->
+      <!--<groupId>microsoft</groupId>-->
+      <!--<artifactId>sqlserver-jdbc</artifactId>-->
+      <!--<version>4.2</version>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+
     <dependency>
       <groupId>com.squareup.okhttp</groupId>
       <artifactId>okhttp</artifactId>
