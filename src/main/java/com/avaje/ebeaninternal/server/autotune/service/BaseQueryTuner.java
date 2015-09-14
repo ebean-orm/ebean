@@ -11,6 +11,7 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 
 import javax.persistence.PersistenceException;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -166,5 +167,12 @@ public class BaseQueryTuner {
           throw new PersistenceException("Invalid AutoTuneMode " + mode);
       }
     }
+  }
+
+  /**
+   * Return the keys as a set.
+   */
+  public Set<String> keySet() {
+    return tunedQueryInfoMap.keySet();
   }
 }

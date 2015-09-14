@@ -26,16 +26,12 @@ public final class CallStack implements Serializable {
 
   private final StackTraceElement[] callStack;
 
-  public CallStack(StackTraceElement[] callStack) {
+  public CallStack(StackTraceElement[] callStack, int zeroHash, int pathHash) {
     this.callStack = callStack;
-    this.zeroHash = enc(callStack[0].hashCode());
-    int hc = 0;
-    for (int i = 1; i < callStack.length; i++) {
-      hc = 31 * hc + callStack[i].hashCode();
-    }
-    this.pathHash = enc(hc);
+    this.zeroHash = enc(zeroHash);
+    this.pathHash = enc(pathHash);
   }
-  
+
   public int hashCode() {
     int hc = 0;
     for (int i = 0; i < callStack.length; i++) {
@@ -99,7 +95,7 @@ public final class CallStack implements Serializable {
   }
 
   public String getOriginKey(int queryHash) {
-    return zeroHash + "." + enc(queryHash) + "." + pathHash;
+    return enc(queryHash)+ "." + zeroHash + "." + pathHash;
   }
 
   private static final int radix = 1 << 6;

@@ -11,6 +11,7 @@
         <xsd:element ref="origin" minOccurs="0" maxOccurs="unbounded"/>
         <xsd:element ref="profileDiff" minOccurs="0" maxOccurs="1"/>
         <xsd:element ref="profileNew" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="profileEmpty" minOccurs="0" maxOccurs="1"/>
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
@@ -36,6 +37,14 @@
   </xsd:element>
 
   <xsd:element name="profileNew">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="origin" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="profileEmpty">
     <xsd:complexType>
       <xsd:sequence>
         <xsd:element ref="origin" minOccurs="0" maxOccurs="unbounded"/>

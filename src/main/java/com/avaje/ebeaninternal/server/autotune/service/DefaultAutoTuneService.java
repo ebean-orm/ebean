@@ -10,6 +10,7 @@ import com.avaje.ebeaninternal.server.autotune.AutoTuneService;
 import com.avaje.ebeaninternal.server.autotune.model.Autotune;
 import com.avaje.ebeaninternal.server.autotune.model.Origin;
 import com.avaje.ebeaninternal.server.autotune.model.ProfileDiff;
+import com.avaje.ebeaninternal.server.autotune.model.ProfileEmpty;
 import com.avaje.ebeaninternal.server.autotune.model.ProfileNew;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetailParser;
@@ -22,7 +23,9 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -105,14 +108,31 @@ public class DefaultAutoTuneService implements AutoTuneService {
     AtomicInteger newCounter = new AtomicInteger();
     AtomicInteger diffCounter = new AtomicInteger();
 
+    Set<String> profileKeys = new HashSet<String>();
     for (AutoTuneCollection.Entry entry : entries) {
       saveProfilingEntry(document, entry, newCounter, diffCounter);
+      profileKeys.add(entry.getOrigin().getKey());
+    }
+
+    // report the origin keys that we didn't collect any profiling on
+    Set<String> tunerKeys = queryTuner.keySet();
+    for (String tuneKey : tunerKeys) {
+      if (!profileKeys.contains(tuneKey)) {
+        ProfileEmpty profileEmpty = document.getProfileEmpty();
+        if (profileEmpty == null) {
+          profileEmpty = new ProfileEmpty();
+          document.setProfileEmpty(profileEmpty);
+        }
+        Origin emptyOrigin = new Origin();
+        emptyOrigin.setKey(tuneKey);
+        profileEmpty.getOrigin().add(emptyOrigin);
+      }
     }
 
     int totalNew = newCounter.get();
     int totalDiff = diffCounter.get();
     if (totalNew == 0 && totalDiff == 0) {
-      logger.debug("No new or diff entries for profiling server:{}", serverName);
+      logger.info("No new or diff entries for profiling server:{}", serverName);
 
     } else {
       sortDocument(document);
@@ -125,7 +145,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
       AutoTuneXmlWriter writer = new AutoTuneXmlWriter();
       writer.write(document, file);
 
-      logger.debug("writing new:{} diff:{} profiling entries for server:{}", totalNew, totalDiff, serverName);
+      logger.info("writing new:{} diff:{} profiling entries for server:{}", totalNew, totalDiff, serverName);
     }
   }
 
@@ -142,6 +162,10 @@ public class DefaultAutoTuneService implements AutoTuneService {
     if (profileNew != null) {
       Collections.sort(profileNew.getOrigin(), new OriginNameKeySort());
     }
+    ProfileEmpty profileEmpty = document.getProfileEmpty();
+    if (profileEmpty != null) {
+      Collections.sort(profileEmpty.getOrigin(), new OriginKeySort());
+    }
   }
 
   /**
@@ -156,6 +180,17 @@ public class DefaultAutoTuneService implements AutoTuneService {
         comp = o1.getKey().compareTo(o2.getKey());
       }
       return comp;
+    }
+  }
+
+  /**
+   * Comparator sort by bean type then key.
+   */
+  class OriginKeySort implements Comparator<Origin> {
+
+    @Override
+    public int compare(Origin o1, Origin o2) {
+      return o1.getKey().compareTo(o2.getKey());
     }
   }
 

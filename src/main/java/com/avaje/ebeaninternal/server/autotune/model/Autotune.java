@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/autotune}origin" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/autotune}profileDiff" minOccurs="0"/>
  *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/autotune}profileNew" minOccurs="0"/>
+ *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/autotune}profileEmpty" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -34,7 +35,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
     "origin",
     "profileDiff",
-    "profileNew"
+    "profileNew",
+    "profileEmpty"
 })
 @XmlRootElement(name = "autotune")
 public class Autotune {
@@ -42,6 +44,7 @@ public class Autotune {
     protected List<Origin> origin;
     protected ProfileDiff profileDiff;
     protected ProfileNew profileNew;
+    protected ProfileEmpty profileEmpty;
 
     /**
      * Gets the value of the origin property.
@@ -118,6 +121,30 @@ public class Autotune {
      */
     public void setProfileNew(ProfileNew value) {
         this.profileNew = value;
+    }
+
+    /**
+     * Gets the value of the profileEmpty property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link ProfileEmpty }
+     *     
+     */
+    public ProfileEmpty getProfileEmpty() {
+        return profileEmpty;
+    }
+
+    /**
+     * Sets the value of the profileEmpty property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ProfileEmpty }
+     *     
+     */
+    public void setProfileEmpty(ProfileEmpty value) {
+        this.profileEmpty = value;
     }
 
 }

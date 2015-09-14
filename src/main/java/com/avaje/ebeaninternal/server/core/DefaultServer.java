@@ -93,8 +93,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private static final int IGNORE_LEADING_ELEMENTS = 5;
   
-  private static final String AVAJE_EBEAN = Ebean.class.getName().substring(0, 15);
-  
+  private static final String COM_AVAJE_EBEAN = "com.avaje.ebean";
+
+  private static final String ORG_AVAJE_EBEAN = "org.avaje.ebean";
+
   private final ServerConfig serverConfig;
   
   private final String serverName;
@@ -104,6 +106,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final TransactionManager transactionManager;
 
   private final TransactionScopeManager transactionScopeManager;
+
+  private final CallStackFactory callStackFactory = new DefaultCallStackFactory();
 
   private final int maxCallStack;
 
@@ -2030,7 +2034,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     // find the first non-avaje stackElement
     for (; startIndex < stackTrace.length; startIndex++) {
-      if (!stackTrace[startIndex].getClassName().startsWith(AVAJE_EBEAN)) {
+      if (!stackTrace[startIndex].getClassName().startsWith(COM_AVAJE_EBEAN)) {
+        break;
+      }
+    }
+    for (; startIndex < stackTrace.length; startIndex++) {
+      if (!stackTrace[startIndex].getClassName().startsWith(ORG_AVAJE_EBEAN)) {
         break;
       }
     }
@@ -2050,10 +2059,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       throw new RuntimeException("StackTraceElement size 0?  stack: " + Arrays.toString(stackTrace));
     }
 
-    return new CallStack(finalTrace);
+    return callStackFactory.createCallStack(finalTrace);
   }
 
-  
   @Override
   public JsonContext json() {
     // immutable thread safe so return shared instance

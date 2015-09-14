@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRegistry;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the com.avaje.ebeaninternal.server.autotune.model package.
+ * generated in the com.avaje.ebeaninternal.server.autotune.model package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -43,6 +43,14 @@ public class ObjectFactory {
      */
     public Origin createOrigin() {
         return new Origin();
+    }
+
+    /**
+     * Create an instance of {@link ProfileEmpty }
+     * 
+     */
+    public ProfileEmpty createProfileEmpty() {
+        return new ProfileEmpty();
     }
 
     /**
