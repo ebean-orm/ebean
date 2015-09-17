@@ -199,6 +199,18 @@ public final class OrderBy<T> implements Serializable {
   }
 
   /**
+   * Clear the orderBy removing any current order by properties.
+   * <p>
+   * This is intended to be used when some code creates a query with a
+   * 'default' order by clause and some other code may clear the 'default'
+   * order by clause and replace.
+   * </p>
+   */
+  public void clear() {
+    list.clear();
+  }
+
+  /**
    * A property and its ascending descending order.
    */
   public static final class Property implements Serializable {
