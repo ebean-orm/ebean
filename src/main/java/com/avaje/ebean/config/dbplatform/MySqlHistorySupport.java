@@ -5,5 +5,4 @@ package com.avaje.ebean.config.dbplatform;
  */
 public class MySqlHistorySupport extends DbViewHistorySupport {
 
-
 }
