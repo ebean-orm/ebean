@@ -5,6 +5,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.Version;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.tests.model.converstation.User;
 import org.junit.Test;
 
@@ -17,6 +18,13 @@ public class TestHistoryInsert extends BaseTestCase {
 
   @Test
   public void test() {
+
+    SpiEbeanServer defaultServer = (SpiEbeanServer)Ebean.getDefaultServer();
+    if (!"h2".equals(defaultServer.getDatabasePlatform().getName())) {
+      // Oracle for example uses total recall so we can select the explicit
+      // history tables as we do in this test
+      return;
+    }
 
     User user = new User();
     user.setName("Jim");
