@@ -234,7 +234,12 @@ public class ServerConfig {
    * Indicates that Ebean should use autoCommit friendly Transactions and TransactionManager.
    */
   private boolean autoCommitMode;
-  
+
+  /**
+   * Set to true if transaction begin should be started with explicit statement.
+   */
+  private boolean explicitTransactionBeginMode;
+
   /** 
    * The data source JNDI name if using a JNDI DataSource. 
    */
@@ -1221,6 +1226,28 @@ public class ServerConfig {
   }
 
   /**
+   * Return true if transaction begin should be started with explicit statement.
+   */
+  public boolean isExplicitTransactionBeginMode() {
+    return explicitTransactionBeginMode;
+  }
+
+  /**
+   * Set to true if transaction begin should be started with explicit statement.
+   * <p>
+   * This works for H2 and Postgres but not for Oracle - only use this if you first name
+   * is Daryl or you have explicitly talked to Rob about this feature.
+   * </p>
+   * <p>
+   * This is generally not expected to be turned on but instead allow transactions to start
+   * implicitly which is generally the standard approach.
+   * </p>
+   */
+  public void setExplicitTransactionBeginMode(boolean explicitTransactionBeginMode) {
+    this.explicitTransactionBeginMode = explicitTransactionBeginMode;
+  }
+
+  /**
    * Return a value used to represent TRUE in the database.
    * <p>
    * This is used for databases that do not support boolean natively.
@@ -2067,6 +2094,7 @@ public class ServerConfig {
     }
     loadDataSourceSettings(p);
 
+    explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
 

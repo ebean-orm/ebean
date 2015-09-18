@@ -39,6 +39,7 @@ import com.avaje.ebeaninternal.server.readaudit.DefaultReadAuditPrepare;
 import com.avaje.ebeaninternal.server.text.json.DJsonContext;
 import com.avaje.ebeaninternal.server.transaction.AutoCommitTransactionManager;
 import com.avaje.ebeaninternal.server.transaction.DefaultTransactionScopeManager;
+import com.avaje.ebeaninternal.server.transaction.ExplicitTransactionManager;
 import com.avaje.ebeaninternal.server.transaction.ExternalTransactionScopeManager;
 import com.avaje.ebeaninternal.server.transaction.JtaTransactionManager;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager;
@@ -219,6 +220,10 @@ public class InternalConfiguration {
    * Create the TransactionManager taking into account autoCommit mode.
    */
   private TransactionManager createTransactionManager() {
+
+    if (serverConfig.isExplicitTransactionBeginMode()) {
+      return new ExplicitTransactionManager(clusterManager, backgroundExecutor, serverConfig, beanDescriptorManager, this.getBootupClasses());
+    }
 
     if (isAutoCommitMode()) {
       return new AutoCommitTransactionManager(clusterManager, backgroundExecutor, serverConfig, beanDescriptorManager, this.getBootupClasses());
