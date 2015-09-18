@@ -10,6 +10,7 @@ public class H2Ddl extends PlatformDdl {
 
   public H2Ddl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
     super(platformTypes, dbIdentity);
+    this.historyDdl = new H2HistoryDdl();
   }
 
 }

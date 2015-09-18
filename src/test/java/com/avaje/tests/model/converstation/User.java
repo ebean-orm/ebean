@@ -4,8 +4,10 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.avaje.ebean.annotation.History;
 import com.avaje.tests.model.BaseModel;
 
+@History
 @Entity
 @Table(name="c_user")
 public class User extends BaseModel {

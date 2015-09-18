@@ -147,12 +147,14 @@
       <version>4.7.1</version>
       <scope>test</scope>
     </dependency>
-        
+
+    <!-- Provided scope so that the H2HistoryTrigger can live in Ebean core
+         and not require a separate module for it -->
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.182</version>
-      <scope>test</scope>
+      <version>1.4.189</version>
+      <scope>provided</scope>
     </dependency>
     
     <dependency>

@@ -55,7 +55,7 @@ public abstract class DbViewHistorySupport implements DbHistorySupport {
   public String getAsOfPredicate(String asOfTableAlias, String asOfSysPeriod) {
 
     // (sys_period_start < ? and (sys_period_end is null or sys_period_end > ?));
-    return "(" + asOfTableAlias + "." + asOfSysPeriod + "_start" + " < ? and (" + asOfTableAlias + "." + asOfSysPeriod + "_end" + " is null or " + asOfTableAlias + "." + asOfSysPeriod + "_end" + " > ?))";
+    return "(" + asOfTableAlias + "." + asOfSysPeriod + "_start" + " <= ? and (" + asOfTableAlias + "." + asOfSysPeriod + "_end" + " is null or " + asOfTableAlias + "." + asOfSysPeriod + "_end" + " > ?))";
   }
 
   /**
