@@ -264,6 +264,65 @@ public class DdlGenerator implements SpiEbeanPlugin {
   }
 
   /**
+   * Local utility used to detect the end of statements / separate statements.
+   * This is often just the semicolon character but for trigger/procedures this
+   * detects the $$ demarcation used in the history DDL generation for MySql and
+   * Postgres.
+   */
+  static class StatementsSeparator {
+
+    ArrayList<String> statements = new ArrayList<String>();
+
+    boolean inDbProcedure = false;
+
+    StringBuilder sb = new StringBuilder();
+
+    void lineContainsDollars(String line) {
+      if (inDbProcedure) {
+        endOfStatement(line);
+      } else {
+        sb.append(line).append(" ");
+      }
+      inDbProcedure = !inDbProcedure;
+    }
+
+    void endOfStatement(String line) {
+      // end of Db procedure
+      sb.append(line);
+      statements.add(sb.toString().trim());
+      sb = new StringBuilder();
+    }
+
+    void nextLine(String line) {
+
+      if (line.contains("$$")) {
+        lineContainsDollars(line);
+        return;
+      }
+
+      if (inDbProcedure) {
+        sb.append(line).append(" ");
+        return;
+      }
+
+      int semiPos = line.indexOf(';');
+      if (semiPos == -1) {
+        sb.append(line).append(" ");
+
+      } else if (semiPos == line.length() - 1) {
+        // semicolon at end of line
+        endOfStatement(line);
+
+      } else {
+        // semicolon in middle of line
+        String preSemi = line.substring(0, semiPos);
+        endOfStatement(preSemi);
+        sb.append(line.substring(semiPos + 1));
+      }
+    }
+  }
+
+  /**
    * Break up the sql in reader into a list of statements using the semi-colon
    * character;
    */
@@ -271,35 +330,16 @@ public class DdlGenerator implements SpiEbeanPlugin {
 
     try {
       BufferedReader br = new BufferedReader(reader);
+      StatementsSeparator statements = new StatementsSeparator();
 
-      ArrayList<String> statements = new ArrayList<String>();
-
-      StringBuilder sb = new StringBuilder();
       String s;
       while ((s = br.readLine()) != null) {
         s = s.trim();
-        int semiPos = s.indexOf(';');
-        if (semiPos == -1) {
-          sb.append(s).append(" ");
-
-        } else if (semiPos == s.length() - 1) {
-          // semicolon at end of line
-          sb.append(s);
-          statements.add(sb.toString().trim());
-          sb = new StringBuilder();
-
-        } else {
-          // semicolon in middle of line
-          String preSemi = s.substring(0, semiPos);
-          sb.append(preSemi);
-          statements.add(sb.toString().trim());
-          sb = new StringBuilder();
-          sb.append(s.substring(semiPos + 1));
-
-        }
+        statements.nextLine(s);
       }
 
-      return statements;
+      return statements.statements;
+
     } catch (IOException e) {
       throw new PersistenceException(e);
     }
