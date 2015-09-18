@@ -273,15 +273,24 @@ public class DdlGenerator implements SpiEbeanPlugin {
 
     ArrayList<String> statements = new ArrayList<String>();
 
-    boolean inDbProcedure = false;
+    boolean trimDelimiter;
+
+    boolean inDbProcedure;
 
     StringBuilder sb = new StringBuilder();
 
     void lineContainsDollars(String line) {
       if (inDbProcedure) {
+        if (trimDelimiter) {
+          line = line.replace("$$","");
+        }
         endOfStatement(line);
       } else {
-        sb.append(line).append(" ");
+        // MySql style delimiter needs to be trimmed/removed
+        trimDelimiter = line.equals("delimiter $$");
+        if (!trimDelimiter) {
+          sb.append(line).append(" ");
+        }
       }
       inDbProcedure = !inDbProcedure;
     }
