@@ -94,7 +94,7 @@ public class ParentRawSqlTest extends BaseTestCase {
   private void joinToInheritanceHierarchy() {
 
     RawSql rawSql = RawSqlBuilder
-        .unparsed("select u.id, u.name, p.type as ptype, p.id as pid from rawinherit_uncle u join rawinherit_parent p where p.id = u.parent_id")
+        .unparsed("select u.id, u.name, p.type as ptype, p.id as pid from rawinherit_uncle u join rawinherit_parent p on p.id = u.parent_id")
         .columnMapping("id", "id")
         .columnMapping("name", "name")
         .columnMapping("ptype", "parent.type")
@@ -113,7 +113,7 @@ public class ParentRawSqlTest extends BaseTestCase {
   private void joinToInheritanceHierarchy_withIgnore() {
 
     RawSql rawSql = RawSqlBuilder
-        .unparsed("select u.id, u.name, p.type as ptype, p.id as pid from rawinherit_uncle u join rawinherit_parent p where p.id = u.parent_id")
+        .unparsed("select u.id, u.name, p.type as ptype, p.id as pid from rawinherit_uncle u join rawinherit_parent p on p.id = u.parent_id")
         .columnMapping("id", "id")
         .columnMapping("name", "name")
         .columnMappingIgnore("ptype")
@@ -132,7 +132,7 @@ public class ParentRawSqlTest extends BaseTestCase {
   private void joinToInheritanceHierarchy_withAliasMapping() {
 
     RawSql rawSql = RawSqlBuilder
-        .parse("select u.id, u.name, p.type, p.id from rawinherit_uncle u join rawinherit_parent p where p.id = u.parent_id")
+        .parse("select u.id, u.name, p.type, p.id from rawinherit_uncle u join rawinherit_parent p on p.id = u.parent_id")
         .tableAliasMapping("p", "parent")
         .create();
 
