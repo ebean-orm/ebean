@@ -40,7 +40,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
         .endOfStatement();
 
     if (whenCreatedColumn != null) {
-      apply.append("update table ").append(baseTableName).append(" set ")
+      apply.append("update ").append(baseTableName).append(" set ")
           .append(sysPeriod).append(" = tstzrange(").append(whenCreatedColumn).append(", null)").endOfStatement();
     }
   }
