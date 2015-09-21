@@ -348,6 +348,12 @@ public interface ExpressionList<T> extends Serializable {
   /**
    * Path exists - for the given path in a JSON document.
    *
+   * <pre>{@code
+   *
+   *   where().jsonExists("content", "path.other")
+   *
+   * }</pre>
+   *
    * @param propertyName the property that holds a JSON document
    * @param path the nested path in the JSON document in dot notation
    */
@@ -355,6 +361,12 @@ public interface ExpressionList<T> extends Serializable {
 
   /**
    * Path does not exist - for the given path in a JSON document.
+   *
+   * <pre>{@code
+   *
+   *   where().jsonNotExists("content", "path.other")
+   *
+   * }</pre>
    *
    * @param propertyName the property that holds a JSON document
    * @param path the nested path in the JSON document in dot notation
@@ -364,38 +376,74 @@ public interface ExpressionList<T> extends Serializable {
   /**
    * Equal to expression for the value at the given path in the JSON document.
    *
+   * <pre>{@code
+   *
+   *   where().jsonEqualTo("content", "path.other", 34)
+   *
+   * }</pre>
+   *
    * @param propertyName the property that holds a JSON document
    * @param path the nested path in the JSON document in dot notation
-   * @param value the value used to test equality against the document path's value
+   * @param value the value used to test against the document path's value
    */
   ExpressionList<T> jsonEqualTo(String propertyName, String path, Object value);
 
   /**
    * Not Equal to - for the given path in a JSON document.
    *
+   * <pre>{@code
+   *
+   *   where().jsonNotEqualTo("content", "path.other", 34)
+   *
+   * }</pre>
+   *
    * @param propertyName the property that holds a JSON document
    * @param path the nested path in the JSON document in dot notation
-   * @param value the value used to test equality against the document path's value
+   * @param value the value used to test against the document path's value
    */
   ExpressionList<T> jsonNotEqualTo(String propertyName, String path, Object value);
 
   /**
    * Greater than - for the given path in a JSON document.
+   *
+   * <pre>{@code
+   *
+   *   where().jsonGreaterThan("content", "path.other", 34)
+   *
+   * }</pre>
    */
   ExpressionList<T> jsonGreaterThan(String propertyName, String path, Object val);
 
   /**
    * Greater than or equal to - for the given path in a JSON document.
+   *
+   * <pre>{@code
+   *
+   *   where().jsonGreaterOrEqual("content", "path.other", 34)
+   *
+   * }</pre>
    */
   ExpressionList<T> jsonGreaterOrEqual(String propertyName, String path, Object val);
 
   /**
    * Less than - for the given path in a JSON document.
+   *
+   * <pre>{@code
+   *
+   *   where().jsonLessThan("content", "path.other", 34)
+   *
+   * }</pre>
    */
   ExpressionList<T> jsonLessThan(String propertyName, String path, Object val);
 
   /**
    * Less than or equal to - for the given path in a JSON document.
+   *
+   * <pre>{@code
+   *
+   *   where().jsonLessOrEqualTo("content", "path.other", 34)
+   *
+   * }</pre>
    */
   ExpressionList<T> jsonLessOrEqualTo(String propertyName, String path, Object val);
 
