@@ -346,11 +346,65 @@ public interface ExpressionList<T> extends Serializable {
   ExpressionList<T> where();
 
   /**
+   * Path exists - for the given path in a JSON document.
+   *
+   * @param propertyName the property that holds a JSON document
+   * @param path the nested path in the JSON document in dot notation
+   */
+  ExpressionList<T> jsonExists(String propertyName, String path);
+
+  /**
+   * Path does not exist - for the given path in a JSON document.
+   *
+   * @param propertyName the property that holds a JSON document
+   * @param path the nested path in the JSON document in dot notation
+   */
+  ExpressionList<T> jsonNotExists(String propertyName, String path);
+
+  /**
+   * Equal to expression for the value at the given path in the JSON document.
+   *
+   * @param propertyName the property that holds a JSON document
+   * @param path the nested path in the JSON document in dot notation
+   * @param value the value used to test equality against the document path's value
+   */
+  ExpressionList<T> jsonEqualTo(String propertyName, String path, Object value);
+
+  /**
+   * Not Equal to - for the given path in a JSON document.
+   *
+   * @param propertyName the property that holds a JSON document
+   * @param path the nested path in the JSON document in dot notation
+   * @param value the value used to test equality against the document path's value
+   */
+  ExpressionList<T> jsonNotEqualTo(String propertyName, String path, Object value);
+
+  /**
+   * Greater than - for the given path in a JSON document.
+   */
+  ExpressionList<T> jsonGreaterThan(String propertyName, String path, Object val);
+
+  /**
+   * Greater than or equal to - for the given path in a JSON document.
+   */
+  ExpressionList<T> jsonGreaterOrEqual(String propertyName, String path, Object val);
+
+  /**
+   * Less than - for the given path in a JSON document.
+   */
+  ExpressionList<T> jsonLessThan(String propertyName, String path, Object val);
+
+  /**
+   * Less than or equal to - for the given path in a JSON document.
+   */
+  ExpressionList<T> jsonLessOrEqualTo(String propertyName, String path, Object val);
+
+  /**
    * Add an Expression to the list.
    * <p>
    * This returns the list so that add() can be chained.
    * </p>
-   * 
+   *
    * <pre>{@code
    *
    * Query<Customer> query = Ebean.find(Customer.class);

@@ -10,20 +10,6 @@ public class SimpleExpression extends AbstractExpression {
 
   private static final long serialVersionUID = -382881395755603790L;
 
-  enum Op {
-    EQ(" = ? "), NOT_EQ(" <> ? "), LT(" < ? "), LT_EQ(" <= ? "), GT(" > ? "), GT_EQ(" >= ? ");
-
-    final String exp;
-
-    Op(String exp) {
-      this.exp = exp;
-    }
-
-    public String bind() {
-      return exp;
-    }
-  }
-
   private final Op type;
 
   private final Object value;

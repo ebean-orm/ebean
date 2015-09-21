@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.api;
 
 import java.util.ArrayList;
 
+import com.avaje.ebeaninternal.server.core.JsonExpressionHandler;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
@@ -9,6 +10,11 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
  * Request object used for gathering expression sql and bind values.
  */
 public interface SpiExpressionRequest {
+
+  /**
+   * Return the DB specific JSON expression handler.
+   */
+  JsonExpressionHandler getJsonHander();
 
   /**
    * Parse the logical property name to the deployment name.

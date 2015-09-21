@@ -363,6 +363,78 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return hash;
   }
 
+  /**
+   * Path exists - for the given path in a JSON document.
+   */
+  @Override
+  public ExpressionList<T> jsonExists(String propertyName, String path) {
+    add(expr.jsonExists(propertyName, path));
+    return this;
+  }
+
+  /**
+   * Path does not exist - for the given path in a JSON document.
+   */
+  @Override
+  public ExpressionList<T> jsonNotExists(String propertyName, String path){
+    add(expr.jsonNotExists(propertyName, path));
+    return this;
+  }
+  
+  /**
+   * Equal to expression for the value at the given path in the JSON document.
+   */
+  @Override
+  public ExpressionList<T> jsonEqualTo(String propertyName, String path, Object value){
+    add(expr.jsonEqualTo(propertyName, path, value));
+    return this;
+  }
+
+  /**
+   * Not Equal to - for the given path in a JSON document.
+   */
+  @Override
+  public ExpressionList<T> jsonNotEqualTo(String propertyName, String path, Object val){
+    add(expr.jsonNotEqualTo(propertyName, path, val));
+    return this;
+  }
+
+  /**
+   * Greater than - for the given path in a JSON document.
+   */
+  @Override
+  public ExpressionList<T> jsonGreaterThan(String propertyName, String path, Object val){
+    add(expr.jsonGreaterThan(propertyName, path, val));
+    return this;
+  }
+
+  /**
+   * Greater than or equal to - for the given path in a JSON document.
+   */
+  @Override
+  public ExpressionList<T> jsonGreaterOrEqual(String propertyName, String path, Object val){
+    add(expr.jsonGreaterOrEqual(propertyName, path, val));
+    return this;
+  }
+
+  /**
+   * Less than - for the given path in a JSON document.
+   */
+  @Override
+  public ExpressionList<T> jsonLessThan(String propertyName, String path, Object val){
+    add(expr.jsonLessThan(propertyName, path, val));
+    return this;
+  }
+
+  /**
+   * Less than or equal to - for the given path in a JSON document.
+   */
+  @Override
+  public ExpressionList<T> jsonLessOrEqualTo(String propertyName, String path, Object val){
+    add(expr.jsonLessOrEqualTo(propertyName, path, val));
+    return this;
+  }
+
   @Override
   public ExpressionList<T> eq(String propertyName, Object value) {
     add(expr.eq(propertyName, value));

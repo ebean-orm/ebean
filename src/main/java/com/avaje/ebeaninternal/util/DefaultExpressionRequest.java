@@ -3,9 +3,11 @@ package com.avaje.ebeaninternal.util;
 import java.util.ArrayList;
 
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
+import com.avaje.ebeaninternal.server.core.JsonExpressionHandler;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.DeployParser;
+import com.avaje.ebeaninternal.server.persist.Binder;
 
 public class DefaultExpressionRequest implements SpiExpressionRequest {
 
@@ -19,18 +21,26 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
 
   private final DeployParser deployParser;
 
+  private final Binder binder;
+
   private int paramIndex;
 
-  public DefaultExpressionRequest(SpiOrmQueryRequest<?> queryRequest, DeployParser deployParser) {
+  public DefaultExpressionRequest(SpiOrmQueryRequest<?> queryRequest, DeployParser deployParser, Binder binder) {
     this.queryRequest = queryRequest;
     this.beanDescriptor = queryRequest.getBeanDescriptor();
     this.deployParser = deployParser;
+    this.binder = binder;
   }
 
   public DefaultExpressionRequest(BeanDescriptor<?> beanDescriptor) {
     this.beanDescriptor = beanDescriptor;
     this.queryRequest = null;
     this.deployParser = null;
+    this.binder = null;
+  }
+
+  public JsonExpressionHandler getJsonHander() {
+    return binder.getJsonExpressionHandler();
   }
 
   public String parseDeploy(String logicalProp) {

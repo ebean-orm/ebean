@@ -302,7 +302,7 @@ public class CQueryPredicates {
 
     SpiExpressionList<?> whereExp = query.getWhereExpressions();
     if (whereExp != null) {
-      DefaultExpressionRequest whereReq = new DefaultExpressionRequest(request, deployParser);
+      DefaultExpressionRequest whereReq = new DefaultExpressionRequest(request, deployParser, binder);
       whereExprBindValues = whereExp.buildBindValues(whereReq);
       if (buildSql) {
         whereExprSql = whereExp.buildSql(whereReq);
@@ -314,7 +314,7 @@ public class CQueryPredicates {
       OrmQueryProperties chunk = query.getDetail().getChunk(manyProperty.getName(), false);
       SpiExpressionList<?> filterMany = chunk.getFilterMany();
       if (filterMany != null) {
-        DefaultExpressionRequest filterReq = new DefaultExpressionRequest(request, deployParser);
+        DefaultExpressionRequest filterReq = new DefaultExpressionRequest(request, deployParser, binder);
         filterManyExprBindValues = filterMany.buildBindValues(filterReq);
         if (buildSql) {
           filterManyExprSql = filterMany.buildSql(filterReq);
@@ -325,7 +325,7 @@ public class CQueryPredicates {
     // having expression
     SpiExpressionList<?> havingExpr = query.getHavingExpressions();
     if (havingExpr != null) {
-      DefaultExpressionRequest havingReq = new DefaultExpressionRequest(request, deployParser);
+      DefaultExpressionRequest havingReq = new DefaultExpressionRequest(request, deployParser, binder);
       havingExprBindValues = havingExpr.buildBindValues(havingReq);
       if (buildSql) {
         havingExprSql = havingExpr.buildSql(havingReq);

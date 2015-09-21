@@ -37,6 +37,46 @@ import java.util.Map;
 public interface ExpressionFactory {
 
   /**
+   * Path exists - for the given path in a JSON document.
+   */
+  Expression jsonExists(String propertyName, String path);
+
+  /**
+   * Path does not exist - for the given path in a JSON document.
+   */
+  Expression jsonNotExists(String propertyName, String path);
+
+  /**
+   * Equal to - for the given path in a JSON document.
+   */
+  Expression jsonEqualTo(String propertyName, String path, Object val);
+
+  /**
+   * Not Equal to - for the given path in a JSON document.
+   */
+  Expression jsonNotEqualTo(String propertyName, String path, Object val);
+
+  /**
+   * Greater than - for the given path in a JSON document.
+   */
+  Expression jsonGreaterThan(String propertyName, String path, Object val);
+
+  /**
+   * Greater than or equal to - for the given path in a JSON document.
+   */
+  Expression jsonGreaterOrEqual(String propertyName, String path, Object val);
+
+  /**
+   * Less than - for the given path in a JSON document.
+   */
+  Expression jsonLessThan(String propertyName, String path, Object val);
+
+  /**
+   * Less than or equal to - for the given path in a JSON document.
+   */
+  Expression jsonLessOrEqualTo(String propertyName, String path, Object val);
+
+  /**
    * Equal To - property equal to the given value.
    */
   Expression eq(String propertyName, Object value);

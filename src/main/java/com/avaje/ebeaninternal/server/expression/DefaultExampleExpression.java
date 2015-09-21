@@ -211,7 +211,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
           // exclude the zero values typically to weed out
           // primitive int and long that initialise to 0
           if (includeZeros || !isZero(value)) {
-            list.add(new SimpleExpression(propName, SimpleExpression.Op.EQ, value));
+            list.add(new SimpleExpression(propName, Op.EQ, value));
           }
         }
       }

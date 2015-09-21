@@ -1,9 +1,5 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import com.avaje.ebean.ExampleExpression;
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.ExpressionFactory;
@@ -14,6 +10,10 @@ import com.avaje.ebean.Query;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiExpressionFactory;
 import com.avaje.ebeaninternal.api.SpiQuery;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Default Expression factory for creating standard expressions.
@@ -36,6 +36,38 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return "sql";
   }
 
+  public Expression jsonExists(String propertyName, String path) {
+    return new JsonPathExpression(propertyName, path, Op.EXISTS, null);
+  }
+
+  public Expression jsonNotExists(String propertyName, String path) {
+    return new JsonPathExpression(propertyName, path, Op.NOT_EXISTS, null);
+  }
+
+  public Expression jsonEqualTo(String propertyName, String path, Object val) {
+    return new JsonPathExpression(propertyName, path, Op.EQ, val);
+  }
+
+  public Expression jsonNotEqualTo(String propertyName, String path, Object val) {
+    return new JsonPathExpression(propertyName, path, Op.NOT_EQ, val);
+  }
+
+  public Expression jsonGreaterThan(String propertyName, String path, Object val) {
+    return new JsonPathExpression(propertyName, path, Op.GT, val);
+  }
+
+  public Expression jsonGreaterOrEqual(String propertyName, String path, Object val) {
+    return new JsonPathExpression(propertyName, path, Op.GT_EQ, val);
+  }
+
+  public Expression jsonLessThan(String propertyName, String path, Object val) {
+    return new JsonPathExpression(propertyName, path, Op.LT, val);
+  }
+
+  public Expression jsonLessOrEqualTo(String propertyName, String path, Object val) {
+    return new JsonPathExpression(propertyName, path, Op.LT_EQ, val);
+  }
+
   /**
    * Equal To - property equal to the given value.
    */
@@ -43,7 +75,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     if (value == null) {
       return equalsWithNullAsNoop ? NoopExpression.INSTANCE : isNull(propertyName);
     }
-    return new SimpleExpression(propertyName, SimpleExpression.Op.EQ, value);
+    return new SimpleExpression(propertyName, Op.EQ, value);
   }
 
   /**
@@ -53,7 +85,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     if (value == null) {
       return equalsWithNullAsNoop ? NoopExpression.INSTANCE : isNotNull(propertyName);
     }
-    return new SimpleExpression(propertyName, SimpleExpression.Op.NOT_EQ, value);
+    return new SimpleExpression(propertyName, Op.NOT_EQ, value);
   }
 
   /**
@@ -88,7 +120,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   public Expression gt(String propertyName, Object value) {
 
-    return new SimpleExpression(propertyName, SimpleExpression.Op.GT, value);
+    return new SimpleExpression(propertyName, Op.GT, value);
   }
 
   /**
@@ -97,7 +129,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   public Expression ge(String propertyName, Object value) {
 
-    return new SimpleExpression(propertyName, SimpleExpression.Op.GT_EQ, value);
+    return new SimpleExpression(propertyName, Op.GT_EQ, value);
   }
 
   /**
@@ -105,7 +137,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   public Expression lt(String propertyName, Object value) {
 
-    return new SimpleExpression(propertyName, SimpleExpression.Op.LT, value);
+    return new SimpleExpression(propertyName, Op.LT, value);
   }
 
   /**
@@ -113,7 +145,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   public Expression le(String propertyName, Object value) {
 
-    return new SimpleExpression(propertyName, SimpleExpression.Op.LT_EQ, value);
+    return new SimpleExpression(propertyName, Op.LT_EQ, value);
   }
 
   /**

@@ -10,6 +10,7 @@ import java.util.List;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebeaninternal.api.BindParams;
+import com.avaje.ebeaninternal.server.core.JsonExpressionHandler;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
@@ -30,13 +31,16 @@ public class Binder {
 
   private final boolean bindAsOfWithFromClause;
 
+  private final JsonExpressionHandler jsonExpressionHandler;
+
   /**
    * Set the PreparedStatement with which to bind variables to.
    */
-  public Binder(TypeManager typeManager, int asOfBindCount, boolean bindAsOfWithFromClause) {
+  public Binder(TypeManager typeManager, int asOfBindCount, boolean bindAsOfWithFromClause, JsonExpressionHandler jsonExpressionHandler) {
     this.typeManager = typeManager;
     this.asOfBindCount = asOfBindCount;
     this.bindAsOfWithFromClause = bindAsOfWithFromClause;
+    this.jsonExpressionHandler = jsonExpressionHandler;
   }
 
   /**
@@ -374,5 +378,12 @@ public class Binder {
       default:
         return false;
     }
+  }
+
+  /**
+   * Return the JsonExpressionHandler specific to the database.
+   */
+  public JsonExpressionHandler getJsonExpressionHandler() {
+    return jsonExpressionHandler;
   }
 }

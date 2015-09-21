@@ -209,11 +209,29 @@ public class InternalConfiguration {
    * For 'As Of' queries return the number of bind variables per predicate.
    */
   private Binder getBinder(TypeManager typeManager, DatabasePlatform databasePlatform) {
+
+    JsonExpressionHandler jsonHandler = getJsonExpressionHandler(databasePlatform);
+
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     if (historySupport == null) {
-      return new Binder(typeManager, 0, false);
+      return new Binder(typeManager, 0, false, jsonHandler);
     }
-    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isBindWithFromClause());
+    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isBindWithFromClause(), jsonHandler);
+  }
+
+  /**
+   * Return the JSON expression handler for the given database platform.
+   */
+  private JsonExpressionHandler getJsonExpressionHandler(DatabasePlatform databasePlatform) {
+
+    String name = databasePlatform.getName();
+    if ("postgres".equalsIgnoreCase(name)) {
+      return new PostgresJsonExpression();
+    }
+    if ("oracle".equalsIgnoreCase(name)) {
+      return new OracleJsonExpression();
+    }
+    return new NotSupportedJsonExpression();
   }
 
   /**
