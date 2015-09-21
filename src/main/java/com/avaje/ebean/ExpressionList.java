@@ -412,7 +412,7 @@ public interface ExpressionList<T> extends Serializable {
    *
    * }</pre>
    */
-  ExpressionList<T> jsonGreaterThan(String propertyName, String path, Object val);
+  ExpressionList<T> jsonGreaterThan(String propertyName, String path, Object value);
 
   /**
    * Greater than or equal to - for the given path in a JSON document.
@@ -423,7 +423,7 @@ public interface ExpressionList<T> extends Serializable {
    *
    * }</pre>
    */
-  ExpressionList<T> jsonGreaterOrEqual(String propertyName, String path, Object val);
+  ExpressionList<T> jsonGreaterOrEqual(String propertyName, String path, Object value);
 
   /**
    * Less than - for the given path in a JSON document.
@@ -434,7 +434,7 @@ public interface ExpressionList<T> extends Serializable {
    *
    * }</pre>
    */
-  ExpressionList<T> jsonLessThan(String propertyName, String path, Object val);
+  ExpressionList<T> jsonLessThan(String propertyName, String path, Object value);
 
   /**
    * Less than or equal to - for the given path in a JSON document.
@@ -445,7 +445,7 @@ public interface ExpressionList<T> extends Serializable {
    *
    * }</pre>
    */
-  ExpressionList<T> jsonLessOrEqualTo(String propertyName, String path, Object val);
+  ExpressionList<T> jsonLessOrEqualTo(String propertyName, String path, Object value);
 
   /**
    * Add an Expression to the list.
