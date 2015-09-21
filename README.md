@@ -5,7 +5,7 @@
 
 Ebean ORM
 ==============
-[http://ebean-orm.github.io/](http://ebean-orm.github.io/ "Ebean ORM's Website")
+[https://ebean-orm.github.io/](http://ebean-orm.github.io/ "Ebean ORM's Website")
 
 
 [Maven central - avaje-ebeanorm](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.avaje.ebeanorm%22%20AND%20a%3A%22avaje-ebeanorm%22 "maven central ebeanorm")
