@@ -44,28 +44,28 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new JsonPathExpression(propertyName, path, Op.NOT_EXISTS, null);
   }
 
-  public Expression jsonEqualTo(String propertyName, String path, Object val) {
-    return new JsonPathExpression(propertyName, path, Op.EQ, val);
+  public Expression jsonEqualTo(String propertyName, String path, Object value) {
+    return new JsonPathExpression(propertyName, path, Op.EQ, value);
   }
 
-  public Expression jsonNotEqualTo(String propertyName, String path, Object val) {
-    return new JsonPathExpression(propertyName, path, Op.NOT_EQ, val);
+  public Expression jsonNotEqualTo(String propertyName, String path, Object value) {
+    return new JsonPathExpression(propertyName, path, Op.NOT_EQ, value);
   }
 
-  public Expression jsonGreaterThan(String propertyName, String path, Object val) {
-    return new JsonPathExpression(propertyName, path, Op.GT, val);
+  public Expression jsonGreaterThan(String propertyName, String path, Object value) {
+    return new JsonPathExpression(propertyName, path, Op.GT, value);
   }
 
-  public Expression jsonGreaterOrEqual(String propertyName, String path, Object val) {
-    return new JsonPathExpression(propertyName, path, Op.GT_EQ, val);
+  public Expression jsonGreaterOrEqual(String propertyName, String path, Object value) {
+    return new JsonPathExpression(propertyName, path, Op.GT_EQ, value);
   }
 
-  public Expression jsonLessThan(String propertyName, String path, Object val) {
-    return new JsonPathExpression(propertyName, path, Op.LT, val);
+  public Expression jsonLessThan(String propertyName, String path, Object value) {
+    return new JsonPathExpression(propertyName, path, Op.LT, value);
   }
 
-  public Expression jsonLessOrEqualTo(String propertyName, String path, Object val) {
-    return new JsonPathExpression(propertyName, path, Op.LT_EQ, val);
+  public Expression jsonLessOrEqualTo(String propertyName, String path, Object value) {
+    return new JsonPathExpression(propertyName, path, Op.LT_EQ, value);
   }
 
   public Expression jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue) {
