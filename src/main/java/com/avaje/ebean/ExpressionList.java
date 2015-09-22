@@ -448,6 +448,17 @@ public interface ExpressionList<T> extends Serializable {
   ExpressionList<T> jsonLessOrEqualTo(String propertyName, String path, Object value);
 
   /**
+   * Between - for the given path in a JSON document.
+   *
+   * <pre>{@code
+   *
+   *   where().jsonBetween("content", "orderDate", lowerDateTime, upperDateTime)
+   *
+   * }</pre>
+   */
+  ExpressionList<T> jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue);
+
+  /**
    * Add an Expression to the list.
    * <p>
    * This returns the list so that add() can be chained.

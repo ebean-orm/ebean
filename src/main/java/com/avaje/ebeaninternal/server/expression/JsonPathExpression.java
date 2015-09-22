@@ -30,11 +30,31 @@ class JsonPathExpression extends AbstractExpression {
    */
   protected final Object value;
 
+  /**
+   * For Between this is the upper bind value.
+   */
+  protected final Object upperValue;
+
+  /**
+   * Construct for Operator (not BETWEEN though).
+   */
   JsonPathExpression(String propertyName, String path, Op operator, Object value) {
     super(propertyName);
     this.path = path;
     this.operator = operator;
     this.value = value;
+    this.upperValue = null;
+  }
+
+  /**
+   * Construct for BETWEEN expression.
+   */
+  JsonPathExpression(String propertyName, String path, Object value, Object upperValue) {
+    super(propertyName);
+    this.path = path;
+    this.operator = Op.BETWEEN;
+    this.value = value;
+    this.upperValue = upperValue;
   }
 
   @Override
@@ -49,7 +69,9 @@ class JsonPathExpression extends AbstractExpression {
 
   @Override
   public int queryBindHash() {
-    return (value == null) ? 0 : value.hashCode();
+    int hc = (value == null) ? 0 : value.hashCode();
+    hc = (upperValue == null) ? hc : hc * 31 + upperValue.hashCode();
+    return hc;
   }
 
   @Override
@@ -63,7 +85,12 @@ class JsonPathExpression extends AbstractExpression {
   public void addBindValues(SpiExpressionRequest request) {
 
     if (value != null) {
+      // value is null for EXISTS/NOT EXISTS
       request.addBindValue(value);
+    }
+    if (upperValue != null) {
+      // upperValue only for BETWEEN operator
+      request.addBindValue(upperValue);
     }
   }
 }

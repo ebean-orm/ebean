@@ -16,6 +16,11 @@ public enum Op {
   NOT_EXISTS(" is null "),
 
   /**
+   * Between (JSON).
+   */
+  BETWEEN(" between ? and ? "),
+
+  /**
    * Equal to
    */
   EQ(" = ? "),

@@ -377,6 +377,14 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     return exprList.jsonLessOrEqualTo(propertyName, path, val);
   }
 
+  /**
+   * Between - for the given path in a JSON document.
+   */
+  @Override
+  public ExpressionList<T> jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue){
+    return exprList.jsonBetween(propertyName, path, lowerValue, upperValue);
+  }
+
   @Override
   public ExpressionList<T> ge(String propertyName, Object value) {
     return exprList.ge(propertyName, value);

@@ -77,6 +77,11 @@ public interface ExpressionFactory {
   Expression jsonLessOrEqualTo(String propertyName, String path, Object val);
 
   /**
+   * Between - for the given path in a JSON document.
+   */
+  Expression jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue);
+
+  /**
    * Equal To - property equal to the given value.
    */
   Expression eq(String propertyName, Object value);

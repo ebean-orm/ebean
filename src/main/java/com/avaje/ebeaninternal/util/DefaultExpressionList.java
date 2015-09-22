@@ -435,6 +435,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return this;
   }
 
+  /**
+   * Between - for the given path in a JSON document.
+   */
+  @Override
+  public ExpressionList<T> jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue){
+    add(expr.jsonBetween(propertyName, path, lowerValue, upperValue));
+    return this;
+  }
+
   @Override
   public ExpressionList<T> eq(String propertyName, Object value) {
     add(expr.eq(propertyName, value));

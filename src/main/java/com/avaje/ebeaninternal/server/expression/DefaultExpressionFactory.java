@@ -68,6 +68,10 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new JsonPathExpression(propertyName, path, Op.LT_EQ, val);
   }
 
+  public Expression jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue) {
+    return new JsonPathExpression(propertyName, path, lowerValue, upperValue);
+  }
+
   /**
    * Equal To - property equal to the given value.
    */
