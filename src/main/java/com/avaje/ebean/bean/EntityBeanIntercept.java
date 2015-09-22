@@ -449,7 +449,18 @@ public final class EntityBeanIntercept implements Serializable {
   public int getPropertyLength() {
     return owner._ebean_getPropertyNames().length;
   }
-  
+
+  /**
+   * Set the loaded state of the property given it's name.
+   */
+  public void setPropertyLoaded(String propertyName, boolean loaded) {
+    int position = findProperty(propertyName);
+    if (position == -1) {
+      throw new IllegalArgumentException("Property "+propertyName+" not found");
+    }
+    loadedProps[position] = loaded;
+  }
+
   /**
    * Set the property to be treated as unloaded. Used for properties initialised in default
    * constructor.

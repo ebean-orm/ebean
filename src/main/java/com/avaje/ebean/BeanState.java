@@ -39,6 +39,33 @@ public interface BeanState {
   void setDisableLazyLoad(boolean disableLazyLoading);
 
   /**
+   * Set the loaded state of the property given it's name.
+   *
+   * <p>
+   *   Typically this would be used to set the loaded state of a property
+   *   to false to ensure that the specific property is excluded from a
+   *   stateless update.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *   // populate a bean via say JSON
+   *   User user = ...;
+   *
+   *   // set loaded state on the email property to false so that
+   *   // the email property is not included in a stateless update
+   *   Ebean.getBeanState(user).setPropertyLoaded("email", false);
+   *
+   *   user.update();
+   *
+   * }</pre>
+   *
+   *
+   * This will throw an IllegalArgumentException if the property is unknown.
+   */
+  void setPropertyLoaded(String propertyName, boolean loaded);
+
+  /**
    * For partially populated beans returns the properties that are loaded on the
    * bean.
    * <p>

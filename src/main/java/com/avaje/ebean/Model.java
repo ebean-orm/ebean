@@ -1,5 +1,6 @@
 package com.avaje.ebean;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebean.util.ClassUtil;
 import org.jetbrains.annotations.Nullable;
@@ -193,7 +194,31 @@ public abstract class Model {
   public void markAsDirty() {
     db().markAsDirty(this);
   }
-  
+
+  /**
+   * Mark the property as unset or 'not loaded'.
+   * <p>
+   *   This would be used to specify a property that we did not wish to include in a stateless update.
+   * </p>
+   * <pre>{@code
+   *
+   *   // populate an entity bean from JSON or whatever
+   *   User user = ...;
+   *
+   *   // mark the email property as 'unset' so that it is not
+   *   // included in a 'stateless update'
+   *   user.markPropertyUnset("email");
+   *
+   *   user.update();
+   *
+   * }</pre>
+   *
+   * @param propertyName the name of the property on the bean to be marked as 'unset'
+   */
+  public void markPropertyUnset(String propertyName) {
+    ((EntityBean)this)._ebean_getIntercept().setPropertyLoaded(propertyName, false);
+  }
+
   /**
    * Insert or update this entity depending on its state.
    * 

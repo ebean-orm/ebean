@@ -1,13 +1,13 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.beans.PropertyChangeListener;
-import java.util.Map;
-import java.util.Set;
-
 import com.avaje.ebean.BeanState;
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
+
+import java.beans.PropertyChangeListener;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Default implementation of BeanState.
@@ -23,9 +23,13 @@ public class DefaultBeanState implements BeanState {
 		this.intercept = entityBean._ebean_getIntercept();
 	}
 
-	public boolean isReference() {
-		return intercept.isReference();
-	}
+  public void setPropertyLoaded(String propertyName, boolean loaded) {
+    intercept.setPropertyLoaded(propertyName, loaded);
+  }
+
+  public boolean isReference() {
+    return intercept.isReference();
+  }
 
 	public boolean isNew() {
 		return intercept.isNew();
