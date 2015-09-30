@@ -45,13 +45,29 @@ public class DbConstraintNaming {
   protected String ckPrefix = "ck_";
   protected String ckSuffix = "";
 
-  protected boolean lowerCaseNames = true;
-
   protected MaxLength maxLength;
 
-  protected DbConstraintNormalise normalise = new DbConstraintNormalise();
+  protected DbConstraintNormalise normalise;
 
+  /**
+   * Construct using default of lower case for both table and column names.
+   */
   public DbConstraintNaming() {
+    this(true, true);
+  }
+
+  /**
+   * Construct specifying if lower case should be used (for both table and column names).
+   */
+  public DbConstraintNaming(boolean lowerCase) {
+    this(lowerCase, lowerCase);
+  }
+
+  /**
+   * Construct specifying if lower case should be used for both table and column names.
+   */
+  public DbConstraintNaming(boolean lowerCaseTableNames, boolean lowerCaseColumnNames) {
+    this.normalise = new DbConstraintNormalise(lowerCaseTableNames, lowerCaseColumnNames);
   }
 
   /**
@@ -167,7 +183,6 @@ public class DbConstraintNaming {
    * quoted identifier characters (",',[,] etc).
    */
   public String normaliseTable(String tableName) {
-
     return normalise.normaliseTable(tableName);
   }
 
@@ -175,18 +190,20 @@ public class DbConstraintNaming {
    * Normalise the column name by removing any quoted identifier characters (",',[,] etc).
    */
   public String normaliseColumn(String tableName) {
-
     return normalise.normaliseColumn(tableName);
   }
 
   /**
-   * Lower case the table or column name checking for quoted identifiers.
+   * Lower case the table name checking for quoted identifiers.
    */
-  public String lowerName(String tableName) {
-    if (lowerCaseNames && normalise.notQuoted(tableName)) {
-      return tableName.toLowerCase();
-    }
-    return tableName;
+  public String lowerTableName(String tableName) {
+    return normalise.lowerTableName(tableName);
   }
 
+  /**
+   * Lower case the column name checking for quoted identifiers.
+   */
+  public String lowerColumnName(String name) {
+    return normalise.lowerColumnName(name);
+  }
 }

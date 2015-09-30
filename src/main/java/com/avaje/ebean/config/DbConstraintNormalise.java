@@ -8,11 +8,17 @@ public class DbConstraintNormalise {
 
   protected final String[] quotedIdentifiers;
 
-  protected boolean lowerCaseTables = true;
+  protected final boolean lowerCaseTables;
 
-  protected boolean lowerCaseColumns = true;
+  protected final boolean lowerCaseColumns;
 
   public DbConstraintNormalise() {
+    this(true, true);
+  }
+
+  public DbConstraintNormalise(boolean lowerCaseTables, boolean lowerCaseColumns) {
+    this.lowerCaseTables = lowerCaseTables;
+    this.lowerCaseColumns = lowerCaseColumns;
     this.quotedIdentifiers = new String[]{"\"", "'", "[", "]", "`"};
   }
 
@@ -44,6 +50,26 @@ public class DbConstraintNormalise {
       columnName = columnName.toLowerCase();
     }
     return columnName;
+  }
+
+  /**
+   * Lower case the table name checking for quoted identifiers.
+   */
+  public String lowerTableName(String tableName) {
+    if (lowerCaseTables && notQuoted(tableName)) {
+      return tableName.toLowerCase();
+    }
+    return tableName;
+  }
+
+  /**
+   * Lower case the column name checking for quoted identifiers.
+   */
+  public String lowerColumnName(String name) {
+    if (lowerCaseColumns && notQuoted(name)) {
+      return name.toLowerCase();
+    }
+    return name;
   }
 
   /**

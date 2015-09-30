@@ -98,7 +98,7 @@ public class BaseTableDdl implements TableDdl {
 
     reset();
 
-    String tableName = lowerName(createTable.getName());
+    String tableName = lowerTableName(createTable.getName());
     List<Column> columns = createTable.getColumn();
     List<Column> pk = determinePrimaryKeyColumns(columns);
 
@@ -248,7 +248,7 @@ public class BaseTableDdl implements TableDdl {
 
   protected void writeForeignKey(DdlWrite write, String fkName, String tableName, String[] columns, String refTable, String[] refColumns, String indexName) throws IOException {
 
-    tableName = lowerName(tableName);
+    tableName = lowerTableName(tableName);
     DdlBuffer fkeyBuffer = write.applyForeignKeys();
     alterTableAddForeignKey(fkeyBuffer, fkName, tableName, columns, refTable, refColumns);
 
@@ -282,7 +282,7 @@ public class BaseTableDdl implements TableDdl {
       if (i > 0) {
         buffer.append(",");
       }
-      buffer.append(lowerName(columns[i].trim()));
+      buffer.append(lowerColumnName(columns[i].trim()));
     }
     buffer.append(")");
   }
@@ -367,7 +367,7 @@ public class BaseTableDdl implements TableDdl {
     buffer.append(",").newLine();
     buffer.append("  constraint ").append(uqName).append(" unique ");
     buffer.append("(");
-    buffer.append(lowerName(column.getName()));
+    buffer.append(lowerColumnName(column.getName()));
     buffer.append(")");
   }
 
@@ -401,14 +401,17 @@ public class BaseTableDdl implements TableDdl {
   }
 
   /**
-   * Convert the table or column name to lower case.
-   * <p>
-   * This is passed up to the platformDdl to override as desired.
-   * Generally lower case with underscore is a good cross database
-   * choice for column/table names.
+   * Convert the table lower case.
    */
-  protected String lowerName(String name) {
-    return naming.lowerName(name);
+  protected String lowerTableName(String name) {
+    return naming.lowerTableName(name);
+  }
+
+  /**
+   * Convert the column name to lower case.
+   */
+  protected String lowerColumnName(String name) {
+    return naming.lowerColumnName(name);
   }
 
   /**

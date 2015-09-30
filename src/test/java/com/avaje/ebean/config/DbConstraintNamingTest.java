@@ -34,4 +34,40 @@ public class DbConstraintNamingTest {
     assertThat(naming.normaliseTable("foo_bar]")).isEqualTo("foo_bar");
   }
 
+  @Test
+  public void testDefaultToLower() throws Exception {
+    assertThat(naming.normaliseTable("SCH.FOO_BAR]")).isEqualTo("foo_bar");
+
+    assertThat(naming.lowerTableName("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR]");
+    assertThat(naming.lowerTableName("SCH.FOO_BAR")).isEqualTo("sch.foo_bar");
+    assertThat(naming.lowerColumnName("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR]");
+    assertThat(naming.lowerColumnName("SCH.FOO_BAR")).isEqualTo("sch.foo_bar");
+  }
+
+  @Test
+  public void testNoLowerCaseTable() throws Exception {
+
+    DbConstraintNaming naming = new DbConstraintNaming(false, true);
+    assertThat(naming.normaliseTable("SCH.FOO_BAR]")).isEqualTo("FOO_BAR");
+    assertThat(naming.normaliseColumn("SCH.FOO_BAR]")).isEqualTo("sch.foo_bar");
+    assertThat(naming.lowerTableName("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR]");
+    // table name not lowered
+    assertThat(naming.lowerTableName("SCH.FOO_BAR")).isEqualTo("SCH.FOO_BAR");
+    assertThat(naming.lowerColumnName("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR]");
+    assertThat(naming.lowerColumnName("SCH.FOO_BAR")).isEqualTo("sch.foo_bar");
+  }
+
+  @Test
+  public void testNoLowerCaseColumn() throws Exception {
+
+    DbConstraintNaming naming = new DbConstraintNaming(true, false);
+    assertThat(naming.normaliseTable("SCH.FOO_BAR]")).isEqualTo("foo_bar");
+    assertThat(naming.normaliseColumn("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR");
+    assertThat(naming.lowerTableName("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR]");
+    assertThat(naming.lowerTableName("SCH.FOO_BAR")).isEqualTo("sch.foo_bar");
+    assertThat(naming.lowerColumnName("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR]");
+    // column name not lowered
+    assertThat(naming.lowerColumnName("SCH.FOO_BAR")).isEqualTo("SCH.FOO_BAR");
+  }
+
 }
