@@ -10,6 +10,7 @@ import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.*;
 import com.avaje.ebean.bean.BeanCollection;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanQueryRequest;
@@ -149,6 +150,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   public PersistenceContext getPersistenceContext() {
     return persistenceContext;
+  }
+
+  /**
+   * Add the bean to the persistence context.
+   */
+  public void persistenceContextAdd(EntityBean bean) {
+    Object id = beanDescriptor.getId(bean);
+    persistenceContext.put(id, bean);
   }
 
   /**

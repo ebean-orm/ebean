@@ -433,6 +433,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     } else {
       // nextBean set to previously read currentBean
       nextBean = currentBean;
+      request.persistenceContextAdd(nextBean);
       // check the current row we have just moved to
       if (checkForDifferentBean()) {
         return true;

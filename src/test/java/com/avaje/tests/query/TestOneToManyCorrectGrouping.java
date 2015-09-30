@@ -21,7 +21,7 @@ public class TestOneToManyCorrectGrouping extends BaseTestCase {
     ResetBasicData.reset();
     Query<Customer> customerQuery = Ebean.find(Customer.class)
         .fetch("orders")
-        .where()
+        .where().le("id", 2)
         .query();
 
     QueryIterator<Customer> customerQueryIterator = customerQuery.findIterate();
