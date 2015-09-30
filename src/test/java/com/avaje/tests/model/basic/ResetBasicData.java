@@ -135,6 +135,7 @@ public class ResetBasicData {
 				createOrder2(cust2);
 				createOrder3(cust1);
 				createOrder4(cust1);
+				createOrder5(cust2);
 			}
 		});	
 	}
@@ -313,4 +314,15 @@ public class ResetBasicData {
 
     Ebean.save(order);
   }
+
+	private void createOrder5(Customer customer) {
+
+		Order order = new Order();
+		order.setCustomer(customer);
+
+		order.addShipment(new OrderShipment());
+
+		Ebean.save(order);
+	}
+
 }
