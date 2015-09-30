@@ -265,11 +265,11 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9.1</version>
         <configuration>
-          <doctitle>Ebean 4</doctitle>
+          <doctitle>Ebean 6</doctitle>
           <overview>src/main/java/com/avaje/ebean/overview.html</overview>
           <source>1.8</source>
           <doclet>org.avaje.doclet.PygmentsDoclet</doclet>
-          <excludePackageNames>com.avaje.ebeaninternal.*:com.avaje.ebean.util</excludePackageNames>
+          <excludePackageNames>com.avaje.ebeaninternal.*:com.avaje.ebean.util:com.avaje.ebean.dbmigration.ddlgeneration:com.avaje.ebean.dbmigration.migration:com.avaje.ebean.dbmigration.migrationreader:com.avaje.ebean.dbmigration.model</excludePackageNames>
           <docletArtifact>
             <groupId>org.avaje</groupId>
             <artifactId>pygments-doclet</artifactId>
