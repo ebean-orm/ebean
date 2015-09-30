@@ -6,6 +6,9 @@ import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -17,9 +20,14 @@ public class TestOneToManyCorrectGrouping extends BaseTestCase{
     @Test
     public void test(){
         ResetBasicData.reset();
+        List<Integer> ids = new ArrayList<Integer>();
+        ids.add(1);
+        ids.add(2);
+
         Query<Customer> customerQuery =  Ebean.find(Customer.class)
                 .fetch("orders")
                 .where()
+                .idIn(ids)
                 .query();
         QueryIterator<Customer> customerQueryIterator = customerQuery.findIterate();
 
