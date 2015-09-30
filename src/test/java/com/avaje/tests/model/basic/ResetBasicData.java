@@ -1,13 +1,13 @@
 package com.avaje.tests.model.basic;
 
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.TxRunnable;
 import com.avaje.tests.model.basic.Order.Status;
+
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ResetBasicData {
 
@@ -135,6 +135,7 @@ public class ResetBasicData {
 				createOrder2(cust2);
 				createOrder3(cust1);
 				createOrder4(cust1);
+        createOrder5(cust2);
 			}
 		});	
 	}
@@ -309,6 +310,15 @@ public class ResetBasicData {
     Order order = new Order();
     order.setCustomer(customer);
 
+    order.addShipment(new OrderShipment());
+
+    Ebean.save(order);
+  }
+
+  private void createOrder5(Customer customer) {
+
+    Order order = new Order();
+    order.setCustomer(customer);
     order.addShipment(new OrderShipment());
 
     Ebean.save(order);
