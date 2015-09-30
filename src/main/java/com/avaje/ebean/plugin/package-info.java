@@ -1,8 +1,8 @@
 /**
- * Generation DDL migration scripts based on changes to the model.
+ * Provides a API for plugins.
  * <p>
- * You can use <code>DbMigration</code> to compare the entity bean model to its prior state
- * and generate DDL for the differences - adding tables, columns etc.
+ * Plugins can get and read meta data about the entity beans and enhance or utilise the
+ * functionality of the EbeanServer.
  * </p>
  */
 package com.avaje.ebean.plugin;
