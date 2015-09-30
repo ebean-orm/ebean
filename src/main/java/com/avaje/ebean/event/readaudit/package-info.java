@@ -1,8 +1,8 @@
 /**
- * Generation DDL migration scripts based on changes to the model.
+ * Provides Auditing of read events including queries and L2 cache.
  * <p>
- * You can use <code>DbMigration</code> to compare the entity bean model to its prior state
- * and generate DDL for the differences - adding tables, columns etc.
+ * Provides a built support for supplied an audit of all the 'read events' for beans annotated
+ * with <code>@ReadAudit</code>
  * </p>
  */
 package com.avaje.ebean.event.readaudit;
