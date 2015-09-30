@@ -64,12 +64,16 @@ public final class ShutdownManager {
 
 	/**
 	 * Deregister the Shutdown hook.
+   * <p>
+   * In calling this method it is expected that application code will invoke
+   * the shutdown() method.
+   * </p>
 	 * <p>
 	 * For running in a Servlet Container a redeploy will cause a shutdown, and
 	 * for that case we need to make sure the shutdown hook is deregistered.
 	 * </p>
 	 */
-	protected static void deregisterShutdownHook() {
+	public static void deregisterShutdownHook() {
 		synchronized (servers) {
 			try {
 				Runtime.getRuntime().removeShutdownHook(shutdownHook);
@@ -87,7 +91,10 @@ public final class ShutdownManager {
 	protected static void registerShutdownHook() {
 		synchronized (servers) {
 			try {
-				Runtime.getRuntime().addShutdownHook(shutdownHook);
+        String value = System.getProperty("ebean.registerShutdownHook");
+        if (value == null || !value.trim().equalsIgnoreCase("false")) {
+          Runtime.getRuntime().addShutdownHook(shutdownHook);
+        }
 			} catch (IllegalStateException ex) {
 				if (!ex.getMessage().equals("Shutdown in progress")) {
 					throw ex;
