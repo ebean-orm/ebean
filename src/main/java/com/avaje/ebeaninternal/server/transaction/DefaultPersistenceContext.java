@@ -31,7 +31,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   /**
    * Map used hold caches. One cache per bean type.
    */
-  private final HashMap<String, ClassContext> typeCache = new HashMap<String, ClassContext>();
+  private HashMap<String, ClassContext> typeCache = new HashMap<String, ClassContext>();
 
   private final Monitor monitor = new Monitor();
 
@@ -144,9 +144,10 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     return beanType;
   }
 
-  private static class ClassContext {
+  public static class ClassContext {
 
     private final Map<Object, Object> map = new HashMap<Object, Object>();
+    private final Map<Object, Object> lastInsertedMap = new HashMap<Object, Object>();
 
     private Set<Object> deleteSet;
 
@@ -155,6 +156,13 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
     public String toString() {
       return "size:" + map.size();
+    }
+
+    public void resetMapWithLastInserted(){
+      map.clear();
+      for (Map.Entry<Object, Object> entry : lastInsertedMap.entrySet()){
+        map.put(entry.getKey(), entry.getValue());
+      }
     }
 
     private WithOption getWithOption(Object id) {
@@ -178,6 +186,9 @@ public final class DefaultPersistenceContext implements PersistenceContext {
       }
       // put the new value and return null indicating the put was successful
       map.put(id, bean);
+      //keep track of the last inserted value only
+      lastInsertedMap.clear();
+      lastInsertedMap.put(id, bean);
       return null;
     }
 
@@ -204,6 +215,14 @@ public final class DefaultPersistenceContext implements PersistenceContext {
       deleteSet.add(id);
       map.remove(id);
     }
+  }
+
+  public HashMap<String, ClassContext> getTypeCache() {
+    return typeCache;
+  }
+
+  public void setTypeCache(HashMap<String, ClassContext> typeCache) {
+    this.typeCache = typeCache;
   }
 
 }
