@@ -68,4 +68,28 @@ public class TestM2mDeleteObject extends BaseTestCase {
     Assert.assertEquals(2, permissionList2.size());
   }
 
+
+  @Test
+  public void test_deleteCascading() {
+
+    Permission p1 = new Permission();
+    Permission p2 = new Permission();
+    p1.setName("p1");
+    p2.setName("p2");
+    Ebean.save(p1);
+    Ebean.save(p2);
+
+    Role role1 = new Role();
+    role1.setName("role");
+
+    Set<Permission> permissions = new HashSet<Permission>();
+    permissions.add(p2);
+    role1.setPermissions(permissions);
+    Ebean.save(role1);
+
+    // only deletes as not associated
+    Ebean.delete(p1);
+    // delete cascades
+    Ebean.delete(role1);
+  }
 }
