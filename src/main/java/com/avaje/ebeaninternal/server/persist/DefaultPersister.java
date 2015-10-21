@@ -643,6 +643,15 @@ public final class DefaultPersister implements Persister {
     private boolean isCascade() {
       return cascade;
     }
+
+    public void modifyListenReset(BeanCollection<?> c) {
+      if (insertedParent) {
+        // after insert set the modify listening mode
+        // for private owned etc
+        c.setModifyListening(many.getModifyListenMode());
+      }
+      c.modifyReset();
+    }
   }
 
   private void saveMany(SaveManyPropRequest saveMany, boolean insertMode) {
@@ -684,6 +693,7 @@ public final class DefaultPersister implements Persister {
 
       BeanCollection<?> c = (BeanCollection<?>) details;
       Set<?> modifyRemovals = c.getModifyRemovals();
+      saveMany.modifyListenReset(c);
       if (modifyRemovals != null && !modifyRemovals.isEmpty()) {
 
         SpiTransaction t = saveMany.getTransaction();

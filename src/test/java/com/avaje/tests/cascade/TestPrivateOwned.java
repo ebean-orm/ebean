@@ -5,6 +5,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.tests.model.basic.TSDetail;
 import com.avaje.tests.model.basic.TSMaster;
+import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.List;
@@ -65,11 +66,22 @@ public class TestPrivateOwned extends BaseTestCase {
     Ebean.save(m0);
     assertThat(m0.getDetails()).hasSize(2);
 
+    LoggedSqlCollector.start();
     m0.getDetails().remove(0);
     Ebean.save(m0);
 
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(1);
+    assertThat(loggedSql.get(0)).contains("delete from t_detail_with_other_namexxxyy where id=?");
+
     TSMaster masterReload = Ebean.find(TSMaster.class, m0.getId());
     assertThat(masterReload.getDetails()).hasSize(1);
+
+    LoggedSqlCollector.start();
+    Ebean.save(m0);
+    loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(0);
+
   }
 
 }
