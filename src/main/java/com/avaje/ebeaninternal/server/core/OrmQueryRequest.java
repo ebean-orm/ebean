@@ -72,6 +72,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     this.readOnly = query.isReadOnly();
   }
 
+  /**
+   * Mark the transaction as not being query only.
+   */
+  @Override
+  public void markNotQueryOnly() {
+    transaction.markNotQueryOnly();
+  }
 
   /**
    * Return the database platform like clause.
@@ -219,7 +226,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   public void endTransIfRequired() {
     if (createdTransaction) {
-      transaction.endQueryOnly();
+      transaction.commit();
     }
   }
 

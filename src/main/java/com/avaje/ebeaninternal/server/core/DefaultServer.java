@@ -1301,6 +1301,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.DELETE, query, t);
     try {
       request.initTransIfRequired();
+      request.markNotQueryOnly();
       return request.delete();
     } finally {
       request.endTransIfRequired();

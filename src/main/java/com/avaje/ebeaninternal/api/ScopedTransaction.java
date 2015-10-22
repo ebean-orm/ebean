@@ -60,11 +60,6 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
-  public void endQueryOnly() {
-    transaction.endQueryOnly();
-  }
-
-  @Override
   public String getLogPrefix() {
     return transaction.getLogPrefix();
   }

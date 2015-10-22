@@ -59,7 +59,7 @@ public final class RelationalQueryRequest {
      */
     public void endTransIfRequired() {
         if (createdTransaction) {
-            trans.endQueryOnly();
+            trans.commit();
         }
     }
 

@@ -5,6 +5,8 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Contact;
+import com.avaje.tests.model.basic.Customer;
+import com.avaje.tests.model.basic.ResetBasicData;
 import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
@@ -49,4 +51,23 @@ public class TestDeleteByQuery extends BaseTestCase {
     assertThat(list).isEmpty();
   }
 
+  @Test
+  public void testCommit() {
+
+    ResetBasicData.reset();
+
+    List<Customer> all = Customer.find.all();
+    Contact contact = new Contact();
+    contact.setFirstName("DelByQueryFirstName");
+    contact.setLastName("deleteMe");
+    contact.setCustomer(all.get(0));
+
+    Ebean.save(contact);
+
+    Ebean.find(Contact.class).select("id").where().eq("firstName", "DelByQueryFirstName").delete();
+
+    Contact contactFind = Ebean.find(Contact.class, contact.getId());
+    assertThat(contactFind).isNull();
+
+  }
 }

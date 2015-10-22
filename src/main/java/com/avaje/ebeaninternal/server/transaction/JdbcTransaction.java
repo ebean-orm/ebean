@@ -850,23 +850,6 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   /**
-   * End the transaction on a query only request.
-   */
-  @Override
-  public void endQueryOnly() {
-    if (!isActive()) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
-    try {
-      connectionEndForQueryOnly();
-    } finally {
-      // these will not throw an exception
-      deactivate();
-      notifyQueryOnly();
-    }
-  }
-
-  /**
    * Commit the transaction.
    */
   @Override

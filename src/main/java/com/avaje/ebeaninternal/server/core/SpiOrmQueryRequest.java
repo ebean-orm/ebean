@@ -112,4 +112,8 @@ public interface SpiOrmQueryRequest<T> {
    */
   String getDBLikeClause();
 
+  /**
+   * Mark the underlying transaction as not being query only.
+   */
+  void markNotQueryOnly();
 }
