@@ -2041,6 +2041,21 @@ public class ServerConfig {
   }
 
   /**
+   * Load settings from test-ebean.properties and do nothing if the properties is not found.
+   * <p>
+   * This is typically used when test-ebean.properties is put into the test class path and used
+   * to configure Ebean for running tests.
+   * </p>
+   */
+  public void loadTestProperties() {
+    Properties properties = PropertyMap.testProperties();
+    if (!properties.isEmpty()) {
+      PropertiesWrapper p = new PropertiesWrapper("ebean", name, properties);
+      loadSettings(p);
+    }
+  }
+
+  /**
    * Return the properties that we used for configuration and were set via a call to loadFromProperties().
    */
   public Properties getProperties() {
@@ -2048,8 +2063,11 @@ public class ServerConfig {
   }
 
   @SuppressWarnings("unchecked")
-  private <T> T createInstance(PropertiesWrapper p, Class<T> pluginType, String key) {
+  private <T> T createInstance(PropertiesWrapper p, Class<T> pluginType, String key, T instance) {
 
+    if (instance != null) {
+      return instance;
+    }
     String classname = p.get(key, null);
     return classname == null ? null : (T) ClassUtil.newInstance(classname);
   }
@@ -2097,15 +2115,15 @@ public class ServerConfig {
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
 
-    currentUserProvider = createInstance(p, CurrentUserProvider.class, "currentUserProvider");
     disableClasspathSearch = p.getBoolean("disableClasspathSearch", disableClasspathSearch);
-    databasePlatform = createInstance(p, DatabasePlatform.class, "databasePlatform");
-    encryptKeyManager = createInstance(p, EncryptKeyManager.class, "encryptKeyManager");
-    encryptDeployManager = createInstance(p, EncryptDeployManager.class, "encryptDeployManager");
-    encryptor = createInstance(p, Encryptor.class, "encryptor");
-    dbEncrypt = createInstance(p, DbEncrypt.class, "dbEncrypt");
-    serverCacheFactory = createInstance(p, ServerCacheFactory.class, "serverCacheFactory");
-    serverCacheManager = createInstance(p, ServerCacheManager.class, "serverCacheManager");
+    currentUserProvider = createInstance(p, CurrentUserProvider.class, "currentUserProvider", currentUserProvider);
+    databasePlatform = createInstance(p, DatabasePlatform.class, "databasePlatform", databasePlatform);
+    encryptKeyManager = createInstance(p, EncryptKeyManager.class, "encryptKeyManager", encryptKeyManager);
+    encryptDeployManager = createInstance(p, EncryptDeployManager.class, "encryptDeployManager", encryptDeployManager);
+    encryptor = createInstance(p, Encryptor.class, "encryptor", encryptor);
+    dbEncrypt = createInstance(p, DbEncrypt.class, "dbEncrypt", dbEncrypt);
+    serverCacheFactory = createInstance(p, ServerCacheFactory.class, "serverCacheFactory", serverCacheFactory);
+    serverCacheManager = createInstance(p, ServerCacheManager.class, "serverCacheManager", serverCacheManager);
     cacheWarmingDelay = p.getInt("cacheWarmingDelay", cacheWarmingDelay);
     classPathReaderClassName = p.get("classpathreader");
     
@@ -2176,7 +2194,7 @@ public class ServerConfig {
 
   private NamingConvention createNamingConvention(PropertiesWrapper properties, NamingConvention namingConvention) {
 
-    NamingConvention nc = createInstance(properties, NamingConvention.class, "namingconvention");
+    NamingConvention nc = createInstance(properties, NamingConvention.class, "namingconvention", null);
     return (nc != null) ? nc : namingConvention;
   }
 

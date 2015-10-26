@@ -18,6 +18,14 @@ public final class PropertyMap implements Serializable {
 
   private final LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 
+  /**
+   * Return properties loaded from test-ebean.properties.
+   */
+  public static Properties testProperties() {
+    PropertyMap propertyMap = PropertyMapLoader.loadTestProperties();
+    return (propertyMap == null) ? new Properties() : propertyMap.asProperties();
+  }
+
   public static Properties defaultProperties() {
     PropertyMap propertyMap = PropertyMapLoader.loadGlobalProperties();
     return (propertyMap == null) ? new Properties() : propertyMap.asProperties();

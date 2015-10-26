@@ -47,6 +47,7 @@ public class ServerConfigTest {
     props1.setProperty("ebean.persistBatchOnCascade", "ALL");
 
     serverConfig.loadFromProperties(props1);
+    serverConfig.loadTestProperties();
 
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.ALL, serverConfig.getPersistBatchOnCascade());

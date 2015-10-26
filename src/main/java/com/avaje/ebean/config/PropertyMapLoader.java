@@ -14,17 +14,34 @@ final class PropertyMapLoader {
 
   private static final Logger logger = LoggerFactory.getLogger(PropertyMapLoader.class);
 
+  /**
+   * Load the <code>test-ebean.properties</code>.
+   */
+  public static PropertyMap loadTestProperties() {
+    return load(null, "test-ebean.properties", false);
+  }
+
+  /**
+   * Load the ebean.properties (and test-ebean.properties if present).
+   */
   public static PropertyMap loadGlobalProperties() {
 
+    boolean loadTestProperties = false;
     String fileName = System.getenv("EBEAN_PROPS_FILE");
     if (fileName == null) {
       fileName = System.getProperty("ebean.props.file");
       if (fileName == null) {
+        loadTestProperties = true;
         fileName = "ebean.properties";
       }
     }
 
-    return load(null, fileName);
+    PropertyMap map = load(null, fileName, true);
+    if (loadTestProperties) {
+      // load test properties if present in classpath
+      load(map, "test-ebean.properties", false);
+    }
+    return map;
   }
 
   /**
@@ -35,11 +52,13 @@ final class PropertyMapLoader {
    * @param fileName
    *          the name of the properties file to load.
    */
-  public static PropertyMap load(PropertyMap p, String fileName) {
+  public static PropertyMap load(PropertyMap p, String fileName, boolean errorOnNull) {
 
     InputStream is = findInputStream(fileName);
     if (is == null) {
-      logger.error(fileName + " not found");
+      if (errorOnNull) {
+        logger.error(fileName + " not found");
+      }
       return p;
     } else {
       return load(p, is);
