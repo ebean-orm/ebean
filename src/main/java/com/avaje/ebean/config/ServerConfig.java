@@ -281,9 +281,9 @@ public class ServerConfig {
   private boolean updatesDeleteMissingChildren = true;
   
   /**
-   * Setting to indicate if UUID should be stored as binary(16) or varchar(40).
+   * Setting to indicate if UUID should be stored as binary(16) or varchar(40) or native DB type (for H2 and Postgres).
    */
-  private boolean uuidStoreAsBinary;
+  private DbUuid dbUuid = DbUuid.AUTO;
 
 
   private List<BeanFindController> findControllers = new ArrayList<BeanFindController>();
@@ -1466,19 +1466,18 @@ public class ServerConfig {
     this.dbEncrypt = dbEncrypt;
   }
 
-  
   /**
-   * Return true if UUID should be stored as binary(16) (as opposed to varchar(40)).
+   * Return the DB type used to store UUID.
    */
-  public boolean isUuidStoreAsBinary() {
-    return uuidStoreAsBinary;
+  public DbUuid getDbUuid() {
+    return dbUuid;
   }
 
   /**
-   * Set to true if UUID should be stored as binary(16) (as opposed to varchar(40)).
+   * Set the DB type used to store UUID.
    */
-  public void setUuidStoreAsBinary(boolean uuidStoreAsBinary) {
-    this.uuidStoreAsBinary = uuidStoreAsBinary;
+  public void setDbUuid(DbUuid dbUuid) {
+    this.dbUuid = dbUuid;
   }
 
   /**
@@ -2152,7 +2151,10 @@ public class ServerConfig {
     databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
     databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);
-    uuidStoreAsBinary = p.getBoolean("uuidStoreAsBinary", uuidStoreAsBinary);
+    dbUuid = p.getEnum(DbUuid.class, "dbuuid", dbUuid);
+    if (p.getBoolean("uuidStoreAsBinary", false)) {
+      dbUuid = DbUuid.BINARY;
+    }
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
 
     lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", lazyLoadBatchSize);
@@ -2273,5 +2275,26 @@ public class ServerConfig {
    */
   public void setExpressionEqualsWithNullAsNoop(boolean expressionEqualsWithNullAsNoop) {
     this.expressionEqualsWithNullAsNoop = expressionEqualsWithNullAsNoop;
+  }
+
+  /**
+   * Specify how UUID is stored.
+   */
+  public enum DbUuid {
+
+    /**
+     * Store using native UUID in H2 and Postgres.
+     */
+    AUTO,
+
+    /**
+     * Store using DB VARCHAR.
+     */
+    VARCHAR,
+
+    /**
+     * Store using DB BINARY.
+     */
+    BINARY
   }
 }

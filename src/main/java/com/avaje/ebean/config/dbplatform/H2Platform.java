@@ -16,6 +16,7 @@ public class H2Platform extends DatabasePlatform {
     this.dbEncrypt = new H2DbEncrypt();
     this.platformDdl = new H2Ddl(this.dbTypeMap, dbIdentity);
     this.historySupport = new H2HistorySupport();
+    this.nativeUuidType = true;
 
     // only support getGeneratedKeys with non-batch JDBC
     // so generally use SEQUENCE instead of IDENTITY for H2

@@ -768,7 +768,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    */
   protected void initialiseStandard(JsonConfig.DateTime mode, ServerConfig config) {
 
-    boolean binaryUUID = config.isUuidStoreAsBinary();
     DatabasePlatform databasePlatform = config.getDatabasePlatform();
     int platformClobType = databasePlatform.getClobDbType();
     int platformBlobType = databasePlatform.getBlobDbType();
@@ -795,9 +794,17 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       nativeMap.put(Types.BIT, booleanType);
     }
 
-    // Store UUID as binary(16) or varchar(40)
-    ScalarType<?> uuidType = (binaryUUID) ? new ScalarTypeUUIDBinary() : new ScalarTypeUUIDVarchar();
-    typeMap.put(UUID.class, uuidType);
+    boolean nativeUuidType = databasePlatform.isNativeUuidType();
+    ServerConfig.DbUuid dbUuid = config.getDbUuid();
+
+    if (nativeUuidType && dbUuid == ServerConfig.DbUuid.AUTO) {
+      // DB has native support for UUID
+      typeMap.put(UUID.class, new ScalarTypeUUIDNative());
+    } else {
+      // Store UUID as binary(16) or varchar(40)
+      ScalarType<?> uuidType = (ServerConfig.DbUuid.BINARY == dbUuid) ? new ScalarTypeUUIDBinary() : new ScalarTypeUUIDVarchar();
+      typeMap.put(UUID.class, uuidType);
+    }
 
     typeMap.put(File.class, fileType);
     typeMap.put(InetAddress.class, inetAddressType);

@@ -1,17 +1,15 @@
 package com.avaje.ebean.config.dbplatform;
 
-import java.sql.Types;
-
-import javax.sql.DataSource;
-
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.Query;
-
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
+import java.sql.Types;
 
 /**
  * Database platform specific settings.
@@ -54,28 +52,33 @@ public class DatabasePlatform {
    */
   protected OnQueryOnly onQueryOnly = OnQueryOnly.ROLLBACK;
 
-  /** 
-   * The open quote used by quoted identifiers. 
+  /**
+   * The open quote used by quoted identifiers.
    */
   protected String openQuote = "\"";
 
   /**
-   *  The close quote used by quoted identifiers. 
+   * The close quote used by quoted identifiers.
    */
   protected String closeQuote = "\"";
 
-  /** 
-   * For limit/offset, row_number etc limiting of SQL queries. 
+  /**
+   * For limit/offset, row_number etc limiting of SQL queries.
    */
   protected SqlLimiter sqlLimiter = new LimitOffsetSqlLimiter();
 
-  /** 
-   * Mapping of JDBC to Database types. 
+  /**
+   * Mapping of JDBC to Database types.
    */
   protected DbTypeMap dbTypeMap = new DbTypeMap();
 
   /**
-   * Defines DB identity/sequence features. 
+   * Set to true if the DB has native UUID type support.
+   */
+  protected boolean nativeUuidType;
+
+  /**
+   * Defines DB identity/sequence features.
    */
   protected DbIdentity dbIdentity = new DbIdentity();
 
@@ -84,28 +87,28 @@ public class DatabasePlatform {
    */
   protected DbHistorySupport historySupport;
 
-  /** 
-   * The JDBC type to map booleans to (by default). 
+  /**
+   * The JDBC type to map booleans to (by default).
    */
   protected int booleanDbType = Types.BOOLEAN;
 
-  /** 
-   * The JDBC type to map Blob to. 
+  /**
+   * The JDBC type to map Blob to.
    */
   protected int blobDbType = Types.BLOB;
 
-  /** 
-   * The JDBC type to map Clob to. 
+  /**
+   * The JDBC type to map Clob to.
    */
   protected int clobDbType = Types.CLOB;
 
-  /** 
-   * For Oracle treat empty strings as null. 
+  /**
+   * For Oracle treat empty strings as null.
    */
   protected boolean treatEmptyStringsAsNull;
 
-  /** 
-   * The database platform name. 
+  /**
+   * The database platform name.
    */
   protected String name = "generic";
 
@@ -124,7 +127,7 @@ public class DatabasePlatform {
    * The like clause. Can be overridden to disable default escape character.
    */
   protected String likeClause = "like ?";
-  
+
   protected DbEncrypt dbEncrypt;
 
   protected boolean idInExpandedForm;
@@ -219,16 +222,12 @@ public class DatabasePlatform {
 
   /**
    * Return a DB Sequence based IdGenerator.
-   * 
-   * @param be
-   *          the BackgroundExecutor that can be used to load the sequence if
-   *          desired
-   * @param ds
-   *          the DataSource
-   * @param seqName
-   *          the name of the sequence
-   * @param batchSize
-   *          the number of sequences that should be loaded
+   *
+   * @param be        the BackgroundExecutor that can be used to load the sequence if
+   *                  desired
+   * @param ds        the DataSource
+   * @param seqName   the name of the sequence
+   * @param batchSize the number of sequences that should be loaded
    */
   public IdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
     return null;
@@ -277,8 +276,15 @@ public class DatabasePlatform {
   }
 
   /**
+   * Return true if the DB supports native UUID.
+   */
+  public boolean isNativeUuidType() {
+    return nativeUuidType;
+  }
+
+  /**
    * Return the mapping of JDBC to DB types.
-   * 
+   *
    * @return the db type map
    */
   public DbTypeMap getDbTypeMap() {
@@ -315,7 +321,7 @@ public class DatabasePlatform {
 
   /**
    * Return the close quote for quoted identifiers.
-   * 
+   *
    * @return the close quote
    */
   public String getCloseQuote() {
@@ -324,7 +330,7 @@ public class DatabasePlatform {
 
   /**
    * Return the open quote for quoted identifiers.
-   * 
+   *
    * @return the open quote
    */
   public String getOpenQuote() {
@@ -333,7 +339,7 @@ public class DatabasePlatform {
 
   /**
    * Return the JDBC type used to store booleans.
-   * 
+   *
    * @return the boolean db type
    */
   public int getBooleanDbType() {
@@ -363,7 +369,7 @@ public class DatabasePlatform {
 
   /**
    * Return true if empty strings should be treated as null.
-   * 
+   *
    * @return true, if checks if is treat empty strings as null
    */
   public boolean isTreatEmptyStringsAsNull() {
@@ -399,7 +405,7 @@ public class DatabasePlatform {
 
   /**
    * Return the DB identity/sequence features for this platform.
-   * 
+   *
    * @return the db identity
    */
   public DbIdentity getDbIdentity() {
@@ -412,7 +418,7 @@ public class DatabasePlatform {
    * <p>
    * Basically add the clauses for limit/offset, rownum, row_number().
    * </p>
-   * 
+   *
    * @return the sql limiter
    */
   public SqlLimiter getSqlLimiter() {
@@ -421,15 +427,12 @@ public class DatabasePlatform {
 
   /**
    * Convert backticks to the platform specific open quote and close quote
-   * 
    * <p>
    * Specific plugins may implement this method to cater for platform specific
    * naming rules.
    * </p>
-   * 
-   * @param dbName
-   *          the db name
-   * 
+   *
+   * @param dbName the db name
    * @return the string
    */
   public String convertQuotedIdentifiers(String dbName) {

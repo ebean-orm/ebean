@@ -49,6 +49,8 @@ public class DbTypeMap {
     lookup.put("TIME", Types.TIME);
     lookup.put("TIMESTAMP", Types.TIMESTAMP);
 
+    lookup.put("UUID", DbType.UUID);
+
     // Not standard java.sql.Types
     // logical JSON storage types
     lookup.put("JSON", DbType.JSON);
@@ -100,6 +102,9 @@ public class DbTypeMap {
 
     put(Types.BLOB, new DbType("blob"));
     put(Types.CLOB, new DbType("clob"));
+
+    // DB native UUID support (H2 and Postgres)
+    put(DbType.UUID, new DbType("uuid"));
 
     if (logicalTypes) {
       // keep it logical for 2 layer DDL generation

@@ -9,6 +9,11 @@ package com.avaje.ebean.config.dbplatform;
 public class DbType {
 
   /**
+   * DB native UUID type (H2 and Postgres).
+   */
+  public static final int UUID = 5010;
+
+  /**
    * Type to map Map content to Postgres HSTORE.
    */
   public static final int HSTORE = 5000;

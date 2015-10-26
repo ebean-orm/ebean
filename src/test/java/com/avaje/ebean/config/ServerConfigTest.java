@@ -31,11 +31,13 @@ public class ServerConfigTest {
     Properties props = new Properties();
     props.setProperty("persistBatch", "INSERT");
     props.setProperty("persistBatchOnCascade", "INSERT");
+    props.setProperty("dbuuid","binary");
 
     serverConfig.loadFromProperties(props);
 
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatchOnCascade());
+    assertEquals(ServerConfig.DbUuid.BINARY, serverConfig.getDbUuid());
 
     serverConfig.setPersistBatch(PersistBatch.NONE);
     serverConfig.setPersistBatchOnCascade(PersistBatch.NONE);
