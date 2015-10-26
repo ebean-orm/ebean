@@ -54,6 +54,12 @@ public class TestDeleteByQuery extends BaseTestCase {
   @Test
   public void testCommit() {
 
+    EbeanServer server = Ebean.getDefaultServer();
+    if (server.getName().equals("mysql")) {
+      // MySql does not the sub query selecting from the delete table
+      return;
+    }
+
     ResetBasicData.reset();
 
     List<Customer> all = Customer.find.all();
