@@ -2,7 +2,11 @@ package com.avaje.tests.model.info;
 
 import com.avaje.ebean.Model;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Version;
 
 @Entity
 public class InfoCustomer extends Model {

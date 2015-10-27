@@ -76,6 +76,8 @@ public class AnnotationFields extends AnnotationParser {
    */
   private void readAssocOne(DeployBeanProperty prop) {
 
+    readJsonAnnotations(prop);
+
     Id id = get(prop, Id.class);
     if (id != null) {
       prop.setId();
@@ -117,25 +119,7 @@ public class AnnotationFields extends AnnotationParser {
       readColumn(column, prop);
     }
 
-    if (jacksonAnnotationsPresent) {
-      com.fasterxml.jackson.annotation.JsonIgnore jsonIgnore = get(prop, com.fasterxml.jackson.annotation.JsonIgnore.class);
-      if (jsonIgnore != null) {
-        prop.setJsonSerialize(!jsonIgnore.value());
-        prop.setJsonDeserialize(!jsonIgnore.value());
-      }
-    }
-
-    Expose expose = get(prop, Expose.class);
-    if (expose != null) {
-      prop.setJsonSerialize(expose.serialize());
-      prop.setJsonDeserialize(expose.deserialize());
-    }
-
-    JsonIgnore jsonIgnore = get(prop, JsonIgnore.class);
-    if (jsonIgnore != null) {
-      prop.setJsonSerialize(jsonIgnore.serialize());
-      prop.setJsonDeserialize(jsonIgnore.deserialize());
-    }
+    readJsonAnnotations(prop);
 
     if (prop.getDbColumn() == null) {
       // No @Column annotation or @Column.name() not set
@@ -288,6 +272,28 @@ public class AnnotationFields extends AnnotationParser {
       }
       prop.setIndexed();
       prop.setIndexName(index.name());
+    }
+  }
+
+  private void readJsonAnnotations(DeployBeanProperty prop) {
+    if (jacksonAnnotationsPresent) {
+      com.fasterxml.jackson.annotation.JsonIgnore jsonIgnore = get(prop, com.fasterxml.jackson.annotation.JsonIgnore.class);
+      if (jsonIgnore != null) {
+        prop.setJsonSerialize(!jsonIgnore.value());
+        prop.setJsonDeserialize(!jsonIgnore.value());
+      }
+    }
+
+    Expose expose = get(prop, Expose.class);
+    if (expose != null) {
+      prop.setJsonSerialize(expose.serialize());
+      prop.setJsonDeserialize(expose.deserialize());
+    }
+
+    JsonIgnore jsonIgnore = get(prop, JsonIgnore.class);
+    if (jsonIgnore != null) {
+      prop.setJsonSerialize(jsonIgnore.serialize());
+      prop.setJsonDeserialize(jsonIgnore.deserialize());
     }
   }
 

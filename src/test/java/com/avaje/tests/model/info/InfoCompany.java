@@ -1,6 +1,7 @@
 package com.avaje.tests.model.info;
 
 import com.avaje.ebean.Model;
+import com.avaje.ebean.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class InfoCompany extends Model {
 
   String name;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
   List<InfoContact> contacts = new ArrayList<InfoContact>();
 

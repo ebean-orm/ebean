@@ -1,10 +1,14 @@
 package com.avaje.tests.iud;
 
 import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.info.InfoCompany;
 import com.avaje.tests.model.info.InfoCustomer;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class TestInfoOneToOne extends BaseTestCase {
 
@@ -20,13 +24,17 @@ public class TestInfoOneToOne extends BaseTestCase {
 
     customer.save();
 
+    // assert JsonIgnore working as expected
+    String asJson = Ebean.json().toJson(company);
+    assertThat(asJson).doesNotContain("contacts");
+
     // assert both are inserted
-    Assert.assertNotNull(customer.getId());
-    Assert.assertNotNull(company.getId());
+    assertNotNull(customer.getId());
+    assertNotNull(company.getId());
 
     // both can be fetched
-    Assert.assertNotNull(InfoCustomer.find.byId(customer.getId()));
-    Assert.assertNotNull(InfoCompany.find.byId(company.getId()));
+    assertNotNull(InfoCustomer.find.byId(customer.getId()));
+    assertNotNull(InfoCompany.find.byId(company.getId()));
 
 
     // just update the customer
@@ -47,8 +55,8 @@ public class TestInfoOneToOne extends BaseTestCase {
 
     // delete both customer and company
     fetchedCustomer.delete();
-    Assert.assertNull(InfoCustomer.find.byId(customer.getId()));
-    Assert.assertNull(InfoCompany.find.byId(company.getId()));
+    assertNull(InfoCustomer.find.byId(customer.getId()));
+    assertNull(InfoCompany.find.byId(company.getId()));
 
   }
 
