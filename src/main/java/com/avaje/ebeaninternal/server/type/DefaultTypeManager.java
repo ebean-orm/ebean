@@ -419,14 +419,23 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return value;
   }
 
-  @SuppressWarnings("ResultOfMethodCallIgnored")
-  private boolean isIntegerType(String s) {
+  protected boolean isIntegerType(String s) {
+    if (isLeadingZeros(s)) {
+      return false;
+    }
     try {
       Integer.parseInt(s);
       return true;
     } catch (NumberFormatException e) {
       return false;
     }
+  }
+
+  /**
+   * Treat leading zeros as a non-integer for enum values.
+   */
+  private boolean isLeadingZeros(String s) {
+    return s.length() > 1 && s.charAt(0) == '0';
   }
 
   /**
