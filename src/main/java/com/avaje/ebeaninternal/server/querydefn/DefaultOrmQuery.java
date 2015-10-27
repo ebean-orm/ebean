@@ -484,6 +484,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.profilingListener = profilingListener;
 
     copy.query = query;
+    copy.rootTableAlias = rootTableAlias;
     copy.additionalWhere = additionalWhere;
     copy.additionalHaving = additionalHaving;
     copy.distinct = distinct;

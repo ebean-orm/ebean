@@ -110,4 +110,27 @@ public class TestQueryFindPagedList extends BaseTestCase {
       Ebean.endTransaction();
     }
   }
+
+
+  @Test
+  public void test_usingAlias() throws ExecutionException, InterruptedException {
+
+    ResetBasicData.reset();
+
+    PagedList<Order> pagedList = Ebean.find(Order.class)
+        .alias("b")
+        .where().raw("b.id > 0")
+        .findPagedList(0, 6);
+
+    LoggedSqlCollector.start();
+
+    pagedList.getTotalRowCount();
+    pagedList.getList();
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+
+    assertEquals(2, loggedSql.size());
+    assertThat(loggedSql.get(0)).contains("select count(*) from o_order b where b.id > 0");
+    assertThat(loggedSql.get(1)).contains("select b.id c0, b.status c1, b.order_date c2");
+  }
 }
