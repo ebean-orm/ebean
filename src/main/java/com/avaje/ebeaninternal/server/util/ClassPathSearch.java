@@ -4,13 +4,24 @@ import com.avaje.ebeaninternal.api.ClassPathSearchService;
 import com.avaje.ebeaninternal.api.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.loader.jar.JarEntryData;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -208,7 +219,7 @@ public class ClassPathSearch implements ClassPathSearchService {
 
   private void scanDirectory(File directory) {
     List<String> directoryFiles = getDirectoryFiles(directory);
-    searchFiles(Collections.enumeration(directoryFiles), null, null);
+    searchFiles(Collections.enumeration(directoryFiles), null, null, null);
   }
 
   private void scanUri(URI uri) throws IOException {
@@ -241,7 +252,7 @@ public class ClassPathSearch implements ClassPathSearchService {
         scanUri(uri);
       }
 
-      searchFiles(module.entries(), classPathEntry.getJarName(), classPathEntry.jarOffset);
+      searchFiles(module.entries(), classPathEntry.getJarName(), classPathEntry.jarOffset, file);
 
     } catch (MalformedURLException ex) {
       throw new IOException("Bad classpath error: ", ex);
@@ -286,25 +297,25 @@ public class ClassPathSearch implements ClassPathSearchService {
   /**
    * Searches through the Java Archive (jar or war file) looking for classes
    * that match our requirements.
-   *
-   * @param files       - all of the files in the Java Archive, this is an enumeration
+   * @param entries       - all of the entries in the Java Archive, this is an enumeration
    *                    provided by the Jar file
    * @param jarFileName - the name of the java archive
    * @param jarOffset   - an offset inside the archive to chop off the name of the class -
    *                    this is used when we have bang path offsets (e.g.
-   *                    file:///myfile.war!/WEB-INF/classes)
+   * @param module the containing jar/war file (used for spring boot embedded jar scanning)
    */
-  private void searchFiles(Enumeration<?> files, String jarFileName, String jarOffset) {
+  private void searchFiles(Enumeration<?> entries, String jarFileName, String jarOffset, File module) {
 
-    if (files == null) {
+    if (entries == null) {
       return;
     }
 
-    /*
-     * Strips the first character off as all entries in a jar file have no /
-     * prefix. We want to come out with a name like WEB-INF/classes/ to ensure
-     * we filter the contents of the war/jar file by this.
-     */
+    logger.debug("searchFiles jarFileName:{}  jarOffset:{}", jarFileName, jarOffset);
+
+    // Strips the first character off as all entries in a jar file have no /
+    // prefix. We want to come out with a name like WEB-INF/classes/ to ensure
+    // we filter the contents of the war/jar file by this.
+
     if ("/".equals(jarOffset)) {
       // root level for runnable jar (spring boot etc)
       jarOffset = null;
@@ -319,48 +330,90 @@ public class ClassPathSearch implements ClassPathSearchService {
       }
     }
 
-    while (files.hasMoreElements()) {
+    while (entries.hasMoreElements()) {
 
-      String fileName = files.nextElement().toString();
+      Object element = entries.nextElement();
+      String entryName = element.toString();
 
-      // we only want the class files
-      if (fileName.endsWith(".class") && (jarOffset == null || fileName.startsWith(jarOffset))) {
+      if (isEntryEmbeddedJar(module, entryName)) {
+        scanSpringBootEmbeddedJar(jarFileName, module, entryName);
+      }
 
-        if (jarOffset != null) {
-          // we got through here only if there is an offset and we
-          // matched it, so strip it off the file
-          // as we are trying to find the className
-          fileName = fileName.substring(jarOffset.length());
+      if (isEntryClass(jarOffset, entryName)) {
+        // check if it an 'interesting' class - entity etc
+        registerScannedClass(jarFileName, jarOffset, entryName);
+      }
+    }
+  }
+
+  /**
+   * Return true if this is an embedded jar that should be scanned.
+   */
+  private boolean isEntryEmbeddedJar(File module, String entryName) {
+    return entryName.endsWith(".jar") && module != null && filter.isSearchJar(entryName, null);
+  }
+
+  /**
+   * Return true if this is a class that should be checked (for entity, interesting interface etc).
+   */
+  private boolean isEntryClass(String jarOffset, String entryName) {
+    return entryName.endsWith(".class") && (jarOffset == null || entryName.startsWith(jarOffset));
+  }
+
+  private void scanSpringBootEmbeddedJar(String jarFileName, File module, String fileName) {
+    // spring boot embedded jar
+    logger.debug("spring boot embedded:{} : module:{}", fileName, module.getAbsoluteFile());
+    try {
+      org.springframework.boot.loader.jar.JarFile jarFile = new org.springframework.boot.loader.jar.JarFile(module);
+      org.springframework.boot.loader.jar.JarFile jarEntryFile = jarFile.getNestedJarFile(jarFile.getJarEntryData(fileName));
+      Iterator<JarEntryData> iterator = jarEntryFile.iterator();
+      while (iterator.hasNext()) {
+        JarEntryData jarEntryData = iterator.next();
+        if (jarEntryData.getName().toString().endsWith(".class")) {
+          logger.debug("... spring boot class entry:{}", jarEntryData.getName().toString());
+          registerScannedClass(jarFileName, null, jarEntryData.getName().toString());
+        }
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void registerScannedClass(String jarFileName, String jarOffset, String fileName) {
+
+    if (jarOffset != null) {
+      // we got through here only if there is an offset and we
+      // matched it, so strip it off the file
+      // as we are trying to find the className
+      fileName = fileName.substring(jarOffset.length());
+    }
+
+    String className = fileName.replace('/', '.').substring(0, fileName.length() - 6);
+    int lastPeriod = className.lastIndexOf(".");
+
+    String pckgName;
+    if (lastPeriod > 0) {
+      pckgName = className.substring(0, lastPeriod);
+    } else {
+      pckgName = "";
+    }
+
+    if (filter.isSearchPackage(pckgName)) {
+      // get the class for our class name
+      try {
+        Class<?> theClass = Class.forName(className, false, classLoader);
+
+        if (matcher.isMatch(theClass)) {
+          matchList.add(theClass);
+          registerHit(jarFileName, theClass);
         }
 
-        String className = fileName.replace('/', '.').substring(0, fileName.length() - 6);
-        int lastPeriod = className.lastIndexOf(".");
-
-        String pckgName;
-        if (lastPeriod > 0) {
-          pckgName = className.substring(0, lastPeriod);
-        } else {
-          pckgName = "";
-        }
-
-        if (filter.isSearchPackage(pckgName)) {
-          // get the class for our class name
-          try {
-            Class<?> theClass = Class.forName(className, false, classLoader);
-
-            if (matcher.isMatch(theClass)) {
-              matchList.add(theClass);
-              registerHit(jarFileName, theClass);
-            }
-
-          } catch (ClassNotFoundException e) {
-            // expected to get this hence trace
-            logger.trace("Error searching classpath" + e.getMessage());
-          } catch (NoClassDefFoundError e) {
-            // expected to get this hence trace
-            logger.trace("Error searching classpath" + e.getMessage());
-          }
-        }
+      } catch (ClassNotFoundException e) {
+        // expected to get this hence trace
+        logger.trace("Error searching classpath" + e.getMessage());
+      } catch (NoClassDefFoundError e) {
+        // expected to get this hence trace
+        logger.trace("Error searching classpath" + e.getMessage());
       }
     }
   }
