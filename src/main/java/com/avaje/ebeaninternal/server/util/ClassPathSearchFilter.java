@@ -122,17 +122,19 @@ public class ClassPathSearchFilter {
 	/**
 	 * Return true if the jar should be included in the search.
 	 */
-	public boolean isSearchJar(String jarName) {
+	public boolean isSearchJar(String jarName, String jarOffset) {
 
-		if (containedIn(includeJarSet, jarName)) {
-			return true;
-		}
+    if (containedIn(includeJarSet, jarName)) {
+      return true;
+    }
 
-		if (containedIn(excludeJarSet, jarName)) {
-			return false;
-		}
-		return defaultJarMatch;
-	}
+    if (containedIn(excludeJarSet, jarName)) {
+      return false;
+    }
+
+    // by default scan the root level in runnable jar (spring boot etc)
+    return "/".equals(jarOffset) || defaultJarMatch;
+  }
 
 	/**
 	 * Helper method to determine is a match is contained in the set.

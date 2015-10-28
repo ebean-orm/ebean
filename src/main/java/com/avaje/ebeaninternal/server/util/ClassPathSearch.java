@@ -157,7 +157,7 @@ public class ClassPathSearch implements ClassPathSearchService {
 
       } else if (element.isJarOrWar()) {
         // search name including the ! offset if it is there
-        if (classPathSize == 1 || filter.isSearchJar(element.getJarNameWithOffset())) {
+        if (classPathSize == 1 || filter.isSearchJar(element.getJarNameWithOffset(), element.getJarOffset())) {
           scanJar(element);
         }
 
@@ -234,6 +234,8 @@ public class ClassPathSearch implements ClassPathSearchService {
       File file = classPathEntry.classPath;
       module = new JarFile(file);
 
+      logger.trace("scanJar file:{}", file);
+
       List<URI> classPathFromManifest = getClassPathFromManifest(file, module.getManifest());
       for (URI uri : classPathFromManifest) {
         scanUri(uri);
@@ -303,7 +305,11 @@ public class ClassPathSearch implements ClassPathSearchService {
      * prefix. We want to come out with a name like WEB-INF/classes/ to ensure
      * we filter the contents of the war/jar file by this.
      */
-    if (jarOffset != null) {
+    if ("/".equals(jarOffset)) {
+      // root level for runnable jar (spring boot etc)
+      jarOffset = null;
+
+    } else if (jarOffset != null) {
       if (jarOffset.startsWith("/")) {
         jarOffset = jarOffset.substring(1);
       }
@@ -497,6 +503,10 @@ public class ClassPathSearch implements ClassPathSearchService {
 
     String getJarNameWithOffset() {
       return (jarOffset == null) ? classPath.getName() : classPath.getName() + "!" + jarOffset;
+    }
+
+    String getJarOffset() {
+      return jarOffset;
     }
   }
 
