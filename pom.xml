@@ -228,7 +228,7 @@
             <configuration>
               <classSource>target/test-classes</classSource>
               <packages>com.avaje.tests.**</packages>
-              <transformArgs>debug=2</transformArgs>
+              <transformArgs>debug=1</transformArgs>
             </configuration>
             <goals>
               <goal>enhance</goal>
