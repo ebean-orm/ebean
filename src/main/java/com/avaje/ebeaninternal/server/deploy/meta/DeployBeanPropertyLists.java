@@ -73,7 +73,31 @@ public class DeployBeanPropertyLists {
 
     this.propertyMap = new LinkedHashMap<String, BeanProperty>();
 
+    // see if there is a discriminator property we should add
+    String discriminatorColumn = null;
+    BeanProperty discProperty = null;
+
+    InheritInfo inheritInfo = deploy.getInheritInfo();
+    if (inheritInfo != null) {
+      // Create a BeanProperty for the discriminator column to support
+      // using RawSql queries with inheritance
+      discriminatorColumn = inheritInfo.getDiscriminatorColumn();
+      DeployBeanProperty discDeployProp = new DeployBeanProperty(deploy, String.class, new ScalarTypeString(), null);
+      discDeployProp.setDiscriminator();
+      discDeployProp.setName(discriminatorColumn);
+      discDeployProp.setDbColumn(discriminatorColumn);
+
+      // only register it in the propertyMap. This might not be used if
+      // an explicit property is mapped to the discriminator on the bean
+      discProperty = new BeanProperty(desc, discDeployProp);
+    }
+
     for (DeployBeanProperty prop : deploy.propertiesAll()) {
+      if (discriminatorColumn != null && discriminatorColumn.equals(prop.getDbColumn())) {
+        // we have an explicit property mapped to the discriminator column
+        prop.setDiscriminator();
+        discProperty = null;
+      }
       BeanProperty beanProp = createBeanProperty(owner, prop);
       propertyMap.put(beanProp.getName(), beanProp);
     }
@@ -84,21 +108,12 @@ public class DeployBeanPropertyLists {
       allocateToList(prop);
     }
 
-    InheritInfo inheritInfo = deploy.getInheritInfo();
-    if (inheritInfo != null) {
-      // Create a BeanProperty for the discriminator column to support 
-      // using RawSql queries with inheritance
-      String discriminatorColumn = inheritInfo.getDiscriminatorColumn();
-      DeployBeanProperty discDeployProp = new DeployBeanProperty(deploy, String.class, new ScalarTypeString(), null);
-      discDeployProp.setDiscriminator();
-      discDeployProp.setName(discriminatorColumn);
-      discDeployProp.setDbColumn(discriminatorColumn);
-      
-      // create the discriminator BeanProperty and only register it in the propertyMap
-      BeanProperty dprop = new BeanProperty(desc, discDeployProp);
-      propertyMap.put(dprop.getName(), dprop);
+    if (discProperty != null) {
+      // put the discriminator property into the property map only
+      // (after the real properties have been organised into their lists)
+      propertyMap.put(discProperty.getName(), discProperty);
     }
-    
+
     List<DeployTableJoin> deployTableJoins = deploy.getTableJoins();
     tableJoins = new TableJoin[deployTableJoins.size()];
     for (int i = 0; i < deployTableJoins.size(); i++) {

@@ -1,10 +1,5 @@
 package com.avaje.tests.inheritance;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.BeanCollection.ModifyListenMode;
@@ -13,6 +8,11 @@ import com.avaje.tests.model.basic.Animal;
 import com.avaje.tests.model.basic.AnimalShelter;
 import com.avaje.tests.model.basic.Cat;
 import com.avaje.tests.model.basic.Dog;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
 
 public class TestInheritanceOnMany extends BaseTestCase {
 
@@ -40,8 +40,9 @@ public class TestInheritanceOnMany extends BaseTestCase {
     BeanList<?> beanList = (BeanList<?>)animals;
     ModifyListenMode modifyListenMode = beanList.getModifyListenMode();
     
-    Assert.assertNotNull(modifyListenMode);
-    
+    assertNotNull(modifyListenMode);
+
+    assertNotNull(Ebean.find(Animal.class).findList());
   }
   
 }

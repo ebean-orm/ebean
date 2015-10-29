@@ -1,5 +1,6 @@
 package com.avaje.tests.model.basic;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -21,6 +22,9 @@ public abstract class Animal {
   @Version
   Long version;
 
+  @Column(name="species", insertable = false, updatable = false, nullable = false)
+  String species;
+
   @ManyToOne
   AnimalShelter shelter;
 
@@ -38,6 +42,14 @@ public abstract class Animal {
 
   public void setVersion(Long version) {
     this.version = version;
+  }
+
+  public String getSpecies() {
+    return species;
+  }
+
+  public void setSpecies(String species) {
+    this.species = species;
   }
 
   public AnimalShelter getShelter() {
