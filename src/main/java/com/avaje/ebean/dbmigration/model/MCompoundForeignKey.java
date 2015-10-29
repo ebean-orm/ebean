@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class MCompoundForeignKey {
 
-  private final String name;
+  private String name;
   private final String referenceTable;
   private final List<String> columns = new ArrayList<String>();
   private final List<String> referenceColumns = new ArrayList<String>();
@@ -45,6 +45,28 @@ public class MCompoundForeignKey {
     fk.setRefColumnNames(toColumnNames(referenceColumns));
     fk.setRefTableName(referenceTable);
     return fk;
+  }
+
+  /**
+   * Add a counter to the foreign key and index names to avoid duplication.
+   */
+  public void addNameSuffix(int counter) {
+    this.name = name + "_" + counter;
+    this.indexName = indexName + "_" + counter;
+  }
+
+  /**
+   * Return the foreign key name.
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * Return the index name.
+   */
+  public String getIndexName() {
+    return indexName;
   }
 
   /**

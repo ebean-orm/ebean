@@ -47,6 +47,8 @@ public class ModelBuildIntersectionTable {
 
 		BeanDescriptor<?> targetDesc = manyProp.getTargetDescriptor();
 		buildFkConstraints(targetDesc, tableJoin.columns(), false);
+
+    intersectionTable.checkDuplicateForeignKeys();
 	}
 
 	

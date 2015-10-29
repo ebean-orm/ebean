@@ -14,6 +14,7 @@ import com.avaje.ebean.dbmigration.migration.UniqueConstraint;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -482,4 +483,32 @@ public class MTable {
     return (value == 0) ? null : BigInteger.valueOf(value);
   }
 
+  /**
+   * Check if there are duplicate foreign keys.
+   * <p>
+   *   This can occur when an ManyToMany relates back to itself.
+   * </p>
+   */
+  public void checkDuplicateForeignKeys() {
+
+    if (hasDuplicateForeignKeys()) {
+      int counter = 1;
+      for (MCompoundForeignKey fk : compoundKeys) {
+        fk.addNameSuffix(counter++);
+      }
+    }
+  }
+
+  /**
+   * Return true if the foreign key names are not unique.
+   */
+  private boolean hasDuplicateForeignKeys() {
+    Set<String> fkNames = new HashSet<String>();
+    for (MCompoundForeignKey fk : compoundKeys) {
+      if (!fkNames.add(fk.getName())) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
