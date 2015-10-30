@@ -1,11 +1,13 @@
 package com.avaje.tests.update;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.SqlQuery;
+import com.avaje.ebean.SqlRow;
 import com.avaje.tests.model.basic.Customer;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestUpdatePartial extends BaseTestCase {
 
@@ -18,6 +20,7 @@ public class TestUpdatePartial extends BaseTestCase {
     c.setSmallnote("a note");
 
     Ebean.save(c);
+    checkDbStatusValue(c.getId(), "A");
 
     Customer c2 = Ebean.find(Customer.class)
         .select("status, smallnote")
@@ -28,6 +31,7 @@ public class TestUpdatePartial extends BaseTestCase {
     c2.setSmallnote("2nd note");
 
     Ebean.save(c2);
+    checkDbStatusValue(c.getId(), "I");
 
     Customer c3 = Ebean.find(Customer.class)
         .select("status")
@@ -38,7 +42,15 @@ public class TestUpdatePartial extends BaseTestCase {
     c3.setSmallnote("3rd note");
 
     Ebean.save(c3);
+    checkDbStatusValue(c.getId(), "N");
+  }
 
+  private void checkDbStatusValue(Integer custId, String dbStatus) {
+    SqlQuery sqlQuery = Ebean.createSqlQuery("select id, status from o_customer where id = ?");
+    sqlQuery.setParameter(1, custId);
+    SqlRow sqlRow = sqlQuery.findUnique();
+    String status = sqlRow.getString("status");
+    assertEquals(dbStatus, status);
   }
 
   /**
@@ -57,6 +69,6 @@ public class TestUpdatePartial extends BaseTestCase {
     Ebean.save(customerWithoutChanges);
 
     // assert
-    Assert.assertEquals(customer.getUpdtime().getTime(), customerWithoutChanges.getUpdtime().getTime());
+    assertEquals(customer.getUpdtime().getTime(), customerWithoutChanges.getUpdtime().getTime());
   }
 }

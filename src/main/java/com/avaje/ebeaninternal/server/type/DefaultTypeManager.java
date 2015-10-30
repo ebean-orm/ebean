@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.annotation.DbEnumType;
+import com.avaje.ebean.annotation.DbEnumValue;
 import com.avaje.ebean.annotation.EnumMapping;
 import com.avaje.ebean.annotation.EnumValue;
 import com.avaje.ebean.config.*;
@@ -21,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -478,7 +481,16 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * much shorter codes used in the DB.
    * </p>
    */
-  public ScalarType<?> createEnumScalarType(Class<?> enumType) {
+  public ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType) {
+
+    Method[] methods = enumType.getMethods();
+    for (int i = 0; i <methods.length; i++) {
+      DbEnumValue dbValue = methods[i].getAnnotation(DbEnumValue.class);
+      if (dbValue != null) {
+        boolean integerValues = DbEnumType.INTEGER == dbValue.storage();
+        return createEnumScalarTypeDbValue(enumType, methods[i], integerValues);
+      }
+    }
 
     // get the mapping information from EnumMapping
     EnumMapping enumMapping = enumType.getAnnotation(EnumMapping.class);
@@ -494,6 +506,33 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     Map<String, String> nameValueMap = StringHelper.delimitedToMap(nameValuePairs, ",", "=");
 
     return createEnumScalarType(enumType, nameValueMap, integerType, dbColumnLength);
+  }
+
+  /**
+   * Create the Mapping of Enum fields to DB values using EnumValue annotations.
+   * <p>
+   * Return null if the EnumValue annotations are not present/used.
+   * </p>
+   */
+  private ScalarType<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType) {
+
+    Map<String, String> nameValueMap = new HashMap<String, String>();
+
+    Enum<?>[] enumConstants = enumType.getEnumConstants();
+    for (int i = 0; i < enumConstants.length; i++) {
+      try {
+        Object value = method.invoke(enumConstants[i]);
+        nameValueMap.put(enumConstants[i].name(), value.toString());
+      } catch (Exception e) {
+        throw new IllegalArgumentException("Error trying to invoke DbEnumValue method on "+enumConstants[i], e);
+      }
+    }
+    if (nameValueMap.isEmpty()) {
+      // Not using EnumValue here
+      return null;
+    }
+
+    return createEnumScalarType(enumType, nameValueMap, integerType, 0);
   }
 
   /**

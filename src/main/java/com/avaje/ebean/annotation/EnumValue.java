@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  * }</pre>
  * <p>
  * This is an alternative to using the JPA standard approach or Ebean's
- * {@link EnumMapping} annotation.
+ * {@link DbEnumValue} annotation.
  * </p>
  * <p>
  * Note that if all the EnumValue values are parsable as Integers then Ebean

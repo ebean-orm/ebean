@@ -55,7 +55,7 @@ public interface TypeManager {
    * Create a ScalarType for an Enum using a mapping (rather than JPA Ordinal
    * or String which has limitations).
    */
-  ScalarType<?> createEnumScalarType(Class<?> enumType);
+  ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType);
 
   /**
    * Return the ScalarType used to handle JSON content.

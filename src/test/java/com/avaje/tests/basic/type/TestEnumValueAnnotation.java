@@ -1,5 +1,6 @@
 package com.avaje.tests.basic.type;
 
+import com.avaje.tests.model.basic.EBasicEnumInt;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -10,6 +11,9 @@ import com.avaje.ebean.SqlRow;
 import com.avaje.tests.model.basic.EBasic;
 import com.avaje.tests.model.basic.EBasic.Status;
 import com.avaje.tests.model.basic.EBasicEnumId;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TestEnumValueAnnotation extends BaseTestCase {
 
@@ -28,7 +32,7 @@ public class TestEnumValueAnnotation extends BaseTestCase {
     SqlRow sqlRow = q.findUnique();
     String strStatus = sqlRow.getString("status");
 
-    Assert.assertEquals("N", strStatus);
+    assertEquals("N", strStatus);
 
     EBasic b2 = new EBasic();
     b2.setName("Apple");
@@ -40,9 +44,9 @@ public class TestEnumValueAnnotation extends BaseTestCase {
     b3.setName("Orange");
 
     Ebean.save(b3);
-
   }
 
+  @Test
   public void testAsId() {
     EBasicEnumId b = new EBasicEnumId();
     b.setName("Banana");
@@ -56,7 +60,7 @@ public class TestEnumValueAnnotation extends BaseTestCase {
     SqlRow sqlRow = q.findUnique();
     String strStatus = sqlRow.getString("status");
 
-    Assert.assertEquals("N", strStatus);
+    assertEquals("N", strStatus);
 
     try {
       b = Ebean.find(EBasicEnumId.class, b.getStatus());
@@ -64,7 +68,32 @@ public class TestEnumValueAnnotation extends BaseTestCase {
       Assert.fail("The use of an enum as id should work : " + iae.getLocalizedMessage());
     }
 
-    Assert.assertEquals(EBasicEnumId.Status.NEW, b.getStatus());
+    assertEquals(EBasicEnumId.Status.NEW, b.getStatus());
   }
 
+  @Test
+  public void testDbEnumValueInt() {
+
+    EBasicEnumInt b = new EBasicEnumInt();
+    b.setName("Banana");
+    b.setStatus(EBasicEnumInt.Status.NEW);
+
+    Ebean.save(b);
+
+    SqlQuery q = Ebean.createSqlQuery("select * from e_basic_eni where id = :id");
+    q.setParameter("id", b.getId());
+
+    SqlRow sqlRow = q.findUnique();
+    Integer intStatus = sqlRow.getInteger("status");
+
+    assertEquals(Integer.valueOf(1), intStatus);
+
+
+    EBasicEnumInt b2 = Ebean.find(EBasicEnumInt.class)
+        .where().eq("id", b.getId())
+        .eq("status", EBasicEnumInt.Status.NEW)
+        .findUnique();
+
+    assertNotNull(b2);
+  }
 }

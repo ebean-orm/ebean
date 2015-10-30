@@ -111,8 +111,8 @@ public class DeployUtil {
     }
     ScalarType<?> scalarType = typeManager.getScalarType(enumType);
     if (scalarType == null) {
-      // see if it has a Mapping in avaje.properties
-      scalarType = typeManager.createEnumScalarType(enumType);
+      // look for @DbEnumValue or @EnumValue annotations etc
+      scalarType = typeManager.createEnumScalarType((Class<? extends Enum<?>>)enumType);
       if (scalarType == null) {
         // use JPA normal Enum type (without mapping)
         EnumType type = enumerated != null ? enumerated.value() : null;

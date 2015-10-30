@@ -2,7 +2,7 @@ package com.avaje.tests.model.basic;
 
 import com.avaje.ebean.annotation.ChangeLog;
 import com.avaje.ebean.annotation.ChangeLogInsertMode;
-import com.avaje.ebean.annotation.EnumValue;
+import com.avaje.ebean.annotation.DbEnumValue;
 import com.avaje.ebean.annotation.JsonIgnore;
 import com.avaje.ebean.annotation.Where;
 import com.avaje.tests.model.basic.finder.CustomerFinder;
@@ -36,14 +36,19 @@ public class Customer extends BasicDomain {
    * EnumValue is an Ebean specific mapping for enums.
    */
   public enum Status {
-    @EnumValue("N")
-    NEW,
+    NEW("N"),
+    ACTIVE("A"),
+    INACTIVE("I");
 
-    @EnumValue("A")
-    ACTIVE,
+    String dbValue;
+    Status(String dbValue) {
+      this.dbValue = dbValue;
+    }
 
-    @EnumValue("I")
-    INACTIVE
+    @DbEnumValue
+    public String getValue() {
+      return dbValue;
+    }
   }
 
   @Transient
