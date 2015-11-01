@@ -23,10 +23,10 @@ public class PostgresPlatform extends DatabasePlatform {
     // OnQueryOnly.CLOSE as a performance optimisation on Postgres
     this.onQueryOnly = OnQueryOnly.CLOSE;
     this.likeClause = "like ? escape''";
-
     this.selectCountWithAlias = true;
     this.blobDbType = Types.LONGVARBINARY;
     this.clobDbType = Types.VARCHAR;
+    this.nativeUuidType = true;
 
     this.dbEncrypt = new PostgresDbEncrypt();
     this.historySupport = new PostgresHistorySupport();
