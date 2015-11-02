@@ -67,8 +67,8 @@ public class ModelBuildContext {
     return maxLength(constraintNaming.checkConstraintName(tableName, columnName), checkCount);
   }
 
-  public void addTable(MTable table) {
-    model.addTable(table);
+  public MTable addTable(MTable table) {
+    return model.addTable(table);
   }
 
   public void addIndex(String indexName, String tableName, String columnName) {

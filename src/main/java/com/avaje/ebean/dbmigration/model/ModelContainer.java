@@ -213,8 +213,8 @@ public class ModelContainer {
   /**
    * Add a table (typically from reading EbeanServer meta data).
    */
-  public void addTable(MTable table) {
-    tables.put(table.getName(), table);
+  public MTable addTable(MTable table) {
+    return tables.put(table.getName(), table);
   }
 
   /**

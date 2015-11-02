@@ -35,7 +35,11 @@ public class ModelBuildIntersectionTable {
   public void build() {
 
     intersectionTable = createTable();
-    ctx.addTable(intersectionTable);
+    MTable existingTable = ctx.addTable(intersectionTable);
+    if (existingTable != null) {
+      throw new IllegalStateException("Property " + manyProp.getFullBeanName() + " has duplicate ManyToMany intersection table " + intersectionTable.getName()
+          + ". Please use @JoinTable to define unique table to use");
+    }
 
     buildFkConstraints();
 	}
