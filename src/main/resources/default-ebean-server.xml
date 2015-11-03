@@ -5,16 +5,9 @@
 
 	<!-- Default abstract Ebean Server configuration -->
 	<bean id="defaultEbeanServerConfig" class="com.avaje.ebean.config.ServerConfig" abstract="true">
-		<property name="autofetchConfig">
-			<bean class="com.avaje.ebean.config.AutofetchConfig">
-				<property name="logDirectory" value="logs"/>
-			</bean>
-		</property>
-
 		<property name="externalTransactionManager">
 			<bean class="com.avaje.ebean.springsupport.txn.SpringAwareJdbcTransactionManager"/>
 		</property>
-
 		<property name="namingConvention">
 			<bean class="com.avaje.ebean.config.UnderscoreNamingConvention"/>
 		</property>
