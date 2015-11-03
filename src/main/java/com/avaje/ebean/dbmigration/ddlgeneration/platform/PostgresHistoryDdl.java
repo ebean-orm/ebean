@@ -81,12 +81,12 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     appendInsertIntoHistory(apply, historyTable, includedColumns);
     apply
         .append("    NEW.").append(sysPeriod).append(" = tstzrange(CURRENT_TIMESTAMP,null);").newLine()
-        .append("    return new;").newLine().newLine();
+        .append("    return new;").newLine();
     apply
         .append("  elsif (TG_OP = 'DELETE') then").newLine();
     appendInsertIntoHistory(apply, historyTable, includedColumns);
     apply
-        .append("    return old;").newLine().newLine();
+        .append("    return old;").newLine();
     apply
         .append("  end if;").newLine()
         .append("end;").newLine()
