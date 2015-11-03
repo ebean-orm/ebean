@@ -918,6 +918,10 @@ public final class DefaultPersister implements Persister {
     t.depth(+1);
 
     if (additions != null && !additions.isEmpty()) {
+      // ensure any cascade batch has been flushed prior
+      // to inserting into the intersection table
+      t.flushBatch();
+
       for (Object other : additions) {
         EntityBean otherBean = (EntityBean) other;
         // the object from the 'other' side of the ManyToMany
@@ -943,6 +947,10 @@ public final class DefaultPersister implements Persister {
       }
     }
     if (deletions != null && !deletions.isEmpty()) {
+      // ensure any cascade batch has been flushed prior
+      // to inserting into the intersection table
+      t.flushBatch();
+
       for (Object other : deletions) {
         EntityBean otherDelete = (EntityBean) other;
         // the object from the 'other' side of the ManyToMany
