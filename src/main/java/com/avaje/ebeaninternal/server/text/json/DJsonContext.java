@@ -125,9 +125,12 @@ public class DJsonContext implements JsonContext {
 
       List<T> list = new ArrayList<T>();
 
-      JsonToken event = src.nextToken();
-      if (event != JsonToken.START_ARRAY) {
-        throw new JsonParseException("Expecting start_array event but got " + event, src.getCurrentLocation());
+      JsonToken currentToken = src.getCurrentToken();
+      if (currentToken != JsonToken.START_ARRAY) {
+        JsonToken event = src.nextToken();
+        if (event != JsonToken.START_ARRAY) {
+          throw new JsonParseException("Expecting start_array event but got " + event, src.getCurrentLocation());
+        }
       }
 
       do {
