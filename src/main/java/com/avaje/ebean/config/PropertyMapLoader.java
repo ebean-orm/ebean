@@ -18,7 +18,7 @@ final class PropertyMapLoader {
    * Load the <code>test-ebean.properties</code>.
    */
   public static PropertyMap loadTestProperties() {
-    return load(null, "test-ebean.properties", false);
+    return load(null, "test-ebean.properties");
   }
 
   /**
@@ -36,10 +36,10 @@ final class PropertyMapLoader {
       }
     }
 
-    PropertyMap map = load(null, fileName, true);
+    PropertyMap map = load(null, fileName);
     if (loadTestProperties) {
       // load test properties if present in classpath
-      load(map, "test-ebean.properties", false);
+      load(map, "test-ebean.properties");
     }
     return map;
   }
@@ -52,13 +52,10 @@ final class PropertyMapLoader {
    * @param fileName
    *          the name of the properties file to load.
    */
-  public static PropertyMap load(PropertyMap p, String fileName, boolean errorOnNull) {
+  public static PropertyMap load(PropertyMap p, String fileName) {
 
     InputStream is = findInputStream(fileName);
     if (is == null) {
-      if (errorOnNull) {
-        logger.error(fileName + " not found");
-      }
       return p;
     } else {
       return load(p, is);
@@ -66,7 +63,7 @@ final class PropertyMapLoader {
   }
 
   /**
-   * Load the inputstream returning the property map.
+   * Load the InputStream returning the property map.
    * 
    * @param p
    *          an existing property map to load into.
