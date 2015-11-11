@@ -1,22 +1,10 @@
 package com.avaje.ebeaninternal.api;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Helper to find classes taking into account the context class loader.
  */
 public class ClassUtil {
-
-  private static final Logger logger = LoggerFactory.getLogger(ClassUtil.class);
-
-  /**
-   * Load a class taking into account a context class loader (if present).
-   */
-  public static Class<?> forName(String name) throws ClassNotFoundException {
-    return forName(name, null);
-  }
 
   /**
    * Load a class taking into account a context class loader (if present).
@@ -27,22 +15,7 @@ public class ClassUtil {
       caller = ClassUtil.class;
     }
     ClassLoadContext ctx = ClassLoadContext.of(caller, true);
-
     return ctx.forName(name);
-  }
-
-
-  public static ClassLoader getClassLoader(Class<?> caller, boolean preferContext) {
-
-    if (caller == null) {
-      caller = ClassUtil.class;
-    }
-    ClassLoadContext ctx = ClassLoadContext.of(caller, preferContext);
-    ClassLoader classLoader = ctx.getDefault(preferContext);
-    if (ctx.isAmbiguous()) {
-      logger.info("Ambigous ClassLoader (Context vs Caller) chosen " + classLoader);
-    }
-    return classLoader;
   }
 
   /**
