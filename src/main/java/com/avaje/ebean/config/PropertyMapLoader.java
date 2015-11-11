@@ -39,7 +39,7 @@ final class PropertyMapLoader {
     PropertyMap map = load(null, fileName);
     if (loadTestProperties) {
       // load test properties if present in classpath
-      load(map, "test-ebean.properties");
+      map = load(map, "test-ebean.properties");
     }
     return map;
   }
