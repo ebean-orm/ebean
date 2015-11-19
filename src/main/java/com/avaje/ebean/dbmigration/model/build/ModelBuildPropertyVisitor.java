@@ -213,6 +213,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     }
 
     MColumn col = new MColumn(p.getDbColumn(), ctx.getColumnDefn(p));
+    col.setComment(p.fetchDbColumn());
 
     if (p.isId()) {
       col.setPrimaryKey(true);
