@@ -95,6 +95,11 @@ public interface SpiQuery<T> extends Query<T> {
 
   enum TemporalMode {
     /**
+     * Query runs against draft tables.
+     */
+    DRAFT,
+
+    /**
      * Query runs against current data (normal).
      */
     CURRENT,
@@ -170,6 +175,11 @@ public interface SpiQuery<T> extends Query<T> {
    * Return true if this is a 'As Of' query.
    */
   boolean isAsOfQuery();
+
+  /**
+   * Return true if this is a 'As Draft' query.
+   */
+  boolean isAsDraft();
 
   /**
    * Return the asOf Timestamp which the query should run as.

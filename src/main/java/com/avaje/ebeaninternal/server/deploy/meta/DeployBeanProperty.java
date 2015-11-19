@@ -8,6 +8,7 @@ import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebeaninternal.server.core.InternString;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyGetter;
@@ -181,6 +182,9 @@ public class DeployBeanProperty {
   private String indexName;
 
   private boolean excludedFromHistory;
+
+  private boolean draftOnly;
+  private boolean draftDirty;
 
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     this.desc = desc;
@@ -598,7 +602,7 @@ public class DeployBeanProperty {
    */
   public void setDbType(int dbType) {
     this.dbType = dbType;
-    this.lob = isLobType(dbType);
+    this.lob = BeanProperty.isLobType(dbType);
   }
 
   /**
@@ -607,22 +611,6 @@ public class DeployBeanProperty {
    */
   public boolean isLob() {
     return lob;
-  }
-
-  private boolean isLobType(int type) {
-    switch (type) {
-      case Types.CLOB:
-        return true;
-      case Types.BLOB:
-        return true;
-      case Types.LONGVARBINARY:
-        return true;
-      case Types.LONGVARCHAR:
-        return true;
-
-      default:
-        return false;
-    }
   }
 
   public boolean isDbNumberType() {
@@ -848,5 +836,22 @@ public class DeployBeanProperty {
 
   public void setExcludedFromHistory() {
     this.excludedFromHistory = true;
+  }
+
+  public void setDraftOnly() {
+    this.draftOnly = true;
+  }
+
+  public boolean isDraftOnly() {
+    return draftOnly;
+  }
+
+  public void setDraftDirty() {
+    this.draftOnly = true;
+    this.draftDirty = true;
+  }
+
+  public boolean isDraftDirty() {
+    return draftDirty;
   }
 }

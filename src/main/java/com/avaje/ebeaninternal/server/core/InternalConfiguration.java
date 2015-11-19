@@ -127,13 +127,14 @@ public class InternalConfiguration {
 
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy();
+    Map<String, String> draftTableMap = beanDescriptorManager.getDraftTableMap();
 
     this.transactionManager = createTransactionManager();
 
     DatabasePlatform databasePlatform = serverConfig.getDatabasePlatform();
 
     this.binder = getBinder(typeManager, databasePlatform);
-    this.cQueryEngine = new CQueryEngine(databasePlatform, binder, asOfTableMapping, serverConfig.getAsOfSysPeriod());
+    this.cQueryEngine = new CQueryEngine(databasePlatform, binder, asOfTableMapping, serverConfig.getAsOfSysPeriod(), draftTableMap);
 
     ExternalTransactionManager externalTransactionManager = serverConfig.getExternalTransactionManager();
     if (externalTransactionManager == null && serverConfig.isUseJtaTransactionManager()) {

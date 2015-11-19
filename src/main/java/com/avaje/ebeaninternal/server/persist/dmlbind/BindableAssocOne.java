@@ -28,6 +28,11 @@ public class BindableAssocOne implements Bindable {
     return "BindableAssocOne " + assocOne;
   }
 
+  @Override
+  public boolean isDraftOnly() {
+    return assocOne.isDraftOnly();
+  }
+
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     if (request.isAddToUpdate(assocOne)) {
       list.add(this);

@@ -45,6 +45,8 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
   private ArrayList<BeanProperty> encryptedProps;
 
+  private final CQueryDraftSupport draftSupport;
+
   private final CQueryHistorySupport historySupport;
 
   private final boolean historyQuery;
@@ -53,12 +55,13 @@ public class DefaultDbSqlContext implements DbSqlContext {
    * Construct for SELECT clause (with column alias settings).
    */
   public DefaultDbSqlContext(SqlTreeAlias alias, String tableAliasPlaceHolder,
-                             String columnAliasPrefix, boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport) {
+                             String columnAliasPrefix, boolean alwaysUseColumnAlias, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
 
     this.alias = alias;
     this.tableAliasPlaceHolder = tableAliasPlaceHolder;
     this.columnAliasPrefix = columnAliasPrefix;
     this.useColumnAlias = alwaysUseColumnAlias;
+    this.draftSupport = draftSupport;
     this.historySupport = historySupport;
     this.historyQuery = (historySupport != null);
   }
@@ -105,22 +108,18 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
     sb.append(" ");
     sb.append(type);
-    if (!historyQuery) {
+    if (draftSupport != null) {
+      appendTable(table, draftSupport.getDraftTable(table));
+
+    } else if (!historyQuery) {
       sb.append(" ").append(table).append(" ");
 
     } else {
       // check if there is an associated history table and if so
       // use the unionAll view - we expect an additional predicate to match
-      String withHistoryTable = historySupport.getAsOfView(table);
-
-      if (withHistoryTable != null) {
-        // there is an associated history table and view so use that
-        sb.append(" ").append(withHistoryTable).append(" ");
-
-      } else {
-        sb.append(" ").append(table).append(" ");
-      }
+      appendTable(table, historySupport.getAsOfView(table));
     }
+
     sb.append(a2);
     sb.append(" on ");
 
@@ -147,6 +146,21 @@ public class DefaultDbSqlContext implements DbSqlContext {
     }
 
     sb.append(" ");
+  }
+
+  private void appendTable(String table, String draftTable) {
+    if (draftTable != null) {
+      // there is an associated history table and view so use that
+      sb.append(" ").append(draftTable).append(" ");
+
+    } else {
+      sb.append(" ").append(table).append(" ");
+    }
+  }
+
+  @Override
+  public boolean isDraftQuery() {
+    return draftSupport != null;
   }
 
   public String getTableAlias(String prefix) {

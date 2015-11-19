@@ -5,6 +5,7 @@ import com.avaje.ebean.dbmigration.model.MColumn;
 import com.avaje.ebean.dbmigration.model.MCompoundForeignKey;
 import com.avaje.ebean.dbmigration.model.MTable;
 import com.avaje.ebean.dbmigration.model.visitor.BaseTablePropertyVisitor;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
@@ -14,6 +15,7 @@ import com.avaje.ebeaninternal.server.deploy.TableJoinColumn;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -26,6 +28,8 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
   private final MTable table;
 
+  private final BeanDescriptor<?> beanDescriptor;
+
   private final IndexSet indexSet = new IndexSet();
 
   private MColumn lastColumn;
@@ -36,11 +40,11 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   private int countCheck;
 
 
-  public ModelBuildPropertyVisitor(ModelBuildContext ctx, MTable table, CompoundUniqueConstraint[] constraints) {
+  public ModelBuildPropertyVisitor(ModelBuildContext ctx, MTable table, BeanDescriptor<?> beanDescriptor) {
     this.ctx = ctx;
     this.table = table;
-
-    addCompoundUniqueConstraint(constraints);
+    this.beanDescriptor = beanDescriptor;
+    addCompoundUniqueConstraint(beanDescriptor.getCompoundUniqueConstraints());
   }
 
   /**
@@ -96,6 +100,36 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
         // effectively an index (probably via unique constraint)
         compoundKey.setIndexName(null);
       }
+    }
+
+    addDraftTable();
+  }
+
+  /**
+   * Create a 'draft' table that is mostly the same as the base table.
+   * It has @DraftOnly columns and adjusted primary and foreign keys.
+   */
+  private void addDraftTable() {
+    if (beanDescriptor.isDraftable() || beanDescriptor.isDraftableElement()) {
+      // create a 'Draft' table which looks very similar (change PK, FK etc)
+      MTable draftTable = table.createDraftTable();
+      draftTable.setPkName(ctx.primaryKeyName(draftTable.getName()));
+
+      int fkCount = 0;
+      int ixCount = 0;
+      Collection<MColumn> cols = draftTable.getColumns().values();
+      for (MColumn col: cols) {
+        if (col.getForeignKeyName() != null) {
+          // Note that we adjust the 'references' table later in a second pass
+          // after we know all the tables that are 'draftable'
+          //col.setReferences(refTable + "." + refColumn);
+          col.setForeignKeyName(ctx.foreignKeyConstraintName(draftTable.getName(), col.getName(), ++fkCount));
+
+          String[] indexCols = {col.getName()};
+          col.setForeignKeyIndex(ctx.foreignKeyIndexName(draftTable.getName(), indexCols, ++ixCount));
+        }
+      }
+      ctx.addTable(draftTable);
     }
   }
 
@@ -213,6 +247,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     }
 
     MColumn col = new MColumn(p.getDbColumn(), ctx.getColumnDefn(p));
+    col.setDraftOnly(p.isDraftOnly());
 
     if (p.isId()) {
       col.setPrimaryKey(true);

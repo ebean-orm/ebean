@@ -118,9 +118,15 @@ public class DeployBeanDescriptor<T> {
 
   private String baseTableVersionsBetween;
 
+  private String draftTable;
+
   private boolean historySupport;
 
   private boolean readAuditing;
+
+  private boolean draftable;
+
+  private boolean draftableElement;
 
   private TableName baseTableFull;
 
@@ -199,6 +205,22 @@ public class DeployBeanDescriptor<T> {
    */
   public boolean isReadAuditing() {
     return readAuditing;
+  }
+
+  public void setDraftable() {
+    draftable = true;
+  }
+
+  public boolean isDraftable() {
+    return draftable;
+  }
+
+  public void setDraftableElement() {
+    draftableElement = true;
+  }
+
+  public boolean isDraftableElement() {
+    return draftableElement;
   }
 
   public boolean isScalaObject() {
@@ -485,6 +507,10 @@ public class DeployBeanDescriptor<T> {
     postLoaders.add(postLoad);
   }
 
+  public String getDraftTable() {
+    return draftTable;
+  }
+
   /**
    * Return the base table. Only properties mapped to the base table are by
    * default persisted.
@@ -522,6 +548,7 @@ public class DeployBeanDescriptor<T> {
     this.baseTable = baseTableFull == null ? null : baseTableFull.getQualifiedName();
     this.baseTableAsOf = baseTable + asOfSuffix;
     this.baseTableVersionsBetween = baseTable + versionsBetweenSuffix;
+    this.draftTable = (draftable) ? baseTable+"_draft" : baseTable;
   }
 
   public void sortProperties() {

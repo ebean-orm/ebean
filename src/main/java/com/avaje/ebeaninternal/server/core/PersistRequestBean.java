@@ -119,6 +119,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private boolean requestUpdateAllLoadedProps;
 
+  private boolean publish;
+
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
       PersistExecute persistExecute, PersistRequest.Type type, boolean saveRecurse) {
 
@@ -735,5 +737,52 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
 
     return requestUpdateAllLoadedProps;
+  }
+
+  /**
+   * This is a persist request for a 'publish' action.
+   */
+  public void setPublish() {
+    publish = true;
+  }
+
+  /**
+   * Return true if this request is a 'publish' action.
+   */
+  public boolean isPublish() {
+    return publish;
+  }
+
+  /**
+   * Return the key for an update persist request.
+   */
+  public int getUpdatePlanHash() {
+
+    int hash;
+    if (determineUpdateAllLoadedProperties()) {
+      hash = intercept.getLoadedPropertyHash();
+    } else {
+      hash = intercept.getDirtyPropertyHash();
+    }
+
+    BeanProperty versionProperty = beanDescriptor.getVersionProperty();
+    if (versionProperty != null) {
+      if (intercept.isLoadedProperty(versionProperty.getPropertyIndex())) {
+        hash = hash * 31 + 7;
+      }
+    }
+
+    if (publish) {
+      hash = hash * 31;
+    }
+
+    return hash;
+  }
+
+  /**
+   * Return the table to update depending if the request is a 'publish' one or normal.
+   */
+  public String getUpdateTable() {
+    return publish ? beanDescriptor.getBaseTable() : beanDescriptor.getDraftTable();
   }
 }

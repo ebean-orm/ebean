@@ -30,6 +30,11 @@ public final class BindableIdEmbedded implements BindableId {
     matches = MatchedImportedProperty.build(props, desc);
   }
 
+  @Override
+  public boolean isDraftOnly() {
+    return false;
+  }
+
   public boolean isEmpty() {
     return false;
   }

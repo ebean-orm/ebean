@@ -35,6 +35,8 @@ public class MColumn {
    */
   private AlterColumn alterColumn;
 
+  private boolean draftOnly;
+
   public MColumn(Column column) {
     this.name = column.getName();
     this.type = column.getType();
@@ -61,6 +63,28 @@ public class MColumn {
     this.name = name;
     this.type = type;
     this.notnull = notnull;
+  }
+
+  /**
+   * Return a copy of this column used for creating the associated draft table.
+   */
+  public MColumn copyForDraft() {
+
+    MColumn copy = new MColumn(name, type);
+    copy.draftOnly = draftOnly;
+    copy.checkConstraint = checkConstraint;
+    copy.checkConstraintName = checkConstraintName;
+    copy.defaultValue = defaultValue;
+    copy.references = references;
+    copy.foreignKeyName = foreignKeyName;
+    copy.foreignKeyIndex = foreignKeyIndex;
+    copy.historyExclude = historyExclude;
+    copy.notnull = notnull;
+    copy.primaryKey = primaryKey;
+    copy.identity = identity;
+    copy.unique = unique;
+    copy.uniqueOneToOne = uniqueOneToOne;
+    return copy;
   }
 
   public String getName() {
@@ -172,6 +196,21 @@ public class MColumn {
    */
   public String getUniqueOneToOne() {
     return uniqueOneToOne;
+  }
+
+
+  /**
+   * Set the draftOnly status for this column.
+   */
+  public void setDraftOnly(boolean draftOnly) {
+    this.draftOnly = draftOnly;
+  }
+
+  /**
+   * Return the draftOnly status for this column.
+   */
+  public boolean isDraftOnly() {
+    return draftOnly;
   }
 
   public Column createColumn() {

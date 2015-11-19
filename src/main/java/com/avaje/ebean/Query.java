@@ -298,6 +298,11 @@ public interface Query<T> extends Serializable {
   Query<T> asOf(Timestamp asOf);
 
   /**
+   * Execute the query against the draft set of tables.
+   */
+  Query<T> asDraft();
+
+  /**
    * Cancel the query execution if supported by the underlying database and
    * driver.
    * <p>

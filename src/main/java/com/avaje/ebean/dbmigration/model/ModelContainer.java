@@ -12,6 +12,7 @@ import com.avaje.ebean.dbmigration.migration.DropIndex;
 import com.avaje.ebean.dbmigration.migration.DropTable;
 import com.avaje.ebean.dbmigration.migration.Migration;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,18 @@ public class ModelContainer {
 
   public ModelContainer() {
 
+  }
+
+  /**
+   * Adjust the FK references on all the draft tables.
+   */
+  public void adjustDraftReferences() {
+    Collection<MTable> tables = this.tables.values();
+    for (MTable table : tables) {
+      if (table.isDraft()) {
+        table.adjustReferences(this);
+      }
+    }
   }
 
   /**

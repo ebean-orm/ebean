@@ -27,6 +27,11 @@ public class BindableCompound implements Bindable {
     return "BindableCompound " + compound + " items:" + Arrays.toString(items);
   }
 
+  @Override
+  public boolean isDraftOnly() {
+    return false;
+  }
+
   public void dmlAppend(GenerateDmlRequest request) {
 
     for (int i = 0; i < items.length; i++) {

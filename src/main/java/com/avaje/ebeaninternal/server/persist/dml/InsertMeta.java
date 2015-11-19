@@ -8,6 +8,7 @@ import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableDiscriminator;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableId;
+import com.avaje.ebeaninternal.server.persist.dmlbind.BindableList;
 
 import java.sql.SQLException;
 
@@ -18,20 +19,21 @@ import java.sql.SQLException;
 public final class InsertMeta {
 
   private final String sqlNullId;
-
   private final String sqlWithId;
+  private final String sqlDraftNullId;
+  private final String sqlDraftWithId;
 
   private final BindableId id;
 
   private final Bindable discriminator;
 
-  private final Bindable all;
+  private final BindableList all;
+
+  private final BindableList allExcludeDraftOnly;
 
   private final boolean supportsGetGeneratedKeys;
 
   private final boolean concatinatedKey;
-
-  private final String tableName;
 
   /**
    * Used for DB that do not support getGeneratedKeys.
@@ -44,16 +46,20 @@ public final class InsertMeta {
 
   private final boolean emptyStringToNull;
 
-  public InsertMeta(DatabasePlatform dbPlatform, BeanDescriptor<?> desc, Bindable shadowFKey, BindableId id, Bindable all) {
+  public InsertMeta(DatabasePlatform dbPlatform, BeanDescriptor<?> desc, Bindable shadowFKey, BindableId id, BindableList all) {
 
     this.emptyStringToNull = dbPlatform.isTreatEmptyStringsAsNull();
-    this.tableName = desc.getBaseTable();
     this.discriminator = getDiscriminator(desc);
     this.id = id;
     this.all = all;
+    this.allExcludeDraftOnly = all.excludeDraftOnly();
     this.shadowFKey = shadowFKey;
 
-    this.sqlWithId = genSql(false);
+    String tableName = desc.getBaseTable();
+    String draftTableName = desc.getDraftTable();
+
+    this.sqlWithId = genSql(false, tableName, false);
+    this.sqlDraftWithId = desc.isDraftable() ? genSql(false, draftTableName, true) : sqlWithId;
 
     // only available for single Id property
     if (id.isConcatenated()) {
@@ -61,6 +67,7 @@ public final class InsertMeta {
       this.concatinatedKey = true;
       this.identityDbColumns = null;
       this.sqlNullId = null;
+      this.sqlDraftNullId = null;
       this.supportsGetGeneratedKeys = false;
       this.selectLastInsertedId = null;
 
@@ -76,7 +83,8 @@ public final class InsertMeta {
         this.supportsGetGeneratedKeys = dbPlatform.getDbIdentity().isSupportsGetGeneratedKeys();
         this.selectLastInsertedId = desc.getSelectLastInsertedId();
       }
-      this.sqlNullId = genSql(true);
+      this.sqlNullId = genSql(true, tableName, false);
+      this.sqlDraftNullId = desc.isDraftable() ? genSql(false, draftTableName, true) : sqlNullId;
     }
   }
 
@@ -99,7 +107,7 @@ public final class InsertMeta {
   /**
    * Return true if this is a concatenated key.
    */
-  public boolean isConcatinatedKey() {
+  public boolean isConcatenatedKey() {
     return concatinatedKey;
   }
 
@@ -137,7 +145,7 @@ public final class InsertMeta {
   /**
    * Bind the request based on whether the id value(s) are null.
    */
-  public void bind(DmlHandler request, EntityBean bean, boolean withId) throws SQLException {
+  public void bind(DmlHandler request, EntityBean bean, boolean withId, boolean publish) throws SQLException {
 
     if (withId) {
       id.dmlBind(request, bean);
@@ -148,27 +156,31 @@ public final class InsertMeta {
     if (discriminator != null) {
       discriminator.dmlBind(request, bean);
     }
-    all.dmlBind(request, bean);
+    if (publish) {
+      allExcludeDraftOnly.dmlBind(request, bean);
+    } else {
+      all.dmlBind(request, bean);
+    }
   }
 
   /**
    * get the sql based whether the id value(s) are null.
    */
-  public String getSql(boolean withId) {
+  public String getSql(boolean withId, boolean publish) {
 
     if (withId) {
-      return sqlWithId;
+      return publish ? sqlWithId : sqlDraftWithId;
     } else {
-      return sqlNullId;
+      return publish ? sqlNullId : sqlDraftNullId;
     }
   }
 
-  private String genSql(boolean nullId) {
+  private String genSql(boolean nullId, String table, boolean draftTable) {
 
     GenerateDmlRequest request = new GenerateDmlRequest();
     request.setInsertSetMode();
 
-    request.append("insert into ").append(tableName);
+    request.append("insert into ").append(table);
     request.append(" (");
 
     if (!nullId) {
@@ -183,7 +195,11 @@ public final class InsertMeta {
       discriminator.dmlAppend(request);
     }
 
-    all.dmlAppend(request);
+    if (draftTable) {
+      all.dmlAppend(request);
+    } else {
+      allExcludeDraftOnly.dmlAppend(request);
+    }
 
     request.append(") values (");
     request.append(request.getInsertBindBuffer());

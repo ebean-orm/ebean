@@ -53,7 +53,7 @@ public class SqlBeanLoad {
 
   public Object load(BeanProperty prop) {
 
-    if (!rawSql && !prop.isLoadProperty()) {
+    if (!rawSql && !prop.isLoadProperty(ctx.isDraftQuery())) {
       return null;
     }
 

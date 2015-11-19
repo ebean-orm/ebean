@@ -1625,6 +1625,27 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  public <T> void publish(Query<T> query, Transaction transaction) {
+
+    TransWrapper wrap = initTransIfRequired(transaction);
+    try {
+      SpiTransaction trans = wrap.transaction;
+      persister.publish(query, trans);
+      wrap.commitIfCreated();
+
+    } catch (RuntimeException e) {
+      wrap.rollbackIfCreated();
+      throw e;
+    }
+  }
+
+  @Override
+  public <T> void publish(Class<T> beanType, Object id, Transaction transaction) {
+
+    Query<T> query = find(beanType).setId(id);
+    publish(query, transaction);
+  }
+
   private EntityBean checkEntityBean(Object bean) {
     if (bean == null) {
       throw new IllegalArgumentException(Message.msg("bean.isnull"));

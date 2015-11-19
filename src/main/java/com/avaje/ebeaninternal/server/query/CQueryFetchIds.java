@@ -266,6 +266,10 @@ public class CQueryFetchIds {
       // no-op
     }
 
+    @Override
+    public boolean isDraftQuery() {
+      return false;
+    }
   }
 
 }

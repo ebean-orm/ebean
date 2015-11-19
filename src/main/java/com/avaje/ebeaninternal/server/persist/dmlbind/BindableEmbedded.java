@@ -27,6 +27,11 @@ public class BindableEmbedded implements Bindable {
     return "BindableEmbedded " + embProp + " items:" + Arrays.toString(items);
   }
 
+  @Override
+  public boolean isDraftOnly() {
+    return embProp.isDraftOnly();
+  }
+
   public void dmlAppend(GenerateDmlRequest request) {
 
     for (int i = 0; i < items.length; i++) {

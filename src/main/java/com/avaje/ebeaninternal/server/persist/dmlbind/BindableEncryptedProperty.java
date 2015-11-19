@@ -27,6 +27,11 @@ public class BindableEncryptedProperty implements Bindable {
     return prop.toString();
   }
 
+  @Override
+  public boolean isDraftOnly() {
+    return prop.isDraftOnly();
+  }
+
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     if (request.isAddToUpdate(prop)) {
       list.add(this);

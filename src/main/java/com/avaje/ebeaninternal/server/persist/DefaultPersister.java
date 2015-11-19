@@ -83,17 +83,7 @@ public final class DefaultPersister implements Persister {
    */
   public int executeCallable(CallableSql callSql, Transaction t) {
 
-    PersistRequestCallableSql request = new PersistRequestCallableSql(server, callSql, (SpiTransaction) t, persistExecute);
-    try {
-      request.initTransIfRequired();
-      int rc = request.executeOrQueue();
-      request.commitTransIfRequired();
-      return rc;
-
-    } catch (RuntimeException e) {
-      request.rollbackTransIfRequired();
-      throw e;
-    }
+    return executeOrQueue(new PersistRequestCallableSql(server, callSql, (SpiTransaction) t, persistExecute));
   }
 
   /**
@@ -110,7 +100,10 @@ public final class DefaultPersister implements Persister {
       throw new PersistenceException(msg);
     }
 
-    PersistRequestOrmUpdate request = new PersistRequestOrmUpdate(server, mgr, ormUpdate, (SpiTransaction) t, persistExecute);
+    return executeOrQueue(new PersistRequestOrmUpdate(server, mgr, ormUpdate, (SpiTransaction) t, persistExecute));
+  }
+
+  private int executeOrQueue(PersistRequest request) {
     try {
       request.initTransIfRequired();
       int rc = request.executeOrQueue();
@@ -128,17 +121,52 @@ public final class DefaultPersister implements Persister {
    */
   public int executeSqlUpdate(SqlUpdate updSql, Transaction t) {
 
-    PersistRequestUpdateSql request = new PersistRequestUpdateSql(server, updSql, (SpiTransaction) t, persistExecute);
-    try {
-      request.initTransIfRequired();
-      int rc = request.executeOrQueue();
-      request.commitTransIfRequired();
-      return rc;
+    return executeOrQueue(new PersistRequestUpdateSql(server, updSql, (SpiTransaction) t, persistExecute));
+  }
 
-    } catch (RuntimeException e) {
-      request.rollbackTransIfRequired();
-      throw e;
+  @Override
+  public <T> void publish(Query<T> query, Transaction transaction) {
+
+    query.asDraft();
+
+    Class<T> beanType = query.getBeanType();
+    List<T> draftBeans = server.findList(query, transaction);
+
+    BeanDescriptor<T> desc = server.getBeanDescriptor(beanType);
+
+    // get the list of Id's
+    List<Object> idList = new ArrayList<Object>();
+    for (T draftBean: draftBeans) {
+      idList.add(desc.getBeanId(draftBean));
     }
+
+    // fetch existing live beans to update (or insert if missing)
+    Map<?, T> liveBeans = server.find(beanType)
+        .where().idIn(idList)
+        .findMap();
+
+    List<T> livePublish = new ArrayList<T>(idList.size());
+
+    BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
+
+    for (T draftBean: draftBeans) {
+      Object draftID = desc.getBeanId(draftBean);
+      T existingLiveBean = liveBeans.get(draftID);
+
+      T liveBean = desc.publish(draftBean, existingLiveBean);
+      livePublish.add(liveBean);
+
+      Type persistType = (existingLiveBean == null) ? Type.INSERT : Type.UPDATE;
+      PersistRequestBean<T> request = createRequest(liveBean, transaction, null, mgr, persistType, false);
+      request.setPublish();
+
+      if (persistType == Type.INSERT) {
+        insert(request);
+      } else {
+        update(request);
+      }
+    }
+
   }
 
   /**

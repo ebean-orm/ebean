@@ -41,10 +41,10 @@ public class CQueryEngine {
 
   private final CQueryHistorySupport historySupport;
 
-  public CQueryEngine(DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, String asOfSysPeriod) {
+  public CQueryEngine(DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, String asOfSysPeriod, Map<String, String> draftTableMap) {
     this.forwardOnlyHintOnFindIterate = dbPlatform.isForwardOnlyHintOnFindIterate();
     this.historySupport = new CQueryHistorySupport(dbPlatform.getHistorySupport(), asOfTableMapping, asOfSysPeriod);
-    this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport);
+    this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
   }
 
   public <T> CQuery<T> buildQuery(OrmQueryRequest<T> request) {

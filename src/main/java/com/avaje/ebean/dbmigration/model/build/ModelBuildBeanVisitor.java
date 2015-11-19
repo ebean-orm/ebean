@@ -5,7 +5,6 @@ import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.dbmigration.migration.IdentityType;
 import com.avaje.ebean.dbmigration.model.MColumn;
 import com.avaje.ebean.dbmigration.model.MTable;
-import com.avaje.ebean.dbmigration.model.visitor.BeanPropertyVisitor;
 import com.avaje.ebean.dbmigration.model.visitor.BeanVisitor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -29,7 +28,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
    * This creates an MTable and adds it to the model.
    * </p>
    */
-  public BeanPropertyVisitor visitBean(BeanDescriptor<?> descriptor) {
+  public ModelBuildPropertyVisitor visitBean(BeanDescriptor<?> descriptor) {
 
     if (!descriptor.isInheritanceRoot()) {
       return null;
@@ -58,7 +57,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
       table.addColumn(new MColumn(discColumn, discDbType, true));
     }
 
-    return new ModelBuildPropertyVisitor(ctx, table, descriptor.getCompoundUniqueConstraints());
+    return new ModelBuildPropertyVisitor(ctx, table, descriptor);
   }
 
   /**

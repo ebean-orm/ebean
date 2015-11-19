@@ -310,6 +310,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  public DefaultOrmQuery<T> asDraft() {
+    this.temporalMode = TemporalMode.DRAFT;
+    return this;
+  }
+
   /**
    * Set the BeanDescriptor for the root type of this query.
    */
@@ -647,6 +652,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return asOf != null;
   }
 
+  @Override
+  public boolean isAsDraft() {
+    return TemporalMode.DRAFT == temporalMode;
+  }
+
   public void setMode(Mode mode) {
     this.mode = mode;
   }
@@ -732,8 +742,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     builder.add(mapKey);
     builder.add(disableLazyLoading);
     builder.add(id != null);
-    builder.add(asOf != null);
-    builder.add(versionsStart != null);
+    builder.add(temporalMode);
     builder.add(rawSql == null ? 0 : rawSql.queryHash());
     builder.add(includeTableJoin != null ? includeTableJoin.queryHash() : 0);
     builder.add(rootTableAlias);

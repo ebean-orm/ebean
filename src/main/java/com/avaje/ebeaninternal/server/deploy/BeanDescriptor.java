@@ -147,10 +147,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   private final String baseTableVersionsBetween;
   private final boolean historySupport;
 
+  private final String draftTable;
+
   /**
    * Set to true if read auditing is on for this bean type.
    */
   private final boolean readAuditing;
+
+  private final boolean draftable;
+
+  private final boolean draftableElement;
 
   /**
    * Map of BeanProperty Linked so as to preserve order.
@@ -319,7 +325,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   private final boolean updateChangesOnly;
 
   private final boolean cacheSharableBeans;
-  
+
+  private final BeanDescriptorDraftHelp<T> draftHelp;
   private final BeanDescriptorCacheHelp<T> cacheHelp;
   private final BeanDescriptorJsonHelp<T> jsonHelp;
   
@@ -372,7 +379,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     this.compoundUniqueConstraints = deploy.getCompoundUniqueConstraints();
 
     this.readAuditing = deploy.isReadAuditing();
+    this.draftable = deploy.isDraftable();
+    this.draftableElement = deploy.isDraftableElement();
     this.historySupport = deploy.isHistorySupport();
+    this.draftTable = deploy.getDraftTable();
     this.baseTable = InternString.intern(deploy.getBaseTable());
     this.baseTableAsOf = deploy.getBaseTableAsOf();
     this.baseTableVersionsBetween = deploy.getBaseTableVersionsBetween();
@@ -413,6 +423,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     this.cacheSharableBeans = noRelationships && deploy.getCacheOptions().isReadOnly();
     this.cacheHelp = new BeanDescriptorCacheHelp<T>(this, owner.getCacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
     this.jsonHelp = new BeanDescriptorJsonHelp<T>(this);
+    this.draftHelp = new BeanDescriptorDraftHelp<T>(this);
     
     // Check if there are no cascade save associated beans ( subject to change
     // in initialiseOther()). Note that if we are in an inheritance hierarchy 
@@ -525,12 +536,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    * </p>
    * @param withHistoryTables map populated if @History is supported on this entity bean
    */
-  public void initialiseId(Map<String, String> withHistoryTables) {
+  public void initialiseId(Map<String, String> withHistoryTables, Map<String,String> draftTables) {
 
     if (logger.isTraceEnabled()) {
       logger.trace("BeanDescriptor initialise " + fullName);
     }
 
+    if (draftable) {
+      draftTables.put(baseTable, draftTable);
+    }
     if (historySupport) {
       // add mapping (used to swap out baseTable for asOf queries)
       withHistoryTables.put(baseTable, baseTableAsOf);
@@ -808,6 +822,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    */
   public boolean isInheritanceRoot() {
     return inheritInfo == null || inheritInfo.isRoot();
+  }
+
+  public T publish(T draftBean, T liveBean) {
+    return draftHelp.publish(draftBean, liveBean);
   }
 
   /**
@@ -1856,6 +1874,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    */
   public String getBaseTable(SpiQuery.TemporalMode mode) {
     switch (mode) {
+      case DRAFT: return draftTable;
       case VERSIONS: return baseTableVersionsBetween;
       case AS_OF: return baseTableAsOf;
         default: return baseTable;
@@ -1863,10 +1882,31 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   }
 
   /**
+   * Return the associated draft table.
+   */
+  public String getDraftTable() {
+    return draftTable;
+  }
+
+  /**
    * Return true if read auditing is on this entity bean.
    */
   public boolean isReadAuditing() {
     return readAuditing;
+  }
+
+  /**
+   * Return true if this entity type is draftable.
+   */
+  public boolean isDraftable() {
+    return draftable;
+  }
+
+  /**
+   * Return true if this entity type is a draftable element (child).
+   */
+  public boolean isDraftableElement() {
+    return draftableElement;
   }
 
   /**

@@ -9,6 +9,8 @@ import javax.persistence.UniqueConstraint;
 
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.CacheTuning;
+import com.avaje.ebean.annotation.Draftable;
+import com.avaje.ebean.annotation.DraftableElement;
 import com.avaje.ebean.annotation.EntityConcurrencyMode;
 import com.avaje.ebean.annotation.History;
 import com.avaje.ebean.annotation.Index;
@@ -96,6 +98,16 @@ public class AnnotationClass extends AnnotationParser {
           descriptor.addCompoundUniqueConstraint(new CompoundUniqueConstraint(c.columnNames()));
         }
       }
+    }
+
+    Draftable draftable = cls.getAnnotation(Draftable.class);
+    if (draftable != null) {
+      descriptor.setDraftable();
+    }
+
+    DraftableElement draftableElement = cls.getAnnotation(DraftableElement.class);
+    if (draftableElement != null) {
+      descriptor.setDraftableElement();
     }
 
     ReadAudit readAudit = cls.getAnnotation(ReadAudit.class);

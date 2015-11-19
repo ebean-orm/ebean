@@ -223,6 +223,10 @@ public class BeanProperty implements ElPropertyValue {
 
   final boolean jsonDeserialize;
 
+  final boolean draftOnly;
+
+  final boolean draftDirty;
+
   final boolean indexed;
 
   final String indexName;
@@ -249,6 +253,8 @@ public class BeanProperty implements ElPropertyValue {
     this.dbInsertable = deploy.isDbInsertable();
     this.dbUpdatable = deploy.isDbUpdateable();
     this.excludedFromHistory = deploy.isExcludedFromHistory();
+    this.draftDirty = deploy.isDraftDirty();
+    this.draftOnly = deploy.isDraftOnly();
 
     this.secondaryTable = deploy.isSecondaryTable();
     if (secondaryTable) {
@@ -333,6 +339,8 @@ public class BeanProperty implements ElPropertyValue {
     this.formula = false;
 
     this.excludedFromHistory = source.excludedFromHistory;
+    this.draftDirty = source.draftDirty;
+    this.draftOnly = source.draftOnly;
     this.fetchEager = source.fetchEager;
     this.unidirectionalShadow = source.unidirectionalShadow;
     this.discriminator = source.discriminator;
@@ -493,7 +501,7 @@ public class BeanProperty implements ElPropertyValue {
     if (formula) {
       ctx.appendFormulaSelect(sqlFormulaSelect);
 
-    } else if (!isTransient) {
+    } else if (!isTransient && !ignoreDraftOnlyProperty(ctx.isDraftQuery())) {
 
       if (secondaryTableJoin != null) {
         String relativePrefix = ctx.getRelativePrefix(secondaryTableJoinPrefix);
@@ -593,6 +601,18 @@ public class BeanProperty implements ElPropertyValue {
   }
 
   /**
+   * Copy/set the property value from the draft bean to the live bean.
+   */
+  public void publish(EntityBean draftBean, EntityBean liveBean) {
+
+    if (!version && !draftOnly) {
+      // set property value from draft to live
+      Object value = getValueIntercept(draftBean);
+      setValueIntercept(liveBean, value);
+    }
+  }
+
+  /**
    * Set the value of the property without interception or
    * PropertyChangeSupport.
    */
@@ -600,10 +620,7 @@ public class BeanProperty implements ElPropertyValue {
     try {
       setter.set(bean, value);
     } catch (Exception ex) {
-      String beanType = bean == null ? "null" : bean.getClass().getName();
-      String msg = "set " + name + " on [" + descriptor + "] arg[" + value + "] type[" + beanType
-          + "] threw error";
-      throw new RuntimeException(msg, ex);
+      throw new RuntimeException(setterErrorMsg(bean, value, "set "), ex);
     }
   }
 
@@ -614,11 +631,16 @@ public class BeanProperty implements ElPropertyValue {
     try {
       setter.setIntercept(bean, value);
     } catch (Exception ex) {
-      String beanType = bean == null ? "null" : bean.getClass().getName();
-      String msg = "setIntercept " + name + " on [" + descriptor + "] arg[" + value + "] type[" + beanType
-          + "] threw error";
-      throw new RuntimeException(msg, ex);
+      throw new RuntimeException(setterErrorMsg(bean, value, "setIntercept "), ex);
     }
+  }
+
+  /**
+   * Return an error message when calling a setter.
+   */
+  private String setterErrorMsg(EntityBean bean, Object value, String prefix) {
+    String beanType = bean == null ? "null" : bean.getClass().getName();
+    return prefix + name + " on [" + descriptor + "] arg[" + value + "] type[" + beanType + "] threw error";
   }
 
   public Object getCacheDataValue(EntityBean bean) {
@@ -900,8 +922,16 @@ public class BeanProperty implements ElPropertyValue {
   /**
    * Return true if this property is loadable from a resultSet.
    */
-  public boolean isLoadProperty() {
-    return !isTransient || formula;
+  public boolean isLoadProperty(boolean draftQuery) {
+    return !ignoreDraftOnlyProperty(draftQuery) && (!isTransient || formula);
+  }
+
+  /**
+   * Return true if this is a draftOnly property on a non-asDraft query and as such this
+   * property should not be included in a sql query.
+   */
+  protected boolean ignoreDraftOnlyProperty(boolean draftQuery) {
+    return draftOnly && !draftQuery;
   }
 
   /**
@@ -951,7 +981,7 @@ public class BeanProperty implements ElPropertyValue {
     return lob;
   }
 
-  private boolean isLobType(int type) {
+  public static boolean isLobType(int type) {
     switch (type) {
       case Types.CLOB:
         return true;
@@ -998,6 +1028,21 @@ public class BeanProperty implements ElPropertyValue {
    */
   public boolean isExcludedFromHistory() {
     return excludedFromHistory;
+  }
+
+  /**
+   * Return true if this property only exists on the draft table.
+   */
+  public boolean isDraftOnly() {
+    return draftOnly;
+  }
+
+  /**
+   * Return true if this property is a boolean flag only on the draft table
+   * indicating that when the draft is different from the published row.
+   */
+  public boolean isDraftDirty() {
+    return draftDirty;
   }
 
   /**

@@ -120,4 +120,9 @@ public interface DbSqlContext {
    */
   void appendHistorySysPeriod();
 
+  /**
+   * Return true if the query is a 'asDraft' query.
+   */
+  boolean isDraftQuery();
+
 }

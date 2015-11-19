@@ -234,6 +234,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     }
   }
 
+  @Override
+  public boolean isDraftQuery() {
+    return query.isAsDraft();
+  }
+
   public Boolean isReadOnly() {
     return readOnly;
   }

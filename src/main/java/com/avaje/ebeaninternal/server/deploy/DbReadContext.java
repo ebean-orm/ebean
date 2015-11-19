@@ -79,4 +79,9 @@ public interface DbReadContext {
    * Return the query mode.
    */
   SpiQuery.Mode getQueryMode();
+
+  /**
+   * Return true if the underlying query is a 'asDraft' query.
+   */
+  boolean isDraftQuery();
 }

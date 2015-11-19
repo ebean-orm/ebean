@@ -31,6 +31,14 @@ public class ModelBuildContext {
     this.maxLength = maxLength;
   }
 
+  /**
+   * Adjust the foreign key references on any draft tables (that reference other draft tables).
+   * This is called as a 'second pass' after all the draft tables have been identified.
+   */
+  public void adjustDraftReferences() {
+    model.adjustDraftReferences();
+  }
+
   public String primaryKeyName(String tableName) {
     return maxLength(constraintNaming.primaryKeyName(tableName), 0);
   }

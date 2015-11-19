@@ -2,11 +2,9 @@ package com.avaje.ebeaninternal.server.persist.dml;
 
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableId;
 import com.avaje.ebeaninternal.server.persist.dmlbind.BindableList;
@@ -39,8 +37,8 @@ public final class UpdateMeta {
     this.id = id;
     this.version = version;
 
-    String sqlNone = genSql(ConcurrencyMode.NONE, set);
-    String sqlVersion = genSql(ConcurrencyMode.VERSION, set);
+    String sqlNone = genSql(ConcurrencyMode.NONE, set, desc.getBaseTable());
+    String sqlVersion = genSql(ConcurrencyMode.VERSION, set, desc.getBaseTable());
 
     this.modeNoneUpdatePlan = new UpdatePlan(ConcurrencyMode.NONE, sqlNone, set);
     this.modeVersionUpdatePlan = new UpdatePlan(ConcurrencyMode.VERSION, sqlVersion, set);
@@ -106,27 +104,10 @@ public final class UpdateMeta {
 
   private SpiUpdatePlan getDynamicUpdatePlan(PersistRequestBean<?> persistRequest) {
 
-    EntityBeanIntercept ebi = persistRequest.getEntityBeanIntercept();
-
-    int hash;
-    if (persistRequest.determineUpdateAllLoadedProperties()) {
-      hash = ebi.getLoadedPropertyHash();
-    } else {
-      hash = ebi.getDirtyPropertyHash();
-    }
-
-    BeanDescriptor<?> beanDescriptor = persistRequest.getBeanDescriptor();
-
-    BeanProperty versionProperty = beanDescriptor.getVersionProperty();
-    if (versionProperty != null) {
-      if (ebi.isLoadedProperty(versionProperty.getPropertyIndex())) {
-        hash = hash * 31 + 7;
-      }
-    }
-
-    Integer key = hash;
+    int key = persistRequest.getUpdatePlanHash();
 
     // check if we can use a cached UpdatePlan
+    BeanDescriptor<?> beanDescriptor = persistRequest.getBeanDescriptor();
     SpiUpdatePlan updatePlan = beanDescriptor.getUpdatePlan(key);
     if (updatePlan != null) {
       return updatePlan;
@@ -142,7 +123,7 @@ public final class UpdateMeta {
     ConcurrencyMode mode = persistRequest.determineConcurrencyMode();
 
     // build the SQL for this update statement
-    String sql = genSql(mode, bindableList);
+    String sql = genSql(mode, bindableList, persistRequest.getUpdateTable());
 
     updatePlan = new UpdatePlan(key, mode, sql, bindableList);
 
@@ -152,7 +133,7 @@ public final class UpdateMeta {
     return updatePlan;
   }
 
-  private String genSql(ConcurrencyMode conMode, BindableList bindableList) {
+  private String genSql(ConcurrencyMode conMode, BindableList bindableList, String tableName) {
 
     // update set col0=?, col1=?, col2=? where bcol=? and bc1=? and bc2=?
 

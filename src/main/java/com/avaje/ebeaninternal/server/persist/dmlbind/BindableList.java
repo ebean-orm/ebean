@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.persist.dmlbind;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.avaje.ebean.bean.EntityBean;
@@ -16,6 +17,24 @@ public class BindableList implements Bindable {
 
   public BindableList(List<Bindable> list) {
     items = list.toArray(new Bindable[list.size()]);
+  }
+
+  /**
+   * Return a bindable list that excludes @DraftOnly properties.
+   */
+  public BindableList excludeDraftOnly() {
+    List<Bindable> copy = new ArrayList<Bindable>(items.length);
+    for (Bindable b : items) {
+      if (!b.isDraftOnly()) {
+        copy.add(b);
+      }
+    }
+    return new BindableList(copy);
+  }
+
+  @Override
+  public boolean isDraftOnly() {
+    return false;
   }
 
   public void addAll(List<Bindable> list) {

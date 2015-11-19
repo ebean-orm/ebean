@@ -44,6 +44,17 @@ public class MTable {
   private final String name;
 
   /**
+   * The associated draft table.
+   */
+  private MTable draftTable;
+
+  /**
+   * Marked true for draft tables. These need to have their FK references adjusted
+   * after all the draft tables have been identified.
+   */
+  private boolean draft;
+
+  /**
    * Primary key name.
    */
   private String pkName;
@@ -107,6 +118,27 @@ public class MTable {
    */
   private AddColumn addColumn;
 
+  /**
+   * Create a copy of this table structure as a 'draft' table.
+   *
+   * Note that both tables contain @DraftOnly MColumns and these are filtered out
+   * later when creating the CreateTable object.
+   */
+  public MTable createDraftTable() {
+
+    draftTable = new MTable(name+"_draft");
+    draftTable.draft = true;
+    draftTable.whenCreatedColumn = whenCreatedColumn;
+    // compoundKeys
+    // compoundUniqueConstraints
+    draftTable.identityType = identityType;
+
+    for (MColumn col: columns.values()) {
+      draftTable.addColumn(col.copyForDraft());
+    }
+
+    return draftTable;
+  }
 
   /**
    * Construct for migration.
@@ -164,7 +196,10 @@ public class MTable {
     }
 
     for (MColumn column : this.columns.values()) {
-      createTable.getColumn().add(column.createColumn());
+      // filter out draftOnly columns from the base table
+      if (draft || !column.isDraftOnly()) {
+        createTable.getColumn().add(column.createColumn());
+      }
     }
 
     for (MCompoundForeignKey compoundKey : compoundKeys) {
@@ -269,6 +304,13 @@ public class MTable {
 
   public String getName() {
     return name;
+  }
+
+  /**
+   * Return true if this table is a 'Draft' table.
+   */
+  public boolean isDraft() {
+    return draft;
   }
 
   public String getPkName() {
@@ -511,4 +553,42 @@ public class MTable {
     }
     return false;
   }
+
+  /**
+   * Adjust the references (FK) if it should relate to a draft table.
+   */
+  public void adjustReferences(ModelContainer modelContainer) {
+
+    Collection<MColumn> cols = columns.values();
+    for (MColumn col : cols) {
+      String references = col.getReferences();
+      if (references != null) {
+        String baseTable = extractBaseTable(references);
+        MTable refBaseTable = modelContainer.getTable(baseTable);
+        if (refBaseTable.draftTable != null) {
+          // change references to another associated 'draft' table
+          String newReferences = deriveReferences(references, refBaseTable.draftTable.getName());
+          col.setReferences(newReferences);
+        }
+      }
+    }
+  }
+
+  /**
+   * Return the base table name from references (table.column).
+   */
+  private String extractBaseTable(String references) {
+    int lastDot = references.lastIndexOf('.');
+    return references.substring(0,lastDot);
+  }
+
+  /**
+   * Return the new references using the given draftTableName.
+   * (The referenced column is the same as before).
+   */
+  private String deriveReferences(String references, String draftTableName) {
+    int lastDot = references.lastIndexOf('.');
+    return draftTableName+"."+references.substring(lastDot+1);
+  }
+
 }

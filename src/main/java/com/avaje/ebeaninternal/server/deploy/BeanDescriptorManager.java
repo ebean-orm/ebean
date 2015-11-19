@@ -168,6 +168,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final Map<String,String> asOfTableMap = new HashMap<String, String>();
 
   /**
+   * Map of base tables to 'draft' tables.
+   */
+  private final Map<String,String> draftTableMap = new HashMap<String, String>();
+
+  /**
    * Create for a given database dbConfig.
    */
   public BeanDescriptorManager(InternalConfiguration config) {
@@ -267,6 +272,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   public IdBinder createIdBinder(BeanProperty idProperty) {
     return idBinderFactory.createIdBinder(idProperty);
+  }
+
+  /**
+   * Return the map of base tables to draft tables.
+   */
+  public Map<String,String> getDraftTableMap() {
+    return draftTableMap;
   }
 
   /**
@@ -396,7 +408,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // first (as they are needed to initialise the
     // associated properties in the second pass).
     for (BeanDescriptor<?> d : descMap.values()) {
-      d.initialiseId(asOfTableMap);
+      d.initialiseId(asOfTableMap, draftTableMap);
     }
 
     // PASS 2:

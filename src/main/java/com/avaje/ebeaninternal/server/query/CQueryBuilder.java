@@ -47,15 +47,18 @@ public class CQueryBuilder {
 
   private final CQueryHistorySupport historySupport;
 
+  private final CQueryDraftSupport draftSupport;
+
   private final DatabasePlatform dbPlatform;
 
   /**
    * Create the SqlGenSelect.
    */
-  public CQueryBuilder(DatabasePlatform dbPlatform, Binder binder, CQueryHistorySupport historySupport) {
+  public CQueryBuilder(DatabasePlatform dbPlatform, Binder binder, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
 
     this.dbPlatform = dbPlatform;
     this.binder = binder;
+    this.draftSupport = draftSupport;
     this.historySupport = historySupport;
     this.tableAliasPlaceHolder = dbPlatform.getTableAliasPlaceHolder();
     this.columnAliasPrefix = dbPlatform.getColumnAliasPrefix();
@@ -103,7 +106,7 @@ public class CQueryBuilder {
 
     predicates.prepare(true);
 
-    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query));
+    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
 
     boolean includeJoins = sqlTree.isIncludeJoins();
 
@@ -146,7 +149,7 @@ public class CQueryBuilder {
     // use RawSql or generated Sql
     predicates.prepare(true);
 
-    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query));
+    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
     SqlLimitResponse s = buildSql(null, request, predicates, sqlTree);
     String sql = s.getSql();
 
@@ -162,6 +165,13 @@ public class CQueryBuilder {
    */
   private <T> CQueryHistorySupport getHistorySupport(SpiQuery<T> query) {
     return query.getTemporalMode() != SpiQuery.TemporalMode.CURRENT ? historySupport : null;
+  }
+
+  /**
+   * Return the draft support (or null) for a 'asDraft' query.
+   */
+  private <T> CQueryDraftSupport getDraftSupport(SpiQuery<T> query) {
+    return query.getTemporalMode() == SpiQuery.TemporalMode.DRAFT ? draftSupport : null;
   }
 
   /**
@@ -205,7 +215,7 @@ public class CQueryBuilder {
 
     predicates.prepare(true);
 
-    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query));
+    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
     SqlLimitResponse s = buildSql(sqlSelect, request, predicates, sqlTree);
     String sql = s.getSql();
     if (hasMany || query.isRawSql()) {
@@ -255,7 +265,7 @@ public class CQueryBuilder {
     // Build the tree structure that represents the query.
     SpiQuery<T> query = request.getQuery();
 
-    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query));
+    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
     if (query.isAsOfQuery()) {
       sqlTree.addAsOfTableAlias(query);
     }
@@ -294,13 +304,13 @@ public class CQueryBuilder {
    * order by clauses that are not already included for the select clause.
    * </p>
    */
-  private SqlTree createSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryHistorySupport historySupport) {
+  private SqlTree createSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
 
     if (request.isRawSql()) {
       return createRawSqlSqlTree(request, predicates);
     }
 
-    return new SqlTreeBuilder(tableAliasPlaceHolder, columnAliasPrefix, request, predicates, historySupport).build();
+    return new SqlTreeBuilder(tableAliasPlaceHolder, columnAliasPrefix, request, predicates, historySupport, draftSupport).build();
   }
 
   private SqlTree createRawSqlSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates) {

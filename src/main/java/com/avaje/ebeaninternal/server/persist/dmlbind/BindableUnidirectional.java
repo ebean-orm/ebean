@@ -38,6 +38,11 @@ public class BindableUnidirectional implements Bindable {
     return "BindableShadowFKey " + unidirectional;
   }
 
+  @Override
+  public boolean isDraftOnly() {
+    return false;
+  }
+
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     throw new PersistenceException("Never called (for insert only)");
   }

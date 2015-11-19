@@ -98,7 +98,7 @@ public class SqlTreeBuilder {
    * to the root node.
    */
   public SqlTreeBuilder(String tableAliasPlaceHolder, String columnAliasPrefix,
-                        OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryHistorySupport historySupport) {
+                        OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
 
     this.rawSql = false;
     this.rawNoId = false;
@@ -112,7 +112,7 @@ public class SqlTreeBuilder {
 
     this.predicates = predicates;
     this.alias = new SqlTreeAlias(request.getQuery().getAlias() == null ? request.getBeanDescriptor().getBaseTableAlias() : request.getQuery().getAlias());
-    this.ctx = new DefaultDbSqlContext(alias, tableAliasPlaceHolder, columnAliasPrefix, !subQuery, historySupport);
+    this.ctx = new DefaultDbSqlContext(alias, tableAliasPlaceHolder, columnAliasPrefix, !subQuery, historySupport, draftSupport);
   }
 
   /**

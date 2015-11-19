@@ -96,7 +96,7 @@ public class MetaFactory {
     embeddedFact.create(allList, desc, DmlMode.INSERT, includeLobs);
     assocOneFact.create(allList, desc, DmlMode.INSERT);
 
-    Bindable allBindable = new BindableList(allList);
+    BindableList allBindable = new BindableList(allList);
 
     BeanPropertyAssocOne<?> unidirectional = desc.getUnidirectional();
 

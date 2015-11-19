@@ -55,7 +55,7 @@ public class InsertHandler extends DmlHandler {
   public InsertHandler(PersistRequestBean<?> persist, InsertMeta meta) {
     super(persist, meta.isEmptyStringToNull());
     this.meta = meta;
-    this.concatinatedKey = meta.isConcatinatedKey();
+    this.concatinatedKey = meta.isConcatenatedKey();
   }
 
   /**
@@ -90,7 +90,7 @@ public class InsertHandler extends DmlHandler {
     SpiTransaction t = persistRequest.getTransaction();
 
     // get the appropriate sql
-    sql = meta.getSql(withId);
+    sql = meta.getSql(withId, persistRequest.isPublish());
 
     PreparedStatement pstmt;
     if (persistRequest.isBatched()) {
@@ -101,7 +101,7 @@ public class InsertHandler extends DmlHandler {
     dataBind = new DataBind(pstmt);
 
     // bind the bean property values
-    meta.bind(this, bean, withId);
+    meta.bind(this, bean, withId, persistRequest.isPublish());
 
     logSql(sql);
   }
@@ -167,15 +167,7 @@ public class InsertHandler extends DmlHandler {
 
     ResultSet rset = dataBind.getPstmt().getGeneratedKeys();
     try {
-      if (rset.next()) {
-        Object idValue = rset.getObject(1);
-        if (idValue != null) {
-          persistRequest.setGeneratedKey(idValue);
-        }
-
-      } else {
-        throw new PersistenceException(Message.msg("persist.autoinc.norows"));
-      }
+      setGeneratedKey(rset);
     } finally {
       try {
         rset.close();
@@ -183,6 +175,18 @@ public class InsertHandler extends DmlHandler {
         String msg = "Error closing rset for returning generatedKeys?";
         logger.warn(msg, ex);
       }
+    }
+  }
+
+  private void setGeneratedKey(ResultSet rset) throws SQLException {
+    if (rset.next()) {
+      Object idValue = rset.getObject(1);
+      if (idValue != null) {
+        persistRequest.setGeneratedKey(idValue);
+      }
+
+    } else {
+      throw new PersistenceException(Message.msg("persist.autoinc.norows"));
     }
   }
 
@@ -199,14 +203,7 @@ public class InsertHandler extends DmlHandler {
     try {
       stmt = conn.prepareStatement(selectLastInsertedId);
       rset = stmt.executeQuery();
-      if (rset.next()) {
-        Object idValue = rset.getObject(1);
-        if (idValue != null) {
-          persistRequest.setGeneratedKey(idValue);
-        }
-      } else {
-        throw new PersistenceException(Message.msg("persist.autoinc.norows"));
-      }
+      setGeneratedKey(rset);
     } finally {
       try {
         if (rset != null) {
