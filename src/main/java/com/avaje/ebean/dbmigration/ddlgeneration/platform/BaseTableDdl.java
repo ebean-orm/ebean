@@ -21,6 +21,7 @@ import com.avaje.ebean.dbmigration.migration.DropTable;
 import com.avaje.ebean.dbmigration.migration.ForeignKey;
 import com.avaje.ebean.dbmigration.migration.UniqueConstraint;
 import com.avaje.ebean.dbmigration.model.MTable;
+import com.avaje.ebean.util.StringHelper;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -123,7 +124,38 @@ public class BaseTableDdl implements TableDdl {
       writePrimaryKeyConstraint(apply, createTable.getPkName(), toColumnNames(pk));
     }
 
-    apply.newLine().append(")").endOfStatement();
+    apply.newLine().append(")");
+    String tableComment = createTable.getComment();
+    if (tableComment != null && tableComment.length() > 1000) { //will it so long??
+      tableComment = tableComment.substring(0, 1000);
+    }
+    if (platformDdl instanceof MySqlDdl && !StringHelper.isNull(tableComment)) {
+      apply.append(String.format(" COMMENT='%s'", tableComment))
+              .endOfStatement();
+    } else if(platformDdl instanceof DB2Ddl
+            || platformDdl instanceof PostgresDdl
+            || platformDdl instanceof HsqldbDdl
+            || platformDdl instanceof MsSqlServerDdl
+            || platformDdl instanceof Oracle10Ddl
+            || platformDdl instanceof H2Ddl) {
+      apply.endOfStatement();
+      //use the "comment on table tablename is 'comment' "
+      // or "comment on column tablename.coolumnname is 'comment' "
+      if (!StringHelper.isNull(tableComment)) {
+        apply.append(String.format("COMMENT ON TABLE %s IS '%s'", tableName, tableComment))
+                .endOfStatement();
+      }
+
+      for (Column column : columns) {
+        if (!StringHelper.isNull(column.getComment())) {
+          apply.append(String.format("COMMENT ON COLUMN %s.%s IS '%s'", tableName, column.getName(), column.getComment()))
+                  .endOfStatement();
+        }
+      }
+
+    } else if (platformDdl instanceof SQLiteDdl){
+      //TODO sorry I can't find how to comment in Sqlite
+    }
 
     writeUniqueOneToOneConstraints(writer, createTable);
 

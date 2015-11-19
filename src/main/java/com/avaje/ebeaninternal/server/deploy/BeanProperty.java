@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.ValuePair;
+import com.avaje.ebean.annotation.DbComment;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
@@ -1130,5 +1131,15 @@ public class BeanProperty implements ElPropertyValue {
       String propName = (prefix == null) ? name : prefix + "." + name;
       map.put(propName, new ValuePair(newVal, oldVal));
     }
+  }
+
+  public String fetchDbColumn() {
+    if (field != null) {
+      DbComment colComment = field.getAnnotation(DbComment.class);
+      if (colComment != null && !StringHelper.isNull(colComment.value())) {
+        return colComment.value();
+      }
+    }
+    return null;
   }
 }

@@ -2,7 +2,12 @@ package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
 import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
+import com.avaje.ebean.dbmigration.migration.Column;
+import com.avaje.ebean.util.StringHelper;
+
+import java.io.IOException;
 
 /**
  * MySql specific DDL.
@@ -63,5 +68,19 @@ public class MySqlDdl extends PlatformDdl {
 
     // use modify
     return "alter table " + tableName + " modify " + columnName + " " + type + notnullClause;
+  }
+
+  @Override
+  protected void writeColumnDefinition(DdlBuffer buffer, Column column, boolean useIdentity) throws IOException {
+    super.writeColumnDefinition(buffer, column, useIdentity);
+    String comment = column.getComment();
+    if (!StringHelper.isNull(comment)) {
+      // in mysql 5.5 column comment save in information_schema.COLUMNS.COLUMN_COMMENT(VARCHAR 1024)
+      if (comment.length() > 500) {
+        comment = comment.substring(0,500);
+      }
+      buffer.append(String.format(" COMMENT '%s'", comment));
+    }
+
   }
 }

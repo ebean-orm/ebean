@@ -121,6 +121,7 @@ public class MTable {
     this.sequenceName = createTable.getSequenceName();
     this.sequenceInitial = toInt(createTable.getSequenceInitial());
     this.sequenceAllocate = toInt(createTable.getSequenceAllocate());
+    this.comment = createTable.getComment();
     List<Column> cols = createTable.getColumn();
     for (Column column : cols) {
       addColumn(column);
@@ -164,7 +165,9 @@ public class MTable {
     }
 
     for (MColumn column : this.columns.values()) {
-      createTable.getColumn().add(column.createColumn());
+      Column col = column.createColumn();
+      col.setComment(column.getComment());
+      createTable.getColumn().add(col);
     }
 
     for (MCompoundForeignKey compoundKey : compoundKeys) {
@@ -281,6 +284,10 @@ public class MTable {
 
   public String getComment() {
     return comment;
+  }
+
+  public void setComment(String comment) {
+    this.comment = comment;
   }
 
   public String getTablespace() {

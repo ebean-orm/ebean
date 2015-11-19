@@ -1,5 +1,6 @@
 package com.avaje.ebean.dbmigration.model.build;
 
+import com.avaje.ebean.annotation.DbComment;
 import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.dbmigration.migration.IdentityType;
@@ -36,6 +37,10 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
     }
 
     MTable table = new MTable(descriptor.getBaseTable());
+    DbComment tableComment = descriptor.getBeanType().getAnnotation(DbComment.class);
+    if (tableComment != null) {
+      table.setComment(tableComment.value());
+    }
     if (descriptor.isHistorySupport()) {
       table.setWithHistory(true);
       BeanProperty whenCreated = descriptor.findWhenCreatedProperty();

@@ -25,6 +25,11 @@ public class MColumn {
   private String unique;
 
   /**
+   * column comment.
+   */
+  private String comment;
+
+  /**
    * Special unique for OneToOne as we need to handle that different
    * specifically for MsSqlServer.
    */
@@ -157,6 +162,14 @@ public class MColumn {
 
   public String getUnique() {
     return unique;
+  }
+
+  public String getComment() {
+    return comment;
+  }
+
+  public void setComment(String comment) {
+    this.comment = comment;
   }
 
   /**
