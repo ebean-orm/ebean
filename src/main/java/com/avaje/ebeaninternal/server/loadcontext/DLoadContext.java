@@ -36,6 +36,7 @@ public class DLoadContext implements LoadContext {
 
   private final DLoadBeanContext rootBeanContext;
 
+  private final boolean asDraft;
   private final Timestamp asOf;
   private final Boolean readOnly;
   private final boolean excludeBeanCache;
@@ -65,6 +66,7 @@ public class DLoadContext implements LoadContext {
 
     SpiQuery<?> query = request.getQuery();
     this.asOf = query.getAsOf();
+    this.asDraft = query.isAsDraft();
     this.readOnly = query.isReadOnly();
     this.disableReadAudit = query.isDisableReadAudit();
     this.disableLazyLoading = query.isDisableLazyLoading();
@@ -228,6 +230,13 @@ public class DLoadContext implements LoadContext {
    */
   protected Timestamp getAsOf() {
     return asOf;
+  }
+
+  /**
+   * Return true if the root query is a 'asDraft' query that should propagate to secondary queries.
+   */
+  protected boolean isAsDraft() {
+    return asDraft;
   }
 
   /**

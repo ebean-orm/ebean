@@ -54,10 +54,12 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     query.asOf(parent.getAsOf());
     query.setParentNode(objectGraphNode);
     query.setLazyLoadProperty(lazyLoadProperty);
+    if (parent.isAsDraft()) {
+      query.asDraft();
+    }
     if (parent.isDisableReadAudit()) {
       query.setDisableReadAuditing();
     }
-
     if (queryProps != null) {
       queryProps.configureBeanQuery(query);
     }
