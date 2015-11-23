@@ -1820,7 +1820,7 @@ public interface EbeanServer {
   JsonContext json();
 
   /**
-   * Publish a single bean given its type and id.
+   * Publish a single bean given its type and id returning the resulting live bean.
    * <p>
    * The values are published from the draft to the live bean.
    * </p>
@@ -1828,19 +1828,19 @@ public interface EbeanServer {
    * @param <T>         the type of the entity bean
    * @param beanType    the type of the entity bean
    * @param id          the id of the entity bean
-   * @param transaction the transaction the publish process should use
+   * @param transaction the transaction the publish process should use (can be null)
    */
   <T> T publish(Class<T> beanType, Object id, Transaction transaction);
 
   /**
-   * Publish the beans that match the query.
+   * Publish the beans that match the query returning the resulting published beans.
    * <p>
    * The values are published from the draft beans to the live beans.
    * </p>
    *
    * @param <T>         the type of the entity bean
    * @param query       the query used to select the draft beans to publish
-   * @param transaction the transaction the publish process should use
+   * @param transaction the transaction the publish process should use (can be null)
    */
   <T> List<T> publish(Query<T> query, Transaction transaction);
 
