@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
    * Join for manyToMany intersection table.
    */
   private final TableJoin intersectionJoin;
+  private final String intersectionPublishTable;
+  private final String intersectionDraftTable;
 
   /**
    * For ManyToMany this is the Inverse join used to build reference queries.
@@ -109,6 +112,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     this.mapKey = deploy.getMapKey();
     this.fetchOrderBy = deploy.getFetchOrderBy();
     this.intersectionJoin = deploy.createIntersectionTableJoin();
+    if (intersectionJoin != null) {
+      this.intersectionPublishTable = intersectionJoin.getTable();
+      this.intersectionDraftTable = deploy.getIntersectionDraftTable();
+    } else {
+      this.intersectionPublishTable = null;
+      this.intersectionDraftTable = null;
+    }
     this.inverseJoin = deploy.createInverseTableJoin();
     this.modifyListenMode = deploy.getModifyListenMode();
     this.jsonHelp = new BeanPropertyAssocManyJsonHelp(this);
@@ -798,20 +808,37 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     return row;
   }
 
-  public IntersectionRow buildManyToManyDeleteChildren(EntityBean parentBean) {
+  public IntersectionRow buildManyToManyDeleteChildren(EntityBean parentBean, boolean publish) {
 
-    IntersectionRow row = new IntersectionRow(intersectionJoin.getTable());
+    String tableName = publish ? intersectionPublishTable : intersectionDraftTable;
+    IntersectionRow row = new IntersectionRow(tableName);
     buildExport(row, parentBean);
     return row;
   }
 
-  public IntersectionRow buildManyToManyMapBean(EntityBean parent, EntityBean other) {
+  public IntersectionRow buildManyToManyMapBean(EntityBean parent, EntityBean other, boolean publish) {
 
-    IntersectionRow row = new IntersectionRow(intersectionJoin.getTable());
-
+    String tableName = publish ? intersectionPublishTable : intersectionDraftTable;
+    IntersectionRow row = new IntersectionRow(tableName);
     buildExport(row, parent);
     buildImport(row, other);
     return row;
+  }
+
+  /**
+   * Register the mapping of intersection table to associated draft table.
+   */
+  public void registerDraftIntersectionTable(Map<String, String> draftTableMap) {
+    if (hasDraftIntersection()) {
+      draftTableMap.put(intersectionPublishTable, intersectionDraftTable);
+    }
+  }
+
+  /**
+   * Return true if the relationship is a ManyToMany with the intersection having an associated draft table.
+   */
+  private boolean hasDraftIntersection() {
+    return intersectionDraftTable != null && !intersectionDraftTable.equals(intersectionPublishTable);
   }
 
   private void buildExport(IntersectionRow row, EntityBean parentBean) {
@@ -876,4 +903,57 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   public void jsonRead(ReadJson readJson, EntityBean parentBean) throws IOException {
     jsonHelp.jsonRead(readJson, parentBean);
   }
+
+  public void publishMany(EntityBean draft, EntityBean live) {
+
+    // collections will not be null due to enhancement
+    BeanCollection<T> draftVal = (BeanCollection<T>)getValueIntercept(draft);
+    BeanCollection<T> liveVal = (BeanCollection<T>)getValueIntercept(live);
+
+    // Organise the existing live beans into map keyed by id
+    Map<Object, T> liveBeansAsMap = liveBeansAsMap(liveVal);
+
+    // publish from each draft to live bean creating new live beans as required
+    draftVal.size();
+    Collection<T> actualDetails = draftVal.getActualDetails();
+    for (T bean : actualDetails) {
+      Object id = targetDescriptor.getId((EntityBean) bean);
+      T liveBean = liveBeansAsMap.remove(id);
+
+      if (isManyToMany()) {
+        if (liveBean == null) {
+          // add new relationship (Map not allowed here)
+          liveVal.addBean(targetDescriptor.createReference(Boolean.FALSE, id));
+        }
+
+      } else {
+        // recursively publish the OneToMany child bean
+        T newLive = targetDescriptor.publish(bean, liveBean);
+        if (liveBean == null) {
+          // Map not allowed here
+          liveVal.addBean(newLive);
+        }
+      }
+    }
+
+    // anything remaining should be deleted (so remove from modify aware collection)
+    Collection<T> values = liveBeansAsMap.values();
+    for (T value : values) {
+      liveVal.removeBean(value);
+    }
+  }
+
+  private Map<Object,T> liveBeansAsMap(BeanCollection<?> liveVal) {
+
+    liveVal.size();
+    Collection<?> liveBeans = liveVal.getActualDetails();
+    Map<Object,T> liveMap = new LinkedHashMap<Object, T>();
+
+    for (Object liveBean : liveBeans) {
+      Object id = targetDescriptor.getId((EntityBean) liveBean);
+      liveMap.put(id, (T)liveBean);
+    }
+    return liveMap;
+  }
+
 }

@@ -216,6 +216,7 @@ public class DeployBeanDescriptor<T> {
   }
 
   public void setDraftableElement() {
+    draftable = true;
     draftableElement = true;
   }
 

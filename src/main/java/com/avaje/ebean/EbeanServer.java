@@ -1825,12 +1825,12 @@ public interface EbeanServer {
    * The values are published from the draft to the live bean.
    * </p>
    *
+   * @param <T>         the type of the entity bean
    * @param beanType    the type of the entity bean
    * @param id          the id of the entity bean
    * @param transaction the transaction the publish process should use
-   * @param <T>         the type of the entity bean
    */
-  <T> void publish(Class<T> beanType, Object id, Transaction transaction);
+  <T> T publish(Class<T> beanType, Object id, Transaction transaction);
 
   /**
    * Publish the beans that match the query.
@@ -1838,10 +1838,10 @@ public interface EbeanServer {
    * The values are published from the draft beans to the live beans.
    * </p>
    *
+   * @param <T>         the type of the entity bean
    * @param query       the query used to select the draft beans to publish
    * @param transaction the transaction the publish process should use
-   * @param <T>         the type of the entity bean
    */
-  <T> void publish(Query<T> query, Transaction transaction);
+  <T> List<T> publish(Query<T> query, Transaction transaction);
 
 }

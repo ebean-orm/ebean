@@ -231,7 +231,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   public boolean isNotify() {
-    this.notifyCache = beanDescriptor.isCacheNotify();
+    this.notifyCache = beanDescriptor.isCacheNotify(publish);
     return notifyCache || isNotifyPersistListener();
   }
 

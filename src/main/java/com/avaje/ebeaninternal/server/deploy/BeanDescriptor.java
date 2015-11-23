@@ -572,16 +572,21 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    *
    * @param asOfTableMap the map of base tables to associated 'with history' tables
    * @param asOfViewSuffix the suffix added to the table name to derive the 'with history' view name
+   * @param draftTableMap the map of base tables to associated 'draft' tables.
    */
-  public void initialiseOther(Map<String, String> asOfTableMap, String asOfViewSuffix) {
+  public void initialiseOther(Map<String, String> asOfTableMap, String asOfViewSuffix, Map<String, String> draftTableMap) {
+
+    for (int i = 0; i < propertiesManyToMany.length; i++) {
+      // register associated draft table for M2M intersection
+      propertiesManyToMany[i].registerDraftIntersectionTable(draftTableMap);
+    }
 
     if (historySupport) {
       // history support on this bean so check all associated intersection tables
       // and if they are not excluded register the associated 'with history' table
       for (int i = 0; i < propertiesManyToMany.length; i++) {
+        // register associated history table for M2M intersection
         if (!propertiesManyToMany[i].isExcludedFromHistory()) {
-          // this intersection table has history support so also register
-          // it into the asOfTableMap
           TableJoin intersectionTableJoin = propertiesManyToMany[i].getIntersectionTableJoin();
           String intersectionTableName = intersectionTableJoin.getTable();
           asOfTableMap.put(intersectionTableName, intersectionTableName + asOfViewSuffix);
@@ -849,7 +854,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   /**
    * Return true if the persist request needs to notify the cache.
    */
-  public boolean isCacheNotify() {
+  public boolean isCacheNotify(boolean publish) {
+    if (draftable && !publish) {
+      // no caching when editing draft beans
+      return false;
+    }
     return cacheHelp.isCacheNotify();
   }
 

@@ -1625,13 +1625,15 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  public <T> void publish(Query<T> query, Transaction transaction) {
+  public <T> List<T> publish(Query<T> query, Transaction transaction) {
 
     TransWrapper wrap = initTransIfRequired(transaction);
     try {
       SpiTransaction trans = wrap.transaction;
-      persister.publish(query, trans);
+      List<T> liveBeans = persister.publish(query, trans);
       wrap.commitIfCreated();
+
+      return liveBeans;
 
     } catch (RuntimeException e) {
       wrap.rollbackIfCreated();
@@ -1640,10 +1642,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> void publish(Class<T> beanType, Object id, Transaction transaction) {
+  public <T> T publish(Class<T> beanType, Object id, Transaction transaction) {
 
     Query<T> query = find(beanType).setId(id);
-    publish(query, transaction);
+    List<T> liveBeans = publish(query, transaction);
+    return (liveBeans.size() == 1) ? liveBeans.get(0) : null;
   }
 
   private EntityBean checkEntityBean(Object bean) {

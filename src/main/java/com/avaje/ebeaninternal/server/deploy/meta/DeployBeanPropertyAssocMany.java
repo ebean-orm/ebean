@@ -9,6 +9,11 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
  */
 public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
 
+  /**
+   * The type of the many, set, list or map.
+   */
+  final ManyType manyType;
+
 	ModifyListenMode modifyListenMode = ModifyListenMode.NONE;
 	
 	/**
@@ -35,12 +40,9 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
 
 	String mapKey;
 
-	/**
-	 * The type of the many, set, list or map.
-	 */
-  final ManyType manyType;
+  String intersectionDraftTable;
 
-	/**
+  /**
 	 * Create this property.
 	 */
 	public DeployBeanPropertyAssocMany(DeployBeanDescriptor<?> desc, Class<T> targetType, ManyType manyType) {
@@ -191,4 +193,17 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
 		}
 	}
 
+  /**
+   * Return a draft table for intersection between 2 @Draftable entities.
+   */
+  public String getIntersectionDraftTable() {
+    return (intersectionDraftTable != null) ? intersectionDraftTable : intersectionJoin.getTable();
+  }
+
+  /**
+   * ManyToMany between 2 @Draftable entities to also need draft intersection table.
+   */
+  public void setIntersectionDraftTable() {
+    this.intersectionDraftTable = intersectionJoin.getTable()+"_draft";
+  }
 }

@@ -899,11 +899,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   public Boolean isUseBeanCache() {
-    return useBeanCache;
+    // not using L2 cache for asDraft() query
+    return isAsDraft() ? Boolean.FALSE : useBeanCache;
   }
 
   public boolean isUseQueryCache() {
-    return Boolean.TRUE.equals(useQueryCache);
+    // not using L2 cache for asDraft() query
+    return !isAsDraft() && Boolean.TRUE.equals(useQueryCache);
   }
 
   public DefaultOrmQuery<T> setUseCache(boolean useBeanCache) {
@@ -917,7 +919,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   public boolean isLoadBeanCache() {
-    return loadBeanCache;
+    // not using L2 cache for asDraft() query
+    return !isAsDraft() && loadBeanCache;
   }
 
   public DefaultOrmQuery<T> setLoadBeanCache(boolean loadBeanCache) {

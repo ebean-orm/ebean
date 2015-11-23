@@ -32,6 +32,16 @@ public interface BeanCollection<E> extends Serializable {
   }
 
   /**
+   * Add a bean to the list/set with modifyListen notification.
+   */
+  void addBean(E bean);
+
+  /**
+   * Remove a bean to the list/set with modifyListen notification.
+   */
+  void removeBean(E bean);
+
+  /**
    * Reset the collection back to an empty state ready for reloading.
    * <p>
    * This is done as part of bean refresh.

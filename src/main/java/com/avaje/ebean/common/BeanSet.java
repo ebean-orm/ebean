@@ -53,7 +53,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   }
 
   @SuppressWarnings("unchecked")
-  public void addBean(EntityBean bean) {
+  public void addEntityBean(EntityBean bean) {
     set.add((E) bean);
   }
 
@@ -172,6 +172,18 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   public int hashCode() {
     init();
     return set.hashCode();
+  }
+
+  @Override
+  public void addBean(E bean) {
+    add(bean);
+  }
+
+  @Override
+  public void removeBean(E bean) {
+    if (set.remove(bean)) {
+      getModifyHolder().modifyRemoval(bean);
+    }
   }
 
   // -----------------------------------------------------//

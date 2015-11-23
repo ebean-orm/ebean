@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.core;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.avaje.ebean.CallableSql;
 import com.avaje.ebean.Query;
@@ -90,6 +91,6 @@ public interface Persister {
   /**
    * Publish the draft beans matching the given query.
    */
-  <T> void publish(Query<T> query, Transaction transaction);
+  <T> List<T> publish(Query<T> query, Transaction transaction);
 
 }

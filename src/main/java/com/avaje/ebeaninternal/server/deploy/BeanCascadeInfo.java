@@ -51,8 +51,8 @@ public class BeanCascadeInfo {
     /**
      * Set to true if delete should cascade.
      */
-    public void setDelete(boolean isDelete) {
-        this.delete = isDelete;
+    public void setDelete(boolean delete) {
+        this.delete = delete;
     }
     /**
      * Return true if save should cascade.
@@ -60,5 +60,13 @@ public class BeanCascadeInfo {
     public boolean isSave() {
         return save;
     }
-    	
+
+  /**
+   * Set cascade save and delete settings.
+   */
+  public void setSaveDelete(boolean save, boolean delete) {
+    this.save = save;
+    this.delete = delete;
+  }
+
 }

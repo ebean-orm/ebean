@@ -5,6 +5,7 @@ import com.avaje.ebean.Model;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.annotation.ConcurrencyMode;
+import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.EncryptKey;
@@ -423,7 +424,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       // also look for intersection tables with
       // associated history support and register them
       // into the asOfTableMap
-      d.initialiseOther(asOfTableMap, asOfViewSuffix);
+      d.initialiseOther(asOfTableMap, asOfViewSuffix, draftTableMap);
     }
 
     // create BeanManager for each non-embedded entity bean
@@ -910,7 +911,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private void checkMappedByOneToMany(DeployBeanInfo<?> info, DeployBeanPropertyAssocMany<?> prop) {
 
-    // get the bean descriptor that holds the mappedBy property
+    DeployBeanDescriptor<?> targetDesc = getTargetDescriptor(prop);
+
+    if (targetDesc.isDraftableElement()) {
+      // automatically turning on orphan removal and CascadeType.ALL
+      prop.setModifyListenMode(BeanCollection.ModifyListenMode.REMOVALS);
+      prop.getCascadeInfo().setSaveDelete(true, true);
+    }
 
     if (prop.getMappedBy() == null) {
       if (!findMappedBy(prop)) {
@@ -924,7 +931,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     String mappedBy = prop.getMappedBy();
 
     // get the mappedBy property
-    DeployBeanDescriptor<?> targetDesc = getTargetDescriptor(prop);
     DeployBeanProperty mappedProp = targetDesc.getBeanProperty(mappedBy);
     if (mappedProp == null) {
 
@@ -960,6 +966,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // get the bean descriptor that holds the mappedBy property
     String mappedBy = prop.getMappedBy();
     if (mappedBy == null) {
+      if (getTargetDescriptor(prop).isDraftable()) {
+        prop.setIntersectionDraftTable();
+      }
       return;
     }
 
@@ -1007,6 +1016,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     DeployTableJoin inverseJoin = new DeployTableJoin();
     mappedIntJoin.copyTo(inverseJoin, false, intTableName);
     prop.setInverseJoin(inverseJoin);
+
+    if (targetDesc.isDraftable()) {
+      prop.setIntersectionDraftTable();
+    }
   }
 
   private <T> void setBeanControllerFinderListener(DeployBeanDescriptor<T> descriptor) {

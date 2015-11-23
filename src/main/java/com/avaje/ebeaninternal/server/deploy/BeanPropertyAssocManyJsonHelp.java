@@ -65,7 +65,7 @@ public class BeanPropertyAssocManyJsonHelp {
         // read the entire array
         break;
       }
-      add.addBean(detailBean);
+      add.addEntityBean(detailBean);
 
       if (parentBean != null && many.childMasterProperty != null) {
         // bind detail bean back to master via mappedBy property

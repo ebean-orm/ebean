@@ -112,24 +112,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   private void addDraftTable() {
     if (beanDescriptor.isDraftable() || beanDescriptor.isDraftableElement()) {
       // create a 'Draft' table which looks very similar (change PK, FK etc)
-      MTable draftTable = table.createDraftTable();
-      draftTable.setPkName(ctx.primaryKeyName(draftTable.getName()));
-
-      int fkCount = 0;
-      int ixCount = 0;
-      Collection<MColumn> cols = draftTable.getColumns().values();
-      for (MColumn col: cols) {
-        if (col.getForeignKeyName() != null) {
-          // Note that we adjust the 'references' table later in a second pass
-          // after we know all the tables that are 'draftable'
-          //col.setReferences(refTable + "." + refColumn);
-          col.setForeignKeyName(ctx.foreignKeyConstraintName(draftTable.getName(), col.getName(), ++fkCount));
-
-          String[] indexCols = {col.getName()};
-          col.setForeignKeyIndex(ctx.foreignKeyIndexName(draftTable.getName(), indexCols, ++ixCount));
-        }
-      }
-      ctx.addTable(draftTable);
+      ctx.createDraft(table);
     }
   }
 

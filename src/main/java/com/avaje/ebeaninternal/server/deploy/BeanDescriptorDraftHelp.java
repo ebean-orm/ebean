@@ -31,11 +31,20 @@ public final class BeanDescriptorDraftHelp<T> {
     EntityBean live = (EntityBean)liveBean;
 
     BeanProperty idProperty = desc.getIdProperty();
-    idProperty.publish(draft, live);
+    if (idProperty != null) {
+      idProperty.publish(draft, live);
+    }
 
     BeanProperty[] props = desc.propertiesNonMany();
     for (int i = 0; i < props.length; i++) {
       props[i].publish(draft, live);
+    }
+
+    BeanPropertyAssocMany<?>[] many = desc.propertiesMany();
+    for (int i = 0; i < many.length; i++) {
+      if (many[i].getTargetDescriptor().isDraftable()) {
+        many[i].publishMany(draft, live);
+      }
     }
 
     return liveBean;

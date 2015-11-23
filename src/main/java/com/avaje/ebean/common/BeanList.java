@@ -60,7 +60,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   }
 
   @SuppressWarnings("unchecked")
-  public void addBean(EntityBean bean) {
+  public void addEntityBean(EntityBean bean) {
     list.add((E) bean);
   }
 
@@ -206,6 +206,11 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     list.add(index, element);
   }
 
+  @Override
+  public void addBean(E bean) {
+    add(bean);
+  }
+
   public boolean add(E o) {
     checkReadOnly();
     init();
@@ -317,6 +322,13 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
       return new ModifyListIterator<E>(this, it);
     }
     return list.listIterator(index);
+  }
+
+  @Override
+  public void removeBean(E bean) {
+    if (list.remove(bean)) {
+      getModifyHolder().modifyRemoval(bean);
+    }
   }
 
   public E remove(int index) {

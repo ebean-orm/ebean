@@ -3,10 +3,13 @@ package com.avaje.ebean.dbmigration.model.build;
 import com.avaje.ebean.config.DbConstraintNaming;
 import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.dbmigration.model.MColumn;
 import com.avaje.ebean.dbmigration.model.MTable;
 import com.avaje.ebean.dbmigration.model.ModelContainer;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.type.ScalarType;
+
+import java.util.Collection;
 
 /**
  * The context used during DDL generation.
@@ -126,6 +129,32 @@ public class ModelBuildContext {
       throw new RuntimeException("No scalarType defined for " + p.getFullBeanName());
     }
     return dbTypeMap.get(dbType);
+  }
+
+  /**
+   * Create the draft table for a given table.
+   */
+  public void createDraft(MTable table) {
+
+    MTable draftTable = table.createDraftTable();
+    draftTable.setPkName(primaryKeyName(draftTable.getName()));
+
+    int fkCount = 0;
+    int ixCount = 0;
+    Collection<MColumn> cols = draftTable.getColumns().values();
+    for (MColumn col: cols) {
+      if (col.getForeignKeyName() != null) {
+        // Note that we adjust the 'references' table later in a second pass
+        // after we know all the tables that are 'draftable'
+        //col.setReferences(refTable + "." + refColumn);
+        col.setForeignKeyName(foreignKeyConstraintName(draftTable.getName(), col.getName(), ++fkCount));
+
+        String[] indexCols = {col.getName()};
+        col.setForeignKeyIndex(foreignKeyIndexName(draftTable.getName(), indexCols, ++ixCount));
+      }
+    }
+
+    addTable(draftTable);
   }
 
 }
