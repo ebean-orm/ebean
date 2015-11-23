@@ -16,8 +16,9 @@ import com.avaje.ebeaninternal.server.persist.dmlbind.BindableId;
 public final class DeleteMeta {
 
   private final String sqlVersion;
-
   private final String sqlNone;
+  private final String sqlDraftVersion;
+  private final String sqlDraftNone;
 
   private final BindableId id;
 
@@ -32,8 +33,19 @@ public final class DeleteMeta {
     this.tableName = desc.getBaseTable();
     this.id = id;
     this.version = version;
-    this.sqlNone = genSql(ConcurrencyMode.NONE);
-    this.sqlVersion = genSql(ConcurrencyMode.VERSION);
+
+    String tableName = desc.getBaseTable();
+    this.sqlNone = genSql(ConcurrencyMode.NONE, tableName);
+    this.sqlVersion = genSql(ConcurrencyMode.VERSION, tableName);
+    if (desc.isDraftable()) {
+      String draftTableName = desc.getDraftTable();
+      this.sqlDraftNone = genSql(ConcurrencyMode.NONE, draftTableName);
+      this.sqlDraftVersion = genSql(ConcurrencyMode.VERSION, draftTableName);
+
+    } else {
+      this.sqlDraftNone = sqlNone;
+      this.sqlDraftVersion = sqlVersion;
+    }
   }
 
   public boolean isEmptyStringAsNull() {
@@ -75,25 +87,26 @@ public final class DeleteMeta {
       throw new IllegalStateException("Can not deleteById on " + request.getFullName() + " as no @Id property");
     }
 
+    boolean publish = request.isPublish();
     switch (request.determineConcurrencyMode()) {
     case NONE:
-      return sqlNone;
+      return publish ? sqlNone : sqlDraftNone;
 
     case VERSION:
-      return sqlVersion;
+      return publish ? sqlVersion : sqlDraftVersion;
 
     default:
       throw new RuntimeException("Invalid mode " + request.determineConcurrencyMode());
     }
   }
 
-  private String genSql(ConcurrencyMode conMode) {
+  private String genSql(ConcurrencyMode conMode, String table) {
 
     // delete ... where bcol=? and bc1=? and bc2 is null and ...
 
     GenerateDmlRequest request = new GenerateDmlRequest();
 
-    request.append("delete from ").append(tableName);
+    request.append("delete from ").append(table);
     request.append(" where ");
 
     request.setWhereIdMode();

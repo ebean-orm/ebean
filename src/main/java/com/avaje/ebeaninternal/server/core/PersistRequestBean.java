@@ -607,7 +607,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         transaction.logSummary("Updated [" + name + "] [" + idValue + "]" + draft);
         break;
       case DELETE:
-        transaction.logSummary("Deleted [" + name + "] [" + idValue + "]");
+        transaction.logSummary("Deleted [" + name + "] [" + idValue + "]" + draft);
         break;
       default:
         break;
