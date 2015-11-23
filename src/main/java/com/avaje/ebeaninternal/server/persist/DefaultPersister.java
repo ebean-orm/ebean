@@ -376,12 +376,16 @@ public final class DefaultPersister implements Persister {
    */
   public void delete(EntityBean bean, Transaction t) {
 
-    PersistRequestBean<?> req = createRequest(bean, t, PersistRequest.Type.DELETE);
+    deleteRequest(createRequest(bean, t, PersistRequest.Type.DELETE));
+  }
+
+  private void deleteRequest(PersistRequestBean<?> req) {
+
     if (req.isRegisteredForDeleteBean()) {
       // skip deleting bean. Used where cascade is on
       // both sides of a relationship
       if (logger.isDebugEnabled()) {
-        logger.debug("skipping delete on alreadyRegistered " + bean);
+        logger.debug("skipping delete on alreadyRegistered " + req.getBean());
       }
       return;
     }
@@ -778,9 +782,8 @@ public final class DefaultPersister implements Persister {
           if (removedBean instanceof EntityBean) {
             EntityBean eb = (EntityBean) removedBean;
             if (eb._ebean_getIntercept().isLoaded()) {
-              // only delete if the bean was loaded meaning that
-              // it is know to exist in the DB
-              deleteRecurse(removedBean, t);
+              // only delete if the bean was loaded meaning that it is known to exist in the DB
+              deleteRequest(createRequest(removedBean, t, PersistRequest.Type.DELETE, saveMany.isPublish()));
             }
           }
         }
@@ -1282,11 +1285,18 @@ public final class DefaultPersister implements Persister {
    * perform an insert, update or delete.
    */
   private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, PersistRequest.Type type) {
+    return createRequest(bean, t, type, false);
+  }
+
+  /**
+   * Create the Persist Request Object additionally specifying the publish status.
+   */
+  private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, PersistRequest.Type type, boolean publish) {
     BeanManager<T> mgr = getBeanManager(bean);
     if (mgr == null) {
       throw new PersistenceException(errNotRegistered(bean.getClass()));
     }
-    return createRequest(bean, t, null, mgr, type, false, false);
+    return createRequest(bean, t, null, mgr, type, false, publish);
   }
 
   /**
