@@ -88,7 +88,6 @@ public class CQueryFetchIds {
    * Return a summary description of this query.
    */
   public String getSummary() {
-    //noinspection StringBufferReplaceableByString
     StringBuilder sb = new StringBuilder(80);
     sb.append("FindIds exeMicros[").append(executionTimeMicros)
         .append("] rows[").append(rowCount)

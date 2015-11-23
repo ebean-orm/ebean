@@ -28,6 +28,8 @@ public class DeployBeanPropertyLists {
 
   private BeanProperty versionProperty;
 
+  private BeanProperty draftDirty;
+
   private final BeanDescriptor<?> desc;
 
   private final LinkedHashMap<String, BeanProperty> propertyMap;
@@ -175,6 +177,8 @@ public class DeployBeanPropertyLists {
             logger.warn("Multiple @Version properties - property " + prop.getFullBeanName()
                 + " not treated as a version property");
           }
+        } else if (prop.isDraftDirty()) {
+          draftDirty = prop;
         }
         if (prop instanceof BeanPropertyCompound) {
           baseCompound.add((BeanPropertyCompound) prop);
@@ -283,6 +287,10 @@ public class DeployBeanPropertyLists {
 
   public BeanPropertyAssocMany<?>[] getManyToMany() {
     return getMany2Many();
+  }
+
+  public BeanProperty getDraftDirty() {
+    return draftDirty;
   }
 
   /**

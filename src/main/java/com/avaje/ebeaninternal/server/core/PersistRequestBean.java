@@ -61,6 +61,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private final boolean dirty;
 
+  private final boolean publish;
+
   private ConcurrencyMode concurrencyMode;
 
   /**
@@ -119,10 +121,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private boolean requestUpdateAllLoadedProps;
 
-  private boolean publish;
-
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
-      PersistExecute persistExecute, PersistRequest.Type type, boolean saveRecurse) {
+                            PersistExecute persistExecute, PersistRequest.Type type, boolean saveRecurse, boolean publish) {
 
     super(server, t, persistExecute);
     this.entityBean = (EntityBean) bean;
@@ -134,7 +134,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     this.parentBean = parentBean;
     this.controller = beanDescriptor.getPersistController();
     this.type = type;
-    
+
     if (saveRecurse) {
       this.persistCascade = t.isPersistCascade();
     }
@@ -149,6 +149,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       beanDescriptor.checkMutableProperties(intercept);
     }
     this.concurrencyMode = beanDescriptor.getConcurrencyMode(intercept);
+    this.publish = publish;
+    if (!publish && beanDescriptor.isDraftable()) {
+      beanDescriptor.setDraftDirty(entityBean, true);
+    }
     this.dirty = intercept.isDirty();
   }
 
@@ -245,17 +249,17 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public void notifyCache() {
     if (notifyCache) {
       switch (type) {
-      case INSERT:
-        beanDescriptor.cacheHandleInsert(this);
-        break;
-      case UPDATE:
-        beanDescriptor.cacheHandleUpdate(idValue, this);
-        break;
-      case DELETE:
-        // Bean deleted from cache early via postDelete()
-        break;
-      default:
-        throw new IllegalStateException("Invalid type " + type);
+        case INSERT:
+          beanDescriptor.cacheHandleInsert(this);
+          break;
+        case UPDATE:
+          beanDescriptor.cacheHandleUpdate(idValue, this);
+          break;
+        case DELETE:
+          // Bean deleted from cache early via postDelete()
+          break;
+        default:
+          throw new IllegalStateException("Invalid type " + type);
       }
     }
   }
@@ -449,24 +453,24 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   @Override
   public int executeNow() {
     switch (type) {
-    case INSERT:
-      persistExecute.executeInsertBean(this);
-      return -1;
+      case INSERT:
+        persistExecute.executeInsertBean(this);
+        return -1;
 
-    case UPDATE:
-      if (beanPersistListener != null) {
-        // store the updated properties for sending later
-        updatedProperties = getUpdatedProperties();
-      }
-      persistExecute.executeUpdateBean(this);
-      return -1;
+      case UPDATE:
+        if (beanPersistListener != null) {
+          // store the updated properties for sending later
+          updatedProperties = getUpdatedProperties();
+        }
+        persistExecute.executeUpdateBean(this);
+        return -1;
 
-    case DELETE:
-      persistExecute.executeDeleteBean(this);
-      return -1;
+      case DELETE:
+        persistExecute.executeDeleteBean(this);
+        return -1;
 
-    default:
-      throw new RuntimeException("Invalid type " + type);
+      default:
+        throw new RuntimeException("Invalid type " + type);
     }
   }
 
@@ -515,8 +519,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       throw new OptimisticLockException(m, null, bean);
     }
     switch (type) {
-      case DELETE: postDelete(); break;
-      case UPDATE: postUpdate(); break;
+      case DELETE:
+        postDelete();
+        break;
+      case UPDATE:
+        postUpdate();
+        break;
       default: // do nothing
     }
   }
@@ -573,35 +581,36 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private void controllerPost() {
     switch (type) {
-    case INSERT:
-      controller.postInsert(this);
-      break;
-    case UPDATE:
-      controller.postUpdate(this);
-      break;
-    case DELETE:
-      controller.postDelete(this);
-      break;
-    default:
-      break;
+      case INSERT:
+        controller.postInsert(this);
+        break;
+      case UPDATE:
+        controller.postUpdate(this);
+        break;
+      case DELETE:
+        controller.postDelete(this);
+        break;
+      default:
+        break;
     }
   }
 
   private void logSummary() {
 
+    String draft = (beanDescriptor.isDraftable() && !publish) ? " draft[true]" : "";
     String name = beanDescriptor.getName();
     switch (type) {
-    case INSERT:
-      transaction.logSummary("Inserted [" + name + "] [" + idValue + "]");
-      break;
-    case UPDATE:
-      transaction.logSummary("Updated [" + name + "] [" + idValue + "]");
-      break;
-    case DELETE:
-      transaction.logSummary("Deleted [" + name + "] [" + idValue + "]");
-      break;
-    default:
-      break;
+      case INSERT:
+        transaction.logSummary("Inserted [" + name + "] [" + idValue + "]" + draft);
+        break;
+      case UPDATE:
+        transaction.logSummary("Updated [" + name + "] [" + idValue + "]" + draft);
+        break;
+      case DELETE:
+        transaction.logSummary("Deleted [" + name + "] [" + idValue + "]");
+        break;
+      default:
+        break;
     }
   }
 
@@ -722,7 +731,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Determine if all loaded properties should be used for an update.
    * <p>
-   *   Takes into account transaction setting and JDBC batch.
+   * Takes into account transaction setting and JDBC batch.
    * </p>
    */
   public boolean determineUpdateAllLoadedProperties() {
@@ -737,13 +746,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
 
     return requestUpdateAllLoadedProps;
-  }
-
-  /**
-   * This is a persist request for a 'publish' action.
-   */
-  public void setPublish() {
-    publish = true;
   }
 
   /**

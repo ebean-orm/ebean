@@ -26,13 +26,13 @@ public class BatchedBeanHolderTest {
     BatchedBeanHolder holder = new BatchedBeanHolder(null, beanDescriptor, 1);
 
     Customer customer = new Customer();
-    PersistRequestBean req1 = new PersistRequestBean(server, customer, null, beanManager, null, null, PersistRequest.Type.INSERT, false);
+    PersistRequestBean req1 = new PersistRequestBean(server, customer, null, beanManager, null, null, PersistRequest.Type.INSERT, false, false);
 
 
     int size = holder.append(req1);
     assertEquals(1, size);
 
-    PersistRequestBean req2 = new PersistRequestBean(server, customer, null, beanManager, null, null, PersistRequest.Type.INSERT, false);
+    PersistRequestBean req2 = new PersistRequestBean(server, customer, null, beanManager, null, null, PersistRequest.Type.INSERT, false, false);
     size = holder.append(req2);
     assertEquals(0, size);
 

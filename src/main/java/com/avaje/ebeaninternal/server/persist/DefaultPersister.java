@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -132,14 +133,14 @@ public final class DefaultPersister implements Persister {
     query.asDraft();
 
     Class<T> beanType = query.getBeanType();
-    List<T> draftBeans = server.findList(query, transaction);
     BeanDescriptor<T> desc = server.getBeanDescriptor(beanType);
 
-    if (draftBeans.isEmpty()) {
-      throw new IllegalArgumentException("No draft beans found to publish");
-    }
+    List<T> draftBeans = server.findList(query, transaction);
+    PUB.debug("publish [{}] count[{}]", desc.getName(), draftBeans.size());
 
-    PUB.debug("publish [{}] count:{}", desc.getName(), draftBeans.size());
+    if (draftBeans.isEmpty()) {
+      return Collections.emptyList();
+    }
 
     // get the list of Id's
     List<Object> idList = new ArrayList<Object>();
@@ -156,6 +157,11 @@ public final class DefaultPersister implements Persister {
 
     BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
 
+    // collect a list of draft beans that have had their
+    // dirty status set back to false by the publish
+    List<T> draftUpdates = new ArrayList<T>();
+    BeanProperty draftDirty = desc.getDraftDirty();
+
     for (T draftBean: draftBeans) {
       Object draftID = desc.getBeanId(draftBean);
       T existingLiveBean = liveBeans.get(draftID);
@@ -164,21 +170,43 @@ public final class DefaultPersister implements Persister {
       livePublish.add(liveBean);
 
       Type persistType = (existingLiveBean == null) ? Type.INSERT : Type.UPDATE;
-      PersistRequestBean<T> request = createRequest(liveBean, transaction, null, mgr, persistType, true);
-      request.setPublish();
+      PUB.trace("publish bean [{}] id[{}] type[{}]", desc.getName(), draftID, persistType);
 
-      PUB.trace("publish [{}] id[{}]", desc.getName(), draftID);
-
+      PersistRequestBean<T> request = createRequest(liveBean, transaction, null, mgr, persistType, true, true);
       if (persistType == Type.INSERT) {
         insert(request);
       } else {
         update(request);
       }
 
-      PUB.debug("publish complete for type:{}", desc.getName());
+      unsetDraftDirtyProperty(draftUpdates, draftDirty, draftBean);
     }
 
+    if (!draftUpdates.isEmpty()) {
+      // update the dirty status on the drafts that have been published
+      PUB.debug("publish - update dirty status on [{}] drafts", draftUpdates.size());
+      for (T draftUpdate : draftUpdates) {
+        update(createRequest(draftUpdate, transaction, null, mgr, Type.UPDATE, false, false));
+      }
+    }
+
+    PUB.debug("publish - complete for [{}]", desc.getName());
+
     return livePublish;
+  }
+
+  /**
+   * Set the draft dirty state to false and add to the draftUpdates list.
+   */
+  private <T> void unsetDraftDirtyProperty(List<T> draftUpdates, BeanProperty draftDirty, T draftBean) {
+
+    if (draftDirty != null) {
+      EntityBean draftEntityBean = (EntityBean)draftBean;
+      draftDirty.setValueIntercept(draftEntityBean, false);
+      if (draftEntityBean._ebean_getIntercept().isDirty()) {
+        draftUpdates.add(draftBean);
+      }
+    }
   }
 
   /**
@@ -258,9 +286,6 @@ public final class DefaultPersister implements Persister {
 
     // determine insert or update taking into account stateless updates
     PersistRequestBean<?> request = createRequestRecurse(bean, t, parentBean, insertMode, publish);
-    if (publish) {
-      request.setPublish();
-    }
 
     if (request.isReference()) {
       // its a reference...
@@ -1261,7 +1286,7 @@ public final class DefaultPersister implements Persister {
     if (mgr == null) {
       throw new PersistenceException(errNotRegistered(bean.getClass()));
     }
-    return createRequest(bean, t, null, mgr, type, false);
+    return createRequest(bean, t, null, mgr, type, false, false);
   }
 
   /**
@@ -1284,7 +1309,7 @@ public final class DefaultPersister implements Persister {
       // determine Insert or Update based on bean state and insert flag
       type = desc.isInsertMode(entityBean._ebean_getIntercept(), insertMode) ? Type.INSERT : Type.UPDATE;
     }
-    return createRequest(bean, t, parentBean, mgr, type, true);
+    return createRequest(bean, t, parentBean, mgr, type, true, publish);
   }
 
   /**
@@ -1292,9 +1317,10 @@ public final class DefaultPersister implements Persister {
    * perform an insert, update or delete.
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, BeanManager<?> mgr, PersistRequest.Type type, boolean saveRecurse) {
+  private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, BeanManager<?> mgr,
+                                                  PersistRequest.Type type, boolean saveRecurse, boolean publish) {
 
-    return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, type, saveRecurse);
+    return new PersistRequestBean(server, bean, parentBean, mgr, (SpiTransaction) t, persistExecute, type, saveRecurse, publish);
   }
 
   private String errNotRegistered(Class<?> beanClass) {

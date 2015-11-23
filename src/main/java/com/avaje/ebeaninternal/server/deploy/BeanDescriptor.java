@@ -158,6 +158,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
 
   private final boolean draftableElement;
 
+  private final BeanProperty draftDirty;
+
   /**
    * Map of BeanProperty Linked so as to preserve order.
    */
@@ -393,6 +395,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
 
     this.idProperty = listHelper.getId();
     this.versionProperty = listHelper.getVersionProperty();
+    this.draftDirty = listHelper.getDraftDirty();
     this.propMap = listHelper.getPropertyMap();
     this.propertiesTransient = listHelper.getTransients();
     this.propertiesNonTransient = listHelper.getNonTransients();
@@ -831,6 +834,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
 
   public T publish(T draftBean, T liveBean) {
     return draftHelp.publish(draftBean, liveBean);
+  }
+
+  /**
+   * Return the draft dirty boolean property or null if there is not one assigned to this bean type.
+   */
+  public BeanProperty getDraftDirty() {
+    return draftDirty;
   }
 
   /**
@@ -1916,6 +1926,19 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    */
   public boolean isDraftableElement() {
     return draftableElement;
+  }
+
+  /**
+   * If there is a @DraftDirty property set it's value on the bean.
+   */
+  public void setDraftDirty(EntityBean entityBean, boolean value) {
+    if (draftDirty != null) {
+      // check to see if the dirty property has already
+      // been set and if so do not set the value
+      if (!entityBean._ebean_getIntercept().isChangedProperty(draftDirty.getPropertyIndex())) {
+        draftDirty.setValueIntercept(entityBean, value);
+      }
+    }
   }
 
   /**

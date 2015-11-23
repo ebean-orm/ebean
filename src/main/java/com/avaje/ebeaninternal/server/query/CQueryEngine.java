@@ -415,6 +415,9 @@ public class CQueryEngine {
     if (query.isAutoTuned()) {
       msg.append("tuned[true] ");
     }
+    if (query.isAsDraft()) {
+      msg.append(" draft[true] ");
+    }
     if (originKey != null) {
       msg.append("origin[").append(originKey).append("] ");
     }
@@ -457,6 +460,9 @@ public class CQueryEngine {
     msg.append("type[").append(q.getBeanName()).append("] ");
     if (query.isAutoTuned()) {
       msg.append("tuned[true] ");
+    }
+    if (query.isAsDraft()) {
+      msg.append(" draft[true] ");
     }
     if (originKey != null) {
       msg.append("origin[").append(originKey).append("] ");
