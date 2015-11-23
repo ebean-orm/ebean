@@ -1642,6 +1642,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public <T> T publish(Class<T> beanType, Object id) {
+    return publish(beanType, id, null);
+  }
+
+  @Override
+  public <T> List<T> publish(Query<T> query) {
+    return publish(query, null);
+  }
+
+  @Override
   public <T> T publish(Class<T> beanType, Object id, Transaction transaction) {
 
     Query<T> query = find(beanType).setId(id);

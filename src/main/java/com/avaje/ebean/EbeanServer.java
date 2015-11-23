@@ -1833,6 +1833,19 @@ public interface EbeanServer {
   <T> T publish(Class<T> beanType, Object id, Transaction transaction);
 
   /**
+   * Publish a single bean given its type and id returning the resulting live bean.
+   * This will use the current transaction or create one if required.
+   * <p>
+   * The values are published from the draft to the live bean.
+   * </p>
+   *
+   * @param <T>         the type of the entity bean
+   * @param beanType    the type of the entity bean
+   * @param id          the id of the entity bean
+   */
+  <T> T publish(Class<T> beanType, Object id);
+
+  /**
    * Publish the beans that match the query returning the resulting published beans.
    * <p>
    * The values are published from the draft beans to the live beans.
@@ -1843,5 +1856,17 @@ public interface EbeanServer {
    * @param transaction the transaction the publish process should use (can be null)
    */
   <T> List<T> publish(Query<T> query, Transaction transaction);
+
+  /**
+   * Publish the beans that match the query returning the resulting published beans.
+   * This will use the current transaction or create one if required.
+   * <p>
+   * The values are published from the draft beans to the live beans.
+   * </p>
+   *
+   * @param <T>         the type of the entity bean
+   * @param query       the query used to select the draft beans to publish
+   */
+  <T> List<T> publish(Query<T> query);
 
 }

@@ -348,6 +348,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> T publish(Class<T> beanType, Object id) {
+    return null;
+  }
+
+  @Override
+  public <T> List<T> publish(Query<T> query) {
+    return null;
+  }
+
+  @Override
   public <T> T publish(Class<T> beanType, Object id, Transaction transaction) {
     return null;
   }
