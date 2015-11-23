@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
+import com.avaje.ebean.Query;
 import com.avaje.ebean.bean.EntityBean;
 
 /**
@@ -48,5 +49,26 @@ public final class BeanDescriptorDraftHelp<T> {
     }
 
     return liveBean;
+  }
+
+  /**
+   * Fetch draftable element relationships.
+   */
+  public void draftQueryOptimise(Query<T> query) {
+
+    BeanPropertyAssocOne<?>[] one = desc.propertiesOne();
+    for (int i = 0; i < one.length; i++) {
+      if (one[i].getTargetDescriptor().isDraftableElement()) {
+        query.fetch(one[i].getName());
+      }
+    }
+
+    BeanPropertyAssocMany<?>[] many = desc.propertiesMany();
+    for (int i = 0; i < many.length; i++) {
+      if (many[i].getTargetDescriptor().isDraftableElement()) {
+        query.fetch(many[i].getName());
+      }
+    }
+
   }
 }

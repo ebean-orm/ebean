@@ -134,6 +134,7 @@ public final class DefaultPersister implements Persister {
 
     Class<T> beanType = query.getBeanType();
     BeanDescriptor<T> desc = server.getBeanDescriptor(beanType);
+    desc.draftQueryOptimise(query);
 
     List<T> draftBeans = server.findList(query, transaction);
     PUB.debug("publish [{}] count[{}]", desc.getName(), draftBeans.size());
@@ -149,9 +150,10 @@ public final class DefaultPersister implements Persister {
     }
 
     // fetch existing live beans to update (or insert if missing)
-    Map<?, T> liveBeans = server.find(beanType)
-        .where().idIn(idList)
-        .findMap();
+    Query<T> liveBeansQuery = server.find(beanType).where().idIn(idList).query();
+    desc.draftQueryOptimise(liveBeansQuery);
+
+    Map<?, T> liveBeans = liveBeansQuery.findMap();
 
     List<T> livePublish = new ArrayList<T>(idList.size());
 

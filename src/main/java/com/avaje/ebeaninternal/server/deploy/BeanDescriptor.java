@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.OrderBy;
+import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.ValuePair;
@@ -1939,6 +1940,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
         draftDirty.setValueIntercept(entityBean, value);
       }
     }
+  }
+
+  /**
+   * Optimise the draft query fetching any draftable element relationships.
+   */
+  public void draftQueryOptimise(Query<T> query) {
+    draftHelp.draftQueryOptimise(query);
   }
 
   /**
