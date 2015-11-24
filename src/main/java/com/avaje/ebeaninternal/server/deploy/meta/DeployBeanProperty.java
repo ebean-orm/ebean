@@ -185,6 +185,7 @@ public class DeployBeanProperty {
 
   private boolean draftOnly;
   private boolean draftDirty;
+  private boolean draftReset;
 
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     this.desc = desc;
@@ -853,5 +854,13 @@ public class DeployBeanProperty {
 
   public boolean isDraftDirty() {
     return draftDirty;
+  }
+
+  public void setDraftReset() {
+    this.draftReset = true;
+  }
+
+  public boolean isDraftReset() {
+    return draftReset;
   }
 }

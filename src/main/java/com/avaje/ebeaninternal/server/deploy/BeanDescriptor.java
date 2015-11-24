@@ -838,6 +838,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   }
 
   /**
+   * Reset properties on the draft bean based on @DraftDirty and @DraftReset.
+   */
+  public boolean draftReset(T draftBean) {
+    return draftHelp.draftReset(draftBean);
+  }
+
+  /**
    * Return the draft dirty boolean property or null if there is not one assigned to this bean type.
    */
   public BeanProperty getDraftDirty() {

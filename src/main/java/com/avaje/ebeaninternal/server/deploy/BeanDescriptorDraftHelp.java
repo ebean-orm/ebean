@@ -3,6 +3,9 @@ package com.avaje.ebeaninternal.server.deploy;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.bean.EntityBean;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Helper for BeanDescriptor that manages draft entity beans.
  * 
@@ -12,16 +15,60 @@ public final class BeanDescriptorDraftHelp<T> {
 
   private final BeanDescriptor<T> desc;
 
+  private final BeanProperty draftDirty;
+
+  private final BeanProperty[] resetProperties;
+
   public BeanDescriptorDraftHelp(BeanDescriptor<T> desc) {
     this.desc = desc;
+    this.draftDirty = desc.getDraftDirty();
+    this.resetProperties = resetProperties();
   }
 
   /**
-   *
+   * Return the properties that are reset on draft beans after publish.
    */
-  public void initialise() {
+  private BeanProperty[] resetProperties() {
+
+    List<BeanProperty> list = new ArrayList<BeanProperty>();
+
+    BeanProperty[] props = desc.propertiesNonMany();
+    for (BeanProperty prop : props) {
+      if (prop.isDraftReset()) {
+        list.add(prop);
+      }
+    }
+
+    return list.toArray(new BeanProperty[list.size()]);
   }
 
+  /**
+   * Set the value of all the 'reset properties' to null on the draft bean.
+   */
+  public boolean draftReset(T draftBean) {
+
+    EntityBean draftEntityBean = (EntityBean)draftBean;
+
+    if (draftDirty != null) {
+      // set @DraftDirty property to false
+      draftDirty.setValueIntercept(draftEntityBean, false);
+    }
+
+    // set to null on all @DraftReset properties
+    for (BeanProperty resetProperty : resetProperties) {
+      resetProperty.setValueIntercept(draftEntityBean, null);
+    }
+
+    // return true if the bean is dirty (and should be persisted)
+    return draftEntityBean._ebean_getIntercept().isDirty();
+  }
+
+  /**
+   * Transfer the values from the draftBean to the liveBean.
+   * <p>
+   * This will recursive transfer values to all @DraftableElement properties.
+   * </p>
+   */
   public T publish(T draftBean, T liveBean) {
 
     if (liveBean == null) {

@@ -227,6 +227,8 @@ public class BeanProperty implements ElPropertyValue {
 
   final boolean draftDirty;
 
+  final boolean draftReset;
+
   final boolean indexed;
 
   final String indexName;
@@ -255,6 +257,7 @@ public class BeanProperty implements ElPropertyValue {
     this.excludedFromHistory = deploy.isExcludedFromHistory();
     this.draftDirty = deploy.isDraftDirty();
     this.draftOnly = deploy.isDraftOnly();
+    this.draftReset = deploy.isDraftReset();
 
     this.secondaryTable = deploy.isSecondaryTable();
     if (secondaryTable) {
@@ -341,6 +344,7 @@ public class BeanProperty implements ElPropertyValue {
     this.excludedFromHistory = source.excludedFromHistory;
     this.draftDirty = source.draftDirty;
     this.draftOnly = source.draftOnly;
+    this.draftReset = source.draftReset;
     this.fetchEager = source.fetchEager;
     this.unidirectionalShadow = source.unidirectionalShadow;
     this.discriminator = source.discriminator;
@@ -1043,6 +1047,13 @@ public class BeanProperty implements ElPropertyValue {
    */
   public boolean isDraftDirty() {
     return draftDirty;
+  }
+
+  /**
+   * Return true if this property is reset/cleared on publish (on the draft bean).
+   */
+  public boolean isDraftReset() {
+    return draftReset;
   }
 
   /**

@@ -152,9 +152,11 @@ public class AnnotationFields extends AnnotationParser {
     if (get(prop, DraftOnly.class) != null) {
       prop.setDraftOnly();
     }
-
     if (get(prop, DraftDirty.class) != null) {
       prop.setDraftDirty();
+    }
+    if (get(prop, DraftReset.class) != null) {
+      prop.setDraftReset();
     }
 
     DbJson dbJson = get(prop, DbJson.class);

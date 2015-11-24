@@ -159,10 +159,7 @@ public final class DefaultPersister implements Persister {
 
     BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
 
-    // collect a list of draft beans that have had their
-    // dirty status set back to false by the publish
-    List<T> draftUpdates = new ArrayList<T>();
-    BeanProperty draftDirty = desc.getDraftDirty();
+    DraftHandler draftHandler = new DraftHandler(desc);
 
     for (T draftBean: draftBeans) {
       Object draftID = desc.getBeanId(draftBean);
@@ -181,34 +178,52 @@ public final class DefaultPersister implements Persister {
         update(request);
       }
 
-      unsetDraftDirtyProperty(draftUpdates, draftDirty, draftBean);
+      draftHandler.resetDraft(draftBean);
     }
 
-    if (!draftUpdates.isEmpty()) {
-      // update the dirty status on the drafts that have been published
-      PUB.debug("publish - update dirty status on [{}] drafts", draftUpdates.size());
-      for (T draftUpdate : draftUpdates) {
-        update(createRequest(draftUpdate, transaction, null, mgr, Type.UPDATE, false, false));
-      }
-    }
+    draftHandler.updateDrafts(transaction, mgr);
 
     PUB.debug("publish - complete for [{}]", desc.getName());
-
     return livePublish;
   }
 
   /**
-   * Set the draft dirty state to false and add to the draftUpdates list.
+   * Helper to handle draft beans (properties reset etc).
    */
-  private <T> void unsetDraftDirtyProperty(List<T> draftUpdates, BeanProperty draftDirty, T draftBean) {
+  class DraftHandler<T> {
 
-    if (draftDirty != null) {
-      EntityBean draftEntityBean = (EntityBean)draftBean;
-      draftDirty.setValueIntercept(draftEntityBean, false);
-      if (draftEntityBean._ebean_getIntercept().isDirty()) {
+    final BeanDescriptor<T> desc;
+    final BeanProperty draftDirty;
+    final List<T> draftUpdates = new ArrayList<T>();
+
+    DraftHandler(BeanDescriptor<T> desc) {
+      this.desc = desc;
+      this.draftDirty = desc.getDraftDirty();
+    }
+
+    /**
+     * Set the draft dirty state to false and reset any dirtyReset properties.
+     */
+    void resetDraft(T draftBean) {
+      if (desc.draftReset(draftBean)) {
+        // draft bean is dirty so collect it for persisting later
         draftUpdates.add(draftBean);
       }
     }
+
+    /**
+     * Save all the draft beans (with various properties reset etc).
+     */
+    void updateDrafts(Transaction transaction, BeanManager<T> mgr) {
+      if (!draftUpdates.isEmpty()) {
+        // update the dirty status on the drafts that have been published
+        PUB.debug("publish - update dirty status on [{}] drafts", draftUpdates.size());
+        for (T draftUpdate : draftUpdates) {
+          update(createRequest(draftUpdate, transaction, null, mgr, Type.UPDATE, false, false));
+        }
+      }
+    }
+
   }
 
   /**
