@@ -127,49 +127,82 @@ public final class DefaultPersister implements Persister {
     return executeOrQueue(new PersistRequestUpdateSql(server, updSql, (SpiTransaction) t, persistExecute));
   }
 
+  /**
+   * Restore draft beans to match live beans given the query.
+   */
   @Override
-  public <T> List<T> publish(Query<T> query, Transaction transaction) {
-
-    query.asDraft();
+  public <T> List<T> draftRestore(Query<T> query, Transaction transaction) {
 
     Class<T> beanType = query.getBeanType();
     BeanDescriptor<T> desc = server.getBeanDescriptor(beanType);
-    desc.draftQueryOptimise(query);
 
-    List<T> draftBeans = server.findList(query, transaction);
+    DraftHandler<T> draftHandler = new DraftHandler<T>(desc, transaction);
+
+    List<T> liveBeans = draftHandler.fetchSourceBeans(query, false);
+    PUB.debug("draftRestore [{}] count[{}]", desc.getName(), liveBeans.size());
+    if (liveBeans.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    draftHandler.fetchDestinationBeans(liveBeans, true);
+
+    BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
+
+    for (T liveBean: liveBeans) {
+      T draftBean = draftHandler.publishToDestinationBean(liveBean);
+      // reset @DraftDirty and @DraftReset properties
+      draftHandler.resetDraft(draftBean);
+
+      PUB.trace("draftRestore bean [{}] id[{}]", desc.getName(), draftHandler.getId());
+      update(createRequest(draftBean, transaction, null, mgr, Type.UPDATE, true, false));
+    }
+
+    PUB.debug("draftRestore - complete for [{}]", desc.getName());
+    return draftHandler.getDrafts();
+  }
+
+  /**
+   * Helper method to return the list of Id values for the list of beans.
+   */
+  private <T> List<Object> getBeanIds(BeanDescriptor<T> desc, List<T> beans) {
+    List<Object> idList = new ArrayList<Object>();
+    for (T liveBean: beans) {
+      idList.add(desc.getBeanId(liveBean));
+    }
+    return idList;
+  }
+
+  /**
+   * Publish from draft to live given the query.
+   */
+  @Override
+  public <T> List<T> publish(Query<T> query, Transaction transaction) {
+
+    Class<T> beanType = query.getBeanType();
+    BeanDescriptor<T> desc = server.getBeanDescriptor(beanType);
+
+    DraftHandler<T> draftHandler = new DraftHandler<T>(desc, transaction);
+
+    List<T> draftBeans = draftHandler.fetchSourceBeans(query, true);
     PUB.debug("publish [{}] count[{}]", desc.getName(), draftBeans.size());
-
     if (draftBeans.isEmpty()) {
       return Collections.emptyList();
     }
 
-    // get the list of Id's
-    List<Object> idList = new ArrayList<Object>();
-    for (T draftBean: draftBeans) {
-      idList.add(desc.getBeanId(draftBean));
-    }
-
-    // fetch existing live beans to update (or insert if missing)
-    Query<T> liveBeansQuery = server.find(beanType).where().idIn(idList).query();
-    desc.draftQueryOptimise(liveBeansQuery);
-
-    Map<?, T> liveBeans = liveBeansQuery.findMap();
-
-    List<T> livePublish = new ArrayList<T>(idList.size());
+    draftHandler.fetchDestinationBeans(draftBeans, false);
 
     BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
 
-    DraftHandler draftHandler = new DraftHandler(desc);
-
+    List<T> livePublish = new ArrayList<T>(draftBeans.size());
     for (T draftBean: draftBeans) {
-      Object draftID = desc.getBeanId(draftBean);
-      T existingLiveBean = liveBeans.get(draftID);
-
-      T liveBean = desc.publish(draftBean, existingLiveBean);
+      T liveBean = draftHandler.publishToDestinationBean(draftBean);
       livePublish.add(liveBean);
+      
+      // reset @DraftDirty and @DraftReset properties
+      draftHandler.resetDraft(draftBean);
 
-      Type persistType = (existingLiveBean == null) ? Type.INSERT : Type.UPDATE;
-      PUB.trace("publish bean [{}] id[{}] type[{}]", desc.getName(), draftID, persistType);
+      Type persistType = draftHandler.isInsert() ? Type.INSERT : Type.UPDATE;
+      PUB.trace("publish bean [{}] id[{}] type[{}]", desc.getName(), draftHandler.getId(), persistType);
 
       PersistRequestBean<T> request = createRequest(liveBean, transaction, null, mgr, persistType, true, true);
       if (persistType == Type.INSERT) {
@@ -177,8 +210,6 @@ public final class DefaultPersister implements Persister {
       } else {
         update(request);
       }
-
-      draftHandler.resetDraft(draftBean);
     }
 
     draftHandler.updateDrafts(transaction, mgr);
@@ -193,12 +224,36 @@ public final class DefaultPersister implements Persister {
   class DraftHandler<T> {
 
     final BeanDescriptor<T> desc;
+    final Transaction transaction;
     final BeanProperty draftDirty;
     final List<T> draftUpdates = new ArrayList<T>();
 
-    DraftHandler(BeanDescriptor<T> desc) {
+    /**
+     * Id value of the last published bean.
+     */
+    Object id;
+
+    /**
+     * True if the last published bean is new/insert.
+     */
+    boolean insert;
+
+    /**
+     * The destination beans to publish/restore to mapped by id.
+     */
+    Map<?, T> destBeans;
+
+    DraftHandler(BeanDescriptor<T> desc, Transaction transaction) {
       this.desc = desc;
+      this.transaction = transaction;
       this.draftDirty = desc.getDraftDirty();
+    }
+
+    /**
+     * Return the list of draft beans with changes (to be persisted).
+     */
+    List<T> getDrafts() {
+      return draftUpdates;
     }
 
     /**
@@ -224,6 +279,56 @@ public final class DefaultPersister implements Persister {
       }
     }
 
+    /**
+     * Fetch the source beans based on the query.
+     */
+    List<T> fetchSourceBeans(Query<T> query, boolean asDraft) {
+      desc.draftQueryOptimise(query);
+      if (asDraft) {
+        query.asDraft();
+      }
+      return server.findList(query, transaction);
+    }
+
+    /**
+     * Fetch the destination beans that will be published to.
+     */
+    void fetchDestinationBeans(List<T> sourceBeans, boolean asDraft) {
+
+      List<Object> ids = getBeanIds(desc, sourceBeans);
+
+      Query<T> destQuery = server.find(desc.getBeanType()).where().idIn(ids).query();
+      if (asDraft) {
+        destQuery.asDraft();
+      }
+      desc.draftQueryOptimise(destQuery);
+      this.destBeans = server.findMap(destQuery, transaction);
+    }
+
+    /**
+     * Publish/restore the values from the sourceBean to the matching destination bean.
+     */
+    T publishToDestinationBean(T sourceBean) {
+      id = desc.getBeanId(sourceBean);
+      T destBean = destBeans.get(id);
+      insert = (destBean == null);
+      // apply changes from liveBean to draftBean
+      return desc.publish(sourceBean, destBean);
+    }
+
+    /**
+     * Return true if the last publish resulted in an new bean to insert.
+     */
+    boolean isInsert() {
+      return insert;
+    }
+
+    /**
+     * Return the Id value of the last published/restored bean.
+     */
+    Object getId() {
+      return id;
+    }
   }
 
   /**

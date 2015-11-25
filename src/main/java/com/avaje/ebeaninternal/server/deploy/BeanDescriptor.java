@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.OrderBy;
+import com.avaje.ebean.PersistenceContextScope;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
@@ -1953,6 +1954,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    * Optimise the draft query fetching any draftable element relationships.
    */
   public void draftQueryOptimise(Query<T> query) {
+    // use per query PersistenceContext to ensure fresh beans loaded
+    query.setPersistenceContextScope(PersistenceContextScope.QUERY);
     draftHelp.draftQueryOptimise(query);
   }
 

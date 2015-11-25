@@ -93,4 +93,9 @@ public interface Persister {
    */
   <T> List<T> publish(Query<T> query, Transaction transaction);
 
+  /**
+   * Restore the draft beans back to the matching live beans.
+   */
+  <T> List<T> draftRestore(Query<T> query, Transaction transaction);
+
 }

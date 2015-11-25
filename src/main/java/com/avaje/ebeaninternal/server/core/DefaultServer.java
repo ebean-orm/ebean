@@ -1659,6 +1659,41 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return (liveBeans.size() == 1) ? liveBeans.get(0) : null;
   }
 
+  @Override
+  public <T> List<T> draftRestore(Query<T> query, Transaction transaction) {
+
+    TransWrapper wrap = initTransIfRequired(transaction);
+    try {
+      SpiTransaction trans = wrap.transaction;
+      List<T> beans = persister.draftRestore(query, trans);
+      wrap.commitIfCreated();
+
+      return beans;
+
+    } catch (RuntimeException e) {
+      wrap.rollbackIfCreated();
+      throw e;
+    }
+  }
+
+  @Override
+  public <T> T draftRestore(Class<T> beanType, Object id, Transaction transaction) {
+
+    Query<T> query = find(beanType).setId(id);
+    List<T> beans = draftRestore(query, transaction);
+    return (beans.size() == 1) ? beans.get(0) : null;
+  }
+
+  @Override
+  public <T> T draftRestore(Class<T> beanType, Object id) {
+    return draftRestore(beanType, id, null);
+  }
+
+  @Override
+  public <T> List<T> draftRestore(Query<T> query) {
+    return draftRestore(query, null);
+  }
+
   private EntityBean checkEntityBean(Object bean) {
     if (bean == null) {
       throw new IllegalArgumentException(Message.msg("bean.isnull"));

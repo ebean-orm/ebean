@@ -1869,4 +1869,56 @@ public interface EbeanServer {
    */
   <T> List<T> publish(Query<T> query);
 
+  /**
+   * Restore the draft bean back to the live state.
+   * <p>
+   * The values from the live beans are set back to the draft bean and the
+   * <code>@DraftDirty</code> and <code>@DraftReset</code> properties are reset.
+   * </p>
+   *
+   * @param <T>         the type of the entity bean
+   * @param beanType    the type of the entity bean
+   * @param id          the id of the entity bean to restore
+   * @param transaction the transaction the restore process should use (can be null)
+   */
+  <T> T draftRestore(Class<T> beanType, Object id, Transaction transaction);
+
+  /**
+   * Restore the draft bean back to the live state.
+   * <p>
+   * The values from the live beans are set back to the draft bean and the
+   * <code>@DraftDirty</code> and <code>@DraftReset</code> properties are reset.
+   * </p>
+   *
+   * @param <T>         the type of the entity bean
+   * @param beanType    the type of the entity bean
+   * @param id          the id of the entity bean to restore
+   */
+  <T> T draftRestore(Class<T> beanType, Object id);
+
+  /**
+   * Restore the draft beans matching the query back to the live state.
+   * <p>
+   * The values from the live beans are set back to the draft bean and the
+   * <code>@DraftDirty</code> and <code>@DraftReset</code> properties are reset.
+   * </p>
+   *
+   * @param <T>         the type of the entity bean
+   * @param query       the query used to select the draft beans to restore
+   * @param transaction the transaction the restore process should use (can be null)
+   */
+  <T> List<T> draftRestore(Query<T> query, Transaction transaction);
+
+  /**
+   * Restore the draft beans matching the query back to the live state.
+   * <p>
+   * The values from the live beans are set back to the draft bean and the
+   * <code>@DraftDirty</code> and <code>@DraftReset</code> properties are reset.
+   * </p>
+   *
+   * @param <T>         the type of the entity bean
+   * @param query       the query used to select the draft beans to restore
+   */
+  <T> List<T> draftRestore(Query<T> query);
+
 }
