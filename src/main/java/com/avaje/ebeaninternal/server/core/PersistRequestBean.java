@@ -422,6 +422,20 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
+   * Create and return a new reference bean matching this beans Id value.
+   */
+  public T createReference() {
+    return beanDescriptor.createReference(Boolean.FALSE, getBeanId());
+  }
+
+  /**
+   * Return true if the bean type is a Draftable.
+   */
+  public boolean isDraftable() {
+    return beanDescriptor.isDraftable();
+  }
+
+  /**
    * Return the parent bean for cascading save with unidirectional relationship.
    */
   public Object getParentBean() {

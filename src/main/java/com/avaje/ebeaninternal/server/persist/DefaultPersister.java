@@ -33,6 +33,7 @@ import com.avaje.ebeaninternal.server.deploy.ManyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,6 +59,8 @@ import java.util.Set;
  * @see com.avaje.ebeaninternal.server.persist.DefaultPersistExecute
  */
 public final class DefaultPersister implements Persister {
+
+  private static final Logger SUM = LoggerFactory.getLogger("org.avaje.ebean.SUM");
 
   private static final Logger PUB = LoggerFactory.getLogger("org.avaje.ebean.PUB");
 
@@ -498,7 +501,18 @@ public final class DefaultPersister implements Persister {
    */
   public void delete(EntityBean bean, Transaction t) {
 
-    deleteRequest(createRequest(bean, t, PersistRequest.Type.DELETE));
+    PersistRequestBean<EntityBean> request = createRequest(bean, t, Type.DELETE);
+    deleteRequest(request);
+
+    if (request.isDraftable()) {
+      // we have just deleting a draft bean so now we need to delete the
+      // associated 'live' bean. This is effectively an 'automatic publish'.
+      try {
+        deleteRequest(createRequest(request.createReference(), t, Type.DELETE, true));
+      } catch (OptimisticLockException e) {
+        SUM.debug("Ignore OptimisticLockException - did not delete live row as draft not published for bean:{} id:{}", request.getFullName(), request.getBeanId());
+      }
+    }
   }
 
   private void deleteRequest(PersistRequestBean<?> req) {
