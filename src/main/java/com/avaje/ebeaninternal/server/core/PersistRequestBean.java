@@ -528,7 +528,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Check for optimistic concurrency exception.
    */
   public final void checkRowCount(int rowCount) {
-    if (rowCount != 1) {
+    if (ConcurrencyMode.VERSION == concurrencyMode && rowCount != 1) {
       String m = Message.msg("persist.conc2", "" + rowCount);
       throw new OptimisticLockException(m, null, bean);
     }
