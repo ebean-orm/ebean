@@ -67,11 +67,13 @@ public class UpdateHandler extends DmlHandler {
    * Execute the update in non-batch.
    */
   @Override
-  public void execute() throws SQLException, OptimisticLockException {
+  public int execute() throws SQLException, OptimisticLockException {
     if (!emptySetClause) {
       int rowCount = dataBind.executeUpdate();
       checkRowCount(rowCount);
+      return rowCount;
     }
+    return 0;
   }
 
   @Override

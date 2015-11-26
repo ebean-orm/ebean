@@ -125,8 +125,8 @@ public class InsertHandler extends DmlHandler {
    * getGeneratedKeys if required.
    */
   @Override
-  public void execute() throws SQLException, OptimisticLockException {
-    int rc = dataBind.executeUpdate();
+  public int execute() throws SQLException, OptimisticLockException {
+    int rowCount = dataBind.executeUpdate();
     if (useGeneratedKeys) {
       // get the auto-increment value back and set into the bean
       getGeneratedKeys();
@@ -136,8 +136,9 @@ public class InsertHandler extends DmlHandler {
       fetchGeneratedKeyUsingSelect();
     }
 
-    checkRowCount(rc);
+    checkRowCount(rowCount);
     executeDerivedRelationships();
+    return rowCount;
   }
 
   protected void executeDerivedRelationships() {
@@ -210,16 +211,14 @@ public class InsertHandler extends DmlHandler {
           rset.close();
         }
       } catch (SQLException ex) {
-        String msg = "Error closing rset for fetchGeneratedKeyUsingSelect?";
-        logger.warn(msg, ex);
+        logger.warn("Error closing ResultSet for fetchGeneratedKeyUsingSelect?", ex);
       }
       try {
         if (stmt != null) {
           stmt.close();
         }
       } catch (SQLException ex) {
-        String msg = "Error closing stmt for fetchGeneratedKeyUsingSelect?";
-        logger.warn(msg, ex);
+        logger.warn("Error closing Statement for fetchGeneratedKeyUsingSelect?", ex);
       }
     }
   }

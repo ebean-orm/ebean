@@ -480,8 +480,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         return -1;
 
       case DELETE:
-        persistExecute.executeDeleteBean(this);
-        return -1;
+        return persistExecute.executeDeleteBean(this);
 
       default:
         throw new RuntimeException("Invalid type " + type);

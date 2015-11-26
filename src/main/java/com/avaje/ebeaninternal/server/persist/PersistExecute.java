@@ -33,7 +33,7 @@ public interface PersistExecute {
   /**
    * Execute a Bean (or MapBean) delete.
    */
-  <T> void executeDeleteBean(PersistRequestBean<T> request);
+  <T> int executeDeleteBean(PersistRequestBean<T> request);
 
   /**
    * Execute a Update.

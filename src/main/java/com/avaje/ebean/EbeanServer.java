@@ -1246,16 +1246,32 @@ public interface EbeanServer {
   /**
    * Delete the bean.
    * <p>
+   * This will return true if the bean was deleted successfully or JDBC batch is being used.
+   * </p>
+   * <p>
    * If there is no current transaction one will be created and committed for
    * you automatically.
    * </p>
+   * <p>
+   * If the Bean does not have a version property (or loaded version property) and
+   * the bean does not exist then this returns false indicating that nothing was
+   * deleted. Note that, if JDBC batch mode is used then this always returns true.
+   * </p>
    */
-  void delete(Object bean) throws OptimisticLockException;
+  boolean delete(Object bean) throws OptimisticLockException;
 
   /**
    * Delete the bean with an explicit transaction.
+   * <p>
+   * This will return true if the bean was deleted successfully or JDBC batch is being used.
+   * </p>
+   * <p>
+   * If the Bean does not have a version property (or loaded version property) and
+   * the bean does not exist then this returns false indicating that nothing was
+   * deleted. However, if JDBC batch mode is used then this always returns true.
+   * </p>
    */
-  void delete(Object bean, Transaction transaction) throws OptimisticLockException;
+  boolean delete(Object bean, Transaction transaction) throws OptimisticLockException;
 
   /**
    * Delete the bean given its type and id.

@@ -548,8 +548,8 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void delete(Object bean) throws OptimisticLockException {
-
+  public boolean delete(Object bean) throws OptimisticLockException {
+    return false;
   }
 
   @Override
@@ -658,8 +658,8 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void delete(Object bean, Transaction t) throws OptimisticLockException {
-
+  public boolean delete(Object bean, Transaction t) throws OptimisticLockException {
+    return false;
   }
 
   @Override

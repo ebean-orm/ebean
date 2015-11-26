@@ -75,7 +75,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Execute now for non-batch execution.
    */
   @Override
-  public abstract void execute() throws SQLException;
+  public abstract int execute() throws SQLException;
 
   /**
    * Check the rowCount.

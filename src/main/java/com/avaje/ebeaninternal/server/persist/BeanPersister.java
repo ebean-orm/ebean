@@ -22,6 +22,6 @@ public interface BeanPersister {
   /**
    * execute the delete bean request.
    */
-  void delete(PersistRequestBean<?> request) throws PersistenceException;
+  int delete(PersistRequestBean<?> request) throws PersistenceException;
 
 }

@@ -46,9 +46,10 @@ public class DeleteHandler extends DmlHandler {
 	 * Execute the delete non-batch.
 	 */
   @Override
-	public void execute() throws SQLException, OptimisticLockException {
+	public int execute() throws SQLException, OptimisticLockException {
 		int rowCount = dataBind.executeUpdate();
 		checkRowCount(rowCount);
+    return rowCount;
 	}
 
   @Override

@@ -498,24 +498,25 @@ public final class DefaultPersister implements Persister {
 
   /**
    * Delete the bean with the explicit transaction.
+   * Return false if the delete is executed without OCC and 0 rows were deleted.
    */
-  public void delete(EntityBean bean, Transaction t) {
+  public boolean delete(EntityBean bean, Transaction t) {
 
     PersistRequestBean<EntityBean> request = createRequest(bean, t, Type.DELETE);
-    deleteRequest(request);
+    boolean deleted = deleteRequest(request);
 
     if (request.isDraftable()) {
       // we have just deleting a draft bean so now we need to delete the
       // associated 'live' bean. This is effectively an 'automatic publish'.
-      try {
-        deleteRequest(createRequest(request.createReference(), t, Type.DELETE, true));
-      } catch (OptimisticLockException e) {
-        SUM.debug("Ignore OptimisticLockException - did not delete live row as draft not published for bean:{} id:{}", request.getFullName(), request.getBeanId());
-      }
+      deleteRequest(createRequest(request.createReference(), t, Type.DELETE, true));
     }
+    return deleted;
   }
 
-  private void deleteRequest(PersistRequestBean<?> req) {
+  /**
+   * Execute the delete request returning true if a delete occurred.
+   */
+  private boolean deleteRequest(PersistRequestBean<?> req) {
 
     if (req.isRegisteredForDeleteBean()) {
       // skip deleting bean. Used where cascade is on
@@ -523,14 +524,16 @@ public final class DefaultPersister implements Persister {
       if (logger.isDebugEnabled()) {
         logger.debug("skipping delete on alreadyRegistered " + req.getBean());
       }
-      return;
+      return false;
     }
 
     try {
       req.initTransIfRequiredWithBatchCascade();
-      delete(req);
+      boolean deleted = delete(req);
       req.commitTransIfRequired();
       req.flushBatchOnCascade();
+
+      return deleted;
 
     } catch (RuntimeException ex) {
       req.rollbackTransIfRequired();
@@ -710,7 +713,7 @@ public final class DefaultPersister implements Persister {
    * Note that preDelete fires before the deletion of children.
    * </p>
    */
-  private void delete(PersistRequestBean<?> request) {
+  private boolean delete(PersistRequestBean<?> request) {
 
     DeleteUnloadedForeignKeys unloadedForeignKeys = null;
 
@@ -729,7 +732,7 @@ public final class DefaultPersister implements Persister {
       }
     }
 
-    request.executeOrQueue();
+    int count = request.executeOrQueue();
 
     if (request.isPersistCascade()) {
       deleteAssocOne(request);
@@ -739,6 +742,8 @@ public final class DefaultPersister implements Persister {
       }
     }
 
+    // return true if using JDBC batch (as we can't tell until the batch is flushed)
+    return count != 0;
   }
 
   /**

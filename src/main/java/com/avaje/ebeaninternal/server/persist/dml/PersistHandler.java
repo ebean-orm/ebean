@@ -25,7 +25,7 @@ public interface PersistHandler {
   /**
    * Execute now for non-batch execution.
    */
-  void execute() throws SQLException;
+  int execute() throws SQLException;
 
   /**
    * Close resources including underlying preparedStatement.

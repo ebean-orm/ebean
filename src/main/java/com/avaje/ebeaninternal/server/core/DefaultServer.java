@@ -1867,16 +1867,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Delete the bean.
    */
-  public void delete(Object bean) {
-    delete(bean, null);
+  public boolean delete(Object bean) {
+    return delete(bean, null);
   }
 
   /**
    * Delete the bean with the explicit transaction.
    */
-  public void delete(Object bean, Transaction t) {
+  public boolean delete(Object bean, Transaction t) {
     
-    persister.delete(checkEntityBean(bean), t);
+    return persister.delete(checkEntityBean(bean), t);
   }
 
   /**

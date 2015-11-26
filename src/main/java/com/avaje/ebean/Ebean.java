@@ -697,12 +697,20 @@ public final class Ebean {
   /**
    * Delete the bean.
    * <p>
+   * This will return true if the bean was deleted successfully or JDBC batch is being used.
+   * </p>
+   * <p>
    * If there is no current transaction one will be created and committed for
    * you automatically.
    * </p>
+   * <p>
+   * If the Bean does not have a version property (or loaded version property) and
+   * the bean does not exist then this returns false indicating that nothing was
+   * deleted. Note that, if JDBC batch mode is used then this always returns true.
+   * </p>
    */
-  public static void delete(Object bean) throws OptimisticLockException {
-    serverMgr.getDefaultServer().delete(bean);
+  public static boolean delete(Object bean) throws OptimisticLockException {
+    return serverMgr.getDefaultServer().delete(bean);
   }
 
   /**

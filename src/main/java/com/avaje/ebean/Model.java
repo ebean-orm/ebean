@@ -251,12 +251,24 @@ public abstract class Model {
   }
 
   /**
-   * Delete this entity.
+   * Delete this bean.
+   * <p>
+   * This will return true if the bean was deleted successfully or JDBC batch is being used.
+   * </p>
+   * <p>
+   * If there is no current transaction one will be created and committed for
+   * you automatically.
+   * </p>
+   * <p>
+   * If the Bean does not have a version property (or loaded version property) and
+   * the bean does not exist then this returns false indicating that nothing was
+   * deleted. Note that, if JDBC batch mode is used then this always returns true.
+   * </p>
    *
    * @see EbeanServer#delete(Object)
    */
-  public void delete() {
-    db().delete(this);
+  public boolean delete() {
+    return db().delete(this);
   }
 
   /**
@@ -276,8 +288,8 @@ public abstract class Model {
   /**
    * Perform a delete using this entity against the specified server.
    */
-  public void delete(String server) {
-    db(server).delete(this);
+  public boolean delete(String server) {
+    return db(server).delete(this);
   }
 
   /**

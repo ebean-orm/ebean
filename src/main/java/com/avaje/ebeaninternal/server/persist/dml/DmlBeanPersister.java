@@ -35,10 +35,10 @@ public final class DmlBeanPersister implements BeanPersister {
 	/**
 	 * execute the bean delete request.
 	 */
-	public void delete(PersistRequestBean<?> request) {
+	public int delete(PersistRequestBean<?> request) {
 
 		DeleteHandler delete = new DeleteHandler(request, deleteMeta);
-		execute(request, delete);
+		return execute(request, delete);
 	}
 
 	/**
@@ -62,15 +62,17 @@ public final class DmlBeanPersister implements BeanPersister {
 	/**
 	 * execute request taking batching into account.
 	 */
-	private void execute(PersistRequestBean<?> request, PersistHandler handler) {
+	private int execute(PersistRequestBean<?> request, PersistHandler handler) {
 
     boolean batched = request.isBatched();
 		try {
 			handler.bind();
 			if (batched) {
 				handler.addBatch();
+        return -1;
+
 			} else {
-				handler.execute();
+				return handler.execute();
 			}
 
 		} catch (SQLException e) {

@@ -73,15 +73,17 @@ public final class DefaultPersistExecute implements PersistExecute {
   /**
    * execute the bean delete request.
    */
-  public <T> void executeDeleteBean(PersistRequestBean<T> request) {
+  public <T> int executeDeleteBean(PersistRequestBean<T> request) {
 
     BeanManager<T> mgr = request.getBeanManager();
     BeanPersister persister = mgr.getBeanPersister();
 
     BeanPersistController controller = request.getBeanController();
     if (controller == null || controller.preDelete(request)) {
-      persister.delete(request);
+      return persister.delete(request);
     }
+    // delete handled by the BeanController so return 0
+    return 0;
   }
 
   /**
