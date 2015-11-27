@@ -578,17 +578,30 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   public void setValue(EntityBean bean, Object value) {
     super.setValue(bean, value);
     if (embedded && value instanceof EntityBean) {
-      EntityBean embedded = (EntityBean) value;
-      embedded._ebean_getIntercept().setEmbeddedOwner(bean, propertyIndex);
+      setEmbeddedOwner(bean, value);
     }
+  }
+
+  /**
+   * Set the owner on the embedded bean property.
+   */
+  public void setEmbeddedOwner(EntityBean owner) {
+
+    Object emb = getValue(owner);
+    if (emb != null) {
+      setEmbeddedOwner(owner, emb);
+    }
+  }
+
+  private void setEmbeddedOwner(EntityBean bean, Object value) {
+    ((EntityBean)value)._ebean_getIntercept().setEmbeddedOwner(bean, propertyIndex);
   }
 
   @Override
   public void setValueIntercept(EntityBean bean, Object value) {
     super.setValueIntercept(bean, value);
     if (embedded && value instanceof EntityBean) {
-      EntityBean embedded = (EntityBean) value;
-      embedded._ebean_getIntercept().setEmbeddedOwner(bean, propertyIndex);
+      setEmbeddedOwner(bean, value);
     }
   }
 

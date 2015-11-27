@@ -691,6 +691,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     for (int i = 0; i < len; i++) {
       intercept.setLoadedProperty(i);
     }
+    beanDescriptor.setEmbeddedOwner(entityBean);
   }
 
   public boolean isReference() {

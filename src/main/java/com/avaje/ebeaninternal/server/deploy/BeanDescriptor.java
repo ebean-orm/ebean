@@ -2051,6 +2051,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     return propertiesEmbedded;
   }
 
+  /**
+   * Set the embedded owner on any embedded bean properties.
+   */
+  public void setEmbeddedOwner(EntityBean bean) {
+    for (int i = 0; i < propertiesEmbedded.length; i++) {
+      propertiesEmbedded[i].setEmbeddedOwner(bean);
+    }
+  }
+
   public BeanProperty getIdProperty() {
     return idProperty;
   }
