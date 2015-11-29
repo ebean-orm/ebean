@@ -14,7 +14,7 @@ public interface SpiExpressionRequest {
   /**
    * Return the DB specific JSON expression handler.
    */
-  JsonExpressionHandler getJsonHander();
+  JsonExpressionHandler getJsonHandler();
 
   /**
    * Parse the logical property name to the deployment name.
@@ -35,7 +35,12 @@ public interface SpiExpressionRequest {
 	 * Append to the expression sql.
 	 */
 	SpiExpressionRequest append(String sql);
-	
+
+  /**
+   * Add an encryption key to bind to this request.
+   */
+  void addBindEncryptKey(Object encryptKey);
+
 	/**
 	 * Add a bind value to this request.
 	 */

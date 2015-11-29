@@ -3,6 +3,7 @@ package com.avaje.tests.basic.encrypt;
 import java.sql.Date;
 import java.util.List;
 
+import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,7 +17,23 @@ import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.tests.model.basic.EBasicEncrypt;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestEncrypt extends BaseTestCase {
+
+
+  @Test
+  public void testQueryBind() {
+
+    LoggedSqlCollector.start();
+    Ebean.find(EBasicEncrypt.class)
+        .where().startsWith("description", "Rob")
+        .findList();
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(1);
+    assertThat(loggedSql.get(0)).contains("; --bind(****,Rob%)");
+  }
 
   @Ignore
   @Test

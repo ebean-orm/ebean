@@ -14,12 +14,31 @@ public class DataBind {
 
   private final PreparedStatement pstmt;
 
+  private final StringBuilder bindLog = new StringBuilder();
+
   private int pos;
 
   public DataBind(PreparedStatement pstmt) {
     this.pstmt = pstmt;
   }
 
+  /**
+   * Append an entry to the bind log.
+   */
+  public StringBuilder append(Object entry) {
+    return bindLog.append(entry);
+  }
+
+  /**
+   * Return the bind log.
+   */
+  public StringBuilder log() {
+    return bindLog;
+  }
+
+  /**
+   * Close the underlying prepared statement.
+   */
   public void close() throws SQLException {
     pstmt.close();
   }

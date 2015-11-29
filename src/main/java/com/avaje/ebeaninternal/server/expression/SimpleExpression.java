@@ -40,7 +40,7 @@ public class SimpleExpression extends AbstractExpression {
       if (prop.isDbEncrypted()) {
         // bind the key as well as the value
         String encryptKey = prop.getBeanProperty().getEncryptKey().getStringValue();
-        request.addBindValue(encryptKey);
+        request.addBindEncryptKey(encryptKey);
       }
       //else if (prop.isLocalEncrypted()) {
       // not supporting this for equals (but probably could)

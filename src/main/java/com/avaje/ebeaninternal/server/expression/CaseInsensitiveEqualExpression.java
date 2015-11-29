@@ -22,7 +22,7 @@ class CaseInsensitiveEqualExpression extends AbstractExpression {
     if (prop != null && prop.isDbEncrypted()) {
       // bind the key as well as the value
       String encryptKey = prop.getBeanProperty().getEncryptKey().getStringValue();
-      request.addBindValue(encryptKey);
+      request.addBindEncryptKey(encryptKey);
     }
 
     request.addBindValue(value);

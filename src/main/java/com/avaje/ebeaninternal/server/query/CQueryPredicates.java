@@ -61,7 +61,7 @@ public class CQueryPredicates {
   /**
    * Bind values from the where expressions.
    */
-  private ArrayList<Object> filterManyExprBindValues;
+  private DefaultExpressionRequest filterMany;
 
   /**
    * SQL generated from the where expressions.
@@ -71,7 +71,7 @@ public class CQueryPredicates {
   /**
    * Bind values from the where expressions.
    */
-  private ArrayList<Object> whereExprBindValues;
+  private DefaultExpressionRequest where;
 
   /**
    * SQL generated from the where expressions.
@@ -86,7 +86,7 @@ public class CQueryPredicates {
   /**
    * Bind values for having expression.
    */
-  private ArrayList<Object> havingExprBindValues;
+  private DefaultExpressionRequest having;
 
   /**
    * SQL generated from the having expression.
@@ -129,16 +129,14 @@ public class CQueryPredicates {
 
   public String bind(DataBind dataBind) throws SQLException {
 
-    StringBuilder bindLog = new StringBuilder();
-
     if (query.isVersionsBetween() && binder.isBindAsOfWithFromClause()) {
       // sql2011 based versions between timestamp syntax
       Timestamp start = query.getVersionStart();
       Timestamp end = query.getVersionEnd();
-      bindLog.append("between ").append(start).append(" and ").append(end);
+      dataBind.append("between ").append(start).append(" and ").append(end);
       binder.bindObject(dataBind, start);
       binder.bindObject(dataBind, end);
-      bindLog.append(", ");
+      dataBind.append(", ");
     }
 
     List<String> historyTableAlias = query.getAsOfTableAlias();
@@ -146,51 +144,37 @@ public class CQueryPredicates {
       // bind the asOf value for each table alias as part of the from/join clauses
       // there is one effective date predicate per table alias
       Timestamp asOf = query.getAsOf();
-      bindLog.append("asOf ").append(asOf);
+      dataBind.append("asOf ").append(asOf);
       for (int i = 0; i < historyTableAlias.size() * binder.getAsOfBindCount(); i++) {
         binder.bindObject(dataBind, asOf);
       }
-      bindLog.append(", ");
+      dataBind.append(", ");
     }
 
     if (idValue != null) {
       // this is a find by id type query...
       request.getBeanDescriptor().bindId(dataBind, idValue);
-      bindLog.append(idValue);
+      dataBind.append(idValue);
     }
 
     if (bindParams != null) {
       // bind named and positioned parameters...
-      binder.bind(bindParams, dataBind, bindLog);
+      binder.bind(bindParams, dataBind, dataBind.log());
     }
 
-    if (whereExprBindValues != null) {
-      for (int i = 0; i < whereExprBindValues.size(); i++) {
-        Object bindValue = whereExprBindValues.get(i);
-        bindValue = binder.bindObject(dataBind, bindValue);
-        if (i > 0 || idValue != null) {
-          bindLog.append(",");
-        }
-        bindLog.append(bindValue);
-      }
+    if (where != null) {
+      where.bind(dataBind);
     }
 
-    if (filterManyExprBindValues != null) {
-      for (int i = 0; i < filterManyExprBindValues.size(); i++) {
-        Object bindValue = filterManyExprBindValues.get(i);
-        bindValue = binder.bindObject(dataBind, bindValue);
-        if (i > 0 || idValue != null) {
-          bindLog.append(",");
-        }
-        bindLog.append(bindValue);
-      }
+    if (filterMany != null) {
+      filterMany.bind(dataBind);
     }
 
     if (historyTableAlias != null && !binder.isBindAsOfWithFromClause()) {
       // bind the asOf value for each table alias after all the normal predicates
       // there is one effective date predicate per table alias
       Timestamp asOf = query.getAsOf();
-      bindLog.append(" asOf ").append(asOf);
+      dataBind.append(" asOf ").append(asOf);
       for (int i = 0; i < historyTableAlias.size() * binder.getAsOfBindCount(); i++) {
         binder.bindObject(dataBind, asOf);
       }
@@ -198,24 +182,14 @@ public class CQueryPredicates {
 
     if (havingNamedParams != null) {
       // bind named parameters in having...
-      bindLog.append(" havingNamed ");
-      binder.bind(havingNamedParams.list(), dataBind, bindLog);
+      binder.bind(havingNamedParams.list(), dataBind, dataBind.log());
     }
 
-    if (havingExprBindValues != null) {
-      // bind having expression...
-      bindLog.append(" having ");
-      for (int i = 0; i < havingExprBindValues.size(); i++) {
-        Object bindValue = havingExprBindValues.get(i);
-        bindValue = binder.bindObject(dataBind, bindValue);
-        if (i > 0) {
-          bindLog.append(",");
-        }
-        bindLog.append(bindValue);
-      }
+    if (having != null) {
+      having.bind(dataBind);
     }
 
-    return bindLog.toString();
+    return dataBind.log().toString();
   }
 
   private void buildBindHavingRawSql(boolean buildSql, boolean parseRaw, DeployParser deployParser) {
@@ -302,22 +276,20 @@ public class CQueryPredicates {
 
     SpiExpressionList<?> whereExp = query.getWhereExpressions();
     if (whereExp != null) {
-      DefaultExpressionRequest whereReq = new DefaultExpressionRequest(request, deployParser, binder);
-      whereExprBindValues = whereExp.buildBindValues(whereReq);
+      this.where = new DefaultExpressionRequest(request, deployParser, binder, whereExp);
       if (buildSql) {
-        whereExprSql = whereExp.buildSql(whereReq);
+        whereExprSql = where.buildSql();
       }
     }
 
     BeanPropertyAssocMany<?> manyProperty = request.getManyProperty();
     if (manyProperty != null) {
       OrmQueryProperties chunk = query.getDetail().getChunk(manyProperty.getName(), false);
-      SpiExpressionList<?> filterMany = chunk.getFilterMany();
-      if (filterMany != null) {
-        DefaultExpressionRequest filterReq = new DefaultExpressionRequest(request, deployParser, binder);
-        filterManyExprBindValues = filterMany.buildBindValues(filterReq);
+      SpiExpressionList<?> filterManyExpr = chunk.getFilterMany();
+      if (filterManyExpr != null) {
+        this.filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
         if (buildSql) {
-          filterManyExprSql = filterMany.buildSql(filterReq);
+          filterManyExprSql = filterMany.buildSql();
         }
       }
     }
@@ -325,10 +297,9 @@ public class CQueryPredicates {
     // having expression
     SpiExpressionList<?> havingExpr = query.getHavingExpressions();
     if (havingExpr != null) {
-      DefaultExpressionRequest havingReq = new DefaultExpressionRequest(request, deployParser, binder);
-      havingExprBindValues = havingExpr.buildBindValues(havingReq);
+      this.having = new DefaultExpressionRequest(request, deployParser, binder, havingExpr);
       if (buildSql) {
-        havingExprSql = havingExpr.buildSql(havingReq);
+        havingExprSql = having.buildSql();
       }
     }
 
@@ -495,7 +466,7 @@ public class CQueryPredicates {
    * Return the bind values for the where expression.
    */
   public ArrayList<Object> getWhereExprBindValues() {
-    return whereExprBindValues;
+    return where.getBindValues();
   }
 
   /**
