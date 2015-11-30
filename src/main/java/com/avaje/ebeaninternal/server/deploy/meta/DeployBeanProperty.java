@@ -4,6 +4,8 @@ import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
 import com.avaje.ebean.annotation.WhenCreated;
 import com.avaje.ebean.annotation.WhenModified;
+import com.avaje.ebean.annotation.WhoCreated;
+import com.avaje.ebean.annotation.WhoModified;
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
@@ -215,14 +217,21 @@ public class DeployBeanProperty {
       return ID_ORDER;
     } else if (undirectionalShadow) {
       return UNIDIRECTIONAL_ORDER;
-    } else if (field.getAnnotation(WhenCreated.class) != null || field.getAnnotation(CreatedTimestamp.class) != null) {
-      return AUDITCOLUMN_ORDER;
-    } else if (field.getAnnotation(WhenModified.class) != null || field.getAnnotation(UpdatedTimestamp.class) != null) {
+    } else if (isAuditProperty()) {
       return AUDITCOLUMN_ORDER;
     } else if (field.getAnnotation(Version.class) != null) {
       return VERSIONCOLUMN_ORDER;
     }
     return 0;
+  }
+
+  private boolean isAuditProperty() {
+    return (field.getAnnotation(WhenCreated.class) != null
+        || field.getAnnotation(WhenModified.class) != null
+        || field.getAnnotation(WhoModified.class) != null
+        || field.getAnnotation(WhoCreated.class) != null
+        || field.getAnnotation(UpdatedTimestamp.class) != null
+        || field.getAnnotation(CreatedTimestamp.class) != null);
   }
 
   public String getFullBeanName() {
