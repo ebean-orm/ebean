@@ -435,6 +435,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     // includes joins and we use - delete ... where id in (...)
     maxRows = 0;
     firstRow = 0;
+    forUpdate = false;
     setSelectId();
   }
 
