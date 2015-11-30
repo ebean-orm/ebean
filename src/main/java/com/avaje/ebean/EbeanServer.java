@@ -1524,7 +1524,6 @@ public interface EbeanServer {
    * @param deleteMissingChildren
    *          specify false if you do not want 'missing children' of a OneToMany
    *          or ManyToMany to be automatically deleted.
-
    */
   void update(Object bean, Transaction transaction, boolean deleteMissingChildren) throws OptimisticLockException;
 
