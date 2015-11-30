@@ -1472,7 +1472,7 @@ public interface EbeanServer {
   void markAsDirty(Object bean);
   
   /**
-   * Saves the bean using an update. If you know you are updating a bean then it is preferrable to
+   * Saves the bean using an update. If you know you are updating a bean then it is preferable to
    * use this update() method rather than save().
    * <p>
    * <b>Stateless updates:</b> Note that the bean does not have to be previously fetched to call
