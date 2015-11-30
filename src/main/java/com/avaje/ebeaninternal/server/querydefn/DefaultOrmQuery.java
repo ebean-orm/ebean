@@ -9,6 +9,7 @@ import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.event.readaudit.ReadEvent;
+import com.avaje.ebean.plugin.SpiBeanType;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.HashQuery;
@@ -17,6 +18,7 @@ import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
+import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -1413,4 +1415,28 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
   }
 
+  @Override
+  public Set<String> validate() {
+    return server.validateQuery(this);
+  }
+
+  /**
+   * Validate all the expression properties/paths given the bean descriptor.
+   */
+  public Set<String> validate(SpiBeanType<T> desc) {
+
+    SpiExpressionValidation validation = new SpiExpressionValidation(desc);
+    if (whereExpressions != null) {
+      whereExpressions.validate(validation);
+    }
+    if (havingExpressions != null) {
+      havingExpressions.validate(validation);
+    }
+    if (orderBy != null) {
+      for (Property property : orderBy.getProperties()) {
+        validation.validate(property.getProperty());
+      }
+    }
+    return validation.getUnknownProperties();
+  }
 }

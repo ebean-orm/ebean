@@ -6,6 +6,7 @@ import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
+import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 /**
@@ -51,6 +52,12 @@ abstract class LogicExpression implements SpiExpression {
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     expOne.containsMany(desc, manyWhereJoin);
     expTwo.containsMany(desc, manyWhereJoin);
+  }
+
+  @Override
+  public void validate(SpiExpressionValidation validation) {
+    expOne.validate(validation);
+    expTwo.validate(validation);
   }
 
   public void addBindValues(SpiExpressionRequest request) {

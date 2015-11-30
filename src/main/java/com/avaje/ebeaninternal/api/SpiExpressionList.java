@@ -67,4 +67,8 @@ public interface SpiExpressionList<T> extends ExpressionList<T> {
    */
   void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder);
 
+  /**
+   * Validate all the properties/paths used in this expression list.
+   */
+  void validate(SpiExpressionValidation validation);
 }

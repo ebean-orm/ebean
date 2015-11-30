@@ -1318,4 +1318,13 @@ public interface Query<T> extends Serializable {
    * </p>
    */
   Query<T> setDisableLazyLoading(boolean disableLazyLoading);
+
+  /**
+   * Returns the set of properties or paths that are unknown (do not map to known properties or paths).
+   * <p>
+   * Validate the query checking the where and orderBy expression paths to confirm if
+   * they represent valid properties or paths for the given bean type.
+   * </p>
+   */
+  Set<String> validate();
 }

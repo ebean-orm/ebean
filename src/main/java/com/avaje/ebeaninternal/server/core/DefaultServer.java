@@ -908,8 +908,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     Class<T> beanType = (Class<T>) list.get(0).getClass();
     BeanDescriptor<T> beanDescriptor = getBeanDescriptor(beanType);
     if (beanDescriptor == null) {
-      String m = "BeanDescriptor not found, is [" + beanType + "] an entity bean?";
-      throw new PersistenceException(m);
+      throw new PersistenceException("BeanDescriptor not found, is [" + beanType + "] an entity bean?");
     }
     beanDescriptor.sort(list, sortByClause);
   }
@@ -931,6 +930,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     // this will parse the query
     return new DefaultOrmQuery<T>(beanType, this, expressionFactory, deployQuery);
+  }
+
+  @Override
+  public <T> Set<String> validateQuery(Query<T> query) {
+
+    BeanDescriptor<T> beanDescriptor = getBeanDescriptor(query.getBeanType());
+    if (beanDescriptor == null) {
+      throw new PersistenceException("BeanDescriptor not found, is [" + query.getBeanType() + "] an entity bean?");
+    }
+    return ((SpiQuery<T>)query).validate(beanDescriptor);
   }
 
   public <T> Filter<T> filter(Class<T> beanType) {

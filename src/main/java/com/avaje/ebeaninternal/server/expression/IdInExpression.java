@@ -7,6 +7,7 @@ import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
+import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.util.DefaultExpressionRequest;
@@ -25,6 +26,11 @@ public class IdInExpression implements SpiExpression {
   }
 
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
+  }
+
+  @Override
+  public void validate(SpiExpressionValidation validation) {
+    // always valid
   }
 
   public void addBindValues(SpiExpressionRequest request) {

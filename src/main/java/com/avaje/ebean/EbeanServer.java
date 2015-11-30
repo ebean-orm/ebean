@@ -1937,4 +1937,12 @@ public interface EbeanServer {
    */
   <T> List<T> draftRestore(Query<T> query);
 
+  /**
+   * Returns the set of properties/paths that are unknown (do not map to known properties or paths).
+   * <p>
+   * Validate the query checking the where and orderBy expression paths to confirm if
+   * they represent valid properties/path for the given bean type.
+   * </p>
+   */
+  <T> Set<String> validateQuery(Query<T> query);
 }

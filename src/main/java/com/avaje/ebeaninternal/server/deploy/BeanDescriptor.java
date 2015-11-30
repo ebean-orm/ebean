@@ -1602,6 +1602,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     return new ElComparatorProperty<T>(elGetValue, sortProp.isAscending(), nullsHigh);
   }
 
+  @Override
+  public boolean isValidExpression(String propertyName) {
+    try {
+      return (getElGetValue(propertyName) != null);
+    } catch (PersistenceException e) {
+      return false;
+    }
+  }
+
   /**
    * Get an Expression language Value object.
    */

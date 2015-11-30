@@ -1,7 +1,10 @@
 package com.avaje.tests.query.orderby;
 
 import java.util.List;
+import java.util.Set;
 
+import com.avaje.tests.model.basic.Customer;
+import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -12,9 +15,29 @@ import com.avaje.tests.model.basic.MRole;
 import com.avaje.tests.model.basic.MUser;
 import com.avaje.tests.model.basic.MUserType;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class TestOrderByWithDistinct extends BaseTestCase {
-	
+
+  @Test
+  public void testOrderByValidation() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.find(Customer.class)
+        .where()
+          .eq("junk","blah")
+          .eq("name","jim")
+        .orderBy("id desc,path.that.does.not.exist,contacts.group.name asc");
+
+    Set<String> unknownProperties = query.validate();
+    assertThat(unknownProperties).isNotEmpty();
+    assertThat(unknownProperties).hasSize(2);
+    assertThat(unknownProperties).contains("junk","path.that.does.not.exist");
+
+  }
+
 	@Test
 	public void test() {
 		/*

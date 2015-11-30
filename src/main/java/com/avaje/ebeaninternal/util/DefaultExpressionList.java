@@ -15,6 +15,7 @@ import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
+import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 /**
@@ -95,6 +96,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
     for (int i = 0; i < list.size(); i++) {
       list.get(i).containsMany(desc, whereManyJoins);
+    }
+  }
+
+  @Override
+  public void validate(SpiExpressionValidation validation) {
+    for (int i = 0; i < list.size(); i++) {
+      list.get(i).validate(validation);
     }
   }
 

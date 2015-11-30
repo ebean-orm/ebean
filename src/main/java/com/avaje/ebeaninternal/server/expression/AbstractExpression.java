@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.expression;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
+import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
@@ -40,6 +41,11 @@ public abstract class AbstractExpression implements SpiExpression {
         }
       }
     }
+  }
+
+  @Override
+  public void validate(SpiExpressionValidation validation) {
+    validation.validate(getPropertyName());
   }
 
   protected ElPropertyValue getElProp(SpiExpressionRequest request) {

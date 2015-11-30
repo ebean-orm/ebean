@@ -13,6 +13,7 @@ import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
+import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.util.DefaultExpressionList;
 
@@ -79,6 +80,11 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
       // restore state to not forcing outer joins
       manyWhereJoin.setRequireOuterJoins(false);
     }
+  }
+
+  @Override
+  public void validate(SpiExpressionValidation validation) {
+    exprList.validate(validation);
   }
 
   @Override

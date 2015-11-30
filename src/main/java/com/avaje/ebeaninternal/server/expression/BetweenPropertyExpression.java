@@ -5,6 +5,7 @@ import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
+import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 
@@ -42,6 +43,12 @@ class BetweenPropertyExpression implements SpiExpression {
     if (elProp != null && elProp.containsMany()) {
       manyWhereJoin.add(elProp);
     }
+  }
+
+  @Override
+  public void validate(SpiExpressionValidation validation) {
+    validation.validate(lowProperty);
+    validation.validate(highProperty);
   }
 
   public void addBindValues(SpiExpressionRequest request) {

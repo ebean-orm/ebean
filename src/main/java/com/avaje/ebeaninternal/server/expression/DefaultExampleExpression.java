@@ -10,6 +10,7 @@ import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
+import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -119,6 +120,13 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   public ExampleExpression useEqualTo() {
     likeType = LikeType.EQUAL_TO;
     return this;
+  }
+
+  @Override
+  public void validate(SpiExpressionValidation validation) {
+    for (int i = 0; i < list.size(); i++) {
+      list.get(i).validate(validation);
+    }
   }
 
   /**

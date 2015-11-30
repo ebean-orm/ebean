@@ -5,6 +5,7 @@ import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
+import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 /**
@@ -17,6 +18,11 @@ class NoopExpression implements SpiExpression {
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
     // nothing to do
+  }
+
+  @Override
+  public void validate(SpiExpressionValidation validation) {
+    // always valid
   }
 
   @Override

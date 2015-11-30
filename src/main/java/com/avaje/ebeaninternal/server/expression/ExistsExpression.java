@@ -8,6 +8,7 @@ import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
+import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.query.CQuery;
@@ -83,6 +84,11 @@ public class ExistsExpression implements SpiExpression {
 
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
+    // Nothing to do for exists expression
+  }
+
+  @Override
+  public void validate(SpiExpressionValidation validation) {
     // Nothing to do for exists expression
   }
 }

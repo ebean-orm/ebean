@@ -17,8 +17,13 @@ public interface SpiBeanType<T> {
   Class<T> getBeanType();
 
   /**
-   * Return the base table this bean type maps to.
+   * Return true if the property is a valid known property or path for the given bean type.
    */
+  boolean isValidExpression(String property);
+
+    /**
+     * Return the base table this bean type maps to.
+     */
   String getBaseTable();
 
   /**

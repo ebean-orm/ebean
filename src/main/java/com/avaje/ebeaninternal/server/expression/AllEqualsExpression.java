@@ -8,6 +8,7 @@ import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
+import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 
@@ -33,6 +34,13 @@ class AllEqualsExpression implements SpiExpression {
           manyWhereJoin.add(elProp);
         }
       }
+    }
+  }
+
+  @Override
+  public void validate(SpiExpressionValidation validation) {
+    for (String propName: propMap.keySet()) {
+      validation.validate(propName);
     }
   }
 

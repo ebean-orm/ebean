@@ -66,4 +66,9 @@ public interface SpiExpression extends Expression {
 	 *            the associated request.
 	 */
 	void addBindValues(SpiExpressionRequest request);
+
+  /**
+   * Validate all the properties/paths associated with this expression.
+   */
+  void validate(SpiExpressionValidation validation);
 }

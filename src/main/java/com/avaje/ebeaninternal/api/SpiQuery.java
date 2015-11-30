@@ -11,6 +11,7 @@ import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.event.readaudit.ReadEvent;
+import com.avaje.ebean.plugin.SpiBeanType;
 import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -22,6 +23,7 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Object Relational query - Internal extension to Query object.
@@ -694,4 +696,10 @@ public interface SpiQuery<T> extends Query<T> {
    * Return root table alias set by {@link #alias(String)} command.
    */
   String getAlias();
+
+  /**
+   * Validate the query returning the set of properties with unknown paths.
+   */
+  Set<String> validate(SpiBeanType<T> desc);
+
 }

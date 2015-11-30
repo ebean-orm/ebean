@@ -26,6 +26,13 @@ public class SpiServerTest {
     assertNull(beanType.getPersistListener());
     assertNull(beanType.getQueryAdapter());
 
+    assertTrue(beanType.isValidExpression("name"));
+    assertTrue(beanType.isValidExpression("contacts.firstName"));
+    assertTrue(beanType.isValidExpression("contacts.group.name"));
+    assertFalse(beanType.isValidExpression("junk"));
+    assertFalse(beanType.isValidExpression("Name"));
+    assertFalse(beanType.isValidExpression("contacts.name"));
+
     Customer customer = new Customer();
     customer.setId(42);
 

@@ -293,6 +293,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> Set<String> validateQuery(Query<T> query) {
+    return null;
+  }
+
+  @Override
   public Object nextId(Class<?> beanType) {
     return null;
   }
