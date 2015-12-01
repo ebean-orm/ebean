@@ -293,6 +293,16 @@ public class DeployBeanPropertyLists {
     return draftDirty;
   }
 
+  public BeanProperty getSoftDeleteProperty() {
+
+    for (BeanProperty prop: nonManys) {
+      if (prop.isSoftDelete()) {
+        return prop;
+      }
+    }
+    return null;
+  }
+
   /**
    * Mode used to determine which BeanPropertyAssoc to include.
    */

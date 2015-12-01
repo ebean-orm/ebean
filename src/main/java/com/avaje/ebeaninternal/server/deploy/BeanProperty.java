@@ -229,6 +229,10 @@ public class BeanProperty implements ElPropertyValue {
 
   final boolean draftReset;
 
+  final boolean softDelete;
+
+  final Object softDeleteValue;
+
   final boolean indexed;
 
   final String indexName;
@@ -258,6 +262,8 @@ public class BeanProperty implements ElPropertyValue {
     this.draftDirty = deploy.isDraftDirty();
     this.draftOnly = deploy.isDraftOnly();
     this.draftReset = deploy.isDraftReset();
+    this.softDelete = deploy.isSoftDelete();
+    this.softDeleteValue = deploy.getSoftDeleteValue();
 
     this.secondaryTable = deploy.isSecondaryTable();
     if (secondaryTable) {
@@ -345,6 +351,8 @@ public class BeanProperty implements ElPropertyValue {
     this.draftDirty = source.draftDirty;
     this.draftOnly = source.draftOnly;
     this.draftReset = source.draftReset;
+    this.softDelete = source.softDelete;
+    this.softDeleteValue = source.softDeleteValue;
     this.fetchEager = source.fetchEager;
     this.unidirectionalShadow = source.unidirectionalShadow;
     this.discriminator = source.discriminator;
@@ -614,6 +622,25 @@ public class BeanProperty implements ElPropertyValue {
       Object value = getValueIntercept(draftBean);
       setValueIntercept(liveBean, value);
     }
+  }
+
+  public String getSoftDeleteDbSet() {
+    return dbColumn +"=true";
+  }
+
+  /**
+   * Return the DB literal predicate used to filter out soft deleted rows from a query.
+   */
+  public String getSoftDeleteDbPredicate(String tableAlias) {
+    return tableAlias+"."+dbColumn+"=false";
+  }
+
+  /**
+   * Set the soft delete property value on the bean without invoking lazy loading.
+   */
+  public void setSoftDeleteValue(EntityBean bean) {
+    setValue(bean, softDeleteValue);
+    bean._ebean_getIntercept().setChangedProperty(propertyIndex);
   }
 
   /**
@@ -1054,6 +1081,13 @@ public class BeanProperty implements ElPropertyValue {
    */
   public boolean isDraftReset() {
     return draftReset;
+  }
+
+  /**
+   * Return true if this property is the soft delete property.
+   */
+  public boolean isSoftDelete() {
+    return softDelete;
   }
 
   /**

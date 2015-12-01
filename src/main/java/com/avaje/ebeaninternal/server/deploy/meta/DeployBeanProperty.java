@@ -189,6 +189,9 @@ public class DeployBeanProperty {
   private boolean draftDirty;
   private boolean draftReset;
 
+  private boolean softDelete;
+  private String softDeleteValue = "";
+
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     this.desc = desc;
     this.propertyType = propertyType;
@@ -871,5 +874,44 @@ public class DeployBeanProperty {
 
   public boolean isDraftReset() {
     return draftReset;
+  }
+
+  public void setSoftDelete(String softDeleteValue) {
+    this.softDelete = true;
+    this.softDeleteValue = softDeleteValue;
+  }
+
+  public boolean isSoftDelete() {
+    return softDelete;
+  }
+
+  public Object getSoftDeleteValue() {
+    return !softDelete ? null : "".equals(softDeleteValue) ? defaultSoftDeleteValue() : parseSoftDeleteValue();
+  }
+
+  private Object parseSoftDeleteValue() {
+    if (Boolean.class.equals(propertyType) || boolean.class.equals(propertyType)) {
+      return Boolean.parseBoolean(softDeleteValue);
+    }
+    if (Integer.class.equals(propertyType) || int.class.equals(propertyType)) {
+      return Integer.parseInt(softDeleteValue);
+    }
+    if (Short.class.equals(propertyType) || short.class.equals(propertyType)) {
+      return Short.parseShort(softDeleteValue);
+    }
+    throw new IllegalStateException("@SoftDelete on ["+getFullBeanName()+"] mapped to unsupported type propertyType["+propertyType+"]");
+  }
+
+  private Object defaultSoftDeleteValue() {
+    if (Boolean.class.equals(propertyType) || boolean.class.equals(propertyType)) {
+      return Boolean.TRUE;
+    }
+    if (Integer.class.equals(propertyType) || int.class.equals(propertyType)) {
+      return Integer.valueOf(1);
+    }
+    if (Short.class.equals(propertyType) || short.class.equals(propertyType)) {
+      return Short.valueOf("1");
+    }
+    throw new IllegalStateException("@SoftDelete on ["+getFullBeanName()+"] mapped to unsupported type propertyType["+propertyType+"]");
   }
 }

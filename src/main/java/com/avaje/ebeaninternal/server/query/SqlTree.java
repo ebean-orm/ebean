@@ -90,6 +90,13 @@ public class SqlTree {
   }
 
   /**
+   * Recurse through the tree adding soft delete predicates as necessary.
+   */
+  public void addSoftDeletePredicate(SpiQuery<?> query) {
+    rootNode.addSoftDeletePredicate(query);
+  }
+
+  /**
    * Build a select expression chain for RawSql.
    */
   public List<String> buildRawSqlSelectChain() {

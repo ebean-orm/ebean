@@ -480,6 +480,16 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     ctx.popJoin();
   }
 
+  public void addSoftDeletePredicate(SpiQuery<?> query) {
+
+    if (desc.isSoftDelete()) {
+      query.addSoftDeletePredicate(desc.getSoftDeletePredicate(baseTableAlias));
+    }
+    for (int i = 0; i < children.length; i++) {
+      children[i].addSoftDeletePredicate(query);
+    }
+  }
+
   public void addAsOfTableAlias(SpiQuery<?> query) {
     // if history on this bean type add it's alias
     // for each alias we add an effect date predicate
