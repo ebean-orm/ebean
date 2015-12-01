@@ -141,6 +141,7 @@ public class ModelBuildContext {
 
     int fkCount = 0;
     int ixCount = 0;
+    int uqCount = 0;
     Collection<MColumn> cols = draftTable.getColumns().values();
     for (MColumn col: cols) {
       if (col.getForeignKeyName() != null) {
@@ -151,6 +152,13 @@ public class ModelBuildContext {
 
         String[] indexCols = {col.getName()};
         col.setForeignKeyIndex(foreignKeyIndexName(draftTable.getName(), indexCols, ++ixCount));
+      }
+      // adjust the unique constraint names
+      if (col.getUnique() != null){
+        col.setUnique(uniqueConstraintName(draftTable.getName(), col.getName(), ++uqCount));
+      }
+      if (col.getUniqueOneToOne() != null){
+        col.setUniqueOneToOne(uniqueConstraintName(draftTable.getName(), col.getName(), ++uqCount));
       }
     }
 
