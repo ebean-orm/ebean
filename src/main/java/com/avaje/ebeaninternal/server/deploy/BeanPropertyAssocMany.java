@@ -800,7 +800,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
   public IntersectionRow buildManyDeleteChildren(EntityBean parentBean, ArrayList<Object> excludeDetailIds) {
 
-    IntersectionRow row = new IntersectionRow(tableJoin.getTable());
+    IntersectionRow row = new IntersectionRow(tableJoin.getTable(), targetDescriptor);
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       row.setExcludeIds(excludeDetailIds, getTargetDescriptor());
     }

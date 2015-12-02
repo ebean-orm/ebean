@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.SoftDelete;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
 import com.avaje.ebean.annotation.WhenCreated;
 import com.avaje.ebean.annotation.WhenModified;
@@ -189,6 +190,8 @@ public class DeployBeanProperty {
   private boolean draftDirty;
   private boolean draftReset;
 
+  private boolean softDelete;
+
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     this.desc = desc;
     this.propertyType = propertyType;
@@ -220,6 +223,8 @@ public class DeployBeanProperty {
     } else if (isAuditProperty()) {
       return AUDITCOLUMN_ORDER;
     } else if (field.getAnnotation(Version.class) != null) {
+      return VERSIONCOLUMN_ORDER;
+    } else if (field.getAnnotation(SoftDelete.class) != null) {
       return VERSIONCOLUMN_ORDER;
     }
     return 0;
@@ -872,4 +877,13 @@ public class DeployBeanProperty {
   public boolean isDraftReset() {
     return draftReset;
   }
+
+  public void setSoftDelete() {
+    this.softDelete = true;
+  }
+
+  public boolean isSoftDelete() {
+    return softDelete;
+  }
+
 }

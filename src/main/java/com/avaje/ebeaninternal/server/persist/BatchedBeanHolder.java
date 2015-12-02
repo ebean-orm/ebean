@@ -138,6 +138,7 @@ public class BatchedBeanHolder {
         return inserts.size();
 
       case UPDATE:
+      case SOFT_DELETE:
         if (updates == null) {
           updates = new ArrayList<PersistRequest>();
         }

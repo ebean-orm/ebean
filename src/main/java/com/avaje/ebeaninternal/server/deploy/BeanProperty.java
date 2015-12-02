@@ -22,6 +22,7 @@ import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
+import com.avaje.ebeaninternal.server.type.ScalarTypeBoolean;
 import com.avaje.ebeaninternal.util.ValueUtil;
 import com.fasterxml.jackson.core.JsonToken;
 import org.slf4j.Logger;
@@ -229,6 +230,12 @@ public class BeanProperty implements ElPropertyValue {
 
   final boolean draftReset;
 
+  final boolean softDelete;
+
+  final String softDeleteDbSet;
+
+  final String softDeleteDbPredicate;
+
   final boolean indexed;
 
   final String indexName;
@@ -258,7 +265,6 @@ public class BeanProperty implements ElPropertyValue {
     this.draftDirty = deploy.isDraftDirty();
     this.draftOnly = deploy.isDraftOnly();
     this.draftReset = deploy.isDraftReset();
-
     this.secondaryTable = deploy.isSecondaryTable();
     if (secondaryTable) {
       this.secondaryTableJoin = new TableJoin(deploy.getSecondaryTableJoin());
@@ -301,6 +307,16 @@ public class BeanProperty implements ElPropertyValue {
 
     this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), false, null);
     this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), dbEncrypted, dbColumn);
+
+    this.softDelete = deploy.isSoftDelete();
+    if (softDelete) {
+      ScalarTypeBoolean.BooleanBase boolType = (ScalarTypeBoolean.BooleanBase)scalarType;
+      this.softDeleteDbSet = dbColumn+"="+boolType.getDbTrueLiteral();
+      this.softDeleteDbPredicate = dbColumn+"="+boolType.getDbFalseLiteral();
+    } else {
+      this.softDeleteDbSet = null;
+      this.softDeleteDbPredicate = null;
+    }
 
     this.jsonSerialize = deploy.isJsonSerialize();
     this.jsonDeserialize = deploy.isJsonDeserialize();
@@ -345,6 +361,9 @@ public class BeanProperty implements ElPropertyValue {
     this.draftDirty = source.draftDirty;
     this.draftOnly = source.draftOnly;
     this.draftReset = source.draftReset;
+    this.softDelete = source.softDelete;
+    this.softDeleteDbSet = source.softDeleteDbSet;
+    this.softDeleteDbPredicate = source.softDeleteDbPredicate;
     this.fetchEager = source.fetchEager;
     this.unidirectionalShadow = source.unidirectionalShadow;
     this.discriminator = source.discriminator;
@@ -614,6 +633,29 @@ public class BeanProperty implements ElPropertyValue {
       Object value = getValueIntercept(draftBean);
       setValueIntercept(liveBean, value);
     }
+  }
+
+  /**
+   * Return the DB literal expression to set the deleted state to true.
+   */
+  public String getSoftDeleteDbSet() {
+    return softDeleteDbSet;
+  }
+
+  /**
+   * Return the DB literal predicate used to filter out soft deleted rows from a query.
+   */
+  public String getSoftDeleteDbPredicate(String tableAlias) {
+    return tableAlias+"."+softDeleteDbPredicate;
+  }
+
+  /**
+   * Set the soft delete property value on the bean without invoking lazy loading.
+   */
+  public void setSoftDeleteValue(EntityBean bean) {
+    // assumes boolean deleted true being set which is ok limitation for now
+    setValue(bean, true);
+    bean._ebean_getIntercept().setChangedProperty(propertyIndex);
   }
 
   /**
@@ -1054,6 +1096,13 @@ public class BeanProperty implements ElPropertyValue {
    */
   public boolean isDraftReset() {
     return draftReset;
+  }
+
+  /**
+   * Return true if this property is the soft delete property.
+   */
+  public boolean isSoftDelete() {
+    return softDelete;
   }
 
   /**

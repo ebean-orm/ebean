@@ -40,6 +40,11 @@ public interface SqlTreeNode {
   void addAsOfTableAlias(SpiQuery<?> query);
 
   /**
+   * Recurse through the tree adding soft delete predicates if necessary.
+   */
+  void addSoftDeletePredicate(SpiQuery<?> query);
+
+  /**
    * Load the appropriate information from the SqlSelectReader.
    * <p>
    * At a high level this actually controls the reading of the data from the

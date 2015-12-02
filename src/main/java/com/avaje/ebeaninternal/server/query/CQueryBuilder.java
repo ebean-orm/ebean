@@ -268,6 +268,8 @@ public class CQueryBuilder {
     SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
     if (query.isAsOfQuery()) {
       sqlTree.addAsOfTableAlias(query);
+    } else if (SpiQuery.TemporalMode.CURRENT == query.getTemporalMode()) {
+      sqlTree.addSoftDeletePredicate(query);
     }
 
     SqlLimitResponse res = buildSql(null, request, predicates, sqlTree);
@@ -475,6 +477,23 @@ public class CQueryBuilder {
           sb.append(" and ");
         }
         sb.append(historySupport.getAsOfPredicate(asOfTableAlias.get(i)));
+      }
+    }
+
+    if (!query.isIncludeSoftDeletes()) {
+      List<String> softDeletePredicates = query.getSoftDeletePredicates();
+      if (softDeletePredicates != null) {
+        if (!hasWhere) {
+          sb.append(" where ");
+        } else {
+          sb.append("and ");
+        }
+        for (int i = 0; i < softDeletePredicates.size(); i++) {
+          if (i > 0) {
+            sb.append(" and ");
+          }
+          sb.append(softDeletePredicates.get(i));
+        }
       }
     }
 

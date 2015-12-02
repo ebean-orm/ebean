@@ -15,13 +15,21 @@ public class IntersectionRow {
 
   private final String tableName;
 
+  private final BeanDescriptor<?> targetDescriptor;
+
   private final LinkedHashMap<String, Object> values = new LinkedHashMap<String, Object>();
 
   private ArrayList<Object> excludeIds;
   private BeanDescriptor<?> excludeDescriptor;
 
+  public IntersectionRow(String tableName, BeanDescriptor<?> targetDescriptor) {
+    this.tableName = tableName;
+    this.targetDescriptor = targetDescriptor;
+  }
+
   public IntersectionRow(String tableName) {
     this.tableName = tableName;
+    this.targetDescriptor = null;
   }
 
   /**
@@ -64,22 +72,20 @@ public class IntersectionRow {
     return new DefaultSqlUpdate(server, sb.toString(), bindParams);
   }
 
-  public SqlUpdate createDelete(EbeanServer server) {
+  public SqlUpdate createDelete(EbeanServer server, boolean softDelete) {
 
     BindParams bindParams = new BindParams();
 
     StringBuilder sb = new StringBuilder();
-    sb.append("delete from ").append(tableName).append(" where ");
-
-    int count = 0;
-    for (Map.Entry<String, Object> entry : values.entrySet()) {
-      if (count++ > 0) {
-        sb.append(" and ");
-      }
-      sb.append(entry.getKey());
-      sb.append(" = ?");
-      bindParams.setParameter(count, entry.getValue());
+    if (softDelete) {
+      sb.append("update ").append(tableName).append(" set ");
+      sb.append(targetDescriptor.getSoftDeleteDbSet());
+    } else {
+      sb.append("delete from ").append(tableName);
     }
+    sb.append(" where ");
+
+    int count = setBindParams(bindParams, sb);
 
     if (excludeIds != null) {
       IdInExpression idIn = new IdInExpression(excludeIds);
@@ -108,6 +114,13 @@ public class IntersectionRow {
     StringBuilder sb = new StringBuilder();
     sb.append("delete from ").append(tableName).append(" where ");
 
+    setBindParams(bindParams, sb);
+
+    return new DefaultSqlUpdate(server, sb.toString(), bindParams);
+  }
+
+  private int setBindParams(BindParams bindParams, StringBuilder sb) {
+
     int count = 0;
     for (Map.Entry<String, Object> entry : values.entrySet()) {
       if (count++ > 0) {
@@ -120,6 +133,6 @@ public class IntersectionRow {
       bindParams.setParameter(count, entry.getValue());
     }
 
-    return new DefaultSqlUpdate(server, sb.toString(), bindParams);
+    return count;
   }
 }

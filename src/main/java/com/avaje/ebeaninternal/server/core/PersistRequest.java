@@ -12,7 +12,7 @@ import com.avaje.ebeaninternal.server.persist.PersistExecute;
 public abstract class PersistRequest extends BeanRequest implements BatchPostExecute {
 
 	public enum Type {
-	  INSERT, UPDATE, DELETE, UPDATESQL, CALLABLESQL
+	  INSERT, UPDATE, DELETE, SOFT_DELETE, DELETE_PERMANENT, UPDATESQL, CALLABLESQL
 	}
 
 	protected boolean persistCascade;

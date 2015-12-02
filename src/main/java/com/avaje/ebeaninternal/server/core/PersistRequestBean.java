@@ -256,6 +256,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
           beanDescriptor.cacheHandleUpdate(idValue, this);
           break;
         case DELETE:
+        case SOFT_DELETE:
           // Bean deleted from cache early via postDelete()
           break;
         default:
@@ -479,12 +480,25 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         persistExecute.executeUpdateBean(this);
         return -1;
 
+      case SOFT_DELETE:
+        prepareForSoftDelete();
+        persistExecute.executeUpdateBean(this);
+        return -1;
+
       case DELETE:
         return persistExecute.executeDeleteBean(this);
 
       default:
         throw new RuntimeException("Invalid type " + type);
     }
+  }
+
+  /**
+   * Soft delete is executed as update so we want to set deleted=true property.
+   */
+  private void prepareForSoftDelete() {
+
+    beanDescriptor.setSoftDeleteValue(entityBean);
   }
 
   @Override
@@ -533,6 +547,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
     switch (type) {
       case DELETE:
+      case SOFT_DELETE:
         postDelete();
         break;
       case UPDATE:
@@ -601,6 +616,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         controller.postUpdate(this);
         break;
       case DELETE:
+      case SOFT_DELETE:
         controller.postDelete(this);
         break;
       default:
@@ -621,6 +637,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         break;
       case DELETE:
         transaction.logSummary("Deleted [" + name + "] [" + idValue + "]" + draft);
+        break;
+      case SOFT_DELETE:
+        transaction.logSummary("SoftDelete [" + name + "] [" + idValue + "]" + draft);
         break;
       default:
         break;
@@ -800,5 +819,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public String getUpdateTable() {
     return publish ? beanDescriptor.getBaseTable() : beanDescriptor.getDraftTable();
+  }
+
+  /**
+   * Return true if this is a soft delete request.
+   */
+  public boolean isSoftDelete() {
+    return Type.SOFT_DELETE == type;
   }
 }

@@ -183,6 +183,7 @@ public class BeanPersistIds implements Serializable {
         addUpdateId(id);
         break;
       case DELETE:
+      case SOFT_DELETE:
         addDeleteId(id);
         break;
 

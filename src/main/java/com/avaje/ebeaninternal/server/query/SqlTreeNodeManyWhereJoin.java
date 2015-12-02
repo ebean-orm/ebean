@@ -44,6 +44,11 @@ public class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
     // do nothing here ...
   }
 
+  @Override
+  public void addSoftDeletePredicate(SpiQuery<?> query) {
+    // do nothing here ...
+  }
+
   /**
    * Append to the FROM clause for this node.
    */

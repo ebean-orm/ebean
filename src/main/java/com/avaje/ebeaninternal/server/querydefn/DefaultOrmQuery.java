@@ -180,6 +180,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private Timestamp versionsStart;
   private Timestamp versionsEnd;
 
+  private List<String> softDeletePredicates;
+
   private boolean disableReadAudit;
 
   private int bufferFetchSizeHint;
@@ -287,6 +289,19 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
+  public void addSoftDeletePredicate(String softDeletePredicate) {
+    if (softDeletePredicates == null) {
+      softDeletePredicates = new ArrayList<String>();
+    }
+    softDeletePredicates.add(softDeletePredicate);
+  }
+
+  @Override
+  public List<String> getSoftDeletePredicates() {
+    return softDeletePredicates;
+  }
+
   /**
    * This table alias is for a @History entity involved in the query and as
    * such we need to add a 'as of predicate' to the query using this alias.
@@ -314,6 +329,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public DefaultOrmQuery<T> asDraft() {
     this.temporalMode = TemporalMode.DRAFT;
+    return this;
+  }
+
+  @Override
+  public Query<T> includeSoftDeletes() {
+    this.temporalMode = TemporalMode.SOFT_DELETED;
     return this;
   }
 
@@ -658,6 +679,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public boolean isAsDraft() {
     return TemporalMode.DRAFT == temporalMode;
+  }
+
+  @Override
+  public boolean isIncludeSoftDeletes() {
+    return TemporalMode.SOFT_DELETED == temporalMode;
   }
 
   public void setMode(Mode mode) {

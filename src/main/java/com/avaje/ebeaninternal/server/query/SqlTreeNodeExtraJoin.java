@@ -47,6 +47,11 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
     // nothing to do here
   }
 
+  @Override
+  public void addSoftDeletePredicate(SpiQuery<?> query) {
+    // nothing to do here
+  }
+
   /**
    * Return true if the extra join is a many join.
    * <p>

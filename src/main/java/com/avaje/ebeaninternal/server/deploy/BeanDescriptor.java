@@ -149,6 +149,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   private final String baseTableVersionsBetween;
   private final boolean historySupport;
 
+  private final BeanProperty softDeleteProperty;
+  private final boolean softDelete;
+
   private final String draftTable;
 
   /**
@@ -316,8 +319,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   private String idBinderIdSql;
 
   private String deleteByIdSql;
-
   private String deleteByIdInSql;
+  private String softDeleteByIdSql;
+  private String softDeleteByIdInSql;
 
   private final String name;
 
@@ -395,6 +399,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     // helper object used to derive lists of properties
     DeployBeanPropertyLists listHelper = new DeployBeanPropertyLists(owner, this, deploy);
 
+    this.softDeleteProperty = listHelper.getSoftDeleteProperty();
+    this.softDelete = (softDeleteProperty != null);
     this.idProperty = listHelper.getId();
     this.versionProperty = listHelper.getVersionProperty();
     this.draftDirty = listHelper.getDraftDirty();
@@ -621,6 +627,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     deleteByIdSql = "delete from " + baseTable + " where " + idEqualsSql;
     deleteByIdInSql = "delete from " + baseTable + " where " + idBinderInLHSSqlNoAlias + " ";
 
+    if (softDelete) {
+      softDeleteByIdSql = "update " + baseTable + " set " + getSoftDeleteDbSet() + " where " + idEqualsSql;
+      softDeleteByIdInSql = "update " + baseTable + " set " + getSoftDeleteDbSet() + " where " + idBinderInLHSSqlNoAlias + " ";
+    } else {
+      softDeleteByIdSql = null;
+      softDeleteByIdInSql = null;
+    }
+
     if (!isEmbedded()) {
       // parse every named update up front into sql dml
       for (DeployNamedUpdate namedUpdate : namedUpdates.values()) {
@@ -669,6 +683,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
       case INSERT:
         return changeLogFilter.includeInsert(request) ? insertBeanChange(request): null;
       case UPDATE:
+      case SOFT_DELETE:
         return changeLogFilter.includeUpdate(request) ? updateBeanChange(request): null;
       case DELETE:
         return changeLogFilter.includeDelete(request) ? deleteBeanChange(request) :null;
@@ -710,11 +725,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     cacheHelp.initialise();
   }
 
-  public SqlUpdate deleteById(Object id, List<Object> idList) {
+  public SqlUpdate deleteById(Object id, List<Object> idList, boolean softDelete) {
     if (id != null) {
-      return deleteById(id);
+      return deleteById(id, softDelete);
     } else {
-      return deleteByIdList(idList);
+      return deleteByIdList(idList, softDelete);
     }
   }
 
@@ -729,9 +744,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    * Return SQL that can be used to delete a list of Id's without any optimistic
    * concurrency checking.
    */
-  private SqlUpdate deleteByIdList(List<Object> idList) {
+  private SqlUpdate deleteByIdList(List<Object> idList, boolean softDelete) {
 
-    StringBuilder sb = new StringBuilder(deleteByIdInSql);
+    String baseSql = softDelete ? softDeleteByIdInSql : deleteByIdInSql;
+    StringBuilder sb = new StringBuilder(baseSql);
     String inClause = idBinder.getIdInValueExprDelete(idList.size());
     sb.append(inClause);
 
@@ -746,9 +762,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    * Return SQL that can be used to delete by Id without any optimistic
    * concurrency checking.
    */
-  private SqlUpdate deleteById(Object id) {
+  private SqlUpdate deleteById(Object id, boolean softDelete) {
 
-    DefaultSqlUpdate sqlDelete = new DefaultSqlUpdate(deleteByIdSql);
+    String baseSql = softDelete ? softDeleteByIdSql : deleteByIdSql;
+    DefaultSqlUpdate sqlDelete = new DefaultSqlUpdate(baseSql);
 
     Object[] bindValues = idBinder.getBindValues(id);
     for (int i = 0; i < bindValues.length; i++) {
@@ -1173,6 +1190,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    */
   public boolean isDeleteRecurseSkippable() {
     return deleteRecurseSkippable;
+  }
+
+  /**
+   * Return true if delete can use a single SQL statement.
+   *
+   * This implies cascade delete does not continue depth wise and that this is no
+   * associated L2 bean caching.
+   */
+  public boolean isDeleteByStatement() {
+    return deleteRecurseSkippable && !isBeanCaching();
   }
 
   /**
@@ -1930,6 +1957,22 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    */
   public boolean isReadAuditing() {
     return readAuditing;
+  }
+
+  public boolean isSoftDelete() {
+    return softDelete;
+  }
+
+  public void setSoftDeleteValue(EntityBean bean) {
+    softDeleteProperty.setSoftDeleteValue(bean);
+  }
+
+  public String getSoftDeleteDbSet() {
+    return softDeleteProperty.getSoftDeleteDbSet();
+  }
+
+  public String getSoftDeletePredicate(String tableAlias) {
+    return softDeleteProperty.getSoftDeleteDbPredicate(tableAlias);
   }
 
   /**

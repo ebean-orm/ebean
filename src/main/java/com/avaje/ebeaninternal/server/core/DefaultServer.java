@@ -1883,9 +1883,28 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Delete the bean with the explicit transaction.
    */
-  public boolean delete(Object bean, Transaction t) {
-    
-    return persister.delete(checkEntityBean(bean), t);
+  public boolean delete(Object bean, Transaction t) throws OptimisticLockException {
+    return persister.delete(checkEntityBean(bean), t, false);
+  }
+
+  @Override
+  public boolean deletePermanent(Object bean) throws OptimisticLockException {
+    return deletePermanent(bean, null);
+  }
+
+  @Override
+  public boolean deletePermanent(Object bean, Transaction t) throws OptimisticLockException {
+    return persister.delete(checkEntityBean(bean), t, true);
+  }
+
+  @Override
+  public int deleteAllPermanent(Collection<?> beans) {
+    return deleteAllInternal(beans.iterator(), null, true);
+  }
+
+  @Override
+  public int deleteAllPermanent(Collection<?> beans, Transaction t) {
+    return deleteAllInternal(beans.iterator(), t, true);
   }
 
   /**
@@ -1893,7 +1912,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public int deleteAll(Collection<?> beans) {
-    return deleteAllInternal(beans.iterator(), null);
+    return deleteAllInternal(beans.iterator(), null, false);
   }
 
   /**
@@ -1901,13 +1920,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public int deleteAll(Collection<?> beans, Transaction t) {
-    return deleteAllInternal(beans.iterator(), t);
+    return deleteAllInternal(beans.iterator(), t, false);
   }
 
   /**
    * Delete all the beans in the iterator with an explicit transaction.
    */
-  private int deleteAllInternal(Iterator<?> it, Transaction t) {
+  private int deleteAllInternal(Iterator<?> it, Transaction t, boolean permanent) {
 
     TransWrapper wrap = initTransIfRequired(t);
 
@@ -1917,7 +1936,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       int deleteCount = 0;
       while (it.hasNext()) {
         EntityBean bean = checkEntityBean(it.next());
-        persister.delete(bean, trans);
+        persister.delete(bean, trans, permanent);
         deleteCount++;
       }
 

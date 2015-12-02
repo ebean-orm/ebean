@@ -668,6 +668,26 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public boolean deletePermanent(Object bean) throws OptimisticLockException {
+    return false;
+  }
+
+  @Override
+  public boolean deletePermanent(Object bean, Transaction transaction) throws OptimisticLockException {
+    return false;
+  }
+
+  @Override
+  public int deleteAllPermanent(Collection<?> beans) throws OptimisticLockException {
+    return 0;
+  }
+
+  @Override
+  public int deleteAllPermanent(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
+    return 0;
+  }
+
+  @Override
   public int execute(SqlUpdate updSql, Transaction t) {
     return 0;
   }

@@ -507,7 +507,7 @@ public final class EntityBeanIntercept implements Serializable {
     setDirty(true);
   }
   
-  private void setChangedProperty(int propertyIndex) {
+  public void setChangedProperty(int propertyIndex) {
     if (changedProps == null) {
       changedProps = new boolean[owner._ebean_getPropertyNames().length];
     }

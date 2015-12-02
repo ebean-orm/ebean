@@ -97,6 +97,10 @@ public interface SpiQuery<T> extends Query<T> {
 
   enum TemporalMode {
     /**
+     * Includes soft deletes rows in the result.
+     */
+    SOFT_DELETED,
+    /**
      * Query runs against draft tables.
      */
     DRAFT,
@@ -184,6 +188,11 @@ public interface SpiQuery<T> extends Query<T> {
   boolean isAsDraft();
 
   /**
+   * Return true if this query includes soft deleted rows.
+   */
+  boolean isIncludeSoftDeletes();
+
+  /**
    * Return the asOf Timestamp which the query should run as.
    */
   Timestamp getAsOf();
@@ -197,6 +206,10 @@ public interface SpiQuery<T> extends Query<T> {
    * Return the list of table alias involved in a 'As Of' query that have @History support.
    */
   List<String> getAsOfTableAlias();
+
+  void addSoftDeletePredicate(String softDeletePredicate);
+
+  List<String> getSoftDeletePredicates();
 
   /**
    * Return a listener that wants to be notified when the bean collection is

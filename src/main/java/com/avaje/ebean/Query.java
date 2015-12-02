@@ -303,6 +303,11 @@ public interface Query<T> extends Serializable {
   Query<T> asDraft();
 
   /**
+   * Execute the query including soft deleted rows.
+   */
+  Query<T> includeSoftDeletes();
+
+  /**
    * Cancel the query execution if supported by the underlying database and
    * driver.
    * <p>
