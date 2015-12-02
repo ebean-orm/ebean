@@ -43,6 +43,7 @@ public class DLoadContext implements LoadContext {
   private final int defaultBatchSize;
   private final boolean disableLazyLoading;
   private final boolean disableReadAudit;
+  private final boolean includeSoftDeletes;
 
   /**
    * The path relative to the root of the object graph.
@@ -67,6 +68,7 @@ public class DLoadContext implements LoadContext {
     SpiQuery<?> query = request.getQuery();
     this.asOf = query.getAsOf();
     this.asDraft = query.isAsDraft();
+    this.includeSoftDeletes = query.isIncludeSoftDeletes();
     this.readOnly = query.isReadOnly();
     this.disableReadAudit = query.isDisableReadAudit();
     this.disableLazyLoading = query.isDisableLazyLoading();
@@ -201,10 +203,6 @@ public class DLoadContext implements LoadContext {
     return new ObjectGraphNode(origin, path);
   }
 
-  public boolean isUseAutoTune() {
-    return useProfiling;
-  }
-
   protected String getFullPath(String path) {
     if (relativePath == null) {
       return path;
@@ -223,34 +221,6 @@ public class DLoadContext implements LoadContext {
    */
   protected Boolean isReadOnly() {
     return readOnly;
-  }
-
-  /**
-   * Return the 'as of' timestamp that should propagate to secondary queries.
-   */
-  protected Timestamp getAsOf() {
-    return asOf;
-  }
-
-  /**
-   * Return true if the root query is a 'asDraft' query that should propagate to secondary queries.
-   */
-  protected boolean isAsDraft() {
-    return asDraft;
-  }
-
-  /**
-   * Return true if disable read auditing should propagate to secondary queries.
-   */
-  protected boolean isDisableReadAudit() {
-    return disableReadAudit;
-  }
-
-  /**
-   * Return true if disable lazy loading should propagate to secondary queries.
-   */
-  protected boolean isDisableLazyLoading() {
-    return disableLazyLoading;
   }
 
   public PersistenceContext getPersistenceContext() {
@@ -335,4 +305,26 @@ public class DLoadContext implements LoadContext {
     return desc.getBeanPropertyFromPath(path);
   }
 
+  /**
+   * Propagate the original query settings (draft, asOf etc) to the secondary queries.
+   */
+  public void propagateQueryState(SpiQuery<?> query) {
+    if (readOnly != null) {
+      query.setReadOnly(readOnly);
+    }
+    query.setDisableLazyLoading(disableLazyLoading);
+    query.asOf(asOf);
+    if (asDraft) {
+      query.asDraft();
+    }
+    if (includeSoftDeletes) {
+      query.includeSoftDeletes();
+    }
+    if (disableReadAudit) {
+      query.setDisableReadAuditing();
+    }
+    if (useProfiling) {
+      query.setAutoTune(true);
+    }
+  }
 }

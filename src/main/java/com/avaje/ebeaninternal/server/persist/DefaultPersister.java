@@ -1245,9 +1245,10 @@ public final class DefaultPersister implements Persister {
     BeanPropertyAssocMany<?>[] manys = desc.propertiesManyDelete();
     for (int i = 0; i < manys.length; i++) {
       if (manys[i].isManyToMany()) {
-        // delete associated rows from intersection table
-        deleteAssocManyIntersection(parentBean, manys[i], t, request.isPublish());
-
+        if (!softDelete) {
+          // delete associated rows from intersection table (but not during soft delete)
+          deleteAssocManyIntersection(parentBean, manys[i], t, request.isPublish());
+        }
       } else {
 
         if (ModifyListenMode.REMOVALS.equals(manys[i].getModifyListenMode())) {

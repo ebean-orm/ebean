@@ -2,10 +2,14 @@ package com.avaje.tests.softdelete;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 import com.avaje.tests.model.softdelete.EBasicSoftDelete;
+import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,5 +43,85 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     assertThat(findInclude).isNotNull();
 
+  }
+
+  @Test
+  public void testCascadeSaveDelete() {
+
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("cascadeOne");
+    bean.addChild("child1", 10);
+    bean.addChild("child2", 20);
+    bean.addChild("child3", 30);
+    bean.addNoSoftDeleteChild("nsd1", 101);
+    bean.addNoSoftDeleteChild("nsd2", 102);
+
+    Ebean.save(bean);
+
+    LoggedSqlCollector.start();
+
+    Ebean.delete(bean);
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+
+    // The children without SoftDelete are left as is (so no third statement)
+    assertThat(loggedSql).hasSize(2);
+
+    // first statement is a single bulk update of the children with SoftDelete
+    assertThat(loggedSql.get(0)).contains("update ebasic_sdchild set deleted=");
+    assertThat(loggedSql.get(0)).contains("where owner_id = ?");
+
+    // second statement is the top level bean
+    assertThat(loggedSql.get(1)).contains("update ebasic_soft_delete set version=?, deleted=? where id=? and version=?");
+
+  }
+
+
+  @Test
+  public void testFetch() {
+
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("cascadeOne");
+    bean.addChild("child1", 10);
+    bean.addChild("child2", 20);
+    bean.addChild("child3", 30);
+    bean.addNoSoftDeleteChild("nsd1", 101);
+    bean.addNoSoftDeleteChild("nsd2", 102);
+
+    Ebean.save(bean);
+
+    Ebean.delete(bean.getChildren().get(1));
+
+    LoggedSqlCollector.start();
+
+    Query<EBasicSoftDelete> query1 =
+        Ebean.find(EBasicSoftDelete.class)
+            .fetch("children")
+            .where().eq("id", bean.getId())
+            .query();
+
+    List<EBasicSoftDelete> fetch1 = query1.findList();
+    String generatedSql = query1.getGeneratedSql();
+
+    // first statement is a single bulk update of the children with SoftDelete
+    assertThat(generatedSql).contains("t0.deleted=");
+    assertThat(generatedSql).contains("t1.deleted=");
+    assertThat(fetch1.get(0).getChildren()).hasSize(2);
+
+    assertThat(fetch1.get(0).getNosdChildren()).hasSize(2);
+
+
+    // fetch again using lazy loading
+    EBasicSoftDelete fetchWithLazy = Ebean.find(EBasicSoftDelete.class, bean.getId());
+    assertThat(fetchWithLazy.getChildren()).hasSize(2);
+
+    // fetch includeSoftDeletes using lazy loading
+    EBasicSoftDelete fetchAllWithLazy =
+        Ebean.find(EBasicSoftDelete.class)
+            .setId(bean.getId())
+        .includeSoftDeletes()
+        .findUnique();
+
+    assertThat(fetchAllWithLazy.getChildren()).hasSize(3);
   }
 }

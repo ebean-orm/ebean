@@ -45,26 +45,11 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
 
   protected void configureQuery(SpiQuery<?> query, String lazyLoadProperty) {
 
-    // propagate the readOnly state
-    if (parent.isReadOnly() != null) {
-      query.setReadOnly(parent.isReadOnly());
-    }
-    // propagate the asOf and lazy loading mode
-    query.setDisableLazyLoading(parent.isDisableLazyLoading());
-    query.asOf(parent.getAsOf());
+    parent.propagateQueryState(query);
     query.setParentNode(objectGraphNode);
     query.setLazyLoadProperty(lazyLoadProperty);
-    if (parent.isAsDraft()) {
-      query.asDraft();
-    }
-    if (parent.isDisableReadAudit()) {
-      query.setDisableReadAuditing();
-    }
     if (queryProps != null) {
       queryProps.configureBeanQuery(query);
-    }
-    if (parent.isUseAutoTune()) {
-      query.setAutoTune(true);
     }
   }
 

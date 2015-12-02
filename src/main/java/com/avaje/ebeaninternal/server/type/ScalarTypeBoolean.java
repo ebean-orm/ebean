@@ -29,6 +29,16 @@ public class ScalarTypeBoolean {
       super(true, Types.BOOLEAN);
     }
 
+    @Override
+    public String getDbFalseLiteral() {
+      return "false";
+    }
+
+    @Override
+    public String getDbTrueLiteral() {
+      return "true";
+    }
+
     public Boolean toBeanType(Object value) {
       return BasicTypeConverter.toBoolean(value);
     }
@@ -68,6 +78,16 @@ public class ScalarTypeBoolean {
       super(true, Types.BIT);
     }
 
+    @Override
+    public String getDbFalseLiteral() {
+      return "0";
+    }
+
+    @Override
+    public String getDbTrueLiteral() {
+      return "1";
+    }
+
     public Boolean toBeanType(Object value) {
       return BasicTypeConverter.toBoolean(value);
     }
@@ -104,6 +124,16 @@ public class ScalarTypeBoolean {
       super(false, Types.INTEGER);
       this.trueValue = trueValue;
       this.falseValue = falseValue;
+    }
+
+    @Override
+    public String getDbFalseLiteral() {
+      return falseValue.toString();
+    }
+
+    @Override
+    public String getDbTrueLiteral() {
+      return trueValue.toString();
     }
 
     @Override
@@ -180,6 +210,16 @@ public class ScalarTypeBoolean {
     }
 
     @Override
+    public String getDbFalseLiteral() {
+      return "'"+falseValue+"'";
+    }
+
+    @Override
+    public String getDbTrueLiteral() {
+      return "'"+trueValue+"'";
+    }
+
+    @Override
     public int getLength() {
       // typically this will return 1
       return Math.max(trueValue.length(), falseValue.length());
@@ -244,6 +284,16 @@ public class ScalarTypeBoolean {
     public BooleanBase(boolean jdbcNative, int jdbcType) {
       super(Boolean.class, jdbcNative, jdbcType);
     }
+
+    /**
+     * Return the DB literal value for false.
+     */
+    public abstract String getDbFalseLiteral();
+
+    /**
+     * Return the DB literal value for true.
+     */
+    public abstract String getDbTrueLiteral();
 
     public String formatValue(Boolean t) {
       return t.toString();

@@ -9,19 +9,17 @@ import java.lang.annotation.Target;
  * Used to indicate a property on an entity bean used to control 'soft delete'
  * (also known as 'logical delete').
  * <p>
- * The property should be of type boolean, int or short.
+ * The property should be of type boolean.
  * </p>
+ * <pre>{@code
+ *
+ * @SoftDelete
+ * boolean deleted;
+ *
+ * }</pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface SoftDelete {
 
-  /**
-   * Specify the bind value that matches 'deleted' state.
-   * <p>
-   *   If not specified then for boolean this is <code>true</code> and
-   *   for int and short this value is <code>1</code>.
-   * </p>
-   */
-  String value() default "";
 }

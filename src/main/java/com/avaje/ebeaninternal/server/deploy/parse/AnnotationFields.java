@@ -160,7 +160,7 @@ public class AnnotationFields extends AnnotationParser {
     }
     SoftDelete softDelete = get(prop, SoftDelete.class);
     if (softDelete != null) {
-      prop.setSoftDelete(softDelete.value());
+      prop.setSoftDelete();
     }
 
     DbJson dbJson = get(prop, DbJson.class);

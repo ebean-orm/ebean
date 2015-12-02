@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.SoftDelete;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
 import com.avaje.ebean.annotation.WhenCreated;
 import com.avaje.ebean.annotation.WhenModified;
@@ -190,7 +191,6 @@ public class DeployBeanProperty {
   private boolean draftReset;
 
   private boolean softDelete;
-  private String softDeleteValue = "";
 
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     this.desc = desc;
@@ -223,6 +223,8 @@ public class DeployBeanProperty {
     } else if (isAuditProperty()) {
       return AUDITCOLUMN_ORDER;
     } else if (field.getAnnotation(Version.class) != null) {
+      return VERSIONCOLUMN_ORDER;
+    } else if (field.getAnnotation(SoftDelete.class) != null) {
       return VERSIONCOLUMN_ORDER;
     }
     return 0;
@@ -876,42 +878,12 @@ public class DeployBeanProperty {
     return draftReset;
   }
 
-  public void setSoftDelete(String softDeleteValue) {
+  public void setSoftDelete() {
     this.softDelete = true;
-    this.softDeleteValue = softDeleteValue;
   }
 
   public boolean isSoftDelete() {
     return softDelete;
   }
 
-  public Object getSoftDeleteValue() {
-    return !softDelete ? null : "".equals(softDeleteValue) ? defaultSoftDeleteValue() : parseSoftDeleteValue();
-  }
-
-  private Object parseSoftDeleteValue() {
-    if (Boolean.class.equals(propertyType) || boolean.class.equals(propertyType)) {
-      return Boolean.parseBoolean(softDeleteValue);
-    }
-    if (Integer.class.equals(propertyType) || int.class.equals(propertyType)) {
-      return Integer.parseInt(softDeleteValue);
-    }
-    if (Short.class.equals(propertyType) || short.class.equals(propertyType)) {
-      return Short.parseShort(softDeleteValue);
-    }
-    throw new IllegalStateException("@SoftDelete on ["+getFullBeanName()+"] mapped to unsupported type propertyType["+propertyType+"]");
-  }
-
-  private Object defaultSoftDeleteValue() {
-    if (Boolean.class.equals(propertyType) || boolean.class.equals(propertyType)) {
-      return Boolean.TRUE;
-    }
-    if (Integer.class.equals(propertyType) || int.class.equals(propertyType)) {
-      return Integer.valueOf(1);
-    }
-    if (Short.class.equals(propertyType) || short.class.equals(propertyType)) {
-      return Short.valueOf("1");
-    }
-    throw new IllegalStateException("@SoftDelete on ["+getFullBeanName()+"] mapped to unsupported type propertyType["+propertyType+"]");
-  }
 }
