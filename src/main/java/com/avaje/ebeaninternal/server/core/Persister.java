@@ -66,7 +66,7 @@ public interface Persister {
   /**
    * Delete the bean.
    */
-  boolean delete(EntityBean entityBean, Transaction t);
+  boolean delete(EntityBean entityBean, Transaction t, boolean permanent);
 
   /**
    * Delete multiple beans given a collection of Id values.

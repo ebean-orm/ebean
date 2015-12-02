@@ -336,7 +336,7 @@ public final class DefaultPersister implements Persister {
    */
   private void deleteRecurse(EntityBean detailBean, Transaction t, boolean softDelete) {
 
-    Type deleteType = softDelete ? Type.SOFT_DELETE : Type.DELETE;
+    Type deleteType = softDelete ? Type.SOFT_DELETE : Type.DELETE_PERMANENT;
     deleteRequest(createRequest(detailBean, t, deleteType));
   }
 
@@ -498,15 +498,16 @@ public final class DefaultPersister implements Persister {
    * Delete the bean with the explicit transaction.
    * Return false if the delete is executed without OCC and 0 rows were deleted.
    */
-  public boolean delete(EntityBean bean, Transaction t) {
+  public boolean delete(EntityBean bean, Transaction t, boolean permanent) {
 
-    PersistRequestBean<EntityBean> request = createRequest(bean, t, Type.DELETE);
+    Type deleteType = permanent ? Type.DELETE_PERMANENT : Type.DELETE;
+    PersistRequestBean<EntityBean> request = createRequest(bean, t, deleteType);
     boolean deleted = deleteRequest(request);
 
-    if (request.isDraftable()) {
+    if (request.isDraftable() && request.getType() == Type.DELETE) {
       // we have just deleting a draft bean so now we need to delete the
       // associated 'live' bean. This is effectively an 'automatic publish'.
-      deleteRequest(createPublishRequest(request.createReference(), t, Type.DELETE, true));
+      deleteRequest(createPublishRequest(request.createReference(), t, Type.DELETE_PERMANENT, true));
     }
     return deleted;
   }
@@ -541,8 +542,8 @@ public final class DefaultPersister implements Persister {
 
   private void deleteList(List<?> beanList, Transaction t, boolean softDelete) {
     for (int i = 0; i < beanList.size(); i++) {
-//      deleteRecurse((EntityBean) beanList.get(i), t, softDelete);
-      delete((EntityBean) beanList.get(i), t);
+      deleteRecurse((EntityBean) beanList.get(i), t, softDelete);
+      //delete((EntityBean) beanList.get(i), t);
     }
   }
 
@@ -590,7 +591,7 @@ public final class DefaultPersister implements Persister {
         // We actually need to execute a query to get the foreign key values
         // as they are required for the delete cascade. Query back just the
         // Id and the appropriate foreign key values
-        Query<?> q = deleteRequiresQuery(descriptor, propImportDelete);
+        Query<?> q = deleteRequiresQuery(descriptor, propImportDelete, softDelete);
         if (idList != null) {
           q.where().idIn(idList);
           if (t.isLogSummary()) {
@@ -701,7 +702,7 @@ public final class DefaultPersister implements Persister {
    * We need to create and execute a query to get the foreign key values as
    * the delete cascades to them (foreign keys).
    */
-  private Query<?> deleteRequiresQuery(BeanDescriptor<?> desc, BeanPropertyAssocOne<?>[] propImportDelete) {
+  private Query<?> deleteRequiresQuery(BeanDescriptor<?> desc, BeanPropertyAssocOne<?>[] propImportDelete, boolean softDelete) {
 
     Query<?> q = server.createQuery(desc.getBeanType());
     StringBuilder sb = new StringBuilder(30);
@@ -710,6 +711,10 @@ public final class DefaultPersister implements Persister {
     }
     q.setAutoTune(false);
     q.select(sb.toString());
+    if (!softDelete) {
+      // hard delete so we want this query to include logically deleted rows (if any)
+      q.includeSoftDeletes();
+    }
     return q;
   }
 
@@ -1492,7 +1497,10 @@ public final class DefaultPersister implements Persister {
   private <T> PersistRequestBean<T> createRequest(T bean, Transaction t, Object parentBean, BeanManager<?> mgr,
                                                   PersistRequest.Type type, boolean saveRecurse, boolean publish) {
 
-    if (type == Type.DELETE && mgr.getBeanDescriptor().isSoftDelete()) {
+    if (type == Type.DELETE_PERMANENT) {
+      type = Type.DELETE;
+    } else if (type == Type.DELETE && mgr.getBeanDescriptor().isSoftDelete()) {
+      // automatically convert to soft delete for types that support it
       type = Type.SOFT_DELETE;
     }
 

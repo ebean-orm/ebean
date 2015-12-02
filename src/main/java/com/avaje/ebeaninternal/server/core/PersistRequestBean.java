@@ -256,6 +256,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
           beanDescriptor.cacheHandleUpdate(idValue, this);
           break;
         case DELETE:
+        case SOFT_DELETE:
           // Bean deleted from cache early via postDelete()
           break;
         default:
@@ -546,6 +547,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
     switch (type) {
       case DELETE:
+      case SOFT_DELETE:
         postDelete();
         break;
       case UPDATE:
@@ -614,6 +616,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         controller.postUpdate(this);
         break;
       case DELETE:
+      case SOFT_DELETE:
         controller.postDelete(this);
         break;
       default:
@@ -634,6 +637,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         break;
       case DELETE:
         transaction.logSummary("Deleted [" + name + "] [" + idValue + "]" + draft);
+        break;
+      case SOFT_DELETE:
+        transaction.logSummary("SoftDelete [" + name + "] [" + idValue + "]" + draft);
         break;
       default:
         break;

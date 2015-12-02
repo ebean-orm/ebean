@@ -683,6 +683,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
       case INSERT:
         return changeLogFilter.includeInsert(request) ? insertBeanChange(request): null;
       case UPDATE:
+      case SOFT_DELETE:
         return changeLogFilter.includeUpdate(request) ? updateBeanChange(request): null;
       case DELETE:
         return changeLogFilter.includeDelete(request) ? deleteBeanChange(request) :null;

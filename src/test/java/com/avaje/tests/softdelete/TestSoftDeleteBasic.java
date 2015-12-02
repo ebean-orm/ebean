@@ -20,7 +20,6 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     EBasicSoftDelete bean = new EBasicSoftDelete();
     bean.setName("one");
-
     Ebean.save(bean);
 
     Ebean.delete(bean);
@@ -42,7 +41,39 @@ public class TestSoftDeleteBasic extends BaseTestCase {
         .findUnique();
 
     assertThat(findInclude).isNotNull();
+  }
 
+  @Test
+  public void testDeleteById() {
+
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("two");
+    Ebean.save(bean);
+
+    Ebean.delete(EBasicSoftDelete.class, bean.getId());
+  }
+
+  @Test
+  public void testDeletePartial() {
+
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("partial");
+    Ebean.save(bean);
+
+    // partially loaded bean without deleted state loaded
+    EBasicSoftDelete partial = Ebean.find(EBasicSoftDelete.class)
+        .select("id")
+        .setId(bean.getId())
+        .findUnique();
+
+    LoggedSqlCollector.start();
+    Ebean.delete(partial);
+
+    // check lazy loading isn't invoked (deleted set to true without invoking lazy loading)
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(2);
+    assertThat(loggedSql.get(0)).contains("update ebasic_sdchild set deleted=");
+    assertThat(loggedSql.get(1)).contains("update ebasic_soft_delete set deleted=? where id=?");
   }
 
   @Test

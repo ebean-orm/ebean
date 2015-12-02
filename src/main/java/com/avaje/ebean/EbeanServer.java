@@ -1274,6 +1274,26 @@ public interface EbeanServer {
   boolean delete(Object bean, Transaction transaction) throws OptimisticLockException;
 
   /**
+   * Delete a bean permanently without soft delete.
+   */
+  boolean deletePermanent(Object bean) throws OptimisticLockException;
+
+  /**
+   * Delete a bean permanently without soft delete using an explicit transaction.
+   */
+  boolean deletePermanent(Object bean, Transaction transaction) throws OptimisticLockException;
+
+  /**
+   * Delete all the beans in the collection permanently without soft delete.
+   */
+  int deleteAllPermanent(Collection<?> beans) throws OptimisticLockException;
+
+  /**
+   * Delete all the beans in the collection permanently without soft delete using an explicit transaction.
+   */
+  int deleteAllPermanent(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
+
+  /**
    * Delete the bean given its type and id.
    */
   int delete(Class<?> beanType, Object id);

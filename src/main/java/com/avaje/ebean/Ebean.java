@@ -704,6 +704,10 @@ public final class Ebean {
    * you automatically.
    * </p>
    * <p>
+   * If the bean is configured with <code>@SoftDelete</code> then this will perform a soft
+   * delete rather than a hard/permanent delete.
+   * </p>
+   * <p>
    * If the Bean does not have a version property (or loaded version property) and
    * the bean does not exist then this returns false indicating that nothing was
    * deleted. Note that, if JDBC batch mode is used then this always returns true.
@@ -711,6 +715,13 @@ public final class Ebean {
    */
   public static boolean delete(Object bean) throws OptimisticLockException {
     return serverMgr.getDefaultServer().delete(bean);
+  }
+
+  /**
+   * Delete the bean in permanent fashion (will not use soft delete).
+   */
+  public static boolean deletePermanent(Object bean) throws OptimisticLockException {
+    return serverMgr.getDefaultServer().deletePermanent(bean);
   }
 
   /**
@@ -732,6 +743,13 @@ public final class Ebean {
    */
   public static int deleteAll(Collection<?> beans) throws OptimisticLockException {
     return serverMgr.getDefaultServer().deleteAll(beans);
+  }
+
+  /**
+   * Delete permanent all the beans in the Collection (will not use soft delete).
+   */
+  public static int deleteAllPermanent(Collection<?> beans) throws OptimisticLockException {
+    return serverMgr.getDefaultServer().deleteAllPermanent(beans);
   }
 
   /**
