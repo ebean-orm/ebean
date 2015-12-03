@@ -3,6 +3,7 @@ package com.avaje.ebean;
 import com.avaje.ebean.text.PathProperties;
 import org.jetbrains.annotations.Nullable;
 
+import javax.persistence.NonUniqueResultException;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -193,8 +194,15 @@ public interface ExpressionList<T> extends Serializable {
   <K> Map<K, T> findMap(String keyProperty, Class<K> keyType);
 
   /**
-   * Execute the query returning a single bean.
-   * 
+   * Execute the query returning a single bean or null (if no matching
+   * bean is found).
+   * <p>
+   * If more than 1 row is found for this query then a NonUniqueResultException is
+   * thrown.
+   * </p>
+   *
+   * @throws NonUniqueResultException if more than one result was found
+   *
    * @see Query#findUnique()
    */
   @Nullable

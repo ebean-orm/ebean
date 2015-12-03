@@ -3,6 +3,7 @@ package com.avaje.ebean;
 import com.avaje.ebean.text.PathProperties;
 import org.jetbrains.annotations.Nullable;
 
+import javax.persistence.NonUniqueResultException;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
@@ -700,7 +701,7 @@ public interface Query<T> extends Serializable {
    * Execute the query returning either a single bean or null (if no matching
    * bean is found).
    * <p>
-   * If more than 1 row is found for this query then a PersistenceException is
+   * If more than 1 row is found for this query then a NonUniqueResultException is
    * thrown.
    * </p>
    * <p>
@@ -736,6 +737,8 @@ public interface Query<T> extends Serializable {
    * List<OrderDetail> details = order.getDetails();
    * ...
    * }</pre>
+   *
+   * @throws NonUniqueResultException if more than one result was found
    */
   @Nullable
   T findUnique();

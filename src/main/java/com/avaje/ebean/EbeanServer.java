@@ -9,6 +9,7 @@ import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
 import org.jetbrains.annotations.Nullable;
 
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.util.Collection;
@@ -1091,14 +1092,17 @@ public interface EbeanServer {
   <T> Map<?, T> findMap(Query<T> query, Transaction transaction);
 
   /**
-   * Execute the query returning at most one entity bean. This will throw a
-   * PersistenceException if the query finds more than one result.
+   * Execute the query returning at most one entity bean or null (if no matching
+   * bean is found).
+   * <p>
+   * This will throw a NonUniqueResultException if the query finds more than one result.
+   * </p>
    * <p>
    * Generally you are able to use {@link Query#findUnique()} rather than
    * explicitly calling this method. You could use this method if you wish to
    * explicitly control the transaction used for the query.
    * </p>
-   * 
+   *
    * @param <T>
    *          the type of entity bean to fetch.
    * @param query
@@ -1106,6 +1110,7 @@ public interface EbeanServer {
    * @param transaction
    *          the transaction to use (can be null).
    * @return the list of fetched beans.
+   * @throws NonUniqueResultException if more than one result was found
    *
    * @see Query#findUnique()
    */

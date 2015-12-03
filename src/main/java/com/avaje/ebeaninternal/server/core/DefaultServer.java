@@ -70,6 +70,7 @@ import com.avaje.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
@@ -1218,13 +1219,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     // a query that is expected to return either 0 or 1 rows
     List<T> list = findList(query, t);
+    return extractUnique(list);
+  }
 
-    if (list.size() == 0) {
+  private <T> T extractUnique(List<T> list) {
+    if (list.isEmpty()) {
       return null;
-      
+
     } else if (list.size() > 1) {
-      throw new PersistenceException("Unique expecting 0 or 1 rows but got [" + list.size() + "]");
-      
+      throw new NonUniqueResultException("Unique expecting 0 or 1 results but got [" + list.size() + "]");
+
     } else {
       return list.get(0);
     }
@@ -1449,17 +1453,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     // no findId() method for SqlQuery...
     // a query that is expected to return either 0 or 1 rows
     List<SqlRow> list = findList(query, t);
-
-    if (list.size() == 0) {
-      return null;
-
-    } else if (list.size() > 1) {
-      String m = "Unique expecting 0 or 1 rows but got [" + list.size() + "]";
-      throw new PersistenceException(m);
-
-    } else {
-      return list.get(0);
-    }
+    return extractUnique(list);
   }
 
   public SqlFutureList findFutureList(SqlQuery query, Transaction t) {
