@@ -11,7 +11,6 @@ import java.lang.annotation.Target;
  * This is effectively an alias for @UpdatedTimestamp and added to hint
  * towards a better naming convention (WhenCreated, WhenModified).
  * </p>
- * </p>
  */
 @Target({ ElementType.FIELD, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)

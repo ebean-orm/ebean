@@ -9,6 +9,10 @@ import java.lang.annotation.Target;
  * For a timestamp property that is set to the datetime when the entity is
  * created/inserted.
  * <p>
+ * This is effectively an alias for @WhenCreated which was added as it hints
+ * towards a better naming convention (WhenCreated, WhenModified).
+ * </p>
+ * <p>
  * An alternative to using this annotation would be to use insertable=false,
  * updateable=false with @Column and have the DB insert the current time
  * (default value on the DB column is SYSTIME etc).
