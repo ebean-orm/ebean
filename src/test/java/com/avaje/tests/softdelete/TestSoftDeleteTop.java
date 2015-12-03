@@ -5,17 +5,12 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.config.PersistBatch;
 import com.avaje.tests.model.softdelete.ESoftDelMid;
-import com.avaje.tests.model.softdelete.ESoftDelRole;
 import com.avaje.tests.model.softdelete.ESoftDelTop;
 import com.avaje.tests.model.softdelete.ESoftDelUp;
-import com.avaje.tests.model.softdelete.ESoftDelUser;
-import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestSoftDeleteTop extends BaseTestCase {
 

@@ -150,6 +150,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     EBasicSoftDelete fetchAllWithLazy =
         Ebean.find(EBasicSoftDelete.class)
             .setId(bean.getId())
+            .where()
         .includeSoftDeletes()
         .findUnique();
 

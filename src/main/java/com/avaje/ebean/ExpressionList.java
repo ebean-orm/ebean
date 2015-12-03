@@ -108,6 +108,16 @@ public interface ExpressionList<T> extends Serializable {
   Query<T> asOf(Timestamp asOf);
 
   /**
+   * Execute the query against the draft set of tables.
+   */
+  Query<T> asDraft();
+
+  /**
+   * Execute the query including soft deleted rows.
+   */
+  Query<T> includeSoftDeletes();
+
+  /**
    * Execute as a delete query deleting the 'root level' beans that match the predicates
    * in the query.
    * <p>

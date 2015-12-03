@@ -122,6 +122,16 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public Query<T> asDraft() {
+    return query.asDraft();
+  }
+
+  @Override
+  public Query<T> includeSoftDeletes() {
+    return query.includeSoftDeletes();
+  }
+
+  @Override
   public List<Version<T>> findVersions() {
     return query.findVersions();
   }

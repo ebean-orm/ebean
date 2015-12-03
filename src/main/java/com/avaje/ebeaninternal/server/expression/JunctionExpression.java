@@ -235,6 +235,16 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
+  public Query<T> asDraft() {
+    return exprList.asDraft();
+  }
+
+  @Override
+  public Query<T> includeSoftDeletes() {
+    return exprList.includeSoftDeletes();
+  }
+
+  @Override
   public List<Version<T>> findVersions() {
     return exprList.findVersions();
   }
