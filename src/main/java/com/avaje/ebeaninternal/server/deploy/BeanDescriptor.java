@@ -2003,6 +2003,17 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   }
 
   /**
+   * Return true if the bean is considered a 'draft' instance.
+   */
+  public boolean isDraftInstance(EntityBean entityBean) {
+    if (draft != null) {
+      return Boolean.TRUE == draft.getValue(entityBean);
+    }
+    // no draft property - so just ignore the check / return true
+    return true;
+  }
+
+  /**
    * If there is a @DraftDirty property set it's value on the bean.
    */
   public void setDraftDirty(EntityBean entityBean, boolean value) {

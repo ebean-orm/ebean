@@ -354,6 +354,7 @@ public final class DefaultPersister implements Persister {
 
     PersistRequestBean<?> req = createRequest(entityBean, t, PersistRequest.Type.UPDATE);
     req.setDeleteMissingChildren(deleteMissingChildren);
+    req.checkDraft();
     try {
       req.initTransIfRequiredWithBatchCascade();
       if (req.isReference()) {

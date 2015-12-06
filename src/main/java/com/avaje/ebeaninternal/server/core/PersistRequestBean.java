@@ -21,6 +21,7 @@ import com.avaje.ebeaninternal.server.persist.PersistExecute;
 import com.avaje.ebeaninternal.server.transaction.BeanPersistIdMap;
 
 import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -437,6 +438,16 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
+   * Checks for @Draftable entity beans with @Draft property that the bean is a 'draft'.
+   * Save or Update is not allowed to execute using 'live' beans - must use publish().
+   */
+  public void checkDraft() {
+    if (beanDescriptor.isDraftable() && !beanDescriptor.isDraftInstance(entityBean)) {
+      throw new PersistenceException("Save or update is not allowed on a 'live' bean - only draft beans");
+    }
+  }
+
+  /**
    * Return the parent bean for cascading save with unidirectional relationship.
    */
   public Object getParentBean() {
@@ -827,4 +838,5 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public boolean isSoftDelete() {
     return Type.SOFT_DELETE == type;
   }
+
 }
