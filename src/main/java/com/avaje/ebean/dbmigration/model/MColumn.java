@@ -213,6 +213,13 @@ public class MColumn {
     return draftOnly;
   }
 
+  /**
+   * Return true if this column should be included in History DB triggers etc.
+   */
+  public boolean isIncludeInHistory() {
+    return !draftOnly && !historyExclude;
+  }
+
   public Column createColumn() {
 
     Column c = new Column();

@@ -232,7 +232,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     List<String> includedColumns = new ArrayList<String>(columns.size());
 
     for (MColumn column : columns) {
-      if (!column.isHistoryExclude()) {
+      if (column.isIncludeInHistory()) {
         includedColumns.add(column.getName());
       }
     }
