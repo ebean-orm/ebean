@@ -224,6 +224,8 @@ public class BeanProperty implements ElPropertyValue {
 
   final boolean jsonDeserialize;
 
+  final boolean draft;
+
   final boolean draftOnly;
 
   final boolean draftDirty;
@@ -262,6 +264,7 @@ public class BeanProperty implements ElPropertyValue {
     this.dbInsertable = deploy.isDbInsertable();
     this.dbUpdatable = deploy.isDbUpdateable();
     this.excludedFromHistory = deploy.isExcludedFromHistory();
+    this.draft = deploy.isDraft();
     this.draftDirty = deploy.isDraftDirty();
     this.draftOnly = deploy.isDraftOnly();
     this.draftReset = deploy.isDraftReset();
@@ -358,6 +361,7 @@ public class BeanProperty implements ElPropertyValue {
     this.formula = false;
 
     this.excludedFromHistory = source.excludedFromHistory;
+    this.draft = source.draft;
     this.draftDirty = source.draftDirty;
     this.draftOnly = source.draftOnly;
     this.draftReset = source.draftReset;
@@ -1081,6 +1085,14 @@ public class BeanProperty implements ElPropertyValue {
    */
   public boolean isDraftOnly() {
     return draftOnly;
+  }
+
+  /**
+   * Return true if this property is a boolean flag on a draftable bean
+   * indicating if the instance is a draft or live bean.
+   */
+  public boolean isDraft() {
+    return draft;
   }
 
   /**

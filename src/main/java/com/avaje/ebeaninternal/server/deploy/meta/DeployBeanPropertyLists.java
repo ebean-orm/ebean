@@ -28,6 +28,8 @@ public class DeployBeanPropertyLists {
 
   private BeanProperty versionProperty;
 
+  private BeanProperty draft;
+
   private BeanProperty draftDirty;
 
   private final BeanDescriptor<?> desc;
@@ -136,6 +138,9 @@ public class DeployBeanPropertyLists {
   private void allocateToList(BeanProperty prop) {
     if (prop.isTransient()) {
       transients.add(prop);
+      if (prop.isDraft()) {
+        draft = prop;
+      }
       return;
     }
     if (prop.isId()) {
@@ -291,6 +296,10 @@ public class DeployBeanPropertyLists {
 
   public BeanProperty getDraftDirty() {
     return draftDirty;
+  }
+
+  public BeanProperty getDraft() {
+    return draft;
   }
 
   public BeanProperty getSoftDeleteProperty() {

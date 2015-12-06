@@ -149,6 +149,9 @@ public class AnnotationFields extends AnnotationParser {
       util.setLobType(prop);
     }
 
+    if (get(prop, Draft.class) != null) {
+      prop.setDraft();
+    }
     if (get(prop, DraftOnly.class) != null) {
       prop.setDraftOnly();
     }

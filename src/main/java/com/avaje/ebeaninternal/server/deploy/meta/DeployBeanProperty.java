@@ -186,6 +186,7 @@ public class DeployBeanProperty {
 
   private boolean excludedFromHistory;
 
+  private boolean draft;
   private boolean draftOnly;
   private boolean draftDirty;
   private boolean draftReset;
@@ -657,6 +658,7 @@ public class DeployBeanProperty {
         return false;
     }
   }
+
   /**
    * Return true if this property is based on a secondary table.
    */
@@ -851,6 +853,15 @@ public class DeployBeanProperty {
 
   public void setExcludedFromHistory() {
     this.excludedFromHistory = true;
+  }
+
+  public void setDraft() {
+    this.draft = true;
+    this.isTransient = true;
+  }
+
+  public boolean isDraft() {
+    return draft;
   }
 
   public void setDraftOnly() {

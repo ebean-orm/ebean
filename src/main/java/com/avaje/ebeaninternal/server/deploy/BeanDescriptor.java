@@ -163,6 +163,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
 
   private final boolean draftableElement;
 
+  private final BeanProperty draft;
+
   private final BeanProperty draftDirty;
 
   /**
@@ -403,6 +405,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     this.softDelete = (softDeleteProperty != null);
     this.idProperty = listHelper.getId();
     this.versionProperty = listHelper.getVersionProperty();
+    this.draft = listHelper.getDraft();
     this.draftDirty = listHelper.getDraftDirty();
     this.propMap = listHelper.getPropertyMap();
     this.propertiesTransient = listHelper.getTransients();
@@ -1987,6 +1990,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    */
   public boolean isDraftableElement() {
     return draftableElement;
+  }
+
+  /**
+   * Set the draft to true for this entity bean instance.
+   * This bean is being loaded via asDraft() query.
+   */
+  public void setDraft(EntityBean entityBean) {
+    if (draft != null) {
+      draft.setValue(entityBean, true);
+    }
   }
 
   /**

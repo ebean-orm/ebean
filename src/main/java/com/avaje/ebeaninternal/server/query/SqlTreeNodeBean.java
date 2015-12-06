@@ -301,6 +301,9 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       if (readId && !temporalVersions) {
         createListProxies(localDesc, ctx, localBean);
       }
+      if (temporalMode == SpiQuery.TemporalMode.DRAFT) {
+        localDesc.setDraft(localBean);
+      }
       localDesc.postLoad(localBean);
 
       EntityBeanIntercept ebi = localBean._ebean_getIntercept();
