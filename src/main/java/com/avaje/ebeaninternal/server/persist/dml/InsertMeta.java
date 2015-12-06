@@ -84,7 +84,7 @@ public final class InsertMeta {
         this.selectLastInsertedId = desc.getSelectLastInsertedId();
       }
       this.sqlNullId = genSql(true, tableName, false);
-      this.sqlDraftNullId = desc.isDraftable() ? genSql(false, draftTableName, true) : sqlNullId;
+      this.sqlDraftNullId = desc.isDraftable() ? genSql(true, draftTableName, true) : sqlNullId;
     }
   }
 
