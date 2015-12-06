@@ -100,6 +100,7 @@ public interface SpiQuery<T> extends Query<T> {
      * Includes soft deletes rows in the result.
      */
     SOFT_DELETED,
+
     /**
      * Query runs against draft tables.
      */
