@@ -7,7 +7,14 @@ import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
-import com.avaje.ebean.event.*;
+import com.avaje.ebean.event.BeanFindController;
+import com.avaje.ebean.event.BeanPersistController;
+import com.avaje.ebean.event.BeanPersistListener;
+import com.avaje.ebean.event.BeanPostLoad;
+import com.avaje.ebean.event.BeanQueryAdapter;
+import com.avaje.ebean.event.BulkTableEventListener;
+import com.avaje.ebean.event.ServerConfigStartup;
+import com.avaje.ebean.event.TransactionEventListener;
 import com.avaje.ebean.event.changelog.ChangeLogListener;
 import com.avaje.ebean.event.changelog.ChangeLogPrepare;
 import com.avaje.ebean.event.changelog.ChangeLogRegister;
@@ -2062,13 +2069,30 @@ public class ServerConfig {
     return properties;
   }
 
+  /**
+   * Return the instance to use (can be null) for the given plugin.
+   *
+   * @param properties the properties
+   * @param pluginType the type of plugin
+   * @param key        properties key
+   * @param instance   existing instance
+   */
   @SuppressWarnings("unchecked")
-  private <T> T createInstance(PropertiesWrapper p, Class<T> pluginType, String key, T instance) {
+  protected  <T> T createInstance(PropertiesWrapper properties, Class<T> pluginType, String key, T instance) {
 
     if (instance != null) {
       return instance;
     }
-    String classname = p.get(key, null);
+    String classname = properties.get(key, null);
+    return createInstance(pluginType, classname);
+  }
+
+  /**
+   * Return the instance to use (can be null) for the given plugin.
+   * @param pluginType the type of plugin
+   * @param classname the implementation class as per properties
+   */
+  protected <T> T createInstance(Class<T> pluginType, String classname) {
     return classname == null ? null : (T) ClassUtil.newInstance(classname);
   }
 
