@@ -254,14 +254,6 @@ public class DataSourcePool implements DataSource {
 
   private void initialise() throws SQLException {
 
-    // Ensure database driver is loaded
-    try {
-      ClassUtil.forName(this.databaseDriver, this.getClass());
-    } catch (Throwable e) {
-      throw new PersistenceException("Problem loading Database Driver [" + this.databaseDriver + "]: "
-          + e.getMessage(), e);
-    }
-
     String transIsolation = TransactionIsolation.getLevelDescription(transactionIsolation);
     //noinspection StringBufferReplaceableByString
     StringBuilder sb = new StringBuilder(70);
