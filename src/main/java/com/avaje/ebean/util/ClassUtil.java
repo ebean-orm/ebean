@@ -10,20 +10,6 @@ import java.util.Arrays;
 public class ClassUtil {
 
   /**
-   * Return a new instance of the class using the default constructor.
-   */
-  public static Object newInstance(String className) {
-    try {
-      Class<?> cls = Class.forName(className);
-      return cls.newInstance();
-    } catch (Exception e) {
-      String msg = "Error constructing " + className;
-      throw new IllegalArgumentException(msg, e);
-    }
-  }
-
-
-  /**
    * Returns the raw type for the 2nd generic parameter for a subclass.
    */
   public static Class<?> getSecondArgumentType(Class<?> subclass) {

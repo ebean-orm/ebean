@@ -21,7 +21,7 @@ import com.avaje.ebean.event.changelog.ChangeLogRegister;
 import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.meta.MetaInfoManager;
-import com.avaje.ebean.util.ClassUtil;
+import com.avaje.ebeaninternal.api.ClassUtil;
 import com.fasterxml.jackson.core.JsonFactory;
 
 import javax.sql.DataSource;
