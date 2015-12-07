@@ -502,21 +502,31 @@ public final class DefaultPersister implements Persister {
   public boolean delete(EntityBean bean, Transaction t, boolean permanent) {
 
     Type deleteType = permanent ? Type.DELETE_PERMANENT : Type.DELETE;
-    PersistRequestBean<EntityBean> request = createRequest(bean, t, deleteType);
-    boolean deleted = deleteRequest(request);
+    PersistRequestBean<EntityBean> originalRequest = createRequest(bean, t, deleteType);
 
-    if (request.isDraftable() && request.getType() == Type.DELETE) {
-      // we have just deleting a draft bean so now we need to delete the
-      // associated 'live' bean. This is effectively an 'automatic publish'.
-      deleteRequest(createPublishRequest(request.createReference(), t, Type.DELETE_PERMANENT, true));
+    if (originalRequest.isHardDeleteDraft()) {
+      // a hard delete of a draftable bean so first we need to  delete the associated 'live' bean
+      // due to FK constraint and then after that execute the original delete of the draft bean
+      return deleteRequest(createPublishRequest(originalRequest.createReference(), t, Type.DELETE_PERMANENT, true), originalRequest);
+
+    } else {
+      // normal delete or soft delete
+      return deleteRequest(originalRequest);
     }
-    return deleted;
   }
 
   /**
    * Execute the delete request returning true if a delete occurred.
    */
   private boolean deleteRequest(PersistRequestBean<?> req) {
+    return deleteRequest(req, null);
+  }
+
+  /**
+   * Execute the delete request support a second delete request for live and draft permanent delete.
+   * A common transaction is used across both requests.
+   */
+  private boolean deleteRequest(PersistRequestBean<?> req, PersistRequestBean<?> draftReq) {
 
     if (req.isRegisteredForDeleteBean()) {
       // skip deleting bean. Used where cascade is on
@@ -530,6 +540,11 @@ public final class DefaultPersister implements Persister {
     try {
       req.initTransIfRequiredWithBatchCascade();
       boolean deleted = delete(req);
+      if (draftReq != null) {
+        // delete the 'draft' bean ('live' bean deleted first)
+        draftReq.setTrans(req.getTransaction());
+        deleted = delete(draftReq);
+      }
       req.commitTransIfRequired();
       req.flushBatchOnCascade();
 

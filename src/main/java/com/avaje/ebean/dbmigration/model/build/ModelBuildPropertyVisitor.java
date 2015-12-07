@@ -112,7 +112,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   private void addDraftTable() {
     if (beanDescriptor.isDraftable() || beanDescriptor.isDraftableElement()) {
       // create a 'Draft' table which looks very similar (change PK, FK etc)
-      ctx.createDraft(table);
+      ctx.createDraft(table, !beanDescriptor.isDraftableElement());
     }
   }
 

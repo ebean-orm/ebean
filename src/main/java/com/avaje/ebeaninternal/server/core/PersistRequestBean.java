@@ -151,10 +151,27 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
     this.concurrencyMode = beanDescriptor.getConcurrencyMode(intercept);
     this.publish = publish;
-    if (!publish && beanDescriptor.isDraftable()) {
+    if (isMarkDraftDirty(publish)) {
       beanDescriptor.setDraftDirty(entityBean, true);
     }
     this.dirty = intercept.isDirty();
+  }
+
+  /**
+   * Return true if the draftDirty property should be set to true for this request.
+   */
+  private boolean isMarkDraftDirty(boolean publish) {
+    return !publish && type != Type.DELETE && beanDescriptor.isDraftable();
+  }
+
+  /**
+   * Set the transaction from prior persist request.
+   * Only used when hard deleting draft & associated live beans.
+   */
+  public void setTrans(SpiTransaction transaction) {
+    this.transaction = transaction;
+    this.createdTransaction = false;
+    this.persistCascade = transaction.isPersistCascade();
   }
 
   /**
@@ -435,6 +452,21 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public boolean isDraftable() {
     return beanDescriptor.isDraftable();
+  }
+
+  /**
+   * Return true if this request is a hard delete of a draftable bean.
+   * If this is true Ebean is expected to auto-publish and delete the associated live bean.
+   */
+  public boolean isHardDeleteDraft() {
+    if (type == Type.DELETE && beanDescriptor.isDraftable() && !beanDescriptor.isDraftableElement()) {
+      // deleting a top level draftable bean
+      if (!beanDescriptor.isDraftInstance(entityBean)) {
+        throw new PersistenceException("Explicit Delete is not allowed on a 'live' bean - only draft beans");
+      }
+      return true;
+    }
+    return false;
   }
 
   /**

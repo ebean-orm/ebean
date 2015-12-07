@@ -44,7 +44,7 @@ public class ModelBuildIntersectionTable {
     buildFkConstraints();
 
     if (manyProp.getTargetDescriptor().isDraftable()) {
-      ctx.createDraft(intersectionTable);
+      ctx.createDraft(intersectionTable, false);
     }
 
 	}

@@ -10,6 +10,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * The context used during DDL generation.
@@ -134,10 +135,21 @@ public class ModelBuildContext {
   /**
    * Create the draft table for a given table.
    */
-  public void createDraft(MTable table) {
+  public void createDraft(MTable table, boolean draftable) {
 
     MTable draftTable = table.createDraftTable();
     draftTable.setPkName(primaryKeyName(draftTable.getName()));
+
+    if (draftable) {
+      // Add a FK from @Draftable live table back to it's draft table)
+      List<MColumn> pkCols = table.primaryKeyColumns();
+      if (pkCols.size() == 1) {
+        // only doing this for single column PK at this stage
+        MColumn pk = pkCols.get(0);
+        pk.setReferences(draftTable.getName() + "." + pk.getName());
+        pk.setForeignKeyName(foreignKeyConstraintName(table.getName(), pk.getName(), 0));
+      }
+    }
 
     int fkCount = 0;
     int ixCount = 0;
