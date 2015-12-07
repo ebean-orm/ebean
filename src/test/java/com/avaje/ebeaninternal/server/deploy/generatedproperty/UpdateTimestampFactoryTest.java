@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 
+import com.avaje.ebean.config.ClassLoadConfig;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import org.junit.Test;
 
@@ -12,7 +13,7 @@ import static org.junit.Assert.*;
 public class UpdateTimestampFactoryTest {
 
 
-  UpdateTimestampFactory factory = new UpdateTimestampFactory();
+  UpdateTimestampFactory factory = new UpdateTimestampFactory(new ClassLoadConfig());
 
   @Test
   public void test_createdTimestamp_LocalDateTime() {

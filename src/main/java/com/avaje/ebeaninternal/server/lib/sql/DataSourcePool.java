@@ -171,10 +171,14 @@ public class DataSourcePool implements DataSource {
   private final Runnable heartbeatRunnable = new HeartBeatRunnable();
 
   public DataSourcePool(DataSourceAlert notify, String name, DataSourceConfig params) {
+    this(notify, name, params, null);
+  }
+
+  public DataSourcePool(DataSourceAlert notify, String name, DataSourceConfig params, DataSourcePoolListener listener) {
 
     this.notify = notify;
     this.name = name;
-    this.poolListener = createPoolListener(params.getPoolListener());
+    this.poolListener = listener;
 
     this.autoCommit = params.isAutoCommit();
     this.transactionIsolation = params.getIsolationLevel();
@@ -236,20 +240,6 @@ public class DataSourcePool implements DataSource {
   @Override
   public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
     throw new SQLFeatureNotSupportedException("We do not support java.util.logging");
-  }
-
-  /**
-   * Create the DataSourcePoolListener if there is one.
-   */
-  private DataSourcePoolListener createPoolListener(String cn) {
-    if (cn == null) {
-      return null;
-    }
-    try {
-      return (DataSourcePoolListener) ClassUtil.newInstance(cn, this.getClass());
-    } catch (Exception e) {
-      throw new IllegalArgumentException(e);
-    }
   }
 
   private void initialise() throws SQLException {

@@ -9,7 +9,7 @@ import java.util.Map;
 
 import javax.persistence.PersistenceException;
 
-import com.avaje.ebeaninternal.api.ClassUtil;
+import com.avaje.ebean.config.ClassLoadConfig;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 /**
@@ -21,18 +21,18 @@ public class UpdateTimestampFactory {
 
   final Map<Class<?>, GeneratedProperty> map = new HashMap<Class<?>, GeneratedProperty>();
 
-  public UpdateTimestampFactory() {
+  public UpdateTimestampFactory(ClassLoadConfig classLoadConfig) {
     map.put(Timestamp.class, new GeneratedUpdateTimestamp());
     map.put(java.util.Date.class, new GeneratedUpdateDate());
     map.put(Long.class, longTime);
     map.put(long.class, longTime);
 
-    if (ClassUtil.isPresent("java.time.LocalDate", this.getClass())) {
+    if (classLoadConfig.isJavaTimePresent()) {
       map.put(LocalDateTime.class, new GeneratedUpdateJavaTime.LocalDT());
       map.put(OffsetDateTime.class, new GeneratedUpdateJavaTime.OffsetDT());
       map.put(ZonedDateTime.class, new GeneratedUpdateJavaTime.ZonedDT());
     }
-    if (ClassUtil.isPresent("org.joda.time.LocalDateTime", this.getClass())) {
+    if (classLoadConfig.isJodaTimePresent()) {
       map.put(org.joda.time.LocalDateTime.class, new GeneratedUpdateJodaTime.LocalDT());
       map.put(org.joda.time.DateTime.class, new GeneratedUpdateJodaTime.DateTimeDT());
     }

@@ -162,13 +162,13 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     this.typeMap = new ConcurrentHashMap<Class<?>, ScalarType<?>>();
     this.nativeMap = new ConcurrentHashMap<Integer, ScalarType<?>>();
 
-    this.objectMapperPresent = ClassUtil.isJacksonObjectMapperPresent();
+    this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
 
     initialiseStandard(jsonDateTime, config);
     initialiseJavaTimeTypes(jsonDateTime, config);
-    initialiseJodaTypes(jsonDateTime);
+    initialiseJodaTypes(jsonDateTime, config);
     initialiseJacksonTypes(config);
 
     if (isPostgres(config.getDatabasePlatform())) {
@@ -738,7 +738,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    */
   protected void initialiseJacksonTypes(ServerConfig config) {
 
-    if (ClassUtil.isPresent("com.fasterxml.jackson.databind.ObjectMapper", this.getClass())) {
+    if (config.getClassLoadConfig().isJacksonObjectMapperPresent()) {
 
       logger.trace("Registering JsonNode type support");
 
@@ -765,7 +765,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   }
 
   protected void initialiseJavaTimeTypes(JsonConfig.DateTime mode, ServerConfig config) {
-    if (ClassUtil.isPresent("java.time.LocalDate", this.getClass())) {
+    if (config.getClassLoadConfig().isJavaTimePresent()) {
       logger.debug("Registering java.time data types");
       typeMap.put(java.time.LocalDate.class, new ScalarTypeLocalDate());
       typeMap.put(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(mode));
@@ -796,10 +796,10 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * Detect if Joda classes are in the classpath and if so register the Joda
    * data types.
    */
-  protected void initialiseJodaTypes(JsonConfig.DateTime mode) {
+  protected void initialiseJodaTypes(JsonConfig.DateTime mode, ServerConfig config) {
 
     // detect if Joda classes are in the classpath
-    if (ClassUtil.isPresent("org.joda.time.LocalDateTime", this.getClass())) {
+    if (config.getClassLoadConfig().isJodaTimePresent()) {
       // Joda classes are in the classpath so register the types
       logger.debug("Registering Joda data types");
       typeMap.put(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(mode));

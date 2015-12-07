@@ -75,7 +75,7 @@ public class ClassPathSearch implements ClassPathSearchService {
       if (classPathReaderCN != null) {
         // use a user defined classPathReader
         logger.info("Using [" + classPathReaderCN + "] to read the searchable class path");
-        classPathReader = (ClassPathReader) ClassUtil.newInstance(classPathReaderCN, this.getClass());
+        classPathReader = (ClassPathReader) ClassUtil.newInstance(classPathReaderCN);
       }
 
       Object[] rawClassPaths = classPathReader.readPath(classLoader);

@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 
@@ -37,8 +36,8 @@ public class ReadAnnotations {
     this.generatedPropFactory = generatedPropFactory;
     this.asOfViewSuffix = asOfViewSuffix;
     this.versionsBetweenSuffix = versionsBetweenSuffix;
-    this.javaxValidationAnnotations = ClassUtil.isJavaxValidationAnnotationsPresent();
-    this.jacksonAnnotations = ClassUtil.isJacksonAnnotationsPresent();
+    this.javaxValidationAnnotations = generatedPropFactory.getClassLoadConfig().isJavaxValidationAnnotationsPresent();
+    this.jacksonAnnotations = generatedPropFactory.getClassLoadConfig().isJacksonAnnotationsPresent();
   }
 
   /**

@@ -7,78 +7,59 @@ package com.avaje.ebeaninternal.api;
 public class ClassUtil {
 
   /**
-   * Load a class taking into account a context class loader (if present).
-   */
-  public static Class<?> forName(String name, Class<?> caller) throws ClassNotFoundException {
-
-    if (caller == null) {
-      caller = ClassUtil.class;
-    }
-    ClassLoadContext ctx = ClassLoadContext.of(caller, true);
-    return ctx.forName(name);
-  }
-
-  /**
-   * Return true if javax validation annotations like Size and NotNull are present.
-   */
-  public static boolean isJavaxValidationAnnotationsPresent() {
-    return isPresent("javax.validation.constraints.NotNull", null);
-  }
-
-  /**
-   * Return true if Jackson annotations like JsonIgnore are present.
-   */
-  public static boolean isJacksonAnnotationsPresent() {
-    return isPresent("com.fasterxml.jackson.annotation.JsonIgnore", null);
-  }
-
-  /**
-   * Return true if Jackson ObjectMapper is present.
-   */
-  public static boolean isJacksonObjectMapperPresent() {
-    return isPresent("com.fasterxml.jackson.databind.ObjectMapper", null);
-  }
-
-
-  /**
-   * Return true if the given class is present.
-   */
-  public static boolean isPresent(String className) {
-    return isPresent(className, null);
-  }
-
-  /**
-   * Return true if the given class is present.
-   */
-  public static boolean isPresent(String className, Class<?> caller) {
-    try {
-      forName(className, caller);
-      return true;
-    } catch (Throwable ex) {
-      // Class or one of its dependencies is not present...
-      return false;
-    }
-  }
-
-  /**
    * Return a new instance of the class using the default constructor.
    */
   public static Object newInstance(String className) {
-    return newInstance(className, null);
-  }
-
-  /**
-   * Return a new instance of the class using the default constructor.
-   */
-  public static Object newInstance(String className, Class<?> caller) {
 
     try {
-      Class<?> cls = forName(className, caller);
+      Class<?> cls = forName(className);
       return cls.newInstance();
     } catch (Exception e) {
       String msg = "Error constructing " + className;
       throw new IllegalArgumentException(msg, e);
     }
+  }
+
+  /**
+   * Load a class taking into account a context class loader (if present).
+   */
+  private static Class<?> forName(String name) throws ClassNotFoundException {
+    return new ClassLoadContext().forName(name);
+  }
+
+
+  /**
+   * Helper to wrap the context and caller classLoaders (to use/try both).
+   */
+  static class ClassLoadContext {
+
+    private final ClassLoader contextLoader;
+
+    private final ClassLoader callerLoader;
+
+    ClassLoadContext() {
+      this.callerLoader = ClassUtil.class.getClassLoader();
+      this.contextLoader = contextLoader();
+    }
+
+    ClassLoader contextLoader() {
+      ClassLoader loader = Thread.currentThread().getContextClassLoader();
+      return (loader != null) ? loader: callerLoader;
+    }
+
+    public Class<?> forName(String name) throws ClassNotFoundException {
+
+      try {
+        return Class.forName(name, true, contextLoader);
+      } catch (ClassNotFoundException e) {
+        if (callerLoader == contextLoader) {
+          throw e;
+        } else {
+          return Class.forName(name, true, callerLoader);
+        }
+      }
+    }
+
   }
 }
 

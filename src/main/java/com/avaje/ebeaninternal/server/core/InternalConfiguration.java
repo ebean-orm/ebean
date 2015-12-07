@@ -357,6 +357,6 @@ public class InternalConfiguration {
   }
 
   public GeneratedPropertyFactory getGeneratedPropertyFactory() {
-    return new GeneratedPropertyFactory(serverConfig.getCurrentUserProvider());
+    return new GeneratedPropertyFactory(serverConfig);
   }
 }

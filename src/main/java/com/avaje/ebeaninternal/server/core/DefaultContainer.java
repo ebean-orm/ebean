@@ -20,6 +20,7 @@ import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourceAlert;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
+import com.avaje.ebeaninternal.server.lib.sql.DataSourcePoolListener;
 import com.avaje.ebeaninternal.server.lib.sql.SimpleDataSourceAlert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -311,7 +312,17 @@ public class DefaultContainer implements SpiContainer {
     }
 
     DataSourceAlert notify = new SimpleDataSourceAlert();
-    return new DataSourcePool(notify, config.getName(), dsConfig);
+    DataSourcePoolListener listener = createListener(config, dsConfig);
+
+    return new DataSourcePool(notify, config.getName(), dsConfig, listener);
+  }
+
+  /**
+   * Create and return a DataSourcePoolListener if it has been specified.
+   */
+  private DataSourcePoolListener createListener(ServerConfig config, DataSourceConfig dsConfig) {
+    String poolListener = dsConfig.getPoolListener();
+    return poolListener != null ? (DataSourcePoolListener) config.getClassLoadConfig().newInstance(poolListener) : null;
   }
 
   /**

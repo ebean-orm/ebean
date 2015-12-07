@@ -21,7 +21,6 @@ import com.avaje.ebean.event.changelog.ChangeLogRegister;
 import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.meta.MetaInfoManager;
-import com.avaje.ebeaninternal.api.ClassUtil;
 import com.fasterxml.jackson.core.JsonFactory;
 
 import javax.sql.DataSource;
@@ -234,6 +233,11 @@ public class ServerConfig {
    * The db migration config (migration resource path etc).
    */
   private DbMigrationConfig migrationConfig = new DbMigrationConfig();
+
+  /**
+   * The ClassLoadConfig used to detect Joda, Java8, Jackson etc and create plugin instances given a className.
+   */
+  private ClassLoadConfig classLoadConfig = new ClassLoadConfig();
 
   /**
    * Set to true if the DataSource uses autoCommit.
@@ -2031,6 +2035,22 @@ public class ServerConfig {
   }
 
   /**
+   * Return the ClassLoadConfig which is used to detect Joda, Java8 types etc and also
+   * create new instances of plugins given a className.
+   */
+  public ClassLoadConfig getClassLoadConfig() {
+    return classLoadConfig;
+  }
+
+  /**
+   * Set the ClassLoadConfig which is used to detect Joda, Java8 types etc and also
+   * create new instances of plugins given a className.
+   */
+  public void setClassLoadConfig(ClassLoadConfig classLoadConfig) {
+    this.classLoadConfig = classLoadConfig;
+  }
+
+  /**
    * Load settings from ebean.properties.
    */
   public void loadFromProperties() {
@@ -2093,7 +2113,7 @@ public class ServerConfig {
    * @param classname the implementation class as per properties
    */
   protected <T> T createInstance(Class<T> pluginType, String classname) {
-    return classname == null ? null : (T) ClassUtil.newInstance(classname);
+    return classname == null ? null : (T) classLoadConfig.newInstance(classname);
   }
 
   /**

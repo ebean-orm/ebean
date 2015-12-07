@@ -3,7 +3,9 @@ package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 import java.math.BigDecimal;
 import java.util.HashSet;
 
+import com.avaje.ebean.config.ClassLoadConfig;
 import com.avaje.ebean.config.CurrentUserProvider;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 /**
@@ -13,9 +15,9 @@ public class GeneratedPropertyFactory {
 
 	private final CounterFactory counterFactory = new CounterFactory();
 
-  private final InsertTimestampFactory insertFactory = new InsertTimestampFactory();
+  private final InsertTimestampFactory insertFactory;
 
-  private final UpdateTimestampFactory updateFactory = new UpdateTimestampFactory();
+  private final UpdateTimestampFactory updateFactory;
 
   private final HashSet<String> numberTypes = new HashSet<String>();
 
@@ -23,8 +25,15 @@ public class GeneratedPropertyFactory {
 
   private final GeneratedWhoCreated generatedWhoCreated;
 
-  public GeneratedPropertyFactory(CurrentUserProvider currentUserProvider) {
+  private final ClassLoadConfig classLoadConfig;
 
+  public GeneratedPropertyFactory(ServerConfig serverConfig) {
+
+    this.classLoadConfig = serverConfig.getClassLoadConfig();
+    this.insertFactory = new InsertTimestampFactory(classLoadConfig);
+    this.updateFactory = new UpdateTimestampFactory(classLoadConfig);
+
+    CurrentUserProvider currentUserProvider = serverConfig.getCurrentUserProvider();
 	  if (currentUserProvider != null) {
       generatedWhoCreated = new GeneratedWhoCreated(currentUserProvider);
       generatedWhoModified = new GeneratedWhoModified(currentUserProvider);
@@ -44,7 +53,11 @@ public class GeneratedPropertyFactory {
 		numberTypes.add(BigDecimal.class.getName());
 	}
 
-	private boolean isNumberType(String typeClassName) {
+  public ClassLoadConfig getClassLoadConfig() {
+    return classLoadConfig;
+  }
+
+  private boolean isNumberType(String typeClassName) {
 		return numberTypes.contains(typeClassName);
 	}
 	

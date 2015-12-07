@@ -31,7 +31,7 @@ public class BeanPropertyAssocManyJsonHelp {
    */
   public BeanPropertyAssocManyJsonHelp(BeanPropertyAssocMany<?> many) {
     this.many = many;
-    this.jsonTransient = !ClassUtil.isJacksonObjectMapperPresent() ? null : new BeanPropertyAssocManyJsonTransient();
+    this.jsonTransient = new BeanPropertyAssocManyJsonTransient();
   }
 
   /**
@@ -81,9 +81,6 @@ public class BeanPropertyAssocManyJsonHelp {
    */
   private void jsonReadTransientUsingObjectMapper(ReadJson readJson, EntityBean parentBean) throws IOException {
 
-    if (jsonTransient == null) {
-      throw new IllegalStateException("Jackson ObjectMapper is required to read this Transient property "+many.getFullBeanName());
-    }
     jsonTransient.jsonReadUsingObjectMapper(many, readJson, parentBean);
   }
 }

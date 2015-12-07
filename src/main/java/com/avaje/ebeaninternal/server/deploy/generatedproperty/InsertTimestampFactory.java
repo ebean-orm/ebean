@@ -9,7 +9,7 @@ import java.util.Map;
 
 import javax.persistence.PersistenceException;
 
-import com.avaje.ebeaninternal.api.ClassUtil;
+import com.avaje.ebean.config.ClassLoadConfig;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 /**
@@ -21,25 +21,25 @@ public class InsertTimestampFactory {
 
   final Map<Class<?>, GeneratedProperty> map = new HashMap<Class<?>, GeneratedProperty>();
 
-  public InsertTimestampFactory() {
+  public InsertTimestampFactory(ClassLoadConfig classLoadConfig) {
     map.put(Timestamp.class, new GeneratedInsertTimestamp());
     map.put(java.util.Date.class, new GeneratedInsertDate());
     map.put(Long.class, longTime);
     map.put(long.class, longTime);
 
-    if (ClassUtil.isPresent("java.time.LocalDate", this.getClass())) {
+    if (classLoadConfig.isJavaTimePresent()) {
       map.put(LocalDateTime.class, new GeneratedInsertJavaTime.LocalDT());
       map.put(OffsetDateTime.class, new GeneratedInsertJavaTime.OffsetDT());
       map.put(ZonedDateTime.class, new GeneratedInsertJavaTime.ZonedDT());
     }
-    if (ClassUtil.isPresent("org.joda.time.LocalDateTime", this.getClass())) {
+    if (classLoadConfig.isJodaTimePresent()) {
       map.put(org.joda.time.LocalDateTime.class, new GeneratedInsertJodaTime.LocalDT());
       map.put(org.joda.time.DateTime.class, new GeneratedInsertJodaTime.DateTimeDT());
     }
 
   }
 
-	public void setInsertTimestamp(DeployBeanProperty property) {
+  public void setInsertTimestamp(DeployBeanProperty property) {
 
 		property.setGeneratedProperty(createInsertTimestamp(property));
 	}
