@@ -12,6 +12,7 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.config.EncryptKey;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.event.BeanFindController;
@@ -507,6 +508,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     } catch (Exception e) {
       throw new IllegalStateException("Error trying to create the prototypeEntityBean for "+beanType, e);
     }
+  }
+
+  /**
+   * Return the ServerConfig.
+   */
+  public ServerConfig getServerConfig() {
+    return owner.getServerConfig();
   }
 
   /**

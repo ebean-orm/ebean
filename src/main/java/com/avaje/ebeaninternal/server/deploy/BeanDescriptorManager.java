@@ -125,6 +125,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final String serverName;
 
+  private final ServerConfig serverConfig;
+
   private Map<Class<?>, DeployBeanInfo<?>> deplyInfoMap = new HashMap<Class<?>, DeployBeanInfo<?>>();
 
   private final Map<Class<?>, BeanTable> beanTableMap = new HashMap<Class<?>, BeanTable>();
@@ -178,8 +180,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   public BeanDescriptorManager(InternalConfiguration config) {
 
-    ServerConfig serverConfig = config.getServerConfig();
-
+    this.serverConfig = config.getServerConfig();
     this.serverName = InternString.intern(serverConfig.getName());
     this.cacheManager = config.getCacheManager();
     this.xmlConfig = config.getXmlConfig();
@@ -238,6 +239,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     // with historySupport returns a simple view suffix or the sql2011 versions between timestamp suffix
     return (historySupport == null ) ? serverConfig.getAsOfViewSuffix() : historySupport.getVersionsBetweenSuffix(serverConfig.getAsOfViewSuffix());
+  }
+
+  @Override
+  public ServerConfig getServerConfig() {
+    return serverConfig;
   }
 
   @SuppressWarnings("unchecked")
