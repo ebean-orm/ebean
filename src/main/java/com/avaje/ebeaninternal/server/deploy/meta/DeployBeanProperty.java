@@ -891,6 +891,7 @@ public class DeployBeanProperty {
 
   public void setSoftDelete() {
     this.softDelete = true;
+    this.nullable = false;
   }
 
   public boolean isSoftDelete() {
