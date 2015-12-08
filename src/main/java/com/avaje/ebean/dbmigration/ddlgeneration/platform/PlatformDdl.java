@@ -53,6 +53,8 @@ public class PlatformDdl {
 
   protected String identitySuffix = " auto_increment";
 
+  protected String alterTableIfExists = "";
+
   protected String dropConstraintIfExists = "drop constraint if exists";
 
   protected String dropIndexIfExists = "drop index if exists ";
@@ -150,7 +152,7 @@ public class PlatformDdl {
    * Return the drop foreign key clause.
    */
   public String alterTableDropForeignKey(String tableName, String fkName) {
-    return "alter table " + tableName + " " + dropConstraintIfExists + " " + fkName;
+    return "alter table " + alterTableIfExists + tableName + " " + dropConstraintIfExists + " " + fkName;
   }
 
   /**

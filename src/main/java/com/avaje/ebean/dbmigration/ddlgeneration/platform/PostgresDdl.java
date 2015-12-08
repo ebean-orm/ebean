@@ -13,6 +13,7 @@ public class PostgresDdl extends PlatformDdl {
     this.historyDdl = new PostgresHistoryDdl();
     this.dropTableCascade = " cascade";
     this.columnSetType = "type ";
+    this.alterTableIfExists = "if exists ";
   }
 
   /**
