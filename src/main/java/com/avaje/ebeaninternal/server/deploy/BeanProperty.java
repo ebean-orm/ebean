@@ -315,7 +315,7 @@ public class BeanProperty implements ElPropertyValue {
     if (softDelete) {
       ScalarTypeBoolean.BooleanBase boolType = (ScalarTypeBoolean.BooleanBase)scalarType;
       this.softDeleteDbSet = dbColumn+"="+boolType.getDbTrueLiteral();
-      this.softDeleteDbPredicate = dbColumn+"="+boolType.getDbFalseLiteral();
+      this.softDeleteDbPredicate = "."+dbColumn+","+boolType.getDbFalseLiteral()+")="+boolType.getDbFalseLiteral();
     } else {
       this.softDeleteDbSet = null;
       this.softDeleteDbPredicate = null;
@@ -650,7 +650,8 @@ public class BeanProperty implements ElPropertyValue {
    * Return the DB literal predicate used to filter out soft deleted rows from a query.
    */
   public String getSoftDeleteDbPredicate(String tableAlias) {
-    return tableAlias+"."+softDeleteDbPredicate;
+    // use coalesce to handle null values from optional relationships
+    return "coalesce(" + tableAlias + softDeleteDbPredicate;
   }
 
   /**

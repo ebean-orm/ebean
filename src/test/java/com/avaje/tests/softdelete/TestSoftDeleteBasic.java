@@ -135,8 +135,8 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     String generatedSql = query1.getGeneratedSql();
 
     // first statement is a single bulk update of the children with SoftDelete
-    assertThat(generatedSql).contains("t0.deleted=");
-    assertThat(generatedSql).contains("t1.deleted=");
+    assertThat(generatedSql).contains("coalesce(t0.deleted,");
+    assertThat(generatedSql).contains("coalesce(t1.deleted,");
     assertThat(fetch1.get(0).getChildren()).hasSize(2);
 
     assertThat(fetch1.get(0).getNosdChildren()).hasSize(2);

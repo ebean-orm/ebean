@@ -2,7 +2,6 @@ package com.avaje.tests.model.softdelete;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.List;
 @Entity
 public class ESoftDelMid extends BaseSoftDelete {
 
-  @ManyToOne(optional = false)
+  @ManyToOne
   ESoftDelTop top;
 
   String mid;
