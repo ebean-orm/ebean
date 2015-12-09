@@ -1,11 +1,13 @@
 package com.avaje.ebean;
 
-import org.junit.Assert;
+import com.avaje.tests.model.basic.Customer;
+import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
 import com.avaje.ebean.RawSql.Sql;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TestRawSqlBuilder extends BaseTestCase {
 
@@ -17,8 +19,27 @@ public class TestRawSqlBuilder extends BaseTestCase {
     assertEquals("id", sql.getPreFrom());
     assertEquals("from t_cust", sql.getPreWhere());
     assertEquals("", sql.getPreHaving());
-    Assert.assertNull(sql.getOrderBy());
+    assertNull(sql.getOrderBy());
+  }
 
+  @Test
+  public void testWithNewLineCharacters() {
+
+    RawSqlBuilder r = RawSqlBuilder.parse("select\n id from\n o_customer");
+    Sql sql = r.getSql();
+
+    assertEquals("id", sql.getPreFrom());
+    assertEquals("from  o_customer", sql.getPreWhere());
+    assertEquals("", sql.getPreHaving());
+    assertNull(sql.getOrderBy());
+
+    ResetBasicData.reset();
+
+    RawSql rawSql = r.create();
+
+    Ebean.find(Customer.class)
+        .setRawSql(rawSql)
+        .findList();
   }
 
   @Test
@@ -29,7 +50,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     assertEquals("id", sql.getPreFrom());
     assertEquals("from t_cust where id > ?", sql.getPreWhere());
     assertEquals("", sql.getPreHaving());
-    Assert.assertNull(sql.getOrderBy());
+    assertNull(sql.getOrderBy());
   }
 
   @Test
@@ -87,7 +108,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     assertEquals("id, sum(x)", sql.getPreFrom());
     assertEquals("from t_cust", sql.getPreWhere());
     assertEquals("group by id having sum(x) > ?", sql.getPreHaving());
-    Assert.assertNull(sql.getOrderBy());
+    assertNull(sql.getOrderBy());
     assertEquals("order by", sql.getOrderByPrefix());
 
     // no order by
@@ -97,7 +118,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
     assertEquals("id, sum(x)", sql.getPreFrom());
     assertEquals("from t_cust where id > ?", sql.getPreWhere());
     assertEquals("group by id having sum(x) > ?", sql.getPreHaving());
-    Assert.assertNull(sql.getOrderBy());
+    assertNull(sql.getOrderBy());
     assertEquals("order by", sql.getOrderByPrefix());
   }
 
