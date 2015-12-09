@@ -2,28 +2,27 @@ package com.avaje.tests.model.softdelete;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
 public class ESoftDelTop extends BaseSoftDelete {
 
-  String top;
+  String name;
 
   @OneToMany(mappedBy = "top", cascade = CascadeType.ALL)
   List<ESoftDelMid> mids;
 
-  public ESoftDelTop(String top) {
-    this.top = top;
+  public ESoftDelTop(String name) {
+    this.name = name;
   }
 
-  public String getTop() {
-    return top;
+  public String getName() {
+    return name;
   }
 
-  public void setTop(String top) {
-    this.top = top;
+  public void setName(String top) {
+    this.name = name;
   }
 
   public List<ESoftDelMid> getMids() {
