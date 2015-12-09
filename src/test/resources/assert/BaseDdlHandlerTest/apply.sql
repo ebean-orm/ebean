@@ -4,6 +4,7 @@ create table foo (
   col3                          varchar(30) not null,
   constraint pk_foo primary key (col1)
 );
+comment on table foo is 'comment';
 create sequence foo_seq;
 
 alter table foo add column added_to_foo varchar(20);
