@@ -166,6 +166,10 @@ public class AnnotationFields extends AnnotationParser {
       prop.setSoftDelete();
     }
 
+    DbComment comment = get(prop, DbComment.class);
+    if (comment != null) {
+      prop.setDbComment(comment.value());
+    }
     DbJson dbJson = get(prop, DbJson.class);
     if (dbJson != null) {
       util.setDbJsonType(prop, dbJson);

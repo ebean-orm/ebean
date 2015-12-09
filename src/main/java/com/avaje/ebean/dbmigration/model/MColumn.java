@@ -16,6 +16,7 @@ public class MColumn {
   private String references;
   private String foreignKeyName;
   private String foreignKeyIndex;
+  private String comment;
 
   private boolean historyExclude;
   private boolean notnull;
@@ -43,6 +44,7 @@ public class MColumn {
     this.checkConstraint = column.getCheckConstraint();
     this.checkConstraintName = column.getCheckConstraintName();
     this.defaultValue = column.getDefaultValue();
+    this.comment = column.getComment();
     this.references = column.getReferences();
     this.foreignKeyName = column.getForeignKeyName();
     this.foreignKeyIndex = column.getForeignKeyIndex();
@@ -76,6 +78,7 @@ public class MColumn {
     copy.checkConstraintName = checkConstraintName;
     copy.defaultValue = defaultValue;
     copy.references = references;
+    copy.comment = comment;
     copy.foreignKeyName = foreignKeyName;
     copy.foreignKeyIndex = foreignKeyIndex;
     copy.historyExclude = historyExclude;
@@ -198,6 +201,19 @@ public class MColumn {
     return uniqueOneToOne;
   }
 
+  /**
+   * Return the column comment.
+   */
+  public String getComment() {
+    return comment;
+  }
+
+  /**
+   * Set the column comment.
+   */
+  public void setComment(String comment) {
+    this.comment = comment;
+  }
 
   /**
    * Set the draftOnly status for this column.
@@ -237,6 +253,7 @@ public class MColumn {
     c.setForeignKeyName(foreignKeyName);
     c.setForeignKeyIndex(foreignKeyIndex);
     c.setDefaultValue(defaultValue);
+    c.setComment(comment);
     c.setUnique(unique);
     c.setUniqueOneToOne(uniqueOneToOne);
 

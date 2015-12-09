@@ -38,6 +38,11 @@ public class PlatformDdl {
   private final DbIdentity dbIdentity;
 
   /**
+   * Set to true if table and column comments are included inline with the create statements.
+   */
+  protected boolean inlineComments;
+
+  /**
    * Default assumes if exists is supported.
    */
   protected String dropTableIfExists = "drop table if exists ";
@@ -114,6 +119,13 @@ public class PlatformDdl {
    */
   public String asIdentityColumn(String columnDefn) {
     return columnDefn + identitySuffix;
+  }
+
+  /**
+   * Return true if the table and column comments are included inline.
+   */
+  public boolean isInlineComments() {
+    return inlineComments;
   }
 
   /**
@@ -385,5 +397,28 @@ public class PlatformDdl {
    */
   protected boolean isTrue(Boolean value) {
     return Boolean.TRUE.equals(value);
+  }
+
+  /**
+   * Add an inline table comment to the create table statement.
+   */
+  public void inlineTableComment(DdlBuffer apply, String tableComment) throws IOException {
+    // do nothing by default (MySql only)
+  }
+
+  /**
+   * Add table comment as a separate statement (from the create table statement).
+   */
+  public void addTableComment(DdlBuffer apply, String tableName, String tableComment) throws IOException {
+
+    apply.append(String.format("comment on table %s is '%s'", tableName, tableComment)).endOfStatement();
+  }
+
+  /**
+   * Add column comment as a separate statement.
+   */
+  public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
+
+    apply.append(String.format("comment on column %s.%s is '%s'", table, column, comment)).endOfStatement();
   }
 }

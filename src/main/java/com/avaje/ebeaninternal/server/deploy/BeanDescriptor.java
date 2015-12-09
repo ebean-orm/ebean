@@ -156,6 +156,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   private final String draftTable;
 
   /**
+   * DB table comment.
+   */
+  private final String dbComment;
+
+  /**
    * Set to true if read auditing is on for this bean type.
    */
   private final boolean readAuditing;
@@ -397,6 +402,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     this.baseTable = InternString.intern(deploy.getBaseTable());
     this.baseTableAsOf = deploy.getBaseTableAsOf();
     this.baseTableVersionsBetween = deploy.getBaseTableVersionsBetween();
+    this.dbComment = deploy.getDbComment();
     this.autoTunable = EntityType.ORM.equals(entityType) && (beanFinder == null);
 
     // helper object used to derive lists of properties
@@ -1934,6 +1940,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    */
   public boolean isSqlSelectBased() {
     return EntityType.SQL.equals(entityType);
+  }
+
+  /**
+   * Return the DB comment for the base table.
+   */
+  public String getDbComment() {
+    return dbComment;
   }
 
   /**

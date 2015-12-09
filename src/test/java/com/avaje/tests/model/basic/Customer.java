@@ -2,6 +2,7 @@ package com.avaje.tests.model.basic;
 
 import com.avaje.ebean.annotation.ChangeLog;
 import com.avaje.ebean.annotation.ChangeLogInsertMode;
+import com.avaje.ebean.annotation.DbComment;
 import com.avaje.ebean.annotation.DbEnumValue;
 import com.avaje.ebean.annotation.JsonIgnore;
 import com.avaje.ebean.annotation.Where;
@@ -26,6 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @ChangeLog(inserts = ChangeLogInsertMode.EXCLUDE, updatesThatInclude = {"name","status"})
 @Entity
 @Table(name = "o_customer")
+@DbComment("Holds external customers")
 public class Customer extends BasicDomain {
 
   private static final long serialVersionUID = 1L;
@@ -60,15 +62,18 @@ public class Customer extends BasicDomain {
   @Transient
   ReentrantLock lock = new ReentrantLock();
 
+  @DbComment("status of the customer")
   Status status;
 
   @NotNull
   @Size(max = 40)
   String name;
 
+  @DbComment("Short notes regarding the customer")
   @Size(max = 100)
   String smallnote;
 
+  @DbComment("Join date of the customer")
   @NotNull(groups = { ValidationGroupSomething.class })
   Date anniversary;
 

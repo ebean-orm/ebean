@@ -165,6 +165,9 @@ public class DeployBeanDescriptor<T> {
 
   private ChangeLogFilter changeLogFilter;
 
+  private String dbComment;
+
+
   /**
    * Construct the BeanDescriptor.
    */
@@ -205,6 +208,14 @@ public class DeployBeanDescriptor<T> {
    */
   public boolean isReadAuditing() {
     return readAuditing;
+  }
+
+  public void setDbComment(String dbComment) {
+    this.dbComment = dbComment;
+  }
+
+  public String getDbComment() {
+    return dbComment;
   }
 
   public void setDraftable() {

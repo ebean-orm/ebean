@@ -212,6 +212,11 @@ public class BeanProperty implements ElPropertyValue {
   final String dbColumnDefn;
 
   /**
+   * Database DDL column comment.
+   */
+  final String dbComment;
+
+  /**
    * DB Constraint (typically check constraint on enum)
    */
   final String dbConstraintExpression;
@@ -298,6 +303,7 @@ public class BeanProperty implements ElPropertyValue {
     this.setter = deploy.getSetter();
 
     this.dbColumn = tableAliasIntern(descriptor, deploy.getDbColumn(), false, null);
+    this.dbComment = deploy.getDbComment();
     this.sqlFormulaJoin = InternString.intern(deploy.getSqlFormulaJoin());
     this.sqlFormulaSelect = InternString.intern(deploy.getSqlFormulaSelect());
     this.formula = sqlFormulaSelect != null;
@@ -377,6 +383,7 @@ public class BeanProperty implements ElPropertyValue {
     this.secondaryTableJoin = source.secondaryTableJoin;
     this.secondaryTableJoinPrefix = source.secondaryTableJoinPrefix;
 
+    this.dbComment = source.dbComment;
     this.dbBind = source.getDbBind();
     this.dbEncrypted = source.isDbEncrypted();
     this.dbEncryptedType = source.getDbEncryptedType();
@@ -997,6 +1004,13 @@ public class BeanProperty implements ElPropertyValue {
    */
   public String getDbColumn() {
     return dbColumn;
+  }
+
+  /**
+   * Return the comment for the associated DB column.
+   */
+  public String getDbComment() {
+    return dbComment;
   }
 
   /**

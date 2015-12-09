@@ -9,6 +9,7 @@ import javax.persistence.UniqueConstraint;
 
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.CacheTuning;
+import com.avaje.ebean.annotation.DbComment;
 import com.avaje.ebean.annotation.Draftable;
 import com.avaje.ebean.annotation.DraftableElement;
 import com.avaje.ebean.annotation.EntityConcurrencyMode;
@@ -118,6 +119,11 @@ public class AnnotationClass extends AnnotationParser {
     History history = cls.getAnnotation(History.class);
     if (history != null) {
       descriptor.setHistorySupport();
+    }
+
+    DbComment comment = cls.getAnnotation(DbComment.class);
+    if (comment != null) {
+      descriptor.setDbComment(comment.value());
     }
 
     UpdateMode updateMode = cls.getAnnotation(UpdateMode.class);

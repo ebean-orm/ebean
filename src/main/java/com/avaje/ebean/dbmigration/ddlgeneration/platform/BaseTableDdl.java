@@ -21,6 +21,7 @@ import com.avaje.ebean.dbmigration.migration.DropTable;
 import com.avaje.ebean.dbmigration.migration.ForeignKey;
 import com.avaje.ebean.dbmigration.migration.UniqueConstraint;
 import com.avaje.ebean.dbmigration.model.MTable;
+import com.avaje.ebean.util.StringHelper;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -123,7 +124,11 @@ public class BaseTableDdl implements TableDdl {
       writePrimaryKeyConstraint(apply, createTable.getPkName(), toColumnNames(pk));
     }
 
-    apply.newLine().append(")").endOfStatement();
+    apply.newLine().append(")");
+    addTableCommentInline(apply, createTable);
+    apply.endOfStatement();
+
+    addComments(apply, createTable);
 
     writeUniqueOneToOneConstraints(writer, createTable);
 
@@ -148,6 +153,37 @@ public class BaseTableDdl implements TableDdl {
 
     writeAddForeignKeys(writer, createTable);
 
+  }
+
+  /**
+   * Add table and column comments (separate from the create table statement).
+   */
+  private void addComments(DdlBuffer apply, CreateTable createTable) throws IOException {
+    if (!platformDdl.isInlineComments()) {
+      String tableComment = createTable.getComment();
+      if (!StringHelper.isNull(tableComment)) {
+        platformDdl.addTableComment(apply, createTable.getName(), tableComment);
+      }
+
+      List<Column> columns = createTable.getColumn();
+      for (Column column : columns) {
+        if (!StringHelper.isNull(column.getComment())) {
+          platformDdl.addColumnComment(apply, createTable.getName(), column.getName(), column.getComment());
+        }
+      }
+    }
+  }
+
+  /**
+   * Add the table comment inline with the create table statement.
+   */
+  private void addTableCommentInline(DdlBuffer apply, CreateTable createTable) throws IOException {
+    if (platformDdl.isInlineComments()) {
+      String tableComment = createTable.getComment();
+      if (!StringHelper.isNull(tableComment)) {
+        platformDdl.inlineTableComment(apply, tableComment);
+      }
+    }
   }
 
   private void writeTableColumns(DdlBuffer apply, List<Column> columns, boolean useIdentity) throws IOException {

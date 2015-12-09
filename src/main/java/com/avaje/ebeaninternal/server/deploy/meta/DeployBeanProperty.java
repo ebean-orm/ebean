@@ -193,6 +193,8 @@ public class DeployBeanProperty {
 
   private boolean softDelete;
 
+  private String dbComment;
+
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     this.desc = desc;
     this.propertyType = propertyType;
@@ -898,4 +900,11 @@ public class DeployBeanProperty {
     return softDelete;
   }
 
+  public void setDbComment(String dbComment) {
+    this.dbComment = dbComment;
+  }
+
+  public String getDbComment() {
+    return dbComment;
+  }
 }

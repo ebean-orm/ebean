@@ -2,7 +2,12 @@ package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
 import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
+import com.avaje.ebean.dbmigration.migration.Column;
+import com.avaje.ebeaninternal.server.lib.util.StringHelper;
+
+import java.io.IOException;
 
 /**
  * MySql specific DDL.
@@ -14,6 +19,7 @@ public class MySqlDdl extends PlatformDdl {
     this.alterColumn =  "modify";
     this.dropUniqueConstraint = "drop index";
     this.historyDdl = new MySqlHistoryDdl();
+    this.inlineComments = true;
   }
 
   /**
@@ -64,4 +70,26 @@ public class MySqlDdl extends PlatformDdl {
     // use modify
     return "alter table " + tableName + " modify " + columnName + " " + type + notnullClause;
   }
+
+  @Override
+  protected void writeColumnDefinition(DdlBuffer buffer, Column column, boolean useIdentity) throws IOException {
+    super.writeColumnDefinition(buffer, column, useIdentity);
+    String comment = column.getComment();
+    if (!StringHelper.isNull(comment)) {
+      // in mysql 5.5 column comment save in information_schema.COLUMNS.COLUMN_COMMENT(VARCHAR 1024)
+      if (comment.length() > 500) {
+        comment = comment.substring(0, 500);
+      }
+      buffer.append(String.format(" comment '%s'", comment));
+    }
+
+  }
+
+  public void inlineTableComment(DdlBuffer apply, String tableComment) throws IOException {
+    if (tableComment.length() > 1000) {
+      tableComment = tableComment.substring(0, 1000);
+    }
+    apply.append(" comment='").append(tableComment).append("'");
+  }
+
 }
