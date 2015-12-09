@@ -2,7 +2,10 @@ package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
 import com.avaje.ebean.config.dbplatform.DbIdentity;
 import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
+
+import java.io.IOException;
 
 /**
  * MS SQL Server platform specific DDL.
@@ -15,6 +18,7 @@ public class MsSqlServerDdl extends PlatformDdl {
     this.foreignKeyRestrict = "";
     this.inlineUniqueOneToOne = false;
     this.columnSetDefault = "add default";
+    this.dropConstraintIfExists = "drop constraint";
   }
 
   @Override
@@ -82,5 +86,21 @@ public class MsSqlServerDdl extends PlatformDdl {
 
     // can't alter itself - done in alterColumnBaseAttributes()
     return null;
+  }
+
+  /**
+   * Add table comment as a separate statement (from the create table statement).
+   */
+  public void addTableComment(DdlBuffer apply, String tableName, String tableComment) throws IOException {
+
+    // do nothing for MS SQL Server (cause it requires stored procedures etc)
+  }
+
+  /**
+   * Add column comment as a separate statement.
+   */
+  public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
+
+    // do nothing for MS SQL Server (cause it requires stored procedures etc)
   }
 }
