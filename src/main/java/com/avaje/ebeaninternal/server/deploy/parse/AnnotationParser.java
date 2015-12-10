@@ -5,9 +5,11 @@ import java.util.HashMap;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 
 import com.avaje.ebeaninternal.server.deploy.BeanCascadeInfo;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 
 /**
@@ -66,4 +68,31 @@ public abstract class AnnotationParser extends AnnotationBase {
 
   }
 
+  protected void readColumn(Column columnAnn, DeployBeanProperty prop) {
+
+    if (!isEmpty(columnAnn.name())) {
+      String dbColumn = databasePlatform.convertQuotedIdentifiers(columnAnn.name());
+      prop.setDbColumn(dbColumn);
+    }
+
+    prop.setDbInsertable(columnAnn.insertable());
+    prop.setDbUpdateable(columnAnn.updatable());
+    prop.setNullable(columnAnn.nullable());
+    prop.setUnique(columnAnn.unique());
+    if (columnAnn.precision() > 0) {
+      prop.setDbLength(columnAnn.precision());
+    } else if (columnAnn.length() != 255) {
+      // set default 255 on DbTypeMap
+      prop.setDbLength(columnAnn.length());
+    }
+    prop.setDbScale(columnAnn.scale());
+    prop.setDbColumnDefn(columnAnn.columnDefinition());
+
+    String baseTable = descriptor.getBaseTable();
+    String tableName = columnAnn.table();
+    if (!"".equals(tableName) && !tableName.equalsIgnoreCase(baseTable)) {
+      // its on a secondary table...
+      prop.setSecondaryTable(tableName);
+    }
+  }
 }

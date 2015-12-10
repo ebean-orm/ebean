@@ -79,6 +79,8 @@ public class ReadAnnotations {
       // dependent on field level annotations
       new AnnotationSql(info, javaxValidationAnnotations).parse();
 
+      new AnnotationClass(info).parseAttributeOverride();
+
     } catch (RuntimeException e) {
       throw new RuntimeException("Error reading annotations for " + info, e);
     }

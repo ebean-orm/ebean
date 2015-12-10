@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
@@ -26,20 +28,58 @@ import com.avaje.ebeaninternal.server.deploy.CompoundUniqueConstraint;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Read the class level deployment annotations.
  */
 public class AnnotationClass extends AnnotationParser {
 
+  private static final Logger logger = LoggerFactory.getLogger(AnnotationClass.class);
+
   private final String asOfViewSuffix;
 
   private final String versionsBetweenSuffix;
 
+  /**
+   * Create for normal early parse of class level annotations.
+   */
   public AnnotationClass(DeployBeanInfo<?> info, boolean validationAnnotations, String asOfViewSuffix, String versionsBetweenSuffix) {
     super(info, validationAnnotations);
     this.asOfViewSuffix = asOfViewSuffix;
     this.versionsBetweenSuffix = versionsBetweenSuffix;
+  }
+
+  /**
+   * Create to parse AttributeOverride annotations which is run last
+   * after all the properties/fields have been parsed fully.
+   */
+  public AnnotationClass(DeployBeanInfo<?> info) {
+    super(info, false);
+    this.asOfViewSuffix = null;
+    this.versionsBetweenSuffix = null;
+  }
+
+  /**
+   * Parse any AttributeOverride set on the class.
+   */
+  public void parseAttributeOverride() {
+
+    Class<?> cls = descriptor.getBeanType();
+    AttributeOverride override = cls.getAnnotation(AttributeOverride.class);
+    if (override != null) {
+      String propertyName = override.name();
+      Column column = override.column();
+      if (column != null) {
+        DeployBeanProperty beanProperty = descriptor.getBeanProperty(propertyName);
+        if (beanProperty == null) {
+          logger.error("AttributeOverride property [" + propertyName + "] not found on " + descriptor.getFullName());
+        } else {
+          readColumn(column, beanProperty);
+        }
+      }
+    }
   }
 
   /**

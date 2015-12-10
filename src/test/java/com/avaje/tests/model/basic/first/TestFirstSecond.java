@@ -15,7 +15,8 @@ public class TestFirstSecond extends BaseTestCase {
     Ebean.save(first);
 
     Second second = new Second();
-    second.setTitle("John");
+    second.setName("Jim");
+    second.setTitle("Sir");
     second.setFirst(first);
     Ebean.save(second);
 
@@ -23,7 +24,5 @@ public class TestFirstSecond extends BaseTestCase {
     second.getFirst().setName("changed");
     Ebean.save(second);
     Ebean.save(first);
-
-    
   }
 }

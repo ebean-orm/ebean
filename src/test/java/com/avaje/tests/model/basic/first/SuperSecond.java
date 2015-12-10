@@ -8,6 +8,8 @@ import javax.persistence.OneToOne;
 @MappedSuperclass
 public abstract class SuperSecond {
 
+  protected String name;
+
   @OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   @JoinColumn(name = "first")
   protected First first;
@@ -20,4 +22,11 @@ public abstract class SuperSecond {
     this.first = first;
   }
 
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
 }
