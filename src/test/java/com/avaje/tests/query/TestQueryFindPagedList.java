@@ -126,7 +126,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     assertFalse(pagedList4.hasNext());
     assertFalse(pagedList4.hasPrev());
-    assertThat(pagedList4.getDisplayXtoYofZ(" to ", "of ")).isEqualTo("1 to "+totalRowCount+" of "+totalRowCount);
+    assertThat(pagedList4.getDisplayXtoYofZ(" to ", " of ")).isEqualTo("1 to "+totalRowCount+" of "+totalRowCount);
 
     PagedList<Order> pagedList5 = Ebean.find(Order.class)
         .setFirstRow(0)
