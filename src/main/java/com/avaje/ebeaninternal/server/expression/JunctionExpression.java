@@ -315,6 +315,11 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
+  public PagedList<T> findPagedList() {
+    return exprList.findPagedList();
+  }
+
+  @Override
   public int findRowCount() {
     return exprList.findRowCount();
   }

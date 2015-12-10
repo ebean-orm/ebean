@@ -21,7 +21,9 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
 
   private final SpiQuery<T> query;
 
-  private final int pageSize;
+  private final int firstRow;
+
+  private final int maxRows;
 
   private final int pageIndex;
 
@@ -33,11 +35,29 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
 
   private List<T> list;
 
+  /**
+   * Construct with pageIndex/pageSize.
+   */
   public LimitOffsetPagedList(EbeanServer server, SpiQuery<T> query, int pageIndex, int pageSize) {
     this.server = server;
     this.query = query;
-    this.pageSize = pageSize;
+    this.maxRows = pageSize;
+    this.firstRow = pageIndex * pageSize;
     this.pageIndex = pageIndex;
+
+    query.setFirstRow(firstRow);
+    query.setMaxRows(pageSize);
+  }
+
+  /**
+   * Construct with firstRow/maxRows.
+   */
+  public LimitOffsetPagedList(EbeanServer server, SpiQuery<T> query) {
+    this.server = server;
+    this.query = query;
+    this.maxRows = query.getMaxRows();
+    this.firstRow = query.getFirstRow();
+    this.pageIndex = 0;
   }
 
   public void loadRowCount() {
@@ -56,8 +76,6 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
   public List<T> getList() {
     synchronized (monitor) {
       if (list == null) {
-        query.setFirstRow(pageIndex * pageSize);
-        query.setMaxRows(pageSize);
         list = server.findList(query, null);
       }
       return list;
@@ -70,7 +88,7 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
     if (rowCount == 0) {
       return 0;
     } else {
-      return ((rowCount - 1) / pageSize) + 1;
+      return ((rowCount - 1) / maxRows) + 1;
     }
   }
 
@@ -94,11 +112,11 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
   }
 
   public boolean hasNext() {
-    return pageIndex < (getTotalPageCount() - 1);
+    return (firstRow + maxRows) < getTotalRowCount();
   }
 
   public boolean hasPrev() {
-    return pageIndex > 0;
+    return firstRow > 0;
   }
 
   public int getPageIndex() {
@@ -106,13 +124,13 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
   }
 
   public int getPageSize() {
-    return pageSize;
+    return maxRows;
   }
 
   public String getDisplayXtoYofZ(String to, String of) {
 
-    int first = pageIndex * pageSize + 1;
-    int last = first + getList().size() - 1;
+    int first = firstRow + 1;
+    int last = firstRow + getList().size();
     int total = getTotalRowCount();
 
     return first + to + last + of + total;

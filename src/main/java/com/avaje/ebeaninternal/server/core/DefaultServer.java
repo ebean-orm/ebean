@@ -1384,6 +1384,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return new LimitOffsetPagedList<T>(this, (SpiQuery<T>)query, pageIndex, pageSize);
   }
 
+  @Override
+  public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction) {
+
+    SpiQuery<T> spiQuery = (SpiQuery<T>)query;
+    int maxRows = spiQuery.getMaxRows();
+    if (maxRows == 0) {
+      throw new PersistenceException("maxRows must be specified for findPagedList() query");
+    }
+
+    return new LimitOffsetPagedList<T>(this, spiQuery);
+  }
+
   public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer, Transaction t) {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);

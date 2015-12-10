@@ -1094,6 +1094,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return server.findPagedList(this, null, pageIndex, pageSize);
   }
 
+  @Override
+  public PagedList<T> findPagedList() {
+    return server.findPagedList(this, null);
+  }
+
   /**
    * Set an ordered bind parameter according to its position. Note that the position starts at 1 to
    * be consistent with JDBC PreparedStatement. You need to set a parameter value for each ? you

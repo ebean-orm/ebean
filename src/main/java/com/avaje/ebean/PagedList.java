@@ -17,6 +17,33 @@ import java.util.concurrent.Future;
  * limit the result set.
  * </p>
  *
+ *
+ * <h4>Example: typical use including total row count</h4>
+ * <pre>{@code
+ *
+ *     // We want to find the first 50 new orders
+ *     //  ... so we don't really need setFirstRow(0)
+ *
+ *     PagedList<Order> pagedList
+ *       = ebeanServer.find(Order.class)
+ *       .where().eq("status", Order.Status.NEW)
+ *       .order().asc("id")
+ *       .setFirstRow(0)
+ *       .setMaxRows(50)
+ *       .findPagedList();
+ *
+ *     // Optional: initiate the loading of the total
+ *     // row count in a background thread
+ *     pagedList.loadRowCount();
+ *
+ *     // fetch and return the list in the foreground thread
+ *     List<Order> orders = pagedList.getList();
+ *
+ *     // get the total row count (from the future)
+ *     int totalRowCount = pagedList.getTotalRowCount();
+ *
+ * }</pre>
+ *
  * <h4>Example: typical use including total row count</h4>
  * <pre>{@code
  *
@@ -156,11 +183,15 @@ public interface PagedList<T> {
 
   /**
    * Return the index position of this page. Zero based.
+   * <p>
+   * Note that if firstRows/maxRows is used rather than pageIndex/pageSize then
+   * this always returns 0.
+   * </p>
    */
   int getPageIndex();
 
   /**
-   * Return the page size used for this query.
+   * Return the page size used for this query. This is the same value as maxRows used by the query.
    */
   int getPageSize();
 

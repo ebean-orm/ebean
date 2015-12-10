@@ -513,6 +513,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction) {
+    return null;
+  }
+
+  @Override
   public <T> Set<T> findSet(Query<T> query, Transaction transaction) {
     return null;
   }

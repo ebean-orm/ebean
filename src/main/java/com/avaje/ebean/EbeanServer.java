@@ -1020,7 +1020,7 @@ public interface EbeanServer {
   SqlFutureList findFutureList(SqlQuery query, Transaction transaction);
 
   /**
-   * Return a PagedList for this query.
+   * Return a PagedList for this query using pageIndex and pageSize.
    * <p>
    * The benefit of using this over just using the normal {@link Query#setFirstRow(int)} and
    * {@link Query#setMaxRows(int)} is that it additionally wraps an optional call to
@@ -1041,6 +1041,38 @@ public interface EbeanServer {
    * @see Query#findPagedList(int, int)
    */
   <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction, int pageIndex, int pageSize);
+
+  /**
+   * Return a PagedList for this query using firstRow and maxRows.
+   * <p>
+   * The benefit of using this over findList() is that it provides functionality to get the
+   * total row count etc.
+   * </p>
+   * <p>
+   * If maxRows is not set on the query prior to calling findPagedList() then a
+   * PersistenceException is thrown.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  PagedList<Order> pagedList = Ebean.find(Order.class)
+   *       .setFirstRow(50)
+   *       .setMaxRows(20)
+   *       .findPagedList();
+   *
+   *       // fetch the total row count in the background
+   *       pagedList.loadRowCount();
+   *
+   *       List<Order> orders = pagedList.getList();
+   *       int totalRowCount = pagedList.getTotalRowCount();
+   *
+   * }</pre>
+   *
+   * @return The PagedList
+   *
+   * @see Query#findPagedList()
+   */
+  <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction);
 
   /**
    * Execute the query returning a set of entity beans.
