@@ -1,34 +1,55 @@
 package com.avaje.ebean.server.type;
 
-import java.sql.Types;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.H2Platform;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.type.CtCompoundType;
 import com.avaje.ebeaninternal.server.type.DefaultTypeManager;
+import com.avaje.ebeaninternal.server.type.RsetDataReader;
 import com.avaje.ebeaninternal.server.type.ScalarDataReader;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
 import com.avaje.tests.model.ivo.CMoney;
 import com.avaje.tests.model.ivo.ExhangeCMoneyRate;
 import com.avaje.tests.model.ivo.Money;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.sql.SQLException;
+import java.sql.Types;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestTypeManager extends BaseTestCase {
 
   @Test
+  public void testEnumWithChar() throws SQLException {
+
+    DefaultTypeManager typeManager = createTypeManager();
+
+    ScalarType<?> dayOfWeekType = typeManager.createEnumScalarType(MyDayOfWeek.class);
+
+    Object val = dayOfWeekType.read(new DummyDataReader("MONDAY   "));
+    assertThat(val).isEqualTo(MyDayOfWeek.MONDAY);
+
+    val = dayOfWeekType.read(new DummyDataReader("TUESDAY  "));
+    assertThat(val).isEqualTo(MyDayOfWeek.TUESDAY);
+
+    val = dayOfWeekType.read(new DummyDataReader("WEDNESDAY"));
+    assertThat(val).isEqualTo(MyDayOfWeek.WEDNESDAY);
+
+    val = dayOfWeekType.read(new DummyDataReader("THURSDAY "));
+    assertThat(val).isEqualTo(MyDayOfWeek.THURSDAY);
+
+    val = dayOfWeekType.read(new DummyDataReader("FRIDAY   "));
+    assertThat(val).isEqualTo(MyDayOfWeek.FRIDAY);
+  }
+
+  @Test
   public void test() {
 
-    ServerConfig serverConfig = new ServerConfig();
-    serverConfig.setDatabasePlatform(new H2Platform());
-
-    BootupClasses bootupClasses = new BootupClasses();
-
-    DefaultTypeManager typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
+    DefaultTypeManager typeManager = createTypeManager();
 
     CheckImmutableResponse checkImmutable = typeManager.checkImmutable(Money.class);
     Assert.assertTrue(checkImmutable.isImmutable());
@@ -50,4 +71,31 @@ public class TestTypeManager extends BaseTestCase {
 
   }
 
+  private DefaultTypeManager createTypeManager() {
+
+    ServerConfig serverConfig = new ServerConfig();
+    serverConfig.setDatabasePlatform(new H2Platform());
+
+    BootupClasses bootupClasses = new BootupClasses();
+
+    return new DefaultTypeManager(serverConfig, bootupClasses);
+  }
+
+  /**
+   * Test double DataReader implementation.
+   */
+  private static class DummyDataReader extends RsetDataReader {
+
+    String val;
+
+    public DummyDataReader(String val) {
+      super(null);
+      this.val = val;
+    }
+
+    @Override
+    public String getString() throws SQLException {
+      return val;
+    }
+  }
 }

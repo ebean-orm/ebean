@@ -553,7 +553,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       maxValueLen = Math.max(maxValueLen, value.length());
 
       Object enumValue = Enum.valueOf(enumType, name.trim());
-      beanDbMap.add(enumValue, value.trim());
+      beanDbMap.add(enumValue, value);
     }
 
     if (dbColumnLength == 0 && !integerType) {
