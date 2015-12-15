@@ -785,7 +785,7 @@ public interface ExpressionList<T> extends Serializable {
    * qualified) will still be translated to their physical name.
    * </p>
    */
-  ExpressionList<T> raw(String raw, Object[] values);
+  ExpressionList<T> raw(String raw, Object... values);
 
   /**
    * Add raw expression with no parameters.

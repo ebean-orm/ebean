@@ -33,7 +33,7 @@ public class TestWhereRawClause extends BaseTestCase {
         .ne("id", 42)
         .raw("orderQty < ?", 100)
         .gt("id", 1)
-        .raw("unitPrice > ? and product.id > ?", new Object[]{2,3})
+        .raw("unitPrice > ? and product.id > ?", 2, 3)
         .findList();
 
   }

@@ -696,7 +696,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public ExpressionList<T> raw(String raw, Object[] values) {
+  public ExpressionList<T> raw(String raw, Object... values) {
     add(expr.raw(raw, values));
     return this;
   }

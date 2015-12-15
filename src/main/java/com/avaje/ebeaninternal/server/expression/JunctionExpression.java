@@ -572,7 +572,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
-  public ExpressionList<T> raw(String raw, Object[] values) {
+  public ExpressionList<T> raw(String raw, Object... values) {
     return exprList.raw(raw, values);
   }
 
