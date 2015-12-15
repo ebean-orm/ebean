@@ -401,8 +401,10 @@ public class DefaultBeanLoader {
       ebi.setPersistenceContext(pc);
     }
 
+    boolean draft = desc.isDraftInstance(bean);
+
     if (embeddedOwnerIndex == -1) {
-      if (SpiQuery.Mode.LAZYLOAD_BEAN.equals(mode) && desc.isBeanCaching()) {
+      if (!draft && SpiQuery.Mode.LAZYLOAD_BEAN.equals(mode) && desc.isBeanCaching()) {
         // lazy loading and the bean cache is active 
         if (desc.cacheBeanLoad(bean, ebi, id)) {
           return;
@@ -415,10 +417,12 @@ public class DefaultBeanLoader {
 
     SpiQuery<?> query = (SpiQuery<?>) server.createQuery(desc.getBeanType());
     query.setLazyLoadProperty(ebi.getLazyLoadProperty());
+    if (draft) {
+      query.asDraft();
+    }
 
     if (embeddedOwnerIndex > -1) {
-      String embeddedBeanPropertyName = ebi.getProperty(embeddedOwnerIndex);
-      query.select("id," + embeddedBeanPropertyName);
+      query.select("id," + ebi.getProperty(embeddedOwnerIndex));
     }
 
     // don't collect AutoTune usage profiling information
