@@ -160,8 +160,10 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
     Collection<MColumn> cols = table.getColumns().values();
     for (MColumn column : cols) {
-      writeColumnDefinition(apply, column.getName(), column.getType());
-      apply.append(",").newLine();
+      if (!column.isDraftOnly()) {
+        writeColumnDefinition(apply, column.getName(), column.getType());
+        apply.append(",").newLine();
+      }
     }
     writeColumnDefinition(apply, sysPeriodStart, sysPeriodType);
     apply.append(",").newLine();

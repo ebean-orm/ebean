@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 
-//@History
+@History
 @Draftable
 @Entity
 public class Link extends BaseDomain {
