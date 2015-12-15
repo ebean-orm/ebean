@@ -461,7 +461,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public boolean isHardDeleteDraft() {
     if (type == Type.DELETE && beanDescriptor.isDraftable() && !beanDescriptor.isDraftableElement()) {
       // deleting a top level draftable bean
-      if (!beanDescriptor.isDraftInstance(entityBean)) {
+      if (beanDescriptor.isLiveInstance(entityBean)) {
         throw new PersistenceException("Explicit Delete is not allowed on a 'live' bean - only draft beans");
       }
       return true;
@@ -474,7 +474,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Save or Update is not allowed to execute using 'live' beans - must use publish().
    */
   public void checkDraft() {
-    if (beanDescriptor.isDraftable() && !beanDescriptor.isDraftInstance(entityBean)) {
+    if (beanDescriptor.isDraftable() && beanDescriptor.isLiveInstance(entityBean)) {
       throw new PersistenceException("Save or update is not allowed on a 'live' bean - only draft beans");
     }
   }
@@ -754,7 +754,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       intercept.setLoadedProperty(i);
     }
     beanDescriptor.setEmbeddedOwner(entityBean);
-    beanDescriptor.setDraft(entityBean);
+    if (!publish) {
+      beanDescriptor.setDraft(entityBean);
+    }
   }
 
   public boolean isReference() {
