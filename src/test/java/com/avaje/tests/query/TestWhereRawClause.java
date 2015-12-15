@@ -15,7 +15,25 @@ public class TestWhereRawClause extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Ebean.find(OrderDetail.class).where().not(Expr.eq("id", 1)).raw("orderQty < shipQty")
+    Ebean.find(OrderDetail.class)
+        .where()
+        .not(Expr.eq("id", 1))
+        .raw("orderQty < shipQty")
+        .findList();
+
+  }
+
+  @Test
+  public void testRawWithBindParams() {
+
+    ResetBasicData.reset();
+
+    Ebean.find(OrderDetail.class)
+        .where()
+        .ne("id", 42)
+        .raw("orderQty < ?", 100)
+        .gt("id", 1)
+        .raw("unitPrice > ? and product.id > ?", new Object[]{2,3})
         .findList();
 
   }
