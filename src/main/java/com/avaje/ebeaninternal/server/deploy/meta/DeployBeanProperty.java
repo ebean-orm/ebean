@@ -877,6 +877,7 @@ public class DeployBeanProperty {
   public void setDraftDirty() {
     this.draftOnly = true;
     this.draftDirty = true;
+    this.nullable = false;
   }
 
   public boolean isDraftDirty() {
