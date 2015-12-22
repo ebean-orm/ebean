@@ -1,11 +1,13 @@
 package com.avaje.tests.draftable;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.draftable.Doc;
 import com.avaje.tests.model.draftable.Link;
 import org.assertj.core.api.StrictAssertions;
+import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
 import javax.persistence.PersistenceException;
@@ -15,7 +17,32 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class DocLinkTest {
+public class DocLinkTest extends BaseTestCase {
+
+  @Test
+  public void testLazyLoadOnDraftProperty() {
+
+    Link link1 = new Link("something");
+    link1.save();
+
+    Ebean.getDefaultServer().publish(Link.class, link1.getId());
+
+    Link link = Ebean.find(Link.class)
+        .setId(link1.getId())
+        .select("name")
+        .findUnique();
+
+    assertThat(link).isNotNull();
+
+    LoggedSqlCollector.start();
+
+    // no lazy loading is invoked as draft property considered @Transient
+    assertThat(link.isDraft()).isFalse();
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).isEmpty();
+
+  }
 
   @Test
   public void testUpdate_whenNotPublished() {
