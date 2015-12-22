@@ -82,6 +82,7 @@ public class TestQueryFindIterate extends BaseTestCase {
             .select("status, orderDate")
             .fetch("customer", "name")
             .where().gt("id",0).le("id",10)
+            .setUseCache(false)
             .findIterate();
 
     try {
