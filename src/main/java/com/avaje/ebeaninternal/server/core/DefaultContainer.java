@@ -47,8 +47,6 @@ public class DefaultContainer implements SpiContainer {
 
   private final JndiDataSourceLookup jndiDataSourceFactory;
 
-//  private final AtomicInteger serverId = new AtomicInteger(1);
-
   public DefaultContainer(ContainerConfig containerConfig) {
 
     this.clusterManager = new ClusterManager(containerConfig);
@@ -116,7 +114,6 @@ public class DefaultContainer implements SpiContainer {
 
       ServerCacheManager cacheManager = getCacheManager(serverConfig);
 
-//      int uniqueServerId = serverId.incrementAndGet();
       SpiBackgroundExecutor bgExecutor = createBackgroundExecutor(serverConfig);
 
       XmlConfigLoader xmlConfigLoader = new XmlConfigLoader(null);
@@ -127,19 +124,6 @@ public class DefaultContainer implements SpiContainer {
       DefaultServer server = new DefaultServer(c, cacheManager);
 
       cacheManager.init(server);
-
-//      if (serverConfig.isRegisterJmxMBeans()) {
-//        MBeanServer mbeanServer;
-//        ArrayList<?> list = MBeanServerFactory.findMBeanServer(null);
-//        if (list.size() == 0) {
-//          // probably not running in a server
-//          mbeanServer = MBeanServerFactory.createMBeanServer();
-//        } else {
-//          // use the first MBeanServer
-//          mbeanServer = (MBeanServer) list.get(0);
-//        }
-//        server.registerMBeans(mbeanServer, uniqueServerId);
-//      }
 
       // generate and run DDL if required
       // if there are any other tasks requiring action in their plugins, do them as well
