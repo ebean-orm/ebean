@@ -466,7 +466,7 @@ public class ClassPathSearch implements ClassPathSearchService {
   }
 
   /**
-   * If a jarfile with a manifest claspath return that.
+   * If a jarfile with a manifest classpath return that.
    */
   private static List<URI> getClassPathFromManifest(File jarFile, Manifest manifest) {
 
