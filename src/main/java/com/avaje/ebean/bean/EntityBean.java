@@ -74,16 +74,6 @@ public interface EntityBean extends Serializable {
   EntityBeanIntercept _ebean_intercept();
 
   /**
-   * Create a copy of this entity bean.
-   * <p>
-   * This occurs when a bean is changed. The copy represents the bean as it was
-   * initially (oldValues) before any changes where made. This is used for
-   * optimistic concurrency control.
-   * </p>
-   */
-  Object _ebean_createCopy();
-
-  /**
    * Set the value of a field of an entity bean of this type.
    * <p>
    * Note that using this method bypasses any interception that otherwise occurs
