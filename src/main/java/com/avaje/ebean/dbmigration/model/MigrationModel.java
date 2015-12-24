@@ -1,12 +1,13 @@
 package com.avaje.ebean.dbmigration.model;
 
-import com.avaje.ebean.dbmigration.migration.Migration;
-import com.avaje.ebean.dbmigration.migrationreader.MigrationXmlReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.io.File;
+import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Build the model from the series of migrations.
@@ -17,26 +18,12 @@ public class MigrationModel {
 
   private final ModelContainer model = new ModelContainer();
 
-  private final Set<String> readVersions = new LinkedHashSet<String>();
+  private final File migrationDirectory;
 
-  private final String resourcePath;
+  private MigrationVersion lastVersion;
 
-  int nextMajorVersion;
-
-  public MigrationModel(String resourcePath) {
-    this.resourcePath = normaliseResourcePath(resourcePath);
-  }
-
-  private String normaliseResourcePath(String resourcePath) {
-    if (resourcePath.endsWith("/")) {
-      // trim trailing slash
-      resourcePath = resourcePath.substring(0, resourcePath.length()-1);
-    }
-    if (resourcePath.startsWith("/")) {
-      // trim leading slash
-      resourcePath = resourcePath.substring(1);
-    }
-    return resourcePath;
+  public MigrationModel(File migrationDirectory) {
+    this.migrationDirectory = migrationDirectory;
   }
 
   /**
@@ -46,57 +33,41 @@ public class MigrationModel {
   public ModelContainer read() {
 
     readMigrations();
-    logger.info("read versions {}", readVersions);
     return model;
-  }
-
-  /**
-   * Return the set of versions that were read.
-   */
-  public Set<String> getReadVersions() {
-    return readVersions;
-  }
-
-  public int getNextMajorVersion() {
-    return nextMajorVersion;
   }
 
   private void readMigrations() {
 
-    for (int majorVersion = 1; majorVersion < 100; majorVersion++) {
-      if (!readMinorVersions(majorVersion)){
-        // no major.0 version so stopping
-        nextMajorVersion = majorVersion;
-        return;
+    // find all the migration xml files
+    File[] xmlFiles = migrationDirectory.listFiles(new FileFilter() {
+      @Override
+      public boolean accept(File pathname) {
+        return pathname.getName().toLowerCase().endsWith(".xml");
       }
+    });
+
+    List<MigrationResource> resources = new ArrayList<MigrationResource>();
+
+    for (File xmlFile: xmlFiles) {
+      resources.add(new MigrationResource(xmlFile));
+    }
+
+    // sort into version order before applying
+    Collections.sort(resources);
+
+    for (MigrationResource migrationResource: resources) {
+      logger.debug("read {}", migrationResource);
+      model.apply(migrationResource.read());
+    }
+
+    // remember the last version
+    if (!resources.isEmpty()) {
+      lastVersion = resources.get(resources.size() - 1).getVersion();
     }
   }
 
-  private boolean readMinorVersions(int majorVersion) {
+  public String getNextVersion(String initialVersion) {
 
-    for (int minorVersion = 0; minorVersion < 100; minorVersion++) {
-      if (!readMigration(majorVersion, minorVersion)) {
-        // continue reading next major if minorVersion 0 was read
-        return (minorVersion > 0);
-      }
-    }
-    return true;
+    return lastVersion == null ? initialVersion : lastVersion.nextVersion();
   }
-
-  private boolean readMigration(int majorVersion, int minorVersion) {
-
-    String version = majorVersion+"."+minorVersion;
-    String path = "/"+resourcePath+"/v"+version+".xml";
-
-    Migration migration = MigrationXmlReader.readMaybe(path);
-    if (migration == null) {
-      logger.debug("... no migration at path:{}", path);
-      return false;
-    }
-    readVersions.add(version);
-    logger.trace("... read migration v{}", version);
-    model.apply(migration);
-    return true;
-  }
-
 }

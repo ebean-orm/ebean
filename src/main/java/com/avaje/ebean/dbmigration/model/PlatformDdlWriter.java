@@ -24,20 +24,19 @@ public class PlatformDdlWriter {
 
   private final String platformPrefix;
 
-  public PlatformDdlWriter(DatabasePlatform platform, ServerConfig serverConfig) {
-    this(platform, serverConfig, "");
-  }
+  private final boolean useSubdirectories;
 
-  public PlatformDdlWriter(DatabasePlatform platform, ServerConfig serverConfig, String platformPrefix) {
+  public PlatformDdlWriter(DatabasePlatform platform, ServerConfig serverConfig, String platformPrefix, boolean useSubdirectories) {
     this.platform = platform;
     this.serverConfig = serverConfig;
     this.platformPrefix = platformPrefix;
+    this.useSubdirectories = useSubdirectories;
   }
 
   /**
    * Write the migration as platform specific ddl.
    */
-  public void processMigration(Migration dbMigration, DdlWrite write, File writePath, int nextMajorVersion) throws IOException {
+  public void processMigration(Migration dbMigration, DdlWrite write, File writePath, String fullVersion) throws IOException {
 
     DdlHandler handler = handler();
 
@@ -49,16 +48,16 @@ public class PlatformDdlWriter {
     }
     handler.generateExtra(write);
 
-    writePlatformDdl(write, writePath, nextMajorVersion);
+    writePlatformDdl(write, writePath, fullVersion);
   }
 
   /**
    * Write the ddl files.
    */
-  protected void writePlatformDdl(DdlWrite write, File resourcePath, int migrationVersion) throws IOException {
+  protected void writePlatformDdl(DdlWrite write, File resourcePath, String fullVersion) throws IOException {
 
     if (!write.isApplyEmpty()) {
-      FileWriter applyWriter = createWriter(resourcePath, migrationVersion, "apply.sql");
+      FileWriter applyWriter = createWriter(resourcePath, fullVersion, "");
       try {
         writeApplyDdl(applyWriter, write);
         applyWriter.flush();
@@ -67,7 +66,7 @@ public class PlatformDdlWriter {
       }
 
       if (!write.isApplyRollbackEmpty()) {
-        FileWriter applyRollbackWriter = createWriter(resourcePath, migrationVersion, "applyRollback.sql");
+        FileWriter applyRollbackWriter = createWriter(resourcePath, fullVersion, "rollback");
         try {
           writeApplyRollbackDdl(applyRollbackWriter, write);
           applyRollbackWriter.flush();
@@ -78,7 +77,7 @@ public class PlatformDdlWriter {
     }
 
     if (!write.isDropEmpty()) {
-      FileWriter dropWriter = createWriter(resourcePath, migrationVersion, "drop.sql");
+      FileWriter dropWriter = createWriter(resourcePath, fullVersion, "drop");
       try {
         writeDropDdl(dropWriter, write);
         dropWriter.flush();
@@ -88,10 +87,30 @@ public class PlatformDdlWriter {
     }
   }
 
-  protected FileWriter createWriter(File resourcePath, int migrationVersion, String suffix) throws IOException {
+  protected FileWriter createWriter(File path, String fullVersion, String suffix) throws IOException {
 
-    File applyFile = new File(resourcePath, "v" + migrationVersion + ".0-" + platformPrefix + suffix);
+    String fileName = fullVersion;
+    if (!platformPrefix.isEmpty()) {
+      fileName += "-"+platformPrefix;
+    }
+    if (!suffix.isEmpty()) {
+      fileName += "-"+suffix;
+      path = subPath(path, suffix);
+    }
+    fileName += ".sql";
+    File applyFile = new File(path,  fileName);
     return new FileWriter(applyFile);
+  }
+
+  protected File subPath(File path, String suffix) {
+    if (!useSubdirectories) {
+      return path;
+    }
+    File subPath = new File(path, suffix);
+    if (!subPath.exists()) {
+      subPath.mkdirs();
+    }
+    return subPath;
   }
 
   /**

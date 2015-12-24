@@ -21,8 +21,8 @@ import com.avaje.ebean.dbmigration.model.CurrentModel;
 import com.avaje.ebean.dbmigration.model.MConfiguration;
 import com.avaje.ebean.dbmigration.model.MigrationModel;
 import com.avaje.ebean.dbmigration.model.ModelContainer;
-import com.avaje.ebean.dbmigration.model.PlatformDdlWriter;
 import com.avaje.ebean.dbmigration.model.ModelDiff;
+import com.avaje.ebean.dbmigration.model.PlatformDdlWriter;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +57,13 @@ public class DbMigration {
 
   protected static final Logger logger = LoggerFactory.getLogger(DbMigration.class);
 
+  private static final String initialVersion = "1.0";
+
+  /**
+   * Set to true if DbMigration run with online EbeanServer instance.
+   */
+  protected final boolean online;
+
   protected SpiEbeanServer server;
 
   protected DbMigrationConfig migrationConfig;
@@ -71,7 +78,19 @@ public class DbMigration {
 
   protected DbConstraintNaming constraintNaming;
 
+  /**
+   * Create for offline migration generation.
+   */
   public DbMigration() {
+    this.online = false;
+  }
+
+  /**
+   * Create using online EbeanServer.
+   */
+  public DbMigration(EbeanServer server) {
+    this.online = true;
+    setServer(server);
   }
 
   /**
@@ -125,7 +144,9 @@ public class DbMigration {
    */
   public void setPlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
-    DbOffline.setPlatform(databasePlatform.getName());
+    if (!online) {
+      DbOffline.setPlatform(databasePlatform.getName());
+    }
   }
 
   /**
@@ -175,16 +196,18 @@ public class DbMigration {
   public void generateMigration() throws IOException {
 
     // use this flag to stop other plugins like full DDL generation
-    DbOffline.setRunningMigration();
+    if (!online) {
+      DbOffline.setRunningMigration();
+    }
 
     setDefaults();
 
     try {
-      MigrationModel migrationModel = new MigrationModel(migrationConfig.getResourcePath());
-      ModelContainer migrated = migrationModel.read();
-      int nextMajorVersion = migrationModel.getNextMajorVersion();
 
-      logger.info("next migration version {}", nextMajorVersion);
+      File migrationDirectory = getMigrationDirectory();
+
+      MigrationModel migrationModel = new MigrationModel(migrationDirectory);
+      ModelContainer migrated = migrationModel.read();
 
       CurrentModel currentModel = new CurrentModel(server, constraintNaming);
       ModelContainer current = currentModel.read();
@@ -200,46 +223,88 @@ public class DbMigration {
       // there were actually changes to write
       Migration dbMigration = diff.getMigration();
 
-      File writePath = getWritePath();
-      logger.info("migration writing version {} to {}", nextMajorVersion, writePath.getAbsolutePath());
-      writeMigrationXml(dbMigration, writePath, nextMajorVersion);
+      String fullVersion = getFullVersion(migrationModel);
 
-      if (databasePlatform != null) {
-        // writer needs the current model to provide table/column details for
-        // history ddl generation (triggers, history tables etc)
-        DdlWrite write = new DdlWrite(new MConfiguration(), currentModel.read());
-        PlatformDdlWriter writer = new PlatformDdlWriter(databasePlatform, serverConfig);
-        writer.processMigration(dbMigration, write, writePath, nextMajorVersion);
+      logger.info("generating migration:{}", fullVersion);
+      if (!writeMigrationXml(dbMigration, migrationDirectory, fullVersion)) {
+        logger.warn("migration already exists, not generating DDL");
+
+      } else {
+        if (databasePlatform != null) {
+          // writer needs the current model to provide table/column details for
+          // history ddl generation (triggers, history tables etc)
+          DdlWrite write = new DdlWrite(new MConfiguration(), currentModel.read());
+          PlatformDdlWriter writer = createDdlWriter(databasePlatform, "");
+          writer.processMigration(dbMigration, write, migrationDirectory, fullVersion);
+        }
+        writeExtraPlatformDdl(fullVersion, currentModel, dbMigration, migrationDirectory);
       }
 
-      writeExtraPlatformDdl(nextMajorVersion, currentModel, dbMigration, writePath);
-
     } finally {
-      DbOffline.reset();
+      if (!online) {
+        DbOffline.reset();
+      }
     }
+  }
+
+  /**
+   * Return the full version for the migration being generated.
+   */
+  private String getFullVersion(MigrationModel migrationModel) {
+
+    String version = migrationConfig.getVersion();
+    if (version == null) {
+      version = migrationModel.getNextVersion(initialVersion);
+    }
+
+    String fullVersion = version;
+
+    String name = migrationConfig.getName();
+    if (name != null) {
+      fullVersion += "__" + toUnderScore(name);
+    }
+    return fullVersion;
+  }
+
+  /**
+   * Replace spaces with underscores.
+   */
+  private String toUnderScore(String name) {
+    return name.replace(' ','_');
   }
 
   /**
    * Write any extra platform ddl.
    */
-  protected void writeExtraPlatformDdl(int nextMajorVersion, CurrentModel currentModel, Migration dbMigration, File writePath) throws IOException {
+  protected void writeExtraPlatformDdl(String fullVersion, CurrentModel currentModel, Migration dbMigration, File writePath) throws IOException {
 
     for (Pair pair : platforms) {
       DdlWrite platformBuffer = new DdlWrite(new MConfiguration(), currentModel.read());
-
-      PlatformDdlWriter platformWriter = new PlatformDdlWriter(pair.platform, serverConfig, pair.prefix);
-      platformWriter.processMigration(dbMigration, platformBuffer, writePath, nextMajorVersion);
+      PlatformDdlWriter platformWriter = createDdlWriter(pair);
+      platformWriter.processMigration(dbMigration, platformBuffer, writePath, fullVersion);
     }
+  }
+
+  private PlatformDdlWriter createDdlWriter(Pair pair) {
+    return createDdlWriter(pair.platform, pair.prefix);
+  }
+
+  private PlatformDdlWriter createDdlWriter(DatabasePlatform platform, String prefix) {
+    return new PlatformDdlWriter(platform, serverConfig, prefix, migrationConfig.isUseSubdirectories());
   }
 
   /**
    * Write the migration xml.
    */
-  protected void writeMigrationXml(Migration dbMigration, File resourcePath, int migrationVersion) {
+  protected boolean writeMigrationXml(Migration dbMigration, File resourcePath, String fullVersion) {
 
-    File file = new File(resourcePath, "v"+migrationVersion+".0.xml");
+    File file = new File(resourcePath, fullVersion+".xml");
+    if (file.exists()) {
+      return false;
+    }
     MigrationXmlWriter xmlWriter = new MigrationXmlWriter();
     xmlWriter.write(dbMigration, file);
+    return true;
   }
 
   /**
@@ -260,7 +325,7 @@ public class DbMigration {
   /**
    * Return the file path to write the xml and sql to.
    */
-  protected File getWritePath() {
+  protected File getMigrationDirectory() {
 
     // path to src/main/resources in typical maven project
     File resourceRootDir = new File(pathToResources);

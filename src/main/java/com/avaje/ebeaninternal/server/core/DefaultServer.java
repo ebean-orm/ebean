@@ -9,6 +9,7 @@ import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.bean.PersistenceContext.WithOption;
 import com.avaje.ebean.cache.ServerCacheManager;
+import com.avaje.ebean.config.DbMigrationConfig;
 import com.avaje.ebean.config.EncryptKeyManager;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
@@ -373,6 +374,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Start any services after registering with the ClusterManager.
    */
   public void start() {
+    DbMigrationConfig migrationConfig = serverConfig.getMigrationConfig();
+    if (migrationConfig != null) {
+      migrationConfig.generateOnStart(this);
+    }
   }
 
   /**
