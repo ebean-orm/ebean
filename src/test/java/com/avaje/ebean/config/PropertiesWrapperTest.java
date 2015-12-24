@@ -1,5 +1,6 @@
 package com.avaje.ebean.config;
 
+import com.avaje.ebean.config.dbplatform.DbPlatformName;
 import org.junit.Test;
 
 import java.util.Properties;
@@ -15,6 +16,18 @@ public class PropertiesWrapperTest {
 
     PropertiesWrapper pw = new PropertiesWrapper(null, "myserver", new Properties());
     assertEquals("myserver", pw.getServerName());
+  }
+
+  @Test
+  public void testGetEnum() {
+
+    Properties properties = new Properties();
+    properties.put("platform","postgres");
+
+    PropertiesWrapper pw = new PropertiesWrapper("pref", "myserver", properties);
+    assertEquals(DbPlatformName.POSTGRES, pw.getEnum(DbPlatformName.class, "platform", DbPlatformName.H2));
+    assertEquals(DbPlatformName.H2, pw.getEnum(DbPlatformName.class, "junk", DbPlatformName.H2));
+    assertNull(pw.getEnum(DbPlatformName.class, "junk", null));
   }
 
   @Test

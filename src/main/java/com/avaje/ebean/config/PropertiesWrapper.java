@@ -141,8 +141,8 @@ public class PropertiesWrapper {
    * Return a Enum property value.
    */
   public <T extends Enum<T>> T getEnum(Class<T> enumType, String key, T defaultValue) {
-    String level = get(key, defaultValue.name());
-    return Enum.valueOf(enumType, level.toUpperCase());
+    String level = get(key, null);
+    return (level == null) ? defaultValue : Enum.valueOf(enumType, level.toUpperCase());
   }
 
 }
