@@ -45,7 +45,7 @@ final class DRawSqlColumnsParser {
     String colInfo = sqlSelect.substring(start, pos++);
     colInfo = colInfo.trim();
 
-    String[] split = colInfo.split(" ");
+    String[] split = colInfo.split("\\s(?=[^\\)]*(?:\\(|$))");
     if (split.length > 1) {
       ArrayList<String> tmp = new ArrayList<String>(split.length);
       for (int i = 0; i < split.length; i++) {
@@ -82,11 +82,13 @@ final class DRawSqlColumnsParser {
 
   private void nextComma() {
     boolean inQuote = false;
+    int inbrackets = 0;
     while (pos < end) {
       char c = sqlSelect.charAt(pos);
-      if (c == '\'') {
-        inQuote = !inQuote;
-      } else if (!inQuote && c == ',') {
+      if (c == '\'') inQuote = !inQuote;
+      else if (c == '(') inbrackets++;
+      else if (c == ')') inbrackets--;
+      else if (!inQuote && inbrackets == 0 && c == ',') {
         return;
       }
       pos++;
