@@ -2,6 +2,7 @@ package com.avaje.tests.draftable;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.PagedList;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.draftable.Link;
 import org.junit.Test;
@@ -31,6 +32,15 @@ public class LinkQueryPublishTest {
     ids.add(link1.getId());
     ids.add(link2.getId());
     ids.add(link3.getId());
+
+    PagedList<Link> pagedList =
+        server.find(Link.class).asDraft()
+        .where().idIn(ids)
+        .setMaxRows(10)
+        .findPagedList();
+
+    assertThat(pagedList.getTotalRowCount()).isEqualTo(3);
+
 
     Query<Link> pubQuery = server.find(Link.class)
         .where().idIn(ids)
