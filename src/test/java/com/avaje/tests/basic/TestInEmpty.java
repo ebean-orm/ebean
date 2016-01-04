@@ -2,23 +2,37 @@ package com.avaje.tests.basic;
 
 import java.util.List;
 
-import org.junit.Assert;
+import com.avaje.ebean.Query;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Order;
 
+import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
 public class TestInEmpty extends BaseTestCase {
 
   @Test
-  public void test() {
+  public void test_in_empty() {
 
-    List<Order> list = Ebean.find(Order.class).where().gt("id", 0).in("id", new Object[0])
-        .findList();
+    Query<Order> query = Ebean.find(Order.class).where().in("id", new Object[0]).gt("id", 0)
+        .query();
 
-    Assert.assertEquals(0, list.size());
+    List<Order> list = query.findList();
+    assertThat(query.getGeneratedSql()).contains("1=0");
+    assertEquals(0, list.size());
+  }
 
+  @Test
+  public void test_notIn_empty() {
+
+    Query<Order> query = Ebean.find(Order.class).where().notIn("id", new Object[0]).gt("id", 0)
+        .query();
+
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("1=1");
   }
 
 }

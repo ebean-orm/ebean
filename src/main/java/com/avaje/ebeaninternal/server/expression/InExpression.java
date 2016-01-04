@@ -1,12 +1,12 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import java.util.Collection;
-
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
+
+import java.util.Collection;
 
 class InExpression extends AbstractExpression {
 
@@ -54,10 +54,8 @@ class InExpression extends AbstractExpression {
   public void addSql(SpiExpressionRequest request) {
 
     if (values.length == 0) {
-      if (!not) {
-        // 'no match' for in empty collection
-        request.append("1=0");
-      }
+      String expr = not ? "1=1" : "1=0";
+      request.append(expr);
       return;
     }
 
