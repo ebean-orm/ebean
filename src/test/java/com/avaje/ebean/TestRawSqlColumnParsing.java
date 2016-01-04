@@ -89,7 +89,42 @@ public class TestRawSqlColumnParsing extends TestCase {
 
     }
 
-    
+    public void test_withDatabaseFunction() {
+
+        ColumnMapping columnMapping = DRawSqlColumnsParser.parse("a a0,b    b1, MONTH(MAKEDATE(2015, 241)) m2 ,   d    d3  , e  e4 ");
+        Map<String, Column> mapping = columnMapping.mapping();
+
+        assertEquals(5, mapping.size());
+
+        Column c = mapping.get("a");
+
+        assertEquals("a",c.getDbColumn());
+        assertEquals(0, c.getIndexPos());
+        assertEquals("a0",c.getPropertyName());
+
+        c = mapping.get("b");
+        assertEquals("b",c.getDbColumn());
+        assertEquals(1, c.getIndexPos());
+        assertEquals("b1",c.getPropertyName());
+
+        c = mapping.get("MONTH(MAKEDATE(2015, 241))");
+        assertEquals("MONTH(MAKEDATE(2015, 241))",c.getDbColumn());
+        assertEquals(2, c.getIndexPos());
+        assertEquals("m2",c.getPropertyName());
+
+        c = mapping.get("d");
+        assertEquals("d",c.getDbColumn());
+        assertEquals(3, c.getIndexPos());
+        assertEquals("d3",c.getPropertyName());
+
+
+        c = mapping.get("e");
+        assertEquals("e",c.getDbColumn());
+        assertEquals(4, c.getIndexPos());
+        assertEquals("e4",c.getPropertyName());
+
+    }
+
     public void test_withAsAlias() {
         
         ColumnMapping columnMapping = DRawSqlColumnsParser.parse("a as a0,'b'    b1, \"c(blah)\" as c2 ,   d as   d3  , e     as e4 ");
