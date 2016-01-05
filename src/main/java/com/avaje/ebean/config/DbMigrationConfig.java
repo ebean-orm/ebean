@@ -18,12 +18,15 @@ public class DbMigrationConfig {
    */
   protected DbPlatformName platform;
 
-  protected boolean useSubdirectories;
-
   /**
    * Set to true if the DB migration should be generated on server start.
    */
   protected boolean generate;
+
+  /**
+   * Set to true to suppress the output of the rollback script.
+   */
+  protected boolean suppressRollback;
 
   /**
    * The migration version name (typically FlywayDb compatible).
@@ -50,9 +53,40 @@ public class DbMigrationConfig {
 
   /**
    * Resource path for the migration xml and sql.
-   * Typically you would change 'app' to be a better/more unique.
    */
-  protected String resourcePath = "dbmigration/app";
+  protected String migrationPath = "dbmigration";
+
+  /**
+   * Subdirectory the model xml files go into.
+   */
+  protected String modelPath = "model";
+
+  /**
+   * Subdirectory the drop ddl scripts go into.
+   */
+  protected String dropPath = "drop";
+
+  /**
+   * Subdirectory the rollback ddl scripts go into.
+   */
+  protected String rollbackPath = "rollback";
+
+  /**
+   * Apply script suffix.
+   */
+  protected String applySuffix = ".sql";
+
+  /**
+   * Default drop script suffix to ddl so that it isn't picked up by FlywayDb.
+   */
+  protected String dropSuffix = ".drop.ddl";
+
+  /**
+   * Default rollback script suffix to ddl so that it isn't picked up by FlywayDb.
+   */
+  protected String rollbackSuffix = ".rollback.ddl";
+
+  protected String modelSuffix = ".model.xml";
 
   /**
    * Return the DB platform to generate migration DDL for.
@@ -74,34 +108,132 @@ public class DbMigrationConfig {
   /**
    * Return the resource path for db migrations.
    */
-  public String getResourcePath() {
-    return resourcePath;
-  }
-
-  /**
-   * Return true if the 'rollback' and 'drop' scripts should be put into subdirectories.
-   */
-  public boolean isUseSubdirectories() {
-    return useSubdirectories;
-  }
-
-  /**
-   * Set to true if the 'rollback' and 'drop' scripts should be put into subdirectories.
-   */
-  public void setUseSubdirectories(boolean useSubdirectories) {
-    this.useSubdirectories = useSubdirectories;
+  public String getMigrationPath() {
+    return migrationPath;
   }
 
   /**
    * Set the resource path for db migrations.
    * <p>
-   * Typically this would be something like "dbmigration/myapp" where myapp gives it a
-   * unique resource path in the case there are multiple EbeanServer applications in the
-   * single classpath.
+   * The default of "dbmigration" is reasonable in most cases. You may look to set this
+   * to be something like "dbmigration/myapp" where myapp gives it a unique resource path
+   * in the case there are multiple EbeanServer applications in the single classpath.
    * </p>
    */
-  public void setResourcePath(String resourcePath) {
-    this.resourcePath = resourcePath;
+  public void setMigrationPath(String migrationPath) {
+    this.migrationPath = migrationPath;
+  }
+
+  /**
+   * Return the relative path for the model files (defaults to model).
+   */
+  public String getModelPath() {
+    return modelPath;
+  }
+
+  /**
+   * Set the relative path for the model files.
+   */
+  public void setModelPath(String modelPath) {
+    this.modelPath = modelPath;
+  }
+
+  /**
+   * Return the relative path for the drop ddl scripts (defaults to drop).
+   */
+  public String getDropPath() {
+    return dropPath;
+  }
+
+  /**
+   * Set the relative path for the drop ddl scripts (defaults to drop).
+   */
+  public void setDropPath(String dropPath) {
+    this.dropPath = dropPath;
+  }
+
+  /**
+   * Return the relative path for the rollback ddl scripts (defaults to rollback).
+   */
+  public String getRollbackPath() {
+    return rollbackPath;
+  }
+
+  /**
+   * Set the relative path for the rollback ddl scripts (defaults to rollback).
+   */
+  public void setRollbackPath(String rollbackPath) {
+    this.rollbackPath = rollbackPath;
+  }
+
+  /**
+   * Return the model suffix (defaults to model.xml)
+   */
+  public String getModelSuffix() {
+    return modelSuffix;
+  }
+
+  /**
+   * Set the model suffix.
+   */
+  public void setModelSuffix(String modelSuffix) {
+    this.modelSuffix = modelSuffix;
+  }
+
+  /**
+   * Return true if the rollback script should not be output.
+   */
+  public boolean isSuppressRollback() {
+    return suppressRollback;
+  }
+
+  /**
+   * Set to true to suppress the output of the rollback script.
+   */
+  public void setSuppressRollback(boolean suppressRollback) {
+    this.suppressRollback = suppressRollback;
+  }
+
+  /**
+   * Return the apply script suffix (defaults to sql).
+   */
+  public String getApplySuffix() {
+    return applySuffix;
+  }
+
+  /**
+   * Set the apply script suffix (defaults to sql).
+   */
+  public void setApplySuffix(String applySuffix) {
+    this.applySuffix = applySuffix;
+  }
+
+  /**
+   * Return the drop script suffix (defaults to ddl so that it isn't picked up by FlywayDb).
+   */
+  public String getDropSuffix() {
+    return dropSuffix;
+  }
+
+  /**
+   * Set the drop script suffix (defaults to ddl so that it isn't picked up by FlywayDb).
+   */
+  public void setDropSuffix(String dropSuffix) {
+    this.dropSuffix = dropSuffix;
+  }
+
+  /**
+   * Return the rollback script suffix (defaults to ddl so that it isn't picked up by FlywayDb).
+   */
+  public String getRollbackSuffix() {
+    return rollbackSuffix;
+  }
+
+  /**
+   * Set the rollback script suffix (defaults to ddl so that it isn't picked up by FlywayDb).
+   */
+  public void setRollbackSuffix(String rollbackSuffix) {
+    this.rollbackSuffix = rollbackSuffix;
   }
 
   /**
@@ -123,15 +255,39 @@ public class DbMigrationConfig {
   }
 
   /**
+   * Set the model, rollback and drop paths to be empty such that all the migration files are generated
+   * into a single directory.
+   */
+  public void singleDirectory() {
+    this.dropPath = "";
+    this.rollbackPath = "";
+    this.modelPath = "";
+  }
+
+  /**
    * Load the settings from the PropertiesWrapper.
    */
   public void loadSettings(PropertiesWrapper properties) {
-    resourcePath = properties.get("migration.resourcePath", resourcePath);
+
+    migrationPath = properties.get("migration.migrationPath", migrationPath);
+    if (properties.getBoolean("migration.singleDirectory", false)) {
+      singleDirectory();
+    } else {
+      modelPath = properties.get("migration.modelPath", modelPath);
+      rollbackPath = properties.get("migration.rollbackPath", rollbackPath);
+      dropPath = properties.get("migration.dropPath", dropPath);
+    }
+    applySuffix = properties.get("migration.applySuffix", applySuffix);
+    dropSuffix = properties.get("migration.dropSuffix", dropSuffix);
+    rollbackSuffix = properties.get("migration.rollbackSuffix", rollbackSuffix);
+    modelSuffix = properties.get("migration.modelSuffix", modelSuffix);
+
     platform = properties.getEnum(DbPlatformName.class, "migration.platform", platform);
+    suppressRollback = properties.getBoolean("migration.suppressRollback", suppressRollback);
+
     generate = properties.getBoolean("migration.generate", generate);
     version = properties.get("migration.version", version);
     name = properties.get("migration.name", name);
-    useSubdirectories = properties.getBoolean("migration.useSubdirectories", useSubdirectories);
   }
 
   /**

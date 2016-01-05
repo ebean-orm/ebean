@@ -1,5 +1,6 @@
 package com.avaje.ebean.dbmigration.model;
 
+import com.avaje.ebean.config.DbMigrationConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
@@ -24,13 +25,13 @@ public class PlatformDdlWriter {
 
   private final String platformPrefix;
 
-  private final boolean useSubdirectories;
+  private final DbMigrationConfig config;
 
-  public PlatformDdlWriter(DatabasePlatform platform, ServerConfig serverConfig, String platformPrefix, boolean useSubdirectories) {
+  public PlatformDdlWriter(DatabasePlatform platform, ServerConfig serverConfig, String platformPrefix, DbMigrationConfig config) {
     this.platform = platform;
     this.serverConfig = serverConfig;
     this.platformPrefix = platformPrefix;
-    this.useSubdirectories = useSubdirectories;
+    this.config = config;
   }
 
   /**
@@ -57,7 +58,7 @@ public class PlatformDdlWriter {
   protected void writePlatformDdl(DdlWrite write, File resourcePath, String fullVersion) throws IOException {
 
     if (!write.isApplyEmpty()) {
-      FileWriter applyWriter = createWriter(resourcePath, fullVersion, "");
+      FileWriter applyWriter = createWriter(resourcePath, fullVersion, "", config.getApplySuffix());
       try {
         writeApplyDdl(applyWriter, write);
         applyWriter.flush();
@@ -65,8 +66,8 @@ public class PlatformDdlWriter {
         applyWriter.close();
       }
 
-      if (!write.isApplyRollbackEmpty()) {
-        FileWriter applyRollbackWriter = createWriter(resourcePath, fullVersion, "rollback");
+      if (!config.isSuppressRollback() && !write.isApplyRollbackEmpty()) {
+        FileWriter applyRollbackWriter = createWriter(resourcePath, fullVersion, config.getRollbackPath(), config.getRollbackSuffix());
         try {
           writeApplyRollbackDdl(applyRollbackWriter, write);
           applyRollbackWriter.flush();
@@ -77,7 +78,7 @@ public class PlatformDdlWriter {
     }
 
     if (!write.isDropEmpty()) {
-      FileWriter dropWriter = createWriter(resourcePath, fullVersion, "drop");
+      FileWriter dropWriter = createWriter(resourcePath, fullVersion, config.getDropPath(), config.getDropSuffix());
       try {
         writeDropDdl(dropWriter, write);
         dropWriter.flush();
@@ -87,25 +88,21 @@ public class PlatformDdlWriter {
     }
   }
 
-  protected FileWriter createWriter(File path, String fullVersion, String suffix) throws IOException {
+  protected FileWriter createWriter(File path, String fullVersion, String subPath, String suffix) throws IOException {
 
     String fileName = fullVersion;
     if (!platformPrefix.isEmpty()) {
       fileName += "-"+platformPrefix;
     }
-    if (!suffix.isEmpty()) {
-      fileName += "-"+suffix;
-      path = subPath(path, suffix);
+    if (subPath != null && !subPath.isEmpty()) {
+      path = subPath(path, subPath);
     }
-    fileName += ".sql";
+    fileName += suffix;
     File applyFile = new File(path,  fileName);
     return new FileWriter(applyFile);
   }
 
   protected File subPath(File path, String suffix) {
-    if (!useSubdirectories) {
-      return path;
-    }
     File subPath = new File(path, suffix);
     if (!subPath.exists()) {
       subPath.mkdirs();

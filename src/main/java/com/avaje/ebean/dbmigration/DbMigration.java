@@ -204,9 +204,10 @@ public class DbMigration {
 
     try {
 
-      File migrationDirectory = getMigrationDirectory();
+      File migrationDir = getMigrationDirectory();
+      File modelDir = getModelDirectory(migrationDir);
 
-      MigrationModel migrationModel = new MigrationModel(migrationDirectory);
+      MigrationModel migrationModel = new MigrationModel(modelDir, migrationConfig.getModelSuffix());
       ModelContainer migrated = migrationModel.read();
 
       CurrentModel currentModel = new CurrentModel(server, constraintNaming);
@@ -226,7 +227,7 @@ public class DbMigration {
       String fullVersion = getFullVersion(migrationModel);
 
       logger.info("generating migration:{}", fullVersion);
-      if (!writeMigrationXml(dbMigration, migrationDirectory, fullVersion)) {
+      if (!writeMigrationXml(dbMigration, modelDir, fullVersion)) {
         logger.warn("migration already exists, not generating DDL");
 
       } else {
@@ -235,9 +236,9 @@ public class DbMigration {
           // history ddl generation (triggers, history tables etc)
           DdlWrite write = new DdlWrite(new MConfiguration(), currentModel.read());
           PlatformDdlWriter writer = createDdlWriter(databasePlatform, "");
-          writer.processMigration(dbMigration, write, migrationDirectory, fullVersion);
+          writer.processMigration(dbMigration, write, migrationDir , fullVersion);
         }
-        writeExtraPlatformDdl(fullVersion, currentModel, dbMigration, migrationDirectory);
+        writeExtraPlatformDdl(fullVersion, currentModel, dbMigration, migrationDir);
       }
 
     } finally {
@@ -290,7 +291,7 @@ public class DbMigration {
   }
 
   private PlatformDdlWriter createDdlWriter(DatabasePlatform platform, String prefix) {
-    return new PlatformDdlWriter(platform, serverConfig, prefix, migrationConfig.isUseSubdirectories());
+    return new PlatformDdlWriter(platform, serverConfig, prefix, migrationConfig);
   }
 
   /**
@@ -298,7 +299,8 @@ public class DbMigration {
    */
   protected boolean writeMigrationXml(Migration dbMigration, File resourcePath, String fullVersion) {
 
-    File file = new File(resourcePath, fullVersion+".xml");
+    String modelFile = fullVersion + migrationConfig.getModelSuffix();
+    File file = new File(resourcePath, modelFile);
     if (file.exists()) {
       return false;
     }
@@ -329,10 +331,9 @@ public class DbMigration {
 
     // path to src/main/resources in typical maven project
     File resourceRootDir = new File(pathToResources);
+    String resourcePath = migrationConfig.getMigrationPath();
 
-    String resourcePath = migrationConfig.getResourcePath();
-
-    // expect to be a path to something like - src/main/resources/dbmigration/myapp
+    // expect to be a path to something like - src/main/resources/dbmigration/model
     File path = new File(resourceRootDir, resourcePath);
     if (!path.exists()) {
       if (!path.mkdirs()) {
@@ -340,6 +341,21 @@ public class DbMigration {
       }
     }
     return path;
+  }
+
+  /**
+   * Return the model directory (relative to the migration directory).
+   */
+  protected File getModelDirectory(File migrationDirectory) {
+    String modelPath = migrationConfig.getModelPath();
+    if (modelPath ==  null || modelPath.isEmpty()) {
+      return migrationDirectory;
+    }
+    File modelDir = new File(migrationDirectory, migrationConfig.getModelPath());
+    if (!modelDir.exists() && !modelDir.mkdirs()) {
+      logger.debug("Unable to ensure migration model directory exists at {}", modelDir.getAbsolutePath());
+    }
+    return modelDir;
   }
 
   /**

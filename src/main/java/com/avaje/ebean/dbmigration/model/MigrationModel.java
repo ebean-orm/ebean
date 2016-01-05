@@ -18,12 +18,15 @@ public class MigrationModel {
 
   private final ModelContainer model = new ModelContainer();
 
-  private final File migrationDirectory;
+  private final File modelDirectory;
+
+  private final String modelSuffix;
 
   private MigrationVersion lastVersion;
 
-  public MigrationModel(File migrationDirectory) {
-    this.migrationDirectory = migrationDirectory;
+  public MigrationModel(File modelDirectory, String modelSuffix) {
+    this.modelDirectory = modelDirectory;
+    this.modelSuffix = modelSuffix;
   }
 
   /**
@@ -39,10 +42,10 @@ public class MigrationModel {
   private void readMigrations() {
 
     // find all the migration xml files
-    File[] xmlFiles = migrationDirectory.listFiles(new FileFilter() {
+    File[] xmlFiles = modelDirectory.listFiles(new FileFilter() {
       @Override
       public boolean accept(File pathname) {
-        return pathname.getName().toLowerCase().endsWith(".xml");
+        return pathname.getName().toLowerCase().endsWith(modelSuffix);
       }
     });
 
