@@ -214,6 +214,8 @@ public class ServerConfig {
 
   private boolean ddlCreateOnly;
 
+  private String ddlSeedSql;
+
   private boolean useJtaTransactionManager;
 
   /**
@@ -1571,6 +1573,28 @@ public class ServerConfig {
   }
 
   /**
+   * Return SQL script to execute after the "create all" DDL has been run.
+   * <p>
+   *   Typically this is a sql script that inserts test seed data when running tests.
+   *   Place a sql script in src/test/resources that inserts test seed data.
+   * </p>
+   */
+  public String getDdlSeedSql() {
+    return ddlSeedSql;
+  }
+
+  /**
+   * Set a SQL script to execute after the "create all" DDL has been run.
+   * <p>
+   *   Typically this is a sql script that inserts test seed data when running tests.
+   *   Place a sql script in src/test/resources that inserts test seed data.
+   * </p>
+   */
+  public void setDdlSeedSql(String ddlSeedSql) {
+    this.ddlSeedSql = ddlSeedSql;
+  }
+
+  /**
    * Return true if the DDL should be generated.
    */
   public boolean isDdlGenerate() {
@@ -2261,6 +2285,7 @@ public class ServerConfig {
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);
     ddlCreateOnly = p.getBoolean("ddl.createOnly", ddlCreateOnly);
+    ddlSeedSql = p.get("ddl.seedSql", ddlSeedSql);
 
     classes = getClasses(p);
   }
