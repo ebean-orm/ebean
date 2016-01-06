@@ -33,6 +33,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
 
   private boolean generateDdl;
   private boolean runDdl;
+  private boolean createOnly;
 
   private CurrentModel currentModel;
   private String dropContent;
@@ -42,6 +43,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
     this.server = server;
     this.generateDdl = serverConfig.isDdlGenerate();
     this.runDdl = serverConfig.isDdlRun();
+    this.createOnly = serverConfig.isDdlCreateOnly();
   }
 
   /**
@@ -60,7 +62,9 @@ public class DdlGenerator implements SpiEbeanPlugin {
    */
   public void generateDdl() {
     if (generateDdl) {
-      writeDrop(getDropFileName());
+      if (!createOnly) {
+        writeDrop(getDropFileName());
+      }
       writeCreate(getCreateFileName());
     }
   }
@@ -78,7 +82,9 @@ public class DdlGenerator implements SpiEbeanPlugin {
         if (createContent == null) {
           createContent = readFile(getCreateFileName());
         }
-        runScript(true, dropContent);
+        if (!createOnly) {
+          runScript(true, dropContent);
+        }
         runScript(false, createContent);
 
       } catch (IOException e) {

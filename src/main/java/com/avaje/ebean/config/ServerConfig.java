@@ -212,6 +212,8 @@ public class ServerConfig {
 
   private boolean ddlRun;
 
+  private boolean ddlCreateOnly;
+
   private boolean useJtaTransactionManager;
 
   /**
@@ -1529,17 +1531,43 @@ public class ServerConfig {
   }
 
   /**
-   * Set to true to run the DDL generation on startup.
+   * Set to true to generate the "create all" DDL on startup.
+   *
+   * Typically we want this on when we are running tests locally (and often using H2)
+   * and we want to create the full DB schema from scratch to run tests.
    */
   public void setDdlGenerate(boolean ddlGenerate) {
     this.ddlGenerate = ddlGenerate;
   }
 
   /**
-   * Set to true to run the generated DDL on startup.
+   * Set to true to run the generated "create all DDL" on startup.
+   *
+   * Typically we want this on when we are running tests locally (and often using H2)
+   * and we want to create the full DB schema from scratch to run tests.
    */
   public void setDdlRun(boolean ddlRun) {
     this.ddlRun = ddlRun;
+  }
+
+  /**
+   * Return true if the "drop all ddl" should be skipped.
+   *
+   * Typically we want to do this when using H2 (in memory) as our test database and the drop statements
+   * are not required so skipping the drop table statements etc makes it faster with less noise in the logs.
+   */
+  public boolean isDdlCreateOnly() {
+    return ddlCreateOnly;
+  }
+
+  /**
+   * Set to true if the "drop all ddl" should be skipped.
+   *
+   * Typically we want to do this when using H2 (in memory) as our test database and the drop statements
+   * are not required so skipping the drop table statements etc makes it faster with less noise in the logs.
+   */
+  public void setDdlCreateOnly(boolean ddlCreateOnly) {
+    this.ddlCreateOnly = ddlCreateOnly;
   }
 
   /**
@@ -2232,6 +2260,7 @@ public class ServerConfig {
 
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);
+    ddlCreateOnly = p.getBoolean("ddl.createOnly", ddlCreateOnly);
 
     classes = getClasses(p);
   }
