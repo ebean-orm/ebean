@@ -214,6 +214,8 @@ public class ServerConfig {
 
   private boolean ddlCreateOnly;
 
+  private String ddlInitSql;
+
   private String ddlSeedSql;
 
   private boolean useJtaTransactionManager;
@@ -1595,6 +1597,20 @@ public class ServerConfig {
   }
 
   /**
+   * Return a SQL script to execute before the "create all" DDL has been run.
+   */
+  public String getDdlInitSql() {
+    return ddlInitSql;
+  }
+
+  /**
+   * Set a SQL script to execute before the "create all" DDL has been run.
+   */
+  public void setDdlInitSql(String ddlInitSql) {
+    this.ddlInitSql = ddlInitSql;
+  }
+
+  /**
    * Return true if the DDL should be generated.
    */
   public boolean isDdlGenerate() {
@@ -2285,6 +2301,7 @@ public class ServerConfig {
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);
     ddlCreateOnly = p.getBoolean("ddl.createOnly", ddlCreateOnly);
+    ddlInitSql = p.get("ddl.initSql", ddlInitSql);
     ddlSeedSql = p.get("ddl.seedSql", ddlSeedSql);
 
     classes = getClasses(p);

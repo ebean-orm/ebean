@@ -67,6 +67,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
 
     if (runDdl) {
       try {
+        runInitSql();
         runDropSql();
         runCreateSql();
         runSeedSql();
@@ -94,13 +95,20 @@ public class DdlGenerator implements SpiEbeanPlugin {
     runScript(false, createContent, getCreateFileName());
   }
 
-  protected void runSeedSql() throws IOException {
+  protected void runInitSql() throws IOException {
+    runResourceScript(server.getServerConfig().getDdlInitSql());
+  }
 
-    String seedSql = server.getServerConfig().getDdlSeedSql();
-    if (seedSql != null) {
-      InputStream is = getClassLoader().getResourceAsStream(seedSql);
+  protected void runSeedSql() throws IOException {
+    runResourceScript(server.getServerConfig().getDdlSeedSql());
+  }
+
+  protected void runResourceScript(String sqlScript) throws IOException {
+
+    if (sqlScript != null) {
+      InputStream is = getClassLoader().getResourceAsStream(sqlScript);
       if (is != null) {
-        DdlRunner runner = new DdlRunner(false, seedSql);
+        DdlRunner runner = new DdlRunner(false, sqlScript);
         String content = readContent(new InputStreamReader(is));
         runner.runAll(content, server);
       }
