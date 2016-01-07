@@ -7,6 +7,7 @@ import com.avaje.ebean.config.ServerConfig;
  *
  * author: Richard Vowles - http://gplus.to/RichardVowles
  */
+@Deprecated
 public interface SpiEbeanPlugin {
 
   /**
