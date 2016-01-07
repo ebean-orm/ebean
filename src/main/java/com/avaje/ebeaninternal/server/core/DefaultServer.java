@@ -142,7 +142,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final List<SpiServerPlugin> serverPlugins;
 
-  private DdlGenerator ddlGenerator;
+  private final DdlGenerator ddlGenerator;
 
   private final ExpressionFactory expressionFactory;
 
@@ -235,6 +235,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.beanLoader = new DefaultBeanLoader(this);
     this.jsonContext = config.createJsonContext(this);
     this.serverPlugins = config.getPlugins();
+    this.ddlGenerator = new DdlGenerator(this, serverConfig);
 
     // load normal plugins late and call setup on all
     loadAndInitializePlugins(config.getServerConfig());
@@ -261,18 +262,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     for (SpiEbeanPlugin plugin : ServiceLoader.load(SpiEbeanPlugin.class)) {
       spiPlugins.add(plugin);
       plugin.setup(this, config);
-
-      if (plugin instanceof DdlGenerator) {
-        // backwards compatible
-        ddlGenerator = (DdlGenerator) plugin;
-      }
-    }
-    
-    if (ddlGenerator == null) {
-      // ServiceLoader not finding ddlGenerator (typically OSGi) 
-      ddlGenerator = new DdlGenerator();
-      spiPlugins.add(ddlGenerator);
-      ddlGenerator.setup(this, config);
     }
 
     ebeanPlugins = Collections.unmodifiableList(spiPlugins);
@@ -289,6 +278,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Execute all the plugins with an online flag indicating the DB is up or not.
    */
   public void executePlugins(boolean online) {
+
+    ddlGenerator.execute(online);
+
     for (SpiEbeanPlugin plugin : ebeanPlugins) {
       plugin.execute(online);
     }

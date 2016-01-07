@@ -16,21 +16,24 @@ import java.io.LineNumberReader;
 import java.io.Reader;
 
 /**
- * Controls the generation of DDL and potentially runs the resulting scripts.
+ * Controls the generation and execution of "Create All" and "Drop All" DDL scripts.
+ *
+ * Typically the "Create All" DDL is executed for running tests etc and has nothing to do
+ * with DB Migration (diff based) DDL.
  */
-public class DdlGenerator implements SpiEbeanPlugin {
+public class DdlGenerator {
 
-  private SpiEbeanServer server;
+  private final SpiEbeanServer server;
 
-  private boolean generateDdl;
-  private boolean runDdl;
-  private boolean createOnly;
+  private final boolean generateDdl;
+  private final boolean runDdl;
+  private final boolean createOnly;
 
   private CurrentModel currentModel;
   private String dropContent;
   private String createContent;
 
-  public void setup(SpiEbeanServer server, ServerConfig serverConfig) {
+  public DdlGenerator(SpiEbeanServer server, ServerConfig serverConfig) {
     this.server = server;
     this.generateDdl = serverConfig.isDdlGenerate();
     this.runDdl = serverConfig.isDdlRun();
@@ -51,7 +54,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
   /**
    * Generate the DDL drop and create scripts if the properties have been set.
    */
-  public void generateDdl() {
+  protected void generateDdl() {
     if (generateDdl) {
       if (!createOnly) {
         writeDrop(getDropFileName());
@@ -63,7 +66,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
   /**
    * Run the DDL drop and DDL create scripts if properties have been set.
    */
-  public void runDdl() {
+  protected void runDdl() {
 
     if (runDdl) {
       try {
@@ -146,7 +149,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
     }
   }
 
-  public String generateDropDdl() {
+  protected String generateDropDdl() {
 
     try {
       dropContent = currentModel().getDropDdl();
@@ -156,7 +159,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
     }
   }
 
-  public String generateCreateDdl() {
+  protected String generateCreateDdl() {
 
     try {
       createContent = currentModel().getCreateDdl();
@@ -204,7 +207,7 @@ public class DdlGenerator implements SpiEbeanPlugin {
     return readContent(new FileReader(f));
   }
 
-  private String readContent(Reader reader) throws IOException {
+  protected String readContent(Reader reader) throws IOException {
 
     StringBuilder buf = new StringBuilder();
 
