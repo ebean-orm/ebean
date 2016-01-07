@@ -1,5 +1,12 @@
 package com.avaje.ebeaninternal.server.lib.sql;
 
+import com.avaje.ebean.config.DataSourceConfig;
+import com.avaje.ebeaninternal.api.ClassUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,15 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-
-import javax.persistence.PersistenceException;
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.avaje.ebean.config.DataSourceConfig;
-import com.avaje.ebeaninternal.api.ClassUtil;
 
 /**
  * A robust DataSource.
@@ -243,6 +241,13 @@ public class DataSourcePool implements DataSource {
   }
 
   private void initialise() throws SQLException {
+
+    // Ensure database driver is loaded
+    try {
+      ClassUtil.forName(this.databaseDriver);
+    } catch (Throwable e) {
+      throw new PersistenceException("Problem loading Database Driver [" + this.databaseDriver + "]: " + e.getMessage(), e);
+    }
 
     String transIsolation = TransactionIsolation.getLevelDescription(transactionIsolation);
     //noinspection StringBufferReplaceableByString

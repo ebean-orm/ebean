@@ -23,7 +23,7 @@ public class ClassUtil {
   /**
    * Load a class taking into account a context class loader (if present).
    */
-  private static Class<?> forName(String name) throws ClassNotFoundException {
+  public static Class<?> forName(String name) throws ClassNotFoundException {
     return new ClassLoadContext().forName(name);
   }
 
