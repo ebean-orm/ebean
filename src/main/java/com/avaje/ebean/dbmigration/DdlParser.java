@@ -81,6 +81,11 @@ public class DdlParser {
         return;
       }
 
+      if (sb.length() == 0 && (line.isEmpty() || line.startsWith("--"))) {
+        // ignore leading empty lines and sql comments
+        return;
+      }
+
       if (inDbProcedure) {
         sb.append(line).append(" ");
         return;
