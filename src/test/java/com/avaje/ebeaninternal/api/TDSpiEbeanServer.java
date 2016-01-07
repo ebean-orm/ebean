@@ -83,11 +83,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public DdlGenerator getDdlGenerator() {
-    return null;
-  }
-
-  @Override
   public ReadAuditLogger getReadAuditLogger() {
     return null;
   }

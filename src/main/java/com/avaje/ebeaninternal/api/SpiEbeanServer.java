@@ -67,11 +67,6 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   PersistenceContextScope getPersistenceContextScope(SpiQuery<?> query);
 
   /**
-   * Return the DDL generator.
-   */
-  DdlGenerator getDdlGenerator();
-
-  /**
    * Clear the query execution statistics.
    */
   void clearQueryStatistics();

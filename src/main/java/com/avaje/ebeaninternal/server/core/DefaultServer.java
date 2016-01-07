@@ -329,10 +329,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return expressionFactory;
   }
 
-  public DdlGenerator getDdlGenerator() {
-    return ddlGenerator;
-  }
-
   @Override
   public AutoTune getAutoTune() {
     return autoTuneService;
