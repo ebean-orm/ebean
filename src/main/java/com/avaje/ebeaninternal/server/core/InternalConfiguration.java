@@ -54,6 +54,7 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 /**
  * Used to extend the ServerConfig with additional objects used to configure and
@@ -165,6 +166,14 @@ public class InternalConfiguration {
    * Return the list of plugins we collected during construction.
    */
   public List<SpiServerPlugin> getPlugins() {
+
+    // find additional plugins via ServiceLoader ...
+    for (SpiServerPlugin plugin : ServiceLoader.load(SpiServerPlugin.class)) {
+      if (!plugins.contains(plugin)) {
+        plugins.add(plugin);
+      }
+    }
+
     return plugins;
   }
 
