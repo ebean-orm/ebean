@@ -45,9 +45,9 @@ public class ExplicitTransactionManager extends TransactionManager {
 
     if (DatabasePlatform.OnQueryOnly.CLOSE.equals(dbPlatformOnQueryOnly)) {
       // Not using OnQueryOnly.CLOSE with ExplicitJdbcTransaction
-      return DatabasePlatform.OnQueryOnly.ROLLBACK;
+      return DatabasePlatform.OnQueryOnly.COMMIT;
     }
     // default to rollback if not defined on the platform
-    return dbPlatformOnQueryOnly == null ? DatabasePlatform.OnQueryOnly.ROLLBACK : dbPlatformOnQueryOnly;
+    return dbPlatformOnQueryOnly == null ? DatabasePlatform.OnQueryOnly.COMMIT : dbPlatformOnQueryOnly;
   }
 }
