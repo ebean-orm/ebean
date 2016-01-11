@@ -2,11 +2,13 @@ package com.avaje.ebeaninternal.server.transaction;
 
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 
 /**
@@ -29,4 +31,23 @@ public class ExplicitTransactionManager extends TransactionManager {
     return new ExplicitJdbcTransaction(prefix + id, explicit, c, this);
   }
 
+  /**
+   * Override the initalise of OnQueryOnly with the intention not to use CLOSE with ExplicitJdbcTransaction.
+   */
+  @Override
+  protected DatabasePlatform.OnQueryOnly initOnQueryOnly(DatabasePlatform.OnQueryOnly dbPlatformOnQueryOnly, DataSource ds) {
+
+    // first check for a system property 'override'
+    String systemPropertyValue = System.getProperty("ebean.transaction.onqueryonly");
+    if (systemPropertyValue != null) {
+      return DatabasePlatform.OnQueryOnly.valueOf(systemPropertyValue.trim().toUpperCase());
+    }
+
+    if (DatabasePlatform.OnQueryOnly.CLOSE.equals(dbPlatformOnQueryOnly)) {
+      // Not using OnQueryOnly.CLOSE with ExplicitJdbcTransaction
+      return DatabasePlatform.OnQueryOnly.ROLLBACK;
+    }
+    // default to rollback if not defined on the platform
+    return dbPlatformOnQueryOnly == null ? DatabasePlatform.OnQueryOnly.ROLLBACK : dbPlatformOnQueryOnly;
+  }
 }

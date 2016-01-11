@@ -164,7 +164,7 @@ public class TransactionManager {
    * just for queries do need to be committed or rollback after the query.
    * </p>
    */
-  private OnQueryOnly initOnQueryOnly(OnQueryOnly dbPlatformOnQueryOnly, DataSource ds) {
+  protected OnQueryOnly initOnQueryOnly(OnQueryOnly dbPlatformOnQueryOnly, DataSource ds) {
 
     // first check for a system property 'override'
     String systemPropertyValue = System.getProperty("ebean.transaction.onqueryonly");
@@ -190,7 +190,7 @@ public class TransactionManager {
   /**
    * Return true if the isolation level is read committed.
    */
-  private boolean isReadCommittedIsolation(DataSource ds) {
+  protected boolean isReadCommittedIsolation(DataSource ds) {
 
     if (DbOffline.isSet()) {
       return true;
