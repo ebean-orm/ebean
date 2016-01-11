@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.autotune.service;
 
-import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.config.AutoTuneConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -9,24 +8,11 @@ import com.avaje.ebeaninternal.server.autotune.AutoTuneCollection;
 import com.avaje.ebeaninternal.server.autotune.AutoTuneService;
 import com.avaje.ebeaninternal.server.autotune.model.Autotune;
 import com.avaje.ebeaninternal.server.autotune.model.Origin;
-import com.avaje.ebeaninternal.server.autotune.model.ProfileDiff;
-import com.avaje.ebeaninternal.server.autotune.model.ProfileEmpty;
-import com.avaje.ebeaninternal.server.autotune.model.ProfileNew;
-import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
-import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetailParser;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of the AutoTuneService which is comprised of profiling and query tuning.
@@ -34,6 +20,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DefaultAutoTuneService implements AutoTuneService {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultAutoTuneService.class);
+
+  private final SpiEbeanServer server;
 
   private final long defaultGarbageCollectionWait;
 
@@ -53,14 +41,18 @@ public class DefaultAutoTuneService implements AutoTuneService {
 
   private final String serverName;
 
+  private final int profilingUpdateFrequency;
+
   public DefaultAutoTuneService(SpiEbeanServer server, ServerConfig serverConfig) {
 
     AutoTuneConfig config = serverConfig.getAutoTuneConfig();
 
+    this.server = server;
     this.queryTuning = config.isQueryTuning();
     this.profiling = config.isProfiling();
     this.tuningFile = config.getQueryTuningFile();
     this.profilingFile = config.getProfilingFile();
+    this.profilingUpdateFrequency = config.getProfilingUpdateFrequency();
     this.serverName = server.getName();
     this.profileManager = new ProfileManager(config, server);
     this.queryTuner = new BaseQueryTuner(config, server, profileManager);
@@ -75,170 +67,101 @@ public class DefaultAutoTuneService implements AutoTuneService {
   public void startup() {
 
     if (queryTuning) {
-      File file = new File(tuningFile);
-      if (!file.exists()) {
-        logger.warn("AutoTune file {} not found - no automatic tuning will be applied", file.getAbsolutePath());
-
-      } else {
-        AutoTuneXmlReader reader = new AutoTuneXmlReader();
-        Autotune profiling = reader.read(file);
-        logger.info("AutoTune loading {} tuning entries", profiling.getOrigin().size());
-        for (Origin origin : profiling.getOrigin()) {
-          queryTuner.load(origin.getKey(), createTunedQueryInfo(origin));
-        }
-      }
+      loadTuningFile();
+      automaticProfiling();
     }
   }
 
-  @NotNull
-  private TunedQueryInfo createTunedQueryInfo(Origin origin) {
-    OrmQueryDetail detail = new OrmQueryDetailParser(origin.getDetail()).parse();
-    return new TunedQueryInfo(detail);
+  private void automaticProfiling() {
+
+    if (isAutomaticTuningUpdate()) {
+      server.getBackgroundExecutor().executePeriodically(new ProfilingUpdate(), profilingUpdateFrequency, TimeUnit.SECONDS);
+    }
   }
 
-  private void saveProfiling(boolean reset) {
+  private boolean isAutomaticTuningUpdate() {
+    return profilingUpdateFrequency > 0;
+  }
 
-    Autotune document = new Autotune();
+  private class ProfilingUpdate implements Runnable {
 
-    AutoTuneCollection autoTuneCollection = profileManager.profilingCollection(reset);
-
-    List<AutoTuneCollection.Entry> entries = autoTuneCollection.getEntries();
-
-    // count "new" and "diff" profiling entries
-    AtomicInteger newCounter = new AtomicInteger();
-    AtomicInteger diffCounter = new AtomicInteger();
-
-    Set<String> profileKeys = new HashSet<String>();
-    for (AutoTuneCollection.Entry entry : entries) {
-      saveProfilingEntry(document, entry, newCounter, diffCounter);
-      profileKeys.add(entry.getOrigin().getKey());
+    @Override
+    public void run() {
+      runtimeTuningUpdate();
     }
+  }
 
-    // report the origin keys that we didn't collect any profiling on
-    Set<String> tunerKeys = queryTuner.keySet();
-    for (String tuneKey : tunerKeys) {
-      if (!profileKeys.contains(tuneKey)) {
-        ProfileEmpty profileEmpty = document.getProfileEmpty();
-        if (profileEmpty == null) {
-          profileEmpty = new ProfileEmpty();
-          document.setProfileEmpty(profileEmpty);
-        }
-        Origin emptyOrigin = new Origin();
-        emptyOrigin.setKey(tuneKey);
-        profileEmpty.getOrigin().add(emptyOrigin);
-      }
-    }
-
-    int totalNew = newCounter.get();
-    int totalDiff = diffCounter.get();
-    if (totalNew == 0 && totalDiff == 0) {
-      logger.info("No new or diff entries for profiling server:{}", serverName);
+  /**
+   * Load tuning information from an existing tuning file.
+   */
+  private void loadTuningFile() {
+    File file = new File(tuningFile);
+    if (!file.exists()) {
+      logger.warn("AutoTune file {} not found - no initial automatic query tuning", file.getAbsolutePath());
 
     } else {
-      sortDocument(document);
-
-      SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss");
-      String now = df.format(new Date());
-
-      // write the file with serverName and now suffix as we can output the profiling many times
-      File file = new File(profilingFile + "-" + serverName + "-" + now + ".xml");
-      AutoTuneXmlWriter writer = new AutoTuneXmlWriter();
-      writer.write(document, file);
-
-      logger.info("writing new:{} diff:{} profiling entries for server:{}", totalNew, totalDiff, serverName);
-    }
-  }
-
-  /**
-   * Set the diff and new entries by bean type followed by key.
-   */
-  private void sortDocument(Autotune document) {
-
-    ProfileDiff profileDiff = document.getProfileDiff();
-    if (profileDiff != null) {
-      Collections.sort(profileDiff.getOrigin(), new OriginNameKeySort());
-    }
-    ProfileNew profileNew = document.getProfileNew();
-    if (profileNew != null) {
-      Collections.sort(profileNew.getOrigin(), new OriginNameKeySort());
-    }
-    ProfileEmpty profileEmpty = document.getProfileEmpty();
-    if (profileEmpty != null) {
-      Collections.sort(profileEmpty.getOrigin(), new OriginKeySort());
-    }
-  }
-
-  /**
-   * Comparator sort by bean type then key.
-   */
-  class OriginNameKeySort implements Comparator<Origin> {
-
-    @Override
-    public int compare(Origin o1, Origin o2) {
-      int comp = o1.getBeanType().compareTo(o2.getBeanType());
-      if (comp == 0) {
-        comp = o1.getKey().compareTo(o2.getKey());
+      AutoTuneXmlReader reader = new AutoTuneXmlReader();
+      Autotune profiling = reader.read(file);
+      logger.info("AutoTune loading {} tuning entries", profiling.getOrigin().size());
+      for (Origin origin : profiling.getOrigin()) {
+        queryTuner.load(origin);
       }
-      return comp;
     }
   }
 
-  /**
-   * Comparator sort by bean type then key.
-   */
-  class OriginKeySort implements Comparator<Origin> {
+  private void runtimeTuningUpdate() {
 
-    @Override
-    public int compare(Origin o1, Origin o2) {
-      return o1.getKey().compareTo(o2.getKey());
-    }
-  }
+    synchronized (this) {
+      try {
+        long start = System.currentTimeMillis();
+        AutoTuneCollection profiling = profileManager.profilingCollection(false);
 
-  private void saveProfilingEntry(Autotune document, AutoTuneCollection.Entry entry, AtomicInteger newCount, AtomicInteger diffCount) {
+        ProfileCollectionEvent event = new ProfileCollectionEvent(profiling, queryTuner, false);
 
-    ObjectGraphOrigin point = entry.getOrigin();
-    OrmQueryDetail profileDetail = entry.getDetail();
+        if (!event.process()) {
+          long exeMillis = System.currentTimeMillis() - start;
+          logger.debug("No tuning updates for server:{} executionMillis:{}", serverName, exeMillis);
 
-    // compare with the existing query tuning entry
-    OrmQueryDetail tuneDetail = queryTuner.get(point.getKey());
-    if (tuneDetail == null) {
-      // New entry
-      newCount.incrementAndGet();
-      ProfileNew profileNew = document.getProfileNew();
-      if (profileNew == null) {
-        profileNew = new ProfileNew();
-        document.setProfileNew(profileNew);
+        } else {
+
+          event.writeFile(profilingFile + "-" + serverName + "-tuningupdate");
+          long exeMillis = System.currentTimeMillis() - start;
+          logger.info("query tuning update - new:{} diff:{} for server:{} executionMillis:{}", event.getNewCount(), event.getDiffCount(), serverName, exeMillis);
+        }
+      } catch (Throwable e) {
+        logger.error("Error collecting or applying automatic query tuning", e);
       }
-      Origin origin = createOrigin(entry, point);
-      origin.setOriginal(entry.getOriginalQuery());
-      profileNew.getOrigin().add(origin);
-
-    } else if (!tuneDetail.isAutoTuneEqual(profileDetail)) {
-      // Diff entry
-      diffCount.incrementAndGet();
-      Origin origin = createOrigin(entry, point);
-      origin.setOriginal(tuneDetail.toString());
-      ProfileDiff diff = document.getProfileDiff();
-      if (diff == null) {
-        diff = new ProfileDiff();
-        document.setProfileDiff(diff);
-      }
-      diff.getOrigin().add(origin);
     }
   }
 
-  /**
-   * Create the XML Origin bean for the given entry and ObjectGraphOrigin.
-   */
-  @NotNull
-  private Origin createOrigin(AutoTuneCollection.Entry entry, ObjectGraphOrigin point) {
-    Origin origin = new Origin();
-    origin.setKey(point.getKey());
-    origin.setBeanType(point.getBeanType());
-    origin.setDetail(entry.getDetail().toString());
-    origin.setCallStack(point.getCallStack().description("\n"));
-    return origin;
+  private void saveProfilingOnShutdown(boolean reset) {
+
+    synchronized (this) {
+      if (isAutomaticTuningUpdate()) {
+        runtimeTuningUpdate();
+        outputAggregateTuning();
+
+      } else {
+
+        AutoTuneCollection profiling = profileManager.profilingCollection(reset);
+        ProfileCollectionEvent event = new ProfileCollectionEvent(profiling, queryTuner, true);
+
+        if (!event.process()) {
+          logger.info("No new or diff entries for profiling server:{}", serverName);
+
+        } else {
+          event.writeFile(profilingFile + "-" + serverName);
+          logger.info("writing new:{} diff:{} profiling entries for server:{}", event.getNewCount(), event.getDiffCount(), serverName);
+        }
+      }
+    }
   }
+
+  private void outputAggregateTuning() {
+
+    //TODO outputAggregateTuning()
+  }
+
 
   /**
    * Shutdown the listener.
@@ -252,7 +175,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
   public void shutdown() {
     if (profiling && !skipCollectionOnShutdown) {
       collectProfiling(-1);
-      saveProfiling(false);
+      saveProfilingOnShutdown(false);
     }
   }
 

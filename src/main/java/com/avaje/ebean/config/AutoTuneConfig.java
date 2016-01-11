@@ -21,6 +21,8 @@ public class AutoTuneConfig {
 
   private double profilingRate = 0.01;
 
+  private int profilingUpdateFrequency;
+
   private int garbageCollectionWait = 100;
   
   private boolean skipCollectionOnShutdown;
@@ -54,6 +56,20 @@ public class AutoTuneConfig {
    */
   public void setProfilingFile(String profilingFile) {
     this.profilingFile = profilingFile;
+  }
+
+  /**
+   * Return the frequency in seconds the profiling should be collected and automatically applied to the tuning.
+   */
+  public int getProfilingUpdateFrequency() {
+    return profilingUpdateFrequency;
+  }
+
+  /**
+   * Set the frequency in seconds the profiling should be collected and automatically applied to the tuning.
+   */
+  public void setProfilingUpdateFrequency(int profilingUpdateFrequency) {
+    this.profilingUpdateFrequency = profilingUpdateFrequency;
   }
 
   /**

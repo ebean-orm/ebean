@@ -2,11 +2,14 @@ package com.avaje.ebeaninternal.server.autotune.service;
 
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.ObjectGraphNode;
+import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.config.AutoTuneConfig;
 import com.avaje.ebean.config.AutoTuneMode;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.server.autotune.AutoTuneCollection;
 import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
+import com.avaje.ebeaninternal.server.autotune.model.Origin;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 
 import javax.persistence.PersistenceException;
@@ -46,6 +49,22 @@ public class BaseQueryTuner {
     this.queryTuning = config.isQueryTuning();
     this.profiling = config.isProfiling();
     this.skipAll = !queryTuning && !profiling;
+  }
+
+  /**
+   * Load an entry from the source tuning xml.
+   */
+  public void load(Origin origin) {
+
+    tunedQueryInfoMap.put(origin.getKey(), new TunedQueryInfo(origin));
+  }
+
+  /**
+   * Add an entry at runtime.
+   */
+  public void add(Origin origin) {
+
+    tunedQueryInfoMap.put(origin.getKey(), new TunedQueryInfo(origin));
   }
 
   /**

@@ -1,7 +1,9 @@
 package com.avaje.ebeaninternal.server.autotune.service;
 
 import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.server.autotune.model.Origin;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
+import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetailParser;
 
 import java.io.Serializable;
 
@@ -11,10 +13,20 @@ import java.io.Serializable;
  */
 public class TunedQueryInfo implements Serializable {
 
+  private final Origin origin;
+
   private final OrmQueryDetail tunedDetail;
 
-  public TunedQueryInfo(OrmQueryDetail tunedDetail) {
-    this.tunedDetail = tunedDetail;
+  public TunedQueryInfo(Origin origin) {
+    this.origin = origin;
+    this.tunedDetail = new OrmQueryDetailParser(origin.getDetail()).parse();
+  }
+
+  /**
+   * Return the origin entry (includes call stack and bean type).
+   */
+  public Origin getOrigin() {
+    return origin;
   }
 
   /**
