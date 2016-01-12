@@ -603,7 +603,7 @@ public class SqlTreeBuilder {
           // no extra join required for embedded beans
           return null;
         }
-        SqlTreeNodeExtraJoin extraJoin = new SqlTreeNodeExtraJoin(propertyName, assocProp);
+        SqlTreeNodeExtraJoin extraJoin = new SqlTreeNodeExtraJoin(propertyName, assocProp, elGetValue.containsMany());
         joinRegister.put(propertyName, extraJoin);
         return extraJoin;
       }

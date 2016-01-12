@@ -29,11 +29,14 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
   private final boolean manyJoin;
 
+  private final boolean pathContainsMany;
+
   private List<SqlTreeNodeExtraJoin> children;
 
-  public SqlTreeNodeExtraJoin(String prefix, BeanPropertyAssoc<?> assocBeanProperty) {
+  public SqlTreeNodeExtraJoin(String prefix, BeanPropertyAssoc<?> assocBeanProperty, boolean pathContainsMany) {
     this.prefix = prefix;
     this.assocBeanProperty = assocBeanProperty;
+    this.pathContainsMany = pathContainsMany;
     this.manyJoin = assocBeanProperty instanceof BeanPropertyAssocMany<?>;
   }
 
@@ -95,13 +98,16 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
       }
     }
 
-    if (!manyToMany) {
+    if (pathContainsMany) {
+      // "promote" to left outer as the path contains a many
+      assocBeanProperty.addJoin(SqlJoinType.OUTER, prefix, ctx);
+    } else if (!manyToMany) {
       assocBeanProperty.addJoin(joinType, prefix, ctx);
     }
 
     if (children != null) {
 
-      if (manyJoin) {
+      if (manyJoin || pathContainsMany) {
         // if AUTO then make all descendants use OUTER JOIN
         joinType = joinType.autoToOuter();
       }

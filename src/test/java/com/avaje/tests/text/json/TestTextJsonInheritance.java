@@ -3,6 +3,8 @@ package com.avaje.tests.text.json;
 import java.io.IOException;
 import java.util.List;
 
+import com.avaje.tests.model.basic.CarAccessory;
+import com.avaje.tests.model.basic.CarFuse;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,6 +40,8 @@ public class TestTextJsonInheritance extends BaseTestCase {
 
   private void setupData() {
 
+    Ebean.createUpdate(CarAccessory.class, "delete from CarAccessory").execute();
+    Ebean.createUpdate(CarFuse.class, "delete from CarFuse").execute();
     Ebean.createUpdate(Trip.class, "delete from trip").execute();
     Ebean.createUpdate(VehicleDriver.class, "delete from vehicleDriver").execute();
     Ebean.createUpdate(Vehicle.class, "delete from vehicle").execute();

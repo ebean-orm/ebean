@@ -2,6 +2,8 @@ package com.avaje.tests.inheritance;
 
 import java.util.List;
 
+import com.avaje.tests.model.basic.CarAccessory;
+import com.avaje.tests.model.basic.CarFuse;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -12,6 +14,9 @@ import com.avaje.tests.model.basic.Car;
 import com.avaje.tests.model.basic.Truck;
 import com.avaje.tests.model.basic.Vehicle;
 import com.avaje.tests.model.basic.VehicleDriver;
+
+import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 
 public class TestInheritInsert extends BaseTestCase {
 
@@ -27,7 +32,7 @@ public class TestInheritInsert extends BaseTestCase {
       Truck t0 = (Truck) v;
       Assert.assertEquals(Double.valueOf(10d), t0.getCapacity());
       Assert.assertEquals(Double.valueOf(10d), ((Truck) v).getCapacity());
-      Assert.assertNotNull(t0.getId());
+      assertNotNull(t0.getId());
     } else {
       Assert.assertTrue("v not a Truck?", false);
     }
@@ -43,7 +48,7 @@ public class TestInheritInsert extends BaseTestCase {
     if (v instanceof Truck) {
       Double capacity = ((Truck) v).getCapacity();
       Assert.assertEquals(Double.valueOf(10d), capacity);
-      Assert.assertNotNull(v.getId());
+      assertNotNull(v.getId());
     } else {
       Assert.assertTrue("v not a Truck?", false);
     }
@@ -73,9 +78,9 @@ public class TestInheritInsert extends BaseTestCase {
     query.where().eq("vehicle.licenseNumber", "MARIOS_CAR_LICENSE");
     List<VehicleDriver> drivers = query.findList();
 
-    Assert.assertNotNull(drivers);
+    assertNotNull(drivers);
     Assert.assertEquals(1, drivers.size());
-    Assert.assertNotNull(drivers.get(0));
+    assertNotNull(drivers.get(0));
 
     Assert.assertEquals("Mario", drivers.get(0).getName());
     Assert.assertEquals("MARIOS_CAR_LICENSE", drivers.get(0).getVehicle().getLicenseNumber());
@@ -86,4 +91,34 @@ public class TestInheritInsert extends BaseTestCase {
     Ebean.save(car);
 
   }
+
+  @Test
+  public void test_AtOrderBy_on_ChildOfChild() {
+
+    Car car = new Car();
+    car.setLicenseNumber("ABC");
+    Ebean.save(car);
+
+    CarFuse fuse = new CarFuse();
+    fuse.setLocationCode("xdfg");
+    Ebean.save(fuse);
+
+    CarAccessory accessory = new CarAccessory(car, fuse);
+    Ebean.save(accessory);
+
+
+    Query<Car> query = Ebean.find(Car.class)
+        .fetch("accessories")
+        .where()
+        .eq("id", car.getId())
+        .query();
+
+    Car result = query.findUnique();
+
+    assertThat(query.getGeneratedSql()).contains("order by t0.id, t2.location_code");
+    assertThat(query.getGeneratedSql()).contains("left outer join car_fuse t2 on t2.id = t1.fuse_id");
+
+    assertNotNull(result);
+  }
+
 }
