@@ -21,7 +21,7 @@ public class OrderDetail implements Serializable {
     @Id
     Integer id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     Order order;
 
     Integer orderQty;

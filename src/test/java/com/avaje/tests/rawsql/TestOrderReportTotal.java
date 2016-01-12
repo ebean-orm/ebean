@@ -1,15 +1,17 @@
 package com.avaje.tests.rawsql;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.OrderAggregate;
+import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 
 public class TestOrderReportTotal extends BaseTestCase {
 
@@ -21,14 +23,28 @@ public class TestOrderReportTotal extends BaseTestCase {
     Query<OrderAggregate> query = Ebean.createQuery(OrderAggregate.class);
 
     List<OrderAggregate> list = query.findList();
-    Assert.assertNotNull(list);
+    assertNotNull(list);
 
     Query<OrderAggregate> q2 = Ebean.createQuery(OrderAggregate.class);
     q2.where().gt("id", 1);
     q2.having().gt("totalItems", 1);
 
     List<OrderAggregate> l2 = q2.findList();
-    Assert.assertNotNull(l2);
+    assertNotNull(l2);
 
+  }
+
+  @Test
+  public void testOrderDetailCount() {
+
+    ResetBasicData.reset();
+
+    int detailsCount = Ebean.find(OrderDetail.class)
+        .where()
+          .gt("order.id", 2)
+          .istartsWith("order.customer.name","rob")
+        .findRowCount();
+
+    assertThat(detailsCount).isGreaterThan(0);
   }
 }
