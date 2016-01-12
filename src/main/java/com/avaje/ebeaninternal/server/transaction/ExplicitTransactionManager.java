@@ -32,7 +32,7 @@ public class ExplicitTransactionManager extends TransactionManager {
   }
 
   /**
-   * Override the initalise of OnQueryOnly with the intention not to use CLOSE with ExplicitJdbcTransaction.
+   * Override the initialise of OnQueryOnly with the intention not to use CLOSE with ExplicitJdbcTransaction.
    */
   @Override
   protected DatabasePlatform.OnQueryOnly initOnQueryOnly(DatabasePlatform.OnQueryOnly dbPlatformOnQueryOnly, DataSource ds) {
@@ -47,7 +47,7 @@ public class ExplicitTransactionManager extends TransactionManager {
       // Not using OnQueryOnly.CLOSE with ExplicitJdbcTransaction
       return DatabasePlatform.OnQueryOnly.COMMIT;
     }
-    // default to rollback if not defined on the platform
+    // default to commit if not defined on the platform
     return dbPlatformOnQueryOnly == null ? DatabasePlatform.OnQueryOnly.COMMIT : dbPlatformOnQueryOnly;
   }
 }
