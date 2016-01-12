@@ -2316,7 +2316,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
    */
   public void appendOrderById(SpiQuery<T> query) {
 
-    if (idProperty != null) {
+    if (idProperty != null && !idProperty.isEmbedded()) {
       OrderBy<T> orderBy = query.getOrderBy();
       if (orderBy == null || orderBy.isEmpty()) {
         query.order().asc(idProperty.getName());

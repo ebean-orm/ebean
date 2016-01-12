@@ -3,6 +3,7 @@ package com.avaje.tests.compositekeys;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.avaje.ebean.PagedList;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,6 +52,8 @@ public class TestCKeyLazyLoad extends BaseTestCase {
 
     Ebean.save(p2);
 
+    exerciseMaxRowsQuery_with_embeddedId();
+
     CKeyParentId searchId = new CKeyParentId(1, "one");
 
     CKeyParent found = Ebean.find(CKeyParent.class).where().idEq(searchId).findUnique();
@@ -78,5 +81,16 @@ public class TestCKeyLazyLoad extends BaseTestCase {
 
     Assert.assertTrue(idInTestList.size() == 2);
 
+  }
+
+  /**
+   * Exercise paging/maxRows type query with EmbeddedId.
+   */
+  private void exerciseMaxRowsQuery_with_embeddedId() {
+
+    PagedList<CKeyParent> siteUserPage = Ebean.find(CKeyParent.class).where()
+        .orderBy("name asc")
+        .findPagedList(0, 10);
+    siteUserPage.getList();
   }
 }
