@@ -43,6 +43,8 @@ public class DefaultAutoTuneService implements AutoTuneService {
 
   private final int profilingUpdateFrequency;
 
+  private long runtimeChangeCount;
+
   public DefaultAutoTuneService(SpiEbeanServer server, ServerConfig serverConfig) {
 
     AutoTuneConfig config = serverConfig.getAutoTuneConfig();
@@ -68,18 +70,18 @@ public class DefaultAutoTuneService implements AutoTuneService {
 
     if (queryTuning) {
       loadTuningFile();
-      automaticProfiling();
+      if (isRuntimeTuningUpdates()) {
+        // periodically gather and update query tuning
+        server.getBackgroundExecutor().executePeriodically(new ProfilingUpdate(), profilingUpdateFrequency, TimeUnit.SECONDS);
+      }
     }
   }
 
-  private void automaticProfiling() {
 
-    if (isAutomaticTuningUpdate()) {
-      server.getBackgroundExecutor().executePeriodically(new ProfilingUpdate(), profilingUpdateFrequency, TimeUnit.SECONDS);
-    }
-  }
-
-  private boolean isAutomaticTuningUpdate() {
+  /**
+   * Return true if the tuning should update periodically at runtime.
+   */
+  private boolean isRuntimeTuningUpdates() {
     return profilingUpdateFrequency > 0;
   }
 
@@ -104,29 +106,33 @@ public class DefaultAutoTuneService implements AutoTuneService {
       Autotune profiling = reader.read(file);
       logger.info("AutoTune loading {} tuning entries", profiling.getOrigin().size());
       for (Origin origin : profiling.getOrigin()) {
-        queryTuner.load(origin);
+        queryTuner.put(origin);
       }
     }
   }
 
+  /**
+   * Collect profiling, check for new/diff to existing tuning and apply changes.
+   */
   private void runtimeTuningUpdate() {
 
     synchronized (this) {
       try {
         long start = System.currentTimeMillis();
+
         AutoTuneCollection profiling = profileManager.profilingCollection(false);
 
-        ProfileCollectionEvent event = new ProfileCollectionEvent(profiling, queryTuner, false);
-
-        if (!event.process()) {
+        AutoTuneDiffCollection event = new AutoTuneDiffCollection(profiling, queryTuner, true);
+        if (event.process()) {
           long exeMillis = System.currentTimeMillis() - start;
-          logger.debug("No tuning updates for server:{} executionMillis:{}", serverName, exeMillis);
+          logger.debug("No query tuning updates for server:{} executionMillis:{}", serverName, exeMillis);
 
         } else {
-
-          event.writeFile(profilingFile + "-" + serverName + "-tuningupdate");
+          // report the query tuning changes that have been made
+          runtimeChangeCount += event.getChangeCount();
+          event.writeFile(profilingFile + "-" + serverName + "-update");
           long exeMillis = System.currentTimeMillis() - start;
-          logger.info("query tuning update - new:{} diff:{} for server:{} executionMillis:{}", event.getNewCount(), event.getDiffCount(), serverName, exeMillis);
+          logger.info("query tuning updates - new:{} diff:{} for server:{} executionMillis:{}", event.getNewCount(), event.getDiffCount(), serverName, exeMillis);
         }
       } catch (Throwable e) {
         logger.error("Error collecting or applying automatic query tuning", e);
@@ -137,15 +143,15 @@ public class DefaultAutoTuneService implements AutoTuneService {
   private void saveProfilingOnShutdown(boolean reset) {
 
     synchronized (this) {
-      if (isAutomaticTuningUpdate()) {
+      if (isRuntimeTuningUpdates()) {
         runtimeTuningUpdate();
-        outputAggregateTuning();
+        outputAllTuning();
 
       } else {
 
         AutoTuneCollection profiling = profileManager.profilingCollection(reset);
-        ProfileCollectionEvent event = new ProfileCollectionEvent(profiling, queryTuner, true);
 
+        AutoTuneDiffCollection event = new AutoTuneDiffCollection(profiling, queryTuner, false);
         if (!event.process()) {
           logger.info("No new or diff entries for profiling server:{}", serverName);
 
@@ -157,11 +163,27 @@ public class DefaultAutoTuneService implements AutoTuneService {
     }
   }
 
-  private void outputAggregateTuning() {
+  /**
+   * Output all the query tuning (the "all" file).
+   * <p>
+   * This is the originally loaded tuning plus any tuning changes picked up and applied at runtime.
+   * </p>
+   * <p>
+   * This "all" file can be used as the next "ebean-autotune.xml" file.
+   * </p>
+   */
+  private void outputAllTuning() {
 
-    //TODO outputAggregateTuning()
+    if (runtimeChangeCount == 0) {
+      logger.info("no runtime query tuning changes for server:{}", serverName);
+
+    } else {
+      AutoTuneAllCollection event = new AutoTuneAllCollection(queryTuner);
+      int size = event.size();
+      event.writeFile(profilingFile + "-" + serverName + "-all");
+      logger.info("query tuning detected [{}] changes, writing all [{}] tuning entries for server:{}", runtimeChangeCount, size, serverName);
+    }
   }
-
 
   /**
    * Shutdown the listener.

@@ -2,17 +2,16 @@ package com.avaje.ebeaninternal.server.autotune.service;
 
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.ObjectGraphNode;
-import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.config.AutoTuneConfig;
 import com.avaje.ebean.config.AutoTuneMode;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.server.autotune.AutoTuneCollection;
 import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.autotune.model.Origin;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 
 import javax.persistence.PersistenceException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,17 +51,16 @@ public class BaseQueryTuner {
   }
 
   /**
-   * Load an entry from the source tuning xml.
+   * Return all the current tuned query entries.
    */
-  public void load(Origin origin) {
-
-    tunedQueryInfoMap.put(origin.getKey(), new TunedQueryInfo(origin));
+  public Collection<TunedQueryInfo> getAll() {
+    return tunedQueryInfoMap.values();
   }
 
   /**
-   * Add an entry at runtime.
+   * Put a query tuning entry.
    */
-  public void add(Origin origin) {
+  public void put(Origin origin) {
 
     tunedQueryInfoMap.put(origin.getKey(), new TunedQueryInfo(origin));
   }

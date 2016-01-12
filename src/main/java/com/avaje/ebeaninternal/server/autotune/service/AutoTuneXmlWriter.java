@@ -7,11 +7,28 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Simple writer for output of the AutoTune Profiling as an XML document.
  */
 public class AutoTuneXmlWriter {
+
+  /**
+   * Write the document as xml file with the given prefix.
+   */
+  public void write(Autotune document, String filePrefix) {
+
+    SortAutoTuneDocument.sort(document);
+
+    SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss");
+    String now = df.format(new Date());
+
+    // write the file with serverName and now suffix as we can output the profiling many times
+    File file = new File(filePrefix + "-" + now + ".xml");
+    write(document, file);
+  }
 
   /**
    * Write Profiling to a file as xml.

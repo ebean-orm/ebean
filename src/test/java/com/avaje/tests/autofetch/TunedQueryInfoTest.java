@@ -3,7 +3,9 @@ package com.avaje.tests.autofetch;
 import java.util.List;
 import java.util.Set;
 
+import com.avaje.ebeaninternal.server.autotune.model.Origin;
 import org.avaje.ebeantest.LoggedSqlCollector;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,43 +36,15 @@ public class TunedQueryInfoTest extends BaseTestCase {
   }
   
   @Test
-  public void withSelectNull() {
-    
-    init();
-    
-    OrmQueryDetail tunedDetail = new OrmQueryDetail();
-    tunedDetail.select(null);
-    
-    TunedQueryInfo tunedInfo = new TunedQueryInfo(tunedDetail);
-      
-    Query<Order> query = server.find(Order.class).setId(1);
-    
-    tunedInfo.tuneQuery((SpiQuery<?>) query);
-    
-    Order order = query.findUnique();
-    EntityBean eb = (EntityBean)order;
-    EntityBeanIntercept ebi = eb._ebean_getIntercept();
-    
-    Assert.assertTrue(ebi.isFullyLoadedBean());
-    
-    Set<String> loadedPropertyNames = ebi.getLoadedPropertyNames();
-    Assert.assertNull(loadedPropertyNames);
-    
-    // invoke lazy loading
-    order.getCustomer();
-  }
-  
-
-  @Test
   public void withSelectEmpty() {
     
     init();
     
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("");
-    
-    TunedQueryInfo tunedInfo = new TunedQueryInfo(tunedDetail);
-      
+
+    TunedQueryInfo tunedInfo = createTunedQueryInfo(tunedDetail);
+
     Query<Order> query = server.find(Order.class).setId(1);
     
     tunedInfo.tuneQuery((SpiQuery<?>) query);
@@ -95,9 +69,9 @@ public class TunedQueryInfoTest extends BaseTestCase {
     
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("somethingThatDoesNotExist");
-    
-    TunedQueryInfo tunedInfo = new TunedQueryInfo(tunedDetail);
-      
+
+    TunedQueryInfo tunedInfo = createTunedQueryInfo(tunedDetail);
+
     Query<Order> query = server.find(Order.class).setId(1);
     
     tunedInfo.tuneQuery((SpiQuery<?>) query);
@@ -123,7 +97,14 @@ public class TunedQueryInfoTest extends BaseTestCase {
     Assert.assertTrue(loggedSql.get(0).contains("select t0.id c0, t0.id c1 from o_order t0 where t0.id = ?"));
     Assert.assertTrue(loggedSql.get(1).contains("select t0.id c0, t0.status c1,"));
   }
-  
+
+  @NotNull
+  private TunedQueryInfo createTunedQueryInfo(OrmQueryDetail tunedDetail) {
+    Origin origin = new Origin();
+    origin.setDetail(tunedDetail.toString());
+    return new TunedQueryInfo(origin);
+  }
+
   @Test
   public void withSelectSomeIncludeLazyLoaded() {
     
@@ -132,7 +113,7 @@ public class TunedQueryInfoTest extends BaseTestCase {
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("status, customer");
     
-    TunedQueryInfo tunedInfo = new TunedQueryInfo(tunedDetail);
+    TunedQueryInfo tunedInfo = createTunedQueryInfo(tunedDetail);
       
     Query<Order> query = server.find(Order.class).setId(1);
     
@@ -167,7 +148,7 @@ public class TunedQueryInfoTest extends BaseTestCase {
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("status");
     
-    TunedQueryInfo tunedInfo = new TunedQueryInfo(tunedDetail);
+    TunedQueryInfo tunedInfo = createTunedQueryInfo(tunedDetail);
       
     Query<Order> query = server.find(Order.class).setId(1);
     

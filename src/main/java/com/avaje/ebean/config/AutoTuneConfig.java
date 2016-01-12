@@ -230,5 +230,6 @@ public class AutoTuneConfig {
     profilingBase = p.getInt("autoTune.profilingBase", profilingBase);
     profilingRate = p.getDouble("autoTune.profilingRate", profilingRate);
     profilingFile = p.get("autoTune.profilingFile", profilingFile);
+    profilingUpdateFrequency = p.getInt("autoTune.profilingUpdateFrequency", profilingUpdateFrequency);
   }
 }

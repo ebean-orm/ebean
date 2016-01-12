@@ -1,5 +1,7 @@
 package com.avaje.tests.cache;
 
+import com.avaje.ebeaninternal.server.autotune.model.Origin;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,6 +15,13 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.tests.model.basic.FeatureDescription;
 
 public class TestL2CacheWithSharedBean extends BaseTestCase {
+
+  @NotNull
+  private TunedQueryInfo createTunedQueryInfo(OrmQueryDetail tunedDetail) {
+    Origin origin = new Origin();
+    origin.setDetail(tunedDetail.toString());
+    return new TunedQueryInfo(origin);
+  }
 
   @Test
   public void test() {
@@ -28,7 +37,7 @@ public class TestL2CacheWithSharedBean extends BaseTestCase {
 
     OrmQueryDetail tunedDetail = new OrmQueryDetail();
     tunedDetail.select("name");
-    TunedQueryInfo tunedInfo = new TunedQueryInfo(tunedDetail);
+    TunedQueryInfo tunedInfo = createTunedQueryInfo(tunedDetail);
 
     Query<FeatureDescription> query = Ebean.find(FeatureDescription.class).setId(f1.getId());
 

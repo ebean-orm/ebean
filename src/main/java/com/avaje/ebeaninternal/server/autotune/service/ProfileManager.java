@@ -118,7 +118,6 @@ public class ProfileManager implements ProfilingListener {
     AutoTuneCollection req = new AutoTuneCollection();
 
     for (ProfileOrigin origin : profileMap.values()) {
-
       BeanDescriptor<?> desc = server.getBeanDescriptorById(origin.getOrigin().getBeanType());
       if (desc != null) {
         origin.profilingCollection(desc, req, reset);

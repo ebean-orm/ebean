@@ -7,23 +7,52 @@ import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Random;
 
 public class TestAutoTuneProfiling extends BaseTestCase {
 
+  @Ignore
   @Test
-  public void test() {
+  public void test() throws InterruptedException {
 
     ResetBasicData.reset();
+
+    System.out.println("Start .......");
 
     for (int i = 0; i < 1; i++) {
       execute();
     }
-
-
     collectUsage();
+
+    System.out.println("Sleeping ...");
+    sortOfBusy();
+
+    System.out.println("Run after collection");
+
+    for (int i = 0; i < 10; i++) {
+      execute();
+    }
+    collectUsage();
+
+    System.out.println("Sleeping ...");
+    sortOfBusy();
+
+    System.out.println("Run after collection");
+
+    for (int i = 0; i < 1; i++) {
+      execute();
+    }
+  }
+
+  private void sortOfBusy() {
+
+    for (int i = 0; i < 90000000; i++) {
+      new Random().nextLong();
+    }
   }
 
 
