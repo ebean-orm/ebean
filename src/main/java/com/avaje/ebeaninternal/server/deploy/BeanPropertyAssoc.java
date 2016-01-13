@@ -85,8 +85,8 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	public void initialise() {
 		// this *MUST* execute after the BeanDescriptor is
 		// put into the map to stop infinite recursion
-		if (!isTransient){
-			targetDescriptor = descriptor.getBeanDescriptor(targetType);
+    targetDescriptor = descriptor.getBeanDescriptor(targetType);
+    if (!isTransient){
 			targetIdBinder = targetDescriptor.getIdBinder();
 			targetInheritInfo = targetDescriptor.getInheritInfo();
 			saveRecurseSkippable = targetDescriptor.isSaveRecurseSkippable();

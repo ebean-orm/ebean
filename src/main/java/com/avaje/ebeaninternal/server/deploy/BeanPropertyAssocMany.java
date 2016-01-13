@@ -887,7 +887,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       if (help != null) {
         help.jsonWrite(ctx, name, value, include != null);
       } else {
-        if (isTransient) {
+        if (isTransient && targetDescriptor == null) {
           ctx.writeValueUsingObjectMapper(name, value);
         } else {
           Collection<?> collection = (Collection<?>)value;
