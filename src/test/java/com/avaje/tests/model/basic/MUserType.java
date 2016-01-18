@@ -5,7 +5,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="muser_type", schema = "mys")
+@Table(name="muser_type")
 public class MUserType {
 
 	@Id
