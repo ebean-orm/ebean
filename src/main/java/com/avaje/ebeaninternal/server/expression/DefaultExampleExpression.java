@@ -14,6 +14,8 @@ import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
+import com.avaje.ebeaninternal.server.query.SplitName;
 
 /**
  * A "Query By Example" type of expression.
@@ -207,25 +209,41 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
     OrmQueryRequest<?> r = (OrmQueryRequest<?>) request;
     BeanDescriptor<?> beanDescriptor = r.getBeanDescriptor();
 
-    for (BeanProperty beanProperty : beanDescriptor.propertiesAll()) {
-      
-      String propName = beanProperty.getName();
-      Object value = beanProperty.getValue(entity);
+    addExpressions(list, beanDescriptor, entity, null);
 
-      if (beanProperty.isScalar() && value != null) {
-        if (value instanceof String) {
-          list.add(new LikeExpression(propName, (String) value, caseInsensitive, likeType));
-        } else {
-          // exclude the zero values typically to weed out
-          // primitive int and long that initialise to 0
-          if (includeZeros || !isZero(value)) {
-            list.add(new SimpleExpression(propName, Op.EQ, value));
+    return list;
+  }
+
+  /**
+   * Add expressions to the list for all the non-null properties (and do this recursively).
+   */
+  private void addExpressions(ArrayList<SpiExpression> list, BeanDescriptor<?> beanDescriptor, EntityBean bean, String prefix) {
+
+    for (BeanProperty beanProperty : beanDescriptor.propertiesAll()) {
+
+      if (!beanProperty.isTransient()) {
+        Object value = beanProperty.getValue(bean);
+        if (value != null) {
+          String propName = SplitName.add(prefix, beanProperty.getName());
+          if (beanProperty.isScalar()) {
+            if (value instanceof String) {
+              list.add(new LikeExpression(propName, (String) value, caseInsensitive, likeType));
+            } else {
+              // exclude the zero values typically to weed out
+              // primitive int and long that initialise to 0
+              if (includeZeros || !isZero(value)) {
+                list.add(new SimpleExpression(propName, Op.EQ, value));
+              }
+            }
+
+          } else if ((beanProperty instanceof BeanPropertyAssocOne) && (value instanceof EntityBean)) {
+            BeanPropertyAssocOne assocOne = (BeanPropertyAssocOne)beanProperty;
+            BeanDescriptor targetDescriptor = assocOne.getTargetDescriptor();
+            addExpressions(list, targetDescriptor, (EntityBean)value, propName);
           }
         }
       }
     }
-
-    return list;
   }
 
   /**
