@@ -64,8 +64,7 @@ public class ModelBuildIntersectionTable {
 	private void buildFkConstraints(BeanDescriptor<?> desc, TableJoinColumn[] columns, boolean direction) {
 
     String tableName = intersectionTableJoin.getTable();
-    String baseTable = desc.getBaseTable();
-
+    String baseTable = ctx.normaliseTable(desc.getBaseTable());
     String fkName = ctx.foreignKeyConstraintName(tableName, baseTable, ++countForeignKey);
     String fkIndex = ctx.foreignKeyIndexName(tableName, baseTable, countForeignKey);
 

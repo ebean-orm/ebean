@@ -43,6 +43,10 @@ public class ModelBuildContext {
     model.adjustDraftReferences();
   }
 
+  public String normaliseTable(String baseTable) {
+    return constraintNaming.normaliseTable(baseTable);
+  }
+
   public String primaryKeyName(String tableName) {
     return maxLength(constraintNaming.primaryKeyName(tableName), 0);
   }
