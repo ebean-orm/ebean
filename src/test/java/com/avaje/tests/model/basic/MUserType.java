@@ -2,8 +2,10 @@ package com.avaje.tests.model.basic;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name="muser_type", schema = "mys")
 public class MUserType {
 
 	@Id
