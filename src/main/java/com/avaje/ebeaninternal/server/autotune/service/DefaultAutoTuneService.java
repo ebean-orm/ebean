@@ -25,7 +25,9 @@ public class DefaultAutoTuneService implements AutoTuneService {
 
   private final long defaultGarbageCollectionWait;
 
-  private final boolean skipCollectionOnShutdown;
+  private final boolean skipGarbageCollectionOnShutdown;
+
+  private final boolean skipProfileReportingOnShutdown;
 
   private final BaseQueryTuner queryTuner;
 
@@ -58,7 +60,8 @@ public class DefaultAutoTuneService implements AutoTuneService {
     this.serverName = server.getName();
     this.profileManager = new ProfileManager(config, server);
     this.queryTuner = new BaseQueryTuner(config, server, profileManager);
-    this.skipCollectionOnShutdown = config.isSkipCollectionOnShutdown();
+    this.skipGarbageCollectionOnShutdown = config.isSkipGarbageCollectionOnShutdown();
+    this.skipProfileReportingOnShutdown = config.isSkipProfileReportingOnShutdown();
     this.defaultGarbageCollectionWait = (long) config.getGarbageCollectionWait();
   }
 
@@ -123,7 +126,8 @@ public class DefaultAutoTuneService implements AutoTuneService {
         AutoTuneCollection profiling = profileManager.profilingCollection(false);
 
         AutoTuneDiffCollection event = new AutoTuneDiffCollection(profiling, queryTuner, true);
-        if (event.process()) {
+        event.process();
+        if (event.isEmpty()) {
           long exeMillis = System.currentTimeMillis() - start;
           logger.debug("No query tuning updates for server:{} executionMillis:{}", serverName, exeMillis);
 
@@ -152,7 +156,8 @@ public class DefaultAutoTuneService implements AutoTuneService {
         AutoTuneCollection profiling = profileManager.profilingCollection(reset);
 
         AutoTuneDiffCollection event = new AutoTuneDiffCollection(profiling, queryTuner, false);
-        if (!event.process()) {
+        event.process();
+        if (event.isEmpty()) {
           logger.info("No new or diff entries for profiling server:{}", serverName);
 
         } else {
@@ -195,10 +200,27 @@ public class DefaultAutoTuneService implements AutoTuneService {
    */
   @Override
   public void shutdown() {
-    if (profiling && !skipCollectionOnShutdown) {
-      collectProfiling(-1);
-      saveProfilingOnShutdown(false);
+    if (profiling) {
+      if (!skipGarbageCollectionOnShutdown && !skipProfileReportingOnShutdown) {
+        // trigger GC to update profiling information on recently executed queries
+        collectProfiling(-1);
+      }
+      if (!skipProfileReportingOnShutdown) {
+        saveProfilingOnShutdown(false);
+      }
     }
+  }
+
+  /**
+   * Output the profiling.
+   * <p>
+   * When profiling updates are applied to tuning at runtime this reports all tuning and profiling combined.
+   * When profiling is not applied at runtime then this reports the diff report with new and diff entries relative
+   * to the existing tuning.
+   * </p>
+   */
+  public void reportProfiling() {
+    saveProfilingOnShutdown(false);
   }
 
   /**

@@ -25,7 +25,9 @@ public class AutoTuneConfig {
 
   private int garbageCollectionWait = 100;
   
-  private boolean skipCollectionOnShutdown;
+  private boolean skipGarbageCollectionOnShutdown;
+
+  private boolean skipProfileReportingOnShutdown;
 
   public AutoTuneConfig() {
   }
@@ -200,17 +202,33 @@ public class AutoTuneConfig {
   }
 
   /**
-   * Return true if profiling collection should be skipped on shutdown.
+   * Return true if triggering garbage collection should be skipped on shutdown.
+   * You might set this when System.GC() slows a application shutdown too much.
    */
-  public boolean isSkipCollectionOnShutdown() {
-    return skipCollectionOnShutdown;
+  public boolean isSkipGarbageCollectionOnShutdown() {
+    return skipGarbageCollectionOnShutdown;
   }
 
   /**
-   * Set to true if profiling collection should be skipped on shutdown.
+   * Set to true if triggering garbage collection should be skipped on shutdown.
+   * You might set this when System.GC() slows a application shutdown too much.
    */
-  public void setSkipCollectionOnShutdown(boolean skipCollectionOnShutdown) {
-    this.skipCollectionOnShutdown = skipCollectionOnShutdown;
+  public void setSkipGarbageCollectionOnShutdown(boolean skipGarbageCollectionOnShutdown) {
+    this.skipGarbageCollectionOnShutdown = skipGarbageCollectionOnShutdown;
+  }
+
+  /**
+   * Return true if profile reporting should be skipped on shutdown.
+   */
+  public boolean isSkipProfileReportingOnShutdown() {
+    return skipProfileReportingOnShutdown;
+  }
+
+  /**
+   * Set to true if profile reporting should be skipped on shutdown.
+   */
+  public void setSkipProfileReportingOnShutdown(boolean skipProfileReportingOnShutdown) {
+    this.skipProfileReportingOnShutdown = skipProfileReportingOnShutdown;
   }
 
   /**
@@ -222,8 +240,9 @@ public class AutoTuneConfig {
     queryTuningAddVersion = p.getBoolean("autoTune.queryTuningAddVersion", queryTuningAddVersion);
     queryTuningFile = p.get("autoTune.queryTuningFile", queryTuningFile);
 
-    skipCollectionOnShutdown = p.getBoolean("autoTune.skipCollectionOnShutdown", skipCollectionOnShutdown);
-    
+    skipGarbageCollectionOnShutdown = p.getBoolean("autoTune.skipGarbageCollectionOnShutdown", skipGarbageCollectionOnShutdown);
+    skipProfileReportingOnShutdown = p.getBoolean("autoTune.skipProfileReportingOnShutdown", skipProfileReportingOnShutdown);
+
     mode = p.getEnum(AutoTuneMode.class, "autoTune.mode", mode);
 
     profiling = p.getBoolean("autoTune.profiling", profiling);

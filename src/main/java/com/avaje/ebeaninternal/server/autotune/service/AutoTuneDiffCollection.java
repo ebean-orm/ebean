@@ -82,13 +82,11 @@ public class AutoTuneDiffCollection {
   /**
    * Process checking profiling entries against existing query tuning.
    */
-  public boolean process() {
+  public void process() {
 
     for (AutoTuneCollection.Entry entry : profiling.getEntries()) {
       addToDocument(entry);
     }
-
-    return isEmpty();
   }
 
   /**
