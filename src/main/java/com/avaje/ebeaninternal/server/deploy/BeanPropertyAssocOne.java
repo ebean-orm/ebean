@@ -101,14 +101,23 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         // no imported or exported information
       } else if (!oneToOneExported) {
         importedId = createImportedId(this, targetDescriptor, tableJoin);
+        if (importedId.isScalar()) {
+          // limit JoinColumn mapping to the @Id / primary key
+          TableJoinColumn[] columns = tableJoin.columns();
+          String foreignJoinColumn = columns[0].getForeignDbColumn();
+          String foreignIdColumn = targetDescriptor.getIdProperty().getDbColumn();
+          if (!foreignJoinColumn.equalsIgnoreCase(foreignIdColumn)) {
+            throw new PersistenceException("Mapping limitation - @OneToOne @JoinColumn needs to map to a primary key as per Issue #529 "
+                + " - joining to " + foreignJoinColumn + " and not " + foreignIdColumn);
+          }
+        }
+
       } else {
         exportedProperties = createExported();
 
         String delStmt = "delete from " + targetDescriptor.getBaseTable() + " where ";
-
         deleteByParentIdSql = delStmt + deriveWhereParentIdSql(false);
         deleteByParentIdInSql = delStmt + deriveWhereParentIdSql(true);
-
       }
     }
   }
