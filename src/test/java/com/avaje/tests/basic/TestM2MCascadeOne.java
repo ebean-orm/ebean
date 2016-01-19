@@ -2,6 +2,7 @@ package com.avaje.tests.basic;
 
 import java.util.List;
 
+import com.avaje.ebean.Query;
 import org.junit.Test;
 
 import com.avaje.ebean.BaseTestCase;
@@ -40,6 +41,18 @@ public class TestM2MCascadeOne extends BaseTestCase {
     u1.addRole(r1);
 
     Ebean.save(u1);
+
+  }
+
+  @Test
+  public void testRawPredicate_with_ManyToManyPath() {
+
+    Query<MUser> query = Ebean.find(MUser.class)
+        .select("userid")
+        .where().raw("roles.roleid in (?)", 24)
+        .query();
+
+    query.findList();
 
   }
 }

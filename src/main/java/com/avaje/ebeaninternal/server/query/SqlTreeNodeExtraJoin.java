@@ -100,8 +100,9 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
     if (pathContainsMany) {
       // "promote" to left outer as the path contains a many
-      assocBeanProperty.addJoin(SqlJoinType.OUTER, prefix, ctx);
-    } else if (!manyToMany) {
+      joinType = SqlJoinType.OUTER;
+    }
+    if (!manyToMany) {
       assocBeanProperty.addJoin(joinType, prefix, ctx);
     }
 
