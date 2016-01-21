@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.api;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.bean.BeanCollection;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class LoadManyRequest extends LoadRequest {
 
-  private static final Logger logger = LoggerFactory.getLogger(EbeanServer.class);
+  private static final Logger logger = LoggerFactory.getLogger(LoadManyRequest.class);
 
   private final List<BeanCollection<?>> batch;
 
@@ -180,7 +181,9 @@ public class LoadManyRequest extends LoadRequest {
       BeanCollection<?> bc = batch.get(i);
       if (bc.checkEmptyLazyLoad()) {
         if (logger.isDebugEnabled()) {
-          logger.debug("BeanCollection after load was empty. Owner:" + batch.get(i).getOwnerBean());
+          EntityBean ownerBean = bc.getOwnerBean();
+          Object parentId = desc.getId(ownerBean);
+          logger.debug("BeanCollection after lazy load was empty. type[" + ownerBean.getClass() + "] id[" + parentId + "] owner[" + ownerBean + "]");
         }
       } else if (isLoadCache()) {
         Object parentId = desc.getId(bc.getOwnerBean());
