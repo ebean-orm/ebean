@@ -40,6 +40,11 @@ public class LoadManyRequest extends LoadRequest {
     this.loadCache = loadCache;
   }
 
+  @Override
+  public Class<?> getBeanType() {
+    return loadContext.getBeanDescriptor().getBeanType();
+  }
+
   public String getDescription() {
     return "path:" + loadContext.getFullPath() + " size:" + batch.size();
   }

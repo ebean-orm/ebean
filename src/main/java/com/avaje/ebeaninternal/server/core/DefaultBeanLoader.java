@@ -6,10 +6,10 @@ import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
-import com.avaje.ebeaninternal.api.LoadBeanBuffer;
 import com.avaje.ebeaninternal.api.LoadBeanRequest;
 import com.avaje.ebeaninternal.api.LoadManyBuffer;
 import com.avaje.ebeaninternal.api.LoadManyRequest;
+import com.avaje.ebeaninternal.api.LoadRequest;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -144,17 +144,7 @@ public class DefaultBeanLoader {
       query.select(many.getTargetIdProperty());
     }
 
-    if (onIterateUseExtraTxn && loadRequest.isParentFindIterate()) {
-      // MySql - we need a different transaction to execute the secondary query
-      SpiTransaction extraTxn = server.createQueryTransaction();
-      try {
-        server.findList(query, extraTxn);
-      } finally {
-        extraTxn.end();
-      }
-    } else {
-      server.findList(query, loadRequest.getTransaction());
-    }
+    executeLazyLoadQuery(loadRequest, query);
 
     // check for BeanCollection's that where never processed
     // in the +query or +lazy load due to no rows (predicates)
@@ -274,96 +264,50 @@ public class DefaultBeanLoader {
   public void loadBean(LoadBeanRequest loadRequest) {
 
     List<EntityBeanIntercept> batch = loadRequest.getBatch();
-
     if (batch.isEmpty()) {
       throw new RuntimeException("Nothing in batch?");
     }
 
     int batchSize = getBatchSize(batch.size());
 
-    LoadBeanBuffer ctx = loadRequest.getLoadContext();
-    BeanDescriptor<?> desc = ctx.getBeanDescriptor();
-
-    Class<?> beanType = desc.getBeanType();
-
-    EntityBeanIntercept[] ebis = batch.toArray(new EntityBeanIntercept[batch.size()]);
-    ArrayList<Object> idList = new ArrayList<Object>(batchSize);
-
-    for (int i = 0; i < batch.size(); i++) {
-      EntityBeanIntercept ebi = batch.get(i);
-      EntityBean bean = ebi.getOwner();
-      Object id = desc.getId(bean);
-      idList.add(id);
-    }
-
+    List<Object> idList = loadRequest.getIdList(batchSize);
     if (idList.isEmpty()) {
       // everything was loaded from cache
       return;
     }
 
-    int extraIds = batchSize - batch.size();
-    if (extraIds > 0) {
-      // for performance make up the Id's to the batch size
-      // so we get the same query (for Ebean and the db)
-      Object firstId = idList.get(0);
-      for (int i = 0; i < extraIds; i++) {
-        // just add the first Id again
-        idList.add(firstId);
-      }
-    }
+    SpiQuery<?> query = (SpiQuery<?>) server.createQuery(loadRequest.getBeanType());
+    loadRequest.configureQuery(query);
 
-    PersistenceContext persistenceContext = ctx.getPersistenceContext();
-
-    SpiQuery<?> query = (SpiQuery<?>) server.createQuery(beanType);
-
-    query.setMode(Mode.LAZYLOAD_BEAN);
-    query.setPersistenceContext(persistenceContext);
-
-    String mode = loadRequest.isLazy() ? "+lazy" : "+query";
-    query.setLoadDescription(mode, loadRequest.getDescription());
-
-    if (loadRequest.isLazy()) {
-      // cascade the batch size (if set) for further lazy loading
-      query.setLazyLoadBatchSize(loadRequest.getBatchSize());
-    }
-
-    ctx.configureQuery(query, loadRequest.getLazyLoadProperty());
-
-    // make sure the query doesn't use the cache
-    // query.setUseCache(false);
     if (idList.size() == 1) {
       query.where().idEq(idList.get(0));
     } else {
       query.where().idIn(idList);
     }
 
-    List<?> list;
+    List<?> list = executeLazyLoadQuery(loadRequest, query);
+
+    loadRequest.processLoadedBeans(list);
+
+    // log the query (for testing secondary queries)
+    loadRequest.logSecondaryQuery(query);
+  }
+
+  /**
+   * Execute the lazy load query taking into account MySql transaction oddness.
+   */
+  private List<?> executeLazyLoadQuery(LoadRequest loadRequest, SpiQuery<?> query) {
     if (onIterateUseExtraTxn && loadRequest.isParentFindIterate()) {
       // MySql - we need a different transaction to execute the secondary query
       SpiTransaction extraTxn = server.createQueryTransaction();
       try {
-        list = server.findList(query, extraTxn);
+        return server.findList(query, extraTxn);
       } finally {
         extraTxn.end();
       }
     } else {
-      list = server.findList(query, loadRequest.getTransaction());
+      return server.findList(query, loadRequest.getTransaction());
     }
-
-    if (loadRequest.isLoadCache()) {
-      for (int i = 0; i < list.size(); i++) {
-        desc.cacheBeanPutData((EntityBean) list.get(i));
-      }
-    }
-
-    for (int i = 0; i < ebis.length; i++) {
-      // Check if the underlying row in DB was deleted. Mark this bean as 'failed' if
-      // necessary but allow processing to continue until it is accessed by client code
-      ebis[i].checkLazyLoadFailure();
-    }
-
-    // log the query (for testing secondary queries)
-    loadRequest.logSecondaryQuery(query);
   }
 
   public void refresh(EntityBean bean) {

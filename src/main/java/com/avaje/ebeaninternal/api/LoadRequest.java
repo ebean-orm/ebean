@@ -22,6 +22,11 @@ public abstract class LoadRequest {
 	}
 
   /**
+   * Return the associated bean type for this load request.
+   */
+  public abstract Class<?> getBeanType();
+
+  /**
    * Log the just executed secondary query with the 'root' query if 'logSecondaryQuery' is set to
    * true. This is for testing purposes to confirm the secondary query executes etc.
    */
