@@ -7,7 +7,6 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.LoadBeanRequest;
-import com.avaje.ebeaninternal.api.LoadManyBuffer;
 import com.avaje.ebeaninternal.api.LoadManyRequest;
 import com.avaje.ebeaninternal.api.LoadRequest;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -16,13 +15,11 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -86,79 +83,11 @@ public class DefaultBeanLoader {
 
     int batchSize = getBatchSize(batch.size());
 
-    LoadManyBuffer ctx = loadRequest.getLoadContext();
-    BeanPropertyAssocMany<?> many = ctx.getBeanProperty();
-
-    PersistenceContext pc = ctx.getPersistenceContext();
-
-    ArrayList<Object> idList = new ArrayList<Object>(batchSize);
-
-    for (int i = 0; i < batch.size(); i++) {
-      BeanCollection<?> bc = batch.get(i);
-      EntityBean ownerBean = bc.getOwnerBean();
-      Object id = many.getParentId(ownerBean);
-      idList.add(id);
-    }
-    int extraIds = batchSize - batch.size();
-    if (extraIds > 0) {
-      Object firstId = idList.get(0);
-      for (int i = 0; i < extraIds; i++) {
-        idList.add(firstId);
-      }
-    }
-
-    BeanDescriptor<?> desc = ctx.getBeanDescriptor();
-
-    SpiQuery<?> query = (SpiQuery<?>) server.createQuery(many.getTargetType());
-    String orderBy = many.getLazyFetchOrderBy();
-    if (orderBy != null) {
-      query.orderBy(orderBy);
-    }
-
-    String extraWhere = many.getExtraWhere();
-    if (extraWhere != null) {
-      // replace special ${ta} placeholder with the base table alias 
-      // which is always t0 and add the extra where clause
-      String ew = StringHelper.replaceString(extraWhere, "${ta}", "t0");
-      query.where().raw(ew);
-    }
-
-    query.setLazyLoadForParents(many);
-    many.addWhereParentIdIn(query, idList);
-
-    query.setPersistenceContext(pc);
-
-    String mode = loadRequest.isLazy() ? "+lazy" : "+query";
-    query.setLoadDescription(mode, loadRequest.getDescription());
-
-    if (loadRequest.isLazy()) {
-      // cascade the batch size (if set) for further lazy loading
-      query.setLazyLoadBatchSize(loadRequest.getBatchSize());
-    }
-
-    // potentially changes the joins and selected properties
-    ctx.configureQuery(query);
-
-    if (loadRequest.isOnlyIds()) {
-      // override to just select the Id values
-      query.select(many.getTargetIdProperty());
-    }
+    SpiQuery<?> query = loadRequest.createQuery(server, batchSize);
 
     executeLazyLoadQuery(loadRequest, query);
 
-    // check for BeanCollection's that where never processed
-    // in the +query or +lazy load due to no rows (predicates)
-    for (int i = 0; i < batch.size(); i++) {
-      BeanCollection<?> bc = batch.get(i);
-      if (bc.checkEmptyLazyLoad()) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("BeanCollection after load was empty. Owner:" + batch.get(i).getOwnerBean());
-        }
-      } else if (loadRequest.isLoadCache()) {
-        Object parentId = desc.getId(bc.getOwnerBean());
-        desc.cacheManyPropPut(many, bc, parentId);
-      }
-    }
+    loadRequest.postLoad();
 
     // log the query (for testing secondary queries)
     loadRequest.logSecondaryQuery(query);
@@ -287,7 +216,7 @@ public class DefaultBeanLoader {
 
     List<?> list = executeLazyLoadQuery(loadRequest, query);
 
-    loadRequest.processLoadedBeans(list);
+    loadRequest.postLoad(list);
 
     // log the query (for testing secondary queries)
     loadRequest.logSecondaryQuery(query);

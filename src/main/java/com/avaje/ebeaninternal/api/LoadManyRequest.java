@@ -1,14 +1,23 @@
 package com.avaje.ebeaninternal.api;
 
-import java.util.List;
-
+import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import com.avaje.ebeaninternal.server.lib.util.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Request for loading Associated Many Beans.
  */
 public class LoadManyRequest extends LoadRequest {
+
+  private static final Logger logger = LoggerFactory.getLogger(EbeanServer.class);
 
   private final List<BeanCollection<?>> batch;
 
@@ -87,5 +96,97 @@ public class LoadManyRequest extends LoadRequest {
    */
   public int getBatchSize() {
     return loadContext.getBatchSize();
+  }
+
+  private List<Object> getParentIdList(int batchSize) {
+
+    ArrayList<Object> idList = new ArrayList<Object>(batchSize);
+
+    BeanPropertyAssocMany<?> many = getMany();
+    for (int i = 0; i < batch.size(); i++) {
+      BeanCollection<?> bc = batch.get(i);
+      idList.add(many.getParentId(bc.getOwnerBean()));
+    }
+    int extraIds = batchSize - batch.size();
+    if (extraIds > 0) {
+      Object firstId = idList.get(0);
+      for (int i = 0; i < extraIds; i++) {
+        idList.add(firstId);
+      }
+    }
+
+    return idList;
+  }
+
+  private BeanPropertyAssocMany<?> getMany() {
+    return loadContext.getBeanProperty();
+  }
+
+  public SpiQuery<?> createQuery(EbeanServer server, int batchSize) {
+
+    BeanPropertyAssocMany<?> many = getMany();
+
+    SpiQuery<?> query = (SpiQuery<?>) server.createQuery(many.getTargetType());
+    String orderBy = many.getLazyFetchOrderBy();
+    if (orderBy != null) {
+      query.orderBy(orderBy);
+    }
+
+    String extraWhere = many.getExtraWhere();
+    if (extraWhere != null) {
+      // replace special ${ta} placeholder with the base table alias
+      // which is always t0 and add the extra where clause
+      String ew = StringHelper.replaceString(extraWhere, "${ta}", "t0");
+      query.where().raw(ew);
+    }
+
+    query.setLazyLoadForParents(many);
+
+    List<Object> idList = getParentIdList(batchSize);
+    many.addWhereParentIdIn(query, idList);
+
+    query.setPersistenceContext(loadContext.getPersistenceContext());
+
+    String mode = isLazy() ? "+lazy" : "+query";
+    query.setLoadDescription(mode, getDescription());
+
+    if (isLazy()) {
+      // cascade the batch size (if set) for further lazy loading
+      query.setLazyLoadBatchSize(getBatchSize());
+    }
+
+    // potentially changes the joins and selected properties
+    loadContext.configureQuery(query);
+
+    if (isOnlyIds()) {
+      // override to just select the Id values
+      query.select(many.getTargetIdProperty());
+    }
+
+    return query;
+  }
+
+  /**
+   * After the query execution check for empty collections and load L2 cache if desired.
+   */
+  public void postLoad() {
+
+    BeanDescriptor<?> desc = loadContext.getBeanDescriptor();
+    BeanPropertyAssocMany<?> many = getMany();
+
+    // check for BeanCollection's that where never processed
+    // in the +query or +lazy load due to no rows (predicates)
+    for (int i = 0; i < batch.size(); i++) {
+      BeanCollection<?> bc = batch.get(i);
+      if (bc.checkEmptyLazyLoad()) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("BeanCollection after load was empty. Owner:" + batch.get(i).getOwnerBean());
+        }
+      } else if (isLoadCache()) {
+        Object parentId = desc.getId(bc.getOwnerBean());
+        desc.cacheManyPropPut(many, bc, parentId);
+      }
+    }
+
   }
 }

@@ -134,7 +134,7 @@ public class LoadBeanRequest extends LoadRequest {
   /**
    * Load the beans into the L2 cache if that is requested and check for load failures due to deletes.
    */
-  public void processLoadedBeans(List<?> list) {
+  public void postLoad(List<?> list) {
 
     if (isLoadCache()) {
       BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
