@@ -77,7 +77,7 @@ public class TestBatchLazyWithDeleted extends BaseTestCase {
       list.get(2).getMaster().getName();
       Assert.assertTrue(false);
     } catch (EntityNotFoundException e) {
-      // this bean was deleted and lazy loading failed 
+      // this bean was deleted and lazy loading failed
       Assert.assertTrue(true);
     }
 
