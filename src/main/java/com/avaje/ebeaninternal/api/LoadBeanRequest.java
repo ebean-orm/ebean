@@ -4,6 +4,8 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +15,13 @@ import java.util.List;
  */
 public class LoadBeanRequest extends LoadRequest {
 
+  private static final Logger logger = LoggerFactory.getLogger(LoadBeanRequest.class);
+
   private final List<EntityBeanIntercept> batch;
 
   private final LoadBeanBuffer loadBuffer;
+
+  private final int lazyLoadPropertyIndex;
 
   private final String lazyLoadProperty;
 
@@ -24,21 +30,24 @@ public class LoadBeanRequest extends LoadRequest {
   /**
    * Construct for lazy load request.
    */
-  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, String lazyLoadProperty, boolean loadCache) {
-    this(LoadBuffer, null, true, lazyLoadProperty, loadCache);
+  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, int lazyLoadPropertyIndex, String lazyLoadProperty, boolean loadCache) {
+    this(LoadBuffer, null, true, lazyLoadPropertyIndex, lazyLoadProperty, loadCache);
   }
 
   /**
    * Construct for secondary query.
    */
   public LoadBeanRequest(LoadBeanBuffer LoadBuffer, OrmQueryRequest<?> parentRequest) {
-    this(LoadBuffer, parentRequest, false, null, false);
+    this(LoadBuffer, parentRequest, false, -1, null, false);
   }
 
-  private LoadBeanRequest(LoadBeanBuffer loadBuffer, OrmQueryRequest<?> parentRequest, boolean lazy, String lazyLoadProperty, boolean loadCache) {
+  private LoadBeanRequest(LoadBeanBuffer loadBuffer, OrmQueryRequest<?> parentRequest, boolean lazy,
+                          int lazyLoadPropertyIndex, String lazyLoadProperty, boolean loadCache) {
+
     super(parentRequest, lazy);
     this.loadBuffer = loadBuffer;
     this.batch = loadBuffer.getBatch();
+    this.lazyLoadPropertyIndex = lazyLoadPropertyIndex;
     this.lazyLoadProperty = lazyLoadProperty;
     this.loadCache = loadCache;
   }
@@ -143,10 +152,20 @@ public class LoadBeanRequest extends LoadRequest {
       }
     }
 
-    for (int i = 0; i < batch.size(); i++) {
-      // Check if the underlying row in DB was deleted. Mark this bean as 'failed' if
-      // necessary but allow processing to continue until it is accessed by client code
-      batch.get(i).checkLazyLoadFailure();
+    if (lazyLoadPropertyIndex > -1) {
+      // this is a lazy loading query so check for lazy loading failure (due to deleted rows)
+      for (int i = 0; i < batch.size(); i++) {
+        // check if the underlying row in DB was deleted. Mark the bean as 'failed' if
+        // necessary but allow processing to continue until it is accessed by client code
+        EntityBeanIntercept ebi = batch.get(i);
+        // all beans in the batch should have this property loaded now
+        if (ebi.isLazyLoadFailure(lazyLoadPropertyIndex)) {
+          BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
+          Object beanId = desc.getId(ebi.getOwner());
+          ebi.setOwnerId(beanId);
+          logger.info("Lazy loading unsuccessful for type:" + desc.getName() + " id:" + beanId + " - expecting when bean has been deleted");
+        }
+      }
     }
   }
 }

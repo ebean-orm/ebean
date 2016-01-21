@@ -1,5 +1,10 @@
 package com.avaje.ebean.bean;
 
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.ValuePair;
+
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.PersistenceException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -10,12 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.PersistenceException;
-
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.ValuePair;
 
 /**
  * This is the object added to every entity bean using byte code enhancement.
@@ -91,6 +90,8 @@ public final class EntityBeanIntercept implements Serializable {
   private Object[] origValues;
 
   private int lazyLoadProperty = -1;
+
+  private Object ownerId;
 
   /**
    * Create a intercept with a given entity.
@@ -349,11 +350,22 @@ public final class EntityBeanIntercept implements Serializable {
    * lazy loading and this bean might not be used by the client code at all.
    * Instead we will fail as soon as the client code tries to use this bean.
    * </p>
+   * @param lazyLoadPropertyIndex the property that is expected to be loaded
    */
-  public void checkLazyLoadFailure() {
-    if (lazyLoadProperty != -1) {
-      this.lazyLoadFailure = true;
+  public boolean isLazyLoadFailure(int lazyLoadPropertyIndex) {
+    if (lazyLoadProperty != -1 || !isLoadedProperty(lazyLoadPropertyIndex)) {
+      lazyLoadFailure = true;
+      return true;
     }
+    lazyLoadFailure = false;
+    return false;
+  }
+
+  /**
+   * Set the Id of the owner bean.
+   */
+  public void setOwnerId(Object ownerId) {
+    this.ownerId = ownerId;
   }
 
   /**
@@ -748,7 +760,7 @@ public final class EntityBeanIntercept implements Serializable {
 
     if (lazyLoadFailure) {
       // failed when batch lazy loaded by another bean in the batch
-      throw new EntityNotFoundException("Bean has been deleted - lazy loading failed");
+      throw new EntityNotFoundException("Lazy loading failed on type:" + owner.getClass().getName() + " id:" + ownerId + " - Bean has been deleted");
     }
 
     if (lazyLoadProperty == -1) {
@@ -763,7 +775,7 @@ public final class EntityBeanIntercept implements Serializable {
 
       if (lazyLoadFailure) {
         // failed when lazy loading this bean
-        throw new EntityNotFoundException("Bean has been deleted - lazy loading failed");
+        throw new EntityNotFoundException("Lazy loading failed on type:" + owner.getClass().getName() + " id:" + ownerId + " - Bean has been deleted.");
       }
 
       // bean should be loaded and intercepting now. setLoaded() has

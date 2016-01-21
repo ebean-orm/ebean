@@ -85,7 +85,7 @@ public class DefaultBeanLoader {
 
     SpiQuery<?> query = loadRequest.createQuery(server, batchSize);
 
-    executeLazyLoadQuery(loadRequest, query);
+    executeQuery(loadRequest, query);
 
     loadRequest.postLoad();
 
@@ -214,7 +214,7 @@ public class DefaultBeanLoader {
       query.where().idIn(idList);
     }
 
-    List<?> list = executeLazyLoadQuery(loadRequest, query);
+    List<?> list = executeQuery(loadRequest, query);
 
     loadRequest.postLoad(list);
 
@@ -225,7 +225,7 @@ public class DefaultBeanLoader {
   /**
    * Execute the lazy load query taking into account MySql transaction oddness.
    */
-  private List<?> executeLazyLoadQuery(LoadRequest loadRequest, SpiQuery<?> query) {
+  private List<?> executeQuery(LoadRequest loadRequest, SpiQuery<?> query) {
     if (onIterateUseExtraTxn && loadRequest.isParentFindIterate()) {
       // MySql - we need a different transaction to execute the secondary query
       SpiTransaction extraTxn = server.createQueryTransaction();
