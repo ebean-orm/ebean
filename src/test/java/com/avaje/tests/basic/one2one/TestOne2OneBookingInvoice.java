@@ -10,7 +10,9 @@ public class TestOne2OneBookingInvoice extends BaseTestCase {
 
   @Test
   public void test() {
-    Booking b = new Booking();
+
+    Booking b = new Booking(3000L);
+    Ebean.save(b);
 
     Invoice ai = new Invoice();
     Invoice ci = new Invoice();
@@ -22,6 +24,9 @@ public class TestOne2OneBookingInvoice extends BaseTestCase {
     b.setClientInvoice(ci);
 
     Ebean.save(b);
+
+    Invoice invoice = Ebean.find(Invoice.class, ai.getId());
+    Assert.assertEquals(b.getId(), invoice.getBooking().getId());
 
     Booking b1 = Ebean.find(Booking.class, b.getId());
 

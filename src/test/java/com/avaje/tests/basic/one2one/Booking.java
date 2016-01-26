@@ -1,8 +1,7 @@
 package com.avaje.tests.basic.one2one;
 
-import java.util.List;
-
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,6 +11,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import java.util.List;
 
 @Entity
 @Table(name = "drel_booking")
@@ -19,9 +19,16 @@ public class Booking {
 
 	@Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
-	
+
+  @Column(unique = true)
+  Long bookingUid;
+
 	@Version
 	private int version;
+
+  public Booking(Long bookingUid) {
+    this.bookingUid = bookingUid;
+  }
 	
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "agent_invoice")	
@@ -31,7 +38,7 @@ public class Booking {
 	@JoinColumn(name = "client_invoice")	
 	private Invoice clientInvoice;
 	
-	@OneToMany(mappedBy = "booking")//, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "booking")
 	private List<Invoice> invoices;
 	
 	public Long getId() {
@@ -41,8 +48,16 @@ public class Booking {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
-	public int getVersion() {
+
+  public Long getBookingUid() {
+    return bookingUid;
+  }
+
+  public void setBookingUid(Long bookingUid) {
+    this.bookingUid = bookingUid;
+  }
+
+  public int getVersion() {
 		return version;
 	}
 	
@@ -69,7 +84,7 @@ public class Booking {
 	public List<Invoice> getInvoices() {
 		return invoices;
 	}
-	
+
 	public void setInvoices(List<Invoice> invoices) {
 		this.invoices= invoices;
 	}

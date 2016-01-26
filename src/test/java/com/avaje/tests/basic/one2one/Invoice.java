@@ -21,7 +21,7 @@ public class Invoice {
 	private int version;
 	
 	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "booking")
+	@JoinColumn(name = "booking")//_xid", referencedColumnName = "booking_uid")
 	private Booking booking;
 
 	public Long getId() {
