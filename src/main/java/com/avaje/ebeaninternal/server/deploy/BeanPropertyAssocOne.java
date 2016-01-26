@@ -107,7 +107,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
           String foreignJoinColumn = columns[0].getForeignDbColumn();
           String foreignIdColumn = targetDescriptor.getIdProperty().getDbColumn();
           if (!foreignJoinColumn.equalsIgnoreCase(foreignIdColumn)) {
-            throw new PersistenceException("Mapping limitation - @OneToOne @JoinColumn needs to map to a primary key as per Issue #529 "
+            throw new PersistenceException("Mapping limitation - @JoinColumn on " + getFullBeanName() + " needs to map to a primary key as per Issue #529 "
                 + " - joining to " + foreignJoinColumn + " and not " + foreignIdColumn);
           }
         }
