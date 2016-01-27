@@ -20,7 +20,7 @@ public class TestManyToManyLazyLoading  extends BaseTestCase {
     
     for (MUser user : users) {
       List<MRole> roles = user.getRoles();
-      System.out.println(""+roles.size());
+      roles.size();
     }
     
   }

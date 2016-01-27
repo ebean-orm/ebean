@@ -31,14 +31,11 @@ public class TestTextJsonBeanReadVisitor extends BaseTestCase {
 
 
     String s = json.toJson(list);
-    System.out.println(s);
 
     List<Customer> mList = json.toList(Customer.class, s);
-    System.out.println("VIA STRING: " + mList);
 
     StringReader reader = new StringReader(s);
     List<Customer> mList2 = json.toList(Customer.class, reader);
-    System.out.println("VIA READER: " + mList2);
 
     Assert.assertEquals(mList.size(), mList2.size());
   }

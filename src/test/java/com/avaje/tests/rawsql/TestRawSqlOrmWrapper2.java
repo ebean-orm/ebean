@@ -40,10 +40,9 @@ public class TestRawSqlOrmWrapper2 extends BaseTestCase {
     Assert.assertNotNull(list);
 
     for (OrderAggregate oa : list) {
-      Double totalAmount = oa.getTotalAmount();
+      oa.getTotalAmount();
       Order order = oa.getOrder();
-      Integer id = order.getId();
-      System.out.println("Order: " + id + " total:" + totalAmount);
+      order.getId();
     }
 
   }

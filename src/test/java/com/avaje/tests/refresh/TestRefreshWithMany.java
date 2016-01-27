@@ -37,9 +37,7 @@ public class TestRefreshWithMany extends BaseTestCase {
     assertEquals(1, rc);
     assertEquals(3, rc2);
 
-    System.out.println("-------------------------- prior");
     Ebean.refresh(customer);
-    System.out.println("-------------------------- after");
 
     assertEquals("ref-modified", customer.getName());
     assertEquals(3, customer.getContacts().size());
@@ -65,22 +63,22 @@ public class TestRefreshWithMany extends BaseTestCase {
 
     List<SqlRow> sqlRows = Ebean.createSqlQuery("select id, first_name, last_name from contact").findList();
     for (SqlRow sqlRow : sqlRows) {
-      System.out.println("row: "+sqlRow.get("id")+" "+sqlRow.get("first_name")+" "+sqlRow.get("last_name"));
+      sqlRow.get("id");
+      sqlRow.get("first_name");
+      sqlRow.get("last_name");
     }
 
     assertEquals(1, rcb1);
     assertEquals(3, rcb2);
 
-    System.out.println("-------------------------- prior2");
     Ebean.refresh(customer1);
-    System.out.println("-------------------------- after2");
 
     assertEquals("ref-modified-again", customer1.getName());
-    System.out.println("-------------------------- after2a");
     assertEquals(3, customer1.getContacts().size());
-    System.out.println("-------------------------- after2b");
     for (Contact contact : customer1.getContacts()) {
-      System.out.println("hello "+contact.getId()+" "+contact.getFirstName()+" "+contact.getLastName());
+      contact.getId();
+      contact.getFirstName();
+      contact.getLastName();
     }
     assertEquals(true, customer1.getContacts().get(0).getFirstName().endsWith("-alt"));
 

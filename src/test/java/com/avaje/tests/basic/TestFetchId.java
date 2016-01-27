@@ -36,14 +36,11 @@ public class TestFetchId extends BaseTestCase {
 		List<Object> partial = futureIds.getPartialIds();
 
 		// this is likely 0 or a small number
-		System.out.println("partial: " + partial.size());
 
 		// wait for all the id's to be fetched
 		List<Object> idList = futureIds.get();
 		Assert.assertTrue("same instance", partial == idList);
 
 		Assert.assertTrue("sz > 0", ids.size() > 0);
-		System.out.println("ids: " + partial);
-
 	}
 }

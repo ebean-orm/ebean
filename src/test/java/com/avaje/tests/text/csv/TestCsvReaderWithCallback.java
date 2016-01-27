@@ -49,8 +49,6 @@ public class TestCsvReaderWithCallback extends BaseTestCase {
       @Override
       public void processBean(int row, String[] lineContent, Customer cust) {
 
-        System.out.println(row + "> " + cust + " " + cust.getBillingAddress());
-
         server.save(cust.getBillingAddress(), transaction);
         server.save(cust, transaction);
       }

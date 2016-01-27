@@ -38,7 +38,6 @@ public class TestJsonSimple extends BaseTestCase {
     String jsonText = sb.toString();
 
     Object el = EJson.parse(jsonText);
-    System.out.println("Got " + el);
 
     Map<String,Object> e2 = EJson.parseObject("{\"a\":12, \"name\":{\"first\":\"rob\", \"last\":\"byg\"}}");
 
@@ -50,8 +49,7 @@ public class TestJsonSimple extends BaseTestCase {
     m.put("test", "me");
 
     JsonContext jsonContext = Ebean.json();
-    String jsonString = jsonContext.toJson(m);
-    System.out.println(jsonString);
+    jsonContext.toJson(m);
 
     String s = "{\"parishId\":\"18\",\"contentId\":null,\"contentStatus\":null,\"contentType\":\"pg-hello\",\"content\":\"asd\"}";
 

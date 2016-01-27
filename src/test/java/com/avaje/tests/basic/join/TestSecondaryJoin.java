@@ -27,9 +27,6 @@ public class TestSecondaryJoin extends BaseTestCase {
     o0.setStatus(Status.APPROVED);
 
     Ebean.save(o0);
-
-    System.out.println("done");
-
   }
 
 }

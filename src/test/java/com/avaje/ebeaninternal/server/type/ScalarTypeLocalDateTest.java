@@ -17,8 +17,6 @@ public class ScalarTypeLocalDateTest {
     LocalDate date = LocalDate.of(2014, 5, 20);
     long millis = type.convertToMillis(date);
 
-    System.out.println(date);
-
     LocalDate parseDate = type.convertFromMillis(millis);
     assertEquals(date, parseDate);
   }

@@ -27,7 +27,8 @@ public class MainAutoQueryTune1 {
 			.findList();
 
 		for (Order order : list) {
-			System.out.println(order.getId() + " " + order.getOrderDate());
+			order.getId();
+      order.getOrderDate();
 		}
 	}
 }

@@ -29,18 +29,16 @@ public class TestEncryptBinary extends BaseTestCase {
     q.setParameter("id", e.getId());
 
     SqlRow row = q.findUnique();
-    String name = row.getString("name");
-    Object data = row.get("data");
-    Object someTimeData = row.get("some_time");
-    System.out.println("SqlRow name:" + name + " data:" + data + " someTime:" + someTimeData);
+    row.getString("name");
+    row.get("data");
+    row.get("some_time");
 
     EBasicEncryptBinary e1 = Ebean.find(EBasicEncryptBinary.class, e.getId());
 
     Timestamp t1 = e1.getSomeTime();
-    byte[] data1 = e1.getData();
-    String s = new String(data1);
-    String desc1 = e1.getDescription();
-    System.out.println("Decrypted data:" + s + " desc:" + desc1);
+    e1.getData();
+
+    e1.getDescription();
 
     Assert.assertEquals(t0, t1);
 
@@ -50,9 +48,7 @@ public class TestEncryptBinary extends BaseTestCase {
     Ebean.save(e1);
 
     EBasicEncryptBinary e2 = Ebean.find(EBasicEncryptBinary.class, e.getId());
-
-    String desc2 = e2.getDescription();
-    System.out.println("moddesc=" + desc2);
+    e2.getDescription();
   }
 
 }

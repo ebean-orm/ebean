@@ -30,9 +30,7 @@ public class TestQueryFilterManySimple extends BaseTestCase {
         .filterMany("orders").eq("status", Order.Status.NEW).gt("orderDate", lastWeek)
         .filterMany("contacts").isNotNull("firstName").findList();
 
-    System.out.println(list);
     // invoke lazy loading
     list.get(0).getOrders().size();
-    System.out.println(list.get(0).getOrders());
   }
 }

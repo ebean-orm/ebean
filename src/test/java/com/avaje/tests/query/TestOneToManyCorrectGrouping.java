@@ -30,9 +30,8 @@ public class TestOneToManyCorrectGrouping extends BaseTestCase {
       int count = 0;
       while (customerQueryIterator.hasNext()) {
         Customer customer = customerQueryIterator.next();
-        System.out.println(String.format("Customer id %s", customer.getId()));
         for (Order order : customer.getOrders()) {
-          System.out.println(String.format("--> Order id %s", order.getId()));
+          order.getId();
         }
         count++;
       }

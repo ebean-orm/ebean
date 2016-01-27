@@ -30,7 +30,6 @@ public class TestTextJsonInheritance extends BaseTestCase {
 
     JsonContext jsonContext = Ebean.json();
     String jsonString = jsonContext.toJson(list);
-    System.out.println(jsonString);
 
     List<Vehicle> rebuiltList = jsonContext.toList(Vehicle.class, jsonString);
 

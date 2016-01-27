@@ -46,13 +46,11 @@ public class TestJsonMap extends BaseTestCase {
     JsonContext jsonContext = Ebean.json();
     JsonWriteOptions options = JsonWriteOptions.parsePath("(id,status,name)");
 
-    String jsonString = jsonContext.toJson(map, options);
-    System.out.println(jsonString);
+    jsonContext.toJson(map, options);
 
     options = JsonWriteOptions.parsePath("(id,status,name,shippingAddress(id,line1,city),billingAddress(*),contacts(*))");
 
-    jsonString = jsonContext.toJson(map, options);
-    System.out.println(jsonString);
+`    jsonContext.toJson(map, options);
 
     // Assert.assertTrue(jsonString.indexOf("{\"1\":") > -1);
     // Assert.assertTrue(jsonString.indexOf("{\"id\":1,\"status\":\"NEW\",\"name\":\"Rob\"},")
@@ -72,9 +70,7 @@ public class TestJsonMap extends BaseTestCase {
         .apply(pathProperties)
         .findList();
 
-    String jsonString = Ebean.json().toJson(customers, pathProperties);
-    System.out.println(jsonString);
-
+    Ebean.json().toJson(customers, pathProperties);
 
     // Assert.assertTrue(jsonString.indexOf("{\"1\":") > -1);
     // Assert.assertTrue(jsonString.indexOf("{\"id\":1,\"status\":\"NEW\",\"name\":\"Rob\"},")

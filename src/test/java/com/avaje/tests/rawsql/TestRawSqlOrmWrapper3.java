@@ -49,14 +49,14 @@ public class TestRawSqlOrmWrapper3 extends BaseTestCase {
   private void output(List<OrderAggregate> list) {
 
     for (OrderAggregate oa : list) {
-      Double totalAmount = oa.getTotalAmount();
+      oa.getTotalAmount();
       Order order = oa.getOrder();
-      Integer id = order.getId();
-      Status status = order.getStatus();
-      System.out.println("Order: " + id + " " + status + " total:" + totalAmount);
+      order.getId();
+      order.getStatus();
 
       Customer c = order.getCustomer();
-      System.out.println("   -> customer: " + c.getId() + " " + c.getName());
+      c.getId();
+      c.getName();
 
       // invoke lazy loading as this property
       // has not populated originally

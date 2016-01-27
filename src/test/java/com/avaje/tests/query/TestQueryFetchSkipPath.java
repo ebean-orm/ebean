@@ -32,10 +32,9 @@ public class TestQueryFetchSkipPath extends BaseTestCase {
       Customer customer = order.getCustomer();
       List<Contact> contacts = customer.getContacts();
       for (Contact contact : contacts) {
-        System.out.println("contact:" + contact);
         List<ContactNote> notes = contact.getNotes();
         for (ContactNote contactNote : notes) {
-          System.out.println("note:" + contactNote.getTitle());
+          contactNote.getTitle();
         }
       }
     }

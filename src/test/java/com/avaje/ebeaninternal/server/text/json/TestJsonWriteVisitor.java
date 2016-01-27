@@ -42,7 +42,6 @@ public class TestJsonWriteVisitor extends BaseTestCase {
     options.setPathVisitor("contacts", new ContactVisitor());
 
     String jsonContent = json.toJson(list, options);
-    System.out.println(jsonContent);
 
     assertThat(jsonContent).contains("customerExtra");
     assertThat(jsonContent).contains("contactExtra");

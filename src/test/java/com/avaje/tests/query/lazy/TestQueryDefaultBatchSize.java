@@ -104,9 +104,9 @@ public class TestQueryDefaultBatchSize extends BaseTestCase {
   private void doStuff(Order order) {
     // invoke lazy loading
     Customer customer = order.getCustomer();
-    System.out.println("do stuff: order:"+order.getId());
-    System.out.println("... customer:"+customer.getName());
-
-    System.out.println("... contacts: "+customer.getContacts().size()+" details:"+order.getDetails().size());
+    order.getId();
+    customer.getName();
+    customer.getContacts().size();
+    order.getDetails().size();
   }
 }

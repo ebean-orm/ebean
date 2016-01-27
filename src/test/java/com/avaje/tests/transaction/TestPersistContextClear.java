@@ -28,8 +28,6 @@ public class TestPersistContextClear extends BaseTestCase {
     SpiTransaction spiTxn = (SpiTransaction) t;
     PersistenceContext pc = spiTxn.getPersistenceContext();
 
-    System.out.println("pc0:" + pc.toString());
-
     // no orders or customers in the PC
     Assert.assertEquals(0, pc.size(Order.class));
     Assert.assertEquals(0, pc.size(Customer.class));
@@ -46,7 +44,6 @@ public class TestPersistContextClear extends BaseTestCase {
       // keep a hold of one of them
       order0 = list.get(0);
 
-      System.out.println("pc1:" + pc.toString());
       Assert.assertEquals(orderSize, pc.size(Order.class));
 
       System.gc();
@@ -67,7 +64,6 @@ public class TestPersistContextClear extends BaseTestCase {
     }
 
     System.gc();
-    System.out.println("pc4:" + pc.toString());
 
     // we still have the order
     Assert.assertNotNull(order0);

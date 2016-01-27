@@ -39,9 +39,8 @@ public class TestFindPartialWithConstructorSetFields extends BaseTestCase {
     assertTrue(!loadedProps.contains("orderDate"));
 
     // invoke lazy loading
-    Status status = order0.getStatus();
-    Date orderDate = order0.getOrderDate();
-    System.out.println("-- order - "+order0.getId()+" status:"+status+" date:"+orderDate);
+    order0.getStatus();
+    order0.getOrderDate();
 
     // assert that these beans are fully loaded
     for (int i = 1; i < list.size(); i++) {

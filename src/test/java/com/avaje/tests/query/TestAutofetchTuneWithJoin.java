@@ -53,8 +53,6 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
     ObjectGraphNode parentNode = sq.getParentNode();
     ObjectGraphOrigin origin = parentNode.getOriginQueryPoint();
 
-    System.out.println("Origin:" + origin.getKey());
-
     // MetaAutoFetchStatistic metaAutoFetchStatistic =
     // ((DefaultOrmQuery<?>)q).getMetaAutoFetchStatistic();
     // if (metaAutoFetchStatistic != null) {
@@ -65,9 +63,6 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
     // System.out.println(queryStats);
     // }
 
-    if (q.isAutoTuned()) {
-      System.out.println("TUNED...");
-    }
   }
 
   private static void collectUsage() {

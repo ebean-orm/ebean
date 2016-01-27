@@ -19,13 +19,7 @@ public class TestM2MCascadeOne extends BaseTestCase {
     MUser u = new MUser();
     u.setUserName("testM2M");
 
-    List<MRole> roles = u.getRoles();
-    if (roles != null) {
-      if (roles instanceof BeanList<?>) {
-        System.out.println("enhancement checkNullManyFields=true successful");
-      }
-    }
-
+    u.getRoles();
     Ebean.save(u);
 
     MRole r0 = new MRole();

@@ -59,7 +59,6 @@ public class TestTextJsonUpdateCascade extends BaseTestCase {
 
     JsonContext jsonContext = server.json();
     String jsonString = jsonContext.toJson(order);
-    System.out.println(jsonString);
 
     Order updOrder = jsonContext.toBean(Order.class, jsonString);
 
@@ -85,9 +84,7 @@ public class TestTextJsonUpdateCascade extends BaseTestCase {
 
     Ebean.save(u0);
 
-    String jsonUser = jsonContext.toJson(u0);
-
-    System.out.println(jsonUser);
+    jsonContext.toJson(u0);
 
     String s = "{\"userid\":" + u0.getUserid()
         + ",\"userName\":\"userj1\", \"roles\":[{\"roleid\":" + r2.getRoleid() + "},{\"roleid\":"

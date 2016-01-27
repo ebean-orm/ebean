@@ -39,7 +39,6 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
     } else {
 
       String jsonString = jsonContext.toJson(product);
-      System.out.println(jsonString);
 
       Product refProd = jsonContext.toBean(Product.class, jsonString);
 
@@ -71,7 +70,6 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
     JsonWriteOptions options = JsonWriteOptions.parsePath("*,details(id,orderQty,product(id))");
 
     String jsonOrder = jsonContext.toJson(order, options);
-    System.out.println(jsonOrder);
 
     Order o2 = jsonContext.toBean(Order.class, jsonOrder);
     Customer customer = o2.getCustomer();

@@ -26,7 +26,6 @@ public class TestDeleteOneToOneMultiple extends BaseTestCase {
 
     // should delete file and fileContent
     Ebean.delete(PFile.class, id);
-    System.out.println("finished delete");
 
     PFile file1 = Ebean.find(PFile.class, id);
     PFileContent content1 = Ebean.find(PFileContent.class, contentId);

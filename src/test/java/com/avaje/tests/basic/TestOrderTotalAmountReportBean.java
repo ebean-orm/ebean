@@ -20,14 +20,13 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
     List<OrderAggregate> l0 = Ebean.find(OrderAggregate.class).findList();
 
     for (OrderAggregate r0 : l0) {
-      System.out.println(r0);
+      r0.toString();
     }
 
     List<OrderAggregate> list = Ebean.createNamedQuery(OrderAggregate.class, "total.amount")
         .where().gt("order.id", 0).having().gt("totalAmount", 50).findList();
 
     for (OrderAggregate r1 : list) {
-      System.out.println(r1);
       Assert.assertTrue(r1.getTotalAmount() > 20.50);
       // partial object query without totalItems
       // ... no lazy loading invoked on this type of bean
@@ -38,7 +37,6 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
         .having().lt("totalItems", 3).gt("totalAmount", 50).findList();
 
     for (OrderAggregate r2 : l2) {
-      // System.out.println(r2);
       Assert.assertTrue(r2.getTotalItems() < 3);
     }
 

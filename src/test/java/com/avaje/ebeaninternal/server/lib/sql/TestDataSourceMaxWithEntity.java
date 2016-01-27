@@ -30,9 +30,6 @@ public class TestDataSourceMaxWithEntity extends BaseTestCase {
         bg.execute(new ConnRunner(server, 4000, i));
       }
 
-      System.out.println("main thread sleep ... ");
-
-   
       Thread.sleep(30000);
       
       server.shutdown(true, false);

@@ -28,7 +28,6 @@ public class TestObjectGraphNodeStatsCollection extends BaseTestCase {
     
     MetaInfoManager infoManager = server.getMetaInfoManager();
     
-    
     server.find(Order.class).findRowCount();
     
     infoManager.collectNodeStatistics(true);
@@ -37,25 +36,15 @@ public class TestObjectGraphNodeStatsCollection extends BaseTestCase {
     runFindOrderQuery(server);
     runFindCustomerQuery(server);
 
-    System.out.println("============================================================");
-
     List<MetaObjectGraphNodeStats> nodeStatistics = infoManager.collectNodeStatistics(true);
     for (MetaObjectGraphNodeStats stat : nodeStatistics) {
-      System.out.println("-----------");
-      System.out.println(stat);
+      stat.toString();
     }
 
-    System.out.println("============================================================");
-    
     List<MetaQueryPlanStatistic> planStatistics = infoManager.collectQueryPlanStatistics(true);
     for (MetaQueryPlanStatistic planStatistic : planStatistics) {
-      System.out.println("------------");
-      System.out.println(planStatistic);
-      System.out.println(planStatistic.getSql());
+      planStatistic.getSql();
     }
-    
-    System.out.println("============================================================");
-
     
   }
 

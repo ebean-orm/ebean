@@ -71,10 +71,6 @@ public class TestCacheCollectionIds extends BaseTestCase {
     int currentNumContacts2 = fetchCustomer(customer.getId());
     Assert.assertEquals(currentNumContacts + 1, currentNumContacts2);
 
-    System.out.println("custCache:" + custCache.getStatistics(false));
-    System.out.println("contactCache:" + contactCache.getStatistics(false));
-    System.out.println("custManyIdsCache:" + custManyIdsCache.getStatistics(false));
-
   }
 
   private int fetchCustomer(Integer id) {

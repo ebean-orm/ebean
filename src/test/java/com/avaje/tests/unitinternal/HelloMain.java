@@ -51,7 +51,6 @@ public class HelloMain {
     long id = 1;
     TOne data = eServer.find(TOne.class, id);
     if (data == null) {
-      System.out.println("This is the first run, saving data..");
       TOne tone = new TOne();
       tone.setName("banan");
       eServer.save(tone);// new TOne()id, "Hello World!"));

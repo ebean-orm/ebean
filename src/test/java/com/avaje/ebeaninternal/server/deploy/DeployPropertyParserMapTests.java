@@ -19,8 +19,6 @@ public class DeployPropertyParserMapTests {
     DeployPropertyParserMap parser = new DeployPropertyParserMap(map);
     
     String output = parser.parse("(lower(customer.name) like ? escape'' or id > ?)");
-    
-    System.out.println(output);
     Assert.assertEquals("(lower(t1.name) like ? escape'' or t0.id > ?)", output);
   }
   

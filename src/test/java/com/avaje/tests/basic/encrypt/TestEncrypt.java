@@ -67,14 +67,12 @@ public class TestEncrypt extends BaseTestCase {
     q.setParameter("id", e.getId());
 
     SqlRow row = q.findUnique();
-    String name = row.getString("name");
-    Object desc = row.get("description");
-    System.out.println("SqlRow: " + name + " " + desc);
+    row.getString("name");
+    row.get("description");
 
     EBasicEncrypt e1 = Ebean.find(EBasicEncrypt.class, e.getId());
 
-    String desc1 = e1.getDescription();
-    System.out.println("Decrypted: " + desc1 + "  " + e1.getDob());
+    e1.getDescription();
 
     e1.setName("testmod");
     e1.setDescription("moddesc");
@@ -83,8 +81,7 @@ public class TestEncrypt extends BaseTestCase {
 
     EBasicEncrypt e2 = Ebean.find(EBasicEncrypt.class, e.getId());
 
-    String desc2 = e2.getDescription();
-    System.out.println("moddesc=" + desc2);
+    e2.getDescription();
 
     SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
     DbEncrypt dbEncrypt = server.getDatabasePlatform().getDbEncrypt();

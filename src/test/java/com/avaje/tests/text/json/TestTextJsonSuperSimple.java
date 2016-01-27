@@ -31,7 +31,6 @@ public class TestTextJsonSuperSimple extends BaseTestCase {
       Customer customer = list.get(0);
 
       String s = json.toJson(customer);
-      System.out.println(s);
       int statusPos = s.indexOf("status");
       Assert.assertEquals(-1, statusPos);
     }

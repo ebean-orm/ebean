@@ -42,14 +42,11 @@ public class TestTextJsonBeanReadVisitor extends BaseTestCase {
     options.addVisitor("shippingAddress", new ASVisitor());
 
     String s = json.toJson(list);
-    System.out.println(s);
 
     List<Customer> mList = json.toList(Customer.class, s, options);
-    System.out.println("VIA STRING: " + mList);
 
     StringReader reader = new StringReader(s);
     List<Customer> mList2 = json.toList(Customer.class, reader);
-    System.out.println("VIA READER: " + mList2);
 
     assertEquals(mList.size(), mList2.size());
   }
@@ -58,28 +55,28 @@ public class TestTextJsonBeanReadVisitor extends BaseTestCase {
 
     @Override
     public void visit(Customer bean, Map<String, Object> unmapped) {
-      System.out.println("visit customer: " + bean);
+      bean.getId();
     }
   }
 
   private static class AVisitor implements JsonReadBeanVisitor<Address> {
 
     public void visit(Address bean, Map<String, Object> unmapped) {
-      System.out.println("visit billing address: " + bean);
+      bean.getId();
     }
   }
 
   private static class ASVisitor implements JsonReadBeanVisitor<Address> {
 
     public void visit(Address bean, Map<String, Object> unmapped) {
-      System.out.println("visit shipping address: " + bean);
+      bean.getId();
     }
   }
 
   private static class ContactVisitor implements JsonReadBeanVisitor<Contact> {
 
     public void visit(Contact bean, Map<String, Object> unmapped) {
-      System.out.println("visit contact: " + bean);
+      bean.getId();
     }
   }
 }

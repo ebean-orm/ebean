@@ -30,7 +30,7 @@ public class ChangeJsonBuilderTest extends BaseTestCase {
     for (int i = 0; i < changes.size(); i++) {
       StringWriter buffer = new StringWriter();
       builder.writeBeanJson(buffer, changes.get(i), changeSet, i);
-      System.out.println(buffer.toString());
+
       assertThat(buffer.toString()).contains("\"source\"");
       assertThat(buffer.toString()).contains("\"userId\"");
       assertThat(buffer.toString()).contains("\"userIpAddress\"");

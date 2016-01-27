@@ -49,8 +49,6 @@ public class TestDataSourceMax extends BaseTestCase {
         bg.execute(new ConnRunner(pool, 4000, i));
       }
 
-      System.out.println("main thread sleep ... " + pool.getStatus(false));
-
       Thread.sleep(10000);
       pool.getStatistics(true);
 
@@ -81,9 +79,7 @@ public class TestDataSourceMax extends BaseTestCase {
 
     private void waitSomeTime(long count) {
       try {
-      System.out.println(position+" sleep " + sleepMillis+" count:"+count);
       Thread.sleep(sleepMillis);
-      System.out.println(position+" sleep done");
       } catch (InterruptedException e){
         throw new RuntimeException(e);
       }

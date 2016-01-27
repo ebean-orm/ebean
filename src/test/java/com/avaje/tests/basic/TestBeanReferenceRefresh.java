@@ -47,8 +47,6 @@ public class TestBeanReferenceRefresh extends BaseTestCase {
 		Status statusRefresh = order.getStatus();
 		Assert.assertEquals(status,statusRefresh);
 		
-		System.out.println("done");
-		
 	}
 	
 	

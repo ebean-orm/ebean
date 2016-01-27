@@ -24,9 +24,6 @@ public class TestTextJsonInvokeLazy extends BaseTestCase {
     JsonWriteOptions opt = JsonWriteOptions.parsePath("name, status");
 
     JsonContext jsonContext = Ebean.json();
-    String jsonString = jsonContext.toJson(list, opt);
-
-    System.out.println(jsonString);
-
+    jsonContext.toJson(list, opt);
   }
 }

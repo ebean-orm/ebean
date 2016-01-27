@@ -68,7 +68,7 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
         .findList();
 
    for (UUOne uuOne : list) {
-     System.out.println(uuOne.getName());
+     uuOne.getName();
    }
    list.get(0).getName();
 

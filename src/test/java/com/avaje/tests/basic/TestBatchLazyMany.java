@@ -16,8 +16,7 @@ public class TestBatchLazyMany extends BaseTestCase {
 	
 		Order order2 = Ebean.getReference(Order.class, 1);
 		order2.getOrderDate();
-		System.out.println("done");
-		
+
 //		List<Order> list = Ebean.find(Order.class)
 //			//.join("details")
 //			//.join("details", "+fetchquery")

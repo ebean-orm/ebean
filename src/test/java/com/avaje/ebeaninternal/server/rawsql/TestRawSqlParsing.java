@@ -24,7 +24,6 @@ public class TestRawSqlParsing extends TestCase {
         Sql rs = rawSql.getSql();
         
         String s = rs.toString();
-        System.out.println(s);
         assertTrue(s, s.contains("[order_id, sum"));
         
     }

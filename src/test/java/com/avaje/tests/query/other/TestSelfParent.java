@@ -47,7 +47,7 @@ public class TestSelfParent extends BaseTestCase {
   }
 
   public static void printNode(SelfParent o) {
-    System.out.println(o.getName());
+    //System.out.println(o.getName());
     for (SelfParent c : o.getChildren()) {
       printNode(c);
     }

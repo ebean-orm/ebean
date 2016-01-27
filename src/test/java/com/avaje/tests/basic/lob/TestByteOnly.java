@@ -23,10 +23,6 @@ public class TestByteOnly extends BaseTestCase {
     e2.setContent(content2);
 
     Ebean.save(e2);
-
-    // Ebean.getServer(null).getAutoTune().collectProfiling();
-    // Ebean.getServer(null).getAutoTune().updateTunedQueryInfo();
-    System.out.println("done");
   }
 
 }

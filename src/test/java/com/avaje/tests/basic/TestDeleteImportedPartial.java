@@ -24,7 +24,6 @@ public class TestDeleteImportedPartial extends BaseTestCase {
 
     // should delete file and fileContent
     Ebean.delete(partialPfile);
-    System.out.println("finished delete");
 
     PFile file1 = Ebean.find(PFile.class, id);
     PFileContent content1 = Ebean.find(PFileContent.class, contentId);

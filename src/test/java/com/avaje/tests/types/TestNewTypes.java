@@ -82,7 +82,6 @@ public class TestNewTypes extends BaseTestCase {
     assertEquals(bean.getInstant(), fetched.getInstant());
 
     String asJson = Ebean.json().toJson(fetched);
-    System.out.println(asJson);
 
     SomeNewTypesBean toBean = Ebean.json().toBean(SomeNewTypesBean.class, asJson);
 

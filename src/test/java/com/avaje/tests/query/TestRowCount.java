@@ -22,10 +22,8 @@ public class TestRowCount extends BaseTestCase {
         .gt("details.id", 1).order("id desc");
 
     int rc = query.findRowCount();
-    System.out.println("rc:" + rc);
 
     List<Object> ids = query.findIds();
-    System.out.println("ids:" + ids);
 
     List<Order> list = query.findList();
     System.out.println(list);

@@ -21,27 +21,19 @@ public class TestAutoTuneProfiling extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    System.out.println("Start .......");
-
     for (int i = 0; i < 1; i++) {
       execute();
     }
     collectUsage();
 
-    System.out.println("Sleeping ...");
     sortOfBusy();
-
-    System.out.println("Run after collection");
 
     for (int i = 0; i < 10; i++) {
       execute();
     }
     collectUsage();
 
-    System.out.println("Sleeping ...");
     sortOfBusy();
-
-    System.out.println("Run after collection");
 
     for (int i = 0; i < 1; i++) {
       execute();

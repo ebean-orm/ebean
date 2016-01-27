@@ -71,7 +71,6 @@ public class TestTextJsonSimple extends BaseTestCase {
     JsonContext json = server.json();
 
     String jsonOutput = json.toJson(list);
-    System.out.println(jsonOutput);
 
     // check that transient fields are included by default in the JSON output
     Assert.assertTrue(jsonOutput.contains("\"selected\":"));
@@ -109,7 +108,6 @@ public class TestTextJsonSimple extends BaseTestCase {
 
     // not using pathProperties - includes transient fields by default
     String jsonOutput = json.toJson(list);
-    System.out.println(jsonOutput);
 
     // check that transient fields are included by default in the JSON output
     Assert.assertTrue(jsonOutput.contains("\"selected\":"));
@@ -133,14 +131,12 @@ public class TestTextJsonSimple extends BaseTestCase {
 
     PathProperties pathProperties = PathProperties.parse("(id,name,selected)");
     String jsonOutput = json.toJson(list, pathProperties);
-    System.out.println(jsonOutput);
 
     // check that transient fields are included by explicit pathProperties
     Assert.assertTrue(jsonOutput.contains("\"selected\":"));
 
     pathProperties = PathProperties.parse("(id,name)");
     jsonOutput = json.toJson(list, pathProperties);
-    System.out.println(jsonOutput);
 
     // check that transient fields are NOT included when explicitly excluded by pathProperties
     Assert.assertFalse(jsonOutput.contains("\"selected\":"));

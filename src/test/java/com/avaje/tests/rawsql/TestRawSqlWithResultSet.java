@@ -43,7 +43,9 @@ public class TestRawSqlWithResultSet extends BaseTestCase {
         .findList();
 
       for (Customer customer : list) {
-        System.out.println("id:"+customer.getId()+" name:"+customer.getName()+" billingAddress:"+customer.getBillingAddress());
+        customer.getId();
+        customer.getName();
+        customer.getBillingAddress();
       }
       
     } finally {

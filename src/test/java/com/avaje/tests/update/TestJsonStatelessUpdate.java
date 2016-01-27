@@ -35,7 +35,6 @@ public class TestJsonStatelessUpdate extends BaseTestCase {
     JsonWriteOptions writeOptions = JsonWriteOptions.parsePath("(id,name,master(*))");
     String jsonString = jsonContext.toJson(twoX, writeOptions);
     
-    System.out.println(jsonString);
     jsonString = jsonString.replace("twoName", "twoNameModified");
     jsonString = jsonString.replace("oneName", "oneNameModified");
     

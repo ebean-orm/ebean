@@ -16,7 +16,6 @@ public class TestOrderByWithDistinctTake2 extends BaseTestCase {
     String test = "helloasc asc ASC desc DESC boodesc desc ASC";
     
     test = test.replaceAll("(?i)\\b asc\\b|\\b desc\\b", "");
-    System.out.println(test);
     Assert.assertEquals("helloasc boodesc", test);
   }
   

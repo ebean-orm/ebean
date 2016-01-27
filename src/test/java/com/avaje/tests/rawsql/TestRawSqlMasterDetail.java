@@ -155,16 +155,15 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
   }
 
   private void printOrders(List<Order> orders, String heading) {
-    System.out.println("-------------- "+heading);
+
     for (Order order : orders) {
       List<OrderDetail> details = order.getDetails();
-      System.out.println("order: "+order.getId()+" "+order.getCustomer().getName());
+      order.getCustomer().getName();
       for (OrderDetail detail : details) {
-        System.out.println("detailId:" + detail.getId() + " productId:" + detail.getProduct().getId() + " qty:" +
-                detail.getOrderQty());
+        detail.getProduct().getId();
+        detail.getOrderQty();
       }
     }
-    System.out.println("-------------- "+heading+" complete");
   }
 }
 

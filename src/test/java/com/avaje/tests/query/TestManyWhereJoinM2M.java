@@ -51,8 +51,7 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
     // of a fetch join (if there is a fetch join)
         .where().eq("roles.roleName", "role2special").query();
 
-    List<MUser> list = query.findList();
-    System.out.println(list);
+    query.findList();
 
     String sql = query.getGeneratedSql();
     Assert.assertTrue(sql.contains("select distinct"));

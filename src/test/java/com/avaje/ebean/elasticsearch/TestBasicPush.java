@@ -61,11 +61,8 @@ public class TestBasicPush extends BaseTestCase {
 
     generator.close();
     String json = writer.toString();
-    System.out.println(json);
 
-    String response = post("http://localhost:9200/_bulk", json);
-
-    System.out.println(response);
+    post("http://localhost:9200/_bulk", json);
 
     //curl -s -XPOST localhost:9200/_bulk
 

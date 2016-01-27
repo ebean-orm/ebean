@@ -15,6 +15,8 @@ import com.avaje.tests.model.basic.ResetBasicData;
 import com.avaje.tests.model.basic.Vehicle;
 import com.avaje.tests.model.basic.VehicleDriver;
 
+import static org.assertj.core.api.StrictAssertions.assertThat;
+
 public class TestSubQuery extends BaseTestCase {
 
   @Test
@@ -30,18 +32,15 @@ public class TestSubQuery extends BaseTestCase {
 
     List<Order> list = Ebean.find(Order.class).where().in("id", sq).findList();
 
-    System.out.println(list);
     // FIXME: need to clear out old orders..
     // Assert.assertEquals(2,list.size());
 
     String oq = " find order (id, status) where id in "
         + "(select a.id from o_order a join o_order_detail ad on ad.order_id = a.id where ad.product_id in (:prods)) ";
 
-    List<Order> list2 = Ebean.createQuery(Order.class, oq).setParameter("prods", productIds)
+    Ebean.createQuery(Order.class, oq).setParameter("prods", productIds)
         .findList();
 
-    System.out.println(list2);
-    // Assert.assertEquals(2,list2.size());
 
   }
 
@@ -59,10 +58,7 @@ public class TestSubQuery extends BaseTestCase {
 
     String golden = "(t0.one_key) in (select t0.one_key from ckey_parent t0) ";
 
-    if (!sql.contains(golden)) {
-      System.out.println("failed sql:" + sql);
-      Assert.fail("golden string not found");
-    }
+    assertThat(sql).contains(golden);
   }
 
   /**
@@ -102,16 +98,12 @@ public class TestSubQuery extends BaseTestCase {
     pq.findList();
 
     String sql = pq.getGeneratedSql();
-    System.err.println(sql);
 
     // TODO: If, after bugfixing, the system still join against vehicle I do not
     // know now, in our case, it is not necessary if not
     // using it in the where clause
     String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id )";
-    if (!sql.contains(golden)) {
-      System.out.println("failed sql:" + sql);
-      Assert.fail("golden string not found");
-    }
+    assertThat(sql).contains(golden);
 
   }
 
@@ -131,13 +123,8 @@ public class TestSubQuery extends BaseTestCase {
     pq.findList();
 
     String sql = pq.getGeneratedSql();
-    System.err.println(sql);
-
     String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id  where t1.license_number = ? )";
-    if (!sql.contains(golden)) {
-      System.out.println("failed sql:" + sql);
-      Assert.fail("golden string not found");
-    }
+    assertThat(sql).contains(golden);
   }
 
   /**
@@ -157,15 +144,8 @@ public class TestSubQuery extends BaseTestCase {
     pq.findList();
 
     String sql = pq.getGeneratedSql();
-    System.err.println(sql);
 
     String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left outer join vehicle t1 on t1.id = t0.vehicle_id )";
-    // OR without join
-    // String golden =
-    // "(t0.id) in (select t0.vehicle_id  from vehicle_driver t0)";
-    if (!sql.contains(golden)) {
-      System.out.println("failed sql:" + sql);
-      Assert.fail("golden string not found");
-    }
+    assertThat(sql).contains(golden);
   }
 }
