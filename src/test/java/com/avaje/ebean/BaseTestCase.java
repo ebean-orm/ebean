@@ -24,4 +24,9 @@ public class BaseTestCase {
     SpiEbeanServer spi = (SpiEbeanServer)Ebean.getDefaultServer();
     return spi.getDatabasePlatform().getName().startsWith("mssqlserver");
   }
+
+  public boolean isH2() {
+    SpiEbeanServer spi = (SpiEbeanServer)Ebean.getDefaultServer();
+    return spi.getDatabasePlatform().getName().equals("h2");
+  }
 }
