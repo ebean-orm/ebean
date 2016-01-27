@@ -9,6 +9,7 @@ services:
   - postgresql
 
 before_script:
+  - psql -c 'create extension pgcrypto;' -U postgres
   - psql -c 'create extension hstore;' -U postgres
   - psql -c 'create extension postgis;' -U postgres
   - psql -c 'create database unit;' -U postgres
