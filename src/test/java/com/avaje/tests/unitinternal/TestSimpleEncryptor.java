@@ -1,15 +1,13 @@
 package com.avaje.tests.unitinternal;
 
-import java.sql.Timestamp;
-import java.util.Arrays;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebeaninternal.server.type.SimpleAesEncryptor;
 import com.avaje.tests.basic.encrypt.BasicEncryptKey;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.sql.Timestamp;
 
 public class TestSimpleEncryptor extends BaseTestCase {
 

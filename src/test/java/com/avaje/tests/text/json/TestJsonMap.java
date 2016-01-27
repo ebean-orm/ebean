@@ -50,7 +50,7 @@ public class TestJsonMap extends BaseTestCase {
 
     options = JsonWriteOptions.parsePath("(id,status,name,shippingAddress(id,line1,city),billingAddress(*),contacts(*))");
 
-`    jsonContext.toJson(map, options);
+    jsonContext.toJson(map, options);
 
     // Assert.assertTrue(jsonString.indexOf("{\"1\":") > -1);
     // Assert.assertTrue(jsonString.indexOf("{\"id\":1,\"status\":\"NEW\",\"name\":\"Rob\"},")
