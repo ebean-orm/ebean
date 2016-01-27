@@ -13,6 +13,7 @@ before_script:
   - psql -c 'create extension hstore;' -U postgres
   - psql -c 'create extension postgis;' -U postgres
   - psql -c 'create database unit;' -U postgres
+  - ./.travis/setup_database
 
 env:
   - EBEAN_DB=h2
