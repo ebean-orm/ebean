@@ -18,6 +18,9 @@ env:
   - EBEAN_DB=h2
   - EBEAN_DB=pg
 
+after_failure:
+  - ./.travis/print_surefire_reports
+
 cache:
   directories:
   - $HOME/.m2
