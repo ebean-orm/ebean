@@ -17,4 +17,6 @@ env:
   - EBEAN_DB=h2
   - EBEAN_DB=pg
 
-
+cache:
+  directories:
+  - $HOME/.m2
