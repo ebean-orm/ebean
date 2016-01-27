@@ -31,7 +31,7 @@ public class LoggedSqlCollector {
 
     basicAppender.setContext(lc);
     Level level = logger.getEffectiveLevel();
-    if (level.isGreaterOrEqual(Level.TRACE)) {
+    if (level.isGreaterOrEqual(Level.INFO)) {
       logger.setAdditive(false);
     }
     logger.addAppender(basicAppender);
