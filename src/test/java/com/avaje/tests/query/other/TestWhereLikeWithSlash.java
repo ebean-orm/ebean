@@ -17,11 +17,9 @@ public class TestWhereLikeWithSlash  extends BaseTestCase {
     basic.setName("slash\\monkey");
     
     Ebean.save(basic);
-    
-    
+
     Query<EBasic> query = Ebean.find(EBasic.class).where().like("name", "slash\\mon%").query();
-    
-    List<EBasic> list = query.findList();
+    query.findList();
 
     // This doesn't work in the latest version of H2 so disable for now.
     // Still good on Postgres which was the original issue

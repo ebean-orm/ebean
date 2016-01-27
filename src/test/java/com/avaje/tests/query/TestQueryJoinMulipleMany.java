@@ -22,7 +22,6 @@ public class TestQueryJoinMulipleMany extends BaseTestCase {
         .gt("id", 0).findList();
 
     Assert.assertNotNull(list);
-    System.out.println(list);
 
     for (Order order : list) {
       List<Contact> contacts = order.getCustomer().getContacts();

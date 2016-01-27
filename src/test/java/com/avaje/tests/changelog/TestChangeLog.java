@@ -102,9 +102,6 @@ public class TestChangeLog extends BaseTestCase {
       this.changes = changes;
       try {
         String json = objectMapper.writeValueAsString(changes);
-
-        logger.info(json);
-
         ChangeSet changes1 = objectMapper.readValue(json, ChangeSet.class);
 
         assertEquals(changes.getTxnId(), changes1.getTxnId());

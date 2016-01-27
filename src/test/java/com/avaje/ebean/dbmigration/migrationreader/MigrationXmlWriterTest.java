@@ -2,14 +2,10 @@ package com.avaje.ebean.dbmigration.migrationreader;
 
 import com.avaje.ebean.dbmigration.migration.Migration;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
 public class MigrationXmlWriterTest {
-
-  Logger logger = LoggerFactory.getLogger(MigrationXmlWriterTest.class);
 
   @Test
   public void testReadWrite() throws Exception {
@@ -19,8 +15,6 @@ public class MigrationXmlWriterTest {
     File temp = File.createTempFile("migrationWrite",".xml");
     MigrationXmlWriter writer = new MigrationXmlWriter();
     writer.write(migration, temp);
-
-    logger.info("wrote migration file: "+temp.getAbsolutePath());
 
   }
 }

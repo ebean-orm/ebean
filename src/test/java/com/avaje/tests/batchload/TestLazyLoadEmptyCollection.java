@@ -34,8 +34,6 @@ public class TestLazyLoadEmptyCollection extends BaseTestCase {
       for (Contact contact : contacts) {
         contact.getNotes();
       }
-      System.out.println(customer);
-      System.out.println(contacts);
     }
 
   }

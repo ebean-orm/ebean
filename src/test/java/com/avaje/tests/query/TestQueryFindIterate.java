@@ -61,7 +61,10 @@ public class TestQueryFindIterate extends BaseTestCase {
         Order order = queryIterator.next();
         Customer customer = order.getCustomer();
         // invoke lazy loading on customer, order details and order shipments
-        System.out.println("order: " + order.getId() + " customerName:" + customer.getName()+" details:"+order.getDetails().size()+" shipments:"+order.getShipments().size());
+        order.getId();
+        customer.getName();
+        order.getDetails().size();
+        order.getShipments().size();
       }
 
     } finally {

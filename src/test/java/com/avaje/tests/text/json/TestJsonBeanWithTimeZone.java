@@ -1,27 +1,23 @@
 package com.avaje.tests.text.json;
 
-import java.io.IOException;
-import java.util.TimeZone;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.tests.model.basic.BeanWithTimeZone;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.util.TimeZone;
 
 public class TestJsonBeanWithTimeZone extends BaseTestCase {
-
-  //private static final Logger logger = LoggerFactory.getLogger(TestJsonBeanWithTimeZone.class);
 
   @Test
   public void testSimple() throws IOException {
 
     TimeZone defaultTimeZone = TimeZone.getDefault();
 
-    String[] ids = TimeZone.getAvailableIDs(defaultTimeZone.getRawOffset());
-    System.out.println(ids);
+    TimeZone.getAvailableIDs(defaultTimeZone.getRawOffset());
 
     String id = defaultTimeZone.getID();
     TimeZone timeZone = TimeZone.getTimeZone(id);
@@ -42,10 +38,6 @@ public class TestJsonBeanWithTimeZone extends BaseTestCase {
     BeanWithTimeZone bean3 = Ebean.find(BeanWithTimeZone.class, bean.getId());
 
     Assert.assertEquals(bean.getTimezone(), bean3.getTimezone());
-
-    // EbeanServer server = Ebean.getServer(null);
-    // server.shutdown();
-    // logger.info("shudown server manually, JVM shutdown hook fires next");
 
   }
 
