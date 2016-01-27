@@ -21,6 +21,8 @@ import ch.qos.logback.core.UnsynchronizedAppenderBase;
  */
 public class LoggedSqlCollector {
 
+  static Logger logger = (Logger) LoggerFactory.getLogger("org.avaje.ebean.SQL");
+
   private static BasicAppender basicAppender = new BasicAppender();
 
   static {
@@ -28,11 +30,12 @@ public class LoggedSqlCollector {
     LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 
     basicAppender.setContext(lc);
-
-    Logger logger = (Logger) LoggerFactory.getLogger("org.avaje.ebean.SQL");
+    Level level = logger.getEffectiveLevel();
+    if (level.isGreaterOrEqual(Level.TRACE)) {
+      logger.setAdditive(false);
+    }
     logger.addAppender(basicAppender);
     logger.setLevel(Level.TRACE);
-    logger.setAdditive(true);
   }
 
   /**
