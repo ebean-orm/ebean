@@ -2,13 +2,13 @@
 
 echo "\n=== SETUP DATABASE ===\n"
 
-set -e
-set -x
+#set -e
+#set -x
 
 # Setup postgres' users and databases
 sudo -u postgres psql -c "CREATE USER unit WITH PASSWORD 'unit';"
-sudo -u postgres psql -c 'CREATE DATABASE test WITH OWNER unit;'
-sudo -u postgres psql test -c 'CREATE EXTENSION hstore;'
-sudo -u postgres psql test -c 'CREATE EXTENSION pgcrypto;'
-sudo -u postgres psql test -c 'CREATE EXTENSION postgis;'
+sudo -u postgres psql -c 'CREATE DATABASE unit WITH OWNER unit;'
+sudo -u postgres psql unit -c 'CREATE EXTENSION hstore;'
+sudo -u postgres psql unit -c 'CREATE EXTENSION pgcrypto;'
+#sudo -u postgres psql test2 -c 'CREATE EXTENSION postgis;'
 
