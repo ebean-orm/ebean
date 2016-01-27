@@ -14,7 +14,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
 
   public PostgresHistoryDdl() {
-    this.currentTimestamp = "current_timestamp";
+    this.currentTimestamp = "statement_timestamp()";
   }
 
   /**
@@ -80,7 +80,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
         .append("  if (TG_OP = 'UPDATE') then").newLine();
     appendInsertIntoHistory(apply, historyTable, includedColumns);
     apply
-        .append("    NEW.").append(sysPeriod).append(" = tstzrange(CURRENT_TIMESTAMP,null);").newLine()
+        .append("    NEW.").append(sysPeriod).append(" = tstzrange(").append(currentTimestamp).append(",null);").newLine()
         .append("    return new;").newLine();
     apply
         .append("  elsif (TG_OP = 'DELETE') then").newLine();
@@ -137,7 +137,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
     buffer.append("    insert into ").append(historyTable).append(" (").append(sysPeriod).append(",");
     appendColumnNames(buffer, columns, "");
-    buffer.append(") values (tstzrange(lower(OLD.").append(sysPeriod).append("), current_timestamp), ");
+    buffer.append(") values (tstzrange(lower(OLD.").append(sysPeriod).append("), ").append(currentTimestamp).append("), ");
     appendColumnNames(buffer, columns, "OLD.");
     buffer.append(");").newLine();
   }
