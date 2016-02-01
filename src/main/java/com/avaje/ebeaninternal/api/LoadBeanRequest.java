@@ -23,8 +23,6 @@ public class LoadBeanRequest extends LoadRequest {
 
   private final LoadBeanBuffer loadBuffer;
 
-  private final int lazyLoadPropertyIndex;
-
   private final String lazyLoadProperty;
 
   private final boolean loadCache;
@@ -32,24 +30,23 @@ public class LoadBeanRequest extends LoadRequest {
   /**
    * Construct for lazy load request.
    */
-  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, int lazyLoadPropertyIndex, String lazyLoadProperty, boolean loadCache) {
-    this(LoadBuffer, null, true, lazyLoadPropertyIndex, lazyLoadProperty, loadCache);
+  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, String lazyLoadProperty, boolean loadCache) {
+    this(LoadBuffer, null, true, lazyLoadProperty, loadCache);
   }
 
   /**
    * Construct for secondary query.
    */
   public LoadBeanRequest(LoadBeanBuffer LoadBuffer, OrmQueryRequest<?> parentRequest) {
-    this(LoadBuffer, parentRequest, false, -1, null, false);
+    this(LoadBuffer, parentRequest, false, null, false);
   }
 
   private LoadBeanRequest(LoadBeanBuffer loadBuffer, OrmQueryRequest<?> parentRequest, boolean lazy,
-                          int lazyLoadPropertyIndex, String lazyLoadProperty, boolean loadCache) {
+                          String lazyLoadProperty, boolean loadCache) {
 
     super(parentRequest, lazy);
     this.loadBuffer = loadBuffer;
     this.batch = loadBuffer.getBatch();
-    this.lazyLoadPropertyIndex = lazyLoadPropertyIndex;
     this.lazyLoadProperty = lazyLoadProperty;
     this.loadCache = loadCache;
   }
@@ -139,7 +136,7 @@ public class LoadBeanRequest extends LoadRequest {
       query.setLazyLoadBatchSize(getBatchSize());
     }
 
-    loadBuffer.configureQuery(query, getLazyLoadProperty());
+    loadBuffer.configureQuery(query, lazyLoadProperty);
 
     if (idList.size() == 1) {
       query.where().idEq(idList.get(0));
@@ -165,7 +162,7 @@ public class LoadBeanRequest extends LoadRequest {
       }
     }
 
-    if (lazyLoadPropertyIndex > -1) {
+    if (lazyLoadProperty != null) {
       for (int i = 0; i < batch.size(); i++) {
         // check if the underlying row in DB was deleted. Mark the bean as 'failed' if
         // necessary but allow processing to continue until it is accessed by client code
