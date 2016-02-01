@@ -19,11 +19,13 @@ public class Car extends Vehicle {
   private String driver;
 
   @ManyToOne
-  TruckRef carRef;
+  private TruckRef carRef;
 
   @OneToMany(mappedBy = "car")
   @OrderBy("fuse.locationCode")
   private Set<CarAccessory> accessories = new HashSet<CarAccessory>();
+
+  private String notes;
 
   public String getDriver() {
     return driver;
@@ -31,6 +33,14 @@ public class Car extends Vehicle {
 
   public void setDriver(String driver) {
     this.driver = driver;
+  }
+
+  public String getNotes() {
+    return notes;
+  }
+
+  public void setNotes(String notes) {
+    this.notes = notes;
   }
 
   public TruckRef getCarRef() {

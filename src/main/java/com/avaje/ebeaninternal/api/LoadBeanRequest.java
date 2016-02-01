@@ -8,7 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Request for loading ManyToOne and OneToOne relationships.
@@ -96,7 +98,7 @@ public class LoadBeanRequest extends LoadRequest {
    */
   public List<Object> getIdList(int batchSize) {
 
-    ArrayList<Object> idList = new ArrayList<Object>(batchSize);
+    List<Object> idList = new ArrayList<Object>(batchSize);
 
     BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
     for (int i = 0; i < batch.size(); i++) {
@@ -124,7 +126,7 @@ public class LoadBeanRequest extends LoadRequest {
   /**
    * Configure the query for lazy loading execution.
    */
-  public void configureQuery(SpiQuery<?> query) {
+  public void configureQuery(SpiQuery<?> query, List<Object> idList) {
 
     query.setMode(SpiQuery.Mode.LAZYLOAD_BEAN);
     query.setPersistenceContext(loadBuffer.getPersistenceContext());
@@ -138,6 +140,12 @@ public class LoadBeanRequest extends LoadRequest {
     }
 
     loadBuffer.configureQuery(query, getLazyLoadProperty());
+
+    if (idList.size() == 1) {
+      query.where().idEq(idList.get(0));
+    } else {
+      query.where().idIn(idList);
+    }
   }
 
   /**
@@ -145,25 +153,27 @@ public class LoadBeanRequest extends LoadRequest {
    */
   public void postLoad(List<?> list) {
 
-    if (isLoadCache()) {
-      BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
-      for (int i = 0; i < list.size(); i++) {
-        desc.cacheBeanPutData((EntityBean) list.get(i));
+    Set<Object> loadedIds = new HashSet<Object>();
+
+    BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
+    // collect Ids and maybe load bean cache
+    for (int i = 0; i < list.size(); i++) {
+      EntityBean loadedBean = (EntityBean) list.get(i);
+      loadedIds.add(desc.getId(loadedBean));
+      if (isLoadCache()) {
+        desc.cacheBeanPutData(loadedBean);
       }
     }
 
     if (lazyLoadPropertyIndex > -1) {
-      // this is a lazy loading query so check for lazy loading failure (due to deleted rows)
       for (int i = 0; i < batch.size(); i++) {
         // check if the underlying row in DB was deleted. Mark the bean as 'failed' if
         // necessary but allow processing to continue until it is accessed by client code
         EntityBeanIntercept ebi = batch.get(i);
-        // all beans in the batch should have this property loaded now
-        if (ebi.isLazyLoadFailure(lazyLoadPropertyIndex)) {
-          BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
-          Object beanId = desc.getId(ebi.getOwner());
-          ebi.setOwnerId(beanId);
-          logger.info("Lazy loading unsuccessful for type:" + desc.getName() + " id:" + beanId + " - expecting when bean has been deleted");
+        Object id = desc.getId(ebi.getOwner());
+        if (!loadedIds.contains(id)) {
+          logger.info("Lazy loading unsuccessful for type:" + desc.getName() + " id:" + id + " - expecting when bean has been deleted");
+          ebi.setLazyLoadFailure(id);
         }
       }
     }

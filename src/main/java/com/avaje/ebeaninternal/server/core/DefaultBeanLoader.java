@@ -206,16 +206,9 @@ public class DefaultBeanLoader {
     }
 
     SpiQuery<?> query = (SpiQuery<?>) server.createQuery(loadRequest.getBeanType());
-    loadRequest.configureQuery(query);
-
-    if (idList.size() == 1) {
-      query.where().idEq(idList.get(0));
-    } else {
-      query.where().idIn(idList);
-    }
+    loadRequest.configureQuery(query, idList);
 
     List<?> list = executeQuery(loadRequest, query);
-
     loadRequest.postLoad(list);
 
     // log the query (for testing secondary queries)

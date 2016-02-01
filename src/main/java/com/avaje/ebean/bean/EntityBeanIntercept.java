@@ -343,28 +343,10 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
-   * Check if the lazy load succeeded. If not then mark this bean as having
-   * failed lazy loading due to the underlying row being deleted.
-   * <p>
-   * We mark the bean this way rather than immediately fail as we might be batch
-   * lazy loading and this bean might not be used by the client code at all.
-   * Instead we will fail as soon as the client code tries to use this bean.
-   * </p>
-   * @param lazyLoadPropertyIndex the property that is expected to be loaded
+   * Set lazy load failure flag.
    */
-  public boolean isLazyLoadFailure(int lazyLoadPropertyIndex) {
-    if (lazyLoadProperty != -1 || !isLoadedProperty(lazyLoadPropertyIndex)) {
-      lazyLoadFailure = true;
-      return true;
-    }
-    lazyLoadFailure = false;
-    return false;
-  }
-
-  /**
-   * Set the Id of the owner bean.
-   */
-  public void setOwnerId(Object ownerId) {
+  public void setLazyLoadFailure(Object ownerId) {
+    this.lazyLoadFailure = true;
     this.ownerId = ownerId;
   }
 
