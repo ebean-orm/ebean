@@ -59,6 +59,8 @@ public class DbMigration {
 
   private static final String initialVersion = "1.0";
 
+  private static final String GENERATED_COMMENT = "THIS IS A GENERATED FILE - DO NOT MODIFY";
+
   /**
    * Set to true if DbMigration run with online EbeanServer instance.
    */
@@ -304,7 +306,8 @@ public class DbMigration {
     if (file.exists()) {
       return false;
     }
-    MigrationXmlWriter xmlWriter = new MigrationXmlWriter();
+    String comment = migrationConfig.isIncludeGeneratedFileComment() ? GENERATED_COMMENT : null;
+    MigrationXmlWriter xmlWriter = new MigrationXmlWriter(comment);
     xmlWriter.write(dbMigration, file);
     return true;
   }

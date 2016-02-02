@@ -88,6 +88,8 @@ public class DbMigrationConfig {
 
   protected String modelSuffix = ".model.xml";
 
+  protected boolean includeGeneratedFileComment;
+
   /**
    * Return the DB platform to generate migration DDL for.
    *
@@ -237,6 +239,20 @@ public class DbMigrationConfig {
   }
 
   /**
+   * Return true if the generated file comment should be included.
+   */
+  public boolean isIncludeGeneratedFileComment() {
+    return includeGeneratedFileComment;
+  }
+
+  /**
+   * Set to true if the generated file comment should be included.
+   */
+  public void setIncludeGeneratedFileComment(boolean includeGeneratedFileComment) {
+    this.includeGeneratedFileComment = includeGeneratedFileComment;
+  }
+
+  /**
    * Set the migration version.
    * <p>
    * Note that version set via System property or environment variable <code>ddl.migration.version</code> takes precedence.
@@ -281,6 +297,7 @@ public class DbMigrationConfig {
     dropSuffix = properties.get("migration.dropSuffix", dropSuffix);
     rollbackSuffix = properties.get("migration.rollbackSuffix", rollbackSuffix);
     modelSuffix = properties.get("migration.modelSuffix", modelSuffix);
+    includeGeneratedFileComment = properties.getBoolean("migration.includeGeneratedFileComment", includeGeneratedFileComment);
 
     platform = properties.getEnum(DbPlatformName.class, "migration.platform", platform);
     suppressRollback = properties.getBoolean("migration.suppressRollback", suppressRollback);
