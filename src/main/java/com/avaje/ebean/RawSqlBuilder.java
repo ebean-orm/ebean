@@ -106,6 +106,9 @@ public class RawSqlBuilder {
    * <p>
    * For example modify all mappings with table alias "c" to have the path prefix "customer".
    * </p>
+   * <p>
+   * For the "Root type" you don't need to specify a tableAliasMapping.
+   * </p>
    */
   public RawSqlBuilder tableAliasMapping(String tableAlias, String path) {
     columnMapping.tableAliasMapping(tableAlias, path);

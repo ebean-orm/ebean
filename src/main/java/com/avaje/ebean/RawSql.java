@@ -585,6 +585,9 @@ public final class RawSql implements Serializable {
      * <p>
      * For example modify all mappings with table alias "c" to have the path prefix "customer".
      * </p>
+     * <p>
+     * For the "Root type" you don't need to specify a tableAliasMapping.
+     * </p>
      */
     public void tableAliasMapping(String tableAlias, String path) {
 
