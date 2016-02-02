@@ -13,6 +13,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Random;
 
+import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -125,6 +126,50 @@ public class TestRawSqlMasterDetail extends BaseTestCase {
 
     assertNotNull(ordersFromRaw);
     assertFalse(ordersFromRaw.isEmpty());
+  }
+
+  @Test
+  public void testTableAlias_with_rootTypeMappedNotMapped() {
+
+    ResetBasicData.reset();
+
+    String rs = "select o.id, o.status " +
+        "from o_order o order by o.id asc";
+
+    RawSql rawSql = RawSqlBuilder.parse(rs)
+        .create();
+
+    List<Order> ordersFromRaw = Ebean.find(Order.class)
+        .setRawSql(rawSql)
+        .findList();
+
+    for (Order order : ordersFromRaw) {
+      assertThat(order.getId()).isNotNull();
+      assertThat(order.getStatus()).isNotNull();
+    }
+
+  }
+
+  @Test
+  public void testTableAlias_with_rootTypeMappedToNullPath() {
+
+    ResetBasicData.reset();
+
+    String rs = "select o.id, o.status " +
+        "from o_order o order by o.id asc";
+
+    RawSql rawSql = RawSqlBuilder.parse(rs)
+        .tableAliasMapping("o", null)
+        .create();
+
+    List<Order> ordersFromRaw = Ebean.find(Order.class)
+        .setRawSql(rawSql)
+        .findList();
+
+    for (Order order : ordersFromRaw) {
+      assertThat(order.getId()).isNotNull();
+      assertThat(order.getStatus()).isNotNull();
+    }
   }
 
   @Test
