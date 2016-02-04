@@ -116,6 +116,12 @@ public class PlatformDdlWriter {
   protected void writeApplyDdl(Writer writer, DdlWrite write) throws IOException {
 
     // merge the apply buffers in the appropriate order
+    if (!write.applyDropDependencies().isEmpty()) {
+      writer.append("-- drop dependencies\n");
+      writer.append(write.applyDropDependencies().getBuffer());
+      writer.append("\n");
+    }
+    writer.append("-- apply changes\n");
     writer.append(write.apply().getBuffer());
     writer.append(write.applyForeignKeys().getBuffer());
     writer.append(write.applyHistory().getBuffer());
@@ -127,6 +133,12 @@ public class PlatformDdlWriter {
   protected void writeApplyRollbackDdl(Writer writer, DdlWrite write) throws IOException {
 
     // merge the rollback buffers in the appropriate order
+    if (!write.rollbackDropDependencies().isEmpty()) {
+      writer.append("-- drop dependencies\n");
+      writer.append(write.rollbackDropDependencies().getBuffer());
+      writer.append("\n");
+    }
+    writer.append("-- reverse changes\n");
     writer.append(write.rollbackForeignKeys().getBuffer());
     writer.append(write.rollback().getBuffer());
   }

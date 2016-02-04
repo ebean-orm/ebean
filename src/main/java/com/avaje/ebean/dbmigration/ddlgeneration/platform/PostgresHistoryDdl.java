@@ -121,7 +121,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
       apply.append("-- Regenerated ").append(procedureName).newLine();
       apply.append("-- changes: ").append(update.description()).newLine();
 
-      recreateHistoryView(apply, table.getName(), includedColumns);
+      recreateHistoryView(writer, true, table.getName(), includedColumns);
     }
 
     addFunction(apply, procedureName, historyTable, includedColumns);
@@ -134,7 +134,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
       rollback.append("-- Revert regenerated ").append(procedureName).newLine();
       rollback.append("-- revert changes: ").append(update.description()).newLine();
 
-      recreateHistoryView(rollback, table.getName(), includedColumns);
+      recreateHistoryView(writer, false, table.getName(), includedColumns);
       addFunction(rollback, procedureName, historyTable, includedColumns);
     }
   }
@@ -143,11 +143,13 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
    * For postgres we need to drop and recreate the view. Well, we could add columns to the end of the view
    * but otherwise we need to drop and create it.
    */
-  private void recreateHistoryView(DdlBuffer buffer, String baseTableName, List<String> includedColumns) throws IOException {
+  private void recreateHistoryView(DdlWrite writer, boolean apply, String baseTableName, List<String> includedColumns) throws IOException {
 
-    buffer.append("drop view if exists ").append(baseTableName).append(viewSuffix).endOfStatement();
+    // we need to drop the view early/first before any changes to the tables etc
+    writer.dropDependencies(apply).append("drop view if exists ").append(baseTableName).append(viewSuffix).endOfStatement();
 
-    createWithHistoryView(buffer, baseTableName, includedColumns);
+    // recreate the view with specific columns specified (the columns generally are not dropped until later)
+    createWithHistoryView(writer.buffer(apply), baseTableName, includedColumns);
   }
 
   @Override

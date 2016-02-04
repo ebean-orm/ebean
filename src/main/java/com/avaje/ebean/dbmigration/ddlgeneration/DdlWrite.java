@@ -12,11 +12,15 @@ public class DdlWrite {
 
   private final ModelContainer currentModel;
 
+  private final DdlBuffer applyDropDependencies;
+
   private final DdlBuffer apply;
 
   private final DdlBuffer applyForeignKeys;
 
   private final DdlBuffer applyHistory;
+
+  private final DdlBuffer rollbackDropDependencies;
 
   private final DdlBuffer rollbackForeignKeys;
 
@@ -51,9 +55,11 @@ public class DdlWrite {
    */
   public DdlWrite(MConfiguration configuration, ModelContainer currentModel) {
     this.currentModel = currentModel;
+    this.applyDropDependencies = new BaseDdlBuffer(configuration);
     this.apply = new BaseDdlBuffer(configuration);
     this.applyForeignKeys = new BaseDdlBuffer(configuration);
     this.applyHistory = new BaseDdlBuffer(configuration);
+    this.rollbackDropDependencies = new BaseDdlBuffer(configuration);
     this.rollbackForeignKeys = new BaseDdlBuffer(configuration);
     this.rollback = new BaseDdlBuffer(configuration);
     this.drop = new BaseDdlBuffer(configuration);
@@ -77,7 +83,8 @@ public class DdlWrite {
   public boolean isApplyEmpty() {
     return apply.getBuffer().isEmpty()
         && applyForeignKeys.getBuffer().isEmpty()
-        && applyHistory.getBuffer().isEmpty();
+        && applyHistory.getBuffer().isEmpty()
+        && applyDropDependencies.getBuffer().isEmpty();
   }
 
   /**
@@ -85,8 +92,24 @@ public class DdlWrite {
    */
   public boolean isApplyRollbackEmpty() {
     return rollback.getBuffer().isEmpty()
-        && rollbackForeignKeys.getBuffer().isEmpty();
+        && rollbackForeignKeys.getBuffer().isEmpty()
+        && rollbackDropDependencies.getBuffer().isEmpty();
   }
+
+  /**
+   * Return the apply or rollback buffer.
+   */
+  public DdlBuffer buffer(boolean apply) {
+    return (apply) ? apply() : rollback();
+  }
+
+  /**
+   * Return the apply or rollback drop dependencies buffer.
+   */
+  public DdlBuffer dropDependencies(boolean apply) {
+    return (apply) ? applyDropDependencies() : rollbackDropDependencies();
+  }
+
 
   /**
    * Return true the drop buffers are empty.
@@ -100,6 +123,13 @@ public class DdlWrite {
    */
   public DdlBuffer apply() {
     return apply;
+  }
+
+  /**
+   * Return the buffer that executes early to drop dependencies like views etc.
+   */
+  public DdlBuffer applyDropDependencies() {
+    return applyDropDependencies;
   }
 
   /**
@@ -117,6 +147,13 @@ public class DdlWrite {
    */
   public DdlBuffer applyHistory() {
     return applyHistory;
+  }
+
+  /**
+   * Return the buffer that rollback executes early to drop dependencies like views.
+   */
+  public DdlBuffer rollbackDropDependencies() {
+    return rollbackDropDependencies;
   }
 
   /**
