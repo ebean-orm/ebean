@@ -118,7 +118,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     DdlBuffer apply = writer.applyHistory();
 
     if (update != null) {
-      apply.append("-- Regenerated ").append(procedureName).newLine();
+      apply.append("-- regenerated ").append(procedureName).newLine();
       apply.append("-- changes: ").append(update.description()).newLine();
 
       recreateHistoryView(writer, true, table.getName(), includedColumns);
@@ -131,8 +131,8 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
       update.toRevertedColumns(includedColumns);
 
       DdlBuffer rollback = writer.rollback();
-      rollback.append("-- Revert regenerated ").append(procedureName).newLine();
-      rollback.append("-- revert changes: ").append(update.description()).newLine();
+      rollback.append("-- reverse regenerated ").append(procedureName).newLine();
+      rollback.append("-- changes: ").append(update.description()).newLine();
 
       recreateHistoryView(writer, false, table.getName(), includedColumns);
       addFunction(rollback, procedureName, historyTable, includedColumns);
