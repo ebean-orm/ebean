@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attGroup ref="{http://ebean-orm.github.io/xml/ns/dbmigration}tablespaceAttributes"/>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="withHistory" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="draft" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="identityType" type="{http://ebean-orm.github.io/xml/ns/dbmigration}identityType" />
  *       &lt;attribute name="sequenceName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="sequenceInitial" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
@@ -59,6 +60,8 @@ public class CreateTable {
     protected String name;
     @XmlAttribute(name = "withHistory")
     protected Boolean withHistory;
+    @XmlAttribute(name = "draft")
+    protected Boolean draft;
     @XmlAttribute(name = "identityType")
     protected IdentityType identityType;
     @XmlAttribute(name = "sequenceName")
@@ -211,6 +214,30 @@ public class CreateTable {
      */
     public void setWithHistory(Boolean value) {
         this.withHistory = value;
+    }
+
+    /**
+     * Gets the value of the draft property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isDraft() {
+        return draft;
+    }
+
+    /**
+     * Sets the value of the draft property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setDraft(Boolean value) {
+        this.draft = value;
     }
 
     /**

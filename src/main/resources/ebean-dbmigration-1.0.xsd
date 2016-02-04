@@ -98,6 +98,7 @@
       </xsd:sequence>
       <xsd:attribute name="name" type="xsd:string" use="required"/>
       <xsd:attribute name="withHistory" type="xsd:boolean"/>
+      <xsd:attribute name="draft" type="xsd:boolean"/>
       <xsd:attribute name="identityType" type="identityType"/>
       <xsd:attribute name="sequenceName" type="xsd:string"/>
       <xsd:attribute name="sequenceInitial" type="xsd:positiveInteger"/>

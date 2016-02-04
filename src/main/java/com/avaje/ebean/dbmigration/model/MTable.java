@@ -10,13 +10,14 @@ import com.avaje.ebean.dbmigration.migration.DropHistoryTable;
 import com.avaje.ebean.dbmigration.migration.DropTable;
 import com.avaje.ebean.dbmigration.migration.IdentityType;
 import com.avaje.ebean.dbmigration.migration.UniqueConstraint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,8 @@ import java.util.Set;
  * </p>
  */
 public class MTable {
+
+  private static final Logger logger = LoggerFactory.getLogger(MTable.class);
 
   /**
    * Table name.
@@ -150,6 +153,7 @@ public class MTable {
     this.tablespace = createTable.getTablespace();
     this.indexTablespace = createTable.getIndexTablespace();
     this.withHistory = Boolean.TRUE.equals(createTable.isWithHistory());
+    this.draft = Boolean.TRUE.equals(createTable.isDraft());
     this.sequenceName = createTable.getSequenceName();
     this.sequenceInitial = toInt(createTable.getSequenceInitial());
     this.sequenceAllocate = toInt(createTable.getSequenceAllocate());
@@ -193,6 +197,9 @@ public class MTable {
     createTable.setIdentityType(identityType);
     if (withHistory) {
       createTable.setWithHistory(Boolean.TRUE);
+    }
+    if (draft) {
+      createTable.setDraft(Boolean.TRUE);
     }
 
     for (MColumn column : this.columns.values()) {
@@ -244,24 +251,29 @@ public class MTable {
 
     addColumn = null;
 
-    Set<String> mappedColumns = new LinkedHashSet<String>();
+    Map<String, MColumn> newColumnMap = newTable.getColumns();
 
-    Collection<MColumn> newColumns = newTable.getColumns().values();
-    for (MColumn newColumn : newColumns) {
-      MColumn localColumn = columns.get(newColumn.getName());
+    // compare newColumns to existing columns (look for new and diff columns)
+    for (MColumn newColumn : newColumnMap.values()) {
+      MColumn localColumn = this.columns.get(newColumn.getName());
       if (localColumn == null) {
-        diffNewColumn(newColumn);
+        // can ignore if draftOnly column and non-draft table
+        if (!newColumn.isDraftOnly() || draft) {
+          diffNewColumn(newColumn);
+        }
       } else {
-        // note that if there are alter column changes in here then
-        // the table withHistory is taken into account
         localColumn.compare(modelDiff, this, newColumn);
-        mappedColumns.add(newColumn.getName());
       }
     }
 
-    Collection<MColumn> existingColumns = columns.values();
-    for (MColumn existingColumn : existingColumns) {
-      if (!mappedColumns.contains(existingColumn.getName())) {
+    // compare existing columns (look for dropped columns)
+    for (MColumn existingColumn : columns.values()) {
+      MColumn newColumn = newColumnMap.get(existingColumn.getName());
+      if (newColumn == null) {
+        diffDropColumn(modelDiff, existingColumn);
+      } else if (newColumn.isDraftOnly() && !draft) {
+        // effectively a drop column (draft only column on a non-draft table)
+        logger.trace("... drop column {} from table {} as now draftOnly", newColumn.getName(), name);
         diffDropColumn(modelDiff, existingColumn);
       }
     }
