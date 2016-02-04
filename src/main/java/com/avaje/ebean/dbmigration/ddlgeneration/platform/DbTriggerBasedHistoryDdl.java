@@ -191,6 +191,25 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
         .endOfStatement().end();
   }
 
+  /**
+   * Create or replace the with_history view with explicit columns.
+   */
+  protected void createWithHistoryView(DdlBuffer apply, String baseTableName, List<String> columns) throws IOException {
+
+    apply.append("create or replace view ").append(baseTableName).append(viewSuffix).append(" as select ");
+    appendColumnNames(apply, columns, "");
+    appendSysPeriodColumns(apply, ", ");
+    apply.append(" from ").append(baseTableName).append(" union all select ");
+    appendColumnNames(apply, columns, "");
+    appendSysPeriodColumns(apply, ", ");
+    apply.append(" from ").append(baseTableName).append(historySuffix).endOfStatement().end();
+  }
+
+  protected void appendSysPeriodColumns(DdlBuffer apply, String prefix) throws IOException {
+    appendColumnName(apply, prefix, sysPeriodStart);
+    appendColumnName(apply, prefix, sysPeriodEnd);
+  }
+
   protected void dropHistoryTableEtc(DdlBuffer buffer, String baseTableName) throws IOException {
 
     buffer.append("drop view ").append(baseTableName).append(viewSuffix).endOfStatement();
@@ -202,8 +221,6 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     buffer.append("alter table ").append(baseTableName).append(" drop column ").append(sysPeriodStart).endOfStatement();
     buffer.append("alter table ").append(baseTableName).append(" drop column ").append(sysPeriodEnd).endOfStatement();
   }
-
-  //protected abstract void addFunction(DdlBuffer apply, String procedureName, String historyTable, List<String> includedColumns) throws IOException;
 
   protected void appendInsertIntoHistory(DdlBuffer buffer, String historyTable, List<String> columns) throws IOException {
 
@@ -222,6 +239,16 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
       }
       buffer.append(columnPrefix);
       buffer.append(columns.get(i));
+    }
+  }
+
+  /**
+   * Append a single column to the buffer if it is not null.
+   */
+  protected void appendColumnName(DdlBuffer buffer, String prefix, String columnName) throws IOException {
+
+    if (columnName != null) {
+      buffer.append(prefix).append(columnName);
     }
   }
 

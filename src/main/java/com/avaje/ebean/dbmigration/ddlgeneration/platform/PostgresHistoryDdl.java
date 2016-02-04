@@ -46,6 +46,11 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
   }
 
   @Override
+  protected void appendSysPeriodColumns(DdlBuffer apply, String prefix) throws IOException {
+    appendColumnName(apply, prefix, sysPeriod);
+  }
+
+  @Override
   protected void dropSysPeriodColumns(DdlBuffer buffer, String baseTableName) throws IOException {
     buffer.append("alter table ").append(baseTableName).append(" drop column ").append(sysPeriod).endOfStatement();
   }
@@ -115,10 +120,11 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     if (update != null) {
       apply.append("-- Regenerated ").append(procedureName).newLine();
       apply.append("-- changes: ").append(update.description()).newLine();
+
+      recreateHistoryView(apply, table.getName(), includedColumns);
     }
 
     addFunction(apply, procedureName, historyTable, includedColumns);
-
 
     if (update != null) {
       // put a reverted version into the rollback buffer
@@ -128,8 +134,20 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
       rollback.append("-- Revert regenerated ").append(procedureName).newLine();
       rollback.append("-- revert changes: ").append(update.description()).newLine();
 
+      recreateHistoryView(rollback, table.getName(), includedColumns);
       addFunction(rollback, procedureName, historyTable, includedColumns);
     }
+  }
+
+  /**
+   * For postgres we need to drop and recreate the view. Well, we could add columns to the end of the view
+   * but otherwise we need to drop and create it.
+   */
+  private void recreateHistoryView(DdlBuffer buffer, String baseTableName, List<String> includedColumns) throws IOException {
+
+    buffer.append("drop view if exists ").append(baseTableName).append(viewSuffix).endOfStatement();
+
+    createWithHistoryView(buffer, baseTableName, includedColumns);
   }
 
   @Override
