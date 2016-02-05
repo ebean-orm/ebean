@@ -1,0 +1,26 @@
+package com.avaje.ebeaninternal.util;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+/**
+ * Utility for closing raw Jdbc resources.
+ */
+public class JdbcClose {
+
+  private static final Logger logger = LoggerFactory.getLogger(JdbcClose.class);
+
+  /**
+   * Close the connection logging if an error occurs.
+   */
+  public static void close(Connection connection) {
+    try {
+      connection.close();
+    } catch (SQLException e) {
+      logger.warn("Error closing connection", e);
+    }
+  }
+}

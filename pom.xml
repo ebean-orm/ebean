@@ -61,6 +61,12 @@
       <version>1.7.7</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.avaje.util</groupId>
+      <artifactId>avaje-classpath-scanner</artifactId>
+      <version>1.1.1-SNAPSHOT</version>
+    </dependency>
+
     <!-- provided scope for Spring boot loader classpath scanning support -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
