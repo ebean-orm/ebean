@@ -40,6 +40,7 @@ public class MigrationTable {
   private final String schema;
   private final String table;
   private final ServerConfig serverConfig;
+  private final String envUserName;
 
   int metaRowPosition;
 
@@ -56,6 +57,8 @@ public class MigrationTable {
     this.catalog = null;
     this.schema = null;
     this.table = "ebean_migration";
+
+    this.envUserName = System.getProperty("user.name");
   }
 
 
@@ -93,7 +96,15 @@ public class MigrationTable {
   }
 
 
-  public boolean shouldRun(int runPosition, LocalMigrationResource localVersion) {
+  public boolean shouldRun(int runPosition, LocalMigrationResource localVersion, LocalMigrationResource priorVersion) {
+
+    // if prior != null check previous version installed
+    //    if previous version not installed ... error - missing version (prior version)
+
+    // if localVersion installed
+    //    check checksum and return ok, or re-installable?
+    // else
+    //    install version and continue
 
     if (runPosition >= metaRows.size()) {
       logger.debug("No matching row");
@@ -112,6 +123,12 @@ public class MigrationTable {
 
     logger.debug("run migration "+localVersion.getLocation());
 
+
+    String script = localVersion.getContent();
+
+    MigrationScriptRunner run = new MigrationScriptRunner(connection);
+    run.runScript(false, script, "run migration version: "+localVersion.getVersion());
+
     String sql = "insert into ebean_migration (id,status,run_version,dep_version,comment,checksum,run_on,run_by,run_ip) "+
         "values (?,?,?,?,?,?,?,?,?)";
 
@@ -123,7 +140,7 @@ public class MigrationTable {
     sqlUpdate.setParameter(5, "comm");
     sqlUpdate.setParameter(6, 0);
     sqlUpdate.setParameter(7, new Timestamp(System.currentTimeMillis()));
-    sqlUpdate.setParameter(8, "user");
+    sqlUpdate.setParameter(8, envUserName);
     sqlUpdate.setParameter(9, "userIp");
 
     ExternalJdbcTransaction t = new ExternalJdbcTransaction(connection);

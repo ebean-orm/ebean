@@ -62,9 +62,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.avaje.util</groupId>
+      <groupId>org.avaje</groupId>
       <artifactId>avaje-classpath-scanner</artifactId>
-      <version>1.1.1-SNAPSHOT</version>
+      <version>1.1.1</version>
     </dependency>
 
     <!-- provided scope for Spring boot loader classpath scanning support -->

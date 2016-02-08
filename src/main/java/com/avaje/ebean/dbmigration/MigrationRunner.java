@@ -46,10 +46,14 @@ public class MigrationRunner {
       MigrationTable table = new MigrationTable(server, migrationConfig, connection);
       table.createIfNeeded();
 
+      LocalMigrationResource priorVersion = null;
       List<LocalMigrationResource> localVersions = resources.getVersions();
       for (int i = 0; i < localVersions.size(); i++) {
         LocalMigrationResource localVersion = localVersions.get(i);
-        if (!table.shouldRun(i, localVersion)) {
+        if (i > 0) {
+          priorVersion = localVersions.get(i-1);
+        }
+        if (!table.shouldRun(i, localVersion, priorVersion)) {
           break;
         }
       }

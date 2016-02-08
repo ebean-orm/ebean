@@ -39,7 +39,7 @@ public class LocalMigrationResources {
     ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
 
     Scanner scanner = new Scanner(classLoader);
-    List<Resource> resourceList = scanner.scanForResources(new Location(migrationPath), new Match(migrationConfig));
+    List<Resource> resourceList = scanner.scanForResources(migrationPath, new Match(migrationConfig));
 
     logger.debug("resources: {}", resourceList);
 
@@ -49,8 +49,8 @@ public class LocalMigrationResources {
         int pos = filename.lastIndexOf(migrationConfig.getApplySuffix());
         String mainName = filename.substring(0, pos);
 
-        MigrationVersion v0 = MigrationVersion.parse(mainName);
-        LocalMigrationResource res = new LocalMigrationResource(v0, resource.getLocation(), resource);
+        MigrationVersion migrationVersion = MigrationVersion.parse(mainName);
+        LocalMigrationResource res = new LocalMigrationResource(migrationVersion, resource.getLocation(), resource);
         versions.add(res);
       }
     }
