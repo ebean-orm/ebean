@@ -8,48 +8,48 @@ import com.avaje.ebeaninternal.server.deploy.BeanProperty;
  */
 public class GeneratedCounterInteger implements GeneratedProperty {
 
-    public GeneratedCounterInteger() {
+  public GeneratedCounterInteger() {
 
-    }
+  }
 
-    /**
-     * Always returns a 1.
-     */
-    @Override
-    public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
-        return 1;
-    }
+  /**
+   * Always returns a 1.
+   */
+  @Override
+  public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
+    return 1;
+  }
 
-    /**
-     * Increments the current value by one.
-     */
-    @Override
-    public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
-        Integer i = (Integer) prop.getValue(bean);
-        return i + 1;
-    }
+  /**
+   * Increments the current value by one.
+   */
+  @Override
+  public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
+    Integer i = (Integer) prop.getValue(bean);
+    return i + 1;
+  }
 
-    /**
-     * Include this in every update.
-     */
-    public boolean includeInUpdate() {
-        return true;
-    }
-    
-    @Override
-    public boolean includeInAllUpdates() {
-      return false;
-    }
+  /**
+   * Include this in every update.
+   */
+  public boolean includeInUpdate() {
+    return true;
+  }
 
-    /**
-     * Include this in every insert setting initial counter value to 1.
-     */
-    public boolean includeInInsert() {
-        return true;
-    }
+  @Override
+  public boolean includeInAllUpdates() {
+    return false;
+  }
 
-    public boolean isDDLNotNullable() {
-        return true;
-    }
+  /**
+   * Include this in every insert setting initial counter value to 1.
+   */
+  public boolean includeInInsert() {
+    return true;
+  }
+
+  public boolean isDDLNotNullable() {
+    return true;
+  }
 
 }

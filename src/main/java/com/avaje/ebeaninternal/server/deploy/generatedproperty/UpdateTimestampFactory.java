@@ -1,5 +1,9 @@
 package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 
+import com.avaje.ebean.config.ClassLoadConfig;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
+
+import javax.persistence.PersistenceException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -7,17 +11,12 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.PersistenceException;
-
-import com.avaje.ebean.config.ClassLoadConfig;
-import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-
 /**
  * Helper for creating Update timestamp GeneratedProperty objects.
  */
 public class UpdateTimestampFactory {
 
-	final GeneratedUpdateLong longTime = new GeneratedUpdateLong();
+  final GeneratedUpdateLong longTime = new GeneratedUpdateLong();
 
   final Map<Class<?>, GeneratedProperty> map = new HashMap<Class<?>, GeneratedProperty>();
 
@@ -38,15 +37,15 @@ public class UpdateTimestampFactory {
     }
   }
 
-	public void setUpdateTimestamp(DeployBeanProperty property) {
+  public void setUpdateTimestamp(DeployBeanProperty property) {
 
-		property.setGeneratedProperty(createUpdateTimestamp(property));
-	}
-	
-	/**
-	 * Create the update GeneratedProperty depending on the property type.
-	 */
-	protected GeneratedProperty createUpdateTimestamp(DeployBeanProperty property) {
+    property.setGeneratedProperty(createUpdateTimestamp(property));
+  }
+
+  /**
+   * Create the update GeneratedProperty depending on the property type.
+   */
+  protected GeneratedProperty createUpdateTimestamp(DeployBeanProperty property) {
 
     Class<?> propType = property.getPropertyType();
     GeneratedProperty generatedProperty = map.get(propType);
@@ -54,7 +53,7 @@ public class UpdateTimestampFactory {
       return generatedProperty;
     }
 
-		throw new PersistenceException("Generated update Timestamp not supported on "+propType.getName());
-	}
-	
+    throw new PersistenceException("Generated update Timestamp not supported on " + propType.getName());
+  }
+
 }

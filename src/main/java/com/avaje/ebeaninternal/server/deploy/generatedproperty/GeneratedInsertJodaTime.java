@@ -2,9 +2,8 @@ package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-
-import org.joda.time.LocalDateTime;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 
 /**
  * Support joda time types as GeneratedProperty.

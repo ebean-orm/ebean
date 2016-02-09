@@ -1,19 +1,19 @@
 package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 
-import java.math.BigDecimal;
-import java.util.HashSet;
-
 import com.avaje.ebean.config.ClassLoadConfig;
 import com.avaje.ebean.config.CurrentUserProvider;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
+
+import java.math.BigDecimal;
+import java.util.HashSet;
 
 /**
  * Default implementation of GeneratedPropertyFactory.
  */
 public class GeneratedPropertyFactory {
 
-	private final CounterFactory counterFactory = new CounterFactory();
+  private final CounterFactory counterFactory = new CounterFactory();
 
   private final InsertTimestampFactory insertFactory;
 
@@ -34,7 +34,7 @@ public class GeneratedPropertyFactory {
     this.updateFactory = new UpdateTimestampFactory(classLoadConfig);
 
     CurrentUserProvider currentUserProvider = serverConfig.getCurrentUserProvider();
-	  if (currentUserProvider != null) {
+    if (currentUserProvider != null) {
       generatedWhoCreated = new GeneratedWhoCreated(currentUserProvider);
       generatedWhoModified = new GeneratedWhoModified(currentUserProvider);
     } else {
@@ -42,47 +42,47 @@ public class GeneratedPropertyFactory {
       generatedWhoModified = null;
     }
 
-		numberTypes.add(Integer.class.getName());
-		numberTypes.add(int.class.getName());
-		numberTypes.add(Long.class.getName());
-		numberTypes.add(long.class.getName());
-		numberTypes.add(Short.class.getName());
-		numberTypes.add(short.class.getName());
-		numberTypes.add(Double.class.getName());
-		numberTypes.add(double.class.getName());
-		numberTypes.add(BigDecimal.class.getName());
-	}
+    numberTypes.add(Integer.class.getName());
+    numberTypes.add(int.class.getName());
+    numberTypes.add(Long.class.getName());
+    numberTypes.add(long.class.getName());
+    numberTypes.add(Short.class.getName());
+    numberTypes.add(short.class.getName());
+    numberTypes.add(Double.class.getName());
+    numberTypes.add(double.class.getName());
+    numberTypes.add(BigDecimal.class.getName());
+  }
 
   public ClassLoadConfig getClassLoadConfig() {
     return classLoadConfig;
   }
 
   private boolean isNumberType(String typeClassName) {
-		return numberTypes.contains(typeClassName);
-	}
-	
-	public void setVersion(DeployBeanProperty property) {
-		if (isNumberType(property.getPropertyType().getName())) {
-			setCounter(property);
-		} else {
-			setUpdateTimestamp(property);
-		}
-	}
-	
-	public void setCounter(DeployBeanProperty property) {
-		
-		counterFactory.setCounter(property);
-	}
+    return numberTypes.contains(typeClassName);
+  }
 
-	public void setInsertTimestamp(DeployBeanProperty property) {
-		
-		insertFactory.setInsertTimestamp(property);
-	}
+  public void setVersion(DeployBeanProperty property) {
+    if (isNumberType(property.getPropertyType().getName())) {
+      setCounter(property);
+    } else {
+      setUpdateTimestamp(property);
+    }
+  }
 
-	public void setUpdateTimestamp(DeployBeanProperty property) {
-		
-		updateFactory.setUpdateTimestamp(property);
-	}
+  public void setCounter(DeployBeanProperty property) {
+
+    counterFactory.setCounter(property);
+  }
+
+  public void setInsertTimestamp(DeployBeanProperty property) {
+
+    insertFactory.setInsertTimestamp(property);
+  }
+
+  public void setUpdateTimestamp(DeployBeanProperty property) {
+
+    updateFactory.setUpdateTimestamp(property);
+  }
 
   public void setWhoCreated(DeployBeanProperty property) {
     if (generatedWhoCreated == null) {

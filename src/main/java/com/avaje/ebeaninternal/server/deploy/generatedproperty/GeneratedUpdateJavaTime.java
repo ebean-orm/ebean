@@ -3,10 +3,6 @@ package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
-
 /**
  * Support java.time DateTime types as GeneratedProperty.
  */
