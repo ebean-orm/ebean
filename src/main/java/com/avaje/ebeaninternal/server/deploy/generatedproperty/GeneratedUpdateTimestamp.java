@@ -13,15 +13,15 @@ public class GeneratedUpdateTimestamp implements GeneratedProperty, GeneratedWhe
     /**
      * Return now as a Timestamp.
      */
-    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
-        return new Timestamp(System.currentTimeMillis());
+    public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
+        return new Timestamp(now);
     }
 
     /**
      * Return now as a Timestamp.
      */
-    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
-        return new Timestamp(System.currentTimeMillis());
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
+        return new Timestamp(now);
     }
 
     /**

@@ -40,13 +40,13 @@ public class GeneratedUpdateJodaTime {
   public static class LocalDT extends Base {
 
     @Override
-    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
-      return new LocalDateTime();
+    public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
+      return new LocalDateTime(now);
     }
 
     @Override
-    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
-      return new LocalDateTime();
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
+      return new LocalDateTime(now);
     }
   }
 
@@ -56,13 +56,13 @@ public class GeneratedUpdateJodaTime {
   public static class DateTimeDT extends Base {
 
     @Override
-    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
-      return new DateTime();
+    public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
+      return new DateTime(now);
     }
 
     @Override
-    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
-      return new DateTime();
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
+      return new DateTime(now);
     }
   }
 

@@ -21,7 +21,7 @@ public class UpdateTimestampFactoryTest {
     DeployBeanProperty prop = new DeployBeanProperty(null, LocalDateTime.class, null, null);
 
     GeneratedProperty generatedProperty = factory.createUpdateTimestamp(prop);
-    Object value = generatedProperty.getInsertValue(null, null);
+    Object value = generatedProperty.getInsertValue(null, null, System.currentTimeMillis());
     assertTrue(value instanceof LocalDateTime);
   }
 
@@ -31,7 +31,7 @@ public class UpdateTimestampFactoryTest {
     DeployBeanProperty prop = new DeployBeanProperty(null, OffsetDateTime.class, null, null);
 
     GeneratedProperty generatedProperty = factory.createUpdateTimestamp(prop);
-    Object value = generatedProperty.getInsertValue(null, null);
+    Object value = generatedProperty.getInsertValue(null, null, System.currentTimeMillis());
     assertTrue(value instanceof OffsetDateTime);
   }
 
@@ -41,7 +41,7 @@ public class UpdateTimestampFactoryTest {
     DeployBeanProperty prop = new DeployBeanProperty(null, Timestamp.class, null, null);
 
     GeneratedProperty generatedProperty = factory.createUpdateTimestamp(prop);
-    Object value = generatedProperty.getInsertValue(null, null);
+    Object value = generatedProperty.getInsertValue(null, null, System.currentTimeMillis());
     assertTrue(value instanceof Timestamp);
   }
 
@@ -51,7 +51,7 @@ public class UpdateTimestampFactoryTest {
     DeployBeanProperty prop = new DeployBeanProperty(null, java.util.Date.class, null, null);
 
     GeneratedProperty generatedProperty = factory.createUpdateTimestamp(prop);
-    Object value = generatedProperty.getInsertValue(null, null);
+    Object value = generatedProperty.getInsertValue(null, null, System.currentTimeMillis());
     assertTrue(value instanceof java.util.Date);
   }
 }

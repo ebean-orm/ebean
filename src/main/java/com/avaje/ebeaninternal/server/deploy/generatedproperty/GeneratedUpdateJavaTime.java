@@ -41,13 +41,13 @@ public class GeneratedUpdateJavaTime {
   public static class LocalDT extends Base {
 
     @Override
-    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
-      return LocalDateTime.now();
+    public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
+      return JavaTimeUtils.toLocalDateTime(now);
     }
 
     @Override
-    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
-      return LocalDateTime.now();
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
+      return JavaTimeUtils.toLocalDateTime(now);
     }
   }
 
@@ -57,13 +57,13 @@ public class GeneratedUpdateJavaTime {
   public static class OffsetDT extends Base {
 
     @Override
-    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
-      return OffsetDateTime.now();
+    public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
+      return JavaTimeUtils.toOffsetDateTime(now);
     }
 
     @Override
-    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
-      return OffsetDateTime.now();
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
+      return JavaTimeUtils.toOffsetDateTime(now);
     }
   }
 
@@ -73,13 +73,13 @@ public class GeneratedUpdateJavaTime {
   public static class ZonedDT extends Base {
 
     @Override
-    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
-      return ZonedDateTime.now();
+    public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
+      return JavaTimeUtils.toZonedDateTime(now);
     }
 
     @Override
-    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
-      return ZonedDateTime.now();
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
+      return JavaTimeUtils.toZonedDateTime(now);
     }
   }
 

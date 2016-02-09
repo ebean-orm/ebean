@@ -12,12 +12,12 @@ public interface GeneratedProperty {
     /**
      * Get the generated insert value for a specific property of a bean.
      */
-    Object getInsertValue(BeanProperty prop, EntityBean bean);
+    Object getInsertValue(BeanProperty prop, EntityBean bean, long now);
 
     /**
      * Get the generated update value for a specific property of a bean.
      */
-    Object getUpdateValue(BeanProperty prop, EntityBean bean);
+    Object getUpdateValue(BeanProperty prop, EntityBean bean, long now);
 
     /**
      * Return true if this should always be includes in an update statement.

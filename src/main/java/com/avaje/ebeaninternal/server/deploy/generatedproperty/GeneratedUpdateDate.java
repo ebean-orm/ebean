@@ -14,15 +14,15 @@ public class GeneratedUpdateDate implements GeneratedProperty {
     /**
      * Return now as a Timestamp.
      */
-    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
-        return new Date(System.currentTimeMillis());
+    public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
+        return new Date(now);
     }
 
     /**
      * Return now as a Timestamp.
      */
-    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
-        return new Date(System.currentTimeMillis());
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
+        return new Date(now);
     }
 
     /**

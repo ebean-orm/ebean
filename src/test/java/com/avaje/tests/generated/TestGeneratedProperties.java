@@ -5,6 +5,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.EGenProps;
 import org.junit.Test;
 
+import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 
 public class TestGeneratedProperties extends BaseTestCase {
@@ -31,8 +32,15 @@ public class TestGeneratedProperties extends BaseTestCase {
     assertNotNull(bean.getLongCreated());
     assertNotNull(bean.getLongUpdated());
 
+    assertThat(bean.getWhenCreated().toInstant().toEpochMilli()).isEqualTo(bean.getLongCreated());
+    assertThat(bean.getWhenModified().toInstant().toEpochMilli()).isEqualTo(bean.getLongCreated());
+    assertThat(bean.getWhenModified().toInstant().toEpochMilli()).isEqualTo(bean.getLongCreated());
+
     bean.setName("updating...");
     Ebean.save(bean);
+
+    assertThat(bean.getWhenModified()).isNotEqualTo(bean.getLongCreated());
+    assertThat(bean.getWhenModified().toInstant().toEpochMilli()).isEqualTo(bean.getLongUpdated());
 
     Ebean.delete(bean);
   }

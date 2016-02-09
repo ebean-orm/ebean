@@ -37,7 +37,7 @@ public class BindablePropertyUpdateGenerated extends BindableProperty {
 
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
-    Object value = gen.getUpdateValue(prop, bean);
+    Object value = gen.getUpdateValue(prop, bean, request.now());
 
     // generated value should be the correct type
     request.bind(value, prop);

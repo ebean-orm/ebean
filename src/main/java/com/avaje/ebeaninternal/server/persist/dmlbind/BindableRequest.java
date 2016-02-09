@@ -56,4 +56,11 @@ public interface BindableRequest {
   PersistRequestBean<?> getPersistRequest();
 
   void registerDerivedRelationship(DerivedRelationshipData assocBean);
+
+  /**
+   * Return the system current time in millis. This is expected to the same time used
+   * by multiple generated properties for a single request.
+   */
+  long now();
+
 }

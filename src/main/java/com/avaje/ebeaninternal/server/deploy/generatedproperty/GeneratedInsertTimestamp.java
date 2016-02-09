@@ -13,14 +13,16 @@ public class GeneratedInsertTimestamp implements GeneratedProperty, GeneratedWhe
     /**
      * Return the current time as a Timestamp.
      */
-    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
-        return new Timestamp(System.currentTimeMillis());
+    @Override
+    public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
+        return new Timestamp(now);
     }
 
     /**
      * Just returns the beans original insert timestamp value.
      */
-    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
+    @Override
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
         return prop.getValue(bean);
     }
 

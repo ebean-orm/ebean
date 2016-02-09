@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class InsertTimestampFactoryTest {
 
@@ -20,7 +20,7 @@ public class InsertTimestampFactoryTest {
     DeployBeanProperty prop = new DeployBeanProperty(null, LocalDateTime.class, null, null);
 
     GeneratedProperty insertTimestamp = factory.createInsertTimestamp(prop);
-    Object value = insertTimestamp.getInsertValue(null, null);
+    Object value = insertTimestamp.getInsertValue(null, null, System.currentTimeMillis());
     assertTrue(value instanceof LocalDateTime);
   }
 
@@ -30,7 +30,7 @@ public class InsertTimestampFactoryTest {
     DeployBeanProperty prop = new DeployBeanProperty(null, OffsetDateTime.class, null, null);
 
     GeneratedProperty insertTimestamp = factory.createInsertTimestamp(prop);
-    Object value = insertTimestamp.getInsertValue(null, null);
+    Object value = insertTimestamp.getInsertValue(null, null, System.currentTimeMillis());
     assertTrue(value instanceof OffsetDateTime);
   }
 
@@ -40,7 +40,7 @@ public class InsertTimestampFactoryTest {
     DeployBeanProperty prop = new DeployBeanProperty(null, Timestamp.class, null, null);
 
     GeneratedProperty insertTimestamp = factory.createInsertTimestamp(prop);
-    Object value = insertTimestamp.getInsertValue(null, null);
+    Object value = insertTimestamp.getInsertValue(null, null, System.currentTimeMillis());
     assertTrue(value instanceof Timestamp);
   }
 
@@ -50,7 +50,7 @@ public class InsertTimestampFactoryTest {
     DeployBeanProperty prop = new DeployBeanProperty(null, java.util.Date.class, null, null);
 
     GeneratedProperty insertTimestamp = factory.createInsertTimestamp(prop);
-    Object value = insertTimestamp.getInsertValue(null, null);
+    Object value = insertTimestamp.getInsertValue(null, null, System.currentTimeMillis());
     assertTrue(value instanceof java.util.Date);
   }
 

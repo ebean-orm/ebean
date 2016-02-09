@@ -18,14 +18,16 @@ public class GeneratedCounter implements GeneratedProperty {
     /**
      * Always returns a 1.
      */
-    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
+    @Override
+    public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
         return BasicTypeConverter.convert(1, numberType);
     }
 
     /**
      * Increments the current value by one.
      */
-    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
+    @Override
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
         Number currVal = (Number) prop.getValue(bean);
         Integer nextVal = currVal.intValue() + 1;
         return BasicTypeConverter.convert(nextVal, numberType);

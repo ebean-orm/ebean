@@ -15,14 +15,16 @@ public class GeneratedCounterInteger implements GeneratedProperty {
     /**
      * Always returns a 1.
      */
-    public Object getInsertValue(BeanProperty prop, EntityBean bean) {
+    @Override
+    public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
         return 1;
     }
 
     /**
      * Increments the current value by one.
      */
-    public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
+    @Override
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
         Integer i = (Integer) prop.getValue(bean);
         return i + 1;
     }

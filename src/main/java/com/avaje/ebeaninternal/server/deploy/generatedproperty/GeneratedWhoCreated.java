@@ -16,12 +16,12 @@ public class GeneratedWhoCreated implements GeneratedProperty {
   }
 
   @Override
-  public Object getInsertValue(BeanProperty prop, EntityBean bean) {
+  public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
     return currentUserProvider.currentUser();
   }
 
   @Override
-  public Object getUpdateValue(BeanProperty prop, EntityBean bean) {
+  public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
     return null;
   }
 

@@ -39,6 +39,8 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
 
   protected final boolean logLevelSql;
 
+  protected final long now;
+
   /**
    * The PreparedStatement used for the dml.
    */
@@ -49,6 +51,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   protected ArrayList<UpdateGenValue> updateGenValues;
 
   protected DmlHandler(PersistRequestBean<?> persistRequest, boolean emptyStringToNull) {
+    this.now = System.currentTimeMillis();
     this.persistRequest = persistRequest;
     this.emptyStringToNull = emptyStringToNull;
     this.transaction = persistRequest.getTransaction();
@@ -58,6 +61,11 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     } else {
       this.bindLog = null;
     }
+  }
+
+  @Override
+  public long now() {
+    return now;
   }
 
   @Override
