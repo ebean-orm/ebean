@@ -53,7 +53,7 @@ public class MigrationRunner {
         if (i > 0) {
           priorVersion = localVersions.get(i-1);
         }
-        if (!table.shouldRun(i, localVersion, priorVersion)) {
+        if (!table.shouldRun(localVersion, priorVersion)) {
           break;
         }
       }

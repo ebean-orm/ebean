@@ -42,7 +42,7 @@ public class MigrationTable {
   private final ServerConfig serverConfig;
   private final String envUserName;
 
-  int metaRowPosition;
+  int currentSearchPosition;
 
   List<SqlRow> metaRows;
 
@@ -96,23 +96,37 @@ public class MigrationTable {
   }
 
 
-  public boolean shouldRun(int runPosition, LocalMigrationResource localVersion, LocalMigrationResource priorVersion) {
+  public boolean shouldRun(LocalMigrationResource localVersion, LocalMigrationResource priorVersion) {
 
     // if prior != null check previous version installed
     //    if previous version not installed ... error - missing version (prior version)
 
-    // if localVersion installed
-    //    check checksum and return ok, or re-installable?
-    // else
-    //    install version and continue
-
-    if (runPosition >= metaRows.size()) {
-      logger.debug("No matching row");
-      runMigration(runPosition, localVersion);
-      return true;
-    }
+//    if (!priorVersionNotInstalled(priorVersion)) {
+//
+//    }
+//
+//    // if localVersion installed
+//    //    check checksum and return ok, or re-installable?
+//    // else
+//    //    install version and continue
+//
+//    if (runPosition >= metaRows.size()) {
+//      logger.debug("No matching row");
+//      runMigration(runPosition, localVersion);
+//      return true;
+//    }
 
     return false;
+  }
+
+  private void checkInstalled(LocalMigrationResource priorVersion) {
+    if (priorVersion != null) {
+      searchFor(priorVersion);
+    }
+  }
+
+  private void searchFor(LocalMigrationResource priorVersion) {
+
   }
 
   public void commit() throws SQLException {
