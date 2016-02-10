@@ -28,8 +28,6 @@ public class DbTriggerUpdate {
 
   /**
    * Prepare for use given the mode and columns included in history.
-   * @param mode
-   * @param includedColumns
    */
   public void prepare(DdlWrite.Mode mode, List<String> includedColumns) {
     this.mode = mode;
