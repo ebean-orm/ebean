@@ -236,7 +236,7 @@ public class DbMigration {
         if (databasePlatform != null) {
           // writer needs the current model to provide table/column details for
           // history ddl generation (triggers, history tables etc)
-          DdlWrite write = new DdlWrite(new MConfiguration(), currentModel.read());
+          DdlWrite write = new DdlWrite(new MConfiguration(), current);
           PlatformDdlWriter writer = createDdlWriter(databasePlatform, "");
           writer.processMigration(dbMigration, write, migrationDir , fullVersion);
         }

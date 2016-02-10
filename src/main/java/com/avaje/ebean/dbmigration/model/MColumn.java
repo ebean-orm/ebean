@@ -283,7 +283,6 @@ public class MColumn {
   /**
    * Compare the column meta data and return true if there is a change that means
    * the history table column needs
-
    */
   public void compare(ModelDiff modelDiff, MTable table, MColumn newColumn) {
 

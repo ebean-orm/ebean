@@ -200,7 +200,7 @@ public class PlatformDdl {
    * Regenerate the history triggers (or function) due to a column being added/dropped/excluded or included.
    */
   public void regenerateHistoryTriggers(DdlWrite write, HistoryTableUpdate update) throws IOException {
-    historyDdl.regenerateHistoryTriggers(write, update);
+    historyDdl.updateTriggers(write, update);
   }
 
   /**

@@ -10,7 +10,6 @@ import com.avaje.ebean.dbmigration.model.MColumn;
 import com.avaje.ebean.dbmigration.model.MTable;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -45,21 +44,71 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     this.historySuffix = serverConfig.getHistoryTableSuffix();
     this.constraintNaming = serverConfig.getConstraintNaming();
 
-    this.sysPeriodStart = sysPeriod+"_start";
-    this.sysPeriodEnd = sysPeriod+"_end";
+    this.sysPeriodStart = sysPeriod + "_start";
+    this.sysPeriodEnd = sysPeriod + "_end";
   }
 
   @Override
-  public void regenerateHistoryTriggers(DdlWrite writer, HistoryTableUpdate update) throws IOException {
+  public void updateTriggers(DdlWrite writer, HistoryTableUpdate update) throws IOException {
 
     MTable table = writer.getTable(update.getBaseTable());
     if (table == null) {
-      throw new IllegalStateException("MTable "+update.getBaseTable()+" not found in writer? (required for history DDL)");
+      throw new IllegalStateException("MTable " + update.getBaseTable() + " not found in writer? (required for history DDL)");
     }
-    regenerateHistoryTriggers(writer, table, update);
+    updateTriggers(writer, table, update);
   }
 
-  protected abstract void regenerateHistoryTriggers(DdlWrite writer, MTable table, HistoryTableUpdate update) throws IOException;
+  /**
+   * Replace the existing triggers/stored procedures/views for history table support given the included columns.
+   */
+  protected abstract void updateHistoryTriggers(DbTriggerUpdate triggerUpdate) throws IOException;
+
+  /**
+   * Process the HistoryTableUpdate which can result in changes to the apply, rollback
+   * and drop scripts.
+   */
+  protected void updateTriggers(DdlWrite writer, MTable table, HistoryTableUpdate update) throws IOException {
+
+    DbTriggerUpdate triggerUpdate = createDbTriggerUpdate(writer, table);
+
+    if (update.hasApplyChanges()) {
+      // includes add, include and exclude column changes
+
+      String applyChangeDescription = update.descriptionForApply();
+      List<String> includedColumns = columnNamesForApply(table);
+
+      DdlBuffer apply = writer.applyHistory();
+      apply.append("-- changes: ").append(applyChangeDescription).newLine();
+
+      triggerUpdate.prepare(DdlWrite.Mode.APPLY, includedColumns);
+      updateHistoryTriggers(triggerUpdate);
+
+      // put a reverted version into the rollback buffer
+      update.toRevertedColumns(includedColumns);
+
+      DdlBuffer rollback = writer.rollback();
+      rollback.append("-- revert changes: ").append(applyChangeDescription).newLine();
+
+      triggerUpdate.prepare(DdlWrite.Mode.ROLLBACK, includedColumns);
+      updateHistoryTriggers(triggerUpdate);//writer, DdlWrite.Mode.ROLLBACK, baseTableName, historyTableName, includedColumns);
+    }
+
+    if (update.hasDropChanges()) {
+      // effectively applies the dropped columns changes to history triggers
+
+      DdlBuffer drop = writer.dropHistory();
+      drop.append("-- changes: ").append(update.descriptionForDrop()).newLine();
+
+      triggerUpdate.prepare(DdlWrite.Mode.DROP, columnNamesForDrop(table));
+      updateHistoryTriggers(triggerUpdate);//writer, DdlWrite.Mode.DROP, baseTableName, historyTableName, columnNamesForDrop(table));
+    }
+  }
+
+  protected DbTriggerUpdate createDbTriggerUpdate(DdlWrite writer, MTable table) {
+    String baseTableName = table.getName();
+    String historyTableName = historyTableName(baseTableName);
+    return new DbTriggerUpdate(baseTableName, historyTableName, writer);
+  }
 
   @Override
   public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
@@ -78,7 +127,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     String baseTable = addHistoryTable.getBaseTable();
     MTable table = writer.getTable(baseTable);
     if (table == null) {
-      throw new IllegalStateException("MTable "+baseTable+" not found in writer? (required for history DDL)");
+      throw new IllegalStateException("MTable " + baseTable + " not found in writer? (required for history DDL)");
     }
 
     createWithHistory(writer, table);
@@ -95,7 +144,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     dropHistoryTableEtc(writer.rollback(), baseTable);
 
     addHistoryTable(writer, table, whenCreatedColumn);
-    addStoredFunction(writer, table, null);
+    createStoredFunction(writer, table);
     createTriggers(writer, table);
   }
 
@@ -103,7 +152,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
   protected abstract void dropTriggers(DdlBuffer buffer, String baseTable) throws IOException;
 
-  protected void addStoredFunction(DdlWrite writer, MTable table, HistoryTableUpdate update) throws IOException {
+  protected void createStoredFunction(DdlWrite writer, MTable table) throws IOException {
     // do nothing
   }
 
@@ -158,7 +207,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
     apply.append("create table ").append(table.getName()).append(historySuffix).append("(").newLine();
 
-    Collection<MColumn> cols = table.getColumns().values();
+    Collection<MColumn> cols = table.allColumns();
     for (MColumn column : cols) {
       if (!column.isDraftOnly()) {
         writeColumnDefinition(apply, column.getName(), column.getType());
@@ -194,15 +243,16 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   /**
    * Create or replace the with_history view with explicit columns.
    */
-  protected void createWithHistoryView(DdlBuffer apply, String baseTableName, List<String> columns) throws IOException {
+  protected void createWithHistoryView(DbTriggerUpdate update) throws IOException {
 
-    apply.append("create or replace view ").append(baseTableName).append(viewSuffix).append(" as select ");
-    appendColumnNames(apply, columns, "");
+    DdlBuffer apply = update.historyBuffer();
+    apply.append("create or replace view ").append(update.getBaseTable()).append(viewSuffix).append(" as select ");
+    appendColumnNames(apply, update.getColumns(), "");
     appendSysPeriodColumns(apply, ", ");
-    apply.append(" from ").append(baseTableName).append(" union all select ");
-    appendColumnNames(apply, columns, "");
+    apply.append(" from ").append(update.getBaseTable()).append(" union all select ");
+    appendColumnNames(apply, update.getColumns(), "");
     appendSysPeriodColumns(apply, ", ");
-    apply.append(" from ").append(baseTableName).append(historySuffix).endOfStatement().end();
+    apply.append(" from ").append(update.getHistoryTable()).endOfStatement().end();
   }
 
   protected void appendSysPeriodColumns(DdlBuffer apply, String prefix) throws IOException {
@@ -233,7 +283,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
   protected void appendColumnNames(DdlBuffer buffer, List<String> columns, String columnPrefix) throws IOException {
 
-    for (int i=0; i< columns.size(); i++) {
+    for (int i = 0; i < columns.size(); i++) {
       if (i > 0) {
         buffer.append(", ");
       }
@@ -253,18 +303,23 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   }
 
   /**
-   * Return the list of included columns in order.
+   * Return the column names included in history for the apply script.
+   * <p>
+   * Note that dropped columns are actually still included at this point as they are going
+   * to be removed from the history handling when the drop script runs that also deletes
+   * the column.
+   * </p>
    */
-  protected List<String> includedColumnNames(MTable table) throws IOException {
+  protected List<String> columnNamesForApply(MTable table) throws IOException {
 
-    Collection<MColumn> columns = table.getColumns().values();
-    List<String> includedColumns = new ArrayList<String>(columns.size());
+    return table.allHistoryColumns(true);
+  }
 
-    for (MColumn column : columns) {
-      if (column.isIncludeInHistory()) {
-        includedColumns.add(column.getName());
-      }
-    }
-    return includedColumns;
+  /**
+   * Return the column names included in history for the drop script.
+   */
+  protected List<String> columnNamesForDrop(MTable table) throws IOException {
+
+    return table.allHistoryColumns(false);
   }
 }

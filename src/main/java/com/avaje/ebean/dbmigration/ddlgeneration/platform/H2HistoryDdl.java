@@ -6,7 +6,6 @@ import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.model.MTable;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * H2 history support using DB triggers to maintain a history table.
@@ -28,40 +27,20 @@ public class H2HistoryDdl extends DbTriggerBasedHistoryDdl {
   protected void createTriggers(DdlWrite writer, MTable table) throws IOException {
 
     String baseTableName = table.getName();
-    String historyTableName = historyTableName(baseTableName);
-    List<String> includedColumns = includedColumnNames(table);
-
     DdlBuffer apply = writer.applyHistory();
 
-    addCreateTrigger(apply, updateTriggerName(baseTableName), baseTableName, historyTableName, includedColumns);
+    addCreateTrigger(apply, updateTriggerName(baseTableName), baseTableName);
   }
 
   @Override
-  protected void regenerateHistoryTriggers(DdlWrite writer, MTable table, HistoryTableUpdate update) throws IOException {
+  protected void updateHistoryTriggers(DbTriggerUpdate update) throws IOException {
 
-    String baseTableName = table.getName();
-    String historyTableName = historyTableName(baseTableName);
-    List<String> includedColumns = includedColumnNames(table);
-
-    DdlBuffer apply = writer.applyHistory();
-
-    apply.append("-- Regenerated ").newLine();
-    apply.append("-- changes: ").append(update.description()).newLine();
-
-    dropTriggers(apply, baseTableName);
-    addCreateTrigger(apply, updateTriggerName(baseTableName), baseTableName, historyTableName, includedColumns);
-
-    // put a reverted version into the rollback buffer
-    update.toRevertedColumns(includedColumns);
-
-    DdlBuffer rollback = writer.rollback();
-    rollback.append("-- Revert regenerated ").newLine();
-    rollback.append("-- revert changes: ").append(update.description()).newLine();
-    dropTriggers(rollback, baseTableName);
-    addCreateTrigger(rollback, updateTriggerName(baseTableName), baseTableName, historyTableName, includedColumns);
+    DdlBuffer buffer = update.historyBuffer();
+    dropTriggers(buffer, update.getBaseTable());
+    addCreateTrigger(buffer, updateTriggerName(update.getBaseTable()), update.getBaseTable());
   }
 
-  private void addCreateTrigger(DdlBuffer apply, String triggerName, String baseTable, String historyTable, List<String> includedColumns) throws IOException {
+  private void addCreateTrigger(DdlBuffer apply, String triggerName, String baseTable) throws IOException {
 
     // Note that this does not take into account the historyTable name (excepts _history suffix) and
     // does not take into account excluded columns (all columns included in history)

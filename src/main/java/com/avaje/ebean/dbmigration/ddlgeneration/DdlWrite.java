@@ -10,6 +10,12 @@ import com.avaje.ebean.dbmigration.model.ModelContainer;
  */
 public class DdlWrite {
 
+  public enum Mode {
+    APPLY,
+    ROLLBACK,
+    DROP
+  }
+
   private final ModelContainer currentModel;
 
   private final DdlBuffer applyDropDependencies;
@@ -44,6 +50,11 @@ public class DdlWrite {
   private final DdlBuffer dropHistory;
 
   /**
+   * Buffer used to drop dependencies early in the 'drop script'.
+   */
+  private final DdlBuffer dropDropDependencies;
+
+  /**
    * Create without any configuration or current model (no history support).
    */
   public DdlWrite() {
@@ -64,6 +75,7 @@ public class DdlWrite {
     this.rollback = new BaseDdlBuffer(configuration);
     this.drop = new BaseDdlBuffer(configuration);
     this.dropHistory = new BaseDdlBuffer(configuration);
+    this.dropDropDependencies = new BaseDdlBuffer(configuration);
   }
 
   /**
@@ -99,15 +111,41 @@ public class DdlWrite {
   /**
    * Return the apply or rollback buffer.
    */
-  public DdlBuffer buffer(boolean apply) {
-    return (apply) ? apply() : rollback();
+  public DdlBuffer buffer(Mode mode) {
+    switch (mode) {
+      case APPLY: return apply();
+      case ROLLBACK: return rollback();
+      case DROP: return drop();
+      default:
+        throw new IllegalStateException("Invalid mode" + mode);
+    }
+  }
+
+  /**
+   * Return the apply or rollback buffer.
+   */
+  public DdlBuffer historyBuffer(Mode mode) {
+    switch (mode) {
+      case APPLY: return applyHistory();
+      case ROLLBACK: return rollback();
+      case DROP: return dropHistory();
+      default:
+        throw new IllegalStateException("Invalid mode" + mode);
+    }
   }
 
   /**
    * Return the apply or rollback drop dependencies buffer.
    */
-  public DdlBuffer dropDependencies(boolean apply) {
-    return (apply) ? applyDropDependencies() : rollbackDropDependencies();
+  public DdlBuffer dropDependencies(Mode mode) {
+
+    switch (mode) {
+      case APPLY: return applyDropDependencies();
+      case ROLLBACK: return rollbackDropDependencies();
+      case DROP: return dropDropDependencies();
+      default:
+        throw new IllegalStateException("Invalid mode" + mode);
+    }
   }
 
 
@@ -193,5 +231,11 @@ public class DdlWrite {
     return dropHistory;
   }
 
+  /**
+   * Return the buffer that executes early for 'drop' script.
+   */
+  public DdlBuffer dropDropDependencies() {
+    return dropDropDependencies;
+  }
 
 }

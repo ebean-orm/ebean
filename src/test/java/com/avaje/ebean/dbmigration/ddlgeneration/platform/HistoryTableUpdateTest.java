@@ -14,7 +14,11 @@ public class HistoryTableUpdateTest {
   public void testToRevertedColumns_add() throws Exception {
 
     HistoryTableUpdate upd = new HistoryTableUpdate("mytab");
+    assertThat(upd.getBaseTable()).isEqualTo("mytab");
+
     upd.add(HistoryTableUpdate.Change.ADD, "two");
+    assertThat(upd.hasApplyChanges()).isTrue();
+    assertThat(upd.hasDropChanges()).isFalse();
 
     List<String> current = current();
     upd.toRevertedColumns(current);
@@ -26,6 +30,8 @@ public class HistoryTableUpdateTest {
 
     HistoryTableUpdate upd = new HistoryTableUpdate("mytab");
     upd.add(HistoryTableUpdate.Change.INCLUDE, "two");
+    assertThat(upd.hasApplyChanges()).isTrue();
+    assertThat(upd.hasDropChanges()).isFalse();
 
     List<String> current = current();
     upd.toRevertedColumns(current);
@@ -36,11 +42,13 @@ public class HistoryTableUpdateTest {
   public void testToRevertedColumns_drop() throws Exception {
 
     HistoryTableUpdate upd = new HistoryTableUpdate("mytab");
-    upd.add(HistoryTableUpdate.Change.DROP, "four");
+    upd.add(HistoryTableUpdate.Change.DROP, "three");
+    assertThat(upd.hasApplyChanges()).isFalse();
+    assertThat(upd.hasDropChanges()).isTrue();
 
     List<String> current = current();
     upd.toRevertedColumns(current);
-    assertThat(current).contains("one","two","three","four");
+    assertThat(current).contains("one","two","three");
   }
 
   @Test
@@ -48,6 +56,8 @@ public class HistoryTableUpdateTest {
 
     HistoryTableUpdate upd = new HistoryTableUpdate("mytab");
     upd.add(HistoryTableUpdate.Change.EXCLUDE, "four");
+    assertThat(upd.hasApplyChanges()).isTrue();
+    assertThat(upd.hasDropChanges()).isFalse();
 
     List<String> current = current();
     upd.toRevertedColumns(current);
@@ -61,8 +71,26 @@ public class HistoryTableUpdateTest {
     HistoryTableUpdate upd = new HistoryTableUpdate("mytab");
     upd.add(HistoryTableUpdate.Change.ADD, "two");
     upd.add(HistoryTableUpdate.Change.DROP, "four");
+    assertThat(upd.hasApplyChanges()).isTrue();
+    assertThat(upd.hasDropChanges()).isTrue();
 
-    assertThat(upd.description()).isEqualTo("add two, drop four");
+    assertThat(upd.descriptionForApply()).isEqualTo("add two");
+    assertThat(upd.descriptionForDrop()).isEqualTo("drop four");
+  }
+
+  @Test
+  public void testDescription_withIncludeExclude() throws Exception {
+
+    HistoryTableUpdate upd = new HistoryTableUpdate("mytab");
+    upd.add(HistoryTableUpdate.Change.ADD, "two");
+    upd.add(HistoryTableUpdate.Change.INCLUDE, "five");
+    upd.add(HistoryTableUpdate.Change.EXCLUDE, "six");
+    upd.add(HistoryTableUpdate.Change.DROP, "four");
+    assertThat(upd.hasApplyChanges()).isTrue();
+    assertThat(upd.hasDropChanges()).isTrue();
+
+    assertThat(upd.descriptionForApply()).isEqualTo("add two, include five, exclude six");
+    assertThat(upd.descriptionForDrop()).isEqualTo("drop four");
   }
 
   List<String> current() {

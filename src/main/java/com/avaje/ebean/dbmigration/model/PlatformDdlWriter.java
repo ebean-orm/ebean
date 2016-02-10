@@ -3,6 +3,7 @@ package com.avaje.ebean.dbmigration.model;
 import com.avaje.ebean.config.DbMigrationConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
@@ -116,11 +117,7 @@ public class PlatformDdlWriter {
   protected void writeApplyDdl(Writer writer, DdlWrite write) throws IOException {
 
     // merge the apply buffers in the appropriate order
-    if (!write.applyDropDependencies().isEmpty()) {
-      writer.append("-- drop dependencies\n");
-      writer.append(write.applyDropDependencies().getBuffer());
-      writer.append("\n");
-    }
+    prependDropDependencies(writer, write.applyDropDependencies());
     writer.append("-- apply changes\n");
     writer.append(write.apply().getBuffer());
     writer.append(write.applyForeignKeys().getBuffer());
@@ -133,11 +130,7 @@ public class PlatformDdlWriter {
   protected void writeApplyRollbackDdl(Writer writer, DdlWrite write) throws IOException {
 
     // merge the rollback buffers in the appropriate order
-    if (!write.rollbackDropDependencies().isEmpty()) {
-      writer.append("-- drop dependencies\n");
-      writer.append(write.rollbackDropDependencies().getBuffer());
-      writer.append("\n");
-    }
+    prependDropDependencies(writer, write.rollbackDropDependencies());
     writer.append("-- reverse changes\n");
     writer.append(write.rollbackForeignKeys().getBuffer());
     writer.append(write.rollback().getBuffer());
@@ -149,8 +142,17 @@ public class PlatformDdlWriter {
   protected void writeDropDdl(Writer writer, DdlWrite write) throws IOException {
 
     // merge the rollback buffers in the appropriate order
+    prependDropDependencies(writer, write.dropDropDependencies());
     writer.append(write.dropHistory().getBuffer());
     writer.append(write.drop().getBuffer());
+  }
+
+  private void prependDropDependencies(Writer writer, DdlBuffer buffer) throws IOException {
+    if (!buffer.isEmpty()) {
+      writer.append("-- drop dependencies\n");
+      writer.append(buffer.getBuffer());
+      writer.append("\n");
+    }
   }
 
   /**

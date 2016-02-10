@@ -37,8 +37,6 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
     assertThat(item.primaryKeyColumns()).hasSize(2);
 
     MTable customer = model.getTable("o_customer");
-
     assertThat(customer).isNotNull();
-    assertThat(customer.getSequenceName()).isNull();
   }
 }

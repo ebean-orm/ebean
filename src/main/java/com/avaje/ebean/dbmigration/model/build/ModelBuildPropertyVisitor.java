@@ -84,7 +84,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     table.setPkName(determinePrimaryKeyName());
 
     // check if indexes on foreign keys should be suppressed
-    for (MColumn column : table.getColumns().values()) {
+    for (MColumn column : table.allColumns()) {
       if (hasValue(column.getForeignKeyIndex())) {
         if (indexSet.contains(column.getName())) {
           // suppress index on foreign key as there is already

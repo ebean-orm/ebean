@@ -158,7 +158,7 @@ public class ModelBuildContext {
     int fkCount = 0;
     int ixCount = 0;
     int uqCount = 0;
-    Collection<MColumn> cols = draftTable.getColumns().values();
+    Collection<MColumn> cols = draftTable.allColumns();
     for (MColumn col: cols) {
       if (col.getForeignKeyName() != null) {
         // Note that we adjust the 'references' table later in a second pass

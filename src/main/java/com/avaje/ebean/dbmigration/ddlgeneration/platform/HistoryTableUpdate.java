@@ -21,10 +21,12 @@ public class HistoryTableUpdate {
     EXCLUDE
   }
 
-  public static class Column {
+  private static class Column {
 
-    public final Change change;
-    public final String column;
+    final Change change;
+
+    final String column;
+
     public Column(Change change, String column) {
       this.change = change;
       this.column = column;
@@ -34,18 +36,23 @@ public class HistoryTableUpdate {
       return change.name().toLowerCase()+" "+column;
     }
 
-    public void apply(List<String> includedColumns) {
+    private boolean isChangeFor(boolean apply) {
+      return apply ? change != Change.DROP : change == Change.DROP;
+    }
+
+    private void revert(List<String> includedColumns) {
       switch (change) {
         case ADD:
         case INCLUDE: {
           includedColumns.remove(column);
           break;
         }
-        case DROP:
         case EXCLUDE: {
           includedColumns.add(column);
           break;
         }
+        case DROP:
+          break;
         default:
           throw new IllegalStateException("Unexpected change "+change);
       }
@@ -63,28 +70,72 @@ public class HistoryTableUpdate {
     this.baseTable = baseTable;
   }
 
+  private boolean isChangeFor(boolean apply) {
+    for (Column columnChange : columnChanges) {
+      if (columnChange.isChangeFor(apply)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Return true if the change includes apply changes (ADD, INCLUDE, EXCLUDE).
+   */
+  public boolean hasApplyChanges() {
+    return isChangeFor(true);
+  }
+
+  /**
+   * Return true if the change includes DROP column.
+   */
+  public boolean hasDropChanges() {
+    return isChangeFor(false);
+  }
+
   /**
    * Return a description of the changes that cause the history trigger/function
-   * to be regenerated (added, dropped, included or excluded columns).
+   * to be regenerated (added, included or excluded columns).
    */
-  public String description() {
+  public String descriptionForApply() {
+    return descriptionFor(true);
+  }
+
+  /**
+   * Return a description of the changes that cause the history trigger/function
+   * to be regenerated in the drop script (dropped columns only).
+   */
+  public String descriptionForDrop() {
+    return descriptionFor(false);
+  }
+
+  private String descriptionFor(boolean apply) {
+
     StringBuilder sb = new StringBuilder(90);
-    for (int i = 0; i < columnChanges.size(); i++) {
-      if (i > 0) {
-        sb.append(", ");
+    boolean first = true;
+    for (Column column : columnChanges) {
+      if (column.isChangeFor(apply)) {
+        if (first) {
+          first = false;
+        } else {
+          sb.append(", ");
+        }
+        sb.append(column.description());
       }
-      sb.append(columnChanges.get(i).description());
     }
     return sb.toString();
   }
 
+  /**
+   * Reverse the apply changes which equates to removing any newly added or
+   * included columns.
+   */
   public void toRevertedColumns(List<String> includedColumns) {
 
     for (Column columnChange : columnChanges) {
-      columnChange.apply(includedColumns);
+      columnChange.revert(includedColumns);
     }
   }
-
 
   /**
    * Add a comment for column added, dropped, included or excluded.
@@ -100,10 +151,4 @@ public class HistoryTableUpdate {
     return baseTable;
   }
 
-  /**
-   * Return the comments.
-   */
-  public List<Column> getColumnChanges() {
-    return columnChanges;
-  }
 }

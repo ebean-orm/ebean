@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -121,6 +122,8 @@ public class MTable {
    */
   private AddColumn addColumn;
 
+  private List<DroppedColumn> droppedColumns = new ArrayList<DroppedColumn>();
+
   /**
    * Create a copy of this table structure as a 'draft' table.
    *
@@ -136,7 +139,7 @@ public class MTable {
     // compoundUniqueConstraints
     draftTable.identityType = identityType;
 
-    for (MColumn col: columns.values()) {
+    for (MColumn col: allColumns()) {
       draftTable.addColumn(col.copyForDraft());
     }
 
@@ -202,7 +205,7 @@ public class MTable {
       createTable.setDraft(Boolean.TRUE);
     }
 
-    for (MColumn column : this.columns.values()) {
+    for (MColumn column : allColumns()) {
       // filter out draftOnly columns from the base table
       if (draft || !column.isDraftOnly()) {
         createTable.getColumn().add(column.createColumn());
@@ -255,7 +258,7 @@ public class MTable {
 
     // compare newColumns to existing columns (look for new and diff columns)
     for (MColumn newColumn : newColumnMap.values()) {
-      MColumn localColumn = this.columns.get(newColumn.getName());
+      MColumn localColumn = getColumn(newColumn.getName());
       if (localColumn == null) {
         // can ignore if draftOnly column and non-draft table
         if (!newColumn.isDraftOnly() || draft) {
@@ -267,15 +270,17 @@ public class MTable {
     }
 
     // compare existing columns (look for dropped columns)
-    for (MColumn existingColumn : columns.values()) {
+    int columnPosition = 0;
+    for (MColumn existingColumn : allColumns()) {
       MColumn newColumn = newColumnMap.get(existingColumn.getName());
       if (newColumn == null) {
-        diffDropColumn(modelDiff, existingColumn);
+        diffDropColumn(modelDiff, existingColumn, columnPosition, newTable);
       } else if (newColumn.isDraftOnly() && !draft) {
         // effectively a drop column (draft only column on a non-draft table)
         logger.trace("... drop column {} from table {} as now draftOnly", newColumn.getName(), name);
-        diffDropColumn(modelDiff, existingColumn);
+        diffDropColumn(modelDiff, existingColumn, columnPosition, newTable);
       }
+      columnPosition++;
     }
 
     if (addColumn != null) {
@@ -299,7 +304,7 @@ public class MTable {
   public void apply(AlterColumn alterColumn) {
     checkTableName(alterColumn.getTableName());
     String columnName = alterColumn.getColumnName();
-    MColumn existingColumn = columns.get(columnName);
+    MColumn existingColumn = getColumn(columnName);
     if (existingColumn == null) {
       throw new IllegalStateException("Column [" + columnName + "] does not exist for AlterColumn change?");
     }
@@ -311,7 +316,10 @@ public class MTable {
    */
   public void apply(DropColumn dropColumn) {
     checkTableName(dropColumn.getTableName());
-    columns.remove(dropColumn.getColumnName());
+    MColumn removed = columns.remove(dropColumn.getColumnName());
+    if (removed == null) {
+      throw new IllegalStateException("Column [" + dropColumn.getColumnName() + "] does not exist for DropColumn change on table [" + dropColumn.getTableName() + "]?");
+    }
   }
 
   public String getName() {
@@ -323,10 +331,6 @@ public class MTable {
    */
   public boolean isDraft() {
     return draft;
-  }
-
-  public String getPkName() {
-    return pkName;
   }
 
   public void setPkName(String pkName) {
@@ -357,7 +361,43 @@ public class MTable {
     this.withHistory = withHistory;
   }
 
-  public Map<String, MColumn> getColumns() {
+  public List<String> allHistoryColumns(boolean includeDropped) {
+
+    List<String> columnNames = new ArrayList<String>(columns.size());
+    for (MColumn column : columns.values()) {
+      if (column.isIncludeInHistory()) {
+        columnNames.add(column.getName());
+      }
+    }
+    if (includeDropped && !droppedColumns.isEmpty()) {
+      Collections.sort(droppedColumns);
+      for (DroppedColumn droppedColumn : droppedColumns) {
+        if (droppedColumn.columnPosition >= columnNames.size()) {
+          columnNames.add(droppedColumn.name);
+        } else {
+          columnNames.add(droppedColumn.columnPosition, droppedColumn.name);
+        }
+      }
+    }
+    return columnNames;
+  }
+
+  /**
+   * Return all the columns (excluding columns marked as dropped).
+   */
+  public Collection<MColumn> allColumns() {
+
+    return columns.values();
+  }
+
+  /**
+   * Return the column by name.
+   */
+  public MColumn getColumn(String name) {
+    return columns.get(name);
+  }
+
+  private Map<String, MColumn> getColumns() {
     return columns;
   }
 
@@ -369,24 +409,12 @@ public class MTable {
     return compoundKeys;
   }
 
-  public String getSequenceName() {
-    return sequenceName;
-  }
-
   public void setSequenceName(String sequenceName) {
     this.sequenceName = sequenceName;
   }
 
-  public int getSequenceInitial() {
-    return sequenceInitial;
-  }
-
   public void setSequenceInitial(int sequenceInitial) {
     this.sequenceInitial = sequenceInitial;
-  }
-
-  public int getSequenceAllocate() {
-    return sequenceAllocate;
   }
 
   public void setSequenceAllocate(int sequenceAllocate) {
@@ -412,21 +440,11 @@ public class MTable {
   }
 
   /**
-   * Returns the identity type to use for this table.
-   * <p>
-   * If set then this overrides the platform default so for UUID generated values
-   * or DB's supporting both sequences and autoincrement.
-   */
-  public IdentityType getIdentityType() {
-    return identityType;
-  }
-
-  /**
    * Return the list of columns that make the primary key.
    */
   public List<MColumn> primaryKeyColumns() {
     List<MColumn> pk = new ArrayList<MColumn>(3);
-    for (MColumn column : columns.values()) {
+    for (MColumn column : allColumns()) {
       if (column.isPrimaryKey()) {
         pk.add(column);
       }
@@ -485,7 +503,7 @@ public class MTable {
    */
   public MColumn addColumn(String dbCol, String columnDefn, boolean notnull) {
 
-    MColumn existingColumn = columns.get(dbCol);
+    MColumn existingColumn = getColumn(dbCol);
     if (existingColumn != null) {
       if (notnull) {
         existingColumn.setNotnull(true);
@@ -519,18 +537,44 @@ public class MTable {
   /**
    * Add a 'drop column' to the diff.
    */
-  private void diffDropColumn(ModelDiff modelDiff, MColumn existingColumn) {
+  private void diffDropColumn(ModelDiff modelDiff, MColumn existingColumn, int columnPosition, MTable newTable) {
 
     DropColumn dropColumn = new DropColumn();
     dropColumn.setTableName(name);
     dropColumn.setColumnName(existingColumn.getName());
-    if (withHistory) {
+    if (withHistory && !existingColumn.isHistoryExclude()) {
       // These dropColumns should occur on the history
       // table as well as the base table
       dropColumn.setWithHistory(Boolean.TRUE);
+      newTable.registerDroppedColumn(existingColumn.getName(), columnPosition);
     }
 
     modelDiff.addDropColumn(dropColumn);
+  }
+
+  /**
+   * Register a dropped column with it's previous column position.
+   * We need this for history triggers and views as we don't actually drop the
+   * column until the 'drop script' is run so the 'apply script' for history changes
+   * still needs to include the columns that are going to be dropped.
+   */
+  protected void registerDroppedColumn(String name, int columnPosition) {
+    droppedColumns.add(new DroppedColumn(name, columnPosition));
+  }
+
+  private static class DroppedColumn implements Comparable<DroppedColumn> {
+    final String name;
+    final int columnPosition;
+
+    DroppedColumn(String name, int columnPosition) {
+      this.name = name;
+      this.columnPosition = columnPosition;
+    }
+
+    @Override
+    public int compareTo(DroppedColumn o) {
+      return Integer.compare(o.columnPosition, columnPosition);
+    }
   }
 
   private int toInt(BigInteger value) {
@@ -575,7 +619,7 @@ public class MTable {
    */
   public void adjustReferences(ModelContainer modelContainer) {
 
-    Collection<MColumn> cols = columns.values();
+    Collection<MColumn> cols = allColumns();
     for (MColumn col : cols) {
       String references = col.getReferences();
       if (references != null) {

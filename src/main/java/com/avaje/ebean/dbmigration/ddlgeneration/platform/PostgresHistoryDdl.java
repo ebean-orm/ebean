@@ -77,7 +77,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     buffer.end();
   }
 
-  protected void addFunction(DdlBuffer apply, String procedureName, String historyTable, List<String> includedColumns) throws IOException {
+  protected void createOrReplaceFunction(DdlBuffer apply, String procedureName, String historyTable, List<String> includedColumns) throws IOException {
     apply
         .append("create or replace function ").append(procedureName).append("() returns trigger as $$").newLine()
         .append("begin").newLine();
@@ -101,55 +101,36 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
   }
 
   @Override
-  protected void regenerateHistoryTriggers(DdlWrite writer, MTable table, HistoryTableUpdate update) throws IOException {
-
-    // just replace the stored function with 'create or replace'
-    addStoredFunction(writer, table, update);
-  }
-
-  @Override
-  protected void addStoredFunction(DdlWrite writer, MTable table, HistoryTableUpdate update) throws IOException {
+  protected void createStoredFunction(DdlWrite writer, MTable table) throws IOException {
 
     String procedureName = procedureName(table.getName());
     String historyTable = historyTableName(table.getName());
 
-    List<String> includedColumns = includedColumnNames(table);
+    List<String> columnNames = columnNamesForApply(table);
+    createOrReplaceFunction(writer.applyHistory(), procedureName, historyTable, columnNames);
+  }
 
-    DdlBuffer apply = writer.applyHistory();
+  @Override
+  protected void updateHistoryTriggers(DbTriggerUpdate update) throws IOException {
 
-    if (update != null) {
-      apply.append("-- regenerated ").append(procedureName).newLine();
-      apply.append("-- changes: ").append(update.description()).newLine();
+    String procedureName = procedureName(update.getBaseTable());
 
-      recreateHistoryView(writer, true, table.getName(), includedColumns);
-    }
-
-    addFunction(apply, procedureName, historyTable, includedColumns);
-
-    if (update != null) {
-      // put a reverted version into the rollback buffer
-      update.toRevertedColumns(includedColumns);
-
-      DdlBuffer rollback = writer.rollback();
-      rollback.append("-- reverse regenerated ").append(procedureName).newLine();
-      rollback.append("-- changes: ").append(update.description()).newLine();
-
-      recreateHistoryView(writer, false, table.getName(), includedColumns);
-      addFunction(rollback, procedureName, historyTable, includedColumns);
-    }
+    recreateHistoryView(update);
+    createOrReplaceFunction(update.historyBuffer(), procedureName, update.getHistoryTable(), update.getColumns());
   }
 
   /**
    * For postgres we need to drop and recreate the view. Well, we could add columns to the end of the view
    * but otherwise we need to drop and create it.
    */
-  private void recreateHistoryView(DdlWrite writer, boolean apply, String baseTableName, List<String> includedColumns) throws IOException {
+  private void recreateHistoryView(DbTriggerUpdate update) throws IOException {
 
+    DdlBuffer buffer = update.dropDependencyBuffer();
     // we need to drop the view early/first before any changes to the tables etc
-    writer.dropDependencies(apply).append("drop view if exists ").append(baseTableName).append(viewSuffix).endOfStatement();
+    buffer.append("drop view if exists ").append(update.getBaseTable()).append(viewSuffix).endOfStatement();
 
     // recreate the view with specific columns specified (the columns generally are not dropped until later)
-    createWithHistoryView(writer.buffer(apply), baseTableName, includedColumns);
+    createWithHistoryView(update);
   }
 
   @Override

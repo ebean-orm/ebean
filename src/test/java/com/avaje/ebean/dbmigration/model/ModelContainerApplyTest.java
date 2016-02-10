@@ -36,6 +36,6 @@ public class ModelContainerApplyTest {
     assertThat(foo.getTablespace()).isEqualTo("fooSpace");
     assertThat(foo.getIndexTablespace()).isEqualTo("fooIndexSpace");
     assertThat(foo.isWithHistory()).isEqualTo(false);
-    assertThat(foo.getColumns()).containsKeys("col1", "col3", "added_to_foo");
+    assertThat(foo.allColumns()).extracting("name").contains("col1", "col3", "added_to_foo");
   }
 }
