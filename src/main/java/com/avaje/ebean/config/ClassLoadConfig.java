@@ -1,6 +1,10 @@
 package com.avaje.ebean.config;
 
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
+
 /**
  * Helper to find classes taking into account the context class loader.
  */
@@ -70,6 +74,10 @@ public class ClassLoadConfig {
     }
   }
 
+  public Enumeration<URL> getResources(String name) throws IOException {
+    return context.getResources(name);
+  }
+
   /**
    * Return true if the given class is present.
    */
@@ -88,6 +96,13 @@ public class ClassLoadConfig {
    */
   protected Class<?> forName(String name) throws ClassNotFoundException {
     return context.forName(name);
+  }
+
+  /**
+   * Return the preferred classLoader.
+   */
+  public ClassLoader getClassLoader() {
+    return context.getClassLoader();
   }
 
   /**
@@ -115,6 +130,13 @@ public class ClassLoadConfig {
       return (loader != null) ? loader: callerLoader;
     }
 
+    Enumeration<URL> getResources(String name) throws IOException {
+      if (preferredLoader != null) {
+        return preferredLoader.getResources(name);
+      }
+      return contextLoader().getResources(name);
+    }
+
     Class<?> forName(String name) throws ClassNotFoundException {
 
       if (preferredLoader != null) {
@@ -138,6 +160,9 @@ public class ClassLoadConfig {
       return Class.forName(name, true, classLoader);
     }
 
+    ClassLoader getClassLoader() {
+      return preferredLoader != null ? preferredLoader : contextLoader;
+    }
   }
 }
 

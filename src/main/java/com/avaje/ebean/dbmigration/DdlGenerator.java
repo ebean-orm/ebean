@@ -2,8 +2,8 @@ package com.avaje.ebean.dbmigration;
 
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.model.CurrentModel;
-import com.avaje.ebeaninternal.api.SpiEbeanPlugin;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.util.JdbcClose;
 
 import javax.persistence.PersistenceException;
 import java.io.File;
@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.Reader;
+import java.sql.Connection;
 
 /**
  * Controls the generation and execution of "Create All" and "Drop All" DDL scripts.
@@ -82,6 +83,21 @@ public class DdlGenerator {
     }
   }
 
+  /**
+   * Execute all the DDL statements in the script.
+   */
+  public int runScript(boolean expectErrors, String content, String scriptName) {
+
+    DdlRunner runner = new DdlRunner(expectErrors, scriptName);
+    // get a connection without threadLocal
+    Connection connection = server.createTransaction().getConnection();
+    try {
+      return runner.runAll(content, connection);
+    } finally {
+      JdbcClose.close(connection);
+    }
+  }
+
   protected void runDropSql() throws IOException {
     if (!createOnly) {
       if (dropContent == null) {
@@ -111,9 +127,8 @@ public class DdlGenerator {
     if (sqlScript != null) {
       InputStream is = getClassLoader().getResourceAsStream(sqlScript);
       if (is != null) {
-        DdlRunner runner = new DdlRunner(false, sqlScript);
         String content = readContent(new InputStreamReader(is));
-        runner.runAll(content, server);
+        runScript(false, content, sqlScript);
       }
     }
   }
@@ -222,15 +237,6 @@ public class DdlGenerator {
     } finally {
       lineReader.close();
     }
-  }
-
-  /**
-   * Execute all the DDL statements in the script.
-   */
-  public int runScript(boolean expectErrors, String content, String scriptName) {
-
-    DdlRunner runner = new DdlRunner(expectErrors, scriptName);
-    return runner.runAll(content, server);
   }
 
 }
