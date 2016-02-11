@@ -328,7 +328,7 @@ public class DbMigration {
    */
   private String generatePendingDrop() {
 
-    String nextDrop = System.getProperty("ddl.migration.pendingDrop");
+    String nextDrop = System.getProperty("ddl.migration.pendingDropsFor");
     if (nextDrop != null) {
       return nextDrop;
     }
