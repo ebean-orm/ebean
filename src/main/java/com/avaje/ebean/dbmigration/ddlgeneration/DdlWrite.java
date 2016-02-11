@@ -179,8 +179,4 @@ public class DdlWrite {
     return rollback;
   }
 
-  public DdlBuffer drop() {
-    return apply;
-  }
-
 }

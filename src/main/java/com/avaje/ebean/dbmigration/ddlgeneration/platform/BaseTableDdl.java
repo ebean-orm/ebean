@@ -544,7 +544,7 @@ public class BaseTableDdl implements TableDdl {
   @Override
   public void generate(DdlWrite writer, DropTable dropTable) throws IOException {
 
-    dropTable(writer.drop(), dropTable.getName());
+    dropTable(writer.apply(), dropTable.getName());
   }
 
   /**
@@ -555,14 +555,14 @@ public class BaseTableDdl implements TableDdl {
 
     String tableName = dropColumn.getTableName();
 
-    alterTableDropColumn(writer.drop(), tableName, dropColumn.getColumnName());
+    alterTableDropColumn(writer.apply(), tableName, dropColumn.getColumnName());
     if (isTrue(dropColumn.isWithHistory())) {
       // also drop from the history table
       regenerateHistoryTriggers(tableName, HistoryTableUpdate.Change.DROP, dropColumn.getColumnName());
-      alterTableDropColumn(writer.drop(), historyTable(tableName), dropColumn.getColumnName());
+      alterTableDropColumn(writer.apply(), historyTable(tableName), dropColumn.getColumnName());
     }
 
-    writer.drop().end();
+    writer.apply().end();
   }
 
   /**

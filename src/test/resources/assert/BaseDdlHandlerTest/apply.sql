@@ -9,3 +9,5 @@ create sequence foo_seq;
 
 alter table foo add column added_to_foo varchar(20);
 
+alter table foo drop column col2;
+

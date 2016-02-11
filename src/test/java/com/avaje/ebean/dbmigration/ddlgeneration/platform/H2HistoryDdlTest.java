@@ -35,8 +35,6 @@ public class H2HistoryDdlTest {
 
     assertThat(write.applyHistory().isEmpty()).isFalse();
     assertThat(write.applyHistory().getBuffer()).contains("add one");
-    assertThat(write.applyHistory().getBuffer()).doesNotContain("two");
-
     assertThat(write.rollback().isEmpty()).isFalse();
 
   }

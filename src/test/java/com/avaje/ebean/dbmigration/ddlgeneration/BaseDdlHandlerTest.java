@@ -46,7 +46,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     handler.generate(write, Helper.getDropColumn());
 
-    assertThat(write.drop().getBuffer()).isEqualTo("alter table foo drop column col2;\n\n");
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo drop column col2;\n\n");
     assertThat(write.rollback().getBuffer()).isEqualTo("");
   }
 
@@ -77,7 +77,6 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     String rollbackLast = Helper.asText(this, "/assert/BaseDdlHandlerTest/rollback.sql");
 
     assertThat(write.apply().getBuffer()).isEqualTo(apply);
-    assertThat(write.drop().getBuffer()).isEqualTo("alter table foo drop column col2;\n\n");
     assertThat(write.rollback().getBuffer()).isEqualTo(rollbackLast);
   }
 
