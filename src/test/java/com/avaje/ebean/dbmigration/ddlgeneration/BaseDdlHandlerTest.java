@@ -73,8 +73,8 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     handler.generate(write, Helper.getChangeSet());
 
-    String apply = Helper.asText(this, "/assert/BaseDdlHandlerTest/apply.sql");
-    String rollbackLast = Helper.asText(this, "/assert/BaseDdlHandlerTest/drop-all.sql");
+    String apply = Helper.asText(this, "/assert/BaseDdlHandlerTest/baseApply.sql");
+    String rollbackLast = Helper.asText(this, "/assert/BaseDdlHandlerTest/baseDropAll.sql");
 
     assertThat(write.apply().getBuffer()).isEqualTo(apply);
     assertThat(write.dropAll().getBuffer()).isEqualTo(rollbackLast);
