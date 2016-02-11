@@ -20,6 +20,7 @@ import com.avaje.ebean.dbmigration.migrationreader.MigrationXmlWriter;
 import com.avaje.ebean.dbmigration.model.CurrentModel;
 import com.avaje.ebean.dbmigration.model.MConfiguration;
 import com.avaje.ebean.dbmigration.model.MigrationModel;
+import com.avaje.ebean.dbmigration.model.MigrationVersion;
 import com.avaje.ebean.dbmigration.model.ModelContainer;
 import com.avaje.ebean.dbmigration.model.ModelDiff;
 import com.avaje.ebean.dbmigration.model.PlatformDdlWriter;
@@ -201,46 +202,15 @@ public class DbMigration {
     if (!online) {
       DbOffline.setRunningMigration();
     }
-
     setDefaults();
-
     try {
+      Request request = createRequest();
 
-      File migrationDir = getMigrationDirectory();
-      File modelDir = getModelDirectory(migrationDir);
-
-      MigrationModel migrationModel = new MigrationModel(modelDir, migrationConfig.getModelSuffix());
-      ModelContainer migrated = migrationModel.read();
-
-      CurrentModel currentModel = new CurrentModel(server, constraintNaming);
-      ModelContainer current = currentModel.read();
-
-      ModelDiff diff = new ModelDiff(migrated);
-      diff.compareTo(current);
-
-      if (diff.isEmpty()) {
-        logger.info("no changes detected - no migration written");
-        return;
-      }
-
-      // there were actually changes to write
-      Migration dbMigration = diff.getMigration();
-
-      String fullVersion = getFullVersion(migrationModel);
-
-      logger.info("generating migration:{}", fullVersion);
-      if (!writeMigrationXml(dbMigration, modelDir, fullVersion)) {
-        logger.warn("migration already exists, not generating DDL");
-
+      String pendingVersion = generatePendingDrop();
+      if (pendingVersion != null) {
+        generatePendingDrop(request, pendingVersion);
       } else {
-        if (databasePlatform != null) {
-          // writer needs the current model to provide table/column details for
-          // history ddl generation (triggers, history tables etc)
-          DdlWrite write = new DdlWrite(new MConfiguration(), current);
-          PlatformDdlWriter writer = createDdlWriter(databasePlatform, "");
-          writer.processMigration(dbMigration, write, migrationDir , fullVersion);
-        }
-        writeExtraPlatformDdl(fullVersion, currentModel, dbMigration, migrationDir);
+        generateDiff(request);
       }
 
     } finally {
@@ -250,10 +220,127 @@ public class DbMigration {
     }
   }
 
+  private void generateDiff(Request request) throws IOException {
+
+    if (request.hasPendingDrops()) {
+      logger.info("Pending un-applied drops in versions {}", request.getPendingDrops());
+    }
+
+    ModelDiff diff = request.createDiff();
+    if (diff.isEmpty()) {
+      logger.info("no changes detected - no migration written");
+    } else {
+      // there were actually changes to write
+      generateMigration(request, diff.getMigration(), null);
+    }
+  }
+
+  private void generatePendingDrop(Request request, String pendingVersion) throws IOException {
+
+    Migration migration = request.migrationForPendingDrop(pendingVersion);
+
+    generateMigration(request, migration, pendingVersion);
+    if (request.hasPendingDrops()) {
+      logger.info("... remaining pending un-applied drops in versions {}", request.getPendingDrops());
+    }
+  }
+
+  private Request createRequest() {
+    return new Request();
+  }
+
+  private class Request {
+
+    final File migrationDir;
+    final File modelDir;
+    final MigrationModel migrationModel;
+    final CurrentModel currentModel;
+    final ModelContainer migrated;
+    final ModelContainer current;
+
+    private Request() {
+      this.migrationDir = getMigrationDirectory();
+      this.modelDir = getModelDirectory(migrationDir);
+      this.migrationModel = new MigrationModel(modelDir, migrationConfig.getModelSuffix());
+      this.migrated = migrationModel.read();
+      this.currentModel = new CurrentModel(server, constraintNaming);
+      this.current = currentModel.read();
+    }
+
+    /**
+     * Return true if there are pending un-applied drops.
+     */
+    public boolean hasPendingDrops() {
+      return migrated.hasPendingDrops();
+    }
+
+    /**
+     * Return the migration for the pending drops for a given version.
+     */
+    public Migration migrationForPendingDrop(String pendingVersion) {
+
+      Migration migration = migrated.migrationForPendingDrop(pendingVersion);
+
+      // register any remaining pending drops
+      migrated.registerPendingHistoryDropColumns(current);
+      return migration;
+    }
+
+    /**
+     * Return the list of versions that have pending un-applied drops.
+     */
+    public List<String> getPendingDrops() {
+      return migrated.getPendingDrops();
+    }
+
+    /**
+     * Create an return the diff of the current model to the migration model.
+     */
+    public ModelDiff createDiff() {
+      ModelDiff diff = new ModelDiff(migrated);
+      diff.compareTo(current);
+      return diff;
+    }
+  }
+
+  private void generateMigration(Request request, Migration dbMigration, String dropsFor) throws IOException {
+
+    String fullVersion = getFullVersion(request.migrationModel, dropsFor);
+
+    logger.info("generating migration:{}", fullVersion);
+    if (!writeMigrationXml(dbMigration, request.modelDir, fullVersion)) {
+      logger.warn("migration already exists, not generating DDL");
+
+    } else {
+      if (databasePlatform != null) {
+        // writer needs the current model to provide table/column details for
+        // history ddl generation (triggers, history tables etc)
+        DdlWrite write = new DdlWrite(new MConfiguration(), request.current);
+        PlatformDdlWriter writer = createDdlWriter(databasePlatform, "");
+        writer.processMigration(dbMigration, write, request.migrationDir , fullVersion);
+      }
+      writeExtraPlatformDdl(fullVersion, request.currentModel, dbMigration, request.migrationDir);
+    }
+  }
+
+  /**
+   * Return true if the next pending drop changeSet should be generated as the next migration.
+   */
+  private String generatePendingDrop() {
+
+    String nextDrop = System.getProperty("ddl.migration.pendingDrop");
+    if (nextDrop != null) {
+      return nextDrop;
+    }
+    return migrationConfig.getGeneratePendingDrop();
+  }
+
   /**
    * Return the full version for the migration being generated.
+   *
+   * The full version can contain a comment suffix after a "__" double underscore.
    */
-  private String getFullVersion(MigrationModel migrationModel) {
+  private String getFullVersion(MigrationModel migrationModel, String dropsFor) {
 
     String version = migrationConfig.getVersion();
     if (version == null) {
@@ -261,10 +348,14 @@ public class DbMigration {
     }
 
     String fullVersion = version;
+    if (migrationConfig.getName() != null) {
+      fullVersion += "__" + toUnderScore(migrationConfig.getName());
 
-    String name = migrationConfig.getName();
-    if (name != null) {
-      fullVersion += "__" + toUnderScore(name);
+    } else if (dropsFor != null) {
+      fullVersion += "__" + toUnderScore("dropsFor_" + MigrationVersion.trim(dropsFor));
+
+    } else if (version.equals(initialVersion)) {
+      fullVersion += "__initial";
     }
     return fullVersion;
   }

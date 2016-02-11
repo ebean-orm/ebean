@@ -10,7 +10,6 @@ import java.util.List;
  */
 public class HistoryTableUpdate {
 
-
   /**
    * Column change type.
    */
@@ -32,12 +31,12 @@ public class HistoryTableUpdate {
       this.column = column;
     }
 
-    public String description() {
-      return change.name().toLowerCase()+" "+column;
+    public String toString() {
+      return description();
     }
 
-    private boolean isChangeFor(boolean apply) {
-      return apply ? change != Change.DROP : change == Change.DROP;
+    public String description() {
+      return change.name().toLowerCase()+" "+column;
     }
 
     private void revert(List<String> includedColumns) {
@@ -47,12 +46,11 @@ public class HistoryTableUpdate {
           includedColumns.remove(column);
           break;
         }
-        case EXCLUDE: {
+        case EXCLUDE:
+        case DROP: {
           includedColumns.add(column);
           break;
         }
-        case DROP:
-          break;
         default:
           throw new IllegalStateException("Unexpected change "+change);
       }
@@ -70,60 +68,12 @@ public class HistoryTableUpdate {
     this.baseTable = baseTable;
   }
 
-  private boolean isChangeFor(boolean apply) {
-    for (Column columnChange : columnChanges) {
-      if (columnChange.isChangeFor(apply)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Return true if the change includes apply changes (ADD, INCLUDE, EXCLUDE).
-   */
-  public boolean hasApplyChanges() {
-    return isChangeFor(true);
-  }
-
-  /**
-   * Return true if the change includes DROP column.
-   */
-  public boolean hasDropChanges() {
-    return isChangeFor(false);
-  }
-
   /**
    * Return a description of the changes that cause the history trigger/function
-   * to be regenerated (added, included or excluded columns).
+   * to be regenerated (added, included, excluded and dropped columns).
    */
-  public String descriptionForApply() {
-    return descriptionFor(true);
-  }
-
-  /**
-   * Return a description of the changes that cause the history trigger/function
-   * to be regenerated in the drop script (dropped columns only).
-   */
-  public String descriptionForDrop() {
-    return descriptionFor(false);
-  }
-
-  private String descriptionFor(boolean apply) {
-
-    StringBuilder sb = new StringBuilder(90);
-    boolean first = true;
-    for (Column column : columnChanges) {
-      if (column.isChangeFor(apply)) {
-        if (first) {
-          first = false;
-        } else {
-          sb.append(", ");
-        }
-        sb.append(column.description());
-      }
-    }
-    return sb.toString();
+  public String description() {
+    return columnChanges.toString();
   }
 
   /**

@@ -12,8 +12,7 @@ public class DdlWrite {
 
   public enum Mode {
     APPLY,
-    ROLLBACK,
-    DROP
+    ROLLBACK
   }
 
   private final ModelContainer currentModel;
@@ -31,28 +30,6 @@ public class DdlWrite {
   private final DdlBuffer rollbackForeignKeys;
 
   private final DdlBuffer rollback;
-
-  /**
-   * For DDL that drops tables and columns etc.
-   *
-   * This DDL typically can not run automatically in production as there is most commonly
-   * existing servers running the application using these tables and columns. Typically
-   * these drop statements may be executed AFTER all the servers in the application have
-   * migrated onto new code.
-   */
-  private final DdlBuffer drop;
-
-  /**
-   * For use when History is turned off for a base table or history is no longer
-   * desired on specific columns. This DDL should typically execute manually after review
-   * by DBA's.
-   */
-  private final DdlBuffer dropHistory;
-
-  /**
-   * Buffer used to drop dependencies early in the 'drop script'.
-   */
-  private final DdlBuffer dropDropDependencies;
 
   /**
    * Create without any configuration or current model (no history support).
@@ -73,9 +50,6 @@ public class DdlWrite {
     this.rollbackDropDependencies = new BaseDdlBuffer(configuration);
     this.rollbackForeignKeys = new BaseDdlBuffer(configuration);
     this.rollback = new BaseDdlBuffer(configuration);
-    this.drop = new BaseDdlBuffer(configuration);
-    this.dropHistory = new BaseDdlBuffer(configuration);
-    this.dropDropDependencies = new BaseDdlBuffer(configuration);
   }
 
   /**
@@ -115,7 +89,6 @@ public class DdlWrite {
     switch (mode) {
       case APPLY: return apply();
       case ROLLBACK: return rollback();
-      case DROP: return drop();
       default:
         throw new IllegalStateException("Invalid mode" + mode);
     }
@@ -128,7 +101,6 @@ public class DdlWrite {
     switch (mode) {
       case APPLY: return applyHistory();
       case ROLLBACK: return rollback();
-      case DROP: return dropHistory();
       default:
         throw new IllegalStateException("Invalid mode" + mode);
     }
@@ -142,18 +114,9 @@ public class DdlWrite {
     switch (mode) {
       case APPLY: return applyDropDependencies();
       case ROLLBACK: return rollbackDropDependencies();
-      case DROP: return dropDropDependencies();
       default:
         throw new IllegalStateException("Invalid mode" + mode);
     }
-  }
-
-
-  /**
-   * Return true the drop buffers are empty.
-   */
-  public boolean isDropEmpty() {
-    return drop.getBuffer().isEmpty() && dropHistory.getBuffer().isEmpty();
   }
 
   /**
@@ -216,26 +179,8 @@ public class DdlWrite {
     return rollback;
   }
 
-  /**
-   * Return the buffer that destructive changes are written to. This is typically drop table and
-   * drop column.
-   */
   public DdlBuffer drop() {
-    return drop;
-  }
-
-  /**
-   * Return the buffer that is used when history is no longer required on a table or specific columns.
-   */
-  public DdlBuffer dropHistory() {
-    return dropHistory;
-  }
-
-  /**
-   * Return the buffer that executes early for 'drop' script.
-   */
-  public DdlBuffer dropDropDependencies() {
-    return dropDropDependencies;
+    return apply;
   }
 
 }

@@ -33,9 +33,6 @@ public class H2HistoryDdlTest {
     h2Ddl.configure(ebeanServer.getServerConfig());
     h2Ddl.regenerateHistoryTriggers(write, update);
 
-    assertThat(write.dropHistory().isEmpty()).isFalse();
-    assertThat(write.dropHistory().getBuffer()).contains("drop two");
-
     assertThat(write.applyHistory().isEmpty()).isFalse();
     assertThat(write.applyHistory().getBuffer()).contains("add one");
     assertThat(write.applyHistory().getBuffer()).doesNotContain("two");

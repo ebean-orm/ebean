@@ -29,7 +29,7 @@ public class ModelContainerApplyTest {
     assertThat(changeSetChildren.get(2)).isInstanceOf(DropColumn.class);
 
     ModelContainer model = new ModelContainer();
-    model.apply(migration);
+    model.apply(migration, MigrationVersion.parse("1.1"));
 
     MTable foo = model.getTable("foo");
     assertThat(foo.getComment()).isEqualTo("comment");

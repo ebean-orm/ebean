@@ -52,7 +52,7 @@ public class MigrationModel {
     List<MigrationResource> resources = new ArrayList<MigrationResource>();
 
     for (File xmlFile: xmlFiles) {
-      resources.add(new MigrationResource(xmlFile));
+      resources.add(new MigrationResource(xmlFile, createVersion(xmlFile)));
     }
 
     // sort into version order before applying
@@ -60,13 +60,19 @@ public class MigrationModel {
 
     for (MigrationResource migrationResource: resources) {
       logger.debug("read {}", migrationResource);
-      model.apply(migrationResource.read());
+      model.apply(migrationResource.read(), migrationResource.getVersion());
     }
 
     // remember the last version
     if (!resources.isEmpty()) {
       lastVersion = resources.get(resources.size() - 1).getVersion();
     }
+  }
+
+  private MigrationVersion createVersion(File xmlFile) {
+    String fileName = xmlFile.getName();
+    String versionName = fileName.substring(0, fileName.length() - modelSuffix.length());
+    return MigrationVersion.parse(versionName);
   }
 
   public String getNextVersion(String initialVersion) {

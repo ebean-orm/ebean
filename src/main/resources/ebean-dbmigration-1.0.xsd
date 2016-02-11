@@ -24,6 +24,7 @@
         </xsd:choice>
       </xsd:sequence>
       <xsd:attribute name="type" type="changeSetType" use="required"/>
+      <xsd:attribute name="dropsFor" type="xsd:string"/>
       <xsd:attribute name="generated" type="xsd:boolean"/>
       <xsd:attribute name="author" type="xsd:string"/>
       <xsd:attribute name="comment" type="xsd:string"/>
@@ -33,7 +34,7 @@
   <xsd:simpleType name="changeSetType">
     <xsd:restriction base="xsd:string">
       <xsd:enumeration value="apply"/>
-      <xsd:enumeration value="drop"/>
+      <xsd:enumeration value="pendingDrops"/>
       <xsd:enumeration value="baseline"/>
     </xsd:restriction>
   </xsd:simpleType>

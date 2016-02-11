@@ -62,11 +62,6 @@ public class DbMigrationConfig {
   protected String modelPath = "model";
 
   /**
-   * Subdirectory the drop ddl scripts go into.
-   */
-  protected String dropPath = "drop";
-
-  /**
    * Subdirectory the rollback ddl scripts go into.
    */
   protected String rollbackPath = "rollback";
@@ -77,11 +72,6 @@ public class DbMigrationConfig {
   protected String applySuffix = ".sql";
 
   /**
-   * Default drop script suffix to ddl so that it isn't picked up by FlywayDb.
-   */
-  protected String dropSuffix = ".drop.ddl";
-
-  /**
    * Default rollback script suffix to ddl so that it isn't picked up by FlywayDb.
    */
   protected String rollbackSuffix = ".rollback.ddl";
@@ -89,6 +79,11 @@ public class DbMigrationConfig {
   protected String modelSuffix = ".model.xml";
 
   protected boolean includeGeneratedFileComment;
+
+  /**
+   * The version of a pending drop that should be generated as the next migration.
+   */
+  protected String generatePendingDrop;
 
   /**
    * Return the DB platform to generate migration DDL for.
@@ -138,20 +133,6 @@ public class DbMigrationConfig {
    */
   public void setModelPath(String modelPath) {
     this.modelPath = modelPath;
-  }
-
-  /**
-   * Return the relative path for the drop ddl scripts (defaults to drop).
-   */
-  public String getDropPath() {
-    return dropPath;
-  }
-
-  /**
-   * Set the relative path for the drop ddl scripts (defaults to drop).
-   */
-  public void setDropPath(String dropPath) {
-    this.dropPath = dropPath;
   }
 
   /**
@@ -211,20 +192,6 @@ public class DbMigrationConfig {
   }
 
   /**
-   * Return the drop script suffix (defaults to ddl so that it isn't picked up by FlywayDb).
-   */
-  public String getDropSuffix() {
-    return dropSuffix;
-  }
-
-  /**
-   * Set the drop script suffix (defaults to ddl so that it isn't picked up by FlywayDb).
-   */
-  public void setDropSuffix(String dropSuffix) {
-    this.dropSuffix = dropSuffix;
-  }
-
-  /**
    * Return the rollback script suffix (defaults to ddl so that it isn't picked up by FlywayDb).
    */
   public String getRollbackSuffix() {
@@ -253,6 +220,20 @@ public class DbMigrationConfig {
   }
 
   /**
+   * Return the migration version (or "next") to generate pending drops for.
+   */
+  public String getGeneratePendingDrop() {
+    return generatePendingDrop;
+  }
+
+  /**
+   * Set the migration version (or "next") to generate pending drops for.
+   */
+  public void setGeneratePendingDrop(String generatePendingDrop) {
+    this.generatePendingDrop = generatePendingDrop;
+  }
+
+  /**
    * Set the migration version.
    * <p>
    * Note that version set via System property or environment variable <code>ddl.migration.version</code> takes precedence.
@@ -275,7 +256,6 @@ public class DbMigrationConfig {
    * into a single directory.
    */
   public void singleDirectory() {
-    this.dropPath = "";
     this.rollbackPath = "";
     this.modelPath = "";
   }
@@ -291,13 +271,12 @@ public class DbMigrationConfig {
     } else {
       modelPath = properties.get("migration.modelPath", modelPath);
       rollbackPath = properties.get("migration.rollbackPath", rollbackPath);
-      dropPath = properties.get("migration.dropPath", dropPath);
     }
     applySuffix = properties.get("migration.applySuffix", applySuffix);
-    dropSuffix = properties.get("migration.dropSuffix", dropSuffix);
     rollbackSuffix = properties.get("migration.rollbackSuffix", rollbackSuffix);
     modelSuffix = properties.get("migration.modelSuffix", modelSuffix);
     includeGeneratedFileComment = properties.getBoolean("migration.includeGeneratedFileComment", includeGeneratedFileComment);
+    generatePendingDrop = properties.get("migration.generatePendingDrop", generatePendingDrop);
 
     platform = properties.getEnum(DbPlatformName.class, "migration.platform", platform);
     suppressRollback = properties.getBoolean("migration.suppressRollback", suppressRollback);
@@ -323,7 +302,6 @@ public class DbMigrationConfig {
     }
     return generate;
   }
-
 
   /**
    * Called by EbeanServer on start.

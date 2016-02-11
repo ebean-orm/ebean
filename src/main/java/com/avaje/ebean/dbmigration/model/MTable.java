@@ -132,14 +132,14 @@ public class MTable {
    */
   public MTable createDraftTable() {
 
-    draftTable = new MTable(name+"_draft");
+    draftTable = new MTable(name + "_draft");
     draftTable.draft = true;
     draftTable.whenCreatedColumn = whenCreatedColumn;
     // compoundKeys
     // compoundUniqueConstraints
     draftTable.identityType = identityType;
 
-    for (MColumn col: allColumns()) {
+    for (MColumn col : allColumns()) {
       draftTable.addColumn(col.copyForDraft());
     }
 
@@ -546,20 +546,19 @@ public class MTable {
       // These dropColumns should occur on the history
       // table as well as the base table
       dropColumn.setWithHistory(Boolean.TRUE);
-      newTable.registerDroppedColumn(existingColumn.getName(), columnPosition);
     }
 
     modelDiff.addDropColumn(dropColumn);
   }
 
   /**
-   * Register a dropped column with it's previous column position.
-   * We need this for history triggers and views as we don't actually drop the
-   * column until the 'drop script' is run so the 'apply script' for history changes
-   * still needs to include the columns that are going to be dropped.
+   * Register a pending un-applied drop column.
+   * <p>
+   * This means this column still needs to be included in history views/triggers etc even
+   * though it is not part of the current model.
    */
-  protected void registerDroppedColumn(String name, int columnPosition) {
-    droppedColumns.add(new DroppedColumn(name, columnPosition));
+  public void registerPendingDropColumn(String columnName) {
+    droppedColumns.add(new DroppedColumn(columnName, 100));
   }
 
   private static class DroppedColumn implements Comparable<DroppedColumn> {
@@ -573,7 +572,7 @@ public class MTable {
 
     @Override
     public int compareTo(DroppedColumn o) {
-      return Integer.compare(o.columnPosition, columnPosition);
+      return (o.columnPosition < columnPosition) ? -1 : ((o.columnPosition == columnPosition) ? 0 : 1);
     }
   }
 
@@ -588,7 +587,7 @@ public class MTable {
   /**
    * Check if there are duplicate foreign keys.
    * <p>
-   *   This can occur when an ManyToMany relates back to itself.
+   * This can occur when an ManyToMany relates back to itself.
    * </p>
    */
   public void checkDuplicateForeignKeys() {
@@ -639,7 +638,7 @@ public class MTable {
    */
   private String extractBaseTable(String references) {
     int lastDot = references.lastIndexOf('.');
-    return references.substring(0,lastDot);
+    return references.substring(0, lastDot);
   }
 
   /**
@@ -648,7 +647,7 @@ public class MTable {
    */
   private String deriveReferences(String references, String draftTableName) {
     int lastDot = references.lastIndexOf('.');
-    return draftTableName+"."+references.substring(lastDot+1);
+    return draftTableName + "." + references.substring(lastDot + 1);
   }
 
 }

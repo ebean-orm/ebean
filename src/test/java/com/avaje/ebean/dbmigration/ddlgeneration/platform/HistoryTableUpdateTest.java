@@ -17,8 +17,6 @@ public class HistoryTableUpdateTest {
     assertThat(upd.getBaseTable()).isEqualTo("mytab");
 
     upd.add(HistoryTableUpdate.Change.ADD, "two");
-    assertThat(upd.hasApplyChanges()).isTrue();
-    assertThat(upd.hasDropChanges()).isFalse();
 
     List<String> current = current();
     upd.toRevertedColumns(current);
@@ -30,8 +28,6 @@ public class HistoryTableUpdateTest {
 
     HistoryTableUpdate upd = new HistoryTableUpdate("mytab");
     upd.add(HistoryTableUpdate.Change.INCLUDE, "two");
-    assertThat(upd.hasApplyChanges()).isTrue();
-    assertThat(upd.hasDropChanges()).isFalse();
 
     List<String> current = current();
     upd.toRevertedColumns(current);
@@ -43,8 +39,6 @@ public class HistoryTableUpdateTest {
 
     HistoryTableUpdate upd = new HistoryTableUpdate("mytab");
     upd.add(HistoryTableUpdate.Change.DROP, "three");
-    assertThat(upd.hasApplyChanges()).isFalse();
-    assertThat(upd.hasDropChanges()).isTrue();
 
     List<String> current = current();
     upd.toRevertedColumns(current);
@@ -56,8 +50,6 @@ public class HistoryTableUpdateTest {
 
     HistoryTableUpdate upd = new HistoryTableUpdate("mytab");
     upd.add(HistoryTableUpdate.Change.EXCLUDE, "four");
-    assertThat(upd.hasApplyChanges()).isTrue();
-    assertThat(upd.hasDropChanges()).isFalse();
 
     List<String> current = current();
     upd.toRevertedColumns(current);
@@ -71,11 +63,8 @@ public class HistoryTableUpdateTest {
     HistoryTableUpdate upd = new HistoryTableUpdate("mytab");
     upd.add(HistoryTableUpdate.Change.ADD, "two");
     upd.add(HistoryTableUpdate.Change.DROP, "four");
-    assertThat(upd.hasApplyChanges()).isTrue();
-    assertThat(upd.hasDropChanges()).isTrue();
 
-    assertThat(upd.descriptionForApply()).isEqualTo("add two");
-    assertThat(upd.descriptionForDrop()).isEqualTo("drop four");
+    assertThat(upd.description()).isEqualTo("add two");
   }
 
   @Test
@@ -86,11 +75,8 @@ public class HistoryTableUpdateTest {
     upd.add(HistoryTableUpdate.Change.INCLUDE, "five");
     upd.add(HistoryTableUpdate.Change.EXCLUDE, "six");
     upd.add(HistoryTableUpdate.Change.DROP, "four");
-    assertThat(upd.hasApplyChanges()).isTrue();
-    assertThat(upd.hasDropChanges()).isTrue();
 
-    assertThat(upd.descriptionForApply()).isEqualTo("add two, include five, exclude six");
-    assertThat(upd.descriptionForDrop()).isEqualTo("drop four");
+    assertThat(upd.description()).isEqualTo("add two, include five, exclude six");
   }
 
   List<String> current() {

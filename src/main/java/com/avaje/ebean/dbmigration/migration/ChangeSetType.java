@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;simpleType name="changeSetType">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *     &lt;enumeration value="apply"/>
- *     &lt;enumeration value="drop"/>
+ *     &lt;enumeration value="pendingDrops"/>
  *     &lt;enumeration value="baseline"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
@@ -28,8 +28,8 @@ public enum ChangeSetType {
 
     @XmlEnumValue("apply")
     APPLY("apply"),
-    @XmlEnumValue("drop")
-    DROP("drop"),
+    @XmlEnumValue("pendingDrops")
+    PENDING_DROPS("pendingDrops"),
     @XmlEnumValue("baseline")
     BASELINE("baseline");
     private final String value;

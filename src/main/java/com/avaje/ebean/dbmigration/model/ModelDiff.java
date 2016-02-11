@@ -111,7 +111,7 @@ public class ModelDiff {
   public ChangeSet getDropChangeSet() {
     // put the changes into a ChangeSet
     ChangeSet createChangeSet = new ChangeSet();
-    createChangeSet.setType(ChangeSetType.DROP);
+    createChangeSet.setType(ChangeSetType.PENDING_DROPS);
     createChangeSet.getChangeSetChildren().addAll(dropChanges);
     return createChangeSet;
   }
@@ -156,6 +156,7 @@ public class ModelDiff {
       }
     }
 
+    baseModel.registerPendingHistoryDropColumns(newModel);
   }
 
   protected void addDropTable(MTable existingTable) {

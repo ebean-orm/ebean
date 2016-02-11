@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;/choice>
  *       &lt;/sequence>
  *       &lt;attribute name="type" use="required" type="{http://ebean-orm.github.io/xml/ns/dbmigration}changeSetType" />
+ *       &lt;attribute name="dropsFor" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="generated" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="author" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -62,6 +63,8 @@ public class ChangeSet {
     protected List<Object> changeSetChildren;
     @XmlAttribute(name = "type", required = true)
     protected ChangeSetType type;
+    @XmlAttribute(name = "dropsFor")
+    protected String dropsFor;
     @XmlAttribute(name = "generated")
     protected Boolean generated;
     @XmlAttribute(name = "author")
@@ -132,6 +135,30 @@ public class ChangeSet {
      */
     public void setType(ChangeSetType value) {
         this.type = value;
+    }
+
+    /**
+     * Gets the value of the dropsFor property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getDropsFor() {
+        return dropsFor;
+    }
+
+    /**
+     * Sets the value of the dropsFor property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setDropsFor(String value) {
+        this.dropsFor = value;
     }
 
     /**

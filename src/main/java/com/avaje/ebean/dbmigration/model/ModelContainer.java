@@ -4,6 +4,7 @@ import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
+import com.avaje.ebean.dbmigration.migration.ChangeSetType;
 import com.avaje.ebean.dbmigration.migration.CreateIndex;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
@@ -28,15 +29,16 @@ public class ModelContainer {
   /**
    * All the tables in the model.
    */
-  private Map<String, MTable> tables = new LinkedHashMap<String, MTable>();
+  private final Map<String, MTable> tables = new LinkedHashMap<String, MTable>();
 
   /**
    * All the non unique non foreign key indexes.
    */
-  private Map<String, MIndex> indexes = new LinkedHashMap<String, MIndex>();
+  private final Map<String, MIndex> indexes = new LinkedHashMap<String, MIndex>();
+
+  private final PendingDrops pendingDrops = new PendingDrops();
 
   public ModelContainer() {
-
   }
 
   /**
@@ -82,12 +84,29 @@ public class ModelContainer {
   /**
    * Apply a migration with associated changeSets to the model.
    */
-  public void apply(Migration migration) {
+  public void apply(Migration migration, MigrationVersion version) {
 
     List<ChangeSet> changeSets = migration.getChangeSet();
     for (ChangeSet changeSet : changeSets) {
-      applyChangeSet(changeSet);
+      boolean pending = changeSet.getType() == ChangeSetType.PENDING_DROPS;
+      if (pending) {
+        // un-applied drop columns etc
+        pendingDrops.add(version, changeSet);
+      } else if (isDropsFor(changeSet)) {
+        // applied drops (so no longer pending)
+        pendingDrops.remove(MigrationVersion.parse(changeSet.getDropsFor()));
+      }
+      if (!isDropsFor(changeSet)) {
+        applyChangeSet(changeSet);
+      }
     }
+  }
+
+  /**
+   * Return true if the changeSet contains drops for a previous PENDING_DROPS changeSet.
+   */
+  private boolean isDropsFor(ChangeSet changeSet) {
+    return changeSet.getDropsFor() != null;
   }
 
   /**
@@ -244,5 +263,45 @@ public class ModelContainer {
   public void addIndex(String indexName, String tableName, String[] columnNames) {
 
     indexes.put(indexName, new MIndex(indexName, tableName, columnNames));
+  }
+
+  /**
+   * Return true if there are pending drops.
+   */
+  public boolean hasPendingDrops() {
+    return !pendingDrops.isEmpty();
+  }
+
+  /**
+   * Return the list of versions containing un-applied pending drops.
+   */
+  public List<String> getPendingDrops() {
+    return pendingDrops.pendingDrops();
+  }
+
+  /**
+   * Return the migration for the pending drops for a given version.
+   */
+  public Migration migrationForPendingDrop(String pendingVersion) {
+    return pendingDrops.migrationForVersion(pendingVersion);
+  }
+
+  /**
+   * Register the drop columns on history tables that have not been applied yet.
+   */
+  public void registerPendingHistoryDropColumns(ModelContainer newModel) {
+    pendingDrops.registerPendingHistoryDropColumns(newModel);
+  }
+
+  /**
+   * Register a drop column on a history tables that has not been applied yet.
+   */
+  public void registerPendingDropColumn(DropColumn dropColumn) {
+
+    MTable table = getTable(dropColumn.getTableName());
+    if (table == null) {
+      throw new IllegalArgumentException("Table ["+dropColumn.getTableName()+"] not found?");
+    }
+    table.registerPendingDropColumn(dropColumn.getColumnName());
   }
 }

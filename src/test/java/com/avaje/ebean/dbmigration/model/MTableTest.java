@@ -57,11 +57,11 @@ public class MTableTest {
   public void test_allHistoryColumns() throws Exception {
 
     MTable base = base();
-    base.registerDroppedColumn("fullName",2);
-    base.registerDroppedColumn("last",4);
+    base.registerPendingDropColumn("fullName");
+    base.registerPendingDropColumn("last");
 
     assertThat(base.allHistoryColumns(false)).containsExactly("id","name","status");
-    assertThat(base.allHistoryColumns(true)).containsExactly("id","name","fullName","status","last");
+    assertThat(base.allHistoryColumns(true)).containsExactly("id","name","status","fullName","last");
   }
 
   @Test

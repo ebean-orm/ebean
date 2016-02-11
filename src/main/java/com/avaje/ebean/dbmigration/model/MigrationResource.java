@@ -17,9 +17,9 @@ public class MigrationResource implements Comparable<MigrationResource> {
   /**
    * Construct with a migration xml file.
    */
-  public MigrationResource(File migrationFile) {
+  public MigrationResource(File migrationFile, MigrationVersion version) {
     this.migrationFile = migrationFile;
-    this.version = MigrationVersion.parse(migrationFile.getName());
+    this.version = version;
   }
 
   public String toString() {

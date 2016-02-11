@@ -71,37 +71,23 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
     DbTriggerUpdate triggerUpdate = createDbTriggerUpdate(writer, table);
 
-    if (update.hasApplyChanges()) {
-      // includes add, include and exclude column changes
+    String description = update.description();
+    List<String> includedColumns = columnNamesForApply(table);
 
-      String applyChangeDescription = update.descriptionForApply();
-      List<String> includedColumns = columnNamesForApply(table);
+    DdlBuffer apply = writer.applyHistory();
+    apply.append("-- changes: ").append(description).newLine();
 
-      DdlBuffer apply = writer.applyHistory();
-      apply.append("-- changes: ").append(applyChangeDescription).newLine();
+    triggerUpdate.prepare(DdlWrite.Mode.APPLY, includedColumns);
+    updateHistoryTriggers(triggerUpdate);
 
-      triggerUpdate.prepare(DdlWrite.Mode.APPLY, includedColumns);
-      updateHistoryTriggers(triggerUpdate);
+    // put a reverted version into the rollback buffer
+    update.toRevertedColumns(includedColumns);
 
-      // put a reverted version into the rollback buffer
-      update.toRevertedColumns(includedColumns);
+    DdlBuffer rollback = writer.rollback();
+    rollback.append("-- revert changes: ").append(description).newLine();
 
-      DdlBuffer rollback = writer.rollback();
-      rollback.append("-- revert changes: ").append(applyChangeDescription).newLine();
-
-      triggerUpdate.prepare(DdlWrite.Mode.ROLLBACK, includedColumns);
-      updateHistoryTriggers(triggerUpdate);//writer, DdlWrite.Mode.ROLLBACK, baseTableName, historyTableName, includedColumns);
-    }
-
-    if (update.hasDropChanges()) {
-      // effectively applies the dropped columns changes to history triggers
-
-      DdlBuffer drop = writer.dropHistory();
-      drop.append("-- changes: ").append(update.descriptionForDrop()).newLine();
-
-      triggerUpdate.prepare(DdlWrite.Mode.DROP, columnNamesForDrop(table));
-      updateHistoryTriggers(triggerUpdate);//writer, DdlWrite.Mode.DROP, baseTableName, historyTableName, columnNamesForDrop(table));
-    }
+    triggerUpdate.prepare(DdlWrite.Mode.ROLLBACK, includedColumns);
+    updateHistoryTriggers(triggerUpdate);
   }
 
   protected DbTriggerUpdate createDbTriggerUpdate(DdlWrite writer, MTable table) {
@@ -116,10 +102,9 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     String baseTable = dropHistoryTable.getBaseTable();
 
     // drop in appropriate order
-    dropTriggers(writer.dropHistory(), baseTable);
-    dropHistoryTableEtc(writer.dropHistory(), baseTable);
+    dropTriggers(writer.applyDropDependencies(), baseTable);
+    dropHistoryTableEtc(writer.applyDropDependencies(), baseTable);
   }
-
 
   @Override
   public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException {
@@ -315,11 +300,4 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     return table.allHistoryColumns(true);
   }
 
-  /**
-   * Return the column names included in history for the drop script.
-   */
-  protected List<String> columnNamesForDrop(MTable table) throws IOException {
-
-    return table.allHistoryColumns(false);
-  }
 }
