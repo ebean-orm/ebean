@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -122,7 +121,7 @@ public class MTable {
    */
   private AddColumn addColumn;
 
-  private List<DroppedColumn> droppedColumns = new ArrayList<DroppedColumn>();
+  private List<String> droppedColumns = new ArrayList<String>();
 
   /**
    * Create a copy of this table structure as a 'draft' table.
@@ -370,13 +369,8 @@ public class MTable {
       }
     }
     if (includeDropped && !droppedColumns.isEmpty()) {
-      Collections.sort(droppedColumns);
-      for (DroppedColumn droppedColumn : droppedColumns) {
-        if (droppedColumn.columnPosition >= columnNames.size()) {
-          columnNames.add(droppedColumn.name);
-        } else {
-          columnNames.add(droppedColumn.columnPosition, droppedColumn.name);
-        }
+      for (String droppedColumn : droppedColumns) {
+        columnNames.add(droppedColumn);
       }
     }
     return columnNames;
@@ -558,22 +552,7 @@ public class MTable {
    * though it is not part of the current model.
    */
   public void registerPendingDropColumn(String columnName) {
-    droppedColumns.add(new DroppedColumn(columnName, 100));
-  }
-
-  private static class DroppedColumn implements Comparable<DroppedColumn> {
-    final String name;
-    final int columnPosition;
-
-    DroppedColumn(String name, int columnPosition) {
-      this.name = name;
-      this.columnPosition = columnPosition;
-    }
-
-    @Override
-    public int compareTo(DroppedColumn o) {
-      return (o.columnPosition < columnPosition) ? -1 : ((o.columnPosition == columnPosition) ? 0 : 1);
-    }
+    droppedColumns.add(columnName);
   }
 
   private int toInt(BigInteger value) {
