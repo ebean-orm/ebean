@@ -27,8 +27,6 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
 
     DbTriggerUpdate update = createDbTriggerUpdate(writer, table);
 
-    update.prepare(DdlWrite.Mode.APPLY, columnNamesForApply(table));
-
     addBeforeUpdate(updateTriggerName(update.getBaseTable()), update);
     addBeforeDelete(deleteTriggerName(update.getBaseTable()), update);
   }

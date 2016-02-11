@@ -10,11 +10,6 @@ import com.avaje.ebean.dbmigration.model.ModelContainer;
  */
 public class DdlWrite {
 
-  public enum Mode {
-    APPLY,
-    ROLLBACK
-  }
-
   private final ModelContainer currentModel;
 
   private final DdlBuffer applyDropDependencies;
@@ -25,11 +20,9 @@ public class DdlWrite {
 
   private final DdlBuffer applyHistory;
 
-  private final DdlBuffer rollbackDropDependencies;
+  private final DdlBuffer dropAllForeignKeys;
 
-  private final DdlBuffer rollbackForeignKeys;
-
-  private final DdlBuffer rollback;
+  private final DdlBuffer dropAll;
 
   /**
    * Create without any configuration or current model (no history support).
@@ -47,9 +40,8 @@ public class DdlWrite {
     this.apply = new BaseDdlBuffer(configuration);
     this.applyForeignKeys = new BaseDdlBuffer(configuration);
     this.applyHistory = new BaseDdlBuffer(configuration);
-    this.rollbackDropDependencies = new BaseDdlBuffer(configuration);
-    this.rollbackForeignKeys = new BaseDdlBuffer(configuration);
-    this.rollback = new BaseDdlBuffer(configuration);
+    this.dropAllForeignKeys = new BaseDdlBuffer(configuration);
+    this.dropAll = new BaseDdlBuffer(configuration);
   }
 
   /**
@@ -71,52 +63,6 @@ public class DdlWrite {
         && applyForeignKeys.getBuffer().isEmpty()
         && applyHistory.getBuffer().isEmpty()
         && applyDropDependencies.getBuffer().isEmpty();
-  }
-
-  /**
-   * Return true if the apply rollback buffers are all empty.
-   */
-  public boolean isApplyRollbackEmpty() {
-    return rollback.getBuffer().isEmpty()
-        && rollbackForeignKeys.getBuffer().isEmpty()
-        && rollbackDropDependencies.getBuffer().isEmpty();
-  }
-
-  /**
-   * Return the apply or rollback buffer.
-   */
-  public DdlBuffer buffer(Mode mode) {
-    switch (mode) {
-      case APPLY: return apply();
-      case ROLLBACK: return rollback();
-      default:
-        throw new IllegalStateException("Invalid mode" + mode);
-    }
-  }
-
-  /**
-   * Return the apply or rollback buffer.
-   */
-  public DdlBuffer historyBuffer(Mode mode) {
-    switch (mode) {
-      case APPLY: return applyHistory();
-      case ROLLBACK: return rollback();
-      default:
-        throw new IllegalStateException("Invalid mode" + mode);
-    }
-  }
-
-  /**
-   * Return the apply or rollback drop dependencies buffer.
-   */
-  public DdlBuffer dropDependencies(Mode mode) {
-
-    switch (mode) {
-      case APPLY: return applyDropDependencies();
-      case ROLLBACK: return rollbackDropDependencies();
-      default:
-        throw new IllegalStateException("Invalid mode" + mode);
-    }
   }
 
   /**
@@ -151,32 +97,17 @@ public class DdlWrite {
   }
 
   /**
-   * Return the buffer that rollback executes early to drop dependencies like views.
+   * Return the buffer used for the 'drop all DDL' for dropping foreign keys and associated indexes.
    */
-  public DdlBuffer rollbackDropDependencies() {
-    return rollbackDropDependencies;
+  public DdlBuffer dropAllForeignKeys() {
+    return dropAllForeignKeys;
   }
 
   /**
-   * Return the buffer that ROLLBACK DDL is written to for foreign keys and associated indexes.
+   * Return the buffer used for the 'drop all DDL' to drop tables, views and history triggers etc.
    */
-  public DdlBuffer rollbackForeignKeys() {
-    return rollbackForeignKeys;
-  }
-
-  /**
-   * Return the buffer that ROLLBACK DDL is written to which is considered safe to run when
-   * apply changes fail to execute. This will reverse the apply changes typically dropping
-   * newly created tables, foreign keys etc.
-   * <p>
-   * When apply changes are made against DB's that support transactional DDL you could argue
-   * that these rollback statements are not necessary.
-   * <p>
-   * Note that statements added to this rollback buffer are executed after foreign key rollback
-   * has been executed.
-   */
-  public DdlBuffer rollback() {
-    return rollback;
+  public DdlBuffer dropAll() {
+    return dropAll;
   }
 
 }

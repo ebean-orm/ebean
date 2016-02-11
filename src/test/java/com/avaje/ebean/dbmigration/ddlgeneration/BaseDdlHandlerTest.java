@@ -35,7 +35,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     handler.generate(write, Helper.getAddColumn());
 
     assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column added_to_foo varchar(20);\n\n");
-    assertThat(write.rollback().getBuffer()).isEqualTo("alter table foo drop column added_to_foo;\n\n");
+    assertThat(write.dropAll().getBuffer()).isEqualTo("");
   }
 
   @Test
@@ -47,7 +47,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     handler.generate(write, Helper.getDropColumn());
 
     assertThat(write.apply().getBuffer()).isEqualTo("alter table foo drop column col2;\n\n");
-    assertThat(write.rollback().getBuffer()).isEqualTo("");
+    assertThat(write.dropAll().getBuffer()).isEqualTo("");
   }
 
 
@@ -62,7 +62,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     String createTableDDL = Helper.asText(this, "/assert/create-table.txt");
 
     assertThat(write.apply().getBuffer()).isEqualTo(createTableDDL);
-    assertThat(write.rollback().getBuffer().trim()).isEqualTo("drop table if exists foo;\ndrop sequence if exists foo_seq;");
+    assertThat(write.dropAll().getBuffer().trim()).isEqualTo("drop table if exists foo;\ndrop sequence if exists foo_seq;");
   }
 
   @Test
@@ -74,10 +74,10 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     handler.generate(write, Helper.getChangeSet());
 
     String apply = Helper.asText(this, "/assert/BaseDdlHandlerTest/apply.sql");
-    String rollbackLast = Helper.asText(this, "/assert/BaseDdlHandlerTest/rollback.sql");
+    String rollbackLast = Helper.asText(this, "/assert/BaseDdlHandlerTest/drop-all.sql");
 
     assertThat(write.apply().getBuffer()).isEqualTo(apply);
-    assertThat(write.rollback().getBuffer()).isEqualTo(rollbackLast);
+    assertThat(write.dropAll().getBuffer()).isEqualTo(rollbackLast);
   }
 
 
@@ -95,10 +95,10 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     handler.generate(write, createChangeSet);
 
     String apply = Helper.asText(this, "/assert/changeset-apply.txt");
-    String rollbackLast = Helper.asText(this, "/assert/changeset-rollback.txt");
+    String rollbackLast = Helper.asText(this, "/assert/changeset-dropAll.txt");
 
     assertThat(write.apply().getBuffer()).isEqualTo(apply);
-    assertThat(write.rollback().getBuffer()).isEqualTo(rollbackLast);
+    assertThat(write.dropAll().getBuffer()).isEqualTo(rollbackLast);
   }
 
   @Ignore
@@ -121,8 +121,8 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     assertThat(write.apply().getBuffer()).isEqualTo(apply);
     assertThat(write.applyForeignKeys().getBuffer()).isEqualTo(applyLast);
-    assertThat(write.rollbackForeignKeys().getBuffer()).isEqualTo(rollbackFirst);
-    assertThat(write.rollback().getBuffer()).isEqualTo(rollbackLast);
+    assertThat(write.dropAllForeignKeys().getBuffer()).isEqualTo(rollbackFirst);
+    assertThat(write.dropAll().getBuffer()).isEqualTo(rollbackLast);
   }
 
 }

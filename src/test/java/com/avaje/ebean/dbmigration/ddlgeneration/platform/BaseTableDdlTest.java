@@ -29,8 +29,8 @@ public class BaseTableDdlTest {
     String apply = write.apply().getBuffer();
     String applyLast = write.applyForeignKeys().getBuffer();
 
-    String rollbackFirst = write.rollbackForeignKeys().getBuffer();
-    String rollbackLast = write.rollback().getBuffer();
+    String rollbackFirst = write.dropAllForeignKeys().getBuffer();
+    String rollbackLast = write.dropAll().getBuffer();
 
     assertThat(apply).isEqualTo(Helper.asText(this, "/assert/BaseTableDdlTest/createTable-apply.txt"));
     assertThat(applyLast).isEqualTo(Helper.asText(this, "/assert/BaseTableDdlTest/createTable-applyLast.txt"));

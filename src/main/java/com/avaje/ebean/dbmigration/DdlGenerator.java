@@ -2,7 +2,6 @@ package com.avaje.ebean.dbmigration;
 
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.model.CurrentModel;
-import com.avaje.ebeaninternal.api.SpiEbeanPlugin;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 
 import javax.persistence.PersistenceException;
@@ -30,8 +29,8 @@ public class DdlGenerator {
   private final boolean createOnly;
 
   private CurrentModel currentModel;
-  private String dropContent;
-  private String createContent;
+  private String dropAllContent;
+  private String createAllContent;
 
   public DdlGenerator(SpiEbeanServer server, ServerConfig serverConfig) {
     this.server = server;
@@ -84,18 +83,18 @@ public class DdlGenerator {
 
   protected void runDropSql() throws IOException {
     if (!createOnly) {
-      if (dropContent == null) {
-        dropContent = readFile(getDropFileName());
+      if (dropAllContent == null) {
+        dropAllContent = readFile(getDropFileName());
       }
-      runScript(true, dropContent, getDropFileName());
+      runScript(true, dropAllContent, getDropFileName());
     }
   }
 
   protected void runCreateSql() throws IOException {
-    if (createContent == null) {
-      createContent = readFile(getCreateFileName());
+    if (createAllContent == null) {
+      createAllContent = readFile(getCreateFileName());
     }
-    runScript(false, createContent, getCreateFileName());
+    runScript(false, createAllContent, getCreateFileName());
   }
 
   protected void runInitSql() throws IOException {
@@ -132,8 +131,7 @@ public class DdlGenerator {
   protected void writeDrop(String dropFile) {
 
     try {
-      String c = generateDropDdl();
-      writeFile(dropFile, c);
+      writeFile(dropFile, generateDropAllDdl());
     } catch (IOException e) {
       throw new PersistenceException("Error generating Drop DDL", e);
     }
@@ -142,28 +140,27 @@ public class DdlGenerator {
   protected void writeCreate(String createFile) {
 
     try {
-      String c = generateCreateDdl();
-      writeFile(createFile, c);
+      writeFile(createFile, generateCreateAllDdl());
     } catch (IOException e) {
       throw new PersistenceException("Error generating Create DDL", e);
     }
   }
 
-  protected String generateDropDdl() {
+  protected String generateDropAllDdl() {
 
     try {
-      dropContent = currentModel().getDropDdl();
-      return dropContent;
+      dropAllContent = currentModel().getDropAllDdl();
+      return dropAllContent;
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  protected String generateCreateDdl() {
+  protected String generateCreateAllDdl() {
 
     try {
-      createContent = currentModel().getCreateDdl();
-      return createContent;
+      createAllContent = currentModel().getCreateDdl();
+      return createAllContent;
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

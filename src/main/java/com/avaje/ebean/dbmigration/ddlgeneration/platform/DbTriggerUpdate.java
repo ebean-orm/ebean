@@ -16,36 +16,27 @@ public class DbTriggerUpdate {
 
   private final DdlWrite writer;
 
-  private DdlWrite.Mode mode;
+  private final List<String> columns;
 
-  private List<String> includedColumns;
-
-  public DbTriggerUpdate(String baseTableName, String historyTableName, DdlWrite writer) {
+  public DbTriggerUpdate(String baseTableName, String historyTableName, DdlWrite writer, List<String> columns) {
     this.baseTableName = baseTableName;
     this.historyTableName = historyTableName;
     this.writer = writer;
-  }
-
-  /**
-   * Prepare for use given the mode and columns included in history.
-   */
-  public void prepare(DdlWrite.Mode mode, List<String> includedColumns) {
-    this.mode = mode;
-    this.includedColumns = includedColumns;
+    this.columns = columns;
   }
 
   /**
    * Return the appropriate buffer for the current mode.
    */
   public DdlBuffer historyBuffer() {
-    return writer.historyBuffer(mode);
+    return writer.applyHistory();
   }
 
   /**
    * Return the appropriate drop dependency buffer for the current mode.
    */
   public DdlBuffer dropDependencyBuffer() {
-    return writer.dropDependencies(mode);
+    return writer.applyDropDependencies();
   }
 
   /**
@@ -66,7 +57,7 @@ public class DbTriggerUpdate {
    * Return the included columns.
    */
   public List<String> getColumns() {
-    return includedColumns;
+    return columns;
   }
 
 }

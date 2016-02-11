@@ -74,18 +74,7 @@ public class PlatformDdlWriter {
       } finally {
         applyWriter.close();
       }
-
-      if (!config.isSuppressRollback() && !write.isApplyRollbackEmpty()) {
-        FileWriter applyRollbackWriter = createWriter(resourcePath, fullVersion, config.getRollbackPath(), config.getRollbackSuffix());
-        try {
-          writeApplyRollbackDdl(applyRollbackWriter, write);
-          applyRollbackWriter.flush();
-        } finally {
-          applyRollbackWriter.close();
-        }
-      }
     }
-
   }
 
   protected FileWriter createWriter(File path, String fullVersion, String subPath, String suffix) throws IOException {
@@ -121,18 +110,6 @@ public class PlatformDdlWriter {
     writer.append(write.apply().getBuffer());
     writer.append(write.applyForeignKeys().getBuffer());
     writer.append(write.applyHistory().getBuffer());
-  }
-
-  /**
-   * Write the 'Rollback' DDL buffers to the writer.
-   */
-  protected void writeApplyRollbackDdl(Writer writer, DdlWrite write) throws IOException {
-
-    // merge the rollback buffers in the appropriate order
-    prependDropDependencies(writer, write.rollbackDropDependencies());
-    writer.append("-- reverse changes\n");
-    writer.append(write.rollbackForeignKeys().getBuffer());
-    writer.append(write.rollback().getBuffer());
   }
 
   private void prependDropDependencies(Writer writer, DdlBuffer buffer) throws IOException {

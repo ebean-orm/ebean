@@ -39,22 +39,6 @@ public class HistoryTableUpdate {
       return change.name().toLowerCase()+" "+column;
     }
 
-    private void revert(List<String> includedColumns) {
-      switch (change) {
-        case ADD:
-        case INCLUDE: {
-          includedColumns.remove(column);
-          break;
-        }
-        case EXCLUDE:
-        case DROP: {
-          includedColumns.add(column);
-          break;
-        }
-        default:
-          throw new IllegalStateException("Unexpected change "+change);
-      }
-    }
   }
 
   private final String baseTable;
@@ -74,17 +58,6 @@ public class HistoryTableUpdate {
    */
   public String description() {
     return columnChanges.toString();
-  }
-
-  /**
-   * Reverse the apply changes which equates to removing any newly added or
-   * included columns.
-   */
-  public void toRevertedColumns(List<String> includedColumns) {
-
-    for (Column columnChange : columnChanges) {
-      columnChange.revert(includedColumns);
-    }
   }
 
   /**

@@ -117,13 +117,13 @@ public class CurrentModel {
   /**
    * Return the 'Drop' DDL.
    */
-  public String getDropDdl() throws IOException {
+  public String getDropAllDdl() throws IOException {
 
     createDdl();
 
     StringBuilder ddl = new StringBuilder(2000);
-    ddl.append(write.rollbackForeignKeys().getBuffer());
-    ddl.append(write.rollback().getBuffer());
+    ddl.append(write.dropAllForeignKeys().getBuffer());
+    ddl.append(write.dropAll().getBuffer());
 
     return ddl.toString();
   }

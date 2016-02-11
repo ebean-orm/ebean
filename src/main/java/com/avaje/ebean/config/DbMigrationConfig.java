@@ -24,11 +24,6 @@ public class DbMigrationConfig {
   protected boolean generate;
 
   /**
-   * Set to true to suppress the output of the rollback script.
-   */
-  protected boolean suppressRollback;
-
-  /**
    * The migration version name (typically FlywayDb compatible).
    * <p>
    * Example: 1.1.1_2
@@ -61,20 +56,7 @@ public class DbMigrationConfig {
    */
   protected String modelPath = "model";
 
-  /**
-   * Subdirectory the rollback ddl scripts go into.
-   */
-  protected String rollbackPath = "rollback";
-
-  /**
-   * Apply script suffix.
-   */
   protected String applySuffix = ".sql";
-
-  /**
-   * Default rollback script suffix to ddl so that it isn't picked up by FlywayDb.
-   */
-  protected String rollbackSuffix = ".rollback.ddl";
 
   protected String modelSuffix = ".model.xml";
 
@@ -136,20 +118,6 @@ public class DbMigrationConfig {
   }
 
   /**
-   * Return the relative path for the rollback ddl scripts (defaults to rollback).
-   */
-  public String getRollbackPath() {
-    return rollbackPath;
-  }
-
-  /**
-   * Set the relative path for the rollback ddl scripts (defaults to rollback).
-   */
-  public void setRollbackPath(String rollbackPath) {
-    this.rollbackPath = rollbackPath;
-  }
-
-  /**
    * Return the model suffix (defaults to model.xml)
    */
   public String getModelSuffix() {
@@ -164,20 +132,6 @@ public class DbMigrationConfig {
   }
 
   /**
-   * Return true if the rollback script should not be output.
-   */
-  public boolean isSuppressRollback() {
-    return suppressRollback;
-  }
-
-  /**
-   * Set to true to suppress the output of the rollback script.
-   */
-  public void setSuppressRollback(boolean suppressRollback) {
-    this.suppressRollback = suppressRollback;
-  }
-
-  /**
    * Return the apply script suffix (defaults to sql).
    */
   public String getApplySuffix() {
@@ -189,20 +143,6 @@ public class DbMigrationConfig {
    */
   public void setApplySuffix(String applySuffix) {
     this.applySuffix = applySuffix;
-  }
-
-  /**
-   * Return the rollback script suffix (defaults to ddl so that it isn't picked up by FlywayDb).
-   */
-  public String getRollbackSuffix() {
-    return rollbackSuffix;
-  }
-
-  /**
-   * Set the rollback script suffix (defaults to ddl so that it isn't picked up by FlywayDb).
-   */
-  public void setRollbackSuffix(String rollbackSuffix) {
-    this.rollbackSuffix = rollbackSuffix;
   }
 
   /**
@@ -256,7 +196,6 @@ public class DbMigrationConfig {
    * into a single directory.
    */
   public void singleDirectory() {
-    this.rollbackPath = "";
     this.modelPath = "";
   }
 
@@ -270,16 +209,13 @@ public class DbMigrationConfig {
       singleDirectory();
     } else {
       modelPath = properties.get("migration.modelPath", modelPath);
-      rollbackPath = properties.get("migration.rollbackPath", rollbackPath);
     }
     applySuffix = properties.get("migration.applySuffix", applySuffix);
-    rollbackSuffix = properties.get("migration.rollbackSuffix", rollbackSuffix);
     modelSuffix = properties.get("migration.modelSuffix", modelSuffix);
     includeGeneratedFileComment = properties.getBoolean("migration.includeGeneratedFileComment", includeGeneratedFileComment);
     generatePendingDrop = properties.get("migration.generatePendingDrop", generatePendingDrop);
 
     platform = properties.getEnum(DbPlatformName.class, "migration.platform", platform);
-    suppressRollback = properties.getBoolean("migration.suppressRollback", suppressRollback);
 
     generate = properties.getBoolean("migration.generate", generate);
     version = properties.get("migration.version", version);

@@ -69,31 +69,17 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
    */
   protected void updateTriggers(DdlWrite writer, MTable table, HistoryTableUpdate update) throws IOException {
 
-    DbTriggerUpdate triggerUpdate = createDbTriggerUpdate(writer, table);
+    writer.applyHistory().append("-- changes: ").append(update.description()).newLine();
 
-    String description = update.description();
-    List<String> includedColumns = columnNamesForApply(table);
-
-    DdlBuffer apply = writer.applyHistory();
-    apply.append("-- changes: ").append(description).newLine();
-
-    triggerUpdate.prepare(DdlWrite.Mode.APPLY, includedColumns);
-    updateHistoryTriggers(triggerUpdate);
-
-    // put a reverted version into the rollback buffer
-    update.toRevertedColumns(includedColumns);
-
-    DdlBuffer rollback = writer.rollback();
-    rollback.append("-- revert changes: ").append(description).newLine();
-
-    triggerUpdate.prepare(DdlWrite.Mode.ROLLBACK, includedColumns);
-    updateHistoryTriggers(triggerUpdate);
+    updateHistoryTriggers(createDbTriggerUpdate(writer, table));
   }
 
   protected DbTriggerUpdate createDbTriggerUpdate(DdlWrite writer, MTable table) {
+
+    List<String> columns = columnNamesForApply(table);
     String baseTableName = table.getName();
     String historyTableName = historyTableName(baseTableName);
-    return new DbTriggerUpdate(baseTableName, historyTableName, writer);
+    return new DbTriggerUpdate(baseTableName, historyTableName, writer, columns);
   }
 
   @Override
@@ -124,9 +110,8 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     String baseTable = table.getName();
     String whenCreatedColumn = table.getWhenCreatedColumn();
 
-    // rollback changes in appropriate order
-    dropTriggers(writer.rollback(), baseTable);
-    dropHistoryTableEtc(writer.rollback(), baseTable);
+    dropTriggers(writer.dropAll(), baseTable);
+    dropHistoryTableEtc(writer.dropAll(), baseTable);
 
     addHistoryTable(writer, table, whenCreatedColumn);
     createStoredFunction(writer, table);
@@ -295,7 +280,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
    * the column.
    * </p>
    */
-  protected List<String> columnNamesForApply(MTable table) throws IOException {
+  protected List<String> columnNamesForApply(MTable table) {
 
     return table.allHistoryColumns(true);
   }

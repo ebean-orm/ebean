@@ -140,7 +140,7 @@ public class BaseTableDdl implements TableDdl {
 
     // add drop table to the rollback buffer - do this before
     // we drop the related sequence (if sequences are used)
-    dropTable(writer.rollback(), tableName);
+    dropTable(writer.dropAll(), tableName);
 
     if (useSequence) {
       String pkCol = pk.get(0).getName();
@@ -149,7 +149,7 @@ public class BaseTableDdl implements TableDdl {
 
     // add blank line for a bit of whitespace between tables
     apply.end();
-    writer.rollback().end();
+    writer.dropAll().end();
 
     writeAddForeignKeys(writer, createTable);
 
@@ -204,7 +204,7 @@ public class BaseTableDdl implements TableDdl {
           .append(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames))
           .endOfStatement();
 
-      write.rollbackForeignKeys()
+      write.dropAllForeignKeys()
           .append(platformDdl.dropIndex(uqName, tableName))
           .endOfStatement();
     }
@@ -225,7 +225,7 @@ public class BaseTableDdl implements TableDdl {
     String createSeq = platformDdl.createSequence(seqName, initial, allocate);
     if (createSeq != null) {
       writer.apply().append(createSeq).newLine();
-      writer.rollback().append(platformDdl.dropSequence(seqName)).endOfStatement();
+      writer.dropAll().append(platformDdl.dropSequence(seqName)).endOfStatement();
     }
   }
 
@@ -295,15 +295,15 @@ public class BaseTableDdl implements TableDdl {
 
     fkeyBuffer.end();
 
-    write.rollbackForeignKeys()
+    write.dropAllForeignKeys()
         .append(platformDdl.alterTableDropForeignKey(tableName, fkName)).endOfStatement();
 
     if (indexName != null) {
-      write.rollbackForeignKeys()
+      write.dropAllForeignKeys()
           .append(platformDdl.dropIndex(indexName, tableName)).endOfStatement();
     }
 
-    write.rollbackForeignKeys().end();
+    write.dropAllForeignKeys().end();
 
   }
 
@@ -471,7 +471,7 @@ public class BaseTableDdl implements TableDdl {
         .append(platformDdl.createIndex(createIndex.getIndexName(), createIndex.getTableName(), cols))
         .endOfStatement();
 
-    writer.rollback()
+    writer.dropAll()
         .append(platformDdl.dropIndex(createIndex.getIndexName(), createIndex.getTableName()))
         .endOfStatement();
   }
@@ -520,7 +520,6 @@ public class BaseTableDdl implements TableDdl {
     List<Column> columns = addColumn.getColumn();
     for (Column column : columns) {
       alterTableAddColumn(writer.apply(), tableName, column, false);
-      alterTableDropColumn(writer.rollback(), tableName, column.getName());
     }
 
     if (isTrue(addColumn.isWithHistory())) {
@@ -529,13 +528,11 @@ public class BaseTableDdl implements TableDdl {
       for (Column column : columns) {
         regenerateHistoryTriggers(tableName, HistoryTableUpdate.Change.ADD, column.getName());
         alterTableAddColumn(writer.apply(), historyTable, column, true);
-        alterTableDropColumn(writer.rollback(), historyTable, column.getName());
       }
     }
 
     // add a bit of whitespace
     writer.apply().end();
-    writer.rollback().end();
   }
 
   /**
@@ -642,21 +639,6 @@ public class BaseTableDdl implements TableDdl {
     if (hasValue(ddl)) {
       writer.apply().append(ddl).endOfStatement();
 
-      // reverse and generate the rollback statement
-      String currentType = alter.getCurrentType();
-      String type = alter.getType();
-      Boolean currentNotnull = alter.isCurrentNotnull();
-      Boolean notnull = alter.isNotnull();
-
-      alter.setCurrentType(type);
-      alter.setType(currentType);
-      alter.setNotnull(currentNotnull);
-      alter.setCurrentNotnull(notnull);
-
-      // write the rollback
-      ddl = platformDdl.alterColumnBaseAttributes(alter);
-      writer.rollback().append(ddl).endOfStatement();
-
       if (isTrue(alter.isWithHistory()) && alter.getType() != null) {
         // mysql and sql server column type change allowing nulls in the history table column
         AlterColumn alterHistoryColumn = new AlterColumn();
@@ -667,11 +649,6 @@ public class BaseTableDdl implements TableDdl {
 
         // write the apply to history table
         writer.apply().append(histColumnDdl).endOfStatement();
-
-        // write the rollback from history table
-        alterHistoryColumn.setType(currentType);
-        histColumnDdl = platformDdl.alterColumnBaseAttributes(alterHistoryColumn);
-        writer.rollback().append(histColumnDdl).endOfStatement();
       }
     }
   }
@@ -689,8 +666,6 @@ public class BaseTableDdl implements TableDdl {
     String ddl = platformDdl.alterColumnNotnull(alter.getTableName(), alter.getColumnName(), alter.isNotnull());
     if (hasValue(ddl)) {
       writer.apply().append(ddl).endOfStatement();
-      ddl = platformDdl.alterColumnNotnull(alter.getTableName(), alter.getColumnName(), alter.isCurrentNotnull());
-      writer.rollback().append(ddl).endOfStatement();
     }
   }
 
@@ -699,14 +674,10 @@ public class BaseTableDdl implements TableDdl {
     String ddl = platformDdl.alterColumnType(alter.getTableName(), alter.getColumnName(), alter.getType());
     if (hasValue(ddl)) {
       writer.apply().append(ddl).endOfStatement();
-      ddl = platformDdl.alterColumnType(alter.getTableName(), alter.getColumnName(), alter.getCurrentType());
-      writer.rollback().append(ddl).endOfStatement();
       if (isTrue(alter.isWithHistory())) {
         // apply same type change to matching column in the history table
         ddl = platformDdl.alterColumnType(historyTable(alter.getTableName()), alter.getColumnName(), alter.getType());
         writer.apply().append(ddl).endOfStatement();
-        ddl = platformDdl.alterColumnType(historyTable(alter.getTableName()), alter.getColumnName(), alter.getCurrentType());
-        writer.rollback().append(ddl).endOfStatement();
       }
     }
   }
@@ -762,7 +733,7 @@ public class BaseTableDdl implements TableDdl {
         .append(platformDdl.alterTableAddUniqueConstraint(alter.getTableName(), uqName, cols))
         .endOfStatement();
 
-    writer.rollbackForeignKeys()
+    writer.dropAllForeignKeys()
         .append(platformDdl.dropIndex(uqName, alter.getTableName()))
         .endOfStatement();
   }
