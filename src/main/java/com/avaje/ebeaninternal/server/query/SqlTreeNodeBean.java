@@ -347,7 +347,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       return localBean;
 
     } else {
-      if (lazyLoadParentId != null && newBean) {
+      if (lazyLoadParentId != null) {
         ctx.setLazyLoadedChildBean(contextBean, lazyLoadParentId);
       }
       return contextBean;

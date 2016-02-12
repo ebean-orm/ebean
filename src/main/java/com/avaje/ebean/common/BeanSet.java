@@ -1,14 +1,14 @@
 package com.avaje.ebean.common;
 
+import com.avaje.ebean.bean.BeanCollectionAdd;
+import com.avaje.ebean.bean.BeanCollectionLoader;
+import com.avaje.ebean.bean.EntityBean;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import com.avaje.ebean.bean.BeanCollectionAdd;
-import com.avaje.ebean.bean.BeanCollectionLoader;
-import com.avaje.ebean.bean.EntityBean;
 
 /**
  * Set capable of lazy loading.
@@ -55,6 +55,13 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   @SuppressWarnings("unchecked")
   public void addEntityBean(EntityBean bean) {
     set.add((E) bean);
+  }
+
+  @Override
+  public void internalAddWithCheck(Object bean) {
+    if (set == null || !set.contains(bean)) {
+      internalAdd(bean);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -107,11 +114,11 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   private void initAsUntouched() {
     init(false);
   }
-  
+
   private void init() {
     init(true);
   }
-  
+
   private void init(boolean setTouched) {
     synchronized (this) {
       if (set == null) {

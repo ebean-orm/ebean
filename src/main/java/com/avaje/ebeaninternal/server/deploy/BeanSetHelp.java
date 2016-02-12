@@ -61,8 +61,12 @@ public final class BeanSetHelp<T> implements BeanCollectionHelp<T> {
     }
   }
 
-  public void add(BeanCollection<?> collection, EntityBean bean) {
-    collection.internalAdd(bean);
+  public void add(BeanCollection<?> collection, EntityBean bean, boolean withCheck) {
+    if (withCheck) {
+      collection.internalAddWithCheck(bean);
+    } else {
+      collection.internalAdd(bean);
+    }
   }
 
   @Override

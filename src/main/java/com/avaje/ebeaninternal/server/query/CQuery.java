@@ -399,7 +399,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
       }
 
       // add the loadedBean to the appropriate collection of lazyLoadParentBean
-      lazyLoadManyProperty.addBeanToCollectionWithCreate(lazyLoadParentBean, bean);
+      lazyLoadManyProperty.addBeanToCollectionWithCreate(lazyLoadParentBean, bean, true);
     }
   }
 
@@ -542,7 +542,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
     while (hasNext()) {
       EntityBean bean = next();
-      help.add(collection, bean);
+      help.add(collection, bean, false);
     }
 
     updateExecutionStatistics();

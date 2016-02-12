@@ -46,8 +46,12 @@ public final class BeanListHelp<T> implements BeanCollectionHelp<T> {
    * Internal add bypassing any modify listening.
    */
   @Override
-  public void add(BeanCollection<?> collection, EntityBean bean) {
-    collection.internalAdd(bean);
+  public void add(BeanCollection<?> collection, EntityBean bean, boolean withCheck) {
+    if (withCheck) {
+      collection.internalAddWithCheck(bean);
+    } else {
+      collection.internalAdd(bean);
+    }
   }
 
   @Override

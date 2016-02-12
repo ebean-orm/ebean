@@ -42,7 +42,7 @@ public interface BeanCollectionHelp<T> {
 	/**
 	 * Add a bean to the List Set or Map.
 	 */
-	void add(BeanCollection<?> collection, EntityBean bean);
+	void add(BeanCollection<?> collection, EntityBean bean, boolean withCheck);
 
 	/**
 	 * Create a lazy loading proxy for a List Set or Map.

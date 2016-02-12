@@ -126,6 +126,11 @@ public interface BeanCollection<E> extends Serializable {
   void internalAdd(Object bean);
 
   /**
+   * Add the bean with a check to see if it is already contained.
+   */
+  void internalAddWithCheck(Object bean);
+
+  /**
    * Return the number of elements in the List Set or Map.
    */
   int size();

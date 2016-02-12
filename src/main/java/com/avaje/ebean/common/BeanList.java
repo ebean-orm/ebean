@@ -1,5 +1,9 @@
 package com.avaje.ebean.common;
 
+import com.avaje.ebean.bean.BeanCollectionAdd;
+import com.avaje.ebean.bean.BeanCollectionLoader;
+import com.avaje.ebean.bean.EntityBean;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,17 +12,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.avaje.ebean.bean.BeanCollectionAdd;
-import com.avaje.ebean.bean.BeanCollectionLoader;
-import com.avaje.ebean.bean.EntityBean;
-
 /**
  * List capable of lazy loading.
  */
 public final class BeanList<E> extends AbstractBeanCollection<E> implements List<E>, BeanCollectionAdd {
 
   private static final long serialVersionUID = 1L;
-  
+
   /**
    * The underlying List implementation.
    */
@@ -74,6 +74,13 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     }
   }
 
+  @Override
+  public void internalAddWithCheck(Object bean) {
+    if (list == null || !list.contains(bean)) {
+      internalAdd(bean);
+    }
+  }
+
   public boolean checkEmptyLazyLoad() {
     if (list == null) {
       list = new ArrayList<E>();
@@ -99,11 +106,11 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   private void initAsUntouched() {
     init(false);
   }
-  
+
   private void init() {
     init(true);
   }
-  
+
   private void init(boolean setTouched) {
     synchronized (this) {
       if (list == null) {
@@ -134,7 +141,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   public Collection<E> getActualDetails() {
     return list;
   }
-  
+
   @Override
   public Collection<?> getActualEntries() {
     return list;

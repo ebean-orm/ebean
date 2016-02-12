@@ -66,7 +66,18 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
       map.put((K) key, (E) bean);
     }
   }
-  
+
+  public void internalPutWithCheck(Object key, Object bean) {
+    if (map == null || !map.containsKey(key)) {
+      internalPut(key, bean);
+    }
+  }
+
+  @Override
+  public void internalAddWithCheck(Object bean) {
+    throw new RuntimeException("Not allowed for map");
+  }
+
   public void internalAdd(Object bean) {
     throw new RuntimeException("Not allowed for map");
   }

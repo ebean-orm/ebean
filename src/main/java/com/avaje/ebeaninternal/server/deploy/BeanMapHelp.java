@@ -108,13 +108,14 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
   }
 
   @Override
-  public void add(BeanCollection<?> collection, EntityBean bean) {
+  public void add(BeanCollection<?> collection, EntityBean bean, boolean withCheck) {
 
     if (bean == null) {
       ((BeanMap<?, ?>) collection).internalPutNull();
     } else {
       Object keyValue = beanProperty.getValueIntercept(bean);
-      ((BeanMap<?, ?>) collection).internalPut(keyValue, bean);
+      BeanMap<?, ?> map = ((BeanMap<?, ?>) collection);
+      map.internalPutWithCheck(keyValue, bean);
     }
   }
 
