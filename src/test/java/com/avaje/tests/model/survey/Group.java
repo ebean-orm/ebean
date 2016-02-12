@@ -1,33 +1,41 @@
 package com.avaje.tests.model.survey;
 
-import javax.persistence.*;
-import java.util.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name="survey_group")
+@Table(name = "survey_group")
 public class Group {
-	@Id
-	public Long id;
+  @Id
+  public Long id;
 
-	@ManyToOne
-    @JoinColumn(name = "categoryObjectId")
-    private Category category;
+  @ManyToOne
+  @JoinColumn(name = "categoryObjectId")
+  private Category category;
 
-    @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @OrderBy("sequenceNumber")
-    private List<Question> questions = new ArrayList<Question>();
+  @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @OrderBy("sequenceNumber")
+  private List<Question> questions = new ArrayList<Question>();
 
-    private int sequenceNumber;
+  private int sequenceNumber;
 
-    public List<Question> getQuestions() {
-    	return questions;
-    }
+  public List<Question> getQuestions() {
+    return questions;
+  }
 
-    public void setQuestions(List<Question> questions) {
-    	this.questions = questions;
-    }
+  public void setQuestions(List<Question> questions) {
+    this.questions = questions;
+  }
 
-        public void setSequenceNumber(int number) {
-        this.sequenceNumber = number;
-    }
+  public void setSequenceNumber(int number) {
+    this.sequenceNumber = number;
+  }
 }

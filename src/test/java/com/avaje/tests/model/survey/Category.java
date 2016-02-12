@@ -1,32 +1,38 @@
 package com.avaje.tests.model.survey;
 
-import javax.persistence.*;
-import java.util.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import java.util.List;
 
 @Entity
 public class Category {
-	@Id
-	public Long id;
+  @Id
+  public Long id;
 
-	 @ManyToOne
-    @JoinColumn(name = "surveyObjectId")
-    private Survey survey;
+  @ManyToOne
+  @JoinColumn(name = "surveyObjectId")
+  private Survey survey;
 
-    @OneToMany(mappedBy = "category", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @OrderBy("sequenceNumber")
-    private List<Group> groups;
+  @OneToMany(mappedBy = "category", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @OrderBy("sequenceNumber")
+  private List<Group> groups;
 
-    private int sequenceNumber;
+  private int sequenceNumber;
 
-    public List<Group> getGroups() {
-    	return groups;
-    }
+  public List<Group> getGroups() {
+    return groups;
+  }
 
-    public void setGroups(List<Group> groups) {
-    	this.groups = groups;
-    }
+  public void setGroups(List<Group> groups) {
+    this.groups = groups;
+  }
 
-    public void setSequenceNumber(int number) {
-        this.sequenceNumber = number;
-    }
+  public void setSequenceNumber(int number) {
+    this.sequenceNumber = number;
+  }
 }

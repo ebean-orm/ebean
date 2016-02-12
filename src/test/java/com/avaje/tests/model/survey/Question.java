@@ -1,20 +1,23 @@
 package com.avaje.tests.model.survey;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Question {
-	@Id
-	public Long id;
+  @Id
+  public Long id;
 
-	@ManyToOne
-    @JoinColumn(name = "groupObjectId")
-    private Group group;
+  @ManyToOne
+  @JoinColumn(name = "groupObjectId")
+  private Group group;
 
-    private int sequenceNumber;
+  private int sequenceNumber;
 
-    public void setSequenceNumber(int number) {
-        this.sequenceNumber = number;
-    }
+  public void setSequenceNumber(int number) {
+    this.sequenceNumber = number;
+  }
 
 }
