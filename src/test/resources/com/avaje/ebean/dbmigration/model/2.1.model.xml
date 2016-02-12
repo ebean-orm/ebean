@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+  <changeSet type="pendingDrops" suppressDropsForever="true">
+    <dropColumn columnName="boom" tableName="document" withHistory="true"/>
+    <dropColumn columnName="baz" tableName="document" withHistory="true"/>
+    <dropColumn columnName="bar" tableName="document" withHistory="true"/>
+  </changeSet>
+  <changeSet type="pendingDrops">
+    <dropColumn columnName="zing" tableName="document" withHistory="true"/>
+    <dropColumn columnName="zong" tableName="document" withHistory="true"/>
+  </changeSet>
+</migration>

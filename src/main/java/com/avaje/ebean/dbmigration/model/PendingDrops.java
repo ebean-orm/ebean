@@ -3,6 +3,7 @@ package com.avaje.ebean.dbmigration.model;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
 import com.avaje.ebean.dbmigration.migration.ChangeSetType;
 import com.avaje.ebean.dbmigration.migration.DropColumn;
+import com.avaje.ebean.dbmigration.migration.DropTable;
 import com.avaje.ebean.dbmigration.migration.Migration;
 
 import java.util.ArrayList;
@@ -48,9 +49,12 @@ public class PendingDrops {
    * All the pending drops for this migration version have been applied so we need
    * to remove the (unsuppressed) pending drops for this version.
    */
-  public boolean appliedDropsFor(MigrationVersion version) {
+  public boolean appliedDropsFor(ChangeSet changeSet) {
+
+    MigrationVersion version = MigrationVersion.parse(changeSet.getDropsFor());
+
     Entry entry = map.get(version.normalised());
-    if (entry.removeDrops()) {
+    if (entry.removeDrops(changeSet)) {
       // it had no suppressForever changeSets so remove completely
       map.remove(version.normalised());
       return true;
@@ -70,8 +74,11 @@ public class PendingDrops {
     Entry entry = getEntry(pendingVersion);
 
     Migration migration = new Migration();
-    for (ChangeSet changeSet : entry.list) {
+    Iterator<ChangeSet> it = entry.list.iterator();
+    while (it.hasNext()) {
+      ChangeSet changeSet = it.next();
       if (!isSuppressForever(changeSet)) {
+        it.remove();
         changeSet.setType(ChangeSetType.APPLY);
         changeSet.setDropsFor(entry.version.asString());
         migration.getChangeSet().add(changeSet);
@@ -113,14 +120,7 @@ public class PendingDrops {
 
     for (Entry entry : map.values()) {
       for (ChangeSet changeSet : entry.list) {
-        for (Object change : changeSet.getChangeSetChildren()) {
-          if (change instanceof DropColumn) {
-            DropColumn dropColumn = (DropColumn) change;
-            if (Boolean.TRUE.equals(dropColumn.isWithHistory())) {
-              newModel.registerPendingDropColumn(dropColumn);
-            }
-          }
-        }
+        newModel.registerPendingHistoryDropColumns(changeSet);
       }
     }
   }
@@ -129,8 +129,14 @@ public class PendingDrops {
    * Return true if there is an Entry for the given version.
    */
   boolean testContainsEntryFor(MigrationVersion version) {
-
     return map.containsKey(version.normalised());
+  }
+
+  /**
+   * Return the Entry for the given version.
+   */
+  Entry testGetEntryFor(MigrationVersion version) {
+    return map.get(version.normalised());
   }
 
   static class Entry {
@@ -175,18 +181,79 @@ public class PendingDrops {
      * Remove the drops that are not suppressForever and return true if that
      * removed all the changeSets (and there are no suppressForever ones).
      */
-    boolean removeDrops() {
+    boolean removeDrops(ChangeSet appliedDrops) {
 
       Iterator<ChangeSet> iterator = list.iterator();
       while (iterator.hasNext()) {
         ChangeSet next = iterator.next();
         if (!isSuppressForever(next)) {
-          iterator.remove();
+          removeMatchingChanges(next, appliedDrops);
+          if (next.getChangeSetChildren().isEmpty()) {
+            iterator.remove();
+          }
         }
       }
 
       return list.isEmpty();
     }
+
+    /**
+     * Remove the applied drops from the pending ones matching by table name and column name.
+     */
+    private void removeMatchingChanges(ChangeSet pendingDrops, ChangeSet appliedDrops) {
+
+      List<Object> pending = pendingDrops.getChangeSetChildren();
+      Iterator<Object> iterator = pending.iterator();
+      while (iterator.hasNext()) {
+        Object pendingDrop = iterator.next();
+        if (pendingDrop instanceof DropColumn && dropColumnIn((DropColumn)pendingDrop, appliedDrops)) {
+          iterator.remove();
+
+        } else if (pendingDrop instanceof DropTable && dropTableIn((DropTable)pendingDrop, appliedDrops)) {
+          iterator.remove();
+        }
+      }
+    }
+
+    /**
+     * Return true if the pendingDrop is contained in the appliedDrops.
+     */
+    private boolean dropTableIn(DropTable pendingDrop, ChangeSet appliedDrops) {
+      for (Object o : appliedDrops.getChangeSetChildren()) {
+        if (o instanceof DropTable && sameTable(pendingDrop, (DropTable)o)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    /**
+     * Return true if the pendingDrop is contained in the appliedDrops.
+     */
+    private boolean dropColumnIn(DropColumn pendingDrop, ChangeSet appliedDrops) {
+      for (Object o : appliedDrops.getChangeSetChildren()) {
+        if (o instanceof DropColumn && sameColumn(pendingDrop, (DropColumn) o)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    /**
+     * Return true if the DropTable match by table name.
+     */
+    private boolean sameTable(DropTable pendingDrop, DropTable o) {
+      return pendingDrop.getName().equals(o.getName());
+    }
+
+    /**
+     * Return true if the DropColumns match by table and column name.
+     */
+    private boolean sameColumn(DropColumn pending, DropColumn o) {
+      return pending.getColumnName().equals(o.getColumnName())
+          && pending.getTableName().equals(o.getTableName());
+    }
+
   }
 
   private static boolean isSuppressForever(ChangeSet next) {

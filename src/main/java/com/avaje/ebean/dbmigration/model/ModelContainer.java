@@ -13,7 +13,6 @@ import com.avaje.ebean.dbmigration.migration.DropIndex;
 import com.avaje.ebean.dbmigration.migration.DropTable;
 import com.avaje.ebean.dbmigration.migration.Migration;
 
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +44,7 @@ public class ModelContainer {
    * Adjust the FK references on all the draft tables.
    */
   public void adjustDraftReferences() {
-    Collection<MTable> tables = this.tables.values();
-    for (MTable table : tables) {
+    for (MTable table : this.tables.values()) {
       if (table.isDraft()) {
         table.adjustReferences(this);
       }
@@ -94,7 +92,7 @@ public class ModelContainer {
         pendingDrops.add(version, changeSet);
 
       } else if (isDropsFor(changeSet)) {
-        pendingDrops.appliedDropsFor(MigrationVersion.parse(changeSet.getDropsFor()));
+        pendingDrops.appliedDropsFor(changeSet);
       }
       if (!isDropsFor(changeSet)) {
         applyChangeSet(changeSet);
@@ -287,9 +285,25 @@ public class ModelContainer {
   }
 
   /**
+   * Register any pending drop columns on history tables.  These columns are now not in the current
+   * logical model but we still need to include them in the history views and triggers until they
+   * are actually dropped.
+   */
+  public void registerPendingHistoryDropColumns(ChangeSet changeSet) {
+    for (Object change : changeSet.getChangeSetChildren()) {
+      if (change instanceof DropColumn) {
+        DropColumn dropColumn = (DropColumn) change;
+        if (Boolean.TRUE.equals(dropColumn.isWithHistory())) {
+          registerPendingDropColumn(dropColumn);
+        }
+      }
+    }
+  }
+
+  /**
    * Register a drop column on a history tables that has not been applied yet.
    */
-  public void registerPendingDropColumn(DropColumn dropColumn) {
+  private void registerPendingDropColumn(DropColumn dropColumn) {
 
     MTable table = getTable(dropColumn.getTableName());
     if (table == null) {

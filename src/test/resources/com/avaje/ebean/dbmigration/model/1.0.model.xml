@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+  <changeSet type="apply">
+
+    <createTable name="document" withHistory="true" pkName="pk_document">
+      <column name="id" type="bigint" primaryKey="true" references="document_draft.id" foreignKeyName="fk_document_id"/>
+      <column name="title" type="varchar(255)" unique="uq_document_title"/>
+      <column name="body" type="varchar(255)"/>
+      <column name="zing" type="varchar(255)"/>
+      <column name="zong" type="varchar(255)"/>
+      <column name="version" type="bigint" notnull="true"/>
+      <column name="when_created" type="timestamp" notnull="true"/>
+      <column name="when_modified" type="timestamp" notnull="true"/>
+    </createTable>
+
+  </changeSet>
+</migration>

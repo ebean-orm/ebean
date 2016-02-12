@@ -13,54 +13,71 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class PendingDropsTest {
 
-  @Test
-  public void testAdd() throws Exception {
+  static final MigrationVersion V1_1 = MigrationVersion.parse("1.1");
 
-    ChangeSet cs = new ChangeSet();
+  static final MigrationVersion V1_2 = MigrationVersion.parse("1.2");
+
+  @Test
+  public void test_add() throws Exception {
 
     PendingDrops pendingDrops = new PendingDrops();
-    pendingDrops.add(MigrationVersion.parse("1.1"), cs);
+    pendingDrops.add(V1_1, new ChangeSet());
   }
 
   @Test
-  public void test_add_appliedDropsFor() throws Exception {
+  public void test_appliedDropsFor_when_matchesSome_then_removesMatched() throws Exception {
 
     PendingDrops pendingDrops = new PendingDrops();
-    assertThat(pendingDrops.pendingDrops()).isEmpty();
 
-    pendingDrops.add(MigrationVersion.parse("1.1"), new ChangeSet());
-    assertThat(pendingDrops.pendingDrops()).containsExactly("1.1");
+    DropColumn one = col("one");
+    DropColumn two = col("two");
+    pendingDrops.add(V1_1, changeSet(one,two));
+    pendingDrops.add(V1_1, changeSet("three","four"));
+    assertThat(pendingDrops.testGetEntryFor(V1_1).list).asList().hasSize(2);
 
-    pendingDrops.appliedDropsFor(MigrationVersion.parse("1_1"));
-    assertThat(pendingDrops.pendingDrops()).isEmpty();
+    ChangeSet applied = changeSet("two");
+    applied.setDropsFor("1.1");
+
+    assertThat(pendingDrops.appliedDropsFor(applied)).isFalse();
+    assertThat(pendingDrops.testGetEntryFor(V1_1).list).asList().hasSize(2);
+    assertThat(pendingDrops.testGetEntryFor(V1_1).list.get(0).getChangeSetChildren()).asList().containsExactly(one);
   }
 
   @Test
-  public void test_add_appliedDropsFor_whenSuppressed() throws Exception {
+  public void test_appliedDropsFor_when_matchesAll_then_removesChangeSet() throws Exception {
 
     PendingDrops pendingDrops = new PendingDrops();
-    assertThat(pendingDrops.pendingDrops()).isEmpty();
 
-    pendingDrops.add(MigrationVersion.parse("1.1"), newSuppressForeverChangeSet());
-    assertThat(pendingDrops.pendingDrops()).isEmpty();
+    DropColumn one = col("one");
+    DropColumn two = col("two");
+    pendingDrops.add(V1_1, changeSet(one,two));
+    pendingDrops.add(V1_1, changeSet("three","four"));
+    assertThat(pendingDrops.testGetEntryFor(V1_1).list).asList().hasSize(2);
 
-    pendingDrops.appliedDropsFor(MigrationVersion.parse("1_1"));
+    ChangeSet applied = changeSet("two","one");
+    applied.setDropsFor("1.1");
+
+    assertThat(pendingDrops.appliedDropsFor(applied)).isFalse();
+    assertThat(pendingDrops.testGetEntryFor(V1_1).list).asList().hasSize(1);
   }
-
 
   @Test
-  public void test_add_appliedDropsFor_whenBoth() throws Exception {
+  public void test_appliedDropsFor_when_changeSetSuppressed_isIgnored() throws Exception {
 
     PendingDrops pendingDrops = new PendingDrops();
-    assertThat(pendingDrops.pendingDrops()).isEmpty();
 
-    pendingDrops.add(MigrationVersion.parse("1.1"), newSuppressForeverChangeSet());
-    pendingDrops.add(MigrationVersion.parse("1.1"), new ChangeSet());
-    assertThat(pendingDrops.pendingDrops()).containsExactly("1.1");
+    DropColumn one = col("one");
+    ChangeSet changeSet = changeSet(one);
+    changeSet.setSuppressDropsForever(true);
+    pendingDrops.add(V1_1, changeSet);
 
-    pendingDrops.appliedDropsFor(MigrationVersion.parse("1_1"));
-    assertThat(pendingDrops.pendingDrops()).isEmpty();
+    ChangeSet applied = changeSet("one");
+    applied.setDropsFor("1.1");
+
+    assertThat(pendingDrops.appliedDropsFor(applied)).isFalse();
+    assertThat(pendingDrops.testGetEntryFor(V1_1).list).asList().hasSize(1);
   }
+
 
   @Test
   public void test_pendingDrops() throws Exception {
@@ -68,8 +85,8 @@ public class PendingDropsTest {
     PendingDrops pendingDrops = new PendingDrops();
     assertThat(pendingDrops.pendingDrops()).isEmpty();
 
-    pendingDrops.add(MigrationVersion.parse("1.1"), new ChangeSet());
-    pendingDrops.add(MigrationVersion.parse("1.2"), new ChangeSet());
+    pendingDrops.add(V1_1, new ChangeSet());
+    pendingDrops.add(V1_2, new ChangeSet());
     assertThat(pendingDrops.pendingDrops()).containsExactly("1.1", "1.2");
   }
 
@@ -79,10 +96,10 @@ public class PendingDropsTest {
     PendingDrops pendingDrops = new PendingDrops();
     assertThat(pendingDrops.pendingDrops()).isEmpty();
 
-    pendingDrops.add(MigrationVersion.parse("1.1"), newSuppressForeverChangeSet());
+    pendingDrops.add(V1_1, newSuppressForeverChangeSet());
     assertThat(pendingDrops.pendingDrops()).isEmpty();
 
-    pendingDrops.add(MigrationVersion.parse("1.2"), new ChangeSet());
+    pendingDrops.add(V1_2, new ChangeSet());
     assertThat(pendingDrops.pendingDrops()).containsExactly("1.2");
   }
 
@@ -92,29 +109,23 @@ public class PendingDropsTest {
     PendingDrops pendingDrops = new PendingDrops();
     assertThat(pendingDrops.pendingDrops()).isEmpty();
 
-    pendingDrops.add(MigrationVersion.parse("1.1"), newSuppressForeverChangeSet());
-    pendingDrops.add(MigrationVersion.parse("1.1"), new ChangeSet());
+    pendingDrops.add(V1_1, newSuppressForeverChangeSet());
+    pendingDrops.add(V1_1, new ChangeSet());
     assertThat(pendingDrops.pendingDrops()).containsExactly("1.1");
 
-    pendingDrops.add(MigrationVersion.parse("1.2"), new ChangeSet());
+    pendingDrops.add(V1_2, new ChangeSet());
     assertThat(pendingDrops.pendingDrops()).containsExactly("1.1", "1.2");
-
-    pendingDrops.appliedDropsFor(MigrationVersion.parse("1_1"));
-    assertThat(pendingDrops.pendingDrops()).containsExactly("1.2");
-
-    pendingDrops.appliedDropsFor(MigrationVersion.parse("1_2"));
-    assertThat(pendingDrops.pendingDrops()).isEmpty();
   }
 
   @Test
-  public void testMigrationForVersion() throws Exception {
+  public void test_migrationForVersion() throws Exception {
 
     PendingDrops pendingDrops = new PendingDrops();
 
     ChangeSet applyDropChangeSet1 = new ChangeSet();
     ChangeSet applyDropChangeSet2 = new ChangeSet();
 
-    MigrationVersion version = MigrationVersion.parse("1.1");
+    MigrationVersion version = V1_1;
     pendingDrops.add(version, applyDropChangeSet1);
     pendingDrops.add(version, applyDropChangeSet2);
 
@@ -125,12 +136,12 @@ public class PendingDropsTest {
   }
 
   @Test
-  public void testMigrationForVersion_when_both() throws Exception {
+  public void test_migrationForVersion_when_both() throws Exception {
 
     PendingDrops pendingDrops = new PendingDrops();
 
     ChangeSet applyDropChangeSet = new ChangeSet();
-    MigrationVersion version = MigrationVersion.parse("1.1");
+    MigrationVersion version = V1_1;
     pendingDrops.add(version, newSuppressForeverChangeSet());
     pendingDrops.add(version, applyDropChangeSet);
 
@@ -141,10 +152,10 @@ public class PendingDropsTest {
   }
 
   @Test
-  public void testMigrationForVersion_when_next() throws Exception {
+  public void test_migrationForVersion_when_next() throws Exception {
 
     PendingDrops pendingDrops = new PendingDrops();
-    MigrationVersion version = MigrationVersion.parse("1.1");
+    MigrationVersion version = V1_1;
 
     ChangeSet applyDropChangeSet = new ChangeSet();
     pendingDrops.add(version, newSuppressForeverChangeSet());
@@ -157,26 +168,57 @@ public class PendingDropsTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testMigrationForVersion_when_next_isSuppressForever() throws Exception {
+  public void test_migrationForVersion_when_next_isSuppressForever() throws Exception {
 
     PendingDrops pendingDrops = new PendingDrops();
-    pendingDrops.add(MigrationVersion.parse("1.1"), newSuppressForeverChangeSet());
+    pendingDrops.add(V1_1, newSuppressForeverChangeSet());
     pendingDrops.migrationForVersion("next");
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testMigrationForVersion_when_doesNotExist() throws Exception {
+  public void test_migrationForVersion_when_doesNotExist() throws Exception {
 
     PendingDrops pendingDrops = new PendingDrops();
     pendingDrops.migrationForVersion("1_1");
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testMigrationForVersion_when_next_doesNotExist() throws Exception {
+  public void test_migrationForVersion_when_next_doesNotExist() throws Exception {
 
     PendingDrops pendingDrops = new PendingDrops();
     pendingDrops.migrationForVersion("next");
   }
+
+
+  @Test
+  public void test_registerPendingHistoryDropColumns() throws Exception {
+
+    TDModelContainer modelContainer = new TDModelContainer();
+
+    DropColumn drop1 = col("one");
+    drop1.setWithHistory(Boolean.TRUE);
+
+    DropColumn drop2 = col("two");
+
+    ChangeSet changeSet = changeSet(drop1, drop2);
+
+    PendingDrops pendingDrops = new PendingDrops();
+    pendingDrops.add(V1_1, changeSet);
+    pendingDrops.registerPendingHistoryDropColumns(modelContainer);
+
+    assertThat(modelContainer.drops).containsExactly(changeSet);
+  }
+
+  class TDModelContainer extends ModelContainer {
+
+    List<ChangeSet> drops = new ArrayList<ChangeSet>();
+
+    @Override
+    public void registerPendingHistoryDropColumns(ChangeSet changeSet) {
+      drops.add(changeSet);
+    }
+  }
+
 
   private ChangeSet newSuppressForeverChangeSet() {
     ChangeSet changeSet = new ChangeSet();
@@ -184,36 +226,21 @@ public class PendingDropsTest {
     return changeSet;
   }
 
+  static ChangeSet changeSet(String... colNames) {
+    return EntryTest.changeSet(colNames);
+  }
 
-  @Test
-  public void testRegisterPendingHistoryDropColumns() throws Exception {
-
-    TDModelContainer modelContainer = new TDModelContainer();
-
-
-    DropColumn drop1 = new DropColumn();
-    drop1.setWithHistory(Boolean.TRUE);
-
-    DropColumn drop2 = new DropColumn();
-
+  static ChangeSet changeSet(DropColumn... drops) {
     ChangeSet changeSet = new ChangeSet();
-    changeSet.getChangeSetChildren().add(drop1);
-    changeSet.getChangeSetChildren().add(drop2);
-
-    PendingDrops pendingDrops = new PendingDrops();
-    pendingDrops.add(MigrationVersion.parse("1.1"), changeSet);
-    pendingDrops.registerPendingHistoryDropColumns(modelContainer);
-
-    assertThat(modelContainer.drops).containsExactly(drop1);
-  }
-
-  class TDModelContainer extends ModelContainer {
-
-    List<DropColumn> drops = new ArrayList<DropColumn>();
-
-    @Override
-    public void registerPendingDropColumn(DropColumn dropColumn) {
-      drops.add(dropColumn);
+    for (DropColumn dropColumn : drops) {
+      changeSet.getChangeSetChildren().add(dropColumn);
     }
+
+    return changeSet;
   }
+
+  static DropColumn col(String colName) {
+    return EntryTest.col(colName);
+  }
+
 }

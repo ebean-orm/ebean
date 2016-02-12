@@ -1,6 +1,7 @@
 package com.avaje.ebean.dbmigration.model;
 
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
+import com.avaje.ebean.dbmigration.migration.DropColumn;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -16,12 +17,10 @@ public class EntryTest {
     assertThat(entry.hasPendingDrops()).isFalse();
   }
 
-
   @Test
   public void test_when_normal() throws Exception {
 
-    PendingDrops.Entry entry = createEntry();
-    entry.add(new ChangeSet());
+    PendingDrops.Entry entry = createEntry(new ChangeSet());
 
     assertThat(entry.hasPendingDrops()).isTrue();
   }
@@ -29,11 +28,10 @@ public class EntryTest {
   @Test
   public void test_when_suppressOnly() throws Exception {
 
-    PendingDrops.Entry entry = createEntry();
-
     ChangeSet cs = new ChangeSet();
     cs.setSuppressDropsForever(Boolean.TRUE);
-    entry.add(cs);
+
+    PendingDrops.Entry entry = createEntry(cs);
 
     assertThat(entry.hasPendingDrops()).isFalse();
   }
@@ -41,12 +39,10 @@ public class EntryTest {
   @Test
   public void test_when_both() throws Exception {
 
-    PendingDrops.Entry entry = createEntry();
-
     ChangeSet cs = new ChangeSet();
     cs.setSuppressDropsForever(Boolean.TRUE);
-    entry.add(cs);
-    entry.add(new ChangeSet());
+
+    PendingDrops.Entry entry = createEntry(cs, new ChangeSet());
 
     assertThat(entry.hasPendingDrops()).isTrue();
   }
@@ -60,21 +56,19 @@ public class EntryTest {
   }
 
   @Test
-  public void test_containsSuppressForever_when_not() {
+  public void test_containsSuppressForever_when_notSuppress() {
 
-    PendingDrops.Entry entry = createEntry();
-    entry.add(new ChangeSet());
+    PendingDrops.Entry entry = createEntry(new ChangeSet());
 
     assertThat(entry.containsSuppressForever()).isFalse();
   }
 
   @Test
-  public void test_containsSuppressForever_when_does() {
+  public void test_containsSuppressForever_when_suppress() {
 
-    PendingDrops.Entry entry = createEntry();
     ChangeSet cs = new ChangeSet();
     cs.setSuppressDropsForever(Boolean.TRUE);
-    entry.add(cs);
+    PendingDrops.Entry entry = createEntry(cs);
 
     assertThat(entry.containsSuppressForever()).isTrue();
   }
@@ -82,45 +76,76 @@ public class EntryTest {
   @Test
   public void test_containsSuppressForever_when_mixed() {
 
-    PendingDrops.Entry entry = createEntry();
     ChangeSet cs = new ChangeSet();
     cs.setSuppressDropsForever(Boolean.TRUE);
-    entry.add(cs);
-    entry.add(new ChangeSet());
+
+    PendingDrops.Entry entry = createEntry(cs, new ChangeSet());
 
     assertThat(entry.containsSuppressForever()).isTrue();
   }
 
   @Test
-  public void test_removeDrops_when_empty() {
+  public void test_removeDrops_when_columnsMatch() {
 
-    PendingDrops.Entry entry = createEntry();
-    assertThat(entry.removeDrops()).isTrue();
+    ChangeSet pending = changeSet("one", "two");
+
+    PendingDrops.Entry entry = createEntry(pending);
+
+    assertThat(entry.removeDrops(changeSet("one","two"))).isTrue();
+    assertThat(entry.list).asList().doesNotContain(pending);
   }
 
   @Test
-  public void test_removeDrops_when_notSuppressed() {
+  public void test_removeDrops_when_subset() {
 
-    PendingDrops.Entry entry = createEntry();
-    entry.add(new ChangeSet());
-    assertThat(entry.removeDrops()).isTrue();
+    DropColumn dropColumnTwo = col("two");
+    ChangeSet pending = changeSet("one");
+    pending.getChangeSetChildren().add(dropColumnTwo);
+
+    PendingDrops.Entry entry = createEntry(pending);
+
+    assertThat(entry.removeDrops(changeSet("one"))).isFalse();
+    assertThat(entry.list).asList().containsExactly(pending);
+    assertThat(pending.getChangeSetChildren()).asList().containsExactly(dropColumnTwo);
   }
 
   @Test
-  public void test_removeDrops_when_containsSuppressed() {
+  public void test_removeDrops_when_columnsMatch_butSuppressed() {
 
-    PendingDrops.Entry entry = createEntry();
-    entry.add(new ChangeSet());
+    ChangeSet pending = changeSet("one", "two");
+    pending.setSuppressDropsForever(Boolean.TRUE);
+
+    PendingDrops.Entry entry = createEntry(pending);
+
+    assertThat(entry.removeDrops(changeSet("one","two"))).isFalse();
+    assertThat(entry.list).asList().contains(pending);
+    assertThat(pending.getChangeSetChildren()).asList().hasSize(2);
+
+  }
+
+  static ChangeSet changeSet(String... colName) {
+
     ChangeSet cs = new ChangeSet();
-    cs.setSuppressDropsForever(Boolean.TRUE);
-    entry.add(cs);
+    for (String col : colName) {
+      cs.getChangeSetChildren().add(col(col));
+    }
+    return cs;
+  }
 
-    assertThat(entry.removeDrops()).isFalse();
+  static DropColumn col(String colName) {
+    DropColumn drop = new DropColumn();
+    drop.setColumnName(colName);
+    drop.setTableName("tab");
+    return drop;
   }
 
   @NotNull
-  private PendingDrops.Entry createEntry() {
-    MigrationVersion version = MigrationVersion.parse("1.1");
-    return new PendingDrops.Entry(version);
+  static PendingDrops.Entry createEntry(ChangeSet... pending) {
+
+    PendingDrops.Entry entry = new PendingDrops.Entry(MigrationVersion.parse("1.1"));
+    for (ChangeSet changeSet: pending) {
+      entry.add(changeSet);
+    }
+    return entry;
   }
 }

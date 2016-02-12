@@ -356,8 +356,9 @@ public class MTable {
     return withHistory;
   }
 
-  public void setWithHistory(boolean withHistory) {
+  public MTable setWithHistory(boolean withHistory) {
     this.withHistory = withHistory;
+    return this;
   }
 
   public List<String> allHistoryColumns(boolean includeDropped) {

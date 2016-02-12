@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+  <changeSet type="apply">
+    <addColumn tableName="document" withHistory="true">
+      <column name="boom" type="varchar(255)"/>
+      <column name="baz" type="varchar(255)"/>
+      <column name="bar" type="varchar(255)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet type="pendingDrops">
+    <dropColumn columnName="zing" tableName="document" withHistory="true"/>
+  </changeSet>
+</migration>

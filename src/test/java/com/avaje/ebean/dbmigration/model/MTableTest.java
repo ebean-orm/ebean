@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.*;
 
 public class MTableTest {
 
-  MTable base() {
+  static MTable base() {
     MTable table = new MTable("tab");
     table.addColumn(new MColumn("id","bigint"));
     table.addColumn(new MColumn("name","varchar(20)"));
@@ -23,7 +23,7 @@ public class MTableTest {
     return table;
   }
 
-  MTable newTable() {
+  static MTable newTable() {
     MTable table = new MTable("tab");
     table.addColumn(new MColumn("id","bigint"));
     table.addColumn(new MColumn("name","varchar(20)"));
@@ -32,7 +32,7 @@ public class MTableTest {
     return table;
   }
 
-  MTable newTableAdd2Columns() {
+  static MTable newTableAdd2Columns() {
     MTable table = new MTable("tab");
     table.addColumn(new MColumn("id","bigint"));
     table.addColumn(new MColumn("name","varchar(20)"));
@@ -42,7 +42,7 @@ public class MTableTest {
     return table;
   }
 
-  MTable newTableModifiedColumn() {
+  static MTable newTableModifiedColumn() {
     MColumn modCol = new MColumn("name", "varchar(30)");// modified type
     modCol.setNotnull(true);
 

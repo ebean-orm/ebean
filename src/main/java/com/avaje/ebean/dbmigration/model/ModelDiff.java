@@ -66,16 +66,14 @@ public class ModelDiff {
   public Migration getMigration() {
 
     Migration migration = new Migration();
-    ChangeSet applyChangeSet = getApplyChangeSet();
-    if (!applyChangeSet.getChangeSetChildren().isEmpty()) {
+    if (!applyChanges.isEmpty()) {
       // add a non empty apply changeSet
-      migration.getChangeSet().add(applyChangeSet);
+      migration.getChangeSet().add(getApplyChangeSet());
     }
 
-    ChangeSet dropChangeSet = getDropChangeSet();
-    if (!dropChangeSet.getChangeSetChildren().isEmpty()) {
+    if (!dropChanges.isEmpty()) {
       // add a non empty drop changeSet
-      migration.getChangeSet().add(dropChangeSet);
+      migration.getChangeSet().add(getDropChangeSet());
     }
     return migration;
   }
@@ -83,14 +81,14 @@ public class ModelDiff {
   /**
    * Return the list of 'apply' changes.
    */
-  public List<Object> getApplyChanges() {
+  List<Object> getApplyChanges() {
     return applyChanges;
   }
 
   /**
    * Return the list of 'drop' changes.
    */
-  public List<Object> getDropChanges() {
+  List<Object> getDropChanges() {
     return dropChanges;
   }
 
@@ -108,7 +106,7 @@ public class ModelDiff {
   /**
    * Return the 'drop' changeSet.
    */
-  public ChangeSet getDropChangeSet() {
+  ChangeSet getDropChangeSet() {
     // put the changes into a ChangeSet
     ChangeSet createChangeSet = new ChangeSet();
     createChangeSet.setType(ChangeSetType.PENDING_DROPS);
@@ -156,7 +154,12 @@ public class ModelDiff {
       }
     }
 
+    // register un-applied ones from the previous migrations
     baseModel.registerPendingHistoryDropColumns(newModel);
+    if (!dropChanges.isEmpty()) {
+      // register new ones created just now as part of this diff
+      newModel.registerPendingHistoryDropColumns(getDropChangeSet());
+    }
   }
 
   protected void addDropTable(MTable existingTable) {

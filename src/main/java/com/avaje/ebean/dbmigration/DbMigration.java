@@ -220,6 +220,9 @@ public class DbMigration {
     }
   }
 
+  /**
+   * Generate the diff migration.
+   */
   private void generateDiff(Request request) throws IOException {
 
     List<String> pendingDrops = request.getPendingDrops();
@@ -227,15 +230,18 @@ public class DbMigration {
       logger.info("Pending un-applied drops in versions {}", pendingDrops);
     }
 
-    ModelDiff diff = request.createDiff();
-    if (diff.isEmpty()) {
+    Migration migration = request.createDiffMigration();
+    if (migration == null) {
       logger.info("no changes detected - no migration written");
     } else {
       // there were actually changes to write
-      generateMigration(request, diff.getMigration(), null);
+      generateMigration(request, migration, null);
     }
   }
 
+  /**
+   * Generate the migration based on the pendingDrops from a prior version.
+   */
   private void generatePendingDrop(Request request, String pendingVersion) throws IOException {
 
     Migration migration = request.migrationForPendingDrop(pendingVersion);
@@ -290,12 +296,12 @@ public class DbMigration {
     }
 
     /**
-     * Create an return the diff of the current model to the migration model.
+     * Create and return the diff of the current model to the migration model.
      */
-    public ModelDiff createDiff() {
+    public Migration createDiffMigration() {
       ModelDiff diff = new ModelDiff(migrated);
       diff.compareTo(current);
-      return diff;
+      return diff.isEmpty() ? null : diff.getMigration();
     }
   }
 
