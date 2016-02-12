@@ -37,4 +37,28 @@ public class DefaultOrmQueryTest {
     assertThat(hash1).isNotEqualTo(hash2);
 
   }
+
+  @Test
+  public void test_AutofetchHash_diffFirstRows() throws Exception {
+
+    SpiQuery<?> query1 = (SpiQuery<?>)Ebean.find(Order.class)
+        .setFirstRow(0)
+        .setMaxRows(31);
+
+    HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
+    query1.queryAutoTuneHash(b1);
+    HashQueryPlan hash1 = b1.build();
+
+    SpiQuery<?> query2 = (SpiQuery<?>)Ebean.find(Order.class)
+        .setFirstRow(1)
+        .setMaxRows(0);
+
+    HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
+    query2.queryAutoTuneHash(b2);
+    HashQueryPlan hash2 = b2.build();
+
+    assertThat(hash1).isNotEqualTo(hash2);
+
+  }
+
 }
