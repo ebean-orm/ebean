@@ -25,6 +25,7 @@
       </xsd:sequence>
       <xsd:attribute name="type" type="changeSetType" use="required"/>
       <xsd:attribute name="dropsFor" type="xsd:string"/>
+      <xsd:attribute name="suppressDropsForever" type="xsd:boolean"/>
       <xsd:attribute name="generated" type="xsd:boolean"/>
       <xsd:attribute name="author" type="xsd:string"/>
       <xsd:attribute name="comment" type="xsd:string"/>

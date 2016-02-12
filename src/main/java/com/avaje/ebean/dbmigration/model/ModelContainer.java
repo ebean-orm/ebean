@@ -92,9 +92,9 @@ public class ModelContainer {
       if (pending) {
         // un-applied drop columns etc
         pendingDrops.add(version, changeSet);
+
       } else if (isDropsFor(changeSet)) {
-        // applied drops (so no longer pending)
-        pendingDrops.remove(MigrationVersion.parse(changeSet.getDropsFor()));
+        pendingDrops.appliedDropsFor(MigrationVersion.parse(changeSet.getDropsFor()));
       }
       if (!isDropsFor(changeSet)) {
         applyChangeSet(changeSet);
@@ -263,13 +263,6 @@ public class ModelContainer {
   public void addIndex(String indexName, String tableName, String[] columnNames) {
 
     indexes.put(indexName, new MIndex(indexName, tableName, columnNames));
-  }
-
-  /**
-   * Return true if there are pending drops.
-   */
-  public boolean hasPendingDrops() {
-    return !pendingDrops.isEmpty();
   }
 
   /**

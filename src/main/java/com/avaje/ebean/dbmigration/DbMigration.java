@@ -222,8 +222,9 @@ public class DbMigration {
 
   private void generateDiff(Request request) throws IOException {
 
-    if (request.hasPendingDrops()) {
-      logger.info("Pending un-applied drops in versions {}", request.getPendingDrops());
+    List<String> pendingDrops = request.getPendingDrops();
+    if (!pendingDrops.isEmpty()) {
+      logger.info("Pending un-applied drops in versions {}", pendingDrops);
     }
 
     ModelDiff diff = request.createDiff();
@@ -240,8 +241,10 @@ public class DbMigration {
     Migration migration = request.migrationForPendingDrop(pendingVersion);
 
     generateMigration(request, migration, pendingVersion);
-    if (request.hasPendingDrops()) {
-      logger.info("... remaining pending un-applied drops in versions {}", request.getPendingDrops());
+
+    List<String> pendingDrops = request.getPendingDrops();
+    if (!pendingDrops.isEmpty()) {
+      logger.info("... remaining pending un-applied drops in versions {}", pendingDrops);
     }
   }
 
@@ -265,13 +268,6 @@ public class DbMigration {
       this.migrated = migrationModel.read();
       this.currentModel = new CurrentModel(server, constraintNaming);
       this.current = currentModel.read();
-    }
-
-    /**
-     * Return true if there are pending un-applied drops.
-     */
-    public boolean hasPendingDrops() {
-      return migrated.hasPendingDrops();
     }
 
     /**

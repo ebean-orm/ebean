@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;/sequence>
  *       &lt;attribute name="type" use="required" type="{http://ebean-orm.github.io/xml/ns/dbmigration}changeSetType" />
  *       &lt;attribute name="dropsFor" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="suppressDropsForever" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="generated" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="author" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -65,6 +66,8 @@ public class ChangeSet {
     protected ChangeSetType type;
     @XmlAttribute(name = "dropsFor")
     protected String dropsFor;
+    @XmlAttribute(name = "suppressDropsForever")
+    protected Boolean suppressDropsForever;
     @XmlAttribute(name = "generated")
     protected Boolean generated;
     @XmlAttribute(name = "author")
@@ -159,6 +162,30 @@ public class ChangeSet {
      */
     public void setDropsFor(String value) {
         this.dropsFor = value;
+    }
+
+    /**
+     * Gets the value of the suppressDropsForever property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isSuppressDropsForever() {
+        return suppressDropsForever;
+    }
+
+    /**
+     * Sets the value of the suppressDropsForever property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setSuppressDropsForever(Boolean value) {
+        this.suppressDropsForever = value;
     }
 
     /**
