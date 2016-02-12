@@ -12,7 +12,7 @@ public class HashQueryPlanBuilder {
   private String rawSql;
   
   public HashQueryPlanBuilder() {
-    this.planHash = 31;
+    this.planHash = 92821;
   }
 
   public String toString() {
@@ -23,7 +23,7 @@ public class HashQueryPlanBuilder {
    * Add a class to the hash calculation.
    */
   public HashQueryPlanBuilder add(Class<?> cls) {
-    planHash = planHash * 31 + cls.getName().hashCode();
+    planHash = planHash * 92821 + cls.getName().hashCode();
     return this;
   }
 
@@ -31,7 +31,7 @@ public class HashQueryPlanBuilder {
    * Add an object to the hash calculation.
    */
   public HashQueryPlanBuilder add(Object object) {
-    planHash = planHash * 31 + (object == null ? 0 : object.hashCode());
+    planHash = planHash * 92821 + (object == null ? 0 : object.hashCode());
     return this;
   }
 
@@ -39,7 +39,7 @@ public class HashQueryPlanBuilder {
    * Add an integer to the hash calculation.
    */
   public HashQueryPlanBuilder add(int hashValue) {
-    planHash = planHash * 31 + (hashValue);
+    planHash = planHash * 92821 + (hashValue);
     return this;
   }
   
@@ -47,7 +47,7 @@ public class HashQueryPlanBuilder {
    * Add a boolean to the hash calculation.
    */
   public HashQueryPlanBuilder add(boolean booleanValue) {
-    planHash = planHash * 31 + (booleanValue ? 31 : 0);
+    planHash = planHash * 92821 + (booleanValue ? 92821 : 0);
     return this;
   }
   
