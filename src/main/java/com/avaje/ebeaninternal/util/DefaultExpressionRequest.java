@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.util;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -20,7 +21,7 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
 
   private final StringBuilder sql = new StringBuilder();
 
-  private final ArrayList<Object> bindValues = new ArrayList<Object>();
+  private final List<Object> bindValues = new ArrayList<Object>();
 
   private final DeployParser deployParser;
 
@@ -140,7 +141,7 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
     return sql.toString();
   }
 
-  public ArrayList<Object> getBindValues() {
+  public List<Object> getBindValues() {
     return bindValues;
   }
 

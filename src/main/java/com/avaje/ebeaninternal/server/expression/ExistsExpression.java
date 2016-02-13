@@ -21,7 +21,9 @@ public class ExistsExpression implements SpiExpression {
 
   private final SpiQuery<?> subQuery;
 
-  private transient CQuery<?> compiledSubQuery;
+  private List<Object> bindParams;
+
+  private String sql;
 
   public ExistsExpression(SpiQuery<?> subQuery, boolean not) {
     this.subQuery = subQuery;
@@ -30,24 +32,24 @@ public class ExistsExpression implements SpiExpression {
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-    // queryPlanHash executes prior to addSql() or addBindValues()
-    // ... so compiledQuery will exist
-    compiledSubQuery = compileSubQuery(request);
-  }
 
-  @Override
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(ExistsExpression.class).add(not);
-    subQuery.queryAutoTuneHash(builder);
+    CQuery<?> subQuery = compileSubQuery(request);
+    this.bindParams = subQuery.getPredicates().getWhereExprBindValues();
+    this.sql = subQuery.getGeneratedSql().replace('\n', ' ');
   }
 
   /**
    * Compile/build the sub query.
    */
   private CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
-
     SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.getEbeanServer();
     return ebeanServer.compileQuery(subQuery, queryRequest.getTransaction());
+  }
+
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
+    builder.add(ExistsExpression.class).add(not);
+    builder.add(sql).add(bindParams.size());
   }
 
   @Override
@@ -58,25 +60,16 @@ public class ExistsExpression implements SpiExpression {
   @Override
   public void addSql(SpiExpressionRequest request) {
 
-    String subSelect = compiledSubQuery.getGeneratedSql();
-    subSelect = subSelect.replace('\n', ' ');
-
     if (not) {
       request.append(" not");
     }
     request.append(" exists (");
-    request.append(subSelect);
+    request.append(sql);
     request.append(") ");
   }
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-
-    List<Object> bindParams = compiledSubQuery.getPredicates().getWhereExprBindValues();
-
-    if (bindParams == null) {
-      return;
-    }
 
     for (int i = 0; i < bindParams.size(); i++) {
       request.addBindValue(bindParams.get(i));

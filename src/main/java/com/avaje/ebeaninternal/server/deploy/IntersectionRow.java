@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.avaje.ebean.EbeanServer;
@@ -98,7 +99,7 @@ public class IntersectionRow {
       sb.append(er.getSql());
       sb.append(" ) ");
 
-      ArrayList<Object> bindValues = er.getBindValues();
+      List<Object> bindValues = er.getBindValues();
       for (int i = 0; i < bindValues.size(); i++) {
         bindParams.setParameter(++count, bindValues.get(i));
       }

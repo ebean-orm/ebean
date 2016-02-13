@@ -20,7 +20,9 @@ class InQueryExpression extends AbstractExpression {
 
   private final SpiQuery<?> subQuery;
 
-  private transient CQuery<?> compiledSubQuery;
+  private List<Object> bindParams;
+
+  private String sql;
 
   public InQueryExpression(String propertyName, SpiQuery<?> subQuery, boolean not) {
     super(propertyName);
@@ -30,13 +32,16 @@ class InQueryExpression extends AbstractExpression {
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-    compiledSubQuery = compileSubQuery(request);
+
+    CQuery<?> subQuery = compileSubQuery(request);
+    this.bindParams = subQuery.getPredicates().getWhereExprBindValues();
+    this.sql = subQuery.getGeneratedSql().replace('\n', ' ');
   }
 
   @Override
   public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(InQueryExpression.class).add(propName).add(not);
-    subQuery.queryAutoTuneHash(builder);
+    builder.add(sql).add(bindParams.size());
   }
 
   /**
@@ -56,27 +61,17 @@ class InQueryExpression extends AbstractExpression {
   @Override
   public void addSql(SpiExpressionRequest request) {
 
-    String subSelect = compiledSubQuery.getGeneratedSql();
-    subSelect = subSelect.replace('\n', ' ');
-
-    String propertyName = getPropertyName();
-    request.append(" (").append(propertyName).append(")");
+    request.append(" (").append(getPropertyName()).append(")");
     if (not) {
       request.append(" not");
     }
     request.append(" in (");
-    request.append(subSelect);
+    request.append(sql);
     request.append(") ");
   }
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-
-    List<Object> bindParams = compiledSubQuery.getPredicates().getWhereExprBindValues();
-
-    if (bindParams == null) {
-      return;
-    }
 
     for (int i = 0; i < bindParams.size(); i++) {
       request.addBindValue(bindParams.get(i));

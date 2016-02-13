@@ -340,7 +340,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public ArrayList<Object> buildBindValues(SpiExpressionRequest request) {
+  public List<Object> buildBindValues(SpiExpressionRequest request) {
 
     for (int i = 0, size = list.size(); i < size; i++) {
       SpiExpression expression = list.get(i);
