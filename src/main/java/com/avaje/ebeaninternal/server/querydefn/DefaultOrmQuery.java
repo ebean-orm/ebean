@@ -759,13 +759,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Calculate the query hash for either AutoTune query tuning or Query Plan caching.
    */
-  private HashQueryPlan calculateHash(HashQueryPlanBuilder builder) {
+  HashQueryPlan calculateQueryPlanHash() {
 
     // exclude bind values and things unrelated to the sql being generated
-
-    if (builder == null) {
-      builder = new HashQueryPlanBuilder();
-    }
+    HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
 
     builder.add((type == null ? 0 : type.ordinal() + 1));
     builder.add(autoTuned).add(distinct).add(sqlDistinct).add(query);
@@ -797,15 +794,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   /**
-   * Calculate a hash used by AutoTune to identify when a query has changed (and hence potentially
-   * needs a new tuned query plan to be developed).
-   */
-  public HashQueryPlan queryAutoTuneHash(HashQueryPlanBuilder builder) {
-
-    return calculateHash(builder);
-  }
-
-  /**
    * Calculate a hash that should be unique for the generated SQL across a given bean type.
    * <p>
    * This can used to enable the caching and reuse of a 'query plan'.
@@ -818,7 +806,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
     prepareExpressions(request);
 
-    queryPlanHash = calculateHash(null);
+    queryPlanHash = calculateQueryPlanHash();
     return queryPlanHash;
   }
 

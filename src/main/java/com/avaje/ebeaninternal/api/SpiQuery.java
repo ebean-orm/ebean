@@ -467,16 +467,6 @@ public interface SpiQuery<T> extends Query<T> {
   String getName();
 
   /**
-   * Calculate a hash used by AutoTune to identify when a query has changed
-   * (and hence potentially needs a new tuned query plan to be developed).
-   * <p>
-   * Excludes bind values and occurs prior to AutoTune potentially
-   * tuning/modifying the query.
-   * </p>
-   */
-  HashQueryPlan queryAutoTuneHash(HashQueryPlanBuilder builder);
-
-  /**
    * Identifies queries that are the same bar the bind variables.
    * <p>
    * This is used AFTER AutoTune has potentially tuned the query. This is
