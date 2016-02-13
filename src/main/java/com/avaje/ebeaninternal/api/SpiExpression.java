@@ -17,32 +17,26 @@ public interface SpiExpression extends Expression {
    * </p>
    */
 	void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins);
-	
-	/**
+
+  /**
+   * Prepare the expression. For example, compile sub-query expressions etc.
+   */
+  void prepareExpression(BeanQueryRequest<?> request);
+
+  /**
 	 * Calculate a hash value used to identify a query for AutoTune tuning.
 	 * <p>
 	 * That is, if the hash changes then the query will be considered different
 	 * from an AutoTune perspective and get different tuning.
 	 * </p>
 	 */
-	void queryAutoTuneHash(HashQueryPlanBuilder builder);
-	
-	/**
-	 * Calculate a hash value for the expression.
-	 * This includes the expression type and property but should exclude
-	 * the bind values.
-	 * <p>
-	 * This is used where queries are the same except for the bind values, in which
-	 * case the query execution plan can be reused.
-	 * </p>
-	 */
-	void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder);
-	
+	void queryPlanHash(HashQueryPlanBuilder builder);
+
 	/**
 	 * Return the hash value for the values that will be bound.
 	 */
 	int queryBindHash();
-	
+
 	/**
 	 * Add some sql to the query.
 	 * <p>
@@ -61,7 +55,7 @@ public interface SpiExpression extends Expression {
 	/**
 	 * Add the parameter values to be set against query. For each ? place holder
 	 * there should be a corresponding value that is added to the bindList.
-	 * 
+	 *
 	 * @param request
 	 *            the associated request.
 	 */

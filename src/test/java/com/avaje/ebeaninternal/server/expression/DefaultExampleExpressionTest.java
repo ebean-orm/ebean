@@ -42,8 +42,10 @@ public class DefaultExampleExpressionTest extends BaseTestCase {
 
 
     BeanQueryRequest<?> request = create(query, desc);
+    expr.prepareExpression(request);
+
     HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
-    expr.queryPlanHash(request, builder);
+    expr.queryPlanHash(builder);
 
     TDSpiExpressionRequest req = new TDSpiExpressionRequest(desc);
     expr.addBindValues(req);

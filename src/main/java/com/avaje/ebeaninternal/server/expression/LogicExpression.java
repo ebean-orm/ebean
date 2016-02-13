@@ -74,19 +74,19 @@ abstract class LogicExpression implements SpiExpression {
     request.append(") ");
   }
 
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
+    expOne.prepareExpression(request);
+    expTwo.prepareExpression(request);
+  }
+
   /**
    * Based on the joinType plus the two expressions.
    */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(LogicExpression.class).add(joinType);
-    expOne.queryAutoTuneHash(builder);
-    expTwo.queryAutoTuneHash(builder);
-  }
-
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    builder.add(LogicExpression.class).add(joinType);
-    expOne.queryPlanHash(request, builder);
-    expTwo.queryPlanHash(request, builder);
+    expOne.queryPlanHash(builder);
+    expTwo.queryPlanHash(builder);
   }
 
   public int queryBindHash() {

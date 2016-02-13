@@ -1,12 +1,11 @@
 package com.avaje.ebeaninternal.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.avaje.ebean.ExpressionFactory;
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+
+import java.util.List;
 
 /**
  * Internal extension of ExpressionList.
@@ -59,13 +58,18 @@ public interface SpiExpressionList<T> extends ExpressionList<T> {
 	 * 
 	 * @return the list of all the bind values in order.
 	 */
-	ArrayList<Object> buildBindValues(SpiExpressionRequest request);
-	
+	List<Object> buildBindValues(SpiExpressionRequest request);
+
+  /**
+   * Prepare the expressions contained in the list. For example, compile sub-query expressions etc.
+   */
+  void prepareExpression(BeanQueryRequest<?> request);
+
   /**
    * Calculate a hash based on the expressions but excluding the actual bind
    * values.
    */
-  void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder);
+  void queryPlanHash(HashQueryPlanBuilder builder);
 
   /**
    * Validate all the properties/paths used in this expression list.

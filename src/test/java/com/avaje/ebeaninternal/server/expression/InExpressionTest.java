@@ -20,10 +20,10 @@ public class InExpressionTest {
     InExpression ex2 = new InExpression("bar", values, false);
 
     HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
-    ex1.queryPlanHash(null, b1);
+    ex1.queryPlanHash(b1);
 
     HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
-    ex2.queryPlanHash(null, b2);
+    ex2.queryPlanHash(b2);
 
     assertNotEquals(b1.build(), b2.build());
   }
@@ -38,10 +38,10 @@ public class InExpressionTest {
     InExpression ex2 = new InExpression("foo", values2, false);
 
     HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
-    ex1.queryPlanHash(null, b1);
+    ex1.queryPlanHash(b1);
 
     HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
-    ex2.queryPlanHash(null, b2);
+    ex2.queryPlanHash(b2);
 
     assertNotEquals(b1.build(), b2.build());
   }
@@ -55,10 +55,10 @@ public class InExpressionTest {
     InExpression ex2 = new InExpression("foo", values, false);
 
     HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
-    ex1.queryPlanHash(null, b1);
+    ex1.queryPlanHash(b1);
 
     HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
-    ex2.queryPlanHash(null, b2);
+    ex2.queryPlanHash(b2);
 
     assertNotEquals(b1.build(), b2.build());
   }
@@ -72,10 +72,10 @@ public class InExpressionTest {
     InExpression ex2 = new InExpression("foo", values, true);
 
     HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
-    ex1.queryPlanHash(null, b1);
+    ex1.queryPlanHash(b1);
 
     HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
-    ex2.queryPlanHash(null, b2);
+    ex2.queryPlanHash(b2);
 
     assertEquals(b1.build(), b2.build());
   }

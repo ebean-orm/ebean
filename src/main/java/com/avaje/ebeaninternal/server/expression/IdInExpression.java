@@ -1,21 +1,19 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import java.util.List;
-
-import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
-import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.util.DefaultExpressionRequest;
 
+import java.util.List;
+
 /**
  * Slightly redundant as Query.setId() ultimately also does the same job.
  */
-public class IdInExpression implements SpiExpression {
+public class IdInExpression extends NonPrepareExpression {
 
   private static final long serialVersionUID = 1L;
 
@@ -25,6 +23,7 @@ public class IdInExpression implements SpiExpression {
     this.idList = idList;
   }
 
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
   }
 
@@ -33,6 +32,7 @@ public class IdInExpression implements SpiExpression {
     // always valid
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
 
     // Bind the Id values including EmbeddedId and multiple Id
@@ -60,6 +60,7 @@ public class IdInExpression implements SpiExpression {
     request.append(inClause);
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
@@ -74,15 +75,13 @@ public class IdInExpression implements SpiExpression {
   /**
    * Incorporates the number of Id values to bind.
    */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(IdInExpression.class).add(idList.size());
     builder.bind(idList.size());
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoTuneHash(builder);
-  }
-
+  @Override
   public int queryBindHash() {
     return idList.hashCode();
   }

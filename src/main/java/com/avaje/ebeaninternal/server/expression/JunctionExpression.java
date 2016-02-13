@@ -131,24 +131,23 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     }
   }
 
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
+    List<SpiExpression> list = exprList.internalList();
+    for (int i = 0; i < list.size(); i++) {
+      list.get(i).prepareExpression(request);
+    }
+  }
+
   /**
    * Based on Junction type and all the expression contained.
    */
   @Override
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(JunctionExpression.class).add(joinType);
     List<SpiExpression> list = exprList.internalList();
     for (int i = 0; i < list.size(); i++) {
-      list.get(i).queryAutoTuneHash(builder);
-    }
-  }
-
-  @Override
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    builder.add(JunctionExpression.class).add(joinType);
-    List<SpiExpression> list = exprList.internalList();
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).queryPlanHash(request, builder);
+      list.get(i).queryPlanHash(builder);
     }
   }
 

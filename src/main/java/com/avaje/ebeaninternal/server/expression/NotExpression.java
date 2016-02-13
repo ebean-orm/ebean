@@ -40,17 +40,18 @@ final class NotExpression implements SpiExpression {
     request.append(") ");
   }
 
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
+    exp.prepareExpression(request);
+  }
+
   /**
    * Based on the expression.
    */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(NotExpression.class);
-    exp.queryAutoTuneHash(builder);
-  }
-
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    builder.add(NotExpression.class);
-    exp.queryPlanHash(request, builder);
+    exp.queryPlanHash(builder);
   }
 
   public int queryBindHash() {

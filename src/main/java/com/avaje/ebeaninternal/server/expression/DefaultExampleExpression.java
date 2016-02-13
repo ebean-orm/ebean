@@ -86,6 +86,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
     this.likeType = likeType;
   }
 
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
     if (list != null) {
       for (int i = 0; i < list.size(); i++) {
@@ -94,31 +95,37 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
     }
   }
 
+  @Override
   public ExampleExpression includeZeros() {
     includeZeros = true;
     return this;
   }
 
+  @Override
   public ExampleExpression caseInsensitive() {
     caseInsensitive = true;
     return this;
   }
 
+  @Override
   public ExampleExpression useStartsWith() {
     likeType = LikeType.STARTS_WITH;
     return this;
   }
 
+  @Override
   public ExampleExpression useContains() {
     likeType = LikeType.CONTAINS;
     return this;
   }
 
+  @Override
   public ExampleExpression useEndsWith() {
     likeType = LikeType.ENDS_WITH;
     return this;
   }
 
+  @Override
   public ExampleExpression useEqualTo() {
     likeType = LikeType.EQUAL_TO;
     return this;
@@ -134,6 +141,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   /**
    * Adds bind values to the request.
    */
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
 
     for (int i = 0; i < list.size(); i++) {
@@ -145,6 +153,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   /**
    * Generates and adds the sql to the request.
    */
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
     if (!list.isEmpty()) {
@@ -162,34 +171,27 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
     }
   }
 
-  /**
-   * Return a hash for AutoTune query identification.
-   */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
-    // we have not yet built the list of expressions
-    // so just based on the class name
-    builder.add(DefaultExampleExpression.class);
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
+    list = buildExpressions(request);
   }
 
   /**
-   * Return a hash for query plan identification.
+   * Return a hash for AutoTune query identification.
    */
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-
-    // this is always called once, and always called before
-    // addSql() and addBindValues() methods
-    list = buildExpressions(request);
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
 
     builder.add(DefaultExampleExpression.class);
-
     for (int i = 0; i < list.size(); i++) {
-      list.get(i).queryPlanHash(request, builder);
+      list.get(i).queryPlanHash(builder);
     }
   }
 
   /**
    * Return a hash for the actual bind values used.
    */
+  @Override
   public int queryBindHash() {
     int hc = DefaultExampleExpression.class.getName().hashCode();
     for (int i = 0; i < list.size(); i++) {

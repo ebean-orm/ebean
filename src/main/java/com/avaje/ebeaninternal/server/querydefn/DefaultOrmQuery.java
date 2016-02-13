@@ -759,7 +759,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Calculate the query hash for either AutoTune query tuning or Query Plan caching.
    */
-  private HashQueryPlan calculateHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+  private HashQueryPlan calculateHash(HashQueryPlanBuilder builder) {
 
     // exclude bind values and things unrelated to the sql being generated
 
@@ -780,31 +780,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     builder.add(rootTableAlias);
 
     if (detail != null) {
-      detail.queryPlanHash(request, builder);
+      detail.queryPlanHash(builder);
     }
     if (bindParams != null) {
       bindParams.buildQueryPlanHash(builder);
     }
 
-    if (request == null) {
-      // for AutoTune...
-      builder.add(true);
-      if (whereExpressions != null) {
-        whereExpressions.queryAutoTuneHash(builder);
-      }
-      if (havingExpressions != null) {
-        havingExpressions.queryAutoTuneHash(builder);
-      }
-
-    } else {
-      // for query plan...
-      builder.add(false);
-      if (whereExpressions != null) {
-        whereExpressions.queryPlanHash(request, builder);
-      }
-      if (havingExpressions != null) {
-        havingExpressions.queryPlanHash(request, builder);
-      }
+    if (whereExpressions != null) {
+      whereExpressions.queryPlanHash(builder);
+    }
+    if (havingExpressions != null) {
+      havingExpressions.queryPlanHash(builder);
     }
 
     return builder.build();
@@ -816,7 +802,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   public HashQueryPlan queryAutoTuneHash(HashQueryPlanBuilder builder) {
 
-    return calculateHash(null, builder);
+    return calculateHash(builder);
   }
 
   /**
@@ -830,8 +816,23 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   public HashQueryPlan queryPlanHash(BeanQueryRequest<?> request) {
 
-    queryPlanHash = calculateHash(request, null);
+    prepareExpressions(request);
+
+    queryPlanHash = calculateHash(null);
     return queryPlanHash;
+  }
+
+  /**
+   * Prepare the expressions (compile sub-queries etc).
+   */
+  private void prepareExpressions(BeanQueryRequest<?> request) {
+
+    if (whereExpressions != null) {
+      whereExpressions.prepareExpression(request);
+    }
+    if (havingExpressions != null) {
+      havingExpressions.prepareExpression(request);
+    }
   }
 
   /**

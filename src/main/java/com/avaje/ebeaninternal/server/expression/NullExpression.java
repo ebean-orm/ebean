@@ -20,10 +20,12 @@ class NullExpression extends AbstractExpression {
     this.notNull = notNull;
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
 
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
     String propertyName = getPropertyName();
@@ -42,14 +44,12 @@ class NullExpression extends AbstractExpression {
   /**
    * Based on notNull flag and the propertyName.
    */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(NullExpression.class).add(notNull).add(propName);
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoTuneHash(builder);
-  }
-
+  @Override
   public int queryBindHash() {
     return (notNull ? 1 : 0);
   }

@@ -28,19 +28,17 @@ public class ExistsExpression implements SpiExpression {
     this.not = not;
   }
 
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
-    builder.add(ExistsExpression.class).add(not);
-
-    subQuery.queryAutoTuneHash(builder);
-  }
-
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
     // queryPlanHash executes prior to addSql() or addBindValues()
     // ... so compiledQuery will exist
     compiledSubQuery = compileSubQuery(request);
+  }
 
-    queryAutoTuneHash(builder);
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
+    builder.add(ExistsExpression.class).add(not);
+    subQuery.queryAutoTuneHash(builder);
   }
 
   /**
@@ -52,10 +50,12 @@ public class ExistsExpression implements SpiExpression {
     return ebeanServer.compileQuery(subQuery, queryRequest.getTransaction());
   }
 
+  @Override
   public int queryBindHash() {
     return subQuery.queryBindHash();
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
     String subSelect = compiledSubQuery.getGeneratedSql();
@@ -69,6 +69,7 @@ public class ExistsExpression implements SpiExpression {
     request.append(") ");
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
 
     List<Object> bindParams = compiledSubQuery.getPredicates().getWhereExprBindValues();

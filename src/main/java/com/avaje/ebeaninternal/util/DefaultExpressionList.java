@@ -349,15 +349,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return request.getBindValues();
   }
 
-  /**
-   * Calculate a hash based on the expressions but excluding the actual bind
-   * values.
-   */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
-    builder.add(DefaultExpressionList.class);
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
     for (int i = 0, size = list.size(); i < size; i++) {
-      SpiExpression expression = list.get(i);
-      expression.queryAutoTuneHash(builder);
+      list.get(i).prepareExpression(request);
     }
   }
 
@@ -366,11 +361,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * values.
    */
   @Override
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(DefaultExpressionList.class);
     for (int i = 0, size = list.size(); i < size; i++) {
-      SpiExpression expression = list.get(i);
-      expression.queryPlanHash(request, builder);
+      list.get(i).queryPlanHash(builder);
     }
   }
 
@@ -380,8 +374,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   public int queryBindHash() {
     int hash = DefaultExpressionList.class.getName().hashCode();
     for (int i = 0, size = list.size(); i < size; i++) {
-      SpiExpression expression = list.get(i);
-      hash = hash * 31 + expression.queryBindHash();
+      hash = hash * 31 + list.get(i).queryBindHash();
     }
     return hash;
   }

@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
@@ -12,7 +11,7 @@ import com.avaje.ebeaninternal.util.DefaultExpressionRequest;
 /**
  * Slightly redundant as Query.setId() ultimately also does the same job.
  */
-class IdExpression implements SpiExpression {
+class IdExpression extends NonPrepareExpression implements SpiExpression {
 
   private static final long serialVersionUID = -3065936341718489842L;
 
@@ -25,6 +24,7 @@ class IdExpression implements SpiExpression {
   /**
    * Always returns false.
    */
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
 
   }
@@ -34,6 +34,7 @@ class IdExpression implements SpiExpression {
     // always valid
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
 
     // 'flatten' EmbeddedId and multiple Id cases
@@ -45,6 +46,7 @@ class IdExpression implements SpiExpression {
     }
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
@@ -56,15 +58,13 @@ class IdExpression implements SpiExpression {
   /**
    * No properties so this is just a unique static number.
    */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(IdExpression.class);
     builder.bind(1);
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoTuneHash(builder);
-  }
-
+  @Override
   public int queryBindHash() {
     return value.hashCode();
   }

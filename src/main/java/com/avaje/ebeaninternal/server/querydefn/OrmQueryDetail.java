@@ -1,5 +1,14 @@
 package com.avaje.ebeaninternal.server.querydefn;
 
+import com.avaje.ebean.FetchConfig;
+import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
+import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
+import com.avaje.ebeaninternal.server.el.ElPropertyValue;
+import com.avaje.ebeaninternal.server.query.SplitName;
+
+import javax.persistence.PersistenceException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,17 +19,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.persistence.PersistenceException;
-
-import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.event.BeanQueryRequest;
-import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
-import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
-import com.avaje.ebeaninternal.server.el.ElPropertyValue;
-import com.avaje.ebeaninternal.server.query.SplitName;
 
 /**
  * Represents the internal structure of an Object Relational query.
@@ -65,17 +63,17 @@ public class OrmQueryDetail implements Serializable {
   /**
    * Calculate the hash for the query plan.
    */
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     if (baseProps == null) {
       builder.add(false);
     } else {
       builder.add(true);
-      baseProps.queryPlanHash(request, builder);
+      baseProps.queryPlanHash(builder);
     }
 
     if (fetchPaths != null) {
       for (OrmQueryProperties p : fetchPaths.values()) {
-        p.queryPlanHash(request, builder);
+        p.queryPlanHash(builder);
       }
     }
   }

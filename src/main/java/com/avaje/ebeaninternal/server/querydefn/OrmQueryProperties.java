@@ -1,18 +1,9 @@
 package com.avaje.ebeaninternal.server.querydefn;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.avaje.ebean.ExpressionFactory;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionFactory;
@@ -22,6 +13,14 @@ import com.avaje.ebeaninternal.server.expression.FilterExprPath;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.util.FilterExpressionList;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Represents the Properties of an Object Relational query.
@@ -334,7 +333,7 @@ public class OrmQueryProperties implements Serializable {
    * Calculate the query plan hash.
    */
   @SuppressWarnings("unchecked")
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
 
     builder.add(path);
     if (properties != null) {
@@ -344,7 +343,7 @@ public class OrmQueryProperties implements Serializable {
     }
     builder.add(filterMany != null);
     if (filterMany != null) {
-      filterMany.queryPlanHash(request, builder);
+      filterMany.queryPlanHash(builder);
     }
     builder.add(lazyFetchBatch);
     builder.add(queryFetchBatch);

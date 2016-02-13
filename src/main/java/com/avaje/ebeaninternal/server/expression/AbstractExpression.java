@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.expression;
 
+import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -41,6 +42,11 @@ public abstract class AbstractExpression implements SpiExpression {
         }
       }
     }
+  }
+
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
+    // do nothing
   }
 
   @Override

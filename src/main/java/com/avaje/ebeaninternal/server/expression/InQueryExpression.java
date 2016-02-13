@@ -28,18 +28,15 @@ class InQueryExpression extends AbstractExpression {
     this.not = not;
   }
 
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
-    builder.add(InQueryExpression.class).add(propName).add(not);
-    subQuery.queryAutoTuneHash(builder);
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
+    compiledSubQuery = compileSubQuery(request);
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-
-    // queryPlanHash executes prior to addSql() or addBindValues()
-    // ... so compiledQuery will exist
-    compiledSubQuery = compileSubQuery(request);
-
-    queryAutoTuneHash(builder);
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
+    builder.add(InQueryExpression.class).add(propName).add(not);
+    subQuery.queryAutoTuneHash(builder);
   }
 
   /**
@@ -51,10 +48,12 @@ class InQueryExpression extends AbstractExpression {
     return ebeanServer.compileQuery(subQuery, queryRequest.getTransaction());
   }
 
+  @Override
   public int queryBindHash() {
     return subQuery.queryBindHash();
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
     String subSelect = compiledSubQuery.getGeneratedSql();
@@ -70,6 +69,7 @@ class InQueryExpression extends AbstractExpression {
     request.append(") ");
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
 
     List<Object> bindParams = compiledSubQuery.getPredicates().getWhereExprBindValues();

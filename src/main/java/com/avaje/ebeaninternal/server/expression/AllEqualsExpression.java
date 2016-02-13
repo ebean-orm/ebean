@@ -1,18 +1,16 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
-import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
-import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 
-class AllEqualsExpression implements SpiExpression {
+import java.util.Map;
+import java.util.Map.Entry;
+
+class AllEqualsExpression extends NonPrepareExpression {
 
   private static final long serialVersionUID = -8691773558205937025L;
 
@@ -26,6 +24,7 @@ class AllEqualsExpression implements SpiExpression {
     return propName;
   }
 
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     if (propMap != null) {
       for (String propertyName : propMap.keySet()) {
@@ -44,6 +43,7 @@ class AllEqualsExpression implements SpiExpression {
     }
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
 
     if (propMap.isEmpty()) {
@@ -57,6 +57,7 @@ class AllEqualsExpression implements SpiExpression {
     }
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
     if (propMap.isEmpty()) {
@@ -92,7 +93,8 @@ class AllEqualsExpression implements SpiExpression {
    * The null check is required due to the "is null" sql being generated.
    * </p>
    */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
 
     builder.add(AllEqualsExpression.class);
 
@@ -104,10 +106,7 @@ class AllEqualsExpression implements SpiExpression {
     }
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoTuneHash(builder);
-  }
-
+  @Override
   public int queryBindHash() {
 
     int hc = 31;

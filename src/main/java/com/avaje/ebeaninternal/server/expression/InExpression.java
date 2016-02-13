@@ -28,6 +28,7 @@ class InExpression extends AbstractExpression {
     this.not = not;
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
 
     ElPropertyValue prop = getElProp(request);
@@ -51,6 +52,7 @@ class InExpression extends AbstractExpression {
     }
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
     if (values.length == 0) {
@@ -88,15 +90,13 @@ class InExpression extends AbstractExpression {
   /**
    * Based on the number of values in the in clause.
    */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(InExpression.class).add(propName).add(values.length).add(not);
     builder.bind(values.length);
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoTuneHash(builder);
-  }
-
+  @Override
   public int queryBindHash() {
     int hc = 31;
     for (int i = 0; i < values.length; i++) {

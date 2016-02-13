@@ -24,6 +24,7 @@ public class SimpleExpression extends AbstractExpression {
     return Op.EQ.equals(type);
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
 
     ElPropertyValue prop = getElProp(request);
@@ -50,6 +51,7 @@ public class SimpleExpression extends AbstractExpression {
     request.addBindValue(value);
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
     String propertyName = getPropertyName();
@@ -72,15 +74,13 @@ public class SimpleExpression extends AbstractExpression {
   /**
    * Based on the type and propertyName.
    */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(SimpleExpression.class).add(propName).add(type.name());
     builder.bind(1);
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoTuneHash(builder);
-  }
-
+  @Override
   public int queryBindHash() {
     return value.hashCode();
   }

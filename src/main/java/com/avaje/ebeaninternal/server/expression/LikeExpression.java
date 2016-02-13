@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.LikeType;
-import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
@@ -61,15 +60,13 @@ class LikeExpression extends AbstractExpression {
   /**
    * Based on caseInsensitive and the property name.
    */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(LikeExpression.class).add(caseInsensitive).add(propName);
     builder.bind(1);
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoTuneHash(builder);
-  }
-
+  @Override
   public int queryBindHash() {
     return val.hashCode();
   }

@@ -58,13 +58,8 @@ class JsonPathExpression extends AbstractExpression {
   }
 
   @Override
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(JsonPathExpression.class).add(propName).add(path).add(operator);
-  }
-
-  @Override
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoTuneHash(builder);
   }
 
   @Override
