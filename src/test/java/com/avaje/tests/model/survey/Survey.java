@@ -12,6 +12,12 @@ public class Survey {
   @Id
   public Long id;
 
+  String name;
+
+  public Survey(String name) {
+    this.name = name;
+  }
+
   @OneToMany(mappedBy = "survey", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @OrderBy("sequenceNumber")
   private List<Category> categories;

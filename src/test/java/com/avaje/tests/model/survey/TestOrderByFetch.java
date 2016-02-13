@@ -15,9 +15,9 @@ public class TestOrderByFetch extends BaseTestCase {
   @Test
   public void test() {
 
-    Survey survey = new Survey();
+    Survey survey = new Survey("s1");
     List<Category> categories = new ArrayList<Category>();
-    Category category = new Category();
+    Category category = new Category("c1");
     category.setSequenceNumber(1);
     categories.add(category);
     survey.setCategories(categories);
@@ -57,14 +57,14 @@ public class TestOrderByFetch extends BaseTestCase {
 
   @NotNull
   private Group group(int number) {
-    Group group1 = new Group();
+    Group group1 = new Group("g" + number);
     group1.setSequenceNumber(number);
     return group1;
   }
 
   @NotNull
   private Question question(int sequence) {
-    Question q2 = new Question();
+    Question q2 = new Question("q" + sequence);
     q2.setSequenceNumber(sequence);
     return q2;
   }

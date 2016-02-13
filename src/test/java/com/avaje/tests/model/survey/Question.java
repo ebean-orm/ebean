@@ -10,6 +10,12 @@ public class Question {
   @Id
   public Long id;
 
+  String name;
+
+  public Question(String name) {
+    this.name = name;
+  }
+
   @ManyToOne
   @JoinColumn(name = "groupObjectId")
   private Group group;

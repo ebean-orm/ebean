@@ -17,6 +17,12 @@ public class Group {
   @Id
   public Long id;
 
+  String name;
+
+  public Group(String name) {
+    this.name = name;
+  }
+
   @ManyToOne
   @JoinColumn(name = "categoryObjectId")
   private Category category;

@@ -14,6 +14,12 @@ public class Category {
   @Id
   public Long id;
 
+  String name;
+
+  public Category(String name) {
+    this.name = name;
+  }
+
   @ManyToOne
   @JoinColumn(name = "surveyObjectId")
   private Survey survey;
