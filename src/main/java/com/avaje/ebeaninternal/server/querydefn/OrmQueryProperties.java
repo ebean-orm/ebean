@@ -317,18 +317,6 @@ public class OrmQueryProperties implements Serializable {
     secondaryChildren.add(child);
   }
 
-  public int autoTunePlanHash() {
-
-    int hc = (path != null ? path.hashCode() : 1);
-    if (properties != null) {
-      hc = hc * 31 + properties.hashCode();
-    } else {
-      hc = hc * 31 + (included != null ? included.hashCode() : 1);
-    }
-
-    return hc;
-  }
-
   /**
    * Calculate the query plan hash.
    */
