@@ -131,20 +131,9 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   void remoteTransactionEvent(RemoteTransactionEvent event);
 
   /**
-   * Create a query request object.
-   */
-  <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> q,
-      Transaction t);
-
-  /**
    * Compile a query.
    */
   <T> CQuery<T> compileQuery(Query<T> query, Transaction t);
-
-  /**
-   * Return the queryEngine for this server.
-   */
-  CQueryEngine getQueryEngine();
 
   /**
    * Execute the findId's query but without copying the query.

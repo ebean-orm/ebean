@@ -15,7 +15,6 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.dbmigration.DdlGenerator;
 import com.avaje.ebean.event.BeanPersistController;
-import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.meta.MetaInfoManager;
@@ -1059,7 +1058,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return createQueryRequest(desc, spiQuery, t);
   }
 
-  public <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> query, Transaction t) {
+  private <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> query, Transaction t) {
 
     if (desc.isAutoTunable() && !query.isSqlSelect() && !autoTuneService.tuneQuery(query)) {
       // use deployment FetchType.LAZY/EAGER annotations
@@ -1067,13 +1066,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       query.setDefaultSelectClause();
     }
 
-    if (query.selectAllForLazyLoadProperty()) {
-      // we need to select all properties to ensure the lazy load property
-      // was included (was not included by default or via autoTune).
-      if (logger.isDebugEnabled()) {
-        logger.debug("Using selectAllForLazyLoadProperty");
-      }
-    }
+    query.selectAllForLazyLoadProperty();
 
     // if determine cost and no origin for AutoTune
     if (query.getParentNode() == null) {
@@ -1087,29 +1080,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       query.setSqlDistinct(true);
     }
 
-    boolean allowOneManyFetch = true;
-    if (Mode.LAZYLOAD_MANY.equals(query.getMode())) {
-      allowOneManyFetch = false;
+    query.convertManyFetchJoinsToQueryJoins(query.isAllowOneManyFetch(), queryBatchSize);
 
-    } else if (query.hasMaxRowsOrFirstRow() && !query.isRawSql() && !query.isSqlSelect()) {
-      // convert ALL fetch joins to Many's to be query joins
-      // so that limit offset type SQL clauses work
-      allowOneManyFetch = false;
-    }
-
-    query.convertManyFetchJoinsToQueryJoins(allowOneManyFetch, queryBatchSize);
-
-    SpiTransaction serverTrans = (SpiTransaction) t;
-    OrmQueryRequest<T> request = new OrmQueryRequest<T>(this, queryEngine, query, desc, serverTrans);
-
-    BeanQueryAdapter queryAdapter = desc.getQueryAdapter();
-    if (queryAdapter != null) {
-      // adaption of the query probably based on the
-      // current user
-      queryAdapter.preQuery(request);
-    }
-
-    // the query hash after any tuning
+    OrmQueryRequest<T> request = new OrmQueryRequest<T>(this, queryEngine, query, desc, (SpiTransaction) t);
+    request.adapterPreQuery();
     request.prepareQuery();
 
     return request;

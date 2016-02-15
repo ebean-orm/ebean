@@ -10,6 +10,7 @@ import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanFindController;
+import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.HashQuery;
@@ -127,6 +128,16 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   public LoadContext getGraphContext() {
     return loadContext;
+  }
+
+  /**
+   * Run BeanQueryAdapter preQuery() if needed.
+   */
+  public void adapterPreQuery() {
+    BeanQueryAdapter queryAdapter = beanDescriptor.getQueryAdapter();
+    if (queryAdapter != null) {
+      queryAdapter.preQuery(this);
+    }
   }
 
   /**
@@ -326,10 +337,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
       }
     }
     return (Map<?, ?>) queryEngine.findMany(this);
-  }
-
-  public SpiQuery.Type getQueryType() {
-    return query.getType();
   }
 
   /**

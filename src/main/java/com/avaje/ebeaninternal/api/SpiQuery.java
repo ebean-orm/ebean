@@ -295,6 +295,11 @@ public interface SpiQuery<T> extends Query<T> {
   boolean initManyWhereJoins();
 
   /**
+   * Return true if one Many fetch join is allowed.
+   */
+  boolean isAllowOneManyFetch();
+
+  /**
    * Return the joins required to support predicates on the many properties.
    */
   ManyWhereJoins getManyWhereJoins();

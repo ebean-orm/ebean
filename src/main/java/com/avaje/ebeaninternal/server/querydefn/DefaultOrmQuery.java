@@ -440,6 +440,19 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     this.lazyLoadManyPath = lazyLoadManyPath;
   }
 
+  @Override
+  public boolean isAllowOneManyFetch() {
+
+    if (Mode.LAZYLOAD_MANY.equals(getMode())) {
+      return false;
+
+    } else if (hasMaxRowsOrFirstRow() && !isRawSql() && !isSqlSelect()) {
+      return false;
+    }
+
+    return true;
+  }
+
   /**
    * Convert any many joins fetch joins to query joins.
    */
