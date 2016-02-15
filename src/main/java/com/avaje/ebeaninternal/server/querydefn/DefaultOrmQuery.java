@@ -344,20 +344,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     this.beanDescriptor = beanDescriptor;
   }
 
-  /**
-   * Return true if select all properties was used to ensure the property invoking a lazy load was
-   * included in the query.
-   */
-  public boolean selectAllForLazyLoadProperty() {
-    if (lazyLoadProperty != null) {
-      if (!detail.containsProperty(lazyLoadProperty)) {
-        detail.select("*");
-        return true;
-      }
-    }
-    return false;
-  }
-
   public RawSql getRawSql() {
     return rawSql;
   }
@@ -404,6 +390,20 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return manyWhereJoins;
   }
 
+  /**
+   * Return true if select all properties was used to ensure the property invoking a lazy load was
+   * included in the query.
+   */
+  public boolean selectAllForLazyLoadProperty() {
+    if (lazyLoadProperty != null) {
+      if (!detail.containsProperty(lazyLoadProperty)) {
+        detail.select("*");
+        return true;
+      }
+    }
+    return false;
+  }
+
   public List<OrmQueryProperties> removeQueryJoins() {
     List<OrmQueryProperties> queryJoins = detail.removeSecondaryQueries();
     if (queryJoins != null) {
@@ -447,6 +447,39 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     detail.convertManyFetchJoinsToQueryJoins(beanDescriptor, lazyLoadManyPath, allowOne, queryBatch);
   }
 
+  protected void setOrmQueryDetail(OrmQueryDetail detail) {
+    this.detail = detail;
+  }
+
+  public void setDefaultSelectClause() {
+    detail.setDefaultSelectClause(beanDescriptor);
+  }
+
+  public void setDetail(OrmQueryDetail detail) {
+    this.detail = detail;
+  }
+
+  public boolean tuneFetchProperties(OrmQueryDetail tunedDetail) {
+    return detail.tuneFetchProperties(tunedDetail);
+  }
+
+  public OrmQueryDetail getDetail() {
+    return detail;
+  }
+
+  public ExpressionList<T> filterMany(String prop) {
+
+    OrmQueryProperties chunk = detail.getChunk(prop, true);
+    return chunk.filterMany(this);
+  }
+
+  public void setFilterMany(String prop, ExpressionList<?> filterMany) {
+    if (filterMany != null) {
+      OrmQueryProperties chunk = detail.getChunk(prop, true);
+      chunk.setFilterMany((SpiExpressionList<?>) filterMany);
+    }
+  }
+
   /**
    * Setup to be a delete query.
    */
@@ -465,7 +498,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public void setSelectId() {
     // clear select and fetch joins..
     detail.clear();
-
     select(beanDescriptor.getIdBinder().getIdProperty());
   }
 
@@ -932,16 +964,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     parser.assign(this);
   }
 
-  protected void setOrmQueryDetail(OrmQueryDetail detail) {
-    this.detail = detail;
-  }
 
   protected void setRawWhereClause(String rawWhereClause) {
     this.rawWhereClause = rawWhereClause;
-  }
-
-  public void setDefaultSelectClause() {
-    detail.setDefaultSelectClause(beanDescriptor);
   }
 
   public DefaultOrmQuery<T> select(String columns) {
@@ -1165,18 +1190,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return beanType;
   }
 
-  public void setDetail(OrmQueryDetail detail) {
-    this.detail = detail;
-  }
-
-  public boolean tuneFetchProperties(OrmQueryDetail tunedDetail) {
-    return detail.tuneFetchProperties(tunedDetail);
-  }
-
-  public OrmQueryDetail getDetail() {
-    return detail;
-  }
-
   public String toString() {
     return "Query [" + whereExpressions + "]";
   }
@@ -1268,19 +1281,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       whereExpressions = new DefaultExpressionList<T>(this, null);
     }
     return whereExpressions;
-  }
-
-  public ExpressionList<T> filterMany(String prop) {
-
-    OrmQueryProperties chunk = detail.getChunk(prop, true);
-    return chunk.filterMany(this);
-  }
-
-  public void setFilterMany(String prop, ExpressionList<?> filterMany) {
-    if (filterMany != null) {
-      OrmQueryProperties chunk = detail.getChunk(prop, true);
-      chunk.setFilterMany((SpiExpressionList<?>) filterMany);
-    }
   }
 
   public DefaultOrmQuery<T> having(String addToHavingClause) {
