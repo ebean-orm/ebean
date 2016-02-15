@@ -407,7 +407,7 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
 
     OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, null, null, null, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, false, null, null);
     OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, null, null, null, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null);
-    assertSame(key1, key2);
+    assertDifferent(key1, key2);
   }
 
   @Test
@@ -417,7 +417,7 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
 
     OrmQueryPlanKey key1 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, null, null, null, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null);
     OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, null, null, null, null, false, false, null, null, null, null, having1, SpiQuery.TemporalMode.CURRENT, false, null, null);
-    assertSame(key1, key2);
+    assertDifferent(key1, key2);
   }
 
   private void assertDifferent(OrmQueryPlanKey key1, OrmQueryPlanKey key2) {
