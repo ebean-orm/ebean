@@ -133,7 +133,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Run BeanQueryAdapter preQuery() if needed.
    */
-  public void adapterPreQuery() {
+  private void adapterPreQuery() {
     BeanQueryAdapter queryAdapter = beanDescriptor.getQueryAdapter();
     if (queryAdapter != null) {
       queryAdapter.preQuery(this);
@@ -144,6 +144,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    * Prepare the query and calculate the query plan key.
    */
   public void prepareQuery() {
+    adapterPreQuery();
     this.queryPlanKey = query.prepare(this);
   }
 

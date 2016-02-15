@@ -1080,10 +1080,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       query.setSqlDistinct(true);
     }
 
-    query.convertManyFetchJoinsToQueryJoins(query.isAllowOneManyFetch(), queryBatchSize);
+    query.convertManyFetchJoinsToQueryJoins(queryBatchSize);
 
     OrmQueryRequest<T> request = new OrmQueryRequest<T>(this, queryEngine, query, desc, (SpiTransaction) t);
-    request.adapterPreQuery();
     request.prepareQuery();
 
     return request;

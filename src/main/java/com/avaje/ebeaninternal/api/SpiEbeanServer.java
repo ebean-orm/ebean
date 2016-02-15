@@ -13,11 +13,8 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
-import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
-import com.avaje.ebean.dbmigration.DdlGenerator;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.query.CQuery;
-import com.avaje.ebeaninternal.server.query.CQueryEngine;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
 import java.util.List;

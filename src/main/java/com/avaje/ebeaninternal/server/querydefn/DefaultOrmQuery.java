@@ -456,7 +456,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Convert any many joins fetch joins to query joins.
    */
-  public void convertManyFetchJoinsToQueryJoins(boolean allowOne, int queryBatch) {
+  public void convertManyFetchJoinsToQueryJoins(int queryBatch) {
+    boolean allowOne = isAllowOneManyFetch();
     detail.convertManyFetchJoinsToQueryJoins(beanDescriptor, lazyLoadManyPath, allowOne, queryBatch);
   }
 
