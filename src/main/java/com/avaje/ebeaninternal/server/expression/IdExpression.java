@@ -6,7 +6,6 @@ import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.util.DefaultExpressionRequest;
 
 /**
  * Slightly redundant as Query.setId() ultimately also does the same job.
@@ -69,4 +68,14 @@ class IdExpression extends NonPrepareExpression implements SpiExpression {
     return value.hashCode();
   }
 
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    return other instanceof IdExpression;
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    IdExpression that = (IdExpression) other;
+    return value.equals(that.value);
+  }
 }

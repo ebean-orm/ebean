@@ -12,7 +12,7 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.expression.FilterExprPath;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SplitName;
-import com.avaje.ebeaninternal.util.FilterExpressionList;
+import com.avaje.ebeaninternal.server.expression.FilterExpressionList;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -2,11 +2,13 @@ package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
+import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -102,7 +104,7 @@ class AllEqualsExpression extends NonPrepareExpression {
       Object value = entry.getValue();
       String propName = entry.getKey();
       builder.add(propName).add(value == null ? 0 : 1);
-      builder.bind(value == null ? 0 : 1);
+      builder.bindIfNotNull(value);
     }
   }
 
@@ -115,5 +117,49 @@ class AllEqualsExpression extends NonPrepareExpression {
     }
 
     return hc;
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof AllEqualsExpression)) {
+      return false;
+    }
+
+    AllEqualsExpression that = (AllEqualsExpression) other;
+    return isSameByValue(that, false);
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    if (!(other instanceof AllEqualsExpression)) {
+      return false;
+    }
+
+    AllEqualsExpression that = (AllEqualsExpression) other;
+    return isSameByValue(that, true);
+  }
+
+  private boolean isSameByValue(AllEqualsExpression that, boolean byValue) {
+
+    if (propMap.size() != that.propMap.size()) {
+      return false;
+    }
+
+    Iterator<Entry<String, Object>> thisIt = propMap.entrySet().iterator();
+    Iterator<Entry<String, Object>> thatIt = that.propMap.entrySet().iterator();
+
+    while (thisIt.hasNext() && thatIt.hasNext()) {
+      Entry<String, Object> thisNext = thisIt.next();
+      Entry<String, Object> thatNext = thatIt.next();
+
+      if (!thisNext.getKey().equals(thatNext.getKey())) {
+        return false;
+      }
+      if (!Same.sameBy(byValue, thisNext.getValue(), thatNext.getValue())) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

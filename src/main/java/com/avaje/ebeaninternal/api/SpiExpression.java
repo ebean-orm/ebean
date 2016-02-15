@@ -37,6 +37,16 @@ public interface SpiExpression extends Expression {
 	 */
 	int queryBindHash();
 
+  /**
+   * Return true if the expression is the same without taking into account bind values.
+   */
+  boolean isSameByPlan(SpiExpression other);
+
+  /**
+   * Return true if the expression is the same with respect to bind values.
+   */
+  boolean isSameByBind(SpiExpression other);
+
 	/**
 	 * Add some sql to the query.
 	 * <p>
@@ -65,4 +75,10 @@ public interface SpiExpression extends Expression {
    * Validate all the properties/paths associated with this expression.
    */
   void validate(SpiExpressionValidation validation);
+
+  /**
+   * Return a copy of the expression for use in the query plan key.
+   */
+  SpiExpression copyForPlanKey();
+
 }

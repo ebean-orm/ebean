@@ -16,6 +16,11 @@ class NoopExpression implements SpiExpression {
   protected static final NoopExpression INSTANCE = new NoopExpression();
 
   @Override
+  public SpiExpression copyForPlanKey() {
+    return this;
+  }
+
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
     // nothing to do
   }
@@ -49,5 +54,15 @@ class NoopExpression implements SpiExpression {
   @Override
   public void addBindValues(SpiExpressionRequest request) {
     // nothing to do
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    return other instanceof NoopExpression;
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    return true;
   }
 }

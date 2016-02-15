@@ -1110,7 +1110,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     // the query hash after any tuning
-    request.calculateQueryPlanHash();
+    request.prepareQuery();
 
     return request;
   }

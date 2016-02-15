@@ -2,11 +2,11 @@ package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
+import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
-import com.avaje.ebeaninternal.util.DefaultExpressionRequest;
 
 import java.util.List;
 
@@ -86,4 +86,27 @@ public class IdInExpression extends NonPrepareExpression {
     return idList.hashCode();
   }
 
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof IdInExpression)) {
+      return false;
+    }
+
+    IdInExpression that = (IdInExpression) other;
+    return this.idList.size() == that.idList.size();
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    IdInExpression that = (IdInExpression) other;
+    if (this.idList.size() != that.idList.size()) {
+      return false;
+    }
+    for (int i = 0; i < idList.size(); i++) {
+      if (!idList.get(i).equals(that.idList.get(i))) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

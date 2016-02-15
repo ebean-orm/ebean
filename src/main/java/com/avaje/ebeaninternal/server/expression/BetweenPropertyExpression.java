@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
+import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -50,6 +51,7 @@ class BetweenPropertyExpression extends NonPrepareExpression {
     validation.validate(highProperty);
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
     request.addBindValue(value);
   }
@@ -69,5 +71,22 @@ class BetweenPropertyExpression extends NonPrepareExpression {
   @Override
   public int queryBindHash() {
     return value.hashCode();
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof BetweenPropertyExpression)) {
+      return false;
+    }
+
+    BetweenPropertyExpression that = (BetweenPropertyExpression) other;
+    return lowProperty.equals(that.lowProperty)
+        && highProperty.equals(that.highProperty);
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    BetweenPropertyExpression that = (BetweenPropertyExpression) other;
+    return value.equals(that.value);
   }
 }

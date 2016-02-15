@@ -22,19 +22,20 @@ public abstract class AbstractExpression implements SpiExpression {
     this.propName = propName;
   }
 
-  public String getPropertyName() {
-    return propName;
+  @Override
+  public SpiExpression copyForPlanKey() {
+    return this;
   }
 
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
 
-    String propertyName = getPropertyName();
-    if (propertyName != null) {
-      ElPropertyDeploy elProp = desc.getElPropertyDeploy(propertyName);
+    if (propName != null) {
+      ElPropertyDeploy elProp = desc.getElPropertyDeploy(propName);
       if (elProp != null) {
         if (elProp.containsFormulaWithJoin()) {
           // for findRowCount query select clause
-          manyWhereJoin.addFormulaWithJoin(propertyName);
+          manyWhereJoin.addFormulaWithJoin(propName);
         }
         if (elProp.containsMany()) {
           // for findRowCount we join to a many property
@@ -51,12 +52,11 @@ public abstract class AbstractExpression implements SpiExpression {
 
   @Override
   public void validate(SpiExpressionValidation validation) {
-    validation.validate(getPropertyName());
+    validation.validate(propName);
   }
 
-  protected ElPropertyValue getElProp(SpiExpressionRequest request) {
+  protected final ElPropertyValue getElProp(SpiExpressionRequest request) {
 
-    String propertyName = getPropertyName();
-    return request.getBeanDescriptor().getElGetValue(propertyName);
+    return request.getBeanDescriptor().getElGetValue(propName);
   }
 }

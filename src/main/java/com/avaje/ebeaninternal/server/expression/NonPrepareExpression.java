@@ -12,4 +12,9 @@ abstract class NonPrepareExpression implements SpiExpression {
   public void prepareExpression(BeanQueryRequest<?> request) {
     // do nothing
   }
+
+  @Override
+  public SpiExpression copyForPlanKey() {
+    return this;
+  }
 }

@@ -13,9 +13,8 @@ import com.avaje.ebean.plugin.SpiBeanType;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.HashQuery;
-import com.avaje.ebeaninternal.api.HashQueryPlan;
-import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
+import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
@@ -28,7 +27,7 @@ import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.expression.SimpleExpression;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
-import com.avaje.ebeaninternal.util.DefaultExpressionList;
+import com.avaje.ebeaninternal.server.expression.DefaultExpressionList;
 
 import javax.persistence.PersistenceException;
 import java.sql.Timestamp;
@@ -234,7 +233,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Hash of final query after AutoTune tuning.
    */
-  private HashQueryPlan queryPlanHash;
+  private CQueryPlanKey queryPlanKey;
 
   private transient PersistenceContext persistenceContext;
 
@@ -493,7 +492,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
         if (se instanceof SimpleExpression) {
           SimpleExpression e = (SimpleExpression) se;
           if (e.isOpEquals()) {
-            return new NaturalKeyBindParam(e.getPropertyName(), e.getValue());
+            return new NaturalKeyBindParam(e.getPropName(), e.getValue());
           }
         }
       }
@@ -759,55 +758,34 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Calculate the query hash for either AutoTune query tuning or Query Plan caching.
    */
-  HashQueryPlan calculateQueryPlanHash() {
+  CQueryPlanKey createQueryPlanKey() {
 
-    // exclude bind values and things unrelated to the sql being generated
-    HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
-
-    builder.add((type == null ? 0 : type.ordinal() + 1));
-    builder.add(autoTuned).add(distinct).add(sqlDistinct).add(query);
-    builder.add(firstRow).add(maxRows).add(orderBy).add(forUpdate);
-    builder.add(rawWhereClause).add(additionalWhere).add(additionalHaving);
-    builder.add(mapKey);
-    builder.add(disableLazyLoading);
-    builder.add(id != null);
-    builder.add(temporalMode);
-    builder.add(rawSql == null ? 0 : rawSql.queryHash());
-    builder.add(includeTableJoin != null ? includeTableJoin.queryHash() : 0);
-    builder.add(rootTableAlias);
-
-    if (detail != null) {
-      detail.queryPlanHash(builder);
-    }
-    if (bindParams != null) {
-      bindParams.buildQueryPlanHash(builder);
-    }
-
+    DefaultExpressionList<T> where = null;
+    DefaultExpressionList<T> having = null;
     if (whereExpressions != null) {
-      whereExpressions.queryPlanHash(builder);
+       where = whereExpressions.copyForPlanKey();
     }
     if (havingExpressions != null) {
-      havingExpressions.queryPlanHash(builder);
+      having = havingExpressions.copyForPlanKey();
     }
 
-    return builder.build();
+    queryPlanKey = new OrmQueryPlanKey(includeTableJoin, type, detail, maxRows, firstRow,
+        disableLazyLoading, rawWhereClause, orderBy, query, additionalWhere, additionalHaving,
+        distinct, sqlDistinct, mapKey, id, bindParams, where, having,
+        temporalMode, forUpdate, rootTableAlias, rawSql);
+
+    return queryPlanKey;
   }
 
   /**
-   * Calculate a hash that should be unique for the generated SQL across a given bean type.
-   * <p>
-   * This can used to enable the caching and reuse of a 'query plan'.
-   * </p>
-   * <p>
-   * This is calculated AFTER AutoTune query tuning has occurred.
-   * </p>
+   * Prepare the query which prepares any expressions (sub-query expressions etc) and calculates the query plan key.
    */
-  public HashQueryPlan queryPlanHash(BeanQueryRequest<?> request) {
+  public CQueryPlanKey prepare(BeanQueryRequest<?> request) {
 
     prepareExpressions(request);
 
-    queryPlanHash = calculateQueryPlanHash();
-    return queryPlanHash;
+    queryPlanKey = createQueryPlanKey();
+    return queryPlanKey;
   }
 
   /**
@@ -852,7 +830,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     // so queryPlanHash is calculated well before this method is called
     int hc = queryBindHash();
 
-    return new HashQuery(queryPlanHash, hc);
+    return new HashQuery(queryPlanKey, hc);
   }
 
   /**

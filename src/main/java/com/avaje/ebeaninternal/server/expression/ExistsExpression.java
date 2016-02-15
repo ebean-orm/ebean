@@ -17,17 +17,24 @@ public class ExistsExpression implements SpiExpression {
 
   private static final long serialVersionUID = 666990277309851644L;
 
-  private final boolean not;
+  protected final boolean not;
 
-  private final SpiQuery<?> subQuery;
+  protected final SpiQuery<?> subQuery;
 
-  private List<Object> bindParams;
+  protected List<Object> bindParams;
 
-  private String sql;
+  protected String sql;
 
   public ExistsExpression(SpiQuery<?> subQuery, boolean not) {
     this.subQuery = subQuery;
     this.not = not;
+  }
+
+  ExistsExpression(boolean not, String sql , List<Object> bindParams) {
+    this.not = not;
+    this.sql = sql;
+    this.bindParams = bindParams;
+    this.subQuery = null;
   }
 
   @Override
@@ -38,10 +45,15 @@ public class ExistsExpression implements SpiExpression {
     this.sql = subQuery.getGeneratedSql().replace('\n', ' ');
   }
 
+  @Override
+  public SpiExpression copyForPlanKey() {
+    return this;
+  }
+
   /**
    * Compile/build the sub query.
    */
-  private CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
+  protected CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
     SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.getEbeanServer();
     return ebeanServer.compileQuery(subQuery, queryRequest.getTransaction());
   }
@@ -74,6 +86,32 @@ public class ExistsExpression implements SpiExpression {
     for (int i = 0; i < bindParams.size(); i++) {
       request.addBindValue(bindParams.get(i));
     }
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof ExistsExpression)) {
+      return false;
+    }
+
+    ExistsExpression that = (ExistsExpression) other;
+    return this.sql.equals(that.sql)
+        && this.not == that.not
+        && this.bindParams.size() == that.bindParams.size();
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    ExistsExpression that = (ExistsExpression) other;
+    if (this.bindParams.size() != that.bindParams.size()) {
+      return false;
+    }
+    for (int i = 0; i < bindParams.size(); i++) {
+      if (!bindParams.get(i).equals(that.bindParams.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override

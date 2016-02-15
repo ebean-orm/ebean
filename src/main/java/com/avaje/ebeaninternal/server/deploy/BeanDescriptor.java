@@ -29,7 +29,7 @@ import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaQueryPlanStatistic;
 import com.avaje.ebean.plugin.SpiBeanType;
-import com.avaje.ebeaninternal.api.HashQueryPlan;
+import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -87,7 +87,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
 
   private final ConcurrentHashMap<Integer, SpiUpdatePlan> updatePlanCache = new ConcurrentHashMap<Integer, SpiUpdatePlan>();
 
-  private final ConcurrentHashMap<HashQueryPlan, CQueryPlan> queryPlanCache = new ConcurrentHashMap<HashQueryPlan, CQueryPlan>();
+  private final ConcurrentHashMap<CQueryPlanKey, CQueryPlan> queryPlanCache = new ConcurrentHashMap<CQueryPlanKey, CQueryPlan>();
 
   private final ConcurrentHashMap<String, ElPropertyValue> elCache = new ConcurrentHashMap<String, ElPropertyValue>();
 
@@ -1163,11 +1163,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     }
   }
 
-  public CQueryPlan getQueryPlan(HashQueryPlan key) {
+  public CQueryPlan getQueryPlan(CQueryPlanKey key) {
     return queryPlanCache.get(key);
   }
 
-  public void putQueryPlan(HashQueryPlan key, CQueryPlan plan) {
+  public void putQueryPlan(CQueryPlanKey key, CQueryPlan plan) {
     queryPlanCache.put(key, plan);
   }
 

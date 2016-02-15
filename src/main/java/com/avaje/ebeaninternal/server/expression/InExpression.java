@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
+import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
@@ -61,20 +61,18 @@ class InExpression extends AbstractExpression {
       return;
     }
 
-    String propertyName = getPropertyName();
-
     ElPropertyValue prop = getElProp(request);
     if (prop != null && !prop.isAssocId()) {
       prop = null;
     }
 
     if (prop != null) {
-      request.append(prop.getAssocIdInExpr(propertyName));
+      request.append(prop.getAssocIdInExpr(propName));
       String inClause = prop.getAssocIdInValueExpr(values.length);
       request.append(inClause);
 
     } else {
-      request.append(propertyName);
+      request.append(propName);
       if (not) {
         request.append(" not");
       }
@@ -105,4 +103,29 @@ class InExpression extends AbstractExpression {
     return hc;
   }
 
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof InExpression)) {
+      return false;
+    }
+
+    InExpression that = (InExpression) other;
+    return propName.equals(that.propName)
+        && not == that.not
+        && values.length == that.values.length;
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    InExpression that = (InExpression) other;
+    if (this.values.length != that.values.length) {
+      return false;
+    }
+    for (int i = 0; i < values.length; i++) {
+      if (!values[i].equals(that.values[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

@@ -86,6 +86,19 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
     this.likeType = likeType;
   }
 
+  DefaultExampleExpression(ArrayList<SpiExpression> source) {
+    this.entity = null;
+    this.list = new ArrayList<SpiExpression>(source.size());
+    for (SpiExpression expression : source) {
+      list.add(expression.copyForPlanKey());
+    }
+  }
+
+  @Override
+  public SpiExpression copyForPlanKey() {
+    return new DefaultExampleExpression(list);
+  }
+
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
     if (list != null) {
@@ -199,6 +212,38 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
     }
 
     return hc;
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof DefaultExampleExpression)) {
+      return false;
+    }
+
+    DefaultExampleExpression that = (DefaultExampleExpression) other;
+    if (this.list.size() != that.list.size()) {
+      return false;
+    }
+    for (int i = 0; i < list.size(); i++) {
+      if (!list.get(i).isSameByPlan(that.list.get(i))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    DefaultExampleExpression that = (DefaultExampleExpression) other;
+    if (this.list.size() != that.list.size()) {
+      return false;
+    }
+    for (int i = 0; i < list.size(); i++) {
+      if (!list.get(i).isSameByBind(that.list.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
+import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 
 /**
@@ -60,6 +60,8 @@ class JsonPathExpression extends AbstractExpression {
   @Override
   public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(JsonPathExpression.class).add(propName).add(path).add(operator);
+    builder.bindIfNotNull(value);
+    builder.bindIfNotNull(upperValue);
   }
 
   @Override
@@ -67,6 +69,27 @@ class JsonPathExpression extends AbstractExpression {
     int hc = (value == null) ? 0 : value.hashCode();
     hc = (upperValue == null) ? hc : hc * 31 + upperValue.hashCode();
     return hc;
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof JsonPathExpression)) {
+      return false;
+    }
+
+    JsonPathExpression that = (JsonPathExpression) other;
+    return propName.equals(that.propName)
+        && operator == that.operator
+        && Same.sameByValue(path, that.path)
+        && Same.sameByNull(value, that.value)
+        && Same.sameByNull(upperValue, that.upperValue);
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    JsonPathExpression that = (JsonPathExpression) other;
+    if (value != null ? !value.equals(that.value) : that.value != null) return false;
+    return upperValue != null ? upperValue.equals(that.upperValue) : that.upperValue == null;
   }
 
   @Override

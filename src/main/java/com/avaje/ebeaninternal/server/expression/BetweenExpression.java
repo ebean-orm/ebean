@@ -1,9 +1,8 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
+import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
-
 
 class BetweenExpression extends AbstractExpression {
 
@@ -30,7 +29,7 @@ class BetweenExpression extends AbstractExpression {
   @Override
   public void addSql(SpiExpressionRequest request) {
 
-    request.append(getPropertyName()).append(BETWEEN).append(" ? and ? ");
+    request.append(propName).append(BETWEEN).append(" ? and ? ");
   }
 
   @Override
@@ -44,5 +43,22 @@ class BetweenExpression extends AbstractExpression {
     int hc = valueLow.hashCode();
     hc = hc * 31 + valueHigh.hashCode();
     return hc;
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof BetweenExpression)) {
+      return false;
+    }
+
+    BetweenExpression that = (BetweenExpression) other;
+    return this.propName.equals(that.propName);
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    BetweenExpression that = (BetweenExpression) other;
+    return valueLow.equals(that.valueLow)
+        && valueHigh.equals(that.valueHigh);
   }
 }

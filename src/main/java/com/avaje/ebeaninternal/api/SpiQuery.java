@@ -467,17 +467,13 @@ public interface SpiQuery<T> extends Query<T> {
   String getName();
 
   /**
-   * Identifies queries that are the same bar the bind variables.
+   * Prepare the query which prepares sub-query expressions and calculates
+   * and returns the query plan key.
    * <p>
-   * This is used AFTER AutoTune has potentially tuned the query. This is
-   * used to identify and reused query plans (the final SQL string and
-   * associated SqlTree object).
-   * </p>
-   * <p>
-   * Excludes the actual bind values (as they don't effect the query plan).
+   * The query plan excludes actual bind values (as they don't effect the query plan).
    * </p>
    */
-  HashQueryPlan queryPlanHash(BeanQueryRequest<?> request);
+  CQueryPlanKey prepare(BeanQueryRequest<?> request);
 
   /**
    * Calculate a hash based on the bind values used in the query.

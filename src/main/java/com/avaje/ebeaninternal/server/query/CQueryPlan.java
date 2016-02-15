@@ -1,13 +1,8 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.security.MessageDigest;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.config.dbplatform.SqlLimitResponse;
-import com.avaje.ebeaninternal.api.HashQueryPlan;
-import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
+import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -17,6 +12,10 @@ import com.avaje.ebeaninternal.server.type.DataReader;
 import com.avaje.ebeaninternal.server.type.RsetDataReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.security.MessageDigest;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Represents a query for a given SQL statement.
@@ -45,7 +44,7 @@ public class CQueryPlan {
 
   private final boolean autoTuned;
 
-  private final HashQueryPlan hash;
+  private final CQueryPlanKey planKey;
 
   private final boolean rawSql;
 
@@ -79,7 +78,7 @@ public class CQueryPlan {
     this.server = request.getServer();
     this.beanType = request.getBeanDescriptor().getBeanType();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
-    this.hash = request.getQueryPlanHash();
+    this.planKey = request.getQueryPlanKey();
     this.autoTuned = request.getQuery().isAutoTuned();
     if (sqlRes != null) {
       this.sql = sqlRes.getSql();
@@ -103,7 +102,7 @@ public class CQueryPlan {
     this.server = request.getServer();
     this.beanType = request.getBeanDescriptor().getBeanType();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
-    this.hash = buildHash(sql, rawSql, rowNumberIncluded, logWhereSql);
+    this.planKey = buildPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
     this.autoTuned = false;
     this.sql = sql;
     this.sqlTree = sqlTree;
@@ -114,15 +113,13 @@ public class CQueryPlan {
   }
 
 
-  private HashQueryPlan buildHash(String sql, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
-    HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
-    builder.add(sql).add(rawSql).add(rowNumberIncluded).add(logWhereSql);
-    builder.addRawSql(sql);
-    return builder.build();
+  private CQueryPlanKey buildPlanKey(String sql, boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
+
+    return new RawSqlQueryPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
   }
 
   public String toString() {
-    return beanType + " hash:" + hash;
+    return beanType + " hash:" + planKey;
   }
 
   public Class<?> getBeanType() {
@@ -147,8 +144,8 @@ public class CQueryPlan {
     return autoTuned;
   }
 
-  public HashQueryPlan getHash() {
-    return hash;
+  public CQueryPlanKey getPlanKey() {
+    return planKey;
   }
 
   /**
@@ -164,7 +161,7 @@ public class CQueryPlan {
 
   private String calcAuditQueryKey() {
     // rawSql needs to include the MD5 hash of the sql
-    return rawSql ? hash.getPartialKey() + "_" + getSqlMd5Hash() : hash.getPartialKey();
+    return rawSql ? planKey.getPartialKey() + "_" + getSqlMd5Hash() : planKey.getPartialKey();
   }
 
   /**

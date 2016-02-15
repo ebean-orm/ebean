@@ -1,14 +1,11 @@
 package com.avaje.ebeaninternal.server.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.PersistenceException;
-
-import com.avaje.ebean.*;
+import com.avaje.ebean.PersistenceContextScope;
+import com.avaje.ebean.QueryEachConsumer;
+import com.avaje.ebean.QueryEachWhileConsumer;
+import com.avaje.ebean.QueryIterator;
+import com.avaje.ebean.RawSql;
+import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.PersistenceContext;
@@ -16,8 +13,8 @@ import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.HashQuery;
-import com.avaje.ebeaninternal.api.HashQueryPlan;
 import com.avaje.ebeaninternal.api.LoadContext;
+import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Type;
@@ -31,6 +28,13 @@ import com.avaje.ebeaninternal.server.loadcontext.DLoadContext;
 import com.avaje.ebeaninternal.server.query.CQueryPlan;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
+
+import javax.persistence.PersistenceException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Wraps the objects involved in executing a Query.
@@ -55,7 +59,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
   private HashQuery cacheKey;
 
-  private HashQueryPlan queryPlanHash;
+  private CQueryPlanKey queryPlanKey;
 
   /**
    * Create the InternalQueryRequest.
@@ -126,10 +130,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   /**
-   * Calculate the query plan hash AFTER any potential AutoTune tuning.
+   * Prepare the query and calculate the query plan key.
    */
-  public void calculateQueryPlanHash() {
-    this.queryPlanHash = query.queryPlanHash(this);
+  public void prepareQuery() {
+    this.queryPlanKey = query.prepare(this);
   }
 
   public boolean isRawSql() {
@@ -355,7 +359,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    * query plan for this query exists.
    */
   public CQueryPlan getQueryPlan() {
-    return beanDescriptor.getQueryPlan(queryPlanHash);
+    return beanDescriptor.getQueryPlan(queryPlanKey);
   }
 
   /**
@@ -366,15 +370,15 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    * with just the bind variables changing.
    * </p>
    */
-  public HashQueryPlan getQueryPlanHash() {
-    return queryPlanHash;
+  public CQueryPlanKey getQueryPlanKey() {
+    return queryPlanKey;
   }
 
   /**
    * Put the QueryPlan into the cache.
    */
   public void putQueryPlan(CQueryPlan queryPlan) {
-    beanDescriptor.putQueryPlan(queryPlanHash, queryPlan);
+    beanDescriptor.putQueryPlan(queryPlanKey, queryPlan);
   }
 
   public boolean isUseBeanCache() {
@@ -401,7 +405,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
       for (T bean : actualDetails) {
         ids.add(beanDescriptor.getIdForJson(bean));
       }
-      beanDescriptor.readAuditMany(queryPlanHash.getPartialKey(), "l2-query-cache", ids);
+      beanDescriptor.readAuditMany(queryPlanKey.getPartialKey(), "l2-query-cache", ids);
     }
 
     return cached;

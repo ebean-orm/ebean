@@ -9,14 +9,12 @@ public class HashQueryPlanBuilder {
   
   private int bindCount;
 
-  private String rawSql;
-  
   public HashQueryPlanBuilder() {
     this.planHash = 92821;
   }
 
   public String toString() {
-    return planHash+":"+bindCount+(rawSql != null ? ":r" : "");
+    return planHash+":"+bindCount;
   }
   
   /**
@@ -58,19 +56,24 @@ public class HashQueryPlanBuilder {
     bindCount += extraBindCount;
   }
 
-  /**
-   * Add raw sql to the hash.
-   */
-  public void addRawSql(String rawSql) {
-    this.rawSql = rawSql;
+  public void bindIfNotNull(Object someValue) {
+    if (someValue != null) {
+      bindCount++;
+    }
   }
 
   /**
    * Build and return the calculated HashQueryPlan.
    */
-  public HashQueryPlan build() {
-    return new HashQueryPlan(rawSql, planHash, bindCount);
+  public String build() {
+    return planHash+"_"+bindCount;
   }
 
-  
+  public int getPlanHash() {
+    return planHash;
+  }
+
+  public int getBindCount() {
+    return bindCount;
+  }
 }

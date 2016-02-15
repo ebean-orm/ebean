@@ -1,13 +1,14 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import java.util.List;
-
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.query.CQuery;
+
+import java.util.List;
 
 /**
  * In expression using a sub query.
@@ -24,10 +25,18 @@ class InQueryExpression extends AbstractExpression {
 
   private String sql;
 
-  public InQueryExpression(String propertyName, SpiQuery<?> subQuery, boolean not) {
+  InQueryExpression(String propertyName, SpiQuery<?> subQuery, boolean not) {
     super(propertyName);
     this.subQuery = subQuery;
     this.not = not;
+  }
+
+  InQueryExpression(String propertyName, boolean not, String sql, List<Object> bindParams) {
+    super(propertyName);
+    this.subQuery = null;
+    this.not = not;
+    this.sql = sql;
+    this.bindParams = bindParams;
   }
 
   @Override
@@ -61,7 +70,7 @@ class InQueryExpression extends AbstractExpression {
   @Override
   public void addSql(SpiExpressionRequest request) {
 
-    request.append(" (").append(getPropertyName()).append(")");
+    request.append(" (").append(propName).append(")");
     if (not) {
       request.append(" not");
     }
@@ -76,5 +85,32 @@ class InQueryExpression extends AbstractExpression {
     for (int i = 0; i < bindParams.size(); i++) {
       request.addBindValue(bindParams.get(i));
     }
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof InQueryExpression)) {
+      return false;
+    }
+
+    InQueryExpression that = (InQueryExpression) other;
+    return propName.equals(that.propName)
+        && sql.equals(that.sql)
+        && not == that.not
+        && bindParams.size() == that.bindParams.size();
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    InQueryExpression that = (InQueryExpression) other;
+    if (this.bindParams.size() != that.bindParams.size()) {
+      return false;
+    }
+    for (int i = 0; i < bindParams.size(); i++) {
+      if (!bindParams.get(i).equals(that.bindParams.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 }

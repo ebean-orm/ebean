@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.LikeType;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
+import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
@@ -22,6 +23,7 @@ class LikeExpression extends AbstractExpression {
     this.val = value;
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
 
     ElPropertyValue prop = getElProp(request);
@@ -35,14 +37,13 @@ class LikeExpression extends AbstractExpression {
     request.addBindValue(bindValue);
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
-    String propertyName = getPropertyName();
-    String pname = propertyName;
-
+    String pname = propName;
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {
-      pname = prop.getBeanProperty().getDecryptProperty(propertyName);
+      pname = prop.getBeanProperty().getDecryptProperty(propName);
     }
     if (caseInsensitive) {
       request.append("lower(").append(pname).append(")");
@@ -69,6 +70,24 @@ class LikeExpression extends AbstractExpression {
   @Override
   public int queryBindHash() {
     return val.hashCode();
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof LikeExpression)) {
+      return false;
+    }
+
+    LikeExpression that = (LikeExpression) other;
+    return this.propName.equals(that.propName)
+        && this.caseInsensitive == that.caseInsensitive
+        && this.type == that.type;
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    LikeExpression that = (LikeExpression) other;
+    return val.equals(that.val);
   }
 
   private static String getValue(String value, boolean caseInsensitive, LikeType type) {

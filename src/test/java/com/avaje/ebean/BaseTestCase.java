@@ -1,6 +1,7 @@
 package com.avaje.ebean;
 
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import org.avaje.agentloader.AgentLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,5 +29,17 @@ public class BaseTestCase {
   public boolean isH2() {
     SpiEbeanServer spi = (SpiEbeanServer)Ebean.getDefaultServer();
     return spi.getDatabasePlatform().getName().equals("h2");
+  }
+
+  protected <T> BeanDescriptor<T> getBeanDescriptor(Class<T> cls) {
+    return spiEbeanServer().getBeanDescriptor(cls);
+  }
+
+  protected SpiEbeanServer spiEbeanServer() {
+    return (SpiEbeanServer) Ebean.getDefaultServer();
+  }
+
+  protected EbeanServer server() {
+    return Ebean.getDefaultServer();
   }
 }

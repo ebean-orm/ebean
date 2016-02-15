@@ -10,7 +10,7 @@ import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.expression.IdInExpression;
-import com.avaje.ebeaninternal.util.DefaultExpressionRequest;
+import com.avaje.ebeaninternal.server.expression.DefaultExpressionRequest;
 
 public class IntersectionRow {
 

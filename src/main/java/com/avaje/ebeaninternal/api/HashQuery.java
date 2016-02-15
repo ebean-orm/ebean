@@ -5,30 +5,16 @@ package com.avaje.ebeaninternal.api;
  */
 public class HashQuery {
 
-  private final HashQueryPlan planHash;
+  private final CQueryPlanKey planHash;
   
   private final int bindHash;
 
   /**
    * Create the HashQuery.
    */
-  public HashQuery(HashQueryPlan planHash, int bindHash) {
+  public HashQuery(CQueryPlanKey planHash, int bindHash) {
     this.planHash = planHash;
     this.bindHash = bindHash;
-  }
-
-  /**
-   * Return the query plan hash.
-   */
-  public HashQueryPlan getPlanHash() {
-    return planHash;
-  }
-
-  /**
-   * Return the bind values hash.
-   */
-  public int getBindHash() {
-    return bindHash;
   }
 
   public int hashCode() {

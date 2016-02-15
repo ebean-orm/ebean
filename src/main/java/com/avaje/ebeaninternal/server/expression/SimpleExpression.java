@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
+import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
@@ -20,8 +20,16 @@ public class SimpleExpression extends AbstractExpression {
     this.value = value;
   }
 
+  public final String getPropName() {
+    return propName;
+  }
+
   public boolean isOpEquals() {
     return Op.EQ.equals(type);
+  }
+
+  public Object getValue() {
+    return value;
   }
 
   @Override
@@ -30,7 +38,7 @@ public class SimpleExpression extends AbstractExpression {
     ElPropertyValue prop = getElProp(request);
     if (prop != null) {
       if (prop.isAssocId()) {
-        Object[] ids = prop.getAssocOneIdValues((EntityBean)value);
+        Object[] ids = prop.getAssocOneIdValues((EntityBean) value);
         if (ids != null) {
           for (int i = 0; i < ids.length; i++) {
             request.addBindValue(ids[i]);
@@ -54,12 +62,10 @@ public class SimpleExpression extends AbstractExpression {
   @Override
   public void addSql(SpiExpressionRequest request) {
 
-    String propertyName = getPropertyName();
-
     ElPropertyValue prop = getElProp(request);
     if (prop != null) {
       if (prop.isAssocId()) {
-        request.append(prop.getAssocOneIdExpr(propertyName, type.bind()));
+        request.append(prop.getAssocOneIdExpr(propName, type.bind()));
         return;
       }
       if (prop.isDbEncrypted()) {
@@ -68,7 +74,7 @@ public class SimpleExpression extends AbstractExpression {
         return;
       }
     }
-    request.append(propertyName).append(type.bind());
+    request.append(propName).append(type.bind());
   }
 
   /**
@@ -85,8 +91,20 @@ public class SimpleExpression extends AbstractExpression {
     return value.hashCode();
   }
 
-  public Object getValue() {
-    return value;
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof SimpleExpression)) {
+      return false;
+    }
+
+    SimpleExpression that = (SimpleExpression) other;
+    return this.propName.equals(that.propName)
+        && this.type == that.type;
   }
 
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    SimpleExpression that = (SimpleExpression) other;
+    return value.equals(that.value);
+  }
 }

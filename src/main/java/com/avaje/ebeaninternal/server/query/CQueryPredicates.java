@@ -13,7 +13,7 @@ import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
-import com.avaje.ebeaninternal.util.DefaultExpressionRequest;
+import com.avaje.ebeaninternal.server.expression.DefaultExpressionRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

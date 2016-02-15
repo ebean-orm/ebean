@@ -1,8 +1,7 @@
-package com.avaje.ebeaninternal.util;
+package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.*;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
-import com.avaje.ebeaninternal.server.expression.FilterExprPath;
 
 import javax.persistence.PersistenceException;
 import java.util.List;

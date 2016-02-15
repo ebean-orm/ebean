@@ -63,6 +63,32 @@ public final class TableJoin {
     return hc;
   }
 
+  @Override
+  public int hashCode() {
+    return queryHash;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    TableJoin that = (TableJoin) o;
+
+    if (!table.equals(that.table)) return false;
+    if (type != that.type) return false;
+    if (columns.length != that.columns.length) return false;
+
+    for (int i = 0; i < columns.length; i++) {
+      if (!columns[i].equals(that.columns[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+
+
   /**
    * Return a hash value for adding to a query plan.
    */

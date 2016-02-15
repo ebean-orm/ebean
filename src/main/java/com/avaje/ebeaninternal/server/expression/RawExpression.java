@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
+import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -54,5 +55,32 @@ class RawExpression extends NonPrepareExpression {
   @Override
   public int queryBindHash() {
     return sql.hashCode();
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof RawExpression)) {
+      return false;
+    }
+    RawExpression that = (RawExpression) other;
+    return sql.equals(that.sql);
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    if (!(other instanceof RawExpression)) {
+      return false;
+    }
+
+    RawExpression that = (RawExpression) other;
+    if (values.length != that.values.length) {
+      return false;
+    }
+    for (int i = 0; i < values.length; i++) {
+      if (!Same.sameByValue(values[i], that.values[i])) {
+        return false;
+      }
+    }
+    return true;
   }
 }

@@ -15,7 +15,6 @@ import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.util.DefaultExpressionList;
 
 /**
  * Junction implementation.
@@ -35,6 +34,14 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     Conjunction(com.avaje.ebean.Query<T> query, ExpressionList<T> parent) {
       super(false, AND, query, parent);
     }
+
+    Conjunction(DefaultExpressionList<T> expressionList) {
+      super(false, AND, expressionList);
+    }
+    @Override
+    public SpiExpression copyForPlanKey() {
+      return new Conjunction<T>(exprList.copyForPlanKey());
+    }
   }
 
   static class Disjunction<T> extends JunctionExpression<T> {
@@ -44,9 +51,18 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     Disjunction(com.avaje.ebean.Query<T> query, ExpressionList<T> parent) {
       super(true, OR, query, parent);
     }
+
+    Disjunction(DefaultExpressionList<T> expressionList) {
+      super(true, OR, expressionList);
+    }
+
+    @Override
+    public SpiExpression copyForPlanKey() {
+      return new Disjunction<T>(exprList.copyForPlanKey());
+    }
   }
 
-  private final DefaultExpressionList<T> exprList;
+  protected final DefaultExpressionList<T> exprList;
 
   private final String joinType;
 
@@ -59,6 +75,15 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     this.disjunction = disjunction;
     this.joinType = joinType;
     this.exprList = new DefaultExpressionList<T>(query, parent);
+  }
+
+  /**
+   * Construct for copyForPlanKey.
+   */
+  JunctionExpression(boolean disjunction, String joinType, DefaultExpressionList<T> exprList) {
+    this.disjunction = disjunction;
+    this.joinType = joinType;
+    this.exprList = exprList;
   }
 
   @Override
@@ -161,6 +186,25 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     }
 
     return hc;
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+
+    if (!(other instanceof JunctionExpression)) {
+      return false;
+    }
+
+    JunctionExpression that = (JunctionExpression) other;
+    return joinType.equals(that.joinType)
+        && exprList.isSameByPlan(that.exprList);
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    JunctionExpression that = (JunctionExpression) other;
+    return joinType.equals(that.joinType)
+        && exprList.isSameByBind(that.exprList);
   }
 
   @Override

@@ -16,7 +16,7 @@ public class DefaultOrmQueryTest {
     DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("name", "a","b","c").query();
     DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 2,2,3).query();
 
-    assertThat(q1.calculateQueryPlanHash()).isNotEqualTo(q2.calculateQueryPlanHash());
+    assertThat(q1.createQueryPlanKey()).isNotEqualTo(q2.createQueryPlanKey());
     assertThat(q1.queryBindHash()).isNotEqualTo(q2.queryBindHash());
   }
 
@@ -26,7 +26,7 @@ public class DefaultOrmQueryTest {
     DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 1,2,3).query();
     DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 2,2,3).query();
 
-    assertThat(q1.calculateQueryPlanHash()).isEqualTo(q2.calculateQueryPlanHash());
+    assertThat(q1.createQueryPlanKey()).isEqualTo(q2.createQueryPlanKey());
     assertThat(q1.queryBindHash()).isNotEqualTo(q2.queryBindHash());
   }
 
@@ -36,7 +36,7 @@ public class DefaultOrmQueryTest {
     DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 1,2,3).query();
     DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 1,2,3).query();
 
-    assertThat(q1.calculateQueryPlanHash()).isEqualTo(q2.calculateQueryPlanHash());
+    assertThat(q1.createQueryPlanKey()).isEqualTo(q2.createQueryPlanKey());
     assertThat(q1.queryBindHash()).isEqualTo(q2.queryBindHash());
   }
 
@@ -55,7 +55,7 @@ public class DefaultOrmQueryTest {
         .fetch("details", "orderQty, unitPrice")
         .fetch("details.product", "sku, name");
 
-    assertThat(query1.calculateQueryPlanHash()).isNotEqualTo(query2.calculateQueryPlanHash());
+    assertThat(query1.createQueryPlanKey()).isNotEqualTo(query2.createQueryPlanKey());
   }
 
   @Test
@@ -69,7 +69,7 @@ public class DefaultOrmQueryTest {
         .setFirstRow(1)
         .setMaxRows(0);
 
-    assertThat(query1.calculateQueryPlanHash()).isNotEqualTo(query2.calculateQueryPlanHash());
+    assertThat(query1.createQueryPlanKey()).isNotEqualTo(query2.createQueryPlanKey());
   }
 
 }
