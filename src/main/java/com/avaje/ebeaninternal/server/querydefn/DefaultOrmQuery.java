@@ -760,18 +760,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   CQueryPlanKey createQueryPlanKey() {
 
-    DefaultExpressionList<T> where = null;
-    DefaultExpressionList<T> having = null;
-    if (whereExpressions != null) {
-       where = whereExpressions.copyForPlanKey();
-    }
-    if (havingExpressions != null) {
-      having = havingExpressions.copyForPlanKey();
-    }
-
     queryPlanKey = new OrmQueryPlanKey(includeTableJoin, type, detail, maxRows, firstRow,
         disableLazyLoading, rawWhereClause, orderBy, query, additionalWhere, additionalHaving,
-        distinct, sqlDistinct, mapKey, id, bindParams, where, having,
+        distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
         temporalMode, forUpdate, rootTableAlias, rawSql);
 
     return queryPlanKey;

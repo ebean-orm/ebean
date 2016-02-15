@@ -17,12 +17,10 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
   private final TableJoin includeTableJoin;
   private final String orderByAsSting;
   private final OrmQueryDetail detail;
-  private final BindParams bindParams;
-  private final SpiExpression whereExpressions;
-  private final SpiExpression havingExpressions;
-  private final RawSql rawSql;
+  private final SpiExpression where;
+  private final SpiExpression having;
+  private final RawSql.Key rawSqlKey;
   private final boolean hasIdValue;
-
   private final SpiQuery.Type type;
   private final int maxRows;
   private final int firstRow;
@@ -58,13 +56,12 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
     this.sqlDistinct = sqlDistinct;
     this.mapKey = mapKey;
     this.hasIdValue = (id != null);
-    this.bindParams = bindParams;
-    this.whereExpressions = whereExpressions;
-    this.havingExpressions = havingExpressions;
+    this.where = (whereExpressions == null) ? null : whereExpressions.copyForPlanKey();
+    this.having = (havingExpressions == null) ? null : havingExpressions.copyForPlanKey();
     this.temporalMode = temporalMode;
     this.forUpdate = forUpdate;
     this.rootTableAlias = rootTableAlias;
-    this.rawSql = rawSql;
+    this.rawSqlKey = (rawSql == null) ? null : rawSql.getKey();
 
     // exclude bind values and things unrelated to the sql being generated
     HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
@@ -78,7 +75,7 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
     builder.add(disableLazyLoading);
     builder.add(hasIdValue);
     builder.add(temporalMode);
-    builder.add(rawSql == null ? 0 : rawSql.queryHash());
+    builder.add(rawSqlKey == null ? 0 : rawSqlKey.hashCode());
     builder.add(includeTableJoin != null ? includeTableJoin.queryHash() : 0);
     builder.add(rootTableAlias);
 
@@ -88,11 +85,11 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
     if (bindParams != null) {
       bindParams.buildQueryPlanHash(builder);
     }
-    if (whereExpressions != null) {
-      whereExpressions.queryPlanHash(builder);
+    if (where != null) {
+      where.queryPlanHash(builder);
     }
-    if (havingExpressions != null) {
-      havingExpressions.queryPlanHash(builder);
+    if (having != null) {
+      having.queryPlanHash(builder);
     }
 
     this.planHash = builder.getPlanHash();
@@ -118,11 +115,9 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
 
     if (planHash != that.planHash) return false;
     if (bindCount != that.bindCount) return false;
-
     if (maxRows != that.maxRows) return false;
     if (firstRow != that.firstRow) return false;
     if (disableLazyLoading != that.disableLazyLoading) return false;
-
     if (distinct != that.distinct) return false;
     if (sqlDistinct != that.sqlDistinct) return false;
     if (forUpdate != that.forUpdate) return false;
@@ -131,13 +126,11 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
     if (temporalMode != that.temporalMode) return false;
     if (includeTableJoin != null ? !includeTableJoin.equals(that.includeTableJoin) : that.includeTableJoin != null) return false;
     if (orderByAsSting != null ? !orderByAsSting.equals(that.orderByAsSting) : that.orderByAsSting != null) return false;
-
-    if (whereExpressions != null ? !whereExpressions.isSameByPlan(that.whereExpressions) : that.whereExpressions != null) return false;
-    if (havingExpressions != null ? !havingExpressions.isSameByPlan(that.havingExpressions) : that.havingExpressions != null) return false;
+    if (where != null ? !where.isSameByPlan(that.where) : that.where != null) return false;
+    if (having != null ? !having.isSameByPlan(that.having) : that.having != null) return false;
+    if (rawSqlKey != null ? !rawSqlKey.equals(that.rawSqlKey) : that.rawSqlKey != null) return false;
 
 //    if (detail != null ? !detail.equals(that.detail) : that.detail != null) return false;
-//    if (bindParams != null ? !bindParams.equals(that.bindParams) : that.bindParams != null) return false;
-//    if (rawSql != null ? !rawSql.equals(that.rawSql) : that.rawSql != null) return false;
 
     if (rawWhereClause != null ? !rawWhereClause.equals(that.rawWhereClause) : that.rawWhereClause != null) return false;
     if (query != null ? !query.equals(that.query) : that.query != null) return false;

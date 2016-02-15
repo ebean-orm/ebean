@@ -71,7 +71,7 @@ class DRawSqlParser {
 
     preFrom = trimSelectKeyword(preFrom);
 
-    return new Sql(sql.hashCode(), preFrom, preWhere, whereExprAnd, preHaving, havingExprAnd, orderByPrefix, orderBySql, (distinctPos > -1));
+    return new Sql(sql, preFrom, preWhere, whereExprAnd, preHaving, havingExprAnd, orderByPrefix, orderBySql, (distinctPos > -1));
   }
 
   /**
