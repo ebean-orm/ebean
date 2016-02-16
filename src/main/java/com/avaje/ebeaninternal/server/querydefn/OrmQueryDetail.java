@@ -172,17 +172,13 @@ public class OrmQueryDetail implements Serializable {
     Collections.sort(matchingPaths);
 
     // the list of secondary queries
-    ArrayList<OrmQueryProperties> props = new ArrayList<OrmQueryProperties>(2);
+    ArrayList<OrmQueryProperties> props = new ArrayList<OrmQueryProperties>();
 
     for (int i = 0; i < matchingPaths.size(); i++) {
       String path = matchingPaths.get(i);
       includes.remove(path);
       OrmQueryProperties secQuery = fetchPaths.remove(path);
-      if (secQuery == null) {
-        // the path has already been removed by another
-        // secondary query
-
-      } else {
+      if (secQuery != null) {
         props.add(secQuery);
 
         // remove any child properties for this path
@@ -332,8 +328,7 @@ public class OrmQueryDetail implements Serializable {
 
         // this is a join to a *ToMany
         OrmQueryProperties chunk = fetchPaths.get(fetchPath);
-        if (chunk.isFetchJoin() && !isLazyLoadManyRoot(lazyLoadManyPath, chunk)
-            && !hasParentSecJoin(lazyLoadManyPath, chunk)) {
+        if (isQueryJoinCandidate(lazyLoadManyPath, chunk)) {
           // this is a 'fetch join' (included in main query)
           if (fetchJoinFirstMany) {
             // letting the first one remain a 'fetch join'
@@ -351,6 +346,15 @@ public class OrmQueryDetail implements Serializable {
       // convert 'fetch joins' over to 'query joins'
       manyChunks.get(i).setQueryFetch(queryBatch, true);
     }
+  }
+
+  /**
+   * Return true if this path is a candidate for converting to a query join.
+   */
+  private boolean isQueryJoinCandidate(String lazyLoadManyPath, OrmQueryProperties chunk) {
+    return chunk.isFetchJoin()
+        && !isLazyLoadManyRoot(lazyLoadManyPath, chunk)
+        && !hasParentSecJoin(lazyLoadManyPath, chunk);
   }
 
   /**
