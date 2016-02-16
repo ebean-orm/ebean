@@ -40,24 +40,6 @@ public class DefaultOrmQueryTest {
     assertThat(q1.queryBindHash()).isEqualTo(q2.queryBindHash());
   }
 
-
-  @Test
-  public void when_FetchConfig_then_differentPlan() throws Exception {
-
-    DefaultOrmQuery<?> query1 = (DefaultOrmQuery<?>)Ebean.find(Order.class)
-        .select("status, shipDate")
-        .fetch("details", "orderQty, unitPrice", new FetchConfig().query())
-        .fetch("details.product", "sku, name");
-
-
-    DefaultOrmQuery<?> query2 = (DefaultOrmQuery<?>)Ebean.find(Order.class)
-        .select("status, shipDate")
-        .fetch("details", "orderQty, unitPrice")
-        .fetch("details.product", "sku, name");
-
-    assertThat(query1.createQueryPlanKey()).isNotEqualTo(query2.createQueryPlanKey());
-  }
-
   @Test
   public void when_diffFirstMaxRows_then_differentPlan() throws Exception {
 

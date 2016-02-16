@@ -29,6 +29,8 @@ public class OrmQueryDetailParser {
 
   public OrmQueryDetail parse() throws PersistenceException {
 
+    if (parser.isEmpty()) return detail;
+
     parser.nextWord();
     processInitial();
     return detail;
@@ -155,7 +157,7 @@ public class OrmQueryDetailParser {
   private void readSelect() {
     String path = null;
     String props = parser.nextWord();
-    if (props.startsWith("(")) {
+    if (props != null && props.startsWith("(")) {
       props = props.substring(1, props.length() - 1);
       OrmQueryProperties base = new OrmQueryProperties(path, props);
       detail.setBase(base);

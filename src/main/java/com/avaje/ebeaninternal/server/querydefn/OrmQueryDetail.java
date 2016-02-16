@@ -7,6 +7,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.query.SplitName;
+import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.PersistenceException;
 import java.io.Serializable;
@@ -18,7 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Represents the internal structure of an Object Relational query.
@@ -38,6 +38,7 @@ public class OrmQueryDetail implements Serializable {
   /**
    * Root level properties.
    */
+  @NotNull
   private OrmQueryProperties baseProps = new OrmQueryProperties();
 
   /**
@@ -60,17 +61,17 @@ public class OrmQueryDetail implements Serializable {
     return copy;
   }
 
+  public int queryPlanHash() {
+    HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
+    queryPlanHash(builder);
+    return builder.getPlanHash();
+  }
+
   /**
    * Calculate the hash for the query plan.
    */
   public void queryPlanHash(HashQueryPlanBuilder builder) {
-    if (baseProps == null) {
-      builder.add(false);
-    } else {
-      builder.add(true);
-      baseProps.queryPlanHash(builder);
-    }
-
+    baseProps.queryPlanHash(builder);
     if (fetchPaths != null) {
       for (OrmQueryProperties p : fetchPaths.values()) {
         p.queryPlanHash(builder);
@@ -79,11 +80,10 @@ public class OrmQueryDetail implements Serializable {
   }
 
   /**
-   * Return true if equal in terms of autoTune (select and fetch).
+   * Return true if the details are the same for query plan purposes.
    */
-  public boolean isAutoTuneEqual(OrmQueryDetail otherDetail) {
-
-    if (!isSame(baseProps, otherDetail.baseProps)) {
+  public boolean isSameByPlan(OrmQueryDetail otherDetail) {
+    if (!isSameByPlan(baseProps, otherDetail.baseProps)) {
       return false;
     }
     if (fetchPaths == null) {
@@ -92,10 +92,16 @@ public class OrmQueryDetail implements Serializable {
     if (fetchPaths.size() != otherDetail.fetchPaths.size()) {
       return false;
     }
-    Set<Map.Entry<String, OrmQueryProperties>> entries = fetchPaths.entrySet();
-    for (Map.Entry<String, OrmQueryProperties> entry : entries) {
-      OrmQueryProperties chunk = otherDetail.getChunk(entry.getKey(), false);
-      if (!isSame(entry.getValue(), chunk)) {
+    // check with ordering being important
+    Iterator<Map.Entry<String, OrmQueryProperties>> thisIt = fetchPaths.entrySet().iterator();
+    Iterator<Map.Entry<String, OrmQueryProperties>> thatIt = otherDetail.fetchPaths.entrySet().iterator();
+    while (thisIt.hasNext() && thatIt.hasNext()) {
+      Map.Entry<String, OrmQueryProperties> thisEntry = thisIt.next();
+      Map.Entry<String, OrmQueryProperties> thatEntry = thatIt.next();
+      if (!thisEntry.getKey().equals(thatEntry.getKey())) {
+        return false;
+      }
+      if (!thisEntry.getValue().isSameByPlan(thatEntry.getValue())) {
         return false;
       }
     }
@@ -103,21 +109,54 @@ public class OrmQueryDetail implements Serializable {
     return true;
   }
 
-  private boolean isSame(OrmQueryProperties p1, OrmQueryProperties p2) {
-    if (p1 == null) {
-      return p2 == null;
+  /**
+   * Return true if equal in terms of autoTune (select and fetch without property ordering).
+   */
+  public boolean isAutoTuneEqual(OrmQueryDetail otherDetail) {
+
+    if (!isSameByAutoTune(baseProps, otherDetail.baseProps)) {
+      return false;
     }
-    return p1.isSame(p2);
+    if (fetchPaths == null) {
+      return otherDetail.fetchPaths == null;
+    }
+    if (fetchPaths.size() != otherDetail.fetchPaths.size()) {
+      return false;
+    }
+    // check without regard to ordering
+    for (Map.Entry<String, OrmQueryProperties> entry : fetchPaths.entrySet()) {
+      OrmQueryProperties chunk = otherDetail.getChunk(entry.getKey(), false);
+      if (!isSameByAutoTune(entry.getValue(), chunk)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private boolean isSameByAutoTune(OrmQueryProperties p1, OrmQueryProperties p2) {
+    return p1 == null ? p2 == null : p1.isSameByAutoTune(p2);
+  }
+
+  private boolean isSameByPlan(OrmQueryProperties p1, OrmQueryProperties p2) {
+    return p1 == null ? p2 == null : p1.isSameByPlan(p2);
   }
 
   public String toString() {
+    return asString();
+  }
+
+  /**
+   * Return the detail in string form.
+   */
+  public String asString() {
     StringBuilder sb = new StringBuilder();
-    if (baseProps != null) {
-      sb.append("select ").append(baseProps);
+    if (!baseProps.isEmpty()) {
+      baseProps.append("select ", sb);
     }
     if (fetchPaths != null) {
       for (OrmQueryProperties join : fetchPaths.values()) {
-        sb.append(" fetch ").append(join);
+        join.append(" fetch ", sb);
       }
     }
     return sb.toString();
@@ -135,7 +174,7 @@ public class OrmQueryDetail implements Serializable {
   }
 
   public boolean containsProperty(String property) {
-    return baseProps == null || baseProps.isIncluded(property);
+    return baseProps.isIncluded(property);
   }
 
   /**
@@ -399,9 +438,6 @@ public class OrmQueryDetail implements Serializable {
   public void setDefaultSelectClause(BeanDescriptor<?> desc) {
 
     if (desc.hasDefaultSelectClause() && !hasSelectClause()) {
-      if (baseProps == null) {
-        baseProps = new OrmQueryProperties();
-      }
       baseProps.setDefaultProperties(desc.getDefaultSelectClause(), desc.getDefaultSelectClauseSet());
     }
 
@@ -417,14 +453,14 @@ public class OrmQueryDetail implements Serializable {
   }
 
   public boolean hasSelectClause() {
-    return (baseProps != null && baseProps.hasSelectClause());
+    return (baseProps.hasSelectClause());
   }
 
   /**
    * Return true if the query detail has neither select properties specified or any joins defined.
    */
   public boolean isEmpty() {
-    return fetchPaths.isEmpty() && (baseProps == null || !baseProps.hasProperties());
+    return fetchPaths.isEmpty() && (!baseProps.hasProperties());
   }
 
   /**

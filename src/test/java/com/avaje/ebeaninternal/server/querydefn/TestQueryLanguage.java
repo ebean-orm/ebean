@@ -1,15 +1,14 @@
 package com.avaje.ebeaninternal.server.querydefn;
 
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebeaninternal.server.expression.DefaultExpressionFactory;
 import com.avaje.tests.model.basic.Order;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.Set;
 
 public class TestQueryLanguage extends BaseTestCase {
 
@@ -19,7 +18,7 @@ public class TestQueryLanguage extends BaseTestCase {
     DefaultOrmQuery<Order> q = check("find order join customer (id, name)");
     OrmQueryDetail detail = q.getDetail();
     OrmQueryProperties chunk = detail.getChunk("customer", false);
-    Set<String> props = chunk.getAllIncludedProperties();
+    Set<String> props = chunk.getIncluded();
 
     Assert.assertTrue(props.contains("id"));
     Assert.assertTrue(props.contains("name"));
@@ -27,7 +26,7 @@ public class TestQueryLanguage extends BaseTestCase {
     q = check("find order join customer(id, name)");
     detail = q.getDetail();
     chunk = detail.getChunk("customer", false);
-    props = chunk.getAllIncludedProperties();
+    props = chunk.getIncluded();
 
     Assert.assertTrue(props.contains("id"));
     Assert.assertTrue(props.contains("name"));
@@ -37,7 +36,7 @@ public class TestQueryLanguage extends BaseTestCase {
     q = check("find order join customer(+cache +readonly, id, name)");
     detail = q.getDetail();
     chunk = detail.getChunk("customer", false);
-    props = chunk.getAllIncludedProperties();
+    props = chunk.getIncluded();
     Assert.assertTrue(props.contains("id"));
     Assert.assertTrue(props.contains("name"));
     Assert.assertTrue(chunk.isCache());
@@ -46,7 +45,7 @@ public class TestQueryLanguage extends BaseTestCase {
     q = check("find order join customer(+cache +readonly,id,name)");
     detail = q.getDetail();
     chunk = detail.getChunk("customer", false);
-    props = chunk.getAllIncludedProperties();
+    props = chunk.getIncluded();
     Assert.assertTrue(props.contains("id"));
     Assert.assertTrue(props.contains("name"));
     Assert.assertTrue(chunk.isCache());
@@ -55,14 +54,14 @@ public class TestQueryLanguage extends BaseTestCase {
     q = check("find order(id,status) join customer(+cache +readonly,id,name)");
     detail = q.getDetail();
     chunk = detail.getChunk("customer", false);
-    props = chunk.getAllIncludedProperties();
+    props = chunk.getIncluded();
     Assert.assertTrue(props.contains("id"));
     Assert.assertTrue(props.contains("name"));
     Assert.assertTrue(chunk.isCache());
     Assert.assertTrue(chunk.isReadOnly());
 
     chunk = detail.getChunk(null, false);
-    props = chunk.getAllIncludedProperties();
+    props = chunk.getIncluded();
     Assert.assertTrue(props.contains("id"));
     Assert.assertTrue(props.contains("status"));
     Assert.assertFalse(props.contains("orderDate"));
@@ -70,7 +69,7 @@ public class TestQueryLanguage extends BaseTestCase {
     q = check("find order(id,status) join customer(+cache +readonly,id,name) where id > :minId order by status");
     detail = q.getDetail();
     chunk = detail.getChunk("customer", false);
-    props = chunk.getAllIncludedProperties();
+    props = chunk.getIncluded();
     Assert.assertTrue(props.contains("id"));
     Assert.assertTrue(props.contains("name"));
     Assert.assertTrue(chunk.isCache());

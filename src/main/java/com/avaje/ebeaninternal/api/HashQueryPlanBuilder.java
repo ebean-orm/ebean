@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.api;
 
+import java.util.Set;
+
 /**
  * Used to build HashQueryPlan instances.
  */
@@ -30,6 +32,21 @@ public class HashQueryPlanBuilder {
    */
   public HashQueryPlanBuilder add(Object object) {
     planHash = planHash * 92821 + (object == null ? 0 : object.hashCode());
+    return this;
+  }
+
+  /**
+   * Add the set with order being important.
+   */
+  public HashQueryPlanBuilder addOrdered(Set<?> set) {
+    if (set == null) {
+      add(false);
+    } else {
+      add(true);
+      for (Object o : set) {
+        add(o);
+      }
+    }
     return this;
   }
 

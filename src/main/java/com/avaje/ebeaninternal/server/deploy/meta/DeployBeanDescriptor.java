@@ -33,7 +33,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Describes Beans including their deployment information.
@@ -763,7 +762,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * Parse the include separating by comma or semicolon.
    */
-  public Set<String> parseDefaultSelectClause(String rawList) {
+  public LinkedHashSet<String> parseDefaultSelectClause(String rawList) {
 
     if (rawList == null) {
       return null;
@@ -780,7 +779,7 @@ public class DeployBeanDescriptor<T> {
         set.add(temp);
       }
     }
-    return Collections.unmodifiableSet(set);
+    return set;
   }
 
   /**

@@ -101,7 +101,7 @@ public class TunedQueryInfoTest extends BaseTestCase {
   @NotNull
   private TunedQueryInfo createTunedQueryInfo(OrmQueryDetail tunedDetail) {
     Origin origin = new Origin();
-    origin.setDetail(tunedDetail.toString());
+    origin.setDetail(tunedDetail.asString());
     return new TunedQueryInfo(origin);
   }
 

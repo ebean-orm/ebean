@@ -10,13 +10,12 @@ import com.avaje.ebeaninternal.api.SpiExpressionFactory;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.expression.FilterExprPath;
-import com.avaje.ebeaninternal.server.lib.util.StringHelper;
-import com.avaje.ebeaninternal.server.query.SplitName;
 import com.avaje.ebeaninternal.server.expression.FilterExpressionList;
+import com.avaje.ebeaninternal.server.expression.Same;
+import com.avaje.ebeaninternal.server.query.SplitName;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,8 +31,7 @@ public class OrmQueryProperties implements Serializable {
   private String parentPath;
   private String path;
 
-  private String properties;
-
+  private String rawProperties;
   private String trimmedProperties;
 
   /**
@@ -57,7 +55,7 @@ public class OrmQueryProperties implements Serializable {
    * Note this SHOULD be a LinkedHashSet to preserve order of the properties. This is to make using
    * SqlSelect easier with predictable property/column ordering.
    */
-  private Set<String> included;
+  private LinkedHashSet<String> included;
 
   /**
    * Included bean joins.
@@ -92,8 +90,10 @@ public class OrmQueryProperties implements Serializable {
     this.parentPath = SplitName.parent(path);
   }
 
+  /**
+   * Construct for root so path (and parentPath) are null.
+   */
   public OrmQueryProperties() {
-    this(null);
   }
 
   /**
@@ -137,25 +137,17 @@ public class OrmQueryProperties implements Serializable {
    * This can include the +query and +lazy type hints.
    * </p>
    */
-  public void setProperties(String properties) {
-    this.properties = properties;
-    this.trimmedProperties = properties;
-    parseProperties();
+  public void setProperties(String rawProperties) {
 
-    if (!isAllProperties()) {
-      Set<String> parsed = parseIncluded(trimmedProperties);
-      if (parsed.contains("*")) {
-        this.included = null;
-      } else {
-        this.included = parsed;
-      }
-    } else {
-      this.included = null;
-    }
-  }
+    OrmQueryPropertiesParser.Response response = OrmQueryPropertiesParser.parse(rawProperties);
 
-  private boolean isAllProperties() {
-    return (trimmedProperties == null) || (trimmedProperties.length() == 0) || "*".equals(trimmedProperties);
+    this.rawProperties = rawProperties;
+    this.trimmedProperties = response.properties;
+    this.included = response.included;
+    this.lazyFetchBatch = response.lazyFetchBatch;
+    this.queryFetchBatch = response.queryFetchBatch;
+    this.cache = response.cache;
+    this.readOnly = response.readOnly;
   }
 
   /**
@@ -204,8 +196,8 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Set the properties from deployment default FetchTypes.
    */
-  public void setDefaultProperties(String properties, Set<String> included) {
-    this.properties = properties;
+  public void setDefaultProperties(String properties, LinkedHashSet<String> included) {
+    this.rawProperties = properties;
     this.trimmedProperties = properties;
     this.included = included;
   }
@@ -215,7 +207,7 @@ public class OrmQueryProperties implements Serializable {
    */
   public void setTunedProperties(OrmQueryProperties tunedProperties) {
     if (tunedProperties.hasProperties()) {
-      this.properties = tunedProperties.properties;
+      this.rawProperties = tunedProperties.rawProperties;
       this.trimmedProperties = tunedProperties.trimmedProperties;
       this.included = tunedProperties.included;
       this.queryFetchBatch = Math.max(queryFetchBatch, tunedProperties.queryFetchBatch);
@@ -264,7 +256,7 @@ public class OrmQueryProperties implements Serializable {
     OrmQueryProperties copy = new OrmQueryProperties();
     copy.parentPath = parentPath;
     copy.path = path;
-    copy.properties = properties;
+    copy.rawProperties = rawProperties;
     copy.trimmedProperties = trimmedProperties;
     copy.cache = cache;
     copy.readOnly = readOnly;
@@ -273,7 +265,7 @@ public class OrmQueryProperties implements Serializable {
     copy.lazyFetchBatch = lazyFetchBatch;
     copy.filterMany = filterMany;
     if (included != null) {
-      copy.included = new HashSet<String>(included);
+      copy.included = new LinkedHashSet<String>(included);
     }
     if (includedBeanJoin != null) {
       copy.includedBeanJoin = new HashSet<String>(includedBeanJoin);
@@ -290,17 +282,28 @@ public class OrmQueryProperties implements Serializable {
     return included != null;
   }
 
+  /**
+   * Return true if the properties and configuration are empty.
+   */
+  public boolean isEmpty() {
+    return rawProperties == null || rawProperties.isEmpty();
+  }
+
   public String toString() {
-    String s = "";
+    StringBuilder sb = new StringBuilder(40);
+    append("", sb);
+    return sb.toString();
+  }
+
+  public String append(String prefix, StringBuilder sb) {
+    sb.append(prefix);
     if (path != null) {
-      s += path + " ";
+      sb.append(path).append(" ");
     }
-    if (properties != null) {
-      s += "(" + properties + ") ";
-    } else if (included != null) {
-      s += "(" + included + ") ";
+    if (!isEmpty()) {
+      sb.append("(").append(rawProperties).append(") ");
     }
-    return s;
+    return sb.toString();
   }
 
   public boolean isChild(OrmQueryProperties possibleChild) {
@@ -318,35 +321,22 @@ public class OrmQueryProperties implements Serializable {
   }
 
   /**
-   * Calculate the query plan hash.
+   * Return the raw properties.
    */
-  @SuppressWarnings("unchecked")
-  public void queryPlanHash(HashQueryPlanBuilder builder) {
-
-    builder.add(path);
-    if (properties != null) {
-      builder.add(properties);
-    } else {
-      builder.add(included);
-    }
-    builder.add(filterMany != null);
-    if (filterMany != null) {
-      filterMany.queryPlanHash(builder);
-    }
-    builder.add(lazyFetchBatch);
-    builder.add(queryFetchBatch);
-    builder.add(queryFetchAll);
-  }
-
   public String getProperties() {
-    return properties;
+    return rawProperties;
   }
 
   /**
-   * Return true if this has properties.
+   * Return true if this has properties. Returning false means this part of the
+   * path is a partial object.
    */
   public boolean hasProperties() {
-    return properties != null || included != null;
+    return included != null;
+  }
+
+  public boolean allProperties() {
+    return included == null;
   }
 
   /**
@@ -370,10 +360,6 @@ public class OrmQueryProperties implements Serializable {
     includedBeanJoin.add(propertyName);
   }
 
-  public boolean allProperties() {
-    return included == null;
-  }
-
   /**
    * This excludes the bean joined properties.
    * <p>
@@ -386,7 +372,7 @@ public class OrmQueryProperties implements Serializable {
       return included;
     }
 
-    LinkedHashSet<String> temp = new LinkedHashSet<String>(secondaryQueryJoins.size() + included.size());
+    LinkedHashSet<String> temp = new LinkedHashSet<String>(2 * (secondaryQueryJoins.size() + included.size()));
     temp.addAll(included);
     temp.addAll(secondaryQueryJoins);
     return temp;
@@ -400,30 +386,10 @@ public class OrmQueryProperties implements Serializable {
   }
 
   /**
-   * Return all the properties including the bean joins. This is the set that will be used by
-   * EntityBeanIntercept to determine if a property needs to be lazy loaded.
+   * Return the property set.
    */
-  public Set<String> getAllIncludedProperties() {
-
-    if (included == null) {
-      return null;
-    }
-
-    if (includedBeanJoin == null && secondaryQueryJoins == null) {
-      return new LinkedHashSet<String>(included);
-    }
-
-    LinkedHashSet<String> s = new LinkedHashSet<String>(2 * (included.size() + 5));
-    if (included != null) {
-      s.addAll(included);
-    }
-    if (includedBeanJoin != null) {
-      s.addAll(includedBeanJoin);
-    }
-    if (secondaryQueryJoins != null) {
-      s.addAll(secondaryQueryJoins);
-    }
-    return s;
+  protected Set<String> getIncluded() {
+    return included;
   }
 
   public boolean isIncluded(String propName) {
@@ -480,96 +446,47 @@ public class OrmQueryProperties implements Serializable {
     return path;
   }
 
-  private void parseProperties() {
-    if (trimmedProperties == null) {
-      return;
-    }
-    int pos = trimmedProperties.indexOf("+readonly");
-    if (pos > -1) {
-      trimmedProperties = StringHelper.replaceString(trimmedProperties, "+readonly", "");
-      this.readOnly = true;
-    }
-    pos = trimmedProperties.indexOf("+cache");
-    if (pos > -1) {
-      trimmedProperties = StringHelper.replaceString(trimmedProperties, "+cache", "");
-      this.cache = true;
-    }
-    pos = trimmedProperties.indexOf("+query");
-    if (pos > -1) {
-      queryFetchBatch = parseBatchHint(pos, "+query");
-    }
-    pos = trimmedProperties.indexOf("+lazy");
-    if (pos > -1) {
-      lazyFetchBatch = parseBatchHint(pos, "+lazy");
-    }
-
-    trimmedProperties = trimmedProperties.trim();
-    while (trimmedProperties.startsWith(",")) {
-      trimmedProperties = trimmedProperties.substring(1).trim();
-    }
-  }
-
-  private int parseBatchHint(int pos, String option) {
-
-    int startPos = pos + option.length();
-
-    int endPos = findEndPos(startPos, trimmedProperties);
-    if (endPos == -1) {
-      trimmedProperties = StringHelper.replaceString(trimmedProperties, option, "");
-      return 0;
-
-    } else {
-
-      String batchParam = trimmedProperties.substring(startPos + 1, endPos);
-
-      if (endPos + 1 >= trimmedProperties.length()) {
-        trimmedProperties = trimmedProperties.substring(0, pos);
-      } else {
-        trimmedProperties = trimmedProperties.substring(0, pos) + trimmedProperties.substring(endPos + 1);
-      }
-      return Integer.parseInt(batchParam);
-    }
-  }
-
-  private int findEndPos(int pos, String props) {
-
-    if (pos < props.length()) {
-      if (props.charAt(pos) == '(') {
-        int endPara = props.indexOf(')', pos + 1);
-        if (endPara == -1) {
-          String m = "Error could not find ')' in " + props + " after position " + pos;
-          throw new RuntimeException(m);
-        }
-        return endPara;
-      }
-    }
-    return -1;
-  }
-
   /**
-   * Parse the include separating by comma or semicolon.
+   * Return true if the properties are the same for autoTune purposes.
    */
-  private static Set<String> parseIncluded(String rawList) {
-
-    String[] res = rawList.split(",");
-
-    LinkedHashSet<String> set = new LinkedHashSet<String>(res.length + 3);
-
-    String temp;
-    for (int i = 0; i < res.length; i++) {
-      temp = res[i].trim();
-      if (temp.length() > 0) {
-        set.add(temp);
-      }
-    }
-
-    return Collections.unmodifiableSet(set);
-  }
-
-  public boolean isSame(OrmQueryProperties p2) {
+  public boolean isSameByAutoTune(OrmQueryProperties p2) {
     if (included == null) {
       return p2.included == null;
     }
     return included.equals(p2.included);
   }
+
+  /**
+   * Properties are the same for query plan purposes.
+   */
+  public boolean isSameByPlan(OrmQueryProperties p2) {
+
+    if (!Same.sameByValue(secondaryQueryJoins, p2.secondaryQueryJoins)) return false;
+    if (!Same.sameByValue(included, p2.included)) return false;
+    if (!Same.sameByNull(filterMany, p2.filterMany)) return false;
+    if (filterMany != null && !filterMany.isSameByPlan(p2.filterMany)) return false;
+
+    return lazyFetchBatch == p2.lazyFetchBatch
+        && queryFetchBatch == p2.queryFetchBatch
+        && queryFetchAll == p2.queryFetchAll;
+  }
+
+  /**
+   * Calculate the query plan hash.
+   */
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
+
+    builder.add(path);
+    builder.addOrdered(included);
+    builder.add(secondaryQueryJoins);
+
+    builder.add(filterMany != null);
+    if (filterMany != null) {
+      filterMany.queryPlanHash(builder);
+    }
+    builder.add(lazyFetchBatch);
+    builder.add(queryFetchBatch);
+    builder.add(queryFetchAll);
+  }
+
 }

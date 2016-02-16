@@ -1038,7 +1038,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return findId(query, t);
   }
 
-  private <T> SpiOrmQueryRequest<T> createQueryRequest(Type type, Query<T> query, Transaction t) {
+  <T> SpiOrmQueryRequest<T> createQueryRequest(Type type, Query<T> query, Transaction t) {
 
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setType(type);

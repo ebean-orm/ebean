@@ -73,9 +73,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -347,7 +347,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   private final BeanDescriptorJsonHelp<T> jsonHelp;
   
   private final String defaultSelectClause;
-  private final Set<String> defaultSelectClauseSet;
+  private final LinkedHashSet<String> defaultSelectClauseSet;
 
   private SpiEbeanServer ebeanServer;
 
@@ -856,7 +856,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   /**
    * Return the default select clause already parsed into an ordered Set.
    */
-  public Set<String> getDefaultSelectClauseSet() {
+  public LinkedHashSet<String> getDefaultSelectClauseSet() {
     return defaultSelectClauseSet;
   }
 
