@@ -119,8 +119,7 @@ public class DLoadContext implements LoadContext {
 
     if (secQuery != null) {
       for (int i = 0; i < secQuery.size(); i++) {
-        OrmQueryProperties properties = secQuery.get(i);
-        LoadSecondaryQuery load = getLoadSecondaryQuery(properties.getPath());
+        LoadSecondaryQuery load = getLoadSecondaryQuery(secQuery.get(i).getPath());
         load.loadSecondaryQuery(parentRequest);
       }
     }
@@ -138,30 +137,19 @@ public class DLoadContext implements LoadContext {
   }
 
   /**
-   * Remove the +query and +lazy secondary queries and
-   * register them with their appropriate LoadBeanContext
-   * or LoadManyContext.
-   * <p>
-   * The parts of the secondary queries are removed and used
-   * by LoadBeanContext/LoadManyContext to build the appropriate
-   * queries.
-   * </p>
+   * Register the +query and +lazy secondary queries with their appropriate LoadBeanContext or LoadManyContext.
    */
-  public void registerSecondaryQueries(SpiQuery<?> query) {
+  public void registerSecondaryQueries(List<OrmQueryProperties> queryJoins, List<OrmQueryProperties> lazyJoins) {
 
-    secQuery = query.removeQueryJoins();
+    this.secQuery = queryJoins;
     if (secQuery != null) {
       for (int i = 0; i < secQuery.size(); i++) {
-        OrmQueryProperties props = secQuery.get(i);
-        registerSecondaryQuery(props);
+        registerSecondaryQuery(secQuery.get(i));
       }
     }
-
-    List<OrmQueryProperties> lazyQueries = query.removeLazyJoins();
-    if (lazyQueries != null) {
-      for (int i = 0; i < lazyQueries.size(); i++) {
-        OrmQueryProperties lazyProps = lazyQueries.get(i);
-        registerSecondaryQuery(lazyProps);
+    if (lazyJoins != null) {
+      for (int i = 0; i < lazyJoins.size(); i++) {
+        registerSecondaryQuery(lazyJoins.get(i));
       }
     }
   }
@@ -172,13 +160,11 @@ public class DLoadContext implements LoadContext {
    */
   private void registerSecondaryQuery(OrmQueryProperties props) {
 
-    String propName = props.getPath();
-    ElPropertyValue elGetValue = rootDescriptor.getElGetValue(propName);
+    ElPropertyValue elGetValue = rootDescriptor.getElGetValue(props.getPath());
 
     boolean many = elGetValue.getBeanProperty().containsMany();
     registerSecondaryNode(many, props);
   }
-
 
   public ObjectGraphNode getObjectGraphNode(String path) {
 

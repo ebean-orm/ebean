@@ -5,6 +5,9 @@ import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
+import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
+
+import java.util.List;
 
 /**
  * Controls the loading of reference objects for a query instance.
@@ -23,16 +26,11 @@ public interface LoadContext {
 	void executeSecondaryQueries(OrmQueryRequest<?> parentRequest);
 
 	/**
-	 * Register any secondary queries (+query or +lazy) with their
-	 * appropriate LoadBeanContext or LoadManyContext.
-	 * <p>
-	 * This is so the LoadBeanContext or LoadManyContext use the 
-	 * defined query for +query and +lazy execution.
-	 * </p>
+	 * Register any secondary queries (+query or +lazy) with their appropriate LoadBeanContext or LoadManyContext.
 	 */
-	void registerSecondaryQueries(SpiQuery<?> query);
-	
-	/**
+  void registerSecondaryQueries(List<OrmQueryProperties> queryJoins, List<OrmQueryProperties> lazyJoins);
+
+  /**
 	 * Return the node for a given path which is used by AutoTune profiling.
 	 */
 	ObjectGraphNode getObjectGraphNode(String path);

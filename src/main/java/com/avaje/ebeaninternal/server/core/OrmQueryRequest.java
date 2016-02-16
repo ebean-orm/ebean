@@ -13,9 +13,9 @@ import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.BeanIdList;
+import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.HashQuery;
 import com.avaje.ebeaninternal.api.LoadContext;
-import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Type;
@@ -28,6 +28,7 @@ import com.avaje.ebeaninternal.server.deploy.DeployPropertyParserMap;
 import com.avaje.ebeaninternal.server.loadcontext.DLoadContext;
 import com.avaje.ebeaninternal.server.query.CQueryPlan;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
+import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 import javax.persistence.PersistenceException;
@@ -61,6 +62,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   private HashQuery cacheKey;
 
   private CQueryPlanKey queryPlanKey;
+
+  private List<OrmQueryProperties> queryJoins;
+
+  private List<OrmQueryProperties> lazyJoins;
 
   /**
    * Create the InternalQueryRequest.
@@ -143,8 +148,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Prepare the query and calculate the query plan key.
    */
-  public void prepareQuery() {
+  public void prepareQuery(int queryBatchSize) {
+
     adapterPreQuery();
+
+    // determine extra joins required to support where clause predicates on *ToMany properties
+    query.convertJoins(queryBatchSize);
+    this.queryJoins = query.removeQueryJoins();
+    this.lazyJoins = query.removeLazyJoins();
     this.queryPlanKey = query.prepare(this);
   }
 
@@ -207,7 +218,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     // initialise the persistenceContext and loadContext
     this.persistenceContext = getPersistenceContext(query, transaction);
     this.loadContext = new DLoadContext(this);
-    this.loadContext.registerSecondaryQueries(query);
+    this.loadContext.registerSecondaryQueries(queryJoins, lazyJoins);
   }
 
   /**
@@ -231,7 +242,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
     // determine the scope (from the query and then server)
     PersistenceContextScope scope = ebeanServer.getPersistenceContextScope(query);
-    return (scope == PersistenceContextScope.QUERY) ? new DefaultPersistenceContext() :  t.getPersistenceContext();
+    return (scope == PersistenceContextScope.QUERY) ? new DefaultPersistenceContext() : t.getPersistenceContext();
   }
 
   /**
@@ -321,7 +332,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   @SuppressWarnings("unchecked")
   public Set<?> findSet() {
-    return (Set<T>)queryEngine.findMany(this);
+    return (Set<T>) queryEngine.findMany(this);
   }
 
   /**

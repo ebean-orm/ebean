@@ -378,12 +378,14 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Return true if the where expressions contains a many property.
    */
-  public boolean initManyWhereJoins() {
+  private void initManyWhereJoins() {
     manyWhereJoins = new ManyWhereJoins();
     if (whereExpressions != null) {
       whereExpressions.containsMany(beanDescriptor, manyWhereJoins);
     }
-    return !manyWhereJoins.isEmpty();
+    if (!manyWhereJoins.isEmpty()) {
+      setSqlDistinct(true);
+    }
   }
 
   public ManyWhereJoins getManyWhereJoins() {
@@ -440,8 +442,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     this.lazyLoadManyPath = lazyLoadManyPath;
   }
 
-  @Override
-  public boolean isAllowOneManyFetch() {
+  private boolean isAllowOneManyFetch() {
 
     if (Mode.LAZYLOAD_MANY.equals(getMode())) {
       return false;
@@ -453,10 +454,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return true;
   }
 
+  @Override
+  public void convertJoins(int queryBatchSize) {
+    initManyWhereJoins();
+    convertManyFetchJoinsToQueryJoins(queryBatchSize);
+  }
+
   /**
    * Convert any many joins fetch joins to query joins.
    */
-  public void convertManyFetchJoinsToQueryJoins(int queryBatch) {
+  private void convertManyFetchJoinsToQueryJoins(int queryBatch) {
     boolean allowOne = isAllowOneManyFetch();
     detail.convertManyFetchJoinsToQueryJoins(beanDescriptor, lazyLoadManyPath, allowOne, queryBatch);
   }

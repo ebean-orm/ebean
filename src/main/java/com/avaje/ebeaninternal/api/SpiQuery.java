@@ -290,16 +290,6 @@ public interface SpiQuery<T> extends Query<T> {
   void setBeanDescriptor(BeanDescriptor<?> desc);
 
   /**
-   * Initialise/determine the joins required to support 'many' where clause predicates.
-   */
-  boolean initManyWhereJoins();
-
-  /**
-   * Return true if one Many fetch join is allowed.
-   */
-  boolean isAllowOneManyFetch();
-
-  /**
    * Return the joins required to support predicates on the many properties.
    */
   ManyWhereJoins getManyWhereJoins();
@@ -346,9 +336,9 @@ public interface SpiQuery<T> extends Query<T> {
   void setLazyLoadManyPath(String lazyLoadManyPath);
 
   /**
-   * Convert any many joins fetch joins to query joins.
+   * Convert joins as necessary to query joins etc.
    */
-  void convertManyFetchJoinsToQueryJoins(int queryBatch);
+  void convertJoins(int queryBatchSize);
 
   /**
    * Return the TransactionContext.

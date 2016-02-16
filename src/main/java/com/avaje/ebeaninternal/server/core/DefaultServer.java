@@ -462,17 +462,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return cqueryEngine.buildQuery(orm);
   }
 
-  public CQueryEngine getQueryEngine() {
-    return cqueryEngine;
-  }
-
   public ServerCacheManager getServerCacheManager() {
     return serverCacheManager;
-  }
-
-  public void refreshMany(Object parentBean, String propertyName, Transaction t) {
-
-    beanLoader.refreshMany(checkEntityBean(parentBean), propertyName, t);
   }
 
   public void refreshMany(Object parentBean, String propertyName) {
@@ -1073,17 +1064,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       query.setOrigin(createCallStack());
     }
 
-    // determine extra joins required to support where clause
-    // predicates on *ToMany properties
-    if (query.initManyWhereJoins()) {
-      // we need a sql distinct now
-      query.setSqlDistinct(true);
-    }
-
-    query.convertManyFetchJoinsToQueryJoins(queryBatchSize);
-
     OrmQueryRequest<T> request = new OrmQueryRequest<T>(this, queryEngine, query, desc, (SpiTransaction) t);
-    request.prepareQuery();
+    request.prepareQuery(queryBatchSize);
 
     return request;
   }
