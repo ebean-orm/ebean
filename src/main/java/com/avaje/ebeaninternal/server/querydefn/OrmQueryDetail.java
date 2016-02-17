@@ -13,12 +13,12 @@ import javax.persistence.PersistenceException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents the internal structure of an Object Relational query.
@@ -46,8 +46,6 @@ public class OrmQueryDetail implements Serializable {
    */
   private LinkedHashMap<String, OrmQueryProperties> fetchPaths = new LinkedHashMap<String, OrmQueryProperties>(8);
 
-  private LinkedHashSet<String> includes = new LinkedHashSet<String>(8);
-
   /**
    * Return a deep copy of the OrmQueryDetail.
    */
@@ -57,7 +55,6 @@ public class OrmQueryDetail implements Serializable {
     for (Map.Entry<String, OrmQueryProperties> entry : fetchPaths.entrySet()) {
       copy.fetchPaths.put(entry.getKey(), entry.getValue().copy());
     }
-    copy.includes = new LinkedHashSet<String>(includes);
     return copy;
   }
 
@@ -170,7 +167,7 @@ public class OrmQueryDetail implements Serializable {
    * set the properties to include on the base / root entity.
    */
   public void select(String columns) {
-    baseProps = new OrmQueryProperties(null, columns);
+    baseProps = new OrmQueryProperties(null, columns, null);
   }
 
   public boolean containsProperty(String property) {
@@ -215,7 +212,6 @@ public class OrmQueryDetail implements Serializable {
 
     for (int i = 0; i < matchingPaths.size(); i++) {
       String path = matchingPaths.get(i);
-      includes.remove(path);
       OrmQueryProperties secQuery = fetchPaths.remove(path);
       if (secQuery != null) {
         props.add(secQuery);
@@ -228,7 +224,6 @@ public class OrmQueryDetail implements Serializable {
             // remove join to secondary query from the main query
             // and add to this secondary query
             pass2It.remove();
-            includes.remove(pass2Prop.getPath());
             secQuery.add(pass2Prop);
           }
         }
@@ -257,29 +252,24 @@ public class OrmQueryDetail implements Serializable {
     OrmQueryProperties tunedRoot = tunedDetail.getChunk(null, false);
     if (tunedRoot != null) {
       tuned = true;
-      baseProps.setTunedProperties(tunedRoot);
-
+      baseProps = tunedRoot;
       for (OrmQueryProperties tunedChunk : tunedDetail.fetchPaths.values()) {
-        OrmQueryProperties chunk = getChunk(tunedChunk.getPath(), false);
-        if (chunk != null) {
-          // set the properties to select
-          chunk.setTunedProperties(tunedChunk);
-        } else {
-          // add a missing join
-          putFetchPath(tunedChunk.copy());
-        }
+        fetch(tunedChunk.copy());
       }
     }
     return tuned;
   }
 
   /**
-   * Matches a join() method of the query.
+   * Add or replace the fetch detail.
    */
-  public void putFetchPath(OrmQueryProperties chunk) {
+  protected void fetch(OrmQueryProperties chunk) {
     String path = chunk.getPath();
-    fetchPaths.put(path, chunk);
-    includes.add(path);
+    if (path == null) {
+      baseProps = chunk;
+    } else {
+      fetchPaths.put(path, chunk);
+    }
   }
 
   /**
@@ -289,7 +279,6 @@ public class OrmQueryDetail implements Serializable {
    * </p>
    */
   public void clear() {
-    includes.clear();
     fetchPaths.clear();
   }
 
@@ -299,11 +288,16 @@ public class OrmQueryDetail implements Serializable {
    * @param path         the property to join
    * @param partialProps the properties on the join property to include
    */
-  public void addFetch(String path, String partialProps, FetchConfig fetchConfig) {
+  public void fetch(String path, String partialProps, FetchConfig fetchConfig) {
 
-    OrmQueryProperties chunk = getChunk(path, true);
-    chunk.setProperties(partialProps);
-    chunk.setFetchConfig(fetchConfig);
+    fetch(new OrmQueryProperties(path, partialProps, fetchConfig));
+  }
+
+  /**
+   * Add for raw sql etc when the properties are already parsed into a set.
+   */
+  public void fetch(String path, LinkedHashSet<String> properties) {
+    fetch(new OrmQueryProperties(path, properties));
   }
 
   public void sortFetchPaths(BeanDescriptor<?> d) {
@@ -438,15 +432,14 @@ public class OrmQueryDetail implements Serializable {
   public void setDefaultSelectClause(BeanDescriptor<?> desc) {
 
     if (desc.hasDefaultSelectClause() && !hasSelectClause()) {
-      baseProps.setDefaultProperties(desc.getDefaultSelectClause(), desc.getDefaultSelectClauseSet());
+      baseProps = new OrmQueryProperties(null, desc.getDefaultSelectClause());
     }
 
     for (OrmQueryProperties joinProps : fetchPaths.values()) {
       if (!joinProps.hasSelectClause()) {
         BeanDescriptor<?> assocDesc = desc.getBeanDescriptor(joinProps.getPath());
         if (assocDesc.hasDefaultSelectClause()) {
-          // use the default select clause
-          joinProps.setDefaultProperties(assocDesc.getDefaultSelectClause(), assocDesc.getDefaultSelectClauseSet());
+          fetch(joinProps.getPath(), assocDesc.getDefaultSelectClause(), joinProps.getFetchConfig());
         }
       }
     }
@@ -489,7 +482,7 @@ public class OrmQueryDetail implements Serializable {
     OrmQueryProperties props = fetchPaths.get(path);
     if (create && props == null) {
       props = new OrmQueryProperties(path);
-      putFetchPath(props);
+      fetch(props);
       return props;
 
     } else {
@@ -498,9 +491,9 @@ public class OrmQueryDetail implements Serializable {
   }
 
   /**
-   * Return true if the property is included.
+   * Return true if the fetch path is included.
    */
-  public boolean includes(String path) {
+  public boolean includesPath(String path) {
 
     OrmQueryProperties chunk = fetchPaths.get(path);
 
@@ -509,9 +502,9 @@ public class OrmQueryDetail implements Serializable {
   }
 
   /**
-   * Return the property includes for this detail.
+   * Return the fetch paths for this detail.
    */
-  public HashSet<String> getIncludes() {
-    return includes;
+  public Set<String> getFetchPaths() {
+    return fetchPaths.keySet();
   }
 }

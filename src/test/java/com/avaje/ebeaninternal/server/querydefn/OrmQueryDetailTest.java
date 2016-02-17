@@ -3,7 +3,9 @@ package com.avaje.ebeaninternal.server.querydefn;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class OrmQueryDetailTest {
 
@@ -68,4 +70,49 @@ public class OrmQueryDetailTest {
     assertNull(root.getPath());
     assertThat(root.getIncluded()).containsExactly("name");
   }
+
+  @Test
+  public void getFetchPaths_when_noFetches_then_expect_empty() {
+
+    assertThat(new OrmQueryDetail().getFetchPaths()).isEmpty();
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    detail.select("foo");
+
+    assertThat(detail.getFetchPaths()).isEmpty();
+  }
+
+  @Test
+  public void getFetchPaths_when_oneFetch() {
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    detail.select("foo");
+    detail.fetch("customer", null, null);
+
+    assertThat(detail.getFetchPaths()).containsExactly("customer");
+  }
+
+  @Test
+  public void getFetchPaths_when_multipleFetch_expect_preserveOrder() {
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    detail.select("foo");
+    detail.fetch("customer", null, null);
+    detail.fetch("details", null, null);
+
+    assertThat(detail.getFetchPaths()).containsExactly("customer", "details");
+  }
+
+  @Test
+  public void getFetchPaths_when_multipleFetch_expect_preserveOrder_v2() {
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    detail.select("foo");
+    detail.fetch("details", null, null);
+    detail.fetch("customer", null, null);
+    detail.fetch("details.product", null, null);
+
+    assertThat(detail.getFetchPaths()).containsExactly("details", "customer", "details.product");
+  }
+
 }

@@ -2,6 +2,8 @@ package com.avaje.ebeaninternal.server.querydefn;
 
 import org.junit.Test;
 
+import java.util.LinkedHashSet;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OrmQueryPropertiesTest {
@@ -10,6 +12,43 @@ public class OrmQueryPropertiesTest {
     StringBuilder sb = new StringBuilder();
     p1.append(prefix, sb);
     return sb.toString();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void construct_with_propertySet_when_null() {
+    new OrmQueryProperties(null, (LinkedHashSet<String>)null);
+  }
+
+  @Test
+  public void construct_with_propertySet_when_empty() {
+
+    OrmQueryProperties p1 = new OrmQueryProperties(null, new LinkedHashSet<String>());
+    assertThat(p1.getProperties()).isEqualTo("");
+    assertThat(p1.allProperties()).isFalse();
+  }
+
+  @Test
+  public void construct_with_propertySet_when_one() {
+
+    LinkedHashSet<String> set = new LinkedHashSet<String>();
+    set.add("name");
+    OrmQueryProperties p1 = new OrmQueryProperties(null, set);
+
+    assertThat(p1.getProperties()).isEqualTo("name");
+    assertThat(p1.allProperties()).isFalse();
+  }
+
+  @Test
+  public void construct_with_propertySet_when_some() {
+
+    LinkedHashSet<String> set = new LinkedHashSet<String>();
+    set.add("id");
+    set.add("name");
+    set.add("startDate");
+    OrmQueryProperties p1 = new OrmQueryProperties(null, set);
+
+    assertThat(p1.getProperties()).isEqualTo("id,name,startDate");
+    assertThat(p1.allProperties()).isFalse();
   }
 
   @Test

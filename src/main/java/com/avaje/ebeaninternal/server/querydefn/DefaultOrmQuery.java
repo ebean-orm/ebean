@@ -1008,7 +1008,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   public DefaultOrmQuery<T> fetch(String property, String columns, FetchConfig config) {
-    detail.addFetch(property, columns, config);
+    detail.fetch(property, columns, config);
     return this;
   }
 

@@ -1252,7 +1252,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
 
     OrmQueryDetail detail = query.getDetail();
     for (int i = 0; i < propertiesMany.length; i++) {
-      if (detail.includes(propertiesMany[i].getName())) {
+      if (detail.includesPath(propertiesMany[i].getName())) {
         return propertiesMany[i];
       }
     }

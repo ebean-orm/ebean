@@ -353,7 +353,7 @@ public class CQueryBuilder {
 
     // transfer PathProperties into OrmQueryDetail
     for (String path : pathProps.getPaths()) {
-      detail.getChunk(path, true).setDefaultProperties(null, pathProps.get(path));
+      detail.fetch(path, pathProps.get(path));
     }
 
     // check if @Id property included in RawSql

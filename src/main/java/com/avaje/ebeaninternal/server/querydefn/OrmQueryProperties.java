@@ -28,11 +28,11 @@ public class OrmQueryProperties implements Serializable {
 
   private static final long serialVersionUID = -8785582703966455658L;
 
-  private String parentPath;
-  private String path;
+  private final String parentPath;
+  private final String path;
 
-  private String rawProperties;
-  private String trimmedProperties;
+  private final String rawProperties;
+  private final String trimmedProperties;
 
   /**
    * NB: -1 means no +query, 0 means use the default batch size.
@@ -55,7 +55,7 @@ public class OrmQueryProperties implements Serializable {
    * Note this SHOULD be a LinkedHashSet to preserve order of the properties. This is to make using
    * SqlSelect easier with predictable property/column ordering.
    */
-  private LinkedHashSet<String> included;
+  private final LinkedHashSet<String> included;
 
   /**
    * Included bean joins.
@@ -83,25 +83,110 @@ public class OrmQueryProperties implements Serializable {
   private SpiExpressionList filterMany;
 
   /**
-   * Construct with a given path (null == root path).
+   * Construct for root so path (and parentPath) are null.
+   */
+  public OrmQueryProperties() {
+    this((String)null);
+  }
+
+  /**
+   * Construct with a given path.
    */
   public OrmQueryProperties(String path) {
     this.path = path;
     this.parentPath = SplitName.parent(path);
+    this.rawProperties = null;
+    this.trimmedProperties = null;
+    this.included = null;
+  }
+
+  public OrmQueryProperties(String path, String rawProperties) {
+    this(path, rawProperties, null);
+  }
+
+  public OrmQueryProperties(String path, String rawProperties, FetchConfig fetchConfig) {
+
+    OrmQueryPropertiesParser.Response response = OrmQueryPropertiesParser.parse(rawProperties);
+
+    this.path = path;
+    this.parentPath = SplitName.parent(path);
+    this.rawProperties = rawProperties;
+    this.trimmedProperties = response.properties;
+    this.included = response.included;
+    this.lazyFetchBatch = response.lazyFetchBatch;
+    this.queryFetchBatch = response.queryFetchBatch;
+    this.cache = response.cache;
+    this.readOnly = response.readOnly;
+
+    if (fetchConfig != null) {
+      this.fetchConfig = fetchConfig;
+      lazyFetchBatch = fetchConfig.getLazyBatchSize();
+      queryFetchBatch = fetchConfig.getQueryBatchSize();
+      queryFetchAll = fetchConfig.isQueryAll();
+    }
+  }
+
+  public OrmQueryProperties(String path, LinkedHashSet<String> parsedProperties) {
+    if (parsedProperties == null) {
+      throw new IllegalArgumentException("parsedProperties is null");
+    }
+
+    this.path = path;
+    this.parentPath = SplitName.parent(path);
+    // for rawSql parsedProperties can be empty (when only fetching Id property)
+    this.included = parsedProperties;
+    this.rawProperties =  join(parsedProperties);
+    this.trimmedProperties = rawProperties;
+    this.lazyFetchBatch = -1;
+    this.queryFetchBatch = -1;
+    this.cache = false;
+    this.readOnly = false;
+    this.queryFetchAll = false;
   }
 
   /**
-   * Construct for root so path (and parentPath) are null.
+   * Join the set of properties into a comma delimited string.
    */
-  public OrmQueryProperties() {
+  private String join(LinkedHashSet<String> parsedProperties) {
+    StringBuilder sb = new StringBuilder(50);
+    boolean first = true;
+    for (String property : parsedProperties) {
+      if (first) {
+        first = false;
+      } else {
+        sb.append(",");
+      }
+      sb.append(property);
+    }
+    return sb.toString();
   }
 
   /**
-   * Used by query language parser.
+   * Copy constructor.
    */
-  public OrmQueryProperties(String path, String properties) {
-    this(path);
-    setProperties(properties);
+  private OrmQueryProperties(OrmQueryProperties source) {
+
+    this.parentPath = source.parentPath;
+    this.path = source.path;
+    this.rawProperties = source.rawProperties;
+    this.trimmedProperties = source.trimmedProperties;
+    this.cache = source.cache;
+    this.readOnly = source.readOnly;
+    this.queryFetchAll = source.queryFetchAll;
+    this.queryFetchBatch = source.queryFetchBatch;
+    this.lazyFetchBatch = source.lazyFetchBatch;
+    this.filterMany = source.filterMany;
+    this.included = (source.included == null) ? null : new LinkedHashSet<String>(source.included);
+    if (includedBeanJoin != null) {
+      this.includedBeanJoin = new HashSet<String>(source.includedBeanJoin);
+    }
+  }
+
+  /**
+   * Creates a copy of the OrmQueryProperties.
+   */
+  public OrmQueryProperties copy() {
+    return new OrmQueryProperties(this);
   }
 
   /**
@@ -115,39 +200,8 @@ public class OrmQueryProperties implements Serializable {
     orderBy.add(orderProp);
   }
 
-  /**
-   * Set the Fetch configuration options for this path.
-   */
-  public void setFetchConfig(FetchConfig fetchConfig) {
-    if (fetchConfig != null) {
-      this.fetchConfig = fetchConfig;
-      lazyFetchBatch = fetchConfig.getLazyBatchSize();
-      queryFetchBatch = fetchConfig.getQueryBatchSize();
-      queryFetchAll = fetchConfig.isQueryAll();
-    }
-  }
-
   public FetchConfig getFetchConfig() {
     return fetchConfig;
-  }
-
-  /**
-   * Set the comma delimited properties to fetch for this path.
-   * <p>
-   * This can include the +query and +lazy type hints.
-   * </p>
-   */
-  public void setProperties(String rawProperties) {
-
-    OrmQueryPropertiesParser.Response response = OrmQueryPropertiesParser.parse(rawProperties);
-
-    this.rawProperties = rawProperties;
-    this.trimmedProperties = response.properties;
-    this.included = response.included;
-    this.lazyFetchBatch = response.lazyFetchBatch;
-    this.queryFetchBatch = response.queryFetchBatch;
-    this.cache = response.cache;
-    this.readOnly = response.readOnly;
   }
 
   /**
@@ -194,28 +248,6 @@ public class OrmQueryProperties implements Serializable {
   }
 
   /**
-   * Set the properties from deployment default FetchTypes.
-   */
-  public void setDefaultProperties(String properties, LinkedHashSet<String> included) {
-    this.rawProperties = properties;
-    this.trimmedProperties = properties;
-    this.included = included;
-  }
-
-  /**
-   * Set the properties from a matching AutoTune tuned properties.
-   */
-  public void setTunedProperties(OrmQueryProperties tunedProperties) {
-    if (tunedProperties.hasProperties()) {
-      this.rawProperties = tunedProperties.rawProperties;
-      this.trimmedProperties = tunedProperties.trimmedProperties;
-      this.included = tunedProperties.included;
-      this.queryFetchBatch = Math.max(queryFetchBatch, tunedProperties.queryFetchBatch);
-      this.lazyFetchBatch = Math.max(lazyFetchBatch, tunedProperties.lazyFetchBatch);
-    }
-  }
-
-  /**
    * Define the select and joins for this query.
    */
   @SuppressWarnings("unchecked")
@@ -247,30 +279,6 @@ public class OrmQueryProperties implements Serializable {
     if (orderBy != null) {
       query.setOrder(orderBy.copyWithTrim(path));
     }
-  }
-
-  /**
-   * Creates a copy of the OrmQueryProperties.
-   */
-  public OrmQueryProperties copy() {
-    OrmQueryProperties copy = new OrmQueryProperties();
-    copy.parentPath = parentPath;
-    copy.path = path;
-    copy.rawProperties = rawProperties;
-    copy.trimmedProperties = trimmedProperties;
-    copy.cache = cache;
-    copy.readOnly = readOnly;
-    copy.queryFetchAll = queryFetchAll;
-    copy.queryFetchBatch = queryFetchBatch;
-    copy.lazyFetchBatch = lazyFetchBatch;
-    copy.filterMany = filterMany;
-    if (included != null) {
-      copy.included = new LinkedHashSet<String>(included);
-    }
-    if (includedBeanJoin != null) {
-      copy.includedBeanJoin = new HashSet<String>(includedBeanJoin);
-    }
-    return copy;
   }
 
   public boolean hasSelectClause() {
