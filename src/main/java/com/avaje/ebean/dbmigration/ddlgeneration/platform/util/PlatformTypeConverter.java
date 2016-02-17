@@ -5,7 +5,7 @@ import com.avaje.ebean.config.dbplatform.DbTypeMap;
 
 /**
  * Converts a logical column definition into platform specific one.
- *
+ * <p>
  * This translates standard sql types into platform specific ones.
  */
 public class PlatformTypeConverter {
@@ -44,20 +44,21 @@ public class PlatformTypeConverter {
       return columnDefinition;
     }
 
-    String type = columnDefinition.substring(0,open);
+    String suffix = close + 1 < columnDefinition.length() ? columnDefinition.substring(close + 1) : "";
+    String type = columnDefinition.substring(0, open);
     try {
       DbType dbType = platformTypes.lookup(type);
-      int comma = columnDefinition.indexOf(',',open);
+      int comma = columnDefinition.indexOf(',', open);
       if (comma > -1) {
         // scale and precision - decimal(10,4)
-        int scale = Integer.parseInt(columnDefinition.substring(open+1, comma));
-        int precision = Integer.parseInt(columnDefinition.substring(comma+1, close));
-        return  dbType.renderType(scale,precision);
+        int scale = Integer.parseInt(columnDefinition.substring(open + 1, comma));
+        int precision = Integer.parseInt(columnDefinition.substring(comma + 1, close));
+        return dbType.renderType(scale, precision) + suffix;
 
       } else {
         // scale - varchar(10)
-        int scale = Integer.parseInt(columnDefinition.substring(open+1, close));
-        return  dbType.renderType(scale,0);
+        int scale = Integer.parseInt(columnDefinition.substring(open + 1, close));
+        return dbType.renderType(scale, 0) + suffix;
       }
 
     } catch (IllegalArgumentException e) {
@@ -73,7 +74,7 @@ public class PlatformTypeConverter {
 
     try {
       DbType dbType = platformTypes.lookup(columnDefinition);
-      return  dbType.renderType(0,0);
+      return dbType.renderType(0, 0);
 
     } catch (IllegalArgumentException e) {
       // assume already platform specific, leave as is

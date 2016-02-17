@@ -1,5 +1,6 @@
 package com.avaje.tests.model.zero;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -11,10 +12,13 @@ public class WithZero {
   @Id
   long id = 0;
 
-  String name = null;
+  String name;
 
   @ManyToOne
-  WithZeroParent parent = null;
+  WithZeroParent parent;
+
+  @Column(columnDefinition = "varchar(2) default 'en' not null")
+  String lang = "en";
 
   @Version
   long version = 0;
@@ -33,6 +37,14 @@ public class WithZero {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getLang() {
+    return lang;
+  }
+
+  public void setLang(String lang) {
+    this.lang = lang;
   }
 
   public WithZeroParent getParent() {

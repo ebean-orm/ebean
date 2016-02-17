@@ -11,6 +11,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PlatformTypeConverterTest {
 
   @Test
+  public void convert_withSuffix_expect_suffix() {
+
+    PostgresPlatform pg = new PostgresPlatform();
+    DbTypeMap dbTypeMap = pg.getDbTypeMap();
+
+    PlatformTypeConverter converter = new PlatformTypeConverter(dbTypeMap);
+
+    assertThat(converter.convert("varchar(10)")).isEqualTo("varchar(10)");
+    assertThat(converter.convert("VARCHAR(10) default 'en' not null")).isEqualTo("varchar(10) default 'en' not null");
+    assertThat(converter.convert("DECIMAL(10,2) DEFAULT '0.00' NOT NULL")).isEqualTo("decimal(10,2) DEFAULT '0.00' NOT NULL");
+    assertThat(converter.convert("CRAZY(12,0) suffix")).isEqualTo("CRAZY(12,0) suffix");
+    assertThat(converter.convert("CRAZY(12) suffix")).isEqualTo("CRAZY(12) suffix");
+    assertThat(converter.convert("CRAZY suffix")).isEqualTo("CRAZY suffix");
+  }
+
+  @Test
   public void testConvert_given_postgres() throws Exception {
 
     PostgresPlatform pg = new PostgresPlatform();
