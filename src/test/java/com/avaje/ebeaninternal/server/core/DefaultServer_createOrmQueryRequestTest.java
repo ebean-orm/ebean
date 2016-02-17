@@ -5,7 +5,6 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.Query;
-import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 import com.avaje.tests.model.basic.Order;
@@ -15,14 +14,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
 
-  static DefaultServer defaultServer = (DefaultServer) Ebean.getDefaultServer();
-
   Query<Order> query() {
-    return defaultServer.find(Order.class);
+    return server().find(Order.class);
   }
 
   OrmQueryRequest<Order> queryRequest(Query<Order> query) {
-    return (OrmQueryRequest<Order>) defaultServer.createQueryRequest(SpiQuery.Type.LIST, query, null);
+    return OrmQueryRequestTestHelper.queryRequest(query);
   }
 
   OrmQueryDetail detail(Query<Order> query) {

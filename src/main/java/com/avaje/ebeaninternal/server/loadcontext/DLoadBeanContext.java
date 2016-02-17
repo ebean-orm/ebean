@@ -58,7 +58,6 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     if (currentBuffer.isFull()) {
       currentBuffer = createBuffer(secondaryBatchSize);
     }
-    // set the persistenceContext on the bean first 
     ebi.setBeanLoader(currentBuffer, getPersistenceContext());
     currentBuffer.add(ebi);
   }
@@ -124,7 +123,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     }
 
     /**
-     * Return true if the buffer is full.
+     * Add the bean to the load buffer.
      */
     public void add(EntityBeanIntercept ebi) {
       if (persistenceContext == null) {
@@ -180,11 +179,10 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
       }
 
       if (context.hitCache) {
-        // Check each of the beans in the batch to see if they are in the L2 cache.
+        // check each of the beans in the batch to see if they are in the L2 cache.
         Iterator<EntityBeanIntercept> iterator = list.iterator();
         while (iterator.hasNext()) {
-          EntityBeanIntercept bean = iterator.next();
-          if (context.desc.cacheBeanLoad(bean)) {
+          if (context.desc.cacheBeanLoad(iterator.next())) {
             iterator.remove();
           }
         }

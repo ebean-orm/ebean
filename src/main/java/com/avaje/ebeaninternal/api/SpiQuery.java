@@ -315,22 +315,6 @@ public interface SpiQuery<T> extends Query<T> {
   void setFilterMany(String prop, ExpressionList<?> filterMany);
 
   /**
-   * Remove the query joins from query detail.
-   * <p>
-   * These are registered with the Load Context.
-   * </p>
-   */
-  List<OrmQueryProperties> removeQueryJoins();
-
-  /**
-   * Remove the lazy joins from query detail.
-   * <p>
-   * These are registered with the Load Context.
-   * </p>
-   */
-  List<OrmQueryProperties> removeLazyJoins();
-
-  /**
    * Set the path of the many when +query/+lazy loading query is executed.
    */
   void setLazyLoadManyPath(String lazyLoadManyPath);
@@ -338,7 +322,7 @@ public interface SpiQuery<T> extends Query<T> {
   /**
    * Convert joins as necessary to query joins etc.
    */
-  void convertJoins();
+  SpiQuerySecondary convertJoins();
 
   /**
    * Return the TransactionContext.

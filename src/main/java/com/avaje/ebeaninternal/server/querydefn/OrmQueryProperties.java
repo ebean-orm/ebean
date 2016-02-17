@@ -393,42 +393,72 @@ public class OrmQueryProperties implements Serializable {
     markForQueryJoin = true;
   }
 
-  public boolean isFetchJoin() {
-    return !isQueryFetch() && !isLazyFetch();
-  }
-
+  /**
+   * Return true if this path is a 'query join'.
+   */
   public boolean isQueryFetch() {
     return markForQueryJoin || getQueryFetchBatch() > -1;
   }
 
-  public int getQueryFetchBatch() {
-    return fetchConfig.getQueryBatchSize();
+  /**
+   * Return true if this path is a 'fetch join'.
+   */
+  public boolean isFetchJoin() {
+    return !isQueryFetch() && !isLazyFetch();
   }
 
-  public boolean isQueryFetchAll() {
-    return fetchConfig.isQueryAll();
-  }
-
+  /**
+   * Return true if this path is a lazy fetch.
+   */
   public boolean isLazyFetch() {
     return getLazyFetchBatch() > -1;
   }
 
+  /**
+   * Return the batch size to use for the query join.
+   */
+  public int getQueryFetchBatch() {
+    return fetchConfig.getQueryBatchSize();
+  }
+
+  /**
+   * Return true if a query join should eagerly fetch 'all' rather than the 'first'.
+   */
+  public boolean isQueryFetchAll() {
+    return fetchConfig.isQueryAll();
+  }
+
+  /**
+   * Return the batch size to use for lazy loading.
+   */
   public int getLazyFetchBatch() {
     return fetchConfig.getLazyBatchSize();
   }
 
+  /**
+   * Return true if this path has the +readonly option.
+   */
   public boolean isReadOnly() {
     return readOnly;
   }
 
+  /**
+   * Return true if this path has the +cache option to hit the cache.
+   */
   public boolean isCache() {
     return cache;
   }
 
+  /**
+   * Return the parent path.
+   */
   public String getParentPath() {
     return parentPath;
   }
 
+  /**
+   * Return the path relative to the root of the graph.
+   */
   public String getPath() {
     return path;
   }

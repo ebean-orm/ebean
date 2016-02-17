@@ -19,6 +19,7 @@ import com.avaje.ebeaninternal.api.LoadContext;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Type;
+import com.avaje.ebeaninternal.api.SpiQuerySecondary;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -28,7 +29,6 @@ import com.avaje.ebeaninternal.server.deploy.DeployPropertyParserMap;
 import com.avaje.ebeaninternal.server.loadcontext.DLoadContext;
 import com.avaje.ebeaninternal.server.query.CQueryPlan;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
-import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 import javax.persistence.PersistenceException;
@@ -63,9 +63,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
   private CQueryPlanKey queryPlanKey;
 
-  private List<OrmQueryProperties> queryJoins;
-
-  private List<OrmQueryProperties> lazyJoins;
+  private SpiQuerySecondary secondaryQueries;
 
   /**
    * Create the InternalQueryRequest.
@@ -152,9 +150,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
     adapterPreQuery();
 
-    query.convertJoins();
-    this.queryJoins = query.removeQueryJoins();
-    this.lazyJoins = query.removeLazyJoins();
+    this.secondaryQueries = query.convertJoins();
     this.queryPlanKey = query.prepare(this);
   }
 
@@ -216,8 +212,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     }
     // initialise the persistenceContext and loadContext
     this.persistenceContext = getPersistenceContext(query, transaction);
-    this.loadContext = new DLoadContext(this);
-    this.loadContext.registerSecondaryQueries(queryJoins, lazyJoins);
+    this.loadContext = new DLoadContext(this, secondaryQueries);
   }
 
   /**

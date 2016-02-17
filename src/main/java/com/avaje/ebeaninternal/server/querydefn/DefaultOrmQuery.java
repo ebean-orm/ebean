@@ -19,6 +19,7 @@ import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.api.SpiQuerySecondary;
 import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -406,7 +407,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return false;
   }
 
-  public List<OrmQueryProperties> removeQueryJoins() {
+  protected List<OrmQueryProperties> removeQueryJoins() {
     List<OrmQueryProperties> queryJoins = detail.removeSecondaryQueries();
     if (queryJoins != null) {
       if (orderBy != null) {
@@ -434,7 +435,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return queryJoins;
   }
 
-  public List<OrmQueryProperties> removeLazyJoins() {
+  protected List<OrmQueryProperties> removeLazyJoins() {
     return detail.removeSecondaryLazyQueries();
   }
 
@@ -443,10 +444,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public void convertJoins() {
+  public SpiQuerySecondary convertJoins() {
 
     createExtraJoinsToSupportManyWhereClause();
     markQueryJoins();
+
+    return new OrmQuerySecondary(removeQueryJoins(), removeLazyJoins());
   }
 
   /**

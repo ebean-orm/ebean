@@ -25,11 +25,6 @@ public interface LoadContext {
 	 */
 	void executeSecondaryQueries(OrmQueryRequest<?> parentRequest);
 
-	/**
-	 * Register any secondary queries (+query or +lazy) with their appropriate LoadBeanContext or LoadManyContext.
-	 */
-  void registerSecondaryQueries(List<OrmQueryProperties> queryJoins, List<OrmQueryProperties> lazyJoins);
-
   /**
 	 * Return the node for a given path which is used by AutoTune profiling.
 	 */
