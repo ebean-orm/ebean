@@ -17,7 +17,7 @@ public class ScalarTypeJodaLocalTimeTest {
   @Test
   public void toJdbcType_toBeanType() {
 
-    LocalTime localTime0 = new LocalTime();
+    LocalTime localTime0 = new LocalTime().withMillisOfSecond(0);
     Object time = type.toJdbcType(localTime0);
     LocalTime localTime1 = type.toBeanType(time);
 
