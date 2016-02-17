@@ -7,7 +7,6 @@ import com.avaje.ebean.annotation.EnumValue;
 import com.avaje.ebean.config.*;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbType;
-import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.type.reflect.*;
@@ -285,7 +284,15 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    */
   @SuppressWarnings("unchecked")
   public <T> ScalarType<T> getScalarType(Class<T> type) {
-    return (ScalarType<T>) typeMap.get(type);
+    ScalarType<T> found = (ScalarType<T>) typeMap.get(type);
+    if (found == null) {
+      if (type.getName().equals("org.joda.time.LocalTime")) {
+        throw new IllegalStateException(
+            "ScalarType of Joda LocalTime not defined. You need to set ServerConfig.jodaLocalTimeMode to"
+                + " either 'normal' or 'utc'.  UTC is the old mode using UTC timezone but local time zone is now preferred as 'normal' mode.");
+      }
+    }
+    return found;
   }
 
   public ScalarDataReader<?> getScalarDataReader(Class<?> propertyType, int sqlType) {
@@ -805,8 +812,18 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       typeMap.put(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(mode));
       typeMap.put(DateTime.class, new ScalarTypeJodaDateTime(mode));
       typeMap.put(LocalDate.class, new ScalarTypeJodaLocalDate());
-      typeMap.put(LocalTime.class, new ScalarTypeJodaLocalTime());
       typeMap.put(DateMidnight.class, new ScalarTypeJodaDateMidnight());
+
+      String jodaLocalTimeMode = config.getJodaLocalTimeMode();
+      if ("normal".equalsIgnoreCase(jodaLocalTimeMode)) {
+        // use the expected/normal local time zone
+        typeMap.put(LocalTime.class, new ScalarTypeJodaLocalTime());
+        logger.debug("registered ScalarTypeJodaLocalTime");
+      } else if ("utc".equalsIgnoreCase(jodaLocalTimeMode)) {
+        // use the old UTC based
+        typeMap.put(LocalTime.class, new ScalarTypeJodaLocalTimeUTC());
+        logger.debug("registered ScalarTypeJodaLocalTimeUTC");
+      }
     }
   }
 	

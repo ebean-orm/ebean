@@ -387,6 +387,8 @@ public class ServerConfig {
    */
   private boolean expressionEqualsWithNullAsNoop;
 
+  private String jodaLocalTimeMode;
+
   /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
    */
@@ -1641,6 +1643,20 @@ public class ServerConfig {
   }
 
   /**
+   * Return the mode to use for Joda LocalTime support 'normal' or 'utc'.
+   */
+  public String getJodaLocalTimeMode() {
+    return jodaLocalTimeMode;
+  }
+
+  /**
+   * Set the mode to use for Joda LocalTime support 'normal' or 'utc'.
+   */
+  public void setJodaLocalTimeMode(String jodaLocalTimeMode) {
+    this.jodaLocalTimeMode = jodaLocalTimeMode;
+  }
+
+  /**
    * Programmatically add classes (typically entities) that this server should
    * use.
    * <p>
@@ -2286,6 +2302,7 @@ public class ServerConfig {
       dbUuid = DbUuid.BINARY;
     }
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
+    jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);
 
     lazyLoadBatchSize = p.getInt("lazyLoadBatchSize", lazyLoadBatchSize);
     queryBatchSize = p.getInt("queryBatchSize", queryBatchSize);

@@ -28,8 +28,7 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
     if (value == null) {
       b.setNull(Types.TIME);
     } else {
-      Time sqlTime = new Time(value.getMillisOfDay());
-      b.setTime(sqlTime);
+      b.setTime(new Time(value.getHourOfDay(), value.getMinuteOfHour(), value.getSecondOfMinute()));
     }
   }
 
@@ -40,14 +39,15 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
     if (sqlTime == null) {
       return null;
     } else {
-      return new LocalTime(sqlTime, DateTimeZone.UTC);
+      return new LocalTime(sqlTime, DateTimeZone.getDefault());
     }
   }
 
   @Override
   public Object toJdbcType(Object value) {
     if (value instanceof LocalTime) {
-      return new Time(((LocalTime) value).getMillisOfDay());
+      LocalTime lt = (LocalTime) value;
+      return new Time(lt.getHourOfDay(), lt.getMinuteOfHour(), lt.getSecondOfMinute());
     }
     return BasicTypeConverter.toTime(value);
   }
@@ -55,7 +55,7 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
   @Override
   public LocalTime toBeanType(Object value) {
     if (value instanceof java.util.Date) {
-      return new LocalTime(value, DateTimeZone.UTC);
+      return new LocalTime(value, DateTimeZone.getDefault());
     }
     return (LocalTime) value;
   }
@@ -88,7 +88,7 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
 
   @Override
   public LocalTime convertFromMillis(long systemTimeMillis) {
-    return new LocalTime(systemTimeMillis);
+    return new LocalTime(systemTimeMillis, DateTimeZone.getDefault());
   }
 
   @Override
