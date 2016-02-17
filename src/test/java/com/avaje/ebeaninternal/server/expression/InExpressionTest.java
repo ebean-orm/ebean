@@ -1,12 +1,16 @@
 package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class InExpressionTest {
 
@@ -20,10 +24,10 @@ public class InExpressionTest {
     InExpression ex2 = new InExpression("bar", values, false);
 
     HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
-    ex1.queryPlanHash(null, b1);
+    ex1.queryPlanHash(b1);
 
     HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
-    ex2.queryPlanHash(null, b2);
+    ex2.queryPlanHash(b2);
 
     assertNotEquals(b1.build(), b2.build());
   }
@@ -38,10 +42,10 @@ public class InExpressionTest {
     InExpression ex2 = new InExpression("foo", values2, false);
 
     HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
-    ex1.queryPlanHash(null, b1);
+    ex1.queryPlanHash(b1);
 
     HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
-    ex2.queryPlanHash(null, b2);
+    ex2.queryPlanHash(b2);
 
     assertNotEquals(b1.build(), b2.build());
   }
@@ -55,10 +59,10 @@ public class InExpressionTest {
     InExpression ex2 = new InExpression("foo", values, false);
 
     HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
-    ex1.queryPlanHash(null, b1);
+    ex1.queryPlanHash(b1);
 
     HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
-    ex2.queryPlanHash(null, b2);
+    ex2.queryPlanHash(b2);
 
     assertNotEquals(b1.build(), b2.build());
   }
@@ -72,10 +76,10 @@ public class InExpressionTest {
     InExpression ex2 = new InExpression("foo", values, true);
 
     HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
-    ex1.queryPlanHash(null, b1);
+    ex1.queryPlanHash(b1);
 
     HashQueryPlanBuilder b2 = new HashQueryPlanBuilder();
-    ex2.queryPlanHash(null, b2);
+    ex2.queryPlanHash(b2);
 
     assertEquals(b1.build(), b2.build());
   }
@@ -87,4 +91,70 @@ public class InExpressionTest {
     }
     return list;
   }
+
+  @NotNull
+  private InExpression exp(String propName, boolean not, Object... values) {
+    return new InExpression(propName, Arrays.asList(values), not);
+  }
+
+  @Test
+  public void isSameByPlan_when_same() {
+
+    assertThat(exp("a", false, 10).isSameByPlan(exp("a", false, 10))).isTrue();
+  }
+
+  @Test
+  public void isSameByPlan_when_diffPropertyName() {
+
+    assertThat(exp("a", false, 10).isSameByPlan(exp("b", false, 10))).isFalse();
+  }
+
+  @Test
+  public void isSameByPlan_when_diffNot() {
+
+    assertThat(exp("a", false, 10).isSameByPlan(exp("a", true, 10))).isFalse();
+  }
+
+  @Test
+  public void isSameByPlan_when_diffBind_same() {
+
+    assertThat(exp("a", false, 10).isSameByPlan(exp("a", false, 10, 20))).isFalse();
+  }
+
+  @Test
+  public void isSameByPlan_when_diffBindCount() {
+
+    assertThat(exp("a", false, 10).isSameByPlan(exp("a", false, 10, 20))).isFalse();
+  }
+
+  @Test
+  public void isSameByBind_when_sameBindValues() {
+
+    assertThat(exp("a", false, 10).isSameByBind(exp("a", false, 10))).isTrue();
+  }
+
+  @Test
+  public void isSameByBind_when_sameMultipleBindValues() {
+
+    assertThat(exp("a", false, 10, "ABC", 20).isSameByBind(exp("a", false, 10, "ABC", 20))).isTrue();
+  }
+
+  @Test
+  public void isSameByBind_when_diffBindValues() {
+
+    assertThat(exp("a", false, 10).isSameByBind(exp("a", false, "foo"))).isFalse();
+  }
+
+  @Test
+  public void isSameByBind_when_lessBindValues() {
+
+    assertThat(exp("a", false, 10, "ABC", 20).isSameByBind(exp("a", false, 10, "ABC"))).isFalse();
+  }
+
+  @Test
+  public void isSameByBind_when_moreBindValues() {
+
+    assertThat(exp("a", false, 10, "ABC").isSameByBind(exp("a", false, 10, "ABC", 30))).isFalse();
+  }
+
 }

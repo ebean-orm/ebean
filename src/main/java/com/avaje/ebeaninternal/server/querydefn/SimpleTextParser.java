@@ -16,6 +16,10 @@ public class SimpleTextParser {
     this.eof = oql.length();
   }
 
+  public boolean isEmpty() {
+    return oql.isEmpty();
+  }
+
   public int getPos() {
     return pos;
   }

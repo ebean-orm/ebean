@@ -1,9 +1,5 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
-import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
@@ -12,7 +8,11 @@ import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 
-class AllEqualsExpression implements SpiExpression {
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
+class AllEqualsExpression extends NonPrepareExpression {
 
   private static final long serialVersionUID = -8691773558205937025L;
 
@@ -26,6 +26,7 @@ class AllEqualsExpression implements SpiExpression {
     return propName;
   }
 
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     if (propMap != null) {
       for (String propertyName : propMap.keySet()) {
@@ -44,6 +45,7 @@ class AllEqualsExpression implements SpiExpression {
     }
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
 
     if (propMap.isEmpty()) {
@@ -57,6 +59,7 @@ class AllEqualsExpression implements SpiExpression {
     }
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
     if (propMap.isEmpty()) {
@@ -92,7 +95,8 @@ class AllEqualsExpression implements SpiExpression {
    * The null check is required due to the "is null" sql being generated.
    * </p>
    */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
 
     builder.add(AllEqualsExpression.class);
 
@@ -100,14 +104,11 @@ class AllEqualsExpression implements SpiExpression {
       Object value = entry.getValue();
       String propName = entry.getKey();
       builder.add(propName).add(value == null ? 0 : 1);
-      builder.bind(value == null ? 0 : 1);
+      builder.bindIfNotNull(value);
     }
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoTuneHash(builder);
-  }
-
+  @Override
   public int queryBindHash() {
 
     int hc = 31;
@@ -116,5 +117,49 @@ class AllEqualsExpression implements SpiExpression {
     }
 
     return hc;
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof AllEqualsExpression)) {
+      return false;
+    }
+
+    AllEqualsExpression that = (AllEqualsExpression) other;
+    return isSameByValue(that, false);
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    if (!(other instanceof AllEqualsExpression)) {
+      return false;
+    }
+
+    AllEqualsExpression that = (AllEqualsExpression) other;
+    return isSameByValue(that, true);
+  }
+
+  private boolean isSameByValue(AllEqualsExpression that, boolean byValue) {
+
+    if (propMap.size() != that.propMap.size()) {
+      return false;
+    }
+
+    Iterator<Entry<String, Object>> thisIt = propMap.entrySet().iterator();
+    Iterator<Entry<String, Object>> thatIt = that.propMap.entrySet().iterator();
+
+    while (thisIt.hasNext() && thatIt.hasNext()) {
+      Entry<String, Object> thisNext = thisIt.next();
+      Entry<String, Object> thatNext = thatIt.next();
+
+      if (!thisNext.getKey().equals(thatNext.getKey())) {
+        return false;
+      }
+      if (!Same.sameBy(byValue, thisNext.getValue(), thatNext.getValue())) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

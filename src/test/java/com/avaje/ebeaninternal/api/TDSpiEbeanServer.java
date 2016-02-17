@@ -148,17 +148,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> q, Transaction t) {
-    return null;
-  }
-
-  @Override
   public <T> CQuery<T> compileQuery(Query<T> query, Transaction t) {
-    return null;
-  }
-
-  @Override
-  public CQueryEngine getQueryEngine() {
     return null;
   }
 

@@ -13,13 +13,13 @@ import com.avaje.ebean.plugin.SpiBeanType;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.HashQuery;
-import com.avaje.ebeaninternal.api.HashQueryPlan;
-import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
+import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.api.SpiQuerySecondary;
 import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -28,7 +28,7 @@ import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.expression.SimpleExpression;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
-import com.avaje.ebeaninternal.util.DefaultExpressionList;
+import com.avaje.ebeaninternal.server.expression.DefaultExpressionList;
 
 import javax.persistence.PersistenceException;
 import java.sql.Timestamp;
@@ -234,7 +234,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Hash of final query after AutoTune tuning.
    */
-  private HashQueryPlan queryPlanHash;
+  private CQueryPlanKey queryPlanKey;
 
   private transient PersistenceContext persistenceContext;
 
@@ -345,20 +345,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     this.beanDescriptor = beanDescriptor;
   }
 
-  /**
-   * Return true if select all properties was used to ensure the property invoking a lazy load was
-   * included in the query.
-   */
-  public boolean selectAllForLazyLoadProperty() {
-    if (lazyLoadProperty != null) {
-      if (!detail.containsProperty(lazyLoadProperty)) {
-        detail.select("*");
-        return true;
-      }
-    }
-    return false;
-  }
-
   public RawSql getRawSql() {
     return rawSql;
   }
@@ -390,22 +376,38 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return expressionFactory;
   }
 
-  /**
-   * Return true if the where expressions contains a many property.
-   */
-  public boolean initManyWhereJoins() {
+  private void createExtraJoinsToSupportManyWhereClause() {
     manyWhereJoins = new ManyWhereJoins();
     if (whereExpressions != null) {
       whereExpressions.containsMany(beanDescriptor, manyWhereJoins);
     }
-    return !manyWhereJoins.isEmpty();
+    if (!manyWhereJoins.isEmpty()) {
+      setSqlDistinct(true);
+    }
   }
 
+  /**
+   * Return the extra joins required to support the where clause for 'Many' properties.
+   */
   public ManyWhereJoins getManyWhereJoins() {
     return manyWhereJoins;
   }
 
-  public List<OrmQueryProperties> removeQueryJoins() {
+  /**
+   * Return true if select all properties was used to ensure the property invoking a lazy load was
+   * included in the query.
+   */
+  public boolean selectAllForLazyLoadProperty() {
+    if (lazyLoadProperty != null) {
+      if (!detail.containsProperty(lazyLoadProperty)) {
+        detail.select("*");
+        return true;
+      }
+    }
+    return false;
+  }
+
+  protected List<OrmQueryProperties> removeQueryJoins() {
     List<OrmQueryProperties> queryJoins = detail.removeSecondaryQueries();
     if (queryJoins != null) {
       if (orderBy != null) {
@@ -433,7 +435,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return queryJoins;
   }
 
-  public List<OrmQueryProperties> removeLazyJoins() {
+  protected List<OrmQueryProperties> removeLazyJoins() {
     return detail.removeSecondaryLazyQueries();
   }
 
@@ -441,11 +443,63 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     this.lazyLoadManyPath = lazyLoadManyPath;
   }
 
+  @Override
+  public SpiQuerySecondary convertJoins() {
+
+    createExtraJoinsToSupportManyWhereClause();
+    markQueryJoins();
+
+    return new OrmQuerySecondary(removeQueryJoins(), removeLazyJoins());
+  }
+
   /**
-   * Convert any many joins fetch joins to query joins.
+   * Limit the number of fetch joins to Many properties, mark as query joins as needed.
    */
-  public void convertManyFetchJoinsToQueryJoins(boolean allowOne, int queryBatch) {
-    detail.convertManyFetchJoinsToQueryJoins(beanDescriptor, lazyLoadManyPath, allowOne, queryBatch);
+  private void markQueryJoins() {
+    detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch());
+  }
+
+  private boolean isAllowOneManyFetch() {
+
+    if (Mode.LAZYLOAD_MANY.equals(getMode())) {
+      return false;
+    } else if (hasMaxRowsOrFirstRow() && !isRawSql() && !isSqlSelect()) {
+      return false;
+    }
+    return true;
+  }
+
+  protected void setOrmQueryDetail(OrmQueryDetail detail) {
+    this.detail = detail;
+  }
+
+  public void setDefaultSelectClause() {
+    detail.setDefaultSelectClause(beanDescriptor);
+  }
+
+  public void setDetail(OrmQueryDetail detail) {
+    this.detail = detail;
+  }
+
+  public boolean tuneFetchProperties(OrmQueryDetail tunedDetail) {
+    return detail.tuneFetchProperties(tunedDetail);
+  }
+
+  public OrmQueryDetail getDetail() {
+    return detail;
+  }
+
+  public ExpressionList<T> filterMany(String prop) {
+
+    OrmQueryProperties chunk = detail.getChunk(prop, true);
+    return chunk.filterMany(this);
+  }
+
+  public void setFilterMany(String prop, ExpressionList<?> filterMany) {
+    if (filterMany != null) {
+      OrmQueryProperties chunk = detail.getChunk(prop, true);
+      chunk.setFilterMany((SpiExpressionList<?>) filterMany);
+    }
   }
 
   /**
@@ -466,7 +520,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public void setSelectId() {
     // clear select and fetch joins..
     detail.clear();
-
     select(beanDescriptor.getIdBinder().getIdProperty());
   }
 
@@ -493,7 +546,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
         if (se instanceof SimpleExpression) {
           SimpleExpression e = (SimpleExpression) se;
           if (e.isOpEquals()) {
-            return new NaturalKeyBindParam(e.getPropertyName(), e.getValue());
+            return new NaturalKeyBindParam(e.getPropName(), e.getValue());
           }
         }
       }
@@ -759,79 +812,38 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Calculate the query hash for either AutoTune query tuning or Query Plan caching.
    */
-  private HashQueryPlan calculateHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+  CQueryPlanKey createQueryPlanKey() {
 
-    // exclude bind values and things unrelated to the sql being generated
+    queryPlanKey = new OrmQueryPlanKey(includeTableJoin, type, detail, maxRows, firstRow,
+        disableLazyLoading, rawWhereClause, orderBy, query, additionalWhere, additionalHaving,
+        distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
+        temporalMode, forUpdate, rootTableAlias, rawSql);
 
-    if (builder == null) {
-      builder = new HashQueryPlanBuilder();
-    }
-
-    builder.add((type == null ? 0 : type.ordinal() + 1));
-    builder.add(autoTuned).add(distinct).add(sqlDistinct).add(query);
-    builder.add(firstRow).add(maxRows).add(orderBy).add(forUpdate);
-    builder.add(rawWhereClause).add(additionalWhere).add(additionalHaving);
-    builder.add(mapKey);
-    builder.add(disableLazyLoading);
-    builder.add(id != null);
-    builder.add(temporalMode);
-    builder.add(rawSql == null ? 0 : rawSql.queryHash());
-    builder.add(includeTableJoin != null ? includeTableJoin.queryHash() : 0);
-    builder.add(rootTableAlias);
-
-    if (detail != null) {
-      detail.queryPlanHash(request, builder);
-    }
-    if (bindParams != null) {
-      bindParams.buildQueryPlanHash(builder);
-    }
-
-    if (request == null) {
-      // for AutoTune...
-      builder.add(true);
-      if (whereExpressions != null) {
-        whereExpressions.queryAutoTuneHash(builder);
-      }
-      if (havingExpressions != null) {
-        havingExpressions.queryAutoTuneHash(builder);
-      }
-
-    } else {
-      // for query plan...
-      builder.add(false);
-      if (whereExpressions != null) {
-        whereExpressions.queryPlanHash(request, builder);
-      }
-      if (havingExpressions != null) {
-        havingExpressions.queryPlanHash(request, builder);
-      }
-    }
-
-    return builder.build();
+    return queryPlanKey;
   }
 
   /**
-   * Calculate a hash used by AutoTune to identify when a query has changed (and hence potentially
-   * needs a new tuned query plan to be developed).
+   * Prepare the query which prepares any expressions (sub-query expressions etc) and calculates the query plan key.
    */
-  public HashQueryPlan queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  public CQueryPlanKey prepare(BeanQueryRequest<?> request) {
 
-    return calculateHash(null, builder);
+    prepareExpressions(request);
+
+    queryPlanKey = createQueryPlanKey();
+    return queryPlanKey;
   }
 
   /**
-   * Calculate a hash that should be unique for the generated SQL across a given bean type.
-   * <p>
-   * This can used to enable the caching and reuse of a 'query plan'.
-   * </p>
-   * <p>
-   * This is calculated AFTER AutoTune query tuning has occurred.
-   * </p>
+   * Prepare the expressions (compile sub-queries etc).
    */
-  public HashQueryPlan queryPlanHash(BeanQueryRequest<?> request) {
+  private void prepareExpressions(BeanQueryRequest<?> request) {
 
-    queryPlanHash = calculateHash(request, null);
-    return queryPlanHash;
+    if (whereExpressions != null) {
+      whereExpressions.prepareExpression(request);
+    }
+    if (havingExpressions != null) {
+      havingExpressions.prepareExpression(request);
+    }
   }
 
   /**
@@ -863,7 +875,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     // so queryPlanHash is calculated well before this method is called
     int hc = queryBindHash();
 
-    return new HashQuery(queryPlanHash, hc);
+    return new HashQuery(queryPlanKey, hc);
   }
 
   /**
@@ -974,16 +986,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     parser.assign(this);
   }
 
-  protected void setOrmQueryDetail(OrmQueryDetail detail) {
-    this.detail = detail;
-  }
 
   protected void setRawWhereClause(String rawWhereClause) {
     this.rawWhereClause = rawWhereClause;
-  }
-
-  public void setDefaultSelectClause() {
-    detail.setDefaultSelectClause(beanDescriptor);
   }
 
   public DefaultOrmQuery<T> select(String columns) {
@@ -1004,7 +1009,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   public DefaultOrmQuery<T> fetch(String property, String columns, FetchConfig config) {
-    detail.addFetch(property, columns, config);
+    detail.fetch(property, columns, config);
     return this;
   }
 
@@ -1207,18 +1212,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return beanType;
   }
 
-  public void setDetail(OrmQueryDetail detail) {
-    this.detail = detail;
-  }
-
-  public boolean tuneFetchProperties(OrmQueryDetail tunedDetail) {
-    return detail.tuneFetchProperties(tunedDetail);
-  }
-
-  public OrmQueryDetail getDetail() {
-    return detail;
-  }
-
   public String toString() {
     return "Query [" + whereExpressions + "]";
   }
@@ -1310,19 +1303,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       whereExpressions = new DefaultExpressionList<T>(this, null);
     }
     return whereExpressions;
-  }
-
-  public ExpressionList<T> filterMany(String prop) {
-
-    OrmQueryProperties chunk = detail.getChunk(prop, true);
-    return chunk.filterMany(this);
-  }
-
-  public void setFilterMany(String prop, ExpressionList<?> filterMany) {
-    if (filterMany != null) {
-      OrmQueryProperties chunk = detail.getChunk(prop, true);
-      chunk.setFilterMany((SpiExpressionList<?>) filterMany);
-    }
   }
 
   public DefaultOrmQuery<T> having(String addToHavingClause) {

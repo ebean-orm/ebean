@@ -140,7 +140,7 @@ public class SqlTreeBuilder {
     boolean includeJoins = (alias == null) ? false : alias.isIncludeJoins();
 
     return new SqlTree(summary.toString(), rootNode, selectSql, fromSql, inheritanceWhereSql, encryptedProps,
-        manyProperty, queryDetail.getIncludes(), includeJoins);
+        manyProperty, queryDetail.getFetchPaths(), includeJoins);
   }
 
   private String buildSelectClause() {
@@ -183,7 +183,7 @@ public class SqlTreeBuilder {
     rootNode = buildSelectChain(null, null, desc, null);
 
     if (!rawSql) {
-      alias.addJoin(queryDetail.getIncludes(), desc);
+      alias.addJoin(queryDetail.getFetchPaths(), desc);
       alias.addJoin(predicates.getPredicateIncludes(), desc);
       alias.addManyWhereJoins(manyWhereJoins.getPropertyNames());
 
@@ -471,7 +471,7 @@ public class SqlTreeBuilder {
       return false;
     }
 
-    if (queryDetail.includes(propName)) {
+    if (queryDetail.includesPath(propName)) {
 
       if (manyProperty != null) {
         // only one many associated allowed to be included in fetch
@@ -498,7 +498,7 @@ public class SqlTreeBuilder {
    */
   private boolean isIncludeBean(String prefix) {
 
-    if (queryDetail.includes(prefix)) {
+    if (queryDetail.includesPath(prefix)) {
       // explicitly included
       summary.append(", ").append(prefix);
       String[] splitNames = SplitName.split(prefix);

@@ -9,6 +9,7 @@ import com.avaje.ebeaninternal.api.LoadContext;
 import com.avaje.ebeaninternal.api.LoadSecondaryQuery;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.api.SpiQuerySecondary;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -58,7 +59,7 @@ public class DLoadContext implements LoadContext {
 
   private List<OrmQueryProperties> secQuery;
 
-  public DLoadContext(OrmQueryRequest<?> request) {
+  public DLoadContext(OrmQueryRequest<?> request, SpiQuerySecondary secondaryQueries) {
 
     this.persistenceContext = request.getPersistenceContext();
     this.ebeanServer = request.getServer();
@@ -86,6 +87,41 @@ public class DLoadContext implements LoadContext {
 
     // initialise rootBeanContext after origin and relativePath have been set
     this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
+
+    registerSecondaryQueries(secondaryQueries);
+  }
+
+
+  /**
+   * Register the +query and +lazy secondary queries with their appropriate LoadBeanContext or LoadManyContext.
+   */
+  private void registerSecondaryQueries(SpiQuerySecondary secondaryQueries) {
+
+    this.secQuery = secondaryQueries.getQueryJoins();
+    if (secQuery != null) {
+      for (OrmQueryProperties pathProperties : secQuery) {
+        registerSecondaryQuery(pathProperties);
+      }
+    }
+
+    List<OrmQueryProperties> lazyJoins = secondaryQueries.getLazyJoins();
+    if (lazyJoins != null) {
+      for (OrmQueryProperties lazyJoin : lazyJoins) {
+        registerSecondaryQuery(lazyJoin);
+      }
+    }
+  }
+
+  /**
+   * Setup the load context at this path with OrmQueryProperties which is
+   * used to build the appropriate query for +query or +lazy loading.
+   */
+  private void registerSecondaryQuery(OrmQueryProperties props) {
+
+    ElPropertyValue elGetValue = rootDescriptor.getElGetValue(props.getPath());
+
+    boolean many = elGetValue.getBeanProperty().containsMany();
+    registerSecondaryNode(many, props);
   }
 
   protected boolean isExcludeBeanCache() {
@@ -119,8 +155,7 @@ public class DLoadContext implements LoadContext {
 
     if (secQuery != null) {
       for (int i = 0; i < secQuery.size(); i++) {
-        OrmQueryProperties properties = secQuery.get(i);
-        LoadSecondaryQuery load = getLoadSecondaryQuery(properties.getPath());
+        LoadSecondaryQuery load = getLoadSecondaryQuery(secQuery.get(i).getPath());
         load.loadSecondaryQuery(parentRequest);
       }
     }
@@ -136,49 +171,6 @@ public class DLoadContext implements LoadContext {
     }
     return beanLoad;
   }
-
-  /**
-   * Remove the +query and +lazy secondary queries and
-   * register them with their appropriate LoadBeanContext
-   * or LoadManyContext.
-   * <p>
-   * The parts of the secondary queries are removed and used
-   * by LoadBeanContext/LoadManyContext to build the appropriate
-   * queries.
-   * </p>
-   */
-  public void registerSecondaryQueries(SpiQuery<?> query) {
-
-    secQuery = query.removeQueryJoins();
-    if (secQuery != null) {
-      for (int i = 0; i < secQuery.size(); i++) {
-        OrmQueryProperties props = secQuery.get(i);
-        registerSecondaryQuery(props);
-      }
-    }
-
-    List<OrmQueryProperties> lazyQueries = query.removeLazyJoins();
-    if (lazyQueries != null) {
-      for (int i = 0; i < lazyQueries.size(); i++) {
-        OrmQueryProperties lazyProps = lazyQueries.get(i);
-        registerSecondaryQuery(lazyProps);
-      }
-    }
-  }
-
-  /**
-   * Setup the load context at this path with OrmQueryProperties which is
-   * used to build the appropriate query for +query or +lazy loading.
-   */
-  private void registerSecondaryQuery(OrmQueryProperties props) {
-
-    String propName = props.getPath();
-    ElPropertyValue elGetValue = rootDescriptor.getElGetValue(propName);
-
-    boolean many = elGetValue.getBeanProperty().containsMany();
-    registerSecondaryNode(many, props);
-  }
-
 
   public ObjectGraphNode getObjectGraphNode(String path) {
 
@@ -247,7 +239,7 @@ public class DLoadContext implements LoadContext {
     getManyContext(path).register(bc);
   }
 
-  private DLoadBeanContext getBeanContext(String path) {
+  protected DLoadBeanContext getBeanContext(String path) {
     if (path == null) {
       return rootBeanContext;
     }

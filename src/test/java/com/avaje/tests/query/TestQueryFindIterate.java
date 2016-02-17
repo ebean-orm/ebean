@@ -13,6 +13,7 @@ import com.avaje.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -150,8 +151,8 @@ public class TestQueryFindIterate extends BaseTestCase {
     List<String> loggedSql = LoggedSqlCollector.stop();
 
     assertEquals("Got SQL: "+loggedSql, 2, loggedSql.size());
-    assertTrue(loggedSql.get(0).contains("select t0.id c0, t0.status c1, t0.order_date c2, t1.id c3, t1.name c4, t2.id c5, t2.order_qty c6, t2.ship_qty"));
-    assertTrue(loggedSql.get(1).contains("select t0.order_id c0, t0.id c1, t0.ship_time c2, t0.cretime c3, t0.updtime c4, t0.version c5, t0.order_id c6 from or_order_ship"));
+    assertThat(loggedSql.get(0)).contains("select t0.id c0, t0.status c1, t0.order_date c2, t1.id c3, t1.name c4, t2.id c5, t2.order_qty c6, t2.ship_qty");
+    assertThat(loggedSql.get(1)).contains("select t0.order_id c0, t0.id c1, t0.ship_time c2, t0.cretime c3, t0.updtime c4, t0.version c5, t0.order_id c6 from or_order_ship");
   }
 
   @Test(expected=PersistenceException.class)

@@ -54,18 +54,7 @@ public abstract class DLoadBaseContext {
       return batchSize;
     }
 
-    int queryFetchBatch = queryProps.getQueryFetchBatch();
-    if (queryFetchBatch > 0) {
-      // property join was automatically set to a 'query join'
-      return queryFetchBatch;
-    }
-
-    FetchConfig fetchConfig = queryProps.getFetchConfig();
-    if (fetchConfig == null) {
-      return batchSize;
-    }
-
-    int queryBatchSize = fetchConfig.getQueryBatchSize();
+    int queryBatchSize = queryProps.getQueryFetchBatch();
     if (queryBatchSize == -1) {
       // not eager query fetch, just lazy loading
       return batchSize;
@@ -84,9 +73,6 @@ public abstract class DLoadBaseContext {
       return defaultBatchSize;
     }
     FetchConfig fetchConfig = queryProps.getFetchConfig();
-    if (fetchConfig == null) {
-      return defaultBatchSize;
-    }
     if (fetchConfig.isQueryAll()) {
       return firstBatchSize;
     }

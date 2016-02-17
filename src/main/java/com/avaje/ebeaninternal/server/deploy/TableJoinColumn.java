@@ -8,76 +8,97 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
  */
 public class TableJoinColumn {
 
-    /**
-     * The local database column name.
-     */
-    private final String localDbColumn;
+  /**
+   * The local database column name.
+   */
+  private final String localDbColumn;
 
-    /**
-     * The foreign database column name.
-     */
-    private final String foreignDbColumn;
+  /**
+   * The foreign database column name.
+   */
+  private final String foreignDbColumn;
 
-    private final boolean insertable;
-    
-    private final boolean updateable;
+  private final boolean insertable;
 
-    /**
-     * Hash for including in a query plan
-     */
-    private final int queryHash;
+  private final boolean updateable;
 
-    /**
-     * Create the pair.
-     */
-    public TableJoinColumn(DeployTableJoinColumn deploy) {
-    	this.localDbColumn = InternString.intern(deploy.getLocalDbColumn());
-    	this.foreignDbColumn = InternString.intern(deploy.getForeignDbColumn());
-    	this.insertable = deploy.isInsertable();
-    	this.updateable = deploy.isUpdateable();
-      this.queryHash = hashOf(localDbColumn) * 31 + hashOf(foreignDbColumn);
-    }
+  /**
+   * Hash for including in a query plan
+   */
+  private final int queryHash;
 
-    private int hashOf(String value) {
-        return (value == null) ? 0 : value.hashCode();
-    }
+  /**
+   * Create the pair.
+   */
+  public TableJoinColumn(DeployTableJoinColumn deploy) {
+    this.localDbColumn = InternString.intern(deploy.getLocalDbColumn());
+    this.foreignDbColumn = InternString.intern(deploy.getForeignDbColumn());
+    this.insertable = deploy.isInsertable();
+    this.updateable = deploy.isUpdateable();
+    this.queryHash = hash();
+  }
 
-    public String toString() {
-        return localDbColumn+" = "+foreignDbColumn;
-    }
+  int hash() {
+    int result = localDbColumn != null ? localDbColumn.hashCode() : 0;
+    result = 31 * result + (foreignDbColumn != null ? foreignDbColumn.hashCode() : 0);
+    result = 31 * result + (insertable ? 1 : 0);
+    result = 31 * result + (updateable ? 1 : 0);
+    return result;
+  }
 
-    /**
-     * Return a hash for including in a query plan.
-     */
-    public int queryHash() {
-      return queryHash;
-    }
+  @Override
+  public int hashCode() {
+    return queryHash;
+  }
 
-    /**
-     * Return the foreign database column name.
-     */
-    public String getForeignDbColumn() {
-        return foreignDbColumn;
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
 
-    /**
-     * Return the local database column name.
-     */
-    public String getLocalDbColumn() {
-        return localDbColumn;
-    }
+    TableJoinColumn that = (TableJoinColumn) o;
+    if (insertable != that.insertable) return false;
+    if (updateable != that.updateable) return false;
+    if (!localDbColumn.equals(that.localDbColumn)) return false;
+    return foreignDbColumn.equals(that.foreignDbColumn);
+  }
 
-	/**
-	 * Return true if this column should be insertable.
-	 */
-	public boolean isInsertable() {
-		return insertable;
-	}
+  public String toString() {
+    return localDbColumn + " = " + foreignDbColumn;
+  }
 
-	/**
-	 * Return true if this column should be updateable.
-	 */
-	public boolean isUpdateable() {
-		return updateable;
-	}
+  /**
+   * Return a hash for including in a query plan.
+   */
+  public int queryHash() {
+    return queryHash;
+  }
+
+  /**
+   * Return the foreign database column name.
+   */
+  public String getForeignDbColumn() {
+    return foreignDbColumn;
+  }
+
+  /**
+   * Return the local database column name.
+   */
+  public String getLocalDbColumn() {
+    return localDbColumn;
+  }
+
+  /**
+   * Return true if this column should be insertable.
+   */
+  public boolean isInsertable() {
+    return insertable;
+  }
+
+  /**
+   * Return true if this column should be updateable.
+   */
+  public boolean isUpdateable() {
+    return updateable;
+  }
 }

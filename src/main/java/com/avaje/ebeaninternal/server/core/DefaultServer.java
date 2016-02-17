@@ -15,7 +15,6 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.dbmigration.DdlGenerator;
 import com.avaje.ebean.event.BeanPersistController;
-import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.meta.MetaInfoManager;
@@ -32,7 +31,6 @@ import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanPlugin;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.api.SpiQuery.Type;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -463,17 +461,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return cqueryEngine.buildQuery(orm);
   }
 
-  public CQueryEngine getQueryEngine() {
-    return cqueryEngine;
-  }
-
   public ServerCacheManager getServerCacheManager() {
     return serverCacheManager;
-  }
-
-  public void refreshMany(Object parentBean, String propertyName, Transaction t) {
-
-    beanLoader.refreshMany(checkEntityBean(parentBean), propertyName, t);
   }
 
   public void refreshMany(Object parentBean, String propertyName) {
@@ -1048,7 +1037,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return findId(query, t);
   }
 
-  private <T> SpiOrmQueryRequest<T> createQueryRequest(Type type, Query<T> query, Transaction t) {
+  <T> SpiOrmQueryRequest<T> createQueryRequest(Type type, Query<T> query, Transaction t) {
 
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setType(type);
@@ -1059,7 +1048,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return createQueryRequest(desc, spiQuery, t);
   }
 
-  public <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> query, Transaction t) {
+  private <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> query, Transaction t) {
 
     if (desc.isAutoTunable() && !query.isSqlSelect() && !autoTuneService.tuneQuery(query)) {
       // use deployment FetchType.LAZY/EAGER annotations
@@ -1067,50 +1056,15 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       query.setDefaultSelectClause();
     }
 
-    if (query.selectAllForLazyLoadProperty()) {
-      // we need to select all properties to ensure the lazy load property
-      // was included (was not included by default or via autoTune).
-      if (logger.isDebugEnabled()) {
-        logger.debug("Using selectAllForLazyLoadProperty");
-      }
-    }
+    query.selectAllForLazyLoadProperty();
 
     // if determine cost and no origin for AutoTune
     if (query.getParentNode() == null) {
       query.setOrigin(createCallStack());
     }
 
-    // determine extra joins required to support where clause
-    // predicates on *ToMany properties
-    if (query.initManyWhereJoins()) {
-      // we need a sql distinct now
-      query.setSqlDistinct(true);
-    }
-
-    boolean allowOneManyFetch = true;
-    if (Mode.LAZYLOAD_MANY.equals(query.getMode())) {
-      allowOneManyFetch = false;
-
-    } else if (query.hasMaxRowsOrFirstRow() && !query.isRawSql() && !query.isSqlSelect()) {
-      // convert ALL fetch joins to Many's to be query joins
-      // so that limit offset type SQL clauses work
-      allowOneManyFetch = false;
-    }
-
-    query.convertManyFetchJoinsToQueryJoins(allowOneManyFetch, queryBatchSize);
-
-    SpiTransaction serverTrans = (SpiTransaction) t;
-    OrmQueryRequest<T> request = new OrmQueryRequest<T>(this, queryEngine, query, desc, serverTrans);
-
-    BeanQueryAdapter queryAdapter = desc.getQueryAdapter();
-    if (queryAdapter != null) {
-      // adaption of the query probably based on the
-      // current user
-      queryAdapter.preQuery(request);
-    }
-
-    // the query hash after any tuning
-    request.calculateQueryPlanHash();
+    OrmQueryRequest<T> request = new OrmQueryRequest<T>(this, queryEngine, query, desc, (SpiTransaction) t);
+    request.prepareQuery();
 
     return request;
   }

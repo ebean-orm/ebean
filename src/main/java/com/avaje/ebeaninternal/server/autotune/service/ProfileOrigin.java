@@ -110,7 +110,7 @@ public class ProfileOrigin {
     Collection<Props> pathProperties = pathProps.getPathProps();
     for (Props props : pathProperties) {
       if (!props.isEmpty()) {
-        detail.addFetch(props.getPath(), props.getPropertiesAsString(), null);
+        detail.fetch(props.getPath(), props.getPropertiesAsString(), null);
       }
     }
 

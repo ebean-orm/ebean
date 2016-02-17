@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.api;
 
+import java.util.Set;
+
 /**
  * Used to build HashQueryPlan instances.
  */
@@ -9,14 +11,12 @@ public class HashQueryPlanBuilder {
   
   private int bindCount;
 
-  private String rawSql;
-  
   public HashQueryPlanBuilder() {
     this.planHash = 92821;
   }
 
   public String toString() {
-    return planHash+":"+bindCount+(rawSql != null ? ":r" : "");
+    return planHash+":"+bindCount;
   }
   
   /**
@@ -32,6 +32,21 @@ public class HashQueryPlanBuilder {
    */
   public HashQueryPlanBuilder add(Object object) {
     planHash = planHash * 92821 + (object == null ? 0 : object.hashCode());
+    return this;
+  }
+
+  /**
+   * Add the set with order being important.
+   */
+  public HashQueryPlanBuilder addOrdered(Set<?> set) {
+    if (set == null) {
+      add(false);
+    } else {
+      add(true);
+      for (Object o : set) {
+        add(o);
+      }
+    }
     return this;
   }
 
@@ -58,19 +73,24 @@ public class HashQueryPlanBuilder {
     bindCount += extraBindCount;
   }
 
-  /**
-   * Add raw sql to the hash.
-   */
-  public void addRawSql(String rawSql) {
-    this.rawSql = rawSql;
+  public void bindIfNotNull(Object someValue) {
+    if (someValue != null) {
+      bindCount++;
+    }
   }
 
   /**
    * Build and return the calculated HashQueryPlan.
    */
-  public HashQueryPlan build() {
-    return new HashQueryPlan(rawSql, planHash, bindCount);
+  public String build() {
+    return planHash+"_"+bindCount;
   }
 
-  
+  public int getPlanHash() {
+    return planHash;
+  }
+
+  public int getBindCount() {
+    return bindCount;
+  }
 }

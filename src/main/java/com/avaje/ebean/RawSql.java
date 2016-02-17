@@ -206,6 +206,14 @@ public final class RawSql implements Serializable {
     return sql;
   }
 
+  /**
+   * Return the key;
+   */
+  public Key getKey() {
+    boolean parsed = sql != null && sql.parsed;
+    String unParsedSql = (sql == null) ? "" : sql.unparsedSql;
+    return new Key(parsed, unParsedSql, columnMapping);
+  }
   
   /**
    * Return the resultSet if this is a ResultSet based RawSql.
@@ -219,16 +227,6 @@ public final class RawSql implements Serializable {
    */
   public ColumnMapping getColumnMapping() {
     return columnMapping;
-  }
-
-  /**
-   * Return the hash for this query.
-   */
-  public int queryHash() {
-    if (resultSet != null) {
-      return 31 * columnMapping.queryHash();
-    }
-    return 31 * sql.queryHash() + columnMapping.queryHash();
   }
 
   /**
@@ -260,13 +258,10 @@ public final class RawSql implements Serializable {
 
     private final boolean distinct;
 
-    private final int queryHashCode;
-
     /**
      * Construct for unparsed SQL.
      */
     protected Sql(String unparsedSql) {
-      this.queryHashCode = unparsedSql.hashCode();
       this.parsed = false;
       this.unparsedSql = unparsedSql;
       this.preFrom = null;
@@ -282,12 +277,11 @@ public final class RawSql implements Serializable {
     /**
      * Construct for parsed SQL.
      */
-    protected Sql(int queryHashCode, String preFrom, String preWhere, boolean andWhereExpr,
+    protected Sql(String unparsedSql, String preFrom, String preWhere, boolean andWhereExpr,
         String preHaving, boolean andHavingExpr, String orderByPrefix, String orderBy, boolean distinct) {
 
-      this.queryHashCode = queryHashCode;
+      this.unparsedSql = unparsedSql;
       this.parsed = true;
-      this.unparsedSql = null;
       this.preFrom = preFrom;
       this.preHaving = preHaving;
       this.preWhere = preWhere;
@@ -296,13 +290,6 @@ public final class RawSql implements Serializable {
       this.orderByPrefix = orderByPrefix;
       this.orderBy = orderBy;
       this.distinct = distinct;
-    }
-
-    /**
-     * Return a hash for this query.
-     */
-    public int queryHash() {
-      return queryHashCode;
     }
 
     public String toString() {
@@ -406,13 +393,10 @@ public final class RawSql implements Serializable {
 
     private final boolean immutable;
 
-    private final int queryHashCode;
-
     /**
      * Construct from parsed sql where the columns have been identified.
      */
     protected ColumnMapping(List<Column> columns) {
-      this.queryHashCode = 0;
       this.immutable = false;
       this.parsed = true;
       this.propertyMap = null;
@@ -428,7 +412,6 @@ public final class RawSql implements Serializable {
      * Construct for unparsed sql.
      */
     protected ColumnMapping() {
-      this.queryHashCode = 0;
       this.immutable = false;
       this.parsed = false;
       this.propertyMap = null;
@@ -443,17 +426,13 @@ public final class RawSql implements Serializable {
       this.immutable = false;
       this.parsed = false;
       this.propertyMap = null;
-      //this.propertyColumnMap = null;
       this.dbColumnMap = new LinkedHashMap<String, Column>();
-      
-      int hc = 31;
+
       int pos = 0;
       for (String prop : propertyNames) {
-        hc = 31 * hc + prop.hashCode();
         dbColumnMap.put(prop, new Column(pos++, prop, null, prop));
       }
       propertyColumnMap = dbColumnMap;
-      this.queryHashCode = hc;
     }
 
     /**
@@ -464,20 +443,28 @@ public final class RawSql implements Serializable {
       this.parsed = parsed;
       this.dbColumnMap = dbColumnMap;
 
-      int hc = ColumnMapping.class.getName().hashCode();
-
       HashMap<String, Column> pcMap = new HashMap<String, Column>();
       HashMap<String, String> pMap = new HashMap<String, String>();
 
       for (Column c : dbColumnMap.values()) {
         pMap.put(c.getPropertyName(), c.getDbColumn());
         pcMap.put(c.getPropertyName(), c);
-        hc = 31 * hc + ((c.getPropertyName() == null) ? 0 : c.getPropertyName().hashCode());
-        hc = 31 * hc + ((c.getDbColumn() == null) ? 0 : c.getDbColumn().hashCode());
       }
       this.propertyMap = Collections.unmodifiableMap(pMap);
       this.propertyColumnMap = Collections.unmodifiableMap(pcMap);
-      this.queryHashCode = hc;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      ColumnMapping that = (ColumnMapping) o;
+      return dbColumnMap.equals(that.dbColumnMap);
+    }
+
+    @Override
+    public int hashCode() {
+      return dbColumnMap.hashCode();
     }
 
     /**
@@ -519,16 +506,6 @@ public final class RawSql implements Serializable {
         }
         column.setPropertyName(propertyName);
       }
-    }
-
-    /**
-     * Return the query hash for this column mapping.
-     */
-    public int queryHash() {
-      if (queryHashCode == 0) {
-        throw new RuntimeException("Bug: queryHashCode == 0");
-      }
-      return queryHashCode;
     }
 
     /**
@@ -648,6 +625,27 @@ public final class RawSql implements Serializable {
         }
       }
 
+      @Override
+      public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Column that = (Column) o;
+        if (indexPos != that.indexPos) return false;
+        if (!dbColumn.equals(that.dbColumn)) return false;
+        if (dbAlias != null ? !dbAlias.equals(that.dbAlias) : that.dbAlias != null) return false;
+        return propertyName != null ? propertyName.equals(that.propertyName) : that.propertyName == null;
+      }
+
+      @Override
+      public int hashCode() {
+        int result = indexPos;
+        result = 31 * result + dbColumn.hashCode();
+        result = 31 * result + (dbAlias != null ? dbAlias.hashCode() : 0);
+        result = 31 * result + (propertyName != null ? propertyName.hashCode() : 0);
+        return result;
+      }
+
       public String toString() {
         return dbColumn + "->" + propertyName;
       }
@@ -697,6 +695,41 @@ public final class RawSql implements Serializable {
           propertyName = path + "." + propertyName;
         }
       }
+    }
+  }
+
+  /**
+   * A key for the RawSql object using for the query plan.
+   */
+  public static final class Key {
+
+    private final boolean parsed;
+    private final ColumnMapping columnMapping;
+    private final String unParsedSql;
+
+    Key(boolean parsed, String unParsedSql, ColumnMapping columnMapping) {
+      this.parsed = parsed;
+      this.unParsedSql = unParsedSql;
+      this.columnMapping = columnMapping;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      Key that = (Key) o;
+      return parsed == that.parsed
+          && columnMapping.equals(that.columnMapping)
+          && unParsedSql.equals(that.unParsedSql);
+    }
+
+    @Override
+    public int hashCode() {
+      int result = (parsed ? 1 : 0);
+      result = 31 * result + columnMapping.hashCode();
+      result = 31 * result + unParsedSql.hashCode();
+      return result;
     }
   }
 }

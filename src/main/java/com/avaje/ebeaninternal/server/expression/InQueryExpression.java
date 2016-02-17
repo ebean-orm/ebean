@@ -1,13 +1,14 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import java.util.List;
-
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.query.CQuery;
+
+import java.util.List;
 
 /**
  * In expression using a sub query.
@@ -20,26 +21,36 @@ class InQueryExpression extends AbstractExpression {
 
   private final SpiQuery<?> subQuery;
 
-  private transient CQuery<?> compiledSubQuery;
+  private List<Object> bindParams;
 
-  public InQueryExpression(String propertyName, SpiQuery<?> subQuery, boolean not) {
+  private String sql;
+
+  InQueryExpression(String propertyName, SpiQuery<?> subQuery, boolean not) {
     super(propertyName);
     this.subQuery = subQuery;
     this.not = not;
   }
 
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
-    builder.add(InQueryExpression.class).add(propName).add(not);
-    subQuery.queryAutoTuneHash(builder);
+  InQueryExpression(String propertyName, boolean not, String sql, List<Object> bindParams) {
+    super(propertyName);
+    this.subQuery = null;
+    this.not = not;
+    this.sql = sql;
+    this.bindParams = bindParams;
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
 
-    // queryPlanHash executes prior to addSql() or addBindValues()
-    // ... so compiledQuery will exist
-    compiledSubQuery = compileSubQuery(request);
+    CQuery<?> subQuery = compileSubQuery(request);
+    this.bindParams = subQuery.getPredicates().getWhereExprBindValues();
+    this.sql = subQuery.getGeneratedSql().replace('\n', ' ');
+  }
 
-    queryAutoTuneHash(builder);
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
+    builder.add(InQueryExpression.class).add(propName).add(not);
+    builder.add(sql).add(bindParams.size());
   }
 
   /**
@@ -51,35 +62,55 @@ class InQueryExpression extends AbstractExpression {
     return ebeanServer.compileQuery(subQuery, queryRequest.getTransaction());
   }
 
+  @Override
   public int queryBindHash() {
     return subQuery.queryBindHash();
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
-    String subSelect = compiledSubQuery.getGeneratedSql();
-    subSelect = subSelect.replace('\n', ' ');
-
-    String propertyName = getPropertyName();
-    request.append(" (").append(propertyName).append(")");
+    request.append(" (").append(propName).append(")");
     if (not) {
       request.append(" not");
     }
     request.append(" in (");
-    request.append(subSelect);
+    request.append(sql);
     request.append(") ");
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
-
-    List<Object> bindParams = compiledSubQuery.getPredicates().getWhereExprBindValues();
-
-    if (bindParams == null) {
-      return;
-    }
 
     for (int i = 0; i < bindParams.size(); i++) {
       request.addBindValue(bindParams.get(i));
     }
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof InQueryExpression)) {
+      return false;
+    }
+
+    InQueryExpression that = (InQueryExpression) other;
+    return propName.equals(that.propName)
+        && sql.equals(that.sql)
+        && not == that.not
+        && bindParams.size() == that.bindParams.size();
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    InQueryExpression that = (InQueryExpression) other;
+    if (this.bindParams.size() != that.bindParams.size()) {
+      return false;
+    }
+    for (int i = 0; i < bindParams.size(); i++) {
+      if (!bindParams.get(i).equals(that.bindParams.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 }

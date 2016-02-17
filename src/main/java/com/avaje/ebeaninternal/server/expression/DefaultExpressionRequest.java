@@ -1,7 +1,8 @@
-package com.avaje.ebeaninternal.util;
+package com.avaje.ebeaninternal.server.expression;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -20,7 +21,7 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
 
   private final StringBuilder sql = new StringBuilder();
 
-  private final ArrayList<Object> bindValues = new ArrayList<Object>();
+  private final List<Object> bindValues = new ArrayList<Object>();
 
   private final DeployParser deployParser;
 
@@ -39,7 +40,7 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
     this.binder = binder;
     this.expressionList = expressionList;
     // immediately build the list of bind values (callback style)
-    expressionList.buildBindValues(this);
+    expressionList.addBindValues(this);
   }
 
   public DefaultExpressionRequest(BeanDescriptor<?> beanDescriptor) {
@@ -54,7 +55,8 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
    * Build sql for the underlying expression list.
    */
   public String buildSql() {
-    return expressionList.buildSql(this);
+    expressionList.addSql(this);
+    return sql.toString();
   }
 
   /**
@@ -70,10 +72,12 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
     }
   }
 
+  @Override
   public JsonExpressionHandler getJsonHandler() {
     return binder.getJsonExpressionHandler();
   }
 
+  @Override
   public String parseDeploy(String logicalProp) {
 
     String s = deployParser.getDeployWord(logicalProp);
@@ -93,14 +97,17 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
   /**
    * Increments the parameter index and returns that value.
    */
+  @Override
   public int nextParameter() {
     return ++paramIndex;
   }
 
+  @Override
   public BeanDescriptor<?> getBeanDescriptor() {
     return beanDescriptor;
   }
 
+  @Override
   public SpiOrmQueryRequest<?> getQueryRequest() {
     return queryRequest;
   }
@@ -108,16 +115,19 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
   /**
    * Append text the underlying sql expression.
    */
+  @Override
   public SpiExpressionRequest append(String sqlExpression) {
     sql.append(sqlExpression);
     return this;
   }
 
+  @Override
   public void addBindEncryptKey(Object bindValue) {
     bindValues.add(bindValue);
     bindLog("****");
   }
 
+  @Override
   public void addBindValue(Object bindValue) {
     bindValues.add(bindValue);
     bindLog(bindValue);
@@ -136,11 +146,13 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
     return bindLog == null ? "" : bindLog.toString();
   }
 
+  @Override
   public String getSql() {
     return sql.toString();
   }
 
-  public ArrayList<Object> getBindValues() {
+  @Override
+  public List<Object> getBindValues() {
     return bindValues;
   }
 

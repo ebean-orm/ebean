@@ -1,16 +1,6 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.avaje.ebean.RawSql;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.BindParams.OrderedList;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
@@ -23,7 +13,15 @@ import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
-import com.avaje.ebeaninternal.util.DefaultExpressionRequest;
+import com.avaje.ebeaninternal.server.expression.DefaultExpressionRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Compile Query Predicates.
@@ -465,7 +463,7 @@ public class CQueryPredicates {
   /**
    * Return the bind values for the where expression.
    */
-  public ArrayList<Object> getWhereExprBindValues() {
+  public List<Object> getWhereExprBindValues() {
     return where.getBindValues();
   }
 

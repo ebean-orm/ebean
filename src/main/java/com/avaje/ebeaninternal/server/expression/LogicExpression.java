@@ -26,6 +26,12 @@ abstract class LogicExpression implements SpiExpression {
     And(Expression expOne, Expression expTwo) {
       super(AND, expOne, expTwo);
     }
+
+    @Override
+    public SpiExpression copyForPlanKey() {
+      return new And(expOne.copyForPlanKey(), expTwo.copyForPlanKey());
+    }
+
   }
 
   static class Or extends LogicExpression {
@@ -35,11 +41,16 @@ abstract class LogicExpression implements SpiExpression {
     Or(Expression expOne, Expression expTwo) {
       super(OR, expOne, expTwo);
     }
+
+    @Override
+    public SpiExpression copyForPlanKey() {
+      return new Or(expOne.copyForPlanKey(), expTwo.copyForPlanKey());
+    }
   }
 
-  private final SpiExpression expOne;
+  protected final SpiExpression expOne;
 
-  private final SpiExpression expTwo;
+  protected final SpiExpression expTwo;
 
   private final String joinType;
 
@@ -49,6 +60,7 @@ abstract class LogicExpression implements SpiExpression {
     this.expTwo = (SpiExpression) expTwo;
   }
 
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     expOne.containsMany(desc, manyWhereJoin);
     expTwo.containsMany(desc, manyWhereJoin);
@@ -60,11 +72,13 @@ abstract class LogicExpression implements SpiExpression {
     expTwo.validate(validation);
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
     expOne.addBindValues(request);
     expTwo.addBindValues(request);
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
     request.append("(");
@@ -74,25 +88,47 @@ abstract class LogicExpression implements SpiExpression {
     request.append(") ");
   }
 
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
+    expOne.prepareExpression(request);
+    expTwo.prepareExpression(request);
+  }
+
   /**
    * Based on the joinType plus the two expressions.
    */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(LogicExpression.class).add(joinType);
-    expOne.queryAutoTuneHash(builder);
-    expTwo.queryAutoTuneHash(builder);
+    expOne.queryPlanHash(builder);
+    expTwo.queryPlanHash(builder);
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    builder.add(LogicExpression.class).add(joinType);
-    expOne.queryPlanHash(request, builder);
-    expTwo.queryPlanHash(request, builder);
-  }
-
+  @Override
   public int queryBindHash() {
     int hc = expOne.queryBindHash();
     hc = hc * 31 + expTwo.queryBindHash();
     return hc;
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+
+    if (!(other instanceof LogicExpression)) {
+      return false;
+    }
+
+    LogicExpression that = (LogicExpression) other;
+    return this.joinType.equals(that.joinType)
+        && this.expOne.isSameByPlan(that.expOne)
+        && this.expTwo.isSameByPlan(that.expTwo);
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    LogicExpression that = (LogicExpression) other;
+    return this.expOne.isSameByBind(that.expOne)
+        && this.expTwo.isSameByBind(that.expTwo);
   }
 
 }

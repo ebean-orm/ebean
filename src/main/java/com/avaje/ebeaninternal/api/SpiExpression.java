@@ -17,32 +17,36 @@ public interface SpiExpression extends Expression {
    * </p>
    */
 	void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins);
-	
-	/**
+
+  /**
+   * Prepare the expression. For example, compile sub-query expressions etc.
+   */
+  void prepareExpression(BeanQueryRequest<?> request);
+
+  /**
 	 * Calculate a hash value used to identify a query for AutoTune tuning.
 	 * <p>
 	 * That is, if the hash changes then the query will be considered different
 	 * from an AutoTune perspective and get different tuning.
 	 * </p>
 	 */
-	void queryAutoTuneHash(HashQueryPlanBuilder builder);
-	
-	/**
-	 * Calculate a hash value for the expression.
-	 * This includes the expression type and property but should exclude
-	 * the bind values.
-	 * <p>
-	 * This is used where queries are the same except for the bind values, in which
-	 * case the query execution plan can be reused.
-	 * </p>
-	 */
-	void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder);
-	
+	void queryPlanHash(HashQueryPlanBuilder builder);
+
 	/**
 	 * Return the hash value for the values that will be bound.
 	 */
 	int queryBindHash();
-	
+
+  /**
+   * Return true if the expression is the same without taking into account bind values.
+   */
+  boolean isSameByPlan(SpiExpression other);
+
+  /**
+   * Return true if the expression is the same with respect to bind values.
+   */
+  boolean isSameByBind(SpiExpression other);
+
 	/**
 	 * Add some sql to the query.
 	 * <p>
@@ -61,7 +65,7 @@ public interface SpiExpression extends Expression {
 	/**
 	 * Add the parameter values to be set against query. For each ? place holder
 	 * there should be a corresponding value that is added to the bindList.
-	 * 
+	 *
 	 * @param request
 	 *            the associated request.
 	 */
@@ -71,4 +75,10 @@ public interface SpiExpression extends Expression {
    * Validate all the properties/paths associated with this expression.
    */
   void validate(SpiExpressionValidation validation);
+
+  /**
+   * Return a copy of the expression for use in the query plan key.
+   */
+  SpiExpression copyForPlanKey();
+
 }

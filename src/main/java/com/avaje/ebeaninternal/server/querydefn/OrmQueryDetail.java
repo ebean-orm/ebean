@@ -1,26 +1,23 @@
 package com.avaje.ebeaninternal.server.querydefn;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.query.SplitName;
+
+import javax.persistence.PersistenceException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents the internal structure of an Object Relational query.
@@ -45,9 +42,7 @@ public class OrmQueryDetail implements Serializable {
   /**
    * Contains the fetch/lazy/query joins and their properties.
    */
-  private LinkedHashMap<String, OrmQueryProperties> fetchPaths = new LinkedHashMap<String, OrmQueryProperties>(8);
-
-  private LinkedHashSet<String> includes = new LinkedHashSet<String>(8);
+  private LinkedHashMap<String, OrmQueryProperties> fetchPaths = new LinkedHashMap<String, OrmQueryProperties>();
 
   /**
    * Return a deep copy of the OrmQueryDetail.
@@ -58,34 +53,32 @@ public class OrmQueryDetail implements Serializable {
     for (Map.Entry<String, OrmQueryProperties> entry : fetchPaths.entrySet()) {
       copy.fetchPaths.put(entry.getKey(), entry.getValue().copy());
     }
-    copy.includes = new LinkedHashSet<String>(includes);
     return copy;
+  }
+
+  public int queryPlanHash() {
+    HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
+    queryPlanHash(builder);
+    return builder.getPlanHash();
   }
 
   /**
    * Calculate the hash for the query plan.
    */
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    if (baseProps == null) {
-      builder.add(false);
-    } else {
-      builder.add(true);
-      baseProps.queryPlanHash(request, builder);
-    }
-
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
+    baseProps.queryPlanHash(builder);
     if (fetchPaths != null) {
       for (OrmQueryProperties p : fetchPaths.values()) {
-        p.queryPlanHash(request, builder);
+        p.queryPlanHash(builder);
       }
     }
   }
 
   /**
-   * Return true if equal in terms of autoTune (select and fetch).
+   * Return true if the details are the same for query plan purposes.
    */
-  public boolean isAutoTuneEqual(OrmQueryDetail otherDetail) {
-
-    if (!isSame(baseProps, otherDetail.baseProps)) {
+  public boolean isSameByPlan(OrmQueryDetail otherDetail) {
+    if (!isSameByPlan(baseProps, otherDetail.baseProps)) {
       return false;
     }
     if (fetchPaths == null) {
@@ -94,10 +87,16 @@ public class OrmQueryDetail implements Serializable {
     if (fetchPaths.size() != otherDetail.fetchPaths.size()) {
       return false;
     }
-    Set<Map.Entry<String, OrmQueryProperties>> entries = fetchPaths.entrySet();
-    for (Map.Entry<String, OrmQueryProperties> entry : entries) {
-      OrmQueryProperties chunk = otherDetail.getChunk(entry.getKey(), false);
-      if (!isSame(entry.getValue(), chunk)) {
+    // check with ordering being important
+    Iterator<Map.Entry<String, OrmQueryProperties>> thisIt = fetchPaths.entrySet().iterator();
+    Iterator<Map.Entry<String, OrmQueryProperties>> thatIt = otherDetail.fetchPaths.entrySet().iterator();
+    while (thisIt.hasNext() && thatIt.hasNext()) {
+      Map.Entry<String, OrmQueryProperties> thisEntry = thisIt.next();
+      Map.Entry<String, OrmQueryProperties> thatEntry = thatIt.next();
+      if (!thisEntry.getKey().equals(thatEntry.getKey())) {
+        return false;
+      }
+      if (!thisEntry.getValue().isSameByPlan(thatEntry.getValue())) {
         return false;
       }
     }
@@ -105,21 +104,54 @@ public class OrmQueryDetail implements Serializable {
     return true;
   }
 
-  private boolean isSame(OrmQueryProperties p1, OrmQueryProperties p2) {
-    if (p1 == null) {
-      return p2 == null;
+  /**
+   * Return true if equal in terms of autoTune (select and fetch without property ordering).
+   */
+  public boolean isAutoTuneEqual(OrmQueryDetail otherDetail) {
+
+    if (!isSameByAutoTune(baseProps, otherDetail.baseProps)) {
+      return false;
     }
-    return p1.isSame(p2);
+    if (fetchPaths == null) {
+      return otherDetail.fetchPaths == null;
+    }
+    if (fetchPaths.size() != otherDetail.fetchPaths.size()) {
+      return false;
+    }
+    // check without regard to ordering
+    for (Map.Entry<String, OrmQueryProperties> entry : fetchPaths.entrySet()) {
+      OrmQueryProperties chunk = otherDetail.getChunk(entry.getKey(), false);
+      if (!isSameByAutoTune(entry.getValue(), chunk)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private boolean isSameByAutoTune(OrmQueryProperties p1, OrmQueryProperties p2) {
+    return p1 == null ? p2 == null : p1.isSameByAutoTune(p2);
+  }
+
+  private boolean isSameByPlan(OrmQueryProperties p1, OrmQueryProperties p2) {
+    return p1 == null ? p2 == null : p1.isSameByPlan(p2);
   }
 
   public String toString() {
+    return asString();
+  }
+
+  /**
+   * Return the detail in string form.
+   */
+  public String asString() {
     StringBuilder sb = new StringBuilder();
-    if (baseProps != null) {
-      sb.append("select ").append(baseProps);
+    if (!baseProps.isEmpty()) {
+      baseProps.append("select ", sb);
     }
     if (fetchPaths != null) {
       for (OrmQueryProperties join : fetchPaths.values()) {
-        sb.append(" fetch ").append(join);
+        join.append(" fetch ", sb);
       }
     }
     return sb.toString();
@@ -133,11 +165,11 @@ public class OrmQueryDetail implements Serializable {
    * set the properties to include on the base / root entity.
    */
   public void select(String columns) {
-    baseProps = new OrmQueryProperties(null, columns);
+    baseProps = new OrmQueryProperties(null, columns, null);
   }
 
   public boolean containsProperty(String property) {
-    return baseProps == null || baseProps.isIncluded(property);
+    return baseProps.isIncluded(property);
   }
 
   /**
@@ -174,17 +206,12 @@ public class OrmQueryDetail implements Serializable {
     Collections.sort(matchingPaths);
 
     // the list of secondary queries
-    ArrayList<OrmQueryProperties> props = new ArrayList<OrmQueryProperties>(2);
+    ArrayList<OrmQueryProperties> props = new ArrayList<OrmQueryProperties>();
 
     for (int i = 0; i < matchingPaths.size(); i++) {
       String path = matchingPaths.get(i);
-      includes.remove(path);
       OrmQueryProperties secQuery = fetchPaths.remove(path);
-      if (secQuery == null) {
-        // the path has already been removed by another
-        // secondary query
-
-      } else {
+      if (secQuery != null) {
         props.add(secQuery);
 
         // remove any child properties for this path
@@ -195,7 +222,6 @@ public class OrmQueryDetail implements Serializable {
             // remove join to secondary query from the main query
             // and add to this secondary query
             pass2It.remove();
-            includes.remove(pass2Prop.getPath());
             secQuery.add(pass2Prop);
           }
         }
@@ -224,29 +250,24 @@ public class OrmQueryDetail implements Serializable {
     OrmQueryProperties tunedRoot = tunedDetail.getChunk(null, false);
     if (tunedRoot != null) {
       tuned = true;
-      baseProps.setTunedProperties(tunedRoot);
-
+      baseProps = tunedRoot;
       for (OrmQueryProperties tunedChunk : tunedDetail.fetchPaths.values()) {
-        OrmQueryProperties chunk = getChunk(tunedChunk.getPath(), false);
-        if (chunk != null) {
-          // set the properties to select
-          chunk.setTunedProperties(tunedChunk);
-        } else {
-          // add a missing join
-          putFetchPath(tunedChunk.copy());
-        }
+        fetch(tunedChunk.copy());
       }
     }
     return tuned;
   }
 
   /**
-   * Matches a join() method of the query.
+   * Add or replace the fetch detail.
    */
-  public void putFetchPath(OrmQueryProperties chunk) {
+  protected void fetch(OrmQueryProperties chunk) {
     String path = chunk.getPath();
-    fetchPaths.put(path, chunk);
-    includes.add(path);
+    if (path == null) {
+      baseProps = chunk;
+    } else {
+      fetchPaths.put(path, chunk);
+    }
   }
 
   /**
@@ -256,7 +277,6 @@ public class OrmQueryDetail implements Serializable {
    * </p>
    */
   public void clear() {
-    includes.clear();
     fetchPaths.clear();
   }
 
@@ -266,26 +286,33 @@ public class OrmQueryDetail implements Serializable {
    * @param path         the property to join
    * @param partialProps the properties on the join property to include
    */
-  public void addFetch(String path, String partialProps, FetchConfig fetchConfig) {
+  public void fetch(String path, String partialProps, FetchConfig fetchConfig) {
 
-    OrmQueryProperties chunk = getChunk(path, true);
-    chunk.setProperties(partialProps);
-    chunk.setFetchConfig(fetchConfig);
+    fetch(new OrmQueryProperties(path, partialProps, fetchConfig));
   }
 
+  /**
+   * Add for raw sql etc when the properties are already parsed into a set.
+   */
+  public void fetch(String path, LinkedHashSet<String> properties) {
+    fetch(new OrmQueryProperties(path, properties));
+  }
+
+  /**
+   * Sort the fetch paths into depth order adding any missing parent paths if necessary.
+   */
   public void sortFetchPaths(BeanDescriptor<?> d) {
 
-    LinkedHashMap<String, OrmQueryProperties> sorted = new LinkedHashMap<String, OrmQueryProperties>(fetchPaths.size());
-
-    for (OrmQueryProperties p : fetchPaths.values()) {
-      sortFetchPaths(d, p, sorted);
+    if (!fetchPaths.isEmpty()) {
+      LinkedHashMap<String, OrmQueryProperties> sorted = new LinkedHashMap<String, OrmQueryProperties>();
+      for (OrmQueryProperties p : fetchPaths.values()) {
+        sortFetchPaths(d, p, sorted);
+      }
+      fetchPaths = sorted;
     }
-
-    fetchPaths = sorted;
   }
 
-  private void sortFetchPaths(BeanDescriptor<?> d, OrmQueryProperties p,
-                              LinkedHashMap<String, OrmQueryProperties> sorted) {
+  private void sortFetchPaths(BeanDescriptor<?> d, OrmQueryProperties p, LinkedHashMap<String, OrmQueryProperties> sorted) {
 
     String path = p.getPath();
     if (!sorted.containsKey(path)) {
@@ -298,8 +325,7 @@ public class OrmQueryDetail implements Serializable {
         if (parentProp == null) {
           ElPropertyValue el = d.getElGetValue(parentPath);
           if (el == null) {
-            String msg = "Path [" + parentPath + "] not valid from " + d.getFullName();
-            throw new PersistenceException(msg);
+            throw new PersistenceException("Path [" + parentPath + "] not valid from " + d.getFullName());
           }
           // add a missing parent path just fetching the Id property
           BeanPropertyAssoc<?> assocOne = (BeanPropertyAssoc<?>) el.getBeanProperty();
@@ -313,12 +339,9 @@ public class OrmQueryDetail implements Serializable {
   }
 
   /**
-   * Convert 'fetch joins' to 'many' properties over to 'query joins'.
+   * Mark 'fetch joins' to 'many' properties over to 'query joins' where needed.
    */
-  public void convertManyFetchJoinsToQueryJoins(BeanDescriptor<?> beanDescriptor, String lazyLoadManyPath,
-                                                boolean allowOne, int queryBatch) {
-
-    ArrayList<OrmQueryProperties> manyChunks = new ArrayList<OrmQueryProperties>(3);
+  public void markQueryJoins(BeanDescriptor<?> beanDescriptor, String lazyLoadManyPath, boolean allowOne) {
 
     // the name of the many fetch property if there is one
     String manyFetchProperty = null;
@@ -334,8 +357,7 @@ public class OrmQueryDetail implements Serializable {
 
         // this is a join to a *ToMany
         OrmQueryProperties chunk = fetchPaths.get(fetchPath);
-        if (chunk.isFetchJoin() && !isLazyLoadManyRoot(lazyLoadManyPath, chunk)
-            && !hasParentSecJoin(lazyLoadManyPath, chunk)) {
+        if (isQueryJoinCandidate(lazyLoadManyPath, chunk)) {
           // this is a 'fetch join' (included in main query)
           if (fetchJoinFirstMany) {
             // letting the first one remain a 'fetch join'
@@ -343,16 +365,20 @@ public class OrmQueryDetail implements Serializable {
             manyFetchProperty = fetchPath;
           } else {
             // convert this one over to a 'query join'
-            manyChunks.add(chunk);
+            chunk.markForQueryJoin();
           }
         }
       }
     }
+  }
 
-    for (int i = 0; i < manyChunks.size(); i++) {
-      // convert 'fetch joins' over to 'query joins'
-      manyChunks.get(i).setQueryFetch(queryBatch, true);
-    }
+  /**
+   * Return true if this path is a candidate for converting to a query join.
+   */
+  private boolean isQueryJoinCandidate(String lazyLoadManyPath, OrmQueryProperties chunk) {
+    return chunk.isFetchJoin()
+        && !isLazyLoadManyRoot(lazyLoadManyPath, chunk)
+        && !hasParentSecJoin(lazyLoadManyPath, chunk);
   }
 
   /**
@@ -397,32 +423,28 @@ public class OrmQueryDetail implements Serializable {
   public void setDefaultSelectClause(BeanDescriptor<?> desc) {
 
     if (desc.hasDefaultSelectClause() && !hasSelectClause()) {
-      if (baseProps == null) {
-        baseProps = new OrmQueryProperties();
-      }
-      baseProps.setDefaultProperties(desc.getDefaultSelectClause(), desc.getDefaultSelectClauseSet());
+      baseProps = new OrmQueryProperties(null, desc.getDefaultSelectClause());
     }
 
     for (OrmQueryProperties joinProps : fetchPaths.values()) {
       if (!joinProps.hasSelectClause()) {
         BeanDescriptor<?> assocDesc = desc.getBeanDescriptor(joinProps.getPath());
         if (assocDesc.hasDefaultSelectClause()) {
-          // use the default select clause
-          joinProps.setDefaultProperties(assocDesc.getDefaultSelectClause(), assocDesc.getDefaultSelectClauseSet());
+          fetch(joinProps.getPath(), assocDesc.getDefaultSelectClause(), joinProps.getFetchConfig());
         }
       }
     }
   }
 
   public boolean hasSelectClause() {
-    return (baseProps != null && baseProps.hasSelectClause());
+    return (baseProps.hasSelectClause());
   }
 
   /**
    * Return true if the query detail has neither select properties specified or any joins defined.
    */
   public boolean isEmpty() {
-    return fetchPaths.isEmpty() && (baseProps == null || !baseProps.hasProperties());
+    return fetchPaths.isEmpty() && baseProps.allProperties();
   }
 
   /**
@@ -451,7 +473,7 @@ public class OrmQueryDetail implements Serializable {
     OrmQueryProperties props = fetchPaths.get(path);
     if (create && props == null) {
       props = new OrmQueryProperties(path);
-      putFetchPath(props);
+      fetch(props);
       return props;
 
     } else {
@@ -460,9 +482,9 @@ public class OrmQueryDetail implements Serializable {
   }
 
   /**
-   * Return true if the property is included.
+   * Return true if the fetch path is included.
    */
-  public boolean includes(String path) {
+  public boolean includesPath(String path) {
 
     OrmQueryProperties chunk = fetchPaths.get(path);
 
@@ -471,9 +493,9 @@ public class OrmQueryDetail implements Serializable {
   }
 
   /**
-   * Return the property includes for this detail.
+   * Return the fetch paths for this detail.
    */
-  public HashSet<String> getIncludes() {
-    return includes;
+  public Set<String> getFetchPaths() {
+    return fetchPaths.keySet();
   }
 }

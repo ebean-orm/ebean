@@ -29,6 +29,8 @@ public class OrmQueryDetailParser {
 
   public OrmQueryDetail parse() throws PersistenceException {
 
+    if (parser.isEmpty()) return detail;
+
     parser.nextWord();
     processInitial();
     return detail;
@@ -62,8 +64,7 @@ public class OrmQueryDetailParser {
 
   private void process() {
     if (isFetch()) {
-      OrmQueryProperties props = readFindFetch();
-      detail.putFetchPath(props);
+      detail.fetch(readFindFetch());
 
     } else if (parser.isMatch("where")) {
       readWhere();

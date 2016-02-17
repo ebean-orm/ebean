@@ -13,11 +13,8 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
-import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
-import com.avaje.ebean.dbmigration.DdlGenerator;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.query.CQuery;
-import com.avaje.ebeaninternal.server.query.CQueryEngine;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
 import java.util.List;
@@ -131,20 +128,9 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   void remoteTransactionEvent(RemoteTransactionEvent event);
 
   /**
-   * Create a query request object.
-   */
-  <T> SpiOrmQueryRequest<T> createQueryRequest(BeanDescriptor<T> desc, SpiQuery<T> q,
-      Transaction t);
-
-  /**
    * Compile a query.
    */
   <T> CQuery<T> compileQuery(Query<T> query, Transaction t);
-
-  /**
-   * Return the queryEngine for this server.
-   */
-  CQueryEngine getQueryEngine();
 
   /**
    * Execute the findId's query but without copying the query.

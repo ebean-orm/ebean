@@ -13,7 +13,8 @@ final class NotExpression implements SpiExpression {
 
   private static final long serialVersionUID = 5648926732402355781L;
 
-  private static final String NOT = "not (";
+  private static final String NOT_START = "not (";
+  private static final String NOT_END = ") ";
 
   private final SpiExpression exp;
 
@@ -21,6 +22,12 @@ final class NotExpression implements SpiExpression {
     this.exp = (SpiExpression) exp;
   }
 
+  @Override
+  public SpiExpression copyForPlanKey() {
+    return new NotExpression(exp.copyForPlanKey());
+  }
+
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     exp.containsMany(desc, manyWhereJoin);
   }
@@ -30,31 +37,49 @@ final class NotExpression implements SpiExpression {
     exp.validate(validation);
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
     exp.addBindValues(request);
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
-    request.append(NOT);
+    request.append(NOT_START);
     exp.addSql(request);
-    request.append(") ");
+    request.append(NOT_END);
+  }
+
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
+    exp.prepareExpression(request);
   }
 
   /**
    * Based on the expression.
    */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(NotExpression.class);
-    exp.queryAutoTuneHash(builder);
+    exp.queryPlanHash(builder);
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    builder.add(NotExpression.class);
-    exp.queryPlanHash(request, builder);
-  }
-
+  @Override
   public int queryBindHash() {
     return exp.queryBindHash();
   }
 
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof NotExpression)) {
+      return false;
+    }
+    NotExpression that = (NotExpression) other;
+    return exp.isSameByPlan(that.exp);
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    NotExpression that = (NotExpression) other;
+    return exp.isSameByBind(that.exp);
+  }
 }

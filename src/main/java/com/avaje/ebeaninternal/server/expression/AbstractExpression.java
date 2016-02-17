@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.expression;
 
+import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -21,19 +22,20 @@ public abstract class AbstractExpression implements SpiExpression {
     this.propName = propName;
   }
 
-  public String getPropertyName() {
-    return propName;
+  @Override
+  public SpiExpression copyForPlanKey() {
+    return this;
   }
 
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
 
-    String propertyName = getPropertyName();
-    if (propertyName != null) {
-      ElPropertyDeploy elProp = desc.getElPropertyDeploy(propertyName);
+    if (propName != null) {
+      ElPropertyDeploy elProp = desc.getElPropertyDeploy(propName);
       if (elProp != null) {
         if (elProp.containsFormulaWithJoin()) {
           // for findRowCount query select clause
-          manyWhereJoin.addFormulaWithJoin(propertyName);
+          manyWhereJoin.addFormulaWithJoin(propName);
         }
         if (elProp.containsMany()) {
           // for findRowCount we join to a many property
@@ -44,13 +46,17 @@ public abstract class AbstractExpression implements SpiExpression {
   }
 
   @Override
-  public void validate(SpiExpressionValidation validation) {
-    validation.validate(getPropertyName());
+  public void prepareExpression(BeanQueryRequest<?> request) {
+    // do nothing
   }
 
-  protected ElPropertyValue getElProp(SpiExpressionRequest request) {
+  @Override
+  public void validate(SpiExpressionValidation validation) {
+    validation.validate(propName);
+  }
 
-    String propertyName = getPropertyName();
-    return request.getBeanDescriptor().getElGetValue(propertyName);
+  protected final ElPropertyValue getElProp(SpiExpressionRequest request) {
+
+    return request.getBeanDescriptor().getElGetValue(propName);
   }
 }

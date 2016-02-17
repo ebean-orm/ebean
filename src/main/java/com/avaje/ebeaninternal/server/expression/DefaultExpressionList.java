@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.util;
+package com.avaje.ebeaninternal.server.expression;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -56,6 +56,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     this.listAndJoin = " and ";
   }
 
+  private DefaultExpressionList() {
+    this(null, null, null, new ArrayList<SpiExpression>());
+  }
+
   @Override
   public SpiExpressionList<?> trimPath(int prefixTrim) {
     throw new RuntimeException("Only allowed on FilterExpressionList");
@@ -63,17 +67,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   public List<SpiExpression> internalList() {
     return list;
-  }
-
-  /**
-   * Set the ExpressionFactory.
-   * <p>
-   * After deserialisation so that it can be further modified.
-   * </p>
-   */
-  @Override
-  public void setExpressionFactory(ExpressionFactory expr) {
-    this.expr = expr;
   }
 
   /**
@@ -85,6 +78,14 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   public DefaultExpressionList<T> copy(Query<T> query) {
     DefaultExpressionList<T> copy = new DefaultExpressionList<T>(query, expr, null);
     copy.list.addAll(list);
+    return copy;
+  }
+
+  public DefaultExpressionList<T> copyForPlanKey() {
+    DefaultExpressionList<T> copy = new DefaultExpressionList<T>();
+    for (int i = 0; i < list.size(); i++) {
+      copy.list.add(list.get(i).copyForPlanKey());
+    }
     return copy;
   }
 
@@ -325,7 +326,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public String buildSql(SpiExpressionRequest request) {
+  public void addSql(SpiExpressionRequest request) {
 
     request.append(listAndStart);
     for (int i = 0, size = list.size(); i < size; i++) {
@@ -336,28 +337,19 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       expression.addSql(request);
     }
     request.append(listAndEnd);
-    return request.getSql();
   }
 
   @Override
-  public ArrayList<Object> buildBindValues(SpiExpressionRequest request) {
-
+  public void addBindValues(SpiExpressionRequest request) {
     for (int i = 0, size = list.size(); i < size; i++) {
-      SpiExpression expression = list.get(i);
-      expression.addBindValues(request);
+      list.get(i).addBindValues(request);
     }
-    return request.getBindValues();
   }
 
-  /**
-   * Calculate a hash based on the expressions but excluding the actual bind
-   * values.
-   */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
-    builder.add(DefaultExpressionList.class);
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
     for (int i = 0, size = list.size(); i < size; i++) {
-      SpiExpression expression = list.get(i);
-      expression.queryAutoTuneHash(builder);
+      list.get(i).prepareExpression(request);
     }
   }
 
@@ -366,24 +358,55 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * values.
    */
   @Override
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(DefaultExpressionList.class);
     for (int i = 0, size = list.size(); i < size; i++) {
-      SpiExpression expression = list.get(i);
-      expression.queryPlanHash(request, builder);
+      list.get(i).queryPlanHash(builder);
     }
   }
 
   /**
    * Calculate a hash based on the expressions.
    */
+  @Override
   public int queryBindHash() {
     int hash = DefaultExpressionList.class.getName().hashCode();
     for (int i = 0, size = list.size(); i < size; i++) {
-      SpiExpression expression = list.get(i);
-      hash = hash * 31 + expression.queryBindHash();
+      hash = hash * 31 + list.get(i).queryBindHash();
     }
     return hash;
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof DefaultExpressionList)) {
+      return false;
+    }
+
+    DefaultExpressionList<?> that = (DefaultExpressionList<?>)other;
+    if (list.size() != that.list.size()) {
+      return false;
+    }
+    for (int i = 0, size = list.size(); i < size; i++) {
+      if (!list.get(i).isSameByPlan(that.list.get(i))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    DefaultExpressionList<?> that = (DefaultExpressionList<?>)other;
+    if (list.size() != that.list.size()) {
+      return false;
+    }
+    for (int i = 0, size = list.size(); i < size; i++) {
+      if (!list.get(i).isSameByBind(that.list.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

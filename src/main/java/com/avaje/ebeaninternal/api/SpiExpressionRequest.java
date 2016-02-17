@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.api;
 
-import java.util.ArrayList;
-
 import com.avaje.ebeaninternal.server.core.JsonExpressionHandler;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+
+import java.util.List;
 
 /**
  * Request object used for gathering expression sql and bind values.
@@ -54,7 +54,7 @@ public interface SpiExpressionRequest {
 	/**
 	 * Return the ordered list of bind values for all expressions in this request.
 	 */
-	ArrayList<Object> getBindValues();
+	List<Object> getBindValues();
 
   /**
    * Increments the parameter index and returns that value.

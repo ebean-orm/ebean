@@ -290,11 +290,6 @@ public interface SpiQuery<T> extends Query<T> {
   void setBeanDescriptor(BeanDescriptor<?> desc);
 
   /**
-   * Initialise/determine the joins required to support 'many' where clause predicates.
-   */
-  boolean initManyWhereJoins();
-
-  /**
    * Return the joins required to support predicates on the many properties.
    */
   ManyWhereJoins getManyWhereJoins();
@@ -320,30 +315,14 @@ public interface SpiQuery<T> extends Query<T> {
   void setFilterMany(String prop, ExpressionList<?> filterMany);
 
   /**
-   * Remove the query joins from query detail.
-   * <p>
-   * These are registered with the Load Context.
-   * </p>
-   */
-  List<OrmQueryProperties> removeQueryJoins();
-
-  /**
-   * Remove the lazy joins from query detail.
-   * <p>
-   * These are registered with the Load Context.
-   * </p>
-   */
-  List<OrmQueryProperties> removeLazyJoins();
-
-  /**
    * Set the path of the many when +query/+lazy loading query is executed.
    */
   void setLazyLoadManyPath(String lazyLoadManyPath);
 
   /**
-   * Convert any many joins fetch joins to query joins.
+   * Convert joins as necessary to query joins etc.
    */
-  void convertManyFetchJoinsToQueryJoins(boolean allowOne, int queryBatch);
+  SpiQuerySecondary convertJoins();
 
   /**
    * Return the TransactionContext.
@@ -467,27 +446,13 @@ public interface SpiQuery<T> extends Query<T> {
   String getName();
 
   /**
-   * Calculate a hash used by AutoTune to identify when a query has changed
-   * (and hence potentially needs a new tuned query plan to be developed).
+   * Prepare the query which prepares sub-query expressions and calculates
+   * and returns the query plan key.
    * <p>
-   * Excludes bind values and occurs prior to AutoTune potentially
-   * tuning/modifying the query.
+   * The query plan excludes actual bind values (as they don't effect the query plan).
    * </p>
    */
-  HashQueryPlan queryAutoTuneHash(HashQueryPlanBuilder builder);
-
-  /**
-   * Identifies queries that are the same bar the bind variables.
-   * <p>
-   * This is used AFTER AutoTune has potentially tuned the query. This is
-   * used to identify and reused query plans (the final SQL string and
-   * associated SqlTree object).
-   * </p>
-   * <p>
-   * Excludes the actual bind values (as they don't effect the query plan).
-   * </p>
-   */
-  HashQueryPlan queryPlanHash(BeanQueryRequest<?> request);
+  CQueryPlanKey prepare(BeanQueryRequest<?> request);
 
   /**
    * Calculate a hash based on the bind values used in the query.

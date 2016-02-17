@@ -92,7 +92,7 @@ public class PathProperties {
   /**
    * Get the properties for a given path.
    */
-  public Set<String> get(String path) {
+  public LinkedHashSet<String> get(String path) {
     Props props = pathMap.get(path);
     return props == null ? null : props.getProperties();
   }
@@ -109,7 +109,7 @@ public class PathProperties {
   /**
    * Set the properties for a given path.
    */
-  public void put(String path, Set<String> properties) {
+  public void put(String path, LinkedHashSet<String> properties) {
     pathMap.put(path, new Props(this, null, path, properties));
   }
 
@@ -160,9 +160,9 @@ public class PathProperties {
     private final String parentPath;
     private final String path;
 
-    private final Set<String> propSet;
+    private final LinkedHashSet<String> propSet;
 
-    private Props(PathProperties owner, String parentPath, String path, Set<String> propSet) {
+    private Props(PathProperties owner, String parentPath, String path, LinkedHashSet<String> propSet) {
       this.owner = owner;
       this.path = path;
       this.parentPath = parentPath;
@@ -195,7 +195,7 @@ public class PathProperties {
     /**
      * Return the properties for this property set.
      */
-    public Set<String> getProperties() {
+    public LinkedHashSet<String> getProperties() {
       return propSet;
     }
 

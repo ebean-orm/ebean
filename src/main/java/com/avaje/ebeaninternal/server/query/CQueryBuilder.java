@@ -25,7 +25,6 @@ import com.avaje.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
 import javax.persistence.PersistenceException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Generates the SQL SELECT statements taking into account the physical
@@ -354,8 +353,7 @@ public class CQueryBuilder {
 
     // transfer PathProperties into OrmQueryDetail
     for (String path : pathProps.getPaths()) {
-      Set<String> props = pathProps.get(path);
-      detail.getChunk(path, true).setDefaultProperties(null, props);
+      detail.fetch(path, pathProps.get(path));
     }
 
     // check if @Id property included in RawSql

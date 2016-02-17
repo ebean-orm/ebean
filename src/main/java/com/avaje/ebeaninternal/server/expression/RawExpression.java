@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
@@ -8,7 +7,7 @@ import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
-class RawExpression implements SpiExpression {
+class RawExpression extends NonPrepareExpression {
 
   private static final long serialVersionUID = 7973903141340334606L;
 
@@ -21,6 +20,7 @@ class RawExpression implements SpiExpression {
     this.values = values;
   }
 
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
 
   }
@@ -30,6 +30,7 @@ class RawExpression implements SpiExpression {
     // always ignored
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
     if (values != null) {
       for (int i = 0; i < values.length; i++) {
@@ -38,6 +39,7 @@ class RawExpression implements SpiExpression {
     }
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
     request.append(sql);
   }
@@ -45,15 +47,40 @@ class RawExpression implements SpiExpression {
   /**
    * Based on the sql.
    */
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(RawExpression.class).add(sql);
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoTuneHash(builder);
-  }
-
+  @Override
   public int queryBindHash() {
     return sql.hashCode();
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof RawExpression)) {
+      return false;
+    }
+    RawExpression that = (RawExpression) other;
+    return sql.equals(that.sql);
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    if (!(other instanceof RawExpression)) {
+      return false;
+    }
+
+    RawExpression that = (RawExpression) other;
+    if (values.length != that.values.length) {
+      return false;
+    }
+    for (int i = 0; i < values.length; i++) {
+      if (!Same.sameByValue(values[i], that.values[i])) {
+        return false;
+      }
+    }
+    return true;
   }
 }

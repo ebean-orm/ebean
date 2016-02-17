@@ -29,7 +29,7 @@ import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaQueryPlanStatistic;
 import com.avaje.ebean.plugin.SpiBeanType;
-import com.avaje.ebeaninternal.api.HashQueryPlan;
+import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -73,9 +73,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -87,7 +87,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
 
   private final ConcurrentHashMap<Integer, SpiUpdatePlan> updatePlanCache = new ConcurrentHashMap<Integer, SpiUpdatePlan>();
 
-  private final ConcurrentHashMap<HashQueryPlan, CQueryPlan> queryPlanCache = new ConcurrentHashMap<HashQueryPlan, CQueryPlan>();
+  private final ConcurrentHashMap<CQueryPlanKey, CQueryPlan> queryPlanCache = new ConcurrentHashMap<CQueryPlanKey, CQueryPlan>();
 
   private final ConcurrentHashMap<String, ElPropertyValue> elCache = new ConcurrentHashMap<String, ElPropertyValue>();
 
@@ -347,7 +347,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   private final BeanDescriptorJsonHelp<T> jsonHelp;
   
   private final String defaultSelectClause;
-  private final Set<String> defaultSelectClauseSet;
+  private final LinkedHashSet<String> defaultSelectClauseSet;
 
   private SpiEbeanServer ebeanServer;
 
@@ -856,7 +856,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
   /**
    * Return the default select clause already parsed into an ordered Set.
    */
-  public Set<String> getDefaultSelectClauseSet() {
+  public LinkedHashSet<String> getDefaultSelectClauseSet() {
     return defaultSelectClauseSet;
   }
 
@@ -1163,11 +1163,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
     }
   }
 
-  public CQueryPlan getQueryPlan(HashQueryPlan key) {
+  public CQueryPlan getQueryPlan(CQueryPlanKey key) {
     return queryPlanCache.get(key);
   }
 
-  public void putQueryPlan(HashQueryPlan key, CQueryPlan plan) {
+  public void putQueryPlan(CQueryPlanKey key, CQueryPlan plan) {
     queryPlanCache.put(key, plan);
   }
 
@@ -1252,7 +1252,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
 
     OrmQueryDetail detail = query.getDetail();
     for (int i = 0; i < propertiesMany.length; i++) {
-      if (detail.includes(propertiesMany[i].getName())) {
+      if (detail.includesPath(propertiesMany[i].getName())) {
         return propertiesMany[i];
       }
     }

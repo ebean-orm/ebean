@@ -17,69 +17,101 @@ public class ExistsExpression implements SpiExpression {
 
   private static final long serialVersionUID = 666990277309851644L;
 
-  private final boolean not;
+  protected final boolean not;
 
-  private final SpiQuery<?> subQuery;
+  protected final SpiQuery<?> subQuery;
 
-  private transient CQuery<?> compiledSubQuery;
+  protected List<Object> bindParams;
+
+  protected String sql;
 
   public ExistsExpression(SpiQuery<?> subQuery, boolean not) {
     this.subQuery = subQuery;
     this.not = not;
   }
 
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
-    builder.add(ExistsExpression.class).add(not);
-
-    subQuery.queryAutoTuneHash(builder);
+  ExistsExpression(boolean not, String sql , List<Object> bindParams) {
+    this.not = not;
+    this.sql = sql;
+    this.bindParams = bindParams;
+    this.subQuery = null;
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
 
-    // queryPlanHash executes prior to addSql() or addBindValues()
-    // ... so compiledQuery will exist
-    compiledSubQuery = compileSubQuery(request);
+    CQuery<?> subQuery = compileSubQuery(request);
+    this.bindParams = subQuery.getPredicates().getWhereExprBindValues();
+    this.sql = subQuery.getGeneratedSql().replace('\n', ' ');
+  }
 
-    queryAutoTuneHash(builder);
+  @Override
+  public SpiExpression copyForPlanKey() {
+    return this;
   }
 
   /**
    * Compile/build the sub query.
    */
-  private CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
-
+  protected CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
     SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.getEbeanServer();
     return ebeanServer.compileQuery(subQuery, queryRequest.getTransaction());
   }
 
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
+    builder.add(ExistsExpression.class).add(not);
+    builder.add(sql).add(bindParams.size());
+  }
+
+  @Override
   public int queryBindHash() {
     return subQuery.queryBindHash();
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
-
-    String subSelect = compiledSubQuery.getGeneratedSql();
-    subSelect = subSelect.replace('\n', ' ');
 
     if (not) {
       request.append(" not");
     }
     request.append(" exists (");
-    request.append(subSelect);
+    request.append(sql);
     request.append(") ");
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
-
-    List<Object> bindParams = compiledSubQuery.getPredicates().getWhereExprBindValues();
-
-    if (bindParams == null) {
-      return;
-    }
 
     for (int i = 0; i < bindParams.size(); i++) {
       request.addBindValue(bindParams.get(i));
     }
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof ExistsExpression)) {
+      return false;
+    }
+
+    ExistsExpression that = (ExistsExpression) other;
+    return this.sql.equals(that.sql)
+        && this.not == that.not
+        && this.bindParams.size() == that.bindParams.size();
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    ExistsExpression that = (ExistsExpression) other;
+    if (this.bindParams.size() != that.bindParams.size()) {
+      return false;
+    }
+    for (int i = 0; i < bindParams.size(); i++) {
+      if (!bindParams.get(i).equals(that.bindParams.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override

@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
@@ -12,7 +11,7 @@ import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 /**
  * Between expression where a value is between two properties.
  */
-class BetweenPropertyExpression implements SpiExpression {
+class BetweenPropertyExpression extends NonPrepareExpression {
 
   private static final long serialVersionUID = 2078918165221454910L;
 
@@ -32,6 +31,7 @@ class BetweenPropertyExpression implements SpiExpression {
     return propName;
   }
 
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
 
     ElPropertyDeploy elProp = desc.getElPropertyDeploy(name(lowProperty));
@@ -51,25 +51,42 @@ class BetweenPropertyExpression implements SpiExpression {
     validation.validate(highProperty);
   }
 
+  @Override
   public void addBindValues(SpiExpressionRequest request) {
     request.addBindValue(value);
   }
 
+  @Override
   public void addSql(SpiExpressionRequest request) {
 
     request.append(" ? ").append(BETWEEN).append(name(lowProperty)).append(" and ").append(name(highProperty));
   }
 
-  public void queryAutoTuneHash(HashQueryPlanBuilder builder) {
+  @Override
+  public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(BetweenPropertyExpression.class).add(lowProperty).add(highProperty);
     builder.bind(1);
   }
 
-  public void queryPlanHash(BeanQueryRequest<?> request, HashQueryPlanBuilder builder) {
-    queryAutoTuneHash(builder);
-  }
-
+  @Override
   public int queryBindHash() {
     return value.hashCode();
+  }
+
+  @Override
+  public boolean isSameByPlan(SpiExpression other) {
+    if (!(other instanceof BetweenPropertyExpression)) {
+      return false;
+    }
+
+    BetweenPropertyExpression that = (BetweenPropertyExpression) other;
+    return lowProperty.equals(that.lowProperty)
+        && highProperty.equals(that.highProperty);
+  }
+
+  @Override
+  public boolean isSameByBind(SpiExpression other) {
+    BetweenPropertyExpression that = (BetweenPropertyExpression) other;
+    return value.equals(that.value);
   }
 }
