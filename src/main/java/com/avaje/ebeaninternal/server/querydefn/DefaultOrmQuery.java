@@ -375,10 +375,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return expressionFactory;
   }
 
-  /**
-   * Return true if the where expressions contains a many property.
-   */
-  private void initManyWhereJoins() {
+  private void createExtraJoinsToSupportManyWhereClause() {
     manyWhereJoins = new ManyWhereJoins();
     if (whereExpressions != null) {
       whereExpressions.containsMany(beanDescriptor, manyWhereJoins);
@@ -388,6 +385,9 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
   }
 
+  /**
+   * Return the extra joins required to support the where clause for 'Many' properties.
+   */
   public ManyWhereJoins getManyWhereJoins() {
     return manyWhereJoins;
   }
@@ -442,30 +442,28 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     this.lazyLoadManyPath = lazyLoadManyPath;
   }
 
+  @Override
+  public void convertJoins() {
+
+    createExtraJoinsToSupportManyWhereClause();
+    markQueryJoins();
+  }
+
+  /**
+   * Limit the number of fetch joins to Many properties, mark as query joins as needed.
+   */
+  private void markQueryJoins() {
+    detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch());
+  }
+
   private boolean isAllowOneManyFetch() {
 
     if (Mode.LAZYLOAD_MANY.equals(getMode())) {
       return false;
-
     } else if (hasMaxRowsOrFirstRow() && !isRawSql() && !isSqlSelect()) {
       return false;
     }
-
     return true;
-  }
-
-  @Override
-  public void convertJoins(int queryBatchSize) {
-    initManyWhereJoins();
-    convertManyFetchJoinsToQueryJoins(queryBatchSize);
-  }
-
-  /**
-   * Convert any many joins fetch joins to query joins.
-   */
-  private void convertManyFetchJoinsToQueryJoins(int queryBatch) {
-    boolean allowOne = isAllowOneManyFetch();
-    detail.convertManyFetchJoinsToQueryJoins(beanDescriptor, lazyLoadManyPath, allowOne, queryBatch);
   }
 
   protected void setOrmQueryDetail(OrmQueryDetail detail) {

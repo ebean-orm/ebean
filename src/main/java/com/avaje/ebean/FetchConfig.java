@@ -249,4 +249,22 @@ public class FetchConfig implements Serializable {
     return queryAll;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    FetchConfig that = (FetchConfig) o;
+    if (lazyBatchSize != that.lazyBatchSize) return false;
+    if (queryBatchSize != that.queryBatchSize) return false;
+    return queryAll == that.queryAll;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = lazyBatchSize;
+    result = 92821 * result + queryBatchSize;
+    result = 92821 * result + (queryAll ? 1 : 0);
+    return result;
+  }
 }

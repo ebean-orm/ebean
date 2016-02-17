@@ -338,7 +338,7 @@ public interface SpiQuery<T> extends Query<T> {
   /**
    * Convert joins as necessary to query joins etc.
    */
-  void convertJoins(int queryBatchSize);
+  void convertJoins();
 
   /**
    * Return the TransactionContext.

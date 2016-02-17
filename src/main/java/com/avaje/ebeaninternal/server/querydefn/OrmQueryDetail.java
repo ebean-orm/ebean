@@ -7,7 +7,6 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.query.SplitName;
-import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.PersistenceException;
 import java.io.Serializable;
@@ -38,13 +37,12 @@ public class OrmQueryDetail implements Serializable {
   /**
    * Root level properties.
    */
-  @NotNull
   private OrmQueryProperties baseProps = new OrmQueryProperties();
 
   /**
    * Contains the fetch/lazy/query joins and their properties.
    */
-  private LinkedHashMap<String, OrmQueryProperties> fetchPaths = new LinkedHashMap<String, OrmQueryProperties>(8);
+  private LinkedHashMap<String, OrmQueryProperties> fetchPaths = new LinkedHashMap<String, OrmQueryProperties>();
 
   /**
    * Return a deep copy of the OrmQueryDetail.
@@ -302,7 +300,7 @@ public class OrmQueryDetail implements Serializable {
 
   public void sortFetchPaths(BeanDescriptor<?> d) {
 
-    LinkedHashMap<String, OrmQueryProperties> sorted = new LinkedHashMap<String, OrmQueryProperties>(fetchPaths.size());
+    LinkedHashMap<String, OrmQueryProperties> sorted = new LinkedHashMap<String, OrmQueryProperties>();
 
     for (OrmQueryProperties p : fetchPaths.values()) {
       sortFetchPaths(d, p, sorted);
@@ -311,8 +309,7 @@ public class OrmQueryDetail implements Serializable {
     fetchPaths = sorted;
   }
 
-  private void sortFetchPaths(BeanDescriptor<?> d, OrmQueryProperties p,
-                              LinkedHashMap<String, OrmQueryProperties> sorted) {
+  private void sortFetchPaths(BeanDescriptor<?> d, OrmQueryProperties p, LinkedHashMap<String, OrmQueryProperties> sorted) {
 
     String path = p.getPath();
     if (!sorted.containsKey(path)) {
@@ -325,8 +322,7 @@ public class OrmQueryDetail implements Serializable {
         if (parentProp == null) {
           ElPropertyValue el = d.getElGetValue(parentPath);
           if (el == null) {
-            String msg = "Path [" + parentPath + "] not valid from " + d.getFullName();
-            throw new PersistenceException(msg);
+            throw new PersistenceException("Path [" + parentPath + "] not valid from " + d.getFullName());
           }
           // add a missing parent path just fetching the Id property
           BeanPropertyAssoc<?> assocOne = (BeanPropertyAssoc<?>) el.getBeanProperty();
@@ -340,12 +336,9 @@ public class OrmQueryDetail implements Serializable {
   }
 
   /**
-   * Convert 'fetch joins' to 'many' properties over to 'query joins'.
+   * Mark 'fetch joins' to 'many' properties over to 'query joins' where needed.
    */
-  public void convertManyFetchJoinsToQueryJoins(BeanDescriptor<?> beanDescriptor, String lazyLoadManyPath,
-                                                boolean allowOne, int queryBatch) {
-
-    ArrayList<OrmQueryProperties> manyChunks = new ArrayList<OrmQueryProperties>(3);
+  public void markQueryJoins(BeanDescriptor<?> beanDescriptor, String lazyLoadManyPath, boolean allowOne) {
 
     // the name of the many fetch property if there is one
     String manyFetchProperty = null;
@@ -369,15 +362,10 @@ public class OrmQueryDetail implements Serializable {
             manyFetchProperty = fetchPath;
           } else {
             // convert this one over to a 'query join'
-            manyChunks.add(chunk);
+            chunk.markForQueryJoin();
           }
         }
       }
-    }
-
-    for (int i = 0; i < manyChunks.size(); i++) {
-      // convert 'fetch joins' over to 'query joins'
-      manyChunks.get(i).setQueryFetch(queryBatch, true);
     }
   }
 

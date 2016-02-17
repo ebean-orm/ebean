@@ -1,5 +1,8 @@
 package com.avaje.ebeaninternal.server.querydefn;
 
+import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.tests.model.basic.Order;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -7,7 +10,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class OrmQueryDetailTest {
+public class OrmQueryDetailTest extends BaseTestCase {
 
   OrmQueryDetail parse(String query) {
     return new OrmQueryDetailParser(query).parse();
@@ -113,6 +116,58 @@ public class OrmQueryDetailTest {
     detail.fetch("details.product", null, null);
 
     assertThat(detail.getFetchPaths()).containsExactly("details", "customer", "details.product");
+  }
+
+  @Test
+  public void markQueryJoins_when_allowOne_expect_stillFetchJoin() {
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    detail.fetch("details", null, null);
+
+    detail.markQueryJoins(orderDesc(), null, true);
+
+    assertThat(detail.getChunk("details", false).isQueryFetch()).isFalse();
+  }
+
+  @Test
+  public void markQueryJoins_when_allowNone_expect_queryJoin() {
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    detail.fetch("details", null, null);
+
+    detail.markQueryJoins(orderDesc(), null, false);
+
+    assertThat(detail.getChunk("details", false).isQueryFetch()).isTrue();
+  }
+
+  @Test
+  public void markQueryJoins_when_allowOneButSecond_expect_queryJoin() {
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    detail.fetch("details", null, null);
+    detail.fetch("customer.contacts", null, null);
+
+    detail.markQueryJoins(orderDesc(), null, true);
+
+    assertThat(detail.getChunk("details", false).isQueryFetch()).isFalse();
+    assertThat(detail.getChunk("customer.contacts", false).isQueryFetch()).isTrue();
+  }
+
+  @Test
+  public void markQueryJoins_when_allowNone_expect_bothQueryJoin() {
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    detail.fetch("details", null, null);
+    detail.fetch("customer.contacts", null, null);
+
+    detail.markQueryJoins(orderDesc(), null, false);
+
+    assertThat(detail.getChunk("details", false).isQueryFetch()).isTrue();
+    assertThat(detail.getChunk("customer.contacts", false).isQueryFetch()).isTrue();
+  }
+
+  BeanDescriptor<Order> orderDesc() {
+    return getBeanDescriptor(Order.class);
   }
 
 }

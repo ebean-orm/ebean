@@ -28,34 +28,26 @@ public class OrmQueryProperties implements Serializable {
 
   private static final long serialVersionUID = -8785582703966455658L;
 
+  protected static final FetchConfig DEFAULT_FETCH = new FetchConfig();
+
   private final String parentPath;
   private final String path;
 
   private final String rawProperties;
   private final String trimmedProperties;
 
-  /**
-   * NB: -1 means no +query, 0 means use the default batch size.
-   */
-  private int queryFetchBatch = -1;
-  private boolean queryFetchAll;
+  private final LinkedHashSet<String> included;
+
+  private final FetchConfig fetchConfig;
 
   /**
-   * NB: -1 means no +lazy, 0 means use the default batch size.
+   * Flag set when this fetch path needs to be a query join.
    */
-  private int lazyFetchBatch = -1;
-
-  private FetchConfig fetchConfig;
+  private boolean markForQueryJoin;
 
   private boolean cache;
 
   private boolean readOnly;
-
-  /**
-   * Note this SHOULD be a LinkedHashSet to preserve order of the properties. This is to make using
-   * SqlSelect easier with predictable property/column ordering.
-   */
-  private final LinkedHashSet<String> included;
 
   /**
    * Included bean joins.
@@ -70,8 +62,7 @@ public class OrmQueryProperties implements Serializable {
   private List<OrmQueryProperties> secondaryChildren;
 
   /**
-   * OrderBy properties that where on the main query but moved here as they relate to this (query
-   * join).
+   * OrderBy properties that where on the main query but moved here as they relate to this (query join).
    */
   @SuppressWarnings("rawtypes")
   private OrderBy orderBy;
@@ -98,6 +89,7 @@ public class OrmQueryProperties implements Serializable {
     this.rawProperties = null;
     this.trimmedProperties = null;
     this.included = null;
+    this.fetchConfig = DEFAULT_FETCH;
   }
 
   public OrmQueryProperties(String path, String rawProperties) {
@@ -113,16 +105,12 @@ public class OrmQueryProperties implements Serializable {
     this.rawProperties = rawProperties;
     this.trimmedProperties = response.properties;
     this.included = response.included;
-    this.lazyFetchBatch = response.lazyFetchBatch;
-    this.queryFetchBatch = response.queryFetchBatch;
     this.cache = response.cache;
     this.readOnly = response.readOnly;
-
     if (fetchConfig != null) {
       this.fetchConfig = fetchConfig;
-      lazyFetchBatch = fetchConfig.getLazyBatchSize();
-      queryFetchBatch = fetchConfig.getQueryBatchSize();
-      queryFetchAll = fetchConfig.isQueryAll();
+    } else {
+      this.fetchConfig = response.fetchConfig;
     }
   }
 
@@ -137,11 +125,9 @@ public class OrmQueryProperties implements Serializable {
     this.included = parsedProperties;
     this.rawProperties =  join(parsedProperties);
     this.trimmedProperties = rawProperties;
-    this.lazyFetchBatch = -1;
-    this.queryFetchBatch = -1;
     this.cache = false;
     this.readOnly = false;
-    this.queryFetchAll = false;
+    this.fetchConfig = DEFAULT_FETCH;
   }
 
   /**
@@ -172,9 +158,7 @@ public class OrmQueryProperties implements Serializable {
     this.trimmedProperties = source.trimmedProperties;
     this.cache = source.cache;
     this.readOnly = source.readOnly;
-    this.queryFetchAll = source.queryFetchAll;
-    this.queryFetchBatch = source.queryFetchBatch;
-    this.lazyFetchBatch = source.lazyFetchBatch;
+    this.fetchConfig = source.fetchConfig;
     this.filterMany = source.filterMany;
     this.included = (source.included == null) ? null : new LinkedHashSet<String>(source.included);
     if (includedBeanJoin != null) {
@@ -216,9 +200,7 @@ public class OrmQueryProperties implements Serializable {
       ExpressionFactory filterEf = queryEf.createExpressionFactory();// exprPath);
       filterMany = new FilterExpressionList(exprPath, filterEf, rootQuery);
       // by default we need to make this a 'query join' now
-      queryFetchAll = true;
-      queryFetchBatch = 100;
-      lazyFetchBatch = 100;
+      markForQueryJoin = true;
     }
     return filterMany;
   }
@@ -409,9 +391,11 @@ public class OrmQueryProperties implements Serializable {
     return included == null || included.contains(propName);
   }
 
-  public void setQueryFetch(int batch, boolean queryFetchAll) {
-    this.queryFetchBatch = batch;
-    this.queryFetchAll = queryFetchAll;
+  /**
+   * Mark this path as needing to be a query join.
+   */
+  public void markForQueryJoin() {
+    markForQueryJoin = true;
   }
 
   public boolean isFetchJoin() {
@@ -419,23 +403,23 @@ public class OrmQueryProperties implements Serializable {
   }
 
   public boolean isQueryFetch() {
-    return queryFetchBatch > -1;
+    return markForQueryJoin || getQueryFetchBatch() > -1;
   }
 
   public int getQueryFetchBatch() {
-    return queryFetchBatch;
+    return fetchConfig.getQueryBatchSize();
   }
 
   public boolean isQueryFetchAll() {
-    return queryFetchAll;
+    return fetchConfig.isQueryAll();
   }
 
   public boolean isLazyFetch() {
-    return lazyFetchBatch > -1;
+    return getLazyFetchBatch() > -1;
   }
 
   public int getLazyFetchBatch() {
-    return lazyFetchBatch;
+    return fetchConfig.getLazyBatchSize();
   }
 
   public boolean isReadOnly() {
@@ -474,9 +458,7 @@ public class OrmQueryProperties implements Serializable {
     if (!Same.sameByNull(filterMany, p2.filterMany)) return false;
     if (filterMany != null && !filterMany.isSameByPlan(p2.filterMany)) return false;
 
-    return lazyFetchBatch == p2.lazyFetchBatch
-        && queryFetchBatch == p2.queryFetchBatch
-        && queryFetchAll == p2.queryFetchAll;
+    return fetchConfig.equals(p2.fetchConfig);
   }
 
   /**
@@ -492,9 +474,7 @@ public class OrmQueryProperties implements Serializable {
     if (filterMany != null) {
       filterMany.queryPlanHash(builder);
     }
-    builder.add(lazyFetchBatch);
-    builder.add(queryFetchBatch);
-    builder.add(queryFetchAll);
+    builder.add(fetchConfig.hashCode());
   }
 
 }

@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.querydefn;
 
+import com.avaje.ebean.FetchConfig;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 
 import java.util.LinkedHashSet;
@@ -18,25 +19,26 @@ public class OrmQueryPropertiesParser {
 
     final boolean readOnly;
     final boolean cache;
-    final int queryFetchBatch;
-    final int lazyFetchBatch;
+    final FetchConfig fetchConfig;
     final String properties;
     final LinkedHashSet<String> included;
 
     public Response(boolean readOnly, boolean cache, int queryFetchBatch, int lazyFetchBatch, String properties, LinkedHashSet<String> included) {
       this.readOnly = readOnly;
       this.cache = cache;
-      this.queryFetchBatch = queryFetchBatch;
-      this.lazyFetchBatch = lazyFetchBatch;
       this.properties = properties;
       this.included = included;
+      if (lazyFetchBatch > -1 || queryFetchBatch > -1) {
+        this.fetchConfig = new FetchConfig().lazy(lazyFetchBatch).query(queryFetchBatch);
+      } else {
+        this.fetchConfig = OrmQueryProperties.DEFAULT_FETCH;
+      }
     }
 
     public Response() {
       this.readOnly = false;
       this.cache = false;
-      this.queryFetchBatch = -1;
-      this.lazyFetchBatch = -1;
+      this.fetchConfig = OrmQueryProperties.DEFAULT_FETCH;
       this.properties = "";
       this.included = null;
     }

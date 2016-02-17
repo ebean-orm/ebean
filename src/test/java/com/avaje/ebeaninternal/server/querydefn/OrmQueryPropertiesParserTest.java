@@ -74,7 +74,7 @@ public class OrmQueryPropertiesParserTest {
   public void when_hasLazy() throws Exception {
 
     OrmQueryPropertiesParser.Response res = OrmQueryPropertiesParser.parse("+lazy");
-    assertThat(res.lazyFetchBatch).isEqualTo(0);
+    assertThat(res.fetchConfig.getLazyBatchSize()).isEqualTo(0);
     assertThat(res.included).isNull();
   }
 
@@ -82,7 +82,7 @@ public class OrmQueryPropertiesParserTest {
   public void when_hasLazyValue() throws Exception {
 
     OrmQueryPropertiesParser.Response res = OrmQueryPropertiesParser.parse("+lazy(20)");
-    assertThat(res.lazyFetchBatch).isEqualTo(20);
+    assertThat(res.fetchConfig.getLazyBatchSize()).isEqualTo(20);
     assertThat(res.included).isNull();
   }
 
@@ -90,7 +90,7 @@ public class OrmQueryPropertiesParserTest {
   public void when_hasLazyValue_last() throws Exception {
 
     OrmQueryPropertiesParser.Response res = OrmQueryPropertiesParser.parse("name,+lazy(20)");
-    assertThat(res.lazyFetchBatch).isEqualTo(20);
+    assertThat(res.fetchConfig.getLazyBatchSize()).isEqualTo(20);
     assertThat(res.included).containsExactly("name");
   }
 
@@ -98,7 +98,7 @@ public class OrmQueryPropertiesParserTest {
   public void when_hasLazyValue_first() throws Exception {
 
     OrmQueryPropertiesParser.Response res = OrmQueryPropertiesParser.parse("+lazy(20),id,name");
-    assertThat(res.lazyFetchBatch).isEqualTo(20);
+    assertThat(res.fetchConfig.getLazyBatchSize()).isEqualTo(20);
     assertThat(res.included).containsExactly("id", "name");
   }
 
@@ -106,17 +106,16 @@ public class OrmQueryPropertiesParserTest {
   public void when_allProperties() throws Exception {
 
     OrmQueryPropertiesParser.Response res = OrmQueryPropertiesParser.parse("+query(4),+lazy(5)");
-    assertThat(res.lazyFetchBatch).isEqualTo(5);
+    assertThat(res.fetchConfig.getLazyBatchSize()).isEqualTo(5);
     assertThat(res.included).isNull();
   }
-
 
   @Test
   public void when_everything_set() throws Exception {
 
     OrmQueryPropertiesParser.Response res = OrmQueryPropertiesParser.parse("id, name +readonly +lazy(20) +query(30) +cache");
-    assertThat(res.lazyFetchBatch).isEqualTo(20);
-    assertThat(res.queryFetchBatch).isEqualTo(30);
+    assertThat(res.fetchConfig.getLazyBatchSize()).isEqualTo(20);
+    assertThat(res.fetchConfig.getQueryBatchSize()).isEqualTo(30);
     assertThat(res.readOnly).isTrue();
     assertThat(res.cache).isTrue();
     assertThat(res.included).containsExactly("id", "name");
@@ -125,8 +124,8 @@ public class OrmQueryPropertiesParserTest {
   private void assertAllDefaults(OrmQueryPropertiesParser.Response res) {
     assertThat(res.cache).isFalse();
     assertThat(res.readOnly).isFalse();
-    assertThat(res.lazyFetchBatch).isEqualTo(-1);
-    assertThat(res.queryFetchBatch).isEqualTo(-1);
+    assertThat(res.fetchConfig.getLazyBatchSize()).isEqualTo(-1);
+    assertThat(res.fetchConfig.getQueryBatchSize()).isEqualTo(-1);
     assertThat(res.included).isNull();
   }
 }

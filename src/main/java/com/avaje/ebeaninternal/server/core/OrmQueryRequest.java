@@ -148,12 +148,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Prepare the query and calculate the query plan key.
    */
-  public void prepareQuery(int queryBatchSize) {
+  public void prepareQuery() {
 
     adapterPreQuery();
 
-    // determine extra joins required to support where clause predicates on *ToMany properties
-    query.convertJoins(queryBatchSize);
+    query.convertJoins();
     this.queryJoins = query.removeQueryJoins();
     this.lazyJoins = query.removeLazyJoins();
     this.queryPlanKey = query.prepare(this);

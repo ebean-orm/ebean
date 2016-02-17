@@ -31,7 +31,6 @@ import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanPlugin;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.api.SpiQuery.Mode;
 import com.avaje.ebeaninternal.api.SpiQuery.Type;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -1065,7 +1064,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     OrmQueryRequest<T> request = new OrmQueryRequest<T>(this, queryEngine, query, desc, (SpiTransaction) t);
-    request.prepareQuery(queryBatchSize);
+    request.prepareQuery();
 
     return request;
   }
