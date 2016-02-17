@@ -17,6 +17,29 @@ public class OrmQueryDetailTest extends BaseTestCase {
   }
 
   @Test
+  public void isEmpty_when_empty() {
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    assertThat(detail.isEmpty()).isTrue();
+  }
+
+  @Test
+  public void isEmpty_when_hasFetch_expect_false() {
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    detail.fetch("customer", null, null);
+    assertThat(detail.isEmpty()).isFalse();
+  }
+
+  @Test
+  public void isEmpty_when_hasSelect_expect_false() {
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    detail.select("name");
+    assertThat(detail.isEmpty()).isFalse();
+  }
+
+  @Test
   public void isAutoTuneEqual_when_fetchOrderIsDifferent_then_stillEqual() {
 
     OrmQueryDetail detail1 = parse("select (id,name) fetch customer (name) fetch details (code)");

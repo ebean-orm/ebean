@@ -318,13 +318,8 @@ public class OrmQueryProperties implements Serializable {
   }
 
   /**
-   * Return true if this has properties. Returning false means this part of the
-   * path is a partial object.
+   * Return true if this includes all properties on the path.
    */
-  public boolean hasProperties() {
-    return included != null;
-  }
-
   public boolean allProperties() {
     return included == null;
   }

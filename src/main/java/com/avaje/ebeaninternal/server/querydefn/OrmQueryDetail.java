@@ -444,7 +444,7 @@ public class OrmQueryDetail implements Serializable {
    * Return true if the query detail has neither select properties specified or any joins defined.
    */
   public boolean isEmpty() {
-    return fetchPaths.isEmpty() && (!baseProps.hasProperties());
+    return fetchPaths.isEmpty() && baseProps.allProperties();
   }
 
   /**
