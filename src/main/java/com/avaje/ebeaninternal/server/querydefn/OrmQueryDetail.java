@@ -298,15 +298,18 @@ public class OrmQueryDetail implements Serializable {
     fetch(new OrmQueryProperties(path, properties));
   }
 
+  /**
+   * Sort the fetch paths into depth order adding any missing parent paths if necessary.
+   */
   public void sortFetchPaths(BeanDescriptor<?> d) {
 
-    LinkedHashMap<String, OrmQueryProperties> sorted = new LinkedHashMap<String, OrmQueryProperties>();
-
-    for (OrmQueryProperties p : fetchPaths.values()) {
-      sortFetchPaths(d, p, sorted);
+    if (!fetchPaths.isEmpty()) {
+      LinkedHashMap<String, OrmQueryProperties> sorted = new LinkedHashMap<String, OrmQueryProperties>();
+      for (OrmQueryProperties p : fetchPaths.values()) {
+        sortFetchPaths(d, p, sorted);
+      }
+      fetchPaths = sorted;
     }
-
-    fetchPaths = sorted;
   }
 
   private void sortFetchPaths(BeanDescriptor<?> d, OrmQueryProperties p, LinkedHashMap<String, OrmQueryProperties> sorted) {

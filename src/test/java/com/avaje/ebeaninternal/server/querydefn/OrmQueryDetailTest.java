@@ -166,6 +166,40 @@ public class OrmQueryDetailTest extends BaseTestCase {
     assertThat(detail.getChunk("customer.contacts", false).isQueryFetch()).isTrue();
   }
 
+  @Test
+  public void sortFetchPaths_when_missingParent_expect_addsMissing() {
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    detail.fetch("customer.contacts", null, null);
+
+    detail.sortFetchPaths(orderDesc());
+
+    assertThat(detail.getFetchPaths()).containsExactly("customer","customer.contacts");
+    assertThat(detail.getChunk("customer",false).getIncluded()).containsExactly("id");
+  }
+
+  @Test
+  public void sortFetchPaths_when_outOfOrder_expect_correctOrder() {
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    detail.fetch("customer.contacts", "email", null);
+    detail.fetch("customer", "name", null);
+
+    detail.sortFetchPaths(orderDesc());
+
+    assertThat(detail.getFetchPaths()).containsExactly("customer","customer.contacts");
+    assertThat(detail.getChunk("customer",false).getIncluded()).containsExactly("name");
+  }
+
+  @Test
+  public void sortFetchPaths_when_empty_expect_stillEmpty() {
+
+    OrmQueryDetail detail = new OrmQueryDetail();
+    detail.sortFetchPaths(orderDesc());
+
+    assertThat(detail.getFetchPaths()).isEmpty();
+  }
+
   BeanDescriptor<Order> orderDesc() {
     return getBeanDescriptor(Order.class);
   }
