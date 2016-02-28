@@ -1,12 +1,13 @@
 package com.avaje.ebean.text.json;
 
+import com.avaje.ebean.FetchPath;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.avaje.ebean.text.PathProperties;
-import com.avaje.ebean.text.json.JsonWriteOptions;
-
 import java.util.Set;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class JsonWriteOptionsTests {
 
@@ -14,45 +15,45 @@ public class JsonWriteOptionsTests {
   public void test_parse() {
     
     JsonWriteOptions options = JsonWriteOptions.parsePath("id,status,name");
-    PathProperties pathProps = options.getPathProperties();
+    FetchPath pathProps = options.getPathProperties();
     
-    Assert.assertEquals(1, pathProps.getPaths().size());
-    Assert.assertTrue(pathProps.get(null).contains("id"));
-    Assert.assertTrue(pathProps.get(null).contains("name"));
-    Assert.assertTrue(pathProps.get(null).contains("status"));
-    Assert.assertFalse(pathProps.get(null).contains("foo"));
+    //Assert.assertEquals(1, pathProps.getPaths().size());
+    assertTrue(pathProps.getProperties(null).contains("id"));
+    assertTrue(pathProps.getProperties(null).contains("name"));
+    assertTrue(pathProps.getProperties(null).contains("status"));
+    assertFalse(pathProps.getProperties(null).contains("foo"));
   }
 
   @Test
   public void test_with_depth() {
 
     JsonWriteOptions options = JsonWriteOptions.parsePath("id,status,name,customer(id,name,address(street,city)),orders(qty,product(sku,prodName))");
-    PathProperties pathProps = options.getPathProperties();
+    FetchPath pathProps = options.getPathProperties();
 
-    Assert.assertEquals(5, pathProps.getPaths().size());
-    Assert.assertTrue(pathProps.get(null).contains("id"));
-    Assert.assertTrue(pathProps.get(null).contains("name"));
-    Assert.assertTrue(pathProps.get(null).contains("status"));
-    Assert.assertTrue(pathProps.get(null).contains("customer"));
-    Assert.assertTrue(pathProps.get(null).contains("orders"));
-    Assert.assertFalse(pathProps.get(null).contains("foo"));
+    //Assert.assertEquals(5, pathProps.getPaths().size());
+    assertTrue(pathProps.getProperties(null).contains("id"));
+    assertTrue(pathProps.getProperties(null).contains("name"));
+    assertTrue(pathProps.getProperties(null).contains("status"));
+    assertTrue(pathProps.getProperties(null).contains("customer"));
+    assertTrue(pathProps.getProperties(null).contains("orders"));
+    assertFalse(pathProps.getProperties(null).contains("foo"));
 
-    Set<String> customer = pathProps.get("customer");
-    Assert.assertTrue(customer.contains("id"));
-    Assert.assertTrue(customer.contains("name"));
-    Assert.assertTrue(customer.contains("address"));
+    Set<String> customer = pathProps.getProperties("customer");
+    assertTrue(customer.contains("id"));
+    assertTrue(customer.contains("name"));
+    assertTrue(customer.contains("address"));
 
-    Set<String> address = pathProps.get("customer.address");
-    Assert.assertTrue(address.contains("street"));
-    Assert.assertTrue(address.contains("city"));
+    Set<String> address = pathProps.getProperties("customer.address");
+    assertTrue(address.contains("street"));
+    assertTrue(address.contains("city"));
 
-    Set<String> orders = pathProps.get("orders");
-    Assert.assertTrue(orders.contains("qty"));
-    Assert.assertTrue(orders.contains("product"));
+    Set<String> orders = pathProps.getProperties("orders");
+    assertTrue(orders.contains("qty"));
+    assertTrue(orders.contains("product"));
 
-    Set<String> product = pathProps.get("orders.product");
-    Assert.assertTrue(product.contains("sku"));
-    Assert.assertTrue(product.contains("prodName"));
+    Set<String> product = pathProps.getProperties("orders.product");
+    assertTrue(product.contains("sku"));
+    assertTrue(product.contains("prodName"));
 
   }
 

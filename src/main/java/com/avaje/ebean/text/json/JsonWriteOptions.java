@@ -1,5 +1,6 @@
 package com.avaje.ebean.text.json;
 
+import com.avaje.ebean.FetchPath;
 import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.text.PathProperties;
 
@@ -15,7 +16,7 @@ import java.util.Map;
  */
 public class JsonWriteOptions {
 
-  protected PathProperties pathProperties;
+  protected FetchPath pathProperties;
 
   protected Object objectMapper;
 
@@ -38,7 +39,7 @@ public class JsonWriteOptions {
   /**
    * Construct JsonWriteOptions with the given pathProperties.
    */
-  public static JsonWriteOptions pathProperties(PathProperties pathProperties) {
+  public static JsonWriteOptions pathProperties(FetchPath pathProperties) {
     JsonWriteOptions o = new JsonWriteOptions();
     o.setPathProperties(pathProperties);
     return o;
@@ -47,14 +48,14 @@ public class JsonWriteOptions {
   /**
    * Set the Map of properties to include by path.
    */
-  public void setPathProperties(PathProperties pathProperties) {
+  public void setPathProperties(FetchPath pathProperties) {
     this.pathProperties = pathProperties;
   }
 
   /**
    * Return the properties to include by path.
    */
-  public PathProperties getPathProperties() {
+  public FetchPath getPathProperties() {
     return pathProperties;
   }
 

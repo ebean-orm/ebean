@@ -1,6 +1,6 @@
 package com.avaje.ebean.text.json;
 
-import com.avaje.ebean.text.PathProperties;
+import com.avaje.ebean.FetchPath;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 
@@ -144,21 +144,21 @@ public interface JsonContext {
   void toJson(Object value, JsonGenerator generator) throws JsonIOException;
 
   /**
-   * Return the bean or collection as JSON string using PathProperties.
+   * Return the bean or collection as JSON string using FetchPath.
    *
    * @throws JsonIOException When IOException occurs
    */
-  String toJson(Object value, PathProperties pathProperties) throws JsonIOException;
+  String toJson(Object value, FetchPath fetchPath) throws JsonIOException;
 
   /**
-   * Write the bean or collection as json to the writer using the PathProperties.
+   * Write the bean or collection as json to the writer using the FetchPath.
    */
-  void toJson(Object value, Writer writer, PathProperties pathProperties) throws JsonIOException;
+  void toJson(Object value, Writer writer, FetchPath fetchPath) throws JsonIOException;
 
   /**
-   * Write the bean or collection to the JsonGenerator using the PathProperties.
+   * Write the bean or collection to the JsonGenerator using the FetchPath.
    */
-  void toJson(Object value, JsonGenerator generator, PathProperties pathProperties) throws JsonIOException;
+  void toJson(Object value, JsonGenerator generator, FetchPath fetchPath) throws JsonIOException;
 
   /**
    * Deprecated in favour of using PathProperties by itself.

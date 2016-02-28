@@ -1,6 +1,5 @@
 package com.avaje.ebean;
 
-import com.avaje.ebean.text.PathProperties;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.NonUniqueResultException;
@@ -95,7 +94,7 @@ public interface ExpressionList<T> extends Serializable {
   /**
    * Apply the path properties to the query replacing the select and fetch clauses.
    */
-  Query<T> apply(PathProperties pathProperties);
+  Query<T> apply(FetchPath fetchPath);
 
   /**
    * Perform an 'As of' query using history tables to return the object graph

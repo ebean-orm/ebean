@@ -3,7 +3,7 @@ package com.avaje.ebean.text;
 /**
  * Parses Uri segments like :(id,name,shippingAddress(*),contacts(*)) so that
  * the response can be customised for performance.
- * 
+ *
  * @author rbygrave
  */
 class PathPropertiesParser {
@@ -50,12 +50,12 @@ class PathPropertiesParser {
     do {
       char c1 = chars[pos++];
       switch (c1) {
-      case '(':
-        return currentWord();
-      default:
-        if (pos == 1) {
-          return "";
-        }
+        case '(':
+          return currentWord();
+        default:
+          if (pos == 1) {
+            return "";
+          }
       }
     } while (pos < eof);
     throw new RuntimeException("Hit EOF while reading sectionTitle from " + startPos);
@@ -72,28 +72,30 @@ class PathPropertiesParser {
   }
 
   private void parseSection() {
-    do {
-      char c1 = chars[pos++];
-      switch (c1) {
-      case '(':
-        addSubpath();
-        break;
-      case ',':
-        addCurrentProperty();
-        break;
-      case ':':
-        // start new section
-        startPos = pos;
-        return;
-      case ')':
-        // end of section
-        addCurrentProperty();
-        popSubpath();
-        break;
-      default:
-      }
+    if (pos < eof) {
+      do {
+        char c1 = chars[pos++];
+        switch (c1) {
+          case '(':
+            addSubpath();
+            break;
+          case ',':
+            addCurrentProperty();
+            break;
+          case ':':
+            // start new section
+            startPos = pos;
+            return;
+          case ')':
+            // end of section
+            addCurrentProperty();
+            popSubpath();
+            break;
+          default:
+        }
 
-    } while (pos < eof);
+      } while (pos < eof);
+    }
     if (startPos < pos) {
       String currentWord = source.substring(startPos, pos);
       currentPathProps.addProperty(currentWord);

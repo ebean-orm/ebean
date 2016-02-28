@@ -1886,8 +1886,8 @@ public interface EbeanServer {
    *
    * }</pre>
    *
-   * @see com.avaje.ebean.text.PathProperties
-   * @see Query#apply(com.avaje.ebean.text.PathProperties)
+   * @see FetchPath
+   * @see Query#apply(FetchPath)
    */
   JsonContext json();
 

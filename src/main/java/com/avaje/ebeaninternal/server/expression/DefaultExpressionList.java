@@ -1,15 +1,7 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.avaje.ebean.*;
 import com.avaje.ebean.event.BeanQueryRequest;
-import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
@@ -17,6 +9,13 @@ import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Default implementation of ExpressionList.
@@ -173,8 +172,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> apply(PathProperties pathProperties) {
-    return query.apply(pathProperties);
+  public Query<T> apply(FetchPath fetchPath) {
+    return query.apply(fetchPath);
   }
 
   @Override

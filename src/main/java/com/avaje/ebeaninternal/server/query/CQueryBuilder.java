@@ -352,8 +352,8 @@ public class CQueryBuilder {
     OrmQueryDetail detail = new OrmQueryDetail();
 
     // transfer PathProperties into OrmQueryDetail
-    for (String path : pathProps.getPaths()) {
-      detail.fetch(path, pathProps.get(path));
+    for (PathProperties.Props props : pathProps.getPathProps()) {
+      detail.fetch(props.getPath(), props.getProperties());
     }
 
     // check if @Id property included in RawSql

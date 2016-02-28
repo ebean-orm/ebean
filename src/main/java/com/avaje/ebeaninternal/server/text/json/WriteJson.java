@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.text.json;
 
+import com.avaje.ebean.FetchPath;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.JsonConfig;
-import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebean.text.json.JsonIOException;
 import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
 import com.avaje.ebean.text.json.JsonWriter;
@@ -26,7 +26,7 @@ public class WriteJson implements JsonWriter {
 
   private final JsonGenerator generator;
 
-  private final PathProperties pathProperties;
+  private final FetchPath fetchPath;
 
   private final Map<String, JsonWriteBeanVisitor<?>> visitors;
 
@@ -41,12 +41,12 @@ public class WriteJson implements JsonWriter {
   /**
    * Construct for full bean use (normal).
    */
-  public WriteJson(SpiEbeanServer server, JsonGenerator generator, PathProperties pathProperties,
+  public WriteJson(SpiEbeanServer server, JsonGenerator generator, FetchPath fetchPath,
                    Map<String, JsonWriteBeanVisitor<?>> visitors, Object objectMapper, JsonConfig.Include include) {
 
     this.server = server;
     this.generator = generator;
-    this.pathProperties = pathProperties;
+    this.fetchPath = fetchPath;
     this.visitors = visitors;
     this.objectMapper = objectMapper;
     this.include = include;
@@ -62,7 +62,7 @@ public class WriteJson implements JsonWriter {
     this.include = include;
     this.visitors = null;
     this.server = null;
-    this.pathProperties = null;
+    this.fetchPath = null;
     this.objectMapper = null;
     this.parentBeans = null;
     this.pathStack = null;
@@ -376,12 +376,12 @@ public class WriteJson implements JsonWriter {
 
     String path = pathStack.peekWithNull();
     JsonWriteBeanVisitor visitor = (visitors == null) ? null : visitors.get(path);
-    if (pathProperties == null) {
+    if (fetchPath == null) {
       return new WriteBean(desc, bean, visitor);
     }
 
     boolean explicitAllProps = false;
-    Set<String> currentIncludeProps = pathProperties.get(path);
+    Set<String> currentIncludeProps = fetchPath.getProperties(path);
     if (currentIncludeProps != null) {
       explicitAllProps = currentIncludeProps.contains("*");
       if (explicitAllProps || currentIncludeProps.isEmpty()) {
@@ -503,9 +503,9 @@ public class WriteJson implements JsonWriter {
   }
 
   public Boolean includeMany(String key) {
-    if (pathProperties != null) {
+    if (fetchPath != null) {
       String fullPath = pathStack.peekFullPath(key);
-      return pathProperties.hasPath(fullPath);
+      return fetchPath.hasPath(fullPath);
     }
     return null;
   }

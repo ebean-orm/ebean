@@ -10,11 +10,10 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebean.plugin.BeanType;
-import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.BindParams;
+import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.HashQuery;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
-import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
@@ -26,9 +25,9 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DRawSqlSelect;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
+import com.avaje.ebeaninternal.server.expression.DefaultExpressionList;
 import com.avaje.ebeaninternal.server.expression.SimpleExpression;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
-import com.avaje.ebeaninternal.server.expression.DefaultExpressionList;
 
 import javax.persistence.PersistenceException;
 import java.sql.Timestamp;
@@ -284,8 +283,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public Query<T> apply(PathProperties pathProperties) {
-    pathProperties.apply(this);
+  public Query<T> apply(FetchPath fetchPath) {
+    fetchPath.apply(this);
     return this;
   }
 

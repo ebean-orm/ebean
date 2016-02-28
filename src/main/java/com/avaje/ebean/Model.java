@@ -1,7 +1,6 @@
 package com.avaje.ebean;
 
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebean.util.ClassUtil;
 import org.jetbrains.annotations.Nullable;
 
@@ -588,10 +587,10 @@ public abstract class Model {
     /**
      * Creates a query applying the path properties to set the select and fetch clauses.
      * <p>
-     * Equivalent to {@link Query#apply(com.avaje.ebean.text.PathProperties)}
+     * Equivalent to {@link Query#apply(FetchPath)}
      */
-    public Query<T> apply(PathProperties pathProperties) {
-      return db().find(type).apply(pathProperties);
+    public Query<T> apply(FetchPath fetchPath) {
+      return db().find(type).apply(fetchPath);
     }
 
     /**
