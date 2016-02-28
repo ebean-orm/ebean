@@ -21,7 +21,7 @@ import com.avaje.ebean.event.changelog.ChangeLogFilter;
 import com.avaje.ebean.event.changelog.ChangeLogListener;
 import com.avaje.ebean.event.changelog.ChangeLogPrepare;
 import com.avaje.ebean.event.changelog.ChangeLogRegister;
-import com.avaje.ebean.plugin.SpiBeanType;
+import com.avaje.ebean.plugin.BeanType;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
@@ -359,7 +359,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Return the BeanDescriptors mapped to the table.
    */
-  public List<? extends SpiBeanType<?>> getBeanTypes(String tableName) {
+  public List<? extends BeanType<?>> getBeanTypes(String tableName) {
     return tableToDescMap.get(tableName.toLowerCase());
   }
 

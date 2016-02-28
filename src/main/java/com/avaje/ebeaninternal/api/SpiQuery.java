@@ -11,7 +11,7 @@ import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.event.readaudit.ReadEvent;
-import com.avaje.ebean.plugin.SpiBeanType;
+import com.avaje.ebean.plugin.BeanType;
 import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -19,7 +19,6 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
 import com.avaje.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
-import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -679,6 +678,6 @@ public interface SpiQuery<T> extends Query<T> {
   /**
    * Validate the query returning the set of properties with unknown paths.
    */
-  Set<String> validate(SpiBeanType<T> desc);
+  Set<String> validate(BeanType<T> desc);
 
 }

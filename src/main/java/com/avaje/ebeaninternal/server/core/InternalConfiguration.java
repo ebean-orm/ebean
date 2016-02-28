@@ -11,7 +11,7 @@ import com.avaje.ebean.event.changelog.ChangeLogPrepare;
 import com.avaje.ebean.event.changelog.ChangeLogRegister;
 import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
-import com.avaje.ebean.plugin.SpiServerPlugin;
+import com.avaje.ebean.plugin.Plugin;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -103,7 +103,7 @@ public class InternalConfiguration {
   /**
    * List of plugins (that ultimately the DefaultServer configures late in construction).
    */
-  private final List<SpiServerPlugin> plugins = new ArrayList<SpiServerPlugin>();
+  private final List<Plugin> plugins = new ArrayList<Plugin>();
 
   public InternalConfiguration(XmlConfig xmlConfig, ClusterManager clusterManager,
                                ServerCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
@@ -156,8 +156,8 @@ public class InternalConfiguration {
    * later on the DefaultServer for late call to configure().
    */
   public <T> T plugin(T maybePlugin) {
-    if (maybePlugin instanceof SpiServerPlugin) {
-      plugins.add((SpiServerPlugin) maybePlugin);
+    if (maybePlugin instanceof Plugin) {
+      plugins.add((Plugin) maybePlugin);
     }
     return maybePlugin;
   }
@@ -165,10 +165,10 @@ public class InternalConfiguration {
   /**
    * Return the list of plugins we collected during construction.
    */
-  public List<SpiServerPlugin> getPlugins() {
+  public List<Plugin> getPlugins() {
 
     // find additional plugins via ServiceLoader ...
-    for (SpiServerPlugin plugin : ServiceLoader.load(SpiServerPlugin.class)) {
+    for (Plugin plugin : ServiceLoader.load(Plugin.class)) {
       if (!plugins.contains(plugin)) {
         plugins.add(plugin);
       }

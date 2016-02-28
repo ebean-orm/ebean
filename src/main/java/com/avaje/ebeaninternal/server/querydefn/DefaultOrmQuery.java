@@ -9,7 +9,7 @@ import com.avaje.ebean.bean.ObjectGraphOrigin;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.event.readaudit.ReadEvent;
-import com.avaje.ebean.plugin.SpiBeanType;
+import com.avaje.ebean.plugin.BeanType;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.HashQuery;
@@ -1438,7 +1438,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Validate all the expression properties/paths given the bean descriptor.
    */
-  public Set<String> validate(SpiBeanType<T> desc) {
+  public Set<String> validate(BeanType<T> desc) {
 
     SpiExpressionValidation validation = new SpiExpressionValidation(desc);
     if (whereExpressions != null) {

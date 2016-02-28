@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.api;
 
-import com.avaje.ebean.plugin.SpiBeanType;
+import com.avaje.ebean.plugin.BeanType;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -10,11 +10,11 @@ import java.util.Set;
  */
 public class SpiExpressionValidation {
 
-  private final SpiBeanType<?> desc;
+  private final BeanType<?> desc;
 
   private final LinkedHashSet<String> unknown = new LinkedHashSet<String>();
 
-  public SpiExpressionValidation(SpiBeanType<?> desc) {
+  public SpiExpressionValidation(BeanType<?> desc) {
     this.desc = desc;
   }
 

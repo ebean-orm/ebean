@@ -9,7 +9,7 @@ import com.avaje.ebean.event.BeanQueryAdapter;
 /**
  * Information and methods on BeanDescriptors made available to plugins.
  */
-public interface SpiBeanType<T> {
+public interface BeanType<T> {
 
   /**
    * Return the class type this BeanDescriptor describes.

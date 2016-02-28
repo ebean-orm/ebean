@@ -28,7 +28,7 @@ import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaQueryPlanStatistic;
-import com.avaje.ebean.plugin.SpiBeanType;
+import com.avaje.ebean.plugin.BeanType;
 import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -81,7 +81,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Describes Beans including their deployment information.
  */
-public class BeanDescriptor<T> implements MetaBeanInfo, SpiBeanType<T> {
+public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanDescriptor.class);
 

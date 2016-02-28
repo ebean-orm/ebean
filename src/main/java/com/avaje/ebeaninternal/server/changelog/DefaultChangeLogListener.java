@@ -5,7 +5,7 @@ import com.avaje.ebean.event.changelog.ChangeLogListener;
 import com.avaje.ebean.event.changelog.ChangeSet;
 import com.avaje.ebean.event.changelog.ChangeType;
 import com.avaje.ebean.plugin.SpiServer;
-import com.avaje.ebean.plugin.SpiServerPlugin;
+import com.avaje.ebean.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +20,7 @@ import java.util.Properties;
  * is fully contained with the transaction information.
  * </p>
  */
-public class DefaultChangeLogListener implements ChangeLogListener, SpiServerPlugin {
+public class DefaultChangeLogListener implements ChangeLogListener, Plugin {
 
   /**
    * The usual application specific logger.

@@ -18,7 +18,7 @@ public class SpiServerTest {
     EbeanServer defaultServer = Ebean.getDefaultServer();
     SpiServer pluginApi = defaultServer.getPluginApi();
 
-    SpiBeanType<Customer> beanType = pluginApi.getBeanType(Customer.class);
+    BeanType<Customer> beanType = pluginApi.getBeanType(Customer.class);
     assertEquals("o_customer", beanType.getBaseTable());
     assertNotNull(pluginApi.getDatabasePlatform());
     assertNull(beanType.getFindController());
@@ -38,11 +38,11 @@ public class SpiServerTest {
 
     assertEquals(42, beanType.getBeanId(customer));
 
-    List<? extends SpiBeanType<?>> beanTypes = pluginApi.getBeanTypes("o_customer");
+    List<? extends BeanType<?>> beanTypes = pluginApi.getBeanTypes("o_customer");
     assertEquals(1, beanTypes.size());
     assertSame(beanType, beanTypes.get(0));
 
-    List<? extends SpiBeanType<?>> allTypes = pluginApi.getBeanTypes();
+    List<? extends BeanType<?>> allTypes = pluginApi.getBeanTypes();
     assertTrue(!allTypes.isEmpty());
   }
 

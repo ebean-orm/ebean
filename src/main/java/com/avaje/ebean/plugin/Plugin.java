@@ -3,7 +3,7 @@ package com.avaje.ebean.plugin;
 /**
  * A 'plugin' that wants to be configured on startup so it can use features of the EbeanServer itself.
  */
-public interface SpiServerPlugin {
+public interface Plugin {
 
   /**
    * Configure the plugin.

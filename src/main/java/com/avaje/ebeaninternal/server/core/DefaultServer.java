@@ -18,9 +18,9 @@ import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.meta.MetaInfoManager;
-import com.avaje.ebean.plugin.SpiBeanType;
+import com.avaje.ebean.plugin.BeanType;
 import com.avaje.ebean.plugin.SpiServer;
-import com.avaje.ebean.plugin.SpiServerPlugin;
+import com.avaje.ebean.plugin.Plugin;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.api.LoadBeanRequest;
@@ -138,7 +138,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private final CQueryEngine cqueryEngine;
 
-  private final List<SpiServerPlugin> serverPlugins;
+  private final List<Plugin> serverPlugins;
 
   private final DdlGenerator ddlGenerator;
 
@@ -248,7 +248,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     autoTuneService.startup();
 
-    for (SpiServerPlugin plugin : serverPlugins) {
+    for (Plugin plugin : serverPlugins) {
       plugin.configure(this);
     }
   }
@@ -282,7 +282,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     for (SpiEbeanPlugin plugin : ebeanPlugins) {
       plugin.execute(online);
     }
-    for (SpiServerPlugin plugin : serverPlugins) {
+    for (Plugin plugin : serverPlugins) {
       plugin.online(online);
     }
   }
@@ -408,7 +408,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private void shutdownPlugins() {
 
-    for (SpiServerPlugin plugin : serverPlugins) {
+    for (Plugin plugin : serverPlugins) {
       try {
         plugin.shutdown();
       } catch (Throwable e) {
@@ -2000,14 +2000,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Return all the SPI BeanTypes.
    */
-  public List<? extends SpiBeanType<?>> getBeanTypes() {
+  public List<? extends BeanType<?>> getBeanTypes() {
     return getBeanDescriptors();
   }
 
   /**
    * Return the SPI bean types mapped to the given table.
    */
-  public List<? extends SpiBeanType<?>> getBeanTypes(String tableName) {
+  public List<? extends BeanType<?>> getBeanTypes(String tableName) {
     return beanDescriptorManager.getBeanTypes(tableName);
   }
 
@@ -2015,7 +2015,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Return the SPI bean types for the given bean class.
    */
   @Override
-  public <T> SpiBeanType<T> getBeanType(Class<T> beanType) {
+  public <T> BeanType<T> getBeanType(Class<T> beanType) {
     return getBeanDescriptor(beanType);
   }
 
