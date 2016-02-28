@@ -8,24 +8,43 @@ import java.util.TimeZone;
 
 public class DateTimeJsonParser {
 
-  private final SimpleDateFormat dateTimeProto;
+  private final SimpleDateFormat dateTimeProto20;
+  private final SimpleDateFormat dateTimeProto22;
+  private final SimpleDateFormat dateTimeProto23;
+  private final SimpleDateFormat dateTimeProto24;
+
 
   public DateTimeJsonParser() {
-    this("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    dateTimeProto20 = init("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    dateTimeProto22 = init("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
+    dateTimeProto23 = init("yyyy-MM-dd'T'HH:mm:ss.SS'Z'");
+    dateTimeProto24 = init("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
   }
 
-  public DateTimeJsonParser(String dateTimeFormat) {
-    this.dateTimeProto = new SimpleDateFormat(dateTimeFormat);
-    this.dateTimeProto.setTimeZone(TimeZone.getTimeZone("UTC"));
+  private SimpleDateFormat init(String dateTimeFormat) {
+    SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat);
+    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+    return sdf;
   }
 
-  private SimpleDateFormat dtFormat() {
-    return (SimpleDateFormat) dateTimeProto.clone();
+  private SimpleDateFormat dtFormat(int length) {
+    switch (length) {
+      case 24:
+        return (SimpleDateFormat) dateTimeProto24.clone();
+      case 23:
+        return (SimpleDateFormat) dateTimeProto23.clone();
+      case 22:
+        return (SimpleDateFormat) dateTimeProto22.clone();
+      case 20:
+        return (SimpleDateFormat) dateTimeProto20.clone();
+      default:
+        return (SimpleDateFormat) dateTimeProto24.clone();
+    }
   }
 
   public Timestamp parse(String jsonDateTime) {
     try {
-      java.util.Date d = dtFormat().parse(jsonDateTime);
+      java.util.Date d = dtFormat(jsonDateTime.length()).parse(jsonDateTime);
       return new Timestamp(d.getTime());
     } catch (ParseException e) {
       throw new RuntimeException("Error parsing Datetime[" + jsonDateTime + "]", e);
@@ -33,6 +52,7 @@ public class DateTimeJsonParser {
   }
 
   public String format(Date value) {
-    return dtFormat().format(value);
+    // always format with millisecond precision
+    return dtFormat(24).format(value);
   }
 }
