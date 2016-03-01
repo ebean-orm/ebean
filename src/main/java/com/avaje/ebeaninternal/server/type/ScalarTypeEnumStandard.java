@@ -102,7 +102,7 @@ public class ScalarTypeEnumStandard {
       if (beanValue == null) {
         return null;
       }
-      return beanValue.toString();
+      return format(beanValue);
     }
 
     public Object toBeanType(Object dbValue) {
