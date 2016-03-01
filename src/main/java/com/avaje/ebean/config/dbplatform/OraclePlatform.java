@@ -16,8 +16,6 @@ public class OraclePlatform extends DatabasePlatform {
     this.name = "oracle";
     this.maxTableNameLength = 30;
     this.maxConstraintNameLength = 30;
-    // OnQueryOnly.CLOSE as a performance optimisation on Oracle
-    this.onQueryOnly = OnQueryOnly.CLOSE;
     this.dbEncrypt = new OracleDbEncrypt();
     this.sqlLimiter = new RownumSqlLimiter();
     this.platformDdl = new Oracle10Ddl(this.dbTypeMap, this.dbIdentity);

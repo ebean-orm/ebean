@@ -14,7 +14,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
 
   public PostgresHistoryDdl() {
-    this.currentTimestamp = "statement_timestamp()";
+    this.currentTimestamp = "current_timestamp";
   }
 
   /**

@@ -19,9 +19,6 @@ public class PostgresPlatform extends DatabasePlatform {
   public PostgresPlatform() {
     super();
     this.name = "postgres";
-
-    // OnQueryOnly.CLOSE as a performance optimisation on Postgres
-    this.onQueryOnly = OnQueryOnly.CLOSE;
     this.likeClause = "like ? escape''";
     this.selectCountWithAlias = true;
     this.blobDbType = Types.LONGVARBINARY;
