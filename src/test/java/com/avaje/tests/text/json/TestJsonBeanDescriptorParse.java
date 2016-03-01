@@ -29,7 +29,7 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
     StringReader reader = new StringReader("{\"id\":123,\"name\":\"Hello rob\"}");
     JsonParser parser = server.json().createParser(reader);
 
-    ReadJson readJson = new ReadJson(parser, null, null);
+    ReadJson readJson = new ReadJson(descriptor, parser, null, null);
     
     Customer customer = descriptor.jsonRead(readJson, null);
     

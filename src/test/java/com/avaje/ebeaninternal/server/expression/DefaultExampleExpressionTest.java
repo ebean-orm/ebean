@@ -54,7 +54,7 @@ public class DefaultExampleExpressionTest extends BaseTestCase {
   DefaultExampleExpression prepare(DefaultExampleExpression expr) {
 
     SpiQuery<Customer> query = (SpiQuery<Customer>)spiEbeanServer().find(Customer.class);
-    BeanQueryRequest<?> request = create(query, customerBeanDescriptor());
+    BeanQueryRequest<?> request = create(query);
     expr.prepareExpression(request);
 
     return expr;
@@ -92,8 +92,8 @@ public class DefaultExampleExpressionTest extends BaseTestCase {
 
   }
 
-  private <T> OrmQueryRequest<T> create(SpiQuery<T> query, BeanDescriptor<T> desc) {
-    return new OrmQueryRequest<T>(null, null, query, desc, null);
+  private <T> OrmQueryRequest<T> create(SpiQuery<T> query) {
+    return new OrmQueryRequest<T>(null, null, query, null);
   }
 
   @Test

@@ -8,6 +8,8 @@ import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 
+import java.io.IOException;
+
 /**
  * Between expression where a value is between two properties.
  */
@@ -29,6 +31,15 @@ class BetweenPropertyExpression extends NonPrepareExpression {
 
   protected String name(String propName) {
     return propName;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+
+    context.writeBoolMustStart();
+    context.writeSimple(Op.LT_EQ, lowProperty, value);
+    context.writeSimple(Op.GT_EQ, highProperty, value);
+    context.writeBoolEnd();
   }
 
   @Override

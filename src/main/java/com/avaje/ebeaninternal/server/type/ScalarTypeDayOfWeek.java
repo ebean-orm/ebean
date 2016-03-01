@@ -14,7 +14,7 @@ public class ScalarTypeDayOfWeek extends ScalarTypeEnumWithMapping {
   static {
     DayOfWeek[] values = DayOfWeek.values();
     for (DayOfWeek value : values) {
-      beanDbMap.add(value, value.getValue());
+      beanDbMap.add(value, value.getValue(), value.name());
     }
   }
 

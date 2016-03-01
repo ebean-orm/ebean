@@ -166,6 +166,11 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 
+  @Override
+  public void set(Object bean, Object value) {
+    throw new RuntimeException("ElPropertyDeploy only - not implemented");
+  }
+
   public void elSetValue(EntityBean bean, Object value, boolean populate) {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }

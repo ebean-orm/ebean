@@ -1,6 +1,9 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
 import com.avaje.ebean.annotation.ConcurrencyMode;
+import com.avaje.ebean.annotation.DocStore;
+import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
@@ -10,6 +13,7 @@ import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanPostLoad;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.changelog.ChangeLogFilter;
+import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistController;
@@ -52,6 +56,8 @@ public class DeployBeanDescriptor<T> {
   private static final PropOrder PROP_ORDER = new PropOrder();
 
   private static final String I_SCALAOBJECT = "scala.ScalaObject";
+
+  private final ServerConfig serverConfig;
 
   /**
    * Map of BeanProperty Linked so as to preserve order.
@@ -166,11 +172,31 @@ public class DeployBeanDescriptor<T> {
 
   private String dbComment;
 
+  /**
+   * One of NONE, INDEX or EMBEDDED.
+   */
+  private boolean docStoreMapped;
+
+  private DocStore docStore;
+
+  private PathProperties docStorePathProperties;
+
+  private String docStoreQueueId;
+
+  private String docStoreIndexName;
+
+  private String docStoreIndexType;
+
+  private DocStoreEvent docStorePersist;
+  private DocStoreEvent docStoreInsert;
+  private DocStoreEvent docStoreUpdate;
+  private DocStoreEvent docStoreDelete;
 
   /**
    * Construct the BeanDescriptor.
    */
-  public DeployBeanDescriptor(Class<T> beanType) {
+  public DeployBeanDescriptor(Class<T> beanType, ServerConfig serverConfig) {
+    this.serverConfig = serverConfig;
     this.beanType = beanType;
   }
 
@@ -232,6 +258,26 @@ public class DeployBeanDescriptor<T> {
 
   public boolean isDraftableElement() {
     return draftableElement;
+  }
+
+  /**
+   * Read the top level doc store deployment information.
+   */
+  public void readDocStore(DocStore docStore) {
+
+    this.docStore = docStore;
+    docStoreMapped = true;
+    docStoreQueueId = docStore.queueId();
+    docStoreIndexName = docStore.indexName();
+    docStoreIndexType = docStore.indexType();
+    docStorePersist = docStore.persist();
+    docStoreInsert = docStore.insert();
+    docStoreUpdate = docStore.update();
+    docStoreDelete = docStore.delete();
+    String doc = docStore.doc();
+    if (doc != null && doc.length() > 0) {
+      docStorePathProperties = PathProperties.parse(doc);
+    }
   }
 
   public boolean isScalaObject() {
@@ -930,5 +976,62 @@ public class DeployBeanDescriptor<T> {
       // continue checking
       checkInheritance(parent);
     }
+  }
+
+  public PathProperties getDocStorePathProperties() {
+    return docStorePathProperties;
+  }
+
+  /**
+   * Return true if this type is mapped for a doc store.
+   */
+  public boolean isDocStoreMapped() {
+    return docStoreMapped;
+  }
+
+  public String getDocStoreQueueId() {
+    return docStoreQueueId;
+  }
+
+  public String getDocStoreIndexName() {
+    return docStoreIndexName;
+  }
+
+  public String getDocStoreIndexType() {
+    return docStoreIndexType;
+  }
+
+  public DocStore getDocStore() {
+    return docStore;
+  }
+
+  /**
+   * Return the DocStore index behavior for bean inserts.
+   */
+  public DocStoreEvent getDocStoreInsertEvent() {
+    return getDocStoreIndexEvent(docStoreInsert);
+  }
+
+  /**
+   * Return the DocStore index behavior for bean updates.
+   */
+  public DocStoreEvent getDocStoreUpdateEvent() {
+    return getDocStoreIndexEvent(docStoreUpdate);
+  }
+
+  /**
+   * Return the DocStore index behavior for bean deletes.
+   */
+  public DocStoreEvent getDocStoreDeleteEvent() {
+    return getDocStoreIndexEvent(docStoreDelete);
+  }
+
+  private DocStoreEvent getDocStoreIndexEvent(DocStoreEvent mostSpecific) {
+    if (!docStoreMapped) {
+      return DocStoreEvent.IGNORE;
+    }
+    if (mostSpecific != DocStoreEvent.DEFAULT) return mostSpecific;
+    if (docStorePersist != DocStoreEvent.DEFAULT) return docStorePersist;
+    return serverConfig.getDocStoreConfig().getPersist();
   }
 }

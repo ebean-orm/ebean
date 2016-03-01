@@ -4,6 +4,8 @@ import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 
+import java.io.IOException;
+
 class BetweenExpression extends AbstractExpression {
 
   private static final long serialVersionUID = 2078918165221454910L;
@@ -18,6 +20,11 @@ class BetweenExpression extends AbstractExpression {
     super(propertyName);
     this.valueLow = valLo;
     this.valueHigh = valHigh;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+    context.writeRange(propName, Op.GT_EQ, valueLow, Op.LT_EQ, valueHigh);
   }
 
   @Override

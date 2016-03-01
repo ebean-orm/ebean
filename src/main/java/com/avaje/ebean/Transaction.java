@@ -1,5 +1,7 @@
 package com.avaje.ebean;
 
+import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.config.DocStoreConfig;
 import com.avaje.ebean.config.PersistBatch;
 
 import javax.persistence.PersistenceException;
@@ -80,6 +82,29 @@ public interface Transaction extends Closeable {
    * Return true if the transaction is active.
    */
   boolean isActive();
+
+  /**
+   * Set the behavior for document store updates on this transaction.
+   * <p>
+   *   For example, set the mode to DocStoreEvent.IGNORE for this transaction and
+   *   then any changes via this transaction are not sent to the doc store. This
+   *   would be used when doing large bulk inserts into the database and we want
+   *   to control how that is sent to the document store.
+   * </p>
+   */
+  void setDocStoreUpdateMode(DocStoreEvent updateMode);
+
+  /**
+   * Set the batch size to use for sending messages to the document store.
+   * <p>
+   *   You might set this if you know the changes in this transaction result in especially large or
+   *   especially small payloads and want to adjust the batch size to match.
+   * </p>
+   * <p>
+   *   Setting this overrides the default of {@link DocStoreConfig#getBulkBatchSize()}
+   * </p>
+   */
+  void setDocStoreUpdateBatchSize(int batchSize);
 
   /**
    * Explicitly turn off or on the cascading nature of save() and delete(). This

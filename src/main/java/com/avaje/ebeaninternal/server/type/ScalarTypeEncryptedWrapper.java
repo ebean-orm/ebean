@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.text.json.JsonWriter;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
@@ -141,4 +142,10 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
   public void jsonWrite(JsonWriter writer, String name, T value) throws IOException {
     wrapped.jsonWrite(writer, name, value);
   }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return wrapped.getDocType();
+  }
+
 }

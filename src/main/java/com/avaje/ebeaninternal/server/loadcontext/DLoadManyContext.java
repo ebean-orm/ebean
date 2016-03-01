@@ -56,7 +56,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 
   public void configureQuery(SpiQuery<?> query) {
 
-    parent.propagateQueryState(query);
+    parent.propagateQueryState(query, desc.isDocStoreMapped());
     query.setParentNode(objectGraphNode);
     if (queryProps != null) {
       queryProps.configureBeanQuery(query);
@@ -127,6 +127,11 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
       this.persistenceContext = context.getPersistenceContext();
       this.batchSize = batchSize;
       this.list = new ArrayList<BeanCollection<?>>(batchSize);
+    }
+
+    @Override
+    public boolean isUseDocStore() {
+      return context.parent.useDocStore;
     }
 
     public int getBatchSize() {

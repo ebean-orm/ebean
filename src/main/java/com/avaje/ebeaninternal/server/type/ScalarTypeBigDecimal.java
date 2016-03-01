@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.json.JsonWriter;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 import com.fasterxml.jackson.core.JsonParser;
@@ -85,6 +86,11 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
   @Override
   public void jsonWrite(JsonWriter writer, String name, BigDecimal value) throws IOException {
     writer.writeNumberField(name, value);
+  }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.DOUBLE;
   }
 
 }

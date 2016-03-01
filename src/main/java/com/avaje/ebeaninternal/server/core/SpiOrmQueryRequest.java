@@ -116,4 +116,9 @@ public interface SpiOrmQueryRequest<T> {
    * Mark the underlying transaction as not being query only.
    */
   void markNotQueryOnly();
+
+  /**
+   * Return true if this query is expected to use the doc store.
+   */
+  boolean isUseDocStore();
 }

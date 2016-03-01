@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.JsonWriter;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
@@ -49,6 +50,11 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
   @Override
   public Byte jsonRead(JsonParser parser, JsonToken event) throws IOException {
     throw new IOException("Not supported");
+  }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.BINARY;
   }
 
   public String formatValue(Byte t) {

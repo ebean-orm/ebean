@@ -15,8 +15,8 @@ public class EnumToDbStringMap extends EnumToDbValueMap<String> {
   }
 
   @Override
-  public EnumToDbStringMap add(Object beanValue, String dbValue) {
-    addInternal(beanValue, dbValue);
+  public EnumToDbStringMap add(Object beanValue, String dbValue, String name) {
+    addInternal(beanValue, dbValue, name);
     return this;
   }
 

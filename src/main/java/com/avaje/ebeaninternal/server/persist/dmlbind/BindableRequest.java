@@ -48,7 +48,7 @@ public interface BindableRequest {
    * Register the value from a update GeneratedValue. This can only be set to
    * the bean property after the where clause has bean built.
    */
-  void registerUpdateGenValue(BeanProperty prop, EntityBean bean, Object value);
+  void registerGeneratedVersion(Object value);
 
   /**
    * Return the original PersistRequest.

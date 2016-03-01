@@ -1,6 +1,9 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.DocCode;
+import com.avaje.ebean.annotation.DocProperty;
+import com.avaje.ebean.annotation.DocSortable;
 import com.avaje.ebean.annotation.SoftDelete;
 import com.avaje.ebean.annotation.UpdatedTimestamp;
 import com.avaje.ebean.annotation.WhenCreated;
@@ -12,6 +15,7 @@ import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+import com.avaje.ebeaninternal.server.deploy.DeployDocPropertyOptions;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyGetter;
@@ -19,6 +23,7 @@ import com.avaje.ebeaninternal.server.properties.BeanPropertySetter;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.ScalarTypeEnum;
 import com.avaje.ebeaninternal.server.type.ScalarTypeWrapper;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyOptions;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.FetchType;
@@ -158,6 +163,8 @@ public class DeployBeanProperty {
    * The jdbc data type this maps to.
    */
   private int dbType;
+
+  private DeployDocPropertyOptions docMapping = new DeployDocPropertyOptions();
 
   /**
    * The method used to read the property.
@@ -908,4 +915,21 @@ public class DeployBeanProperty {
   public String getDbComment() {
     return dbComment;
   }
+
+  public void setDocProperty(DocProperty docProperty) {
+    docMapping.setDocProperty(docProperty);
+  }
+
+  public void setDocSortable(DocSortable docSortable) {
+    docMapping.setDocSortable(docSortable);
+  }
+
+  public void setDocCode(DocCode docCode) {
+    docMapping.setDocCode(docCode);
+  }
+
+  public DocPropertyOptions getDocPropertyOptions() {
+    return docMapping.create();
+  }
+
 }

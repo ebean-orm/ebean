@@ -68,11 +68,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   /**
    * Create the InternalQueryRequest.
    */
-  public OrmQueryRequest(SpiEbeanServer server, OrmQueryEngine queryEngine, SpiQuery<T> query, BeanDescriptor<T> desc, SpiTransaction t) {
-
+  public OrmQueryRequest(SpiEbeanServer server, OrmQueryEngine queryEngine, SpiQuery<T> query, SpiTransaction t) {
     super(server, t);
-
-    this.beanDescriptor = desc;
+    this.beanDescriptor = query.getBeanDescriptor();
     this.rawSql = query.getRawSql();
     this.finder = beanDescriptor.getBeanFinder();
     this.queryEngine = queryEngine;
@@ -131,6 +129,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   public LoadContext getGraphContext() {
     return loadContext;
+  }
+
+  @Override
+  public boolean isUseDocStore() {
+    return query.isUseDocStore();
   }
 
   /**

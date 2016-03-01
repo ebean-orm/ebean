@@ -1,10 +1,11 @@
 package com.avaje.tests.model.basic;
 
-import java.io.Serializable;
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
+import com.avaje.ebean.annotation.ChangeLog;
+import com.avaje.ebean.annotation.DocStore;
+import com.avaje.ebean.annotation.DocStoreEmbedded;
+import com.avaje.ebean.annotation.Formula;
+import com.avaje.ebean.annotation.WhenCreated;
+import com.avaje.ebean.annotation.Where;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,16 +21,16 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlType;
-
-import com.avaje.ebean.annotation.ChangeLog;
-import com.avaje.ebean.annotation.Formula;
-import com.avaje.ebean.annotation.WhenCreated;
-import com.avaje.ebean.annotation.Where;
+import java.io.Serializable;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Order entity bean.
  */
+@DocStore
 @ChangeLog
 @Entity
 @Table(name = "o_order")
@@ -37,7 +38,6 @@ public class Order implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @XmlType(name = "status")
   public enum Status {
     NEW,
     APPROVED,
@@ -86,9 +86,9 @@ public class Order implements Serializable {
   @NotNull
   @ManyToOne
   @JoinColumn(name = "kcustomer_id")
+  @DocStoreEmbedded(doc = "id,name")
   Customer customer;
 
-  //@Basic(fetch=FetchType.LAZY)
   @Column(name = "name", table = "o_customer")
   String customerName;
 
@@ -101,6 +101,7 @@ public class Order implements Serializable {
   @Where(clause = "${ta}.id > 0")
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
   @OrderBy("id asc, orderQty asc, cretime desc")
+  @DocStoreEmbedded
   List<OrderDetail> details;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")

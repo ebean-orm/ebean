@@ -25,8 +25,10 @@ import com.fasterxml.jackson.core.JsonFactory;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.ServiceLoader;
 
 /**
  * The configuration used for creating a EbeanServer.
@@ -128,6 +130,11 @@ public class ServerConfig {
    * Class name of a classPathReader implementation.
    */
   private String classPathReaderClassName;
+
+  /**
+   * Configuration for the ElasticSearch integration.
+   */
+  private DocStoreConfig docStoreConfig = new DocStoreConfig();
 
   /**
    * This is used to populate @WhoCreated, @WhoModified and
@@ -283,7 +290,7 @@ public class ServerConfig {
   private DbConstraintNaming constraintNaming = new DbConstraintNaming();
 
   /** 
-   * Behaviour of update to include on the change properties. 
+   * Behaviour of update to include on the change properties.
    */
   private boolean updateChangesOnly = true;
 
@@ -1151,6 +1158,20 @@ public class ServerConfig {
    */
   public void setNamingConvention(NamingConvention namingConvention) {
     this.namingConvention = namingConvention;
+  }
+
+  /**
+   * Return the configuration for the ElasticSearch integration.
+   */
+  public DocStoreConfig getDocStoreConfig() {
+    return docStoreConfig;
+  }
+
+  /**
+   * Set the configuration for the ElasticSearch integration.
+   */
+  public void setDocStoreConfig(DocStoreConfig docStoreConfig) {
+    this.docStoreConfig = docStoreConfig;
   }
 
   /**
@@ -2135,6 +2156,23 @@ public class ServerConfig {
   }
 
   /**
+   * Return the service loader using the classLoader defined in ClassLoadConfig.
+   */
+  public <T> ServiceLoader<T> serviceLoad(Class<T> spiService) {
+
+    return ServiceLoader.load(spiService, classLoadConfig.getClassLoader());
+  }
+
+  /**
+   * Return the first service using the service loader (or null).
+   */
+  public <T> T service(Class<T> spiService) {
+    ServiceLoader<T> load = serviceLoad(spiService);
+    Iterator<T> serviceInstances = load.iterator();
+    return serviceInstances.hasNext() ? serviceInstances.next() : null;
+  }
+
+  /**
    * Load settings from ebean.properties.
    */
   public void loadFromProperties() {
@@ -2214,6 +2252,13 @@ public class ServerConfig {
   /**
    * This is broken out for the same reason as above - preserve existing behaviour but let it be overridden.
    */
+  protected void loadDocStoreSettings(PropertiesWrapper p) {
+    docStoreConfig.loadSettings(p);
+  }
+
+  /**
+   * This is broken out for the same reason as above - preserve existing behaviour but let it be overridden.
+   */
   protected void loadAutoTuneSettings(PropertiesWrapper p) {
     autoTuneConfig.loadSettings(p);
   }
@@ -2238,6 +2283,11 @@ public class ServerConfig {
       dataSourceConfig = new DataSourceConfig();
     }
     loadDataSourceSettings(p);
+
+    if (docStoreConfig == null) {
+      docStoreConfig = new DocStoreConfig();
+    }
+    docStoreConfig.loadSettings(p);
 
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);

@@ -194,7 +194,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     this.queryPlan = queryPlan;
     this.query = request.getQuery();
     this.queryMode = query.getMode();
-    this.lazyLoadManyProperty = query.getLazyLoadForParentsProperty();
+    this.lazyLoadManyProperty = query.getLazyLoadMany();
 
     this.readOnly = request.isReadOnly();
 

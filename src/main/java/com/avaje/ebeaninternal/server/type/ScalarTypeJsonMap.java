@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebean.text.json.JsonWriter;
@@ -203,6 +204,11 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
         EJson.write(value, writer.gen());
       }
     }
+  }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.OBJECT;
   }
 
   @Override

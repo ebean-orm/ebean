@@ -6,6 +6,8 @@ import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
+import java.io.IOException;
+
 public class SimpleExpression extends AbstractExpression {
 
   private static final long serialVersionUID = -382881395755603790L;
@@ -18,6 +20,16 @@ public class SimpleExpression extends AbstractExpression {
     super(propertyName);
     this.type = type;
     this.value = value;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+
+    if (type == Op.BETWEEN) {
+      throw new IllegalStateException("BETWEEN Not expected in SimpleExpression?");
+    }
+
+    context.writeSimple(type, propName, value);
   }
 
   public final String getPropName() {

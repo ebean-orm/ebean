@@ -9,6 +9,8 @@ import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
+import java.io.IOException;
+
 /**
  * A logical And or Or for joining two expressions.
  */
@@ -58,6 +60,16 @@ abstract class LogicExpression implements SpiExpression {
     this.joinType = joinType;
     this.expOne = (SpiExpression) expOne;
     this.expTwo = (SpiExpression) expTwo;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+
+    boolean conjunction = joinType.equals(AND);
+    context.writeBoolStart(conjunction);
+    expOne.writeElastic(context);
+    expTwo.writeElastic(context);
+    context.writeBoolEnd();
   }
 
   @Override

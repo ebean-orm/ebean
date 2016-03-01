@@ -106,13 +106,21 @@ public class DJsonContext implements JsonContext {
 
   public <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
-    ReadJson readJson = new ReadJson(parser, options, determineObjectMapper(options));
+    BeanDescriptor<T> desc = getDescriptor(cls);
+    ReadJson readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
     try {
-      BeanDescriptor<T> d = getDescriptor(cls);
-      return d.jsonRead(readJson, null);
+      return desc.jsonRead(readJson, null);
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
+  }
+
+  @Override
+  public <T> DJsonBeanReader createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
+
+    BeanDescriptor<T> desc = getDescriptor(cls);
+    ReadJson readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
+    return new DJsonBeanReader<T>(desc, readJson);
   }
 
   public <T> List<T> toList(Class<T> cls, String json) throws JsonIOException {
@@ -138,9 +146,9 @@ public class DJsonContext implements JsonContext {
 
   public <T> List<T> toList(Class<T> cls, JsonParser src, JsonReadOptions options) throws JsonIOException {
 
-    ReadJson readJson = new ReadJson(src, options, determineObjectMapper(options));
+    BeanDescriptor<T> desc = getDescriptor(cls);
+    ReadJson readJson = new ReadJson(desc, src, options, determineObjectMapper(options));
     try {
-      BeanDescriptor<T> d = getDescriptor(cls);
 
       List<T> list = new ArrayList<T>();
 
@@ -153,7 +161,7 @@ public class DJsonContext implements JsonContext {
       }
 
       do {
-        T bean = d.jsonRead(readJson, null);
+        T bean = desc.jsonRead(readJson, null);
         if (bean == null) {
           break;
         } else {

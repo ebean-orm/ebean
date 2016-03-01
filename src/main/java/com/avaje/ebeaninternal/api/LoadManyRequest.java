@@ -144,7 +144,7 @@ public class LoadManyRequest extends LoadRequest {
     query.setLazyLoadForParents(many);
 
     List<Object> idList = getParentIdList(batchSize);
-    many.addWhereParentIdIn(query, idList);
+    many.addWhereParentIdIn(query, idList, loadContext.isUseDocStore());
 
     query.setPersistenceContext(loadContext.getPersistenceContext());
 

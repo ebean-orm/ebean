@@ -15,16 +15,16 @@ public class EnumToDbIntegerMap extends EnumToDbValueMap<Integer> {
     return Types.INTEGER;
   }
 
-  public void add(Object beanValue, Integer dbValue) {
-    addInternal(beanValue, dbValue);
+  public void add(Object beanValue, Integer dbValue, String name) {
+    addInternal(beanValue, dbValue, name);
   }
 
   @Override
-  public EnumToDbIntegerMap add(Object beanValue, String stringDbValue) {
+  public EnumToDbIntegerMap add(Object beanValue, String stringDbValue, String name) {
 
     try {
       Integer value = Integer.valueOf(stringDbValue);
-      addInternal(beanValue, value);
+      addInternal(beanValue, value, name);
 
       return this;
 

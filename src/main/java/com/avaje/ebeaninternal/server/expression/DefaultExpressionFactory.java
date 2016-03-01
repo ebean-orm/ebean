@@ -306,7 +306,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression exists(Query<?> subQuery) {
-	return new ExistsExpression((SpiQuery<?>) subQuery, false);
+	return new ExistsQueryExpression((SpiQuery<?>) subQuery, false);
   }
   
   /**
@@ -314,7 +314,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression notExists(Query<?> subQuery) {
-	return new ExistsExpression((SpiQuery<?>) subQuery, true);
+	return new ExistsQueryExpression((SpiQuery<?>) subQuery, true);
   }
 
 

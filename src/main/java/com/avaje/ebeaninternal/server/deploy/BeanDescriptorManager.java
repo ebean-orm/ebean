@@ -52,6 +52,8 @@ import com.avaje.ebeaninternal.server.properties.BeanPropertiesReader;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfo;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfoFactory;
 import com.avaje.ebeaninternal.server.properties.EnhanceBeanPropertyInfoFactory;
+import com.avaje.ebeanservice.docstore.api.DocStoreBeanAdapter;
+import com.avaje.ebeanservice.docstore.api.DocStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,11 +113,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final BeanManagerFactory beanManagerFactory;
 
+  private final ServerConfig serverConfig;
+
   private final ChangeLogListener changeLogListener;
 
   private final ChangeLogRegister changeLogRegister;
 
   private final ChangeLogPrepare changeLogPrepare;
+
+  private final DocStoreFactory docStoreFactory;
 
   private int enhancedClassCount;
   
@@ -125,13 +131,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final String serverName;
 
-  private final ServerConfig serverConfig;
-
   private Map<Class<?>, DeployBeanInfo<?>> deplyInfoMap = new HashMap<Class<?>, DeployBeanInfo<?>>();
 
   private final Map<Class<?>, BeanTable> beanTableMap = new HashMap<Class<?>, BeanTable>();
 
   private final Map<String, BeanDescriptor<?>> descMap = new HashMap<String, BeanDescriptor<?>>();
+
+  private final Map<String, BeanDescriptor<?>> descQueueMap = new HashMap<String, BeanDescriptor<?>>();
 
   private final Map<String, BeanManager<?>> beanManagerMap = new HashMap<String, BeanManager<?>>();
 
@@ -183,6 +189,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.serverConfig = config.getServerConfig();
     this.serverName = InternString.intern(serverConfig.getName());
     this.cacheManager = config.getCacheManager();
+    this.docStoreFactory = config.getDocStoreFactory();
     this.xmlConfig = config.getXmlConfig();
     this.dbSequenceBatchSize = serverConfig.getDatabaseSequenceBatchSize();
     this.backgroundExecutor = config.getBackgroundExecutor();
@@ -244,6 +251,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   @Override
   public ServerConfig getServerConfig() {
     return serverConfig;
+  }
+
+  @Override
+  public <T> DocStoreBeanAdapter<T> createDocStoreBeanAdapter(BeanDescriptor descriptor, DeployBeanDescriptor<T> deploy) {
+    return docStoreFactory.createAdapter(descriptor, deploy);
+  }
+
+  public BeanDescriptor<?> getBeanDescriptorByQueueId(String queueId) {
+    return descQueueMap.get(queueId);
   }
 
   @SuppressWarnings("unchecked")
@@ -433,6 +449,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       d.initialiseOther(asOfTableMap, asOfViewSuffix, draftTableMap);
     }
 
+    // PASS 4:
+    // now initialise document mapping which needs target descriptors
+    for (BeanDescriptor<?> d : descMap.values()) {
+      d.initialiseDocMapping();
+    }
+
     // create BeanManager for each non-embedded entity bean
     for (BeanDescriptor<?> d : descMap.values()) {
       if (!d.isEmbedded()) {
@@ -518,6 +540,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private void registerBeanDescriptor(BeanDescriptor<?> desc) {
     descMap.put(desc.getBeanType().getName(), desc);
+    if (desc.isDocStoreMapped()) {
+      descQueueMap.put(desc.getDocStoreQueueId(), desc);
+    }
   }
 
   /**
@@ -1050,7 +1075,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private <T> DeployBeanInfo<T> createDeployBeanInfo(Class<T> beanClass) {
 
-    DeployBeanDescriptor<T> desc = new DeployBeanDescriptor<T>(beanClass);
+    DeployBeanDescriptor<T> desc = new DeployBeanDescriptor<T>(beanClass, serverConfig);
 
     desc.setUpdateChangesOnly(updateChangesOnly);
 

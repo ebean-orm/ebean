@@ -8,54 +8,56 @@ public enum Op {
   /**
    * Exists (JSON).
    */
-  EXISTS(" is not null "),
+  EXISTS(" is not null ", ""),
 
   /**
    * Not Exists (JSON).
    */
-  NOT_EXISTS(" is null "),
+  NOT_EXISTS(" is null ", ""),
 
   /**
    * Between (JSON).
    */
-  BETWEEN(" between ? and ? "),
+  BETWEEN(" between ? and ? ", ""),
 
   /**
    * Equal to
    */
-  EQ(" = ? "),
+  EQ(" = ? ", ""),
 
   /**
    * Not equal to.
    */
-  NOT_EQ(" <> ? "),
+  NOT_EQ(" <> ? ", ""),
 
   /**
-   *
    * Less than.
    */
 
-  LT(" < ? "),
+  LT(" < ? ", "lt"),
 
   /**
    * Less than or equal to.
    */
-  LT_EQ(" <= ? "),
+  LT_EQ(" <= ? ", "lte"),
 
   /**
    * Greater than.
    */
-  GT(" > ? "),
+  GT(" > ? ", "gt"),
 
   /**
    * Greater than or equal to.
    */
-  GT_EQ(" >= ? ");
+  GT_EQ(" >= ? ", "gte");
 
   final String exp;
 
-  Op(String exp) {
+  final String docExp;
+
+  Op(String exp, String docExp) {
     this.exp = exp;
+    this.docExp = docExp;
   }
 
   /**
@@ -63,5 +65,12 @@ public enum Op {
    */
   public String bind() {
     return exp;
+  }
+
+  /**
+   * Return the doc store expression.
+   */
+  public String docExp() {
+    return docExp;
   }
 }

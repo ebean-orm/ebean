@@ -36,16 +36,20 @@ public abstract class BeanRequest {
 	 * A transaction may have been passed in or active in the thread local. If
 	 * not then create one implicitly to handle the request.
 	 * </p>
+   *
+   * @return True if a transaction was set (from current or created).
 	 */
-	public void createImplicitTransIfRequired() {
-		if (transaction == null) {
-			transaction = ebeanServer.getCurrentServerTransaction();
-			if (transaction == null || !transaction.isActive()) {
-				// create an implicit transaction to execute this query
-				transaction = ebeanServer.createServerTransaction(false, -1);
-				createdTransaction = true;
-			}
-		}
+	public boolean createImplicitTransIfRequired() {
+		if (transaction != null) {
+      return false;
+    }
+    transaction = ebeanServer.getCurrentServerTransaction();
+    if (transaction == null || !transaction.isActive()) {
+      // create an implicit transaction to execute this query
+      transaction = ebeanServer.createServerTransaction(false, -1);
+      createdTransaction = true;
+    }
+    return true;
 	}
 
   /**

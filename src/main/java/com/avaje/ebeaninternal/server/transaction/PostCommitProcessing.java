@@ -1,8 +1,11 @@
 package com.avaje.ebeaninternal.server.transaction;
 
+import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
@@ -37,15 +40,38 @@ public final class PostCommitProcessing {
 
   private final DeleteByIdMap deleteByIdMap;
 
+  private final DocStoreEvent txnDocStoreMode;
+
+  private final int txnDocStoreBatchSize;
+
   /**
-   * Create for a TransactionManager and event.
+   * Create for an external modification.
    */
   public PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, TransactionEvent event) {
 
     this.clusterManager = clusterManager;
     this.manager = manager;
     this.serverName = manager.getServerName();
+    this.txnDocStoreMode = DocStoreEvent.IGNORE;
+    this.txnDocStoreBatchSize = 0;
     this.event = event;
+    this.deleteByIdMap = event.getDeleteByIdMap();
+    this.persistBeanRequests = event.getPersistRequestBeans();
+    this.beanPersistIdMap = createBeanPersistIdMap();
+    this.remoteTransactionEvent = createRemoteTransactionEvent();
+  }
+
+  /**
+   * Create for a transaction.
+   */
+  public PostCommitProcessing(ClusterManager clusterManager, TransactionManager manager, SpiTransaction transaction) {
+
+    this.clusterManager = clusterManager;
+    this.manager = manager;
+    this.serverName = manager.getServerName();
+    this.txnDocStoreMode = transaction.getDocStoreUpdateMode();
+    this.txnDocStoreBatchSize = transaction.getDocStoreBulkBatchSize();
+    this.event = transaction.getEvent();
     this.deleteByIdMap = event.getDeleteByIdMap();
     this.persistBeanRequests = event.getPersistRequestBeans();
     this.beanPersistIdMap = createBeanPersistIdMap();
@@ -76,6 +102,33 @@ public final class PostCommitProcessing {
     }
   }
 
+  /**
+   * Process any document store updates.
+   */
+  protected void processDocStoreUpdates() {
+
+    if (isDocStoreUpdate()) {
+      // collect 'bulk update' and 'queue' events
+      DocStoreUpdates docStoreUpdates = new DocStoreUpdates();
+      event.addDocStoreUpdates(docStoreUpdates);
+      if (deleteByIdMap != null) {
+        deleteByIdMap.addDocStoreUpdates(docStoreUpdates, txnDocStoreMode);
+      }
+
+      if (!docStoreUpdates.isEmpty()) {
+        // send to docstore / ElasticSearch and/or queue
+        manager.processDocStoreUpdates(docStoreUpdates, txnDocStoreBatchSize);
+      }
+    }
+  }
+
+  /**
+   * Return true if updates to the document store occur for this transaction.
+   */
+  private boolean isDocStoreUpdate() {
+    return manager.isDocStoreActive() && (txnDocStoreMode == null || txnDocStoreMode != DocStoreEvent.IGNORE);
+  }
+
   public void notifyCluster() {
     if (remoteTransactionEvent != null && !remoteTransactionEvent.isEmpty()) {
       // send the interesting events to the cluster
@@ -91,6 +144,7 @@ public final class PostCommitProcessing {
     return new Runnable() {
       public void run() {
         localPersistListenersNotify();
+        processDocStoreUpdates();
       }
     };
   }

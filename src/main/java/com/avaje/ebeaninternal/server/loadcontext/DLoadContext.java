@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.loadcontext;
 
 import com.avaje.ebean.bean.BeanCollection;
+import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.ObjectGraphOrigin;
@@ -45,6 +46,7 @@ public class DLoadContext implements LoadContext {
   private final boolean disableLazyLoading;
   private final boolean disableReadAudit;
   private final boolean includeSoftDeletes;
+  protected final boolean useDocStore;
 
   /**
    * The path relative to the root of the object graph.
@@ -59,6 +61,34 @@ public class DLoadContext implements LoadContext {
 
   private List<OrmQueryProperties> secQuery;
 
+  /**
+   * Construct for use with JSON marshalling (doc store).
+   */
+  public DLoadContext(BeanDescriptor<?> rootDescriptor, PersistenceContext persistenceContext) {
+
+    this.useDocStore = true;
+    this.rootDescriptor = rootDescriptor;
+    this.ebeanServer = rootDescriptor.getEbeanServer();
+    this.persistenceContext = persistenceContext;
+    this.origin = initOrigin();
+    this.defaultBatchSize = 100;
+    this.excludeBeanCache = false;
+    this.asDraft = false;
+    this.asOf = null;
+    this.readOnly = false;
+    this.disableLazyLoading = false;
+    this.disableReadAudit = false;
+    this.includeSoftDeletes = false;
+    this.relativePath = null;
+    this.useProfiling = false;
+    this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, defaultBatchSize, null);
+  }
+
+  private ObjectGraphOrigin initOrigin() {
+    CallStack callStack = ebeanServer.createCallStack();
+    return new ObjectGraphOrigin(0, callStack, rootDescriptor.getFullName());
+  }
+
   public DLoadContext(OrmQueryRequest<?> request, SpiQuerySecondary secondaryQueries) {
 
     this.persistenceContext = request.getPersistenceContext();
@@ -67,6 +97,7 @@ public class DLoadContext implements LoadContext {
     this.rootDescriptor = request.getBeanDescriptor();
 
     SpiQuery<?> query = request.getQuery();
+    this.useDocStore = query.isUseDocStore();
     this.asOf = query.getAsOf();
     this.asDraft = query.isAsDraft();
     this.includeSoftDeletes = query.isIncludeSoftDeletes();
@@ -300,7 +331,10 @@ public class DLoadContext implements LoadContext {
   /**
    * Propagate the original query settings (draft, asOf etc) to the secondary queries.
    */
-  public void propagateQueryState(SpiQuery<?> query) {
+  public void propagateQueryState(SpiQuery<?> query, boolean docStoreMapped) {
+    if (useDocStore && docStoreMapped) {
+      query.setUseDocStore(true);
+    }
     if (readOnly != null) {
       query.setReadOnly(readOnly);
     }

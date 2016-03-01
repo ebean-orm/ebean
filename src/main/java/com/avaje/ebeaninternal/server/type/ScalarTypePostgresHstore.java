@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebean.text.json.JsonWriter;
@@ -130,4 +131,8 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
     return EJson.parseObject(parser, event);
   }
 
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.OBJECT;
+  }
 }

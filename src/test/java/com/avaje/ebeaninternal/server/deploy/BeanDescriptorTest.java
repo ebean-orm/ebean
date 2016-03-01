@@ -9,10 +9,11 @@ import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.tests.model.basic.EBasic;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-/**
- */
 public class BeanDescriptorTest {
 
   @Test

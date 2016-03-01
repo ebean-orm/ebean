@@ -274,7 +274,7 @@ import java.util.Set;
  * @param <T>
  *          the type of Entity bean this query will fetch.
  */
-public interface Query<T> extends Serializable {
+public interface Query<T> {
 
   /**
    * Return the RawSql that was set to use for this query.
@@ -1286,6 +1286,14 @@ public interface Query<T> extends Serializable {
   Query<T> setUseQueryCache(boolean useQueryCache);
 
   /**
+   * Set to true if this query should execute against the doc store.
+   * <p>
+   *   When setting this you may also consider disabling lazy loading.
+   * </p>
+   */
+  Query<T> setUseDocStore(boolean useDocStore);
+
+  /**
    * When set to true when you want the returned beans to be read only.
    */
   Query<T> setReadOnly(boolean readOnly);
@@ -1364,4 +1372,10 @@ public interface Query<T> extends Serializable {
    * </p>
    */
   Set<String> validate();
+
+  /**
+   * Return the query in JSON form for ElasticSearch doc store.
+   */
+  String asElasticQuery();
+
 }

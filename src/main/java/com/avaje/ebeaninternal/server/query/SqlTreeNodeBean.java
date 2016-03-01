@@ -232,7 +232,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     PersistenceContext persistenceContext = (!readId || temporalVersions) ? null : ctx.getPersistenceContext();
 
-    boolean newBean = false;
     if (readId) {
       Object id = localIdBinder.readSet(ctx, localBean);
       if (id == null) {
@@ -243,7 +242,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
         contextBean = (EntityBean) persistenceContext.putIfAbsent(id, localBean);
         if (contextBean == null) {
           // bean just added to the persistenceContext
-          newBean = true;
           contextBean = localBean;
         } else {
           // bean already exists in persistenceContext

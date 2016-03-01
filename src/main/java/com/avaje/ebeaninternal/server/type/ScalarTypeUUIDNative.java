@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.json.JsonWriter;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -117,4 +118,8 @@ public class ScalarTypeUUIDNative extends ScalarTypeBase<UUID> {
     return strValue == null ? null : parse(strValue);
   }
 
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.STRING;
+  }
 }

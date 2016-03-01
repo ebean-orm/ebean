@@ -14,7 +14,7 @@ public class ScalarTypeMonth extends ScalarTypeEnumWithMapping {
   static {
     Month[] values = Month.values();
     for (Month value : values) {
-      beanDbMap.add(value, value.getValue());
+      beanDbMap.add(value, value.getValue(), value.name());
     }
   }
 

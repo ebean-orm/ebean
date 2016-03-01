@@ -2,6 +2,8 @@ package com.avaje.tests.batchload;
 
 import java.util.List;
 
+import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.bean.EntityBeanIntercept;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,6 +36,15 @@ public class TestLoadOnDirty extends BaseTestCase {
     Assert.assertTrue(beanState.isDirty());
     Assert.assertTrue(beanState.getChangedProps().contains("name"));
     Assert.assertEquals(1, beanState.getChangedProps().size());
+
+    EntityBeanIntercept ebi = ((EntityBean) customer)._ebean_getIntercept();
+    boolean[] dirtyProperties = ebi.getDirtyProperties();
+    for (int i = 0; i < dirtyProperties.length; i++) {
+      if (dirtyProperties[i]) {
+        String dirtyPropertyName = ebi.getProperty(i);
+        Assert.assertEquals("name", dirtyPropertyName);
+      }
+    }
 
     customer.setStatus(Customer.Status.INACTIVE);
 

@@ -17,6 +17,8 @@ import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdateProcessor;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +72,13 @@ public class TransactionManager {
 
   protected final String serverName;
 
+  protected final boolean docStoreActive;
+
+  /**
+   * The elastic search index update processor.
+   */
+  protected final DocStoreUpdateProcessor docStoreUpdateProcessor;
+
   protected final PersistBatch persistBatch;
 
   protected final PersistBatch persistBatchOnCascade;
@@ -97,7 +106,7 @@ public class TransactionManager {
   /**
    * Create the TransactionManager
    */
-  public TransactionManager(ClusterManager clusterManager, BackgroundExecutor backgroundExecutor, ServerConfig config,
+  public TransactionManager(ServerConfig config, ClusterManager clusterManager, BackgroundExecutor backgroundExecutor, DocStoreUpdateProcessor docStoreUpdateProcessor,
                             BeanDescriptorManager descMgr, BootupClasses bootupClasses) {
 
     this.persistBatch = config.getPersistBatch();
@@ -109,11 +118,12 @@ public class TransactionManager {
     this.serverName = config.getName();
     this.backgroundExecutor = backgroundExecutor;
     this.dataSource = config.getDataSource();
+    this.docStoreActive = config.getDocStoreConfig().isActive();
+    this.docStoreUpdateProcessor = docStoreUpdateProcessor;
     this.bulkEventListenerMap = new BulkEventListenerMap(config.getBulkTableEventListeners());
 
     List<TransactionEventListener> transactionEventListeners = bootupClasses.getTransactionEventListeners();
-    this.transactionEventListeners = transactionEventListeners.toArray(new
-        TransactionEventListener[transactionEventListeners.size()]);
+    this.transactionEventListeners = transactionEventListeners.toArray(new TransactionEventListener[transactionEventListeners.size()]);
 
     this.prefix = "";
     this.externalTransPrefix = "e";
@@ -134,6 +144,10 @@ public class TransactionManager {
     if (shutdownDataSource && (dataSource instanceof DataSourcePool)) {
       ((DataSourcePool) dataSource).shutdown(deregisterDriver);
     }
+  }
+
+  public boolean isDocStoreActive() {
+    return docStoreActive;
   }
 
   public BeanDescriptorManager getBeanDescriptorManager() {
@@ -391,7 +405,7 @@ public class TransactionManager {
         TXN_LOGGER.debug(transaction.getLogPrefix() + "Commit");
       }
 
-      PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction.getEvent());
+      PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction);
 
       postCommit.notifyLocalCacheIndex();
       postCommit.notifyCluster();
@@ -452,6 +466,13 @@ public class TransactionManager {
         beanPersist.notifyCacheAndListener();
       }
     }
+  }
+
+  /**
+   * Process the docstore / ElasticSearch updates.
+   */
+  public void processDocStoreUpdates(DocStoreUpdates docStoreUpdates, int bulkBatchSize) {
+    docStoreUpdateProcessor.process(docStoreUpdates, bulkBatchSize);
   }
 
   /**

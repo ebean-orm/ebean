@@ -42,13 +42,14 @@ public class BindablePropertyUpdateGenerated extends BindableProperty {
     // generated value should be the correct type
     request.bind(value, prop);
 
-    // only register the update value if it was included
-    // in the bean in the first place
-    if (request.getPersistRequest().isLoadedProperty(prop)) {
-      //if (request.isIncluded(prop)) {
-      // need to set the generated value to the bean later
-      // after the where clause has been generated
-      request.registerUpdateGenValue(prop, bean, value);
+    if (prop.isVersion()) {
+      if (request.getPersistRequest().isLoadedProperty(prop)) {
+        // set to the bean after the where clause has been generated
+        request.registerGeneratedVersion(value);
+      }
+    } else {
+      // @WhenModified set without invoking interception
+      prop.setValueChanged(bean, value);
     }
   }
 
@@ -59,6 +60,5 @@ public class BindablePropertyUpdateGenerated extends BindableProperty {
   public void dmlAppend(GenerateDmlRequest request) {
     request.appendColumn(prop.getDbColumn());
   }
-
 
 }

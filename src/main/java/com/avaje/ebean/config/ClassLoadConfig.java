@@ -91,6 +91,13 @@ public class ClassLoadConfig {
   }
 
   /**
+   * Return the classLoader to use for service loading etc.
+   */
+  public ClassLoader getClassLoader() {
+    return context.getClassLoader();
+  }
+
+  /**
    * Wraps the preferred, caller and context class loaders.
    */
   protected class ClassLoaderContext {
@@ -138,6 +145,9 @@ public class ClassLoadConfig {
       return Class.forName(name, true, classLoader);
     }
 
+    ClassLoader getClassLoader() {
+      return preferredLoader != null ? preferredLoader : contextLoader;
+    }
   }
 }
 

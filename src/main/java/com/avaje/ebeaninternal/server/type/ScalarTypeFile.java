@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.JsonWriter;
 import com.fasterxml.jackson.core.JsonParser;
@@ -125,6 +126,11 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
     os.flush();
     os.close();
     return tempFile;
+  }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.BINARY;
   }
 
   @Override

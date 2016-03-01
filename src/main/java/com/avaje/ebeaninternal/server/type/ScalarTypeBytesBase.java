@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.JsonWriter;
 import com.fasterxml.jackson.core.JsonParser;
@@ -50,6 +51,11 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
     ByteArrayOutputStream out = new ByteArrayOutputStream(500);
     parser.readBinaryValue(out);
     return out.toByteArray();
+  }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.BINARY;
   }
 
   public String formatValue(byte[] t) {

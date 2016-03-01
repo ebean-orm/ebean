@@ -23,7 +23,7 @@ import java.util.Set;
  * <p>
  * Duplicate beans are ones having the same type and unique id value. These are
  * considered duplicates and replaced by the bean instance that was already
- * loaded into the PersistanceContext.
+ * loaded into the PersistenceContext.
  * </p>
  */
 public final class DefaultPersistenceContext implements PersistenceContext {
@@ -36,13 +36,13 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   private final Monitor monitor = new Monitor();
 
   /**
-   * Create a new PersistanceContext.
+   * Create a new PersistenceContext.
    */
   public DefaultPersistenceContext() {
   }
 
   /**
-   * Set an object into the PersistanceContext.
+   * Set an object into the PersistenceContext.
    */
   public void put(Object id, Object bean) {
     synchronized (monitor) {

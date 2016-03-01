@@ -16,10 +16,12 @@ import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
+import com.avaje.ebeaninternal.server.expression.ElasticExpressionContext;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
 import com.avaje.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
@@ -127,6 +129,26 @@ public interface SpiQuery<T> extends Query<T> {
       return (query != null) ? query.getTemporalMode() : TemporalMode.CURRENT;
     }
   }
+
+  /**
+   * Write the query as an elastic search query.
+   */
+  void writeElastic(ElasticExpressionContext context) throws IOException;
+
+  /**
+   * Return true if AutoTune should be attempted on this query.
+   */
+  boolean isAutoTunable();
+
+  /**
+   * Return the bean descriptor for this query.
+   */
+  BeanDescriptor<T> getBeanDescriptor();
+
+  /**
+   * Return true if this query should be executed against the doc store.
+   */
+  boolean isUseDocStore();
 
   /**
    * Return the PersistenceContextScope that this query should use.
@@ -276,17 +298,12 @@ public interface SpiQuery<T> extends Query<T> {
   /**
    * Return the lazy loading 'many' property.
    */
-  BeanPropertyAssocMany<?> getLazyLoadForParentsProperty();
+  BeanPropertyAssocMany<?> getLazyLoadMany();
 
   /**
    * Set the load mode (+lazy or +query) and the load description.
    */
   void setLoadDescription(String loadMode, String loadDescription);
-
-  /**
-   * Set the BeanDescriptor for the root type of this query.
-   */
-  void setBeanDescriptor(BeanDescriptor<?> desc);
 
   /**
    * Return the joins required to support predicates on the many properties.
@@ -639,9 +656,9 @@ public interface SpiQuery<T> extends Query<T> {
    */
   boolean isDisableReadAudit();
 
-    /**
-     * Return true if this is a query executing in the background.
-     */
+  /**
+   * Return true if this is a query executing in the background.
+   */
   boolean isFutureFetch();
 
   /**

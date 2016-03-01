@@ -5,6 +5,8 @@ import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
+import java.io.IOException;
+
 
 /**
  * Slightly redundant as Query.setId() ultimately also does the same job.
@@ -18,6 +20,11 @@ class NullExpression extends AbstractExpression {
   NullExpression(String propertyName, boolean notNull) {
     super(propertyName);
     this.notNull = notNull;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+    context.writeExists(notNull, propName);
   }
 
   @Override

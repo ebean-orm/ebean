@@ -4,6 +4,12 @@ import java.util.ArrayList;
 
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.text.PathProperties;
+import com.avaje.ebeaninternal.server.query.SplitName;
+import com.avaje.ebeanservice.docstore.api.mapping.DocMappingBuilder;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyMapping;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
+import com.avaje.ebeanservice.docstore.api.support.DocStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +40,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	IdBinder targetIdBinder;
 
 	InheritInfo targetInheritInfo;
-	
+
 	String targetIdProperty;
 
 	/**
@@ -59,6 +65,8 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	
 	final String mappedBy;
 
+  final String docStoreDoc;
+  
 	final String extraWhere;
 
 	boolean saveRecurseSkippable;
@@ -71,7 +79,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 		this.extraWhere = InternString.intern(deploy.getExtraWhere());
 		this.beanTable = deploy.getBeanTable();
 		this.mappedBy = InternString.intern(deploy.getMappedBy());
-
+    this.docStoreDoc = deploy.getDocStoreDoc();
 		this.tableJoin = new TableJoin(deploy.getTableJoin());
 
 		this.targetType = deploy.getTargetType();
@@ -214,6 +222,63 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	public String getExtraWhere() {
 		return extraWhere;
 	}
+
+  /**
+   * Return the elastic search doc for this embedded property.
+   */
+  public String getDocStoreDoc() {
+    return docStoreDoc;
+  }
+
+  /**
+   * Determine if and how the associated bean is included in the doc store document.
+   */
+  @Override
+  public void docStoreInclude(boolean includeByDefault, DocStructure docStructure) {
+
+    String embeddedDoc = getDocStoreDoc();
+    if (embeddedDoc == null) {
+      // not annotated so use include by default
+      // which is *ToOne included and *ToMany excluded
+      if (includeByDefault) {
+        docStoreIncludeByDefault(docStructure.doc());
+      }
+    } else {
+      // explicitly annotated to be included
+      if (embeddedDoc.isEmpty()) {
+        embeddedDoc = "*";
+      }
+      // add in a nested way
+      PathProperties embDoc = PathProperties.parse(embeddedDoc);
+      docStructure.addNested(name, embDoc);
+    }
+  }
+
+  /**
+   * Include the property in the document store by default.
+   */
+  protected void docStoreIncludeByDefault(PathProperties pathProps) {
+    pathProps.addToPath(null, name);
+  }
+
+  @Override
+  public void docStoreMapping(DocMappingBuilder mapping, String prefix) {
+
+    if (mapping.includesPath(prefix, name)) {
+      String fullName = SplitName.add(prefix, name);
+
+      DocPropertyType type = isMany() ? DocPropertyType.LIST : DocPropertyType.OBJECT;
+      DocPropertyMapping nested = new DocPropertyMapping(name, type);
+
+      mapping.push(nested);
+      targetDescriptor.docStoreMapping(mapping, fullName);
+      mapping.pop();
+
+      if (!nested.getChildren().isEmpty()) {
+        mapping.add(nested);
+      }
+    }
+  }
 
 	/**
 	 * Return true if this association is updateable.

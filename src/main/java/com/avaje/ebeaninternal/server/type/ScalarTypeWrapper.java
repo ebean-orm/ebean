@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.text.json.JsonWriter;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
@@ -191,6 +192,11 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   public void jsonWrite(JsonWriter writer, String name, B beanValue) throws IOException {
     S unwrapValue = converter.unwrapValue(beanValue);
     scalarType.jsonWrite(writer, name, unwrapValue);
+  }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return scalarType.getDocType();
   }
 
 }

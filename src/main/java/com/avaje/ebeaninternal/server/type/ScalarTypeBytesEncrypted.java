@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.text.json.JsonWriter;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
@@ -73,6 +74,11 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
     ByteArrayOutputStream out = new ByteArrayOutputStream(500);
     parser.readBinaryValue(out);
     return out.toByteArray();
+  }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return baseType.getDocType();
   }
 
   public String format(Object v) {

@@ -8,12 +8,13 @@ import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.query.CQuery;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
  * In expression using a sub query.
  */
-class InQueryExpression extends AbstractExpression {
+class InQueryExpression extends AbstractExpression implements UnsupportedDocStoreExpression {
 
   private static final long serialVersionUID = 666990277309851644L;
 
@@ -37,6 +38,11 @@ class InQueryExpression extends AbstractExpression {
     this.not = not;
     this.sql = sql;
     this.bindParams = bindParams;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+    throw new IllegalStateException("Not supported");
   }
 
   @Override

@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -17,7 +16,6 @@ import javax.persistence.OptimisticLockException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * Base class for Handler implementations.
@@ -48,7 +46,10 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
 
   protected String sql;
 
-  protected ArrayList<UpdateGenValue> updateGenValues;
+  /**
+   * The generated value for the @Version property. Must be set after where clause is bound.
+   */
+  protected Object versionValue;
 
   protected DmlHandler(PersistRequestBean<?> persistRequest, boolean emptyStringToNull) {
     this.now = System.currentTimeMillis();
@@ -224,11 +225,8 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * </p>
    */
   @Override
-  public void registerUpdateGenValue(BeanProperty prop, EntityBean bean, Object value) {
-    if (updateGenValues == null) {
-      updateGenValues = new ArrayList<UpdateGenValue>();
-    }
-    updateGenValues.add(new UpdateGenValue(prop, bean, value));
+  public void registerGeneratedVersion(Object versionValue) {
+    this.versionValue = versionValue;
   }
 
   /**
@@ -236,11 +234,8 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * clause has been bound.
    */
   public void setUpdateGenValues() {
-    if (updateGenValues != null) {
-      for (int i = 0; i < updateGenValues.size(); i++) {
-        UpdateGenValue updGenVal = updateGenValues.get(i);
-        updGenVal.setValue();
-      }
+    if (versionValue != null) {
+      persistRequest.setVersionValue(versionValue);
     }
   }
 
@@ -282,30 +277,4 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     return stmt;
   }
 
-  /**
-   * Hold the values from GeneratedValue that need to be set to the bean
-   * property after the where clause has been built.
-   */
-  private static final class UpdateGenValue {
-
-    private final BeanProperty property;
-
-    private final EntityBean bean;
-
-    private final Object value;
-
-    private UpdateGenValue(BeanProperty property, EntityBean bean, Object value) {
-      this.property = property;
-      this.bean = bean;
-      this.value = value;
-    }
-
-    /**
-     * Set the value to the bean property.
-     */
-    private void setValue() {
-      // support PropertyChangeSupport
-      property.setValueIntercept(bean, value);
-    }
-  }
 }

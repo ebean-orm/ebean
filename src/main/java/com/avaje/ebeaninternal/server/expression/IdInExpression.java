@@ -8,6 +8,7 @@ import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -25,6 +26,11 @@ public class IdInExpression extends NonPrepareExpression {
 
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+    context.writeIds(idList);
   }
 
   @Override

@@ -3,12 +3,20 @@ package com.avaje.ebeaninternal.api;
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.expression.ElasticExpressionContext;
+
+import java.io.IOException;
 
 
 /**
  * An expression that becomes part of a Where clause or Having clause.
  */
 public interface SpiExpression extends Expression {
+
+  /**
+   * Write the expression as an elastic search expression.
+   */
+  void writeElastic(ElasticExpressionContext context) throws IOException;
 
   /**
    * Process "Many" properties populating ManyWhereJoins.

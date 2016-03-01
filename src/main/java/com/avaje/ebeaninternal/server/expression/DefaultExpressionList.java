@@ -10,6 +10,7 @@ import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,6 +58,33 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   private DefaultExpressionList() {
     this(null, null, null, new ArrayList<SpiExpression>());
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+    writeElastic(context, null);
+  }
+
+  public void writeElastic(ElasticExpressionContext context, SpiExpression idEquals) throws IOException {
+
+    int size = list.size();
+    if (size == 1 && idEquals == null) {
+      // only 1 expression - skip bool must
+      list.get(0).writeElastic(context);
+    } else if (size == 0 && idEquals != null) {
+      // only idEquals - skip bool must
+      idEquals.writeElastic(context);
+    } else {
+      // bool must wrap all the children
+      context.writeBoolMustStart();
+      if (idEquals != null) {
+        idEquals.writeElastic(context);
+      }
+      for (int i = 0; i < size; i++) {
+        list.get(i).writeElastic(context);
+      }
+      context.writeBoolEnd();
+    }
   }
 
   @Override
@@ -382,7 +410,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       return false;
     }
 
-    DefaultExpressionList<?> that = (DefaultExpressionList<?>)other;
+    DefaultExpressionList<?> that = (DefaultExpressionList<?>) other;
     if (list.size() != that.list.size()) {
       return false;
     }
@@ -396,7 +424,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public boolean isSameByBind(SpiExpression other) {
-    DefaultExpressionList<?> that = (DefaultExpressionList<?>)other;
+    DefaultExpressionList<?> that = (DefaultExpressionList<?>) other;
     if (list.size() != that.list.size()) {
       return false;
     }
@@ -421,16 +449,16 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * Path does not exist - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonNotExists(String propertyName, String path){
+  public ExpressionList<T> jsonNotExists(String propertyName, String path) {
     add(expr.jsonNotExists(propertyName, path));
     return this;
   }
-  
+
   /**
    * Equal to expression for the value at the given path in the JSON document.
    */
   @Override
-  public ExpressionList<T> jsonEqualTo(String propertyName, String path, Object value){
+  public ExpressionList<T> jsonEqualTo(String propertyName, String path, Object value) {
     add(expr.jsonEqualTo(propertyName, path, value));
     return this;
   }
@@ -439,7 +467,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * Not Equal to - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonNotEqualTo(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonNotEqualTo(String propertyName, String path, Object val) {
     add(expr.jsonNotEqualTo(propertyName, path, val));
     return this;
   }
@@ -448,7 +476,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * Greater than - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonGreaterThan(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonGreaterThan(String propertyName, String path, Object val) {
     add(expr.jsonGreaterThan(propertyName, path, val));
     return this;
   }
@@ -457,7 +485,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * Greater than or equal to - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonGreaterOrEqual(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonGreaterOrEqual(String propertyName, String path, Object val) {
     add(expr.jsonGreaterOrEqual(propertyName, path, val));
     return this;
   }
@@ -466,7 +494,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * Less than - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonLessThan(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonLessThan(String propertyName, String path, Object val) {
     add(expr.jsonLessThan(propertyName, path, val));
     return this;
   }
@@ -475,7 +503,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * Less than or equal to - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonLessOrEqualTo(String propertyName, String path, Object val){
+  public ExpressionList<T> jsonLessOrEqualTo(String propertyName, String path, Object val) {
     add(expr.jsonLessOrEqualTo(propertyName, path, val));
     return this;
   }
@@ -484,7 +512,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * Between - for the given path in a JSON document.
    */
   @Override
-  public ExpressionList<T> jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue){
+  public ExpressionList<T> jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue) {
     add(expr.jsonBetween(propertyName, path, lowerValue, upperValue));
     return this;
   }

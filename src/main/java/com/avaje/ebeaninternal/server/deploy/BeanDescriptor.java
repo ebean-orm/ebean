@@ -7,6 +7,7 @@ import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.annotation.ConcurrencyMode;
+import com.avaje.ebean.annotation.DocStoreEvent;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
@@ -28,8 +29,13 @@ import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebean.meta.MetaBeanInfo;
 import com.avaje.ebean.meta.MetaQueryPlanStatistic;
+import com.avaje.ebean.plugin.BeanDocType;
 import com.avaje.ebean.plugin.BeanType;
+import com.avaje.ebean.plugin.ExpressionPath;
+import com.avaje.ebean.plugin.Property;
+import com.avaje.ebean.text.json.JsonReadOptions;
 import com.avaje.ebeaninternal.api.CQueryPlanKey;
+import com.avaje.ebeaninternal.api.LoadContext;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
@@ -60,8 +66,13 @@ import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.util.SortByClause;
-import com.avaje.ebeaninternal.util.SortByClause.Property;
 import com.avaje.ebeaninternal.util.SortByClauseParser;
+import com.avaje.ebeanservice.docstore.api.DocStoreBeanAdapter;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdateContext;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
+import com.avaje.ebeanservice.docstore.api.mapping.DocMappingBuilder;
+import com.avaje.ebeanservice.docstore.api.mapping.DocumentMapping;
+import com.fasterxml.jackson.core.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -240,7 +251,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   private final BeanProperty versionProperty;
   
   private final int versionPropertyIndex;
-  
+
+  private final BeanProperty whenModifiedProperty;
+
+  private final BeanProperty whenCreatedProperty;
+
   /**
    * Properties that are initialised in the constructor need to be 'unloaded' to support partial object queries.
    */
@@ -342,10 +357,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   private final boolean cacheSharableBeans;
 
+  private final String docStoreQueueId;
+
+  private DocumentMapping docMapping;
+
   private final BeanDescriptorDraftHelp<T> draftHelp;
   private final BeanDescriptorCacheHelp<T> cacheHelp;
   private final BeanDescriptorJsonHelp<T> jsonHelp;
-  
+  private final DocStoreBeanAdapter<T> docStoreAdapter;
+
   private final String defaultSelectClause;
   private final LinkedHashSet<String> defaultSelectClauseSet;
 
@@ -440,12 +460,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.derivedTableJoins = listHelper.getTableJoin();
 
     boolean noRelationships = propertiesOne.length + propertiesMany.length == 0;
-    
+
     this.cacheSharableBeans = noRelationships && deploy.getCacheOptions().isReadOnly();
     this.cacheHelp = new BeanDescriptorCacheHelp<T>(this, owner.getCacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
     this.jsonHelp = new BeanDescriptorJsonHelp<T>(this);
     this.draftHelp = new BeanDescriptorDraftHelp<T>(this);
-    
+
+    this.docStoreAdapter = owner.createDocStoreBeanAdapter(this, deploy);
+    this.docStoreQueueId = docStoreAdapter.getQueueId();
+
     // Check if there are no cascade save associated beans ( subject to change
     // in initialiseOther()). Note that if we are in an inheritance hierarchy 
     // then we also need to check every BeanDescriptors in the InheritInfo as 
@@ -459,6 +482,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     
     // object used to handle Id values
     this.idBinder = owner.createIdBinder(idProperty);
+    this.whenModifiedProperty = findWhenModifiedProperty();
+    this.whenCreatedProperty = findWhenCreatedProperty();
 
     // derive the index position of the Id and Version properties
     if (Modifier.isAbstract(beanType.getModifiers())) {
@@ -659,6 +684,17 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
         namedUpdate.initialise(parser);
       }
     }
+    docStoreAdapter.registerPaths();
+  }
+
+  /**
+   * Initialise the document mapping.
+   */
+  public void initialiseDocMapping() {
+    for (int i = 0; i < propertiesMany.length; i++) {
+      propertiesMany[i].initialisePostTarget();
+    }
+    docMapping = docStoreAdapter.createDocMapping();
   }
 
   public void initInheritInfo() {
@@ -866,6 +902,84 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public boolean isInheritanceRoot() {
     return inheritInfo == null || inheritInfo.isRoot();
+  }
+
+  /**
+   * Return true if this type maps to a root type of a doc store document (not embedded or ignored).
+   */
+  @Override
+  public boolean isDocStoreMapped() {
+    return docStoreAdapter.isMapped();
+  }
+
+  /**
+   * Return the queueId used to uniquely identify this type when queuing an index updateAdd.
+   */
+  @Override
+  public String getDocStoreQueueId() {
+    return docStoreQueueId;
+  }
+
+  @Override
+  public DocumentMapping getDocMapping() {
+    return docMapping;
+  }
+
+  /**
+   * Return the doc store helper for this bean type.
+   */
+  @Override
+  public BeanDocType docStore() {
+    return docStoreAdapter;
+  }
+
+  /**
+   * Return doc store adapter for internal use for processing persist requests.
+   */
+  public DocStoreBeanAdapter<T> docStoreAdapter() {
+    return docStoreAdapter;
+  }
+
+  /**
+   * Build the Document mapping recursively with the given prefix relative to the root of the document.
+   */
+  public void docStoreMapping(DocMappingBuilder mapping, String prefix) {
+
+    if (prefix != null && idProperty != null) {
+      // id property not included in the
+      idProperty.docStoreMapping(mapping, prefix);
+    }
+
+    for (BeanProperty prop: propertiesNonTransient) {
+      prop.docStoreMapping(mapping, prefix);
+    }
+  }
+
+  /**
+   * Return the type of DocStoreEvent that should occur for this type of persist request
+   * given the transactions requested mode.
+   */
+  public DocStoreEvent getDocStoreEvent(PersistRequest.Type persistType, DocStoreEvent txnMode) {
+    return docStoreAdapter.getEvent(persistType, txnMode);
+  }
+
+  public void docStoreInsert(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext bulkUpdate) throws IOException {
+    docStoreAdapter.insert(idValue, persistRequest, bulkUpdate);
+  }
+
+  public void docStoreUpdate(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext bulkUpdate) throws IOException {
+    docStoreAdapter.update(idValue, persistRequest, bulkUpdate);
+  }
+
+  /**
+   * Check if this update invalidates an embedded part of a doc store document.
+   */
+  public void docStoreUpdateEmbedded(PersistRequestBean<T> request, DocStoreUpdates docStoreUpdates) {
+    docStoreAdapter.updateEmbedded(request, docStoreUpdates);
+  }
+
+  public void docStoreDeleteById(Object idValue, DocStoreUpdateContext txn) throws IOException {
+    docStoreAdapter.deleteById(idValue, txn);
   }
 
   public T publish(T draftBean, T liveBean) {
@@ -1220,9 +1334,23 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Return the 'when modified' property if there is one defined.
+   */
+  public BeanProperty getWhenModifiedProperty() {
+    return whenModifiedProperty;
+  }
+
+  /**
+   * Return the 'when created' property if there is one defined.
+   */
+  public BeanProperty getWhenCreatedProperty() {
+    return whenCreatedProperty;
+  }
+
+  /**
    * Find a property annotated with @WhenCreated or @CreatedTimestamp.
    */
-  public BeanProperty findWhenCreatedProperty() {
+  private BeanProperty findWhenCreatedProperty() {
 
     for (int i = 0; i < propertiesBaseScalar.length; i++) {
       if (propertiesBaseScalar[i].isGeneratedWhenCreated()) {
@@ -1235,7 +1363,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Find a property annotated with @WhenModified or @UpdatedTimestamp.
    */
-  public BeanProperty findWhenModifiedProperty() {
+  private BeanProperty findWhenModifiedProperty() {
 
     for (int i = 0; i < propertiesBaseScalar.length; i++) {
       if (propertiesBaseScalar[i].isGeneratedWhenModified()) {
@@ -1328,6 +1456,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return namedUpdates.get(name);
   }
 
+  @Override
+  public T createBean() {
+    return (T)createEntityBean();
+  }
+
   /**
    * Creates a new EntityBean.
    */
@@ -1399,6 +1532,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     BeanDescriptor<?> targetDesc = assocProp.getTargetDescriptor();
 
     return targetDesc.getBeanPropertyFromPath(split[1]);
+  }
+
+  @Override
+  public BeanType<?> getBeanTypeAtPath(String path) {
+    return getBeanDescriptor(path);
   }
 
   /**
@@ -1473,6 +1611,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the class type this BeanDescriptor describes.
    */
+  @Override
   public Class<T> getBeanType() {
     return beanType;
   }
@@ -1484,6 +1623,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * instead.
    * </p>
    */
+  @Override
   public String getFullName() {
     return fullName;
   }
@@ -1510,6 +1650,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public Object getId(EntityBean bean) {
     return (idProperty == null) ? null : idProperty.getValue(bean);
+  }
+
+  @Override
+  public Object beanId(Object bean) {
+    return getId((EntityBean) bean);
   }
 
   @Override
@@ -1553,6 +1698,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Set the bean id value converting if necessary.
+   */
+  @Override
+  public void setBeanId(T bean, Object idValue) {
+    idBinder.convertSetId(idValue, (EntityBean) bean);
+  }
+
+  /**
    * Convert and set the id value.
    * <p>
    * If the bean is not null, the id value is set to the id property of the bean
@@ -1561,6 +1714,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public Object convertSetId(Object idValue, EntityBean bean) {
     return idBinder.convertSetId(idValue, bean);
+  }
+
+  @Override
+  public Property getProperty(String propName) {
+    return getBeanProperty(propName);
   }
 
   /**
@@ -1583,6 +1741,27 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       comparatorCache.put(propNameOrSortBy, c);
     }
     return c;
+  }
+
+  /**
+   * Register all the assoc many properties on this bean that are not populated with the load context.
+   * <p>
+   *   This provides further lazy loading via the load context.
+   * </p>
+   */
+  public void lazyLoadRegister(String prefix, EntityBeanIntercept ebi, EntityBean bean, LoadContext loadContext) {
+
+    // load the List/Set/Map proxy objects (deferred fetching of lists)
+    BeanPropertyAssocMany<?>[] manys = propertiesMany();
+    for (int i = 0; i < manys.length; i++) {
+      if (!ebi.isLoadedProperty(manys[i].getPropertyIndex())) {
+        BeanCollection<?> ref = manys[i].createReferenceIfNull(bean);
+        if (ref != null && !ref.isRegisteredWithLoadContext()) {
+          String path = SplitName.add(prefix, manys[i].getName());
+          loadContext.register(path, ref);
+        }
+      }
+    }
   }
 
   /**
@@ -1626,16 +1805,16 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     // create a compound comparator based on the list of properties
     ElComparator<T>[] comparators = new ElComparator[sortBy.size()];
 
-    List<Property> sortProps = sortBy.getProperties();
+    List<SortByClause.Property> sortProps = sortBy.getProperties();
     for (int i = 0; i < sortProps.size(); i++) {
-      Property sortProperty = sortProps.get(i);
+      SortByClause.Property sortProperty = sortProps.get(i);
       comparators[i] = createPropertyComparator(sortProperty);
     }
 
     return new ElComparatorCompound<T>(comparators);
   }
 
-  private ElComparator<T> createPropertyComparator(Property sortProp) {
+  private ElComparator<T> createPropertyComparator(SortByClause.Property sortProp) {
 
     ElPropertyValue elGetValue = getElGetValue(sortProp.getName());
 
@@ -1668,6 +1847,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       elCache.put(propName, elGetValue);
     }
     return elGetValue;
+  }
+
+  @Override
+  public ExpressionPath getExpressionPath(String path) {
+    return getElGetValue(path);
   }
 
   /**
@@ -2130,6 +2314,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return derivedTableJoins;
   }
 
+  @Override
+  public Collection<? extends Property> allProperties() {
+    return propertiesAll();
+  }
+
   /**
    * Return a collection of all BeanProperty. This includes transient properties.
    */
@@ -2168,6 +2357,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     }
   }
 
+  @Override
   public BeanProperty getIdProperty() {
     return idProperty;
   }
@@ -2442,6 +2632,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return propertiesLocal;
   }
 
+  public void jsonWriteDirty(WriteJson writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
+    jsonHelp.jsonWriteDirty(writeJson, bean, dirtyProps);
+  }
+
+  protected void jsonWriteDirtyProperties(WriteJson writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
+    jsonHelp.jsonWriteDirtyProperties(writeJson, bean, dirtyProps);
+  }
+
   public void jsonWrite(WriteJson writeJson, EntityBean bean) throws IOException {
     jsonHelp.jsonWrite(writeJson, bean, null);
   }  
@@ -2460,5 +2658,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   
   protected T jsonReadObject(ReadJson jsonRead, String path) throws IOException {
     return jsonHelp.jsonReadObject(jsonRead, path);
+  }
+
+  @Override
+  public T jsonRead(JsonParser parser, JsonReadOptions readOptions, Object objectMapper) throws IOException {
+    ReadJson jsonRead = new ReadJson(this, parser, readOptions, objectMapper);
+    return jsonRead(jsonRead, null);
   }
 }

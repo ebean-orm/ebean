@@ -1,5 +1,7 @@
 package com.avaje.ebean.text.json;
 
+import com.avaje.ebean.bean.PersistenceContext;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -16,6 +18,10 @@ public class JsonReadOptions {
   protected final Map<String, JsonReadBeanVisitor<?>> visitorMap;
 
   protected Object objectMapper;
+
+  protected boolean enableLazyLoading;
+
+  protected PersistenceContext persistenceContext;
 
   /**
    * Default constructor.
@@ -47,6 +53,25 @@ public class JsonReadOptions {
   }
 
   /**
+   * Return true if lazy loading is enabled after the objects are loaded.
+   */
+  public boolean isEnableLazyLoading() {
+    return enableLazyLoading;
+  }
+
+  /**
+   * Set to true to enable lazy loading on partially populated beans.
+   * <p>
+   *   If this is set to true a persistence context will be created if one has
+   *   not already been supplied.
+   * </p>
+   */
+  public JsonReadOptions setEnableLazyLoading(boolean enableLazyLoading) {
+    this.enableLazyLoading = enableLazyLoading;
+    return this;
+  }
+
+  /**
    * Return the Jackson ObjectMapper to use (if not wanted to use the objectMapper set on the ServerConfig).
    */
   public Object getObjectMapper() {
@@ -56,7 +81,23 @@ public class JsonReadOptions {
   /**
    * Set the Jackson ObjectMapper to use (if not wanted to use the objectMapper set on the ServerConfig).
    */
-  public void setObjectMapper(Object objectMapper) {
+  public JsonReadOptions setObjectMapper(Object objectMapper) {
     this.objectMapper = objectMapper;
+    return this;
+  }
+
+  /**
+   * Set the persistence context to use when building the object graph from the JSON.
+   */
+  public JsonReadOptions setPersistenceContext(PersistenceContext persistenceContext) {
+    this.persistenceContext = persistenceContext;
+    return this;
+  }
+
+  /**
+   * Return the persistence context to use when marshalling JSON.
+   */
+  public PersistenceContext getPersistenceContext() {
+    return persistenceContext;
   }
 }

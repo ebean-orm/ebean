@@ -220,6 +220,18 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
+   * Check each property to see if the bean is partially loaded.
+   */
+  public boolean isPartial() {
+    for (int i = 0; i < loadedProps.length; i++) {
+      if (!loadedProps[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Return true if this bean has been directly modified (it has oldValues) or
    * if any embedded beans are either new or dirty (and hence need saving).
    */
@@ -469,7 +481,7 @@ public final class EntityBeanIntercept implements Serializable {
   public void setLoadedProperty(int propertyIndex) {
     loadedProps[propertyIndex] = true;
   }
-  
+
   /**
    * Return true if the property is loaded.
    */
@@ -558,6 +570,23 @@ public final class EntityBeanIntercept implements Serializable {
       }
     }
     return props;
+  }
+
+  /**
+   * Return the array of flags indicating the dirty properties.
+   */
+  public boolean[] getDirtyProperties() {
+    int len = getPropertyLength();
+    boolean[] dirties = new boolean[len];
+    for (int i = 0; i < len; i++) {
+      if (changedProps != null && changedProps[i]) {
+        dirties[i] = true;
+      } else if (embeddedDirty != null && embeddedDirty[i]) {
+        // an embedded property has been changed - recurse
+        dirties[i] = true;
+      }
+    }
+    return dirties;
   }
 
   /**

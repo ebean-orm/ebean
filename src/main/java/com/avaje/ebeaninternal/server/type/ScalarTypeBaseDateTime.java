@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.config.JsonConfig;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.json.JsonWriter;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -120,6 +121,11 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
         writer.gen().writeNumberField(name, convertToMillis(value));
       }
     }
+  }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.DATETIME;
   }
 
   public String formatValue(T t) {

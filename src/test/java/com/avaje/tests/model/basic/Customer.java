@@ -4,6 +4,8 @@ import com.avaje.ebean.annotation.ChangeLog;
 import com.avaje.ebean.annotation.ChangeLogInsertMode;
 import com.avaje.ebean.annotation.DbComment;
 import com.avaje.ebean.annotation.DbEnumValue;
+import com.avaje.ebean.annotation.DocStoreEmbedded;
+import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.JsonIgnore;
 import com.avaje.ebean.annotation.Where;
 import com.avaje.tests.model.basic.finder.CustomerFinder;
@@ -24,6 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Customer entity bean.
  */
+@DocStore
 @ChangeLog(inserts = ChangeLogInsertMode.EXCLUDE, updatesThatInclude = {"name","status"})
 @Entity
 @Table(name = "o_customer")
@@ -77,9 +80,11 @@ public class Customer extends BasicDomain {
   @NotNull(groups = { ValidationGroupSomething.class })
   Date anniversary;
 
+  @DocStoreEmbedded(doc="*,country(*)")
   @ManyToOne(cascade = CascadeType.ALL)
   Address billingAddress;
 
+  @DocStoreEmbedded(doc="*,country(*)")
   @ManyToOne(cascade = CascadeType.ALL)
   Address shippingAddress;
 

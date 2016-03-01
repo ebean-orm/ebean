@@ -8,6 +8,8 @@ import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
+import java.io.IOException;
+
 /**
  * Effectively an expression that has no effect.
  */
@@ -18,6 +20,10 @@ class NoopExpression implements SpiExpression {
   @Override
   public SpiExpression copyForPlanKey() {
     return this;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
   }
 
   @Override

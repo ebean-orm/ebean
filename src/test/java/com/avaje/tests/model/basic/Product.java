@@ -11,99 +11,101 @@ import javax.validation.constraints.Size;
 
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.DocStore;
 
 /**
  * Product entity bean.
  */
-@CacheStrategy(warmingQuery="order by name")
+@DocStore
+@CacheStrategy(warmingQuery = "order by name")
 @Entity
-@Table(name="o_product")
+@Table(name = "o_product")
 public class Product implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    @Id
-    Integer id;
+  @Id
+  Integer id;
 
-    @Size(max=20)
-    String sku;
+  @Size(max = 20)
+  String sku;
 
-    String name;
+  String name;
 
-    @CreatedTimestamp
-    Timestamp cretime;
+  @CreatedTimestamp
+  Timestamp cretime;
 
-    @Version
-    Timestamp updtime;
+  @Version
+  Timestamp updtime;
 
-    /**
-     * Return id.
-     */    
-    public Integer getId() {
-  	    return id;
-    }
+  /**
+   * Return id.
+   */
+  public Integer getId() {
+    return id;
+  }
 
-    /**
-     * Set id.
-     */    
-    public void setId(Integer id) {
-  	    this.id = id;
-    }
+  /**
+   * Set id.
+   */
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-    /**
-     * Return sku.
-     */    
-    public String getSku() {
-  	    return sku;
-    }
+  /**
+   * Return sku.
+   */
+  public String getSku() {
+    return sku;
+  }
 
-    /**
-     * Set sku.
-     */    
-    public void setSku(String sku) {
-  	    this.sku = sku;
-    }
+  /**
+   * Set sku.
+   */
+  public void setSku(String sku) {
+    this.sku = sku;
+  }
 
-    /**
-     * Return name.
-     */    
-    public String getName() {
-  	    return name;
-    }
+  /**
+   * Return name.
+   */
+  public String getName() {
+    return name;
+  }
 
-    /**
-     * Set name.
-     */    
-    public void setName(String name) {
-  	    this.name = name;
-    }
+  /**
+   * Set name.
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    /**
-     * Return cretime.
-     */    
-    public Timestamp getCretime() {
-  	    return cretime;
-    }
+  /**
+   * Return cretime.
+   */
+  public Timestamp getCretime() {
+    return cretime;
+  }
 
-    /**
-     * Set cretime.
-     */    
-    public void setCretime(Timestamp cretime) {
-  	    this.cretime = cretime;
-    }
+  /**
+   * Set cretime.
+   */
+  public void setCretime(Timestamp cretime) {
+    this.cretime = cretime;
+  }
 
-    /**
-     * Return updtime.
-     */    
-    public Timestamp getUpdtime() {
-  	    return updtime;
-    }
+  /**
+   * Return updtime.
+   */
+  public Timestamp getUpdtime() {
+    return updtime;
+  }
 
-    /**
-     * Set updtime.
-     */    
-    public void setUpdtime(Timestamp updtime) {
-  	    this.updtime = updtime;
-    }
-    
+  /**
+   * Set updtime.
+   */
+  public void setUpdtime(Timestamp updtime) {
+    this.updtime = updtime;
+  }
+
 }

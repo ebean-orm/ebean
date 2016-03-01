@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.JsonWriter;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
@@ -94,4 +95,10 @@ public class ScalarTypeShort extends ScalarTypeBase<Short> {
   public void jsonWrite(JsonWriter writer, String name, Short value) throws IOException {
     writer.writeNumberField(name, value);
   }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.SHORT;
+  }
+
 }

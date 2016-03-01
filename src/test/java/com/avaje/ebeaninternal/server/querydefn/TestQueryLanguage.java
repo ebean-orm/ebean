@@ -2,7 +2,8 @@ package com.avaje.ebeaninternal.server.querydefn;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.EbeanServer;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.expression.DefaultExpressionFactory;
 import com.avaje.tests.model.basic.Order;
 import org.junit.Assert;
@@ -81,11 +82,13 @@ public class TestQueryLanguage extends BaseTestCase {
 
   private DefaultOrmQuery<Order> check(String q) {
 
-    EbeanServer server = Ebean.getServer(null);
+    SpiEbeanServer server = (SpiEbeanServer)Ebean.getServer(null);
 
     OrmQueryDetailParser p = new OrmQueryDetailParser(q);
     p.parse();
-    DefaultOrmQuery<Order> qry = new DefaultOrmQuery<Order>(Order.class, server,
+
+    BeanDescriptor<Order> desc = server.getBeanDescriptor(Order.class);
+    DefaultOrmQuery<Order> qry = new DefaultOrmQuery<Order>(desc, server,
         new DefaultExpressionFactory(false), (String) null);
     p.assign(qry);
 

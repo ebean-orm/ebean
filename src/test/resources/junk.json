@@ -1,20 +1,22 @@
 {
-  "txnId": "ABCD",
-  "txnState": "C",
-  "txnBatch": 0,
-  "txnPosition": 0,
-  "userId": "user234",
-  "userIpAddress": "123.4.5.6",
-  "object": "mytable",
-  "objectId": "11",
-  "change": "I",
-  "eventTime": 1440465178268,
-  "values": {
-    "name": {
-      "new": "rob"
-    },
-    "modified": {
-      "new": 1440465178267
+  "fields": [
+    "status",
+    "customer.name",
+    "details.product.id"
+  ],
+  "query": {
+    "filtered": {
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "match": {
+                "customer.name": "Rob"
+              }
+            }
+          ]
+        }
+      }
     }
   }
 }

@@ -9,6 +9,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebeanservice.docstore.api.support.DocStoreDeleteEvent;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
+
 /**
  * Beans deleted by Id used for updating L2 Cache.
  */
@@ -72,5 +76,28 @@ public final class DeleteByIdMap {
     return r;
   }
 
-
+  /**
+   * Add the deletes to the DocStoreUpdates.
+   */
+  public void addDocStoreUpdates(DocStoreUpdates docStoreUpdates, DocStoreEvent txnIndexMode) {
+    for (BeanPersistIds deleteIds : beanMap.values()) {
+      BeanDescriptor<?> desc = deleteIds.getBeanDescriptor();
+      DocStoreEvent docStoreEvent = desc.getDocStoreEvent(PersistRequest.Type.DELETE, txnIndexMode);
+      if (DocStoreEvent.IGNORE != docStoreEvent) {
+        // Add to queue or bulk update entries
+        boolean queue = (DocStoreEvent.QUEUE == docStoreEvent);
+        String queueId = desc.getDocStoreQueueId();
+        List<Serializable> idValues = deleteIds.getDeleteIds();
+        if (idValues != null) {
+          for (int i = 0; i < idValues.size(); i++) {
+            if (queue) {
+              docStoreUpdates.queueDelete(queueId, idValues.get(i));
+            } else {
+              docStoreUpdates.addDelete(new DocStoreDeleteEvent(desc, idValues.get(i)));
+            }
+          }
+        }
+      }
+    }
+  }
 }

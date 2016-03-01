@@ -5,6 +5,8 @@ import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
+import java.io.IOException;
+
 class CaseInsensitiveEqualExpression extends AbstractExpression {
 
   private static final long serialVersionUID = -6406036750998971064L;
@@ -14,6 +16,21 @@ class CaseInsensitiveEqualExpression extends AbstractExpression {
   CaseInsensitiveEqualExpression(String propertyName, String value) {
     super(propertyName);
     this.value = value.toLowerCase();
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+
+    String[] values = value.split(" ");
+    if (values.length == 1) {
+      context.writeMatch(propName, value);
+    } else {
+      context.writeBoolStart(true);
+      for (String val : values) {
+        context.writeMatch(propName, val);
+      }
+      context.writeBoolEnd();
+    }
   }
 
   @Override

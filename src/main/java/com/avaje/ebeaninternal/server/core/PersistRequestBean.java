@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.annotation.ConcurrencyMode;
+import com.avaje.ebean.annotation.DocStoreEvent;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.event.BeanPersistController;
@@ -19,9 +20,13 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
 import com.avaje.ebeaninternal.server.persist.PersistExecute;
 import com.avaje.ebeaninternal.server.transaction.BeanPersistIdMap;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdateContext;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdate;
 
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +35,7 @@ import java.util.Set;
 /**
  * PersistRequest for insert update or delete of a bean.
  */
-public final class PersistRequestBean<T> extends PersistRequest implements BeanPersistRequest<T> {
+public final class PersistRequestBean<T> extends PersistRequest implements BeanPersistRequest<T>, DocStoreUpdate {
 
   private final BeanManager<T> beanManager;
 
@@ -63,6 +68,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private final boolean dirty;
 
   private final boolean publish;
+
+  private DocStoreEvent docStoreEvent;
 
   private ConcurrencyMode concurrencyMode;
 
@@ -103,6 +110,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private Set<String> updatedProperties;
 
   /**
+   * Flags indicating the dirty properties on the bean.
+   */
+  private boolean[] dirtyProperties;
+
+  /**
    * Flag set when request is added to JDBC batch.
    */
   private boolean batched;
@@ -135,7 +147,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     this.parentBean = parentBean;
     this.controller = beanDescriptor.getPersistController();
     this.type = type;
-
+    this.docStoreEvent = calcDocStoreEvent(transaction, type);
     if (saveRecurse) {
       this.persistCascade = t.isPersistCascade();
     }
@@ -155,6 +167,17 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       beanDescriptor.setDraftDirty(entityBean, true);
     }
     this.dirty = intercept.isDirty();
+  }
+
+  /**
+   * Return the document store event that should be used for this request.
+   *
+   * Used to check if the Transaction has set the mode to IGNORE when doing large batch inserts that we
+   * don't want to send to the doc store.
+   */
+  private DocStoreEvent calcDocStoreEvent(SpiTransaction txn, Type type) {
+    DocStoreEvent docStoreEvent = (txn == null) ? null : txn.getDocStoreUpdateMode();
+    return beanDescriptor.getDocStoreEvent(type, docStoreEvent);
   }
 
   /**
@@ -178,7 +201,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Init the transaction and also check for batch on cascade escalation.
    */
   public void initTransIfRequiredWithBatchCascade() {
-    createImplicitTransIfRequired();
+
+    if (createImplicitTransIfRequired()) {
+      docStoreEvent = calcDocStoreEvent(transaction, type);
+    }
     if (transaction.checkBatchEscalationOnCascade(this)) {
       // we escalated to use batch mode so flush when done
       // but if createdTransaction then commit will flush it
@@ -240,11 +266,31 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
+   * Return the dirty properties on this request.
+   */
+  public boolean[] getDirtyProperties() {
+    return dirtyProperties;
+  }
+
+  /**
    * Return true if any of the given property names are dirty.
    */
   @Override
   public boolean hasDirtyProperty(Set<String> propertyNames) {
     return intercept.hasDirtyProperty(propertyNames);
+  }
+
+  /**
+   * Return true if any of the given properties are dirty.
+   */
+  public boolean hasDirtyProperty(int[] propertyPositions) {
+
+    for (int i = 0; i < propertyPositions.length; i++) {
+      if (dirtyProperties[propertyPositions[i]]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -254,7 +300,16 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   public boolean isNotify() {
     this.notifyCache = beanDescriptor.isCacheNotify(publish);
-    return notifyCache || isNotifyPersistListener();
+    return notifyCache || isNotifyPersistListener() || isDocStoreNotify();
+  }
+
+  /**
+   * Return true if this request should updateAdd an ElasticSearch index
+   * by queuing an event or direct updateAdd (via Bulk API).
+   */
+  private boolean isDocStoreNotify() {
+    // Either queue or directly update the document store
+    return docStoreEvent != DocStoreEvent.IGNORE;
   }
 
   public boolean isNotifyPersistListener() {
@@ -280,6 +335,45 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         default:
           throw new IllegalStateException("Invalid type " + type);
       }
+    }
+  }
+
+  /**
+   * Process the persist request updating the document store.
+   */
+  public void docStoreUpdate(DocStoreUpdateContext txn) throws IOException {
+
+    switch (type) {
+      case INSERT:
+        beanDescriptor.docStoreInsert(idValue, this, txn);
+        break;
+      case UPDATE:
+        beanDescriptor.docStoreUpdate(idValue, this, txn);
+        break;
+      case DELETE:
+        beanDescriptor.docStoreDeleteById(idValue, txn);
+        break;
+      default:
+        throw new IllegalStateException("Invalid type " + type);
+    }
+  }
+
+  /**
+   * Add this event to the queue entries in IndexUpdates.
+   */
+  public void addToQueue(DocStoreUpdates docStoreUpdates) {
+    switch (type) {
+      case INSERT:
+        docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
+        break;
+      case UPDATE:
+        docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
+        break;
+      case DELETE:
+        docStoreUpdates.queueDelete(beanDescriptor.getDocStoreQueueId(), idValue);
+        break;
+      default:
+        throw new IllegalStateException("Invalid type " + type);
     }
   }
 
@@ -637,6 +731,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       controllerPost();
     }
 
+    if (type == Type.UPDATE && docStoreEvent == DocStoreEvent.UPDATE) {
+      // get the dirty properties for update notification to the doc store
+      dirtyProperties = intercept.getDirtyProperties();
+    }
     // if bean persisted again then should result in an update
     intercept.setLoaded();
     if (isInsert()) {
@@ -806,6 +904,29 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return updatedManysOnly;
   }
 
+  /**
+   * For requests that update document store add this event to either the list
+   * of queue events or list of update events.
+   */
+  public void addDocStoreUpdates(DocStoreUpdates docStoreUpdates) {
+
+    if (type == Type.UPDATE) {
+      beanDescriptor.docStoreUpdateEmbedded(this, docStoreUpdates);
+    }
+    switch (docStoreEvent) {
+      case UPDATE: {
+        docStoreUpdates.addPersist(this);
+        return;
+      }
+      case QUEUE: {
+        if (type == Type.DELETE) {
+          docStoreUpdates.queueDelete(beanDescriptor.getDocStoreQueueId(), idValue);
+        } else {
+          docStoreUpdates.queueIndex(beanDescriptor.getDocStoreQueueId(), idValue);
+        }
+      }
+    }
+  }
 
   /**
    * Determine if all loaded properties should be used for an update.
@@ -872,6 +993,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public boolean isSoftDelete() {
     return Type.SOFT_DELETE == type;
+  }
+
+  /**
+   * Set the value of the Version property on the bean.
+   */
+  public void setVersionValue(Object versionValue) {
+    beanDescriptor.getVersionProperty().setValueIntercept(entityBean, versionValue);
   }
 
 }

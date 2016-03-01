@@ -45,7 +45,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
 
   protected void configureQuery(SpiQuery<?> query, String lazyLoadProperty) {
 
-    parent.propagateQueryState(query);
+    parent.propagateQueryState(query, desc.isDocStoreMapped());
     query.setParentNode(objectGraphNode);
     query.setLazyLoadProperty(lazyLoadProperty);
     if (queryProps != null) {

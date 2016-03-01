@@ -9,6 +9,8 @@ import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
+import java.io.IOException;
+
 final class NotExpression implements SpiExpression {
 
   private static final long serialVersionUID = 5648926732402355781L;
@@ -20,6 +22,13 @@ final class NotExpression implements SpiExpression {
 
   NotExpression(Expression exp) {
     this.exp = (SpiExpression) exp;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+    context.writeBoolMustNotStart();
+    exp.writeElastic(context);
+    context.writeBoolEnd();
   }
 
   @Override

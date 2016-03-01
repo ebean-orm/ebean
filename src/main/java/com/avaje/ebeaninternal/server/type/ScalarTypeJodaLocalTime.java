@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.json.JsonWriter;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 import com.fasterxml.jackson.core.JsonParser;
@@ -84,6 +85,11 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
       String string = parser.getValueAsString();
       throw new RuntimeException("convert " + string);
     }
+  }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.STRING;
   }
 
   @Override

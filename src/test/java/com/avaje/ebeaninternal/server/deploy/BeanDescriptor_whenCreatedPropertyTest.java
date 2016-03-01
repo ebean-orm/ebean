@@ -21,15 +21,15 @@ public class BeanDescriptor_whenCreatedPropertyTest extends BaseTestCase {
 
     BeanDescriptor<Customer> desc = server.getBeanDescriptor(Customer.class);
 
-    BeanProperty whenCreatedProperty = desc.findWhenCreatedProperty();
+    BeanProperty whenCreatedProperty = desc.getWhenCreatedProperty();
     assertEquals("cretime",whenCreatedProperty.getDbColumn());
 
-    BeanProperty whenModifiedProperty = desc.findWhenModifiedProperty();
+    BeanProperty whenModifiedProperty = desc.getWhenModifiedProperty();
     assertEquals("updtime",whenModifiedProperty.getDbColumn());
 
 
     BeanDescriptor<EBasic> eBasicDesc = server.getBeanDescriptor(EBasic.class);
-    assertNull(eBasicDesc.findWhenCreatedProperty());
-    assertNull(eBasicDesc.findWhenModifiedProperty());
+    assertNull(eBasicDesc.getWhenCreatedProperty());
+    assertNull(eBasicDesc.getWhenModifiedProperty());
   }
 }

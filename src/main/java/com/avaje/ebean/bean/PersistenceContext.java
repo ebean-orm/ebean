@@ -10,12 +10,12 @@ package com.avaje.ebean.bean;
 public interface PersistenceContext {
 
   /**
-   * Put the entity bean into the PersistanceContext.
+   * Put the entity bean into the PersistenceContext.
    */
   void put(Object id, Object bean);
 
   /**
-   * Put the entity bean into the PersistanceContext if one is not already
+   * Put the entity bean into the PersistenceContext if one is not already
    * present (for this id).
    * <p>
    * Returns an existing entity bean (if one is already there) and otherwise

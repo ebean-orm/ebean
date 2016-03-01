@@ -8,6 +8,7 @@ import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,6 +25,22 @@ class AllEqualsExpression extends NonPrepareExpression {
 
   protected String name(String propName) {
     return propName;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+
+    context.writeBoolMustStart();
+    for (Map.Entry<String, Object> entry : propMap.entrySet()) {
+      Object value = entry.getValue();
+      String propName = entry.getKey();
+      if (value == null) {
+        context.writeExists(false, propName);
+      } else {
+        context.writeTerm(propName, value);
+      }
+    }
+    context.writeBoolEnd();
   }
 
   @Override

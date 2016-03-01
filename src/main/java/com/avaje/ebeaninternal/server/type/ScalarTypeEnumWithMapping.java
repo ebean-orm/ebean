@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
+
 import java.sql.SQLException;
 import java.util.Iterator;
 
@@ -80,6 +82,11 @@ public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase i
 
   public Object toJdbcType(Object beanValue) {
     return beanDbMap.getDbValue(beanValue);
+  }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.STRING;
   }
 
 }

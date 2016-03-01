@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
@@ -20,6 +21,8 @@ public abstract class EnumToDbValueMap<T> {
   final LinkedHashMap<Object, T> keyMap;
 
   final LinkedHashMap<T, Object> valueMap;
+
+  final HashMap<Object, Object> nameMap;
 
   final boolean allowNulls;
 
@@ -43,8 +46,9 @@ public abstract class EnumToDbValueMap<T> {
   public EnumToDbValueMap(boolean allowNulls, boolean isIntegerType) {
     this.allowNulls = allowNulls;
     this.isIntegerType = isIntegerType;
-    keyMap = new LinkedHashMap<Object, T>();
-    valueMap = new LinkedHashMap<T, Object>();
+    this.keyMap = new LinkedHashMap<Object, T>();
+    this.valueMap = new LinkedHashMap<T, Object>();
+    this.nameMap = new HashMap<Object, Object>();
   }
 
   /**
@@ -81,7 +85,7 @@ public abstract class EnumToDbValueMap<T> {
    * Add name value pair where the dbValue is the raw string and may need to
    * be converted (to an Integer for example).
    */
-  public abstract EnumToDbValueMap<T> add(Object beanValue, String dbValue);
+  public abstract EnumToDbValueMap<T> add(Object beanValue, String dbValue, String name);
 
   /**
    * Add a bean value and DB value pair.
@@ -89,10 +93,11 @@ public abstract class EnumToDbValueMap<T> {
    * The dbValue will be converted to an Integer if isIntegerType is true;
    * </p>
    */
-  protected void addInternal(Object beanValue, T dbValue) {
+  protected void addInternal(Object beanValue, T dbValue, String name) {
 
     keyMap.put(beanValue, dbValue);
     valueMap.put(dbValue, beanValue);
+    nameMap.put(name, beanValue);
   }
 
   /**
@@ -118,6 +123,9 @@ public abstract class EnumToDbValueMap<T> {
       return null;
     }
     Object beanValue = valueMap.get(dbValue);
+    if (beanValue == null) {
+      beanValue = nameMap.get(dbValue);
+    }
     if (beanValue == null && !allowNulls) {
       String msg = "Bean value for " + dbValue + " not found in " + valueMap;
       throw new IllegalArgumentException(msg);

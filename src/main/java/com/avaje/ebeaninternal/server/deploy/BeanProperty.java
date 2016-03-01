@@ -5,6 +5,10 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebeaninternal.server.type.ScalarTypeEnum;
+import com.avaje.ebeanservice.docstore.api.mapping.DocMappingBuilder;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyMapping;
+import com.avaje.ebean.plugin.Property;
 import com.avaje.ebean.text.StringParser;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
@@ -24,6 +28,9 @@ import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.ScalarTypeBoolean;
 import com.avaje.ebeaninternal.util.ValueUtil;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyOptions;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
+import com.avaje.ebeanservice.docstore.api.support.DocStructure;
 import com.fasterxml.jackson.core.JsonToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +49,7 @@ import java.util.Map;
  * Description of a property of a bean. Includes its deployment information such
  * as database column mapping information.
  */
-public class BeanProperty implements ElPropertyValue {
+public class BeanProperty implements ElPropertyValue, Property {
 
   private static final Logger logger = LoggerFactory.getLogger(BeanProperty.class);
 
@@ -196,6 +203,8 @@ public class BeanProperty implements ElPropertyValue {
   @SuppressWarnings("rawtypes")
   final ScalarType scalarType;
 
+  final DocPropertyOptions docOptions;
+
   /**
    * The length or precision for DB column.
    */
@@ -313,6 +322,7 @@ public class BeanProperty implements ElPropertyValue {
     this.lob = isLobType(dbType);
     this.propertyType = deploy.getPropertyType();
     this.field = deploy.getField();
+    this.docOptions = deploy.getDocPropertyOptions();
 
     this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), false, null);
     this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), dbEncrypted, dbColumn);
@@ -414,6 +424,7 @@ public class BeanProperty implements ElPropertyValue {
     this.lob = isLobType(dbType);
     this.propertyType = source.getPropertyType();
     this.field = source.getField();
+    this.docOptions = source.docOptions;
 
     this.elPlaceHolder = override.replace(source.elPlaceHolder, source.dbColumn);
     this.elPlaceHolderEncrypted = override.replace(source.elPlaceHolderEncrypted, source.dbColumn);
@@ -557,6 +568,11 @@ public class BeanProperty implements ElPropertyValue {
     }
   }
 
+  @Override
+  public boolean isMany() {
+    return false;
+  }
+
   public boolean isAssignableFrom(Class<?> type) {
     return owningType.isAssignableFrom(type);
   }
@@ -671,6 +687,15 @@ public class BeanProperty implements ElPropertyValue {
   }
 
   /**
+   * Set the changed value without invoking interception (lazy loading etc).
+   * Typically used to set generated values on update.
+   */
+  public void setValueChanged(EntityBean bean, Object value) {
+    setValue(bean, value);
+    bean._ebean_getIntercept().setChangedProperty(propertyIndex);
+  }
+
+  /**
    * Set the value of the property without interception or
    * PropertyChangeSupport.
    */
@@ -716,6 +741,10 @@ public class BeanProperty implements ElPropertyValue {
     throw new RuntimeException("Expected to be called only on BeanPropertyCompoundScalar");
   }
 
+  public Object getVal(Object bean) {
+    return getValue((EntityBean)bean);
+  }
+
   /**
    * Return the value of the property method.
    */
@@ -744,6 +773,14 @@ public class BeanProperty implements ElPropertyValue {
       return null;
     }
     return convertToLogicalType(value);
+  }
+
+  @Override
+  public void set(Object bean, Object value) {
+
+    // convert for Enums etc
+    Object logicalVal = convertToLogicalType(value);
+    elSetValue((EntityBean) bean, logicalVal, true);
   }
 
   public void elSetValue(EntityBean bean, Object value, boolean populate) {
@@ -1187,6 +1224,14 @@ public class BeanProperty implements ElPropertyValue {
     return name;
   }
 
+  /**
+   * Append this property to the document store based on includeByDefault setting.
+   */
+  public void docStoreInclude(boolean includeByDefault, DocStructure docStructure) {
+    if (includeByDefault) {
+      docStructure.addProperty(name);
+    }
+  }
 
   @SuppressWarnings(value = "unchecked")
   public void jsonWrite(WriteJson writeJson, EntityBean bean) throws IOException {
@@ -1262,5 +1307,29 @@ public class BeanProperty implements ElPropertyValue {
       String propName = (prefix == null) ? name : prefix + "." + name;
       map.put(propName, new ValuePair(newVal, oldVal));
     }
+  }
+
+  /**
+   * Add to the document mapping if this property is included for this index.
+   */
+  public void docStoreMapping(DocMappingBuilder mapping, String prefix) {
+
+    if (mapping.includesProperty(prefix, name)) {
+
+      DocPropertyType type = scalarType.getDocType();
+      DocPropertyOptions options = docOptions.copy();
+      if (DocPropertyType.STRING == type && isDocCode()) {
+        options.setCode(true);
+      }
+
+      mapping.add(new DocPropertyMapping(name, type, options));
+    }
+  }
+
+  /**
+   * Return true if this should be treated as a 'code' (effectively not analysed).
+   */
+  private boolean isDocCode() {
+    return id || scalarType instanceof ScalarTypeEnum;
   }
 }

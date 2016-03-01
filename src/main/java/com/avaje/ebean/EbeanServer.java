@@ -1892,6 +1892,11 @@ public interface EbeanServer {
   JsonContext json();
 
   /**
+   * Return the Document store.
+   */
+  DocumentStore docStore();
+
+  /**
    * Publish a single bean given its type and id returning the resulting live bean.
    * <p>
    * The values are published from the draft to the live bean.

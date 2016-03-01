@@ -6,6 +6,7 @@ import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
+import java.io.IOException;
 import java.util.Collection;
 
 class InExpression extends AbstractExpression {
@@ -26,6 +27,11 @@ class InExpression extends AbstractExpression {
     super(propertyName);
     this.values = array;
     this.not = not;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+    context.writeTerms(propName, values);
   }
 
   @Override

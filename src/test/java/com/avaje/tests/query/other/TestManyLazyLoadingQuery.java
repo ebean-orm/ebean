@@ -52,7 +52,7 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
       
       query0.setLazyLoadForParents(beanProperty);
       
-      beanProperty.addWhereParentIdIn(query0, parentIds);
+      beanProperty.addWhereParentIdIn(query0, parentIds, false);
       
       query0.findList();
 

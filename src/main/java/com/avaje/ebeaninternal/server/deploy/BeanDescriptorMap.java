@@ -4,6 +4,8 @@ import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
+import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+import com.avaje.ebeanservice.docstore.api.DocStoreBeanAdapter;
 
 /**
  * Provides a method to find a BeanDescriptor.
@@ -38,6 +40,13 @@ public interface BeanDescriptorMap {
    */
   EncryptKey getEncryptKey(String tableName, String columnName);
 
+  /**
+   * Create a IdBinder for this bean property.
+   */
   IdBinder createIdBinder(BeanProperty id);
 
+  /**
+   * Create a doc store specific adapter for this bean type.
+   */
+  <T> DocStoreBeanAdapter<T> createDocStoreBeanAdapter(BeanDescriptor descriptor, DeployBeanDescriptor<T> deploy);
 }

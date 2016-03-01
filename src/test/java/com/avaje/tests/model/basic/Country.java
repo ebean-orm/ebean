@@ -4,6 +4,7 @@ import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.CacheTuning;
 import com.avaje.ebean.annotation.ChangeLog;
 import com.avaje.ebean.annotation.ChangeLogInsertMode;
+import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.ReadAudit;
 
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import javax.validation.constraints.Size;
 /**
  * Country entity bean.
  */
+@DocStore
 @ReadAudit
 @ChangeLog(inserts = ChangeLogInsertMode.INCLUDE)
 @CacheStrategy(readOnly = true, warmingQuery = "order by name")

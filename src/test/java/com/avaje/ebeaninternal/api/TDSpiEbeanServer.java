@@ -8,17 +8,14 @@ import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebean.dbmigration.DdlGenerator;
 import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
-import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.query.CQuery;
-import com.avaje.ebeaninternal.server.query.CQueryEngine;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
 import javax.persistence.OptimisticLockException;
@@ -83,6 +80,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public DocumentStore docStore() {
+    return null;
+  }
+
+  @Override
   public ReadAuditLogger getReadAuditLogger() {
     return null;
   }
@@ -95,6 +97,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public void clearQueryStatistics() {
 
+  }
+
+  @Override
+  public BeanDescriptor<?> getBeanDescriptorByQueueId(String queueId) {
+    return null;
   }
 
   @Override

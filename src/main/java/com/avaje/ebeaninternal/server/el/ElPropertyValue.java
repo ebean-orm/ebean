@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.el;
 
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.plugin.ExpressionPath;
 import com.avaje.ebean.text.StringParser;
 
 /**
@@ -9,7 +10,7 @@ import com.avaje.ebean.text.StringParser;
  * This can be used for local sorting and filtering.
  * </p>
  */
-public interface ElPropertyValue extends ElPropertyDeploy {
+public interface ElPropertyValue extends ElPropertyDeploy, ExpressionPath {
 
   /**
    * Return the Id values for the given bean value.

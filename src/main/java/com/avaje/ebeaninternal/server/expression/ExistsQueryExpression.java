@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.expression;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.avaje.ebean.event.BeanQueryRequest;
@@ -13,7 +14,7 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.query.CQuery;
 
-public class ExistsExpression implements SpiExpression {
+class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpression {
 
   private static final long serialVersionUID = 666990277309851644L;
 
@@ -25,16 +26,21 @@ public class ExistsExpression implements SpiExpression {
 
   protected String sql;
 
-  public ExistsExpression(SpiQuery<?> subQuery, boolean not) {
+  public ExistsQueryExpression(SpiQuery<?> subQuery, boolean not) {
     this.subQuery = subQuery;
     this.not = not;
   }
 
-  ExistsExpression(boolean not, String sql , List<Object> bindParams) {
+  ExistsQueryExpression(boolean not, String sql , List<Object> bindParams) {
     this.not = not;
     this.sql = sql;
     this.bindParams = bindParams;
     this.subQuery = null;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+    throw new IllegalStateException("Not supported");
   }
 
   @Override
@@ -60,7 +66,7 @@ public class ExistsExpression implements SpiExpression {
 
   @Override
   public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(ExistsExpression.class).add(not);
+    builder.add(ExistsQueryExpression.class).add(not);
     builder.add(sql).add(bindParams.size());
   }
 
@@ -90,11 +96,11 @@ public class ExistsExpression implements SpiExpression {
 
   @Override
   public boolean isSameByPlan(SpiExpression other) {
-    if (!(other instanceof ExistsExpression)) {
+    if (!(other instanceof ExistsQueryExpression)) {
       return false;
     }
 
-    ExistsExpression that = (ExistsExpression) other;
+    ExistsQueryExpression that = (ExistsQueryExpression) other;
     return this.sql.equals(that.sql)
         && this.not == that.not
         && this.bindParams.size() == that.bindParams.size();
@@ -102,7 +108,7 @@ public class ExistsExpression implements SpiExpression {
 
   @Override
   public boolean isSameByBind(SpiExpression other) {
-    ExistsExpression that = (ExistsExpression) other;
+    ExistsQueryExpression that = (ExistsQueryExpression) other;
     if (this.bindParams.size() != that.bindParams.size()) {
       return false;
     }

@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.JsonWriter;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
@@ -102,4 +103,10 @@ public class ScalarTypeLocalTime extends ScalarTypeBase<LocalTime> {
   public void jsonWrite(JsonWriter writer, String name, LocalTime value) throws IOException {
     writer.writeStringField(name, value.toString());
   }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.STRING;
+  }
+
 }

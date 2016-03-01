@@ -4,6 +4,8 @@ import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 
+import java.io.IOException;
+
 /**
  * Generally speaking tests the value at a given path in the JSON document.
  * <p>
@@ -55,6 +57,17 @@ class JsonPathExpression extends AbstractExpression {
     this.operator = Op.BETWEEN;
     this.value = value;
     this.upperValue = upperValue;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+
+    String fullName = propName + "." + path;
+    if (operator == Op.BETWEEN) {
+      context.writeRange(fullName, Op.GT_EQ, value, Op.LT_EQ, upperValue);
+    } else {
+      context.writeSimple(operator, fullName, value);
+    }
   }
 
   @Override

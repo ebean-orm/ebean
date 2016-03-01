@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.api;
 
+import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.transaction.DeleteByIdMap;
@@ -120,4 +121,16 @@ public class TransactionEvent implements Serializable {
     }
   }
 
+  /**
+   * Add any relevant PersistRequestBean's to DocStoreUpdates for later processing.
+   */
+  public void addDocStoreUpdates(DocStoreUpdates docStoreUpdates) {
+
+    List<PersistRequestBean<?>> persistRequestBeans = getPersistRequestBeans();
+    if (persistRequestBeans != null) {
+      for (int i=0; i< persistRequestBeans.size(); i++) {
+        persistRequestBeans.get(i).addDocStoreUpdates(docStoreUpdates);
+      }
+    }
+  }
 }

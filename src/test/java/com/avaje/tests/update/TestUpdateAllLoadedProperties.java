@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -100,9 +101,9 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
 
-    assertEquals(2, loggedSql.size());
-    assertTrue(loggedSql.get(0), loggedSql.get(0).contains("update e_basicver set name=?, other=?, last_update=? where id=?; --bind("));
-    assertTrue(loggedSql.get(1), loggedSql.get(1).contains("update e_basicver set name=?, other=?, last_update=? where id=?; --bind("));
+    assertThat(loggedSql).hasSize(2);
+    assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, other=?, last_update=? where id=?; --bind(");
+    assertThat(loggedSql.get(1)).contains("update e_basicver set name=?, other=?, last_update=? where id=?; --bind(");
 
   }
 }

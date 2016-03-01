@@ -11,126 +11,131 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
  * This is used for non-scalar properties of a Compound Value Object. These only
  * occur in nested compound types.
  * </p>
- * 
+ *
  * @author rbygrave
  */
 public class CtCompoundPropertyElAdapter implements ElPropertyValue {
 
-    private final CtCompoundProperty prop;
+  private final CtCompoundProperty prop;
 
-    private int deployOrder;
-    
-    public CtCompoundPropertyElAdapter(CtCompoundProperty prop) {
-        this.prop = prop;
-    }
-    
-    public void setDeployOrder(int deployOrder) {
-        this.deployOrder = deployOrder;
-    }
+  private int deployOrder;
 
-    public Object elConvertType(Object value) {
-        return value;
-    }
+  public CtCompoundPropertyElAdapter(CtCompoundProperty prop) {
+    this.prop = prop;
+  }
 
-    public Object elGetReference(EntityBean bean) {
-        return bean;
-    }
+  public void setDeployOrder(int deployOrder) {
+    this.deployOrder = deployOrder;
+  }
 
-    public Object elGetValue(EntityBean bean) {
-        return prop.getValue(bean);
-    }
+  public Object elConvertType(Object value) {
+    return value;
+  }
 
-    public void elSetValue(EntityBean bean, Object value, boolean populate) {
-        prop.setValue(bean, value);
-    }
+  public Object elGetReference(EntityBean bean) {
+    return bean;
+  }
 
-    public int getDeployOrder() {
-        return deployOrder;
-    }
+  public Object elGetValue(EntityBean bean) {
+    return prop.getValue(bean);
+  }
 
-    public String getAssocOneIdExpr(String prefix, String operator) {
-        throw new RuntimeException("Not Supported or Expected");
-    }
+  @Override
+  public void set(Object bean, Object value) {
+    elSetValue((EntityBean) bean, value, true);
+  }
 
-    public Object[] getAssocOneIdValues(EntityBean bean) {
-        throw new RuntimeException("Not Supported or Expected");
-    }
-    
-    public String getAssocIdInExpr(String prefix) {
-        throw new RuntimeException("Not Supported or Expected");
-    }
+  public void elSetValue(EntityBean bean, Object value, boolean populate) {
+    prop.setValue(bean, value);
+  }
 
-    public String getAssocIdInValueExpr(int size) {
-        throw new RuntimeException("Not Supported or Expected");
-    }
+  public int getDeployOrder() {
+    return deployOrder;
+  }
 
-    public BeanProperty getBeanProperty() {
-        return null;
-    }
+  public String getAssocOneIdExpr(String prefix, String operator) {
+    throw new RuntimeException("Not Supported or Expected");
+  }
 
-    public StringParser getStringParser() {
-        return null;
-    }
+  public Object[] getAssocOneIdValues(EntityBean bean) {
+    throw new RuntimeException("Not Supported or Expected");
+  }
 
-    public boolean isDbEncrypted() {
-        return false;
-    }
+  public String getAssocIdInExpr(String prefix) {
+    throw new RuntimeException("Not Supported or Expected");
+  }
 
-    public boolean isLocalEncrypted() {
-        return false;
-    }
+  public String getAssocIdInValueExpr(int size) {
+    throw new RuntimeException("Not Supported or Expected");
+  }
 
-    public boolean isAssocId() {
-        return false;
-    }
-    
-    public boolean isAssocProperty() {
-        return false;
-    }
+  public BeanProperty getBeanProperty() {
+    return null;
+  }
 
-    public boolean isDateTimeCapable() {
-        return false;
-    }
+  public StringParser getStringParser() {
+    return null;
+  }
 
-    public int getJdbcType() {
-	    return 0;
-    }
+  public boolean isDbEncrypted() {
+    return false;
+  }
 
-	public Object parseDateTime(long systemTimeMillis) {
-        throw new RuntimeException("Not Supported or Expected");
-    }
-    
-    @Override
-    public boolean containsFormulaWithJoin() {
-      return false;
-    }
+  public boolean isLocalEncrypted() {
+    return false;
+  }
 
-    public boolean containsMany() {
-        return false;
-    }
+  public boolean isAssocId() {
+    return false;
+  }
 
-    public boolean containsManySince(String sinceProperty) {
-        return containsMany();
-    }
-    
-    public String getDbColumn() {
-        return null;
-    }
+  public boolean isAssocProperty() {
+    return false;
+  }
 
-    public String getElPlaceholder(boolean encrypted) {
-        return null;
-    }
+  public boolean isDateTimeCapable() {
+    return false;
+  }
 
-    public String getElPrefix() {
-        return null;
-    }
+  public int getJdbcType() {
+    return 0;
+  }
 
-    public String getName() {
-        return prop.getPropertyName();
-    }
+  public Object parseDateTime(long systemTimeMillis) {
+    throw new RuntimeException("Not Supported or Expected");
+  }
 
-    public String getElName() {
-        return prop.getPropertyName();
-    }
+  @Override
+  public boolean containsFormulaWithJoin() {
+    return false;
+  }
+
+  public boolean containsMany() {
+    return false;
+  }
+
+  public boolean containsManySince(String sinceProperty) {
+    return containsMany();
+  }
+
+  public String getDbColumn() {
+    return null;
+  }
+
+  public String getElPlaceholder(boolean encrypted) {
+    return null;
+  }
+
+  public String getElPrefix() {
+    return null;
+  }
+
+  public String getName() {
+    return prop.getPropertyName();
+  }
+
+  public String getElName() {
+    return prop.getPropertyName();
+  }
 
 }

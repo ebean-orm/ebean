@@ -64,7 +64,7 @@ public class AnnotationFields extends AnnotationParser {
 
     for (DeployBeanProperty prop : descriptor.propertiesAll()) {
       if (prop instanceof DeployBeanPropertyAssoc<?>) {
-        readAssocOne(prop);
+        readAssocOne((DeployBeanPropertyAssoc<?>)prop);
       } else {
         readField(prop);
       }
@@ -74,7 +74,7 @@ public class AnnotationFields extends AnnotationParser {
   /**
    * Read the Id marker annotations on EmbeddedId properties.
    */
-  private void readAssocOne(DeployBeanProperty prop) {
+  private void readAssocOne(DeployBeanPropertyAssoc<?> prop) {
 
     readJsonAnnotations(prop);
 
@@ -89,6 +89,11 @@ public class AnnotationFields extends AnnotationParser {
       prop.setId();
       prop.setNullable(false);
       prop.setEmbedded();
+    }
+
+    DocStoreEmbedded docStoreEmbedded = get(prop, DocStoreEmbedded.class);
+    if (docStoreEmbedded != null) {
+      prop.setDocStoreEmbedded(docStoreEmbedded);
     }
 
     if (prop instanceof DeployBeanPropertyAssocOne<?>) {
@@ -177,6 +182,19 @@ public class AnnotationFields extends AnnotationParser {
       if (get(prop, DbJsonB.class) != null) {
         util.setDbJsonBType(prop);
       }
+    }
+
+    DocProperty docProperty = get(prop, DocProperty.class);
+    if (docProperty != null) {
+      prop.setDocProperty(docProperty);
+    }
+    DocSortable docSortable = get(prop, DocSortable.class);
+    if (docSortable != null) {
+      prop.setDocSortable(docSortable);
+    }
+    DocCode docCode = get(prop, DocCode.class);
+    if (docCode != null) {
+      prop.setDocCode(docCode);
     }
 
     if (get(prop, DbHstore.class) != null) {

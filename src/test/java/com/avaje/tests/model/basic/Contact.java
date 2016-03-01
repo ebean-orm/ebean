@@ -12,8 +12,11 @@ import javax.persistence.Version;
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.ChangeLog;
 import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.DocStoreEmbedded;
+import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.Index;
 
+@DocStore
 @Index(columnNames = {"last_name","first_name"})
 @ChangeLog
 @Entity
@@ -32,6 +35,7 @@ public class Contact {
     String mobile;
     String email;
 
+    @DocStoreEmbedded(doc="id,name")
     @ManyToOne(optional=false)
     Customer customer;
     

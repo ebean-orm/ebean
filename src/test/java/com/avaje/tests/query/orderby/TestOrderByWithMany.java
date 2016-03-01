@@ -52,7 +52,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     String lazyLoadSql = loggedSql.get(1);
     // contains the foreign key back to the parent bean (t0.order_id)
-    Assert.assertTrue(lazyLoadSql.contains("select t0.order_id c0, t0.id"));
+    Assert.assertTrue(lazyLoadSql, lazyLoadSql.contains("select t0.order_id c0, t0.id"));
     Assert.assertTrue(lazyLoadSql.contains("order by t0.order_id, t0.id, t0.order_qty, t0.cretime desc"));
 
   }

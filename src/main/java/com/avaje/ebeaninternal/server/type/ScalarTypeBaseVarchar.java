@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.JsonWriter;
 import com.fasterxml.jackson.core.JsonParser;
@@ -131,4 +132,10 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
   public void jsonWrite(JsonWriter writer, String name, T value) throws IOException {
     writer.writeStringField(name, format(value));
   }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.STRING;
+  }
+
 }

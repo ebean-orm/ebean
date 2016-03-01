@@ -8,12 +8,12 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
-public class ExistsExpressionTest {
+public class ExistsQueryExpressionTest {
 
 
   @NotNull
-  private ExistsExpression exp(boolean not, String sql, Object... bindValues) {
-    return new ExistsExpression(not, sql, Arrays.asList(bindValues));
+  private ExistsQueryExpression exp(boolean not, String sql, Object... bindValues) {
+    return new ExistsQueryExpression(not, sql, Arrays.asList(bindValues));
   }
 
   @Test

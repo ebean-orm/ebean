@@ -6,6 +6,8 @@ import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
+import java.io.IOException;
+
 class LikeExpression extends AbstractExpression {
 
   private static final long serialVersionUID = -5398151809111172380L;
@@ -21,6 +23,36 @@ class LikeExpression extends AbstractExpression {
     this.caseInsensitive = caseInsensitive;
     this.type = type;
     this.val = value;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+
+    String paramVal = (caseInsensitive) ? val.toLowerCase() : val;
+    switch (type) {
+      case RAW:
+        context.writeWildcard(propName, paramVal);
+        break;
+
+      case STARTS_WITH:
+        context.writePrefix(propName, paramVal);
+        break;
+
+      case ENDS_WITH:
+        context.writeSuffix(propName, paramVal);
+        break;
+
+      case CONTAINS:
+        context.writeMatch(propName, paramVal);
+         break;
+
+      case EQUAL_TO:
+        context.writeTerm(propName, paramVal);
+        break;
+
+      default:
+        throw new RuntimeException("LikeType " + type + " missed?");
+    }
   }
 
   @Override

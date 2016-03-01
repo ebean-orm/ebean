@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.util.List;
 
 import com.avaje.ebean.Transaction;
+import com.avaje.ebean.annotation.DocStoreEvent;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.changelog.BeanChange;
 import com.avaje.ebean.event.changelog.ChangeSet;
@@ -20,7 +21,7 @@ import com.avaje.ebeaninternal.server.persist.BatchControl;
 public interface SpiTransaction extends Transaction {
 
   /**
-   * Return the string prefix with the transactin id and label used in logging.
+   * Return the string prefix with the transaction id and label used in logging.
    */
   String getLogPrefix();
 
@@ -108,6 +109,20 @@ public interface SpiTransaction extends Transaction {
    * Returning 0 implies to use the system wide default batch size.
    * </p>
    */
+  DocStoreEvent getDocStoreUpdateMode();
+
+  /**
+   * Return the batch size to us for ElasticSearch Bulk API calls
+   * as a result of this transaction.
+   */
+  int getDocStoreBulkBatchSize();
+
+  /**
+   * Return the batchSize specifically set for this transaction or 0.
+   * <p>
+   * Returning 0 implies to use the system wide default batch size.
+   * </p>
+   */
   int getBatchSize();
 
   /**
@@ -157,12 +172,12 @@ public interface SpiTransaction extends Transaction {
   boolean isBatchThisRequest(PersistRequest.Type type);
 
   /**
-   * Return the queue used to batch up persist requests.
+   * Return the BatchControl used to batch up persist requests.
    */
   BatchControl getBatchControl();
 
   /**
-   * Set the queue used to batch up persist requests. There should only be one
+   * Set the BatchControl used to batch up persist requests. There should only be one
    * PersistQueue set per transaction.
    */
   void setBatchControl(BatchControl control);

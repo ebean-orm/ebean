@@ -84,6 +84,11 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
   BeanDescriptor<?> getBeanDescriptorById(String className);
 
   /**
+   * Return BeanDescriptor using it's unique doc store queueId.
+   */
+  BeanDescriptor<?> getBeanDescriptorByQueueId(String queueId);
+
+  /**
    * Return BeanDescriptors mapped to this table.
    */
   List<BeanDescriptor<?>> getBeanDescriptors(String tableName);

@@ -7,6 +7,8 @@ import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
+import java.io.IOException;
+
 /**
  * Slightly redundant as Query.setId() ultimately also does the same job.
  */
@@ -18,6 +20,11 @@ class IdExpression extends NonPrepareExpression implements SpiExpression {
 
   IdExpression(Object value) {
     this.value = value;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+    context.writeId(value);
   }
 
   /**

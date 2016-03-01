@@ -18,9 +18,9 @@ public class TestEnumToBeanType {
      OrdinalEnum ordinalEnum = new ScalarTypeEnumStandard.OrdinalEnum(Order.Status.class);
      
      EnumToDbValueMap<?> beanDbMap = EnumToDbValueMap.create(false);
-     beanDbMap.add(Customer.Status.ACTIVE, "A");
-     beanDbMap.add(Customer.Status.NEW, "N");
-     beanDbMap.add(Customer.Status.INACTIVE, "I");
+     beanDbMap.add(Customer.Status.ACTIVE, "A", Customer.Status.ACTIVE.name());
+     beanDbMap.add(Customer.Status.NEW, "N", Customer.Status.NEW.name());
+     beanDbMap.add(Customer.Status.INACTIVE, "I", Customer.Status.INACTIVE.name());
      
      ScalarTypeEnumWithMapping withMapping = new ScalarTypeEnumWithMapping(beanDbMap, Customer.Status.class, 1);
      

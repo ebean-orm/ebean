@@ -7,6 +7,8 @@ import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
+import java.io.IOException;
+
 class RawExpression extends NonPrepareExpression {
 
   private static final long serialVersionUID = 7973903141340334606L;
@@ -18,6 +20,11 @@ class RawExpression extends NonPrepareExpression {
   RawExpression(String sql, Object[] values) {
     this.sql = sql;
     this.values = values;
+  }
+
+  @Override
+  public void writeElastic(ElasticExpressionContext context) throws IOException {
+    context.writeRaw(sql);
   }
 
   @Override
