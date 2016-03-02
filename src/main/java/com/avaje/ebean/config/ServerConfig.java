@@ -2250,14 +2250,14 @@ public class ServerConfig {
   }
 
   /**
-   * This is broken out for the same reason as above - preserve existing behaviour but let it be overridden.
+   * This is broken out to allow overridden behaviour.
    */
   protected void loadDocStoreSettings(PropertiesWrapper p) {
     docStoreConfig.loadSettings(p);
   }
 
   /**
-   * This is broken out for the same reason as above - preserve existing behaviour but let it be overridden.
+   * This is broken out to allow overridden behaviour.
    */
   protected void loadAutoTuneSettings(PropertiesWrapper p) {
     autoTuneConfig.loadSettings(p);
@@ -2287,7 +2287,7 @@ public class ServerConfig {
     if (docStoreConfig == null) {
       docStoreConfig = new DocStoreConfig();
     }
-    docStoreConfig.loadSettings(p);
+    loadDocStoreSettings(p);
 
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);

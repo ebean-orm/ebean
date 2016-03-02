@@ -134,5 +134,6 @@ public class DocStoreConfig {
     url = properties.get("docstore.url", url);
     persist = properties.getEnum(DocStoreEvent.class, "docstore.persist", persist);
     bulkBatchSize = properties.getInt("docstore.bulkBatchSize", bulkBatchSize);
+    dropCreate = properties.getBoolean("docstore.dropCreate", dropCreate);
   }
 }
