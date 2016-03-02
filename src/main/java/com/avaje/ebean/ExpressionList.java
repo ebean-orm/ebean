@@ -381,6 +381,32 @@ public interface ExpressionList<T> extends Serializable {
   Query<T> setUseQueryCache(boolean useCache);
 
   /**
+   * Set to true if this query should execute against the doc store.
+   * <p>
+   * When setting this you may also consider disabling lazy loading.
+   * </p>
+   */
+  Query<T> setUseDocStore(boolean useDocsStore);
+
+  /**
+   * Set true if you want to disable lazy loading.
+   * <p>
+   * That is, once the object graph is returned further lazy loading is disabled.
+   * </p>
+   */
+  Query<T> setDisableLazyLoading(boolean disableLazyLoading);
+
+  /**
+   * Disable read auditing for this query.
+   * <p>
+   * This is intended to be used when the query is not a user initiated query and instead
+   * part of the internal processing in an application to load a cache or document store etc.
+   * In these cases we don't want the query to be part of read auditing.
+   * </p>
+   */
+  Query<T> setDisableReadAuditing();
+
+  /**
    * Add expressions to the having clause.
    * <p>
    * The having clause is only used for queries based on raw sql (via SqlSelect

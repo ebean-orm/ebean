@@ -44,7 +44,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
 
     private static final long serialVersionUID = -645619859900030678L;
 
-    Conjunction(com.avaje.ebean.Query<T> query, ExpressionList<T> parent) {
+    Conjunction(Query<T> query, ExpressionList<T> parent) {
       super(false, AND, query, parent);
     }
 
@@ -61,7 +61,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
 
     private static final long serialVersionUID = -8464470066692221413L;
 
-    Disjunction(com.avaje.ebean.Query<T> query, ExpressionList<T> parent) {
+    Disjunction(Query<T> query, ExpressionList<T> parent) {
       super(true, OR, query, parent);
     }
 
@@ -84,7 +84,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
    */
   private final boolean disjunction;
 
-  JunctionExpression(boolean disjunction, String joinType, com.avaje.ebean.Query<T> query, ExpressionList<T> parent) {
+  JunctionExpression(boolean disjunction, String joinType, Query<T> query, ExpressionList<T> parent) {
     this.disjunction = disjunction;
     this.joinType = joinType;
     this.exprList = new DefaultExpressionList<T>(query, parent);
@@ -532,7 +532,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
-  public ExpressionList<T> in(String propertyName, com.avaje.ebean.Query<?> subQuery) {
+  public ExpressionList<T> in(String propertyName, Query<?> subQuery) {
     return exprList.in(propertyName, subQuery);
   }
 
@@ -547,7 +547,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
-  public ExpressionList<T> notIn(String propertyName, com.avaje.ebean.Query<?> subQuery) {
+  public ExpressionList<T> notIn(String propertyName, Query<?> subQuery) {
     return exprList.notIn(propertyName, subQuery);
   }
 
@@ -612,7 +612,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
-  public com.avaje.ebean.Query<T> order(String orderByClause) {
+  public Query<T> order(String orderByClause) {
     return exprList.order(orderByClause);
   }
 
@@ -622,12 +622,12 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
-  public com.avaje.ebean.Query<T> orderBy(String orderBy) {
+  public Query<T> orderBy(String orderBy) {
     return exprList.orderBy(orderBy);
   }
 
   @Override
-  public com.avaje.ebean.Query<T> query() {
+  public Query<T> query() {
     return exprList.query();
   }
 
@@ -647,7 +647,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
-  public com.avaje.ebean.Query<T> select(String properties) {
+  public Query<T> select(String properties) {
     return exprList.select(properties);
   }
 
@@ -657,33 +657,48 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
-  public com.avaje.ebean.Query<T> setFirstRow(int firstRow) {
+  public Query<T> setFirstRow(int firstRow) {
     return exprList.setFirstRow(firstRow);
   }
 
   @Override
-  public com.avaje.ebean.Query<T> setMapKey(String mapKey) {
+  public Query<T> setMapKey(String mapKey) {
     return exprList.setMapKey(mapKey);
   }
 
   @Override
-  public com.avaje.ebean.Query<T> setMaxRows(int maxRows) {
+  public Query<T> setMaxRows(int maxRows) {
     return exprList.setMaxRows(maxRows);
   }
 
   @Override
-  public com.avaje.ebean.Query<T> setOrderBy(String orderBy) {
+  public Query<T> setOrderBy(String orderBy) {
     return exprList.setOrderBy(orderBy);
   }
 
   @Override
-  public com.avaje.ebean.Query<T> setUseCache(boolean useCache) {
+  public Query<T> setUseCache(boolean useCache) {
     return exprList.setUseCache(useCache);
   }
 
   @Override
   public Query<T> setUseQueryCache(boolean useCache) {
     return exprList.setUseQueryCache(useCache);
+  }
+
+  @Override
+  public Query<T> setUseDocStore(boolean useDocsStore) {
+    return exprList.setUseDocStore(useDocsStore);
+  }
+
+  @Override
+  public Query<T> setDisableLazyLoading(boolean disableLazyLoading) {
+    return exprList.setDisableLazyLoading(disableLazyLoading);
+  }
+
+  @Override
+  public Query<T> setDisableReadAuditing() {
+    return exprList.setDisableReadAuditing();
   }
 
   @Override

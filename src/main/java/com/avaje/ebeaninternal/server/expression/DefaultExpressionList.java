@@ -325,6 +325,21 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public Query<T> setUseDocStore(boolean useDocsStore) {
+    return query.setUseDocStore(useDocsStore);
+  }
+
+  @Override
+  public Query<T> setDisableLazyLoading(boolean disableLazyLoading) {
+    return query.setDisableLazyLoading(disableLazyLoading);
+  }
+
+  @Override
+  public Query<T> setDisableReadAuditing() {
+    return query.setDisableReadAuditing();
+  }
+
+  @Override
   public ExpressionList<T> having() {
     return query.having();
   }
