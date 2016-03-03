@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.type;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
@@ -70,7 +69,7 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public byte[] jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public byte[] jsonRead(JsonParser parser) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream(500);
     parser.readBinaryValue(out);
     return out.toByteArray();

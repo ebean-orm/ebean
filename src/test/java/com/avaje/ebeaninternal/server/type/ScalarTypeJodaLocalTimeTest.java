@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.Ebean;
+import com.avaje.tests.model.basic.TJodaEntity;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
@@ -42,5 +44,20 @@ public class ScalarTypeJodaLocalTimeTest {
 
     assertEquals(ts1, ts2);
 
+  }
+
+  @Test
+  public void toJson() {
+
+    LocalTime now = new LocalTime();
+
+    TJodaEntity bean = new TJodaEntity();
+    bean.setId(42);
+    bean.setLocalTime(now);
+
+    String json = Ebean.json().toJson(bean);
+    TJodaEntity bean1 = Ebean.json().toBean(TJodaEntity.class, json);
+
+    assertEquals(bean1.getLocalTime(), now);
   }
 }

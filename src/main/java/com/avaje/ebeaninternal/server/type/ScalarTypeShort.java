@@ -87,7 +87,7 @@ public class ScalarTypeShort extends ScalarTypeBase<Short> {
   }
 
   @Override
-  public Short jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public Short jsonRead(JsonParser parser) throws IOException {
     return parser.getShortValue();
   }
 

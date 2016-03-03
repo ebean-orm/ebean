@@ -43,9 +43,9 @@ public class JsonTester<T> {
     assertEquals(JsonToken.START_OBJECT, token);
     token = parser.nextToken();
     assertEquals(JsonToken.FIELD_NAME, token);
-    token = parser.nextToken();
+    parser.nextToken();
 
-    T val1 = type.jsonRead(parser, token);
+    T val1 = type.jsonRead(parser);
     assertEquals(value, val1);
 
   }

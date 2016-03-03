@@ -95,7 +95,7 @@ public class ScalarTypeLocalTime extends ScalarTypeBase<LocalTime> {
   }
 
   @Override
-  public LocalTime jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public LocalTime jsonRead(JsonParser parser) throws IOException {
     return LocalTime.parse(parser.getValueAsString());
   }
 

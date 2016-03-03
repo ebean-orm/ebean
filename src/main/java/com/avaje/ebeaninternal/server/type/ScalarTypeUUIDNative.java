@@ -105,7 +105,7 @@ public class ScalarTypeUUIDNative extends ScalarTypeBase<UUID> {
   }
 
   @Override
-  public UUID jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public UUID jsonRead(JsonParser parser) throws IOException {
     String strValue = parser.getValueAsString();
     return strValue == null ? null : parse(strValue);
   }

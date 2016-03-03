@@ -86,7 +86,7 @@ public class ScalarTypeDouble extends ScalarTypeBase<Double> {
   }
 
   @Override
-  public Double jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public Double jsonRead(JsonParser parser) throws IOException {
     return parser.getDoubleValue();
   }
 

@@ -134,8 +134,8 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
   }
 
   @Override
-  public T jsonRead(JsonParser parser, JsonToken event) throws IOException {
-    return wrapped.jsonRead(parser, event);
+  public T jsonRead(JsonParser parser) throws IOException {
+    return wrapped.jsonRead(parser);
   }
 
   @Override

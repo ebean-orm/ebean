@@ -64,7 +64,7 @@ public class ScalarTypeCharArray extends ScalarTypeBaseVarchar<char[]> {
   }
 
   @Override
-  public char[] jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public char[] jsonRead(JsonParser parser) throws IOException {
     return parser.getValueAsString().toCharArray();
   }
 

@@ -5,7 +5,6 @@ import com.avaje.ebean.text.StringParser;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -203,7 +202,7 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   /**
    * Read the value from JsonParser.
    */
-  T jsonRead(JsonParser parser, JsonToken event) throws IOException;
+  T jsonRead(JsonParser parser) throws IOException;
 
   /**
    * Write the value to the JsonGenerator.

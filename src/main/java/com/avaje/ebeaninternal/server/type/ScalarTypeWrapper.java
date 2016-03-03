@@ -183,8 +183,8 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public B jsonRead(JsonParser parser, JsonToken event) throws IOException {
-    S object = scalarType.jsonRead(parser, event);
+  public B jsonRead(JsonParser parser) throws IOException {
+    S object = scalarType.jsonRead(parser);
     return converter.wrapValue(object);
   }
 

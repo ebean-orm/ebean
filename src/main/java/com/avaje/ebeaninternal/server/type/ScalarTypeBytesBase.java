@@ -47,7 +47,7 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
   }
 
   @Override
-  public byte[] jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public byte[] jsonRead(JsonParser parser) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream(500);
     parser.readBinaryValue(out);
     return out.toByteArray();

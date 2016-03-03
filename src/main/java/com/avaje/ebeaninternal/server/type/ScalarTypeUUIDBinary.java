@@ -145,7 +145,7 @@ public class ScalarTypeUUIDBinary extends ScalarTypeBase<UUID> {
   }
 
   @Override
-  public UUID jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public UUID jsonRead(JsonParser parser) throws IOException {
     return UUID.fromString(parser.getValueAsString());
   }
 

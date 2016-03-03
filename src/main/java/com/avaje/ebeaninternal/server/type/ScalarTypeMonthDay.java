@@ -120,7 +120,7 @@ public class ScalarTypeMonthDay extends ScalarTypeBase<MonthDay> {
   }
 
   @Override
-  public MonthDay jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public MonthDay jsonRead(JsonParser parser) throws IOException {
     return parse(parser.getValueAsString());
   }
 

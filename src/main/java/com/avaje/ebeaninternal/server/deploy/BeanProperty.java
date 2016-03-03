@@ -1262,7 +1262,7 @@ public class BeanProperty implements ElPropertyValue, Property {
       // expect to read non-null json value
       Object objValue;
       if (scalarType != null) {
-        objValue = scalarType.jsonRead(ctx.getParser(), event);
+        objValue = scalarType.jsonRead(ctx.getParser());
       } else {
         try {
           objValue = ctx.readValueUsingObjectMapper(propertyType);

@@ -90,7 +90,7 @@ public class ScalarTypeYear extends ScalarTypeBase<Year> {
   }
 
   @Override
-  public Year jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public Year jsonRead(JsonParser parser) throws IOException {
     return Year.of(parser.getIntValue());
   }
 

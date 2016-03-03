@@ -49,7 +49,7 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
   }
 
   @Override
-  public Byte jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public Byte jsonRead(JsonParser parser) throws IOException {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     parser.readBinaryValue(os);
     byte[] bytes = os.toByteArray();

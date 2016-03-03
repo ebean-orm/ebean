@@ -86,7 +86,7 @@ public class ScalarTypeString extends ScalarTypeBase<String> {
   }
 
   @Override
-  public String jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public String jsonRead(JsonParser parser) throws IOException {
     return parser.getValueAsString();
   }
 

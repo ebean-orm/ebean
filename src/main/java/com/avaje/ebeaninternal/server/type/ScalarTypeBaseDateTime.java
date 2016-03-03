@@ -85,9 +85,9 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public T jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public T jsonRead(JsonParser parser) throws IOException {
 
-    switch (event) {
+    switch (parser.getCurrentToken()) {
       case VALUE_NUMBER_INT: {
         return convertFromMillis(parser.getLongValue());
       }

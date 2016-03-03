@@ -331,8 +331,8 @@ public class ScalarTypeBoolean {
     }
 
     @Override
-    public Boolean jsonRead(JsonParser parser, JsonToken event) {
-      return JsonToken.VALUE_TRUE == event ? Boolean.TRUE : Boolean.FALSE;
+    public Boolean jsonRead(JsonParser parser) {
+      return JsonToken.VALUE_TRUE == parser.getCurrentToken() ? Boolean.TRUE : Boolean.FALSE;
     }
 
     @Override

@@ -93,7 +93,7 @@ public class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
   }
 
   @Override
-  public BigInteger jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public BigInteger jsonRead(JsonParser parser) throws IOException {
     return parser.getDecimalValue().toBigInteger();
   }
 

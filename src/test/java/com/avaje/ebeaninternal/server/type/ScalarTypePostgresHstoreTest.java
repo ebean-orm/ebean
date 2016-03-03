@@ -94,7 +94,7 @@ public class ScalarTypePostgresHstoreTest {
     // simulate that here
     JsonToken token = parser.nextToken();
     assertEquals(JsonToken.START_OBJECT, token);
-    return (Map<String,Object>)hstore.jsonRead(parser, token);
+    return (Map<String,Object>)hstore.jsonRead(parser);
   }
 
   private String generateJson(Map<String, Object> map) throws IOException {

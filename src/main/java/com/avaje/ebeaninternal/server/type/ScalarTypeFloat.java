@@ -86,7 +86,7 @@ public class ScalarTypeFloat extends ScalarTypeBase<Float> {
   }
 
   @Override
-  public Float jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public Float jsonRead(JsonParser parser) throws IOException {
     return parser.getFloatValue();
   }
 

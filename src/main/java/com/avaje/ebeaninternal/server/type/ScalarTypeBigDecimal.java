@@ -79,7 +79,7 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
   }
 
   @Override
-  public BigDecimal jsonRead(JsonParser parser, JsonToken event) throws IOException {
+  public BigDecimal jsonRead(JsonParser parser) throws IOException {
     return parser.getDecimalValue();
   }
 
