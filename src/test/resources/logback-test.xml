@@ -77,8 +77,8 @@
   <logger name="com.avaje.ebean" level="INFO"/>
   <logger name="org.avaje.ebean" level="INFO"/>
 
-  <logger name="org.avaje.ebean.SQL" level="TRACE"/>
-  <logger name="org.avaje.ebean.TXN" level="TRACE"/>
+  <!--<logger name="org.avaje.ebean.SQL" level="TRACE"/>-->
+  <!--<logger name="org.avaje.ebean.TXN" level="TRACE"/>-->
   <!--<logger name="org.avaje.ebean.SUM" level="TRACE"/>-->
   <!--<logger name="org.avaje.ebean.ELA" level="TRACE"/>-->
 

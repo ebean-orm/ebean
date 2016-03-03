@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.TextException;
-import com.avaje.ebean.text.json.JsonWriter;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -206,8 +206,8 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, JsonNode value) throws IOException {
-    objectMapper.writeTree(writer.gen(), value);
+  public void jsonWrite(JsonGenerator writer, JsonNode value) throws IOException {
+    objectMapper.writeTree(writer, value);
   }
 
   @Override

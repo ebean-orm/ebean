@@ -1244,7 +1244,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     } else {
       if (scalarType != null) {
         writeJson.writeFieldName(name);
-        scalarType.jsonWrite(writeJson, value);
+        scalarType.jsonWrite(writeJson.gen(), value);
       } else {
         writeJson.writeValueUsingObjectMapper(name, value);
       }

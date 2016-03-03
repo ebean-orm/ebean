@@ -2,8 +2,8 @@ package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
-import com.avaje.ebean.text.json.JsonWriter;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
@@ -208,6 +208,6 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   /**
    * Write the value to the JsonGenerator.
    */
-  void jsonWrite(JsonWriter writer, T value) throws IOException;
+  void jsonWrite(JsonGenerator writer, T value) throws IOException;
 
 }

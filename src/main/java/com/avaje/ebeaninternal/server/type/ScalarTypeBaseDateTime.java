@@ -2,7 +2,7 @@ package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
-import com.avaje.ebean.text.json.JsonWriter;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
@@ -104,19 +104,19 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, T value) throws IOException {
+  public void jsonWrite(JsonGenerator writer, T value) throws IOException {
 
     switch (mode) {
       case ISO8601: {
-        writer.gen().writeString(toJsonISO8601(value));
+        writer.writeString(toJsonISO8601(value));
         break;
       }
       case NANOS: {
-        writer.gen().writeNumber(toJsonNanos(value));
+        writer.writeNumber(toJsonNanos(value));
         break;
       }
       default: {
-        writer.gen().writeNumber(convertToMillis(value));
+        writer.writeNumber(convertToMillis(value));
       }
     }
   }

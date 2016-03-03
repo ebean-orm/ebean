@@ -1,12 +1,11 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.TextException;
-import com.avaje.ebean.text.json.JsonWriter;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -43,9 +42,8 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, byte[] value) throws IOException {
-    ByteArrayInputStream is = new ByteArrayInputStream(value);
-    writer.writeBinary(is, value.length);
+  public void jsonWrite(JsonGenerator writer, byte[] value) throws IOException {
+    writer.writeBinary(value);
   }
 
   @Override

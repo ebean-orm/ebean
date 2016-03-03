@@ -22,17 +22,18 @@ public class DefaultJsonScalar implements JsonScalar {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public void write(Object value) throws IOException {
 
     if (value instanceof String) {
       writeJson.writeString((String)value);
 
     } else {
-      ScalarType scalarType = (ScalarType)typeManager.getScalarType(value.getClass());
+      ScalarType scalarType = typeManager.getScalarType(value.getClass());
       if (scalarType == null) {
         throw new IllegalArgumentException("unhandled type " + value.getClass());
       }
-      scalarType.jsonWrite(writeJson, value);
+      scalarType.jsonWrite(writeJson.gen(), value);
     }
   }
 }

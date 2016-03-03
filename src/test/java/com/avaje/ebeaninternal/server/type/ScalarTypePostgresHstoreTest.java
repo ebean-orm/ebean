@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebean.config.JsonConfig;
-import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -14,7 +12,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ScalarTypePostgresHstoreTest {
 
@@ -105,8 +105,7 @@ public class ScalarTypePostgresHstoreTest {
     generator.writeStartObject();
     generator.writeFieldName("key");
 
-    WriteJson writeJson = new WriteJson(generator, JsonConfig.Include.ALL);
-    hstore.jsonWrite(writeJson, map);
+    hstore.jsonWrite(generator, map);
 
     generator.writeEndObject();
     generator.flush();

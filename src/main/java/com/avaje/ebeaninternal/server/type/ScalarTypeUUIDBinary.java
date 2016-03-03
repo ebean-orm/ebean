@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
-import com.avaje.ebean.text.json.JsonWriter;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
@@ -150,7 +150,7 @@ public class ScalarTypeUUIDBinary extends ScalarTypeBase<UUID> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, UUID value) throws IOException {
+  public void jsonWrite(JsonGenerator writer, UUID value) throws IOException {
     writer.writeString(value.toString());
   }
 

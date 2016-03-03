@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.TextException;
-import com.avaje.ebean.text.json.JsonWriter;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
@@ -238,7 +238,7 @@ public class ScalarTypeEnumStandard {
     }
 
     @Override
-    public void jsonWrite(JsonWriter writer, Object value) throws IOException {
+    public void jsonWrite(JsonGenerator writer, Object value) throws IOException {
       writer.writeString(formatValue(value));
     }
 

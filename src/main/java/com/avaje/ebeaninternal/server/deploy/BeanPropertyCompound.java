@@ -155,6 +155,7 @@ public class BeanPropertyCompound extends BeanProperty {
     if (value == null) {
       ctx.writeNullField(name);
     } else {
+      ctx.writeFieldName(name);
       compoundType.jsonWrite(ctx, value, name);
     }
   }

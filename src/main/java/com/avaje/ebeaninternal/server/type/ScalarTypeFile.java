@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebean.text.TextException;
-import com.avaje.ebean.text.json.JsonWriter;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import org.slf4j.Logger;
@@ -112,7 +112,7 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, File value) throws IOException {
+  public void jsonWrite(JsonGenerator writer, File value) throws IOException {
     InputStream is = getInputStream(value);
     writer.writeBinary(is, (int) value.length());
   }
