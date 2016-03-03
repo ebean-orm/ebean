@@ -4,7 +4,6 @@ import com.avaje.ebean.text.TextException;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
@@ -39,23 +38,6 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
 
   public byte[] toBeanType(Object value) {
     return (byte[]) value;
-  }
-
-  @Override
-  public void jsonWrite(JsonGenerator writer, byte[] value) throws IOException {
-    writer.writeBinary(value);
-  }
-
-  @Override
-  public byte[] jsonRead(JsonParser parser) throws IOException {
-    ByteArrayOutputStream out = new ByteArrayOutputStream(500);
-    parser.readBinaryValue(out);
-    return out.toByteArray();
-  }
-
-  @Override
-  public DocPropertyType getDocType() {
-    return DocPropertyType.BINARY;
   }
 
   public String formatValue(byte[] t) {
@@ -96,4 +78,20 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
     }
   }
 
+  @Override
+  public void jsonWrite(JsonGenerator writer, byte[] value) throws IOException {
+    writer.writeBinary(value);
+  }
+
+  @Override
+  public byte[] jsonRead(JsonParser parser) throws IOException {
+    ByteArrayOutputStream out = new ByteArrayOutputStream(500);
+    parser.readBinaryValue(out);
+    return out.toByteArray();
+  }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.BINARY;
+  }
 }

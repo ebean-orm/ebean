@@ -4,7 +4,6 @@ import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -126,14 +125,12 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
     return DocPropertyType.DATETIME;
   }
 
-  public String formatValue(T t) {
-    Timestamp ts = convertToTimestamp(t);
-    return ts.toString();
+  public String formatValue(T value) {
+    return convertToTimestamp(value).toString();
   }
 
   public T parse(String value) {
-    Timestamp ts = Timestamp.valueOf(value);
-    return convertFromTimestamp(ts);
+    return convertFromTimestamp(Timestamp.valueOf(value));
   }
 
 

@@ -71,24 +71,6 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
     return new LocalTime(value);
   }
 
-  @Override
-  public void jsonWrite(JsonGenerator writer, LocalTime value) throws IOException {
-    writer.writeString(value.toString());
-  }
-
-  @Override
-  public LocalTime jsonRead(JsonParser parser) throws IOException {
-    if (JsonToken.VALUE_NUMBER_INT == parser.getCurrentToken()) {
-      return convertFromMillis(parser.getLongValue());
-    } else {
-      return parse(parser.getValueAsString());
-    }
-  }
-
-  @Override
-  public DocPropertyType getDocType() {
-    return DocPropertyType.STRING;
-  }
 
   @Override
   public LocalTime convertFromMillis(long systemTimeMillis) {
@@ -119,5 +101,24 @@ public class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
       dataOutput.writeBoolean(true);
       dataOutput.writeUTF(format(value));
     }
+  }
+
+  @Override
+  public void jsonWrite(JsonGenerator writer, LocalTime value) throws IOException {
+    writer.writeString(value.toString());
+  }
+
+  @Override
+  public LocalTime jsonRead(JsonParser parser) throws IOException {
+    if (JsonToken.VALUE_NUMBER_INT == parser.getCurrentToken()) {
+      return convertFromMillis(parser.getLongValue());
+    } else {
+      return parse(parser.getValueAsString());
+    }
+  }
+
+  @Override
+  public DocPropertyType getDocType() {
+    return DocPropertyType.STRING;
   }
 }

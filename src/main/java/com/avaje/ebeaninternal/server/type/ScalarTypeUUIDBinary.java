@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.type;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -135,12 +134,10 @@ public class ScalarTypeUUIDBinary extends ScalarTypeBase<UUID> {
 
   @Override
   public void writeData(DataOutput dataOutput, UUID value) throws IOException {
-
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {
-      dataOutput.writeBoolean(true);
-      dataOutput.writeUTF(format(value));
+      ScalarHelp.writeUTF(dataOutput, format(value));
     }
   }
 

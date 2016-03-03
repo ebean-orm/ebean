@@ -4,7 +4,6 @@ import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -20,25 +19,6 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
 
   public ScalarTypeBigDecimal() {
     super(BigDecimal.class, true, Types.DECIMAL);
-  }
-
-  public BigDecimal readData(DataInput dataInput) throws IOException {
-    if (!dataInput.readBoolean()) {
-      return null;
-    } else {
-      double val = dataInput.readDouble();
-      return new BigDecimal(val);
-    }
-  }
-
-  public void writeData(DataOutput dataOutput, BigDecimal b) throws IOException {
-
-    if (b == null) {
-      dataOutput.writeBoolean(false);
-    } else {
-      dataOutput.writeBoolean(true);
-      dataOutput.writeDouble(b.doubleValue());
-    }
   }
 
   public void bind(DataBind b, BigDecimal value) throws SQLException {
@@ -76,6 +56,24 @@ public class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
 
   public boolean isDateTimeCapable() {
     return true;
+  }
+
+  public BigDecimal readData(DataInput dataInput) throws IOException {
+    if (!dataInput.readBoolean()) {
+      return null;
+    } else {
+      return new BigDecimal(dataInput.readDouble());
+    }
+  }
+
+  public void writeData(DataOutput dataOutput, BigDecimal b) throws IOException {
+
+    if (b == null) {
+      dataOutput.writeBoolean(false);
+    } else {
+      dataOutput.writeBoolean(true);
+      dataOutput.writeDouble(b.doubleValue());
+    }
   }
 
   @Override

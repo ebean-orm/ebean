@@ -55,7 +55,6 @@ public class ScalarTypeMonthDay extends ScalarTypeBase<MonthDay> {
     return ts == null ? null : convertFromDate(ts);
   }
 
-
   @Override
   public void bind(DataBind b, MonthDay value) throws SQLException {
     if (value == null) {

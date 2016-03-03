@@ -4,7 +4,6 @@ import com.avaje.ebean.text.TextException;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -50,7 +49,6 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
   public void bind(DataBind b, T value) throws SQLException {
     if (value == null) {
       b.setNull(Types.VARCHAR);
-
     } else {
       b.setString(convertToDbString(value));
     }
@@ -107,19 +105,15 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      String val = dataInput.readUTF();
-      return convertFromDbString(val);
+      return convertFromDbString(dataInput.readUTF());
     }
   }
 
   public void writeData(DataOutput dataOutput, T value) throws IOException {
-
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {
-      dataOutput.writeBoolean(true);
-      String s = convertToDbString(value);
-      dataOutput.writeUTF(s);
+      ScalarHelp.writeUTF(dataOutput, convertToDbString(value));
     }
   }
 

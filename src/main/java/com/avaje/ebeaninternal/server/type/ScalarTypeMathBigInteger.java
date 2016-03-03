@@ -4,7 +4,6 @@ import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -34,11 +33,11 @@ public class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
   @Override
   public BigInteger read(DataReader dataReader) throws SQLException {
 
-    Long l = dataReader.getLong();
-    if (l == null) {
+    Long value = dataReader.getLong();
+    if (value == null) {
       return null;
     }
-    return new BigInteger(String.valueOf(l));
+    return new BigInteger(String.valueOf(value));
   }
 
   @Override
@@ -76,8 +75,7 @@ public class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      long val = dataInput.readLong();
-      return BigInteger.valueOf(val);
+      return BigInteger.valueOf(dataInput.readLong());
     }
   }
 

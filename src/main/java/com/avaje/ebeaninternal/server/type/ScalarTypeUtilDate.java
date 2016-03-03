@@ -45,14 +45,11 @@ public class ScalarTypeUtilDate {
     }
 
     @Override
-    public void bind(DataBind b, java.util.Date value)
-        throws SQLException {
+    public void bind(DataBind dataBind, java.util.Date value) throws SQLException {
       if (value == null) {
-        b.setNull(Types.TIMESTAMP);
+        dataBind.setNull(Types.TIMESTAMP);
       } else {
-
-        Timestamp timestamp = new Timestamp(value.getTime());
-        b.setTimestamp(timestamp);
+        dataBind.setTimestamp(new Timestamp(value.getTime()));
       }
     }
 
@@ -73,8 +70,8 @@ public class ScalarTypeUtilDate {
     }
 
     @Override
-    public Timestamp convertToTimestamp(Date t) {
-      return new Timestamp(t.getTime());
+    public Timestamp convertToTimestamp(Date date) {
+      return new Timestamp(date.getTime());
     }
 
     @Override
@@ -101,8 +98,8 @@ public class ScalarTypeUtilDate {
     }
 
     @Override
-    public java.sql.Date convertToDate(Date t) {
-      return new java.sql.Date(t.getTime());
+    public java.sql.Date convertToDate(Date date) {
+      return new java.sql.Date(date.getTime());
     }
 
     @Override

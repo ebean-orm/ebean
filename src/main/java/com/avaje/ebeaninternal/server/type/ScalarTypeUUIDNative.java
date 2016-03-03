@@ -89,13 +89,11 @@ public class ScalarTypeUUIDNative extends ScalarTypeBase<UUID> {
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, UUID v) throws IOException {
-    if (v == null) {
+  public void writeData(DataOutput dataOutput, UUID value) throws IOException {
+    if (value == null) {
       dataOutput.writeBoolean(false);
     } else {
-      dataOutput.writeBoolean(true);
-      String json = format(v);
-      dataOutput.writeUTF(json);
+      ScalarHelp.writeUTF(dataOutput, format(value));
     }
   }
 
@@ -106,8 +104,7 @@ public class ScalarTypeUUIDNative extends ScalarTypeBase<UUID> {
 
   @Override
   public UUID jsonRead(JsonParser parser) throws IOException {
-    String strValue = parser.getValueAsString();
-    return strValue == null ? null : parse(strValue);
+    return parse(parser.getValueAsString());
   }
 
   @Override

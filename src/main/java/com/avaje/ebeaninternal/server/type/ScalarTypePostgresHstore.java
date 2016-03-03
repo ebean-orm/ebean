@@ -6,7 +6,6 @@ import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -96,19 +95,16 @@ public class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      String json = dataInput.readUTF();
-      return parse(json);
+      return parse(dataInput.readUTF());
     }
   }
 
   @Override
-  public void writeData(DataOutput dataOutput, Map v) throws IOException {
-    if (v == null) {
+  public void writeData(DataOutput dataOutput, Map map) throws IOException {
+    if (map == null) {
       dataOutput.writeBoolean(false);
     } else {
-      dataOutput.writeBoolean(true);
-      String json = format(v);
-      dataOutput.writeUTF(json);
+      ScalarHelp.writeUTF(dataOutput, format(map));
     }
   }
 

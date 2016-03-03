@@ -4,7 +4,6 @@ import com.avaje.ebean.text.TextException;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -189,8 +188,7 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      String json = dataInput.readUTF();
-      return parse(json);
+      return parse(dataInput.readUTF());
     }
   }
 
@@ -199,9 +197,7 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {
-      dataOutput.writeBoolean(true);
-      String json = format(value);
-      dataOutput.writeUTF(json);
+      ScalarHelp.writeUTF(dataOutput, format(value));
     }
   }
 
@@ -211,15 +207,13 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
-    return DocPropertyType.OBJECT;
+  public JsonNode jsonRead(JsonParser parser) throws IOException {
+    return objectMapper.readValue(parser, JsonNode.class);
   }
 
   @Override
-  public JsonNode jsonRead(JsonParser parser) throws IOException {
-    // at this point the BeanProperty has read the START_OBJECT token
-    // to check for a null value.
-    return objectMapper.readValue(parser, JsonNode.class);
+  public DocPropertyType getDocType() {
+    return DocPropertyType.OBJECT;
   }
 
 }

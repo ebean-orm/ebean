@@ -4,7 +4,6 @@ import com.avaje.ebean.text.TextException;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -208,13 +207,13 @@ public class ScalarTypeEnumStandard {
     }
 
     @Override
-    public String format(Object t) {
-      return ((Enum<?>) t).name();
+    public String format(Object value) {
+      return ((Enum<?>) value).name();
     }
 
     @Override
-    public String formatValue(Object t) {
-      return ((Enum<?>) t).name();
+    public String formatValue(Object value) {
+      return ((Enum<?>) value).name();
     }
 
     @Override
@@ -252,20 +251,17 @@ public class ScalarTypeEnumStandard {
       if (!dataInput.readBoolean()) {
         return null;
       } else {
-        String s = dataInput.readUTF();
-        return parse(s);
+        return parse(dataInput.readUTF());
       }
     }
 
     @Override
-    public void writeData(DataOutput dataOutput, Object v) throws IOException {
-      if (v == null) {
+    public void writeData(DataOutput dataOutput, Object value) throws IOException {
+      if (value == null) {
         dataOutput.writeBoolean(false);
       } else {
-        dataOutput.writeBoolean(true);
-        dataOutput.writeUTF(format(v));
+        ScalarHelp.writeUTF(dataOutput, format(value));
       }
     }
-
   }
 }
