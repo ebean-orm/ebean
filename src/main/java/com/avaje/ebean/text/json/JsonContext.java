@@ -4,6 +4,7 @@ import com.avaje.ebean.FetchPath;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
@@ -213,13 +214,13 @@ public interface JsonContext {
   JsonParser createParser(Reader reader) throws JsonIOException;
 
   /**
-   * Return a helper that can write scalar types known to Ebean to Jackson.
+   * Write a scalar types known to Ebean to Jackson.
    * <p>
    * Ebean has built in support for java8 and Joda types as well as the other
    * standard JDK types like URI, URL, UUID etc. This is a fast simple way to
    * write any of those types to Jackson.
    * </p>
    */
-  JsonScalar getScalar(JsonGenerator generator);
+  void writeScalar(JsonGenerator generator, Object scalarValue) throws IOException;
 
 }

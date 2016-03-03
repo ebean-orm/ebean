@@ -7,7 +7,6 @@ import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebean.text.json.JsonIOException;
 import com.avaje.ebean.text.json.JsonReadOptions;
-import com.avaje.ebean.text.json.JsonScalar;
 import com.avaje.ebean.text.json.JsonWriteBeanVisitor;
 import com.avaje.ebean.text.json.JsonWriteOptions;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -51,16 +50,19 @@ public class DJsonContext implements JsonContext {
 
   private final JsonConfig.Include defaultInclude;
 
+  private final DJsonScalar jsonScalar;
+
   public DJsonContext(SpiEbeanServer server, JsonFactory jsonFactory, TypeManager typeManager) {
     this.server = server;
     this.typeManager = typeManager;
     this.jsonFactory = (jsonFactory != null) ? jsonFactory : new JsonFactory();
     this.defaultObjectMapper = this.server.getServerConfig().getObjectMapper();
     this.defaultInclude = this.server.getServerConfig().getJsonInclude();
+    this.jsonScalar = new DJsonScalar(typeManager);
   }
 
-  public JsonScalar getScalar(JsonGenerator generator) {
-    return  new DefaultJsonScalar(typeManager, new WriteJson(generator, defaultInclude));
+  public void writeScalar(JsonGenerator generator, Object scalarValue) throws IOException {
+    jsonScalar.write(generator, scalarValue);
   }
 
   public boolean isSupportedType(Type genericType) {

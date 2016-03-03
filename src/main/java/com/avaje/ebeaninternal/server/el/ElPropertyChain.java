@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.el;
 
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.text.StringFormatter;
 import com.avaje.ebean.text.StringParser;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;

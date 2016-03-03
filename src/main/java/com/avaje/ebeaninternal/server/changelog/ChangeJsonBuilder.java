@@ -5,7 +5,6 @@ import com.avaje.ebean.event.changelog.BeanChange;
 import com.avaje.ebean.event.changelog.ChangeSet;
 import com.avaje.ebean.event.changelog.ChangeType;
 import com.avaje.ebean.text.json.JsonContext;
-import com.avaje.ebean.text.json.JsonScalar;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 
@@ -97,10 +96,7 @@ public class ChangeJsonBuilder {
     if (bean.getType() != ChangeType.DELETE) {
       gen.writeFieldName("values");
       gen.writeStartObject();
-      // use JsonScalar as it knows how to encode all the scalar
-      // property types that Ebean supports (Java8, Joda etc)
-      JsonScalar scalarWriter = json.getScalar(gen);
-      writeValuePairs(bean, scalarWriter, gen);
+      writeValuePairs(bean, gen);
       gen.writeEndObject();
     }
   }
@@ -111,7 +107,7 @@ public class ChangeJsonBuilder {
    * We are intentionally keeping the same new/old structure for both inserts and updates.
    * </p>
    */
-  protected void writeValuePairs(BeanChange bean, JsonScalar scalarWriter, JsonGenerator gen) throws IOException {
+  protected void writeValuePairs(BeanChange bean, JsonGenerator gen) throws IOException {
 
     for (Map.Entry<String, ValuePair> entry : bean.getValues().entrySet()) {
       gen.writeFieldName(entry.getKey());
@@ -120,12 +116,12 @@ public class ChangeJsonBuilder {
       Object newValue = value.getNewValue();
       if (newValue != null) {
         gen.writeFieldName("new");
-        scalarWriter.write(newValue);
+        json.writeScalar(gen, newValue);
       }
       Object oldValue = value.getOldValue();
       if (oldValue != null) {
         gen.writeFieldName("old");
-        scalarWriter.write(oldValue);
+        json.writeScalar(gen, oldValue);
       }
       gen.writeEndObject();
     }

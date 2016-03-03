@@ -3,10 +3,12 @@ package com.avaje.ebeaninternal.server.expression;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.plugin.BeanType;
 import com.avaje.ebean.plugin.ExpressionPath;
+import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.server.query.SplitName;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +32,11 @@ public class ElasticExpressionContext {
   public static final String EXISTS = "exists";
   public static final String FIELD = "field";
 
+  private final JsonContext jsonContext;
+
   private final JsonGenerator json;
+
+  private final StringWriter writer;
 
   private final BeanType<?> desc;
 
@@ -39,9 +45,11 @@ public class ElasticExpressionContext {
   /**
    * Construct given the JSON generator and root bean type.
    */
-  public ElasticExpressionContext(JsonGenerator json, BeanType<?> desc) {
-    this.json = json;
+  public ElasticExpressionContext(JsonContext jsonContext, BeanType<?> desc) {
+    this.jsonContext = jsonContext;
     this.desc = desc;
+    this.writer = new StringWriter(200);
+    this.json = jsonContext.createGenerator(writer);
   }
 
   /**
@@ -54,9 +62,10 @@ public class ElasticExpressionContext {
   /**
    * Flush the JsonGenerator buffer.
    */
-  public void flush() throws IOException {
+  public String flush() throws IOException {
     endNested();
     json.flush();
+    return writer.toString();
   }
 
   /**
@@ -77,7 +86,7 @@ public class ElasticExpressionContext {
 
   /**
    * Start Bool MUST or SHOULD.
-   *
+   * <p>
    * If conjunction is true then MUST(and) and if false is SHOULD(or).
    */
   public void writeBoolStart(boolean conjunction) throws IOException {
@@ -137,7 +146,7 @@ public class ElasticExpressionContext {
     json.writeObjectFieldStart(RANGE);
     json.writeObjectFieldStart(rawProperty(propertyName));
     json.writeFieldName(rangeType);
-    json.writeObject(value);
+    jsonContext.writeScalar(json, value);
     json.writeEndObject();
     json.writeEndObject();
     json.writeEndObject();
@@ -148,17 +157,14 @@ public class ElasticExpressionContext {
    */
   public void writeRange(String propertyName, Op lowOp, Object valueLow, Op highOp, Object valueHigh) throws IOException {
 
-    //Property property = desc.getProperty(propertyName);
-    //property.
-
     prepareNestedPath(propertyName);
     json.writeStartObject();
     json.writeObjectFieldStart(RANGE);
     json.writeObjectFieldStart(rawProperty(propertyName));
     json.writeFieldName(lowOp.docExp());
-    json.writeObject(valueLow);
+    jsonContext.writeScalar(json, valueLow);
     json.writeFieldName(highOp.docExp());
-    json.writeObject(valueHigh);
+    jsonContext.writeScalar(json, valueHigh);
     json.writeEndObject();
     json.writeEndObject();
     json.writeEndObject();
@@ -174,7 +180,7 @@ public class ElasticExpressionContext {
     json.writeObjectFieldStart(TERMS);
     json.writeArrayFieldStart(rawProperty(propertyName));
     for (Object value : values) {
-      json.writeObject(value);
+      jsonContext.writeScalar(json, value);
     }
     json.writeEndArray();
     json.writeEndObject();
@@ -191,7 +197,7 @@ public class ElasticExpressionContext {
     json.writeObjectFieldStart(IDS);
     json.writeArrayFieldStart(VALUES);
     for (Object id : idList) {
-      json.writeObject(id);
+      jsonContext.writeScalar(json, id);
     }
     json.writeEndArray();
     json.writeEndObject();
@@ -322,7 +328,7 @@ public class ElasticExpressionContext {
     json.writeStartObject();
     json.writeObjectFieldStart(type);
     json.writeFieldName(propertyName);
-    json.writeObject(value);
+    jsonContext.writeScalar(json, value);
     json.writeEndObject();
     json.writeEndObject();
   }

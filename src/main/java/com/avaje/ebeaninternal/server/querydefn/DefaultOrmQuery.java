@@ -292,18 +292,14 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public String asElasticQuery() {
 
-    StringWriter sw = new StringWriter(200);
     JsonContext json = server.json();
 
-    JsonGenerator generator = json.createGenerator(sw);
 
-    BeanType<T> beanType = server.getPluginApi().getBeanType(this.beanType);
-    ElasticExpressionContext context = new ElasticExpressionContext(generator, beanType);
+    ElasticExpressionContext context = new ElasticExpressionContext(json, beanDescriptor);
 
     try {
       writeElastic(context);
-      context.flush();
-      generatedSql = sw.toString();
+      generatedSql = context.flush();
       return generatedSql;
 
     } catch (IOException e) {

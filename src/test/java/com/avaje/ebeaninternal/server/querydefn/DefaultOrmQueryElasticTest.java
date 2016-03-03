@@ -11,7 +11,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.StringWriter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,8 +27,7 @@ public class DefaultOrmQueryElasticTest extends BaseElasticTest {
 
     SpiExpressionList<Order> whereExpressions = spiQuery.getWhereExpressions();
 
-    StringWriter sb = new StringWriter();
-    ElasticExpressionContext context = context(sb);
+    ElasticExpressionContext context = context();
     JsonGenerator json = context.json();
     json.writeStartObject();
     json.writeFieldName("filter");
@@ -37,9 +35,8 @@ public class DefaultOrmQueryElasticTest extends BaseElasticTest {
     whereExpressions.writeElastic(context);
 
     json.writeEndObject();
-    context.flush();
 
-    assertThat(sb.toString()).isEqualTo("{\"filter\":{\"term\":{\"customer.name\":\"Rob\"}}}");
+    assertThat(context.flush()).isEqualTo("{\"filter\":{\"term\":{\"customer.name\":\"Rob\"}}}");
   }
 
   @Test
@@ -52,13 +49,10 @@ public class DefaultOrmQueryElasticTest extends BaseElasticTest {
 
     SpiQuery<Order> spiQuery = (SpiQuery<Order>)query;
 
-    StringWriter sb = new StringWriter();
-    ElasticExpressionContext context = context(sb);
-
+    ElasticExpressionContext context = context();
     spiQuery.writeElastic(context);
-    context.flush();
 
-    assertThat(sb.toString()).isEqualTo("{\"fields\":[\"status\",\"customer.name\",\"details.product.id\"],\"query\":{\"filtered\":{\"filter\":{\"term\":{\"customer.name\":\"Rob\"}}}}}");
+    assertThat(context.flush()).isEqualTo("{\"fields\":[\"status\",\"customer.name\",\"details.product.id\"],\"query\":{\"filtered\":{\"filter\":{\"term\":{\"customer.name\":\"Rob\"}}}}}");
   }
 
   @Test
