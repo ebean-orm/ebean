@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -27,7 +29,11 @@ public class ScalarTypeUUIDBinary extends ScalarTypeUUIDBase {
 
   @Override
   public UUID toBeanType(Object value) {
-    return convertFromBytes((byte[]) value);
+    if (value instanceof byte[]) {
+      return convertFromBytes((byte[]) value);
+    } else {
+      return BasicTypeConverter.toUUID(value);
+    }
   }
 
   @Override

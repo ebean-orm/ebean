@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -46,6 +47,16 @@ public abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> {
   @Override
   public boolean isDateTimeCapable() {
     return false;
+  }
+
+  @Override
+  public UUID toBeanType(Object value) {
+    return BasicTypeConverter.toUUID(value);
+  }
+
+  @Override
+  public Object toJdbcType(Object value) {
+    return BasicTypeConverter.convert(value, jdbcType);
   }
 
   @Override

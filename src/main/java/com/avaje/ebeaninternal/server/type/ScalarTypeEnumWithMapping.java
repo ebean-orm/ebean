@@ -84,9 +84,4 @@ public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase i
     return beanDbMap.getDbValue(beanValue);
   }
 
-  @Override
-  public DocPropertyType getDocType() {
-    return DocPropertyType.STRING;
-  }
-
 }

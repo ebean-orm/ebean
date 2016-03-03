@@ -33,9 +33,4 @@ public class ScalarTypeUUIDNative extends ScalarTypeUUIDBase {
     return value;
   }
 
-  @Override
-  public UUID toBeanType(Object value) {
-    return (UUID) value;
-  }
-
 }
