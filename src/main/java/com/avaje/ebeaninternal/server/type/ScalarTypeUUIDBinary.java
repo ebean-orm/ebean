@@ -1,24 +1,18 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.UUID;
 
-public class ScalarTypeUUIDBinary extends ScalarTypeBase<UUID> {
+public class ScalarTypeUUIDBinary extends ScalarTypeUUIDBase {
 
   protected ScalarTypeUUIDBinary() {
-    super(UUID.class, false, Types.BINARY);
+    super(false, Types.BINARY);
   }
 
   @Override
@@ -37,23 +31,22 @@ public class ScalarTypeUUIDBinary extends ScalarTypeBase<UUID> {
   }
 
   @Override
-  public String formatValue(UUID v) {
-    return v.toString();
+  public void bind(DataBind b, UUID value) throws SQLException {
+    if (value == null) {
+      b.setNull(Types.BINARY);
+    } else {
+      b.setBytes(convertToBytes(value));
+    }
   }
 
   @Override
-  public UUID parse(String value) {
-    return UUID.fromString(value);
-  }
-
-  @Override
-  public UUID convertFromMillis(long dateTime) {
-    throw new IllegalStateException("Never called");
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
+  public UUID read(DataReader dataReader) throws SQLException {
+    byte[] bytes = dataReader.getBytes();
+    if (bytes == null) {
+      return null;
+    } else {
+      return convertFromBytes(bytes);
+    }
   }
 
   /**
@@ -103,56 +96,4 @@ public class ScalarTypeUUIDBinary extends ScalarTypeBase<UUID> {
     return baos.toByteArray();
   }
 
-  @Override
-  public void bind(DataBind b, UUID value) throws SQLException {
-    if (value == null) {
-      b.setNull(Types.BINARY);
-
-    } else {
-      b.setBytes(convertToBytes(value));
-    }
-  }
-
-  @Override
-  public UUID read(DataReader dataReader) throws SQLException {
-    byte[] bytes = dataReader.getBytes();
-    if (bytes == null) {
-      return null;
-    } else {
-      return convertFromBytes(bytes);
-    }
-  }
-
-  @Override
-  public UUID readData(DataInput dataInput) throws IOException {
-    if (!dataInput.readBoolean()) {
-      return null;
-    } else {
-      return parse(dataInput.readUTF());
-    }
-  }
-
-  @Override
-  public void writeData(DataOutput dataOutput, UUID value) throws IOException {
-    if (value == null) {
-      dataOutput.writeBoolean(false);
-    } else {
-      ScalarHelp.writeUTF(dataOutput, format(value));
-    }
-  }
-
-  @Override
-  public UUID jsonRead(JsonParser parser) throws IOException {
-    return UUID.fromString(parser.getValueAsString());
-  }
-
-  @Override
-  public void jsonWrite(JsonGenerator writer, UUID value) throws IOException {
-    writer.writeString(value.toString());
-  }
-
-  @Override
-  public DocPropertyType getDocType() {
-    return DocPropertyType.STRING;
-  }
 }
