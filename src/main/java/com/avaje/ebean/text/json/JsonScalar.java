@@ -11,5 +11,5 @@ public interface JsonScalar {
    * Write the scalar type to JSON where the value can be any type known to Ebean
    * including Enums, Java8 time types, Joda types, URL, URI etc.
    */
-  void write(String name, Object value) throws IOException;
+  void write(Object value) throws IOException;
 }

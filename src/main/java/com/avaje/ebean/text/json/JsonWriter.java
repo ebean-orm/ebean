@@ -136,6 +136,11 @@ public interface JsonWriter {
   void writeNumber(long value);
 
   /**
+   * Write a double value.
+   */
+  void writeNumber(double value);
+
+  /**
    * Write a BigDecimal value (typically inside a list).
    */
   void writeNumber(BigDecimal value);

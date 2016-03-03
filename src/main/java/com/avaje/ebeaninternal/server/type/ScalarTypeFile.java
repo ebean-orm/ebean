@@ -112,8 +112,7 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, String name, File value) throws IOException {
-    writer.writeFieldName(name);
+  public void jsonWrite(JsonWriter writer, File value) throws IOException {
     InputStream is = getInputStream(value);
     writer.writeBinary(is, (int) value.length());
   }

@@ -104,21 +104,19 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, String name, T value) throws IOException {
+  public void jsonWrite(JsonWriter writer, T value) throws IOException {
 
     switch (mode) {
       case ISO8601: {
-        writer.writeFieldName(name);
         writer.gen().writeString(toJsonISO8601(value));
         break;
       }
       case NANOS: {
-        writer.writeFieldName(name);
         writer.gen().writeNumber(toJsonNanos(value));
         break;
       }
       default: {
-        writer.gen().writeNumberField(name, convertToMillis(value));
+        writer.gen().writeNumber(convertToMillis(value));
       }
     }
   }

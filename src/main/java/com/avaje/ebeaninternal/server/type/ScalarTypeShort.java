@@ -92,8 +92,8 @@ public class ScalarTypeShort extends ScalarTypeBase<Short> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, String name, Short value) throws IOException {
-    writer.writeNumberField(name, value);
+  public void jsonWrite(JsonWriter writer, Short value) throws IOException {
+    writer.writeNumber(value);
   }
 
   @Override

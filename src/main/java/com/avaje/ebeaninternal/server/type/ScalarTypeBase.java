@@ -36,6 +36,7 @@ public abstract class ScalarTypeBase<T> implements ScalarType<T> {
   /**
    * Just return 0.
    */
+  @Override
   public int getLength() {
     return 0;
   }

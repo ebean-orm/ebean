@@ -125,8 +125,8 @@ public class ScalarTypeMonthDay extends ScalarTypeBase<MonthDay> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, String name, MonthDay value) throws IOException {
-    writer.writeStringField(name, format(value));
+  public void jsonWrite(JsonWriter writer, MonthDay value) throws IOException {
+    writer.writeString(format(value));
   }
 
   @Override

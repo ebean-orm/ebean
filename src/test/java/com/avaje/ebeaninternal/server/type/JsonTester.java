@@ -33,7 +33,8 @@ public class JsonTester<T> {
     generator.writeStartObject();
 
     WriteJson writeJson = new WriteJson(generator, JsonConfig.Include.ALL);
-    type.jsonWrite(writeJson, "key", value);
+    writeJson.writeFieldName("key");
+    type.jsonWrite(writeJson, value);
     generator.writeEndObject();
     generator.flush();
 

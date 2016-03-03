@@ -44,6 +44,7 @@ public class ScalarTypePostgresHstoreTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testParse() throws Exception {
     Map<String,Object> map = (Map<String,Object>)hstore.parse("{\"name\":\"rob\"}");
     assertEquals(1, map.size());
@@ -51,6 +52,7 @@ public class ScalarTypePostgresHstoreTest {
   }
 
   @Test(expected = RuntimeException.class)
+  @SuppressWarnings("unchecked")
   public void testParseDateTime() throws Exception {
     Map<String,Object> map = (Map<String,Object>)hstore.convertFromMillis(1234L);
     assertEquals(1, map.size());
@@ -59,8 +61,6 @@ public class ScalarTypePostgresHstoreTest {
 
   @Test
   public void testJsonWrite() throws Exception {
-
-    assertEquals("{\"key\":null}", generateJson(null));
 
     Map<String,Object> map = new LinkedHashMap<String, Object>();
 
@@ -87,6 +87,7 @@ public class ScalarTypePostgresHstoreTest {
 
   }
 
+  @SuppressWarnings("unchecked")
   private Map<String,Object> parseHstore(String json) throws IOException {
     JsonParser parser = jsonFactory.createParser(json);
     // BeanProperty reads the first token checking for null so
@@ -97,13 +98,15 @@ public class ScalarTypePostgresHstoreTest {
   }
 
   private String generateJson(Map<String, Object> map) throws IOException {
+
     StringWriter writer = new StringWriter();
     JsonGenerator generator = jsonFactory.createGenerator(writer);
     // wrap in an object to form proper json
     generator.writeStartObject();
+    generator.writeFieldName("key");
 
     WriteJson writeJson = new WriteJson(generator, JsonConfig.Include.ALL);
-    hstore.jsonWrite(writeJson, "key", map);
+    hstore.jsonWrite(writeJson, map);
 
     generator.writeEndObject();
     generator.flush();

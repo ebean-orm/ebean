@@ -314,6 +314,15 @@ public class WriteJson implements JsonWriter {
   }
 
   @Override
+  public void writeNumber(double value) {
+    try {
+      generator.writeNumber(value);
+    } catch (IOException e) {
+      throw new JsonIOException(e);
+    }
+  }
+
+  @Override
   public void writeNumber(BigDecimal value) {
     try {
       generator.writeNumber(value);

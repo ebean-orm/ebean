@@ -91,8 +91,8 @@ public class ScalarTypeLong extends ScalarTypeBase<Long> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, String name, Long value) throws IOException {
-    writer.writeNumberField(name, value);
+  public void jsonWrite(JsonWriter writer, Long value) throws IOException {
+    writer.writeNumber(value);
   }
 
   @Override

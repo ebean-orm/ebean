@@ -139,8 +139,8 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, String name, T value) throws IOException {
-    wrapped.jsonWrite(writer, name, value);
+  public void jsonWrite(JsonWriter writer, T value) throws IOException {
+    wrapped.jsonWrite(writer, value);
   }
 
   @Override

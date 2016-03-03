@@ -91,8 +91,8 @@ public class ScalarTypeFloat extends ScalarTypeBase<Float> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, String name, Float value) throws IOException {
-    writer.writeNumberField(name, value);
+  public void jsonWrite(JsonWriter writer, Float value) throws IOException {
+    writer.writeNumber(value);
   }
 
   @Override

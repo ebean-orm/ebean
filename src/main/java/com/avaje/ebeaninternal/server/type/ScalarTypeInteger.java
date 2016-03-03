@@ -91,8 +91,8 @@ public class ScalarTypeInteger extends ScalarTypeBase<Integer> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, String name, Integer value) throws IOException {
-    writer.writeNumberField(name, value);
+  public void jsonWrite(JsonWriter writer, Integer value) throws IOException {
+    writer.writeNumber(value);
   }
 
   @Override

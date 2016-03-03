@@ -119,11 +119,13 @@ public class ChangeJsonBuilder {
       ValuePair value = entry.getValue();
       Object newValue = value.getNewValue();
       if (newValue != null) {
-        scalarWriter.write("new", newValue);
+        gen.writeFieldName("new");
+        scalarWriter.write(newValue);
       }
       Object oldValue = value.getOldValue();
       if (oldValue != null) {
-        scalarWriter.write("old", oldValue);
+        gen.writeFieldName("old");
+        scalarWriter.write(oldValue);
       }
       gen.writeEndObject();
     }

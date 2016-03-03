@@ -206,14 +206,8 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, String name, JsonNode value) throws IOException {
-    // write the field name followed by the JsonNode object
-    if (value == null) {
-      writer.writeNullField(name);
-    } else {
-      writer.writeFieldName(name);
-      objectMapper.writeTree(writer.gen(), value);
-    }
+  public void jsonWrite(JsonWriter writer, JsonNode value) throws IOException {
+    objectMapper.writeTree(writer.gen(), value);
   }
 
   @Override

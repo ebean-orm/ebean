@@ -129,8 +129,8 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, String name, T value) throws IOException {
-    writer.writeStringField(name, format(value));
+  public void jsonWrite(JsonWriter writer, T value) throws IOException {
+    writer.writeString(format(value));
   }
 
   @Override

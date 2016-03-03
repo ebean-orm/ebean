@@ -41,7 +41,7 @@ public class TestJsonExcludeEmptyMap {
 
     String asJson = Ebean.json().toJson(bean, options);
 
-    String expectedJson = "{\"id\":99}";
+    String expectedJson = "{\"id\":99,\"content\":{}}";
 
     assertEquals(expectedJson, asJson);
   }

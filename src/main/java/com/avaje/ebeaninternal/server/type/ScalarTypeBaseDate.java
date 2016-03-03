@@ -78,9 +78,9 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
     }
   }
 
-  public void jsonWrite(JsonWriter writer, String name, T value) throws IOException {
-    long millis = convertToMillis(value);
-    writer.writeNumberField(name, millis);
+  @Override
+  public void jsonWrite(JsonWriter writer, T value) throws IOException {
+    writer.writeNumber(convertToMillis(value));
   }
 
   @Override

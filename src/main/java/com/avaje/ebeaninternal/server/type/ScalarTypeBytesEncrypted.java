@@ -5,6 +5,7 @@ import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -65,8 +66,9 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, String name, byte[] value) throws IOException {
-    writer.writeBinaryField(name, value);
+  public void jsonWrite(JsonWriter writer, byte[] value) throws IOException {
+    ByteArrayInputStream is = new ByteArrayInputStream(value);
+    writer.writeBinary(is, value.length);
   }
 
   @Override

@@ -336,8 +336,8 @@ public class ScalarTypeBoolean {
     }
 
     @Override
-    public void jsonWrite(JsonWriter writer, String name, Boolean value) throws IOException {
-      writer.writeBooleanField(name, value);
+    public void jsonWrite(JsonWriter writer, Boolean value) throws IOException {
+      writer.writeBoolean(value);
     }
 
     @Override

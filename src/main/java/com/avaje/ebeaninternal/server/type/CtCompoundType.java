@@ -173,26 +173,25 @@ public final class CtCompoundType<V> implements ScalarDataReader<V> {
   public void jsonWrite(WriteJson ctx, Object valueObject, String propertyName) throws IOException {
 
     ctx.beginAssocOne(propertyName, valueObject);
-    jsonWriteProps(ctx, valueObject, propertyName);
+    jsonWriteProps(ctx, valueObject);
     ctx.endAssocOne();
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  private void jsonWriteProps(WriteJson ctx, Object valueObject, String propertyName) throws IOException {
+  private void jsonWriteProps(WriteJson ctx, Object valueObject) throws IOException {
 
-    if (propertyName != null) {
-      ctx.gen().writeFieldName(propertyName);
-    }
     ctx.gen().writeStartObject();
 
     for (int i = 0; i < properties.length; i++) {
       String propName = properties[i].getName();
       Object value = properties[i].getValue((V) valueObject);
       if (propReaders[i] instanceof CtCompoundType<?>) {
+        ctx.writeFieldName(propName);
         ((CtCompoundType) propReaders[i]).jsonWrite(ctx, value, propName);
 
       } else {
-        ((ScalarType) propReaders[i]).jsonWrite(ctx, propName, value);
+        ctx.writeFieldName(propName);
+        ((ScalarType) propReaders[i]).jsonWrite(ctx, value);
       }
     }
 

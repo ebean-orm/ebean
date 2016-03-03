@@ -100,20 +100,12 @@ public class ScalarTypeUUIDNative extends ScalarTypeBase<UUID> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, String name, UUID value) throws IOException {
-    // write the field name followed by the Map/JSON Object
-    if (value == null) {
-      writer.writeNullField(name);
-    } else {
-      writer.writeStringField(name, formatValue(value));
-    }
+  public void jsonWrite(JsonWriter writer, UUID value) throws IOException {
+    writer.writeString(formatValue(value));
   }
 
   @Override
   public UUID jsonRead(JsonParser parser, JsonToken event) throws IOException {
-    // at this point the BeanProperty has read the START_OBJECT token
-    // to check for a null value. Pass the START_OBJECT token through to
-    // the EJson parsing so that it knows the first token has been read
     String strValue = parser.getValueAsString();
     return strValue == null ? null : parse(strValue);
   }

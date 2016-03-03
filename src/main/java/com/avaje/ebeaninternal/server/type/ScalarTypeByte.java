@@ -43,7 +43,7 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
   }
 
   @Override
-  public void jsonWrite(JsonWriter writer, String name, Byte value) throws IOException {
+  public void jsonWrite(JsonWriter writer, Byte value) throws IOException {
     throw new IOException("Not supported");
   }
 
