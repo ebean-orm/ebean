@@ -3,40 +3,43 @@ package com.avaje.ebean.config;
 import com.avaje.ebean.annotation.DocStoreEvent;
 
 /**
- * Configuration for the Document store (ElasticSearch) integration.
+ * Configuration for the Document store integration (e.g. ElasticSearch).
  */
 public class DocStoreConfig {
 
   /**
    * True when the Document store integration is active/on.
    */
-  boolean active;
+  protected boolean active;
 
   /**
    * When true the Document store should drop and re-create any document mapping (like DDL).
    */
-  boolean dropCreate;
+  protected boolean dropCreate;
 
   /**
    * The URL of the Document store server. For example: http://localhost:9200.
    */
-  String url;
+  protected String url;
 
   /**
    * The default mode used by indexes.
    */
-  DocStoreEvent persist = DocStoreEvent.UPDATE;
+  protected DocStoreEvent persist = DocStoreEvent.UPDATE;
 
   /**
    * The default batch size to use for the Bulk API calls.
    */
-  int bulkBatchSize = 1000;
-
+  protected int bulkBatchSize = 1000;
 
   /**
    * Return true if the Document store (ElasticSearch) integration is active.
    */
   public boolean isActive() {
+    String systemValue = System.getProperty("ebean.docstore.active");
+    if (systemValue != null) {
+      return Boolean.parseBoolean(systemValue);
+    }
     return active;
   }
 
@@ -45,6 +48,27 @@ public class DocStoreConfig {
    */
   public void setActive(boolean active) {
     this.active = active;
+  }
+
+  /**
+   * Return the URL to the Document store.
+   */
+  public String getUrl() {
+    String systemValue = System.getProperty("ebean.docstore.url");
+    if (systemValue != null) {
+      return systemValue;
+    }
+
+    return url;
+  }
+
+  /**
+   * Set the URL to the Document store server.
+   * <p>
+   * For a local ElasticSearch server this would be: http://localhost:9200
+   */
+  public void setUrl(String url) {
+    this.url = url;
   }
 
   /**
@@ -60,6 +84,24 @@ public class DocStoreConfig {
   public void setDropCreate(boolean dropCreate) {
     this.dropCreate = dropCreate;
   }
+
+  /**
+   * Return the default batch size to use for calls to the Bulk API.
+   */
+  public int getBulkBatchSize() {
+    return bulkBatchSize;
+  }
+
+  /**
+   * Set the default batch size to use for calls to the Bulk API.
+   * <p>
+   * The batch size can be set on a transaction via {@link com.avaje.ebean.Transaction#setDocStoreUpdateBatchSize(int)}.
+   * </p>
+   */
+  public void setBulkBatchSize(int bulkBatchSize) {
+    this.bulkBatchSize = bulkBatchSize;
+  }
+
 
   /**
    * Return the default behavior for when Insert, Update and Delete events occur on beans that have an associated
@@ -89,40 +131,6 @@ public class DocStoreConfig {
    */
   public void setPersist(DocStoreEvent persist) {
     this.persist = persist;
-  }
-
-  /**
-   * Return the URL to the Document store.
-   */
-  public String getUrl() {
-    return url;
-  }
-
-  /**
-   * Set the URL to the Document store server.
-   *
-   * For a local ElasticSearch server this would be: http://localhost:9200
-   */
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
-
-  /**
-   * Return the default batch size to use for calls to the Bulk API.
-   */
-  public int getBulkBatchSize() {
-    return bulkBatchSize;
-  }
-
-  /**
-   * Set the default batch size to use for calls to the Bulk API.
-   * <p>
-   *   The batch size can be set on a transaction via {@link com.avaje.ebean.Transaction#setDocStoreUpdateBatchSize(int)}.
-   * </p>
-   */
-  public void setBulkBatchSize(int bulkBatchSize) {
-    this.bulkBatchSize = bulkBatchSize;
   }
 
   /**

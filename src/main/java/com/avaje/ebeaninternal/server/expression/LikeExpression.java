@@ -28,26 +28,29 @@ class LikeExpression extends AbstractExpression {
   @Override
   public void writeElastic(ElasticExpressionContext context) throws IOException {
 
-    String paramVal = (caseInsensitive) ? val.toLowerCase() : val;
     switch (type) {
       case RAW:
-        context.writeWildcard(propName, paramVal);
+        context.writeLike(propName, val);
         break;
 
       case STARTS_WITH:
-        context.writePrefix(propName, paramVal);
+        context.writeStartsWith(propName, val);
         break;
 
       case ENDS_WITH:
-        context.writeSuffix(propName, paramVal);
+        context.writeEndsWith(propName, val);
         break;
 
       case CONTAINS:
-        context.writeMatch(propName, paramVal);
+        context.writeContains(propName, val);
          break;
 
       case EQUAL_TO:
-        context.writeTerm(propName, paramVal);
+        if (caseInsensitive) {
+          context.writeIEqual(propName, val);
+        } else {
+          context.writeTerm(propName, val);
+        }
         break;
 
       default:

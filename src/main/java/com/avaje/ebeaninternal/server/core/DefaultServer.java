@@ -1129,7 +1129,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setType(Type.BEAN);
-
     if (SpiQuery.Mode.NORMAL.equals(spiQuery.getMode()) && !spiQuery.isLoadBeanCache()) {
       // See if we can skip doing the fetch completely by getting the bean from the
       // persistence context or the bean cache
@@ -1140,6 +1139,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     SpiOrmQueryRequest<T> request = createQueryRequest(spiQuery, t);
+    if (request.isUseDocStore()) {
+      return docStore().getById(query.getBeanType(), query.getId());
+    }
     try {
       request.initTransIfRequired();
       return (T) request.findId();
@@ -1158,9 +1160,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return findId(query, t);
     }
 
-    BeanDescriptor<T> desc = beanDescriptorManager.getBeanDescriptor(query.getBeanType());
+    SpiQuery<T> spiQuery = (SpiQuery<T>) query;
+    BeanDescriptor<T> desc = spiQuery.getBeanDescriptor();
 
-    T bean = desc.cacheNaturalKeyLookup((SpiQuery<T>) query, (SpiTransaction) t);
+    T bean = desc.cacheNaturalKeyLookup(spiQuery, (SpiTransaction) t);
     if (bean != null) {
       return bean;
     }
@@ -1352,6 +1355,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
 
+    if (request.isUseDocStore()) {
+      docStore().findEach(query, consumer);
+      return;
+    }
+
     request.initTransIfRequired();
     request.findEach(consumer);
     // no try finally - findVisit guarantee's cleanup of the transaction if required
@@ -1397,7 +1405,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <T> List<T> findList(Query<T> query, Transaction t) {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, t);
-
     Object result = request.getFromQueryCache();
     if (result != null) {
       return (List<T>) result;

@@ -303,7 +303,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     try {
       writeElastic(context);
       context.flush();
-      return sw.toString();
+      generatedSql = sw.toString();
+      return generatedSql;
 
     } catch (IOException e) {
       throw new PersistenceIOException(e);

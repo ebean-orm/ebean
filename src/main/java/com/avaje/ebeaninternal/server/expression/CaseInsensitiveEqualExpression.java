@@ -20,17 +20,7 @@ class CaseInsensitiveEqualExpression extends AbstractExpression {
 
   @Override
   public void writeElastic(ElasticExpressionContext context) throws IOException {
-
-    String[] values = value.split(" ");
-    if (values.length == 1) {
-      context.writeMatch(propName, value);
-    } else {
-      context.writeBoolStart(true);
-      for (String val : values) {
-        context.writeMatch(propName, val);
-      }
-      context.writeBoolEnd();
-    }
+    context.writeIEqual(propName, value);
   }
 
   @Override

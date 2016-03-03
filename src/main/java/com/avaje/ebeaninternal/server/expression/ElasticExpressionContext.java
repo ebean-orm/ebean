@@ -36,6 +36,9 @@ public class ElasticExpressionContext {
 
   private String currentNestedPath;
 
+  /**
+   * Construct given the JSON generator and root bean type.
+   */
   public ElasticExpressionContext(JsonGenerator json, BeanType<?> desc) {
     this.json = json;
     this.desc = desc;
@@ -66,23 +69,38 @@ public class ElasticExpressionContext {
 
   /**
    * Return an associated 'raw' property given the property name.
+   * This just returns the original propertyName if no 'raw' property is mapped.
    */
   private String rawProperty(String propertyName) {
     return desc.docStore().rawProperty(propertyName);
   }
 
+  /**
+   * Start Bool MUST or SHOULD.
+   *
+   * If conjunction is true then MUST(and) and if false is SHOULD(or).
+   */
   public void writeBoolStart(boolean conjunction) throws IOException {
     writeBoolStart((conjunction) ? MUST : SHOULD);
   }
 
+  /**
+   * Start Bool MUST.
+   */
   public void writeBoolMustStart() throws IOException {
     writeBoolStart(MUST);
   }
 
+  /**
+   * Start Bool MUST_NOT.
+   */
   public void writeBoolMustNotStart() throws IOException {
     writeBoolStart(MUST_NOT);
   }
 
+  /**
+   * Start a Bool expression list with the given type (MUST, MUST_NOT, SHOULD).
+   */
   private void writeBoolStart(String type) throws IOException {
     endNested();
     json.writeStartObject();
@@ -90,17 +108,28 @@ public class ElasticExpressionContext {
     json.writeArrayFieldStart(type);
   }
 
+  /**
+   * Write the end of a Bool expression list.
+   */
   public void writeBoolEnd() throws IOException {
     json.writeEndArray();
     json.writeEndObject();
     json.writeEndObject();
   }
 
+  /**
+   * Write a term expression.
+   */
   public void writeTerm(String propertyName, Object value) throws IOException {
 
-    writeRawType(TERM, rawProperty(propertyName), value);
+    // prepareNested on propertyName and expression uses raw
+    prepareNestedPath(propertyName);
+    writeRawExpression(TERM, rawProperty(propertyName), value);
   }
 
+  /**
+   * Write a range expression with a single value.
+   */
   public void writeRange(String propertyName, String rangeType, Object value) throws IOException {
 
     prepareNestedPath(propertyName);
@@ -114,7 +143,13 @@ public class ElasticExpressionContext {
     json.writeEndObject();
   }
 
+  /**
+   * Write a range expression with a low and high value.
+   */
   public void writeRange(String propertyName, Op lowOp, Object valueLow, Op highOp, Object valueHigh) throws IOException {
+
+    //Property property = desc.getProperty(propertyName);
+    //property.
 
     prepareNestedPath(propertyName);
     json.writeStartObject();
@@ -129,6 +164,9 @@ public class ElasticExpressionContext {
     json.writeEndObject();
   }
 
+  /**
+   * Write a terms expression.
+   */
   public void writeTerms(String propertyName, Object[] values) throws IOException {
 
     prepareNestedPath(propertyName);
@@ -143,7 +181,9 @@ public class ElasticExpressionContext {
     json.writeEndObject();
   }
 
-
+  /**
+   * Write an Ids expression.
+   */
   public void writeIds(List<?> idList) throws IOException {
 
     endNested();
@@ -158,6 +198,9 @@ public class ElasticExpressionContext {
     json.writeEndObject();
   }
 
+  /**
+   * Write an Id expression.
+   */
   public void writeId(Object value) throws IOException {
 
     List<Object> ids = new ArrayList<Object>(1);
@@ -165,33 +208,89 @@ public class ElasticExpressionContext {
     writeIds(ids);
   }
 
-  public void writeSuffix(String propertyName, String value) {
-    throw new IllegalArgumentException("Not implemented yet. Could search for a mapped 'reversed' property and do prefix query");
-  }
-
-  public void writePrefix(String propertyName, String value) throws IOException {
+  /**
+   * Write a prefix expression.
+   */
+  public void writeStartsWith(String propertyName, String value) throws IOException {
     // use analysed field
-    prepareNestedPath(propertyName);
-    writeRawType(PREFIX, propertyName, value);
+    writeRawWithPrepareNested(PREFIX, propertyName, value.toLowerCase());
   }
 
+  /**
+   * Suffix expression not supported yet.
+   */
+  public void writeEndsWith(String propertyName, String value) throws IOException {
+    // use analysed field
+    // this will likely be slow - best to avoid if you can
+    writeWildcard(propertyName, "*" + value.toLowerCase());
+  }
+
+  /**
+   * Write a match expression.
+   */
+  public void writeContains(String propertyName, String value) throws IOException {
+    // use analysed field
+    writeWildcard(propertyName, "*" + value.toLowerCase() + "*");
+  }
+
+  /**
+   * Write a wildcard expression.
+   */
+  public void writeLike(String propertyName, String value) throws IOException {
+    // use analysed field
+    String val = value.toLowerCase();
+    // replace SQL wildcard characters with ElasticSearch ones
+    val = val.replace('_', '?');
+    val = val.replace('%', '*');
+    writeRawWithPrepareNested(WILDCARD, propertyName, val);
+  }
+
+  /**
+   * Write case-insensitive equal to.
+   */
+  public void writeIEqual(String propName, String value) throws IOException {
+
+    String[] values = value.toLowerCase().split(" ");
+    if (values.length == 1) {
+      writeMatch(propName, value);
+    } else {
+      // Boolean AND all the terms together
+      writeBoolStart(true);
+      for (String val : values) {
+        writeMatch(propName, val);
+      }
+      writeBoolEnd();
+    }
+  }
+
+  /**
+   * Write a prefix expression.
+   */
   public void writeMatch(String propertyName, String value) throws IOException {
     // use analysed field
-    prepareNestedPath(propertyName);
-    writeRawType(MATCH, propertyName, value);
+    writeRawWithPrepareNested(MATCH, propertyName, value.toLowerCase());
   }
 
+  /**
+   * Write a wildcard expression.
+   */
   public void writeWildcard(String propertyName, String value) throws IOException {
-    prepareNestedPath(propertyName);
-    writeRawType(WILDCARD, propertyName, value);
+    writeRawWithPrepareNested(WILDCARD, propertyName, value);
   }
 
+  /**
+   * Write raw JSON to the query buffer.
+   */
   public void writeRaw(String jsonExpression) throws IOException {
     json.writeRaw(jsonExpression);
   }
 
+  /**
+   * Write an exists expression.
+   */
   public void writeExists(boolean notNull, String propertyName) throws IOException {
 
+    // prepareNestedPath prior to BoolMustNotStart
     prepareNestedPath(propertyName);
     if (!notNull) {
       writeBoolMustNotStart();
@@ -203,12 +302,23 @@ public class ElasticExpressionContext {
   }
 
   private void writeExists(String propertyName) throws IOException {
-    writeRawType(EXISTS, FIELD, propertyName);
+    writeRawExpression(EXISTS, FIELD, propertyName);
   }
 
-  private void writeRawType(String type, String propertyName, Object value) throws IOException {
+  /**
+   * Write with prepareNestedPath() on the propertyName
+   */
+  private void writeRawWithPrepareNested(String type, String propertyName, Object value) throws IOException {
 
     prepareNestedPath(propertyName);
+    writeRawExpression(type, propertyName, value);
+  }
+
+  /**
+   * Write raw.  prepareNestedPath() should already be done.
+   */
+  private void writeRawExpression(String type, String propertyName, Object value) throws IOException {
+
     json.writeStartObject();
     json.writeObjectFieldStart(type);
     json.writeFieldName(propertyName);
@@ -217,10 +327,12 @@ public class ElasticExpressionContext {
     json.writeEndObject();
   }
 
-
-
+  /**
+   * Write an expression for the core operations.
+   */
   public void writeSimple(Op type, String propertyName, Object value) throws IOException {
 
+    // prepareNested prior to boolMustNotStart
     prepareNestedPath(propertyName);
     switch (type) {
       case EQ:
@@ -243,7 +355,6 @@ public class ElasticExpressionContext {
       default:
         writeRange(propertyName, type.docExp(), value);
     }
-
   }
 
   /**
@@ -264,6 +375,9 @@ public class ElasticExpressionContext {
     }
   }
 
+  /**
+   * Check if we need to start a nested path filter and do so if required.
+   */
   private void prepareNestedPath(String propName) throws IOException {
     ExpressionPath exprPath = desc.getExpressionPath(propName);
     if (exprPath != null && exprPath.containsMany()) {
@@ -274,6 +388,9 @@ public class ElasticExpressionContext {
     }
   }
 
+  /**
+   * Start a nested path filter.
+   */
   private void startNested(String nestedPath) throws IOException {
 
     if (currentNestedPath != null) {
@@ -281,6 +398,7 @@ public class ElasticExpressionContext {
         // just add to currentNestedPath
         return;
       } else {
+        // end the prior one as this is different
         endNested();
       }
     }
@@ -292,12 +410,15 @@ public class ElasticExpressionContext {
     json.writeFieldName("filter");
   }
 
+  /**
+   * End a nested path filter if one is still open.
+   */
   private void endNested() throws IOException {
     if (currentNestedPath != null) {
       currentNestedPath = null;
-      //json.writeEndObject();
       json.writeEndObject();
       json.writeEndObject();
     }
   }
+
 }

@@ -462,7 +462,7 @@ public class BeanProperty implements ElPropertyValue, Property {
 
   public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain,
                                               boolean propertyDeploy) {
-    throw new PersistenceException("Not valid on scalar bean property " + getFullBeanName());
+    return null;
   }
 
   /**
