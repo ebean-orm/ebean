@@ -1319,7 +1319,7 @@ public class BeanProperty implements ElPropertyValue, Property {
 
       DocPropertyType type = scalarType.getDocType();
       DocPropertyOptions options = docOptions.copy();
-      if (DocPropertyType.STRING == type && isDocCode()) {
+      if (id || DocPropertyType.ENUM == type) {
         options.setCode(true);
       }
 
@@ -1327,10 +1327,4 @@ public class BeanProperty implements ElPropertyValue, Property {
     }
   }
 
-  /**
-   * Return true if this should be treated as a 'code' (effectively not analysed).
-   */
-  private boolean isDocCode() {
-    return id || scalarType instanceof ScalarTypeEnum;
-  }
 }
