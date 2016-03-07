@@ -69,8 +69,8 @@ public final class PostCommitProcessing {
     this.clusterManager = clusterManager;
     this.manager = manager;
     this.serverName = manager.getServerName();
-    this.txnDocStoreMode = transaction.getDocStoreUpdateMode();
-    this.txnDocStoreBatchSize = transaction.getDocStoreBulkBatchSize();
+    this.txnDocStoreMode = transaction.getDocStoreMode();
+    this.txnDocStoreBatchSize = transaction.getDocStoreBatchSize();
     this.event = transaction.getEvent();
     this.deleteByIdMap = event.getDeleteByIdMap();
     this.persistBeanRequests = event.getPersistRequestBeans();

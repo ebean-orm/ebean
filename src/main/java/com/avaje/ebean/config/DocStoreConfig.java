@@ -110,7 +110,7 @@ public class DocStoreConfig {
   /**
    * Set the default batch size to use for calls to the Bulk API.
    * <p>
-   * The batch size can be set on a transaction via {@link com.avaje.ebean.Transaction#setDocStoreUpdateBatchSize(int)}.
+   * The batch size can be set on a transaction via {@link com.avaje.ebean.Transaction#setDocStoreBatchSize(int)}.
    * </p>
    */
   public void setBulkBatchSize(int bulkBatchSize) {

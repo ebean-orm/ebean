@@ -147,9 +147,9 @@ public class JdbcTransaction implements SpiTransaction {
    * The mode for updating doc store indexes for this transaction.
    * Only set when you want to override the default behavior.
    */
-  protected DocStoreMode docStoreUpdateMode;
+  protected DocStoreMode docStoreMode;
 
-  protected int docStoreBulkBatchSize;
+  protected int docStoreBatchSize;
 
   /**
    * Create a new JdbcTransaction.
@@ -282,22 +282,22 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   @Override
-  public int getDocStoreBulkBatchSize() {
-    return docStoreBulkBatchSize;
+  public int getDocStoreBatchSize() {
+    return docStoreBatchSize;
   }
 
   @Override
-  public void setDocStoreUpdateBatchSize(int docStoreBulkBatchSize) {
-    this.docStoreBulkBatchSize = docStoreBulkBatchSize;
+  public void setDocStoreBatchSize(int docStoreBatchSize) {
+    this.docStoreBatchSize = docStoreBatchSize;
   }
 
-  public DocStoreMode getDocStoreUpdateMode() {
-    return docStoreUpdateMode;
+  public DocStoreMode getDocStoreMode() {
+    return docStoreMode;
   }
 
   @Override
-  public void setDocStoreUpdateMode(DocStoreMode docStoreUpdateMode) {
-    this.docStoreUpdateMode = docStoreUpdateMode;
+  public void setDocStoreMode(DocStoreMode docStoreMode) {
+    this.docStoreMode = docStoreMode;
   }
 
   @Override

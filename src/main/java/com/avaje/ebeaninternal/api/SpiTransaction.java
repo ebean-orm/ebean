@@ -109,13 +109,13 @@ public interface SpiTransaction extends Transaction {
    * Returning 0 implies to use the system wide default batch size.
    * </p>
    */
-  DocStoreMode getDocStoreUpdateMode();
+  DocStoreMode getDocStoreMode();
 
   /**
    * Return the batch size to us for ElasticSearch Bulk API calls
    * as a result of this transaction.
    */
-  int getDocStoreBulkBatchSize();
+  int getDocStoreBatchSize();
 
   /**
    * Return the batchSize specifically set for this transaction or 0.

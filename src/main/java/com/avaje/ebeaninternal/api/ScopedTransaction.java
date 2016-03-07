@@ -61,23 +61,23 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
-  public DocStoreMode getDocStoreUpdateMode() {
-    return transaction.getDocStoreUpdateMode();
+  public DocStoreMode getDocStoreMode() {
+    return transaction.getDocStoreMode();
   }
 
   @Override
-  public void setDocStoreUpdateMode(DocStoreMode mode) {
-    transaction.setDocStoreUpdateMode(mode);
+  public void setDocStoreMode(DocStoreMode mode) {
+    transaction.setDocStoreMode(mode);
   }
 
   @Override
-  public int getDocStoreBulkBatchSize() {
-    return transaction.getDocStoreBulkBatchSize();
+  public int getDocStoreBatchSize() {
+    return transaction.getDocStoreBatchSize();
   }
 
   @Override
-  public void setDocStoreUpdateBatchSize(int batchSize) {
-    transaction.setDocStoreUpdateBatchSize(batchSize);
+  public void setDocStoreBatchSize(int batchSize) {
+    transaction.setDocStoreBatchSize(batchSize);
   }
 
   @Override

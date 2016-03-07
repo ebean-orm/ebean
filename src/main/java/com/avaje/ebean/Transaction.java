@@ -92,7 +92,7 @@ public interface Transaction extends Closeable {
    *   to control how that is sent to the document store.
    * </p>
    */
-  void setDocStoreUpdateMode(DocStoreMode updateMode);
+  void setDocStoreMode(DocStoreMode mode);
 
   /**
    * Set the batch size to use for sending messages to the document store.
@@ -104,7 +104,7 @@ public interface Transaction extends Closeable {
    *   Setting this overrides the default of {@link DocStoreConfig#getBulkBatchSize()}
    * </p>
    */
-  void setDocStoreUpdateBatchSize(int batchSize);
+  void setDocStoreBatchSize(int batchSize);
 
   /**
    * Explicitly turn off or on the cascading nature of save() and delete(). This

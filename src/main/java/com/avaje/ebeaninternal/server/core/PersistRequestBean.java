@@ -176,8 +176,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * don't want to send to the doc store.
    */
   private DocStoreMode calcDocStoreEvent(SpiTransaction txn, Type type) {
-    DocStoreMode docStoreMode = (txn == null) ? null : txn.getDocStoreUpdateMode();
-    return beanDescriptor.getDocStoreMode(type, docStoreMode);
+    DocStoreMode txnMode = (txn == null) ? null : txn.getDocStoreMode();
+    return beanDescriptor.getDocStoreMode(type, txnMode);
   }
 
   /**
