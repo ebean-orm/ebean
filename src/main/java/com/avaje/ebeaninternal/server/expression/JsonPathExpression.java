@@ -60,8 +60,7 @@ class JsonPathExpression extends AbstractExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
-
+  public void writeDocQuery(DocQueryContext context) throws IOException {
     String fullName = propName + "." + path;
     if (operator == Op.BETWEEN) {
       context.writeRange(fullName, Op.GT_EQ, value, Op.LT_EQ, upperValue);

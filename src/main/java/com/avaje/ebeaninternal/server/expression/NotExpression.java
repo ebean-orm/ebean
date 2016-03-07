@@ -25,10 +25,10 @@ final class NotExpression implements SpiExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
-    context.writeBoolMustNotStart();
-    exp.writeElastic(context);
-    context.writeBoolEnd();
+  public void writeDocQuery(DocQueryContext context) throws IOException {
+    context.startBoolMustNot();
+    exp.writeDocQuery(context);
+    context.endBool();
   }
 
   @Override

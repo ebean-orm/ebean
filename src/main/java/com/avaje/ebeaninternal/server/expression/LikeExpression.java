@@ -26,36 +26,8 @@ class LikeExpression extends AbstractExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
-
-    switch (type) {
-      case RAW:
-        context.writeLike(propName, val);
-        break;
-
-      case STARTS_WITH:
-        context.writeStartsWith(propName, val);
-        break;
-
-      case ENDS_WITH:
-        context.writeEndsWith(propName, val);
-        break;
-
-      case CONTAINS:
-        context.writeContains(propName, val);
-         break;
-
-      case EQUAL_TO:
-        if (caseInsensitive) {
-          context.writeIEqual(propName, val);
-        } else {
-          context.writeTerm(propName, val);
-        }
-        break;
-
-      default:
-        throw new RuntimeException("LikeType " + type + " missed?");
-    }
+  public void writeDocQuery(DocQueryContext context) throws IOException {
+    context.writeLike(propName, val, type, caseInsensitive);
   }
 
   @Override

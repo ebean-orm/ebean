@@ -63,13 +63,13 @@ abstract class LogicExpression implements SpiExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
+  public void writeDocQuery(DocQueryContext context) throws IOException {
 
     boolean conjunction = joinType.equals(AND);
-    context.writeBoolStart(conjunction);
-    expOne.writeElastic(context);
-    expTwo.writeElastic(context);
-    context.writeBoolEnd();
+    context.startBool(conjunction);
+    expOne.writeDocQuery(context);
+    expTwo.writeDocQuery(context);
+    context.endBool();
   }
 
   @Override

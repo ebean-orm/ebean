@@ -61,29 +61,29 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
-    writeElastic(context, null);
+  public void writeDocQuery(DocQueryContext context) throws IOException {
+    writeDocQuery(context, null);
   }
 
-  public void writeElastic(ElasticExpressionContext context, SpiExpression idEquals) throws IOException {
+  public void writeDocQuery(DocQueryContext context, SpiExpression idEquals) throws IOException {
 
     int size = list.size();
     if (size == 1 && idEquals == null) {
       // only 1 expression - skip bool must
-      list.get(0).writeElastic(context);
+      list.get(0).writeDocQuery(context);
     } else if (size == 0 && idEquals != null) {
       // only idEquals - skip bool must
-      idEquals.writeElastic(context);
+      idEquals.writeDocQuery(context);
     } else {
       // bool must wrap all the children
-      context.writeBoolMustStart();
+      context.startBoolMust();
       if (idEquals != null) {
-        idEquals.writeElastic(context);
+        idEquals.writeDocQuery(context);
       }
       for (int i = 0; i < size; i++) {
-        list.get(i).writeElastic(context);
+        list.get(i).writeDocQuery(context);
       }
-      context.writeBoolEnd();
+      context.endBool();
     }
   }
 

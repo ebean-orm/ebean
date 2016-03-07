@@ -23,8 +23,8 @@ class RawExpression extends NonPrepareExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
-    context.writeRaw(sql);
+  public void writeDocQuery(DocQueryContext context) throws IOException {
+    context.writeRaw(sql, values);
   }
 
   @Override

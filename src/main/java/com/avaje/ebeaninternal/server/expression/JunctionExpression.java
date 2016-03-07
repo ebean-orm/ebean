@@ -100,14 +100,13 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
-
-    context.writeBoolStart(!disjunction);
+  public void writeDocQuery(DocQueryContext context) throws IOException {
+    context.startBool(!disjunction);
     List<SpiExpression> list = exprList.internalList();
     for (int i = 0; i < list.size(); i++) {
-      list.get(i).writeElastic(context);
+      list.get(i).writeDocQuery(context);
     }
-    context.writeBoolEnd();
+    context.endBool();
   }
 
   @Override

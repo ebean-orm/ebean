@@ -29,7 +29,7 @@ public class IdInExpression extends NonPrepareExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
+  public void writeDocQuery(DocQueryContext context) throws IOException {
     context.writeIds(idList);
   }
 

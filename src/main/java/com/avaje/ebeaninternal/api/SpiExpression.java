@@ -3,7 +3,7 @@ package com.avaje.ebeaninternal.api;
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.expression.ElasticExpressionContext;
+import com.avaje.ebeaninternal.server.expression.DocQueryContext;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ public interface SpiExpression extends Expression {
   /**
    * Write the expression as an elastic search expression.
    */
-  void writeElastic(ElasticExpressionContext context) throws IOException;
+  void writeDocQuery(DocQueryContext context) throws IOException;
 
   /**
    * Process "Many" properties populating ManyWhereJoins.

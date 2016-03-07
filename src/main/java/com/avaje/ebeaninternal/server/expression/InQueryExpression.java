@@ -41,7 +41,7 @@ class InQueryExpression extends AbstractExpression implements UnsupportedDocStor
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
+  public void writeDocQuery(DocQueryContext context) throws IOException {
     throw new IllegalStateException("Not supported");
   }
 

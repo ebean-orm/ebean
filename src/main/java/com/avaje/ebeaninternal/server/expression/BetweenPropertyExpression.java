@@ -34,12 +34,11 @@ class BetweenPropertyExpression extends NonPrepareExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
-
-    context.writeBoolMustStart();
+  public void writeDocQuery(DocQueryContext context) throws IOException {
+    context.startBoolMust();
     context.writeSimple(Op.LT_EQ, lowProperty, value);
     context.writeSimple(Op.GT_EQ, highProperty, value);
-    context.writeBoolEnd();
+    context.endBool();
   }
 
   @Override

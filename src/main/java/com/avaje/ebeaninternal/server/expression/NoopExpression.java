@@ -23,7 +23,7 @@ class NoopExpression implements SpiExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
+  public void writeDocQuery(DocQueryContext context) throws IOException {
   }
 
   @Override

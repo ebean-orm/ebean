@@ -19,8 +19,8 @@ class CaseInsensitiveEqualExpression extends AbstractExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
-    context.writeIEqual(propName, value);
+  public void writeDocQuery(DocQueryContext context) throws IOException {
+    context.writeIEqualTo(propName, value);
   }
 
   @Override

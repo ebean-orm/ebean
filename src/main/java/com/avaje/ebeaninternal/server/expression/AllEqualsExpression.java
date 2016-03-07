@@ -28,19 +28,8 @@ class AllEqualsExpression extends NonPrepareExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
-
-    context.writeBoolMustStart();
-    for (Map.Entry<String, Object> entry : propMap.entrySet()) {
-      Object value = entry.getValue();
-      String propName = entry.getKey();
-      if (value == null) {
-        context.writeExists(false, propName);
-      } else {
-        context.writeTerm(propName, value);
-      }
-    }
-    context.writeBoolEnd();
+  public void writeDocQuery(DocQueryContext context) throws IOException {
+    context.writeAllEquals(propMap);
   }
 
   @Override

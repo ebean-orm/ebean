@@ -10,8 +10,6 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebean.plugin.BeanType;
-import com.avaje.ebean.FetchPath;
-import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.HashQuery;
@@ -27,15 +25,11 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DRawSqlSelect;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
-import com.avaje.ebeaninternal.server.expression.ElasticExpressionContext;
+import com.avaje.ebeaninternal.server.expression.DefaultExpressionList;
 import com.avaje.ebeaninternal.server.expression.SimpleExpression;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
-import com.avaje.ebeaninternal.server.expression.DefaultExpressionList;
-import com.fasterxml.jackson.core.JsonGenerator;
 
 import javax.persistence.PersistenceException;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -288,64 +282,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
         setQuery(namedQuery.getQuery());
       }
     }
-  }
-
-  public String asElasticQuery() {
-
-    JsonContext json = server.json();
-
-
-    ElasticExpressionContext context = new ElasticExpressionContext(json, beanDescriptor);
-
-    try {
-      writeElastic(context);
-      generatedSql = context.flush();
-      return generatedSql;
-
-    } catch (IOException e) {
-      throw new PersistenceIOException(e);
-    }
-  }
-
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
-
-    JsonGenerator json = context.json();
-    json.writeStartObject();
-    if (firstRow > 0) {
-      json.writeNumberField("from", firstRow);
-    }
-    if (maxRows > 0) {
-      json.writeNumberField("size", maxRows);
-    }
-
-    detail.writeElastic(context);
-    context.writeOrderBy(orderBy);
-
-    json.writeFieldName("query");
-    json.writeStartObject();
-
-    SpiExpression idEquals = null;
-    if (id != null) {
-      idEquals = (SpiExpression)expressionFactory.idEq(id);
-    }
-
-    boolean hasWhere = (whereExpressions != null && !whereExpressions.isEmpty());
-    if (idEquals != null || hasWhere) {
-      json.writeFieldName("filtered");
-      json.writeStartObject();
-      json.writeFieldName("filter");
-      if (hasWhere) {
-        whereExpressions.writeElastic(context, idEquals);
-      } else {
-        idEquals.writeElastic(context);
-      }
-      json.writeEndObject();
-    } else {
-      json.writeObjectFieldStart("match_all");
-      json.writeEndObject();
-    }
-    json.writeEndObject();
-    json.writeEndObject();
   }
 
   @Override

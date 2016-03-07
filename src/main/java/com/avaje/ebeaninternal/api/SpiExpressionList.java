@@ -1,7 +1,9 @@
 package com.avaje.ebeaninternal.api;
 
 import com.avaje.ebean.ExpressionList;
+import com.avaje.ebeaninternal.server.expression.DocQueryContext;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -24,4 +26,8 @@ public interface SpiExpressionList<T> extends ExpressionList<T>, SpiExpression {
 	 */
 	boolean isEmpty();
 
+  /**
+   * Write the top level where expressions taking into account possible extra idEquals expression.
+   */
+  void writeDocQuery(DocQueryContext context, SpiExpression idEquals) throws IOException;
 }

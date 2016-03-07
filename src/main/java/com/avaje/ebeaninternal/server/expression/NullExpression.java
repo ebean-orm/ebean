@@ -23,7 +23,7 @@ class NullExpression extends AbstractExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
+  public void writeDocQuery(DocQueryContext context) throws IOException {
     context.writeExists(notNull, propName);
   }
 

@@ -96,13 +96,13 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
+  public void writeDocQuery(DocQueryContext context) throws IOException {
     if (!list.isEmpty()) {
-      context.writeBoolMustStart();
+      context.startBoolMust();
       for (SpiExpression expr : list) {
-        expr.writeElastic(context);
+        expr.writeDocQuery(context);
       }
-      context.writeBoolEnd();
+      context.endBool();
     }
   }
 

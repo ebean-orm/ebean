@@ -39,7 +39,7 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
+  public void writeDocQuery(DocQueryContext context) throws IOException {
     throw new IllegalStateException("Not supported");
   }
 

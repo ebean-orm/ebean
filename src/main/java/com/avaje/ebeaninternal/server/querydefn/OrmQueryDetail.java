@@ -6,12 +6,9 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
-import com.avaje.ebeaninternal.server.expression.ElasticExpressionContext;
 import com.avaje.ebeaninternal.server.query.SplitName;
-import com.fasterxml.jackson.core.JsonGenerator;
 
 import javax.persistence.PersistenceException;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -440,7 +437,7 @@ public class OrmQueryDetail implements Serializable {
   }
 
   public boolean hasSelectClause() {
-    return (baseProps.hasSelectClause());
+    return baseProps.hasSelectClause();
   }
 
   /**
@@ -503,65 +500,9 @@ public class OrmQueryDetail implements Serializable {
   }
 
   /**
-   * Write the Elastic search source include and fields if necessary.
-   * <p>
-   *   Fetch all property is put into includes.
-   *   Fetch on 'many' path is put into includes.
-   *   Fetch on 'one' paths and root path are put into fields.
-   * </p>
+   * Return the underlying fetch path entries.
    */
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
-
-    Set<String> includes = new LinkedHashSet<String>();
-    Set<String> fields = new LinkedHashSet<String>();
-
-    for (Map.Entry<String, OrmQueryProperties> entry : fetchPaths.entrySet()) {
-
-      String path = entry.getKey();
-      OrmQueryProperties value = entry.getValue();
-      if (value.allProperties()) {
-        includes.add(path + ".*");
-      } else if (context.containsMany(path)) {
-        for (String propName : value.getIncluded()) {
-          includes.add(path + "." + propName);
-        }
-      } else {
-        for (String propName : value.getIncluded()) {
-          fields.add(path + "." + propName);
-        }
-      }
-    }
-
-    if (hasSelectClause()) {
-      Set<String> included = baseProps.getIncluded();
-      if (included != null) {
-        for (String propName : included) {
-          fields.add(propName);
-        }
-      }
-    }
-
-    if (!includes.isEmpty()) {
-      JsonGenerator json = context.json();
-      json.writeFieldName("_source");
-      json.writeStartObject();
-      json.writeFieldName("include");
-      json.writeStartArray();
-      for (String propName : includes) {
-        json.writeString(propName);
-      }
-      json.writeEndArray();
-      json.writeEndObject();
-    }
-
-    if (!fields.isEmpty()) {
-      JsonGenerator json = context.json();
-      json.writeFieldName("fields");
-      json.writeStartArray();
-      for (String propName : fields) {
-        json.writeString(propName);
-      }
-      json.writeEndArray();
-    }
+  public Set<Map.Entry<String, OrmQueryProperties>> entries() {
+    return fetchPaths.entrySet();
   }
 }

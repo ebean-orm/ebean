@@ -373,7 +373,7 @@ public class OrmQueryProperties implements Serializable {
   /**
    * Return the property set.
    */
-  protected Set<String> getIncluded() {
+  public Set<String> getIncluded() {
     return included;
   }
 

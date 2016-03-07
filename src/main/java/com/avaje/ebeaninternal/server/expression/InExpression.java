@@ -30,8 +30,8 @@ class InExpression extends AbstractExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
-    context.writeTerms(propName, values);
+  public void writeDocQuery(DocQueryContext context) throws IOException {
+    context.writeIn(propName, values, not);
   }
 
   @Override

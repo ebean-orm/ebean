@@ -23,7 +23,7 @@ class BetweenExpression extends AbstractExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
+  public void writeDocQuery(DocQueryContext context) throws IOException {
     context.writeRange(propName, Op.GT_EQ, valueLow, Op.LT_EQ, valueHigh);
   }
 

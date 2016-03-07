@@ -23,12 +23,10 @@ public class SimpleExpression extends AbstractExpression {
   }
 
   @Override
-  public void writeElastic(ElasticExpressionContext context) throws IOException {
-
+  public void writeDocQuery(DocQueryContext context) throws IOException {
     if (type == Op.BETWEEN) {
       throw new IllegalStateException("BETWEEN Not expected in SimpleExpression?");
     }
-
     context.writeSimple(type, propName, value);
   }
 

@@ -1373,9 +1373,4 @@ public interface Query<T> {
    */
   Set<String> validate();
 
-  /**
-   * Return the query in JSON form for ElasticSearch doc store.
-   */
-  String asElasticQuery();
-
 }
