@@ -10,64 +10,71 @@ import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyOptions;
  */
 public class DeployDocPropertyOptions {
 
-  private Boolean code;
+  private static DocPropertyOptions EMPTY = new DocPropertyOptions();
 
-  private Boolean sortable;
+  private DocPropertyOptions mapping;
 
-  private Boolean store;
-
-  private Float boost;
-
-  private String nullValue;
-
+  private void createOptions() {
+    if (mapping == null) {
+      mapping = new DocPropertyOptions();
+    }
+  }
   /**
    * Read the DocProperty deployment options.
    */
   public void setDocProperty(DocProperty doc) {
-    code = checkDefault(doc.code());
-    sortable = checkDefault(doc.sortable());
-    store = checkDefault(doc.store());
-    boost = checkDefault(doc.boost());
-    nullValue = checkDefault(doc.nullValue());
+
+    createOptions();
+    mapping.apply(doc);
   }
 
   /**
    * Read the DocSortable deployment options.
    */
   public void setDocSortable(DocSortable doc) {
-    sortable = Boolean.TRUE;
-    store = checkDefault(doc.store());
-    boost = checkDefault(doc.boost());
-    nullValue = checkDefault(doc.nullValue());
+
+    createOptions();
+    mapping.setSortable(true);
+    setStore(doc.store());
+    setBoost(doc.boost());
+    setNullValue(doc.nullValue());
   }
 
   /**
    * Read the DocCode deployment options.
    */
   public void setDocCode(DocCode doc) {
-    code = Boolean.TRUE;
-    store = checkDefault(doc.store());
-    boost = checkDefault(doc.boost());
-    nullValue = checkDefault(doc.nullValue());
+
+    createOptions();
+    mapping.setCode(true);
+    setStore(doc.store());
+    setBoost(doc.boost());
+    setNullValue(doc.nullValue());
   }
 
-  private String checkDefault(String s) {
-    return "".equals(s) ? null : s;
+  private void setNullValue(String value) {
+    if (!value.equals("")) {
+      mapping.setNullValue(value);
+    }
   }
 
-  private Float checkDefault(float boost) {
-    return (boost == 1) ? null : boost;
+  private void setBoost(float boost) {
+    if (boost != 1) {
+      mapping.setBoost(boost);
+    }
   }
 
-  private Boolean checkDefault(boolean store) {
-    return (store) ? Boolean.TRUE : null;
+  private void setStore(boolean store) {
+    if (store) {
+      mapping.setStore(true);
+    }
   }
 
   /**
    * Return the DocPropertyOptions with the collected options.
    */
   public DocPropertyOptions create() {
-    return new DocPropertyOptions(code, sortable, store, boost, nullValue);
+    return (mapping == null) ? EMPTY : mapping;
   }
 
 }

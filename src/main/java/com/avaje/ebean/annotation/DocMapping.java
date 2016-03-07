@@ -18,27 +18,7 @@ public @interface DocMapping {
   String name();
 
   /**
-   * Set this to true to indicate that this property should be un-analysed.
+   * Mapping options.
    */
-  boolean code() default false;
-
-  /**
-   * Set this to true to get an additional un-analysed 'raw' field to use for sorting etc.
-   */
-  boolean sortable() default false;
-
-  /**
-   * Set to true to have the property additionally stored separately from _source.
-   */
-  boolean store() default false;
-
-  /**
-   * Set a boost value specific to this property.
-   */
-  float boost() default 1;
-
-  /**
-   * Set a value to use instead of null.
-   */
-  String nullValue() default "";
+  DocProperty options();
 }
