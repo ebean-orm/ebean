@@ -555,22 +555,18 @@ public class JdbcTransaction implements SpiTransaction {
       // implicit transaction, no gain by batching where depth <= 0
       return false;
     }
-    switch (batchMode) {
-      case ALL:
-        return true;
-      case INSERT:
-        return type == PersistRequest.Type.INSERT;
-      default:
-        return false;
-    }
+    return isBatch(batchMode, type);
   }
 
   /**
    * Return true if JDBC batch should be used on cascade persist.
    */
   private boolean isBatchOnCascade(PersistRequest.Type type) {
+    return isBatch(batchOnCascadeMode, type);
+  }
 
-    switch (batchOnCascadeMode) {
+  private boolean isBatch(PersistBatch batch, PersistRequest.Type type) {
+    switch (batch) {
       case ALL:
         return true;
       case INSERT:
@@ -615,20 +611,9 @@ public class JdbcTransaction implements SpiTransaction {
     batchMode = oldBatchMode;
   }
 
-  private boolean isAlreadyBatching(PersistRequest.Type type) {
-    switch (batchMode) {
-      case ALL:
-        return true;
-      case INSERT:
-        return type == PersistRequest.Type.INSERT;
-      default:
-        return false;
-    }
-  }
-
   public boolean checkBatchEscalationOnCascade(PersistRequestBean<?> request) {
 
-    if (isAlreadyBatching(request.getType())) {
+    if (isBatch(batchMode, request.getType())) {
       // already batching (at top level)
       return false;
     }
