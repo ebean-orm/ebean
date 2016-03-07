@@ -5,7 +5,6 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.DbType;
-import com.avaje.ebeaninternal.server.type.ScalarTypeEnum;
 import com.avaje.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import com.avaje.ebean.plugin.Property;
@@ -1319,12 +1318,19 @@ public class BeanProperty implements ElPropertyValue, Property {
 
       DocPropertyType type = scalarType.getDocType();
       DocPropertyOptions options = docOptions.copy();
-      if (id || DocPropertyType.ENUM == type) {
+      if (DocPropertyType.ENUM == type || isStringId(type)) {
         options.setCode(true);
       }
 
       mapping.add(new DocPropertyMapping(name, type, options));
     }
+  }
+
+  /**
+   * Return true if this is a String Id property and should be treated as a code by the document store.
+   */
+  private boolean isStringId(DocPropertyType type) {
+    return DocPropertyType.STRING == type && id;
   }
 
 }

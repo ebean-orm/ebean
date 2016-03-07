@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.text.json;
 import com.avaje.ebean.FetchPath;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.JsonConfig;
+import com.avaje.ebean.plugin.BeanType;
 import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebean.text.json.JsonIOException;
@@ -121,6 +122,14 @@ public class DJsonContext implements JsonContext {
   public <T> DJsonBeanReader createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
     BeanDescriptor<T> desc = getDescriptor(cls);
+    ReadJson readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
+    return new DJsonBeanReader<T>(desc, readJson);
+  }
+
+  @Override
+  public <T> DJsonBeanReader createBeanReader(BeanType<T> beanType, JsonParser parser, JsonReadOptions options) throws JsonIOException {
+
+    BeanDescriptor<T> desc = (BeanDescriptor<T>)beanType;
     ReadJson readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
     return new DJsonBeanReader<T>(desc, readJson);
   }
