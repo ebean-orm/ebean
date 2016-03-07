@@ -1368,6 +1368,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer, Transaction t) {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
+    if (request.isUseDocStore()) {
+      docStore().findEachWhile(query, consumer);
+      return;
+    }
 
     request.initTransIfRequired();
     request.findEachWhile(consumer);

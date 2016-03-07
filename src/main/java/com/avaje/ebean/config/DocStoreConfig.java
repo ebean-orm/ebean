@@ -33,6 +33,21 @@ public class DocStoreConfig {
   protected int bulkBatchSize = 1000;
 
   /**
+   * Resource path for the Document store mapping files.
+   */
+  protected String mappingPath;
+
+  /**
+   * Suffix used for mapping files.
+   */
+  protected String mappingSuffix;
+
+  /**
+   * Location of resources that mapping files are generated into.
+   */
+  protected String pathToResources = "src/main/resources";
+
+  /**
    * Return true if the Document store (ElasticSearch) integration is active.
    */
   public boolean isActive() {
@@ -102,6 +117,47 @@ public class DocStoreConfig {
     this.bulkBatchSize = bulkBatchSize;
   }
 
+  /**
+   * Return the mapping path.
+   */
+  public String getMappingPath() {
+    return mappingPath;
+  }
+
+  /**
+   * Set the mapping path.
+   */
+  public void setMappingPath(String mappingPath) {
+    this.mappingPath = mappingPath;
+  }
+
+  /**
+   * Return the mapping suffix.
+   */
+  public String getMappingSuffix() {
+    return mappingSuffix;
+  }
+
+  /**
+   * Set the mapping suffix.
+   */
+  public void setMappingSuffix(String mappingSuffix) {
+    this.mappingSuffix = mappingSuffix;
+  }
+
+  /**
+   * Return the relative file system path to resources when generating mapping files.
+   */
+  public String getPathToResources() {
+    return pathToResources;
+  }
+
+  /**
+   * Set the relative file system path to resources when generating mapping files.
+   */
+  public void setPathToResources(String pathToResources) {
+    this.pathToResources = pathToResources;
+  }
 
   /**
    * Return the default behavior for when Insert, Update and Delete events occur on beans that have an associated
@@ -143,5 +199,8 @@ public class DocStoreConfig {
     persist = properties.getEnum(DocStoreEvent.class, "docstore.persist", persist);
     bulkBatchSize = properties.getInt("docstore.bulkBatchSize", bulkBatchSize);
     dropCreate = properties.getBoolean("docstore.dropCreate", dropCreate);
+    mappingPath = properties.get("docstore.mappingPath", mappingPath);
+    mappingSuffix = properties.get("docstore.mappingSuffix", mappingSuffix);
+    pathToResources = properties.get("docstore.pathToResources", pathToResources);
   }
 }
