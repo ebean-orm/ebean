@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.api;
 
 import com.avaje.ebean.TransactionCallback;
-import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.config.PersistBatch;
 import com.avaje.ebean.event.changelog.BeanChange;
@@ -61,13 +61,13 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
-  public DocStoreEvent getDocStoreUpdateMode() {
+  public DocStoreMode getDocStoreUpdateMode() {
     return transaction.getDocStoreUpdateMode();
   }
 
   @Override
-  public void setDocStoreUpdateMode(DocStoreEvent indexUpdateMode) {
-    transaction.setDocStoreUpdateMode(indexUpdateMode);
+  public void setDocStoreUpdateMode(DocStoreMode mode) {
+    transaction.setDocStoreUpdateMode(mode);
   }
 
   @Override

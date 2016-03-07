@@ -7,7 +7,7 @@ import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.annotation.ConcurrencyMode;
-import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
@@ -84,7 +84,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -367,7 +366,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   private final DocStoreBeanAdapter<T> docStoreAdapter;
 
   private final String defaultSelectClause;
-  private final LinkedHashSet<String> defaultSelectClauseSet;
 
   private SpiEbeanServer ebeanServer;
 
@@ -401,8 +399,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.changeLogFilter = deploy.getChangeLogFilter();
 
     this.defaultSelectClause = deploy.getDefaultSelectClause();
-    this.defaultSelectClauseSet = deploy.parseDefaultSelectClause(defaultSelectClause);
-
     this.idType = deploy.getIdType();
     this.idTypePlatformDefault = deploy.isIdTypePlatformDefault();
     this.idGenerator = deploy.getIdGenerator();
@@ -890,13 +886,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
-   * Return the default select clause already parsed into an ordered Set.
-   */
-  public LinkedHashSet<String> getDefaultSelectClauseSet() {
-    return defaultSelectClauseSet;
-  }
-
-  /**
    * Return true if this object is the root level object in its entity
    * inheritance.
    */
@@ -929,7 +918,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Return the doc store helper for this bean type.
    */
   @Override
-  public BeanDocType docStore() {
+  public BeanDocType<T> docStore() {
     return docStoreAdapter;
   }
 
@@ -956,11 +945,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
-   * Return the type of DocStoreEvent that should occur for this type of persist request
+   * Return the type of DocStoreMode that should occur for this type of persist request
    * given the transactions requested mode.
    */
-  public DocStoreEvent getDocStoreEvent(PersistRequest.Type persistType, DocStoreEvent txnMode) {
-    return docStoreAdapter.getEvent(persistType, txnMode);
+  public DocStoreMode getDocStoreMode(PersistRequest.Type persistType, DocStoreMode txnMode) {
+    return docStoreAdapter.getMode(persistType, txnMode);
   }
 
   public void docStoreInsert(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext bulkUpdate) throws IOException {
@@ -1457,6 +1446,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public T createBean() {
     return (T)createEntityBean();
   }
@@ -1464,6 +1454,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Creates a new EntityBean.
    */
+  @SuppressWarnings("unchecked")
   public EntityBean createEntityBean() {
     try {
       EntityBean bean = (EntityBean)prototypeEntityBean._ebean_newInstance();

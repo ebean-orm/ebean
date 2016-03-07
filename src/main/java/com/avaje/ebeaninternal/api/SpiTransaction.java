@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.util.List;
 
 import com.avaje.ebean.Transaction;
-import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.changelog.BeanChange;
 import com.avaje.ebean.event.changelog.ChangeSet;
@@ -109,7 +109,7 @@ public interface SpiTransaction extends Transaction {
    * Returning 0 implies to use the system wide default batch size.
    * </p>
    */
-  DocStoreEvent getDocStoreUpdateMode();
+  DocStoreMode getDocStoreUpdateMode();
 
   /**
    * Return the batch size to us for ElasticSearch Bulk API calls

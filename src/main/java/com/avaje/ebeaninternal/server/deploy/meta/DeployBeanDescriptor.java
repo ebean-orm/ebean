@@ -2,7 +2,7 @@ package com.avaje.ebeaninternal.server.deploy.meta;
 
 import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.annotation.DocStore;
-import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -187,10 +186,10 @@ public class DeployBeanDescriptor<T> {
 
   private String docStoreIndexType;
 
-  private DocStoreEvent docStorePersist;
-  private DocStoreEvent docStoreInsert;
-  private DocStoreEvent docStoreUpdate;
-  private DocStoreEvent docStoreDelete;
+  private DocStoreMode docStorePersist;
+  private DocStoreMode docStoreInsert;
+  private DocStoreMode docStoreUpdate;
+  private DocStoreMode docStoreDelete;
 
   /**
    * Construct the BeanDescriptor.
@@ -806,29 +805,6 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
-   * Parse the include separating by comma or semicolon.
-   */
-  public LinkedHashSet<String> parseDefaultSelectClause(String rawList) {
-
-    if (rawList == null) {
-      return null;
-    }
-
-    String[] res = rawList.split(",");
-
-    LinkedHashSet<String> set = new LinkedHashSet<String>(res.length + 3);
-
-    String temp;
-    for (int i = 0; i < res.length; i++) {
-      temp = res[i].trim();
-      if (temp.length() > 0) {
-        set.add(temp);
-      }
-    }
-    return set;
-  }
-
-  /**
    * Return true if the primary key is a compound key or if it's database type
    * is non-numeric (and hence not suitable for db identity or sequence.
    */
@@ -1008,30 +984,30 @@ public class DeployBeanDescriptor<T> {
   /**
    * Return the DocStore index behavior for bean inserts.
    */
-  public DocStoreEvent getDocStoreInsertEvent() {
+  public DocStoreMode getDocStoreInsertEvent() {
     return getDocStoreIndexEvent(docStoreInsert);
   }
 
   /**
    * Return the DocStore index behavior for bean updates.
    */
-  public DocStoreEvent getDocStoreUpdateEvent() {
+  public DocStoreMode getDocStoreUpdateEvent() {
     return getDocStoreIndexEvent(docStoreUpdate);
   }
 
   /**
    * Return the DocStore index behavior for bean deletes.
    */
-  public DocStoreEvent getDocStoreDeleteEvent() {
+  public DocStoreMode getDocStoreDeleteEvent() {
     return getDocStoreIndexEvent(docStoreDelete);
   }
 
-  private DocStoreEvent getDocStoreIndexEvent(DocStoreEvent mostSpecific) {
+  private DocStoreMode getDocStoreIndexEvent(DocStoreMode mostSpecific) {
     if (!docStoreMapped) {
-      return DocStoreEvent.IGNORE;
+      return DocStoreMode.IGNORE;
     }
-    if (mostSpecific != DocStoreEvent.DEFAULT) return mostSpecific;
-    if (docStorePersist != DocStoreEvent.DEFAULT) return docStorePersist;
+    if (mostSpecific != DocStoreMode.DEFAULT) return mostSpecific;
+    if (docStorePersist != DocStoreMode.DEFAULT) return docStorePersist;
     return serverConfig.getDocStoreConfig().getPersist();
   }
 }

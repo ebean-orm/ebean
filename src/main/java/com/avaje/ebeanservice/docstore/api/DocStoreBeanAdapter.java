@@ -1,7 +1,7 @@
 package com.avaje.ebeanservice.docstore.api;
 
 import com.avaje.ebean.Query;
-import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.plugin.BeanDocType;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
@@ -47,7 +47,7 @@ public interface DocStoreBeanAdapter<T> extends BeanDocType<T> {
    * <p>
    * Some transactions (like bulk updates) might specifically turn off indexing for example.
    */
-  DocStoreEvent getEvent(PersistRequest.Type persistType, DocStoreEvent txnMode);
+  DocStoreMode getMode(PersistRequest.Type persistType, DocStoreMode txnMode);
 
   /**
    * Return the index type for this bean type.

@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebeanservice.docstore.api.support.DocStoreDeleteEvent;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 
@@ -79,13 +79,13 @@ public final class DeleteByIdMap {
   /**
    * Add the deletes to the DocStoreUpdates.
    */
-  public void addDocStoreUpdates(DocStoreUpdates docStoreUpdates, DocStoreEvent txnIndexMode) {
+  public void addDocStoreUpdates(DocStoreUpdates docStoreUpdates, DocStoreMode txnIndexMode) {
     for (BeanPersistIds deleteIds : beanMap.values()) {
       BeanDescriptor<?> desc = deleteIds.getBeanDescriptor();
-      DocStoreEvent docStoreEvent = desc.getDocStoreEvent(PersistRequest.Type.DELETE, txnIndexMode);
-      if (DocStoreEvent.IGNORE != docStoreEvent) {
+      DocStoreMode mode = desc.getDocStoreMode(PersistRequest.Type.DELETE, txnIndexMode);
+      if (DocStoreMode.IGNORE != mode) {
         // Add to queue or bulk update entries
-        boolean queue = (DocStoreEvent.QUEUE == docStoreEvent);
+        boolean queue = (DocStoreMode.QUEUE == mode);
         String queueId = desc.getDocStoreQueueId();
         List<Serializable> idValues = deleteIds.getDeleteIds();
         if (idValues != null) {

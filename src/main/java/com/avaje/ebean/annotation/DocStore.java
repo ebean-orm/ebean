@@ -45,22 +45,22 @@ public @interface DocStore {
   /**
    * Specify the behavior when bean Insert, Update, Delete events occur.
    */
-  DocStoreEvent persist() default DocStoreEvent.DEFAULT;
+  DocStoreMode persist() default DocStoreMode.DEFAULT;
 
   /**
    * Specify the behavior when bean Insert occurs.
    */
-  DocStoreEvent insert() default DocStoreEvent.DEFAULT;
+  DocStoreMode insert() default DocStoreMode.DEFAULT;
 
   /**
    * Specify the behavior when bean Update occurs.
    */
-  DocStoreEvent update() default DocStoreEvent.DEFAULT;
+  DocStoreMode update() default DocStoreMode.DEFAULT;
 
   /**
    * Specify the behavior when bean Delete occurs.
    */
-  DocStoreEvent delete() default DocStoreEvent.DEFAULT;
+  DocStoreMode delete() default DocStoreMode.DEFAULT;
 
   /**
    * Specify to include only some properties in the doc store document.

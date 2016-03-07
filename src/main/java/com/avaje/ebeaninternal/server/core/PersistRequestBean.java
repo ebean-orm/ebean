@@ -2,7 +2,7 @@ package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.annotation.ConcurrencyMode;
-import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.event.BeanPersistController;
@@ -69,7 +69,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private final boolean publish;
 
-  private DocStoreEvent docStoreEvent;
+  private DocStoreMode docStoreMode;
 
   private ConcurrencyMode concurrencyMode;
 
@@ -147,7 +147,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     this.parentBean = parentBean;
     this.controller = beanDescriptor.getPersistController();
     this.type = type;
-    this.docStoreEvent = calcDocStoreEvent(transaction, type);
+    this.docStoreMode = calcDocStoreEvent(transaction, type);
     if (saveRecurse) {
       this.persistCascade = t.isPersistCascade();
     }
@@ -175,9 +175,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Used to check if the Transaction has set the mode to IGNORE when doing large batch inserts that we
    * don't want to send to the doc store.
    */
-  private DocStoreEvent calcDocStoreEvent(SpiTransaction txn, Type type) {
-    DocStoreEvent docStoreEvent = (txn == null) ? null : txn.getDocStoreUpdateMode();
-    return beanDescriptor.getDocStoreEvent(type, docStoreEvent);
+  private DocStoreMode calcDocStoreEvent(SpiTransaction txn, Type type) {
+    DocStoreMode docStoreMode = (txn == null) ? null : txn.getDocStoreUpdateMode();
+    return beanDescriptor.getDocStoreMode(type, docStoreMode);
   }
 
   /**
@@ -203,7 +203,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public void initTransIfRequiredWithBatchCascade() {
 
     if (createImplicitTransIfRequired()) {
-      docStoreEvent = calcDocStoreEvent(transaction, type);
+      docStoreMode = calcDocStoreEvent(transaction, type);
     }
     if (transaction.checkBatchEscalationOnCascade(this)) {
       // we escalated to use batch mode so flush when done
@@ -309,7 +309,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private boolean isDocStoreNotify() {
     // Either queue or directly update the document store
-    return docStoreEvent != DocStoreEvent.IGNORE;
+    return docStoreMode != DocStoreMode.IGNORE;
   }
 
   public boolean isNotifyPersistListener() {
@@ -731,7 +731,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       controllerPost();
     }
 
-    if (type == Type.UPDATE && docStoreEvent == DocStoreEvent.UPDATE) {
+    if (type == Type.UPDATE && docStoreMode == DocStoreMode.UPDATE) {
       // get the dirty properties for update notification to the doc store
       dirtyProperties = intercept.getDirtyProperties();
     }
@@ -913,7 +913,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (type == Type.UPDATE) {
       beanDescriptor.docStoreUpdateEmbedded(this, docStoreUpdates);
     }
-    switch (docStoreEvent) {
+    switch (docStoreMode) {
       case UPDATE: {
         docStoreUpdates.addPersist(this);
         return;

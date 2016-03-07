@@ -1,6 +1,6 @@
 package com.avaje.ebean.config;
 
-import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.annotation.DocStoreMode;
 import org.junit.Test;
 
 import java.util.Properties;
@@ -26,7 +26,7 @@ public class DocStoreConfigTest {
 
     assertTrue(config.isActive());
     assertEquals("http://foo:9800", config.getUrl());
-    assertEquals(DocStoreEvent.IGNORE, config.getPersist());
+    assertEquals(DocStoreMode.IGNORE, config.getPersist());
     assertEquals(99, config.getBulkBatchSize());
 
   }

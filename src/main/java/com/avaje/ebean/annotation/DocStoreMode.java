@@ -8,7 +8,7 @@ package com.avaje.ebean.annotation;
  * for later processing rather than look to update ElasticSearch at that time.
  * </p>
  */
-public enum DocStoreEvent {
+public enum DocStoreMode {
 
   /**
    * Add the event to the queue for processing later (delaying the update to the document store).

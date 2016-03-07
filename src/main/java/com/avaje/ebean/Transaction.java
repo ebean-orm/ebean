@@ -1,6 +1,6 @@
 package com.avaje.ebean;
 
-import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.config.DocStoreConfig;
 import com.avaje.ebean.config.PersistBatch;
 
@@ -92,7 +92,7 @@ public interface Transaction extends Closeable {
    *   to control how that is sent to the document store.
    * </p>
    */
-  void setDocStoreUpdateMode(DocStoreEvent updateMode);
+  void setDocStoreUpdateMode(DocStoreMode updateMode);
 
   /**
    * Set the batch size to use for sending messages to the document store.

@@ -3,7 +3,7 @@ package com.avaje.ebeanservice.docstore.api.support;
 import com.avaje.ebean.FetchPath;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.annotation.DocStore;
-import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
@@ -69,17 +69,17 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   /**
    * Behavior on insert.
    */
-  protected final DocStoreEvent insert;
+  protected final DocStoreMode insert;
 
   /**
    * Behavior on update.
    */
-  protected final DocStoreEvent update;
+  protected final DocStoreMode update;
 
   /**
    * Behavior on delete.
    */
-  protected final DocStoreEvent delete;
+  protected final DocStoreMode delete;
 
   /**
    * List of embedded paths from other documents that include this document type.
@@ -267,17 +267,17 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   }
 
   @Override
-  public DocStoreEvent getEvent(PersistRequest.Type persistType, DocStoreEvent txnMode) {
+  public DocStoreMode getMode(PersistRequest.Type persistType, DocStoreMode txnMode) {
 
     if (txnMode == null) {
-      return getDocStoreEvent(persistType);
-    } else if (txnMode == DocStoreEvent.IGNORE) {
-      return DocStoreEvent.IGNORE;
+      return getMode(persistType);
+    } else if (txnMode == DocStoreMode.IGNORE) {
+      return DocStoreMode.IGNORE;
     }
-    return mapped ? txnMode : getDocStoreEvent(persistType);
+    return mapped ? txnMode : getMode(persistType);
   }
 
-  private DocStoreEvent getDocStoreEvent(PersistRequest.Type persistType) {
+  private DocStoreMode getMode(PersistRequest.Type persistType) {
     switch (persistType) {
       case INSERT:
         return insert;
@@ -286,7 +286,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
       case DELETE:
         return delete;
       default:
-        return DocStoreEvent.IGNORE;
+        return DocStoreMode.IGNORE;
     }
   }
 

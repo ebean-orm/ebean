@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.transaction;
 
-import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
@@ -40,7 +40,7 @@ public final class PostCommitProcessing {
 
   private final DeleteByIdMap deleteByIdMap;
 
-  private final DocStoreEvent txnDocStoreMode;
+  private final DocStoreMode txnDocStoreMode;
 
   private final int txnDocStoreBatchSize;
 
@@ -52,7 +52,7 @@ public final class PostCommitProcessing {
     this.clusterManager = clusterManager;
     this.manager = manager;
     this.serverName = manager.getServerName();
-    this.txnDocStoreMode = DocStoreEvent.IGNORE;
+    this.txnDocStoreMode = DocStoreMode.IGNORE;
     this.txnDocStoreBatchSize = 0;
     this.event = event;
     this.deleteByIdMap = event.getDeleteByIdMap();
@@ -126,7 +126,7 @@ public final class PostCommitProcessing {
    * Return true if updates to the document store occur for this transaction.
    */
   private boolean isDocStoreUpdate() {
-    return manager.isDocStoreActive() && (txnDocStoreMode == null || txnDocStoreMode != DocStoreEvent.IGNORE);
+    return manager.isDocStoreActive() && (txnDocStoreMode == null || txnDocStoreMode != DocStoreMode.IGNORE);
   }
 
   public void notifyCluster() {

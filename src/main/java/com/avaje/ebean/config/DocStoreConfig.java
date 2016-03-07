@@ -1,6 +1,6 @@
 package com.avaje.ebean.config;
 
-import com.avaje.ebean.annotation.DocStoreEvent;
+import com.avaje.ebean.annotation.DocStoreMode;
 
 /**
  * Configuration for the Document store integration (e.g. ElasticSearch).
@@ -25,7 +25,7 @@ public class DocStoreConfig {
   /**
    * The default mode used by indexes.
    */
-  protected DocStoreEvent persist = DocStoreEvent.UPDATE;
+  protected DocStoreMode persist = DocStoreMode.UPDATE;
 
   /**
    * The default batch size to use for the Bulk API calls.
@@ -163,7 +163,7 @@ public class DocStoreConfig {
    * Return the default behavior for when Insert, Update and Delete events occur on beans that have an associated
    * Document store.
    */
-  public DocStoreEvent getPersist() {
+  public DocStoreMode getPersist() {
     return persist;
   }
 
@@ -185,7 +185,7 @@ public class DocStoreConfig {
    * you don't want Ebean to do anything when the data changes.
    * </p>
    */
-  public void setPersist(DocStoreEvent persist) {
+  public void setPersist(DocStoreMode persist) {
     this.persist = persist;
   }
 
@@ -196,7 +196,7 @@ public class DocStoreConfig {
 
     active = properties.getBoolean("docstore.active", active);
     url = properties.get("docstore.url", url);
-    persist = properties.getEnum(DocStoreEvent.class, "docstore.persist", persist);
+    persist = properties.getEnum(DocStoreMode.class, "docstore.persist", persist);
     bulkBatchSize = properties.getInt("docstore.bulkBatchSize", bulkBatchSize);
     dropCreate = properties.getBoolean("docstore.dropCreate", dropCreate);
     mappingPath = properties.get("docstore.mappingPath", mappingPath);
