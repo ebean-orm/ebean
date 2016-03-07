@@ -5,6 +5,7 @@ import com.avaje.ebean.DocumentStore;
 import com.avaje.ebean.PagedList;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.QueryEachConsumer;
+import com.avaje.ebean.QueryEachWhileConsumer;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class NoneDocStore implements DocumentStore {
   }
 
   @Override
-  public void createIndex(String indexName, String alias, String mappingResource) {
+  public void createIndex(String indexName, String alias) {
     throw implementationNotInClassPath();
   }
 
@@ -45,6 +46,11 @@ public class NoneDocStore implements DocumentStore {
   }
 
   @Override
+  public long copyIndex(Query<?> query, String newIndex, int bulkBatchSize) {
+    throw implementationNotInClassPath();
+  }
+
+  @Override
   public <T> void indexByQuery(Query<T> query) {
     throw implementationNotInClassPath();
   }
@@ -56,7 +62,7 @@ public class NoneDocStore implements DocumentStore {
 
   @Nullable
   @Override
-  public <T> T getById(Class<T> beanType, Object id) {
+  public <T> T find(Class<T> beanType, Object id) {
     throw implementationNotInClassPath();
   }
 
@@ -72,6 +78,11 @@ public class NoneDocStore implements DocumentStore {
 
   @Override
   public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer) {
+    throw implementationNotInClassPath();
+  }
+
+  @Override
+  public <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer) {
     throw implementationNotInClassPath();
   }
 

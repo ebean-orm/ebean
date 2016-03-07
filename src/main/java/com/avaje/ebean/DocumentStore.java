@@ -48,7 +48,7 @@ public interface DocumentStore {
    * If the document is not found null is returned.
    */
   @Nullable
-  <T> T getById(Class<T> beanType, Object id);
+  <T> T find(Class<T> beanType, Object id);
 
   /**
    * Execute the query against the document store returning the list.
@@ -73,6 +73,18 @@ public interface DocumentStore {
   <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer);
 
   /**
+   * Execute the query against the document store with the expectation of a large set of results
+   * that are processed in a scrolling resultSet fashion.
+   * <p>
+   * Unlike findEach() this provides the opportunity to stop iterating through the large query.
+   * </p>
+   * <p>
+   * For example, with the ElasticSearch doc store this uses SCROLL.
+   * </p>
+   */
+  <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer);
+
+  /**
    * Process the queue entries sending updates to the document store or queuing them for later processing.
    */
   long process(List<DocStoreQueueEntry> queueEntries) throws IOException;
@@ -87,9 +99,8 @@ public interface DocumentStore {
    *
    * @param indexName       the name of the new index
    * @param alias           the alias of the index
-   * @param mappingResource the path of the mapping file as a resource in the classpath
    */
-  void createIndex(String indexName, String alias, String mappingResource);
+  void createIndex(String indexName, String alias);
 
   /**
    * Copy the index to a new index.
@@ -97,9 +108,15 @@ public interface DocumentStore {
    * This copy process does not use the database but instead will copy from the source index to a destination index.
    * </p>
    *
+   * <pre>{@code
+   *
+   *  long copyCount = documentStore.copyIndex(Product.class, "product_copy");
+   *
+   * }</pre>
+   *
+   *
    * @param beanType The bean type of the source index
    * @param newIndex The name of the index to copy to
-   *
    * @return the number of documents copied to the new index
    */
   long copyIndex(Class<?> beanType, String newIndex);
@@ -111,11 +128,42 @@ public interface DocumentStore {
    * To support this the document needs to have a <code>@WhenModified</code> property.
    * </p>
    *
+   * <pre>{@code
+   *
+   *  long copyCount = documentStore.copyIndex(Product.class, "product_copy", sinceMillis);
+   *
+   * }</pre>
+   *
+   *
    * @param beanType The bean type of the source index
    * @param newIndex The name of the index to copy to
-   *
    * @return the number of documents copied to the new index
    */
   long copyIndex(Class<?> beanType, String newIndex, long sinceEpochMillis);
 
+  /**
+   * Copy from a source index to a new index taking only the documents
+   * matching the given query.
+   *
+   * <pre>{@code
+   *
+   *  // predicates to select the source documents to copy
+   *  Query<Product> query = server.find(Product.class)
+   *    .where()
+   *      .ge("whenModified", new Timestamp(since))
+   *      .ge("name", "A")
+   *      .lt("name", "D")
+   *      .query();
+   *
+   *  // copy from the source index to "product_copy" index
+   *  long copyCount = documentStore.copyIndex(query, "product_copy", 1000);
+   *
+   * }</pre>
+   *
+   * @param query         The query to select the source documents to copy
+   * @param newIndex      The target index to copy the documents to
+   * @param bulkBatchSize The ElasticSearch bulk batch size, if 0 uses the default.
+   * @return The number of documents copied to the new index.
+   */
+  long copyIndex(Query<?> query, String newIndex, int bulkBatchSize);
 }

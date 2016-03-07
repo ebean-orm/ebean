@@ -1140,7 +1140,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(spiQuery, t);
     if (request.isUseDocStore()) {
-      return docStore().getById(query.getBeanType(), query.getId());
+      return docStore().find(query.getBeanType(), query.getId());
     }
     try {
       request.initTransIfRequired();
