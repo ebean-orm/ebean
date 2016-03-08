@@ -58,6 +58,6 @@ public interface ElPropertyValue extends ElPropertyDeploy, ExpressionPath {
    * Return the value ensuring objects prior to the top scalar property are
    * automatically populated.
    */
-  Object elGetReference(EntityBean bean);
+  Object pathGetNested(Object bean);
 
 }

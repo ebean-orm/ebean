@@ -463,11 +463,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public Object elGetReference(EntityBean bean) {
-    Object value = getValueIntercept(bean);
+  public Object pathGetNested(Object bean) {
+    Object value = getValueIntercept((EntityBean)bean);
     if (value == null) {
       value = targetDescriptor.createEntityBean();
-      setValueIntercept(bean, value);
+      setValueIntercept((EntityBean)bean, value);
     }
     return value;
   }

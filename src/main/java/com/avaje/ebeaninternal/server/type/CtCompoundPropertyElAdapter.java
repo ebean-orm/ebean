@@ -33,7 +33,8 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
     return value;
   }
 
-  public Object elGetReference(EntityBean bean) {
+  @Override
+  public Object pathGetNested(Object bean) {
     return bean;
   }
 
@@ -45,10 +46,6 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
   @Override
   public void pathSet(Object bean, Object value) {
     prop.setValue(bean, value);
-  }
-
-  public int getDeployOrder() {
-    return deployOrder;
   }
 
   public String getAssocOneIdExpr(String prefix, String operator) {

@@ -791,7 +791,8 @@ public class BeanProperty implements ElPropertyValue, Property {
     return getValueIntercept((EntityBean)bean);
   }
 
-  public Object elGetReference(EntityBean bean) {
+  @Override
+  public Object pathGetNested(Object bean) {
     throw new RuntimeException("Not expected to call this");
   }
 

@@ -226,12 +226,13 @@ public class ElPropertyChain implements ElPropertyValue {
     return bean;
   }
 
-  public Object elGetReference(EntityBean bean) {
+  @Override
+  public Object pathGetNested(Object bean) {
 
-    EntityBean prevBean = bean;
+    Object prevBean = bean;
     for (int i = 0; i < last; i++) {
       // always return non null prevBean
-      prevBean = (EntityBean) chain[i].elGetReference(prevBean);
+      prevBean = chain[i].pathGetNested(prevBean);
     }
     // try the last step in the chain
     return chain[last].pathGet(prevBean);
@@ -240,10 +241,9 @@ public class ElPropertyChain implements ElPropertyValue {
   @Override
   public void pathSet(Object bean, Object value) {
 
-    EntityBean prevBean = (EntityBean)bean;
+    Object prevBean = bean;
     for (int i = 0; i < last; i++) {
-      // always return non null prevBean
-      prevBean = (EntityBean) chain[i].elGetReference(prevBean);
+      prevBean = chain[i].pathGetNested(prevBean);
     }
     if (prevBean != null) {
       if (lastBeanProperty != null) {

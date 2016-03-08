@@ -178,7 +178,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public Object elGetReference(EntityBean bean) {
+  public Object pathGetNested(Object bean) {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 

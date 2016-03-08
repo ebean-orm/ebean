@@ -143,7 +143,7 @@ public class BeanPropertyCompound extends BeanProperty {
   }
 
   @Override
-  public Object elGetReference(EntityBean bean) {
+  public Object pathGetNested(Object bean) {
     return bean;
   }
 
