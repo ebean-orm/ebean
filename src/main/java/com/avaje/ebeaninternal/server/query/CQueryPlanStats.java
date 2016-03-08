@@ -230,7 +230,6 @@ public final class CQueryPlanStats {
       return queryPlan.isAutoTuned();
     }
 
-
     @Override
     public String getQueryPlanHash() {
       return queryPlan.getPlanKey().toString();

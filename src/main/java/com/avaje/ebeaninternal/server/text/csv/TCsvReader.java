@@ -13,6 +13,7 @@ import java.util.Locale;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.plugin.ExpressionPath;
 import com.avaje.ebean.text.StringParser;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.TimeStringParser;
@@ -24,8 +25,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
 /**
- * 
- * @author rbygrave
+ * Implementation of the CsvReader
  */
 public class TCsvReader<T> implements CsvReader<T> {
 
@@ -54,9 +54,6 @@ public class TCsvReader<T> implements CsvReader<T> {
 	protected int persistBatchSize = 30;
 
 	private boolean addPropertiesFromHeader;
-
-	// private String addHeaderDateTimeFormat;
-	// private Locale addHeaderLocale;
 
 	public TCsvReader(EbeanServer server, BeanDescriptor<T> descriptor) {
 		this.server = server;
@@ -114,11 +111,10 @@ public class TCsvReader<T> implements CsvReader<T> {
 
 	public void addDateTime(String propertyName, String dateTimeFormat, Locale locale) {
 
-		ElPropertyValue elProp = descriptor.getElGetValue(propertyName);
+		ExpressionPath elProp = descriptor.getExpressionPath(propertyName);
 		if (!elProp.isDateTimeCapable()) {
 			throw new TextException("Property " + propertyName + " is not DateTime capable");
 		}
-
 		if (dateTimeFormat == null) {
 			dateTimeFormat = getDefaultDateTimeFormat(elProp.getJdbcType());
 		}
@@ -150,7 +146,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 
 	public void addProperty(String propertyName, StringParser parser) {
 
-		ElPropertyValue elProp = descriptor.getElGetValue(propertyName);
+		ExpressionPath elProp = descriptor.getExpressionPath(propertyName);
 		if (parser == null) {
 			parser = elProp.getStringParser();
 		}
@@ -214,7 +210,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 			callback.end(row);
 
 		} catch (Exception e) {
-			// notify that an error occured so that any
+			// notify that an error occurred so that any
 			// transaction can be rolled back if required
 			callback.endWithError(row, e);
 			throw e;
@@ -285,26 +281,23 @@ public class TCsvReader<T> implements CsvReader<T> {
 	 */
 	public static class CsvColumn {
 
-		private final ElPropertyValue elProp;
+		private final ExpressionPath path;
 		private final StringParser parser;
-		private final boolean ignore;
 
 		/**
 		 * Constructor for the IGNORE column.
 		 */
 		private CsvColumn() {
-			this.elProp = null;
+			this.path = null;
 			this.parser = null;
-			this.ignore = true;
 		}
 
 		/**
 		 * Construct with a property and parser.
 		 */
-		public CsvColumn(ElPropertyValue elProp, StringParser parser) {
-			this.elProp = elProp;
+		public CsvColumn(ExpressionPath path, StringParser parser) {
+			this.path = path;
 			this.parser = parser;
-			this.ignore = false;
 		}
 
 		/**
@@ -312,9 +305,9 @@ public class TCsvReader<T> implements CsvReader<T> {
 		 */
 		public void convertAndSet(String strValue, EntityBean bean) {
 
-			if (!ignore) {
+			if (parser != null && path != null) {
 				Object value = parser.parse(strValue);
-				elProp.elSetValue(bean, value, true);
+				path.pathSet(bean, value);
 			}
 		}
 	}
@@ -327,19 +320,19 @@ public class TCsvReader<T> implements CsvReader<T> {
 	private static class DateTimeParser implements StringParser {
 
 		private final DateFormat dateFormat;
-		private final ElPropertyValue elProp;
+		private final ExpressionPath path;
 		private final String format;
 
-		DateTimeParser(DateFormat dateFormat, String format, ElPropertyValue elProp) {
+		DateTimeParser(DateFormat dateFormat, String format, ExpressionPath path) {
 			this.dateFormat = dateFormat;
-			this.elProp = elProp;
+			this.path = path;
 			this.format = format;
 		}
 
 		public Object parse(String value) {
 			try {
 				Date dt = dateFormat.parse(value);
-				return elProp.parseDateTime(dt.getTime());
+				return path.parseDateTime(dt.getTime());
 
 			} catch (ParseException e) {
 				throw new TextException("Error parsing [" + value + "] using format[" + format + "]", e);

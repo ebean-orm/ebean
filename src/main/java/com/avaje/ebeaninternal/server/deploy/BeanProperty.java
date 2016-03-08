@@ -767,7 +767,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     }
   }
 
-  public Object elConvertType(Object value) {
+  public Object convert(Object value) {
     if (value == null) {
       return null;
     }
@@ -775,25 +775,20 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   @Override
-  public void set(Object bean, Object value) {
+  public void pathSet(Object bean, Object value) {
 
-    // convert for Enums etc
-    Object logicalVal = convertToLogicalType(value);
-    elSetValue((EntityBean) bean, logicalVal, true);
-  }
-
-  public void elSetValue(EntityBean bean, Object value, boolean populate) {
     if (bean != null) {
-      // Not using setValueIntercept at this stage
-      setValue(bean, value);
+      Object logicalVal = convertToLogicalType(value);
+      setValue((EntityBean)bean, logicalVal);
     }
   }
 
-  public Object elGetValue(EntityBean bean) {
+  @Override
+  public Object pathGet(Object bean) {
     if (bean == null) {
       return null;
     }
-    return getValueIntercept(bean);
+    return getValueIntercept((EntityBean)bean);
   }
 
   public Object elGetReference(EntityBean bean) {
@@ -1330,7 +1325,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    * Return true if this is a String Id property and should be treated as a code by the document store.
    */
   private boolean isStringId(DocPropertyType type) {
-    return DocPropertyType.STRING == type && id;
+    return DocPropertyType.STRING == type && (id || discriminator);
   }
 
 }

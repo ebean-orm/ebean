@@ -63,7 +63,7 @@ public class ExpressionPathTest {
 
     BeanType<Order> beanType = beanType(Order.class);
     Order order = new Order();
-    beanType.getExpressionPath("id").set(order, 42);
+    beanType.getExpressionPath("id").pathSet(order, 42);
     assertThat(order.getId()).isEqualTo(42);
   }
 
@@ -72,7 +72,7 @@ public class ExpressionPathTest {
 
     BeanType<Order> beanType = beanType(Order.class);
     Order order = new Order();
-    beanType.getExpressionPath("customer.name").set(order, "Rob");
+    beanType.getExpressionPath("customer.name").pathSet(order, "Rob");
     assertThat(order.getCustomer().getName()).isEqualTo("Rob");
   }
 

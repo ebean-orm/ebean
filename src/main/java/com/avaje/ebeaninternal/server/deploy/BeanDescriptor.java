@@ -71,6 +71,8 @@ import com.avaje.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdateContext;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import com.avaje.ebeanservice.docstore.api.mapping.DocMappingBuilder;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyMapping;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebeanservice.docstore.api.mapping.DocumentMapping;
 import com.fasterxml.jackson.core.JsonParser;
 import org.slf4j.Logger;
@@ -80,6 +82,7 @@ import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -358,12 +361,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   private final String docStoreQueueId;
 
-  private DocumentMapping docMapping;
-
   private final BeanDescriptorDraftHelp<T> draftHelp;
   private final BeanDescriptorCacheHelp<T> cacheHelp;
   private final BeanDescriptorJsonHelp<T> jsonHelp;
-  private final DocStoreBeanAdapter<T> docStoreAdapter;
+  private DocStoreBeanAdapter<T> docStoreAdapter;
+  private DocumentMapping docMapping;
+
 
   private final String defaultSelectClause;
 
@@ -680,7 +683,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
         namedUpdate.initialise(parser);
       }
     }
-    docStoreAdapter.registerPaths();
   }
 
   /**
@@ -690,7 +692,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     for (int i = 0; i < propertiesMany.length; i++) {
       propertiesMany[i].initialisePostTarget();
     }
+    if (inheritInfo != null && !inheritInfo.isRoot()) {
+      docStoreAdapter = (DocStoreBeanAdapter<T>)inheritInfo.getRoot().getBeanDescriptor().docStoreAdapter();
+    }
     docMapping = docStoreAdapter.createDocMapping();
+    docStoreAdapter.registerPaths();
   }
 
   public void initInheritInfo() {
@@ -932,16 +938,44 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Build the Document mapping recursively with the given prefix relative to the root of the document.
    */
-  public void docStoreMapping(DocMappingBuilder mapping, String prefix) {
+  public void docStoreMapping(final DocMappingBuilder mapping, final String prefix) {
 
     if (prefix != null && idProperty != null) {
       // id property not included in the
       idProperty.docStoreMapping(mapping, prefix);
     }
 
+    if (inheritInfo != null) {
+      String discCol = inheritInfo.getDiscriminatorColumn();
+      if (Types.VARCHAR == inheritInfo.getDiscriminatorType()) {
+        mapping.add(new DocPropertyMapping(discCol, DocPropertyType.ENUM));
+      } else {
+        mapping.add(new DocPropertyMapping(discCol, DocPropertyType.INTEGER));
+      }
+    }
     for (BeanProperty prop: propertiesNonTransient) {
       prop.docStoreMapping(mapping, prefix);
     }
+    if (inheritInfo != null) {
+      inheritInfo.visitChildren(new InheritInfoVisitor() {
+        @Override
+        public void visit(InheritInfo inheritInfo) {
+          for (BeanProperty localProperty : inheritInfo.localProperties()) {
+            localProperty.docStoreMapping(mapping, prefix);
+          }
+        }
+      });
+    }
+  }
+
+  /**
+   * Return the root bean type if part of inheritance hierarchy.
+   */
+  public BeanType<?> root() {
+    if (inheritInfo != null && !inheritInfo.isRoot()) {
+      return inheritInfo.getRoot().getBeanDescriptor();
+    }
+    return this;
   }
 
   /**
@@ -1539,7 +1573,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     }
     String[] splitBegin = SplitName.splitBegin(path);
 
-    BeanProperty beanProperty = propMap.get(splitBegin[0]);
+    BeanProperty beanProperty = findBeanProperty(splitBegin[0]);
     if (beanProperty instanceof BeanPropertyAssoc<?>) {
       BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) beanProperty;
       return assocProp.getTargetDescriptor().getBeanDescriptor(splitBegin[1]);
@@ -1709,7 +1743,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   @Override
   public Property getProperty(String propName) {
-    return getBeanProperty(propName);
+    return findBeanProperty(propName);
   }
 
   /**
@@ -1974,6 +2008,30 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public InheritInfo getInheritInfo() {
     return inheritInfo;
+  }
+
+  @Override
+  public boolean hasInheritance() {
+    return inheritInfo != null;
+  }
+
+  @Override
+  public String getDiscColumn() {
+    return inheritInfo.getDiscriminatorColumn();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public T createBeanUsingDisc(Object discValue) {
+    InheritInfo type = inheritInfo.getType(discValue.toString());
+    return (T)type.getBeanDescriptor().createBean();
+  }
+
+  @Override
+  public void addInheritanceWhere(SpiQuery<?> query) {
+    if (inheritInfo != null && !inheritInfo.isRoot()) {
+      query.where().eq(inheritInfo.getDiscriminatorColumn(), inheritInfo.getDiscriminatorValue());
+    }
   }
 
   /**

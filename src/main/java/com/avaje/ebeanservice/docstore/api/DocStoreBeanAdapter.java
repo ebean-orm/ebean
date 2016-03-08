@@ -113,4 +113,9 @@ public interface DocStoreBeanAdapter<T> extends BeanDocType<T> {
    * </p>
    */
   String rawProperty(String property);
+
+  /**
+   * Return true if this bean type as embedded invalidate registered.
+   */
+  boolean hasEmbeddedInvalidation();
 }

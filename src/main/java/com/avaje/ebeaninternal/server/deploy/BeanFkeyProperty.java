@@ -162,23 +162,22 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 
-  public Object elConvertType(Object value) {
+  @Override
+  public Object convert(Object value) {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 
   @Override
-  public void set(Object bean, Object value) {
+  public void pathSet(Object bean, Object value) {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 
-  public void elSetValue(EntityBean bean, Object value, boolean populate) {
+  @Override
+  public Object pathGet(Object bean) {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 
-  public Object elGetValue(EntityBean bean) {
-    throw new RuntimeException("ElPropertyDeploy only - not implemented");
-  }
-
+  @Override
   public Object elGetReference(EntityBean bean) {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }

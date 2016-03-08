@@ -4,12 +4,15 @@ import com.avaje.ebean.FetchPath;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.DocStoreMode;
+import com.avaje.ebean.plugin.BeanType;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
+import com.avaje.ebeaninternal.server.deploy.InheritInfo;
+import com.avaje.ebeaninternal.server.deploy.InheritInfoVisitor;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import com.avaje.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdateContext;
@@ -40,11 +43,6 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    * The type of index.
    */
   protected final boolean mapped;
-
-  /**
-   * Nested path properties defining the doc structure for indexing.
-   */
-  protected final DocStructure docStructure;
 
   /**
    * Identifier used in the queue system to identify the index.
@@ -87,18 +85,28 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    */
   protected final List<DocStoreEmbeddedInvalidation> embeddedInvalidation = new ArrayList<DocStoreEmbeddedInvalidation>();
 
+  protected final PathProperties pathProps;
+
   /**
    * Map of properties to 'raw' properties.
    */
-  private Map<String, String> sortableMap;
+  protected Map<String, String> sortableMap;
 
+  /**
+   * Nested path properties defining the doc structure for indexing.
+   */
+  protected DocStructure docStructure;
+
+  protected DocumentMapping documentMapping;
+
+  private boolean registerPaths;
 
   public DocStoreBeanBaseAdapter(BeanDescriptor<T> desc, DeployBeanDescriptor<T> deploy) {
 
     this.desc = desc;
     this.server = desc.getEbeanServer();
     this.mapped = deploy.isDocStoreMapped();
-    this.docStructure = (!mapped) ? null : derivePathProperties(deploy);
+    this.pathProps = deploy.getDocStorePathProperties();
     this.docStore = deploy.getDocStore();
     this.queueId = derive(desc, deploy.getDocStoreQueueId());
     this.indexName = derive(desc, deploy.getDocStoreIndexName());
@@ -109,27 +117,29 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   }
 
   @Override
+  public boolean hasEmbeddedInvalidation() {
+    return !embeddedInvalidation.isEmpty();
+  }
+
+  @Override
   public DocumentMapping createDocMapping() {
+
+    if (documentMapping != null) {
+      return documentMapping;
+    }
 
     if (!mapped) return null;
 
-    PathProperties paths = docStructure.doc();
+    this.docStructure = derivePathProperties(pathProps);
 
-    DocMappingBuilder mappingBuilder = new DocMappingBuilder(paths, docStore);
+    DocMappingBuilder mappingBuilder = new DocMappingBuilder(docStructure.doc(), docStore);
     desc.docStoreMapping(mappingBuilder, null);
-
     mappingBuilder.applyMapping();
-    prepareMapping(mappingBuilder);
 
     sortableMap = mappingBuilder.collectSortable();
-
     docStructure.prepareMany(desc);
-
-    return mappingBuilder.create(queueId, indexName, indexType);
-  }
-
-  protected void prepareMapping(DocMappingBuilder mappingBuilder) {
-    // do nothing by default
+    documentMapping = mappingBuilder.create(queueId, indexName, indexType);
+    return documentMapping;
   }
 
   @Override
@@ -159,7 +169,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    */
   @Override
   public void registerPaths() {
-    if (mapped) {
+    if (mapped && !registerPaths) {
       Collection<PathProperties.Props> pathProps = docStructure.doc().getPathProps();
       for (PathProperties.Props pathProp : pathProps) {
         String path = pathProp.getPath();
@@ -170,6 +180,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
           targetDesc.docStoreAdapter().registerInvalidationPath(desc.getDocStoreQueueId(), fullPath, pathProp.getProperties());
         }
       }
+      registerPaths = true;
     }
   }
 
@@ -223,13 +234,8 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    * Return the pathProperties which defines the JSON document to index.
    * This can add derived/embedded/nested parts to the document.
    */
-  protected DocStructure derivePathProperties(DeployBeanDescriptor<T> deploy) {
+  protected DocStructure derivePathProperties(PathProperties pathProps) {
 
-    if (!mapped) {
-      return null;
-    }
-
-    PathProperties pathProps = deploy.getDocStorePathProperties();
     boolean includeByDefault = (pathProps == null);
     if (pathProps  == null) {
       pathProps = new PathProperties();
@@ -238,13 +244,27 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
     return getDocStructure(pathProps, includeByDefault);
   }
 
-  protected DocStructure getDocStructure(PathProperties pathProps, boolean includeByDefault) {
+  protected DocStructure getDocStructure(PathProperties pathProps, final boolean includeByDefault) {
 
-    DocStructure docStructure = new DocStructure(pathProps);
+    final DocStructure docStructure = new DocStructure(pathProps);
+
     BeanProperty[] properties = desc.propertiesNonTransient();
     for (int i = 0; i < properties.length; i++) {
       properties[i].docStoreInclude(includeByDefault, docStructure);
     }
+
+    InheritInfo inheritInfo = desc.getInheritInfo();
+    if (inheritInfo != null) {
+      inheritInfo.visitChildren(new InheritInfoVisitor() {
+        @Override
+        public void visit(InheritInfo inheritInfo) {
+          for (BeanProperty localProperty : inheritInfo.localProperties()) {
+            localProperty.docStoreInclude(includeByDefault, docStructure);
+          }
+        }
+      });
+    }
+
     return docStructure;
   }
 
@@ -293,7 +313,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   /**
    * Return the supplied value or default to the bean name lower case.
    */
-  protected String derive(BeanDescriptor<T> desc, String suppliedValue) {
+  protected String derive(BeanType<?> desc, String suppliedValue) {
     return (suppliedValue != null && suppliedValue.length() > 0) ? suppliedValue : desc.getName().toLowerCase();
   }
 

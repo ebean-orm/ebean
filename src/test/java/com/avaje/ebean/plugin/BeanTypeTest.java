@@ -3,17 +3,24 @@ package com.avaje.ebean.plugin;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.FetchPath;
+import com.avaje.ebean.Query;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
+import com.avaje.tests.inheritance.Stockforecast;
+import com.avaje.tests.model.basic.Car;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.Person;
 import com.avaje.tests.model.basic.Product;
+import com.avaje.tests.model.basic.Vehicle;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 public class BeanTypeTest {
@@ -189,4 +196,48 @@ public class BeanTypeTest {
   public void docStoreUpdateEmbedded() throws Exception {
     beanType(Order.class).docStore().updateEmbedded(1, "customer", "someJson", null);
   }
+
+  @Test
+  public void hasInheritance_when_not() {
+    assertFalse(beanType(Order.class).hasInheritance());
+  }
+
+  @Test
+  public void hasInheritance_when_root() {
+    assertTrue(beanType(Vehicle.class).hasInheritance());
+  }
+
+  @Test
+  public void hasInheritance_when_leaf() {
+    assertTrue(beanType(Car.class).hasInheritance());
+  }
+
+  @Test
+  public void getDiscColumn_when_default() {
+    assertEquals(beanType(Car.class).getDiscColumn(),"dtype");
+  }
+
+  @Test
+  public void getDiscColumn_when_set() {
+    assertEquals(beanType(Stockforecast.class).getDiscColumn(),"type");
+  }
+
+  @Test
+  public void createBeanUsingDisc_when_set() {
+    Vehicle vehicle = beanType(Vehicle.class).createBeanUsingDisc("C");
+    assertTrue(vehicle instanceof Car);
+  }
+
+  @Test
+  public void addInheritanceWhere_when_leaf() {
+    Query<Vehicle> query = server.find(Vehicle.class);
+    beanType(Car.class).addInheritanceWhere((SpiQuery<?>)query);
+  }
+
+  @Test
+  public void addInheritanceWhere_when_root() {
+    Query<Vehicle> query = server.find(Vehicle.class);
+    beanType(Vehicle.class).addInheritanceWhere((SpiQuery<?>)query);
+  }
+
 }

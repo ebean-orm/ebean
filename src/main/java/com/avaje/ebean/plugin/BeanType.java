@@ -6,6 +6,7 @@ import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.text.json.JsonReadOptions;
+import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeanservice.docstore.api.mapping.DocumentMapping;
 import com.fasterxml.jackson.core.JsonParser;
 
@@ -16,6 +17,11 @@ import java.util.Collection;
  * Information and methods on BeanDescriptors made available to plugins.
  */
 public interface BeanType<T> {
+
+  /**
+   * Return the short name of the bean type.
+   */
+  String getName();
 
   /**
    * Return the full name of the bean type.
@@ -53,12 +59,12 @@ public interface BeanType<T> {
   Property getWhenCreatedProperty();
 
   /**
-   * Return the SpiProperty for a property to read values from a bean.
+   * Return the Property to read values from a bean.
    */
   Property getProperty(String propertyName);
 
   /**
-   * Return the SpiExpressionPath for a given property path.
+   * Return the ExpressionPath for a given property path.
    * <p>
    * This can return a property or nested property path.
    * </p>
@@ -154,4 +160,28 @@ public interface BeanType<T> {
    */
   T jsonRead(JsonParser parser, JsonReadOptions readOptions, Object objectMapper) throws IOException;
 
+  /**
+   * Add the discriminator value to the query if needed.
+   */
+  void addInheritanceWhere(SpiQuery<?> query);
+
+  /**
+   * Return the root bean type for an inheritance hierarchy.
+   */
+  BeanType<?> root();
+
+  /**
+   * Return true if this bean type has an inheritance hierarchy.
+   */
+  boolean hasInheritance();
+
+  /**
+   * Return the discriminator column.
+   */
+  String getDiscColumn();
+
+  /**
+   * Create a bean given the discriminator value.
+   */
+  T createBeanUsingDisc(Object discValue);
 }

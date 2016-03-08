@@ -309,7 +309,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private boolean isDocStoreNotify() {
     // Either queue or directly update the document store
-    return docStoreMode != DocStoreMode.IGNORE;
+    return docStoreMode != DocStoreMode.IGNORE || beanDescriptor.docStoreAdapter().hasEmbeddedInvalidation();
   }
 
   public boolean isNotifyPersistListener() {

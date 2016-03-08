@@ -220,20 +220,19 @@ public class ElPropertyChain implements ElPropertyValue {
     return scalarType;
   }
 
-  public Object elConvertType(Object value) {
+  public Object convert(Object value) {
     // just convert using the last one in the chain
-    return lastElPropertyValue.elConvertType(value);
+    return lastElPropertyValue.convert(value);
   }
 
-  public Object elGetValue(EntityBean bean) {
-
+  @Override
+  public Object pathGet(Object bean) {
     for (int i = 0; i < chain.length; i++) {
-      bean = (EntityBean) chain[i].elGetValue(bean);
+      bean = chain[i].pathGet(bean);
       if (bean == null) {
         return null;
       }
     }
-
     return bean;
   }
 
@@ -245,39 +244,25 @@ public class ElPropertyChain implements ElPropertyValue {
       prevBean = (EntityBean) chain[i].elGetReference(prevBean);
     }
     // try the last step in the chain
-    return chain[last].elGetValue(prevBean);
+    return chain[last].pathGet(prevBean);
   }
 
   @Override
-  public void set(Object bean, Object value) {
-    elSetValue((EntityBean)bean, value, true);
-  }
+  public void pathSet(Object bean, Object value) {
 
-  public void elSetValue(EntityBean bean, Object value, boolean populate) {
-
-    EntityBean prevBean = bean;
-    if (populate) {
-      for (int i = 0; i < last; i++) {
-        // always return non null prevBean
-        prevBean = (EntityBean) chain[i].elGetReference(prevBean);
-      }
-    } else {
-      for (int i = 0; i < last; i++) {
-        // always return non null prevBean
-        prevBean = (EntityBean) chain[i].elGetValue(prevBean);
-        if (prevBean == null) {
-          break;
-        }
-      }
+    EntityBean prevBean = (EntityBean)bean;
+    for (int i = 0; i < last; i++) {
+      // always return non null prevBean
+      prevBean = (EntityBean) chain[i].elGetReference(prevBean);
     }
     if (prevBean != null) {
       if (lastBeanProperty != null) {
         // last chain element maps to a real scalar property
-        lastBeanProperty.setValueIntercept(prevBean, value);
+        lastBeanProperty.pathSet(prevBean, value);
 
       } else {
         // a non-scalar property of a Compound value object
-        lastElPropertyValue.elSetValue(prevBean, value, populate);
+        lastElPropertyValue.pathSet(prevBean, value);
       }
     }
   }

@@ -28,7 +28,8 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
     this.deployOrder = deployOrder;
   }
 
-  public Object elConvertType(Object value) {
+  @Override
+  public Object convert(Object value) {
     return value;
   }
 
@@ -36,16 +37,13 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
     return bean;
   }
 
-  public Object elGetValue(EntityBean bean) {
+  @Override
+  public Object pathGet(Object bean) {
     return prop.getValue(bean);
   }
 
   @Override
-  public void set(Object bean, Object value) {
-    elSetValue((EntityBean) bean, value, true);
-  }
-
-  public void elSetValue(EntityBean bean, Object value, boolean populate) {
+  public void pathSet(Object bean, Object value) {
     prop.setValue(bean, value);
   }
 

@@ -28,7 +28,7 @@ public final class ElFilter<T> implements Filter<T> {
   private Object convertValue(String propertyName, Object value) {
     // convert type of value to match expected type
     ElPropertyValue elGetValue = beanDescriptor.getElGetValue(propertyName);
-    return elGetValue.elConvertType(value);
+    return elGetValue.convert(value);
   }
 
   private ElComparator<T> getElComparator(String propertyName) {
@@ -87,8 +87,8 @@ public final class ElFilter<T> implements Filter<T> {
   public Filter<T> between(String propertyName, Object min, Object max) {
 
     ElPropertyValue elGetValue = getElGetValue(propertyName);
-    min = elGetValue.elConvertType(min);
-    max = elGetValue.elConvertType(max);
+    min = elGetValue.convert(min);
+    max = elGetValue.convert(max);
 
     ElComparator<T> elComparator = getElComparator(propertyName);
 

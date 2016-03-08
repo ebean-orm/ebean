@@ -28,7 +28,7 @@ class ElMatchBuilder {
     }
 
     public boolean isMatch(T bean) {
-      String v = (String) elGetValue.elGetValue((EntityBean) bean);
+      String v = (String) elGetValue.pathGet(bean);
       return pattern.matcher(v).matches();
     }
   }
@@ -55,7 +55,7 @@ class ElMatchBuilder {
     }
 
     public boolean isMatch(T bean) {
-      String v = (String) elGetValue.elGetValue((EntityBean) bean);
+      String v = (String) elGetValue.pathGet(bean);
       return value.equalsIgnoreCase(v);
     }
   }
@@ -75,7 +75,7 @@ class ElMatchBuilder {
 
     public boolean isMatch(T bean) {
 
-      String v = (String) elGetValue.elGetValue((EntityBean) bean);
+      String v = (String) elGetValue.pathGet(bean);
       return charMatch.startsWith(v);
     }
   }
@@ -95,7 +95,7 @@ class ElMatchBuilder {
 
     public boolean isMatch(T bean) {
 
-      String v = (String) elGetValue.elGetValue((EntityBean) bean);
+      String v = (String) elGetValue.pathGet(bean);
       return charMatch.endsWith(v);
     }
   }
@@ -106,7 +106,7 @@ class ElMatchBuilder {
     }
 
     public boolean isMatch(T bean) {
-      String v = (String) elGetValue.elGetValue((EntityBean) bean);
+      String v = (String) elGetValue.pathGet(bean);
       return value.startsWith(v);
     }
   }
@@ -117,7 +117,7 @@ class ElMatchBuilder {
     }
 
     public boolean isMatch(T bean) {
-      String v = (String) elGetValue.elGetValue((EntityBean) bean);
+      String v = (String) elGetValue.pathGet(bean);
       return value.endsWith(v);
     }
   }
@@ -131,7 +131,7 @@ class ElMatchBuilder {
     }
 
     public boolean isMatch(T bean) {
-      return (null == elGetValue.elGetValue((EntityBean) bean));
+      return (null == elGetValue.pathGet(bean));
     }
   }
 
@@ -144,7 +144,7 @@ class ElMatchBuilder {
     }
 
     public boolean isMatch(T bean) {
-      return (null != elGetValue.elGetValue((EntityBean) bean));
+      return (null != elGetValue.pathGet(bean));
     }
   }
 
@@ -175,7 +175,7 @@ class ElMatchBuilder {
 
     public boolean isMatch(T bean) {
 
-      Object value = elGetValue.elGetValue((EntityBean) bean);
+      Object value = elGetValue.pathGet(bean);
       return value != null && set.contains(value);
     }
   }

@@ -61,52 +61,9 @@ public interface ElPropertyValue extends ElPropertyDeploy, ExpressionPath {
   int getDeployOrder();
 
   /**
-   * Return the default StringParser for the scalar property.
-   */
-  StringParser getStringParser();
-
-  /**
-   * Return true if the last type is "DateTime capable" - can support
-   * {@link #parseDateTime(long)}.
-   */
-  boolean isDateTimeCapable();
-
-  /**
-   * Return the underlying JDBC type or 0 if this is not a scalar type.
-   */
-  int getJdbcType();
-
-  /**
-   * For DateTime capable scalar types convert the long systemTimeMillis into
-   * an appropriate java time (Date,Timestamp,Time,Calendar, JODA type etc).
-   */
-  Object parseDateTime(long systemTimeMillis);
-
-  /**
-   * Return the value from a given entity bean.
-   */
-  Object elGetValue(EntityBean bean);
-
-  /**
    * Return the value ensuring objects prior to the top scalar property are
    * automatically populated.
    */
   Object elGetReference(EntityBean bean);
 
-  /**
-   * Set a value given a root level bean.
-   * <p>
-   * If populate then
-   * </p>
-   */
-  void elSetValue(EntityBean bean, Object value, boolean populate);
-
-  /**
-   * Convert the value to the expected type.
-   * <p>
-   * Typically useful for converting strings to the appropriate number type
-   * etc.
-   * </p>
-   */
-  Object elConvertType(Object value);
 }

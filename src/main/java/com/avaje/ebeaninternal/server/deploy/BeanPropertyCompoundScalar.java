@@ -77,8 +77,8 @@ public class BeanPropertyCompoundScalar extends BeanProperty {
   }
 
   @Override
-  public Object elGetValue(EntityBean bean) {
-    return getValue(bean);
+  public Object pathGet(Object bean) {
+    return ctProperty.getValue(bean);
   }
 
 }

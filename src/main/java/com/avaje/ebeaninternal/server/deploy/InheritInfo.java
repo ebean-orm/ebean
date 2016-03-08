@@ -146,6 +146,13 @@ public class InheritInfo {
   }
 
   /**
+   * Return the local properties for this node in the hierarchy.
+   */
+  public BeanProperty[] localProperties() {
+    return descriptor.propertiesLocal();
+  }
+
+  /**
    * Get the bean property additionally looking in the sub types.
    */
   public BeanProperty findSubTypeProperty(String propertyName) {
