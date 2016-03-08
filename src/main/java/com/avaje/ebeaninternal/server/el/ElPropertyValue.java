@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.el;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.plugin.ExpressionPath;
-import com.avaje.ebean.text.StringParser;
 
 /**
  * The expression language object that can get values.
@@ -54,11 +53,6 @@ public interface ElPropertyValue extends ElPropertyDeploy, ExpressionPath {
    * Return true if the property is encrypted in the DB.
    */
   boolean isDbEncrypted();
-
-  /**
-   * Return the deploy order for the property.
-   */
-  int getDeployOrder();
 
   /**
    * Return the value ensuring objects prior to the top scalar property are
