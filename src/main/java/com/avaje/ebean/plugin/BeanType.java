@@ -5,12 +5,9 @@ import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebean.event.BeanQueryAdapter;
-import com.avaje.ebean.text.json.JsonReadOptions;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeanservice.docstore.api.mapping.DocumentMapping;
-import com.fasterxml.jackson.core.JsonParser;
 
-import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -154,11 +151,6 @@ public interface BeanType<T> {
    * Return the doc store support for this bean type.\
    */
   BeanDocType<T> docStore();
-
-  /**
-   * Read the JSON content returning the bean.
-   */
-  T jsonRead(JsonParser parser, JsonReadOptions readOptions, Object objectMapper) throws IOException;
 
   /**
    * Add the discriminator value to the query if needed.

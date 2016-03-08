@@ -2709,9 +2709,4 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return jsonHelp.jsonReadObject(jsonRead, path);
   }
 
-  @Override
-  public T jsonRead(JsonParser parser, JsonReadOptions readOptions, Object objectMapper) throws IOException {
-    ReadJson jsonRead = new ReadJson(this, parser, readOptions, objectMapper);
-    return jsonRead(jsonRead, null);
-  }
 }
