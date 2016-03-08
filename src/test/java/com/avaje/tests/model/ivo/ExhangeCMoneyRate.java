@@ -1,4 +1,3 @@
-
 package com.avaje.tests.model.ivo;
 
 /**
@@ -6,42 +5,42 @@ package com.avaje.tests.model.ivo;
  */
 public class ExhangeCMoneyRate {
 
-    private final Rate rate;
-    private final CMoney cmoney;
-    
-    public ExhangeCMoneyRate(Rate rate, CMoney cmoney) {
-        this.rate = rate;
-        this.cmoney = cmoney;
-    }
+  private final Rate rate;
+  private final CMoney cmoney;
 
-    public Rate getRate() {
-        return rate;
-    }
+  public ExhangeCMoneyRate(Rate rate, CMoney cmoney) {
+    this.rate = rate;
+    this.cmoney = cmoney;
+  }
 
-    public CMoney getCmoney() {
-        return cmoney;
-    }
+  public Rate getRate() {
+    return rate;
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ExhangeCMoneyRate){
-            ExhangeCMoneyRate e = (ExhangeCMoneyRate)obj;
-            return e.rate.equals(rate) && e.cmoney.equals(cmoney);
-        }
-        return false;
-    }
+  public CMoney getCmoney() {
+    return cmoney;
+  }
 
-    @Override
-    public int hashCode() {
-        int hc = rate.hashCode();
-        hc = hc * 31 + cmoney.hashCode();
-        return hc;
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof ExhangeCMoneyRate) {
+      ExhangeCMoneyRate e = (ExhangeCMoneyRate) obj;
+      return e.rate.equals(rate) && e.cmoney.equals(cmoney);
     }
+    return false;
+  }
 
-    @Override
-    public String toString() {
-        return "rate="+rate+" cmoney="+cmoney;
-    }
-    
-    
+  @Override
+  public int hashCode() {
+    int hc = rate.hashCode();
+    hc = hc * 31 + cmoney.hashCode();
+    return hc;
+  }
+
+  @Override
+  public String toString() {
+    return "rate=" + rate + " cmoney=" + cmoney;
+  }
+
+
 }

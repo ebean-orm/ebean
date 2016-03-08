@@ -1,18 +1,17 @@
 package com.avaje.tests.model.ivo;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.util.Currency;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutable;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
 import com.avaje.ebeaninternal.server.type.reflect.ImmutableMeta;
 import com.avaje.ebeaninternal.server.type.reflect.ImmutableMetaFactory;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.util.Currency;
 
 public class TestCheckImmutable extends BaseTestCase {
 

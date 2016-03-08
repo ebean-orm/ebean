@@ -15,120 +15,120 @@ import java.math.MathContext;
  * Rates are typically used to multiple or divide against an amount.
  * For example, you can't ADD a Rate to Money.
  * </p>
- * @author rbygrave
  *
+ * @author rbygrave
  */
 public final class Rate implements Comparable<Rate>, Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public static final Rate ZERO = new Rate(BigDecimal.ZERO);
-    public static final Rate ONE = new Rate(BigDecimal.ONE);
-    
-    private final BigDecimal value;
-    
-    public Rate(BigDecimal value) {
-        if (value == null){
-            throw new NullPointerException("value can not be null");
-        }
-        this.value = value;
-    }
+  public static final Rate ZERO = new Rate(BigDecimal.ZERO);
+  public static final Rate ONE = new Rate(BigDecimal.ONE);
 
-    public Rate(double val) {
-        this(BigDecimal.valueOf(val));
-    }
+  private final BigDecimal value;
 
-    public Rate(String val) {
-        this(new BigDecimal(val));
+  public Rate(BigDecimal value) {
+    if (value == null) {
+      throw new NullPointerException("value can not be null");
     }
+    this.value = value;
+  }
 
-    public String toString() {
-        return value.toString();
-    }
-    
-    public int compareTo(Rate o) {
-        return value.compareTo(o.value);
-    }
-    
-    @Override
-    public int hashCode() {
-        return value.hashCode();
-    }
+  public Rate(double val) {
+    this(BigDecimal.valueOf(val));
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Rate){
-            // use BigDecimal.compareTo to handle scale differences
-            return value.compareTo(((Rate)obj).getValue()) == 0;
-        }
-        return false;
-    }
+  public Rate(String val) {
+    this(new BigDecimal(val));
+  }
 
-    public BigDecimal getValue() {
-        return value;
-    }
-    
-    public Rate subtract(Rate amt){
-        BigDecimal b = value.subtract(amt.value);
-        return new Rate(b);
-    }
-    
-    public Rate subtract(Rate amt, MathContext ctx){
-        BigDecimal b = value.subtract(amt.value, ctx);
-        return new Rate(b);
-    }
-    
-    public Rate add(Rate amt){
-        BigDecimal b = value.add(amt.value);
-        return new Rate(b);
-    }
+  public String toString() {
+    return value.toString();
+  }
 
-    public Rate add(Rate amt, MathContext ctx){
-        BigDecimal b = value.add(amt.value, ctx);
-        return new Rate(b);
-    }
+  public int compareTo(Rate o) {
+    return value.compareTo(o.value);
+  }
 
-    /**
-     * A Rate times Money amount returns Money.
-     */
-    public Money times(Money amount){
-        return multiply(amount);
-    }
+  @Override
+  public int hashCode() {
+    return value.hashCode();
+  }
 
-    public Money multiply(Money amount){
-        BigDecimal b = value.multiply(amount.getAmount());
-        return new Money(b);
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Rate) {
+      // use BigDecimal.compareTo to handle scale differences
+      return value.compareTo(((Rate) obj).getValue()) == 0;
     }
+    return false;
+  }
 
-    public Rate multiply(Rate m){
-        return multiply(m.value);
-    }
+  public BigDecimal getValue() {
+    return value;
+  }
 
-    public Rate multiply(int val){
-        return multiply(BigDecimal.valueOf(val));
-    }
+  public Rate subtract(Rate amt) {
+    BigDecimal b = value.subtract(amt.value);
+    return new Rate(b);
+  }
 
-    public Rate multiply(float val){
-        return multiply(BigDecimal.valueOf(val));
-    }
+  public Rate subtract(Rate amt, MathContext ctx) {
+    BigDecimal b = value.subtract(amt.value, ctx);
+    return new Rate(b);
+  }
 
-    public Rate multiply(double val){
-        return multiply(BigDecimal.valueOf(val));
-    }
-    
-    public Rate multiply(BigDecimal m){
-        BigDecimal b = value.multiply(m);
-        return new Rate(b);
-    }
+  public Rate add(Rate amt) {
+    BigDecimal b = value.add(amt.value);
+    return new Rate(b);
+  }
 
-    public Rate divide(BigDecimal divisor){
-        BigDecimal b = value.divide(divisor);
-        return new Rate(b);
-    }
-    
-    public Rate divide(BigDecimal divisor, MathContext ctx){
-        BigDecimal b = value.divide(divisor, ctx);
-        return new Rate(b);
-    }
+  public Rate add(Rate amt, MathContext ctx) {
+    BigDecimal b = value.add(amt.value, ctx);
+    return new Rate(b);
+  }
+
+  /**
+   * A Rate times Money amount returns Money.
+   */
+  public Money times(Money amount) {
+    return multiply(amount);
+  }
+
+  public Money multiply(Money amount) {
+    BigDecimal b = value.multiply(amount.getAmount());
+    return new Money(b);
+  }
+
+  public Rate multiply(Rate m) {
+    return multiply(m.value);
+  }
+
+  public Rate multiply(int val) {
+    return multiply(BigDecimal.valueOf(val));
+  }
+
+  public Rate multiply(float val) {
+    return multiply(BigDecimal.valueOf(val));
+  }
+
+  public Rate multiply(double val) {
+    return multiply(BigDecimal.valueOf(val));
+  }
+
+  public Rate multiply(BigDecimal m) {
+    BigDecimal b = value.multiply(m);
+    return new Rate(b);
+  }
+
+  public Rate divide(BigDecimal divisor) {
+    BigDecimal b = value.divide(divisor);
+    return new Rate(b);
+  }
+
+  public Rate divide(BigDecimal divisor, MathContext ctx) {
+    BigDecimal b = value.divide(divisor, ctx);
+    return new Rate(b);
+  }
 
 }

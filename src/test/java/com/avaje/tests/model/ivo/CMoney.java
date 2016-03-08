@@ -4,25 +4,24 @@ import java.util.Currency;
 
 /**
  * Currency and Money.
- * 
- * @author rbygrave
  *
+ * @author rbygrave
  */
 public class CMoney {
 
-    private final Money amount;
-    private final Currency currency;
-    
-    public CMoney(Money amount, Currency currency) {
-        this.amount = amount;
-        this.currency = currency;
-    }
+  private final Money amount;
+  private final Currency currency;
 
-    public Money getAmount() {
-        return amount;
-    }
+  public CMoney(Money amount, Currency currency) {
+    this.amount = amount;
+    this.currency = currency;
+  }
 
-    public Currency getCurrency() {
-        return currency;
-    }
+  public Money getAmount() {
+    return amount;
+  }
+
+  public Currency getCurrency() {
+    return currency;
+  }
 }

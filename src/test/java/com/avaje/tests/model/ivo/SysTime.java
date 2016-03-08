@@ -2,14 +2,14 @@ package com.avaje.tests.model.ivo;
 
 public class SysTime {
 
-    private final long millis;
-    
-    public SysTime(long millis){
-        this.millis = millis;
-    }
+  private final long millis;
 
-    public long getMillis() {
-        return millis;
-    }
-    
+  public SysTime(long millis) {
+    this.millis = millis;
+  }
+
+  public long getMillis() {
+    return millis;
+  }
+
 }
