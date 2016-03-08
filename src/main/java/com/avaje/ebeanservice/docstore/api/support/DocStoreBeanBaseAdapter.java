@@ -72,7 +72,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   /**
    * Behavior on update.
    */
-  protected final DocStoreMode update;
+  protected DocStoreMode update;
 
   /**
    * Behavior on delete.
@@ -190,6 +190,13 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   @Override
   public void registerInvalidationPath(String queueId, String path, Set<String> properties) {
 
+    if (!mapped) {
+      if (update == DocStoreMode.IGNORE) {
+        // bean type not mapped but is included as nested document
+        // in a doc store index so we need to update
+        update = DocStoreMode.UPDATE;
+      }
+    }
     embeddedInvalidation.add(getEmbeddedInvalidation(queueId, path, properties));
   }
 

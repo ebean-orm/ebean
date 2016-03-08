@@ -147,7 +147,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     this.parentBean = parentBean;
     this.controller = beanDescriptor.getPersistController();
     this.type = type;
-    this.docStoreMode = calcDocStoreEvent(transaction, type);
+    this.docStoreMode = calcDocStoreMode(transaction, type);
     if (saveRecurse) {
       this.persistCascade = t.isPersistCascade();
     }
@@ -175,7 +175,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Used to check if the Transaction has set the mode to IGNORE when doing large batch inserts that we
    * don't want to send to the doc store.
    */
-  private DocStoreMode calcDocStoreEvent(SpiTransaction txn, Type type) {
+  private DocStoreMode calcDocStoreMode(SpiTransaction txn, Type type) {
     DocStoreMode txnMode = (txn == null) ? null : txn.getDocStoreMode();
     return beanDescriptor.getDocStoreMode(type, txnMode);
   }
@@ -203,7 +203,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public void initTransIfRequiredWithBatchCascade() {
 
     if (createImplicitTransIfRequired()) {
-      docStoreMode = calcDocStoreEvent(transaction, type);
+      docStoreMode = calcDocStoreMode(transaction, type);
     }
     if (transaction.checkBatchEscalationOnCascade(this)) {
       // we escalated to use batch mode so flush when done
@@ -308,8 +308,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * by queuing an event or direct updateAdd (via Bulk API).
    */
   private boolean isDocStoreNotify() {
-    // Either queue or directly update the document store
-    return docStoreMode != DocStoreMode.IGNORE || beanDescriptor.docStoreAdapter().hasEmbeddedInvalidation();
+    return docStoreMode != DocStoreMode.IGNORE;
   }
 
   public boolean isNotifyPersistListener() {
