@@ -8,8 +8,6 @@ import java.io.IOException;
 
 class BetweenExpression extends AbstractExpression {
 
-  private static final long serialVersionUID = 2078918165221454910L;
-
   private static final String BETWEEN = " between ";
 
   private final Object valueHigh;

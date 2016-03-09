@@ -1,5 +1,7 @@
 package com.avaje.ebean;
 
+import com.avaje.ebean.search.Match;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -286,6 +288,11 @@ public interface ExpressionFactory {
   Expression raw(String raw);
 
   /**
+   * Create a Text Match expression (currently doc store/Elastic only).
+   */
+  Expression textMatch(String propertyName, String search, Match options);
+
+  /**
    * And - join two expressions with a logical and.
    */
   Expression and(Expression expOne, Expression expTwo);
@@ -319,4 +326,12 @@ public interface ExpressionFactory {
    * Return a list of expressions that will be joined by OR's.
    */
   <T> Junction<T> disjunction(Query<T> query, ExpressionList<T> parent);
+
+  /**
+   * Return a Text query junction for MUST, SHOULD or MUST NOT.
+   * <p>
+   * This is doc store Elastic only.
+   * </p>
+   */
+  <T> TextJunction<T> textJunction(Query<T> query, TextExpressionList<T> parent, TextJunction.Type type);
 }

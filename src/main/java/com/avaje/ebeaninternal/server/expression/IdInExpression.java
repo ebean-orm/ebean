@@ -16,8 +16,6 @@ import java.util.List;
  */
 public class IdInExpression extends NonPrepareExpression {
 
-  private static final long serialVersionUID = 1L;
-
   private final List<?> idList;
 
   public IdInExpression(List<?> idList) {

@@ -3,7 +3,6 @@ package com.avaje.ebean;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.NonUniqueResultException;
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -1041,6 +1040,27 @@ public interface Query<T> {
    * @return The ExpressionList for adding expressions to.
    */
   ExpressionList<T> where();
+
+  /**
+   * Add Full text search expressions for Document store queries.
+   * <p>
+   * This is currently ElasticSearch only and provides the full text
+   * expressions such as Match and Multi-Match.
+   * </p>
+   * <p>
+   * This automatically makes this query a "Doc Store" query and will execute
+   * against the document store (ElasticSearch).
+   * </p>
+   * <p>
+   * Expressions added here are added to the "query" section of an ElasticSearch
+   * query rather than the "filter" section.
+   * </p>
+   * <p>
+   * Expressions added to the where() are added to the "filter" section of an
+   * ElasticSearch query.
+   * </p>
+   */
+  TextExpressionList<T> text();
 
   /**
    * This applies a filter on the 'many' property list rather than the root

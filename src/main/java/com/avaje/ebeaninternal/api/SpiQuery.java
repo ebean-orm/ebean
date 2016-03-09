@@ -510,6 +510,11 @@ public interface SpiQuery<T> extends Query<T> {
   SpiExpressionList<T> getHavingExpressions();
 
   /**
+   * Return the text expressions.
+   */
+  SpiExpressionList<T> getTextExpression();
+
+  /**
    * Return additional having clause. Where raw String expressions are added
    * to having clause rather than Expression objects.
    */

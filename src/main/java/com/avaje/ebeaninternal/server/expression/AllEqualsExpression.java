@@ -15,8 +15,6 @@ import java.util.Map.Entry;
 
 class AllEqualsExpression extends NonPrepareExpression {
 
-  private static final long serialVersionUID = -8691773558205937025L;
-
   private final Map<String, Object> propMap;
 
   AllEqualsExpression(Map<String, Object> propMap) {

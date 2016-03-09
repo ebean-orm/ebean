@@ -42,8 +42,6 @@ import com.avaje.ebeaninternal.server.query.SplitName;
  */
 public class DefaultExampleExpression implements SpiExpression, ExampleExpression {
 
-  private static final long serialVersionUID = 1L;
-
   /**
    * The example bean containing the properties.
    */

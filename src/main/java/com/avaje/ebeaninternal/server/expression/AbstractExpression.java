@@ -14,8 +14,6 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
  */
 public abstract class AbstractExpression implements SpiExpression {
 
-  private static final long serialVersionUID = 4072786211853856174L;
-
   protected final String propName;
 
   protected AbstractExpression(String propName) {

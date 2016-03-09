@@ -2,12 +2,15 @@ package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.*;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebean.search.Match;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
+import com.avaje.ebeaninternal.api.SpiTextExpressionList;
+import com.avaje.ebeaninternal.api.SpiTextJunction;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.IOException;
@@ -21,15 +24,13 @@ import java.util.Set;
 /**
  * Default implementation of ExpressionList.
  */
-public class DefaultExpressionList<T> implements SpiExpressionList<T> {
-
-  private static final long serialVersionUID = -6992345500247035947L;
+public class DefaultExpressionList<T> implements SpiExpressionList<T>, SpiTextExpressionList<T> {
 
   protected final List<SpiExpression> list;
 
   protected final Query<T> query;
 
-  protected final ExpressionList<T> parentExprList;
+  protected final TextExpressionList<T> parentExprList;
 
   protected transient ExpressionFactory expr;
 
@@ -37,15 +38,32 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   private final String listAndEnd;
   private final String listAndJoin;
 
-  public DefaultExpressionList(Query<T> query, ExpressionList<T> parentExprList) {
+  /**
+   * Set to true for the "Text" root expression list.
+   */
+  private final boolean textRoot;
+
+  /**
+   * Construct for Text root expression list - this handles implicit Bool Should, Must etc.
+   */
+  public DefaultExpressionList(Query<T> query) {
+    this(query, query.getExpressionFactory(), null, new ArrayList<SpiExpression>(), true);
+  }
+
+  public DefaultExpressionList(Query<T> query, TextExpressionList<T> parentExprList) {
     this(query, query.getExpressionFactory(), parentExprList);
   }
 
-  public DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList) {
+  public DefaultExpressionList(Query<T> query, ExpressionFactory expr, TextExpressionList<T> parentExprList) {
     this(query, expr, parentExprList, new ArrayList<SpiExpression>());
   }
 
-  protected DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
+  protected DefaultExpressionList(Query<T> query, ExpressionFactory expr, TextExpressionList<T> parentExprList, List<SpiExpression> list) {
+    this(query, expr, parentExprList, list, false);
+  }
+
+  private DefaultExpressionList(Query<T> query, ExpressionFactory expr, TextExpressionList<T> parentExprList, List<SpiExpression> list, boolean textRoot) {
+    this.textRoot = textRoot;
     this.list = list;
     this.query = query;
     this.expr = expr;
@@ -60,19 +78,66 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     this(null, null, null, new ArrayList<SpiExpression>());
   }
 
+  /**
+   * Write being aware if it is the Top level "text" expressions.
+   * <p>
+   * If this is the Top level "text" expressions then it detects if explicit or implicit Bool Should, Must etc is required
+   * to wrap the expressions.
+   * </p>
+   * <p>
+   * If implicit Bool is required SHOULD is used.
+   * </p>
+   */
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-    writeDocQuery(context, null);
+    if (!textRoot) {
+      writeDocQuery(context, null);
+
+    } else {
+      // this is a Top level "text" expressions so we may need to wrap in Bool SHOULD etc.
+      if (list.isEmpty()) throw new IllegalStateException("empty expression list?");
+
+      int size = list.size();
+
+      SpiExpression first = list.get(0);
+      boolean explicitBool = first instanceof SpiTextJunction<?>;
+      boolean implicitBool = !explicitBool && size > 1;
+
+      if (implicitBool || explicitBool) {
+        context.startBoolGroup();
+      }
+      if (implicitBool) {
+        context.startBoolGroupList(TextJunction.Type.SHOULD);
+      }
+      for (int i = 0; i < size; i++) {
+        SpiExpression expr = list.get(i);
+        if (explicitBool) {
+          try {
+            ((SpiTextJunction<?>) expr).writeDocQueryJunction(context);
+          } catch (ClassCastException e) {
+            throw new IllegalStateException("The top level text() expressions should be all be 'Must', 'Should' or 'Must Not' or none of them should be.", e);
+          }
+        } else {
+          expr.writeDocQuery(context);
+        }
+      }
+      if (implicitBool) {
+        context.endBoolGroupList();
+      }
+      if (implicitBool || explicitBool) {
+        context.endBoolGroup();
+      }
+    }
   }
 
   public void writeDocQuery(DocQueryContext context, SpiExpression idEquals) throws IOException {
 
     int size = list.size();
     if (size == 1 && idEquals == null) {
-      // only 1 expression - skip bool must
+      // only 1 expression - skip bool
       list.get(0).writeDocQuery(context);
     } else if (size == 0 && idEquals != null) {
-      // only idEquals - skip bool must
+      // only idEquals - skip bool
       idEquals.writeDocQuery(context);
     } else {
       // bool must wrap all the children
@@ -136,6 +201,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public ExpressionList<T> endJunction() {
+    return parentExprList == null ? this : parentExprList;
+  }
+
+  protected TextExpressionList<T> endTextJunction() {
     return parentExprList == null ? this : parentExprList;
   }
 
@@ -574,6 +643,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return this;
   }
 
+  public TextJunction<T> textJunction(TextJunction.Type type) {
+    TextJunction<T> junction = expr.textJunction(query, this, type);
+    add(junction);
+    return junction;
+  }
+
   @Override
   public Junction<T> conjunction() {
     Junction<T> conjunction = expr.conjunction(query, this);
@@ -778,4 +853,44 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return this;
   }
 
+  @Override
+  public TextExpressionList<T> match(String propertyName, String search) {
+    return match(propertyName, search, null);
+  }
+
+  @Override
+  public TextExpressionList<T> match(String propertyName, String search, Match options) {
+    add(expr.textMatch(propertyName, search, options));
+    return this;
+  }
+
+  @Override
+  public TextJunction<T> must() {
+    return textJunction(TextJunction.Type.MUST);
+  }
+
+  @Override
+  public TextJunction<T> should() {
+    return textJunction(TextJunction.Type.SHOULD);
+  }
+
+  @Override
+  public TextJunction<T> mustNot() {
+    return textJunction(TextJunction.Type.MUST_NOT);
+  }
+
+  @Override
+  public TextExpressionList<T> endMust() {
+    return endTextJunction();
+  }
+
+  @Override
+  public TextExpressionList<T> endShould() {
+    return endTextJunction();
+  }
+
+  @Override
+  public TextExpressionList<T> endMustNot() {
+    return endTextJunction();
+  }
 }

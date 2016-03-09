@@ -16,14 +16,10 @@ import java.io.IOException;
  */
 abstract class LogicExpression implements SpiExpression {
 
-  private static final long serialVersionUID = 616860781960645251L;
-
   static final String AND = " and ";
   static final String OR = " or ";
 
   static class And extends LogicExpression {
-
-    private static final long serialVersionUID = -3832889676798526444L;
 
     And(Expression expOne, Expression expTwo) {
       super(AND, expOne, expTwo);
@@ -37,8 +33,6 @@ abstract class LogicExpression implements SpiExpression {
   }
 
   static class Or extends LogicExpression {
-
-    private static final long serialVersionUID = -6871993143194094819L;
 
     Or(Expression expOne, Expression expTwo) {
       super(OR, expOne, expTwo);

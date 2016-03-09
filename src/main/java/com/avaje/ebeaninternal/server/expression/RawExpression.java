@@ -11,8 +11,6 @@ import java.io.IOException;
 
 class RawExpression extends NonPrepareExpression {
 
-  private static final long serialVersionUID = 7973903141340334606L;
-
   private final String sql;
 
   private final Object[] values;

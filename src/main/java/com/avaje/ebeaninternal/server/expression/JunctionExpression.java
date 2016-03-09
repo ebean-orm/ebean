@@ -1,19 +1,6 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import com.avaje.ebean.Expression;
-import com.avaje.ebean.ExpressionList;
-import com.avaje.ebean.FetchPath;
-import com.avaje.ebean.FutureIds;
-import com.avaje.ebean.FutureList;
-import com.avaje.ebean.FutureRowCount;
-import com.avaje.ebean.Junction;
-import com.avaje.ebean.OrderBy;
-import com.avaje.ebean.PagedList;
-import com.avaje.ebean.Query;
-import com.avaje.ebean.QueryEachConsumer;
-import com.avaje.ebean.QueryEachWhileConsumer;
-import com.avaje.ebean.QueryIterator;
-import com.avaje.ebean.Version;
+import com.avaje.ebean.*;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
@@ -34,15 +21,11 @@ import java.util.Set;
  */
 abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, ExpressionList<T> {
 
-  private static final long serialVersionUID = -7422204102750462676L;
+  static final String OR = " or ";
 
-  private static final String OR = " or ";
-
-  private static final String AND = " and ";
+  static final String AND = " and ";
 
   static class Conjunction<T> extends JunctionExpression<T> {
-
-    private static final long serialVersionUID = -645619859900030678L;
 
     Conjunction(Query<T> query, ExpressionList<T> parent) {
       super(false, AND, query, parent);
@@ -58,8 +41,6 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   }
 
   static class Disjunction<T> extends JunctionExpression<T> {
-
-    private static final long serialVersionUID = -8464470066692221413L;
 
     Disjunction(Query<T> query, ExpressionList<T> parent) {
       super(true, OR, query, parent);
@@ -84,10 +65,16 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
    */
   private final boolean disjunction;
 
+  JunctionExpression(Query<T> query, TextExpressionList<T> parent) {
+    this.disjunction = true;
+    this.joinType = OR;
+    this.exprList = new DefaultExpressionList<T>(query, parent);
+  }
+
   JunctionExpression(boolean disjunction, String joinType, Query<T> query, ExpressionList<T> parent) {
     this.disjunction = disjunction;
     this.joinType = joinType;
-    this.exprList = new DefaultExpressionList<T>(query, parent);
+    this.exprList = new DefaultExpressionList<T>(query, (TextExpressionList<T>)parent);
   }
 
   /**

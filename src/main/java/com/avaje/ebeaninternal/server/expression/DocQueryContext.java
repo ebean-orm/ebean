@@ -1,6 +1,8 @@
 package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.LikeType;
+import com.avaje.ebean.TextJunction;
+import com.avaje.ebean.search.Match;
 
 import java.io.IOException;
 import java.util.List;
@@ -90,4 +92,29 @@ public interface DocQueryContext {
    * Write a Like expression.
    */
   void writeLike(String propName, String val, LikeType type, boolean caseInsensitive) throws IOException;
+
+  /**
+   * Write a Match expression.
+   */
+  void writeMatch(String propName, String search, Match options) throws IOException;
+
+  /**
+   * Start a Bool which may contain some of Must, Must Not, Should.
+   */
+  void startBoolGroup() throws IOException;
+
+  /**
+   * Start a Must, Must Not or Should list.
+   */
+  void startBoolGroupList(TextJunction.Type type) throws IOException;
+
+  /**
+   * End a Must, Must Not or Should list.
+   */
+  void endBoolGroupList() throws IOException;
+
+  /**
+   * End the Bool group.
+   */
+  void endBoolGroup() throws IOException;
 }

@@ -9,8 +9,6 @@ import java.io.IOException;
 
 class CaseInsensitiveEqualExpression extends AbstractExpression {
 
-  private static final long serialVersionUID = -6406036750998971064L;
-
   private final String value;
 
   CaseInsensitiveEqualExpression(String propertyName, String value) {

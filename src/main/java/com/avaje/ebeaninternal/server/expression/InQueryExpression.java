@@ -16,8 +16,6 @@ import java.util.List;
  */
 class InQueryExpression extends AbstractExpression implements UnsupportedDocStoreExpression {
 
-  private static final long serialVersionUID = 666990277309851644L;
-
   private final boolean not;
 
   private final SpiQuery<?> subQuery;

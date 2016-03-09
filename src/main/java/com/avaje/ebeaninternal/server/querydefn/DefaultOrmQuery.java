@@ -158,6 +158,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private BindParams bindParams;
 
+  private DefaultExpressionList<T> textExpressions;
+
   private DefaultExpressionList<T> whereExpressions;
 
   private DefaultExpressionList<T> havingExpressions;
@@ -1313,6 +1315,15 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
+  public TextExpressionList text() {
+    if (textExpressions == null) {
+      useDocStore = true;
+      textExpressions = new DefaultExpressionList<T>(this);
+    }
+    return textExpressions;
+  }
+
   public ExpressionList<T> where() {
     if (whereExpressions == null) {
       whereExpressions = new DefaultExpressionList<T>(this, null);
@@ -1350,6 +1361,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public SpiExpressionList<T> getWhereExpressions() {
     return whereExpressions;
+  }
+
+  @Override
+  public SpiExpressionList<T> getTextExpression() {
+    return textExpressions;
   }
 
   public String getGeneratedSql() {

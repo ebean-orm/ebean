@@ -10,8 +10,6 @@ import java.util.Set;
 
 public class FilterExpressionList<T> extends DefaultExpressionList<T> {
 
-  private static final long serialVersionUID = 2226895827150099020L;
-
   private static final String notAllowedMessage = "This method is not allowed on a filter";
 
   private final Query<T> rootQuery;

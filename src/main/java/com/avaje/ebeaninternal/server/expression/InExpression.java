@@ -11,8 +11,6 @@ import java.util.Collection;
 
 class InExpression extends AbstractExpression {
 
-  private static final long serialVersionUID = 3150665801693551260L;
-
   private final boolean not;
 
   private final Object[] values;

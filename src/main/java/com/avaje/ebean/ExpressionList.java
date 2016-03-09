@@ -3,7 +3,6 @@ package com.avaje.ebean;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.NonUniqueResultException;
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
@@ -30,7 +29,7 @@ import java.util.Set;
  * 
  * @see Query#where()
  */
-public interface ExpressionList<T> extends Serializable {
+public interface ExpressionList<T> {
 
   /**
    * Return the query that owns this expression list.

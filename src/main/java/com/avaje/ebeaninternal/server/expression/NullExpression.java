@@ -13,8 +13,6 @@ import java.io.IOException;
  */
 class NullExpression extends AbstractExpression {
 
-  private static final long serialVersionUID = 4246991057451128269L;
-
   private final boolean notNull;
 
   NullExpression(String propertyName, boolean notNull) {

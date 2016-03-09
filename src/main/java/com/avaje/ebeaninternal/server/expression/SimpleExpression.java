@@ -10,8 +10,6 @@ import java.io.IOException;
 
 public class SimpleExpression extends AbstractExpression {
 
-  private static final long serialVersionUID = -382881395755603790L;
-
   private final Op type;
 
   private final Object value;

@@ -16,8 +16,6 @@ import com.avaje.ebeaninternal.server.query.CQuery;
 
 class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpression {
 
-  private static final long serialVersionUID = 666990277309851644L;
-
   protected final boolean not;
 
   protected final SpiQuery<?> subQuery;

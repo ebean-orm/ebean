@@ -13,8 +13,6 @@ import java.io.IOException;
 
 final class NotExpression implements SpiExpression {
 
-  private static final long serialVersionUID = 5648926732402355781L;
-
   private static final String NOT_START = "not (";
   private static final String NOT_END = ") ";
 

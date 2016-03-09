@@ -10,8 +10,6 @@ import java.io.IOException;
 
 class LikeExpression extends AbstractExpression {
 
-  private static final long serialVersionUID = -5398151809111172380L;
-
   private final String val;
 
   private final boolean caseInsensitive;

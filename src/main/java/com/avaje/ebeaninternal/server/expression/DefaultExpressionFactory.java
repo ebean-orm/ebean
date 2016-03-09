@@ -7,7 +7,10 @@ import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Junction;
 import com.avaje.ebean.LikeType;
 import com.avaje.ebean.Query;
+import com.avaje.ebean.TextExpressionList;
+import com.avaje.ebean.TextJunction;
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.search.Match;
 import com.avaje.ebeaninternal.api.SpiExpressionFactory;
 import com.avaje.ebeaninternal.api.SpiQuery;
 
@@ -34,6 +37,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
 
   public String getLang() {
     return "sql";
+  }
+
+  @Override
+  public Expression textMatch(String propertyName, String search, Match options) {
+    return new TextMatchExpression(propertyName, search, options);
   }
 
   public Expression jsonExists(String propertyName, String path) {
@@ -434,4 +442,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new JunctionExpression.Disjunction<T>(query, parent);
   }
 
+  /**
+   * Create and return a Full text junction (Must, Must Not or Should).
+   */
+  @Override
+  public <T> TextJunction<T> textJunction(Query<T> query, TextExpressionList<T> parent, TextJunction.Type type) {
+    return new DTextJunction<T>(query, parent, type);
+  }
 }

@@ -14,8 +14,6 @@ import java.io.IOException;
  */
 class IdExpression extends NonPrepareExpression implements SpiExpression {
 
-  private static final long serialVersionUID = -3065936341718489842L;
-
   private final Object value;
 
   IdExpression(Object value) {
