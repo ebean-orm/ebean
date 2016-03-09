@@ -1,11 +1,9 @@
 package com.avaje.ebean.search;
 
-import java.util.Arrays;
-
 /**
  * Options for the text match expression.
  */
-public class MultiMatch extends BaseMatch {
+public class MultiMatch extends AbstractMatch {
 
   /**
    * The MultiMatch type.
@@ -154,33 +152,4 @@ public class MultiMatch extends BaseMatch {
     return tieBreaker;
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    MultiMatch that = (MultiMatch) o;
-
-    if (Double.compare(that.tieBreaker, tieBreaker) != 0) return false;
-    if (type != that.type) return false;
-    if (fields.length != that.fields.length) return false;
-    for (int i = 0; i < fields.length; i++) {
-      if (!fields[i].equals(that.fields[i])) {
-        return false;
-      }
-    }
-    return baseEquals(that);
-  }
-
-  @Override
-  public int hashCode() {
-    int result;
-    long temp;
-    result = type.hashCode();
-    result = 31 * result + Arrays.hashCode(fields);
-    temp = Double.doubleToLongBits(tieBreaker);
-    result = 31 * result + (int) (temp ^ (temp >>> 32));
-    result = 31 * result + baseHashCode();
-    return result;
-  }
 }

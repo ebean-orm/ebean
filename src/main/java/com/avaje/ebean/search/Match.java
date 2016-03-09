@@ -3,7 +3,7 @@ package com.avaje.ebean.search;
 /**
  * Options for the text match expression.
  */
-public class Match extends BaseMatch {
+public class Match extends AbstractMatch {
 
   protected boolean phrase;
 
@@ -125,23 +125,4 @@ public class Match extends BaseMatch {
     return phrasePrefix;
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    Match match = (Match) o;
-
-    if (phrase != match.phrase) return false;
-    if (phrasePrefix != match.phrasePrefix) return false;
-    return baseEquals(match);
-  }
-
-  @Override
-  public int hashCode() {
-    int result = (phrase ? 1 : 0);
-    result = 31 * result + (phrasePrefix ? 1 : 0);
-    result = 31 * result + baseHashCode();
-    return result;
-  }
 }
