@@ -3,25 +3,11 @@ package com.avaje.ebean.search;
 /**
  * Options for the text match expression.
  */
-public class Match {
-
-  protected boolean and;
-
-  protected double boost;
-
-  protected String minShouldMatch;
-
-  protected String zeroTerms;
-
-  protected double cutoffFrequency;
-
-  protected String analyzer;
+public class Match extends BaseMatch {
 
   protected boolean phrase;
 
   protected boolean phrasePrefix;
-
-  protected int maxExpansions;
 
   /**
    * Create and return Match options using AND operator.
@@ -38,38 +24,6 @@ public class Match {
   }
 
   /**
-   * Use the AND operator (rather than OR).
-   */
-  public Match opAnd() {
-    and = true;
-    return this;
-  }
-
-  /**
-   * Use the OR operator (rather than AND).
-   */
-  public Match opOr() {
-    and = false;
-    return this;
-  }
-
-  /**
-   * Set the minimum should match value.
-   */
-  public Match minShouldMatch(String minShouldMatch) {
-    this.minShouldMatch = minShouldMatch;
-    return this;
-  }
-
-  /**
-   * Set the boost.
-   */
-  public Match boost(double boost) {
-    this.boost = boost;
-    return this;
-  }
-
-  /**
    * Set this to be a "Phrase" type expression.
    */
   public Match phrase() {
@@ -82,6 +36,22 @@ public class Match {
    */
   public Match phrasePrefix() {
     phrasePrefix = true;
+    return this;
+  }
+
+  /**
+   * Use the AND operator (rather than OR).
+   */
+  public Match opAnd() {
+    and = true;
+    return this;
+  }
+
+  /**
+   * Use the OR operator (rather than AND).
+   */
+  public Match opOr() {
+    and = false;
     return this;
   }
 
@@ -118,48 +88,41 @@ public class Match {
   }
 
   /**
-   * Return true if using the AND operator otherwise using the OR operator.
+   * Set the boost.
    */
-  public boolean isAnd() {
-    return and;
+  public Match boost(double boost) {
+    this.boost = boost;
+    return this;
   }
 
   /**
-   * Return the boost.
+   * Set the rewrite to use.
    */
-  public double getBoost() {
-    return boost;
+  public Match minShouldMatch(String minShouldMatch) {
+    this.minShouldMatch = minShouldMatch;
+    return this;
   }
 
   /**
-   * Return the minimum should match.
+   * Set the rewrite to use.
    */
-  public String getMinShouldMatch() {
-    return minShouldMatch;
+  public Match rewrite(String rewrite) {
+    this.rewrite = rewrite;
+    return this;
   }
 
-  public String getZeroTerms() {
-    return zeroTerms;
-  }
-
-  public double getCutoffFrequency() {
-    return cutoffFrequency;
-  }
-
+  /**
+   * Return true if this is a phrase query.
+   */
   public boolean isPhrase() {
     return phrase;
   }
 
+  /**
+   * Return true if this is a phrase prefix query.
+   */
   public boolean isPhrasePrefix() {
     return phrasePrefix;
-  }
-
-  public int getMaxExpansions() {
-    return maxExpansions;
-  }
-
-  public String getAnalyzer() {
-    return analyzer;
   }
 
   @Override
@@ -169,33 +132,16 @@ public class Match {
 
     Match match = (Match) o;
 
-    if (and != match.and) return false;
-    if (Double.compare(match.boost, boost) != 0) return false;
-    if (Double.compare(match.cutoffFrequency, cutoffFrequency) != 0) return false;
     if (phrase != match.phrase) return false;
     if (phrasePrefix != match.phrasePrefix) return false;
-    if (maxExpansions != match.maxExpansions) return false;
-    if (minShouldMatch != null ? !minShouldMatch.equals(match.minShouldMatch) : match.minShouldMatch != null)
-      return false;
-    if (zeroTerms != null ? !zeroTerms.equals(match.zeroTerms) : match.zeroTerms != null) return false;
-    return analyzer != null ? analyzer.equals(match.analyzer) : match.analyzer == null;
+    return baseEquals(match);
   }
 
   @Override
   public int hashCode() {
-    int result;
-    long temp;
-    result = (and ? 1 : 0);
-    temp = Double.doubleToLongBits(boost);
-    result = 31 * result + (int) (temp ^ (temp >>> 32));
-    result = 31 * result + (minShouldMatch != null ? minShouldMatch.hashCode() : 0);
-    result = 31 * result + (zeroTerms != null ? zeroTerms.hashCode() : 0);
-    temp = Double.doubleToLongBits(cutoffFrequency);
-    result = 31 * result + (int) (temp ^ (temp >>> 32));
-    result = 31 * result + (analyzer != null ? analyzer.hashCode() : 0);
-    result = 31 * result + (phrase ? 1 : 0);
+    int result = (phrase ? 1 : 0);
     result = 31 * result + (phrasePrefix ? 1 : 0);
-    result = 31 * result + maxExpansions;
+    result = 31 * result + baseHashCode();
     return result;
   }
 }

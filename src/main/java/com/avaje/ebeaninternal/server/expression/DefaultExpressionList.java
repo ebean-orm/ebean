@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.expression;
 import com.avaje.ebean.*;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.search.Match;
+import com.avaje.ebean.search.MultiMatch;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
@@ -861,6 +862,17 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T>, SpiTextEx
   @Override
   public TextExpressionList<T> match(String propertyName, String search, Match options) {
     add(expr.textMatch(propertyName, search, options));
+    return this;
+  }
+
+  @Override
+  public TextExpressionList<T> multiMatch(String query, String... fields) {
+    return multiMatch(query, new MultiMatch().fields(fields));
+  }
+
+  @Override
+  public TextExpressionList<T> multiMatch(String query, MultiMatch options) {
+    add(expr.textMultiMatch(query, options));
     return this;
   }
 

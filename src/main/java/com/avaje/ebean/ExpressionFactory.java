@@ -1,6 +1,7 @@
 package com.avaje.ebean;
 
 import com.avaje.ebean.search.Match;
+import com.avaje.ebean.search.MultiMatch;
 
 import java.util.Collection;
 import java.util.List;
@@ -293,6 +294,11 @@ public interface ExpressionFactory {
   Expression textMatch(String propertyName, String search, Match options);
 
   /**
+   * Create a Text Multi match expression (currently doc store/Elastic only).
+   */
+  Expression textMultiMatch(String query, MultiMatch options);
+
+  /**
    * And - join two expressions with a logical and.
    */
   Expression and(Expression expOne, Expression expTwo);
@@ -334,4 +340,5 @@ public interface ExpressionFactory {
    * </p>
    */
   <T> TextJunction<T> textJunction(Query<T> query, TextExpressionList<T> parent, TextJunction.Type type);
+
 }

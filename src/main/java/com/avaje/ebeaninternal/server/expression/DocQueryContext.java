@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.expression;
 import com.avaje.ebean.LikeType;
 import com.avaje.ebean.TextJunction;
 import com.avaje.ebean.search.Match;
+import com.avaje.ebean.search.MultiMatch;
 
 import java.io.IOException;
 import java.util.List;
@@ -99,6 +100,11 @@ public interface DocQueryContext {
   void writeMatch(String propName, String search, Match options) throws IOException;
 
   /**
+   * Write a Multi-match expression.
+   */
+  void writeMultiMatch(String search, MultiMatch options) throws IOException;
+
+  /**
    * Start a Bool which may contain some of Must, Must Not, Should.
    */
   void startBoolGroup() throws IOException;
@@ -117,4 +123,5 @@ public interface DocQueryContext {
    * End the Bool group.
    */
   void endBoolGroup() throws IOException;
+
 }

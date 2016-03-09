@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.expression;
 
+import com.avaje.ebean.search.BaseMatch;
 import com.avaje.ebean.search.Match;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpression;
@@ -44,9 +45,9 @@ public class TextMatchExpression extends AbstractExpression {
   public void queryPlanHash(HashQueryPlanBuilder builder) {
     builder.add(TextMatchExpression.class).add(propName).add(search);
     if (options != null) {
-      builder.add(options.isAnd());
-      builder.add(options.getBoost());
-      builder.add(options.getMinShouldMatch());
+      builder.add(options.isPhrase());
+      builder.add(options.isPhrasePrefix());
+      addHash(builder, options);
     }
   }
 
@@ -71,5 +72,21 @@ public class TextMatchExpression extends AbstractExpression {
   public boolean isSameByBind(SpiExpression other) {
     TextMatchExpression that = (TextMatchExpression) other;
     return search.equals(that.search);
+  }
+
+  /**
+   * Add the hash to the builder for the base/common options.
+   */
+  public static void addHash(HashQueryPlanBuilder builder, BaseMatch options) {
+    builder.add(options.isAnd());
+    builder.add(options.getAnalyzer());
+    builder.add(options.getBoost());
+    builder.add(options.getCutoffFrequency());
+    builder.add(options.getFuzziness());
+    builder.add(options.getMaxExpansions());
+    builder.add(options.getMinShouldMatch());
+    builder.add(options.getPrefixLength());
+    builder.add(options.getRewrite());
+    builder.add(options.getZeroTerms());
   }
 }

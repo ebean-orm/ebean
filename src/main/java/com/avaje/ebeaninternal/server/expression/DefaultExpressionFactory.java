@@ -11,6 +11,7 @@ import com.avaje.ebean.TextExpressionList;
 import com.avaje.ebean.TextJunction;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.search.Match;
+import com.avaje.ebean.search.MultiMatch;
 import com.avaje.ebeaninternal.api.SpiExpressionFactory;
 import com.avaje.ebeaninternal.api.SpiQuery;
 
@@ -42,6 +43,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   @Override
   public Expression textMatch(String propertyName, String search, Match options) {
     return new TextMatchExpression(propertyName, search, options);
+  }
+
+  @Override
+  public Expression textMultiMatch(String query, MultiMatch options) {
+    return new TextMultiMatchExpression(query, options);
   }
 
   public Expression jsonExists(String propertyName, String path) {

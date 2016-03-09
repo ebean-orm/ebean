@@ -1,6 +1,7 @@
 package com.avaje.ebean;
 
 import com.avaje.ebean.search.Match;
+import com.avaje.ebean.search.MultiMatch;
 
 /**
  * An list of Full text query expressions.
@@ -25,6 +26,16 @@ public interface TextExpressionList<T> extends ExpressionList<T> {
    * @param search The search value
    */
   TextExpressionList<T> match(String propertyName, String search, Match options);
+
+  /**
+   * Add a multi-match expression.
+   */
+  TextExpressionList<T>  multiMatch(String search, String... properties);
+
+  /**
+   * Add a multi-match expression using options.
+   */
+  TextExpressionList<T> multiMatch(String search, MultiMatch options);
 
   /**
    * Start a list of expressions that will be joined by MUST.
@@ -55,4 +66,5 @@ public interface TextExpressionList<T> extends ExpressionList<T> {
    * End the list of MUST NOT expressions.
    */
   TextExpressionList<T> endMustNot();
+
 }

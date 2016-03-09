@@ -2,6 +2,7 @@ package com.avaje.ebean;
 
 
 import com.avaje.ebean.search.Match;
+import com.avaje.ebean.search.MultiMatch;
 import com.avaje.tests.model.basic.Order;
 import org.junit.Test;
 
@@ -57,6 +58,23 @@ public class TextExpressionListTest {
         .where()
           .gt("reviewDate", 12345);
 
+
+  }
+
+  @Test
+  public void syntax_multiMatch() {
+
+    Ebean.find(Order.class)
+        .text()
+        .multiMatch("Will Smith", "title", "*name");
+
+    MultiMatch match = MultiMatch.fields("title", "*name")
+        .opAnd()
+        .type(MultiMatch.Type.PHRASE_PREFIX);
+
+    Ebean.find(Order.class)
+        .text()
+        .multiMatch("Will Smith", match);
 
   }
 }
