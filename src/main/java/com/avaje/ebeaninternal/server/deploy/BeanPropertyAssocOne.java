@@ -37,7 +37,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
   protected final boolean importedPrimaryKey;
 
-  protected final AssocOneHelp localHelp;
+  protected AssocOneHelp localHelp;
 
   protected final BeanProperty[] embeddedProps;
 
@@ -87,12 +87,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       embeddedProps = null;
       embeddedPropsMap = null;
     }
-    localHelp = createHelp(embedded, oneToOneExported);
   }
 
   @Override
   public void initialise() {
     super.initialise();
+    localHelp = createHelp(embedded, oneToOneExported);
+
     if (!isTransient) {
       //noinspection StatementWithEmptyBody
       if (embedded) {
@@ -633,7 +634,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     } else if (oneToOneExported) {
       return new AssocOneHelpReferenceExported(this);
     } else {
-      return new AssocOneHelpReference(this);
+      if (targetInheritInfo != null) {
+        return new AssocOneHelpRefInherit(this);
+      } else {
+        return new AssocOneHelpRefSimple(this);
+      }
     }
   }
 

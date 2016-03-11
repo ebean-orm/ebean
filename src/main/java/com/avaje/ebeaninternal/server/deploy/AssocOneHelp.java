@@ -11,10 +11,17 @@ import java.sql.SQLException;
  */
 abstract class AssocOneHelp {
 
+  protected final BeanPropertyAssocOne property;
+
+  AssocOneHelp(BeanPropertyAssocOne property) {
+    this.property = property;
+  }
   /**
    * Effectively skip reading (the jdbc resultSet as already in the persistence context etc).
    */
-  abstract void loadIgnore(DbReadContext ctx);
+  void loadIgnore(DbReadContext ctx) {
+    property.targetIdBinder.loadIgnore(ctx);
+  }
 
   /**
    * Read and return the bean.
@@ -24,7 +31,14 @@ abstract class AssocOneHelp {
   /**
    * Read setting values into the bean.
    */
-  abstract Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException;
+  Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
+    Object val = read(ctx);
+    if (bean != null) {
+      property.setValue(bean, val);
+      ctx.propagateState(val);
+    }
+    return val;
+  }
 
   /**
    * Append to the select clause.
@@ -34,6 +48,8 @@ abstract class AssocOneHelp {
   /**
    * Append to the from clause.
    */
-  abstract void appendFrom(DbSqlContext ctx, SqlJoinType joinType);
+  void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
+    // nothing required here
+  }
 
 }

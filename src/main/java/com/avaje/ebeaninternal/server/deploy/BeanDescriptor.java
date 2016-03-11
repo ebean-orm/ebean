@@ -194,7 +194,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * The type of bean this describes.
    */
   private final Class<T> beanType;
-  private final Class<?> rootBeanType;
+  protected final Class<?> rootBeanType;
 
   /**
    * This is not sent to a remote client.
@@ -1528,14 +1528,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     }
     try {
       EntityBean eb = createEntityBean();
-
       convertSetId(id, eb);
 
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
       ebi.setBeanLoader(ebeanServer);
-
-      // Note: not creating proxies for many's...
       ebi.setReference(idPropertyIndex);
+      if (Boolean.TRUE == readOnly) {
+        ebi.setReadOnly(true);
+      }
 
       return (T) eb;
 

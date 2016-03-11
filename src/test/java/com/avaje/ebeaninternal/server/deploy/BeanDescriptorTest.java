@@ -1,112 +1,48 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import com.avaje.ebean.EbeanServerFactory;
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.event.AbstractBeanPersistListener;
-import com.avaje.ebean.event.BeanPersistAdapter;
-import com.avaje.ebean.event.BeanPersistListener;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.tests.model.basic.EBasic;
+import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebean.plugin.Property;
+import com.avaje.tests.model.basic.Customer;
+import com.avaje.tests.model.basic.Order;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import java.util.Collection;
 
-public class BeanDescriptorTest {
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class BeanDescriptorTest extends BaseTestCase {
+
+  BeanDescriptor<Customer> customerDesc = spiEbeanServer().getBeanDescriptor(Customer.class);
 
   @Test
-  public void testRegisterDeregister() throws Exception {
+  public void createReference() {
 
-    ServerConfig config = new ServerConfig();
-
-    config.setName("h2other");
-    config.loadFromProperties();
-    config.setRegister(false);
-    config.setDefaultServer(false);
-    config.getClasses().add(EBasic.class);
-
-    SpiEbeanServer ebeanServer = (SpiEbeanServer)EbeanServerFactory.create(config);
-    BeanDescriptor<EBasic> desc = ebeanServer.getBeanDescriptor(EBasic.class);
-
-    persistListenerRegistrationTests(desc);
-    persistControllerRegistrationTests(desc);
+    Customer bean = customerDesc.createReference(null, 42);
+    assertThat(bean.getId()).isEqualTo(42);
+    assertThat(server().getBeanState(bean).isReadOnly()).isFalse();
   }
 
-  private void persistControllerRegistrationTests(BeanDescriptor<EBasic> desc) {
+  @Test
+  public void createReference_whenReadOnly() {
 
-    Controller1 controller1 = new Controller1();
-
-    assertNull(desc.getPersistController());
-    desc.register(controller1);
-    assertSame(controller1, desc.getPersistController());
-
-    Controller2 controller2 = new Controller2();
-    desc.register(controller2);
-
-    assertEquals(2, ((ChainedBeanPersistController) desc.getPersistController()).size());
-
-    desc.deregister(controller1);
-    assertEquals(1, ((ChainedBeanPersistController)desc.getPersistController()).size());
-
-    desc.deregister(controller2);
-    assertEquals(0, ((ChainedBeanPersistController)desc.getPersistController()).size());
+    Customer bean = customerDesc.createReference(Boolean.TRUE, 42);
+    assertThat(server().getBeanState(bean).isReadOnly()).isTrue();
   }
 
-  private void persistListenerRegistrationTests(BeanDescriptor<EBasic> desc) {
+  @Test
+  public void createReference_whenNotReadOnly() {
 
-    Listener1 listener1 = new Listener1();
-
-    assertNull(desc.getPersistListener());
-    desc.register(listener1);
-    assertSame(listener1, desc.getPersistListener());
-
-    Listener2 listener2 = new Listener2();
-    desc.register(listener2);
-
-    BeanPersistListener persistListener = desc.getPersistListener();
-    assertTrue(persistListener instanceof ChainedBeanPersistListener);
-    assertEquals(2, ((ChainedBeanPersistListener) persistListener).size());
-
-    desc.deregister(listener1);
-    assertEquals(1, ((ChainedBeanPersistListener)desc.getPersistListener()).size());
-
-    desc.deregister(listener2);
-    assertEquals(0, ((ChainedBeanPersistListener)desc.getPersistListener()).size());
+    Customer bean = customerDesc.createReference(Boolean.FALSE, 42);
+    assertThat(server().getBeanState(bean).isReadOnly()).isFalse();
   }
 
-  public static class Listener1 extends AbstractBeanPersistListener {
+  @Test
+  public void allProperties() {
 
-    @Override
-    public boolean isRegisterFor(Class<?> cls) {
-      return EBasic.class.isAssignableFrom(cls);
-    }
+    BeanDescriptor<Order> desc = getBeanDescriptor(Order.class);
+    Collection<? extends Property> props = desc.allProperties();
 
+    assertThat(props).extracting("name").contains("id", "status", "orderDate", "shipDate");
   }
 
-  public static class Listener2 extends AbstractBeanPersistListener {
-
-    @Override
-    public boolean isRegisterFor(Class<?> cls) {
-      return EBasic.class.isAssignableFrom(cls);
-    }
-
-  }
-
-  public static class Controller1 extends BeanPersistAdapter {
-
-    @Override
-    public boolean isRegisterFor(Class<?> cls) {
-      return EBasic.class.isAssignableFrom(cls);
-    }
-  }
-
-  public static class Controller2 extends BeanPersistAdapter {
-
-    @Override
-    public boolean isRegisterFor(Class<?> cls) {
-      return EBasic.class.isAssignableFrom(cls);
-    }
-  }
 }

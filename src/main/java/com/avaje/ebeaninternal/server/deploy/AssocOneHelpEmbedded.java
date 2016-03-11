@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
 import java.sql.SQLException;
 
@@ -10,15 +9,13 @@ import java.sql.SQLException;
  */
 final class AssocOneHelpEmbedded extends AssocOneHelp {
 
-  private BeanPropertyAssocOne beanPropertyAssocOne;
-
-  public AssocOneHelpEmbedded(BeanPropertyAssocOne beanPropertyAssocOne) {
-    this.beanPropertyAssocOne = beanPropertyAssocOne;
+  public AssocOneHelpEmbedded(BeanPropertyAssocOne property) {
+    super(property);
   }
 
   void loadIgnore(DbReadContext ctx) {
-    for (int i = 0; i < beanPropertyAssocOne.embeddedProps.length; i++) {
-      beanPropertyAssocOne.embeddedProps[i].loadIgnore(ctx);
+    for (int i = 0; i < property.embeddedProps.length; i++) {
+      property.embeddedProps[i].loadIgnore(ctx);
     }
   }
 
@@ -27,10 +24,9 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
     Object dbVal = read(ctx);
     if (bean != null) {
       // set back to the parent bean
-      beanPropertyAssocOne.setValue(bean, dbVal);
+      property.setValue(bean, dbVal);
       ctx.propagateState(dbVal);
       return dbVal;
-
     } else {
       return null;
     }
@@ -39,11 +35,11 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
   @Override
   Object read(DbReadContext ctx) throws SQLException {
 
-    EntityBean embeddedBean = beanPropertyAssocOne.targetDescriptor.createEntityBean();
+    EntityBean embeddedBean = property.targetDescriptor.createEntityBean();
 
     boolean notNull = false;
-    for (int i = 0; i < beanPropertyAssocOne.embeddedProps.length; i++) {
-      Object value = beanPropertyAssocOne.embeddedProps[i].readSet(ctx, embeddedBean);
+    for (int i = 0; i < property.embeddedProps.length; i++) {
+      Object value = property.embeddedProps[i].readSet(ctx, embeddedBean);
       if (value != null) {
         notNull = true;
       }
@@ -57,13 +53,9 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
   }
 
   @Override
-  void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
-  }
-
-  @Override
   void appendSelect(DbSqlContext ctx, boolean subQuery) {
-    for (int i = 0; i < beanPropertyAssocOne.embeddedProps.length; i++) {
-      beanPropertyAssocOne.embeddedProps[i].appendSelect(ctx, subQuery);
+    for (int i = 0; i < property.embeddedProps.length; i++) {
+      property.embeddedProps[i].appendSelect(ctx, subQuery);
     }
   }
 }
