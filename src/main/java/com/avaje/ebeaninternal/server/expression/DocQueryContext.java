@@ -4,6 +4,9 @@ import com.avaje.ebean.LikeType;
 import com.avaje.ebean.TextJunction;
 import com.avaje.ebean.search.Match;
 import com.avaje.ebean.search.MultiMatch;
+import com.avaje.ebean.search.TextCommonTerms;
+import com.avaje.ebean.search.TextQueryString;
+import com.avaje.ebean.search.TextSimple;
 
 import java.io.IOException;
 import java.util.List;
@@ -103,6 +106,21 @@ public interface DocQueryContext {
    * Write a Multi-match expression.
    */
   void writeMultiMatch(String search, MultiMatch options) throws IOException;
+
+  /**
+   * Write a simple expression.
+   */
+  void writeTextSimple(String search, TextSimple options) throws IOException;
+
+  /**
+   * Write a common terms expression.
+   */
+  void writeTextCommonTerms(String search, TextCommonTerms options) throws IOException;
+
+  /**
+   * Write a query string expression.
+   */
+  void writeTextQueryString(String search, TextQueryString options) throws IOException;
 
   /**
    * Start a Bool which may contain some of Must, Must Not, Should.

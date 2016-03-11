@@ -16,24 +16,17 @@ public class MultiMatch extends AbstractMatch {
     PHRASE_PREFIX
   }
 
-  protected Type type = Type.BEST_FIELDS;
+  protected final String[] fields;
 
-  protected String[] fields;
+  protected Type type = Type.BEST_FIELDS;
 
   protected double tieBreaker;
 
   /**
-   * Create and return Match options using AND operator.
+   * Create with the given fields.
    */
   public static MultiMatch fields(String... fields) {
     return new MultiMatch(fields);
-  }
-
-  /**
-   * Create and return Match options using OR operator.
-   */
-  public static MultiMatch OR() {
-    return new MultiMatch().opOr();
   }
 
   /**
@@ -63,7 +56,7 @@ public class MultiMatch extends AbstractMatch {
    * Use the AND operator (rather than OR).
    */
   public MultiMatch opAnd() {
-    and = true;
+    operatorAnd = true;
     return this;
   }
 
@@ -71,7 +64,7 @@ public class MultiMatch extends AbstractMatch {
    * Use the OR operator (rather than AND).
    */
   public MultiMatch opOr() {
-    and = false;
+    operatorAnd = false;
     return this;
   }
 

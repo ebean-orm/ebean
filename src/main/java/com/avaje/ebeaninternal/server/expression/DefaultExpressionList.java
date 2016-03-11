@@ -4,6 +4,9 @@ import com.avaje.ebean.*;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.search.Match;
 import com.avaje.ebean.search.MultiMatch;
+import com.avaje.ebean.search.TextCommonTerms;
+import com.avaje.ebean.search.TextQueryString;
+import com.avaje.ebean.search.TextSimple;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
@@ -873,6 +876,24 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T>, SpiTextEx
   @Override
   public TextExpressionList<T> multiMatch(String query, MultiMatch options) {
     add(expr.textMultiMatch(query, options));
+    return this;
+  }
+
+  @Override
+  public TextExpressionList<T> textSimple(String search, TextSimple options) {
+    add(expr.textSimple(search, options));
+    return this;
+  }
+
+  @Override
+  public TextExpressionList<T> textQueryString(String search, TextQueryString options) {
+    add(expr.textQueryString(search, options));
+    return this;
+  }
+
+  @Override
+  public TextExpressionList<T> textCommonTerms(String search, TextCommonTerms options) {
+    add(expr.textCommonTerms(search, options));
     return this;
   }
 

@@ -1,22 +1,23 @@
 {
-  "fields": [
-    "status",
-    "customer.name",
-    "details.product.id"
-  ],
   "query": {
-    "filtered": {
-      "filter": {
-        "bool": {
-          "must": [
-            {
-              "match": {
-                "customer.name": "Rob"
-              }
-            }
-          ]
-        }
-      }
+    "query_string": {
+      "query": "brown",
+      "default_field": "name",
+      "default_operator": "and",
+      "analyzer": "whitespace",
+      "allow_leading_wildcard": false,
+      "lowercase_expanded_terms": false,
+      "enable_position_increments": false,
+      "fuzzy_max_expansions": 10,
+      "fuzziness": "1",
+      "fuzzy_prefix_length": 3,
+      "boost": 2.0,
+      "analyze_wildcard": false,
+      "auto_generate_phrase_queries": true,
+      "max_determinized_states": 500,
+      "minimum_should_match": "1",
+      "lenient": true,
+      "locale": "EN"
     }
   }
 }

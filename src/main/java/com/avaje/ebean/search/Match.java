@@ -9,18 +9,7 @@ public class Match extends AbstractMatch {
 
   protected boolean phrasePrefix;
 
-  /**
-   * Create and return Match options using AND operator.
-   */
-  public static Match AND() {
-    return new Match().opAnd();
-  }
-
-  /**
-   * Create and return Match options using OR operator.
-   */
-  public static Match OR() {
-    return new Match().opOr();
+  public Match() {
   }
 
   /**
@@ -43,7 +32,7 @@ public class Match extends AbstractMatch {
    * Use the AND operator (rather than OR).
    */
   public Match opAnd() {
-    and = true;
+    operatorAnd = true;
     return this;
   }
 
@@ -51,7 +40,7 @@ public class Match extends AbstractMatch {
    * Use the OR operator (rather than AND).
    */
   public Match opOr() {
-    and = false;
+    operatorAnd = false;
     return this;
   }
 

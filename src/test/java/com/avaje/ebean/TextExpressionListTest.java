@@ -37,7 +37,7 @@ public class TextExpressionListTest {
           .match("title", "war and peace")
           .match("author", "leo tolstoy")
           .should()
-            .match("translator", "Constance Garnett", Match.AND().boost(2).minShouldMatch("75%"))
+            .match("translator", "Constance Garnett", new Match().opAnd().boost(2).minShouldMatch("75%"))
             .match("translator", "Louise Maude")
         .where()
           .gt("reviewDate", 12345);

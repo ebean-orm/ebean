@@ -5,6 +5,9 @@ import com.avaje.ebean.TextExpressionList;
 import com.avaje.ebean.TextJunction;
 import com.avaje.ebean.search.Match;
 import com.avaje.ebean.search.MultiMatch;
+import com.avaje.ebean.search.TextCommonTerms;
+import com.avaje.ebean.search.TextQueryString;
+import com.avaje.ebean.search.TextSimple;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiTextJunction;
 
@@ -56,6 +59,21 @@ class DTextJunction<T> extends JunctionExpression<T> implements SpiTextJunction<
   @Override
   public TextExpressionList<T> multiMatch(String query, MultiMatch options) {
     return exprList.multiMatch(query, options);
+  }
+
+  @Override
+  public TextExpressionList<T> textSimple(String search, TextSimple options) {
+    return exprList.textSimple(search, options);
+  }
+
+  @Override
+  public TextExpressionList<T> textQueryString(String search, TextQueryString options) {
+    return exprList.textQueryString(search, options);
+  }
+
+  @Override
+  public TextExpressionList<T> textCommonTerms(String search, TextCommonTerms options) {
+    return exprList.textCommonTerms(search, options);
   }
 
   @Override

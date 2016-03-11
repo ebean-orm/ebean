@@ -5,7 +5,7 @@ package com.avaje.ebean.search;
  */
 public abstract class AbstractMatch {
 
-  protected boolean and;
+  protected boolean operatorAnd;
 
   protected String analyzer;
 
@@ -28,8 +28,8 @@ public abstract class AbstractMatch {
   /**
    * Return true if using the AND operator otherwise using the OR operator.
    */
-  public boolean isAnd() {
-    return and;
+  public boolean isOperatorAnd() {
+    return operatorAnd;
   }
 
   /**

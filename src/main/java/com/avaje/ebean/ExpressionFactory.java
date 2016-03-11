@@ -2,6 +2,9 @@ package com.avaje.ebean;
 
 import com.avaje.ebean.search.Match;
 import com.avaje.ebean.search.MultiMatch;
+import com.avaje.ebean.search.TextCommonTerms;
+import com.avaje.ebean.search.TextQueryString;
+import com.avaje.ebean.search.TextSimple;
 
 import java.util.Collection;
 import java.util.List;
@@ -297,6 +300,21 @@ public interface ExpressionFactory {
    * Create a Text Multi match expression (currently doc store/Elastic only).
    */
   Expression textMultiMatch(String query, MultiMatch options);
+
+  /**
+   * Create a text simple query expression (currently doc store/Elastic only).
+   */
+  Expression textSimple(String search, TextSimple options);
+
+  /**
+   * Create a text query string expression (currently doc store/Elastic only).
+   */
+  Expression textQueryString(String search, TextQueryString options);
+
+  /**
+   * Create a text common terms expression (currently doc store/Elastic only).
+   */
+  Expression textCommonTerms(String search, TextCommonTerms options);
 
   /**
    * And - join two expressions with a logical and.

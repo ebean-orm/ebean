@@ -2,6 +2,9 @@ package com.avaje.ebean;
 
 import com.avaje.ebean.search.Match;
 import com.avaje.ebean.search.MultiMatch;
+import com.avaje.ebean.search.TextCommonTerms;
+import com.avaje.ebean.search.TextQueryString;
+import com.avaje.ebean.search.TextSimple;
 
 /**
  * An list of Full text query expressions.
@@ -36,6 +39,21 @@ public interface TextExpressionList<T> extends ExpressionList<T> {
    * Add a multi-match expression using options.
    */
   TextExpressionList<T> multiMatch(String search, MultiMatch options);
+
+  /**
+   * Add a simple query string expression.
+   */
+  TextExpressionList<T> textSimple(String search, TextSimple options);
+
+  /**
+   * Add a query string expression.
+   */
+  TextExpressionList<T> textQueryString(String search, TextQueryString options);
+
+  /**
+   * Add common terms expression.
+   */
+  TextExpressionList<T> textCommonTerms(String search, TextCommonTerms options);
 
   /**
    * Start a list of expressions that will be joined by MUST.
