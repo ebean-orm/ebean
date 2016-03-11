@@ -5,9 +5,6 @@ import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
-import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
-
-import java.util.List;
 
 /**
  * Controls the loading of reference objects for a query instance.
