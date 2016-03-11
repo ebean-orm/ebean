@@ -120,7 +120,7 @@ public class ReadJson {
       return null;
     }
 
-    Object contextBean = persistenceContext.putIfAbsent(id, bean);
+    Object contextBean = beanDesc.contextPutIfAbsent(persistenceContext, id, bean);
     if (contextBean == null) {
       if (loadContext != null) {
         EntityBeanIntercept ebi = bean._ebean_getIntercept();

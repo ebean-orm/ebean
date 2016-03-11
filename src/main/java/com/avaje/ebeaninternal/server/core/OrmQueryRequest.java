@@ -189,7 +189,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
    */
   public void persistenceContextAdd(EntityBean bean) {
     Object id = beanDescriptor.getId(bean);
-    persistenceContext.put(id, bean);
+    beanDescriptor.contextPut(persistenceContext, id, bean);
   }
 
   /**

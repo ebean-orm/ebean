@@ -6,11 +6,8 @@ import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebean.bean.EntityBeanIntercept;
-import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.server.cache.CachedBeanData;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
-import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.el.ElPropertyChainBuilder;
@@ -34,28 +31,29 @@ import java.util.Map;
  */
 public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
-  private final boolean oneToOne;
+  protected final boolean oneToOne;
 
-  private final boolean oneToOneExported;
+  protected final boolean oneToOneExported;
 
-  private final boolean importedPrimaryKey;
+  protected final boolean importedPrimaryKey;
 
-  private final LocalHelp localHelp;
+  protected final AssocOneHelp localHelp;
 
-  private final BeanProperty[] embeddedProps;
+  protected final BeanProperty[] embeddedProps;
 
-  private final HashMap<String, BeanProperty> embeddedPropsMap;
+  protected final HashMap<String, BeanProperty> embeddedPropsMap;
 
   /**
    * The information for Imported foreign Keys.
    */
-  private ImportedId importedId;
+  protected ImportedId importedId;
 
-  private ExportedProperty[] exportedProperties;
+  protected ExportedProperty[] exportedProperties;
 
-  private String deleteByParentIdSql;
-  private String deleteByParentIdInSql;
-  BeanPropertyAssocMany<?> relationshipProperty;
+  protected String deleteByParentIdSql;
+  protected String deleteByParentIdInSql;
+
+  protected BeanPropertyAssocMany<?> relationshipProperty;
 
   /**
    * Create based on deploy information of an EmbeddedId.
@@ -629,269 +627,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
   }
 
-  private LocalHelp createHelp(boolean embedded, boolean oneToOneExported) {
+  private AssocOneHelp createHelp(boolean embedded, boolean oneToOneExported) {
     if (embedded) {
-      return new Embedded();
+      return new AssocOneHelpEmbedded(this);
     } else if (oneToOneExported) {
-      return new ReferenceExported();
+      return new AssocOneHelpReferenceExported(this);
     } else {
-      return new Reference();
-    }
-  }
-
-  /**
-   * Local interface to handle Embedded, Reference and Reference Exported
-   * cases.
-   */
-  private abstract class LocalHelp {
-
-    abstract void loadIgnore(DbReadContext ctx);
-
-    abstract Object read(DbReadContext ctx) throws SQLException;
-
-    abstract Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException;
-
-    abstract void appendSelect(DbSqlContext ctx, boolean subQuery);
-
-    abstract void appendFrom(DbSqlContext ctx, SqlJoinType joinType);
-
-  }
-
-  private final class Embedded extends LocalHelp {
-
-    void loadIgnore(DbReadContext ctx) {
-      for (int i = 0; i < embeddedProps.length; i++) {
-        embeddedProps[i].loadIgnore(ctx);
-      }
-    }
-
-    @Override
-    Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
-      Object dbVal = read(ctx);
-      if (bean != null) {
-        // set back to the parent bean
-        setValue(bean, dbVal);
-        ctx.propagateState(dbVal);
-        return dbVal;
-
-      } else {
-        return null;
-      }
-    }
-
-    @Override
-    Object read(DbReadContext ctx) throws SQLException {
-
-      EntityBean embeddedBean = targetDescriptor.createEntityBean();
-
-      boolean notNull = false;
-      for (int i = 0; i < embeddedProps.length; i++) {
-        Object value = embeddedProps[i].readSet(ctx, embeddedBean);
-        if (value != null) {
-          notNull = true;
-        }
-      }
-      if (notNull) {
-        ctx.propagateState(embeddedBean);
-        return embeddedBean;
-      } else {
-        return null;
-      }
-    }
-
-    @Override
-    void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
-    }
-
-    @Override
-    void appendSelect(DbSqlContext ctx, boolean subQuery) {
-      for (int i = 0; i < embeddedProps.length; i++) {
-        embeddedProps[i].appendSelect(ctx, subQuery);
-      }
-    }
-  }
-
-  /**
-   * For imported reference - this is the common case.
-   */
-  private final class Reference extends LocalHelp {
-
-    Reference() {
-    }
-
-    @Override
-    void loadIgnore(DbReadContext ctx) {
-      targetIdBinder.loadIgnore(ctx);
-      if (targetInheritInfo != null) {
-        ctx.getDataReader().incrementPos(1);
-      }
-    }
-
-    @Override
-    Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
-      Object val = read(ctx);
-      if (bean != null) {
-        setValue(bean, val);
-        ctx.propagateState(val);
-      }
-      return val;
-    }
-
-    /**
-     * Read and set a Reference bean.
-     */
-    @Override
-    Object read(DbReadContext ctx) throws SQLException {
-
-      BeanDescriptor<?> rowDescriptor = null;
-      Class<?> rowType = targetType;
-      if (targetInheritInfo != null) {
-        // read discriminator to determine the type
-        InheritInfo rowInheritInfo = targetInheritInfo.readType(ctx);
-        if (rowInheritInfo != null) {
-          rowType = rowInheritInfo.getType();
-          rowDescriptor = rowInheritInfo.getBeanDescriptor();
-        }
-      }
-
-      // read the foreign key column(s)
-      Object id = targetIdBinder.read(ctx);
-      if (id == null) {
-        return null;
-      }
-
-      // check transaction context to see if it already exists
-      Object existing = ctx.getPersistenceContext().get(rowType, id);
-
-      if (existing != null) {
-        return existing;
-      }
-
-      Boolean readOnly = ctx.isReadOnly();
-      Object ref;
-      if (targetInheritInfo != null) {
-        // for inheritance hierarchy create the correct type for this row...
-        ref = rowDescriptor.createReference(readOnly, id);
-      } else {
-        ref = targetDescriptor.createReference(readOnly, id);
-      }
-
-      Object existingBean = ctx.getPersistenceContext().putIfAbsent(id, ref);
-      if (existingBean != null) {
-        // advanced case when we use multiple concurrent threads to
-        // build a single object graph, and another thread has since
-        // loaded a matching bean so we will use that instead.
-        ref = existingBean;
-
-      } else {
-        EntityBeanIntercept ebi = ((EntityBean) ref)._ebean_getIntercept();
-        if (Boolean.TRUE.equals(ctx.isReadOnly())) {
-          ebi.setReadOnly(true);
-        }
-        ctx.register(name, ebi);
-      }
-
-      return ref;
-    }
-
-    @Override
-    void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
-      if (targetInheritInfo != null) {
-        // add join to support the discriminator column
-        String relativePrefix = ctx.getRelativePrefix(name);
-        tableJoin.addJoin(joinType, relativePrefix, ctx);
-      }
-    }
-
-    /**
-     * Append columns for foreign key columns.
-     */
-    @Override
-    void appendSelect(DbSqlContext ctx, boolean subQuery) {
-
-      if (!subQuery && targetInheritInfo != null) {
-        // add discriminator column
-        String relativePrefix = ctx.getRelativePrefix(getName());
-        String tableAlias = ctx.getTableAlias(relativePrefix);
-        ctx.appendColumn(tableAlias, targetInheritInfo.getDiscriminatorColumn());
-      }
-      importedId.sqlAppend(ctx);
-    }
-  }
-
-  /**
-   * For OneToOne exported reference - not so common.
-   */
-  private final class ReferenceExported extends LocalHelp {
-
-    @Override
-    void loadIgnore(DbReadContext ctx) {
-      targetDescriptor.getIdBinder().loadIgnore(ctx);
-    }
-
-    /**
-     * Read and set a Reference bean.
-     */
-    @Override
-    Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
-
-      Object dbVal = read(ctx);
-      if (bean != null) {
-        setValue(bean, dbVal);
-        ctx.propagateState(dbVal);
-      }
-      return dbVal;
-    }
-
-    @Override
-    Object read(DbReadContext ctx) throws SQLException {
-
-      // TODO: Support for Inheritance hierarchy on exported OneToOne ?
-      IdBinder idBinder = targetDescriptor.getIdBinder();
-      Object id = idBinder.read(ctx);
-      if (id == null) {
-        return null;
-      }
-
-      PersistenceContext persistCtx = ctx.getPersistenceContext();
-      Object existing = persistCtx.get(targetType, id);
-
-      if (existing != null) {
-        return existing;
-      }
-      Object ref = targetDescriptor.createReference(ctx.isReadOnly(), id);
-
-      EntityBeanIntercept ebi = ((EntityBean) ref)._ebean_getIntercept();
-      if (Boolean.TRUE.equals(ctx.isReadOnly())) {
-        ebi.setReadOnly(true);
-      }
-      persistCtx.put(id, ref);
-      ctx.register(name, ebi);
-      return ref;
-    }
-
-    /**
-     * Append columns for foreign key columns.
-     */
-    @Override
-    void appendSelect(DbSqlContext ctx, boolean subQuery) {
-
-      // set appropriate tableAlias for the exported id columns
-
-      String relativePrefix = ctx.getRelativePrefix(getName());
-      ctx.pushTableAlias(relativePrefix);
-
-      IdBinder idBinder = targetDescriptor.getIdBinder();
-      idBinder.appendSelect(ctx, subQuery);
-
-      ctx.popTableAlias();
-    }
-
-    @Override
-    void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
-
-      String relativePrefix = ctx.getRelativePrefix(getName());
-      tableJoin.addJoin(joinType, relativePrefix, ctx);
+      return new AssocOneHelpReference(this);
     }
   }
 

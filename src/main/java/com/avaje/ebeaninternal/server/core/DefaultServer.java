@@ -616,9 +616,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         ref = desc.createReference(null, id);
       }
 
-      if (ctx != null && (ref instanceof EntityBean)) {
-        // Not putting a vanilla reference in the persistence context
-        ctx.put(id, ref);
+      if (ctx != null) {
+        desc.contextPut(ctx, id, ref);
       }
     }
     return (T) ref;

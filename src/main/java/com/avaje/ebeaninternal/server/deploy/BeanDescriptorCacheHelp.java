@@ -245,7 +245,7 @@ public final class BeanDescriptorCacheHelp<T> {
       EntityBeanIntercept refEbi = ((EntityBean) refBean)._ebean_getIntercept();
 
       many.add(bc, (EntityBean) refBean);
-      persistenceContext.put(id, refBean);
+      targetDescriptor.contextPut(persistenceContext, id, refBean);
       refEbi.setPersistenceContext(persistenceContext);
     }
     return true;
@@ -343,8 +343,7 @@ public final class BeanDescriptorCacheHelp<T> {
     EntityBeanIntercept ebi = entityBean._ebean_getIntercept();
     ebi.setPersistenceContext(context);
     Object id = desc.getId(entityBean);
-    context.put(id, bean);
-
+    desc.contextPut(context, id, bean);
   }
   
   /**

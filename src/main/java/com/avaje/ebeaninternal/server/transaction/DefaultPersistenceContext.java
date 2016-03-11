@@ -1,9 +1,9 @@
 package com.avaje.ebeaninternal.server.transaction;
 
 import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebean.bean.PersistenceContextUtil;
 import com.avaje.ebeaninternal.api.Monitor;
 
-import javax.persistence.Entity;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,7 +31,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   /**
    * Map used hold caches. One cache per bean type.
    */
-  private final HashMap<String, ClassContext> typeCache = new HashMap<String, ClassContext>();
+  private final HashMap<Class<?>, ClassContext> typeCache = new HashMap<Class<?>, ClassContext>();
 
   private final Monitor monitor = new Monitor();
 
@@ -44,15 +44,15 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   /**
    * Set an object into the PersistenceContext.
    */
-  public void put(Object id, Object bean) {
+  public void put(Class<?> rootType, Object id, Object bean) {
     synchronized (monitor) {
-      getClassContext(bean.getClass()).put(id, bean);
+      getClassContext(rootType).put(id, bean);
     }
   }
 
-  public Object putIfAbsent(Object id, Object bean) {
+  public Object putIfAbsent(Class<?> rootType, Object id, Object bean) {
     synchronized (monitor) {
-      return getClassContext(bean.getClass()).putIfAbsent(id, bean);
+      return getClassContext(rootType).putIfAbsent(id, bean);
     }
   }
 
@@ -76,7 +76,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
    */
   public int size(Class<?> beanType) {
     synchronized (monitor) {
-      ClassContext classMap = typeCache.get(beanType.getName());
+      ClassContext classMap = typeCache.get(beanType);
       return classMap == null ? 0 : classMap.size();
     }
   }
@@ -92,7 +92,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
   public void clear(Class<?> beanType) {
     synchronized (monitor) {
-      ClassContext classMap = typeCache.get(beanType.getName());
+      ClassContext classMap = typeCache.get(beanType);
       if (classMap != null) {
         classMap.clear();
       }
@@ -101,7 +101,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
   public void deleted(Class<?> beanType, Object id) {
     synchronized (monitor) {
-      ClassContext classMap = typeCache.get(beanType.getName());
+      ClassContext classMap = typeCache.get(beanType);
       if (classMap != null && id != null) {
         classMap.deleted(id);
       }
@@ -110,7 +110,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
   public void clear(Class<?> beanType, Object id) {
     synchronized (monitor) {
-      ClassContext classMap = typeCache.get(beanType.getName());
+      ClassContext classMap = typeCache.get(beanType);
       if (classMap != null && id != null) {
         classMap.remove(id);
       }
@@ -125,23 +125,13 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
   private ClassContext getClassContext(Class<?> beanType) {
 
-    String clsName = getBeanBaseType(beanType).getName();
-    ClassContext classMap = typeCache.get(clsName);
+    Class<?> rootType =  PersistenceContextUtil.root(beanType);
+    ClassContext classMap = typeCache.get(rootType);
     if (classMap == null) {
       classMap = new ClassContext();
-      typeCache.put(clsName, classMap);
+      typeCache.put(rootType, classMap);
     }
     return classMap;
-  }
-
-  private Class<?> getBeanBaseType(Class<?> beanType) {
-    Class<?> parent = beanType.getSuperclass();
-
-    while (parent != null && parent.isAnnotationPresent(Entity.class)) {
-      beanType = parent;
-      parent = parent.getSuperclass();
-    }
-    return beanType;
   }
 
   private static class ClassContext {

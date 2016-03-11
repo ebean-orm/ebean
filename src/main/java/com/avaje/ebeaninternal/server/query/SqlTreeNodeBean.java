@@ -239,7 +239,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
         localBean = null;
       } else if (!temporalVersions) {
         // check the PersistenceContext to see if the bean already exists
-        contextBean = (EntityBean) persistenceContext.putIfAbsent(id, localBean);
+        contextBean = (EntityBean) localDesc.contextPutIfAbsent(persistenceContext, id, localBean);
         if (contextBean == null) {
           // bean just added to the persistenceContext
           contextBean = localBean;

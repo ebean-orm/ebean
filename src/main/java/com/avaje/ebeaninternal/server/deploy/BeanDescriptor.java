@@ -12,6 +12,7 @@ import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebean.bean.PersistenceContextUtil;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.IdGenerator;
@@ -33,7 +34,6 @@ import com.avaje.ebean.plugin.BeanDocType;
 import com.avaje.ebean.plugin.BeanType;
 import com.avaje.ebean.plugin.ExpressionPath;
 import com.avaje.ebean.plugin.Property;
-import com.avaje.ebean.text.json.JsonReadOptions;
 import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.LoadContext;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -74,7 +74,6 @@ import com.avaje.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebeanservice.docstore.api.mapping.DocumentMapping;
-import com.fasterxml.jackson.core.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -195,6 +194,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * The type of bean this describes.
    */
   private final Class<T> beanType;
+  private final Class<?> rootBeanType;
 
   /**
    * This is not sent to a remote client.
@@ -387,6 +387,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.fullName = InternString.intern(deploy.getFullName());
 
     this.beanType = deploy.getBeanType();
+    this.rootBeanType = PersistenceContextUtil.root(beanType);
     this.prototypeEntityBean = createPrototypeEntityBean(beanType);
     
     this.namedQueries = deploy.getNamedQueries();
@@ -1665,6 +1666,20 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public String toString() {
     return fullName;
+  }
+
+  /**
+   * Put the bean into the persistence context.
+   */
+  public void contextPut(PersistenceContext pc, Object id, Object bean) {
+    pc.put(rootBeanType, id, bean);
+  }
+
+  /**
+   * Put the bean into the persistence context if it is absent.
+   */
+  public Object contextPutIfAbsent(PersistenceContext pc, Object id, EntityBean localBean) {
+    return pc.putIfAbsent(rootBeanType, id, localBean);
   }
 
   /**

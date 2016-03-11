@@ -11,12 +11,12 @@ import com.avaje.ebean.bean.PersistenceContext;
 public class NoopPersistenceContext implements PersistenceContext {
 
   @Override
-  public void put(Object id, Object bean) {
+  public void put(Class<?> rootType, Object id, Object bean) {
     // do nothing
   }
 
   @Override
-  public Object putIfAbsent(Object id, Object bean) {
+  public Object putIfAbsent(Class<?> rootType, Object id, Object bean) {
     // do nothing
     return null;
   }

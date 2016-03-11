@@ -126,7 +126,7 @@ public class DefaultBeanLoader {
 
     if (pc == null) {
       pc = new DefaultPersistenceContext();
-      pc.put(parentId, parentBean);
+      parentDesc.contextPut(pc, parentId, parentBean);
     }
 
     boolean useManyIdCache = beanCollection != null && parentDesc.isManyPropCaching();
@@ -263,7 +263,7 @@ public class DefaultBeanLoader {
     if (pc == null) {
       // a reference with no existing persistenceContext
       pc = new DefaultPersistenceContext();
-      pc.put(id, bean);
+      desc.contextPut(pc, id, bean);
       ebi.setPersistenceContext(pc);
     }
 

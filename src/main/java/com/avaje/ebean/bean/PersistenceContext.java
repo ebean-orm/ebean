@@ -12,7 +12,7 @@ public interface PersistenceContext {
   /**
    * Put the entity bean into the PersistenceContext.
    */
-  void put(Object id, Object bean);
+  void put(Class<?> rootType, Object id, Object bean);
 
   /**
    * Put the entity bean into the PersistenceContext if one is not already
@@ -22,7 +22,7 @@ public interface PersistenceContext {
    * returns null.
    * </p>
    */
-  Object putIfAbsent(Object id, Object bean);
+  Object putIfAbsent(Class<?> rootType, Object id, Object bean);
 
   /**
    * Return an object given its type and unique id.
