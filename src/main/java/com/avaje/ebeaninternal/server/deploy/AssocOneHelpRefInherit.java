@@ -2,7 +2,7 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
-import com.avaje.ebean.bean.PersistenceContextUtil;
+import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
 
 import java.sql.SQLException;
@@ -36,30 +36,24 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
     if (rowInheritInfo == null) {
       return null;
     }
-    BeanDescriptor<?> desc = rowInheritInfo.getBeanDescriptor();
 
-    // read the foreign key column(s)
     Object id = property.targetIdBinder.read(ctx);
     if (id == null) {
       return null;
     }
 
     // check transaction context to see if it already exists
-    Class<?>  rowType = desc.rootBeanType;
-    Object existing = ctx.getPersistenceContext().get(rowType, id);
+    PersistenceContext pc = ctx.getPersistenceContext();
+    BeanDescriptor<?> desc = rowInheritInfo.getBeanDescriptor();
+    Object existing = desc.contextGet(pc, id);
     if (existing != null) {
       return existing;
     }
 
     // for inheritance hierarchy create the correct type for this row...
-    Object  ref = desc.createReference(ctx.isReadOnly(), id);
-
-    Class<?> rootType = PersistenceContextUtil.root(ref.getClass());
-    ctx.getPersistenceContext().put(rootType, id, ref);
-
+    Object ref = desc.contextRef(pc, ctx.isReadOnly(), id);
     EntityBeanIntercept ebi = ((EntityBean) ref)._ebean_getIntercept();
     ctx.register(property.name, ebi);
-
     return ref;
   }
 

@@ -1669,6 +1669,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Get the bean from the persistence context.
+   */
+  public Object contextGet(PersistenceContext pc, Object id) {
+    return pc.get(rootBeanType, id);
+  }
+
+  /**
    * Put the bean into the persistence context.
    */
   public void contextPut(PersistenceContext pc, Object id, Object bean) {
@@ -1680,6 +1687,17 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public Object contextPutIfAbsent(PersistenceContext pc, Object id, EntityBean localBean) {
     return pc.putIfAbsent(rootBeanType, id, localBean);
+  }
+
+  /**
+   * Create a reference bean and put it in the persistence context (and return it).
+   */
+  public Object contextRef(PersistenceContext pc, Boolean readOnly, Object id) {
+    Object ref = createReference(readOnly, id);
+    if (pc != null) {
+      contextPut(pc, id, ref);
+    }
+    return ref;
   }
 
   /**

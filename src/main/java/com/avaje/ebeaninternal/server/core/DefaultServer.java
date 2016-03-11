@@ -580,47 +580,31 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     BeanDescriptor desc = getBeanDescriptor(type);
-    // convert the id type if necessary
     id = desc.convertId(id);
 
-    Object ref = null;
-    PersistenceContext ctx = null;
-
+    PersistenceContext pc = null;
     SpiTransaction t = transactionScopeManager.get();
     if (t != null) {
-      // first try the persistence context
-      ctx = t.getPersistenceContext();
-      ref = ctx.get(type, id);
-    }
-
-    if (ref == null) {
-      InheritInfo inheritInfo = desc.getInheritInfo();
-      if (inheritInfo != null) {
-        // we actually need to do a query because
-        // we don't know the type without the
-        // discriminator value
-        BeanProperty idProp = desc.getIdProperty();
-        if (idProp == null) {
-          throw new PersistenceException("No ID properties for this type? " + desc);          
-        }
-        
-        // just select the id properties and
-        // the discriminator column (auto added)
-        Query<T> query = createQuery(type);
-        query.select(idProp.getName()).setId(id);
-
-        ref = query.findUnique();
-
-      } else {
-        // use the default reference options
-        ref = desc.createReference(null, id);
-      }
-
-      if (ctx != null) {
-        desc.contextPut(ctx, id, ref);
+      pc = t.getPersistenceContext();
+      Object existing = desc.contextGet(pc, id);
+      if (existing != null) {
+        return (T)existing;
       }
     }
-    return (T) ref;
+
+    InheritInfo inheritInfo = desc.getInheritInfo();
+    if (inheritInfo == null) {
+      return (T)desc.contextRef(pc, null, id);
+    }
+
+    BeanProperty idProp = desc.getIdProperty();
+    if (idProp == null) {
+      throw new PersistenceException("No ID properties for this type? " + desc);
+    }
+
+    // we actually need to do a query because we don't know the type without the discriminator
+    // value, just select the id property and discriminator column (auto added)
+    return find(type).select(idProp.getName()).setId(id).findUnique();
   }
 
   @Override

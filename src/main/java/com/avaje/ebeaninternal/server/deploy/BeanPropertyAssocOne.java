@@ -632,7 +632,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     if (embedded) {
       return new AssocOneHelpEmbedded(this);
     } else if (oneToOneExported) {
-      return new AssocOneHelpReferenceExported(this);
+      return new AssocOneHelpRefExported(this);
     } else {
       if (targetInheritInfo != null) {
         return new AssocOneHelpRefInherit(this);
