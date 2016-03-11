@@ -1065,31 +1065,32 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (t == null) {
       t = getCurrentServerTransaction();
     }
-    PersistenceContext context = null;
+
+    BeanDescriptor<T> desc = query.getBeanDescriptor();
+
+    PersistenceContext pc = null;
     if (t != null && useTransactionPersistenceContext(query)) {
       // first look in the transaction scoped persistence context
-      context = t.getPersistenceContext();
-      if (context != null) {
-        WithOption o = context.getWithOption(query.getBeanType(), query.getId());
+      pc = t.getPersistenceContext();
+      if (pc != null) {
+        WithOption o = desc.contextGetWithOption(pc, query.getId());
         if (o != null) {
           if (o.isDeleted()) {
             // Bean was previously deleted in the same transaction / persistence context
             return null;
           }
-          // Return the entity bean instance from the persistence context
           return (T) o.getBean();
         }
       }
     }
 
-    BeanDescriptor<T> desc = query.getBeanDescriptor();
     if (!desc.calculateUseCache(query.isUseBeanCache())) {
       // not using bean cache
       return null;
     }
 
     // Hit the L2 bean cache
-    return desc.cacheBeanGet(query, context);
+    return desc.cacheBeanGet(query, pc);
   }
 
   /**

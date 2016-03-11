@@ -698,7 +698,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private void postUpdate() {
     if (statelessUpdate) {
-      transaction.getPersistenceContext().clear(beanDescriptor.getBeanType(), idValue);
+      beanDescriptor.contextClear(transaction.getPersistenceContext(), idValue);
     }
   }
 
@@ -706,9 +706,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Aggressive L1 and L2 cache cleanup for deletes.
    */
   private void postDelete() {
-    // Delete the bean from the PersistenceContent
-    transaction.getPersistenceContext().clear(beanDescriptor.getBeanType(), idValue);
-    // Delete from cache early even if transaction fails
+    beanDescriptor.contextClear(transaction.getPersistenceContext(), idValue);
     beanDescriptor.cacheHandleDelete(idValue, this);
   }
 

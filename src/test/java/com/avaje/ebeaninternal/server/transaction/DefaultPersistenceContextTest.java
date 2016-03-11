@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.transaction;
 
 import com.avaje.ebean.bean.PersistenceContext;
+import com.avaje.ebean.bean.PersistenceContextUtil;
 import com.avaje.tests.model.basic.Car;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Vehicle;
@@ -32,13 +33,17 @@ public class DefaultPersistenceContextTest {
     return pc;
   }
 
+  Class<?> root(Class<?> cls) {
+    return PersistenceContextUtil.root(cls);
+  }
+
   @Test
   public void put_get_withInheritance() throws Exception {
 
     PersistenceContext pc = pc();
-    pc.put(Vehicle.class, 1, car1);
+    pc.put(root(Vehicle.class), 1, car1);
 
-    Object found = pc.get(Car.class, 1);
+    Object found = pc.get(root(Car.class), 1);
     assertThat(found).isSameAs(car1);
   }
 

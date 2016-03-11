@@ -706,10 +706,10 @@ public final class DefaultPersister implements Persister {
     PersistenceContext persistenceContext = t.getPersistenceContext();
     if (idList != null) {
       for (Object idValue : idList) {
-        persistenceContext.deleted(descriptor.getBeanType(), idValue);
+        descriptor.contextDeleted(persistenceContext, idValue);
       }
     } else {
-      persistenceContext.deleted(descriptor.getBeanType(), id);
+      descriptor.contextDeleted(persistenceContext, id);
     }
     return rows;
   }

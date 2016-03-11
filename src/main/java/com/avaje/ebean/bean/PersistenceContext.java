@@ -27,14 +27,14 @@ public interface PersistenceContext {
   /**
    * Return an object given its type and unique id.
    */
-  Object get(Class<?> beanType, Object uid);
+  Object get(Class<?> rootType, Object uid);
 
   /**
    * Get the bean from the persistence context also checked to see if it had
    * been previously deleted (if so then you also can't hit the L2 cache to
    * fetch the bean for this particular persistence context).
    */
-  WithOption getWithOption(Class<?> beanType, Object uid);
+  WithOption getWithOption(Class<?> rootType, Object uid);
 
   /**
    * Clear all the references.
@@ -44,22 +44,22 @@ public interface PersistenceContext {
   /**
    * Clear all the references for a given type of entity bean.
    */
-  void clear(Class<?> beanType);
+  void clear(Class<?> rootType);
 
   /**
    * Clear the reference to a specific entity bean.
    */
-  void clear(Class<?> beanType, Object uid);
+  void clear(Class<?> rootType, Object uid);
 
   /**
    * Clear the reference as a result of an entity being deleted.
    */
-  void deleted(Class<?> beanType, Object id);
+  void deleted(Class<?> rootType, Object id);
 
   /**
    * Return the number of beans of the given type in the persistence context.
    */
-  int size(Class<?> beanType);
+  int size(Class<?> rootType);
 
   /**
    * Wrapper on a bean to also indicate if a bean has been deleted.

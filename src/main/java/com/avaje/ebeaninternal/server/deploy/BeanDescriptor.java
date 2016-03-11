@@ -1676,6 +1676,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Get the bean from the persistence context with delete check option.
+   */
+  public PersistenceContext.WithOption contextGetWithOption(PersistenceContext pc, Object id) {
+    return pc.getWithOption(rootBeanType, id);
+  }
+
+  /**
    * Put the bean into the persistence context.
    */
   public void contextPut(PersistenceContext pc, Object id, Object bean) {
@@ -1698,6 +1705,20 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       contextPut(pc, id, ref);
     }
     return ref;
+  }
+
+  /**
+   * Clear a bean from the persistence context.
+   */
+  public void contextClear(PersistenceContext pc, Object idValue) {
+    pc.clear(rootBeanType, idValue);
+  }
+
+  /**
+   * Delete a bean from the persistence context (such that we don't fetch it in the same transaction).
+   */
+  public void contextDeleted(PersistenceContext pc, Object idValue) {
+    pc.deleted(rootBeanType, idValue);
   }
 
   /**

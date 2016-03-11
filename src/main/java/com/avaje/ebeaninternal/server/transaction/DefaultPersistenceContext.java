@@ -59,24 +59,24 @@ public final class DefaultPersistenceContext implements PersistenceContext {
   /**
    * Return an object given its type and unique id.
    */
-  public Object get(Class<?> beanType, Object id) {
+  public Object get(Class<?> rootType, Object id) {
     synchronized (monitor) {
-      return getClassContext(beanType).get(id);
+      return getClassContext(rootType).get(id);
     }
   }
 
-  public WithOption getWithOption(Class<?> beanType, Object id) {
+  public WithOption getWithOption(Class<?> rootType, Object id) {
     synchronized (monitor) {
-      return getClassContext(beanType).getWithOption(id);
+      return getClassContext(rootType).getWithOption(id);
     }
   }
 
   /**
    * Return the number of beans of the given type in the persistence context.
    */
-  public int size(Class<?> beanType) {
+  public int size(Class<?> rootType) {
     synchronized (monitor) {
-      ClassContext classMap = typeCache.get(beanType);
+      ClassContext classMap = typeCache.get(rootType);
       return classMap == null ? 0 : classMap.size();
     }
   }
@@ -90,27 +90,27 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     }
   }
 
-  public void clear(Class<?> beanType) {
+  public void clear(Class<?> rootType) {
     synchronized (monitor) {
-      ClassContext classMap = typeCache.get(beanType);
+      ClassContext classMap = typeCache.get(rootType);
       if (classMap != null) {
         classMap.clear();
       }
     }
   }
 
-  public void deleted(Class<?> beanType, Object id) {
+  public void deleted(Class<?> rootType, Object id) {
     synchronized (monitor) {
-      ClassContext classMap = typeCache.get(beanType);
+      ClassContext classMap = typeCache.get(rootType);
       if (classMap != null && id != null) {
         classMap.deleted(id);
       }
     }
   }
 
-  public void clear(Class<?> beanType, Object id) {
+  public void clear(Class<?> rootType, Object id) {
     synchronized (monitor) {
-      ClassContext classMap = typeCache.get(beanType);
+      ClassContext classMap = typeCache.get(rootType);
       if (classMap != null && id != null) {
         classMap.remove(id);
       }
@@ -123,9 +123,8 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     }
   }
 
-  private ClassContext getClassContext(Class<?> beanType) {
+  private ClassContext getClassContext(Class<?> rootType) {
 
-    Class<?> rootType =  PersistenceContextUtil.root(beanType);
     ClassContext classMap = typeCache.get(rootType);
     if (classMap == null) {
       classMap = new ClassContext();
