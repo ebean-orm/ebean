@@ -227,6 +227,7 @@ public class OrmQueryProperties implements Serializable {
    */
   public void setFilterMany(SpiExpressionList<?> filterMany) {
     this.filterMany = filterMany;
+    this.markForQueryJoin = true;
   }
 
   /**
@@ -269,7 +270,7 @@ public class OrmQueryProperties implements Serializable {
       return true;
     }
     // explicitly selected some properties
-    return included != null;
+    return included != null || filterMany != null;
   }
 
   /**
