@@ -21,6 +21,8 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 
   protected final BeanPropertyAssocMany<?> property;
 
+  private final boolean docStoreMapped;
+
   private List<LoadBuffer> bufferList;
 
   private LoadBuffer currentBuffer;
@@ -31,6 +33,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
     super(parent, property.getBeanDescriptor(), path, defaultBatchSize, queryProps);
 
     this.property = property;
+    this.docStoreMapped = property.getTargetDescriptor().isDocStoreMapped();
     // bufferList only required when using query joins (queryFetch)
     this.bufferList = (!queryFetch) ? null : new ArrayList<DLoadManyContext.LoadBuffer>();
     this.currentBuffer = createBuffer(firstBatchSize);
@@ -56,7 +59,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 
   public void configureQuery(SpiQuery<?> query) {
 
-    parent.propagateQueryState(query, desc.isDocStoreMapped());
+    parent.propagateQueryState(query, docStoreMapped);
     query.setParentNode(objectGraphNode);
     if (queryProps != null) {
       queryProps.configureBeanQuery(query);
@@ -85,7 +88,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
     bc.setLoader(currentBuffer);
   }
 
-  public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest) {
+  public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest, boolean forEach) {
 
     if (!queryFetch) {
       throw new IllegalStateException("Not expecting loadSecondaryQuery() to be called?");
@@ -103,8 +106,12 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
           }
         }
 
-        // this is only run once - secondary query is a one shot deal
-        this.bufferList = null;
+        if (forEach) {
+          clear();
+        } else {
+          // this is only run once - secondary query is a one shot deal
+          this.bufferList = null;
+        }
       }
     }
   }
@@ -131,7 +138,7 @@ public class DLoadManyContext extends DLoadBaseContext implements LoadManyContex
 
     @Override
     public boolean isUseDocStore() {
-      return context.parent.useDocStore;
+      return context.parent.useDocStore && context.docStoreMapped;
     }
 
     public int getBatchSize() {

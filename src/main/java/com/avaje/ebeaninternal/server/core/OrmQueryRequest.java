@@ -12,6 +12,7 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebean.text.json.JsonReadOptions;
 import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.HashQuery;
@@ -59,6 +60,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
   private PersistenceContext persistenceContext;
 
+  private JsonReadOptions jsonRead;
+
   private HashQuery cacheKey;
 
   private CQueryPlanKey queryPlanKey;
@@ -94,8 +97,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     return ebeanServer.getDatabasePlatform().getLikeClause();
   }
 
-  public void executeSecondaryQueries() {
-    loadContext.executeSecondaryQueries(this);
+  public void executeSecondaryQueries(boolean forEach) {
+    // disable lazy loading leaves loadContext null
+    if (loadContext != null) {
+      loadContext.executeSecondaryQueries(this, forEach);
+    }
   }
 
   /**
@@ -152,7 +158,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public void prepareQuery() {
 
     adapterPreQuery();
-
     this.secondaryQueries = query.convertJoins();
     this.queryPlanKey = query.prepare(this);
   }
@@ -213,9 +218,27 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
         createdTransaction = true;
       }
     }
-    // initialise the persistenceContext and loadContext
-    this.persistenceContext = getPersistenceContext(query, transaction);
-    this.loadContext = new DLoadContext(this, secondaryQueries);
+    persistenceContext = getPersistenceContext(query, transaction);
+    loadContext = new DLoadContext(this, secondaryQueries);
+  }
+
+  /**
+   * Return the JsonReadOptions taking into account lazy loading and persistence context.
+   */
+  public JsonReadOptions createJsonReadOptions() {
+
+    persistenceContext = getPersistenceContext(query, transaction);
+    if (query.getPersistenceContext() == null) {
+      query.setPersistenceContext(persistenceContext);
+    }
+    jsonRead = new JsonReadOptions();
+    jsonRead.setPersistenceContext(persistenceContext);
+    if (!query.isDisableLazyLoading()) {
+      loadContext = new DLoadContext(this, secondaryQueries);
+      jsonRead.setLoadContext(loadContext);
+    }
+
+    return jsonRead;
   }
 
   /**
@@ -224,6 +247,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public void flushPersistenceContextOnIterate() {
     persistenceContext = new DefaultPersistenceContext();
     loadContext.resetPersistenceContext(persistenceContext);
+    if (jsonRead != null) {
+      jsonRead.setPersistenceContext(persistenceContext);
+      jsonRead.setLoadContext(loadContext);
+    }
   }
 
   /**
@@ -239,7 +266,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
 
     // determine the scope (from the query and then server)
     PersistenceContextScope scope = ebeanServer.getPersistenceContextScope(query);
-    return (scope == PersistenceContextScope.QUERY) ? new DefaultPersistenceContext() : t.getPersistenceContext();
+    return (scope == PersistenceContextScope.QUERY || t == null) ? new DefaultPersistenceContext() : t.getPersistenceContext();
   }
 
   /**

@@ -70,13 +70,12 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
     return buffer;
   }
 
-  public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest) {
+  public void loadSecondaryQuery(OrmQueryRequest<?> parentRequest, boolean forEach) {
 
     if (!queryFetch) {
       throw new IllegalStateException("Not expecting loadSecondaryQuery() to be called?");
     }
     synchronized (this) {
-
       if (bufferList != null) {
         for (LoadBuffer loadBuffer : bufferList) {
           if (!loadBuffer.list.isEmpty()) {
@@ -87,8 +86,12 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
               break;
             }
           }
-          // this is only run once - secondary query is a one shot deal
-          this.bufferList = null;
+          if (forEach) {
+            clear();
+          } else {
+            // this is only run once - secondary query is a one shot deal
+            this.bufferList = null;
+          }
         }
       }
     }

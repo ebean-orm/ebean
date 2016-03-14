@@ -202,6 +202,27 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   /**
+   * Copy collection value if existing is empty.
+   */
+  @Override
+  public void merge(EntityBean bean, EntityBean existing) {
+
+    Object existingCollection = getVal(existing);
+    if (existingCollection instanceof BeanCollection<?>) {
+      BeanCollection<?> toBC = (BeanCollection<?>)existingCollection;
+      if (!toBC.isPopulated()) {
+        Object fromCollection = getVal(bean);
+        if (fromCollection instanceof BeanCollection<?>) {
+          BeanCollection<?> fromBC = (BeanCollection<?>)fromCollection;
+          if (fromBC.isPopulated()) {
+            toBC.loadFrom(fromBC);
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Add the bean to the appropriate collection on the parent bean.
    */
   public void addBeanToCollectionWithCreate(EntityBean parentBean, EntityBean detailBean, boolean withCheck) {

@@ -1124,7 +1124,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(spiQuery, t);
     if (request.isUseDocStore()) {
-      return docStore().find(query.getBeanType(), query.getId());
+      return docStore().find(request);
     }
     try {
       request.initTransIfRequired();
@@ -1329,7 +1329,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     if (spiQuery.isUseDocStore()) {
-      return docStore().findPagedList(query);
+      return docStore().findPagedList(createQueryRequest(Type.LIST, query, transaction));
     }
 
     return new LimitOffsetPagedList<T>(this, spiQuery);
@@ -1340,7 +1340,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
 
     if (request.isUseDocStore()) {
-      docStore().findEach(query, consumer);
+      docStore().findEach(request, consumer);
       return;
     }
 
@@ -1353,7 +1353,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
     if (request.isUseDocStore()) {
-      docStore().findEachWhile(query, consumer);
+      docStore().findEachWhile(request, consumer);
       return;
     }
 
@@ -1398,7 +1398,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return (List<T>) result;
     }
     if (request.isUseDocStore()) {
-      return docStore().findList(query);
+      return docStore().findList(request);
     }
 
     try {

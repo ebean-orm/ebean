@@ -6,7 +6,7 @@ import com.avaje.ebean.PagedList;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
-import org.jetbrains.annotations.Nullable;
+import com.avaje.ebeanservice.docstore.api.DocQueryRequest;
 
 import java.io.IOException;
 import java.util.List;
@@ -60,29 +60,28 @@ public class NoneDocStore implements DocumentStore {
     throw implementationNotInClassPath();
   }
 
-  @Nullable
   @Override
-  public <T> T find(Class<T> beanType, Object id) {
+  public <T> T find(DocQueryRequest<T> request) {
     throw implementationNotInClassPath();
   }
 
   @Override
-  public <T> PagedList<T> findPagedList(Query<T> query) {
+  public <T> PagedList<T> findPagedList(DocQueryRequest<T> request) {
     throw implementationNotInClassPath();
   }
 
   @Override
-  public <T> List<T> findList(Query<T> query) {
+  public <T> List<T> findList(DocQueryRequest<T> request) {
     throw implementationNotInClassPath();
   }
 
   @Override
-  public <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer) {
+  public <T> void findEach(DocQueryRequest<T> query, QueryEachConsumer<T> consumer) {
     throw implementationNotInClassPath();
   }
 
   @Override
-  public <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer) {
+  public <T> void findEachWhile(DocQueryRequest<T> query, QueryEachWhileConsumer<T> consumer) {
     throw implementationNotInClassPath();
   }
 

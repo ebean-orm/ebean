@@ -20,7 +20,7 @@ public interface JsonBeanReader<T> {
   /**
    * Create a new reader taking the context from the existing one but using a new JsonParser.
    */
-  JsonBeanReader<T> forJson(JsonParser moreJson);
+  JsonBeanReader<T> forJson(JsonParser moreJson, boolean resetContext);
 
   /**
    * Add a bean explicitly to the persistence context.

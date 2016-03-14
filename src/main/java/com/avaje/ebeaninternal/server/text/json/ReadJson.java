@@ -63,21 +63,31 @@ public class ReadJson {
   /**
    * Construct when transferring load context, persistence context, object mapper etc to a new ReadJson instance.
    */
-  private ReadJson(JsonParser moreJson, ReadJson source) {
+  private ReadJson(JsonParser moreJson, ReadJson source, boolean resetContext) {
     this.parser = moreJson;
     this.rootDesc = source.rootDesc;
     this.pathStack = source.pathStack;
     this.visitorMap = source.visitorMap;
     this.objectMapper = source.objectMapper;
-    this.persistenceContext = source.persistenceContext;
-    this.loadContext = source.loadContext;
+    if (resetContext) {
+      this.persistenceContext = new DefaultPersistenceContext();
+      this.loadContext = source.loadContext;
+      if (loadContext != null) {
+        loadContext.resetPersistenceContext(persistenceContext);
+      }
+    } else {
+      this.persistenceContext = source.persistenceContext;
+      this.loadContext = source.loadContext;
+    }
   }
 
   private LoadContext initLoadContext(BeanDescriptor<?> desc, JsonReadOptions readOptions) {
-    if (readOptions != null && readOptions.isEnableLazyLoading()) {
+    if (readOptions == null) return null;
+    if (readOptions.isEnableLazyLoading() && readOptions.getLoadContext() == null) {
       return new DLoadContext(desc, persistenceContext);
+    } else {
+      return (LoadContext) readOptions.getLoadContext();
     }
-    return null;
   }
 
   private PersistenceContext initPersistenceContext(JsonReadOptions readOptions) {
@@ -97,8 +107,8 @@ public class ReadJson {
   /**
    * Return a new instance of ReadJson using the existing context but with a new JsonParser.
    */
-  public ReadJson forJson(JsonParser moreJson) {
-    return new ReadJson(moreJson, this);
+  public ReadJson forJson(JsonParser moreJson, boolean resetContext) {
+    return new ReadJson(moreJson, this, resetContext);
   }
 
   /**
@@ -120,8 +130,11 @@ public class ReadJson {
       return null;
     }
 
-    Object contextBean = beanDesc.contextPutIfAbsent(persistenceContext, id, bean);
-    if (contextBean == null) {
+    Object existing = beanDesc.contextPutIfAbsent(persistenceContext, id, bean);
+    if (existing != null) {
+      beanDesc.merge(bean, (EntityBean)existing);
+
+    } else {
       if (loadContext != null) {
         EntityBeanIntercept ebi = bean._ebean_getIntercept();
         if (ebi.isPartial()) {
@@ -134,7 +147,7 @@ public class ReadJson {
       }
       return null;
     }
-    return contextBean;
+    return existing;
   }
 
   /**

@@ -47,7 +47,7 @@ public class JsonBeanReaderTest extends BaseTestCase {
     beanReader.read();
 
     JsonParser more = getParser();
-    JsonBeanReader<Customer> moreReader = beanReader.forJson(more);
+    JsonBeanReader<Customer> moreReader = beanReader.forJson(more, true);
 
     Customer customer = moreReader.read();
     assertThat(customer.getId()).isEqualTo(42);

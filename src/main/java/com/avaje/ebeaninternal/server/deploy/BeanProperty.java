@@ -1329,4 +1329,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     return DocPropertyType.STRING == type && (id || discriminator);
   }
 
+  public void merge(EntityBean bean, EntityBean existing) {
+    // do nothing unless Many property
+  }
 }

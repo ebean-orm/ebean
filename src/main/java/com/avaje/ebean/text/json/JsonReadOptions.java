@@ -23,6 +23,8 @@ public class JsonReadOptions {
 
   protected PersistenceContext persistenceContext;
 
+  protected Object loadContext;
+
   /**
    * Default constructor.
    */
@@ -100,4 +102,19 @@ public class JsonReadOptions {
   public PersistenceContext getPersistenceContext() {
     return persistenceContext;
   }
+
+  /**
+   * Return the load context to use.
+   */
+  public Object getLoadContext() {
+    return loadContext;
+  }
+
+  /**
+   * Set the load context to use.
+   */
+  public void setLoadContext(Object loadContext) {
+    this.loadContext = loadContext;
+  }
+
 }

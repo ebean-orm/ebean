@@ -7,6 +7,7 @@ import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeanservice.docstore.api.DocQueryRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.Set;
 /**
  * Defines the ORM query request api.
  */
-public interface SpiOrmQueryRequest<T> {
+public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
 
   /**
    * Return the query.

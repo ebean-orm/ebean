@@ -182,12 +182,12 @@ public class DLoadContext implements LoadContext {
   /**
    * Execute all the secondary queries.
    */
-  public void executeSecondaryQueries(OrmQueryRequest<?> parentRequest) {
+  public void executeSecondaryQueries(OrmQueryRequest<?> parentRequest, boolean forEach) {
 
     if (secQuery != null) {
       for (int i = 0; i < secQuery.size(); i++) {
         LoadSecondaryQuery load = getLoadSecondaryQuery(secQuery.get(i).getPath());
-        load.loadSecondaryQuery(parentRequest);
+        load.loadSecondaryQuery(parentRequest, forEach);
       }
     }
   }

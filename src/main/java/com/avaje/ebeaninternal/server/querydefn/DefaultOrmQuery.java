@@ -462,10 +462,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public SpiQuerySecondary convertJoins() {
-
-    createExtraJoinsToSupportManyWhereClause();
+    if (!useDocStore) {
+      createExtraJoinsToSupportManyWhereClause();
+    }
     markQueryJoins();
-
     return new OrmQuerySecondary(removeQueryJoins(), removeLazyJoins());
   }
 
@@ -845,7 +845,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public CQueryPlanKey prepare(BeanQueryRequest<?> request) {
 
     prepareExpressions(request);
-
     queryPlanKey = createQueryPlanKey();
     return queryPlanKey;
   }

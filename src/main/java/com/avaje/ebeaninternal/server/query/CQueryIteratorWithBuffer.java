@@ -42,8 +42,7 @@ class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
             moreToLoad = false;
           }
         }
-        // execute secondary queries
-        request.executeSecondaryQueries();
+        request.executeSecondaryQueries(true);
       }
       return !buffer.isEmpty();
 

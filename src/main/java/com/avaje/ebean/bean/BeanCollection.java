@@ -32,6 +32,11 @@ public interface BeanCollection<E> extends Serializable {
   }
 
   /**
+   * Load bean from another collection.
+   */
+  void loadFrom(BeanCollection<?> other);
+
+  /**
    * Add a bean to the list/set with modifyListen notification.
    */
   void addBean(E bean);

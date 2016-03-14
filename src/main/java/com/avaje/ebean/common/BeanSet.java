@@ -1,5 +1,6 @@
 package com.avaje.ebean.common;
 
+import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.EntityBean;
@@ -55,6 +56,15 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   @SuppressWarnings("unchecked")
   public void addEntityBean(EntityBean bean) {
     set.add((E) bean);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public void loadFrom(BeanCollection<?> other) {
+    if (set == null) {
+      set = new LinkedHashSet<E>();
+    }
+    set.addAll((Collection<? extends E>) other.getActualDetails());
   }
 
   @Override

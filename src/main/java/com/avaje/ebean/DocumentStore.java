@@ -1,5 +1,6 @@
 package com.avaje.ebean;
 
+import com.avaje.ebeanservice.docstore.api.DocQueryRequest;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -48,12 +49,12 @@ public interface DocumentStore {
    * If the document is not found null is returned.
    */
   @Nullable
-  <T> T find(Class<T> beanType, Object id);
+  <T> T find(DocQueryRequest<T> request);
 
   /**
-   * Execute the query against the document store returning the list.
+   * Execute the find list query. This request is prepared to execute secondary queries.
    */
-  <T> List<T> findList(Query<T> query);
+  <T> List<T> findList(DocQueryRequest<T> request);
 
   /**
    * Execute the query against the document store returning the paged list.
@@ -61,7 +62,7 @@ public interface DocumentStore {
    * The query should have <code>firstRow</code> or <code>maxRows</code> set prior to calling this method.
    * </p>
    */
-  <T> PagedList<T> findPagedList(Query<T> query);
+  <T> PagedList<T> findPagedList(DocQueryRequest<T> request);
 
   /**
    * Execute the query against the document store with the expectation of a large set of results
@@ -70,7 +71,7 @@ public interface DocumentStore {
    * For example, with the ElasticSearch doc store this uses SCROLL.
    * </p>
    */
-  <T> void findEach(Query<T> query, QueryEachConsumer<T> consumer);
+  <T> void findEach(DocQueryRequest<T> query, QueryEachConsumer<T> consumer);
 
   /**
    * Execute the query against the document store with the expectation of a large set of results
@@ -82,7 +83,7 @@ public interface DocumentStore {
    * For example, with the ElasticSearch doc store this uses SCROLL.
    * </p>
    */
-  <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer);
+  <T> void findEachWhile(DocQueryRequest<T> query, QueryEachWhileConsumer<T> consumer);
 
   /**
    * Process the queue entries sending updates to the document store or queuing them for later processing.

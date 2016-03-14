@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.BaseTestCase;
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.plugin.Property;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.Order;
@@ -43,6 +44,20 @@ public class BeanDescriptorTest extends BaseTestCase {
     Collection<? extends Property> props = desc.allProperties();
 
     assertThat(props).extracting("name").contains("id", "status", "orderDate", "shipDate");
+  }
+
+  @Test
+  public void merge_when_empty() {
+
+    Customer from = new Customer();
+    from.setId(42);
+    from.setName("rob");
+
+    Customer to = new Customer();
+    customerDesc.merge((EntityBean)from, (EntityBean)to);
+
+    assertThat(to.getId()).isEqualTo(42);
+    assertThat(to.getName()).isEqualTo("rob");
   }
 
 }

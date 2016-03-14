@@ -1,5 +1,6 @@
 package com.avaje.ebean.common;
 
+import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.EntityBean;
 
@@ -49,6 +50,14 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   public boolean isEmptyAndUntouched() {
     return !touched && (map == null || map.isEmpty());
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public void loadFrom(BeanCollection<?> other) {
+    BeanMap<K,E> otherMap = (BeanMap<K,E>)other;
+    internalPutNull();
+    map.putAll(otherMap.getActualMap());
   }
 
   public void internalPutNull() {

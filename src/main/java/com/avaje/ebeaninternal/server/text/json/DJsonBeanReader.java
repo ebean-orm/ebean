@@ -45,7 +45,7 @@ public class DJsonBeanReader<T> implements JsonBeanReader<T> {
   }
 
   @Override
-  public JsonBeanReader<T> forJson(JsonParser moreJson) {
-    return new DJsonBeanReader(desc, readJson.forJson(moreJson));
+  public JsonBeanReader<T> forJson(JsonParser moreJson, boolean resetContext) {
+    return new DJsonBeanReader(desc, readJson.forJson(moreJson, resetContext));
   }
 }

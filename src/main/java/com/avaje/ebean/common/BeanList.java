@@ -1,5 +1,6 @@
 package com.avaje.ebean.common;
 
+import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.EntityBean;
@@ -62,6 +63,15 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   @SuppressWarnings("unchecked")
   public void addEntityBean(EntityBean bean) {
     list.add((E) bean);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public void loadFrom(BeanCollection<?> other) {
+    if (list == null) {
+      list = new ArrayList<E>();
+    }
+    list.addAll((Collection<? extends E>) other.getActualDetails());
   }
 
   @SuppressWarnings("unchecked")

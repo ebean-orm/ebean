@@ -316,7 +316,7 @@ public class CQueryEngine {
         cquery.auditFindMany();
       }
 
-      request.executeSecondaryQueries();
+      request.executeSecondaryQueries(false);
 
       return beanCollection;
 
@@ -365,7 +365,7 @@ public class CQueryEngine {
         cquery.auditFind(bean);
       }
 
-      request.executeSecondaryQueries();
+      request.executeSecondaryQueries(false);
 
       return (T) bean;
 
