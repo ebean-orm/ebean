@@ -24,7 +24,9 @@ public final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
     // being set to the parentBean directly
     EntityBean detailBean = super.load(cquery, null, null);
     // initialise the collection and add detailBean if it is not null
-    manyProp.addBeanToCollectionWithCreate(contextParent, detailBean, false);
+    if (contextParent != null) {
+      manyProp.addBeanToCollectionWithCreate(contextParent, detailBean, false);
+    }
     return detailBean;
   }
 
