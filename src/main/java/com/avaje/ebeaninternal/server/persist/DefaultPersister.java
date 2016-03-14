@@ -899,6 +899,13 @@ public final class DefaultPersister implements Persister {
     public boolean isPublish() {
       return publish;
     }
+
+    private void resetModifyState() {
+      Object details = getValue();
+      if (details instanceof BeanCollection<?>) {
+        modifyListenReset((BeanCollection<?>)details);
+      }
+    }
   }
 
   private void saveMany(SaveManyPropRequest saveMany, boolean insertMode) {
@@ -906,9 +913,9 @@ public final class DefaultPersister implements Persister {
     if (saveMany.getMany().isManyToMany()) {
 
       // check if we can save the m2m intersection in this direction
+      // we only allow one direction based on first traversed basis
       boolean saveIntersectionFromThisDirection = saveMany.isSaveIntersection();
       if (saveMany.isCascade()) {
-        // Need explicit Cascade to save the beans on other side
         saveAssocManyDetails(saveMany, false, insertMode);
       }
       // for ManyToMany save the 'relationship' via inserts/deletes
@@ -916,6 +923,8 @@ public final class DefaultPersister implements Persister {
       if (saveIntersectionFromThisDirection) {
         // only allowed on one direction of a m2m based on beanName
         saveAssocManyIntersection(saveMany, saveMany.isDeleteMissingChildren());
+      } else {
+        saveMany.resetModifyState();
       }
     } else {
       if (saveMany.isModifyListenMode()) {
