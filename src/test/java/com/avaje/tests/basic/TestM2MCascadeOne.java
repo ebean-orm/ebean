@@ -1,15 +1,11 @@
 package com.avaje.tests.basic;
 
-import java.util.List;
-
-import com.avaje.ebean.Query;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.common.BeanList;
+import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.MRole;
 import com.avaje.tests.model.basic.MUser;
+import org.junit.Test;
 
 public class TestM2MCascadeOne extends BaseTestCase {
 
