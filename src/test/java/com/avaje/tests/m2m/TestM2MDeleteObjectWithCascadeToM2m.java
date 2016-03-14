@@ -22,22 +22,15 @@ public class TestM2MDeleteObjectWithCascadeToM2m extends BaseTestCase {
     Ebean.createUpdate(Tenant.class, "delete from Tenant").execute();
     Ebean.createUpdate(Role.class, "delete from Role").execute();
     
-    Tenant tenant1 = new Tenant();
-    tenant1.setName("Tenant");
-
+    Tenant tenant1 = new Tenant("Tenant");
     Ebean.save(tenant1);
 
-    Permission p1 = new Permission();
-    Permission p2 = new Permission();
-
-    p1.setName("p1");
-    p2.setName("p2");
-
+    Permission p1 = new Permission("p1");
+    Permission p2 = new Permission("p2");
     Ebean.save(p1);
     Ebean.save(p2);
 
-    Role role1 = new Role();
-    role1.setName("RoleOne");
+    Role role1 = new Role("RoleOne");
     role1.setTenant(tenant1);
 
     Set<Permission> permissions = new HashSet<Permission>();

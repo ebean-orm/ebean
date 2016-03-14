@@ -30,7 +30,8 @@ public class Tenant {
   @Version
   private Long version;
 
-  public Tenant() {
+  public Tenant(String name) {
+    this.name = name;
   }
 
   public UUID getId() {

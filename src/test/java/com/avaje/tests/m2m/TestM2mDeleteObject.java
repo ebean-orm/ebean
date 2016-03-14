@@ -22,23 +22,17 @@ public class TestM2mDeleteObject extends BaseTestCase {
     Ebean.createUpdate(Tenant.class, "delete from Tenant").execute();
     Ebean.createUpdate(Role.class, "delete from Role").execute();
 
-    Tenant t = new Tenant();
-    t.setName("tenant");
+    Tenant t = new Tenant("tenant");
 
     Ebean.save(t);
 
-    Permission p1 = new Permission();
-    Permission p2 = new Permission();
-
-    p1.setName("p1");
-    p2.setName("p2");
+    Permission p1 = new Permission("p1");
+    Permission p2 = new Permission("p2");
 
     Ebean.save(p1);
-
     Ebean.save(p2);
 
-    Role role1 = new Role();
-    role1.setName("role");
+    Role role1 = new Role("role");
     role1.setTenant(t);
 
     Set<Permission> permissions = new HashSet<Permission>();
@@ -72,15 +66,12 @@ public class TestM2mDeleteObject extends BaseTestCase {
   @Test
   public void test_deleteCascading() {
 
-    Permission p1 = new Permission();
-    Permission p2 = new Permission();
-    p1.setName("p1");
-    p2.setName("p2");
+    Permission p1 = new Permission("p1");
+    Permission p2 = new Permission("p2");
     Ebean.save(p1);
     Ebean.save(p2);
 
-    Role role1 = new Role();
-    role1.setName("role");
+    Role role1 = new Role("role");
 
     Set<Permission> permissions = new HashSet<Permission>();
     permissions.add(p2);

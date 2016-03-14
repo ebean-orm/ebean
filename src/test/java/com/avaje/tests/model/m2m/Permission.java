@@ -1,15 +1,14 @@
 package com.avaje.tests.model.m2m;
 
-import java.util.Set;
-import java.util.UUID;
+import com.avaje.ebean.annotation.CacheStrategy;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
-import com.avaje.ebean.annotation.CacheStrategy;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * The Class Permission.
@@ -19,42 +18,46 @@ import com.avaje.ebean.annotation.CacheStrategy;
 @Table(name = "mt_permission")
 public class Permission {
 
-   @Id
-   private UUID id;
+  @Id
+  private UUID id;
 
-   @Column
-   private String name;
+  @Column
+  private String name;
 
-   @ManyToMany(mappedBy = "permissions")
-   private Set<Role> roles;
+  @ManyToMany(mappedBy = "permissions")
+  private Set<Role> roles;
 
-   public UUID getId() {
-      return id;
-   }
+  public Permission(String name) {
+    this.name = name;
+  }
 
-   public void setId(UUID id) {
-      this.id = id;
-   }
+  public UUID getId() {
+    return id;
+  }
 
-   public String getName() {
-      return name;
-   }
+  public void setId(UUID id) {
+    this.id = id;
+  }
 
-   public void setName(String name) {
-      this.name = name;
-   }
+  public String getName() {
+    return name;
+  }
 
-   public Set<Role> getRoles() {
-      return roles;
-   }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-   public void setRoles(Set<Role> roles) {
-      this.roles = roles;
-   }
+  public Set<Role> getRoles() {
+    return roles;
+  }
 
-   @Override
-   public String toString() {
+  public void setRoles(Set<Role> roles) {
+    this.roles = roles;
+  }
+
+  @Override
+  public String toString() {
     return "name:" + name + "id:" + id;
-   }
+  }
 
 }

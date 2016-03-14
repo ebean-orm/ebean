@@ -34,6 +34,10 @@ public class Role {
   @Version
   private Long version;
 
+  public Role(String name) {
+    this.name = name;
+  }
+
   public UUID getId() {
     return id;
   }
