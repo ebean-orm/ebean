@@ -10,6 +10,7 @@ import com.avaje.ebean.config.dbplatform.SqlLimitResponse;
 import com.avaje.ebean.config.dbplatform.SqlLimiter;
 import com.avaje.ebean.event.readaudit.ReadAuditQueryPlan;
 import com.avaje.ebean.text.PathProperties;
+import com.avaje.ebean.util.StringHelper;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
@@ -92,6 +93,7 @@ public class CQueryBuilder {
   public <T> CQueryDelete buildDeleteQuery(OrmQueryRequest<T> request) {
 
     SpiQuery<T> query = request.getQuery();
+    String rootTableAlias = query.getAlias();
     query.setDelete();
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
@@ -112,12 +114,13 @@ public class CQueryBuilder {
     String sql;
     if (!includeJoins) {
       // simple - delete from table ...
-      sql = buildSql("delete", request, predicates, sqlTree).getSql();
-
+      sql = aliasStrip(buildSql("delete", request, predicates, sqlTree).getSql());
     } else {
       // wrap as - delete from table where id in (select id ...)
       sql = buildSql(null, request, predicates, sqlTree).getSql();
       sql = request.getBeanDescriptor().getDeleteByIdInSql() + "in (" + sql + ")";
+      String alias = (rootTableAlias == null) ? "t0" : rootTableAlias;
+      sql = aliasReplace(sql, alias);
     }
 
     // cache the query plan
@@ -125,6 +128,22 @@ public class CQueryBuilder {
 
     request.putQueryPlan(queryPlan);
     return new CQueryDelete(request, predicates, sql);
+  }
+
+  /**
+   * Strip the root table alias.
+   */
+  private String aliasStrip(String sql) {
+    sql = StringHelper.replaceString(sql, "${RTA}.", "");
+    return StringHelper.replaceString(sql, " ${RTA}", "");
+  }
+
+  /**
+   * Replace the root table alias.
+   */
+  private String aliasReplace(String sql, String replaceWith) {
+    sql = StringHelper.replaceString(sql, "${RTA}.", replaceWith+".");
+    return StringHelper.replaceString(sql, "${RTA}", replaceWith);
   }
 
   /**

@@ -41,7 +41,7 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
-    assertThat(loggedSql.get(0)).contains("delete from contact t0 where t0.first_name =");
+    assertThat(loggedSql.get(0)).contains("delete from contact where first_name =");
 
 
     server.find(Contact.class).select("id").where().eq("firstName", "NotARealFirstName").delete();
@@ -54,26 +54,34 @@ public class TestDeleteByQuery extends BaseTestCase {
   @Test
   public void testWithForUpdate() {
 
-    EbeanServer server = Ebean.getDefaultServer();
-    if (server.getName().equals("mysql")) {
-      // MySql does not the sub query selecting from the delete table
-      return;
-    }
+    LoggedSqlCollector.start();
 
-    server.find(Customer.class)
-        .where().eq("name","FatsDomino")
+    Ebean.find(Customer.class)
+        .where().eq("name","Don Roberto")
         .query().setForUpdate(true)
         .delete();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("delete from o_customer where name = ?");
+  }
+
+  @Test
+  public void delete_queryString() {
+
+    LoggedSqlCollector.start();
+
+    Ebean.createQuery(Customer.class, "where name = :name")
+        .setParameter("name","Don Roberto")
+        .delete();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("delete from o_customer where name = ?");
   }
 
   @Test
   public void testCommit() {
-
-    EbeanServer server = Ebean.getDefaultServer();
-    if (server.getName().equals("mysql")) {
-      // MySql does not the sub query selecting from the delete table
-      return;
-    }
 
     ResetBasicData.reset();
 
@@ -85,10 +93,9 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     Ebean.save(contact);
 
-    Ebean.find(Contact.class).select("id").where().eq("firstName", "DelByQueryFirstName").delete();
+    Ebean.find(Contact.class).where().eq("firstName", "DelByQueryFirstName").delete();
 
     Contact contactFind = Ebean.find(Contact.class, contact.getId());
     assertThat(contactFind).isNull();
-
   }
 }

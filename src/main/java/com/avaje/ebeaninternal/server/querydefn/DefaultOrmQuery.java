@@ -528,6 +528,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     maxRows = 0;
     firstRow = 0;
     forUpdate = false;
+    rootTableAlias = "${RTA}"; // alias we remove later
     setSelectId();
   }
 
