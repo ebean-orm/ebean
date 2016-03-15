@@ -13,9 +13,19 @@ public class DocStoreConfig {
   protected boolean active;
 
   /**
-   * When true the Document store should drop and re-create any document mapping (like DDL).
+   * Set to true means Ebean will generate mapping files on startup.
+   */
+  protected boolean generateMapping;
+
+  /**
+   * When true the Document store should drop and re-create document indexes.
    */
   protected boolean dropCreate;
+
+  /**
+   * When true the Document store should create any document indexes that don't already exist.
+   */
+  protected boolean create;
 
   /**
    * The URL of the Document store server. For example: http://localhost:9200.
@@ -87,17 +97,47 @@ public class DocStoreConfig {
   }
 
   /**
-   * Return true if the document store should recreate mappings.
+   * Return true if Ebean should generate mapping files on server startup.
+   */
+  public boolean isGenerateMapping() {
+    return generateMapping;
+  }
+
+  /**
+   * Set to true if Ebean should generate mapping files on server startup.
+   */
+  public void setGenerateMapping(boolean generateMapping) {
+    this.generateMapping = generateMapping;
+  }
+
+  /**
+   * Return true if the document store should recreate mapped indexes.
    */
   public boolean isDropCreate() {
     return dropCreate;
   }
 
   /**
-   * Set to true if the document store should recreate mappings.
+   * Set to true if the document store should recreate mapped indexes.
    */
   public void setDropCreate(boolean dropCreate) {
     this.dropCreate = dropCreate;
+  }
+
+  /**
+   * Create true if the document store should create mapped indexes that don't yet exist.
+   * This is only used if dropCreate is false.
+   */
+  public boolean isCreate() {
+    return create;
+  }
+
+  /**
+   * Set to true if the document store should create mapped indexes that don't yet exist.
+   * This is only used if dropCreate is false.
+   */
+  public void setCreate(boolean create) {
+    this.create = create;
   }
 
   /**
@@ -198,7 +238,9 @@ public class DocStoreConfig {
     url = properties.get("docstore.url", url);
     persist = properties.getEnum(DocStoreMode.class, "docstore.persist", persist);
     bulkBatchSize = properties.getInt("docstore.bulkBatchSize", bulkBatchSize);
+    generateMapping = properties.getBoolean("docstore.generateMapping", generateMapping);
     dropCreate = properties.getBoolean("docstore.dropCreate", dropCreate);
+    create = properties.getBoolean("docstore.create", create);
     mappingPath = properties.get("docstore.mappingPath", mappingPath);
     mappingSuffix = properties.get("docstore.mappingSuffix", mappingSuffix);
     pathToResources = properties.get("docstore.pathToResources", pathToResources);
