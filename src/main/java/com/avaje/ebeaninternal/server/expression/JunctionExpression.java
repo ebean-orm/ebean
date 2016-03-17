@@ -2,11 +2,17 @@ package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.*;
 import com.avaje.ebean.event.BeanQueryRequest;
+import com.avaje.ebean.search.Match;
+import com.avaje.ebean.search.MultiMatch;
+import com.avaje.ebean.search.TextCommonTerms;
+import com.avaje.ebean.search.TextQueryString;
+import com.avaje.ebean.search.TextSimple;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
+import com.avaje.ebeaninternal.api.SpiJunction;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.IOException;
@@ -19,20 +25,30 @@ import java.util.Set;
 /**
  * Junction implementation.
  */
-abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, ExpressionList<T> {
+abstract class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, ExpressionList<T> {
 
-  static final String OR = " or ";
+  static class TextJunction<T> extends JunctionExpression<T> {
 
-  static final String AND = " and ";
+    TextJunction(Query<T> query, ExpressionList<T> parent, TextJunction.Type type) {
+      super(type, query, parent);
+    }
+    TextJunction(TextJunction.Type type, DefaultExpressionList<T> expressionList) {
+      super(type, expressionList);
+    }
+    @Override
+    public SpiExpression copyForPlanKey() {
+      return new TextJunction<T>(type, exprList.copyForPlanKey());
+    }
+  }
 
   static class Conjunction<T> extends JunctionExpression<T> {
 
     Conjunction(Query<T> query, ExpressionList<T> parent) {
-      super(false, AND, query, parent);
+      super(Type.AND, query, parent);
     }
 
     Conjunction(DefaultExpressionList<T> expressionList) {
-      super(false, AND, expressionList);
+      super(Type.AND, expressionList);
     }
     @Override
     public SpiExpression copyForPlanKey() {
@@ -43,11 +59,11 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
   static class Disjunction<T> extends JunctionExpression<T> {
 
     Disjunction(Query<T> query, ExpressionList<T> parent) {
-      super(true, OR, query, parent);
+      super(Type.OR, query, parent);
     }
 
     Disjunction(DefaultExpressionList<T> expressionList) {
-      super(true, OR, expressionList);
+      super(Type.OR, expressionList);
     }
 
     @Override
@@ -58,42 +74,39 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
 
   protected final DefaultExpressionList<T> exprList;
 
-  private final String joinType;
+  protected final Junction.Type type;
 
-  /**
-   * If true then a disjunction which means outer joins are required.
-   */
-  private final boolean disjunction;
-
-  JunctionExpression(Query<T> query, TextExpressionList<T> parent) {
-    this.disjunction = true;
-    this.joinType = OR;
+  JunctionExpression(Junction.Type type, Query<T> query, ExpressionList<T> parent) {
+    this.type = type;
     this.exprList = new DefaultExpressionList<T>(query, parent);
-  }
-
-  JunctionExpression(boolean disjunction, String joinType, Query<T> query, ExpressionList<T> parent) {
-    this.disjunction = disjunction;
-    this.joinType = joinType;
-    this.exprList = new DefaultExpressionList<T>(query, (TextExpressionList<T>)parent);
   }
 
   /**
    * Construct for copyForPlanKey.
    */
-  JunctionExpression(boolean disjunction, String joinType, DefaultExpressionList<T> exprList) {
-    this.disjunction = disjunction;
-    this.joinType = joinType;
+  JunctionExpression(Junction.Type type, DefaultExpressionList<T> exprList) {
+    this.type = type;
     this.exprList = exprList;
   }
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.startBool(!disjunction);
+    context.startBool(type == Type.AND);
     List<SpiExpression> list = exprList.internalList();
     for (int i = 0; i < list.size(); i++) {
       list.get(i).writeDocQuery(context);
     }
     context.endBool();
+  }
+
+  @Override
+  public void writeDocQueryJunction(DocQueryContext context) throws IOException {
+    context.startBoolGroupList(type);
+    List<SpiExpression> list = exprList.internalList();
+    for (int i = 0; i < list.size(); i++) {
+      list.get(i).writeDocQuery(context);
+    }
+    context.endBoolGroupList();
   }
 
   @Override
@@ -103,7 +116,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
 
     // get the current state for 'require outer joins'
     boolean parentOuterJoins = manyWhereJoin.isRequireOuterJoins();
-    if (disjunction) {
+    if (type == Type.OR) {
       // turn on outer joins required for disjunction expressions
       manyWhereJoin.setRequireOuterJoins(true);
     }
@@ -111,7 +124,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     for (int i = 0; i < list.size(); i++) {
       list.get(i).containsMany(desc, manyWhereJoin);
     }
-    if (disjunction && !parentOuterJoins) {
+    if (type == Type.OR && !parentOuterJoins) {
       // restore state to not forcing outer joins
       manyWhereJoin.setRequireOuterJoins(false);
     }
@@ -155,7 +168,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
       for (int i = 0; i < list.size(); i++) {
         SpiExpression item = list.get(i);
         if (i > 0) {
-          request.append(joinType);
+          request.append(type.literal());
         }
         item.addSql(request);
       }
@@ -177,7 +190,7 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
    */
   @Override
   public void queryPlanHash(HashQueryPlanBuilder builder) {
-    builder.add(JunctionExpression.class).add(joinType);
+    builder.add(JunctionExpression.class).add(type);
     List<SpiExpression> list = exprList.internalList();
     for (int i = 0; i < list.size(); i++) {
       list.get(i).queryPlanHash(builder);
@@ -204,15 +217,82 @@ abstract class JunctionExpression<T> implements Junction<T>, SpiExpression, Expr
     }
 
     JunctionExpression that = (JunctionExpression) other;
-    return joinType.equals(that.joinType)
-        && exprList.isSameByPlan(that.exprList);
+    return type == that.type && exprList.isSameByPlan(that.exprList);
   }
 
   @Override
   public boolean isSameByBind(SpiExpression other) {
     JunctionExpression that = (JunctionExpression) other;
-    return joinType.equals(that.joinType)
-        && exprList.isSameByBind(that.exprList);
+    return type == that.type && exprList.isSameByBind(that.exprList);
+  }
+
+  @Override
+  public ExpressionList<T> match(String propertyName, String search) {
+    return match(propertyName, search, null);
+  }
+
+  @Override
+  public ExpressionList<T> match(String propertyName, String search, Match options) {
+    return exprList.match(propertyName, search, options);
+  }
+
+  @Override
+  public ExpressionList<T> multiMatch(String query, String... properties) {
+    return exprList.multiMatch(query, properties);
+  }
+
+  @Override
+  public ExpressionList<T> multiMatch(String query, MultiMatch options) {
+    return exprList.multiMatch(query, options);
+  }
+
+  @Override
+  public ExpressionList<T> textSimple(String search, TextSimple options) {
+    return exprList.textSimple(search, options);
+  }
+
+  @Override
+  public ExpressionList<T> textQueryString(String search, TextQueryString options) {
+    return exprList.textQueryString(search, options);
+  }
+
+  @Override
+  public ExpressionList<T> textCommonTerms(String search, TextCommonTerms options) {
+    return exprList.textCommonTerms(search, options);
+  }
+
+  @Override
+  public Junction<T> must() {
+    return exprList.must();
+  }
+
+  @Override
+  public Junction<T> should() {
+    return exprList.should();
+  }
+
+  @Override
+  public Junction<T> mustNot() {
+    return exprList.mustNot();
+  }
+
+  @Override
+  public ExpressionList<T> endMust() {
+    return endTextJunction();
+  }
+
+  @Override
+  public ExpressionList<T> endShould() {
+    return endTextJunction();
+  }
+
+  @Override
+  public ExpressionList<T> endMustNot() {
+    return endTextJunction();
+  }
+
+  private ExpressionList<T> endTextJunction() {
+    return exprList.endTextJunction();
   }
 
   @Override

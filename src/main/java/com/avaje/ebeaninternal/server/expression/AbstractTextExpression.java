@@ -18,31 +18,33 @@ public abstract class AbstractTextExpression extends AbstractExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    throw new IllegalStateException("Not implemented - DocStore/Elastic only");
+    // do nothing, only execute against document store
   }
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-    throw new IllegalStateException("Not implemented - DocStore/Elastic only");
+    // do nothing, only execute against document store
   }
 
   @Override
   public void queryPlanHash(HashQueryPlanBuilder builder) {
-    throw new IllegalStateException("Not implemented - query plan caching done explicitly by the doc store");
+    // do nothing, only execute against document store
   }
 
   @Override
   public int queryBindHash() {
-    throw new IllegalStateException("Not implemented - query plan caching done explicitly by the doc store");
+    return 0;
   }
 
   @Override
   public boolean isSameByPlan(SpiExpression other) {
-    throw new IllegalStateException("Not implemented - query plan caching done explicitly by the doc store");
+    // do not compare by plan / bind values (this way)
+    return false;
   }
 
   @Override
   public boolean isSameByBind(SpiExpression other) {
-    throw new IllegalStateException("Not implemented - query plan caching done explicitly by the doc store");
+    // do not compare by plan / bind values (this way)
+    return false;
   }
 }

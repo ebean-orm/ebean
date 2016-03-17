@@ -1060,7 +1060,7 @@ public interface Query<T> {
    * ElasticSearch query.
    * </p>
    */
-  TextExpressionList<T> text();
+  ExpressionList<T> text();
 
   /**
    * This applies a filter on the 'many' property list rather than the root

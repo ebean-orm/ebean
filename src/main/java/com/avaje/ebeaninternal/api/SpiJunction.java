@@ -1,18 +1,17 @@
 package com.avaje.ebeaninternal.api;
 
-import com.avaje.ebean.TextJunction;
+import com.avaje.ebean.Junction;
 import com.avaje.ebeaninternal.server.expression.DocQueryContext;
 
 import java.io.IOException;
 
 /**
- * SPI extension to the full text junctions (MUST, MUST NOT, SHOULD).
+ * SPI methods for Junction.
  */
-public interface SpiTextJunction<T> extends TextJunction<T> {
+public interface SpiJunction<T> extends Junction<T> {
 
   /**
-   * Write the junction expression to the query context.
+   * Write the Junction taking into account it is implied.
    */
   void writeDocQueryJunction(DocQueryContext context) throws IOException;
-
 }

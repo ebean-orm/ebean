@@ -7,8 +7,6 @@ import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Junction;
 import com.avaje.ebean.LikeType;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.TextExpressionList;
-import com.avaje.ebean.TextJunction;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.search.Match;
 import com.avaje.ebean.search.MultiMatch;
@@ -438,7 +436,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Return a list of expressions that will be joined by AND's.
    */
   public <T> Junction<T> conjunction(Query<T> query) {
-
     return new JunctionExpression.Conjunction<T>(query, query.where());
   }
 
@@ -446,7 +443,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Return a list of expressions that will be joined by OR's.
    */
   public <T> Junction<T> disjunction(Query<T> query) {
-
     return new JunctionExpression.Disjunction<T>(query, query.where());
   }
 
@@ -454,7 +450,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Return a list of expressions that will be joined by AND's.
    */
   public <T> Junction<T> conjunction(Query<T> query, ExpressionList<T> parent) {
-
     return new JunctionExpression.Conjunction<T>(query, parent);
   }
 
@@ -462,7 +457,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Return a list of expressions that will be joined by OR's.
    */
   public <T> Junction<T> disjunction(Query<T> query, ExpressionList<T> parent) {
-
     return new JunctionExpression.Disjunction<T>(query, parent);
   }
 
@@ -470,7 +464,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Create and return a Full text junction (Must, Must Not or Should).
    */
   @Override
-  public <T> TextJunction<T> textJunction(Query<T> query, TextExpressionList<T> parent, TextJunction.Type type) {
-    return new DTextJunction<T>(query, parent, type);
+  public <T> Junction<T> textJunction(Query<T> query, ExpressionList<T> parent, Junction.Type type) {
+    return new JunctionExpression.TextJunction<T>(query, parent, type);
   }
 }

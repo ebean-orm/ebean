@@ -357,6 +357,6 @@ public interface ExpressionFactory {
    * This is doc store Elastic only.
    * </p>
    */
-  <T> TextJunction<T> textJunction(Query<T> query, TextExpressionList<T> parent, TextJunction.Type type);
+  <T> Junction<T> textJunction(Query<T> query, ExpressionList<T> parent, Junction.Type type);
 
 }

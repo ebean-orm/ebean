@@ -13,8 +13,7 @@ import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
-import com.avaje.ebeaninternal.api.SpiTextExpressionList;
-import com.avaje.ebeaninternal.api.SpiTextJunction;
+import com.avaje.ebeaninternal.api.SpiJunction;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.IOException;
@@ -28,13 +27,13 @@ import java.util.Set;
 /**
  * Default implementation of ExpressionList.
  */
-public class DefaultExpressionList<T> implements SpiExpressionList<T>, SpiTextExpressionList<T> {
+public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   protected final List<SpiExpression> list;
 
   protected final Query<T> query;
 
-  protected final TextExpressionList<T> parentExprList;
+  protected final ExpressionList<T> parentExprList;
 
   protected transient ExpressionFactory expr;
 
@@ -54,19 +53,19 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T>, SpiTextEx
     this(query, query.getExpressionFactory(), null, new ArrayList<SpiExpression>(), true);
   }
 
-  public DefaultExpressionList(Query<T> query, TextExpressionList<T> parentExprList) {
+  public DefaultExpressionList(Query<T> query, ExpressionList<T> parentExprList) {
     this(query, query.getExpressionFactory(), parentExprList);
   }
 
-  public DefaultExpressionList(Query<T> query, ExpressionFactory expr, TextExpressionList<T> parentExprList) {
+  public DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList) {
     this(query, expr, parentExprList, new ArrayList<SpiExpression>());
   }
 
-  protected DefaultExpressionList(Query<T> query, ExpressionFactory expr, TextExpressionList<T> parentExprList, List<SpiExpression> list) {
+  protected DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
     this(query, expr, parentExprList, list, false);
   }
 
-  private DefaultExpressionList(Query<T> query, ExpressionFactory expr, TextExpressionList<T> parentExprList, List<SpiExpression> list, boolean textRoot) {
+  private DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list, boolean textRoot) {
     this.textRoot = textRoot;
     this.list = list;
     this.query = query;
@@ -104,20 +103,20 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T>, SpiTextEx
       int size = list.size();
 
       SpiExpression first = list.get(0);
-      boolean explicitBool = first instanceof SpiTextJunction<?>;
+      boolean explicitBool = first instanceof SpiJunction<?>;
       boolean implicitBool = !explicitBool && size > 1;
 
       if (implicitBool || explicitBool) {
         context.startBoolGroup();
       }
       if (implicitBool) {
-        context.startBoolGroupList(TextJunction.Type.SHOULD);
+        context.startBoolGroupList(Junction.Type.SHOULD);
       }
       for (int i = 0; i < size; i++) {
         SpiExpression expr = list.get(i);
         if (explicitBool) {
           try {
-            ((SpiTextJunction<?>) expr).writeDocQueryJunction(context);
+            ((SpiJunction<?>)expr).writeDocQueryJunction(context);
           } catch (ClassCastException e) {
             throw new IllegalStateException("The top level text() expressions should be all be 'Must', 'Should' or 'Must Not' or none of them should be.", e);
           }
@@ -208,7 +207,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T>, SpiTextEx
     return parentExprList == null ? this : parentExprList;
   }
 
-  protected TextExpressionList<T> endTextJunction() {
+  protected ExpressionList<T> endTextJunction() {
     return parentExprList == null ? this : parentExprList;
   }
 
@@ -647,8 +646,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T>, SpiTextEx
     return this;
   }
 
-  public TextJunction<T> textJunction(TextJunction.Type type) {
-    TextJunction<T> junction = expr.textJunction(query, this, type);
+  public Junction<T> textJunction(Junction.Type type) {
+    Junction<T> junction = expr.textJunction(query, this, type);
     add(junction);
     return junction;
   }
@@ -858,72 +857,77 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T>, SpiTextEx
   }
 
   @Override
-  public TextExpressionList<T> match(String propertyName, String search) {
+  public ExpressionList<T> match(String propertyName, String search) {
     return match(propertyName, search, null);
   }
 
   @Override
-  public TextExpressionList<T> match(String propertyName, String search, Match options) {
+  public ExpressionList<T> match(String propertyName, String search, Match options) {
     add(expr.textMatch(propertyName, search, options));
+    setUseDocStore(true);
     return this;
   }
 
   @Override
-  public TextExpressionList<T> multiMatch(String query, String... fields) {
-    return multiMatch(query, new MultiMatch().fields(fields));
+  public ExpressionList<T> multiMatch(String query, String... fields) {
+    return multiMatch(query, MultiMatch.fields(fields));
   }
 
   @Override
-  public TextExpressionList<T> multiMatch(String query, MultiMatch options) {
+  public ExpressionList<T> multiMatch(String query, MultiMatch options) {
+    setUseDocStore(true);
     add(expr.textMultiMatch(query, options));
     return this;
   }
 
   @Override
-  public TextExpressionList<T> textSimple(String search, TextSimple options) {
+  public ExpressionList<T> textSimple(String search, TextSimple options) {
+    setUseDocStore(true);
     add(expr.textSimple(search, options));
     return this;
   }
 
   @Override
-  public TextExpressionList<T> textQueryString(String search, TextQueryString options) {
+  public ExpressionList<T> textQueryString(String search, TextQueryString options) {
+    setUseDocStore(true);
     add(expr.textQueryString(search, options));
     return this;
   }
 
   @Override
-  public TextExpressionList<T> textCommonTerms(String search, TextCommonTerms options) {
+  public ExpressionList<T> textCommonTerms(String search, TextCommonTerms options) {
+    setUseDocStore(true);
     add(expr.textCommonTerms(search, options));
     return this;
   }
 
   @Override
-  public TextJunction<T> must() {
-    return textJunction(TextJunction.Type.MUST);
+  public Junction<T> must() {
+    return textJunction(Junction.Type.MUST);
   }
 
   @Override
-  public TextJunction<T> should() {
-    return textJunction(TextJunction.Type.SHOULD);
+  public Junction<T> should() {
+    return textJunction(Junction.Type.SHOULD);
   }
 
   @Override
-  public TextJunction<T> mustNot() {
-    return textJunction(TextJunction.Type.MUST_NOT);
+  public Junction<T> mustNot() {
+    return textJunction(Junction.Type.MUST_NOT);
   }
 
   @Override
-  public TextExpressionList<T> endMust() {
+  public ExpressionList<T> endMust() {
     return endTextJunction();
   }
 
   @Override
-  public TextExpressionList<T> endShould() {
+  public ExpressionList<T> endShould() {
     return endTextJunction();
   }
 
   @Override
-  public TextExpressionList<T> endMustNot() {
+  public ExpressionList<T> endMustNot() {
     return endTextJunction();
   }
 }

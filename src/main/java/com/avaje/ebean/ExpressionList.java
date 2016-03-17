@@ -1,5 +1,10 @@
 package com.avaje.ebean;
 
+import com.avaje.ebean.search.Match;
+import com.avaje.ebean.search.MultiMatch;
+import com.avaje.ebean.search.TextCommonTerms;
+import com.avaje.ebean.search.TextQueryString;
+import com.avaje.ebean.search.TextSimple;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.NonUniqueResultException;
@@ -843,6 +848,47 @@ public interface ExpressionList<T> {
   ExpressionList<T> not(Expression exp);
 
   /**
+   * Add a match expression.
+   *
+   * @param propertyName The property name for the match
+   * @param search The search value
+   */
+  ExpressionList<T> match(String propertyName, String search);
+
+  /**
+   * Add a match expression with options.
+   *
+   * @param propertyName The property name for the match
+   * @param search The search value
+   */
+  ExpressionList<T> match(String propertyName, String search, Match options);
+
+  /**
+   * Add a multi-match expression.
+   */
+  ExpressionList<T>  multiMatch(String search, String... properties);
+
+  /**
+   * Add a multi-match expression using options.
+   */
+  ExpressionList<T> multiMatch(String search, MultiMatch options);
+
+  /**
+   * Add a simple query string expression.
+   */
+  ExpressionList<T> textSimple(String search, TextSimple options);
+
+  /**
+   * Add a query string expression.
+   */
+  ExpressionList<T> textQueryString(String search, TextQueryString options);
+
+  /**
+   * Add common terms expression.
+   */
+  ExpressionList<T> textCommonTerms(String search, TextCommonTerms options);
+
+  /**
    * Return a list of expressions that will be joined by AND's.
    */
   Junction<T> conjunction();
@@ -861,4 +907,33 @@ public interface ExpressionList<T> {
    */
   ExpressionList<T> endJunction();
 
+  /**
+   * Start a list of expressions that will be joined by MUST.
+   */
+  Junction<T> must();
+
+  /**
+   * Start a list of expressions that will be joined by SHOULD.
+   */
+  Junction<T> should();
+
+  /**
+   * Start a list of expressions that will be joined by MUST NOT.
+   */
+  Junction<T> mustNot();
+
+  /**
+   * End the list of MUST expressions.
+   */
+  ExpressionList<T> endMust();
+
+  /**
+   * End the list of SHOULD expressions.
+   */
+  ExpressionList<T> endShould();
+
+  /**
+   * End the list of MUST NOT expressions.
+   */
+  ExpressionList<T> endMustNot();
 }

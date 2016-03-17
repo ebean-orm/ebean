@@ -1316,7 +1316,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public TextExpressionList text() {
+  public ExpressionList<T> text() {
     if (textExpressions == null) {
       useDocStore = true;
       textExpressions = new DefaultExpressionList<T>(this);

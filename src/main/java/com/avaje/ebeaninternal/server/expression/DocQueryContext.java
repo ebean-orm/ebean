@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.server.expression;
 
+import com.avaje.ebean.Junction;
 import com.avaje.ebean.LikeType;
-import com.avaje.ebean.TextJunction;
 import com.avaje.ebean.search.Match;
 import com.avaje.ebean.search.MultiMatch;
 import com.avaje.ebean.search.TextCommonTerms;
@@ -130,7 +130,7 @@ public interface DocQueryContext {
   /**
    * Start a Must, Must Not or Should list.
    */
-  void startBoolGroupList(TextJunction.Type type) throws IOException;
+  void startBoolGroupList(Junction.Type type) throws IOException;
 
   /**
    * End a Must, Must Not or Should list.
