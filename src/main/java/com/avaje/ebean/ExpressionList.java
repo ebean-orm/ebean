@@ -833,21 +833,6 @@ public interface ExpressionList<T> {
   ExpressionList<T> raw(String raw);
 
   /**
-   * And - join two expressions with a logical and.
-   */
-  ExpressionList<T> and(Expression expOne, Expression expTwo);
-
-  /**
-   * Or - join two expressions with a logical or.
-   */
-  ExpressionList<T> or(Expression expOne, Expression expTwo);
-
-  /**
-   * Negate the expression (prefix it with NOT).
-   */
-  ExpressionList<T> not(Expression exp);
-
-  /**
    * Add a match expression.
    *
    * @param propertyName The property name for the match
@@ -887,6 +872,21 @@ public interface ExpressionList<T> {
    * Add common terms expression.
    */
   ExpressionList<T> textCommonTerms(String search, TextCommonTerms options);
+
+  /**
+   * And - join two expressions with a logical and.
+   */
+  ExpressionList<T> and(Expression expOne, Expression expTwo);
+
+  /**
+   * Or - join two expressions with a logical or.
+   */
+  ExpressionList<T> or(Expression expOne, Expression expTwo);
+
+  /**
+   * Negate the expression (prefix it with NOT).
+   */
+  ExpressionList<T> not(Expression exp);
 
   /**
    * Return a list of expressions that will be joined by AND's.
