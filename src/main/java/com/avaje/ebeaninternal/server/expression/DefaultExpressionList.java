@@ -910,16 +910,19 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public Junction<T> must() {
+    setUseDocStore(true);
     return junction(Junction.Type.MUST);
   }
 
   @Override
   public Junction<T> should() {
+    setUseDocStore(true);
     return junction(Junction.Type.SHOULD);
   }
 
   @Override
   public Junction<T> mustNot() {
+    setUseDocStore(true);
     return junction(Junction.Type.MUST_NOT);
   }
 
