@@ -653,6 +653,16 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public Junction<T> and() {
+    return conjunction();
+  }
+
+  @Override
+  public Junction<T> or() {
+    return disjunction();
+  }
+
+  @Override
   public Junction<T> conjunction() {
     Junction<T> conjunction = expr.conjunction(query, this);
     add(conjunction);

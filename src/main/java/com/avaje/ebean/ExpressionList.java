@@ -890,6 +890,18 @@ public interface ExpressionList<T> {
 
   /**
    * Return a list of expressions that will be joined by AND's.
+   * This is exactly the same as conjunction();
+   */
+  Junction<T> and();
+
+  /**
+   * Return a list of expressions that will be joined by OR's.
+   * This is exactly the same as disjunction();
+   */
+  Junction<T> or();
+
+  /**
+   * Return a list of expressions that will be joined by AND's.
    */
   Junction<T> conjunction();
 

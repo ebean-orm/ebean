@@ -321,6 +321,16 @@ abstract class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, E
   }
 
   @Override
+  public Junction<T> and() {
+    return conjunction();
+  }
+
+  @Override
+  public Junction<T> or() {
+    return disjunction();
+  }
+
+  @Override
   public Junction<T> conjunction() {
     return exprList.conjunction();
   }
