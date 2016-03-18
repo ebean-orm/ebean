@@ -63,7 +63,7 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.startBool(type == Type.AND);
+    context.startBool(type);
     List<SpiExpression> list = exprList.internalList();
     for (int i = 0; i < list.size(); i++) {
       list.get(i).writeDocQuery(context);

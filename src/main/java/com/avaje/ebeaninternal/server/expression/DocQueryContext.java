@@ -18,9 +18,9 @@ import java.util.Map;
 public interface DocQueryContext {
 
   /**
-   * Start a conjunction or disjunction.
+   * Start a junction.
    */
-  void startBool(boolean conjunction) throws IOException;
+  void startBool(Junction.Type type) throws IOException;
 
   /**
    * Start a conjunction.

@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.Expression;
+import com.avaje.ebean.Junction;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.ManyWhereJoins;
@@ -60,7 +61,7 @@ abstract class LogicExpression implements SpiExpression {
   public void writeDocQuery(DocQueryContext context) throws IOException {
 
     boolean conjunction = joinType.equals(AND);
-    context.startBool(conjunction);
+    context.startBool(conjunction ? Junction.Type.AND : Junction.Type.OR);
     expOne.writeDocQuery(context);
     expTwo.writeDocQuery(context);
     context.endBool();
