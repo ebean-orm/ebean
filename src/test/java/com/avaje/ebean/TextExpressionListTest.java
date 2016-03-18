@@ -47,14 +47,14 @@ public class TextExpressionListTest {
         .text()
         .must()
           .match("title", "quick")
-        .endMust()
+          .endJunction()
         .should()
           .match("title", "brown")
           .match("title", "dog")
-        .endShould()
+          .endJunction()
         .mustNot()
           .match("title", "lazy")
-        .endMustNot()
+          .endJunction()
         .where()
           .gt("reviewDate", 12345);
 

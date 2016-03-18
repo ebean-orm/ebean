@@ -44,10 +44,9 @@ public class TestExprNestedDisjunction extends BaseTestCase {
         .where()
         .or()
           .and()
-            .startsWith("name", "r").eq("anniversary", onAfter).endAnd()
+            .startsWith("name", "r").eq("anniversary", onAfter).endJunction()
           .and()
-            .eq("status", Customer.Status.ACTIVE).gt("id", 0).endAnd()
-        .endOr()
+            .eq("status", Customer.Status.ACTIVE).gt("id", 0).endJunction()
         .orderBy().asc("name");
 
     q.findList();
@@ -69,7 +68,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
           .not()
             .gt("id", 1)
             .eq("anniversary", onAfter)
-          .endNot()
+            .endJunction()
         .orderBy().asc("name");
 
     q.findList();

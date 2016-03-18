@@ -923,33 +923,4 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return junction(Junction.Type.MUST_NOT);
   }
 
-  @Override
-  public ExpressionList<T> endAnd() {
-    return endJunction();
-  }
-
-  @Override
-  public ExpressionList<T> endOr() {
-    return endJunction();
-  }
-
-  @Override
-  public ExpressionList<T> endNot() {
-    return endJunction();
-  }
-
-  @Override
-  public ExpressionList<T> endMust() {
-    return endJunction();
-  }
-
-  @Override
-  public ExpressionList<T> endShould() {
-    return endJunction();
-  }
-
-  @Override
-  public ExpressionList<T> endMustNot() {
-    return endJunction();
-  }
 }

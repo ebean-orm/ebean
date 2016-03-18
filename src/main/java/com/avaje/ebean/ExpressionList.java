@@ -931,41 +931,15 @@ public interface ExpressionList<T> {
   Junction<T> mustNot();
 
   /**
-   * End a Conjunction or Disjunction returning the parent expression list.
+   * End a junction returning the parent expression list.
    * <p>
-   * Alternatively you can always use where() to return the top level expression
-   * list.
+   *   Ends a and(), or(), not(), must(), mustNot() or should() junction
+   *   such that you get the parent expression.
+   * </p>
+   * <p>
+   * Alternatively you can always use where() to return the top level expression list.
    * </p>
    */
   ExpressionList<T> endJunction();
 
-  /**
-   * End the list of AND expressions.
-   */
-  ExpressionList<T> endAnd();
-
-  /**
-   * End the list of OR expressions.
-   */
-  ExpressionList<T> endOr();
-
-  /**
-   * End the list of NOT expressions.
-   */
-  ExpressionList<T> endNot();
-
-  /**
-   * End the list of MUST expressions.
-   */
-  ExpressionList<T> endMust();
-
-  /**
-   * End the list of SHOULD expressions.
-   */
-  ExpressionList<T> endShould();
-
-  /**
-   * End the list of MUST NOT expressions.
-   */
-  ExpressionList<T> endMustNot();
 }
