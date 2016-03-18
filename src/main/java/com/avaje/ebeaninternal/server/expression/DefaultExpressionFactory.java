@@ -436,35 +436,42 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * Return a list of expressions that will be joined by AND's.
    */
   public <T> Junction<T> conjunction(Query<T> query) {
-    return new JunctionExpression.Conjunction<T>(query, query.where());
+    return new JunctionExpression<T>(Junction.Type.AND, query, query.where());
   }
 
   /**
    * Return a list of expressions that will be joined by OR's.
    */
   public <T> Junction<T> disjunction(Query<T> query) {
-    return new JunctionExpression.Disjunction<T>(query, query.where());
+    return new JunctionExpression<T>(Junction.Type.OR, query, query.where());
   }
 
   /**
    * Return a list of expressions that will be joined by AND's.
    */
   public <T> Junction<T> conjunction(Query<T> query, ExpressionList<T> parent) {
-    return new JunctionExpression.Conjunction<T>(query, parent);
+    return new JunctionExpression<T>(Junction.Type.AND, query, parent);
   }
 
   /**
    * Return a list of expressions that will be joined by OR's.
    */
   public <T> Junction<T> disjunction(Query<T> query, ExpressionList<T> parent) {
-    return new JunctionExpression.Disjunction<T>(query, parent);
+    return new JunctionExpression<T>(Junction.Type.OR, query, parent);
+  }
+
+  /**
+   * Return a list of expressions that are wrapped by NOT.
+   */
+  public <T> Junction<T> junction(Junction.Type type, Query<T> query) {
+    return new JunctionExpression<T>(type, query, query.where());
   }
 
   /**
    * Create and return a Full text junction (Must, Must Not or Should).
    */
   @Override
-  public <T> Junction<T> textJunction(Query<T> query, ExpressionList<T> parent, Junction.Type type) {
-    return new JunctionExpression.TextJunction<T>(query, parent, type);
+  public <T> Junction<T> junction(Junction.Type type, Query<T> query, ExpressionList<T> parent) {
+    return new JunctionExpression<T>(type, query, parent);
   }
 }

@@ -203,15 +203,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public ExpressionList<T> endJunction() {
-    return parentExprList == null ? this : parentExprList;
-  }
-
-  protected ExpressionList<T> endTextJunction() {
-    return parentExprList == null ? this : parentExprList;
-  }
-
-  @Override
   public Query<T> query() {
     return query;
   }
@@ -646,40 +637,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return this;
   }
 
-  public Junction<T> textJunction(Junction.Type type) {
-    Junction<T> junction = expr.textJunction(query, this, type);
-    add(junction);
-    return junction;
-  }
-
-  @Override
-  public Junction<T> and() {
-    return conjunction();
-  }
-
-  @Override
-  public Junction<T> or() {
-    return disjunction();
-  }
-
-  @Override
-  public Junction<T> conjunction() {
-    Junction<T> conjunction = expr.conjunction(query, this);
-    add(conjunction);
-    return conjunction;
-  }
-
   @Override
   public ExpressionList<T> contains(String propertyName, String value) {
     add(expr.contains(propertyName, value));
     return this;
-  }
-
-  @Override
-  public Junction<T> disjunction() {
-    Junction<T> disjunction = expr.disjunction(query, this);
-    add(disjunction);
-    return disjunction;
   }
 
   @Override
@@ -911,33 +872,84 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return this;
   }
 
+  private Junction<T> junction(Junction.Type type) {
+    Junction<T> junction = expr.junction(type, query, this);
+    add(junction);
+    return junction;
+  }
+
+  @Override
+  public ExpressionList<T> endJunction() {
+    return parentExprList == null ? this : parentExprList;
+  }
+
+  @Override
+  public Junction<T> and() {
+    return conjunction();
+  }
+
+  @Override
+  public Junction<T> or() {
+    return disjunction();
+  }
+
+  @Override
+  public Junction<T> not() {
+    return junction(Junction.Type.NOT);
+  }
+
+  @Override
+  public Junction<T> conjunction() {
+    return junction(Junction.Type.AND);
+  }
+
+  @Override
+  public Junction<T> disjunction() {
+    return junction(Junction.Type.OR);
+  }
+
   @Override
   public Junction<T> must() {
-    return textJunction(Junction.Type.MUST);
+    return junction(Junction.Type.MUST);
   }
 
   @Override
   public Junction<T> should() {
-    return textJunction(Junction.Type.SHOULD);
+    return junction(Junction.Type.SHOULD);
   }
 
   @Override
   public Junction<T> mustNot() {
-    return textJunction(Junction.Type.MUST_NOT);
+    return junction(Junction.Type.MUST_NOT);
+  }
+
+  @Override
+  public ExpressionList<T> endAnd() {
+    return endJunction();
+  }
+
+  @Override
+  public ExpressionList<T> endOr() {
+    return endJunction();
+  }
+
+  @Override
+  public ExpressionList<T> endNot() {
+    return endJunction();
   }
 
   @Override
   public ExpressionList<T> endMust() {
-    return endTextJunction();
+    return endJunction();
   }
 
   @Override
   public ExpressionList<T> endShould() {
-    return endTextJunction();
+    return endJunction();
   }
 
   @Override
   public ExpressionList<T> endMustNot() {
-    return endTextJunction();
+    return endJunction();
   }
 }

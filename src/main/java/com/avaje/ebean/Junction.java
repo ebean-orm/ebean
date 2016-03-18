@@ -10,68 +10,68 @@ package com.avaje.ebean;
  * Note: where() always takes you to the top level WHERE expression list.
  * </p>
  *
- * <pre class="code">
+ * <pre>{@code
  * Query q =
  *     Ebean.find(Person.class)
  *         .where().disjunction()
- *         .like(&quot;name&quot;, &quot;Rob%&quot;)
- *         .eq(&quot;status&quot;, Status.NEW)
+ *         .like("name", "Rob%")
+ *         .eq("status", Status.NEW)
  *
  *         // where() returns us to the top level expression list
- *         .where().gt(&quot;id&quot;, 10);
+ *         .where().gt("id", 10);
  *
  * // read as...
  * // where ( ((name like Rob%) or (status = NEW)) AND (id &gt; 10) )
- * </pre>
+ * }</pre>
  *
  * <p>
  * Note: endJunction() takes you to the parent expression list
  * </p>
  *
- * <pre class="code">
+ * <pre>{@code
  * Query q =
  *     Ebean.find(Person.class)
  *         .where().disjunction()
- *         .like(&quot;name&quot;, &quot;Rob%&quot;)
- *         .eq(&quot;status&quot;, Status.NEW)
+ *         .like("name", "Rob%")
+ *         .eq("status", Status.NEW)
  *         .endJunction()
  *
  *         // endJunction().. takes us to the 'parent' expression list
  *         // which in this case is the top level (same as where())
  *
- *         .gt(&quot;id&quot;, 10);
+ *         .gt("id", 10);
  *
  * // read as...
  * // where ( ((name like Rob%) or (status = NEW)) AND (id &gt; 10) )
- * </pre>
+ * }</pre>
  *
  * <p>
  * Example of a nested disjunction.
  * </p>
  *
- * <pre class="code">
- * Query&lt;Customer&gt; q =
+ * <pre>{@code
+ * Query<Customer> q =
  *  Ebean.find(Customer.class)
  *      .where()
- *          .disjunction()
- *              .conjunction()
- *                  .startsWith(&quot;name&quot;, &quot;r&quot;)
- *                  .eq(&quot;anniversary&quot;, onAfter)
+ *          .or()
+ *              .and()
+ *                  .startsWith("name", "r")
+ *                  .eq("anniversary", onAfter)
  *                  .endJunction()
- *              .conjunction()
- *                  .eq(&quot;status&quot;, Customer.Status.ACTIVE)
- *                  .gt(&quot;id&quot;, 0)
+ *              .and()
+ *                  .eq("status", Customer.Status.ACTIVE)
+ *                  .gt("id", 0)
  *                  .endJunction()
- *      .order().asc(&quot;name&quot;);
+ *      .order().asc("name");
  *
  * q.findList();
  * String s = q.getGeneratedSql();
  *
  *  // this produces an expression like:
  *
- *  ( name like ? and c.anniversary = ? ) or (c.status = ?  and c.id &gt; ? )
+ *  ( name like ? and c.anniversary = ? ) or (c.status = ?  and c.id > ? )
  *
- * </pre>
+ * }</pre>
  */
 public interface Junction<T> extends Expression, ExpressionList<T> {
 
@@ -83,32 +83,39 @@ public interface Junction<T> extends Expression, ExpressionList<T> {
     /**
      * AND group.
      */
-    AND(" and "),
+    AND(" and ", ""),
 
     /**
      * OR group.
      */
-    OR(" or "),
+    OR(" or ", ""),
+
+    /**
+     * NOT group.
+     */
+    NOT(" and ", "not "),
 
     /**
      * Text search AND group.
      */
-    MUST("must"),
+    MUST("must", ""),
 
     /**
      * Text search NOT group.
      */
-    MUST_NOT("must_not"),
+    MUST_NOT("must_not", ""),
 
     /**
      * Text search OR group.
      */
-    SHOULD("should");
+    SHOULD("should", "");
 
+    String prefix;
     String literal;
 
-    Type(String literal) {
+    Type(String literal, String prefix) {
       this.literal = literal;
+      this.prefix = prefix;
     }
 
     /**
@@ -116,6 +123,13 @@ public interface Junction<T> extends Expression, ExpressionList<T> {
      */
     public String literal() {
       return literal;
+    }
+
+    /**
+     * Return the prefix value for this type.
+     */
+    public String prefix() {
+      return prefix;
     }
   }
 

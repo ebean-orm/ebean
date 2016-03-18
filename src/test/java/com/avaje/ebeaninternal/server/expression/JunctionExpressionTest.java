@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Expression;
+import com.avaje.ebean.Junction;
 import org.junit.Test;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
@@ -23,11 +24,11 @@ public class JunctionExpressionTest {
   }
 
   <T> JunctionExpression and(DefaultExpressionList<T> list) {
-    return new JunctionExpression.Conjunction<T>(list);
+    return new JunctionExpression<T>(Junction.Type.AND, list);
   }
 
   <T> JunctionExpression or(DefaultExpressionList<T> list) {
-    return new JunctionExpression.Disjunction<T>(list);
+    return new JunctionExpression<T>(Junction.Type.OR, list);
   }
 
   @Test

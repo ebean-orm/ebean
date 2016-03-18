@@ -901,6 +901,11 @@ public interface ExpressionList<T> {
   Junction<T> or();
 
   /**
+   * Return a list of expressions that will be wrapped by NOT.
+   */
+  Junction<T> not();
+
+  /**
    * Return a list of expressions that will be joined by AND's.
    */
   Junction<T> conjunction();
@@ -909,15 +914,6 @@ public interface ExpressionList<T> {
    * Return a list of expressions that will be joined by OR's.
    */
   Junction<T> disjunction();
-
-  /**
-   * End a Conjunction or Disjunction returning the parent expression list.
-   * <p>
-   * Alternatively you can always use where() to return the top level expression
-   * list.
-   * </p>
-   */
-  ExpressionList<T> endJunction();
 
   /**
    * Start a list of expressions that will be joined by MUST.
@@ -933,6 +929,30 @@ public interface ExpressionList<T> {
    * Start a list of expressions that will be joined by MUST NOT.
    */
   Junction<T> mustNot();
+
+  /**
+   * End a Conjunction or Disjunction returning the parent expression list.
+   * <p>
+   * Alternatively you can always use where() to return the top level expression
+   * list.
+   * </p>
+   */
+  ExpressionList<T> endJunction();
+
+  /**
+   * End the list of AND expressions.
+   */
+  ExpressionList<T> endAnd();
+
+  /**
+   * End the list of OR expressions.
+   */
+  ExpressionList<T> endOr();
+
+  /**
+   * End the list of NOT expressions.
+   */
+  ExpressionList<T> endNot();
 
   /**
    * End the list of MUST expressions.

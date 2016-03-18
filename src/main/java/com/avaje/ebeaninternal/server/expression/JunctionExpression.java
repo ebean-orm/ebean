@@ -1,6 +1,19 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import com.avaje.ebean.*;
+import com.avaje.ebean.Expression;
+import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.FetchPath;
+import com.avaje.ebean.FutureIds;
+import com.avaje.ebean.FutureList;
+import com.avaje.ebean.FutureRowCount;
+import com.avaje.ebean.Junction;
+import com.avaje.ebean.OrderBy;
+import com.avaje.ebean.PagedList;
+import com.avaje.ebean.Query;
+import com.avaje.ebean.QueryEachConsumer;
+import com.avaje.ebean.QueryEachWhileConsumer;
+import com.avaje.ebean.QueryIterator;
+import com.avaje.ebean.Version;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebean.search.Match;
 import com.avaje.ebean.search.MultiMatch;
@@ -25,52 +38,7 @@ import java.util.Set;
 /**
  * Junction implementation.
  */
-abstract class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, ExpressionList<T> {
-
-  static class TextJunction<T> extends JunctionExpression<T> {
-
-    TextJunction(Query<T> query, ExpressionList<T> parent, TextJunction.Type type) {
-      super(type, query, parent);
-    }
-    TextJunction(TextJunction.Type type, DefaultExpressionList<T> expressionList) {
-      super(type, expressionList);
-    }
-    @Override
-    public SpiExpression copyForPlanKey() {
-      return new TextJunction<T>(type, exprList.copyForPlanKey());
-    }
-  }
-
-  static class Conjunction<T> extends JunctionExpression<T> {
-
-    Conjunction(Query<T> query, ExpressionList<T> parent) {
-      super(Type.AND, query, parent);
-    }
-
-    Conjunction(DefaultExpressionList<T> expressionList) {
-      super(Type.AND, expressionList);
-    }
-    @Override
-    public SpiExpression copyForPlanKey() {
-      return new Conjunction<T>(exprList.copyForPlanKey());
-    }
-  }
-
-  static class Disjunction<T> extends JunctionExpression<T> {
-
-    Disjunction(Query<T> query, ExpressionList<T> parent) {
-      super(Type.OR, query, parent);
-    }
-
-    Disjunction(DefaultExpressionList<T> expressionList) {
-      super(Type.OR, expressionList);
-    }
-
-    @Override
-    public SpiExpression copyForPlanKey() {
-      return new Disjunction<T>(exprList.copyForPlanKey());
-    }
-  }
+class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, ExpressionList<T> {
 
   protected final DefaultExpressionList<T> exprList;
 
@@ -87,6 +55,10 @@ abstract class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, E
   JunctionExpression(Junction.Type type, DefaultExpressionList<T> exprList) {
     this.type = type;
     this.exprList = exprList;
+  }
+
+  public SpiExpression copyForPlanKey() {
+    return new JunctionExpression<T>(type, exprList.copyForPlanKey());
   }
 
   @Override
@@ -151,7 +123,6 @@ abstract class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, E
   public void addBindValues(SpiExpressionRequest request) {
 
     List<SpiExpression> list = exprList.internalList();
-
     for (int i = 0; i < list.size(); i++) {
       list.get(i).addBindValues(request);
     }
@@ -163,8 +134,8 @@ abstract class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, E
     List<SpiExpression> list = exprList.internalList();
 
     if (!list.isEmpty()) {
+      request.append(type.prefix());
       request.append("(");
-
       for (int i = 0; i < list.size(); i++) {
         SpiExpression item = list.get(i);
         if (i > 0) {
@@ -172,7 +143,6 @@ abstract class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, E
         }
         item.addSql(request);
       }
-
       request.append(") ");
     }
   }
@@ -200,12 +170,10 @@ abstract class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, E
   @Override
   public int queryBindHash() {
     int hc = JunctionExpression.class.getName().hashCode();
-
     List<SpiExpression> list = exprList.internalList();
     for (int i = 0; i < list.size(); i++) {
       hc = hc * 31 + list.get(i).queryBindHash();
     }
-
     return hc;
   }
 
@@ -261,44 +229,6 @@ abstract class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, E
     return exprList.textCommonTerms(search, options);
   }
 
-  @Override
-  public Junction<T> must() {
-    return exprList.must();
-  }
-
-  @Override
-  public Junction<T> should() {
-    return exprList.should();
-  }
-
-  @Override
-  public Junction<T> mustNot() {
-    return exprList.mustNot();
-  }
-
-  @Override
-  public ExpressionList<T> endMust() {
-    return endTextJunction();
-  }
-
-  @Override
-  public ExpressionList<T> endShould() {
-    return endTextJunction();
-  }
-
-  @Override
-  public ExpressionList<T> endMustNot() {
-    return endTextJunction();
-  }
-
-  private ExpressionList<T> endTextJunction() {
-    return exprList.endTextJunction();
-  }
-
-  @Override
-  public ExpressionList<T> endJunction() {
-    return exprList.endJunction();
-  }
 
   @Override
   public ExpressionList<T> allEq(Map<String, Object> propertyMap) {
@@ -321,28 +251,8 @@ abstract class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, E
   }
 
   @Override
-  public Junction<T> and() {
-    return conjunction();
-  }
-
-  @Override
-  public Junction<T> or() {
-    return disjunction();
-  }
-
-  @Override
-  public Junction<T> conjunction() {
-    return exprList.conjunction();
-  }
-
-  @Override
   public ExpressionList<T> contains(String propertyName, String value) {
     return exprList.contains(propertyName, value);
-  }
-
-  @Override
-  public Junction<T> disjunction() {
-    return exprList.disjunction();
   }
 
   @Override
@@ -785,6 +695,81 @@ abstract class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, E
   @Override
   public ExpressionList<T> where() {
     return exprList.where();
+  }
+
+  @Override
+  public Junction<T> and() {
+    return conjunction();
+  }
+
+  @Override
+  public Junction<T> or() {
+    return disjunction();
+  }
+
+  @Override
+  public Junction<T> not() {
+    return exprList.not();
+  }
+
+  @Override
+  public Junction<T> conjunction() {
+    return exprList.conjunction();
+  }
+
+  @Override
+  public Junction<T> disjunction() {
+    return exprList.disjunction();
+  }
+
+  @Override
+  public Junction<T> must() {
+    return exprList.must();
+  }
+
+  @Override
+  public Junction<T> should() {
+    return exprList.should();
+  }
+
+  @Override
+  public Junction<T> mustNot() {
+    return exprList.mustNot();
+  }
+
+  @Override
+  public ExpressionList<T> endJunction() {
+    return exprList.endJunction();
+  }
+
+  @Override
+  public ExpressionList<T> endAnd() {
+    return endJunction();
+  }
+
+  @Override
+  public ExpressionList<T> endOr() {
+    return endJunction();
+  }
+
+  @Override
+  public ExpressionList<T> endNot() {
+    return endJunction();
+  }
+
+  @Override
+  public ExpressionList<T> endMust() {
+    return endJunction();
+  }
+
+  @Override
+  public ExpressionList<T> endShould() {
+    return endJunction();
+  }
+
+  @Override
+  public ExpressionList<T> endMustNot() {
+    return endJunction();
   }
 
 }
