@@ -309,7 +309,10 @@ public class BaseTableDdl implements TableDdl {
 
   protected void alterTableAddForeignKey(DdlBuffer buffer, String fkName, String tableName, String[] columns, String refTable, String[] refColumns) throws IOException {
 
-    buffer.append(platformDdl.alterTableAddForeignKey(tableName, fkName, columns, refTable, refColumns)).endOfStatement();
+    String fkConstraint = platformDdl.alterTableAddForeignKey(tableName, fkName, columns, refTable, refColumns);
+    if (fkConstraint != null && !fkConstraint.isEmpty()) {
+      buffer.append(fkConstraint).endOfStatement();
+    }
   }
 
   protected void appendColumns(String[] columns, DdlBuffer buffer) throws IOException {
