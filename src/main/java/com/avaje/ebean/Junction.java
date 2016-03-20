@@ -13,12 +13,13 @@ package com.avaje.ebean;
  * <pre>{@code
  * Query q =
  *     Ebean.find(Person.class)
- *         .where().disjunction()
- *         .like("name", "Rob%")
- *         .eq("status", Status.NEW)
+ *       .where()
+ *         .or()
+ *           .like("name", "Rob%")
+ *           .eq("status", Status.NEW)
  *
- *         // where() returns us to the top level expression list
- *         .where().gt("id", 10);
+ *       // where() returns us to the top level expression list
+ *       .where().gt("id", 10);
  *
  * // read as...
  * // where ( ((name like Rob%) or (status = NEW)) AND (id &gt; 10) )
@@ -31,18 +32,19 @@ package com.avaje.ebean;
  * <pre>{@code
  * Query q =
  *     Ebean.find(Person.class)
- *         .where().disjunction()
- *         .like("name", "Rob%")
- *         .eq("status", Status.NEW)
- *         .endJunction()
+ *       .where()
+ *         .or()
+ *           .like("name", "Rob%")
+ *           .eq("status", Status.NEW)
+ *           .endJunction()
  *
- *         // endJunction().. takes us to the 'parent' expression list
- *         // which in this case is the top level (same as where())
+ *           // endJunction().. takes us to the 'parent' expression list
+ *           // which in this case is the top level (same as where())
  *
  *         .gt("id", 10);
  *
  * // read as...
- * // where ( ((name like Rob%) or (status = NEW)) AND (id &gt; 10) )
+ * // where ( ((name like Rob%) or (status = NEW)) AND (id > 10) )
  * }</pre>
  *
  * <p>
@@ -53,22 +55,21 @@ package com.avaje.ebean;
  * Query<Customer> q =
  *  Ebean.find(Customer.class)
  *      .where()
- *          .or()
- *              .and()
- *                  .startsWith("name", "r")
- *                  .eq("anniversary", onAfter)
- *                  .endJunction()
- *              .and()
- *                  .eq("status", Customer.Status.ACTIVE)
- *                  .gt("id", 0)
- *                  .endJunction()
+ *        .or()
+ *          .and()
+ *            .startsWith("name", "r")
+ *            .eq("anniversary", onAfter)
+ *            .endJunction()
+ *          .and()
+ *            .eq("status", Customer.Status.ACTIVE)
+ *            .gt("id", 0)
+ *            .endJunction()
  *      .order().asc("name");
  *
  * q.findList();
  * String s = q.getGeneratedSql();
  *
  *  // this produces an expression like:
- *
  *  ( name like ? and c.anniversary = ? ) or (c.status = ?  and c.id > ? )
  *
  * }</pre>

@@ -889,52 +889,165 @@ public interface ExpressionList<T> {
   ExpressionList<T> not(Expression exp);
 
   /**
-   * Return a list of expressions that will be joined by AND's.
+   * Start a list of expressions that will be joined by AND's
+   * returning the expression list the expressions are added to.
+   * <p>
    * This is exactly the same as conjunction();
+   * </p>
+   * <p>
+   * Use endJunction() to end the AND junction.
+   * </p>
+   * <p>
+   * Note that a where() clause defaults to an AND junction so
+   * typically you only explicitly need to use the and() junction
+   * when it is nested inside an or() or not() junction.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  // Example: Nested and()
+   *
+   *  Ebean.find(Customer.class)
+   *    .where()
+   *    .or()
+   *      .and() // nested and
+   *        .startsWith("name", "r")
+   *        .eq("anniversary", onAfter)
+   *        .endJunction() // end AND junction
+   *      .and()
+   *        .eq("status", Customer.Status.ACTIVE)
+   *        .gt("id", 0)
+   *        .endJunction() // end AND junction
+   *      .orderBy().asc("name")
+   *      .findList();
+   * }</pre>
    */
   Junction<T> and();
 
   /**
    * Return a list of expressions that will be joined by OR's.
    * This is exactly the same as disjunction();
+   *
+   * <p>
+   *   Use endJunction() to end the OR junction.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  // Example: Use or() to join
+   *  // two nested and() expressions
+   *
+   *  Ebean.find(Customer.class)
+   *    .where()
+   *    .or()
+   *      .and()
+   *        .startsWith("name", "r")
+   *        .eq("anniversary", onAfter)
+   *        .endJunction() // end AND junction
+   *      .and()
+   *        .eq("status", Customer.Status.ACTIVE)
+   *        .gt("id", 0)
+   *        .endJunction() // end AND junction
+   *      .orderBy().asc("name")
+   *      .findList();
+   *
+   * }</pre>
    */
   Junction<T> or();
 
   /**
    * Return a list of expressions that will be wrapped by NOT.
+   * <p>
+   *   Use endJunction() to end expressions being added to the
+   *   NOT expression list.
+   * </p>
+   *
+   * <pre>@{code
+   *
+   *    .where()
+   *      .not()
+   *        .gt("id", 1)
+   *        .eq("anniversary", onAfter)
+   *        .endJunction() // end the not expressions
+   *
+   * }</pre>
+   *
+   * <pre>@{code
+   *
+   * // Example: nested not()
+   *
+   * Ebean.find(Customer.class)
+   *   .where()
+   *     .eq("status", Customer.Status.ACTIVE)
+   *     .not()
+   *       .gt("id", 1)
+   *       .eq("anniversary", onAfter)
+   *       .endJunction() // end the not expressions
+   *     .orderBy()
+   *       .asc("name")
+   *     .findList();
+   *
+   * }</pre>
    */
   Junction<T> not();
 
   /**
-   * Return a list of expressions that will be joined by AND's.
+   * Start (and return) a list of expressions that will be joined by AND's.
+   * <p>
+   * This is the same as and().
+   * </p>
    */
   Junction<T> conjunction();
 
   /**
-   * Return a list of expressions that will be joined by OR's.
+   * Start (and return) a list of expressions that will be joined by OR's.
+   * <p>
+   * This is the same as or().
+   * </p>
    */
   Junction<T> disjunction();
 
   /**
    * Start a list of expressions that will be joined by MUST.
+   * <p>
+   * This automatically makes the query a useDocStore(true) query that
+   * will execute against the document store (ElasticSearch etc).
+   * </p>
+   * <p>
+   * This is logically similar to and().
+   * </p>
    */
   Junction<T> must();
 
   /**
    * Start a list of expressions that will be joined by SHOULD.
+   * <p>
+   * This automatically makes the query a useDocStore(true) query that
+   * will execute against the document store (ElasticSearch etc).
+   * </p>
+   * <p>
+   * This is logically similar to or().
+   * </p>
    */
   Junction<T> should();
 
   /**
    * Start a list of expressions that will be joined by MUST NOT.
+   * <p>
+   * This automatically makes the query a useDocStore(true) query that
+   * will execute against the document store (ElasticSearch etc).
+   * </p>
+   * <p>
+   * This is logically similar to not().
+   * </p>
    */
   Junction<T> mustNot();
 
   /**
    * End a junction returning the parent expression list.
    * <p>
-   *   Ends a and(), or(), not(), must(), mustNot() or should() junction
-   *   such that you get the parent expression.
+   * Ends a and(), or(), not(), must(), mustNot() or should() junction
+   * such that you get the parent expression.
    * </p>
    * <p>
    * Alternatively you can always use where() to return the top level expression list.
