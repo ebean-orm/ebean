@@ -27,13 +27,16 @@ public interface DocumentStore {
    * that will fetch a lot of beans. The default bulkBatchSize is used.
    * </p>
    *
-   * @param query The query used to update the associated document store.
+   * @param query The query that selects object to send to the document store.
    */
   <T> void indexByQuery(Query<T> query);
 
   /**
    * Update the associated document store index using the result of the query additionally specifying a
    * bulkBatchSize to use for sending the messages to ElasticSearch.
+   *
+   * @param query         The query that selects object to send to the document store.
+   * @param bulkBatchSize The batch size to use when bulk sending to the document store.
    */
   <T> void indexByQuery(Query<T> query, int bulkBatchSize);
 
@@ -41,18 +44,43 @@ public interface DocumentStore {
    * Update the document store for all beans of this type.
    * <p>
    * This is the same as indexByQuery where the query has no predicates and so fetches all rows.
+   * </p>
    */
   void indexAll(Class<?> beanType);
 
   /**
    * Return the bean by fetching it's content from the document store.
    * If the document is not found null is returned.
+   * <p>
+   * Typically this is called indirectly by findUnique() on the query.
+   * </p>
+   * <pre>{@code
+   *
+   * Customer customer =
+   *   server.find(Customer.class)
+   *     .setUseDocStore(true)
+   *     .setId(42)
+   *     .findUnique();
+   *
+   * }</pre>
    */
   @Nullable
   <T> T find(DocQueryRequest<T> request);
 
   /**
    * Execute the find list query. This request is prepared to execute secondary queries.
+   * <p>
+   * Typically this is called indirectly by findList() on the query that has setUseDocStore(true).
+   * </p>
+   * <pre>{@code
+   *
+   * List<Customer> newCustomers =
+   *  server.find(Customer.class)
+   *    .setUseDocStore(true)
+   *    .where().eq("status, Customer.Status.NEW)
+   *    .findList();
+   *
+   * }</pre>
    */
   <T> List<T> findList(DocQueryRequest<T> request);
 
@@ -61,6 +89,21 @@ public interface DocumentStore {
    * <p>
    * The query should have <code>firstRow</code> or <code>maxRows</code> set prior to calling this method.
    * </p>
+   * <p>
+   * Typically this is called indirectly by findPagedList() on the query that has setUseDocStore(true).
+   * </p>
+   *
+   * <pre>{@code
+   *
+   * PagedList<Customer> newCustomers =
+   *  server.find(Customer.class)
+   *    .setUseDocStore(true)
+   *    .where().eq("status, Customer.Status.NEW)
+   *    .setMaxRows(50)
+   *    .findPagedList();
+   *
+   * }</pre>
+   *
    */
   <T> PagedList<T> findPagedList(DocQueryRequest<T> request);
 
@@ -70,6 +113,23 @@ public interface DocumentStore {
    * <p>
    * For example, with the ElasticSearch doc store this uses SCROLL.
    * </p>
+   * <p>
+   * Typically this is called indirectly by findEach() on the query that has setUseDocStore(true).
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *  server.find(Order.class)
+   *    .setUseDocStore(true)
+   *    .where()... // perhaps add predicates
+   *    .findEach(new QueryEachConsumer<Order>() {
+   *      @Override
+   *      public void accept(Order bean) {
+   *        // process the bean
+   *      }
+   *    });
+   *
+   * }</pre>
    */
   <T> void findEach(DocQueryRequest<T> query, QueryEachConsumer<T> consumer);
 
@@ -82,6 +142,28 @@ public interface DocumentStore {
    * <p>
    * For example, with the ElasticSearch doc store this uses SCROLL.
    * </p>
+   * <p>
+   * Typically this is called indirectly by findEachWhile() on the query that has setUseDocStore(true).
+   * </p>
+   *
+   *
+   * <pre>{@code
+   *
+   *  server.find(Order.class)
+   *    .setUseDocStore(true)
+   *    .where()... // perhaps add predicates
+   *    .findEachWhile(new QueryEachWhileConsumer<Order>() {
+   *      @Override
+   *      public void accept(Order bean) {
+   *        // process the bean
+   *
+   *        // return true to continue, false to stop
+   *        // boolean shouldContinue = ...
+   *        return shouldContinue;
+   *      }
+   *    });
+   *
+   * }</pre>
    */
   <T> void findEachWhile(DocQueryRequest<T> query, QueryEachWhileConsumer<T> consumer);
 
@@ -92,11 +174,31 @@ public interface DocumentStore {
 
   /**
    * Drop the index from the document store (similar to DDL drop table).
+   *
+   * <pre>{@code
+   *
+   *   DocumentStore documentStore = server.docStore();
+   *
+   *   documentStore.dropIndex("product_copy");
+   *
+   * }</pre>
+   *
    */
   void dropIndex(String indexName);
 
   /**
    * Create an index given a mapping file as a resource in the classPath (similar to DDL create table).
+   *
+   * <pre>{@code
+   *
+   *   DocumentStore documentStore = server.docStore();
+   *
+   *   // uses product_copy.mapping.json resource
+   *   // ... to define mappings for the index
+   *
+   *   documentStore.createIndex("product_copy", null);
+   *
+   * }</pre>
    *
    * @param indexName       the name of the new index
    * @param alias           the alias of the index
@@ -114,7 +216,6 @@ public interface DocumentStore {
    *  long copyCount = documentStore.copyIndex(Product.class, "product_copy");
    *
    * }</pre>
-   *
    *
    * @param beanType The bean type of the source index
    * @param newIndex The name of the index to copy to
@@ -134,7 +235,6 @@ public interface DocumentStore {
    *  long copyCount = documentStore.copyIndex(Product.class, "product_copy", sinceMillis);
    *
    * }</pre>
-   *
    *
    * @param beanType The bean type of the source index
    * @param newIndex The name of the index to copy to
