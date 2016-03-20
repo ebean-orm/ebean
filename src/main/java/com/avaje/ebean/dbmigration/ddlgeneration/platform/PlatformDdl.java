@@ -85,6 +85,11 @@ public class PlatformDdl {
 
   protected DbConstraintNaming naming;
 
+  /**
+   * Generally not desired as then they are not named (used with SQLite).
+   */
+  protected boolean inlineForeignKeys;
+
   public PlatformDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
     this.dbIdentity = dbIdentity;
     this.typeConverter = new PlatformTypeConverter(platformTypes);
@@ -126,6 +131,14 @@ public class PlatformDdl {
    */
   public boolean isInlineComments() {
     return inlineComments;
+  }
+
+  /**
+   * Return true if foreign key reference constraints need to inlined with create table.
+   * Ideally we don't do this as then the constraints are not named. Do this for SQLite.
+   */
+  public boolean isInlineForeignKeys() {
+    return inlineForeignKeys;
   }
 
   /**
@@ -252,6 +265,20 @@ public class PlatformDdl {
     buffer.append("create index ").append(indexName).append(" on ").append(tableName);
     appendColumns(columns, buffer);
 
+    return buffer.toString();
+  }
+
+  /**
+   * Return the foreign key constraint when used inline with create table.
+   */
+  public String tableInlineForeignKey(String[] columns, String refTable, String[] refColumns) {
+
+    StringBuilder buffer = new StringBuilder(90);
+    buffer.append("foreign key");
+    appendColumns(columns, buffer);
+    buffer.append(" references ").append(lowerTableName(refTable));
+    appendColumns(refColumns, buffer);
+    appendWithSpace(foreignKeyRestrict, buffer);
     return buffer.toString();
   }
 

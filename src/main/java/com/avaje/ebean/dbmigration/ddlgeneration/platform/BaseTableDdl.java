@@ -123,6 +123,9 @@ public class BaseTableDdl implements TableDdl {
       // defined on the columns
       writePrimaryKeyConstraint(apply, createTable.getPkName(), toColumnNames(pk));
     }
+    if (platformDdl.isInlineForeignKeys()) {
+      writeInlineForeignKeys(writer, createTable);
+    }
 
     apply.newLine().append(")");
     addTableCommentInline(apply, createTable);
@@ -151,8 +154,9 @@ public class BaseTableDdl implements TableDdl {
     apply.end();
     writer.dropAll().end();
 
-    writeAddForeignKeys(writer, createTable);
-
+    if (!platformDdl.isInlineForeignKeys()) {
+      writeAddForeignKeys(writer, createTable);
+    }
   }
 
   /**
@@ -233,6 +237,43 @@ public class BaseTableDdl implements TableDdl {
 
     MTable table = writer.getTable(name);
     platformDdl.createWithHistory(writer, table);
+  }
+
+  protected void writeInlineForeignKeys(DdlWrite write, CreateTable createTable) throws IOException {
+
+    for (Column column : createTable.getColumn()) {
+      String references = column.getReferences();
+      if (hasValue(references)) {
+        writeInlineForeignKey(write, column);
+      }
+    }
+    writeInlineCompoundForeignKeys(write, createTable);
+  }
+
+  protected void writeInlineForeignKey(DdlWrite write, Column column) throws IOException {
+
+    String references = column.getReferences();
+    int pos = references.lastIndexOf('.');
+    if (pos == -1) {
+      throw new IllegalStateException("Expecting period '.' character for table.column split but not found in [" + references + "]");
+    }
+    String refTableName = references.substring(0, pos);
+    String refColumnName = references.substring(pos + 1);
+    String fkConstraint = platformDdl.tableInlineForeignKey(new String[]{column.getName()}, refTableName, new String[]{refColumnName});
+    write.apply().append(",").newLine().append("  ").append(fkConstraint);
+  }
+
+  protected void writeInlineCompoundForeignKeys(DdlWrite write, CreateTable createTable) throws IOException {
+
+    List<ForeignKey> foreignKey = createTable.getForeignKey();
+    for (ForeignKey key : foreignKey) {
+      String refTableName = key.getRefTableName();
+      String[] cols = toColumnNamesSplit(key.getColumnNames());
+      String[] refColumns = toColumnNamesSplit(key.getRefColumnNames());
+
+      String fkConstraint = platformDdl.tableInlineForeignKey(cols, refTableName, refColumns);
+      write.apply().append(",").newLine().append("  ").append(fkConstraint);
+    }
   }
 
   protected void writeAddForeignKeys(DdlWrite write, CreateTable createTable) throws IOException {

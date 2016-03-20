@@ -14,6 +14,7 @@ public class SQLiteDdl extends PlatformDdl {
   public SQLiteDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
     super(platformTypes, dbIdentity);
     this.identitySuffix = "";
+    this.inlineForeignKeys = true;
   }
 
   @Override
