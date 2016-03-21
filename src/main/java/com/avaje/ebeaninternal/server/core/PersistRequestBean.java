@@ -563,6 +563,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
+   * Return true if this was a hard/permanent delete request (and should cascade as such).
+   */
+  public boolean isHardDeleteCascade() {
+    return (type == Type.DELETE && beanDescriptor.isSoftDelete());
+  }
+
+  /**
    * Checks for @Draftable entity beans with @Draft property that the bean is a 'draft'.
    * Save or Update is not allowed to execute using 'live' beans - must use publish().
    */
