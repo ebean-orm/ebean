@@ -48,10 +48,4 @@ public abstract class BaseModel extends Model {
     return this.deleted;
   }
 
-  /**
-   * Delete this entry permanently.
-   */
-  public boolean deletePermanent() {
-    return db().deletePermanent(this);
-  }
 }

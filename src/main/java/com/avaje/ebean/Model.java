@@ -271,6 +271,19 @@ public abstract class Model {
   }
 
   /**
+   * Delete a bean permanently without soft delete.
+   * <p>
+   * This is used when the bean contains a <code>@SoftDelete</code> property and we
+   * want to perform a hard/permanent delete.
+   * </p>
+   *
+   * @see EbeanServer#deletePermanent(Object)
+   */
+  public boolean deletePermanent() {
+    return db().deletePermanent(this);
+  }
+
+  /**
    * Perform an update using this entity against the specified server.
    */
   public void update(String server) {
