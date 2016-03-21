@@ -44,13 +44,37 @@ public class TestSoftDeleteBasic extends BaseTestCase {
   }
 
   @Test
-  public void testDeleteById() {
+  public void testDeleteById_and_findRowCount() {
 
     EBasicSoftDelete bean = new EBasicSoftDelete();
     bean.setName("two");
     Ebean.save(bean);
 
+    int rowCountBefore = Ebean.find(EBasicSoftDelete.class).findRowCount();
+
     Ebean.delete(EBasicSoftDelete.class, bean.getId());
+
+
+    // -- test .findRowCount()
+
+    LoggedSqlCollector.start();
+    int rowCountAfter = Ebean.find(EBasicSoftDelete.class).findRowCount();
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(1);
+    assertThat(loggedSql.get(0)).contains("where coalesce(t0.deleted,false)=false");
+
+    assertThat(rowCountAfter).isEqualTo(rowCountBefore - 1);
+
+    // -- test includeSoftDeletes().findRowCount()
+
+    LoggedSqlCollector.start();
+    int rowCountFull = Ebean.find(EBasicSoftDelete.class).includeSoftDeletes().findRowCount();
+    assertThat(rowCountFull).isGreaterThan(rowCountAfter);
+
+    loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(1);
+    assertThat(loggedSql.get(0)).doesNotContain("where coalesce(t0.deleted,false)=false");
   }
 
   @Test

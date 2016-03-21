@@ -600,10 +600,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     if (detail != null) {
       copy.detail = detail.copy();
     }
-    if (temporalMode == TemporalMode.DRAFT) {
-      copy.temporalMode = TemporalMode.DRAFT;
-    }
-
+    copy.temporalMode = temporalMode;
     copy.firstRow = firstRow;
     copy.maxRows = maxRows;
     copy.rawWhereClause = rawWhereClause;

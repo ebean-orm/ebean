@@ -234,6 +234,10 @@ public class CQueryBuilder {
     predicates.prepare(true);
 
     SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
+    if (SpiQuery.TemporalMode.CURRENT == query.getTemporalMode()) {
+      sqlTree.addSoftDeletePredicate(query);
+    }
+
     SqlLimitResponse s = buildSql(sqlSelect, request, predicates, sqlTree);
     String sql = s.getSql();
     if (hasMany || query.isRawSql()) {
