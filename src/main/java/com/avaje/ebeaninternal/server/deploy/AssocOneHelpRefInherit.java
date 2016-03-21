@@ -34,6 +34,8 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
     // read discriminator to determine the type
     InheritInfo rowInheritInfo = inherit.readType(ctx);
     if (rowInheritInfo == null) {
+      // ignore the id property
+      property.targetIdBinder.loadIgnore(ctx);
       return null;
     }
 

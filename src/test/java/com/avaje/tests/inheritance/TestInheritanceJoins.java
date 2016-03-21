@@ -16,34 +16,55 @@ import com.avaje.tests.inheritance.model.ProductConfiguration;
 
 public class TestInheritanceJoins extends BaseTestCase {
 
-
 	@Test
 	public void testAssocOne() {
 
-	  EbeanServer server = Ebean.getServer(null);
+	  EbeanServer server = Ebean.getDefaultServer();
 	  
-		final ProductConfiguration pc = new ProductConfiguration();
+		ProductConfiguration pc = new ProductConfiguration();
 		pc.setName("PC1");
 		server.save(pc);
 
-		final GroupConfiguration gc = new GroupConfiguration();
+		GroupConfiguration gc = new GroupConfiguration();
 		gc.setName("GC1");
 		server.save(gc);
 
 		CalculationResult r = new CalculationResult();
-		final Double charge = 100.0;
-		r.setCharge(charge);
+		r.setCharge(100.0);
 		r.setProductConfiguration(pc);
 		r.setGroupConfiguration(gc);
 		server.save(r);
 
 
 		Query<CalculationResult> q = server.createNamedQuery(CalculationResult.class, "loadResult");
-		q.setParameter("charge", charge);
+		q.setParameter("charge", 100.0);
 		
 		List<CalculationResult> results = q.findList();
 		
 		Assert.assertTrue(!results.isEmpty());
+	}
+
+	@Test
+	public void assocOne_when_null() {
+
+		EbeanServer server = Ebean.getDefaultServer();
+
+		GroupConfiguration gc = new GroupConfiguration();
+		gc.setName("GC1");
+		server.save(gc);
+
+		CalculationResult r = new CalculationResult();
+		r.setCharge(100.0);
+
+		// @ManyToOne with inheritance and null
+		r.setProductConfiguration(null);
+		r.setGroupConfiguration(gc);
+		server.save(r);
+
+		CalculationResult result = server.find(CalculationResult.class, r.getId());
+
+		GroupConfiguration group  = result.getGroupConfiguration();
+		Assert.assertEquals(group.getId(), gc.getId());
 	}
 	
 	@Test
