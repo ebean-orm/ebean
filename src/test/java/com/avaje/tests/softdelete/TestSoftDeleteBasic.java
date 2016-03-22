@@ -62,7 +62,8 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
-    assertThat(loggedSql.get(0)).contains("where coalesce(t0.deleted,false)=false");
+    // usually where coalesce(t0.deleted,false)=false but false is 0 for Oracle etc
+    assertThat(loggedSql.get(0)).contains("where coalesce(t0.deleted,");
 
     assertThat(rowCountAfter).isEqualTo(rowCountBefore - 1);
 

@@ -7,6 +7,7 @@ import com.avaje.ebean.annotation.Draftable;
 import com.avaje.ebean.annotation.History;
 import com.avaje.ebean.annotation.SoftDelete;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import java.sql.Timestamp;
@@ -34,7 +35,7 @@ public class Link extends BaseDomain {
   /**
    * Draft reset to null on publish.
    */
-  @DraftReset
+  @DraftReset @Column(name = "link_comment")
   String comment;
 
   /**
