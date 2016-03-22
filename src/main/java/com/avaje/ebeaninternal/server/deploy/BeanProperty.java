@@ -220,6 +220,11 @@ public class BeanProperty implements ElPropertyValue, Property {
   final String dbColumnDefn;
 
   /**
+   * DB Column default value for DDL definition (FALSE, NOW etc).
+   */
+  final String dbColumnDefault;
+
+  /**
    * Database DDL column comment.
    */
   final String dbComment;
@@ -298,6 +303,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbScale = deploy.getDbScale();
     this.dbColumnDefn = InternString.intern(deploy.getDbColumnDefn());
     this.dbConstraintExpression = InternString.intern(deploy.getDbConstraintExpression());
+    this.dbColumnDefault = deploy.getDbColumnDefault();
 
     this.inherited = false;// deploy.isInherited();
     this.owningType = deploy.getOwningType();
@@ -407,6 +413,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbScale = source.getDbScale();
     this.dbColumnDefn = InternString.intern(source.getDbColumnDefn());
     this.dbConstraintExpression = InternString.intern(source.getDbConstraintExpression());
+    this.dbColumnDefault = source.dbColumnDefault;
 
     this.inherited = source.isInherited();
     this.owningType = source.owningType;
@@ -943,6 +950,13 @@ public class BeanProperty implements ElPropertyValue, Property {
       return dbColumnDefn;
     }
     return dbType.renderType(dbLength, dbScale);
+  }
+
+  /**
+   * Return the DB column default to use for DDL.
+   */
+  public String getDbColumnDefault() {
+    return dbColumnDefn != null ? null : dbColumnDefault;
   }
 
   /**

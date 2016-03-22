@@ -1,7 +1,6 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
-import com.avaje.ebean.config.dbplatform.DbIdentity;
-import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 
@@ -12,8 +11,8 @@ import java.io.IOException;
  */
 public class MsSqlServerDdl extends PlatformDdl {
 
-  public MsSqlServerDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
-    super(platformTypes, dbIdentity);
+  public MsSqlServerDdl(DatabasePlatform platform) {
+    super(platform);
     this.identitySuffix = " identity(1,1)";
     this.foreignKeyRestrict = "";
     this.inlineUniqueOneToOne = false;

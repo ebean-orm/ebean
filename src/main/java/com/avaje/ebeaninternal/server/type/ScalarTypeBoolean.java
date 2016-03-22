@@ -70,12 +70,12 @@ public class ScalarTypeBoolean {
    * type.boolean.dbtype="bit" in the ebean configuration
    * </p>
    */
-  public static class BitBoolean extends BooleanBase {
+  static class BitBoolean extends BooleanBase {
 
     /**
      * Native Boolean database type.
      */
-    public BitBoolean() {
+    BitBoolean() {
       super(true, Types.BIT);
     }
 
@@ -116,12 +116,12 @@ public class ScalarTypeBoolean {
   /**
    * Converted to/from an Integer in the Database.
    */
-  public static class IntBoolean extends BooleanBase {
+  static class IntBoolean extends BooleanBase {
 
     private final Integer trueValue;
     private final Integer falseValue;
 
-    public IntBoolean(Integer trueValue, Integer falseValue) {
+    IntBoolean(Integer trueValue, Integer falseValue) {
       super(false, Types.INTEGER);
       this.trueValue = trueValue;
       this.falseValue = falseValue;
@@ -169,7 +169,7 @@ public class ScalarTypeBoolean {
     /**
      * Convert the Boolean value to the db value.
      */
-    public Integer toInteger(Object value) {
+    Integer toInteger(Object value) {
       if (value == null) {
         return null;
       }
@@ -199,12 +199,12 @@ public class ScalarTypeBoolean {
   /**
    * Converted to/from an Integer in the Database.
    */
-  public static class StringBoolean extends BooleanBase {
+  static class StringBoolean extends BooleanBase {
 
     private final String trueValue;
     private final String falseValue;
 
-    public StringBoolean(String trueValue, String falseValue) {
+    StringBoolean(String trueValue, String falseValue) {
       super(false, Types.VARCHAR);
       this.trueValue = trueValue;
       this.falseValue = falseValue;
@@ -280,9 +280,9 @@ public class ScalarTypeBoolean {
     }
   }
 
-  public static abstract class BooleanBase extends ScalarTypeBase<Boolean> {
+  public static abstract class BooleanBase extends ScalarTypeBase<Boolean> implements ScalarTypeBool {
 
-    public BooleanBase(boolean jdbcNative, int jdbcType) {
+    BooleanBase(boolean jdbcNative, int jdbcType) {
       super(Boolean.class, jdbcNative, jdbcType);
     }
 

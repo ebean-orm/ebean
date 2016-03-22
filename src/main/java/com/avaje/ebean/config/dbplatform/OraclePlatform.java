@@ -18,7 +18,7 @@ public class OraclePlatform extends DatabasePlatform {
     this.maxConstraintNameLength = 30;
     this.dbEncrypt = new OracleDbEncrypt();
     this.sqlLimiter = new RownumSqlLimiter();
-    this.platformDdl = new Oracle10Ddl(this.dbTypeMap, this.dbIdentity);
+    this.platformDdl = new Oracle10Ddl(this);
     this.historySupport = new OracleDbHistorySupport();
 
     // Not using getGeneratedKeys as instead we will

@@ -1,7 +1,6 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
-import com.avaje.ebean.config.dbplatform.DbIdentity;
-import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.Column;
@@ -14,8 +13,8 @@ import java.io.IOException;
  */
 public class MySqlDdl extends PlatformDdl {
 
-  public MySqlDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
-    super(platformTypes, dbIdentity);
+  public MySqlDdl(DatabasePlatform platform) {
+    super(platform);
     this.alterColumn =  "modify";
     this.dropUniqueConstraint = "drop index";
     this.historyDdl = new MySqlHistoryDdl();

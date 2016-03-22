@@ -230,6 +230,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     }
 
     MColumn col = new MColumn(p.getDbColumn(), ctx.getColumnDefn(p));
+    col.setDefaultValue(p.getDbColumnDefault());
     col.setComment(p.getDbComment());
     col.setDraftOnly(p.isDraftOnly());
 

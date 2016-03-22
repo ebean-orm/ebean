@@ -848,9 +848,13 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     ScalarType<?> mathBigIntType = extraTypeFactory.createMathBigInteger();
     typeMap.put(BigInteger.class, mathBigIntType);
 
-    ScalarType<?> booleanType = extraTypeFactory.createBoolean();
+    ScalarTypeBool booleanType = extraTypeFactory.createBoolean();
     typeMap.put(Boolean.class, booleanType);
     typeMap.put(boolean.class, booleanType);
+
+    // register the boolean literals to the platform for DDL default values
+    databasePlatform.setDbTrueLiteral(booleanType.getDbTrueLiteral());
+    databasePlatform.setDbFalseLiteral(booleanType.getDbFalseLiteral());
 
     // always register Types.BOOLEAN to our boolean type
     nativeMap.put(Types.BOOLEAN, booleanType);

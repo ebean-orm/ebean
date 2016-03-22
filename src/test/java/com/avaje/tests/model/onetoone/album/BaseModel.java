@@ -6,7 +6,6 @@ import com.avaje.ebean.annotation.WhenCreated;
 import com.avaje.ebean.annotation.WhenModified;
 import org.joda.time.DateTime;
 
-import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
@@ -17,7 +16,6 @@ public abstract class BaseModel extends Model {
   protected Long id;
 
   @SoftDelete
-  @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
   protected boolean deleted;
 
   @WhenCreated

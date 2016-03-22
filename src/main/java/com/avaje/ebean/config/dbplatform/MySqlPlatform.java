@@ -25,7 +25,7 @@ public class MySqlPlatform extends DatabasePlatform {
     this.likeClause = "like ? escape''";
     this.selectCountWithAlias = true;
     this.dbEncrypt = new MySqlDbEncrypt();
-    this.platformDdl = new MySqlDdl(this.dbTypeMap, this.dbIdentity);
+    this.platformDdl = new MySqlDdl(this);
     this.historySupport = new MySqlHistorySupport();
 
     this.dbIdentity.setIdType(IdType.IDENTITY);

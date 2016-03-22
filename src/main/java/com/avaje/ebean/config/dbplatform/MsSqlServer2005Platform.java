@@ -25,7 +25,7 @@ public class MsSqlServer2005Platform extends DatabasePlatform {
     this.idInExpandedForm = true;
     this.selectCountWithAlias = true;
     this.sqlLimiter = new MsSqlServer2005SqlLimiter();
-    this.platformDdl = new MsSqlServerDdl(dbTypeMap, dbIdentity);
+    this.platformDdl = new MsSqlServerDdl(this);
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsIdentity(true);

@@ -11,6 +11,7 @@ import com.avaje.ebean.annotation.WhenModified;
 import com.avaje.ebean.annotation.WhoCreated;
 import com.avaje.ebean.annotation.WhoModified;
 import com.avaje.ebean.config.ScalarTypeConverter;
+import com.avaje.ebean.config.dbplatform.DbDefaultValue;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebeaninternal.server.core.InternString;
@@ -201,6 +202,8 @@ public class DeployBeanProperty {
   private boolean softDelete;
 
   private String dbComment;
+
+  private String dbColumnDefault;
 
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     this.desc = desc;
@@ -902,6 +905,7 @@ public class DeployBeanProperty {
   public void setSoftDelete() {
     this.softDelete = true;
     this.nullable = false;
+    this.dbColumnDefault = DbDefaultValue.FALSE;
   }
 
   public boolean isSoftDelete() {
@@ -932,4 +936,7 @@ public class DeployBeanProperty {
     return docMapping.create();
   }
 
+  public String getDbColumnDefault() {
+    return dbColumnDefault;
+  }
 }

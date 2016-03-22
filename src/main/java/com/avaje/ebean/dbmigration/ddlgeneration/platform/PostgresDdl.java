@@ -1,15 +1,14 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
-import com.avaje.ebean.config.dbplatform.DbIdentity;
-import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 
 /**
  * Postgres specific DDL.
  */
 public class PostgresDdl extends PlatformDdl {
 
-  public PostgresDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
-    super(platformTypes, dbIdentity);
+  public PostgresDdl(DatabasePlatform platform) {
+    super(platform);
     this.historyDdl = new PostgresHistoryDdl();
     this.dropTableCascade = " cascade";
     this.columnSetType = "type ";

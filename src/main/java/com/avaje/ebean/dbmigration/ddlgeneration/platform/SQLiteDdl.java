@@ -1,7 +1,6 @@
 package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
-import com.avaje.ebean.config.dbplatform.DbIdentity;
-import com.avaje.ebean.config.dbplatform.DbTypeMap;
+import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
 
 import java.io.IOException;
@@ -11,8 +10,8 @@ import java.io.IOException;
  */
 public class SQLiteDdl extends PlatformDdl {
 
-  public SQLiteDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
-    super(platformTypes, dbIdentity);
+  public SQLiteDdl(DatabasePlatform platform) {
+    super(platform);
     this.identitySuffix = "";
     this.inlineForeignKeys = true;
   }

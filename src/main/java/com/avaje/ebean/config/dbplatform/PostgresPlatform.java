@@ -27,7 +27,7 @@ public class PostgresPlatform extends DatabasePlatform {
 
     this.dbEncrypt = new PostgresDbEncrypt();
     this.historySupport = new PostgresHistorySupport();
-    this.platformDdl = new PostgresDdl(this.dbTypeMap, this.dbIdentity);
+    this.platformDdl = new PostgresDdl(this);
 
     // Use Identity and getGeneratedKeys
     this.dbIdentity.setIdType(IdType.IDENTITY);

@@ -15,7 +15,7 @@ public class HsqldbPlatform extends DatabasePlatform {
     super();
     this.name = "hsqldb";
     this.dbEncrypt = new H2DbEncrypt();
-    this.platformDdl = new HsqldbDdl(dbTypeMap, dbIdentity);
+    this.platformDdl = new HsqldbDdl(this);
 
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);

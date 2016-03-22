@@ -18,7 +18,7 @@ public class DB2Platform extends DatabasePlatform {
     this.maxTableNameLength = 18;
     this.maxConstraintNameLength = 18;
     this.sqlLimiter = new Db2SqlLimiter();
-    this.platformDdl = new DB2Ddl(dbTypeMap, dbIdentity);
+    this.platformDdl = new DB2Ddl(this);
 
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);

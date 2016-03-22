@@ -18,7 +18,6 @@ public class DatabasePlatform {
 
   private static final Logger logger = LoggerFactory.getLogger(DatabasePlatform.class);
 
-
   /**
    * Behavior used when ending a query only transaction (at read committed isolation level).
    */
@@ -71,6 +70,11 @@ public class DatabasePlatform {
    * Mapping of JDBC to Database types.
    */
   protected DbTypeMap dbTypeMap = new DbTypeMap();
+
+  /**
+   * Default values for DB columns.
+   */
+  protected DbDefaultValue dbDefaultValue = new DbDefaultValue();
 
   /**
    * Set to true if the DB has native UUID type support.
@@ -292,6 +296,13 @@ public class DatabasePlatform {
   }
 
   /**
+   * Return the mapping for DB column default values.
+   */
+  public DbDefaultValue getDbDefaultValue() {
+    return dbDefaultValue;
+  }
+
+  /**
    * Return the column alias prefix.
    */
   public String getColumnAliasPrefix() {
@@ -423,6 +434,20 @@ public class DatabasePlatform {
    */
   public SqlLimiter getSqlLimiter() {
     return sqlLimiter;
+  }
+
+  /**
+   * Set the DB TRUE literal (from the registered boolean ScalarType)
+   */
+  public void setDbTrueLiteral(String dbTrueLiteral) {
+    this.dbDefaultValue.setTrue(dbTrueLiteral);
+  }
+
+  /**
+   * Set the DB FALSE literal (from the registered boolean ScalarType)
+   */
+  public void setDbFalseLiteral(String dbFalseLiteral) {
+    this.dbDefaultValue.setFalse(dbFalseLiteral);
   }
 
   /**

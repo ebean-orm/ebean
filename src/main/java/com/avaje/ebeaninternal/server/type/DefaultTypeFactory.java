@@ -20,7 +20,7 @@ public class DefaultTypeFactory {
     this.serverConfig = serverConfig;
   }
 
-  protected ScalarType<Boolean> createBoolean(String trueValue, String falseValue) {
+  protected ScalarTypeBool createBoolean(String trueValue, String falseValue) {
 
     try {
       // first try Integer based boolean
@@ -40,7 +40,7 @@ public class DefaultTypeFactory {
    * native data type and for others Booleans will be converted to Y/N or 0/1
    * etc.
    */
-  public ScalarType<Boolean> createBoolean() {
+  public ScalarTypeBool createBoolean() {
 
     if (serverConfig == null) {
       return new ScalarTypeBoolean.Native();

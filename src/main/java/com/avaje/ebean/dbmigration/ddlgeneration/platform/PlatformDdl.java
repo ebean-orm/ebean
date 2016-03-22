@@ -2,8 +2,9 @@ package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
 import com.avaje.ebean.config.DbConstraintNaming;
 import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebean.config.dbplatform.DbDefaultValue;
 import com.avaje.ebean.config.dbplatform.DbIdentity;
-import com.avaje.ebean.config.dbplatform.DbTypeMap;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.dbmigration.ddlgeneration.BaseDdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlBuffer;
@@ -90,9 +91,12 @@ public class PlatformDdl {
    */
   protected boolean inlineForeignKeys;
 
-  public PlatformDdl(DbTypeMap platformTypes, DbIdentity dbIdentity) {
-    this.dbIdentity = dbIdentity;
-    this.typeConverter = new PlatformTypeConverter(platformTypes);
+  protected final DbDefaultValue dbDefaultValue;
+
+  public PlatformDdl(DatabasePlatform platform) {
+    this.dbIdentity = platform.getDbIdentity();
+    this.dbDefaultValue = platform.getDbDefaultValue();
+    this.typeConverter = new PlatformTypeConverter(platform.getDbTypeMap());
   }
 
   /**
@@ -165,12 +169,32 @@ public class PlatformDdl {
     buffer.append("  ");
     buffer.append(lowerColumnName(column.getName()), 29);
     buffer.append(platformType);
+    if (!typeContainsDefault(platformType)) {
+      String defaultValue = convertDefaultValue(column.getDefaultValue());
+      if (defaultValue != null) {
+        buffer.append(" default ").append(defaultValue);
+      }
+    }
     if (isTrue(column.isNotnull()) || isTrue(column.isPrimaryKey())) {
       buffer.append(" not null");
     }
 
     // add check constraints later as we really want to give them a nice name
     // so that the database can potentially provide a nice SQL error
+  }
+
+  /**
+   * Return true if the type definition already contains a default value.
+   */
+  private boolean typeContainsDefault(String platformType) {
+    return platformType.toLowerCase().contains(" default");
+  }
+
+  /**
+   * Convert the DB column default literal to platform specific.
+   */
+  private String convertDefaultValue(String dbDefault) {
+    return dbDefaultValue.convert(dbDefault);
   }
 
   /**

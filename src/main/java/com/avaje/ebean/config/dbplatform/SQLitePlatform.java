@@ -9,7 +9,7 @@ public class SQLitePlatform extends DatabasePlatform {
   public SQLitePlatform() {
     super();
     this.name = "sqlite";
-    this.platformDdl = new SQLiteDdl(dbTypeMap, dbIdentity);
+    this.platformDdl = new SQLiteDdl(this);
 
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(false);

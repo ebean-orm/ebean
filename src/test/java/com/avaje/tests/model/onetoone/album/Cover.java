@@ -21,7 +21,6 @@ public class Cover extends Model {
   protected Long id;
 
   @SoftDelete
-  @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
   protected boolean deleted;
 
   protected String s3Url;
