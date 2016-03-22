@@ -221,6 +221,7 @@ public class DocLinkTest extends BaseTestCase {
 
 
     draftDoc1.getLinks().remove(0);
+    Link remaining = draftDoc1.getLinks().get(0);
     draftDoc1.getLinks().add(link3);
 
     draftDoc1.save();
@@ -228,7 +229,7 @@ public class DocLinkTest extends BaseTestCase {
     // publish with insert and delete of Links M2M relationship
     Doc liveDoc2 = server.publish(Doc.class, doc1.getId(), null);
     assertThat(liveDoc2.getLinks()).hasSize(2);
-    assertThat(liveDoc2.getLinks()).extracting("id").contains(link2.getId(), link3.getId());
+    assertThat(liveDoc2.getLinks()).extracting("id").contains(remaining.getId(), link3.getId());
 
     // delete the draft and live beans (with associated children)
     draftDoc1.delete();
