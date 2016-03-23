@@ -1,5 +1,6 @@
 package com.avaje.tests.model.bridge;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -14,6 +15,8 @@ public class BSiteUserB {
 
     // Use plain site and user matching by property name (not siteId, userId)
     public UUID site;
+
+    @Column(name = "usr") // not using 'user' as column name as PG keyword
     public UUID user;
 
     @Override
