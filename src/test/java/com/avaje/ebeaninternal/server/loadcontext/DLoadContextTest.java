@@ -25,9 +25,11 @@ public class DLoadContextTest extends BaseTestCase {
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query());
     queryRequest.initTransIfRequired();
+    queryRequest.endTransIfRequired();
 
     DLoadContext graphContext = (DLoadContext)queryRequest.getGraphContext();
     DLoadBeanContext customer = graphContext.getBeanContext("customer");
+
 
     assertThat(customer.firstBatchSize).isEqualTo(10);
     assertThat(customer.secondaryBatchSize).isEqualTo(10);
@@ -38,6 +40,7 @@ public class DLoadContextTest extends BaseTestCase {
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query().fetch("customer",new FetchConfig().query()));
     queryRequest.initTransIfRequired();
+    queryRequest.endTransIfRequired();
 
     DLoadContext graphContext = (DLoadContext)queryRequest.getGraphContext();
     DLoadBeanContext customer = graphContext.getBeanContext("customer");
@@ -51,6 +54,7 @@ public class DLoadContextTest extends BaseTestCase {
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query().fetch("customer",new FetchConfig().query(50)));
     queryRequest.initTransIfRequired();
+    queryRequest.endTransIfRequired();
 
     DLoadContext graphContext = (DLoadContext)queryRequest.getGraphContext();
     DLoadBeanContext customer = graphContext.getBeanContext("customer");
@@ -64,6 +68,7 @@ public class DLoadContextTest extends BaseTestCase {
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query().fetch("customer",new FetchConfig().queryFirst(20).lazy(5)));
     queryRequest.initTransIfRequired();
+    queryRequest.endTransIfRequired();
 
     DLoadContext graphContext = (DLoadContext)queryRequest.getGraphContext();
     DLoadBeanContext customer = graphContext.getBeanContext("customer");
