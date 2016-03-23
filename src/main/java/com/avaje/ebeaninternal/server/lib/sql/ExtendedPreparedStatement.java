@@ -87,7 +87,7 @@ public class ExtendedPreparedStatement extends ExtendedStatement implements Prep
     } catch (SQLException e) {
       // we got an error... need to check this
       // connection before returning it
-      pooledConnection.addError(e);
+      pooledConnection.markWithError();
       throw e;
     }
   }
@@ -101,7 +101,7 @@ public class ExtendedPreparedStatement extends ExtendedStatement implements Prep
     } catch (SQLException e) {
       // we got an error... need to check
       // this connection before returning it
-      pooledConnection.addError(e);
+      pooledConnection.markWithError();
       throw e;
     }
   }
@@ -115,7 +115,7 @@ public class ExtendedPreparedStatement extends ExtendedStatement implements Prep
     } catch (SQLException e) {
       // we got an error... need to check
       // this connection before returning it
-      pooledConnection.addError(e);
+      pooledConnection.markWithError();
       throw e;
     }
   }
@@ -129,7 +129,7 @@ public class ExtendedPreparedStatement extends ExtendedStatement implements Prep
     } catch (SQLException e) {
       // we got an error... need to check
       // this connection before returning it
-      pooledConnection.addError(e);
+      pooledConnection.markWithError();
       throw e;
     }
   }
@@ -143,7 +143,7 @@ public class ExtendedPreparedStatement extends ExtendedStatement implements Prep
     } catch (SQLException e) {
       // we got an error... need to check
       // this connection before returning it
-      pooledConnection.addError(e);
+      pooledConnection.markWithError();
       throw e;
     }
   }
@@ -157,7 +157,7 @@ public class ExtendedPreparedStatement extends ExtendedStatement implements Prep
     } catch (SQLException e) {
       // we got an error... need to check
       // this connection before returning it
-      pooledConnection.addError(e);
+      pooledConnection.markWithError();
       throw e;
     }
   }

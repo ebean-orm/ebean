@@ -50,7 +50,7 @@ abstract class ExtendedStatement extends PreparedStatementDelegator {
     try {
       return pstmt.getConnection();
     } catch (SQLException e) {
-      pooledConnection.addError(e);
+      pooledConnection.markWithError();
       throw e;
     }
   }
@@ -63,7 +63,7 @@ abstract class ExtendedStatement extends PreparedStatementDelegator {
       pooledConnection.setLastStatement(sql);
       pstmt.addBatch(sql);
     } catch (SQLException e) {
-      pooledConnection.addError(e);
+      pooledConnection.markWithError();
       throw e;
     }
   }
@@ -76,7 +76,7 @@ abstract class ExtendedStatement extends PreparedStatementDelegator {
       pooledConnection.setLastStatement(sql);
       return pstmt.execute(sql);
     } catch (SQLException e) {
-      pooledConnection.addError(e);
+      pooledConnection.markWithError();
       throw e;
     }
   }
@@ -89,7 +89,7 @@ abstract class ExtendedStatement extends PreparedStatementDelegator {
       pooledConnection.setLastStatement(sql);
       return pstmt.executeQuery(sql);
     } catch (SQLException e) {
-      pooledConnection.addError(e);
+      pooledConnection.markWithError();
       throw e;
     }
   }
@@ -102,7 +102,7 @@ abstract class ExtendedStatement extends PreparedStatementDelegator {
       pooledConnection.setLastStatement(sql);
       return pstmt.executeUpdate(sql);
     } catch (SQLException e) {
-      pooledConnection.addError(e);
+      pooledConnection.markWithError();
       throw e;
     }
   }

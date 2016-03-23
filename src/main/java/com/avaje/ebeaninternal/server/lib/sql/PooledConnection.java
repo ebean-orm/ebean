@@ -324,7 +324,7 @@ public class PooledConnection extends ConnectionDelegator {
     try {
       return connection.createStatement();
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -337,7 +337,7 @@ public class PooledConnection extends ConnectionDelegator {
       return connection.createStatement(resultSetType, resultSetConcurreny);
 
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -405,7 +405,7 @@ public class PooledConnection extends ConnectionDelegator {
       }
 
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -420,7 +420,7 @@ public class PooledConnection extends ConnectionDelegator {
       lastStatement = sql;
       return connection.prepareStatement(sql, resultSetType, resultSetConcurreny);
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -446,7 +446,7 @@ public class PooledConnection extends ConnectionDelegator {
    * before it is placed back into the connection pool.
    * </p>
    */
-  void addError(Throwable throwable) {
+  void markWithError() {
     hadErrors = true;
   }
 
@@ -633,7 +633,7 @@ public class PooledConnection extends ConnectionDelegator {
       resetIsolationReadOnlyRequired = true;
       connection.setTransactionIsolation(level);
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -660,7 +660,7 @@ public class PooledConnection extends ConnectionDelegator {
       status = STATUS_ENDED;
       connection.commit();
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -753,7 +753,7 @@ public class PooledConnection extends ConnectionDelegator {
       status = STATUS_ENDED;
       connection.rollback();
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -765,7 +765,7 @@ public class PooledConnection extends ConnectionDelegator {
     try {
       connection.setAutoCommit(autoCommit);
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -788,7 +788,7 @@ public class PooledConnection extends ConnectionDelegator {
     try {
       return connection.setSavepoint();
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -797,7 +797,7 @@ public class PooledConnection extends ConnectionDelegator {
     try {
       return connection.setSavepoint(savepointName);
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -806,7 +806,7 @@ public class PooledConnection extends ConnectionDelegator {
     try {
       connection.rollback(sp);
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -815,7 +815,7 @@ public class PooledConnection extends ConnectionDelegator {
     try {
       connection.releaseSavepoint(sp);
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -824,7 +824,7 @@ public class PooledConnection extends ConnectionDelegator {
     try {
       connection.setHoldability(i);
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -833,7 +833,7 @@ public class PooledConnection extends ConnectionDelegator {
     try {
       return connection.getHoldability();
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -842,7 +842,7 @@ public class PooledConnection extends ConnectionDelegator {
     try {
       return connection.createStatement(i, x, y);
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -851,7 +851,7 @@ public class PooledConnection extends ConnectionDelegator {
     try {
       return connection.prepareStatement(s, i, x, y);
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -860,7 +860,7 @@ public class PooledConnection extends ConnectionDelegator {
     try {
       return connection.prepareStatement(s, i);
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -869,7 +869,7 @@ public class PooledConnection extends ConnectionDelegator {
     try {
       return connection.prepareStatement(s, s2);
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
@@ -878,7 +878,7 @@ public class PooledConnection extends ConnectionDelegator {
     try {
       return connection.prepareCall(s, i, x, y);
     } catch (SQLException ex) {
-      addError(ex);
+      markWithError();
       throw ex;
     }
   }
