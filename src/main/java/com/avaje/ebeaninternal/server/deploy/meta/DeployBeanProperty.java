@@ -183,7 +183,7 @@ public class DeployBeanProperty {
    */
   private GeneratedProperty generatedProperty;
 
-  private final DeployBeanDescriptor<?> desc;
+  protected final DeployBeanDescriptor<?> desc;
 
   private boolean undirectionalShadow;
 

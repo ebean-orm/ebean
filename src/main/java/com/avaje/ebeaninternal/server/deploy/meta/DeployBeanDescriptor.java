@@ -14,8 +14,10 @@ import com.avaje.ebean.event.BeanPostLoad;
 import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.changelog.ChangeLogFilter;
 import com.avaje.ebean.text.PathProperties;
+import com.avaje.ebean.util.CamelCaseHelper;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistController;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistListener;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanPostLoad;
@@ -25,6 +27,7 @@ import com.avaje.ebeaninternal.server.deploy.DRawSqlMeta;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
+import com.avaje.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
@@ -42,7 +45,7 @@ import java.util.Map;
  */
 public class DeployBeanDescriptor<T> {
 
-  static class PropOrder implements Comparator<DeployBeanProperty> {
+  private static class PropOrder implements Comparator<DeployBeanProperty> {
 
     public int compare(DeployBeanProperty o1, DeployBeanProperty o2) {
 
@@ -57,6 +60,8 @@ public class DeployBeanDescriptor<T> {
   private static final String I_SCALAOBJECT = "scala.ScalaObject";
 
   private final ServerConfig serverConfig;
+
+  private final BeanDescriptorManager manager;
 
   /**
    * Map of BeanProperty Linked so as to preserve order.
@@ -191,12 +196,22 @@ public class DeployBeanDescriptor<T> {
   private DocStoreMode docStoreUpdate;
   private DocStoreMode docStoreDelete;
 
+  private List<DeployBeanProperty> idProperties;
+
   /**
    * Construct the BeanDescriptor.
    */
-  public DeployBeanDescriptor(Class<T> beanType, ServerConfig serverConfig) {
+  public DeployBeanDescriptor(BeanDescriptorManager manager, Class<T> beanType, ServerConfig serverConfig) {
+    this.manager = manager;
     this.serverConfig = serverConfig;
     this.beanType = beanType;
+  }
+
+  /**
+   * Return the DeployBeanInfo for the given bean class.
+   */
+  DeployBeanInfo<?> getDeploy(Class<?> cls) {
+    return manager.getDeploy(cls);
   }
 
   /**
@@ -274,7 +289,7 @@ public class DeployBeanDescriptor<T> {
     docStoreUpdate = docStore.update();
     docStoreDelete = docStore.delete();
     String doc = docStore.doc();
-    if (doc != null && doc.length() > 0) {
+    if (doc.length() > 0) {
       docStorePathProperties = PathProperties.parse(doc);
     }
   }
@@ -628,6 +643,34 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
+   * Find the matching property for a given property name or dbColumn.
+   * <p>
+   * This is primarily to find imported primary key columns (ManyToOne that also match the PK).
+   * </p>
+   */
+  DeployBeanProperty findMatch(String propertyName, String dbColumn) {
+
+    DeployBeanProperty prop = propMap.get(propertyName);
+    if (prop != null) {
+      return prop;
+    }
+    if (dbColumn != null) {
+      String asCamel = CamelCaseHelper.toCamelFromUnderscore(dbColumn);
+      prop = propMap.get(asCamel);
+      if (prop != null) {
+        return prop;
+      }
+      // scan looking for dbColumn match
+      for (DeployBeanProperty property : propMap.values()) {
+        if (dbColumn.equals(property.getDbColumn())) {
+          return property;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
    * Get a BeanProperty by its name.
    */
   public DeployBeanProperty getBeanProperty(String propName) {
@@ -697,7 +740,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * Set the DB sequence name.
    */
-  public void setSequenceName(String sequenceName) {
+  private void setSequenceName(String sequenceName) {
     this.sequenceName = sequenceName;
   }
 
@@ -764,7 +807,7 @@ public class DeployBeanDescriptor<T> {
     tableJoinList.add(join);
   }
 
-  public List<DeployTableJoin> getTableJoins() {
+  List<DeployTableJoin> getTableJoins() {
     return tableJoinList;
   }
 
@@ -850,15 +893,15 @@ public class DeployBeanDescriptor<T> {
    */
   public List<DeployBeanProperty> propertiesId() {
 
-    ArrayList<DeployBeanProperty> list = new ArrayList<DeployBeanProperty>(2);
-
-    for (DeployBeanProperty prop : propMap.values()) {
-      if (prop.isId()) {
-        list.add(prop);
+    if (idProperties == null) {
+      idProperties = new ArrayList<DeployBeanProperty>(2);
+      for (DeployBeanProperty prop : propMap.values()) {
+        if (prop.isId()) {
+          idProperties.add(prop);
+        }
       }
     }
-
-    return list;
+    return idProperties;
   }
 
   public DeployBeanPropertyAssocOne<?> findJoinToTable(String tableName) {

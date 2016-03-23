@@ -31,29 +31,29 @@ import java.util.Map;
  */
 public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
-  protected final boolean oneToOne;
+  private final boolean oneToOne;
 
-  protected final boolean oneToOneExported;
+  private final boolean oneToOneExported;
 
-  protected final boolean importedPrimaryKey;
+  private final boolean importedPrimaryKey;
 
-  protected AssocOneHelp localHelp;
+  private AssocOneHelp localHelp;
 
   protected final BeanProperty[] embeddedProps;
 
-  protected final HashMap<String, BeanProperty> embeddedPropsMap;
+  private final HashMap<String, BeanProperty> embeddedPropsMap;
 
   /**
    * The information for Imported foreign Keys.
    */
   protected ImportedId importedId;
 
-  protected ExportedProperty[] exportedProperties;
+  private ExportedProperty[] exportedProperties;
 
-  protected String deleteByParentIdSql;
-  protected String deleteByParentIdInSql;
+  private String deleteByParentIdSql;
+  private String deleteByParentIdInSql;
 
-  protected BeanPropertyAssocMany<?> relationshipProperty;
+  private BeanPropertyAssocMany<?> relationshipProperty;
 
   /**
    * Create based on deploy information of an EmbeddedId.
@@ -70,7 +70,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     super(descriptor, deploy);
 
-    importedPrimaryKey = false;//TODO: Review this - deploy.isImportedPrimaryKey();
+    importedPrimaryKey = deploy.isImportedPrimaryKey();
     oneToOne = deploy.isOneToOne();
     oneToOneExported = deploy.isOneToOneExported();
 
@@ -128,21 +128,21 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     return (EntityBean) getValue(owner);
   }
 
-  public void setRelationshipProperty(BeanPropertyAssocMany<?> relationshipProperty) {
+  void setRelationshipProperty(BeanPropertyAssocMany<?> relationshipProperty) {
     this.relationshipProperty = relationshipProperty;
   }
 
-  public BeanPropertyAssocMany<?> getRelationshipProperty() {
+  BeanPropertyAssocMany<?> getRelationshipProperty() {
     return relationshipProperty;
   }
 
-  public void cacheClear() {
+  void cacheClear() {
     if (targetDescriptor.isBeanCaching() && relationshipProperty != null) {
       targetDescriptor.cacheManyPropClear(relationshipProperty.getName());
     }
   }
 
-  public void cacheDelete(boolean clearOnNull, EntityBean bean) {
+  void cacheDelete(boolean clearOnNull, EntityBean bean) {
     if (targetDescriptor.isBeanCaching() && relationshipProperty != null) {
       Object assocBean = getValue(bean);
       if (assocBean != null) {
@@ -269,7 +269,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
   }
 
-  public void addFkey() {
+  void addFkey() {
     if (importedId != null) {
       importedId.addFkeys(name);
     }
@@ -593,7 +593,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   /**
    * Set the owner on the embedded bean property.
    */
-  public void setEmbeddedOwner(EntityBean owner) {
+  void setEmbeddedOwner(EntityBean owner) {
 
     Object emb = getValue(owner);
     if (emb != null) {

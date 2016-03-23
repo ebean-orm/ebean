@@ -1,12 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.bean.BeanCollection.ModifyListenMode;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorMap;
@@ -18,6 +11,12 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertySimpleCollection;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.type.ScalarTypeString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Helper object to classify BeanProperties into appropriate lists.
@@ -67,6 +66,8 @@ public class DeployBeanPropertyLists {
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public DeployBeanPropertyLists(BeanDescriptorMap owner, BeanDescriptor<?> desc, DeployBeanDescriptor<?> deploy) {
     this.desc = desc;
+
+    setImportedPrimaryKeys(deploy);
 
     DeployBeanPropertyAssocOne<?> deployUnidirectional = deploy.getUnidirectional();
     if (deployUnidirectional == null) {
@@ -122,6 +123,31 @@ public class DeployBeanPropertyLists {
     tableJoins = new TableJoin[deployTableJoins.size()];
     for (int i = 0; i < deployTableJoins.size(); i++) {
       tableJoins[i] = new TableJoin(deployTableJoins.get(i));
+    }
+  }
+
+  /**
+   * Find and set imported primary keys.
+   * <p>
+   * This is where @ManyToOne properties maps to a PFK (Primary and foreign key).
+   * Perform the match by naming convention on property name and db column.
+   * </p>
+   */
+  private void setImportedPrimaryKeys(DeployBeanDescriptor<?> deploy) {
+
+    List<DeployBeanProperty> ids = deploy.propertiesId();
+    if (ids.size() == 1) {
+      DeployBeanProperty id = ids.get(0);
+      if (id instanceof DeployBeanPropertyAssocOne<?>) {
+        // only interested if the primary key is a compound key
+        DeployBeanDescriptor<?> targetDeploy = ((DeployBeanPropertyAssocOne<?>) id).getTargetDeploy();
+        for (DeployBeanPropertyAssocOne<?> assoc : deploy.propertiesAssocOne()) {
+          DeployBeanProperty pkMatch = targetDeploy.findMatch(assoc.getName(), assoc.getDbColumn());
+          if (pkMatch != null) {
+            assoc.setImportedPrimaryKey(pkMatch);
+          }
+        }
+      }
     }
   }
 

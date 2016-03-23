@@ -155,4 +155,13 @@ public class DeployTableJoin {
   public void setInheritInfo(InheritInfo inheritInfo) {
     this.inheritInfo = inheritInfo;
   }
+
+  /**
+   * Change the join column (based on imported primary key match on property name etc).
+   */
+  void setLocalColumn(String dbColumn) {
+    if (columns.size() == 1) {
+      columns.get(0).setLocalDbColumn(dbColumn);
+    }
+  }
 }

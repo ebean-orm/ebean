@@ -126,4 +126,10 @@ public class DeployTableJoinColumn {
 		return localDbColumn;
 	}
 
+	/**
+	 * Set the local database column name.
+   */
+	public void setLocalDbColumn(String localDbColumn) {
+		this.localDbColumn = localDbColumn;
+	}
 }

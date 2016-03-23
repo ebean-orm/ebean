@@ -82,8 +82,8 @@ public final class BindableIdEmbedded implements BindableId {
   public boolean deriveConcatenatedId(PersistRequestBean<?> persist) {
 
     if (matches == null) {
-      String m = "Matches for the concatinated key columns where not found?"
-          + " I expect that the concatinated key was null, and this bean does"
+      String m = "Matches for the concatenated key columns where not found?"
+          + " I expect that the concatenated key was null, and this bean does"
           + " not have ManyToOne assoc beans matching the primary key columns?";
       throw new PersistenceException(m);
     }

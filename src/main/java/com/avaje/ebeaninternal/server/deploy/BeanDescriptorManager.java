@@ -254,7 +254,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   @Override
-  public <T> DocStoreBeanAdapter<T> createDocStoreBeanAdapter(BeanDescriptor descriptor, DeployBeanDescriptor<T> deploy) {
+  public <T> DocStoreBeanAdapter<T> createDocStoreBeanAdapter(BeanDescriptor<T> descriptor, DeployBeanDescriptor<T> deploy) {
     return docStoreFactory.createAdapter(descriptor, deploy);
   }
 
@@ -311,8 +311,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     try {
       createListeners();
-      readEmbeddedDeployment();
       readEntityDeploymentInitial();
+      readEmbeddedDeployment();
       readEntityBeanTable();
       readEntityDeploymentAssociations();
       readInheritedIdGenerators();
@@ -338,8 +338,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       return asOfTableMap;
 
     } catch (RuntimeException e) {
-      String msg = "Error in deployment";
-      logger.error(msg, e);
+      logger.error("Error in deployment", e);
       throw e;
     }
   }
@@ -532,10 +531,15 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   private <T> BeanDescriptor<T> createEmbedded(Class<T> beanClass) {
-
-    DeployBeanInfo<T> info = createDeployBeanInfo(beanClass);
-    readDeployAssociations(info);
+    DeployBeanInfo<T> info = getDeploy(beanClass);
     return new BeanDescriptor<T>(this, info.getDescriptor());
+  }
+
+  /**
+   * Return the bean deploy info for the given class.
+   */
+  public <T> DeployBeanInfo<T> getDeploy(Class<T> cls) {
+    return  (DeployBeanInfo<T>) deplyInfoMap.get(cls);
   }
 
   private void registerBeanDescriptor(BeanDescriptor<?> desc) {
@@ -552,13 +556,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     List<Class<?>> embeddedClasses = bootupClasses.getEmbeddables();
     for (int i = 0; i < embeddedClasses.size(); i++) {
-      Class<?> cls = embeddedClasses.get(i);
-      if (logger.isTraceEnabled()) {
-        String msg = "load deployinfo for embeddable:" + cls.getName();
-        logger.trace(msg);
-      }
-      BeanDescriptor<?> embDesc = createEmbedded(cls);
-      registerBeanDescriptor(embDesc);
+      registerBeanDescriptor(createEmbedded(embeddedClasses.get(i)));
     }
   }
 
@@ -571,10 +569,13 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private void readEntityDeploymentInitial() {
 
-    List<Class<?>> entityClasses = bootupClasses.getEntities();
-
-    for (Class<?> entityClass : entityClasses) {
+    for (Class<?> entityClass : bootupClasses.getEntities()) {
       DeployBeanInfo<?> info = createDeployBeanInfo(entityClass);
+      deplyInfoMap.put(entityClass, info);
+    }
+    for (Class<?> entityClass : bootupClasses.getEmbeddables()) {
+      DeployBeanInfo<?> info = createDeployBeanInfo(entityClass);
+      readDeployAssociations(info);
       deplyInfoMap.put(entityClass, info);
     }
   }
@@ -1075,7 +1076,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private <T> DeployBeanInfo<T> createDeployBeanInfo(Class<T> beanClass) {
 
-    DeployBeanDescriptor<T> desc = new DeployBeanDescriptor<T>(beanClass, serverConfig);
+    DeployBeanDescriptor<T> desc = new DeployBeanDescriptor<T>(this, beanClass, serverConfig);
 
     desc.setUpdateChangesOnly(updateChangesOnly);
 

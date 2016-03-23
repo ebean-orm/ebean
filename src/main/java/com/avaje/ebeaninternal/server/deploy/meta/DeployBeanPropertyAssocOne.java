@@ -5,11 +5,13 @@ package com.avaje.ebeaninternal.server.deploy.meta;
  */
 public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
 
-  boolean oneToOne;
+  private boolean oneToOne;
 
-  boolean oneToOneExported;
+  private boolean oneToOneExported;
 
-  DeployBeanEmbedded deployEmbedded;
+  private boolean importedPrimaryKey;
+
+  private DeployBeanEmbedded deployEmbedded;
 
   /**
    * Create the property.
@@ -76,7 +78,22 @@ public class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc<T> {
     this.oneToOneExported = true;
   }
 
+  /**
+   * Return true if this is part of the primary key.
+   */
   public boolean isImportedPrimaryKey() {
-    return false;
+    return importedPrimaryKey;
+  }
+
+  /**
+   * Set to true if this is part of the primary key.
+   */
+  void setImportedPrimaryKey(DeployBeanProperty primaryKey) {
+    this.importedPrimaryKey = true;
+    String dbColumn = primaryKey.getDbColumn();
+    if (dbColumn != null) {
+      // change join db column if matched by property name
+      tableJoin.setLocalColumn(dbColumn);
+    }
   }
 }

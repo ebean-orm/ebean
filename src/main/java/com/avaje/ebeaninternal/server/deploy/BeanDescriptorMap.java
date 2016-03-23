@@ -48,5 +48,5 @@ public interface BeanDescriptorMap {
   /**
    * Create a doc store specific adapter for this bean type.
    */
-  <T> DocStoreBeanAdapter<T> createDocStoreBeanAdapter(BeanDescriptor descriptor, DeployBeanDescriptor<T> deploy);
+  <T> DocStoreBeanAdapter<T> createDocStoreBeanAdapter(BeanDescriptor<T> descriptor, DeployBeanDescriptor<T> deploy);
 }

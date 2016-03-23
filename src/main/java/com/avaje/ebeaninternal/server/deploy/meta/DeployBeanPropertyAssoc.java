@@ -12,41 +12,48 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
 	/**
 	 * The type of the joined bean.
 	 */
-	Class<T> targetType;
+	protected Class<T> targetType;
 
 	/**
 	 * Persist settings.
 	 */
-  final BeanCascadeInfo cascadeInfo = new BeanCascadeInfo();
+  private final BeanCascadeInfo cascadeInfo = new BeanCascadeInfo();
 
 	/**
 	 * The join table information.
 	 */
-	BeanTable beanTable;
+  private BeanTable beanTable;
 
 	/**
 	 * Join between the beans.
 	 */
-  final DeployTableJoin tableJoin = new DeployTableJoin();
+  protected final DeployTableJoin tableJoin = new DeployTableJoin();
 
 	/**
 	 * Literal added to where clause of lazy loading query.
 	 */
-	String extraWhere;
+  private String extraWhere;
 
 	/**
 	 * From the deployment mappedBy attribute.
 	 */
-	String mappedBy;
+  private String mappedBy;
 
-	String docStoreDoc;
+	private String docStoreDoc;
 
 	/**
 	 * Construct the property.
 	 */
-	public DeployBeanPropertyAssoc(DeployBeanDescriptor<?> desc, Class<T> targetType) {
+	DeployBeanPropertyAssoc(DeployBeanDescriptor<?> desc, Class<T> targetType) {
 		super(desc, targetType, null, null);
 		this.targetType = targetType;
+	}
+
+  /**
+   * Return the target DeployBeanDescriptor for this associated bean property.
+   */
+	public DeployBeanDescriptor<?> getTargetDeploy() {
+		return desc.getDeploy(targetType).getDescriptor();
 	}
 
 	/**
