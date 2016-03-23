@@ -1,5 +1,7 @@
 package com.avaje.ebean.config;
 
+import com.avaje.ebean.util.CamelCaseHelper;
+
 /**
  * Converts between Camel Case and Underscore based names for both table and
  * column names (and is the default naming convention in Ebean).
@@ -141,21 +143,6 @@ public class UnderscoreNamingConvention extends AbstractNamingConvention {
    * Convert and return the from string from underscore to camel case.
    */
   protected String toCamelFromUnderscore(String underscore) {
-
-    StringBuilder result = new StringBuilder(underscore.length());
-    String[] vals = underscore.split("_");
-
-    for (int i = 0; i < vals.length; i++) {
-      String lower = vals[i].toLowerCase();
-      if (i > 0) {
-        char c = Character.toUpperCase(lower.charAt(0));
-        result.append(c);
-        result.append(lower.substring(1));
-      } else {
-        result.append(lower);
-      }
-    }
-
-    return result.toString();
+    return CamelCaseHelper.toCamelFromUnderscore(underscore);
   }
 }
