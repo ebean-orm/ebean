@@ -179,7 +179,7 @@ public class PooledConnection extends ConnectionDelegator {
     this.pool = pool;
     this.connection = connection;
     this.name = pool.getName() + "." + uniqueId;
-    this.pstmtCache = new PstmtCache(name, pool.getPstmtCacheSize());
+    this.pstmtCache = new PstmtCache(pool.getPstmtCacheSize());
     this.maxStackTrace = pool.getMaxStackTraceSize();
     this.creationTime = System.currentTimeMillis();
     this.lastUseTime = creationTime;
@@ -202,14 +202,14 @@ public class PooledConnection extends ConnectionDelegator {
   /**
    * Return the slot position in the busy buffer.
    */
-  public int getSlotId() {
+  int getSlotId() {
     return slotId;
   }
 
   /**
    * Set the slot position in the busy buffer.
    */
-  public void setSlotId(int slotId) {
+  void setSlotId(int slotId) {
     this.slotId = slotId;
   }
 
@@ -220,7 +220,7 @@ public class PooledConnection extends ConnectionDelegator {
     return name;
   }
 
-  public String getNameSlot() {
+  private String getNameSlot() {
     return name + ":" + slotId;
   }
 
@@ -228,7 +228,7 @@ public class PooledConnection extends ConnectionDelegator {
     return getDescription();
   }
 
-  public long getBusySeconds() {
+  private long getBusySeconds() {
     return (System.currentTimeMillis() - startUseTime) / 1000;
   }
 
@@ -236,7 +236,7 @@ public class PooledConnection extends ConnectionDelegator {
     return "name[" + name + "] slot[" + slotId + "] startTime[" + getStartUseTime() + "] busySeconds[" + getBusySeconds() + "] createdBy[" + getCreatedByMethod() + "] stmt[" + getLastStatement() + "]";
   }
 
-  public String getFullDescription() {
+  String getFullDescription() {
     return "name[" + name + "] slot[" + slotId + "] startTime[" + getStartUseTime() + "] busySeconds[" + getBusySeconds() + "] stackTrace[" + getStackTraceAsString() + "] stmt[" + getLastStatement() + "]";
   }
 
@@ -247,7 +247,7 @@ public class PooledConnection extends ConnectionDelegator {
   /**
    * Return true if the connection should be treated as long running (skip connection pool leak check).
    */
-  public boolean isLongRunning() {
+  boolean isLongRunning() {
     return longRunning;
   }
 
@@ -268,7 +268,7 @@ public class PooledConnection extends ConnectionDelegator {
    *
    * @param logErrors if false then don't log errors when closing
    */
-  public void closeConnectionFully(boolean logErrors) {
+  void closeConnectionFully(boolean logErrors) {
 
     if (pool != null) {
       // allow collection of load statistics
@@ -345,7 +345,7 @@ public class PooledConnection extends ConnectionDelegator {
   /**
    * Return a PreparedStatement back into the cache.
    */
-  protected void returnPreparedStatement(ExtendedPreparedStatement pstmt) {
+  void returnPreparedStatement(ExtendedPreparedStatement pstmt) {
 
     synchronized (pstmtMonitor) {
       if (!pstmtCache.returnStatement(pstmt)) {
@@ -429,7 +429,7 @@ public class PooledConnection extends ConnectionDelegator {
    * Reset the connection for returning to the client. Resets the status,
    * startUseTime and hadErrors.
    */
-  protected void resetForUse() {
+  void resetForUse() {
     this.status = STATUS_ACTIVE;
     this.startUseTime = System.currentTimeMillis();
     this.exeStartNanos = System.nanoTime();
@@ -446,7 +446,7 @@ public class PooledConnection extends ConnectionDelegator {
    * before it is placed back into the connection pool.
    * </p>
    */
-  public void addError(Throwable throwable) {
+  void addError(Throwable throwable) {
     hadErrors = true;
   }
 
@@ -532,7 +532,7 @@ public class PooledConnection extends ConnectionDelegator {
   /**
    * Return true if the connection is too old.
    */
-  public boolean exceedsMaxAge(long maxAgeMillis) {
+  private boolean exceedsMaxAge(long maxAgeMillis) {
     if (maxAgeMillis > 0 && (creationTime < (System.currentTimeMillis() - maxAgeMillis))) {
       this.closeReason = REASON_MAXAGE;
       return true;
@@ -540,7 +540,7 @@ public class PooledConnection extends ConnectionDelegator {
     return false;
   }
 
-  public boolean shouldTrimOnReturn(long lastResetTime, long maxAgeMillis) {
+  boolean shouldTrimOnReturn(long lastResetTime, long maxAgeMillis) {
     if (creationTime <= lastResetTime) {
       this.closeReason = REASON_RESET;
       return true;
@@ -551,7 +551,7 @@ public class PooledConnection extends ConnectionDelegator {
   /**
    * Return true if the connection has been idle for too long or is too old.
    */
-  public boolean shouldTrim(long usedSince, long createdSince) {
+  boolean shouldTrim(long usedSince, long createdSince) {
     if (lastUseTime < usedSince) {
       // been idle for too long so trim it
       this.closeReason = REASON_IDLE;
@@ -571,7 +571,7 @@ public class PooledConnection extends ConnectionDelegator {
    * Used to detect busy connections that could be leaks.
    * </p>
    */
-  public long getStartUseTime() {
+  private long getStartUseTime() {
     return startUseTime;
   }
 
@@ -582,14 +582,14 @@ public class PooledConnection extends ConnectionDelegator {
    * minutes.
    * </p>
    */
-  public long getLastUsedTime() {
+  long getLastUsedTime() {
     return lastUseTime;
   }
 
   /**
    * Returns the last sql statement executed.
    */
-  public String getLastStatement() {
+  private String getLastStatement() {
     return lastStatement;
   }
 
@@ -599,7 +599,7 @@ public class PooledConnection extends ConnectionDelegator {
    * Note with addBatch() this will not really work.
    * </p>
    */
-  protected void setLastStatement(String lastStatement) {
+  void setLastStatement(String lastStatement) {
     this.lastStatement = lastStatement;
     if (logger.isTraceEnabled()) {
       logger.trace(".setLastStatement[" + lastStatement + "]");
@@ -889,7 +889,7 @@ public class PooledConnection extends ConnectionDelegator {
    * Used to help finding connection pool leaks.
    * </p>
    */
-  public String getCreatedByMethod() {
+  private String getCreatedByMethod() {
     if (createdByMethod != null) {
       return createdByMethod;
     }
@@ -934,7 +934,7 @@ public class PooledConnection extends ConnectionDelegator {
   /**
    * Return the stackTrace as a String for logging purposes.
    */
-  public String getStackTraceAsString() {
+  private String getStackTraceAsString() {
     StackTraceElement[] stackTrace = getStackTrace();
     if (stackTrace == null) {
       return "";

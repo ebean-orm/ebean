@@ -97,10 +97,8 @@ class BusyConnectionBuffer {
 
   /**
    * Collect the load statistics from all the busy connections.
-   *
-   * @param reset
    */
-  protected void collectStatistics(LoadValues values, boolean reset) {
+  void collectStatistics(LoadValues values, boolean reset) {
 
     for (int i = 0; i < slots.length; i++) {
       if (slots[i] != null) {
@@ -112,7 +110,7 @@ class BusyConnectionBuffer {
   /**
    * Close connections that should be considered leaked.
    */
-  protected void closeBusyConnections(long leakTimeMinutes) {
+  void closeBusyConnections(long leakTimeMinutes) {
 
     long olderThanTime = System.currentTimeMillis() - (leakTimeMinutes * 60000);
 
@@ -152,7 +150,7 @@ class BusyConnectionBuffer {
   /**
    * Returns information describing connections that are currently being used.
    */
-  protected String getBusyConnectionInformation(boolean toLogger) {
+  String getBusyConnectionInformation(boolean toLogger) {
 
     if (toLogger) {
       logger.info("Dumping [{}] busy connections: (Use datasource.xxx.capturestacktrace=true  ... to get stackTraces)", size());

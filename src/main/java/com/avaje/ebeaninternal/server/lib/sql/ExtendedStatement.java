@@ -16,12 +16,12 @@ import com.avaje.ebeaninternal.jdbc.PreparedStatementDelegator;
  * for the case where someone uses the Statement api on an ExtendedPreparedStatement.
  * </p>
  */
-public abstract class ExtendedStatement extends PreparedStatementDelegator {
+abstract class ExtendedStatement extends PreparedStatementDelegator {
 
   /**
    * The pooled connection this Statement belongs to.
    */
-  protected final PooledConnection pooledConnection;
+  final PooledConnection pooledConnection;
 
   /**
    * The underlying Statement that this object wraps.
@@ -31,7 +31,7 @@ public abstract class ExtendedStatement extends PreparedStatementDelegator {
   /**
    * Create the ExtendedStatement for a given pooledConnection.
    */
-  public ExtendedStatement(PooledConnection pooledConnection, PreparedStatement pstmt) {
+  ExtendedStatement(PooledConnection pooledConnection, PreparedStatement pstmt) {
     super(pstmt);
 
     this.pooledConnection = pooledConnection;

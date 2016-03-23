@@ -130,7 +130,7 @@ public class PooledConnectionQueue {
   /**
    * Collect statistics of a connection that is fully closing
    */
-  protected void reportClosingConnection(PooledConnection pooledConnection) {
+  void reportClosingConnection(PooledConnection pooledConnection) {
 
     collectedStats.add(pooledConnection.getStatistics());
   }
@@ -173,7 +173,7 @@ public class PooledConnectionQueue {
     }
   }
 
-  public void setMinSize(int minSize) {
+  void setMinSize(int minSize) {
     final ReentrantLock lock = this.lock;
     lock.lock();
     try {
@@ -186,7 +186,7 @@ public class PooledConnectionQueue {
     }
   }
 
-  public void setMaxSize(int maxSize) {
+  void setMaxSize(int maxSize) {
     final ReentrantLock lock = this.lock;
     lock.lock();
     try {
@@ -200,7 +200,7 @@ public class PooledConnectionQueue {
     }
   }
 
-  public void setWarningSize(int warningSize) {
+  void setWarningSize(int warningSize) {
     final ReentrantLock lock = this.lock;
     lock.lock();
     try {
@@ -217,7 +217,7 @@ public class PooledConnectionQueue {
     return freeList.size() + busyList.size();
   }
 
-  public void ensureMinimumConnections() throws SQLException {
+  void ensureMinimumConnections() throws SQLException {
     final ReentrantLock lock = this.lock;
     lock.lock();
     try {
@@ -238,7 +238,7 @@ public class PooledConnectionQueue {
   /**
    * Return a PooledConnection.
    */
-  protected void returnPooledConnection(PooledConnection c, boolean forceClose) {
+  void returnPooledConnection(PooledConnection c, boolean forceClose) {
 
     final ReentrantLock lock = this.lock;
     lock.lock();
@@ -264,7 +264,7 @@ public class PooledConnectionQueue {
     return c;
   }
 
-  public PooledConnection getPooledConnection() throws SQLException {
+  PooledConnection getPooledConnection() throws SQLException {
 
     try {
       PooledConnection pc = _getPooledConnection();
@@ -448,7 +448,7 @@ public class PooledConnectionQueue {
   /**
    * Close all the connections that are in the free list.
    */
-  public void closeFreeConnections(boolean logErrors) {
+  private void closeFreeConnections(boolean logErrors) {
     final ReentrantLock lock = this.lock;
     lock.lock();
     try {
@@ -470,7 +470,7 @@ public class PooledConnectionQueue {
    * closed and put back into the pool.
    * </p>
    */
-  public void closeBusyConnections(long leakTimeMinutes) {
+  void closeBusyConnections(long leakTimeMinutes) {
 
     final ReentrantLock lock = this.lock;
     lock.lock();
@@ -504,11 +504,11 @@ public class PooledConnectionQueue {
     }
   }
 
-  public String getBusyConnectionInformation() {
+  String getBusyConnectionInformation() {
     return getBusyConnectionInformation(false);
   }
 
-  public void dumpBusyConnectionInformation() {
+  void dumpBusyConnectionInformation() {
     getBusyConnectionInformation(true);
   }
 

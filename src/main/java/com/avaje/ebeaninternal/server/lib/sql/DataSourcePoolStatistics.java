@@ -26,20 +26,9 @@ public class DataSourcePoolStatistics {
   private final long totalMicros;
 
   /**
-   * No statistics collected.
-   */
-  public DataSourcePoolStatistics() {
-    this.collectionStart = 0;
-    this.count = 0;
-    this.errorCount = 0;
-    this.hwmMicros = 0;
-    this.totalMicros = 0;
-  }
-
-  /**
    * Construct with statistics collected.
    */
-  public DataSourcePoolStatistics(long collectionStart, long count, long errorCount, long hwmMicros, long totalMicros) {
+  DataSourcePoolStatistics(long collectionStart, long count, long errorCount, long hwmMicros, long totalMicros) {
     this.collectionStart = collectionStart;
     this.count = count;
     this.errorCount = errorCount;

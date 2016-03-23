@@ -25,7 +25,7 @@ class FreeConnectionBuffer {
    */
   private final LinkedList<PooledConnection> freeBuffer = new LinkedList<PooledConnection>();
 
-  protected FreeConnectionBuffer() {
+  FreeConnectionBuffer() {
   }
 
   protected int size() {
@@ -53,7 +53,7 @@ class FreeConnectionBuffer {
   /**
    * Close all connections in this buffer.
    */
-  protected void closeAll(boolean logErrors) {
+  void closeAll(boolean logErrors) {
 
     // create a temporary list
     List<PooledConnection> tempList = new ArrayList<PooledConnection>(freeBuffer.size());
@@ -97,7 +97,7 @@ class FreeConnectionBuffer {
   /**
    * Collect the load statistics from all the free connections.
    */
-  protected void collectStatistics(LoadValues values, boolean reset) {
+  void collectStatistics(LoadValues values, boolean reset) {
 
     for (PooledConnection c : freeBuffer) {
       values.plus(c.getStatistics().getValues(reset));

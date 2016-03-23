@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Collects load statistics for a PooledConnection.
  */
-public class PooledConnectionStatistics {
+class PooledConnectionStatistics {
 
   private final AtomicLong count = new AtomicLong();
 
@@ -18,7 +18,7 @@ public class PooledConnectionStatistics {
 
   private final AtomicLong collectionStart;
 
-  public PooledConnectionStatistics() {
+  PooledConnectionStatistics() {
     this.collectionStart = new AtomicLong(System.currentTimeMillis());
   }
 
@@ -67,22 +67,22 @@ public class PooledConnectionStatistics {
     return count.get();
   }
 
-  public long getErrorCount() {
+  private long getErrorCount() {
     return errorCount.get();
   }
 
-  public long getTotalMicros() {
+  private long getTotalMicros() {
     return TimeUnit.MICROSECONDS.convert(totalNanos.get(), TimeUnit.NANOSECONDS);
   }
 
-  public long getHwmMicros() {
+  private long getHwmMicros() {
     return TimeUnit.MICROSECONDS.convert(hwmNanos.get(), TimeUnit.NANOSECONDS);
   }
 
   /**
    * Get the current values and reset the statistics if necessary.
    */
-  public LoadValues getValues(boolean reset) {
+  LoadValues getValues(boolean reset) {
     LoadValues value = new LoadValues(collectionStart.get(), count.get(), errorCount.get(), getHwmMicros(), getTotalMicros());
     if (reset) {
       count.set(0);
@@ -100,7 +100,7 @@ public class PooledConnectionStatistics {
    * These are aggregated up to get a total for the DataSourcePool.
    * </p>
    */
-  public static class LoadValues {
+  static class LoadValues {
 
     private long collectionStart;
     private long count;
@@ -108,10 +108,10 @@ public class PooledConnectionStatistics {
     private long hwmMicros;
     private long totalMicros;
 
-    public LoadValues() {
+    LoadValues() {
     }
 
-    public LoadValues(long collectionStart, long count, long errorCount, long hwmMicros, long totalMicros) {
+    LoadValues(long collectionStart, long count, long errorCount, long hwmMicros, long totalMicros) {
       this.collectionStart = collectionStart;
       this.count = count;
       this.errorCount = errorCount;
@@ -131,7 +131,7 @@ public class PooledConnectionStatistics {
       return "count[" + count + "] errors[" + errorCount + "] totalMicros[" + totalMicros + "] hwmMicros[" + hwmMicros + "] avgMicros[" + getAvgMicros() + "]";
     }
 
-    public long getCollectionStart() {
+    long getCollectionStart() {
       return collectionStart;
     }
 
@@ -139,19 +139,19 @@ public class PooledConnectionStatistics {
       return count;
     }
 
-    public long getErrorCount() {
+    long getErrorCount() {
       return errorCount;
     }
 
-    public long getHwmMicros() {
+    long getHwmMicros() {
       return hwmMicros;
     }
 
-    public long getTotalMicros() {
+    long getTotalMicros() {
       return totalMicros;
     }
 
-    public long getAvgMicros() {
+    long getAvgMicros() {
       return (count == 0) ? 0 : totalMicros / count;
     }
   }

@@ -10,16 +10,11 @@ import java.util.Map;
 /**
  * A LRU based cache for PreparedStatements.
  */
-public class PstmtCache extends LinkedHashMap<String, ExtendedPreparedStatement> {
+class PstmtCache extends LinkedHashMap<String, ExtendedPreparedStatement> {
 
   private static final Logger logger = LoggerFactory.getLogger(PstmtCache.class);
 
   static final long serialVersionUID = -3096406924865550697L;
-
-  /**
-   * The name of the cache, for tracing purposes.
-   */
-  protected final String cacheName;
 
   /**
    * The maximum size of the cache.  When this is exceeded the oldest entry is removed.
@@ -46,11 +41,9 @@ public class PstmtCache extends LinkedHashMap<String, ExtendedPreparedStatement>
    */
   private int putCounter;
 
-  public PstmtCache(String cacheName, int maxCacheSize) {
-
+  PstmtCache(int maxCacheSize) {
     // note = access ordered list.  This is what gives it the LRU order
     super(maxCacheSize * 3, 0.75f, true);
-    this.cacheName = cacheName;
     this.maxSize = maxCacheSize;
   }
 
@@ -72,7 +65,7 @@ public class PstmtCache extends LinkedHashMap<String, ExtendedPreparedStatement>
    * Gets the hit ratio.  A number between 0 and 100 indicating the number of
    * hits to misses.  A number approaching 100 is desirable.
    */
-  public int getHitRatio() {
+  private int getHitRatio() {
     if (hitCounter == 0) {
       return 0;
     } else {
@@ -106,7 +99,7 @@ public class PstmtCache extends LinkedHashMap<String, ExtendedPreparedStatement>
    * matching ExtendedPreparedStatement in the cache return false else add
    * the statement to the cache and return true.
    */
-  public boolean returnStatement(ExtendedPreparedStatement pstmt) {
+  boolean returnStatement(ExtendedPreparedStatement pstmt) {
 
     ExtendedPreparedStatement alreadyInCache = super.get(pstmt.getCacheKey());
     if (alreadyInCache != null) {
