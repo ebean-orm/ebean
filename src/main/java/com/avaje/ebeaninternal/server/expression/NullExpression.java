@@ -39,7 +39,7 @@ class NullExpression extends AbstractExpression {
 
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isAssocId()) {
-      request.append(prop.getAssocOneIdExpr(propertyName, nullExpr));
+      request.append(prop.getAssocIdExpression(propertyName, nullExpr));
       return;
     }
 

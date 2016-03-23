@@ -154,14 +154,14 @@ public class ElPropertyChain implements ElPropertyValue {
     return lastElPropertyValue.isLocalEncrypted();
   }
 
-  public Object[] getAssocOneIdValues(EntityBean bean) {
+  public Object[] getAssocIdValues(EntityBean bean) {
     // Don't navigate the object graph as bean
     // is assumed to be the appropriate type
-    return lastElPropertyValue.getAssocOneIdValues(bean);
+    return lastElPropertyValue.getAssocIdValues(bean);
   }
 
-  public String getAssocOneIdExpr(String prefix, String operator) {
-    return lastElPropertyValue.getAssocOneIdExpr(expression, operator);
+  public String getAssocIdExpression(String prefix, String operator) {
+    return lastElPropertyValue.getAssocIdExpression(expression, operator);
   }
 
   public String getAssocIdInExpr(String prefix) {

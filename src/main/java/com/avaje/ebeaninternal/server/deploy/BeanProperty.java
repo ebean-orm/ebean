@@ -834,12 +834,12 @@ public class BeanProperty implements ElPropertyValue, Property {
     return false;
   }
 
-  public Object[] getAssocOneIdValues(EntityBean bean) {
+  public Object[] getAssocIdValues(EntityBean bean) {
     // Returns null as not an AssocOne.
     return null;
   }
 
-  public String getAssocOneIdExpr(String prefix, String operator) {
+  public String getAssocIdExpression(String prefix, String operator) {
     // Returns null as not an AssocOne.
     return null;
   }

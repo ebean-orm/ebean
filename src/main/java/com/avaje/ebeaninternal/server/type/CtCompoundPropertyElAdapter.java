@@ -48,11 +48,11 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
     prop.setValue(bean, value);
   }
 
-  public String getAssocOneIdExpr(String prefix, String operator) {
+  public String getAssocIdExpression(String prefix, String operator) {
     throw new RuntimeException("Not Supported or Expected");
   }
 
-  public Object[] getAssocOneIdValues(EntityBean bean) {
+  public Object[] getAssocIdValues(EntityBean bean) {
     throw new RuntimeException("Not Supported or Expected");
   }
 

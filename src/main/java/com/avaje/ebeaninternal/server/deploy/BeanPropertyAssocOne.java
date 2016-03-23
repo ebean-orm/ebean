@@ -415,14 +415,14 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
    * Return the Id values from the given bean.
    */
   @Override
-  public Object[] getAssocOneIdValues(EntityBean bean) {
+  public Object[] getAssocIdValues(EntityBean bean) {
     return targetDescriptor.getIdBinder().getIdValues(bean);
   }
 
   /**
    * Return the Id expression to add to where clause etc.
    */
-  public String getAssocOneIdExpr(String prefix, String operator) {
+  public String getAssocIdExpression(String prefix, String operator) {
     return targetDescriptor.getIdBinder().getAssocOneIdExpr(prefix, operator);
   }
 

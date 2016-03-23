@@ -98,14 +98,14 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   /**
    * Returns null as not an AssocOne.
    */
-  public Object[] getAssocOneIdValues(EntityBean value) {
+  public Object[] getAssocIdValues(EntityBean value) {
     return null;
   }
 
   /**
    * Returns null as not an AssocOne.
    */
-  public String getAssocOneIdExpr(String prefix, String operator) {
+  public String getAssocIdExpression(String prefix, String operator) {
     return null;
   }
 

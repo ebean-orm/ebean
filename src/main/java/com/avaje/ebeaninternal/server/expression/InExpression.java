@@ -46,7 +46,7 @@ class InExpression extends AbstractExpression {
 
       } else {
         // extract the id values from the bean
-        Object[] ids = prop.getAssocOneIdValues((EntityBean) values[i]);
+        Object[] ids = prop.getAssocIdValues((EntityBean) values[i]);
         if (ids != null) {
           for (int j = 0; j < ids.length; j++) {
             request.addBindValue(ids[j]);

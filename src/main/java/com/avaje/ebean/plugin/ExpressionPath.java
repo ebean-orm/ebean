@@ -67,10 +67,10 @@ public interface ExpressionPath {
    * Typically used to produce id = ? expression strings.
    * </p>
    */
-  String getAssocOneIdExpr(String propName, String bindOperator);
+  String getAssocIdExpression(String propName, String bindOperator);
 
   /**
    * Return the Id values for the given bean value.
    */
-  Object[] getAssocOneIdValues(EntityBean bean);
+  Object[] getAssocIdValues(EntityBean bean);
 }
