@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.plugin.ExpressionPath;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
@@ -25,7 +26,17 @@ public class SimpleExpression extends AbstractExpression {
     if (type == Op.BETWEEN) {
       throw new IllegalStateException("BETWEEN Not expected in SimpleExpression?");
     }
-    context.writeSimple(type, propName, value);
+    ExpressionPath prop = context.getExpressionPath(propName);
+    if (prop != null && prop.isAssocId()) {
+      String idName = prop.getAssocOneIdExpr(propName, "");
+      Object[] ids = prop.getAssocOneIdValues((EntityBean) value);
+      if (ids == null || ids.length != 1) {
+        throw new IllegalArgumentException("Expecting 1 Id value for " + idName + " but got " + ids);
+      }
+      context.writeSimple(type, idName, ids[0]);
+    } else {
+      context.writeSimple(type, propName, value);
+    }
   }
 
   public final String getPropName() {

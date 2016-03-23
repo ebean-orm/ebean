@@ -1,5 +1,6 @@
 package com.avaje.ebean.plugin;
 
+import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.StringParser;
 
 /**
@@ -54,4 +55,22 @@ public interface ExpressionPath {
    * Return the underlying JDBC type or 0 if this is not a scalar type.
    */
   int getJdbcType();
+
+  /**
+   * Return true if this is an ManyToOne or OneToOne associated bean property.
+   */
+  boolean isAssocId();
+
+  /**
+   * Return the Id expression string.
+   * <p>
+   * Typically used to produce id = ? expression strings.
+   * </p>
+   */
+  String getAssocOneIdExpr(String propName, String bindOperator);
+
+  /**
+   * Return the Id values for the given bean value.
+   */
+  Object[] getAssocOneIdValues(EntityBean bean);
 }

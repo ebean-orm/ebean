@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.Junction;
 import com.avaje.ebean.LikeType;
+import com.avaje.ebean.plugin.ExpressionPath;
 import com.avaje.ebean.search.Match;
 import com.avaje.ebean.search.MultiMatch;
 import com.avaje.ebean.search.TextCommonTerms;
@@ -142,4 +143,8 @@ public interface DocQueryContext {
    */
   void endBoolGroup() throws IOException;
 
+  /**
+   * Return the expression path for the given property path.
+   */
+  ExpressionPath getExpressionPath(String propName);
 }

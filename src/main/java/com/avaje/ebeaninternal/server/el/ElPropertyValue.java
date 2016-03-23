@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.el;
 
-import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.plugin.ExpressionPath;
 
 /**
@@ -10,19 +9,6 @@ import com.avaje.ebean.plugin.ExpressionPath;
  * </p>
  */
 public interface ElPropertyValue extends ElPropertyDeploy, ExpressionPath {
-
-  /**
-   * Return the Id values for the given bean value.
-   */
-  Object[] getAssocOneIdValues(EntityBean bean);
-
-  /**
-   * Return the Id expression string.
-   * <p>
-   * Typically used to produce id = ? expression strings.
-   * </p>
-   */
-  String getAssocOneIdExpr(String prefix, String operator);
 
   /**
    * Return the logical id value expression taking into account embedded id's.
