@@ -12,11 +12,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class DLoadContextTest extends BaseTestCase {
 
-  OrmQueryRequest<Order> queryRequest(Query<Order> query) {
+  private OrmQueryRequest<Order> queryRequest(Query<Order> query) {
     return OrmQueryRequestTestHelper.queryRequest(query);
   }
 
-  Query<Order> query() {
+  private Query<Order> query() {
     return server().find(Order.class);
   }
 
