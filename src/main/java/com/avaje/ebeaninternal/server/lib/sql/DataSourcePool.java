@@ -290,7 +290,7 @@ public class DataSourcePool implements DataSource {
    * This is only used when {@link #isCaptureStackTrace()} is true.
    * </p>
    */
-  public int getMaxStackTraceSize() {
+  int getMaxStackTraceSize() {
     return maxStackTraceSize;
   }
 
@@ -389,7 +389,7 @@ public class DataSourcePool implements DataSource {
    * run periodically (every heartbeatFreqSecs seconds actually).
    * </p>
    */
-  public void checkDataSource() {
+  private void checkDataSource() {
 
     // first trim idle connections
     trimIdleConnections();
@@ -560,7 +560,7 @@ public class DataSourcePool implements DataSource {
    * Make sure the connection is still ok to use. If not then remove it from
    * the pool.
    */
-  protected boolean validateConnection(PooledConnection conn) {
+  boolean validateConnection(PooledConnection conn) {
     try {
       return testConnection(conn);
 
@@ -581,7 +581,7 @@ public class DataSourcePool implements DataSource {
    *
    * @param pooledConnection the returning connection
    */
-  protected void returnConnection(PooledConnection pooledConnection) {
+  void returnConnection(PooledConnection pooledConnection) {
 
     // return a normal 'good' connection
     returnTheConnection(pooledConnection, false);
@@ -590,7 +590,7 @@ public class DataSourcePool implements DataSource {
   /**
    * This is a bad connection and must be removed from the pool's busy list and fully closed.
    */
-  protected void returnConnectionForceClose(PooledConnection pooledConnection) {
+  void returnConnectionForceClose(PooledConnection pooledConnection) {
 
     returnTheConnection(pooledConnection, true);
   }
@@ -615,7 +615,7 @@ public class DataSourcePool implements DataSource {
   /**
    * Collect statistics of a connection that is fully closing
    */
-  protected void reportClosingConnection(PooledConnection pooledConnection) {
+  void reportClosingConnection(PooledConnection pooledConnection) {
 
     queue.reportClosingConnection(pooledConnection);
   }
@@ -664,7 +664,7 @@ public class DataSourcePool implements DataSource {
    * This method is protected by synchronization in calling methods.
    * </p>
    */
-  protected PooledConnection createConnectionForQueue(int connId) throws SQLException {
+  PooledConnection createConnectionForQueue(int connId) throws SQLException {
 
     try {
       Connection c = createUnpooledConnection();
@@ -715,7 +715,7 @@ public class DataSourcePool implements DataSource {
    * will go into a wait if the pool has hit its maximum size.
    * </p>
    */
-  public PooledConnection getPooledConnection() throws SQLException {
+  private PooledConnection getPooledConnection() throws SQLException {
 
     PooledConnection c = queue.getPooledConnection();
 
@@ -774,7 +774,7 @@ public class DataSourcePool implements DataSource {
    *
    * @return the default transaction isolation level
    */
-  public int getTransactionIsolation() {
+  int getTransactionIsolation() {
     return transactionIsolation;
   }
 
@@ -891,9 +891,9 @@ public class DataSourcePool implements DataSource {
   /**
    * Deregister the JDBC driver.
    */
-  public void deregisterDriver() {
+  private void deregisterDriver() {
     try {
-      logger.debug("Deregistered the JDBC driver " + this.databaseDriver);
+      logger.debug("Deregister the JDBC driver " + this.databaseDriver);
       DriverManager.deregisterDriver(DriverManager.getDriver(this.databaseUrl));
     } catch (SQLException e) {
       logger.warn("Error trying to deregister the JDBC driver " + this.databaseDriver, e);
