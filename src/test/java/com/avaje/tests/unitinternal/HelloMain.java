@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.EbeanServerFactory;
-import com.avaje.ebean.config.DataSourceConfig;
+import org.avaje.datasource.DataSourceConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.tests.model.basic.TOne;
 

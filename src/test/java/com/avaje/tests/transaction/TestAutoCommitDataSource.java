@@ -5,16 +5,19 @@ import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.Transaction;
-import com.avaje.ebean.config.DataSourceConfig;
+import com.avaje.ebean.config.PropertyMap;
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
 import com.avaje.tests.model.basic.UTDetail;
 import com.avaje.tests.model.basic.UTMaster;
+import org.avaje.datasource.DataSourceConfig;
+import org.avaje.datasource.DataSourcePool;
+import org.avaje.datasource.pool.ConnectionPool;
 import org.junit.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -24,11 +27,13 @@ public class TestAutoCommitDataSource extends BaseTestCase {
   @Test
   public void test() throws SQLException {
 
+    Properties properties = PropertyMap.defaultProperties();
+
     DataSourceConfig dsConfig = new DataSourceConfig();
-    dsConfig.loadSettings("h2autocommit");//"pg"
+    dsConfig.loadSettings(properties, "h2autocommit");//"pg"
     dsConfig.setAutoCommit(true);
 
-    DataSourcePool pool = new DataSourcePool(null, "h2autocommit", dsConfig);
+    DataSourcePool pool = new ConnectionPool("h2autocommit", dsConfig);
 
     Connection connection = pool.getConnection();
     assertTrue(connection.getAutoCommit());

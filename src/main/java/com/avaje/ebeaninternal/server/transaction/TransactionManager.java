@@ -16,7 +16,7 @@ import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
-import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
+import org.avaje.datasource.DataSourcePool;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import org.slf4j.Logger;
@@ -27,7 +27,6 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -129,15 +128,6 @@ public class TransactionManager {
     this.externalTransPrefix = "e";
 
     this.onQueryOnly = initOnQueryOnly(config.getDatabasePlatform().getOnQueryOnly(), dataSource);
-
-    initialiseHeartbeat();
-  }
-
-  private void initialiseHeartbeat() {
-    if (dataSource instanceof DataSourcePool) {
-      DataSourcePool ds = (DataSourcePool) dataSource;
-      backgroundExecutor.executePeriodically(ds.getHeartbeatRunnable(), ds.getHeartbeatFreqSecs(), TimeUnit.SECONDS);
-    }
   }
 
   public void shutdown(boolean shutdownDataSource, boolean deregisterDriver) {

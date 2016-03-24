@@ -6,7 +6,6 @@ import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.common.SpiContainer;
 import com.avaje.ebean.config.ContainerConfig;
-import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.PropertyMap;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.UnderscoreNamingConvention;
@@ -18,10 +17,10 @@ import com.avaje.ebeaninternal.server.cache.DefaultServerCacheFactory;
 import com.avaje.ebeaninternal.server.cache.DefaultServerCacheManager;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
-import com.avaje.ebeaninternal.server.lib.sql.DataSourceAlert;
-import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
-import com.avaje.ebeaninternal.server.lib.sql.DataSourcePoolListener;
-import com.avaje.ebeaninternal.server.lib.sql.SimpleDataSourceAlert;
+import org.avaje.datasource.DataSourceAlertFactory;
+import org.avaje.datasource.DataSourceConfig;
+import org.avaje.datasource.DataSourceFactory;
+import org.avaje.datasource.DataSourcePoolListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -295,18 +294,32 @@ public class DefaultContainer implements SpiContainer {
       return null;
     }
 
-    DataSourceAlert notify = new SimpleDataSourceAlert();
-    DataSourcePoolListener listener = createListener(config, dsConfig);
+    DataSourceFactory factory = config.service(DataSourceFactory.class);
+    if (factory == null) {
+      throw new IllegalStateException("No DataSourceFactory service implementation found in class path."
+          + " Probably missing dependency to avaje-datasource?");
+    }
 
-    return new DataSourcePool(notify, config.getName(), dsConfig, listener);
+    DataSourceAlertFactory alertFactory = config.service(DataSourceAlertFactory.class);
+    if (alertFactory != null) {
+      dsConfig.setAlert(alertFactory.createAlert());
+    }
+
+    attachListener(config, dsConfig);
+
+    return factory.createPool(config.getName(), dsConfig);
   }
 
   /**
-   * Create and return a DataSourcePoolListener if it has been specified.
+   * Create and attach a DataSourcePoolListener if it has been specified via properties and there is not one already attached.
    */
-  private DataSourcePoolListener createListener(ServerConfig config, DataSourceConfig dsConfig) {
-    String poolListener = dsConfig.getPoolListener();
-    return poolListener != null ? (DataSourcePoolListener) config.getClassLoadConfig().newInstance(poolListener) : null;
+  private void attachListener(ServerConfig config, DataSourceConfig dsConfig) {
+    if (dsConfig.getListener() == null) {
+      String poolListener = dsConfig.getPoolListener();
+      if (poolListener != null) {
+        dsConfig.setListener((DataSourcePoolListener)config.getClassLoadConfig().newInstance(poolListener));
+      }
+    }
   }
 
   /**

@@ -8,7 +8,7 @@ import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlRow;
-import com.avaje.ebean.config.DataSourceConfig;
+import org.avaje.datasource.DataSourceConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.PostgresPlatform;
 import com.avaje.tests.model.basic.TOne;

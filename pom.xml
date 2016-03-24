@@ -56,6 +56,24 @@
     </dependency>
 
     <dependency>
+      <groupId>org.avaje</groupId>
+      <artifactId>avaje-datasource-api</artifactId>
+      <version>1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.avaje</groupId>
+      <artifactId>avaje-datasource</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+
+    <!--<dependency>-->
+      <!--<groupId>org.avaje</groupId>-->
+      <!--<artifactId>avaje-datasource-alert</artifactId>-->
+      <!--<version>1.1.1</version>-->
+    <!--</dependency>-->
+
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>1.7.7</version>

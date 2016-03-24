@@ -22,6 +22,7 @@ import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.fasterxml.jackson.core.JsonFactory;
+import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -1391,8 +1392,6 @@ public class ServerConfig {
    * <p>
    * Values are oracle, h2, postgres, mysql, mssqlserver2005.
    * </p>
-   * 
-   * @see DataSourceConfig#setOffline(boolean)
    */
   public void setDatabasePlatformName(String databasePlatformName) {
     this.databasePlatformName = databasePlatformName;
@@ -2246,7 +2245,7 @@ public class ServerConfig {
    * @param p - The defined property source passed to load settings
    */
   protected void loadDataSourceSettings(PropertiesWrapper p) {
-    dataSourceConfig.loadSettings(p.withPrefix("datasource"));
+    dataSourceConfig.loadSettings(p.properties, name);
   }
 
   /**

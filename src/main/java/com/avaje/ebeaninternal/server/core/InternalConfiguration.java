@@ -29,7 +29,7 @@ import com.avaje.ebeaninternal.server.deploy.parse.DeployCreateProperties;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployInherit;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployUtil;
 import com.avaje.ebeaninternal.server.expression.DefaultExpressionFactory;
-import com.avaje.ebeaninternal.server.lib.sql.DataSourcePool;
+import org.avaje.datasource.DataSourcePool;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.persist.DefaultPersister;
 import com.avaje.ebeaninternal.server.query.CQueryEngine;
@@ -361,7 +361,7 @@ public class InternalConfiguration {
       return true;
     }
     DataSource dataSource = serverConfig.getDataSource();
-    return dataSource instanceof DataSourcePool && ((DataSourcePool) dataSource).getAutoCommit();
+    return dataSource instanceof DataSourcePool && ((DataSourcePool) dataSource).isAutoCommit();
   }
 
   /**

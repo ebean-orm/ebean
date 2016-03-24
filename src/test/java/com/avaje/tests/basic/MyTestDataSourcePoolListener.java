@@ -2,7 +2,7 @@ package com.avaje.tests.basic;
 
 import java.sql.Connection;
 
-import com.avaje.ebeaninternal.server.lib.sql.DataSourcePoolListener;
+import org.avaje.datasource.DataSourcePoolListener;
 
 public class MyTestDataSourcePoolListener implements DataSourcePoolListener
 {
