@@ -291,7 +291,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9.1</version>
         <configuration>
-          <doctitle>Ebean 6</doctitle>
+          <doctitle>Ebean 7</doctitle>
           <overview>src/main/java/com/avaje/ebean/overview.html</overview>
           <source>1.8</source>
           <doclet>org.avaje.doclet.PygmentsDoclet</doclet>
@@ -310,7 +310,6 @@
           </additionalparam>
           <linksource>true</linksource>
           <overview>src/main/java/com/avaje/ebean/overview.html</overview>
-
         </configuration>
 
         <executions>
