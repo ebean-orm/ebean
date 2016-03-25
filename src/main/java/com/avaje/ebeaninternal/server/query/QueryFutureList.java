@@ -47,8 +47,12 @@ public class QueryFutureList<T> extends BaseFuture<List<T>> implements FutureLis
   public List<T> getUnchecked() {
     try {
       return get();
+
     } catch (InterruptedException e) {
+      // restore the interrupted status (so client can check for that)
+      Thread.currentThread().interrupt();
       throw new PersistenceException(e);
+
     } catch (ExecutionException e) {
       throw new PersistenceException(e);
     }
@@ -58,8 +62,12 @@ public class QueryFutureList<T> extends BaseFuture<List<T>> implements FutureLis
   public List<T> getUnchecked(long timeout, TimeUnit unit) throws TimeoutException {
     try {
       return get(timeout, unit);
+
     } catch (InterruptedException e) {
+      // restore the interrupted status (so client can check for that)
+      Thread.currentThread().interrupt();
       throw new PersistenceException(e);
+
     } catch (ExecutionException e) {
       throw new PersistenceException(e);
     }

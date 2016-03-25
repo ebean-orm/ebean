@@ -252,6 +252,8 @@ public class DefaultAutoTuneService implements AutoTuneService {
       }
       Thread.sleep(waitMillis);
     } catch (InterruptedException e) {
+      // restore the interrupted status
+      Thread.currentThread().interrupt();
       logger.warn("Error while sleeping after System.gc() request.", e);
     }
   }
