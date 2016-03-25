@@ -108,7 +108,7 @@ public class DefaultContainer implements SpiContainer {
         serverConfig.getDatabasePlatform().setDbEncrypt(serverConfig.getDbEncrypt());
       }
 
-      // inform the NamingConvention of the associated DatabasePlaform
+      // inform the NamingConvention of the associated DatabasePlatform
       serverConfig.getNamingConvention().setDatabasePlatform(serverConfig.getDatabasePlatform());
 
       ServerCacheManager cacheManager = getCacheManager(serverConfig);
@@ -234,8 +234,7 @@ public class DefaultContainer implements SpiContainer {
    */
   private void setNamingConvention(ServerConfig config) {
     if (config.getNamingConvention() == null) {
-      UnderscoreNamingConvention nc = new UnderscoreNamingConvention();
-      config.setNamingConvention(nc);
+      config.setNamingConvention(new UnderscoreNamingConvention());
     }
   }
 
@@ -246,7 +245,6 @@ public class DefaultContainer implements SpiContainer {
 
     DatabasePlatform dbPlatform = config.getDatabasePlatform();
     if (dbPlatform == null) {
-
       DatabasePlatformFactory factory = new DatabasePlatformFactory();
       DatabasePlatform db = factory.create(config);
       config.setDatabasePlatform(db);
@@ -259,8 +257,7 @@ public class DefaultContainer implements SpiContainer {
    */
   private void setDataSource(ServerConfig config) {
     if (config.getDataSource() == null) {
-      DataSource ds = getDataSourceFromConfig(config);
-      config.setDataSource(ds);
+      config.setDataSource(getDataSourceFromConfig(config));
     }
   }
 
@@ -328,7 +325,7 @@ public class DefaultContainer implements SpiContainer {
    * If autoCommit is true this could be a real problem.
    * </p>
    * <p>
-   * If the Isolation level is not READ_COMMITED then optimistic concurrency
+   * If the Isolation level is not READ_COMMITTED then optimistic concurrency
    * checking may not work as expected.
    * </p>
    */
@@ -349,12 +346,9 @@ public class DefaultContainer implements SpiContainer {
     Connection c = null;
     try {
       c = serverConfig.getDataSource().getConnection();
-
       if (c.getAutoCommit()) {
-        String m = "DataSource [" + serverConfig.getName() + "] has autoCommit defaulting to true!";
-        logger.warn(m);
+        logger.warn("DataSource [{}] has autoCommit defaulting to true!", serverConfig.getName());
       }
-
       return true;
 
     } catch (SQLException ex) {
@@ -365,7 +359,7 @@ public class DefaultContainer implements SpiContainer {
         try {
           c.close();
         } catch (SQLException ex) {
-          logger.error(null, ex);
+          logger.error("Error closing connection", ex);
         }
       }
     }
