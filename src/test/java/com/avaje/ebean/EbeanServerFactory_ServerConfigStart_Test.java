@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class EbeanServerFactory_ServerConfigStart_Test {
 
   @Test
-  public void test() {
+  public void test() throws InterruptedException {
 
     ServerConfig config = new ServerConfig();
     config.setName("h2");
@@ -34,6 +34,12 @@ public class EbeanServerFactory_ServerConfigStart_Test {
     assertThat(OnStartupViaClass.calledWithConfig).isSameAs(config);
 
     assertThat(ebeanServer).isNotNull();
+
+    // test server shutdown and restart using the same ServerConfig
+    ebeanServer.shutdown(true, false);
+
+    EbeanServer restartedServer = EbeanServerFactory.create(config);
+    restartedServer.shutdown(true, false);
   }
 
   public static class OnStartup implements ServerConfigStartup {

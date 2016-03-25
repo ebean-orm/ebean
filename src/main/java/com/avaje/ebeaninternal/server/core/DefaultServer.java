@@ -398,9 +398,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   private void shutdownInternal(boolean shutdownDataSource, boolean deregisterDriver) {
 
-    logger.debug("Shutting down EbeanServer " + getName());
+    logger.debug("Shutting down EbeanServer {}", serverName);
     if (shutdown) {
-      // Already shutdown
+      // already shutdown
       return;
     }
     shutdownPlugins();
@@ -411,6 +411,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     // shutdown DataSource (if its an Ebean one)
     transactionManager.shutdown(shutdownDataSource, deregisterDriver);
     shutdown = true;
+    if (shutdownDataSource) {
+      // deregister the DataSource in case ServerConfig is re-used
+      serverConfig.setDataSource(null);
+    }
   }
 
   private void shutdownPlugins() {
