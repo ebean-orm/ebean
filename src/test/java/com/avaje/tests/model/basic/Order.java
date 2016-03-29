@@ -1,6 +1,7 @@
 package com.avaje.tests.model.basic;
 
 import com.avaje.ebean.annotation.ChangeLog;
+import com.avaje.ebean.annotation.DocEmbedded;
 import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.DocStoreEmbedded;
 import com.avaje.ebean.annotation.Formula;
@@ -86,7 +87,7 @@ public class Order implements Serializable {
   @NotNull
   @ManyToOne
   @JoinColumn(name = "kcustomer_id")
-  @DocStoreEmbedded(doc = "id,name")
+  @DocEmbedded(doc = "id,name")
   Customer customer;
 
   @Column(name = "name", table = "o_customer")

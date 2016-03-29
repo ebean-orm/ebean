@@ -1,15 +1,14 @@
 package com.avaje.tests.model.basic;
 
-import com.avaje.ebean.annotation.DocStoreEmbedded;
-
-import java.io.Serializable;
-import java.sql.Timestamp;
+import com.avaje.ebean.annotation.DocEmbedded;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
  * Order Detail entity bean.
@@ -33,7 +32,7 @@ public class OrderDetail implements Serializable {
     Double unitPrice;
 
     @ManyToOne
-    @DocStoreEmbedded(doc = "id,name,sku")
+    @DocEmbedded(doc = "id,name,sku")
     Product product;
 
     Timestamp cretime;

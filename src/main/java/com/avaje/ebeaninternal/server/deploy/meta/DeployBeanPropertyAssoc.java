@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
-import com.avaje.ebean.annotation.DocStoreEmbedded;
 import com.avaje.ebeaninternal.server.deploy.BeanCascadeInfo;
 import com.avaje.ebeaninternal.server.deploy.BeanTable;
 
@@ -140,8 +139,8 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
 	/**
 	 * Set DocStoreEmbedded deployment information.
 	 */
-	public void setDocStoreEmbedded(DocStoreEmbedded embedded) {
-		docStoreDoc = embedded.doc();
+	public void setDocStoreEmbedded(String embeddedDoc) {
+		this.docStoreDoc = embeddedDoc;
 	}
 
   public String getDocStoreDoc() {

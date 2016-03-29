@@ -6,27 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specify the property is included in the parent document store index.
- *
- * <pre>{@code
- *
- *
- * @DocStore
- * @Entity @Table(name = "o_order")
- * public class Order {
- *
- *   ...
- *   // include some customer details including
- *   // nested billingAddress
- *   @DocStoreEmbedded(doc = "id,status,name,billingAddress(*,country(*)")
- *   @ManyToOne
- *   Customer customer;
- *
- *
- * }</pre>
+ * Deprecated in favor of @DocEmbedded (i.e. renamed to @DocEmbedded)
  */
 @Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
+@Deprecated
 public @interface DocStoreEmbedded {
 
   /**
