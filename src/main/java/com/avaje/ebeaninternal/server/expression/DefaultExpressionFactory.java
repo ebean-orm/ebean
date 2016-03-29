@@ -16,6 +16,7 @@ import com.avaje.ebean.search.TextSimple;
 import com.avaje.ebeaninternal.api.SpiExpressionFactory;
 import com.avaje.ebeaninternal.api.SpiQuery;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -363,6 +364,13 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   public Expression idIn(List<?> idList) {
     return new IdInExpression(idList);
+  }
+
+  /**
+   * Id IN a list of id values.
+   */
+  public Expression idIn(Object... idValues) {
+    return new IdInExpression(Arrays.asList(idValues));
   }
 
   /**

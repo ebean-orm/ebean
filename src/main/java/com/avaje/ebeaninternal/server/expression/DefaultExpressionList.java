@@ -33,7 +33,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   protected final Query<T> query;
 
-  protected final ExpressionList<T> parentExprList;
+  private final ExpressionList<T> parentExprList;
 
   protected transient ExpressionFactory expr;
 
@@ -57,11 +57,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     this(query, query.getExpressionFactory(), parentExprList);
   }
 
-  public DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList) {
+  DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList) {
     this(query, expr, parentExprList, new ArrayList<SpiExpression>());
   }
 
-  protected DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
+  DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
     this(query, expr, parentExprList, list, false);
   }
 
@@ -664,6 +664,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> icontains(String propertyName, String value) {
     add(expr.icontains(propertyName, value));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> idIn(Object... idValues) {
+    add(expr.idIn(idValues));
     return this;
   }
 

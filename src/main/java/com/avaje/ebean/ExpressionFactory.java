@@ -254,6 +254,11 @@ public interface ExpressionFactory {
   /**
    * Id IN a list of Id values.
    */
+  Expression idIn(Object... idValues);
+
+  /**
+   * Id IN a list of Id values.
+   */
   Expression idIn(List<?> idList);
 
   /**

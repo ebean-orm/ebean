@@ -761,6 +761,11 @@ public interface ExpressionList<T> {
   /**
    * Id IN a list of id values.
    */
+  ExpressionList<T> idIn(Object... idValues);
+
+  /**
+   * Id IN a list of id values.
+   */
   ExpressionList<T> idIn(List<?> idValues);
 
   /**
