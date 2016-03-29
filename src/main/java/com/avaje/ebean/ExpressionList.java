@@ -117,9 +117,15 @@ public interface ExpressionList<T> {
   Query<T> asDraft();
 
   /**
+   * Deprecated in favour of setIncludeSoftDeletes().
+   */
+  @Deprecated
+  Query<T> includeSoftDeletes();
+
+  /**
    * Execute the query including soft deleted rows.
    */
-  Query<T> includeSoftDeletes();
+  Query<T> setIncludeSoftDeletes();
 
   /**
    * Execute as a delete query deleting the 'root level' beans that match the predicates

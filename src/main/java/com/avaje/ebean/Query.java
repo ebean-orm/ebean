@@ -302,8 +302,9 @@ public interface Query<T> {
   Query<T> asDraft();
 
   /**
-   * Execute the query including soft deleted rows.
+   * Deprecated in favour of setIncludeSoftDeletes().
    */
+  @Deprecated
   Query<T> includeSoftDeletes();
 
   /**
@@ -374,6 +375,11 @@ public interface Query<T> {
    * @param lazyLoadBatchSize the number of beans to lazy load in a single batch
    */
   Query<T> setLazyLoadBatchSize(int lazyLoadBatchSize);
+
+  /**
+   * Execute the query including soft deleted rows.
+   */
+  Query<T> setIncludeSoftDeletes();
 
   /**
    * Disable read auditing for this query.

@@ -729,7 +729,7 @@ public final class DefaultPersister implements Persister {
     q.select(sb.toString());
     if (!softDelete) {
       // hard delete so we want this query to include logically deleted rows (if any)
-      q.includeSoftDeletes();
+      q.setIncludeSoftDeletes();
     }
     return q;
   }

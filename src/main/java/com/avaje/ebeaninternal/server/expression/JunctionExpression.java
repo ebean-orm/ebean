@@ -292,7 +292,12 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
 
   @Override
   public Query<T> includeSoftDeletes() {
-    return exprList.includeSoftDeletes();
+    return setIncludeSoftDeletes();
+  }
+
+  @Override
+  public Query<T> setIncludeSoftDeletes() {
+    return exprList.setIncludeSoftDeletes();
   }
 
   @Override

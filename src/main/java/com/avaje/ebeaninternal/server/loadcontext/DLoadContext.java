@@ -344,7 +344,7 @@ public class DLoadContext implements LoadContext {
       query.asDraft();
     }
     if (includeSoftDeletes) {
-      query.includeSoftDeletes();
+      query.setIncludeSoftDeletes();
     }
     if (disableReadAudit) {
       query.setDisableReadAuditing();

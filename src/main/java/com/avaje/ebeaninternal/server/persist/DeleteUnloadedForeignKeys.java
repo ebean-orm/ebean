@@ -68,7 +68,7 @@ class DeleteUnloadedForeignKeys {
     q.setPersistenceContextScope(PersistenceContextScope.QUERY);
     q.setAutoTune(false);
     q.select(sb.toString());
-    q.includeSoftDeletes();
+    q.setIncludeSoftDeletes();
     q.where().idEq(id);
 
     SpiTransaction t = request.getTransaction();

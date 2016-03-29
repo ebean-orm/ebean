@@ -37,7 +37,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     EBasicSoftDelete findInclude = Ebean.find(EBasicSoftDelete.class)
         .setId(bean.getId())
-        .includeSoftDeletes()
+        .setIncludeSoftDeletes()
         .findUnique();
 
     assertThat(findInclude).isNotNull();
@@ -70,7 +70,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     // -- test includeSoftDeletes().findRowCount()
 
     LoggedSqlCollector.start();
-    int rowCountFull = Ebean.find(EBasicSoftDelete.class).includeSoftDeletes().findRowCount();
+    int rowCountFull = Ebean.find(EBasicSoftDelete.class).setIncludeSoftDeletes().findRowCount();
     assertThat(rowCountFull).isGreaterThan(rowCountAfter);
 
     loggedSql = LoggedSqlCollector.stop();

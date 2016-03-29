@@ -358,6 +358,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public Query<T> includeSoftDeletes() {
+    return setIncludeSoftDeletes();
+  }
+
+  @Override
+  public Query<T> setIncludeSoftDeletes() {
     this.temporalMode = TemporalMode.SOFT_DELETED;
     return this;
   }
