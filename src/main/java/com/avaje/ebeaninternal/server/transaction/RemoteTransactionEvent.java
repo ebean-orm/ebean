@@ -33,10 +33,15 @@ public class RemoteTransactionEvent implements Runnable {
   }
 
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(beanPersistList);
+    StringBuilder sb = new StringBuilder(100);
+    if (!beanPersistList.isEmpty()) {
+      sb.append(beanPersistList);
+    }
     if (tableList != null) {
       sb.append(tableList);
+    }
+    if (deleteByIdMap != null) {
+      sb.append(deleteByIdMap.values());
     }
     return sb.toString();
   }
@@ -55,15 +60,15 @@ public class RemoteTransactionEvent implements Runnable {
       }
     }
 
-    if (beanPersistList != null) {
-      for (int i = 0; i < beanPersistList.size(); i++) {
-        beanPersistList.get(i).writeBinaryMessage(msgList);
-      }
+    for (int i = 0; i < beanPersistList.size(); i++) {
+      beanPersistList.get(i).writeBinaryMessage(msgList);
     }
   }
 
   public boolean isEmpty() {
-    return beanPersistList.isEmpty() && (tableList == null || tableList.isEmpty());
+    return beanPersistList.isEmpty()
+        && (tableList == null || tableList.isEmpty())
+        && (deleteByIdMap == null || deleteByIdMap.isEmpty());
   }
 
   public void addBeanPersistIds(BeanPersistIds beanPersist) {
@@ -89,11 +94,7 @@ public class RemoteTransactionEvent implements Runnable {
     this.server = server;
   }
 
-  public DeleteByIdMap getDeleteByIdMap() {
-    return deleteByIdMap;
-  }
-
-  public void setDeleteByIdMap(DeleteByIdMap deleteByIdMap) {
+  void setDeleteByIdMap(DeleteByIdMap deleteByIdMap) {
     this.deleteByIdMap = deleteByIdMap;
   }
 

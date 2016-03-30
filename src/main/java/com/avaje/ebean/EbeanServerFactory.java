@@ -133,7 +133,7 @@ public class EbeanServerFactory {
   /**
    * Create the container instance using the configuration.
    */
-  private static SpiContainer createContainer(ContainerConfig containerConfig) {
+  protected static SpiContainer createContainer(ContainerConfig containerConfig) {
 
     String implClassName = System.getProperty("ebean.container", DEFAULT_CONTAINER);
 

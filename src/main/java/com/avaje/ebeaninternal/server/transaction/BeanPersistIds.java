@@ -28,17 +28,15 @@ import java.util.List;
  * size of data sent around the network.
  * </p>
  */
-public class BeanPersistIds implements Serializable {
+public class BeanPersistIds {
 
-  private static final long serialVersionUID = 8389469180931531409L;
-
-  private transient BeanDescriptor<?> beanDescriptor;
+  private final BeanDescriptor<?> beanDescriptor;
 
   private final String descriptorId;
 
-  private ArrayList<Serializable> insertIds;
-  private ArrayList<Serializable> updateIds;
-  private ArrayList<Serializable> deleteIds;
+  private List<Object> insertIds;
+  private List<Object> updateIds;
+  private List<Object> deleteIds;
 
   /**
    * Create the payload.
@@ -62,8 +60,7 @@ public class BeanPersistIds implements Serializable {
     IdBinder idBinder = beanDescriptor.getIdBinder();
 
     int iudType = dataInput.readInt();
-    ArrayList<Serializable> idList = readIdList(dataInput, idBinder);
-
+    List<Object> idList = readIdList(dataInput, idBinder);
     switch (iudType) {
       case 0:
         insertIds = idList;
@@ -89,24 +86,23 @@ public class BeanPersistIds implements Serializable {
    * across multiple Packets.
    * </p>
    */
-  public void writeBinaryMessage(BinaryMessageList msgList) throws IOException {
+  void writeBinaryMessage(BinaryMessageList msgList) throws IOException {
 
     writeIdList(beanDescriptor, 0, insertIds, msgList);
     writeIdList(beanDescriptor, 1, updateIds, msgList);
     writeIdList(beanDescriptor, 2, deleteIds, msgList);
-
   }
 
-  private ArrayList<Serializable> readIdList(DataInput dataInput, IdBinder idBinder) throws IOException {
+  private List<Object> readIdList(DataInput dataInput, IdBinder idBinder) throws IOException {
 
     int count = dataInput.readInt();
     if (count < 1) {
       return null;
     }
-    ArrayList<Serializable> idList = new ArrayList<Serializable>(count);
+    List<Object> idList = new ArrayList<Object>(count);
     for (int i = 0; i < count; i++) {
       Object id = idBinder.readData(dataInput);
-      idList.add((Serializable) id);
+      idList.add(id);
     }
     return idList;
   }
@@ -121,8 +117,7 @@ public class BeanPersistIds implements Serializable {
    * Packets.
    * </p>
    */
-  private void writeIdList(BeanDescriptor<?> desc, int iudType, ArrayList<Serializable> idList,
-                           BinaryMessageList msgList) throws IOException {
+  private void writeIdList(BeanDescriptor<?> desc, int iudType, List<Object> idList, BinaryMessageList msgList) throws IOException {
 
     IdBinder idBinder = desc.getIdBinder();
 
@@ -144,8 +139,7 @@ public class BeanPersistIds implements Serializable {
         os.writeInt(count);
 
         for (; i < endOfLoop; i++) {
-          Serializable idValue = idList.get(i);
-          idBinder.writeData(os, idValue);
+          idBinder.writeData(os, idList.get(i));
         }
 
         os.flush();
@@ -174,7 +168,7 @@ public class BeanPersistIds implements Serializable {
     return sb.toString();
   }
 
-  public void addId(PersistRequest.Type type, Serializable id) {
+  void addId(PersistRequest.Type type, Serializable id) {
     switch (type) {
       case INSERT:
         addInsertId(id);
@@ -194,21 +188,21 @@ public class BeanPersistIds implements Serializable {
 
   private void addInsertId(Serializable id) {
     if (insertIds == null) {
-      insertIds = new ArrayList<Serializable>();
+      insertIds = new ArrayList<Object>();
     }
     insertIds.add(id);
   }
 
   private void addUpdateId(Serializable id) {
     if (updateIds == null) {
-      updateIds = new ArrayList<Serializable>();
+      updateIds = new ArrayList<Object>();
     }
     updateIds.add(id);
   }
 
   private void addDeleteId(Serializable id) {
     if (deleteIds == null) {
-      deleteIds = new ArrayList<Serializable>();
+      deleteIds = new ArrayList<Object>();
     }
     deleteIds.add(id);
   }
@@ -217,19 +211,15 @@ public class BeanPersistIds implements Serializable {
     return beanDescriptor;
   }
 
-  public List<Serializable> getDeleteIds() {
+  List<Object> getDeleteIds() {
     return deleteIds;
-  }
-
-  public void setBeanDescriptor(BeanDescriptor<?> beanDescriptor) {
-    this.beanDescriptor = beanDescriptor;
   }
 
   /**
    * Notify the cache and local BeanPersistListener of this event that came
    * from another server in the cluster.
    */
-  public void notifyCacheAndListener() {
+  void notifyCacheAndListener() {
 
     BeanPersistListener listener = beanDescriptor.getPersistListener();
 
@@ -238,7 +228,6 @@ public class BeanPersistIds implements Serializable {
 
     if (insertIds != null) {
       if (listener != null) {
-        // notify listener
         for (int i = 0; i < insertIds.size(); i++) {
           listener.remoteInsert(insertIds.get(i));
         }
@@ -246,25 +235,19 @@ public class BeanPersistIds implements Serializable {
     }
     if (updateIds != null) {
       for (int i = 0; i < updateIds.size(); i++) {
-        Serializable id = updateIds.get(i);
-
-        // remove from cache
+        Object id = updateIds.get(i);
         beanDescriptor.cacheBeanRemove(id);
         if (listener != null) {
-          // notify listener
-          listener.remoteInsert(id);
+          listener.remoteUpdate(id);
         }
       }
     }
     if (deleteIds != null) {
       for (int i = 0; i < deleteIds.size(); i++) {
-        Serializable id = deleteIds.get(i);
-
-        // remove from cache
+        Object id = deleteIds.get(i);
         beanDescriptor.cacheBeanRemove(id);
         if (listener != null) {
-          // notify listener
-          listener.remoteInsert(id);
+          listener.remoteDelete(id);
         }
       }
     }

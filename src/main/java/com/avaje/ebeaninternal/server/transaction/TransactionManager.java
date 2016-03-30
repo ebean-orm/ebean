@@ -39,6 +39,8 @@ public class TransactionManager {
 
   private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
 
+  public static final Logger clusterLogger = LoggerFactory.getLogger("org.avaje.ebean.Cluster");
+
   public static final Logger SQL_LOGGER = LoggerFactory.getLogger("org.avaje.ebean.SQL");
 
   public static final Logger SUM_LOGGER = LoggerFactory.getLogger("org.avaje.ebean.SUM");
@@ -396,12 +398,8 @@ public class TransactionManager {
       }
 
       PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction);
-
-      postCommit.notifyLocalCacheIndex();
-      postCommit.notifyCluster();
-
-      // cluster and text indexing
-      backgroundExecutor.execute(postCommit.notifyPersistListeners());
+      postCommit.notifyLocalCache();
+      backgroundExecutor.execute(postCommit.backgroundNotify());
 
       for (TransactionEventListener listener : transactionEventListeners) {
         listener.postTransactionCommit(transaction);
@@ -425,11 +423,8 @@ public class TransactionManager {
     event.add(tableEvents);
 
     PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, event);
-
-    // invalidate parts of local cache and index
-    postCommit.notifyLocalCacheIndex();
-
-    backgroundExecutor.execute(postCommit.notifyPersistListeners());
+    postCommit.notifyLocalCache();
+    backgroundExecutor.execute(postCommit.backgroundNotify());
   }
 
   /**
@@ -437,8 +432,8 @@ public class TransactionManager {
    */
   public void remoteTransactionEvent(RemoteTransactionEvent remoteEvent) {
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Cluster Received: " + remoteEvent.toString());
+    if (clusterLogger.isDebugEnabled()) {
+      clusterLogger.debug("processing {}", toString());
     }
 
     List<TableIUD> tableIUDList = remoteEvent.getTableIUDList();
@@ -449,11 +444,12 @@ public class TransactionManager {
       }
     }
 
+    // note DeleteById is written as BeanPersistIds and getBeanPersistList()
+    // processes both Bean IUD and DeleteById
     List<BeanPersistIds> beanPersistList = remoteEvent.getBeanPersistList();
     if (beanPersistList != null) {
       for (int i = 0; i < beanPersistList.size(); i++) {
-        BeanPersistIds beanPersist = beanPersistList.get(i);
-        beanPersist.notifyCacheAndListener();
+        beanPersistList.get(i).notifyCacheAndListener();
       }
     }
   }

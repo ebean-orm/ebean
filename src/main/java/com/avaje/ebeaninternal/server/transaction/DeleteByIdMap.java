@@ -27,7 +27,7 @@ public final class DeleteByIdMap {
   public void notifyCache() {
     for (BeanPersistIds deleteIds : beanMap.values()) {
       BeanDescriptor<?> d = deleteIds.getBeanDescriptor();
-      List<Serializable> idValues = deleteIds.getDeleteIds();
+      List<Object> idValues = deleteIds.getDeleteIds();
       if (idValues != null) {
         d.queryCacheClear();
         for (int i = 0; i < idValues.size(); i++) {
@@ -79,7 +79,7 @@ public final class DeleteByIdMap {
   /**
    * Add the deletes to the DocStoreUpdates.
    */
-  public void addDocStoreUpdates(DocStoreUpdates docStoreUpdates, DocStoreMode txnIndexMode) {
+  void addDocStoreUpdates(DocStoreUpdates docStoreUpdates, DocStoreMode txnIndexMode) {
     for (BeanPersistIds deleteIds : beanMap.values()) {
       BeanDescriptor<?> desc = deleteIds.getBeanDescriptor();
       DocStoreMode mode = desc.getDocStoreMode(PersistRequest.Type.DELETE, txnIndexMode);
@@ -87,7 +87,7 @@ public final class DeleteByIdMap {
         // Add to queue or bulk update entries
         boolean queue = (DocStoreMode.QUEUE == mode);
         String queueId = desc.getDocStoreQueueId();
-        List<Serializable> idValues = deleteIds.getDeleteIds();
+        List<Object> idValues = deleteIds.getDeleteIds();
         if (idValues != null) {
           for (int i = 0; i < idValues.size(); i++) {
             if (queue) {

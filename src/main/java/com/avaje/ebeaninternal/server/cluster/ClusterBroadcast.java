@@ -12,7 +12,7 @@ public interface ClusterBroadcast {
    * Inform the other cluster members that this instance has come online and
    * start any listeners etc.
    */
-  void startup(ClusterManager clusterManager);
+  void startup();
 
   /**
    * Inform the other cluster members that this instance is leaving and

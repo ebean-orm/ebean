@@ -78,12 +78,11 @@ public final class PostCommitProcessing {
     this.remoteTransactionEvent = createRemoteTransactionEvent();
   }
 
-  public void notifyLocalCacheIndex() {
-
-    // notify cache with bulk insert/update/delete statements
+  /**
+   * Notify the local part of L2 cache.
+   */
+  void notifyLocalCache() {
     processTableEvents(event.getEventTables());
-
-    // notify cache with bean changes
     event.notifyCache();
   }
 
@@ -105,7 +104,7 @@ public final class PostCommitProcessing {
   /**
    * Process any document store updates.
    */
-  protected void processDocStoreUpdates() {
+  private void processDocStoreUpdates() {
 
     if (isDocStoreUpdate()) {
       // collect 'bulk update' and 'queue' events
@@ -129,7 +128,7 @@ public final class PostCommitProcessing {
     return manager.isDocStoreActive() && (txnDocStoreMode == null || txnDocStoreMode != DocStoreMode.IGNORE);
   }
 
-  public void notifyCluster() {
+  private void notifyCluster() {
     if (remoteTransactionEvent != null && !remoteTransactionEvent.isEmpty()) {
       // send the interesting events to the cluster
       if (logger.isDebugEnabled()) {
@@ -140,10 +139,14 @@ public final class PostCommitProcessing {
     }
   }
 
-  public Runnable notifyPersistListeners() {
+  /**
+   * In background notify persist listeners, cluster and document store.
+   */
+  Runnable backgroundNotify() {
     return new Runnable() {
       public void run() {
         localPersistListenersNotify();
+        notifyCluster();
         processDocStoreUpdates();
       }
     };

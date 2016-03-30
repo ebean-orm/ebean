@@ -2,18 +2,20 @@ package com.avaje.ebeaninternal.server.cluster;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.config.ContainerConfig;
-import com.avaje.ebeaninternal.server.cluster.mcast.McastClusterManager;
-import com.avaje.ebeaninternal.server.cluster.socket.SocketClusterBroadcast;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
+import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages the cluster service.
  */
 public class ClusterManager {
+
+  private static final Logger clusterLogger = LoggerFactory.getLogger("org.avaje.ebean.Cluster");
 
   private static final Logger logger = LoggerFactory.getLogger(ClusterManager.class);
 
@@ -25,28 +27,31 @@ public class ClusterManager {
 
   private boolean started;
 
-  public ClusterManager(ContainerConfig containerConfig) {
-
-    ContainerConfig.ClusterMode mode = containerConfig.getMode();
-    try {
-      switch (mode) {
-        case SOCKET: {
-          this.broadcast = new SocketClusterBroadcast(containerConfig);
-          break;
-        }
-        case MULTICAST: {
-          this.broadcast = new McastClusterManager(containerConfig);
-          break;
-        }
-        default: {
-          this.broadcast = null;
-        }
-      }
-
-    } catch (Exception e) {
-      logger.error("Error initialising ClusterManager type [" + mode + "]", e);
-      throw new RuntimeException(e);
+  public ClusterManager(ContainerConfig config) {
+    if (!config.isClusterActive()) {
+      broadcast = null;
+    } else {
+      ClusterBroadcastFactory factory = createFactory();
+      broadcast = factory.create(this, config.getProperties());
     }
+  }
+
+  /**
+   * Return the ClusterTransportFactory via ServiceLoader.
+   */
+  private ClusterBroadcastFactory createFactory() {
+
+    ServiceLoader<ClusterBroadcastFactory> load = ServiceLoader.load(ClusterBroadcastFactory.class);
+    ClusterBroadcastFactory factory = null;
+    Iterator<ClusterBroadcastFactory> iterator = load.iterator();
+    if (iterator.hasNext()) {
+      factory = iterator.next();
+    }
+    if (factory == null) {
+      throw new IllegalStateException("No ClusterTransportFactory found in classpath. "
+          + " Probably need to add the avaje-ebeanorm-cluster dependency");
+    }
+    return factory;
   }
 
   public void registerServer(EbeanServer server) {
@@ -67,7 +72,7 @@ public class ClusterManager {
   private void startup() {
     started = true;
     if (broadcast != null) {
-      broadcast.startup(this);
+      broadcast.startup();
     }
   }
 
@@ -81,9 +86,12 @@ public class ClusterManager {
   /**
    * Send the message headers and payload to every server in the cluster.
    */
-  public void broadcast(RemoteTransactionEvent remoteTransEvent) {
+  public void broadcast(RemoteTransactionEvent event) {
     if (broadcast != null) {
-      broadcast.broadcast(remoteTransEvent);
+      if (clusterLogger.isDebugEnabled()) {
+        clusterLogger.debug("sending: {}", event);
+      }
+      broadcast.broadcast(event);
     }
   }
 
