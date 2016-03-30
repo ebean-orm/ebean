@@ -101,8 +101,7 @@ public class BeanPersistIds {
     }
     List<Object> idList = new ArrayList<Object>(count);
     for (int i = 0; i < count; i++) {
-      Object id = idBinder.readData(dataInput);
-      idList.add(id);
+      idList.add(idBinder.readData(dataInput));
     }
     return idList;
   }

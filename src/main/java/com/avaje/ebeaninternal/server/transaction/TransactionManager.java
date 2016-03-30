@@ -433,7 +433,7 @@ public class TransactionManager {
   public void remoteTransactionEvent(RemoteTransactionEvent remoteEvent) {
 
     if (clusterLogger.isDebugEnabled()) {
-      clusterLogger.debug("processing {}", toString());
+      clusterLogger.debug("processing {}", remoteEvent);
     }
 
     List<TableIUD> tableIUDList = remoteEvent.getTableIUDList();
