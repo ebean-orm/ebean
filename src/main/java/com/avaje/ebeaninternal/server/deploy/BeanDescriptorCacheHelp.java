@@ -405,7 +405,8 @@ public final class BeanDescriptorCacheHelp<T> {
   }
   
   public T beanCacheGet(SpiQuery<T> query, PersistenceContext context) {
-    T bean = beanCacheGetInternal(query.getId(), query.isReadOnly());
+    Object id = desc.convertId(query.getId());
+    T bean = beanCacheGetInternal(id, query.isReadOnly());
     if (bean != null) {
       setupContext(bean, context);
     }
