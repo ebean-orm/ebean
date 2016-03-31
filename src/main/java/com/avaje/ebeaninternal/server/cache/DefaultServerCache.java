@@ -333,8 +333,8 @@ public class DefaultServerCache implements ServerCache {
     evictByTTL.add(trimmedByTTL);
     evictByLRU.add(trimmedByLRU);
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}]"
+    if (logger.isTraceEnabled()) {
+      logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}]"
           , name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU);
     }
   }
@@ -358,7 +358,9 @@ public class DefaultServerCache implements ServerCache {
     private static final long serialVersionUID = 1L;
 
     public int compare(CacheEntry entry1, CacheEntry entry2) {
-      return Long.compare(entry1.getLastAccessTime(), entry2.getLastAccessTime());
+      long x = entry1.getLastAccessTime();
+      long y = entry2.getLastAccessTime();
+      return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
   }
 
