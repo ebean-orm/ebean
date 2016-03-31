@@ -18,6 +18,9 @@ final class PropertyMapLoader {
    * Load the <code>test-ebean.properties</code>.
    */
   public static PropertyMap loadTestProperties() {
+    if (!PropertyMap.loadTestProperties()) {
+      return new PropertyMap();
+    }
     return load(null, "test-ebean.properties");
   }
 
@@ -31,7 +34,7 @@ final class PropertyMapLoader {
     if (fileName == null) {
       fileName = System.getProperty("ebean.props.file");
       if (fileName == null) {
-        loadTestProperties = true;
+        loadTestProperties = PropertyMap.loadTestProperties();
         fileName = "ebean.properties";
       }
     }

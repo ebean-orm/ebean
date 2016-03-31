@@ -31,6 +31,11 @@ public final class PropertyMap implements Serializable {
     return (propertyMap == null) ? new Properties() : propertyMap.asProperties();
   }
 
+  public static boolean loadTestProperties() {
+    String disable = System.getProperty("disableTestProperties");
+    return (disable == null || !disable.equalsIgnoreCase("true"));
+  }
+
   public String toString() {
     return map.toString();
   }
