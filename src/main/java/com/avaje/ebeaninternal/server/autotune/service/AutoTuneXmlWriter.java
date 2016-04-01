@@ -16,18 +16,26 @@ import java.util.Date;
 public class AutoTuneXmlWriter {
 
   /**
+   * Return 'now' as a string to second precision.
+   */
+  public static String now() {
+    SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss");
+    return df.format(new Date());
+  }
+
+  /**
    * Write the document as xml file with the given prefix.
    */
-  public void write(Autotune document, String filePrefix) {
+  public void write(Autotune document, String fileName, boolean withNow) {
 
     SortAutoTuneDocument.sort(document);
 
-    SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss");
-    String now = df.format(new Date());
+    if (withNow) {
+      fileName += "-" + now() + ".xml";
+    }
 
     // write the file with serverName and now suffix as we can output the profiling many times
-    File file = new File(filePrefix + "-" + now + ".xml");
-    write(document, file);
+    write(document, new File(fileName));
   }
 
   /**

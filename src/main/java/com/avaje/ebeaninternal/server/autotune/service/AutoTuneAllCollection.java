@@ -41,10 +41,10 @@ public class AutoTuneAllCollection {
   /**
    * Write the document as an xml file.
    */
-  public void writeFile(String filePrefix) {
+  public void writeFile(String filePrefix, boolean withNow) {
 
     AutoTuneXmlWriter writer = new AutoTuneXmlWriter();
-    writer.write(document, filePrefix);
+    writer.write(document, filePrefix, withNow);
   }
 
   /**

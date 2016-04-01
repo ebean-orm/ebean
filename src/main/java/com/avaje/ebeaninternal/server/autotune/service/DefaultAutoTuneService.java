@@ -185,7 +185,15 @@ public class DefaultAutoTuneService implements AutoTuneService {
     } else {
       AutoTuneAllCollection event = new AutoTuneAllCollection(queryTuner);
       int size = event.size();
-      event.writeFile(profilingFile + "-" + serverName + "-all");
+      File existingTuning = new File(tuningFile);
+      if (existingTuning.exists()) {
+        // rename the existing autotune.xml file (appending 'now')
+        if (!existingTuning.renameTo(new File(tuningFile+"."+AutoTuneXmlWriter.now()))) {
+          logger.warn("Failed to rename autotune file [{}]", tuningFile);
+        }
+      }
+
+      event.writeFile(tuningFile, false);
       logger.info("query tuning detected [{}] changes, writing all [{}] tuning entries for server:{}", runtimeChangeCount, size, serverName);
     }
   }

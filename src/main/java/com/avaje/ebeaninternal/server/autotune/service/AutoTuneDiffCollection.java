@@ -76,7 +76,7 @@ public class AutoTuneDiffCollection {
   public void writeFile(String filePrefix) {
 
     AutoTuneXmlWriter writer = new AutoTuneXmlWriter();
-    writer.write(document, filePrefix);
+    writer.write(document, filePrefix, true);
   }
 
   /**
