@@ -225,8 +225,7 @@ public class DefaultContainer implements SpiContainer {
       return new BootupClasses(serverConfig.getClasses());
     }
 
-    BootupClassPathSearch search = new BootupClassPathSearch(null, serverConfig.getPackages(), serverConfig.getJars(), serverConfig.getClassPathReaderClassName());
-    return search.getBootupClasses();
+    return BootupClassPathSearch.search(serverConfig);
   }
 
   /**
