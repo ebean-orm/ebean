@@ -28,7 +28,6 @@ import com.avaje.ebeaninternal.api.LoadManyRequest;
 import com.avaje.ebeaninternal.api.ScopeTrans;
 import com.avaje.ebeaninternal.api.ScopedTransaction;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
-import com.avaje.ebeaninternal.api.SpiEbeanPlugin;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Type;
@@ -177,11 +176,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   private final int queryBatchSize;
 
-  /**
-   * holds plugins (e.g. ddl generator) detected by the service loader
-   */
-  private List<SpiEbeanPlugin> ebeanPlugins;
-
   private final boolean updateAllPropertiesInBatch;
 
   private final boolean collectQueryOrigins;
@@ -242,9 +236,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.serverPlugins = config.getPlugins();
     this.ddlGenerator = new DdlGenerator(this, serverConfig);
 
-    // load normal plugins late and call setup on all
-    loadAndInitializePlugins(config.getServerConfig());
-
     configureServerPlugins();
     
     // Register with the JVM Shutdown hook
@@ -260,35 +251,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  protected void loadAndInitializePlugins(ServerConfig config) {
-    
-    List<SpiEbeanPlugin> spiPlugins = new ArrayList<SpiEbeanPlugin>();
-
-    for (SpiEbeanPlugin plugin : ServiceLoader.load(SpiEbeanPlugin.class)) {
-      spiPlugins.add(plugin);
-      plugin.setup(this, config);
-    }
-
-    ebeanPlugins = Collections.unmodifiableList(spiPlugins);
-  }
-
-  /**
-   * Return the list of registered plugins.
-   */
-  public List<SpiEbeanPlugin> getSpiEbeanPlugins() {
-    return ebeanPlugins;
-  }
-
   /**
    * Execute all the plugins with an online flag indicating the DB is up or not.
    */
   public void executePlugins(boolean online) {
 
     ddlGenerator.execute(online);
-
-    for (SpiEbeanPlugin plugin : ebeanPlugins) {
-      plugin.execute(online);
-    }
     for (Plugin plugin : serverPlugins) {
       plugin.online(online);
     }
