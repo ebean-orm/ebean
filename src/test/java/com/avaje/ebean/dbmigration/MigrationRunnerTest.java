@@ -1,10 +1,27 @@
 package com.avaje.ebean.dbmigration;
 
-import static org.junit.Assert.*;
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.config.DbMigrationConfig;
+import org.junit.Test;
 
-/**
- * Created by rob on 1/04/16.
- */
+
 public class MigrationRunnerTest {
 
+
+  @Test
+  public void test() {
+
+    EbeanServer server = Ebean.getDefaultServer();
+
+    DbMigrationConfig config = new DbMigrationConfig();
+    config.setMigrationPath("test-dbmigration");
+    config.setRunMigration(true);
+    config.setDbUser("sa");
+    config.setDbPassword("");
+
+    MigrationRunner runner = new MigrationRunner(server, config);
+
+    runner.run();
+  }
 }

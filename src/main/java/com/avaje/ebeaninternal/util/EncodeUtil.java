@@ -15,7 +15,6 @@ public final class EncodeUtil {
     /* no instances */
   }
 
-
   /**
    * URL-encodes the specified UTF-8 string.
    */

@@ -3,9 +3,8 @@ package com.avaje.ebean.dbmigration.runner;
 import com.avaje.ebean.config.DbMigrationConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.model.MigrationVersion;
-import org.avaje.classpath.scanner.Location;
-import org.avaje.classpath.scanner.MatchResource;
 import org.avaje.classpath.scanner.Resource;
+import org.avaje.classpath.scanner.ResourceFilter;
 import org.avaje.classpath.scanner.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- *
+ * Loads the DB migration resources and sorts them into execution order.
  */
 public class LocalMigrationResources {
 
@@ -27,11 +26,17 @@ public class LocalMigrationResources {
 
   private final List<LocalMigrationResource> versions = new ArrayList<LocalMigrationResource>();
 
-  public LocalMigrationResources(ServerConfig serverConfig) {
+  /**
+   * Construct with configuration options.
+   */
+  public LocalMigrationResources(ServerConfig serverConfig, DbMigrationConfig migrationConfig) {
     this.serverConfig = serverConfig;
-    this.migrationConfig = serverConfig.getMigrationConfig();
+    this.migrationConfig = migrationConfig;
   }
 
+  /**
+   * Read all the migration resources (SQL scripts) returning true if there are versions.
+   */
   public boolean readResources() {
 
     String migrationPath = migrationConfig.getMigrationPath();
@@ -59,14 +64,20 @@ public class LocalMigrationResources {
     return !versions.isEmpty();
   }
 
+  /**
+   * Return the list of migration resources in version order.
+   */
   public List<LocalMigrationResource> getVersions() {
     return versions;
   }
 
 
-  static class Match implements MatchResource {
+  /**
+   * Filter used to find the migration scripts.
+   */
+  private static class Match implements ResourceFilter {
 
-    final DbMigrationConfig migrationConfig;
+    private final DbMigrationConfig migrationConfig;
 
     Match(DbMigrationConfig migrationConfig) {
       this.migrationConfig = migrationConfig;
@@ -74,12 +85,7 @@ public class LocalMigrationResources {
 
     @Override
     public boolean isMatch(String name) {
-
-      return name.endsWith(migrationConfig.getApplySuffix())
-          || name.endsWith(migrationConfig.getModelSuffix())
-          || name.endsWith(migrationConfig.getDropSuffix())
-          || name.endsWith(migrationConfig.getRollbackSuffix());
-
+      return name.endsWith(migrationConfig.getApplySuffix());
     }
   }
 }

@@ -2267,7 +2267,7 @@ public class ServerConfig {
    */
   protected void loadSettings(PropertiesWrapper p) {
 
-    migrationConfig.loadSettings(p);
+    migrationConfig.loadSettings(p, name);
 
     namingConvention = createNamingConvention(p, namingConvention);
     if (namingConvention != null) {

@@ -540,6 +540,9 @@ public class DatabasePlatform {
     }
   }
 
+  /**
+   * Close the resultSet.
+   */
   protected void close(ResultSet resultSet) {
     try {
       resultSet.close();

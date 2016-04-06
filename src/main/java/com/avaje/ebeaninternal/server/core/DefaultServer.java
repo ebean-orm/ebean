@@ -20,8 +20,8 @@ import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.plugin.BeanType;
-import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebean.plugin.Plugin;
+import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.api.LoadBeanRequest;
@@ -73,6 +73,7 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -80,7 +81,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
@@ -309,6 +309,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public DataSource getDataSource() {
+    return transactionManager.getDataSource();
+  }
+
+  @Override
   public ReadAuditPrepare getReadAuditPrepare() {
     return readAuditPrepare;
   }
@@ -341,8 +346,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       migrationConfig.generateOnStart(this);
     }
 
-    MigrationRunner migrationRunner = new MigrationRunner(this);
-    migrationRunner.run();
+    if (migrationConfig.isRunMigration()) {
+      new MigrationRunner(this, migrationConfig).run();
+    }
   }
 
   /**

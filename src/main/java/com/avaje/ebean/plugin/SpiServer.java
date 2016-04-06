@@ -4,6 +4,7 @@ import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 
+import javax.sql.DataSource;
 import java.util.List;
 
 /**
@@ -40,4 +41,9 @@ public interface SpiServer extends EbeanServer {
    * Return the bean type for a given doc store queueId.
    */
   BeanType<?> getBeanTypeForQueueId(String queueId);
+
+  /**
+   * Return the associated DataSource for this EbeanServer instance.
+   */
+  DataSource getDataSource();
 }

@@ -5,12 +5,15 @@ import com.avaje.ebean.dbmigration.DdlRunner;
 import java.sql.Connection;
 
 /**
- * Created by rob on 5/02/16.
+ * Runs the DDL migration scripts.
  */
 public class MigrationScriptRunner {
 
-  final Connection connection;
+  private final Connection connection;
 
+  /**
+   * Construct with a given connection.
+   */
   public MigrationScriptRunner(Connection connection) {
     this.connection = connection;
   }

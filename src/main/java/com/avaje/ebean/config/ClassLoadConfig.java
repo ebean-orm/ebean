@@ -74,6 +74,9 @@ public class ClassLoadConfig {
     }
   }
 
+  /**
+   * Return the resources for the given name.
+   */
   public Enumeration<URL> getResources(String name) throws IOException {
     return context.getResources(name);
   }

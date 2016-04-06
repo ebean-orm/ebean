@@ -23,4 +23,15 @@ public class JdbcClose {
       logger.warn("Error closing connection", e);
     }
   }
+
+  /**
+   * Rollback the connection logging if an error occurs.
+   */
+  public static void rollback(Connection connection) {
+    try {
+      connection.rollback();
+    } catch (SQLException e) {
+      logger.warn("Error on connection rollback", e);
+    }
+  }
 }

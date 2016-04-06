@@ -17,12 +17,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Created by rob on 5/02/16.
+ * Manages the migration table.
  */
 public class MigrationTable {
 
@@ -34,34 +35,53 @@ public class MigrationTable {
 
   private final DatabasePlatform databasePlatform;
 
-  private final DbMigrationConfig migrationConfig;
-
   private final String catalog;
   private final String schema;
   private final String table;
   private final ServerConfig serverConfig;
   private final String envUserName;
 
-  int currentSearchPosition;
+  private final ScriptTransform scriptTransform;
 
-  List<SqlRow> metaRows;
+  private final String insertSql;
 
+  private final LinkedHashMap<String,MigrationMetaRow> migrations;
+
+  private MigrationMetaRow lastMigration;
+
+  /**
+   * Construct with server, configuration and jdbc connection (DB admin user).
+   */
   public MigrationTable(EbeanServer server, DbMigrationConfig migrationConfig, Connection connection) {
     this.connection = connection;
     this.server = server;
+    this.migrations = new LinkedHashMap<String, MigrationMetaRow>();
 
     SpiServer pluginApi = server.getPluginApi();
     this.serverConfig = pluginApi.getServerConfig();
     this.databasePlatform = pluginApi.getDatabasePlatform();
-    this.migrationConfig = migrationConfig;
+
     this.catalog = null;
     this.schema = null;
-    this.table = "ebean_migration";
+    this.table = migrationConfig.getMetaTable();
+    this.insertSql = MigrationMetaRow.insertSql(table);
 
+    this.scriptTransform = createScriptTransform(migrationConfig);
     this.envUserName = System.getProperty("user.name");
   }
 
+  /**
+   * Create the ScriptTransform for placeholder key/value replacement.
+   */
+  private ScriptTransform createScriptTransform(DbMigrationConfig config) {
 
+    Map<String, String> map = PlaceholderBuilder.build(config.getRunPlaceholders(), config.getRunPlaceholderMap());
+    return new ScriptTransform(map);
+  }
+
+  /**
+   * Create the table is it does not exist.
+   */
   public void createIfNeeded() throws SQLException, IOException {
 
     if (!tableExists(connection)) {
@@ -69,20 +89,39 @@ public class MigrationTable {
     }
 
     ExternalJdbcTransaction t = new ExternalJdbcTransaction(connection);
-    SqlQuery sqlQuery = server.createSqlQuery("select * from ebean_migration order by id for update");
-    metaRows = server.findList(sqlQuery, t);
+    SqlQuery sqlQuery = server.createSqlQuery("select * from "+table+" order by id for update");
+    List<SqlRow> metaRows = server.findList(sqlQuery, t);
+
+    for (SqlRow row : metaRows) {
+      addMigration(new MigrationMetaRow(row));
+    }
   }
+
 
   private void createTable(Connection connection) throws IOException {
 
-    String script = getCreateTableScript();
+    String script = ScriptTransform.table(table, getCreateTableScript());
+
     MigrationScriptRunner run = new MigrationScriptRunner(connection);
-    run.runScript(false, script, "create migration tables");
+    run.runScript(false, script, "create migration table");
   }
 
+  /**
+   * Return the create table script.
+   */
   private String getCreateTableScript() throws IOException {
+    // supply a script to override the default table create script
+    String script = readResource("migration-support/create-table.sql");
+    if (script == null) {
+      // no, just use the default script
+      script = readResource("migration-support/default-create-table.sql");
+    }
+    return script;
+  }
 
-    Enumeration<URL> resources = serverConfig.getClassLoadConfig().getResources("migration-support/create.sql");
+  private String readResource(String location) throws IOException {
+
+    Enumeration<URL> resources = serverConfig.getClassLoadConfig().getResources(location);
     if (resources.hasMoreElements()) {
       URL url = resources.nextElement();
       return IOUtils.readUtf8(url.openStream());
@@ -90,75 +129,106 @@ public class MigrationTable {
     return null;
   }
 
-  public boolean tableExists(Connection connection) throws SQLException {
-
+  /**
+   * Return true if the table exists.
+   */
+  private boolean tableExists(Connection connection) throws SQLException {
     return databasePlatform.tableExists(connection, catalog, schema, table);
   }
 
-
+  /**
+   * Return true if the migration ran successfully and false if the migration failed.
+   */
   public boolean shouldRun(LocalMigrationResource localVersion, LocalMigrationResource priorVersion) {
 
-    // if prior != null check previous version installed
-    //    if previous version not installed ... error - missing version (prior version)
-
-//    if (!priorVersionNotInstalled(priorVersion)) {
-//
-//    }
-//
-//    // if localVersion installed
-//    //    check checksum and return ok, or re-installable?
-//    // else
-//    //    install version and continue
-//
-//    if (runPosition >= metaRows.size()) {
-//      logger.debug("No matching row");
-//      runMigration(runPosition, localVersion);
-//      return true;
-//    }
-
-    return false;
-  }
-
-  private void checkInstalled(LocalMigrationResource priorVersion) {
     if (priorVersion != null) {
-      searchFor(priorVersion);
+      // check priorVersion is installed
+      MigrationMetaRow existing = migrations.get(priorVersion.getVersion().normalised());
+      if (existing == null) {
+        logger.warn("Migration {} requires prior migration {} which has not been run", localVersion.getVersion(), priorVersion.getVersion());
+        return false;
+      }
+    }
+
+    MigrationMetaRow existing = migrations.get(localVersion.getVersion().normalised());
+    if (existing == null) {
+      runMigration(localVersion, priorVersion);
+      return true;
+
+    } else {
+      // check checksum and return ok, or re-run if repeatable script?
+      existing.getChecksum();
+      return true;
     }
   }
 
-  private void searchFor(LocalMigrationResource priorVersion) {
-
-  }
-
-  public void commit() throws SQLException {
-    connection.commit();
-  }
-
-  private void runMigration(int runPosition, LocalMigrationResource localVersion) {
+  /**
+   * Run the migration script.
+   */
+  private void runMigration(LocalMigrationResource localVersion, LocalMigrationResource prior) {
 
     logger.debug("run migration "+localVersion.getLocation());
 
-
-    String script = localVersion.getContent();
+    String script = convertScript(localVersion.getContent());
 
     MigrationScriptRunner run = new MigrationScriptRunner(connection);
     run.runScript(false, script, "run migration version: "+localVersion.getVersion());
 
-    String sql = "insert into ebean_migration (id,status,run_version,dep_version,comment,checksum,run_on,run_by,run_ip) "+
-        "values (?,?,?,?,?,?,?,?,?)";
 
-    SqlUpdate sqlUpdate = server.createSqlUpdate(sql);
-    sqlUpdate.setParameter(1, runPosition+1);
-    sqlUpdate.setParameter(2, "success");
-    sqlUpdate.setParameter(3, localVersion.getVersion().getFull());
-    sqlUpdate.setParameter(4, "na");
-    sqlUpdate.setParameter(5, "comm");
-    sqlUpdate.setParameter(6, 0);
-    sqlUpdate.setParameter(7, new Timestamp(System.currentTimeMillis()));
-    sqlUpdate.setParameter(8, envUserName);
-    sqlUpdate.setParameter(9, "userIp");
+    int checksum = Checksum.calculate(script);
+    MigrationMetaRow metaRow = createMetaRow(localVersion, prior, checksum);
 
-    ExternalJdbcTransaction t = new ExternalJdbcTransaction(connection);
-    server.execute(sqlUpdate, t);
+    SqlUpdate insert = server.createSqlUpdate(insertSql);
+    metaRow.bindInsert(insert);
+    server.execute(insert, new ExternalJdbcTransaction(connection));
 
+    addMigration(metaRow);
+  }
+
+  /**
+   * Create the MigrationMetaRow for this migration.
+   */
+  private MigrationMetaRow createMetaRow(LocalMigrationResource localVersion, LocalMigrationResource prior, int checksum) {
+
+    int nextId = 1;
+    if (lastMigration != null) {
+      nextId = lastMigration.getId() + 1;
+    }
+
+    String runVersion = localVersion.getVersion().normalised();
+    String comment = getMigrationComment(localVersion);
+    String priorVersion = getMigrationPriorVersion(prior);
+
+    return new MigrationMetaRow(nextId, runVersion, priorVersion, comment, checksum, envUserName);
+  }
+
+  /**
+   * Return the prior migration normalised version.
+   */
+  private String getMigrationPriorVersion(LocalMigrationResource prior) {
+    return prior != null ? prior.getVersion().normalised() : "-";
+  }
+
+  /**
+   * Return the migration comment.
+   */
+  private String getMigrationComment(LocalMigrationResource localVersion) {
+    String comment = localVersion.getVersion().getComment();
+    return comment == null || comment.isEmpty() ? "-" : comment;
+  }
+
+  /**
+   * Apply the placeholder key/value replacement on the script.
+   */
+  private String convertScript(String script) {
+    return scriptTransform.transform(script);
+  }
+
+  /**
+   * Register the successfully executed migration (to allow dependant scripts to run).
+   */
+  private void addMigration(MigrationMetaRow metaRow) {
+    lastMigration = metaRow;
+    migrations.put(metaRow.getRunVersion(), metaRow);
   }
 }

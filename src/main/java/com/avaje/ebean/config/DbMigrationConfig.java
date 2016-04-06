@@ -6,6 +6,8 @@ import com.avaje.ebean.dbmigration.DbMigration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 /**
  * Configuration for the DB migration processing.
  */
@@ -66,6 +68,36 @@ public class DbMigrationConfig {
    * The version of a pending drop that should be generated as the next migration.
    */
   protected String generatePendingDrop;
+
+  /**
+   * For running migration the DB table that holds migration execution status.
+   */
+  protected String metaTable = "db_migration";
+
+  /**
+   * Flag set to true means to run any outstanding migrations on startup.
+   */
+  protected boolean runMigration;
+
+  /**
+   * Comma and equals delimited key/value placeholders to replace in DDL scripts.
+   */
+  protected String runPlaceholders;
+
+  /**
+   * Map of key/value placeholders to replace in DDL scripts.
+   */
+  protected Map<String,String> runPlaceholderMap;
+
+  /**
+   * DB user used to run the DB migration.
+   */
+  protected String dbUser;
+
+  /**
+   * DB password used to run the DB migration.
+   */
+  protected String dbPassword;
 
   /**
    * Return the DB platform to generate migration DDL for.
@@ -200,9 +232,118 @@ public class DbMigrationConfig {
   }
 
   /**
+   * Return the table name that holds the migration run details
+   * (used by DB Migration runner only).
+   */
+  public String getMetaTable() {
+    return metaTable;
+  }
+
+  /**
+   * Set the table name that holds the migration run details
+   * (used by DB Migration runner only).
+   */
+  public void setMetaTable(String metaTable) {
+    this.metaTable = metaTable;
+  }
+
+  /**
+   * Return a comma and equals delimited placeholders that are substituted in SQL scripts when running migration
+   * (used by DB Migration runner only).
+   */
+  public String getRunPlaceholders() {
+    // environment properties take precedence
+    String placeholders = readEnvironment("ddl.migration.placeholders");
+    if (placeholders != null) {
+      return placeholders;
+    }
+    return runPlaceholders;
+  }
+
+  /**
+   * Set a comma and equals delimited placeholders that are substituted in SQL scripts when running migration
+   * (used by DB Migration runner only).
+   */
+  public void setRunPlaceholders(String runPlaceholders) {
+    this.runPlaceholders = runPlaceholders;
+  }
+
+  /**
+   * Return a map of placeholder values that are substituted in SQL scripts when running migration
+   * (used by DB Migration runner only).
+   */
+  public Map<String, String> getRunPlaceholderMap() {
+    return runPlaceholderMap;
+  }
+
+  /**
+   * Set a map of placeholder values that are substituted when running migration
+   * (used by DB Migration runner only).
+   */
+  public void setRunPlaceholderMap(Map<String, String> runPlaceholderMap) {
+    this.runPlaceholderMap = runPlaceholderMap;
+  }
+
+  /**
+   * Return true if the DB migration should be run on startup.
+   */
+  public boolean isRunMigration() {
+    // environment properties take precedence
+    String run = readEnvironment("ddl.migration.run");
+    if (run != null) {
+      return "true".equalsIgnoreCase(run.trim());
+    }
+    return runMigration;
+  }
+
+  /**
+   * Set to true to run the DB migration on startup.
+   */
+  public void setRunMigration(boolean runMigration) {
+    this.runMigration = runMigration;
+  }
+
+  /**
+   * Return the DB user to use for running DB migrations.
+   */
+  public String getDbUser() {
+    // environment properties take precedence
+    String user = readEnvironment("ddl.migration.user");
+    if (user != null) {
+      return user;
+    }
+    return dbUser;
+  }
+
+  /**
+   * Set the DB user to use for running DB migrations.
+   */
+  public void setDbUser(String dbUser) {
+    this.dbUser = dbUser;
+  }
+
+  /**
+   * Return the DB password to use for running DB migrations.
+   */
+  public String getDbPassword() {
+    String user = readEnvironment("ddl.migration.password");
+    if (user != null) {
+      return user;
+    }
+    return dbPassword;
+  }
+
+  /**
+   * Set the DB password to use for running DB migrations.
+   */
+  public void setDbPassword(String dbPassword) {
+    this.dbPassword = dbPassword;
+  }
+
+  /**
    * Load the settings from the PropertiesWrapper.
    */
-  public void loadSettings(PropertiesWrapper properties) {
+  public void loadSettings(PropertiesWrapper properties, String serverName) {
 
     migrationPath = properties.get("migration.migrationPath", migrationPath);
     if (properties.getBoolean("migration.singleDirectory", false)) {
@@ -219,7 +360,19 @@ public class DbMigrationConfig {
 
     generate = properties.getBoolean("migration.generate", generate);
     version = properties.get("migration.version", version);
-    name = properties.get("migration.name", name);
+    this.name = properties.get("migration.name", this.name);
+
+    runMigration = properties.getBoolean("migration.run", runMigration);
+    metaTable = properties.get("migration.metaTable", metaTable);
+    runPlaceholders = properties.get("migration.placeholders", runPlaceholders);
+
+    String adminUser = properties.get("datasource."+serverName+".user", dbUser);
+    adminUser = properties.get("datasource."+serverName+".adminuser", adminUser);
+    dbUser = properties.get("migration.dbuser", adminUser);
+
+    String adminPwd = properties.get("datasource."+serverName+".password", dbPassword);
+    adminPwd = properties.get("datasource."+serverName+".adminpassword", adminPwd);
+    dbPassword = properties.get("migration.dbpassword", adminPwd);
   }
 
   /**

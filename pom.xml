@@ -64,7 +64,7 @@
     <dependency>
       <groupId>org.avaje</groupId>
       <artifactId>avaje-datasource</artifactId>
-      <version>1.1.1</version>
+      <version>1.1.2</version>
     </dependency>
 
     <!-- bring in cluster support by default -->
@@ -90,12 +90,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>[1.7.1,1.7.99)</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.avaje</groupId>
-      <artifactId>avaje-classpath-scanner</artifactId>
-      <version>1.1.1</version>
     </dependency>
 
     <!-- provided scope for Spring boot loader classpath scanning support -->

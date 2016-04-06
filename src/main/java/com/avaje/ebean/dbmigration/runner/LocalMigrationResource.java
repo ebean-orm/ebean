@@ -4,7 +4,7 @@ import com.avaje.ebean.dbmigration.model.MigrationVersion;
 import org.avaje.classpath.scanner.Resource;
 
 /**
- * A DB migration resource.
+ * A DB migration resource (DDL script with version).
  */
 public class LocalMigrationResource implements Comparable<LocalMigrationResource> {
 
@@ -14,6 +14,9 @@ public class LocalMigrationResource implements Comparable<LocalMigrationResource
 
   private final Resource resource;
 
+  /**
+   * Construct with version and resource.
+   */
   public LocalMigrationResource(MigrationVersion version, String location, Resource resource) {
     this.version = version;
     this.location = location;

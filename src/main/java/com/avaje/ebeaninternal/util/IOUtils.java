@@ -7,9 +7,10 @@ import java.io.OutputStream;
 import java.io.Reader;
 
 /**
- * Created by rob on 5/02/16.
+ * Utilities for IO.
  */
 public class IOUtils {
+
   /**
    * Reads the entire contents of the specified input stream and returns them
    * as a byte array.
@@ -44,6 +45,9 @@ public class IOUtils {
     return EncodeUtil.decodeBytes(read(in), encoding);
   }
 
+  /**
+   * Read the entire contents from the reader returning as a String.
+   */
   public static String read(Reader reader) throws IOException {
 
     StringBuilder sb = new StringBuilder();
