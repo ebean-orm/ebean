@@ -9,6 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Types;
 
 /**
@@ -522,4 +526,25 @@ public class DatabasePlatform {
     return disallowBatchOnCascade;
   }
 
+  /**
+   * Return true if the table exists.
+   */
+  public boolean tableExists(Connection connection, String catalog, String schema, String table) throws SQLException {
+
+    DatabaseMetaData metaData = connection.getMetaData();
+    ResultSet tables = metaData.getTables(catalog, schema, table, null);
+    try {
+      return tables.next();
+    } finally {
+      close(tables);
+    }
+  }
+
+  protected void close(ResultSet resultSet) {
+    try {
+      resultSet.close();
+    } catch (SQLException e) {
+      logger.error("Error closing resultSet", e);
+    }
+  }
 }

@@ -14,6 +14,7 @@ import com.avaje.ebean.config.EncryptKeyManager;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.dbmigration.DdlGenerator;
+import com.avaje.ebean.dbmigration.MigrationRunner;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
@@ -339,6 +340,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (migrationConfig != null) {
       migrationConfig.generateOnStart(this);
     }
+
+    MigrationRunner migrationRunner = new MigrationRunner(this);
+    migrationRunner.run();
   }
 
   /**

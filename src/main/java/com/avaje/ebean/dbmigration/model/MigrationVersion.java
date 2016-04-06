@@ -28,6 +28,13 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
     this.comment = comment;
   }
 
+  /**
+   * Return the full version.
+   */
+  public String getFull() {
+    return raw;
+  }
+
   public String toString() {
     return raw;
   }

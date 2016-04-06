@@ -1,7 +1,5 @@
 package com.avaje.ebean.dbmigration;
 
-import com.avaje.ebean.Transaction;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,29 +35,33 @@ public class DdlRunner {
   /**
    * Parse the content into sql statements and execute them in a transaction.
    */
-  public int runAll(String content, SpiEbeanServer server) {
+  public int runAll(String content, Connection connection) {
 
     List<String> statements = ddlParser.parse(new StringReader(content));
-    return runStatements(statements, server);
+    return runStatements(statements, connection);
   }
 
   /**
    * Execute all the statements in a single transaction.
    */
-  public int runStatements(List<String> statements, SpiEbeanServer server) {
+  public int runStatements(List<String> statements, Connection connection) {
 
-    Transaction t = server.createTransaction();
     try {
-      int statementCount = runStatements(expectErrors, statements, t.getConnection());
-      t.commit();
-
+      int statementCount = runStatements(expectErrors, statements, connection);
+      connection.commit();
       return statementCount;
 
     } catch (Exception e) {
+      rollback(connection);
       throw new PersistenceException("Error: " + e.getMessage(), e);
+    }
+  }
 
-    } finally {
-      t.end();
+  private void rollback(Connection connection) {
+    try {
+      connection.rollback();
+    } catch (SQLException e) {
+      logger.error("Error trying to rollback connection", e);
     }
   }
 
