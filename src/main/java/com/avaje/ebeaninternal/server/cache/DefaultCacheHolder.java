@@ -4,6 +4,7 @@ import com.avaje.ebean.annotation.CacheTuning;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheOptions;
+import com.avaje.ebean.cache.ServerCacheType;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,7 +52,7 @@ public class DefaultCacheHolder {
   /**
    * Return the cache for a given bean type.
    */
-  public ServerCache getCache(String cacheKey) {
+  public ServerCache getCache(String cacheKey, ServerCacheType type) {
 
     ServerCache cache = concMap.get(cacheKey);
     if (cache != null) {
@@ -61,7 +62,7 @@ public class DefaultCacheHolder {
       cache = synchMap.get(cacheKey);
       if (cache == null) {
         ServerCacheOptions options = getCacheOptions(cacheKey);
-        cache = cacheFactory.createCache(cacheKey, options);
+        cache = cacheFactory.createCache(type, cacheKey, options);
         synchMap.put(cacheKey, cache);
         concMap.put(cacheKey, cache);
       }

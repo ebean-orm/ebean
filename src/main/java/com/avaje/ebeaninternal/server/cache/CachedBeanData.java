@@ -1,17 +1,18 @@
 package com.avaje.ebeaninternal.server.cache;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * Data held in the bean cache for cached beans.
  */
-public class CachedBeanData {
+public class CachedBeanData implements Serializable {
 
   private final long whenCreated;
   private final Object sharableBean;
   private final boolean[] loaded;
   private final Object[] data;
-  
+
   private final boolean naturalKeyUpdate;
   private final Object naturalKey;
   private final Object oldNaturalKey;
@@ -29,7 +30,7 @@ public class CachedBeanData {
   public String toString() {
     return Arrays.toString(data);
   }
-  
+
   /**
    * Return a copy of the property data.
    */
@@ -46,6 +47,20 @@ public class CachedBeanData {
     boolean[] dest = new boolean[data.length];
     System.arraycopy(loaded, 0, dest, 0, dest.length);
     return dest;
+  }
+
+  /**
+   * Return the loaded status for each property.
+   */
+  public boolean[] getLoaded() {
+    return loaded;
+  }
+
+  /**
+   * Return the property values.
+   */
+  public Object[] getData() {
+    return data;
   }
 
   /**
@@ -75,7 +90,7 @@ public class CachedBeanData {
   public Object getNaturalKey() {
     return naturalKey;
   }
-  
+
   /**
    * Return the old natural key (its entry should be removed).
    */

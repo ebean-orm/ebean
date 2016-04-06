@@ -5,6 +5,7 @@ import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.cache.ServerCacheOptions;
+import com.avaje.ebean.cache.ServerCacheType;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 
 
@@ -70,33 +71,25 @@ public class DefaultServerCacheManager implements ServerCacheManager {
 
 
   public ServerCache getCollectionIdsCache(Class<?> beanType, String propertyName) {
-    return collectionIdsCache.getCache(beanType.getName() + "." + propertyName);
-  }
-
-  public boolean isCollectionIdsCaching(Class<?> beanType) {
-    return collectionIdsCache.isCaching(beanType.getName());
+    return collectionIdsCache.getCache(beanType.getName() + "." + propertyName, ServerCacheType.COLLECTION_IDS);
   }
 
   public ServerCache getNaturalKeyCache(Class<?> beanType) {
-    return naturalKeyCache.getCache(beanType.getName());
-  }
-
-  public boolean isNaturalKeyCaching(Class<?> beanType) {
-    return naturalKeyCache.isCaching(beanType.getName());
+    return naturalKeyCache.getCache(beanType.getName(), ServerCacheType.NATURAL_KEY);
   }
 
   /**
    * Return the query cache for a given bean type.
    */
   public ServerCache getQueryCache(Class<?> beanType) {
-    return queryCache.getCache(beanType.getName());
+    return queryCache.getCache(beanType.getName(), ServerCacheType.QUERY);
   }
 
   /**
    * Return the bean cache for a given bean type.
    */
   public ServerCache getBeanCache(Class<?> beanType) {
-    return beanCache.getCache(beanType.getName());
+    return beanCache.getCache(beanType.getName(), ServerCacheType.BEAN);
   }
 
   /**
@@ -104,11 +97,6 @@ public class DefaultServerCacheManager implements ServerCacheManager {
    */
   public boolean isBeanCaching(Class<?> beanType) {
     return beanCache.isCaching(beanType.getName());
-  }
-
-
-  public boolean isQueryCaching(Class<?> beanType) {
-    return queryCache.isCaching(beanType.getName());
   }
 
 

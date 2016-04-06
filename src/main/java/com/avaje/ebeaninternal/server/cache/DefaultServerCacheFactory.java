@@ -4,6 +4,7 @@ import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheOptions;
+import com.avaje.ebean.cache.ServerCacheType;
 
 
 /**
@@ -17,7 +18,7 @@ public class DefaultServerCacheFactory implements ServerCacheFactory {
     this.ebeanServer = ebeanServer;
   }
 
-  public ServerCache createCache(String cacheKey, ServerCacheOptions cacheOptions) {
+  public ServerCache createCache(ServerCacheType type, String cacheKey, ServerCacheOptions cacheOptions) {
 
     ServerCache cache = new DefaultServerCache(cacheKey, cacheOptions);
     cache.init(ebeanServer);

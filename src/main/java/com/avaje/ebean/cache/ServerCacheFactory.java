@@ -21,6 +21,6 @@ public interface ServerCacheFactory {
   /**
    * Create the cache for the given type with options.
    */
-  ServerCache createCache(String cacheKey, ServerCacheOptions cacheOptions);
+  ServerCache createCache(ServerCacheType type, String cacheKey, ServerCacheOptions cacheOptions);
 
 }
