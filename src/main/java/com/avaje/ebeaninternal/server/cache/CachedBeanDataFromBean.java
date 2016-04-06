@@ -11,10 +11,10 @@ public class CachedBeanDataFromBean {
   public static CachedBeanData extract(BeanDescriptor<?> desc, EntityBean bean) {
 
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
-    
+
     Object[] data = new Object[desc.getPropertyCount()];
     boolean[] loaded = new boolean[desc.getPropertyCount()];
-    
+
     BeanProperty idProperty = desc.getIdProperty();
     if (idProperty != null) {
       int propertyIndex = idProperty.getPropertyIndex();
@@ -47,14 +47,14 @@ public class CachedBeanDataFromBean {
   }
 
   private static EntityBean createSharableBean(BeanDescriptor<?> desc, EntityBean bean, EntityBeanIntercept beanEbi) {
-    
+
     if (!desc.isCacheSharableBeans() || !beanEbi.isFullyLoadedBean()) {
       return null;
     }
     if (beanEbi.isReadOnly()) {
       return bean;
-    } 
-    
+    }
+
     // create a readOnly sharable instance by copying the data
     EntityBean sharableBean = desc.createEntityBean();
     BeanProperty idProp = desc.getIdProperty();

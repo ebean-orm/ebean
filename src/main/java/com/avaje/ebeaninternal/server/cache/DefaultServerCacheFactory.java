@@ -11,17 +11,17 @@ import com.avaje.ebean.cache.ServerCacheOptions;
  */
 public class DefaultServerCacheFactory implements ServerCacheFactory {
 
-	private EbeanServer ebeanServer;
-	
-	public void init(EbeanServer ebeanServer){
-		this.ebeanServer = ebeanServer;
-	}
-	
-	public ServerCache createCache(String cacheKey, ServerCacheOptions cacheOptions) {
-		
-		ServerCache cache =  new DefaultServerCache(cacheKey, cacheOptions);	
-		cache.init(ebeanServer);
-		return cache;
-	}
-	
+  private EbeanServer ebeanServer;
+
+  public void init(EbeanServer ebeanServer) {
+    this.ebeanServer = ebeanServer;
+  }
+
+  public ServerCache createCache(String cacheKey, ServerCacheOptions cacheOptions) {
+
+    ServerCache cache = new DefaultServerCache(cacheKey, cacheOptions);
+    cache.init(ebeanServer);
+    return cache;
+  }
+
 }
