@@ -1,16 +1,21 @@
 package com.avaje.ebean.dbmigration;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.config.DbMigrationConfig;
 import org.junit.Test;
 
 
-public class MigrationRunnerTest {
+public class MigrationRunnerTest extends BaseTestCase {
 
 
   @Test
   public void test() {
+
+    if (!isH2()) {
+      return;
+    }
 
     EbeanServer server = Ebean.getDefaultServer();
 
@@ -20,8 +25,6 @@ public class MigrationRunnerTest {
     config.setDbUser("sa");
     config.setDbPassword("");
 
-    MigrationRunner runner = new MigrationRunner(server, config);
-
-    runner.run();
+    new MigrationRunner(server, config).run();
   }
 }
