@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.cache;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -8,7 +9,7 @@ import java.util.List;
  * This is effectively just the Id values for each of the beans in the collection.
  * </p>
  */
-public class CachedManyIds {
+public class CachedManyIds implements Serializable {
 
   private final List<Object> idList;
 
