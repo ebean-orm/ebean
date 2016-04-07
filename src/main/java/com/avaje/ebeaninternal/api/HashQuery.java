@@ -17,6 +17,10 @@ public class HashQuery {
     this.bindHash = bindHash;
   }
 
+  public String toString() {
+    return "HashQuery@" + Integer.toHexString(hashCode());
+  }
+
   public int hashCode() {
     int hc = 31 * planHash.hashCode();
     hc = 31 * hc + bindHash;
