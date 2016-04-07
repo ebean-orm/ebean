@@ -1,12 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.Query;
 import com.avaje.ebean.bean.BeanCollection;
@@ -27,6 +20,12 @@ import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Helper for BeanDescriptor that manages the bean, query and collection caches.
@@ -170,7 +169,15 @@ public final class BeanDescriptorCacheHelp<T> {
     if (queryCache == null) {
       return null;
     } else {
-      return (BeanCollection<T>) queryCache.get(id);
+      BeanCollection<T> list = (BeanCollection<T>) queryCache.get(id);
+      if (queryLog.isTraceEnabled()) {
+        if (list == null) {
+          queryLog.trace("   GET {} - cache miss", cacheName);
+        } else {
+          queryLog.trace("   GET {} - hit", cacheName);
+        }
+      }
+      return list;
     }
   }
 
