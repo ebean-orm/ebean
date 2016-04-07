@@ -147,6 +147,17 @@ public interface EbeanServer {
   Object getBeanId(Object bean);
 
   /**
+   * Set the Id value onto the bean converting the type of the id value if necessary.
+   * <p>
+   * For example, if the id value passed in is a String but ought to be a Long or UUID etc
+   * then it will automatically be converted.
+   * </p>
+   *  @param bean The entity bean to set the id value on.
+   * @param id   The id value to set.
+   */
+  Object setBeanId(Object bean, Object id);
+
+  /**
    * Return a map of the differences between two objects of the same type.
    * <p>
    * When null is passed in for b, then the 'OldValues' of a is used for the

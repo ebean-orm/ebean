@@ -2,6 +2,7 @@ package com.avaje.tests.basic;
 
 import java.util.List;
 
+import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.MyEBasicConfigStartup;
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,9 +12,34 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.tests.model.basic.EBasic;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class TestExplicitInsert extends BaseTestCase {
+
+  @Test
+  public void setId_when_converted() {
+
+    EbeanServer server = Ebean.getDefaultServer();
+
+    Customer cust = new Customer();
+    Object returnId = server.setBeanId(cust, "42");
+
+    assertThat(returnId).isEqualTo(42);
+    assertThat(cust.getId()).isEqualTo(42);
+  }
+
+  @Test
+  public void setId_when_correctType() {
+
+    EbeanServer server = Ebean.getDefaultServer();
+
+    Customer customer = new Customer();
+    Object returnId = server.setBeanId(customer, 42);
+
+    assertThat(returnId).isEqualTo(42);
+    assertThat(customer.getId()).isEqualTo(42);
+  }
 
   @Test
   public void test() throws InterruptedException {
@@ -27,12 +53,15 @@ public class TestExplicitInsert extends BaseTestCase {
     b.setDescription("explicit insert");
     b.setStatus(EBasic.Status.ACTIVE);
 
-    EbeanServer server = Ebean.getServer(null);
+    EbeanServer server = Ebean.getDefaultServer();
     server.insert(b);
 
     Assert.assertNotNull(b.getId());
 
     Assert.assertEquals(b.getId(), server.getBeanId(b));
+
+
+
 
 
     EBasic b2 = server.find(EBasic.class, b.getId());

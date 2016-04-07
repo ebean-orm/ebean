@@ -1957,14 +1957,23 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return typeInfo != null && getBeanDescriptor(typeInfo.getBeanType()) != null;
   }
 
+  @Override
+  public Object setBeanId(Object bean, Object id) {
+    EntityBean eb = checkEntityBean(bean);
+    BeanDescriptor<?> desc = getBeanDescriptor(bean.getClass());
+    if (desc == null) {
+      throw new PersistenceException(bean.getClass().getName() + " is NOT an Entity Bean registered with this server?");
+    }
+    return desc.convertSetId(id, eb);
+  }
+
+  @Override
   public Object getBeanId(Object bean) {
     EntityBean eb = checkEntityBean(bean);
     BeanDescriptor<?> desc = getBeanDescriptor(bean.getClass());
     if (desc == null) {
-      String m = bean.getClass().getName() + " is NOT an Entity Bean registered with this server?";
-      throw new PersistenceException(m);
+      throw new PersistenceException(bean.getClass().getName() + " is NOT an Entity Bean registered with this server?");
     }
-
     return desc.getId(eb);
   }
 

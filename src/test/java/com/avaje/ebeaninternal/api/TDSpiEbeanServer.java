@@ -245,6 +245,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public Object setBeanId(Object bean, Object id) {
+    return id;
+  }
+
+  @Override
   public Object getBeanId(Object bean) {
     return null;
   }
