@@ -170,11 +170,11 @@ public final class BeanDescriptorCacheHelp<T> {
       return null;
     } else {
       BeanCollection<T> list = (BeanCollection<T>) queryCache.get(id);
-      if (queryLog.isTraceEnabled()) {
+      if (queryLog.isDebugEnabled()) {
         if (list == null) {
-          queryLog.trace("   GET {} - cache miss", cacheName);
+          queryLog.debug("   GET {}({}) - cache miss", cacheName, id);
         } else {
-          queryLog.trace("   GET {} - hit", cacheName);
+          queryLog.debug("   GET {}({}) - hit", cacheName, id);
         }
       }
       return list;
@@ -189,7 +189,7 @@ public final class BeanDescriptorCacheHelp<T> {
       queryCache = cacheManager.getQueryCache(beanType);
     }
     if (queryLog.isDebugEnabled()) {
-      queryLog.debug("   PUT {} {}", cacheName, id);
+      queryLog.debug("   PUT {}({})", cacheName, id);
     }
     queryCache.put(id, query);
   }
