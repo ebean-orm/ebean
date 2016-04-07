@@ -26,8 +26,10 @@ import org.avaje.datasource.DataSourceConfig;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
@@ -81,6 +83,12 @@ public class ServerConfig {
    * The EbeanServer name.
    */
   private String name;
+
+  /**
+   * Typically configuration type objects that are passed by this ServerConfig
+   * to plugins. For example - IgniteConfiguration passed to Ignite plugin.
+   */
+  private Map<String,Object> serviceObject = new HashMap<String, Object>();
 
   private ContainerConfig containerConfig;
 
@@ -402,6 +410,23 @@ public class ServerConfig {
    */
   public ServerConfig() {
 
+  }
+
+  /**
+   * Put a service object into configuration such that it can be passed to a plugin.
+   * <p>
+   * For example, put IgniteConfiguration in to be passed to the Ignite plugin.
+   * </p>
+   */
+  public void putServiceObject(String key, Object configObject) {
+    serviceObject.put(key, configObject);
+  }
+
+  /**
+   * Return the service object given the key.
+   */
+  public Object getServiceObject(String key) {
+    return serviceObject.get(key);
   }
   
   /**
