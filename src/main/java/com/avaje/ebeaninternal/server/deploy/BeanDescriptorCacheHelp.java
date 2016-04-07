@@ -59,7 +59,7 @@ public final class BeanDescriptorCacheHelp<T> {
 
   private ServerCache beanCache;
   private ServerCache naturalKeyCache;
-  private ServerCache queryCache;
+  private volatile ServerCache queryCache;
 
   public BeanDescriptorCacheHelp(BeanDescriptor<T> desc, ServerCacheManager cacheManager, CacheOptions cacheOptions,
       boolean cacheSharableBeans, BeanPropertyAssocOne<?>[] propertiesOneImported) {
@@ -146,6 +146,17 @@ public final class BeanDescriptorCacheHelp<T> {
 
   public CacheOptions getCacheOptions() {
     return cacheOptions;
+  }
+
+  /**
+   * Initialise the query cache if required
+   * (as some node in the cluster already has it).
+   */
+  public void queryCacheInit() {
+    if (queryCache == null) {
+      queryLog.debug("   init {}", cacheName);
+      queryCache = cacheManager.getQueryCache(beanType);
+    }
   }
 
   /**

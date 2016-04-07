@@ -2030,6 +2030,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return beanDescriptorManager.getBeanDescriptorByClassName(beanClassName);
   }
 
+  @Override
+  public boolean initQueryCache(String key) {
+    BeanDescriptor<?> desc = getBeanDescriptorById(key);
+    if (desc != null) {
+      desc.queryCacheInit();
+      return true;
+    }
+    return false;
+  }
+
   /**
    * Another server in the cluster sent this event so that we can inform local
    * BeanListeners of inserts updates and deletes that occurred remotely (on

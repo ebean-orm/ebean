@@ -46,4 +46,9 @@ public interface SpiServer extends EbeanServer {
    * Return the associated DataSource for this EbeanServer instance.
    */
   DataSource getDataSource();
+
+  /**
+   * Initialise the query cache for the given bean type.
+   */
+  boolean initQueryCache(String key);
 }

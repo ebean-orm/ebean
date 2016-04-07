@@ -1075,6 +1075,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return cacheHelp.isCacheNotify();
   }
 
+  public void queryCacheInit() {
+    cacheHelp.queryCacheInit();
+  }
+
   /**
    * Clear the query cache.
    */
