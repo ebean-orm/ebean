@@ -469,7 +469,9 @@ public class OrmQueryProperties implements Serializable {
    */
   public boolean isSameByAutoTune(OrmQueryProperties p2) {
     if (included == null) {
-      return p2.included == null;
+      return p2 == null || p2.included == null;
+    } else if (p2 == null) {
+      return false;
     }
     return included.equals(p2.included);
   }

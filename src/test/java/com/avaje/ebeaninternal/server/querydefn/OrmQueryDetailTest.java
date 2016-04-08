@@ -76,6 +76,36 @@ public class OrmQueryDetailTest extends BaseTestCase {
   }
 
   @Test
+  public void isAutoTuneEqual_when_different_removedFetch() {
+
+    OrmQueryDetail detail1 = parse("select (id,name) fetch customer (name) fetch details (code) fetch customer.contacts");
+    OrmQueryDetail detail2 = parse("select (id,name) fetch customer (name) fetch details (code)");
+
+    assertFalse(detail1.isAutoTuneEqual(detail2));
+    assertFalse(detail2.isAutoTuneEqual(detail1));
+  }
+
+  @Test
+  public void isAutoTuneEqual_when_different_removedFetchProperty() {
+
+    OrmQueryDetail detail1 = parse("select (id,name) fetch customer (name)");
+    OrmQueryDetail detail2 = parse("select (id,name) fetch customer ");
+
+    assertFalse(detail1.isAutoTuneEqual(detail2));
+    assertFalse(detail2.isAutoTuneEqual(detail1));
+  }
+
+  @Test
+  public void isAutoTuneEqual_when_different_path() {
+
+    OrmQueryDetail detail1 = parse("select (id,name) fetch customer (name)");
+    OrmQueryDetail detail2 = parse("select (id,name) fetch details (id) ");
+
+    assertFalse(detail1.isAutoTuneEqual(detail2));
+    assertFalse(detail2.isAutoTuneEqual(detail1));
+  }
+
+  @Test
   public void select_whenMultiple() throws Exception {
 
     OrmQueryDetail other = new OrmQueryDetail();
