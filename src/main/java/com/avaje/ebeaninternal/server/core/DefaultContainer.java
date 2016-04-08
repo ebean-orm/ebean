@@ -222,7 +222,7 @@ public class DefaultContainer implements SpiContainer {
     List<Class<?>> entityClasses = serverConfig.getClasses();
     if (serverConfig.isDisableClasspathSearch() || (entityClasses != null && entityClasses.size() > 0)) {
       // use classes we explicitly added via configuration
-      return new BootupClasses(serverConfig.getClasses());
+      return new BootupClasses(entityClasses);
     }
 
     return BootupClassPathSearch.search(serverConfig);
