@@ -348,6 +348,15 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
 	return new ExistsQueryExpression((SpiQuery<?>) subQuery, true);
   }
 
+  @Override
+  public Expression isEmpty(String propertyName) {
+    return new IsEmptyExpression(propertyName, true);
+  }
+
+  @Override
+  public Expression isNotEmpty(String propertyName) {
+    return new IsEmptyExpression(propertyName, false);
+  }
 
   /**
    * Id Equal to - ID property is equal to the value.

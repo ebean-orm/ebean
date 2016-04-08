@@ -40,7 +40,7 @@ import java.util.Set;
  */
 class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, ExpressionList<T> {
 
-  protected final DefaultExpressionList<T> exprList;
+  private final DefaultExpressionList<T> exprList;
 
   protected final Junction.Type type;
 
@@ -545,6 +545,16 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public ExpressionList<T> notIn(String propertyName, Query<?> subQuery) {
     return exprList.notIn(propertyName, subQuery);
+  }
+
+  @Override
+  public ExpressionList<T> isEmpty(String propertyName) {
+    return exprList.isEmpty(propertyName);
+  }
+
+  @Override
+  public ExpressionList<T> isNotEmpty(String propertyName) {
+    return exprList.isNotEmpty(propertyName);
   }
 
   @Override

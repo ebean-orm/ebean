@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.el;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.StringParser;
+import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.query.SplitName;
@@ -152,6 +153,11 @@ public class ElPropertyChain implements ElPropertyValue {
 
   public boolean isLocalEncrypted() {
     return lastElPropertyValue.isLocalEncrypted();
+  }
+
+  @Override
+  public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
+    return lastElPropertyValue.getAssocIsEmpty(request, path);
   }
 
   public Object[] getAssocIdValues(EntityBean bean) {

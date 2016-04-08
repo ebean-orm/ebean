@@ -743,6 +743,18 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> isEmpty(String propertyName) {
+    add(expr.isEmpty(propertyName));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> isNotEmpty(String propertyName) {
+    add(expr.isNotEmpty(propertyName));
+    return this;
+  }
+
+  @Override
   public ExpressionList<T> exists(Query<?> subQuery) {
     add(expr.exists(subQuery));
     return this;

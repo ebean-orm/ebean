@@ -11,6 +11,7 @@ import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.BeanCollectionLoader;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.PathProperties;
+import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
@@ -479,6 +480,28 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
   public void add(BeanCollection<?> collection, EntityBean bean) {
     help.add(collection, bean, false);
+  }
+
+  @Override
+  public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
+
+    StringBuilder sb = new StringBuilder();
+
+    SpiQuery<?> query = request.getQueryRequest().getQuery();
+    if (manyToMany) {
+      sb.append(query.isAsDraft() ?  intersectionDraftTable : intersectionPublishTable);
+    } else {
+      sb.append(targetDescriptor.getBaseTable(query.getTemporalMode()));
+    }
+    sb.append(" where ");
+    for (int i = 0; i < exportedProperties.length; i++) {
+      if (i > 0) {
+        sb.append(" and ");
+      }
+      exportedProperties[i].appendWhere(sb, path);
+    }
+
+    return sb.toString();
   }
 
   /**

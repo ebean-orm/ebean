@@ -755,6 +755,16 @@ public interface ExpressionList<T> {
   ExpressionList<T> notIn(String propertyName, Query<?> subQuery);
 
   /**
+   * Is empty expression for collection properties.
+   */
+  ExpressionList<T> isEmpty(String propertyName);
+
+  /**
+   * Is not empty expression for collection properties.
+   */
+  ExpressionList<T> isNotEmpty(String propertyName);
+
+  /**
    * Exists expression
    */
   ExpressionList<T> exists(Query<?> subQuery);

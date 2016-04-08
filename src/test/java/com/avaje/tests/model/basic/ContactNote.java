@@ -17,6 +17,11 @@ public class ContactNote extends BasicDomain {
     @Lob
     String note;
 
+    public ContactNote(String title, String note) {
+        this.title = title;
+        this.note = note;
+    }
+
     public String getTitle() {
         return title;
     }

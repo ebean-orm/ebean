@@ -5,6 +5,7 @@ import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import com.avaje.ebean.plugin.Property;
@@ -832,6 +833,12 @@ public class BeanProperty implements ElPropertyValue, Property {
 
   public boolean containsMany() {
     return false;
+  }
+
+  @Override
+  public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
+    // overridden in BanePropertyAssocMany
+    throw new RuntimeException("Not Supported or Expected");
   }
 
   public Object[] getAssocIdValues(EntityBean bean) {

@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.StringParser;
+import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
@@ -49,6 +50,11 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
   }
 
   public String getAssocIdExpression(String prefix, String operator) {
+    throw new RuntimeException("Not Supported or Expected");
+  }
+
+  @Override
+  public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
     throw new RuntimeException("Not Supported or Expected");
   }
 

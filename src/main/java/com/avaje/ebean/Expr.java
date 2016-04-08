@@ -210,6 +210,20 @@ public class Expr {
   }
 
   /**
+   * For collection properties that are empty (have not existing elements).
+   */
+  public static Expression isEmpty(String propertyName) {
+    return Ebean.getExpressionFactory().isEmpty(propertyName);
+  }
+
+  /**
+   * For collection properties that are not empty (have existing elements).
+   */
+  public static Expression isNotEmpty(String propertyName) {
+    return Ebean.getExpressionFactory().isNotEmpty(propertyName);
+  }
+
+  /**
    * In - property has a value in the array of values.
    */
   public static Expression in(String propertyName, Object[] values) {

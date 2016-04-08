@@ -11,6 +11,8 @@ import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.MRole;
 import com.avaje.tests.model.basic.MUser;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestManyWhereJoinM2M extends BaseTestCase {
 
   @Test
@@ -43,6 +45,10 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
 
     Ebean.save(u1);
 
+    MUser u2 = new MUser();
+    u2.setUserName("user2");
+    Ebean.save(u2);
+
     Ebean.commitTransaction();
 
     Query<MUser> query = Ebean.find(MUser.class).fetch("roles")
@@ -59,5 +65,32 @@ public class TestManyWhereJoinM2M extends BaseTestCase {
     Assert.assertTrue(sql.contains("join mrole "));
     Assert.assertTrue(sql.contains(".role_name = ?"));
 
+    isEmpty();
+    isNotEmpty();
+  }
+
+  private void isEmpty() {
+
+    Query<MUser> query = Ebean.find(MUser.class)
+        .where().isEmpty("roles")
+        .query();
+
+    List<MUser> usersWithNoRoles = query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("select t0.userid c0, t0.user_name c1, t0.user_type_id c2 from muser t0 where not exists (select 1 from mrole_muser where muser_userid = t0.userid)");
+    assertThat(usersWithNoRoles).isNotEmpty();
+  }
+
+  private void isNotEmpty() {
+
+    Query<MUser> query = Ebean.find(MUser.class)
+        .select("userName")
+        .where().isNotEmpty("roles")
+        .query();
+
+    List<MUser> usersWithRoles = query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("select t0.userid c0, t0.user_name c1 from muser t0 where exists (select 1 from mrole_muser where muser_userid = t0.userid)");
+    assertThat(usersWithRoles).isNotEmpty();
   }
 }

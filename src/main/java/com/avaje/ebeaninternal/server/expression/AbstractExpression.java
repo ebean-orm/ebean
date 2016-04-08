@@ -28,12 +28,19 @@ public abstract class AbstractExpression implements SpiExpression {
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
 
-    if (propName != null) {
-      ElPropertyDeploy elProp = desc.getElPropertyDeploy(propName);
+    propertyContainsMany(propName, desc, manyWhereJoin);
+  }
+
+  /**
+   * Check the logical property path for containing a 'many' property.
+   */
+  protected void propertyContainsMany(String propertyName, BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
+    if (propertyName != null) {
+      ElPropertyDeploy elProp = desc.getElPropertyDeploy(propertyName);
       if (elProp != null) {
         if (elProp.containsFormulaWithJoin()) {
           // for findRowCount query select clause
-          manyWhereJoin.addFormulaWithJoin(propName);
+          manyWhereJoin.addFormulaWithJoin(propertyName);
         }
         if (elProp.containsMany()) {
           // for findRowCount we join to a many property

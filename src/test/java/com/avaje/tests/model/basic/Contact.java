@@ -7,6 +7,7 @@ import com.avaje.ebean.annotation.DocEmbedded;
 import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.Index;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -41,7 +42,7 @@ public class Contact {
     @ManyToOne(optional=true)
     ContactGroup group;
     
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     List<ContactNote> notes;
 
     @CreatedTimestamp

@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.text.StringParser;
+import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
 /**
@@ -121,6 +122,11 @@ public final class BeanFkeyProperty implements ElPropertyValue {
    */
   public String getAssocIdInValueExpr(int size) {
     return null;
+  }
+
+  @Override
+  public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
+    throw new RuntimeException("Not Supported or Expected");
   }
 
   /**

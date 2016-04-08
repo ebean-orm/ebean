@@ -247,6 +247,16 @@ public interface ExpressionFactory {
   Expression notExists(Query<?> subQuery);
 
   /**
+   * Is empty expression for collection properties.
+   */
+  Expression isEmpty(String propertyName);
+
+  /**
+   * Is not empty expression for collection properties.
+   */
+  Expression isNotEmpty(String propertyName);
+
+  /**
    * Id Equal to - ID property is equal to the value.
    */
   Expression idEq(Object value);

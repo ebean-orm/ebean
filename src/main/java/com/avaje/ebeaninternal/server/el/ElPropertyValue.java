@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.el;
 
 import com.avaje.ebean.plugin.ExpressionPath;
+import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 
 /**
  * The expression language object that can get values.
@@ -19,6 +20,11 @@ public interface ElPropertyValue extends ElPropertyDeploy, ExpressionPath {
    * Return the logical id in expression taking into account embedded id's.
    */
   String getAssocIdInExpr(String prefix);
+
+  /**
+   * Return the logical where clause to support "Is empty".
+   */
+  String getAssocIsEmpty(SpiExpressionRequest request, String path);
 
   /**
    * Return true if this is an ManyToOne or OneToOne associated bean property.
