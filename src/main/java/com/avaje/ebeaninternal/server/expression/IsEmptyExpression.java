@@ -10,13 +10,13 @@ import com.avaje.ebeaninternal.server.query.SplitName;
 
 import java.io.IOException;
 
-public class IsEmptyExpression extends AbstractExpression {
+class IsEmptyExpression extends AbstractExpression {
 
   private final boolean empty;
 
   private final String propertyPath;
 
-  public IsEmptyExpression(String propertyName, boolean empty) {
+  IsEmptyExpression(String propertyName, boolean empty) {
     super(propertyName);
     this.empty = empty;
     this.propertyPath = SplitName.split(propertyName)[0];
@@ -24,7 +24,7 @@ public class IsEmptyExpression extends AbstractExpression {
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-
+    context.writeExists(!empty, propName);
   }
 
   public final String getPropName() {
