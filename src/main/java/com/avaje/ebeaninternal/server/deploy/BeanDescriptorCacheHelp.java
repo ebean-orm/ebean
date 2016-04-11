@@ -582,35 +582,33 @@ public final class BeanDescriptorCacheHelp<T> {
       ServerCache cache = getBeanCache();
       CachedBeanData existingData = (CachedBeanData) cache.get(id);
       if (existingData != null) {
-        
+        CachedBeanData newData = CachedBeanDataUpdate.update(desc, existingData, updateRequest.getEntityBean());
         if (isCachedDataTooOld(existingData)) {
           // just remove the entry from the cache
           if (beanLog.isDebugEnabled()) {
             beanLog.debug("   REMOVE {}({}) - entry too old", cacheName, id);
           }
           cache.remove(id);
-          
+
         } else {
           // Update the cache data with the changes from our update
-          CachedBeanData newData = CachedBeanDataUpdate.update(desc, existingData, updateRequest.getEntityBean());
           if (beanLog.isDebugEnabled()) {
             beanLog.debug("   UPDATE {}({})", cacheName, id);
           }
           cache.put(id, newData);
-          if (newData.isNaturalKeyUpdate() && naturalKeyCache != null) {
-            
-            Object oldKey = newData.getOldNaturalKey();
-            Object newKey = newData.getNaturalKey();
-            if (natLog.isDebugEnabled()) {
-              natLog.debug(".. update {} PUT({}, {}) REMOVE({})", cacheName, newKey, id, oldKey);
-            }
-    
-            if (oldKey != null) {
-              naturalKeyCache.remove(oldKey);
-            }
-            if (newKey != null) {
-              naturalKeyCache.put(newKey, id);
-            }
+        }
+
+        if (newData.isNaturalKeyUpdate() && naturalKeyCache != null) {
+          Object oldKey = newData.getOldNaturalKey();
+          Object newKey = newData.getNaturalKey();
+          if (natLog.isDebugEnabled()) {
+            natLog.debug(".. update {} PUT({}, {}) REMOVE({})", cacheName, newKey, id, oldKey);
+          }
+          if (oldKey != null) {
+            naturalKeyCache.remove(oldKey);
+          }
+          if (newKey != null) {
+            naturalKeyCache.put(newKey, id);
           }
         }
       }
