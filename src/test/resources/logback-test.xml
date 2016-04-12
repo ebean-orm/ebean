@@ -77,17 +77,17 @@
   <logger name="com.avaje.ebean" level="INFO"/>
   <logger name="org.avaje.ebean" level="INFO"/>
 
-  <logger name="org.avaje.ebean.SQL" level="TRACE"/>
-  <logger name="org.avaje.ebean.TXN" level="TRACE"/>
-  <logger name="org.avaje.ebean.SUM" level="TRACE"/>
+  <!--<logger name="org.avaje.ebean.SQL" level="TRACE"/>-->
+  <!--<logger name="org.avaje.ebean.TXN" level="TRACE"/>-->
+  <!--<logger name="org.avaje.ebean.SUM" level="TRACE"/>-->
   <!--<logger name="org.avaje.ebean.ELA" level="TRACE"/>-->
 
   <logger name="org.avaje.classpath" level="INFO"/>
 
-  <logger name="org.avaje.ebean.cache.QUERY" level="TRACE"/>
-  <logger name="org.avaje.ebean.cache.BEAN" level="TRACE"/>
-  <logger name="org.avaje.ebean.cache.COLL" level="TRACE"/>
-  <logger name="org.avaje.ebean.cache.NATKEY" level="TRACE"/>
+  <!--<logger name="org.avaje.ebean.cache.QUERY" level="TRACE"/>-->
+  <!--<logger name="org.avaje.ebean.cache.BEAN" level="TRACE"/>-->
+  <!--<logger name="org.avaje.ebean.cache.COLL" level="TRACE"/>-->
+  <!--<logger name="org.avaje.ebean.cache.NATKEY" level="TRACE"/>-->
 
   <!--<logger name="com.avaje.tests" level="DEBUG"/>-->
   <!--<logger name="com.avaje.ebean.config.dbplatform.H2HistoryTrigger" level="DEBUG"/>-->
