@@ -10,7 +10,7 @@ import javax.persistence.OneToMany;
 import com.avaje.ebean.annotation.CacheStrategy;
 
 
-@CacheStrategy(useBeanCache=true, warmingQuery="find article join sections")
+@CacheStrategy
 @Entity
 public class Article extends BasicDomain {
 

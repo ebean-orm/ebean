@@ -20,7 +20,7 @@ public class TestCacheBasic extends BaseTestCase {
     Ebean.getServerCacheManager().clear(Country.class);
     ServerCache countryCache = Ebean.getServerCacheManager().getBeanCache(Country.class);
 
-    Ebean.runCacheWarming(Country.class);
+    loadCountryCache();
     Assert.assertTrue(countryCache.size() > 0);
 
     // reset the statistics

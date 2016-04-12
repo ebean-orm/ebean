@@ -218,7 +218,6 @@ public class AnnotationClass extends AnnotationParser {
     if (cacheStrategy != null) {
       cacheOptions.setUseCache(cacheStrategy.useBeanCache());
       cacheOptions.setReadOnly(cacheStrategy.readOnly());
-      cacheOptions.setWarmingQuery(cacheStrategy.warmingQuery());
       if (cacheStrategy.naturalKey().length() > 0) {
         String propName = cacheStrategy.naturalKey().trim();
         DeployBeanProperty beanProperty = descriptor.getBeanProperty(propName);

@@ -1847,22 +1847,6 @@ public interface EbeanServer {
   BackgroundExecutor getBackgroundExecutor();
 
   /**
-   * Run the cache warming queries on all bean types that have one defined.
-   * <p>
-   * A cache warming query can be defined via {@link CacheStrategy}.
-   * </p>
-   */
-  void runCacheWarming();
-
-  /**
-   * Run the cache warming query for a specific bean type.
-   * <p>
-   * A cache warming query can be defined via {@link CacheStrategy}.
-   * </p>
-   */
-  void runCacheWarming(Class<?> beanType);
-
-  /**
    * Return the JsonContext for reading/writing JSON.
    * <p>
    * This instance is safe to be used concurrently by multiple threads and this

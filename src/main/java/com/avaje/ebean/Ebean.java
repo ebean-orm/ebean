@@ -1485,29 +1485,6 @@ public final class Ebean {
   }
 
   /**
-   * Run the cache warming queries on all bean types that have one defined for
-   * the default/primary EbeanServer.
-   * <p>
-   * A cache warming query can be defined via {@link CacheStrategy}.
-   * </p>
-   */
-  public static void runCacheWarming() {
-    serverMgr.getDefaultServer().runCacheWarming();
-  }
-
-  /**
-   * Run the cache warming query for a specific bean type for the
-   * default/primary EbeanServer.
-   * <p>
-   * A cache warming query can be defined via {@link CacheStrategy}.
-   * </p>
-   */
-  public static void runCacheWarming(Class<?> beanType) {
-
-    serverMgr.getDefaultServer().runCacheWarming(beanType);
-  }
-
-  /**
    * Return the JsonContext for reading/writing JSON.
    */
   public static JsonContext json() {

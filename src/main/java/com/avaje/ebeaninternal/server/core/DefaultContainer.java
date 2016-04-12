@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.core;
 
-import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.cache.ServerCacheOptions;
@@ -32,8 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.ServiceLoader;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Default Server side implementation of ServerFactory.
@@ -137,13 +134,6 @@ public class DefaultContainer implements SpiContainer {
         if (clusterManager.isClustering()) {
           // register the server once it has been created
           clusterManager.registerServer(server);
-        }
-
-        // warm the cache in 30 seconds
-        long sleepMillis = 1000 * serverConfig.getCacheWarmingDelay();
-        if (sleepMillis > 0) {
-          Timer timer = new Timer("EbeanCacheWarmer", true);
-          timer.schedule(new CacheWarmer(server, timer), sleepMillis);
         }
       }
 
@@ -364,21 +354,4 @@ public class DefaultContainer implements SpiContainer {
     }
   }
 
-  private static class CacheWarmer extends TimerTask {
-
-    private final EbeanServer server;
-
-    private final Timer timer;
-
-    CacheWarmer(EbeanServer server, Timer timer) {
-      this.server = server;
-      this.timer = timer;
-    }
-
-    public void run() {
-      server.runCacheWarming();
-      timer.cancel();
-    }
-
-  }
 }

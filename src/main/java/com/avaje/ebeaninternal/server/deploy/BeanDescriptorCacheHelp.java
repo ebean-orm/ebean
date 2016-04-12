@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Query;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;
@@ -85,26 +83,6 @@ final class BeanDescriptorCacheHelp<T> {
     }
     if (cacheOptions.isUseCache()) {
       this.beanCache = cacheManager.getBeanCache(beanType);
-    }
-  }
-
-  /**
-   * Execute the warming cache query (if defined) and load the cache.
-   */
-  public void runCacheWarming(EbeanServer ebeanServer) {
-    if (cacheOptions == null) {
-      return;
-    }
-    String warmingQuery = cacheOptions.getWarmingQuery();
-    if (warmingQuery != null && warmingQuery.trim().length() > 0) {
-      Query<?> query = ebeanServer.createQuery(beanType, warmingQuery);
-      query.setUseCache(true);
-      query.setReadOnly(true);
-      query.setLoadBeanCache(true);
-      List<?> list = query.findList();
-      if (beanLog.isInfoEnabled()) {
-        beanLog.info("Loaded {} cache with [{}] beans", cacheName, list.size());
-      }
     }
   }
 

@@ -422,26 +422,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   /**
-   * Run the cache warming queries on all beans that have them defined.
-   */
-  public void runCacheWarming() {
-    List<BeanDescriptor<?>> descList = beanDescriptorManager.getBeanDescriptorList();
-    for (int i = 0; i < descList.size(); i++) {
-      descList.get(i).runCacheWarming();
-    }
-  }
-
-  public void runCacheWarming(Class<?> beanType) {
-    BeanDescriptor<?> desc = beanDescriptorManager.getBeanDescriptor(beanType);
-    if (desc == null) {
-      String msg = "Is " + beanType + " an entity? Could not find a BeanDescriptor";
-      throw new PersistenceException(msg);
-    } else {
-      desc.runCacheWarming();
-    }
-  }
-
-  /**
    * Compile a query. Only valid for ORM queries.
    */
   public <T> CQuery<T> compileQuery(Query<T> query, Transaction t) {

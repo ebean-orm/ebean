@@ -11,8 +11,6 @@ public class CacheOptions {
 
   private String naturalKey;
 
-  private String warmingQuery;
-
   private int maxIdleSecs;
   
   private long maxSecsToLive;
@@ -49,20 +47,6 @@ public class CacheOptions {
    */
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
-  }
-
-  /**
-   * Return the query used to warm the cache.
-   */
-  public String getWarmingQuery() {
-    return warmingQuery;
-  }
-
-  /**
-   * Set the cache warming query.
-   */
-  public void setWarmingQuery(String warmingQuery) {
-    this.warmingQuery = warmingQuery;
   }
 
   /**

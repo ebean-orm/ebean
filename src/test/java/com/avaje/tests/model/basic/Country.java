@@ -18,7 +18,7 @@ import javax.validation.constraints.Size;
 @DocStore
 @ReadAudit
 @ChangeLog(inserts = ChangeLogInsertMode.INCLUDE)
-@CacheStrategy(readOnly = true, warmingQuery = "order by name")
+@CacheStrategy(readOnly = true)
 @CacheTuning(maxSize = 500)
 @Entity
 @Table(name = "o_country")

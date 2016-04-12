@@ -17,7 +17,7 @@ import com.avaje.ebean.annotation.DocStore;
  * Product entity bean.
  */
 @DocStore
-@CacheStrategy(warmingQuery = "order by name")
+@CacheStrategy
 @Entity
 @Table(name = "o_product")
 public class Product implements Serializable {

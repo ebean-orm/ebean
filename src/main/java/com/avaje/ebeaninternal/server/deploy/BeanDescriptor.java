@@ -896,13 +896,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
-   * Execute the warming cache query (if defined) and load the cache.
-   */
-  public void runCacheWarming() {
-    cacheHelp.runCacheWarming(ebeanServer);
-  }
-
-  /**
    * Return true if this bean type has a default select clause that is not
    * simply select all properties.
    */

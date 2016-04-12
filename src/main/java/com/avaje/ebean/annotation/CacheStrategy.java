@@ -42,17 +42,4 @@ public @interface CacheStrategy {
    */
   boolean readOnly() default false;
 
-  /**
-   * Specify a query that can be used to warm the cache.
-   * <p>
-   * All the beans fetched by this query will be loaded into the bean cache and
-   * the query itself will be loaded into the query cache.
-   * </p>
-   * <p>
-   * The warming query will typically be executed at startup time after a short
-   * delay (defaults to a 30 seconds delay).
-   * </p>
-   */
-  String warmingQuery() default "";
-
 }

@@ -730,16 +730,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void runCacheWarming() {
-
-  }
-
-  @Override
-  public void runCacheWarming(Class<?> beanType) {
-
-  }
-
-  @Override
   public JsonContext json() {
     return null;
   }

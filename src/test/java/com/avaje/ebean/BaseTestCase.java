@@ -2,6 +2,7 @@ package com.avaje.ebean;
 
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.tests.model.basic.Country;
 import org.avaje.agentloader.AgentLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,5 +53,12 @@ public class BaseTestCase {
 
   protected EbeanServer server() {
     return Ebean.getDefaultServer();
+  }
+
+  protected void loadCountryCache() {
+
+    Ebean.find(Country.class)
+        .setLoadBeanCache(true)
+        .findList();
   }
 }
