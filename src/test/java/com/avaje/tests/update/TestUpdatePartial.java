@@ -23,6 +23,7 @@ public class TestUpdatePartial extends BaseTestCase {
     checkDbStatusValue(c.getId(), "A");
 
     Customer c2 = Ebean.find(Customer.class)
+        .setUseCache(false)
         .select("status, smallnote")
         .setId(c.getId())
         .findUnique();
@@ -34,6 +35,7 @@ public class TestUpdatePartial extends BaseTestCase {
     checkDbStatusValue(c.getId(), "I");
 
     Customer c3 = Ebean.find(Customer.class)
+        .setUseCache(false)
         .select("status")
         .setId(c.getId())
         .findUnique();
@@ -58,17 +60,15 @@ public class TestUpdatePartial extends BaseTestCase {
    */
   @Test
   public void testWithoutChangesAndVersionColumn() {
-    // arrange
+
     Customer customer = new Customer();
     customer.setName("something");
 
     Ebean.save(customer);
 
-    // act
     Customer customerWithoutChanges = Ebean.find(Customer.class, customer.getId());
     Ebean.save(customerWithoutChanges);
 
-    // assert
     assertEquals(customer.getUpdtime().getTime(), customerWithoutChanges.getUpdtime().getTime());
   }
 }

@@ -41,7 +41,9 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
+import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
 import com.avaje.ebeaninternal.server.cache.CachedBeanData;
+import com.avaje.ebeaninternal.server.cache.CachedManyIds;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.core.DiffHelp;
@@ -210,12 +212,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Map of BeanProperty Linked so as to preserve order.
    */
-  private final LinkedHashMap<String, BeanProperty> propMap;
+  protected final LinkedHashMap<String, BeanProperty> propMap;
 
   /**
    * The type of bean this describes.
    */
   private final Class<T> beanType;
+
   protected final Class<?> rootBeanType;
 
   /**
@@ -226,8 +229,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   
   private final String[] properties;
   
-  private final int propertyCount;
-
   /**
    * Intercept pre post on insert,update, and delete .
    */
@@ -337,6 +338,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * All non transient properties excluding the id properties.
    */
   private final BeanProperty[] propertiesNonTransient;
+  protected final BeanProperty[] propertiesIndex;
 
   /**
    * The bean class name or the table name for MapBeans.
@@ -403,7 +405,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.serverName = owner.getServerName();
     this.entityType = deploy.getEntityType();
     this.properties = deploy.getProperties();
-    this.propertyCount = this.properties.length;
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());
@@ -512,12 +513,17 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       this.idPropertyIndex = -1;
       this.versionPropertyIndex = -1;
       this.unloadProperties = new int[0];
+      this.propertiesIndex = new BeanProperty[0];
       
     } else {
       EntityBeanIntercept ebi = prototypeEntityBean._ebean_getIntercept();
       this.idPropertyIndex = (idProperty == null) ? -1 : ebi.findProperty(idProperty.getName());
       this.versionPropertyIndex = (versionProperty == null) ? -1 : ebi.findProperty(versionProperty.getName());
       this.unloadProperties = derivePropertiesToUnload(prototypeEntityBean);
+      this.propertiesIndex = new BeanProperty[ebi.getPropertyLength()];
+      for (int i = 0; i < propertiesIndex.length; i++) {
+        propertiesIndex[i] = propMap.get(ebi.getProperty(i));
+      }
     }
   }
 
@@ -595,10 +601,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return entityType;
   }
 
-  public int getPropertyCount() {
-    return propertyCount;
-  }
-  
   public String[] getProperties() {
     return properties;
   }
@@ -711,6 +713,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Initialise the document mapping.
    */
+  @SuppressWarnings("unchecked")
   public void initialiseDocMapping() {
     for (int i = 0; i < propertiesMany.length; i++) {
       propertiesMany[i].initialisePostTarget();
@@ -1101,6 +1104,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Add a query cache clear into the changeSet.
+   */
+  public void queryCacheClear(CacheChangeSet changeSet) {
+    cacheHelp.queryCacheClear(changeSet);
+  }
+
+  /**
    * Try to load the beanCollection from cache return true if successful.
    */
   public boolean cacheManyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId, Boolean readOnly) {
@@ -1114,37 +1124,68 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     cacheHelp.manyPropPut(many, bc, parentId);
   }
 
-  public void cacheManyPropRemove(Object parentId, String propertyName) {
-    cacheHelp.manyPropRemove(parentId, propertyName);
+  /**
+   * Update the bean collection entry in the cache.
+   */
+  public void cacheManyPropPut(String name, Object parentId, CachedManyIds entry) {
+    cacheHelp.cachePutManyIds(parentId, name, entry);
+  }
+
+  public void cacheManyPropRemove(String propertyName, Object parentId) {
+    cacheHelp.manyPropRemove(propertyName, parentId);
   }
 
   public void cacheManyPropClear(String propertyName) {
     cacheHelp.manyPropClear(propertyName);
   }
 
-  public void cacheBeanPut(T bean) {
-    cacheBeanPutData((EntityBean) bean);
+  /**
+   * Extract the raw cache data from the embedded bean.
+   */
+  public CachedBeanData cacheEmbeddedBeanExtract(EntityBean bean) {
+    return cacheHelp.beanExtractData(this, bean);
   }
   
   /**
-   * Extract the raw cache data from the bean.
+   * Load the embedded bean (taking into account inheritance).
    */
-  public CachedBeanData cacheBeanExtractData(EntityBean bean) {
-    return cacheHelp.beanExtractData(bean);
-  }
-  
-  /**
-   * Load the raw cache data into the bean.
-   */
-  public void cacheBeanLoadData(EntityBean bean, CachedBeanData data) {
-    cacheHelp.beanLoadData(bean, data);
+  public EntityBean cacheEmbeddedBeanLoad(CachedBeanData data) {
+    return cacheHelp.embeddedBeanLoad(data);
   }
 
   /**
-   * Put a bean into the bean cache.
+   * Load the embedded bean as the root type.
    */
-  public void cacheBeanPutData(EntityBean bean) {
+  EntityBean cacheEmbeddedBeanLoadDirect(CachedBeanData data) {
+    return cacheHelp.embeddedBeanLoadDirect(data);
+  }
+
+  /**
+   * Load the entity bean as the correct bean type.
+   */
+  EntityBean cacheBeanLoadDirect(Object id, Boolean readOnly, CachedBeanData data) {
+    return cacheHelp.loadBeanDirect(id, readOnly, data);
+  }
+
+  /**
+   * Put the bean into the cache.
+   */
+  public void cacheBeanPut(T bean) {
+    cacheBeanPut((EntityBean) bean);
+  }
+
+  /**
+   * Put a bean into the bean cache (taking into account inheritance).
+   */
+  public void cacheBeanPut(EntityBean bean) {
     cacheHelp.beanCachePut(bean);
+  }
+
+  /**
+   * Put a bean into the cache as the correct type.
+   */
+  void cacheBeanPutDirect(EntityBean bean) {
+    cacheHelp.beanCachePutDirect(bean);
   }
 
   /**
@@ -1157,7 +1198,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Remove a bean from the cache given its Id.
    */
-  public void cacheBeanRemove(Object id) {
+  public void cacheHandleDeleteById(Object id) {
     cacheHelp.beanCacheRemove(id);
   }
   
@@ -1184,6 +1225,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return cacheHelp.naturalKeyLookup(query, t);
   }
 
+  public void cacheNaturalKeyPut(Object id, Object newKey) {
+    cacheHelp.cacheNaturalKeyPut(id, newKey);
+  }
+
   /**
    * Invalidate parts of cache due to SqlUpdate or external modification etc.
    */
@@ -1192,21 +1237,38 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
-   * Remove a bean from the cache given its Id.
+   * Handle a delete by id request adding an cache change into the changeSet.
    */
-  public void cacheHandleDelete(Object id, PersistRequestBean<T> deleteRequest) {
-    cacheHelp.handleDelete(id, deleteRequest);
-  }
-
-  public void cacheHandleInsert(PersistRequestBean<T> insertRequest) {
-    cacheHelp.handleInsert(insertRequest);
+  public void cacheHandleDeleteById(Object id, CacheChangeSet changeSet) {
+    cacheHelp.handleDelete(id, changeSet);
   }
 
   /**
-   * Update the cached bean data.
+   * Remove a bean from the cache given its Id.
    */
-  public void cacheHandleUpdate(Object id, PersistRequestBean<T> updateRequest) {
-    cacheHelp.handleUpdate(id, updateRequest);
+  public void cacheHandleDelete(Object id, PersistRequestBean<T> deleteRequest, CacheChangeSet changeSet) {
+    cacheHelp.handleDelete(id, deleteRequest, changeSet);
+  }
+
+  /**
+   * Add the insert changes to the changeSet.
+   */
+  public void cacheHandleInsert(PersistRequestBean<T> insertRequest, CacheChangeSet changeSet) {
+    cacheHelp.handleInsert(insertRequest, changeSet);
+  }
+
+  /**
+   * Add the update to the changeSet.
+   */
+  public void cacheHandleUpdate(Object id, PersistRequestBean<T> updateRequest, CacheChangeSet changeSet) {
+    cacheHelp.handleUpdate(id, updateRequest, changeSet);
+  }
+
+  /**
+   * Apply the update to the cache.
+   */
+  public void cacheBeanUpdate(Object id, Map<String, Object> changes, boolean updateNaturalKey, long version) {
+    cacheHelp.cacheBeanUpdate(id, changes, updateNaturalKey, version);
   }
 
   /**
@@ -2100,6 +2162,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     return inheritInfo.getDiscriminatorColumn();
   }
 
+  /**
+   * Return the discriminator value for this bean type (or null when there is no inheritance).
+   */
+  public String getDiscValue() {
+    return inheritInfo == null ? null : inheritInfo.getDiscriminatorStringValue();
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   public T createBeanUsingDisc(Object discValue) {
@@ -2532,6 +2601,25 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   public boolean hasVersionProperty(EntityBeanIntercept ebi) {
     return versionPropertyIndex > -1 && ebi.isLoadedProperty(versionPropertyIndex);
+  }
+
+  /**
+   * Set the version value returning it in primitive long form.
+   */
+  public long setVersion(EntityBean entityBean, Object versionValue) {
+    versionProperty.setValueIntercept(entityBean, versionValue);
+    return versionProperty.scalarType.asVersion(versionValue);
+  }
+
+  /**
+   * Return the version value in primitive long form (if exists and set).
+   */
+  public long getVersion(EntityBean entityBean) {
+    if (versionProperty == null) {
+      return 0;
+    }
+    Object value = versionProperty.getValue(entityBean);
+    return value == null ? 0 : versionProperty.scalarType.asVersion(value);
   }
 
   /**

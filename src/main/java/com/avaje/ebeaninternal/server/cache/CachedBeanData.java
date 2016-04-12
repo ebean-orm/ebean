@@ -1,66 +1,92 @@
 package com.avaje.ebeaninternal.server.cache;
 
-import java.io.Serializable;
-import java.util.Arrays;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Data held in the bean cache for cached beans.
  */
-public class CachedBeanData implements Serializable {
+public class CachedBeanData implements Externalizable {
 
-  private final long whenCreated;
-  private final Object sharableBean;
-  private final boolean[] loaded;
-  private final Object[] data;
+  private long whenCreated;
+  private long version;
+  private String discValue;
+  private Map<String, Object> data;
 
-  private final boolean naturalKeyUpdate;
-  private final Object naturalKey;
-  private final Object oldNaturalKey;
+  /**
+   * The sharable bean is effectively transient (near cache only).
+   */
+  private transient Object sharableBean;
 
-  public CachedBeanData(Object sharableBean, boolean[] loaded, Object[] data, Object naturalKey, Object oldNaturalKey) {
+  /**
+   * Construct from a loaded bean.
+   */
+  public CachedBeanData(Object sharableBean, String discValue, Map<String, Object> data, long version) {
     this.whenCreated = System.currentTimeMillis();
     this.sharableBean = sharableBean;
-    this.loaded = loaded;
+    this.discValue = discValue;
     this.data = data;
-    this.naturalKeyUpdate = naturalKey != null;
-    this.naturalKey = (naturalKey != null) ? naturalKey : oldNaturalKey;
-    this.oldNaturalKey = oldNaturalKey;
+    this.version = version;
+  }
+
+  /**
+   * Construct from serialisation.
+   */
+  public CachedBeanData() {
+  }
+
+  @Override
+  public void writeExternal(ObjectOutput out) throws IOException {
+    out.writeLong(version);
+    out.writeLong(whenCreated);
+    boolean hasDisc = discValue != null;
+    out.writeBoolean(hasDisc);
+    if (hasDisc) {
+      out.writeUTF(discValue);
+    }
+    out.writeInt(data.size());
+    for (Map.Entry<String, Object> entry : data.entrySet()) {
+      out.writeUTF(entry.getKey());
+      out.writeObject(entry.getValue());
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    version = in.readLong();
+    whenCreated = in.readLong();
+    if (in.readBoolean()) {
+      discValue = in.readUTF();
+    }
+    data = new LinkedHashMap<String, Object>();
+    int count = in.readInt();
+    for (int i = 0; i < count; i++) {
+      String key = in.readUTF();
+      Object val = in.readObject();
+      data.put(key, val);
+    }
   }
 
   public String toString() {
-    return Arrays.toString(data);
+    return data.toString();
   }
 
   /**
-   * Return a copy of the property data.
+   * Create and return a new version of CachedBeanData based on this
+   * entry applying the given changes.
    */
-  public Object[] copyData() {
-    Object[] dest = new Object[data.length];
-    System.arraycopy(data, 0, dest, 0, data.length);
-    return dest;
-  }
+  public CachedBeanData update(Map<String, Object> changes, long version) {
 
-  /**
-   * Return a copy of the loaded status for the properties.
-   */
-  public boolean[] copyLoaded() {
-    boolean[] dest = new boolean[data.length];
-    System.arraycopy(loaded, 0, dest, 0, dest.length);
-    return dest;
-  }
-
-  /**
-   * Return the loaded status for each property.
-   */
-  public boolean[] getLoaded() {
-    return loaded;
-  }
-
-  /**
-   * Return the property values.
-   */
-  public Object[] getData() {
-    return data;
+    Map<String, Object> copy = new HashMap<String, Object>();
+    copy.putAll(data);
+    copy.putAll(changes);
+    return new CachedBeanData(null, discValue, copy, version);
   }
 
   /**
@@ -71,45 +97,38 @@ public class CachedBeanData implements Serializable {
   }
 
   /**
-   * Return a sharable (immutable read only) bean.
+   * Return the version value.
+   */
+  public long getVersion() {
+    return version;
+  }
+
+  /**
+   * Return the raw discriminator value.
+   */
+  public String getDiscValue() {
+    return discValue;
+  }
+
+  /**
+   * Return a sharable (immutable read only) bean. Near cache only use.
    */
   public Object getSharableBean() {
     return sharableBean;
   }
 
   /**
-   * Return true if this data requires an update to the natural key cache.
+   * Return true if the property is held.
    */
-  public boolean isNaturalKeyUpdate() {
-    return naturalKeyUpdate;
+  public boolean isLoaded(String propertyName) {
+    return data.containsKey(propertyName);
   }
 
   /**
-   * Return the new/current natural key value.
+   * Return the value for a given property name.
    */
-  public Object getNaturalKey() {
-    return naturalKey;
-  }
-
-  /**
-   * Return the old natural key (its entry should be removed).
-   */
-  public Object getOldNaturalKey() {
-    return oldNaturalKey;
-  }
-
-  /**
-   * Return the data for the specific property.
-   */
-  public Object getData(int i) {
-    return data[i];
-  }
-
-  /**
-   * Return true if the property is contained in this data.
-   */
-  public boolean isLoaded(int i) {
-    return loaded[i];
+  public Object getData(String propertyName) {
+    return data.get(propertyName);
   }
 
 }

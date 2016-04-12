@@ -1,14 +1,14 @@
 package com.avaje.tests.cache;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.tests.model.basic.EBasicVer;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestQueryCacheInsert extends BaseTestCase {
 
@@ -24,13 +24,10 @@ public class TestQueryCacheInsert extends BaseTestCase {
 
     EBasicVer a2 = new EBasicVer();
     server.save(a2);
+    awaitL2Cache();
 
     List<EBasicVer> alist1 = server.find(EBasicVer.class).setUseQueryCache(true).findList();
 
-    Assert.assertEquals(alist0.size() + 1, alist1.size());
-    // List<EBasicVer> noQueryCacheList = server.find(EBasicVer.class)
-    // .setUseQueryCache(false)
-    // .findList();
-    // Assert.assertTrue(sizeOne != noQueryCacheList.size());
+    assertEquals(alist0.size() + 1, alist1.size());
   }
 }

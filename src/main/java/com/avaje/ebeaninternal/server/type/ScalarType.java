@@ -182,6 +182,11 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   boolean isDateTimeCapable();
 
   /**
+   * Convert the value into a long version value.
+   */
+  long asVersion(T value);
+
+  /**
    * Convert the systemTimeMillis into the appropriate java object.
    * <p>
    * For non dateTime types this will throw an exception.

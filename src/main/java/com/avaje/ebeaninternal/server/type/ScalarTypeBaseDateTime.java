@@ -28,6 +28,11 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
     this.mode = mode;
   }
 
+  @Override
+  public long asVersion(T value) {
+    return convertToMillis(value);
+  }
+
   /**
    * Convert the value to a Timestamp.
    */

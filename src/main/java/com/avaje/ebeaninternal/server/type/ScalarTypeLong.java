@@ -56,6 +56,11 @@ public class ScalarTypeLong extends ScalarTypeBase<Long> {
   }
 
   @Override
+  public long asVersion(Long value) {
+    return value;
+  }
+
+  @Override
   public Long convertFromMillis(long systemTimeMillis) {
     return systemTimeMillis;
   }

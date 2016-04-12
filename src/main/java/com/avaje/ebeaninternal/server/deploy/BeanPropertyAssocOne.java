@@ -6,6 +6,7 @@ import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
 import com.avaje.ebeaninternal.server.cache.CachedBeanData;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
@@ -142,18 +143,19 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
   }
 
-  void cacheDelete(boolean clearOnNull, EntityBean bean) {
+  void cacheDelete(boolean clear, EntityBean bean, CacheChangeSet changeSet) {
+
     if (targetDescriptor.isBeanCaching() && relationshipProperty != null) {
-      Object assocBean = getValue(bean);
-      if (assocBean != null) {
-        Object parentId = targetDescriptor.getId((EntityBean) assocBean);
-        if (parentId != null) {
-          targetDescriptor.cacheManyPropRemove(parentId, relationshipProperty.getName());
-          return;
+      if (clear) {
+        changeSet.addManyClear(targetDescriptor, relationshipProperty.getName());
+      } else {
+        Object assocBean = getValue(bean);
+        if (assocBean != null) {
+          Object parentId = targetDescriptor.getId((EntityBean) assocBean);
+          if (parentId != null) {
+            changeSet.addManyRemove(targetDescriptor, relationshipProperty.getName(), parentId);
+          }
         }
-      }
-      if (clearOnNull) {
-        targetDescriptor.cacheManyPropClear(relationshipProperty.getName());
       }
     }
   }
@@ -389,7 +391,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
       return null;
     }
     if (embedded) {
-      return targetDescriptor.cacheBeanExtractData((EntityBean) ap);
+      return targetDescriptor.cacheEmbeddedBeanExtract((EntityBean) ap);
 
     } else {
       return targetDescriptor.getId((EntityBean) ap);
@@ -400,8 +402,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   public void setCacheDataValue(EntityBean bean, Object cacheData) {
     if (cacheData != null) {
       if (embedded) {
-        EntityBean embeddedBean = targetDescriptor.createEntityBean();
-        targetDescriptor.cacheBeanLoadData(embeddedBean, (CachedBeanData) cacheData);
+        EntityBean embeddedBean = targetDescriptor.cacheEmbeddedBeanLoad((CachedBeanData) cacheData);
         setValue(bean, embeddedBean);
 
       } else {

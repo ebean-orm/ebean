@@ -49,6 +49,7 @@ public class TestJsonStatelessUpdate extends BaseTestCase {
     // as it thinks it should INSERT master rather than UPDATE master
     
     Ebean.update(two2);
+    awaitL2Cache();
 
 
     // confirm the properties where updated as expected

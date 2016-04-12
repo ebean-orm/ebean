@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.api;
 
+import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -105,20 +106,17 @@ public class TransactionEvent implements Serializable {
   }
 
   /**
-   * Notify the cache of bean changes.
-   * <p>
-   * This returns the TransactionEventTable so that if any
-   * general table changes can also be used to invalidate
-   * parts of the cache.
-   * </p>
+   * Build and return the cache changeSet.
    */
-  public void notifyCache() {
+  public CacheChangeSet buildCacheChanges() {
+    CacheChangeSet changeSet = new CacheChangeSet();
     if (eventBeans != null) {
-      eventBeans.notifyCache();
+      eventBeans.notifyCache(changeSet);
     }
     if (deleteByIdMap != null) {
-      deleteByIdMap.notifyCache();
+      deleteByIdMap.notifyCache(changeSet);
     }
+    return changeSet;
   }
 
   /**

@@ -31,6 +31,17 @@ public class BaseTestCase {
     return spi.getDatabasePlatform().getName().equals("h2");
   }
 
+  /**
+   * Wait for the L2 cache to propagate changes post-commit.
+   */
+  protected void awaitL2Cache() {
+    try {
+      Thread.sleep(10);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   protected <T> BeanDescriptor<T> getBeanDescriptor(Class<T> cls) {
     return spiEbeanServer().getBeanDescriptor(cls);
   }

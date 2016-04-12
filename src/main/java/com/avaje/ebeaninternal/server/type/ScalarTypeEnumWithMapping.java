@@ -24,6 +24,11 @@ public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase i
     this.length = length;
   }
 
+  @Override
+  public long asVersion(Object value) {
+    throw new RuntimeException("not supported");
+  }
+
   /**
    * Return the IN values for DB constraint construction.
    */

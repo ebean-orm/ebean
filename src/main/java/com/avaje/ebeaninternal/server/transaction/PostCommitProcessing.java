@@ -5,6 +5,7 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
+import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdates;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
@@ -43,6 +44,8 @@ public final class PostCommitProcessing {
   private final DocStoreMode txnDocStoreMode;
 
   private final int txnDocStoreBatchSize;
+
+  private CacheChangeSet cacheChanges;
 
   /**
    * Create for an external modification.
@@ -83,7 +86,7 @@ public final class PostCommitProcessing {
    */
   void notifyLocalCache() {
     processTableEvents(event.getEventTables());
-    event.notifyCache();
+    cacheChanges = event.buildCacheChanges();
   }
 
   /**
@@ -145,6 +148,9 @@ public final class PostCommitProcessing {
   Runnable backgroundNotify() {
     return new Runnable() {
       public void run() {
+        if (cacheChanges != null) {
+          cacheChanges.apply();
+        }
         localPersistListenersNotify();
         notifyCluster();
         processDocStoreUpdates();

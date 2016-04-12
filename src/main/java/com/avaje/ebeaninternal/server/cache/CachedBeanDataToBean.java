@@ -25,9 +25,9 @@ public class CachedBeanDataToBean {
       loadProperty(bean, cacheBeanData, ebi, props[i]);
     }
 
-    BeanPropertyAssocMany<?>[] manys = desc.propertiesMany();
-    for (int i = 0; i < manys.length; i++) {
-      manys[i].createReferenceIfNull(bean);
+    BeanPropertyAssocMany<?>[] many = desc.propertiesMany();
+    for (int i = 0; i < many.length; i++) {
+      many[i].createReferenceIfNull(bean);
     }
 
     ebi.setLoadedLazy();
@@ -35,14 +35,10 @@ public class CachedBeanDataToBean {
 
   private static void loadProperty(EntityBean bean, CachedBeanData cacheBeanData, EntityBeanIntercept ebi, BeanProperty prop) {
 
-    int propertyIndex = prop.getPropertyIndex();
-    if (cacheBeanData.isLoaded(propertyIndex)) {
-      //noinspection StatementWithEmptyBody
-      if (ebi.isLoadedProperty(propertyIndex)) {
-        // already loaded (lazy load on partially loaded bean)
-      } else {
-        Object data = cacheBeanData.getData(propertyIndex);
-        prop.setCacheDataValue(bean, data);
+    if (cacheBeanData.isLoaded(prop.getName())) {
+      if (!ebi.isLoadedProperty(prop.getPropertyIndex())) {
+        Object value = cacheBeanData.getData(prop.getName());
+        prop.setCacheDataValue(bean, value);
       }
     }
   }

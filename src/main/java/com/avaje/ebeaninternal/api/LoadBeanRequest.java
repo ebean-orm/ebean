@@ -158,7 +158,7 @@ public class LoadBeanRequest extends LoadRequest {
       EntityBean loadedBean = (EntityBean) list.get(i);
       loadedIds.add(desc.getId(loadedBean));
       if (isLoadCache()) {
-        desc.cacheBeanPutData(loadedBean);
+        desc.cacheBeanPut(loadedBean);
       }
     }
 

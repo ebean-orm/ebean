@@ -55,6 +55,11 @@ public class ScalarTypeInteger extends ScalarTypeBase<Integer> {
   }
 
   @Override
+  public long asVersion(Integer value) {
+    return value.longValue();
+  }
+
+  @Override
   public Object toJdbcType(Object value) {
     return BasicTypeConverter.toInteger(value);
   }

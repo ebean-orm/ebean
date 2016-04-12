@@ -24,6 +24,11 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
   }
 
   @Override
+  public long asVersion(T value) {
+    throw new RuntimeException("not supported");
+  }
+
+  @Override
   public boolean isMutable() {
     return wrapped.isMutable();
   }

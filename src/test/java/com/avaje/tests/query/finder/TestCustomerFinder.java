@@ -56,6 +56,7 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(customer.getName()).isEqualTo(customer2.getName());
 
     Customer.find.deleteById(customer.getId());
+    awaitL2Cache();
 
     Customer notThere = Customer.find.byId(customer.getId());
     assertThat(notThere).isNull();

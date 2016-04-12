@@ -1,16 +1,18 @@
 package com.avaje.tests.cache;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheStatistics;
 import com.avaje.tests.model.basic.Contact;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestCacheNaturalId extends BaseTestCase {
 
@@ -23,7 +25,7 @@ public class TestCacheNaturalId extends BaseTestCase {
 
     List<Contact> list = Ebean.find(Contact.class).setLoadBeanCache(true).findList();
 
-    Assert.assertTrue(contactCache.size() > 0);
+    assertTrue(contactCache.size() > 0);
 
     String emailToSearch = null;
     for (Contact contact : list) {
@@ -43,24 +45,25 @@ public class TestCacheNaturalId extends BaseTestCase {
 
     ServerCacheStatistics stats1 = contactCache.getStatistics(false);
 
-    Assert.assertNotNull(c0);
-    Assert.assertNotNull(c1);
+    assertNotNull(c0);
+    assertNotNull(c1);
 
-    Assert.assertEquals(1, stats0.getHitCount());
-    Assert.assertEquals(2, stats1.getHitCount());
+    assertEquals(1, stats0.getHitCount());
+    assertEquals(2, stats1.getHitCount());
 
     c1.setEmail("mychangedemail@what.com");
     Ebean.save(c1);
+    awaitL2Cache();
 
     Contact c2 = Ebean.find(Contact.class).where().eq("email", "mychangedemail@what.com")
         .findUnique();
 
     ServerCacheStatistics stats2 = contactCache.getStatistics(false);
 
-    Assert.assertNotNull(c2);
-    Assert.assertEquals(c2.getId(), c1.getId());
-    Assert.assertEquals(c0.getId(), c1.getId());
-    Assert.assertTrue(stats2.getHitCount() > stats1.getHitCount());
+    assertNotNull(c2);
+    assertEquals(c2.getId(), c1.getId());
+    assertEquals(c0.getId(), c1.getId());
+    assertTrue(stats2.getHitCount() > stats1.getHitCount());
 
   }
 }

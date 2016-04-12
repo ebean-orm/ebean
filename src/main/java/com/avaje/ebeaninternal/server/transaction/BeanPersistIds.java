@@ -235,7 +235,7 @@ public class BeanPersistIds {
     if (updateIds != null) {
       for (int i = 0; i < updateIds.size(); i++) {
         Object id = updateIds.get(i);
-        beanDescriptor.cacheBeanRemove(id);
+        beanDescriptor.cacheHandleDeleteById(id);
         if (listener != null) {
           listener.remoteUpdate(id);
         }
@@ -244,7 +244,7 @@ public class BeanPersistIds {
     if (deleteIds != null) {
       for (int i = 0; i < deleteIds.size(); i++) {
         Object id = deleteIds.get(i);
-        beanDescriptor.cacheBeanRemove(id);
+        beanDescriptor.cacheHandleDeleteById(id);
         if (listener != null) {
           listener.remoteDelete(id);
         }

@@ -23,18 +23,10 @@ import static org.junit.Assert.assertNull;
 
 public class TestStatelessUpdate extends BaseTestCase {
 
-  private EbeanServer server;
-
-  @Before
-  public void setUp() {
-    server = Ebean.getServer(null);
-  }
+  private EbeanServer server = server();
 
   @Test
   public void test() {
-
-    // GlobalProperties.put("ebean.defaultUpdateNullProperties", "true");
-    // GlobalProperties.put("ebean.defaultDeleteMissingChildren", "false");
 
     EBasic e = new EBasic();
     e.setName("something");

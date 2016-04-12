@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.transaction;
 
+import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
@@ -24,18 +25,17 @@ public final class DeleteByIdMap {
     return beanMap.toString();
   }
 
-  public void notifyCache() {
+  public void notifyCache(CacheChangeSet changeSet) {
     for (BeanPersistIds deleteIds : beanMap.values()) {
       BeanDescriptor<?> d = deleteIds.getBeanDescriptor();
       List<Object> idValues = deleteIds.getDeleteIds();
       if (idValues != null) {
-        d.queryCacheClear();
+        d.queryCacheClear(changeSet);
         for (int i = 0; i < idValues.size(); i++) {
-          d.cacheBeanRemove(idValues.get(i));
+          d.cacheHandleDeleteById(idValues.get(i), changeSet);
         }
       }
     }
-
   }
 
   public boolean isEmpty() {

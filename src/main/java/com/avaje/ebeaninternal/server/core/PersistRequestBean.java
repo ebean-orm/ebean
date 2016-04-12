@@ -13,6 +13,7 @@ import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEvent;
+import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanManager;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -133,6 +134,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Set for updates to determine if all loaded properties are included in the update.
    */
   private boolean requestUpdateAllLoadedProps;
+
+  private long version;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
                             PersistExecute persistExecute, PersistRequest.Type type, boolean saveRecurse, boolean publish) {
@@ -298,38 +301,47 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return intercept.getDirtyValues();
   }
 
-  public boolean isNotify() {
+  /**
+   * Set the cache notify status.
+   */
+  public void setNotifyCache() {
     this.notifyCache = beanDescriptor.isCacheNotify(publish);
+  }
+
+  /**
+   * Return true if this change should notify cache, listener or doc store.
+   */
+  public boolean isNotify() {
     return notifyCache || isNotifyPersistListener() || isDocStoreNotify();
   }
 
   /**
-   * Return true if this request should updateAdd an ElasticSearch index
-   * by queuing an event or direct updateAdd (via Bulk API).
+   * Return true if this request should update the document store.
    */
   private boolean isDocStoreNotify() {
     return docStoreMode != DocStoreMode.IGNORE;
   }
 
-  public boolean isNotifyPersistListener() {
+  private boolean isNotifyPersistListener() {
     return beanPersistListener != null;
   }
 
   /**
    * Notify/Update the local L2 cache after the transaction has successfully committed.
    */
-  public void notifyCache() {
+  public void notifyCache(CacheChangeSet changeSet) {
     if (notifyCache) {
       switch (type) {
         case INSERT:
-          beanDescriptor.cacheHandleInsert(this);
+          beanDescriptor.cacheHandleInsert(this, changeSet);
           break;
         case UPDATE:
-          beanDescriptor.cacheHandleUpdate(idValue, this);
+          beanDescriptor.cacheHandleUpdate(idValue, this, changeSet);
           break;
         case DELETE:
         case SOFT_DELETE:
           // Bean deleted from cache early via postDelete()
+          beanDescriptor.cacheHandleDelete(idValue, this, changeSet);
           break;
         default:
           throw new IllegalStateException("Invalid type " + type);
@@ -714,7 +726,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private void postDelete() {
     beanDescriptor.contextClear(transaction.getPersistenceContext(), idValue);
-    beanDescriptor.cacheHandleDelete(idValue, this);
   }
 
   private void changeLog() {
@@ -734,8 +745,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (controller != null) {
       controllerPost();
     }
+    setNotifyCache();
 
-    if (type == Type.UPDATE && docStoreMode == DocStoreMode.UPDATE) {
+    if (type == Type.UPDATE && (notifyCache || docStoreMode == DocStoreMode.UPDATE)) {
       // get the dirty properties for update notification to the doc store
       dirtyProperties = intercept.getDirtyProperties();
     }
@@ -870,12 +882,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * cache on post commit.
    */
   public void addUpdatedManyProperty(BeanPropertyAssocMany<?> updatedAssocMany) {
-    // if (notifyCache) {
     if (updatedManys == null) {
       updatedManys = new ArrayList<BeanPropertyAssocMany<?>>(5);
     }
     updatedManys.add(updatedAssocMany);
-    // }
   }
 
   /**
@@ -897,6 +907,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         this.idValue = beanDescriptor.getId(entityBean);
       }
       updatedManysOnly = true;
+      setNotifyCache();
       addEvent();
     }
   }
@@ -1003,7 +1014,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Set the value of the Version property on the bean.
    */
   public void setVersionValue(Object versionValue) {
-    beanDescriptor.getVersionProperty().setValueIntercept(entityBean, versionValue);
+    version = beanDescriptor.setVersion(entityBean, versionValue);
   }
 
+  /**
+   * Return the version in long form (if set).
+   */
+  public long getVersion() {
+    return version;
+  }
 }

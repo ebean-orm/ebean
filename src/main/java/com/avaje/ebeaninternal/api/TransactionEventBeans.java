@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 
 /**
@@ -30,10 +31,13 @@ public class TransactionEventBeans {
 
 		requests.add(request);
 	}
-	
-	public void notifyCache() {
+
+	/**
+	 * Collect the cache changes.
+   */
+	public void notifyCache(CacheChangeSet changeSet) {
 		for (int i = 0; i < requests.size(); i++) {
-			requests.get(i).notifyCache();
+			requests.get(i).notifyCache(changeSet);
 		}
 	}
 

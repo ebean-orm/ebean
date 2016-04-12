@@ -17,6 +17,11 @@ public abstract class ScalarTypeBase<T> implements ScalarType<T> {
     this.jdbcType = jdbcType;
   }
 
+  @Override
+  public long asVersion(T value) {
+    throw new RuntimeException("not supported");
+  }
+
   /**
    * Default implementation of mutable false.
    */

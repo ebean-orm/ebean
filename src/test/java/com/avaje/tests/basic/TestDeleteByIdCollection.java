@@ -38,6 +38,7 @@ public class TestDeleteByIdCollection extends BaseTestCase {
 
 
     Ebean.deleteAll(Customer.class, ids);
+    awaitL2Cache();
 
     c0Back = Ebean.find(Customer.class, c0.getId());
     c1Back = Ebean.find(Customer.class, "" + c1.getId());
@@ -67,6 +68,7 @@ public class TestDeleteByIdCollection extends BaseTestCase {
     ids.add(order1.getId());
 
     Ebean.deleteAll(Order.class, ids);
+    awaitL2Cache();
 
     o0Back = Ebean.find(Order.class, order0.getId());
     o1Back = Ebean.find(Order.class, order1.getId());

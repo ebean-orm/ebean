@@ -48,7 +48,8 @@ public class TestQueryCacheCountry extends BaseTestCase {
     Country nz = Ebean.find(Country.class, "NZ");
     nz.setName("New Zealandia");
     Ebean.save(nz);
-    
+    awaitL2Cache();
+
     statistics = queryCache.getStatistics(false);
     Assert.assertEquals(0, statistics.getSize());
     

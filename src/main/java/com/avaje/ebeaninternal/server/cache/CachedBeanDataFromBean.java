@@ -5,6 +5,9 @@ import com.avaje.ebean.bean.EntityBeanIntercept;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class CachedBeanDataFromBean {
 
 
@@ -12,38 +15,28 @@ public class CachedBeanDataFromBean {
 
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
 
-    Object[] data = new Object[desc.getPropertyCount()];
-    boolean[] loaded = new boolean[desc.getPropertyCount()];
+    Map<String,Object> data = new LinkedHashMap<String,Object>();
 
     BeanProperty idProperty = desc.getIdProperty();
     if (idProperty != null) {
       int propertyIndex = idProperty.getPropertyIndex();
       if (ebi.isLoadedProperty(propertyIndex)) {
-        // extract the id property value
-        data[propertyIndex] = idProperty.getCacheDataValue(bean);
-        loaded[propertyIndex] = true;
+        data.put(idProperty.getName(), idProperty.getCacheDataValue(bean));
       }
     }
     BeanProperty[] props = desc.propertiesNonMany();
-
-    Object naturalKey = null;
 
     // extract all the non-many properties
     for (int i = 0; i < props.length; i++) {
       BeanProperty prop = props[i];
       if (ebi.isLoadedProperty(prop.getPropertyIndex())) {
-        int propertyIndex = prop.getPropertyIndex();
-        data[propertyIndex] = prop.getCacheDataValue(bean);
-        loaded[propertyIndex] = true;
-        if (prop.isNaturalKey()) {
-          naturalKey = prop.getValue(bean);
-        }
+        data.put(prop.getName(), prop.getCacheDataValue(bean));
       }
     }
 
+    long version = desc.getVersion(bean);
     EntityBean sharableBean = createSharableBean(desc, bean, ebi);
-
-    return new CachedBeanData(sharableBean, loaded, data, naturalKey, null);
+    return new CachedBeanData(sharableBean, desc.getDiscValue(), data, version);
   }
 
   private static EntityBean createSharableBean(BeanDescriptor<?> desc, EntityBean bean, EntityBeanIntercept beanEbi) {

@@ -25,6 +25,11 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
+  public long asVersion(byte[] value) {
+    throw new RuntimeException("not supported");
+  }
+
+  @Override
   public boolean isMutable() {
     return false;
   }

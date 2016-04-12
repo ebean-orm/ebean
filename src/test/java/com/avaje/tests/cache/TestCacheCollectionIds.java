@@ -67,6 +67,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     newContact.setCustomer(customer);
 
     Ebean.save(newContact);
+    awaitL2Cache();
 
     int currentNumContacts2 = fetchCustomer(customer.getId());
     Assert.assertEquals(currentNumContacts + 1, currentNumContacts2);
@@ -121,6 +122,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     loadedBean.getCountries().add(Ebean.find(Country.class, "AU"));
 
     Ebean.save(loadedBean);
+    awaitL2Cache();
 
     // Get the data to assert/check against
     OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
@@ -169,6 +171,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     loadedBean.getCountries().add(Ebean.find(Country.class, "AU"));
 
     Ebean.save(loadedBean);
+    awaitL2Cache();
 
     // Get the data to assert/check against
     OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
@@ -222,9 +225,9 @@ public class TestCacheCollectionIds extends BaseTestCase {
     update.getCountries().add(Ebean.find(Country.class, "AU"));
 
     Ebean.update(update);
-    
+    awaitL2Cache();
+
     Assert.assertEquals("countries entry still there (but updated)", 1, cachedBeanCountriesCache.size());
-    
 
     CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(update.getId());
 
