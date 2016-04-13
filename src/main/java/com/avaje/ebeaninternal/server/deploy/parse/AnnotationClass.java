@@ -43,13 +43,16 @@ public class AnnotationClass extends AnnotationParser {
 
   private final String versionsBetweenSuffix;
 
+  private final boolean disableL2Cache;
+
   /**
    * Create for normal early parse of class level annotations.
    */
-  public AnnotationClass(DeployBeanInfo<?> info, boolean validationAnnotations, String asOfViewSuffix, String versionsBetweenSuffix) {
+  public AnnotationClass(DeployBeanInfo<?> info, boolean validationAnnotations, String asOfViewSuffix, String versionsBetweenSuffix, boolean disableL2Cache) {
     super(info, validationAnnotations);
     this.asOfViewSuffix = asOfViewSuffix;
     this.versionsBetweenSuffix = versionsBetweenSuffix;
+    this.disableL2Cache = disableL2Cache;
   }
 
   /**
@@ -60,6 +63,7 @@ public class AnnotationClass extends AnnotationParser {
     super(info, false);
     this.asOfViewSuffix = null;
     this.versionsBetweenSuffix = null;
+    this.disableL2Cache = false;
   }
 
   /**
@@ -210,6 +214,9 @@ public class AnnotationClass extends AnnotationParser {
 
   private void readCacheStrategy(CacheStrategy cacheStrategy, CacheTuning cacheTuning) {
 
+    if (disableL2Cache) {
+      return;
+    }
     CacheOptions cacheOptions = descriptor.getCacheOptions();
     if (cacheTuning != null) {
       cacheOptions.setMaxSecsToLive(cacheTuning.maxSecsToLive());

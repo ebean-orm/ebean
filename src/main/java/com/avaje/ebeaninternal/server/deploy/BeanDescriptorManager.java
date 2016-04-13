@@ -201,7 +201,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     this.asOfViewSuffix = getAsOfViewSuffix(databasePlatform, serverConfig);
     String versionsBetweenSuffix = getVersionsBetweenSuffix(databasePlatform, serverConfig);
-    this.readAnnotations = new ReadAnnotations(config.getGeneratedPropertyFactory(), asOfViewSuffix, versionsBetweenSuffix);
+    this.readAnnotations = new ReadAnnotations(config.getGeneratedPropertyFactory(), asOfViewSuffix, versionsBetweenSuffix, serverConfig.isDisableL2Cache());
     this.bootupClasses = config.getBootupClasses();
     this.createProperties = config.getDeployCreateProperties();
     this.namingConvention = serverConfig.getNamingConvention();

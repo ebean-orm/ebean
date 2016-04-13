@@ -37,6 +37,13 @@ public class DefaultServerCacheManager implements ServerCacheManager {
     this.collectionIdsCache = new DefaultCacheHolder(cacheFactory, defaultQueryOptions, false);
   }
 
+  /**
+   * Construct when l2 cache is disabled.
+   */
+  public DefaultServerCacheManager() {
+    this(new DefaultServerCacheFactory(), new ServerCacheOptions(), new ServerCacheOptions());
+  }
+
   public void init(EbeanServer server) {
     cacheFactory.init(server);
     this.ebeanServer = (SpiEbeanServer) server;

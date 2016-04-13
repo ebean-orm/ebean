@@ -149,6 +149,10 @@ public class DefaultContainer implements SpiContainer {
    */
   private ServerCacheManager getCacheManager(ServerConfig serverConfig) {
 
+    if (serverConfig.isDisableL2Cache()) {
+      return new DefaultServerCacheManager();
+    }
+
     ServerCacheManager serverCacheManager = serverConfig.getServerCacheManager();
     if (serverCacheManager != null) {
       return serverCacheManager;

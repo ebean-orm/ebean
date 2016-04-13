@@ -406,6 +406,11 @@ public class ServerConfig {
   private String jodaLocalTimeMode;
 
   /**
+   * Set to true to globally disable L2 caching (typically for performance testing).
+   */
+  private boolean disableL2Cache;
+
+  /**
    * Construct a Server Configuration for programmatically creating an EbeanServer.
    */
   public ServerConfig() {
@@ -2313,6 +2318,7 @@ public class ServerConfig {
     }
     loadDocStoreSettings(p);
 
+    disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     explicitTransactionBeginMode = p.getBoolean("explicitTransactionBeginMode", explicitTransactionBeginMode);
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
@@ -2499,6 +2505,20 @@ public class ServerConfig {
    */
   public void setExpressionEqualsWithNullAsNoop(boolean expressionEqualsWithNullAsNoop) {
     this.expressionEqualsWithNullAsNoop = expressionEqualsWithNullAsNoop;
+  }
+
+  /**
+   * Return true if L2 cache is disabled.
+   */
+  public boolean isDisableL2Cache() {
+    return disableL2Cache;
+  }
+
+  /**
+   * Set to true to disable L2 caching. Typically useful in performance testing.
+   */
+  public void setDisableL2Cache(boolean disableL2Cache) {
+    this.disableL2Cache = disableL2Cache;
   }
 
   /**

@@ -32,12 +32,15 @@ public class ReadAnnotations {
    */
   private final boolean jacksonAnnotations;
 
-  public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix) {
+  private final boolean disableL2Cache;
+
+  public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, boolean disableL2Cache) {
     this.generatedPropFactory = generatedPropFactory;
     this.asOfViewSuffix = asOfViewSuffix;
     this.versionsBetweenSuffix = versionsBetweenSuffix;
     this.javaxValidationAnnotations = generatedPropFactory.getClassLoadConfig().isJavaxValidationAnnotationsPresent();
     this.jacksonAnnotations = generatedPropFactory.getClassLoadConfig().isJacksonAnnotationsPresent();
+    this.disableL2Cache = disableL2Cache;
   }
 
   /**
@@ -50,7 +53,7 @@ public class ReadAnnotations {
   public void readInitial(DeployBeanInfo<?> info, boolean eagerFetchLobs) {
 
     try {
-      new AnnotationClass(info, javaxValidationAnnotations, asOfViewSuffix, versionsBetweenSuffix).parse();
+      new AnnotationClass(info, javaxValidationAnnotations, asOfViewSuffix, versionsBetweenSuffix, disableL2Cache).parse();
       new AnnotationFields(generatedPropFactory, info, javaxValidationAnnotations, jacksonAnnotations, eagerFetchLobs).parse();
 
     } catch (RuntimeException e) {
