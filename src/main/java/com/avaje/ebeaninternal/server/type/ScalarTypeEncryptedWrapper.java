@@ -29,6 +29,11 @@ public class ScalarTypeEncryptedWrapper<T> implements ScalarType<T> {
   }
 
   @Override
+  public boolean isBinaryType() {
+    return wrapped.isBinaryType();
+  }
+
+  @Override
   public boolean isMutable() {
     return wrapped.isMutable();
   }

@@ -634,11 +634,13 @@ final class BeanDescriptorCacheHelp<T> {
       for (int i = 0; i < dirtyProperties.length; i++) {
         if (dirtyProperties[i]) {
           BeanProperty property = desc.propertiesIndex[i];
-          Object val = property.getCacheDataValue(bean);
-          changes.put(property.getName(), val);
-          if (property.isNaturalKey()) {
-            updateNaturalKey = true;
-            changeSet.addNaturalKeyPut(desc, id, val);
+          if (property.isCacheDataInclude()) {
+            Object val = property.getCacheDataValue(bean);
+            changes.put(property.getName(), val);
+            if (property.isNaturalKey()) {
+              updateNaturalKey = true;
+              changeSet.addNaturalKeyPut(desc, id, val);
+            }
           }
         }
       }

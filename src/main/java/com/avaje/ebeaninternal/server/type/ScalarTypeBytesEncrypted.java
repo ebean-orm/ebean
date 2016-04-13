@@ -30,6 +30,11 @@ public class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
+  public boolean isBinaryType() {
+    return true;
+  }
+
+  @Override
   public boolean isMutable() {
     return false;
   }

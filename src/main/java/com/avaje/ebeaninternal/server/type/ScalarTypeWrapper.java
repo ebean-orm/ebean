@@ -48,6 +48,11 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
+  public boolean isBinaryType() {
+    return scalarType.isBinaryType();
+  }
+
+  @Override
   public boolean isMutable() {
     return scalarType.isMutable();
   }

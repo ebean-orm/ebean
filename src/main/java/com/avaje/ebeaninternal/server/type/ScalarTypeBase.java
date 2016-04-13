@@ -22,6 +22,12 @@ public abstract class ScalarTypeBase<T> implements ScalarType<T> {
     throw new RuntimeException("not supported");
   }
 
+  @Override
+  public boolean isBinaryType() {
+    // override for binary/byte based types
+    return false;
+  }
+
   /**
    * Default implementation of mutable false.
    */

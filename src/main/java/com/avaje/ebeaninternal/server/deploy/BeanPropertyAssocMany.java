@@ -327,6 +327,15 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   }
 
   /**
+   * Exclude many properties from bean cache data.
+   */
+  @Override
+  public boolean isCacheDataInclude() {
+    // this would change for DB Array type support
+    return false;
+  }
+
+  /**
    * Add the loaded current bean to its associated parent.
    */
   public void lazyLoadMany(EntityBean current) {

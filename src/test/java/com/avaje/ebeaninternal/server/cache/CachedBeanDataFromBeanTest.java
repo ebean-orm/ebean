@@ -32,9 +32,9 @@ public class CachedBeanDataFromBeanTest extends BaseTestCase {
 
     CachedBeanData cacheData = CachedBeanDataFromBean.extract(desc, (EntityBean) customer);
 
-    assertEquals(cacheData.getData("id"), Integer.valueOf(42));
+    assertEquals(cacheData.getData("id"), "42");
     assertEquals(cacheData.getData("name"), "Rob");
-    assertEquals(cacheData.getData("billingAddress"), Short.valueOf("12"));
+    assertEquals(cacheData.getData("billingAddress"), "12");
   }
 
 

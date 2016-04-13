@@ -20,6 +20,11 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
     super(byte[].class, jdbcNative, jdbcType);
   }
 
+  @Override
+  public boolean isBinaryType() {
+    return true;
+  }
+
   public byte[] convertToBytes(Object value) {
     return (byte[]) value;
   }

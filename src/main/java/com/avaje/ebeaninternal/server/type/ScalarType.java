@@ -36,6 +36,12 @@ import java.sql.SQLException;
 public interface ScalarType<T> extends StringParser, StringFormatter, ScalarDataReader<T> {
 
   /**
+   * Return true if this is a binary type and can not support parse() and format() from/to string.
+   * This allows Ebean to optimise marshalling types to string.
+   */
+  boolean isBinaryType();
+
+  /**
    * Return true if this is a mutable scalar type (like hstore).
    */
   boolean isMutable();

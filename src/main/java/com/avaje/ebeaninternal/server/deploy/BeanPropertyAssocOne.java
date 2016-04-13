@@ -385,6 +385,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     return getPropertyType();
   }
 
+  @Override
   public Object getCacheDataValue(EntityBean bean) {
     Object ap = getValue(bean);
     if (ap == null) {
@@ -392,22 +393,23 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     }
     if (embedded) {
       return targetDescriptor.cacheEmbeddedBeanExtract((EntityBean) ap);
-
     } else {
-      return targetDescriptor.getId((EntityBean) ap);
+      return targetDescriptor.getIdProperty().getCacheDataValue((EntityBean) ap);
     }
   }
 
   @Override
   public void setCacheDataValue(EntityBean bean, Object cacheData) {
-    if (cacheData != null) {
+    if (cacheData == null) {
+      setValue(bean, null);
+    } else {
       if (embedded) {
-        EntityBean embeddedBean = targetDescriptor.cacheEmbeddedBeanLoad((CachedBeanData) cacheData);
-        setValue(bean, embeddedBean);
-
+        setValue(bean, targetDescriptor.cacheEmbeddedBeanLoad((CachedBeanData) cacheData));
       } else {
-        T ref = targetDescriptor.createReference(Boolean.FALSE, cacheData);
-        setValue(bean, ref);
+        if (cacheData instanceof String) {
+          cacheData = targetDescriptor.getIdProperty().scalarType.parse((String)cacheData);
+        }
+        setValue(bean, targetDescriptor.createReference(Boolean.FALSE, cacheData));
       }
     }
   }

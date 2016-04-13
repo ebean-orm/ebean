@@ -23,6 +23,11 @@ public class ScalarTypeByte extends ScalarTypeBase<Byte> {
     super(Byte.class, true, Types.TINYINT);
   }
 
+  @Override
+  public boolean isBinaryType() {
+    return true;
+  }
+
   public void bind(DataBind b, Byte value) throws SQLException {
     if (value == null) {
       b.setNull(Types.TINYINT);

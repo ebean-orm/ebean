@@ -54,6 +54,11 @@ public class ScalarTypeFile extends ScalarTypeBase<File> {
     this.bufferSize = bufferSize;
   }
 
+  @Override
+  public boolean isBinaryType() {
+    return true;
+  }
+
   private InputStream getInputStream(File value) throws IOException {
     FileInputStream fi = new FileInputStream(value);
     return new BufferedInputStream(fi, bufferSize);

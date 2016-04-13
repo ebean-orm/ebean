@@ -733,11 +733,42 @@ public class BeanProperty implements ElPropertyValue, Property {
     return prefix + name + " on [" + descriptor + "] arg[" + value + "] type[" + beanType + "] threw error";
   }
 
-  public Object getCacheDataValue(EntityBean bean) {
-    return getValue(bean);
+  /**
+   * Return true if this property should be included in the cache bean data.
+   */
+  public boolean isCacheDataInclude() {
+    return true;
   }
 
+  /**
+   * Return the value for this property which we hold in the L2 cache entry.
+   * <p>
+   * This uses format() where possible to store the value as a string and this
+   * is done to make any resulting Java object serialisation content smaller as
+   * strings get special treatment.
+   * </p>
+   */
+  public Object getCacheDataValue(EntityBean bean) {
+    Object value = getValue(bean);
+    if (value == null || scalarType.isBinaryType()) {
+      return value;
+    } else {
+      // convert to string as an optimisation for java object serialisation
+      return scalarType.format(value);
+    }
+  }
+
+  /**
+   * Read the value for this property from L2 cache entry and set it to the bean.
+   * <p>
+   * This uses parse() as per the comment in getCacheDataValue().
+   * </p>
+   */
   public void setCacheDataValue(EntityBean bean, Object cacheData) {
+    if (cacheData instanceof String) {
+      // parse back from string to support optimisation of java object serialisation
+      cacheData = scalarType.parse((String)cacheData);
+    }
     setValue(bean, cacheData);
   }
 
