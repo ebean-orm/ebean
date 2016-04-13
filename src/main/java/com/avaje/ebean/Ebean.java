@@ -1,23 +1,20 @@
 package com.avaje.ebean;
 
+import com.avaje.ebean.cache.ServerCacheManager;
+import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.text.csv.CsvReader;
+import com.avaje.ebean.text.json.JsonContext;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.OptimisticLockException;
+import javax.persistence.PersistenceException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
-
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.avaje.ebean.annotation.CacheStrategy;
-import com.avaje.ebean.cache.ServerCacheManager;
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.text.csv.CsvReader;
-import com.avaje.ebean.text.json.JsonContext;
 
 /**
  * This Ebean object is effectively a singleton that holds a map of registered

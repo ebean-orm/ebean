@@ -38,7 +38,7 @@ final class BeanDescriptorCacheHelp<T> {
   private static final Logger beanLog = LoggerFactory.getLogger("org.avaje.ebean.cache.BEAN");
   private static final Logger manyLog = LoggerFactory.getLogger("org.avaje.ebean.cache.COLL");
   private static final Logger natLog = LoggerFactory.getLogger("org.avaje.ebean.cache.NATKEY");
-  
+
   private final BeanDescriptor<T> desc;
 
   private final ServerCacheManager cacheManager;
