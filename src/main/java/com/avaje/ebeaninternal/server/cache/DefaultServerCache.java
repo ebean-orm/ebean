@@ -34,7 +34,6 @@ public class DefaultServerCache implements ServerCache {
    */
   public static final CompareByLastAccess BY_LAST_ACCESS = new CompareByLastAccess();
 
-
   /**
    * The underlying map (ConcurrentHashMap or similar)
    */
@@ -89,7 +88,23 @@ public class DefaultServerCache implements ServerCache {
     this.maxSize = maxSize;
     this.maxIdleSecs = maxIdleSecs;
     this.maxSecsToLive = maxSecsToLive;
-    this.trimFrequency = trimFrequency;
+    this.trimFrequency = determineTrim(maxIdleSecs, maxSecsToLive, trimFrequency);
+  }
+
+  /**
+   * Determine a good trimFrequency as half of maxIdleSecs (or maxSecsToLive).
+   */
+  int determineTrim(int maxIdleSecs, int maxSecsToLive, int trimFrequency) {
+    if (trimFrequency > 0) {
+      return trimFrequency;
+    }
+    if (maxIdleSecs > 0) {
+      return maxIdleSecs / 2 - 1;
+    }
+    if (maxSecsToLive > 0) {
+      return maxSecsToLive / 2 - 1;
+    }
+    return 0;
   }
 
   @Override

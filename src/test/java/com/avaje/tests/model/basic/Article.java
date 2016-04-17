@@ -1,66 +1,64 @@
 package com.avaje.tests.model.basic;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.CacheTuning;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
-
-import com.avaje.ebean.annotation.CacheStrategy;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @CacheStrategy
+@CacheTuning(maxSecsToLive = 45)
 @Entity
 public class Article extends BasicDomain {
 
-    private static final long serialVersionUID = 1L;
+  String name;
 
-    String name;
-    
-    String author;
-    
-    @OneToMany(cascade=CascadeType.ALL)
-    List<Section> sections;
+  String author;
 
-    public Article() {
-        
-    }
-    
-    public Article(String name, String author) {
-        this.name = name;
-        this.author = author;
-    }
-    
-    public String getName() {
-        return name;
-    }
+  @OneToMany(cascade = CascadeType.ALL)
+  List<Section> sections;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public Article() {
+  }
 
-    public String getAuthor() {
-        return author;
-    }
+  public Article(String name, String author) {
+    this.name = name;
+    this.author = author;
+  }
 
-    public void setAuthor(String author) {
-        this.author = author;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public List<Section> getSections() {
-        return sections;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setSections(List<Section> sections) {
-        this.sections = sections;
+  public String getAuthor() {
+    return author;
+  }
+
+  public void setAuthor(String author) {
+    this.author = author;
+  }
+
+  public List<Section> getSections() {
+    return sections;
+  }
+
+  public void setSections(List<Section> sections) {
+    this.sections = sections;
+  }
+
+  public void addSection(Section s) {
+    if (sections == null) {
+      sections = new ArrayList<Section>();
     }
-    
-    public void addSection(Section s){
-        if (sections == null){
-            sections = new ArrayList<Section>();
-        }
-        sections.add(s);
-    }
-    
+    sections.add(s);
+  }
+
 }

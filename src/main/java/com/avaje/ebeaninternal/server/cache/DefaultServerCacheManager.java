@@ -31,10 +31,10 @@ public class DefaultServerCacheManager implements ServerCacheManager {
    */
   public DefaultServerCacheManager(ServerCacheFactory cacheFactory, ServerCacheOptions defaultBeanOptions, ServerCacheOptions defaultQueryOptions) {
     this.cacheFactory = cacheFactory;
-    this.beanCache = new DefaultCacheHolder(cacheFactory, defaultBeanOptions, true);
-    this.queryCache = new DefaultCacheHolder(cacheFactory, defaultQueryOptions, false);
-    this.naturalKeyCache = new DefaultCacheHolder(cacheFactory, defaultQueryOptions, false);
-    this.collectionIdsCache = new DefaultCacheHolder(cacheFactory, defaultQueryOptions, false);
+    this.beanCache = new DefaultCacheHolder(cacheFactory, defaultBeanOptions);
+    this.queryCache = new DefaultCacheHolder(cacheFactory, defaultQueryOptions);
+    this.naturalKeyCache = new DefaultCacheHolder(cacheFactory, defaultBeanOptions);
+    this.collectionIdsCache = new DefaultCacheHolder(cacheFactory, defaultBeanOptions);
   }
 
   /**

@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.cache;
 
+import com.avaje.ebean.annotation.CacheQueryTuning;
 import com.avaje.ebean.annotation.CacheTuning;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheFactory;
@@ -24,29 +25,15 @@ public class DefaultCacheHolder {
 
   private final ServerCacheOptions defaultOptions;
 
-  private final boolean useBeanTuning;
-
   /**
    * Create with a cache factory and default cache options.
    *
    * @param cacheFactory   the factory for creating the cache
    * @param defaultOptions the default options for tuning the cache
-   * @param useBeanTuning  if true then use the bean class specific tuning. This is
-   *                       generally false for the query cache.
    */
-  public DefaultCacheHolder(ServerCacheFactory cacheFactory,
-                            ServerCacheOptions defaultOptions, boolean useBeanTuning) {
-
+  public DefaultCacheHolder(ServerCacheFactory cacheFactory, ServerCacheOptions defaultOptions) {
     this.cacheFactory = cacheFactory;
     this.defaultOptions = defaultOptions;
-    this.useBeanTuning = useBeanTuning;
-  }
-
-  /**
-   * Return the default cache options.
-   */
-  public ServerCacheOptions getDefaultOptions() {
-    return defaultOptions;
   }
 
   /**
@@ -61,7 +48,7 @@ public class DefaultCacheHolder {
     synchronized (monitor) {
       cache = synchMap.get(cacheKey);
       if (cache == null) {
-        ServerCacheOptions options = getCacheOptions(cacheKey);
+        ServerCacheOptions options = getCacheOptions(cacheKey, type);
         cache = cacheFactory.createCache(type, cacheKey, options);
         synchMap.put(cacheKey, cache);
         concMap.put(cacheKey, cache);
@@ -94,25 +81,41 @@ public class DefaultCacheHolder {
   /**
    * Return the cache options for a given bean type.
    */
-  private ServerCacheOptions getCacheOptions(String beanType) {
+  ServerCacheOptions getCacheOptions(String beanType, ServerCacheType type) {
 
-    if (useBeanTuning) {
-      // read the deployment annotation
-      try {
-        Class<?> cls = Class.forName(beanType);
-        CacheTuning cacheTuning = cls.getAnnotation(CacheTuning.class);
-        if (cacheTuning != null) {
-          ServerCacheOptions o = new ServerCacheOptions(cacheTuning);
-          o.applyDefaults(defaultOptions);
-          return o;
-        }
-      } catch (ClassNotFoundException e) {
-        // ignore
+    try {
+      Class<?> cls = Class.forName(beanType);
+      switch (type) {
+        case QUERY:
+          return getQueryOptions(cls);
+        default:
+          return getBeanOptions(cls);
       }
+    } catch (ClassNotFoundException e) {
+      // ignore
     }
 
     return defaultOptions.copy();
+  }
 
+  private ServerCacheOptions getQueryOptions(Class<?> cls) {
+    CacheQueryTuning tuning = cls.getAnnotation(CacheQueryTuning.class);
+    if (tuning != null) {
+      ServerCacheOptions o = new ServerCacheOptions(tuning);
+      o.applyDefaults(defaultOptions);
+      return o;
+    }
+    return defaultOptions.copy();
+  }
+
+  private ServerCacheOptions getBeanOptions(Class<?> cls) {
+    CacheTuning cacheTuning = cls.getAnnotation(CacheTuning.class);
+    if (cacheTuning != null) {
+      ServerCacheOptions o = new ServerCacheOptions(cacheTuning);
+      o.applyDefaults(defaultOptions);
+      return o;
+    }
+    return defaultOptions.copy();
   }
 
 }

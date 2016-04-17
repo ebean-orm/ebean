@@ -1,5 +1,6 @@
 package com.avaje.ebean.cache;
 
+import com.avaje.ebean.annotation.CacheQueryTuning;
 import com.avaje.ebean.annotation.CacheTuning;
 
 /**
@@ -30,13 +31,13 @@ public class ServerCacheOptions {
   }
 
   /**
-   * Create merging default options with the deployment specified ones.
+   * Create from the cacheTuning deployment annotation.
    */
-  public ServerCacheOptions(ServerCacheOptions defaults) {
-    this.maxSize = defaults.getMaxSize();
-    this.maxIdleSecs = defaults.getMaxIdleSecs();
-    this.maxSecsToLive = defaults.getMaxIdleSecs();
-    this.trimFrequency = defaults.getTrimFrequency();
+  public ServerCacheOptions(CacheQueryTuning cacheTuning) {
+    this.maxSize = cacheTuning.maxSize();
+    this.maxIdleSecs = cacheTuning.maxIdleSecs();
+    this.maxSecsToLive = cacheTuning.maxSecsToLive();
+    this.trimFrequency = cacheTuning.trimFrequency();
   }
 
   /**
