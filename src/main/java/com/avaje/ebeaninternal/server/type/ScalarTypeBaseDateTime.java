@@ -131,13 +131,19 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   }
 
   public String formatValue(T value) {
-    return convertToTimestamp(value).toString();
+    // format all timestamps into epoch millis
+    long epochMillis = convertToMillis(value);
+    return Long.toString(epochMillis);
   }
 
   public T parse(String value) {
-    return convertFromTimestamp(Timestamp.valueOf(value));
+    try {
+      long epochMillis = Long.parseLong(value);
+      return convertFromMillis(epochMillis);
+    } catch (NumberFormatException e) {
+      return convertFromTimestamp(Timestamp.valueOf(value));
+    }
   }
-
 
   public boolean isDateTimeCapable() {
     return true;

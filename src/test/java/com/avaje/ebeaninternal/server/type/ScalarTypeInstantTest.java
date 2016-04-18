@@ -69,15 +69,34 @@ public class ScalarTypeInstantTest {
     Instant now = Instant.now();
     Timestamp timestamp = Timestamp.from(now);
     String formatted = type.formatValue(now);
-    assertEquals(timestamp.toString(), formatted);
+    assertEquals(""+timestamp.getTime(), formatted);
   }
 
   @Test
-  public void testParse() throws Exception {
+  public void testParse_when_epochMillis() throws Exception {
+
+    Instant now = Instant.now();
+    Timestamp timestamp = Timestamp.from(now);
+    Instant val1 = type.parse(""+timestamp.getTime());
+    assertEquals(now, val1);
+  }
+
+  @Test
+  public void testParse_when_timestampForm() throws Exception {
 
     Instant now = Instant.now();
     Timestamp timestamp = Timestamp.from(now);
     Instant val1 = type.parse(timestamp.toString());
+    assertEquals(now, val1);
+  }
+
+  @Test
+  public void testFormatAndParse() throws Exception {
+
+    Instant now = Instant.now();
+
+    String format = type.format(now);
+    Instant val1 = type.parse(format);
     assertEquals(now, val1);
   }
 
