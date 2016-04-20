@@ -14,7 +14,7 @@ public class ScalarTypePathTest {
   @Test
   public void convertFromDbString() throws Exception {
 
-    Path path = Paths.get(".");
+    Path path = Paths.get("/tmp");
 
     String asString = type.convertToDbString(path);
     Path converted = type.convertFromDbString(asString);
@@ -25,7 +25,7 @@ public class ScalarTypePathTest {
   @Test
   public void formatAndParse() throws Exception {
 
-    Path path = Paths.get(".");
+    Path path = Paths.get("/tmp");
 
     String asString = type.formatValue(path);
     Path converted = type.parse(asString);
