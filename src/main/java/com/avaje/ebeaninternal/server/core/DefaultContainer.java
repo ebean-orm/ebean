@@ -108,7 +108,7 @@ public class DefaultContainer implements SpiContainer {
       // inform the NamingConvention of the associated DatabasePlatform
       serverConfig.getNamingConvention().setDatabasePlatform(serverConfig.getDatabasePlatform());
 
-      ServerCacheManager cacheManager = getCacheManager(serverConfig);
+      ServerCacheManager cacheManager = getCacheManager(online, serverConfig);
 
       SpiBackgroundExecutor bgExecutor = createBackgroundExecutor(serverConfig);
 
@@ -147,9 +147,10 @@ public class DefaultContainer implements SpiContainer {
   /**
    * Create and return the CacheManager.
    */
-  private ServerCacheManager getCacheManager(ServerConfig serverConfig) {
+  private ServerCacheManager getCacheManager(boolean online, ServerConfig serverConfig) {
 
-    if (serverConfig.isDisableL2Cache()) {
+    if (!online || serverConfig.isDisableL2Cache()) {
+      // use local only L2 cache implementation as placeholder
       return new DefaultServerCacheManager();
     }
 
