@@ -3,13 +3,13 @@
 
   <parent>
     <groupId>org.avaje</groupId>
-    <artifactId>avaje-javaparent</artifactId>
-    <version>1.2</version>
+    <artifactId>oss-parent</artifactId>
+    <version>1.1</version>
   </parent>
 
   <groupId>org.avaje.ebeanorm</groupId>
   <artifactId>avaje-ebeanorm</artifactId>
-  <version>7.7.2-SNAPSHOT</version>
+  <version>7.8.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>avaje-ebeanorm</name>
@@ -36,9 +36,7 @@
   </developers>
 
   <scm>
-    <connection>scm:git:https://github.com/ebean-orm/avaje-ebeanorm.git</connection>
     <developerConnection>scm:git:https://github.com/ebean-orm/avaje-ebeanorm.git</developerConnection>
-    <url>https://github.com/ebean-orm/avaje-ebeanorm.git</url>
   </scm>
 
   <dependencies>
@@ -67,13 +65,6 @@
       <version>1.1.2</version>
     </dependency>
 
-    <!-- bring in cluster support by default -->
-    <dependency>
-      <groupId>org.avaje.ebeanorm</groupId>
-      <artifactId>avaje-ebeanorm-cluster</artifactId>
-      <version>1.1.1</version>
-    </dependency>
-
     <dependency>
       <groupId>org.avaje</groupId>
       <artifactId>avaje-classpath-scanner-api</artifactId>
@@ -92,12 +83,11 @@
       <version>[1.7.1,1.7.99)</version>
     </dependency>
 
-    <!-- provided scope for Spring boot loader classpath scanning support -->
+    <!-- Jackson core used internally by Ebean -->
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-loader</artifactId>
-      <version>1.2.7.RELEASE</version>
-      <scope>provided</scope>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.6.5</version>
     </dependency>
 
     <!-- provided scope for JsonNode support -->
@@ -106,13 +96,6 @@
       <artifactId>jackson-databind</artifactId>
       <version>2.6.5</version>
       <scope>provided</scope>
-    </dependency>
-
-    <!-- Jackson core used internally by Ebean -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>2.6.5</version>
     </dependency>
 
     <dependency>
@@ -151,6 +134,8 @@
       <version>9.4-1202-jdbc41</version>
       <scope>provided</scope>
     </dependency>
+
+    <!-- Test scope -->
 
     <!--<dependency>-->
       <!--<groupId>oracle</groupId>-->
@@ -228,9 +213,9 @@
   </dependencies>
 
 
-  <!-- Enhance the meta beans -->
   <build>
     <plugins>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -240,12 +225,12 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.avaje.ebeanorm</groupId>
         <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
         <version>4.9.2</version>
         <executions>
-          <!--   Not going to enhance Model bean -->
           <execution>
             <id>test</id>
             <phase>process-test-classes</phase>
@@ -282,7 +267,8 @@
           </systemProperties>
         </configuration>
       </plugin>
- 	 <plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.5</version>
@@ -292,6 +278,7 @@
           </archive>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -317,7 +304,6 @@
           <linksource>true</linksource>
           <overview>src/main/java/com/avaje/ebean/overview.html</overview>
         </configuration>
-
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -327,6 +313,7 @@
           </execution>
         </executions>
       </plugin>
+
     </plugins>
 
   </build>
