@@ -6,6 +6,7 @@ import com.avaje.tests.model.types.SomeNewTypesBean;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.*;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class TestNewTypes extends BaseTestCase {
     bean.setZoneId(ZoneId.systemDefault());
     bean.setZoneOffset(ZonedDateTime.now().getOffset());
     bean.setYearMonth(YearMonth.of(2014, 9));
+    bean.setPath(Paths.get("/tmp"));
 
 
     Ebean.save(bean);
@@ -69,6 +71,9 @@ public class TestNewTypes extends BaseTestCase {
     list = Ebean.find(SomeNewTypesBean.class).where().le("month", Month.SEPTEMBER).findList();
     assertTrue(!list.isEmpty());
 
+    list = Ebean.find(SomeNewTypesBean.class).where().eq("path", Paths.get("/tmp")).findList();
+    assertTrue(!list.isEmpty());
+
     SomeNewTypesBean fetched = Ebean.find(SomeNewTypesBean.class, bean.getId());
 
     assertEquals(bean.getZoneId(), fetched.getZoneId());
@@ -80,6 +85,7 @@ public class TestNewTypes extends BaseTestCase {
     assertEquals(bean.getLocalDateTime(), fetched.getLocalDateTime());
     assertEquals(bean.getOffsetDateTime(), fetched.getOffsetDateTime());
     assertEquals(bean.getInstant(), fetched.getInstant());
+    assertEquals(bean.getPath(), fetched.getPath());
 
     String asJson = Ebean.json().toJson(fetched);
 
@@ -94,6 +100,7 @@ public class TestNewTypes extends BaseTestCase {
     assertEquals(bean.getLocalDateTime(), toBean.getLocalDateTime());
     assertEquals(bean.getOffsetDateTime(), toBean.getOffsetDateTime());
     assertEquals(bean.getInstant(), toBean.getInstant());
+    assertEquals(bean.getPath(), toBean.getPath());
 
   }
 
@@ -115,6 +122,7 @@ public class TestNewTypes extends BaseTestCase {
     assertNull(fetched.getLocalDateTime());
     assertNull(fetched.getOffsetDateTime());
     assertNull(fetched.getInstant());
+    assertNull(fetched.getPath());
 
   }
 }

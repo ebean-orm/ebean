@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
+import java.nio.file.Path;
 import java.time.*;
 
 @Entity
@@ -40,6 +41,8 @@ public class SomeNewTypesBean {
   ZoneId zoneId;
 
   ZoneOffset zoneOffset;
+
+  Path path;
 
   public Long getId() {
     return id;
@@ -143,5 +146,13 @@ public class SomeNewTypesBean {
 
   public void setZoneOffset(ZoneOffset zoneOffset) {
     this.zoneOffset = zoneOffset;
+  }
+
+  public Path getPath() {
+    return path;
+  }
+
+  public void setPath(Path path) {
+    this.path = path;
   }
 }

@@ -42,14 +42,14 @@ public interface TypeManager {
   /**
    * Return the ScalarType for a given logical type.
    */
-  <T> ScalarType<T> getScalarType(Class<T> type);
+  ScalarType<?> getScalarType(Class<?> type);
 
   /**
    * For java.util.Date and java.util.Calendar additionally pass the jdbc type
    * that you would like the ScalarType to map to. This is because these types
    * can map to different java.sql.Types depending on the property.
    */
-  <T> ScalarType<T> getScalarType(Class<T> type, int jdbcType);
+  ScalarType<?> getScalarType(Class<?> type, int jdbcType);
 
   /**
    * Create a ScalarType for an Enum using a mapping (rather than JPA Ordinal

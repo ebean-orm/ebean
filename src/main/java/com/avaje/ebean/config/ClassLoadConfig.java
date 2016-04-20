@@ -34,6 +34,13 @@ public class ClassLoadConfig {
   }
 
   /**
+   * Return true if Java7 is present.
+   */
+  public boolean isJava7Present() {
+    return isPresent("java.nio.file.Path");
+  }
+
+  /**
    * Return true if the Joda types are available and should be supported.
    */
   public boolean isJodaTimePresent() {

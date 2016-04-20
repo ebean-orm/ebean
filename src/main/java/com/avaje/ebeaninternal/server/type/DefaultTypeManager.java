@@ -125,6 +125,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final boolean objectMapperPresent;
 
+  private final boolean java7Present;
+
   // OPTIONAL ScalarTypes registered if Jackson/JsonNode is in the classpath
 
   /**
@@ -153,6 +155,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    */
   public DefaultTypeManager(ServerConfig config, BootupClasses bootupClasses) {
 
+    this.java7Present = config.getClassLoadConfig().isJava7Present();
     this.jsonDateTime = config.getJsonDateTime();
     this.checkImmutable = new CheckImmutable(this);
     this.reflectScalarBuilder = new ReflectionBasedTypeBuilder(this);
@@ -282,17 +285,31 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   /**
    * This can return null if no matching ScalarType is found.
    */
-  @SuppressWarnings("unchecked")
-  public <T> ScalarType<T> getScalarType(Class<T> type) {
-    ScalarType<T> found = (ScalarType<T>) typeMap.get(type);
+  public ScalarType<?> getScalarType(Class<?> type) {
+    ScalarType<?> found = typeMap.get(type);
     if (found == null) {
       if (type.getName().equals("org.joda.time.LocalTime")) {
         throw new IllegalStateException(
             "ScalarType of Joda LocalTime not defined. You need to set ServerConfig.jodaLocalTimeMode to"
                 + " either 'normal' or 'utc'.  UTC is the old mode using UTC timezone but local time zone is now preferred as 'normal' mode.");
       }
+      found = checkInterfaceTypes(type);
     }
     return found;
+  }
+
+  private ScalarType<?> checkInterfaceTypes(Class<?> type) {
+    if (java7Present) {
+      return checkJava7InterfaceTypes(type);
+    }
+    return null;
+  }
+
+  private ScalarType<?> checkJava7InterfaceTypes(Class<?> type) {
+    if (java.nio.file.Path.class.isAssignableFrom(type)) {
+      return typeMap.get(java.nio.file.Path.class);
+    }
+    return null;
   }
 
   public ScalarDataReader<?> getScalarDataReader(Class<?> propertyType, int sqlType) {
@@ -362,11 +379,11 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * </p>
    */
   @SuppressWarnings("unchecked")
-  public <T> ScalarType<T> getScalarType(Class<T> type, int jdbcType) {
+  public ScalarType<?> getScalarType(Class<?> type, int jdbcType) {
 
     // File is a special Lob so check for that first
     if (File.class.equals(type)) {
-      return (ScalarType<T>) fileType;
+      return fileType;
     }
 
     // check for Clob, LongVarchar etc ...
@@ -375,23 +392,23 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     ScalarType<?> scalarType = getLobTypes(jdbcType);
     if (scalarType != null) {
       // it is a specific Lob type...
-      return (ScalarType<T>) scalarType;
+      return scalarType;
     }
 
     scalarType = typeMap.get(type);
     if (scalarType != null) {
       if (jdbcType == 0 || scalarType.getJdbcType() == jdbcType) {
         // matching type
-        return (ScalarType<T>) scalarType;
+        return scalarType;
       }
     }
     // a util Date with jdbcType not matching server wide settings
     if (type.equals(java.util.Date.class)) {
-      return (ScalarType<T>) extraTypeFactory.createUtilDate(jsonDateTime, jdbcType);
+      return extraTypeFactory.createUtilDate(jsonDateTime, jdbcType);
     }
     // a Calendar with jdbcType not matching server wide settings
     if (type.equals(java.util.Calendar.class)) {
-      return (ScalarType<T>) extraTypeFactory.createCalendar(jsonDateTime, jdbcType);
+      return extraTypeFactory.createCalendar(jsonDateTime, jdbcType);
     }
 
     throw new IllegalArgumentException("Unmatched ScalarType for " + type + " jdbcType:" + jdbcType);
@@ -772,6 +789,11 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   }
 
   protected void initialiseJavaTimeTypes(JsonConfig.DateTime mode, ServerConfig config) {
+
+    if (java7Present) {
+      typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
+    }
+
     if (config.getClassLoadConfig().isJavaTimePresent()) {
       logger.debug("Registering java.time data types");
       typeMap.put(java.time.LocalDate.class, new ScalarTypeLocalDate());
