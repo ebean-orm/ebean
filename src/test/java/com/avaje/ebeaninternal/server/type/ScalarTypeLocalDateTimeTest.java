@@ -16,14 +16,23 @@ public class ScalarTypeLocalDateTimeTest {
   LocalDateTime warmUp = LocalDateTime.now();
 
   @Test
-  public void testConvertToMillis() throws Exception {
+  public void testNowToMillis() throws Exception {
 
     warmUp.hashCode();
 
     long now = System.currentTimeMillis();
     long toMillis = type.convertToMillis(LocalDateTime.now());
-
     assertTrue(toMillis - now < 30);
+  }
+
+  @Test
+  public void testConvertToMillis() throws Exception {
+
+    LocalDateTime now = LocalDateTime.now();
+    long asMillis = type.convertToMillis(now);
+    LocalDateTime fromMillis = type.convertFromMillis(asMillis);
+
+    assertEquals(now, fromMillis);
   }
 
   @Test

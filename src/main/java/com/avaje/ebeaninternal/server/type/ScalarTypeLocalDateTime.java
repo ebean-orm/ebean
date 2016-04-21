@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 /**
  * ScalarType for java.sql.Timestamp.
@@ -24,7 +23,7 @@ public class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTim
 
   @Override
   public long convertToMillis(LocalDateTime value) {
-    return value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    return Timestamp.valueOf(value).getTime();
   }
 
   @Override
@@ -33,20 +32,18 @@ public class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTim
   }
 
   @Override
-  protected String toJsonISO8601(LocalDateTime value) {
-    return value.atZone(ZoneId.systemDefault()).toInstant().toString();
+  protected String toJsonISO8601(LocalDateTime dateTime) {
+    return dateTime.atZone(ZoneId.systemDefault()).toInstant().toString();
   }
 
   @Override
-  public LocalDateTime convertFromTimestamp(Timestamp ts) {
-    return ts.toLocalDateTime();
+  public LocalDateTime convertFromTimestamp(Timestamp timestamp) {
+    return timestamp.toLocalDateTime();
   }
 
   @Override
-  public Timestamp convertToTimestamp(LocalDateTime t) {
-
-    ZonedDateTime zonedDateTime = t.atZone(ZoneId.systemDefault());
-    return Timestamp.from(zonedDateTime.toInstant());
+  public Timestamp convertToTimestamp(LocalDateTime dateTime) {
+    return Timestamp.valueOf(dateTime);
   }
 
   @Override
