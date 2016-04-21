@@ -1,6 +1,5 @@
 package com.avaje.ebeaninternal.server.transaction;
 
-import com.avaje.ebean.event.BeanPersistListener;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.cluster.BinaryMessage;
 import com.avaje.ebeaninternal.server.cluster.BinaryMessageList;
@@ -215,41 +214,24 @@ public class BeanPersistIds {
   }
 
   /**
-   * Notify the cache and local BeanPersistListener of this event that came
-   * from another server in the cluster.
+   * Notify the cache of this event that came from another server in the cluster.
    */
   void notifyCacheAndListener() {
-
-    BeanPersistListener listener = beanDescriptor.getPersistListener();
 
     // any change invalidates the query cache
     beanDescriptor.queryCacheClear();
 
-    if (insertIds != null) {
-      if (listener != null) {
-        for (int i = 0; i < insertIds.size(); i++) {
-          listener.remoteInsert(insertIds.get(i));
-        }
-      }
-    }
     if (updateIds != null) {
       for (int i = 0; i < updateIds.size(); i++) {
         Object id = updateIds.get(i);
         beanDescriptor.cacheHandleDeleteById(id);
-        if (listener != null) {
-          listener.remoteUpdate(id);
-        }
       }
     }
     if (deleteIds != null) {
       for (int i = 0; i < deleteIds.size(); i++) {
         Object id = deleteIds.get(i);
         beanDescriptor.cacheHandleDeleteById(id);
-        if (listener != null) {
-          listener.remoteDelete(id);
-        }
       }
     }
-
   }
 }

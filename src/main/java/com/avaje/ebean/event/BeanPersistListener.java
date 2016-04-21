@@ -74,28 +74,4 @@ public interface BeanPersistListener {
    */
   boolean deleted(Object bean);
 
-  /**
-   * Notify that a bean was inserted on another node of the cluster.
-   * 
-   * @param id
-   *          the id value of the inserted bean
-   */
-  void remoteInsert(Object id);
-
-  /**
-   * Notify that a bean was updated on another node of the cluster.
-   * 
-   * @param id
-   *          the id value of the updated bean.
-   */
-  void remoteUpdate(Object id);
-
-  /**
-   * Notify that a bean was deleted on another node of the cluster.
-   * 
-   * @param id
-   *          the id value of the deleted bean.
-   */
-  void remoteDelete(Object id);
-
 }

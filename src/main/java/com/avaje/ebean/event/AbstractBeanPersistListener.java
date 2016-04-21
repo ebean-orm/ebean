@@ -46,33 +46,4 @@ public abstract class AbstractBeanPersistListener implements BeanPersistListener
     return false;
   }
 
-  /**
-   * Notify that a bean was inserted on another node of the cluster.
-   *
-   * @param id the id value of the inserted bean
-   */
-  @Override
-  public void remoteInsert(Object id) {
-    // do nothing
-  }
-
-  /**
-   * Notify that a bean was updated on another node of the cluster.
-   *
-   * @param id the id value of the updated bean.
-   */
-  @Override
-  public void remoteUpdate(Object id) {
-    // do nothing
-  }
-
-  /**
-   * Notify that a bean was deleted on another node of the cluster.
-   *
-   * @param id the id value of the deleted bean.
-   */
-  @Override
-  public void remoteDelete(Object id) {
-    // do nothing
-  }
 }

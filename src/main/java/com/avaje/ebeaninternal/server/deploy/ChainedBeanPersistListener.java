@@ -83,7 +83,6 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 		}
 	}
 
-
 	public boolean deleted(Object bean) {
 		boolean notifyCluster = false;
 		for (int i = 0; i < chain.length; i++) {
@@ -102,24 +101,6 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 			}
 		}
 		return notifyCluster;
-	}
-
-	public void remoteDelete(Object id) {
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].remoteDelete(id);
-		}
-	}
-
-	public void remoteInsert(Object id) {
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].remoteInsert(id);
-		}
-	}
-
-	public void remoteUpdate(Object id) {
-		for (int i = 0; i < chain.length; i++) {
-			chain[i].remoteUpdate(id);
-		}
 	}
 
 	public boolean updated(Object bean, Set<String> updatedProperties) {

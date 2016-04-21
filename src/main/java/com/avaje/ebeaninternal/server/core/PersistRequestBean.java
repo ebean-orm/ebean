@@ -304,7 +304,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Set the cache notify status.
    */
-  public void setNotifyCache() {
+  private void setNotifyCache() {
     this.notifyCache = beanDescriptor.isCacheNotify(publish);
   }
 
@@ -327,7 +327,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
-   * Notify/Update the local L2 cache after the transaction has successfully committed.
+   * Collect L2 cache changes to be applied after the transaction has successfully committed.
    */
   public void notifyCache(CacheChangeSet changeSet) {
     if (notifyCache) {
@@ -340,7 +340,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
           break;
         case DELETE:
         case SOFT_DELETE:
-          // Bean deleted from cache early via postDelete()
           beanDescriptor.cacheHandleDelete(idValue, this, changeSet);
           break;
         default:
@@ -949,7 +948,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Takes into account transaction setting and JDBC batch.
    * </p>
    */
-  public boolean determineUpdateAllLoadedProperties() {
+  private boolean determineUpdateAllLoadedProperties() {
 
     Boolean txnUpdateAll = transaction.isUpdateAllLoadedProperties();
     if (txnUpdateAll != null) {
