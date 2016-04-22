@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.lib;
 
 
-
 /**
  * This is the ShutdownHook that gets added to Runtime.
  * It will try to shutdown the system cleanly when the JVM exits.
@@ -9,14 +8,14 @@ package com.avaje.ebeaninternal.server.lib;
  */
 class ShutdownHook extends Thread {
 
-	ShutdownHook() {
-	}
+  ShutdownHook() {
+  }
 
-	/**
-	 * Fired by the JVM Runtime on shutdown.
-	 */
-	public void run() {
-		ShutdownManager.shutdown();
-	}
+  /**
+   * Fired by the JVM Runtime on shutdown.
+   */
+  public void run() {
+    ShutdownManager.shutdown();
+  }
 
 }
