@@ -14,6 +14,13 @@ public class JavaTimeUtils {
   /**
    * Return the system millis time as a LocalDateTime.
    */
+  public static Object toInstant(long systemMillis) {
+    return Instant.ofEpochMilli(systemMillis);
+  }
+
+  /**
+   * Return the system millis time as a LocalDateTime.
+   */
   public static Object toLocalDateTime(long systemMillis) {
     return new Timestamp(systemMillis).toLocalDateTime();
   }

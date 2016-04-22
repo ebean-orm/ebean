@@ -5,6 +5,7 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 import javax.persistence.PersistenceException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
@@ -27,6 +28,7 @@ public class UpdateTimestampFactory {
     map.put(long.class, longTime);
 
     if (classLoadConfig.isJavaTimePresent()) {
+      map.put(Instant.class, new GeneratedUpdateJavaTime.InstantDT());
       map.put(LocalDateTime.class, new GeneratedUpdateJavaTime.LocalDT());
       map.put(OffsetDateTime.class, new GeneratedUpdateJavaTime.OffsetDT());
       map.put(ZonedDateTime.class, new GeneratedUpdateJavaTime.ZonedDT());

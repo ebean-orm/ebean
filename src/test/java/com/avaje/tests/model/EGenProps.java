@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
@@ -53,6 +54,12 @@ public class EGenProps {
 
   @UpdatedTimestamp
   ZonedDateTime zdtUpdated;
+
+  @CreatedTimestamp
+  Instant instantCreated;
+
+  @UpdatedTimestamp
+  Instant instantUpdated;
 
   @CreatedTimestamp
   long longCreated;
@@ -178,5 +185,21 @@ public class EGenProps {
 
   public void setLongUpdated(long longUpdated) {
     this.longUpdated = longUpdated;
+  }
+
+  public Instant getInstantCreated() {
+    return instantCreated;
+  }
+
+  public void setInstantCreated(Instant instantCreated) {
+    this.instantCreated = instantCreated;
+  }
+
+  public Instant getInstantUpdated() {
+    return instantUpdated;
+  }
+
+  public void setInstantUpdated(Instant instantUpdated) {
+    this.instantUpdated = instantUpdated;
   }
 }

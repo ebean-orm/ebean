@@ -32,6 +32,22 @@ public class GeneratedUpdateJavaTime {
   }
 
   /**
+   * Instant support.
+   */
+  public static class InstantDT extends Base {
+
+    @Override
+    public Object getInsertValue(BeanProperty prop, EntityBean bean, long now) {
+      return JavaTimeUtils.toInstant(now);
+    }
+
+    @Override
+    public Object getUpdateValue(BeanProperty prop, EntityBean bean, long now) {
+      return JavaTimeUtils.toInstant(now);
+    }
+  }
+
+  /**
    * LocalDateTime support.
    */
   public static class LocalDT extends Base {

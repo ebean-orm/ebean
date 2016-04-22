@@ -31,9 +31,10 @@ public class TestGeneratedProperties extends BaseTestCase {
     assertNotNull(bean.getZdtUpdated());
     assertNotNull(bean.getLongCreated());
     assertNotNull(bean.getLongUpdated());
+    assertNotNull(bean.getInstantCreated());
+    assertNotNull(bean.getInstantUpdated());
 
     assertThat(bean.getWhenCreated().toInstant().toEpochMilli()).isEqualTo(bean.getLongCreated());
-    assertThat(bean.getWhenModified().toInstant().toEpochMilli()).isEqualTo(bean.getLongCreated());
     assertThat(bean.getWhenModified().toInstant().toEpochMilli()).isEqualTo(bean.getLongCreated());
 
     bean.setName("updating...");
@@ -41,6 +42,8 @@ public class TestGeneratedProperties extends BaseTestCase {
 
     assertThat(bean.getWhenModified()).isNotEqualTo(bean.getLongCreated());
     assertThat(bean.getWhenModified().toInstant().toEpochMilli()).isEqualTo(bean.getLongUpdated());
+    assertThat(bean.getInstantUpdated().toEpochMilli()).isEqualTo(bean.getLongUpdated());
+    assertThat(bean.getInstantCreated().toEpochMilli()).isEqualTo(bean.getLongCreated());
 
     Ebean.delete(bean);
   }
