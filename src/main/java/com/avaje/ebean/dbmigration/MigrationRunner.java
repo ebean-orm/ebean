@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class MigrationRunner {
 
-  private static final Logger logger = LoggerFactory.getLogger(MigrationRunner.class);
+  public static final Logger logger = LoggerFactory.getLogger("org.avaje.ebean.DbMigration");
 
   private final EbeanServer server;
 
@@ -48,8 +48,16 @@ public class MigrationRunner {
 
     String migrationUser = migrationConfig.getDbUser();
     String migrationPwd = migrationConfig.getDbPassword();
+    if (migrationUser == null) {
+      throw new IllegalStateException("No DB migration user specified (to run the db migration) ?");
+    }
 
     DataSource dataSource = server.getPluginApi().getDataSource();
+    if (dataSource == null) {
+      throw new IllegalStateException("No dataSource when trying to run migration? "
+          +"Maybe trying to generate DBMigration when ebean.migration.run=true is set? "
+          +"Perhaps need to set ebean.migration.run=false in test-ebean.properties?");
+    }
 
     Connection connection;
     try {
@@ -59,8 +67,8 @@ public class MigrationRunner {
     }
 
     try {
+      logger.debug("using db user [{}] to run migrations ...");
       connection.setAutoCommit(false);
-
       runMigrations(resources, connection);
 
       connection.commit();
@@ -84,6 +92,8 @@ public class MigrationRunner {
 
     // get the migrations in version order
     List<LocalMigrationResource> localVersions = resources.getVersions();
+
+    logger.info("local migrations:{}  existing migrations:{}", localVersions.size(), table.size());
 
     LocalMigrationResource priorVersion = null;
 

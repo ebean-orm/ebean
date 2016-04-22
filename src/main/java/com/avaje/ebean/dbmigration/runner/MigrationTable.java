@@ -7,11 +7,11 @@ import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.config.DbMigrationConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
+import com.avaje.ebean.dbmigration.MigrationRunner;
 import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 import com.avaje.ebeaninternal.util.IOUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class MigrationTable {
 
-  private static final Logger logger = LoggerFactory.getLogger(MigrationTable.class);
+  private static final Logger logger = MigrationRunner.logger;
 
   private final  Connection connection;
 
@@ -68,6 +68,13 @@ public class MigrationTable {
 
     this.scriptTransform = createScriptTransform(migrationConfig);
     this.envUserName = System.getProperty("user.name");
+  }
+
+  /**
+   * Return the number of migrations in the DB migration table.
+   */
+  public int size() {
+    return migrations.size();
   }
 
   /**
@@ -229,6 +236,10 @@ public class MigrationTable {
    */
   private void addMigration(MigrationMetaRow metaRow) {
     lastMigration = metaRow;
-    migrations.put(metaRow.getRunVersion(), metaRow);
+    String runVersion = metaRow.getRunVersion();
+    if (runVersion == null) {
+      throw new IllegalStateException("No runVersion in db migration table row? " + metaRow);
+    }
+    migrations.put(runVersion, metaRow);
   }
 }

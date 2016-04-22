@@ -45,12 +45,16 @@ class MigrationMetaRow {
   MigrationMetaRow(SqlRow row) {
     id = row.getInteger("id");
     status = row.getString("status");
-    runVersion = row.getString("row_version");
+    runVersion = row.getString("run_version");
     depVersion = row.getString("dep_version");
     comment = row.getString("comment");
     checksum = row.getInteger("checksum");
     runOn = row.getTimestamp("run_on");
     runBy = row.getString("run_by");
+  }
+
+  public String toString() {
+    return "id:" + id + " status:" + status + " runVersion:" + runVersion + " comment:" + comment + " runOn:" + runOn + " runBy:" + runBy;
   }
 
   /**

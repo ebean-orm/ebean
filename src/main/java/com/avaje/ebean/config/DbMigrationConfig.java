@@ -366,8 +366,8 @@ public class DbMigrationConfig {
     metaTable = properties.get("migration.metaTable", metaTable);
     runPlaceholders = properties.get("migration.placeholders", runPlaceholders);
 
-    String adminUser = properties.get("datasource."+serverName+".user", dbUser);
-    adminUser = properties.get("datasource."+serverName+".adminuser", adminUser);
+    String adminUser = properties.get("datasource."+serverName+".username", dbUser);
+    adminUser = properties.get("datasource."+serverName+".adminusername", adminUser);
     dbUser = properties.get("migration.dbuser", adminUser);
 
     String adminPwd = properties.get("datasource."+serverName+".password", dbPassword);
