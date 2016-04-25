@@ -2,6 +2,7 @@ package com.avaje.tests.timezone;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Transaction;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -14,10 +15,6 @@ import java.util.TimeZone;
 
 public class TimezoneTests {
 
-  static {
-    System.setProperty("oracle.jdbc.J2EE13Compliant", "true") ;
-  }
-
   private final long now = 1460000000000L;
 
   private final Timestamp nowTs = new Timestamp(now);
@@ -29,6 +26,7 @@ public class TimezoneTests {
     utcCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
 
+  @Ignore
   @Test
   public void rawJdbc() throws SQLException {
 
@@ -65,30 +63,6 @@ public class TimezoneTests {
     statement.close();
     transaction.end();
   }
-
-//  private void fetch() throws SQLException {
-//    Transaction transaction = Ebean.beginTransaction();
-//    Connection connection = transaction.getConnection();
-//    SqlQuery sqlQuery = Ebean.createSqlQuery("select * from tztest");
-//    List<SqlRow> rows = sqlQuery.findList();
-//    for (SqlRow row : rows) {
-//      System.out.println(" zone:"+row.getString("zone"));
-//      System.out.println("   ts:"+tsof(row.getTimestamp("ts")));
-//      System.out.println(" tstz:"+tsof(row.getTimestamp("tstz")));
-//      //System.out.println(" tstz:"+tsof(getOracleTimestamp(connection, row, "tstz")));
-//      System.out.println("  ts1:"+tsof(row.getTimestamp("ts1")));
-//      System.out.println("tstz1:"+tsof(row.getTimestamp("tstz1")));
-//      //System.out.println("tstz1:"+tsof(getOracleTimestamp(connection, row, "tstz1")));
-//    }
-//    System.out.println("");
-//    transaction.end();
-//  }
-//
-//  private Timestamp getOracleTimestamp(Connection connection, SqlRow row, String name) throws SQLException {
-//    TIMESTAMPTZ ts = (TIMESTAMPTZ)row.get(name);
-//    Connection unwrap = connection.unwrap(Connection.class);
-//    return ts.timestampValue(unwrap);
-//  }
 
   private String tsof(Timestamp timestamp) {
     return ""+timestamp.getTime()+","+timestamp.toString();
