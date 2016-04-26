@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.deploy;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.PersistenceContextScope;
 import com.avaje.ebean.Query;
+import com.avaje.ebean.RawSql;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.ValuePair;
@@ -2719,6 +2720,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     if (idProperty != null && !idProperty.isEmbedded()) {
       OrderBy<T> orderBy = query.getOrderBy();
       if (orderBy == null || orderBy.isEmpty()) {
+        RawSql rawSql = query.getRawSql();
+        if (rawSql != null) {
+          query.order(rawSql.getSql().getOrderBy());
+        }
         query.order().asc(idProperty.getName());
       } else if (!orderBy.containsProperty(idProperty.getName())){
         query.order().asc(idProperty.getName());

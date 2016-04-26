@@ -3,6 +3,7 @@ package com.avaje.tests.rawsql;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import com.avaje.tests.model.basic.Order;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -16,6 +17,8 @@ import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestRawSqlOrmQuery extends BaseTestCase {
 
@@ -106,5 +109,72 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       customer.getCretime();
     }
 
+  }
+
+  @Test
+  public void testPaging_with_existingRawSqlOrderBy_expect_id_appendToOrderBy() {
+
+    ResetBasicData.reset();
+
+    RawSql rawSql = RawSqlBuilder.parse("select o.id, o.order_date, o.ship_date from o_order o order by o.ship_date desc nulls last")
+        .columnMapping("o.id", "id")
+        .columnMapping("o.order_date", "orderDate")
+        .columnMapping("o.ship_date", "shipDate")
+        .create();
+
+    Query<Order> query = Ebean.find(Order.class);
+    query.setUseCache(false).setUseQueryCache(false);
+    query.setRawSql(rawSql);
+
+    query.setMaxRows(100);
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("order by o.ship_date desc nulls last, o.id limit 100");
+  }
+
+  @Test
+  public void testPaging_when_setOrderBy_expect_id_appendToOrderBy() {
+
+    ResetBasicData.reset();
+
+    RawSql rawSql = RawSqlBuilder.parse("select o.id, o.order_date, o.ship_date from o_order o order by o.ship_date desc nulls last")
+        .columnMapping("o.id", "id")
+        .columnMapping("o.order_date", "orderDate")
+        .columnMapping("o.ship_date", "shipDate")
+        .create();
+
+    Query<Order> query = Ebean.find(Order.class);
+    query.setUseCache(false).setUseQueryCache(false);
+    query.setRawSql(rawSql);
+
+    query.setMaxRows(100);
+    query.order("coalesce(shipDate, now()) desc");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("order by coalesce(o.ship_date, now()) desc, o.id limit 100");
+  }
+
+  @Test
+  public void testPaging_when_setOrderBy_containsId_expect_leaveAsIs() {
+
+    ResetBasicData.reset();
+
+    RawSql rawSql = RawSqlBuilder.parse("select o.id, o.order_date, o.ship_date from o_order o order by o.ship_date desc nulls last")
+        .columnMapping("o.id", "id")
+        .columnMapping("o.order_date", "orderDate")
+        .columnMapping("o.ship_date", "shipDate")
+        .create();
+
+    Query<Order> query = Ebean.find(Order.class);
+    query.setUseCache(false).setUseQueryCache(false);
+    query.setRawSql(rawSql);
+
+    query.setMaxRows(100);
+    query.order("id desc");
+    PagedList<Order> pagedList = query.findPagedList();
+    pagedList.getList();
+    pagedList.getTotalRowCount();
+
+    assertThat(query.getGeneratedSql()).contains("order by o.id desc limit 100");
   }
 }

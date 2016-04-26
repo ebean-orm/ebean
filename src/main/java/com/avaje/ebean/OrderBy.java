@@ -221,24 +221,39 @@ public final class OrderBy<T> implements Serializable {
 
     private boolean ascending;
 
+    private String nulls;
+
+    private String highLow;
+
     public Property(String property, boolean ascending) {
       this.property = property;
       this.ascending = ascending;
+    }
+
+    public Property(String property, boolean ascending, String nulls, String highLow) {
+      this.property = property;
+      this.ascending = ascending;
+      this.nulls = nulls;
+      this.highLow = highLow;
     }
 
     /**
      * Return a copy of this Property with the path trimmed.
      */
     public Property copyWithTrim(String path) {
-      return new Property(property.substring(path.length() + 1), ascending);
+      return new Property(property.substring(path.length() + 1), ascending, nulls, highLow);
     }
 
+    @Override
     public int hashCode() {
       int hc = property.hashCode();
       hc = hc * 31 + (ascending ? 0 : 1);
+      hc = hc * 31 + (nulls == null ? 0 : nulls.hashCode());
+      hc = hc * 31 + (highLow == null ? 0 : highLow.hashCode());
       return hc;
     }
-    
+
+    @Override
     public boolean equals(Object obj) {
       if (obj == this) {
         return true;
@@ -246,10 +261,11 @@ public final class OrderBy<T> implements Serializable {
       if (!(obj instanceof Property)) {
         return false;
       }
-      
       Property e = (Property) obj;
-      return e.ascending == ascending 
-          && e.property.equals(property);
+      if (ascending != e.ascending) return false;
+      if (!property.equals(e.property)) return false;
+      if (nulls != null ? !nulls.equals(e.nulls) : e.nulls != null) return false;
+      return highLow != null ? highLow.equals(e.highLow) : e.highLow == null;
     }
 
     public String toString() {
@@ -257,10 +273,20 @@ public final class OrderBy<T> implements Serializable {
     }
 
     public String toStringFormat() {
-      if (ascending) {
-        return property;
+      if (nulls == null) {
+        if (ascending) {
+          return property;
+        } else {
+          return property + " desc";
+        }
       } else {
-        return property + " desc";
+        StringBuilder sb = new StringBuilder();
+        sb.append(property);
+        if (!ascending) {
+          sb.append(" ").append("desc");
+        }
+        sb.append(" ").append(nulls).append(" ").append(highLow);
+        return  sb.toString();
       }
     }
 
@@ -282,7 +308,7 @@ public final class OrderBy<T> implements Serializable {
      * Return a copy of this property.
      */
     public Property copy() {
-      return new Property(property, ascending);
+      return new Property(property, ascending, nulls, highLow);
     }
 
     /**
@@ -323,7 +349,6 @@ public final class OrderBy<T> implements Serializable {
 
     String[] chunks = orderByClause.split(",");
     for (int i = 0; i < chunks.length; i++) {
-
       String[] pairs = chunks[i].split(" ");
       Property p = parseProperty(pairs);
       if (p != null) {
@@ -353,8 +378,12 @@ public final class OrderBy<T> implements Serializable {
       boolean asc = isAscending(wordList.get(1));
       return new Property(wordList.get(0), asc);
     }
-    String m = "Expecting a max of 2 words in [" + Arrays.toString(pairs)
-        + "] but got " + wordList.size();
+    if (wordList.size() == 4) {
+      // nulls high or nulls low as 3rd and 4th
+      boolean asc = isAscending(wordList.get(1));
+      return new Property(wordList.get(0), asc, wordList.get(2), wordList.get(3));
+    }
+    String m = "Expecting a 1, 2 or 4 words in [" + Arrays.toString(pairs) + "] but got " + wordList;
     throw new RuntimeException(m);
   }
 
