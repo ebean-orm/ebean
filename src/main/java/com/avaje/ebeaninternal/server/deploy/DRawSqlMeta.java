@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.deploy;
 
-import com.avaje.ebean.annotation.SqlSelect;
-
 /**
  * Meta data for a sql-select object.
  * <p>
@@ -18,18 +16,6 @@ public class DRawSqlMeta {
 	private String where;
 	private String having;
 	private String columnMapping;
-
-
-	public DRawSqlMeta(SqlSelect sqlSelect) {
-		this.debug = sqlSelect.debug();
-		this.name = sqlSelect.name();
-		this.tableAlias = toNull(sqlSelect.tableAlias());
-		this.extend = toNull(sqlSelect.extend());
-		this.having = toNull(sqlSelect.having());
-		this.where = toNull(sqlSelect.where());
-		this.columnMapping = toNull(sqlSelect.columnMapping());
-		this.query = toNull(sqlSelect.query());
-	}
 
 	public DRawSqlMeta(String name, String extend, String query, boolean debug,
 			String where, String having, String columnMapping) {
@@ -129,11 +115,4 @@ public class DRawSqlMeta {
 		}
 	}
 
-	private static String toNull(String s) {
-		if (s != null && s.equals("")){
-			return null;
-		} else {
-			return s;
-		}
-	}
 }

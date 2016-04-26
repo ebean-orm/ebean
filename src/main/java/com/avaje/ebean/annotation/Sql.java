@@ -6,16 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specify explicit sql for multiple select statements. Need to use this if you
- * have more than one SqlSelect for a given bean.
+ * Mark and entity bean that is used solely via RawSql.
+ * <p>
+ * This means the entity bean has no base table specified (via @Table).
+ * </p>
  */
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Sql {
-
-  /**
-   * The sql select statements.
-   */
-  SqlSelect[] select() default { @SqlSelect };
 
 }
