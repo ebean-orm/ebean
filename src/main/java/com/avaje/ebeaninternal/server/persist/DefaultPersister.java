@@ -565,10 +565,10 @@ public final class DefaultPersister implements Persister {
   /**
    * Delete by a List of Id's.
    */
-  public void deleteMany(Class<?> beanType, Collection<?> ids, Transaction transaction, boolean permanent) {
+  public int deleteMany(Class<?> beanType, Collection<?> ids, Transaction transaction, boolean permanent) {
 
     if (ids == null || ids.size() == 0) {
-      return;
+      return 0;
     }
 
     BeanDescriptor<?> descriptor = beanDescriptorManager.getBeanDescriptor(beanType);
@@ -580,7 +580,7 @@ public final class DefaultPersister implements Persister {
     }
 
     boolean softDelete = !permanent && descriptor.isSoftDelete();
-    delete(descriptor, null, idList, transaction, softDelete);
+    return delete(descriptor, null, idList, transaction, softDelete);
   }
 
   /**

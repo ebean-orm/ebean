@@ -1373,22 +1373,22 @@ public interface EbeanServer {
   /**
    * Delete several beans given their type and id values.
    */
-  void deleteAll(Class<?> beanType, Collection<?> ids);
+  int deleteAll(Class<?> beanType, Collection<?> ids);
 
   /**
    * Delete several beans given their type and id values with an explicit transaction.
    */
-  void deleteAll(Class<?> beanType, Collection<?> ids, Transaction transaction);
+  int deleteAll(Class<?> beanType, Collection<?> ids, Transaction transaction);
 
   /**
    * Delete permanent for several beans given their type and id values.
    */
-  void deleteAllPermanent(Class<?> beanType, Collection<?> ids);
+  int deleteAllPermanent(Class<?> beanType, Collection<?> ids);
 
   /**
    * Delete permanent for several beans given their type and id values with an explicit transaction.
    */
-  void deleteAllPermanent(Class<?> beanType, Collection<?> ids, Transaction transaction);
+  int deleteAllPermanent(Class<?> beanType, Collection<?> ids, Transaction transaction);
 
   /**
    * Execute a Sql Update Delete or Insert statement. This returns the number of

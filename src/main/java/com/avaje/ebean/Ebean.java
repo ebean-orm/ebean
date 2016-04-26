@@ -738,15 +738,15 @@ public final class Ebean {
   /**
    * Delete several beans given their type and id values.
    */
-  public static void deleteAll(Class<?> beanType, Collection<?> ids) {
-    serverMgr.getDefaultServer().deleteAll(beanType, ids);
+  public static int deleteAll(Class<?> beanType, Collection<?> ids) {
+    return serverMgr.getDefaultServer().deleteAll(beanType, ids);
   }
 
   /**
    * Delete permanent several beans given their type and id values.
    */
-  public static void deleteAllPermanent(Class<?> beanType, Collection<?> ids) {
-    serverMgr.getDefaultServer().deleteAllPermanent(beanType, ids);
+  public static int deleteAllPermanent(Class<?> beanType, Collection<?> ids) {
+    return serverMgr.getDefaultServer().deleteAllPermanent(beanType, ids);
   }
 
   /**

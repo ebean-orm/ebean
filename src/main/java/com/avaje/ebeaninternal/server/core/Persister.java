@@ -71,7 +71,7 @@ public interface Persister {
   /**
    * Delete multiple beans given a collection of Id values.
    */
-  void deleteMany(Class<?> beanType, Collection<?> ids, Transaction transaction, boolean permanent);
+  int deleteMany(Class<?> beanType, Collection<?> ids, Transaction transaction, boolean permanent);
 
   /**
    * Execute the Update.

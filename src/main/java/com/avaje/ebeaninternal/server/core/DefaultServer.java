@@ -1793,32 +1793,33 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void deleteAll(Class<?> beanType, Collection<?> ids) {
-    deleteAll(beanType, ids, null);
+  public int deleteAll(Class<?> beanType, Collection<?> ids) {
+    return deleteAll(beanType, ids, null);
   }
 
   @Override
-  public void deleteAll(Class<?> beanType, Collection<?> ids, Transaction t) {
-    deleteAll(beanType, ids, t, false);
+  public int deleteAll(Class<?> beanType, Collection<?> ids, Transaction t) {
+    return deleteAll(beanType, ids, t, false);
   }
 
   @Override
-  public void deleteAllPermanent(Class<?> beanType, Collection<?> ids) {
-    deleteAll(beanType, ids, null, true);
+  public int deleteAllPermanent(Class<?> beanType, Collection<?> ids) {
+    return deleteAll(beanType, ids, null, true);
   }
 
   @Override
-  public void deleteAllPermanent(Class<?> beanType, Collection<?> ids, Transaction t) {
-    deleteAll(beanType, ids, t, true);
+  public int deleteAllPermanent(Class<?> beanType, Collection<?> ids, Transaction t) {
+    return deleteAll(beanType, ids, t, true);
   }
 
-  private void deleteAll(Class<?> beanType, Collection<?> ids, Transaction t, boolean permanent) {
+  private int deleteAll(Class<?> beanType, Collection<?> ids, Transaction t, boolean permanent) {
 
     TransWrapper wrap = initTransIfRequired(t);
     try {
       SpiTransaction trans = wrap.transaction;
-      persister.deleteMany(beanType, ids, trans, permanent);
+      int count = persister.deleteMany(beanType, ids, trans, permanent);
       wrap.commitIfCreated();
+      return count;
 
     } catch (RuntimeException e) {
       wrap.rollbackIfCreated();

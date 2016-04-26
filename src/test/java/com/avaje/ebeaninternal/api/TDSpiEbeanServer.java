@@ -766,23 +766,23 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void deleteAll(Class<?> beanType, Collection<?> ids) {
-
+  public int deleteAll(Class<?> beanType, Collection<?> ids) {
+    return 0;
   }
 
   @Override
-  public void deleteAll(Class<?> beanType, Collection<?> ids, Transaction transaction) {
-
+  public int deleteAll(Class<?> beanType, Collection<?> ids, Transaction transaction) {
+    return 0;
   }
 
   @Override
-  public void deleteAllPermanent(Class<?> beanType, Collection<?> ids) {
-
+  public int deleteAllPermanent(Class<?> beanType, Collection<?> ids) {
+    return 0;
   }
 
   @Override
-  public void deleteAllPermanent(Class<?> beanType, Collection<?> ids, Transaction transaction) {
-
+  public int deleteAllPermanent(Class<?> beanType, Collection<?> ids, Transaction transaction) {
+    return 0;
   }
 
   @Override
