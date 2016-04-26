@@ -17,6 +17,7 @@ import com.avaje.ebean.text.json.JsonContext;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.query.CQuery;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -42,6 +43,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   @Override
   public void shutdownManaged() {
 
+  }
+
+  @Override
+  public DataTimeZone getDataTimeZone() {
+    return null;
   }
 
   @Override

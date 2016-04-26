@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebeaninternal.server.core.Message;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Calendar;
 
 public class RsetDataReader implements DataReader {
 
@@ -23,11 +25,14 @@ public class RsetDataReader implements DataReader {
 
   static final int stringInitialSize = 512;
 
+  private final DataTimeZone dataTimeZone;
+
   private final ResultSet rset;
 
   protected int pos;
 
-  public RsetDataReader(ResultSet rset) {
+  public RsetDataReader(DataTimeZone dataTimeZone, ResultSet rset) {
+    this.dataTimeZone = dataTimeZone;
     this.rset = rset;
   }
 
@@ -149,9 +154,13 @@ public class RsetDataReader implements DataReader {
     return rset.getTime(pos());
   }
 
-
   public Timestamp getTimestamp() throws SQLException {
-    return rset.getTimestamp(pos());
+    Calendar cal = dataTimeZone.getTimeZone();
+    if (cal != null) {
+      return rset.getTimestamp(pos(), cal);
+    } else {
+      return rset.getTimestamp(pos());
+    }
   }
 
   public String getStringFromStream() throws SQLException {

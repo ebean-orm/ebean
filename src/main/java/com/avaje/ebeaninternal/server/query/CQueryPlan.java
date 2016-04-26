@@ -9,11 +9,13 @@ import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.type.RsetDataReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -65,6 +67,8 @@ public class CQueryPlan {
 
   private final Class<?> beanType;
 
+  protected final DataTimeZone dataTimeZone;
+
   /**
    * Key used to identify the query plan in audit logging.
    */
@@ -76,6 +80,7 @@ public class CQueryPlan {
   public CQueryPlan(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, boolean rawSql, String logWhereSql) {
 
     this.server = request.getServer();
+    this.dataTimeZone = server.getDataTimeZone();
     this.beanType = request.getBeanDescriptor().getBeanType();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.planKey = request.getQueryPlanKey();
@@ -100,6 +105,7 @@ public class CQueryPlan {
                     boolean rawSql, boolean rowNumberIncluded, String logWhereSql) {
 
     this.server = request.getServer();
+    this.dataTimeZone = server.getDataTimeZone();
     this.beanType = request.getBeanDescriptor().getBeanType();
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.planKey = buildPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
@@ -127,17 +133,21 @@ public class CQueryPlan {
   }
 
   public DataReader createDataReader(ResultSet rset) {
-
-    return new RsetDataReader(rset);
+    return new RsetDataReader(dataTimeZone, rset);
   }
 
-  public void bindEncryptedProperties(DataBind dataBind) throws SQLException {
+  /**
+   * Bind keys for encrypted properties if necessary returning the DataBind.
+   */
+  public DataBind bindEncryptedProperties(PreparedStatement stmt) throws SQLException {
+    DataBind dataBind = new DataBind(dataTimeZone, stmt);
     if (encryptedProps != null) {
       for (int i = 0; i < encryptedProps.length; i++) {
         String key = encryptedProps[i].getEncryptKey().getStringValue();
         dataBind.setString(key);
       }
     }
+    return dataBind;
   }
 
   public boolean isAutoTuned() {

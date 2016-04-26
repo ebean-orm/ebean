@@ -1,13 +1,15 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
+
 import java.sql.ResultSet;
 
 public class RsetDataReaderIndexed extends RsetDataReader {
 
   private final int[] rsetIndexPositions;
 
-  public RsetDataReaderIndexed(ResultSet rset, int[] rsetIndexPositions, boolean rowNumberIncluded) {
-    super(rset);
+  public RsetDataReaderIndexed(DataTimeZone dataTimeZone, ResultSet rset, int[] rsetIndexPositions, boolean rowNumberIncluded) {
+    super(dataTimeZone, rset);
     if (!rowNumberIncluded) {
       this.rsetIndexPositions = rsetIndexPositions;
     } else {

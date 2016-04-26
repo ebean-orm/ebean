@@ -1,5 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
@@ -9,8 +11,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Calendar;
 
 public class DataBind {
+
+  private final DataTimeZone dataTimeZone;
 
   private final PreparedStatement pstmt;
 
@@ -18,7 +23,8 @@ public class DataBind {
 
   private int pos;
 
-  public DataBind(PreparedStatement pstmt) {
+  public DataBind(DataTimeZone dataTimeZone, PreparedStatement pstmt) {
+    this.dataTimeZone = dataTimeZone;
     this.pstmt = pstmt;
   }
 
@@ -108,7 +114,12 @@ public class DataBind {
   }
 
   public void setTimestamp(Timestamp v) throws SQLException {
-    pstmt.setTimestamp(++pos, v);
+    Calendar timeZone = dataTimeZone.getTimeZone();
+    if (timeZone != null) {
+      pstmt.setTimestamp(++pos, v, timeZone);
+    } else {
+      pstmt.setTimestamp(++pos, v);
+    }
   }
 
   public void setTime(Time v) throws SQLException {

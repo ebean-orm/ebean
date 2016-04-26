@@ -22,6 +22,9 @@ import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogListener;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogPrepare;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogRegister;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
+import com.avaje.ebeaninternal.server.core.timezone.CloneDataTimeZone;
+import com.avaje.ebeaninternal.server.core.timezone.NoDataTimeZone;
+import com.avaje.ebeaninternal.server.core.timezone.SimpleDataTimeZone;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.DeployOrmXml;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
@@ -29,6 +32,7 @@ import com.avaje.ebeaninternal.server.deploy.parse.DeployCreateProperties;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployInherit;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployUtil;
 import com.avaje.ebeaninternal.server.expression.DefaultExpressionFactory;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import org.avaje.datasource.DataSourcePool;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.persist.DefaultPersister;
@@ -78,6 +82,8 @@ public class InternalConfiguration {
   private final DeployOrmXml deployOrmXml;
 
   private final TypeManager typeManager;
+
+  private final DataTimeZone dataTimeZone;
 
   private final Binder binder;
 
@@ -136,7 +142,8 @@ public class InternalConfiguration {
 
     DatabasePlatform databasePlatform = serverConfig.getDatabasePlatform();
 
-    this.binder = getBinder(typeManager, databasePlatform);
+    this.dataTimeZone = initDataTimeZone();
+    this.binder = getBinder(typeManager, databasePlatform, dataTimeZone);
     this.cQueryEngine = new CQueryEngine(databasePlatform, binder, asOfTableMapping, serverConfig.getAsOfSysPeriod(), draftTableMap);
   }
 
@@ -218,15 +225,15 @@ public class InternalConfiguration {
   /**
    * For 'As Of' queries return the number of bind variables per predicate.
    */
-  private Binder getBinder(TypeManager typeManager, DatabasePlatform databasePlatform) {
+  private Binder getBinder(TypeManager typeManager, DatabasePlatform databasePlatform, DataTimeZone dataTimeZone) {
 
     JsonExpressionHandler jsonHandler = getJsonExpressionHandler(databasePlatform);
 
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     if (historySupport == null) {
-      return new Binder(typeManager, 0, false, jsonHandler);
+      return new Binder(typeManager, 0, false, jsonHandler, dataTimeZone);
     }
-    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isBindWithFromClause(), jsonHandler);
+    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isBindWithFromClause(), jsonHandler, dataTimeZone);
   }
 
   /**
@@ -380,5 +387,25 @@ public class InternalConfiguration {
     } else {
       return new DefaultTransactionScopeManager(transactionManager);
     }
+  }
+
+  /**
+   * Create the DataTimeZone implementation to use.
+   */
+  private DataTimeZone initDataTimeZone() {
+
+    String tz = serverConfig.getDataTimeZone();
+    if (tz == null) {
+      return new NoDataTimeZone();
+    }
+    if (getDatabasePlatform().getName().toLowerCase().startsWith("oracle")) {
+      return new CloneDataTimeZone(tz);
+    } else {
+      return new SimpleDataTimeZone(tz);
+    }
+  }
+
+  public DataTimeZone getDataTimeZone() {
+    return dataTimeZone;
   }
 }

@@ -4,7 +4,6 @@ import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiCallableSql;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequestCallableSql;
-import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +95,7 @@ public class ExeCallableSql {
 
     String bindLog = null;
     if (!bindParams.isEmpty()) {
-      bindLog = binder.bind(bindParams, new DataBind(cstmt));
+      bindLog = binder.bind(bindParams, cstmt);
     }
 
     request.setBindLog(bindLog);

@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.core;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiTransaction;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,35 +13,35 @@ import org.slf4j.LoggerFactory;
 public abstract class BeanRequest {
 
   private static final Logger log = LoggerFactory.getLogger(BeanRequest.class);
-  
-	/**
-	 * The server processing the request.
-	 */
-	protected final SpiEbeanServer ebeanServer;
 
-	/**
-	 * The transaction this is part of.
-	 */
-	protected SpiTransaction transaction;
+  /**
+   * The server processing the request.
+   */
+  protected final SpiEbeanServer ebeanServer;
 
-	protected boolean createdTransaction;
+  /**
+   * The transaction this is part of.
+   */
+  protected SpiTransaction transaction;
 
-	public BeanRequest(SpiEbeanServer ebeanServer, SpiTransaction t) {
-		this.ebeanServer = ebeanServer;
-		this.transaction = t;
-	}
+  protected boolean createdTransaction;
 
-	/**
-	 * A helper method for creating an implicit transaction is it is required.
-	 * <p>
-	 * A transaction may have been passed in or active in the thread local. If
-	 * not then create one implicitly to handle the request.
-	 * </p>
+  public BeanRequest(SpiEbeanServer ebeanServer, SpiTransaction t) {
+    this.ebeanServer = ebeanServer;
+    this.transaction = t;
+  }
+
+  /**
+   * A helper method for creating an implicit transaction is it is required.
+   * <p>
+   * A transaction may have been passed in or active in the thread local. If
+   * not then create one implicitly to handle the request.
+   * </p>
    *
    * @return True if a transaction was set (from current or created).
-	 */
-	public boolean createImplicitTransIfRequired() {
-		if (transaction != null) {
+   */
+  public boolean createImplicitTransIfRequired() {
+    if (transaction != null) {
       return false;
     }
     transaction = ebeanServer.getCurrentServerTransaction();
@@ -50,7 +51,7 @@ public abstract class BeanRequest {
       createdTransaction = true;
     }
     return true;
-	}
+  }
 
   /**
    * Commit this transaction if it was created for this request.
@@ -61,40 +62,40 @@ public abstract class BeanRequest {
     }
   }
 
-	/**
-	 * Rollback the transaction if it was created for this request.
-	 */
-	public void rollbackTransIfRequired() {
-		if (createdTransaction) {
-		  try {
-		    transaction.rollback();
-		  } catch (Exception e) {
-		    // Just log this and carry on. A previous exception has been
-		    // thrown and if this rollback throws exception it likely means
-		    // that the connection is broken (and the datasource and db will cleanup)
-		    log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
-		  }
-		}
-	}
+  /**
+   * Rollback the transaction if it was created for this request.
+   */
+  public void rollbackTransIfRequired() {
+    if (createdTransaction) {
+      try {
+        transaction.rollback();
+      } catch (Exception e) {
+        // Just log this and carry on. A previous exception has been
+        // thrown and if this rollback throws exception it likely means
+        // that the connection is broken (and the datasource and db will cleanup)
+        log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
+      }
+    }
+  }
 
-	/**
-	 * Return the server processing the request. Made available for
-	 * BeanController and BeanFinder.
-	 */
-	public EbeanServer getEbeanServer() {
-		return ebeanServer;
-	}
+  /**
+   * Return the server processing the request. Made available for
+   * BeanController and BeanFinder.
+   */
+  public EbeanServer getEbeanServer() {
+    return ebeanServer;
+  }
 
   public SpiEbeanServer getServer() {
     return ebeanServer;
   }
 
-	/**
-	 * Return the Transaction associated with this request.
-	 */
-	public SpiTransaction getTransaction() {
-		return transaction;
-	}
+  /**
+   * Return the Transaction associated with this request.
+   */
+  public SpiTransaction getTransaction() {
+    return transaction;
+  }
 
   /**
    * Return true if SQL should be logged for this transaction.
@@ -108,5 +109,12 @@ public abstract class BeanRequest {
    */
   public boolean isLogSummary() {
     return transaction.isLogSummary();
+  }
+
+  /**
+   * Return the DataTimeZone to use.
+   */
+  public DataTimeZone getDataTimeZone() {
+    return ebeanServer.getDataTimeZone();
   }
 }

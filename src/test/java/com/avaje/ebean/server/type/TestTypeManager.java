@@ -89,7 +89,7 @@ public class TestTypeManager extends BaseTestCase {
     String val;
 
     public DummyDataReader(String val) {
-      super(null);
+      super(null, null);
       this.val = val;
     }
 

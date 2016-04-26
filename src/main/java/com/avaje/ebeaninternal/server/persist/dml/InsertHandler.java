@@ -9,7 +9,6 @@ import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.persist.DmlUtil;
-import com.avaje.ebeaninternal.server.type.DataBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,9 +97,7 @@ public class InsertHandler extends DmlHandler {
     } else {
       pstmt = getPstmt(t, sql, useGeneratedKeys);
     }
-    dataBind = new DataBind(pstmt);
-
-    // bind the bean property values
+    dataBind = bind(pstmt);
     meta.bind(this, bean, withId, persistRequest.isPublish());
 
     logSql(sql);

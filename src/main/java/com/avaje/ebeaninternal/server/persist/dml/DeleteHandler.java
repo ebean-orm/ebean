@@ -1,14 +1,12 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import javax.persistence.OptimisticLockException;
-
 import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
-import com.avaje.ebeaninternal.server.type.DataBind;
+
+import javax.persistence.OptimisticLockException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * Delete bean handler.
@@ -37,7 +35,7 @@ public class DeleteHandler extends DmlHandler {
 		} else {
 			pstmt = getPstmt(t, sql, false);
 		}
-		dataBind = new DataBind(pstmt);
+		dataBind = bind(pstmt);
 		meta.bind(persistRequest, this);
 		logSql(sql);
 	}

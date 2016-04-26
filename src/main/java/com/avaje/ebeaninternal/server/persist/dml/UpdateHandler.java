@@ -4,7 +4,6 @@ import com.avaje.ebeaninternal.api.DerivedRelationshipData;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
-import com.avaje.ebeaninternal.server.type.DataBind;
 
 import javax.persistence.OptimisticLockException;
 import java.sql.PreparedStatement;
@@ -47,8 +46,7 @@ public class UpdateHandler extends DmlHandler {
     } else {
       pstmt = getPstmt(t, sql, false);
     }
-    dataBind = new DataBind(pstmt);
-
+    dataBind = bind(pstmt);
     meta.bind(persistRequest, this, updatePlan);
 
     setUpdateGenValues();

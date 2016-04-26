@@ -75,6 +75,13 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   }
 
   /**
+   * Bind to the statement returning the DataBind.
+   */
+  protected DataBind bind(PreparedStatement stmt) {
+    return new DataBind(persistRequest.getDataTimeZone(), stmt);
+  }
+
+  /**
    * Get the sql and bind the statement.
    */
   @Override

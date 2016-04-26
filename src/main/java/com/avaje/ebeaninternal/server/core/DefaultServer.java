@@ -64,6 +64,7 @@ import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 import com.avaje.ebeaninternal.server.transaction.TransactionScopeManager;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.util.ParamTypeHelper;
 import com.avaje.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import com.avaje.ebeanservice.docstore.api.DocStoreIntegration;
@@ -107,6 +108,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final TransactionManager transactionManager;
 
   private final TransactionScopeManager transactionScopeManager;
+
+  private final DataTimeZone dataTimeZone;
 
   private final CallStackFactory callStackFactory = new DefaultCallStackFactory();
 
@@ -228,6 +231,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     this.beanLoader = new DefaultBeanLoader(this);
     this.jsonContext = config.createJsonContext(this);
+    this.dataTimeZone = config.getDataTimeZone();
 
     DocStoreIntegration docStoreComponents = config.createDocStoreIntegration(this);
     this.transactionManager = config.createTransactionManager(docStoreComponents.updateProcessor());
@@ -284,7 +288,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public DatabasePlatform getDatabasePlatform() {
     return databasePlatform;
   }
-  
+
+  @Override
+  public DataTimeZone getDataTimeZone() {
+    return dataTimeZone;
+  }
+
   @Override
   public MetaInfoManager getMetaInfoManager() {
     return metaInfoManager;

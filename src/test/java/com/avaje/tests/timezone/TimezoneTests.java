@@ -13,17 +13,14 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+/**
+ * Must run this manually with various JVM timezones for insert and fetch.
+ */
 public class TimezoneTests {
 
-  private final long now = 1460000000000L;
-
-  private final Timestamp nowTs = new Timestamp(now);
-
-  private final Calendar utcCalendar;
+  private final Timestamp nowTs = new Timestamp(1460000000000L);
 
   public TimezoneTests() {
-    utcCalendar = Calendar.getInstance();
-    utcCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
 
   @Ignore
@@ -34,12 +31,12 @@ public class TimezoneTests {
 //    insert("UTC");
 //    insert("America/Los_Angeles");
 
-    System.out.println("Local");
-    fetch();
+//    System.out.println("Local");
+//    fetch();
 
-    System.out.println("UTC");
-    setZone("UTC");
-    fetch();
+//    System.out.println("UTC");
+//    setZone("UTC");
+//    fetch();
 
     System.out.println("LA");
     setZone("America/Los_Angeles");
@@ -49,14 +46,15 @@ public class TimezoneTests {
   private void fetch() throws SQLException {
     Transaction transaction = Ebean.beginTransaction();
     Connection connection = transaction.getConnection();
+
     PreparedStatement statement = connection.prepareStatement("select * from tztest");
     ResultSet resultSet = statement.executeQuery();
     while (resultSet.next()) {
       System.out.println(" zone:"+resultSet.getString("zone"));
       System.out.println("   ts:"+tsof(resultSet.getTimestamp("ts")));
       System.out.println(" tstz:"+tsof(resultSet.getTimestamp("tstz")));
-      System.out.println("  ts1:"+tsof(resultSet.getTimestamp("ts1", utcCal())));
-      System.out.println("tstz1:"+tsof(resultSet.getTimestamp("tstz1", utcCal())));
+      System.out.println("  ts1:"+tsof(resultSet.getTimestamp("ts1", cal())));
+      System.out.println("tstz1:"+tsof(resultSet.getTimestamp("tstz1", cal())));
     }
     System.out.println("");
     resultSet.close();
@@ -65,7 +63,7 @@ public class TimezoneTests {
   }
 
   private String tsof(Timestamp timestamp) {
-    return ""+timestamp.getTime()+","+timestamp.toString();
+    return ""+timestamp.getTime()+", "+timestamp.toString()+", "+timestamp.toInstant();
   }
 
   private void setZone(String zone) {
@@ -86,14 +84,17 @@ public class TimezoneTests {
     statement.setString(1, zone);
     statement.setTimestamp(2, nowTs);
     statement.setTimestamp(3, nowTs);
-    statement.setTimestamp(4, nowTs, utcCal());
-    statement.setTimestamp(5, nowTs, utcCal());
+    statement.setTimestamp(4, nowTs, cal());
+    statement.setTimestamp(5, nowTs, cal());
     statement.executeUpdate();
 
     transaction.commit();
   }
 
-  private Calendar utcCal() {
-    return (Calendar) utcCalendar.clone();
+  private Calendar cal() {
+
+    Calendar instance = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    //Calendar instance = Calendar.getInstance(TimeZone.getDefault());
+    return (Calendar) instance.clone();
   }
 }

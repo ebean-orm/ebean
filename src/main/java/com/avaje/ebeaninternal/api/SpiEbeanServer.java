@@ -16,6 +16,7 @@ import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.query.CQuery;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 
 import java.util.List;
 
@@ -187,4 +188,9 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * user context information (user id, user ip address etc).
    */
   ReadAuditPrepare getReadAuditPrepare();
+
+  /**
+   * Return the DataTimeZone to use when reading/writing timestamps via JDBC.
+   */
+  DataTimeZone getDataTimeZone();
 }

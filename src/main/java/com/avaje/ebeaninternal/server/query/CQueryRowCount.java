@@ -116,8 +116,7 @@ public class CQueryRowCount {
         pstmt.setQueryTimeout(query.getTimeout());
       }
 
-      bindLog = predicates.bind(new DataBind(pstmt));
-
+      bindLog = predicates.bind(pstmt);
       rset = pstmt.executeQuery();
 
       if (!rset.next()) {

@@ -224,6 +224,11 @@ public class ServerConfig {
 
   private boolean eagerFetchLobs;
 
+  /**
+   * Timezone used to get/set Timestamp values via JDBC.
+   */
+  private String dataTimeZone;
+
   private boolean ddlGenerate;
 
   private boolean ddlRun;
@@ -839,6 +844,23 @@ public class ServerConfig {
    */
   public void setMigrationConfig(DbMigrationConfig migrationConfig) {
     this.migrationConfig = migrationConfig;
+  }
+
+  /**
+   * Return the time zone to use when reading/writing Timestamps via JDBC.
+   * <p>
+   * When set a Calendar object is used in JDBC calls when reading/writing Timestamp objects.
+   * </p>
+   */
+  public String getDataTimeZone() {
+    return System.getProperty("ebean.dataTimeZone", dataTimeZone);
+  }
+
+  /**
+   * Set the time zone to use when reading/writing Timestamps via JDBC.
+   */
+  public void setDataTimeZone(String dataTimeZone) {
+    this.dataTimeZone = dataTimeZone;
   }
 
   /**
@@ -2369,6 +2391,7 @@ public class ServerConfig {
     changeLogIncludeInserts = p.getBoolean("changeLogIncludeInserts", changeLogIncludeInserts);
     expressionEqualsWithNullAsNoop = p.getBoolean("expressionEqualsWithNullAsNoop", expressionEqualsWithNullAsNoop);
 
+    dataTimeZone = p.get("dataTimeZone", dataTimeZone);
     asOfViewSuffix = p.get("asOfViewSuffix", asOfViewSuffix);
     asOfSysPeriod = p.get("asOfSysPeriod", asOfSysPeriod);
     historyTableSuffix = p.get("historyTableSuffix", historyTableSuffix);

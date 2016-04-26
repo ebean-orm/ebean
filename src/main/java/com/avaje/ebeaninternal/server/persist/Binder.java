@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.persist;
 
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.server.core.JsonExpressionHandler;
 import com.avaje.ebeaninternal.server.core.Message;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.TypeManager;
@@ -34,14 +36,19 @@ public class Binder {
 
   private final JsonExpressionHandler jsonExpressionHandler;
 
+  private final DataTimeZone dataTimeZone;
+
   /**
    * Set the PreparedStatement with which to bind variables to.
    */
-  public Binder(TypeManager typeManager, int asOfBindCount, boolean bindAsOfWithFromClause, JsonExpressionHandler jsonExpressionHandler) {
+  public Binder(TypeManager typeManager, int asOfBindCount, boolean bindAsOfWithFromClause,
+                JsonExpressionHandler jsonExpressionHandler, DataTimeZone dataTimeZone) {
+
     this.typeManager = typeManager;
     this.asOfBindCount = asOfBindCount;
     this.bindAsOfWithFromClause = bindAsOfWithFromClause;
     this.jsonExpressionHandler = jsonExpressionHandler;
+    this.dataTimeZone = dataTimeZone;
   }
 
   /**
@@ -89,6 +96,13 @@ public class Binder {
         }
       }
     }
+  }
+
+  /**
+   * Bind the parameters to the preparedStatement returning the bind log.
+   */
+  public String bind(BindParams bindParams, PreparedStatement statement) throws SQLException {
+    return bind(bindParams, new DataBind(dataTimeZone, statement));
   }
 
   /**
@@ -391,5 +405,12 @@ public class Binder {
    */
   public JsonExpressionHandler getJsonExpressionHandler() {
     return jsonExpressionHandler;
+  }
+
+  /**
+   * Create and return a DataBind for the statement.
+   */
+  public DataBind dataBind(PreparedStatement stmt) {
+    return new DataBind(dataTimeZone, stmt);
   }
 }

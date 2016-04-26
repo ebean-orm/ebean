@@ -81,7 +81,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
         }
 
         if (!bindParams.isEmpty()) {
-          bindLog = binder.bind(bindParams, new DataBind(pstmt));
+          bindLog = binder.bind(bindParams, pstmt);
         }
 
         if (request.isLogSql()) {

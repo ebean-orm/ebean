@@ -12,7 +12,6 @@ import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
-import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.DataReader;
 import com.avaje.ebeaninternal.server.type.RsetDataReader;
 import org.slf4j.Logger;
@@ -144,10 +143,10 @@ public class CQueryFetchIds {
         pstmt.setQueryTimeout(query.getTimeout());
       }
 
-      bindLog = predicates.bind(new DataBind(pstmt));
+      bindLog = predicates.bind(pstmt);
 
       ResultSet rset = pstmt.executeQuery();
-      dataReader = new RsetDataReader(rset);
+      dataReader = new RsetDataReader(request.getDataTimeZone(), rset);
 
       boolean hitMaxRows = false;
       boolean hasMoreRows = false;

@@ -24,9 +24,9 @@ public class CQueryPlanRawSql extends CQueryPlan {
     this.rsetIndexPositions = createIndexPositions(request, sqlTree);
   }
 
+  @Override
   public DataReader createDataReader(ResultSet rset) {
-
-    return new RsetDataReaderIndexed(rset, rsetIndexPositions, isRowNumberIncluded());
+    return new RsetDataReaderIndexed(dataTimeZone, rset, rsetIndexPositions, isRowNumberIncluded());
   }
 
   private int[] createIndexPositions(OrmQueryRequest<?> request, SqlTree sqlTree) {
