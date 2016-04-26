@@ -3,7 +3,6 @@ package com.avaje.tests.model.basic;
 import com.avaje.ebean.annotation.ChangeLog;
 import com.avaje.ebean.annotation.DocEmbedded;
 import com.avaje.ebean.annotation.DocStore;
-import com.avaje.ebean.annotation.DocStoreEmbedded;
 import com.avaje.ebean.annotation.Formula;
 import com.avaje.ebean.annotation.WhenCreated;
 import com.avaje.ebean.annotation.Where;
@@ -102,7 +101,7 @@ public class Order implements Serializable {
   @Where(clause = "${ta}.id > 0")
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
   @OrderBy("id asc, orderQty asc, cretime desc")
-  @DocStoreEmbedded
+  @DocEmbedded
   List<OrderDetail> details;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
