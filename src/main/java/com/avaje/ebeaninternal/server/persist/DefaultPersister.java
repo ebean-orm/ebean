@@ -559,14 +559,13 @@ public final class DefaultPersister implements Persister {
   private void deleteList(List<?> beanList, Transaction t, boolean softDelete) {
     for (int i = 0; i < beanList.size(); i++) {
       deleteRecurse((EntityBean) beanList.get(i), t, softDelete);
-      //delete((EntityBean) beanList.get(i), t);
     }
   }
 
   /**
    * Delete by a List of Id's.
    */
-  public void deleteMany(Class<?> beanType, Collection<?> ids, Transaction transaction) {
+  public void deleteMany(Class<?> beanType, Collection<?> ids, Transaction transaction, boolean permanent) {
 
     if (ids == null || ids.size() == 0) {
       return;
@@ -580,19 +579,18 @@ public final class DefaultPersister implements Persister {
       idList.add(descriptor.convertId(id));
     }
 
-    delete(descriptor, null, idList, transaction, descriptor.isSoftDelete());
+    boolean softDelete = !permanent && descriptor.isSoftDelete();
+    delete(descriptor, null, idList, transaction, softDelete);
   }
 
   /**
    * Delete by Id.
    */
-  public int delete(Class<?> beanType, Object id, Transaction transaction) {
-
+  public int delete(Class<?> beanType, Object id, Transaction transaction, boolean permanent) {
     BeanDescriptor<?> descriptor = beanDescriptorManager.getBeanDescriptor(beanType);
-
-    // convert to appropriate type if required
     id = descriptor.convertId(id);
-    return delete(descriptor, id, null, transaction, descriptor.isSoftDelete());
+    boolean softDelete = !permanent && descriptor.isSoftDelete();
+    return delete(descriptor, id, null, transaction, softDelete);
   }
 
   /**

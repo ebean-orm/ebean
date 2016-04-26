@@ -576,6 +576,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public int deletePermanent(Class<?> beanType, Object id) {
+    return 0;
+  }
+
+  @Override
+  public int deletePermanent(Class<?> beanType, Object id, Transaction transaction) {
+    return 0;
+  }
+
+  @Override
   public int execute(SqlUpdate updSql) {
     return 0;
   }
@@ -762,6 +772,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void deleteAll(Class<?> beanType, Collection<?> ids, Transaction transaction) {
+
+  }
+
+  @Override
+  public void deleteAllPermanent(Class<?> beanType, Collection<?> ids) {
+
+  }
+
+  @Override
+  public void deleteAllPermanent(Class<?> beanType, Collection<?> ids, Transaction transaction) {
 
   }
 

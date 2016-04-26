@@ -25,6 +25,13 @@ public class Cover extends Model {
 
   protected String s3Url;
 
+  public Cover() {
+  }
+
+  public Cover(String s3Url) {
+    this.s3Url = s3Url;
+  }
+
   public String getS3Url() {
     return this.s3Url;
   }

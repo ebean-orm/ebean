@@ -61,7 +61,7 @@ public interface Persister {
    * This will also cascade delete one level of children.
    * </p>
    */
-  int delete(Class<?> beanType, Object id, Transaction transaction);
+  int delete(Class<?> beanType, Object id, Transaction transaction, boolean permanent);
 
   /**
    * Delete the bean.
@@ -71,7 +71,7 @@ public interface Persister {
   /**
    * Delete multiple beans given a collection of Id values.
    */
-  void deleteMany(Class<?> beanType, Collection<?> ids, Transaction transaction);
+  void deleteMany(Class<?> beanType, Collection<?> ids, Transaction transaction, boolean permanent);
 
   /**
    * Execute the Update.

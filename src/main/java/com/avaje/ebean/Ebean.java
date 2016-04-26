@@ -729,10 +729,24 @@ public final class Ebean {
   }
 
   /**
+   * Delete permanent the bean given its type and id.
+   */
+  public static int deletePermanent(Class<?> beanType, Object id) {
+    return serverMgr.getDefaultServer().deletePermanent(beanType, id);
+  }
+
+  /**
    * Delete several beans given their type and id values.
    */
   public static void deleteAll(Class<?> beanType, Collection<?> ids) {
     serverMgr.getDefaultServer().deleteAll(beanType, ids);
+  }
+
+  /**
+   * Delete permanent several beans given their type and id values.
+   */
+  public static void deleteAllPermanent(Class<?> beanType, Collection<?> ids) {
+    serverMgr.getDefaultServer().deleteAllPermanent(beanType, ids);
   }
 
   /**

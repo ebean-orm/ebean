@@ -1,6 +1,5 @@
 package com.avaje.ebean;
 
-import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.meta.MetaInfoManager;
@@ -1352,6 +1351,16 @@ public interface EbeanServer {
   int delete(Class<?> beanType, Object id, Transaction transaction);
 
   /**
+   * Delete permanent given the bean type and id.
+   */
+  int deletePermanent(Class<?> beanType, Object id);
+
+  /**
+   * Delete permanent given the bean type and id with an explicit transaction.
+   */
+  int deletePermanent(Class<?> beanType, Object id, Transaction transaction);
+
+  /**
    * Delete all the beans in the collection.
    */
   int deleteAll(Collection<?> beans) throws OptimisticLockException;
@@ -1367,10 +1376,19 @@ public interface EbeanServer {
   void deleteAll(Class<?> beanType, Collection<?> ids);
 
   /**
-   * Delete several beans given their type and id values with an explicit
-   * transaction.
+   * Delete several beans given their type and id values with an explicit transaction.
    */
   void deleteAll(Class<?> beanType, Collection<?> ids, Transaction transaction);
+
+  /**
+   * Delete permanent for several beans given their type and id values.
+   */
+  void deleteAllPermanent(Class<?> beanType, Collection<?> ids);
+
+  /**
+   * Delete permanent for several beans given their type and id values with an explicit transaction.
+   */
+  void deleteAllPermanent(Class<?> beanType, Collection<?> ids, Transaction transaction);
 
   /**
    * Execute a Sql Update Delete or Insert statement. This returns the number of

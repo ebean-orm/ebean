@@ -1765,11 +1765,23 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   public int delete(Class<?> beanType, Object id, Transaction t) {
+    return delete(beanType, id, t, false);
+  }
+
+  public int deletePermanent(Class<?> beanType, Object id) {
+    return delete(beanType, id, null, true);
+  }
+
+  public int deletePermanent(Class<?> beanType, Object id, Transaction t) {
+    return delete(beanType, id, t, true);
+  }
+
+  private int delete(Class<?> beanType, Object id, Transaction t, boolean permanent) {
 
     TransWrapper wrap = initTransIfRequired(t);
     try {
       SpiTransaction trans = wrap.transaction;
-      int rowCount = persister.delete(beanType, id, trans);
+      int rowCount = persister.delete(beanType, id, trans, permanent);
       wrap.commitIfCreated();
 
       return rowCount;
@@ -1787,11 +1799,25 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void deleteAll(Class<?> beanType, Collection<?> ids, Transaction t) {
+    deleteAll(beanType, ids, t, false);
+  }
+
+  @Override
+  public void deleteAllPermanent(Class<?> beanType, Collection<?> ids) {
+    deleteAll(beanType, ids, null, true);
+  }
+
+  @Override
+  public void deleteAllPermanent(Class<?> beanType, Collection<?> ids, Transaction t) {
+    deleteAll(beanType, ids, t, true);
+  }
+
+  private void deleteAll(Class<?> beanType, Collection<?> ids, Transaction t, boolean permanent) {
 
     TransWrapper wrap = initTransIfRequired(t);
     try {
       SpiTransaction trans = wrap.transaction;
-      persister.deleteMany(beanType, ids, trans);
+      persister.deleteMany(beanType, ids, trans, permanent);
       wrap.commitIfCreated();
 
     } catch (RuntimeException e) {

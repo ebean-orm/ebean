@@ -12,10 +12,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class EbeanServer_deleteByIdTest {
 
   @Test
-  public void deleteAllById() {
+  public void deleteById() {
 
     EBasicVer someBean = bean("foo1");
-
     Ebean.save(someBean);
 
     // act
@@ -28,7 +27,23 @@ public class EbeanServer_deleteByIdTest {
   }
 
   @Test
-  public void deleteAllById_withTransaction() {
+  public void deletePermanentById() {
+
+    EBasicVer someBean = bean("foo1");
+    Ebean.save(someBean);
+
+    // act
+    LoggedSqlCollector.start();
+    Ebean.deletePermanent(EBasicVer.class, someBean.getId());
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(1);
+    assertThat(loggedSql.get(0)).contains("delete from e_basicver where id = ?");
+  }
+
+
+  @Test
+  public void deleteById_withTransaction() {
 
     EBasicVer someBean = bean("foo1");
     Ebean.save(someBean);
@@ -39,6 +54,27 @@ public class EbeanServer_deleteByIdTest {
     Transaction txn = server.beginTransaction();
     try {
       server.delete(EBasicVer.class, someBean.getId(), txn);
+      txn.commit();
+    } finally {
+      txn.end();
+    }
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(1);
+    assertThat(loggedSql.get(0)).contains("delete from e_basicver where id = ?");
+  }
+
+  @Test
+  public void deletePermanentById_withTransaction() {
+
+    EBasicVer someBean = bean("foo2");
+    Ebean.save(someBean);
+
+    EbeanServer server = Ebean.getDefaultServer();
+    // act
+    LoggedSqlCollector.start();
+    Transaction txn = server.beginTransaction();
+    try {
+      server.deletePermanent(EBasicVer.class, someBean.getId(), txn);
       txn.commit();
     } finally {
       txn.end();

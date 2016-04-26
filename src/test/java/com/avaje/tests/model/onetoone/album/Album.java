@@ -17,6 +17,13 @@ public class Album extends BaseModel {
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private Cover cover;
 
+  public Album(String name) {
+    this.name = name;
+  }
+
+  public Album() {
+  }
+
   public String getName() {
     return this.name;
   }

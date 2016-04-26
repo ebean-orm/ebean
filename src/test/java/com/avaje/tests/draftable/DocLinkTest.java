@@ -82,7 +82,6 @@ public class DocLinkTest extends BaseTestCase {
     Ebean.delete(link1);
   }
 
-
   @Test
   public void testDeletePermanent_whenPublished2() {
 

@@ -30,7 +30,6 @@ public class EbeanServer_deleteAllByIdTest {
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).contains("delete from e_basicver where id  in (?,?,?)");
-
   }
 
   @Test
@@ -50,6 +49,53 @@ public class EbeanServer_deleteAllByIdTest {
     Transaction txn = server.beginTransaction();
     try {
       server.deleteAll(EBasicVer.class, ids, txn);
+      txn.commit();
+    } finally {
+      txn.end();
+    }
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(1);
+    assertThat(loggedSql.get(0)).contains("delete from e_basicver where id  in (?,?,?)");
+  }
+
+  @Test
+  public void deleteAllPermanentById() {
+
+    List<EBasicVer> someBeans = beans(3);
+
+    Ebean.saveAll(someBeans);
+    List<Integer> ids = new ArrayList<Integer>();
+    for (EBasicVer someBean : someBeans) {
+      ids.add(someBean.getId());
+    }
+
+    LoggedSqlCollector.start();
+
+    Ebean.deleteAllPermanent(EBasicVer.class, ids);
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(1);
+    assertThat(loggedSql.get(0)).contains("delete from e_basicver where id  in (?,?,?)");
+  }
+
+
+  @Test
+  public void deleteAllPermanentById_withTransaction() {
+
+    List<EBasicVer> someBeans = beans(3);
+
+    Ebean.saveAll(someBeans);
+    List<Integer> ids = new ArrayList<Integer>();
+    for (EBasicVer someBean : someBeans) {
+      ids.add(someBean.getId());
+    }
+
+    EbeanServer server = Ebean.getDefaultServer();
+    // act
+    LoggedSqlCollector.start();
+    Transaction txn = server.beginTransaction();
+    try {
+      server.deleteAllPermanent(EBasicVer.class, ids, txn);
       txn.commit();
     } finally {
       txn.end();
