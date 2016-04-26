@@ -8,9 +8,6 @@ import java.lang.annotation.Target;
 /**
  * Specify explicit sql for multiple select statements. Need to use this if you
  * have more than one SqlSelect for a given bean.
- * <p>
- * FUTURE: Support explicit sql for SqlInsert, SqlUpdate and SqlDelete.
- * </p>
  */
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
