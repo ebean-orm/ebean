@@ -14,6 +14,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Properties;
 
 /**
  * Database platform specific settings.
@@ -173,6 +174,10 @@ public class DatabasePlatform {
    * Instantiates a new database platform.
    */
   public DatabasePlatform() {
+  }
+
+  public void configure(Properties properties) {
+    // by default do nothing
   }
 
   /**

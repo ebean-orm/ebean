@@ -241,6 +241,7 @@ public class DefaultContainer implements SpiContainer {
     if (dbPlatform == null) {
       DatabasePlatformFactory factory = new DatabasePlatformFactory();
       DatabasePlatform db = factory.create(config);
+      db.configure(config.getProperties());
       config.setDatabasePlatform(db);
       logger.info("DatabasePlatform name:" + config.getName() + " platform:" + db.getName());
     }

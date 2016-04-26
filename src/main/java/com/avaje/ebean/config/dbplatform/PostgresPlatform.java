@@ -7,6 +7,7 @@ import com.avaje.ebean.dbmigration.ddlgeneration.platform.PostgresDdl;
 
 import javax.sql.DataSource;
 import java.sql.Types;
+import java.util.Properties;
 
 /**
  * Postgres v9 specific platform.
@@ -50,6 +51,7 @@ public class PostgresPlatform extends DatabasePlatform {
     dbTypeMap.put(Types.DOUBLE, new DbType("float"));
     dbTypeMap.put(Types.TINYINT, new DbType("smallint"));
     dbTypeMap.put(Types.DECIMAL, new DbType("decimal", 38));
+    dbTypeMap.put(Types.TIMESTAMP, new DbType("timestamptz"));
 
     dbTypeMap.put(Types.BINARY, dbBytea);
     dbTypeMap.put(Types.VARBINARY, dbBytea);
@@ -58,7 +60,16 @@ public class PostgresPlatform extends DatabasePlatform {
     dbTypeMap.put(Types.CLOB, dbTypeText);
     dbTypeMap.put(Types.LONGVARBINARY, dbBytea);
     dbTypeMap.put(Types.LONGVARCHAR, dbTypeText);
+  }
 
+  @Override
+  public void configure(Properties properties) {
+    super.configure(properties);
+    String tsType = properties.getProperty("ebean.postgres.timestamp");
+    if (tsType != null) {
+      // set timestamp type to "timestamp" without time zone
+      dbTypeMap.put(Types.TIMESTAMP, new DbType(tsType));
+    }
   }
 
   /**
