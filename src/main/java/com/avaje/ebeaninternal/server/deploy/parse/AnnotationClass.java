@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
 import com.avaje.ebean.annotation.CacheStrategy;
-import com.avaje.ebean.annotation.CacheTuning;
+import com.avaje.ebean.annotation.CacheBeanTuning;
 import com.avaje.ebean.annotation.DbComment;
 import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.Draftable;
@@ -203,21 +203,21 @@ public class AnnotationClass extends AnnotationParser {
     }
 
     CacheStrategy cacheStrategy = cls.getAnnotation(CacheStrategy.class);
-    CacheTuning cacheTuning = cls.getAnnotation(CacheTuning.class);
-    if (cacheStrategy != null || cacheTuning != null) {
-      readCacheStrategy(cacheStrategy, cacheTuning);
+    CacheBeanTuning cacheBeanTuning = cls.getAnnotation(CacheBeanTuning.class);
+    if (cacheStrategy != null || cacheBeanTuning != null) {
+      readCacheStrategy(cacheStrategy, cacheBeanTuning);
     }
   }
 
-  private void readCacheStrategy(CacheStrategy cacheStrategy, CacheTuning cacheTuning) {
+  private void readCacheStrategy(CacheStrategy cacheStrategy, CacheBeanTuning cacheBeanTuning) {
 
     if (disableL2Cache) {
       return;
     }
     CacheOptions cacheOptions = descriptor.getCacheOptions();
-    if (cacheTuning != null) {
-      cacheOptions.setMaxSecsToLive(cacheTuning.maxSecsToLive());
-      cacheOptions.setMaxIdleSecs(cacheTuning.maxIdleSecs()); 
+    if (cacheBeanTuning != null) {
+      cacheOptions.setMaxSecsToLive(cacheBeanTuning.maxSecsToLive());
+      cacheOptions.setMaxIdleSecs(cacheBeanTuning.maxIdleSecs());
     }
     if (cacheStrategy != null) {
       cacheOptions.setUseCache(cacheStrategy.useBeanCache());

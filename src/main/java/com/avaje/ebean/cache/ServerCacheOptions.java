@@ -1,7 +1,7 @@
 package com.avaje.ebean.cache;
 
 import com.avaje.ebean.annotation.CacheQueryTuning;
-import com.avaje.ebean.annotation.CacheTuning;
+import com.avaje.ebean.annotation.CacheBeanTuning;
 
 /**
  * Options for controlling a cache.
@@ -23,11 +23,11 @@ public class ServerCacheOptions {
   /**
    * Create from the cacheTuning deployment annotation.
    */
-  public ServerCacheOptions(CacheTuning cacheTuning) {
-    this.maxSize = cacheTuning.maxSize();
-    this.maxIdleSecs = cacheTuning.maxIdleSecs();
-    this.maxSecsToLive = cacheTuning.maxSecsToLive();
-    this.trimFrequency = cacheTuning.trimFrequency();
+  public ServerCacheOptions(CacheBeanTuning tuning) {
+    this.maxSize = tuning.maxSize();
+    this.maxIdleSecs = tuning.maxIdleSecs();
+    this.maxSecsToLive = tuning.maxSecsToLive();
+    this.trimFrequency = tuning.trimFrequency();
   }
 
   /**

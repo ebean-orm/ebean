@@ -6,14 +6,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specify cache tuning for a specific entity type.
+ * Cache tuning hints for the L2 bean cache of a specific entity type.
  * <p>
- * If this is not specified then the system default settings are used.
+ * Note that this is not useful when distributed L2 bean caches are used like
+ * ElasticSearch, Hazelcast, Ignite etc.
  * </p>
  */
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CacheTuning {
+public @interface CacheBeanTuning {
 
   /**
    * The maximum size for the cache.

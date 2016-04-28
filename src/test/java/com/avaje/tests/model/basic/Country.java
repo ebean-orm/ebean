@@ -1,7 +1,7 @@
 package com.avaje.tests.model.basic;
 
 import com.avaje.ebean.annotation.CacheStrategy;
-import com.avaje.ebean.annotation.CacheTuning;
+import com.avaje.ebean.annotation.CacheBeanTuning;
 import com.avaje.ebean.annotation.ChangeLog;
 import com.avaje.ebean.annotation.ChangeLogInsertMode;
 import com.avaje.ebean.annotation.DocStore;
@@ -19,7 +19,7 @@ import javax.validation.constraints.Size;
 @ReadAudit
 @ChangeLog(inserts = ChangeLogInsertMode.INCLUDE)
 @CacheStrategy(readOnly = true)
-@CacheTuning(maxSize = 500)
+@CacheBeanTuning(maxSize = 500)
 @Entity
 @Table(name = "o_country")
 public class Country {

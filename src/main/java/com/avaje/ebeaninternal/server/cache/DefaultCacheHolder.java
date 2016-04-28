@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.server.cache;
 
 import com.avaje.ebean.annotation.CacheQueryTuning;
-import com.avaje.ebean.annotation.CacheTuning;
+import com.avaje.ebean.annotation.CacheBeanTuning;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheOptions;
@@ -109,9 +109,9 @@ public class DefaultCacheHolder {
   }
 
   private ServerCacheOptions getBeanOptions(Class<?> cls) {
-    CacheTuning cacheTuning = cls.getAnnotation(CacheTuning.class);
-    if (cacheTuning != null) {
-      ServerCacheOptions o = new ServerCacheOptions(cacheTuning);
+    CacheBeanTuning tuning = cls.getAnnotation(CacheBeanTuning.class);
+    if (tuning != null) {
+      ServerCacheOptions o = new ServerCacheOptions(tuning);
       o.applyDefaults(defaultOptions);
       return o;
     }

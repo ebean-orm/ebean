@@ -1,7 +1,7 @@
 package com.avaje.tests.model.basic;
 
 import com.avaje.ebean.annotation.CacheStrategy;
-import com.avaje.ebean.annotation.CacheTuning;
+import com.avaje.ebean.annotation.CacheBeanTuning;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -11,7 +11,7 @@ import java.util.List;
 
 
 @CacheStrategy
-@CacheTuning(maxSecsToLive = 45)
+@CacheBeanTuning(maxSecsToLive = 45)
 @Entity
 public class Article extends BasicDomain {
 
