@@ -80,19 +80,6 @@ public interface SqlQuery extends Serializable {
   SqlRow findUnique();
 
   /**
-   * Execute find list SQL query in a background thread.
-   * <p>
-   * This returns a Future object which can be used to cancel, check the
-   * execution status (isDone etc) and get the value (with or without a
-   * timeout).
-   * </p>
-   * 
-   * @return a Future object for the list result of the query
-   * @deprecated
-   */
-  SqlFutureList findFutureList();
-
-  /**
    * The same as bind for named parameters.
    */
   SqlQuery setParameter(String name, Object value);

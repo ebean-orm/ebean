@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.querydefn;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
-import com.avaje.ebean.SqlFutureList;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
@@ -75,10 +74,6 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
 
   public SqlRow findUnique() {
     return server.findUnique(this, null);
-  }
-
-  public SqlFutureList findFutureList() {
-    return server.findFutureList(this, null);
   }
 
   public DefaultRelationalQuery setParameter(int position, Object value) {

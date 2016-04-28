@@ -1014,22 +1014,6 @@ public interface EbeanServer {
   <T> FutureList<T> findFutureList(Query<T> query, Transaction transaction);
 
   /**
-   * Execute find list SQL query in a background thread.
-   * <p>
-   * This returns a Future object which can be used to cancel, check the
-   * execution status (isDone etc) and get the value (with or without a
-   * timeout).
-   * </p>
-   *
-   * @param query
-   *          the query to execute in the background
-   * @param transaction
-   *          the transaction (can be null).
-   * @return a Future object for the list result of the query
-   */
-  SqlFutureList findFutureList(SqlQuery query, Transaction transaction);
-
-  /**
    * Return a PagedList for this query using pageIndex and pageSize.
    * <p>
    * The benefit of using this over just using the normal {@link Query#setFirstRow(int)} and

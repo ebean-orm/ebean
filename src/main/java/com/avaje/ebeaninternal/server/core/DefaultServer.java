@@ -32,10 +32,10 @@ import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuery.Type;
-import com.avaje.ebeaninternal.api.SpiSqlQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.server.autotune.AutoTuneService;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
@@ -50,12 +50,10 @@ import com.avaje.ebeaninternal.server.query.CQueryEngine;
 import com.avaje.ebeaninternal.server.query.CallableQueryIds;
 import com.avaje.ebeaninternal.server.query.CallableQueryList;
 import com.avaje.ebeaninternal.server.query.CallableQueryRowCount;
-import com.avaje.ebeaninternal.server.query.CallableSqlQueryList;
 import com.avaje.ebeaninternal.server.query.LimitOffsetPagedList;
 import com.avaje.ebeaninternal.server.query.QueryFutureIds;
 import com.avaje.ebeaninternal.server.query.QueryFutureList;
 import com.avaje.ebeaninternal.server.query.QueryFutureRowCount;
-import com.avaje.ebeaninternal.server.query.SqlQueryFutureList;
 import com.avaje.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import com.avaje.ebeaninternal.server.querydefn.DefaultOrmUpdate;
 import com.avaje.ebeaninternal.server.querydefn.DefaultRelationalQuery;
@@ -64,7 +62,6 @@ import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import com.avaje.ebeaninternal.server.transaction.TransactionManager;
 import com.avaje.ebeaninternal.server.transaction.TransactionScopeManager;
-import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.util.ParamTypeHelper;
 import com.avaje.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import com.avaje.ebeanservice.docstore.api.DocStoreIntegration;
@@ -84,7 +81,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.FutureTask;
 
 /**
  * The default server side implementation of EbeanServer.
@@ -1387,21 +1383,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     // a query that is expected to return either 0 or 1 rows
     List<SqlRow> list = findList(query, t);
     return extractUnique(list);
-  }
-
-  public SqlFutureList findFutureList(SqlQuery query, Transaction t) {
-
-    SpiSqlQuery spiQuery = (SpiSqlQuery) query;
-    spiQuery.setFutureFetch(true);
-
-    Transaction newTxn = createTransaction();
-    CallableSqlQueryList call = new CallableSqlQueryList(this, query, newTxn);
-
-    FutureTask<List<SqlRow>> futureTask = new FutureTask<List<SqlRow>>(call);
-
-    backgroundExecutor.execute(futureTask);
-
-    return new SqlQueryFutureList(query, futureTask);
   }
 
   @Override
