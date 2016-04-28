@@ -2,11 +2,85 @@ package com.avaje.ebean.dbmigration.model;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
 public class MigrationVersionTest {
 
 
+  @Test
+  public void sort() {
+
+    List<MigrationVersion> list= new ArrayList<MigrationVersion>();
+    list.add(MigrationVersion.parse("1.1__point"));
+    list.add(MigrationVersion.parse("3.0__three"));
+    list.add(MigrationVersion.parse("1.0__init"));
+    list.add(MigrationVersion.parse("R__beta"));
+    list.add(MigrationVersion.parse("R__alpha"));
+
+    Collections.sort(list);
+
+    assertThat(list.get(0).getComment()).isEqualTo("init");
+    assertThat(list.get(1).getComment()).isEqualTo("point");
+    assertThat(list.get(2).getComment()).isEqualTo("three");
+    assertThat(list.get(3).getComment()).isEqualTo("alpha");
+    assertThat(list.get(4).getComment()).isEqualTo("beta");
+  }
+
+  @Test
+  public void test_parse_when_repeatable() throws Exception {
+
+    MigrationVersion version = MigrationVersion.parse("R__Foo");
+    assertThat(version.getComment()).isEqualTo("Foo");
+    assertThat(version.normalised()).isEqualTo("R");
+  }
+
+  @Test
+  public void test_parse_when_repeatable_case() throws Exception {
+
+    MigrationVersion version = MigrationVersion.parse("r__Foo");
+    assertThat(version.isRepeatable()).isTrue();
+    assertThat(version.getComment()).isEqualTo("Foo");
+    assertThat(version.normalised()).isEqualTo("R");
+    assertThat(version.normalised()).isEqualTo("R");
+  }
+
+  @Test
+  public void test_parse_when_v_prefix() throws Exception {
+
+    MigrationVersion version = MigrationVersion.parse("v1_0__Foo");
+    assertThat(version.isRepeatable()).isFalse();
+    assertThat(version.getComment()).isEqualTo("Foo");
+    assertThat(version.normalised()).isEqualTo("1.0");
+    assertThat(version.asString()).isEqualTo("1_0");
+    assertThat(version.getRaw()).isEqualTo("1_0__Foo");
+  }
+
+  @Test
+  public void repeatable_compareTo() throws Exception {
+
+    MigrationVersion foo = MigrationVersion.parse("R__Foo");
+    MigrationVersion bar = MigrationVersion.parse("R__Bar");
+    assertThat(foo.compareTo(bar)).isGreaterThan(0);
+    assertThat(bar.compareTo(foo)).isLessThan(0);
+
+    MigrationVersion bar2 = MigrationVersion.parse("R__Bar");
+    assertThat(bar.compareTo(bar2)).isEqualTo(0);
+  }
+
+  @Test
+  public void repeatable_compareTo_when_caseDifferent() throws Exception {
+
+    MigrationVersion none = MigrationVersion.parse("R__");
+    MigrationVersion bar = MigrationVersion.parse("R__Bar");
+    MigrationVersion bar2 = MigrationVersion.parse("R__bar");
+    assertThat(none.compareTo(bar)).isLessThan(0);
+    assertThat(bar.compareTo(bar2)).isLessThan(0);
+    assertThat(none.compareTo(bar2)).isLessThan(0);
+  }
 
   @Test
   public void test_parse_getComment() throws Exception {
@@ -51,10 +125,14 @@ public class MigrationVersionTest {
     MigrationVersion v0 = MigrationVersion.parse("1.1.1_2__Foo");
     MigrationVersion v1 = MigrationVersion.parse("1.1.1.2_junk");
     MigrationVersion v2 = MigrationVersion.parse("1.1_1.2_foo");
+    MigrationVersion v3 = MigrationVersion.parse("1.1_1.2__foo");
 
-    assertThat(v0.compareTo(v1)).isEqualTo(0);
-    assertThat(v1.compareTo(v0)).isEqualTo(0);
+    assertThat(v0.compareTo(v1)).isGreaterThan(0);
+    assertThat(v1.compareTo(v0)).isLessThan(0);
     assertThat(v1.compareTo(v2)).isEqualTo(0);
+
+    assertThat(v0.compareTo(v3)).isLessThan(0);
+    assertThat(v3.compareTo(v0)).isGreaterThan(0);
   }
 
   @Test

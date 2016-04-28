@@ -133,7 +133,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   public enum EntityType {
-    ORM, EMBEDDED, SQL
+    ORM, EMBEDDED, VIEW, SQL
   }
 
   /**
@@ -178,6 +178,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   private final ConcurrencyMode concurrencyMode;
 
   private final CompoundUniqueConstraint[] compoundUniqueConstraints;
+
+  private final String[] dependentTables;
 
   /**
    * The base database table.
@@ -446,6 +448,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.baseTable = InternString.intern(deploy.getBaseTable());
     this.baseTableAsOf = deploy.getBaseTableAsOf();
     this.baseTableVersionsBetween = deploy.getBaseTableVersionsBetween();
+    this.dependentTables = deploy.getDependentTables();
     this.dbComment = deploy.getDbComment();
     this.autoTunable = EntityType.ORM.equals(entityType) && (beanFinder == null);
 
@@ -1055,6 +1058,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public boolean isBeanCaching() {
     return cacheHelp.isBeanCaching();
+  }
+
+  /**
+   * Return true if there is query caching for this type of bean.
+   */
+  public boolean isQueryCaching() {
+    return cacheHelp.isQueryCaching();
   }
 
   public boolean isManyPropCaching() {
@@ -2326,11 +2336,28 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Return the dependent tables for a view based entity.
+   * <p>
+   * These tables
+   * </p>
+   */
+  public String[] getDependentTables() {
+    return dependentTables;
+  }
+
+  /**
    * Return the base table. Only properties mapped to the base table are by
    * default persisted.
    */
   public String getBaseTable() {
     return baseTable;
+  }
+
+  /**
+   * Return true if this type is a base table entity type.
+   */
+  public boolean isBaseTable() {
+    return baseTable != null && entityType == EntityType.ORM;
   }
 
   /**

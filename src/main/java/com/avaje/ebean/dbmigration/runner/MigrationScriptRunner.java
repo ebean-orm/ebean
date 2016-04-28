@@ -3,6 +3,7 @@ package com.avaje.ebean.dbmigration.runner;
 import com.avaje.ebean.dbmigration.DdlRunner;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Runs the DDL migration scripts.
@@ -21,7 +22,7 @@ public class MigrationScriptRunner {
   /**
    * Execute all the DDL statements in the script.
    */
-  public int runScript(boolean expectErrors, String content, String scriptName) {
+  int runScript(boolean expectErrors, String content, String scriptName) throws SQLException {
 
     DdlRunner runner = new DdlRunner(expectErrors, scriptName);
     return runner.runAll(content, connection);

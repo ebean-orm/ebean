@@ -19,6 +19,8 @@ public class BeanDescriptor_registerTest {
   @Test
   public void testRegisterDeregister() throws Exception {
 
+    System.setProperty("ebean.ignoreExtraDdl", "true");
+
     ServerConfig config = new ServerConfig();
 
     config.setName("h2other");

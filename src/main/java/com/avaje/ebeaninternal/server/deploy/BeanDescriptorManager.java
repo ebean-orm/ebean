@@ -124,7 +124,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final DocStoreFactory docStoreFactory;
 
   private int enhancedClassCount;
-  
+
   private final boolean updateChangesOnly;
 
   private final BootupClasses bootupClasses;
@@ -142,6 +142,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private final Map<String, BeanManager<?>> beanManagerMap = new HashMap<String, BeanManager<?>>();
 
   private final Map<String, List<BeanDescriptor<?>>> tableToDescMap = new HashMap<String, List<BeanDescriptor<?>>>();
+
+  private final Map<String, List<BeanDescriptor<?>>> tableToViewDescMap = new HashMap<String, List<BeanDescriptor<?>>>();
 
   private List<BeanDescriptor<?>> immutableDescriptorList;
 
@@ -174,12 +176,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Map of base tables to 'with history views' used to support 'as of' queries.
    */
-  private final Map<String,String> asOfTableMap = new HashMap<String, String>();
+  private final Map<String, String> asOfTableMap = new HashMap<String, String>();
 
   /**
    * Map of base tables to 'draft' tables.
    */
-  private final Map<String,String> draftTableMap = new HashMap<String, String>();
+  private final Map<String, String> draftTableMap = new HashMap<String, String>();
 
   /**
    * Create for a given database dbConfig.
@@ -235,7 +237,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     // with historySupport returns a simple view suffix or the sql2011 as of timestamp suffix
-    return (historySupport == null ) ? serverConfig.getAsOfViewSuffix() : historySupport.getAsOfViewSuffix(serverConfig.getAsOfViewSuffix());
+    return (historySupport == null) ? serverConfig.getAsOfViewSuffix() : historySupport.getAsOfViewSuffix(serverConfig.getAsOfViewSuffix());
   }
 
   /**
@@ -245,7 +247,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     // with historySupport returns a simple view suffix or the sql2011 versions between timestamp suffix
-    return (historySupport == null ) ? serverConfig.getAsOfViewSuffix() : historySupport.getVersionsBetweenSuffix(serverConfig.getAsOfViewSuffix());
+    return (historySupport == null) ? serverConfig.getAsOfViewSuffix() : historySupport.getVersionsBetweenSuffix(serverConfig.getAsOfViewSuffix());
   }
 
   @Override
@@ -300,14 +302,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   /**
    * Return the map of base tables to draft tables.
    */
-  public Map<String,String> getDraftTableMap() {
+  public Map<String, String> getDraftTableMap() {
     return draftTableMap;
   }
 
   /**
    * Deploy returning the asOfTableMap (which is required by the SQL builders).
    */
-  public Map<String,String> deploy() {
+  public Map<String, String> deploy() {
 
     try {
       createListeners();
@@ -356,10 +358,19 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   public void cacheNotify(TransactionEventTable.TableIUD tableIUD) {
 
-    List<BeanDescriptor<?>> list = getBeanDescriptors(tableIUD.getTableName());
-    if (list != null) {
-      for (int i = 0; i < list.size(); i++) {
-        list.get(i).cacheHandleBulkUpdate(tableIUD);
+    String tableName = tableIUD.getTableName().toLowerCase();
+    List<BeanDescriptor<?>> normalBeanTypes = tableToDescMap.get(tableName);
+    if (normalBeanTypes != null) {
+      // 'normal' entity beans based on a "base table"
+      for (int i = 0; i < normalBeanTypes.size(); i++) {
+        normalBeanTypes.get(i).cacheHandleBulkUpdate(tableIUD);
+      }
+    }
+    List<BeanDescriptor<?>> viewBeans = tableToViewDescMap.get(tableName);
+    if (viewBeans != null) {
+      // entity beans based on a "view"
+      for (int i = 0; i < viewBeans.size(); i++) {
+        viewBeans.get(i).cacheHandleBulkUpdate(tableIUD);
       }
     }
   }
@@ -379,6 +390,21 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   /**
+   * Invalidate entity beans based on views via their dependent tables.
+   */
+  public void processViewInvalidation(Set<String> viewInvalidation) {
+
+    for (String depTable : viewInvalidation) {
+      List<BeanDescriptor<?>> list = tableToViewDescMap.get(depTable.toLowerCase());
+      if (list == null) {
+        for (int i = 0; i < list.size(); i++) {
+          list.get(i).queryCacheClear();
+        }
+      }
+    }
+  }
+
+  /**
    * Build a map of table names to BeanDescriptors.
    * <p>
    * This is generally used to maintain caches from table names.
@@ -390,13 +416,28 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       String baseTable = desc.getBaseTable();
       if (baseTable != null) {
         baseTable = baseTable.toLowerCase();
-
         List<BeanDescriptor<?>> list = tableToDescMap.get(baseTable);
         if (list == null) {
           list = new ArrayList<BeanDescriptor<?>>(1);
           tableToDescMap.put(baseTable, list);
         }
         list.add(desc);
+      }
+      if (desc.getEntityType() == EntityType.VIEW && desc.isQueryCaching()) {
+        // build map of tables to view entities dependent on those tables
+        // for the purpose of invalidating appropriate query caches
+        String[] dependentTables = desc.getDependentTables();
+        if (dependentTables != null && dependentTables.length > 0) {
+          for (String depTable : dependentTables) {
+            depTable = depTable.toLowerCase();
+            List<BeanDescriptor<?>> list = tableToViewDescMap.get(depTable);
+            if (list == null) {
+              list = new ArrayList<BeanDescriptor<?>>(1);
+              tableToViewDescMap.put(depTable, list);
+            }
+            list.add(desc);
+          }
+        }
       }
     }
   }
@@ -488,6 +529,14 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   /**
+   * Return true if there are 'view based entities' using l2 query caching and so need
+   * to be invalidated based on changes to dependent tables.
+   */
+  public boolean requiresViewEntityCacheInvalidation() {
+    return !tableToViewDescMap.isEmpty();
+  }
+
+  /**
    * Return an immutable list of all the BeanDescriptors.
    */
   public List<BeanDescriptor<?>> getBeanDescriptorList() {
@@ -539,7 +588,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * Return the bean deploy info for the given class.
    */
   public <T> DeployBeanInfo<T> getDeploy(Class<T> cls) {
-    return  (DeployBeanInfo<T>) deplyInfoMap.get(cls);
+    return (DeployBeanInfo<T>) deplyInfoMap.get(cls);
   }
 
   private void registerBeanDescriptor(BeanDescriptor<?> desc) {
@@ -651,7 +700,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private void readEntityRelationships() {
 
     // We only perform 'circular' checks etc after we have
@@ -667,9 +716,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     // Set inheritance info
     for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
-        setInheritanceInfo(info);
+      setInheritanceInfo(info);
     }
-    
+
     for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
       registerBeanDescriptor(new BeanDescriptor(this, info.getDescriptor()));
     }
@@ -681,24 +730,24 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * @param info the new inheritance info
    */
   private void setInheritanceInfo(DeployBeanInfo<?> info) {
-    
-		for (DeployBeanPropertyAssocOne<?> oneProp : info.getDescriptor().propertiesAssocOne()) {
-			if (!oneProp.isTransient()) {
-				DeployBeanInfo<?> assoc = deplyInfoMap.get(oneProp.getTargetType());
-				if (assoc != null){
-					oneProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
-				}
-			}
-		}
-		
-		for (DeployBeanPropertyAssocMany<?> manyProp : info.getDescriptor().propertiesAssocMany()) {
-			if (!manyProp.isTransient()) {
-				DeployBeanInfo<?> assoc = deplyInfoMap.get(manyProp.getTargetType());
-				if (assoc != null){
-					manyProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
-				}
-			}
-		}
+
+    for (DeployBeanPropertyAssocOne<?> oneProp : info.getDescriptor().propertiesAssocOne()) {
+      if (!oneProp.isTransient()) {
+        DeployBeanInfo<?> assoc = deplyInfoMap.get(oneProp.getTargetType());
+        if (assoc != null) {
+          oneProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
+        }
+      }
+    }
+
+    for (DeployBeanPropertyAssocMany<?> manyProp : info.getDescriptor().propertiesAssocMany()) {
+      if (!manyProp.isTransient()) {
+        DeployBeanInfo<?> assoc = deplyInfoMap.get(manyProp.getTargetType());
+        if (assoc != null) {
+          manyProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
+        }
+      }
+    }
   }
 
   private void secondaryPropsJoins(DeployBeanInfo<?> info) {
@@ -845,7 +894,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * into the order_id column on the order_lines table).
    * </p>
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private void makeUnidirectional(DeployBeanInfo<?> info, DeployBeanPropertyAssocMany<?> oneToMany) {
 
     DeployBeanDescriptor<?> targetDesc = getTargetDescriptor(oneToMany);
@@ -1081,7 +1130,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     desc.setUpdateChangesOnly(updateChangesOnly);
 
     beanLifecycleAdapterFactory.addLifecycleMethods(desc);
-    
+
     // set bean controller, finder and listener
     setBeanControllerFinderListener(desc);
     deplyInherit.process(desc);
@@ -1103,8 +1152,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     readXml(desc);
 
-    if (!EntityType.ORM.equals(desc.getEntityType())) {
-      // not using base table
+    if (EntityType.SQL == desc.getEntityType()) {
       desc.setBaseTable(null, null, null);
     }
 
@@ -1373,7 +1421,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     Class<?> beanType = desc.getBeanType();
 
     BeanPropertiesReader reflectProps = new BeanPropertiesReader(beanType);
-    
+
     BeanPropertyInfo beanReflect = reflectFactory.create(beanType);
     desc.setProperties(reflectProps.getProperties());
 
@@ -1384,7 +1432,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         if (isPersistentField(prop)) {
           throw new IllegalStateException("Property " + propName + " not found in " + reflectProps + " for type " + beanType);
         }
-        
+
       } else {
         final int propertyIndex = pos;
         prop.setPropertyIndex(propertyIndex);
@@ -1459,7 +1507,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     Class<?> beanClass = desc.getBeanType();
 
     if (!hasEntityBeanInterface(beanClass)) {
-      throw new IllegalStateException("Bean "+beanClass+" is not enhanced?");
+      throw new IllegalStateException("Bean " + beanClass + " is not enhanced?");
     }
 
     // the bean already implements EntityBean
@@ -1475,7 +1523,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * enhanced or all dynamically subclassed).
    */
   private void checkInheritedClasses(Class<?> beanClass) {
-    
+
     Class<?> superclass = beanClass.getSuperclass();
     if (Object.class.equals(superclass)) {
       // we got to the top of the inheritance
@@ -1490,9 +1538,9 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
         // ok to stop and treat just the same as Object.class
         return;
       }
-      throw new IllegalStateException("Super type "+superclass+" is not enhanced?");
+      throw new IllegalStateException("Super type " + superclass + " is not enhanced?");
     }
-    
+
     // recursively continue up the inheritance hierarchy
     checkInheritedClasses(superclass);
   }
@@ -1502,7 +1550,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * If so it is ok for it not to be enhanced.
    */
   private boolean isMappedSuperWithNoProperties(Class<?> beanClass) {
-    
+
     MappedSuperclass annotation = beanClass.getAnnotation(MappedSuperclass.class);
     if (annotation == null) {
       return false;

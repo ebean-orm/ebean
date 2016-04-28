@@ -1,9 +1,10 @@
 package com.avaje.ebean.dbmigration;
 
+import com.avaje.ebean.Transaction;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.model.CurrentModel;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.util.JdbcClose;
+import com.avaje.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 
 import javax.persistence.PersistenceException;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.Reader;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Controls the generation and execution of "Create All" and "Drop All" DDL scripts.
@@ -89,12 +91,19 @@ public class DdlGenerator {
   public int runScript(boolean expectErrors, String content, String scriptName) {
 
     DdlRunner runner = new DdlRunner(expectErrors, scriptName);
-    // get a connection without threadLocal
-    Connection connection = server.createTransaction().getConnection();
+
+    Transaction transaction = server.createTransaction();
+    Connection connection = transaction.getConnection();
     try {
-      return runner.runAll(content, connection);
+      int count = runner.runAll(content, connection);
+      transaction.commit();
+      return count;
+
+    } catch (SQLException e) {
+      throw new PersistenceException("Failed to run script", e);
+
     } finally {
-      JdbcClose.close(connection);
+      transaction.end();
     }
   }
 
@@ -112,6 +121,14 @@ public class DdlGenerator {
       createAllContent = readFile(getCreateFileName());
     }
     runScript(false, createAllContent, getCreateFileName());
+
+    String ignoreExtraDdl = System.getProperty("ebean.ignoreExtraDdl");
+    if (!"true".equalsIgnoreCase(ignoreExtraDdl)) {
+      String extraApply = ExtraDdlXmlReader.buildExtra(server.getDatabasePlatform().getName());
+      if (extraApply != null) {
+        runScript(false, extraApply, "extra-dll");
+      }
+    }
   }
 
   protected void runInitSql() throws IOException {

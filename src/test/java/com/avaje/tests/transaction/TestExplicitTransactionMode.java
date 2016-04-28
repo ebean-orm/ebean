@@ -39,6 +39,8 @@ public class TestExplicitTransactionMode extends BaseTestCase {
     assertTrue(connection.getAutoCommit());
     connection.close();
 
+    System.setProperty("ebean.ignoreExtraDdl", "true");
+
     ServerConfig config = new ServerConfig();
     config.setName("h2autocommit");
     config.loadFromProperties();

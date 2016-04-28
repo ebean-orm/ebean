@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,7 +30,7 @@ public class MigrationTable {
 
   private static final Logger logger = MigrationRunner.logger;
 
-  private final  Connection connection;
+  private final Connection connection;
 
   private final EbeanServer server;
 
@@ -41,11 +42,15 @@ public class MigrationTable {
   private final ServerConfig serverConfig;
   private final String envUserName;
 
+  private final Timestamp runTime = new Timestamp(System.currentTimeMillis());
+
   private final ScriptTransform scriptTransform;
 
   private final String insertSql;
 
-  private final LinkedHashMap<String,MigrationMetaRow> migrations;
+  private final String updateSql;
+
+  private final LinkedHashMap<String, MigrationMetaRow> migrations;
 
   private MigrationMetaRow lastMigration;
 
@@ -65,6 +70,7 @@ public class MigrationTable {
     this.schema = null;
     this.table = migrationConfig.getMetaTable();
     this.insertSql = MigrationMetaRow.insertSql(table);
+    this.updateSql = MigrationMetaRow.updateSql(table);
 
     this.scriptTransform = createScriptTransform(migrationConfig);
     this.envUserName = System.getProperty("user.name");
@@ -96,16 +102,17 @@ public class MigrationTable {
     }
 
     ExternalJdbcTransaction t = new ExternalJdbcTransaction(connection);
-    SqlQuery sqlQuery = server.createSqlQuery("select * from "+table+" order by id for update");
+    SqlQuery sqlQuery = server.createSqlQuery("select * from " + table + " order by id for update");
     List<SqlRow> metaRows = server.findList(sqlQuery, t);
 
     for (SqlRow row : metaRows) {
-      addMigration(new MigrationMetaRow(row));
+      MigrationMetaRow metaRow = new MigrationMetaRow(row);
+      addMigration(metaRow.getVersion(), metaRow);
     }
   }
 
 
-  private void createTable(Connection connection) throws IOException {
+  private void createTable(Connection connection) throws IOException, SQLException {
 
     String script = ScriptTransform.table(table, getCreateTableScript());
 
@@ -146,82 +153,101 @@ public class MigrationTable {
   /**
    * Return true if the migration ran successfully and false if the migration failed.
    */
-  public boolean shouldRun(LocalMigrationResource localVersion, LocalMigrationResource priorVersion) {
+  public boolean shouldRun(LocalMigrationResource localVersion, LocalMigrationResource priorVersion) throws SQLException {
 
-    if (priorVersion != null) {
-      // check priorVersion is installed
-      MigrationMetaRow existing = migrations.get(priorVersion.getVersion().normalised());
-      if (existing == null) {
-        logger.warn("Migration {} requires prior migration {} which has not been run", localVersion.getVersion(), priorVersion.getVersion());
+    if (priorVersion != null && !localVersion.isRepeatable()) {
+      if (!migrationExists(priorVersion)) {
+        logger.error("Migration {} requires prior migration {} which has not been run", localVersion.getVersion(), priorVersion.getVersion());
         return false;
       }
     }
 
-    MigrationMetaRow existing = migrations.get(localVersion.getVersion().normalised());
-    if (existing == null) {
-      runMigration(localVersion, priorVersion);
-      return true;
-
-    } else {
-      // check checksum and return ok, or re-run if repeatable script?
-      existing.getChecksum();
-      return true;
-    }
+    MigrationMetaRow existing = migrations.get(localVersion.key());
+    return runMigration(localVersion, existing);
   }
 
   /**
    * Run the migration script.
+   *
+   * @param local    The local migration resource
+   * @param existing The information for this migration existing in the table
+   *
+   * @return True if the migrations should continue
    */
-  private void runMigration(LocalMigrationResource localVersion, LocalMigrationResource prior) {
+  private boolean runMigration(LocalMigrationResource local, MigrationMetaRow existing) throws SQLException {
 
-    logger.debug("run migration "+localVersion.getLocation());
+    String script = convertScript(local.getContent());
+    int checksum = Checksum.calculate(script);
 
-    String script = convertScript(localVersion.getContent());
+    if (existing != null) {
+
+      boolean matchChecksum = (existing.getChecksum() == checksum);
+
+      if (!local.isRepeatable()) {
+        if (!matchChecksum) {
+          logger.error("Checksum mismatch on migration {}", local.getLocation());
+        }
+        return true;
+
+      } else if (matchChecksum) {
+        logger.trace("... skip unchanged repeatable migration {}", local.getLocation());
+        return true;
+      }
+    }
+
+    runMigration(local, existing, script, checksum);
+    return true;
+  }
+
+  /**
+   * Run a migration script as new migration or update on existing repeatable migration.
+   */
+  private void runMigration(LocalMigrationResource local, MigrationMetaRow existing, String script, int checksum) throws SQLException {
+
+    logger.debug("run migration {}", local.getLocation());
 
     MigrationScriptRunner run = new MigrationScriptRunner(connection);
-    run.runScript(false, script, "run migration version: "+localVersion.getVersion());
+    run.runScript(false, script, "run migration version: " + local.getVersion());
 
+    if (existing != null) {
+      // update existing migration row
+      SqlUpdate update = server.createSqlUpdate(updateSql);
+      existing.bindUpdate(checksum, envUserName, runTime, update);
+      server.execute(update, new ExternalJdbcTransaction(connection));
 
-    int checksum = Checksum.calculate(script);
-    MigrationMetaRow metaRow = createMetaRow(localVersion, prior, checksum);
+    } else {
+      // insert new migration row
+      SqlUpdate insert = server.createSqlUpdate(insertSql);
+      MigrationMetaRow metaRow = createMetaRow(local, checksum);
+      metaRow.bindInsert(insert);
+      server.execute(insert, new ExternalJdbcTransaction(connection));
 
-    SqlUpdate insert = server.createSqlUpdate(insertSql);
-    metaRow.bindInsert(insert);
-    server.execute(insert, new ExternalJdbcTransaction(connection));
-
-    addMigration(metaRow);
+      addMigration(local.key(), metaRow);
+    }
   }
 
   /**
    * Create the MigrationMetaRow for this migration.
    */
-  private MigrationMetaRow createMetaRow(LocalMigrationResource localVersion, LocalMigrationResource prior, int checksum) {
+  private MigrationMetaRow createMetaRow(LocalMigrationResource migration, int checksum) {
 
     int nextId = 1;
     if (lastMigration != null) {
       nextId = lastMigration.getId() + 1;
     }
 
-    String runVersion = localVersion.getVersion().normalised();
-    String comment = getMigrationComment(localVersion);
-    String priorVersion = getMigrationPriorVersion(prior);
+    String type = migration.getType();
+    String runVersion = migration.key();
+    String comment = migration.getComment();
 
-    return new MigrationMetaRow(nextId, runVersion, priorVersion, comment, checksum, envUserName);
+    return new MigrationMetaRow(nextId, type, runVersion, comment, checksum, envUserName, runTime);
   }
 
   /**
-   * Return the prior migration normalised version.
+   * Return true if the migration exists.
    */
-  private String getMigrationPriorVersion(LocalMigrationResource prior) {
-    return prior != null ? prior.getVersion().normalised() : "-";
-  }
-
-  /**
-   * Return the migration comment.
-   */
-  private String getMigrationComment(LocalMigrationResource localVersion) {
-    String comment = localVersion.getVersion().getComment();
-    return comment == null || comment.isEmpty() ? "-" : comment;
+  private boolean migrationExists(LocalMigrationResource priorVersion) {
+    return migrations.containsKey(priorVersion.key());
   }
 
   /**
@@ -234,12 +260,11 @@ public class MigrationTable {
   /**
    * Register the successfully executed migration (to allow dependant scripts to run).
    */
-  private void addMigration(MigrationMetaRow metaRow) {
+  private void addMigration(String key, MigrationMetaRow metaRow) {
     lastMigration = metaRow;
-    String runVersion = metaRow.getRunVersion();
-    if (runVersion == null) {
+    if (metaRow.getVersion() == null) {
       throw new IllegalStateException("No runVersion in db migration table row? " + metaRow);
     }
-    migrations.put(runVersion, metaRow);
+    migrations.put(key, metaRow);
   }
 }

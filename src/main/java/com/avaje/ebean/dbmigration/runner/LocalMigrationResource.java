@@ -8,6 +8,16 @@ import org.avaje.classpath.scanner.Resource;
  */
 public class LocalMigrationResource implements Comparable<LocalMigrationResource> {
 
+  /**
+   * Code for repeatable migrations.
+   */
+  private static final String REPEAT_TYPE = "R";
+
+  /**
+   * Code for version migrations.
+   */
+  private static final String VERSION_TYPE = "V";
+
   private final MigrationVersion version;
 
   private final String location;
@@ -25,6 +35,32 @@ public class LocalMigrationResource implements Comparable<LocalMigrationResource
 
   public String toString() {
     return version.toString();
+  }
+
+  /**
+   * Return true if the underlying version is "repeatable".
+   */
+  public boolean isRepeatable() {
+    return version.isRepeatable();
+  }
+
+  /**
+   * Return the "key" that identifies the migration.
+   */
+  public String key() {
+    if (isRepeatable()) {
+      return version.getComment().toLowerCase();
+    } else {
+      return version.normalised();
+    }
+  }
+
+  /**
+   * Return the migration comment.
+   */
+  public String getComment() {
+    String comment = version.getComment();
+    return (comment == null || comment.isEmpty()) ? "-" : comment;
   }
 
   /**
@@ -54,5 +90,12 @@ public class LocalMigrationResource implements Comparable<LocalMigrationResource
    */
   public String getContent() {
     return resource.loadAsString("UTF-8");
+  }
+
+  /**
+   * Return the type code ("R" or "V") for this migration.
+   */
+  public String getType() {
+    return isRepeatable() ? REPEAT_TYPE : VERSION_TYPE;
   }
 }

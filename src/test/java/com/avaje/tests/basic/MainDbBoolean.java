@@ -37,6 +37,8 @@ public class MainDbBoolean {
 	 */
 	private EbeanServer createOracleEbeanServer() {
 
+		System.setProperty("ebean.ignoreExtraDdl", "true");
+
 		ServerConfig c = new ServerConfig();
 		c.setName("ora");
 
@@ -70,6 +72,8 @@ public class MainDbBoolean {
 	}
 	
 	private EbeanServer createEbeanServer() {
+
+		System.setProperty("ebean.ignoreExtraDdl", "true");
 
 		ServerConfig c = new ServerConfig();
 		c.setName("pgtest");

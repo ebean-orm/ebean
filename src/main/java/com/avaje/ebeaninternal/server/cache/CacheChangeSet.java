@@ -22,9 +22,25 @@ public class CacheChangeSet {
   private final Map<ManyKey, ManyChange> manyChangeMap = new HashMap<ManyKey, ManyChange>();
 
   /**
-   * Apply all the changes to the L2 cache.
+   * Set of "base tables" modified used to invalidate entities based on views.
    */
-  public void apply() {
+  private final Set<String> viewInvalidation = new HashSet<String>();
+
+  private final boolean viewEntityInvalidation;
+
+  /**
+   * Construct specifying if we also need to process invalidation for entities based on views.
+   */
+  public CacheChangeSet(boolean viewEntityInvalidation) {
+    this.viewEntityInvalidation = viewEntityInvalidation;
+  }
+
+  /**
+   * Apply the changes to the L2 cache except entity/view invalidation.
+   *
+   * Return the set of table changes to process invalidation for entities based on views.
+   */
+  public Set<String> apply() {
     for (BeanDescriptor entry : queryCaches) {
       entry.queryCacheClear();
     }
@@ -34,6 +50,7 @@ public class CacheChangeSet {
     for (CacheChange entry : manyChangeMap.values()) {
       entry.apply();
     }
+    return viewInvalidation;
   }
 
   /**
@@ -65,10 +82,22 @@ public class CacheChangeSet {
   }
 
   /**
+   * On bean insert register table for view based entity invalidation.
+   */
+  public void addBeanInsert(String baseTable) {
+    if (viewEntityInvalidation) {
+      viewInvalidation.add(baseTable);
+    }
+  }
+
+  /**
    * Remove a bean from the cache.
    */
   public <T> void addBeanRemove(BeanDescriptor<T> desc, Object id) {
     entries.add(new CacheChangeBeanRemove(desc, id));
+    if (viewEntityInvalidation) {
+      viewInvalidation.add(desc.getBaseTable());
+    }
   }
 
   /**
@@ -76,6 +105,9 @@ public class CacheChangeSet {
    */
   public <T> void addBeanUpdate(BeanDescriptor<T> desc, Object id, Map<String, Object> changes, boolean updateNaturalKey, long version) {
     entries.add(new CacheChangeBeanUpdate(desc, id, changes, updateNaturalKey, version));
+    if (viewEntityInvalidation) {
+      viewInvalidation.add(desc.getBaseTable());
+    }
   }
 
   /**

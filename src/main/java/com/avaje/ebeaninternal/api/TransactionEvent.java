@@ -108,8 +108,8 @@ public class TransactionEvent implements Serializable {
   /**
    * Build and return the cache changeSet.
    */
-  public CacheChangeSet buildCacheChanges() {
-    CacheChangeSet changeSet = new CacheChangeSet();
+  public CacheChangeSet buildCacheChanges(boolean viewInvalidation) {
+    CacheChangeSet changeSet = new CacheChangeSet(viewInvalidation);
     if (eventBeans != null) {
       eventBeans.notifyCache(changeSet);
     }

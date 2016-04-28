@@ -84,9 +84,9 @@ public final class PostCommitProcessing {
   /**
    * Notify the local part of L2 cache.
    */
-  void notifyLocalCache() {
+  void notifyLocalCache(boolean viewInvalidation) {
     processTableEvents(event.getEventTables());
-    cacheChanges = event.buildCacheChanges();
+    cacheChanges = event.buildCacheChanges(viewInvalidation);
   }
 
   /**
@@ -149,7 +149,7 @@ public final class PostCommitProcessing {
     return new Runnable() {
       public void run() {
         if (cacheChanges != null) {
-          cacheChanges.apply();
+          manager.processViewInvalidation(cacheChanges.apply());
         }
         localPersistListenersNotify();
         notifyCluster();

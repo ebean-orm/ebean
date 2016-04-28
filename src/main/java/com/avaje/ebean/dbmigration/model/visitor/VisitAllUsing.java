@@ -39,7 +39,7 @@ public class VisitAllUsing {
 
   public void visitAllBeans() {
     for (BeanDescriptor<?> desc : descriptors) {
-      if (desc.getBaseTable() != null) {
+      if (desc.isBaseTable()) {
         visitBean(desc, visitor);
       }
     }

@@ -20,6 +20,8 @@ public class BeanFindControllerTest extends BaseTestCase {
   @Test
   public void test() {
 
+    System.setProperty("ebean.ignoreExtraDdl", "true");
+
     ServerConfig config = new ServerConfig();
 
     config.setName("h2otherfind");

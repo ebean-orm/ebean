@@ -3,7 +3,6 @@ package com.avaje.ebean.dbmigration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.PersistenceException;
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,11 +17,11 @@ public class DdlRunner {
 
   protected static final Logger logger = LoggerFactory.getLogger(DdlRunner.class);
 
-  protected DdlParser ddlParser = new DdlParser();
+  private DdlParser ddlParser = new DdlParser();
 
-  protected final String scriptName;
+  private final String scriptName;
 
-  protected final boolean expectErrors;
+  private final boolean expectErrors;
 
   /**
    * Construct with a script name (for logging) and flag indicating if errors are expected.
@@ -35,7 +34,7 @@ public class DdlRunner {
   /**
    * Parse the content into sql statements and execute them in a transaction.
    */
-  public int runAll(String content, Connection connection) {
+  public int runAll(String content, Connection connection) throws SQLException {
 
     List<String> statements = ddlParser.parse(new StringReader(content));
     return runStatements(statements, connection);
@@ -44,31 +43,7 @@ public class DdlRunner {
   /**
    * Execute all the statements in a single transaction.
    */
-  public int runStatements(List<String> statements, Connection connection) {
-
-    try {
-      int statementCount = runStatements(expectErrors, statements, connection);
-      connection.commit();
-      return statementCount;
-
-    } catch (Exception e) {
-      rollback(connection);
-      throw new PersistenceException("Error: " + e.getMessage(), e);
-    }
-  }
-
-  private void rollback(Connection connection) {
-    try {
-      connection.rollback();
-    } catch (SQLException e) {
-      logger.error("Error trying to rollback connection", e);
-    }
-  }
-
-  /**
-   * Execute the list of statements.
-   */
-  private int runStatements(boolean expectErrors, List<String> statements, Connection c) {
+  private int runStatements(List<String> statements, Connection connection) throws SQLException {
 
     List<String> noDuplicates = new ArrayList<String>();
 
@@ -82,7 +57,7 @@ public class DdlRunner {
 
     for (int i = 0; i < noDuplicates.size(); i++) {
       String xOfy = (i + 1) + " of " + noDuplicates.size();
-      runStatement(expectErrors, xOfy, noDuplicates.get(i), c);
+      runStatement(expectErrors, xOfy, noDuplicates.get(i), connection);
     }
 
     return noDuplicates.size();
@@ -91,7 +66,7 @@ public class DdlRunner {
   /**
    * Execute the statement.
    */
-  private void runStatement(boolean expectErrors, String oneOf, String stmt, Connection c) {
+  private void runStatement(boolean expectErrors, String oneOf, String stmt, Connection c) throws SQLException {
 
     PreparedStatement pstmt = null;
     try {
@@ -111,12 +86,12 @@ public class DdlRunner {
       pstmt = c.prepareStatement(stmt);
       pstmt.execute();
 
-    } catch (Exception e) {
+    } catch (SQLException e) {
       if (expectErrors) {
         logger.debug(" ... ignoring error executing " + getSummary(stmt) + "  error: " + e.getMessage());
       } else {
         String msg = "Error executing stmt[" + stmt + "] error[" + e.getMessage() + "]";
-        throw new RuntimeException(msg, e);
+        throw new SQLException(msg, e);
       }
 
     } finally {

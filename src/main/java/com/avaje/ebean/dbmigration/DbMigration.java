@@ -25,10 +25,14 @@ import com.avaje.ebean.dbmigration.model.ModelContainer;
 import com.avaje.ebean.dbmigration.model.ModelDiff;
 import com.avaje.ebean.dbmigration.model.PlatformDdlWriter;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.extraddl.model.DdlScript;
+import com.avaje.ebeaninternal.extraddl.model.ExtraDdl;
+import com.avaje.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +46,7 @@ import java.util.List;
  * and drop objects (drop tables, drop columns).
  * </p>
  * <p>
- *   This does not run the migration or ddl scripts but just generates them.
+ * This does not run the migration or ddl scripts but just generates them.
  * </p>
  * <pre>{@code
  *
@@ -98,7 +102,7 @@ public class DbMigration {
 
   /**
    * Set the path from the current working directory to the application resources.
-   *
+   * <p>
    * This defaults to maven style 'src/main/resources'.
    */
   public void setPathToResources(String pathToResources) {
@@ -169,7 +173,7 @@ public class DbMigration {
   /**
    * Generate the next migration xml file and associated apply and rollback sql scripts.
    * <p>
-   *   This does not run the migration or ddl scripts but just generates them.
+   * This does not run the migration or ddl scripts but just generates them.
    * </p>
    * <h3>Example: Run for a single specific platform</h3>
    * <pre>{@code
@@ -181,7 +185,7 @@ public class DbMigration {
    *       migration.generateMigration();
    *
    * }</pre>
-   *
+   * <p>
    * <h3>Example: Run migration generating DDL for multiple platforms</h3>
    * <pre>{@code
    *
@@ -206,6 +210,8 @@ public class DbMigration {
     try {
       Request request = createRequest();
 
+      generateExtraDdl(request);
+
       String pendingVersion = generatePendingDrop();
       if (pendingVersion != null) {
         generatePendingDrop(request, pendingVersion);
@@ -218,6 +224,49 @@ public class DbMigration {
         DbOffline.reset();
       }
     }
+  }
+
+  /**
+   * Generate "repeatable" migration scripts.
+   * <p>
+   * These take scrips from extra-dll.xml (typically views) and outputs "repeatable"
+   * migration scripts (starting with "R__") to be run by FlywayDb or Ebean's own
+   * migration runner.
+   * </p>
+   */
+  private void generateExtraDdl(Request request) throws IOException {
+
+    if (databasePlatform != null) {
+      ExtraDdl extraDdl = ExtraDdlXmlReader.read("/extra-ddl.xml");
+      if (extraDdl != null) {
+        List<DdlScript> ddlScript = extraDdl.getDdlScript();
+        for (DdlScript script : ddlScript) {
+          if (ExtraDdlXmlReader.matchPlatform(databasePlatform.getName(), script.getPlatforms())) {
+            writeExtraDdl(request, script);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Write (or override) the "repeatable" migration script.
+   */
+  private void writeExtraDdl(Request request, DdlScript script) throws IOException {
+
+    String fullName = repeatableMigrationName(script.getName());
+
+    logger.info("writing repeatable script {}", fullName);
+
+    File file = new File(request.migrationDir, fullName);
+    FileWriter writer = new FileWriter(file);
+    writer.write(script.getValue());
+    writer.flush();
+    writer.close();
+  }
+
+  private String repeatableMigrationName(String scriptName) {
+    return "R__" + scriptName.replace(' ', '_') + migrationConfig.getApplySuffix();
   }
 
   /**
@@ -319,7 +368,7 @@ public class DbMigration {
         // history ddl generation (triggers, history tables etc)
         DdlWrite write = new DdlWrite(new MConfiguration(), request.current);
         PlatformDdlWriter writer = createDdlWriter(databasePlatform, "");
-        writer.processMigration(dbMigration, write, request.migrationDir , fullVersion);
+        writer.processMigration(dbMigration, write, request.migrationDir, fullVersion);
       }
       writeExtraPlatformDdl(fullVersion, request.currentModel, dbMigration, request.migrationDir);
     }
@@ -339,7 +388,7 @@ public class DbMigration {
 
   /**
    * Return the full version for the migration being generated.
-   *
+   * <p>
    * The full version can contain a comment suffix after a "__" double underscore.
    */
   private String getFullVersion(MigrationModel migrationModel, String dropsFor) {
@@ -366,7 +415,7 @@ public class DbMigration {
    * Replace spaces with underscores.
    */
   private String toUnderScore(String name) {
-    return name.replace(' ','_');
+    return name.replace(' ', '_');
   }
 
   /**
@@ -444,7 +493,7 @@ public class DbMigration {
    */
   protected File getModelDirectory(File migrationDirectory) {
     String modelPath = migrationConfig.getModelPath();
-    if (modelPath ==  null || modelPath.isEmpty()) {
+    if (modelPath == null || modelPath.isEmpty()) {
       return migrationDirectory;
     }
     File modelDir = new File(migrationDirectory, migrationConfig.getModelPath());

@@ -89,7 +89,7 @@
   <!--<logger name="org.avaje.ebean.cache.COLL" level="TRACE"/>-->
   <!--<logger name="org.avaje.ebean.cache.NATKEY" level="TRACE"/>-->
 
-  <!--<logger name="com.avaje.tests" level="DEBUG"/>-->
+  <!--<logger name="com.avaje.ebean.dbmigration.DdlRunner" level="DEBUG"/>-->
   <!--<logger name="com.avaje.ebean.config.dbplatform.H2HistoryTrigger" level="DEBUG"/>-->
 
 </configuration>

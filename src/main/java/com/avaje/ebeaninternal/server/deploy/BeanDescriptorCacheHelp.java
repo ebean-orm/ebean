@@ -98,7 +98,7 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Return true if there is currently query caching for this type of bean.
    */
-  private boolean isQueryCaching() {
+  boolean isQueryCaching() {
     return queryCache != null;
   }
 
@@ -598,6 +598,7 @@ final class BeanDescriptorCacheHelp<T> {
   void handleInsert(PersistRequestBean<T> insertRequest, CacheChangeSet changeSet) {
     queryCacheClear(changeSet);
     cacheDeleteImported(false, insertRequest.getEntityBean(), changeSet);
+    changeSet.addBeanInsert(desc.getBaseTable());
   }
 
   private void cacheDeleteImported(boolean clear, EntityBean entityBean, CacheChangeSet changeSet) {

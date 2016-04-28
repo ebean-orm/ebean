@@ -7,6 +7,10 @@ import java.util.Arrays;
  */
 public class MigrationVersion implements Comparable<MigrationVersion> {
 
+  private static final int[] REPEAT_ORDERING = {Integer.MAX_VALUE};
+
+  private static final boolean[] REPEAT_UNDERSCORES = {false};
+
   /**
    * The raw version text.
    */
@@ -21,11 +25,31 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
 
   private final String comment;
 
+  /**
+   * Construct for "repeatable" version.
+   */
+  private MigrationVersion(String raw, String comment) {
+    this.raw = raw;
+    this.comment = comment;
+    this.ordering = REPEAT_ORDERING;
+    this.underscores = REPEAT_UNDERSCORES;
+  }
+
+  /**
+   * Construct for "normal" version.
+   */
   private MigrationVersion(String raw, int[] ordering, boolean[] underscores, String comment) {
     this.raw = raw;
     this.ordering = ordering;
     this.underscores = underscores;
     this.comment = comment;
+  }
+
+  /**
+   * Return true if this is a "repeatable" version.
+   */
+  public boolean isRepeatable() {
+    return ordering == REPEAT_ORDERING;
   }
 
   /**
@@ -76,11 +100,15 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
 
   /**
    * Returns the version part of the string.
-   *
+   * <p>
    * Normalised means always use '.' delimiters (no underscores).
    * NextVersion means bump/increase the last version number by 1.
    */
   private String formattedVersion(boolean normalised, boolean nextVersion) {
+
+    if (ordering == REPEAT_ORDERING) {
+      return "R";
+    }
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < ordering.length; i++) {
       if (i < ordering.length - 1) {
@@ -110,8 +138,7 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
         return (ordering[i] > other.ordering[i]) ? 1 : -1;
       }
     }
-    // considered the same
-    return 0;
+    return comment.compareTo(other.comment);
   }
 
   /**
@@ -126,6 +153,10 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
    */
   public static MigrationVersion parse(String raw) {
 
+    if (raw.startsWith("V") || raw.startsWith("v")) {
+      raw = raw.substring(1);
+    }
+
     String comment = "";
     String value = raw;
     int commentStart = raw.indexOf("__");
@@ -138,6 +169,11 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
     value = value.replace('_', '.');
 
     String[] sections = value.split("\\.");
+
+    if ("r".equalsIgnoreCase(sections[0])) {
+      // a "repeatable" version (does not have a version number)
+      return new MigrationVersion(raw, comment);
+    }
 
     boolean[] underscores = new boolean[sections.length];
     int[] ordering = new int[sections.length];

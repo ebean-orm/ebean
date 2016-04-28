@@ -24,6 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ModelBuild_compoundKeyTest extends BaseTestCase {
 
   private SpiEbeanServer getServer() {
+
+    System.setProperty("ebean.ignoreExtraDdl", "true");
+
     ServerConfig config = new ServerConfig();
     config.setName("h2");
     config.loadFromProperties();
@@ -37,7 +40,6 @@ public class ModelBuild_compoundKeyTest extends BaseTestCase {
     config.addClass(CKeyParent.class);
     config.addClass(CKeyAssoc.class);
     config.addClass(CKeyParentId.class);
-
 
     return (SpiEbeanServer) EbeanServerFactory.create(config);
   }

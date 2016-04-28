@@ -18,6 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ModelBuild_explicitSequencesTest extends BaseTestCase {
 
   private SpiEbeanServer getServer(boolean postgres) {
+
+    System.setProperty("ebean.ignoreExtraDdl", "true");
+
     ServerConfig config = new ServerConfig();
     config.setName("h2");
     config.loadFromProperties();

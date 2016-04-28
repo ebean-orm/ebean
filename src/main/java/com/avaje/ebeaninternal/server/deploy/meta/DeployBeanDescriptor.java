@@ -129,6 +129,8 @@ public class DeployBeanDescriptor<T> {
 
   private String draftTable;
 
+  private String[] dependentTables;
+
   private boolean historySupport;
 
   private boolean readAuditing;
@@ -583,6 +585,13 @@ public class DeployBeanDescriptor<T> {
   }
 
   /**
+   * For view based entity return the dependant tables.
+   */
+  public String[] getDependentTables() {
+    return dependentTables;
+  }
+
+  /**
    * Return the base table. Only properties mapped to the base table are by
    * default persisted.
    */
@@ -609,6 +618,15 @@ public class DeployBeanDescriptor<T> {
    */
   public TableName getBaseTableFull() {
     return baseTableFull;
+  }
+
+  /**
+   * Set when entity is based on a view.
+   */
+  public void setView(String viewName, String[] dependentTables) {
+    this.entityType = EntityType.VIEW;
+    this.dependentTables = this.dependentTables;
+    setBaseTable(new TableName(viewName), "", "");
   }
 
   /**

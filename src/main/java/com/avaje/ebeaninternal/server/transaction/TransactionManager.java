@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -104,6 +105,8 @@ public class TransactionManager {
    */
   private final ChangeLogListener changeLogListener;
 
+  private final boolean viewInvalidation;
+
   /**
    * Create the TransactionManager
    */
@@ -113,6 +116,7 @@ public class TransactionManager {
     this.persistBatch = config.getPersistBatch();
     this.persistBatchOnCascade = config.appliedPersistBatchOnCascade();
     this.beanDescriptorManager = descMgr;
+    this.viewInvalidation = descMgr.requiresViewEntityCacheInvalidation();
     this.changeLogPrepare = descMgr.getChangeLogPrepare();
     this.changeLogListener = descMgr.getChangeLogListener();
     this.clusterManager = clusterManager;
@@ -398,7 +402,7 @@ public class TransactionManager {
       }
 
       PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction);
-      postCommit.notifyLocalCache();
+      postCommit.notifyLocalCache(viewInvalidation);
       backgroundExecutor.execute(postCommit.backgroundNotify());
 
       for (TransactionEventListener listener : transactionEventListeners) {
@@ -423,7 +427,7 @@ public class TransactionManager {
     event.add(tableEvents);
 
     PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, event);
-    postCommit.notifyLocalCache();
+    postCommit.notifyLocalCache(viewInvalidation);
     backgroundExecutor.execute(postCommit.backgroundNotify());
   }
 
@@ -476,6 +480,15 @@ public class TransactionManager {
           changeLogListener.log(changeSet);
         }
       });
+    }
+  }
+
+  /**
+   * Invalidate the query caches for entities based on views.
+   */
+  public void processViewInvalidation(Set<String> viewInvalidation) {
+    if (!viewInvalidation.isEmpty()) {
+      beanDescriptorManager.processViewInvalidation(viewInvalidation);
     }
   }
 }

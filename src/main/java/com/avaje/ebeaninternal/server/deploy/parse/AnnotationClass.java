@@ -22,6 +22,7 @@ import com.avaje.ebean.annotation.NamedUpdate;
 import com.avaje.ebean.annotation.NamedUpdates;
 import com.avaje.ebean.annotation.ReadAudit;
 import com.avaje.ebean.annotation.UpdateMode;
+import com.avaje.ebean.annotation.View;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
@@ -136,13 +137,15 @@ public class AnnotationClass extends AnnotationParser {
       descriptor.addCompoundUniqueConstraint(new CompoundUniqueConstraint(uc.columnNames()));
     }
 
+    View view = cls.getAnnotation(View.class);
+    if (view != null) {
+      descriptor.setView(view.name(), view.dependentTables());
+    }
     Table table = cls.getAnnotation(Table.class);
     if (table != null) {
       UniqueConstraint[] uniqueConstraints = table.uniqueConstraints();
-      if (uniqueConstraints != null) {
-        for (UniqueConstraint c : uniqueConstraints) {
-          descriptor.addCompoundUniqueConstraint(new CompoundUniqueConstraint(c.columnNames()));
-        }
+      for (UniqueConstraint c : uniqueConstraints) {
+        descriptor.addCompoundUniqueConstraint(new CompoundUniqueConstraint(c.columnNames()));
       }
     }
 
