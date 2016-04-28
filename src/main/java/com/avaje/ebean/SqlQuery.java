@@ -136,11 +136,6 @@ public interface SqlQuery extends Serializable {
   SqlQuery setMaxRows(int maxRows);
 
   /**
-   * Set the index after which fetching continues in a background thread.
-   */
-  SqlQuery setBackgroundFetchAfter(int backgroundFetchAfter);
-
-  /**
    * Set the column to use to determine the keys for a Map.
    */
   SqlQuery setMapKey(String mapKey);

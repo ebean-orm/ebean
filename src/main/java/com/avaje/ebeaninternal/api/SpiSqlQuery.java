@@ -36,11 +36,6 @@ public interface SpiSqlQuery extends SqlQuery {
   int getMaxRows();
 
   /**
-   * Return the number of rows after which background fetching occurs.
-   */
-  int getBackgroundFetchAfter();
-
-  /**
    * Return the key property for maps.
    */
   String getMapKey();

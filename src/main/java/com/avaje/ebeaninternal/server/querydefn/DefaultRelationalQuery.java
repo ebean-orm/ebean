@@ -45,11 +45,6 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
    */
   private transient PreparedStatement pstmt;
 
-  /**
-   * The rows after which the fetch continues in a bg thread.
-   */
-  private int backgroundFetchAfter;
-
   private int bufferFetchSizeHint;
 
   /**
@@ -163,15 +158,6 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
 
   public DefaultRelationalQuery setMapKey(String mapKey) {
     this.mapKey = mapKey;
-    return this;
-  }
-
-  public int getBackgroundFetchAfter() {
-    return backgroundFetchAfter;
-  }
-
-  public DefaultRelationalQuery setBackgroundFetchAfter(int backgroundFetchAfter) {
-    this.backgroundFetchAfter = backgroundFetchAfter;
     return this;
   }
 
