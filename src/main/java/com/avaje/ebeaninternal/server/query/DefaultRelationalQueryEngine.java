@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.query;
 
 import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
-import com.avaje.ebean.SqlQueryListener;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
 import com.avaje.ebeaninternal.server.core.Message;
@@ -90,7 +89,6 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
       List<SqlRow> rows = new ArrayList<SqlRow>();
 
       SpiSqlQuery query = request.getQuery();
-      SqlQueryListener listener = query.getListener();
 
       while (request.next()) {
         SqlRow bean;
@@ -101,11 +99,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
           bean = readRow(request);
         }
         if (bean != null) {
-          if (listener != null) {
-            listener.process(bean);
-          } else {
-            rows.add(bean);
-          }
+          rows.add(bean);
           loadRowCount++;
           if (loadRowCount == maxRows) {
             // break, as we have hit the max rows to fetch...

@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.api;
 import java.sql.PreparedStatement;
 
 import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlQueryListener;
 
 /**
  * SQL query - Internal extension to SqlQuery.
@@ -19,11 +18,6 @@ public interface SpiSqlQuery extends SqlQuery {
    * return the query.
    */
   String getQuery();
-
-  /**
-   * Return the queryListener.
-   */
-  SqlQueryListener getListener();
 
   /**
    * Return the first row to fetch.

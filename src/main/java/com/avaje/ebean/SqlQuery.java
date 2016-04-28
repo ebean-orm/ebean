@@ -103,19 +103,6 @@ public interface SqlQuery extends Serializable {
   SqlQuery setParameter(int position, Object value);
 
   /**
-   * Set a listener to process the query on a row by row basis.
-   * <p>
-   * It this case the rows are not loaded into the persistence context and
-   * instead can be processed by the query listener.
-   * </p>
-   * <p>
-   * Use this when you want to process a large query and do not want to hold the
-   * entire query result in memory.
-   * </p>
-   */
-  SqlQuery setListener(SqlQueryListener queryListener);
-
-  /**
    * Set the index of the first row of the results to return.
    */
   SqlQuery setFirstRow(int firstRow);

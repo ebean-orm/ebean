@@ -4,7 +4,6 @@ import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.SqlFutureList;
-import com.avaje.ebean.SqlQueryListener;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
@@ -22,8 +21,6 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   private static final long serialVersionUID = -1098305779779591068L;
 
   private final transient EbeanServer server;
-
-  private transient SqlQueryListener queryListener;
 
   private String query;
 
@@ -91,26 +88,6 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
 
   public DefaultRelationalQuery setParameter(String paramName, Object value) {
     bindParams.setParameter(paramName, value);
-    return this;
-  }
-
-  /**
-   * Return the findListener is one has been set.
-   */
-  public SqlQueryListener getListener() {
-    return queryListener;
-  }
-
-  /**
-   * Set a listener. This is designed for large fetches
-   * where lots are rows are to be processed and instead of
-   * returning all the rows they are processed one at a time.
-   * <p>
-   * Note that the returning List Set or Map will be empty.
-   * </p>
-   */
-  public DefaultRelationalQuery setListener(SqlQueryListener queryListener) {
-    this.queryListener = queryListener;
     return this;
   }
 
