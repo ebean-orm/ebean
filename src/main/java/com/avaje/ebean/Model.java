@@ -362,29 +362,6 @@ public abstract class Model {
       super(serverName, type);
     }
 
-    /**
-     * Please migrate to use {@link Find} or constructor <code>Finder(Class)</code> that
-     * does not have the idType parameter.
-     * <p/>
-     * Create with the type of the ID property and entity bean and specific server name.
-     *
-     * @deprecated
-     */
-    public Finder(Class<I> idType, Class<T> type) {
-      super(null, type);
-    }
-
-    /**
-     * Please migrate to use the constructor <code>Finder(String, Class)</code> that
-     * does not have the idType parameter.
-     * <p/>
-     * Create with the type of the ID property and entity bean and specific server name.
-     *
-     * @deprecated
-     */
-    public Finder(String serverName, Class<I> idType, Class<T> type) {
-      super(serverName, type);
-    }
   }
 
   /**
