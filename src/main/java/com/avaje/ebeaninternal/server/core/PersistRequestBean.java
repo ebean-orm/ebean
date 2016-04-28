@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.ValuePair;
-import com.avaje.ebean.annotation.ConcurrencyMode;
+import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.EntityBeanIntercept;

@@ -2,7 +2,7 @@ package com.avaje.ebeaninternal.server.persist.dml;
 
 import java.sql.SQLException;
 
-import com.avaje.ebean.annotation.ConcurrencyMode;
+import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;

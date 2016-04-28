@@ -4,7 +4,7 @@ import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
-import com.avaje.ebean.annotation.ConcurrencyMode;
+import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.cache.ServerCacheManager;

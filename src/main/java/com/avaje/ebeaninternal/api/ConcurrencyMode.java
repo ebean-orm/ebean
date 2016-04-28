@@ -1,4 +1,4 @@
-package com.avaje.ebean.annotation;
+package com.avaje.ebeaninternal.api;
 
 /**
  * Optimistic concurrency mode used for updates and deletes.

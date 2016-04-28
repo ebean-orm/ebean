@@ -1,21 +1,11 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
 import com.avaje.ebean.annotation.CacheStrategy;
 import com.avaje.ebean.annotation.CacheTuning;
-import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.DbComment;
+import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.Draftable;
 import com.avaje.ebean.annotation.DraftableElement;
-import com.avaje.ebean.annotation.EntityConcurrencyMode;
 import com.avaje.ebean.annotation.History;
 import com.avaje.ebean.annotation.Index;
 import com.avaje.ebean.annotation.NamedUpdate;
@@ -32,6 +22,15 @@ import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * Read the class level deployment annotations.
@@ -207,11 +206,6 @@ public class AnnotationClass extends AnnotationParser {
     CacheTuning cacheTuning = cls.getAnnotation(CacheTuning.class);
     if (cacheStrategy != null || cacheTuning != null) {
       readCacheStrategy(cacheStrategy, cacheTuning);
-    }
-
-    EntityConcurrencyMode entityConcurrencyMode = cls.getAnnotation(EntityConcurrencyMode.class);
-    if (entityConcurrencyMode != null) {
-      descriptor.setConcurrencyMode(entityConcurrencyMode.value());
     }
   }
 

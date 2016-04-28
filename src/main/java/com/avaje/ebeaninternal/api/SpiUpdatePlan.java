@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.api;
 
 import java.sql.SQLException;
 
-import com.avaje.ebean.annotation.ConcurrencyMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.persist.dml.DmlHandler;
 import com.avaje.ebeaninternal.server.persist.dmlbind.Bindable;

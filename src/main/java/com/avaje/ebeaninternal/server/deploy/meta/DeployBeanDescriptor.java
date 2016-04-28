@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
-import com.avaje.ebean.annotation.ConcurrencyMode;
+import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.config.ServerConfig;

@@ -7,7 +7,7 @@ import com.avaje.ebean.RawSql;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.ValuePair;
-import com.avaje.ebean.annotation.ConcurrencyMode;
+import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;

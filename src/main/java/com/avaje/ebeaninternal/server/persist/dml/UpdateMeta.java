@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.persist.dml;
 
-import com.avaje.ebean.annotation.ConcurrencyMode;
+import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
