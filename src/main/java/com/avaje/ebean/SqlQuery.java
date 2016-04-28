@@ -21,30 +21,24 @@ import java.util.Set;
  * conversion support added.
  * </p>
  * 
- * <pre class="code">
- * // its typically a good idea to use a named query
- * // and put the sql in the orm.xml instead of in your code
+ * <pre>{@code
+ *
+ *   // its typically a good idea to use a named query
+ *   // and put the sql in the orm.xml instead of in your code
  * 
- * String sql = &quot;select id, name from customer where name like :name and status_code = :status&quot;;
+ *   String sql = "select id, name from customer where name like :name and status_code = :status";
  * 
- * SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
- * sqlQuery.setParameter(&quot;name&quot;, &quot;Acme%&quot;);
- * sqlQuery.setParameter(&quot;status&quot;, &quot;ACTIVE&quot;);
+ *   SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
+ *   sqlQuery.setParameter("name", "Acme%");
+ *   sqlQuery.setParameter("status", "ACTIVE");
  * 
- * // execute the query returning a List of MapBean objects
- * List&lt;SqlRow&gt; list = sqlQuery.findList();
- * </pre>
+ *   // execute the query returning a List of MapBean objects
+ *   List<SqlRow> list = sqlQuery.findList();
+ *
+ * }</pre>
  * 
  */
 public interface SqlQuery extends Serializable {
-
-  /**
-   * Cancel the query if support by the underlying database and driver.
-   * <p>
-   * This must be called from a different thread to the one executing the query.
-   * </p>
-   */
-  void cancel();
 
   /**
    * Execute the query returning a list.

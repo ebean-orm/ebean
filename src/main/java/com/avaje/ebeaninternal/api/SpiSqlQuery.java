@@ -40,22 +40,8 @@ public interface SpiSqlQuery extends SqlQuery {
   int getBufferFetchSizeHint();
 
   /**
-   * Return true if this is a future fetch type query.
-   */
-  boolean isFutureFetch();
-
-  /**
-   * Set to true if this is a future fetch type query.
-   */
-  void setFutureFetch(boolean futureFetch);
-
-  /**
    * Set the PreparedStatement for the purposes of supporting cancel.
    */
   void setPreparedStatement(PreparedStatement pstmt);
 
-  /**
-   * Return true if the query has been cancelled.
-   */
-  boolean isCancelled();
 }

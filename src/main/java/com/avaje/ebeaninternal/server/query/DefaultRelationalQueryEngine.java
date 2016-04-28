@@ -3,13 +3,10 @@ package com.avaje.ebeaninternal.server.query;
 import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.SqlRow;
-import com.avaje.ebeaninternal.api.SpiSqlQuery;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.core.RelationalQueryEngine;
 import com.avaje.ebeaninternal.server.core.RelationalQueryRequest;
 import com.avaje.ebeaninternal.server.persist.Binder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
@@ -20,9 +17,6 @@ import java.util.List;
  * Perform native sql fetches.
  */
 public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
-
-  private static final Logger logger = LoggerFactory.getLogger(DefaultRelationalQueryEngine.class);
-
 
   private final Binder binder;
 
@@ -78,9 +72,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 
     long startTime = System.currentTimeMillis();
     try {
-      if (!request.executeSql(binder)) {
-        return null;
-      }
+      request.executeSql(binder);
 
       int maxRows = request.getMaxRows();
 
@@ -88,23 +80,12 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 
       List<SqlRow> rows = new ArrayList<SqlRow>();
 
-      SpiSqlQuery query = request.getQuery();
-
       while (request.next()) {
-        SqlRow bean;
-        synchronized (query) {
-          if (request.isCancelled()) {
-            break;
-          }
-          bean = readRow(request);
-        }
-        if (bean != null) {
-          rows.add(bean);
-          loadRowCount++;
-          if (loadRowCount == maxRows) {
-            // break, as we have hit the max rows to fetch...
-            break;
-          }
+        rows.add(readRow(request));
+        loadRowCount++;
+        if (loadRowCount == maxRows) {
+          // break, as we have hit the max rows to fetch...
+          break;
         }
       }
 
@@ -125,10 +106,6 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
     if (request.isLogSummary()) {
       long exeTime = System.currentTimeMillis() - startTime;
       request.getTransaction().logSummary("SqlQuery  rows[" + request.getRowCount() + "] time[" + exeTime + "] bind[" + request.getBindLog() + "]");
-    }
-
-    if (request.isCancelled()) {
-      logger.debug("Query was cancelled during execution rows: {}", request.getRowCount());
     }
   }
 

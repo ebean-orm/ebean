@@ -7,9 +7,7 @@ import com.avaje.ebean.SqlRow;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
 
-import javax.persistence.PersistenceException;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -28,10 +26,6 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   private int maxRows;
 
   private int timeout;
-
-  private boolean futureFetch;
-
-  private boolean cancelled;
 
   /**
    * For the purposes of cancelling the query.
@@ -134,36 +128,9 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
     return query;
   }
 
-  public boolean isFutureFetch() {
-    return futureFetch;
-  }
-
-  public void setFutureFetch(boolean futureFetch) {
-    this.futureFetch = futureFetch;
-  }
-
   public void setPreparedStatement(PreparedStatement pstmt) {
     synchronized (this) {
       this.pstmt = pstmt;
-    }
-  }
-
-  public void cancel() {
-    synchronized (this) {
-      this.cancelled = true;
-      if (pstmt != null) {
-        try {
-          pstmt.cancel();
-        } catch (SQLException e) {
-          throw new PersistenceException("Error cancelling query", e);
-        }
-      }
-    }
-  }
-
-  public boolean isCancelled() {
-    synchronized (this) {
-      return cancelled;
     }
   }
 

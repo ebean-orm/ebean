@@ -8,7 +8,6 @@ import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.lib.util.Str;
@@ -45,8 +44,6 @@ public final class RelationalQueryRequest {
   private SpiTransaction trans;
 
   private boolean createdTransaction;
-
-  private SpiQuery.Type queryType;
 
   private String sql;
 
@@ -96,17 +93,14 @@ public final class RelationalQueryRequest {
   }
 
   public void findEach(QueryEachConsumer<SqlRow> consumer) {
-    queryType = SpiQuery.Type.ITERATE;
     queryEngine.findEach(this, consumer);
   }
 
   public void findEachWhile(QueryEachWhileConsumer<SqlRow> consumer) {
-    queryType = SpiQuery.Type.ITERATE;
     queryEngine.findEach(this, consumer);
   }
 
   public List<SqlRow> findList() {
-    queryType = SpiQuery.Type.LIST;
     return queryEngine.findList(this);
   }
 
@@ -115,13 +109,6 @@ public final class RelationalQueryRequest {
    */
   public SpiSqlQuery getQuery() {
     return query;
-  }
-
-  /**
-   * Return the type (List, Set or Map) that this fetch returns.
-   */
-  public SpiQuery.Type getQueryType() {
-    return queryType;
   }
 
   public EbeanServer getEbeanServer() {
@@ -231,49 +218,36 @@ public final class RelationalQueryRequest {
   /**
    * Prepare and execute the SQL using the Binder.
    */
-  public boolean executeSql(Binder binder) throws SQLException {
+  public void executeSql(Binder binder) throws SQLException {
 
     prepareSql();
-    synchronized (query) {
-      if (query.isCancelled()) {
-        logger.trace("Query already cancelled");
-        return false;
-      }
 
-      Connection conn = trans.getInternalConnection();
+    Connection conn = trans.getInternalConnection();
 
-      // synchronise for query.cancel() support
-      pstmt = conn.prepareStatement(sql);
-      if (query.getTimeout() > 0) {
-        pstmt.setQueryTimeout(query.getTimeout());
-      }
-      if (query.getBufferFetchSizeHint() > 0) {
-        pstmt.setFetchSize(query.getBufferFetchSizeHint());
-      }
-
-      BindParams bindParams = query.getBindParams();
-      if (!bindParams.isEmpty()) {
-        this.bindLog = binder.bind(bindParams, pstmt);
-      }
-
-      if (isLogSql()) {
-        String logSql = sql;
-        if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-          logSql = Str.add(logSql, "; --bind(", bindLog, ")");
-        }
-        trans.logSql(logSql);
-      }
-
-      setResultSet(pstmt.executeQuery());
-      return true;
+    // synchronise for query.cancel() support
+    pstmt = conn.prepareStatement(sql);
+    if (query.getTimeout() > 0) {
+      pstmt.setQueryTimeout(query.getTimeout());
     }
-  }
+    if (query.getBufferFetchSizeHint() > 0) {
+      pstmt.setFetchSize(query.getBufferFetchSizeHint());
+    }
 
-  /**
-   * Return true if the query has been cancelled.
-   */
-  public boolean isCancelled() {
-    return query.isCancelled();
+    BindParams bindParams = query.getBindParams();
+    if (!bindParams.isEmpty()) {
+      this.bindLog = binder.bind(bindParams, pstmt);
+    }
+
+    if (isLogSql()) {
+      String logSql = sql;
+      if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
+        logSql = Str.add(logSql, "; --bind(", bindLog, ")");
+      }
+      trans.logSql(logSql);
+    }
+
+    setResultSet(pstmt.executeQuery());
+
   }
 
   /**
