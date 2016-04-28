@@ -9,6 +9,8 @@ import java.util.Set;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.QueryEachConsumer;
+import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.SqlFutureList;
 import com.avaje.ebean.SqlQueryListener;
 import com.avaje.ebean.SqlRow;
@@ -71,6 +73,16 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   public DefaultRelationalQuery setQuery(String query) {
     this.query = query;
     return this;
+  }
+
+  @Override
+  public void findEach(QueryEachConsumer<SqlRow> consumer) {
+    server.findEach(this, consumer, null);
+  }
+
+  @Override
+  public void findEachWhile(QueryEachWhileConsumer<SqlRow> consumer) {
+    server.findEachWhile(this, consumer, null);
   }
 
   public List<SqlRow> findList() {

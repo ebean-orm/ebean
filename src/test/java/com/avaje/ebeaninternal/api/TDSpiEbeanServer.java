@@ -541,6 +541,14 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public void findEach(SqlQuery query, QueryEachConsumer<SqlRow> consumer, Transaction transaction) {
+  }
+
+  @Override
+  public void findEachWhile(SqlQuery query, QueryEachWhileConsumer<SqlRow> consumer, Transaction transaction) {
+  }
+
+  @Override
   public Set<SqlRow> findSet(SqlQuery query, Transaction transaction) {
     return null;
   }

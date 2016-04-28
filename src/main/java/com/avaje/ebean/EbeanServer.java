@@ -1193,6 +1193,25 @@ public interface EbeanServer {
   List<SqlRow> findList(SqlQuery query, Transaction transaction);
 
   /**
+   * Execute the SqlQuery iterating a row at a time.
+   * <p>
+   * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
+   * </p>
+   */
+  void findEach(SqlQuery query, QueryEachConsumer<SqlRow> consumer, Transaction transaction);
+
+  /**
+   * Execute the SqlQuery iterating a row at a time with the ability to stop consuming part way through.
+   * <p>
+   * Returning false after processing a row stops the iteration through the query results.
+   * </p>
+   * <p>
+   * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
+   * </p>
+   */
+  void findEachWhile(SqlQuery query, QueryEachWhileConsumer<SqlRow> consumer, Transaction transaction);
+
+  /**
    * Execute the sql query returning a set of MapBean.
    * <p>
    * Generally you are able to use {@link SqlQuery#findSet()} rather than

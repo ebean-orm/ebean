@@ -62,6 +62,25 @@ public interface SqlQuery extends Serializable {
   Map<?, SqlRow> findMap();
 
   /**
+   * Execute the SqlQuery iterating a row at a time.
+   * <p>
+   * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
+   * </p>
+   */
+  void findEach(QueryEachConsumer<SqlRow> consumer);
+
+  /**
+   * Execute the SqlQuery iterating a row at a time with the ability to stop consuming part way through.
+   * <p>
+   * Returning false after processing a row stops the iteration through the query results.
+   * </p>
+   * <p>
+   * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
+   * </p>
+   */
+  void findEachWhile(QueryEachWhileConsumer<SqlRow> consumer);
+
+  /**
    * Execute the query returning a single row or null.
    * <p>
    * If this query finds 2 or more rows then it will throw a

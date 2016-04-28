@@ -1404,6 +1404,30 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return new SqlQueryFutureList(query, futureTask);
   }
 
+  @Override
+  public void findEach(SqlQuery query, QueryEachConsumer<SqlRow> consumer, Transaction transaction) {
+
+    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, transaction);
+    try {
+      request.initTransIfRequired();
+      request.findEach(consumer);
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
+  @Override
+  public void findEachWhile(SqlQuery query, QueryEachWhileConsumer<SqlRow> consumer, Transaction transaction) {
+
+    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, transaction);
+    try {
+      request.initTransIfRequired();
+      request.findEachWhile(consumer);
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
   public List<SqlRow> findList(SqlQuery query, Transaction t) {
 
     RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, t);
