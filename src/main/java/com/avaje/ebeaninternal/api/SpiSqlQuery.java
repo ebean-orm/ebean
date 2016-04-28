@@ -36,11 +36,6 @@ public interface SpiSqlQuery extends SqlQuery {
   int getMaxRows();
 
   /**
-   * Return the key property for maps.
-   */
-  String getMapKey();
-
-  /**
    * Return the query timeout.
    */
   int getTimeout();

@@ -14,10 +14,10 @@ import com.avaje.ebean.meta.MetaInfoManager;
 import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebean.text.csv.CsvReader;
 import com.avaje.ebean.text.json.JsonContext;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.query.CQuery;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
-import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -546,16 +546,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
 
   @Override
   public void findEachWhile(SqlQuery query, QueryEachWhileConsumer<SqlRow> consumer, Transaction transaction) {
-  }
-
-  @Override
-  public Set<SqlRow> findSet(SqlQuery query, Transaction transaction) {
-    return null;
-  }
-
-  @Override
-  public Map<?, SqlRow> findMap(SqlQuery query, Transaction transaction) {
-    return null;
   }
 
   @Override

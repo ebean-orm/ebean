@@ -52,16 +52,6 @@ public interface SqlQuery extends Serializable {
   List<SqlRow> findList();
 
   /**
-   * Execute the query returning a set.
-   */
-  Set<SqlRow> findSet();
-
-  /**
-   * Execute the query returning a map.
-   */
-  Map<?, SqlRow> findMap();
-
-  /**
    * Execute the SqlQuery iterating a row at a time.
    * <p>
    * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
@@ -134,11 +124,6 @@ public interface SqlQuery extends Serializable {
    * Set the maximum number of query results to return.
    */
   SqlQuery setMaxRows(int maxRows);
-
-  /**
-   * Set the column to use to determine the keys for a Map.
-   */
-  SqlQuery setMapKey(String mapKey);
 
   /**
    * Set a timeout on this query.

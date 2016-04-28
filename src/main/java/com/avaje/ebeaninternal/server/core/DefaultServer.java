@@ -1441,31 +1441,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  public Set<SqlRow> findSet(SqlQuery query, Transaction t) {
-
-    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, t);
-
-    try {
-      request.initTransIfRequired();
-      return request.findSet();
-
-    } finally {
-      request.endTransIfRequired();
-    }
-  }
-
-  public Map<?, SqlRow> findMap(SqlQuery query, Transaction t) {
-
-    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, t);
-    try {
-      request.initTransIfRequired();
-      return request.findMap();
-
-    } finally {
-      request.endTransIfRequired();
-    }
-  }
-
   /**
    * Persist the bean by either performing an insert or update.
    */
@@ -1480,7 +1455,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     persister.save(checkEntityBean(bean), t);
   }
 
-  
   @Override
   public void markAsDirty(Object bean) {
     if (!(bean instanceof EntityBean)) {

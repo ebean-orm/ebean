@@ -5,12 +5,14 @@ import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
 import com.avaje.ebean.SqlRow;
 
+import java.util.List;
+
 public interface RelationalQueryEngine {
 
   /**
    * Find a list of beans using relational query.
    */
-  Object findMany(RelationalQueryRequest request);
+  List<SqlRow> findList(RelationalQueryRequest request);
 
   /**
    * Find each query using relational query.

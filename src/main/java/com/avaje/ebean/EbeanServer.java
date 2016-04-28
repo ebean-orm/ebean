@@ -1212,42 +1212,6 @@ public interface EbeanServer {
   void findEachWhile(SqlQuery query, QueryEachWhileConsumer<SqlRow> consumer, Transaction transaction);
 
   /**
-   * Execute the sql query returning a set of MapBean.
-   * <p>
-   * Generally you are able to use {@link SqlQuery#findSet()} rather than
-   * explicitly calling this method. You could use this method if you wish to
-   * explicitly control the transaction used for the query.
-   * </p>
-   * 
-   * @param query
-   *          the query to execute.
-   * @param transaction
-   *          the transaction to use (can be null).
-   * @return the set of fetched MapBean.
-   *
-   * @see SqlQuery#findSet()
-   */
-  Set<SqlRow> findSet(SqlQuery query, Transaction transaction);
-
-  /**
-   * Execute the sql query returning a map of MapBean.
-   * <p>
-   * Generally you are able to use {@link SqlQuery#findMap()} rather than
-   * explicitly calling this method. You could use this method if you wish to
-   * explicitly control the transaction used for the query.
-   * </p>
-   * 
-   * @param query
-   *          the query to execute.
-   * @param transaction
-   *          the transaction to use (can be null).
-   * @return the set of fetched MapBean.
-   *
-   * @see SqlQuery#findMap()
-   */
-  Map<?, SqlRow> findMap(SqlQuery query, Transaction transaction);
-
-  /**
    * Execute the sql query returning a single MapBean or null.
    * <p>
    * This will throw a PersistenceException if the query found more than one

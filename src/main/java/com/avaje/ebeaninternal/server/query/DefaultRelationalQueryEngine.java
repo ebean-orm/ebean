@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Perform native sql fetches.
@@ -73,7 +75,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
     }
   }
 
-  public Object findMany(RelationalQueryRequest request) {
+  public List<SqlRow> findList(RelationalQueryRequest request) {
 
     long startTime = System.currentTimeMillis();
     try {
@@ -85,9 +87,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 
       int loadRowCount = 0;
 
-      BeanCollectionWrapper wrapper = new BeanCollectionWrapper(request);
-      boolean isMap = wrapper.isMap();
-      String mapKey = request.getQuery().getMapKey();
+      List<SqlRow> rows = new ArrayList<SqlRow>();
 
       SpiSqlQuery query = request.getQuery();
       SqlQueryListener listener = query.getListener();
@@ -104,11 +104,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
           if (listener != null) {
             listener.process(bean);
           } else {
-            if (isMap) {
-              wrapper.addToMap(bean, bean.get(mapKey));
-            } else {
-              wrapper.addToCollection(bean);
-            }
+            rows.add(bean);
           }
           loadRowCount++;
           if (loadRowCount == maxRows) {
@@ -120,7 +116,7 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 
       logSummary(request, startTime);
 
-      return wrapper.getBeanCollection();
+      return rows;
 
     } catch (Exception e) {
       throw new PersistenceException(Message.msg("fetch.error", e.getMessage(), request.getSql()), e);

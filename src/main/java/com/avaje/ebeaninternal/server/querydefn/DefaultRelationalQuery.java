@@ -1,13 +1,5 @@
 package com.avaje.ebeaninternal.server.querydefn;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
@@ -16,6 +8,11 @@ import com.avaje.ebean.SqlQueryListener;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiSqlQuery;
+
+import javax.persistence.PersistenceException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Default implementation of SQuery - SQL Query.
@@ -48,11 +45,6 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
   private int bufferFetchSizeHint;
 
   /**
-   * The property used to get the key value for a Map.
-   */
-  private String mapKey;
-
-  /**
    * Bind parameters when using the query language.
    */
   private final BindParams bindParams = new BindParams();
@@ -82,14 +74,6 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
 
   public List<SqlRow> findList() {
     return server.findList(this, null);
-  }
-
-  public Set<SqlRow> findSet() {
-    return server.findSet(this, null);
-  }
-
-  public Map<?, SqlRow> findMap() {
-    return server.findMap(this, null);
   }
 
   public SqlRow findUnique() {
@@ -149,15 +133,6 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
 
   public DefaultRelationalQuery setMaxRows(int maxRows) {
     this.maxRows = maxRows;
-    return this;
-  }
-
-  public String getMapKey() {
-    return mapKey;
-  }
-
-  public DefaultRelationalQuery setMapKey(String mapKey) {
-    this.mapKey = mapKey;
     return this;
   }
 

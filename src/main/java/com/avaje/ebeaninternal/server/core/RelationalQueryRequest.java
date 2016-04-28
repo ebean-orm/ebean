@@ -26,8 +26,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Wraps the objects involved in executing a SqlQuery.
@@ -107,22 +105,9 @@ public final class RelationalQueryRequest {
     queryEngine.findEach(this, consumer);
   }
 
-  @SuppressWarnings("unchecked")
   public List<SqlRow> findList() {
     queryType = SpiQuery.Type.LIST;
-    return (List<SqlRow>) queryEngine.findMany(this);
-  }
-
-  @SuppressWarnings("unchecked")
-  public Set<SqlRow> findSet() {
-    queryType = SpiQuery.Type.SET;
-    return (Set<SqlRow>) queryEngine.findMany(this);
-  }
-
-  @SuppressWarnings("unchecked")
-  public Map<?, SqlRow> findMap() {
-    queryType = SpiQuery.Type.MAP;
-    return (Map<?, SqlRow>) queryEngine.findMany(this);
+    return queryEngine.findList(this);
   }
 
   /**
