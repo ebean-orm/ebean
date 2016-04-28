@@ -2,17 +2,27 @@ package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.annotation.DbEnumType;
 import com.avaje.ebean.annotation.DbEnumValue;
-import com.avaje.ebean.annotation.EnumMapping;
 import com.avaje.ebean.annotation.EnumValue;
-import com.avaje.ebean.config.*;
+import com.avaje.ebean.config.CompoundType;
+import com.avaje.ebean.config.CompoundTypeProperty;
+import com.avaje.ebean.config.JsonConfig;
+import com.avaje.ebean.config.ScalarTypeConverter;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
-import com.avaje.ebeaninternal.server.lib.util.StringHelper;
-import com.avaje.ebeaninternal.server.type.reflect.*;
+import com.avaje.ebeaninternal.server.type.reflect.CheckImmutable;
+import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
+import com.avaje.ebeaninternal.server.type.reflect.ImmutableMeta;
+import com.avaje.ebeaninternal.server.type.reflect.ImmutableMetaFactory;
+import com.avaje.ebeaninternal.server.type.reflect.KnownImmutable;
+import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundType;
+import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundTypeProperty;
+import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedTypeBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.joda.time.*;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
@@ -32,11 +42,29 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.*;
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.Month;
+import java.time.MonthDay;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.time.Period;
-import java.util.*;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -516,20 +544,9 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       }
     }
 
-    // get the mapping information from EnumMapping
-    EnumMapping enumMapping = enumType.getAnnotation(EnumMapping.class);
-    if (enumMapping == null) {
-      // look for EnumValue annotations instead
-      return createEnumScalarType2(enumType);
-    }
 
-    String nameValuePairs = enumMapping.nameValuePairs();
-    boolean integerType = enumMapping.integerType();
-    int dbColumnLength = enumMapping.length();
-
-    Map<String, String> nameValueMap = StringHelper.delimitedToMap(nameValuePairs, ",", "=");
-
-    return createEnumScalarType(enumType, nameValueMap, integerType, dbColumnLength);
+    // look for EnumValue annotations instead
+    return createEnumScalarType2(enumType);
   }
 
   /**
