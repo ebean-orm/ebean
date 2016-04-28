@@ -179,7 +179,6 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
     return this;
   }
 
-
   public int getBufferFetchSizeHint() {
     return bufferFetchSizeHint;
   }
@@ -209,8 +208,7 @@ public class DefaultRelationalQuery implements SpiSqlQuery {
         try {
           pstmt.cancel();
         } catch (SQLException e) {
-          String msg = "Error cancelling query";
-          throw new PersistenceException(msg, e);
+          throw new PersistenceException("Error cancelling query", e);
         }
       }
     }
