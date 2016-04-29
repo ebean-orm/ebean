@@ -10,6 +10,8 @@ import com.avaje.tests.model.basic.Car;
 import com.avaje.tests.model.basic.Customer;
 import org.junit.Test;
 
+import java.sql.Date;
+
 import static org.junit.Assert.assertEquals;
 
 public class CachedBeanDataFromBeanTest extends BaseTestCase {
@@ -21,9 +23,12 @@ public class CachedBeanDataFromBeanTest extends BaseTestCase {
 
     BeanDescriptor<Customer> desc = server.getBeanDescriptor(Customer.class);
 
+    Date largeDate = new Date(9223372036825200000L);
+
     Customer customer = new Customer();
     customer.setId(42);
     customer.setName("Rob");
+    customer.setAnniversary(largeDate);
 
     Address billingAddress = new Address();
     billingAddress.setId(Short.valueOf("12"));
@@ -36,6 +41,7 @@ public class CachedBeanDataFromBeanTest extends BaseTestCase {
     assertEquals(cacheData.getData("id"), "42");
     assertEquals(cacheData.getData("name"), "Rob");
     assertEquals(cacheData.getData("billingAddress"), "12");
+    assertEquals(cacheData.getData("anniversary"), "9223372036825200000");
   }
 
 
