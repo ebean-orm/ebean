@@ -1,47 +1,49 @@
 package com.avaje.tests.model.basic;
 
-import java.util.List;
-import java.util.UUID;
+import com.avaje.ebean.annotation.Cache;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import java.util.List;
+import java.util.UUID;
 
+@Cache
 @Entity
 public class UUOne {
 
-    @Id
-    UUID id;
-    
-    String name;
+  @Id
+  UUID id;
+
+  String name;
 
 
-    @OneToMany(cascade=CascadeType.ALL, mappedBy="master")
-    List<UUTwo> comments;
-    
-    public UUID getId() {
-        return id;
-    }
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "master")
+  List<UUTwo> comments;
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+  public UUID getId() {
+    return id;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public void setId(UUID id) {
+    this.id = id;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public List<UUTwo> getComments() {
-        return comments;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setComments(List<UUTwo> comments) {
-        this.comments = comments;
-    }
-    
+  public List<UUTwo> getComments() {
+    return comments;
+  }
+
+  public void setComments(List<UUTwo> comments) {
+    this.comments = comments;
+  }
+
 }

@@ -1,7 +1,5 @@
 package com.avaje.ebean.cache;
 
-import com.avaje.ebean.EbeanServer;
-
 /**
  * Represents part of the "L2" server side cache.
  * <p>
@@ -16,27 +14,6 @@ import com.avaje.ebean.EbeanServer;
  * @author rbygrave
  */
 public interface ServerCache {
-
-  /**
-   * Just after a cache is created this init method is called. This is so that a
-   * cache implementation can make use of the BackgroundExecutor service to
-   * trim/cleanup itself or use the EbeanServer to populate itself.
-   * <p>
-   * This method is called after the cache is constructed but before the cache
-   * is made available for use.
-   * </p>
-   */
-  void init(EbeanServer ebeanServer);
-
-  /**
-   * Return the configuration options for this cache.
-   */
-  ServerCacheOptions getOptions();
-
-  /**
-   * Update the configuration options for this cache.
-   */
-  void setOptions(ServerCacheOptions options);
 
   /**
    * Return the value given the key.

@@ -1,5 +1,6 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.Cache;
 import com.avaje.ebean.annotation.ChangeLog;
 import com.avaje.ebean.annotation.DocEmbedded;
 import com.avaje.ebean.annotation.DocStore;
@@ -30,6 +31,7 @@ import java.util.List;
 /**
  * Order entity bean.
  */
+@Cache
 @DocStore
 @ChangeLog
 @Entity

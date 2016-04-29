@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import com.avaje.ebean.annotation.CacheStrategy;
-import com.avaje.ebean.annotation.CacheBeanTuning;
+import com.avaje.ebean.annotation.Cache;
 import com.avaje.ebean.annotation.DbComment;
 import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.Draftable;
@@ -14,7 +13,6 @@ import com.avaje.ebean.annotation.ReadAudit;
 import com.avaje.ebean.annotation.UpdateMode;
 import com.avaje.ebean.annotation.View;
 import com.avaje.ebean.config.TableName;
-import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.CompoundUniqueConstraint;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
@@ -202,34 +200,9 @@ public class AnnotationClass extends AnnotationParser {
       readNamedUpdate(namedUpdate);
     }
 
-    CacheStrategy cacheStrategy = cls.getAnnotation(CacheStrategy.class);
-    CacheBeanTuning cacheBeanTuning = cls.getAnnotation(CacheBeanTuning.class);
-    if (cacheStrategy != null || cacheBeanTuning != null) {
-      readCacheStrategy(cacheStrategy, cacheBeanTuning);
-    }
-  }
-
-  private void readCacheStrategy(CacheStrategy cacheStrategy, CacheBeanTuning cacheBeanTuning) {
-
-    if (disableL2Cache) {
-      return;
-    }
-    CacheOptions cacheOptions = descriptor.getCacheOptions();
-    if (cacheBeanTuning != null) {
-      cacheOptions.setMaxSecsToLive(cacheBeanTuning.maxSecsToLive());
-      cacheOptions.setMaxIdleSecs(cacheBeanTuning.maxIdleSecs());
-    }
-    if (cacheStrategy != null) {
-      cacheOptions.setUseCache(cacheStrategy.useBeanCache());
-      cacheOptions.setReadOnly(cacheStrategy.readOnly());
-      if (cacheStrategy.naturalKey().length() > 0) {
-        String propName = cacheStrategy.naturalKey().trim();
-        DeployBeanProperty beanProperty = descriptor.getBeanProperty(propName);
-        if (beanProperty != null) {
-          beanProperty.setNaturalKey();
-          cacheOptions.setNaturalKey(propName);
-        }
-      }
+    Cache cache = cls.getAnnotation(Cache.class);
+    if (cache != null && !disableL2Cache) {
+      descriptor.setCache(cache);
     }
   }
 

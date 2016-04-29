@@ -335,11 +335,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (encryptKeyManager != null) {
       encryptKeyManager.initialise();
     }
-    List<BeanDescriptor<?>> list = beanDescriptorManager.getBeanDescriptorList();
-    for (int i = 0; i < list.size(); i++) {
-      list.get(i).cacheInitialise();
-    }
-
   }
 
   /**
@@ -1026,7 +1021,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Try to get the object out of the persistence context.
    */
   @SuppressWarnings("unchecked")
-  private <T> T findIdCheckPersistenceContextAndCache(Transaction transaction, SpiQuery<T> query) {
+  private <T> T findIdCheckPersistenceContextAndCache(Transaction transaction, SpiQuery<T> query, Object id) {
 
     SpiTransaction t = (SpiTransaction) transaction;
     if (t == null) {
@@ -1034,13 +1029,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     BeanDescriptor<T> desc = query.getBeanDescriptor();
+    id = desc.convertId(id);
 
     PersistenceContext pc = null;
     if (t != null && useTransactionPersistenceContext(query)) {
       // first look in the transaction scoped persistence context
       pc = t.getPersistenceContext();
       if (pc != null) {
-        WithOption o = desc.contextGetWithOption(pc, query.getId());
+        WithOption o = desc.contextGetWithOption(pc, id);
         if (o != null) {
           if (o.isDeleted()) {
             // Bean was previously deleted in the same transaction / persistence context
@@ -1057,7 +1053,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
 
     // Hit the L2 bean cache
-    return desc.cacheBeanGet(query, pc);
+    return desc.cacheBeanGet(id, query.isReadOnly(), pc);
   }
 
   /**
@@ -1083,7 +1079,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (SpiQuery.Mode.NORMAL.equals(spiQuery.getMode()) && !spiQuery.isLoadBeanCache()) {
       // See if we can skip doing the fetch completely by getting the bean from the
       // persistence context or the bean cache
-      T bean = findIdCheckPersistenceContextAndCache(t, spiQuery);
+      T bean = findIdCheckPersistenceContextAndCache(t, spiQuery,  spiQuery.getId());
       if (bean != null) {
         return bean;
       }
@@ -1104,19 +1100,21 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   public <T> T findUnique(Query<T> query, Transaction t) {
 
-    // actually a find by Id type of query...
-    // ... perhaps with joins and cache hints
     Object id = query.getId();
     if (id != null) {
+      // actually a find by Id query
       return findId(query, t);
     }
 
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     BeanDescriptor<T> desc = spiQuery.getBeanDescriptor();
 
-    T bean = desc.cacheNaturalKeyLookup(spiQuery, (SpiTransaction) t);
-    if (bean != null) {
-      return bean;
+    id = desc.cacheNaturalKeyIdLookup(spiQuery);
+    if (id != null) {
+      T bean = findIdCheckPersistenceContextAndCache(t, spiQuery, id);
+      if (bean != null) {
+        return bean;
+      }
     }
 
     // a query that is expected to return either 0 or 1 rows
@@ -2023,16 +2021,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   public BeanDescriptor<?> getBeanDescriptorById(String beanClassName) {
     return beanDescriptorManager.getBeanDescriptorByClassName(beanClassName);
-  }
-
-  @Override
-  public boolean initQueryCache(String key) {
-    BeanDescriptor<?> desc = getBeanDescriptorById(key);
-    if (desc != null) {
-      desc.queryCacheInit();
-      return true;
-    }
-    return false;
   }
 
   /**

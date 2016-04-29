@@ -1,111 +1,67 @@
 package com.avaje.ebeaninternal.server.core;
 
+import com.avaje.ebean.annotation.Cache;
+
 /**
  * Options for controlling cache behaviour for a given type.
  */
 public class CacheOptions {
 
-  private boolean useCache;
-
-  private boolean readOnly;
-
-  private String naturalKey;
-
-  private int maxIdleSecs;
-  
-  private long maxSecsToLive;
-  
   /**
-   * Construct with options.
+   * Instance when no caching is used.
    */
-  public CacheOptions() {
+  public static CacheOptions NO_CACHING = new CacheOptions();
+
+  private final boolean enableBeanCache;
+  private final boolean enableQueryCache;
+  private final boolean readOnly;
+  private final String naturalKey;
+
+  /**
+   * Construct for no caching.
+   */
+  private CacheOptions() {
+    enableBeanCache = false;
+    enableQueryCache = false;
+    readOnly = false;
+    naturalKey = null;
   }
 
   /**
-   * Return true if this should use a cache for lazy loading.
+   * Construct with cache annotation.
    */
-  public boolean isUseCache() {
-    return useCache;
+  public CacheOptions(Cache cache, String naturalKey) {
+    enableBeanCache = cache.enableBeanCache();
+    enableQueryCache = cache.enableQueryCache();
+    readOnly = cache.readOnly();
+    this.naturalKey = naturalKey;
   }
 
   /**
-   * Set whether to use the bean cache for the associated type.
+   * Return true if bean caching is enabled.
    */
-  public void setUseCache(boolean useCache) {
-    this.useCache = useCache;
+  public boolean isEnableBeanCache() {
+    return enableBeanCache;
   }
 
   /**
-   * Return the readOnly default setting.
+   * Return true if query caching is enabled.
+   */
+  public boolean isEnableQueryCache() {
+    return enableQueryCache;
+  }
+
+  /**
+   * Return true if bean cache hits default to read only.
    */
   public boolean isReadOnly() {
     return readOnly;
   }
 
   /**
-   * Set read Only default setting.
-   */
-  public void setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
-  }
-
-  /**
-   * Return true if a natural key is set.
-   */
-  public boolean isUseNaturalKeyCache() {
-    return naturalKey != null;
-  }
-
-  /**
-   * Return the natural key property.
+   * Return the natural key property name.
    */
   public String getNaturalKey() {
     return naturalKey;
   }
-
-  /**
-   * Set the natural key property.
-   */
-  public void setNaturalKey(String naturalKey) {
-    if (naturalKey != null && naturalKey.length() != 0) {
-      this.naturalKey = naturalKey.trim();
-    }
-  }
-  
-  /**
-   * Return the max age of entries in seconds.
-   */
-  public long getMaxSecsToLive() {
-    return maxSecsToLive;
-  }
-
-  /**
-   * Set the max age of entries in seconds.
-   */
-  public void setMaxSecsToLive(long maxSecsToLive) {
-    this.maxSecsToLive = maxSecsToLive;
-  }
-
-  /**
-   * Set the max idle seconds.
-   */
-  public void setMaxIdleSecs(int maxIdleSecs) {
-    this.maxIdleSecs = maxIdleSecs;
-  }
-
-  /**
-   * Return the max idle seconds.
-   */
-  public int getMaxIdleSecs() {
-    return maxIdleSecs;
-  }
-
-  /**
-   * Return true if the entry exceeds the maxIdleSecs or maxSecsToLive.
-   */
-  public boolean isTooOldInMillis(long ageMillis) {
-    long secs = ageMillis / 1000;
-    return (maxIdleSecs > 0 && secs > maxIdleSecs) || (maxSecsToLive > 0 && secs > maxSecsToLive);
-  }
-
 }

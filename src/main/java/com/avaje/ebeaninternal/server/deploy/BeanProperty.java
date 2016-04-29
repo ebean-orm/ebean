@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.DbType;
@@ -764,7 +765,7 @@ public class BeanProperty implements ElPropertyValue, Property {
    * This uses parse() as per the comment in getCacheDataValue().
    * </p>
    */
-  public void setCacheDataValue(EntityBean bean, Object cacheData) {
+  public void setCacheDataValue(EntityBean bean, Object cacheData, PersistenceContext context) {
     if (cacheData instanceof String) {
       // parse back from string to support optimisation of java object serialisation
       cacheData = scalarType.parse((String)cacheData);

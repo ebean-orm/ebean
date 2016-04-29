@@ -12,28 +12,33 @@ import com.avaje.ebean.cache.ServerCacheStatistics;
 import com.avaje.tests.model.basic.Country;
 import com.avaje.tests.model.basic.ResetBasicData;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class TestQueryCacheCountry extends BaseTestCase {
   
   @Test
   public void test() {
     
     ResetBasicData.reset();
-    
+
+    awaitL2Cache();
+
     ServerCache queryCache = Ebean.getServerCacheManager().getQueryCache(Country.class);
     queryCache.clear();
 
     ServerCache beanCache = Ebean.getServerCacheManager().getBeanCache(Country.class);
     beanCache.clear();
 
-    Assert.assertEquals(0, queryCache.getStatistics(false).getSize());
+    assertEquals(0, queryCache.getStatistics(false).getSize());
     
     List<Country> countryList0 = Ebean.find(Country.class)
       .setUseQueryCache(true)
       .order().asc("name")
       .findList();
     
-    Assert.assertEquals(1, queryCache.getStatistics(false).getSize());
-    Assert.assertTrue(countryList0.size() > 0);
+    assertEquals(1, queryCache.getStatistics(false).getSize());
+    assertTrue(countryList0.size() > 0);
     
     List<Country> countryList1 = Ebean.find(Country.class)
         .setUseQueryCache(true)
@@ -41,8 +46,8 @@ public class TestQueryCacheCountry extends BaseTestCase {
         .findList();
       
     ServerCacheStatistics statistics = queryCache.getStatistics(false);
-    Assert.assertEquals(1, statistics.getSize());
-    Assert.assertEquals(1, statistics.getHitCount());
+    assertEquals(1, statistics.getSize());
+    assertEquals(1, statistics.getHitCount());
     Assert.assertSame(countryList1, countryList0);
     
     Country nz = Ebean.find(Country.class, "NZ");
@@ -51,7 +56,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
     awaitL2Cache();
 
     statistics = queryCache.getStatistics(false);
-    Assert.assertEquals(0, statistics.getSize());
+    assertEquals(0, statistics.getSize());
     
     List<Country> countryList2 = Ebean.find(Country.class)
         .setUseQueryCache(true)

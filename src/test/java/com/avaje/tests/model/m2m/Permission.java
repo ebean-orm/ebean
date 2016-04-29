@@ -1,6 +1,6 @@
 package com.avaje.tests.model.m2m;
 
-import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.Cache;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +14,7 @@ import java.util.UUID;
  * The Class Permission.
  */
 @Entity
-@CacheStrategy(readOnly = true)
+@Cache(readOnly = true)
 @Table(name = "mt_permission")
 public class Permission {
 

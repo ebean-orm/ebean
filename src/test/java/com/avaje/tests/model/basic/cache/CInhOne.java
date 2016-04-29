@@ -1,12 +1,12 @@
 package com.avaje.tests.model.basic.cache;
 
-import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.Cache;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 
-@CacheStrategy
+@Cache
 @Entity
 @Inheritance
 @DiscriminatorValue("O")

@@ -1,5 +1,7 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.Cache;
+
 import java.sql.Timestamp;
 
 import javax.persistence.Entity;
@@ -7,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+@Cache(enableQueryCache = true)
 @Entity
 @Table(name = "e_basicver")
 public class EBasicVer {

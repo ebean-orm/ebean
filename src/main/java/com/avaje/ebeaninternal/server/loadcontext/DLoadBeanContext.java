@@ -175,7 +175,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
         return;
       }
 
-      if (context.hitCache && context.desc.cacheBeanLoad(ebi)) {
+      if (context.hitCache && context.desc.cacheBeanLoad(ebi, persistenceContext)) {
         // successfully hit the L2 cache so don't invoke DB lazy loading
         list.remove(ebi);
         return;
@@ -185,7 +185,7 @@ public class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContex
         // check each of the beans in the batch to see if they are in the L2 cache.
         Iterator<EntityBeanIntercept> iterator = list.iterator();
         while (iterator.hasNext()) {
-          if (context.desc.cacheBeanLoad(iterator.next())) {
+          if (context.desc.cacheBeanLoad(iterator.next(), persistenceContext)) {
             iterator.remove();
           }
         }

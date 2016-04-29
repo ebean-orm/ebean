@@ -28,9 +28,6 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
       inserted.add(insert(names[i]));
     }
     
-    ServerCacheManager serverCacheManager = Ebean.getServerCacheManager();
-    serverCacheManager.setCaching(UUOne.class, true);
-    
     UUOne b = Ebean.find(UUOne.class)
       .setId(inserted.get(1).getId())
       .setUseCache(true)

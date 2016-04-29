@@ -4,6 +4,7 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import com.avaje.tests.model.basic.Address;
 import com.avaje.tests.model.basic.Car;
 import com.avaje.tests.model.basic.Customer;
@@ -51,7 +52,7 @@ public class CachedBeanDataFromBeanTest extends BaseTestCase {
 
     Car newCar = new Car();
     EntityBean entityBean = (EntityBean)newCar;
-    CachedBeanDataToBean.load(carDesc, entityBean, cacheData);
+    CachedBeanDataToBean.load(carDesc, entityBean, cacheData, new DefaultPersistenceContext());
 
     assertEquals(newCar.getId(), car.getId());
     assertEquals(newCar.getDriver(), car.getDriver());

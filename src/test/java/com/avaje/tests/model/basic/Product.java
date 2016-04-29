@@ -10,7 +10,7 @@ import javax.persistence.Version;
 import javax.validation.constraints.Size;
 
 import com.avaje.ebean.annotation.CacheQueryTuning;
-import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.Cache;
 import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.DocStore;
 
@@ -18,7 +18,7 @@ import com.avaje.ebean.annotation.DocStore;
  * Product entity bean.
  */
 @DocStore
-@CacheStrategy
+@Cache
 @CacheQueryTuning(maxSecsToLive = 15)
 @Entity
 @Table(name = "o_product")

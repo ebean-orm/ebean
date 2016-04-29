@@ -1,12 +1,10 @@
 package com.avaje.ebeaninternal.server.cache;
 
-import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.cache.ServerCacheType;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
 
 
 /**
@@ -22,15 +20,10 @@ public class DefaultServerCacheManager implements ServerCacheManager {
 
   private final DefaultCacheHolder collectionIdsCache;
 
-  private final ServerCacheFactory cacheFactory;
-
-  private SpiEbeanServer ebeanServer;
-
   /**
    * Create with a cache factory and default cache options.
    */
   public DefaultServerCacheManager(ServerCacheFactory cacheFactory, ServerCacheOptions defaultBeanOptions, ServerCacheOptions defaultQueryOptions) {
-    this.cacheFactory = cacheFactory;
     this.beanCache = new DefaultCacheHolder(cacheFactory, defaultBeanOptions);
     this.queryCache = new DefaultCacheHolder(cacheFactory, defaultQueryOptions);
     this.naturalKeyCache = new DefaultCacheHolder(cacheFactory, defaultBeanOptions);
@@ -42,18 +35,6 @@ public class DefaultServerCacheManager implements ServerCacheManager {
    */
   public DefaultServerCacheManager() {
     this(new DefaultServerCacheFactory(), new ServerCacheOptions(), new ServerCacheOptions());
-  }
-
-  public void init(EbeanServer server) {
-    cacheFactory.init(server);
-    this.ebeanServer = (SpiEbeanServer) server;
-  }
-
-  /**
-   * Set bean caching on or off for a given bean type.
-   */
-  public void setCaching(Class<?> beanType, boolean useCache) {
-    ebeanServer.getBeanDescriptor(beanType).setUseCache(useCache);
   }
 
   /**

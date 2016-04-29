@@ -46,7 +46,7 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
 
     // check transaction context to see if it already exists
     PersistenceContext pc = ctx.getPersistenceContext();
-    BeanDescriptor<?> desc = rowInheritInfo.getBeanDescriptor();
+    BeanDescriptor<?> desc = rowInheritInfo.desc();
     Object existing = desc.contextGet(pc, id);
     if (existing != null) {
       return existing;

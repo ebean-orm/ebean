@@ -150,8 +150,8 @@ public class VisitAllUsing {
     }
 
     public void visit(InheritInfo inheritInfo) {
-      BeanProperty[] propertiesLocal = inheritInfo.getBeanDescriptor().propertiesLocal();
-      for (int i = 0; i <propertiesLocal.length ; i++) {
+      BeanProperty[] propertiesLocal = inheritInfo.desc().propertiesLocal();
+      for (int i = 0; i < propertiesLocal.length; i++) {
         owner.visit(pv, propertiesLocal[i]);
       }
     }

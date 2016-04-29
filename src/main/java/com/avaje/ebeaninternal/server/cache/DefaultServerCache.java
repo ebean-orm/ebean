@@ -107,15 +107,12 @@ public class DefaultServerCache implements ServerCache {
     return 0;
   }
 
-  @Override
-  public void init(EbeanServer server) {
+  public void periodicTrim(BackgroundExecutor executor) {
 
     EvictionRunnable trim = new EvictionRunnable();
 
     // default to trimming the cache every 60 seconds
     long trimFreqSecs = (trimFrequency == 0) ? 60 : trimFrequency;
-
-    BackgroundExecutor executor = server.getBackgroundExecutor();
     executor.executePeriodically(trim, trimFreqSecs, TimeUnit.SECONDS);
   }
 
@@ -173,33 +170,6 @@ public class DefaultServerCache implements ServerCache {
       return 0;
     } else {
       return (int) (hc * 100 / totalCount);
-    }
-  }
-
-  /**
-   * Return the options controlling the cache.
-   */
-  @Override
-  public ServerCacheOptions getOptions() {
-    synchronized (monitor) {
-      ServerCacheOptions options = new ServerCacheOptions();
-      options.setMaxIdleSecs(maxIdleSecs);
-      options.setMaxSize(maxSize);
-      options.setMaxSecsToLive(maxSecsToLive);
-      options.setTrimFrequency(trimFrequency);
-      return options;
-    }
-  }
-
-  /**
-   * Set the options controlling the cache
-   */
-  @Override
-  public void setOptions(ServerCacheOptions options) {
-    synchronized (monitor) {
-      maxIdleSecs = options.getMaxIdleSecs();
-      maxSize = options.getMaxSize();
-      maxSecsToLive = options.getMaxSecsToLive();
     }
   }
 

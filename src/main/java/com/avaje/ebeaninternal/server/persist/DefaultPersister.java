@@ -1352,7 +1352,7 @@ public final class DefaultPersister implements Persister {
       // convert into a list of reference objects and perform delete by object
       List<Object> refList = new ArrayList<Object>(childIds.size());
       for (Object id : childIds) {
-        refList.add(targetDesc.createReference(null, id));
+        refList.add(targetDesc.createReference(null, id, null));
       }
       deleteList(refList, t, softDelete);
 

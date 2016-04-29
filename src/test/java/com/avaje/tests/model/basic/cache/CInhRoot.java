@@ -1,13 +1,13 @@
 package com.avaje.tests.model.basic.cache;
 
-import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.Cache;
 import com.avaje.tests.model.basic.BasicDomain;
 
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 
-@CacheStrategy
+@Cache
 @Entity
 @Inheritance
 @DiscriminatorColumn(length = 3)

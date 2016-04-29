@@ -18,7 +18,7 @@ public class BeanDescriptorTest extends BaseTestCase {
   @Test
   public void createReference() {
 
-    Customer bean = customerDesc.createReference(null, 42);
+    Customer bean = customerDesc.createReference(null, 42, null);
     assertThat(bean.getId()).isEqualTo(42);
     assertThat(server().getBeanState(bean).isReadOnly()).isFalse();
   }
@@ -26,14 +26,14 @@ public class BeanDescriptorTest extends BaseTestCase {
   @Test
   public void createReference_whenReadOnly() {
 
-    Customer bean = customerDesc.createReference(Boolean.TRUE, 42);
+    Customer bean = customerDesc.createReference(Boolean.TRUE, 42, null);
     assertThat(server().getBeanState(bean).isReadOnly()).isTrue();
   }
 
   @Test
   public void createReference_whenNotReadOnly() {
 
-    Customer bean = customerDesc.createReference(Boolean.FALSE, 42);
+    Customer bean = customerDesc.createReference(Boolean.FALSE, 42, null);
     assertThat(server().getBeanState(bean).isReadOnly()).isFalse();
   }
 

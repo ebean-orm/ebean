@@ -10,12 +10,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.Cache;
 
 /**
  * Cached bean for testing caching implementation.
  */
-@CacheStrategy
+@Cache
 @Entity
 @Table(name = "o_cached_bean")
 public class OCachedBean {

@@ -270,14 +270,14 @@ public class DefaultBeanLoader {
     boolean draft = desc.isDraftInstance(bean);
 
     if (embeddedOwnerIndex == -1) {
-      if (!draft && SpiQuery.Mode.LAZYLOAD_BEAN.equals(mode) && desc.isBeanCaching()) {
-        // lazy loading and the bean cache is active 
-        if (desc.cacheBeanLoad(bean, ebi, id)) {
-          return;
-        }
-      }
       if (desc.lazyLoadMany(ebi)) {
         return;
+      }
+      if (!draft && SpiQuery.Mode.LAZYLOAD_BEAN.equals(mode) && desc.isBeanCaching()) {
+        // lazy loading and the bean cache is active 
+        if (desc.cacheBeanLoad(bean, ebi, id, pc)) {
+          return;
+        }
       }
     }
 

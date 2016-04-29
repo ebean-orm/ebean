@@ -4,9 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.Cache;
 
-@CacheStrategy(readOnly = true, useBeanCache = true)
+@Cache(readOnly = true)
 @Entity
 @Table(name="feature_desc")
 public class FeatureDescription  {

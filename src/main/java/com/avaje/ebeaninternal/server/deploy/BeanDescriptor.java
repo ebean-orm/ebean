@@ -39,7 +39,6 @@ import com.avaje.ebeaninternal.api.CQueryPlanKey;
 import com.avaje.ebeaninternal.api.LoadContext;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
-import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import com.avaje.ebeaninternal.api.TransactionEventTable.TableIUD;
 import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
@@ -723,7 +722,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       propertiesMany[i].initialisePostTarget();
     }
     if (inheritInfo != null && !inheritInfo.isRoot()) {
-      docStoreAdapter = (DocStoreBeanAdapter<T>)inheritInfo.getRoot().getBeanDescriptor().docStoreAdapter();
+      docStoreAdapter = (DocStoreBeanAdapter<T>)inheritInfo.getRoot().desc().docStoreAdapter();
     }
     docMapping = docStoreAdapter.createDocMapping();
     docStoreAdapter.registerPaths();
@@ -801,13 +800,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   private BeanChange newBeanChange(Object id, ChangeType changeType, Map<String, ValuePair> values) {
     return new BeanChange(getBaseTable(), id, changeType, values);
-  }
-
-  /**
-   * Initialise the cache once the server has started.
-   */
-  public void cacheInitialise() {
-    cacheHelp.initialise();
   }
 
   public SqlUpdate deleteById(Object id, List<Object> idList, boolean softDelete) {
@@ -996,7 +988,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public BeanType<?> root() {
     if (inheritInfo != null && !inheritInfo.isRoot()) {
-      return inheritInfo.getRoot().getBeanDescriptor();
+      return inheritInfo.getRoot().desc();
     }
     return this;
   }
@@ -1047,13 +1039,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
-   * Set the bean caching on or off.
-   */
-  public void setUseCache(boolean useCache) {
-    cacheHelp.setUseCache(useCache);
-  }
-
-  /**
    * Return true if there is currently bean caching for this type of bean.
    */
   public boolean isBeanCaching() {
@@ -1080,10 +1065,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       return false;
     }
     return cacheHelp.isCacheNotify();
-  }
-
-  public void queryCacheInit() {
-    cacheHelp.queryCacheInit();
   }
 
   /**
@@ -1153,22 +1134,22 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Load the embedded bean (taking into account inheritance).
    */
-  public EntityBean cacheEmbeddedBeanLoad(CachedBeanData data) {
-    return cacheHelp.embeddedBeanLoad(data);
+  public EntityBean cacheEmbeddedBeanLoad(CachedBeanData data, PersistenceContext context) {
+    return cacheHelp.embeddedBeanLoad(data, context);
   }
 
   /**
    * Load the embedded bean as the root type.
    */
-  EntityBean cacheEmbeddedBeanLoadDirect(CachedBeanData data) {
-    return cacheHelp.embeddedBeanLoadDirect(data);
+  EntityBean cacheEmbeddedBeanLoadDirect(CachedBeanData data, PersistenceContext context) {
+    return cacheHelp.embeddedBeanLoadDirect(data, context);
   }
 
   /**
    * Load the entity bean as the correct bean type.
    */
-  EntityBean cacheBeanLoadDirect(Object id, Boolean readOnly, CachedBeanData data) {
-    return cacheHelp.loadBeanDirect(id, readOnly, data);
+  EntityBean cacheBeanLoadDirect(Object id, Boolean readOnly, CachedBeanData data, PersistenceContext context) {
+    return cacheHelp.loadBeanDirect(id, readOnly, data, context);
   }
 
   /**
@@ -1195,8 +1176,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return a bean from the bean cache (or null).
    */
-  public T cacheBeanGet(SpiQuery<T> query, PersistenceContext context) {
-    return cacheHelp.beanCacheGet(query, context);
+  public T cacheBeanGet(Object id, Boolean readOnly, PersistenceContext context) {
+    return cacheHelp.beanCacheGet(id, readOnly, context);
   }
 
   /**
@@ -1209,24 +1190,24 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Returns true if it managed to populate/load the bean from the cache.
    */
-  public boolean cacheBeanLoad(EntityBean bean, EntityBeanIntercept ebi, Object id) {
-    return cacheHelp.beanCacheLoad(bean, ebi, id);
+  public boolean cacheBeanLoad(EntityBean bean, EntityBeanIntercept ebi, Object id, PersistenceContext context) {
+    return cacheHelp.beanCacheLoad(bean, ebi, id, context);
   }
 
   /**
    * Returns true if it managed to populate/load the bean from the cache.
    */
-  public boolean cacheBeanLoad(EntityBeanIntercept ebi) {
+  public boolean cacheBeanLoad(EntityBeanIntercept ebi, PersistenceContext context) {
     EntityBean bean = ebi.getOwner();
     Object id = getId(bean);
-    return cacheBeanLoad(bean, ebi, id);
+    return cacheBeanLoad(bean, ebi, id, context);
   }
 
   /**
    * Try to hit the cache using the natural key.
    */
-  public T cacheNaturalKeyLookup(SpiQuery<T> query, SpiTransaction t) {
-    return cacheHelp.naturalKeyLookup(query, t);
+  public Object cacheNaturalKeyIdLookup(SpiQuery<T> query) {
+    return cacheHelp.naturalKeyIdLookup(query);
   }
 
   public void cacheNaturalKeyPut(Object id, Object newKey) {
@@ -1604,7 +1585,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Create a reference bean based on the id.
    */
   @SuppressWarnings("unchecked")
-  public T createReference(Boolean readOnly, Object id) {
+  public T createReference(Boolean readOnly, Object id, PersistenceContext pc) {
 
     if (cacheSharableBeans && !Boolean.FALSE.equals(readOnly)) {
       CachedBeanData d = cacheHelp.beanCacheGetData(id);
@@ -1620,13 +1601,17 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     }
     try {
       EntityBean eb = createEntityBean();
-      convertSetId(id, eb);
+      id = convertSetId(id, eb);
 
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
       ebi.setBeanLoader(ebeanServer);
       ebi.setReference(idPropertyIndex);
       if (Boolean.TRUE == readOnly) {
         ebi.setReadOnly(true);
+      }
+      if (pc != null) {
+        contextPut(pc, id, eb);
+        ebi.setPersistenceContext(pc);
       }
 
       return (T) eb;
@@ -1696,7 +1681,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       return unidirectional;
     }
     if (inheritInfo != null && !inheritInfo.isRoot()) {
-      return inheritInfo.getParent().getBeanDescriptor().getUnidirectional();
+      return inheritInfo.getParent().desc().getUnidirectional();
     }
     return null;
   }
@@ -1792,11 +1777,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Create a reference bean and put it in the persistence context (and return it).
    */
   public Object contextRef(PersistenceContext pc, Boolean readOnly, Object id) {
-    Object ref = createReference(readOnly, id);
-    if (pc != null) {
-      contextPut(pc, id, ref);
-    }
-    return ref;
+    return createReference(readOnly, id, pc);
   }
 
   /**
@@ -1945,17 +1926,33 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     if (lazyLoadProperty == -1) {
       return false;
     }
-    String lazyLoadPropertyName = ebi.getProperty(lazyLoadProperty);
-    BeanProperty lazyLoadBeanProp = getBeanProperty(lazyLoadPropertyName);
 
+    if (inheritInfo != null) {
+      return descOf(ebi.getOwner().getClass()).lazyLoadMany(ebi, lazyLoadProperty);
+    }
+    return lazyLoadMany(ebi, lazyLoadProperty);
+  }
+
+  /**
+   * Check for lazy loading of many property.
+   */
+  private boolean lazyLoadMany(EntityBeanIntercept ebi, int lazyLoadProperty) {
+
+    BeanProperty lazyLoadBeanProp = propertiesIndex[lazyLoadProperty];
     if (lazyLoadBeanProp instanceof BeanPropertyAssocMany<?>) {
       BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) lazyLoadBeanProp;
       manyProp.createReference(ebi.getOwner());
       ebi.setLoadedLazy();
       return true;
     }
-
     return false;
+  }
+
+  /**
+   * Return the correct BeanDescriptor based on the bean class type.
+   */
+  BeanDescriptor<?> descOf(Class<?> type) {
+    return inheritInfo.readType(type).desc();
   }
 
   /**
@@ -2176,8 +2173,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   @Override
   @SuppressWarnings("unchecked")
   public T createBeanUsingDisc(Object discValue) {
-    InheritInfo type = inheritInfo.getType(discValue.toString());
-    return (T)type.getBeanDescriptor().createBean();
+    return (T) inheritInfo.getType(discValue.toString()).desc().createBean();
   }
 
   @Override

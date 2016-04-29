@@ -37,8 +37,7 @@ public class BeanDescriptorJsonHelp<T> {
       String discColumn = localInheritInfo.getDiscriminatorColumn();
       writeJson.gen().writeStringField(discColumn, discValue);
 
-      BeanDescriptor<?> localDescriptor = localInheritInfo.getBeanDescriptor();
-      localDescriptor.jsonWriteProperties(writeJson, bean);
+      localInheritInfo.desc().jsonWriteProperties(writeJson, bean);
     }
 
     writeJson.writeEndObject();
@@ -54,13 +53,9 @@ public class BeanDescriptorJsonHelp<T> {
 
     if (inheritInfo == null) {
       jsonWriteDirtyProperties(writeJson, bean, dirtyProps);
-
     } else {
-      InheritInfo localInheritInfo = inheritInfo.readType(bean.getClass());
-      BeanDescriptor<?> localDescriptor = localInheritInfo.getBeanDescriptor();
-      localDescriptor.jsonWriteDirtyProperties(writeJson, bean, dirtyProps);
+      desc.descOf(bean.getClass()).jsonWriteDirtyProperties(writeJson, bean, dirtyProps);
     }
-
   }
 
   protected void jsonWriteDirtyProperties(WriteJson writeJson, EntityBean bean, boolean[] dirtyProps) throws IOException {
@@ -120,11 +115,7 @@ public class BeanDescriptorJsonHelp<T> {
     }
 
     String discValue = parser.nextTextValue();
-
-    // determine the sub type for this particular json object
-    InheritInfo localInheritInfo = inheritInfo.readType(discValue);
-    BeanDescriptor<?> localDescriptor = localInheritInfo.getBeanDescriptor();
-    return (T) localDescriptor.jsonReadObject(jsonRead, path);
+    return (T) inheritInfo.readType(discValue).desc().jsonReadObject(jsonRead, path);
   }
 
   protected T jsonReadObject(ReadJson readJson, String path) throws IOException {

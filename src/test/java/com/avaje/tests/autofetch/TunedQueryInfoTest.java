@@ -32,7 +32,6 @@ public class TunedQueryInfoTest extends BaseTestCase {
     
     ServerCacheManager serverCacheManager = Ebean.getServer(null).getServerCacheManager();
     serverCacheManager.clearAll();
-    serverCacheManager.setCaching(Order.class, false);    
   }
   
   @Test

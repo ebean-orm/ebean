@@ -5,6 +5,7 @@ import com.avaje.ebean.PersistenceContextScope;
 import com.avaje.ebean.annotation.Encrypted;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
+import com.avaje.ebean.cache.ServerCachePlugin;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.event.BeanFindController;
@@ -356,7 +357,7 @@ public class ServerConfig {
 
   private DbEncrypt dbEncrypt;
 
-  private ServerCacheFactory serverCacheFactory;
+  private ServerCachePlugin serverCachePlugin;
 
   private ServerCacheManager serverCacheManager;
 
@@ -938,17 +939,17 @@ public class ServerConfig {
   }
 
   /**
-   * Return the ServerCacheFactory.
+   * Return the ServerCachePlugin.
    */
-  public ServerCacheFactory getServerCacheFactory() {
-    return serverCacheFactory;
+  public ServerCachePlugin getServerCachePlugin() {
+    return serverCachePlugin;
   }
 
   /**
-   * Set the ServerCacheFactory to use.
+   * Set the ServerCachePlugin to use.
    */
-  public void setServerCacheFactory(ServerCacheFactory serverCacheFactory) {
-    this.serverCacheFactory = serverCacheFactory;
+  public void setServerCachePlugin(ServerCachePlugin serverCachePlugin) {
+    this.serverCachePlugin = serverCachePlugin;
   }
 
   /**
@@ -2352,7 +2353,7 @@ public class ServerConfig {
     encryptDeployManager = createInstance(p, EncryptDeployManager.class, "encryptDeployManager", encryptDeployManager);
     encryptor = createInstance(p, Encryptor.class, "encryptor", encryptor);
     dbEncrypt = createInstance(p, DbEncrypt.class, "dbEncrypt", dbEncrypt);
-    serverCacheFactory = createInstance(p, ServerCacheFactory.class, "serverCacheFactory", serverCacheFactory);
+    serverCachePlugin = createInstance(p, ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
     serverCacheManager = createInstance(p, ServerCacheManager.class, "serverCacheManager", serverCacheManager);
     cacheWarmingDelay = p.getInt("cacheWarmingDelay", cacheWarmingDelay);
     classPathReaderClassName = p.get("classpathreader");

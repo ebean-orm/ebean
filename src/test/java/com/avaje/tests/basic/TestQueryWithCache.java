@@ -85,7 +85,6 @@ public class TestQueryWithCache extends BaseTestCase {
     CacheOptions cacheOptions = beanDescriptor.getCacheOptions();
 
     Assert.assertNotNull(cacheOptions);
-    Assert.assertTrue(cacheOptions.isUseCache());
     Assert.assertTrue(cacheOptions.isReadOnly());
     Assert.assertTrue(beanDescriptor.isCacheSharableBeans());
 

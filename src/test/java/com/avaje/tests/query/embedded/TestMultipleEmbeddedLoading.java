@@ -55,6 +55,8 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     invoice2.getBillAddress().setStreet("3 Pineapple St");
     // bean should be dirty
     Ebean.save(invoice2);
+
+    awaitL2Cache();
     
     EInvoice invoice3 = Ebean.find(EInvoice.class)
         .where().idEq(invoice.getId())

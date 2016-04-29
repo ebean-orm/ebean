@@ -2,9 +2,11 @@ package com.avaje.ebeaninternal.server.cache;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
+import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import com.avaje.tests.model.basic.Address;
 import com.avaje.tests.model.basic.Country;
 import com.avaje.tests.model.basic.Customer;
@@ -50,7 +52,7 @@ public class CacheBeanDataTest extends BaseTestCase {
 
     Customer newCustomer = new Customer();
     newCustomer.setId(c.getId());
-    CachedBeanDataToBean.load(desc, (EntityBean) newCustomer, cacheData);
+    CachedBeanDataToBean.load(desc, (EntityBean) newCustomer, cacheData, new DefaultPersistenceContext());
 
     assertEquals(c.getId(), newCustomer.getId());
     assertEquals(c.getName(), newCustomer.getName());
@@ -91,9 +93,11 @@ public class CacheBeanDataTest extends BaseTestCase {
 
     CachedBeanData addressCacheData = (CachedBeanData) addressBeanProperty.getCacheDataValue((EntityBean) person);
 
+    PersistenceContext context = new DefaultPersistenceContext();
+
     EPerson newPersonCheck = new EPerson();
     newPersonCheck.setId(98989L);
-    addressBeanProperty.setCacheDataValue((EntityBean) newPersonCheck, addressCacheData);
+    addressBeanProperty.setCacheDataValue((EntityBean) newPersonCheck, addressCacheData, context);
 
     EAddress newAddress = newPersonCheck.getAddress();
     assertEquals(address.getStreet(), newAddress.getStreet());
@@ -105,7 +109,7 @@ public class CacheBeanDataTest extends BaseTestCase {
 
     assertNotNull(cacheData);
 
-    EPerson newPerson = (EPerson)desc.cacheEmbeddedBeanLoad(cacheData);
+    EPerson newPerson = (EPerson)desc.cacheEmbeddedBeanLoad(cacheData, context);
 
     assertNotNull(newPerson.getId());
     assertNotNull(newPerson.getName());

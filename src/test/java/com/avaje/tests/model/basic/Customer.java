@@ -1,5 +1,6 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.Cache;
 import com.avaje.ebean.annotation.ChangeLog;
 import com.avaje.ebean.annotation.ChangeLogInsertMode;
 import com.avaje.ebean.annotation.DbComment;
@@ -26,6 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Customer entity bean.
  */
+@Cache(enableQueryCache = true)
 @DocStore
 @ChangeLog(inserts = ChangeLogInsertMode.EXCLUDE, updatesThatInclude = {"name","status"})
 @Entity

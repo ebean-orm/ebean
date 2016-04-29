@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
+import com.avaje.ebean.annotation.Cache;
 import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.DocStoreMode;
@@ -153,7 +154,7 @@ public class DeployBeanDescriptor<T> {
   private final List<BeanQueryAdapter> queryAdapters = new ArrayList<BeanQueryAdapter>();
   private final List<BeanPostLoad> postLoaders = new ArrayList<BeanPostLoad>();
 
-  private final CacheOptions cacheOptions = new CacheOptions();
+  private CacheOptions cacheOptions = CacheOptions.NO_CACHING;
 
   /**
    * If set overrides the find implementation. Server side only.
@@ -440,6 +441,24 @@ public class DeployBeanDescriptor<T> {
    */
   public void setInheritInfo(InheritInfo inheritInfo) {
     this.inheritInfo = inheritInfo;
+  }
+
+  /**
+   * Enable L2 bean and query caching based on Cache annotation.
+   */
+  public void setCache(Cache cache) {
+
+    String naturalKey = null;
+    if (cache.naturalKey().length() > 0) {
+      // find the property and mark as natural key property
+      String propName = cache.naturalKey().trim();
+      DeployBeanProperty beanProperty = getBeanProperty(propName);
+      if (beanProperty != null) {
+        beanProperty.setNaturalKey();
+        naturalKey = propName;
+      }
+    }
+    this.cacheOptions = new CacheOptions(cache, naturalKey);
   }
 
   /**

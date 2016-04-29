@@ -9,9 +9,9 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.Cache;
 
-@CacheStrategy(useBeanCache=true)
+@Cache
 @Entity
 public class Section extends BasicDomain {
 

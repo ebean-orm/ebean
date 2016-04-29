@@ -6,6 +6,7 @@ import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.bean.EntityBean;
+import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebeaninternal.server.cache.CacheChangeSet;
 import com.avaje.ebeaninternal.server.cache.CachedBeanData;
 import com.avaje.ebeaninternal.server.core.DefaultSqlUpdate;
@@ -399,17 +400,22 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
   }
 
   @Override
-  public void setCacheDataValue(EntityBean bean, Object cacheData) {
+  public void setCacheDataValue(EntityBean bean, Object cacheData, PersistenceContext context) {
     if (cacheData == null) {
       setValue(bean, null);
     } else {
       if (embedded) {
-        setValue(bean, targetDescriptor.cacheEmbeddedBeanLoad((CachedBeanData) cacheData));
+        setValue(bean, targetDescriptor.cacheEmbeddedBeanLoad((CachedBeanData) cacheData, context));
       } else {
         if (cacheData instanceof String) {
           cacheData = targetDescriptor.getIdProperty().scalarType.parse((String)cacheData);
         }
-        setValue(bean, targetDescriptor.createReference(Boolean.FALSE, cacheData));
+        // cacheData is the id value, maybe already in persistence context
+        Object assocBean = targetDescriptor.contextGet(context, cacheData);
+        if (assocBean == null) {
+          assocBean = targetDescriptor.createReference(Boolean.FALSE, cacheData, context);
+        }
+        setValue(bean, assocBean);
       }
     }
   }

@@ -5,12 +5,12 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.Cache;
 
 /**
  * Cached bean for testing caching implementation, especially relations.
  */
-@CacheStrategy
+@Cache
 @Entity
 @Table(name = "o_cached_bean_child")
 public class OCachedBeanChild {

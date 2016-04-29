@@ -1,61 +1,66 @@
 package com.avaje.tests.basic;
 
-import java.sql.Date;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.sql.Date;
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 public class TestManyLazyLoad extends BaseTestCase {
 
-	@Test
-	public void testLazyLoadRef() {
-	
-		ResetBasicData.reset();
-		
-		List<Order> list = Ebean.find(Order.class).order().asc("id").findList();
-		Assert.assertTrue(list.size()+" > 0", list.size() > 0);
-		
-		// just use the first one
-		Order order = list.get(0);
-		
-		// get it as a reference
-		Order order1 = Ebean.getReference(Order.class, order.getId());
-		Assert.assertNotNull(order1);
-		
-		Date orderDate = order1.getOrderDate();
-		Assert.assertNotNull(orderDate);
-		
-		List<OrderDetail> details = order1.getDetails();
-		
-		// lazy load the details
-		int sz = details.size();
-		Assert.assertTrue(sz+" > 0", sz > 0);
-		
-		Order o = details.get(0).getOrder();
-		Assert.assertTrue("same instance", o == order1);
-		
+  @Test
+  public void testLazyLoadRef() throws InterruptedException {
 
-		// change order... list before a scalar property
-		Order order2 = Ebean.getReference(Order.class, order.getId());
-		Assert.assertNotNull(order2);
-		
-		List<OrderDetail> details2 = order2.getDetails();
-		
-		// lazy load the details
-		int sz2 = details2.size();
-		Assert.assertTrue(sz2+" > 0", sz2 > 0);
-		
-		Order o2 = details2.get(0).getOrder();
-		Assert.assertTrue("same instance", o2 == order2);
+    ResetBasicData.reset();
 
-		
-	}
-	
+    awaitL2Cache();
+
+    List<Order> list = Ebean.find(Order.class).order().asc("id").findList();
+    assertTrue(list.size() + " > 0", list.size() > 0);
+
+    // just use the first one
+    Order order = list.get(0);
+
+    // get it as a reference
+    Order order1 = Ebean.getReference(Order.class, order.getId());
+    assertNotNull(order1);
+
+    Date orderDate = order1.getOrderDate();
+    assertNotNull(orderDate);
+
+    List<OrderDetail> details = order1.getDetails();
+
+    // lazy load the details
+    int sz = details.size();
+    assertTrue(sz + " > 0", sz > 0);
+
+    OrderDetail orderDetail = details.get(0);
+    Order o = orderDetail.getOrder();
+    assertSame(o, order1);
+
+    // load detail into cache
+    Ebean.find(OrderDetail.class, orderDetail.getId());
+
+    // change order... list before a scalar property
+    Order order2 = Ebean.getReference(Order.class, order.getId());
+    assertNotNull(order2);
+
+    List<OrderDetail> details2 = order2.getDetails();
+
+    // lazy load the details
+    int sz2 = details2.size();
+    assertTrue(sz2 + " > 0", sz2 > 0);
+
+    Order o2 = details2.get(0).getOrder();
+    assertSame(o2, order2);
+  }
+
 }

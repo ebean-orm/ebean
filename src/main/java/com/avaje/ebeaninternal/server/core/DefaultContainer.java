@@ -1,8 +1,10 @@
 package com.avaje.ebeaninternal.server.core;
 
+import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.cache.ServerCacheOptions;
+import com.avaje.ebean.cache.ServerCachePlugin;
 import com.avaje.ebean.common.SpiContainer;
 import com.avaje.ebean.config.ContainerConfig;
 import com.avaje.ebean.config.PropertyMap;
@@ -12,7 +14,7 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.dbmigration.DbOffline;
 import com.avaje.ebeaninternal.api.SpiBackgroundExecutor;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.cache.DefaultServerCacheFactory;
+import com.avaje.ebeaninternal.server.cache.DefaultServerCachePlugin;
 import com.avaje.ebeaninternal.server.cache.DefaultServerCacheManager;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
@@ -108,18 +110,14 @@ public class DefaultContainer implements SpiContainer {
       // inform the NamingConvention of the associated DatabasePlatform
       serverConfig.getNamingConvention().setDatabasePlatform(serverConfig.getDatabasePlatform());
 
-      ServerCacheManager cacheManager = getCacheManager(online, serverConfig);
+      // executor and l2 caching service setup early (used during server construction)
+      SpiBackgroundExecutor executor = createBackgroundExecutor(serverConfig);
+      ServerCacheManager cacheManager = getCacheManager(online, serverConfig, executor);
 
-      SpiBackgroundExecutor bgExecutor = createBackgroundExecutor(serverConfig);
-
-      XmlConfigLoader xmlConfigLoader = new XmlConfigLoader(null);
-      XmlConfig xmlConfig = xmlConfigLoader.load();
-
-      InternalConfiguration c = new InternalConfiguration(xmlConfig, clusterManager, cacheManager, bgExecutor, serverConfig, bootupClasses);
+      XmlConfig xmlConfig = new XmlConfigLoader(null).load();
+      InternalConfiguration c = new InternalConfiguration(xmlConfig, clusterManager, cacheManager, executor, serverConfig, bootupClasses);
 
       DefaultServer server = new DefaultServer(c, cacheManager);
-
-      cacheManager.init(server);
 
       // generate and run DDL if required
       // if there are any other tasks requiring action in their plugins, do them as well
@@ -147,7 +145,7 @@ public class DefaultContainer implements SpiContainer {
   /**
    * Create and return the CacheManager.
    */
-  private ServerCacheManager getCacheManager(boolean online, ServerConfig serverConfig) {
+  private ServerCacheManager getCacheManager(boolean online, ServerConfig serverConfig, BackgroundExecutor executor) {
 
     if (!online || serverConfig.isDisableL2Cache()) {
       // use local only L2 cache implementation as placeholder
@@ -171,21 +169,22 @@ public class DefaultContainer implements SpiContainer {
     queryOptions.setMaxIdleSecs(serverConfig.getQueryCacheMaxIdleTime());
     queryOptions.setMaxSecsToLive(serverConfig.getQueryCacheMaxTimeToLive());
 
-    ServerCacheFactory cacheFactory = serverConfig.getServerCacheFactory();
-    if (cacheFactory == null) {
-      ServiceLoader<ServerCacheFactory> cacheFactories = ServiceLoader.load(ServerCacheFactory.class);
-      Iterator<ServerCacheFactory> iterator = cacheFactories.iterator();
+    ServerCachePlugin plugin = serverConfig.getServerCachePlugin();
+    if (plugin == null) {
+      ServiceLoader<ServerCachePlugin> cacheFactories = ServiceLoader.load(ServerCachePlugin.class);
+      Iterator<ServerCachePlugin> iterator = cacheFactories.iterator();
       if (iterator.hasNext()) {
         // use the cacheFactory (via classpath service loader)
-        cacheFactory = iterator.next();
-        logger.debug("using ServerCacheFactory {}", cacheFactory.getClass());
+        plugin = iterator.next();
+        logger.debug("using ServerCacheFactory {}", plugin.getClass());
       } else {
         // use the built in default
-        cacheFactory = new DefaultServerCacheFactory();
+        plugin = new DefaultServerCachePlugin();
       }
     }
 
-    return new DefaultServerCacheManager(cacheFactory, beanOptions, queryOptions);
+    ServerCacheFactory factory = plugin.create(serverConfig, executor);
+    return new DefaultServerCacheManager(factory, beanOptions, queryOptions);
   }
 
   /**

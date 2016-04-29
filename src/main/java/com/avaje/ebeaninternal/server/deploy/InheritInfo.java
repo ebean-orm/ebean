@@ -141,7 +141,7 @@ public class InheritInfo {
   /**
    * Return the associated BeanDescriptor for this node.
    */
-  public BeanDescriptor<?> getBeanDescriptor() {
+  public BeanDescriptor<?> desc() {
     return descriptor;
   }
 
@@ -161,10 +161,8 @@ public class InheritInfo {
 
     for (int i = 0, x = children.size(); i < x; i++) {
       InheritInfo childInfo = children.get(i);
-
       // recursively search this child bean descriptor
-      prop = childInfo.getBeanDescriptor().findBeanProperty(propertyName);
-
+      prop = childInfo.desc().findBeanProperty(propertyName);
       if (prop != null) {
         return prop;
       }

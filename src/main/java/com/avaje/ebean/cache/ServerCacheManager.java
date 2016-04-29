@@ -1,24 +1,9 @@
 package com.avaje.ebean.cache;
 
-import com.avaje.ebean.EbeanServer;
-
 /**
  * The cache service for server side caching of beans and query results.
  */
 public interface ServerCacheManager {
-
-  /**
-   * This method is called just after the construction of the
-   * ServerCacheManager.
-   * <p>
-   * The EbeanServer is provided so that cache implementations can make use of
-   * EbeanServer and BackgroundExecutor for automatically populating and
-   * background trimming of the cache.
-   * </p>
-   */
-  void init(EbeanServer server);
-
-  void setCaching(Class<?> beanType, boolean useCache);
 
   /**
    * Return true if there is an active bean cache for this type of bean.
@@ -35,6 +20,9 @@ public interface ServerCacheManager {
    */
   ServerCache getBeanCache(Class<?> beanType);
 
+  /**
+   * Return the cache for associated many properties of a bean type.
+   */
   ServerCache getCollectionIdsCache(Class<?> beanType, String propertyName);
 
   /**

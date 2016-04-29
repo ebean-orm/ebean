@@ -1,5 +1,6 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.Cache;
 import com.avaje.ebean.annotation.DocEmbedded;
 
 import javax.persistence.Entity;
@@ -13,146 +14,147 @@ import java.sql.Timestamp;
 /**
  * Order Detail entity bean.
  */
+@Cache
 @Entity
 @Table(name = "o_order_detail")
 public class OrderDetail implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    @Id
-    Integer id;
+  @Id
+  Integer id;
 
-    @ManyToOne(optional = false)
-    Order order;
+  @ManyToOne(optional = false)
+  Order order;
 
-    Integer orderQty;
+  Integer orderQty;
 
-    Integer shipQty;
+  Integer shipQty;
 
-    Double unitPrice;
+  Double unitPrice;
 
-    @ManyToOne
-    @DocEmbedded(doc = "id,name,sku")
-    Product product;
+  @ManyToOne
+  @DocEmbedded(doc = "id,name,sku")
+  Product product;
 
-    Timestamp cretime;
+  Timestamp cretime;
 
-    @Version
-    Timestamp updtime;
+  @Version
+  Timestamp updtime;
 
-    public OrderDetail() {
-    }
+  public OrderDetail() {
+  }
 
-    public OrderDetail(Product product, Integer orderQty, Double unitPrice) {
-        this.product = product;
-        this.orderQty = orderQty;
-        this.unitPrice = unitPrice;
-    }
+  public OrderDetail(Product product, Integer orderQty, Double unitPrice) {
+    this.product = product;
+    this.orderQty = orderQty;
+    this.unitPrice = unitPrice;
+  }
 
-    /**
-     * Return id.
-     */
-    public Integer getId() {
-        return id;
-    }
+  /**
+   * Return id.
+   */
+  public Integer getId() {
+    return id;
+  }
 
-    /**
-     * Set id.
-     */
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  /**
+   * Set id.
+   */
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-    /**
-     * Return order qty.
-     */
-    public Integer getOrderQty() {
-        return orderQty;
-    }
+  /**
+   * Return order qty.
+   */
+  public Integer getOrderQty() {
+    return orderQty;
+  }
 
-    /**
-     * Set order qty.
-     */
-    public void setOrderQty(Integer orderQty) {
-        this.orderQty = orderQty;
-    }
+  /**
+   * Set order qty.
+   */
+  public void setOrderQty(Integer orderQty) {
+    this.orderQty = orderQty;
+  }
 
-    /**
-     * Return ship qty.
-     */
-    public Integer getShipQty() {
-        return shipQty;
-    }
+  /**
+   * Return ship qty.
+   */
+  public Integer getShipQty() {
+    return shipQty;
+  }
 
-    /**
-     * Set ship qty.
-     */
-    public void setShipQty(Integer shipQty) {
-        this.shipQty = shipQty;
-    }
+  /**
+   * Set ship qty.
+   */
+  public void setShipQty(Integer shipQty) {
+    this.shipQty = shipQty;
+  }
 
-    public Double getUnitPrice() {
-        return unitPrice;
-    }
+  public Double getUnitPrice() {
+    return unitPrice;
+  }
 
-    public void setUnitPrice(Double unitPrice) {
-        this.unitPrice = unitPrice;
-    }
+  public void setUnitPrice(Double unitPrice) {
+    this.unitPrice = unitPrice;
+  }
 
-    /**
-     * Return cretime.
-     */
-    public Timestamp getCretime() {
-        return cretime;
-    }
+  /**
+   * Return cretime.
+   */
+  public Timestamp getCretime() {
+    return cretime;
+  }
 
-    /**
-     * Set cretime.
-     */
-    public void setCretime(Timestamp cretime) {
-        this.cretime = cretime;
-    }
+  /**
+   * Set cretime.
+   */
+  public void setCretime(Timestamp cretime) {
+    this.cretime = cretime;
+  }
 
-    /**
-     * Return updtime.
-     */
-    public Timestamp getUpdtime() {
-        return updtime;
-    }
+  /**
+   * Return updtime.
+   */
+  public Timestamp getUpdtime() {
+    return updtime;
+  }
 
-    /**
-     * Set updtime.
-     */
-    public void setUpdtime(Timestamp updtime) {
-        this.updtime = updtime;
-    }
+  /**
+   * Set updtime.
+   */
+  public void setUpdtime(Timestamp updtime) {
+    this.updtime = updtime;
+  }
 
-    /**
-     * Return order.
-     */
-    public Order getOrder() {
-        return order;
-    }
+  /**
+   * Return order.
+   */
+  public Order getOrder() {
+    return order;
+  }
 
-    /**
-     * Set order.
-     */
-    public void setOrder(Order order) {
-        this.order = order;
-    }
+  /**
+   * Set order.
+   */
+  public void setOrder(Order order) {
+    this.order = order;
+  }
 
-    /**
-     * Return product.
-     */
-    public Product getProduct() {
-        return product;
-    }
+  /**
+   * Return product.
+   */
+  public Product getProduct() {
+    return product;
+  }
 
-    /**
-     * Set product.
-     */
-    public void setProduct(Product product) {
-        this.product = product;
-    }
+  /**
+   * Set product.
+   */
+  public void setProduct(Product product) {
+    this.product = product;
+  }
 
 }

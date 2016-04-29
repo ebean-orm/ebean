@@ -4,6 +4,7 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 import com.avaje.tests.model.basic.TBytesOnly;
@@ -82,7 +83,7 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
     assertEquals(read.getData(), extract.getData());
 
     Customer loadCustomer = new Customer();
-    CachedBeanDataToBean.load(desc, (EntityBean)loadCustomer, read);
+    CachedBeanDataToBean.load(desc, (EntityBean)loadCustomer, read, new DefaultPersistenceContext());
 
     assertEquals(loadCustomer.getVersion(), customer.getVersion());
     assertEquals(loadCustomer.getId(), customer.getId());
@@ -113,7 +114,7 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
     assertTrue(Arrays.equals(bean.getContent(), extraContent));
 
     TBytesOnly loadBean= new TBytesOnly();
-    CachedBeanDataToBean.load(desc, (EntityBean)loadBean, read);
+    CachedBeanDataToBean.load(desc, (EntityBean)loadBean, read, new DefaultPersistenceContext());
 
     assertEquals(loadBean.getId(), bean.getId());
     assertTrue(Arrays.equals(loadBean.getContent(), bean.getContent()));

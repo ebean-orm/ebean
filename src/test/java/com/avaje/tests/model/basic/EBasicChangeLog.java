@@ -1,5 +1,6 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.Cache;
 import com.avaje.ebean.annotation.ChangeLog;
 import com.avaje.ebean.annotation.ReadAudit;
 import com.avaje.ebean.annotation.WhenCreated;
@@ -13,6 +14,7 @@ import javax.persistence.Version;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
+@Cache(enableQueryCache = true)
 @ReadAudit
 @ChangeLog(updatesThatInclude = {"name","shortDescription"})
 @Entity

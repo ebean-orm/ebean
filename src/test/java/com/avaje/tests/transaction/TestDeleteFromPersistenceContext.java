@@ -1,13 +1,15 @@
 package com.avaje.tests.transaction;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.tests.model.basic.EBasicVer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import static junit.framework.TestCase.assertNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
 public class TestDeleteFromPersistenceContext extends BaseTestCase {
 
@@ -25,30 +27,33 @@ public class TestDeleteFromPersistenceContext extends BaseTestCase {
     try {
       
       EBasicVer bean2 = Ebean.find(EBasicVer.class, bean.getId());
-      Assert.assertNotSame(bean, bean2);
+      assertNotSame(bean, bean2);
       
       EBasicVer bean3 = Ebean.find(EBasicVer.class, bean.getId());
       // same instance from PersistenceContext 
-      Assert.assertSame(bean2, bean3);
+      assertSame(bean2, bean3);
       
       Object bean4 = transaction.getPersistenceContext().get(EBasicVer.class, bean.getId());
-      Assert.assertSame(bean2, bean4);
+      assertSame(bean2, bean4);
       
       Ebean.delete(bean2);
 
       Object bean5 = transaction.getPersistenceContext().get(EBasicVer.class, bean.getId());
-      Assert.assertNull("Bean is deleted from PersistenceContext",bean5);
-      
-      EBasicVer bean6 = Ebean.find(EBasicVer.class).where().eq("id", bean.getId()).findUnique();
-      Assert.assertNull("Bean where id eq is not found "+bean6, bean6);
-      
-      EBasicVer bean7 = Ebean.find(EBasicVer.class, bean.getId());
-      Assert.assertNull("Bean is not expected to be found? "+bean7, bean7);
-      
+      assertNull("Bean is deleted from PersistenceContext",bean5);
+
+      Ebean.commitTransaction();
+
     } finally {
       Ebean.endTransaction();
     }
-    
+
+    EBasicVer bean6 = Ebean.find(EBasicVer.class).where().eq("id", bean.getId()).findUnique();
+    assertNull("Bean where id eq is not found "+bean6, bean6);
+
+    awaitL2Cache();
+    EBasicVer bean7 = Ebean.find(EBasicVer.class, bean.getId());
+    assertNull("Bean is not expected to be found? "+bean7, bean7);
+
   }
   
 }

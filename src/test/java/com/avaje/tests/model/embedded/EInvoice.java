@@ -1,5 +1,7 @@
 package com.avaje.tests.model.embedded;
 
+import com.avaje.ebean.annotation.Cache;
+
 import java.util.Date;
 
 import javax.persistence.AttributeOverride;
@@ -11,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 
+@Cache
 @Entity
 public class EInvoice {
 
