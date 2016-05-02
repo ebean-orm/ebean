@@ -24,6 +24,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
   public void test() {
 
     ResetBasicData.reset();
+    awaitL2Cache();
 
     ServerCache custCache = cacheManager.getBeanCache(Customer.class);
     ServerCache contactCache = cacheManager.getBeanCache(Contact.class);
