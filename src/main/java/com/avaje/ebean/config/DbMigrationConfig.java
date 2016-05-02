@@ -60,6 +60,11 @@ public class DbMigrationConfig {
 
   protected String applySuffix = ".sql";
 
+  /**
+   * Set this to "V" to be compatible with FlywayDB.
+   */
+  protected String applyPrefix = "";
+
   protected String modelSuffix = ".model.xml";
 
   protected boolean includeGeneratedFileComment;
@@ -175,6 +180,20 @@ public class DbMigrationConfig {
    */
   public void setApplySuffix(String applySuffix) {
     this.applySuffix = applySuffix;
+  }
+
+  /**
+   * Return the apply prefix.
+   */
+  public String getApplyPrefix() {
+    return applyPrefix;
+  }
+
+  /**
+   * Set the apply prefix. This might be set to "V" for use with FlywayDB.
+   */
+  public void setApplyPrefix(String applyPrefix) {
+    this.applyPrefix = applyPrefix;
   }
 
   /**
@@ -351,6 +370,7 @@ public class DbMigrationConfig {
     } else {
       modelPath = properties.get("migration.modelPath", modelPath);
     }
+    applyPrefix = properties.get("migration.applyPrefix", applyPrefix);
     applySuffix = properties.get("migration.applySuffix", applySuffix);
     modelSuffix = properties.get("migration.modelSuffix", modelSuffix);
     includeGeneratedFileComment = properties.getBoolean("migration.includeGeneratedFileComment", includeGeneratedFileComment);
@@ -360,7 +380,7 @@ public class DbMigrationConfig {
 
     generate = properties.getBoolean("migration.generate", generate);
     version = properties.get("migration.version", version);
-    this.name = properties.get("migration.name", this.name);
+    name = properties.get("migration.name", name);
 
     runMigration = properties.getBoolean("migration.run", runMigration);
     metaTable = properties.get("migration.metaTable", metaTable);

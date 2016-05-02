@@ -24,10 +24,12 @@ class MigrationMetaRow {
 
   private String runBy;
 
+  private long runTime;
+
   /**
    * Construct for inserting into table.
    */
-  MigrationMetaRow(int id, String type, String version, String comment, int checksum, String runBy, Timestamp runOn) {
+  MigrationMetaRow(int id, String type, String version, String comment, int checksum, String runBy, Timestamp runOn, long runTime) {
     this.id = id;
     this.type = type;
     this.version = version;
@@ -35,6 +37,7 @@ class MigrationMetaRow {
     this.comment = comment;
     this.runBy = runBy;
     this.runOn = runOn;
+    this.runTime = runTime;
   }
 
   /**
@@ -48,6 +51,7 @@ class MigrationMetaRow {
     checksum = row.getInteger("mchecksum");
     runOn = row.getTimestamp("run_on");
     runBy = row.getString("run_by");
+    runTime = row.getLong("run_time");
   }
 
   public String toString() {
@@ -87,23 +91,7 @@ class MigrationMetaRow {
     insert.setParameter(6, checksum);
     insert.setParameter(7, runOn);
     insert.setParameter(8, runBy);
-    insert.setParameter(9, "ip");
-  }
-
-  /**
-   * Bind to an update statement.
-   */
-  public void bindUpdate(int checksum, String runBy, Timestamp runOn, SqlUpdate update) {
-
-    this.checksum = checksum;
-    this.runOn = runOn;
-    this.runBy = runBy;
-
-    update.setParameter(1, checksum);
-    update.setParameter(2, runOn);
-    update.setParameter(3, runBy);
-    update.setParameter(4, "ip");
-    update.setParameter(5, id);
+    insert.setParameter(9, runTime);
   }
 
   /**
@@ -111,14 +99,8 @@ class MigrationMetaRow {
    */
   static String insertSql(String table) {
     return "insert into " + table
-        + " (id, mtype, mstatus, mversion, mcomment, mchecksum, run_on, run_by, run_ip)"
+        + " (id, mtype, mstatus, mversion, mcomment, mchecksum, run_on, run_by, run_time)"
         + " values (?,?,?,?,?,?,?,?,?)";
-  }
-
-  static String updateSql(String table) {
-    return "update " + table
-        + " set mchecksum = ?, run_on = ?, run_by = ?, run_ip = ?"
-        + " where id = ?";
   }
 
 }

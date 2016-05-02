@@ -398,7 +398,7 @@ public class DbMigration {
       version = migrationModel.getNextVersion(initialVersion);
     }
 
-    String fullVersion = version;
+    String fullVersion = migrationConfig.getApplyPrefix() + version;
     if (migrationConfig.getName() != null) {
       fullVersion += "__" + toUnderScore(migrationConfig.getName());
 

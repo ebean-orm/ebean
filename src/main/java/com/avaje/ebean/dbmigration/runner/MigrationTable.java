@@ -42,13 +42,11 @@ public class MigrationTable {
   private final ServerConfig serverConfig;
   private final String envUserName;
 
-  private final Timestamp runTime = new Timestamp(System.currentTimeMillis());
+  private final Timestamp runOn = new Timestamp(System.currentTimeMillis());
 
   private final ScriptTransform scriptTransform;
 
   private final String insertSql;
-
-  private final String updateSql;
 
   private final LinkedHashMap<String, MigrationMetaRow> migrations;
 
@@ -65,13 +63,10 @@ public class MigrationTable {
     SpiServer pluginApi = server.getPluginApi();
     this.serverConfig = pluginApi.getServerConfig();
     this.databasePlatform = pluginApi.getDatabasePlatform();
-
     this.catalog = null;
     this.schema = null;
     this.table = migrationConfig.getMetaTable();
     this.insertSql = MigrationMetaRow.insertSql(table);
-    this.updateSql = MigrationMetaRow.updateSql(table);
-
     this.scriptTransform = createScriptTransform(migrationConfig);
     this.envUserName = System.getProperty("user.name");
   }
@@ -195,41 +190,35 @@ public class MigrationTable {
       }
     }
 
-    runMigration(local, existing, script, checksum);
+    runMigration(local, script, checksum);
     return true;
   }
 
   /**
    * Run a migration script as new migration or update on existing repeatable migration.
    */
-  private void runMigration(LocalMigrationResource local, MigrationMetaRow existing, String script, int checksum) throws SQLException {
+  private void runMigration(LocalMigrationResource local, String script, int checksum) throws SQLException {
 
     logger.debug("run migration {}", local.getLocation());
 
+    long start = System.currentTimeMillis();
     MigrationScriptRunner run = new MigrationScriptRunner(connection);
     run.runScript(false, script, "run migration version: " + local.getVersion());
 
-    if (existing != null) {
-      // update existing migration row
-      SqlUpdate update = server.createSqlUpdate(updateSql);
-      existing.bindUpdate(checksum, envUserName, runTime, update);
-      server.execute(update, new ExternalJdbcTransaction(connection));
+    long exeMillis = System.currentTimeMillis() - start;
+    // insert new migration row
+    SqlUpdate insert = server.createSqlUpdate(insertSql);
+    MigrationMetaRow metaRow = createMetaRow(local, checksum, exeMillis);
+    metaRow.bindInsert(insert);
+    server.execute(insert, new ExternalJdbcTransaction(connection));
 
-    } else {
-      // insert new migration row
-      SqlUpdate insert = server.createSqlUpdate(insertSql);
-      MigrationMetaRow metaRow = createMetaRow(local, checksum);
-      metaRow.bindInsert(insert);
-      server.execute(insert, new ExternalJdbcTransaction(connection));
-
-      addMigration(local.key(), metaRow);
-    }
+    addMigration(local.key(), metaRow);
   }
 
   /**
    * Create the MigrationMetaRow for this migration.
    */
-  private MigrationMetaRow createMetaRow(LocalMigrationResource migration, int checksum) {
+  private MigrationMetaRow createMetaRow(LocalMigrationResource migration, int checksum, long exeMillis) {
 
     int nextId = 1;
     if (lastMigration != null) {
@@ -240,7 +229,7 @@ public class MigrationTable {
     String runVersion = migration.key();
     String comment = migration.getComment();
 
-    return new MigrationMetaRow(nextId, type, runVersion, comment, checksum, envUserName, runTime);
+    return new MigrationMetaRow(nextId, type, runVersion, comment, checksum, envUserName, runOn, exeMillis);
   }
 
   /**

@@ -104,6 +104,7 @@ public class MigrationRunner {
         break;
       }
       priorVersion = localVersion;
+      connection.commit();
     }
   }
 
