@@ -44,6 +44,27 @@ public class TestSoftDeleteBasic extends BaseTestCase {
   }
 
   @Test
+  public void testFindSoftDeleted() {
+
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("softDelFetch");
+    Ebean.save(bean);
+
+    Ebean.delete(bean);
+
+    Query<EBasicSoftDelete> query = Ebean.find(EBasicSoftDelete.class)
+        .setIncludeSoftDeletes()
+        .where()
+        .eq("deleted", true)
+        .eq("name", "softDelFetch")
+        .query();
+
+    List<EBasicSoftDelete> list = query.findList();
+    assertThat(query.getGeneratedSql()).contains("deleted = ?");
+    assertThat(list).hasSize(1);
+  }
+
+  @Test
   public void testDeleteById_and_findRowCount() {
 
     EBasicSoftDelete bean = new EBasicSoftDelete();
