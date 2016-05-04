@@ -168,7 +168,7 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
 
     value = value.replace('_', '.');
 
-    String[] sections = value.split("\\.");
+    String[] sections = value.split("[\\.-]");
 
     if ("r".equalsIgnoreCase(sections[0])) {
       // a "repeatable" version (does not have a version number)

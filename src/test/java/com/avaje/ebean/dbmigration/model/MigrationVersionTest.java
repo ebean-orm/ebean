@@ -31,6 +31,22 @@ public class MigrationVersionTest {
   }
 
   @Test
+  public void test_parse_hyphenSnapshot() {
+
+    MigrationVersion version = MigrationVersion.parse("0.1.1-SNAPSHOT");
+    assertThat(version.normalised()).isEqualTo("0.1.1");
+    assertThat(version.getComment()).isEqualTo("");
+  }
+
+  @Test
+  public void test_parse_hyphenSnapshot_when_underscores() {
+
+    MigrationVersion version = MigrationVersion.parse("0_1_1-SNAPSHOT__Foo");
+    assertThat(version.normalised()).isEqualTo("0.1.1");
+    assertThat(version.getComment()).isEqualTo("Foo");
+  }
+
+  @Test
   public void test_parse_when_repeatable() throws Exception {
 
     MigrationVersion version = MigrationVersion.parse("R__Foo");
