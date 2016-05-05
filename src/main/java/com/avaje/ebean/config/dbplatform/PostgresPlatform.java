@@ -43,9 +43,9 @@ public class PostgresPlatform extends DatabasePlatform {
     DbType dbTypeText = new DbType("text");
     DbType dbBytea = new DbType("bytea", false);
 
-    dbTypeMap.put(DbType.HSTORE, new DbType("hstore"));
-    dbTypeMap.put(DbType.JSON, new DbType("json"));
-    dbTypeMap.put(DbType.JSONB, new DbType("jsonb"));
+    dbTypeMap.put(DbType.HSTORE, new DbType("hstore", false));
+    dbTypeMap.put(DbType.JSON, new DbType("json", false));
+    dbTypeMap.put(DbType.JSONB, new DbType("jsonb", false));
 
     dbTypeMap.put(Types.INTEGER, new DbType("integer", false));
     dbTypeMap.put(Types.DOUBLE, new DbType("float"));

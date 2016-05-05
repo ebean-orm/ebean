@@ -108,9 +108,9 @@ public class DbTypeMap {
 
     if (logicalTypes) {
       // keep it logical for 2 layer DDL generation
-      put(DbType.HSTORE, new DbType("hstore"));
-      put(DbType.JSON, new DbType("json"));
-      put(DbType.JSONB, new DbType("jsonb"));
+      put(DbType.HSTORE, new DbType("hstore", false));
+      put(DbType.JSON, new DbType("json", false));
+      put(DbType.JSONB, new DbType("jsonb", false));
       put(DbType.JSONClob, new DbType("jsonclob"));
       put(DbType.JSONBlob, new DbType("jsonblob"));
       put(DbType.JSONVarchar, new DbType("jsonvarchar", 1000));
@@ -137,7 +137,7 @@ public class DbTypeMap {
   /**
    * Lookup the platform specific DbType given the standard sql type name.
    */
-  public DbType lookup(String name) {
+  public DbType lookup(String name, boolean withScale) {
     name = name.trim().toUpperCase();
     Integer typeKey = lookup.get(name);
     if (typeKey == null) {
@@ -152,18 +152,19 @@ public class DbTypeMap {
       case DbType.JSONVarchar:
         return get(Types.VARCHAR);
       case DbType.JSON:
-        return getJsonType(DbType.JSON);
+        return getJsonType(DbType.JSON, withScale);
       case DbType.JSONB:
-        return getJsonType(DbType.JSONB);
+        return getJsonType(DbType.JSONB, withScale);
       default:
         return get(typeKey);
     }
   }
 
-  private DbType getJsonType(int type) {
+  private DbType getJsonType(int type, boolean withScale) {
     DbType dbType = get(type);
     if (dbType == JSON_CLOB_PLACEHOLDER) {
-      return get(Types.CLOB);
+      // if we have scale that implies this maps to varchar
+      return withScale ? get(Types.VARCHAR) : get(Types.CLOB);
     }
     if (dbType == JSON_BLOB_PLACEHOLDER) {
       return get(Types.BLOB);

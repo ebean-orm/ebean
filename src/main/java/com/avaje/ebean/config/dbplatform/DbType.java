@@ -117,14 +117,26 @@ public class DbType {
    *          the scale defined by deployment on a specific property.
    */
   public String renderType(int deployLength, int deployScale) {
+    return renderType(deployLength, deployScale, true);
+  }
+
+  /**
+   * Render the type defining strict mode.
+   * <p>
+   * If strict mode if OFF then this will render with a scale value even if
+   * that is not strictly supported. The reason for supporting this is to enable
+   * use to use types like jsonb(200) as a "logical" type that maps to JSONB for
+   * Postgres and VARCHAR(200) for other databases.
+   * </p>
+   */
+  public String renderType(int deployLength, int deployScale, boolean strict) {
 
     StringBuilder sb = new StringBuilder();
     sb.append(name);
 
-    if (canHaveLength) {
+    if (canHaveLength || !strict) {
       // see if there is a precision/scale to add (or not)
       int len = deployLength != 0 ? deployLength : defaultLength;
-
       if (len > 0) {
         sb.append("(");
         sb.append(len);

@@ -6,6 +6,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.annotation.DbJson;
+import com.avaje.ebean.annotation.DbJsonB;
 import com.avaje.ebean.annotation.DbJsonType;
 import com.avaje.ebean.config.EncryptDeploy;
 import com.avaje.ebean.config.EncryptDeployManager;
@@ -103,6 +104,7 @@ public class DeployUtil {
     return new DataEncryptSupport(encryptKeyManager, bytesEncryptor, table, column);
   }
 
+  @SuppressWarnings("unchecked")
   public void setEnumScalarType(Enumerated enumerated, DeployBeanProperty prop) {
 
     Class<?> enumType = prop.getPropertyType();
@@ -200,11 +202,9 @@ public class DeployUtil {
    * Map to Postgres HSTORE type.
    */
   public void setDbHstore(DeployBeanProperty prop) {
-
     ScalarType<?> scalarType = typeManager.getScalarType(DbType.HSTORE);
     if (scalarType == null) {
-      // this should never occur actually
-      throw new RuntimeException("No ScalarType found for HSTORE on [" + prop.getFullBeanName() + "]");
+      throw new RuntimeException("No ScalarType found for HSTORE on [" + prop.getFullBeanName() + "] ?");
     }
     prop.setDbType(DbType.HSTORE);
     prop.setScalarType(scalarType);
@@ -219,22 +219,20 @@ public class DeployUtil {
     setDbJsonType(prop, dbType, dbJsonType.length());
   }
 
-  public void setDbJsonBType(DeployBeanProperty prop) {
-    setDbJsonType(prop, DbType.JSONB, 0);
+  public void setDbJsonBType(DeployBeanProperty prop, DbJsonB dbJsonB) {
+    setDbJsonType(prop, DbType.JSONB, dbJsonB.length());
   }
 
   private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength) {
 
     Class<?> type = prop.getPropertyType();
-
-    ScalarType<?> scalarType = typeManager.getJsonScalarType(type, dbType);
+    ScalarType<?> scalarType = typeManager.getJsonScalarType(type, dbType, dbLength);
     if (scalarType == null) {
-      // this should never occur actually
       throw new RuntimeException("No ScalarType for JSON type [" + type + "] [" + dbType + "]");
     }
     prop.setDbType(dbType);
     prop.setScalarType(scalarType);
-    if (dbType == Types.VARCHAR) {
+    if (dbType == Types.VARCHAR || dbLength > 0) {
       // determine the db column size
       int columnLength = (dbLength > 0) ? dbLength : DEFAULT_JSON_VARCHAR_LENGTH;
       prop.setDbLength(columnLength);

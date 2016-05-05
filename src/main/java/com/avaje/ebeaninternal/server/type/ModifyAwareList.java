@@ -24,6 +24,10 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
     this.owner = owner;
   }
 
+  public String toString() {
+    return list.toString();
+  }
+
   @Override
   public boolean isMarkedDirty() {
     return owner.isMarkedDirty();

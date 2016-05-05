@@ -36,4 +36,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface DbJsonB {
 
+  /**
+   * For VARCHAR storage specify the column length.
+   */
+  int length() default 0;
 }

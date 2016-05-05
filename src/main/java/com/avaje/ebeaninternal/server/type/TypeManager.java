@@ -63,5 +63,5 @@ public interface TypeManager {
    * Note that type expected to be JsonNode or Map.
    * </p>
    */
-  ScalarType<?> getJsonScalarType(Class<?> type, int dbType);
+  ScalarType<?> getJsonScalarType(Class<?> type, int dbType, int dbLength);
 }

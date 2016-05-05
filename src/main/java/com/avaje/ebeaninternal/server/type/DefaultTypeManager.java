@@ -155,6 +155,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final boolean java7Present;
 
+  private final boolean postgres;
+
   // OPTIONAL ScalarTypes registered if Jackson/JsonNode is in the classpath
 
   /**
@@ -195,14 +197,14 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
+    this.postgres = isPostgres(config.getDatabasePlatform());
 
     initialiseStandard(jsonDateTime, config);
     initialiseJavaTimeTypes(jsonDateTime, config);
     initialiseJodaTypes(jsonDateTime, config);
     initialiseJacksonTypes(config);
 
-    if (isPostgres(config.getDatabasePlatform())) {
-      // Postgres has special DB types for JSON/JSONB
+    if (postgres) {
       this.jsonMapJson = new ScalarTypeJsonMapPostgres.JSON();
       this.jsonMapJsonb = new ScalarTypeJsonMapPostgres.JSONB();
     } else {
@@ -368,7 +370,17 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   }
 
   @Override
-  public ScalarType<?> getJsonScalarType(Class<?> type, int dbType) {
+  public ScalarType<?> getJsonScalarType(Class<?> type, int dbType, int dbLength) {
+
+    if (type.equals(List.class)) {
+      if (postgres) {
+        switch (dbType) {
+          case DbType.JSONB: return ScalarTypeJsonList.JSONB;
+          case DbType.JSON: return ScalarTypeJsonList.JSON;
+        }
+      }
+      return ScalarTypeJsonList.VARCHAR;
+    }
 
     if (type.equals(Map.class)) {
       // @DbJson Map<String,Object> property

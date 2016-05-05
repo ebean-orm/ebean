@@ -108,12 +108,15 @@ public class ModelBuildContext {
   }
 
 
-  public String getColumnDefn(BeanProperty p) {
+  /**
+   * Render the DB type for this property given the strict mode.
+   */
+  public String getColumnDefn(BeanProperty p, boolean strict) {
     DbType dbType = getDbType(p);
     if (dbType == null) {
       throw new IllegalStateException("Unknown DbType mapping for " + p.getFullBeanName());
     }
-    return p.renderDbType(dbType);
+    return p.renderDbType(dbType, strict);
   }
 
   private DbType getDbType(BeanProperty p) {

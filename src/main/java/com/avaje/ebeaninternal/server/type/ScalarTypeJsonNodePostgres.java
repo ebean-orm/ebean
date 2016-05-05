@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.type;
 import com.avaje.ebean.config.dbplatform.DbType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.postgresql.util.PGobject;
 
 import java.sql.SQLException;
 
@@ -11,10 +10,6 @@ import java.sql.SQLException;
  * Support for mapping JsonNode to Postgres DB types JSON and JSONB.
  */
 public abstract class ScalarTypeJsonNodePostgres extends ScalarTypeJsonNode {
-
-  private static final String POSTGRES_TYPE_JSON = "json";
-
-  private static final String POSTGRES_TYPE_JSONB = "jsonb";
 
   final ObjectMapper objectMapper;
 
@@ -27,14 +22,9 @@ public abstract class ScalarTypeJsonNodePostgres extends ScalarTypeJsonNode {
   }
 
   @Override
-  public void bind(DataBind dataBind, JsonNode value) throws SQLException {
-
+  public void bind(DataBind bind, JsonNode value) throws SQLException {
     String rawJson = (value == null) ? null : formatValue(value);
-
-    PGobject pgo = new PGobject();
-    pgo.setType(postgresType);
-    pgo.setValue(rawJson);
-    dataBind.setObject(pgo);
+    bind.setObject(PostgresHelper.asObject(postgresType, rawJson));
   }
 
   /**
@@ -43,7 +33,7 @@ public abstract class ScalarTypeJsonNodePostgres extends ScalarTypeJsonNode {
   public static class JSON extends ScalarTypeJsonNodePostgres {
 
     public JSON(ObjectMapper objectMapper) {
-      super(objectMapper, DbType.JSON, POSTGRES_TYPE_JSON);
+      super(objectMapper, DbType.JSON, PostgresHelper.JSON_TYPE);
     }
   }
 
@@ -53,7 +43,7 @@ public abstract class ScalarTypeJsonNodePostgres extends ScalarTypeJsonNode {
   public static class JSONB extends ScalarTypeJsonNodePostgres {
 
     public JSONB(ObjectMapper objectMapper) {
-      super(objectMapper, DbType.JSONB, POSTGRES_TYPE_JSONB);
+      super(objectMapper, DbType.JSONB, PostgresHelper.JSONB_TYPE);
     }
   }
 }

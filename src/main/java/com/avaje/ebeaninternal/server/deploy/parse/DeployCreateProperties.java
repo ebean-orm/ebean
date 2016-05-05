@@ -223,21 +223,18 @@ public class DeployCreateProperties {
     Class<?> propertyType = field.getType();
     
     ManyToOne manyToOne = field.getAnnotation(ManyToOne.class);
-    
     if (manyToOne != null){
     	Class<?> tt = manyToOne.targetEntity();
-    	
-    	if (tt != null && !tt.equals(void.class)){
+    	if (!tt.equals(void.class)){
     		propertyType = tt;
     	}
     }
-    if (isMappedType(field)) {
+    if (isSpecialScalarType(field)) {
       return new DeployBeanProperty(desc, propertyType, null, null);
     }
     
     // check for Collection type (list, set or map)
     ManyType manyType = determineManyType.getManyType(propertyType);
-
     if (manyType != null) {
       // List, Set or Map based object
       Class<?> targetType = determineTargetType(field);
@@ -299,7 +296,7 @@ public class DeployCreateProperties {
   /**
    * Return true if the field has one of the special mappings.
    */
-  private boolean isMappedType(Field field) {
+  private boolean isSpecialScalarType(Field field) {
     return (field.getAnnotation(DbJson.class) != null)
         || (field.getAnnotation(DbJsonB.class) != null)
         || (field.getAnnotation(DbHstore.class) != null);

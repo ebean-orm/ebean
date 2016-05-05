@@ -98,7 +98,7 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
 
     TBytesOnly bean = new TBytesOnly();
     bean.setId(42);
-    bean.setContent(stringContent.getBytes("UTF8"));
+    bean.setContent(stringContent.getBytes("UTF-8"));
 
     BeanDescriptor<TBytesOnly> desc = getBeanDescriptor(TBytesOnly.class);
     CachedBeanData extract = CachedBeanDataFromBean.extract(desc, (EntityBean)bean);

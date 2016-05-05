@@ -175,12 +175,16 @@ public class AnnotationFields extends AnnotationParser {
     if (comment != null) {
       prop.setDbComment(comment.value());
     }
+    if (get(prop, DbHstore.class) != null) {
+      util.setDbHstore(prop);
+    }
     DbJson dbJson = get(prop, DbJson.class);
     if (dbJson != null) {
       util.setDbJsonType(prop, dbJson);
     } else {
-      if (get(prop, DbJsonB.class) != null) {
-        util.setDbJsonBType(prop);
+      DbJsonB dbJsonB = get(prop, DbJsonB.class);
+      if (dbJsonB != null) {
+        util.setDbJsonBType(prop, dbJsonB);
       }
     }
 
@@ -197,10 +201,6 @@ public class AnnotationFields extends AnnotationParser {
       prop.setDocProperty(docProperty);
     }
 
-    if (get(prop, DbHstore.class) != null) {
-      util.setDbHstore(prop);
-    }
-    
     Formula formula = get(prop, Formula.class);
     if (formula != null) {
       prop.setSqlFormula(formula.select(), formula.join());

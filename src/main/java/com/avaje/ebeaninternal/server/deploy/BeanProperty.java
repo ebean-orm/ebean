@@ -984,11 +984,11 @@ public class BeanProperty implements ElPropertyValue, Property {
   /**
    * Return the DB column type definition.
    */
-  public String renderDbType(DbType dbType) {
+  public String renderDbType(DbType dbType, boolean strict) {
     if (dbColumnDefn != null) {
       return dbColumnDefn;
     }
-    return dbType.renderType(dbLength, dbScale);
+    return dbType.renderType(dbLength, dbScale, strict);
   }
 
   /**

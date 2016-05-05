@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.text.TextException;
+import com.avaje.ebeaninternal.util.EncodeUtil;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -13,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Types;
 
@@ -85,7 +85,7 @@ public abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
         dataBind.setNull(Types.BLOB);
       } else {
         String rawJson = formatValue(value);
-        dataBind.setBlob(rawJson.getBytes(StandardCharsets.UTF_8));
+        dataBind.setBlob(EncodeUtil.utf8ToBytes(rawJson));
       }
     }
   }

@@ -52,6 +52,11 @@ class EJsonReader {
   }
 
   @SuppressWarnings("unchecked")
+  static List<Object> parseList(String json, boolean modifyAware) throws IOException {
+    return (List<Object>) parse(json, modifyAware);
+  }
+
+  @SuppressWarnings("unchecked")
   static List<Object> parseList(String json) throws IOException {
     return (List<Object>) parse(json);
   }
@@ -62,15 +67,21 @@ class EJsonReader {
   }
   
   @SuppressWarnings("unchecked")
-  static List<Object> parseList(JsonParser parser) throws IOException {
-    return (List<Object>) parse(parser);
+  static List<Object> parseList(JsonParser parser, boolean modifyAware) throws IOException {
+    return (List<Object>) parse(parser, modifyAware);
   }
 
   static Object parse(String json) throws IOException {
+    if (json == null) {
+      return null;
+    }
     return parse(new StringReader(json));
   }
 
   static Object parse(String json, boolean modifyAware) throws IOException {
+    if (json == null) {
+      return null;
+    }
     return parse(new StringReader(json), modifyAware);
   }
 

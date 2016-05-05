@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.EJson;
+import com.avaje.ebeaninternal.util.EncodeUtil;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -12,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Map;
@@ -77,7 +77,7 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
         b.setNull(Types.BLOB);
       } else {
         String rawJson = formatValue(value);
-        b.setBytes(rawJson.getBytes(StandardCharsets.UTF_8));
+        b.setBytes(EncodeUtil.utf8ToBytes(rawJson));
       }
     }
   }

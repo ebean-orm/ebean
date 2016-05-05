@@ -246,4 +246,18 @@ public class EJsonTests {
 
   }
 
+
+  @Test
+  public void parse_when_null() throws IOException {
+
+    Object nothing = EJson.parse((String) null);
+    Assert.assertNull(nothing);
+  }
+
+  @Test
+  public void parseList_when_null() throws IOException {
+
+    Object nothing = EJson.parseList((String) null);
+    Assert.assertNull(nothing);
+  }
 }

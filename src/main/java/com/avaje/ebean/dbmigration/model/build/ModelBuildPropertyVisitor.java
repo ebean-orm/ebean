@@ -184,7 +184,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       if (importedProperty == null) {
         throw new RuntimeException("Imported BeanProperty not found?");
       }
-      String columnDefn = ctx.getColumnDefn(importedProperty);
+      String columnDefn = ctx.getColumnDefn(importedProperty, true);
       String refColumn = importedProperty.getDbColumn();
 
       MColumn col = table.addColumn(dbCol, columnDefn, !p.isNullable());
@@ -229,7 +229,9 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       return;
     }
 
-    MColumn col = new MColumn(p.getDbColumn(), ctx.getColumnDefn(p));
+    // using non-strict mode to render the DB type such that we have a
+    // "logical" type like jsonb(200) that can map to JSONB or VARCHAR(200)
+    MColumn col = new MColumn(p.getDbColumn(), ctx.getColumnDefn(p, false));
     col.setDefaultValue(p.getDbColumnDefault());
     col.setComment(p.getDbComment());
     col.setDraftOnly(p.isDraftOnly());

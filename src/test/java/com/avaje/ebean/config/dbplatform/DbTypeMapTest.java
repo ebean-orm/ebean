@@ -13,16 +13,16 @@ public class DbTypeMapTest {
     PostgresPlatform pg = new PostgresPlatform();
     DbTypeMap dbTypeMap = pg.getDbTypeMap();
 
-    assertThat(dbTypeMap.lookup("clob").renderType(0,0)).isEqualTo("text");
-    assertThat(dbTypeMap.lookup("CLOB").renderType(0, 0)).isEqualTo("text");
+    assertThat(dbTypeMap.lookup("clob", false).renderType(0,0)).isEqualTo("text");
+    assertThat(dbTypeMap.lookup("CLOB", false).renderType(0, 0)).isEqualTo("text");
 
-    assertThat(dbTypeMap.lookup("varchar").renderType(20,0)).isEqualTo("varchar(20)");
+    assertThat(dbTypeMap.lookup("varchar", true).renderType(20,0)).isEqualTo("varchar(20)");
 
-    assertThat(dbTypeMap.lookup("json").renderType(0,0)).isEqualTo("json");
-    assertThat(dbTypeMap.lookup("jsonb").renderType(0,0)).isEqualTo("jsonb");
-    assertThat(dbTypeMap.lookup("jsonclob").renderType(0,0)).isEqualTo("text");
-    assertThat(dbTypeMap.lookup("jsonblob").renderType(0,0)).isEqualTo("bytea");
-    assertThat(dbTypeMap.lookup("jsonvarchar").renderType(200,0)).isEqualTo("varchar(200)");
+    assertThat(dbTypeMap.lookup("json", false).renderType(0,0)).isEqualTo("json");
+    assertThat(dbTypeMap.lookup("jsonb", false).renderType(0,0)).isEqualTo("jsonb");
+    assertThat(dbTypeMap.lookup("jsonclob", false).renderType(0,0)).isEqualTo("text");
+    assertThat(dbTypeMap.lookup("jsonblob", false).renderType(0,0)).isEqualTo("bytea");
+    assertThat(dbTypeMap.lookup("jsonvarchar", false).renderType(200,0)).isEqualTo("varchar(200)");
 
   }
 
@@ -31,7 +31,7 @@ public class DbTypeMapTest {
 
     DbTypeMap dbTypeMap = DbTypeMap.logicalTypes();
     DbType dbType = dbTypeMap.get(DbType.JSON);
-    DbType json = dbTypeMap.lookup("json");
+    DbType json = dbTypeMap.lookup("json", false);
 
     assertThat(dbType).isSameAs(json);
   }

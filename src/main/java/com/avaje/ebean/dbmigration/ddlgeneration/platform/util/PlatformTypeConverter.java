@@ -47,7 +47,7 @@ public class PlatformTypeConverter {
     String suffix = close + 1 < columnDefinition.length() ? columnDefinition.substring(close + 1) : "";
     String type = columnDefinition.substring(0, open);
     try {
-      DbType dbType = platformTypes.lookup(type);
+      DbType dbType = platformTypes.lookup(type, true);
       int comma = columnDefinition.indexOf(',', open);
       if (comma > -1) {
         // scale and precision - decimal(10,4)
@@ -73,7 +73,7 @@ public class PlatformTypeConverter {
   protected String convertNoScale(String columnDefinition) {
 
     try {
-      DbType dbType = platformTypes.lookup(columnDefinition);
+      DbType dbType = platformTypes.lookup(columnDefinition, false);
       return dbType.renderType(0, 0);
 
     } catch (IllegalArgumentException e) {

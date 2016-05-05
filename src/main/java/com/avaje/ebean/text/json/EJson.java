@@ -91,8 +91,14 @@ public class EJson {
   }
 
   /**
+   * Parse the json and return as a modify aware List.
+   */
+  public static List<Object> parseList(String json, boolean modifyAware) throws IOException {
+    return EJsonReader.parseList(json, modifyAware);
+  }
+
+  /**
    * Parse the json and return as a List.
-   * @throws IOException 
    */
   public static List<Object> parseList(String json) throws IOException {
     return EJsonReader.parseList(json);
@@ -100,7 +106,6 @@ public class EJson {
   
   /**
    * Parse the json and return as a List taking a Reader.
-   * @throws IOException 
    */
   public static List<Object> parseList(Reader reader) throws IOException {
     return EJsonReader.parseList(reader);
@@ -110,10 +115,16 @@ public class EJson {
    * Parse the json and return as a List taking a JsonParser.
    */
   public static List<Object> parseList(JsonParser parser) throws IOException {
-    return EJsonReader.parseList(parser);
+    return EJsonReader.parseList(parser, false);
   }
-  
-  
+
+  /**
+   * Parse the json returning as a List taking into account the current token.
+   */
+  public static List<Object> parseList(JsonParser parser, JsonToken currentToken) throws IOException {
+    return (List<Object>)EJsonReader.parse(parser, currentToken, false);
+  }
+
   /**
    * Parse the json and return as a List or Map.
    */
