@@ -96,8 +96,8 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
 
   @Override
   @SuppressWarnings("unchecked")
-  public String format(Object v) {
-    return formatValue((T) v);
+  public String format(Object value) {
+    return formatValue((T) value);
   }
 
   @Override

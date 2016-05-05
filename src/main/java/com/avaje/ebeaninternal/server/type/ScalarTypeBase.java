@@ -65,12 +65,12 @@ public abstract class ScalarTypeBase<T> implements ScalarType<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public String format(Object v) {
-    return formatValue((T) v);
+  public String format(Object value) {
+    return formatValue((T) value);
   }
 
-  public void loadIgnore(DataReader dataReader) {
-    dataReader.incrementPos(1);
+  public void loadIgnore(DataReader reader) {
+    reader.incrementPos(1);
   }
 
   public void accumulateScalarTypes(String propName, CtCompoundTypeScalarList list) {
