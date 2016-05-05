@@ -225,4 +225,16 @@ public class ModifyAwareListTest {
     sub.remove("C");
     assertTrue(list.isMarkedDirty());
   }
+
+  @Test
+  public void testAsSet() throws Exception {
+
+    ModifyAwareList<String> list = createList();
+    ModifyAwareSet<String> set = list.asSet();
+    assertFalse(set.isMarkedDirty());
+
+    set.add("next");
+
+    assertTrue(set.isMarkedDirty());
+  }
 }

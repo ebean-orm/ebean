@@ -6,7 +6,9 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.avaje.ebeaninternal.server.type.ModifyAwareList;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -146,4 +148,14 @@ public class EJson {
     return EJsonReader.parse(parser);
   }
 
+  /**
+   * Parse the json returning a Set that might be modify aware.
+   */
+  public static Set parseSet(String json, boolean modifyAware) throws IOException {
+    List<Object> list = parseList(json, modifyAware);
+    if (list == null) {
+      return null;
+    }
+    return ((ModifyAwareList)list).asSet();
+  }
 }

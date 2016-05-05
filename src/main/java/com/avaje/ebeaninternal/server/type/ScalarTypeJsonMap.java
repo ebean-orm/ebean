@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.text.TextException;
 import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebeaninternal.util.EncodeUtil;
@@ -21,6 +22,28 @@ import java.util.Map;
  * Type which maps Map<String,Object> to various DB types (Clob, Varchar, Blob) in JSON format.
  */
 public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
+
+  private static final ScalarTypeJsonMap CLOB = new ScalarTypeJsonMap.Clob();
+  private static final ScalarTypeJsonMap BLOB = new ScalarTypeJsonMap.Blob();
+  private static final ScalarTypeJsonMap VARCHAR = new ScalarTypeJsonMap.Varchar();
+  private static final ScalarTypeJsonMap JSON = new ScalarTypeJsonMapPostgres.JSON();
+  private static final ScalarTypeJsonMap JSONB = new ScalarTypeJsonMapPostgres.JSONB();
+
+  /**
+   * Return the ScalarType for the requested dbType and postgres.
+   */
+  public static ScalarTypeJsonMap typeFor(boolean postgres, int dbType) {
+
+    switch (dbType) {
+      case Types.VARCHAR : return VARCHAR;
+      case Types.BLOB: return BLOB;
+      case Types.CLOB : return CLOB;
+      case DbType.JSONB: return postgres ? JSONB : CLOB;
+      case DbType.JSON: return postgres ? JSON : CLOB;
+      default:
+        throw new IllegalStateException("Unknown dbType "+dbType);
+    }
+  }
 
   public static class Clob extends ScalarTypeJsonMap {
 

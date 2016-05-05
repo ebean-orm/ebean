@@ -9,36 +9,38 @@ import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Types for mapping List in JSON format to DB types VARCHAR, JSON and JSONB.
  */
-public class ScalarTypeJsonList  {
+public class ScalarTypeJsonSet {
 
-  public static final ScalarTypeJsonCollection<List> VARCHAR = new ScalarTypeJsonList.Varchar();
+  private static final ScalarTypeJsonCollection<Set> VARCHAR = new ScalarTypeJsonSet.Varchar();
 
-  public static final ScalarTypeJsonCollection<List> JSON = new ScalarTypeJsonList.Json();
+  private static final ScalarTypeJsonCollection<Set> JSON = new ScalarTypeJsonSet.Json();
 
-  public static final ScalarTypeJsonCollection<List> JSONB = new ScalarTypeJsonList.JsonB();
+  private static final ScalarTypeJsonCollection<Set> JSONB = new ScalarTypeJsonSet.JsonB();
 
   /**
-   * Return the appropriate ScalarType based requested dbType and if Postgres.
+   * Return the appropriate ScalarType for the requested dbType and Postgres.
    */
   public static ScalarType<?> typeFor(boolean postgres, int dbType) {
     if (postgres) {
       switch (dbType) {
-        case DbType.JSONB: return ScalarTypeJsonList.JSONB;
-        case DbType.JSON: return ScalarTypeJsonList.JSON;
+        case DbType.JSONB: return ScalarTypeJsonSet.JSONB;
+        case DbType.JSON: return ScalarTypeJsonSet.JSON;
       }
     }
-    return ScalarTypeJsonList.VARCHAR;
+    return ScalarTypeJsonSet.VARCHAR;
   }
 
   /**
    * List mapped to DB VARCHAR.
    */
-  private static class Varchar extends ScalarTypeJsonList.Base {
+  private static class Varchar extends ScalarTypeJsonSet.Base {
     public Varchar() {
       super(Types.VARCHAR);
     }
@@ -47,7 +49,7 @@ public class ScalarTypeJsonList  {
   /**
    * List mapped to Postgres JSON.
    */
-  private static class Json extends ScalarTypeJsonList.PgBase {
+  private static class Json extends ScalarTypeJsonSet.PgBase {
     public Json() {
       super(DbType.JSON, PostgresHelper.JSON_TYPE);
     }
@@ -56,7 +58,7 @@ public class ScalarTypeJsonList  {
   /**
    * List mapped to Postgres JSONB.
    */
-  private static class JsonB extends ScalarTypeJsonList.PgBase {
+  private static class JsonB extends ScalarTypeJsonSet.PgBase {
     public JsonB() {
       super(DbType.JSONB, PostgresHelper.JSONB_TYPE);
     }
@@ -65,24 +67,24 @@ public class ScalarTypeJsonList  {
   /**
    * Base class for List handling.
    */
-  private abstract static class Base extends ScalarTypeJsonCollection<List> {
+  private abstract static class Base extends ScalarTypeJsonCollection<Set> {
 
     public Base(int dbType) {
-      super(List.class, dbType);
+      super(Set.class, dbType);
     }
 
     @Override
-    public List read(DataReader dataReader) throws SQLException {
+    public Set read(DataReader dataReader) throws SQLException {
       try {
         // parse JSON into modifyAware list
-        return EJson.parseList(dataReader.getString(), true);
+        return EJson.parseSet(dataReader.getString(), true);
       } catch (IOException e) {
         throw new SQLException("Failed to parse JSON content as List: ["+ dataReader.getString() +"]", e);
       }
     }
 
     @Override
-    public void bind(DataBind b, List value) throws SQLException {
+    public void bind(DataBind b, Set value) throws SQLException {
 
       if (value == null) {
         b.setNull(Types.VARCHAR);
@@ -92,13 +94,13 @@ public class ScalarTypeJsonList  {
         try {
           b.setString(EJson.write(value));
         } catch (IOException e) {
-          throw new SQLException("Failed to format List into JSON content", e);
+          throw new SQLException("Failed to format Set into JSON content", e);
         }
       }
     }
 
     @Override
-    public String formatValue(List value) {
+    public String formatValue(Set value) {
       try {
         return EJson.write(value);
       } catch (IOException e) {
@@ -107,30 +109,36 @@ public class ScalarTypeJsonList  {
     }
 
     @Override
-    public List parse(String value) {
+    public Set parse(String value) {
       try {
-        return EJson.parseList(value, false);
+        return convertList(EJson.parseList(value));
       } catch (IOException e) {
-        throw new PersistenceException("Failed to parse JSON content as List: ["+value+"]", e);
+        throw new PersistenceException("Failed to parse JSON content as Set: ["+value+"]", e);
       }
     }
 
     @Override
-    public List jsonRead(JsonParser parser) throws IOException {
-      return EJson.parseList(parser, parser.getCurrentToken());
+    public Set jsonRead(JsonParser parser) throws IOException {
+      return convertList(EJson.parseList(parser, parser.getCurrentToken()));
     }
 
     @Override
-    public void jsonWrite(JsonGenerator writer, List value) throws IOException {
+    public void jsonWrite(JsonGenerator writer, Set value) throws IOException {
       EJson.write(value, writer);
     }
 
+    @SuppressWarnings("unchecked")
+    private Set convertList(List list) {
+      LinkedHashSet set = new LinkedHashSet();
+      set.addAll(list);
+      return set;
+    }
   }
 
   /**
    * Postgres extension to base List handling.
    */
-  private static class PgBase extends ScalarTypeJsonList.Base {
+  private static class PgBase extends ScalarTypeJsonSet.Base {
 
     final String pgType;
 
@@ -140,7 +148,7 @@ public class ScalarTypeJsonList  {
     }
 
     @Override
-    public void bind(DataBind bind, List value) throws SQLException {
+    public void bind(DataBind bind, Set value) throws SQLException {
 
       String rawJson = (value == null) ? null : formatValue(value);
       bind.setObject(PostgresHelper.asObject(pgType, rawJson));

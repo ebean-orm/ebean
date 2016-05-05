@@ -63,6 +63,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,14 +85,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   private final ConcurrentHashMap<Integer, ScalarType<?>> nativeMap;
 
   private final DefaultTypeFactory extraTypeFactory;
-
-  private final ScalarTypeJsonMap JSON_MAP_CLOB = new ScalarTypeJsonMap.Clob();
-
-  private final ScalarTypeJsonMap jsonMapClob = JSON_MAP_CLOB;
-  private final ScalarTypeJsonMap jsonMapBlob = new ScalarTypeJsonMap.Blob();
-  private final ScalarTypeJsonMap jsonMapVarchar = new ScalarTypeJsonMap.Varchar();
-  private final ScalarTypeJsonMap jsonMapJson;
-  private final ScalarTypeJsonMap jsonMapJsonb;
 
   private final ScalarTypeFile fileType = new ScalarTypeFile();
 
@@ -203,14 +196,6 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     initialiseJavaTimeTypes(jsonDateTime, config);
     initialiseJodaTypes(jsonDateTime, config);
     initialiseJacksonTypes(config);
-
-    if (postgres) {
-      this.jsonMapJson = new ScalarTypeJsonMapPostgres.JSON();
-      this.jsonMapJsonb = new ScalarTypeJsonMapPostgres.JSONB();
-    } else {
-      this.jsonMapJson = JSON_MAP_CLOB;
-      this.jsonMapJsonb = JSON_MAP_CLOB;
-    }
 
     if (bootupClasses != null) {
       initialiseCustomScalarTypes(jsonDateTime, bootupClasses, config);
@@ -373,30 +358,18 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   public ScalarType<?> getJsonScalarType(Class<?> type, int dbType, int dbLength) {
 
     if (type.equals(List.class)) {
-      if (postgres) {
-        switch (dbType) {
-          case DbType.JSONB: return ScalarTypeJsonList.JSONB;
-          case DbType.JSON: return ScalarTypeJsonList.JSON;
-        }
-      }
-      return ScalarTypeJsonList.VARCHAR;
+      return ScalarTypeJsonList.typeFor(postgres, dbType);
+    }
+
+    if (type.equals(Set.class)) {
+      return ScalarTypeJsonSet.typeFor(postgres, dbType);
     }
 
     if (type.equals(Map.class)) {
-      // @DbJson Map<String,Object> property
-      switch (dbType) {
-        case Types.VARCHAR : return jsonMapVarchar;
-        case Types.BLOB: return jsonMapBlob;
-        case Types.CLOB : return jsonMapClob;
-        case DbType.JSONB: return jsonMapJsonb;
-        case DbType.JSON: return jsonMapJson;
-        default:
-          return jsonMapJson;
-      }
+      return ScalarTypeJsonMap.typeFor(postgres, dbType);
     }
 
     if (type.equals(JsonNode.class)) {
-      // @DbJson JsonNode property (Jackson)
       switch (dbType) {
         case Types.VARCHAR : return jsonNodeVarchar;
         case Types.BLOB: return jsonNodeBlob;

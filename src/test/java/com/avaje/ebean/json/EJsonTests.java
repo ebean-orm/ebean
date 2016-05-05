@@ -2,15 +2,23 @@ package com.avaje.ebean.json;
 
 import com.avaje.ebean.text.json.EJson;
 import com.avaje.ebeaninternal.server.type.ModifyAwareMap;
+import com.avaje.ebeaninternal.server.type.ModifyAwareOwner;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class EJsonTests {
 
@@ -25,13 +33,13 @@ public class EJsonTests {
 
     Object result = EJson.parse(jsonParser);
     
-    Assert.assertTrue(result instanceof Map);
+    assertTrue(result instanceof Map);
     Map<?,?> map = (Map<?,?>)result;
-    Assert.assertEquals("rob", map.get("name"));
-    Assert.assertEquals(12L, map.get("age"));
+    assertEquals("rob", map.get("name"));
+    assertEquals(12L, map.get("age"));
     
     String jsonOutput = EJson.write(result);
-    Assert.assertEquals(jsonInput, jsonOutput);
+    assertEquals(jsonInput, jsonOutput);
   }
 
   @Test
@@ -45,12 +53,12 @@ public class EJsonTests {
 
     Map<String,Object> map = EJson.parseObject(jsonParser);
 
-    Assert.assertNotNull(map);
-    Assert.assertEquals("rob", map.get("name"));
-    Assert.assertEquals(12L, map.get("age"));
+    assertNotNull(map);
+    assertEquals("rob", map.get("name"));
+    assertEquals(12L, map.get("age"));
 
     String jsonOutput = EJson.write(map);
-    Assert.assertEquals(jsonInput, jsonOutput);
+    assertEquals(jsonInput, jsonOutput);
   }
 
   @Test
@@ -62,12 +70,12 @@ public class EJsonTests {
 
     Map<String, Object> map = EJson.parseObject(reader);
 
-    Assert.assertNotNull(map);
-    Assert.assertEquals("rob", map.get("name"));
-    Assert.assertEquals(12L, map.get("age"));
+    assertNotNull(map);
+    assertEquals("rob", map.get("name"));
+    assertEquals(12L, map.get("age"));
 
     String jsonOutput = EJson.write(map);
-    Assert.assertEquals(jsonInput, jsonOutput);
+    assertEquals(jsonInput, jsonOutput);
   }
 
   @Test
@@ -76,24 +84,24 @@ public class EJsonTests {
     String jsonInput = "{\"name\":\"rob\",\"age\":12,\"org\":{\"name\":\"superorg\",\"rating\":4},\"nums\":[1,2,3]}";
     Object result = EJson.parse(jsonInput);
 
-    Assert.assertTrue(result instanceof Map);
+    assertTrue(result instanceof Map);
     Map<?,?> map = (Map<?,?>)result;
-    Assert.assertEquals(4, map.size());
-    Assert.assertEquals("rob", map.get("name"));
-    Assert.assertEquals(12L, map.get("age"));
+    assertEquals(4, map.size());
+    assertEquals("rob", map.get("name"));
+    assertEquals(12L, map.get("age"));
 
     Map<?,?> org = (Map<?,?>)map.get("org");
-    Assert.assertEquals("superorg", org.get("name"));
-    Assert.assertEquals(4L, org.get("rating"));
+    assertEquals("superorg", org.get("name"));
+    assertEquals(4L, org.get("rating"));
 
     List<?> nums = (List<?>)map.get("nums");
-    Assert.assertEquals(3, nums.size());
-    Assert.assertEquals(1L, nums.get(0));
-    Assert.assertEquals(2L, nums.get(1));
-    Assert.assertEquals(3L, nums.get(2));
+    assertEquals(3, nums.size());
+    assertEquals(1L, nums.get(0));
+    assertEquals(2L, nums.get(1));
+    assertEquals(3L, nums.get(2));
 
     String jsonOutput = EJson.write(result);
-    Assert.assertEquals(jsonInput, jsonOutput);
+    assertEquals(jsonInput, jsonOutput);
   }
 
   @Test
@@ -102,13 +110,13 @@ public class EJsonTests {
     String jsonInput = "{\"name\":\"rob\",\"age\":null}";
     Object result = EJson.parse(jsonInput);
 
-    Assert.assertTrue(result instanceof Map);
+    assertTrue(result instanceof Map);
     Map<?,?> map = (Map<?,?>)result;
-    Assert.assertEquals("rob", map.get("name"));
-    Assert.assertNull(map.get("age"));
+    assertEquals("rob", map.get("name"));
+    assertNull(map.get("age"));
 
     String jsonOutput = EJson.write(result);
-    Assert.assertEquals(jsonInput, jsonOutput);
+    assertEquals(jsonInput, jsonOutput);
   }
 
   @Test
@@ -117,14 +125,14 @@ public class EJsonTests {
     String jsonInput = "[\"name\",\"rob\",12,13]";
     List<Object> list = EJson.parseList(jsonInput);
 
-    Assert.assertEquals(4, list.size());
-    Assert.assertEquals("name", list.get(0));
-    Assert.assertEquals("rob", list.get(1));
-    Assert.assertEquals(12L, list.get(2));
-    Assert.assertEquals(13L, list.get(3));
+    assertEquals(4, list.size());
+    assertEquals("name", list.get(0));
+    assertEquals("rob", list.get(1));
+    assertEquals(12L, list.get(2));
+    assertEquals(13L, list.get(3));
 
     String jsonOutput = EJson.write(list);
-    Assert.assertEquals(jsonInput, jsonOutput);
+    assertEquals(jsonInput, jsonOutput);
   }
 
   @Test
@@ -134,14 +142,14 @@ public class EJsonTests {
     StringReader reader = new StringReader(jsonInput);
     List<Object> list = EJson.parseList(reader);
 
-    Assert.assertEquals(4, list.size());
-    Assert.assertEquals("name", list.get(0));
-    Assert.assertEquals("rob", list.get(1));
-    Assert.assertEquals(12L, list.get(2));
-    Assert.assertEquals(13L, list.get(3));
+    assertEquals(4, list.size());
+    assertEquals("name", list.get(0));
+    assertEquals("rob", list.get(1));
+    assertEquals(12L, list.get(2));
+    assertEquals(13L, list.get(3));
 
     String jsonOutput = EJson.write(list);
-    Assert.assertEquals(jsonInput, jsonOutput);
+    assertEquals(jsonInput, jsonOutput);
   }
 
   @Test
@@ -154,14 +162,14 @@ public class EJsonTests {
 
     List<Object> list = EJson.parseList(parser);
 
-    Assert.assertEquals(4, list.size());
-    Assert.assertEquals("name", list.get(0));
-    Assert.assertEquals("rob", list.get(1));
-    Assert.assertEquals(12L, list.get(2));
-    Assert.assertEquals(13L, list.get(3));
+    assertEquals(4, list.size());
+    assertEquals("name", list.get(0));
+    assertEquals("rob", list.get(1));
+    assertEquals(12L, list.get(2));
+    assertEquals(13L, list.get(3));
 
     String jsonOutput = EJson.write(list);
-    Assert.assertEquals(jsonInput, jsonOutput);
+    assertEquals(jsonInput, jsonOutput);
   }
 
   @SuppressWarnings("unchecked")
@@ -171,17 +179,17 @@ public class EJsonTests {
     String jsonInput = "[{\"name\":\"rob\",\"age\":12},{\"name\":\"mike\",\"age\":13}]";
     Object result = EJson.parse(jsonInput);
 
-    Assert.assertTrue(result instanceof List);
+    assertTrue(result instanceof List);
 
     List<Map<?,?>> list = (List<Map<?,?>>)result;
-    Assert.assertEquals(2, list.size());
-    Assert.assertEquals("rob", list.get(0).get("name"));
-    Assert.assertEquals(12L, list.get(0).get("age"));
-    Assert.assertEquals("mike", list.get(1).get("name"));
-    Assert.assertEquals(13L, list.get(1).get("age"));
+    assertEquals(2, list.size());
+    assertEquals("rob", list.get(0).get("name"));
+    assertEquals(12L, list.get(0).get("age"));
+    assertEquals("mike", list.get(1).get("name"));
+    assertEquals(13L, list.get(1).get("age"));
 
     String jsonOutput = EJson.write(result);
-    Assert.assertEquals(jsonInput, jsonOutput);
+    assertEquals(jsonInput, jsonOutput);
   }
 
   @Test
@@ -192,15 +200,14 @@ public class EJsonTests {
 
     Object result = EJson.parse(reader);
 
-    Assert.assertTrue(result instanceof Map);
+    assertTrue(result instanceof Map);
     Map<?,?> map = (Map<?,?>)result;
-    Assert.assertEquals("rob", map.get("name"));
-    Assert.assertNull(map.get("age"));
+    assertEquals("rob", map.get("name"));
+    assertNull(map.get("age"));
 
     Map<?,?> friend = (Map<?,?>)map.get("friend");
-    Assert.assertEquals("mike", friend.get("name"));
-    Assert.assertEquals(13L, friend.get("age"));
-
+    assertEquals("mike", friend.get("name"));
+    assertEquals(13L, friend.get("age"));
   }
 
 
@@ -210,12 +217,11 @@ public class EJsonTests {
     String jsonInput = "{\"name\":\"rob\",\"age\":12,\"org\":{\"name\":\"superorg\",\"rating\":4},\"nums\":[1,2,3]}";
     ModifyAwareMap<String,Object> map = (ModifyAwareMap<String, Object>) EJson.parseObject(jsonInput, true);
 
-    Assert.assertFalse(map.isMarkedDirty());
-    Assert.assertEquals(4, map.size());
+    assertFalse(map.isMarkedDirty());
+    assertEquals(4, map.size());
 
     map.put("name", "jim");
-    Assert.assertTrue(map.isMarkedDirty());
-
+    assertTrue(map.isMarkedDirty());
   }
 
   @SuppressWarnings("unchecked")
@@ -224,12 +230,11 @@ public class EJsonTests {
 
     String jsonInput = "{\"name\":\"rob\",\"age\":12,\"org\":{\"name\":\"superorg\",\"rating\":4},\"nums\":[1,2,3]}";
     ModifyAwareMap<String,Object> map = (ModifyAwareMap<String, Object>) EJson.parseObject(jsonInput, true);
-    Assert.assertFalse(map.isMarkedDirty());
+    assertFalse(map.isMarkedDirty());
 
     List<Object> nums = (List<Object>) map.get("nums");
     nums.add(4);
-    Assert.assertTrue(map.isMarkedDirty());
-
+    assertTrue(map.isMarkedDirty());
   }
 
   @SuppressWarnings("unchecked")
@@ -238,12 +243,11 @@ public class EJsonTests {
 
     String jsonInput = "{\"name\":\"rob\",\"age\":12,\"org\":{\"name\":\"superorg\",\"rating\":4},\"nums\":[1,2,3]}";
     ModifyAwareMap<String,Object> map = (ModifyAwareMap<String, Object>) EJson.parseObject(jsonInput, true);
-    Assert.assertFalse(map.isMarkedDirty());
+    assertFalse(map.isMarkedDirty());
 
     Map<String,Object> org = (Map<String, Object>) map.get("org");
     org.put("extra","foo");
-    Assert.assertTrue(map.isMarkedDirty());
-
+    assertTrue(map.isMarkedDirty());
   }
 
 
@@ -251,13 +255,31 @@ public class EJsonTests {
   public void parse_when_null() throws IOException {
 
     Object nothing = EJson.parse((String) null);
-    Assert.assertNull(nothing);
+    assertNull(nothing);
   }
 
   @Test
   public void parseList_when_null() throws IOException {
 
     Object nothing = EJson.parseList((String) null);
-    Assert.assertNull(nothing);
+    assertNull(nothing);
+  }
+
+  @Test
+  public void parseSet_when_modifyAware() throws IOException {
+
+    String jsonInput = "[{\"name\":\"rob\",\"age\":12},{\"name\":\"jim\",\"age\":42}]";
+
+    Set set = EJson.parseSet(jsonInput, true);
+
+    ModifyAwareOwner modAware = (ModifyAwareOwner)set;
+    assertFalse(modAware.isMarkedDirty());
+
+    Iterator iterator = set.iterator();
+    if (iterator.hasNext()) {
+      Map map = (Map)iterator.next();
+      map.put("name","stu");
+      assertTrue(modAware.isMarkedDirty());
+    }
   }
 }

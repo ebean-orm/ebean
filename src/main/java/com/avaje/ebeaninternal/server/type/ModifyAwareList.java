@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.type;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -167,5 +168,15 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
   @Override
   public List<E> subList(int fromIndex, int toIndex) {
     return new ModifyAwareList<E>(owner,list.subList(fromIndex, toIndex));
+  }
+
+  /**
+   * Create an return a modify aware Set.
+   */
+  public ModifyAwareSet<E> asSet() {
+
+    LinkedHashSet<E> set = new LinkedHashSet<E>();
+    set.addAll(list);
+    return new ModifyAwareSet<E>(owner, set);
   }
 }
