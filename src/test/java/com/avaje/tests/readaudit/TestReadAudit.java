@@ -14,6 +14,7 @@ import com.avaje.ebean.event.readaudit.ReadEvent;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.tests.model.basic.Country;
 import com.avaje.tests.model.basic.EBasicChangeLog;
+import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -176,21 +177,15 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.many.get(0).getBeanType()).isEqualTo(EBasicChangeLog.class.getName());
     assertThat(readAuditLogger.many.get(0).getIds()).contains(id1, id2);
 
-    ServerCache queryCache = server.getServerCacheManager().getQueryCache(EBasicChangeLog.class);
-    ServerCacheStatistics statistics = queryCache.getStatistics(false);
-    assertThat(statistics.getSize()).isEqualTo(1);
-    assertThat(statistics.getHitCount()).isEqualTo(0);
+    LoggedSqlCollector.start();
 
     server.find(EBasicChangeLog.class)
         .setUseQueryCache(true)
         .where().startsWith("shortDescription", "readAudit")
         .findList();
 
-    awaitL2Cache();
-
-    statistics = queryCache.getStatistics(false);
-    assertThat(statistics.getSize()).isEqualTo(1);
-    assertThat(statistics.getHitCount()).isEqualTo(1);
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).isEmpty();
 
     assertThat(readAuditPrepare.count).isEqualTo(2);
     assertThat(readAuditLogger.plans).hasSize(1);
