@@ -186,6 +186,8 @@ public class TestReadAudit extends BaseTestCase {
         .where().startsWith("shortDescription", "readAudit")
         .findList();
 
+    awaitL2Cache();
+
     statistics = queryCache.getStatistics(false);
     assertThat(statistics.getSize()).isEqualTo(1);
     assertThat(statistics.getHitCount()).isEqualTo(1);
