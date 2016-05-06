@@ -6,12 +6,12 @@ import com.avaje.ebean.config.EncryptDeploy.Mode;
 import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.IdType;
+import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
-import com.avaje.ebeaninternal.server.idgen.UuidIdGenerator;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
 import com.avaje.ebeaninternal.server.type.CtCompoundType;
 import com.avaje.ebeaninternal.server.type.DataEncryptSupport;
@@ -419,12 +419,8 @@ public class AnnotationFields extends AnnotationParser {
     prop.setNullable(false);
 
     if (prop.getPropertyType().equals(UUID.class)) {
-      // An Id of type UUID
       if (descriptor.getIdGeneratorName() == null) {
-        // Without a generator explicitly specified
-        // so will use the default one AUTO_UUID
-        descriptor.setIdGeneratorName(UuidIdGenerator.AUTO_UUID);
-        descriptor.setIdType(IdType.GENERATOR);
+        descriptor.setUuidGenerator();
       }
     }
   }
@@ -449,14 +445,20 @@ public class AnnotationFields extends AnnotationParser {
 
     } else if (strategy == GenerationType.SEQUENCE) {
       descriptor.setIdType(IdType.SEQUENCE);
-      if (genName != null && genName.length() > 0) {
+      if (!genName.equals("")) {
         descriptor.setIdGeneratorName(genName);
       }
 
     } else if (strategy == GenerationType.AUTO) {
-      if (prop.getPropertyType().equals(UUID.class)) {
-        descriptor.setIdGeneratorName(UuidIdGenerator.AUTO_UUID);
-        descriptor.setIdType(IdType.GENERATOR);
+      if (!genName.equals("")) {
+        // use a custom IdGenerator
+        PlatformIdGenerator idGenerator = generatedPropFactory.getIdGenerator(genName);
+        if (idGenerator == null) {
+          throw new IllegalStateException("No custom IdGenerator registered with name "+genName);
+        }
+        descriptor.setCustomIdGenerator(idGenerator);
+      } else if (prop.getPropertyType().equals(UUID.class)) {
+        descriptor.setUuidGenerator();
       }
     }
   }

@@ -1,41 +1,43 @@
 package com.avaje.ebeaninternal.server.idgen;
 
-import java.util.UUID;
-
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
+
+import java.util.UUID;
 
 /**
  * IdGenerator for java util UUID.
  */
 public class UuidIdGenerator implements PlatformIdGenerator {
 
-	/**
-	 * Return UUID from UUID.randomUUID();
-	 */
-	public Object nextId(Transaction t) {
-		return UUID.randomUUID();
-	}
+  public static UuidIdGenerator INSTANCE = new UuidIdGenerator();
 
-	/**
-	 * Returns "uuid".
-	 */
-	public String getName() {
-		return "uuid";
-	}
+  /**
+   * Return UUID from UUID.randomUUID();
+   */
+  public Object nextId(Transaction t) {
+    return UUID.randomUUID();
+  }
 
-	/**
-	 * Returns false.
-	 */
-	public boolean isDbSequence() {
-		return false;
-	}
+  /**
+   * Returns "uuid".
+   */
+  public String getName() {
+    return "uuid";
+  }
 
-	/**
-	 * Ignored for UUID as not required as a performance optimisation.
-	 */
-	public void preAllocateIds(int allocateSize) {
-		// ignored
-	}
+  /**
+   * Returns false.
+   */
+  public boolean isDbSequence() {
+    return false;
+  }
+
+  /**
+   * Ignored for UUID as not required as a performance optimisation.
+   */
+  public void preAllocateIds(int allocateSize) {
+    // ignored
+  }
 
 }

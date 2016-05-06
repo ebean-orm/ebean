@@ -153,8 +153,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final DatabasePlatform databasePlatform;
 
-  private final UuidIdGenerator uuidIdGenerator = new UuidIdGenerator();
-
   private final ServerCacheManager cacheManager;
 
   private final BackgroundExecutor backgroundExecutor;
@@ -1177,6 +1175,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private <T> void setIdGeneration(DeployBeanDescriptor<T> desc) {
 
+    if (desc.getIdGenerator() != null) {
+      // already assigned (So custom or UUID)
+      return;
+    }
     if (desc.propertiesId().size() == 0) {
       // bean doesn't have an Id property
       if (desc.isBaseTableType() && desc.getBeanFinder() == null) {
@@ -1209,14 +1211,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       desc.setIdTypePlatformDefault();
     }
 
-    if (IdType.GENERATOR.equals(desc.getIdType())) {
-      String genName = desc.getIdGeneratorName();
-      if (UuidIdGenerator.AUTO_UUID.equals(genName)) {
-        desc.setIdGenerator(uuidIdGenerator);
-        return;
-      }
-    }
-
     if (desc.getBaseTable() == null) {
       // no base table so not going to set Identity
       // of sequence information
@@ -1240,8 +1234,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
 
     // create the sequence based IdGenerator
-    PlatformIdGenerator seqIdGen = createSequenceIdGenerator(seqName);
-    desc.setIdGenerator(seqIdGen);
+    desc.setIdGenerator(createSequenceIdGenerator(seqName));
   }
 
   private PlatformIdGenerator createSequenceIdGenerator(String seqName) {

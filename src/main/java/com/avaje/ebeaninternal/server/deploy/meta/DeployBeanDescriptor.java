@@ -29,6 +29,7 @@ import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployBeanInfo;
+import com.avaje.ebeaninternal.server.idgen.UuidIdGenerator;
 
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
@@ -828,6 +829,24 @@ public class DeployBeanDescriptor<T> {
     if (idGenerator != null && idGenerator.isDbSequence()) {
       setSequenceName(idGenerator.getName());
     }
+  }
+
+  /**
+   * Assign the standard UUID generator.
+   */
+  public void setUuidGenerator() {
+    this.idType = IdType.EXTERNAL;
+    this.idGeneratorName = UuidIdGenerator.AUTO_UUID;
+    this.idGenerator = UuidIdGenerator.INSTANCE;
+  }
+
+  /**
+   * Assign a custom external IdGenerator.
+   */
+  public void setCustomIdGenerator(PlatformIdGenerator idGenerator) {
+    this.idType = IdType.EXTERNAL;
+    this.idGeneratorName = idGenerator.getName();
+    this.idGenerator = idGenerator;
   }
 
   /**

@@ -211,6 +211,13 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.avaje.moduuid</groupId>
+      <artifactId>avaje-moduuid</artifactId>
+      <version>1.2</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 

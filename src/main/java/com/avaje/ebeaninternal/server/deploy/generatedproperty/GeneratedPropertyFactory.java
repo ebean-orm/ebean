@@ -1,12 +1,18 @@
 package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 
+import com.avaje.ebean.Transaction;
 import com.avaje.ebean.config.ClassLoadConfig;
 import com.avaje.ebean.config.CurrentUserProvider;
+import com.avaje.ebean.config.IdGenerator;
 import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Default implementation of GeneratedPropertyFactory.
@@ -27,7 +33,9 @@ public class GeneratedPropertyFactory {
 
   private final ClassLoadConfig classLoadConfig;
 
-  public GeneratedPropertyFactory(ServerConfig serverConfig) {
+  private final Map<String,PlatformIdGenerator> idGeneratorMap = new HashMap<String,PlatformIdGenerator>();
+
+  public GeneratedPropertyFactory(ServerConfig serverConfig, List<IdGenerator> idGenerators) {
 
     this.classLoadConfig = serverConfig.getClassLoadConfig();
     this.insertFactory = new InsertTimestampFactory(classLoadConfig);
@@ -51,6 +59,12 @@ public class GeneratedPropertyFactory {
     numberTypes.add(Double.class.getName());
     numberTypes.add(double.class.getName());
     numberTypes.add(BigDecimal.class.getName());
+
+    if (idGenerators != null) {
+      for (IdGenerator idGenerator : idGenerators) {
+        idGeneratorMap.put(idGenerator.getName(), new CustomIdGenerator(idGenerator));
+      }
+    }
   }
 
   public ClassLoadConfig getClassLoadConfig() {
@@ -98,4 +112,42 @@ public class GeneratedPropertyFactory {
     property.setGeneratedProperty(generatedWhoModified);
   }
 
+  /**
+   * Return the named custom IdGenerator (wrapped as a PlatformIdGenerator).
+   */
+  public PlatformIdGenerator getIdGenerator(String generatorName) {
+    return idGeneratorMap.get(generatorName);
+  }
+
+  /**
+   * Wraps the custom IdGenerator to implement PlatformIdGenerator.
+   */
+  private static class CustomIdGenerator implements PlatformIdGenerator {
+
+    private final IdGenerator generator;
+
+    CustomIdGenerator(IdGenerator generator) {
+      this.generator = generator;
+    }
+
+    @Override
+    public String getName() {
+      return generator.getName();
+    }
+
+    @Override
+    public boolean isDbSequence() {
+      return false;
+    }
+
+    @Override
+    public Object nextId(Transaction transaction) {
+      return generator.nextValue();
+    }
+
+    @Override
+    public void preAllocateIds(int allocateSize) {
+      // do nothing
+    }
+  }
 }

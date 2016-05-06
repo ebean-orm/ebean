@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.core;
 
 import com.avaje.ebean.config.CompoundType;
+import com.avaje.ebean.config.IdGenerator;
 import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.event.BeanFindController;
@@ -48,6 +49,8 @@ public class BootupClasses implements ClassPathSearchMatcher, ClassFilter {
 
   private final List<Class<?>> compoundTypeList = new ArrayList<Class<?>>();
 
+  private final List<Class<?>> idGeneratorList = new ArrayList<Class<?>>();
+
   private final List<Class<?>> beanControllerList = new ArrayList<Class<?>>();
 
   private final List<Class<?>> beanPostLoadList = new ArrayList<Class<?>>();
@@ -62,6 +65,7 @@ public class BootupClasses implements ClassPathSearchMatcher, ClassFilter {
   private final List<Class<?>> serverConfigStartupList = new ArrayList<Class<?>>();
   private final List<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<ServerConfigStartup>();
 
+  private final List<IdGenerator> idGeneratorInstances = new ArrayList<IdGenerator>();
   private final List<BeanFindController> findControllerInstances = new ArrayList<BeanFindController>();
   private final List<BeanPersistController> persistControllerInstances = new ArrayList<BeanPersistController>();
   private final List<BeanPostLoad> beanPostLoadInstances = new ArrayList<BeanPostLoad>();
@@ -112,6 +116,19 @@ public class BootupClasses implements ClassPathSearchMatcher, ClassFilter {
       } catch (Exception e) {
         // assume that the desired behavior is to fail - add your own try catch if needed
         throw new IllegalStateException("Error running ServerConfigStartup " + startup.getClass(), e);
+      }
+    }
+  }
+
+  /**
+   * Add IdGenerator instances (registered explicitly with the ServerConfig).
+   */
+  public void addIdGenerators(List<IdGenerator> idGenerators) {
+    if (idGenerators != null) {
+      for (IdGenerator c : idGenerators) {
+        this.idGeneratorInstances.add(c);
+        // don't automatically instantiate
+        this.idGeneratorList.remove(c.getClass());
       }
     }
   }
@@ -328,6 +345,13 @@ public class BootupClasses implements ClassPathSearchMatcher, ClassFilter {
     return beanPostLoadInstances;
   }
 
+  public List<IdGenerator> getIdGenerators() {
+    for (Class<?> cls : idGeneratorList) {
+      createAdd(cls, idGeneratorInstances);
+    }
+    return idGeneratorInstances;
+  }
+
   public List<TransactionEventListener> getTransactionEventListeners() {
     // add class registered TransactionEventListener to the already created instances
     for (Class<?> cls : transactionEventListenerList) {
@@ -401,6 +425,11 @@ public class BootupClasses implements ClassPathSearchMatcher, ClassFilter {
       return false;
     }
     boolean interesting = false;
+
+    if (IdGenerator.class.isAssignableFrom(cls)) {
+      idGeneratorList.add(cls);
+      interesting = true;
+    }
 
     if (BeanPersistController.class.isAssignableFrom(cls)) {
       beanControllerList.add(cls);

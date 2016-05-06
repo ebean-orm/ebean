@@ -7,12 +7,15 @@ import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.common.BeanList;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.tests.model.basic.EBasic;
+import com.avaje.tests.model.basic.ECustomId;
+import org.example.ModUuidGenerator;
 import org.junit.Test;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class BeanFindControllerTest extends BaseTestCase {
@@ -30,7 +33,9 @@ public class BeanFindControllerTest extends BaseTestCase {
     config.setDdlRun(true);
     config.setRegister(false);
     config.setDefaultServer(false);
+    config.add(new ModUuidGenerator());
     config.getClasses().add(EBasic.class);
+    config.getClasses().add(ECustomId.class);
 
     EBasicFindController findController = new EBasicFindController();
     config.getFindControllers().add(findController);
@@ -61,6 +66,10 @@ public class BeanFindControllerTest extends BaseTestCase {
     eBasic = list.get(0);
     assertEquals(Integer.valueOf(47), eBasic.getId());
     assertEquals("47", eBasic.getName());
+
+    ECustomId bean = new ECustomId("check");
+    ebeanServer.save(bean);
+    assertNotNull(bean.getId());
   }
 
   static class EBasicFindController implements BeanFindController {

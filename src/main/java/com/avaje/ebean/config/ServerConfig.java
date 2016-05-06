@@ -3,7 +3,6 @@ package com.avaje.ebean.config;
 import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.PersistenceContextScope;
 import com.avaje.ebean.annotation.Encrypted;
-import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebean.cache.ServerCachePlugin;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
@@ -46,37 +45,36 @@ import java.util.ServiceLoader;
  * includes searching the class path and automatically registering any entity
  * classes and listeners etc.
  * </p>
- * 
+ *
  * <pre>{@code
  * ServerConfig c = new ServerConfig();
  * c.setName("ordh2");
- * 
+ *
  * // read the ebean.properties and load
  * // those settings into this serverConfig object
  * c.loadFromProperties();
- * 
+ *
  * // generate DDL and run it
  * c.setDdlGenerate(true);
  * c.setDdlRun(true);
- * 
+ *
  * // add any classes found in the app.data package
  * c.addPackage("app.data");
- * 
+ *
  * // add the names of Jars that contain entities
  * c.addJar("myJarContainingEntities.jar");
  * c.addJar("someOtherJarContainingEntities.jar");
- * 
+ *
  * // register as the 'Default' server
  * c.setDefaultServer(true);
- * 
+ *
  * EbeanServer server = EbeanServerFactory.create(c);
- * 
+ *
  * }</pre>
- * 
- * @see EbeanServerFactory
- * 
+ *
  * @author emcgreal
  * @author rbygrave
+ * @see EbeanServerFactory
  */
 public class ServerConfig {
 
@@ -89,7 +87,7 @@ public class ServerConfig {
    * Typically configuration type objects that are passed by this ServerConfig
    * to plugins. For example - IgniteConfiguration passed to Ignite plugin.
    */
-  private Map<String,Object> serviceObject = new HashMap<String, Object>();
+  private Map<String, Object> serviceObject = new HashMap<String, Object>();
 
   private ContainerConfig containerConfig;
 
@@ -152,7 +150,7 @@ public class ServerConfig {
    */
   private CurrentUserProvider currentUserProvider;
 
-  /** 
+  /**
    * Config controlling the AutoTune behaviour.
    */
   private AutoTuneConfig autoTuneConfig = new AutoTuneConfig();
@@ -168,13 +166,13 @@ public class ServerConfig {
    */
   private JsonConfig.Include jsonInclude = JsonConfig.Include.ALL;
 
-  /** 
-   * The database platform name. Used to imply a DatabasePlatform to use.  
+  /**
+   * The database platform name. Used to imply a DatabasePlatform to use.
    */
   private String databasePlatformName;
 
-  /** 
-   * The database platform. 
+  /**
+   * The database platform.
    */
   private DatabasePlatform databasePlatform;
 
@@ -213,12 +211,12 @@ public class ServerConfig {
 
   private int persistBatchSize = 20;
 
-  /** 
-   * The default batch size for lazy loading 
+  /**
+   * The default batch size for lazy loading
    */
   private int lazyLoadBatchSize = 10;
 
-  /** 
+  /**
    * The default batch size for 'query joins'.
    */
   private int queryBatchSize = 100;
@@ -248,12 +246,12 @@ public class ServerConfig {
   private ExternalTransactionManager externalTransactionManager;
 
   /**
-   * The data source (if programmatically provided). 
+   * The data source (if programmatically provided).
    */
   private DataSource dataSource;
 
-  /** 
-   * The data source config. 
+  /**
+   * The data source config.
    */
   private DataSourceConfig dataSourceConfig = new DataSourceConfig();
 
@@ -279,23 +277,23 @@ public class ServerConfig {
    */
   private boolean explicitTransactionBeginMode;
 
-  /** 
-   * The data source JNDI name if using a JNDI DataSource. 
+  /**
+   * The data source JNDI name if using a JNDI DataSource.
    */
   private String dataSourceJndiName;
 
-  /** 
+  /**
    * The database boolean true value (typically either 1, T, or Y).
    */
   private String databaseBooleanTrue;
 
-  /** 
-   * The database boolean false value (typically either 0, F or N). 
+  /**
+   * The database boolean false value (typically either 0, F or N).
    */
   private String databaseBooleanFalse;
 
-  /** 
-   * The naming convention. 
+  /**
+   * The naming convention.
    */
   private NamingConvention namingConvention = new UnderscoreNamingConvention();
 
@@ -304,7 +302,7 @@ public class ServerConfig {
    */
   private DbConstraintNaming constraintNaming = new DbConstraintNaming();
 
-  /** 
+  /**
    * Behaviour of update to include on the change properties.
    */
   private boolean updateChangesOnly = true;
@@ -318,13 +316,14 @@ public class ServerConfig {
    * Default behaviour for updates when cascade save on a O2M or M2M to delete any missing children.
    */
   private boolean updatesDeleteMissingChildren = true;
-  
+
   /**
    * Setting to indicate if UUID should be stored as binary(16) or varchar(40) or native DB type (for H2 and Postgres).
    */
   private DbUuid dbUuid = DbUuid.AUTO;
 
 
+  private List<IdGenerator> idGenerators = new ArrayList<IdGenerator>();
   private List<BeanFindController> findControllers = new ArrayList<BeanFindController>();
   private List<BeanPersistController> persistControllers = new ArrayList<BeanPersistController>();
   private List<BeanPostLoad> postLoaders = new ArrayList<BeanPostLoad>();
@@ -395,13 +394,13 @@ public class ServerConfig {
   private int cacheWarmingDelay = 30;
   private int cacheMaxSize = 10000;
   private int cacheMaxIdleTime = 600;
-  private int cacheMaxTimeToLive = 60*60*6;
+  private int cacheMaxTimeToLive = 60 * 60 * 6;
 
   // defaults for the L2 query caching
 
   private int queryCacheMaxSize = 1000;
   private int queryCacheMaxIdleTime = 600;
-  private int queryCacheMaxTimeToLive = 60*60*6;
+  private int queryCacheMaxTimeToLive = 60 * 60 * 6;
   private Object objectMapper;
 
   /**
@@ -444,7 +443,7 @@ public class ServerConfig {
   public Object getServiceObject(String key) {
     return serviceObject.get(key);
   }
-  
+
   /**
    * Return the Jackson JsonFactory to use.
    * <p>
@@ -671,6 +670,7 @@ public class ServerConfig {
    * <p>
    * You can also set the batch size on the transaction.
    * </p>
+   *
    * @see com.avaje.ebean.Transaction#setBatchSize(int)
    */
   public void setPersistBatchSize(int persistBatchSize) {
@@ -679,7 +679,7 @@ public class ServerConfig {
 
   /**
    * Gets the query batch size. This defaults to 100.
-   * 
+   *
    * @return the query batch size
    */
   public int getQueryBatchSize() {
@@ -688,9 +688,8 @@ public class ServerConfig {
 
   /**
    * Sets the query batch size. This defaults to 100.
-   * 
-   * @param queryBatchSize
-   *          the new query batch size
+   *
+   * @param queryBatchSize the new query batch size
    */
   public void setQueryBatchSize(int queryBatchSize) {
     this.queryBatchSize = queryBatchSize;
@@ -736,8 +735,8 @@ public class ServerConfig {
   /**
    * Return the ChangeLogPrepare.
    * <p>
-   *   This is used to set user context information to the ChangeSet in the
-   *   foreground thread prior to the logging occurring in a background thread.
+   * This is used to set user context information to the ChangeSet in the
+   * foreground thread prior to the logging occurring in a background thread.
    * </p>
    */
   public ChangeLogPrepare getChangeLogPrepare() {
@@ -747,8 +746,8 @@ public class ServerConfig {
   /**
    * Set the ChangeLogPrepare.
    * <p>
-   *   This is used to set user context information to the ChangeSet in the
-   *   foreground thread prior to the logging occurring in a background thread.
+   * This is used to set user context information to the ChangeSet in the
+   * foreground thread prior to the logging occurring in a background thread.
    * </p>
    */
   public void setChangeLogPrepare(ChangeLogPrepare changeLogPrepare) {
@@ -1309,7 +1308,7 @@ public class ServerConfig {
   public void setDataSourceJndiName(String dataSourceJndiName) {
     this.dataSourceJndiName = dataSourceJndiName;
   }
-  
+
   /**
    * Return true if autoCommit mode is on. This indicates to Ebean to use autoCommit friendly Transactions and TransactionManager.
    */
@@ -1488,12 +1487,11 @@ public class ServerConfig {
    * <p>
    * You can also set this in ebean.proprerties:
    * </p>
-   * 
-   * <pre class="code">
+   *
+   * <pre>{@code
    * # set via ebean.properties
-   * 
    * ebean.encryptKeyManager=com.avaje.tests.basic.encrypt.BasicEncyptKeyManager
-   * </pre>
+   * }</pre>
    */
   public void setEncryptKeyManager(EncryptKeyManager encryptKeyManager) {
     this.encryptKeyManager = encryptKeyManager;
@@ -1616,7 +1614,7 @@ public class ServerConfig {
 
   /**
    * Set to true to generate the "create all" DDL on startup.
-   *
+   * <p>
    * Typically we want this on when we are running tests locally (and often using H2)
    * and we want to create the full DB schema from scratch to run tests.
    */
@@ -1626,7 +1624,7 @@ public class ServerConfig {
 
   /**
    * Set to true to run the generated "create all DDL" on startup.
-   *
+   * <p>
    * Typically we want this on when we are running tests locally (and often using H2)
    * and we want to create the full DB schema from scratch to run tests.
    */
@@ -1636,7 +1634,7 @@ public class ServerConfig {
 
   /**
    * Return true if the "drop all ddl" should be skipped.
-   *
+   * <p>
    * Typically we want to do this when using H2 (in memory) as our test database and the drop statements
    * are not required so skipping the drop table statements etc makes it faster with less noise in the logs.
    */
@@ -1646,7 +1644,7 @@ public class ServerConfig {
 
   /**
    * Set to true if the "drop all ddl" should be skipped.
-   *
+   * <p>
    * Typically we want to do this when using H2 (in memory) as our test database and the drop statements
    * are not required so skipping the drop table statements etc makes it faster with less noise in the logs.
    */
@@ -1657,8 +1655,8 @@ public class ServerConfig {
   /**
    * Return SQL script to execute after the "create all" DDL has been run.
    * <p>
-   *   Typically this is a sql script that inserts test seed data when running tests.
-   *   Place a sql script in src/test/resources that inserts test seed data.
+   * Typically this is a sql script that inserts test seed data when running tests.
+   * Place a sql script in src/test/resources that inserts test seed data.
    * </p>
    */
   public String getDdlSeedSql() {
@@ -1668,8 +1666,8 @@ public class ServerConfig {
   /**
    * Set a SQL script to execute after the "create all" DDL has been run.
    * <p>
-   *   Typically this is a sql script that inserts test seed data when running tests.
-   *   Place a sql script in src/test/resources that inserts test seed data.
+   * Typically this is a sql script that inserts test seed data when running tests.
+   * Place a sql script in src/test/resources that inserts test seed data.
    * </p>
    */
   public void setDdlSeedSql(String ddlSeedSql) {
@@ -1748,10 +1746,9 @@ public class ServerConfig {
    * <p>
    * Alternatively the classes can be added via {@link #setClasses(List)}.
    * </p>
-   * 
-   * @param cls
-   *          the entity type (or other type) that should be registered by this
-   *          server.
+   *
+   * @param cls the entity type (or other type) that should be registered by this
+   *            server.
    */
   public void addClass(Class<?> cls) {
     if (classes == null) {
@@ -1802,13 +1799,13 @@ public class ServerConfig {
    * If you are using ebean.properties you can specify jars to search by setting
    * a ebean.search.jars property.
    * </p>
-   * 
-   * <pre class="code">
-   * # EBean will search through classes for entities, but will not search jar files 
-   * # unless you tell it to do so, for performance reasons.  Set this value to a 
+   *
+   * <pre>{@code
+   * # EBean will search through classes for entities, but will not search jar files
+   * # unless you tell it to do so, for performance reasons.  Set this value to a
    * # comma-delimited list of jar files you want ebean to search.
    * ebean.search.jars=example.jar
-   * </pre>
+   * }</pre>
    */
   public void addJar(String jarName) {
     if (searchJars == null) {
@@ -1846,7 +1843,7 @@ public class ServerConfig {
 
   /**
    * Set the class name of a classPathReader implementation.
-   *
+   * <p>
    * Refer to server.util.ClassPathReader, this should really by a plugin but doing this for now
    * to be relatively compatible with current implementation.
    */
@@ -1901,7 +1898,7 @@ public class ServerConfig {
   /**
    * Set to false if by default updates in JDBC batch should not include all properties.
    * <p>
-   *   This mode can be explicitly set per transaction.
+   * This mode can be explicitly set per transaction.
    * </p>
    *
    * @see com.avaje.ebean.Transaction#setUpdateAllLoadedProperties(boolean)
@@ -1944,6 +1941,7 @@ public class ServerConfig {
    * <p>
    * This information can be later retrieved via {@link MetaInfoManager}.
    * </p>
+   *
    * @see MetaInfoManager
    */
   public void setCollectQueryStatsByNode(boolean collectQueryStatsByNode) {
@@ -1964,6 +1962,7 @@ public class ServerConfig {
    * <p>
    * This information can be later retrieved via {@link MetaInfoManager}.
    * </p>
+   *
    * @see MetaInfoManager
    */
   public void setCollectQueryOrigins(boolean collectQueryOrigins) {
@@ -2011,6 +2010,27 @@ public class ServerConfig {
    */
   public void setQueryAdapters(List<BeanQueryAdapter> queryAdapters) {
     this.queryAdapters = queryAdapters;
+  }
+
+  /**
+   * Return the custom IdGenerator instances.
+   */
+  public List<IdGenerator> getIdGenerators() {
+    return idGenerators;
+  }
+
+  /**
+   * Set the custom IdGenerator instances.
+   */
+  public void setIdGenerators(List<IdGenerator> idGenerators) {
+    this.idGenerators = idGenerators;
+  }
+
+  /**
+   * Register a customer IdGenerator instance.
+   */
+  public void add(IdGenerator idGenerator) {
+    idGenerators.add(idGenerator);
   }
 
   /**
@@ -2277,7 +2297,7 @@ public class ServerConfig {
    * @param instance   existing instance
    */
   @SuppressWarnings("unchecked")
-  protected  <T> T createInstance(PropertiesWrapper properties, Class<T> pluginType, String key, T instance) {
+  protected <T> T createInstance(PropertiesWrapper properties, Class<T> pluginType, String key, T instance) {
 
     if (instance != null) {
       return instance;
@@ -2288,8 +2308,9 @@ public class ServerConfig {
 
   /**
    * Return the instance to use (can be null) for the given plugin.
+   *
    * @param pluginType the type of plugin
-   * @param classname the implementation class as per properties
+   * @param classname  the implementation class as per properties
    */
   protected <T> T createInstance(Class<T> pluginType, String classname) {
     return classname == null ? null : (T) classLoadConfig.newInstance(classname);
@@ -2362,7 +2383,7 @@ public class ServerConfig {
     serverCacheManager = createInstance(p, ServerCacheManager.class, "serverCacheManager", serverCacheManager);
     cacheWarmingDelay = p.getInt("cacheWarmingDelay", cacheWarmingDelay);
     classPathReaderClassName = p.get("classpathreader");
-    
+
     String jarsProp = p.get("search.jars", p.get("jars", null));
     if (jarsProp != null) {
       searchJars = getSearchJarsPackages(jarsProp);
@@ -2378,7 +2399,7 @@ public class ServerConfig {
 
     updateAllPropertiesInBatch = p.getBoolean("updateAllPropertiesInBatch", updateAllPropertiesInBatch);
     updateChangesOnly = p.getBoolean("updateChangesOnly", updateChangesOnly);
-    
+
     boolean defaultDeleteMissingChildren = p.getBoolean("defaultDeleteMissingChildren", updatesDeleteMissingChildren);
     updatesDeleteMissingChildren = p.getBoolean("updatesDeleteMissingChildren", defaultDeleteMissingChildren);
 
@@ -2442,10 +2463,8 @@ public class ServerConfig {
 
   /**
    * Build the list of classes from the comma delimited string.
-   * 
-   * @param properties
-   *          the properties
-   * 
+   *
+   * @param properties the properties
    * @return the classes
    */
   private List<Class<?>> getClasses(PropertiesWrapper properties) {
@@ -2528,9 +2547,9 @@ public class ServerConfig {
   /**
    * Set to true if you want eq("someProperty", null) to generate "1=1" rather than "is null" sql expression.
    * <p>
-   *   Setting this to true has the effect that eq(propertyName, value), ieq(propertyName, value) and
-   *   ne(propertyName, value) have no effect when the value is null. The expression factory adds a NoopExpression
-   *   which will add "1=1" into the SQL rather than "is null".
+   * Setting this to true has the effect that eq(propertyName, value), ieq(propertyName, value) and
+   * ne(propertyName, value) have no effect when the value is null. The expression factory adds a NoopExpression
+   * which will add "1=1" into the SQL rather than "is null".
    * </p>
    */
   public void setExpressionEqualsWithNullAsNoop(boolean expressionEqualsWithNullAsNoop) {

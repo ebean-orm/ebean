@@ -337,7 +337,7 @@ public class InternalConfiguration {
   }
 
   public GeneratedPropertyFactory getGeneratedPropertyFactory() {
-    return new GeneratedPropertyFactory(serverConfig);
+    return new GeneratedPropertyFactory(serverConfig, bootupClasses.getIdGenerators());
   }
 
   /**
