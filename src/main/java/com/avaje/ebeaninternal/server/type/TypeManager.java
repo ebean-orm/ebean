@@ -2,6 +2,8 @@ package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
 
+import java.lang.reflect.Type;
+
 /**
  * Convert an Object to the required type.
  */
@@ -63,5 +65,5 @@ public interface TypeManager {
    * Note that type expected to be JsonNode or Map.
    * </p>
    */
-  ScalarType<?> getJsonScalarType(Class<?> type, int dbType, int dbLength);
+  ScalarType<?> getJsonScalarType(Class<?> type, int dbType, int dbLength, Type genericType);
 }

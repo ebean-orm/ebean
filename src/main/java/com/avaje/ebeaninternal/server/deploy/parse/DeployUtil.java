@@ -226,7 +226,7 @@ public class DeployUtil {
   private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength) {
 
     Class<?> type = prop.getPropertyType();
-    ScalarType<?> scalarType = typeManager.getJsonScalarType(type, dbType, dbLength);
+    ScalarType<?> scalarType = typeManager.getJsonScalarType(type, dbType, dbLength, prop.getGenericType());
     if (scalarType == null) {
       throw new RuntimeException("No ScalarType for JSON type [" + type + "] [" + dbType + "]");
     }

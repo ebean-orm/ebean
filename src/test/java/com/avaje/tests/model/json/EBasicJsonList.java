@@ -7,8 +7,10 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Entity
@@ -18,6 +20,18 @@ public class EBasicJsonList {
   Long id;
 
   String name;
+
+  @DbJson(length = 700)
+  Set<PlainBean> beanSet;
+
+  @DbJson(length = 700)
+  List<PlainBean> beanList;
+
+  @DbJson(length = 700)
+  Map<String,PlainBean> beanMap = new LinkedHashMap<String, PlainBean>();
+
+  @DbJson(length = 500)
+  PlainBean plainBean;
 
   @DbJson(length = 50)
   Set<Long> flags = new LinkedHashSet<Long>();
@@ -58,6 +72,38 @@ public class EBasicJsonList {
 
   public void setFlags(Set<Long> flags) {
     this.flags = flags;
+  }
+
+  public PlainBean getPlainBean() {
+    return plainBean;
+  }
+
+  public void setPlainBean(PlainBean plainBean) {
+    this.plainBean = plainBean;
+  }
+
+  public Set<PlainBean> getBeanSet() {
+    return beanSet;
+  }
+
+  public void setBeanSet(Set<PlainBean> beanSet) {
+    this.beanSet = beanSet;
+  }
+
+  public List<PlainBean> getBeanList() {
+    return beanList;
+  }
+
+  public void setBeanList(List<PlainBean> beanList) {
+    this.beanList = beanList;
+  }
+
+  public Map<String, PlainBean> getBeanMap() {
+    return beanMap;
+  }
+
+  public void setBeanMap(Map<String, PlainBean> beanMap) {
+    this.beanMap = beanMap;
   }
 
   public Long getVersion() {

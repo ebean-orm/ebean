@@ -230,7 +230,7 @@ public class DeployCreateProperties {
     	}
     }
     if (isSpecialScalarType(field)) {
-      return new DeployBeanProperty(desc, propertyType, null, null);
+      return new DeployBeanProperty(desc, propertyType, field.getGenericType());
     }
     
     // check for Collection type (list, set or map)

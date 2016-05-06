@@ -14,6 +14,13 @@ public class ModifyAwareSet<E> extends ModifyAwareCollection<E> implements Set<E
     super(owner, s);
   }
 
+  /**
+   * Create as top level with it's own ModifyAwareOwner instance wrapping the given Set.
+   */
+  public ModifyAwareSet(Set<E> s) {
+    super(new ModifyAwareFlag(), s);
+  }
+
   @Override
   public boolean isMarkedDirty() {
     return owner.isMarkedDirty();

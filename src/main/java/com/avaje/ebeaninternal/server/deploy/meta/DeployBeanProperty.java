@@ -32,6 +32,7 @@ import javax.persistence.Id;
 import javax.persistence.Version;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.sql.Types;
 
 /**
@@ -147,6 +148,8 @@ public class DeployBeanProperty {
    */
   private final Class<?> propertyType;
 
+  private final Type genericType;
+
   /**
    * Set for Non-JDBC types to provide logical to db type conversion.
    */
@@ -208,8 +211,15 @@ public class DeployBeanProperty {
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
     this.desc = desc;
     this.propertyType = propertyType;
+    this.genericType = null;
     this.scalarType = wrapScalarType(propertyType, scalarType, typeConverter);
     this.dbType = (scalarType == null) ? 0 : scalarType.getJdbcType();
+  }
+
+  public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, Type genericType) {
+    this.desc = desc;
+    this.propertyType = propertyType;
+    this.genericType = genericType;
   }
 
   /**
@@ -808,6 +818,13 @@ public class DeployBeanProperty {
    */
   public Class<?> getPropertyType() {
     return propertyType;
+  }
+
+  /**
+   * Return the generic type for this property.
+   */
+  public Type getGenericType() {
+    return genericType;
   }
 
   /**

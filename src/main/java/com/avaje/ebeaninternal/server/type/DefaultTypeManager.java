@@ -33,6 +33,8 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -144,7 +146,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final JsonConfig.DateTime jsonDateTime;
 
-  private final boolean objectMapperPresent;
+  private final Object objectMapper;
 
   private final boolean java7Present;
 
@@ -187,7 +189,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     this.typeMap = new ConcurrentHashMap<Class<?>, ScalarType<?>>();
     this.nativeMap = new ConcurrentHashMap<Integer, ScalarType<?>>();
 
-    this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
+    boolean objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
+    this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
     this.postgres = isPostgres(config.getDatabasePlatform());
@@ -355,18 +358,30 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   }
 
   @Override
-  public ScalarType<?> getJsonScalarType(Class<?> type, int dbType, int dbLength) {
+  public ScalarType<?> getJsonScalarType(Class<?> type, int dbType, int dbLength, Type genericType) {
 
     if (type.equals(List.class)) {
-      return ScalarTypeJsonList.typeFor(postgres, dbType);
+      if (isValueTypeSimple(genericType)) {
+        return ScalarTypeJsonList.typeFor(postgres, dbType);
+      } else {
+        return createJsonObjectMapperType(type, genericType, dbType);
+      }
     }
 
     if (type.equals(Set.class)) {
-      return ScalarTypeJsonSet.typeFor(postgres, dbType);
+      if (isValueTypeSimple(genericType)) {
+        return ScalarTypeJsonSet.typeFor(postgres, dbType);
+      } else {
+        return createJsonObjectMapperType(type, genericType, dbType);
+      }
     }
 
     if (type.equals(Map.class)) {
-      return ScalarTypeJsonMap.typeFor(postgres, dbType);
+      if (isMapValueTypeObject(genericType)) {
+        return ScalarTypeJsonMap.typeFor(postgres, dbType);
+      } else {
+        return createJsonObjectMapperType(type, genericType, dbType);
+      }
     }
 
     if (type.equals(JsonNode.class)) {
@@ -381,7 +396,30 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       }
     }
 
-    throw new IllegalArgumentException("Type [" + type + "] unsupported for @DbJson mapping");
+    return createJsonObjectMapperType(type, type, dbType);
+  }
+
+  /**
+   * Return true if value parameter type of the map is Object.
+   */
+  private boolean isValueTypeSimple(Type genericType) {
+    Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
+    return String.class.equals(typeArgs[0]) || Long.class.equals(typeArgs[0]);
+  }
+
+  /**
+   * Return true if value parameter type of the map is Object.
+   */
+  private boolean isMapValueTypeObject(Type genericType) {
+    Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
+    return Object.class.equals(typeArgs[1]);
+  }
+
+  private ScalarType<?> createJsonObjectMapperType(Class<?> type, Type genericType, int dbType) {
+    if (objectMapper == null) {
+      throw new IllegalArgumentException("Type [" + type + "] unsupported for @DbJson mapping - Jackson ObjectMapper not present");
+    }
+    return ScalarTypeJsonObjectMapper.createTypeFor(postgres, type, (ObjectMapper) objectMapper, genericType, dbType);
   }
 
   /**
@@ -610,15 +648,13 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       try {
 
         ScalarType<?> scalarType;
-        if (!objectMapperPresent) {
+        if (objectMapper == null) {
           scalarType = (ScalarType<?>) cls.newInstance();
-
         } else {
           try {
             // first try objectMapper constructor
             Constructor<?> constructor = cls.getConstructor(ObjectMapper.class);
-            ObjectMapper objectMapper = getObjectMapper(serverConfig);
-            scalarType = (ScalarType<?>)constructor.newInstance(objectMapper);
+            scalarType = (ScalarType<?>)constructor.newInstance((ObjectMapper)objectMapper);
           } catch (NoSuchMethodException e) {
             scalarType = (ScalarType<?>) cls.newInstance();
           }
@@ -634,9 +670,9 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     }
   }
 
-  private ObjectMapper getObjectMapper(ServerConfig serverConfig) {
+  private Object initObjectMapper(ServerConfig serverConfig) {
 
-    ObjectMapper objectMapper = (ObjectMapper)serverConfig.getObjectMapper();
+    Object objectMapper = serverConfig.getObjectMapper();
     if (objectMapper == null) {
       objectMapper = new ObjectMapper();
       serverConfig.setObjectMapper(objectMapper);
