@@ -15,7 +15,7 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbHistorySupport;
 import com.avaje.ebean.config.dbplatform.DbIdentity;
-import com.avaje.ebean.config.dbplatform.IdGenerator;
+import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.event.changelog.ChangeLogFilter;
 import com.avaje.ebean.event.changelog.ChangeLogListener;
@@ -663,7 +663,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       InheritInfo inheritInfo = descriptor.getInheritInfo();
       if (inheritInfo != null && !inheritInfo.isRoot()) {
         DeployBeanInfo<?> rootBeanInfo = deplyInfoMap.get(inheritInfo.getRoot().getType());
-        IdGenerator rootIdGen = rootBeanInfo.getDescriptor().getIdGenerator();
+        PlatformIdGenerator rootIdGen = rootBeanInfo.getDescriptor().getIdGenerator();
         if (rootIdGen != null) {
           descriptor.setIdGenerator(rootIdGen);
         }
@@ -1240,11 +1240,11 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     }
 
     // create the sequence based IdGenerator
-    IdGenerator seqIdGen = createSequenceIdGenerator(seqName);
+    PlatformIdGenerator seqIdGen = createSequenceIdGenerator(seqName);
     desc.setIdGenerator(seqIdGen);
   }
 
-  private IdGenerator createSequenceIdGenerator(String seqName) {
+  private PlatformIdGenerator createSequenceIdGenerator(String seqName) {
     return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, seqName, dbSequenceBatchSize);
   }
 

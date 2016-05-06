@@ -11,7 +11,7 @@ import com.avaje.ebean.Transaction;
  * actual insert.
  * </p>
  */
-public interface IdGenerator {
+public interface PlatformIdGenerator {
 
   /**
    * The name of the default UUID generator.

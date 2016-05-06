@@ -26,7 +26,7 @@ public class HsqldbPlatform extends DatabasePlatform {
   }
 
   @Override
-  public IdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
 
     return new H2SequenceIdGenerator(be, ds, seqName, batchSize);
   }

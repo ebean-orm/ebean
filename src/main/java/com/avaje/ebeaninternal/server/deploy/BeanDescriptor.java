@@ -16,7 +16,7 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.bean.PersistenceContextUtil;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.config.dbplatform.IdGenerator;
+import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanPersistController;
@@ -152,7 +152,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   private final boolean idTypePlatformDefault;
 
-  private final IdGenerator idGenerator;
+  private final PlatformIdGenerator idGenerator;
 
   /**
    * The database sequence name (optional).

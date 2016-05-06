@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * One which batch requests sequence Id's would be better for performance.
  * </p>
  */
-public class SimpleSequenceIdGenerator implements IdGenerator {
+public class SimpleSequenceIdGenerator implements PlatformIdGenerator {
 
   private static final Logger logger = LoggerFactory.getLogger(SimpleSequenceIdGenerator.class);
 

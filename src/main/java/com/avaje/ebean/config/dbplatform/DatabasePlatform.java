@@ -251,7 +251,7 @@ public class DatabasePlatform {
    * @param seqName   the name of the sequence
    * @param batchSize the number of sequences that should be loaded
    */
-  public IdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
     return null;
   }
 

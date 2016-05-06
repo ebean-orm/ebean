@@ -6,7 +6,7 @@ import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.TableName;
-import com.avaje.ebean.config.dbplatform.IdGenerator;
+import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanPersistController;
@@ -94,7 +94,7 @@ public class DeployBeanDescriptor<T> {
    */
   private String idGeneratorName;
 
-  private IdGenerator idGenerator;
+  private PlatformIdGenerator idGenerator;
 
   /**
    * The database sequence name (optional).
@@ -816,14 +816,14 @@ public class DeployBeanDescriptor<T> {
   /**
    * Return the actual IdGenerator for this bean type (can be null).
    */
-  public IdGenerator getIdGenerator() {
+  public PlatformIdGenerator getIdGenerator() {
     return idGenerator;
   }
 
   /**
    * Set the actual IdGenerator for this bean type.
    */
-  public void setIdGenerator(IdGenerator idGenerator) {
+  public void setIdGenerator(PlatformIdGenerator idGenerator) {
     this.idGenerator = idGenerator;
     if (idGenerator != null && idGenerator.isDbSequence()) {
       setSequenceName(idGenerator.getName());

@@ -52,8 +52,8 @@ public class MySqlPlatform extends DatabasePlatform {
    * Return null in case there is a sequence annotation.
    */
   @Override
-  public IdGenerator createSequenceIdGenerator(BackgroundExecutor be,
-      DataSource ds, String seqName, int batchSize) {
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be,
+                                                       DataSource ds, String seqName, int batchSize) {
 
     return null;
   }

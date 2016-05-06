@@ -54,7 +54,7 @@ public class OraclePlatform extends DatabasePlatform {
   }
 
   @Override
-  public IdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
+  public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
 
     return new OracleSequenceIdGenerator(be, ds, seqName, batchSize);
   }

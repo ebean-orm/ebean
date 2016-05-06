@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Database sequence based IdGenerator.
  */
-public abstract class SequenceIdGenerator implements IdGenerator {
+public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
   private static final Logger logger = LoggerFactory.getLogger(SequenceIdGenerator.class);
 

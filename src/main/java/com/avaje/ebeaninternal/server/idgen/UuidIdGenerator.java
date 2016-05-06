@@ -3,12 +3,12 @@ package com.avaje.ebeaninternal.server.idgen;
 import java.util.UUID;
 
 import com.avaje.ebean.Transaction;
-import com.avaje.ebean.config.dbplatform.IdGenerator;
+import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
 
 /**
  * IdGenerator for java util UUID.
  */
-public class UuidIdGenerator implements IdGenerator {
+public class UuidIdGenerator implements PlatformIdGenerator {
 
 	/**
 	 * Return UUID from UUID.randomUUID();
@@ -38,6 +38,4 @@ public class UuidIdGenerator implements IdGenerator {
 		// ignored
 	}
 
-	
-	
 }
