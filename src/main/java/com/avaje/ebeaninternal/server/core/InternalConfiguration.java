@@ -126,8 +126,9 @@ public class InternalConfiguration {
     this.cacheManager = cacheManager;
     this.serverConfig = serverConfig;
     this.bootupClasses = bootupClasses;
-    this.expressionFactory = new DefaultExpressionFactory(serverConfig.isExpressionEqualsWithNullAsNoop());
 
+    DatabasePlatform databasePlatform = serverConfig.getDatabasePlatform();
+    this.expressionFactory = initExpressionFactory(serverConfig, databasePlatform);
     this.typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
 
     this.deployOrmXml = new DeployOrmXml();
@@ -140,11 +141,18 @@ public class InternalConfiguration {
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy();
     Map<String, String> draftTableMap = beanDescriptorManager.getDraftTableMap();
 
-    DatabasePlatform databasePlatform = serverConfig.getDatabasePlatform();
-
     this.dataTimeZone = initDataTimeZone();
     this.binder = getBinder(typeManager, databasePlatform, dataTimeZone);
     this.cQueryEngine = new CQueryEngine(databasePlatform, binder, asOfTableMapping, serverConfig.getAsOfSysPeriod(), draftTableMap);
+  }
+
+  /**
+   * Create and return the ExpressionFactory based on configuration and database platform.
+   */
+  private ExpressionFactory initExpressionFactory(ServerConfig serverConfig, DatabasePlatform databasePlatform) {
+
+    boolean nativeIlike = serverConfig.isExpressionNativeIlike() && databasePlatform.isSupportsNativeIlike();
+    return new DefaultExpressionFactory(serverConfig.isExpressionEqualsWithNullAsNoop(), nativeIlike);
   }
 
   private DocStoreFactory initDocStoreFactory(DocStoreFactory service) {
@@ -322,10 +330,6 @@ public class InternalConfiguration {
 
   public CQueryEngine getCQueryEngine() {
     return cQueryEngine;
-  }
-
-  public ClusterManager getClusterManager() {
-    return clusterManager;
   }
 
   public SpiBackgroundExecutor getBackgroundExecutor() {

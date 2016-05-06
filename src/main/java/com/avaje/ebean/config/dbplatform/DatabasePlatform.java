@@ -170,6 +170,8 @@ public class DatabasePlatform {
    */
   protected int maxConstraintNameLength = 60;
 
+  protected boolean supportsNativeIlike;
+
   /**
    * Instantiates a new database platform.
    */
@@ -189,6 +191,13 @@ public class DatabasePlatform {
    */
   public String getName() {
     return name;
+  }
+
+  /**
+   * Return true if this database platform supports native ILIKE expression.
+   */
+  public boolean isSupportsNativeIlike() {
+    return supportsNativeIlike;
   }
 
   /**

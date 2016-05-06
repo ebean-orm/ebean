@@ -16,7 +16,7 @@ public class JunctionExpressionTest {
 
   DefaultExpressionList<?> exp(Expression... expressions) {
 
-    DefaultExpressionList<Object> list = new DefaultExpressionList<Object>(null, new DefaultExpressionFactory(true), null);
+    DefaultExpressionList<Object> list = new DefaultExpressionList<Object>(null, new DefaultExpressionFactory(true, false), null);
     for (Expression ex : expressions) {
       list.add(ex);
     }

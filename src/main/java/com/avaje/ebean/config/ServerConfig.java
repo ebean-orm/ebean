@@ -409,6 +409,11 @@ public class ServerConfig {
    */
   private boolean expressionEqualsWithNullAsNoop;
 
+  /**
+   * Set to true to use native ILIKE expression (if support by datasbase platform / like Postgres).
+   */
+  private boolean expressionNativeIlike;
+
   private String jodaLocalTimeMode;
 
   /**
@@ -2391,6 +2396,7 @@ public class ServerConfig {
 
     changeLogIncludeInserts = p.getBoolean("changeLogIncludeInserts", changeLogIncludeInserts);
     expressionEqualsWithNullAsNoop = p.getBoolean("expressionEqualsWithNullAsNoop", expressionEqualsWithNullAsNoop);
+    expressionNativeIlike = p.getBoolean("expressionNativeIlike", expressionNativeIlike);
 
     dataTimeZone = p.get("dataTimeZone", dataTimeZone);
     asOfViewSuffix = p.get("asOfViewSuffix", asOfViewSuffix);
@@ -2529,6 +2535,20 @@ public class ServerConfig {
    */
   public void setExpressionEqualsWithNullAsNoop(boolean expressionEqualsWithNullAsNoop) {
     this.expressionEqualsWithNullAsNoop = expressionEqualsWithNullAsNoop;
+  }
+
+  /**
+   * Return true if native ILIKE expression should be used if supported by the database platform (e.g. Postgres).
+   */
+  public boolean isExpressionNativeIlike() {
+    return expressionNativeIlike;
+  }
+
+  /**
+   * Set to true to use native ILIKE expression if supported by the database platform (e.g. Postgres).
+   */
+  public void setExpressionNativeIlike(boolean expressionNativeIlike) {
+    this.expressionNativeIlike = expressionNativeIlike;
   }
 
   /**

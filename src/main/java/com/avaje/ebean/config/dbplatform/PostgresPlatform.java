@@ -20,6 +20,7 @@ public class PostgresPlatform extends DatabasePlatform {
   public PostgresPlatform() {
     super();
     this.name = "postgres";
+    this.supportsNativeIlike = true;
     this.likeClause = "like ? escape''";
     this.selectCountWithAlias = true;
     this.blobDbType = Types.LONGVARBINARY;

@@ -28,10 +28,13 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
 
   private static final Object[] EMPTY_ARRAY = new Object[] {};
 
+  private final boolean nativeIlike;
+
   private final boolean equalsWithNullAsNoop;
 
-  public DefaultExpressionFactory(boolean equalsWithNullAsNoop) {
+  public DefaultExpressionFactory(boolean equalsWithNullAsNoop, boolean nativeIlike) {
     this.equalsWithNullAsNoop = equalsWithNullAsNoop;
+    this.nativeIlike = nativeIlike;
   }
 
   public ExpressionFactory createExpressionFactory(){
@@ -242,7 +245,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * a lower() function to make the expression case insensitive.
    */
   public Expression ilike(String propertyName, String value) {
-    return new LikeExpression(propertyName, value, true, LikeType.RAW);
+    if (nativeIlike) {
+      return new NativeILikeExpression(propertyName, value);
+    } else {
+      return new LikeExpression(propertyName, value, true, LikeType.RAW);
+    }
   }
 
   /**
