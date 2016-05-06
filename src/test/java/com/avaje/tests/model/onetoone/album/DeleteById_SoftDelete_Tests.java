@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class DeleteById_SoftDelete_Tests {
 
@@ -26,6 +28,38 @@ public class DeleteById_SoftDelete_Tests {
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("update cover set deleted=true where id = ?");
+
+    cover.deletePermanent();
+  }
+
+  @Test
+  public void undo_softDelete() {
+
+    Cover cover = new Cover("b1");
+    cover.save();
+
+    Ebean.delete(Cover.class, cover.getId());
+
+    Cover findWhenSoft = Ebean.find(Cover.class, cover.getId());
+    assertNull(findWhenSoft);
+
+    Cover cover1 = Ebean.find(Cover.class)
+        .setIncludeSoftDeletes()
+        .setId(cover.getId())
+        .findUnique();
+
+    cover1.setDeleted(false);
+
+    LoggedSqlCollector.start();
+
+    cover1.update();
+
+    List<String> sql = LoggedSqlCollector.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("update cover set deleted=? where id=?; --bind(false");
+
+    Cover findAgain = Ebean.find(Cover.class, cover.getId());
+    assertNotNull(findAgain);
 
     cover.deletePermanent();
   }

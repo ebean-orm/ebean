@@ -49,6 +49,10 @@ public class Cover extends Model {
     return this.deleted;
   }
 
+  public void setDeleted(boolean deleted) {
+    this.deleted = deleted;
+  }
+
   public Long getId() {
     return this.id;
   }
