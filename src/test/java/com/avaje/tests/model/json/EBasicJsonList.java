@@ -1,6 +1,7 @@
 package com.avaje.tests.model.json;
 
 import com.avaje.ebean.annotation.DbJson;
+import com.avaje.ebean.annotation.DbJsonB;
 import com.avaje.ebean.annotation.DbJsonType;
 
 import javax.persistence.Entity;
@@ -24,7 +25,7 @@ public class EBasicJsonList {
   @DbJson(length = 700)
   Set<PlainBean> beanSet;
 
-  @DbJson(length = 700)
+  @DbJsonB
   List<PlainBean> beanList;
 
   @DbJson(length = 700)
