@@ -378,6 +378,12 @@ public interface Query<T> {
 
   /**
    * Execute the query including soft deleted rows.
+   * <p>
+   * This means that Ebean will not add any predicates to the query for filtering out
+   * soft deleted rows. You can still add your own predicates for the deleted properties
+   * and effectively you have full control over the query to include or exclude soft deleted
+   * rows as needed for a given use case.
+   * </p>
    */
   Query<T> setIncludeSoftDeletes();
 
