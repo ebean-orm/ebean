@@ -23,4 +23,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface DbHstore {
 
+  /**
+   * For VARCHAR storage specify the column length (defaults to 1000).
+   */
+  int length() default 0;
 }

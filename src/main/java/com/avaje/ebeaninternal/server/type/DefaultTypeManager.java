@@ -90,6 +90,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final DefaultTypeFactory extraTypeFactory;
 
+  private final ScalarType<?> hstoreType = new ScalarTypePostgresHstore();
+
   private final ScalarTypeFile fileType = new ScalarTypeFile();
 
   private final ScalarType<?> charType = new ScalarTypeChar();
@@ -357,6 +359,11 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       reader = compoundTypeMap.get(type);
     }
     return reader;
+  }
+
+  @Override
+  public ScalarType<?> getHstoreScalarType() {
+    return (postgres) ? hstoreType : ScalarTypeJsonMap.typeFor(false, Types.VARCHAR);
   }
 
   @Override
@@ -930,7 +937,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     int platformClobType = databasePlatform.getClobDbType();
     int platformBlobType = databasePlatform.getBlobDbType();
 
-    nativeMap.put(DbType.HSTORE, new ScalarTypePostgresHstore());
+    nativeMap.put(DbType.HSTORE, hstoreType);
 
     ScalarType<?> utilDateType = extraTypeFactory.createUtilDate(mode);
     typeMap.put(java.util.Date.class, utilDateType);

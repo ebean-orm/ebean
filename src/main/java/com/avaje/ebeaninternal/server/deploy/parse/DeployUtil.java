@@ -6,6 +6,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.annotation.DbArray;
+import com.avaje.ebean.annotation.DbHstore;
 import com.avaje.ebean.annotation.DbJson;
 import com.avaje.ebean.annotation.DbJsonB;
 import com.avaje.ebean.annotation.DbJsonType;
@@ -203,15 +204,20 @@ public class DeployUtil {
   }
 
   /**
-   * Map to Postgres HSTORE type.
+   * Map to Postgres HSTORE type (with fallback to JSON storage in VARCHAR).
    */
-  public void setDbHstore(DeployBeanProperty prop) {
-    ScalarType<?> scalarType = typeManager.getScalarType(DbType.HSTORE);
-    if (scalarType == null) {
-      throw new RuntimeException("No ScalarType found for HSTORE on [" + prop.getFullBeanName() + "] ?");
-    }
-    prop.setDbType(DbType.HSTORE);
+  public void setDbHstore(DeployBeanProperty prop, DbHstore dbHstore) {
+
+    ScalarType<?> scalarType = typeManager.getHstoreScalarType();
+    int dbType = scalarType.getJdbcType();
+    prop.setDbType(dbType);
     prop.setScalarType(scalarType);
+    if (dbType == Types.VARCHAR) {
+      // this is actually the fallback of JSON storage into VARCHAR
+      int dbLength = dbHstore.length();
+      int columnLength = (dbLength > 0) ? dbLength : DEFAULT_JSON_VARCHAR_LENGTH;
+      prop.setDbLength(columnLength);
+    }
   }
 
   /**

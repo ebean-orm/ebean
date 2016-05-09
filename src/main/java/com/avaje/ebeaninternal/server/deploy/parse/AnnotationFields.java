@@ -175,8 +175,9 @@ public class AnnotationFields extends AnnotationParser {
     if (comment != null) {
       prop.setDbComment(comment.value());
     }
-    if (get(prop, DbHstore.class) != null) {
-      util.setDbHstore(prop);
+    DbHstore dbHstore = get(prop, DbHstore.class);
+    if (dbHstore != null) {
+      util.setDbHstore(prop, dbHstore);
     }
     DbJson dbJson = get(prop, DbJson.class);
     if (dbJson != null) {
