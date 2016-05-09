@@ -16,7 +16,6 @@ public class SimpleDataTimeZone implements DataTimeZone {
 
   @Override
   public Calendar getTimeZone() {
-    // return null so Calendar is not used
     return zone;
   }
 }
