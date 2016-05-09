@@ -89,6 +89,6 @@ public abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> {
 
   @Override
   public DocPropertyType getDocType() {
-    return DocPropertyType.STRING;
+    return DocPropertyType.UUID;
   }
 }

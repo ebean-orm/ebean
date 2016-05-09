@@ -827,6 +827,30 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> arrayContains(String propertyName, Object... elementValue) {
+    add(expr.arrayContains(propertyName, elementValue));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> arrayNotContains(String propertyName, Object... values) {
+    add(expr.arrayNotContains(propertyName, values));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> arrayIsEmpty(String propertyName) {
+    add(expr.arrayIsEmpty(propertyName));
+    return this;
+  }
+
+  @Override
+  public ExpressionList<T> arrayIsNotEmpty(String propertyName) {
+    add(expr.arrayIsNotEmpty(propertyName));
+    return this;
+  }
+
+  @Override
   public ExpressionList<T> raw(String raw, Object value) {
     add(expr.raw(raw, value));
     return this;

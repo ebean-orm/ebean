@@ -11,6 +11,11 @@ public enum DocPropertyType {
   ENUM,
 
   /**
+   * A UUID is a String Id implying it should not be analysed.
+   */
+  UUID,
+
+  /**
    * String.
    */
   STRING,

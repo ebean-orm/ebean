@@ -100,7 +100,7 @@ public class ExeUpdateSql {
 
     String bindLog = null;
     if (!bindParams.isEmpty()) {
-      bindLog = binder.bind(bindParams, pstmt);
+      bindLog = binder.bind(bindParams, pstmt, t.getInternalConnection());
     }
 
     request.setBindLog(bindLog);

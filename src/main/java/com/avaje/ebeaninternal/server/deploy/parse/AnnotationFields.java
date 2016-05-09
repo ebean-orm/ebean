@@ -187,6 +187,10 @@ public class AnnotationFields extends AnnotationParser {
         util.setDbJsonBType(prop, dbJsonB);
       }
     }
+    DbArray dbArray = get(prop, DbArray.class);
+    if (dbArray != null) {
+      util.setDbArray(prop, dbArray);
+    }
 
     DocCode docCode = get(prop, DocCode.class);
     if (docCode != null) {

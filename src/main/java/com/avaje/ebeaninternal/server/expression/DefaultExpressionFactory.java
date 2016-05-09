@@ -106,6 +106,26 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new JsonPathExpression(propertyName, path, lowerValue, upperValue);
   }
 
+  @Override
+  public Expression arrayContains(String propertyName, Object... values) {
+    return new ArrayContainsExpression(propertyName, true, values);
+  }
+
+  @Override
+  public Expression arrayNotContains(String propertyName, Object... values) {
+    return new ArrayContainsExpression(propertyName, false, values);
+  }
+
+  @Override
+  public Expression arrayIsEmpty(String propertyName) {
+    return new ArrayIsEmptyExpression(propertyName, true);
+  }
+
+  @Override
+  public Expression arrayIsNotEmpty(String propertyName) {
+    return new ArrayIsEmptyExpression(propertyName, false);
+  }
+
   /**
    * Equal To - property equal to the given value.
    */

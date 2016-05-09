@@ -802,6 +802,35 @@ public interface ExpressionList<T> {
   ExpressionList<T> allEq(Map<String, Object> propertyMap);
 
   /**
+   * Array property contains entries with the given values.
+   */
+  ExpressionList<T> arrayContains(String propertyName, Object... values);
+
+  /**
+   * Array does not contain the given values.
+   * <p>
+   * Array support is effectively limited to Postgres at this time.
+   * </p>
+   */
+  ExpressionList<T> arrayNotContains(String propertyName, Object... values);
+
+  /**
+   * Array is empty - for the given array property.
+   * <p>
+   * Array support is effectively limited to Postgres at this time.
+   * </p>
+   */
+  ExpressionList<T> arrayIsEmpty(String propertyName);
+
+  /**
+   * Array is not empty - for the given array property.
+   * <p>
+   * Array support is effectively limited to Postgres at this time.
+   * </p>
+   */
+  ExpressionList<T> arrayIsNotEmpty(String propertyName);
+
+  /**
    * Add raw expression with a single parameter.
    * <p>
    * The raw expression should contain a single ? at the location of the

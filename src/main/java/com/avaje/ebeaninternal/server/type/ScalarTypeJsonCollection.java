@@ -8,8 +8,11 @@ import java.io.IOException;
 
 abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> {
 
-  public ScalarTypeJsonCollection(Class<T> type, int dbType) {
+  protected DocPropertyType docPropertyType;
+
+  public ScalarTypeJsonCollection(Class<T> type, int dbType, DocPropertyType docPropertyType) {
     super(type, false, dbType);
+    this.docPropertyType = docPropertyType;
   }
 
   /**
@@ -41,7 +44,7 @@ abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> {
 
   @Override
   public DocPropertyType getDocType() {
-    return DocPropertyType.LIST;
+    return docPropertyType;
   }
 
   @Override

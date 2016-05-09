@@ -235,7 +235,7 @@ public final class RelationalQueryRequest {
 
     BindParams bindParams = query.getBindParams();
     if (!bindParams.isEmpty()) {
-      this.bindLog = binder.bind(bindParams, pstmt);
+      this.bindLog = binder.bind(bindParams, pstmt, conn);
     }
 
     if (isLogSql()) {

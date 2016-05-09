@@ -105,7 +105,7 @@ public class CQueryDelete {
         pstmt.setQueryTimeout(query.getTimeout());
       }
 
-      bindLog = predicates.bind(pstmt);
+      bindLog = predicates.bind(pstmt, conn);
       rowCount = pstmt.executeUpdate();
 
       long exeNano = System.nanoTime() - startNano;

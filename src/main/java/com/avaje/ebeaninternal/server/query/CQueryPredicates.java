@@ -17,6 +17,7 @@ import com.avaje.ebeaninternal.server.expression.DefaultExpressionRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -126,8 +127,8 @@ public class CQueryPredicates {
     this.idValue = query.getId();
   }
 
-  public String bind(PreparedStatement stmt) throws SQLException {
-    return bind(binder.dataBind(stmt));
+  public String bind(PreparedStatement stmt,  Connection connection) throws SQLException {
+    return bind(binder.dataBind(stmt, connection));
   }
 
   public String bind(DataBind dataBind) throws SQLException {

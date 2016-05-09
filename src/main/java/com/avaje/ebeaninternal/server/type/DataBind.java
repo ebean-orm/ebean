@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
+import java.sql.Array;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
@@ -19,13 +21,16 @@ public class DataBind {
 
   private final PreparedStatement pstmt;
 
+  private final Connection connection;
+
   private final StringBuilder bindLog = new StringBuilder();
 
   private int pos;
 
-  public DataBind(DataTimeZone dataTimeZone, PreparedStatement pstmt) {
+  public DataBind(DataTimeZone dataTimeZone, PreparedStatement pstmt, Connection connection) {
     this.dataTimeZone = dataTimeZone;
     this.pstmt = pstmt;
+    this.connection = connection;
   }
 
   /**
@@ -154,6 +159,11 @@ public class DataBind {
   public void setClob(String content) throws SQLException {
     Reader reader = new StringReader(content);
     pstmt.setCharacterStream(++pos, reader, content.length());
+  }
+
+  public void setArray(String arrayType, Object[] elements) throws SQLException {
+    Array array = connection.createArrayOf(arrayType, elements);
+    pstmt.setArray(++pos, array);
   }
 
 }

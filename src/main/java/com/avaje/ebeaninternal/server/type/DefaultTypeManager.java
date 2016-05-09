@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.annotation.DbArray;
 import com.avaje.ebean.annotation.DbEnumType;
 import com.avaje.ebean.annotation.DbEnumValue;
 import com.avaje.ebean.annotation.EnumValue;
@@ -19,6 +20,7 @@ import com.avaje.ebeaninternal.server.type.reflect.KnownImmutable;
 import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundType;
 import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedCompoundTypeProperty;
 import com.avaje.ebeaninternal.server.type.reflect.ReflectionBasedTypeBuilder;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateMidnight;
@@ -358,21 +360,37 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   }
 
   @Override
+  public ScalarType<?> getArrayScalarType(Class<?> type, DbArray dbArray, Type genericType) {
+
+    if (type.equals(List.class)) {
+      if (postgres) {
+        Type valueType = getValueType(genericType);
+        return ScalarTypeArrayList.typeFor(valueType);
+      }
+      // fallback to JSON storage in VARCHAR column
+      return new ScalarTypeJsonList.Varchar(getDocType(getValueType(genericType)));
+    }
+    throw new IllegalStateException("Type ["+type+"] not supported for @DbArray");
+  }
+
+  @Override
   public ScalarType<?> getJsonScalarType(Class<?> type, int dbType, int dbLength, Type genericType) {
 
     if (type.equals(List.class)) {
+      DocPropertyType docType = getDocType(genericType);
       if (isValueTypeSimple(genericType)) {
-        return ScalarTypeJsonList.typeFor(postgres, dbType);
+        return ScalarTypeJsonList.typeFor(postgres, dbType, docType);
       } else {
-        return createJsonObjectMapperType(type, genericType, dbType);
+        return createJsonObjectMapperType(type, genericType, dbType, docType);
       }
     }
 
     if (type.equals(Set.class)) {
+      DocPropertyType docType = getDocType(genericType);
       if (isValueTypeSimple(genericType)) {
-        return ScalarTypeJsonSet.typeFor(postgres, dbType);
+        return ScalarTypeJsonSet.typeFor(postgres, dbType, docType);
       } else {
-        return createJsonObjectMapperType(type, genericType, dbType);
+        return createJsonObjectMapperType(type, genericType, dbType, docType);
       }
     }
 
@@ -380,7 +398,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       if (isMapValueTypeObject(genericType)) {
         return ScalarTypeJsonMap.typeFor(postgres, dbType);
       } else {
-        return createJsonObjectMapperType(type, genericType, dbType);
+        return createJsonObjectMapperType(type, genericType, dbType, DocPropertyType.OBJECT);
       }
     }
 
@@ -396,7 +414,17 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       }
     }
 
-    return createJsonObjectMapperType(type, type, dbType);
+    return createJsonObjectMapperType(type, type, dbType, DocPropertyType.OBJECT);
+  }
+
+  private DocPropertyType getDocType(Type genericType) {
+    if (genericType instanceof Class<?>) {
+      ScalarType<?> found = typeMap.get(genericType);
+      if (found != null) {
+        return found.getDocType();
+      }
+    }
+    return DocPropertyType.OBJECT;
   }
 
   /**
@@ -407,6 +435,11 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return String.class.equals(typeArgs[0]) || Long.class.equals(typeArgs[0]);
   }
 
+  private Type getValueType(Type genericType) {
+    Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
+    return typeArgs[0];
+  }
+
   /**
    * Return true if value parameter type of the map is Object.
    */
@@ -415,11 +448,11 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return Object.class.equals(typeArgs[1]);
   }
 
-  private ScalarType<?> createJsonObjectMapperType(Class<?> type, Type genericType, int dbType) {
+  private ScalarType<?> createJsonObjectMapperType(Class<?> type, Type genericType, int dbType, DocPropertyType docType) {
     if (objectMapper == null) {
       throw new IllegalArgumentException("Type [" + type + "] unsupported for @DbJson mapping - Jackson ObjectMapper not present");
     }
-    return ScalarTypeJsonObjectMapper.createTypeFor(postgres, type, (ObjectMapper) objectMapper, genericType, dbType);
+    return ScalarTypeJsonObjectMapper.createTypeFor(postgres, type, (ObjectMapper) objectMapper, genericType, dbType, docType);
   }
 
   /**

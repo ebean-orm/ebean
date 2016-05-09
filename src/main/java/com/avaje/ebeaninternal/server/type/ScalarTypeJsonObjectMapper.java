@@ -25,21 +25,16 @@ public class ScalarTypeJsonObjectMapper {
 
   /**
    * Create and return the appropriate ScalarType.
-   *
-   * @param postgres
-   * @param type         The field/property type
-   * @param objectMapper The Jackson ObjectMapper to use for marshalling
-   * @param genericType  The generic type
-   * @param dbType       The DB storage type to use
    */
-  public static ScalarType<?> createTypeFor(boolean postgres, Class<?> type, ObjectMapper objectMapper, Type genericType, int dbType) {
+  public static ScalarType<?> createTypeFor(boolean postgres, Class<?> type, ObjectMapper objectMapper,
+                                            Type genericType, int dbType, DocPropertyType docType) {
 
     String pgType = getPostgresType(postgres, dbType);
     if (Set.class.equals(type)) {
-      return new OmSet(objectMapper, genericType, dbType, pgType);
+      return new OmSet(objectMapper, genericType, dbType, pgType, docType);
     }
     if (List.class.equals(type)) {
-      return new OmList(objectMapper, genericType, dbType, pgType);
+      return new OmList(objectMapper, genericType, dbType, pgType, docType);
     }
     if (Map.class.equals(type)) {
       return new OmMap(objectMapper, genericType, dbType, pgType);
@@ -63,7 +58,7 @@ public class ScalarTypeJsonObjectMapper {
   private static class GenericObject extends Base<Object> {
 
     public GenericObject(ObjectMapper objectMapper, Type type, int dbType, String pgType) {
-      super(Object.class, objectMapper, type, dbType, pgType);
+      super(Object.class, objectMapper, type, dbType, pgType, DocPropertyType.OBJECT);
     }
   }
 
@@ -72,8 +67,8 @@ public class ScalarTypeJsonObjectMapper {
    */
   private static class OmSet extends Base<Set> {
 
-    public OmSet(ObjectMapper objectMapper, Type type, int dbType, String pgType) {
-      super(Set.class, objectMapper, type, dbType, pgType);
+    public OmSet(ObjectMapper objectMapper, Type type, int dbType, String pgType, DocPropertyType docType) {
+      super(Set.class, objectMapper, type, dbType, pgType, docType);
     }
 
     @Override
@@ -89,8 +84,8 @@ public class ScalarTypeJsonObjectMapper {
    */
   private static class OmList extends Base<List> {
 
-    public OmList(ObjectMapper objectMapper, Type type, int dbType, String pgType) {
-      super(List.class, objectMapper, type, dbType, pgType);
+    public OmList(ObjectMapper objectMapper, Type type, int dbType, String pgType, DocPropertyType docType) {
+      super(List.class, objectMapper, type, dbType, pgType, docType);
     }
 
     @Override
@@ -107,7 +102,7 @@ public class ScalarTypeJsonObjectMapper {
   private static class OmMap extends Base<Map> {
 
     public OmMap(ObjectMapper objectMapper, Type type, int dbType, String pgType) {
-      super(Map.class, objectMapper, type, dbType, pgType);
+      super(Map.class, objectMapper, type, dbType, pgType, DocPropertyType.OBJECT);
     }
 
     @Override
@@ -130,16 +125,15 @@ public class ScalarTypeJsonObjectMapper {
 
     private final String pgType;
 
+    private final DocPropertyType docType;
+
     /**
      * Construct given the object mapper, property type and DB type for storage.
-     *
-     * @param objectMapper Jackson object mapper for JSON marshalling/unmarshalling
-     * @param type         The property type (ie. type of field with @DbJson)
-     * @param dbType       The DB type used for storage (JSON, JSONB, VARCHAR, CLOB or BLOB)
      */
-    public Base(Class<T> cls, ObjectMapper objectMapper, Type type, int dbType, String pgType) {
+    public Base(Class<T> cls, ObjectMapper objectMapper, Type type, int dbType, String pgType, DocPropertyType docType) {
       super(cls, false, dbType);
       this.pgType = pgType;
+      this.docType = docType;
       this.objectMapper = objectMapper;
       this.javaType = objectMapper.getTypeFactory().constructType(type);
     }
@@ -199,6 +193,7 @@ public class ScalarTypeJsonObjectMapper {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T toBeanType(Object value) {
       // no type conversion supported
       return (T) value;
@@ -224,7 +219,7 @@ public class ScalarTypeJsonObjectMapper {
 
     @Override
     public DocPropertyType getDocType() {
-      return DocPropertyType.OBJECT;
+      return docType;
     }
 
     @Override

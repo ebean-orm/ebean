@@ -49,6 +49,7 @@ public class DbTypeMap {
     lookup.put("TIME", Types.TIME);
     lookup.put("TIMESTAMP", Types.TIMESTAMP);
 
+    lookup.put("ARRAY", Types.ARRAY);
     lookup.put("UUID", DbType.UUID);
 
     // Not standard java.sql.Types
@@ -105,6 +106,7 @@ public class DbTypeMap {
 
     // DB native UUID support (H2 and Postgres)
     put(DbType.UUID, new DbType("uuid"));
+    put(Types.ARRAY, new DbType("array"));
 
     if (logicalTypes) {
       // keep it logical for 2 layer DDL generation

@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
-import com.avaje.ebeaninternal.server.core.JsonExpressionHandler;
+import com.avaje.ebeaninternal.server.core.DbExpressionHandler;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.DeployParser;
@@ -73,8 +73,8 @@ public class DefaultExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
-  public JsonExpressionHandler getJsonHandler() {
-    return binder.getJsonExpressionHandler();
+  public DbExpressionHandler getDbPlatformHandler() {
+    return binder.getDbExpressionHandler();
   }
 
   @Override

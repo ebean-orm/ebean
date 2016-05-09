@@ -32,6 +32,11 @@ public class BaseTestCase {
     return spi.getDatabasePlatform().getName().equals("h2");
   }
 
+  public boolean isPostgres() {
+    SpiEbeanServer spi = (SpiEbeanServer)Ebean.getDefaultServer();
+    return spi.getDatabasePlatform().getName().equals("postgres");
+  }
+
   /**
    * Wait for the L2 cache to propagate changes post-commit.
    */

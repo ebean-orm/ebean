@@ -463,6 +463,26 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public ExpressionList<T> arrayContains(String propertyName, Object... values) {
+    return exprList.arrayContains(propertyName, values);
+  }
+
+  @Override
+  public ExpressionList<T> arrayNotContains(String propertyName, Object... values) {
+    return exprList.arrayNotContains(propertyName, values);
+  }
+
+  @Override
+  public ExpressionList<T> arrayIsEmpty(String propertyName) {
+    return exprList.arrayIsEmpty(propertyName);
+  }
+
+  @Override
+  public ExpressionList<T> arrayIsNotEmpty(String propertyName) {
+    return exprList.arrayIsNotEmpty(propertyName);
+  }
+
+  @Override
   public ExpressionList<T> ge(String propertyName, Object value) {
     return exprList.ge(propertyName, value);
   }

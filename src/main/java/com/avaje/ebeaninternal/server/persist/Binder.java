@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.persist;
 
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -12,7 +13,7 @@ import javax.persistence.PersistenceException;
 
 import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebeaninternal.api.BindParams;
-import com.avaje.ebeaninternal.server.core.JsonExpressionHandler;
+import com.avaje.ebeaninternal.server.core.DbExpressionHandler;
 import com.avaje.ebeaninternal.server.core.Message;
 import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.type.DataBind;
@@ -34,7 +35,7 @@ public class Binder {
 
   private final boolean bindAsOfWithFromClause;
 
-  private final JsonExpressionHandler jsonExpressionHandler;
+  private final DbExpressionHandler dbExpressionHandler;
 
   private final DataTimeZone dataTimeZone;
 
@@ -42,12 +43,12 @@ public class Binder {
    * Set the PreparedStatement with which to bind variables to.
    */
   public Binder(TypeManager typeManager, int asOfBindCount, boolean bindAsOfWithFromClause,
-                JsonExpressionHandler jsonExpressionHandler, DataTimeZone dataTimeZone) {
+                DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone) {
 
     this.typeManager = typeManager;
     this.asOfBindCount = asOfBindCount;
     this.bindAsOfWithFromClause = bindAsOfWithFromClause;
-    this.jsonExpressionHandler = jsonExpressionHandler;
+    this.dbExpressionHandler = dbExpressionHandler;
     this.dataTimeZone = dataTimeZone;
   }
 
@@ -101,8 +102,8 @@ public class Binder {
   /**
    * Bind the parameters to the preparedStatement returning the bind log.
    */
-  public String bind(BindParams bindParams, PreparedStatement statement) throws SQLException {
-    return bind(bindParams, new DataBind(dataTimeZone, statement));
+  public String bind(BindParams bindParams, PreparedStatement statement, Connection connection) throws SQLException {
+    return bind(bindParams, new DataBind(dataTimeZone, statement, connection));
   }
 
   /**
@@ -401,16 +402,16 @@ public class Binder {
   }
 
   /**
-   * Return the JsonExpressionHandler specific to the database.
+   * Return the DB platform specific expression handler (for JSON and ARRAY types).
    */
-  public JsonExpressionHandler getJsonExpressionHandler() {
-    return jsonExpressionHandler;
+  public DbExpressionHandler getDbExpressionHandler() {
+    return dbExpressionHandler;
   }
 
   /**
    * Create and return a DataBind for the statement.
    */
-  public DataBind dataBind(PreparedStatement stmt) {
-    return new DataBind(dataTimeZone, stmt);
+  public DataBind dataBind(PreparedStatement stmt, Connection connection) {
+    return new DataBind(dataTimeZone, stmt, connection);
   }
 }

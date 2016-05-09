@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.annotation.DbArray;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
 
 import java.lang.reflect.Type;
@@ -66,4 +67,9 @@ public interface TypeManager {
    * </p>
    */
   ScalarType<?> getJsonScalarType(Class<?> type, int dbType, int dbLength, Type genericType);
+
+  /**
+   * Return the ScalarType used to handle DB ARRAY.
+   */
+  ScalarType<?> getArrayScalarType(Class<?> type, DbArray dbArray, Type genericType);
 }

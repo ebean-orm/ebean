@@ -108,7 +108,7 @@ class JsonPathExpression extends AbstractExpression {
   public void addSql(SpiExpressionRequest request) {
 
     // Use DB specific expression handling (Postgres and Oracle supported)
-    request.getJsonHandler().addSql(request, propName, path, operator, value);
+    request.getDbPlatformHandler().json(request, propName, path, operator, value);
   }
 
   @Override

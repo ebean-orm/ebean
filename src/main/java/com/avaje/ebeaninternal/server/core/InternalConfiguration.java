@@ -235,7 +235,7 @@ public class InternalConfiguration {
    */
   private Binder getBinder(TypeManager typeManager, DatabasePlatform databasePlatform, DataTimeZone dataTimeZone) {
 
-    JsonExpressionHandler jsonHandler = getJsonExpressionHandler(databasePlatform);
+    DbExpressionHandler jsonHandler = getDbExpressionHandler(databasePlatform);
 
     DbHistorySupport historySupport = databasePlatform.getHistorySupport();
     if (historySupport == null) {
@@ -247,16 +247,16 @@ public class InternalConfiguration {
   /**
    * Return the JSON expression handler for the given database platform.
    */
-  private JsonExpressionHandler getJsonExpressionHandler(DatabasePlatform databasePlatform) {
+  private DbExpressionHandler getDbExpressionHandler(DatabasePlatform databasePlatform) {
 
     String name = databasePlatform.getName();
     if ("postgres".equalsIgnoreCase(name)) {
       return new PostgresJsonExpression();
     }
     if ("oracle".equalsIgnoreCase(name)) {
-      return new OracleJsonExpression();
+      return new OracleDbExpression();
     }
-    return new NotSupportedJsonExpression();
+    return new NotSupportedDbExpression();
   }
 
   public JsonContext createJsonContext(SpiEbeanServer server) {

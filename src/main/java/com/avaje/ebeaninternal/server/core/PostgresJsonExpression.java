@@ -4,12 +4,12 @@ import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.expression.Op;
 
 /**
- * Postgres JSON expression handler
+ * Postgres JSON and ARRAY expression handler
  */
-public class PostgresJsonExpression implements JsonExpressionHandler {
+public class PostgresJsonExpression implements DbExpressionHandler {
 
   @Override
-  public void addSql(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {
+  public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {
 
     StringBuilder sb = new StringBuilder(50);
     String[] paths = path.split("\\.");
@@ -29,43 +29,36 @@ public class PostgresJsonExpression implements JsonExpressionHandler {
       sb.append("}')");
     }
 
-    request.append(castType(sb.toString(), value));
+    request.append(sb.toString());
+    request.append(PostgresCast.cast(value));
     request.append(operator.bind());
   }
 
-  /**
-   * Postgres CAST the type if necessary as text values always returned from the json operators used.
-   */
-  private String castType(String expression, Object value) {
+  @Override
+  public void arrayContains(SpiExpressionRequest request, String propName, boolean contains, Object... values) {
 
-    if (value == null) {
-      // for exists and not-exists expressions
-      return expression;
+    if (!contains) {
+      request.append("not (");
     }
-
-    // Postgres cast of returned text value
-    if (isIntegerType(value)) {
-      return expression+"::INTEGER";
+    request.append(propName).append(" @> array[?");
+    for (int i = 1; i < values.length; i++) {
+      request.append(",?");
     }
-    if (isNumberType(value)) {
-      return expression+"::DECIMAL";
+    request.append("]");
+    request.append(PostgresCast.cast(values[0], true));
+    if (!contains) {
+      request.append(")");
     }
-    if (isBooleanType(value)) {
-      return expression+"::BOOLEAN";
-    }
-
-    return expression;
   }
 
-  private boolean isBooleanType(Object value) {
-    return (value instanceof Boolean);
-  }
+  @Override
+  public void arrayIsEmpty(SpiExpressionRequest request, String propName, boolean empty) {
 
-  private boolean isIntegerType(Object value) {
-    return (value instanceof Integer) || (value instanceof Long);
-  }
-
-  private boolean isNumberType(Object value) {
-    return (value instanceof Number);
+    request.append("coalesce(cardinality(").append(propName).append("),0)");
+    if (empty) {
+      request.append(" = 0");
+    } else {
+      request.append(" <> 0");
+    }
   }
 }

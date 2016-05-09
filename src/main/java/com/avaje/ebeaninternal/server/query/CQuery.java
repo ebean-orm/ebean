@@ -335,7 +335,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
         pstmt.setFetchSize(query.getBufferFetchSizeHint());
       }
 
-      DataBind dataBind = queryPlan.bindEncryptedProperties(pstmt);
+      DataBind dataBind = queryPlan.bindEncryptedProperties(pstmt, conn);
       bindLog = predicates.bind(dataBind);
 
       // executeQuery

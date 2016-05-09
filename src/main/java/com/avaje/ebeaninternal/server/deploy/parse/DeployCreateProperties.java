@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
+import com.avaje.ebean.annotation.DbArray;
 import com.avaje.ebean.annotation.DbHstore;
 import com.avaje.ebean.annotation.DbJson;
 import com.avaje.ebean.annotation.DbJsonB;
@@ -299,6 +300,7 @@ public class DeployCreateProperties {
   private boolean isSpecialScalarType(Field field) {
     return (field.getAnnotation(DbJson.class) != null)
         || (field.getAnnotation(DbJsonB.class) != null)
+        || (field.getAnnotation(DbArray.class) != null)
         || (field.getAnnotation(DbHstore.class) != null);
   }
   

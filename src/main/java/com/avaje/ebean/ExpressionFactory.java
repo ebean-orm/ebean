@@ -88,6 +88,38 @@ public interface ExpressionFactory {
   Expression jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue);
 
   /**
+   * Array contains all the given values.
+   * <p>
+   * Array support is effectively limited to Postgres at this time.
+   * </p>
+   */
+  Expression arrayContains(String propertyName, Object... values);
+
+  /**
+   * Array does not contain the given values.
+   * <p>
+   * Array support is effectively limited to Postgres at this time.
+   * </p>
+   */
+  Expression arrayNotContains(String propertyName, Object... values);
+
+  /**
+   * Array is empty - for the given array property.
+   * <p>
+   * Array support is effectively limited to Postgres at this time.
+   * </p>
+   */
+  Expression arrayIsEmpty(String propertyName);
+
+  /**
+   * Array is not empty - for the given array property.
+   * <p>
+   * Array support is effectively limited to Postgres at this time.
+   * </p>
+   */
+  Expression arrayIsNotEmpty(String propertyName);
+
+  /**
    * Equal To - property equal to the given value.
    */
   Expression eq(String propertyName, Object value);

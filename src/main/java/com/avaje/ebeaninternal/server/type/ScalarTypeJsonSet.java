@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebean.text.json.EJson;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 
@@ -18,31 +19,25 @@ import java.util.Set;
  */
 public class ScalarTypeJsonSet {
 
-  private static final ScalarTypeJsonCollection<Set> VARCHAR = new ScalarTypeJsonSet.Varchar();
-
-  private static final ScalarTypeJsonCollection<Set> JSON = new ScalarTypeJsonSet.Json();
-
-  private static final ScalarTypeJsonCollection<Set> JSONB = new ScalarTypeJsonSet.JsonB();
-
   /**
    * Return the appropriate ScalarType for the requested dbType and Postgres.
    */
-  public static ScalarType<?> typeFor(boolean postgres, int dbType) {
+  public static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docPropertyType) {
     if (postgres) {
       switch (dbType) {
-        case DbType.JSONB: return ScalarTypeJsonSet.JSONB;
-        case DbType.JSON: return ScalarTypeJsonSet.JSON;
+        case DbType.JSONB: return new ScalarTypeJsonSet.JsonB(docPropertyType);
+        case DbType.JSON: return new ScalarTypeJsonSet.Json(docPropertyType);
       }
     }
-    return ScalarTypeJsonSet.VARCHAR;
+    return new ScalarTypeJsonSet.Varchar(docPropertyType);
   }
 
   /**
    * List mapped to DB VARCHAR.
    */
   private static class Varchar extends ScalarTypeJsonSet.Base {
-    public Varchar() {
-      super(Types.VARCHAR);
+    public Varchar(DocPropertyType docPropertyType) {
+      super(Types.VARCHAR, docPropertyType);
     }
   }
 
@@ -50,8 +45,8 @@ public class ScalarTypeJsonSet {
    * List mapped to Postgres JSON.
    */
   private static class Json extends ScalarTypeJsonSet.PgBase {
-    public Json() {
-      super(DbType.JSON, PostgresHelper.JSON_TYPE);
+    public Json(DocPropertyType docPropertyType) {
+      super(DbType.JSON, PostgresHelper.JSON_TYPE, docPropertyType);
     }
   }
 
@@ -59,8 +54,8 @@ public class ScalarTypeJsonSet {
    * List mapped to Postgres JSONB.
    */
   private static class JsonB extends ScalarTypeJsonSet.PgBase {
-    public JsonB() {
-      super(DbType.JSONB, PostgresHelper.JSONB_TYPE);
+    public JsonB(DocPropertyType docPropertyType) {
+      super(DbType.JSONB, PostgresHelper.JSONB_TYPE, docPropertyType);
     }
   }
 
@@ -69,8 +64,8 @@ public class ScalarTypeJsonSet {
    */
   private abstract static class Base extends ScalarTypeJsonCollection<Set> {
 
-    public Base(int dbType) {
-      super(Set.class, dbType);
+    public Base(int dbType, DocPropertyType docPropertyType) {
+      super(Set.class, dbType, docPropertyType);
     }
 
     @Override
@@ -142,8 +137,8 @@ public class ScalarTypeJsonSet {
 
     final String pgType;
 
-    PgBase(int jdbcType, String pgType) {
-      super(jdbcType);
+    PgBase(int jdbcType, String pgType, DocPropertyType docPropertyType) {
+      super(jdbcType, docPropertyType);
       this.pgType = pgType;
     }
 

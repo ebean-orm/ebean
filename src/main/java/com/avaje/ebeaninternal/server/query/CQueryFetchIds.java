@@ -143,7 +143,7 @@ public class CQueryFetchIds {
         pstmt.setQueryTimeout(query.getTimeout());
       }
 
-      bindLog = predicates.bind(pstmt);
+      bindLog = predicates.bind(pstmt, conn);
 
       ResultSet rset = pstmt.executeQuery();
       dataReader = new RsetDataReader(request.getDataTimeZone(), rset);

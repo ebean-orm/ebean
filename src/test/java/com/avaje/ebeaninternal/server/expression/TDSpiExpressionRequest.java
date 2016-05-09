@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
-import com.avaje.ebeaninternal.server.core.JsonExpressionHandler;
+import com.avaje.ebeaninternal.server.core.DbExpressionHandler;
 import com.avaje.ebeaninternal.server.core.SpiOrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 
@@ -22,7 +22,7 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
-  public JsonExpressionHandler getJsonHandler() {
+  public DbExpressionHandler getDbPlatformHandler() {
     return null;
   }
 

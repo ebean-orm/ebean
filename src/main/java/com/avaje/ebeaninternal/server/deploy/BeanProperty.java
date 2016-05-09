@@ -1367,7 +1367,7 @@ public class BeanProperty implements ElPropertyValue, Property {
 
       DocPropertyType type = scalarType.getDocType();
       DocPropertyOptions options = docOptions.copy();
-      if (DocPropertyType.ENUM == type || isStringId(type)) {
+      if (DocPropertyType.UUID == type || DocPropertyType.ENUM == type ||isStringId(type)) {
         options.setCode(true);
       }
 

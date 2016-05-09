@@ -5,6 +5,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.PersistenceException;
 
+import com.avaje.ebean.annotation.DbArray;
 import com.avaje.ebean.annotation.DbJson;
 import com.avaje.ebean.annotation.DbJsonB;
 import com.avaje.ebean.annotation.DbJsonType;
@@ -21,6 +22,7 @@ import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyCompound;
 import com.avaje.ebeaninternal.server.type.DataEncryptSupport;
 import com.avaje.ebeaninternal.server.type.ScalarType;
+import com.avaje.ebeaninternal.server.type.ScalarTypeArrayList;
 import com.avaje.ebeaninternal.server.type.ScalarTypeEnumStandard;
 import com.avaje.ebeaninternal.server.type.SimpleAesEncryptor;
 import com.avaje.ebeaninternal.server.type.TypeManager;
@@ -46,6 +48,8 @@ public class DeployUtil {
   private static final int dbBLOBType = Types.BLOB;
 
   private static final int DEFAULT_JSON_VARCHAR_LENGTH = 3000;
+
+  private static final int DEFAULT_ARRAY_VARCHAR_LENGTH = 1000;
 
   private final NamingConvention namingConvention;
 
@@ -208,6 +212,30 @@ public class DeployUtil {
     }
     prop.setDbType(DbType.HSTORE);
     prop.setScalarType(scalarType);
+  }
+
+  /**
+   * Set the DbArray type (effectively Postgres only).
+   */
+  public void setDbArray(DeployBeanProperty prop, DbArray dbArray) {
+
+    Class<?> type = prop.getPropertyType();
+    ScalarType<?> scalarType = typeManager.getArrayScalarType(type, dbArray, prop.getGenericType());
+    if (scalarType == null) {
+      throw new RuntimeException("No ScalarType for @DbArray type for [" + prop.getFullBeanName()+ "]");
+    }
+    int dbType = scalarType.getJdbcType();
+    prop.setDbType(dbType);
+    prop.setScalarType(scalarType);
+    if (scalarType instanceof ScalarTypeArrayList) {
+      prop.setDbColumnDefn(((ScalarTypeArrayList)scalarType).getDbColumnDefn());
+    }
+    if (dbType == Types.VARCHAR) {
+      // determine the db column size
+      int dbLength = dbArray.length();
+      int columnLength = (dbLength > 0) ? dbLength : DEFAULT_ARRAY_VARCHAR_LENGTH;
+      prop.setDbLength(columnLength);
+    }
   }
 
   /**

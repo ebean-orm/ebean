@@ -95,7 +95,7 @@ public class ExeCallableSql {
 
     String bindLog = null;
     if (!bindParams.isEmpty()) {
-      bindLog = binder.bind(bindParams, cstmt);
+      bindLog = binder.bind(bindParams, cstmt, t.getInternalConnection());
     }
 
     request.setBindLog(bindLog);

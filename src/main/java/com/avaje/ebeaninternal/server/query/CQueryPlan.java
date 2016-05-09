@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -139,8 +140,8 @@ public class CQueryPlan {
   /**
    * Bind keys for encrypted properties if necessary returning the DataBind.
    */
-  public DataBind bindEncryptedProperties(PreparedStatement stmt) throws SQLException {
-    DataBind dataBind = new DataBind(dataTimeZone, stmt);
+  public DataBind bindEncryptedProperties(PreparedStatement stmt, Connection conn) throws SQLException {
+    DataBind dataBind = new DataBind(dataTimeZone, stmt, conn);
     if (encryptedProps != null) {
       for (int i = 0; i < encryptedProps.length; i++) {
         String key = encryptedProps[i].getEncryptKey().getStringValue();
