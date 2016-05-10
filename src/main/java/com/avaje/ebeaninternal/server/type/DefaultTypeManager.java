@@ -840,25 +840,20 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    */
   protected void initialiseJacksonTypes(ServerConfig config) {
 
-    if (config.getClassLoadConfig().isJacksonObjectMapperPresent()) {
+    if (objectMapper != null) {
 
       logger.trace("Registering JsonNode type support");
 
-      ObjectMapper objectMapper = (ObjectMapper)config.getObjectMapper();
-      if (objectMapper == null) {
-        objectMapper = new ObjectMapper();
-        config.setObjectMapper(objectMapper);
-      }
-
-      jsonNodeClob = new ScalarTypeJsonNode.Clob(objectMapper);
-      jsonNodeBlob = new ScalarTypeJsonNode.Blob(objectMapper);
-      jsonNodeVarchar = new ScalarTypeJsonNode.Varchar(objectMapper);
+      ObjectMapper mapper = (ObjectMapper)objectMapper;
+      jsonNodeClob = new ScalarTypeJsonNode.Clob(mapper);
+      jsonNodeBlob = new ScalarTypeJsonNode.Blob(mapper);
+      jsonNodeVarchar = new ScalarTypeJsonNode.Varchar(mapper);
       jsonNodeJson = jsonNodeClob;  // Default for non-Postgres databases
       jsonNodeJsonb = jsonNodeClob; // Default for non-Postgres databases
 
       if (isPostgres(config.getDatabasePlatform())) {
-        jsonNodeJson = new ScalarTypeJsonNodePostgres.JSON(objectMapper);
-        jsonNodeJsonb = new ScalarTypeJsonNodePostgres.JSONB(objectMapper);
+        jsonNodeJson = new ScalarTypeJsonNodePostgres.JSON(mapper);
+        jsonNodeJsonb = new ScalarTypeJsonNodePostgres.JSONB(mapper);
       }
 
       // add as default mapping for JsonNode (when not annotated with @DbJson etc)
