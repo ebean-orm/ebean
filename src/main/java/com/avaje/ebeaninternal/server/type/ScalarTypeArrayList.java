@@ -23,7 +23,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> {
 
   private static ScalarTypeArrayList UUID = new ScalarTypeArrayList("uuid", DocPropertyType.UUID, ArrayElementConverter.UUID);
 
-  private static ScalarTypeArrayList LONG = new ScalarTypeArrayList("integer", DocPropertyType.LONG, ArrayElementConverter.LONG);
+  private static ScalarTypeArrayList LONG = new ScalarTypeArrayList("bigint", DocPropertyType.LONG, ArrayElementConverter.LONG);
 
   private static ScalarTypeArrayList INTEGER = new ScalarTypeArrayList("integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER);
 

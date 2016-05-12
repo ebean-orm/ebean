@@ -50,7 +50,7 @@ public class TestDbArray_basic extends BaseTestCase {
 
       List<EArrayBean> list = query.findList();
 
-      assertThat(query.getGeneratedSql()).contains(" t0.other_ids @> array[?,?]::integer[] ");
+      assertThat(query.getGeneratedSql()).contains(" t0.other_ids @> array[?,?]::bigint[] ");
       assertThat(query.getGeneratedSql()).contains(" t0.uids @> array[?] ");
       assertThat(query.getGeneratedSql()).contains(" t0.phone_numbers @> array[?] ");
       assertThat(query.getGeneratedSql()).contains(" coalesce(cardinality(t0.phone_numbers),0) <> 0");
