@@ -170,6 +170,8 @@ public class TestReadAudit extends BaseTestCase {
         .where().startsWith("shortDescription", "readAudit")
         .findList();
 
+    System.out.println("test_findList_useL2Cache> first query");
+
     assertThat(list).hasSize(2);
     assertThat(readAuditPrepare.count).isEqualTo(1);
     assertThat(readAuditLogger.plans).hasSize(1);
@@ -177,6 +179,7 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.many.get(0).getBeanType()).isEqualTo(EBasicChangeLog.class.getName());
     assertThat(readAuditLogger.many.get(0).getIds()).contains(id1, id2);
 
+    System.out.println("test_findList_useL2Cache> second query");
     LoggedSqlCollector.start();
 
     server.find(EBasicChangeLog.class)
@@ -186,6 +189,10 @@ public class TestReadAudit extends BaseTestCase {
 
     List<String> sql = LoggedSqlCollector.stop();
     assertThat(sql).isEmpty();
+
+    System.out.println("test_findList_useL2Cache> prepare:" + readAuditPrepare.count
+        + " plans:" + readAuditLogger.plans
+        + " many:" + readAuditLogger.many);
 
     assertThat(readAuditPrepare.count).isEqualTo(2);
     assertThat(readAuditLogger.plans).hasSize(1);
