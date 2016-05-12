@@ -131,11 +131,11 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   }
 
   protected String historyTableName(String baseTableName) {
-    return normalise(baseTableName) + historySuffix;
+    return baseTableName + historySuffix;
   }
 
   protected String procedureName(String baseTableName) {
-    return normalise(baseTableName) + "_history_version";
+    return baseTableName + "_history_version";
   }
 
   protected String triggerName(String baseTableName) {
