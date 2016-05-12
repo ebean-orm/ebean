@@ -5,6 +5,7 @@ import com.avaje.ebean.dbmigration.ddlgeneration.platform.BaseTableDdl;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
 import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
+import com.avaje.ebean.dbmigration.migration.AddTableComment;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
 import com.avaje.ebean.dbmigration.migration.CreateIndex;
@@ -37,6 +38,8 @@ public class BaseDdlHandler implements DdlHandler {
         generate(writer, (CreateTable) change);
       } else if (change instanceof DropTable) {
         generate(writer, (DropTable) change);
+      } else if (change instanceof AddTableComment) {
+        generate(writer, (AddTableComment) change);
       } else if (change instanceof CreateIndex) {
         generate(writer, (CreateIndex) change);
       } else if (change instanceof DropIndex) {
@@ -68,6 +71,11 @@ public class BaseDdlHandler implements DdlHandler {
   @Override
   public void generate(DdlWrite writer, DropTable dropTable) throws IOException {
     tableDdl.generate(writer, dropTable);
+  }
+
+  @Override
+  public void generate(DdlWrite writer, AddTableComment addTableComment) throws IOException {
+    tableDdl.generate(writer, addTableComment);
   }
 
   @Override

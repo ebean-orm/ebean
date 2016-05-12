@@ -10,6 +10,7 @@ import com.avaje.ebean.dbmigration.ddlgeneration.TableDdl;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.util.IndexSet;
 import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
+import com.avaje.ebean.dbmigration.migration.AddTableComment;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.Column;
 import com.avaje.ebean.dbmigration.migration.CreateIndex;
@@ -554,6 +555,13 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
+  @Override
+  public void generate(DdlWrite writer, AddTableComment addTableComment) throws IOException {
+    if (hasValue(addTableComment.getComment())) {
+      platformDdl.addTableComment(writer.apply(), addTableComment.getName(), addTableComment.getComment());
+    }
+  }
+
   /**
    * Add add column DDL.
    */
@@ -634,7 +642,9 @@ public class BaseTableDdl implements TableDdl {
     if (hasValue(alterColumn.getUniqueOneToOne())) {
       alterColumnAddUniqueOneToOneConstraint(writer, alterColumn);
     }
-
+    if (hasValue(alterColumn.getComment())) {
+      alterColumnComment(writer, alterColumn);
+    }
 
     boolean alterCheckConstraint = hasValue(alterColumn.getCheckConstraint());
 
@@ -662,6 +672,10 @@ public class BaseTableDdl implements TableDdl {
       // add constraint last (after potential type change)
       addCheckConstraint(writer, alterColumn);
     }
+  }
+
+  private void alterColumnComment(DdlWrite writer, AlterColumn alterColumn) throws IOException {
+    platformDdl.addColumnComment(writer.apply(), alterColumn.getTableName(), alterColumn.getColumnName(), alterColumn.getComment());
   }
 
   /**

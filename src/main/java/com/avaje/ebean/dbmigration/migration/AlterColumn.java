@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="currentDefaultValue" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="notnull" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="currentNotnull" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="historyExclude" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="checkConstraint" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="checkConstraintName" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -68,6 +69,8 @@ public class AlterColumn {
     protected Boolean notnull;
     @XmlAttribute(name = "currentNotnull")
     protected Boolean currentNotnull;
+    @XmlAttribute(name = "comment")
+    protected String comment;
     @XmlAttribute(name = "historyExclude")
     protected Boolean historyExclude;
     @XmlAttribute(name = "checkConstraint")
@@ -307,6 +310,30 @@ public class AlterColumn {
      */
     public void setCurrentNotnull(Boolean value) {
         this.currentNotnull = value;
+    }
+
+    /**
+     * Gets the value of the comment property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Sets the value of the comment property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setComment(String value) {
+        this.comment = value;
     }
 
     /**

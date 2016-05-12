@@ -5,6 +5,7 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.H2Platform;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.Helper;
+import com.avaje.ebean.dbmigration.migration.AddTableComment;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.Column;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
@@ -37,6 +38,41 @@ public class BaseTableDdlTest {
     String ddl = write.apply().getBuffer();
     assertThat(ddl).contains("alter table mytab drop constraint ck_mytab_acol");
     assertThat(ddl).contains("alter table mytab add constraint ck_mytab_acol check (acol in ('A','B'))");
+  }
+
+  @Test
+  public void testAlterColumnComment() throws IOException {
+
+    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, new H2Platform().getPlatformDdl());
+
+    DdlWrite write = new DdlWrite();
+
+    AlterColumn alterColumn = new AlterColumn();
+    alterColumn.setTableName("mytab");
+    alterColumn.setColumnName("acol");
+    alterColumn.setComment("my comment");
+
+    ddlGen.generate(write, alterColumn);
+
+    String ddl = write.apply().getBuffer();
+    assertThat(ddl).contains("comment on column mytab.acol is 'my comment'");
+  }
+
+  @Test
+  public void testAddTableComment() throws IOException {
+
+    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, new H2Platform().getPlatformDdl());
+
+    DdlWrite write = new DdlWrite();
+
+    AddTableComment addTableComment = new AddTableComment();
+    addTableComment.setName("mytab");
+    addTableComment.setComment("my comment");
+
+    ddlGen.generate(write, addTableComment);
+
+    String ddl = write.apply().getBuffer();
+    assertThat(ddl).contains("comment on table mytab is 'my comment'");
   }
 
   @Test

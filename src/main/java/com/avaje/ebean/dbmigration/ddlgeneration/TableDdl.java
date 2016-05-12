@@ -2,6 +2,7 @@ package com.avaje.ebean.dbmigration.ddlgeneration;
 
 import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
+import com.avaje.ebean.dbmigration.migration.AddTableComment;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.CreateIndex;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
@@ -41,6 +42,11 @@ public interface TableDdl {
    * Write the drop column change.
    */
   void generate(DdlWrite writer, DropColumn dropColumn) throws IOException;
+
+  /**
+   * Write the AddTableComment change.
+   */
+  void generate(DdlWrite writer, AddTableComment addTableComment) throws IOException;
 
   /**
    * Write the AddHistoryTable change.

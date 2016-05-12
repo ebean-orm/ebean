@@ -260,7 +260,7 @@ public class MColumn {
     return c;
   }
 
-  private boolean different(String val1, String val2) {
+  protected static boolean different(String val1, String val2) {
     return (val1 == null) ? val2 != null : !val1.equals(val2);
   }
 
@@ -314,7 +314,10 @@ public class MColumn {
         alter.setDefaultValue(newColumn.defaultValue);
       }
     }
-
+    if (different(comment, newColumn.comment)) {
+      AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
+      alter.setComment(newColumn.comment);
+    }
     if (different(checkConstraint, newColumn.checkConstraint)) {
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
       if (hasValue(checkConstraint) && !hasValue(newColumn.checkConstraint)) {

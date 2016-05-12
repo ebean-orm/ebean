@@ -152,6 +152,13 @@
     </xsd:complexType>
   </xsd:element>
 
+  <xsd:element name="addTableComment">
+    <xsd:complexType>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+      <xsd:attribute name="comment" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
   <!-- HISTORY -->
 
   <xsd:element name="addHistoryTable">
@@ -203,6 +210,7 @@
       <xsd:attribute name="currentDefaultValue" type="xsd:string"/>
       <xsd:attribute name="notnull" type="xsd:boolean"/>
       <xsd:attribute name="currentNotnull" type="xsd:boolean"/>
+      <xsd:attribute name="comment" type="xsd:string"/>
       <xsd:attribute name="historyExclude" type="xsd:boolean"/>
       <xsd:attribute name="checkConstraint" type="xsd:string"/>
       <xsd:attribute name="checkConstraintName" type="xsd:string"/>
@@ -282,6 +290,7 @@
       <xsd:element ref="createTable" maxOccurs="unbounded"/>
       <xsd:element ref="dropTable" maxOccurs="unbounded"/>
       <xsd:element ref="renameTable" maxOccurs="unbounded"/>
+      <xsd:element ref="addTableComment" maxOccurs="unbounded"/>
 
       <xsd:element ref="addHistoryTable" maxOccurs="unbounded"/>
       <xsd:element ref="dropHistoryTable" maxOccurs="unbounded"/>

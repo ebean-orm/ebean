@@ -2,6 +2,7 @@ package com.avaje.ebean.dbmigration.model;
 
 import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
+import com.avaje.ebean.dbmigration.migration.AddTableComment;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
 import com.avaje.ebean.dbmigration.migration.ChangeSetType;
@@ -236,5 +237,12 @@ public class ModelDiff {
    */
   public void addCreateIndex(CreateIndex createIndex) {
     applyChanges.add(createIndex);
+  }
+
+  /**
+   * Add a table comment to the 'apply' changes.
+   */
+  public void addTableComment(AddTableComment addTableComment) {
+    applyChanges.add(addTableComment);
   }
 }

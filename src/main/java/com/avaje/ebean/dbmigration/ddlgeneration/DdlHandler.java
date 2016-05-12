@@ -2,6 +2,7 @@ package com.avaje.ebean.dbmigration.ddlgeneration;
 
 import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
+import com.avaje.ebean.dbmigration.migration.AddTableComment;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
 import com.avaje.ebean.dbmigration.migration.CreateIndex;
@@ -14,6 +15,7 @@ import com.avaje.ebean.dbmigration.migration.DropTable;
 import java.io.IOException;
 
 /**
+ * DDL generation interface.
  */
 public interface DdlHandler {
 
@@ -22,6 +24,8 @@ public interface DdlHandler {
   void generate(DdlWrite writer, CreateTable createTable) throws IOException;
 
   void generate(DdlWrite writer, DropTable dropTable) throws IOException;
+
+  void generate(DdlWrite writer, AddTableComment addTableComment) throws IOException;
 
   void generate(DdlWrite writer, AddColumn addColumn) throws IOException;
 

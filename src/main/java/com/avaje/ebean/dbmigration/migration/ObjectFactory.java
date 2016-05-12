@@ -102,6 +102,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link AddTableComment }
+     * 
+     */
+    public AddTableComment createAddTableComment() {
+        return new AddTableComment();
+    }
+
+    /**
      * Create an instance of {@link RenameTable }
      * 
      */

@@ -2,6 +2,7 @@ package com.avaje.ebean.dbmigration.model;
 
 import com.avaje.ebean.dbmigration.migration.AddColumn;
 import com.avaje.ebean.dbmigration.migration.AddHistoryTable;
+import com.avaje.ebean.dbmigration.migration.AddTableComment;
 import com.avaje.ebean.dbmigration.migration.AlterColumn;
 import com.avaje.ebean.dbmigration.migration.Column;
 import com.avaje.ebean.dbmigration.migration.CreateTable;
@@ -284,6 +285,13 @@ public class MTable {
 
     if (addColumn != null) {
       modelDiff.addAddColumn(addColumn);
+    }
+
+    if (MColumn.different(comment, newTable.comment)) {
+      AddTableComment addTableComment = new AddTableComment();
+      addTableComment.setName(name);
+      addTableComment.setComment(newTable.comment);
+      modelDiff.addTableComment(addTableComment);
     }
   }
 
