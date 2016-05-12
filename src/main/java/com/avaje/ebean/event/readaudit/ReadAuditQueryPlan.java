@@ -74,4 +74,23 @@ public class ReadAuditQueryPlan {
   public void setSql(String sql) {
     this.sql = sql;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ReadAuditQueryPlan that = (ReadAuditQueryPlan) o;
+    if (!beanType.equals(that.beanType)) return false;
+    if (!queryKey.equals(that.queryKey)) return false;
+    return sql.equals(that.sql);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = beanType.hashCode();
+    result = 31 * result + queryKey.hashCode();
+    result = 31 * result + sql.hashCode();
+    return result;
+  }
 }

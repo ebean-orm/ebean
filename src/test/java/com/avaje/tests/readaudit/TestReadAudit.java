@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -358,7 +359,7 @@ public class TestReadAudit extends BaseTestCase {
 
   class TDReadAuditLogger implements ReadAuditLogger {
 
-    List<ReadAuditQueryPlan> plans = new ArrayList<ReadAuditQueryPlan>();
+    Set<ReadAuditQueryPlan> plans = new HashSet<ReadAuditQueryPlan>();
     List<ReadEvent> beans = new ArrayList<ReadEvent>();
     List<ReadEvent> many = new ArrayList<ReadEvent>();
 
