@@ -1,8 +1,7 @@
 package com.avaje.ebean.config.dbplatform;
 
 /**
- * Use top xx and start at xx to limit sql results. Based on
- * MsSqlServer2005SqlLimiter and LimitOffsetSqlLimiter
+ * Use top xx and start at xx to limit sql results.
  */
 public class SqlAnywhereLimiter implements SqlLimiter {
 
