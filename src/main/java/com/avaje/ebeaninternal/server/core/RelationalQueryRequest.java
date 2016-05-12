@@ -31,8 +31,6 @@ import java.util.List;
  */
 public final class RelationalQueryRequest {
 
-  private static final int GLOBAL_ROW_LIMIT = Integer.valueOf(System.getProperty("ebean.query.globallimit", "1000000"));
-
   private static final Logger logger = LoggerFactory.getLogger(RelationalQueryRequest.class);
 
   private final SpiSqlQuery query;
@@ -212,7 +210,18 @@ public final class RelationalQueryRequest {
       // convert any named parameters if required
       sql = BindParamsParser.parse(bindParams, sql);
     }
-    this.sql = sql;
+    this.sql = limitOffset(sql);
+  }
+
+  private String limitOffset(String sql) {
+
+    int firstRow = query.getFirstRow();
+    int maxRows = query.getMaxRows();
+    if (firstRow > 0 || maxRows > 0) {
+      return ebeanServer.getDatabasePlatform().getBasicSqlLimiter()
+          .limit(query.getQuery(), firstRow, maxRows);
+    }
+    return sql;
   }
 
   /**
@@ -248,13 +257,6 @@ public final class RelationalQueryRequest {
 
     setResultSet(pstmt.executeQuery());
 
-  }
-
-  /**
-   * Return the maxRows allowed to fetch.
-   */
-  public int getMaxRows() {
-    return query.getMaxRows() >= 1 ? query.getMaxRows() : GLOBAL_ROW_LIMIT;
   }
 
   /**

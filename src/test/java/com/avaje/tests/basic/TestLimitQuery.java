@@ -1,16 +1,16 @@
 package com.avaje.tests.basic;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class TestLimitQuery extends BaseTestCase {
@@ -26,9 +26,6 @@ public class TestLimitQuery extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
-    boolean h2Db = "h2".equals(server.getDatabasePlatform().getName());
-
     Query<Order> query = Ebean.find(Order.class)
         .setAutoTune(false)
         .fetch("details")
@@ -40,21 +37,16 @@ public class TestLimitQuery extends BaseTestCase {
     query.findList();
 
     String sql = query.getGeneratedSql();
-    boolean hasLimit = sql.contains("limit 0");
-    boolean hasOffset = sql.contains("offset 3");
-
-    if (h2Db) {
-      Assert.assertTrue(hasLimit);
-      Assert.assertTrue(hasOffset);
+    if (isH2()) {
+      assertThat(sql).contains("offset 3");
+      assertThat(sql).contains("limit 0");
     }
   }
 
   @Test
   public void testMaxRowsWithFirstRowZero() {
-    ResetBasicData.reset();
 
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
-    boolean h2Db = "h2".equals(server.getDatabasePlatform().getName());
+    ResetBasicData.reset();
 
     Query<Order> query = Ebean.find(Order.class)
         .setAutoTune(false)
@@ -69,7 +61,7 @@ public class TestLimitQuery extends BaseTestCase {
     boolean hasLimit = sql.contains("limit 3");
     boolean hasOffset = sql.contains("offset");
 
-    if (h2Db) {
+    if (isH2()) {
       Assert.assertTrue(sql, hasLimit);
       Assert.assertFalse(sql, hasOffset);
     }
@@ -78,9 +70,6 @@ public class TestLimitQuery extends BaseTestCase {
   @Test
   public void testDefaults() {
     ResetBasicData.reset();
-
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
-    boolean h2Db = "h2".equals(server.getDatabasePlatform().getName());
 
     Query<Order> query = Ebean.find(Order.class)
         .setAutoTune(false)
@@ -94,7 +83,7 @@ public class TestLimitQuery extends BaseTestCase {
     boolean hasLimit = sql.contains("limit");
     boolean hasOffset = sql.contains("offset");
 
-    if (h2Db) {
+    if (isH2()) {
       Assert.assertFalse(hasLimit);
       Assert.assertFalse(hasOffset);
     }
@@ -102,9 +91,6 @@ public class TestLimitQuery extends BaseTestCase {
 
   private void rob() {
     ResetBasicData.reset();
-
-    SpiEbeanServer server = (SpiEbeanServer) Ebean.getServer(null);
-    boolean h2Db = "h2".equals(server.getDatabasePlatform().getName());
 
     Query<Order> query = Ebean.find(Order.class)
         .setAutoTune(false)
@@ -126,7 +112,7 @@ public class TestLimitQuery extends BaseTestCase {
     Assert.assertTrue(hasDetailsJoin);
     Assert.assertFalse(hasSelectedDetails);
     Assert.assertTrue(hasDistinct);
-    if (h2Db) {
+    if (isH2()) {
       Assert.assertTrue(hasLimit);
     }
 
@@ -146,7 +132,7 @@ public class TestLimitQuery extends BaseTestCase {
     Assert.assertFalse("no join with maxRows", hasDetailsJoin);
     Assert.assertFalse(hasSelectedDetails);
     Assert.assertFalse(hasDistinct);
-    if (h2Db) {
+    if (isH2()) {
       Assert.assertTrue(hasLimit);
     }
   }

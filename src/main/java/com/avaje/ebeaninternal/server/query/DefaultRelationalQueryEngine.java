@@ -74,19 +74,9 @@ public class DefaultRelationalQueryEngine implements RelationalQueryEngine {
     try {
       request.executeSql(binder);
 
-      int maxRows = request.getMaxRows();
-
-      int loadRowCount = 0;
-
       List<SqlRow> rows = new ArrayList<SqlRow>();
-
       while (request.next()) {
         rows.add(readRow(request));
-        loadRowCount++;
-        if (loadRowCount == maxRows) {
-          // break, as we have hit the max rows to fetch...
-          break;
-        }
       }
 
       logSummary(request, startTime);

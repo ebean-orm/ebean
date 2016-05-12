@@ -72,6 +72,11 @@ public class DatabasePlatform {
   protected SqlLimiter sqlLimiter = new LimitOffsetSqlLimiter();
 
   /**
+   * Limit/offset support for SqlQuery only.
+   */
+  protected BasicSqlLimiter basicSqlLimiter = new BasicSqlLimitOffset();
+
+  /**
    * Mapping of JDBC to Database types.
    */
   protected DbTypeMap dbTypeMap = new DbTypeMap();
@@ -452,6 +457,13 @@ public class DatabasePlatform {
    */
   public SqlLimiter getSqlLimiter() {
     return sqlLimiter;
+  }
+
+  /**
+   * Return the BasicSqlLimiter for limit/offset of SqlQuery queries.
+   */
+  public BasicSqlLimiter getBasicSqlLimiter() {
+    return basicSqlLimiter;
   }
 
   /**
