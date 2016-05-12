@@ -103,7 +103,7 @@ public class PlatformDdl_AlterColumnTest {
     assertEquals("alter table mytab alter column acol set null", sql);
 
     sql = pgDdl.alterColumnNotnull("mytab", "acol", false);
-    assertEquals("alter table mytab alter column acol set null", sql);
+    assertEquals("alter table mytab alter column acol drop not null", sql);
 
     sql = oraDdl.alterColumnNotnull("mytab", "acol", false);
     assertEquals("alter table mytab modify acol null", sql);
