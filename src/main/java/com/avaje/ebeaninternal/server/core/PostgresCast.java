@@ -24,29 +24,18 @@ public class PostgresCast {
       // for exists and not-exists expressions
       return "";
     }
-
-    if (isIntegerType(value)) {
+    if (value instanceof Integer) {
       return asArray ? "::integer[]" : "::integer";
     }
-    if (isNumberType(value)) {
+    if (value instanceof Long) {
+      return asArray ? "::bigint[]" : "::bigint";
+    }
+    if (value instanceof Number) {
       return asArray ? "::decimal[]" : "::decimal";
     }
-    if (isBooleanType(value)) {
+    if (value instanceof Boolean) {
       return asArray ? "::boolean[]" : "::boolean";
     }
-
     return "";
-  }
-
-  private static boolean isBooleanType(Object value) {
-    return (value instanceof Boolean);
-  }
-
-  private static boolean isIntegerType(Object value) {
-    return (value instanceof Integer) || (value instanceof Long);
-  }
-
-  private static boolean isNumberType(Object value) {
-    return (value instanceof Number);
   }
 }
