@@ -317,7 +317,7 @@ public class MColumn {
 
     if (different(checkConstraint, newColumn.checkConstraint)) {
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
-      if (hasValue(checkConstraint)) {
+      if (hasValue(checkConstraint) && !hasValue(newColumn.checkConstraint)) {
         alter.setDropCheckConstraint(checkConstraintName);
       }
       if (hasValue(newColumn.checkConstraint)) {

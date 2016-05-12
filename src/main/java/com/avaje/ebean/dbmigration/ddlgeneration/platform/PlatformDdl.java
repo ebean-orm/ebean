@@ -67,7 +67,11 @@ public class PlatformDdl {
 
   protected String alterColumn = "alter column";
 
+  protected String dropConstraint = "drop constraint";
+
   protected String dropUniqueConstraint = "drop constraint";
+
+  protected String addConstraint = "add constraint";
 
   protected String columnSetType = "";
 
@@ -327,10 +331,17 @@ public class PlatformDdl {
   }
 
   /**
-   * Drop a unique constraint from the table.
+   * Drop a unique constraint from the table (Sometimes this is an index).
    */
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
     return "alter table " + tableName + " " + dropUniqueConstraint + " " + uniqueConstraintName;
+  }
+
+  /**
+   * Drop a unique constraint from the table.
+   */
+  public String alterTableDropConstraint(String tableName, String constraintName) {
+    return "alter table " + tableName + " " + dropConstraint + " " + constraintName;
   }
 
   /**
@@ -375,6 +386,14 @@ public class PlatformDdl {
 
     String suffix = notnull ? columnSetNotnull : columnSetNull;
     return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix;
+  }
+
+  /**
+   * Alter table adding the check constraint.
+   */
+  public String alterTableAddCheckConstraint(String tableName, String checkConstraintName, String checkConstraint) {
+
+    return "alter table " + tableName + " " + addConstraint + " " + checkConstraintName + " " + checkConstraint;
   }
 
   /**

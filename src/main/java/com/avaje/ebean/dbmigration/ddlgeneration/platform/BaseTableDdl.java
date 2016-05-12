@@ -635,6 +635,13 @@ public class BaseTableDdl implements TableDdl {
       alterColumnAddUniqueOneToOneConstraint(writer, alterColumn);
     }
 
+
+    boolean alterCheckConstraint = hasValue(alterColumn.getCheckConstraint());
+
+    if (alterCheckConstraint) {
+      // drop constraint before altering type etc
+      dropCheckConstraint(writer, alterColumn);
+    }
     boolean alterBaseAttributes = false;
     if (hasValue(alterColumn.getType())) {
       alterColumnType(writer, alterColumn);
@@ -648,9 +655,12 @@ public class BaseTableDdl implements TableDdl {
       alterColumnNotnull(writer, alterColumn);
       alterBaseAttributes = true;
     }
-
     if (alterBaseAttributes) {
       alterColumnBaseAttributes(writer, alterColumn);
+    }
+    if (alterCheckConstraint) {
+      // add constraint last (after potential type change)
+      addCheckConstraint(writer, alterColumn);
     }
   }
 
@@ -700,6 +710,22 @@ public class BaseTableDdl implements TableDdl {
   protected void alterColumnDefaultValue(DdlWrite writer, AlterColumn alter) throws IOException {
 
     String ddl = platformDdl.alterColumnDefaultValue(alter.getTableName(), alter.getColumnName(), alter.getDefaultValue());
+    if (hasValue(ddl)) {
+      writer.apply().append(ddl).endOfStatement();
+    }
+  }
+
+  protected void dropCheckConstraint(DdlWrite writer, AlterColumn alter) throws IOException {
+
+    String ddl = platformDdl.alterTableDropConstraint(alter.getTableName(), alter.getCheckConstraintName());
+    if (hasValue(ddl)) {
+      writer.apply().append(ddl).endOfStatement();
+    }
+  }
+
+  protected void addCheckConstraint(DdlWrite writer, AlterColumn alter) throws IOException {
+
+    String ddl = platformDdl.alterTableAddCheckConstraint(alter.getTableName(), alter.getCheckConstraintName(), alter.getCheckConstraint());
     if (hasValue(ddl)) {
       writer.apply().append(ddl).endOfStatement();
     }

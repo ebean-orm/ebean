@@ -38,8 +38,13 @@ public class MySqlDdl extends PlatformDdl {
   }
 
   @Override
-  public String alterColumnType(String tableName, String columnName, String type) {
+  public String alterTableDropConstraint(String tableName, String constraintName) {
+    // drop constraint not supported
+    return null;
+  }
 
+  @Override
+  public String alterColumnType(String tableName, String columnName, String type) {
     // can't alter itself - done in alterColumnBaseAttributes()
     return null;
   }

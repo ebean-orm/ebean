@@ -142,7 +142,11 @@ public class MigrationTable {
    * Return true if the table exists.
    */
   private boolean tableExists(Connection connection) throws SQLException {
-    return databasePlatform.tableExists(connection, catalog, schema, table);
+    boolean exists = databasePlatform.tableExists(connection, catalog, schema, table);
+    if (!exists) {
+      exists = databasePlatform.tableExists(connection, catalog, schema, table.toUpperCase());
+    }
+    return exists;
   }
 
   /**

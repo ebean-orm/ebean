@@ -99,7 +99,7 @@ public class MColumnTest {
 
     assertChanges(diff);
     assertThat(getAlterColumn(diff).getCheckConstraint()).isEqualTo("abc");
-    assertThat(getAlterColumn(diff).getDropCheckConstraint()).isEqualTo("d");
+    assertThat(getAlterColumn(diff).getDropCheckConstraint()).isNull();
   }
 
   @Test

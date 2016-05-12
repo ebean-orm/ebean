@@ -49,7 +49,6 @@ class MigrationMetaRow {
     version = row.getString("mversion");
     comment = row.getString("mcomment");
     checksum = row.getInteger("mchecksum");
-    runOn = row.getTimestamp("run_on");
     runBy = row.getString("run_by");
     runTime = row.getLong("run_time");
   }
