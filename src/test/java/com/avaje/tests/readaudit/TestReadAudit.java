@@ -179,15 +179,17 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.many.get(0).getBeanType()).isEqualTo(EBasicChangeLog.class.getName());
     assertThat(readAuditLogger.many.get(0).getIds()).contains(id1, id2);
 
-    System.out.println("test_findList_useL2Cache> second query");
     LoggedSqlCollector.start();
 
-    server.find(EBasicChangeLog.class)
+    List<EBasicChangeLog> list1 = server.find(EBasicChangeLog.class)
         .setUseQueryCache(true)
         .where().startsWith("shortDescription", "readAudit")
         .findList();
 
+    System.out.println("test_findList_useL2Cache> second query "+list1.size());
+    assertThat(list1).hasSize(2);
     List<String> sql = LoggedSqlCollector.stop();
+    System.out.println("test_findList_useL2Cache> sql: "+sql);
     assertThat(sql).isEmpty();
 
     System.out.println("test_findList_useL2Cache> prepare:" + readAuditPrepare.count
