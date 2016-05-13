@@ -28,6 +28,11 @@ public @interface Cache {
    * set this to false on a bean type that we want to use query caching but no
    * bean caching (and this is expected to be a rare case).
    * </p>
+   * <p>
+   * When bean caching is enabled by default "find by id" and "find by unique natural key"
+   * queries will try to use the bean cache. We use {@link com.avaje.ebean.Query#setUseCache(boolean)}
+   * with <code>false</code> for the case when we do NOT want to use the bean cache.
+   * </p>
    */
   boolean enableBeanCache() default true;
 

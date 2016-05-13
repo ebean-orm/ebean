@@ -1304,10 +1304,16 @@ public interface Query<T> {
   Query<T> setMapKey(String mapKey);
 
   /**
-   * Set this to true to use the bean cache.
+   * Set this to false to not use the bean cache.
    * <p>
-   * If the query result is in cache then by default this same instance is
-   * returned. In this sense it should be treated as a read only object graph.
+   * By default "find by id" and "find by natural key" will use the bean cache
+   * when bean caching is enabled. Setting this to false means that the query
+   * will not use the bean cache and instead hit the database.
+   * </p>
+   * <p>
+   * In the case of other queries (findList(), findEach() etc) then setting this to
+   * false beans that the if lazy loading is invoked that lazy loading will not try
+   * to use the bean cache.
    * </p>
    */
   Query<T> setUseCache(boolean useCache);
