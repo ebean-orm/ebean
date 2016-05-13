@@ -32,7 +32,6 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
         .columnMapping("r.name", "name").create();
 
     Query<Customer> query = Ebean.find(Customer.class);
-    query.setUseCache(false).setUseQueryCache(false);
     query.setRawSql(rawSql);
     query.where().ilike("name", "r%");
 
@@ -58,7 +57,6 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
             .create();
                 
     Query<Customer> query = Ebean.find(Customer.class);
-    query.setUseCache(false).setUseQueryCache(false);
     query.setRawSql(rawSql);
 
     int initialRowCount = query.findRowCount();
@@ -91,7 +89,6 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
         .create();
 
     Query<Customer> query = Ebean.find(Customer.class);
-    query.setUseCache(false).setUseQueryCache(false);
     query.setRawSql(rawSql);
     
     int initialRowCount = query.findRowCount();
@@ -123,7 +120,6 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
         .create();
 
     Query<Order> query = Ebean.find(Order.class);
-    query.setUseCache(false).setUseQueryCache(false);
     query.setRawSql(rawSql);
 
     query.setMaxRows(100);
@@ -144,7 +140,6 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
         .create();
 
     Query<Order> query = Ebean.find(Order.class);
-    query.setUseCache(false).setUseQueryCache(false);
     query.setRawSql(rawSql);
 
     query.setMaxRows(100);
@@ -166,7 +161,6 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
         .create();
 
     Query<Order> query = Ebean.find(Order.class);
-    query.setUseCache(false).setUseQueryCache(false);
     query.setRawSql(rawSql);
 
     query.setMaxRows(100);

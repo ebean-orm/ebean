@@ -189,7 +189,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private boolean loadBeanCache;
 
-  private Boolean useBeanCache;
+  private boolean excludeBeanCache;
 
   private Boolean useQueryCache;
 
@@ -330,6 +330,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * This table alias is for a @History entity involved in the query and as
    * such we need to add a 'as of predicate' to the query using this alias.
    */
+  @Override
   public void addAsOfTableAlias(String tableAlias) {
     if (asOfTableAlias == null) {
       asOfTableAlias = new ArrayList<String>();
@@ -337,20 +338,24 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     asOfTableAlias.add(tableAlias);
   }
 
+  @Override
   public List<String> getAsOfTableAlias() {
     return asOfTableAlias;
   }
 
+  @Override
   public Timestamp getAsOf() {
     return asOf;
   }
 
+  @Override
   public DefaultOrmQuery<T> asOf(Timestamp asOfDateTime) {
     this.temporalMode = (asOfDateTime != null) ? TemporalMode.AS_OF : TemporalMode.CURRENT;
     this.asOf = asOfDateTime;
     return this;
   }
 
+  @Override
   public DefaultOrmQuery<T> asDraft() {
     this.temporalMode = TemporalMode.DRAFT;
     return this;
@@ -367,10 +372,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
   public RawSql getRawSql() {
     return rawSql;
   }
 
+  @Override
   public DefaultOrmQuery<T> setRawSql(RawSql rawSql) {
     this.rawSql = rawSql;
     return this;
@@ -381,19 +388,23 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return lazyLoadBatchSize;
   }
 
+  @Override
   public Query<T> setLazyLoadBatchSize(int lazyLoadBatchSize) {
     this.lazyLoadBatchSize = lazyLoadBatchSize;
     return this;
   }
 
+  @Override
   public String getLazyLoadProperty() {
     return lazyLoadProperty;
   }
 
+  @Override
   public void setLazyLoadProperty(String lazyLoadProperty) {
     this.lazyLoadProperty = lazyLoadProperty;
   }
 
+  @Override
   public ExpressionFactory getExpressionFactory() {
     return expressionFactory;
   }
@@ -411,6 +422,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Return the extra joins required to support the where clause for 'Many' properties.
    */
+  @Override
   public ManyWhereJoins getManyWhereJoins() {
     return manyWhereJoins;
   }
@@ -419,6 +431,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Return true if select all properties was used to ensure the property invoking a lazy load was
    * included in the query.
    */
+  @Override
   public boolean selectAllForLazyLoadProperty() {
     if (lazyLoadProperty != null) {
       if (!detail.containsProperty(lazyLoadProperty)) {
@@ -461,6 +474,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return detail.removeSecondaryLazyQueries();
   }
 
+  @Override
   public void setLazyLoadManyPath(String lazyLoadManyPath) {
     this.lazyLoadManyPath = lazyLoadManyPath;
   }
@@ -495,28 +509,34 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     this.detail = detail;
   }
 
+  @Override
   public void setDefaultSelectClause() {
     detail.setDefaultSelectClause(beanDescriptor);
   }
 
+  @Override
   public void setDetail(OrmQueryDetail detail) {
     this.detail = detail;
   }
 
+  @Override
   public boolean tuneFetchProperties(OrmQueryDetail tunedDetail) {
     return detail.tuneFetchProperties(tunedDetail);
   }
 
+  @Override
   public OrmQueryDetail getDetail() {
     return detail;
   }
 
+  @Override
   public ExpressionList<T> filterMany(String prop) {
 
     OrmQueryProperties chunk = detail.getChunk(prop, true);
     return chunk.filterMany(this);
   }
 
+  @Override
   public void setFilterMany(String prop, ExpressionList<?> filterMany) {
     if (filterMany != null) {
       OrmQueryProperties chunk = detail.getChunk(prop, true);
@@ -527,6 +547,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Setup to be a delete query.
    */
+  @Override
   public void setDelete() {
     // unset any paging and select on the id in the case where the query
     // includes joins and we use - delete ... where id in (...)
@@ -540,12 +561,14 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Set the select clause to select the Id property.
    */
+  @Override
   public void setSelectId() {
     // clear select and fetch joins..
     detail.clear();
     select(beanDescriptor.getIdBinder().getIdProperty());
   }
 
+  @Override
   public NaturalKeyBindParam getNaturalKeyBindParam() {
     NaturalKeyBindParam namedBind = null;
     if (bindParams != null) {
@@ -577,10 +600,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return null;
   }
 
+  @Override
   public DefaultOrmQuery<T> copy() {
     return copy(server);
   }
 
+  @Override
   public DefaultOrmQuery<T> copy(EbeanServer server) {
 
     DefaultOrmQuery<T> copy = new DefaultOrmQuery<T>(beanDescriptor, server, expressionFactory, (String) null);
@@ -598,7 +623,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.mapKey = mapKey;
     copy.id = id;
     copy.loadBeanCache = loadBeanCache;
-    copy.useBeanCache = useBeanCache;
+    copy.excludeBeanCache = excludeBeanCache;
     copy.useQueryCache = useQueryCache;
     copy.readOnly = readOnly;
     copy.sqlSelect = sqlSelect;
@@ -637,26 +662,32 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
   public PersistenceContextScope getPersistenceContextScope() {
     return persistenceContextScope;
   }
 
+  @Override
   public Type getType() {
     return type;
   }
 
+  @Override
   public void setType(Type type) {
     this.type = type;
   }
 
+  @Override
   public String getLoadDescription() {
     return loadDescription;
   }
 
+  @Override
   public String getLoadMode() {
     return loadMode;
   }
 
+  @Override
   public void setLoadDescription(String loadMode, String loadDescription) {
     this.loadMode = loadMode;
     this.loadDescription = loadDescription;
@@ -669,6 +700,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Transaction is used (transaction scoped persistence context).
    * </p>
    */
+  @Override
   public PersistenceContext getPersistenceContext() {
     return persistenceContext;
   }
@@ -680,6 +712,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Transaction is used (transaction scoped persistence context).
    * </p>
    */
+  @Override
   public void setPersistenceContext(PersistenceContext persistenceContext) {
     this.persistenceContext = persistenceContext;
   }
@@ -697,26 +730,32 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Return true if the query detail has neither select or joins specified.
    */
+  @Override
   public boolean isDetailEmpty() {
     return detail.isEmpty();
   }
 
+  @Override
   public boolean isAutoTuned() {
     return autoTuned;
   }
 
+  @Override
   public void setAutoTuned(boolean autoTuned) {
     this.autoTuned = autoTuned;
   }
 
+  @Override
   public Boolean isAutoTune() {
     return sqlSelect ? Boolean.FALSE : autoTune;
   }
 
+  @Override
   public boolean isForUpdate() {
     return forUpdate;
   }
 
+  @Override
   public DefaultOrmQuery<T> setAutoTune(boolean autoTune) {
     this.autoTune = autoTune;
     return this;
@@ -748,6 +787,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return temporalMode;
   }
 
+  @Override
   public boolean isAsOfQuery() {
     return asOf != null;
   }
@@ -762,22 +802,27 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return TemporalMode.SOFT_DELETED == temporalMode;
   }
 
+  @Override
   public void setMode(Mode mode) {
     this.mode = mode;
   }
 
+  @Override
   public boolean isUsageProfiling() {
     return usageProfiling;
   }
 
+  @Override
   public void setUsageProfiling(boolean usageProfiling) {
     this.usageProfiling = usageProfiling;
   }
 
+  @Override
   public void setLogSecondaryQuery(boolean logSecondaryQuery) {
     this.logSecondaryQuery = logSecondaryQuery;
   }
 
+  @Override
   public boolean isLogSecondaryQuery() {
     return logSecondaryQuery;
   }
@@ -789,6 +834,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return loggedSecondaryQueries;
   }
 
+  @Override
   public void logSecondaryQuery(SpiQuery<?> query) {
     if (loggedSecondaryQueries == null) {
       loggedSecondaryQueries = new ArrayList<SpiQuery<?>>();
@@ -796,14 +842,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     loggedSecondaryQueries.add(query);
   }
 
+  @Override
   public void setParentNode(ObjectGraphNode parentNode) {
     this.parentNode = parentNode;
   }
 
+  @Override
   public ObjectGraphNode getParentNode() {
     return parentNode;
   }
 
+  @Override
   public ObjectGraphNode setOrigin(CallStack callStack) {
 
     // create a 'origin' which links this query to the profiling information
@@ -845,6 +894,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Prepare the query which prepares any expressions (sub-query expressions etc) and calculates the query plan key.
    */
+  @Override
   public CQueryPlanKey prepare(BeanQueryRequest<?> request) {
 
     prepareExpressions(request);
@@ -871,6 +921,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Used with queryPlanHash() to get a unique hash for a query.
    * </p>
    */
+  @Override
   public int queryBindHash() {
     int hc = (id == null ? 0 : id.hashCode());
     hc = hc * 31 + (whereExpressions == null ? 0 : whereExpressions.queryBindHash());
@@ -889,6 +940,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * values) before.
    * </p>
    */
+  @Override
   public HashQuery queryHash() {
     // calculateQueryPlanHash is called just after potential AutoTune tuning
     // so queryPlanHash is calculated well before this method is called
@@ -900,14 +952,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Return the query name.
    */
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public boolean isSqlSelect() {
     return sqlSelect;
   }
 
+  @Override
   public boolean isRawSql() {
     return rawSql != null;
   }
@@ -915,6 +970,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Return any additional where clauses.
    */
+  @Override
   public String getAdditionalWhere() {
     return additionalWhere;
   }
@@ -922,6 +978,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Return the timeout.
    */
+  @Override
   public int getTimeout() {
     return timeout;
   }
@@ -929,10 +986,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Return any additional having clauses.
    */
+  @Override
   public String getAdditionalHaving() {
     return additionalHaving;
   }
 
+  @Override
   public boolean hasMaxRowsOrFirstRow() {
     return maxRows > 0 || firstRow > 0;
   }
@@ -952,45 +1011,58 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return versionsEnd;
   }
 
+  @Override
   public Boolean isReadOnly() {
     return readOnly;
   }
 
+  @Override
   public DefaultOrmQuery<T> setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
     return this;
   }
 
-  public Boolean isUseBeanCache() {
+  public boolean isExcludeBeanCache() {
     // not using L2 cache for asDraft() query
-    return isAsDraft() ? Boolean.FALSE : useBeanCache;
+    return excludeBeanCache || isAsDraft() ;
   }
 
+  @Override
+  public boolean isUseBeanCache() {
+    return !isExcludeBeanCache() && beanDescriptor.isBeanCaching();
+  }
+
+  @Override
   public boolean isUseQueryCache() {
     // not using L2 cache for asDraft() query
     return !isAsDraft() && Boolean.TRUE.equals(useQueryCache);
   }
 
-  public DefaultOrmQuery<T> setUseCache(boolean useBeanCache) {
-    this.useBeanCache = useBeanCache;
+  @Override
+  public DefaultOrmQuery<T> setUseCache(boolean useCache) {
+    this.excludeBeanCache = !useCache;
     return this;
   }
 
+  @Override
   public DefaultOrmQuery<T> setUseQueryCache(boolean useQueryCache) {
     this.useQueryCache = useQueryCache;
     return this;
   }
 
+  @Override
   public boolean isLoadBeanCache() {
     // not using L2 cache for asDraft() query
     return !isAsDraft() && loadBeanCache;
   }
 
+  @Override
   public DefaultOrmQuery<T> setLoadBeanCache(boolean loadBeanCache) {
     this.loadBeanCache = loadBeanCache;
     return this;
   }
 
+  @Override
   public DefaultOrmQuery<T> setTimeout(int secs) {
     this.timeout = secs;
     return this;
@@ -1010,23 +1082,28 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     this.rawWhereClause = rawWhereClause;
   }
 
+  @Override
   public DefaultOrmQuery<T> select(String columns) {
     detail.select(columns);
     return this;
   }
 
+  @Override
   public DefaultOrmQuery<T> fetch(String property) {
     return fetch(property, null, null);
   }
 
+  @Override
   public DefaultOrmQuery<T> fetch(String property, FetchConfig joinConfig) {
     return fetch(property, null, joinConfig);
   }
 
+  @Override
   public DefaultOrmQuery<T> fetch(String property, String columns) {
     return fetch(property, columns, null);
   }
 
+  @Override
   public DefaultOrmQuery<T> fetch(String property, String columns, FetchConfig config) {
     detail.fetch(property, columns, config);
     return this;
@@ -1037,6 +1114,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return server.delete(this, null);
   }
 
+  @Override
   public List<Object> findIds() {
     // a copy of this query is made in the server
     // as the query needs to modified (so we modify
@@ -1044,6 +1122,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return server.findIds(this, null);
   }
 
+  @Override
   public int findRowCount() {
     // a copy of this query is made in the server
     // as the query needs to modified (so we modify
@@ -1078,40 +1157,49 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return server.findVersions(this, null);
   }
 
+  @Override
   public QueryIterator<T> findIterate() {
     return server.findIterate(this, null);
   }
 
+  @Override
   public List<T> findList() {
     return server.findList(this, null);
   }
 
+  @Override
   public Set<T> findSet() {
     return server.findSet(this, null);
   }
 
+  @Override
   public Map<?, T> findMap() {
     return server.findMap(this, null);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
     setMapKey(keyProperty);
     return (Map<K, T>) findMap();
   }
 
+  @Override
   public T findUnique() {
     return server.findUnique(this, null);
   }
 
+  @Override
   public FutureIds<T> findFutureIds() {
     return server.findFutureIds(this, null);
   }
 
+  @Override
   public FutureList<T> findFutureList() {
     return server.findFutureList(this, null);
   }
 
+  @Override
   public FutureRowCount<T> findFutureRowCount() {
     return server.findFutureRowCount(this, null);
   }
@@ -1131,6 +1219,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * be consistent with JDBC PreparedStatement. You need to set a parameter value for each ? you
    * have in the query.
    */
+  @Override
   public DefaultOrmQuery<T> setParameter(int position, Object value) {
     if (bindParams == null) {
       bindParams = new BindParams();
@@ -1142,6 +1231,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Set a named bind parameter. Named parameters have a colon to prefix the name.
    */
+  @Override
   public DefaultOrmQuery<T> setParameter(String name, Object value) {
     if (bindParams == null) {
       bindParams = new BindParams();
@@ -1150,6 +1240,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
   public OrderBy<T> getOrderBy() {
     return orderBy;
   }
@@ -1157,14 +1248,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Return the order by clause.
    */
+  @Override
   public String getRawWhereClause() {
     return rawWhereClause;
   }
 
+  @Override
   public OrderBy<T> orderBy() {
     return order();
   }
 
+  @Override
   public OrderBy<T> order() {
     if (orderBy == null) {
       orderBy = new OrderBy<T>(this, null);
@@ -1172,10 +1266,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return orderBy;
   }
 
+  @Override
   public DefaultOrmQuery<T> orderBy(String orderByClause) {
     return order(orderByClause);
   }
 
+  @Override
   public DefaultOrmQuery<T> order(String orderByClause) {
     if (orderByClause == null || orderByClause.trim().length() == 0) {
       this.orderBy = null;
@@ -1185,10 +1281,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
   public DefaultOrmQuery<T> setOrderBy(OrderBy<T> orderBy) {
     return setOrder(orderBy);
   }
 
+  @Override
   public DefaultOrmQuery<T> setOrder(OrderBy<T> orderBy) {
     this.orderBy = orderBy;
     if (orderBy != null) {
@@ -1200,6 +1298,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * return true if user specified to use SQL DISTINCT (effectively excludes id property).
    */
+  @Override
   public boolean isDistinct() {
     return distinct;
   }
@@ -1207,6 +1306,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Internally set to use SQL DISTINCT on the query but still have id property included.
    */
+  @Override
   public DefaultOrmQuery<T> setDistinct(boolean distinct) {
     this.distinct = distinct;
     return this;
@@ -1216,6 +1316,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Return true if this query uses SQL DISTINCT either explicitly by the user or internally defined
    * by ebean.
    */
+  @Override
   public boolean isDistinctQuery() {
     return distinct || sqlDistinct;
   }
@@ -1223,10 +1324,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Internally set to use SQL DISTINCT on the query but still have id property included.
    */
+  @Override
   public void setSqlDistinct(boolean sqlDistinct) {
     this.sqlDistinct = sqlDistinct;
   }
 
+  @Override
   public Class<T> getBeanType() {
     return beanType;
   }
@@ -1235,10 +1338,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return "Query [" + whereExpressions + "]";
   }
 
+  @Override
   public TableJoin getIncludeTableJoin() {
     return includeTableJoin;
   }
 
+  @Override
   public void setIncludeTableJoin(TableJoin includeTableJoin) {
     this.includeTableJoin = includeTableJoin;
   }
@@ -1249,41 +1354,50 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
   public boolean isDisableLazyLoading() {
     return disableLazyLoading;
   }
 
+  @Override
   public int getFirstRow() {
     return firstRow;
   }
 
+  @Override
   public DefaultOrmQuery<T> setFirstRow(int firstRow) {
     this.firstRow = firstRow;
     return this;
   }
 
+  @Override
   public int getMaxRows() {
     return maxRows;
   }
 
+  @Override
   public DefaultOrmQuery<T> setMaxRows(int maxRows) {
     this.maxRows = maxRows;
     return this;
   }
 
+  @Override
   public String getMapKey() {
     return mapKey;
   }
 
+  @Override
   public DefaultOrmQuery<T> setMapKey(String mapKey) {
     this.mapKey = mapKey;
     return this;
   }
 
+  @Override
   public Object getId() {
     return id;
   }
 
+  @Override
   public DefaultOrmQuery<T> setId(Object id) {
     if (id == null) {
       throw new NullPointerException("The id is null");
@@ -1292,14 +1406,17 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
   public BindParams getBindParams() {
     return bindParams;
   }
 
+  @Override
   public String getQuery() {
     return query;
   }
 
+  @Override
   public DefaultOrmQuery<T> where(String addToWhereClause) {
     if (additionalWhere == null) {
       additionalWhere = addToWhereClause;
@@ -1309,6 +1426,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
   public DefaultOrmQuery<T> where(Expression expression) {
     if (whereExpressions == null) {
       whereExpressions = new DefaultExpressionList<T>(this, null);
@@ -1326,6 +1444,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return textExpressions;
   }
 
+  @Override
   public ExpressionList<T> where() {
     if (whereExpressions == null) {
       whereExpressions = new DefaultExpressionList<T>(this, null);
@@ -1333,6 +1452,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return whereExpressions;
   }
 
+  @Override
   public DefaultOrmQuery<T> having(String addToHavingClause) {
     if (additionalHaving == null) {
       additionalHaving = addToHavingClause;
@@ -1342,6 +1462,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
   public DefaultOrmQuery<T> having(Expression expression) {
     if (havingExpressions == null) {
       havingExpressions = new DefaultExpressionList<T>(this, null);
@@ -1350,6 +1471,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
   public ExpressionList<T> having() {
     if (havingExpressions == null) {
       havingExpressions = new DefaultExpressionList<T>(this, null);
@@ -1357,10 +1479,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return havingExpressions;
   }
 
+  @Override
   public SpiExpressionList<T> getHavingExpressions() {
     return havingExpressions;
   }
 
+  @Override
   public SpiExpressionList<T> getWhereExpressions() {
     return whereExpressions;
   }
@@ -1370,19 +1494,23 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return textExpressions;
   }
 
+  @Override
   public String getGeneratedSql() {
     return generatedSql;
   }
 
+  @Override
   public void setGeneratedSql(String generatedSql) {
     this.generatedSql = generatedSql;
   }
 
+  @Override
   public Query<T> setBufferFetchSizeHint(int bufferFetchSizeHint) {
     this.bufferFetchSizeHint = bufferFetchSizeHint;
     return this;
   }
 
+  @Override
   public int getBufferFetchSizeHint() {
     return bufferFetchSizeHint;
   }
@@ -1393,30 +1521,37 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return this;
   }
 
+  @Override
   public boolean isDisableReadAudit() {
     return disableReadAudit;
   }
 
+  @Override
   public void setBeanCollectionTouched(BeanCollectionTouched notify) {
     this.beanCollectionTouched = notify;
   }
 
+  @Override
   public BeanCollectionTouched getBeanCollectionTouched() {
     return beanCollectionTouched;
   }
 
+  @Override
   public List<Object> getIdList() {
     return partialIds;
   }
 
+  @Override
   public void setIdList(List<Object> partialIds) {
     this.partialIds = partialIds;
   }
 
+  @Override
   public boolean isFutureFetch() {
     return futureFetch;
   }
 
+  @Override
   public void setFutureFetch(boolean backgroundFetch) {
     this.futureFetch = backgroundFetch;
   }
@@ -1431,6 +1566,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return futureFetchAudit;
   }
 
+  @Override
   public void setCancelableQuery(CancelableQuery cancelableQuery) {
     synchronized (this) {
       this.cancelableQuery = cancelableQuery;
@@ -1448,6 +1584,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return rootTableAlias;
   }
 
+  @Override
   public void cancel() {
     synchronized (this) {
       cancelled = true;
@@ -1457,6 +1594,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
   }
 
+  @Override
   public boolean isCancelled() {
     synchronized (this) {
       return cancelled;
@@ -1471,6 +1609,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   /**
    * Validate all the expression properties/paths given the bean descriptor.
    */
+  @Override
   public Set<String> validate(BeanType<T> desc) {
 
     SpiExpressionValidation validation = new SpiExpressionValidation(desc);

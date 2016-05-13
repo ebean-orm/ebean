@@ -40,9 +40,7 @@ public class TestWhereAnnotation extends BaseTestCase {
     
     LoggedSqlCollector.start();
     
-    List<Customer> customers = Ebean.find(Customer.class)
-        .setUseCache(false)
-        .findList();
+    List<Customer> customers = Ebean.find(Customer.class).findList();
     
     List<Order> orders = customers.get(0).getOrders();
     orders.size();

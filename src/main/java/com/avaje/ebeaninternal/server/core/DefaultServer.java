@@ -1047,8 +1047,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
     }
 
-    if (!desc.calculateUseCache(query.isUseBeanCache())) {
-      // not using bean cache
+    if (!query.isUseBeanCache()) {
       return null;
     }
 

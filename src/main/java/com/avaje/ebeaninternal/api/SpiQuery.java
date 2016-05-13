@@ -526,9 +526,15 @@ public interface SpiQuery<T> extends Query<T> {
   boolean hasMaxRowsOrFirstRow();
 
   /**
-   * Return true if this query should use/check the bean cache.
+   * Return true if the bean cache should be exclude for query or lazy loading.
    */
-  Boolean isUseBeanCache();
+  boolean isExcludeBeanCache();
+
+  /**
+   * Return true if this query should use the bean cache.
+   * It is not skipped and bean caching is supported.
+   */
+  boolean isUseBeanCache();
 
   /**
    * Return true if this query should use/check the query cache.

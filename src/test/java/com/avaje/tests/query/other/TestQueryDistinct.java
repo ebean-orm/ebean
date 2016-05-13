@@ -21,7 +21,6 @@ public class TestQueryDistinct extends BaseTestCase {
     ResetBasicData.reset();
     
     Query<Customer> query = Ebean.find(Customer.class)
-      .setUseCache(false)
       .setDistinct(true)
       .select("name");
     
@@ -48,7 +47,6 @@ public class TestQueryDistinct extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> query = Ebean.find(Customer.class)
-        .setUseCache(false)
         .where().setDistinct(true)
         .select("name");
 
@@ -64,7 +62,6 @@ public class TestQueryDistinct extends BaseTestCase {
     ResetBasicData.reset();
     
     Query<Customer> query = Ebean.find(Customer.class)
-      .setUseCache(false)
       .setDistinct(true)
       .select("status")
       .where().isNotNull("status").query();

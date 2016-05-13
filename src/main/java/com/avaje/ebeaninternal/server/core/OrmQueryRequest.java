@@ -425,7 +425,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   public boolean isUseBeanCache() {
-    return beanDescriptor.calculateUseCache(query.isUseBeanCache());
+    return query.isUseBeanCache();
   }
 
   /**

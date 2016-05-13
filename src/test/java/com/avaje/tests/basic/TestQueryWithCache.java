@@ -2,6 +2,7 @@ package com.avaje.tests.basic;
 
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Query;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheManager;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
@@ -11,6 +12,7 @@ import com.avaje.tests.model.basic.Country;
 import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -56,4 +58,18 @@ public class TestQueryWithCache extends BaseTestCase {
     assertTrue(nz3 != nz4);
 
   }
+
+  @Test
+  public void testSkipCache() {
+
+    ResetBasicData.reset();
+
+    Ebean.find(Country.class, "NZ");
+
+    Query<Country> query = Ebean.find(Country.class).setId("NZ").setUseCache(false);
+    query.findUnique();
+
+    assertThat(query.getGeneratedSql()).isNotNull();
+  }
+
 }

@@ -1310,7 +1310,7 @@ public interface Query<T> {
    * returned. In this sense it should be treated as a read only object graph.
    * </p>
    */
-  Query<T> setUseCache(boolean useBeanCache);
+  Query<T> setUseCache(boolean useCache);
 
   /**
    * Set this to true to use the query cache.

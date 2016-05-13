@@ -104,7 +104,7 @@ public class DLoadContext implements LoadContext {
     this.readOnly = query.isReadOnly();
     this.disableReadAudit = query.isDisableReadAudit();
     this.disableLazyLoading = query.isDisableLazyLoading();
-    this.excludeBeanCache = Boolean.FALSE.equals(query.isUseBeanCache());
+    this.excludeBeanCache = query.isExcludeBeanCache();
     this.useProfiling = query.getProfilingListener() != null;
 
     ObjectGraphNode parentNode = query.getParentNode();
