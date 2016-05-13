@@ -1,10 +1,5 @@
 package com.avaje.tests.query.embedded;
 
-import java.util.Date;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
@@ -14,6 +9,12 @@ import com.avaje.ebean.cache.ServerCacheStatistics;
 import com.avaje.tests.model.embedded.EAddress;
 import com.avaje.tests.model.embedded.EInvoice;
 import com.avaje.tests.model.embedded.EInvoice.State;
+import org.junit.Test;
+
+import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TestMultipleEmbeddedLoading extends BaseTestCase {
 
@@ -40,16 +41,14 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     // act: save and fetch
     Ebean.save(invoice);
     
-    EInvoice invoice2 = Ebean.find(EInvoice.class)
-      .where().idEq(invoice.getId())
-      .findUnique();
+    EInvoice invoice2 = Ebean.find(EInvoice.class, invoice.getId());
     
     // assert fetched bean populated as expected
-    Assert.assertEquals(invoice.getId(), invoice2.getId());
-    Assert.assertEquals(invoice.getState(), invoice2.getState());
-    Assert.assertEquals(invoice.getInvoiceDate(), invoice2.getInvoiceDate());
-    Assert.assertEquals("2 Apple St", invoice.getBillAddress().getStreet());
-    Assert.assertEquals("2 Apple St", invoice2.getBillAddress().getStreet());
+    assertEquals(invoice.getId(), invoice2.getId());
+    assertEquals(invoice.getState(), invoice2.getState());
+    assertEquals(invoice.getInvoiceDate(), invoice2.getInvoiceDate());
+    assertEquals("2 Apple St", invoice.getBillAddress().getStreet());
+    assertEquals("2 Apple St", invoice2.getBillAddress().getStreet());
     
     // act: only update one of the embedded fields
     invoice2.getBillAddress().setStreet("3 Pineapple St");
@@ -58,12 +57,10 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
 
     awaitL2Cache();
     
-    EInvoice invoice3 = Ebean.find(EInvoice.class)
-        .where().idEq(invoice.getId())
-        .findUnique();
+    EInvoice invoice3 = Ebean.find(EInvoice.class, invoice.getId());
     
     // assert field has updated value
-    Assert.assertEquals("3 Pineapple St", invoice3.getBillAddress().getStreet());
+    assertEquals("3 Pineapple St", invoice3.getBillAddress().getStreet());
     
     
     // fetch a partial
@@ -75,8 +72,8 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     // lazy load of embedded bean
     EAddress billAddress = invoicePartial.getBillAddress();
       
-    Assert.assertNotNull(billAddress);
-    Assert.assertEquals("3 Pineapple St", billAddress.getStreet());
+    assertNotNull(billAddress);
+    assertEquals("3 Pineapple St", billAddress.getStreet());
    
     EbeanServer server = Ebean.getServer(null);
     ServerCacheManager serverCacheManager = server.getServerCacheManager();
@@ -87,34 +84,26 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     beanCache.getStatistics(true);
     
     // fetch and load the cache
-    EInvoice invoice4 = Ebean.find(EInvoice.class)
-        .where().idEq(invoice.getId())
-        .setUseCache(true)
-        .findUnique();
-    
-    Assert.assertNotNull(invoice4);
-    
+    EInvoice invoice4 = Ebean.find(EInvoice.class, invoice.getId());
+    assertNotNull(invoice4);
+
     ServerCacheStatistics statistics = beanCache.getStatistics(false);
 
-    Assert.assertEquals(1, statistics.getSize());
-    Assert.assertEquals(0, statistics.getHitCount());
+    assertEquals(1, statistics.getSize());
+    assertEquals(0, statistics.getHitCount());
 
     // fetch out of the cache this time
-    EInvoice invoice5 = Ebean.find(EInvoice.class)
-        .where().idEq(invoice.getId())
-        .setUseCache(true)
-        .findUnique();
-
-    Assert.assertNotNull(invoice5);
+    EInvoice invoice5 = Ebean.find(EInvoice.class, invoice.getId());
+    assertNotNull(invoice5);
     
     statistics = beanCache.getStatistics(false);
-    Assert.assertEquals(1, statistics.getSize());
-    Assert.assertEquals(1, statistics.getHitCount());
+    assertEquals(1, statistics.getSize());
+    assertEquals(1, statistics.getHitCount());
 
     billAddress = invoice5.getBillAddress();
     
-    Assert.assertNotNull(billAddress);
-    Assert.assertEquals("3 Pineapple St", billAddress.getStreet());
+    assertNotNull(billAddress);
+    assertEquals("3 Pineapple St", billAddress.getStreet());
 
   }
   

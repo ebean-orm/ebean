@@ -84,7 +84,7 @@ public class TestReadAudit extends BaseTestCase {
   public void test_findById_usingL2Cache() {
     resetCounters();
 
-    EBasicChangeLog found = server.find(EBasicChangeLog.class).setId(id1).setUseCache(true).findUnique();
+    EBasicChangeLog found = server.find(EBasicChangeLog.class, id1);
     assertThat(found).isNotNull();
     assertThat(readAuditPrepare.count).isEqualTo(1);
     assertThat(readAuditLogger.plans).hasSize(1);
@@ -97,7 +97,7 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(statistics.getSize()).isEqualTo(1);
     assertThat(statistics.getHitCount()).isEqualTo(0);
 
-    EBasicChangeLog found2 = server.find(EBasicChangeLog.class).setId(id1).setUseCache(true).findUnique();
+    EBasicChangeLog found2 = server.find(EBasicChangeLog.class, id1);
     assertThat(found2).isNotNull();
     statistics = beanCache.getStatistics(false);
     assertThat(statistics.getSize()).isEqualTo(1);
@@ -110,7 +110,7 @@ public class TestReadAudit extends BaseTestCase {
   public void test_findById_usingL2Cache_sharedBean() {
     resetCounters();
 
-    Country found = server.find(Country.class).setId("AR").setUseCache(true).findUnique();
+    Country found = server.find(Country.class, "AR");
     assertThat(found).isNotNull();
     assertThat(readAuditPrepare.count).isEqualTo(1);
     assertThat(readAuditLogger.plans).hasSize(1);
@@ -123,7 +123,7 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(statistics.getSize()).isEqualTo(1);
     assertThat(statistics.getHitCount()).isEqualTo(0);
 
-    Country found2 = server.find(Country.class).setId("AR").setUseCache(true).findUnique();
+    Country found2 = server.find(Country.class, "AR");
     assertThat(found2).isNotNull();
     statistics = beanCache.getStatistics(false);
     assertThat(statistics.getSize()).isEqualTo(1);

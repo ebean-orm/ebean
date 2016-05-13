@@ -77,9 +77,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
   private int fetchCustomer(Integer id) {
 
-    Customer customer2 = Ebean.find(Customer.class).setId(id)
-    // .setUseCache(true)
-        .findUnique();
+    Customer customer2 = Ebean.find(Customer.class, id);
 
     List<Contact> contacts2 = customer2.getContacts();
     contacts2.size();

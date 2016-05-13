@@ -1,10 +1,5 @@
 package com.avaje.tests.basic;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.bean.BeanCollection;
@@ -12,6 +7,13 @@ import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.Product;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class TestSharedInstancePropagation extends BaseTestCase {
 
@@ -28,37 +30,36 @@ public class TestSharedInstancePropagation extends BaseTestCase {
 
 		Order order = Ebean.find(Order.class)
 			.setAutoTune(false)
-			.setUseCache(true)
 			.setReadOnly(true)
 			.setId(1)
 			.findUnique();
 			
 		
-		Assert.assertNotNull(order);
-		Assert.assertTrue(Ebean.getBeanState(order).isReadOnly());
+		assertNotNull(order);
+		assertTrue(Ebean.getBeanState(order).isReadOnly());
 		
 		List<OrderDetail> details = order.getDetails();
 		BeanCollection<?> bc = (BeanCollection<?>)details;
-		Assert.assertTrue(bc.isReadOnly());
-		Assert.assertFalse(bc.isPopulated());
+		assertTrue(bc.isReadOnly());
+		assertFalse(bc.isPopulated());
 		
 		// lazy load
 		bc.size();
 		
-		Assert.assertTrue(bc.isPopulated());
-		Assert.assertTrue(bc.size() > 0);
+		assertTrue(bc.isPopulated());
+		assertTrue(bc.size() > 0);
 		OrderDetail detail = details.get(0);
 		
-		Assert.assertTrue(Ebean.getBeanState(detail).isReadOnly());
-		Assert.assertFalse(Ebean.getBeanState(detail).isReference());
+		assertTrue(Ebean.getBeanState(detail).isReadOnly());
+		assertFalse(Ebean.getBeanState(detail).isReference());
 		
 		Product product = detail.getProduct();
 
-		Assert.assertTrue(Ebean.getBeanState(product).isReadOnly());
+		assertTrue(Ebean.getBeanState(product).isReadOnly());
 		
 		// lazy load
 		product.getName();
-		Assert.assertFalse(Ebean.getBeanState(product).isReference());
+		assertFalse(Ebean.getBeanState(product).isReference());
 		
 	}
 }

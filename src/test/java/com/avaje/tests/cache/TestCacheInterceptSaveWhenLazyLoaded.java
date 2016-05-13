@@ -30,14 +30,6 @@ public class TestCacheInterceptSaveWhenLazyLoaded extends BaseTestCase {
           .where().eq("id", order.getId())
           .findUnique();
 
-//      QueryIterator<Order> iterate = Ebean.find(Order.class)
-//          //.setUseCache(true)
-//          .where().eq("id", order.getId())
-//          .findIterate();
-//
-//      iterate.hasNext();
-//      Order foundOrder = iterate.next();
-
       foundOrder.setStatus(Order.Status.APPROVED);
       assertTrue(Ebean.getBeanState(foundOrder).isDirty());
 
