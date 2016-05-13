@@ -305,7 +305,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Set the cache notify status.
    */
   private void setNotifyCache() {
-    this.notifyCache = beanDescriptor.isCacheNotify(publish);
+    this.notifyCache = beanDescriptor.isCacheNotify(type, publish);
   }
 
   /**

@@ -134,19 +134,28 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
     this.relationshipProperty = relationshipProperty;
   }
 
-  BeanPropertyAssocMany<?> getRelationshipProperty() {
-    return relationshipProperty;
+  /**
+   * Return true if this relationship needs to maintain/update L2 cache.
+   */
+  boolean isCacheNotify() {
+    return targetDescriptor.isBeanCaching() && relationshipProperty != null;
   }
 
+  /**
+   * Clear the L2 relationship cache for this property.
+   */
   void cacheClear() {
-    if (targetDescriptor.isBeanCaching() && relationshipProperty != null) {
+    if (isCacheNotify()) {
       targetDescriptor.cacheManyPropClear(relationshipProperty.getName());
     }
   }
 
+  /**
+   * Clear part of the L2 relationship cache for this property.
+   */
   void cacheDelete(boolean clear, EntityBean bean, CacheChangeSet changeSet) {
 
-    if (targetDescriptor.isBeanCaching() && relationshipProperty != null) {
+    if (isCacheNotify()) {
       if (clear) {
         changeSet.addManyClear(targetDescriptor, relationshipProperty.getName());
       } else {

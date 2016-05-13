@@ -726,6 +726,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     }
     docMapping = docStoreAdapter.createDocMapping();
     docStoreAdapter.registerPaths();
+    cacheHelp.deriveNotifyFlags();
   }
 
   public void initInheritInfo() {
@@ -1059,12 +1060,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return true if the persist request needs to notify the cache.
    */
-  public boolean isCacheNotify(boolean publish) {
+  public boolean isCacheNotify(PersistRequest.Type type, boolean publish) {
     if (draftable && !publish) {
       // no caching when editing draft beans
       return false;
     }
-    return cacheHelp.isCacheNotify();
+    return cacheHelp.isCacheNotify(type);
   }
 
   /**

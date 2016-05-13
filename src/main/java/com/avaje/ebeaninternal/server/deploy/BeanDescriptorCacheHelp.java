@@ -14,6 +14,7 @@ import com.avaje.ebeaninternal.server.cache.CachedBeanDataFromBean;
 import com.avaje.ebeaninternal.server.cache.CachedBeanDataToBean;
 import com.avaje.ebeaninternal.server.cache.CachedManyIds;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
+import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
@@ -32,6 +33,8 @@ import java.util.Map;
  * @param <T> The entity bean type
  */
 final class BeanDescriptorCacheHelp<T> {
+
+  private static final Logger logger = LoggerFactory.getLogger(BeanDescriptorCacheHelp.class);
 
   private static final Logger queryLog = LoggerFactory.getLogger("org.avaje.ebean.cache.QUERY");
   private static final Logger beanLog = LoggerFactory.getLogger("org.avaje.ebean.cache.BEAN");
@@ -59,6 +62,16 @@ final class BeanDescriptorCacheHelp<T> {
   private final ServerCache beanCache;
   private final ServerCache naturalKeyCache;
   private final ServerCache queryCache;
+
+  /**
+   * Set to true if all persist changes need to notify the cache.
+   */
+  private boolean cacheNotifyOnAll;
+
+  /**
+   * Set to true if delete changes need to notify cache.
+   */
+  private boolean cacheNotifyOnDelete;
 
   BeanDescriptorCacheHelp(BeanDescriptor<T> desc, ServerCacheManager cacheManager, CacheOptions cacheOptions,
       boolean cacheSharableBeans, BeanPropertyAssocOne<?>[] propertiesOneImported) {
@@ -92,6 +105,43 @@ final class BeanDescriptorCacheHelp<T> {
   }
 
   /**
+   * Derive the cache notify flags.
+   */
+  public void deriveNotifyFlags() {
+    cacheNotifyOnAll = (beanCache != null || queryCache != null);
+    cacheNotifyOnDelete = !cacheNotifyOnAll && isNotifyOnDeletes();
+
+    if (logger.isDebugEnabled()) {
+      if (isBeanCaching() || isQueryCaching() || cacheNotifyOnAll || cacheNotifyOnDelete) {
+        String notifyMode = cacheNotifyOnAll ? "All" : (cacheNotifyOnDelete ? "Delete" : "None");
+        logger.debug("l2 caching on {} - beanCaching:{} queryCaching:{} notifyMode:{} ",
+            desc.getFullName(), isBeanCaching(), isQueryCaching(), notifyMode);
+      }
+    }
+  }
+
+  /**
+   * Return true if there is an imported bi-directional relationship to a bea
+   * that does have bean caching enabled.
+   */
+  private boolean isNotifyOnDeletes() {
+    for (int i = 0; i < propertiesOneImported.length; i++) {
+      if (propertiesOneImported[i].isCacheNotify()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Return true if the persist request needs to notify the cache.
+   */
+  boolean isCacheNotify(PersistRequest.Type type) {
+    return cacheNotifyOnAll
+        || cacheNotifyOnDelete && (type == PersistRequest.Type.DELETE || type == PersistRequest.Type.DELETE_PERMANENT);
+  }
+
+  /**
    * Return true if there is currently query caching for this type of bean.
    */
   boolean isQueryCaching() {
@@ -103,22 +153,6 @@ final class BeanDescriptorCacheHelp<T> {
    */
   boolean isBeanCaching() {
     return beanCache != null;
-  }
-
-  /**
-   * Return true if the persist request needs to notify the cache.
-   */
-  boolean isCacheNotify() {
-
-    if (isBeanCaching() || isQueryCaching()) {
-      return true;
-    }
-    for (int i = 0; i < propertiesOneImported.length; i++) {
-      if (propertiesOneImported[i].getTargetDescriptor().isBeanCaching()) {
-        return true;
-      }
-    }
-    return false;
   }
 
   CacheOptions getCacheOptions() {
@@ -539,7 +573,7 @@ final class BeanDescriptorCacheHelp<T> {
   }
 
   /**
-   * Add appropriate cache changes to support delete.
+   * Add appropriate cache changes to support delete by id.
    */
   void handleDelete(Object id, CacheChangeSet changeSet) {
     if (beanCache != null) {
@@ -549,7 +583,7 @@ final class BeanDescriptorCacheHelp<T> {
   }
 
   /**
-   * Add appropriate cache changes to support delete.
+   * Add appropriate cache changes to support delete bean.
    */
   void handleDelete(Object id, PersistRequestBean<T> deleteRequest, CacheChangeSet changeSet) {
     queryCacheClear(changeSet);

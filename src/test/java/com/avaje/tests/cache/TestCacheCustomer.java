@@ -2,6 +2,7 @@ package com.avaje.tests.cache;
 
 import java.util.List;
 
+import com.avaje.tests.model.basic.Country;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,6 +14,25 @@ import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 
 public class TestCacheCustomer extends BaseTestCase {
+
+  @Test
+  public void testUpdateAddress() {
+
+    ResetBasicData.reset();
+
+    Country nz = Ebean.getReference(Country.class, "NZ");
+    Address address = new Address();
+    address.setLine1("Some Place");
+    address.setCity("Auckland");
+    address.setCountry(nz);
+
+    Ebean.save(address);
+
+    address.setLine2("Else");
+    Ebean.save(address);
+
+    Ebean.delete(address);
+  }
 
   @Test
   public void test() {
