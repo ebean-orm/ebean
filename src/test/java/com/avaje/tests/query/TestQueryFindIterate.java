@@ -126,7 +126,6 @@ public class TestQueryFindIterate extends BaseTestCase {
     QueryIterator<Order> queryIterator = Ebean.find(Order.class)
             .setLazyLoadBatchSize(10)
             .setUseCache(false)
-            .setUseQueryCache(false)
             .select("status, orderDate")
             .fetch("customer", "name")
             .fetch("details")
