@@ -231,6 +231,11 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
+  public Boolean getBatchGetGeneratedKeys() {
+    return transaction.getBatchGetGeneratedKeys();
+  }
+
+  @Override
   public void setBatchFlushOnMixed(boolean batchFlushOnMixed) {
     transaction.setBatchFlushOnMixed(batchFlushOnMixed);
   }

@@ -501,6 +501,11 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   @Override
+  public Boolean getBatchGetGeneratedKeys() {
+    return batchGetGeneratedKeys;
+  }
+
+  @Override
   public void setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
     this.batchGetGeneratedKeys = getGeneratedKeys;
     if (batchControl != null) {

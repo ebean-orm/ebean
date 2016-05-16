@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+//import static org.assertj.core.api.Assertions.assertThat;
+//import static org.junit.Assert.assertNull;
+
 public class TestBatchInsertSimple extends BaseTestCase {
 
   Random random = new Random();
@@ -62,6 +65,35 @@ public class TestBatchInsertSimple extends BaseTestCase {
       master.save();
     }
   }
+
+//  @Test
+//  public void testTransactional_skipGeneratedBeans() {
+//
+//    if (isMsSqlServer()) return;
+//
+//    List<UTMaster> beans = saveWithFullBatchMode_skipGeneratedKeys();
+//    for (UTMaster bean : beans) {
+//      assertNull(bean.getId());
+//    }
+//  }
+//
+//  @Transactional(batch=PersistBatch.ALL, batchSize=50, getGeneratedKeys = false)
+//  public List<UTMaster> saveWithFullBatchMode_skipGeneratedKeys() {
+//
+//    Transaction transaction = server().currentTransaction();
+//    SpiTransaction spiTxn = (SpiTransaction)transaction;
+//    Boolean generatedKeys = spiTxn.getBatchGetGeneratedKeys();
+//
+//    assertThat(generatedKeys).isFalse();
+//
+//    List<UTMaster> beans = new ArrayList<UTMaster>();
+//    for (int i = 0; i < 4; i++) {
+//     beans.add(createMaster(i));
+//    }
+//
+//    server().saveAll(beans);
+//    return beans;
+//  }
 
   @Test
   public void testJdbcBatchPerRequestWithMasterOnly() {

@@ -91,6 +91,16 @@ public @interface Transactional {
   int batchSize() default 0;
 
   /**
+   * Set to false when we want to skip getting generatedKeys.
+   * <p>
+   * This is typically used in the case of large batch inserts where we get a
+   * performance benefit from not calling getGeneratedKeys (as we are going to
+   * insert a lot of rows and have no need for the Id values after the insert).
+   * </p>
+   */
+  boolean getGeneratedKeys() default true;
+
+  /**
    * The transaction isolation level this transaction should have.
    * <p>
    * This will only be used if this scope creates the transaction. If the

@@ -36,6 +36,8 @@ public final class TxScope {
 
   int batchSize;
 
+  boolean skipGeneratedKeys;
+
   boolean readOnly;
 
   ArrayList<Class<? extends Throwable>> rollbackFor;
@@ -186,6 +188,21 @@ public final class TxScope {
   public TxScope setBatchSize(int batchSize) {
     this.batchSize = batchSize;
     return this;
+  }
+
+  /**
+   * Set if the transaction should skip reading generated keys for inserts.
+   */
+  public TxScope setSkipGeneratedKeys() {
+    this.skipGeneratedKeys = true;
+    return this;
+  }
+
+  /**
+   * Return true if getGeneratedKeys should be skipped for this transaction.
+   */
+  public boolean isSkipGeneratedKeys() {
+    return skipGeneratedKeys;
   }
 
   /**

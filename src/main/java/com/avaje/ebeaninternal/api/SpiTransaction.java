@@ -1,8 +1,5 @@
 package com.avaje.ebeaninternal.api;
 
-import java.sql.Connection;
-import java.util.List;
-
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.bean.PersistenceContext;
@@ -11,6 +8,9 @@ import com.avaje.ebean.event.changelog.ChangeSet;
 import com.avaje.ebeaninternal.server.core.PersistRequest;
 import com.avaje.ebeaninternal.server.core.PersistRequestBean;
 import com.avaje.ebeaninternal.server.persist.BatchControl;
+
+import java.sql.Connection;
+import java.util.List;
 
 /**
  * Extends Transaction with additional API required on server.
@@ -124,6 +124,11 @@ public interface SpiTransaction extends Transaction {
    * </p>
    */
   int getBatchSize();
+
+  /**
+   * Return the getGeneratedKeys setting for this transaction.
+   */
+  Boolean getBatchGetGeneratedKeys();
 
   /**
    * Modify and return the current 'depth' of the transaction.
