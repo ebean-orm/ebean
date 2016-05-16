@@ -6,6 +6,7 @@ import com.avaje.ebean.Query;
 import org.avaje.ebeantest.LoggedSqlCollector;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -109,5 +110,34 @@ public class TestDbArray_basic extends BaseTestCase {
     List<String> sql = LoggedSqlCollector.stop();
 
     assertThat(sql.get(0)).contains("update earray_bean set phone_numbers=?, uids=?, version=? where");
+  }
+
+  @Test
+  public void insertNulls() {
+
+    EArrayBean bean = new EArrayBean();
+    bean.setName("some nulls");
+    bean.setPhoneNumbers(null);
+    bean.setOtherIds(null);
+    bean.setUids(null);
+
+    Ebean.save(bean);
+    Ebean.delete(bean);
+  }
+
+  @Test
+  public void insertAll_when_hasNulls() {
+
+    EArrayBean bean = new EArrayBean();
+    bean.setName("some nulls");
+    bean.setPhoneNumbers(null);
+    bean.setOtherIds(null);
+    bean.setUids(null);
+
+    List<EArrayBean> all = new ArrayList<EArrayBean>();
+    all.add(bean);
+
+    Ebean.saveAll(all);
+    Ebean.deleteAll(all);
   }
 }
