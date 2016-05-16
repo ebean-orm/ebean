@@ -91,7 +91,11 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> {
 
   @Override
   public void bind(DataBind bind, List value) throws SQLException {
-    bind.setArray(arrayType, toArray(value));
+    if (value == null) {
+      bind.setNull(Types.ARRAY);
+    } else {
+      bind.setArray(arrayType, toArray(value));
+    }
   }
 
   @Override
