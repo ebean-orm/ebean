@@ -45,11 +45,10 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     this.ownerBean = ownerBean;
     this.propertyName = propertyName;
     this.map = null;
-    this.touched = false;
   }
 
-  public boolean isEmptyAndUntouched() {
-    return !touched && (map == null || map.isEmpty());
+  public boolean isSkipSave() {
+    return map == null || (map.isEmpty() && !holdsModifications());
   }
 
   @Override
@@ -125,24 +124,14 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
           map = new LinkedHashMap<K, E>();
         }
       }
-      touched(true);
     }
   }
 
-  private void initAsUntouched() {
-    init(false);
-  }
-  
   private void init() {
-    init(true);
-  }
-  
-  private void init(boolean setTouched) {
     synchronized (this) {
       if (map == null) {
         lazyLoadCollection(false);
       }
-      touched(setTouched);
     }
   }
 
@@ -249,7 +238,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   public boolean isEmpty() {
-    initAsUntouched();
+    init();
     return map.isEmpty();
   }
 

@@ -238,13 +238,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   /**
    * Return true if this is considered 'empty' from a save perspective.
    */
-  public boolean isEmptyBeanCollection(EntityBean bean, boolean insertedParent) {
+  public boolean isSkipSaveBeanCollection(EntityBean bean, boolean insertedParent) {
     Object val = getValue(bean);
     if (val == null) {
       return true;
     }
     if ((val instanceof BeanCollection<?>)) {
-      return ((BeanCollection<?>) val).isEmptyAndUntouched();
+      return ((BeanCollection<?>) val).isSkipSave();
     }
     if (insertedParent) {
       // check 'vanilla' collection types

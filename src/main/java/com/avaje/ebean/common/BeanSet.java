@@ -46,11 +46,10 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     this.ownerBean = ownerBean;
     this.propertyName = propertyName;
     this.set = null;
-    this.touched = false;
   }
 
-  public boolean isEmptyAndUntouched() {
-    return !touched && (set == null || set.isEmpty());
+  public boolean isSkipSave() {
+    return set == null || (set.isEmpty() && !holdsModifications());
   }
 
   @SuppressWarnings("unchecked")
@@ -117,24 +116,14 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
           set = new LinkedHashSet<E>();
         }
       }
-      touched(true);
     }
   }
 
-  private void initAsUntouched() {
-    init(false);
-  }
-
   private void init() {
-    init(true);
-  }
-
-  private void init(boolean setTouched) {
     synchronized (this) {
       if (set == null) {
         lazyLoadCollection(true);
       }
-      touched(setTouched);
     }
   }
 
@@ -260,7 +249,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   }
 
   public boolean isEmpty() {
-    initAsUntouched();
+    init();
     return set.isEmpty();
   }
 

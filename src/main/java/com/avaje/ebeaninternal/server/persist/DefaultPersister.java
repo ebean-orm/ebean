@@ -806,8 +806,8 @@ public final class DefaultPersister implements Persister {
     // many's with cascade save
     BeanPropertyAssocMany<?>[] manys = desc.propertiesManySave();
     for (int i = 0; i < manys.length; i++) {
-      // check that property is loaded and not empty uninitialised collection
-      if (request.isLoadedProperty(manys[i]) && !manys[i].isEmptyBeanCollection(parentBean, insertedParent)) {
+      // check that property is loaded and collection should be cascaded to
+      if (request.isLoadedProperty(manys[i]) && !manys[i].isSkipSaveBeanCollection(parentBean, insertedParent)) {
         saveMany(new SaveManyPropRequest(insertedParent, manys[i], parentBean, request), insertMode);
         if (!insertedParent) {
           request.addUpdatedManyProperty(manys[i]);

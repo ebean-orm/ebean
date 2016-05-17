@@ -71,4 +71,11 @@ class ModifyHolder<E> implements Serializable {
   Set<E> getModifyRemovals() {
     return modifyDeletions;
   }
+
+  /**
+   * Return true if there additions or removals.
+   */
+  boolean hasModifications() {
+    return !modifyDeletions.isEmpty() || !modifyAdditions.isEmpty();
+  }
 }

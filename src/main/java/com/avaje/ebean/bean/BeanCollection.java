@@ -54,10 +54,12 @@ public interface BeanCollection<E> extends Serializable {
   void reset(EntityBean ownerBean, String propertyName);
 
   /**
-   * Return true if the collection is empty and untouched. Used to detect if a
-   * collection was 'cleared' deliberately or just un-initialised.
+   * Return true if the collection is uninitialised or is empty without any held modifications.
+   * <p>
+   * Returning true means can safely skip cascade save for this bean collection.
+   * </p>
    */
-  boolean isEmptyAndUntouched();
+  boolean isSkipSave();
 
   /**
    * Return the bean that owns this collection.
