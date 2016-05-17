@@ -1,12 +1,11 @@
 package com.avaje.tests.model.basic.xtra;
 
-import java.util.ArrayList;
-
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlUpdate;
+import org.junit.Test;
+
+import java.util.ArrayList;
 
 public class TestDeleteUnloadedChildren extends BaseTestCase {
 

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Finder methods for Customer.
  */
-public class CustomerFinder extends Finder<Integer,Customer> {
+public class CustomerFinder extends Finder<Integer, Customer> {
 
   public CustomerFinder() {
     super(Customer.class);

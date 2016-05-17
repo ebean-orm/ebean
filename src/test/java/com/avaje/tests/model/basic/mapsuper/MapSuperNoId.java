@@ -1,18 +1,17 @@
 package com.avaje.tests.model.basic.mapsuper;
 
-import java.sql.Timestamp;
+import com.avaje.ebean.annotation.CreatedTimestamp;
 
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
-
-import com.avaje.ebean.annotation.CreatedTimestamp;
+import java.sql.Timestamp;
 
 @MappedSuperclass
 public class MapSuperNoId {
 
   @CreatedTimestamp
   Timestamp whenCreated;
-  
+
   @Version
   Timestamp whenUpdated;
 
@@ -31,5 +30,5 @@ public class MapSuperNoId {
   public void setWhenUpdated(Timestamp whenUpdated) {
     this.whenUpdated = whenUpdated;
   }
-  
+
 }

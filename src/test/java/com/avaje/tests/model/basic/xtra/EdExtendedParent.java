@@ -8,14 +8,14 @@ import javax.persistence.Entity;
 @DiscriminatorValue("EXTENDED")
 public class EdExtendedParent extends EdParent {
 
-    private String extendedName;
+  private String extendedName;
 
-    public String getExtendedName() {
-        return extendedName;
-    }
+  public String getExtendedName() {
+    return extendedName;
+  }
 
-    public void setExtendedName(String extendedName) {
-        this.extendedName = extendedName;
-    }
+  public void setExtendedName(String extendedName) {
+    this.extendedName = extendedName;
+  }
 
 }

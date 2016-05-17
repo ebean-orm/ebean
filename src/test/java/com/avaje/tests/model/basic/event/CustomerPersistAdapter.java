@@ -6,19 +6,19 @@ import com.avaje.tests.model.basic.Customer;
 
 public class CustomerPersistAdapter extends BeanPersistAdapter {
 
-	@Override
-	public boolean isRegisterFor(Class<?> cls) {
-		return Customer.class.equals(cls);
-	}
+  @Override
+  public boolean isRegisterFor(Class<?> cls) {
+    return Customer.class.equals(cls);
+  }
 
-	@Override
-	public boolean preInsert(BeanPersistRequest<?> request) {
-						
+  @Override
+  public boolean preInsert(BeanPersistRequest<?> request) {
+
 //		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 //		request.getTransaction().log("+++++ "+Arrays.toString(stackTrace));
-		
-		return true;
-	}
+
+    return true;
+  }
 
   @Override
   public boolean preUpdate(BeanPersistRequest<?> request) {

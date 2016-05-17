@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@AttributeOverride(name="name", column=@Column(name = "mod_name"))
+@AttributeOverride(name = "name", column = @Column(name = "mod_name"))
 @Entity
 @Table(name = "f_second")
 public class Second extends SuperSecond {

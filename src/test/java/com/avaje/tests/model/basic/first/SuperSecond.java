@@ -10,7 +10,7 @@ public abstract class SuperSecond {
 
   protected String name;
 
-  @OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "first")
   protected First first;
 

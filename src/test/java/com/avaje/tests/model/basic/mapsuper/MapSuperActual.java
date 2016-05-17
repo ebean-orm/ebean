@@ -5,12 +5,12 @@ import javax.persistence.Id;
 
 @Entity
 public class MapSuperActual extends MapSuperNoId {
-  
+
   @Id
   Long id;
-  
+
   String name;
-  
+
   public Long getId() {
     return id;
   }
@@ -26,5 +26,5 @@ public class MapSuperActual extends MapSuperNoId {
   public void setName(String name) {
     this.name = name;
   }
-  
+
 }
