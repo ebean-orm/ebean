@@ -1,15 +1,13 @@
 package com.avaje.ebean.common;
 
-import java.util.Set;
-
-import javax.persistence.PersistenceException;
-
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionLoader;
-import com.avaje.ebean.bean.BeanCollectionTouched;
 import com.avaje.ebean.bean.EntityBean;
+
+import javax.persistence.PersistenceException;
+import java.util.Set;
 
 /**
  * Base class for List Set and Map implementations of BeanCollection.
@@ -35,8 +33,6 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   protected boolean registeredWithLoadContext;
 
   protected String ebeanServerName;
-
-  protected transient BeanCollectionTouched beanCollectionTouched;
 
   /**
    * The owning bean (used for lazy fetch).
@@ -117,15 +113,6 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     if (setFlag) {
       touched = true;
     }
-    if (beanCollectionTouched != null) {
-      // only call this once
-      beanCollectionTouched.notifyTouched(this);
-      beanCollectionTouched = null;
-    }
-  }
-
-  public void setBeanCollectionTouched(BeanCollectionTouched notify) {
-    this.beanCollectionTouched = notify;
   }
 
   public boolean isRegisteredWithLoadContext() {

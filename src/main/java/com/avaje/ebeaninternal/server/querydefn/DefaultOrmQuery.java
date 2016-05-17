@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.querydefn;
 
 import com.avaje.ebean.*;
 import com.avaje.ebean.OrderBy.Property;
-import com.avaje.ebean.bean.BeanCollectionTouched;
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.ObjectGraphOrigin;
@@ -47,8 +46,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private final BeanDescriptor<T> beanDescriptor;
 
   private final EbeanServer server;
-
-  private BeanCollectionTouched beanCollectionTouched;
 
   private final ExpressionFactory expressionFactory;
 
@@ -1524,16 +1521,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public boolean isDisableReadAudit() {
     return disableReadAudit;
-  }
-
-  @Override
-  public void setBeanCollectionTouched(BeanCollectionTouched notify) {
-    this.beanCollectionTouched = notify;
-  }
-
-  @Override
-  public BeanCollectionTouched getBeanCollectionTouched() {
-    return beanCollectionTouched;
   }
 
   @Override

@@ -5,7 +5,6 @@ import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.OrderBy;
 import com.avaje.ebean.PersistenceContextScope;
 import com.avaje.ebean.Query;
-import com.avaje.ebean.bean.BeanCollectionTouched;
 import com.avaje.ebean.bean.CallStack;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.bean.PersistenceContext;
@@ -225,18 +224,6 @@ public interface SpiQuery<T> extends Query<T> {
   void addSoftDeletePredicate(String softDeletePredicate);
 
   List<String> getSoftDeletePredicates();
-
-  /**
-   * Return a listener that wants to be notified when the bean collection is
-   * first used.
-   */
-  BeanCollectionTouched getBeanCollectionTouched();
-
-  /**
-   * Set a listener to be notified when the bean collection has been touched
-   * (when the list/set/map is first used).
-   */
-  void setBeanCollectionTouched(BeanCollectionTouched notify);
 
   /**
    * Set the list of Id's that is being populated.

@@ -93,11 +93,6 @@ public interface BeanCollection<E> extends Serializable {
   void setFilterMany(ExpressionList<?> filterMany);
 
   /**
-   * Set a listener to be notified when the BeanCollection is first touched.
-   */
-  void setBeanCollectionTouched(BeanCollectionTouched notify);
-
-  /**
    * Return true if the collection has been registered with the batch loading context.
    */
   boolean isRegisteredWithLoadContext();

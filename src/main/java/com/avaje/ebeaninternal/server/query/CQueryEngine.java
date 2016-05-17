@@ -4,7 +4,6 @@ import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
-import com.avaje.ebean.bean.BeanCollectionTouched;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.ObjectGraphNode;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
@@ -300,14 +299,6 @@ public class CQueryEngine {
       }
 
       BeanCollection<T> beanCollection = cquery.readCollection();
-
-      BeanCollectionTouched collectionTouched = query.getBeanCollectionTouched();
-      if (collectionTouched != null) {
-        // register a listener that wants to be notified when the
-        // bean collection is first used
-        beanCollection.setBeanCollectionTouched(collectionTouched);
-      }
-
       if (request.isLogSummary()) {
         logFindManySummary(cquery);
       }
