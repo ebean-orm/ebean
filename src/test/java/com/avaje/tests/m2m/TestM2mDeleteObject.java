@@ -1,17 +1,16 @@
 package com.avaje.tests.m2m;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.m2m.Permission;
 import com.avaje.tests.model.m2m.Role;
 import com.avaje.tests.model.m2m.Tenant;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class TestM2mDeleteObject extends BaseTestCase {
 

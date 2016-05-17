@@ -1,16 +1,15 @@
 package com.avaje.tests.m2m;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.MRole;
 import com.avaje.tests.model.basic.MUser;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class TestM2MDeleteWithCascade extends BaseTestCase {
 

@@ -4,16 +4,10 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
-import com.avaje.tests.model.basic.MnocRole;
-import com.avaje.tests.model.basic.MnocUser;
 import com.avaje.tests.model.m2m.MnyA;
 import com.avaje.tests.model.m2m.MnyB;
 import com.avaje.tests.model.m2m.MnyC;
-import org.junit.Assert;
 import org.junit.Test;
-
-import javax.persistence.PersistenceException;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 

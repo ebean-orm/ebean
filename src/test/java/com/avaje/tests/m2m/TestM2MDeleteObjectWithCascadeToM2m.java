@@ -1,27 +1,26 @@
 package com.avaje.tests.m2m;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.m2m.Permission;
 import com.avaje.tests.model.m2m.Role;
 import com.avaje.tests.model.m2m.Tenant;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class TestM2MDeleteObjectWithCascadeToM2m extends BaseTestCase {
 
   @Test
   public void test() {
-    
+
     Ebean.createUpdate(Permission.class, "delete from Permission").execute();
     Ebean.createUpdate(Tenant.class, "delete from Tenant").execute();
     Ebean.createUpdate(Role.class, "delete from Role").execute();
-    
+
     Tenant tenant1 = new Tenant("Tenant");
     Ebean.save(tenant1);
 
@@ -36,12 +35,12 @@ public class TestM2MDeleteObjectWithCascadeToM2m extends BaseTestCase {
     Set<Permission> permissions = new HashSet<Permission>();
     List<Permission> permsList = Ebean.find(Permission.class).findList();
     permissions.addAll(permsList);
-    
+
     role1.setPermissions(permissions);
 
     Ebean.save(role1);
-    
-    
+
+
     List<Tenant> tenantList = Ebean.find(Tenant.class).fetch("roles").findList();
     List<Role> roleList = Ebean.find(Role.class).fetch("permissions").findList();
     List<Permission> permissionList = Ebean.find(Permission.class).fetch("roles").findList();
@@ -59,6 +58,6 @@ public class TestM2MDeleteObjectWithCascadeToM2m extends BaseTestCase {
     Assert.assertEquals(0, tenantList2.size());
     Assert.assertEquals(0, roleList2.size());
     Assert.assertEquals(2, permissionList2.size());
-    
+
   }
 }
