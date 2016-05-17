@@ -6,25 +6,25 @@ import javax.persistence.Id;
 @Entity
 public class TruckRef {
 
-	@Id
-	Integer id;
-	
-	String something;
+  @Id
+  Integer id;
 
-	public Integer getId() {
-		return id;
-	}
+  String something;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  public Integer getId() {
+    return id;
+  }
 
-	public String getSomething() {
-		return something;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public void setSomething(String something) {
-		this.something = something;
-	}
-	
+  public String getSomething() {
+    return something;
+  }
+
+  public void setSomething(String something) {
+    this.something = something;
+  }
+
 }

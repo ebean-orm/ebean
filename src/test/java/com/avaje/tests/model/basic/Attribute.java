@@ -11,19 +11,19 @@ import javax.persistence.ManyToOne;
 @Inheritance()
 @DiscriminatorColumn(name = "option_type", discriminatorType = DiscriminatorType.INTEGER)
 @DiscriminatorValue("0")
-public class Attribute extends BasicDomain{
-	
-	private static final long serialVersionUID = 1L;
+public class Attribute extends BasicDomain {
 
-	@ManyToOne
-	private AttributeHolder attributeHolder;
+  private static final long serialVersionUID = 1L;
 
-	public AttributeHolder getAttributeHolder() {
-		return attributeHolder;
-	}
+  @ManyToOne
+  private AttributeHolder attributeHolder;
 
-	public void setAttributeHolder(AttributeHolder attributeHolder) {
-		this.attributeHolder = attributeHolder;
-	}
-	
+  public AttributeHolder getAttributeHolder() {
+    return attributeHolder;
+  }
+
+  public void setAttributeHolder(AttributeHolder attributeHolder) {
+    this.attributeHolder = attributeHolder;
+  }
+
 }

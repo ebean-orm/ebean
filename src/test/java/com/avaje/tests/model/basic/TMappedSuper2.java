@@ -1,4 +1,3 @@
-
 package com.avaje.tests.model.basic;
 
 import javax.persistence.MappedSuperclass;
@@ -8,48 +7,48 @@ import javax.persistence.Version;
 @MappedSuperclass
 public class TMappedSuper2 {
 
-	String something;
-	
-	@Version
-	int version;
-	
-	@Transient
-	SomeObject someObject;
+  String something;
 
-	@Transient
-	Integer myint;
+  @Version
+  int version;
 
-	public String getSomething() {
-		return something;
-	}
+  @Transient
+  SomeObject someObject;
 
-	public void setSomething(String something) {
-		this.something = something;
-	}
+  @Transient
+  Integer myint;
 
-	public SomeObject getSomeObject() {
-		return someObject;
-	}
+  public String getSomething() {
+    return something;
+  }
 
-	public void setSomeObject(SomeObject someObject) {
-		this.someObject = someObject;
-	}
+  public void setSomething(String something) {
+    this.something = something;
+  }
 
-	public Integer getMyint() {
-		return myint;
-	}
+  public SomeObject getSomeObject() {
+    return someObject;
+  }
 
-	public void setMyint(Integer myint) {
-		this.myint = myint;
-	}
+  public void setSomeObject(SomeObject someObject) {
+    this.someObject = someObject;
+  }
 
-	public int getVersion() {
-		return version;
-	}
+  public Integer getMyint() {
+    return myint;
+  }
 
-	public void setVersion(int version) {
-		this.version = version;
-	}
+  public void setMyint(Integer myint) {
+    this.myint = myint;
+  }
+
+  public int getVersion() {
+    return version;
+  }
+
+  public void setVersion(int version) {
+    this.version = version;
+  }
 
 }
 

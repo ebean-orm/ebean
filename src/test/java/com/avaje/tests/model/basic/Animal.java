@@ -18,11 +18,11 @@ public abstract class Animal {
 
   @Id
   Long id;
-  
+
   @Version
   Long version;
 
-  @Column(name="species", insertable = false, updatable = false, nullable = false)
+  @Column(name = "species", insertable = false, updatable = false, nullable = false)
   String species;
 
   @ManyToOne
@@ -59,5 +59,5 @@ public abstract class Animal {
   public void setShelter(AnimalShelter shelter) {
     this.shelter = shelter;
   }
-  
+
 }

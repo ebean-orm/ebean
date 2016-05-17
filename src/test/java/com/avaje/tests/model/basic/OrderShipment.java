@@ -1,36 +1,35 @@
 package com.avaje.tests.model.basic;
 
-import java.sql.Timestamp;
-
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.sql.Timestamp;
 
 @Entity
-@Table(name="or_order_ship")
+@Table(name = "or_order_ship")
 public class OrderShipment extends BasicDomain {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@ManyToOne
-	private Order order;
-	
-	private Timestamp shipTime = new Timestamp(System.currentTimeMillis());
+  @ManyToOne
+  private Order order;
 
-	public Timestamp getShipTime() {
-		return shipTime;
-	}
+  private Timestamp shipTime = new Timestamp(System.currentTimeMillis());
 
-	public void setShipTime(Timestamp shipTime) {
-		this.shipTime = shipTime;
-	}
+  public Timestamp getShipTime() {
+    return shipTime;
+  }
 
-	public Order getOrder() {
-		return order;
-	}
+  public void setShipTime(Timestamp shipTime) {
+    this.shipTime = shipTime;
+  }
 
-	public void setOrder(Order order) {
-		this.order = order;
-	}
+  public Order getOrder() {
+    return order;
+  }
+
+  public void setOrder(Order order) {
+    this.order = order;
+  }
 
 }

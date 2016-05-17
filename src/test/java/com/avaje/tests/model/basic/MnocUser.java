@@ -1,75 +1,74 @@
 package com.avaje.tests.model.basic;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Version;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class MnocUser {
 
-    @Id
-    Integer userId;
-    
-    String userName;
-    
-    @Version
-    Integer version;
+  @Id
+  Integer userId;
 
-    // No cascade REMOVE
-    @ManyToMany(cascade=CascadeType.PERSIST)
-    @OrderBy("roleName")
-    List<MnocRole> validRoles;
-    
-    public MnocUser() {
-        
-    }
-    
-    public MnocUser(String userName) {
-        this.userName = userName;
-    }
+  String userName;
 
-    public Integer getUserId() {
-        return userId;
-    }
+  @Version
+  Integer version;
 
-    public void setUserId(Integer roleId) {
-        this.userId = roleId;
-    }
+  // No cascade REMOVE
+  @ManyToMany(cascade = CascadeType.PERSIST)
+  @OrderBy("roleName")
+  List<MnocRole> validRoles;
 
-    public String getUserName() {
-        return userName;
-    }
+  public MnocUser() {
 
-    public void setUserName(String roleName) {
-        this.userName = roleName;
-    }
+  }
 
-    public Integer getVersion() {
-        return version;
-    }
+  public MnocUser(String userName) {
+    this.userName = userName;
+  }
 
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
+  public Integer getUserId() {
+    return userId;
+  }
 
-    public List<MnocRole> getValidRoles() {
-        return validRoles;
-    }
+  public void setUserId(Integer roleId) {
+    this.userId = roleId;
+  }
 
-    public void setValidRoles(List<MnocRole> validRoles) {
-        this.validRoles = validRoles;
+  public String getUserName() {
+    return userName;
+  }
+
+  public void setUserName(String roleName) {
+    this.userName = roleName;
+  }
+
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
+  public List<MnocRole> getValidRoles() {
+    return validRoles;
+  }
+
+  public void setValidRoles(List<MnocRole> validRoles) {
+    this.validRoles = validRoles;
+  }
+
+  public void addValidRole(MnocRole role) {
+    if (validRoles == null) {
+      validRoles = new ArrayList<MnocRole>();
     }
-    
-    public void addValidRole(MnocRole role) {
-        if (validRoles == null){
-            validRoles = new ArrayList<MnocRole>();
-        }
-        validRoles.add(role);
-    }
+    validRoles.add(role);
+  }
 }

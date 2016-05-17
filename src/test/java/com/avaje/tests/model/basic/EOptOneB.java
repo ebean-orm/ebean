@@ -6,27 +6,27 @@ import javax.persistence.ManyToOne;
 @Entity
 public class EOptOneB extends BasicDomain {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    String nameForB;
+  String nameForB;
 
-    @ManyToOne(optional=false)
-    EOptOneC c;
-    
-    public String getNameForB() {
-        return nameForB;
-    }
+  @ManyToOne(optional = false)
+  EOptOneC c;
 
-    public void setNameForB(String nameForA) {
-        this.nameForB = nameForA;
-    }
+  public String getNameForB() {
+    return nameForB;
+  }
 
-    public EOptOneC getC() {
-        return c;
-    }
+  public void setNameForB(String nameForA) {
+    this.nameForB = nameForA;
+  }
 
-    public void setC(EOptOneC c) {
-        this.c = c;
-    }
-    
+  public EOptOneC getC() {
+    return c;
+  }
+
+  public void setC(EOptOneC c) {
+    this.c = c;
+  }
+
 }

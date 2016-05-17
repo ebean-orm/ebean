@@ -13,29 +13,29 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 @Entity
-@Table(name="e_basic_withlife")
+@Table(name = "e_basic_withlife")
 public class EBasicWithLifecycle {
 
   @Id
   Long id;
-  
+
   String name;
-  
+
   @Version
   Long version;
-  
+
   transient StringBuilder buffer = new StringBuilder();
-  
+
   @PrePersist
   public void prePersist1() {
     buffer.append("prePersist1");
   }
-  
+
   @PrePersist
   public void prePersist2() {
     buffer.append("prePersist2");
   }
-  
+
   @PostPersist
   public void postPersist1() {
     buffer.append("postPersist1");
@@ -45,7 +45,7 @@ public class EBasicWithLifecycle {
   public void postPersist2() {
     buffer.append("postPersist2");
   }
-  
+
   @PreUpdate
   public void preUpdate1() {
     buffer.append("preUpdate1");
@@ -55,7 +55,7 @@ public class EBasicWithLifecycle {
   public void preUpdate2() {
     buffer.append("preUpdate2");
   }
-  
+
   @PostUpdate
   public void postUpdate1() {
     buffer.append("postUpdate1");
@@ -65,7 +65,7 @@ public class EBasicWithLifecycle {
   public void postUpdate2() {
     buffer.append("postUpdate2");
   }
-  
+
   @PreRemove
   public void preRemove1() {
     buffer.append("preRemove1");
@@ -75,7 +75,7 @@ public class EBasicWithLifecycle {
   public void preRemove2() {
     buffer.append("preRemove2");
   }
-  
+
   @PostRemove
   public void postRemove1() {
     buffer.append("postRemove1");
@@ -85,7 +85,7 @@ public class EBasicWithLifecycle {
   public void postRemove2() {
     buffer.append("postRemove2");
   }
-  
+
   @PostLoad
   public void postLoad1() {
     buffer.append("postLoad1");
@@ -123,5 +123,5 @@ public class EBasicWithLifecycle {
   public String getBuffer() {
     return buffer.toString();
   }
-  
+
 }

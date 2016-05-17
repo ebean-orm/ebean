@@ -7,58 +7,58 @@ import javax.persistence.OneToOne;
 @Entity
 public class OCar extends BasicDomain {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	private String vin;
-	
-	private String name;
+  private String vin;
 
-	@OneToOne(mappedBy="car",cascade=CascadeType.ALL)
-	private OGearBox gearBox;
+  private String name;
 
-    @OneToOne(mappedBy="car",cascade=CascadeType.ALL)
-    private OEngine engine;
-	
-	public OCar() {
-	}
+  @OneToOne(mappedBy = "car", cascade = CascadeType.ALL)
+  private OGearBox gearBox;
 
-	public OCar(String vin, String name) {
-		super();
-		this.vin = vin;
-		this.name = name;
-	}
+  @OneToOne(mappedBy = "car", cascade = CascadeType.ALL)
+  private OEngine engine;
 
-    public String getVin() {
-        return vin;
-    }
+  public OCar() {
+  }
 
-    public void setVin(String vin) {
-        this.vin = vin;
-    }
+  public OCar(String vin, String name) {
+    super();
+    this.vin = vin;
+    this.name = name;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getVin() {
+    return vin;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setVin(String vin) {
+    this.vin = vin;
+  }
 
-    public OGearBox getGearBox() {
-        return gearBox;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setGearBox(OGearBox gearBox) {
-        this.gearBox = gearBox;
-        gearBox.setCar(this);
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public OEngine getEngine() {
-        return engine;
-    }
+  public OGearBox getGearBox() {
+    return gearBox;
+  }
 
-    public void setEngine(OEngine engine) {
-        this.engine = engine;
-        engine.setCar(this);
-    }
+  public void setGearBox(OGearBox gearBox) {
+    this.gearBox = gearBox;
+    gearBox.setCar(this);
+  }
+
+  public OEngine getEngine() {
+    return engine;
+  }
+
+  public void setEngine(OEngine engine) {
+    this.engine = engine;
+    engine.setCar(this);
+  }
 }

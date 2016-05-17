@@ -2,12 +2,11 @@ package com.avaje.tests.model.basic;
 
 import com.avaje.ebean.annotation.Cache;
 
-import java.sql.Timestamp;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import java.sql.Timestamp;
 
 @Cache(enableQueryCache = true)
 @Entity

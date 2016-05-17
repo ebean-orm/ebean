@@ -1,9 +1,9 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.Sql;
+
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
-
-import com.avaje.ebean.annotation.Sql;
 
 /**
  * An example of an Aggregate object.
@@ -16,33 +16,33 @@ import com.avaje.ebean.annotation.Sql;
 @Sql
 public class CustomerAggregate {
 
-    @OneToOne
-    Customer customer;
+  @OneToOne
+  Customer customer;
 
-    int totalContacts;
-
-
-    public String toString() {
-        return customer.getId() + " totalContacts:" + totalContacts;
-    }
+  int totalContacts;
 
 
-    public Customer getCustomer() {
-        return customer;
-    }
+  public String toString() {
+    return customer.getId() + " totalContacts:" + totalContacts;
+  }
 
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
+  public Customer getCustomer() {
+    return customer;
+  }
 
 
-    public int getTotalContacts() {
-        return totalContacts;
-    }
+  public void setCustomer(Customer customer) {
+    this.customer = customer;
+  }
 
 
-    public void setTotalContacts(int totalContacts) {
-        this.totalContacts = totalContacts;
-    }
+  public int getTotalContacts() {
+    return totalContacts;
+  }
+
+
+  public void setTotalContacts(int totalContacts) {
+    this.totalContacts = totalContacts;
+  }
 }

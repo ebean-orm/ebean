@@ -1,67 +1,66 @@
 package com.avaje.tests.model.basic;
 
-import java.sql.Timestamp;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Version;
+import java.sql.Timestamp;
 
 @Entity
 public class EBasicClob {
 
-    @Id
-    private Long id;
+  @Id
+  private Long id;
 
-    private String name;
-    
-    private String title;
+  private String name;
 
-    @Lob
-    private String description;
-    
-    @Version
-    private Timestamp lastUpdate;
+  private String title;
 
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
+  @Lob
+  private String description;
 
-    public Long getId() {
-        return id;
-    }
+  @Version
+  private Timestamp lastUpdate;
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
-    public String getName() {
-        return name;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public String getTitle() {
-    	return title;
-    }
+  public String getName() {
+    return name;
+  }
 
-	public void setTitle(String title) {
-    	this.title = title;
-    }
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-	public Timestamp getLastUpdate() {
-    	return lastUpdate;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-	public void setLastUpdate(Timestamp lastUpdate) {
-    	this.lastUpdate = lastUpdate;
-    }
-    
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public Timestamp getLastUpdate() {
+    return lastUpdate;
+  }
+
+  public void setLastUpdate(Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
+
 }

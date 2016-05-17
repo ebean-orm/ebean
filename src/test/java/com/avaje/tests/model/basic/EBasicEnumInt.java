@@ -18,9 +18,11 @@ public class EBasicEnumInt {
     INACTIVE("3");
 
     String value;
+
     Status(String value) {
       this.value = value;
     }
+
     @DbEnumValue(storage = DbEnumType.INTEGER)
     public String getValue() {
       return value;

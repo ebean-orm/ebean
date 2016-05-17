@@ -1,24 +1,23 @@
 package com.avaje.tests.model.basic;
 
-import java.net.InetAddress;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import java.net.InetAddress;
 
 @Entity
-@Table(name="e_withinet")
+@Table(name = "e_withinet")
 public class EWithInetAddr {
 
   @Id
   Long id;
-  
+
   @Version
   Long version;
-  
+
   String name;
-  
+
   InetAddress inetAddress;
 
   public Long getId() {
@@ -52,5 +51,5 @@ public class EWithInetAddr {
   public void setInetAddress(InetAddress inetAddress) {
     this.inetAddress = inetAddress;
   }
-  
+
 }

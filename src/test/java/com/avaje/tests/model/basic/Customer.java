@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Cache(enableQueryCache = true)
 @DocStore
-@ChangeLog(inserts = ChangeLogInsertMode.EXCLUDE, updatesThatInclude = {"name","status"})
+@ChangeLog(inserts = ChangeLogInsertMode.EXCLUDE, updatesThatInclude = {"name", "status"})
 @Entity
 @Table(name = "o_customer")
 @DbComment("Holds external customers")
@@ -48,6 +48,7 @@ public class Customer extends BasicDomain {
     INACTIVE("I");
 
     String dbValue;
+
     Status(String dbValue) {
       this.dbValue = dbValue;
     }
@@ -79,14 +80,14 @@ public class Customer extends BasicDomain {
   String smallnote;
 
   @DbComment("Join date of the customer")
-  @NotNull(groups = { ValidationGroupSomething.class })
+  @NotNull(groups = {ValidationGroupSomething.class})
   Date anniversary;
 
-  @DocEmbedded(doc="*,country(*)")
+  @DocEmbedded(doc = "*,country(*)")
   @ManyToOne(cascade = CascadeType.ALL)
   Address billingAddress;
 
-  @DocEmbedded(doc="*,country(*)")
+  @DocEmbedded(doc = "*,country(*)")
   @ManyToOne(cascade = CascadeType.ALL)
   Address shippingAddress;
 

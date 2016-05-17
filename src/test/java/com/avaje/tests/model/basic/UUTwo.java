@@ -1,45 +1,44 @@
 package com.avaje.tests.model.basic;
 
-import java.util.UUID;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import java.util.UUID;
 
 @Entity
 public class UUTwo {
 
-    @Id
-    UUID id;
-    
-    String name;
+  @Id
+  UUID id;
 
-    @ManyToOne(cascade=CascadeType.PERSIST)
-    UUOne master;
-    
-    public UUID getId() {
-        return id;
-    }
+  String name;
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+  @ManyToOne(cascade = CascadeType.PERSIST)
+  UUOne master;
 
-    public String getName() {
-        return name;
-    }
+  public UUID getId() {
+    return id;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setId(UUID id) {
+    this.id = id;
+  }
 
-    public UUOne getMaster() {
-        return master;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setMaster(UUOne master) {
-        this.master = master;
-    }
-    
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public UUOne getMaster() {
+    return master;
+  }
+
+  public void setMaster(UUOne master) {
+    this.master = master;
+  }
+
 }

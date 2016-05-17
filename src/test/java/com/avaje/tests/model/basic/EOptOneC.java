@@ -5,16 +5,16 @@ import javax.persistence.Entity;
 @Entity
 public class EOptOneC extends BasicDomain {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    String nameForC;
+  String nameForC;
 
-    public String getNameForC() {
-        return nameForC;
-    }
+  public String getNameForC() {
+    return nameForC;
+  }
 
-    public void setNameForC(String nameForA) {
-        this.nameForC = nameForA;
-    }
-    
+  public void setNameForC(String nameForA) {
+    this.nameForC = nameForA;
+  }
+
 }

@@ -9,29 +9,29 @@ import javax.persistence.Inheritance;
 
 @Entity
 @Inheritance
-@DiscriminatorColumn(name="my_type",length=3,discriminatorType=DiscriminatorType.INTEGER)
+@DiscriminatorColumn(name = "my_type", length = 3, discriminatorType = DiscriminatorType.INTEGER)
 @DiscriminatorValue("1")
 public class TIntRoot {
 
-	@Id
-	Integer id;
-	
-	String name;
+  @Id
+  Integer id;
 
-	public Integer getId() {
-		return id;
-	}
+  String name;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  public Integer getId() {
+    return id;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
 }

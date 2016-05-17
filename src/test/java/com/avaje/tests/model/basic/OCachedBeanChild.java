@@ -1,11 +1,11 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.Cache;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import com.avaje.ebean.annotation.Cache;
 
 /**
  * Cached bean for testing caching implementation, especially relations.
@@ -15,25 +15,25 @@ import com.avaje.ebean.annotation.Cache;
 @Table(name = "o_cached_bean_child")
 public class OCachedBeanChild {
 
-    @Id
-    Long id;
+  @Id
+  Long id;
 
-    @ManyToOne
-    OCachedBean cachedBean;
+  @ManyToOne
+  OCachedBean cachedBean;
 
-    public Long getId() {
-        return id;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public OCachedBean getCachedBean() {
-        return cachedBean;
-    }
+  public OCachedBean getCachedBean() {
+    return cachedBean;
+  }
 
-    public void setCachedBean(OCachedBean cachedBean) {
-        this.cachedBean = cachedBean;
-    }
+  public void setCachedBean(OCachedBean cachedBean) {
+    this.cachedBean = cachedBean;
+  }
 }

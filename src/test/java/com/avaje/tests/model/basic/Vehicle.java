@@ -1,46 +1,45 @@
 package com.avaje.tests.model.basic;
 
-import java.util.Date;
-
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
+import java.util.Date;
 
 @Entity
 @Inheritance
 @DiscriminatorColumn(length = 3)
 public abstract class Vehicle extends BasicDomain {
 
-    private static final long serialVersionUID = -3060920549470002030L;
+  private static final long serialVersionUID = -3060920549470002030L;
 
-    private String licenseNumber;
+  private String licenseNumber;
 
-    private Date registrationDate;
+  private Date registrationDate;
 
-    // @Transient
-    private transient String testTransient;
+  // @Transient
+  private transient String testTransient;
 
-    public String getLicenseNumber() {
-        return licenseNumber;
-    }
+  public String getLicenseNumber() {
+    return licenseNumber;
+  }
 
-    public void setLicenseNumber(String licenseNumber) {
-        this.licenseNumber = licenseNumber;
-    }
+  public void setLicenseNumber(String licenseNumber) {
+    this.licenseNumber = licenseNumber;
+  }
 
-    public Date getRegistrationDate() {
-        return registrationDate;
-    }
+  public Date getRegistrationDate() {
+    return registrationDate;
+  }
 
-    public void setRegistrationDate(Date registrationDate) {
-        this.registrationDate = registrationDate;
-    }
+  public void setRegistrationDate(Date registrationDate) {
+    this.registrationDate = registrationDate;
+  }
 
-    public String getTestTransient() {
-        return testTransient;
-    }
+  public String getTestTransient() {
+    return testTransient;
+  }
 
-    public void setTestTransient(String testTransient) {
-        this.testTransient = testTransient;
-    }
+  public void setTestTransient(String testTransient) {
+    this.testTransient = testTransient;
+  }
 }

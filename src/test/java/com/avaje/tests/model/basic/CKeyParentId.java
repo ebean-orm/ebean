@@ -5,48 +5,52 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class CKeyParentId {
 
-	Integer oneKey;
-	String twoKey;
-	
-	public CKeyParentId() {
-		
-	}
-	public CKeyParentId(Integer oneKey, String twoKey){
-		this.oneKey = oneKey;
-		this.twoKey = twoKey;
-	}
-	
-	public Integer getOneKey() {
-		return oneKey;
-	}
-	public void setOneKey(Integer oneKey) {
-		this.oneKey = oneKey;
-	}
-	public String getTwoKey() {
-		return twoKey;
-	}
-	public void setTwoKey(String twoKey) {
-		this.twoKey = twoKey;
-	}
+  Integer oneKey;
+  String twoKey;
 
-	@Override
-    public boolean equals(Object o) {
-        if (this == o){
-            return true;
-        }
-        if (!(o instanceof CKeyParentId)){
-            return false;
-        }
+  public CKeyParentId() {
 
-        CKeyParentId otherKey = (CKeyParentId) o;
-        return otherKey.hashCode() == hashCode();
+  }
+
+  public CKeyParentId(Integer oneKey, String twoKey) {
+    this.oneKey = oneKey;
+    this.twoKey = twoKey;
+  }
+
+  public Integer getOneKey() {
+    return oneKey;
+  }
+
+  public void setOneKey(Integer oneKey) {
+    this.oneKey = oneKey;
+  }
+
+  public String getTwoKey() {
+    return twoKey;
+  }
+
+  public void setTwoKey(String twoKey) {
+    this.twoKey = twoKey;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof CKeyParentId)) {
+      return false;
     }
 
-    @Override
-    public int hashCode(){
-        int hc = getClass().getName().hashCode();
-        hc = 31 * hc + oneKey;
-        hc = 31 * hc + twoKey.hashCode();
-        return hc;
-    }
+    CKeyParentId otherKey = (CKeyParentId) o;
+    return otherKey.hashCode() == hashCode();
+  }
+
+  @Override
+  public int hashCode() {
+    int hc = getClass().getName().hashCode();
+    hc = 31 * hc + oneKey;
+    hc = 31 * hc + twoKey.hashCode();
+    return hc;
+  }
 }

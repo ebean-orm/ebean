@@ -7,38 +7,42 @@ import javax.persistence.OneToOne;
 
 @Entity
 public class PersistentFileContent extends BasicDomain {
-	
-	private static final long serialVersionUID = 1L;
 
-	/** The persistent file. */
-	@OneToOne(cascade=CascadeType.ALL)
-	private PersistentFile persistentFile;
+  private static final long serialVersionUID = 1L;
 
-	/** The content. */
-	@Lob
-	private byte[] content;
+  /**
+   * The persistent file.
+   */
+  @OneToOne(cascade = CascadeType.ALL)
+  private PersistentFile persistentFile;
 
-	public PersistentFileContent(){
-	}
+  /**
+   * The content.
+   */
+  @Lob
+  private byte[] content;
 
-	public PersistentFileContent(byte[] content) {
-		super();
-		this.content = content;
-	}
+  public PersistentFileContent() {
+  }
 
-	public PersistentFile getPersistentFile() {
-		return persistentFile;
-	}
+  public PersistentFileContent(byte[] content) {
+    super();
+    this.content = content;
+  }
 
-	public void setPersistentFile(PersistentFile persistentFile) {
-		this.persistentFile = persistentFile;
-	}
+  public PersistentFile getPersistentFile() {
+    return persistentFile;
+  }
 
-	public byte[] getContent() {
-		return content;
-	}
+  public void setPersistentFile(PersistentFile persistentFile) {
+    this.persistentFile = persistentFile;
+  }
 
-	public void setContent(byte[] content) {
-		this.content = content;
-	}
+  public byte[] getContent() {
+    return content;
+  }
+
+  public void setContent(byte[] content) {
+    this.content = content;
+  }
 }

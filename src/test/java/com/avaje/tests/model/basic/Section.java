@@ -1,82 +1,81 @@
 package com.avaje.tests.model.basic;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.avaje.ebean.annotation.Cache;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
-import com.avaje.ebean.annotation.Cache;
+import java.util.ArrayList;
+import java.util.List;
 
 @Cache
 @Entity
 public class Section extends BasicDomain {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public enum Type {
-        GENERAL,
-        NOTE
-    }
-    
-    @ManyToOne
-    Article article;
-    
-    Type type = Type.GENERAL;
-    
-    @Lob
-    String content;
-    
-    @OneToMany(cascade=CascadeType.ALL)
-    List<SubSection> subSections;
+  public enum Type {
+    GENERAL,
+    NOTE
+  }
 
-    public Section() {
-    }
+  @ManyToOne
+  Article article;
 
-    public Section(String content) {
-        this.content = content;
-    }
-    
-    public Type getType() {
-        return type;
-    }
+  Type type = Type.GENERAL;
 
-    public void setType(Type type) {
-        this.type = type;
-    }
+  @Lob
+  String content;
 
-    public String getContent() {
-        return content;
-    }
+  @OneToMany(cascade = CascadeType.ALL)
+  List<SubSection> subSections;
 
-    public void setContent(String content) {
-        this.content = content;
-    }
+  public Section() {
+  }
 
-    public Article getArticle() {
-        return article;
-    }
+  public Section(String content) {
+    this.content = content;
+  }
 
-    public void setArticle(Article article) {
-        this.article = article;
-    }
+  public Type getType() {
+    return type;
+  }
 
-    public List<SubSection> getSubSections() {
-        return subSections;
-    }
+  public void setType(Type type) {
+    this.type = type;
+  }
 
-    public void setSubSections(List<SubSection> subSections) {
-        this.subSections = subSections;
+  public String getContent() {
+    return content;
+  }
+
+  public void setContent(String content) {
+    this.content = content;
+  }
+
+  public Article getArticle() {
+    return article;
+  }
+
+  public void setArticle(Article article) {
+    this.article = article;
+  }
+
+  public List<SubSection> getSubSections() {
+    return subSections;
+  }
+
+  public void setSubSections(List<SubSection> subSections) {
+    this.subSections = subSections;
+  }
+
+  public void addSubSection(SubSection s) {
+    if (subSections == null) {
+      subSections = new ArrayList<SubSection>();
     }
-    
-    public void addSubSection(SubSection s){
-        if (subSections == null){
-            subSections = new ArrayList<SubSection>();
-        }
-        subSections.add(s);
-    }
-    
+    subSections.add(s);
+  }
+
 }

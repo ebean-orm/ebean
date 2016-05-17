@@ -1,16 +1,15 @@
 package com.avaje.tests.model.basic;
 
-import java.sql.Date;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import java.sql.Date;
 
 @Entity
 @DiscriminatorValue("DOG")
 public class Dog extends Animal {
 
   String registrationNumber;
-  
+
   Date dateOfBirth;
 
   public String getRegistrationNumber() {
@@ -28,5 +27,5 @@ public class Dog extends Animal {
   public void setDateOfBirth(Date dateOfBirth) {
     this.dateOfBirth = dateOfBirth;
   }
-  
+
 }

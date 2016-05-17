@@ -1,18 +1,17 @@
 package com.avaje.tests.model.basic;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
+import com.avaje.ebean.annotation.Cache;
+import com.avaje.ebean.annotation.CacheQueryTuning;
+import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.DocStore;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.constraints.Size;
-
-import com.avaje.ebean.annotation.CacheQueryTuning;
-import com.avaje.ebean.annotation.Cache;
-import com.avaje.ebean.annotation.CreatedTimestamp;
-import com.avaje.ebean.annotation.DocStore;
+import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
  * Product entity bean.

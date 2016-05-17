@@ -1,32 +1,31 @@
 package com.avaje.tests.model.basic;
 
-import java.util.UUID;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.UUID;
 
 @Entity
 public class TUuidEntity {
 
-	@Id
-	private UUID id;
-	
-	private String name;
+  @Id
+  private UUID id;
 
-	public UUID getId() {
-		return id;
-	}
+  private String name;
 
-	public void setId(UUID id) {
-		this.id = id;
-	}
+  public UUID getId() {
+    return id;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public void setId(UUID id) {
+    this.id = id;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
 }

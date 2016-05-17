@@ -7,12 +7,12 @@ import javax.persistence.Id;
 @Entity
 public class SomeEnumBean {
 
-  @Id 
+  @Id
   Long id;
-  
+
   @Enumerated
   SomeEnum someEnum;
-  
+
   String name;
 
   public Long getId() {
@@ -38,5 +38,5 @@ public class SomeEnumBean {
   public void setName(String name) {
     this.name = name;
   }
-  
+
 }

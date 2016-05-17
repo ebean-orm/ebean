@@ -1,13 +1,12 @@
 package com.avaje.tests.model.basic;
 
-import java.sql.Timestamp;
-
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Version;
+import java.sql.Timestamp;
 
 @Entity
 public class EBasicClobFetchEager {

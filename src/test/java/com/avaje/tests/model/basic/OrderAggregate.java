@@ -1,9 +1,9 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.Sql;
+
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
-
-import com.avaje.ebean.annotation.Sql;
 
 /**
  * An example of an Aggregate object.
@@ -16,38 +16,38 @@ import com.avaje.ebean.annotation.Sql;
 @Sql
 public class OrderAggregate {
 
-    @OneToOne
-    Order order;
+  @OneToOne
+  Order order;
 
-    Double totalAmount;
+  Double totalAmount;
 
-    Double totalItems;
+  Double totalItems;
 
-    public String toString() {
-        return order.getId() + " totalAmount:" + totalAmount + " totalItems:" + totalItems;
-    }
+  public String toString() {
+    return order.getId() + " totalAmount:" + totalAmount + " totalItems:" + totalItems;
+  }
 
-    public Order getOrder() {
-        return order;
-    }
+  public Order getOrder() {
+    return order;
+  }
 
-    public void setOrder(Order order) {
-        this.order = order;
-    }
+  public void setOrder(Order order) {
+    this.order = order;
+  }
 
-    public Double getTotalAmount() {
-        return totalAmount;
-    }
+  public Double getTotalAmount() {
+    return totalAmount;
+  }
 
-    public void setTotalAmount(Double totalAmount) {
-        this.totalAmount = totalAmount;
-    }
+  public void setTotalAmount(Double totalAmount) {
+    this.totalAmount = totalAmount;
+  }
 
-    public Double getTotalItems() {
-        return totalItems;
-    }
+  public Double getTotalItems() {
+    return totalItems;
+  }
 
-    public void setTotalItems(Double totalItems) {
-        this.totalItems = totalItems;
-    }
+  public void setTotalItems(Double totalItems) {
+    this.totalItems = totalItems;
+  }
 }

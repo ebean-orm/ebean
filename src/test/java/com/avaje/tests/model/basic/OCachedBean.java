@@ -1,7 +1,6 @@
 package com.avaje.tests.model.basic;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.avaje.ebean.annotation.Cache;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -9,8 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import com.avaje.ebean.annotation.Cache;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Cached bean for testing caching implementation.

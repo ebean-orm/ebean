@@ -1,21 +1,21 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.Cache;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.avaje.ebean.annotation.Cache;
-
 @Cache(readOnly = true)
 @Entity
-@Table(name="feature_desc")
-public class FeatureDescription  {
+@Table(name = "feature_desc")
+public class FeatureDescription {
 
   @Id
   private Integer id;
-  
+
   private String name;
-  
+
   private String description;
 
   public Integer getId() {

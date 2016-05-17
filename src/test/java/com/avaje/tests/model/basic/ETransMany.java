@@ -1,44 +1,43 @@
 package com.avaje.tests.model.basic;
 
-import java.util.Map;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Transient;
+import java.util.Map;
 
 @Entity
 public class ETransMany {
 
-    @Id
-    Integer id;
-    
-    String name;
-    
-    @Transient
-    Map<String,String> transMap;
+  @Id
+  Integer id;
 
-    public Integer getId() {
-        return id;
-    }
+  String name;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  @Transient
+  Map<String, String> transMap;
 
-    public String getName() {
-        return name;
-    }
+  public Integer getId() {
+    return id;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-    public Map<String, String> getTransMap() {
-        return transMap;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setTransMap(Map<String, String> transMap) {
-        this.transMap = transMap;
-    }
-    
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public Map<String, String> getTransMap() {
+    return transMap;
+  }
+
+  public void setTransMap(Map<String, String> transMap) {
+    this.transMap = transMap;
+  }
+
 }

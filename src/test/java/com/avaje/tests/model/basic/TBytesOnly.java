@@ -9,27 +9,27 @@ import javax.persistence.Lob;
 @Entity
 public class TBytesOnly {
 
-	@Id
-	Integer id;
-	
-	@Lob
-	@Basic(fetch=FetchType.EAGER)
-	byte[] content;
+  @Id
+  Integer id;
 
-	public Integer getId() {
-		return id;
-	}
+  @Lob
+  @Basic(fetch = FetchType.EAGER)
+  byte[] content;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  public Integer getId() {
+    return id;
+  }
 
-	public byte[] getContent() {
-		return content;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public void setContent(byte[] content) {
-		this.content = content;
-	}
-	
+  public byte[] getContent() {
+    return content;
+  }
+
+  public void setContent(byte[] content) {
+    this.content = content;
+  }
+
 }

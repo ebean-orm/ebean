@@ -1,7 +1,5 @@
 package com.avaje.tests.model.basic;
 
-import java.io.Serializable;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,49 +10,50 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @Entity(name = "Phone")
 @Table(name = "PHONES")
 public class Phone implements Serializable {
 
-    private static final long serialVersionUID = -326610269092956952L;
+  private static final long serialVersionUID = -326610269092956952L;
 
-    private Long id;
-    private String phoneNumber;
-    private Person person;
+  private Long id;
+  private String phoneNumber;
+  private Person person;
 
-    public Phone() {
-    }
+  public Phone() {
+  }
 
-    @Id
-    @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
-    @Column(name = "ID", unique = true, nullable = false)
-    public Long getId() {
-        return id;
-    }
+  @Id
+  @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
+  @Column(name = "ID", unique = true, nullable = false)
+  public Long getId() {
+    return id;
+  }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    @Column(name = "PHONE_NUMBER", nullable = false, unique = true, columnDefinition = "varchar(7)")
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
+  @Column(name = "PHONE_NUMBER", nullable = false, unique = true, columnDefinition = "varchar(7)")
+  public String getPhoneNumber() {
+    return phoneNumber;
+  }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
+  public void setPhoneNumber(String phoneNumber) {
+    this.phoneNumber = phoneNumber;
+  }
 
-    @NotNull
-    @ManyToOne(targetEntity = Person.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "PERSON_ID", nullable = false)
-    public Person getPerson() {
-        return person;
-    }
+  @NotNull
+  @ManyToOne(targetEntity = Person.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JoinColumn(name = "PERSON_ID", nullable = false)
+  public Person getPerson() {
+    return person;
+  }
 
-    public void setPerson(Person person) {
-        this.person = person;
-    }
+  public void setPerson(Person person) {
+    this.person = person;
+  }
 
 }

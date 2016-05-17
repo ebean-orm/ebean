@@ -12,62 +12,63 @@ import javax.persistence.Table;
 @Table(name = "ts_detail_two")
 public class TSDetailTwo {
 
-	@Id
-	Integer id;
+  @Id
+  Integer id;
 
-	String name;
+  String name;
 
-	String description;
+  String description;
 
-	boolean active;
-	
-	@ManyToOne
-	TSMasterTwo master;
+  boolean active;
 
-	public TSDetailTwo(String name){
-		this.name = name;
-	}
-	
-	public TSDetailTwo() {
-		
-	}
-	public Integer getId() {
-		return id;
-	}
+  @ManyToOne
+  TSMasterTwo master;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  public TSDetailTwo(String name) {
+    this.name = name;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public TSDetailTwo() {
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  }
 
-	public String getDescription() {
-		return description;
-	}
+  public Integer getId() {
+    return id;
+  }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public boolean isActive() {
-		return active;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public void setActive(boolean active) {
-		this.active = active;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public TSMasterTwo getMaster() {
-		return master;
-	}
+  public String getDescription() {
+    return description;
+  }
 
-	public void setMaster(TSMasterTwo master) {
-		this.master = master;
-	}	
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
+  public TSMasterTwo getMaster() {
+    return master;
+  }
+
+  public void setMaster(TSMasterTwo master) {
+    this.master = master;
+  }
 }

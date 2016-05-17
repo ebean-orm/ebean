@@ -14,64 +14,65 @@ import javax.persistence.Table;
 @Table(name = "t_detail_with_other_namexxxyy")
 public class TSDetail {
 
-	
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "t_atable_detail_seq")
-	@Id
-	Integer id;
 
-	String name;
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "t_atable_detail_seq")
+  @Id
+  Integer id;
 
-	String description;
+  String name;
 
-	boolean active;
-	
-	@ManyToOne
-	TSMaster master;
+  String description;
 
-	public TSDetail(String name){
-		this.name = name;
-	}
-	
-	public TSDetail() {
-		
-	}
-	public Integer getId() {
-		return id;
-	}
+  boolean active;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  @ManyToOne
+  TSMaster master;
 
-	public String getName() {
-		return name;
-	}
+  public TSDetail(String name) {
+    this.name = name;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public TSDetail() {
 
-	public String getDescription() {
-		return description;
-	}
+  }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+  public Integer getId() {
+    return id;
+  }
 
-	public boolean isActive() {
-		return active;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public void setActive(boolean active) {
-		this.active = active;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public TSMaster getMaster() {
-		return master;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public void setMaster(TSMaster master) {
-		this.master = master;
-	}	
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
+  public TSMaster getMaster() {
+    return master;
+  }
+
+  public void setMaster(TSMaster master) {
+    this.master = master;
+  }
 }

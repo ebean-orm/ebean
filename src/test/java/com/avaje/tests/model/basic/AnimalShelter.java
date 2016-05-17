@@ -1,27 +1,26 @@
 package com.avaje.tests.model.basic;
 
-import java.util.List;
+import com.avaje.ebean.annotation.PrivateOwned;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
-
-import com.avaje.ebean.annotation.PrivateOwned;
+import java.util.List;
 
 @Entity
 public class AnimalShelter {
 
   @Id
   Long id;
-  
+
   @Version
   Long version;
-  
+
   String name;
-  
-  @OneToMany(cascade=CascadeType.PERSIST, mappedBy="shelter")
+
+  @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "shelter")
   @PrivateOwned
   List<Animal> animals;
 
@@ -56,5 +55,5 @@ public class AnimalShelter {
   public void setAnimals(List<Animal> animals) {
     this.animals = animals;
   }
-  
+
 }

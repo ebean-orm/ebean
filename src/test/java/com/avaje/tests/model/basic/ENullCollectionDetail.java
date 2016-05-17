@@ -6,28 +6,28 @@ import javax.persistence.Id;
 @Entity
 public class ENullCollectionDetail {
 
-    @Id
-    Integer id;
-    
-    String something;
-    
-    public ENullCollectionDetail() {
-    }
+  @Id
+  Integer id;
 
-    public Integer getId() {
-        return id;
-    }
+  String something;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  public ENullCollectionDetail() {
+  }
 
-    public String getSomething() {
-        return something;
-    }
+  public Integer getId() {
+    return id;
+  }
 
-    public void setSomething(String something) {
-        this.something = something;
-    }
-    
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public String getSomething() {
+    return something;
+  }
+
+  public void setSomething(String something) {
+    this.something = something;
+  }
+
 }

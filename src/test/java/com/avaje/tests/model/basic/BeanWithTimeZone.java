@@ -1,18 +1,17 @@
 package com.avaje.tests.model.basic;
 
-import java.util.TimeZone;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.TimeZone;
 
 @Entity
 public class BeanWithTimeZone {
 
-  @Id 
+  @Id
   Long id;
-  
+
   String name;
-  
+
   TimeZone timezone;
 
   public Long getId() {
@@ -38,5 +37,5 @@ public class BeanWithTimeZone {
   public void setTimezone(TimeZone timezone) {
     this.timezone = timezone;
   }
-  
+
 }

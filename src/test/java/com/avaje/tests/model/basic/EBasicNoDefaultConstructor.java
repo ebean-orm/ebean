@@ -8,33 +8,33 @@ import javax.persistence.Table;
 @Table(name = "e_basic_ndc")
 public class EBasicNoDefaultConstructor {
 
-    @Id
-    Integer id;
+  @Id
+  Integer id;
 
-    String name;
+  String name;
 
-    public EBasicNoDefaultConstructor() {
-    }
-    
-    public EBasicNoDefaultConstructor(Integer id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+  public EBasicNoDefaultConstructor() {
+  }
 
-    public Integer getId() {
-        return id;
-    }
+  public EBasicNoDefaultConstructor(Integer id, String name) {
+    this.id = id;
+    this.name = name;
+  }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  public Integer getId() {
+    return id;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
 
 }

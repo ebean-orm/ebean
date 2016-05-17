@@ -9,16 +9,16 @@ import javax.persistence.Inheritance;
 @DiscriminatorValue("2")
 public class TIntChild extends TIntRoot {
 
-	private static final long serialVersionUID = 1L;
-	
-	String childProperty;
+  private static final long serialVersionUID = 1L;
 
-	public String getChildProperty() {
-		return childProperty;
-	}
+  String childProperty;
 
-	public void setChildProperty(String childProperty) {
-		this.childProperty = childProperty;
-	}
-	
+  public String getChildProperty() {
+    return childProperty;
+  }
+
+  public void setChildProperty(String childProperty) {
+    this.childProperty = childProperty;
+  }
+
 }

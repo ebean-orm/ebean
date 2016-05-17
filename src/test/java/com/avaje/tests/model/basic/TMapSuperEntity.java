@@ -1,37 +1,37 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.UpdateMode;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.avaje.ebean.annotation.UpdateMode;
-
 @Entity
-@Table(name="t_mapsuper1")
-@UpdateMode(updateChangesOnly=true)
+@Table(name = "t_mapsuper1")
+@UpdateMode(updateChangesOnly = true)
 public class TMapSuperEntity extends TMappedSuper2 {
 
-	private static final long serialVersionUID = 1L;
-	
-	@Id
-	Integer id;
-	
-	String name;
+  private static final long serialVersionUID = 1L;
 
-	public Integer getId() {
-		return id;
-	}
+  @Id
+  Integer id;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  String name;
 
-	public String getName() {
-		return name;
-	}
+  public Integer getId() {
+    return id;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
 
 }

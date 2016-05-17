@@ -8,50 +8,50 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="non_updateprop")
+@Table(name = "non_updateprop")
 public class MNonUpdPropEntity {
 
-    @Id
-    Integer id;
-    
-    @Enumerated(EnumType.STRING)
-    MNonEnum nonEnum;
-    
-    @Column(updatable=false)
-    String name;
-    
-    String note;
+  @Id
+  Integer id;
 
-    public Integer getId() {
-        return id;
-    }
+  @Enumerated(EnumType.STRING)
+  MNonEnum nonEnum;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  @Column(updatable = false)
+  String name;
 
-    public String getName() {
-        return name;
-    }
+  String note;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public Integer getId() {
+    return id;
+  }
 
-    public String getNote() {
-        return note;
-    }
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-    public void setNote(String note) {
-        this.note = note;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public MNonEnum getNonEnum() {
-        return nonEnum;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setNonEnum(MNonEnum nonEnum) {
-        this.nonEnum = nonEnum;
-    }
-    
+  public String getNote() {
+    return note;
+  }
+
+  public void setNote(String note) {
+    this.note = note;
+  }
+
+  public MNonEnum getNonEnum() {
+    return nonEnum;
+  }
+
+  public void setNonEnum(MNonEnum nonEnum) {
+    this.nonEnum = nonEnum;
+  }
+
 }

@@ -1,13 +1,12 @@
 package com.avaje.tests.model.basic;
 
-import java.sql.Timestamp;
+import com.avaje.ebean.annotation.EnumValue;
+import com.avaje.ebean.annotation.Index;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.avaje.ebean.annotation.EnumValue;
-import com.avaje.ebean.annotation.Index;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "e_basic")

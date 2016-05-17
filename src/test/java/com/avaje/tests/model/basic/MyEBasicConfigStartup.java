@@ -1,11 +1,14 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.event.AbstractBeanPersistListener;
+import com.avaje.ebean.event.BulkTableEvent;
+import com.avaje.ebean.event.BulkTableEventListener;
+import com.avaje.ebean.event.ServerConfigStartup;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
-
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.event.*;
 
 public class MyEBasicConfigStartup implements ServerConfigStartup {
 
@@ -52,19 +55,19 @@ public class MyEBasicConfigStartup implements ServerConfigStartup {
 
     public boolean inserted(Object bean) {
       insertCount.incrementAndGet();
-      System.out.println("-- EBasic inserted " + ((EBasic)bean).getId());
+      System.out.println("-- EBasic inserted " + ((EBasic) bean).getId());
       return false;
     }
 
     public boolean updated(Object bean, Set<String> updatedProperties) {
       updateCount.incrementAndGet();
-      System.out.println("-- EBasic updated " + ((EBasic)bean).getId()+" updatedProperties: "+updatedProperties);
+      System.out.println("-- EBasic updated " + ((EBasic) bean).getId() + " updatedProperties: " + updatedProperties);
       return false;
     }
 
     public boolean deleted(Object bean) {
       deleteCount.incrementAndGet();
-      System.out.println("-- EBasic deleted " + ((EBasic)bean).getId());
+      System.out.println("-- EBasic deleted " + ((EBasic) bean).getId());
       return false;
     }
 

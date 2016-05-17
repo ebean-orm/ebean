@@ -6,9 +6,9 @@ import javax.persistence.Entity;
 @Entity
 @DiscriminatorValue("CAT")
 public class Cat extends Animal {
-  
+
   String name;
-  
+
   public String getName() {
     return name;
   }
@@ -16,5 +16,5 @@ public class Cat extends Animal {
   public void setName(String name) {
     this.name = name;
   }
-  
+
 }

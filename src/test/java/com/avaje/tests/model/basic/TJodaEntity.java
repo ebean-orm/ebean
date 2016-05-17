@@ -1,32 +1,32 @@
 package com.avaje.tests.model.basic;
 
+import org.joda.time.LocalTime;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
-
-import org.joda.time.LocalTime;
 
 @Entity
 public class TJodaEntity {
 
-	@Id 
-	Integer id;
-	
-	LocalTime localTime;
+  @Id
+  Integer id;
 
-	public Integer getId() {
-		return id;
-	}
+  LocalTime localTime;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  public Integer getId() {
+    return id;
+  }
 
-	public LocalTime getLocalTime() {
-		return localTime;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public void setLocalTime(LocalTime localTime) {
-		this.localTime = localTime;
-	}
+  public LocalTime getLocalTime() {
+    return localTime;
+  }
+
+  public void setLocalTime(LocalTime localTime) {
+    this.localTime = localTime;
+  }
 
 }

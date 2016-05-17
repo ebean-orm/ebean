@@ -7,43 +7,43 @@ import javax.persistence.ManyToOne;
 @Entity
 public class ContactNote extends BasicDomain {
 
-    private static final long serialVersionUID = 7949702621226333278L;
+  private static final long serialVersionUID = 7949702621226333278L;
 
-    @ManyToOne
-    Contact contact;
-    
-    String title;
-    
-    @Lob
-    String note;
+  @ManyToOne
+  Contact contact;
 
-    public ContactNote(String title, String note) {
-        this.title = title;
-        this.note = note;
-    }
+  String title;
 
-    public String getTitle() {
-        return title;
-    }
+  @Lob
+  String note;
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+  public ContactNote(String title, String note) {
+    this.title = title;
+    this.note = note;
+  }
 
-    public String getNote() {
-        return note;
-    }
+  public String getTitle() {
+    return title;
+  }
 
-    public void setNote(String note) {
-        this.note = note;
-    }
+  public void setTitle(String title) {
+    this.title = title;
+  }
 
-    public Contact getContact() {
-        return contact;
-    }
+  public String getNote() {
+    return note;
+  }
 
-    public void setContact(Contact contact) {
-        this.contact = contact;
-    }    
-        
+  public void setNote(String note) {
+    this.note = note;
+  }
+
+  public Contact getContact() {
+    return contact;
+  }
+
+  public void setContact(Contact contact) {
+    this.contact = contact;
+  }
+
 }

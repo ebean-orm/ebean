@@ -1,21 +1,20 @@
 package com.avaje.tests.model.basic;
 
-import java.sql.Timestamp;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
+import java.sql.Timestamp;
 
 @Entity
 public class BWithQIdent {
 
   @Id
   Integer id;
-  
-  @Column(name="`Name`", unique=true)
+
+  @Column(name = "`Name`", unique = true)
   String name;
-  
+
   @Version
   Timestamp lastUpdated;
 
@@ -42,5 +41,5 @@ public class BWithQIdent {
   public void setLastUpdated(Timestamp lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
-  
+
 }

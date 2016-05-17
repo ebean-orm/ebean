@@ -1,61 +1,60 @@
 package com.avaje.tests.model.basic;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
+import com.avaje.ebean.annotation.WhenCreated;
+import com.avaje.ebean.annotation.WhenModified;
 
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
-
-import com.avaje.ebean.annotation.WhenCreated;
-import com.avaje.ebean.annotation.WhenModified;
+import java.io.Serializable;
+import java.sql.Timestamp;
 
 @MappedSuperclass
 public class BasicDomain implements Serializable {
 
-	private static final long serialVersionUID = 5569496199004449769L;
+  private static final long serialVersionUID = 5569496199004449769L;
 
-	@Id
-	Integer id;
+  @Id
+  Integer id;
 
-	@WhenCreated
-	Timestamp cretime;
-	
-	@WhenModified
-	Timestamp updtime;
+  @WhenCreated
+  Timestamp cretime;
 
-	@Version
-	Long version;
+  @WhenModified
+  Timestamp updtime;
 
-	public Integer getId() {
-		return id;
-	}
+  @Version
+  Long version;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  public Integer getId() {
+    return id;
+  }
 
-	public Timestamp getUpdtime() {
-		return updtime;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public void setUpdtime(Timestamp updtime) {
-		this.updtime = updtime;
-	}
+  public Timestamp getUpdtime() {
+    return updtime;
+  }
 
-	public Timestamp getCretime() {
-		return cretime;
-	}
+  public void setUpdtime(Timestamp updtime) {
+    this.updtime = updtime;
+  }
 
-	public void setCretime(Timestamp cretime) {
-		this.cretime = cretime;
-	}
+  public Timestamp getCretime() {
+    return cretime;
+  }
 
-	public Long getVersion() {
-		return version;
-	}
+  public void setCretime(Timestamp cretime) {
+    this.cretime = cretime;
+  }
 
-	public void setVersion(Long version) {
-		this.version = version;
-	}
+  public Long getVersion() {
+    return version;
+  }
+
+  public void setVersion(Long version) {
+    this.version = version;
+  }
 }

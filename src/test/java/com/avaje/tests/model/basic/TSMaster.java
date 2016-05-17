@@ -1,7 +1,6 @@
 package com.avaje.tests.model.basic;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.avaje.ebean.annotation.PrivateOwned;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -10,8 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import com.avaje.ebean.annotation.PrivateOwned;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A basic entity to test simple things.
@@ -20,65 +19,65 @@ import com.avaje.ebean.annotation.PrivateOwned;
 @Table(name = "t_atable_thatisrelatively")
 public class TSMaster {
 
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "t_atable_master_seq")
-	@Id
-	Integer id;
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "t_atable_master_seq")
+  @Id
+  Integer id;
 
-	String name;
+  String name;
 
-	String description;
+  String description;
 
-	boolean active;
-	
-	@OneToMany(cascade=CascadeType.ALL,mappedBy="master")
-	@PrivateOwned
-	List<TSDetail> details;
+  boolean active;
 
-	public Integer getId() {
-		return id;
-	}
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "master")
+  @PrivateOwned
+  List<TSDetail> details;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  public Integer getId() {
+    return id;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public String getDescription() {
-		return description;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+  public String getDescription() {
+    return description;
+  }
 
-	public boolean isActive() {
-		return active;
-	}
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-	public void setActive(boolean active) {
-		this.active = active;
-	}
+  public boolean isActive() {
+    return active;
+  }
 
-	public List<TSDetail> getDetails() {
-		return details;
-	}
+  public void setActive(boolean active) {
+    this.active = active;
+  }
 
-	public void setDetails(List<TSDetail> details) {
-		this.details = details;
-	}
-	
-	public void addDetail(TSDetail detail) {
-		if (details == null){
-			details = new ArrayList<TSDetail>();
-		}
-		details.add(detail);
-	}
-	
+  public List<TSDetail> getDetails() {
+    return details;
+  }
+
+  public void setDetails(List<TSDetail> details) {
+    this.details = details;
+  }
+
+  public void addDetail(TSDetail detail) {
+    if (details == null) {
+      details = new ArrayList<TSDetail>();
+    }
+    details.add(detail);
+  }
+
 }

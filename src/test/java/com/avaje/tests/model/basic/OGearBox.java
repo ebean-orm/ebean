@@ -1,73 +1,72 @@
 package com.avaje.tests.model.basic;
 
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Version;
+import java.util.UUID;
 
 @Entity
 public class OGearBox {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	private UUID id;
+  @Id
+  private UUID id;
 
-	private String boxDesc;
+  private String boxDesc;
 
-	@Column(name="box_size")
-	private Integer size;
-	
-	@Version
-	private Integer version;
-	
-	@OneToOne
-	private OCar car;
-	
-	public OGearBox() {
-	}
+  @Column(name = "box_size")
+  private Integer size;
 
-    public UUID getId() {
-        return id;
-    }
+  @Version
+  private Integer version;
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+  @OneToOne
+  private OCar car;
 
-    public String getBoxDesc() {
-        return boxDesc;
-    }
+  public OGearBox() {
+  }
 
-    public void setBoxDesc(String boxDesc) {
-        this.boxDesc = boxDesc;
-    }
+  public UUID getId() {
+    return id;
+  }
 
-    public Integer getSize() {
-        return size;
-    }
+  public void setId(UUID id) {
+    this.id = id;
+  }
 
-    public void setSize(Integer size) {
-        this.size = size;
-    }
+  public String getBoxDesc() {
+    return boxDesc;
+  }
 
-    public OCar getCar() {
-        return car;
-    }
+  public void setBoxDesc(String boxDesc) {
+    this.boxDesc = boxDesc;
+  }
 
-    public void setCar(OCar car) {
-        this.car = car;
-    }
+  public Integer getSize() {
+    return size;
+  }
 
-    public Integer getVersion() {
-        return version;
-    }
+  public void setSize(Integer size) {
+    this.size = size;
+  }
 
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
+  public OCar getCar() {
+    return car;
+  }
+
+  public void setCar(OCar car) {
+    this.car = car;
+  }
+
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
 
 }

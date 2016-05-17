@@ -6,72 +6,72 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 @Entity
-@Table(name="ut_detail")
+@Table(name = "ut_detail")
 public class UTDetail {
 
-    @Id
-    Integer id;
-    
-    String name;
-    
-    Integer qty;
-    
-    Double amount;
-    
-    @Version
-    Integer version;
+  @Id
+  Integer id;
 
-    public UTDetail() {
-    }
-    
-    public UTDetail(String name, Integer qty, Double amount) {
-        this.name = name;
-        this.qty = qty;
-        this.amount = amount;
-    }
-    
-    public String toString() {
-      return id+" name:"+name+" qty:"+qty+" amt:"+amount;
-    }
-    
-    public Integer getId() {
-        return id;
-    }
+  String name;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+  Integer qty;
 
-    public String getName() {
-        return name;
-    }
+  Double amount;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  @Version
+  Integer version;
 
-    public Integer getQty() {
-        return qty;
-    }
+  public UTDetail() {
+  }
 
-    public void setQty(Integer qty) {
-        this.qty = qty;
-    }
+  public UTDetail(String name, Integer qty, Double amount) {
+    this.name = name;
+    this.qty = qty;
+    this.amount = amount;
+  }
 
-    public Double getAmount() {
-        return amount;
-    }
+  public String toString() {
+    return id + " name:" + name + " qty:" + qty + " amt:" + amount;
+  }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
+  public Integer getId() {
+    return id;
+  }
 
-    public Integer getVersion() {
-        return version;
-    }
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
-    
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public Integer getQty() {
+    return qty;
+  }
+
+  public void setQty(Integer qty) {
+    this.qty = qty;
+  }
+
+  public Double getAmount() {
+    return amount;
+  }
+
+  public void setAmount(Double amount) {
+    this.amount = amount;
+  }
+
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
 }

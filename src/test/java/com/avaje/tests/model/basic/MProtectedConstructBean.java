@@ -8,14 +8,14 @@ public class MProtectedConstructBean {
 
   @Id
   Long id;
-  
+
   String name;
-  
+
 //  private MProtectedConstructBean() {
 //    
 //  }
-  
-  public MProtectedConstructBean(String name){
+
+  public MProtectedConstructBean(String name) {
     this.name = name;
   }
 
@@ -34,5 +34,5 @@ public class MProtectedConstructBean {
   public void setName(String name) {
     this.name = name;
   }
-  
+
 }

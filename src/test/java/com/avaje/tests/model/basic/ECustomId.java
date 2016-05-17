@@ -7,7 +7,8 @@ import javax.persistence.Id;
 @Entity
 public class ECustomId {
 
-  @Id @GeneratedValue(generator = "shortUid")
+  @Id
+  @GeneratedValue(generator = "shortUid")
   String id;
 
   String name;

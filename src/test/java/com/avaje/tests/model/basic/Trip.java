@@ -1,56 +1,55 @@
 package com.avaje.tests.model.basic;
 
-import java.util.Date;
-
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import java.util.Date;
 
 @Entity
 public class Trip extends BasicDomain {
-	
-    private static final long serialVersionUID = 1L;
 
-    @ManyToOne
-	private VehicleDriver vehicleDriver;
-	
-	private String destination;
-	
-	@ManyToOne
-	private Address address;
-	
-	private Date starDate;
+  private static final long serialVersionUID = 1L;
 
-	public VehicleDriver getVehicleDriver() {
-		return vehicleDriver;
-	}
+  @ManyToOne
+  private VehicleDriver vehicleDriver;
 
-	public void setVehicleDriver(VehicleDriver vehicleDriver) {
-		this.vehicleDriver = vehicleDriver;
-	}
+  private String destination;
 
-	public String getDestination() {
-		return destination;
-	}
+  @ManyToOne
+  private Address address;
 
-	public void setDestination(String destination) {
-		this.destination = destination;
-	}
+  private Date starDate;
 
-	public Address getAddress() {
-		return address;
-	}
+  public VehicleDriver getVehicleDriver() {
+    return vehicleDriver;
+  }
 
-	public void setAddress(Address address) {
-		this.address = address;
-	}
+  public void setVehicleDriver(VehicleDriver vehicleDriver) {
+    this.vehicleDriver = vehicleDriver;
+  }
 
-	public Date getStarDate() {
-		return starDate;
-	}
+  public String getDestination() {
+    return destination;
+  }
 
-	public void setStarDate(Date starDate) {
-		this.starDate = starDate;
-	}
-	
-	
+  public void setDestination(String destination) {
+    this.destination = destination;
+  }
+
+  public Address getAddress() {
+    return address;
+  }
+
+  public void setAddress(Address address) {
+    this.address = address;
+  }
+
+  public Date getStarDate() {
+    return starDate;
+  }
+
+  public void setStarDate(Date starDate) {
+    this.starDate = starDate;
+  }
+
+
 }

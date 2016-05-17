@@ -9,48 +9,48 @@ import javax.persistence.ManyToOne;
 @Entity
 public class MyLobSizeJoinMany {
 
-	@Id
-	Integer id;
-	
-	@Basic(fetch=FetchType.LAZY)
-	String something;
-	
-	String other;
-	
-	@ManyToOne
-	MyLobSize parent;
+  @Id
+  Integer id;
 
-	public Integer getId() {
-		return id;
-	}
+  @Basic(fetch = FetchType.LAZY)
+  String something;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  String other;
 
-	public String getSomething() {
-		return something;
-	}
+  @ManyToOne
+  MyLobSize parent;
 
-	public void setSomething(String something) {
-		this.something = something;
-	}
+  public Integer getId() {
+    return id;
+  }
 
-	public String getOther() {
-		return other;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public void setOther(String other) {
-		this.other = other;
-	}
+  public String getSomething() {
+    return something;
+  }
 
-	public MyLobSize getParent() {
-		return parent;
-	}
+  public void setSomething(String something) {
+    this.something = something;
+  }
 
-	public void setParent(MyLobSize parent) {
-		this.parent = parent;
-	}
-	
-	
+  public String getOther() {
+    return other;
+  }
+
+  public void setOther(String other) {
+    this.other = other;
+  }
+
+  public MyLobSize getParent() {
+    return parent;
+  }
+
+  public void setParent(MyLobSize parent) {
+    this.parent = parent;
+  }
+
+
 }

@@ -7,36 +7,36 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class TWithPreInsert {
 
-	@Id
-	private Integer id;
-	
-	@NotNull
-	private String name;
-	
-	private String title;
+  @Id
+  private Integer id;
 
-	public Integer getId() {
-		return id;
-	}
+  @NotNull
+  private String name;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  private String title;
 
-	public String getName() {
-		return name;
-	}
+  public Integer getId() {
+    return id;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public String getTitle() {
-    	return title;
-    }
+  public String getName() {
+    return name;
+  }
 
-	public void setTitle(String title) {
-    	this.title = title;
-    }
-	
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
 }

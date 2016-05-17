@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 
 @Cache(enableQueryCache = true)
 @ReadAudit
-@ChangeLog(updatesThatInclude = {"name","shortDescription"})
+@ChangeLog(updatesThatInclude = {"name", "shortDescription"})
 @Entity
 public class EBasicChangeLog {
 
