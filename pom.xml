@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>avaje-javaparent</artifactId>
@@ -10,7 +11,7 @@
   <groupId>org.avaje.ebeanorm</groupId>
   <artifactId>avaje-ebeanorm-spring</artifactId>
   <name>avaje-ebeanorm-spring</name>
-  <version>6.1.2-SNAPSHOT</version>
+  <version>7.1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <description>Support for Spring transactions and IOC setup of Ebean server config</description>
 
@@ -38,28 +39,41 @@
   <dependencies>
 
     <dependency>
-      <groupId>org.avaje.ebeanorm</groupId>
-      <artifactId>avaje-ebeanorm</artifactId>
-      <version>[6,7)</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>[1.7,)</version>
     </dependency>
 
+    <!-- Provided: Bring in explicitly -->
+    <dependency>
+      <groupId>org.avaje.ebeanorm</groupId>
+      <artifactId>avaje-ebeanorm</artifactId>
+      <version>[6,8)</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Optional: Add to use AgentLoaderSupport -->
     <dependency>
       <groupId>org.avaje.ebeanorm</groupId>
       <artifactId>avaje-ebeanorm-agent</artifactId>
       <version>[4.5,5)</version>
+      <scope>provided</scope>
     </dependency>
 
+    <!-- Optional: Add to use AgentLoaderSupport -->
     <dependency>
       <groupId>org.avaje</groupId>
       <artifactId>avaje-agentloader</artifactId>
       <version>2.1.2</version>
+      <scope>provided</scope>
     </dependency>
 
-    <!-- Spring -->
+    <!-- Provided: Spring, bring in explicitly -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
       <version>${spring.framework.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -114,12 +128,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>1.7.12</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.avaje.composite</groupId>
       <artifactId>avaje-composite-testing-ebean</artifactId>
       <version>4.1</version>
@@ -134,7 +142,7 @@
       <plugin>
         <groupId>org.avaje.ebeanorm</groupId>
         <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
-        <version>4.5.3</version>
+        <version>4.10.1</version>
         <executions>
           <execution>
             <id>main</id>
