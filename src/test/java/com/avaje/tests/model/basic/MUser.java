@@ -1,72 +1,80 @@
 package com.avaje.tests.model.basic;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
-
 @Entity
-@Table(name="muser")
+@Table(name = "muser")
 public class MUser {
 
-	@Id
-	Integer userid;
-	
-	String userName;
+  @Id
+  Integer userid;
 
-	// Cascade remove will delete from intersection table
-	// but will not delete the actual Roles
-	@ManyToMany(mappedBy="users",cascade=CascadeType.ALL)
-	List<MRole> roles;
-	
-	@ManyToOne
-	private MUserType userType;
-	
-    public MUser() {
-        
+  String userName;
+
+  // Cascade remove will delete from intersection table
+  // but will not delete the actual Roles
+  @ManyToMany(mappedBy = "users", cascade = CascadeType.ALL)
+  List<MRole> roles;
+
+  @ManyToOne
+  private MUserType userType;
+
+  public MUser() {
+
+  }
+
+  public MUser(List<MRole> startRoles) {
+    this.roles.addAll(startRoles);
+  }
+
+  public MUser(String userName) {
+    this.userName = userName;
+  }
+
+  public Integer getUserid() {
+    return userid;
+  }
+
+  public void setUserid(Integer userid) {
+    this.userid = userid;
+  }
+
+  public String getUserName() {
+    return userName;
+  }
+
+  public void setUserName(String userName) {
+    this.userName = userName;
+  }
+
+  public List<MRole> getRoles() {
+    return roles;
+  }
+
+  public void setRoles(List<MRole> roles) {
+    this.roles = roles;
+  }
+
+  public void addRole(MRole role) {
+    if (roles == null) {
+      roles = new ArrayList<MRole>();
     }
-    
-    public MUser(String userName) {
-        this.userName = userName;
-    }
-    
-	public Integer getUserid() {
-		return userid;
-	}
+    roles.add(role);
+  }
 
-	public void setUserid(Integer userid) {
-		this.userid = userid;
-	}
+  public MUserType getUserType() {
+    return userType;
+  }
 
-	public String getUserName() {
-		return userName;
-	}
+  public void setUserType(MUserType userType) {
+    this.userType = userType;
+  }
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public List<MRole> getRoles() {
-		return roles;
-	}
-
-	public void setRoles(List<MRole> roles) {
-		this.roles = roles;
-	}
-	
-	public void addRole(MRole role){
-	    if (roles == null){
-	        roles = new ArrayList<MRole>();
-	    }
-	    roles.add(role);
-	}
-
-	public MUserType getUserType() {
-		return userType;
-	}
-	
-	public void setUserType(MUserType userType) {
-		this.userType = userType;
-	}
-	
 }

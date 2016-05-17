@@ -40,6 +40,7 @@ public class LinkQueryPublishTest {
         .findPagedList();
 
     assertThat(pagedList.getTotalRowCount()).isEqualTo(3);
+    assertThat(pagedList.getList()).hasSize(3);
 
 
     Query<Link> pubQuery = server.find(Link.class)
