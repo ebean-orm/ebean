@@ -1,18 +1,17 @@
 package com.avaje.ebeaninternal.server.query;
 
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
+import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
+
+import javax.persistence.PersistenceException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
-
 /**
  * Special Map of the logical property joins to table alias.
- *
- * @author rbygrave
  */
 public class SqlTreeAlias {
 
@@ -61,7 +60,10 @@ public class SqlTreeAlias {
     if (propJoins != null) {
       for (String propJoin : propJoins) {
         ElPropertyDeploy elProp = desc.getElPropertyDeploy(propJoin);
-        if (elProp != null && elProp.getBeanProperty().isEmbedded()) {
+        if (elProp == null) {
+          throw new PersistenceException("Invalid path " + propJoin + " from " + desc.getFullName());
+
+        } else if (elProp.getBeanProperty().isEmbedded()) {
           addEmbeddedPropertyJoin(propJoin);
 
         } else {

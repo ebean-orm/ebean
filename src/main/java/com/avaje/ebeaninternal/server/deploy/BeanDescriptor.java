@@ -1654,7 +1654,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       return assocProp.getTargetDescriptor().getBeanDescriptor(splitBegin[1]);
 
     } else {
-      throw new RuntimeException("Error getting BeanDescriptor for path " + path + " from " + getFullName());
+      throw new PersistenceException("Invalid path " + path + " from " + getFullName());
     }
   }
 

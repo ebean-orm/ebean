@@ -353,7 +353,10 @@ public class OrmQueryDetail implements Serializable {
 
     for (String fetchPath : fetchPaths.keySet()) {
       ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(fetchPath);
-      if (elProp != null && elProp.containsManySince(manyFetchProperty)) {
+      if (elProp == null) {
+        throw new PersistenceException("Invalid fetch path " + fetchPath + " from " + beanDescriptor.getFullName());
+      }
+      if (elProp.containsManySince(manyFetchProperty)) {
 
         // this is a join to a *ToMany
         OrmQueryProperties chunk = fetchPaths.get(fetchPath);
