@@ -3,6 +3,8 @@ package com.avaje.ebean.config;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.config.dbplatform.DbPlatformName;
 import com.avaje.ebean.dbmigration.DbMigration;
+import org.avaje.dbmigration.MigrationConfig;
+import org.avaje.dbmigration.MigrationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -494,4 +496,20 @@ public class DbMigrationConfig {
     return val == null || val.trim().isEmpty();
   }
 
+  /**
+   * Create the MigrationRunner to run migrations if necessary.
+   */
+  public MigrationRunner createRunner(ClassLoader classLoader) {
+
+    MigrationConfig runnerConfig = new MigrationConfig();
+    runnerConfig.setMetaTable(metaTable);
+    runnerConfig.setApplySuffix(applySuffix);
+    runnerConfig.setMigrationPath(migrationPath);
+    runnerConfig.setRunPlaceholderMap(runPlaceholderMap);
+    runnerConfig.setRunPlaceholders(runPlaceholders);
+    runnerConfig.setDbUsername(getDbUser());
+    runnerConfig.setDbPassword(getDbPassword());
+    runnerConfig.setClassLoader(classLoader);
+    return new MigrationRunner(runnerConfig);
+  }
 }

@@ -14,7 +14,6 @@ import com.avaje.ebean.config.EncryptKeyManager;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.dbmigration.DdlGenerator;
-import com.avaje.ebean.dbmigration.MigrationRunner;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
@@ -65,6 +64,7 @@ import com.avaje.ebeaninternal.server.transaction.TransactionScopeManager;
 import com.avaje.ebeaninternal.util.ParamTypeHelper;
 import com.avaje.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import com.avaje.ebeanservice.docstore.api.DocStoreIntegration;
+import org.avaje.dbmigration.MigrationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -344,10 +344,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     DbMigrationConfig migrationConfig = serverConfig.getMigrationConfig();
     if (migrationConfig != null) {
       migrationConfig.generateOnStart(this);
-    }
 
-    if (migrationConfig.isRunMigration()) {
-      new MigrationRunner(this, migrationConfig).run();
+      if (migrationConfig.isRunMigration()) {
+        // classLoader used to load resources
+        ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
+        MigrationRunner runner = migrationConfig.createRunner(classLoader);
+        runner.run(serverConfig.getDataSource());
+      }
     }
   }
 

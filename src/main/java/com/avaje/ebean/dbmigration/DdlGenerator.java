@@ -5,6 +5,7 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.model.CurrentModel;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
+import org.avaje.dbmigration.ddl.DdlRunner;
 
 import javax.persistence.PersistenceException;
 import java.io.File;
