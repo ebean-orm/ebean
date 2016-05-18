@@ -59,6 +59,37 @@ public class MColumnTest {
   }
 
   @Test
+  public void diffNull() throws Exception {
+
+    ModelDiff diff = diff();
+
+    MColumn newCol = basic();
+    newCol.setNotnull(false);
+
+    MColumn baseCol = basic();
+    baseCol.setNotnull(true);
+
+    baseCol.compare(diff, table, newCol);
+
+    assertChanges(diff);
+    AlterColumn alterColumn = getAlterColumn(diff);
+    assertThat(alterColumn.isNotnull()).isEqualTo(false);
+  }
+
+  @Test
+  public void applyNotNull_expect_notNull() throws Exception {
+
+    MColumn newCol = basic();
+    newCol.setNotnull(true);
+
+    AlterColumn alterColumn = new AlterColumn();
+    alterColumn.setNotnull(Boolean.FALSE);
+    newCol.apply(alterColumn);
+
+    assertThat(newCol.isNotnull()).isFalse();
+  }
+
+  @Test
   public void diffCheckAdd() throws Exception {
 
     ModelDiff diff = diff();

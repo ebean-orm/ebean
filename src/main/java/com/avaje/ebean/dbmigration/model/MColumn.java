@@ -268,6 +268,10 @@ public class MColumn {
     return val != null && !val.isEmpty();
   }
 
+  private boolean hasValue(Boolean val) {
+    return val != null;
+  }
+
   private AlterColumn getAlterColumn(String tableName, boolean tableWithHistory) {
     if (alterColumn == null) {
       alterColumn = new AlterColumn();
@@ -395,6 +399,9 @@ public class MColumn {
 
     if (hasValue(alterColumn.getType())) {
       type = alterColumn.getType();
+    }
+    if (hasValue(alterColumn.isNotnull())) {
+      notnull = alterColumn.isNotnull();
     }
     if (hasValue(alterColumn.getDefaultValue())) {
       defaultValue = alterColumn.getDefaultValue();
