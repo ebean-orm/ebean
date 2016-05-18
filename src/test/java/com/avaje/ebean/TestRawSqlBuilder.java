@@ -2,10 +2,12 @@ package com.avaje.ebean;
 
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import com.avaje.tests.model.rawsql.ERawSqlAggBean;
 import org.junit.Test;
 
 import com.avaje.ebean.RawSql.Sql;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -169,6 +171,67 @@ public class TestRawSqlBuilder extends BaseTestCase {
     assertEquals(5, columnMapping.getIndexPosition("details.orderQty"));
     assertEquals(6, columnMapping.getIndexPosition("details.product.id"));
     assertEquals(7, columnMapping.getIndexPosition("details.product.name"));
+
+  }
+
+  @Test
+  public void testWithCoalesceFunction() {
+
+    String rs = "select id, coalesce(status,'E') as status, "+
+        " budgets.amount as  budget," +
+        " COALESCE(month_sums.sum,0.0) as transaction_sum, " +
+        " COALESCE(month_balances.balance,0.0) as balance, " +
+        " COALESCE(month_sums.end_date,date_trunc('month',budgets.month),month_balances.end_date) as data_month"+
+        " from o_order order by id asc";
+
+    RawSqlBuilder builder = RawSqlBuilder.parse(rs);
+
+    RawSql rawSql = builder.create();
+    RawSql.ColumnMapping columnMapping = rawSql.getColumnMapping();
+
+    assertEquals(0, columnMapping.getIndexPosition("id"));
+    assertEquals(1, columnMapping.getIndexPosition("status"));
+    assertEquals(2, columnMapping.getIndexPosition("budget"));
+    assertEquals(3, columnMapping.getIndexPosition("transaction_sum"));
+    assertEquals(4, columnMapping.getIndexPosition("balance"));
+    assertEquals(5, columnMapping.getIndexPosition("data_month"));
+  }
+
+  @Test
+  public void postgres_parse_withDateTruncCaseHaving() {
+
+    if (!isPostgres()) {
+      return;
+    }
+
+    ResetBasicData.reset();
+
+    String sql = "select DATE_TRUNC('DAY', d.order_date) as day," +
+        " count(*) as total," +
+        " sum(case when d.status = 0 then 2 else 3 end) as scheduled," +
+        " sum(case when d.status = 1 then 1 else 0 end) as completed" +
+        " from o_order d" +
+        " group by DATE_TRUNC('DAY', d.order_date)";
+
+    RawSql rawSql = RawSqlBuilder.parse(sql).create();
+
+    RawSql.ColumnMapping columnMapping = rawSql.getColumnMapping();
+
+    assertEquals(0, columnMapping.getIndexPosition("day"));
+    assertEquals(1, columnMapping.getIndexPosition("total"));
+    assertEquals(2, columnMapping.getIndexPosition("scheduled"));
+    assertEquals(3, columnMapping.getIndexPosition("completed"));
+
+    Query<ERawSqlAggBean> query = Ebean.find(ERawSqlAggBean.class)
+        .setRawSql(rawSql)
+        .having().gt("total", 2)
+        .query();
+
+
+    query.findList();
+
+    String fullSql = query.getGeneratedSql();
+    assertThat(fullSql).contains(" having count(*) > ?");
 
   }
 
