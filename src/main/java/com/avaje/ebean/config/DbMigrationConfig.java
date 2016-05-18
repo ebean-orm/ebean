@@ -99,7 +99,7 @@ public class DbMigrationConfig {
   /**
    * DB user used to run the DB migration.
    */
-  protected String dbUser;
+  protected String dbUsername;
 
   /**
    * DB password used to run the DB migration.
@@ -245,14 +245,6 @@ public class DbMigrationConfig {
   }
 
   /**
-   * Set the model, rollback and drop paths to be empty such that all the migration files are generated
-   * into a single directory.
-   */
-  public void singleDirectory() {
-    this.modelPath = "";
-  }
-
-  /**
    * Return the table name that holds the migration run details
    * (used by DB Migration runner only).
    */
@@ -325,22 +317,22 @@ public class DbMigrationConfig {
   }
 
   /**
-   * Return the DB user to use for running DB migrations.
+   * Return the DB username to use for running DB migrations.
    */
-  public String getDbUser() {
+  public String getDbUsername() {
     // environment properties take precedence
     String user = readEnvironment("ddl.migration.user");
     if (user != null) {
       return user;
     }
-    return dbUser;
+    return dbUsername;
   }
 
   /**
-   * Set the DB user to use for running DB migrations.
+   * Set the DB username to use for running DB migrations.
    */
-  public void setDbUser(String dbUser) {
-    this.dbUser = dbUser;
+  public void setDbUsername(String dbUsername) {
+    this.dbUsername = dbUsername;
   }
 
   /**
@@ -367,11 +359,7 @@ public class DbMigrationConfig {
   public void loadSettings(PropertiesWrapper properties, String serverName) {
 
     migrationPath = properties.get("migration.migrationPath", migrationPath);
-    if (properties.getBoolean("migration.singleDirectory", false)) {
-      singleDirectory();
-    } else {
-      modelPath = properties.get("migration.modelPath", modelPath);
-    }
+    modelPath = properties.get("migration.modelPath", modelPath);
     applyPrefix = properties.get("migration.applyPrefix", applyPrefix);
     applySuffix = properties.get("migration.applySuffix", applySuffix);
     modelSuffix = properties.get("migration.modelSuffix", modelSuffix);
@@ -388,9 +376,9 @@ public class DbMigrationConfig {
     metaTable = properties.get("migration.metaTable", metaTable);
     runPlaceholders = properties.get("migration.placeholders", runPlaceholders);
 
-    String adminUser = properties.get("datasource."+serverName+".username", dbUser);
+    String adminUser = properties.get("datasource."+serverName+".username", dbUsername);
     adminUser = properties.get("datasource."+serverName+".adminusername", adminUser);
-    dbUser = properties.get("migration.dbuser", adminUser);
+    dbUsername = properties.get("migration.dbusername", adminUser);
 
     String adminPwd = properties.get("datasource."+serverName+".password", dbPassword);
     adminPwd = properties.get("datasource."+serverName+".adminpassword", adminPwd);
@@ -507,7 +495,7 @@ public class DbMigrationConfig {
     runnerConfig.setMigrationPath(migrationPath);
     runnerConfig.setRunPlaceholderMap(runPlaceholderMap);
     runnerConfig.setRunPlaceholders(runPlaceholders);
-    runnerConfig.setDbUsername(getDbUser());
+    runnerConfig.setDbUsername(getDbUsername());
     runnerConfig.setDbPassword(getDbPassword());
     runnerConfig.setClassLoader(classLoader);
     return new MigrationRunner(runnerConfig);
