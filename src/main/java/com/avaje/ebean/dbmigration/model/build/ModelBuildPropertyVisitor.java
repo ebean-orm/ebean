@@ -11,12 +11,13 @@ import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
 import com.avaje.ebeaninternal.server.deploy.CompoundUniqueConstraint;
+import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.TableJoinColumn;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Used as part of ModelBuildBeanVisitor and generally adds the MColumn to the associated
@@ -249,9 +250,13 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       col.setUnique(determineUniqueConstraintName(col.getName()));
       indexSetAdd(col.getName());
     }
-    String checkConstraint = p.getDbConstraintExpression();
-    if (checkConstraint != null) {
-      col.setCheckConstraint(checkConstraint);
+    Set<String> checkConstraintValues = p.getDbCheckConstraintValues();
+    if (checkConstraintValues != null) {
+      if (beanDescriptor.hasInheritance()) {
+        InheritInfo inheritInfo = beanDescriptor.getInheritInfo();
+        inheritInfo.appendCheckConstraintValues(p.getName(), checkConstraintValues);
+      }
+      col.setCheckConstraint(buildCheckConstraint(p.getDbColumn(), checkConstraintValues));
       col.setCheckConstraintName(determineCheckConstraintName(col.getName()));
     }
 
@@ -268,6 +273,22 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     table.addColumn(col);
 	}
 
+  /**
+   * Build the check constraint clause given the db column and values.
+   */
+  private String buildCheckConstraint(String dbColumn, Set<String> checkConstraintValues) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("check ( ").append(dbColumn).append(" in (");
+    int count = 0;
+    for (String value : checkConstraintValues) {
+      if (count++ > 0) {
+        sb.append(",");
+      }
+      sb.append(value);
+    }
+    sb.append("))");
+    return sb.toString();
+  }
 
   private void indexSetAdd(String column) {
     indexSet.add(column);

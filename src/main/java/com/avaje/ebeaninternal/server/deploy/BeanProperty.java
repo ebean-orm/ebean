@@ -6,11 +6,9 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.DbType;
-import com.avaje.ebeaninternal.api.SpiExpressionRequest;
-import com.avaje.ebeanservice.docstore.api.mapping.DocMappingBuilder;
-import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import com.avaje.ebean.plugin.Property;
 import com.avaje.ebean.text.StringParser;
+import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenCreated;
@@ -28,7 +26,10 @@ import com.avaje.ebeaninternal.server.text.json.WriteJson;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.ScalarTypeBoolean;
+import com.avaje.ebeaninternal.server.type.ScalarTypeEnum;
 import com.avaje.ebeaninternal.util.ValueUtil;
+import com.avaje.ebeanservice.docstore.api.mapping.DocMappingBuilder;
+import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyOptions;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.avaje.ebeanservice.docstore.api.support.DocStructure;
@@ -45,6 +46,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Description of a property of a bean. Includes its deployment information such
@@ -231,11 +233,6 @@ public class BeanProperty implements ElPropertyValue, Property {
    */
   final String dbComment;
 
-  /**
-   * DB Constraint (typically check constraint on enum)
-   */
-  final String dbConstraintExpression;
-
   final DbEncryptFunction dbEncryptFunction;
 
   int deployOrder;
@@ -304,7 +301,6 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbLength = deploy.getDbLength();
     this.dbScale = deploy.getDbScale();
     this.dbColumnDefn = InternString.intern(deploy.getDbColumnDefn());
-    this.dbConstraintExpression = InternString.intern(deploy.getDbConstraintExpression());
     this.dbColumnDefault = deploy.getDbColumnDefault();
 
     this.inherited = false;// deploy.isInherited();
@@ -414,7 +410,6 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.dbLength = source.getDbLength();
     this.dbScale = source.getDbScale();
     this.dbColumnDefn = InternString.intern(source.getDbColumnDefn());
-    this.dbConstraintExpression = InternString.intern(source.getDbConstraintExpression());
     this.dbColumnDefault = source.dbColumnDefault;
 
     this.inherited = source.isInherited();
@@ -977,8 +972,11 @@ public class BeanProperty implements ElPropertyValue, Property {
    * For an Enum returns IN expression for the set of Enum values.
    * </p>
    */
-  public String getDbConstraintExpression() {
-    return dbConstraintExpression;
+  public Set<String> getDbCheckConstraintValues() {
+    if (scalarType instanceof ScalarTypeEnum) {
+      return ((ScalarTypeEnum) scalarType).getDbCheckConstraintValues();
+    }
+    return null;
   }
 
   /**

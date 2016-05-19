@@ -1,5 +1,7 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.DbEnumValue;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -10,7 +12,24 @@ import javax.persistence.ManyToOne;
 @DiscriminatorValue("T")
 public class Truck extends Vehicle {
 
-  private static final long serialVersionUID = 7433386912403859900L;
+  public enum Size {
+    SMALL("S"),
+    MEDIUM("M"),
+    LARGE("L"),
+    HUGE("H");
+
+    String value;
+    Size(String value) {
+      this.value = value;
+    }
+
+    @DbEnumValue
+    public String value() {
+      return value;
+    }
+  }
+
+  private Size size;
 
   @ManyToOne
   TruckRef truckRef;
@@ -33,4 +52,11 @@ public class Truck extends Vehicle {
     this.truckRef = truckRef;
   }
 
+  public Size getSize() {
+    return size;
+  }
+
+  public void setSize(Size size) {
+    this.size = size;
+  }
 }

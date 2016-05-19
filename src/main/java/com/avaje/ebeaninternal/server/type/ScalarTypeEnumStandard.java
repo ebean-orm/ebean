@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.EnumSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * JPA standard based Enum scalar type.
@@ -41,22 +43,17 @@ public class ScalarTypeEnumStandard {
     /**
      * Return the IN values for DB constraint construction.
      */
-    public String getConstraintInValues() {
+    @Override
+    public Set<String> getDbCheckConstraintValues() {
 
-      StringBuilder sb = new StringBuilder();
+      LinkedHashSet<String> values = new LinkedHashSet<String>();
 
-      sb.append("(");
       Object[] ea = enumType.getEnumConstants();
       for (int i = 0; i < ea.length; i++) {
         Enum<?> e = (Enum<?>) ea[i];
-        if (i > 0) {
-          sb.append(",");
-        }
-        sb.append("'").append(e.name()).append("'");
+        values.add("'" + e.name() + "'");
       }
-      sb.append(")");
-
-      return sb.toString();
+      return values;
     }
 
     private int maxValueLength(Class<?> enumType) {
@@ -129,21 +126,15 @@ public class ScalarTypeEnumStandard {
     /**
      * Return the IN values for DB constraint construction.
      */
-    public String getConstraintInValues() {
+    @Override
+    public Set<String> getDbCheckConstraintValues() {
 
-      StringBuilder sb = new StringBuilder();
-
-      sb.append("(");
+      LinkedHashSet<String> values = new LinkedHashSet<String>();
       for (int i = 0; i < enumArray.length; i++) {
         Enum<?> e = (Enum<?>) enumArray[i];
-        if (i > 0) {
-          sb.append(",");
-        }
-        sb.append(e.ordinal());
+        values.add(Integer.toString(e.ordinal()));
       }
-      sb.append(")");
-
-      return sb.toString();
+      return values;
     }
 
     public void bind(DataBind b, Object value) throws SQLException {

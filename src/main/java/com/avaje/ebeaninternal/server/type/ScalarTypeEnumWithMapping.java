@@ -2,6 +2,8 @@ package com.avaje.ebeaninternal.server.type;
 
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Additional control over mapping to DB values.
@@ -35,32 +37,21 @@ public class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase i
   /**
    * Return the IN values for DB constraint construction.
    */
-  public String getConstraintInValues() {
+  @Override
+  public Set<String> getDbCheckConstraintValues() {
 
-    StringBuilder sb = new StringBuilder();
-
-    int i = 0;
-
-    sb.append("(");
+    LinkedHashSet values = new LinkedHashSet();
 
     Iterator<?> it = beanDbMap.dbValues();
     while (it.hasNext()) {
       Object dbValue = it.next();
-      if (i++ > 0) {
-        sb.append(",");
-      }
-      if (!beanDbMap.isIntegerType()) {
-        sb.append("'");
-      }
-      sb.append(dbValue.toString());
-      if (!beanDbMap.isIntegerType()) {
-        sb.append("'");
+      if (beanDbMap.isIntegerType()) {
+        values.add(dbValue.toString());
+      } else {
+        values.add("'" + dbValue.toString() + "'");
       }
     }
-
-    sb.append(")");
-
-    return sb.toString();
+    return values;
   }
 
   /**

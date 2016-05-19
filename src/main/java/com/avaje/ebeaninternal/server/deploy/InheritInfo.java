@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.deploy;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
@@ -86,6 +87,25 @@ public class InheritInfo {
       visitor.visit(child);
       child.visitChildren(visitor);
     }
+  }
+
+  /**
+   * Append check constraint values for the entire inheritance hierarchy.
+   */
+  public void appendCheckConstraintValues(final String propertyName, final Set<String> checkConstraintValues) {
+
+    visitChildren(new InheritInfoVisitor() {
+      @Override
+      public void visit(InheritInfo inheritInfo) {
+        BeanProperty prop = inheritInfo.desc().getBeanProperty(propertyName);
+        if (prop != null) {
+          Set<String> values = prop.getDbCheckConstraintValues();
+          if (values != null) {
+            checkConstraintValues.addAll(values);
+          }
+        }
+      }
+    });
   }
 
   /**

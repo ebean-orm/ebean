@@ -1,5 +1,7 @@
 package com.avaje.tests.model.basic;
 
+import com.avaje.ebean.annotation.DbEnumValue;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -14,7 +16,22 @@ import java.util.Set;
 @DiscriminatorValue("C")
 public class Car extends Vehicle {
 
-  private static final long serialVersionUID = 4716705779684333446L;
+  public enum Size {
+    SMALL("S"),
+    LARGE("L");
+
+    String value;
+    Size(String value) {
+      this.value = value;
+    }
+
+    @DbEnumValue
+    public String value() {
+      return value;
+    }
+  }
+
+  private Size size;
 
   private String driver;
 
@@ -57,5 +74,13 @@ public class Car extends Vehicle {
 
   public void setAccessories(Set<CarAccessory> accessories) {
     this.accessories = accessories;
+  }
+
+  public Size getSize() {
+    return size;
+  }
+
+  public void setSize(Size size) {
+    this.size = size;
   }
 }

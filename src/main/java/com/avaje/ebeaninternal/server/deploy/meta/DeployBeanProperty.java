@@ -393,17 +393,6 @@ public class DeployBeanProperty {
     }
   }
 
-  public String getDbConstraintExpression() {
-    if (scalarType instanceof ScalarTypeEnum) {
-      // create a check constraint for the enum
-      ScalarTypeEnum etype = (ScalarTypeEnum) scalarType;
-
-      // check dbColName IN ('A', 'I', 'D')
-      return "check (" + dbColumn + " in " + etype.getConstraintInValues() + ")";
-    }
-    return null;
-  }
-
   /**
    * Return the scalarType. This returns null for native JDBC types, otherwise
    * it is used to convert between logical types and jdbc types.
