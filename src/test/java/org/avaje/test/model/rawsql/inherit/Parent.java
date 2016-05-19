@@ -13,38 +13,48 @@ import java.util.List;
 
 @Entity
 @Table(name = "rawinherit_parent")
-@Inheritance(strategy= InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="type")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type")
 public abstract class Parent {
 
-    @Id
-    private Long id;
+  @Id
+  private Long id;
 
-    private Integer val;
+  private Integer val;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
-    private List<Data> data = new ArrayList<Data>();
+  private String more;
 
-    protected Parent(Integer val) {
-        this.val = val;
-    }
+  @ManyToMany(cascade = CascadeType.PERSIST)
+  private List<Data> data = new ArrayList<Data>();
 
-    public abstract String getName();
+  protected Parent(Integer val, String more) {
+    this.val = val;
+    this.more = more;
+  }
 
-    public Long getId() {
-        return id;
-    }
+  public abstract String getName();
 
-    public Integer getVal() {
-        return val;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public List<Data> getData() {
-        return data;
-    }
+  public Integer getVal() {
+    return val;
+  }
 
-    public void setData(List<Data> datas) {
-        this.data = datas;
-    }
+  public List<Data> getData() {
+    return data;
+  }
 
+  public void setData(List<Data> datas) {
+    this.data = datas;
+  }
+
+  public String getMore() {
+    return more;
+  }
+
+  public void setMore(String more) {
+    this.more = more;
+  }
 }

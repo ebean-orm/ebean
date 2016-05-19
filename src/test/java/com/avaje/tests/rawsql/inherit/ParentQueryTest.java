@@ -24,15 +24,15 @@ public class ParentQueryTest extends BaseTestCase {
     exampleData.add(new Data(1));
     exampleData.add(new Data(2));
 
-    ChildA a = new ChildA(0);
+    ChildA a = new ChildA(0, "PA");
     a.setData(exampleData);
     Ebean.save(a);
 
-    ChildB b = new ChildB(1);
+    ChildB b = new ChildB(1, "PB");
     b.setData(exampleData);
     Ebean.save(b);
 
-    ChildA c = new ChildA(2);
+    ChildA c = new ChildA(2, "PC");
     c.setData(exampleData);
     Ebean.save(c);
 

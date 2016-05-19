@@ -160,6 +160,10 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
   public void buildRawSqlSelectChain(List<String> selectChain) {
     if (readId) {
+      if (desc.hasInheritance()) {
+        // discriminator column always proceeds id column
+        selectChain.add(getPath(prefix, desc.getInheritInfo().getDiscriminatorColumn()));
+      }
       idBinder.buildRawSqlSelectChain(prefix, selectChain);
     }
     for (int i = 0, x = properties.length; i < x; i++) {

@@ -30,15 +30,15 @@ public class ParentRawSqlTest extends BaseTestCase {
     exampleData.add(new Data(1));
     exampleData.add(new Data(2));
 
-    ChildA a = new ChildA(0);
+    ChildA a = new ChildA(0, "PA");
     a.setData(exampleData);
     Ebean.save(a);
 
-    ChildB b = new ChildB(1);
+    ChildB b = new ChildB(1, "PB");
     b.setData(exampleData);
     Ebean.save(b);
 
-    ChildA c = new ChildA(2);
+    ChildA c = new ChildA(2, "PC");
     c.setData(exampleData);
     Ebean.save(c);
 
@@ -62,15 +62,15 @@ public class ParentRawSqlTest extends BaseTestCase {
     exampleData.add(new Data(1));
     exampleData.add(new Data(2));
 
-    ChildA a = new ChildA(0);
+    ChildA a = new ChildA(0, "PA");
     a.setData(exampleData);
     Ebean.save(a);
 
-    ChildB b = new ChildB(1);
+    ChildB b = new ChildB(1, "PB");
     b.setData(exampleData);
     Ebean.save(b);
 
-    ChildA c = new ChildA(2);
+    ChildA c = new ChildA(2, "PC");
     c.setData(exampleData);
     Ebean.save(c);
 
@@ -80,25 +80,44 @@ public class ParentRawSqlTest extends BaseTestCase {
     Ebean.save(e1);
 
     joinToInheritanceHierarchy_withAliasMapping();
-    joinToInheritanceHierarchy();
+    joinToInheritanceHierarchy_bug416();
+    joinToInheritanceHierarchy_with_queryJoin();
     joinToInheritanceHierarchy_withIgnore();
 
     useColumnMappingIgnore();
-
     useColumnMappingWithDiscriminator();
-
     useExtraColumnMappingIgnore();
   }
 
 
-  private void joinToInheritanceHierarchy() {
+  private void joinToInheritanceHierarchy_bug416() {
+
+    // For bug 416 we need the parent.more to trigger it
 
     RawSql rawSql = RawSqlBuilder
-        .unparsed("select u.id, u.name, p.type as ptype, p.id as pid from rawinherit_uncle u join rawinherit_parent p on p.id = u.parent_id")
+        .unparsed("select u.id, u.name, p.type as p_type, p.id as p_id, p.more as p_more from rawinherit_uncle u join rawinherit_parent p on p.id = u.parent_id")
         .columnMapping("id", "id")
         .columnMapping("name", "name")
-        .columnMapping("ptype", "parent.type")
-        .columnMapping("pid", "parent.id")
+        .columnMapping("p_type", "parent.type")
+        .columnMapping("p_id", "parent.id")
+        .columnMapping("p_more", "parent.more")
+        .create();
+
+    List<EUncle> uncles = Ebean.find(EUncle.class).setRawSql(rawSql).findList();
+
+    assertNotNull(uncles.get(0));
+    Parent parent = uncles.get(0).getParent();
+    assertTrue(parent instanceof ChildB);
+  }
+
+  private void joinToInheritanceHierarchy_with_queryJoin() {
+
+    RawSql rawSql = RawSqlBuilder
+        .unparsed("select u.id, u.name, p.type as p_type, p.id as p_id from rawinherit_uncle u join rawinherit_parent p on p.id = u.parent_id")
+        .columnMapping("id", "id")
+        .columnMapping("name", "name")
+        .columnMapping("p_type", "parent.type")
+        .columnMapping("p_id", "parent.id")
         .create();
 
     List<EUncle> uncles = Ebean.find(EUncle.class).setRawSql(rawSql)

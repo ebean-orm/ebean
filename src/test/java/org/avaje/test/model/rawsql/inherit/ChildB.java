@@ -7,11 +7,11 @@ import javax.persistence.Entity;
 @DiscriminatorValue("B")
 public class ChildB extends Parent {
 
-    public String getName() {
-        return "B Name";
-    }
+  public String getName() {
+    return "B Name";
+  }
 
-    public ChildB(Integer number) {
-        super(number);
-    }
+  public ChildB(Integer number, String more) {
+    super(number, more);
+  }
 }

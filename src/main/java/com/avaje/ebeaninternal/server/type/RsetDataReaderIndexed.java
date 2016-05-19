@@ -4,6 +4,9 @@ import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 
 import java.sql.ResultSet;
 
+/**
+ * A DataReader with indexed positions for the properties to read specifically for RawSql use.
+ */
 public class RsetDataReaderIndexed extends RsetDataReader {
 
   private final int[] rsetIndexPositions;
