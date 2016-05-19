@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
 import java.io.InputStream;
-import java.io.Reader;
 import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.SQLException;

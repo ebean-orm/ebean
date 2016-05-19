@@ -1,15 +1,15 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+
 import java.sql.SQLException;
 import java.sql.Types;
-
-import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 
 /**
  * ScalarType for String.
  */
 public class ScalarTypeClob extends ScalarTypeBaseVarchar<String> {
-  
+
   protected ScalarTypeClob(boolean jdbcNative, int jdbcType) {
     super(String.class, jdbcNative, jdbcType);
   }

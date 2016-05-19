@@ -37,9 +37,9 @@ public interface ArrayElementConverter<T> {
     @Override
     public Long toElement(Object rawValue) {
       if (rawValue instanceof Long) {
-        return (Long)rawValue;
+        return (Long) rawValue;
       } else {
-        return ((Number)rawValue).longValue();
+        return ((Number) rawValue).longValue();
       }
     }
   }
@@ -49,9 +49,9 @@ public interface ArrayElementConverter<T> {
     @Override
     public Integer toElement(Object rawValue) {
       if (rawValue instanceof Integer) {
-        return (Integer)rawValue;
+        return (Integer) rawValue;
       } else {
-        return ((Number)rawValue).intValue();
+        return ((Number) rawValue).intValue();
       }
     }
   }
@@ -72,7 +72,7 @@ public interface ArrayElementConverter<T> {
 
     @Override
     public T toElement(Object rawValue) {
-      return (T)rawValue;
+      return (T) rawValue;
     }
   }
 

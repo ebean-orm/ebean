@@ -1,8 +1,8 @@
 package com.avaje.ebeaninternal.server.type;
 
-import java.net.InetAddress;
-
 import com.avaje.ebean.text.TextException;
+
+import java.net.InetAddress;
 
 /**
  * ScalarType for java.net.URI which converts to and from a VARCHAR database column.

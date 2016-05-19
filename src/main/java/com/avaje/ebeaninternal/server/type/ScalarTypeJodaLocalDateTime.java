@@ -1,12 +1,11 @@
 package com.avaje.ebeaninternal.server.type;
 
-import java.sql.Timestamp;
-import java.sql.Types;
-
 import com.avaje.ebean.config.JsonConfig;
+import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 import org.joda.time.LocalDateTime;
 
-import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import java.sql.Timestamp;
+import java.sql.Types;
 
 /**
  * ScalarType for Joda LocalDateTime. This maps to a JDBC Timestamp.

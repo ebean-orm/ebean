@@ -167,7 +167,7 @@ public class ModifyAwareList<E> implements List<E>, ModifyAwareOwner {
 
   @Override
   public List<E> subList(int fromIndex, int toIndex) {
-    return new ModifyAwareList<E>(owner,list.subList(fromIndex, toIndex));
+    return new ModifyAwareList<E>(owner, list.subList(fromIndex, toIndex));
   }
 
   /**

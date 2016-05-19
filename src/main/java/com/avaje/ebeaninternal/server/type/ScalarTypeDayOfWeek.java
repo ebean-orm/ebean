@@ -31,7 +31,7 @@ public class ScalarTypeDayOfWeek extends ScalarTypeEnumWithMapping {
       b.setNull(Types.INTEGER);
     } else {
       // avoiding the map lookup
-      b.setInt(((DayOfWeek)value).getValue());
+      b.setInt(((DayOfWeek) value).getValue());
     }
   }
 

@@ -45,7 +45,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> {
     if (valueType.equals(String.class)) {
       return STRING;
     }
-    throw new IllegalArgumentException("Type ["+valueType+"] not supported for @DbArray mapping");
+    throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
   }
 
   private final String arrayType;
@@ -67,7 +67,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> {
    * Return the DB column definition for DDL generation.
    */
   public String getDbColumnDefn() {
-    return arrayType+"[]";
+    return arrayType + "[]";
   }
 
   @SuppressWarnings("unchecked")
@@ -86,7 +86,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> {
   @Override
   public List read(DataReader reader) throws SQLException {
     Array array = reader.getArray();
-    return fromArray((Object[])array.getArray());
+    return fromArray((Object[]) array.getArray());
   }
 
   @Override
@@ -112,7 +112,7 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> {
     try {
       return EJson.parseList(value, false);
     } catch (IOException e) {
-      throw new PersistenceException("Failed to parse JSON content as List: ["+value+"]", e);
+      throw new PersistenceException("Failed to parse JSON content as List: [" + value + "]", e);
     }
   }
 

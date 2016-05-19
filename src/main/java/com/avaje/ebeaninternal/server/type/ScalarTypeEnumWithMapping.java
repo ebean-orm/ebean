@@ -1,7 +1,5 @@
 package com.avaje.ebeaninternal.server.type;
 
-import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
-
 import java.sql.SQLException;
 import java.util.Iterator;
 

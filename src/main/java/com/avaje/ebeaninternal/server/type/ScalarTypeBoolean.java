@@ -212,12 +212,12 @@ public class ScalarTypeBoolean {
 
     @Override
     public String getDbFalseLiteral() {
-      return "'"+falseValue+"'";
+      return "'" + falseValue + "'";
     }
 
     @Override
     public String getDbTrueLiteral() {
-      return "'"+trueValue+"'";
+      return "'" + trueValue + "'";
     }
 
     @Override

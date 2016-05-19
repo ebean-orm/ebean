@@ -377,7 +377,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       // fallback to JSON storage in VARCHAR column
       return new ScalarTypeJsonList.Varchar(getDocType(getValueType(genericType)));
     }
-    throw new IllegalStateException("Type ["+type+"] not supported for @DbArray");
+    throw new IllegalStateException("Type [" + type + "] not supported for @DbArray");
   }
 
   @Override
@@ -411,11 +411,16 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     if (type.equals(JsonNode.class)) {
       switch (dbType) {
-        case Types.VARCHAR : return jsonNodeVarchar;
-        case Types.BLOB: return jsonNodeBlob;
-        case Types.CLOB : return jsonNodeClob;
-        case DbType.JSONB: return jsonNodeJsonb;
-        case DbType.JSON: return jsonNodeJson;
+        case Types.VARCHAR:
+          return jsonNodeVarchar;
+        case Types.BLOB:
+          return jsonNodeBlob;
+        case Types.CLOB:
+          return jsonNodeClob;
+        case DbType.JSONB:
+          return jsonNodeJsonb;
+        case DbType.JSON:
+          return jsonNodeJson;
         default:
           return jsonNodeJson;
       }
@@ -520,11 +525,9 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   /**
    * Convert the Object to the required datatype. The
-   * 
-   * @param value
-   *          the Object value
-   * @param toJdbcType
-   *          the type as per java.sql.Types.
+   *
+   * @param value      the Object value
+   * @param toJdbcType the type as per java.sql.Types.
    */
   public Object convert(Object value, int toJdbcType) {
     if (value == null) {
@@ -586,7 +589,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     return createEnumScalarType(enumType, nameValueMap, integerType, 0);
   }
-    
+
   /**
    * Create a ScalarType for an Enum that has additional mapping.
    * <p>
@@ -599,7 +602,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   public ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType) {
 
     Method[] methods = enumType.getMethods();
-    for (int i = 0; i <methods.length; i++) {
+    for (int i = 0; i < methods.length; i++) {
       DbEnumValue dbValue = methods[i].getAnnotation(DbEnumValue.class);
       if (dbValue != null) {
         boolean integerValues = DbEnumType.INTEGER == dbValue.storage();
@@ -628,7 +631,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
         Object value = method.invoke(enumConstants[i]);
         nameValueMap.put(enumConstants[i].name(), value.toString());
       } catch (Exception e) {
-        throw new IllegalArgumentException("Error trying to invoke DbEnumValue method on "+enumConstants[i], e);
+        throw new IllegalArgumentException("Error trying to invoke DbEnumValue method on " + enumConstants[i], e);
       }
     }
     if (nameValueMap.isEmpty()) {
@@ -643,14 +646,14 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * Given the name value mapping and integer/string type and explicit DB column
    * length create the ScalarType for the Enum.
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private ScalarType<?> createEnumScalarType(Class enumType, Map<String, String> nameValueMap, boolean integerType, int dbColumnLength) {
 
     EnumToDbValueMap<?> beanDbMap = EnumToDbValueMap.create(integerType);
 
     int maxValueLen = 0;
 
-    for (Map.Entry<String,String> entry : nameValueMap.entrySet()) {
+    for (Map.Entry<String, String> entry : nameValueMap.entrySet()) {
       String name = entry.getKey();
       String value = entry.getValue();
 
@@ -694,7 +697,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
           try {
             // first try objectMapper constructor
             Constructor<?> constructor = cls.getConstructor(ObjectMapper.class);
-            scalarType = (ScalarType<?>)constructor.newInstance((ObjectMapper)objectMapper);
+            scalarType = (ScalarType<?>) constructor.newInstance((ObjectMapper) objectMapper);
           } catch (NoSuchMethodException e) {
             scalarType = (ScalarType<?>) cls.newInstance();
           }
@@ -720,7 +723,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     return objectMapper;
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected void initialiseScalarConverters(BootupClasses bootupClasses) {
 
     List<Class<?>> foundTypes = bootupClasses.getScalarConverters();
@@ -782,7 +785,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     }
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   protected CtCompoundType createCompoundScalarDataReader(Class<?> compoundTypeClass, CompoundType<?> compoundType, String info) {
 
     CtCompoundType<?> ctCompoundType = compoundTypeMap.get(compoundTypeClass);
@@ -844,7 +847,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
       logger.trace("Registering JsonNode type support");
 
-      ObjectMapper mapper = (ObjectMapper)objectMapper;
+      ObjectMapper mapper = (ObjectMapper) objectMapper;
       jsonNodeClob = new ScalarTypeJsonNode.Clob(mapper);
       jsonNodeBlob = new ScalarTypeJsonNode.Blob(mapper);
       jsonNodeVarchar = new ScalarTypeJsonNode.Varchar(mapper);
@@ -887,10 +890,10 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       createCompoundScalarDataReader(Period.class, new CompoundTypePeriod(), "");
 
       boolean localTimeNanos = config.isLocalTimeWithNanos();
-      typeMap.put(java.time.LocalTime.class, (localTimeNanos)? new ScalarTypeLocalTimeWithNanos() : new ScalarTypeLocalTime());
+      typeMap.put(java.time.LocalTime.class, (localTimeNanos) ? new ScalarTypeLocalTimeWithNanos() : new ScalarTypeLocalTime());
 
       boolean durationNanos = config.isDurationWithNanos();
-      typeMap.put(Duration.class, (durationNanos)? new ScalarTypeDurationWithNanos() : new ScalarTypeDuration());
+      typeMap.put(Duration.class, (durationNanos) ? new ScalarTypeDurationWithNanos() : new ScalarTypeDuration());
     }
   }
 
@@ -921,7 +924,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       }
     }
   }
-	
+
   /**
    * Register all the standard types supported. This is the standard JDBC types
    * plus some other common types such as java.util.Date and java.util.Calendar.

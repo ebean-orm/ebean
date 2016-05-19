@@ -1,9 +1,9 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.text.TextException;
+
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import com.avaje.ebean.text.TextException;
 
 /**
  * ScalarType for java.net.URI which converts to and from a VARCHAR database column.

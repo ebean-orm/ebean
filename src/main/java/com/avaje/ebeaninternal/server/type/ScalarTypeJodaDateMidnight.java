@@ -1,11 +1,10 @@
 package com.avaje.ebeaninternal.server.type;
 
-import java.sql.Date;
-import java.sql.Types;
-
+import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 import org.joda.time.DateMidnight;
 
-import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+import java.sql.Date;
+import java.sql.Types;
 
 /**
  * ScalarType for Joda DateMidnight. This maps to a JDBC Date.

@@ -1,12 +1,12 @@
 package com.avaje.ebeaninternal.server.type;
 
-import java.math.BigInteger;
-import java.sql.Types;
-import java.util.Calendar;
-
 import com.avaje.ebean.config.JsonConfig;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+
+import java.math.BigInteger;
+import java.sql.Types;
+import java.util.Calendar;
 
 /**
  * Helper to create some default ScalarType objects for Booleans,

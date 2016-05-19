@@ -25,8 +25,10 @@ public class ScalarTypeJsonSet {
   public static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docPropertyType) {
     if (postgres) {
       switch (dbType) {
-        case DbType.JSONB: return new ScalarTypeJsonSet.JsonB(docPropertyType);
-        case DbType.JSON: return new ScalarTypeJsonSet.Json(docPropertyType);
+        case DbType.JSONB:
+          return new ScalarTypeJsonSet.JsonB(docPropertyType);
+        case DbType.JSON:
+          return new ScalarTypeJsonSet.Json(docPropertyType);
       }
     }
     return new ScalarTypeJsonSet.Varchar(docPropertyType);
@@ -74,7 +76,7 @@ public class ScalarTypeJsonSet {
         // parse JSON into modifyAware list
         return EJson.parseSet(dataReader.getString(), true);
       } catch (IOException e) {
-        throw new SQLException("Failed to parse JSON content as List: ["+ dataReader.getString() +"]", e);
+        throw new SQLException("Failed to parse JSON content as List: [" + dataReader.getString() + "]", e);
       }
     }
 
@@ -108,7 +110,7 @@ public class ScalarTypeJsonSet {
       try {
         return convertList(EJson.parseList(value));
       } catch (IOException e) {
-        throw new PersistenceException("Failed to parse JSON content as Set: ["+value+"]", e);
+        throw new PersistenceException("Failed to parse JSON content as Set: [" + value + "]", e);
       }
     }
 

@@ -1,9 +1,8 @@
 package com.avaje.ebeaninternal.server.type;
 
+import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.sql.Types;
-
-import javax.persistence.PersistenceException;
 
 /**
  * Used to map enum values to database integer values.

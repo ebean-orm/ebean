@@ -49,12 +49,12 @@ public class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTim
   @Override
   public Object toJdbcType(Object value) {
     if (value instanceof Timestamp) return value;
-    return convertToTimestamp((LocalDateTime)value);
+    return convertToTimestamp((LocalDateTime) value);
   }
 
   @Override
   public LocalDateTime toBeanType(Object value) {
-    if (value instanceof LocalDateTime) return (LocalDateTime)value;
-    return convertFromTimestamp((Timestamp)value);
+    if (value instanceof LocalDateTime) return (LocalDateTime) value;
+    return convertFromTimestamp((Timestamp) value);
   }
 }

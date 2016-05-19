@@ -23,7 +23,7 @@ public class CompoundTypePeriod implements CompoundType<Period> {
 
   @Override
   public Period create(Object[] propertyValues) {
-    return Period.of((Integer)propertyValues[0], (Integer)propertyValues[1], (Integer)propertyValues[2]);
+    return Period.of((Integer) propertyValues[0], (Integer) propertyValues[1], (Integer) propertyValues[2]);
   }
 
   @Override

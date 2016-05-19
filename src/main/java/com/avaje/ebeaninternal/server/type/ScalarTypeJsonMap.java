@@ -35,13 +35,18 @@ public abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
   public static ScalarTypeJsonMap typeFor(boolean postgres, int dbType) {
 
     switch (dbType) {
-      case Types.VARCHAR : return VARCHAR;
-      case Types.BLOB: return BLOB;
-      case Types.CLOB : return CLOB;
-      case DbType.JSONB: return postgres ? JSONB : CLOB;
-      case DbType.JSON: return postgres ? JSON : CLOB;
+      case Types.VARCHAR:
+        return VARCHAR;
+      case Types.BLOB:
+        return BLOB;
+      case Types.CLOB:
+        return CLOB;
+      case DbType.JSONB:
+        return postgres ? JSONB : CLOB;
+      case DbType.JSON:
+        return postgres ? JSON : CLOB;
       default:
-        throw new IllegalStateException("Unknown dbType "+dbType);
+        throw new IllegalStateException("Unknown dbType " + dbType);
     }
   }
 

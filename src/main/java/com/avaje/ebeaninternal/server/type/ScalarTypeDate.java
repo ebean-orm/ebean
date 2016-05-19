@@ -1,10 +1,10 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
+
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Types;
-
-import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 
 /**
  * ScalarType for java.sql.Date.

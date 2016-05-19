@@ -61,7 +61,7 @@ public final class DecimalUtils {
 
   public static BigDecimal toDecimal(Timestamp instant) {
     long millis = instant.getTime();
-    long secs = millis/1000;
+    long secs = millis / 1000;
     return new BigDecimal(toDecimal(secs, instant.getNanos()));
   }
 

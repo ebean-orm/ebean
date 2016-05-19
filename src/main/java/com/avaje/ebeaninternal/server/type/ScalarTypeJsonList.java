@@ -15,15 +15,17 @@ import java.util.List;
 /**
  * Types for mapping List in JSON format to DB types VARCHAR, JSON and JSONB.
  */
-public class ScalarTypeJsonList  {
+public class ScalarTypeJsonList {
   /**
    * Return the appropriate ScalarType based requested dbType and if Postgres.
    */
   public static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docType) {
     if (postgres) {
       switch (dbType) {
-        case DbType.JSONB: return new ScalarTypeJsonList.JsonB(docType);
-        case DbType.JSON: return new ScalarTypeJsonList.Json(docType);
+        case DbType.JSONB:
+          return new ScalarTypeJsonList.JsonB(docType);
+        case DbType.JSON:
+          return new ScalarTypeJsonList.Json(docType);
       }
     }
     return new ScalarTypeJsonList.Varchar(docType);
@@ -71,7 +73,7 @@ public class ScalarTypeJsonList  {
         // parse JSON into modifyAware list
         return EJson.parseList(dataReader.getString(), true);
       } catch (IOException e) {
-        throw new SQLException("Failed to parse JSON content as List: ["+ dataReader.getString() +"]", e);
+        throw new SQLException("Failed to parse JSON content as List: [" + dataReader.getString() + "]", e);
       }
     }
 
@@ -105,7 +107,7 @@ public class ScalarTypeJsonList  {
       try {
         return EJson.parseList(value, false);
       } catch (IOException e) {
-        throw new PersistenceException("Failed to parse JSON content as List: ["+value+"]", e);
+        throw new PersistenceException("Failed to parse JSON content as List: [" + value + "]", e);
       }
     }
 

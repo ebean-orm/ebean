@@ -47,13 +47,13 @@ public class ScalarTypeInstant extends ScalarTypeBaseDateTime<Instant> {
 
   @Override
   public Object toJdbcType(Object value) {
-    if (value instanceof  Timestamp) return value;
+    if (value instanceof Timestamp) return value;
     return convertToTimestamp((Instant) value);
   }
 
   @Override
   public Instant toBeanType(Object value) {
-    if (value instanceof  Instant) return (Instant) value;
+    if (value instanceof Instant) return (Instant) value;
     return convertFromTimestamp((Timestamp) value);
   }
 }

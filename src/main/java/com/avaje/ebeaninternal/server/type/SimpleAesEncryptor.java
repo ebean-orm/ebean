@@ -1,13 +1,12 @@
 package com.avaje.ebeaninternal.server.type;
 
-import java.io.UnsupportedEncodingException;
+import com.avaje.ebean.config.EncryptKey;
+import com.avaje.ebean.config.Encryptor;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-
-import com.avaje.ebean.config.EncryptKey;
-import com.avaje.ebean.config.Encryptor;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Simple AES based encryption and decryption.

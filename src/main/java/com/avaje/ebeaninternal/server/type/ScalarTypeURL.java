@@ -1,9 +1,9 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.text.TextException;
+
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import com.avaje.ebean.text.TextException;
 
 /**
  * ScalarType for java.net.URL which converts to and from a VARCHAR database column.

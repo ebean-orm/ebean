@@ -39,7 +39,7 @@ abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> {
   @Override
   @SuppressWarnings("unchecked")
   public T toBeanType(Object value) {
-    return (T)value;
+    return (T) value;
   }
 
   @Override

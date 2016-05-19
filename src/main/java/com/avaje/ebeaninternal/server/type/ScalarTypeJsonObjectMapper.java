@@ -45,8 +45,10 @@ public class ScalarTypeJsonObjectMapper {
   private static String getPostgresType(boolean postgres, int dbType) {
     if (postgres) {
       switch (dbType) {
-        case DbType.JSON : return PostgresHelper.JSON_TYPE;
-        case DbType.JSONB : return PostgresHelper.JSONB_TYPE;
+        case DbType.JSON:
+          return PostgresHelper.JSON_TYPE;
+        case DbType.JSONB:
+          return PostgresHelper.JSONB_TYPE;
       }
     }
     return null;
