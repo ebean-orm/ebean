@@ -302,12 +302,6 @@ public interface Query<T> {
   Query<T> asDraft();
 
   /**
-   * Deprecated in favour of setIncludeSoftDeletes().
-   */
-  @Deprecated
-  Query<T> includeSoftDeletes();
-
-  /**
    * Cancel the query execution if supported by the underlying database and
    * driver.
    * <p>
