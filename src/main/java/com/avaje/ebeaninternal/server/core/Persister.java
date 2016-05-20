@@ -42,15 +42,6 @@ public interface Persister {
   void saveManyToManyAssociations(EntityBean ownerBean, String propertyName, Transaction t);
 
   /**
-   * Save an association (OneToMany, ManyToOne, OneToOne or ManyToMany).
-   *
-   * @param parentBean   the bean that owns the association.
-   * @param propertyName the name of the property to save.
-   * @param t            the transaction to use.
-   */
-  void saveAssociation(EntityBean parentBean, String propertyName, Transaction t);
-
-  /**
    * Delete the associations of a ManyToMany given the owner bean and the property name of the ManyToMany.
    */
   int deleteManyToManyAssociations(EntityBean ownerBean, String propertyName, Transaction t);

@@ -1086,39 +1086,6 @@ public final class DefaultPersister implements Persister {
     saveAssocManyIntersection(new SaveManyPropRequest(prop, ownerBean, (SpiTransaction) t), false);
   }
 
-  public void saveAssociation(EntityBean parentBean, String propertyName, Transaction t) {
-
-    BeanDescriptor<?> descriptor = beanDescriptorManager.getBeanDescriptor(parentBean.getClass());
-    SpiTransaction trans = (SpiTransaction) t;
-
-    BeanProperty prop = descriptor.getBeanProperty(propertyName);
-    if (prop == null) {
-      String msg = "Could not find property [" + propertyName + "] on bean " + parentBean.getClass();
-      throw new PersistenceException(msg);
-    }
-
-    if (prop instanceof BeanPropertyAssocMany<?>) {
-      BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) prop;
-      saveMany(new SaveManyPropRequest(manyProp, parentBean, (SpiTransaction) t), true);
-
-    } else if (prop instanceof BeanPropertyAssocOne<?>) {
-      BeanPropertyAssocOne<?> oneProp = (BeanPropertyAssocOne<?>) prop;
-      EntityBean assocBean = oneProp.getValueAsEntityBean(parentBean);
-
-      int depth = oneProp.isOneToOneExported() ? 1 : -1;
-      int revertDepth = -1 * depth;
-
-      trans.depth(depth);
-      saveRecurse(assocBean, t, parentBean, true, false);
-      trans.depth(revertDepth);
-
-    } else {
-      String msg = "Expecting [" + prop.getFullBeanName() + "] to be a OneToMany, OneToOne, ManyToOne or ManyToMany property?";
-      throw new PersistenceException(msg);
-    }
-
-  }
-
   /**
    * Save the additions and removals from a ManyToMany collection as inserts
    * and deletes from the intersection table.

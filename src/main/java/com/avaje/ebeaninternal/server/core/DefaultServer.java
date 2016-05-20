@@ -1598,27 +1598,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  public void saveAssociation(Object ownerBean, String propertyName) {
-    saveAssociation(ownerBean, propertyName, null);
-  }
-
-  public void saveAssociation(Object ownerBean, String propertyName, Transaction t) {
-
-    EntityBean owner = checkEntityBean(ownerBean);
-    
-    TransWrapper wrap = initTransIfRequired(t);
-    try {
-      SpiTransaction trans = wrap.transaction;
-      persister.saveAssociation(owner, propertyName, trans);
-
-      wrap.commitIfCreated();
-
-    } catch (RuntimeException e) {
-      wrap.rollbackIfCreated();
-      throw e;
-    }
-  }
-
   @Override
   public int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
     return saveAllInternal(beans.iterator(), transaction);

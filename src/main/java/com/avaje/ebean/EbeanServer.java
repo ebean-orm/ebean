@@ -1488,44 +1488,6 @@ public interface EbeanServer {
   void saveManyToManyAssociations(Object ownerBean, String propertyName, Transaction transaction);
 
   /**
-   * Save the associated collection or bean given the property name.
-   * <p>
-   * This is similar to performing a save cascade on a specific property
-   * manually.
-   * </p>
-   * <p>
-   * Note that you can turn on/off cascading for a transaction via
-   * {@link Transaction#setPersistCascade(boolean)}
-   * </p>
-   * 
-   * @param ownerBean
-   *          the bean instance holding the property we want to save
-   * @param propertyName
-   *          the property we want to save
-   */
-  void saveAssociation(Object ownerBean, String propertyName);
-
-  /**
-   * Save the associated collection or bean given the property name with a
-   * specific transaction.
-   * <p>
-   * This is similar to performing a save cascade on a specific property
-   * manually.
-   * </p>
-   * <p>
-   * Note that you can turn on/off cascading for a transaction via
-   * {@link Transaction#setPersistCascade(boolean)}
-   * </p>
-   * 
-   * @param ownerBean
-   *          the bean instance holding the property we want to save
-   * @param propertyName
-   *          the property we want to save
-   */
-  void saveAssociation(Object ownerBean, String propertyName, Transaction transaction);
-
-
-  /**
    * Execute explicitly passing a transaction.
    */
   int execute(SqlUpdate updSql, Transaction transaction);

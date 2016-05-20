@@ -30,7 +30,7 @@ public class TestM2MDeleteCascadeFromParent extends BaseTestCase {
     b0.save();
 
     c0.getBs().add(b0);
-    Ebean.saveAssociation(c0, "bs");
+    Ebean.save(c0);
 
     SqlQuery sqlQuery = Ebean.createSqlQuery("select count(*) as count from mny_b_mny_c");
     SqlRow unique = sqlQuery.findUnique();

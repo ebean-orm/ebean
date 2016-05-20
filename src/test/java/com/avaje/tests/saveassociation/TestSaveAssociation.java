@@ -21,7 +21,7 @@ public class TestSaveAssociation extends BaseTestCase {
     m0.addDetail(new TSDetail("master1 detail1"));
     m0.addDetail(new TSDetail("master1 detail2"));
 
-    Ebean.saveAssociation(m0, "details");
+    Ebean.save(m0);
 
     TSMaster m0Check = Ebean.find(TSMaster.class).fetch("details").where().idEq(m0.getId())
         .findUnique();

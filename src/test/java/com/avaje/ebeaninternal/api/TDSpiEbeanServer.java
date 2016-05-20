@@ -629,16 +629,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public void saveAssociation(Object ownerBean, String propertyName) {
-
-  }
-
-  @Override
-  public void saveAssociation(Object ownerBean, String propertyName, Transaction t) {
-
-  }
-
-  @Override
   public boolean delete(Object bean, Transaction t) throws OptimisticLockException {
     return false;
   }
