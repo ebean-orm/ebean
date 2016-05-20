@@ -25,8 +25,6 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
 
   private final int maxRows;
 
-  private final int pageIndex;
-
   private final Monitor monitor = new Monitor();
 
   private int foregroundTotalRowCount = -1;
@@ -36,20 +34,6 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
   private List<T> list;
 
   /**
-   * Construct with pageIndex/pageSize.
-   */
-  public LimitOffsetPagedList(EbeanServer server, SpiQuery<T> query, int pageIndex, int pageSize) {
-    this.server = server;
-    this.query = query;
-    this.maxRows = pageSize;
-    this.firstRow = pageIndex * pageSize;
-    this.pageIndex = pageIndex;
-
-    query.setFirstRow(firstRow);
-    query.setMaxRows(pageSize);
-  }
-
-  /**
    * Construct with firstRow/maxRows.
    */
   public LimitOffsetPagedList(EbeanServer server, SpiQuery<T> query) {
@@ -57,7 +41,6 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
     this.query = query;
     this.maxRows = query.getMaxRows();
     this.firstRow = query.getFirstRow();
-    this.pageIndex = 0;
   }
 
   public void loadRowCount() {
@@ -117,10 +100,6 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
 
   public boolean hasPrev() {
     return firstRow > 0;
-  }
-
-  public int getPageIndex() {
-    return pageIndex;
   }
 
   public int getPageSize() {

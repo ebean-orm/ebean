@@ -84,7 +84,7 @@ import java.util.concurrent.Future;
  * @param <T>
  *          the entity bean type
  * 
- * @see Query#findPagedList(int, int)
+ * @see Query#findPagedList()
  */
 public interface PagedList<T> {
 
@@ -180,15 +180,6 @@ public interface PagedList<T> {
    * </p>
    */
   int getTotalPageCount();
-
-  /**
-   * Return the index position of this page. Zero based.
-   * <p>
-   * Note that if firstRows/maxRows is used rather than pageIndex/pageSize then
-   * this always returns 0.
-   * </p>
-   */
-  int getPageIndex();
 
   /**
    * Return the page size used for this query. This is the same value as maxRows used by the query.

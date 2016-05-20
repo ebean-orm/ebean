@@ -90,7 +90,8 @@ public class TestCKeyLazyLoad extends BaseTestCase {
 
     PagedList<CKeyParent> siteUserPage = Ebean.find(CKeyParent.class).where()
         .orderBy("name asc")
-        .findPagedList(0, 10);
+        .setMaxRows(10)
+        .findPagedList();
     siteUserPage.getList();
   }
 }

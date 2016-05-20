@@ -360,11 +360,6 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public PagedList<T> findPagedList(int pageIndex, int pageSize) {
-    return exprList.findPagedList(pageIndex, pageSize);
-  }
-
-  @Override
   public PagedList<T> findPagedList() {
     return exprList.findPagedList();
   }

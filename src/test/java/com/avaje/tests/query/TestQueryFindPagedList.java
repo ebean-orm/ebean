@@ -142,7 +142,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    PagedList<Order> pagedList = Ebean.find(Order.class).findPagedList(0, 4);
+    PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(4).findPagedList();
 
     LoggedSqlCollector.start();
 
@@ -159,7 +159,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    PagedList<Order> pagedList = Ebean.find(Order.class).findPagedList(0, 3);
+    PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(3).findPagedList();
 
     Future<Integer> rowCount = pagedList.getFutureRowCount();
     List<Order> orders = pagedList.getList();
@@ -181,7 +181,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     ResetBasicData.reset();
 
     // fetch less that total orders (page size 3)
-    PagedList<Order> pagedList = Ebean.find(Order.class).findPagedList(0, 3);
+    PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(3).findPagedList();
 
     pagedList.loadRowCount();
     List<Order> orders = pagedList.getList();
@@ -196,7 +196,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    PagedList<Order> pagedList = Ebean.find(Order.class).findPagedList(0, 6);
+    PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(6).findPagedList();
 
     LoggedSqlCollector.start();
 
@@ -237,7 +237,8 @@ public class TestQueryFindPagedList extends BaseTestCase {
     PagedList<Order> pagedList = Ebean.find(Order.class)
         .alias("b")
         .where().raw("b.id > 0")
-        .findPagedList(0, 6);
+        .setMaxRows(6)
+        .findPagedList();
 
     LoggedSqlCollector.start();
 

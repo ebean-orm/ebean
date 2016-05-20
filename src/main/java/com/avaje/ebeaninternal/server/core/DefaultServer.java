@@ -1217,12 +1217,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction, int pageIndex, int pageSize) {
-
-    return new LimitOffsetPagedList<T>(this, (SpiQuery<T>)query, pageIndex, pageSize);
-  }
-
-  @Override
   public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction) {
 
     SpiQuery<T> spiQuery = (SpiQuery<T>)query;

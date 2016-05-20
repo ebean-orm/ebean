@@ -1127,11 +1127,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public PagedList<T> findPagedList(int pageIndex, int pageSize) {
-    return server.findPagedList(this, null, pageIndex, pageSize);
-  }
-
-  @Override
   public PagedList<T> findPagedList() {
     return server.findPagedList(this, null);
   }

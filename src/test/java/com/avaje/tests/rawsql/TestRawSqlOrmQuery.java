@@ -93,7 +93,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     
     int initialRowCount = query.findRowCount();
     
-    PagedList<Customer> page = query.findPagedList(0, 2);
+    PagedList<Customer> page = query.setMaxRows(2).findPagedList();
 
     List<Customer> list = page.getList();
     int rowCount = page.getTotalRowCount();

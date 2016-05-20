@@ -813,52 +813,6 @@ public interface Query<T> {
   FutureList<T> findFutureList();
 
   /**
-   * Return a PagedList for this query using pageIndex and pageSize.
-   * <p>
-   * The benefit of using this over just using the normal {@link Query#setFirstRow(int)} and
-   * {@link Query#setMaxRows(int)} is that it additionally wraps an optional call to
-   * {@link Query#findFutureRowCount()} to determine total row count, total page count etc.
-   * </p>
-   * <p>
-   * Internally this works using {@link Query#setFirstRow(int)} and {@link Query#setMaxRows(int)} on
-   * the query. This translates into SQL that uses limit offset, rownum or row_number function to
-   * limit the result set.
-   * </p>
-   *
-   * <h4>Example: typical use including total row count</h4>
-   * <pre>{@code
-   *
-   *     // We want to find the first 100 new orders
-   *     //  ... 0 means first page
-   *     //  ... page size is 100
-   *
-   *     PagedList<Order> pagedList
-   *       = ebeanServer.find(Order.class)
-   *       .where().eq("status", Order.Status.NEW)
-   *       .order().asc("id")
-   *       .findPagedList(0, 100);
-   *
-   *     // Optional: initiate the loading of the total
-   *     // row count in a background thread
-   *     pagedList.loadRowCount();
-   *
-   *     // fetch and return the list in the foreground thread
-   *     List<Order> orders = pagedList.getList();
-   *
-   *     // get the total row count (from the future)
-   *     int totalRowCount = pagedList.getTotalRowCount();
-   *
-   * }</pre>
-   *
-   * @param pageIndex
-   *          The zero based index of the page.
-   * @param pageSize
-   *          The number of beans to return per page.
-   * @return The PagedList
-   */
-  PagedList<T> findPagedList(int pageIndex, int pageSize);
-
-  /**
    * Return a PagedList for this query using firstRow and maxRows.
    * <p>
    * The benefit of using this over findList() is that it provides functionality to get the

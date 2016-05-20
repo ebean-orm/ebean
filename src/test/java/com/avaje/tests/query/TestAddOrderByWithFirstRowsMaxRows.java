@@ -101,7 +101,8 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     PagedList<Order> pagedList =
         Ebean.find(Order.class)
-        .findPagedList(0, 10);
+          .setMaxRows(10)
+          .findPagedList();
 
     pagedList.getList();
 
@@ -119,7 +120,9 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
     LoggedSqlCollector.start();
 
     Ebean.find(Order.class)
-        .findPagedList(1, 10)
+        .setFirstRow(10)
+        .setMaxRows(10)
+        .findPagedList()
         .getList();
 
     List<String> loggedSql = LoggedSqlCollector.stop();
@@ -138,7 +141,8 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     Ebean.find(Order.class)
         .order().asc("orderDate")
-        .findPagedList(0, 10)
+        .setMaxRows(10)
+        .findPagedList()
         .getList();
 
     List<String> loggedSql = LoggedSqlCollector.stop();
@@ -157,7 +161,8 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
     Ebean.find(Order.class)
         .order().asc("orderDate")
         .order().desc("id")
-        .findPagedList(0, 10)
+        .setMaxRows(10)
+        .findPagedList()
         .getList();
 
     List<String> loggedSql = LoggedSqlCollector.stop();

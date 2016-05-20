@@ -675,16 +675,6 @@ public abstract class Model {
     }
 
     /**
-     * Return a PagedList of all entities of the given type (use where() to specify predicates as
-     * needed).
-     * <p>
-     * Equivalent to {@link Query#findPagedList(int, int)}
-     */
-    public PagedList<T> findPagedList(int pageIndex, int pageSize) {
-      return query().findPagedList(pageIndex, pageSize);
-    }
-
-    /**
      * Executes a find row count query in a background thread.
      * <p>
      * Equivalent to {@link Query#findFutureRowCount()}

@@ -293,11 +293,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public PagedList<T> findPagedList(int pageIndex, int pageSize) {
-    return query.findPagedList(pageIndex, pageSize);
-  }
-
-  @Override
   public PagedList<T> findPagedList() {
     return query.findPagedList();
   }
