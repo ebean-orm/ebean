@@ -466,7 +466,6 @@ public class CQueryEngine {
     }
     msg.append("exeMicros[").append(q.getQueryExecutionTimeMicros());
     msg.append("] rows[").append(q.getLoadedRowDetail());
-    msg.append("] name[").append(q.getName());
     msg.append("] predicates[").append(q.getLogWhereSql());
     msg.append("] bind[").append(q.getBindLog()).append("]");
 

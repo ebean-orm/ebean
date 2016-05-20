@@ -591,13 +591,6 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   }
 
   /**
-   * Return the query name.
-   */
-  public String getName() {
-    return query.getName();
-  }
-
-  /**
    * Return true if this is a raw sql query as opposed to Ebean generated sql.
    */
   public boolean isRawSql() {

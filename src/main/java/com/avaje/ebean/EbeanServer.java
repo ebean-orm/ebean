@@ -180,52 +180,6 @@ public interface EbeanServer {
   <T> CsvReader<T> createCsvReader(Class<T> beanType);
 
   /**
-   * Return a named Query that will have defined fetch paths, predicates etc.
-   * <p>
-   * The query is created from a statement that will be defined in a deployment
-   * orm xml file or NamedQuery annotations. The query will typically already
-   * define fetch paths, predicates, order by clauses etc so often you will just
-   * need to bind required parameters and then execute the query.
-   * </p>
-   *
-   * <pre>{@code
-   *
-   *   // example
-   *   Query<Order> query = ebeanServer.createNamedQuery(Order.class, "new.for.customer");
-   *   query.setParameter("customerId", 23);
-   *   List<Order> newOrders = query.findList();
-   *
-   * }</pre>
-   */
-  <T> Query<T> createNamedQuery(Class<T> beanType, String namedQuery);
-
-  /**
-   * Create a query using the query language.
-   * <p>
-   * Note that you are allowed to add additional clauses using where() as well
-   * as use fetch() and setOrderBy() after the query has been created.
-   * </p>
-   * <p>
-   * Note that this method signature used to map to named queries and that has
-   * moved to {@link #createNamedQuery(Class, String)}.
-   * </p>
-   * 
-   * <pre>{@code
-   *  EbeanServer ebeanServer = ... ;
-   *  String q = "find order fetch details where status = :st";
-   *  
-   *  List<Order> newOrders
-   *        = ebeanServer.createQuery(Order.class, q)
-   *             .setParameter("st", Order.Status.NEW)
-   *             .findList();
-   * }</pre>
-   * 
-   * @param query
-   *          the object query
-   */
-  <T> Query<T> createQuery(Class<T> beanType, String query);
-
-  /**
    * Create a query for an entity bean and synonym for {@link #find(Class)}.
    *
    * @see #find(Class)
@@ -345,62 +299,6 @@ public interface EbeanServer {
   <T> void sort(List<T> list, String sortByClause);
 
   /**
-   * Create a named orm update. The update statement is specified via the
-   * NamedUpdate annotation.
-   * <p>
-   * The orm update differs from the SqlUpdate in that it uses the bean name and
-   * bean property names rather than table and column names.
-   * </p>
-   * <p>
-   * Note that named update statements can be specified in raw sql (with column
-   * and table names) or using bean name and bean property names. This can be
-   * specified with the isSql flag.
-   * </p>
-   * <p>
-   * Example named updates:
-   * </p>
-   *
-   * <pre>{@code
-   *   package app.data;
-   *
-   *   import ...
-   *
-   *   @NamedUpdates(value = {
-   *    @NamedUpdate( name = "setTitle",
-   * 	    isSql = false,
-   * 		  notifyCache = false,
-   * 		  update = "update topic set title = :title, postCount = :postCount where id = :id"),
-   * 	  @NamedUpdate( name = "setPostCount",
-   * 		  notifyCache = false,
-   * 		  update = "update f_topic set post_count = :postCount where id = :id"),
-   * 	  @NamedUpdate( name = "incrementPostCount",
-   * 		  notifyCache = false,
-   * 		  isSql = false,
-   * 		  update = "update Topic set postCount = postCount + 1 where id = :id") })
-   *   @Entity
-   *   @Table(name = "f_topic")
-   *   public class Topic { ...
-   *
-   * }</pre>
-   *
-   * <p>
-   * Example using a named update:
-   * </p>
-   *
-   * <pre>{@code
-   *
-   *   Update<Topic> update = ebeanServer.createNamedUpdate(Topic.class, "setPostCount");
-   *   update.setParameter("postCount", 10);
-   *   update.setParameter("id", 3);
-   *
-   *   int rows = update.execute();
-   *   System.out.println("rows updated: " + rows);
-   *
-   * }</pre>
-   */
-  <T> Update<T> createNamedUpdate(Class<T> beanType, String namedUpdate);
-
-  /**
    * Create a orm update where you will supply the insert/update or delete
    * statement (rather than using a named one that is already defined using the
    * &#064;NamedUpdates annotation).
@@ -442,17 +340,6 @@ public interface EbeanServer {
   SqlQuery createSqlQuery(String sql);
 
   /**
-   * Create a named sql query.
-   * <p>
-   * The query statement will be defined in a deployment orm xml file.
-   * </p>
-   *
-   * @param namedQuery
-   *          the name of the query
-   */
-  SqlQuery createNamedSqlQuery(String namedQuery);
-
-  /**
    * Create a sql update for executing native dml statements.
    * <p>
    * Use this to execute a Insert Update or Delete statement. The statement will
@@ -461,10 +348,6 @@ public interface EbeanServer {
    * <p>
    * See {@link SqlUpdate} for example usage.
    * </p>
-   * <p>
-   * Where possible it would be expected practice to put the statement in a orm
-   * xml file (named update) and use {@link #createNamedSqlUpdate(String)} .
-   * </p>
    */
   SqlUpdate createSqlUpdate(String sql);
 
@@ -472,27 +355,6 @@ public interface EbeanServer {
    * Create a CallableSql to execute a given stored procedure.
    */
   CallableSql createCallableSql(String callableSql);
-
-  /**
-   * Create a named sql update.
-   * <p>
-   * The statement (an Insert Update or Delete statement) will be defined in a
-   * deployment orm xml file.
-   * </p>
-   *
-   * <pre>{@code
-   *
-   *   // Use a namedQuery
-   *   UpdateSql update = Ebean.createNamedSqlUpdate("update.topic.count");
-   *
-   *   update.setParameter("count", 1);
-   *   update.setParameter("topicId", 50);
-   *
-   *   int modifiedCount = update.execute();
-   *
-   * }</pre>
-   */
-  SqlUpdate createNamedSqlUpdate(String namedQuery);
 
   /**
    * Register a TransactionCallback on the currently active transaction.

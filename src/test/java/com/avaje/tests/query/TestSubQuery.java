@@ -30,18 +30,7 @@ public class TestSubQuery extends BaseTestCase {
     Query<Order> sq = Ebean.createQuery(Order.class).select("id").where()
         .in("details.product.id", productIds).query();
 
-    List<Order> list = Ebean.find(Order.class).where().in("id", sq).findList();
-
-    // FIXME: need to clear out old orders..
-    // Assert.assertEquals(2,list.size());
-
-    String oq = " find order (id, status) where id in "
-        + "(select a.id from o_order a join o_order_detail ad on ad.order_id = a.id where ad.product_id in (:prods)) ";
-
-    Ebean.createQuery(Order.class, oq).setParameter("prods", productIds)
-        .findList();
-
-
+    Ebean.find(Order.class).where().in("id", sq).findList();
   }
 
   public void testCompositeKey() {

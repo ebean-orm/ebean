@@ -114,8 +114,7 @@ public class DefaultContainer implements SpiContainer {
       SpiBackgroundExecutor executor = createBackgroundExecutor(serverConfig);
       ServerCacheManager cacheManager = getCacheManager(online, serverConfig, executor);
 
-      XmlConfig xmlConfig = new XmlConfigLoader(null).load();
-      InternalConfiguration c = new InternalConfiguration(xmlConfig, clusterManager, cacheManager, executor, serverConfig, bootupClasses);
+      InternalConfiguration c = new InternalConfiguration(clusterManager, cacheManager, executor, serverConfig, bootupClasses);
 
       DefaultServer server = new DefaultServer(c, cacheManager);
 

@@ -21,14 +21,11 @@ import com.avaje.ebeaninternal.api.SpiQuerySecondary;
 import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import com.avaje.ebeaninternal.server.deploy.DRawSqlSelect;
-import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.expression.DefaultExpressionList;
 import com.avaje.ebeaninternal.server.expression.SimpleExpression;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
 
-import javax.persistence.PersistenceException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -60,11 +57,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   private boolean cancelled;
 
   private CancelableQuery cancelableQuery;
-
-  /**
-   * The name of the query.
-   */
-  private String name;
 
   private Type type;
 
@@ -194,8 +186,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private PersistenceContextScope persistenceContextScope;
 
-  private boolean sqlSelect;
-
   /**
    * Allow for explicit on off or null for default.
    */
@@ -240,47 +230,12 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private boolean useDocStore;
 
-  public DefaultOrmQuery(BeanDescriptor<T> desc, EbeanServer server, ExpressionFactory expressionFactory, String query) {
+  public DefaultOrmQuery(BeanDescriptor<T> desc, EbeanServer server, ExpressionFactory expressionFactory) {
     this.beanDescriptor = desc;
     this.beanType = desc.getBeanType();
     this.server = server;
     this.expressionFactory = expressionFactory;
     this.detail = new OrmQueryDetail();
-    this.name = "";
-    if (query != null) {
-      setQuery(query);
-    }
-  }
-
-  /**
-   * Additional supply a query which is parsed.
-   */
-  public DefaultOrmQuery(BeanDescriptor<T> desc, EbeanServer server, ExpressionFactory expressionFactory,
-                         DeployNamedQuery namedQuery) throws PersistenceException {
-
-    this.beanDescriptor = desc;
-    this.beanType = desc.getBeanType();
-    this.server = server;
-    this.expressionFactory = expressionFactory;
-    this.detail = new OrmQueryDetail();
-    if (namedQuery == null) {
-      this.name = "";
-    } else {
-      this.name = namedQuery.getName();
-      this.sqlSelect = namedQuery.isSqlSelect();
-      if (sqlSelect) {
-        // potentially with where and having clause...
-        DRawSqlSelect sqlSelect = namedQuery.getSqlSelect();
-        additionalWhere = sqlSelect.getWhereClause();
-        additionalHaving = sqlSelect.getHavingClause();
-      } else if (namedQuery.isRawSql()) {
-        rawSql = namedQuery.getRawSql();
-
-      } else {
-        // parse the entire query...
-        setQuery(namedQuery.getQuery());
-      }
-    }
   }
 
   @Override
@@ -290,7 +245,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public boolean isAutoTunable() {
-    return beanDescriptor.isAutoTunable() && !isSqlSelect();
+    return beanDescriptor.isAutoTunable();
   }
 
   @Override
@@ -496,7 +451,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
     if (Mode.LAZYLOAD_MANY.equals(getMode())) {
       return false;
-    } else if (hasMaxRowsOrFirstRow() && !isRawSql() && !isSqlSelect()) {
+    } else if (hasMaxRowsOrFirstRow() && !isRawSql()) {
       return false;
     }
     return true;
@@ -605,8 +560,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public DefaultOrmQuery<T> copy(EbeanServer server) {
 
-    DefaultOrmQuery<T> copy = new DefaultOrmQuery<T>(beanDescriptor, server, expressionFactory, (String) null);
-    copy.name = name;
+    DefaultOrmQuery<T> copy = new DefaultOrmQuery<T>(beanDescriptor, server, expressionFactory);
     copy.includeTableJoin = includeTableJoin;
     copy.profilingListener = profilingListener;
 
@@ -623,7 +577,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.excludeBeanCache = excludeBeanCache;
     copy.useQueryCache = useQueryCache;
     copy.readOnly = readOnly;
-    copy.sqlSelect = sqlSelect;
     if (detail != null) {
       copy.detail = detail.copy();
     }
@@ -744,7 +697,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public Boolean isAutoTune() {
-    return sqlSelect ? Boolean.FALSE : autoTune;
+    return autoTune;
   }
 
   @Override
@@ -946,19 +899,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return new HashQuery(queryPlanKey, hc);
   }
 
-  /**
-   * Return the query name.
-   */
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public boolean isSqlSelect() {
-    return sqlSelect;
-  }
-
   @Override
   public boolean isRawSql() {
     return rawSql != null;
@@ -1064,16 +1004,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     this.timeout = secs;
     return this;
   }
-
-  public void setQuery(String queryString) throws PersistenceException {
-
-    this.query = queryString;
-
-    OrmQueryDetailParser parser = new OrmQueryDetailParser(queryString);
-    parser.parse();
-    parser.assign(this);
-  }
-
 
   protected void setRawWhereClause(String rawWhereClause) {
     this.rawWhereClause = rawWhereClause;

@@ -437,11 +437,6 @@ public interface SpiQuery<T> extends Query<T> {
   void setUsageProfiling(boolean usageProfiling);
 
   /**
-   * Return the query name.
-   */
-  String getName();
-
-  /**
    * Prepare the query which prepares sub-query expressions and calculates
    * and returns the query plan key.
    * <p>
@@ -463,12 +458,6 @@ public interface SpiQuery<T> extends Query<T> {
    * Identifies queries that are exactly the same including bind variables.
    */
   HashQuery queryHash();
-
-  /**
-   * Return true if this is a query based on a SqlSelect rather than
-   * generated.
-   */
-  boolean isSqlSelect();
 
   /**
    * Return true if this is a RawSql query.

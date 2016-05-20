@@ -276,16 +276,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> Query<T> createNamedQuery(Class<T> beanType, String namedQuery) {
-    return null;
-  }
-
-  @Override
-  public <T> Query<T> createQuery(Class<T> beanType, String query) {
-    return null;
-  }
-
-  @Override
   public <T> Query<T> createQuery(Class<T> beanType) {
     return null;
   }
@@ -316,11 +306,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> Update<T> createNamedUpdate(Class<T> beanType, String namedUpdate) {
-    return null;
-  }
-
-  @Override
   public <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate) {
     return null;
   }
@@ -331,22 +316,12 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public SqlQuery createNamedSqlQuery(String namedQuery) {
-    return null;
-  }
-
-  @Override
   public SqlUpdate createSqlUpdate(String sql) {
     return null;
   }
 
   @Override
   public CallableSql createCallableSql(String callableSql) {
-    return null;
-  }
-
-  @Override
-  public SqlUpdate createNamedSqlUpdate(String namedQuery) {
     return null;
   }
 

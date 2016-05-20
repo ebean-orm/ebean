@@ -7,16 +7,12 @@ import com.avaje.ebean.annotation.Draftable;
 import com.avaje.ebean.annotation.DraftableElement;
 import com.avaje.ebean.annotation.History;
 import com.avaje.ebean.annotation.Index;
-import com.avaje.ebean.annotation.NamedUpdate;
-import com.avaje.ebean.annotation.NamedUpdates;
 import com.avaje.ebean.annotation.ReadAudit;
 import com.avaje.ebean.annotation.UpdateMode;
 import com.avaje.ebean.annotation.View;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.CompoundUniqueConstraint;
-import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
-import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +21,6 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -181,53 +175,10 @@ public class AnnotationClass extends AnnotationParser {
       descriptor.setUpdateChangesOnly(updateMode.updateChangesOnly());
     }
 
-    NamedQueries namedQueries = cls.getAnnotation(NamedQueries.class);
-    if (namedQueries != null) {
-      readNamedQueries(namedQueries);
-    }
-    NamedQuery namedQuery = cls.getAnnotation(NamedQuery.class);
-    if (namedQuery != null) {
-      readNamedQuery(namedQuery);
-    }
-
-    NamedUpdates namedUpdates = cls.getAnnotation(NamedUpdates.class);
-    if (namedUpdates != null) {
-      readNamedUpdates(namedUpdates);
-    }
-
-    NamedUpdate namedUpdate = cls.getAnnotation(NamedUpdate.class);
-    if (namedUpdate != null) {
-      readNamedUpdate(namedUpdate);
-    }
-
     Cache cache = cls.getAnnotation(Cache.class);
     if (cache != null && !disableL2Cache) {
       descriptor.setCache(cache);
     }
-  }
-
-  private void readNamedQueries(NamedQueries namedQueries) {
-    NamedQuery[] queries = namedQueries.value();
-    for (int i = 0; i < queries.length; i++) {
-      readNamedQuery(queries[i]);
-    }
-  }
-
-  private void readNamedQuery(NamedQuery namedQuery) {
-    DeployNamedQuery q = new DeployNamedQuery(namedQuery);
-    descriptor.add(q);
-  }
-
-  private void readNamedUpdates(NamedUpdates updates) {
-    NamedUpdate[] updateArray = updates.value();
-    for (int i = 0; i < updateArray.length; i++) {
-      readNamedUpdate(updateArray[i]);
-    }
-  }
-
-  private void readNamedUpdate(NamedUpdate update) {
-    DeployNamedUpdate upd = new DeployNamedUpdate(update);
-    descriptor.add(upd);
   }
 
 }

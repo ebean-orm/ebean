@@ -347,10 +347,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   private final String fullName;
 
-  private final Map<String, DeployNamedQuery> namedQueries;
-
-  private final Map<String, DeployNamedUpdate> namedUpdates;
-
   /**
    * Flag used to determine if saves can be skipped.
    */
@@ -414,9 +410,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.beanType = deploy.getBeanType();
     this.rootBeanType = PersistenceContextUtil.root(beanType);
     this.prototypeEntityBean = createPrototypeEntityBean(beanType);
-    
-    this.namedQueries = deploy.getNamedQueries();
-    this.namedUpdates = deploy.getNamedUpdates();
 
     this.inheritInfo = deploy.getInheritInfo();
 
@@ -702,14 +695,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     } else {
       softDeleteByIdSql = null;
       softDeleteByIdInSql = null;
-    }
-
-    if (!isEmbedded()) {
-      // parse every named update up front into sql dml
-      for (DeployNamedUpdate namedUpdate : namedUpdates.values()) {
-        DeployUpdateParser parser = new DeployUpdateParser(this);
-        namedUpdate.initialise(parser);
-      }
     }
   }
 
@@ -1530,24 +1515,6 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public Object[] getBindIdValues(Object idValue) {
     return idBinder.getBindValues(idValue);
-  }
-
-  /**
-   * Return a named query.
-   */
-  public DeployNamedQuery getNamedQuery(String name) {
-    return namedQueries.get(name);
-  }
-
-  public void addNamedQuery(DeployNamedQuery deployNamedQuery) {
-    namedQueries.put(deployNamedQuery.getName(), deployNamedQuery);
-  }
-
-  /**
-   * Return a named update.
-   */
-  public DeployNamedUpdate getNamedUpdate(String name) {
-    return namedUpdates.get(name);
   }
 
   @Override

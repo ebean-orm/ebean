@@ -38,9 +38,6 @@ import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
-import com.avaje.ebeaninternal.server.deploy.DNativeQuery;
-import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
-import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.el.ElFilter;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
@@ -851,25 +848,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     beanDescriptor.sort(list, sortByClause);
   }
 
-  public <T> Query<T> createQuery(Class<T> beanType) throws PersistenceException {
-    return createQuery(beanType, null);
-  }
-
-  public <T> Query<T> createNamedQuery(Class<T> beanType, String namedQuery) throws PersistenceException {
-
-    BeanDescriptor<T> desc = getBeanDescriptor(beanType);
-    if (desc == null) {
-      throw new PersistenceException("Is " + beanType.getName() + " an Entity Bean? BeanDescriptor not found?");
-    }
-    DeployNamedQuery deployQuery = desc.getNamedQuery(namedQuery);
-    if (deployQuery == null) {
-      throw new PersistenceException("named query " + namedQuery + " was not found for " + desc.getFullName());
-    }
-
-    // this will parse the query
-    return new DefaultOrmQuery<T>(desc, this, expressionFactory, deployQuery);
-  }
-
   @Override
   public <T> Set<String> validateQuery(Query<T> query) {
 
@@ -901,38 +879,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return createQuery(beanType);
   }
 
-  public <T> Query<T> createQuery(Class<T> beanType, String query) {
+  public <T> Query<T> createQuery(Class<T> beanType) {
     BeanDescriptor<T> desc = getBeanDescriptor(beanType);
     if (desc == null) {
       throw new PersistenceException(beanType.getName() + " is NOT an Entity Bean registered with this server?");
     }
-    switch (desc.getEntityType()) {
-    case SQL:
-      if (query != null) {
-        throw new PersistenceException("You must used Named queries for this Entity " + desc.getFullName());
-      }
-      // use the "default" SqlSelect
-      DeployNamedQuery defaultSqlSelect = desc.getNamedQuery("default");
-      return new DefaultOrmQuery<T>(desc, this, expressionFactory, defaultSqlSelect);
-
-    default:
-      return new DefaultOrmQuery<T>(desc, this, expressionFactory, query);
-    }
-  }
-
-  public <T> Update<T> createNamedUpdate(Class<T> beanType, String namedUpdate) {
-    BeanDescriptor<?> desc = getBeanDescriptor(beanType);
-    if (desc == null) {
-      String m = beanType.getName() + " is NOT an Entity Bean registered with this server?";
-      throw new PersistenceException(m);
-    }
-
-    DeployNamedUpdate deployUpdate = desc.getNamedUpdate(namedUpdate);
-    if (deployUpdate == null) {
-      throw new PersistenceException("named update " + namedUpdate + " was not found for " + desc.getFullName());
-    }
-
-    return new DefaultOrmUpdate<T>(beanType, this, desc.getBaseTable(), deployUpdate);
+    return new DefaultOrmQuery<T>(desc, this, expressionFactory);
   }
 
   public <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate) {
@@ -949,28 +901,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return new DefaultRelationalQuery(this, sql);
   }
 
-  public SqlQuery createNamedSqlQuery(String namedQuery) {
-    DNativeQuery nq = beanDescriptorManager.getNativeQuery(namedQuery);
-    if (nq == null) {
-      throw new PersistenceException("SqlQuery " + namedQuery + " not found.");
-    }
-    return new DefaultRelationalQuery(this, nq.getQuery());
-  }
-
   public SqlUpdate createSqlUpdate(String sql) {
     return new DefaultSqlUpdate(this, sql);
   }
 
   public CallableSql createCallableSql(String sql) {
     return new DefaultCallableSql(this, sql);
-  }
-
-  public SqlUpdate createNamedSqlUpdate(String namedQuery) {
-    DNativeQuery nq = beanDescriptorManager.getNativeQuery(namedQuery);
-    if (nq == null) {
-      throw new PersistenceException("SqlUpdate " + namedQuery + " not found.");
-    }
-    return new DefaultSqlUpdate(this, nq.getQuery());
   }
 
   public <T> T find(Class<T> beanType, Object uid) {

@@ -67,20 +67,6 @@ public class TestDeleteByQuery extends BaseTestCase {
   }
 
   @Test
-  public void delete_queryString() {
-
-    LoggedSqlCollector.start();
-
-    Ebean.createQuery(Customer.class, "where name = :name")
-        .setParameter("name","Don Roberto")
-        .delete();
-
-    List<String> sql = LoggedSqlCollector.stop();
-    assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("delete from o_customer where name = ?");
-  }
-
-  @Test
   public void testCommit() {
 
     ResetBasicData.reset();

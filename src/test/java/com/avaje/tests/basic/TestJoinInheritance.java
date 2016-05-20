@@ -80,22 +80,5 @@ public class TestJoinInheritance extends BaseTestCase {
 			Ebean.save(trip);
 		}
 
-		Ebean.beginTransaction();
-
-		Query<Trip> q = Ebean.createQuery(Trip.class, "join address join vehicleDriver ");
-		
-		List<Trip> trips = q.findList();
-		
-		Assert.assertTrue(trips.size() == nrDrivers);
-		
-		for (Trip t:trips){
-			Address a = t.getAddress();
-			Assert.assertTrue(line1.equals(a.getLine1()));
-			Assert.assertTrue(line2.equals(a.getLine2()));
-			Assert.assertTrue(city.equals(a.getCity()));
-		}
-		
-		
-		Ebean.endTransaction();
 	}
 }

@@ -2,9 +2,6 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.Model;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
-import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.cache.ServerCacheManager;
@@ -15,20 +12,20 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbHistorySupport;
 import com.avaje.ebean.config.dbplatform.DbIdentity;
-import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
+import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
 import com.avaje.ebean.event.changelog.ChangeLogFilter;
 import com.avaje.ebean.event.changelog.ChangeLogListener;
 import com.avaje.ebean.event.changelog.ChangeLogPrepare;
 import com.avaje.ebean.event.changelog.ChangeLogRegister;
 import com.avaje.ebean.plugin.BeanType;
+import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
 import com.avaje.ebeaninternal.server.core.BootupClasses;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.core.InternalConfiguration;
 import com.avaje.ebeaninternal.server.core.Message;
-import com.avaje.ebeaninternal.server.core.XmlConfig;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinderEmbedded;
@@ -46,8 +43,6 @@ import com.avaje.ebeaninternal.server.deploy.parse.DeployInherit;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployUtil;
 import com.avaje.ebeaninternal.server.deploy.parse.ReadAnnotations;
 import com.avaje.ebeaninternal.server.deploy.parse.TransientProperties;
-import com.avaje.ebeaninternal.server.idgen.UuidIdGenerator;
-import com.avaje.ebeaninternal.server.lib.util.Dnode;
 import com.avaje.ebeaninternal.server.properties.BeanPropertiesReader;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfo;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfoFactory;
@@ -109,8 +104,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final DeployCreateProperties createProperties;
 
-  private final DeployOrmXml deployOrmXml;
-
   private final BeanManagerFactory beanManagerFactory;
 
   private final ServerConfig serverConfig;
@@ -163,8 +156,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final IdBinderFactory idBinderFactory;
 
-  private final XmlConfig xmlConfig;
-
   private final BeanLifecycleAdapterFactory beanLifecycleAdapterFactory;
 
   private final boolean eagerFetchLobs;
@@ -190,7 +181,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.serverName = InternString.intern(serverConfig.getName());
     this.cacheManager = config.getCacheManager();
     this.docStoreFactory = config.getDocStoreFactory();
-    this.xmlConfig = config.getXmlConfig();
     this.dbSequenceBatchSize = serverConfig.getDatabaseSequenceBatchSize();
     this.backgroundExecutor = config.getBackgroundExecutor();
     this.dataSource = serverConfig.getDataSource();
@@ -207,7 +197,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     this.namingConvention = serverConfig.getNamingConvention();
     this.dbIdentity = config.getDatabasePlatform().getDbIdentity();
     this.deplyInherit = config.getDeployInherit();
-    this.deployOrmXml = config.getDeployOrmXml();
     this.deployUtil = config.getDeployUtil();
 
     this.beanManagerFactory = new BeanManagerFactory(config.getDatabasePlatform());
@@ -316,10 +305,8 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       readEntityBeanTable();
       readEntityDeploymentAssociations();
       readInheritedIdGenerators();
-
       // creates the BeanDescriptors
       readEntityRelationships();
-      readRawSqlQueries();
 
       List<BeanDescriptor<?>> list = new ArrayList<BeanDescriptor<?>>(descMap.values());
       Collections.sort(list, beanDescComparator);
@@ -555,10 +542,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     return beanManagerMap.get(beanClassName);
   }
 
-  public DNativeQuery getNativeQuery(String name) {
-    return deployOrmXml.getNativeQuery(name);
-  }
-
   /**
    * Create the BeanControllers, BeanFinders and BeanListeners.
    */
@@ -677,25 +660,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     DeployBeanDescriptor<?> deployDescriptor = info.getDescriptor();
     DeployBeanTable beanTable = deployDescriptor.createDeployBeanTable();
     return new BeanTable(beanTable, this);
-  }
-
-  /**
-   * Parse the named Raw Sql queries using BeanDescriptor.
-   */
-  private void readRawSqlQueries() {
-
-    for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
-
-      DeployBeanDescriptor<?> deployDesc = info.getDescriptor();
-      BeanDescriptor<?> desc = getBeanDescriptor(deployDesc.getBeanType());
-
-      for (DRawSqlMeta rawSqlMeta : deployDesc.getRawSqlMeta()) {
-        if (rawSqlMeta.getQuery() != null) {
-          DeployNamedQuery nq = new DRawSqlSelectBuilder(namingConvention, desc, rawSqlMeta).parse();
-          desc.addNamedQuery(nq);
-        }
-      }
-    }
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
@@ -1148,8 +1112,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     readAnnotations.readAssociations(info, this);
 
-    readXml(desc);
-
     if (EntityType.SQL == desc.getEntityType()) {
       desc.setBaseTable(null, null, null);
     }
@@ -1267,127 +1229,6 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     for (DeployBeanProperty prop : deployDesc.propertiesAll()) {
       if (!(prop instanceof DeployBeanPropertyAssoc<?>)) {
         deployUtil.setScalarType(prop);
-      }
-    }
-  }
-
-  private void readXml(DeployBeanDescriptor<?> deployDesc) {
-
-    List<Dnode> eXml = xmlConfig.findEntityXml(deployDesc.getFullName());
-    readXmlRawSql(deployDesc, eXml);
-
-    Dnode entityXml = deployOrmXml.findEntityDeploymentXml(deployDesc.getFullName());
-
-    if (entityXml != null) {
-      readXmlNamedQueries(deployDesc, entityXml);
-      readXmlSql(deployDesc, entityXml);
-    }
-  }
-
-  /**
-   * Read sql-select (FUTURE: additionally sql-insert, sql-update, sql-delete).
-   * If found this entity bean is based on raw sql.
-   */
-  private void readXmlSql(DeployBeanDescriptor<?> deployDesc, Dnode entityXml) {
-
-    List<Dnode> sqlSelectList = entityXml.findAll("sql-select", entityXml.getLevel() + 1);
-    for (int i = 0; i < sqlSelectList.size(); i++) {
-      Dnode sqlSelect = sqlSelectList.get(i);
-      readSqlSelect(deployDesc, sqlSelect);
-    }
-  }
-
-  private String findContent(Dnode node, String nodeName) {
-    Dnode found = node.find(nodeName);
-    if (found != null) {
-      return found.getNodeContent();
-    } else {
-      return null;
-    }
-  }
-
-  private void readSqlSelect(DeployBeanDescriptor<?> deployDesc, Dnode sqlSelect) {
-
-    String name = sqlSelect.getStringAttr("name", "default");
-    String extend = sqlSelect.getStringAttr("extend", null);
-    String queryDebug = sqlSelect.getStringAttr("debug", null);
-    boolean debug = (queryDebug != null && queryDebug.equalsIgnoreCase("true"));
-
-    // the raw sql select
-    String query = findContent(sqlSelect, "query");
-    String where = findContent(sqlSelect, "where");
-    String having = findContent(sqlSelect, "having");
-    String columnMapping = findContent(sqlSelect, "columnMapping");
-
-    DRawSqlMeta m = new DRawSqlMeta(name, extend, query, debug, where, having, columnMapping);
-
-    deployDesc.add(m);
-
-  }
-
-  private void readXmlRawSql(DeployBeanDescriptor<?> deployDesc, List<Dnode> entityXml) {
-
-    List<Dnode> rawSqlQueries = xmlConfig.find(entityXml, "raw-sql");
-    for (int i = 0; i < rawSqlQueries.size(); i++) {
-      Dnode rawSqlDnode = rawSqlQueries.get(i);
-      String name = rawSqlDnode.getAttribute("name");
-      if (isEmpty(name)) {
-        throw new IllegalStateException("raw-sql for " + deployDesc.getFullName() + " missing name attribute");
-      }
-      Dnode queryNode = rawSqlDnode.find("query");
-      if (queryNode == null) {
-        throw new IllegalStateException("raw-sql for " + deployDesc.getFullName() + " missing query element");
-      }
-      String sql = queryNode.getNodeContent();
-      if (isEmpty(sql)) {
-        throw new IllegalStateException("raw-sql for " + deployDesc.getFullName() + " has empty sql in the query element?");
-      }
-
-      List<Dnode> columnMappings = rawSqlDnode.findAll("columnMapping", 1);
-
-      RawSqlBuilder rawSqlBuilder = RawSqlBuilder.parse(sql);
-      for (int j = 0; j < columnMappings.size(); j++) {
-        Dnode cm = columnMappings.get(j);
-        String column = cm.getAttribute("column");
-        String property = cm.getAttribute("property");
-        rawSqlBuilder.columnMapping(column, property);
-      }
-      RawSql rawSql = rawSqlBuilder.create();
-
-      DeployNamedQuery namedQuery = new DeployNamedQuery(name, rawSql);
-      deployDesc.add(namedQuery);
-    }
-  }
-
-  private boolean isEmpty(String s) {
-    return s == null || s.trim().length() == 0;
-  }
-
-  /**
-   * Read named queries for this bean type.
-   */
-  private void readXmlNamedQueries(DeployBeanDescriptor<?> deployDesc, Dnode entityXml) {
-
-    // look for named-query...
-    List<Dnode> namedQueries = entityXml.findAll("named-query", 1);
-
-    for (Dnode namedQueryXml : namedQueries) {
-
-      String name = namedQueryXml.getAttribute("name");
-      Dnode query = namedQueryXml.find("query");
-      if (query == null) {
-        logger.warn("orm.xml " + deployDesc.getFullName() + " named-query missing query element?");
-
-      } else {
-        String oql = query.getNodeContent();
-        // TODO: QueryHints not read from xml yet
-        if (name == null || oql == null) {
-          logger.warn("orm.xml " + deployDesc.getFullName() + " named-query has no query content?");
-        } else {
-          // add the named query
-          DeployNamedQuery q = new DeployNamedQuery(name, oql, null);
-          deployDesc.add(q);
-        }
       }
     }
   }

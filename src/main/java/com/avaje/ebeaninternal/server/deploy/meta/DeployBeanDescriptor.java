@@ -1,13 +1,12 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
 import com.avaje.ebean.annotation.Cache;
-import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.TableName;
-import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
+import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
 import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
@@ -16,6 +15,7 @@ import com.avaje.ebean.event.BeanQueryAdapter;
 import com.avaje.ebean.event.changelog.ChangeLogFilter;
 import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebean.util.CamelCaseHelper;
+import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebeaninternal.server.core.CacheOptions;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
@@ -24,9 +24,6 @@ import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistListener;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanPostLoad;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
 import com.avaje.ebeaninternal.server.deploy.CompoundUniqueConstraint;
-import com.avaje.ebeaninternal.server.deploy.DRawSqlMeta;
-import com.avaje.ebeaninternal.server.deploy.DeployNamedQuery;
-import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import com.avaje.ebeaninternal.server.idgen.UuidIdGenerator;
@@ -40,7 +37,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Describes Beans including their deployment information.
@@ -71,12 +67,6 @@ public class DeployBeanDescriptor<T> {
   private LinkedHashMap<String, DeployBeanProperty> propMap = new LinkedHashMap<String, DeployBeanProperty>();
 
   private EntityType entityType;
-
-  private final Map<String, DeployNamedQuery> namedQueries = new LinkedHashMap<String, DeployNamedQuery>();
-
-  private final Map<String, DeployNamedUpdate> namedUpdates = new LinkedHashMap<String, DeployNamedUpdate>();
-
-  private final Map<String, DRawSqlMeta> rawSqlMetas = new LinkedHashMap<String, DRawSqlMeta>();
 
   private DeployBeanPropertyAssocOne<?> unidirectional;
 
@@ -309,32 +299,6 @@ public class DeployBeanDescriptor<T> {
     return false;
   }
 
-  public Collection<DRawSqlMeta> getRawSqlMeta() {
-    if (!processedRawSqlExtend) {
-      rawSqlProcessExtend();
-      processedRawSqlExtend = true;
-    }
-    return rawSqlMetas.values();
-  }
-
-  /**
-   * Process the "extend" attributes of raw SQL. Aka inherit the query and
-   * column mapping.
-   */
-  private void rawSqlProcessExtend() {
-
-    for (DRawSqlMeta rawSqlMeta : rawSqlMetas.values()) {
-      String extend = rawSqlMeta.getExtend();
-      if (extend != null) {
-        DRawSqlMeta parentQuery = rawSqlMetas.get(extend);
-        if (parentQuery == null) {
-          throw new RuntimeException("parent query [" + extend + "] not found for sql-select " + rawSqlMeta.getName());
-        }
-        rawSqlMeta.extend(parentQuery);
-      }
-    }
-  }
-
   public DeployBeanTable createDeployBeanTable() {
 
     DeployBeanTable beanTable = new DeployBeanTable(getBeanType());
@@ -378,32 +342,6 @@ public class DeployBeanDescriptor<T> {
 
   public int getSequenceAllocationSize() {
     return sequenceAllocationSize;
-  }
-
-  public void add(DRawSqlMeta rawSqlMeta) {
-    rawSqlMetas.put(rawSqlMeta.getName(), rawSqlMeta);
-    if ("default".equals(rawSqlMeta.getName())) {
-      setEntityType(EntityType.SQL);
-    }
-  }
-
-  public void add(DeployNamedUpdate namedUpdate) {
-    namedUpdates.put(namedUpdate.getName(), namedUpdate);
-  }
-
-  public void add(DeployNamedQuery namedQuery) {
-    namedQueries.put(namedQuery.getName(), namedQuery);
-    if ("default".equals(namedQuery.getName())) {
-      setEntityType(EntityType.SQL);
-    }
-  }
-
-  public Map<String, DeployNamedQuery> getNamedQueries() {
-    return namedQueries;
-  }
-
-  public Map<String, DeployNamedUpdate> getNamedUpdates() {
-    return namedUpdates;
   }
 
   public String[] getProperties() {

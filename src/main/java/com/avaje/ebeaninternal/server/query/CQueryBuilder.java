@@ -38,7 +38,6 @@ public class CQueryBuilder {
 
   private final SqlLimiter sqlLimiter;
 
-  private final RawSqlSelectClauseBuilder sqlSelectBuilder;
   private final CQueryBuilderRawSql rawSqlHandler;
 
   private final Binder binder;
@@ -62,7 +61,6 @@ public class CQueryBuilder {
     this.historySupport = historySupport;
     this.tableAliasPlaceHolder = dbPlatform.getTableAliasPlaceHolder();
     this.columnAliasPrefix = dbPlatform.getColumnAliasPrefix();
-    this.sqlSelectBuilder = new RawSqlSelectClauseBuilder(dbPlatform, binder);
     this.sqlLimiter = dbPlatform.getSqlLimiter();
     this.rawSqlHandler = new CQueryBuilderRawSql(sqlLimiter, dbPlatform);
     this.selectCountWithAlias = dbPlatform.isSelectCountWithAlias();
@@ -259,10 +257,6 @@ public class CQueryBuilder {
    * names to physical deployment column names.
    */
   public <T> CQuery<T> buildQuery(OrmQueryRequest<T> request) {
-
-    if (request.isSqlSelect()) {
-      return sqlSelectBuilder.build(request);
-    }
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
 

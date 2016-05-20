@@ -89,7 +89,7 @@ public class TestQueryLanguage extends BaseTestCase {
 
     BeanDescriptor<Order> desc = server.getBeanDescriptor(Order.class);
     DefaultOrmQuery<Order> qry = new DefaultOrmQuery<Order>(desc, server,
-        new DefaultExpressionFactory(false, false), (String) null);
+        new DefaultExpressionFactory(false, false));
     p.assign(qry);
 
     return qry;

@@ -5,7 +5,6 @@ import java.io.Serializable;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebeaninternal.api.BindParams;
 import com.avaje.ebeaninternal.api.SpiUpdate;
-import com.avaje.ebeaninternal.server.deploy.DeployNamedUpdate;
 
 /**
  * Default implementation of OrmUpdate.
@@ -59,20 +58,6 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
     this.baseTable = baseTable;
     this.name = "";
     this.updateStatement = updateStatement;
-    this.type = deriveType(updateStatement);
-
-  }
-
-  public DefaultOrmUpdate(Class<?> beanType, EbeanServer server, String baseTable, DeployNamedUpdate namedUpdate) {
-
-    this.beanType = beanType;
-    this.server = server;
-    this.baseTable = baseTable;
-    this.name = namedUpdate.getName();
-    this.notifyCache = namedUpdate.isNotifyCache();
-
-    // named updates are always converted to sql as part of the initialisation
-    this.updateStatement = namedUpdate.getSqlUpdateStatement();
     this.type = deriveType(updateStatement);
   }
 

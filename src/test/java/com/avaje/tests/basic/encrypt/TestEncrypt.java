@@ -56,18 +56,6 @@ public class TestEncrypt extends BaseTestCase {
 
     Date earlyDob = new Date(System.currentTimeMillis() - 500000);
 
-    List<EBasicEncrypt> qlList = Ebean
-        .createQuery(EBasicEncrypt.class, "where description like :d and dob >= :dob")
-        .setParameter("d", "testde%").setParameter("dob", earlyDob).findList();
-
-    Assert.assertTrue(qlList.size() > 0);
-
-    qlList = Ebean
-        .createQuery(EBasicEncrypt.class, "find e (id, description) where description = :d")
-        .setParameter("d", "testdesc").findList();
-
-    Assert.assertTrue(qlList.size() == 1);
-
     SqlQuery q = Ebean.createSqlQuery("select * from e_basicenc where id = :id");
     q.setParameter("id", e.getId());
 
@@ -105,11 +93,6 @@ public class TestEncrypt extends BaseTestCase {
       list = Ebean.find(EBasicEncrypt.class).where().startsWith("description", "modde").findList();
 
       Assert.assertEquals(1, list.size());
-
-      list = Ebean.createQuery(EBasicEncrypt.class, "where description like :d")
-          .setParameter("d", "modde%").findList();
-
-      Assert.assertNotNull(list);
     }
   }
 

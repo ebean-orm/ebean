@@ -34,14 +34,6 @@ public class TestInheritanceJoins extends BaseTestCase {
 		r.setProductConfiguration(pc);
 		r.setGroupConfiguration(gc);
 		server.save(r);
-
-
-		Query<CalculationResult> q = server.createNamedQuery(CalculationResult.class, "loadResult");
-		q.setParameter("charge", 100.0);
-		
-		List<CalculationResult> results = q.findList();
-		
-		Assert.assertTrue(!results.isEmpty());
 	}
 
 	@Test
@@ -84,14 +76,6 @@ public class TestInheritanceJoins extends BaseTestCase {
 		r.setProductConfiguration(pc);
 		r.setGroupConfiguration(null);
 		server.save(r);
-
-
-		Query<CalculationResult> q = server.createNamedQuery(CalculationResult.class, "loadResult");
-		q.setParameter("charge", charge);
-		
-		List<CalculationResult> results = q.findList();
-		
-		Assert.assertTrue(!results.isEmpty());
 	}
 
 	@Test

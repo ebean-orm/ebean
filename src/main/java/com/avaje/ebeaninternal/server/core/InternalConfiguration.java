@@ -23,17 +23,15 @@ import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogPrepare;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogRegister;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
 import com.avaje.ebeaninternal.server.core.timezone.CloneDataTimeZone;
+import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.core.timezone.NoDataTimeZone;
 import com.avaje.ebeaninternal.server.core.timezone.SimpleDataTimeZone;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
-import com.avaje.ebeaninternal.server.deploy.DeployOrmXml;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployCreateProperties;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployInherit;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployUtil;
 import com.avaje.ebeaninternal.server.expression.DefaultExpressionFactory;
-import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
-import org.avaje.datasource.DataSourcePool;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.persist.DefaultPersister;
 import com.avaje.ebeaninternal.server.query.CQueryEngine;
@@ -56,6 +54,7 @@ import com.avaje.ebeanservice.docstore.api.DocStoreIntegration;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import com.avaje.ebeanservice.docstore.none.NoneDocStoreFactory;
 import com.fasterxml.jackson.core.JsonFactory;
+import org.avaje.datasource.DataSourcePool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,8 +78,6 @@ public class InternalConfiguration {
 
   private final DeployInherit deployInherit;
 
-  private final DeployOrmXml deployOrmXml;
-
   private final TypeManager typeManager;
 
   private final DataTimeZone dataTimeZone;
@@ -103,8 +100,6 @@ public class InternalConfiguration {
 
   private final SpiBackgroundExecutor backgroundExecutor;
 
-  private final XmlConfig xmlConfig;
-
   private final JsonFactory jsonFactory;
 
   private final DocStoreFactory docStoreFactory;
@@ -114,13 +109,12 @@ public class InternalConfiguration {
    */
   private final List<Plugin> plugins = new ArrayList<Plugin>();
 
-  public InternalConfiguration(XmlConfig xmlConfig, ClusterManager clusterManager,
+  public InternalConfiguration(ClusterManager clusterManager,
                                ServerCacheManager cacheManager, SpiBackgroundExecutor backgroundExecutor,
                                ServerConfig serverConfig, BootupClasses bootupClasses) {
 
     this.docStoreFactory = initDocStoreFactory(serverConfig.service(DocStoreFactory.class));
     this.jsonFactory = serverConfig.getJsonFactory();
-    this.xmlConfig = xmlConfig;
     this.clusterManager = clusterManager;
     this.backgroundExecutor = backgroundExecutor;
     this.cacheManager = cacheManager;
@@ -131,7 +125,6 @@ public class InternalConfiguration {
     this.expressionFactory = initExpressionFactory(serverConfig, databasePlatform);
     this.typeManager = new DefaultTypeManager(serverConfig, bootupClasses);
 
-    this.deployOrmXml = new DeployOrmXml();
     this.deployInherit = new DeployInherit(bootupClasses);
 
     this.deployCreateProperties = new DeployCreateProperties(typeManager);
@@ -264,10 +257,6 @@ public class InternalConfiguration {
     return new DJsonContext(server, jsonFactory, typeManager);
   }
 
-  public XmlConfig getXmlConfig() {
-    return xmlConfig;
-  }
-
   public AutoTuneService createAutoTuneService(SpiEbeanServer server) {
     return AutoTuneServiceFactory.create(server, serverConfig);
   }
@@ -314,10 +303,6 @@ public class InternalConfiguration {
 
   public DeployInherit getDeployInherit() {
     return deployInherit;
-  }
-
-  public DeployOrmXml getDeployOrmXml() {
-    return deployOrmXml;
   }
 
   public DeployCreateProperties getDeployCreateProperties() {

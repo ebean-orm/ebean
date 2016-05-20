@@ -844,15 +844,6 @@ public abstract class Model {
     }
 
     /**
-     * Create and return a new query using the OQL.
-     * <p>
-     * Equivalent to {@link EbeanServer#createQuery(Class, String)}
-     */
-    public Query<T> setQuery(String oql) {
-      return db().createQuery(type, oql);
-    }
-
-    /**
      * Create and return a new query based on the <code>RawSql</code>.
      * <p>
      * Equivalent to {@link Query#setRawSql(RawSql)}

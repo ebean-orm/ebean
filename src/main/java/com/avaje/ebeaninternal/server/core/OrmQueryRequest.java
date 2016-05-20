@@ -175,14 +175,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   /**
-   * Return true if this is a query using generated sql. If false this query
-   * will use raw sql (Entity bean based on raw sql select).
-   */
-  public boolean isSqlSelect() {
-    return query.isSqlSelect() && query.getRawSql() == null;
-  }
-
-  /**
    * Return the PersistenceContext used for this request.
    */
   public PersistenceContext getPersistenceContext() {

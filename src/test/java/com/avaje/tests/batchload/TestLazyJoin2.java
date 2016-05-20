@@ -71,19 +71,6 @@ public class TestLazyJoin2 extends BaseTestCase {
     String name = customer2.getName();
     Assert.assertNotNull(name);
 
-    String q = "find order join customer (+query(1) +lazy(10) name, status) join customer.contacts ";
-    Query<Order> query = Ebean.createQuery(Order.class, q);
-
-    List<Order> list3 = query.findList();
-    Order order3 = list3.get(0);
-    String n3 = order3.getCustomer().getName();
-
-    for (Order o3 : list3) {
-      o3.getCustomer().getName();
-    }
-
-    Assert.assertNotNull(n3);
-
   }
 
 }
