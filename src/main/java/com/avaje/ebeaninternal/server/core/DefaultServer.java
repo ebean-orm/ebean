@@ -1249,7 +1249,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     request.initTransIfRequired();
     request.findEach(consumer);
-    // no try finally - findVisit guarantee's cleanup of the transaction if required
+    // no try finally - findEach guarantee's cleanup of the transaction if required
   }
 
   public <T> void findEachWhile(Query<T> query, QueryEachWhileConsumer<T> consumer, Transaction t) {
@@ -1262,21 +1262,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     request.initTransIfRequired();
     request.findEachWhile(consumer);
-    // no try finally - findVisit guarantee's cleanup of the transaction if required
-  }
-
-  public <T> QueryIterator<T> findIterate(Query<T> query, Transaction t) {
-
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
-
-    try {
-      request.initTransIfRequired();
-      return request.findIterate();
-      
-    } catch (RuntimeException ex) {
-      request.endTransIfRequired();
-      throw ex;
-    }
+    // no try finally - findEachWhile guarantee's cleanup of the transaction if required
   }
 
   @Override

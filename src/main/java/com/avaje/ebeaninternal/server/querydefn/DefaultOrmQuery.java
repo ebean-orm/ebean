@@ -1085,11 +1085,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public QueryIterator<T> findIterate() {
-    return server.findIterate(this, null);
-  }
-
-  @Override
   public List<T> findList() {
     return server.findList(this, null);
   }

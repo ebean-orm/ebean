@@ -323,11 +323,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public QueryIterator<T> findIterate() {
-    return query.findIterate();
-  }
-
-  @Override
   public List<T> findList() {
     return query.findList();
   }

@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 import javax.persistence.PersistenceException;
 
-import com.avaje.ebean.QueryIterator;
+import com.avaje.ebeaninternal.server.core.QueryIterator;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 
 /**

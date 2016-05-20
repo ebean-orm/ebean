@@ -548,25 +548,6 @@ public interface Query<T> {
   List<Object> findIds();
 
   /**
-   * Execute the query iterating over the results.
-   * <p>
-   * Remember that with {@link QueryIterator} you must call
-   * {@link QueryIterator#close()} when you have finished iterating the results
-   * (typically in a finally block).
-   * </p>
-   * <p>
-   * findEach() and findEachWhile() are preferred to findIterate() as they ensure
-   * the jdbc statement and resultSet are closed at the end of the iteration.
-   * </p>
-   * <p>
-   * This query will execute against the EbeanServer that was used to create it.
-   * </p>
-   */
-  QueryIterator<T> findIterate();
-
-
-
-  /**
    * Execute the query processing the beans one at a time.
    * <p>
    * This method is appropriate to process very large query results as the

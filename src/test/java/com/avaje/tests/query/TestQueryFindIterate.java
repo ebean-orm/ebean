@@ -12,6 +12,7 @@ import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -31,20 +32,16 @@ public class TestQueryFindIterate extends BaseTestCase {
         //.fetch("contacts", new FetchConfig().query(2)).where().gt("id", 0).orderBy("id")
         .setMaxRows(2);
 
-    int count = 0;
+    final AtomicInteger count = new AtomicInteger();
 
-    QueryIterator<Customer> it = query.findIterate();
-    try {
-      while (it.hasNext()) {
-        Customer customer = it.next();
-        customer.hashCode();
-        count++;
+    query.findEach(new QueryEachConsumer<Customer>() {
+      @Override
+      public void accept(Customer bean) {
+        count.incrementAndGet();
       }
-    } finally {
-      it.close();
-    }
+    });
 
-    assertEquals(2, count);
+    assertEquals(2, count.get());
   }
 
   @Test
@@ -52,25 +49,20 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    QueryIterator<Order> queryIterator = Ebean.find(Order.class)
+    Ebean.find(Order.class)
             //.select("orderDate")
             .where().gt("id",0).le("id",10)
-            .findIterate();
-
-    try {
-      while (queryIterator.hasNext()) {
-        Order order = queryIterator.next();
-        Customer customer = order.getCustomer();
-        // invoke lazy loading on customer, order details and order shipments
-        order.getId();
-        customer.getName();
-        order.getDetails().size();
-        order.getShipments().size();
-      }
-
-    } finally {
-      queryIterator.close();
-    }
+            .findEach(new QueryEachConsumer<Order>() {
+              @Override
+              public void accept(Order order) {
+                Customer customer = order.getCustomer();
+                // invoke lazy loading on customer, order details and order shipments
+                order.getId();
+                customer.getName();
+                order.getDetails().size();
+                order.getShipments().size();
+              }
+            });
 
   }
 
@@ -81,26 +73,22 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    QueryIterator<Order> queryIterator = Ebean.find(Order.class)
-            .setLazyLoadBatchSize(10)
-            .select("status, orderDate")
-            .fetch("customer", "name")
-            .where().gt("id",0).le("id",10)
-            .setUseCache(false)
-            .findIterate();
+    Ebean.find(Order.class)
+      .setLazyLoadBatchSize(10)
+      .select("status, orderDate")
+      .fetch("customer", "name")
+      .where().gt("id",0).le("id",10)
+      .setUseCache(false)
+      .findEach(new QueryEachConsumer<Order>() {
+        @Override
+        public void accept(Order order) {
+          Customer customer = order.getCustomer();
+          customer.getName();
+          order.getDetails().size();
+          order.getShipments().size();
+        }
+      });
 
-    try {
-      while (queryIterator.hasNext()) {
-        Order order = queryIterator.next();
-        Customer customer = order.getCustomer();
-        customer.getName();
-        order.getDetails().size();
-        order.getShipments().size();
-      }
-
-    } finally {
-      queryIterator.close();
-    }
 
     List<String> loggedSql = LoggedSqlCollector.stop();
 
@@ -123,29 +111,24 @@ public class TestQueryFindIterate extends BaseTestCase {
     Ebean.getServerCacheManager().getBeanCache(OrderShipment.class).clear();
     Ebean.getServerCacheManager().getQueryCache(OrderShipment.class).clear();
 
-    QueryIterator<Order> queryIterator = Ebean.find(Order.class)
-            .setLazyLoadBatchSize(10)
-            .setUseCache(false)
-            .select("status, orderDate")
-            .fetch("customer", "name")
-            .fetch("details")
-            .where().gt("id",0).le("id",10)
-            .order().asc("id")
-            .findIterate();
-
-    try {
-      while (queryIterator.hasNext()) {
-        Order order = queryIterator.next();
-        Customer customer = order.getCustomer();
-        order.getId();
-        customer.getName();
-        order.getDetails().size();
-        order.getShipments().size();
-      }
-
-    } finally {
-      queryIterator.close();
-    }
+    Ebean.find(Order.class)
+          .setLazyLoadBatchSize(10)
+          .setUseCache(false)
+          .select("status, orderDate")
+          .fetch("customer", "name")
+          .fetch("details")
+          .where().gt("id",0).le("id",10)
+          .order().asc("id")
+          .findEach(new QueryEachConsumer<Order>() {
+            @Override
+            public void accept(Order order) {
+              Customer customer = order.getCustomer();
+              order.getId();
+              customer.getName();
+              order.getDetails().size();
+              order.getShipments().size();
+            }
+          });
 
     List<String> loggedSql = LoggedSqlCollector.stop();
 
@@ -168,8 +151,12 @@ public class TestQueryFindIterate extends BaseTestCase {
         .setMaxRows(2);
 
     // this throws an exception immediately
-    QueryIterator<Customer> it = query.findIterate();
-    it.close();
+    query.findEach(new QueryEachConsumer<Customer>() {
+      @Override
+      public void accept(Customer bean) {
+
+      }
+    });
 
     if (!server.getName().equals("h2")) {
       // MySql allows the query with type conversion?
@@ -191,17 +178,13 @@ public class TestQueryFindIterate extends BaseTestCase {
         .where().gt("id", 0)
         .setMaxRows(2);
 
-    QueryIterator<Customer> it = query.findIterate();
-    try {
-      while (it.hasNext()) {
-        Customer customer = it.next();
+    query.findEach(new QueryEachConsumer<Customer>() {
+      @Override
+      public void accept(Customer customer) {
         if (customer != null) {
           throw new IllegalStateException("cause an exception");
         }
       }
-      
-    } finally {
-      it.close();
-    }
+    });
   }
 }

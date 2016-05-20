@@ -11,7 +11,6 @@ import org.junit.Test;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.Transaction;
 import com.avaje.tests.model.basic.EBasic;
 import com.sun.management.HotSpotDiagnosticMXBean;
@@ -52,33 +51,24 @@ public class TestFindIterateHeapDump extends BaseTestCase {
       transaction.end();
     }    
 
-    QueryIterator<EBasic> iterate = server.find(EBasic.class).findIterate();
-    iterate.hashCode();
-    try {
-    
-      // Intentionally not iterating through the iterator to 
-      
-      // try {
-      // while (iterate.hasNext()) {
-      // EBasic eBasic = iterate.next();
-      // eBasic.getDescription();
-      // }
-      // } finally {
-      // iterate.close();
-      // }
-      
-      String fileName = "heap-dump6.snapshot";
-      
-      File file = new File(fileName);
-      if (file.exists())
-        file.delete();
-  
-      dumpHeap(fileName, true);
-      
-    } finally {
-      iterate.close();
-    }
-    
+    // Intentionally not iterating through the iterator to
+
+    // try {
+    // while (iterate.hasNext()) {
+    // EBasic eBasic = iterate.next();
+    // eBasic.getDescription();
+    // }
+    // } finally {
+    // iterate.close();
+    // }
+
+    String fileName = "heap-dump6.snapshot";
+
+    File file = new File(fileName);
+    if (file.exists())
+      file.delete();
+
+    dumpHeap(fileName, true);
   }
 
   static void dumpHeap(String fileName, boolean live) {

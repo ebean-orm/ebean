@@ -140,13 +140,6 @@ public interface ExpressionList<T> {
   int delete();
 
   /**
-   * Execute the query iterating over the results.
-   * 
-   * @see Query#findIterate()
-   */
-  QueryIterator<T> findIterate();
-
-  /**
    * Execute the query process the beans one at a time.
    *
    * @see Query#findEach(QueryEachConsumer)

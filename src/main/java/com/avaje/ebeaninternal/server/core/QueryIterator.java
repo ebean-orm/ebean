@@ -1,4 +1,4 @@
-package com.avaje.ebean;
+package com.avaje.ebeaninternal.server.core;
 
 import java.util.Iterator;
 

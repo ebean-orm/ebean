@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.core;
 import com.avaje.ebean.PersistenceContextScope;
 import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.ebean.QueryEachWhileConsumer;
-import com.avaje.ebean.QueryIterator;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
