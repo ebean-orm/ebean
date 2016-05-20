@@ -50,10 +50,17 @@ class IsEmptyExpression extends AbstractExpression {
       throw new IllegalStateException("Property [" + propName + "] not found");
     }
 
+    isEmptySql(request, prop, empty, propertyPath);
+  }
+
+  /**
+   * Append an exists subQuery for the property.
+   */
+  static void isEmptySql(SpiExpressionRequest request, ElPropertyValue prop, boolean empty, String propertyPath) {
+
     if (empty) {
       request.append("not ");
     }
-
     request
         .append("exists (select 1 from ")
         .append(prop.getAssocIsEmpty(request, propertyPath))

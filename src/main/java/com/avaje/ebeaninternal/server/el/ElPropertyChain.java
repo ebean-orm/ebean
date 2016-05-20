@@ -178,6 +178,11 @@ public class ElPropertyChain implements ElPropertyValue {
     return lastElPropertyValue.getAssocIdInValueExpr(size);
   }
 
+  @Override
+  public boolean isAssocMany() {
+    return lastElPropertyValue.isAssocMany();
+  }
+
   public boolean isAssocId() {
     return assocId;
   }

@@ -1,6 +1,8 @@
 package com.avaje.ebeaninternal.server.expression;
 
+import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
+import com.avaje.tests.model.basic.Order;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -8,7 +10,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class NullExpressionTest extends BaseExpressionTest {
 
   NullExpression nullExp(String propertyName, boolean notNull) {
-    return new NullExpression(propertyName, notNull);
+    NullExpression expr = new NullExpression(propertyName, notNull);
+    expr.containsMany(getBeanDescriptor(Order.class), new ManyWhereJoins());
+    return expr;
   }
 
   @Test

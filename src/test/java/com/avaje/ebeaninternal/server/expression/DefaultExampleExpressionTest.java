@@ -6,6 +6,7 @@ import com.avaje.ebean.Query;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.event.BeanQueryRequest;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
+import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
@@ -55,8 +56,8 @@ public class DefaultExampleExpressionTest extends BaseTestCase {
 
     SpiQuery<Customer> query = (SpiQuery<Customer>)spiEbeanServer().find(Customer.class);
     BeanQueryRequest<?> request = create(query);
+    expr.containsMany(customerBeanDescriptor(), new ManyWhereJoins());
     expr.prepareExpression(request);
-
     return expr;
   }
 

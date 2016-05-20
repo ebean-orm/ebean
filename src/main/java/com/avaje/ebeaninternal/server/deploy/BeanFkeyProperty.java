@@ -129,13 +129,20 @@ public final class BeanFkeyProperty implements ElPropertyValue {
     throw new RuntimeException("Not Supported or Expected");
   }
 
+  @Override
+  public boolean isAssocMany() {
+    return false;
+  }
+
   /**
    * Returns false as not an AssocOne.
    */
+  @Override
   public boolean isAssocId() {
     return false;
   }
 
+  @Override
   public boolean isAssocProperty() {
     return false;
   }

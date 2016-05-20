@@ -1,23 +1,48 @@
 package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
+import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
+import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
+import com.avaje.ebeaninternal.server.query.SplitName;
 
 import java.io.IOException;
 
 
 /**
- * Slightly redundant as Query.setId() ultimately also does the same job.
+ * Null / Not Null expression.
+ * <p>
+ * Note that for OneToMany/ManyToMany this effectively gets translated into isEmpty()/isNotEmpty().
+ * </p>
  */
 class NullExpression extends AbstractExpression {
 
   private final boolean notNull;
 
+  private ElPropertyValue elProperty;
+
+  private boolean assocMany;
+
+  private String propertyPath;
+
   NullExpression(String propertyName, boolean notNull) {
     super(propertyName);
     this.notNull = notNull;
+  }
+
+  @Override
+  public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
+    elProperty = desc.getElGetValue(propName);
+    if (elProperty != null && elProperty.isAssocMany()) {
+      // it is OneToMany or ManyToMany so going to be treated as isEmpty() expression
+      assocMany = true;
+      propertyPath = SplitName.split(propName)[0];
+      propertyContainsMany(propertyPath, desc, manyWhereJoin);
+    } else {
+      propertyContainsMany(propName, desc, manyWhereJoin);
+    }
   }
 
   @Override
@@ -33,17 +58,18 @@ class NullExpression extends AbstractExpression {
   @Override
   public void addSql(SpiExpressionRequest request) {
 
-    String propertyName = propName;
-
-    String nullExpr = notNull ? " is not null " : " is null ";
-
-    ElPropertyValue prop = getElProp(request);
-    if (prop != null && prop.isAssocId()) {
-      request.append(prop.getAssocIdExpression(propertyName, nullExpr));
+    if (assocMany) {
+      // translate to exists subquery
+      IsEmptyExpression.isEmptySql(request, elProperty, !notNull, propertyPath);
       return;
     }
 
-    request.append(propertyName).append(nullExpr);
+    String nullExpr = notNull ? " is not null " : " is null ";
+    if (elProperty != null && elProperty.isAssocId()) {
+      request.append(elProperty.getAssocIdExpression(propName, nullExpr));
+    } else {
+      request.append(propName).append(nullExpr);
+    }
   }
 
   @Override

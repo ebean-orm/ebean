@@ -86,6 +86,12 @@ public class CtCompoundPropertyElAdapter implements ElPropertyValue {
     return false;
   }
 
+  @Override
+  public boolean isAssocMany() {
+    return false;
+  }
+
+  @Override
   public boolean isAssocId() {
     return false;
   }

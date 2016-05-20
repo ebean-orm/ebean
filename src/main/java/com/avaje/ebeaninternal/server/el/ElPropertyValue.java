@@ -32,6 +32,11 @@ public interface ElPropertyValue extends ElPropertyDeploy, ExpressionPath {
   boolean isAssocId();
 
   /**
+   * Return true if the property is a OneToMany or ManyToMany associated bean property.
+   */
+  boolean isAssocMany();
+
+  /**
    * Return true if any path of this path contains a Associated One or Many.
    */
   boolean isAssocProperty();

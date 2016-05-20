@@ -111,11 +111,17 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
 
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
+    list = buildExpressions(desc);
     if (list != null) {
       for (int i = 0; i < list.size(); i++) {
         list.get(i).containsMany(desc, whereManyJoins);
       }
     }
+  }
+
+  @Override
+  public void prepareExpression(BeanQueryRequest<?> request) {
+    // do nothing
   }
 
   @Override
@@ -194,11 +200,6 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
     }
   }
 
-  @Override
-  public void prepareExpression(BeanQueryRequest<?> request) {
-    list = buildExpressions(request);
-  }
-
   /**
    * Return a hash for AutoTune query identification.
    */
@@ -259,15 +260,10 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   /**
    * Build the List of expressions.
    */
-  private ArrayList<SpiExpression> buildExpressions(BeanQueryRequest<?> request) {
+  private ArrayList<SpiExpression> buildExpressions(BeanDescriptor<?> beanDescriptor) {
 
     ArrayList<SpiExpression> list = new ArrayList<SpiExpression>();
-
-    OrmQueryRequest<?> r = (OrmQueryRequest<?>) request;
-    BeanDescriptor<?> beanDescriptor = r.getBeanDescriptor();
-
     addExpressions(list, beanDescriptor, entity, null);
-
     return list;
   }
 

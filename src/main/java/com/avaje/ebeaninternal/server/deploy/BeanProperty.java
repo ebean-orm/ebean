@@ -888,6 +888,12 @@ public class BeanProperty implements ElPropertyValue, Property {
     return null;
   }
 
+  @Override
+  public boolean isAssocMany() {
+    // Returns false - override in BeanPropertyAssocMany.
+    return false;
+  }
+
   public boolean isAssocId() {
     // Returns false - override in BeanPropertyAssocOne.
     return false;
