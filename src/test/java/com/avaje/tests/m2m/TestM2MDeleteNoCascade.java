@@ -41,11 +41,9 @@ public class TestM2MDeleteNoCascade extends BaseTestCase {
       Assert.assertTrue(true);
     }
 
-    int rc = Ebean.deleteManyToManyAssociations(u0, "validRoles");
-    Assert.assertTrue(rc != 0);
+    u0.getValidRoles().clear();
+    Ebean.save(u0);
 
     Ebean.delete(u0);
-    Assert.assertTrue(true);
-
   }
 }

@@ -640,38 +640,6 @@ public final class Ebean {
   }
 
   /**
-   * Delete the associations (from the intersection table) of a ManyToMany given
-   * the owner bean and the propertyName of the ManyToMany collection.
-   * <p>
-   * Typically these deletions occur automatically when persisting a ManyToMany
-   * collection and this provides a way to invoke those deletions directly.
-   * </p>
-   * 
-   * @return the number of associations deleted (from the intersection table).
-   */
-  public static int deleteManyToManyAssociations(Object ownerBean, String propertyName) {
-    return serverMgr.getDefaultServer().deleteManyToManyAssociations(ownerBean, propertyName);
-  }
-
-  /**
-   * Save the associations of a ManyToMany given the owner bean and the
-   * propertyName of the ManyToMany collection.
-   * <p>
-   * Typically the saving of these associations (inserting into the intersection
-   * table) occurs automatically when persisting a ManyToMany. This provides a
-   * way to invoke those insertions directly.
-   * </p>
-   * <p>
-   * You can use this when the collection is new and in this case all the
-   * entries in the collection are treated as additions are result in inserts
-   * into the intersection table.
-   * </p>
-   */
-  public static void saveManyToManyAssociations(Object ownerBean, String propertyName) {
-    serverMgr.getDefaultServer().saveManyToManyAssociations(ownerBean, propertyName);
-  }
-
-  /**
    * Delete the bean.
    * <p>
    * This will return true if the bean was deleted successfully or JDBC batch is being used.

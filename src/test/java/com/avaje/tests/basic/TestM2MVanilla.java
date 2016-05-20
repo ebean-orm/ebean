@@ -87,12 +87,9 @@ public class TestM2MVanilla extends BaseTestCase {
     List<MRole> roles = mUser.getRoles();
     Assert.assertEquals(1, roles.size());
 
-//    Ebean.refreshMany(mUser, "roles");
-//    Assert.assertEquals(1, mUser.getRoles().size());
-
     checkRoles2.remove(0);
     checkRoles2.remove(0);
-    Ebean.saveManyToManyAssociations(checkUser2, "roles");
+    Ebean.save(checkUser2);
 
     checkUser2 = Ebean.find(MUser.class, u0.getUserid());
     checkRoles2 = checkUser2.getRoles();

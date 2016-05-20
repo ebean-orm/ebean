@@ -609,26 +609,6 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public int deleteManyToManyAssociations(Object ownerBean, String propertyName) {
-    return 0;
-  }
-
-  @Override
-  public int deleteManyToManyAssociations(Object ownerBean, String propertyName, Transaction t) {
-    return 0;
-  }
-
-  @Override
-  public void saveManyToManyAssociations(Object ownerBean, String propertyName) {
-
-  }
-
-  @Override
-  public void saveManyToManyAssociations(Object ownerBean, String propertyName, Transaction t) {
-
-  }
-
-  @Override
   public boolean delete(Object bean, Transaction t) throws OptimisticLockException {
     return false;
   }

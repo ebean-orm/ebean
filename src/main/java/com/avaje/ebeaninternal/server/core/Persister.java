@@ -36,17 +36,6 @@ public interface Persister {
   void save(EntityBean entityBean, Transaction t);
 
   /**
-   * Save the associations of a ManyToMany given the owner bean and the
-   * propertyName of the ManyToMany collection.
-   */
-  void saveManyToManyAssociations(EntityBean ownerBean, String propertyName, Transaction t);
-
-  /**
-   * Delete the associations of a ManyToMany given the owner bean and the property name of the ManyToMany.
-   */
-  int deleteManyToManyAssociations(EntityBean ownerBean, String propertyName, Transaction t);
-
-  /**
    * Delete a bean given it's type and id value.
    * <p>
    * This will also cascade delete one level of children.

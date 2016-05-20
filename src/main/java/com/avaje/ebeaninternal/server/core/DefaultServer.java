@@ -1535,69 +1535,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return (EntityBean)bean;
   }
   
-  /**
-   * Delete the associations (from the intersection table) of a ManyToMany given
-   * the owner bean and the propertyName of the ManyToMany collection.
-   * <p>
-   * This returns the number of associations deleted.
-   * </p>
-   */
-  public int deleteManyToManyAssociations(Object ownerBean, String propertyName) {
-    return deleteManyToManyAssociations(ownerBean, propertyName, null);
-  }
-
-  /**
-   * Delete the associations (from the intersection table) of a ManyToMany given
-   * the owner bean and the propertyName of the ManyToMany collection.
-   * <p>
-   * This returns the number of associations deleted.
-   * </p>
-   */
-  public int deleteManyToManyAssociations(Object ownerBean, String propertyName, Transaction t) {
-
-    EntityBean owner = checkEntityBean(ownerBean);
-    TransWrapper wrap = initTransIfRequired(t);
-    try {
-      SpiTransaction trans = wrap.transaction;
-      int rc = persister.deleteManyToManyAssociations(owner, propertyName, trans);
-      wrap.commitIfCreated();
-      return rc;
-
-    } catch (RuntimeException e) {
-      wrap.rollbackIfCreated();
-      throw e;
-    }
-  }
-
-  /**
-   * Save the associations of a ManyToMany given the owner bean and the
-   * propertyName of the ManyToMany collection.
-   */
-  public void saveManyToManyAssociations(Object ownerBean, String propertyName) {
-    saveManyToManyAssociations(ownerBean, propertyName, null);
-  }
-
-  /**
-   * Save the associations of a ManyToMany given the owner bean and the
-   * propertyName of the ManyToMany collection.
-   */
-  public void saveManyToManyAssociations(Object ownerBean, String propertyName, Transaction t) {
-
-    EntityBean owner = checkEntityBean(ownerBean);
-    TransWrapper wrap = initTransIfRequired(t);
-    try {
-      SpiTransaction trans = wrap.transaction;
-
-      persister.saveManyToManyAssociations(owner, propertyName, trans);
-
-      wrap.commitIfCreated();
-
-    } catch (RuntimeException e) {
-      wrap.rollbackIfCreated();
-      throw e;
-    }
-  }
-
   @Override
   public int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
     return saveAllInternal(beans.iterator(), transaction);

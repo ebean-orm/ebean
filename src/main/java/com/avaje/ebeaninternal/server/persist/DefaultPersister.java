@@ -1071,21 +1071,6 @@ public final class DefaultPersister implements Persister {
     t.depth(-1);
   }
 
-  public int deleteManyToManyAssociations(EntityBean ownerBean, String propertyName, Transaction t) {
-
-    BeanDescriptor<?> descriptor = beanDescriptorManager.getBeanDescriptor(ownerBean.getClass());
-    BeanPropertyAssocMany<?> prop = (BeanPropertyAssocMany<?>) descriptor.getBeanProperty(propertyName);
-    return deleteAssocManyIntersection(ownerBean, prop, t, false);
-  }
-
-  public void saveManyToManyAssociations(EntityBean ownerBean, String propertyName, Transaction t) {
-
-    BeanDescriptor<?> descriptor = beanDescriptorManager.getBeanDescriptor(ownerBean.getClass());
-    BeanPropertyAssocMany<?> prop = (BeanPropertyAssocMany<?>) descriptor.getBeanProperty(propertyName);
-
-    saveAssocManyIntersection(new SaveManyPropRequest(prop, ownerBean, (SpiTransaction) t), false);
-  }
-
   /**
    * Save the additions and removals from a ManyToMany collection as inserts
    * and deletes from the intersection table.

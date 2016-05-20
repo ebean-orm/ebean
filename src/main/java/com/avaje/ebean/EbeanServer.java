@@ -1439,55 +1439,6 @@ public interface EbeanServer {
   void insertAll(Collection<?> beans, Transaction transaction);
 
   /**
-   * Delete the associations (from the intersection table) of a ManyToMany given
-   * the owner bean and the propertyName of the ManyToMany collection.
-   * <p>
-   * Typically these deletions occur automatically when persisting a ManyToMany
-   * collection and this provides a way to invoke those deletions directly.
-   * </p>
-   *
-   * @return the number of associations deleted (from the intersection table).
-   */
-  int deleteManyToManyAssociations(Object ownerBean, String propertyName);
-
-  /**
-   * Delete the associations (from the intersection table) of a ManyToMany given
-   * the owner bean and the propertyName of the ManyToMany collection.
-   * <p>
-   * Additionally specify a transaction to use.
-   * </p>
-   * <p>
-   * Typically these deletions occur automatically when persisting a ManyToMany
-   * collection and this provides a way to invoke those deletions directly.
-   * </p>
-   *
-   * @return the number of associations deleted (from the intersection table).
-   */
-  int deleteManyToManyAssociations(Object ownerBean, String propertyName, Transaction transaction);
-
-  /**
-   * Save the associations of a ManyToMany given the owner bean and the
-   * propertyName of the ManyToMany collection.
-   * <p>
-   * Typically the saving of these associations (inserting into the intersection
-   * table) occurs automatically when persisting a ManyToMany. This provides a
-   * way to invoke those insertions directly.
-   * </p>
-   */
-  void saveManyToManyAssociations(Object ownerBean, String propertyName);
-
-  /**
-   * Save the associations of a ManyToMany given the owner bean and the
-   * propertyName of the ManyToMany collection.
-   * <p>
-   * Typically the saving of these associations (inserting into the intersection
-   * table) occurs automatically when persisting a ManyToMany. This provides a
-   * way to invoke those insertions directly.
-   * </p>
-   */
-  void saveManyToManyAssociations(Object ownerBean, String propertyName, Transaction transaction);
-
-  /**
    * Execute explicitly passing a transaction.
    */
   int execute(SqlUpdate updSql, Transaction transaction);
