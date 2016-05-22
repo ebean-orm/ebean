@@ -1,5 +1,6 @@
 package com.avaje.tests.cache;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
@@ -239,5 +240,38 @@ public class TestCacheCollectionIds extends BaseTestCase {
     OCachedBean result = Ebean.find(OCachedBean.class, cachedBean.getId());
     Assert.assertEquals(1, result.getCountries().size());
 
+  }
+
+  @Test
+  public void testUpdating_noChange() throws InterruptedException {
+
+    ResetBasicData.reset();
+
+    Ebean.beginTransaction();
+    try {
+
+      OCachedBean cachedBean = new OCachedBean();
+      cachedBean.setName("helloForUpdate");
+      Ebean.save(cachedBean);
+
+      cachedBean = Ebean.find(OCachedBean.class, cachedBean.getId());
+
+      cachedBean.setName("mod");
+      ArrayList<Country> list = new ArrayList<Country>();
+      list.add(Ebean.find(Country.class, "NZ"));
+      cachedBean.setCountries(list);
+      Ebean.save(cachedBean);
+
+
+      cachedBean.setName("mod2");
+      Ebean.save(cachedBean);
+
+      Ebean.commitTransaction();
+    } finally {
+      Ebean.endTransaction();
+    }
+
+
+    Thread.sleep(2000);
   }
 }

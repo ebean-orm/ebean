@@ -24,7 +24,7 @@ public class OCachedBean {
 
   String name;
 
-  @ManyToMany
+  @ManyToMany(cascade = CascadeType.ALL)
   List<Country> countries = new ArrayList<Country>();
 
   @OneToMany(mappedBy = "cachedBean", cascade = CascadeType.ALL)

@@ -278,7 +278,9 @@ final class BeanDescriptorCacheHelp<T> {
   void manyPropPut(BeanPropertyAssocMany<?> many, Object details, Object parentId) {
 
     CachedManyIds entry = createManyIds(many, details);
-    cachePutManyIds(parentId, many.getName(), entry);
+    if (entry != null) {
+      cachePutManyIds(parentId, many.getName(), entry);
+    }
   }
 
   void cachePutManyIds(Object parentId, String manyName, CachedManyIds entry) {
@@ -296,6 +298,9 @@ final class BeanDescriptorCacheHelp<T> {
 
     List<Object> idList = new ArrayList<Object>();
     Collection<?> actualDetails = BeanCollectionUtil.getActualEntries(details);
+    if (actualDetails == null) {
+      return null;
+    }
     for (Object bean : actualDetails) {
       idList.add(targetDescriptor.getId((EntityBean) bean));
     }
@@ -621,7 +626,9 @@ final class BeanDescriptorCacheHelp<T> {
         BeanPropertyAssocMany<?> many = manyCollections.get(i);
         Object details = many.getValue(updateRequest.getEntityBean());
         CachedManyIds entry = createManyIds(many, details);
-        changeSet.addManyPut(desc, many.getName(), id, entry);
+        if (entry != null) {
+          changeSet.addManyPut(desc, many.getName(), id, entry);
+        }
       }
     }
     
