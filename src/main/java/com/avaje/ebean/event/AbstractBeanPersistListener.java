@@ -19,8 +19,7 @@ public abstract class AbstractBeanPersistListener implements BeanPersistListener
    * @param bean The bean that was inserted.
    */
   @Override
-  public boolean inserted(Object bean) {
-    return false;
+  public void inserted(Object bean) {
   }
 
   /**
@@ -31,8 +30,7 @@ public abstract class AbstractBeanPersistListener implements BeanPersistListener
    * @param updatedProperties The properties that were modified by this update.
    */
   @Override
-  public boolean updated(Object bean, Set<String> updatedProperties) {
-    return false;
+  public void updated(Object bean, Set<String> updatedProperties) {
   }
 
   /**
@@ -42,8 +40,7 @@ public abstract class AbstractBeanPersistListener implements BeanPersistListener
    * @param bean The bean that was deleted.
    */
   @Override
-  public boolean deleted(Object bean) {
-    return false;
+  public void deleted(Object bean) {
   }
 
 }

@@ -83,33 +83,21 @@ public class ChainedBeanPersistListener implements BeanPersistListener {
 		}
 	}
 
-	public boolean deleted(Object bean) {
-		boolean notifyCluster = false;
+	public void deleted(Object bean) {
 		for (int i = 0; i < chain.length; i++) {
-			if (chain[i].deleted(bean)) {
-				notifyCluster = true;
-			}
+			chain[i].deleted(bean);
 		}
-		return notifyCluster;
 	}
 
-	public boolean inserted(Object bean) {
-		boolean notifyCluster = false;
+	public void inserted(Object bean) {
 		for (int i = 0; i < chain.length; i++) {
-			if (chain[i].inserted(bean)) {
-				notifyCluster = true;
-			}
+			chain[i].inserted(bean);
 		}
-		return notifyCluster;
 	}
 
-	public boolean updated(Object bean, Set<String> updatedProperties) {
-		boolean notifyCluster = false;
+	public void updated(Object bean, Set<String> updatedProperties) {
 		for (int i = 0; i < chain.length; i++) {
-			if (chain[i].updated(bean, updatedProperties)) {
-				notifyCluster = true;
-			}
+			chain[i].updated(bean, updatedProperties);
 		}
-		return notifyCluster;
 	}
 }

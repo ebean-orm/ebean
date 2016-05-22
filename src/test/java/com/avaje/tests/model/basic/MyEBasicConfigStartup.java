@@ -53,22 +53,19 @@ public class MyEBasicConfigStartup implements ServerConfigStartup {
       return EBasic.class.isAssignableFrom(cls);
     }
 
-    public boolean inserted(Object bean) {
+    public void inserted(Object bean) {
       insertCount.incrementAndGet();
       System.out.println("-- EBasic inserted " + ((EBasic) bean).getId());
-      return false;
     }
 
-    public boolean updated(Object bean, Set<String> updatedProperties) {
+    public void updated(Object bean, Set<String> updatedProperties) {
       updateCount.incrementAndGet();
       System.out.println("-- EBasic updated " + ((EBasic) bean).getId() + " updatedProperties: " + updatedProperties);
-      return false;
     }
 
-    public boolean deleted(Object bean) {
+    public void deleted(Object bean) {
       deleteCount.incrementAndGet();
       System.out.println("-- EBasic deleted " + ((EBasic) bean).getId());
-      return false;
     }
 
   }
