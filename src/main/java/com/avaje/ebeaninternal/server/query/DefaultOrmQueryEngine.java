@@ -53,6 +53,12 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
     return queryEngine.delete(request);
   }
 
+  public <T> int update(OrmQueryRequest<T> request) {
+
+    flushJdbcBatchOnQuery(request);
+    return queryEngine.update(request);
+  }
+
   public <T> int findRowCount(OrmQueryRequest<T> request) {
 
     flushJdbcBatchOnQuery(request);

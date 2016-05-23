@@ -51,10 +51,18 @@ public class CQueryEngine {
   }
 
   public <T> int delete(OrmQueryRequest<T> request) {
+    CQueryUpdate query = queryBuilder.buildUpdateQuery("Delete", request);
+    return executeUpdate(request, query);
+  }
 
-    CQueryDelete query = queryBuilder.buildDeleteQuery(request);
+  public <T> int update(OrmQueryRequest<T> request) {
+    CQueryUpdate query = queryBuilder.buildUpdateQuery("Update", request);
+    return executeUpdate(request, query);
+  }
+
+  private <T> int executeUpdate(OrmQueryRequest<T> request, CQueryUpdate query) {
     try {
-      int rows = query.delete();
+      int rows = query.execute();
 
       if (request.isLogSql()) {
         String logSql = query.getGeneratedSql();

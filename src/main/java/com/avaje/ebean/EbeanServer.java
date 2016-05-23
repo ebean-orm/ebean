@@ -48,20 +48,20 @@ import java.util.Set;
  * <p>
  * Example: Get a EbeanServer
  * </p>
- * 
+ * <p>
  * <pre>{@code
  * // Get access to the Human Resources EbeanServer/Database
  * EbeanServer hrServer = Ebean.getServer("HR");
- * 
- * 
+ *
+ *
  * // fetch contact 3 from the HR database Contact contact =
  * hrServer.find(Contact.class, new Integer(3));
- * 
+ *
  * contact.setStatus("INACTIVE"); ...
- * 
+ *
  * // save the contact back to the HR database hrServer.save(contact);
  * }</pre>
- * 
+ * <p>
  * <p>
  * <b>EbeanServer has more API than Ebean</b><br/>
  * EbeanServer provides additional API compared with Ebean. For example it
@@ -78,7 +78,7 @@ import java.util.Set;
  * ThreadLocal transaction management you can use the createTransaction()
  * method. Example: a single thread requires more than one transaction.
  * </p>
- * 
+ *
  * @see Ebean
  * @see EbeanServerFactory
  * @see ServerConfig
@@ -95,16 +95,14 @@ public interface EbeanServer {
    * also have the option of shutting down the DataSource and deregistering the
    * JDBC driver.
    * </p>
-   * 
-   * @param shutdownDataSource
-   *          if true then shutdown the underlying DataSource if it is the EbeanORM
-   *          DataSource implementation.
-   * @param deregisterDriver
-   *          if true then deregister the JDBC driver if it is the EbeanORM
-   *          DataSource implementation.
+   *
+   * @param shutdownDataSource if true then shutdown the underlying DataSource if it is the EbeanORM
+   *                           DataSource implementation.
+   * @param deregisterDriver   if true then deregister the JDBC driver if it is the EbeanORM
+   *                           DataSource implementation.
    */
   void shutdown(boolean shutdownDataSource, boolean deregisterDriver);
-  
+
   /**
    * Return AutoTune which is used to control the AutoTune service at runtime.
    */
@@ -151,7 +149,8 @@ public interface EbeanServer {
    * For example, if the id value passed in is a String but ought to be a Long or UUID etc
    * then it will automatically be converted.
    * </p>
-   *  @param bean The entity bean to set the id value on.
+   *
+   * @param bean The entity bean to set the id value on.
    * @param id   The id value to set.
    */
   Object setBeanId(Object bean, Object id);
@@ -180,6 +179,27 @@ public interface EbeanServer {
   <T> CsvReader<T> createCsvReader(Class<T> beanType);
 
   /**
+   * Create an Update query to perform a bulk update.
+   * <p>
+   * <pre>{@code
+   *
+   *  int rows = ebeanServer
+   *      .update(Customer.class)
+   *      .set("status", Customer.Status.ACTIVE)
+   *      .set("updtime", new Timestamp(System.currentTimeMillis()))
+   *      .where()
+   *        .gt("id", 1000)
+   *        .update();
+   *
+   * }</pre>
+   *
+   * @param beanType The type of entity bean to update
+   * @param <T>      The type of entity bean
+   * @return The update query to use
+   */
+  <T> UpdateQuery<T> update(Class<T> beanType);
+
+  /**
    * Create a query for an entity bean and synonym for {@link #find(Class)}.
    *
    * @see #find(Class)
@@ -201,7 +221,7 @@ public interface EbeanServer {
    * {@link Query#findSet()} etc will execute against the same EbeanServer from
    * which is was created.
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *   // Find order 2 specifying explicitly the parts of the object graph to
@@ -224,7 +244,6 @@ public interface EbeanServer {
    *       .findList();
    *
    * }</pre>
-   *
    */
   <T> Query<T> find(Class<T> beanType);
 
@@ -272,7 +291,7 @@ public interface EbeanServer {
    * Note that the sorting uses a Comparator and Collections.sort(); and does
    * not invoke a DB query.
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *   // find orders and their customers
@@ -291,10 +310,8 @@ public interface EbeanServer {
    *
    * }</pre>
    *
-   * @param list
-   *          the list of entity beans
-   * @param sortByClause
-   *          the properties to sort the list by
+   * @param list         the list of entity beans
+   * @param sortByClause the properties to sort the list by
    */
   <T> void sort(List<T> list, String sortByClause);
 
@@ -309,7 +326,7 @@ public interface EbeanServer {
    * <p>
    * An example:
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *   // The bean name and properties - "topic","postCount" and "id"
@@ -362,7 +379,6 @@ public interface EbeanServer {
    * If there is no currently active transaction then a PersistenceException is thrown.
    *
    * @param transactionCallback The transaction callback to be registered with the current transaction.
-   *
    * @throws PersistenceException If there is no currently active transaction
    */
   void register(TransactionCallback transactionCallback) throws PersistenceException;
@@ -400,7 +416,7 @@ public interface EbeanServer {
    * Example of using a transaction to span multiple calls to find(), save()
    * etc.
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *    // start a transaction (stored in a ThreadLocal)
@@ -419,7 +435,7 @@ public interface EbeanServer {
    *    }
    *
    * }</pre>
-   *
+   * <p>
    * <h3>Transaction options:</h3>
    * <pre>{@code
    *
@@ -452,7 +468,7 @@ public interface EbeanServer {
    *    }
    *
    * }</pre>
-   *
+   * <p>
    * <p>
    * If you want to externalise the transaction management then you use
    * createTransaction() and pass the transaction around to the various methods on
@@ -468,12 +484,12 @@ public interface EbeanServer {
 
   /**
    * Start a transaction typically specifying REQUIRES_NEW or REQUIRED semantics.
-   *
+   * <p>
    * <p>
    * Note that this provides an try finally alternative to using {@link #execute(TxScope, TxCallable)} or
    * {@link #execute(TxScope, TxRunnable)}.
    * </p>
-   *
+   * <p>
    * <h3>REQUIRES_NEW example:</h3>
    * <pre>{@code
    * // Start a new transaction. If there is a current transaction
@@ -494,7 +510,7 @@ public interface EbeanServer {
    * }
    *
    * }</pre>
-   *
+   * <p>
    * <h3>REQUIRED example:</h3>
    * <pre>{@code
    *
@@ -543,25 +559,24 @@ public interface EbeanServer {
    * </p>
    * <p>
    * Code example:
-   * 
+   * <p>
    * <pre>{@code
    *
    *   ebeanServer.beginTransaction();
    *   try {
    *     // do some fetching and or persisting ...
-   * 
+   *
    *     // commit at the end
    *     ebeanServer.commitTransaction();
-   * 
+   *
    *   } finally {
    *     // if commit didn't occur then rollback the transaction
    *     ebeanServer.endTransaction();
    *   }
    *
    * }</pre>
-   * 
+   * <p>
    * </p>
-   *
    */
   void endTransaction();
 
@@ -576,28 +591,25 @@ public interface EbeanServer {
 
   /**
    * Refresh a many property of an entity bean.
-   * 
-   * @param bean
-   *          the entity bean containing the 'many' property
-   * @param propertyName
-   *          the 'many' property to be refreshed
    *
+   * @param bean         the entity bean containing the 'many' property
+   * @param propertyName the 'many' property to be refreshed
    */
   void refreshMany(Object bean, String propertyName);
 
   /**
    * Find a bean using its unique id.
-   *
+   * <p>
    * <pre>{@code
    *   // Fetch order 1
    *   Order order = ebeanServer.find(Order.class, 1);
    * }</pre>
-   *
+   * <p>
    * <p>
    * If you want more control over the query then you can use createQuery() and
    * Query.findUnique();
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *   // ... additionally fetching customer, customer shipping address,
    *   // order details, and the product associated with each order detail.
@@ -628,10 +640,8 @@ public interface EbeanServer {
    *
    * }</pre>
    *
-   * @param beanType
-   *          the type of entity bean to fetch
-   * @param id
-   *          the id value
+   * @param beanType the type of entity bean to fetch
+   * @param id       the id value
    */
   <T> T find(Class<T> beanType, Object id);
 
@@ -658,7 +668,7 @@ public interface EbeanServer {
    *
    *
    * }</pre>
-   *
+   * <p>
    * <h3>Lazy loading characteristics</h3>
    * <pre>{@code
    *
@@ -673,10 +683,8 @@ public interface EbeanServer {
    *
    * }</pre>
    *
-   * @param beanType
-   *          the type of entity bean
-   * @param id
-   *          the id value
+   * @param beanType the type of entity bean
+   * @param id       the id value
    */
   <T> T getReference(Class<T> beanType, Object id);
 
@@ -707,7 +715,7 @@ public interface EbeanServer {
    * Internally this query using a PersistenceContext scoped to each bean (and the
    * beans associated object graph).
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *     ebeanServer.find(Order.class)
@@ -741,7 +749,7 @@ public interface EbeanServer {
    * Internally this query using a PersistenceContext scoped to each bean (and the
    * beans associated object graph).
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *     ebeanServer.find(Order.class)
@@ -766,8 +774,8 @@ public interface EbeanServer {
   /**
    * Return versions of a @History entity bean.
    * <p>
-   *   Generally this query is expected to be a find by id or unique predicates query.
-   *   It will execute the query against the history returning the versions of the bean.
+   * Generally this query is expected to be a find by id or unique predicates query.
+   * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
   <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction);
@@ -779,7 +787,7 @@ public interface EbeanServer {
    * explicitly calling this method. You could use this method if you wish to
    * explicitly control the transaction used for the query.
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    * List<Customer> customers =
@@ -789,14 +797,10 @@ public interface EbeanServer {
    *
    * }</pre>
    *
-   * @param <T>
-   *          the type of entity bean to fetch.
-   * @param query
-   *          the query to execute.
-   * @param transaction
-   *          the transaction to use (can be null).
+   * @param <T>         the type of entity bean to fetch.
+   * @param query       the query to execute.
+   * @param transaction the transaction to use (can be null).
    * @return the list of fetched beans.
-   *
    * @see Query#findList()
    */
   <T> List<T> findList(Query<T> query, Transaction transaction);
@@ -808,13 +812,10 @@ public interface EbeanServer {
    * execution status (isDone etc) and get the value (with or without a
    * timeout).
    * </p>
-   * 
-   * @param query
-   *          the query to execute the row count on
-   * @param transaction
-   *          the transaction (can be null).
-   * @return a Future object for the row count query
    *
+   * @param query       the query to execute the row count on
+   * @param transaction the transaction (can be null).
+   * @return a Future object for the row count query
    * @see com.avaje.ebean.Query#findFutureRowCount()
    */
   <T> FutureRowCount<T> findFutureRowCount(Query<T> query, Transaction transaction);
@@ -826,13 +827,10 @@ public interface EbeanServer {
    * execution status (isDone etc) and get the value (with or without a
    * timeout).
    * </p>
-   * 
-   * @param query
-   *          the query to execute the fetch Id's on
-   * @param transaction
-   *          the transaction (can be null).
-   * @return a Future object for the list of Id's
    *
+   * @param query       the query to execute the fetch Id's on
+   * @param transaction the transaction (can be null).
+   * @return a Future object for the list of Id's
    * @see com.avaje.ebean.Query#findFutureIds()
    */
   <T> FutureIds<T> findFutureIds(Query<T> query, Transaction transaction);
@@ -846,13 +844,9 @@ public interface EbeanServer {
    * This query will execute in it's own PersistenceContext and using its own transaction.
    * What that means is that it will not share any bean instances with other queries.
    *
-   *
-   * @param query
-   *          the query to execute in the background
-   * @param transaction
-   *          the transaction (can be null).
+   * @param query       the query to execute in the background
+   * @param transaction the transaction (can be null).
    * @return a Future object for the list result of the query
-   *
    * @see Query#findFutureList()
    */
   <T> FutureList<T> findFutureList(Query<T> query, Transaction transaction);
@@ -867,7 +861,7 @@ public interface EbeanServer {
    * If maxRows is not set on the query prior to calling findPagedList() then a
    * PersistenceException is thrown.
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *  PagedList<Order> pagedList = Ebean.find(Order.class)
@@ -884,7 +878,6 @@ public interface EbeanServer {
    * }</pre>
    *
    * @return The PagedList
-   *
    * @see Query#findPagedList()
    */
   <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction);
@@ -896,7 +889,7 @@ public interface EbeanServer {
    * explicitly calling this method. You could use this method if you wish to
    * explicitly control the transaction used for the query.
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    * Set<Customer> customers =
@@ -905,15 +898,11 @@ public interface EbeanServer {
    *     .findSet();
    *
    * }</pre>
-   * 
-   * @param <T>
-   *          the type of entity bean to fetch.
-   * @param query
-   *          the query to execute
-   * @param transaction
-   *          the transaction to use (can be null).
-   * @return the set of fetched beans.
    *
+   * @param <T>         the type of entity bean to fetch.
+   * @param query       the query to execute
+   * @param transaction the transaction to use (can be null).
+   * @return the set of fetched beans.
    * @see Query#findSet()
    */
   <T> Set<T> findSet(Query<T> query, Transaction transaction);
@@ -925,15 +914,11 @@ public interface EbeanServer {
    * explicitly calling this method. You could use this method if you wish to
    * explicitly control the transaction used for the query.
    * </p>
-   * 
-   * @param <T>
-   *          the type of entity bean to fetch.
-   * @param query
-   *          the query to execute.
-   * @param transaction
-   *          the transaction to use (can be null).
-   * @return the map of fetched beans.
    *
+   * @param <T>         the type of entity bean to fetch.
+   * @param query       the query to execute.
+   * @param transaction the transaction to use (can be null).
+   * @return the map of fetched beans.
    * @see Query#findMap()
    */
   <T> Map<?, T> findMap(Query<T> query, Transaction transaction);
@@ -950,15 +935,11 @@ public interface EbeanServer {
    * explicitly control the transaction used for the query.
    * </p>
    *
-   * @param <T>
-   *          the type of entity bean to fetch.
-   * @param query
-   *          the query to execute.
-   * @param transaction
-   *          the transaction to use (can be null).
+   * @param <T>         the type of entity bean to fetch.
+   * @param query       the query to execute.
+   * @param transaction the transaction to use (can be null).
    * @return the list of fetched beans.
    * @throws NonUniqueResultException if more than one result was found
-   *
    * @see Query#findUnique()
    */
   @Nullable
@@ -980,19 +961,29 @@ public interface EbeanServer {
   <T> int delete(Query<T> query, Transaction transaction);
 
   /**
+   * Execute the update query returning the number of rows updated.
+   * <p>
+   * The update query must be created using {@link #update(Class)}.
+   * </p>
+   *
+   * @param query       the update query to execute
+   * @param transaction the optional transaction to use for the update (can be null)
+   * @param <T>         the type of entity bean
+   * @return The number of rows updated
+   */
+  <T> int update(Query<T> query, Transaction transaction);
+
+  /**
    * Execute the sql query returning a list of MapBean.
    * <p>
    * Generally you are able to use {@link SqlQuery#findList()} rather than
    * explicitly calling this method. You could use this method if you wish to
    * explicitly control the transaction used for the query.
    * </p>
-   * 
-   * @param query
-   *          the query to execute.
-   * @param transaction
-   *          the transaction to use (can be null).
-   * @return the list of fetched MapBean.
    *
+   * @param query       the query to execute.
+   * @param transaction the transaction to use (can be null).
+   * @return the list of fetched MapBean.
    * @see SqlQuery#findList()
    */
   List<SqlRow> findList(SqlQuery query, Transaction transaction);
@@ -1027,13 +1018,10 @@ public interface EbeanServer {
    * explicitly calling this method. You could use this method if you wish to
    * explicitly control the transaction used for the query.
    * </p>
-   * 
-   * @param query
-   *          the query to execute.
-   * @param transaction
-   *          the transaction to use (can be null).
-   * @return the fetched MapBean or null if none was found.
    *
+   * @param query       the query to execute.
+   * @param transaction the transaction to use (can be null).
+   * @return the fetched MapBean or null if none was found.
    * @see SqlQuery#findUnique()
    */
   @Nullable
@@ -1054,7 +1042,7 @@ public interface EbeanServer {
    * In this example below the details property has a CascadeType.ALL set so
    * saving an order will also save all its details.
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *   public class Order { ...
    *
@@ -1063,7 +1051,7 @@ public interface EbeanServer {
    * 	   ...
    *   }
    * }</pre>
-   *
+   * <p>
    * <p>
    * When a save cascades via a OneToMany or ManyToMany Ebean will automatically
    * set the 'parent' object to the 'detail' object. In the example below in
@@ -1195,7 +1183,7 @@ public interface EbeanServer {
    * <p>
    * Example:
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *   // example that uses 'named' parameters
@@ -1212,11 +1200,8 @@ public interface EbeanServer {
    *
    * }</pre>
    *
-   * @param sqlUpdate
-   *          the update sql potentially with bind values
-   *
+   * @param sqlUpdate the update sql potentially with bind values
    * @return the number of rows updated or deleted. -1 if executed in batch.
-   *
    * @see CallableSql
    */
   int execute(SqlUpdate sqlUpdate);
@@ -1241,7 +1226,7 @@ public interface EbeanServer {
    * <p>
    * Example:
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *   String sql = "{call sp_order_modify(?,?,?)}";
@@ -1288,28 +1273,20 @@ public interface EbeanServer {
    * information is registered immediately (with the transaction manager).
    * </p>
    *
-   * @param tableName
-   *          the name of the table that was modified
-   * @param inserted
-   *          true if rows where inserted into the table
-   * @param updated
-   *          true if rows on the table where updated
-   * @param deleted
-   *          true if rows on the table where deleted
+   * @param tableName the name of the table that was modified
+   * @param inserted  true if rows where inserted into the table
+   * @param updated   true if rows on the table where updated
+   * @param deleted   true if rows on the table where deleted
    */
   void externalModification(String tableName, boolean inserted, boolean updated, boolean deleted);
 
   /**
    * Find a entity bean with an explicit transaction.
-   * 
-   * @param <T>
-   *          the type of entity bean to find
-   * @param beanType
-   *          the type of entity bean to find
-   * @param id
-   *          the bean id value
-   * @param transaction
-   *          the transaction to use (can be null)
+   *
+   * @param <T>         the type of entity bean to find
+   * @param beanType    the type of entity bean to find
+   * @param id          the bean id value
+   * @param transaction the transaction to use (can be null)
    */
   <T> T find(Class<T> beanType, Object id, Transaction transaction);
 
@@ -1331,20 +1308,20 @@ public interface EbeanServer {
    * <p>
    * An unmodified bean that is saved or updated is normally skipped and this marks the bean as
    * dirty so that it is not skipped.
-   * 
+   * <p>
    * <pre>{@code
-   * 
+   *
    * Customer customer = ebeanServer.find(Customer, id);
-   * 
+   *
    * // mark the bean as dirty so that a save() or update() will
    * // increment the version property
    * ebeanServer.markAsDirty(customer);
    * ebeanServer.save(customer);
-   * 
+   *
    * }</pre>
    */
   void markAsDirty(Object bean);
-  
+
   /**
    * Saves the bean using an update. If you know you are updating a bean then it is preferable to
    * use this update() method rather than save().
@@ -1367,17 +1344,17 @@ public interface EbeanServer {
    * controls if only the changed properties are included in the update or if all the loaded
    * properties are included instead.
    * </p>
-   * 
+   * <p>
    * <pre>{@code
-   * 
+   *
    * // A 'stateless update' example
    * Customer customer = new Customer();
    * customer.setId(7);
    * customer.setName("ModifiedNameNoOCC");
    * ebeanServer.update(customer);
-   * 
+   *
    * }</pre>
-   * 
+   *
    * @see ServerConfig#setUpdatesDeleteMissingChildren(boolean)
    * @see ServerConfig#setUpdateChangesOnly(boolean)
    */
@@ -1390,14 +1367,11 @@ public interface EbeanServer {
 
   /**
    * Update a bean additionally specifying a transaction and the deleteMissingChildren setting.
-   * 
-   * @param bean
-   *          the bean to update
-   * @param transaction
-   *          the transaction to use (can be null).
-   * @param deleteMissingChildren
-   *          specify false if you do not want 'missing children' of a OneToMany
-   *          or ManyToMany to be automatically deleted.
+   *
+   * @param bean                  the bean to update
+   * @param transaction           the transaction to use (can be null).
+   * @param deleteMissingChildren specify false if you do not want 'missing children' of a OneToMany
+   *                              or ManyToMany to be automatically deleted.
    */
   void update(Object bean, Transaction transaction, boolean deleteMissingChildren) throws OptimisticLockException;
 
@@ -1454,7 +1428,7 @@ public interface EbeanServer {
    * The scope can control the transaction type, isolation and rollback
    * semantics.
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *   // set specific transactional scope settings
@@ -1477,7 +1451,7 @@ public interface EbeanServer {
    * The default scope runs with REQUIRED and by default will rollback on any
    * exception (checked or runtime).
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *    ebeanServer.execute(new TxRunnable() {
@@ -1503,7 +1477,7 @@ public interface EbeanServer {
    * The scope can control the transaction type, isolation and rollback
    * semantics.
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *   // set specific transactional scope settings
@@ -1531,7 +1505,7 @@ public interface EbeanServer {
    * This is basically the same as TxRunnable except that it returns an Object
    * (and you specify the return type via generics).
    * </p>
-   *
+   * <p>
    * <pre>{@code
    *
    *   ebeanServer.execute(new TxCallable<String>() {
@@ -1555,7 +1529,6 @@ public interface EbeanServer {
 
   /**
    * Return the manager of the server cache ("L2" cache).
-   * 
    */
   ServerCacheManager getServerCacheManager();
 
@@ -1571,7 +1544,7 @@ public interface EbeanServer {
    * This instance is safe to be used concurrently by multiple threads and this
    * method is cheap to call.
    * </p>
-   *
+   * <p>
    * <h3>Simple example:</h3>
    * <pre>{@code
    *
@@ -1580,7 +1553,7 @@ public interface EbeanServer {
    *     System.out.println(jsonOutput);
    *
    * }</pre>
-   *
+   * <p>
    * <h3>Using PathProperties:</h3>
    * <pre>{@code
    *
@@ -1630,9 +1603,9 @@ public interface EbeanServer {
    * The values are published from the draft to the live bean.
    * </p>
    *
-   * @param <T>         the type of the entity bean
-   * @param beanType    the type of the entity bean
-   * @param id          the id of the entity bean
+   * @param <T>      the type of the entity bean
+   * @param beanType the type of the entity bean
+   * @param id       the id of the entity bean
    */
   <T> T publish(Class<T> beanType, Object id);
 
@@ -1655,8 +1628,8 @@ public interface EbeanServer {
    * The values are published from the draft beans to the live beans.
    * </p>
    *
-   * @param <T>         the type of the entity bean
-   * @param query       the query used to select the draft beans to publish
+   * @param <T>   the type of the entity bean
+   * @param query the query used to select the draft beans to publish
    */
   <T> List<T> publish(Query<T> query);
 
@@ -1681,9 +1654,9 @@ public interface EbeanServer {
    * <code>@DraftDirty</code> and <code>@DraftReset</code> properties are reset.
    * </p>
    *
-   * @param <T>         the type of the entity bean
-   * @param beanType    the type of the entity bean
-   * @param id          the id of the entity bean to restore
+   * @param <T>      the type of the entity bean
+   * @param beanType the type of the entity bean
+   * @param id       the id of the entity bean to restore
    */
   <T> T draftRestore(Class<T> beanType, Object id);
 
@@ -1707,8 +1680,8 @@ public interface EbeanServer {
    * <code>@DraftDirty</code> and <code>@DraftReset</code> properties are reset.
    * </p>
    *
-   * @param <T>         the type of the entity bean
-   * @param query       the query used to select the draft beans to restore
+   * @param <T>   the type of the entity bean
+   * @param query the query used to select the draft beans to restore
    */
   <T> List<T> draftRestore(Query<T> query);
 

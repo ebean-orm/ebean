@@ -278,6 +278,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public int update() {
+    return query.update();
+  }
+
+  @Override
   public FutureIds<T> findFutureIds() {
     return query.findFutureIds();
   }

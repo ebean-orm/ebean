@@ -1020,6 +1020,28 @@ public final class Ebean {
   }
 
   /**
+   * Create an Update query to perform a bulk update.
+   * <p>
+   * <pre>{@code
+   *
+   *  int rows = Ebean.update(Customer.class)
+   *      .set("status", Customer.Status.ACTIVE)
+   *      .set("updtime", new Timestamp(System.currentTimeMillis()))
+   *      .where()
+   *        .gt("id", 1000)
+   *        .update();
+   *
+   * }</pre>
+   *
+   * @param beanType The type of entity bean to update
+   * @param <T>      The type of entity bean
+   * @return The update query to use
+   */
+  public static <T> UpdateQuery<T> update(Class<T> beanType) {
+    return serverMgr.getDefaultServer().update(beanType);
+  }
+
+  /**
    * Create a filter for sorting and filtering lists of entities locally without
    * going back to the database.
    * <p>

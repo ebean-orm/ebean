@@ -53,6 +53,11 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   int delete();
 
   /**
+   * Execute the query as a update.
+   */
+  int update();
+
+  /**
    * Execute the query as findById.
    */
   Object findId();

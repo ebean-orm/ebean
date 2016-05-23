@@ -42,4 +42,9 @@ public interface OrmQueryEngine {
    * Execute the query as a delete statement.
    */
   <T> int delete(OrmQueryRequest<T> request);
+
+  /**
+   * Execute the query as a update statement.
+   */
+  <T> int update(OrmQueryRequest<T> request);
 }

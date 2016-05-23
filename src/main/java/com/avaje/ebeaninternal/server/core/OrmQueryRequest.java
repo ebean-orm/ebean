@@ -287,6 +287,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   /**
+   * Execute the query as a update.
+   */
+  public int update() {
+    return queryEngine.update(this);
+  }
+
+  /**
    * Execute the query as findById.
    */
   public Object findId() {

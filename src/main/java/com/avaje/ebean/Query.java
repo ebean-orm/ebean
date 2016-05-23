@@ -764,6 +764,11 @@ public interface Query<T> {
   int delete();
 
   /**
+   * Execute the UpdateQuery returning the number of rows updated.
+   */
+  int update();
+
+  /**
    * Return the count of entities this query should return.
    * <p>
    * This is the number of 'top level' or 'root level' entities.

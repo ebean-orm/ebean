@@ -9,11 +9,12 @@ import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DeployParser;
+import com.avaje.ebeaninternal.server.expression.DefaultExpressionRequest;
 import com.avaje.ebeaninternal.server.persist.Binder;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryProperties;
+import com.avaje.ebeaninternal.server.querydefn.OrmUpdateProperties;
 import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.util.BindParamsParser;
-import com.avaje.ebeaninternal.server.expression.DefaultExpressionRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,6 +113,8 @@ public class CQueryPredicates {
 
   private String dbOrderBy;
 
+  private String dbUpdateClause;
+
   /**
    * Includes from where and order by clauses.
    */
@@ -132,6 +135,12 @@ public class CQueryPredicates {
   }
 
   public String bind(DataBind dataBind) throws SQLException {
+
+    OrmUpdateProperties updateProperties = query.getUpdateProperties();
+    if (updateProperties != null) {
+      // bind the update set clause
+      updateProperties.bind(binder, dataBind);
+    }
 
     if (query.isVersionsBetween() && binder.isBindAsOfWithFromClause()) {
       // sql2011 based versions between timestamp syntax
@@ -194,6 +203,15 @@ public class CQueryPredicates {
     }
 
     return dataBind.log().toString();
+  }
+
+  private void buildUpdateClause(boolean buildSql, DeployParser deployParser) {
+    if (buildSql) {
+      OrmUpdateProperties updateProperties = query.getUpdateProperties();
+      if (updateProperties != null) {
+        dbUpdateClause = updateProperties.buildSetClause(deployParser);
+      }
+    }
   }
 
   private void buildBindHavingRawSql(boolean buildSql, boolean parseRaw, DeployParser deployParser) {
@@ -266,15 +284,12 @@ public class CQueryPredicates {
     prepare(buildSql, true, deployParser);
   }
 
-  public void prepareRawSql(DeployParser deployParser) {
-    prepare(true, false, deployParser);
-  }
-
   /**
    * This combines the sql from named/positioned parameters and expressions.
    */
   private void prepare(boolean buildSql, boolean parseRaw, DeployParser deployParser) {
 
+    buildUpdateClause(buildSql, deployParser);
     buildBindWhereRawSql(buildSql, parseRaw, deployParser);
     buildBindHavingRawSql(buildSql, parseRaw, deployParser);
 
@@ -471,6 +486,13 @@ public class CQueryPredicates {
    */
   public List<Object> getWhereExprBindValues() {
     return where.getBindValues();
+  }
+
+  /**
+   * Return the db update set clause for an UpdateQuery.
+   */
+  public String getDbUpdateClause() {
+    return dbUpdateClause;
   }
 
   /**

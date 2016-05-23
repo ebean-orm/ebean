@@ -18,6 +18,7 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.query.CancelableQuery;
 import com.avaje.ebeaninternal.server.querydefn.NaturalKeyBindParam;
 import com.avaje.ebeaninternal.server.querydefn.OrmQueryDetail;
+import com.avaje.ebeaninternal.server.querydefn.OrmUpdateProperties;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -91,6 +92,11 @@ public interface SpiQuery<T> extends Query<T> {
      * Delete query.
      */
     DELETE,
+
+    /**
+     * Update query.
+     */
+    UPDATE,
   }
 
   enum TemporalMode {
@@ -676,5 +682,10 @@ public interface SpiQuery<T> extends Query<T> {
    * Validate the query returning the set of properties with unknown paths.
    */
   Set<String> validate(BeanType<T> desc);
+
+  /**
+   * Return the properties for an update query.
+   */
+  OrmUpdateProperties getUpdateProperties();
 
 }

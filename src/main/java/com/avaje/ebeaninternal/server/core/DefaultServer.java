@@ -53,6 +53,7 @@ import com.avaje.ebeaninternal.server.query.QueryFutureRowCount;
 import com.avaje.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import com.avaje.ebeaninternal.server.querydefn.DefaultOrmUpdate;
 import com.avaje.ebeaninternal.server.querydefn.DefaultRelationalQuery;
+import com.avaje.ebeaninternal.server.querydefn.DefaultUpdateQuery;
 import com.avaje.ebeaninternal.server.text.csv.TCsvReader;
 import com.avaje.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
@@ -875,11 +876,15 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return new TCsvReader<T>(this, descriptor);
   }
 
+  public <T> UpdateQuery<T> update(Class<T> beanType) {
+    return new DefaultUpdateQuery<T>(createQuery(beanType));
+  }
+
   public <T> Query<T> find(Class<T> beanType) {
     return createQuery(beanType);
   }
 
-  public <T> Query<T> createQuery(Class<T> beanType) {
+  public <T> DefaultOrmQuery<T> createQuery(Class<T> beanType) {
     BeanDescriptor<T> desc = getBeanDescriptor(beanType);
     if (desc == null) {
       throw new PersistenceException(beanType.getName() + " is NOT an Entity Bean registered with this server?");
@@ -1154,6 +1159,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       request.initTransIfRequired();
       request.markNotQueryOnly();
       return request.delete();
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
+  public <T> int update(Query<T> query, Transaction t) {
+
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.UPDATE, query, t);
+    try {
+      request.initTransIfRequired();
+      request.markNotQueryOnly();
+      return request.update();
     } finally {
       request.endTransIfRequired();
     }

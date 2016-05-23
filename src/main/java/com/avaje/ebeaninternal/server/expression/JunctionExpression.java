@@ -280,6 +280,11 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public int update() {
+    return exprList.update();
+  }
+
+  @Override
   public Query<T> asOf(Timestamp asOf) {
     return exprList.asOf(asOf);
   }

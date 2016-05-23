@@ -230,6 +230,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private boolean useDocStore;
 
+  private OrmUpdateProperties updateProperties;
+
   public DefaultOrmQuery(BeanDescriptor<T> desc, EbeanServer server, ExpressionFactory expressionFactory) {
     this.beanDescriptor = desc;
     this.beanType = desc.getBeanType();
@@ -831,7 +833,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     queryPlanKey = new OrmQueryPlanKey(includeTableJoin, type, detail, maxRows, firstRow,
         disableLazyLoading, rawWhereClause, orderBy, query, additionalWhere, additionalHaving,
         distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
-        temporalMode, forUpdate, rootTableAlias, rawSql);
+        temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);
 
     return queryPlanKey;
   }
@@ -1034,6 +1036,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public int delete() {
     return server.delete(this, null);
+  }
+
+  @Override
+  public int update() {
+    return server.update(this, null);
   }
 
   @Override
@@ -1527,5 +1534,14 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       }
     }
     return validation.getUnknownProperties();
+  }
+
+  public void setUpdateProperties(OrmUpdateProperties updateProperties) {
+    this.updateProperties = updateProperties;
+  }
+
+  @Override
+  public OrmUpdateProperties getUpdateProperties() {
+    return updateProperties;
   }
 }

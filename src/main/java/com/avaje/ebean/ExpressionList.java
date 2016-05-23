@@ -135,9 +135,17 @@ public interface ExpressionList<T> {
    * optimal depending on the database platform.
    * </p>
    *
-   * @return the number of beans/rows that were deleted.
+   * @return the number of rows that were deleted.
    */
   int delete();
+
+  /**
+   * Execute as a update query.
+   *
+   * @return the number of rows that were updated.
+   * @see UpdateQuery
+   */
+  int update();
 
   /**
    * Execute the query process the beans one at a time.

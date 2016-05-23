@@ -4,9 +4,6 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.type.DataBind;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.sql.Connection;
@@ -18,8 +15,6 @@ import java.sql.SQLException;
  * Executes the select row count query.
  */
 public class CQueryRowCount {
-
-  private static final Logger logger = LoggerFactory.getLogger(CQueryRowCount.class);
 
   /**
    * The overall find request wrapper object.
@@ -137,29 +132,12 @@ public class CQueryRowCount {
 
   /**
    * Close the resources.
-   * <p>
-   * The jdbc resultSet and statement need to be closed. Its important that
-   * this method is called.
-   * </p>
    */
   private void close() {
-    try {
-      if (rset != null) {
-        rset.close();
-        rset = null;
-      }
-    } catch (SQLException e) {
-      logger.error(null, e);
-    }
-    try {
-      if (pstmt != null) {
-        pstmt.close();
-        pstmt = null;
-      }
-    } catch (SQLException e) {
-      logger.error(null, e);
-    }
+    UtilJdbc.close(rset);
+    UtilJdbc.close(pstmt);
+    rset = null;
+    pstmt = null;
   }
-
 
 }

@@ -35,11 +35,12 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
   private final SpiQuery.TemporalMode temporalMode;
   private final boolean forUpdate;
   private final String rootTableAlias;
+  private final OrmUpdateProperties updateProperties;
 
   private final int planHash;
   private final int bindCount;
 
-  public OrmQueryPlanKey(TableJoin includeTableJoin, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading, String rawWhereClause, OrderBy<?> orderBy, String query, String additionalWhere, String additionalHaving, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams, SpiExpression whereExpressions, SpiExpression havingExpressions, SpiQuery.TemporalMode temporalMode, boolean forUpdate, String rootTableAlias, RawSql rawSql) {
+  public OrmQueryPlanKey(TableJoin includeTableJoin, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading, String rawWhereClause, OrderBy<?> orderBy, String query, String additionalWhere, String additionalHaving, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams, SpiExpression whereExpressions, SpiExpression havingExpressions, SpiQuery.TemporalMode temporalMode, boolean forUpdate, String rootTableAlias, RawSql rawSql, OrmUpdateProperties updateProperties) {
 
     this.includeTableJoin = includeTableJoin;
     this.type = type;
@@ -61,6 +62,7 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
     this.temporalMode = temporalMode;
     this.forUpdate = forUpdate;
     this.rootTableAlias = rootTableAlias;
+    this.updateProperties = updateProperties;
     this.rawSqlKey = (rawSql == null) ? null : rawSql.getKey();
 
     // exclude bind values and things unrelated to the sql being generated
@@ -90,6 +92,9 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
     }
     if (having != null) {
       having.queryPlanHash(builder);
+    }
+    if (updateProperties != null) {
+      updateProperties.buildQueryPlanHash(builder);
     }
 
     this.planHash = builder.getPlanHash();
@@ -128,6 +133,7 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
     if (orderByAsSting != null ? !orderByAsSting.equals(that.orderByAsSting) : that.orderByAsSting != null) return false;
     if (where != null ? !where.isSameByPlan(that.where) : that.where != null) return false;
     if (having != null ? !having.isSameByPlan(that.having) : that.having != null) return false;
+    if (updateProperties != null ? !updateProperties.isSameByPlan(that.updateProperties) : that.updateProperties != null) return false;
     if (rawSqlKey != null ? !rawSqlKey.equals(that.rawSqlKey) : that.rawSqlKey != null) return false;
 
 //    if (detail != null ? !detail.equals(that.detail) : that.detail != null) return false;

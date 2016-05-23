@@ -88,7 +88,7 @@ public class CQueryBuilder {
   /**
    * Build the delete query.
    */
-  public <T> CQueryDelete buildDeleteQuery(OrmQueryRequest<T> request) {
+  public <T> CQueryUpdate buildUpdateQuery(String type, OrmQueryRequest<T> request) {
 
     SpiQuery<T> query = request.getQuery();
     String rootTableAlias = query.getAlias();
@@ -99,33 +99,54 @@ public class CQueryBuilder {
     if (queryPlan != null) {
       // skip building the SqlTree and Sql string
       predicates.prepare(false);
-      String sql = queryPlan.getSql();
-      return new CQueryDelete(request, predicates, sql);
+      return new CQueryUpdate(type, request, predicates, queryPlan.getSql());
     }
 
     predicates.prepare(true);
 
     SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
 
-    boolean includeJoins = sqlTree.isIncludeJoins();
-
     String sql;
-    if (!includeJoins) {
-      // simple - delete from table ...
-      sql = aliasStrip(buildSql("delete", request, predicates, sqlTree).getSql());
+    if (type.equals("Delete")) {
+      sql = buildDeleteSql(request, rootTableAlias, predicates, sqlTree);
     } else {
-      // wrap as - delete from table where id in (select id ...)
-      sql = buildSql(null, request, predicates, sqlTree).getSql();
-      sql = request.getBeanDescriptor().getDeleteByIdInSql() + "in (" + sql + ")";
-      String alias = (rootTableAlias == null) ? "t0" : rootTableAlias;
-      sql = aliasReplace(sql, alias);
+      sql = buildUpdateSql(request, rootTableAlias, predicates, sqlTree);
     }
 
     // cache the query plan
     queryPlan = new CQueryPlan(request, sql, sqlTree, false, false, predicates.getLogWhereSql());
-
     request.putQueryPlan(queryPlan);
-    return new CQueryDelete(request, predicates, sql);
+    return new CQueryUpdate(type, request, predicates, sql);
+  }
+
+  private <T> String buildDeleteSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
+
+    if (!sqlTree.isIncludeJoins()) {
+      // simple - delete from table ...
+      return  aliasStrip(buildSql("delete", request, predicates, sqlTree).getSql());
+    }
+    // wrap as - delete from table where id in (select id ...)
+    String sql = buildSql(null, request, predicates, sqlTree).getSql();
+    sql = request.getBeanDescriptor().getDeleteByIdInSql() + "in (" + sql + ")";
+    String alias = (rootTableAlias == null) ? "t0" : rootTableAlias;
+    sql = aliasReplace(sql, alias);
+    return sql;
+  }
+
+  private <T> String buildUpdateSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
+
+    String updateClause = "update "+request.getBeanDescriptor().getBaseTable()+" set "+predicates.getDbUpdateClause();
+
+    if (!sqlTree.isIncludeJoins()) {
+      // simple - update table set ... where ...
+      return  aliasStrip(buildSql(updateClause, request, predicates, sqlTree).getSql());
+    }
+    // wrap as - update table set ... where id in (select id ...)
+    String sql = buildSql(null, request, predicates, sqlTree).getSql();
+    sql = updateClause + " " + request.getBeanDescriptor().getWhereIdInSql() + "in (" + sql + ")";
+    String alias = (rootTableAlias == null) ? "t0" : rootTableAlias;
+    sql = aliasReplace(sql, alias);
+    return sql;
   }
 
   /**
@@ -423,11 +444,10 @@ public class CQueryBuilder {
       }
     }
 
-    sb.append(" from ");
-
-    // build the from clause potentially with joins
-    // required only for the predicates
-    sb.append(select.getFromSql());
+    if (selectClause == null || !selectClause.startsWith("update")) {
+      sb.append(" from ");
+      sb.append(select.getFromSql());
+    }
 
     String inheritanceWhere = select.getInheritanceWhereSql();
 

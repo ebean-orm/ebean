@@ -367,6 +367,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   private String deleteByIdSql;
   private String deleteByIdInSql;
+  private String whereIdInSql;
   private String softDeleteByIdSql;
   private String softDeleteByIdInSql;
 
@@ -687,7 +688,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     String idEqualsSql = idBinder.getBindIdSql(null);
 
     deleteByIdSql = "delete from " + baseTable + " where " + idEqualsSql;
-    deleteByIdInSql = "delete from " + baseTable + " where " + idBinderInLHSSqlNoAlias + " ";
+    whereIdInSql = " where " + idBinderInLHSSqlNoAlias + " ";
+    deleteByIdInSql = "delete from " + baseTable + whereIdInSql;
 
     if (softDelete) {
       softDeleteByIdSql = "update " + baseTable + " set " + getSoftDeleteDbSet() + " where " + idEqualsSql;
@@ -794,6 +796,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     } else {
       return deleteByIdList(idList, softDelete);
     }
+  }
+
+  /**
+   * Return the "where id in" sql (for use with UpdateQuery).
+   */
+  public String getWhereIdInSql() {
+    return whereIdInSql;
   }
 
   /**

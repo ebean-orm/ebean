@@ -4,9 +4,6 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.type.DataBind;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,9 +12,7 @@ import java.sql.SQLException;
 /**
  * Executes the delete query.
  */
-public class CQueryDelete {
-
-  private static final Logger logger = LoggerFactory.getLogger(CQueryDelete.class);
+public class CQueryUpdate {
 
   private final OrmQueryRequest<?> request;
 
@@ -35,6 +30,8 @@ public class CQueryDelete {
    */
   private final String sql;
 
+  private final String type;
+
   /**
    * The statement used to create the resultSet.
    */
@@ -49,8 +46,8 @@ public class CQueryDelete {
   /**
    * Create the Sql select based on the request.
    */
-  public CQueryDelete(OrmQueryRequest<?> request, CQueryPredicates predicates, String sql) {
-
+  public CQueryUpdate(String type, OrmQueryRequest<?> request, CQueryPredicates predicates, String sql) {
+    this.type = type;
     this.request = request;
     this.query = request.getQuery();
     this.sql = sql;
@@ -63,14 +60,12 @@ public class CQueryDelete {
    * Return a summary description of this query.
    */
   public String getSummary() {
-    //noinspection StringBufferReplaceableByString
     StringBuilder sb = new StringBuilder(80);
-    sb.append("Delete exeMicros[").append(executionTimeMicros)
+    sb.append(type).append(" exeMicros[").append(executionTimeMicros)
         .append("] rows[").append(rowCount)
         .append("] type[").append(desc.getName())
         .append("] predicates[").append(predicates.getLogWhereSql())
         .append("] bind[").append(bindLog).append("]");
-
     return sb.toString();
   }
 
@@ -89,12 +84,11 @@ public class CQueryDelete {
   }
 
   /**
-   * Execute the query returning the row count.
+   * Execute the update or delete statement returning the row count.
    */
-  public int delete() throws SQLException {
+  public int execute() throws SQLException {
 
     long startNano = System.nanoTime();
-
     try {
 
       SpiTransaction t = request.getTransaction();
@@ -122,14 +116,8 @@ public class CQueryDelete {
    * Close the resources.
    */
   private void close() {
-    try {
-      if (pstmt != null) {
-        pstmt.close();
-        pstmt = null;
-      }
-    } catch (SQLException e) {
-      logger.error(null, e);
-    }
+    UtilJdbc.close(pstmt);
+    pstmt = null;
   }
 
 }

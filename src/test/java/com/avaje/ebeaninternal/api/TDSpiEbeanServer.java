@@ -171,6 +171,16 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> UpdateQuery<T> update(Class<T> beanType) {
+    return null;
+  }
+
+  @Override
+  public <T> int update(Query<T> query, Transaction transaction) {
+    return 0;
+  }
+
+  @Override
   public <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction) {
     return null;
   }
