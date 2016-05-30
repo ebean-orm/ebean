@@ -620,6 +620,11 @@ final class BeanDescriptorCacheHelp<T> {
 
     queryCacheClear(changeSet);
 
+    if (beanCache == null) {
+      // query caching only
+      return;
+    }
+
     List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.getUpdatedManyCollections();
     if (manyCollections != null) {
       for (int i = 0; i < manyCollections.size(); i++) {
