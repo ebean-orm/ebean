@@ -638,6 +638,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     if (v instanceof BeanCollection<?>) {
       BeanCollection<?> bc = (BeanCollection<?>) v;
       return bc.isReference() ? bc : null;
+    } else if (v != null) {
+      return null;
     } else {
       return createReference(parentBean);
     }
