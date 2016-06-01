@@ -918,40 +918,6 @@ public interface Query<T> {
   Object getId();
 
   /**
-   * Add additional clause(s) to the where clause.
-   * <p>
-   * This typically contains named parameters which will need to be set via
-   * {@link #setParameter(String, Object)}.
-   * </p>
-   * 
-   * <pre>{@code
-   *
-   * Query<Order> query = ebeanServer.createQuery(Order.class, "top");
-   * ...
-   * if (...) {
-   *   query.where("status = :status and lower(customer.name) like :custName");
-   *   query.setParameter("status", Order.NEW);
-   *   query.setParameter("custName", "rob%");
-   * }
-   *
-   * }</pre>
-   * 
-   * <p>
-   * Internally the addToWhereClause string is processed by removing named
-   * parameters (replacing them with ?) and by converting logical property names
-   * to database column names (with table alias). The rest of the string is left
-   * as is and it is completely acceptable and expected for the addToWhereClause
-   * string to include sql functions and columns.
-   * </p>
-   * 
-   * @param addToWhereClause
-   *          the clause to append to the where clause which typically contains
-   *          named parameters.
-   * @return The query object
-   */
-  Query<T> where(String addToWhereClause);
-
-  /**
    * Add a single Expression to the where clause returning the query.
    * 
    * <pre>{@code
@@ -1060,29 +1026,6 @@ public interface Query<T> {
    * @return The ExpressionList for adding more expressions to.
    */
   ExpressionList<T> having();
-
-  /**
-   * Add additional clause(s) to the having clause.
-   * <p>
-   * This typically contains named parameters which will need to be set via
-   * {@link #setParameter(String, Object)}.
-   * </p>
-   * 
-   * <pre>{@code
-   *
-   * List<ReportOrder> query =
-   *     ebeanServer.find(ReportOrder.class)
-   *     .having("score > :min").setParameter("min", 1)
-   *     .findList();
-   *
-   * }</pre>
-   * 
-   * @param addToHavingClause
-   *          the clause to append to the having clause which typically contains
-   *          named parameters.
-   * @return The query object
-   */
-  Query<T> having(String addToHavingClause);
 
   /**
    * Add an expression to the having clause returning the query.

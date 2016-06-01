@@ -2,7 +2,6 @@ package com.avaje.ebeaninternal.server.query;
 
 import com.avaje.ebean.RawSql;
 import com.avaje.ebeaninternal.api.BindParams;
-import com.avaje.ebeaninternal.api.BindParams.OrderedList;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
@@ -55,11 +54,6 @@ public class CQueryPredicates {
   private final BindParams bindParams;
 
   /**
-   * Named bind parameters for the having clause.
-   */
-  private OrderedList havingNamedParams;
-
-  /**
    * Bind values from the where expressions.
    */
   private DefaultExpressionRequest filterMany;
@@ -80,11 +74,6 @@ public class CQueryPredicates {
   private String whereExprSql;
 
   /**
-   * SQL generated from where with named parameters.
-   */
-  private String whereRawSql;
-
-  /**
    * Bind values for having expression.
    */
   private DefaultExpressionRequest having;
@@ -93,11 +82,6 @@ public class CQueryPredicates {
    * SQL generated from the having expression.
    */
   private String havingExprSql;
-
-  /**
-   * SQL generated from having with named parameters.
-   */
-  private String havingRawSql;
 
   private String dbHaving;
 
@@ -193,11 +177,6 @@ public class CQueryPredicates {
       }
     }
 
-    if (havingNamedParams != null) {
-      // bind named parameters in having...
-      binder.bind(havingNamedParams.list(), dataBind, dataBind.log());
-    }
-
     if (having != null) {
       having.bind(dataBind);
     }
@@ -214,84 +193,26 @@ public class CQueryPredicates {
     }
   }
 
-  private void buildBindHavingRawSql(boolean buildSql, boolean parseRaw, DeployParser deployParser) {
-    if (buildSql || bindParams != null) {
-      // having clause with named parameters...
-      havingRawSql = query.getAdditionalHaving();
-      if (parseRaw) {
-        havingRawSql = deployParser.parse(havingRawSql);
-      }
-      if (havingRawSql != null && bindParams != null) {
-        // convert and order named parameters if required
-        havingNamedParams = BindParamsParser.parseNamedParams(bindParams, havingRawSql);
-        havingRawSql = havingNamedParams.getPreparedSql();
-      }
-    }
-  }
-
   /**
    * Convert named parameters into an OrderedList.
    */
-  private void buildBindWhereRawSql(boolean buildSql, boolean parseRaw, DeployParser parser) {
-    if (buildSql || bindParams != null) {
-      whereRawSql = buildWhereRawSql();
-      boolean hasRaw = !"".equals(whereRawSql);
-      if (hasRaw && parseRaw) {
-        // parse with encrypted property awareness. This means that if we have
-        // an encrypted property we will insert special named parameter place
-        // holders for binding the encryption key values
-        parser.setEncrypted(true);
-        whereRawSql = parser.parse(whereRawSql);
-        parser.setEncrypted(false);
-      }
+  private void buildBindWhereRawSql(boolean buildSql) {
 
-      if (bindParams != null) {
-        if (hasRaw) {
-          whereRawSql = BindParamsParser.parse(bindParams, whereRawSql, request.getBeanDescriptor());
-
-        } else if (query.isRawSql() && !buildSql) {
-          // RawSql query hit cached query plan. Need to convert
-          // named parameters into positioned parameters so that
-          // the named parameters are bound
-          RawSql.Sql sql = query.getRawSql().getSql();
-          String s = sql.isParsed() ? sql.getPreWhere() : sql.getUnparsedSql();
-          if (bindParams.requiresNamedParamsPrepare()) {
-            BindParamsParser.parse(bindParams, s);
-          }
-        }
-      }
+    if (!buildSql && query.isRawSql() && bindParams != null && bindParams.requiresNamedParamsPrepare()) {
+      // RawSql query hit cached query plan. Need to convert
+      // named parameters into positioned parameters so that
+      // the named parameters are bound
+      RawSql.Sql sql = query.getRawSql().getSql();
+      String s = sql.isParsed() ? sql.getPreWhere() : sql.getUnparsedSql();
+      BindParamsParser.parse(bindParams, s);
     }
-  }
-
-  private String buildWhereRawSql() {
-    // this is the where part of a OQL query which
-    // may contain bind parameters...
-    String whereRaw = query.getRawWhereClause();
-    if (whereRaw == null) {
-      whereRaw = "";
-    }
-    // add any additional stuff to the where clause
-    String additionalWhere = query.getAdditionalWhere();
-    if (additionalWhere != null) {
-      whereRaw += additionalWhere;
-    }
-    return whereRaw;
   }
 
   public void prepare(boolean buildSql) {
 
     DeployParser deployParser = request.createDeployParser();
-    prepare(buildSql, true, deployParser);
-  }
-
-  /**
-   * This combines the sql from named/positioned parameters and expressions.
-   */
-  private void prepare(boolean buildSql, boolean parseRaw, DeployParser deployParser) {
-
     buildUpdateClause(buildSql, deployParser);
-    buildBindWhereRawSql(buildSql, parseRaw, deployParser);
-    buildBindHavingRawSql(buildSql, parseRaw, deployParser);
+    buildBindWhereRawSql(buildSql);
 
     SpiExpressionList<?> whereExp = query.getWhereExpressions();
     if (whereExp != null) {
@@ -360,7 +281,7 @@ public class CQueryPredicates {
   }
 
   private String deriveWhere(DeployParser deployParser) {
-    return parse(whereRawSql, whereExprSql, deployParser);
+    return parse(whereExprSql, deployParser);
   }
 
   /**
@@ -387,12 +308,9 @@ public class CQueryPredicates {
     return s == null || s.length() == 0;
   }
 
-  private String parse(String raw, String expr, DeployParser deployParser) {
+  private String parse(String expr, DeployParser deployParser) {
 
     StringBuilder sb = new StringBuilder();
-    if (!isEmpty(raw)) {
-      sb.append(raw);
-    }
     if (!isEmpty(expr)) {
       if (sb.length() > 0) {
         sb.append(" and ");
@@ -403,7 +321,7 @@ public class CQueryPredicates {
   }
 
   private String deriveHaving(DeployParser deployParser) {
-    return parse(havingRawSql, havingExprSql, deployParser);
+    return parse(havingExprSql, deployParser);
   }
 
   private String parseOrderBy() {

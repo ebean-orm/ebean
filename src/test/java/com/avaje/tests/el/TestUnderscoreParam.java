@@ -1,25 +1,25 @@
 package com.avaje.tests.el;
 
-import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.junit.Assert;
-
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Customer;
+import org.junit.Test;
 
-public class TestUnderscoreParam extends TestCase {
+import static org.assertj.core.api.Assertions.assertThat;
 
-    public void test() {
-        
-        List<Customer> list = Ebean.find(Customer.class)
-            .where("name like :cust_name")
-            .setParameter("cust_name", "Rob%")
-            .findList();
-        
-        Assert.assertNotNull(list);
-        
-    }
-    
+public class TestUnderscoreParam {
+
+  @Test
+  public void test() {
+
+    Query<Customer> query = Ebean.find(Customer.class)
+        .where().raw("name like ?", "Rob%")
+        .query();
+
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where t0.name like ?");
+
+  }
+
 }

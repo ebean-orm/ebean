@@ -36,14 +36,6 @@ public class OrmQueryDetailParser {
     return detail;
   }
 
-  protected void assign(DefaultOrmQuery<?> query) {
-    query.setOrmQueryDetail(detail);
-    query.setFirstRow(firstRow);
-    query.setMaxRows(maxRows);
-    query.setRawWhereClause(rawWhereClause);
-    query.order(rawOrderBy);
-  }
-
   private void processInitial() {
     if (parser.isMatch("select")) {
       readSelect();

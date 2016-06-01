@@ -81,11 +81,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private int lazyLoadBatchSize;
 
-  /**
-   * The where clause from a parsed query string.
-   */
-  private String rawWhereClause;
-
   private OrderBy<T> orderBy;
 
   private String loadMode;
@@ -98,10 +93,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Query language version of the query.
    */
   private String query;
-
-  private String additionalWhere;
-
-  private String additionalHaving;
 
   private String lazyLoadProperty;
 
@@ -563,8 +554,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
     copy.query = query;
     copy.rootTableAlias = rootTableAlias;
-    copy.additionalWhere = additionalWhere;
-    copy.additionalHaving = additionalHaving;
     copy.distinct = distinct;
     copy.sqlDistinct = sqlDistinct;
     copy.timeout = timeout;
@@ -580,7 +569,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.temporalMode = temporalMode;
     copy.firstRow = firstRow;
     copy.maxRows = maxRows;
-    copy.rawWhereClause = rawWhereClause;
     if (orderBy != null) {
       copy.orderBy = orderBy.copy();
     }
@@ -599,7 +587,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.parentNode = parentNode;
     copy.forUpdate = forUpdate;
     copy.rawSql = rawSql;
-    copy.rawWhereClause = rawWhereClause;
     return copy;
   }
 
@@ -831,7 +818,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   CQueryPlanKey createQueryPlanKey() {
 
     queryPlanKey = new OrmQueryPlanKey(includeTableJoin, type, detail, maxRows, firstRow,
-        disableLazyLoading, rawWhereClause, orderBy, query, additionalWhere, additionalHaving,
+        disableLazyLoading, orderBy, query,
         distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
         temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);
 
@@ -902,27 +889,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   /**
-   * Return any additional where clauses.
-   */
-  @Override
-  public String getAdditionalWhere() {
-    return additionalWhere;
-  }
-
-  /**
    * Return the timeout.
    */
   @Override
   public int getTimeout() {
     return timeout;
-  }
-
-  /**
-   * Return any additional having clauses.
-   */
-  @Override
-  public String getAdditionalHaving() {
-    return additionalHaving;
   }
 
   @Override
@@ -1000,10 +971,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public DefaultOrmQuery<T> setTimeout(int secs) {
     this.timeout = secs;
     return this;
-  }
-
-  protected void setRawWhereClause(String rawWhereClause) {
-    this.rawWhereClause = rawWhereClause;
   }
 
   @Override
@@ -1162,14 +1129,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public OrderBy<T> getOrderBy() {
     return orderBy;
-  }
-
-  /**
-   * Return the order by clause.
-   */
-  @Override
-  public String getRawWhereClause() {
-    return rawWhereClause;
   }
 
   @Override
@@ -1336,21 +1295,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> where(String addToWhereClause) {
-    if (additionalWhere == null) {
-      additionalWhere = addToWhereClause;
-    } else {
-      additionalWhere += " " + addToWhereClause;
-    }
-    return this;
-  }
-
-  @Override
   public DefaultOrmQuery<T> where(Expression expression) {
-    if (whereExpressions == null) {
-      whereExpressions = new DefaultExpressionList<T>(this, null);
-    }
-    whereExpressions.add(expression);
+    where().add(expression);
     return this;
   }
 
@@ -1372,21 +1318,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public DefaultOrmQuery<T> having(String addToHavingClause) {
-    if (additionalHaving == null) {
-      additionalHaving = addToHavingClause;
-    } else {
-      additionalHaving += " " + addToHavingClause;
-    }
-    return this;
-  }
-
-  @Override
   public DefaultOrmQuery<T> having(Expression expression) {
-    if (havingExpressions == null) {
-      havingExpressions = new DefaultExpressionList<T>(this, null);
-    }
-    havingExpressions.add(expression);
+    having().add(expression);
     return this;
   }
 

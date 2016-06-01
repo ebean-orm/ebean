@@ -476,12 +476,6 @@ public interface SpiQuery<T> extends Query<T> {
   OrderBy<T> getOrderBy();
 
   /**
-   * Return additional where clause. This should be added to any where clause
-   * that was part of the original query.
-   */
-  String getAdditionalWhere();
-
-  /**
    * Can return null if no expressions where added to the where clause.
    */
   SpiExpressionList<T> getWhereExpressions();
@@ -495,12 +489,6 @@ public interface SpiQuery<T> extends Query<T> {
    * Return the text expressions.
    */
   SpiExpressionList<T> getTextExpression();
-
-  /**
-   * Return additional having clause. Where raw String expressions are added
-   * to having clause rather than Expression objects.
-   */
-  String getAdditionalHaving();
 
   /**
    * Returns true if either firstRow or maxRows has been set.
@@ -621,11 +609,6 @@ public interface SpiQuery<T> extends Query<T> {
    * Set default select clauses where none have been explicitly defined.
    */
   void setDefaultSelectClause();
-
-  /**
-   * Return the where clause from a parsed string query.
-   */
-  String getRawWhereClause();
 
   /**
    * Set the generated sql for debug purposes.

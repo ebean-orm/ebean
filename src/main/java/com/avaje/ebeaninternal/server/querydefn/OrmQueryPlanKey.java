@@ -25,10 +25,7 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
   private final int maxRows;
   private final int firstRow;
   private final boolean disableLazyLoading;
-  private final String rawWhereClause;
   private final String query;
-  private final String additionalWhere;
-  private final String additionalHaving;
   private final boolean distinct;
   private final boolean sqlDistinct;
   private final String mapKey;
@@ -40,7 +37,7 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
   private final int planHash;
   private final int bindCount;
 
-  public OrmQueryPlanKey(TableJoin includeTableJoin, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading, String rawWhereClause, OrderBy<?> orderBy, String query, String additionalWhere, String additionalHaving, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams, SpiExpression whereExpressions, SpiExpression havingExpressions, SpiQuery.TemporalMode temporalMode, boolean forUpdate, String rootTableAlias, RawSql rawSql, OrmUpdateProperties updateProperties) {
+  public OrmQueryPlanKey(TableJoin includeTableJoin, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading, OrderBy<?> orderBy, String query, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams, SpiExpression whereExpressions, SpiExpression havingExpressions, SpiQuery.TemporalMode temporalMode, boolean forUpdate, String rootTableAlias, RawSql rawSql, OrmUpdateProperties updateProperties) {
 
     this.includeTableJoin = includeTableJoin;
     this.type = type;
@@ -48,11 +45,8 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
     this.maxRows = maxRows;
     this.firstRow = firstRow;
     this.disableLazyLoading = disableLazyLoading;
-    this.rawWhereClause = rawWhereClause;
     this.orderByAsSting = (orderBy == null) ? null : orderBy.toStringFormat();
     this.query = query;
-    this.additionalWhere = additionalWhere;
-    this.additionalHaving = additionalHaving;
     this.distinct = distinct;
     this.sqlDistinct = sqlDistinct;
     this.mapKey = mapKey;
@@ -72,7 +66,6 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
     builder.add(distinct).add(sqlDistinct).add(query);
     builder.add(firstRow).add(maxRows);
     builder.add(orderBy).add(forUpdate);
-    builder.add(rawWhereClause).add(additionalWhere).add(additionalHaving);
     builder.add(mapKey);
     builder.add(disableLazyLoading);
     builder.add(hasIdValue);
@@ -138,10 +131,7 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
 
 //    if (detail != null ? !detail.equals(that.detail) : that.detail != null) return false;
 
-    if (rawWhereClause != null ? !rawWhereClause.equals(that.rawWhereClause) : that.rawWhereClause != null) return false;
     if (query != null ? !query.equals(that.query) : that.query != null) return false;
-    if (additionalWhere != null ? !additionalWhere.equals(that.additionalWhere) : that.additionalWhere != null) return false;
-    if (additionalHaving != null ? !additionalHaving.equals(that.additionalHaving) : that.additionalHaving != null) return false;
     if (mapKey != null ? !mapKey.equals(that.mapKey) : that.mapKey != null) return false;
     return rootTableAlias != null ? rootTableAlias.equals(that.rootTableAlias) : that.rootTableAlias == null;
   }
