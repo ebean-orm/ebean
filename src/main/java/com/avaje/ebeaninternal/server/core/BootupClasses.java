@@ -17,7 +17,6 @@ import com.avaje.ebean.event.changelog.ChangeLogRegister;
 import com.avaje.ebean.event.readaudit.ReadAuditLogger;
 import com.avaje.ebean.event.readaudit.ReadAuditPrepare;
 import com.avaje.ebeaninternal.server.type.ScalarType;
-import com.avaje.ebeaninternal.server.util.ClassPathSearchMatcher;
 import org.avaje.classpath.scanner.ClassFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,7 @@ import java.util.List;
  * Interesting classes for a EbeanServer such as Embeddable, Entity,
  * ScalarTypes, Finders, Listeners and Controllers.
  */
-public class BootupClasses implements ClassPathSearchMatcher, ClassFilter {
+public class BootupClasses implements ClassFilter {
 
   private static final Logger logger = LoggerFactory.getLogger(BootupClasses.class);
 
