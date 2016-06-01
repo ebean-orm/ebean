@@ -776,4 +776,18 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
     return exprList.endJunction();
   }
 
+  @Override
+  public ExpressionList<T> endAnd() {
+    return endJunction();
+  }
+
+  @Override
+  public ExpressionList<T> endOr() {
+    return endJunction();
+  }
+
+  @Override
+  public ExpressionList<T> endNot() {
+    return endJunction();
+  }
 }

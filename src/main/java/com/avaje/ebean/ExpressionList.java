@@ -925,7 +925,7 @@ public interface ExpressionList<T> {
    * This is exactly the same as conjunction();
    * </p>
    * <p>
-   * Use endJunction() to end the AND junction.
+   * Use endAnd() or endJunction() to end the AND junction.
    * </p>
    * <p>
    * Note that a where() clause defaults to an AND junction so
@@ -943,11 +943,11 @@ public interface ExpressionList<T> {
    *      .and() // nested and
    *        .startsWith("name", "r")
    *        .eq("anniversary", onAfter)
-   *        .endJunction() // end AND junction
+   *        .endAnd()
    *      .and()
    *        .eq("status", Customer.Status.ACTIVE)
    *        .gt("id", 0)
-   *        .endJunction() // end AND junction
+   *        .endAnd()
    *      .orderBy().asc("name")
    *      .findList();
    * }</pre>
@@ -959,7 +959,7 @@ public interface ExpressionList<T> {
    * This is exactly the same as disjunction();
    *
    * <p>
-   *   Use endJunction() to end the OR junction.
+   *   Use endOr() or endJunction() to end the OR junction.
    * </p>
    *
    * <pre>{@code
@@ -973,11 +973,11 @@ public interface ExpressionList<T> {
    *      .and()
    *        .startsWith("name", "r")
    *        .eq("anniversary", onAfter)
-   *        .endJunction() // end AND junction
+   *        .endAnd()
    *      .and()
    *        .eq("status", Customer.Status.ACTIVE)
    *        .gt("id", 0)
-   *        .endJunction() // end AND junction
+   *        .endAnd()
    *      .orderBy().asc("name")
    *      .findList();
    *
@@ -988,7 +988,7 @@ public interface ExpressionList<T> {
   /**
    * Return a list of expressions that will be wrapped by NOT.
    * <p>
-   *   Use endJunction() to end expressions being added to the
+   *   Use endNot() or endJunction() to end expressions being added to the
    *   NOT expression list.
    * </p>
    *
@@ -998,7 +998,7 @@ public interface ExpressionList<T> {
    *      .not()
    *        .gt("id", 1)
    *        .eq("anniversary", onAfter)
-   *        .endJunction() // end the not expressions
+   *        .endNot()
    *
    * }</pre>
    *
@@ -1012,7 +1012,7 @@ public interface ExpressionList<T> {
    *     .not()
    *       .gt("id", 1)
    *       .eq("anniversary", onAfter)
-   *       .endJunction() // end the not expressions
+   *       .endNot()
    *     .orderBy()
    *       .asc("name")
    *     .findList();
@@ -1084,5 +1084,20 @@ public interface ExpressionList<T> {
    * </p>
    */
   ExpressionList<T> endJunction();
+
+  /**
+   * End a AND junction - synonym for endJunction().
+   */
+  ExpressionList<T> endAnd();
+
+  /**
+   * End a AND junction - synonym for endJunction().
+   */
+  ExpressionList<T> endOr();
+
+  /**
+   * End a NOT junction - synonym for endJunction().
+   */
+  ExpressionList<T> endNot();
 
 }
