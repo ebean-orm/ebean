@@ -86,7 +86,11 @@ public class ScalarTypeArrayList extends ScalarTypeJsonCollection<List> {
   @Override
   public List read(DataReader reader) throws SQLException {
     Array array = reader.getArray();
-    return fromArray((Object[]) array.getArray());
+    if (array == null) {
+      return null;
+    } else {
+      return fromArray((Object[]) array.getArray());
+    }
   }
 
   @Override
