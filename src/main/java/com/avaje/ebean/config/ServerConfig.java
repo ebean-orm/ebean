@@ -129,11 +129,6 @@ public class ServerConfig {
   private List<String> packages = new ArrayList<String>();
 
   /**
-   * Class name of a classPathReader implementation.
-   */
-  private String classPathReaderClassName;
-
-  /**
    * Configuration for the ElasticSearch integration.
    */
   private DocStoreConfig docStoreConfig = new DocStoreConfig();
@@ -1785,23 +1780,6 @@ public class ServerConfig {
   }
 
   /**
-   * Return the class name of a classPathReader implementation.
-   */
-  public String getClassPathReaderClassName() {
-    return classPathReaderClassName;
-  }
-
-  /**
-   * Set the class name of a classPathReader implementation.
-   * <p>
-   * Refer to server.util.ClassPathReader, this should really by a plugin but doing this for now
-   * to be relatively compatible with current implementation.
-   */
-  public void setClassPathReaderClassName(String classPathReaderClassName) {
-    this.classPathReaderClassName = classPathReaderClassName;
-  }
-
-  /**
    * Set the list of classes (entities, listeners, scalarTypes etc) that should
    * be used for this server.
    * <p>
@@ -2332,7 +2310,6 @@ public class ServerConfig {
     serverCachePlugin = createInstance(p, ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
     serverCacheManager = createInstance(p, ServerCacheManager.class, "serverCacheManager", serverCacheManager);
     cacheWarmingDelay = p.getInt("cacheWarmingDelay", cacheWarmingDelay);
-    classPathReaderClassName = p.get("classpathreader");
 
     if (packages != null) {
       String packagesProp = p.get("search.packages", p.get("packages", null));
