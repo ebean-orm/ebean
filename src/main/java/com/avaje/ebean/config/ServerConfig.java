@@ -47,23 +47,16 @@ import java.util.ServiceLoader;
  * </p>
  *
  * <pre>{@code
+ *
  * ServerConfig c = new ServerConfig();
- * c.setName("ordh2");
+ * c.setName("db");
  *
  * // read the ebean.properties and load
  * // those settings into this serverConfig object
  * c.loadFromProperties();
  *
- * // generate DDL and run it
- * c.setDdlGenerate(true);
- * c.setDdlRun(true);
- *
  * // add any classes found in the app.data package
- * c.addPackage("app.data");
- *
- * // add the names of Jars that contain entities
- * c.addJar("myJarContainingEntities.jar");
- * c.addJar("someOtherJarContainingEntities.jar");
+ * c.addPackage("com.myapp.domain");
  *
  * // register as the 'Default' server
  * c.setDefaultServer(true);
