@@ -3,7 +3,7 @@ package com.avaje.ebean.server.type;
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.H2Platform;
-import com.avaje.ebeaninternal.server.core.BootupClasses;
+import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.type.CtCompoundType;
 import com.avaje.ebeaninternal.server.type.DefaultTypeManager;
 import com.avaje.ebeaninternal.server.type.RsetDataReader;

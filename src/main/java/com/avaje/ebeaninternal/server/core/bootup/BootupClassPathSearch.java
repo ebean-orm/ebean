@@ -1,6 +1,7 @@
-package com.avaje.ebeaninternal.server.core;
+package com.avaje.ebeaninternal.server.core.bootup;
 
 import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebeaninternal.server.core.ClassPathScanners;
 import org.avaje.classpath.scanner.ClassPathScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +11,11 @@ import java.util.*;
 /**
  * Searches for interesting classes such as Entities, Embedded and ScalarTypes.
  */
-class BootupClassPathSearch {
+public class BootupClassPathSearch {
 
   private static final Logger logger = LoggerFactory.getLogger(BootupClassPathSearch.class);
+
+  private static final String EBEAN_MF = "META-INF/ebean.mf";
 
   private final List<String> packages;
 
@@ -28,7 +31,11 @@ class BootupClassPathSearch {
   }
 
   private BootupClassPathSearch(ServerConfig serverConfig) {
-    this.packages = serverConfig.getPackages();
+
+    // find packages defined in META-INF/ebean.mf resources
+    Set<String> mfPackages = ManifestReader.readManifests(serverConfig.getClassLoadConfig().getClassLoader(), EBEAN_MF);
+
+    this.packages = DistillPackages.distill(serverConfig.getPackages(), mfPackages);
     this.scanners = ClassPathScanners.find(serverConfig);
   }
 

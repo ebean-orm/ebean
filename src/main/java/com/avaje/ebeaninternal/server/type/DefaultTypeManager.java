@@ -11,7 +11,7 @@ import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbType;
-import com.avaje.ebeaninternal.server.core.BootupClasses;
+import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutable;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
 import com.avaje.ebeaninternal.server.type.reflect.ImmutableMeta;

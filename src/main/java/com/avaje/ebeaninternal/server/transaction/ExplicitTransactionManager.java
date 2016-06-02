@@ -6,7 +6,7 @@ import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
-import com.avaje.ebeaninternal.server.core.BootupClasses;
+import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 
 import javax.sql.DataSource;

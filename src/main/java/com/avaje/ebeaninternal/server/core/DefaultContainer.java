@@ -17,6 +17,8 @@ import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.cache.DefaultServerCachePlugin;
 import com.avaje.ebeaninternal.server.cache.DefaultServerCacheManager;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
+import com.avaje.ebeaninternal.server.core.bootup.BootupClassPathSearch;
+import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
 import org.avaje.datasource.DataSourceAlertFactory;
 import org.avaje.datasource.DataSourceConfig;

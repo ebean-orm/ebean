@@ -1,4 +1,4 @@
-package com.avaje.ebeaninternal.server.core;
+package com.avaje.ebeaninternal.server.core.bootup;
 
 import com.avaje.ebean.config.CompoundType;
 import com.avaje.ebean.config.IdGenerator;

@@ -2,7 +2,7 @@ package com.avaje.ebeaninternal.server.type;
 
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.PostgresPlatform;
-import com.avaje.ebeaninternal.server.core.BootupClasses;
+import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

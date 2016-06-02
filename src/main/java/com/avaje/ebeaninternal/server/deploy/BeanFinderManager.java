@@ -1,7 +1,7 @@
 package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.event.BeanFindController;
-import com.avaje.ebeaninternal.server.core.BootupClasses;
+import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

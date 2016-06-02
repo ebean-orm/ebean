@@ -22,6 +22,7 @@ import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogListener;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogPrepare;
 import com.avaje.ebeaninternal.server.changelog.DefaultChangeLogRegister;
 import com.avaje.ebeaninternal.server.cluster.ClusterManager;
+import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.core.timezone.CloneDataTimeZone;
 import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 import com.avaje.ebeaninternal.server.core.timezone.NoDataTimeZone;

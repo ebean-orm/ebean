@@ -1,6 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import com.avaje.ebeaninternal.server.core.BootupClasses;
+import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 

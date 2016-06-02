@@ -22,7 +22,7 @@ import com.avaje.ebean.plugin.BeanType;
 import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
-import com.avaje.ebeaninternal.server.core.BootupClasses;
+import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.core.InternalConfiguration;
 import com.avaje.ebeaninternal.server.core.Message;

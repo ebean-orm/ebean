@@ -1,0 +1,1 @@
+packages:  com.foo.domain, com.bar.domain
