@@ -129,12 +129,6 @@ public class ServerConfig {
   private List<String> packages = new ArrayList<String>();
 
   /**
-   * The names of Jar files that are searched for entities and other interesting
-   * classes. Only used when classes is empty/not explicitly specified.
-   */
-  private List<String> searchJars = new ArrayList<String>();
-
-  /**
    * Class name of a classPathReader implementation.
    */
   private String classPathReaderClassName;
@@ -1791,50 +1785,6 @@ public class ServerConfig {
   }
 
   /**
-   * Add the name of a Jar to search for entities via class path search.
-   * <p>
-   * This is only used if classes have not been explicitly specified.
-   * </p>
-   * <p>
-   * If you are using ebean.properties you can specify jars to search by setting
-   * a ebean.search.jars property.
-   * </p>
-   *
-   * <pre>{@code
-   * # EBean will search through classes for entities, but will not search jar files
-   * # unless you tell it to do so, for performance reasons.  Set this value to a
-   * # comma-delimited list of jar files you want ebean to search.
-   * ebean.search.jars=example.jar
-   * }</pre>
-   */
-  public void addJar(String jarName) {
-    if (searchJars == null) {
-      searchJars = new ArrayList<String>();
-    }
-    searchJars.add(jarName);
-  }
-
-  /**
-   * Return packages to search for entities via class path search.
-   * <p>
-   * This is only used if classes have not been explicitly specified.
-   * </p>
-   */
-  public List<String> getJars() {
-    return searchJars;
-  }
-
-  /**
-   * Set the names of Jars to search for entities via class path search.
-   * <p>
-   * This is only used if classes have not been explicitly specified.
-   * </p>
-   */
-  public void setJars(List<String> searchJars) {
-    this.searchJars = searchJars;
-  }
-
-  /**
    * Return the class name of a classPathReader implementation.
    */
   public String getClassPathReaderClassName() {
@@ -2383,11 +2333,6 @@ public class ServerConfig {
     serverCacheManager = createInstance(p, ServerCacheManager.class, "serverCacheManager", serverCacheManager);
     cacheWarmingDelay = p.getInt("cacheWarmingDelay", cacheWarmingDelay);
     classPathReaderClassName = p.get("classpathreader");
-
-    String jarsProp = p.get("search.jars", p.get("jars", null));
-    if (jarsProp != null) {
-      searchJars = getSearchJarsPackages(jarsProp);
-    }
 
     if (packages != null) {
       String packagesProp = p.get("search.packages", p.get("packages", null));
