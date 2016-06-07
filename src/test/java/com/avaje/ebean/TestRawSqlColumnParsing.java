@@ -60,29 +60,29 @@ public class TestRawSqlColumnParsing extends TestCase {
         
         assertEquals(5, mapping.size());
         
-        Column c = mapping.get("a");
+        Column c = mapping.get("a0");
         
         assertEquals("a",c.getDbColumn());
         assertEquals(0, c.getIndexPos());
         assertEquals("a0",c.getPropertyName());
 
-        c = mapping.get("b");
+        c = mapping.get("b1");
         assertEquals("b",c.getDbColumn());
         assertEquals(1, c.getIndexPos());
         assertEquals("b1",c.getPropertyName());
 
-        c = mapping.get("c");
+        c = mapping.get("c2");
         assertEquals("c",c.getDbColumn());
         assertEquals(2, c.getIndexPos());
         assertEquals("c2",c.getPropertyName());
 
-        c = mapping.get("d");
+        c = mapping.get("d3");
         assertEquals("d",c.getDbColumn());
         assertEquals(3, c.getIndexPos());
         assertEquals("d3",c.getPropertyName());
 
         
-        c = mapping.get("e");
+        c = mapping.get("e4");
         assertEquals("e",c.getDbColumn());
         assertEquals(4, c.getIndexPos());
         assertEquals("e4",c.getPropertyName());
@@ -96,29 +96,29 @@ public class TestRawSqlColumnParsing extends TestCase {
 
         assertEquals(5, mapping.size());
 
-        Column c = mapping.get("a");
+        Column c = mapping.get("a0");
 
         assertEquals("a",c.getDbColumn());
         assertEquals(0, c.getIndexPos());
         assertEquals("a0",c.getPropertyName());
 
-        c = mapping.get("b");
+        c = mapping.get("b1");
         assertEquals("b",c.getDbColumn());
         assertEquals(1, c.getIndexPos());
         assertEquals("b1",c.getPropertyName());
 
-        c = mapping.get("MONTH(MAKEDATE(2015, 241))");
+        c = mapping.get("m2");
         assertEquals("MONTH(MAKEDATE(2015, 241))",c.getDbColumn());
         assertEquals(2, c.getIndexPos());
         assertEquals("m2",c.getPropertyName());
 
-        c = mapping.get("d");
+        c = mapping.get("d3");
         assertEquals("d",c.getDbColumn());
         assertEquals(3, c.getIndexPos());
         assertEquals("d3",c.getPropertyName());
 
 
-        c = mapping.get("e");
+        c = mapping.get("e4");
         assertEquals("e",c.getDbColumn());
         assertEquals(4, c.getIndexPos());
         assertEquals("e4",c.getPropertyName());
@@ -132,29 +132,29 @@ public class TestRawSqlColumnParsing extends TestCase {
         
         assertEquals(5, mapping.size());
         
-        Column c = mapping.get("a");
+        Column c = mapping.get("a0");
         
         assertEquals("a",c.getDbColumn());
         assertEquals(0, c.getIndexPos());
         assertEquals("a0",c.getPropertyName());
 
-        c = mapping.get("'b'");
+        c = mapping.get("b1");
         assertEquals("'b'",c.getDbColumn());
         assertEquals(1, c.getIndexPos());
         assertEquals("b1",c.getPropertyName());
 
-        c = mapping.get("\"c(blah)\"");
+        c = mapping.get("c2");
         assertEquals("\"c(blah)\"",c.getDbColumn());
         assertEquals(2, c.getIndexPos());
         assertEquals("c2",c.getPropertyName());
 
-        c = mapping.get("d");
+        c = mapping.get("d3");
         assertEquals("d",c.getDbColumn());
         assertEquals(3, c.getIndexPos());
         assertEquals("d3",c.getPropertyName());
 
         
-        c = mapping.get("e");
+        c = mapping.get("e4");
         assertEquals("e",c.getDbColumn());
         assertEquals(4, c.getIndexPos());
         assertEquals("e4",c.getPropertyName());

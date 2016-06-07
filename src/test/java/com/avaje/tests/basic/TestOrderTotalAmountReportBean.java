@@ -2,6 +2,7 @@ package com.avaje.tests.basic;
 
 import java.util.List;
 
+import com.avaje.ebean.Query;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import org.junit.Assert;
@@ -11,6 +12,8 @@ import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.basic.OrderAggregate;
 import com.avaje.tests.model.basic.ResetBasicData;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestOrderTotalAmountReportBean extends BaseTestCase {
 
@@ -45,5 +48,30 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
     }
 
   }
+
+  @Test
+  public void test_when_explicitMapping() {
+
+    ResetBasicData.reset();
+
+    String sql =
+        "select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount \n" +
+            "from o_order_detail \n" +
+            "group by order_id";
+
+    RawSql rawSql = RawSqlBuilder.parse(sql)
+        .columnMapping("order_id", "order.id")
+        .columnMapping("total_items", "totalItems")
+        .columnMapping("total_amount", "totalAmount")
+        .create();
+
+    Query<OrderAggregate> query = Ebean.find(OrderAggregate.class)
+        .setRawSql(rawSql);
+
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("count(*) as total_items, sum(order_qty*unit_price) as total_amount");
+  }
+
 
 }

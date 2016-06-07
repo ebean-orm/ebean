@@ -404,7 +404,7 @@ public final class RawSql implements Serializable {
       this.dbColumnMap = new LinkedHashMap<String, Column>();
       for (int i = 0; i < columns.size(); i++) {
         Column c = columns.get(i);
-        dbColumnMap.put(c.getDbColumn(), c);
+        dbColumnMap.put(c.getDbColumnKey(), c);
       }
     }
 
@@ -500,8 +500,7 @@ public final class RawSql implements Serializable {
       } else {
         Column column = dbColumnMap.get(dbColumn);
         if (column == null) {
-          String msg = "DB Column [" + dbColumn + "] not found in mapping. Expecting one of ["
-              + dbColumnMap.keySet() + "]";
+          String msg = "DB Column [" + dbColumn + "] not found in mapping. Expecting one of [" + dbColumnMap.keySet() + "]";
           throw new IllegalArgumentException(msg);
         }
         column.setPropertyName(propertyName);
@@ -658,17 +657,18 @@ public final class RawSql implements Serializable {
       }
 
       /**
+       * Return the DB column alias if specified otherwise DB column.
+       * This is used as the key for mapping a column to a logical property.
+       */
+      public String getDbColumnKey() {
+        return (dbAlias != null) ? dbAlias : dbColumn;
+      }
+
+      /**
        * Return the DB column name including table alias (if it has one).
        */
       public String getDbColumn() {
         return dbColumn;
-      }
-
-      /**
-       * Return the DB column alias (if it has one).
-       */
-      public String getDbAlias() {
-        return dbAlias;
       }
 
       /**
