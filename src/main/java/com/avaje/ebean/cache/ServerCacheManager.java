@@ -6,6 +6,15 @@ package com.avaje.ebean.cache;
 public interface ServerCacheManager {
 
   /**
+   * Return true if the L2 caching is local.
+   * <p>
+   * Local L2 caching means that the cache updates should occur in foreground
+   * rather than background processing.
+   * </p>
+   */
+  boolean isLocalL2Caching();
+
+  /**
    * Return true if there is an active bean cache for this type of bean.
    */
   boolean isBeanCaching(Class<?> beanType);

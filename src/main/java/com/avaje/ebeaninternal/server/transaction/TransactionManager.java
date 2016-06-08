@@ -105,14 +105,17 @@ public class TransactionManager {
    */
   private final ChangeLogListener changeLogListener;
 
-  private final boolean viewInvalidation;
+  protected final boolean localL2Caching;
+
+  protected final boolean viewInvalidation;
 
   /**
    * Create the TransactionManager
    */
-  public TransactionManager(ServerConfig config, ClusterManager clusterManager, BackgroundExecutor backgroundExecutor, DocStoreUpdateProcessor docStoreUpdateProcessor,
-                            BeanDescriptorManager descMgr, BootupClasses bootupClasses) {
+  public TransactionManager(boolean localL2Caching, ServerConfig config, ClusterManager clusterManager, BackgroundExecutor backgroundExecutor,
+                            DocStoreUpdateProcessor docStoreUpdateProcessor, BeanDescriptorManager descMgr, BootupClasses bootupClasses) {
 
+    this.localL2Caching = localL2Caching;
     this.persistBatch = config.getPersistBatch();
     this.persistBatchOnCascade = config.appliedPersistBatchOnCascade();
     this.beanDescriptorManager = descMgr;
@@ -402,7 +405,7 @@ public class TransactionManager {
       }
 
       PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction);
-      postCommit.notifyLocalCache(viewInvalidation);
+      postCommit.notifyLocalCache();
       backgroundExecutor.execute(postCommit.backgroundNotify());
 
       for (TransactionEventListener listener : transactionEventListeners) {
@@ -427,7 +430,7 @@ public class TransactionManager {
     event.add(tableEvents);
 
     PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, event);
-    postCommit.notifyLocalCache(viewInvalidation);
+    postCommit.notifyLocalCache();
     backgroundExecutor.execute(postCommit.backgroundNotify());
   }
 

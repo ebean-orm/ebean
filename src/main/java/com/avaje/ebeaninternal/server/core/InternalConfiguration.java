@@ -338,15 +338,16 @@ public class InternalConfiguration {
    */
   public TransactionManager createTransactionManager(DocStoreUpdateProcessor indexUpdateProcessor) {
 
+    boolean localL2 = cacheManager.isLocalL2Caching();
     if (serverConfig.isExplicitTransactionBeginMode()) {
-      return new ExplicitTransactionManager(serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, beanDescriptorManager, this.getBootupClasses());
+      return new ExplicitTransactionManager(localL2, serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, beanDescriptorManager, this.getBootupClasses());
     }
 
     if (isAutoCommitMode()) {
-      return new AutoCommitTransactionManager(serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, beanDescriptorManager, this.getBootupClasses());
+      return new AutoCommitTransactionManager(localL2, serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, beanDescriptorManager, this.getBootupClasses());
     }
 
-    return new TransactionManager(serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, beanDescriptorManager, this.getBootupClasses());
+    return new TransactionManager(localL2, serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, beanDescriptorManager, this.getBootupClasses());
   }
 
   /**

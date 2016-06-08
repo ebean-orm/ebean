@@ -84,9 +84,15 @@ public final class PostCommitProcessing {
   /**
    * Notify the local part of L2 cache.
    */
-  void notifyLocalCache(boolean viewInvalidation) {
+  void notifyLocalCache() {
     processTableEvents(event.getEventTables());
-    cacheChanges = event.buildCacheChanges(viewInvalidation);
+    if (manager.localL2Caching) {
+      // process l2 cache changes in foreground
+      processCacheChanges(event.buildCacheChanges(manager.viewInvalidation));
+    } else {
+      // collect l2 cache changes for delayed background processing
+      cacheChanges = event.buildCacheChanges(manager.viewInvalidation);
+    }
   }
 
   /**
@@ -148,14 +154,21 @@ public final class PostCommitProcessing {
   Runnable backgroundNotify() {
     return new Runnable() {
       public void run() {
-        if (cacheChanges != null) {
-          manager.processViewInvalidation(cacheChanges.apply());
-        }
+        processCacheChanges(cacheChanges);
         localPersistListenersNotify();
         notifyCluster();
         processDocStoreUpdates();
       }
     };
+  }
+
+  /**
+   * Apply the changes to the L2 caches.
+   */
+  private void processCacheChanges(CacheChangeSet cacheChanges) {
+    if (cacheChanges != null) {
+      manager.processViewInvalidation(cacheChanges.apply());
+    }
   }
 
   private void localPersistListenersNotify() {

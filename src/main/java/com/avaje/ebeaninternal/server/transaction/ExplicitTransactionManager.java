@@ -17,10 +17,10 @@ import java.sql.Connection;
  */
 public class ExplicitTransactionManager extends TransactionManager {
 
-  public ExplicitTransactionManager(ServerConfig serverConfig, ClusterManager clusterManager, BackgroundExecutor backgroundExecutor,
+  public ExplicitTransactionManager(boolean localL2Caching, ServerConfig serverConfig, ClusterManager clusterManager, BackgroundExecutor backgroundExecutor,
                                       DocStoreUpdateProcessor indexUpdateProcessor, BeanDescriptorManager descMgr, BootupClasses bootupClasses) {
 
-    super(serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, descMgr, bootupClasses);
+    super(localL2Caching, serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, descMgr, bootupClasses);
   }
 
   /**

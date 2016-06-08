@@ -170,6 +170,7 @@ public class DefaultContainer implements SpiContainer {
     queryOptions.setMaxIdleSecs(serverConfig.getQueryCacheMaxIdleTime());
     queryOptions.setMaxSecsToLive(serverConfig.getQueryCacheMaxTimeToLive());
 
+    boolean localL2Caching = false;
     ServerCachePlugin plugin = serverConfig.getServerCachePlugin();
     if (plugin == null) {
       ServiceLoader<ServerCachePlugin> cacheFactories = ServiceLoader.load(ServerCachePlugin.class);
@@ -179,13 +180,14 @@ public class DefaultContainer implements SpiContainer {
         plugin = iterator.next();
         logger.debug("using ServerCacheFactory {}", plugin.getClass());
       } else {
-        // use the built in default
+        // use the built in default l2 caching which is local cache based
+        localL2Caching = true;
         plugin = new DefaultServerCachePlugin();
       }
     }
 
     ServerCacheFactory factory = plugin.create(serverConfig, executor);
-    return new DefaultServerCacheManager(factory, beanOptions, queryOptions);
+    return new DefaultServerCacheManager(localL2Caching, factory, beanOptions, queryOptions);
   }
 
   /**
@@ -194,20 +196,20 @@ public class DefaultContainer implements SpiContainer {
    */
   private BootupClasses getBootupClasses(ServerConfig serverConfig) {
 
-    BootupClasses bootupClasses = getBootupClasses1(serverConfig);
-    bootupClasses.addIdGenerators(serverConfig.getIdGenerators());
-    bootupClasses.addPersistControllers(serverConfig.getPersistControllers());
-    bootupClasses.addPostLoaders(serverConfig.getPostLoaders());
-    bootupClasses.addFindControllers(serverConfig.getFindControllers());
-    bootupClasses.addTransactionEventListeners(serverConfig.getTransactionEventListeners());
-    bootupClasses.addPersistListeners(serverConfig.getPersistListeners());
-    bootupClasses.addQueryAdapters(serverConfig.getQueryAdapters());
-    bootupClasses.addServerConfigStartup(serverConfig.getServerConfigStartupListeners());
-    bootupClasses.addChangeLogInstances(serverConfig);
+    BootupClasses bootup = getBootupClasses1(serverConfig);
+    bootup.addIdGenerators(serverConfig.getIdGenerators());
+    bootup.addPersistControllers(serverConfig.getPersistControllers());
+    bootup.addPostLoaders(serverConfig.getPostLoaders());
+    bootup.addFindControllers(serverConfig.getFindControllers());
+    bootup.addTransactionEventListeners(serverConfig.getTransactionEventListeners());
+    bootup.addPersistListeners(serverConfig.getPersistListeners());
+    bootup.addQueryAdapters(serverConfig.getQueryAdapters());
+    bootup.addServerConfigStartup(serverConfig.getServerConfigStartupListeners());
+    bootup.addChangeLogInstances(serverConfig);
 
     // run any ServerConfigStartup instances
-    bootupClasses.runServerConfigStartup(serverConfig);
-    return bootupClasses;
+    bootup.runServerConfigStartup(serverConfig);
+    return bootup;
   }
 
   /**

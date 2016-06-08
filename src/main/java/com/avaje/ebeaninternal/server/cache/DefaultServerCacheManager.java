@@ -20,10 +20,13 @@ public class DefaultServerCacheManager implements ServerCacheManager {
 
   private final DefaultCacheHolder collectionIdsCache;
 
+  private final boolean localL2Caching;
+
   /**
    * Create with a cache factory and default cache options.
    */
-  public DefaultServerCacheManager(ServerCacheFactory cacheFactory, ServerCacheOptions defaultBeanOptions, ServerCacheOptions defaultQueryOptions) {
+  public DefaultServerCacheManager(boolean localL2Caching, ServerCacheFactory cacheFactory, ServerCacheOptions defaultBeanOptions, ServerCacheOptions defaultQueryOptions) {
+    this.localL2Caching = localL2Caching;
     this.beanCache = new DefaultCacheHolder(cacheFactory, defaultBeanOptions);
     this.queryCache = new DefaultCacheHolder(cacheFactory, defaultQueryOptions);
     this.naturalKeyCache = new DefaultCacheHolder(cacheFactory, defaultBeanOptions);
@@ -34,7 +37,11 @@ public class DefaultServerCacheManager implements ServerCacheManager {
    * Construct when l2 cache is disabled.
    */
   public DefaultServerCacheManager() {
-    this(new DefaultServerCacheFactory(), new ServerCacheOptions(), new ServerCacheOptions());
+    this(true, new DefaultServerCacheFactory(), new ServerCacheOptions(), new ServerCacheOptions());
+  }
+
+  public boolean isLocalL2Caching() {
+    return localL2Caching;
   }
 
   /**
@@ -49,14 +56,15 @@ public class DefaultServerCacheManager implements ServerCacheManager {
     queryCache.clearCache(beanName);
   }
 
-
+  /**
+   * Clear all caches.
+   */
   public void clearAll() {
     beanCache.clearAll();
     queryCache.clearAll();
     naturalKeyCache.clearAll();
     collectionIdsCache.clearAll();
   }
-
 
   public ServerCache getCollectionIdsCache(Class<?> beanType, String propertyName) {
     return collectionIdsCache.getCache(beanType.getName() + "." + propertyName, ServerCacheType.COLLECTION_IDS);
@@ -86,6 +94,5 @@ public class DefaultServerCacheManager implements ServerCacheManager {
   public boolean isBeanCaching(Class<?> beanType) {
     return beanCache.isCaching(beanType.getName());
   }
-
 
 }

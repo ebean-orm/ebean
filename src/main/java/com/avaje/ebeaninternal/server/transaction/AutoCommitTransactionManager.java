@@ -17,10 +17,10 @@ import java.sql.Connection;
  */
 public class AutoCommitTransactionManager extends TransactionManager {
 
-  public AutoCommitTransactionManager(ServerConfig serverConfig, ClusterManager clusterManager, BackgroundExecutor backgroundExecutor,
+  public AutoCommitTransactionManager(boolean localL2Caching, ServerConfig serverConfig, ClusterManager clusterManager, BackgroundExecutor backgroundExecutor,
           DocStoreUpdateProcessor indexUpdateProcessor, BeanDescriptorManager descMgr, BootupClasses bootupClasses) {
     
-    super(serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, descMgr, bootupClasses);
+    super(localL2Caching, serverConfig, clusterManager, backgroundExecutor, indexUpdateProcessor, descMgr, bootupClasses);
   }
 
   /**
