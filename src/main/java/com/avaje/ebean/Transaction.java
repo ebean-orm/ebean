@@ -3,6 +3,7 @@ package com.avaje.ebean;
 import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.config.DocStoreConfig;
 import com.avaje.ebean.config.PersistBatch;
+import com.avaje.ebean.config.ServerConfig;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
@@ -125,12 +126,77 @@ public interface Transaction extends Closeable {
    * Set to true when you want all loaded properties to be included in the update
    * (rather than just the changed properties).
    * <p>
-   *   You might set this when using JDBC batch in order to get multiple updates
-   *   with slightly different sets of changed properties into the same statement
-   *   and hence better JDBC batch performance.
+   * You might set this when using JDBC batch in order to get multiple updates
+   * with slightly different sets of changed properties into the same statement
+   * and hence better JDBC batch performance.
    * </p>
    */
   void setUpdateAllLoadedProperties(boolean updateAllLoadedProperties);
+
+  /**
+   * Set if the L2 cache should be skipped for "find by id" and "find by natural key" queries.
+   * <p>
+   * By default {@link ServerConfig#isSkipCacheAfterWrite()} is true and that means that for
+   * "find by id" and "find by natural key" queries which normally hit L2 bean cache automatically
+   * - will not do so after a persist/write on the transaction.
+   * </p>
+   * <p>
+   * This method provides explicit control over whether "find by id" and "find by natural key"
+   * will skip the L2 bean cache or not (regardless of whether the transaction is considered "read only").
+   * </p>
+   * <p>
+   * Refer to {@link ServerConfig#setSkipCacheAfterWrite(boolean)} for configuring the default behavior
+   * for using the L2 bean cache in transactions spanning multiple query/persist requests.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *   // assume Customer has L2 bean caching enabled ...
+   *
+   *   Transaction transaction = Ebean.beginTransaction();
+   *   try {
+   *
+   *     // this uses L2 bean cache as the transaction
+   *     // ... is considered "query only" at this point
+   *     Customer.find.byId(42);
+   *
+   *     // transaction no longer "query only" once
+   *     // ... a bean has been saved etc
+   *     Ebean.save(someBean);
+   *
+   *     // will NOT use L2 bean cache as the transaction
+   *     // ... is no longer considered "query only"
+   *     Customer.find.byId(55);
+   *
+   *
+   *
+   *     // explicit control - please use L2 bean cache
+   *
+   *     transaction.setSkipCache(false);
+   *     Customer.find.byId(77); // hit the l2 bean cache
+   *
+   *
+   *     // explicit control - please don't use L2 bean cache
+   *
+   *     transaction.setSkipCache(true);
+   *     Customer.find.byId(99); // skips l2 bean cache
+   *
+   *
+   *   } finally {
+   *     transaction.end();
+   *   }
+   *
+   * }</pre>
+   *
+   * @see ServerConfig#isSkipCacheAfterWrite()
+   */
+  void setSkipCache(boolean skipCache);
+
+  /**
+   * Return true if the L2 cache should be skipped. More accurately if true then find by id
+   * and find by natural key queries should NOT automatically use the L2 bean cache.
+   */
+  boolean isSkipCache();
 
   /**
    * Turn on or off statement batching. Statement batching can be transparent

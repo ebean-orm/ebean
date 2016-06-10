@@ -991,7 +991,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
     }
 
-    if (!query.isUseBeanCache()) {
+    if (!query.isUseBeanCache() || (t != null && t.isSkipCache())) {
       return null;
     }
 
@@ -1041,26 +1041,32 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  public <T> T findUnique(Query<T> query, Transaction t) {
+  public <T> T findUnique(Query<T> query, Transaction transaction) {
 
     Object id = query.getId();
     if (id != null) {
       // actually a find by Id query
-      return findId(query, t);
+      return findId(query, transaction);
     }
 
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     BeanDescriptor<T> desc = spiQuery.getBeanDescriptor();
 
-    id = desc.cacheNaturalKeyIdLookup(spiQuery);
-    if (id != null) {
-      T bean = findIdCheckPersistenceContextAndCache(t, spiQuery, id);
-      if (bean != null) {
-        return bean;
+    SpiTransaction t = (SpiTransaction) transaction;
+    if (t == null) {
+      t = getCurrentServerTransaction();
+    }
+    if (t == null || !t.isSkipCache()) {
+      id = desc.cacheNaturalKeyIdLookup(spiQuery);
+      if (id != null) {
+        T bean = findIdCheckPersistenceContextAndCache(t, spiQuery, id);
+        if (bean != null) {
+          return bean;
+        }
       }
     }
 
-    // a query that is expected to return either 0 or 1 rows
+    // a query that is expected to return either 0 or 1 beans
     List<T> list = findList(query, t);
     return extractUnique(list);
   }

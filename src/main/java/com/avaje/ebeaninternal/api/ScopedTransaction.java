@@ -106,6 +106,16 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
+  public void setSkipCache(boolean skipCache) {
+    transaction.setSkipCache(skipCache);
+  }
+
+  @Override
+  public boolean isSkipCache() {
+    return transaction.isSkipCache();
+  }
+
+  @Override
   public void addBeanChange(BeanChange beanChange) {
     transaction.addBeanChange(beanChange);
   }

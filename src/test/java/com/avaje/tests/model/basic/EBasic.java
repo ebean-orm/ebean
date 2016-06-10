@@ -35,6 +35,14 @@ public class EBasic {
 
   Timestamp someDate;
 
+  public EBasic() {
+
+  }
+
+  public EBasic(String name) {
+    this.name = name;
+  }
+
   public Integer getId() {
     return id;
   }

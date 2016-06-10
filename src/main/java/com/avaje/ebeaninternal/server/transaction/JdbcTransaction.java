@@ -4,6 +4,7 @@ import com.avaje.ebean.TransactionCallback;
 import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.config.PersistBatch;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import com.avaje.ebean.event.changelog.BeanChange;
 import com.avaje.ebean.event.changelog.ChangeSet;
@@ -152,6 +153,16 @@ public class JdbcTransaction implements SpiTransaction {
   protected int docStoreBatchSize;
 
   /**
+   * Explicit control over skipCache.
+   */
+  protected Boolean skipCache;
+
+  /**
+   * Default skip cache behavior from {@link ServerConfig#isSkipCacheAfterWrite()}.
+   */
+  protected final boolean skipCacheAfterWrite;
+
+  /**
    * Create a new JdbcTransaction.
    */
   public JdbcTransaction(String id, boolean explicit, Connection connection, TransactionManager manager) {
@@ -162,10 +173,19 @@ public class JdbcTransaction implements SpiTransaction {
       this.explicit = explicit;
       this.manager = manager;
       this.connection = connection;
-      this.batchMode = manager == null ? PersistBatch.NONE : manager.getPersistBatch();
-      this.batchOnCascadeMode = manager == null ? PersistBatch.NONE : manager.getPersistBatchOnCascade();
-      this.onQueryOnly = manager == null ? OnQueryOnly.ROLLBACK : manager.getOnQueryOnly();
       this.persistenceContext = new DefaultPersistenceContext();
+
+      if (manager == null) {
+        this.skipCacheAfterWrite = true;
+        this.batchMode = PersistBatch.NONE;
+        this.batchOnCascadeMode = PersistBatch.NONE;
+        this.onQueryOnly = OnQueryOnly.ROLLBACK;
+      } else {
+        this.skipCacheAfterWrite = manager.isSkipCacheAfterWrite();
+        this.batchMode = manager.getPersistBatch();
+        this.batchOnCascadeMode = manager.getPersistBatchOnCascade();
+        this.onQueryOnly = manager.getOnQueryOnly();
+      }
 
       checkAutoCommit(connection);
 
@@ -195,6 +215,17 @@ public class JdbcTransaction implements SpiTransaction {
     }
     sb.append("] ");
     return sb.toString();
+  }
+
+  @Override
+  public boolean isSkipCache() {
+    if (skipCache != null) return skipCache;
+    return skipCacheAfterWrite && !queryOnly;
+  }
+
+  @Override
+  public void setSkipCache(boolean skipCache) {
+    this.skipCache = skipCache;
   }
 
   @Override

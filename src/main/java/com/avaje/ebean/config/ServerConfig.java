@@ -220,6 +220,11 @@ public class ServerConfig {
 
   private String ddlSeedSql;
 
+  /**
+   * When true L2 bean cache use is skipped after a write has occurred on a transaction.
+   */
+  private boolean skipCacheAfterWrite = true;
+
   private boolean useJtaTransactionManager;
 
   /**
@@ -1796,6 +1801,66 @@ public class ServerConfig {
   }
 
   /**
+   * Return true if L2 bean cache should be skipped once writes have occurred on a transaction.
+   * <p>
+   * This defaults to true and means that for "find by id" and "find by natural key"
+   * queries that normally hit L2 bean cache automatically will not do so after a write/persist
+   * on the transaction.
+   * </p>
+   *
+   * <pre>{@code
+   *
+   *   // assume Customer has L2 bean caching enabled ...
+   *
+   *   Transaction transaction = Ebean.beginTransaction();
+   *   try {
+   *
+   *     // this uses L2 bean cache as the transaction
+   *     // ... is considered "query only" at this point
+   *     Customer.find.byId(42);
+   *
+   *     // transaction no longer "query only" once
+   *     // ... a bean has been saved etc
+   *     Ebean.save(someBean);
+   *
+   *     // will NOT use L2 bean cache as the transaction
+   *     // ... is no longer considered "query only"
+   *     Customer.find.byId(55);
+   *
+   *
+   *
+   *     // explicit control - please use L2 bean cache
+   *
+   *     transaction.setSkipCache(false);
+   *     Customer.find.byId(77); // hit the l2 bean cache
+   *
+   *
+   *     // explicit control - please don't use L2 bean cache
+   *
+   *     transaction.setSkipCache(true);
+   *     Customer.find.byId(99); // skips l2 bean cache
+   *
+   *
+   *   } finally {
+   *     transaction.end();
+   *   }
+   *
+   * }</pre>
+   *
+   * @see com.avaje.ebean.Transaction#setSkipCache(boolean)
+   */
+  public boolean isSkipCacheAfterWrite() {
+    return skipCacheAfterWrite;
+  }
+
+  /**
+   * Set to false when we still want to hit the cache after a write has occurred on a transaction.
+   */
+  public void setSkipCacheAfterWrite(boolean skipCacheAfterWrite) {
+    this.skipCacheAfterWrite = skipCacheAfterWrite;
+  }
+
+  /**
    * Return true to only update changed properties.
    */
   public boolean isUpdateChangesOnly() {
@@ -2312,6 +2377,7 @@ public class ServerConfig {
     collectQueryStatsByNode = p.getBoolean("collectQueryStatsByNode", collectQueryStatsByNode);
     collectQueryOrigins = p.getBoolean("collectQueryOrigins", collectQueryOrigins);
 
+    skipCacheAfterWrite = p.getBoolean("skipCacheAfterWrite", skipCacheAfterWrite);
     updateAllPropertiesInBatch = p.getBoolean("updateAllPropertiesInBatch", updateAllPropertiesInBatch);
     updateChangesOnly = p.getBoolean("updateChangesOnly", updateChangesOnly);
 

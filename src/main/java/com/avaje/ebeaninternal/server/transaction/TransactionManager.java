@@ -109,12 +109,15 @@ public class TransactionManager {
 
   protected final boolean viewInvalidation;
 
+  private final boolean skipCacheAfterWrite;
+
   /**
    * Create the TransactionManager
    */
   public TransactionManager(boolean localL2Caching, ServerConfig config, ClusterManager clusterManager, BackgroundExecutor backgroundExecutor,
                             DocStoreUpdateProcessor docStoreUpdateProcessor, BeanDescriptorManager descMgr, BootupClasses bootupClasses) {
 
+    this.skipCacheAfterWrite = config.isSkipCacheAfterWrite();
     this.localL2Caching = localL2Caching;
     this.persistBatch = config.getPersistBatch();
     this.persistBatchOnCascade = config.appliedPersistBatchOnCascade();
@@ -147,6 +150,10 @@ public class TransactionManager {
 
   public boolean isDocStoreActive() {
     return docStoreActive;
+  }
+
+  public boolean isSkipCacheAfterWrite() {
+    return skipCacheAfterWrite;
   }
 
   public BeanDescriptorManager getBeanDescriptorManager() {

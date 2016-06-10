@@ -326,7 +326,7 @@ final class BeanDescriptorCacheHelp<T> {
 
     // try to lookup the id using the natural key
     Object id = naturalKeyCache.get(keyBindParam.getValue());
-    if (natLog.isTraceEnabled() && id != null) {
+    if (natLog.isTraceEnabled()) {
       natLog.trace(" LOOKUP {}({}) - id:{}", cacheName, keyBindParam.getValue(), id);
     }
     return id;
