@@ -11,7 +11,7 @@ import javax.persistence.Version;
 @Entity
 public class InfoCustomer extends Model {
 
-  public static Finder<Long,InfoCustomer> find = new Finder<Long,InfoCustomer>(InfoCustomer.class);
+  public static final Finder<Long,InfoCustomer> find = new Finder<Long,InfoCustomer>(InfoCustomer.class);
 
   @Id
   Long id;
