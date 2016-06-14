@@ -567,7 +567,7 @@ public final class DefaultPersister implements Persister {
    */
   public int deleteMany(Class<?> beanType, Collection<?> ids, Transaction transaction, boolean permanent) {
 
-    if (ids == null || ids.size() == 0) {
+    if (ids == null || ids.isEmpty()) {
       return 0;
     }
 

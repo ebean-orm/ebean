@@ -794,7 +794,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       }
     }
 
-    if (matchSet.size() == 0) {
+    if (matchSet.isEmpty()) {
       // this is a unidirectional relationship
       // ... that is no matching property on the 'detail' bean
       return false;
