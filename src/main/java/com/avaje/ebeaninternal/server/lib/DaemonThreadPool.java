@@ -69,7 +69,6 @@ public final class DaemonThreadPool extends ThreadPoolExecutor {
 
       } catch (Exception e) {
         logger.error("Error during shutdown of DaemonThreadPool[" + namePrefix + "]", e);
-        e.printStackTrace();
       }
     }
   }

@@ -147,7 +147,6 @@ public final class ShutdownManager {
           server.shutdownManaged();
         } catch (Exception ex) {
           logger.error("Error executing shutdown runnable", ex);
-          ex.printStackTrace();
         }
       }
       

@@ -62,7 +62,6 @@ public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor 
 
       } catch (Exception e) {
         logger.error("Error during shutdown of " + namePrefix, e);
-        e.printStackTrace();
       }
     }
   }
