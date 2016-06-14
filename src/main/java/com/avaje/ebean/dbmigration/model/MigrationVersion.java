@@ -141,6 +141,32 @@ public class MigrationVersion implements Comparable<MigrationVersion> {
     return comment.compareTo(other.comment);
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
+    }
+    if (obj == this) {
+      return true;
+    }
+    if (obj.getClass() == this.getClass()) {
+      MigrationVersion other = (MigrationVersion) obj;
+      boolean result = true;
+      result &= raw != null ? raw.equals(other.raw) : other.raw == null;
+      result &= comment != null ? comment.equals(other.comment) : other.comment == null;
+      return result;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = 25;
+    result = raw != null ? 31 * result + raw.hashCode() : result;
+    result = comment != null ? 31 * result + comment.hashCode() : result;
+    return result;
+  }
+
   /**
    * Parse the raw version string and just return the leading version number;
    */
