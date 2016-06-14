@@ -168,7 +168,7 @@
     <dependency>
       <groupId>org.avaje.ebeanorm</groupId>
       <artifactId>avaje-ebeanorm-agent</artifactId>
-      <version>4.10.1</version>
+      <version>4.11.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -243,14 +243,14 @@
       <plugin>
         <groupId>org.avaje.ebeanorm</groupId>
         <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
-        <version>4.10.1</version>
+        <version>4.11.1</version>
         <executions>
           <execution>
             <id>test</id>
             <phase>process-test-classes</phase>
             <configuration>
               <classSource>target/test-classes</classSource>
-              <packages>com.avaje.tests.**</packages>
+              <!--<packages>com.avaje.tests.**</packages>-->
               <transformArgs>debug=1</transformArgs>
             </configuration>
             <goals>
