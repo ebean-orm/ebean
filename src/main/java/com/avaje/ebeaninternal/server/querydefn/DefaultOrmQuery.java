@@ -522,7 +522,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       List<SpiExpression> exprList = whereExpressions.internalList();
       if (exprList.size() > 1) {
         return null;
-      } else if (exprList.size() == 0) {
+      } else if (exprList.isEmpty()) {
         return namedBind;
       } else {
         if (namedBind != null) {

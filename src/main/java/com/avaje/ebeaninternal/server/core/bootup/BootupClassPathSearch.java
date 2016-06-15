@@ -49,7 +49,7 @@ public class BootupClassPathSearch {
 
       long st = System.currentTimeMillis();
       for (ClassPathScanner finder : this.scanners) {
-        if (packages != null && packages.size() > 0) {
+        if (packages != null && !packages.isEmpty()) {
           for (String packageName : packages) {
             finder.scanForClasses(packageName, bc);
           }

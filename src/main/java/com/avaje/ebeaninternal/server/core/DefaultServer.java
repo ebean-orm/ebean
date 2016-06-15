@@ -836,7 +836,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (sortByClause == null) {
       throw new NullPointerException("sortByClause is null");
     }
-    if (list.size() == 0) {
+    if (list.isEmpty()) {
       // don't need to sort an empty list
       return;
     }

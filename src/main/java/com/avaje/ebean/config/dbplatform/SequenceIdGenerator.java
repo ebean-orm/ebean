@@ -114,7 +114,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
   public Object nextId(Transaction t) {
     synchronized (monitor) {
 
-      if (idList.size() == 0) {
+      if (idList.isEmpty()) {
         loadMoreIds(batchSize, t);
       }
       Long nextId = idList.remove(0);
@@ -193,7 +193,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
       while (rset.next()) {
         newIds.add(rset.getLong(1));
       }
-      if (newIds.size() == 0) {
+      if (newIds.isEmpty()) {
         throw new PersistenceException("Always expecting more than 1 row from " + sql);
       }
 
