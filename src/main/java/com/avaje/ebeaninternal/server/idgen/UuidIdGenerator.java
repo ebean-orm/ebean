@@ -10,7 +10,7 @@ import java.util.UUID;
  */
 public class UuidIdGenerator implements PlatformIdGenerator {
 
-  public static UuidIdGenerator INSTANCE = new UuidIdGenerator();
+  public static final UuidIdGenerator INSTANCE = new UuidIdGenerator();
 
   /**
    * Return UUID from UUID.randomUUID();

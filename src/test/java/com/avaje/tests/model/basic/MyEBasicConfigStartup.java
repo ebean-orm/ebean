@@ -12,9 +12,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class MyEBasicConfigStartup implements ServerConfigStartup {
 
-  public static AtomicLong insertCount = new AtomicLong();
-  public static AtomicLong updateCount = new AtomicLong();
-  public static AtomicLong deleteCount = new AtomicLong();
+  public static final AtomicLong insertCount = new AtomicLong();
+  public static final AtomicLong updateCount = new AtomicLong();
+  public static final AtomicLong deleteCount = new AtomicLong();
 
   public static void resetCounters() {
     insertCount.set(0);

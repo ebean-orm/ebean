@@ -10,7 +10,7 @@ public class CacheOptions {
   /**
    * Instance when no caching is used.
    */
-  public static CacheOptions NO_CACHING = new CacheOptions();
+  public static final CacheOptions NO_CACHING = new CacheOptions();
 
   private final boolean enableBeanCache;
   private final boolean enableQueryCache;
