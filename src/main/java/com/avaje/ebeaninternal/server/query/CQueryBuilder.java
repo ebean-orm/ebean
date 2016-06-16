@@ -139,10 +139,10 @@ public class CQueryBuilder {
 
     if (!sqlTree.isIncludeJoins()) {
       // simple - update table set ... where ...
-      return  aliasStrip(buildSql(updateClause, request, predicates, sqlTree).getSql());
+      return  aliasStrip(buildSqlUpdate(updateClause, request, predicates, sqlTree).getSql());
     }
     // wrap as - update table set ... where id in (select id ...)
-    String sql = buildSql(null, request, predicates, sqlTree).getSql();
+    String sql = buildSqlUpdate(null, request, predicates, sqlTree).getSql();
     sql = updateClause + " " + request.getBeanDescriptor().getWhereIdInSql() + "in (" + sql + ")";
     String alias = (rootTableAlias == null) ? "t0" : rootTableAlias;
     sql = aliasReplace(sql, alias);
@@ -406,7 +406,21 @@ public class CQueryBuilder {
     return new SqlTreeBuilder(request, predicates, detail, rawNoId).build();
   }
 
+  /**
+   * Return the SQL response with row limiting (when not an update statement).
+   */
   private SqlLimitResponse buildSql(String selectClause, OrmQueryRequest<?> request, CQueryPredicates predicates, SqlTree select) {
+    return buildSql(selectClause, request, predicates, select, false);
+  }
+
+  /**
+   * Return the SQL response for update statement (stripping table alias for find by id expression).
+   */
+  private SqlLimitResponse buildSqlUpdate(String selectClause, OrmQueryRequest<?> request, CQueryPredicates predicates, SqlTree select) {
+    return buildSql(selectClause, request, predicates, select, true);
+  }
+
+  private SqlLimitResponse buildSql(String selectClause, OrmQueryRequest<?> request, CQueryPredicates predicates, SqlTree select, boolean stripAlias) {
 
     SpiQuery<?> query = request.getQuery();
 
@@ -470,6 +484,10 @@ public class CQueryBuilder {
       if (idSql.isEmpty()) {
         throw new IllegalStateException("Executing FindById query on entity bean " + desc.getName()
             + " that doesn't have an @Id property??");
+      }
+      if (stripAlias) {
+        // strip the table alias for use in update statement
+        idSql = StringHelper.replaceString(idSql, "t0.","");
       }
       sb.append(idSql).append(" ");
       hasWhere = true;
