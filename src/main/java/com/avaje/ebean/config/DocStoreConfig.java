@@ -83,7 +83,6 @@ public class DocStoreConfig {
     if (systemValue != null) {
       return systemValue;
     }
-
     return url;
   }
 
@@ -100,6 +99,10 @@ public class DocStoreConfig {
    * Return true if Ebean should generate mapping files on server startup.
    */
   public boolean isGenerateMapping() {
+    String systemValue = System.getProperty("ebean.docstore.generateMapping");
+    if (systemValue != null) {
+      return Boolean.parseBoolean(systemValue);
+    }
     return generateMapping;
   }
 
@@ -114,6 +117,10 @@ public class DocStoreConfig {
    * Return true if the document store should recreate mapped indexes.
    */
   public boolean isDropCreate() {
+    String systemValue = System.getProperty("ebean.docstore.dropCreate");
+    if (systemValue != null) {
+      return Boolean.parseBoolean(systemValue);
+    }
     return dropCreate;
   }
 
@@ -129,6 +136,10 @@ public class DocStoreConfig {
    * This is only used if dropCreate is false.
    */
   public boolean isCreate() {
+    String systemValue = System.getProperty("ebean.docstore.create");
+    if (systemValue != null) {
+      return Boolean.parseBoolean(systemValue);
+    }
     return create;
   }
 
