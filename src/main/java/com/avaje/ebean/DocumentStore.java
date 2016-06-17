@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Document storage operations.
@@ -204,6 +205,39 @@ public interface DocumentStore {
    * @param alias           the alias of the index
    */
   void createIndex(String indexName, String alias);
+
+  /**
+   * Modify the settings on an index.
+   * <p>
+   * For example, this can be used be used to set elasticSearch refresh_interval
+   * on an index before a bulk update.
+   * </p>
+   * <pre>{@code
+   *
+   *   // refresh_interval -1 ... disable refresh while bulk loading
+   *
+   *   Map<String,Object> settings = new LinkedHashMap<>();
+   *   settings.put("refresh_interval", "-1");
+   *
+   *   documentStore.indexSettings("product", settings);
+   *
+   * }</pre>
+   *
+   * <pre>{@code
+   *
+   *   // refresh_interval 1s ... restore after bulk loading
+   *
+   *   Map<String,Object> settings = new LinkedHashMap<>();
+   *   settings.put("refresh_interval", "1s");
+   *
+   *   documentStore.indexSettings("product", settings);
+   *
+   * }</pre>
+   *
+   * @param indexName the name of the index to update settings on
+   * @param settings  the settings to set on the index
+   */
+  void indexSettings(String indexName, Map<String, Object> settings);
 
   /**
    * Copy the index to a new index.

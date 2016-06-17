@@ -10,6 +10,7 @@ import com.avaje.ebeanservice.docstore.api.DocQueryRequest;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DocumentStore that barfs it is used.
@@ -18,6 +19,11 @@ public class NoneDocStore implements DocumentStore {
 
   public static IllegalStateException implementationNotInClassPath() {
     throw new IllegalStateException("DocStore implementation not included in the classPath. You need to add the maven dependency for avaje-ebeanorm-elastic");
+  }
+
+  @Override
+  public void indexSettings(String indexName, Map<String, Object> settings) {
+    throw implementationNotInClassPath();
   }
 
   @Override
