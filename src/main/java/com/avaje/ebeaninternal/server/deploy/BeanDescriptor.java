@@ -119,7 +119,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
     for (int i = 0; i < propertyLength; i++) {
 
-      if (fromEbi.isLoadedProperty(i) ) {
+      if (fromEbi.isLoadedProperty(i)) {
         BeanProperty property = getBeanProperty(names[i]);
         if (!toEbi.isLoadedProperty(i)) {
           Object val = property.getValue(bean);
@@ -228,9 +228,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   private final BeanDescriptorMap owner;
 
-  
+
   private final String[] properties;
-  
+
   /**
    * Intercept pre post on insert,update, and delete .
    */
@@ -276,7 +276,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Derived list of properties that are used for version concurrency checking.
    */
   private final BeanProperty versionProperty;
-  
+
   private final int versionPropertyIndex;
 
   private final BeanProperty whenModifiedProperty;
@@ -287,7 +287,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Properties that are initialised in the constructor need to be 'unloaded' to support partial object queries.
    */
   private final int[] unloadProperties;
-  
+
   /**
    * Properties local to this type (not from a super type).
    */
@@ -298,7 +298,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   private final BeanProperty[] propertiesMutable;
 
-  
+
   private final BeanPropertyAssocOne<?> unidirectional;
 
   /**
@@ -358,7 +358,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   private boolean deleteRecurseSkippable;
 
   private final EntityBean prototypeEntityBean;
-  
+
   private final IdBinder idBinder;
 
   private String idBinderInLHSSql;
@@ -499,7 +499,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     // Check if there are no cascade delete associated beans (also subject to
     // change in initialiseOther()).
     deleteRecurseSkippable = (0 == (propertiesOneExportedDelete.length + propertiesOneImportedDelete.length + propertiesManyDelete.length));
-    
+
     // object used to handle Id values
     this.idBinder = owner.createIdBinder(idProperty);
     this.whenModifiedProperty = findWhenModifiedProperty();
@@ -511,7 +511,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       this.versionPropertyIndex = -1;
       this.unloadProperties = new int[0];
       this.propertiesIndex = new BeanProperty[0];
-      
+
     } else {
       EntityBeanIntercept ebi = prototypeEntityBean._ebean_getIntercept();
       this.idPropertyIndex = (idProperty == null) ? -1 : ebi.findProperty(idProperty.getName());
@@ -529,40 +529,40 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * These properties need to be unloaded when populating beans for queries.
    */
   private int[] derivePropertiesToUnload(EntityBean prototypeEntityBean) {
-    
+
     boolean[] loaded = prototypeEntityBean._ebean_getIntercept().getLoaded();
     int[] props = new int[loaded.length];
     int pos = 0;
-    
+
     // collect the positions of the properties initialised in the default constructor.
     for (int i = 0; i < loaded.length; i++) {
       if (loaded[i]) {
         props[pos++] = i;
       }
     }
-    
+
     if (pos == 0) {
       // nothing set in the constructor
       return new int[0];
     }
-    
+
     // populate a smaller/minimal array
     int[] unload = new int[pos];
     System.arraycopy(props, 0, unload, 0, pos);
     return unload;
   }
-  
+
   /**
-   * Create an entity bean that is used as a prototype/factory to create new instances. 
+   * Create an entity bean that is used as a prototype/factory to create new instances.
    */
   private EntityBean createPrototypeEntityBean(Class<T> beanType) {
     if (Modifier.isAbstract(beanType.getModifiers())) {
-      return null;      
-    } 
+      return null;
+    }
     try {
       return (EntityBean) beanType.newInstance();
     } catch (Exception e) {
-      throw new IllegalStateException("Error trying to create the prototypeEntityBean for "+beanType, e);
+      throw new IllegalStateException("Error trying to create the prototypeEntityBean for " + beanType, e);
     }
   }
 
@@ -608,9 +608,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * These properties need to be initialised prior to the association properties
    * as they are used to get the imported and exported properties.
    * </p>
+   *
    * @param withHistoryTables map populated if @History is supported on this entity bean
    */
-  public void initialiseId(Map<String, String> withHistoryTables, Map<String,String> draftTables) {
+  public void initialiseId(Map<String, String> withHistoryTables, Map<String, String> draftTables) {
 
     if (logger.isTraceEnabled()) {
       logger.trace("BeanDescriptor initialise " + fullName);
@@ -644,9 +645,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Initialise the exported and imported parts for associated properties.
    *
-   * @param asOfTableMap the map of base tables to associated 'with history' tables
+   * @param asOfTableMap   the map of base tables to associated 'with history' tables
    * @param asOfViewSuffix the suffix added to the table name to derive the 'with history' view name
-   * @param draftTableMap the map of base tables to associated 'draft' tables.
+   * @param draftTableMap  the map of base tables to associated 'draft' tables.
    */
   public void initialiseOther(Map<String, String> asOfTableMap, String asOfViewSuffix, Map<String, String> draftTableMap) {
 
@@ -709,7 +710,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       propertiesMany[i].initialisePostTarget();
     }
     if (inheritInfo != null && !inheritInfo.isRoot()) {
-      docStoreAdapter = (DocStoreBeanAdapter<T>)inheritInfo.getRoot().desc().docStoreAdapter();
+      docStoreAdapter = (DocStoreBeanAdapter<T>) inheritInfo.getRoot().desc().docStoreAdapter();
     }
     docMapping = docStoreAdapter.createDocMapping();
     docStoreAdapter.registerPaths();
@@ -753,12 +754,12 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     PersistRequest.Type type = request.getType();
     switch (type) {
       case INSERT:
-        return changeLogFilter.includeInsert(request) ? insertBeanChange(request): null;
+        return changeLogFilter.includeInsert(request) ? insertBeanChange(request) : null;
       case UPDATE:
       case SOFT_DELETE:
-        return changeLogFilter.includeUpdate(request) ? updateBeanChange(request): null;
+        return changeLogFilter.includeUpdate(request) ? updateBeanChange(request) : null;
       case DELETE:
-        return changeLogFilter.includeDelete(request) ? deleteBeanChange(request) :null;
+        return changeLogFilter.includeDelete(request) ? deleteBeanChange(request) : null;
       default:
         throw new IllegalStateException("Unhandled request type " + type);
     }
@@ -959,7 +960,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
         mapping.add(new DocPropertyMapping(discCol, DocPropertyType.INTEGER));
       }
     }
-    for (BeanProperty prop: propertiesNonTransient) {
+    for (BeanProperty prop : propertiesNonTransient) {
       prop.docStoreMapping(mapping, prefix);
     }
     if (inheritInfo != null) {
@@ -1121,7 +1122,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   public CachedBeanData cacheEmbeddedBeanExtract(EntityBean bean) {
     return cacheHelp.beanExtractData(this, bean);
   }
-  
+
   /**
    * Load the embedded bean (taking into account inheritance).
    */
@@ -1177,7 +1178,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   public void cacheHandleDeleteById(Object id) {
     cacheHelp.beanCacheRemove(id);
   }
-  
+
   /**
    * Returns true if it managed to populate/load the bean from the cache.
    */
@@ -1330,15 +1331,15 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   public List<MetaQueryPlanStatistic> collectQueryPlanStatistics(boolean reset) {
     return collectQueryPlanStatisticsInternal(reset, false);
   }
-  
+
   @Override
   public List<MetaQueryPlanStatistic> collectAllQueryPlanStatistics(boolean reset) {
     return collectQueryPlanStatisticsInternal(reset, false);
   }
-  
+
   public List<MetaQueryPlanStatistic> collectQueryPlanStatisticsInternal(boolean reset, boolean collectAll) {
     List<MetaQueryPlanStatistic> list = new ArrayList<MetaQueryPlanStatistic>(queryPlanCache.size());
-    for (CQueryPlan queryPlan :  queryPlanCache.values()) {
+    for (CQueryPlan queryPlan : queryPlanCache.values()) {
       Snapshot snapshot = queryPlan.getSnapshot(reset);
       if (collectAll || snapshot.getExecutionCount() > 0) {
         list.add(snapshot);
@@ -1413,7 +1414,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   /**
    * Return true if delete can use a single SQL statement.
-   *
+   * <p>
    * This implies cascade delete does not continue depth wise and that this is no
    * associated L2 bean caching.
    */
@@ -1529,7 +1530,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   @Override
   @SuppressWarnings("unchecked")
   public T createBean() {
-    return (T)createEntityBean();
+    return (T) createEntityBean();
   }
 
   /**
@@ -1538,8 +1539,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   @SuppressWarnings("unchecked")
   public EntityBean createEntityBean() {
     try {
-      EntityBean bean = (EntityBean)prototypeEntityBean._ebean_newInstance();
-      
+      EntityBean bean = (EntityBean) prototypeEntityBean._ebean_newInstance();
+
       if (unloadProperties.length > 0) {
         // 'unload' any properties initialised in the default constructor
         EntityBeanIntercept ebi = bean._ebean_getIntercept();
@@ -1548,7 +1549,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
         }
       }
       return bean;
-      
+
     } catch (Exception ex) {
       throw new PersistenceException(ex);
     }
@@ -1806,7 +1807,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   public Object convertIdFromJson(Object idValue) {
     return idBinder.convertIdFromJson(idValue);
   }
-  
+
   /**
    * Return the default order by that may need to be added if a many property is
    * included in the query.
@@ -1871,7 +1872,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Register all the assoc many properties on this bean that are not populated with the load context.
    * <p>
-   *   This provides further lazy loading via the load context.
+   * This provides further lazy loading via the load context.
    * </p>
    */
   public void lazyLoadRegister(String prefix, EntityBeanIntercept ebi, EntityBean bean, LoadContext loadContext) {
@@ -1930,9 +1931,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   /**
    * Return a Comparator for local sorting of lists.
-   * 
-   * @param sortByClause
-   *          list of property names with optional ASC or DESC suffix.
+   *
+   * @param sortByClause list of property names with optional ASC or DESC suffix.
    */
   @SuppressWarnings("unchecked")
   private ElComparator<T> createComparator(String sortByClause) {
@@ -2025,7 +2025,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       ElPropertyDeploy fk = elDeployCache.get(propName);
       if (fk != null && fk instanceof BeanFkeyProperty) {
         // propertyDeploy chain for foreign key column
-        return ((BeanFkeyProperty)fk).create(chain.getExpression(), chain.isContainsMany());
+        return ((BeanFkeyProperty) fk).create(chain.getExpression(), chain.isContainsMany());
       }
     }
 
@@ -2087,7 +2087,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public void resetManyProperties(Object dbBean) {
 
-    EntityBean bean = (EntityBean)dbBean;
+    EntityBean bean = (EntityBean) dbBean;
     for (int i = 0; i < propertiesMany.length; i++) {
       if (propertiesMany[i].isCascadeRefresh()) {
         propertiesMany[i].resetMany(bean);
@@ -2336,10 +2336,14 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   public String getBaseTable(SpiQuery.TemporalMode mode) {
     switch (mode) {
-      case DRAFT: return draftTable;
-      case VERSIONS: return baseTableVersionsBetween;
-      case AS_OF: return baseTableAsOf;
-        default: return baseTable;
+      case DRAFT:
+        return draftTable;
+      case VERSIONS:
+        return baseTableVersionsBetween;
+      case AS_OF:
+        return baseTableAsOf;
+      default:
+        return baseTable;
     }
   }
 
@@ -2554,19 +2558,17 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   /**
    * Return true if this bean should be inserted rather than updated.
-   * 
-   * @param ebi
-   *          The entity bean intercept
-   * @param insertMode
-   *          true if the 'root request' was an insert rather than an update
+   *
+   * @param ebi        The entity bean intercept
+   * @param insertMode true if the 'root request' was an insert rather than an update
    */
   public boolean isInsertMode(EntityBeanIntercept ebi, boolean insertMode) {
-    
+
     if (ebi.isLoaded()) {
       // must be an update as the bean is loaded
       return false;
     }
-    
+
     if (idProperty.isEmbedded()) {
       // not using Id generator so just base on isLoaded() 
       return !ebi.isLoaded();
@@ -2578,11 +2580,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     // same as the 'root request'
     return insertMode;
   }
-  
+
   public boolean isReference(EntityBeanIntercept ebi) {
     return ebi.isReference() || hasIdPropertyOnly(ebi);
   }
-  
+
   public boolean hasIdPropertyOnly(EntityBeanIntercept ebi) {
     return ebi.hasIdOnly(idPropertyIndex);
   }
@@ -2631,13 +2633,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       }
     }
   }
-  
+
   public ConcurrencyMode getConcurrencyMode(EntityBeanIntercept ebi) {
-    
+
     if (!hasVersionProperty(ebi)) {
       return ConcurrencyMode.NONE;
     } else {
-      return concurrencyMode;     
+      return concurrencyMode;
     }
   }
 
@@ -2723,7 +2725,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
           query.order(rawSql.getSql().getOrderBy());
         }
         query.order().asc(idProperty.getName());
-      } else if (!orderBy.containsProperty(idProperty.getName())){
+      } else if (!orderBy.containsProperty(idProperty.getName())) {
         query.order().asc(idProperty.getName());
       }
     }
@@ -2855,8 +2857,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   public void jsonWrite(WriteJson writeJson, EntityBean bean) throws IOException {
     jsonHelp.jsonWrite(writeJson, bean, null);
-  }  
-  
+  }
+
   public void jsonWrite(WriteJson writeJson, EntityBean bean, String key) throws IOException {
     jsonHelp.jsonWrite(writeJson, bean, key);
   }
@@ -2864,11 +2866,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   protected void jsonWriteProperties(WriteJson writeJson, EntityBean bean) throws IOException {
     jsonHelp.jsonWriteProperties(writeJson, bean);
   }
-    
+
   public T jsonRead(ReadJson jsonRead, String path) throws IOException {
     return jsonHelp.jsonRead(jsonRead, path);
   }
-  
+
   protected T jsonReadObject(ReadJson jsonRead, String path) throws IOException {
     return jsonHelp.jsonReadObject(jsonRead, path);
   }

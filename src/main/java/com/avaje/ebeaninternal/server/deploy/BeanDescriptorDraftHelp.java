@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Helper for BeanDescriptor that manages draft entity beans.
- * 
+ *
  * @param <T> The entity bean type
  */
 public final class BeanDescriptorDraftHelp<T> {
@@ -47,7 +47,7 @@ public final class BeanDescriptorDraftHelp<T> {
    */
   public boolean draftReset(T draftBean) {
 
-    EntityBean draftEntityBean = (EntityBean)draftBean;
+    EntityBean draftEntityBean = (EntityBean) draftBean;
 
     if (draftDirty != null) {
       // set @DraftDirty property to false
@@ -72,11 +72,11 @@ public final class BeanDescriptorDraftHelp<T> {
   public T publish(T draftBean, T liveBean) {
 
     if (liveBean == null) {
-      liveBean = (T)desc.createEntityBean();
+      liveBean = (T) desc.createEntityBean();
     }
 
-    EntityBean draft = (EntityBean)draftBean;
-    EntityBean live = (EntityBean)liveBean;
+    EntityBean draft = (EntityBean) draftBean;
+    EntityBean live = (EntityBean) liveBean;
 
     BeanProperty idProperty = desc.getIdProperty();
     if (idProperty != null) {

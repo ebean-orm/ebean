@@ -7,27 +7,27 @@ import com.avaje.ebeaninternal.server.persist.BeanPersister;
  */
 public class BeanManager<T> {
 
-	private final BeanPersister persister;
+  private final BeanPersister persister;
 
-	private final BeanDescriptor<T> descriptor;
+  private final BeanDescriptor<T> descriptor;
 
-	public BeanManager(BeanDescriptor<T> descriptor, BeanPersister persister) {
-		this.descriptor = descriptor;
-		this.persister = persister;
-	}
+  public BeanManager(BeanDescriptor<T> descriptor, BeanPersister persister) {
+    this.descriptor = descriptor;
+    this.persister = persister;
+  }
 
-	/**
-	 * Return the associated BeanPersister.
-	 */
-	public BeanPersister getBeanPersister() {
-		return persister;
-	}
+  /**
+   * Return the associated BeanPersister.
+   */
+  public BeanPersister getBeanPersister() {
+    return persister;
+  }
 
-	/**
-	 * Return the BeanDescriptor.
-	 */
-	public BeanDescriptor<T> getBeanDescriptor() {
-		return descriptor;
-	}
+  /**
+   * Return the BeanDescriptor.
+   */
+  public BeanDescriptor<T> getBeanDescriptor() {
+    return descriptor;
+  }
 
 }

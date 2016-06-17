@@ -42,7 +42,7 @@ public class BeanCascadeInfo {
         save = true;
         break;
       default:
-        throw new IllegalStateException("Unexpected CascadeType "+type);
+        throw new IllegalStateException("Unexpected CascadeType " + type);
     }
   }
 

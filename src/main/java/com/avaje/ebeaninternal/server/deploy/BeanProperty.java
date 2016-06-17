@@ -332,9 +332,9 @@ public class BeanProperty implements ElPropertyValue, Property {
 
     this.softDelete = deploy.isSoftDelete();
     if (softDelete) {
-      ScalarTypeBoolean.BooleanBase boolType = (ScalarTypeBoolean.BooleanBase)scalarType;
-      this.softDeleteDbSet = dbColumn+"="+boolType.getDbTrueLiteral();
-      this.softDeleteDbPredicate = "."+dbColumn+","+boolType.getDbFalseLiteral()+")="+boolType.getDbFalseLiteral();
+      ScalarTypeBoolean.BooleanBase boolType = (ScalarTypeBoolean.BooleanBase) scalarType;
+      this.softDeleteDbSet = dbColumn + "=" + boolType.getDbTrueLiteral();
+      this.softDeleteDbPredicate = "." + dbColumn + "," + boolType.getDbFalseLiteral() + ")=" + boolType.getDbFalseLiteral();
     } else {
       this.softDeleteDbSet = null;
       this.softDeleteDbPredicate = null;
@@ -763,7 +763,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   public void setCacheDataValue(EntityBean bean, Object cacheData, PersistenceContext context) {
     if (cacheData instanceof String) {
       // parse back from string to support optimisation of java object serialisation
-      cacheData = scalarType.parse((String)cacheData);
+      cacheData = scalarType.parse((String) cacheData);
     }
     setValue(bean, cacheData);
   }
@@ -776,7 +776,7 @@ public class BeanProperty implements ElPropertyValue, Property {
   }
 
   public Object getVal(Object bean) {
-    return getValue((EntityBean)bean);
+    return getValue((EntityBean) bean);
   }
 
   /**
@@ -814,7 +814,7 @@ public class BeanProperty implements ElPropertyValue, Property {
 
     if (bean != null) {
       Object logicalVal = convertToLogicalType(value);
-      setValue((EntityBean)bean, logicalVal);
+      setValue((EntityBean) bean, logicalVal);
     }
   }
 
@@ -823,7 +823,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     if (bean == null) {
       return null;
     }
-    return getValueIntercept((EntityBean)bean);
+    return getValueIntercept((EntityBean) bean);
   }
 
   @Override
@@ -1322,7 +1322,7 @@ public class BeanProperty implements ElPropertyValue, Property {
           // change in behavior for #318
           objValue = null;
           String msg = "Error trying to use Jackson ObjectMapper to read transient property "
-              + getFullBeanName() +" - consider marking this property with @JsonIgnore";
+              + getFullBeanName() + " - consider marking this property with @JsonIgnore";
           logger.error(msg, e);
         }
       }
@@ -1371,7 +1371,7 @@ public class BeanProperty implements ElPropertyValue, Property {
 
       DocPropertyType type = scalarType.getDocType();
       DocPropertyOptions options = docOptions.copy();
-      if (DocPropertyType.UUID == type || DocPropertyType.ENUM == type ||isStringId(type)) {
+      if (DocPropertyType.UUID == type || DocPropertyType.ENUM == type || isStringId(type)) {
         options.setCode(true);
       }
 

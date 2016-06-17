@@ -21,7 +21,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   public BeanFkeyProperty(String name, String dbColumn, int deployOrder) {
     this(null, name, dbColumn, deployOrder, false);
   }
-  
+
   private BeanFkeyProperty(String prefix, String name, String dbColumn, int deployOrder, boolean containsMany) {
     this.prefix = prefix;
     this.name = name;
@@ -32,7 +32,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   public String toString() {
-    return "prefix:"+prefix+" name:"+name+" dbColumn:"+dbColumn+" ph:"+placeHolder;
+    return "prefix:" + prefix + " name:" + name + " dbColumn:" + dbColumn + " ph:" + placeHolder;
   }
 
   public int getDeployOrder() {

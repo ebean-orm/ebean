@@ -38,7 +38,8 @@ public final class BeanMapHelp<T> implements BeanCollectionHelp<T> {
 
   /**
    * When help is attached to a specific many property.
-   */  public BeanMapHelp(BeanPropertyAssocMany<T> many) {
+   */
+  public BeanMapHelp(BeanPropertyAssocMany<T> many) {
     this.many = many;
     this.targetDescriptor = many.getTargetDescriptor();
     this.propertyName = many.getName();

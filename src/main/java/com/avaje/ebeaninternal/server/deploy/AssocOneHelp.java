@@ -21,6 +21,7 @@ abstract class AssocOneHelp {
     this.property = property;
     this.target = property.targetDescriptor;
   }
+
   /**
    * Effectively skip reading (the jdbc resultSet as already in the persistence context etc).
    */

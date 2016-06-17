@@ -29,7 +29,7 @@ import java.util.Map;
 
 /**
  * Helper for BeanDescriptor that manages the bean, query and collection caches.
- * 
+ *
  * @param <T> The entity bean type
  */
 final class BeanDescriptorCacheHelp<T> {
@@ -55,7 +55,7 @@ final class BeanDescriptorCacheHelp<T> {
   private final Class<?> beanType;
 
   private final String cacheName;
-  
+
   private final BeanPropertyAssocOne<?>[] propertiesOneImported;
   private final String naturalKeyProperty;
 
@@ -74,7 +74,7 @@ final class BeanDescriptorCacheHelp<T> {
   private boolean cacheNotifyOnDelete;
 
   BeanDescriptorCacheHelp(BeanDescriptor<T> desc, ServerCacheManager cacheManager, CacheOptions cacheOptions,
-      boolean cacheSharableBeans, BeanPropertyAssocOne<?>[] propertiesOneImported) {
+                          boolean cacheSharableBeans, BeanPropertyAssocOne<?>[] propertiesOneImported) {
 
     this.desc = desc;
     this.beanType = desc.rootBeanType;
@@ -88,7 +88,7 @@ final class BeanDescriptorCacheHelp<T> {
     if (!cacheOptions.isEnableQueryCache()) {
       this.queryCache = null;
     } else {
-      this.queryCache =  cacheManager.getQueryCache(beanType);
+      this.queryCache = cacheManager.getQueryCache(beanType);
     }
 
     if (cacheOptions.isEnableBeanCache()) {
@@ -240,7 +240,7 @@ final class BeanDescriptorCacheHelp<T> {
         manyLog.trace("   GET {}({}).{} - cache miss", cacheName, parentId, propertyName);
       }
     } else if (manyLog.isDebugEnabled()) {
-      manyLog.debug("   GET {}({}).{} - hit", cacheName, parentId, propertyName);      
+      manyLog.debug("   GET {}({}).{} - hit", cacheName, parentId, propertyName);
     }
     return entry;
   }
@@ -255,7 +255,7 @@ final class BeanDescriptorCacheHelp<T> {
       // not in cache so return unsuccessful
       return false;
     }
-    
+
     Object ownerBean = bc.getOwnerBean();
     EntityBeanIntercept ebi = ((EntityBean) ownerBean)._ebean_getIntercept();
     PersistenceContext persistenceContext = ebi.getPersistenceContext();
@@ -350,13 +350,13 @@ final class BeanDescriptorCacheHelp<T> {
 
     // Not using a loadContext for beans coming out of L2 cache
     // so that means no batch lazy loading for these beans
-    EntityBean entityBean = (EntityBean)bean;
+    EntityBean entityBean = (EntityBean) bean;
     EntityBeanIntercept ebi = entityBean._ebean_getIntercept();
     ebi.setPersistenceContext(context);
     Object id = desc.getId(entityBean);
     desc.contextPut(context, id, bean);
   }
-  
+
   /**
    * Return the beanCache creating it if necessary.
    */
@@ -366,7 +366,7 @@ final class BeanDescriptorCacheHelp<T> {
     }
     return beanCache;
   }
-  
+
   /**
    * Clear the bean cache.
    */
@@ -422,7 +422,7 @@ final class BeanDescriptorCacheHelp<T> {
   CachedBeanData beanCacheGetData(Object id) {
     return (CachedBeanData) getBeanCache().get(id);
   }
-  
+
   T beanCacheGet(Object id, Boolean readOnly, PersistenceContext context) {
     T bean = beanCacheGetInternal(id, readOnly, context);
     if (bean != null) {
@@ -430,7 +430,7 @@ final class BeanDescriptorCacheHelp<T> {
     }
     return bean;
   }
-  
+
   /**
    * Return a bean from the bean cache.
    */
@@ -457,7 +457,7 @@ final class BeanDescriptorCacheHelp<T> {
       }
     }
 
-    return (T)loadBean(id, readOnly, data, context);
+    return (T) loadBean(id, readOnly, data, context);
   }
 
   /**
@@ -636,7 +636,7 @@ final class BeanDescriptorCacheHelp<T> {
         }
       }
     }
-    
+
     // check if the bean itself was updated
     if (!updateRequest.isUpdatedManysOnly()) {
 
