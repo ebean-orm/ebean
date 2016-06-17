@@ -265,12 +265,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
    */
   public void resetMany(EntityBean bean) {
     Object value = getValue(bean);
-    if (value == null) {
-      // not expecting this - set an empty reference
-      createReference(bean);
-    } else {
+    if (value instanceof BeanCollection) {
       // reset the collection back to empty
       ((BeanCollection)value).reset(bean, name);
+    } else {
+      createReference(bean);
     }
   }
 

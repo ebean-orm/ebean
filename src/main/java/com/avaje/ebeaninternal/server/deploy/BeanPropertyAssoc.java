@@ -168,7 +168,14 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
 	public BeanDescriptor<T> getTargetDescriptor() {
 		return targetDescriptor;
 	}
-	
+
+	/**
+	 * Return true if REFRESH should cascade.
+   */
+	public boolean isCascadeRefresh() {
+		return cascadeInfo.isRefresh();
+	}
+
 	public boolean isSaveRecurseSkippable(Object bean) {
 
     return saveRecurseSkippable && bean instanceof EntityBean && !((EntityBean) bean)._ebean_getIntercept().isNewOrDirty();

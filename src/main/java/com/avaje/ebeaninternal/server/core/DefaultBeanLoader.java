@@ -281,7 +281,7 @@ public class DefaultBeanLoader {
       }
     }
 
-    SpiQuery<?> query = (SpiQuery<?>) server.createQuery(desc.getBeanType());
+    SpiQuery<?> query = server.createQuery(desc.getBeanType());
     query.setLazyLoadProperty(ebi.getLazyLoadProperty());
     if (draft) {
       query.asDraft();

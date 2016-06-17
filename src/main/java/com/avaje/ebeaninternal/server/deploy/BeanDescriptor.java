@@ -2089,7 +2089,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
     EntityBean bean = (EntityBean)dbBean;
     for (int i = 0; i < propertiesMany.length; i++) {
-      propertiesMany[i].resetMany(bean);
+      if (propertiesMany[i].isCascadeRefresh()) {
+        propertiesMany[i].resetMany(bean);
+      }
     }
   }
 

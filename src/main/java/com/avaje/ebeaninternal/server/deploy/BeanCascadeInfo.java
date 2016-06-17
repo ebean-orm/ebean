@@ -10,56 +10,69 @@ import javax.persistence.CascadeType;
  */
 public class BeanCascadeInfo {
 
-    /**
-     * should delete cascade.
-     */
-    boolean delete;
-    
-    /**
-     * Should save cascade.
-     */
-    boolean save;
+  private boolean delete;
 
-    public void setTypes(CascadeType[] types) {
-        for (int i = 0; i < types.length; i++) {
-            setType(types[i]);
-        }
+  private boolean save;
+
+  private boolean refresh;
+
+  public void setTypes(CascadeType[] types) {
+    for (int i = 0; i < types.length; i++) {
+      setType(types[i]);
     }
-    
-    private void setType(CascadeType type) {
-        if (type.equals(CascadeType.ALL)){
-            save = true;
-            delete = true;
-        }
-        if (type.equals(CascadeType.REMOVE)){
-            delete = true;
-        }
-        if (type.equals(CascadeType.PERSIST)){
-            save = true;
-        }
-        if (type.equals(CascadeType.MERGE)){
-            save = true;
-        }
+  }
+
+  private void setType(CascadeType type) {
+    switch (type) {
+      case ALL:
+        save = true;
+        delete = true;
+        refresh = true;
+        break;
+      case REMOVE:
+        delete = true;
+        break;
+      case REFRESH:
+        refresh = true;
+        break;
+      case PERSIST:
+        save = true;
+        break;
+      case MERGE:
+        save = true;
+        break;
+      default:
+        throw new IllegalStateException("Unexpected CascadeType "+type);
     }
-    
-    /**
-     * Return true if delete should cascade.
-     */
-    public boolean isDelete() {
-        return delete;
-    }
-    /**
-     * Set to true if delete should cascade.
-     */
-    public void setDelete(boolean delete) {
-        this.delete = delete;
-    }
-    /**
-     * Return true if save should cascade.
-     */
-    public boolean isSave() {
-        return save;
-    }
+  }
+
+  /**
+   * Return true if refresh should cascade.
+   */
+  public boolean isRefresh() {
+    return refresh;
+  }
+
+  /**
+   * Return true if delete should cascade.
+   */
+  public boolean isDelete() {
+    return delete;
+  }
+
+  /**
+   * Set to true if delete should cascade.
+   */
+  public void setDelete(boolean delete) {
+    this.delete = delete;
+  }
+
+  /**
+   * Return true if save should cascade.
+   */
+  public boolean isSave() {
+    return save;
+  }
 
   /**
    * Set cascade save and delete settings.

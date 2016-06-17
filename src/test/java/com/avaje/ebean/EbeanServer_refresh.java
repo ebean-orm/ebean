@@ -1,7 +1,12 @@
 package com.avaje.ebean;
 
 import com.avaje.tests.model.basic.EBasic;
+import com.avaje.tests.model.basic.Order;
+import com.avaje.tests.model.basic.OrderDetail;
+import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 
@@ -27,4 +32,41 @@ public class EbeanServer_refresh {
     server.refresh(basic);
     assertEquals(basic.getStatus(), EBasic.Status.ACTIVE);
   }
+
+  @Test
+  public void refresh_when_oneToManyLoaded() {
+
+    ResetBasicData.reset();
+
+    Order order = Ebean.find(Order.class, 1);
+    order.getCustomer().getName();
+    order.getDetails().size();
+
+    Ebean.refresh(order);
+  }
+
+  @Test
+  public void refresh_when_oneToManyVanilla() {
+
+    ResetBasicData.reset();
+
+    Order order = Ebean.find(Order.class, 1);
+    order.getCustomer().getName();
+    order.setDetails(new ArrayList<OrderDetail>());
+
+    Ebean.refresh(order);
+  }
+
+  @Test
+  public void refresh_when_oneToManyNull() {
+
+    ResetBasicData.reset();
+
+    Order order = Ebean.find(Order.class, 1);
+    order.getCustomer().getName();
+    order.setDetails(null);
+
+    Ebean.refresh(order);
+  }
+
 }
