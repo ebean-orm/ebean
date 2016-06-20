@@ -147,4 +147,14 @@ public interface DocQueryContext {
    * Return the expression path for the given property path.
    */
   ExpressionPath getExpressionPath(String propName);
+
+  /**
+   * Start nested path expressions.
+   */
+  void startNested(String nestedPath) throws IOException;
+
+  /**
+   * End nested path expressions.
+   */
+  void endNested() throws IOException;
 }

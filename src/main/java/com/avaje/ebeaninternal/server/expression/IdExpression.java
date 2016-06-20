@@ -25,6 +25,11 @@ class IdExpression extends NonPrepareExpression implements SpiExpression {
     context.writeId(value);
   }
 
+  @Override
+  public String nestedPath(BeanDescriptor<?> desc) {
+    return null;
+  }
+
   /**
    * Always returns false.
    */

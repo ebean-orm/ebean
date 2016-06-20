@@ -119,6 +119,11 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
   }
 
   @Override
+  public String nestedPath(BeanDescriptor<?> desc) {
+    return null;
+  }
+
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
     // Nothing to do for exists expression
   }

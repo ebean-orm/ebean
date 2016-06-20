@@ -18,8 +18,13 @@ public interface SpiExpression extends Expression {
    */
   void writeDocQuery(DocQueryContext context) throws IOException;
 
-  /**
-   * Process "Many" properties populating ManyWhereJoins.
+	/**
+	 * Return the nested path for this expression.
+	 */
+	String nestedPath(BeanDescriptor<?> desc);
+
+	/**
+	 * Process "Many" properties populating ManyWhereJoins.
    * <p>
    * Predicates on Many properties require an extra independent join clause.
    * </p>

@@ -31,6 +31,11 @@ class AllEqualsExpression extends NonPrepareExpression {
   }
 
   @Override
+  public String nestedPath(BeanDescriptor<?> desc) {
+    return null;
+  }
+
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     if (propMap != null) {
       for (String propertyName : propMap.keySet()) {

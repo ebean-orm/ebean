@@ -302,6 +302,11 @@ public interface SpiQuery<T> extends Query<T> {
   NaturalKeyBindParam getNaturalKeyBindParam();
 
   /**
+   * Prepare the query for docstore execution with nested paths.
+   */
+  void prepareDocNested();
+
+  /**
    * Set the query to be a delete query.
    */
   void setDelete();

@@ -45,9 +45,9 @@ abstract class LogicExpression implements SpiExpression {
     }
   }
 
-  protected final SpiExpression expOne;
+  protected SpiExpression expOne;
 
-  protected final SpiExpression expTwo;
+  protected SpiExpression expTwo;
 
   private final String joinType;
 
@@ -65,6 +65,27 @@ abstract class LogicExpression implements SpiExpression {
     expOne.writeDocQuery(context);
     expTwo.writeDocQuery(context);
     context.endBool();
+  }
+
+  @Override
+  public String nestedPath(BeanDescriptor<?> desc) {
+
+    String pathOne = expOne.nestedPath(desc);
+    String pathTwo = expTwo.nestedPath(desc);
+
+    if (pathOne == null && pathTwo == null) {
+      return null;
+    }
+    if (pathOne != null && pathOne.equals(pathTwo)) {
+      return pathOne;
+    }
+    if (pathOne != null) {
+      expOne = new NestedPathWrapperExpression(pathOne, expOne);
+    }
+    if (pathTwo != null) {
+      expTwo = new NestedPathWrapperExpression(pathTwo, expTwo);
+    }
+    return null;
   }
 
   @Override

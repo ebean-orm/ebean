@@ -7,6 +7,7 @@ import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
+import com.avaje.ebeaninternal.server.query.SplitName;
 
 import java.io.IOException;
 
@@ -37,6 +38,16 @@ class BetweenPropertyExpression extends NonPrepareExpression {
     context.writeSimple(Op.LT_EQ, lowProperty, value);
     context.writeSimple(Op.GT_EQ, highProperty, value);
     context.endBool();
+  }
+
+  @Override
+  public String nestedPath(BeanDescriptor<?> desc) {
+    ElPropertyDeploy elProp = desc.getElPropertyDeploy(name(lowProperty));
+    if (elProp != null && elProp.containsMany()) {
+      // assumes highProperty is also nested property which seems reasonable
+      return SplitName.begin(lowProperty);
+    }
+    return null;
   }
 
   @Override

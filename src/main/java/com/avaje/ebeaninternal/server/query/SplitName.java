@@ -1,9 +1,15 @@
 package com.avaje.ebeaninternal.server.query;
 
+/**
+ * Helper for dot notation property paths.
+ */
 public class SplitName {
 
   private static final char PERIOD = '.';
 
+  /**
+   * Add the two name sections together in dot notation.
+   */
   public static String add(String prefix, String name) {
     if (prefix != null) {
       return prefix + "." + name;
@@ -38,8 +44,18 @@ public class SplitName {
     }
   }
 
+  /**
+   * Return the name split by last.
+   */
   public static String[] split(String name) {
     return split(name, true);
+  }
+
+  /**
+   * Return the first part of the name.
+   */
+  public static String begin(String name) {
+    return splitBegin(name)[0];
   }
 
   public static String[] splitBegin(String name) {

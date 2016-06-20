@@ -31,13 +31,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   private static final String AND = " and ";
 
-  protected final List<SpiExpression> list;
+  protected List<SpiExpression> list;
 
   protected final Query<T> query;
 
   private final ExpressionList<T> parentExprList;
 
   protected transient ExpressionFactory expr;
+
+  protected String allDocNestedPath;
 
   /**
    * Set to true for the "Text" root expression list.
@@ -76,6 +78,26 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   /**
+   * Wrap the expression list as a Junction or top level DefaultExpressionList.
+   *
+   * @param list       The list of expressions grouped by nested path
+   * @param nestedPath The doc store nested path
+   * @param type       The junction type (or null for top level expression list).
+   * @return A single SpiExpression that has the nestedPath set
+   */
+  SpiExpression wrap(List<SpiExpression> list, String nestedPath, Junction.Type type) {
+
+    DefaultExpressionList<T> wrapper = new DefaultExpressionList<T>(query, expr, null, list, false);
+    wrapper.setAllDocNested(nestedPath);
+
+    if (type != null) {
+      return new JunctionExpression<T>(type, wrapper);
+    } else {
+      return wrapper;
+    }
+  }
+
+  /**
    * Write being aware if it is the Top level "text" expressions.
    * <p>
    * If this is the Top level "text" expressions then it detects if explicit or implicit Bool Should, Must etc is required
@@ -94,6 +116,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       // this is a Top level "text" expressions so we may need to wrap in Bool SHOULD etc.
       if (list.isEmpty()) throw new IllegalStateException("empty expression list?");
 
+      if (allDocNestedPath!=null) context.startNested(allDocNestedPath);
       int size = list.size();
 
       SpiExpression first = list.get(0);
@@ -124,11 +147,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       if (implicitBool || explicitBool) {
         context.endBoolGroup();
       }
+      if (allDocNestedPath!=null) context.endNested();
     }
   }
 
   public void writeDocQuery(DocQueryContext context, SpiExpression idEquals) throws IOException {
 
+    if (allDocNestedPath!=null) context.startNested(allDocNestedPath);
     int size = list.size();
     if (size == 1 && idEquals == null) {
       // only 1 expression - skip bool
@@ -147,6 +172,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       }
       context.endBool();
     }
+    if (allDocNestedPath!=null) context.endNested();
   }
 
   @Override
@@ -975,4 +1001,30 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return junction(Junction.Type.MUST_NOT);
   }
 
+  @Override
+  public String nestedPath(BeanDescriptor<?> desc) {
+    // effectively handled by JunctionExpression
+    return null;
+  }
+
+  /**
+   * Set the nested path that all contained expressions share.
+   */
+  public void setAllDocNested(String allDocNestedPath) {
+    this.allDocNestedPath = allDocNestedPath;
+  }
+
+  /**
+   * Replace the underlying expression list with one organised by nested path.
+   */
+  public void setUnderlying(List<SpiExpression> groupedByNesting) {
+    this.list = groupedByNesting;
+  }
+
+  /**
+   * Prepare expressions for document store nested path handling.
+   */
+  public void prepareDocNested(BeanDescriptor<T> beanDescriptor) {
+    PrepareDocNested.prepare(this, beanDescriptor);
+  }
 }

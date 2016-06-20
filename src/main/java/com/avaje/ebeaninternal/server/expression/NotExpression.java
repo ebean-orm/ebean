@@ -35,6 +35,11 @@ final class NotExpression implements SpiExpression {
   }
 
   @Override
+  public String nestedPath(BeanDescriptor<?> desc) {
+    return exp.nestedPath(desc);
+  }
+
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     exp.containsMany(desc, manyWhereJoin);
   }

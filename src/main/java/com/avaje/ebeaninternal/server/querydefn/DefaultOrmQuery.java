@@ -484,6 +484,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     }
   }
 
+  @Override
+  public void prepareDocNested() {
+    if (textExpressions != null) {
+      textExpressions.prepareDocNested(beanDescriptor);
+    }
+    if (whereExpressions != null) {
+      whereExpressions.prepareDocNested(beanDescriptor);
+    }
+  }
+
   /**
    * Setup to be a delete query.
    */

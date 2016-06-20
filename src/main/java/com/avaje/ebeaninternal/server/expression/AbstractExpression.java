@@ -8,6 +8,7 @@ import com.avaje.ebeaninternal.api.SpiExpressionValidation;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.el.ElPropertyDeploy;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
+import com.avaje.ebeaninternal.server.query.SplitName;
 
 /**
  * Base class for simple expressions.
@@ -23,6 +24,21 @@ public abstract class AbstractExpression implements SpiExpression {
   @Override
   public SpiExpression copyForPlanKey() {
     return this;
+  }
+
+  @Override
+  public String nestedPath(BeanDescriptor<?> desc) {
+    return propertyNestedPath(propName, desc);
+  }
+
+  protected String propertyNestedPath(String propertyName, BeanDescriptor<?> desc) {
+    if (propertyName != null) {
+      ElPropertyDeploy elProp = desc.getElPropertyDeploy(propertyName);
+      if (elProp != null && elProp.containsMany()) {
+        return SplitName.begin(propName);
+      }
+    }
+    return null;
   }
 
   @Override

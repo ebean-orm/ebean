@@ -110,6 +110,11 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   }
 
   @Override
+  public String nestedPath(BeanDescriptor<?> desc) {
+    return null;
+  }
+
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins whereManyJoins) {
     list = buildExpressions(desc);
     if (list != null) {

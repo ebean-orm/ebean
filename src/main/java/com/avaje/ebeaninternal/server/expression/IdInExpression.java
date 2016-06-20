@@ -23,6 +23,11 @@ public class IdInExpression extends NonPrepareExpression {
   }
 
   @Override
+  public String nestedPath(BeanDescriptor<?> desc) {
+    return null;
+  }
+
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
   }
 

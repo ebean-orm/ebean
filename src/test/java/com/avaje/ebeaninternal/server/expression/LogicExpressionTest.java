@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.expression;
 
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Expression;
+import com.avaje.tests.model.basic.Order;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,5 +75,55 @@ public class LogicExpressionTest extends BaseExpressionTest {
 
     assertThat(and(eq("a", 10), eq("b", 10))
         .isSameByBind(and(eq("a", 10), eq("c", 20)))).isFalse();
+  }
+
+  @Test
+  public void nestedPath_when_notNested() {
+
+    LogicExpression and = and(eq("orderDate", 10), eq("shipDate", 10));
+
+    and.nestedPath(getBeanDescriptor(Order.class));
+
+    assertThat(and.expOne).isInstanceOf(SimpleExpression.class);
+    assertThat(and.expTwo).isInstanceOf(SimpleExpression.class);
+  }
+
+  @Test
+  public void nestedPath_when_nestedSame() {
+
+    LogicExpression and = and(eq("details.orderQty", 10), eq("details.unitPrice", 10));
+
+    String path = and.nestedPath(getBeanDescriptor(Order.class));
+
+    assertThat(path).isEqualTo("details");
+    assertThat(and.expOne).isInstanceOf(SimpleExpression.class);
+    assertThat(and.expTwo).isInstanceOf(SimpleExpression.class);
+  }
+
+  @Test
+  public void nestedPath_when_nestedDifferent() {
+
+    LogicExpression and = and(eq("details.orderQty", 10), eq("shipments.shipTime", 10));
+
+    String path = and.nestedPath(getBeanDescriptor(Order.class));
+
+    assertThat(path).isNull();
+    assertThat(and.expOne).isInstanceOf(NestedPathWrapperExpression.class);
+    assertThat(((NestedPathWrapperExpression)and.expOne).nestedPath).isEqualTo("details");
+    assertThat(and.expTwo).isInstanceOf(NestedPathWrapperExpression.class);
+    assertThat(((NestedPathWrapperExpression)and.expTwo).nestedPath).isEqualTo("shipments");
+  }
+
+  @Test
+  public void nestedPath_when_oneNested() {
+
+    LogicExpression and = and(eq("details.orderQty", 10), eq("orderDate", 10));
+
+    String path = and.nestedPath(getBeanDescriptor(Order.class));
+
+    assertThat(path).isNull();
+    assertThat(and.expOne).isInstanceOf(NestedPathWrapperExpression.class);
+    assertThat(((NestedPathWrapperExpression)and.expOne).nestedPath).isEqualTo("details");
+    assertThat(and.expTwo).isInstanceOf(SimpleExpression.class);
   }
 }

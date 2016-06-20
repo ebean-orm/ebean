@@ -39,7 +39,7 @@ import java.util.Set;
  */
 class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, ExpressionList<T> {
 
-  private final DefaultExpressionList<T> exprList;
+  protected final DefaultExpressionList<T> exprList;
 
   protected final Junction.Type type;
 
@@ -789,5 +789,18 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   @Override
   public ExpressionList<T> endNot() {
     return endJunction();
+  }
+
+  @Override
+  public String nestedPath(BeanDescriptor<?> desc) {
+
+    PrepareDocNested.prepare(exprList, desc, type);
+    String nestedPath = exprList.allDocNestedPath;
+    if (nestedPath != null) {
+      // push the nestedPath up to parent
+      exprList.setAllDocNested(null);
+      return nestedPath;
+    }
+    return null;
   }
 }
