@@ -219,7 +219,7 @@ public final class RelationalQueryRequest {
     int maxRows = query.getMaxRows();
     if (firstRow > 0 || maxRows > 0) {
       return ebeanServer.getDatabasePlatform().getBasicSqlLimiter()
-          .limit(query.getQuery(), firstRow, maxRows);
+          .limit(sql, firstRow, maxRows);
     }
     return sql;
   }

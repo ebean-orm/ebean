@@ -71,6 +71,22 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
+  public void maxRows_withParam() {
+
+    ResetBasicData.reset();
+
+    SqlQuery sqlQuery = Ebean.createSqlQuery("select * from o_order where o_order.id > :id order by id ");
+    sqlQuery.setParameter("id", 3);
+    sqlQuery.setMaxRows(10);
+
+    LoggedSqlCollector.start();
+    sqlQuery.findList();
+    List<String> sql = LoggedSqlCollector.stop();
+
+    assertThat(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id  limit 10;");
+  }
+
+  @Test
   public void findEachMaxRows() {
 
     ResetBasicData.reset();
