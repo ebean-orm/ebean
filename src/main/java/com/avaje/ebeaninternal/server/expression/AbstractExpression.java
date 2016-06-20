@@ -22,6 +22,12 @@ public abstract class AbstractExpression implements SpiExpression {
   }
 
   @Override
+  public Object getIdEqualTo(String idName) {
+    // override on SimpleExpression
+    return null;
+  }
+
+  @Override
   public SpiExpression copyForPlanKey() {
     return this;
   }

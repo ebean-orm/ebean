@@ -42,6 +42,12 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
   }
 
   @Override
+  public Object getIdEqualTo(String idName) {
+    // always return null for this expression
+    return null;
+  }
+
+  @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
 
     CQuery<?> subQuery = compileSubQuery(request);

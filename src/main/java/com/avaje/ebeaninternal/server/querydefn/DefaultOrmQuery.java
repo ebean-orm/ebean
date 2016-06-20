@@ -237,6 +237,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public void checkIdEqualTo() {
+    if (id == null && whereExpressions != null) {
+      id = whereExpressions.idEqualTo(beanDescriptor.getIdName());
+      if (id != null) {
+        whereExpressions = null;
+      }
+    }
+  }
+
+  @Override
   public boolean isAutoTunable() {
     return beanDescriptor.isAutoTunable();
   }

@@ -1043,21 +1043,20 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   public <T> T findUnique(Query<T> query, Transaction transaction) {
 
-    Object id = query.getId();
+    SpiQuery<T> spiQuery = (SpiQuery<T>) query;
+    spiQuery.checkIdEqualTo();
+    Object id = spiQuery.getId();
     if (id != null) {
       // actually a find by Id query
       return findId(query, transaction);
     }
-
-    SpiQuery<T> spiQuery = (SpiQuery<T>) query;
-    BeanDescriptor<T> desc = spiQuery.getBeanDescriptor();
 
     SpiTransaction t = (SpiTransaction) transaction;
     if (t == null) {
       t = getCurrentServerTransaction();
     }
     if (t == null || !t.isSkipCache()) {
-      id = desc.cacheNaturalKeyIdLookup(spiQuery);
+      id = spiQuery.getBeanDescriptor().cacheNaturalKeyIdLookup(spiQuery);
       if (id != null) {
         T bean = findIdCheckPersistenceContextAndCache(t, spiQuery, id);
         if (bean != null) {

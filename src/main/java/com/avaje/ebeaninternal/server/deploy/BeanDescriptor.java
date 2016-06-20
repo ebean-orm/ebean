@@ -1769,6 +1769,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
+   * Return the Id property name or null if no Id property exists.
+   */
+  public String getIdName() {
+    return (idProperty == null) ? null : idProperty.getName();
+  }
+
+  /**
    * Helper method to return the unique property. If only one property makes up
    * the unique id then it's value is returned. If there is a concatenated
    * unique id then a Map is built with the keys being the names of the

@@ -134,6 +134,11 @@ public interface SpiQuery<T> extends Query<T> {
   }
 
   /**
+   * Check for a single "equal to" expression for the Id.
+   */
+  void checkIdEqualTo();
+
+  /**
    * Return true if AutoTune should be attempted on this query.
    */
   boolean isAutoTunable();

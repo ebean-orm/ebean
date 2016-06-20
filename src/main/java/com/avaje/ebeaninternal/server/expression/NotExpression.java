@@ -30,6 +30,12 @@ final class NotExpression implements SpiExpression {
   }
 
   @Override
+  public Object getIdEqualTo(String idName) {
+    // always return null for this expression
+    return null;
+  }
+
+  @Override
   public SpiExpression copyForPlanKey() {
     return new NotExpression(exp.copyForPlanKey());
   }

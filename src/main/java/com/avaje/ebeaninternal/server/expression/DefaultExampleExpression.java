@@ -1,8 +1,5 @@
 package com.avaje.ebeaninternal.server.expression;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 import com.avaje.ebean.ExampleExpression;
 import com.avaje.ebean.LikeType;
 import com.avaje.ebean.bean.EntityBean;
@@ -12,11 +9,13 @@ import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
-import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.query.SplitName;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * A "Query By Example" type of expression.
@@ -24,21 +23,20 @@ import com.avaje.ebeaninternal.server.query.SplitName;
  * Pass in an example entity and for each non-null scalar properties an
  * expression is added.
  * </p>
- * 
- * <pre class="code">
+ * <p>
+ * <pre>{@code
  * // create an example bean and set the properties
  * // with the query parameters you want
  * Customer example = new Customer();
- * example.setName(&quot;Rob%&quot;);
- * example.setNotes(&quot;%something%&quot;);
- * 
- * List&lt;Customer&gt; list = Ebean.find(Customer.class).where()
- * // pass the bean into the where() clause
- *     .exampleLike(example)
- *     // you can add other expressions to the same query
- *     .gt(&quot;id&quot;, 2).findList();
- * 
- * </pre>
+ * example.setName("Rob%");
+ * example.setNotes("%something%");
+ *
+ * List<Customer> list = Ebean.find(Customer.class)
+ *   .where()
+ *   .exampleLike(example)
+ *   .findList();
+ *
+ * }</pre>
  */
 public class DefaultExampleExpression implements SpiExpression, ExampleExpression {
 
@@ -71,13 +69,10 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
 
   /**
    * Construct the query by example expression.
-   * 
-   * @param entity
-   *          the example entity with non null property values
-   * @param caseInsensitive
-   *          if true use case insensitive expressions
-   * @param likeType
-   *          the type of Like wild card used
+   *
+   * @param entity          the example entity with non null property values
+   * @param caseInsensitive if true use case insensitive expressions
+   * @param likeType        the type of Like wild card used
    */
   public DefaultExampleExpression(EntityBean entity, boolean caseInsensitive, LikeType likeType) {
     this.entity = entity;
@@ -102,6 +97,12 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
       }
       context.endBool();
     }
+  }
+
+  @Override
+  public Object getIdEqualTo(String idName) {
+    // always return null for this expression
+    return null;
   }
 
   @Override
@@ -295,9 +296,9 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
             }
 
           } else if ((beanProperty instanceof BeanPropertyAssocOne) && (value instanceof EntityBean)) {
-            BeanPropertyAssocOne assocOne = (BeanPropertyAssocOne)beanProperty;
+            BeanPropertyAssocOne assocOne = (BeanPropertyAssocOne) beanProperty;
             BeanDescriptor targetDescriptor = assocOne.getTargetDescriptor();
-            addExpressions(list, targetDescriptor, (EntityBean)value, propName);
+            addExpressions(list, targetDescriptor, (EntityBean) value, propName);
           }
         }
       }

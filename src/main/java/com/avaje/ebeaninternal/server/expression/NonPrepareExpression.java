@@ -14,6 +14,12 @@ abstract class NonPrepareExpression implements SpiExpression {
   }
 
   @Override
+  public Object getIdEqualTo(String idName) {
+    // always null in this expression
+    return null;
+  }
+
+  @Override
   public SpiExpression copyForPlanKey() {
     return this;
   }

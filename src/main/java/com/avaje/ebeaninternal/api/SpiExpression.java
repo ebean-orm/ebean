@@ -94,4 +94,8 @@ public interface SpiExpression extends Expression {
    */
   SpiExpression copyForPlanKey();
 
+	/**
+	 * Return the bind Id value if this is a "equal to" expression for the id property.
+   */
+	Object getIdEqualTo(String idName);
 }

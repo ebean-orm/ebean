@@ -204,6 +204,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return copy;
   }
 
+  @Override
+  public Object getIdEqualTo(String idName) {
+    // always return null for this expression
+    return null;
+  }
+
   /**
    * Return true if one of the expressions is related to a Many property.
    */
@@ -1026,5 +1032,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   public void prepareDocNested(BeanDescriptor<T> beanDescriptor) {
     PrepareDocNested.prepare(this, beanDescriptor);
+  }
+
+  public Object idEqualTo(String idName) {
+    if (list.size() == 1) {
+      return list.get(0).getIdEqualTo(idName);
+    }
+    return null;
   }
 }

@@ -17,6 +17,12 @@ public abstract class AbstractTextExpression extends AbstractExpression {
   }
 
   @Override
+  public Object getIdEqualTo(String idName) {
+    // always null for this expression
+    return null;
+  }
+
+  @Override
   public void addSql(SpiExpressionRequest request) {
     // do nothing, only execute against document store
   }

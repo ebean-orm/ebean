@@ -89,6 +89,12 @@ abstract class LogicExpression implements SpiExpression {
   }
 
   @Override
+  public Object getIdEqualTo(String idName) {
+    // always return null for this expression
+    return null;
+  }
+
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     expOne.containsMany(desc, manyWhereJoin);
     expTwo.containsMany(desc, manyWhereJoin);

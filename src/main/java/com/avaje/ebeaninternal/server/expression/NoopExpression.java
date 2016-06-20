@@ -27,6 +27,12 @@ class NoopExpression implements SpiExpression {
   }
 
   @Override
+  public Object getIdEqualTo(String idName) {
+    // always return null for this expression
+    return null;
+  }
+
+  @Override
   public String nestedPath(BeanDescriptor<?> desc) {
     return null;
   }

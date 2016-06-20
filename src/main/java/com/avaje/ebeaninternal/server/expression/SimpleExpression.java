@@ -22,6 +22,14 @@ public class SimpleExpression extends AbstractExpression {
   }
 
   @Override
+  public Object getIdEqualTo(String idName) {
+    if (type == Op.EQ && idName.equals(propName)) {
+      return value;
+    }
+    return null;
+  }
+
+  @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
     if (type == Op.BETWEEN) {
       throw new IllegalStateException("BETWEEN Not expected in SimpleExpression?");

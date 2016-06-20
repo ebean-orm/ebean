@@ -2,13 +2,34 @@ package com.avaje.ebeaninternal.server.querydefn;
 
 
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.FetchConfig;
 import com.avaje.tests.model.basic.Order;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DefaultOrmQueryTest {
+
+  @Test
+  public void checkForId_when_eqId_then_translatedTo_setId() {
+
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().eq("id", 42).query();
+    assertThat(q1.getWhereExpressions()).isNotNull();
+    assertThat(q1.getId()).isNull();
+
+    q1.checkIdEqualTo();
+
+    assertThat(q1.getId()).isEqualTo(42);
+    assertThat(q1.getWhereExpressions()).isNull();
+  }
+
+  @Test
+  public void checkForId_when_idEq_ok() {
+
+    DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().idEq(42).query();
+    assertThat(q1.getId()).isEqualTo(42);
+    q1.checkIdEqualTo();
+    assertThat(q1.getId()).isEqualTo(42);
+  }
 
   @Test
   public void when_addWhere_then_planChanges() {

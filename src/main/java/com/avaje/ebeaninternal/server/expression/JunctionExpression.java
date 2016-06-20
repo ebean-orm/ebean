@@ -81,6 +81,12 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public Object getIdEqualTo(String idName) {
+    // always null for this expression
+    return null;
+  }
+
+  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
 
     List<SpiExpression> list = exprList.internalList();
