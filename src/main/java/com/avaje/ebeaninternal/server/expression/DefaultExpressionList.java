@@ -29,6 +29,8 @@ import java.util.Set;
  */
 public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
+  private static final String AND = " and ";
+
   protected final List<SpiExpression> list;
 
   protected final Query<T> query;
@@ -36,10 +38,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   private final ExpressionList<T> parentExprList;
 
   protected transient ExpressionFactory expr;
-
-  private final String listAndStart;
-  private final String listAndEnd;
-  private final String listAndJoin;
 
   /**
    * Set to true for the "Text" root expression list.
@@ -71,10 +69,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     this.query = query;
     this.expr = expr;
     this.parentExprList = parentExprList;
-
-    this.listAndStart = "";
-    this.listAndEnd = "";
-    this.listAndJoin = " and ";
   }
 
   private DefaultExpressionList() {
@@ -433,15 +427,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public void addSql(SpiExpressionRequest request) {
 
-    request.append(listAndStart);
     for (int i = 0, size = list.size(); i < size; i++) {
       SpiExpression expression = list.get(i);
       if (i > 0) {
-        request.append(listAndJoin);
+        request.append(AND);
       }
       expression.addSql(request);
     }
-    request.append(listAndEnd);
   }
 
   @Override
