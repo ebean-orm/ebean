@@ -16,6 +16,8 @@ class IsEmptyExpression extends AbstractExpression {
 
   private final String propertyPath;
 
+  private String nestedPath;
+
   IsEmptyExpression(String propertyName, boolean empty) {
     super(propertyName);
     this.empty = empty;
@@ -23,8 +25,29 @@ class IsEmptyExpression extends AbstractExpression {
   }
 
   @Override
+  public String nestedPath(BeanDescriptor<?> desc) {
+    if (empty) {
+      // capture the nestedPath as we want to put wrap
+      // a NOT around the outer of the nested path  exists
+      this.nestedPath = propertyNestedPath(propName, desc);
+      return null;
+    } else {
+      return super.nestedPath(desc);
+    }
+  }
+
+  @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeExists(!empty, propName);
+    if (nestedPath == null) {
+      context.writeExists(!empty, propName);
+    } else {
+      // wrap NOT around the outside of nested path exists expression
+      context.startNot();
+      context.startNested(nestedPath);
+      context.writeExists(empty, propName);
+      context.endNested();
+      context.endNot();
+    }
   }
 
   public final String getPropName() {

@@ -157,4 +157,14 @@ public interface DocQueryContext {
    * End nested path expressions.
    */
   void endNested() throws IOException;
+
+  /**
+   * Start a not wrapping an expression.
+   */
+  void startNot() throws IOException;
+
+  /**
+   * End a not wrapper.
+   */
+  void endNot() throws IOException;
 }
