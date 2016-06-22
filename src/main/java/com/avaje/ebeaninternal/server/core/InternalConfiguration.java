@@ -235,7 +235,7 @@ public class InternalConfiguration {
     if (historySupport == null) {
       return new Binder(typeManager, 0, false, jsonHandler, dataTimeZone);
     }
-    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isBindWithFromClause(), jsonHandler, dataTimeZone);
+    return new Binder(typeManager, historySupport.getBindCount(), historySupport.isStandardsBased(), jsonHandler, dataTimeZone);
   }
 
   /**

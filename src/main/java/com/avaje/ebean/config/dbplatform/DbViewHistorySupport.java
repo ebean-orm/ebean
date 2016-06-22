@@ -9,11 +9,8 @@ package com.avaje.ebean.config.dbplatform;
  */
 public abstract class DbViewHistorySupport implements DbHistorySupport {
 
-  /**
-   * Return false for view based implementations where we append extra 'as of' predicates to the end.
-   */
   @Override
-  public boolean isBindWithFromClause() {
+  public boolean isStandardsBased() {
     return false;
   }
 

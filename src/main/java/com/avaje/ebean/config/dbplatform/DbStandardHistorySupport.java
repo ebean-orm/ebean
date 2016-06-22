@@ -5,11 +5,8 @@ package com.avaje.ebean.config.dbplatform;
  */
 public abstract class DbStandardHistorySupport implements DbHistorySupport {
 
-  /**
-   * Return true as with sql2011 the 'as of timestamp' clause included in from or join clause.
-   */
   @Override
-  public boolean isBindWithFromClause() {
+  public boolean isStandardsBased() {
     return true;
   }
 

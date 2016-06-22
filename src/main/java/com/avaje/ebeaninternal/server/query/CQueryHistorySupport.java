@@ -31,11 +31,10 @@ public class CQueryHistorySupport {
   }
 
   /**
-   * Return true if the bind of 'as of' timestamp occurs with the from clause
-   * rather than at the end.
+   * Return true if the underlying history support is standards based.
    */
-  public boolean isBindAtFromClause() {
-    return dbHistorySupport.isBindWithFromClause();
+  public boolean isStandardsBased() {
+    return dbHistorySupport.isStandardsBased();
   }
 
   /**

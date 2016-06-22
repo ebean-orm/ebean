@@ -513,4 +513,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public boolean isAuditReads() {
     return !query.isDisableReadAudit() && beanDescriptor.isReadAuditing();
   }
+
+  /**
+   * Return the base table alias for this query.
+   */
+  public String getBaseTableAlias() {
+    return query.getAlias() == null ? beanDescriptor.getBaseTableAlias() : query.getAlias();
+  }
 }

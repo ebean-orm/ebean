@@ -126,7 +126,7 @@ public class CQueryPredicates {
       updateProperties.bind(binder, dataBind);
     }
 
-    if (query.isVersionsBetween() && binder.isBindAsOfWithFromClause()) {
+    if (query.isVersionsBetween() && binder.isAsOfStandardsBased()) {
       // sql2011 based versions between timestamp syntax
       Timestamp start = query.getVersionStart();
       Timestamp end = query.getVersionEnd();
@@ -136,13 +136,13 @@ public class CQueryPredicates {
       dataBind.append(", ");
     }
 
-    List<String> historyTableAlias = query.getAsOfTableAlias();
-    if (historyTableAlias != null && binder.isBindAsOfWithFromClause()) {
+    int asOfTableCount = query.getAsOfTableCount();
+    if (asOfTableCount > 0) {
       // bind the asOf value for each table alias as part of the from/join clauses
       // there is one effective date predicate per table alias
       Timestamp asOf = query.getAsOf();
       dataBind.append("asOf ").append(asOf);
-      for (int i = 0; i < historyTableAlias.size() * binder.getAsOfBindCount(); i++) {
+      for (int i = 0; i < asOfTableCount * binder.getAsOfBindCount(); i++) {
         binder.bindObject(dataBind, asOf);
       }
       dataBind.append(", ");
@@ -165,16 +165,6 @@ public class CQueryPredicates {
 
     if (filterMany != null) {
       filterMany.bind(dataBind);
-    }
-
-    if (historyTableAlias != null && !binder.isBindAsOfWithFromClause()) {
-      // bind the asOf value for each table alias after all the normal predicates
-      // there is one effective date predicate per table alias
-      Timestamp asOf = query.getAsOf();
-      dataBind.append(" asOf ").append(asOf);
-      for (int i = 0; i < historyTableAlias.size() * binder.getAsOfBindCount(); i++) {
-        binder.bindObject(dataBind, asOf);
-      }
     }
 
     if (having != null) {

@@ -6,11 +6,13 @@ package com.avaje.ebean.config.dbplatform;
 public interface DbHistorySupport {
 
   /**
-   * Return true if the 'As of' predicate is part of the from clause
-   * (more standard sql2011). So true for Oracle total recall and false
-   * for Postgres and MySql (where we use views and history tables).
+   * Return true if the implementation is SQL2011 standards based.
+   * <p>
+   * Non standards based means we need to add additional predicates into the
+   * JOIN ON clause and add an additional predicate for the base table.
+   * </p>
    */
-  boolean isBindWithFromClause();
+  boolean isStandardsBased();
 
   /**
    * Return the number of columns bound in a 'As Of' predicate.

@@ -106,8 +106,8 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
     tableJoins.add(joinKey);
 
-    sb.append(" ");
-    sb.append(type);
+    sb.append(" ").append(type);
+    boolean addAsOfOnClause = false;
     if (draftSupport != null) {
       appendTable(table, draftSupport.getDraftTable(table));
 
@@ -117,32 +117,32 @@ public class DefaultDbSqlContext implements DbSqlContext {
     } else {
       // check if there is an associated history table and if so
       // use the unionAll view - we expect an additional predicate to match
-      appendTable(table, historySupport.getAsOfView(table));
+      String asOfView = historySupport.getAsOfView(table);
+      appendTable(table, asOfView);
+      if (asOfView != null) {
+        addAsOfOnClause = !historySupport.isStandardsBased();
+      }
     }
 
     sb.append(a2);
     sb.append(" on ");
-
     for (int i = 0; i < cols.length; i++) {
       TableJoinColumn pair = cols[i];
       if (i > 0) {
         sb.append(" and ");
       }
-
-      sb.append(a2);
-      sb.append(".").append(pair.getForeignDbColumn());
+      sb.append(a2).append(".").append(pair.getForeignDbColumn());
       sb.append(" = ");
-      sb.append(a1);
-      sb.append(".").append(pair.getLocalDbColumn());
+      sb.append(a1).append(".").append(pair.getLocalDbColumn());
     }
-
 
     // add on any inheritance where clause
     if (inheritance != null && inheritance.length() > 0) {
-      sb.append(" and ");
-      sb.append(a2);
-      sb.append(".");
-      sb.append(inheritance);
+      sb.append(" and ").append(a2).append(".").append(inheritance);
+    }
+
+    if (addAsOfOnClause) {
+      sb.append(" and ").append(historySupport.getAsOfPredicate(a2));
     }
 
     sb.append(" ");

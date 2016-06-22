@@ -472,12 +472,14 @@ public class CQueryBuilder {
       hasWhere = true;
     }
 
+    int asOfCount = query.getAsOfTableCount();
+    if (asOfCount > 0 && !historySupport.isStandardsBased()) {
+      hasWhere = appendWhere(hasWhere, sb);
+      sb.append(historySupport.getAsOfPredicate(request.getBaseTableAlias()));
+    }
+
     if (request.isFindById() || query.getId() != null) {
-      if (hasWhere) {
-        sb.append(" and ");
-      } else {
-        sb.append(" where ");
-      }
+      appendWhere(hasWhere, sb);
 
       BeanDescriptor<?> desc = request.getBeanDescriptor();
       String idSql = desc.getIdBinderIdSql();
@@ -515,24 +517,6 @@ public class CQueryBuilder {
       sb.append(dbFilterMany);
     }
 
-    List<String> asOfTableAlias = query.getAsOfTableAlias();
-    if (asOfTableAlias != null && !historySupport.isBindAtFromClause()) {
-      // append the effective date predicates for each table alias
-      // that maps to a @History entity involved in this query
-      // Do this when history using separate tables/views (PG, MySql etc)
-      if (!hasWhere) {
-        sb.append(" where ");
-      } else {
-        sb.append("and ");
-      }
-      for (int i = 0; i < asOfTableAlias.size(); i++) {
-        if (i > 0) {
-          sb.append(" and ");
-        }
-        sb.append(historySupport.getAsOfPredicate(asOfTableAlias.get(i)));
-      }
-    }
-
     if (!query.isIncludeSoftDeletes()) {
       List<String> softDeletePredicates = query.getSoftDeletePredicates();
       if (softDeletePredicates != null) {
@@ -563,6 +547,18 @@ public class CQueryBuilder {
       return new SqlLimitResponse(dbPlatform.completeSql(sb.toString(), query), false);
     }
 
+  }
+
+  /**
+   * Append where or and based on the hasWhere flag.
+   */
+  private boolean appendWhere(boolean hasWhere, StringBuilder sb) {
+    if (hasWhere) {
+      sb.append(" and ");
+    } else {
+      sb.append(" where ");
+    }
+    return true;
   }
 
   /**

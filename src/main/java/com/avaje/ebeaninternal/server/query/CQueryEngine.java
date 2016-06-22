@@ -206,7 +206,7 @@ public class CQueryEngine {
     SpiQuery<T> query = request.getQuery();
 
     String sysPeriodLower = getSysPeriodLower(query);
-    if (query.isVersionsBetween() && !historySupport.isBindAtFromClause()) {
+    if (query.isVersionsBetween() && !historySupport.isStandardsBased()) {
       // just add as normal predicates using the lower bound
       query.where().gt(sysPeriodLower, query.getVersionStart());
       query.where().lt(sysPeriodLower, query.getVersionEnd());

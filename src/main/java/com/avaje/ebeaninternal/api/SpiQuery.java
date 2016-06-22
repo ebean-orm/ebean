@@ -223,14 +223,14 @@ public interface SpiQuery<T> extends Query<T> {
   Timestamp getAsOf();
 
   /**
-   * Add a table alias for a @History entity involved in a 'As Of' query.
+   * Increment the counter of tables used in 'As Of' query.
    */
-  void addAsOfTableAlias(String tableAlias);
+  void incrementAsOfTableCount();
 
   /**
-   * Return the list of table alias involved in a 'As Of' query that have @History support.
+   * Return the table alias used for the base table.
    */
-  List<String> getAsOfTableAlias();
+  int getAsOfTableCount();
 
   void addSoftDeletePredicate(String softDeletePredicate);
 

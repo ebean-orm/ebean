@@ -33,7 +33,7 @@ public class Binder {
 
   private final int asOfBindCount;
 
-  private final boolean bindAsOfWithFromClause;
+  private final boolean asOfStandardsBased;
 
   private final DbExpressionHandler dbExpressionHandler;
 
@@ -42,12 +42,12 @@ public class Binder {
   /**
    * Set the PreparedStatement with which to bind variables to.
    */
-  public Binder(TypeManager typeManager, int asOfBindCount, boolean bindAsOfWithFromClause,
+  public Binder(TypeManager typeManager, int asOfBindCount, boolean asOfStandardsBased,
                 DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone) {
 
     this.typeManager = typeManager;
     this.asOfBindCount = asOfBindCount;
-    this.bindAsOfWithFromClause = bindAsOfWithFromClause;
+    this.asOfStandardsBased = asOfStandardsBased;
     this.dbExpressionHandler = dbExpressionHandler;
     this.dataTimeZone = dataTimeZone;
   }
@@ -60,12 +60,10 @@ public class Binder {
   }
 
   /**
-   * Return true if the 'as of' predicates are in the from/join clause in which case the timestamp is
-   * bound early (before all the other predicates ala Oracle). Return false if the 'as of' predicates are
-   * appended to the end of the predicates and the timestamp is bound last (Postgres, MySql).
+   * Return true if the 'as of' history support is SQL2011 standards based.
    */
-  public boolean isBindAsOfWithFromClause() {
-    return bindAsOfWithFromClause;
+  public boolean isAsOfStandardsBased() {
+    return asOfStandardsBased;
   }
 
   /**

@@ -144,10 +144,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private DefaultExpressionList<T> havingExpressions;
 
-  /**
-   * The list of table alias associated with @History entity beans.
-   */
-  private List<String> asOfTableAlias;
+  private int asOfTableCount;
 
   /**
    * Set for flashback style 'as of' query.
@@ -281,21 +278,14 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return softDeletePredicates;
   }
 
-  /**
-   * This table alias is for a @History entity involved in the query and as
-   * such we need to add a 'as of predicate' to the query using this alias.
-   */
   @Override
-  public void addAsOfTableAlias(String tableAlias) {
-    if (asOfTableAlias == null) {
-      asOfTableAlias = new ArrayList<String>();
-    }
-    asOfTableAlias.add(tableAlias);
+  public void incrementAsOfTableCount() {
+    asOfTableCount++;
   }
 
   @Override
-  public List<String> getAsOfTableAlias() {
-    return asOfTableAlias;
+  public int getAsOfTableCount() {
+    return asOfTableCount;
   }
 
   @Override
