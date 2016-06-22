@@ -85,6 +85,11 @@ public class ModelBuildIntersectionTable {
 
     String tableName = intersectionTableJoin.getTable();
     MTable table = new MTable(tableName);
+		if (!manyProp.isExcludedFromHistory()) {
+			if (localDesc.isHistorySupport()) {
+				table.setWithHistory(true);
+			}
+		}
     table.setPkName(ctx.primaryKeyName(tableName));
 
 		TableJoinColumn[] columns = intersectionTableJoin.columns();
