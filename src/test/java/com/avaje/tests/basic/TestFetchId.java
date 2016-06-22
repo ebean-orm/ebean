@@ -41,6 +41,6 @@ public class TestFetchId extends BaseTestCase {
 		List<Object> idList = futureIds.get();
 		Assert.assertTrue("same instance", partial == idList);
 
-		Assert.assertTrue("sz > 0", ids.size() > 0);
+		Assert.assertTrue("sz > 0", !ids.isEmpty());
 	}
 }

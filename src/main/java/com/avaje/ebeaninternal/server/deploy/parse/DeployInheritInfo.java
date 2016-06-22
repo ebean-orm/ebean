@@ -188,7 +188,7 @@ public class DeployInheritInfo {
   public void setDiscriminatorValue(String value) {
     if (value != null) {
       value = value.trim();
-      if (value.length() != 0) {
+      if (!value.isEmpty()) {
         discriminatorStringValue = value;
         // convert the value if desired
         if (discriminatorType == Types.INTEGER) {

@@ -198,7 +198,7 @@ public class OrmQueryDetail implements Serializable {
       }
     }
 
-    if (matchingPaths.size() == 0) {
+    if (matchingPaths.isEmpty()) {
       return null;
     }
 

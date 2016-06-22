@@ -522,7 +522,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
       List<SpiExpression> exprList = whereExpressions.internalList();
       if (exprList.size() > 1) {
         return null;
-      } else if (exprList.size() == 0) {
+      } else if (exprList.isEmpty()) {
         return namedBind;
       } else {
         if (namedBind != null) {
@@ -1151,7 +1151,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public DefaultOrmQuery<T> order(String orderByClause) {
-    if (orderByClause == null || orderByClause.trim().length() == 0) {
+    if (orderByClause == null || orderByClause.trim().isEmpty()) {
       this.orderBy = null;
     } else {
       this.orderBy = new OrderBy<T>(this, orderByClause);

@@ -452,7 +452,7 @@ public class CQueryBuilder {
     String inheritanceWhere = select.getInheritanceWhereSql();
 
     boolean hasWhere = false;
-    if (inheritanceWhere.length() > 0) {
+    if (!inheritanceWhere.isEmpty()) {
       sb.append(" where");
       sb.append(inheritanceWhere);
       hasWhere = true;
@@ -557,7 +557,7 @@ public class CQueryBuilder {
   }
 
   private boolean isEmpty(String s) {
-    return s == null || s.length() == 0;
+    return s == null || s.isEmpty();
   }
 
 }

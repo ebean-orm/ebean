@@ -283,7 +283,7 @@ public class DeployBeanDescriptor<T> {
     docStoreUpdate = docStore.update();
     docStoreDelete = docStore.delete();
     String doc = docStore.doc();
-    if (doc.length() > 0) {
+    if (!doc.isEmpty()) {
       docStorePathProperties = PathProperties.parse(doc);
     }
   }
@@ -388,7 +388,7 @@ public class DeployBeanDescriptor<T> {
   public void setCache(Cache cache) {
 
     String naturalKey = null;
-    if (cache.naturalKey().length() > 0) {
+    if (!cache.naturalKey().isEmpty()) {
       // find the property and mark as natural key property
       String propName = cache.naturalKey().trim();
       DeployBeanProperty beanProperty = getBeanProperty(propName);
@@ -477,7 +477,7 @@ public class DeployBeanDescriptor<T> {
    * Return the BeanPersistController (could be a chain of them, 1 or null).
    */
   public BeanPersistController getPersistController() {
-    if (persistControllers.size() == 0) {
+    if (persistControllers.isEmpty()) {
       return null;
     } else if (persistControllers.size() == 1) {
       return persistControllers.get(0);
@@ -490,7 +490,7 @@ public class DeployBeanDescriptor<T> {
    * Return the BeanPersistListener (could be a chain of them, 1 or null).
    */
   public BeanPersistListener getPersistListener() {
-    if (persistListeners.size() == 0) {
+    if (persistListeners.isEmpty()) {
       return null;
     } else if (persistListeners.size() == 1) {
       return persistListeners.get(0);
@@ -500,7 +500,7 @@ public class DeployBeanDescriptor<T> {
   }
 
   public BeanQueryAdapter getQueryAdapter() {
-    if (queryAdapters.size() == 0) {
+    if (queryAdapters.isEmpty()) {
       return null;
     } else if (queryAdapters.size() == 1) {
       return queryAdapters.get(0);
@@ -513,7 +513,7 @@ public class DeployBeanDescriptor<T> {
    * Return the BeanPostLoad (could be a chain of them, 1 or null).
    */
   public BeanPostLoad getPostLoad() {
-    if (postLoaders.size() == 0) {
+    if (postLoaders.isEmpty()) {
       return null;
     } else if (postLoaders.size() == 1) {
       return postLoaders.get(0);
@@ -835,7 +835,7 @@ public class DeployBeanDescriptor<T> {
       return null;
     }
     String selectClause = sb.toString();
-    if (selectClause.length() == 0) {
+    if (selectClause.isEmpty()) {
       throw new IllegalStateException("Bean " + getFullName() + " has no properties?");
     }
     return selectClause.substring(0, selectClause.length() - 1);

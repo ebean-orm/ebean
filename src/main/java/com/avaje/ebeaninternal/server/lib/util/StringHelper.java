@@ -24,7 +24,7 @@ public class StringHelper {
 			String listDelimiter, String nameValueSeparator) {
 
 		HashMap<String, String> params = new HashMap<String, String>();
-		if ((allNameValuePairs == null) || (allNameValuePairs.length() == 0)) {
+		if ((allNameValuePairs == null) || (allNameValuePairs.isEmpty())) {
 			return params;
 		}
 		// trim off any leading listDelimiter...
@@ -56,7 +56,7 @@ public class StringHelper {
 	 * Return true if the value is null or an empty string.
 	 */
 	public static boolean isNull(String value) {
-    return value == null || value.trim().length() == 0;
+    return value == null || value.trim().isEmpty();
   }
 
 	/**
@@ -90,7 +90,7 @@ public class StringHelper {
 			// there is a key without a value?
 			String key = allNameValuePairs.substring(pos, delimPos);
 			key = key.trim();
-			if (key.length() > 0) {
+			if (!key.isEmpty()) {
 				map.put(key, null);
 			}
 			return getKeyValue(map, delimPos + 1, allNameValuePairs, listDelimiter,

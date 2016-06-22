@@ -35,7 +35,7 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
         .where().lt("id", 3).findList();
 
     Assert.assertNotNull(list);
-    Assert.assertTrue(list.size() > 0);
+    Assert.assertTrue(!list.isEmpty());
 
     for (Order order : list) {
       List<Contact> contacts = order.getCustomer().getContacts();

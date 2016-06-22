@@ -23,7 +23,7 @@ public final class TimeStringParser implements StringParser {
    */
   @SuppressWarnings("deprecation")
   public Object parse(String value) {
-    if (value == null || value.trim().length() == 0) {
+    if (value == null || value.trim().isEmpty()) {
       return null;
     }
 

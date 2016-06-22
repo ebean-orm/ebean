@@ -794,7 +794,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       }
     }
 
-    if (matchSet.size() == 0) {
+    if (matchSet.isEmpty()) {
       // this is a unidirectional relationship
       // ... that is no matching property on the 'detail' bean
       return false;
@@ -1141,7 +1141,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
       // already assigned (So custom or UUID)
       return;
     }
-    if (desc.propertiesId().size() == 0) {
+    if (desc.propertiesId().isEmpty()) {
       // bean doesn't have an Id property
       if (desc.isBaseTableType() && desc.getBeanFinder() == null) {
         // expecting an id property

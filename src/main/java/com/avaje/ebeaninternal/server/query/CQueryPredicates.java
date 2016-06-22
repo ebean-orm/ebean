@@ -305,7 +305,7 @@ public class CQueryPredicates {
   }
 
   private boolean isEmpty(String s) {
-    return s == null || s.length() == 0;
+    return s == null || s.isEmpty();
   }
 
   private String parse(String expr, DeployParser deployParser) {

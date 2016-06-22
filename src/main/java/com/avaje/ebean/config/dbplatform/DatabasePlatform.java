@@ -492,7 +492,7 @@ public class DatabasePlatform {
    */
   public String convertQuotedIdentifiers(String dbName) {
     // Ignore null values e.g. schema name or catalog
-    if (dbName != null && dbName.length() > 0) {
+    if (dbName != null && !dbName.isEmpty()) {
       if (dbName.charAt(0) == BACK_TICK) {
         if (dbName.charAt(dbName.length() - 1) == BACK_TICK) {
 

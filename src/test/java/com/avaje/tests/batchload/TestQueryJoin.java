@@ -60,7 +60,7 @@ public class TestQueryJoin extends BaseTestCase {
     System.out.println(billingAddress);
     billingAddress.getLine1();
 
-    Assert.assertTrue(list.size() > 0);
+    Assert.assertTrue(!list.isEmpty());
 
   }
 }

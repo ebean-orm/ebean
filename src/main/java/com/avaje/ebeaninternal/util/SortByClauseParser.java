@@ -33,7 +33,7 @@ public final class SortByClauseParser {
   }
 
   private Property parseSection(String section) {
-    if (section.length() == 0) {
+    if (section.isEmpty()) {
       return null;
     }
     String[] words = section.split(" ");

@@ -38,7 +38,7 @@ public class TestInheritAbstract extends TestCase {
 		.findList();
 	
 		Assert.assertNotNull(list2);
-		Assert.assertTrue(list2.size() > 0);
+		Assert.assertTrue(!list2.isEmpty());
 		
 		for (AbstractBar abstractBar : list2) {
 			Foo foo = abstractBar.getFoo();

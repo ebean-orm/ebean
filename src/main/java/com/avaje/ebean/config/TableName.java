@@ -146,6 +146,6 @@ public final class TableName {
    * @return true, if is valid
    */
   public boolean isValid() {
-    return name != null && name.length() > 0;
+    return name != null && !name.isEmpty();
   }
 }

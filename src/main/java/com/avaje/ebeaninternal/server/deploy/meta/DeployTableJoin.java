@@ -46,7 +46,7 @@ public class DeployTableJoin {
    * Return true if the JoinOnPair have been set.
    */
   public boolean hasJoinColumns() {
-    return columns.size() > 0;
+    return !columns.isEmpty();
   }
 
   /**

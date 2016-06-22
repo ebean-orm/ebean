@@ -23,7 +23,7 @@ public class TestWhereAnnotation extends BaseTestCase {
     Customer customer = Ebean.find(Customer.class, custTest.getId());
     List<Order> orders = customer.getOrders();
 
-    Assert.assertTrue(orders.size() > 0);
+    Assert.assertTrue(!orders.isEmpty());
 
     Query<Customer> q1 = Ebean.find(Customer.class).setUseCache(false).fetch("orders").where()
         .idEq(1).query();

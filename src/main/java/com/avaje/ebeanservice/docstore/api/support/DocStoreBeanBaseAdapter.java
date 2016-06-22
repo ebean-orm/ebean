@@ -321,7 +321,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    * Return the supplied value or default to the bean name lower case.
    */
   protected String derive(BeanType<?> desc, String suppliedValue) {
-    return (suppliedValue != null && suppliedValue.length() > 0) ? suppliedValue : desc.getName().toLowerCase();
+    return (suppliedValue != null && !suppliedValue.isEmpty()) ? suppliedValue : desc.getName().toLowerCase();
   }
 
   @Override
