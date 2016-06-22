@@ -3,7 +3,10 @@ package com.avaje.ebeaninternal.server.type;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Array;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 
 public interface DataReader {
 
@@ -37,11 +40,11 @@ public interface DataReader {
 
   byte[] getBytes() throws SQLException;
 
-  java.sql.Date getDate() throws SQLException;
+  Date getDate() throws SQLException;
 
-  java.sql.Time getTime() throws SQLException;
+  Time getTime() throws SQLException;
 
-  java.sql.Timestamp getTimestamp() throws SQLException;
+  Timestamp getTimestamp() throws SQLException;
 
   BigDecimal getBigDecimal() throws SQLException;
 

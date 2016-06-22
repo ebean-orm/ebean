@@ -75,7 +75,7 @@ import com.avaje.ebeaninternal.api.SpiSqlUpdate;
  * }
  * </pre> 
  * @see com.avaje.ebean.CallableSql
- * @see com.avaje.ebean.Ebean#execute(SqlUpdate)
+ * @see Ebean#execute(SqlUpdate)
  */
 public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
 

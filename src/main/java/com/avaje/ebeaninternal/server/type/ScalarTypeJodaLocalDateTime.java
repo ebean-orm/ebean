@@ -6,6 +6,7 @@ import org.joda.time.LocalDateTime;
 
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.Date;
 
 /**
  * ScalarType for Joda LocalDateTime. This maps to a JDBC Timestamp.
@@ -57,8 +58,8 @@ public class ScalarTypeJodaLocalDateTime extends ScalarTypeBaseDateTime<LocalDat
 
   @Override
   public LocalDateTime toBeanType(Object value) {
-    if (value instanceof java.util.Date) {
-      return new LocalDateTime(((java.util.Date) value).getTime());
+    if (value instanceof Date) {
+      return new LocalDateTime(((Date) value).getTime());
     }
     return (LocalDateTime) value;
   }

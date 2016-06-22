@@ -5,6 +5,8 @@ import org.joda.time.Interval;
 import com.avaje.ebean.config.CompoundType;
 import com.avaje.ebean.config.CompoundTypeProperty;
 
+import java.sql.Types;
+
 public class JodaIntervalCompoundType implements CompoundType<Interval>{
 
     public Interval create(Object[] propertyValues) {
@@ -28,7 +30,7 @@ public class JodaIntervalCompoundType implements CompoundType<Interval>{
         }
 
         public int getDbType() {
-            return java.sql.Types.TIMESTAMP;
+            return Types.TIMESTAMP;
         }
     }
 
@@ -43,7 +45,7 @@ public class JodaIntervalCompoundType implements CompoundType<Interval>{
         }
         
         public int getDbType() {
-            return java.sql.Types.TIMESTAMP;
+            return Types.TIMESTAMP;
         }
 
     }

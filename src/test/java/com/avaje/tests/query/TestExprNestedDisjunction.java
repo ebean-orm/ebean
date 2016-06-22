@@ -7,6 +7,8 @@ import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
+import java.sql.Date;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestExprNestedDisjunction extends BaseTestCase {
@@ -16,7 +18,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
+    Date onAfter = Date.valueOf("2009-08-31");
 
     Query<Customer> q = Ebean.find(Customer.class).where()
         .disjunction()
@@ -37,7 +39,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
+    Date onAfter = Date.valueOf("2009-08-31");
 
     Query<Customer> q = Ebean.find(Customer.class)
         .where()
@@ -60,7 +62,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
+    Date onAfter = Date.valueOf("2009-08-31");
 
     Query<Customer> q = Ebean.find(Customer.class)
         .where()
@@ -81,7 +83,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
+    Date onAfter = Date.valueOf("2009-08-31");
 
     Query<Customer> q = Ebean.find(Customer.class)
         .where()
@@ -103,7 +105,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    java.sql.Date onAfter = java.sql.Date.valueOf("2009-08-31");
+    Date onAfter = Date.valueOf("2009-08-31");
 
     Query<Customer> q = Ebean.find(Customer.class)
         .where()

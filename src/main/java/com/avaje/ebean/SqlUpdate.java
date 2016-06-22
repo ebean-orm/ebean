@@ -48,7 +48,7 @@ public interface SqlUpdate {
    * {@link Transaction#setBatchSize(int)}.
    * </p>
    * 
-   * @see com.avaje.ebean.Ebean#execute(SqlUpdate)
+   * @see Ebean#execute(SqlUpdate)
    */
   int execute();
 

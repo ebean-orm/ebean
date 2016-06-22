@@ -34,7 +34,7 @@ public final class TimeStringParser implements StringParser {
     int secondColon = s.indexOf(':', firstColon + 1);
 
     if (firstColon == -1) {
-      throw new java.lang.IllegalArgumentException("No ':' in value [" + s + "]");
+      throw new IllegalArgumentException("No ':' in value [" + s + "]");
     }
     try {
       int hour = Integer.parseInt(s.substring(0, firstColon));
@@ -49,7 +49,7 @@ public final class TimeStringParser implements StringParser {
       return new Time(hour, minute, second);
 
     } catch (NumberFormatException e) {
-      throw new java.lang.IllegalArgumentException("Number format Error parsing time [" + s + "] "
+      throw new IllegalArgumentException("Number format Error parsing time [" + s + "] "
           + e.getMessage(), e);
     }
   }

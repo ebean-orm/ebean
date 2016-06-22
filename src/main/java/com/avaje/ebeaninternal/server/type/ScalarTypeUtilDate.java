@@ -13,10 +13,10 @@ import java.util.Date;
  */
 public class ScalarTypeUtilDate {
 
-  public static class TimestampType extends ScalarTypeBaseDateTime<java.util.Date> {
+  public static class TimestampType extends ScalarTypeBaseDateTime<Date> {
 
     public TimestampType(JsonConfig.DateTime mode) {
-      super(mode, java.util.Date.class, false, Types.TIMESTAMP);
+      super(mode, Date.class, false, Types.TIMESTAMP);
     }
 
     @Override
@@ -35,17 +35,17 @@ public class ScalarTypeUtilDate {
     }
 
     @Override
-    public java.util.Date read(DataReader dataReader) throws SQLException {
+    public Date read(DataReader dataReader) throws SQLException {
       Timestamp timestamp = dataReader.getTimestamp();
       if (timestamp == null) {
         return null;
       } else {
-        return new java.util.Date(timestamp.getTime());
+        return new Date(timestamp.getTime());
       }
     }
 
     @Override
-    public void bind(DataBind dataBind, java.util.Date value) throws SQLException {
+    public void bind(DataBind dataBind, Date value) throws SQLException {
       if (value == null) {
         dataBind.setNull(Types.TIMESTAMP);
       } else {
@@ -59,14 +59,14 @@ public class ScalarTypeUtilDate {
     }
 
     @Override
-    public java.util.Date toBeanType(Object value) {
+    public Date toBeanType(Object value) {
       return BasicTypeConverter.toUtilDate(value);
     }
 
 
     @Override
     public Date convertFromTimestamp(Timestamp ts) {
-      return new java.util.Date(ts.getTime());
+      return new Date(ts.getTime());
     }
 
     @Override
@@ -75,12 +75,12 @@ public class ScalarTypeUtilDate {
     }
 
     @Override
-    public java.util.Date convertFromMillis(long systemTimeMillis) {
-      return new java.util.Date(systemTimeMillis);
+    public Date convertFromMillis(long systemTimeMillis) {
+      return new Date(systemTimeMillis);
     }
   }
 
-  public static class DateType extends ScalarTypeBaseDate<java.util.Date> {
+  public static class DateType extends ScalarTypeBaseDate<Date> {
 
     public DateType() {
       super(Date.class, false, Types.DATE);
@@ -88,13 +88,13 @@ public class ScalarTypeUtilDate {
 
 
     @Override
-    public long convertToMillis(java.util.Date value) {
+    public long convertToMillis(Date value) {
       return value.getTime();
     }
 
     @Override
     public Date convertFromDate(java.sql.Date ts) {
-      return new java.util.Date(ts.getTime());
+      return new Date(ts.getTime());
     }
 
     @Override
@@ -108,7 +108,7 @@ public class ScalarTypeUtilDate {
     }
 
     @Override
-    public java.util.Date toBeanType(Object value) {
+    public Date toBeanType(Object value) {
       return BasicTypeConverter.toUtilDate(value);
     }
   }

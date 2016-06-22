@@ -6,6 +6,12 @@ package com.avaje.ebeaninternal.server.util;
  * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
+import sun.misc.Unsafe;
+
+import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.Random;
 
 /**
@@ -96,7 +102,7 @@ abstract class Striped64 extends Number {
         }
 
         // Unsafe mechanics
-        private static final sun.misc.Unsafe UNSAFE;
+        private static final Unsafe UNSAFE;
         private static final long valueOffset;
         static {
             try {
@@ -294,7 +300,7 @@ abstract class Striped64 extends Number {
     }
 
     // Unsafe mechanics
-    private static final sun.misc.Unsafe UNSAFE;
+    private static final Unsafe UNSAFE;
     private static final long baseOffset;
     private static final long busyOffset;
     static {
@@ -317,16 +323,16 @@ abstract class Striped64 extends Number {
      *
      * @return a sun.misc.Unsafe
      */
-    private static sun.misc.Unsafe getUnsafe() {
+    private static Unsafe getUnsafe() {
         try {
-            return sun.misc.Unsafe.getUnsafe();
+            return Unsafe.getUnsafe();
         } catch (SecurityException tryReflectionInstead) {}
         try {
-            return java.security.AccessController.doPrivileged
-            (new java.security.PrivilegedExceptionAction<sun.misc.Unsafe>() {
-                public sun.misc.Unsafe run() throws Exception {
-                    Class<sun.misc.Unsafe> k = sun.misc.Unsafe.class;
-                    for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+            return AccessController.doPrivileged
+            (new PrivilegedExceptionAction<Unsafe>() {
+                public Unsafe run() throws Exception {
+                    Class<Unsafe> k = Unsafe.class;
+                    for (Field f : k.getDeclaredFields()) {
                         f.setAccessible(true);
                         Object x = f.get(null);
                         if (k.isInstance(x))
@@ -334,7 +340,7 @@ abstract class Striped64 extends Number {
                     }
                     throw new NoSuchFieldError("the Unsafe");
                 }});
-        } catch (java.security.PrivilegedActionException e) {
+        } catch (PrivilegedActionException e) {
             throw new RuntimeException("Could not initialize intrinsics",
                                        e.getCause());
         }

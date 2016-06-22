@@ -42,6 +42,7 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -328,8 +329,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   }
 
   private ScalarType<?> checkJava7InterfaceTypes(Class<?> type) {
-    if (java.nio.file.Path.class.isAssignableFrom(type)) {
-      return typeMap.get(java.nio.file.Path.class);
+    if (Path.class.isAssignableFrom(type)) {
+      return typeMap.get(Path.class);
     }
     return null;
   }
@@ -503,7 +504,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       return extraTypeFactory.createUtilDate(jsonDateTime, jdbcType);
     }
     // a Calendar with jdbcType not matching server wide settings
-    if (type.equals(java.util.Calendar.class)) {
+    if (type.equals(Calendar.class)) {
       return extraTypeFactory.createCalendar(jsonDateTime, jdbcType);
     }
 
@@ -867,7 +868,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
   protected void initialiseJavaTimeTypes(JsonConfig.DateTime mode, ServerConfig config) {
 
     if (java7Present) {
-      typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
+      typeMap.put(Path.class, new ScalarTypePath());
     }
 
     if (config.getClassLoadConfig().isJavaTimePresent()) {

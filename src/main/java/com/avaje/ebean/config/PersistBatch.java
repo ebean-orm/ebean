@@ -6,8 +6,8 @@ package com.avaje.ebean.config;
  * Used both at a per transaction basis and per request basis.
  * </p>
  *
- * @see com.avaje.ebean.config.ServerConfig#setPersistBatch(PersistBatch)
- * @see com.avaje.ebean.config.ServerConfig#setPersistBatchOnCascade(PersistBatch)
+ * @see ServerConfig#setPersistBatch(PersistBatch)
+ * @see ServerConfig#setPersistBatchOnCascade(PersistBatch)
  *
  * @see com.avaje.ebean.Transaction#setBatch(PersistBatch)
  * @see com.avaje.ebean.Transaction#setBatchOnCascade(PersistBatch)

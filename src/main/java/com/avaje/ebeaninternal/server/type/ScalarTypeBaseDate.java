@@ -29,12 +29,12 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
   /**
    * Convert to java.sql.Date from the target Date type.
    */
-  public abstract java.sql.Date convertToDate(T t);
+  public abstract Date convertToDate(T t);
 
   /**
    * Convert from java.sql.Date to the target Date type.
    */
-  public abstract T convertFromDate(java.sql.Date ts);
+  public abstract T convertFromDate(Date ts);
 
   public void bind(DataBind b, T value) throws SQLException {
     if (value == null) {

@@ -2180,7 +2180,7 @@ public class ServerConfig {
    * .Query#setPersistenceContextScope(com.avaje.ebean.PersistenceContextScope)}. If it
    * is not set on the query this default scope is used.
    *
-   * @see com.avaje.ebean.Query#setPersistenceContextScope(com.avaje.ebean.PersistenceContextScope)
+   * @see com.avaje.ebean.Query#setPersistenceContextScope(PersistenceContextScope)
    */
   public PersistenceContextScope getPersistenceContextScope() {
     // if somehow null return TRANSACTION scope
@@ -2196,7 +2196,7 @@ public class ServerConfig {
    * .Query#setPersistenceContextScope(com.avaje.ebean.PersistenceContextScope)}. If it
    * is not set on the query this scope is used.
    *
-   * @see com.avaje.ebean.Query#setPersistenceContextScope(com.avaje.ebean.PersistenceContextScope)
+   * @see com.avaje.ebean.Query#setPersistenceContextScope(PersistenceContextScope)
    */
   public void setPersistenceContextScope(PersistenceContextScope persistenceContextScope) {
     this.persistenceContextScope = persistenceContextScope;

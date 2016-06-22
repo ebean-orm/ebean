@@ -64,7 +64,7 @@ public class TestEnumValueAnnotation extends BaseTestCase {
 
     try {
       b = Ebean.find(EBasicEnumId.class, b.getStatus());
-    } catch (java.lang.IllegalArgumentException iae) {
+    } catch (IllegalArgumentException iae) {
       Assert.fail("The use of an enum as id should work : " + iae.getLocalizedMessage());
     }
 

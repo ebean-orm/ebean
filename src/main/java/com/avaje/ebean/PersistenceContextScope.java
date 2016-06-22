@@ -7,7 +7,7 @@ package com.avaje.ebean;
  * use (by default) and explicitly set the scope to use for an individual query.
  *
  * @see com.avaje.ebean.config.ServerConfig#setPersistenceContextScope(PersistenceContextScope)
- * @see com.avaje.ebean.Query#setPersistenceContextScope(PersistenceContextScope)
+ * @see Query#setPersistenceContextScope(PersistenceContextScope)
  */
 public enum PersistenceContextScope {
 

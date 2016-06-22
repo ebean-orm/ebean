@@ -44,8 +44,8 @@ public class ScalarTypeLocalDate extends ScalarTypeBaseDate<LocalDate> {
 
   @Override
   public LocalDate toBeanType(Object value) {
-    if (value instanceof java.sql.Date) {
-      return ((java.sql.Date) value).toLocalDate();
+    if (value instanceof Date) {
+      return ((Date) value).toLocalDate();
     }
     return (LocalDate) value;
   }

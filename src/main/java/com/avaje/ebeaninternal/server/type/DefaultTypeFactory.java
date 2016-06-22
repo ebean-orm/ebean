@@ -7,6 +7,7 @@ import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 import java.math.BigInteger;
 import java.sql.Types;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Helper to create some default ScalarType objects for Booleans,
@@ -79,7 +80,7 @@ public class DefaultTypeFactory {
   /**
    * Create the default ScalarType for java.util.Date.
    */
-  public ScalarType<java.util.Date> createUtilDate(JsonConfig.DateTime mode) {
+  public ScalarType<Date> createUtilDate(JsonConfig.DateTime mode) {
     // by default map anonymous java.util.Date to java.sql.Timestamp.
     // String mapType =
     // properties.getProperty("type.mapping.java.util.Date","timestamp");
@@ -92,7 +93,7 @@ public class DefaultTypeFactory {
    * Create a ScalarType for java.util.Date explicitly specifying the type to
    * map to.
    */
-  public ScalarType<java.util.Date> createUtilDate(JsonConfig.DateTime mode, int utilDateType) {
+  public ScalarType<Date> createUtilDate(JsonConfig.DateTime mode, int utilDateType) {
 
     switch (utilDateType) {
       case Types.DATE:
@@ -126,9 +127,9 @@ public class DefaultTypeFactory {
 
   private int getTemporalMapType(String mapType) {
     if (mapType.equalsIgnoreCase("date")) {
-      return java.sql.Types.DATE;
+      return Types.DATE;
     }
-    return java.sql.Types.TIMESTAMP;
+    return Types.TIMESTAMP;
   }
 
   /**

@@ -72,8 +72,8 @@ import java.sql.SQLException;
  * }
  * </pre>
  * 
- * @see com.avaje.ebean.SqlUpdate
- * @see com.avaje.ebean.Ebean#execute(CallableSql)
+ * @see SqlUpdate
+ * @see Ebean#execute(CallableSql)
  */
 public interface CallableSql {
 

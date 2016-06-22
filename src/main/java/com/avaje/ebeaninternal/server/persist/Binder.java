@@ -3,8 +3,11 @@ package com.avaje.ebeaninternal.server.persist;
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -222,19 +225,19 @@ public class Binder {
     }
 
     switch (dbType) {
-      case java.sql.Types.LONGVARCHAR:
+      case Types.LONGVARCHAR:
         bindLongVarChar(dataBind, data);
         break;
 
-      case java.sql.Types.LONGVARBINARY:
+      case Types.LONGVARBINARY:
         bindLongVarBinary(dataBind, data);
         break;
 
-      case java.sql.Types.CLOB:
+      case Types.CLOB:
         bindClob(dataBind, data);
         break;
 
-      case java.sql.Types.BLOB:
+      case Types.BLOB:
         bindBlob(dataBind, data);
         break;
 
@@ -250,76 +253,76 @@ public class Binder {
 
     try {
       switch (dataType) {
-        case java.sql.Types.BOOLEAN:
+        case Types.BOOLEAN:
           b.setBoolean((Boolean) data);
           break;
-        case java.sql.Types.BIT:
+        case Types.BIT:
           // Types.BIT should map to Java Boolean
           b.setBoolean((Boolean) data);
           break;
 
-        case java.sql.Types.VARCHAR:
+        case Types.VARCHAR:
           b.setString((String) data);
           break;
 
-        case java.sql.Types.CHAR:
+        case Types.CHAR:
           b.setString(data.toString());
           break;
 
-        case java.sql.Types.TINYINT:
+        case Types.TINYINT:
           b.setByte((Byte) data);
           break;
 
-        case java.sql.Types.SMALLINT:
+        case Types.SMALLINT:
           b.setShort((Short) data);
           break;
 
-        case java.sql.Types.INTEGER:
+        case Types.INTEGER:
           b.setInt((Integer) data);
           break;
 
-        case java.sql.Types.BIGINT:
+        case Types.BIGINT:
           b.setLong((Long) data);
           break;
 
-        case java.sql.Types.REAL:
+        case Types.REAL:
           b.setFloat((Float) data);
           break;
 
-        case java.sql.Types.FLOAT:
+        case Types.FLOAT:
           // DB Float in theory maps to Java Double type
           b.setDouble((Double) data);
           break;
 
-        case java.sql.Types.DOUBLE:
+        case Types.DOUBLE:
           b.setDouble((Double) data);
           break;
 
-        case java.sql.Types.NUMERIC:
+        case Types.NUMERIC:
           b.setBigDecimal((BigDecimal) data);
           break;
 
-        case java.sql.Types.DECIMAL:
+        case Types.DECIMAL:
           b.setBigDecimal((BigDecimal) data);
           break;
 
-        case java.sql.Types.TIME:
-          b.setTime((java.sql.Time) data);
+        case Types.TIME:
+          b.setTime((Time) data);
           break;
 
-        case java.sql.Types.DATE:
-          b.setDate((java.sql.Date) data);
+        case Types.DATE:
+          b.setDate((Date) data);
           break;
 
-        case java.sql.Types.TIMESTAMP:
-          b.setTimestamp((java.sql.Timestamp) data);
+        case Types.TIMESTAMP:
+          b.setTimestamp((Timestamp) data);
           break;
 
-        case java.sql.Types.BINARY:
+        case Types.BINARY:
           b.setBytes((byte[]) data);
           break;
 
-        case java.sql.Types.VARBINARY:
+        case Types.VARBINARY:
           b.setBytes((byte[]) data);
           break;
 
@@ -328,11 +331,11 @@ public class Binder {
           b.setObject(data);
           break;
 
-        case java.sql.Types.OTHER:
+        case Types.OTHER:
           b.setObject(data);
           break;
 
-        case java.sql.Types.JAVA_OBJECT:
+        case Types.JAVA_OBJECT:
           // Not too sure about this.
           b.setObject(data);
           break;

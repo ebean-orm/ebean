@@ -5,6 +5,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
@@ -27,7 +28,7 @@ public class Person implements Serializable {
   }
 
   @Id
-  @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.AUTO)
   @SequenceGenerator(name = "PERSONS_SEQ", initialValue = 1000, allocationSize = 40)
   @Column(name = "ID", unique = true, nullable = false)
   public Long getId() {
