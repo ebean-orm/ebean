@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -204,15 +205,16 @@ public class CQueryEngine {
 
     SpiQuery<T> query = request.getQuery();
 
+    String sysPeriodLower = getSysPeriodLower(query);
     if (query.isVersionsBetween() && !historySupport.isBindAtFromClause()) {
       // just add as normal predicates using the lower bound
-      query.where().gt(getSysPeriodLower(query), query.getVersionStart());
-      query.where().lt(getSysPeriodLower(query), query.getVersionEnd());
+      query.where().gt(sysPeriodLower, query.getVersionStart());
+      query.where().lt(sysPeriodLower, query.getVersionEnd());
     }
 
     // order by id asc, lower sys period desc
     query.orderBy().asc(request.getBeanDescriptor().getIdProperty().getName());
-    query.orderBy().desc(getSysPeriodLower(query));
+    query.orderBy().desc(sysPeriodLower);
 
     CQuery<T> cquery = queryBuilder.buildQuery(request);
     try {
@@ -222,6 +224,9 @@ public class CQueryEngine {
       }
 
       List<Version<T>> versions = cquery.readVersions();
+      // just order in memory rather than use NULLS LAST as that
+      // is not universally supported, not expect huge list here
+      Collections.sort(versions, OrderVersionDesc.INSTANCE);
       deriveVersionDiffs(versions, request);
 
       if (request.isLogSummary()) {
