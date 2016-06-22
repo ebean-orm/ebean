@@ -583,7 +583,7 @@ public class DeployBeanDescriptor<T> {
    */
   public void setView(String viewName, String[] dependentTables) {
     this.entityType = EntityType.VIEW;
-    this.dependentTables = this.dependentTables;
+    this.dependentTables = dependentTables;
     setBaseTable(new TableName(viewName), "", "");
   }
 
