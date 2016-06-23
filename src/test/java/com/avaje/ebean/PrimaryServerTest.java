@@ -30,6 +30,6 @@ public class PrimaryServerTest {
   public void testLoadProperties() throws Exception {
 
     Properties properties = PrimaryServer.getProperties();
-    assertTrue(properties.size() > 0);
+    assertTrue(!properties.isEmpty());
   }
 }

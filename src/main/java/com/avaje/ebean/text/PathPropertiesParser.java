@@ -108,7 +108,7 @@ class PathPropertiesParser {
 
   private void addCurrentProperty() {
     String w = currentWord();
-    if (w.length() > 0) {
+    if (!w.isEmpty()) {
       currentPathProps.addProperty(w);
     }
   }

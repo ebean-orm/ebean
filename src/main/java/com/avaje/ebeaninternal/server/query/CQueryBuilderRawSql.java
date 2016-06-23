@@ -134,7 +134,7 @@ public class CQueryBuilderRawSql {
   }
 
   private boolean isEmpty(String s) {
-    return s == null || s.length() == 0;
+    return s == null || s.isEmpty();
   }
 
   private String getOrderBy(CQueryPredicates predicates, RawSql.Sql sql) {

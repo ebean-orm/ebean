@@ -178,7 +178,7 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
 	 * Set the default mapKey to use when returning a Map.
 	 */
 	public void setMapKey(String mapKey) {
-		if (mapKey != null && mapKey.length() > 0) {
+		if (mapKey != null && !mapKey.isEmpty()) {
 			this.mapKey = mapKey;
 		}
 	}
@@ -188,7 +188,7 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
 	 * list, set or map.
 	 */
 	public void setFetchOrderBy(String orderBy) {
-		if (orderBy != null && orderBy.length() > 0) {
+		if (orderBy != null && !orderBy.isEmpty()) {
 			fetchOrderBy = orderBy;
 		}
 	}

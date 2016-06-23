@@ -24,7 +24,7 @@ public class TestLimitQuery extends BaseTestCase {
             .findList();
 
     // should at least find the "Cust NoAddress" customer
-    Assert.assertTrue(customers.size() > 0);
+    Assert.assertTrue(!customers.isEmpty());
 
   }
 }

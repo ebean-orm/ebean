@@ -29,7 +29,7 @@ public class TestQueryCache extends BaseTestCase {
     BeanCollection<Customer> bc = (BeanCollection<Customer>) list;
     Assert.assertFalse(bc.isReadOnly());
     Assert.assertFalse(bc.isEmpty());
-    Assert.assertTrue(list.size() > 0);
+    Assert.assertTrue(!list.isEmpty());
     Assert.assertTrue(Ebean.getBeanState(list.get(0)).isReadOnly());
 
     List<Customer> list2 = Ebean.find(Customer.class).setUseQueryCache(true).setReadOnly(true).where()

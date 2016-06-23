@@ -268,7 +268,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 
 		strValue = strValue.trim();
 
-		if (strValue.length() == 0) {
+		if (strValue.isEmpty()) {
 			return;
 		}
 

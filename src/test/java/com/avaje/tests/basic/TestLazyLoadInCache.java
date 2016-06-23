@@ -29,7 +29,7 @@ public class TestLazyLoadInCache extends BaseTestCase {
 			.orderBy().asc("id")
 			.findMap();
 		
-		assertTrue(map.size() > 0);
+		assertTrue(!map.isEmpty());
 		
 		Object id = map.keySet().iterator().next();
 		

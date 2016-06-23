@@ -78,6 +78,6 @@ class PrimaryServer {
    * Return true if the string is null or empty.
    */
   private static boolean isEmpty(String value) {
-    return value == null || value.trim().length() == 0;
+    return value == null || value.trim().isEmpty();
   }
 }

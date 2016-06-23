@@ -47,7 +47,7 @@ public class TestReadOnlyPropagation extends BaseTestCase {
 		Assert.assertTrue(!bc.isPopulated());
 		
 		bc.size();
-		Assert.assertTrue(bc.size() > 0);
+		Assert.assertTrue(!bc.isEmpty());
 		Assert.assertTrue(bc.isReadOnly());
 		Assert.assertTrue(bc.isPopulated());
 		try {

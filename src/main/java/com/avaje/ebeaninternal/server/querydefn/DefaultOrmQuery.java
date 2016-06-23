@@ -1161,7 +1161,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   public DefaultOrmQuery<T> order(String orderByClause) {
-    if (orderByClause == null || orderByClause.trim().length() == 0) {
+    if (orderByClause == null || orderByClause.trim().isEmpty()) {
       this.orderBy = null;
     } else {
       this.orderBy = new OrderBy<T>(this, orderByClause);

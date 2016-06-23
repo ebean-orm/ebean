@@ -126,6 +126,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
 
     sb.append(a2);
     sb.append(" on ");
+
     for (int i = 0; i < cols.length; i++) {
       TableJoinColumn pair = cols[i];
       if (i > 0) {
@@ -136,8 +137,9 @@ public class DefaultDbSqlContext implements DbSqlContext {
       sb.append(a1).append(".").append(pair.getLocalDbColumn());
     }
 
+
     // add on any inheritance where clause
-    if (inheritance != null && inheritance.length() > 0) {
+    if (inheritance != null && !inheritance.isEmpty()) {
       sb.append(" and ").append(a2).append(".").append(inheritance);
     }
 

@@ -40,7 +40,7 @@ public class ExtraDdlXmlReader {
    * @param platforms The platforms (comma delimited) this script should run for
    */
   public static boolean matchPlatform(String platformName, String platforms) {
-    if (platforms == null || platforms.trim().length() == 0) {
+    if (platforms == null || platforms.trim().isEmpty()) {
       return true;
     }
     String[] names = platforms.split("[,;]");

@@ -24,7 +24,7 @@ public class TestManyLazyLoad extends BaseTestCase {
     awaitL2Cache();
 
     List<Order> list = Ebean.find(Order.class).order().asc("id").findList();
-    assertTrue(list.size() + " > 0", list.size() > 0);
+    assertTrue(list.size() + " > 0", !list.isEmpty());
 
     // just use the first one
     Order order = list.get(0);

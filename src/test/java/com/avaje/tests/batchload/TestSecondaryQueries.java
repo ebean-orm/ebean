@@ -68,7 +68,7 @@ public class TestSecondaryQueries extends BaseTestCase {
     spiQuery.setLogSecondaryQuery(true);
     
     List<Order> list = query.findList();
-    Assert.assertTrue(list.size() > 0);
+    Assert.assertTrue(!list.isEmpty());
     for (Order order : list) {
       order.getCustomer().getStatus();
     }

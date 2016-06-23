@@ -35,7 +35,7 @@ public class TestLazyJoin2 extends BaseTestCase {
     Order o0 = l0.get(0);
     Customer c0 = o0.getCustomer();
     List<Contact> contacts = c0.getContacts();
-    Assert.assertTrue(contacts.size() > 0);
+    Assert.assertTrue(!contacts.isEmpty());
 
     // query 1) find order (status, shipDate)
     // query 2) find orderDetail (quantity, price) join product (sku, name)

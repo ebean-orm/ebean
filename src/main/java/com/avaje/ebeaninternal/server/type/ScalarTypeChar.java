@@ -35,7 +35,7 @@ public class ScalarTypeChar extends ScalarTypeBaseVarchar<Character> {
 
   public Character read(DataReader dataReader) throws SQLException {
     String string = dataReader.getString();
-    if (string == null || string.length() == 0) {
+    if (string == null || string.isEmpty()) {
       return null;
     } else {
       return string.charAt(0);

@@ -101,7 +101,7 @@ public class TestLimitQuery extends BaseTestCase {
 
     List<Order> list = query.findList();
 
-    Assert.assertTrue("sz > 0", list.size() > 0);
+    Assert.assertTrue("sz > 0", !list.isEmpty());
 
     String sql = query.getGeneratedSql();
     boolean hasDetailsJoin = sql.contains("join o_order_detail");

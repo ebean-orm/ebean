@@ -48,7 +48,7 @@ public class TestBasicLazy extends BaseTestCase {
     // some contacts
     Customer c = Ebean.find(Customer.class).setId(1).findUnique();
     Assert.assertNotNull(c.getContacts());
-    Assert.assertTrue("no contacts on test customer 1", c.getContacts().size() > 0);
+    Assert.assertTrue("no contacts on test customer 1", !c.getContacts().isEmpty());
 
     // start transaction so we have a "long running" persistence context
     Transaction tx = Ebean.beginTransaction();
@@ -56,7 +56,7 @@ public class TestBasicLazy extends BaseTestCase {
       List<Order> order = Ebean.find(Order.class).where(Expr.eq("customer.id", 1)).findList();
 
       Assert.assertNotNull(order);
-      Assert.assertTrue(order.size() > 0);
+      Assert.assertTrue(!order.isEmpty());
 
       Customer customer = order.get(0).getCustomer();
       Assert.assertNotNull(customer);
@@ -66,7 +66,7 @@ public class TestBasicLazy extends BaseTestCase {
       List<Contact> contacts = customer.getContacts();
 
       Assert.assertNotNull(contacts);
-      Assert.assertTrue("contacts not lazily fetched", contacts.size() > 0);
+      Assert.assertTrue("contacts not lazily fetched", !contacts.isEmpty());
     } finally {
       tx.commit();
     }
@@ -196,7 +196,7 @@ public class TestBasicLazy extends BaseTestCase {
       MyTestDataSourcePoolListener.SLEEP_AFTER_BORROW = 0;
     }
 
-    if (exceptions.size() > 0) {
+    if (!exceptions.isEmpty()) {
       System.err.println("Seen Exceptions:");
       for (Throwable exception : exceptions) {
         exception.printStackTrace();

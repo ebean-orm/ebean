@@ -23,7 +23,7 @@ public class TestOrderByAnnotation extends BaseTestCase {
 		Customer customer = Ebean.find(Customer.class, custTest.getId());
 		List<Order> orders = customer.getOrders();
 
-		Assert.assertTrue(orders.size() > 0);
+		Assert.assertTrue(!orders.isEmpty());
 
 
 		Query<Order> q1 = Ebean.find(Order.class)

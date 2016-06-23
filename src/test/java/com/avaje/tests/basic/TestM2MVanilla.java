@@ -76,7 +76,7 @@ public class TestM2MVanilla extends BaseTestCase {
     Query<MUser> rolesQuery = Ebean.find(MUser.class).where().in("roles", roleList).query();
 
     List<MUser> userInRolesList = rolesQuery.findList();
-    Assert.assertTrue(userInRolesList.size() > 0);
+    Assert.assertTrue(!userInRolesList.isEmpty());
 
     List<MUser> list = Ebean.find(MUser.class)
         .where().in("roles", roleList)

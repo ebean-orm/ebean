@@ -400,6 +400,6 @@ public final class OrderBy<T> implements Serializable {
   }
 
   private boolean isEmptyString(String s) {
-    return s == null || s.length() == 0;
+    return s == null || s.isEmpty();
   }
 }

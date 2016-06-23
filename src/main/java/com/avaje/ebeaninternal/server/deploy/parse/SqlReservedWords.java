@@ -70,7 +70,7 @@ public class SqlReservedWords {
 	public static synchronized void addKeyword(String keyword){
 		if (keyword != null){
 			keyword = keyword.trim().toUpperCase();
-			if (keyword.length() > 0){
+			if (!keyword.isEmpty()){
 				keywords.add(keyword);				
 			}
 		}

@@ -109,7 +109,7 @@ public class PathProperties implements FetchPath {
       String path = entry.getKey();
       String props = entry.getValue().getPropertiesAsString();
 
-      if (path == null || path.length() == 0) {
+      if (path == null || path.isEmpty()) {
         query.select(props);
       } else {
         query.fetch(path, props);

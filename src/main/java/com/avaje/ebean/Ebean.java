@@ -161,7 +161,7 @@ public final class Ebean {
           // look to see if there is a default server defined
           String defaultName = PrimaryServer.getDefaultServerName();
           logger.debug("defaultName:" + defaultName);
-          if (defaultName != null && defaultName.trim().length() > 0) {
+          if (defaultName != null && !defaultName.trim().isEmpty()) {
             defaultServer = getWithCreate(defaultName.trim());
           }
         }
@@ -182,7 +182,7 @@ public final class Ebean {
     }
 
     private EbeanServer get(String name) {
-      if (name == null || name.length() == 0) {
+      if (name == null || name.isEmpty()) {
         return defaultServer;
       }
       // non-synchronized read
