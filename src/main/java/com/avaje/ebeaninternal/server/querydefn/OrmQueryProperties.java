@@ -236,7 +236,7 @@ public class OrmQueryProperties implements Serializable {
   @SuppressWarnings("unchecked")
   public void configureBeanQuery(SpiQuery<?> query) {
 
-    if (trimmedProperties != null && trimmedProperties.length() > 0) {
+    if (trimmedProperties != null && !trimmedProperties.isEmpty()) {
       query.select(trimmedProperties);
     }
 

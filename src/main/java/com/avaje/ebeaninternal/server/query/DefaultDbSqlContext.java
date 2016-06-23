@@ -137,7 +137,7 @@ public class DefaultDbSqlContext implements DbSqlContext {
     }
 
     // add on any inheritance where clause
-    if (inheritance != null && inheritance.length() > 0) {
+    if (inheritance != null && !inheritance.isEmpty()) {
       sb.append(" and ").append(a2).append(".").append(inheritance);
     }
 

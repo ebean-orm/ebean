@@ -2460,7 +2460,7 @@ public class ServerConfig {
     String[] split = classNames.split("[ ,;]");
     for (int i = 0; i < split.length; i++) {
       String cn = split[i].trim();
-      if (cn.length() > 0 && !"class".equalsIgnoreCase(cn)) {
+      if (!cn.isEmpty() && !"class".equalsIgnoreCase(cn)) {
         try {
           classes.add(Class.forName(cn));
         } catch (ClassNotFoundException e) {

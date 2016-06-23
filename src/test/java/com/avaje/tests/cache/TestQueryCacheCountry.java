@@ -38,7 +38,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
       .findList();
     
     assertEquals(1, queryCache.getStatistics(false).getSize());
-    assertTrue(countryList0.size() > 0);
+    assertTrue(!countryList0.isEmpty());
     
     List<Country> countryList1 = Ebean.find(Country.class)
         .setUseQueryCache(true)

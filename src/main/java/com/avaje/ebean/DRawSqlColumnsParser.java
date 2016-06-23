@@ -49,7 +49,7 @@ final class DRawSqlColumnsParser {
     if (split.length > 1) {
       ArrayList<String> tmp = new ArrayList<String>(split.length);
       for (int i = 0; i < split.length; i++) {
-        if (split[i].trim().length() > 0) {
+        if (!split[i].trim().isEmpty()) {
           tmp.add(split[i].trim());
         }
       }

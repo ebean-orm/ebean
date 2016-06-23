@@ -86,7 +86,7 @@ public class BindParamsParser {
 
     if (params.isSameBindHash()) {
       String preparedSql = params.getPreparedSql();
-      if (preparedSql != null && preparedSql.length() > 0) {
+      if (preparedSql != null && !preparedSql.isEmpty()) {
         // the sql has already been parsed and positionedParameters are set in order
         return preparedSql;
       }

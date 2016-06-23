@@ -283,7 +283,7 @@ public class DeployBeanDescriptor<T> {
     docStoreUpdate = docStore.update();
     docStoreDelete = docStore.delete();
     String doc = docStore.doc();
-    if (doc.length() > 0) {
+    if (!doc.isEmpty()) {
       docStorePathProperties = PathProperties.parse(doc);
     }
   }
@@ -388,7 +388,7 @@ public class DeployBeanDescriptor<T> {
   public void setCache(Cache cache) {
 
     String naturalKey = null;
-    if (cache.naturalKey().length() > 0) {
+    if (!cache.naturalKey().isEmpty()) {
       // find the property and mark as natural key property
       String propName = cache.naturalKey().trim();
       DeployBeanProperty beanProperty = getBeanProperty(propName);
@@ -835,7 +835,7 @@ public class DeployBeanDescriptor<T> {
       return null;
     }
     String selectClause = sb.toString();
-    if (selectClause.length() == 0) {
+    if (selectClause.isEmpty()) {
       throw new IllegalStateException("Bean " + getFullName() + " has no properties?");
     }
     return selectClause.substring(0, selectClause.length() - 1);

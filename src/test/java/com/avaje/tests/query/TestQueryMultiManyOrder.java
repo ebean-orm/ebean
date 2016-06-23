@@ -24,7 +24,7 @@ public class TestQueryMultiManyOrder extends BaseTestCase {
     List<Order> list = q.findList();
     String sql = q.getGeneratedSql();
 
-    Assert.assertTrue(list.size() > 0);
+    Assert.assertTrue(!list.isEmpty());
     Assert.assertTrue(sql.contains("join o_customer "));
 
     Assert.assertFalse(sql.contains("left outer join contact "));

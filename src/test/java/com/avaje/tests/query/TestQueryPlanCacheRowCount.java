@@ -39,7 +39,7 @@ public class TestQueryPlanCacheRowCount extends BaseTestCase {
     Assert.assertEquals(rc0, list1.size());
 
     int idGt = 5;
-    if (ids1.size() > 0) {
+    if (!ids1.isEmpty()) {
       Object id = ids.get(0);
       idGt = Integer.valueOf("" + id);
     }

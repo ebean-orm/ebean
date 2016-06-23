@@ -47,7 +47,7 @@ public class TestSharedInstancePropagation extends BaseTestCase {
 		bc.size();
 		
 		assertTrue(bc.isPopulated());
-		assertTrue(bc.size() > 0);
+		assertTrue(!bc.isEmpty());
 		OrderDetail detail = details.get(0);
 		
 		assertTrue(Ebean.getBeanState(detail).isReadOnly());

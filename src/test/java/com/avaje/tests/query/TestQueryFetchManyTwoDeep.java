@@ -31,7 +31,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
     spiQuery.setLogSecondaryQuery(true);
     
     List<Customer> list = query.findList();
-    Assert.assertTrue("has rows", list.size() > 0);
+    Assert.assertTrue("has rows", !list.isEmpty());
     Assert.assertTrue(query.getGeneratedSql().contains("from o_customer t0 "));
     Assert.assertTrue(query.getGeneratedSql().contains("left outer join o_order t1 on t1.kcustomer_id = t0.id"));
     Assert.assertTrue(query.getGeneratedSql().contains("left outer join o_customer t2 on t2.id = t1.kcustomer_id"));
@@ -71,7 +71,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
         .fetch("order.details");
 
     List<OrderShipment> shipList = shipQuery.findList();
-    Assert.assertTrue("has rows", shipList.size() > 0);
+    Assert.assertTrue("has rows", !shipList.isEmpty());
     
     String generatedSql = shipQuery.getGeneratedSql();
 
@@ -112,7 +112,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
         .fetch("customer.orders");
 
     List<Contact> shipList = query.findList();
-    Assert.assertTrue("has rows", shipList.size() > 0);
+    Assert.assertTrue("has rows", !shipList.isEmpty());
     
     String generatedSql = query.getGeneratedSql();
 
@@ -144,7 +144,7 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
         .query();
 
     List<Contact> list = query.findList();
-    Assert.assertTrue("has rows", list.size() > 0);
+    Assert.assertTrue("has rows", !list.isEmpty());
     
     String generatedSql = query.getGeneratedSql();
 

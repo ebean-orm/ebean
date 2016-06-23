@@ -386,7 +386,7 @@ public class DeployBeanProperty {
    * Set a specific DB column definition.
    */
   public void setDbColumnDefn(String dbColumnDefn) {
-    if (dbColumnDefn == null || dbColumnDefn.trim().length() == 0) {
+    if (dbColumnDefn == null || dbColumnDefn.trim().isEmpty()) {
       this.dbColumnDefn = null;
     } else {
       this.dbColumnDefn = InternString.intern(dbColumnDefn);

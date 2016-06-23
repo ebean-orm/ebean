@@ -34,7 +34,7 @@ public class TestInheritRef extends BaseTestCase {
               .setAutoTune(false)
               .findList();
 
-      Assert.assertTrue(list.size() > 0);
+      Assert.assertTrue(!list.isEmpty());
 
       Truck foundTruck = null;
       int found = 0;

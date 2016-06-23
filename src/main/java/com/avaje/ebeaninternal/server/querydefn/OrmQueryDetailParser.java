@@ -134,7 +134,7 @@ public class OrmQueryDetailParser {
       }
     }
     String whereClause = sb.toString().trim();
-    if (whereClause.length() > 0) {
+    if (!whereClause.isEmpty()) {
       rawWhereClause = whereClause;
     }
 

@@ -32,7 +32,7 @@ public abstract class AnnotationBase {
    * Checks string is null or empty .
    */
   protected boolean isEmpty(String s) {
-    return s == null || s.trim().length() == 0;
+    return s == null || s.trim().isEmpty();
   }
 
 
