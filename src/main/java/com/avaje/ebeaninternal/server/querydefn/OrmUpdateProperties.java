@@ -72,6 +72,7 @@ public class OrmUpdateProperties {
     @Override
     public void bind(Binder binder, DataBind dataBind) throws SQLException {
       binder.bindObject(dataBind, value);
+      dataBind.append(value).append(",");
     }
   }
 
@@ -105,6 +106,7 @@ public class OrmUpdateProperties {
     public void bind(Binder binder, DataBind dataBind) throws SQLException {
       for (Object val : bindValues) {
         binder.bindObject(dataBind, val);
+        dataBind.append(val).append(",");
       }
     }
   }
