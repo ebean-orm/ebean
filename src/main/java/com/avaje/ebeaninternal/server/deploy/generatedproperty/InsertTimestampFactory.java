@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.deploy.generatedproperty;
 
 import com.avaje.ebean.config.ClassLoadConfig;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
+import org.joda.time.DateTime;
 
 import javax.persistence.PersistenceException;
 import java.sql.Timestamp;
@@ -9,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +25,7 @@ public class InsertTimestampFactory {
 
   public InsertTimestampFactory(ClassLoadConfig classLoadConfig) {
     map.put(Timestamp.class, new GeneratedInsertTimestamp());
-    map.put(java.util.Date.class, new GeneratedInsertDate());
+    map.put(Date.class, new GeneratedInsertDate());
     map.put(Long.class, longTime);
     map.put(long.class, longTime);
 
@@ -35,7 +37,7 @@ public class InsertTimestampFactory {
     }
     if (classLoadConfig.isJodaTimePresent()) {
       map.put(org.joda.time.LocalDateTime.class, new GeneratedInsertJodaTime.LocalDT());
-      map.put(org.joda.time.DateTime.class, new GeneratedInsertJodaTime.DateTimeDT());
+      map.put(DateTime.class, new GeneratedInsertJodaTime.DateTimeDT());
     }
 
   }

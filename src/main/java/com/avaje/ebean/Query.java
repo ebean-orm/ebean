@@ -325,7 +325,7 @@ public interface Query<T> {
    * Specify the PersistenceContextScope to use for this query.
    * <p/>
    * When this is not set the 'default' configured on {@link com.avaje.ebean.config.ServerConfig#setPersistenceContextScope(PersistenceContextScope)}
-   * is used - this value defaults to {@link com.avaje.ebean.PersistenceContextScope#TRANSACTION}.
+   * is used - this value defaults to {@link PersistenceContextScope#TRANSACTION}.
    * <p/>
    * Note that the same persistence Context is used for subsequent lazy loading and query join queries.
    * <p/>

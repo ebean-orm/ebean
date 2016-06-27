@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.Date;
 
 import static org.junit.Assert.assertTrue;
 
@@ -58,11 +59,11 @@ public class InsertTimestampFactoryTest {
   @Test
   public void test_createdTimestamp_utilDate() {
 
-    DeployBeanProperty prop = new DeployBeanProperty(null, java.util.Date.class, null, null);
+    DeployBeanProperty prop = new DeployBeanProperty(null, Date.class, null, null);
 
     GeneratedProperty insertTimestamp = factory.createInsertTimestamp(prop);
     Object value = insertTimestamp.getInsertValue(null, null, System.currentTimeMillis());
-    assertTrue(value instanceof java.util.Date);
+    assertTrue(value instanceof Date);
   }
 
 }

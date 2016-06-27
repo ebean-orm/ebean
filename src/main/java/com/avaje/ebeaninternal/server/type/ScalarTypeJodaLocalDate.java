@@ -32,7 +32,7 @@ public class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
 
   @Override
   public Date convertToDate(LocalDate value) {
-    return new java.sql.Date(convertToMillis(value));
+    return new Date(convertToMillis(value));
   }
 
   @Override

@@ -693,14 +693,14 @@ public interface EbeanServer {
    * return.
    *
    * @see Query#findRowCount()
-   * @see com.avaje.ebean.Query#findFutureRowCount()
+   * @see Query#findFutureRowCount()
    */
   <T> int findRowCount(Query<T> query, Transaction transaction);
 
   /**
    * Return the Id values of the query as a List.
    *
-   * @see com.avaje.ebean.Query#findIds()
+   * @see Query#findIds()
    */
   <T> List<Object> findIds(Query<T> query, Transaction transaction);
 
@@ -816,7 +816,7 @@ public interface EbeanServer {
    * @param query       the query to execute the row count on
    * @param transaction the transaction (can be null).
    * @return a Future object for the row count query
-   * @see com.avaje.ebean.Query#findFutureRowCount()
+   * @see Query#findFutureRowCount()
    */
   <T> FutureRowCount<T> findFutureRowCount(Query<T> query, Transaction transaction);
 
@@ -831,7 +831,7 @@ public interface EbeanServer {
    * @param query       the query to execute the fetch Id's on
    * @param transaction the transaction (can be null).
    * @return a Future object for the list of Id's
-   * @see com.avaje.ebean.Query#findFutureIds()
+   * @see Query#findFutureIds()
    */
   <T> FutureIds<T> findFutureIds(Query<T> query, Transaction transaction);
 

@@ -9,6 +9,7 @@ import java.io.StringReader;
 import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
@@ -114,7 +115,7 @@ public class DataBind {
     pstmt.setBigDecimal(++pos, v);
   }
 
-  public void setDate(java.sql.Date v) throws SQLException {
+  public void setDate(Date v) throws SQLException {
     pstmt.setDate(++pos, v);
   }
 

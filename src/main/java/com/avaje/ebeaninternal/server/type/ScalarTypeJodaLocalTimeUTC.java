@@ -7,6 +7,7 @@ import org.joda.time.LocalTime;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Types;
+import java.util.Date;
 
 /**
  * ScalarType for Joda LocalTime. This maps to a JDBC Time.
@@ -48,7 +49,7 @@ public class ScalarTypeJodaLocalTimeUTC extends ScalarTypeJodaLocalTime {
 
   @Override
   public LocalTime toBeanType(Object value) {
-    if (value instanceof java.util.Date) {
+    if (value instanceof Date) {
       return new LocalTime(value, DateTimeZone.UTC);
     }
     return (LocalTime) value;

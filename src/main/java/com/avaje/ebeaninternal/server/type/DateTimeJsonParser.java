@@ -44,7 +44,7 @@ public class DateTimeJsonParser {
 
   public Timestamp parse(String jsonDateTime) {
     try {
-      java.util.Date d = dtFormat(jsonDateTime.length()).parse(jsonDateTime);
+      Date d = dtFormat(jsonDateTime.length()).parse(jsonDateTime);
       return new Timestamp(d.getTime());
     } catch (ParseException e) {
       throw new RuntimeException("Error parsing Datetime[" + jsonDateTime + "]", e);

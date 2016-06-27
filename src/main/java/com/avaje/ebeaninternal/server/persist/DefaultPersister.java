@@ -55,7 +55,7 @@ import java.util.Set;
  * <li>Handles the batching and queueing</li>
  * </p>
  *
- * @see com.avaje.ebeaninternal.server.persist.DefaultPersistExecute
+ * @see DefaultPersistExecute
  */
 public final class DefaultPersister implements Persister {
 

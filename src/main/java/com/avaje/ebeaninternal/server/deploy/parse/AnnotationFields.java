@@ -23,6 +23,7 @@ import com.avaje.ebeaninternal.server.type.ScalarTypeEncryptedWrapper;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.groups.Default;
 import java.sql.Types;
 import java.util.Map;
 import java.util.UUID;
@@ -352,7 +353,7 @@ public class AnnotationFields extends AnnotationParser {
    * can be applied to DDL generation.
    */
   private boolean isNotNullOnAllValidationGroups(Class<?>[] groups) {
-    return groups.length == 0 || groups.length == 1 && javax.validation.groups.Default.class.isAssignableFrom(groups[0]);
+    return groups.length == 0 || groups.length == 1 && Default.class.isAssignableFrom(groups[0]);
   }
 
   private void setEncryption(DeployBeanProperty prop, boolean dbEncString, int dbLen) {

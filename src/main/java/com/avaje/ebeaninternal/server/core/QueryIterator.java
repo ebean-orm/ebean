@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.core;
 
+import java.io.Closeable;
 import java.util.Iterator;
 
 /**
@@ -36,7 +37,7 @@ import java.util.Iterator;
  * @param <T>
  *          the type of entity bean in the iteration
  */
-public interface QueryIterator<T> extends Iterator<T>, java.io.Closeable {
+public interface QueryIterator<T> extends Iterator<T>, Closeable {
 
   /**
    * Returns <tt>true</tt> if the iteration has more elements.

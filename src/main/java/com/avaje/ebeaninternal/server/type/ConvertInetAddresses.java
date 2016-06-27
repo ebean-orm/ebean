@@ -335,7 +335,7 @@ public final class ConvertInetAddresses {
    * however, it requires that IPv6 addresses are surrounded by square brackets.
    * <p/>
    * <p>This function is the inverse of
-   * {@link ConvertInetAddresses#toUriString(java.net.InetAddress)}.
+   * {@link ConvertInetAddresses#toUriString(InetAddress)}.
    *
    * @param hostAddr A RFC 3986 section 3.2.2 encoded IPv4 or IPv6 address
    * @return an InetAddress representing the address in {@code hostAddr}

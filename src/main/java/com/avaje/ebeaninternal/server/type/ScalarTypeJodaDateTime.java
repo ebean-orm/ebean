@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.Date;
 
 /**
  * ScalarType for Joda DateTime. This maps to a JDBC Timestamp.
@@ -56,8 +57,8 @@ public class ScalarTypeJodaDateTime extends ScalarTypeBaseDateTime<DateTime> {
 
   @Override
   public DateTime toBeanType(Object value) {
-    if (value instanceof java.util.Date) {
-      return new DateTime(((java.util.Date) value).getTime());
+    if (value instanceof Date) {
+      return new DateTime(((Date) value).getTime());
     }
     return (DateTime) value;
   }

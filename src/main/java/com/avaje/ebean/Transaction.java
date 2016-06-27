@@ -19,25 +19,25 @@ public interface Transaction extends Closeable {
    * Read Committed transaction isolation. Same as
    * java.sql.Connection.TRANSACTION_READ_COMMITTED.
    */
-  int READ_COMMITTED = java.sql.Connection.TRANSACTION_READ_COMMITTED;
+  int READ_COMMITTED = Connection.TRANSACTION_READ_COMMITTED;
 
   /**
    * Read Uncommitted transaction isolation. Same as
    * java.sql.Connection.TRANSACTION_READ_UNCOMMITTED.
    */
-  int READ_UNCOMMITTED = java.sql.Connection.TRANSACTION_READ_UNCOMMITTED;
+  int READ_UNCOMMITTED = Connection.TRANSACTION_READ_UNCOMMITTED;
 
   /**
    * Repeatable read transaction isolation. Same as
    * java.sql.Connection.TRANSACTION_REPEATABLE_READ.
    */
-  int REPEATABLE_READ = java.sql.Connection.TRANSACTION_REPEATABLE_READ;
+  int REPEATABLE_READ = Connection.TRANSACTION_REPEATABLE_READ;
 
   /**
    * Serializable transaction isolation. Same as
    * java.sql.Connection.TRANSACTION_SERIALIZABLE.
    */
-  int SERIALIZABLE = java.sql.Connection.TRANSACTION_SERIALIZABLE;
+  int SERIALIZABLE = Connection.TRANSACTION_SERIALIZABLE;
 
   /**
    * Register a TransactionCallback with this transaction.
@@ -277,7 +277,7 @@ public interface Transaction extends Closeable {
    *
    * @param persistBatchMode the batch mode to use for this transaction
    *
-   * @see com.avaje.ebean.config.ServerConfig#setPersistBatch(com.avaje.ebean.config.PersistBatch)
+   * @see ServerConfig#setPersistBatch(PersistBatch)
    */
   void setBatch(PersistBatch persistBatchMode);
 
@@ -299,7 +299,7 @@ public interface Transaction extends Closeable {
    *
    * @param batchOnCascadeMode the batch mode to use per save(), insert(), update() or delete()
    *
-   * @see com.avaje.ebean.config.ServerConfig#setPersistBatchOnCascade(com.avaje.ebean.config.PersistBatch)
+   * @see ServerConfig#setPersistBatchOnCascade(PersistBatch)
    */
   void setBatchOnCascade(PersistBatch batchOnCascadeMode);
 

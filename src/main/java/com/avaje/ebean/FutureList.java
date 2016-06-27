@@ -62,7 +62,7 @@ public interface FutureList<T> extends Future<List<T>> {
   List<T> getUnchecked();
 
   /**
-   * Same as {@link #get(long, java.util.concurrent.TimeUnit)} but wraps InterruptedException
+   * Same as {@link #get(long, TimeUnit)} but wraps InterruptedException
    * and ExecutionException in the unchecked PersistenceException.
    *
    * @return The query list result

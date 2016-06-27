@@ -29,7 +29,7 @@ public class JsonWriteOptions {
    * (a,b,c(d,e),f(g)) where "c" is a path containing "d" and "e" and "f" is a
    * path containing "g" and the root path contains "a","b","c" and "f".
    *
-   * @see com.avaje.ebean.text.PathProperties#parse(String)
+   * @see PathProperties#parse(String)
    */
   public static JsonWriteOptions parsePath(String pathProperties) {
 

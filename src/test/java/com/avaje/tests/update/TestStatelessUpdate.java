@@ -103,7 +103,7 @@ public class TestStatelessUpdate extends BaseTestCase {
    * <br />
    * This feature already works for normal Updates!
    * <br />
-   * see: {@link com.avaje.tests.update.TestUpdatePartial#testWithoutChangesAndVersionColumn()}
+   * see: {@link TestUpdatePartial#testWithoutChangesAndVersionColumn()}
    */
   @Test
   public void testWithoutChangesAndVersionColumnAndIgnoreNullValues() {

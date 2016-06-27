@@ -18,6 +18,7 @@ import com.avaje.ebeaninternal.server.query.CQuery;
 import com.avaje.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import com.avaje.ebeaninternal.server.core.timezone.DataTimeZone;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -171,7 +172,7 @@ public interface SpiEbeanServer extends EbeanServer, BeanLoader, BeanCollectionL
    * Return true if the type is known as an Entity or Xml type or a List Set or
    * Map of known bean types.
    */
-  boolean isSupportedType(java.lang.reflect.Type genericType);
+  boolean isSupportedType(Type genericType);
 
   /**
    * Collect query statistics by ObjectGraphNode. Used for Lazy loading reporting.
