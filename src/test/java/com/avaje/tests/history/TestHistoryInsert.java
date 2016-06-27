@@ -70,6 +70,8 @@ public class TestHistoryInsert extends BaseTestCase {
     assertThat(earlyVersion.getName()).isEqualTo("Jim");
     assertThat(earlyVersion.getEmail()).isEqualTo("one@email.com");
 
+    Ebean.find(User.class).setId(user.getId()).asOf(afterInsert).findUnique();
+
 
     history = fetchHistory(user);
     assertThat(history).hasSize(3);
