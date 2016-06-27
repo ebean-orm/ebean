@@ -70,6 +70,8 @@ public class CQueryPlan {
 
   protected final DataTimeZone dataTimeZone;
 
+  private final int asOfTableCount;
+
   /**
    * Key used to identify the query plan in audit logging.
    */
@@ -86,6 +88,7 @@ public class CQueryPlan {
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.planKey = request.getQueryPlanKey();
     this.autoTuned = request.getQuery().isAutoTuned();
+    this.asOfTableCount = request.getQuery().getAsOfTableCount();
     if (sqlRes != null) {
       this.sql = sqlRes.getSql();
       this.rowNumberIncluded = sqlRes.isIncludesRowNumberColumn();
@@ -111,6 +114,7 @@ public class CQueryPlan {
     this.stats = new CQueryPlanStats(this, server.isCollectQueryOrigins());
     this.planKey = buildPlanKey(sql, rawSql, rowNumberIncluded, logWhereSql);
     this.autoTuned = false;
+    this.asOfTableCount = 0;
     this.sql = sql;
     this.sqlTree = sqlTree;
     this.rawSql = rawSql;
@@ -149,6 +153,10 @@ public class CQueryPlan {
       }
     }
     return dataBind;
+  }
+
+  public int getAsOfTableCount() {
+    return asOfTableCount;
   }
 
   public boolean isAutoTuned() {

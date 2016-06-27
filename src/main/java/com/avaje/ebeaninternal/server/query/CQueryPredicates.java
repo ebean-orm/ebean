@@ -136,7 +136,7 @@ public class CQueryPredicates {
       dataBind.append(", ");
     }
 
-    int asOfTableCount = query.getAsOfTableCount();
+    int asOfTableCount = request.getQueryPlan().getAsOfTableCount();
     if (asOfTableCount > 0) {
       // bind the asOf value for each table alias as part of the from/join clauses
       // there is one effective date predicate per table alias
