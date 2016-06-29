@@ -402,12 +402,7 @@ public class TransactionManager {
   public void notifyOfCommit(SpiTransaction transaction) {
 
     try {
-
-      if (transaction.isExplicit()) {
-        if (TXN_LOGGER.isInfoEnabled()) {
-          TXN_LOGGER.info(transaction.getLogPrefix() + "Commit");
-        }
-      } else if (TXN_LOGGER.isDebugEnabled()) {
+      if (TXN_LOGGER.isDebugEnabled()) {
         TXN_LOGGER.debug(transaction.getLogPrefix() + "Commit");
       }
 
