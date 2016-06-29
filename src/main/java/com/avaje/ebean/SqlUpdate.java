@@ -26,7 +26,7 @@ package com.avaje.ebean;
  * 
  * int modifiedCount = Ebean.execute(update);
  * 
- * String msg = &quot;There where &quot; + modifiedCount + &quot;rows updated&quot;
+ * String msg = &quot;There were &quot; + modifiedCount + &quot; rows updated&quot;
  * </pre>
  * 
  * @see Update
