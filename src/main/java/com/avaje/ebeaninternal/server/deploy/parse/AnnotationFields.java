@@ -7,6 +7,7 @@ import com.avaje.ebean.config.dbplatform.DbEncrypt;
 import com.avaje.ebean.config.dbplatform.DbEncryptFunction;
 import com.avaje.ebean.config.dbplatform.IdType;
 import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
+import com.avaje.ebeaninternal.server.deploy.IndexDefinition;
 import com.avaje.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
@@ -314,8 +315,7 @@ public class AnnotationFields extends AnnotationParser {
       if (hasRelationshipItem(prop)) {
         throw new RuntimeException("Can't use Index on foreign key relationships.");
       }
-      prop.setIndexed();
-      prop.setIndexName(index.name());
+      descriptor.addIndex(new IndexDefinition(prop.getDbColumn(), index.name(), index.unique()));
     }
   }
 

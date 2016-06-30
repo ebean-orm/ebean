@@ -23,7 +23,7 @@ import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistController;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanPersistListener;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanPostLoad;
 import com.avaje.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
-import com.avaje.ebeaninternal.server.deploy.CompoundUniqueConstraint;
+import com.avaje.ebeaninternal.server.deploy.IndexDefinition;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import com.avaje.ebeaninternal.server.idgen.UuidIdGenerator;
@@ -108,7 +108,7 @@ public class DeployBeanDescriptor<T> {
 
   private boolean updateChangesOnly;
 
-  private List<CompoundUniqueConstraint> compoundUniqueConstraints;
+  private List<IndexDefinition> indexDefinitions;
 
   /**
    * The base database table.
@@ -440,21 +440,21 @@ public class DeployBeanDescriptor<T> {
   /**
    * Add a compound unique constraint.
    */
-  public void addCompoundUniqueConstraint(CompoundUniqueConstraint c) {
-    if (compoundUniqueConstraints == null) {
-      compoundUniqueConstraints = new ArrayList<CompoundUniqueConstraint>();
+  public void addIndex(IndexDefinition c) {
+    if (indexDefinitions == null) {
+      indexDefinitions = new ArrayList<IndexDefinition>();
     }
-    compoundUniqueConstraints.add(c);
+    indexDefinitions.add(c);
   }
 
   /**
    * Return the compound unique constraints (can be null).
    */
-  public CompoundUniqueConstraint[] getCompoundUniqueConstraints() {
-    if (compoundUniqueConstraints == null) {
+  public IndexDefinition[] getIndexDefinitions() {
+    if (indexDefinitions == null) {
       return null;
     } else {
-      return compoundUniqueConstraints.toArray(new CompoundUniqueConstraint[compoundUniqueConstraints.size()]);
+      return indexDefinitions.toArray(new IndexDefinition[indexDefinitions.size()]);
     }
   }
 

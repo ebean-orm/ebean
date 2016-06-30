@@ -255,10 +255,6 @@ public class BeanProperty implements ElPropertyValue, Property {
 
   final String softDeleteDbPredicate;
 
-  final boolean indexed;
-
-  final String indexName;
-
   public BeanProperty(DeployBeanProperty deploy) {
     this(null, deploy);
   }
@@ -268,8 +264,6 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.descriptor = descriptor;
     this.name = InternString.intern(deploy.getName());
     this.propertyIndex = deploy.getPropertyIndex();
-    this.indexed = deploy.isIndexed();
-    this.indexName = deploy.getIndexName();
     this.unidirectionalShadow = deploy.isUndirectionalShadow();
     this.discriminator = deploy.isDiscriminator();
     this.localEncrypted = deploy.isLocalEncrypted();
@@ -370,9 +364,6 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.descriptor = source.descriptor;
     this.name = InternString.intern(source.getName());
     this.propertyIndex = source.propertyIndex;
-
-    this.indexed = source.isIndexed();
-    this.indexName = source.getIndexName();
     this.dbColumn = InternString.intern(override.getDbColumn());
     // override with sqlFormula not currently supported
     this.sqlFormulaJoin = null;
@@ -629,14 +620,6 @@ public class BeanProperty implements ElPropertyValue, Property {
 
   public BeanProperty getBeanProperty() {
     return this;
-  }
-
-  public boolean isIndexed() {
-    return indexed;
-  }
-
-  public String getIndexName() {
-    return indexName;
   }
 
   /**

@@ -104,7 +104,7 @@ public class MTable {
   /**
    * Compound unique constraints.
    */
-  private List<MCompoundUniqueConstraint> compoundUniqueConstraints = new ArrayList<MCompoundUniqueConstraint>();
+  private List<MCompoundUniqueConstraint> uniqueConstraints = new ArrayList<MCompoundUniqueConstraint>();
 
   /**
    * Compound foreign keys.
@@ -216,7 +216,7 @@ public class MTable {
       createTable.getForeignKey().add(compoundKey.createForeignKey());
     }
 
-    for (MCompoundUniqueConstraint constraint : compoundUniqueConstraints) {
+    for (MCompoundUniqueConstraint constraint : uniqueConstraints) {
       UniqueConstraint uq = new UniqueConstraint();
       uq.setName(constraint.getName());
       String[] columns = constraint.getColumns();
@@ -404,8 +404,8 @@ public class MTable {
     return columns;
   }
 
-  public List<MCompoundUniqueConstraint> getCompoundUniqueConstraints() {
-    return compoundUniqueConstraints;
+  public List<MCompoundUniqueConstraint> getUniqueConstraints() {
+    return uniqueConstraints;
   }
 
   public List<MCompoundForeignKey> getCompoundKeys() {
@@ -476,21 +476,21 @@ public class MTable {
   }
 
   /**
-   * Add a compound unique constraint.
+   * Add a unique constraint.
    */
-  public void addCompoundUniqueConstraint(String[] columns, boolean oneToOne, String constraintName) {
-    compoundUniqueConstraints.add(new MCompoundUniqueConstraint(columns, oneToOne, constraintName));
+  public void addUniqueConstraint(String[] columns, boolean oneToOne, String constraintName) {
+    uniqueConstraints.add(new MCompoundUniqueConstraint(columns, oneToOne, constraintName));
   }
 
   /**
-   * Add a compound unique constraint.
+   * Add a unique constraint.
    */
-  public void addCompoundUniqueConstraint(List<MColumn> columns, boolean oneToOne, String constraintName) {
+  public void addUniqueConstraint(List<MColumn> columns, boolean oneToOne, String constraintName) {
     String[] cols = new String[columns.size()];
     for (int i = 0; i < columns.size(); i++) {
       cols[i] = columns.get(i).getName();
     }
-    addCompoundUniqueConstraint(cols, oneToOne, constraintName);
+    addUniqueConstraint(cols, oneToOne, constraintName);
   }
 
   /**

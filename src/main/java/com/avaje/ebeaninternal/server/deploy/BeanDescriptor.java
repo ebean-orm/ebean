@@ -176,7 +176,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    */
   private final ConcurrencyMode concurrencyMode;
 
-  private final CompoundUniqueConstraint[] compoundUniqueConstraints;
+  private final IndexDefinition[] indexDefinitions;
 
   private final String[] dependentTables;
 
@@ -431,7 +431,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.selectLastInsertedId = deploy.getSelectLastInsertedId();
     this.concurrencyMode = deploy.getConcurrencyMode();
     this.updateChangesOnly = deploy.isUpdateChangesOnly();
-    this.compoundUniqueConstraints = deploy.getCompoundUniqueConstraints();
+    this.indexDefinitions = deploy.getIndexDefinitions();
 
     this.readAuditing = deploy.isReadAuditing();
     this.draftable = deploy.isDraftable();
@@ -2175,8 +2175,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Return the compound unique constraints.
    */
-  public CompoundUniqueConstraint[] getCompoundUniqueConstraints() {
-    return compoundUniqueConstraints;
+  public IndexDefinition[] getIndexDefinitions() {
+    return indexDefinitions;
   }
 
   /**

@@ -10,7 +10,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyCompound;
-import com.avaje.ebeaninternal.server.deploy.CompoundUniqueConstraint;
+import com.avaje.ebeaninternal.server.deploy.IndexDefinition;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.TableJoinColumn;
 import com.avaje.ebeaninternal.server.deploy.id.ImportedId;
@@ -45,30 +45,30 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     this.ctx = ctx;
     this.table = table;
     this.beanDescriptor = beanDescriptor;
-    addCompoundUniqueConstraint(beanDescriptor.getCompoundUniqueConstraints());
+    addIndexes(beanDescriptor.getIndexDefinitions());
   }
 
   /**
    * Add unique constraints defined via JPA UniqueConstraint annotations.
    */
-  private void addCompoundUniqueConstraint(CompoundUniqueConstraint[] constraints) {
+  private void addIndexes(IndexDefinition[] indexes) {
 
-    if (constraints != null) {
-      for (int i = 0; i < constraints.length; i++) {
-        CompoundUniqueConstraint constraint = constraints[i];
-        String[] columns = constraint.getColumns();
+    if (indexes != null) {
+      for (int i = 0; i < indexes.length; i++) {
+        IndexDefinition index = indexes[i];
+        String[] columns = index.getColumns();
         indexSet.add(columns);
 
-        if (constraint.isUnique()) {
-          String uqName = constraint.getName();
+        if (index.isUnique()) {
+          String uqName = index.getName();
           if (uqName == null || uqName.trim().isEmpty()) {
             uqName = determineUniqueConstraintName(columns);
           }
-          table.addCompoundUniqueConstraint(columns, false, uqName);
+          table.addUniqueConstraint(columns, false, uqName);
 
         } else {
           // 'just' an index (not a unique constraint)
-          String idxName = constraint.getName();
+          String idxName = index.getName();
           if (idxName == null || idxName.trim().isEmpty()) {
             idxName = determineIndexName(columns);
           }
@@ -216,7 +216,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
       } else {
         String uqName = determineUniqueConstraintName(p.getName());
-        table.addCompoundUniqueConstraint(modelColumns, true, uqName);
+        table.addUniqueConstraint(modelColumns, true, uqName);
         indexSetAdd(modelColumns);
       }
     }
@@ -258,15 +258,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       }
       col.setCheckConstraint(buildCheckConstraint(p.getDbColumn(), checkConstraintValues));
       col.setCheckConstraintName(determineCheckConstraintName(col.getName()));
-    }
-
-    String indexName = p.getIndexName();
-    if (indexName != null) {
-      // single column non-unique index
-      if (indexName.trim().isEmpty()) {
-        indexName = determineIndexName(col.getName());
-      }
-      ctx.addIndex(indexName, table.getName(), p.getDbColumn());
     }
 
     lastColumn = col;

@@ -3,7 +3,7 @@ package com.avaje.ebeaninternal.server.deploy;
 /**
  * Holds multiple column unique constraints defined for an entity.
  */
-public class CompoundUniqueConstraint {
+public class IndexDefinition {
 
   private final String[] columns;
 
@@ -11,7 +11,16 @@ public class CompoundUniqueConstraint {
 
   private final boolean unique;
 
-  public CompoundUniqueConstraint(String[] columns, String name, boolean unique) {
+  /**
+   * A single column index.
+   */
+  public IndexDefinition(String column, String name, boolean unique) {
+    this.columns = new String[]{column};
+    this.unique = unique;
+    this.name = name;
+  }
+
+  public IndexDefinition(String[] columns, String name, boolean unique) {
     this.columns = columns;
     this.unique = unique;
     this.name = name;
@@ -20,7 +29,7 @@ public class CompoundUniqueConstraint {
   /**
    * Create a unique constraint given the column names.
    */
-  public CompoundUniqueConstraint(String[] columns) {
+  public IndexDefinition(String[] columns) {
     this.columns = columns;
     this.unique = true;
     this.name = null;

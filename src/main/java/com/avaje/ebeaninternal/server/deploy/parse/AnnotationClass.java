@@ -12,7 +12,7 @@ import com.avaje.ebean.annotation.UpdateMode;
 import com.avaje.ebean.annotation.View;
 import com.avaje.ebean.config.TableName;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
-import com.avaje.ebeaninternal.server.deploy.CompoundUniqueConstraint;
+import com.avaje.ebeaninternal.server.deploy.IndexDefinition;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,12 +120,12 @@ public class AnnotationClass extends AnnotationParser {
 
     Index index = cls.getAnnotation(Index.class);
     if (index != null) {
-      descriptor.addCompoundUniqueConstraint(new CompoundUniqueConstraint(index.columnNames(), index.name(), index.unique()));
+      descriptor.addIndex(new IndexDefinition(index.columnNames(), index.name(), index.unique()));
     }
 
     UniqueConstraint uc = cls.getAnnotation(UniqueConstraint.class);
     if (uc != null) {
-      descriptor.addCompoundUniqueConstraint(new CompoundUniqueConstraint(uc.columnNames()));
+      descriptor.addIndex(new IndexDefinition(uc.columnNames()));
     }
 
     View view = cls.getAnnotation(View.class);
@@ -136,7 +136,7 @@ public class AnnotationClass extends AnnotationParser {
     if (table != null) {
       UniqueConstraint[] uniqueConstraints = table.uniqueConstraints();
       for (UniqueConstraint c : uniqueConstraints) {
-        descriptor.addCompoundUniqueConstraint(new CompoundUniqueConstraint(c.columnNames()));
+        descriptor.addIndex(new IndexDefinition(c.columnNames()));
       }
     }
 

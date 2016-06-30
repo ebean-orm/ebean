@@ -22,7 +22,6 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyGetter;
 import com.avaje.ebeaninternal.server.properties.BeanPropertySetter;
 import com.avaje.ebeaninternal.server.type.ScalarType;
-import com.avaje.ebeaninternal.server.type.ScalarTypeEnum;
 import com.avaje.ebeaninternal.server.type.ScalarTypeWrapper;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyOptions;
 
@@ -191,9 +190,6 @@ public class DeployBeanProperty {
   private boolean undirectionalShadow;
 
   private int sortOrder;
-
-  private boolean indexed;
-  private String indexName;
 
   private boolean excludedFromHistory;
 
@@ -847,22 +843,6 @@ public class DeployBeanProperty {
 
   public String toString() {
     return desc.getFullName() + "." + name;
-  }
-
-  public boolean isIndexed() {
-    return indexed;
-  }
-
-  public void setIndexed() {
-    this.indexed = true;
-  }
-
-  public String getIndexName() {
-    return indexName;
-  }
-
-  public void setIndexName(String indexName) {
-    this.indexName = indexName;
   }
 
   public boolean isExcludedFromHistory() {
