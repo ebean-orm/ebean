@@ -839,16 +839,6 @@ public final class DefaultPersister implements Persister {
       this.publish = request.isPublish();
     }
 
-    private SaveManyPropRequest(BeanPropertyAssocMany<?> many, EntityBean parentBean, SpiTransaction t) {
-      this.insertedParent = false;
-      this.many = many;
-      this.parentBean = parentBean;
-      this.transaction = t;
-      this.cascade = true;
-      this.deleteMissingChildren = false;
-      this.publish = false;
-    }
-
     public boolean isSaveIntersection() {
       return transaction.isSaveAssocManyIntersection(many.getIntersectionTableJoin().getTable(), many.getBeanDescriptor().getName());
     }
