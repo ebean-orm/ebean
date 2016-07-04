@@ -1,19 +1,18 @@
 package com.avaje.tests.query.other;
 
-import java.io.File;
-import java.lang.management.ManagementFactory;
-
-import javax.management.MBeanServer;
-
-import org.junit.Ignore;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.Transaction;
+import com.avaje.ebean.QueryEachConsumer;
 import com.avaje.tests.model.basic.EBasic;
 import com.sun.management.HotSpotDiagnosticMXBean;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import javax.management.MBeanServer;
+import java.io.File;
+import java.lang.management.ManagementFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("restriction")
 public class TestFindIterateHeapDump extends BaseTestCase {
@@ -34,24 +33,42 @@ public class TestFindIterateHeapDump extends BaseTestCase {
   @Test
   public void test() {
 
-    EbeanServer server = Ebean.getServer(null);
+    EbeanServer server = Ebean.getDefaultServer();
 
-    Transaction transaction = server.beginTransaction();
-    try {
-      transaction.setBatchMode(true);
-      transaction.setBatchSize(20);
-      for (int i = 0; i < 10000; i++) {
-        EBasic dumbModel = new EBasic();
-        dumbModel.setName("Hello");
-        server.save(dumbModel);
-      }
-      transaction.commit();
-
-    } finally {
-      transaction.end();
-    }    
+//    Transaction transaction = server.beginTransaction();
+//    try {
+//      transaction.setBatchMode(true);
+//      transaction.setBatchSize(20);
+//      for (int i = 0; i < 20000; i++) {
+//        EBasic dumbModel = new EBasic();
+//        dumbModel.setName("Goodbye now");
+//        server.save(dumbModel);
+//      }
+//      transaction.commit();
+//
+//    } finally {
+//      transaction.end();
+//    }
+//
+//    if (true) {
+//      return;
+//    }
 
     // Intentionally not iterating through the iterator to
+
+    final AtomicInteger counter = new AtomicInteger();
+
+    server.find(EBasic.class)
+        .findEach(new QueryEachConsumer<EBasic>() {
+          @Override
+          public void accept(EBasic bean) {
+
+            int count = counter.incrementAndGet();
+            if (count == 1) {
+              dumpHeap("heap-dump13-initial.snapshot", true);
+            }
+          }
+        });
 
     // try {
     // while (iterate.hasNext()) {
@@ -62,7 +79,7 @@ public class TestFindIterateHeapDump extends BaseTestCase {
     // iterate.close();
     // }
 
-    String fileName = "heap-dump6.snapshot";
+    String fileName = "heap-dump13.snapshot";
 
     File file = new File(fileName);
     if (file.exists())

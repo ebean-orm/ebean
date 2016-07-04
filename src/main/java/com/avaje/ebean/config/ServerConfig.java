@@ -164,6 +164,17 @@ public class ServerConfig {
   private int databaseSequenceBatchSize = 20;
 
   /**
+   * JDBC fetchSize hint when using findList.  Defaults to 0 leaving it up to the JDBC driver.
+   */
+  private int jdbcFetchSizeFindList;
+
+  /**
+   * JDBC fetchSize hint when using findEach/findEachWhile.  Defaults to 100. Note that this does
+   * not apply to MySql as that gets special treatment (forward only etc).
+   */
+  private int jdbcFetchSizeFindEach = 100;
+
+  /**
    * Suffix appended to the base table to derive the view that contains the union
    * of the base table and the history table in order to support asOf queries.
    */
@@ -717,6 +728,34 @@ public class ServerConfig {
    */
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
     this.databaseSequenceBatchSize = databaseSequenceBatchSize;
+  }
+
+  /**
+   * Return the default JDBC fetchSize hint for findList queries.
+   */
+  public int getJdbcFetchSizeFindList() {
+    return jdbcFetchSizeFindList;
+  }
+
+  /**
+   * Set the default JDBC fetchSize hint for findList queries.
+   */
+  public void setJdbcFetchSizeFindList(int jdbcFetchSizeFindList) {
+    this.jdbcFetchSizeFindList = jdbcFetchSizeFindList;
+  }
+
+  /**
+   * Return the default JDBC fetchSize hint for findEach/findEachWhile queries.
+   */
+  public int getJdbcFetchSizeFindEach() {
+    return jdbcFetchSizeFindEach;
+  }
+
+  /**
+   * Set the default JDBC fetchSize hint for findEach/findEachWhile queries.
+   */
+  public void setJdbcFetchSizeFindEach(int jdbcFetchSizeFindEach) {
+    this.jdbcFetchSizeFindEach = jdbcFetchSizeFindEach;
   }
 
   /**
@@ -2405,6 +2444,8 @@ public class ServerConfig {
     asOfSysPeriod = p.get("asOfSysPeriod", asOfSysPeriod);
     historyTableSuffix = p.get("historyTableSuffix", historyTableSuffix);
     dataSourceJndiName = p.get("dataSourceJndiName", dataSourceJndiName);
+    jdbcFetchSizeFindEach = p.getInt("jdbcFetchSizeFindEach", jdbcFetchSizeFindEach);
+    jdbcFetchSizeFindList = p.getInt("jdbcFetchSizeFindList", jdbcFetchSizeFindList);
     databaseSequenceBatchSize = p.getInt("databaseSequenceBatchSize", databaseSequenceBatchSize);
     databaseBooleanTrue = p.get("databaseBooleanTrue", databaseBooleanTrue);
     databaseBooleanFalse = p.get("databaseBooleanFalse", databaseBooleanFalse);

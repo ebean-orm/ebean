@@ -520,4 +520,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   public String getBaseTableAlias() {
     return query.getAlias() == null ? beanDescriptor.getBaseTableAlias() : query.getAlias();
   }
+
+  /**
+   * Set the JDBC buffer fetchSize hint if not set explicitly.
+   */
+  public void setDefaultFetchBuffer(int fetchSize) {
+    query.setDefaultFetchBuffer(fetchSize);
+  }
 }

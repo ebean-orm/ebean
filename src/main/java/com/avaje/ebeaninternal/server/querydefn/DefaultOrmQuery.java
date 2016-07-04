@@ -1367,6 +1367,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public void setDefaultFetchBuffer(int fetchSize) {
+    if (bufferFetchSizeHint == 0) {
+      bufferFetchSizeHint = fetchSize;
+    }
+  }
+
+  @Override
   public Query<T> setBufferFetchSizeHint(int bufferFetchSizeHint) {
     this.bufferFetchSizeHint = bufferFetchSizeHint;
     return this;

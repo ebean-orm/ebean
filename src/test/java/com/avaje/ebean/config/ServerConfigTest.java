@@ -32,12 +32,16 @@ public class ServerConfigTest {
     props.setProperty("persistBatch", "INSERT");
     props.setProperty("persistBatchOnCascade", "INSERT");
     props.setProperty("dbuuid","binary");
+    props.setProperty("jdbcFetchSizeFindEach", "42");
+    props.setProperty("jdbcFetchSizeFindList", "43");
 
     serverConfig.loadFromProperties(props);
 
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatch());
     assertEquals(PersistBatch.INSERT, serverConfig.getPersistBatchOnCascade());
     assertEquals(ServerConfig.DbUuid.BINARY, serverConfig.getDbUuid());
+    assertEquals(42, serverConfig.getJdbcFetchSizeFindEach());
+    assertEquals(43, serverConfig.getJdbcFetchSizeFindList());
 
     serverConfig.setPersistBatch(PersistBatch.NONE);
     serverConfig.setPersistBatchOnCascade(PersistBatch.NONE);

@@ -626,6 +626,11 @@ public interface SpiQuery<T> extends Query<T> {
   void setGeneratedSql(String generatedSql);
 
   /**
+   * Set the JDBC fetchSize buffer hint if not explicitly set.
+   */
+  void setDefaultFetchBuffer(int fetchSize);
+
+  /**
    * Return the hint for Statement.setFetchSize().
    */
   int getBufferFetchSizeHint();

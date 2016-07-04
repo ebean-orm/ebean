@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.query;
 
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebeaninternal.server.core.QueryIterator;
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.Version;
@@ -35,15 +36,22 @@ public class CQueryEngine {
 
   private static final String T0 = "t0";
 
+  private final int defaultFetchSizeFindList;
+
+  private final int defaultFetchSizeFindEach;
+
   private final boolean forwardOnlyHintOnFindIterate;
 
   private final CQueryBuilder queryBuilder;
 
   private final CQueryHistorySupport historySupport;
 
-  public CQueryEngine(DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, String asOfSysPeriod, Map<String, String> draftTableMap) {
+  public CQueryEngine(ServerConfig serverConfig, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
+    this.defaultFetchSizeFindEach = serverConfig.getJdbcFetchSizeFindEach();
+    this.defaultFetchSizeFindList = serverConfig.getJdbcFetchSizeFindList();
     this.forwardOnlyHintOnFindIterate = dbPlatform.isForwardOnlyHintOnFindIterate();
-    this.historySupport = new CQueryHistorySupport(dbPlatform.getHistorySupport(), asOfTableMapping, asOfSysPeriod);
+
+    this.historySupport = new CQueryHistorySupport(dbPlatform.getHistorySupport(), asOfTableMapping, serverConfig.getAsOfSysPeriod());
     this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
   }
 
@@ -91,11 +99,7 @@ public class CQueryEngine {
       BeanIdList list = rcQuery.findIds();
 
       if (request.isLogSql()) {
-        String logSql = rcQuery.getGeneratedSql();
-        if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-          logSql = Str.add(logSql, "; --bind(", rcQuery.getBindLog(), ")");
-        }
-        request.logSql(logSql);
+        logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog());
       }
 
       if (request.isLogSummary()) {
@@ -115,6 +119,14 @@ public class CQueryEngine {
     }
   }
 
+  private <T> void logGeneratedSql(OrmQueryRequest<T> request, String sql, String bindLog) {
+    String logSql = sql;
+    if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
+      logSql = Str.add(logSql, "; --bind(", bindLog, ")");
+    }
+    request.logSql(logSql);
+  }
+
   /**
    * Build and execute the row count query.
    */
@@ -126,11 +138,7 @@ public class CQueryEngine {
       int rowCount = rcQuery.findRowCount();
 
       if (request.isLogSql()) {
-        String logSql = rcQuery.getGeneratedSql();
-        if (TransactionManager.SQL_LOGGER.isTraceEnabled()) {
-          logSql = Str.add(logSql, "; --bind(", rcQuery.getBindLog(), ")");
-        }
-        request.logSql(logSql);
+        logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog());
       }
 
       if (request.isLogSummary()) {
@@ -138,7 +146,6 @@ public class CQueryEngine {
       }
 
       if (request.getQuery().isFutureFetch()) {
-        logger.debug("Future findRowCount completed!");
         request.getTransaction().end();
       }
 
@@ -159,7 +166,9 @@ public class CQueryEngine {
     request.setCancelableQuery(cquery);
 
     try {
-
+      if (defaultFetchSizeFindEach > 0) {
+        request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
+      }
       if (!cquery.prepareBindExecuteQueryForwardOnly(forwardOnlyHintOnFindIterate)) {
         // query has been cancelled already
         logger.trace("Future fetch already cancelled");
@@ -301,6 +310,9 @@ public class CQueryEngine {
     request.setCancelableQuery(cquery);
 
     try {
+      if (defaultFetchSizeFindList > 0) {
+        request.setDefaultFetchBuffer(defaultFetchSizeFindList);
+      }
       if (!cquery.prepareBindExecuteQuery()) {
         // query has been cancelled already
         logger.trace("Future fetch already cancelled");
