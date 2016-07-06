@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * This object is used internally with the enhancement of a method with
  * Transactional annotation.
  * </p>
- * 
+ *
  * @see TxCallable
  * @see TxRunnable
  * @see Ebean#execute(TxScope, TxCallable)
@@ -43,27 +43,6 @@ public final class TxScope {
   ArrayList<Class<? extends Throwable>> rollbackFor;
 
   ArrayList<Class<? extends Throwable>> noRollbackFor;
-
-  /**
-   * Return true if PersistBatch has been set.
-   */
-  public boolean isBatchSet() {
-    return batch != null && batch != PersistBatch.INHERIT;
-  }
-
-  /**
-   * Return true if batch on cascade has been set.
-   */
-  public boolean isBatchOnCascadeSet() {
-    return batchOnCascade != null && batchOnCascade != PersistBatch.INHERIT;
-  }
-
-  /**
-   * Return true if batch size has been set.
-   */
-  public boolean isBatchSizeSet() {
-    return batchSize > 0;
-  }
 
   /**
    * Helper method to create a TxScope with REQUIRES.
@@ -128,6 +107,44 @@ public final class TxScope {
     return "TxScope[" + type + "] readOnly[" + readOnly + "] isolation[" + isolation
         + "] serverName[" + serverName
         + "] rollbackFor[" + rollbackFor + "] noRollbackFor[" + noRollbackFor + "]";
+  }
+
+  /**
+   * Return true if PersistBatch has been set.
+   */
+  public boolean isBatchSet() {
+    return batch != null && batch != PersistBatch.INHERIT;
+  }
+
+  /**
+   * Return true if batch on cascade has been set.
+   */
+  public boolean isBatchOnCascadeSet() {
+    return batchOnCascade != null && batchOnCascade != PersistBatch.INHERIT;
+  }
+
+  /**
+   * Return true if batch size has been set.
+   */
+  public boolean isBatchSizeSet() {
+    return batchSize > 0;
+  }
+
+  /**
+   * Check for batchSize being set without batch mode and use this to imply PersistBatch.ALL.
+   */
+  public void checkBatchMode() {
+    if (batchSize > 0 && notSet(batch) && notSet(batchOnCascade)) {
+      // Use setting the batchSize as implying PersistBatch.ALL for @Transactional
+      batch = PersistBatch.ALL;
+    }
+  }
+
+  /**
+   * Return true if the mode is considered not set.
+   */
+  private boolean notSet(PersistBatch batchMode) {
+    return batchMode == null || batchMode == PersistBatch.INHERIT;
   }
 
   /**

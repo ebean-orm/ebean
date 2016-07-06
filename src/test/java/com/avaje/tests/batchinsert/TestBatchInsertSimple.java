@@ -53,7 +53,7 @@ public class TestBatchInsertSimple extends BaseTestCase {
     saveWithFullBatchMode();
   }
 
-  @Transactional(batch=PersistBatch.ALL, batchSize=50)
+  @Transactional(batchSize=50)
   public void saveWithFullBatchMode() {
 
     int numOfMasters = 4;

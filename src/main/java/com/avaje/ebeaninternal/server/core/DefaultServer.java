@@ -683,6 +683,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (txScope == null) {
       // create a TxScope with default settings
       txScope = new TxScope();
+    } else {
+      // check for implied batch mode via setting batchSize
+      txScope.checkBatchMode();
     }
 
     SpiTransaction suspended = null;
