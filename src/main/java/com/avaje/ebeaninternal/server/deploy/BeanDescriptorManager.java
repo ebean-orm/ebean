@@ -116,7 +116,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final DocStoreFactory docStoreFactory;
 
-  private int enhancedClassCount;
+  private int entityBeanCount;
 
   private final boolean updateChangesOnly;
 
@@ -557,7 +557,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   }
 
   private void logStatus() {
-    logger.info("Entities enhanced[" + enhancedClassCount + "]");
+    logger.debug("Entities[{}]", entityBeanCount);
   }
 
   private <T> BeanDescriptor<T> createEmbedded(Class<T> beanClass) {
@@ -1348,7 +1348,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     checkInheritedClasses(beanClass);
 
     if (!beanClass.getName().startsWith("com.avaje.ebean.meta")) {
-      enhancedClassCount++;
+      entityBeanCount++;
     }
   }
 
