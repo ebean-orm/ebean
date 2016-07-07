@@ -198,9 +198,11 @@ public class ServerConfig {
   private PersistBatch persistBatch = PersistBatch.NONE;
 
   /**
-   * Use for per request batch mode.
+   * Use for cascade persist JDBC batch mode. INHERIT means use the platform default
+   * which is ALL except for SQL Server where it is NONE (as getGeneratedKeys isn't
+   * supported on SQL Server with JDBC batch).
    */
-  private PersistBatch persistBatchOnCascade = PersistBatch.NONE;
+  private PersistBatch persistBatchOnCascade = PersistBatch.INHERIT;
 
   private int persistBatchSize = 20;
 
@@ -2530,13 +2532,14 @@ public class ServerConfig {
   /**
    * Return the PersistBatch mode to use for 'batchOnCascade' taking into account if the database
    * platform supports getGeneratedKeys in batch mode.
-   * <p>
-   * Used to effectively turn off batchOnCascade for SQL Server - still allows explicit batch mode.
-   * </p>
    */
   public PersistBatch appliedPersistBatchOnCascade() {
 
-    return databasePlatform.isDisallowBatchOnCascade() ? PersistBatch.NONE : persistBatchOnCascade;
+    if (persistBatchOnCascade == PersistBatch.INHERIT) {
+      // use the platform default (ALL except SQL Server which has NONE)
+      return databasePlatform.getPersistBatchOnCascade();
+    }
+    return persistBatchOnCascade;
   }
 
   /**

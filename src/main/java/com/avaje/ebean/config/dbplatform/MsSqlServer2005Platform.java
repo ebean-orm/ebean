@@ -1,5 +1,6 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.config.PersistBatch;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.MsSqlServerDdl;
 
 import java.sql.Types;
@@ -21,7 +22,7 @@ public class MsSqlServer2005Platform extends DatabasePlatform {
     this.name = "mssqlserver2005";
     // effectively disable persistBatchOnCascade mode for SQL Server
     // due to lack of support for getGeneratedKeys in batch mode
-    this.disallowBatchOnCascade = true;
+    this.persistBatchOnCascade = PersistBatch.NONE;
     this.idInExpandedForm = true;
     this.selectCountWithAlias = true;
     this.sqlLimiter = new MsSqlServer2005SqlLimiter();

@@ -2,6 +2,7 @@ package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.Query;
+import com.avaje.ebean.config.PersistBatch;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlHandler;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.PlatformDdl;
@@ -155,11 +156,9 @@ public class DatabasePlatform {
   protected boolean forwardOnlyHintOnFindIterate;
 
   /**
-   * Flag set for SQL Server due to lack of support of getGeneratedKeys in
-   * batch mode (meaning for batch inserts you should explicitly turn off
-   * getGeneratedKeys - joy).
+   * By default we use JDBC batch when cascading (except for SQL Server).
    */
-  protected boolean disallowBatchOnCascade;
+  protected PersistBatch persistBatchOnCascade = PersistBatch.ALL;
 
   protected PlatformDdl platformDdl;
 
@@ -542,14 +541,10 @@ public class DatabasePlatform {
   }
 
   /**
-   * Return true if the persistBatchOnCascade setting should be ignored.
-   * <p>
-   * This is primarily for SQL Server which does not support getGeneratedKeys with jdbc batch mode
-   * so can't really be transparently used.
-   * </p>
+   * Return the platform default JDBC batch mode for persist cascade.
    */
-  public boolean isDisallowBatchOnCascade() {
-    return disallowBatchOnCascade;
+  public PersistBatch getPersistBatchOnCascade() {
+    return persistBatchOnCascade;
   }
 
   /**
