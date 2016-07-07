@@ -4,6 +4,7 @@ import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.H2Ddl;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * H2 specific platform.
@@ -19,9 +20,7 @@ public class H2Platform extends DatabasePlatform {
     this.nativeUuidType = true;
     this.dbDefaultValue.setNow("now()");
 
-    // only support getGeneratedKeys with non-batch JDBC
-    // so generally use SEQUENCE instead of IDENTITY for H2
-    this.dbIdentity.setIdType(IdType.SEQUENCE);
+    this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
     this.dbIdentity.setSupportsIdentity(true);
@@ -32,6 +31,15 @@ public class H2Platform extends DatabasePlatform {
 
     // H2 data types match default JDBC types
     // so no changes to dbTypeMap required
+  }
+
+  @Override
+  public void configure(Properties properties) {
+    super.configure(properties);
+    String idType = properties.getProperty("ebean.h2.idtype");
+    if (idType != null) {
+      this.dbIdentity.setIdType(IdType.valueOf(idType));
+    }
   }
 
   /**
