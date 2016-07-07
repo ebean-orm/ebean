@@ -1,18 +1,16 @@
 create table ckey_assoc (
-  id                            integer not null,
+  id                            integer auto_increment not null,
   assoc_one                     varchar(255),
   constraint pk_ckey_assoc primary key (id)
 );
-create sequence ckey_assoc_seq;
 
 create table ckey_detail (
-  id                            integer not null,
+  id                            integer auto_increment not null,
   something                     varchar(255),
   one_key                       integer,
   two_key                       varchar(255),
   constraint pk_ckey_detail primary key (id)
 );
-create sequence ckey_detail_seq;
 
 create table ckey_parent (
   one_key                       integer not null,

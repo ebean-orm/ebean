@@ -1,9 +1,8 @@
 create table mytable (
-  id                            integer not null,
+  id                            integer auto_increment not null,
   status                        varchar(1) not null,
   order_id                      integer not null,
   constraint ck_mytable_status check (status in ('A','B')),
   constraint pk_mytable primary key (id)
 );
-create sequence mytable_seq;
 

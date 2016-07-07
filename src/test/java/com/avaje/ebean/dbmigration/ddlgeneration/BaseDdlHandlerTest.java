@@ -62,7 +62,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     String createTableDDL = Helper.asText(this, "/assert/create-table.txt");
 
     assertThat(write.apply().getBuffer()).isEqualTo(createTableDDL);
-    assertThat(write.dropAll().getBuffer().trim()).isEqualTo("drop table if exists foo;\ndrop sequence if exists foo_seq;");
+    assertThat(write.dropAll().getBuffer().trim()).isEqualTo("drop table if exists foo;");
   }
 
   @Test
