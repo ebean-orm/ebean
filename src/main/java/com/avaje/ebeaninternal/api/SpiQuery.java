@@ -565,6 +565,11 @@ public interface SpiQuery<T> extends Query<T> {
   boolean tuneFetchProperties(OrmQueryDetail detail);
 
   /**
+   * If this is a RawSql based entity set the default RawSql if not set.
+   */
+  void setDefaultRawSqlIfRequired();
+
+  /**
    * Set to true if this query has been tuned by autoTune.
    */
   void setAutoTuned(boolean autoTuned);

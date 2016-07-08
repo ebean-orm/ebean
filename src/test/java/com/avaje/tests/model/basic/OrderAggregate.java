@@ -19,9 +19,11 @@ public class OrderAggregate {
   @OneToOne
   Order order;
 
+  Double maxAmount;
+
   Double totalAmount;
 
-  Double totalItems;
+  Long totalItems;
 
   public String toString() {
     return order.getId() + " totalAmount:" + totalAmount + " totalItems:" + totalItems;
@@ -43,11 +45,19 @@ public class OrderAggregate {
     this.totalAmount = totalAmount;
   }
 
-  public Double getTotalItems() {
+  public Long getTotalItems() {
     return totalItems;
   }
 
-  public void setTotalItems(Double totalItems) {
+  public void setTotalItems(Long totalItems) {
     this.totalItems = totalItems;
+  }
+
+  public Double getMaxAmount() {
+    return maxAmount;
+  }
+
+  public void setMaxAmount(Double maxAmount) {
+    this.maxAmount = maxAmount;
   }
 }

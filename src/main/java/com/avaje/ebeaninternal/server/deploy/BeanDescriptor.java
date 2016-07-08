@@ -109,6 +109,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
 
   private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<String, ElComparator<T>>();
 
+  private final Map<String, RawSql> namedRawSql;
+
   public void merge(EntityBean bean, EntityBean existing) {
 
     EntityBeanIntercept fromEbi = bean._ebean_getIntercept();
@@ -412,6 +414,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.rootBeanType = PersistenceContextUtil.root(beanType);
     this.prototypeEntityBean = createPrototypeEntityBean(beanType);
 
+    this.namedRawSql = deploy.getNamedRawSql();
     this.inheritInfo = deploy.getInheritInfo();
 
     this.beanFinder = deploy.getBeanFinder();
@@ -443,7 +446,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.baseTableVersionsBetween = deploy.getBaseTableVersionsBetween();
     this.dependentTables = deploy.getDependentTables();
     this.dbComment = deploy.getDbComment();
-    this.autoTunable = EntityType.ORM.equals(entityType) && (beanFinder == null);
+    this.autoTunable = EntityType.ORM == entityType && (beanFinder == null);
 
     // helper object used to derive lists of properties
     DeployBeanPropertyLists listHelper = new DeployBeanPropertyLists(owner, this, deploy);
@@ -983,6 +986,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       return inheritInfo.getRoot().desc();
     }
     return this;
+  }
+
+  /**
+   * Return the named RawSql query.
+   */
+  public RawSql getNamedRawSql(String named) {
+    return namedRawSql.get(named);
   }
 
   /**
@@ -2169,7 +2179,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Return true if this is an embedded bean.
    */
   public boolean isEmbedded() {
-    return EntityType.EMBEDDED.equals(entityType);
+    return EntityType.EMBEDDED == entityType;
   }
 
   /**
@@ -2295,15 +2305,10 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   }
 
   /**
-   * Returns true if this bean is based on a table (or possibly view) and
-   * returns false if this bean is based on a raw sql select statement.
-   * <p>
-   * When false querying this bean is based on a supplied sql select statement
-   * placed in the orm xml file (as opposed to Ebean generated sql).
-   * </p>
+   * Returns true if this bean is based on RawSql.
    */
-  public boolean isSqlSelectBased() {
-    return EntityType.SQL.equals(entityType);
+  public boolean isRawSqlBased() {
+    return EntityType.SQL == entityType;
   }
 
   /**

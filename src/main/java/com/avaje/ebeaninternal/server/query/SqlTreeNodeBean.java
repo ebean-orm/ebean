@@ -128,7 +128,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
     // the bean has an Id property and we want to use it
     this.readId = withId && (desc.getIdProperty() != null);
-    this.disableLazyLoad = disableLazyLoad || !readId || desc.isSqlSelectBased() || temporalVersions;
+    this.disableLazyLoad = disableLazyLoad || !readId || desc.isRawSqlBased() || temporalVersions;
 
     this.partialObject = props.isPartialObject();
     this.properties = props.getProps();

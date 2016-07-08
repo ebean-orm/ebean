@@ -14,6 +14,7 @@ import com.avaje.tests.model.basic.OrderAggregate;
 import com.avaje.tests.model.basic.ResetBasicData;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 
 public class TestOrderTotalAmountReportBean extends BaseTestCase {
 
@@ -73,5 +74,61 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
     assertThat(query.getGeneratedSql()).contains("count(*) as total_items, sum(order_qty*unit_price) as total_amount");
   }
 
+  @Test
+  public void testDefaultNamedRawSql() {
 
+    Query<OrderAggregate> query = Ebean.find(OrderAggregate.class);
+    List<OrderAggregate> list = query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("count(*) as total_items, sum(order_qty*unit_price) as total_amount");
+    assertNotNull(list);
+  }
+
+  @Test
+  public void testNamedRawSql() {
+
+    ResetBasicData.reset();
+
+    Query<OrderAggregate> query = Ebean.getDefaultServer().createNamedQuery(OrderAggregate.class, "withMax");
+    List<OrderAggregate> list = query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("count(*) as totalItems, sum(order_qty*unit_price) as totalAmount, max(order_qty*unit_price) as maxAmount from o_order_detail");
+    assertNotNull(list);
+  }
+
+  @Test
+  public void testNamedRawSql_with_extraPredicates() {
+
+    ResetBasicData.reset();
+
+    Query<OrderAggregate> query = Ebean.getDefaultServer().createNamedQuery(OrderAggregate.class, "withMax");
+    List<OrderAggregate> list = query
+        .where().gt("order.id", 1)
+        .having().gt("totalItems", 1)
+        .order().desc("totalAmount")
+        .findList();
+
+    assertThat(query.getGeneratedSql()).contains("count(*) as totalItems, sum(order_qty*unit_price) as totalAmount, max(order_qty*unit_price) as maxAmount from o_order_detail");
+    assertThat(query.getGeneratedSql()).contains("from o_order_detail  where order_id > ?  group by order_id  having count(*) > ?   order by sum(order_qty*unit_price) desc");
+    assertNotNull(list);
+  }
+
+  @Test
+  public void testNamedRawSql_with_param() {
+
+    ResetBasicData.reset();
+
+    Query<OrderAggregate> query = Ebean.getDefaultServer().createNamedQuery(OrderAggregate.class, "withParam");
+    List<OrderAggregate> list = query
+        .setParameter("minId", 2)
+        .where().isNotNull("order.id")
+        .having().lt("totalAmount", 100)
+        .order().desc("totalAmount")
+        .setMaxRows(10)
+        .findList();
+
+    assertThat(query.getGeneratedSql()).contains("count(*) as totalItems, sum(order_qty*unit_price) as totalAmount, max(order_qty*unit_price) as maxAmount from o_order_detail");
+    assertThat(query.getGeneratedSql()).contains("from o_order_detail where id > ?  and order_id is not null  group by order_id  having sum(order_qty*unit_price) < ?   order by sum(order_qty*unit_price) desc");
+    assertNotNull(list);
+  }
 }

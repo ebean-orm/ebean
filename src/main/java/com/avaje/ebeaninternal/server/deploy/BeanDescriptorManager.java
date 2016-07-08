@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.deploy;
 
 import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.Model;
+import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.cache.ServerCacheManager;
@@ -22,10 +23,10 @@ import com.avaje.ebean.plugin.BeanType;
 import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.TransactionEventTable;
-import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.core.InternString;
 import com.avaje.ebeaninternal.server.core.InternalConfiguration;
 import com.avaje.ebeaninternal.server.core.Message;
+import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinderEmbedded;
@@ -47,6 +48,12 @@ import com.avaje.ebeaninternal.server.properties.BeanPropertiesReader;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfo;
 import com.avaje.ebeaninternal.server.properties.BeanPropertyInfoFactory;
 import com.avaje.ebeaninternal.server.properties.EnhanceBeanPropertyInfoFactory;
+import com.avaje.ebeaninternal.xmlmapping.XmlMappingReader;
+import com.avaje.ebeaninternal.xmlmapping.model.XmAliasMapping;
+import com.avaje.ebeaninternal.xmlmapping.model.XmColumnMapping;
+import com.avaje.ebeaninternal.xmlmapping.model.XmEbean;
+import com.avaje.ebeaninternal.xmlmapping.model.XmEntity;
+import com.avaje.ebeaninternal.xmlmapping.model.XmRawSql;
 import com.avaje.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import com.avaje.ebeanservice.docstore.api.DocStoreFactory;
 import org.slf4j.Logger;
@@ -56,12 +63,16 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -124,7 +135,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
   private final String serverName;
 
-  private Map<Class<?>, DeployBeanInfo<?>> deplyInfoMap = new HashMap<Class<?>, DeployBeanInfo<?>>();
+  private Map<Class<?>, DeployBeanInfo<?>> deployInfoMap = new HashMap<Class<?>, DeployBeanInfo<?>>();
 
   private final Map<Class<?>, BeanTable> beanTableMap = new HashMap<Class<?>, BeanTable>();
 
@@ -301,6 +312,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     try {
       createListeners();
       readEntityDeploymentInitial();
+      readXmlMapping();
       readEmbeddedDeployment();
       readEntityBeanTable();
       readEntityDeploymentAssociations();
@@ -319,14 +331,70 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
       logStatus();
 
-      deplyInfoMap.clear();
-      deplyInfoMap = null;
+      deployInfoMap.clear();
+      deployInfoMap = null;
 
       return asOfTableMap;
 
     } catch (RuntimeException e) {
       logger.error("Error in deployment", e);
       throw e;
+    }
+  }
+
+  private void readXmlMapping() {
+
+    try {
+      ClassLoader classLoader = serverConfig.getClassLoadConfig().getClassLoader();
+
+      Enumeration<URL> resources = classLoader.getResources("ebean.xml");
+
+      List<XmEbean> mappings = new ArrayList<XmEbean>();
+      while (resources.hasMoreElements()) {
+        URL url = resources.nextElement();
+        InputStream is = url.openStream();
+        mappings.add(XmlMappingReader.read(is));
+        is.close();
+      }
+
+      for (XmEbean mapping : mappings) {
+        List<XmEntity> entityDeploy = mapping.getEntity();
+        for (XmEntity deploy : entityDeploy) {
+          readEntityMapping(classLoader, deploy);
+        }
+      }
+
+    } catch (IOException e) {
+      throw new RuntimeException("Error reading ebean.xml", e);
+    }
+  }
+
+  private void readEntityMapping(ClassLoader classLoader, XmEntity entityDeploy) {
+
+    String entityClassName = entityDeploy.getClazz();
+    Class<?> entityClass;
+    try {
+      entityClass = Class.forName(entityClassName, false, classLoader);
+    } catch (Exception e) {
+      logger.error("Could not load entity bean class "+entityClassName+" for ebean.xml entry");
+      return;
+    }
+
+    DeployBeanInfo<?> info = deployInfoMap.get(entityClass);
+    if (info == null) {
+      logger.error("No entity bean for ebean.xml entry "+entityClassName);
+
+    } else {
+      for (XmRawSql sql : entityDeploy.getRawSql()) {
+        RawSqlBuilder builder = RawSqlBuilder.parse(sql.getQuery().getValue());
+        for (XmColumnMapping columnMapping : sql.getColumnMapping()) {
+          builder.columnMapping(columnMapping.getColumn(), columnMapping.getProperty());
+        }
+        for (XmAliasMapping aliasMapping : sql.getAliasMapping()) {
+          builder.tableAliasMapping(aliasMapping.getAlias(), aliasMapping.getProperty());
+        }
+        info.addRawSql(sql.getName(), builder.create());
+      }
     }
   }
 
@@ -569,7 +637,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    * Return the bean deploy info for the given class.
    */
   public <T> DeployBeanInfo<T> getDeploy(Class<T> cls) {
-    return (DeployBeanInfo<T>) deplyInfoMap.get(cls);
+    return (DeployBeanInfo<T>) deployInfoMap.get(cls);
   }
 
   private void registerBeanDescriptor(BeanDescriptor<?> desc) {
@@ -601,12 +669,12 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     for (Class<?> entityClass : bootupClasses.getEntities()) {
       DeployBeanInfo<?> info = createDeployBeanInfo(entityClass);
-      deplyInfoMap.put(entityClass, info);
+      deployInfoMap.put(entityClass, info);
     }
     for (Class<?> entityClass : bootupClasses.getEmbeddables()) {
       DeployBeanInfo<?> info = createDeployBeanInfo(entityClass);
       readDeployAssociations(info);
-      deplyInfoMap.put(entityClass, info);
+      deployInfoMap.put(entityClass, info);
     }
   }
 
@@ -618,7 +686,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private void readEntityBeanTable() {
 
-    for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
+    for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       BeanTable beanTable = createBeanTable(info);
       beanTableMap.put(beanTable.getBeanType(), beanTable);
     }
@@ -632,18 +700,18 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
    */
   private void readEntityDeploymentAssociations() {
 
-    for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
+    for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       readDeployAssociations(info);
     }
   }
 
   private void readInheritedIdGenerators() {
 
-    for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
+    for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       DeployBeanDescriptor<?> descriptor = info.getDescriptor();
       InheritInfo inheritInfo = descriptor.getInheritInfo();
       if (inheritInfo != null && !inheritInfo.isRoot()) {
-        DeployBeanInfo<?> rootBeanInfo = deplyInfoMap.get(inheritInfo.getRoot().getType());
+        DeployBeanInfo<?> rootBeanInfo = deployInfoMap.get(inheritInfo.getRoot().getType());
         PlatformIdGenerator rootIdGen = rootBeanInfo.getDescriptor().getIdGenerator();
         if (rootIdGen != null) {
           descriptor.setIdGenerator(rootIdGen);
@@ -668,20 +736,20 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
     // We only perform 'circular' checks etc after we have
     // all the DeployBeanDescriptors created and in the map.
 
-    for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
+    for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       checkMappedBy(info);
     }
 
-    for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
+    for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       secondaryPropsJoins(info);
     }
 
     // Set inheritance info
-    for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
+    for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       setInheritanceInfo(info);
     }
 
-    for (DeployBeanInfo<?> info : deplyInfoMap.values()) {
+    for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       registerBeanDescriptor(new BeanDescriptor(this, info.getDescriptor()));
     }
   }
@@ -695,7 +763,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     for (DeployBeanPropertyAssocOne<?> oneProp : info.getDescriptor().propertiesAssocOne()) {
       if (!oneProp.isTransient()) {
-        DeployBeanInfo<?> assoc = deplyInfoMap.get(oneProp.getTargetType());
+        DeployBeanInfo<?> assoc = deployInfoMap.get(oneProp.getTargetType());
         if (assoc != null) {
           oneProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
         }
@@ -704,7 +772,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
 
     for (DeployBeanPropertyAssocMany<?> manyProp : info.getDescriptor().propertiesAssocMany()) {
       if (!manyProp.isTransient()) {
-        DeployBeanInfo<?> assoc = deplyInfoMap.get(manyProp.getTargetType());
+        DeployBeanInfo<?> assoc = deployInfoMap.get(manyProp.getTargetType());
         if (assoc != null) {
           manyProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
         }
@@ -763,7 +831,7 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
   private DeployBeanDescriptor<?> getTargetDescriptor(DeployBeanPropertyAssoc<?> prop) {
 
     Class<?> targetType = prop.getTargetType();
-    DeployBeanInfo<?> info = deplyInfoMap.get(targetType);
+    DeployBeanInfo<?> info = deployInfoMap.get(targetType);
     if (info == null) {
       String msg = "Can not find descriptor [" + targetType + "] for " + prop.getFullBeanName();
       throw new PersistenceException(msg);

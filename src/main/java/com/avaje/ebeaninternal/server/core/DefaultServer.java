@@ -887,6 +887,21 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return createQuery(beanType);
   }
 
+  @Override
+  public <T> Query<T> createNamedQuery(Class<T> beanType, String namedQuery) {
+    BeanDescriptor<T> desc = getBeanDescriptor(beanType);
+    if (desc == null) {
+      throw new PersistenceException(beanType.getName() + " is NOT an Entity Bean registered with this server?");
+    }
+    RawSql rawSql = desc.getNamedRawSql(namedQuery);
+    if (rawSql != null) {
+      DefaultOrmQuery<T> query = createQuery(beanType);
+      query.setRawSql(rawSql);
+      return query;
+    }
+    throw new PersistenceException("No named query called " + namedQuery + " for bean:" + beanType.getName());
+  }
+
   public <T> DefaultOrmQuery<T> createQuery(Class<T> beanType) {
     BeanDescriptor<T> desc = getBeanDescriptor(beanType);
     if (desc == null) {
@@ -945,6 +960,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private <T> SpiOrmQueryRequest<T> createQueryRequest(SpiQuery<T> query, Transaction t) {
 
+    query.setDefaultRawSqlIfRequired();
     if (query.isAutoTunable() && !autoTuneService.tuneQuery(query)) {
       // use deployment FetchType.LAZY/EAGER annotations
       // to define the 'default' select clause

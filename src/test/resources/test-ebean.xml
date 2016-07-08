@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ebean xmlns="http://ebean-orm.github.io/xml/ns/ebean">
+
+  <entity class="com.avaje.tests.model.basic.OrderAggregate">
+    <raw-sql name="default">
+      <column-mapping column="order_id" property="order.id"/>
+      <query>
+        select order_id, count(*) as totalItems, sum(order_qty*unit_price) as totalAmount
+        from o_order_detail
+        group by order_id
+      </query>
+    </raw-sql>
+    <raw-sql name="default">
+      <column-mapping column="order_id" property="order.id"/>
+      <query>
+        select order_id, count(*) as totalItems, sum(order_qty*unit_price) as totalAmount
+        from o_order_detail
+        group by order_id
+      </query>
+    </raw-sql>
+  </entity>
+
+</ebean>

@@ -38,6 +38,8 @@ import java.util.Set;
  */
 public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
+  public static final String DEFAULT_QUERY_NAME = "default";
+
   private final Class<T> beanType;
 
   private final BeanDescriptor<T> beanDescriptor;
@@ -697,6 +699,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public boolean isForUpdate() {
     return forUpdate;
+  }
+
+  @Override
+  public void setDefaultRawSqlIfRequired() {
+    if (beanDescriptor.isRawSqlBased() && rawSql == null) {
+      rawSql = beanDescriptor.getNamedRawSql(DEFAULT_QUERY_NAME);
+    }
   }
 
   @Override

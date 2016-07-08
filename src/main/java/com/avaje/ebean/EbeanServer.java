@@ -200,6 +200,19 @@ public interface EbeanServer {
   <T> UpdateQuery<T> update(Class<T> beanType);
 
   /**
+   * Create a named query.
+   * <p>
+   * For RawSql the named query is expected to be in ebean.xml.
+   * </p>
+   *
+   * @param beanType   The type of entity bean
+   * @param namedQuery The name of the query
+   * @param <T>        The type of entity bean
+   * @return The query
+   */
+  <T> Query<T> createNamedQuery(Class<T> beanType, String namedQuery);
+
+  /**
    * Create a query for an entity bean and synonym for {@link #find(Class)}.
    *
    * @see #find(Class)

@@ -1,11 +1,12 @@
 package com.avaje.ebeaninternal.server.deploy.parse;
 
-import java.util.HashMap;
-
+import com.avaje.ebean.RawSql;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import com.avaje.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import com.avaje.ebeaninternal.server.query.SqlJoinType;
+
+import java.util.HashMap;
 
 /**
  * Wraps information about a bean during deployment parsing.
@@ -75,4 +76,10 @@ public class DeployBeanInfo<T> {
 		tableJoin.setType(outerJoin ? SqlJoinType.OUTER : SqlJoinType.INNER);
 	}
 
+  /**
+   * Add named RawSql from ebean.xml.
+   */
+	public void addRawSql(String name, RawSql rawSql) {
+		descriptor.addRawSql(name, rawSql);
+	}
 }

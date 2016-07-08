@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.deploy.meta;
 
+import com.avaje.ebean.RawSql;
 import com.avaje.ebean.annotation.Cache;
 import com.avaje.ebean.annotation.DocStore;
 import com.avaje.ebean.annotation.DocStoreMode;
@@ -35,13 +36,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Describes Beans including their deployment information.
  */
 public class DeployBeanDescriptor<T> {
+
+  private static final Map<String, RawSql> EMPTY_RAW_MAP = new HashMap<String, RawSql>();
 
   private static class PropOrder implements Comparator<DeployBeanProperty> {
 
@@ -65,6 +70,8 @@ public class DeployBeanDescriptor<T> {
    * Map of BeanProperty Linked so as to preserve order.
    */
   private LinkedHashMap<String, DeployBeanProperty> propMap = new LinkedHashMap<String, DeployBeanProperty>();
+
+  private Map<String, RawSql> namedRawSql;
 
   private EntityType entityType;
 
@@ -1046,5 +1053,22 @@ public class DeployBeanDescriptor<T> {
     if (mostSpecific != DocStoreMode.DEFAULT) return mostSpecific;
     if (docStorePersist != DocStoreMode.DEFAULT) return docStorePersist;
     return serverConfig.getDocStoreConfig().getPersist();
+  }
+
+  /**
+   * Return the named RawSql queries.
+   */
+  public Map<String, RawSql> getNamedRawSql() {
+    return (namedRawSql != null) ? namedRawSql : EMPTY_RAW_MAP;
+  }
+
+  /**
+   * Add a named RawSql from ebean.xml file.
+   */
+  public void addRawSql(String name, RawSql rawSql) {
+    if (namedRawSql == null) {
+      namedRawSql = new HashMap<String, RawSql>();
+    }
+    namedRawSql.put(name, rawSql);
   }
 }

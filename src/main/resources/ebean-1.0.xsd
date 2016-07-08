@@ -1,0 +1,59 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://ebean-orm.github.io/xml/ns/ebean"
+            targetNamespace="http://ebean-orm.github.io/xml/ns/ebean" elementFormDefault="qualified">
+
+  <!-- Root level type : extra-ddl -->
+
+  <xsd:element name="ebean">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="entity" minOccurs="1" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="entity">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="raw-sql" minOccurs="1" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="class" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="raw-sql">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="alias-mapping" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="column-mapping" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="query" minOccurs="1" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="alias-mapping">
+    <xsd:complexType>
+      <xsd:attribute name="alias" type="xsd:string" use="required"/>
+      <xsd:attribute name="property" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="column-mapping">
+    <xsd:complexType>
+      <xsd:attribute name="column" type="xsd:string" use="required"/>
+      <xsd:attribute name="property" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="query">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+          <!--<xsd:attribute name="class" type="xsd:string" use="required"/>-->
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+
+</xsd:schema>

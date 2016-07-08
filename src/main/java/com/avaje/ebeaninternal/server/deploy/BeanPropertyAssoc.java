@@ -322,7 +322,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
     BeanProperty idProp = target.getIdProperty();
     BeanProperty[] others = target.propertiesBaseScalar();
 
-    if (descriptor.isSqlSelectBased()) {
+    if (descriptor.isRawSqlBased()) {
       String dbColumn = owner.getDbColumn();
       return new ImportedIdSimple(owner, dbColumn, idProp, 0);
     }
