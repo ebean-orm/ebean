@@ -6,41 +6,41 @@ import java.util.Arrays;
 import com.avaje.ebean.config.CompoundType;
 import com.avaje.ebean.config.CompoundTypeProperty;
 
-@SuppressWarnings({ "rawtypes" })
+@SuppressWarnings({"rawtypes"})
 public class ReflectionBasedCompoundType implements CompoundType {
 
-    private final Constructor<?> constructor;
-    
-    private final ReflectionBasedCompoundTypeProperty[] props;
-    
-    public ReflectionBasedCompoundType(Constructor<?> constructor, ReflectionBasedCompoundTypeProperty[] props) {
-        this.constructor = constructor;
-        this.props = props;
-    }
-    
-    public String toString() {
-        return "ReflectionBasedCompoundType "+constructor+" "+Arrays.toString(props);
-    }
-    
-    public Object create(Object[] propertyValues) {
-        
-        try {
-            return constructor.newInstance(propertyValues);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } 
-    }
+  private final Constructor<?> constructor;
 
-    public CompoundTypeProperty[] getProperties() {
-        return props;
-    }
+  private final ReflectionBasedCompoundTypeProperty[] props;
 
-    public Class<?> getPropertyType(int i){
-        return props[i].getPropertyType();
+  public ReflectionBasedCompoundType(Constructor<?> constructor, ReflectionBasedCompoundTypeProperty[] props) {
+    this.constructor = constructor;
+    this.props = props;
+  }
+
+  public String toString() {
+    return "ReflectionBasedCompoundType " + constructor + " " + Arrays.toString(props);
+  }
+
+  public Object create(Object[] propertyValues) {
+
+    try {
+      return constructor.newInstance(propertyValues);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
-    
-    public Class<?> getCompoundType() {
-        return constructor.getDeclaringClass();
-    }
-    
+  }
+
+  public CompoundTypeProperty[] getProperties() {
+    return props;
+  }
+
+  public Class<?> getPropertyType(int i) {
+    return props[i].getPropertyType();
+  }
+
+  public Class<?> getCompoundType() {
+    return constructor.getDeclaringClass();
+  }
+
 }

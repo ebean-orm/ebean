@@ -1,37 +1,36 @@
 package com.avaje.ebeaninternal.server.type.reflect;
 
 
-
 public class CheckImmutableResponse {
 
-    private boolean immutable = true;
-    
-    private String reasonNotImmutable;
+  private boolean immutable = true;
 
-    private boolean compoundType;
-    
-    public String toString(){
-        if(immutable){
-            return "immutable";
-        } else {
-            return "not immutable due to:"+reasonNotImmutable;
-        }
-    }
+  private String reasonNotImmutable;
 
-    public boolean isCompoundType() {
-        return compoundType;
-    }
+  private boolean compoundType;
 
-    public void setCompoundType(boolean compoundType) {
-        this.compoundType = compoundType;
+  public String toString() {
+    if (immutable) {
+      return "immutable";
+    } else {
+      return "not immutable due to:" + reasonNotImmutable;
     }
+  }
 
-    public void setReasonNotImmutable(String error) {
-        this.immutable = false;
-        this.reasonNotImmutable = error;
-    }
+  public boolean isCompoundType() {
+    return compoundType;
+  }
 
-    public boolean isImmutable() {
-        return immutable;
-    }
+  public void setCompoundType(boolean compoundType) {
+    this.compoundType = compoundType;
+  }
+
+  public void setReasonNotImmutable(String error) {
+    this.immutable = false;
+    this.reasonNotImmutable = error;
+  }
+
+  public boolean isImmutable() {
+    return immutable;
+  }
 }
