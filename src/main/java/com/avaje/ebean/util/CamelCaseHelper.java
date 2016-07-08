@@ -12,9 +12,12 @@ public class CamelCaseHelper {
    */
   public static String toCamelFromUnderscore(String underscore) {
 
-    StringBuilder result = new StringBuilder();
     String[] vals = underscore.split("_");
+    if (vals.length == 1) {
+      return underscore;
+    }
 
+    StringBuilder result = new StringBuilder();
     for (int i = 0; i < vals.length; i++) {
       String lower = vals[i].toLowerCase();
       if (i > 0) {

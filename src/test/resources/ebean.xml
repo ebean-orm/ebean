@@ -4,8 +4,6 @@
   <entity class="com.avaje.tests.model.basic.OrderAggregate">
     <raw-sql name="default">
       <column-mapping column="order_id" property="order.id"/>
-      <column-mapping column="total_items" property="totalItems"/>
-      <column-mapping column="total_amount" property="totalAmount"/>
       <query>
         select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount
         from o_order_detail
@@ -16,7 +14,7 @@
     <raw-sql name="withMax">
       <column-mapping column="order_id" property="order.id"/>
       <query>
-        select order_id, count(*) as totalItems, sum(order_qty*unit_price) as totalAmount, max(order_qty*unit_price) as maxAmount
+        select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount, max(order_qty*unit_price) as maxAmount
         from o_order_detail
         group by order_id
       </query>

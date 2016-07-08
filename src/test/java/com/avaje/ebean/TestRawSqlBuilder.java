@@ -14,6 +14,16 @@ import static org.junit.Assert.assertNull;
 public class TestRawSqlBuilder extends BaseTestCase {
 
   @Test
+  public void testDeriveProperty() {
+    assertThat(RawSql.ColumnMapping.Column.derivePropertyName("item_total", "some_other")).isEqualTo("itemTotal");
+    assertThat(RawSql.ColumnMapping.Column.derivePropertyName(null, "some_other")).isEqualTo("someOther");
+    assertThat(RawSql.ColumnMapping.Column.derivePropertyName(null, "alias.some_other")).isEqualTo("someOther");
+    assertThat(RawSql.ColumnMapping.Column.derivePropertyName(null, "alias.someOther")).isEqualTo("someOther");
+    assertThat(RawSql.ColumnMapping.Column.derivePropertyName(null, "some")).isEqualTo("some");
+    assertThat(RawSql.ColumnMapping.Column.derivePropertyName(null, "someOther")).isEqualTo("someOther");
+  }
+
+  @Test
   public void testSimple() {
 
     RawSqlBuilder r = RawSqlBuilder.parse("select id from t_cust");
@@ -192,9 +202,9 @@ public class TestRawSqlBuilder extends BaseTestCase {
     assertEquals(0, columnMapping.getIndexPosition("id"));
     assertEquals(1, columnMapping.getIndexPosition("status"));
     assertEquals(2, columnMapping.getIndexPosition("budget"));
-    assertEquals(3, columnMapping.getIndexPosition("transaction_sum"));
+    assertEquals(3, columnMapping.getIndexPosition("transactionSum"));
     assertEquals(4, columnMapping.getIndexPosition("balance"));
-    assertEquals(5, columnMapping.getIndexPosition("data_month"));
+    assertEquals(5, columnMapping.getIndexPosition("dataMonth"));
   }
 
   @Test

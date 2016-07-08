@@ -606,9 +606,9 @@ public final class RawSql implements Serializable {
         }
       }
 
-      private static String derivePropertyName(String dbAlias, String dbColumn) {
+      protected static String derivePropertyName(String dbAlias, String dbColumn) {
         if (dbAlias != null) {
-          return dbAlias;
+          return CamelCaseHelper.toCamelFromUnderscore(dbAlias);
         }
         int dotPos = dbColumn.indexOf('.');
         if (dotPos > -1) {

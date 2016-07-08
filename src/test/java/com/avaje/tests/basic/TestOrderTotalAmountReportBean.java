@@ -51,7 +51,7 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
   }
 
   @Test
-  public void test_when_explicitMapping() {
+  public void test_when_aliasInUnderscore() {
 
     ResetBasicData.reset();
 
@@ -62,8 +62,6 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
 
     RawSql rawSql = RawSqlBuilder.parse(sql)
         .columnMapping("order_id", "order.id")
-        .columnMapping("total_items", "totalItems")
-        .columnMapping("total_amount", "totalAmount")
         .create();
 
     Query<OrderAggregate> query = Ebean.find(OrderAggregate.class)
@@ -72,6 +70,28 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
     query.findList();
 
     assertThat(query.getGeneratedSql()).contains("count(*) as total_items, sum(order_qty*unit_price) as total_amount");
+  }
+
+  @Test
+  public void test_when_aliasInCamelCase() {
+
+    ResetBasicData.reset();
+
+    String sql =
+        "select order_id, count(*) as totalItems, sum(order_qty*unit_price) as totalAmount \n" +
+            "from o_order_detail \n" +
+            "group by order_id";
+
+    RawSql rawSql = RawSqlBuilder.parse(sql)
+        .columnMapping("order_id", "order.id")
+        .create();
+
+    Query<OrderAggregate> query = Ebean.find(OrderAggregate.class)
+        .setRawSql(rawSql);
+
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("count(*) as totalItems, sum(order_qty*unit_price) as totalAmount");
   }
 
   @Test
@@ -92,7 +112,7 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
     Query<OrderAggregate> query = Ebean.getDefaultServer().createNamedQuery(OrderAggregate.class, "withMax");
     List<OrderAggregate> list = query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("count(*) as totalItems, sum(order_qty*unit_price) as totalAmount, max(order_qty*unit_price) as maxAmount from o_order_detail");
+    assertThat(query.getGeneratedSql()).contains("count(*) as total_items, sum(order_qty*unit_price) as total_amount, max(order_qty*unit_price) as maxAmount from o_order_detail");
     assertNotNull(list);
   }
 
@@ -108,7 +128,7 @@ public class TestOrderTotalAmountReportBean extends BaseTestCase {
         .order().desc("totalAmount")
         .findList();
 
-    assertThat(query.getGeneratedSql()).contains("count(*) as totalItems, sum(order_qty*unit_price) as totalAmount, max(order_qty*unit_price) as maxAmount from o_order_detail");
+    assertThat(query.getGeneratedSql()).contains("count(*) as total_items, sum(order_qty*unit_price) as total_amount, max(order_qty*unit_price) as maxAmount from o_order_detail");
     assertThat(query.getGeneratedSql()).contains("from o_order_detail  where order_id > ?  group by order_id  having count(*) > ?   order by sum(order_qty*unit_price) desc");
     assertNotNull(list);
   }
