@@ -146,11 +146,10 @@ public class OrmQueryDetailParser {
   }
 
   private void readSelect() {
-    String path = null;
     String props = parser.nextWord();
     if (props.startsWith("(")) {
       props = props.substring(1, props.length() - 1);
-      OrmQueryProperties base = new OrmQueryProperties(path, props);
+      OrmQueryProperties base = new OrmQueryProperties(null, props);
       detail.setBase(base);
       parser.nextWord();
     } else {

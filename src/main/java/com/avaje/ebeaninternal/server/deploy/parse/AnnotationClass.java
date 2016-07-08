@@ -68,13 +68,11 @@ public class AnnotationClass extends AnnotationParser {
     if (override != null) {
       String propertyName = override.name();
       Column column = override.column();
-      if (column != null) {
-        DeployBeanProperty beanProperty = descriptor.getBeanProperty(propertyName);
-        if (beanProperty == null) {
-          logger.error("AttributeOverride property [" + propertyName + "] not found on " + descriptor.getFullName());
-        } else {
-          readColumn(column, beanProperty);
-        }
+      DeployBeanProperty beanProperty = descriptor.getBeanProperty(propertyName);
+      if (beanProperty == null) {
+        logger.error("AttributeOverride property [" + propertyName + "] not found on " + descriptor.getFullName());
+      } else {
+        readColumn(column, beanProperty);
       }
     }
   }

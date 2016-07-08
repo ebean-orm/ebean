@@ -398,7 +398,7 @@ public class StringHelper {
       int additionalSize, int startPos, int endPos) {
 
     if (source == null) {
-      return source;
+      return null;
     }
 
     char match0 = match.charAt(0);

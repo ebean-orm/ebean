@@ -51,14 +51,14 @@ public abstract class DeployParser {
 	 */
 	public abstract Set<String> getIncludes();
 
-    public void setEncrypted(boolean encrytped) {
-        this.encrypted = encrytped;
-    }
+	public void setEncrypted(boolean encrypted) {
+		this.encrypted = encrypted;
+	}
 
 	public String parse(String source) {
 
 		if (source == null) {
-			return source;
+			return null;
 		}
 		
 		pos = -1;

@@ -9,9 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * H2 database trigger used to populate history tables to support the @History feature.
@@ -54,7 +52,6 @@ public class H2HistoryTrigger implements Trigger {
     insertSql.append("insert into ").append(tableName).append(HISTORY_SUFFIX).append(" (");
 
     int count = 0;
-    List<String> columns = new ArrayList<String>();
     while (rs.next()) {
       if (++count > 1) {
         insertSql.append(",");
@@ -66,7 +63,6 @@ public class H2HistoryTrigger implements Trigger {
         this.effectEndPosition = count - 1;
       }
       insertSql.append(columnName);
-      columns.add(columnName);
     }
     insertSql.append(") values (");
     for (int i = 0; i < count; i++) {

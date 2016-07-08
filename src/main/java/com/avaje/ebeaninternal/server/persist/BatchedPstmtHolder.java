@@ -105,7 +105,7 @@ public class BatchedPstmtHolder {
           firstError = ex;
           errorSql = bs.getSql();
         } else {
-          logger.error(null, ex);
+          logger.error("Error executing batched PreparedStatement", ex);
         }
         isError = true;
 
@@ -113,8 +113,7 @@ public class BatchedPstmtHolder {
         try {
           bs.close();
         } catch (SQLException ex) {
-          // error closing PreparedStatement
-          logger.error(null, ex);
+          logger.error("Error closing batched PreparedStatement", ex);
         }
       }
     }

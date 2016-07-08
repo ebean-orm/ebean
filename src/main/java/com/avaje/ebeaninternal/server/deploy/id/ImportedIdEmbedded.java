@@ -144,15 +144,13 @@ public class ImportedIdEmbedded implements ImportedId {
    */
   public BeanProperty findMatchImport(String matchDbColumn) {
 
-    BeanProperty p = null;
     for (int i = 0; i < imported.length; i++) {
-      p = imported[i].findMatchImport(matchDbColumn);
+      BeanProperty p = imported[i].findMatchImport(matchDbColumn);
       if (p != null) {
         return p;
       }
     }
-
-    return p;
+    return null;
   }
 
 }
