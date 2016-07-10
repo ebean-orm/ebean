@@ -433,15 +433,14 @@ public class SqlTreeNodeBean implements SqlTreeNode {
 
   public void appendWhere(DbSqlContext ctx) {
 
-    // Only apply inheritance to root node as any join will alreay have the inheritance join include - see TableJoin
+    // Only apply inheritance to root node as any join will already have the inheritance join include - see TableJoin
     if (inheritInfo != null && nodeBeanProp == null) {
       if (!inheritInfo.isRoot()) {
-        // restrict to this type and
-        // sub types of this type.
+        // restrict to this type and sub types of this type.
         if (ctx.length() > 0) {
           ctx.append(" and");
         }
-        ctx.append(" ").append(ctx.getTableAlias(prefix)).append(".");// tableAlias
+        ctx.append(" ").append(ctx.getTableAlias(prefix)).append(".");
         ctx.append(inheritInfo.getWhere()).append(" ");
       }
     }
