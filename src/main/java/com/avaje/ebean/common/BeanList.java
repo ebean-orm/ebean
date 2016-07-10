@@ -102,7 +102,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   private void initClear() {
     synchronized (this) {
       if (list == null) {
-        if (modifyListening) {
+        if (!disableLazyLoad && modifyListening) {
           lazyLoadCollection(true);
         } else {
           list = new ArrayList<E>();
@@ -114,7 +114,11 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   private void init() {
     synchronized (this) {
       if (list == null) {
-        lazyLoadCollection(false);
+        if (disableLazyLoad) {
+          list = new ArrayList<E>();
+        } else {
+          lazyLoadCollection(false);
+        }
       }
     }
   }

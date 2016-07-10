@@ -303,7 +303,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     if (!lazyLoadMany && localBean != null) {
       ctx.setCurrentPrefix(prefix, pathMap);
       if (readId && !temporalVersions) {
-        createListProxies(localDesc, ctx, localBean);
+        createListProxies(localDesc, ctx, localBean, disableLazyLoad);
       }
       if (temporalMode == SpiQuery.TemporalMode.DRAFT) {
         localDesc.setDraft(localBean);
@@ -360,7 +360,7 @@ public class SqlTreeNodeBean implements SqlTreeNode {
    * Create lazy loading proxies for the Many's except for the one that is
    * included in the actual query.
    */
-  private void createListProxies(BeanDescriptor<?> localDesc, DbReadContext ctx, EntityBean localBean) {
+  private void createListProxies(BeanDescriptor<?> localDesc, DbReadContext ctx, EntityBean localBean, boolean disableLazyLoad) {
 
     BeanPropertyAssocMany<?> fetchedMany = ctx.getManyProperty();
 
@@ -371,8 +371,12 @@ public class SqlTreeNodeBean implements SqlTreeNode {
       if (fetchedMany == null || !fetchedMany.equals(manys[i])) {
         // create a proxy for the many (deferred fetching)
         BeanCollection<?> ref = manys[i].createReferenceIfNull(localBean);
-        if (ref != null && !ref.isRegisteredWithLoadContext()) {
-          ctx.register(manys[i].getName(), ref);
+        if (ref != null) {
+          if (disableLazyLoad) {
+            ref.setDisableLazyLoad(true);
+          } else if (!ref.isRegisteredWithLoadContext()) {
+            ctx.register(manys[i].getName(), ref);
+          }
         }
       }
     }

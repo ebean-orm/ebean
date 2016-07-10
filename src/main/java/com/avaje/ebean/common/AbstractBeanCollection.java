@@ -20,6 +20,8 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   protected boolean readOnly;
 
+  protected boolean disableLazyLoad;
+
   /**
    * The EbeanServer this is associated with. (used for lazy fetch).
    */
@@ -82,6 +84,11 @@ public abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   public void setFilterMany(ExpressionList<?> filterMany) {
     this.filterMany = filterMany;
+  }
+
+  @Override
+  public void setDisableLazyLoad(boolean disableLazyLoad) {
+    this.disableLazyLoad = disableLazyLoad;
   }
 
   protected void lazyLoadCollection(boolean onlyIds) {

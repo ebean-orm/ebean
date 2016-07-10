@@ -32,6 +32,11 @@ public interface BeanCollection<E> extends Serializable {
   }
 
   /**
+   * Set the disableLazyLoad state.
+   */
+  void setDisableLazyLoad(boolean disableLazyLoad);
+
+  /**
    * Load bean from another collection.
    */
   void loadFrom(BeanCollection<?> other);
