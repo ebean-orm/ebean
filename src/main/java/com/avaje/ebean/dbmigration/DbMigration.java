@@ -205,6 +205,11 @@ public class DbMigration {
     // use this flag to stop other plugins like full DDL generation
     if (!online) {
       DbOffline.setGenerateMigration();
+      if (databasePlatform == null || !platforms.isEmpty()) {
+        // for multiple platform generation set the general platform
+        // to H2 so that it runs offline without DB connection
+        setPlatform(DbPlatformName.H2);
+      }
     }
     setDefaults();
     try {
