@@ -368,14 +368,16 @@ public class DbMigration {
       logger.warn("migration already exists, not generating DDL");
 
     } else {
-      if (databasePlatform != null) {
+      if (!platforms.isEmpty()) {
+        writeExtraPlatformDdl(fullVersion, request.currentModel, dbMigration, request.migrationDir);
+
+      } else if (databasePlatform != null) {
         // writer needs the current model to provide table/column details for
         // history ddl generation (triggers, history tables etc)
         DdlWrite write = new DdlWrite(new MConfiguration(), request.current);
         PlatformDdlWriter writer = createDdlWriter(databasePlatform, "");
         writer.processMigration(dbMigration, write, request.migrationDir, fullVersion);
       }
-      writeExtraPlatformDdl(fullVersion, request.currentModel, dbMigration, request.migrationDir);
     }
   }
 
