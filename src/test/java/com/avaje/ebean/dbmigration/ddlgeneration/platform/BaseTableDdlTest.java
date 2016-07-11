@@ -3,6 +3,7 @@ package com.avaje.ebean.dbmigration.ddlgeneration.platform;
 
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.H2Platform;
+import com.avaje.ebean.config.dbplatform.OraclePlatform;
 import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.ddlgeneration.Helper;
 import com.avaje.ebean.dbmigration.migration.AddTableComment;
@@ -38,6 +39,23 @@ public class BaseTableDdlTest {
     String ddl = write.apply().getBuffer();
     assertThat(ddl).contains("alter table mytab drop constraint ck_mytab_acol");
     assertThat(ddl).contains("alter table mytab add constraint ck_mytab_acol check (acol in ('A','B'))");
+  }
+
+  @Test
+  public void testAddColumn_withTypeConversion() throws IOException {
+
+    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, new OraclePlatform().getPlatformDdl());
+
+    DdlWrite write = new DdlWrite();
+
+    Column column = new Column();
+    column.setName("col_name");
+    column.setType("varchar(20)");
+
+    ddlGen.alterTableAddColumn(write.apply(), "mytable", column, false);
+
+    String ddl = write.apply().getBuffer();
+    assertThat(ddl).contains("alter table mytable add column col_name varchar2(20)");
   }
 
   @Test

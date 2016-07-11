@@ -831,9 +831,10 @@ public class BaseTableDdl implements TableDdl {
 
   protected void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable) throws IOException {
 
+    String convertedType = platformDdl.convert(column.getType(), false);
     buffer.append("alter table ").append(tableName)
         .append(" add column ").append(column.getName())
-        .append(" ").append(column.getType());
+        .append(" ").append(convertedType);
 
     if (!onHistoryTable) {
       if (isTrue(column.isNotnull())) {
