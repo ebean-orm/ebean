@@ -122,22 +122,20 @@ public class DefaultContainer implements SpiContainer {
 
       // generate and run DDL if required
       // if there are any other tasks requiring action in their plugins, do them as well
-      if (!DbOffline.isRunningMigration()) {
+      if (!DbOffline.isGenerateMigration()) {
         server.executePlugins(online);
-      }
 
-      // initialise prior to registering with clusterManager
-      server.initialise();
-
-      if (online) {
-        if (clusterManager.isClustering()) {
-          // register the server once it has been created
-          clusterManager.registerServer(server);
+        // initialise prior to registering with clusterManager
+        server.initialise();
+        if (online) {
+          if (clusterManager.isClustering()) {
+            // register the server once it has been created
+            clusterManager.registerServer(server);
+          }
         }
+        // start any services after registering with clusterManager
+        server.start();
       }
-
-      // start any services after registering with clusterManager
-      server.start();
       DbOffline.reset();
       return server;
     }
@@ -244,7 +242,7 @@ public class DefaultContainer implements SpiContainer {
     if (dbPlatform == null) {
       DatabasePlatformFactory factory = new DatabasePlatformFactory();
       DatabasePlatform db = factory.create(config);
-      db.configure(config.getProperties());
+      db.configure(config);
       config.setDatabasePlatform(db);
       logger.info("DatabasePlatform name:" + config.getName() + " platform:" + db.getName());
     }

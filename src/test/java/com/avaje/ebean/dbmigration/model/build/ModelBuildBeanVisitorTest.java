@@ -25,7 +25,7 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
     DbConstraintNaming constraintNaming = defaultServer.getServerConfig().getConstraintNaming();
 
     DefaultConstraintMaxLength maxLength = new DefaultConstraintMaxLength(60);
-    ModelBuildContext ctx = new ModelBuildContext(model, constraintNaming, maxLength);
+    ModelBuildContext ctx = new ModelBuildContext(model, constraintNaming, maxLength, true);
 
     ModelBuildBeanVisitor addTable = new ModelBuildBeanVisitor(ctx);
 

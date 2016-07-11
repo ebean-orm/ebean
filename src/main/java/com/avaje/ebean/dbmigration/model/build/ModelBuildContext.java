@@ -29,10 +29,13 @@ public class ModelBuildContext {
 
   private final DbConstraintNaming.MaxLength maxLength;
 
-  public ModelBuildContext(ModelContainer model, DbConstraintNaming naming, DbConstraintNaming.MaxLength maxLength) {
+  private final boolean platformTypes;
+
+  public ModelBuildContext(ModelContainer model, DbConstraintNaming naming, DbConstraintNaming.MaxLength maxLength, boolean platformTypes) {
     this.model = model;
     this.constraintNaming = naming;
     this.maxLength = maxLength;
+    this.platformTypes = platformTypes;
   }
 
   /**
@@ -132,7 +135,7 @@ public class ModelBuildContext {
     }
 
     // can be the logical JSON types (JSON, JSONB, JSONClob, JSONBlob, JSONVarchar)
-    int dbType = p.getDbType();
+    int dbType = p.getDbType(platformTypes);
     if (dbType == 0) {
       throw new RuntimeException("No scalarType defined for " + p.getFullBeanName());
     }

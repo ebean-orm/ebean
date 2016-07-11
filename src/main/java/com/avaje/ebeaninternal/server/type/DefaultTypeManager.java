@@ -11,6 +11,7 @@ import com.avaje.ebean.config.ScalarTypeConverter;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
 import com.avaje.ebean.config.dbplatform.DbType;
+import com.avaje.ebean.dbmigration.DbOffline;
 import com.avaje.ebeaninternal.server.core.bootup.BootupClasses;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutable;
 import com.avaje.ebeaninternal.server.type.reflect.CheckImmutableResponse;
@@ -156,6 +157,8 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
   private final boolean postgres;
 
+  private final boolean offlineMigrationGeneration;
+
   // OPTIONAL ScalarTypes registered if Jackson/JsonNode is in the classpath
 
   /**
@@ -198,6 +201,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
 
     this.extraTypeFactory = new DefaultTypeFactory(config);
     this.postgres = isPostgres(config.getDatabasePlatform());
+    this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
 
     initialiseStandard(jsonDateTime, config);
     initialiseJavaTimeTypes(jsonDateTime, config);
@@ -961,15 +965,13 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
       nativeMap.put(Types.BIT, booleanType);
     }
 
-    boolean nativeUuidType = databasePlatform.isNativeUuidType();
     ServerConfig.DbUuid dbUuid = config.getDbUuid();
 
-    if (nativeUuidType && dbUuid == ServerConfig.DbUuid.AUTO) {
-      // DB has native support for UUID
+    if (offlineMigrationGeneration || (databasePlatform.isNativeUuidType() && dbUuid.useNativeType())) {
       typeMap.put(UUID.class, new ScalarTypeUUIDNative());
     } else {
       // Store UUID as binary(16) or varchar(40)
-      ScalarType<?> uuidType = (ServerConfig.DbUuid.BINARY == dbUuid) ? new ScalarTypeUUIDBinary() : new ScalarTypeUUIDVarchar();
+      ScalarType<?> uuidType = dbUuid.useBinary() ? new ScalarTypeUUIDBinary() : new ScalarTypeUUIDVarchar();
       typeMap.put(UUID.class, uuidType);
     }
 

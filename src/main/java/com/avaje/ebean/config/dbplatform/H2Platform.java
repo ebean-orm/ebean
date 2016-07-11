@@ -1,6 +1,7 @@
 package com.avaje.ebean.config.dbplatform;
 
 import com.avaje.ebean.BackgroundExecutor;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.dbmigration.ddlgeneration.platform.H2Ddl;
 
 import javax.sql.DataSource;
@@ -34,11 +35,14 @@ public class H2Platform extends DatabasePlatform {
   }
 
   @Override
-  public void configure(Properties properties) {
-    super.configure(properties);
-    String idType = properties.getProperty("ebean.h2.idtype");
-    if (idType != null) {
-      this.dbIdentity.setIdType(IdType.valueOf(idType));
+  public void configure(ServerConfig serverConfig) {
+    super.configure(serverConfig);
+    Properties properties = serverConfig.getProperties();
+    if (properties != null) {
+      String idType = properties.getProperty("ebean.h2.idtype");
+      if (idType != null) {
+        this.dbIdentity.setIdType(IdType.valueOf(idType));
+      }
     }
   }
 

@@ -26,6 +26,8 @@ import java.util.List;
  */
 public class PlatformDdl {
 
+  protected final DatabasePlatform platform;
+
   protected PlatformHistoryDdl historyDdl = new NoHistorySupportDdl();
 
   /**
@@ -98,6 +100,7 @@ public class PlatformDdl {
   protected final DbDefaultValue dbDefaultValue;
 
   public PlatformDdl(DatabasePlatform platform) {
+    this.platform = platform;
     this.dbIdentity = platform.getDbIdentity();
     this.dbDefaultValue = platform.getDbDefaultValue();
     this.typeConverter = new PlatformTypeConverter(platform.getDbTypeMap());
@@ -107,6 +110,7 @@ public class PlatformDdl {
    * Set configuration options.
    */
   public void configure(ServerConfig serverConfig) {
+    platform.configure(serverConfig);
     historyDdl.configure(serverConfig, this);
     naming = serverConfig.getConstraintNaming();
   }

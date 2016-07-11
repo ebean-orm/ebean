@@ -152,4 +152,10 @@ public class DbType {
     return sb.toString();
   }
 
+  /**
+   * Create a copy of the type with a new default length.
+   */
+  public DbType withLength(int defaultLength) {
+    return new DbType(name, defaultLength);
+  }
 }

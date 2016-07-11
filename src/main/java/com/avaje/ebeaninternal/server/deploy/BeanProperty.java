@@ -27,6 +27,7 @@ import com.avaje.ebeaninternal.server.type.DataBind;
 import com.avaje.ebeaninternal.server.type.ScalarType;
 import com.avaje.ebeaninternal.server.type.ScalarTypeBoolean;
 import com.avaje.ebeaninternal.server.type.ScalarTypeEnum;
+import com.avaje.ebeaninternal.server.type.ScalarTypeLogicalType;
 import com.avaje.ebeaninternal.util.ValueUtil;
 import com.avaje.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyMapping;
@@ -413,7 +414,7 @@ public class BeanProperty implements ElPropertyValue, Property {
     this.generatedProperty = source.getGeneratedProperty();
     this.getter = source.getter;
     this.setter = source.setter;
-    this.dbType = source.getDbType();
+    this.dbType = source.getDbType(true);
     this.scalarType = source.scalarType;
     this.lob = isLobType(dbType);
     this.propertyType = source.getPropertyType();
@@ -1087,9 +1088,14 @@ public class BeanProperty implements ElPropertyValue, Property {
 
   /**
    * Return the database jdbc data type this is mapped to.
+   *
+   * @param platformTypes Set as false when we want logical platform agnostic types.
    */
-  public int getDbType() {
-    return dbType;
+  public int getDbType(boolean platformTypes) {
+    if (platformTypes || !(scalarType instanceof ScalarTypeLogicalType)) {
+      return dbType;
+    }
+    return ((ScalarTypeLogicalType)scalarType).getLogicalType();
   }
 
   /**

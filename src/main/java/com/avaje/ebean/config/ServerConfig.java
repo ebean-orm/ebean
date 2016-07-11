@@ -320,7 +320,7 @@ public class ServerConfig {
   /**
    * Setting to indicate if UUID should be stored as binary(16) or varchar(40) or native DB type (for H2 and Postgres).
    */
-  private DbUuid dbUuid = DbUuid.AUTO;
+  private DbUuid dbUuid = DbUuid.AUTO_VARCHAR;
 
 
   private List<IdGenerator> idGenerators = new ArrayList<IdGenerator>();
@@ -2615,18 +2615,45 @@ public class ServerConfig {
   public enum DbUuid {
 
     /**
-     * Store using native UUID in H2 and Postgres.
+     * Store using native UUID in H2 and Postgres and otherwise fallback to VARCHAR(40).
      */
-    AUTO,
+    AUTO_VARCHAR(true, false),
 
     /**
-     * Store using DB VARCHAR.
+     * Store using native UUID in H2 and Postgres and otherwise fallback to BINARY(16).
      */
-    VARCHAR,
+    AUTO_BINARY(true, true),
 
     /**
-     * Store using DB BINARY.
+     * Store using DB VARCHAR(40).
      */
-    BINARY
+    VARCHAR(false, false),
+
+    /**
+     * Store using DB BINARY(16).
+     */
+    BINARY(false, true);
+
+    boolean nativeType;
+    boolean binary;
+
+    DbUuid(boolean nativeType, boolean binary) {
+      this.nativeType = nativeType;
+      this.binary = binary;
+    }
+
+    /**
+     * Return true if native UUID type is preferred.
+     */
+    public boolean useNativeType() {
+      return nativeType;
+    }
+
+    /**
+     * Return true if BINARY(16) storage is preferred over VARCHAR(40).
+     */
+    public boolean useBinary() {
+      return binary;
+    }
   }
 }

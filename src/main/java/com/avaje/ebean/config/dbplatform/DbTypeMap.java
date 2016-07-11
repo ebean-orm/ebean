@@ -1,5 +1,7 @@
 package com.avaje.ebean.config.dbplatform;
 
+import com.avaje.ebean.config.ServerConfig;
+
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +11,8 @@ import java.util.Map;
  */
 public class DbTypeMap {
 
+  private static final DbType UUID_NATIVE = new DbType("uuid", false);
+  private static final DbType UUID_PLACEHOLDER = new DbType("uuidPlaceholder");
   private static final DbType JSON_CLOB_PLACEHOLDER = new DbType("jsonClobPlaceholder");
   private static final DbType JSON_BLOB_PLACEHOLDER = new DbType("jsonBlobPlaceholder");
   private static final DbType JSON_VARCHAR_PLACEHOLDER = new DbType("jsonVarcharPlaceholder");
@@ -66,7 +70,7 @@ public class DbTypeMap {
 
   /**
    * Return the DbTypeMap with standard (not platform specific) types.
-   *
+   * <p>
    * This has some extended JSON types (JSON, JSONB, JSONVarchar, JSONClob, JSONBlob).
    * These types get translated to specific database platform types during DDL generation.
    */
@@ -104,8 +108,6 @@ public class DbTypeMap {
     put(Types.BLOB, new DbType("blob"));
     put(Types.CLOB, new DbType("clob"));
 
-    // DB native UUID support (H2 and Postgres)
-    put(DbType.UUID, new DbType("uuid"));
     put(Types.ARRAY, new DbType("array"));
 
     if (logicalTypes) {
@@ -116,6 +118,7 @@ public class DbTypeMap {
       put(DbType.JSONClob, new DbType("jsonclob"));
       put(DbType.JSONBlob, new DbType("jsonblob"));
       put(DbType.JSONVarchar, new DbType("jsonvarchar", 1000));
+      put(DbType.UUID, UUID_NATIVE);
 
     } else {
       put(DbType.JSON, JSON_CLOB_PLACEHOLDER); // Postgres maps this to JSON
@@ -123,6 +126,7 @@ public class DbTypeMap {
       put(DbType.JSONClob, JSON_CLOB_PLACEHOLDER);
       put(DbType.JSONBlob, JSON_BLOB_PLACEHOLDER);
       put(DbType.JSONVarchar, JSON_VARCHAR_PLACEHOLDER);
+      put(DbType.UUID, UUID_PLACEHOLDER);
     }
 
     put(Types.LONGVARBINARY, new DbType("longvarbinary"));
@@ -133,7 +137,6 @@ public class DbTypeMap {
     put(Types.DATE, new DbType("date"));
     put(Types.TIME, new DbType("time"));
     put(Types.TIMESTAMP, new DbType("timestamp"));
-
   }
 
   /**
@@ -190,5 +193,18 @@ public class DbTypeMap {
    */
   public DbType get(int jdbcType) {
     return typeMap.get(jdbcType);
+  }
+
+  /**
+   * Map the UUID appropriately based on native DB support and ServerConfig.DbUuid.
+   */
+  public void config(boolean nativeUuidType, ServerConfig.DbUuid dbUuid) {
+    if (nativeUuidType && dbUuid.useNativeType()) {
+      put(DbType.UUID, UUID_NATIVE);
+    } else if (dbUuid.useBinary()) {
+      put(DbType.UUID, get(Types.BINARY).withLength(16));
+    } else {
+      put(DbType.UUID, get(Types.VARCHAR).withLength(40));
+    }
   }
 }

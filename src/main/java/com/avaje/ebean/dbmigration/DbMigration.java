@@ -204,7 +204,7 @@ public class DbMigration {
 
     // use this flag to stop other plugins like full DDL generation
     if (!online) {
-      DbOffline.setRunningMigration();
+      DbOffline.setGenerateMigration();
     }
     setDefaults();
     try {

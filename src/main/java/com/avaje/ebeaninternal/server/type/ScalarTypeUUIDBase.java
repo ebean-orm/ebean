@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.type;
 
+import com.avaje.ebean.config.dbplatform.DbType;
 import com.avaje.ebeaninternal.server.core.BasicTypeConverter;
 import com.avaje.ebeanservice.docstore.api.mapping.DocPropertyType;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -13,10 +14,15 @@ import java.util.UUID;
 /**
  * Base UUID type for string formatting, json handling etc.
  */
-public abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> {
+public abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> implements ScalarTypeLogicalType {
 
   public ScalarTypeUUIDBase(boolean jdbcNative, int jdbcType) {
     super(UUID.class, jdbcNative, jdbcType);
+  }
+
+  @Override
+  public int getLogicalType() {
+    return DbType.UUID;
   }
 
   @Override

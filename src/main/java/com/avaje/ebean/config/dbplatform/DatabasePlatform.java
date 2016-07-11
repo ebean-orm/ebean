@@ -182,8 +182,11 @@ public class DatabasePlatform {
   public DatabasePlatform() {
   }
 
-  public void configure(Properties properties) {
-    // by default do nothing
+  /**
+   * Configure UUID Storage etc based on ServerConfig settings.
+   */
+  public void configure(ServerConfig serverConfig) {
+    dbTypeMap.config(nativeUuidType, serverConfig.getDbUuid());
   }
 
   /**

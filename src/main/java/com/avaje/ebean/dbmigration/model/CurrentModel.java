@@ -11,7 +11,6 @@ import com.avaje.ebean.dbmigration.model.visitor.VisitAllUsing;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Reads EbeanServer bean descriptors to build the current model.
@@ -24,6 +23,8 @@ public class CurrentModel {
 
   private final DbConstraintNaming.MaxLength maxLength;
 
+  private final boolean platformTypes;
+
   private ModelContainer model;
 
   private ChangeSet changeSet;
@@ -31,32 +32,31 @@ public class CurrentModel {
   private DdlWrite write;
 
   /**
-   * Construct with a given EbeanServer instance.
+   * Construct with a given EbeanServer instance for DDL create all generation, not migration.
    */
   public CurrentModel(SpiEbeanServer server) {
-    this(server, server.getServerConfig().getConstraintNaming());
+    this(server, server.getServerConfig().getConstraintNaming(), true);
   }
 
   /**
    * Construct with a given EbeanServer, platformDdl and constraintNaming convention.
    * <p>
-   *   Note the EbeanServer is just used to read the BeanDescriptors and platformDdl supplies
-   *   the platform specific handling on
+   * Note the EbeanServer is just used to read the BeanDescriptors and platformDdl supplies
+   * the platform specific handling on
    * </p>
    */
   public CurrentModel(SpiEbeanServer server, DbConstraintNaming constraintNaming) {
+    this(server, constraintNaming, false);
+  }
+
+  private CurrentModel(SpiEbeanServer server, DbConstraintNaming constraintNaming, boolean platformTypes) {
     this.server = server;
     this.constraintNaming = constraintNaming;
     this.maxLength = maxLength(server, constraintNaming);
+    this.platformTypes = platformTypes;
   }
 
-  public CurrentModel(SpiEbeanServer server, DbConstraintNaming constraintNaming, int maxConstraintLength) {
-    this.server = server;
-    this.constraintNaming = constraintNaming;
-    this.maxLength = new DefaultConstraintMaxLength(maxConstraintLength);
-  }
-
-  private DbConstraintNaming.MaxLength maxLength(SpiEbeanServer server, DbConstraintNaming naming) {
+  private static DbConstraintNaming.MaxLength maxLength(SpiEbeanServer server, DbConstraintNaming naming) {
 
     if (naming.getMaxLength() != null) {
       return naming.getMaxLength();
@@ -73,7 +73,7 @@ public class CurrentModel {
     if (model == null) {
       model = new ModelContainer();
 
-      ModelBuildContext context = new ModelBuildContext(model, constraintNaming, maxLength);
+      ModelBuildContext context = new ModelBuildContext(model, constraintNaming, maxLength, platformTypes);
       ModelBuildBeanVisitor visitor = new ModelBuildBeanVisitor(context);
       VisitAllUsing visit = new VisitAllUsing(visitor, server);
       visit.visitAllBeans();

@@ -64,12 +64,15 @@ public class PostgresPlatform extends DatabasePlatform {
   }
 
   @Override
-  public void configure(Properties properties) {
-    super.configure(properties);
-    String tsType = properties.getProperty("ebean.postgres.timestamp");
-    if (tsType != null) {
-      // set timestamp type to "timestamp" without time zone
-      dbTypeMap.put(Types.TIMESTAMP, new DbType(tsType));
+  public void configure(ServerConfig serverConfig) {
+    super.configure(serverConfig);
+    Properties properties = serverConfig.getProperties();
+    if (properties != null) {
+      String tsType = properties.getProperty("ebean.postgres.timestamp");
+      if (tsType != null) {
+        // set timestamp type to "timestamp" without time zone
+        dbTypeMap.put(Types.TIMESTAMP, new DbType(tsType));
+      }
     }
   }
 
