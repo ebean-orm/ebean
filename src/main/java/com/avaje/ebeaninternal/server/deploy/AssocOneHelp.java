@@ -46,9 +46,11 @@ abstract class AssocOneHelp {
       return existing;
     }
 
-    Object ref = target.contextRef(pc, ctx.isReadOnly(), id);
-    EntityBeanIntercept ebi = ((EntityBean) ref)._ebean_getIntercept();
-    ctx.register(property.name, ebi);
+    boolean disableLazyLoading = ctx.isDisableLazyLoading();
+    Object ref = target.contextRef(pc, ctx.isReadOnly(), disableLazyLoading, id);
+    if (!disableLazyLoading) {
+      ctx.register(property.name, ((EntityBean) ref)._ebean_getIntercept());
+    }
     return ref;
   }
 

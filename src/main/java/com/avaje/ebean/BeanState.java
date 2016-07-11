@@ -39,6 +39,11 @@ public interface BeanState {
   void setDisableLazyLoad(boolean disableLazyLoading);
 
   /**
+   * Return true if the bean has lazy loading disabled.
+   */
+  boolean isDisableLazyLoad();
+
+  /**
    * Set the loaded state of the property given it's name.
    *
    * <p>

@@ -422,7 +422,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
         // cacheData is the id value, maybe already in persistence context
         Object assocBean = targetDescriptor.contextGet(context, cacheData);
         if (assocBean == null) {
-          assocBean = targetDescriptor.createReference(Boolean.FALSE, cacheData, context);
+          assocBean = targetDescriptor.createReference(Boolean.FALSE, false, cacheData, context);
         }
         setValue(bean, assocBean);
       }

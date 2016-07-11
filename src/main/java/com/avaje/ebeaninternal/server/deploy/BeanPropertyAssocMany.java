@@ -1028,7 +1028,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
       if (isManyToMany()) {
         if (liveBean == null) {
           // add new relationship (Map not allowed here)
-          liveVal.addBean(targetDescriptor.createReference(Boolean.FALSE, id, null));
+          liveVal.addBean(targetDescriptor.createReference(Boolean.FALSE, false, id, null));
         }
 
       } else {

@@ -107,6 +107,8 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
 
   private final SpiQuery<T> query;
 
+  private final boolean disableLazyLoading;
+
   private Map<String, String> currentPathMap;
 
   private String currentPrefix;
@@ -197,6 +199,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
     this.lazyLoadManyProperty = query.getLazyLoadMany();
 
     this.readOnly = request.isReadOnly();
+    this.disableLazyLoading = query.isDisableLazyLoading();
 
     this.objectGraphNode = query.getParentNode();
     this.profilingListener = query.getProfilingListener();
@@ -237,6 +240,11 @@ public class CQuery<T> implements DbReadContext, CancelableQuery {
   @Override
   public boolean isDraftQuery() {
     return query.isAsDraft();
+  }
+
+  @Override
+  public boolean isDisableLazyLoading() {
+    return disableLazyLoading;
   }
 
   public Boolean isReadOnly() {

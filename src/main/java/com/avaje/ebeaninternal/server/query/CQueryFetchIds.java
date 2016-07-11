@@ -197,7 +197,7 @@ public class CQueryFetchIds {
         dataReader = null;
       }
     } catch (SQLException e) {
-      logger.error(null, e);
+      logger.error("Error closing DataReader", e);
     }
     try {
       if (pstmt != null) {
@@ -205,7 +205,7 @@ public class CQueryFetchIds {
         pstmt = null;
       }
     } catch (SQLException e) {
-      logger.error(null, e);
+      logger.error("Error closing PreparedStatement", e);
     }
   }
 
@@ -226,6 +226,11 @@ public class CQueryFetchIds {
 
     public Boolean isReadOnly() {
       return Boolean.FALSE;
+    }
+
+    @Override
+    public boolean isDisableLazyLoading() {
+      return false;
     }
 
     public boolean isRawSql() {

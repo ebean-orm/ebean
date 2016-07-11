@@ -84,4 +84,9 @@ public interface DbReadContext {
    * Return true if the underlying query is a 'asDraft' query.
    */
   boolean isDraftQuery();
+
+  /**
+   * Return true if this request disables lazy loading.
+   */
+  boolean isDisableLazyLoading();
 }

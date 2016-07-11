@@ -53,9 +53,11 @@ class AssocOneHelpRefInherit extends AssocOneHelp {
     }
 
     // for inheritance hierarchy create the correct type for this row...
-    Object ref = desc.contextRef(pc, ctx.isReadOnly(), id);
-    EntityBeanIntercept ebi = ((EntityBean) ref)._ebean_getIntercept();
-    ctx.register(property.name, ebi);
+    boolean disableLazyLoading = ctx.isDisableLazyLoading();
+    Object ref = desc.contextRef(pc, ctx.isReadOnly(), disableLazyLoading, id);
+    if (disableLazyLoading) {
+      ctx.register(property.name, ((EntityBean) ref)._ebean_getIntercept());
+    }
     return ref;
   }
 

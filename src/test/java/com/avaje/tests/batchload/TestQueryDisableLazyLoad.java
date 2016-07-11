@@ -11,6 +11,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TestQueryDisableLazyLoad {
 
@@ -38,5 +39,52 @@ public class TestQueryDisableLazyLoad {
 
     assertThat(loggedSql.get(0)).contains("select t0.id c0, t0.status c1, t0.order_date c2,");
     assertThat(loggedSql.get(0)).contains(" from o_order t0 ");
+  }
+
+  @Test
+  public void onAssocOne() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    List<Order> l0 = Ebean.find(Order.class)
+        .setDisableLazyLoading(true)
+        .order().asc("id")
+        .findList();
+
+    assertThat(l0).isNotEmpty();
+
+    Order order = l0.get(0);
+
+    // normally invokes lazy loading
+    assertNull(order.getCustomer().getStatus());
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(1);
+  }
+
+  @Test
+  public void onAssocOne_when_partial() {
+
+    ResetBasicData.reset();
+
+    LoggedSqlCollector.start();
+
+    List<Order> l0 = Ebean.find(Order.class)
+        .setDisableLazyLoading(true)
+        .fetch("customer","smallnote")
+        .order().asc("id")
+        .findList();
+
+    assertThat(l0).isNotEmpty();
+
+    Order order = l0.get(0);
+
+    // normally invokes lazy loading
+    assertNull(order.getCustomer().getStatus());
+
+    List<String> loggedSql = LoggedSqlCollector.stop();
+    assertThat(loggedSql).hasSize(1);
   }
 }

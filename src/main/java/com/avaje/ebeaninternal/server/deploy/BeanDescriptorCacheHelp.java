@@ -266,7 +266,7 @@ final class BeanDescriptorCacheHelp<T> {
     bc.checkEmptyLazyLoad();
     for (int i = 0; i < idList.size(); i++) {
       Object id = idList.get(i);
-      Object refBean = targetDescriptor.createReference(readOnly, id, persistenceContext);
+      Object refBean = targetDescriptor.createReference(readOnly, false, id, persistenceContext);
       many.add(bc, (EntityBean) refBean);
     }
     return true;

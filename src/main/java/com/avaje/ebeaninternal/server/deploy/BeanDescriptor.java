@@ -1569,9 +1569,9 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
    * Create a reference bean based on the id.
    */
   @SuppressWarnings("unchecked")
-  public T createReference(Boolean readOnly, Object id, PersistenceContext pc) {
+  public T createReference(Boolean readOnly, boolean disableLazyLoad, Object id, PersistenceContext pc) {
 
-    if (cacheSharableBeans && !Boolean.FALSE.equals(readOnly)) {
+    if (cacheSharableBeans && !disableLazyLoad && !Boolean.FALSE.equals(readOnly)) {
       CachedBeanData d = cacheHelp.beanCacheGetData(id);
       if (d != null) {
         Object shareableBean = d.getSharableBean();
@@ -1588,7 +1588,11 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       id = convertSetId(id, eb);
 
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
-      ebi.setBeanLoader(ebeanServer);
+      if (disableLazyLoad) {
+        ebi.setDisableLazyLoad(true);
+      } else {
+        ebi.setBeanLoader(ebeanServer);
+      }
       ebi.setReference(idPropertyIndex);
       if (Boolean.TRUE == readOnly) {
         ebi.setReadOnly(true);
@@ -1760,8 +1764,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   /**
    * Create a reference bean and put it in the persistence context (and return it).
    */
-  public Object contextRef(PersistenceContext pc, Boolean readOnly, Object id) {
-    return createReference(readOnly, id, pc);
+  public Object contextRef(PersistenceContext pc, Boolean readOnly, boolean disableLazyLoad, Object id) {
+    return createReference(readOnly, disableLazyLoad, id, pc);
   }
 
   /**
