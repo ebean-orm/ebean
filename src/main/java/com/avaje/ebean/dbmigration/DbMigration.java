@@ -164,9 +164,6 @@ public class DbMigration {
    * </p>
    */
   public void addPlatform(DbPlatformName platform, String prefix) {
-    if (!prefix.endsWith("-")) {
-      prefix += "-";
-    }
     platforms.add(new Pair(getPlatform(platform), prefix));
   }
 
@@ -215,7 +212,9 @@ public class DbMigration {
     try {
       Request request = createRequest();
 
-      generateExtraDdl(request);
+      if (platforms.isEmpty()) {
+        generateExtraDdl(request.migrationDir, databasePlatform);
+      }
 
       String pendingVersion = generatePendingDrop();
       if (pendingVersion != null) {
@@ -239,15 +238,15 @@ public class DbMigration {
    * migration runner.
    * </p>
    */
-  private void generateExtraDdl(Request request) throws IOException {
+  private void generateExtraDdl(File migrationDir, DatabasePlatform dbPlatform) throws IOException {
 
-    if (databasePlatform != null) {
+    if (dbPlatform != null) {
       ExtraDdl extraDdl = ExtraDdlXmlReader.read("/extra-ddl.xml");
       if (extraDdl != null) {
         List<DdlScript> ddlScript = extraDdl.getDdlScript();
         for (DdlScript script : ddlScript) {
-          if (ExtraDdlXmlReader.matchPlatform(databasePlatform.getName(), script.getPlatforms())) {
-            writeExtraDdl(request, script);
+          if (ExtraDdlXmlReader.matchPlatform(dbPlatform.getName(), script.getPlatforms())) {
+            writeExtraDdl(migrationDir, script);
           }
         }
       }
@@ -257,13 +256,13 @@ public class DbMigration {
   /**
    * Write (or override) the "repeatable" migration script.
    */
-  private void writeExtraDdl(Request request, DdlScript script) throws IOException {
+  private void writeExtraDdl(File migrationDir, DdlScript script) throws IOException {
 
     String fullName = repeatableMigrationName(script.getName());
 
     logger.info("writing repeatable script {}", fullName);
 
-    File file = new File(request.migrationDir, fullName);
+    File file = new File(migrationDir, fullName);
     FileWriter writer = new FileWriter(file);
     writer.write(script.getValue());
     writer.flush();
@@ -433,7 +432,10 @@ public class DbMigration {
     for (Pair pair : platforms) {
       DdlWrite platformBuffer = new DdlWrite(new MConfiguration(), currentModel.read());
       PlatformDdlWriter platformWriter = createDdlWriter(pair);
-      platformWriter.processMigration(dbMigration, platformBuffer, writePath, fullVersion);
+      File subPath = platformWriter.subPath(writePath, pair.prefix);
+      platformWriter.processMigration(dbMigration, platformBuffer, subPath, fullVersion);
+
+      generateExtraDdl(subPath, pair.platform);
     }
   }
 

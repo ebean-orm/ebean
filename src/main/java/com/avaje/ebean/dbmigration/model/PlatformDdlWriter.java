@@ -9,6 +9,8 @@ import com.avaje.ebean.dbmigration.ddlgeneration.DdlWrite;
 import com.avaje.ebean.dbmigration.migration.ChangeSet;
 import com.avaje.ebean.dbmigration.migration.ChangeSetType;
 import com.avaje.ebean.dbmigration.migration.Migration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -20,6 +22,8 @@ import java.util.List;
  * Writes migration changes as platform specific DDL.
  */
 public class PlatformDdlWriter {
+
+  private static final Logger logger = LoggerFactory.getLogger(PlatformDdlWriter.class);
 
   private final ServerConfig serverConfig;
 
@@ -67,7 +71,7 @@ public class PlatformDdlWriter {
   protected void writePlatformDdl(DdlWrite write, File resourcePath, String fullVersion) throws IOException {
 
     if (!write.isApplyEmpty()) {
-      FileWriter applyWriter = createWriter(resourcePath, fullVersion, "", config.getApplySuffix());
+      FileWriter applyWriter = createWriter(resourcePath, fullVersion, config.getApplySuffix());
       try {
         writeApplyDdl(applyWriter, write);
         applyWriter.flush();
@@ -77,26 +81,10 @@ public class PlatformDdlWriter {
     }
   }
 
-  protected FileWriter createWriter(File path, String fullVersion, String subPath, String suffix) throws IOException {
+  protected FileWriter createWriter(File path, String fullVersion, String suffix) throws IOException {
 
-    String fileName = fullVersion;
-    if (!platformPrefix.isEmpty()) {
-      fileName += "-"+platformPrefix;
-    }
-    if (subPath != null && !subPath.isEmpty()) {
-      path = subPath(path, subPath);
-    }
-    fileName += suffix;
-    File applyFile = new File(path,  fileName);
+    File applyFile = new File(path,  fullVersion + suffix);
     return new FileWriter(applyFile);
-  }
-
-  protected File subPath(File path, String suffix) {
-    File subPath = new File(path, suffix);
-    if (!subPath.exists()) {
-      subPath.mkdirs();
-    }
-    return subPath;
   }
 
   /**
@@ -125,6 +113,19 @@ public class PlatformDdlWriter {
    */
   protected DdlHandler handler() {
     return platform.createDdlHandler(serverConfig);
+  }
+
+  /**
+   * Return a sub directory (for multi-platform ddl generation).
+   */
+  public File subPath(File path, String suffix) {
+    File subPath = new File(path, suffix);
+    if (!subPath.exists()) {
+      if (!subPath.mkdirs()) {
+        logger.error("failed to create directories for " + subPath.getAbsolutePath());
+      }
+    }
+    return subPath;
   }
 
 }
