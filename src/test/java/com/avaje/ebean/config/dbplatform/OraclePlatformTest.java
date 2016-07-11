@@ -27,7 +27,7 @@ public class OraclePlatformTest {
     assertThat(ddl.convert("boolean", false)).isEqualTo("number(1) default 0");
     assertThat(ddl.convert("bit", false)).isEqualTo("bit");
     assertThat(ddl.convert("tinyint", false)).isEqualTo("number(3)");
-
+    assertThat(ddl.convert("binary(16)", false)).isEqualTo("raw(16)");
   }
 
   @Test
@@ -51,6 +51,6 @@ public class OraclePlatformTest {
     platform.configure(serverConfig);
 
     DbType dbType = platform.getDbTypeMap().get(DbType.UUID);
-    assertThat(dbType.renderType(0, 0)).isEqualTo("binary(16)");
+    assertThat(dbType.renderType(0, 0)).isEqualTo("raw(16)");
   }
 }
