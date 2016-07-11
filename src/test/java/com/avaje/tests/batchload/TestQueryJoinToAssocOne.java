@@ -94,6 +94,9 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     // normally invokes lazy loading
     orderDetail.getShipQty();
 
+    // normally invokes lazy loading
+    order.getShipments().size();
+
     List<String> loggedSql = LoggedSqlCollector.stop();
     assertThat(loggedSql).hasSize(2);
 
