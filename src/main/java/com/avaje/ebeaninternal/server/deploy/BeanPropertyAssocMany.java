@@ -85,11 +85,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
   private BeanProperty mapKeyProperty;
 
-  /**
-   * Derived list of exported property and matching foreignKey
-   */
-  private ExportedProperty[] exportedProperties;
-
   private String exportedPropertyBindProto = "?";
 
   /**
@@ -692,20 +687,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     for (int i = 0; i < exportedProperties.length; i++) {
       Object embVal = exportedProperties[i].getValue(parent);
       sqlUpd.addParameter(embVal);
-    }
-  }
-
-  private void bindWhereParentId(List<Object> bindValues, Object parentId) {
-
-    if (exportedProperties.length == 1) {
-      bindValues.add(parentId);
-
-    } else {
-      EntityBean parent = (EntityBean) parentId;
-      for (int i = 0; i < exportedProperties.length; i++) {
-        Object embVal = exportedProperties[i].getValue(parent);
-        bindValues.add(embVal);
-      }
     }
   }
 

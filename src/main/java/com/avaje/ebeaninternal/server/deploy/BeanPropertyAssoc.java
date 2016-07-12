@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Abstract base for properties mapped to an associated bean, list, set or map.
@@ -40,6 +41,11 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
   InheritInfo targetInheritInfo;
 
   String targetIdProperty;
+
+  /**
+   * Derived list of exported property and matching foreignKey
+   */
+  protected ExportedProperty[] exportedProperties;
 
   /**
    * Persist settings.
@@ -384,5 +390,19 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty {
         + "]. Could not find the local match for [" + matchColumn + "] "//in table["+searchTable+"]?"
         + " Perhaps an error in a @JoinColumn";
     throw new PersistenceException(msg);
+  }
+
+  protected void bindWhereParentId(List<Object> bindValues, Object parentId) {
+
+    if (exportedProperties.length == 1) {
+      bindValues.add(parentId);
+
+    } else {
+      EntityBean parent = (EntityBean) parentId;
+      for (int i = 0; i < exportedProperties.length; i++) {
+        Object embVal = exportedProperties[i].getValue(parent);
+        bindValues.add(embVal);
+      }
+    }
   }
 }

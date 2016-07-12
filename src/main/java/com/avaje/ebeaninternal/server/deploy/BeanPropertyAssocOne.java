@@ -50,8 +50,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
    */
   protected ImportedId importedId;
 
-  private ExportedProperty[] exportedProperties;
-
   private String deleteByParentIdSql;
   private String deleteByParentIdInSql;
 
@@ -240,45 +238,35 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> {
 
     String rawWhere = deriveWhereParentIdSql(false);
 
+    List<Object> bindValues = new ArrayList<Object>();
+    bindWhereParentId(bindValues, parentId);
+
     EbeanServer server = getBeanDescriptor().getEbeanServer();
     Query<?> q = server.find(getPropertyType())
-        .where().raw(rawWhere).query();
+        .where()
+        .raw(rawWhere, bindValues.toArray())
+        .query();
 
-    bindWhereParendId(q, parentId);
     return server.findIds(q, t);
   }
 
-  private List<Object> findIdsByParentIdList(List<Object> parentIdist, Transaction t) {
+  private List<Object> findIdsByParentIdList(List<Object> parentIdList, Transaction t) {
 
     String rawWhere = deriveWhereParentIdSql(true);
-    String inClause = targetIdBinder.getIdInValueExpr(parentIdist.size());
+    String inClause = targetIdBinder.getIdInValueExpr(parentIdList.size());
 
     String expr = rawWhere + inClause;
 
+    List<Object> bindValues = new ArrayList<Object>();
+    for (int i = 0; i < parentIdList.size(); i++) {
+      bindWhereParentId(bindValues, parentIdList.get(i));
+    }
+
     EbeanServer server = getBeanDescriptor().getEbeanServer();
     Query<?> q = (Query<?>) server.find(getPropertyType())
-        .where().raw(expr);
-
-    for (int i = 0; i < parentIdist.size(); i++) {
-      bindWhereParendId(q, parentIdist.get(i));
-    }
+        .where().raw(expr, bindValues.toArray());
 
     return server.findIds(q, t);
-  }
-
-  private void bindWhereParendId(Query<?> q, Object parentId) {
-
-    if (exportedProperties.length == 1) {
-      q.setParameter(1, parentId);
-
-    } else {
-      int pos = 1;
-      EntityBean parent = (EntityBean) parentId;
-      for (int i = 0; i < exportedProperties.length; i++) {
-        Object embVal = exportedProperties[i].getValue(parent);
-        q.setParameter(pos++, embVal);
-      }
-    }
   }
 
   void addFkey() {
