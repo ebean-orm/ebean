@@ -46,6 +46,9 @@ class EqlAdapterHelper {
       case EQ:
         peekExprList().eq(path, bind(value));
         break;
+      case IEQ:
+        peekExprList().ieq(path, bindString(value));
+        break;
       case NE:
         peekExprList().ne(path, bind(value));
         break;

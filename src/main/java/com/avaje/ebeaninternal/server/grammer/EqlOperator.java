@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.grammer;
 enum EqlOperator {
 
   EQ,
+  IEQ,
   NE,
   LT,
   LTE,

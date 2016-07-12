@@ -19,6 +19,15 @@ public class EqlParserTest {
   }
 
   @Test
+  public void where_ieq() throws Exception {
+
+    Query<Customer> query = parse("where name ieq 'Rob'");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where lower(t0.name) =?");
+  }
+
+  @Test
   public void where_eq2() throws Exception {
 
     Query<Customer> query = parse("where name = 'Rob'");

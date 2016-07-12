@@ -10,6 +10,7 @@ class OperatorMapping {
   public OperatorMapping() {
     map.put("eq", EqlOperator.EQ);
     map.put("=", EqlOperator.EQ);
+    map.put("ieq", EqlOperator.IEQ);
 
     map.put("ne", EqlOperator.NE);
     map.put("<>", EqlOperator.NE);
