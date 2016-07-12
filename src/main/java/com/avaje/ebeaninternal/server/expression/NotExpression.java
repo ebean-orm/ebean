@@ -23,6 +23,11 @@ final class NotExpression implements SpiExpression {
   }
 
   @Override
+  public void simplify() {
+    // do nothing
+  }
+
+  @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
     context.startBoolMustNot();
     exp.writeDocQuery(context);

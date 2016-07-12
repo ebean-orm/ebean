@@ -97,6 +97,16 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     }
   }
 
+  void simplifyEntries() {
+    for (SpiExpression element : list) {
+      element.simplify();
+    }
+  }
+
+  public void simplify() {
+    simplifyEntries();
+  }
+
   /**
    * Write being aware if it is the Top level "text" expressions.
    * <p>

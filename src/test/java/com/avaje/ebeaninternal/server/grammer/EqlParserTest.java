@@ -2,8 +2,8 @@ package com.avaje.ebeaninternal.server.grammer;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
+import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.tests.model.basic.Customer;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,10 +75,27 @@ public class EqlParserTest {
     assertThat(query.getGeneratedSql()).contains("where ((t0.name = ?  or t0.status = ? )  and t0.smallnote is null )");
   }
 
+  @Test
+  public void test_simplifyExpressions() throws Exception {
+
+    Query<Customer> query = parse("where not (name = 'Rob' and status = 'NEW')");
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
+
+    query = parse("where not ((name = 'Rob' and status = 'NEW'))");
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
+
+    query = parse("where not (((name = 'Rob') and (status = 'NEW')))");
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
+  }
+
+
   private Query<Customer> parse(String raw) {
 
     Query<Customer> query = Ebean.find(Customer.class);
-    EqlParser.parse(raw, query);
+    EqlParser.parse(raw, (SpiQuery)query);
     return query;
   }
 

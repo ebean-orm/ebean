@@ -39,9 +39,9 @@ import java.util.Set;
  */
 class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, ExpressionList<T> {
 
-  protected final DefaultExpressionList<T> exprList;
+  protected DefaultExpressionList<T> exprList;
 
-  protected final Junction.Type type;
+  protected Junction.Type type;
 
   JunctionExpression(Junction.Type type, Query<T> query, ExpressionList<T> parent) {
     this.type = type;
@@ -54,6 +54,31 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   JunctionExpression(Junction.Type type, DefaultExpressionList<T> exprList) {
     this.type = type;
     this.exprList = exprList;
+  }
+
+  /**
+   * Simplify nested expressions where possible.
+   * <p>
+   * This is expected to only used after expressions are built via query language parsing.
+   * </p>
+   */
+  public void simplify() {
+    exprList.simplifyEntries();
+
+    List<SpiExpression> list = exprList.list;
+    if (list.size() == 1 && list.get(0) instanceof JunctionExpression) {
+      JunctionExpression nested = (JunctionExpression)list.get(0);
+      if (type == Type.AND && !nested.type.isText()) {
+        // and (and (a, b, c)) -> and (a, b, c)
+        // and (not (a, b, c)) -> not (a, b, c)
+        // and (or  (a, b, c)) -> or  (a, b, c)
+        this.exprList = nested.exprList;
+        this.type = nested.type;
+      } else if (type == Type.NOT && nested.type == Type.AND) {
+        // not (and (a, b, c)) -> not (a, b, c)
+        this.exprList = nested.exprList;
+      }
+    }
   }
 
   public SpiExpression copyForPlanKey() {

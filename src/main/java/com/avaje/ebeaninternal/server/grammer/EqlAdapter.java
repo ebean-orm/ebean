@@ -27,8 +27,8 @@ class EqlAdapter<T> extends EQLBaseListener {
 
   private boolean textMode;
 
-  public EqlAdapter(Query<T> query) {
-    this.query = (SpiQuery<T>)query;
+  public EqlAdapter(SpiQuery<T> query) {
+    this.query = query;
     this.helper = new EqlAdapterHelper(this);
   }
 

@@ -25,6 +25,11 @@ class NestedPathWrapperExpression implements SpiExpression {
   }
 
   @Override
+  public void simplify() {
+    // do nothing
+  }
+
+  @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
     context.startNested(nestedPath);
     delegate.writeDocQuery(context);

@@ -89,6 +89,11 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
   }
 
   @Override
+  public void simplify() {
+    // do nothing
+  }
+
+  @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
     if (!list.isEmpty()) {
       context.startBoolMust();

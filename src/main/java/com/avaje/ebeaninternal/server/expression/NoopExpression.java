@@ -18,6 +18,11 @@ class NoopExpression implements SpiExpression {
   protected static final NoopExpression INSTANCE = new NoopExpression();
 
   @Override
+  public void simplify() {
+    // do nothing
+  }
+
+  @Override
   public SpiExpression copyForPlanKey() {
     return this;
   }

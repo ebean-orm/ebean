@@ -1350,6 +1350,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public void simplifyExpressions() {
+    if (whereExpressions != null) {
+      whereExpressions.simplify();
+    }
+  }
+
+  @Override
   public DefaultOrmQuery<T> having(Expression expression) {
     having().add(expression);
     return this;

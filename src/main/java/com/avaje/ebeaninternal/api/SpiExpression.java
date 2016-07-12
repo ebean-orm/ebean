@@ -13,7 +13,12 @@ import java.io.IOException;
  */
 public interface SpiExpression extends Expression {
 
-  /**
+	/**
+	 * Simplify nested expressions if possible.
+	 */
+	void simplify();
+
+	/**
    * Write the expression as an elastic search expression.
    */
   void writeDocQuery(DocQueryContext context) throws IOException;

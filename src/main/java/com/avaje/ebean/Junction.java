@@ -59,11 +59,11 @@ package com.avaje.ebean;
  *          .and()
  *            .startsWith("name", "r")
  *            .eq("anniversary", onAfter)
- *            .endJunction()
+ *            .endAnd()
  *          .and()
  *            .eq("status", Customer.Status.ACTIVE)
  *            .gt("id", 0)
- *            .endJunction()
+ *            .endAnd()
  *      .order().asc("name");
  *
  * q.findList();
@@ -84,39 +84,41 @@ public interface Junction<T> extends Expression, ExpressionList<T> {
     /**
      * AND group.
      */
-    AND(" and ", ""),
+    AND(" and ", "", false),
 
     /**
      * OR group.
      */
-    OR(" or ", ""),
+    OR(" or ", "", false),
 
     /**
      * NOT group.
      */
-    NOT(" and ", "not "),
+    NOT(" and ", "not ", false),
 
     /**
      * Text search AND group.
      */
-    MUST("must", ""),
+    MUST("must", "", true),
 
     /**
      * Text search NOT group.
      */
-    MUST_NOT("must_not", ""),
+    MUST_NOT("must_not", "", true),
 
     /**
      * Text search OR group.
      */
-    SHOULD("should", "");
+    SHOULD("should", "", true);
 
-    String prefix;
-    String literal;
+    private String prefix;
+    private String literal;
+    private boolean text;
 
-    Type(String literal, String prefix) {
+    Type(String literal, String prefix, boolean text) {
       this.literal = literal;
       this.prefix = prefix;
+      this.text = text;
     }
 
     /**
@@ -132,6 +134,14 @@ public interface Junction<T> extends Expression, ExpressionList<T> {
     public String prefix() {
       return prefix;
     }
+
+    /**
+     * Return true if this is a text type.
+     */
+    public boolean isText() {
+      return text;
+    }
+
   }
 
 }

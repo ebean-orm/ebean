@@ -693,4 +693,8 @@ public interface SpiQuery<T> extends Query<T> {
    */
   OrmUpdateProperties getUpdateProperties();
 
+  /**
+   * Simplify nested expression lists where possible.
+   */
+  void simplifyExpressions();
 }

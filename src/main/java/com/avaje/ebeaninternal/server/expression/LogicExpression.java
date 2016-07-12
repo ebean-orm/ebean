@@ -58,6 +58,11 @@ abstract class LogicExpression implements SpiExpression {
   }
 
   @Override
+  public void simplify() {
+    // do nothing
+  }
+
+  @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
 
     boolean conjunction = joinType.equals(AND);
