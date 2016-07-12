@@ -76,6 +76,18 @@ public class EQLBaseListener implements EQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterFetch_property_set(EQLParser.Fetch_property_setContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFetch_property_set(EQLParser.Fetch_property_setContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterFetch_property_group(EQLParser.Fetch_property_groupContext ctx) { }
 	/**
 	 * {@inheritDoc}

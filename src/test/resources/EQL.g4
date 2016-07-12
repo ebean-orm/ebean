@@ -1,7 +1,7 @@
 grammar EQL;
 
 select_statement
-   : (select_clause)? (fetch_clause)? (where_clause)?
+   : (select_clause)? (fetch_clause)* (where_clause)?
    ;
 
 select_clause
@@ -17,7 +17,11 @@ where_clause
    ;
 
 fetch_path
-   : 'fetch' PATH_VARIABLE '(' fetch_property_group ')'
+   : 'fetch' PATH_VARIABLE fetch_property_set?
+   ;
+
+fetch_property_set
+   : '(' fetch_property_group ')'
    ;
 
 fetch_property_group

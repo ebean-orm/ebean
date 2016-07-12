@@ -185,6 +185,43 @@ public class EqlParserTest {
     assertThat(query.getGeneratedSql()).contains("where  ?  between t0.name and t0.smallnote");
   }
 
+  @Test
+  public void fetch_basic() throws Exception {
+
+    Query<Customer> query = parse("fetch billingAddress");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains(", t1.id c9");
+  }
+
+  @Test
+  public void fetch_withProperty() throws Exception {
+
+    Query<Customer> query = parse("fetch billingAddress (city)");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains(", t1.id c9, t1.city");
+  }
+
+  @Test
+  public void fetch_basic_multiple() throws Exception {
+
+    Query<Customer> query = parse("fetch billingAddress fetch shippingAddress");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains(", t1.city ");
+    assertThat(query.getGeneratedSql()).contains(", t2.city ");
+  }
+
+  @Test
+  public void fetch_basic_multiple_withProperties() throws Exception {
+
+    Query<Customer> query = parse("fetch billingAddress (city) fetch shippingAddress (city)");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains(", t1.id c8, t1.city c9, t2.id c10, t2.city c11");
+  }
+
   private Query<Customer> parse(String raw) {
 
     Query<Customer> query = Ebean.find(Customer.class);

@@ -88,6 +88,28 @@ class EqlAdapter<T> extends EQLBaseListener {
     }
   }
 
+  @Override
+  public void enterFetch_path(EQLParser.Fetch_pathContext ctx) {
+    int childCount = ctx.getChildCount();
+    checkChildren(ctx, 2);
+    String path = child(ctx, 1);
+    if (childCount == 2) {
+      query.fetch(path);
+
+    } else {
+      String fetchProperties = trimParenthesis(ctx.getChild(2).getText());
+      query.fetch(path, fetchProperties);
+    }
+  }
+
+  /**
+   * Trim leading '(' and trailing ')'
+   */
+  private String trimParenthesis(String text) {
+    text = text.substring(1);
+    text = text.substring(0, text.length()-1);
+    return text;
+  }
 
   private String getLeftHandSidePath(ParserRuleContext ctx) {
     TerminalNode pathToken = ctx.getToken(EQLLexer.PATH_VARIABLE, 0);
@@ -128,7 +150,7 @@ class EqlAdapter<T> extends EQLBaseListener {
     int childCount = ctx.getChildCount();
     for (int i = 0; i < childCount; i++) {
       String text = child(ctx, i);
-      if (isInValue(text)) {
+      if (isValue(text)) {
         inValues.add(helper.bind(text));
       }
     }
@@ -139,7 +161,7 @@ class EqlAdapter<T> extends EQLBaseListener {
     return child.getText();
   }
 
-  private boolean isInValue(String text) {
+  private boolean isValue(String text) {
     if (text.length() == 1 && (text.equals("(") || text.equals(")") || text.equals(","))) {
       return false;
     }
