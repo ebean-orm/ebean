@@ -144,10 +144,6 @@ PATH_VARIABLE
    : ('a' .. 'z' | 'A' .. 'Z' | '_') ('a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '.')*
    ;
 
-CHARACTER
-   : '\'' (~ ('\'' | '\\')) '\''
-   ;
-
 BOOLEAN_LITERAL
    : 'true'
    | 'false'
@@ -158,10 +154,6 @@ NUMBER_LITERAL
 
 STRING_LITERAL
    : '\'' ( ~'\'' | '\'\'' )* '\''
-   ;
-
-ESCAPE_CHARACTER
-   : CHARACTER
    ;
 
 WS

@@ -97,6 +97,13 @@ class EqlAdapter<T> extends EQLBaseListener {
   @Override
   public void enterBetween_expression(EQLParser.Between_expressionContext ctx) {
 
+    checkChildren(ctx, 5);
+    String path = getLeftHandSidePath(ctx);
+    EqlOperator op = getOperator(ctx);
+    if (op != EqlOperator.BETWEEN) {
+      throw new IllegalStateException("Expecting BETWEEN operator but got "+op);
+    }
+    helper.addBetween(path, ctx.getChild(2).getText(), ctx.getChild(4).getText());
   }
 
   @Override
@@ -219,6 +226,25 @@ class EqlAdapter<T> extends EQLBaseListener {
   public void exitConditional_factor(EQLParser.Conditional_factorContext ctx) {
     if (ctx.getChildCount() > 1) {
       popJunction();
+    }
+  }
+
+  private EqlOperator getOperator(ParserRuleContext ctx) {
+    // the operator text which may be a variation
+    String operator = ctx.getChild(1).getText();
+    EqlOperator op = operatorMapping.get(operator);
+    if (op == null) {
+      throw new IllegalStateException("No operator found for " + operator);
+    }
+    return op;
+  }
+
+  /**
+   * Check for the minimum number of children.
+   */
+  private void checkChildren(ParserRuleContext ctx, int min) {
+    if (ctx.getChildCount() < min) {
+      throw new IllegalStateException("expecting " + min + " children for comparison? " + ctx);
     }
   }
 

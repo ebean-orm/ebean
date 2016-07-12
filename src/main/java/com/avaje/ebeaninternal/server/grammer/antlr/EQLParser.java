@@ -1,4 +1,4 @@
-// Generated from /home/rob/github/avaje-ebeanorm/src/test/resources/EQL.g4 by ANTLR 4.5.1
+// Generated from /home/rob/github/avaje-ebeanorm/src/test/resources/EQL.g4 by ANTLR 4.5.3
 package com.avaje.ebeaninternal.server.grammer.antlr;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class EQLParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.5.1", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.5.3", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -23,8 +23,8 @@ public class EQLParser extends Parser {
 		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31, 
 		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, T__37=38, 
 		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, T__43=44, INPUT_VARIABLE=45, 
-		PATH_VARIABLE=46, CHARACTER=47, BOOLEAN_LITERAL=48, NUMBER_LITERAL=49, 
-		STRING_LITERAL=50, ESCAPE_CHARACTER=51, WS=52;
+		PATH_VARIABLE=46, BOOLEAN_LITERAL=47, NUMBER_LITERAL=48, STRING_LITERAL=49, 
+		WS=50;
 	public static final int
 		RULE_select_statement = 0, RULE_select_clause = 1, RULE_fetch_clause = 2, 
 		RULE_where_clause = 3, RULE_fetch_path = 4, RULE_fetch_property_group = 5, 
@@ -59,8 +59,8 @@ public class EQLParser extends Parser {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, "INPUT_VARIABLE", 
-		"PATH_VARIABLE", "CHARACTER", "BOOLEAN_LITERAL", "NUMBER_LITERAL", "STRING_LITERAL", 
-		"ESCAPE_CHARACTER", "WS"
+		"PATH_VARIABLE", "BOOLEAN_LITERAL", "NUMBER_LITERAL", "STRING_LITERAL", 
+		"WS"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
@@ -648,6 +648,7 @@ public class EQLParser extends Parser {
 		enterRule(_localctx, 20, RULE_conditional_primary);
 		try {
 			setState(113);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,7,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
@@ -730,6 +731,7 @@ public class EQLParser extends Parser {
 		enterRule(_localctx, 22, RULE_any_expression);
 		try {
 			setState(128);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,8,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
@@ -890,6 +892,7 @@ public class EQLParser extends Parser {
 		int _la;
 		try {
 			setState(149);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,10,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
@@ -1072,6 +1075,7 @@ public class EQLParser extends Parser {
 		enterRule(_localctx, 32, RULE_isNull_expression);
 		try {
 			setState(168);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,11,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
@@ -1127,6 +1131,7 @@ public class EQLParser extends Parser {
 		enterRule(_localctx, 34, RULE_isNotNull_expression);
 		try {
 			setState(178);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,12,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
@@ -1193,6 +1198,7 @@ public class EQLParser extends Parser {
 		enterRule(_localctx, 36, RULE_isEmpty_expression);
 		try {
 			setState(185);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,13,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
@@ -1248,6 +1254,7 @@ public class EQLParser extends Parser {
 		enterRule(_localctx, 38, RULE_isNotEmpty_expression);
 		try {
 			setState(195);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,14,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
@@ -1573,7 +1580,7 @@ public class EQLParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\66\u00da\4\2\t\2"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\64\u00da\4\2\t\2"+
 		"\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13"+
 		"\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
@@ -1590,7 +1597,7 @@ public class EQLParser extends Parser {
 		"\25\3\25\3\25\3\25\3\25\3\25\5\25\u00c6\n\25\3\26\3\26\3\26\3\26\3\27"+
 		"\3\27\3\30\3\30\3\30\3\30\3\31\3\31\3\32\3\32\5\32\u00d6\n\32\3\33\3\33"+
 		"\3\33\2\2\34\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62\64"+
-		"\2\5\3\2\27\36\3\2\37.\3\2\62\64\u00da\2\67\3\2\2\2\4?\3\2\2\2\6D\3\2"+
+		"\2\5\3\2\27\36\3\2\37.\3\2\61\63\u00da\2\67\3\2\2\2\4?\3\2\2\2\6D\3\2"+
 		"\2\2\bF\3\2\2\2\nI\3\2\2\2\fO\3\2\2\2\16W\3\2\2\2\20Y\3\2\2\2\22a\3\2"+
 		"\2\2\24j\3\2\2\2\26s\3\2\2\2\30\u0082\3\2\2\2\32\u0084\3\2\2\2\34\u0097"+
 		"\3\2\2\2\36\u0099\3\2\2\2 \u009f\3\2\2\2\"\u00aa\3\2\2\2$\u00b4\3\2\2"+

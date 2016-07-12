@@ -124,6 +124,15 @@ public class EqlParserTest {
     assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ?, ? )");
   }
 
+  @Test
+  public void where_between() throws Exception {
+
+    Query<Customer> query = parse("where name between 'As' and 'B'");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where t0.name between  ? and ? ");
+  }
+
   private Query<Customer> parse(String raw) {
 
     Query<Customer> query = Ebean.find(Customer.class);

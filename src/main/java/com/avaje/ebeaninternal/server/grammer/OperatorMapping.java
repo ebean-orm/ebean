@@ -40,6 +40,7 @@ class OperatorMapping {
     map.put("iendsWith", EqlOperator.IENDS_WITH);
     map.put("ilike", EqlOperator.ILIKE);
 
+    map.put("between", EqlOperator.BETWEEN);
   }
 
   public EqlOperator get(String key) {

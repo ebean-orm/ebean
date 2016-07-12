@@ -16,6 +16,7 @@ enum EqlOperator {
   ICONTAINS,
   ISTARTS_WITH,
   IENDS_WITH,
-  ILIKE
+  ILIKE,
+  BETWEEN
 
 }

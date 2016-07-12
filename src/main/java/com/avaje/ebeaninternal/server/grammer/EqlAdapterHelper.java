@@ -41,6 +41,10 @@ class EqlAdapterHelper {
     }
   }
 
+  protected void addBetween(String path, String value1, String value2) {
+    peekExprList().between(path, bind(value1), bind(value2));
+  }
+
   @SuppressWarnings("unchecked")
   protected void addIn(String path, List<Object> inValues) {
     peekExprList().in(path, inValues);
