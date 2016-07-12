@@ -133,6 +133,36 @@ public class EqlParserTest {
     assertThat(query.getGeneratedSql()).contains("where t0.name between  ? and ? ");
   }
 
+  @Test
+  public void where_between_withNamedParams() throws Exception {
+
+    Query<Customer> query = parse("where name between :one and :two");
+    query.setParameter("one", "a");
+    query.setParameter("two", "b");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where t0.name between  ? and ? ");
+  }
+
+  @Test
+  public void where_betweenProperty() throws Exception {
+
+    Query<Customer> query = parse("where 'x' between name and smallnote");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where  ?  between t0.name and t0.smallnote");
+  }
+
+  @Test
+  public void where_betweenProperty_withNamed() throws Exception {
+
+    Query<Customer> query = parse("where :some between name and smallnote");
+    query.setParameter("some", "A");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where  ?  between t0.name and t0.smallnote");
+  }
+
   private Query<Customer> parse(String raw) {
 
     Query<Customer> query = Ebean.find(Customer.class);

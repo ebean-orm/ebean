@@ -108,7 +108,13 @@ class EqlAdapter<T> extends EQLBaseListener {
 
   @Override
   public void enterPropertyBetween_expression(EQLParser.PropertyBetween_expressionContext ctx) {
-
+    checkChildren(ctx, 5);
+    String rawValue = ctx.getChild(0).getText();
+    EqlOperator op = getOperator(ctx);
+    if (op != EqlOperator.BETWEEN) {
+      throw new IllegalStateException("Expecting BETWEEN operator but got "+op);
+    }
+    helper.addBetweenProperty(rawValue, ctx.getChild(2).getText(), ctx.getChild(4).getText());
   }
 
   @Override

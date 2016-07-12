@@ -41,6 +41,10 @@ class EqlAdapterHelper {
     }
   }
 
+  protected void addBetweenProperty(String rawValue, String lowProperty, String highProperty) {
+    peekExprList().betweenProperties(lowProperty, highProperty, bind(rawValue));
+  }
+
   protected void addBetween(String path, String value1, String value2) {
     peekExprList().between(path, bind(value1), bind(value2));
   }

@@ -32,11 +32,15 @@ class BetweenPropertyExpression extends NonPrepareExpression {
     return propName;
   }
 
+  private Object val() {
+    return NamedParamHelp.value(value);
+  }
+
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
     context.startBoolMust();
-    context.writeSimple(Op.LT_EQ, lowProperty, value);
-    context.writeSimple(Op.GT_EQ, highProperty, value);
+    context.writeSimple(Op.LT_EQ, lowProperty, val());
+    context.writeSimple(Op.GT_EQ, highProperty, val());
     context.endBool();
   }
 
@@ -72,7 +76,7 @@ class BetweenPropertyExpression extends NonPrepareExpression {
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-    request.addBindValue(value);
+    request.addBindValue(val());
   }
 
   @Override
@@ -89,7 +93,7 @@ class BetweenPropertyExpression extends NonPrepareExpression {
 
   @Override
   public int queryBindHash() {
-    return value.hashCode();
+    return val().hashCode();
   }
 
   @Override
@@ -106,6 +110,6 @@ class BetweenPropertyExpression extends NonPrepareExpression {
   @Override
   public boolean isSameByBind(SpiExpression other) {
     BetweenPropertyExpression that = (BetweenPropertyExpression) other;
-    return value.equals(that.value);
+    return val().equals(that.val());
   }
 }

@@ -14,21 +14,29 @@ class BetweenExpression extends AbstractExpression {
 
   private final Object valueLow;
 
-  BetweenExpression(String propertyName, Object valLo, Object valHigh) {
+  BetweenExpression(String propertyName, Object valueLow, Object valueHigh) {
     super(propertyName);
-    this.valueLow = valLo;
-    this.valueHigh = valHigh;
+    this.valueLow = valueLow;
+    this.valueHigh = valueHigh;
+  }
+
+  private Object low() {
+    return NamedParamHelp.value(valueLow);
+  }
+
+  private Object high() {
+    return NamedParamHelp.value(valueHigh);
   }
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeRange(propName, Op.GT_EQ, valueLow, Op.LT_EQ, valueHigh);
+    context.writeRange(propName, Op.GT_EQ, low(), Op.LT_EQ, high());
   }
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-    request.addBindValue(valueLow);
-    request.addBindValue(valueHigh);
+    request.addBindValue(low());
+    request.addBindValue(high());
   }
 
   @Override
@@ -45,8 +53,8 @@ class BetweenExpression extends AbstractExpression {
 
   @Override
   public int queryBindHash() {
-    int hc = valueLow.hashCode();
-    hc = hc * 31 + valueHigh.hashCode();
+    int hc = low().hashCode();
+    hc = hc * 31 + high().hashCode();
     return hc;
   }
 
@@ -63,7 +71,7 @@ class BetweenExpression extends AbstractExpression {
   @Override
   public boolean isSameByBind(SpiExpression other) {
     BetweenExpression that = (BetweenExpression) other;
-    return valueLow.equals(that.valueLow)
-        && valueHigh.equals(that.valueHigh);
+    return low().equals(that.low())
+        && high().equals(that.high());
   }
 }
