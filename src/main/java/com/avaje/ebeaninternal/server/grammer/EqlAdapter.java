@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.grammer;
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.LikeType;
-import com.avaje.ebean.Query;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.grammer.antlr.EQLBaseListener;
 import com.avaje.ebeaninternal.server.grammer.antlr.EQLLexer;
@@ -12,6 +11,9 @@ import com.avaje.ebeaninternal.server.util.ArrayStack;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class EqlAdapter<T> extends EQLBaseListener {
 
@@ -26,6 +28,10 @@ class EqlAdapter<T> extends EQLBaseListener {
   private ArrayStack<ExpressionList<T>> whereStack;
 
   private boolean textMode;
+
+  private List<Object> inValues;
+
+  private String inPropertyName;
 
   public EqlAdapter(SpiQuery<T> query) {
     this.query = query;
@@ -100,7 +106,25 @@ class EqlAdapter<T> extends EQLBaseListener {
 
   @Override
   public void enterIn_expression(EQLParser.In_expressionContext ctx) {
+    this.inValues = new ArrayList<Object>();
+    this.inPropertyName = getLeftHandSidePath(ctx);
+  }
 
+  @Override
+  public void enterIn_value(EQLParser.In_valueContext ctx) {
+    int childCount = ctx.getChildCount();
+    for (int i = 0; i < childCount; i++) {
+      ParseTree child = ctx.getChild(i);
+      String text = child.getText();
+      if (!text.equals("(") && !text.equals(")")) {
+        inValues.add(helper.bind(text));
+      }
+    }
+  }
+
+  @Override
+  public void exitIn_expression(EQLParser.In_expressionContext ctx) {
+    helper.addIn(inPropertyName, inValues);
   }
 
   @Override

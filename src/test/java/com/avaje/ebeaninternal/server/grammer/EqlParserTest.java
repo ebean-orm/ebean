@@ -6,6 +6,8 @@ import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.tests.model.basic.Customer;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class EqlParserTest {
@@ -91,6 +93,36 @@ public class EqlParserTest {
     assertThat(query.getGeneratedSql()).contains("where not (t0.name = ?  and t0.status = ? )");
   }
 
+
+  @Test
+  public void where_in() throws Exception {
+
+    Query<Customer> query = parse("where name in ('Rob','Jim')");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+  }
+
+  @Test
+  public void where_in_when_namedParams() throws Exception {
+
+    Query<Customer> query = parse("where name in (:one, :two)");
+    query.setParameter("one", "Foo");
+    query.setParameter("two", "Bar");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+  }
+
+  @Test
+  public void where_in_when_namedParamAsList() throws Exception {
+
+    Query<Customer> query = parse("where name in (:names)");
+    query.setParameter("names", Arrays.asList("Baz","Maz","Jim"));
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ?, ? )");
+  }
 
   private Query<Customer> parse(String raw) {
 

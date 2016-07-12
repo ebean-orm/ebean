@@ -4,6 +4,7 @@ import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.LikeType;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 class EqlAdapterHelper {
 
@@ -40,6 +41,10 @@ class EqlAdapterHelper {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  protected void addIn(String path, List<Object> inValues) {
+    peekExprList().in(path, inValues);
+  }
 
   protected void addExpression(String path, EqlOperator op, String value) {
 
@@ -99,7 +104,7 @@ class EqlAdapterHelper {
     peekExprList().add(owner.like(caseInsensitive, likeType, path, bindValue));
   }
 
-  private Object bind(String value) {
+  protected Object bind(String value) {
     ValueType valueType = getValueType(value);
     return getBindValue(valueType, value);
   }
