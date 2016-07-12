@@ -251,6 +251,12 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new DefaultExampleExpression(checkEntityBean(example), caseInsensitive, likeType);
   }
 
+  @Override
+  public Expression like(LikeType likeType, String propertyName, Object value) {
+
+    return new LikeExpression(propertyName, value, true, LikeType.RAW);
+  }
+
   /**
    * Like - property like value where the value contains the SQL wild card
    * characters % (percentage) and _ (underscore).

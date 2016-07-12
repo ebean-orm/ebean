@@ -296,6 +296,8 @@ public interface SpiQuery<T> extends Query<T> {
    */
   void setLoadDescription(String loadMode, String loadDescription);
 
+  SpiNamedParam createNamedParameter(String parameterName);
+
   /**
    * Return the joins required to support predicates on the many properties.
    */

@@ -1,6 +1,7 @@
 package com.avaje.ebeaninternal.server.grammer;
 
 import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.LikeType;
 
 import java.math.BigDecimal;
 
@@ -65,16 +66,16 @@ class EqlAdapterHelper {
         peekExprList().le(path, bind(value));
         break;
       case LIKE:
-        peekExprList().like(path, bindString(value));
+        addLike(LikeType.RAW, path, bind(value));
         break;
       case CONTAINS:
-        peekExprList().contains(path, bindString(value));
+        addLike(LikeType.CONTAINS, path, bind(value));
         break;
       case STARTS_WITH:
-        peekExprList().startsWith(path, bindString(value));
+        addLike(LikeType.STARTS_WITH, path, bind(value));
         break;
       case ENDS_WITH:
-        peekExprList().endsWith(path, bindString(value));
+        addLike(LikeType.ENDS_WITH, path, bind(value));
         break;
       case ILIKE:
         peekExprList().ilike(path, bindString(value));
@@ -92,6 +93,10 @@ class EqlAdapterHelper {
         throw new IllegalStateException("Unhandled operator " + op);
     }
 
+  }
+
+  private void addLike(LikeType likeType, String path, Object bindValue) {
+    peekExprList().add(owner.like(likeType, path, bindValue));
   }
 
   private String bindString(String value) {
@@ -120,7 +125,7 @@ class EqlAdapterHelper {
       case BOOL: return Boolean.parseBoolean(value);
       case NUMBER: return new BigDecimal(value);
       case STRING: return unquote(value);
-      case NAMED_PARAM: return new NamedParameter(value.substring(1));
+      case NAMED_PARAM: return owner.namedParam(value.substring(1));
       default:
         throw new IllegalArgumentException("Unhandled valueType "+valueType);
     }

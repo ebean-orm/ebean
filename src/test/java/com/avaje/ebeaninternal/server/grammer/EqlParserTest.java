@@ -37,7 +37,7 @@ public class EqlParserTest {
     assertThat(query.getGeneratedSql()).contains("where t0.name = ?");
   }
 
-  @Test @Ignore
+  @Test
   public void where_namedParam() throws Exception {
 
     Query<Customer> query = parse("where name eq :name");
@@ -46,6 +46,16 @@ public class EqlParserTest {
 
     assertThat(query.getGeneratedSql()).contains("where t0.name = ?");
   }
+
+//  @Test
+//  public void where_namedParam_startsWith() throws Exception {
+//
+//    Query<Customer> query = parse("where name startsWith :name");
+//    query.setParameter("name", "Rob");
+//    query.findList();
+//
+//    assertThat(query.getGeneratedSql()).contains("where t0.name like ?");
+//  }
 
   @Test
   public void where_or1() throws Exception {

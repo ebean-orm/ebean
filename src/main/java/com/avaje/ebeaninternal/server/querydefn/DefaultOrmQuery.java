@@ -16,6 +16,7 @@ import com.avaje.ebeaninternal.api.ManyWhereJoins;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionList;
 import com.avaje.ebeaninternal.api.SpiExpressionValidation;
+import com.avaje.ebeaninternal.api.SpiNamedParam;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.api.SpiQuerySecondary;
 import com.avaje.ebeaninternal.server.autotune.ProfilingListener;
@@ -28,6 +29,7 @@ import com.avaje.ebeaninternal.server.query.CancelableQuery;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -134,6 +136,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * Used for find by id type query.
    */
   private Object id;
+
+  private Map<String,ONamedParam> namedParams;
 
   /**
    * Bind parameters when using the query language.
@@ -1138,6 +1142,15 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   @Override
   public DefaultOrmQuery<T> setParameter(String name, Object value) {
+
+    if (namedParams != null) {
+      ONamedParam param = namedParams.get(name);
+      if (param != null) {
+        param.setValue(value);
+        return this;
+      }
+    }
+
     if (bindParams == null) {
       bindParams = new BindParams();
     }
@@ -1373,6 +1386,20 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public void setGeneratedSql(String generatedSql) {
     this.generatedSql = generatedSql;
+  }
+
+  @Override
+  public SpiNamedParam createNamedParameter(String name) {
+    if (namedParams == null) {
+      namedParams = new HashMap<String, ONamedParam>();
+    }
+
+    ONamedParam param = namedParams.get(name);
+    if (param == null) {
+      param = new ONamedParam(name);
+      namedParams.put(name, param);
+    }
+    return param;
   }
 
   @Override

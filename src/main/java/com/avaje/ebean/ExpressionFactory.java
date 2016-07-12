@@ -193,6 +193,11 @@ public interface ExpressionFactory {
   ExampleExpression exampleLike(Object example, boolean caseInsensitive, LikeType likeType);
 
   /**
+   * Create the query by Example expression specifying more options.
+   */
+  Expression like(LikeType likeType, String propertyName, Object value);
+
+  /**
    * Like - property like value where the value contains the SQL wild card
    * characters % (percentage) and _ (underscore).
    */

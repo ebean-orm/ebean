@@ -5,6 +5,7 @@ import com.avaje.ebean.plugin.ExpressionPath;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
+import com.avaje.ebeaninternal.api.SpiNamedParam;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
 import java.io.IOException;
@@ -13,18 +14,28 @@ public class SimpleExpression extends AbstractExpression {
 
   private final Op type;
 
-  private final Object value;
+  private final Object val;
 
   public SimpleExpression(String propertyName, Op type, Object value) {
     super(propertyName);
     this.type = type;
-    this.value = value;
+    this.val = value;
+  }
+
+  /**
+   * Return the bind value taking into account named parameters.
+   */
+  private Object value() {
+    if (val instanceof SpiNamedParam) {
+      return ((SpiNamedParam)val).getValue();
+    }
+    return val;
   }
 
   @Override
   public Object getIdEqualTo(String idName) {
     if (type == Op.EQ && idName.equals(propName)) {
-      return value;
+      return value();
     }
     return null;
   }
@@ -37,13 +48,13 @@ public class SimpleExpression extends AbstractExpression {
     ExpressionPath prop = context.getExpressionPath(propName);
     if (prop != null && prop.isAssocId()) {
       String idName = prop.getAssocIdExpression(propName, "");
-      Object[] ids = prop.getAssocIdValues((EntityBean) value);
+      Object[] ids = prop.getAssocIdValues((EntityBean) value());
       if (ids == null || ids.length != 1) {
         throw new IllegalArgumentException("Expecting 1 Id value for " + idName + " but got " + ids);
       }
       context.writeSimple(type, idName, ids[0]);
     } else {
-      context.writeSimple(type, propName, value);
+      context.writeSimple(type, propName, value());
     }
   }
 
@@ -56,7 +67,7 @@ public class SimpleExpression extends AbstractExpression {
   }
 
   public Object getValue() {
-    return value;
+    return value();
   }
 
   @Override
@@ -65,7 +76,7 @@ public class SimpleExpression extends AbstractExpression {
     ElPropertyValue prop = getElProp(request);
     if (prop != null) {
       if (prop.isAssocId()) {
-        Object[] ids = prop.getAssocIdValues((EntityBean) value);
+        Object[] ids = prop.getAssocIdValues((EntityBean) value());
         if (ids != null) {
           for (int i = 0; i < ids.length; i++) {
             request.addBindValue(ids[i]);
@@ -83,7 +94,7 @@ public class SimpleExpression extends AbstractExpression {
       // prop.getBeanProperty().getScalarType();
     }
 
-    request.addBindValue(value);
+    request.addBindValue(value());
   }
 
   @Override
@@ -115,7 +126,7 @@ public class SimpleExpression extends AbstractExpression {
 
   @Override
   public int queryBindHash() {
-    return value.hashCode();
+    return value().hashCode();
   }
 
   @Override
@@ -132,6 +143,6 @@ public class SimpleExpression extends AbstractExpression {
   @Override
   public boolean isSameByBind(SpiExpression other) {
     SimpleExpression that = (SimpleExpression) other;
-    return value.equals(that.value);
+    return value().equals(that.value());
   }
 }

@@ -1,7 +1,10 @@
 package com.avaje.ebeaninternal.server.grammer;
 
+import com.avaje.ebean.Expression;
 import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.LikeType;
 import com.avaje.ebean.Query;
+import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.grammer.antlr.EQLBaseListener;
 import com.avaje.ebeaninternal.server.grammer.antlr.EQLLexer;
 import com.avaje.ebeaninternal.server.grammer.antlr.EQLParser;
@@ -14,7 +17,7 @@ class EqlAdapter<T> extends EQLBaseListener {
 
   private static final OperatorMapping operatorMapping = new OperatorMapping();
 
-  private final Query<T> query;
+  private final SpiQuery<T> query;
 
   private final EqlAdapterHelper helper;
 
@@ -25,7 +28,7 @@ class EqlAdapter<T> extends EQLBaseListener {
   private boolean textMode;
 
   public EqlAdapter(Query<T> query) {
-    this.query = query;
+    this.query = (SpiQuery<T>)query;
     this.helper = new EqlAdapterHelper(this);
   }
 
@@ -60,8 +63,7 @@ class EqlAdapter<T> extends EQLBaseListener {
   /**
    * Push the expression list onto the appropriate stack.
    */
-  private void pushExprList(ExpressionList<T> list, String type) {
-    System.out.println("Push " + type + ">> ");
+  private void pushExprList(ExpressionList<T> list) {
     if (textMode) {
       textStack.push(list);
     } else {
@@ -72,8 +74,7 @@ class EqlAdapter<T> extends EQLBaseListener {
   /**
    * End a list of expressions added by 'OR'.
    */
-  private void popJunction(String type) {
-    System.out.println("Pop " + type + " >> ");
+  private void popJunction() {
     if (textMode) {
       textStack.pop();
     } else {
@@ -145,7 +146,7 @@ class EqlAdapter<T> extends EQLBaseListener {
     String operator = ctx.getChild(1).getText();
     EqlOperator op = operatorMapping.get(operator);
     if (op == null) {
-      throw new IllegalStateException("No operator found for " + op);
+      throw new IllegalStateException("No operator found for " + operator);
     }
 
     // RHS is Path, Literal or Named input parameter
@@ -158,43 +159,50 @@ class EqlAdapter<T> extends EQLBaseListener {
   public void enterConditional_term(EQLParser.Conditional_termContext ctx) {
     int childCount = ctx.getChildCount();
     if (childCount > 1) {
-      pushExprList(peekExprList().and(), "Conjunction");
+      pushExprList(peekExprList().and());
     }
   }
 
   @Override
   public void exitConditional_term(EQLParser.Conditional_termContext ctx) {
     if (ctx.getChildCount() > 1) {
-      popJunction("Conjunction");
+      popJunction();
     }
   }
 
   @Override
   public void enterConditional_expression(EQLParser.Conditional_expressionContext ctx) {
     if (ctx.getChildCount() > 1) {
-      pushExprList(peekExprList().or(), "Disjunction");
+      pushExprList(peekExprList().or());
     }
   }
 
   @Override
   public void exitConditional_expression(EQLParser.Conditional_expressionContext ctx) {
     if (ctx.getChildCount() > 1) {
-      popJunction("Disjunction");
+      popJunction();
     }
   }
 
   @Override
   public void enterConditional_factor(EQLParser.Conditional_factorContext ctx) {
     if (ctx.getChildCount() > 1) {
-      pushExprList(peekExprList().not(), "Not");
+      pushExprList(peekExprList().not());
     }
   }
 
   @Override
   public void exitConditional_factor(EQLParser.Conditional_factorContext ctx) {
     if (ctx.getChildCount() > 1) {
-      popJunction("Not");
+      popJunction();
     }
   }
 
+  public Object namedParam(String parameterName) {
+    return query.createNamedParameter(parameterName);
+  }
+
+  public Expression like(LikeType likeType, String property, Object bindValue) {
+    return query.getExpressionFactory().like(likeType, property, bindValue);
+  }
 }
