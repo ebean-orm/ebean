@@ -1,16 +1,16 @@
 package com.avaje.tests.query;
 
 
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
+import com.avaje.ebean.RawSql;
+import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestIContains extends BaseTestCase {
 
@@ -25,15 +25,15 @@ public class TestIContains extends BaseTestCase {
     query.findList();
     String generatedSql = query.getGeneratedSql();
 
-    Assert.assertTrue(generatedSql.contains("lower(t0.name)"));
+    assertThat(generatedSql).contains("lower(t0.name)");
 
-    // not case insensitive
+    // case sensitive
     query = Ebean.find(Customer.class).where().contains("name", "Rob").query();
 
     query.findList();
     generatedSql = query.getGeneratedSql();
 
-    Assert.assertTrue(generatedSql.contains(" t0.name "));
+    assertThat(generatedSql).contains(" t0.name ");
 
     Ebean.find(Customer.class).where().icontains("name", "Rob").findList();
     Ebean.find(Customer.class).where().icontains("name", "Rob").findList();

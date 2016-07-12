@@ -1,10 +1,5 @@
 package com.avaje.tests.rawsql;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
@@ -12,6 +7,11 @@ import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.tests.model.basic.Customer;
 import com.avaje.tests.model.basic.ResetBasicData;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
 
 public class TestRawSqlPositionedParams extends BaseTestCase {
 
@@ -22,7 +22,7 @@ public class TestRawSqlPositionedParams extends BaseTestCase {
 
     RawSql rawSql = RawSqlBuilder
         .parse("select r.id, r.name from o_customer r where r.id >= ? and r.name like ?")
-        .columnMapping("r.id", "id").columnMapping("r.name", "name").create();
+        .create();
 
     Query<Customer> query = Ebean.find(Customer.class);
     query.setRawSql(rawSql);
@@ -32,7 +32,7 @@ public class TestRawSqlPositionedParams extends BaseTestCase {
 
     List<Customer> list = query.findList();
 
-    Assert.assertNotNull(list);
+    assertNotNull(list);
   }
 
   @Test
@@ -52,6 +52,6 @@ public class TestRawSqlPositionedParams extends BaseTestCase {
 
     List<Customer> list = query.findList();
 
-    Assert.assertNotNull(list);
+    assertNotNull(list);
   }
 }
