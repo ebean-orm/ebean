@@ -299,23 +299,25 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
   /**
    * Find the Id's of detail beans given a parent Id or list of parent Id's.
    */
-  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIdist, Transaction t, ArrayList<Object> excludeDetailIds) {
+  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIdList, Transaction t, ArrayList<Object> excludeDetailIds) {
     if (parentId != null) {
       return findIdsByParentId(parentId, t, excludeDetailIds);
     } else {
-      return findIdsByParentIdList(parentIdist, t, excludeDetailIds);
+      return findIdsByParentIdList(parentIdList, t, excludeDetailIds);
     }
   }
 
   private List<Object> findIdsByParentId(Object parentId, Transaction t, ArrayList<Object> excludeDetailIds) {
 
     String rawWhere = deriveWhereParentIdSql(false, "");
+    List<Object> bindValues = new ArrayList<Object>();
+    bindWhereParentId(bindValues, parentId);
 
     EbeanServer server = getBeanDescriptor().getEbeanServer();
     Query<?> q = server.find(getPropertyType())
-        .where().raw(rawWhere).query();
-
-    bindWhereParendId(1, q, parentId);
+        .where()
+        .raw(rawWhere, bindValues.toArray())
+        .query();
 
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       Expression idIn = q.getExpressionFactory().idIn(excludeDetailIds);
@@ -371,20 +373,23 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     query.where().raw(expr, bindValues.toArray());
   }
 
-  private List<Object> findIdsByParentIdList(List<Object> parentIdist, Transaction t, ArrayList<Object> excludeDetailIds) {
+  private List<Object> findIdsByParentIdList(List<Object> parentIdList, Transaction t, ArrayList<Object> excludeDetailIds) {
 
     String rawWhere = deriveWhereParentIdSql(true, "");
-    String inClause = buildInClauseBinding(parentIdist.size(), exportedPropertyBindProto);
+    String inClause = buildInClauseBinding(parentIdList.size(), exportedPropertyBindProto);
 
     String expr = rawWhere + inClause;
 
-    EbeanServer server = getBeanDescriptor().getEbeanServer();
-    Query<?> q = server.find(getPropertyType()).where().raw(expr).query();
-
-    int pos = 1;
-    for (int i = 0; i < parentIdist.size(); i++) {
-      pos = bindWhereParendId(pos, q, parentIdist.get(i));
+    List<Object> bindValues = new ArrayList<Object>();
+    for (int i = 0; i < parentIdList.size(); i++) {
+      bindWhereParentId(bindValues, parentIdList.get(i));
     }
+
+    EbeanServer server = getBeanDescriptor().getEbeanServer();
+    Query<?> q = server.find(getPropertyType())
+        .where()
+        .raw(expr, bindValues.toArray())
+        .query();
 
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       Expression idIn = q.getExpressionFactory().idIn(excludeDetailIds);
@@ -690,20 +695,18 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
     }
   }
 
-  private int bindWhereParendId(int pos, Query<?> q, Object parentId) {
+  private void bindWhereParentId(List<Object> bindValues, Object parentId) {
 
     if (exportedProperties.length == 1) {
-      q.setParameter(pos++, parentId);
+      bindValues.add(parentId);
 
     } else {
-
       EntityBean parent = (EntityBean) parentId;
       for (int i = 0; i < exportedProperties.length; i++) {
         Object embVal = exportedProperties[i].getValue(parent);
-        q.setParameter(pos++, embVal);
+        bindValues.add(embVal);
       }
     }
-    return pos;
   }
 
   public void addSelectExported(DbSqlContext ctx, String tableAlias) {

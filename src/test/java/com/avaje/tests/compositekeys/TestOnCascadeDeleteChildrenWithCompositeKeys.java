@@ -75,7 +75,8 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
     assertEquals(0, Ebean.find(User.class).findList().size());
   }
   
-  @Test public void testFindByParentIdList() {
+  @Test
+  public void testFindByParentIdList() {
 
     if (isMsSqlServer()) return;
 
@@ -92,7 +93,8 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
     ids.add(1L);
     ids.add(2L);
 
-    beanProperty.findIdsByParentId(null, ids, null, null);    
+    beanProperty.findIdsByParentId(null, ids, null, null);
+    beanProperty.findIdsByParentId(1L, null, null, null);
   }
 
   @Entity @Table(name = "em_user") public static class User {

@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.grammer;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.tests.model.basic.Customer;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,6 +32,16 @@ public class EqlParserTest {
   public void where_eq2() throws Exception {
 
     Query<Customer> query = parse("where name = 'Rob'");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where t0.name = ?");
+  }
+
+  @Test @Ignore
+  public void where_namedParam() throws Exception {
+
+    Query<Customer> query = parse("where name eq :name");
+    query.setParameter("name", "Rob");
     query.findList();
 
     assertThat(query.getGeneratedSql()).contains("where t0.name = ?");

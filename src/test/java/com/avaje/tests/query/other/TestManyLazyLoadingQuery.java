@@ -15,6 +15,8 @@ import com.avaje.tests.model.basic.Order;
 import com.avaje.tests.model.basic.OrderDetail;
 import com.avaje.tests.model.basic.ResetBasicData;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TestManyLazyLoadingQuery extends BaseTestCase {
 
   @Test
@@ -55,6 +57,7 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
       beanProperty.addWhereParentIdIn(query0, parentIds, false);
       
       query0.findList();
+      assertThat(query0.getGeneratedSql()).contains(" from o_order_detail t0 where (t0.order_id) in (");
 
     } finally {
       Ebean.endTransaction();
