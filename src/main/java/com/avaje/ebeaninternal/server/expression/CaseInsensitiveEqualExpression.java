@@ -7,18 +7,22 @@ import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
 import java.io.IOException;
 
-class CaseInsensitiveEqualExpression extends AbstractExpression {
+class CaseInsensitiveEqualExpression extends AbstractValueExpression {
 
-  private final String value;
+  CaseInsensitiveEqualExpression(String propertyName, Object value) {
+    super(propertyName, value);
+  }
 
-  CaseInsensitiveEqualExpression(String propertyName, String value) {
-    super(propertyName);
-    this.value = value.toLowerCase();
+  /**
+   * Return the bind value taking into account named parameters.
+   */
+  private String val() {
+    return strValue().toLowerCase();
   }
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeIEqualTo(propName, value);
+    context.writeIEqualTo(propName, val());
   }
 
   @Override
@@ -31,7 +35,7 @@ class CaseInsensitiveEqualExpression extends AbstractExpression {
       request.addBindEncryptKey(encryptKey);
     }
 
-    request.addBindValue(value);
+    request.addBindValue(val());
   }
 
   @Override
@@ -54,7 +58,7 @@ class CaseInsensitiveEqualExpression extends AbstractExpression {
 
   @Override
   public int queryBindHash() {
-    return value.hashCode();
+    return val().hashCode();
   }
 
   @Override
@@ -70,6 +74,6 @@ class CaseInsensitiveEqualExpression extends AbstractExpression {
   @Override
   public boolean isSameByBind(SpiExpression other) {
     CaseInsensitiveEqualExpression that = (CaseInsensitiveEqualExpression) other;
-    return value.equals(that.value);
+    return val().equals(that.val());
   }
 }

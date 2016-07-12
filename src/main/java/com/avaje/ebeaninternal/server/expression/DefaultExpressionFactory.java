@@ -158,6 +158,13 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   /**
+   * Create for named parameter use (and without support for equalsWithNullAsNoop).
+   */
+  public Expression ieqObject(String propertyName, Object value) {
+    return new CaseInsensitiveEqualExpression(propertyName, value);
+  }
+
+  /**
    * Between - property between the two given values.
    */
   public Expression between(String propertyName, Object value1, Object value2) {
@@ -252,9 +259,8 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   @Override
-  public Expression like(LikeType likeType, String propertyName, Object value) {
-
-    return new LikeExpression(propertyName, value, true, LikeType.RAW);
+  public Expression like(String propertyName, Object value, boolean caseInsensitive, LikeType likeType) {
+    return new LikeExpression(propertyName, value, caseInsensitive, likeType);
   }
 
   /**

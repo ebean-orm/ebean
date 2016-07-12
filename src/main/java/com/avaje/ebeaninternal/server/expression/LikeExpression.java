@@ -4,43 +4,25 @@ import com.avaje.ebean.LikeType;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
-import com.avaje.ebeaninternal.api.SpiNamedParam;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
 import java.io.IOException;
 
-class LikeExpression extends AbstractExpression {
-
-  private final Object value;
+class LikeExpression extends AbstractValueExpression {
 
   private final boolean caseInsensitive;
 
   private final LikeType type;
 
   LikeExpression(String propertyName, Object value, boolean caseInsensitive, LikeType type) {
-    super(propertyName);
+    super(propertyName, value);
     this.caseInsensitive = caseInsensitive;
     this.type = type;
-    this.value = value;
-  }
-
-  /**
-   * Return the bind value taking into account named parameters.
-   */
-  private Object value() {
-    if (value instanceof SpiNamedParam) {
-      return ((SpiNamedParam)value).getValue();
-    }
-    return value;
-  }
-
-  private String val() {
-    return value().toString();
   }
 
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeLike(propName, val(), type, caseInsensitive);
+    context.writeLike(propName, strValue(), type, caseInsensitive);
   }
 
   @Override
@@ -53,7 +35,7 @@ class LikeExpression extends AbstractExpression {
       request.addBindEncryptKey(encryptKey);
     }
 
-    String bindValue = getValue(val(), caseInsensitive, type);
+    String bindValue = getValue(strValue(), caseInsensitive, type);
     request.addBindValue(bindValue);
   }
 
@@ -89,7 +71,7 @@ class LikeExpression extends AbstractExpression {
 
   @Override
   public int queryBindHash() {
-    return val().hashCode();
+    return strValue().hashCode();
   }
 
   @Override
@@ -107,7 +89,7 @@ class LikeExpression extends AbstractExpression {
   @Override
   public boolean isSameByBind(SpiExpression other) {
     LikeExpression that = (LikeExpression) other;
-    return val().equals(that.val());
+    return strValue().equals(that.strValue());
   }
 
   private static String getValue(String value, boolean caseInsensitive, LikeType type) {

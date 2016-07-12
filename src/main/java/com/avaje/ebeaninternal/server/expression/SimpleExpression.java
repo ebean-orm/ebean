@@ -5,31 +5,17 @@ import com.avaje.ebean.plugin.ExpressionPath;
 import com.avaje.ebeaninternal.api.HashQueryPlanBuilder;
 import com.avaje.ebeaninternal.api.SpiExpression;
 import com.avaje.ebeaninternal.api.SpiExpressionRequest;
-import com.avaje.ebeaninternal.api.SpiNamedParam;
 import com.avaje.ebeaninternal.server.el.ElPropertyValue;
 
 import java.io.IOException;
 
-public class SimpleExpression extends AbstractExpression {
+public class SimpleExpression extends AbstractValueExpression {
 
   private final Op type;
 
-  private final Object val;
-
   public SimpleExpression(String propertyName, Op type, Object value) {
-    super(propertyName);
+    super(propertyName, value);
     this.type = type;
-    this.val = value;
-  }
-
-  /**
-   * Return the bind value taking into account named parameters.
-   */
-  private Object value() {
-    if (val instanceof SpiNamedParam) {
-      return ((SpiNamedParam)val).getValue();
-    }
-    return val;
   }
 
   @Override

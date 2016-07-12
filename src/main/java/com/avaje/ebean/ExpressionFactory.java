@@ -136,6 +136,11 @@ public interface ExpressionFactory {
   Expression ieq(String propertyName, String value);
 
   /**
+   * Case Insensitive Equal To that allows for named parameter use.
+   */
+  Expression ieqObject(String propertyName, Object value);
+
+  /**
    * Between - property between the two given values.
    */
   Expression between(String propertyName, Object value1, Object value2);
@@ -193,9 +198,9 @@ public interface ExpressionFactory {
   ExampleExpression exampleLike(Object example, boolean caseInsensitive, LikeType likeType);
 
   /**
-   * Create the query by Example expression specifying more options.
+   * Like with support for named parameters.
    */
-  Expression like(LikeType likeType, String propertyName, Object value);
+  Expression like(String propertyName, Object value, boolean caseInsensitive, LikeType likeType);
 
   /**
    * Like - property like value where the value contains the SQL wild card

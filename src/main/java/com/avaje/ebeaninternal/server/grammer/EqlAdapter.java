@@ -202,7 +202,11 @@ class EqlAdapter<T> extends EQLBaseListener {
     return query.createNamedParameter(parameterName);
   }
 
-  public Expression like(LikeType likeType, String property, Object bindValue) {
-    return query.getExpressionFactory().like(likeType, property, bindValue);
+  public Expression like(boolean caseInsensitive, LikeType likeType, String property, Object bindValue) {
+    return query.getExpressionFactory().like(property, bindValue, caseInsensitive, likeType);
+  }
+
+  public Expression ieq(String property, Object bindValue) {
+    return query.getExpressionFactory().ieqObject(property, bindValue);
   }
 }

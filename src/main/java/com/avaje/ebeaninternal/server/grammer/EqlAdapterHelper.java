@@ -48,7 +48,7 @@ class EqlAdapterHelper {
         peekExprList().eq(path, bind(value));
         break;
       case IEQ:
-        peekExprList().ieq(path, bindString(value));
+        peekExprList().add(owner.ieq(path, bind(value)));
         break;
       case NE:
         peekExprList().ne(path, bind(value));
@@ -66,28 +66,28 @@ class EqlAdapterHelper {
         peekExprList().le(path, bind(value));
         break;
       case LIKE:
-        addLike(LikeType.RAW, path, bind(value));
+        addLike(false, LikeType.RAW, path, bind(value));
         break;
       case CONTAINS:
-        addLike(LikeType.CONTAINS, path, bind(value));
+        addLike(false, LikeType.CONTAINS, path, bind(value));
         break;
       case STARTS_WITH:
-        addLike(LikeType.STARTS_WITH, path, bind(value));
+        addLike(false, LikeType.STARTS_WITH, path, bind(value));
         break;
       case ENDS_WITH:
-        addLike(LikeType.ENDS_WITH, path, bind(value));
+        addLike(false, LikeType.ENDS_WITH, path, bind(value));
         break;
       case ILIKE:
-        peekExprList().ilike(path, bindString(value));
+        addLike(true, LikeType.RAW, path, bind(value));
         break;
       case ICONTAINS:
-        peekExprList().icontains(path, bindString(value));
+        addLike(true, LikeType.CONTAINS, path, bind(value));
         break;
       case ISTARTS_WITH:
-        peekExprList().istartsWith(path, bindString(value));
+        addLike(true, LikeType.STARTS_WITH, path, bind(value));
         break;
       case IENDS_WITH:
-        peekExprList().iendsWith(path, bindString(value));
+        addLike(true, LikeType.ENDS_WITH, path, bind(value));
         break;
       default:
         throw new IllegalStateException("Unhandled operator " + op);
@@ -95,20 +95,8 @@ class EqlAdapterHelper {
 
   }
 
-  private void addLike(LikeType likeType, String path, Object bindValue) {
-    peekExprList().add(owner.like(likeType, path, bindValue));
-  }
-
-  private String bindString(String value) {
-    ValueType valueType = getValueType(value);
-    switch (valueType) {
-      case NAMED_PARAM:
-        return NamedParameter.PREFIX + value;
-      case STRING:
-        return unquote(value);
-      default:
-        throw new IllegalArgumentException("Only STRING or NAMED PARAMETER argument allowed but got " + valueType);
-    }
+  private void addLike(boolean caseInsensitive, LikeType likeType, String path, Object bindValue) {
+    peekExprList().add(owner.like(caseInsensitive, likeType, path, bindValue));
   }
 
   private Object bind(String value) {
