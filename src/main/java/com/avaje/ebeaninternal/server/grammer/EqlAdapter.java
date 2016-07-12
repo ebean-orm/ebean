@@ -103,18 +103,18 @@ class EqlAdapter<T> extends EQLBaseListener {
     if (op != EqlOperator.BETWEEN) {
       throw new IllegalStateException("Expecting BETWEEN operator but got "+op);
     }
-    helper.addBetween(path, ctx.getChild(2).getText(), ctx.getChild(4).getText());
+    helper.addBetween(path, child(ctx,2), child(ctx,4));
   }
 
   @Override
   public void enterPropertyBetween_expression(EQLParser.PropertyBetween_expressionContext ctx) {
     checkChildren(ctx, 5);
-    String rawValue = ctx.getChild(0).getText();
+    String rawValue = child(ctx,0);
     EqlOperator op = getOperator(ctx);
     if (op != EqlOperator.BETWEEN) {
       throw new IllegalStateException("Expecting BETWEEN operator but got "+op);
     }
-    helper.addBetweenProperty(rawValue, ctx.getChild(2).getText(), ctx.getChild(4).getText());
+    helper.addBetweenProperty(rawValue, child(ctx,2), child(ctx,4));
   }
 
   @Override
@@ -127,12 +127,23 @@ class EqlAdapter<T> extends EQLBaseListener {
   public void enterIn_value(EQLParser.In_valueContext ctx) {
     int childCount = ctx.getChildCount();
     for (int i = 0; i < childCount; i++) {
-      ParseTree child = ctx.getChild(i);
-      String text = child.getText();
-      if (!text.equals("(") && !text.equals(")")) {
+      String text = child(ctx, i);
+      if (isInValue(text)) {
         inValues.add(helper.bind(text));
       }
     }
+  }
+
+  private String child(ParserRuleContext ctx, int position) {
+    ParseTree child = ctx.getChild(position);
+    return child.getText();
+  }
+
+  private boolean isInValue(String text) {
+    if (text.length() == 1 && (text.equals("(") || text.equals(")") || text.equals(","))) {
+      return false;
+    }
+    return true;
   }
 
   @Override
@@ -180,15 +191,14 @@ class EqlAdapter<T> extends EQLBaseListener {
       throw new IllegalStateException("expecting 3 children for comparison? " + ctx);
     }
     String path = getLeftHandSidePath(ctx);
-    String operator = ctx.getChild(1).getText();
+    String operator = child(ctx, 1);
     EqlOperator op = operatorMapping.get(operator);
     if (op == null) {
       throw new IllegalStateException("No operator found for " + operator);
     }
 
     // RHS is Path, Literal or Named input parameter
-    ParseTree rhs = ctx.getChild(2);
-    helper.addExpression(path, op, rhs.getText());
+    helper.addExpression(path, op, child(ctx, 2));
   }
 
 
@@ -236,8 +246,7 @@ class EqlAdapter<T> extends EQLBaseListener {
   }
 
   private EqlOperator getOperator(ParserRuleContext ctx) {
-    // the operator text which may be a variation
-    String operator = ctx.getChild(1).getText();
+    String operator = child(ctx,1);
     EqlOperator op = operatorMapping.get(operator);
     if (op == null) {
       throw new IllegalStateException("No operator found for " + operator);

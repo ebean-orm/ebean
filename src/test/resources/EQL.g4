@@ -65,7 +65,6 @@ in_expression
 
 in_value
    : INPUT_VARIABLE
-   | '(' INPUT_VARIABLE ')'
    | '(' value_expression (',' value_expression)* ')'
    ;
 

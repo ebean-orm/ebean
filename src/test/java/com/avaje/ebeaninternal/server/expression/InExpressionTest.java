@@ -23,6 +23,9 @@ public class InExpressionTest {
     InExpression ex1 = new InExpression("foo", values, false);
     InExpression ex2 = new InExpression("bar", values, false);
 
+    ex1.prepareExpression(null);
+    ex2.prepareExpression(null);
+
     HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
     ex1.queryPlanHash(b1);
 
@@ -41,6 +44,9 @@ public class InExpressionTest {
     InExpression ex1 = new InExpression("foo", values1, false);
     InExpression ex2 = new InExpression("foo", values2, false);
 
+    ex1.prepareExpression(null);
+    ex2.prepareExpression(null);
+
     HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
     ex1.queryPlanHash(b1);
 
@@ -58,6 +64,9 @@ public class InExpressionTest {
     InExpression ex1 = new InExpression("foo", values, true);
     InExpression ex2 = new InExpression("foo", values, false);
 
+    ex1.prepareExpression(null);
+    ex2.prepareExpression(null);
+
     HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
     ex1.queryPlanHash(b1);
 
@@ -74,6 +83,9 @@ public class InExpressionTest {
 
     InExpression ex1 = new InExpression("foo", values, true);
     InExpression ex2 = new InExpression("foo", values, true);
+
+    ex1.prepareExpression(null);
+    ex2.prepareExpression(null);
 
     HashQueryPlanBuilder b1 = new HashQueryPlanBuilder();
     ex1.queryPlanHash(b1);
@@ -94,7 +106,9 @@ public class InExpressionTest {
 
   @NotNull
   private InExpression exp(String propName, boolean not, Object... values) {
-    return new InExpression(propName, Arrays.asList(values), not);
+    InExpression ex = new InExpression(propName, Arrays.asList(values), not);
+    ex.prepareExpression(null);
+    return ex;
   }
 
   @Test

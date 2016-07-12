@@ -115,6 +115,28 @@ public class EqlParserTest {
   }
 
   @Test
+  public void where_in_when_namedParams_withWhitespace() throws Exception {
+
+    Query<Customer> query = parse("where name in (:one,  :two)");
+    query.setParameter("one", "Foo");
+    query.setParameter("two", "Bar");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+  }
+
+  @Test
+  public void where_in_when_namedParams_withNoWhitespace() throws Exception {
+
+    Query<Customer> query = parse("where name in (:one,:two)");
+    query.setParameter("one", "Foo");
+    query.setParameter("two", "Bar");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("where t0.name in (?, ? )");
+  }
+
+  @Test
   public void where_in_when_namedParamAsList() throws Exception {
 
     Query<Customer> query = parse("where name in (:names)");

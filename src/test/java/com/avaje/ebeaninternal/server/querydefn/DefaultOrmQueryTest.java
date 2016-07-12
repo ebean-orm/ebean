@@ -37,6 +37,7 @@ public class DefaultOrmQueryTest {
     DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("name", "a","b","c").query();
     DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 2,2,3).query();
 
+    prepare(q1, q2);
     assertThat(q1.createQueryPlanKey()).isNotEqualTo(q2.createQueryPlanKey());
     assertThat(q1.queryBindHash()).isNotEqualTo(q2.queryBindHash());
   }
@@ -47,6 +48,7 @@ public class DefaultOrmQueryTest {
     DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 1,2,3).query();
     DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 2,2,3).query();
 
+    prepare(q1, q2);
     assertThat(q1.createQueryPlanKey()).isEqualTo(q2.createQueryPlanKey());
     assertThat(q1.queryBindHash()).isNotEqualTo(q2.queryBindHash());
   }
@@ -57,6 +59,7 @@ public class DefaultOrmQueryTest {
     DefaultOrmQuery<Order> q1 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 1,2,3).query();
     DefaultOrmQuery<Order> q2 = (DefaultOrmQuery<Order>)Ebean.find(Order.class).where().in("id", 1,2,3).query();
 
+    prepare(q1, q2);
     assertThat(q1.createQueryPlanKey()).isEqualTo(q2.createQueryPlanKey());
     assertThat(q1.queryBindHash()).isEqualTo(q2.queryBindHash());
   }
@@ -72,7 +75,12 @@ public class DefaultOrmQueryTest {
         .setFirstRow(1)
         .setMaxRows(0);
 
+    prepare(query1, query2);
     assertThat(query1.createQueryPlanKey()).isNotEqualTo(query2.createQueryPlanKey());
   }
 
+  private void prepare(DefaultOrmQuery<?> q1, DefaultOrmQuery<?> q2) {
+    q1.prepare(null);
+    q2.prepare(null);
+  }
 }
