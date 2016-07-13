@@ -29,6 +29,7 @@ import com.avaje.ebeaninternal.server.query.CancelableQuery;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -1393,6 +1394,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public void setGeneratedSql(String generatedSql) {
     this.generatedSql = generatedSql;
+  }
+
+  @Override
+  public void checkNamedParameters() {
+    if (namedParams != null) {
+      Collection<ONamedParam> values = namedParams.values();
+      for (ONamedParam value : values) {
+        value.checkValueSet();
+      }
+    }
   }
 
   @Override

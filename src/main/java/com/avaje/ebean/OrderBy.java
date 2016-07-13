@@ -213,8 +213,9 @@ public final class OrderBy<T> implements Serializable {
    * order by clause and replace.
    * </p>
    */
-  public void clear() {
+  public OrderBy<T> clear() {
     list.clear();
+    return this;
   }
 
   /**

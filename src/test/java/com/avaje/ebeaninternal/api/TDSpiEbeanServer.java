@@ -291,6 +291,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> Query<T> createQuery(Class<T> beanType, String eql) {
+    return null;
+  }
+
+  @Override
   public <T> Query<T> createQuery(Class<T> beanType) {
     return null;
   }

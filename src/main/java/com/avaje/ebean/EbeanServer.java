@@ -220,6 +220,43 @@ public interface EbeanServer {
   <T> Query<T> createQuery(Class<T> beanType);
 
   /**
+   * Parse the Ebean query language statement returning the query which can then
+   * be modified (add expressions, change order by clause, change maxRows, change
+   * fetch and select paths etc).
+   *
+   * <h3>Example</h3>
+   *
+   * <pre>{@code
+   *
+   *   // Find order additionally fetching the customer, details and details.product name.
+   *
+   *   String eql = "fetch customer fetch details fetch details.product (name) where id = :orderId ";
+   *
+   *   Query<Order> query = Ebean.createQuery(Order.class, eql);
+   *   query.setParameter("orderId", 2);
+   *
+   *   Order order = query.findUnique();
+   *
+   *   // This is the same as:
+   *
+   *   Order order = Ebean.find(Order.class)
+   *     .fetch("customer")
+   *     .fetch("details")
+   *     .fetch("detail.product", "name")
+   *     .setId(2)
+   *     .findUnique();
+   *
+   * }</pre>
+   *
+   * @param beanType The type of bean to fetch
+   * @param eql The Ebean query
+   * @param <T> The type of the entity bean
+   *
+   * @return The query with expressions defined as per the parsed query statement
+   */
+  <T> Query<T> createQuery(Class<T> beanType, String eql);
+
+  /**
    * Create a query for a type of entity bean.
    * <p>
    * You can use the methods on the Query object to specify fetch paths,

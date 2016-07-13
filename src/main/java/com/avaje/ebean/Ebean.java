@@ -975,39 +975,7 @@ public final class Ebean {
    * {@link Query#findSet()} etc will execute against the same EbeanServer from
    * which is was created.
    * </p>
-   * 
-   * <pre>{@code
-   *   // Find order 2 additionally fetching the customer, details and details.product
-   *   // name.
-   * 
-   *   Order order = Ebean.find(Order.class)
-   *     .fetch("customer")
-   *     .fetch("details")
-   *     .fetch("detail.product", "name")
-   *     .setId(2)
-   *     .findUnique();
-   * 
-   *   // Find order 2 additionally fetching the customer, details and details.product
-   *   // name.
-   *   // Note: same query as above but using the query language
-   *   // Note: using a named query would be preferred practice
-   * 
-   *   String oql = "find order fetch customer fetch details fetch details.product (name) where id = :orderId ";
-   * 
-   *   Query<Order> query = Ebean.find(Order.class);
-   *   query.setQuery(oql);
-   *   query.setParameter("orderId", 2);
-   * 
-   *   Order order = query.findUnique();
-   * 
-   *   // Using a named query
-   *   Query<Order> query = Ebean.find(Order.class, "with.details");
-   *   query.setParameter("orderId", 2);
-   * 
-   *   Order order = query.findUnique();
-   * 
-   * }</pre>
-   * 
+   *
    * @param beanType
    *          the class of entity to be fetched
    * @return A ORM Query object for this beanType
@@ -1015,6 +983,47 @@ public final class Ebean {
   public static <T> Query<T> createQuery(Class<T> beanType) {
 
     return serverMgr.getDefaultServer().createQuery(beanType);
+  }
+
+  /**
+   * Parse the Ebean query language statement returning the query which can then
+   * be modified (add expressions, change order by clause, change maxRows, change
+   * fetch and select paths etc).
+   *
+   * <h3>Example</h3>
+   *
+   * <pre>{@code
+   *
+   *
+   *   // Find order additionally fetching the customer, details and details.product name.
+   *
+   *   String eql = "fetch customer fetch details fetch details.product (name) where id = :orderId ";
+   *
+   *   Query<Order> query = Ebean.createQuery(Order.class, eql);
+   *   query.setParameter("orderId", 2);
+   *
+   *   Order order = query.findUnique();
+   *
+   *   // This is the same as:
+   *
+   *   Order order = Ebean.find(Order.class)
+   *     .fetch("customer")
+   *     .fetch("details")
+   *     .fetch("detail.product", "name")
+   *     .setId(2)
+   *     .findUnique();
+   *
+   * }</pre>
+   *
+   * @param beanType The type of bean to fetch
+   * @param eql The Ebean query
+   * @param <T> The type of the entity bean
+   *
+   * @return The query with expressions defined as per the parsed query statement
+   */
+  public static <T> Query<T> createQuery(Class<T> beanType, String eql) {
+
+    return serverMgr.getDefaultServer().createQuery(beanType, eql);
   }
 
   /**

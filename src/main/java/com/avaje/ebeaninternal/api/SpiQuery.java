@@ -296,6 +296,14 @@ public interface SpiQuery<T> extends Query<T> {
    */
   void setLoadDescription(String loadMode, String loadDescription);
 
+  /**
+   * Check that the named parameters have had their values set.
+   */
+  void checkNamedParameters();
+
+  /**
+   * Create a named parameter placeholder.
+   */
   SpiNamedParam createNamedParameter(String parameterName);
 
   /**

@@ -40,6 +40,7 @@ import com.avaje.ebeaninternal.server.deploy.BeanDescriptorManager;
 import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.el.ElFilter;
+import com.avaje.ebeaninternal.server.grammer.EqlParser;
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
 import com.avaje.ebeaninternal.server.query.CQuery;
 import com.avaje.ebeaninternal.server.query.CQueryEngine;
@@ -902,6 +903,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     throw new PersistenceException("No named query called " + namedQuery + " for bean:" + beanType.getName());
   }
 
+  @Override
+  public <T> Query<T> createQuery(Class<T> beanType, String eql) {
+
+    DefaultOrmQuery<T> query = createQuery(beanType);
+    EqlParser.parse(eql, query);
+    return query;
+  }
+
   public <T> DefaultOrmQuery<T> createQuery(Class<T> beanType) {
     BeanDescriptor<T> desc = getBeanDescriptor(beanType);
     if (desc == null) {
@@ -954,6 +963,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setType(type);
+    spiQuery.checkNamedParameters();
 
     return createQueryRequest(spiQuery, t);
   }

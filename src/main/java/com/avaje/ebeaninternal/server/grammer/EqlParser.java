@@ -7,8 +7,14 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+/**
+ * Parse EQL query language applying it to an ORM query object.
+ */
 public class EqlParser {
 
+  /**
+   * Parse the raw EQL query and apply it to the supplied query.
+   */
   public static <T> void parse(String raw, SpiQuery<T> query) {
 
     EQLLexer lexer = new EQLLexer(new ANTLRInputStream(raw));
