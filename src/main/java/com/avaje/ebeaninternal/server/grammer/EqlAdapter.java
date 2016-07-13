@@ -20,6 +20,8 @@ class EqlAdapter<T> extends EQLBaseListener {
 
   private static final OperatorMapping operatorMapping = new OperatorMapping();
 
+  private static final String DISTINCT = "distinct";
+
   private final SpiQuery<T> query;
 
   private final EqlAdapterHelper helper;
@@ -91,9 +93,14 @@ class EqlAdapter<T> extends EQLBaseListener {
 
   @Override
   public void enterSelect_clause(EQLParser.Select_clauseContext ctx) {
+
     checkChildren(ctx, 4);
-    String selectProperties = child(ctx, 2);
-    query.select(selectProperties);
+    if (DISTINCT.equals(child(ctx, 1))) {
+      query.setDistinct(true);
+      query.select(child(ctx, 3));
+    } else {
+      query.select(child(ctx, 2));
+    }
   }
 
   @Override

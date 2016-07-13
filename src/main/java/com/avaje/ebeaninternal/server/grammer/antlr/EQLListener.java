@@ -28,6 +28,16 @@ public interface EQLListener extends ParseTreeListener {
 	 */
 	void exitSelect_clause(EQLParser.Select_clauseContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link EQLParser#distinct}.
+	 * @param ctx the parse tree
+	 */
+	void enterDistinct(EQLParser.DistinctContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#distinct}.
+	 * @param ctx the parse tree
+	 */
+	void exitDistinct(EQLParser.DistinctContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link EQLParser#fetch_clause}.
 	 * @param ctx the parse tree
 	 */

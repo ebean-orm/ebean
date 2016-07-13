@@ -284,14 +284,24 @@ public class EqlParserTest {
     customer.getBillingAddress().getCity();
   }
 
-
   @Test
   public void select() throws Exception {
 
     ResetBasicData.reset();
 
     Query<Customer> query = parse("select (name)");
+    query.findList();
     assertThat(query.getGeneratedSql()).contains("select t0.id c0, t0.name c1 from o_customer t0");
+  }
+
+  @Test
+  public void selectDistinct() throws Exception {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = parse("select distinct (name)");
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains("select distinct t0.name c0 from o_customer t0");
   }
 
   private Query<Customer> parse(String raw) {

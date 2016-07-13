@@ -5,7 +5,11 @@ select_statement
    ;
 
 select_clause
-   : 'select' '(' fetch_property_group ')'
+   : 'select' (distinct)? '(' fetch_property_group ')'
+   ;
+
+distinct
+   : 'distinct'
    ;
 
 fetch_clause

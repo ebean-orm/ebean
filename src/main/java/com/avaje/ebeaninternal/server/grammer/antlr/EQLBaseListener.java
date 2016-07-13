@@ -40,6 +40,18 @@ public class EQLBaseListener implements EQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterDistinct(EQLParser.DistinctContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDistinct(EQLParser.DistinctContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterFetch_clause(EQLParser.Fetch_clauseContext ctx) { }
 	/**
 	 * {@inheritDoc}
