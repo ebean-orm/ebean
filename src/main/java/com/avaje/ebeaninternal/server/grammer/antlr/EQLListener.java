@@ -58,6 +58,46 @@ public interface EQLListener extends ParseTreeListener {
 	 */
 	void exitWhere_clause(EQLParser.Where_clauseContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link EQLParser#orderby_clause}.
+	 * @param ctx the parse tree
+	 */
+	void enterOrderby_clause(EQLParser.Orderby_clauseContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#orderby_clause}.
+	 * @param ctx the parse tree
+	 */
+	void exitOrderby_clause(EQLParser.Orderby_clauseContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EQLParser#orderby_property}.
+	 * @param ctx the parse tree
+	 */
+	void enterOrderby_property(EQLParser.Orderby_propertyContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#orderby_property}.
+	 * @param ctx the parse tree
+	 */
+	void exitOrderby_property(EQLParser.Orderby_propertyContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EQLParser#nulls_firstlast}.
+	 * @param ctx the parse tree
+	 */
+	void enterNulls_firstlast(EQLParser.Nulls_firstlastContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#nulls_firstlast}.
+	 * @param ctx the parse tree
+	 */
+	void exitNulls_firstlast(EQLParser.Nulls_firstlastContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EQLParser#asc_desc}.
+	 * @param ctx the parse tree
+	 */
+	void enterAsc_desc(EQLParser.Asc_descContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#asc_desc}.
+	 * @param ctx the parse tree
+	 */
+	void exitAsc_desc(EQLParser.Asc_descContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link EQLParser#limit_clause}.
 	 * @param ctx the parse tree
 	 */

@@ -55,6 +55,17 @@ public class TestOrderByParse extends BaseTestCase {
   }
 
   @Test
+  public void add_parse() {
+
+    OrderBy<Object> o1 = new OrderBy<Object>();
+    o1.add("id desc nulls high");
+    assertTrue(o1.getProperties().size() == 1);
+    assertTrue(o1.getProperties().get(0).getProperty().equals("id"));
+    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertTrue(o1.toStringFormat().equals("id desc nulls high"));
+  }
+
+  @Test
   public void parseNullsHigh_with_second() {
 
     OrderBy<Object> o1 = new OrderBy<Object>("id desc nulls high, name");

@@ -4,6 +4,7 @@ import com.avaje.ebean.Expression;
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.LikeType;
+import com.avaje.ebean.OrderBy;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.grammer.antlr.EQLBaseListener;
 import com.avaje.ebeaninternal.server.grammer.antlr.EQLLexer;
@@ -21,6 +22,10 @@ class EqlAdapter<T> extends EQLBaseListener {
   private static final OperatorMapping operatorMapping = new OperatorMapping();
 
   private static final String DISTINCT = "distinct";
+
+  private static final String NULLS = "nulls";
+
+  private static final String ASC = "asc";
 
   private final SpiQuery<T> query;
 
@@ -124,6 +129,34 @@ class EqlAdapter<T> extends EQLBaseListener {
       String fetchProperties = trimParenthesis(ctx.getChild(noPropertiesLength).getText());
       query.fetch(path, fetchProperties, fetchConfig);
     }
+  }
+
+  @Override
+  public void enterOrderby_property(EQLParser.Orderby_propertyContext ctx) {
+
+    int childCount = ctx.getChildCount();
+
+    String path = child(ctx, 0);
+    boolean asc = true;
+    String nulls = null;
+    String nullsFirstLast = null;
+
+    if (childCount == 3) {
+      asc = child(ctx, 1).startsWith(ASC);
+      nullsFirstLast = ctx.getChild(2).getChild(1).getText();
+      nulls = NULLS;
+
+    } else if (childCount == 2) {
+      String firstChild = child(ctx, 1);
+      if (firstChild.startsWith(NULLS)) {
+        nullsFirstLast = ctx.getChild(1).getChild(1).getText();
+        nulls = NULLS;
+      } else {
+        asc = firstChild.startsWith(ASC);
+      }
+    }
+
+    query.orderBy().add(new OrderBy.Property(path, asc, nulls, nullsFirstLast));
   }
 
   @Override

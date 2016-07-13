@@ -330,6 +330,65 @@ public class EqlParserTest extends BaseTestCase {
     }
   }
 
+  @Test
+  public void orderBy() throws Exception {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = parse("order by id");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("from o_customer t0 order by t0.id");
+    }
+  }
+
+  @Test
+  public void orderBy_desc() throws Exception {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = parse("order by id desc");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains("from o_customer t0 order by t0.id desc");
+    }
+  }
+
+  @Test
+  public void orderBy_nullsLast() throws Exception {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = parse("order by id desc nulls last");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains(" from o_customer t0 order by t0.id desc nulls last");
+    }
+  }
+
+  @Test
+  public void orderBy_nullsFirst() throws Exception {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = parse("order by id nulls first");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains(" from o_customer t0 order by t0.id nulls first");
+    }
+  }
+
+  @Test
+  public void orderBy_multiple() throws Exception {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = parse("order by billingAddress.city desc nulls last, name, id desc nulls last");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains(" order by t1.city desc nulls last, t0.name, t0.id desc nulls last");
+    }
+  }
 
   private Query<Customer> parse(String raw) {
 

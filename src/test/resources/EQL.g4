@@ -1,7 +1,7 @@
 grammar EQL;
 
 select_statement
-   : select_clause? fetch_clause* where_clause? limit_clause?
+   : select_clause? fetch_clause* where_clause? orderby_clause? limit_clause?
    ;
 
 select_clause
@@ -18,6 +18,24 @@ fetch_clause
 
 where_clause
    : 'where' conditional_expression
+   ;
+
+orderby_clause
+   : 'order' 'by' orderby_property (',' orderby_property)*
+   ;
+
+orderby_property
+   : PATH_VARIABLE asc_desc? nulls_firstlast?
+   ;
+
+nulls_firstlast
+   : 'nulls' 'first'
+   | 'nulls' 'last'
+   ;
+
+asc_desc
+   : 'asc'
+   | 'desc'
    ;
 
 limit_clause

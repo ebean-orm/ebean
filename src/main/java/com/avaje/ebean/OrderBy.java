@@ -149,6 +149,13 @@ public final class OrderBy<T> implements Serializable {
   }
 
   /**
+   * Add to the order by by parsing a raw expression.
+   */
+  public void add(String rawExpression) {
+    parse(rawExpression);
+  }
+
+  /**
    * Add a property to the order by.
    */
   public void add(Property p) {
