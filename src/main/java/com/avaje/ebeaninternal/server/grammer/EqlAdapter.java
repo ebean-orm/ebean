@@ -126,6 +126,24 @@ class EqlAdapter<T> extends EQLBaseListener {
     }
   }
 
+  @Override
+  public void enterLimit_clause(EQLParser.Limit_clauseContext ctx) {
+
+    try {
+      String limitValue = child(ctx, 1);
+      query.setMaxRows(Integer.parseInt(limitValue));
+
+      int childCount = ctx.getChildCount();
+      if (childCount == 3) {
+        ParseTree offsetTree = ctx.getChild(2);
+        String offsetValue = offsetTree.getChild(1).getText();
+        query.setFirstRow(Integer.parseInt(offsetValue));
+      }
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Error parsing limit or offset parameter - not an integer", e);
+    }
+  }
+
   /**
    * Trim leading '(' and trailing ')'
    */

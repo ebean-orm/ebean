@@ -1,11 +1,11 @@
 grammar EQL;
 
 select_statement
-   : (select_clause)? (fetch_clause)* (where_clause)?
+   : select_clause? fetch_clause* where_clause? limit_clause?
    ;
 
 select_clause
-   : 'select' (distinct)? '(' fetch_property_group ')'
+   : 'select' distinct? '(' fetch_property_group ')'
    ;
 
 distinct
@@ -18,6 +18,14 @@ fetch_clause
 
 where_clause
    : 'where' conditional_expression
+   ;
+
+limit_clause
+   : 'limit' NUMBER_LITERAL offset_clause?
+   ;
+
+offset_clause
+   : 'offset' NUMBER_LITERAL
    ;
 
 fetch_path
@@ -52,11 +60,11 @@ fetch_option
    ;
 
 fetch_query_option
-   : 'query' (fetch_batch_size)?
+   : 'query' fetch_batch_size?
    ;
 
 fetch_lazy_option
-   : 'lazy' (fetch_batch_size)?
+   : 'lazy' fetch_batch_size?
    ;
 
 fetch_batch_size
@@ -64,15 +72,15 @@ fetch_batch_size
    ;
 
 conditional_expression
-   : (conditional_term) ('or' conditional_term)*
+   : conditional_term ('or' conditional_term)*
    ;
 
 conditional_term
-   : (conditional_factor) ('and' conditional_factor)*
+   : conditional_factor ('and' conditional_factor)*
    ;
 
 conditional_factor
-   : ('not')? conditional_primary
+   : 'not'? conditional_primary
    ;
 
 conditional_primary

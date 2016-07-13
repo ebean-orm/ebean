@@ -58,6 +58,26 @@ public interface EQLListener extends ParseTreeListener {
 	 */
 	void exitWhere_clause(EQLParser.Where_clauseContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link EQLParser#limit_clause}.
+	 * @param ctx the parse tree
+	 */
+	void enterLimit_clause(EQLParser.Limit_clauseContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#limit_clause}.
+	 * @param ctx the parse tree
+	 */
+	void exitLimit_clause(EQLParser.Limit_clauseContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EQLParser#offset_clause}.
+	 * @param ctx the parse tree
+	 */
+	void enterOffset_clause(EQLParser.Offset_clauseContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#offset_clause}.
+	 * @param ctx the parse tree
+	 */
+	void exitOffset_clause(EQLParser.Offset_clauseContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link EQLParser#fetch_path}.
 	 * @param ctx the parse tree
 	 */

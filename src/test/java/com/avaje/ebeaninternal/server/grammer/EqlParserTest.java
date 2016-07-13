@@ -1,5 +1,6 @@
 package com.avaje.ebeaninternal.server.grammer;
 
+import com.avaje.ebean.BaseTestCase;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -12,7 +13,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class EqlParserTest {
+public class EqlParserTest extends BaseTestCase {
 
   @Test
   public void where_eq() throws Exception {
@@ -303,6 +304,32 @@ public class EqlParserTest {
     query.findList();
     assertThat(query.getGeneratedSql()).contains("select distinct t0.name c0 from o_customer t0");
   }
+
+
+  @Test
+  public void limit() throws Exception {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = parse("limit 10");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains(" limit 10");
+    }
+  }
+
+  @Test
+  public void limitOffset() throws Exception {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = parse("limit 10 offset 5");
+    query.findList();
+    if (isH2()) {
+      assertThat(query.getGeneratedSql()).contains(" limit 10 offset 5");
+    }
+  }
+
 
   private Query<Customer> parse(String raw) {
 
