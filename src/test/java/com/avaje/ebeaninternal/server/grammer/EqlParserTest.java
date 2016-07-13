@@ -282,7 +282,16 @@ public class EqlParserTest {
 
     Customer customer = list.get(0);
     customer.getBillingAddress().getCity();
+  }
 
+
+  @Test
+  public void select() throws Exception {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = parse("select (name)");
+    assertThat(query.getGeneratedSql()).contains("select t0.id c0, t0.name c1 from o_customer t0");
   }
 
   private Query<Customer> parse(String raw) {

@@ -90,6 +90,13 @@ class EqlAdapter<T> extends EQLBaseListener {
   }
 
   @Override
+  public void enterSelect_clause(EQLParser.Select_clauseContext ctx) {
+    checkChildren(ctx, 4);
+    String selectProperties = child(ctx, 2);
+    query.select(selectProperties);
+  }
+
+  @Override
   public void enterFetch_path(EQLParser.Fetch_pathContext ctx) {
 
     int childCount = ctx.getChildCount();
