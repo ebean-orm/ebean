@@ -2,6 +2,7 @@ package com.avaje.ebeaninternal.server.grammer;
 
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.LikeType;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.grammer.antlr.EQLBaseListener;
@@ -90,15 +91,24 @@ class EqlAdapter<T> extends EQLBaseListener {
 
   @Override
   public void enterFetch_path(EQLParser.Fetch_pathContext ctx) {
+
     int childCount = ctx.getChildCount();
     checkChildren(ctx, 2);
     String path = child(ctx, 1);
-    if (childCount == 2) {
-      query.fetch(path);
+
+    int noPropertiesLength = 2;
+
+    FetchConfig fetchConfig = ParseFetchConfig.parse(path);
+    if (fetchConfig != null) {
+      noPropertiesLength = 3;
+      path = child(ctx, 2);
+    }
+    if (childCount == noPropertiesLength) {
+      query.fetch(path, fetchConfig);
 
     } else {
-      String fetchProperties = trimParenthesis(ctx.getChild(2).getText());
-      query.fetch(path, fetchProperties);
+      String fetchProperties = trimParenthesis(ctx.getChild(noPropertiesLength).getText());
+      query.fetch(path, fetchProperties, fetchConfig);
     }
   }
 

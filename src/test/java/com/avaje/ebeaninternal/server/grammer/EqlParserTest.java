@@ -4,9 +4,11 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.tests.model.basic.Customer;
+import com.avaje.tests.model.basic.ResetBasicData;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -204,6 +206,15 @@ public class EqlParserTest {
   }
 
   @Test
+  public void fetch_withProperty_noWhitespace() throws Exception {
+
+    Query<Customer> query = parse("fetch billingAddress(city)");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains(", t1.id c9, t1.city");
+  }
+
+  @Test
   public void fetch_basic_multiple() throws Exception {
 
     Query<Customer> query = parse("fetch billingAddress fetch shippingAddress");
@@ -220,6 +231,58 @@ public class EqlParserTest {
     query.findList();
 
     assertThat(query.getGeneratedSql()).contains(", t1.id c8, t1.city c9, t2.id c10, t2.city c11");
+  }
+
+  @Test
+  public void fetch_lazy() throws Exception {
+
+    Query<Customer> query = parse("fetch lazy billingAddress");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city ");
+  }
+
+  @Test
+  public void fetch_lazy50() throws Exception {
+
+    Query<Customer> query = parse("fetch lazy(50) billingAddress");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city ");
+  }
+
+  @Test
+  public void fetch_query50() throws Exception {
+
+    ResetBasicData.reset();
+    Query<Customer> query = parse("fetch query(50) billingAddress");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city ");
+  }
+
+  @Test
+  public void fetch_query50_asHint() throws Exception {
+
+    ResetBasicData.reset();
+    Query<Customer> query = parse("fetch billingAddress (+query(50),city)");
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city ");
+  }
+
+  @Test
+  public void fetch_lazy50_asHint() throws Exception {
+
+    ResetBasicData.reset();
+    Query<Customer> query = parse("fetch billingAddress (+lazy(50),city)");
+    List<Customer> list = query.findList();
+
+    assertThat(query.getGeneratedSql()).doesNotContain(", t1.city ");
+
+    Customer customer = list.get(0);
+    customer.getBillingAddress().getCity();
+
   }
 
   private Query<Customer> parse(String raw) {

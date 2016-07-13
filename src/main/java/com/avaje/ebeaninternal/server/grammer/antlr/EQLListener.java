@@ -88,6 +88,66 @@ public interface EQLListener extends ParseTreeListener {
 	 */
 	void exitFetch_property(EQLParser.Fetch_propertyContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link EQLParser#fetch_query_hint}.
+	 * @param ctx the parse tree
+	 */
+	void enterFetch_query_hint(EQLParser.Fetch_query_hintContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#fetch_query_hint}.
+	 * @param ctx the parse tree
+	 */
+	void exitFetch_query_hint(EQLParser.Fetch_query_hintContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EQLParser#fetch_lazy_hint}.
+	 * @param ctx the parse tree
+	 */
+	void enterFetch_lazy_hint(EQLParser.Fetch_lazy_hintContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#fetch_lazy_hint}.
+	 * @param ctx the parse tree
+	 */
+	void exitFetch_lazy_hint(EQLParser.Fetch_lazy_hintContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EQLParser#fetch_option}.
+	 * @param ctx the parse tree
+	 */
+	void enterFetch_option(EQLParser.Fetch_optionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#fetch_option}.
+	 * @param ctx the parse tree
+	 */
+	void exitFetch_option(EQLParser.Fetch_optionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EQLParser#fetch_query_option}.
+	 * @param ctx the parse tree
+	 */
+	void enterFetch_query_option(EQLParser.Fetch_query_optionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#fetch_query_option}.
+	 * @param ctx the parse tree
+	 */
+	void exitFetch_query_option(EQLParser.Fetch_query_optionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EQLParser#fetch_lazy_option}.
+	 * @param ctx the parse tree
+	 */
+	void enterFetch_lazy_option(EQLParser.Fetch_lazy_optionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#fetch_lazy_option}.
+	 * @param ctx the parse tree
+	 */
+	void exitFetch_lazy_option(EQLParser.Fetch_lazy_optionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link EQLParser#fetch_batch_size}.
+	 * @param ctx the parse tree
+	 */
+	void enterFetch_batch_size(EQLParser.Fetch_batch_sizeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link EQLParser#fetch_batch_size}.
+	 * @param ctx the parse tree
+	 */
+	void exitFetch_batch_size(EQLParser.Fetch_batch_sizeContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link EQLParser#conditional_expression}.
 	 * @param ctx the parse tree
 	 */

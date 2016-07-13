@@ -17,7 +17,7 @@ where_clause
    ;
 
 fetch_path
-   : 'fetch' PATH_VARIABLE fetch_property_set?
+   : 'fetch' fetch_option? PATH_VARIABLE fetch_property_set?
    ;
 
 fetch_property_set
@@ -30,8 +30,34 @@ fetch_property_group
 
 fetch_property
    : PATH_VARIABLE
+   | fetch_query_hint
+   | fetch_lazy_hint
    ;
 
+fetch_query_hint
+   : '+' fetch_query_option
+   ;
+
+fetch_lazy_hint
+   : '+' fetch_lazy_option
+   ;
+
+fetch_option
+   : fetch_query_option
+   | fetch_lazy_option
+   ;
+
+fetch_query_option
+   : 'query' (fetch_batch_size)?
+   ;
+
+fetch_lazy_option
+   : 'lazy' (fetch_batch_size)?
+   ;
+
+fetch_batch_size
+   : '(' NUMBER_LITERAL ')'
+   ;
 
 conditional_expression
    : (conditional_term) ('or' conditional_term)*
@@ -153,7 +179,18 @@ BOOLEAN_LITERAL
    ;
 
 NUMBER_LITERAL
-   : [0-9]+ '.'? [0-9]*;
+   : '-'? DOUBLE
+   | '-'? INT
+   | ZERO
+   ;
+
+DOUBLE
+   : [0-9]+ '.' [0-9]*;
+
+INT
+   : [1-9] [0-9]*;
+
+ZERO : '0';
 
 STRING_LITERAL
    : '\'' ( ~'\'' | '\'\'' )* '\''
