@@ -32,6 +32,8 @@ public class ServerConfigTest {
     props.setProperty("dbuuid","binary");
     props.setProperty("jdbcFetchSizeFindEach", "42");
     props.setProperty("jdbcFetchSizeFindList", "43");
+    props.setProperty("backgroundExecutorShutdownSecs", "98");
+    props.setProperty("backgroundExecutorSchedulePoolSize", "4");
 
     serverConfig.loadFromProperties(props);
 
@@ -40,6 +42,8 @@ public class ServerConfigTest {
     assertEquals(ServerConfig.DbUuid.BINARY, serverConfig.getDbUuid());
     assertEquals(42, serverConfig.getJdbcFetchSizeFindEach());
     assertEquals(43, serverConfig.getJdbcFetchSizeFindList());
+    assertEquals(4, serverConfig.getBackgroundExecutorSchedulePoolSize());
+    assertEquals(98, serverConfig.getBackgroundExecutorShutdownSecs());
 
     serverConfig.setPersistBatch(PersistBatch.NONE);
     serverConfig.setPersistBatchOnCascade(PersistBatch.NONE);

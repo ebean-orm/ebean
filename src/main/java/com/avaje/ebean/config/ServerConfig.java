@@ -384,9 +384,6 @@ public class ServerConfig {
   // configuration for the background executor service (thread pool)
 
   private int backgroundExecutorSchedulePoolSize = 1;
-  private int backgroundExecutorCorePoolSize = 1;
-  private int backgroundExecutorMaxPoolSize = 8;
-  private int backgroundExecutorIdleSecs = 60;
   private int backgroundExecutorShutdownSecs = 30;
 
   // defaults for the L2 bean caching
@@ -1068,48 +1065,6 @@ public class ServerConfig {
    */
   public void setBackgroundExecutorSchedulePoolSize(int backgroundExecutorSchedulePoolSize) {
     this.backgroundExecutorSchedulePoolSize = backgroundExecutorSchedulePoolSize;
-  }
-
-  /**
-   * Return the Background executor core pool size.
-   */
-  public int getBackgroundExecutorCorePoolSize() {
-    return backgroundExecutorCorePoolSize;
-  }
-
-  /**
-   * Set the Background executor core pool size.
-   */
-  public void setBackgroundExecutorCorePoolSize(int backgroundExecutorCorePoolSize) {
-    this.backgroundExecutorCorePoolSize = backgroundExecutorCorePoolSize;
-  }
-
-  /**
-   * Return the Background executor max pool size.
-   */
-  public int getBackgroundExecutorMaxPoolSize() {
-    return backgroundExecutorMaxPoolSize;
-  }
-
-  /**
-   * Set the Background executor max pool size.
-   */
-  public void setBackgroundExecutorMaxPoolSize(int backgroundExecutorMaxPoolSize) {
-    this.backgroundExecutorMaxPoolSize = backgroundExecutorMaxPoolSize;
-  }
-
-  /**
-   * Return the Background executor idle seconds.
-   */
-  public int getBackgroundExecutorIdleSecs() {
-    return backgroundExecutorIdleSecs;
-  }
-
-  /**
-   * Set the Background executor idle seconds.
-   */
-  public void setBackgroundExecutorIdleSecs(int backgroundExecutorIdleSecs) {
-    this.backgroundExecutorIdleSecs = backgroundExecutorIdleSecs;
   }
 
   /**
@@ -2399,6 +2354,8 @@ public class ServerConfig {
     autoCommitMode = p.getBoolean("autoCommitMode", autoCommitMode);
     useJtaTransactionManager = p.getBoolean("useJtaTransactionManager", useJtaTransactionManager);
 
+    backgroundExecutorSchedulePoolSize = p.getInt("backgroundExecutorSchedulePoolSize", backgroundExecutorSchedulePoolSize);
+    backgroundExecutorShutdownSecs = p.getInt("backgroundExecutorShutdownSecs", backgroundExecutorShutdownSecs);
     disableClasspathSearch = p.getBoolean("disableClasspathSearch", disableClasspathSearch);
     currentUserProvider = createInstance(p, CurrentUserProvider.class, "currentUserProvider", currentUserProvider);
     databasePlatform = createInstance(p, DatabasePlatform.class, "databasePlatform", databasePlatform);

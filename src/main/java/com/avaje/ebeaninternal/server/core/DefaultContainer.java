@@ -78,14 +78,10 @@ public class DefaultContainer implements SpiContainer {
   private SpiBackgroundExecutor createBackgroundExecutor(ServerConfig serverConfig) {
 
     String namePrefix = "ebean-" + serverConfig.getName();
-
     int schedulePoolSize = serverConfig.getBackgroundExecutorSchedulePoolSize();
-    int corePoolSize = serverConfig.getBackgroundExecutorCorePoolSize();
-    int maxPoolSize = serverConfig.getBackgroundExecutorMaxPoolSize();
-    int idleSecs = serverConfig.getBackgroundExecutorIdleSecs();
     int shutdownSecs = serverConfig.getBackgroundExecutorShutdownSecs();
 
-    return new DefaultBackgroundExecutor(schedulePoolSize, corePoolSize, maxPoolSize, idleSecs, shutdownSecs, namePrefix);
+    return new DefaultBackgroundExecutor(schedulePoolSize, shutdownSecs, namePrefix);
   }
 
   /**

@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Uses Daemon threads and hooks into shutdown event.
  * </p>
- * 
- * @author rbygrave
  */
 public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor {
 
@@ -26,19 +24,11 @@ public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor 
    * Construct the DaemonScheduleThreadPool.
    */
   public DaemonScheduleThreadPool(int coreSize, int shutdownWaitSeconds, String namePrefix) {
-    
     super(coreSize, new DaemonThreadFactory(namePrefix));
     this.namePrefix = namePrefix;
     this.shutdownWaitSeconds = shutdownWaitSeconds;
   }
 
-  /**
-   * Register a shutdown hook with the JVM Runtime.
-   */
-  public void registerShutdownHook() {
-    Runtime.getRuntime().addShutdownHook(new ShutdownHook());    
-  }
-  
   /**
    * Shutdown this thread pool nicely if possible.
    * <p>
@@ -64,16 +54,6 @@ public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor 
         logger.error("Error during shutdown of " + namePrefix, e);
         e.printStackTrace();
       }
-    }
-  }
-
-  /**
-   * Fired by the JVM Runtime shutdown.
-   */
-  private class ShutdownHook extends Thread {
-    @Override
-    public void run() {
-      shutdown();
     }
   }
 }
