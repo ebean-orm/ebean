@@ -46,4 +46,14 @@
     </raw-sql>
   </entity>
 
+  <entity class="com.avaje.tests.model.basic.Customer">
+    <named-query name="withContactsById">
+      <query>
+        select (name, version)
+        fetch contacts (firstName, lastName, email)
+        where id = :id
+      </query>
+    </named-query>
+  </entity>
+
 </ebean>

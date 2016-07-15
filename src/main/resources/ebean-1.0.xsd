@@ -15,9 +15,19 @@
   <xsd:element name="entity">
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element ref="raw-sql" minOccurs="1" maxOccurs="unbounded"/>
+        <xsd:element ref="named-query" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="raw-sql" minOccurs="0" maxOccurs="unbounded"/>
       </xsd:sequence>
       <xsd:attribute name="class" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="named-query">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="query" minOccurs="1" maxOccurs="1"/>
+      </xsd:sequence>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
     </xsd:complexType>
   </xsd:element>
 

@@ -104,4 +104,18 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     assertThat(query.getGeneratedSql()).contains("from o_customer t0 left outer join contact t1 on t1.customer_id = t0.id ");
   }
+
+  @Test
+  public void namedQuery_fromXml() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = server()
+        .createNamedQuery(Customer.class, "withContactsById")
+        .setParameter("id", 1);
+
+    query.findUnique();
+
+    assertThat(query.getGeneratedSql()).contains("from o_customer t0 left outer join contact t1 on t1.customer_id = t0.id ");
+  }
 }

@@ -53,6 +53,7 @@ import com.avaje.ebeaninternal.xmlmapping.model.XmAliasMapping;
 import com.avaje.ebeaninternal.xmlmapping.model.XmColumnMapping;
 import com.avaje.ebeaninternal.xmlmapping.model.XmEbean;
 import com.avaje.ebeaninternal.xmlmapping.model.XmEntity;
+import com.avaje.ebeaninternal.xmlmapping.model.XmNamedQuery;
 import com.avaje.ebeaninternal.xmlmapping.model.XmRawSql;
 import com.avaje.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import com.avaje.ebeanservice.docstore.api.DocStoreFactory;
@@ -394,6 +395,10 @@ public class BeanDescriptorManager implements BeanDescriptorMap {
           builder.tableAliasMapping(aliasMapping.getAlias(), aliasMapping.getProperty());
         }
         info.addRawSql(sql.getName(), builder.create());
+      }
+
+      for (XmNamedQuery namedQuery : entityDeploy.getNamedQuery()) {
+        info.addNamedQuery(namedQuery.getName(), namedQuery.getQuery().getValue());
       }
     }
   }

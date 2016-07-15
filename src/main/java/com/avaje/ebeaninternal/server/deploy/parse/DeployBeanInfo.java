@@ -82,4 +82,11 @@ public class DeployBeanInfo<T> {
 	public void addRawSql(String name, RawSql rawSql) {
 		descriptor.addRawSql(name, rawSql);
 	}
+
+	/**
+	 * Add the named query.
+   */
+	public void addNamedQuery(String name, String query) {
+		descriptor.addNamedQuery(name, query);
+	}
 }

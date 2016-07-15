@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
+ *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/ebean}named-query" maxOccurs="unbounded"/>
  *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/ebean}raw-sql" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *       &lt;attribute name="class" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -33,15 +34,47 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
+    "namedQuery",
     "rawSql"
 })
 @XmlRootElement(name = "entity")
 public class XmEntity {
 
+    @XmlElement(name = "named-query", required = true)
+    protected List<XmNamedQuery> namedQuery;
     @XmlElement(name = "raw-sql", required = true)
     protected List<XmRawSql> rawSql;
     @XmlAttribute(name = "class", required = true)
     protected String clazz;
+
+    /**
+     * Gets the value of the namedQuery property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the namedQuery property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getNamedQuery().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link XmNamedQuery }
+     * 
+     * 
+     */
+    public List<XmNamedQuery> getNamedQuery() {
+        if (namedQuery == null) {
+            namedQuery = new ArrayList<XmNamedQuery>();
+        }
+        return this.namedQuery;
+    }
 
     /**
      * Gets the value of the rawSql property.

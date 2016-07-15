@@ -77,4 +77,12 @@ public class ObjectFactory {
         return new XmEntity();
     }
 
+    /**
+     * Create an instance of {@link XmNamedQuery }
+     * 
+     */
+    public XmNamedQuery createNamedQuery() {
+        return new XmNamedQuery();
+    }
+
 }
