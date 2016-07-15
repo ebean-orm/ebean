@@ -388,7 +388,6 @@ public class ServerConfig {
 
   // defaults for the L2 bean caching
 
-  private int cacheWarmingDelay = 30;
   private int cacheMaxSize = 10000;
   private int cacheMaxIdleTime = 600;
   private int cacheMaxTimeToLive = 60 * 60 * 6;
@@ -1081,20 +1080,6 @@ public class ServerConfig {
    */
   public void setBackgroundExecutorShutdownSecs(int backgroundExecutorShutdownSecs) {
     this.backgroundExecutorShutdownSecs = backgroundExecutorShutdownSecs;
-  }
-
-  /**
-   * Return the cache warming delay in seconds.
-   */
-  public int getCacheWarmingDelay() {
-    return cacheWarmingDelay;
-  }
-
-  /**
-   * Set the cache warming delay in seconds.
-   */
-  public void setCacheWarmingDelay(int cacheWarmingDelay) {
-    this.cacheWarmingDelay = cacheWarmingDelay;
   }
 
   /**
@@ -2365,7 +2350,6 @@ public class ServerConfig {
     dbEncrypt = createInstance(p, DbEncrypt.class, "dbEncrypt", dbEncrypt);
     serverCachePlugin = createInstance(p, ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
     serverCacheManager = createInstance(p, ServerCacheManager.class, "serverCacheManager", serverCacheManager);
-    cacheWarmingDelay = p.getInt("cacheWarmingDelay", cacheWarmingDelay);
 
     if (packages != null) {
       String packagesProp = p.get("search.packages", p.get("packages", null));
