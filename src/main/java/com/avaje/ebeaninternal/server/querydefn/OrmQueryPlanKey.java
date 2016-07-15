@@ -25,7 +25,6 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
   private final int maxRows;
   private final int firstRow;
   private final boolean disableLazyLoading;
-  private final String query;
   private final boolean distinct;
   private final boolean sqlDistinct;
   private final String mapKey;
@@ -37,7 +36,7 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
   private final int planHash;
   private final int bindCount;
 
-  public OrmQueryPlanKey(TableJoin includeTableJoin, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading, OrderBy<?> orderBy, String query, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams, SpiExpression whereExpressions, SpiExpression havingExpressions, SpiQuery.TemporalMode temporalMode, boolean forUpdate, String rootTableAlias, RawSql rawSql, OrmUpdateProperties updateProperties) {
+  public OrmQueryPlanKey(TableJoin includeTableJoin, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading, OrderBy<?> orderBy, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams, SpiExpression whereExpressions, SpiExpression havingExpressions, SpiQuery.TemporalMode temporalMode, boolean forUpdate, String rootTableAlias, RawSql rawSql, OrmUpdateProperties updateProperties) {
 
     this.includeTableJoin = includeTableJoin;
     this.type = type;
@@ -46,7 +45,6 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
     this.firstRow = firstRow;
     this.disableLazyLoading = disableLazyLoading;
     this.orderByAsSting = (orderBy == null) ? null : orderBy.toStringFormat();
-    this.query = query;
     this.distinct = distinct;
     this.sqlDistinct = sqlDistinct;
     this.mapKey = mapKey;
@@ -63,7 +61,7 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
     HashQueryPlanBuilder builder = new HashQueryPlanBuilder();
 
     builder.add((type == null ? 0 : type.ordinal() + 1));
-    builder.add(distinct).add(sqlDistinct).add(query);
+    builder.add(distinct).add(sqlDistinct);
     builder.add(firstRow).add(maxRows);
     builder.add(orderBy).add(forUpdate);
     builder.add(mapKey);
@@ -131,7 +129,6 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
 
 //    if (detail != null ? !detail.equals(that.detail) : that.detail != null) return false;
 
-    if (query != null ? !query.equals(that.query) : that.query != null) return false;
     if (mapKey != null ? !mapKey.equals(that.mapKey) : that.mapKey != null) return false;
     return rootTableAlias != null ? rootTableAlias.equals(that.rootTableAlias) : that.rootTableAlias == null;
   }

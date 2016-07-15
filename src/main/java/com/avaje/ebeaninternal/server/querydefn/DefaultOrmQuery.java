@@ -94,11 +94,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private String generatedSql;
 
-  /**
-   * Query language version of the query.
-   */
-  private String query;
-
   private String lazyLoadProperty;
 
   private String lazyLoadManyPath;
@@ -569,7 +564,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     copy.includeTableJoin = includeTableJoin;
     copy.profilingListener = profilingListener;
 
-    copy.query = query;
+//    copy.query = query;
     copy.rootTableAlias = rootTableAlias;
     copy.distinct = distinct;
     copy.sqlDistinct = sqlDistinct;
@@ -842,7 +837,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   CQueryPlanKey createQueryPlanKey() {
 
     queryPlanKey = new OrmQueryPlanKey(includeTableJoin, type, detail, maxRows, firstRow,
-        disableLazyLoading, orderBy, query,
+        disableLazyLoading, orderBy,
         distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
         temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);
 
@@ -1320,11 +1315,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public BindParams getBindParams() {
     return bindParams;
-  }
-
-  @Override
-  public String getQuery() {
-    return query;
   }
 
   @Override

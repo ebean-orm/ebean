@@ -553,12 +553,6 @@ public interface SpiQuery<T> extends Query<T> {
   BindParams getBindParams();
 
   /**
-   * Get the orm query as a String. Only available if the query was built from
-   * a string.
-   */
-  String getQuery();
-
-  /**
    * Replace the query detail. This is used by the AutoTune feature to as a
    * fast way to set the query properties and joins.
    * <p>
