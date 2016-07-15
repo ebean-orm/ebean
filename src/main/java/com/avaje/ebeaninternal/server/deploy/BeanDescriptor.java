@@ -7,7 +7,6 @@ import com.avaje.ebean.RawSql;
 import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.Transaction;
 import com.avaje.ebean.ValuePair;
-import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebean.annotation.DocStoreMode;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
@@ -16,8 +15,8 @@ import com.avaje.ebean.bean.PersistenceContext;
 import com.avaje.ebean.bean.PersistenceContextUtil;
 import com.avaje.ebean.config.EncryptKey;
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
 import com.avaje.ebean.config.dbplatform.IdType;
+import com.avaje.ebean.config.dbplatform.PlatformIdGenerator;
 import com.avaje.ebean.event.BeanFindController;
 import com.avaje.ebean.event.BeanPersistController;
 import com.avaje.ebean.event.BeanPersistListener;
@@ -36,6 +35,7 @@ import com.avaje.ebean.plugin.BeanType;
 import com.avaje.ebean.plugin.ExpressionPath;
 import com.avaje.ebean.plugin.Property;
 import com.avaje.ebeaninternal.api.CQueryPlanKey;
+import com.avaje.ebeaninternal.api.ConcurrencyMode;
 import com.avaje.ebeaninternal.api.LoadContext;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.api.SpiQuery;
@@ -110,6 +110,8 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
   private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<String, ElComparator<T>>();
 
   private final Map<String, RawSql> namedRawSql;
+
+  private final Map<String, String> namedQuery;
 
   public void merge(EntityBean bean, EntityBean existing) {
 
@@ -414,6 +416,7 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
     this.rootBeanType = PersistenceContextUtil.root(beanType);
     this.prototypeEntityBean = createPrototypeEntityBean(beanType);
 
+    this.namedQuery = deploy.getNamedQuery();
     this.namedRawSql = deploy.getNamedRawSql();
     this.inheritInfo = deploy.getInheritInfo();
 
@@ -986,6 +989,13 @@ public class BeanDescriptor<T> implements MetaBeanInfo, BeanType<T> {
       return inheritInfo.getRoot().desc();
     }
     return this;
+  }
+
+  /**
+   * Return the named ORM query.
+   */
+  public String getNamedQuery(String name) {
+    return namedQuery.get(name);
   }
 
   /**

@@ -5,17 +5,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 
 @Entity
-@NamedQueries({
-	@NamedQuery(name="loadResult",
-			query="find CalculationResult " +
-			"fetch productConfiguration "+
-			"fetch groupConfiguration "+
-			"where charge = :charge")
-})
 public class CalculationResult {
 	
 	@Id

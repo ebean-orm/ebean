@@ -894,6 +894,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (desc == null) {
       throw new PersistenceException(beanType.getName() + " is NOT an Entity Bean registered with this server?");
     }
+    String named = desc.getNamedQuery(namedQuery);
+    if (named != null) {
+      return createQuery(beanType, named);
+    }
     RawSql rawSql = desc.getNamedRawSql(namedQuery);
     if (rawSql != null) {
       DefaultOrmQuery<T> query = createQuery(beanType);
@@ -905,7 +909,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> Query<T> createQuery(Class<T> beanType, String eql) {
-
     DefaultOrmQuery<T> query = createQuery(beanType);
     EqlParser.parse(eql, query);
     return query;

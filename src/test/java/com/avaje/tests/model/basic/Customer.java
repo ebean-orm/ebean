@@ -14,6 +14,8 @@ import com.avaje.tests.model.basic.finder.CustomerFinder;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -27,6 +29,13 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Customer entity bean.
  */
+@NamedQueries(
+    value = {
+      @NamedQuery(name = "name", query = "select(name) order by name"),
+      @NamedQuery(name = "withStatus", query = "select(name,status) order by name")
+    }
+)
+@NamedQuery(name="withContacts", query = "fetch contacts (firstName, lastName) where id = :id")
 @Cache(enableQueryCache = true)
 @DocStore
 @ChangeLog(inserts = ChangeLogInsertMode.EXCLUDE, updatesThatInclude = {"name", "status"})

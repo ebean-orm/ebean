@@ -68,4 +68,40 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.findUnique();
   }
 
+  @Test
+  public void namedQuery() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> name = server().createNamedQuery(Customer.class, "name");
+    name.findList();
+
+    assertThat(name.getGeneratedSql()).contains("select t0.id c0, t0.name c1 from o_customer t0 order by t0.name");
+  }
+
+  @Test
+  public void namedQuery_withStatus() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> name = server().createNamedQuery(Customer.class, "withStatus");
+    name.order().clear().asc("status");
+    name.findList();
+
+    assertThat(name.getGeneratedSql()).contains("select t0.id c0, t0.name c1, t0.status c2 from o_customer t0 order by t0.status");
+  }
+
+  @Test
+  public void namedQuery_withContacts() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = server()
+        .createNamedQuery(Customer.class, "withContacts")
+        .setParameter("id", 1);
+
+    query.findUnique();
+
+    assertThat(query.getGeneratedSql()).contains("from o_customer t0 left outer join contact t1 on t1.customer_id = t0.id ");
+  }
 }

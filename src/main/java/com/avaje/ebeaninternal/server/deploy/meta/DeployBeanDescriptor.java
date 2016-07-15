@@ -46,6 +46,8 @@ import java.util.Map;
  */
 public class DeployBeanDescriptor<T> {
 
+  private static final Map<String, String> EMPTY_NAMED_QUERY = new HashMap<String, String>();
+
   private static final Map<String, RawSql> EMPTY_RAW_MAP = new HashMap<String, RawSql>();
 
   private static class PropOrder implements Comparator<DeployBeanProperty> {
@@ -72,6 +74,8 @@ public class DeployBeanDescriptor<T> {
   private LinkedHashMap<String, DeployBeanProperty> propMap = new LinkedHashMap<String, DeployBeanProperty>();
 
   private Map<String, RawSql> namedRawSql;
+
+  private Map<String, String> namedQuery;
 
   private EntityType entityType;
 
@@ -1053,6 +1057,23 @@ public class DeployBeanDescriptor<T> {
     if (mostSpecific != DocStoreMode.DEFAULT) return mostSpecific;
     if (docStorePersist != DocStoreMode.DEFAULT) return docStorePersist;
     return serverConfig.getDocStoreConfig().getPersist();
+  }
+
+  /**
+   * Return the named ORM queries.
+   */
+  public Map<String, String> getNamedQuery() {
+    return (namedQuery != null) ? namedQuery : EMPTY_NAMED_QUERY;
+  }
+
+  /**
+   * Add a named query.
+   */
+  public void addNamedQuery(String name, String query) {
+    if (namedQuery == null) {
+      namedQuery = new LinkedHashMap<String, String>();
+    }
+    namedQuery.put(name, query);
   }
 
   /**

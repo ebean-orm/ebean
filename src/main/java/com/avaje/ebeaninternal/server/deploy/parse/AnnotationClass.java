@@ -21,6 +21,8 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -176,6 +178,18 @@ public class AnnotationClass extends AnnotationParser {
     Cache cache = cls.getAnnotation(Cache.class);
     if (cache != null && !disableL2Cache) {
       descriptor.setCache(cache);
+    }
+
+    NamedQueries namedQueries = cls.getAnnotation(NamedQueries.class);
+    if (namedQueries != null) {
+      for (NamedQuery namedQuery : namedQueries.value()) {
+        descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
+      }
+    }
+
+    NamedQuery namedQuery = cls.getAnnotation(NamedQuery.class);
+    if (namedQuery != null) {
+      descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
     }
   }
 
