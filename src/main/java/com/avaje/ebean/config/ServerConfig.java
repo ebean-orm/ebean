@@ -379,8 +379,6 @@ public class ServerConfig {
 
   private boolean transactionRollbackOnChecked = true;
 
-  private boolean registerJmxMBeans = true;
-
   // configuration for the background executor service (thread pool)
 
   private int backgroundExecutorSchedulePoolSize = 1;
@@ -405,7 +403,7 @@ public class ServerConfig {
   private boolean expressionEqualsWithNullAsNoop;
 
   /**
-   * Set to true to use native ILIKE expression (if support by datasbase platform / like Postgres).
+   * Set to true to use native ILIKE expression (if support by database platform / like Postgres).
    */
   private boolean expressionNativeIlike;
 
@@ -1036,20 +1034,6 @@ public class ServerConfig {
    */
   public void setTransactionRollbackOnChecked(boolean transactionRollbackOnChecked) {
     this.transactionRollbackOnChecked = transactionRollbackOnChecked;
-  }
-
-  /**
-   * Return true if the server should register JMX MBeans.
-   */
-  public boolean isRegisterJmxMBeans() {
-    return registerJmxMBeans;
-  }
-
-  /**
-   * Set if the server should register JMX MBeans.
-   */
-  public void setRegisterJmxMBeans(boolean registerJmxMBeans) {
-    this.registerJmxMBeans = registerJmxMBeans;
   }
 
   /**
