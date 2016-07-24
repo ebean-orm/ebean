@@ -5,6 +5,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.tests.model.types.SomeNewTypesBean;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.*;
@@ -16,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestNewTypes extends BaseTestCase {
 
+  private static final String TEMP_PATH = new File("/tmp").getAbsolutePath();	
   @Test
   public void testInsertUpdate() throws IOException {
 
@@ -31,7 +33,7 @@ public class TestNewTypes extends BaseTestCase {
     bean.setZoneId(ZoneId.systemDefault());
     bean.setZoneOffset(ZonedDateTime.now().getOffset());
     bean.setYearMonth(YearMonth.of(2014, 9));
-    bean.setPath(Paths.get("/tmp"));
+    bean.setPath(Paths.get(TEMP_PATH));
 
 
     Ebean.save(bean);
@@ -71,7 +73,7 @@ public class TestNewTypes extends BaseTestCase {
     list = Ebean.find(SomeNewTypesBean.class).where().le("month", Month.SEPTEMBER).findList();
     assertTrue(!list.isEmpty());
 
-    list = Ebean.find(SomeNewTypesBean.class).where().eq("path", Paths.get("/tmp")).findList();
+    list = Ebean.find(SomeNewTypesBean.class).where().eq("path", Paths.get(TEMP_PATH)).findList();
     assertTrue(!list.isEmpty());
 
     SomeNewTypesBean fetched = Ebean.find(SomeNewTypesBean.class, bean.getId());
@@ -100,6 +102,7 @@ public class TestNewTypes extends BaseTestCase {
     assertEquals(bean.getLocalDateTime(), toBean.getLocalDateTime());
     assertEquals(bean.getOffsetDateTime(), toBean.getOffsetDateTime());
     assertEquals(bean.getInstant(), toBean.getInstant());
+    // FIXME: This test fails on Windows with: expected:<\tmp> but was:<C:\tmp>
     assertEquals(bean.getPath(), toBean.getPath());
 
   }
