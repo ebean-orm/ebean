@@ -96,7 +96,13 @@ public class DdlGenerator {
     Transaction transaction = server.createTransaction();
     Connection connection = transaction.getConnection();
     try {
+      if (expectErrors) {
+        connection.setAutoCommit(true);
+      }
       int count = runner.runAll(content, connection);
+      if (expectErrors) {
+        connection.setAutoCommit(false);
+      }
       transaction.commit();
       return count;
 
