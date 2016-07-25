@@ -572,7 +572,7 @@ public class DeployBeanDescriptor<T> {
    * Return the base table with as of suffix.
    */
   public String getBaseTableAsOf() {
-    return baseTableAsOf;
+    return historySupport ? baseTableAsOf : baseTable;
   }
 
   /**
