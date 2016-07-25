@@ -507,6 +507,9 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     if (desc.isHistorySupport()) {
       query.incrementAsOfTableCount();
     }
+    if (lazyLoadParent != null && lazyLoadParent.isManyToManyWithHistory()) {
+      query.incrementAsOfTableCount();
+    }
     if (intersectionAsOfTableAlias) {
       query.incrementAsOfTableCount();
     }

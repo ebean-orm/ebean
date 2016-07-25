@@ -34,6 +34,22 @@ public final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   }
 
   /**
+   * Set AsOf support (at root level).
+   */
+  public void addAsOfTableAlias(SpiQuery<?> query) {
+    if (desc.isHistorySupport()) {
+      query.setAsOfBaseTable();
+      query.incrementAsOfTableCount();
+    }
+    if (lazyLoadParent != null && lazyLoadParent.isManyToManyWithHistory()) {
+      query.incrementAsOfTableCount();
+    }
+    for (int i = 0; i < children.length; i++) {
+      children[i].addAsOfTableAlias(query);
+    }
+  }
+
+  /**
    * For the root node there is no join type or on clause etc.
    */
   @Override

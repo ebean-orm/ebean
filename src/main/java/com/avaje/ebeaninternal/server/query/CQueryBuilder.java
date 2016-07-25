@@ -472,8 +472,7 @@ public class CQueryBuilder {
       hasWhere = true;
     }
 
-    int asOfCount = query.getAsOfTableCount();
-    if (asOfCount > 0 && !historySupport.isStandardsBased()) {
+    if (query.isAsOfBaseTable() && !historySupport.isStandardsBased()) {
       hasWhere = appendWhere(hasWhere, sb);
       sb.append(historySupport.getAsOfPredicate(request.getBaseTableAlias()));
     }

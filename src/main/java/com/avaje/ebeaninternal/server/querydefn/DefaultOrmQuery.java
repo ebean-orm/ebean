@@ -146,6 +146,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   private DefaultExpressionList<T> havingExpressions;
 
+  private boolean asOfBaseTable;
+
   private int asOfTableCount;
 
   /**
@@ -278,6 +280,14 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public List<String> getSoftDeletePredicates() {
     return softDeletePredicates;
+  }
+
+  public boolean isAsOfBaseTable() {
+    return asOfBaseTable;
+  }
+
+  public void setAsOfBaseTable() {
+    this.asOfBaseTable = true;
   }
 
   @Override

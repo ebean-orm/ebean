@@ -223,6 +223,16 @@ public interface SpiQuery<T> extends Query<T> {
   Timestamp getAsOf();
 
   /**
+   * Return true if the base table is using history.
+   */
+  boolean isAsOfBaseTable();
+
+  /**
+   * Set when the base table is using history.
+   */
+  void setAsOfBaseTable();
+
+  /**
    * Increment the counter of tables used in 'As Of' query.
    */
   void incrementAsOfTableCount();
