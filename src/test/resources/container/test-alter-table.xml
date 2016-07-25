@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://ebean-orm.github.io/xml/ns/dbmigration http://ebean-orm.github.io/xml/ns/dbmigration-1.0.xsd">
+
+  <changeSet type="apply">
+
+    <addColumn tableName="foo">
+      <column name="some_id" type="integer" references="bar.id" foreignKeyName="fk_foo_some_id" foreignKeyIndex="idx_foo_some_id"/>
+    </addColumn>
+
+  </changeSet>
+
+</migration>

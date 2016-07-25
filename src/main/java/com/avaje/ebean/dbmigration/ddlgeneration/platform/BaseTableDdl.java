@@ -583,6 +583,12 @@ public class BaseTableDdl implements TableDdl {
       }
     }
 
+    for (Column column : columns) {
+      if (hasValue(column.getReferences())) {
+        writeForeignKey(writer, tableName, column);
+      }
+    }
+
     // add a bit of whitespace
     writer.apply().end();
   }

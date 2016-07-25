@@ -35,6 +35,23 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     handler.generate(write, Helper.getAddColumn());
 
     assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column added_to_foo varchar(20);\n\n");
+  }
+
+
+  @Test
+  public void addColumn_withForeignKey() throws Exception {
+
+    DdlWrite write = new DdlWrite();
+
+    DdlHandler handler = h2Handler();
+    handler.generate(write, Helper.getAlterTableAddColumn());
+
+    String buffer = write.apply().getBuffer();
+    assertThat(buffer).contains("alter table foo add column some_id integer;");
+
+    String fkBuffer = write.applyForeignKeys().getBuffer();
+    assertThat(fkBuffer).contains("alter table foo add constraint fk_foo_some_id foreign key (some_id) references bar (id) on delete restrict on update restrict;");
+    assertThat(fkBuffer).contains("create index idx_foo_some_id on foo (some_id);");
     assertThat(write.dropAll().getBuffer()).isEqualTo("");
   }
 

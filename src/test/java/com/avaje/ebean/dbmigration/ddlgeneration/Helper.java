@@ -20,14 +20,23 @@ public class Helper {
 
   static Migration migration = MigrationXmlReader.read("/container/test-create-table.xml");
 
+  static Migration alterTableMigration = MigrationXmlReader.read("/container/test-alter-table.xml");
+
   static ChangeSet changeSet;
 
   static List<Object> changeSetChildren;
+
+  static ChangeSet alterTableChangeSet;
+
+  static List<Object> alterTableChangeSetChildren;
 
   static {
     List<ChangeSet> changeSets = migration.getChangeSet();
     changeSet = changeSets.get(0);
     changeSetChildren = changeSet.getChangeSetChildren();
+
+    alterTableChangeSet = alterTableMigration.getChangeSet().get(0);
+    alterTableChangeSetChildren = alterTableChangeSet.getChangeSetChildren();
   }
 
   public static ChangeSet getChangeSet() {
@@ -40,6 +49,10 @@ public class Helper {
 
   public static AddColumn getAddColumn() {
     return (AddColumn) changeSetChildren.get(1);
+  }
+
+  public static AddColumn getAlterTableAddColumn() {
+    return (AddColumn) alterTableChangeSetChildren.get(0);
   }
 
   public static DropColumn getDropColumn() {
