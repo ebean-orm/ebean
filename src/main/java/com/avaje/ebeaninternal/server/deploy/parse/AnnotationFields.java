@@ -310,13 +310,44 @@ public class AnnotationFields extends AnnotationParser {
       }
     }
 
+    Indices indices =  get(prop, Indices.class);
+    if (indices != null) {
+      for (Index index: indices.indices()) {
+        addIndex(prop, index);
+      }
+    }
+    
     Index index = get(prop, Index.class);
     if (index != null) {
-      if (hasRelationshipItem(prop)) {
-        throw new RuntimeException("Can't use Index on foreign key relationships.");
-      }
-      descriptor.addIndex(new IndexDefinition(prop.getDbColumn(), index.name(), index.unique()));
+      addIndex(prop, index);
     }
+  }
+
+  private void addIndex(DeployBeanProperty prop, Index index) {
+    String[] columnNames;
+    if (index.columnNames() == null || index.columnNames().length == 0) {
+      columnNames = new String[] {prop.getDbColumn()};
+    } else {
+      columnNames = new String[index.columnNames().length];
+      int i=0;
+      int found = 0;
+      for (String colName : index.columnNames()) {
+        if (colName.equals("${fa}") || colName.equals(prop.getDbColumn())) {
+          columnNames[i++] = prop.getDbColumn();
+          found++;
+        } else {
+          columnNames[i++] = colName;
+        }
+      }
+      if (found != 1) {
+        throw new RuntimeException("DB-columname has to be specified exactly one time in columnNames.");
+      }
+    }
+    
+    if (columnNames.length == 1 && hasRelationshipItem(prop)) {
+      throw new RuntimeException("Can't use Index on foreign key relationships.");
+    }
+    descriptor.addIndex(new IndexDefinition(columnNames, index.name(), index.unique()));
   }
 
   private void readJsonAnnotations(DeployBeanProperty prop) {

@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * An annotation for declaring an index on a single column.
+ * An annotation for declaring an index.
  *
  * @author rvbiljouw
  */
@@ -27,6 +27,9 @@ public @interface Index {
   /**
    * When placed on the class (rather than field) you can specify the columns
    * to include in the index in order.
+   * 
+   * Wnen placed on a field, and columnNames are specified, the field-column has to be included.
+   * You can use "${fa}" for alias
    */
   String[] columnNames() default {};
 

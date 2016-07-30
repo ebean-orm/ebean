@@ -7,6 +7,7 @@ import com.avaje.ebean.annotation.Draftable;
 import com.avaje.ebean.annotation.DraftableElement;
 import com.avaje.ebean.annotation.History;
 import com.avaje.ebean.annotation.Index;
+import com.avaje.ebean.annotation.Indices;
 import com.avaje.ebean.annotation.ReadAudit;
 import com.avaje.ebean.annotation.UpdateMode;
 import com.avaje.ebean.annotation.View;
@@ -116,6 +117,13 @@ public class AnnotationClass extends AnnotationParser {
     if (embeddable != null) {
       descriptor.setEntityType(EntityType.EMBEDDED);
       descriptor.setName("Embeddable:" + cls.getSimpleName());
+    }
+
+    Indices indices = AnnotationBase.findAnnotation(cls, Indices.class);
+    if (indices != null) {
+      for (Index index: indices.indices()) {
+        descriptor.addIndex(new IndexDefinition(index.columnNames(), index.name(), index.unique()));
+      }
     }
 
     Index index = AnnotationBase.findAnnotation(cls,Index.class);
