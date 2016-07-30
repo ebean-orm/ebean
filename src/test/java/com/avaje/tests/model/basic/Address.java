@@ -7,6 +7,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.constraints.Size;
+
+import com.avaje.tests.model.basic.metaannotation.SizeMedium;
+
 import java.sql.Timestamp;
 
 /**
@@ -23,11 +26,11 @@ public class Address {
   @Column(name = "line_1")
   String line1;
 
-  @Size(max = 100)
+  @SizeMedium
   @Column(name = "line_2")
   String line2;
 
-  @Size(max = 100)
+  @SizeMedium
   String city;
 
   Timestamp cretime;
