@@ -5,6 +5,7 @@ import com.avaje.ebean.annotation.ChangeLogInsertMode;
 import com.avaje.ebean.event.BeanPersistRequest;
 import com.avaje.ebean.event.changelog.ChangeLogFilter;
 import com.avaje.ebean.event.changelog.ChangeLogRegister;
+import com.avaje.ebeaninternal.server.deploy.parse.AnnotationBase;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -52,14 +53,7 @@ public class DefaultChangeLogRegister implements ChangeLogRegister {
    * Find and return the ChangeLog annotation in the inheritance hierarchy.
    */
   private ChangeLog getChangeLog(Class<?> beanType) {
-    ChangeLog changeLog = beanType.getAnnotation(ChangeLog.class);
-    if (changeLog != null) {
-      return changeLog;
-    }
-    if (Object.class.equals(beanType.getSuperclass())) {
-      return null;
-    }
-    return getChangeLog(beanType.getSuperclass());
+    return AnnotationBase.findAnnotation(beanType, ChangeLog.class);
   }
 
   /**

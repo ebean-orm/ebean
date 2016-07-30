@@ -223,7 +223,7 @@ public class DeployCreateProperties {
 
     Class<?> propertyType = field.getType();
     
-    ManyToOne manyToOne = field.getAnnotation(ManyToOne.class);
+    ManyToOne manyToOne = AnnotationBase.findAnnotation(field,ManyToOne.class);
     if (manyToOne != null){
     	Class<?> tt = manyToOne.targetEntity();
     	if (!tt.equals(void.class)){
@@ -240,7 +240,7 @@ public class DeployCreateProperties {
       // List, Set or Map based object
       Class<?> targetType = determineTargetType(field);
       if (targetType == null) {
-        Transient transAnnotation = field.getAnnotation(Transient.class);
+        Transient transAnnotation = AnnotationBase.findAnnotation(field,Transient.class);
         if (transAnnotation != null) {
           // not supporting this field (generic type used)
           return null;
@@ -298,15 +298,15 @@ public class DeployCreateProperties {
    * Return true if the field has one of the special mappings.
    */
   private boolean isSpecialScalarType(Field field) {
-    return (field.getAnnotation(DbJson.class) != null)
-        || (field.getAnnotation(DbJsonB.class) != null)
-        || (field.getAnnotation(DbArray.class) != null)
-        || (field.getAnnotation(DbHstore.class) != null);
+    return (AnnotationBase.findAnnotation(field,DbJson.class) != null)
+        || (AnnotationBase.findAnnotation(field,DbJsonB.class) != null)
+        || (AnnotationBase.findAnnotation(field,DbArray.class) != null)
+        || (AnnotationBase.findAnnotation(field,DbHstore.class) != null);
   }
   
   private boolean isTransientField(Field field) {
 
-    Transient t = field.getAnnotation(Transient.class);
+    Transient t = AnnotationBase.findAnnotation(field,Transient.class);
     return (t != null);
   }
 

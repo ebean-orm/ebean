@@ -66,7 +66,7 @@ public class AnnotationClass extends AnnotationParser {
   public void parseAttributeOverride() {
 
     Class<?> cls = descriptor.getBeanType();
-    AttributeOverride override = cls.getAnnotation(AttributeOverride.class);
+    AttributeOverride override = AnnotationBase.findAnnotation(cls,AttributeOverride.class);
     if (override != null) {
       String propertyName = override.name();
       Column column = override.column();
@@ -103,7 +103,7 @@ public class AnnotationClass extends AnnotationParser {
 
   private void read(Class<?> cls) {
 
-    Entity entity = cls.getAnnotation(Entity.class);
+    Entity entity = AnnotationBase.findAnnotation(cls,Entity.class);
     if (entity != null) {
       if (entity.name().equals("")) {
         descriptor.setName(cls.getSimpleName());
@@ -112,27 +112,27 @@ public class AnnotationClass extends AnnotationParser {
       }
     }
 
-    Embeddable embeddable = cls.getAnnotation(Embeddable.class);
+    Embeddable embeddable = AnnotationBase.findAnnotation(cls,Embeddable.class);
     if (embeddable != null) {
       descriptor.setEntityType(EntityType.EMBEDDED);
       descriptor.setName("Embeddable:" + cls.getSimpleName());
     }
 
-    Index index = cls.getAnnotation(Index.class);
+    Index index = AnnotationBase.findAnnotation(cls,Index.class);
     if (index != null) {
       descriptor.addIndex(new IndexDefinition(index.columnNames(), index.name(), index.unique()));
     }
 
-    UniqueConstraint uc = cls.getAnnotation(UniqueConstraint.class);
+    UniqueConstraint uc = AnnotationBase.findAnnotation(cls,UniqueConstraint.class);
     if (uc != null) {
       descriptor.addIndex(new IndexDefinition(uc.columnNames()));
     }
 
-    View view = cls.getAnnotation(View.class);
+    View view = AnnotationBase.findAnnotation(cls,View.class);
     if (view != null) {
       descriptor.setView(view.name(), view.dependentTables());
     }
-    Table table = cls.getAnnotation(Table.class);
+    Table table = AnnotationBase.findAnnotation(cls,Table.class);
     if (table != null) {
       UniqueConstraint[] uniqueConstraints = table.uniqueConstraints();
       for (UniqueConstraint c : uniqueConstraints) {
@@ -140,54 +140,54 @@ public class AnnotationClass extends AnnotationParser {
       }
     }
 
-    Draftable draftable = cls.getAnnotation(Draftable.class);
+    Draftable draftable = AnnotationBase.findAnnotation(cls,Draftable.class);
     if (draftable != null) {
       descriptor.setDraftable();
     }
 
-    DraftableElement draftableElement = cls.getAnnotation(DraftableElement.class);
+    DraftableElement draftableElement = AnnotationBase.findAnnotation(cls,DraftableElement.class);
     if (draftableElement != null) {
       descriptor.setDraftableElement();
     }
 
-    ReadAudit readAudit = cls.getAnnotation(ReadAudit.class);
+    ReadAudit readAudit = AnnotationBase.findAnnotation(cls,ReadAudit.class);
     if (readAudit != null) {
       descriptor.setReadAuditing();
     }
 
-    History history = cls.getAnnotation(History.class);
+    History history = AnnotationBase.findAnnotation(cls,History.class);
     if (history != null) {
       descriptor.setHistorySupport();
     }
 
-    DbComment comment = cls.getAnnotation(DbComment.class);
+    DbComment comment = AnnotationBase.findAnnotation(cls,DbComment.class);
     if (comment != null) {
       descriptor.setDbComment(comment.value());
     }
 
-    DocStore docStore = cls.getAnnotation(DocStore.class);
+    DocStore docStore = AnnotationBase.findAnnotation(cls,DocStore.class);
     if (docStore != null) {
       descriptor.readDocStore(docStore);
     }
 
-    UpdateMode updateMode = cls.getAnnotation(UpdateMode.class);
+    UpdateMode updateMode = AnnotationBase.findAnnotation(cls,UpdateMode.class);
     if (updateMode != null) {
       descriptor.setUpdateChangesOnly(updateMode.updateChangesOnly());
     }
 
-    Cache cache = cls.getAnnotation(Cache.class);
+    Cache cache = AnnotationBase.findAnnotation(cls,Cache.class);
     if (cache != null && !disableL2Cache) {
       descriptor.setCache(cache);
     }
 
-    NamedQueries namedQueries = cls.getAnnotation(NamedQueries.class);
+    NamedQueries namedQueries = AnnotationBase.findAnnotation(cls,NamedQueries.class);
     if (namedQueries != null) {
       for (NamedQuery namedQuery : namedQueries.value()) {
         descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
       }
     }
 
-    NamedQuery namedQuery = cls.getAnnotation(NamedQuery.class);
+    NamedQuery namedQuery = AnnotationBase.findAnnotation(cls,NamedQuery.class);
     if (namedQuery != null) {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
     }
