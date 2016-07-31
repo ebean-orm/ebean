@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.avaje.ebean.bean.EntityBean;
-
 
 /**
  * Contains the various ElMatcher implementations.

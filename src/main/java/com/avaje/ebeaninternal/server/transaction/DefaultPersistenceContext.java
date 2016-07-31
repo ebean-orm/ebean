@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.transaction;
 
 import com.avaje.ebean.bean.PersistenceContext;
-import com.avaje.ebean.bean.PersistenceContextUtil;
 import com.avaje.ebeaninternal.api.Monitor;
 
 import java.util.HashMap;

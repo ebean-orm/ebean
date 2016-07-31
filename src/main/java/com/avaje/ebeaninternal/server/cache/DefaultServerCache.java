@@ -1,7 +1,6 @@
 package com.avaje.ebeaninternal.server.cache;
 
 import com.avaje.ebean.BackgroundExecutor;
-import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.cache.ServerCacheStatistics;

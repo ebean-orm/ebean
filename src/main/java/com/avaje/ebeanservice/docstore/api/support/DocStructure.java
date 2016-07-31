@@ -1,9 +1,8 @@
 package com.avaje.ebeanservice.docstore.api.support;
 
-import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebean.FetchPath;
+import com.avaje.ebean.text.PathProperties;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
-import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 
 import java.util.HashMap;

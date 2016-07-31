@@ -1,7 +1,5 @@
 package com.avaje.ebean.event;
 
-import java.util.Set;
-
 /**
  * Used to enhance or override the default bean persistence mechanism.
  * <p>

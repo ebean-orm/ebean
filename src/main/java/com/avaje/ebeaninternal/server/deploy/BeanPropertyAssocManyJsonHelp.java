@@ -3,7 +3,6 @@ package com.avaje.ebeaninternal.server.deploy;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.BeanCollectionAdd;
 import com.avaje.ebean.bean.EntityBean;
-import com.avaje.ebeaninternal.api.ClassUtil;
 import com.avaje.ebeaninternal.server.text.json.ReadJson;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
