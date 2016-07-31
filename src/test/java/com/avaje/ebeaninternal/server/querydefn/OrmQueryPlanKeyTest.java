@@ -30,7 +30,7 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_diffTableJoinNull() {
 
-    TableJoin tableJoin = tableJoin("id", "customer_id");
+    TableJoin tableJoin = tableJoin("table", "id", "customer_id");
 
     OrmQueryPlanKey key1 = new OrmQueryPlanKey(tableJoin, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
     OrmQueryPlanKey key2 = new OrmQueryPlanKey(null, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
@@ -41,8 +41,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_diffTableJoin() {
 
-    TableJoin tableJoin1 = tableJoin("id", "customer_id");
-    TableJoin tableJoin2 = tableJoin("id", "other_customer_id");
+    TableJoin tableJoin1 = tableJoin("one", "id", "customer_id");
+    TableJoin tableJoin2 = tableJoin("two", "id", "customer_id");
 
     OrmQueryPlanKey key1 = new OrmQueryPlanKey(tableJoin1, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
     OrmQueryPlanKey key2 = new OrmQueryPlanKey(tableJoin2, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
@@ -53,8 +53,8 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   @Test
   public void equals_when_sameTableJoin() {
 
-    TableJoin tableJoin1 = tableJoin("id", "customer_id");
-    TableJoin tableJoin2 = tableJoin("id", "customer_id");
+    TableJoin tableJoin1 = tableJoin("one", "id", "customer_id");
+    TableJoin tableJoin2 = tableJoin("one", "id", "customer_id");
 
     OrmQueryPlanKey key1 = new OrmQueryPlanKey(tableJoin1, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
     OrmQueryPlanKey key2 = new OrmQueryPlanKey(tableJoin2, SpiQuery.Type.BEAN, null, 0, 0, false, null, false, false, null, null, null, null, null, SpiQuery.TemporalMode.CURRENT, false, null, null, null);
@@ -63,9 +63,9 @@ public class OrmQueryPlanKeyTest extends BaseExpressionTest {
   }
 
   @NotNull
-  private TableJoin tableJoin(String col1, String col2) {
+  private TableJoin tableJoin(String table, String col1, String col2) {
     DeployTableJoin deploy = new DeployTableJoin();
-    deploy.setTable("myTable");
+    deploy.setTable(table);
     deploy.addJoinColumn(new DeployTableJoinColumn(col1, col2));
     return new TableJoin(deploy);
   }
