@@ -4,8 +4,7 @@ import com.avaje.ebeaninternal.api.SpiTransaction;
 import com.avaje.ebeaninternal.server.transaction.TransactionMap.State;
 
 /**
- * Used by EbeanMgr to store its Transactions in a ThreadLocal. This way the
- * transaction objects don't have to passed around.
+ * Used to store Transactions in a ThreadLocal.
  */
 public final class DefaultTransactionThreadLocal {
 
@@ -99,7 +98,7 @@ public final class DefaultTransactionThreadLocal {
    * block.
    * <p>
    * <pre>
-   * Ebean.beingTransaction();
+   * Ebean.beginTransaction();
    * try {
    *   // ... perform some actions in a single transaction
    *
@@ -110,8 +109,6 @@ public final class DefaultTransactionThreadLocal {
    *   Ebean.endTransaction();
    * }
    * </pre>
-   * <p>
-   * </p>
    */
   public static void end(String serverName) {
 
