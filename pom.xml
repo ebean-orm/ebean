@@ -9,7 +9,7 @@
 
   <groupId>org.avaje.ebeanorm</groupId>
   <artifactId>avaje-ebeanorm</artifactId>
-  <version>7.21.1-SNAPSHOT</version>
+  <version>7.21.1</version>
   <packaging>jar</packaging>
 
   <name>avaje-ebeanorm</name>
@@ -37,7 +37,7 @@
 
   <scm>
     <developerConnection>scm:git:https://github.com/ebean-orm/avaje-ebeanorm.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>avaje-ebeanorm-7.21.1</tag>
   </scm>
 
   <dependencies>
