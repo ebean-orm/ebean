@@ -153,4 +153,10 @@ public class SqlTree {
     return encryptedProps;
   }
 
+  /**
+   * Return true if the query has a many join.
+   */
+  public boolean hasMany() {
+    return manyProperty != null || rootNode.hasMany();
+  }
 }

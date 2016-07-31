@@ -109,4 +109,9 @@ public class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
     // nothing to do here
     return null;
   }
+
+  @Override
+  public boolean hasMany() {
+    return true;
+  }
 }

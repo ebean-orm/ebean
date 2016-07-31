@@ -137,10 +137,10 @@ public class ManyWhereJoins implements Serializable {
   }
 
   /**
-   * Return true if the findRowCount query just needs the id property in the select clause.
+   * Return true if the query select includes a formula with join.
    */
-  public boolean isSelectId() {
-    return !formulaWithJoin;
+  public boolean isFormulaWithJoin() {
+    return formulaWithJoin;
   }
 
   /**

@@ -123,7 +123,7 @@ public class CQueryBuilder {
 
     if (!sqlTree.isIncludeJoins()) {
       // simple - delete from table ...
-      return  aliasStrip(buildSql("delete", request, predicates, sqlTree).getSql());
+      return aliasStrip(buildSql("delete", request, predicates, sqlTree).getSql());
     }
     // wrap as - delete from table where id in (select id ...)
     String sql = buildSql(null, request, predicates, sqlTree).getSql();
@@ -135,11 +135,11 @@ public class CQueryBuilder {
 
   private <T> String buildUpdateSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
 
-    String updateClause = "update "+request.getBeanDescriptor().getBaseTable()+" set "+predicates.getDbUpdateClause();
+    String updateClause = "update " + request.getBeanDescriptor().getBaseTable() + " set " + predicates.getDbUpdateClause();
 
     if (!sqlTree.isIncludeJoins()) {
       // simple - update table set ... where ...
-      return  aliasStrip(buildSqlUpdate(updateClause, request, predicates, sqlTree).getSql());
+      return aliasStrip(buildSqlUpdate(updateClause, request, predicates, sqlTree).getSql());
     }
     // wrap as - update table set ... where id in (select id ...)
     String sql = buildSqlUpdate(null, request, predicates, sqlTree).getSql();
@@ -161,7 +161,7 @@ public class CQueryBuilder {
    * Replace the root table alias.
    */
   private String aliasReplace(String sql, String replaceWith) {
-    sql = StringHelper.replaceString(sql, "${RTA}.", replaceWith+".");
+    sql = StringHelper.replaceString(sql, "${RTA}.", replaceWith + ".");
     return StringHelper.replaceString(sql, "${RTA}", replaceWith);
   }
 
@@ -225,20 +225,10 @@ public class CQueryBuilder {
 
     ManyWhereJoins manyWhereJoins = query.getManyWhereJoins();
 
-    boolean hasMany = manyWhereJoins.isHasMany();
-    if (manyWhereJoins.isSelectId()) {
-      // just select the id property
-      query.setSelectId();
-    } else {
-      // select the id and the required formula properties
+    if (manyWhereJoins.isFormulaWithJoin()) {
       query.select(manyWhereJoins.getFormulaProperties());
-    }
-
-    String sqlSelect = "select count(*)";
-    if (hasMany) {
-      // need to count distinct id's ...
-      query.setSqlDistinct(true);
-      sqlSelect = null;
+    } else {
+      query.setSelectId();
     }
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
@@ -255,6 +245,14 @@ public class CQueryBuilder {
     SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
     if (SpiQuery.TemporalMode.CURRENT == query.getTemporalMode()) {
       sqlTree.addSoftDeletePredicate(query);
+    }
+
+    boolean hasMany = sqlTree.hasMany();
+    String sqlSelect = "select count(*)";
+    if (hasMany) {
+      // need to count distinct id's ...
+      query.setSqlDistinct(true);
+      sqlSelect = null;
     }
 
     SqlLimitResponse s = buildSql(sqlSelect, request, predicates, sqlTree);
@@ -488,7 +486,7 @@ public class CQueryBuilder {
       }
       if (stripAlias) {
         // strip the table alias for use in update statement
-        idSql = StringHelper.replaceString(idSql, "t0.","");
+        idSql = StringHelper.replaceString(idSql, "t0.", "");
       }
       sb.append(idSql).append(" ");
       hasWhere = true;

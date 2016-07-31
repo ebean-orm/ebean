@@ -1,11 +1,5 @@
 package com.avaje.ebeaninternal.server.query;
 
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
@@ -23,6 +17,12 @@ import com.avaje.ebeaninternal.server.deploy.InheritInfo;
 import com.avaje.ebeaninternal.server.deploy.TableJoin;
 import com.avaje.ebeaninternal.server.deploy.id.IdBinder;
 import com.avaje.ebeaninternal.server.lib.util.StringHelper;
+
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Normal bean included in the query.
@@ -570,4 +570,14 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     return true;
   }
 
+  @Override
+  public boolean hasMany() {
+
+    for (SqlTreeNode child : children) {
+      if (child.hasMany()) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

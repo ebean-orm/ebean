@@ -146,4 +146,9 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
   public <T> Version<T> loadVersion(DbReadContext ctx) throws SQLException {
     return null;
   }
+
+  @Override
+  public boolean hasMany() {
+    return manyJoin;
+  }
 }
