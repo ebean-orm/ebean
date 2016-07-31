@@ -25,11 +25,11 @@ public class TestNestedBeginRequiresNew extends BaseTestCase {
     Transaction txn = server.beginTransaction(TxScope.requiresNew());
     try {
 
-      server.find(Country.class).findRowCount();
+      server.find(Country.class).findCount();
 
       someInnerMethod();
 
-      server.find(Product.class).findRowCount();
+      server.find(Product.class).findCount();
 
       txn.commit();
 
@@ -45,7 +45,7 @@ public class TestNestedBeginRequiresNew extends BaseTestCase {
     Transaction txn = server.beginTransaction(TxScope.requiresNew());
     try {
 
-      server.find(Customer.class).findRowCount();
+      server.find(Customer.class).findCount();
       txn.commit();
 
     } finally {

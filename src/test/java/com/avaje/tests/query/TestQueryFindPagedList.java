@@ -83,7 +83,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     pagedList.loadRowCount();
     List<Order> orders = pagedList.getList();
-    int totalRowCount = pagedList.getTotalRowCount();
+    int totalRowCount = pagedList.getTotalCount();
 
     assertThat(orders.size()).isLessThan(totalRowCount);
     assertTrue(pagedList.hasNext());
@@ -96,9 +96,9 @@ public class TestQueryFindPagedList extends BaseTestCase {
         .setMaxRows(3)
         .findPagedList();
 
-    pagedList2.loadRowCount();
+    pagedList2.loadCount();
     List<Order> orders2 = pagedList2.getList();
-    int totalRowCount2 = pagedList2.getTotalRowCount();
+    int totalRowCount2 = pagedList2.getTotalCount();
     assertTrue(pagedList2.hasNext());
     assertTrue(pagedList2.hasPrev());
 
@@ -161,11 +161,11 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(3).findPagedList();
 
-    Future<Integer> rowCount = pagedList.getFutureRowCount();
+    Future<Integer> rowCount = pagedList.getFutureCount();
     List<Order> orders = pagedList.getList();
 
     // these are each getting the total row count
-    int totalRowCount = pagedList.getTotalRowCount();
+    int totalRowCount = pagedList.getTotalCount();
     Integer totalRowCountWithTimeout = rowCount.get(30, TimeUnit.SECONDS);
     Integer totalRowCountViaFuture = rowCount.get();
 
@@ -183,9 +183,9 @@ public class TestQueryFindPagedList extends BaseTestCase {
     // fetch less that total orders (page size 3)
     PagedList<Order> pagedList = Ebean.find(Order.class).setMaxRows(3).findPagedList();
 
-    pagedList.loadRowCount();
+    pagedList.loadCount();
     List<Order> orders = pagedList.getList();
-    int totalRowCount = pagedList.getTotalRowCount();
+    int totalRowCount = pagedList.getTotalCount();
 
     assertThat(orders.size()).isLessThan(totalRowCount);
   }
@@ -207,10 +207,10 @@ public class TestQueryFindPagedList extends BaseTestCase {
     try {
 
       List<Order> orders = pagedList.getList();
-      int totalRowCount = pagedList.getTotalRowCount();
+      int totalRowCount = pagedList.getTotalCount();
 
       // invoke it again but cached...
-      int totalRowCountAgain = pagedList.getTotalRowCount();
+      int totalRowCountAgain = pagedList.getTotalCount();
 
       List<String> loggedSql = LoggedSqlCollector.stop();
 
@@ -242,7 +242,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     LoggedSqlCollector.start();
 
-    pagedList.getTotalRowCount();
+    pagedList.getTotalCount();
     pagedList.getList();
 
     List<String> loggedSql = LoggedSqlCollector.stop();

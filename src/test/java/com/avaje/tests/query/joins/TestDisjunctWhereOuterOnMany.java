@@ -44,7 +44,7 @@ public class TestDisjunctWhereOuterOnMany extends BaseTestCase {
         .query();
     
     List<UUOne> list = query.findList();
-    int rowCount = query.findRowCount();
+    int rowCount = query.findCount();
     
     // select distinct t0.id c0, t0.name c1 
     // from uuone t0 

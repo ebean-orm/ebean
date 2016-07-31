@@ -361,8 +361,13 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
+  public FutureRowCount<T> findFutureCount() {
+    return exprList.findFutureCount();
+  }
+
+  @Override
   public FutureRowCount<T> findFutureRowCount() {
-    return exprList.findFutureRowCount();
+    return findFutureCount();
   }
 
   @Override
@@ -401,8 +406,13 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public int findRowCount() {
+  public int findCount() {
     return exprList.findRowCount();
+  }
+
+  @Override
+  public int findRowCount() {
+    return findCount();
   }
 
   @Override

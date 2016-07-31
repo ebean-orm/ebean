@@ -28,7 +28,7 @@ public class TestObjectGraphNodeStatsCollection extends BaseTestCase {
     
     MetaInfoManager infoManager = server.getMetaInfoManager();
     
-    server.find(Order.class).findRowCount();
+    server.find(Order.class).findCount();
     
     infoManager.collectNodeStatistics(true);
     infoManager.collectQueryPlanStatistics(true);

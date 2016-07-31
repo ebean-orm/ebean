@@ -182,6 +182,13 @@ public interface ExpressionList<T> {
    * This is the number of 'top level' or 'root level' entities.
    * </p>
    */
+  int findCount();
+
+  /**
+   * Deprecated in favor of findCount().
+   *
+   * @deprecated
+   */
   int findRowCount();
 
   /**
@@ -227,6 +234,13 @@ public interface ExpressionList<T> {
    * </p>
    * 
    * @return a Future object for the row count query
+   */
+  FutureRowCount<T> findFutureCount();
+
+  /**
+   * Deprecated in favor of findFutureCount().
+   *
+   * @deprecated
    */
   FutureRowCount<T> findFutureRowCount();
 

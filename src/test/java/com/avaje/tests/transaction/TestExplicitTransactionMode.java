@@ -70,7 +70,7 @@ public class TestExplicitTransactionMode extends BaseTestCase {
     }
 
     // rollback as expected
-    assertEquals(0, ebeanServer.find(UTMaster.class).findRowCount());
+    assertEquals(0, ebeanServer.find(UTMaster.class).findCount());
 
     UTMaster bean1 = new UTMaster("one1");
     UTMaster bean2 = new UTMaster("two2");

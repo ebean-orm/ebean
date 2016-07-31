@@ -677,19 +677,36 @@ public abstract class Model {
     /**
      * Executes a find row count query in a background thread.
      * <p>
-     * Equivalent to {@link Query#findFutureRowCount()}
+     * Equivalent to {@link Query#findFutureCount()}
+     */
+    public FutureRowCount<T> findFutureCount() {
+      return query().findFutureCount();
+    }
+
+    /**
+     * Deprecated in favor of findFutureCount().
+     * <p>
+     * Equivalent to {@link Query#findFutureCount()}
      */
     public FutureRowCount<T> findFutureRowCount() {
-      return query().findFutureRowCount();
+      return query().findFutureCount();
     }
 
     /**
      * Returns the total number of entities for this type. *
      * <p>
-     * Equivalent to {@link Query#findRowCount()}
+     * Equivalent to {@link Query#findCount()}
+     */
+    public int findCount() {
+      return query().findCount();
+    }
+
+    /**
+     * Deprecated in favor of findCount().
+     * @deprecated
      */
     public int findRowCount() {
-      return query().findRowCount();
+      return query().findCount();
     }
 
     /**

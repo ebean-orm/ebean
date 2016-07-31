@@ -147,7 +147,7 @@ public class MainDbBoolean {
 			.setAutoTune(false)
 			.order("id");
 	
-		int rc = query.findRowCount();
+		int rc = query.findCount();
 		Assert.assertTrue(rc > 0);
 	
 		

@@ -29,7 +29,7 @@ public class TestQueryPlanCacheRowCount extends BaseTestCase {
     List<Order> list0 = query.findList();
     Assert.assertEquals(rc0, list0.size());
 
-    int rc1 = query.findRowCount();
+    int rc1 = query.findCount();
     Assert.assertEquals(rc0, rc1);
 
     List<Object> ids1 = query.findIds();
@@ -48,7 +48,7 @@ public class TestQueryPlanCacheRowCount extends BaseTestCase {
     Query<Order> query2 = Ebean.find(Order.class).where().eq("status", Order.Status.NEW)
         .ge("id", idGt).order().desc("id");
 
-    int rc2 = query2.findRowCount();
+    int rc2 = query2.findCount();
 
     System.out.println("Expection Not same " + rc0 + " != " + rc2);
     Assert.assertNotSame(rc0, rc2);

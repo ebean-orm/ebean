@@ -29,7 +29,7 @@ public class TestFutureRowCountErrorHandling  extends BaseTestCase {
       .where().eq("doesNotExist", "this will fail")
       .query();
       
-    FutureRowCount<Customer> futureRowCount = server.findFutureRowCount(query, null);
+    FutureRowCount<Customer> futureRowCount = server.findFutureCount(query, null);
     
     QueryFutureRowCount<Customer> internalRowCount = (QueryFutureRowCount<Customer>)futureRowCount;
     Transaction t = internalRowCount.getTransaction();

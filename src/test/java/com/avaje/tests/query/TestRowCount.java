@@ -21,7 +21,7 @@ public class TestRowCount extends BaseTestCase {
     Query<Order> query = Ebean.find(Order.class).fetch("details").where().gt("id", 1)
         .gt("details.id", 1).order("id desc");
 
-    int rc = query.findRowCount();
+    int rc = query.findCount();
 
     List<Object> ids = query.findIds();
 

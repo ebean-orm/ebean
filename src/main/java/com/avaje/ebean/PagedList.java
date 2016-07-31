@@ -110,6 +110,13 @@ public interface PagedList<T> {
    * wrapped in the unchecked PersistenceException (which might be preferrable).
    * </p>
    */
+  void loadCount();
+
+  /**
+   * Deprecated in favor of loadCount().
+   *
+   * @deprecated
+   */
   void loadRowCount();
 
   /**
@@ -137,6 +144,13 @@ public interface PagedList<T> {
    *     int totalRowCount = pagedList.getTotalRowCount();
    *
    * }</pre>
+   */
+  Future<Integer> getFutureCount();
+
+  /**
+   * Deprecated in favor of getFutureCount().
+   *
+   * @deprecated
    */
   Future<Integer> getFutureRowCount();
 
@@ -169,6 +183,13 @@ public interface PagedList<T> {
    *     int totalRowCount = pagedList.getTotalRowCount();
    *
    * }</pre>
+   */
+  int getTotalCount();
+
+  /**
+   * Deprecated in favor of getTotalCount().
+   *
+   * @deprecated
    */
   int getTotalRowCount();
 

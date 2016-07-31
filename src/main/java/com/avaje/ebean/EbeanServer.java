@@ -741,8 +741,8 @@ public interface EbeanServer {
   /**
    * Return the number of 'top level' or 'root' entities this query should return.
    *
-   * @see Query#findRowCount()
-   * @see com.avaje.ebean.Query#findFutureRowCount()
+   * @see Query#findCount()
+   * @see Query#findFutureCount()
    */
   <T> int findCount(Query<T> query, Transaction transaction);
 

@@ -39,13 +39,13 @@ public class TestM2MDeleteWithCascade extends BaseTestCase {
     List<Object> roleIds = new ArrayList<Object>();
     Collections.addAll(roleIds, r0.getRoleid(), r1.getRoleid());
 
-    int rc = Ebean.find(MRole.class).where().idIn(roleIds).findRowCount();
+    int rc = Ebean.find(MRole.class).where().idIn(roleIds).findCount();
 
     Assert.assertEquals("roles not deleted", 2, rc);
 
     Ebean.deleteAll(roles);
 
-    rc = Ebean.find(MRole.class).where().idIn(roleIds).findRowCount();
+    rc = Ebean.find(MRole.class).where().idIn(roleIds).findCount();
 
     Assert.assertEquals("roles deleted now", 0, rc);
   }

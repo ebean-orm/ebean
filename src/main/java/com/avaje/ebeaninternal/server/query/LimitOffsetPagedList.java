@@ -43,17 +43,25 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
     this.firstRow = query.getFirstRow();
   }
 
-  public void loadRowCount() {
-    getFutureRowCount();
+  public void loadCount() {
+    getFutureCount();
   }
 
-  public Future<Integer> getFutureRowCount() {
+  public void loadRowCount() {
+    loadCount();
+  }
+
+  public Future<Integer> getFutureCount() {
     synchronized (monitor) {
       if (futureRowCount == null) {
-        futureRowCount = server.findFutureRowCount(query, null);
+        futureRowCount = server.findFutureCount(query, null);
       }
       return futureRowCount;
     }
+  }
+
+  public Future<Integer> getFutureRowCount() {
+    return getFutureCount();
   }
 
   public List<T> getList() {
@@ -67,7 +75,7 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
 
   public int getTotalPageCount() {
 
-    int rowCount = getTotalRowCount();
+    int rowCount = getTotalCount();
     if (rowCount == 0) {
       return 0;
     } else {
@@ -75,7 +83,7 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
     }
   }
 
-  public int getTotalRowCount() {
+  public int getTotalCount() {
     synchronized (monitor) {
       if (futureRowCount != null) {
         try {
@@ -89,13 +97,17 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
       if (foregroundTotalRowCount > -1) return foregroundTotalRowCount;
 
       // just using foreground thread
-      foregroundTotalRowCount = server.findRowCount(query, null);
+      foregroundTotalRowCount = server.findCount(query, null);
       return foregroundTotalRowCount;
     }
   }
 
+  public int getTotalRowCount() {
+    return getTotalCount();
+  }
+
   public boolean hasNext() {
-    return (firstRow + maxRows) < getTotalRowCount();
+    return (firstRow + maxRows) < getTotalCount();
   }
 
   public boolean hasPrev() {
@@ -110,7 +122,7 @@ public class LimitOffsetPagedList<T> implements PagedList<T> {
 
     int first = firstRow + 1;
     int last = firstRow + getList().size();
-    int total = getTotalRowCount();
+    int total = getTotalCount();
 
     return first + to + last + of + total;
   }

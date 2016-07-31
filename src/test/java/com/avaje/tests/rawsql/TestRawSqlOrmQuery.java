@@ -78,14 +78,14 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     Query<Customer> query = Ebean.find(Customer.class);
     query.setRawSql(rawSql);
 
-    int initialRowCount = query.findRowCount();
+    int initialRowCount = query.findCount();
 
     query.setFirstRow(1);
     query.setMaxRows(2);
     List<Customer> list = query.findList();
     
-    int rowCount = query.findRowCount();
-    FutureRowCount<Customer> futureRowCount = query.findFutureRowCount();
+    int rowCount = query.findCount();
+    FutureRowCount<Customer> futureRowCount = query.findFutureCount();
 
     Assert.assertEquals(initialRowCount, rowCount);
     Assert.assertEquals(initialRowCount, futureRowCount.get().intValue());
@@ -110,12 +110,12 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     Query<Customer> query = Ebean.find(Customer.class);
     query.setRawSql(rawSql);
     
-    int initialRowCount = query.findRowCount();
+    int initialRowCount = query.findCount();
     
     PagedList<Customer> page = query.setMaxRows(2).findPagedList();
 
     List<Customer> list = page.getList();
-    int rowCount = page.getTotalRowCount();
+    int rowCount = page.getTotalCount();
     
     Assert.assertEquals(2, list.size());
     Assert.assertEquals(initialRowCount, rowCount);
@@ -186,7 +186,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     query.order("id desc");
     PagedList<Order> pagedList = query.findPagedList();
     pagedList.getList();
-    pagedList.getTotalRowCount();
+    pagedList.getTotalCount();
 
     assertThat(query.getGeneratedSql()).contains("order by o.id desc limit 100");
   }

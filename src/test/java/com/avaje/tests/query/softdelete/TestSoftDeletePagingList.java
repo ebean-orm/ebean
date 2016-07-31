@@ -31,7 +31,7 @@ public class TestSoftDeletePagingList {
         .setMaxRows(10)
         .findPagedList();
 
-    int totalRowCount = pagedList.getTotalRowCount();
+    int totalRowCount = pagedList.getTotalCount();
     List<Cover> resultList = pagedList.getList();
 
     List<String> sql = LoggedSqlCollector.stop();

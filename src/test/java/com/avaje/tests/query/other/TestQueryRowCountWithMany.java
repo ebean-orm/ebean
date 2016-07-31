@@ -47,7 +47,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     Assert.assertTrue(generatedSql.contains(" order by t0.cretime"));
 
     
-    int rowCount = query.findRowCount();
+    int rowCount = query.findCount();
 
     // select count(*) from o_order t0
     // left outer join o_order_detail t1 on t1.order_id = t0.id
@@ -84,7 +84,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
         .orderBy("cretime asc");
 
     LoggedSqlCollector.start();
-    query.findRowCount();
+    query.findCount();
 
     List<String> sqlLogged = LoggedSqlCollector.stop();
 
