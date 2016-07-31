@@ -209,7 +209,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
     initialiseJacksonTypes(config);
 
     if (bootupClasses != null) {
-      initialiseCustomScalarTypes(jsonDateTime, bootupClasses, config);
+      initialiseCustomScalarTypes(jsonDateTime, bootupClasses);
       initialiseScalarConverters(bootupClasses);
       initialiseCompoundTypes(bootupClasses);
     }
@@ -682,7 +682,7 @@ public final class DefaultTypeManager implements TypeManager, KnownImmutable {
    * interface and register it with this TypeManager.
    * </p>
    */
-  protected void initialiseCustomScalarTypes(JsonConfig.DateTime mode, BootupClasses bootupClasses, ServerConfig serverConfig) {
+  protected void initialiseCustomScalarTypes(JsonConfig.DateTime mode, BootupClasses bootupClasses) {
 
     ScalarTypeLongToTimestamp longToTimestamp = new ScalarTypeLongToTimestamp(mode);
 
