@@ -344,12 +344,12 @@ public class TransactionManager {
   public void notifyOfRollback(SpiTransaction transaction, Throwable cause) {
 
     try {
-      if (TXN_LOGGER.isInfoEnabled()) {
+      if (TXN_LOGGER.isDebugEnabled()) {
         String msg = transaction.getLogPrefix() + "Rollback";
         if (cause != null) {
           msg += " error: " + formatThrowable(cause);
         }
-        TXN_LOGGER.info(msg);
+        TXN_LOGGER.debug(msg);
       }
 
       for (TransactionEventListener listener : transactionEventListeners) {
