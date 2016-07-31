@@ -75,6 +75,11 @@ public interface Transaction extends Closeable {
   void rollback(Throwable e) throws PersistenceException;
 
   /**
+   * Mark the transaction for rollback only.
+   */
+  void setRollbackOnly();
+
+  /**
    * If the transaction is active then perform rollback. Otherwise do nothing.
    */
   void end() throws PersistenceException;

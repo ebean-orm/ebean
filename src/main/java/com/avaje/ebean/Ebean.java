@@ -500,6 +500,13 @@ public final class Ebean {
   }
 
   /**
+   * Mark the current transaction as rollback only.
+   */
+  public static void setRollbackOnly() {
+    serverMgr.getDefaultServer().currentTransaction().setRollbackOnly();
+  }
+
+  /**
    * Return a map of the differences between two objects of the same type.
    * <p>
    * When null is passed in for b, then the 'OldValues' of a is used for the

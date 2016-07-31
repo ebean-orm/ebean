@@ -66,6 +66,8 @@ public class JdbcTransaction implements SpiTransaction {
    */
   protected boolean active;
 
+  protected boolean rollbackOnly;
+
   /**
    * The underlying Connection.
    */
@@ -903,6 +905,10 @@ public class JdbcTransaction implements SpiTransaction {
    */
   @Override
   public void commit() throws RollbackException {
+    if (rollbackOnly) {
+      rollback();
+      return;
+    }
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
@@ -943,6 +949,14 @@ public class JdbcTransaction implements SpiTransaction {
         manager.notifyOfRollback(this, cause);
       }
     }
+  }
+
+  /**
+   * Mark the transaction as rollback only.
+   */
+  @Override
+  public void setRollbackOnly() {
+    this.rollbackOnly = true;
   }
 
   /**
