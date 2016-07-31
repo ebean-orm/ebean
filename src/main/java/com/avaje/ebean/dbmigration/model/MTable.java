@@ -270,17 +270,15 @@ public class MTable {
     }
 
     // compare existing columns (look for dropped columns)
-    int columnPosition = 0;
     for (MColumn existingColumn : allColumns()) {
       MColumn newColumn = newColumnMap.get(existingColumn.getName());
       if (newColumn == null) {
-        diffDropColumn(modelDiff, existingColumn, columnPosition, newTable);
+        diffDropColumn(modelDiff, existingColumn);
       } else if (newColumn.isDraftOnly() && !draft) {
         // effectively a drop column (draft only column on a non-draft table)
         logger.trace("... drop column {} from table {} as now draftOnly", newColumn.getName(), name);
-        diffDropColumn(modelDiff, existingColumn, columnPosition, newTable);
+        diffDropColumn(modelDiff, existingColumn);
       }
-      columnPosition++;
     }
 
     if (addColumn != null) {
@@ -540,7 +538,7 @@ public class MTable {
   /**
    * Add a 'drop column' to the diff.
    */
-  private void diffDropColumn(ModelDiff modelDiff, MColumn existingColumn, int columnPosition, MTable newTable) {
+  private void diffDropColumn(ModelDiff modelDiff, MColumn existingColumn) {
 
     DropColumn dropColumn = new DropColumn();
     dropColumn.setTableName(name);
