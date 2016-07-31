@@ -132,10 +132,6 @@ public class ManyWhereJoins implements Serializable {
     formulaProperties.append(propertyName);
   }
 
-  public boolean isHasMany() {
-    return formulaWithJoin || !joins.isEmpty();
-  }
-
   /**
    * Return true if the query select includes a formula with join.
    */
