@@ -170,9 +170,7 @@ public class AnnotationAssocManys extends AnnotationParser {
 	}
 
 	/**
-	 * Return the full table name 
-	 * @param joinTable
-	 * @return
+	 * Return the full table name
 	 */
 	private String getFullTableName(JoinTable joinTable) {
 	    StringBuilder sb = new StringBuilder();
