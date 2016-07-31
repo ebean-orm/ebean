@@ -55,7 +55,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    * For lazy loading of ManyToMany we need to add a join to the intersection table. This is that
    * join to the intersection table.
    */
-  private TableJoin includeTableJoin;
+  private TableJoin m2mIncludeJoin;
 
   private ProfilingListener profilingListener;
 
@@ -571,7 +571,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public DefaultOrmQuery<T> copy(EbeanServer server) {
 
     DefaultOrmQuery<T> copy = new DefaultOrmQuery<T>(beanDescriptor, server, expressionFactory);
-    copy.includeTableJoin = includeTableJoin;
+    copy.m2mIncludeJoin = m2mIncludeJoin;
     copy.profilingListener = profilingListener;
 
 //    copy.query = query;
@@ -846,7 +846,7 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   CQueryPlanKey createQueryPlanKey() {
 
-    queryPlanKey = new OrmQueryPlanKey(includeTableJoin, type, detail, maxRows, firstRow,
+    queryPlanKey = new OrmQueryPlanKey(m2mIncludeJoin, type, detail, maxRows, firstRow,
         disableLazyLoading, orderBy,
         distinct, sqlDistinct, mapKey, id, bindParams, whereExpressions, havingExpressions,
         temporalMode, forUpdate, rootTableAlias, rawSql, updateProperties);
@@ -1264,14 +1264,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     return "Query [" + whereExpressions + "]";
   }
 
-  @Override
-  public TableJoin getIncludeTableJoin() {
-    return includeTableJoin;
+  public TableJoin getM2mIncludeJoin() {
+    return m2mIncludeJoin;
   }
 
   @Override
-  public void setIncludeTableJoin(TableJoin includeTableJoin) {
-    this.includeTableJoin = includeTableJoin;
+  public void setM2MIncludeJoin(TableJoin m2mIncludeJoin) {
+    this.m2mIncludeJoin = m2mIncludeJoin;
   }
 
   @Override

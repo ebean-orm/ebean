@@ -593,9 +593,15 @@ public interface SpiQuery<T> extends Query<T> {
    */
   OrmQueryDetail getDetail();
 
-  TableJoin getIncludeTableJoin();
+  /**
+   * Return the extra join for a M2M lazy load.
+   */
+  TableJoin getM2mIncludeJoin();
 
-  void setIncludeTableJoin(TableJoin includeTableJoin);
+  /**
+   * Set the extra join for a M2M lazy load.
+   */
+  void setM2MIncludeJoin(TableJoin includeTableJoin);
 
   /**
    * Return the property used to specify keys for a map.

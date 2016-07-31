@@ -14,7 +14,7 @@ import com.avaje.ebeaninternal.server.deploy.TableJoin;
  */
 public class OrmQueryPlanKey implements CQueryPlanKey {
 
-  private final TableJoin includeTableJoin;
+  private final String m2mIncludeTable;
   private final String orderByAsSting;
   private final OrmQueryDetail detail;
   private final SpiExpression where;
@@ -38,7 +38,7 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
 
   public OrmQueryPlanKey(TableJoin includeTableJoin, SpiQuery.Type type, OrmQueryDetail detail, int maxRows, int firstRow, boolean disableLazyLoading, OrderBy<?> orderBy, boolean distinct, boolean sqlDistinct, String mapKey, Object id, BindParams bindParams, SpiExpression whereExpressions, SpiExpression havingExpressions, SpiQuery.TemporalMode temporalMode, boolean forUpdate, String rootTableAlias, RawSql rawSql, OrmUpdateProperties updateProperties) {
 
-    this.includeTableJoin = includeTableJoin;
+    this.m2mIncludeTable = includeTableJoin == null ? null : includeTableJoin.getTable();
     this.type = type;
     this.detail = detail;
     this.maxRows = maxRows;
@@ -69,7 +69,7 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
     builder.add(hasIdValue);
     builder.add(temporalMode);
     builder.add(rawSqlKey == null ? 0 : rawSqlKey.hashCode());
-    builder.add(includeTableJoin != null ? includeTableJoin.queryHash() : 0);
+    builder.add(m2mIncludeTable);
     builder.add(rootTableAlias);
 
     if (detail != null) {
@@ -120,7 +120,7 @@ public class OrmQueryPlanKey implements CQueryPlanKey {
     if (hasIdValue != that.hasIdValue) return false;
     if (type != that.type) return false;
     if (temporalMode != that.temporalMode) return false;
-    if (includeTableJoin != null ? !includeTableJoin.equals(that.includeTableJoin) : that.includeTableJoin != null) return false;
+    if (m2mIncludeTable != null ? !m2mIncludeTable.equals(that.m2mIncludeTable) : that.m2mIncludeTable != null) return false;
     if (orderByAsSting != null ? !orderByAsSting.equals(that.orderByAsSting) : that.orderByAsSting != null) return false;
     if (where != null ? !where.isSameByPlan(that.where) : that.where != null) return false;
     if (having != null ? !having.isSameByPlan(that.having) : that.having != null) return false;

@@ -357,7 +357,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> {
 
     String tableAlias = manyToMany ? "int_." : "t0.";
     if (manyToMany) {
-      query.setIncludeTableJoin(inverseJoin);
+      query.setM2MIncludeJoin(inverseJoin);
     }
     String rawWhere = deriveWhereParentIdSql(true, tableAlias);
     String expr = descriptor.getParentIdInExpr(parentIds.size(), rawWhere);
