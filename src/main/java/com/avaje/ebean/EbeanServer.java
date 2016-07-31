@@ -739,11 +739,18 @@ public interface EbeanServer {
   <T> T getReference(Class<T> beanType, Object id);
 
   /**
-   * Return the number of 'top level' or 'root' entities this query should
-   * return.
+   * Return the number of 'top level' or 'root' entities this query should return.
    *
    * @see Query#findRowCount()
    * @see com.avaje.ebean.Query#findFutureRowCount()
+   */
+  <T> int findCount(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated in favor of findCount()
+   *
+   * Return the number of 'top level' or 'root' entities this query should return.
+   * @deprecated
    */
   <T> int findRowCount(Query<T> query, Transaction transaction);
 
@@ -868,7 +875,15 @@ public interface EbeanServer {
    * @return a Future object for the row count query
    * @see com.avaje.ebean.Query#findFutureRowCount()
    */
-  <T> FutureRowCount<T> findFutureRowCount(Query<T> query, Transaction transaction);
+  <T> FutureRowCount<T> findFutureCount(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated in favor of findFutureCount().
+   *
+   * Execute find row count query in a background thread.
+   * @deprecated
+   */
+   <T> FutureRowCount<T> findFutureRowCount(Query<T> query, Transaction transaction);
 
   /**
    * Execute find Id's query in a background thread.

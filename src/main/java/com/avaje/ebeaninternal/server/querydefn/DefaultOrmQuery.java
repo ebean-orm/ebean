@@ -1048,11 +1048,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
-  public int findRowCount() {
+  public int findCount() {
     // a copy of this query is made in the server
     // as the query needs to modified (so we modify
     // the copy rather than this query instance)
-    return server.findRowCount(this, null);
+    return server.findCount(this, null);
+  }
+
+  @Override
+  public int findRowCount() {
+    return findCount();
   }
 
   @Override
@@ -1120,8 +1125,13 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public FutureRowCount<T> findFutureCount() {
+    return server.findFutureCount(this, null);
+  }
+
+  @Override
   public FutureRowCount<T> findFutureRowCount() {
-    return server.findFutureRowCount(this, null);
+    return findFutureCount();
   }
 
   @Override

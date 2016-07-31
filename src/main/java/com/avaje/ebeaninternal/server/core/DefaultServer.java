@@ -1152,10 +1152,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  public <T> int findRowCount(Query<T> query, Transaction t) {
+  public <T> int findCount(Query<T> query, Transaction t) {
 
     SpiQuery<T> copy = ((SpiQuery<T>) query).copy();
     return findRowCountWithCopy(copy, t);
+  }
+
+  public <T> int findRowCount(Query<T> query, Transaction t) {
+    return findCount(query, t);
   }
 
   public <T> int findRowCountWithCopy(Query<T> query, Transaction t) {
@@ -1213,7 +1217,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  public <T> FutureRowCount<T> findFutureRowCount(Query<T> q, Transaction t) {
+  public <T> FutureRowCount<T> findFutureCount(Query<T> q, Transaction t) {
 
     SpiQuery<T> copy = ((SpiQuery<T>) q).copy();
     copy.setFutureFetch(true);
@@ -1226,6 +1230,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     backgroundExecutor.execute(queryFuture.getFutureTask());
 
     return queryFuture;
+  }
+
+  public <T> FutureRowCount<T> findFutureRowCount(Query<T> q, Transaction t) {
+    return findFutureCount(q, t);
   }
 
   public <T> FutureIds<T> findFutureIds(Query<T> query, Transaction t) {

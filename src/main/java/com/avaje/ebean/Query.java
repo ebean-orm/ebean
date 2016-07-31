@@ -13,10 +13,10 @@ import java.util.Set;
  * <p>
  * Example: Create the query using the API.
  * </p>
- * 
+ * <p>
  * <pre>{@code
  *
- * List<Order> orderList = 
+ * List<Order> orderList =
  *   ebeanServer.find(Order.class)
  *     .fetch("customer")
  *     .fetch("details")
@@ -26,46 +26,41 @@ import java.util.Set;
  *     .orderBy("customer.id, id desc")
  *     .setMaxRows(50)
  *     .findList();
- *   
+ *
  * ...
  * }</pre>
- * 
  * <p>
  * Example: The same query using the query language
  * </p>
- * 
  * <pre>{@code
  *
- * String oql = 
+ * String oql =
  *   	"  find  order "
  *   	+" fetch customer "
  *   	+" fetch details "
  *   	+" where customer.name like :custName and orderDate > :minOrderDate "
  *   	+" order by customer.id, id desc "
  *   	+" limit 50 ";
- *   
+ *
  * Query<Order> query = ebeanServer.createQuery(Order.class, oql);
  * query.setParameter("custName", "Rob%");
  * query.setParameter("minOrderDate", lastWeek);
- *   
+ *
  * List<Order> orderList = query.findList();
  * ...
  * }</pre>
- * 
  * <p>
  * Example: Using a named query called "with.cust.and.details"
  * </p>
- * 
  * <pre>{@code
  *
  * Query<Order> query = ebeanServer.createNamedQuery(Order.class,"with.cust.and.details");
  * query.setParameter("custName", "Rob%");
  * query.setParameter("minOrderDate", lastWeek);
- *   
+ *
  * List<Order> orderList = query.findList();
  * ...
  * }</pre>
- * 
  * <h3>AutoTune</h3>
  * <p>
  * Ebean has built in support for "AutoTune". This is a mechanism where a query
@@ -82,7 +77,6 @@ import java.util.Set;
  * to a remote client or where there is some requirement for "Read Consistency"
  * guarantees.
  * </p>
- * 
  * <h3>Query Language</h3>
  * <p>
  * <b>Partial Objects</b>
@@ -101,7 +95,6 @@ import java.util.Set;
  * concurrency checking will occur but only include the fetched properties.
  * Refer to "ALL Properties/Columns" mode of Optimistic Concurrency checking.
  * </p>
- * 
  * <pre>{@code
  * [ find  {bean type} [ ( * | {fetch properties} ) ] ]
  * [ fetch {associated bean} [ ( * | {fetch properties} ) ] ]
@@ -109,7 +102,6 @@ import java.util.Set;
  * [ order by {order by properties} ]
  * [ limit {max rows} [ offset {first row} ] ]
  * }</pre>
- * 
  * <p>
  * <b>FIND</b> <b>{bean type}</b> [ ( <i>*</i> | <i>{fetch properties}</i> ) ]
  * </p>
@@ -163,50 +155,40 @@ import java.util.Set;
  * <p>
  * Find orders fetching all its properties
  * </p>
- * 
  * <pre>{@code
  * find order
  * }</pre>
- * 
  * <p>
  * Find orders fetching all its properties
  * </p>
- * 
  * <pre>{@code
  * find order (*)
  * }</pre>
- * 
  * <p>
  * Find orders fetching its id, shipDate and status properties. Note that the id
  * property is always fetched even if it is not included in the list of fetch
  * properties.
  * </p>
- * 
  * <pre>{@code
  * find order (shipDate, status)
  * }</pre>
- * 
  * <p>
  * Find orders with a named bind variable (that will need to be bound via
  * {@link Query#setParameter(String, Object)}).
  * </p>
- * 
  * <pre>{@code
  * find order
  * where customer.name like :custLike
  * }</pre>
- * 
  * <p>
  * Find orders and also fetch the customer with a named bind parameter. This
  * will fetch and populate both the order and customer objects.
  * </p>
- * 
  * <pre>{@code
  * find  order
  * fetch customer
  * where customer.id = :custId
  * }</pre>
- * 
  * <p>
  * Find orders and also fetch the customer, customer shippingAddress, order
  * details and related product. Note that customer and product objects will be
@@ -215,7 +197,6 @@ import java.util.Set;
  * objects (associated with each order detail) will have their id, sku and name
  * populated.
  * </p>
- * 
  * <pre>{@code
  * find  order
  * fetch customer (name)
@@ -223,7 +204,6 @@ import java.util.Set;
  * fetch details
  * fetch details.product (sku, name)
  * }</pre>
- * 
  * <h3>Early parsing of the Query</h3>
  * <p>
  * When you get a Query object from a named query, the query statement has
@@ -269,9 +249,8 @@ import java.util.Set;
  * to make it as easy as possible to use your own SQL to populate entity beans.
  * Refer to {@link RawSql} .
  * </p>
- * 
- * @param <T>
- *          the type of Entity bean this query will fetch.
+ *
+ * @param <T> the type of Entity bean this query will fetch.
  */
 public interface Query<T> {
 
@@ -289,7 +268,7 @@ public interface Query<T> {
    * Perform an 'As of' query using history tables to return the object graph
    * as of a time in the past.
    * <p>
-   *   To perform this query the DB must have underlying history tables.
+   * To perform this query the DB must have underlying history tables.
    * </p>
    *
    * @param asOf the date time in the past at which you want to view the data
@@ -399,7 +378,6 @@ public interface Query<T> {
    * You use {@link #fetch(String, String)} to specify specific properties to fetch
    * on other non-root level paths of the object graph.
    * </p>
-   *
    * <pre>{@code
    *
    * List<Customer> customers =
@@ -412,8 +390,7 @@ public interface Query<T> {
    *
    * }</pre>
    *
-   * @param fetchProperties
-   *          the properties to fetch for this bean (* = all properties).
+   * @param fetchProperties the properties to fetch for this bean (* = all properties).
    */
   Query<T> select(String fetchProperties);
 
@@ -428,7 +405,6 @@ public interface Query<T> {
    * only those properties are fetched and populated resulting in a
    * "Partial Object" - a bean that only has some of its properties populated.
    * </p>
-   * 
    * <pre>{@code
    *
    * // query orders...
@@ -437,17 +413,15 @@ public interface Query<T> {
    *       // fetch the customer...
    *       // ... getting the customers name and phone number
    *       .fetch("customer", "name, phoneNumber")
-   * 
+   *
    *       // ... also fetch the customers billing address (* = all properties)
    *       .fetch("customer.billingAddress", "*")
    *       .findList();
    * }</pre>
-   * 
    * <p>
    * If columns is null or "*" then all columns/properties for that path are
    * fetched.
    * </p>
-   * 
    * <pre>{@code
    *
    * // fetch customers (their id, name and status)
@@ -458,19 +432,16 @@ public interface Query<T> {
    *     .findList();
    *
    * }</pre>
-   * 
-   * @param path
-   *          the path of an associated (1-1,1-M,M-1,M-M) bean.
-   * @param fetchProperties
-   *          properties of the associated bean that you want to include in the
-   *          fetch (* means all properties, null also means all properties).
+   *
+   * @param path            the path of an associated (1-1,1-M,M-1,M-M) bean.
+   * @param fetchProperties properties of the associated bean that you want to include in the
+   *                        fetch (* means all properties, null also means all properties).
    */
   Query<T> fetch(String path, String fetchProperties);
 
   /**
    * Additionally specify a FetchConfig to use a separate query or lazy loading
    * to load this path.
-   *
    * <pre>{@code
    *
    * // fetch customers (their id, name and status)
@@ -500,16 +471,13 @@ public interface Query<T> {
    *
    * }</pre>
    *
-   * @param path
-   *          the property of an associated (1-1,1-M,M-1,M-M) bean.
+   * @param path the property of an associated (1-1,1-M,M-1,M-M) bean.
    */
   Query<T> fetch(String path);
 
   /**
    * Additionally specify a JoinConfig to specify a "query join" and or define
    * the lazy loading query.
-   *
-   *
    * <pre>{@code
    *
    * // fetch customers (their id, name and status)
@@ -536,7 +504,7 @@ public interface Query<T> {
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
    * </p>
-   * 
+   *
    * @see EbeanServer#findIds(Query, Transaction)
    */
   List<Object> findIds();
@@ -564,7 +532,6 @@ public interface Query<T> {
    * iterator uses the QueryEachConsumer (SAM) interface which is better suited to use
    * with Java8 closures.
    * </p>
-   *
    * <pre>{@code
    *
    *  ebeanServer.find(Customer.class)
@@ -578,8 +545,7 @@ public interface Query<T> {
    *
    * }</pre>
    *
-   * @param consumer
-   *          the consumer used to process the queried beans.
+   * @param consumer the consumer used to process the queried beans.
    */
   void findEach(QueryEachConsumer<T> consumer);
 
@@ -591,8 +557,6 @@ public interface Query<T> {
    * iterator uses the QueryEachWhileConsumer (SAM) interface which is better suited to use
    * with Java8 closures.
    * </p>
-
-   *
    * <pre>{@code
    *
    *  ebeanServer.find(Customer.class)
@@ -611,8 +575,7 @@ public interface Query<T> {
    *
    * }</pre>
    *
-   * @param consumer
-   *          the consumer used to process the queried beans.
+   * @param consumer the consumer used to process the queried beans.
    */
   void findEachWhile(QueryEachWhileConsumer<T> consumer);
 
@@ -621,7 +584,6 @@ public interface Query<T> {
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
    * </p>
-   *
    * <pre>{@code
    *
    * List<Customer> customers =
@@ -640,7 +602,6 @@ public interface Query<T> {
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
    * </p>
-   *
    * <pre>{@code
    *
    * Set<Customer> customers =
@@ -663,7 +624,6 @@ public interface Query<T> {
    * You can use setMapKey() so specify the property values to be used as keys
    * on the map. If one is not specified then the id property is used.
    * </p>
-   * 
    * <pre>{@code
    *
    * Map<?, Product> map =
@@ -672,7 +632,7 @@ public interface Query<T> {
    *     .findMap();
    *
    * }</pre>
-   * 
+   *
    * @see EbeanServer#findMap(Query, Transaction)
    */
   Map<?, T> findMap();
@@ -693,7 +653,6 @@ public interface Query<T> {
    * This is useful when your predicates dictate that your query should only
    * return 0 or 1 results.
    * </p>
-   * 
    * <pre>{@code
    *
    * // assuming the sku of products is unique...
@@ -703,16 +662,14 @@ public interface Query<T> {
    *         .findUnique();
    * ...
    * }</pre>
-   * 
    * <p>
    * It is also useful with finding objects by their id when you want to specify
    * further join information.
    * </p>
-   * 
    * <pre>{@code
    *
    * // Fetch order 1 and additionally fetch join its order details...
-   * Order order = 
+   * Order order =
    *     ebeanServer.find(Order.class)
    *       .setId(1)
    *       .fetch("details")
@@ -731,13 +688,13 @@ public interface Query<T> {
   /**
    * Return versions of a @History entity bean.
    * <p>
-   *   Note that this query will work against view based history implementations
-   *   but not sql2011 standards based implementations that require a start and
-   *   end timestamp to be specified.
+   * Note that this query will work against view based history implementations
+   * but not sql2011 standards based implementations that require a start and
+   * end timestamp to be specified.
    * </p>
    * <p>
-   *   Generally this query is expected to be a find by id or unique predicates query.
-   *   It will execute the query against the history returning the versions of the bean.
+   * Generally this query is expected to be a find by id or unique predicates query.
+   * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
   List<Version<T>> findVersions();
@@ -745,8 +702,8 @@ public interface Query<T> {
   /**
    * Return versions of a @History entity bean between the 2 timestamps.
    * <p>
-   *   Generally this query is expected to be a find by id or unique predicates query.
-   *   It will execute the query against the history returning the versions of the bean.
+   * Generally this query is expected to be a find by id or unique predicates query.
+   * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
   List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end);
@@ -774,6 +731,14 @@ public interface Query<T> {
    * This is the number of 'top level' or 'root level' entities.
    * </p>
    */
+  int findCount();
+
+  /**
+   * Deprecated in favor of findCount().
+   * <p>
+   * Return the count of entities this query should return.
+   * @deprecated
+   */
   int findRowCount();
 
   /**
@@ -783,8 +748,23 @@ public interface Query<T> {
    * execution status (isDone etc) and get the value (with or without a
    * timeout).
    * </p>
-   * 
+   *
    * @return a Future object for the row count query
+   */
+  FutureRowCount<T> findFutureCount();
+
+  /**
+   * Deprecated in favor of findFutureCount().
+   * <p>
+   * Execute find row count query in a background thread.
+   * <p>
+   * This returns a Future object which can be used to cancel, check the
+   * execution status (isDone etc) and get the value (with or without a
+   * timeout).
+   * </p>
+   *
+   * @return a Future object for the row count query
+   * @deprecated
    */
   FutureRowCount<T> findFutureRowCount();
 
@@ -795,7 +775,7 @@ public interface Query<T> {
    * execution status (isDone etc) and get the value (with or without a
    * timeout).
    * </p>
-   * 
+   *
    * @return a Future object for the list of Id's
    */
   FutureIds<T> findFutureIds();
@@ -821,7 +801,6 @@ public interface Query<T> {
    * If maxRows is not set on the query prior to calling findPagedList() then a
    * PersistenceException is thrown.
    * </p>
-   *
    * <pre>{@code
    *
    *  PagedList<Order> pagedList = Ebean.find(Order.class)
@@ -843,24 +822,21 @@ public interface Query<T> {
 
   /**
    * Set a named bind parameter. Named parameters have a colon to prefix the name.
-   * 
    * <pre>{@code
    *
    * // a query with a named parameter
    * String oql = "find order where status = :orderStatus";
-   * 
+   *
    * Query<Order> query = ebeanServer.find(Order.class, oql);
-   * 
+   *
    * // bind the named parameter
    * query.bind("orderStatus", OrderStatus.NEW);
    * List<Order> list = query.findList();
    *
    * }</pre>
-   * 
-   * @param name
-   *          the parameter name
-   * @param value
-   *          the parameter value
+   *
+   * @param name  the parameter name
+   * @param value the parameter value
    */
   Query<T> setParameter(String name, Object value);
 
@@ -868,25 +844,22 @@ public interface Query<T> {
    * Set an ordered bind parameter according to its position. Note that the
    * position starts at 1 to be consistent with JDBC PreparedStatement. You need
    * to set a parameter value for each ? you have in the query.
-   * 
    * <pre>{@code
    *
    * // a query with a positioned parameter
    * String oql = "where status = ? order by id desc";
-   * 
+   *
    * Query<Order> query = ebeanServer.createQuery(Order.class, oql);
-   * 
+   *
    * // bind the parameter
    * query.setParameter(1, OrderStatus.NEW);
-   * 
+   *
    * List<Order> list = query.findList();
    *
    * }</pre>
-   * 
-   * @param position
-   *          the parameter bind position starting from 1 (not 0)
-   * @param value
-   *          the parameter bind value.
+   *
+   * @param position the parameter bind position starting from 1 (not 0)
+   * @param value    the parameter bind value.
    */
   Query<T> setParameter(int position, Object value);
 
@@ -896,7 +869,6 @@ public interface Query<T> {
    * You can use this to have further control over the query. For example adding
    * fetch joins.
    * </p>
-   * 
    * <pre>{@code
    *
    * Order order =
@@ -919,10 +891,9 @@ public interface Query<T> {
 
   /**
    * Add a single Expression to the where clause returning the query.
-   * 
    * <pre>{@code
    *
-   * List<Order> newOrders = 
+   * List<Order> newOrders =
    *     ebeanServer.find(Order.class)
    * 		.where().eq("status", Order.NEW)
    * 		.findList();
@@ -936,7 +907,6 @@ public interface Query<T> {
    * Add Expressions to the where clause with the ability to chain on the
    * ExpressionList. You can use this for adding multiple expressions to the
    * where clause.
-   * 
    * <pre>{@code
    *
    * List<Order> orders =
@@ -947,9 +917,9 @@ public interface Query<T> {
    *     .findList();
    *
    * }</pre>
-   * 
-   * @see Expr
+   *
    * @return The ExpressionList for adding expressions to.
+   * @see Expr
    */
   ExpressionList<T> where();
 
@@ -984,9 +954,8 @@ public interface Query<T> {
    * each customer you only want to get the new orders they placed since last
    * week. In this case you can use filterMany() to filter the orders.
    * </p>
-   * 
    * <pre>{@code
-   * 
+   *
    * List<Customer> list =
    *     ebeanServer.find(Customer.class)
    *     // .fetch("orders", new FetchConfig().lazy())
@@ -995,20 +964,17 @@ public interface Query<T> {
    *     .where().ilike("name", "rob%")
    *     .filterMany("orders").eq("status", Order.Status.NEW).gt("orderDate", lastWeek)
    *     .findList();
-   * 
+   *
    * }</pre>
-   * 
    * <p>
    * Please note you have to be careful that you add expressions to the correct
    * expression list - as there is one for the 'root level' and one for each
    * filterMany that you have.
    * </p>
-   * 
-   * @param propertyName
-   *          the name of the many property that you want to have a filter on.
-   * 
+   *
+   * @param propertyName the name of the many property that you want to have a filter on.
    * @return the expression list that you add filter expressions for the many
-   *         to.
+   * to.
    */
   ExpressionList<T> filterMany(String propertyName);
 
@@ -1021,9 +987,9 @@ public interface Query<T> {
    * Note that this returns the ExpressionList (so you can add multiple
    * expressions to the query in a fluent API way).
    * </p>
-   * 
-   * @see Expr
+   *
    * @return The ExpressionList for adding more expressions to.
+   * @see Expr
    */
   ExpressionList<T> having();
 
@@ -1037,9 +1003,8 @@ public interface Query<T> {
    * than the ExpressionList. This is useful when you want to further specify
    * something on the query.
    * </p>
-   * 
-   * @param addExpressionToHaving
-   *          the expression to add to the having clause.
+   *
+   * @param addExpressionToHaving the expression to add to the having clause.
    * @return the Query object
    */
   Query<T> having(Expression addExpressionToHaving);
@@ -1151,9 +1116,8 @@ public interface Query<T> {
 
   /**
    * Set the maximum number of rows to return in the query.
-   * 
-   * @param maxRows
-   *          the maximum number of rows to return in the query.
+   *
+   * @param maxRows the maximum number of rows to return in the query.
    */
   Query<T> setMaxRows(int maxRows);
 
@@ -1162,11 +1126,10 @@ public interface Query<T> {
    * <p>
    * If no property is set then the id property is used.
    * </p>
-   * 
    * <pre>{@code
    *
    * // Assuming sku is unique for products...
-   *    
+   *
    * Map<?,Product> productMap =
    *     ebeanServer.find(Product.class)
    *     // use sku for keys...
@@ -1174,9 +1137,8 @@ public interface Query<T> {
    *     .findMap();
    *
    * }</pre>
-   * 
-   * @param mapKey
-   *          the property to use as keys for a map.
+   *
+   * @param mapKey the property to use as keys for a map.
    */
   Query<T> setMapKey(String mapKey);
 
@@ -1203,7 +1165,7 @@ public interface Query<T> {
   /**
    * Set to true if this query should execute against the doc store.
    * <p>
-   *   When setting this you may also consider disabling lazy loading.
+   * When setting this you may also consider disabling lazy loading.
    * </p>
    */
   Query<T> setUseDocStore(boolean useDocStore);
@@ -1226,9 +1188,8 @@ public interface Query<T> {
    * preparedStatement. If the timeout occurs an exception will be thrown - this
    * will be a SQLException wrapped up in a PersistenceException.
    * </p>
-   * 
-   * @param secs
-   *          the query timeout limit in seconds. Zero means there is no limit.
+   *
+   * @param secs the query timeout limit in seconds. Zero means there is no limit.
    */
   Query<T> setTimeout(int secs);
 
@@ -1260,7 +1221,7 @@ public interface Query<T> {
    * Return true if this query has forUpdate set.
    */
   boolean isForUpdate();
-  
+
   /**
    * Set root table alias.
    */
@@ -1274,7 +1235,7 @@ public interface Query<T> {
   /**
    * Set true if you want to disable lazy loading.
    * <p>
-   *   That is, once the object graph is returned further lazy loading is disabled.
+   * That is, once the object graph is returned further lazy loading is disabled.
    * </p>
    */
   Query<T> setDisableLazyLoading(boolean disableLazyLoading);
