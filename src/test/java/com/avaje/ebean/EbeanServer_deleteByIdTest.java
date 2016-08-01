@@ -85,8 +85,6 @@ public class EbeanServer_deleteByIdTest {
   }
 
   private EBasicVer bean(String name) {
-    EBasicVer bean = new EBasicVer();
-    bean.setName(name);
-    return bean;
+    return new EBasicVer(name);
   }
 }

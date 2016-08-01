@@ -14,9 +14,7 @@ public class TestMarkAsDirty extends BaseTestCase {
   @Test
   public void test() throws InterruptedException {
     
-    EBasicVer bean = new EBasicVer();
-    bean.setName("markAsDirty");
-    
+    EBasicVer bean = new EBasicVer("markAsDirty");
     Ebean.save(bean);
     
     Timestamp lastUpdate = bean.getLastUpdate();

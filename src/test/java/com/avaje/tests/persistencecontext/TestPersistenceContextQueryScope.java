@@ -16,8 +16,7 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
   @Test
   public void test() {
 
-    EBasicVer bean = new EBasicVer();
-    bean.setName("first");
+    EBasicVer bean = new EBasicVer("first");
     Ebean.save(bean);
 
     //Ebean.getServerCacheManager().setCaching(EBasicVer.class, true);

@@ -24,8 +24,7 @@ public class BeanPostLoadTest extends BaseTestCase {
 
     EbeanServer ebeanServer = getEbeanServer();
 
-    EBasicVer bean = new EBasicVer();
-    bean.setName("testPostLoad");
+    EBasicVer bean = new EBasicVer("testPostLoad");
     bean.setDescription("someDescription");
     bean.setOther("other");
 

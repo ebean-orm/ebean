@@ -39,8 +39,7 @@ public class TestTxTypeOnTransactional extends BaseTestCase {
   public void testOptimisticException() {
 
     logger.info("-- testOptimisticException");
-    EBasicVer v = new EBasicVer();
-    v.setName("occ");
+    EBasicVer v = new EBasicVer("occ");
     v.setDescription("blah");
     Ebean.save(v);
 

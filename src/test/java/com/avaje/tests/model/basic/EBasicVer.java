@@ -25,6 +25,10 @@ public class EBasicVer {
   @Version
   Timestamp lastUpdate;
 
+  public EBasicVer(String name) {
+    this.name = name;
+  }
+
   public Integer getId() {
     return id;
   }

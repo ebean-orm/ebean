@@ -18,9 +18,7 @@ public class TestDeleteFromPersistenceContext extends BaseTestCase {
     
     ResetBasicData.reset();
     
-    EBasicVer bean = new EBasicVer();
-    bean.setName("Please Delete Me");
-    
+    EBasicVer bean = new EBasicVer("Please Delete Me");
     Ebean.save(bean);
     
     SpiTransaction transaction = (SpiTransaction)Ebean.beginTransaction();

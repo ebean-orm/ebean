@@ -123,8 +123,6 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
   }
 
   private EBasicVer bean(String name) {
-    EBasicVer bean = new EBasicVer();
-    bean.setName(name);
-    return bean;
+    return new EBasicVer(name);
   }
 }
