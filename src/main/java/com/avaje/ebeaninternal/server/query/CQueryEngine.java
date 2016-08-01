@@ -300,9 +300,10 @@ public class CQueryEngine {
 
 
     SpiQuery<T> query = request.getQuery();
-    if (query.getMaxRows() > 1 || query.getFirstRow() > 0) {
+    if (!query.isDistinct() && (query.getMaxRows() > 1 || query.getFirstRow() > 0)) {
       // deemed to be a be a paging query - check that the order by contains
       // the id property to ensure unique row ordering for predicable paging
+      // but only in case, this is not a distinct query
       request.getBeanDescriptor().appendOrderById(query);
     }
 
