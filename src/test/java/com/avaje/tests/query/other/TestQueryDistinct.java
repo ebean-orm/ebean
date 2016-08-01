@@ -80,5 +80,32 @@ public class TestQueryDistinct extends BaseTestCase {
       Assert.assertNull(customer.getAnniversary());
     }
   }
+
+  @Test
+  public void testPagingQuery() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = Ebean.find(Customer.class)
+      .setMaxRows(10)
+      .setDistinct(true)
+      .select("name");
+
+    List<Customer> customers = query.findList();
+
+    String generatedSql = query.getGeneratedSql();
+    Assert.assertTrue(generatedSql.contains("select distinct t0.name c0 from o_customer t0 limit 10"));
+
+    for (Customer customer : customers) {
+
+      EntityBeanIntercept ebi = ((EntityBean)customer)._ebean_getIntercept();
+      Assert.assertTrue(ebi.isDisableLazyLoad());
+      Assert.assertNull(ebi.getPersistenceContext());
+
+      // lazy loading disabled
+      Assert.assertNull(customer.getId());
+      Assert.assertNull(customer.getAnniversary());
+    }
+  }
   
 }
