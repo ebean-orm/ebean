@@ -284,20 +284,23 @@ public class DLoadContext implements LoadContext {
 
   private void registerSecondaryNode(boolean many, OrmQueryProperties props) {
 
-    String path = props.getPath();
-    int lazyJoinBatch = props.getLazyFetchBatch();
-    int batchSize = lazyJoinBatch > 0 ? lazyJoinBatch : defaultBatchSize;
-
-    if (many) {
-      DLoadManyContext manyContext = createManyContext(path, batchSize, props);
-      manyMap.put(path, manyContext);
+    int batchSize;
+    if (props.isQueryFetch()) {
+      batchSize = 100;
     } else {
-      DLoadBeanContext beanContext = createBeanContext(path, batchSize, props);
-      beanMap.put(path, beanContext);
+      int lazyJoinBatch = props.getLazyFetchBatch();
+      batchSize = lazyJoinBatch > 0 ? lazyJoinBatch : defaultBatchSize;
+    }
+
+    String path = props.getPath();
+    if (many) {
+      manyMap.put(path, createManyContext(path, batchSize, props));
+    } else {
+      beanMap.put(path, createBeanContext(path, batchSize, props));
     }
   }
 
-  private DLoadManyContext getManyContext(String path) {
+  protected DLoadManyContext getManyContext(String path) {
     if (path == null) {
       throw new RuntimeException("path is null?");
     }

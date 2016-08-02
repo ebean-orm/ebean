@@ -77,4 +77,19 @@ public class DLoadContextTest extends BaseTestCase {
     assertThat(customer.secondaryBatchSize).isEqualTo(5);
   }
 
+  @Test
+  public void construct_when_fetch_expect_100_100_batchSize() {
+
+    // the fetch is converted to a query join due to the maxRows
+    OrmQueryRequest<Order> queryRequest = queryRequest(query().fetch("details").setMaxRows(100))                                         ;
+    queryRequest.initTransIfRequired();
+    queryRequest.endTransIfRequired();
+
+    DLoadContext graphContext = (DLoadContext)queryRequest.getGraphContext();
+    DLoadManyContext details = graphContext.getManyContext("details");
+
+    assertThat(details.firstBatchSize).isEqualTo(100);
+    assertThat(details.secondaryBatchSize).isEqualTo(100);
+  }
+
 }
