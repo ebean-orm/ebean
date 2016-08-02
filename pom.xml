@@ -9,7 +9,7 @@
 
   <groupId>org.avaje.ebeanorm</groupId>
   <artifactId>avaje-ebeanorm</artifactId>
-  <version>7.21.3-SNAPSHOT</version>
+  <version>8.1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>avaje-ebeanorm</name>
@@ -174,7 +174,7 @@
     <dependency>
       <groupId>org.avaje.ebeanorm</groupId>
       <artifactId>avaje-ebeanorm-agent</artifactId>
-      <version>4.12.1-SNAPSHOT</version>
+      <version>8.1.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -249,7 +249,7 @@
       <plugin>
         <groupId>org.avaje.ebeanorm</groupId>
         <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
-        <version>4.12.1-SNAPSHOT</version>
+        <version>8.1.1</version>
         <executions>
           <execution>
             <id>test</id>
