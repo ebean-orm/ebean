@@ -49,6 +49,7 @@ public class TestSecondaryQueries extends BaseTestCase {
         .select("status")
         .fetchLazy("customer", "name")
         .setMaxRows(10)
+        .setUseCache(false)
         .findList();
 
     List<String> sql = LoggedSqlCollector.stop();
