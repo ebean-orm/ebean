@@ -371,11 +371,13 @@ public interface Query<T> {
   Query<T> setDisableReadAuditing();
 
   /**
-   * Explicitly set a comma delimited list of the properties to fetch on the
-   * 'main' root level entity bean (aka partial object). Note that '*' means all
-   * properties.
+   * Specify the properties to fetch on the root level entity bean in comma delimited format.
    * <p>
-   * You use {@link #fetch(String, String)} to specify specific properties to fetch
+   * The Id property is automatically included in the properties to fetch unless setDistinct(true)
+   * is set on the query.
+   * </p>
+   * <p>
+   * Use {@link #fetch(String, String)} to specify specific properties to fetch
    * on other non-root level paths of the object graph.
    * </p>
    * <pre>{@code
@@ -395,21 +397,17 @@ public interface Query<T> {
   Query<T> select(String fetchProperties);
 
   /**
-   * Specify a path to <em>fetch</em> with its specific properties to include
-   * (aka partial object).
+   * Specify a path to fetch eagerly including specific properties.
    * <p>
-   * When you specify a join this means that property (associated bean(s)) will
-   * be fetched and populated. If you specify "*" then all the properties of the
-   * associated bean will be fetched and populated. You can specify a comma
-   * delimited list of the properties of that associated bean which means that
-   * only those properties are fetched and populated resulting in a
-   * "Partial Object" - a bean that only has some of its properties populated.
+   * Ebean will endeavour to fetch this path using a SQL join. If Ebean determines that it can
+   * not use a SQL join (due to maxRows or because it would result in a cartesian product) Ebean
+   * will automatically convert this fetch query into a "query join" - i.e. use fetchQuery().
    * </p>
    * <pre>{@code
    *
    * // query orders...
    * List<Order> orders =
-   *     ebeanserver.find(Order.class)
+   *     ebeanServer.find(Order.class)
    *       // fetch the customer...
    *       // ... getting the customers name and phone number
    *       .fetch("customer", "name, phoneNumber")
@@ -419,8 +417,7 @@ public interface Query<T> {
    *       .findList();
    * }</pre>
    * <p>
-   * If columns is null or "*" then all columns/properties for that path are
-   * fetched.
+   * If columns is null or "*" then all columns/properties for that path are fetched.
    * </p>
    * <pre>{@code
    *
@@ -433,11 +430,61 @@ public interface Query<T> {
    *
    * }</pre>
    *
-   * @param path            the path of an associated (1-1,1-M,M-1,M-M) bean.
+   * @param path            the property path we wish to fetch eagerly.
    * @param fetchProperties properties of the associated bean that you want to include in the
    *                        fetch (* means all properties, null also means all properties).
    */
   Query<T> fetch(String path, String fetchProperties);
+
+  /**
+   * Fetch the path and properties using a "query join" (separate SQL query).
+   * <p>
+   * This is the same as:
+   * </p>
+   * <pre>{@code
+   *
+   *  fetch(path, fetchProperties, new FetchConfig().query())
+   *
+   * }</pre>
+   * <p>
+   * This would be used instead of a fetch() when we use a separate SQL query to fetch this
+   * part of the object graph rather than a SQL join.
+   * </p>
+   * <p>
+   * We might typically get a performance benefit when the path to fetch is a OneToMany
+   * or ManyToMany, the 'width' of the 'root bean' is wide and the cardinality of the many
+   * is high.
+   * </p>
+   *
+   * @param path            the property path we wish to fetch eagerly.
+   * @param fetchProperties properties of the associated bean that you want to include in the
+   *                        fetch (* means all properties, null also means all properties).
+   */
+  Query<T> fetchQuery(String path, String fetchProperties);
+
+  /**
+   * Fetch the path and properties lazily (via batch lazy loading).
+   * <p>
+   * This is the same as:
+   * </p>
+   * <pre>{@code
+   *
+   *  fetch(path, fetchProperties, new FetchConfig().lazy())
+   *
+   * }</pre>
+   * <p>
+   * The reason for using fetchLazy() is to either:
+   * </p>
+   * <ul>
+   * <li>Control/tune what is fetched as part of lazy loading</li>
+   * <li>Make use of the L2 cache, build this part of the graph from L2 cache</li>
+   * </ul>
+   *
+   * @param path            the property path we wish to fetch lazily.
+   * @param fetchProperties properties of the associated bean that you want to include in the
+   *                        fetch (* means all properties, null also means all properties).
+   */
+  Query<T> fetchLazy(String path, String fetchProperties);
 
   /**
    * Additionally specify a FetchConfig to use a separate query or lazy loading
@@ -452,13 +499,17 @@ public interface Query<T> {
    *     .findList();
    *
    * }</pre>
+   *
+   * @param path the property path we wish to fetch eagerly.
    */
-  Query<T> fetch(String assocProperty, String fetchProperties, FetchConfig fetchConfig);
+  Query<T> fetch(String path, String fetchProperties, FetchConfig fetchConfig);
 
   /**
-   * Specify a path to load including all its properties.
+   * Specify a path to fetch eagerly including all its properties.
    * <p>
-   * The same as {@link #fetch(String, String)} with the fetchProperties as "*".
+   * Ebean will endeavour to fetch this path using a SQL join. If Ebean determines that it can
+   * not use a SQL join (due to maxRows or because it would result in a cartesian product) Ebean
+   * will automatically convert this fetch query into a "query join" - i.e. use fetchQuery().
    * </p>
    * <pre>{@code
    *
@@ -471,9 +522,55 @@ public interface Query<T> {
    *
    * }</pre>
    *
-   * @param path the property of an associated (1-1,1-M,M-1,M-M) bean.
+   * @param path the property path we wish to fetch eagerly.
    */
   Query<T> fetch(String path);
+
+  /**
+   * Fetch the path eagerly using a "query join" (separate SQL query).
+   * <p>
+   * This is the same as:
+   * </p>
+   * <pre>{@code
+   *
+   *  fetch(path, new FetchConfig().query())
+   *
+   * }</pre>
+   * <p>
+   * This would be used instead of a fetch() when we use a separate SQL query to fetch this
+   * part of the object graph rather than a SQL join.
+   * </p>
+   * <p>
+   * We might typically get a performance benefit when the path to fetch is a OneToMany
+   * or ManyToMany, the 'width' of the 'root bean' is wide and the cardinality of the many
+   * is high.
+   * </p>
+   *
+   * @param path the property path we wish to fetch eagerly
+   */
+  Query<T> fetchQuery(String path);
+
+  /**
+   * Fetch the path lazily (via batch lazy loading).
+   * <p>
+   * This is the same as:
+   * </p>
+   * <pre>{@code
+   *
+   *  fetch(path, new FetchConfig().lazy())
+   *
+   * }</pre>
+   * <p>
+   * The reason for using fetchLazy() is to either:
+   * </p>
+   * <ul>
+   * <li>Control/tune what is fetched as part of lazy loading</li>
+   * <li>Make use of the L2 cache, build this part of the graph from L2 cache</li>
+   * </ul>
+   *
+   * @param path the property path we wish to fetch lazily.
+   */
+  Query<T> fetchLazy(String path);
 
   /**
    * Additionally specify a JoinConfig to specify a "query join" and or define
@@ -737,6 +834,7 @@ public interface Query<T> {
    * Deprecated in favor of findCount().
    * <p>
    * Return the count of entities this query should return.
+   *
    * @deprecated
    */
   int findRowCount();
@@ -1198,6 +1296,16 @@ public interface Query<T> {
    * <p>
    * Gives the JDBC driver a hint as to the number of rows that should be
    * fetched from the database when more rows are needed for ResultSet.
+   * </p>
+   * <p>
+   * Note that internally findEach and findEachWhile will set the fetch size
+   * if it has not already as these queries expect to process a lot of rows.
+   * If we didn't then Postgres and MySql for example would eagerly pull back
+   * all the row data and potentially consume a lot of memory in the process.
+   * </p>
+   * <p>
+   * As findEach and findEachWhile automatically set the fetch size we don't have
+   * to do so generally but we might still wish to for tuning a specific use case.
    * </p>
    */
   Query<T> setBufferFetchSizeHint(int fetchSize);

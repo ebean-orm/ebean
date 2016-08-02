@@ -43,6 +43,10 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   public static final String DEFAULT_QUERY_NAME = "default";
 
+  private static final FetchConfig FETCH_QUERY = new FetchConfig().query();
+
+  private static final FetchConfig FETCH_LAZY = new FetchConfig().lazy();
+
   private final Class<T> beanType;
 
   private final BeanDescriptor<T> beanDescriptor;
@@ -1014,6 +1018,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   }
 
   @Override
+  public Query<T> fetchQuery(String property) {
+    return fetch(property, null, FETCH_QUERY);
+  }
+
+  @Override
+  public Query<T> fetchLazy(String property) {
+    return fetch(property, null, FETCH_LAZY);
+  }
+
+  @Override
   public DefaultOrmQuery<T> fetch(String property, FetchConfig joinConfig) {
     return fetch(property, null, joinConfig);
   }
@@ -1021,6 +1035,16 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public DefaultOrmQuery<T> fetch(String property, String columns) {
     return fetch(property, columns, null);
+  }
+
+  @Override
+  public Query<T> fetchQuery(String property, String columns) {
+    return fetch(property, columns, FETCH_QUERY);
+  }
+
+  @Override
+  public Query<T> fetchLazy(String property, String columns) {
+    return fetch(property, columns, FETCH_LAZY);
   }
 
   @Override
