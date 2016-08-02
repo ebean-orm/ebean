@@ -35,7 +35,6 @@ import java.util.Set;
  * <pre>{@code
  *
  * String oql =
- *   	"  find  order "
  *   	+" fetch customer "
  *   	+" fetch details "
  *   	+" where customer.name like :custName and orderDate > :minOrderDate "
@@ -96,33 +95,24 @@ import java.util.Set;
  * Refer to "ALL Properties/Columns" mode of Optimistic Concurrency checking.
  * </p>
  * <pre>{@code
- * [ find  {bean type} [ ( * | {fetch properties} ) ] ]
- * [ fetch {associated bean} [ ( * | {fetch properties} ) ] ]
+ * [ select [ ( * | {fetch properties} ) ] ]
+ * [ fetch {path} [ ( * | {fetch properties} ) ] ]
  * [ where {predicates} ]
  * [ order by {order by properties} ]
  * [ limit {max rows} [ offset {first row} ] ]
  * }</pre>
  * <p>
- * <b>FIND</b> <b>{bean type}</b> [ ( <i>*</i> | <i>{fetch properties}</i> ) ]
+ * <b>SELECT</b> [ ( <i>*</i> | <i>{fetch properties}</i> ) ]
  * </p>
  * <p>
- * With the find you specify the type of beans to fetch. You can optionally
- * specify a list of properties to fetch. If you do not specify a list of
- * properties ALL the properties for those beans are fetched.
+ * With the select you can specify a list of properties to fetch.
  * </p>
  * <p>
- * In object graph terms the <em>find</em> clause specifies the type of bean at
- * the root level and the <em>fetch</em> clauses specify the paths of the object
- * graph to populate.
- * </p>
- * <p>
- * <b>FETCH</b> <b>{associated property}</b> [ ( <i>*</i> | <i>{fetch
- * properties}</i> ) ]
+ * <b>FETCH</b> <b>{path}</b> [ ( <i>*</i> | <i>{fetch properties}</i> ) ]
  * </p>
  * <p>
  * With the fetch you specify the associated property to fetch and populate. The
- * associated property is a OneToOnem, ManyToOne, OneToMany or ManyToMany
- * property. When the query is executed Ebean will fetch the associated data.
+ * path is a OneToOne, ManyToOne, OneToMany or ManyToMany property.
  * </p>
  * <p>
  * For fetch of a path we can optionally specify a list of properties to fetch.
@@ -153,41 +143,33 @@ import java.util.Set;
  * </p>
  * <h4>Examples of Ebean's Query Language</h4>
  * <p>
- * Find orders fetching all its properties
- * </p>
- * <pre>{@code
- * find order
- * }</pre>
- * <p>
- * Find orders fetching all its properties
- * </p>
- * <pre>{@code
- * find order (*)
- * }</pre>
- * <p>
  * Find orders fetching its id, shipDate and status properties. Note that the id
  * property is always fetched even if it is not included in the list of fetch
  * properties.
  * </p>
  * <pre>{@code
- * find order (shipDate, status)
+ *
+ * select (shipDate, status)
+ *
  * }</pre>
  * <p>
  * Find orders with a named bind variable (that will need to be bound via
  * {@link Query#setParameter(String, Object)}).
  * </p>
  * <pre>{@code
- * find order
+ *
  * where customer.name like :custLike
+ *
  * }</pre>
  * <p>
  * Find orders and also fetch the customer with a named bind parameter. This
  * will fetch and populate both the order and customer objects.
  * </p>
  * <pre>{@code
- * find  order
+ *
  * fetch customer
  * where customer.id = :custId
+ *
  * }</pre>
  * <p>
  * Find orders and also fetch the customer, customer shippingAddress, order
@@ -198,57 +180,13 @@ import java.util.Set;
  * populated.
  * </p>
  * <pre>{@code
- * find  order
+ *
  * fetch customer (name)
  * fetch customer.shippingAddress
  * fetch details
  * fetch details.product (sku, name)
+ *
  * }</pre>
- * <h3>Early parsing of the Query</h3>
- * <p>
- * When you get a Query object from a named query, the query statement has
- * already been parsed. You can then add to that query (add fetch paths, add to
- * the where clause) or override some of its settings (override the order by
- * clause, first rows, max rows).
- * </p>
- * <p>
- * The thought is that you can use named queries as a 'starting point' and then
- * modify the query to suit specific needs.
- * </p>
- * <h3>Building the Where clause</h3>
- * <p>
- * You can add to the where clause using Expression objects or a simple String.
- * Note that the ExpressionList has methods to add most of the common
- * expressions that you will need.
- * <ul>
- * <li>where(String addToWhereClause)</li>
- * <li>where().add(Expression expression)</li>
- * <li>where().eq(propertyName, value).like(propertyName , value)...</li>
- * </ul>
- * </p>
- * <p>
- * The full WHERE clause is constructed by appending together
- * <li>original query where clause (Named query or query.setQuery(String oql))</li>
- * <li>clauses added via query.where(String addToWhereClause)</li>
- * <li>clauses added by Expression objects</li>
- * </p>
- * <p>
- * The above is the order that these are clauses are appended to give the full
- * WHERE clause.
- * </p>
- * <h3>Design Goal</h3>
- * <p>
- * This query language is NOT designed to be a replacement for SQL. It is
- * designed to be a simple way to describe the "Object Graph" you want Ebean to
- * build for you. Each find/fetch represents a node in that "Object Graph" which
- * makes it easy to define for each node which properties you want to fetch.
- * </p>
- * <p>
- * Once you hit the limits of this language such as wanting aggregate functions
- * (sum, average, min etc) or recursive queries etc you use SQL. Ebean's goal is
- * to make it as easy as possible to use your own SQL to populate entity beans.
- * Refer to {@link RawSql} .
- * </p>
  *
  * @param <T> the type of Entity bean this query will fetch.
  */
@@ -304,7 +242,7 @@ public interface Query<T> {
    * Specify the PersistenceContextScope to use for this query.
    * <p/>
    * When this is not set the 'default' configured on {@link com.avaje.ebean.config.ServerConfig#setPersistenceContextScope(PersistenceContextScope)}
-   * is used - this value defaults to {@link com.avaje.ebean.PersistenceContextScope#TRANSACTION}.
+   * is used - this value defaults to {@link PersistenceContextScope#TRANSACTION}.
    * <p/>
    * Note that the same persistence Context is used for subsequent lazy loading and query join queries.
    * <p/>
