@@ -50,6 +50,20 @@ public class DLoadContextTest extends BaseTestCase {
   }
 
   @Test
+  public void construct_when_fetchQuery_expect_100_batchSize_viaFetchQuery() {
+
+    OrmQueryRequest<Order> queryRequest = queryRequest(query().fetchQuery("customer"));
+    queryRequest.initTransIfRequired();
+    queryRequest.endTransIfRequired();
+
+    DLoadContext graphContext = (DLoadContext)queryRequest.getGraphContext();
+    DLoadBeanContext customer = graphContext.getBeanContext("customer");
+
+    assertThat(customer.firstBatchSize).isEqualTo(100);
+    assertThat(customer.secondaryBatchSize).isEqualTo(100);
+  }
+
+  @Test
   public void construct_when_fetchQuery50_expect_50_batchSize() {
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query().fetch("customer",new FetchConfig().query(50)));
