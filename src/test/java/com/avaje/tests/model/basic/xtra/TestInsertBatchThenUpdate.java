@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class TestInsertBatchThenUpdate extends BaseTestCase {
@@ -24,6 +25,8 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
     try {
       txn.setBatch(PersistBatch.ALL);
 
+      LoggedSqlCollector.start();
+
       EdParent parent = new EdParent();
       parent.setName("MyComputer");
 
@@ -36,21 +39,17 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
 
       Ebean.save(parent);
 
-      // nothing flushed yet
-      List<String> loggedSql0 = LoggedSqlCollector.start();
-      assertEquals(0, loggedSql0.size());
-
       parent.setName("MyDesk");
       Ebean.save(parent);
-
-      // nothing flushed yet
-      assertEquals(0, LoggedSqlCollector.start().size());
 
       Ebean.commitTransaction();
 
       // insert statements for EdExtendedParent
-      List<String> loggedSql2 = LoggedSqlCollector.start();
-      assertEquals(2, loggedSql2.size());
+      List<String> loggedSql = LoggedSqlCollector.stop();
+      assertEquals(3, loggedSql.size());
+      assertThat(loggedSql.get(0)).contains("insert into td_parent");
+      assertThat(loggedSql.get(1)).contains("insert into td_child ");
+      assertThat(loggedSql.get(2)).contains("update td_parent set parent_name=? where parent_id=?");
 
     } finally {
       Ebean.endTransaction();

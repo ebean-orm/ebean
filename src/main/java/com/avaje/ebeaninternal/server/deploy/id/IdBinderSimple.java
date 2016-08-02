@@ -217,12 +217,10 @@ public final class IdBinderSimple implements IdBinder {
     if (!idValue.getClass().equals(expectedType)) {
       idValue = scalarType.toBeanType(idValue);
     }
-
     if (bean != null) {
       // support PropertyChangeSupport
       idProperty.setValueIntercept(bean, idValue);
     }
-
     return idValue;
   }
 }
