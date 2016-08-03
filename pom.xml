@@ -7,12 +7,12 @@
     <version>1.1</version>
   </parent>
 
-  <groupId>org.avaje.ebeanorm</groupId>
-  <artifactId>avaje-ebeanorm</artifactId>
-  <version>8.1.2-SNAPSHOT</version>
+  <groupId>org.avaje.ebean</groupId>
+  <artifactId>ebean</artifactId>
+  <version>8.1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>avaje-ebeanorm</name>
+  <name>ebean</name>
   <url>http://ebean-orm.github.io/</url>
 
   <properties>
@@ -172,8 +172,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.avaje.ebeanorm</groupId>
-      <artifactId>avaje-ebeanorm-agent</artifactId>
+      <groupId>org.avaje.ebean</groupId>
+      <artifactId>ebean-agent</artifactId>
       <version>8.1.1</version>
       <scope>test</scope>
     </dependency>
@@ -247,8 +247,8 @@
       </plugin>
 
       <plugin>
-        <groupId>org.avaje.ebeanorm</groupId>
-        <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
+        <groupId>org.avaje.ebean</groupId>
+        <artifactId>ebean-maven-plugin</artifactId>
         <version>8.1.1</version>
         <executions>
           <execution>
@@ -304,7 +304,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9.1</version>
         <configuration>
-          <doctitle>Ebean 7</doctitle>
+          <doctitle>Ebean 8</doctitle>
           <overview>src/main/java/com/avaje/ebean/overview.html</overview>
           <source>1.8</source>
           <doclet>org.avaje.doclet.PygmentsDoclet</doclet>
