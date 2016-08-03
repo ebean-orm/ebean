@@ -8,9 +8,9 @@
     <version>1.2</version>
   </parent>
 
-  <groupId>org.avaje.ebeanorm</groupId>
-  <artifactId>avaje-ebeanorm-spring</artifactId>
-  <name>avaje-ebeanorm-spring</name>
+  <groupId>org.avaje.ebean</groupId>
+  <artifactId>ebean-spring</artifactId>
+  <name>ebean-spring</name>
   <version>7.1.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <description>Support for Spring transactions and IOC setup of Ebean server config</description>
@@ -46,17 +46,17 @@
 
     <!-- Provided: Bring in explicitly -->
     <dependency>
-      <groupId>org.avaje.ebeanorm</groupId>
-      <artifactId>avaje-ebeanorm</artifactId>
-      <version>[6,8)</version>
+      <groupId>org.avaje.ebean</groupId>
+      <artifactId>ebean</artifactId>
+      <version>8.1.1</version>
       <scope>provided</scope>
     </dependency>
 
     <!-- Optional: Add to use AgentLoaderSupport -->
     <dependency>
-      <groupId>org.avaje.ebeanorm</groupId>
-      <artifactId>avaje-ebeanorm-agent</artifactId>
-      <version>[4.5,5)</version>
+      <groupId>org.avaje.ebean</groupId>
+      <artifactId>ebean-agent</artifactId>
+      <version>8.1.1</version>
       <scope>provided</scope>
     </dependency>
 
@@ -140,9 +140,9 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.avaje.ebeanorm</groupId>
-        <artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
-        <version>4.10.1</version>
+        <groupId>org.avaje.ebean</groupId>
+        <artifactId>ebean-maven-plugin</artifactId>
+        <version>8.1.1</version>
         <executions>
           <execution>
             <id>main</id>
@@ -182,10 +182,10 @@
                 <pluginExecution>
                   <pluginExecutionFilter>
                     <groupId>
-                      org.avaje.ebeanorm
+                      org.avaje.ebean
                     </groupId>
                     <artifactId>
-                      avaje-ebeanorm-mavenenhancer
+                      ebean-maven-plugin
                     </artifactId>
                     <versionRange>
                       [3,4)
