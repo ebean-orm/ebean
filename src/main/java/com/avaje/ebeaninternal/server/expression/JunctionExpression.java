@@ -396,11 +396,6 @@ class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expression
   }
 
   @Override
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
-    return exprList.findMap(keyProperty, keyType);
-  }
-
-  @Override
   public <A> List<A> findSingleAttributeList() {
     return exprList.findSingleAttributeList();
   }

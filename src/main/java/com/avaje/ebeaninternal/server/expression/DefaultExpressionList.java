@@ -384,11 +384,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
-    return query.findMap(keyProperty, keyType);
-  }
-
-  @Override
   public <A> List<A> findSingleAttributeList() {
     return query.findSingleAttributeList();
   }

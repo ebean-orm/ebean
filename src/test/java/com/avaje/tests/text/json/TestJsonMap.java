@@ -41,7 +41,7 @@ public class TestJsonMap extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Map<String, Customer> map = Ebean.find(Customer.class).findMap("id", String.class);
+    Map<String, Customer> map = Ebean.find(Customer.class).findMap();
 
     JsonContext jsonContext = Ebean.json();
     JsonWriteOptions options = JsonWriteOptions.parsePath("(id,status,name)");

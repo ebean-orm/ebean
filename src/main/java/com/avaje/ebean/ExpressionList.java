@@ -206,11 +206,6 @@ public interface ExpressionList<T> {
   <K> Map<K, T> findMap();
 
   /**
-   * Return a typed map specifying the key property and type.
-   */
-  <K> Map<K, T> findMap(String keyProperty, Class<K> keyType);
-
-  /**
    * Execute the query returning a list of values for a single property.
    *
    * <h3>Example 1:</h3>

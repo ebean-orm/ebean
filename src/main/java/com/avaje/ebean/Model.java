@@ -665,16 +665,6 @@ public abstract class Model {
     }
 
     /**
-     * Executes the query and returns the results as a map of the objects specifying the map key
-     * property.
-     * <p>
-     * Equivalent to {@link Query#findMap(String, Class)}
-     */
-    public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
-      return query().findMap(keyProperty, keyType);
-    }
-
-    /**
      * Executes a find row count query in a background thread.
      * <p>
      * Equivalent to {@link Query#findFutureCount()}

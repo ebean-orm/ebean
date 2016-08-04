@@ -1148,12 +1148,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
 
   @Override
   @SuppressWarnings("unchecked")
-  public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
-    setMapKey(keyProperty);
-    return (Map<K, T>) findMap();
-  }
-
-  @Override
   public <A> List<A> findSingleAttributeList() {
     return (List<A>)server.findSingleAttributeList(this, null);
   }
