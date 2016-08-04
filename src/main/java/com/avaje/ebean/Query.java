@@ -678,6 +678,38 @@ public interface Query<T> {
   <K> Map<K, T> findMap(String keyProperty, Class<K> keyType);
 
   /**
+   * Execute the query returning a list of values for a single property.
+   *
+   * <h3>Example 1:</h3>
+   * <pre>{@code
+   *
+   *  List<String> names =
+   *    Ebean.find(Customer.class)
+   *      .select("name")
+   *      .orderBy().asc("name")
+   *      .findSingleAttributeList();
+   *
+   * }</pre>
+   *
+   * <h3>Example 2:</h3>
+   * <pre>{@code
+   *
+   *  List<String> names =
+   *    Ebean.find(Customer.class)
+   *      .setDistinct(true)
+   *      .select("name")
+   *      .where().eq("status", Customer.Status.NEW)
+   *      .orderBy().asc("name")
+   *      .setMaxRows(100)
+   *      .findSingleAttributeList();
+   *
+   * }</pre>
+   *
+   * @return the list of values for the selected property
+   */
+  <A> List<A> findSingleAttributeList();
+
+  /**
    * Execute the query returning either a single bean or null (if no matching
    * bean is found).
    * <p>

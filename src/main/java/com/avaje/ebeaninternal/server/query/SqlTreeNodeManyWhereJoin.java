@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.query;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocOne;
@@ -37,6 +38,11 @@ public class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
 
     String[] split = SplitName.split(prefix);
     this.parentPrefix = split[0];
+  }
+
+  @Override
+  public BeanProperty getSingleProperty() {
+    throw new IllegalStateException("No expected");
   }
 
   @Override

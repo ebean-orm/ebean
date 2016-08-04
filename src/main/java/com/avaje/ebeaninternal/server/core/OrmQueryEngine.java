@@ -21,6 +21,14 @@ public interface OrmQueryEngine {
    */
   <T> BeanCollection<T> findMany(OrmQueryRequest<T> request);
 
+  /**
+   * Execute the findSingleAttributeList query.
+   */
+  <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request);
+
+  /**
+   * Execute the findVersions query.
+   */
   <T> List<Version<T>> findVersions(OrmQueryRequest<T> request);
 
   /**

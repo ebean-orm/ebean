@@ -108,6 +108,11 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   Map<?, ?> findMap();
 
   /**
+   * Execute the findSingleAttributeList query.
+   */
+  <A> List<A> findSingleAttributeList();
+
+  /**
    * Try to get the query result from the query cache.
    */
   BeanCollection<T> getFromQueryCache();

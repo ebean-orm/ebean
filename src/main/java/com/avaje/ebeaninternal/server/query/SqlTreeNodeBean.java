@@ -137,6 +137,11 @@ public class SqlTreeNodeBean implements SqlTreeNode {
     pathMap = createPathMap(prefix, desc);
   }
 
+  @Override
+  public BeanProperty getSingleProperty() {
+    return properties[0];
+  }
+
   private Map<String, String> createPathMap(String prefix, BeanDescriptor<?> desc) {
 
     BeanPropertyAssocMany<?>[] manys = desc.propertiesMany();

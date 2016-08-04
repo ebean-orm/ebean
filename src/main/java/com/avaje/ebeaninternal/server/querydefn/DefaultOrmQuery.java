@@ -192,6 +192,8 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private boolean forUpdate;
 
+  private boolean singleAttribute;
+
   /**
    * Set to true if this query has been tuned by autoTune.
    */
@@ -532,6 +534,26 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
     // clear select and fetch joins..
     detail.clear();
     select(beanDescriptor.getIdBinder().getIdProperty());
+  }
+
+  @Override
+  public void setSingleAttribute() {
+    this.singleAttribute = true;
+  }
+
+  /**
+   * Return true if this is a single attribute query.
+   */
+  public boolean isSingleAttribute() {
+    return singleAttribute;
+  }
+
+  /**
+   * Return true if the Id should be included in the query.
+   */
+  @Override
+  public boolean isWithId() {
+    return !distinct && !singleAttribute;
   }
 
   @Override
@@ -1131,6 +1153,11 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   public <K> Map<K, T> findMap(String keyProperty, Class<K> keyType) {
     setMapKey(keyProperty);
     return (Map<K, T>) findMap();
+  }
+
+  @Override
+  public <A> List<A> findSingleAttributeList() {
+    return (List<A>)server.findSingleAttributeList(this, null);
   }
 
   @Override

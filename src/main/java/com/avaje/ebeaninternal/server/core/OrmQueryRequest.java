@@ -374,6 +374,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
   }
 
   /**
+   * Execute the findSingleAttributeList query.
+   */
+  @Override
+  public <A> List<A> findSingleAttributeList() {
+    return queryEngine.findSingleAttributeList(this);
+  }
+
+  /**
    * Return a bean specific finder if one has been set.
    */
   public BeanFindController getBeanFinder() {

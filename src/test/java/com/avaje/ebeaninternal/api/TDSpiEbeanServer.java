@@ -521,6 +521,11 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
+  public <A> List<A> findSingleAttributeList(Query<?> query, Transaction transaction) {
+    return null;
+  }
+
+  @Override
   public <T> T findUnique(Query<T> query, Transaction transaction) {
     return null;
   }

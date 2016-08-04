@@ -89,6 +89,27 @@ public class CQueryEngine {
   }
 
   /**
+   * Build and execute the findSingleAttributeList query.
+   */
+  public <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request) {
+
+    CQueryFetchSingleAttribute rcQuery = queryBuilder.buildFetchAttributeQuery(request);
+    try {
+      List list = rcQuery.findList();
+      if (request.isLogSql()) {
+        logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog());
+      }
+      if (request.isLogSummary()) {
+        request.getTransaction().logSummary(rcQuery.getSummary());
+      }
+      return list;
+
+    } catch (SQLException e) {
+      throw CQuery.createPersistenceException(e, request.getTransaction(), rcQuery.getBindLog(), rcQuery.getGeneratedSql());
+    }
+  }
+
+  /**
    * Build and execute the find Id's query.
    */
   public <T> BeanIdList findIds(OrmQueryRequest<T> request) {
@@ -97,15 +118,12 @@ public class CQueryEngine {
     try {
 
       BeanIdList list = rcQuery.findIds();
-
       if (request.isLogSql()) {
         logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog());
       }
-
       if (request.isLogSummary()) {
         request.getTransaction().logSummary(rcQuery.getSummary());
       }
-
       if (request.getQuery().isFutureFetch()) {
         // end the transaction for futureFindIds (it had it's own one)
         logger.debug("Future findIds completed!");

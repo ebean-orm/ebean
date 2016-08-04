@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.query;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
 import com.avaje.ebeaninternal.server.deploy.DbSqlContext;
 
@@ -62,4 +63,10 @@ public interface SqlTreeNode {
    * Return true if the query has a many join.
    */
   boolean hasMany();
+
+  /**
+   * Return the property for singleAttribute query.
+   */
+  BeanProperty getSingleProperty();
+
 }

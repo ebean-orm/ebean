@@ -266,4 +266,7 @@ public class CQueryPlan {
     return stats.getLastQueryTime();
   }
 
+  public BeanProperty getSingleProperty() {
+    return sqlTree.getRootNode().getSingleProperty();
+  }
 }

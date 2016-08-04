@@ -79,6 +79,11 @@ public interface SpiQuery<T> extends Query<T> {
     ID_LIST,
 
     /**
+     * Find single attribute.
+     */
+    ATTRIBUTE,
+
+    /**
      * Find rowCount.
      */
     ROWCOUNT,
@@ -340,6 +345,24 @@ public interface SpiQuery<T> extends Query<T> {
    * Set the query to select the id property only.
    */
   void setSelectId();
+
+  /**
+   * Mark the query as selecting a single attribute.
+   */
+  void setSingleAttribute();
+
+  /**
+   * Return true if this is singleAttribute query.
+   */
+  boolean isSingleAttribute();
+
+  /**
+   * Return true if the query should include the Id property.
+   * <p>
+   * distinct and single attribute queries exclude the Id property.
+   * </p>
+   */
+  boolean isWithId();
 
   /**
    * Set a filter to a join path.

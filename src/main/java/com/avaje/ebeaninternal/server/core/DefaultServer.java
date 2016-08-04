@@ -1152,6 +1152,23 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Override
+  public <A> List<A> findSingleAttributeList(Query<?> query, Transaction t) {
+
+    SpiOrmQueryRequest request = createQueryRequest(Type.ATTRIBUTE, query, t);
+    Object result = request.getFromQueryCache();
+    if (result != null) {
+      return (List<A>) result;
+    }
+    try {
+      request.initTransIfRequired();
+      return (List<A>) request.findSingleAttributeList();
+
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
   public <T> int findCount(Query<T> query, Transaction t) {
 
     SpiQuery<T> copy = ((SpiQuery<T>) query).copy();

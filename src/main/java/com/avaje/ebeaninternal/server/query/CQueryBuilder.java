@@ -165,13 +165,35 @@ public class CQueryBuilder {
     return StringHelper.replaceString(sql, "${RTA}", replaceWith);
   }
 
+  public CQueryFetchSingleAttribute buildFetchAttributeQuery(OrmQueryRequest<?> request) {
+
+    SpiQuery<?> query = request.getQuery();
+    query.setSingleAttribute();
+
+    CQueryPredicates predicates = new CQueryPredicates(binder, request);
+    CQueryPlan queryPlan = request.getQueryPlan();
+    if (queryPlan != null) {
+      predicates.prepare(false);
+      return new CQueryFetchSingleAttribute(request, predicates, queryPlan);
+    }
+
+    // use RawSql or generated Sql
+    predicates.prepare(true);
+
+    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
+    SqlLimitResponse s = buildSql(null, request, predicates, sqlTree);
+
+    queryPlan = new CQueryPlan(request, s.getSql(), sqlTree, false, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
+    request.putQueryPlan(queryPlan);
+    return new CQueryFetchSingleAttribute(request, predicates, queryPlan);
+  }
+
   /**
    * Build the row count query.
    */
   public <T> CQueryFetchIds buildFetchIdsQuery(OrmQueryRequest<T> request) {
 
     SpiQuery<T> query = request.getQuery();
-
     query.setSelectId();
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
@@ -179,8 +201,7 @@ public class CQueryBuilder {
     if (queryPlan != null) {
       // skip building the SqlTree and Sql string
       predicates.prepare(false);
-      String sql = queryPlan.getSql();
-      return new CQueryFetchIds(request, predicates, sql);
+      return new CQueryFetchIds(request, predicates, queryPlan.getSql());
     }
 
     // use RawSql or generated Sql
@@ -450,8 +471,8 @@ public class CQueryBuilder {
       }
 
       sb.append(select.getSelectSql());
-      if (query.isDistinctQuery() && dbOrderBy != null) {
-        // add the orderby columns to the select clause (due to distinct)
+      if (query.isDistinctQuery() && dbOrderBy != null && !query.isSingleAttribute()) {
+        // add the orderBy columns to the select clause (due to distinct)
         sb.append(", ").append(convertDbOrderByForSelect(dbOrderBy));
       }
     }

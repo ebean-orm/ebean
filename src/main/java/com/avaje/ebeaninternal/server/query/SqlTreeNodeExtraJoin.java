@@ -3,6 +3,7 @@ package com.avaje.ebeaninternal.server.query;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebeaninternal.api.SpiQuery;
+import com.avaje.ebeaninternal.server.deploy.BeanProperty;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import com.avaje.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import com.avaje.ebeaninternal.server.deploy.DbReadContext;
@@ -53,6 +54,11 @@ public class SqlTreeNodeExtraJoin implements SqlTreeNode {
   @Override
   public void addSoftDeletePredicate(SpiQuery<?> query) {
     // nothing to do here
+  }
+
+  @Override
+  public BeanProperty getSingleProperty() {
+    throw new IllegalStateException("No expected");
   }
 
   /**
