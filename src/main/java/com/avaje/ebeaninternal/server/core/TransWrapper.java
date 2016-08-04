@@ -41,7 +41,7 @@ final class TransWrapper {
 	
 	void rollbackIfCreated() {
 		if (wasCreated){
-			transaction.rollback();
+			transaction.rollbackIfActive();
 		}
 	}
 	

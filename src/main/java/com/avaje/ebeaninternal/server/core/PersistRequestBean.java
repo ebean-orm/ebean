@@ -821,7 +821,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
-   * Add the bean to the TransactionEvent. This will be used by TransactionManager to synch Cache,
+   * Add the bean to the TransactionEvent. This will be used by TransactionManager to sync Cache,
    * Cluster and text indexes.
    */
   private void addEvent() {

@@ -343,6 +343,13 @@ public final class EntityBeanIntercept implements Serializable {
   }
 
   /**
+   * Set the bean into NEW state.
+   */
+  public void setNew() {
+    this.state = STATE_NEW;
+  }
+
+  /**
    * Set the loaded state to true.
    * <p>
    * Calls to setter methods after the bean is loaded can result in 'Old Values'

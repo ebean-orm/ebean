@@ -913,28 +913,27 @@ public class JdbcTransaction implements SpiTransaction {
       throw new IllegalStateException(illegalStateMessage);
     }
 
-    firePreCommit();
-
     try {
       if (queryOnly) {
-        // can rollback or just close for performance
         connectionEndForQueryOnly();
+
       } else {
-        // commit
         if (batchControl != null && !batchControl.isEmpty()) {
           batchControl.flush();
         }
+        firePreCommit();
+        // only performCommit can throw an exception
         performCommit();
+        firePostCommit();
+        notifyCommit();
       }
 
     } catch (Exception e) {
+      doRollback(e);
       throw new RollbackException(e);
 
     } finally {
-      // these will not throw an exception
-      firePostCommit();
       deactivate();
-      notifyCommit();
     }
   }
 
@@ -960,6 +959,16 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   /**
+   * Perform rollback is the transaction is still active.
+   */
+  @Override
+  public void rollbackIfActive() {
+    if (isActive()) {
+      rollback(null);
+    }
+  }
+
+  /**
    * Rollback the transaction.
    */
   @Override
@@ -976,17 +985,26 @@ public class JdbcTransaction implements SpiTransaction {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
+    try {
+      doRollback(cause);
+    } finally {
+      deactivate();
+    }
+  }
+
+  /**
+   * Perform the jdbc rollback and fire any registered callbacks.
+   */
+  private void doRollback(Throwable cause) {
     firePreRollback();
     try {
       performRollback();
-
-    } catch (Exception ex) {
+    } catch (SQLException ex) {
       throw new PersistenceException(ex);
 
     } finally {
       // these will not throw an exception
       firePostRollback();
-      deactivate();
       notifyRollback(cause);
     }
   }
