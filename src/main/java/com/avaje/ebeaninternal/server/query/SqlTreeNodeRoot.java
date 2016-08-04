@@ -26,14 +26,6 @@ public final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   }
 
   /**
-   * Construct for raw sql named queries.
-   */
-  public SqlTreeNodeRoot(BeanDescriptor<?> desc, SqlTreeProperties props, boolean withId) {
-    super(desc, props, withId, false);
-    this.includeJoin = null;
-  }
-
-  /**
    * Set AsOf support (at root level).
    */
   public void addAsOfTableAlias(SpiQuery<?> query) {

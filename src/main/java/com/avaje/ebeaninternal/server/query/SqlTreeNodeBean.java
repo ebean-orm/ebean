@@ -84,13 +84,6 @@ public class SqlTreeNodeBean implements SqlTreeNode {
   private boolean intersectionAsOfTableAlias;
 
   /**
-   * Construct for Raw SQL.
-   */
-  public SqlTreeNodeBean(BeanDescriptor<?> desc, SqlTreeProperties props, boolean withId, boolean disableLazyLoad) {
-    this(null, null, desc, props, null, withId, null, null, disableLazyLoad);
-  }
-
-  /**
    * Construct for leaf node.
    */
   public SqlTreeNodeBean(String prefix, BeanPropertyAssoc<?> beanProp, SqlTreeProperties props,
