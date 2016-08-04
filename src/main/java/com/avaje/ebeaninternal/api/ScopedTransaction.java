@@ -33,6 +33,11 @@ public class ScopedTransaction implements SpiTransaction {
   }
 
   @Override
+  public void commitAndContinue() throws RollbackException {
+    transaction.commitAndContinue();
+  }
+
+  @Override
   public void commit() throws RollbackException {
     scopeTrans.commitTransaction();
     committed = true;

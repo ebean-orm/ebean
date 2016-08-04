@@ -55,12 +55,51 @@ public interface Transaction extends Closeable {
   void setReadOnly(boolean readOnly);
 
   /**
+   * Commits the transaction at this point with the expectation that another
+   * commit (or rollback or end) will occur later to complete the transaction.
+   * <p>
+   * This is similar to commit() but leaves the transaction "Active".
+   * </p>
+   * <h3>Functions/h3>
+   * <ul>
+   *   <li>Flush the JDBC batch buffer</li>
+   *   <li>Call commit on the underlying JDBC connection</li>
+   *   <li>Trigger any registered TransactionCallbacks</li>
+   *   <li>Perform post-commit processing updating L2 cache, ElasticSearch etc</li>
+   * </ul>
+   */
+  void commitAndContinue() throws RollbackException;
+
+  /**
    * Commit the transaction.
+   * <p>
+   * This performs commit and completes the transaction closing underlying resources and
+   * marking the transaction as "In active".
+   * </p>
+   * <h3>Functions/h3>
+   * <ul>
+   *   <li>Flush the JDBC batch buffer</li>
+   *   <li>Call commit on the underlying JDBC connection</li>
+   *   <li>Trigger any registered TransactionCallbacks</li>
+   *   <li>Perform post-commit processing updating L2 cache, ElasticSearch etc</li>
+   *   <li>Close any underlying resources, closing the underlying JDBC connection</li>
+   *   <li>Mark the transaction as "Inactive"</li>
+   * </ul>
    */
   void commit() throws RollbackException;
 
   /**
    * Rollback the transaction.
+   * <p>
+   * This performs rollback, closes underlying resources and marks the transaction as "In active".
+   * </p>
+   * <h3>Functions/h3>
+   * <ul>
+   *   <li>Call rollback on the underlying JDBC connection</li>
+   *   <li>Trigger any registered TransactionCallbacks</li>
+   *   <li>Close any underlying resources, closing the underlying JDBC connection</li>
+   *   <li>Mark the transaction as "Inactive"</li>
+   * </ul>
    */
   void rollback() throws PersistenceException;
 
@@ -422,9 +461,8 @@ public interface Transaction extends Closeable {
 
   /**
    * Add an arbitrary user object to the transaction. The objects added have no
-   * impact on any internals of ebena and are solely meant as a convenient
-   * method push user information to e.g. the
-   * {@link com.avaje.ebean.event.TransactionEventListener}.
+   * impact on any internals of ebean and are solely meant as a convenient
+   * method push user information (although somewhat replaced by TransactionCallback).
    */
   void putUserObject(String name, Object value);
 

@@ -883,6 +883,48 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   /**
+   * Batch flush, jdbc commit, trigger registered TransactionCallbacks, notify l2 cache etc.
+   */
+  private void flushCommitAndNotify() throws SQLException {
+    if (batchControl != null && !batchControl.isEmpty()) {
+      batchControl.flush();
+    }
+    firePreCommit();
+    // only performCommit can throw an exception
+    performCommit();
+    firePostCommit();
+    notifyCommit();
+  }
+
+  /**
+   * Perform a commit, fire callbacks and notify l2 cache etc.
+   * <p>
+   * This leaves the transaction active and expects another commit
+   * to occur later (which closes the underlying connection etc).
+   * </p>
+   */
+  @Override
+  public void commitAndContinue() throws RollbackException {
+    if (rollbackOnly) {
+      return;
+    }
+    if (!isActive()) {
+      throw new IllegalStateException(illegalStateMessage);
+    }
+    try {
+      flushCommitAndNotify();
+      // the event has been sent to the transaction manager
+      // for postCommit processing (l2 cache updates etc)
+      // start a new transaction event
+      event = new TransactionEvent();
+
+    } catch (Exception e) {
+      doRollback(e);
+      throw new RollbackException(e);
+    }
+  }
+
+  /**
    * Commit the transaction.
    */
   @Override
@@ -894,20 +936,11 @@ public class JdbcTransaction implements SpiTransaction {
     if (!isActive()) {
       throw new IllegalStateException(illegalStateMessage);
     }
-
     try {
       if (queryOnly) {
         connectionEndForQueryOnly();
-
       } else {
-        if (batchControl != null && !batchControl.isEmpty()) {
-          batchControl.flush();
-        }
-        firePreCommit();
-        // only performCommit can throw an exception
-        performCommit();
-        firePostCommit();
-        notifyCommit();
+        flushCommitAndNotify();
       }
 
     } catch (Exception e) {
