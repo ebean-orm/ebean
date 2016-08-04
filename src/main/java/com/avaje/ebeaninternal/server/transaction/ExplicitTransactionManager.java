@@ -44,11 +44,7 @@ public class ExplicitTransactionManager extends TransactionManager {
       return DatabasePlatform.OnQueryOnly.valueOf(systemPropertyValue.trim().toUpperCase());
     }
 
-    if (DatabasePlatform.OnQueryOnly.CLOSE.equals(dbPlatformOnQueryOnly)) {
-      // Not using OnQueryOnly.CLOSE with ExplicitJdbcTransaction
-      return DatabasePlatform.OnQueryOnly.COMMIT;
-    }
-    // default to commit if not defined on the platform
-    return dbPlatformOnQueryOnly == null ? DatabasePlatform.OnQueryOnly.COMMIT : dbPlatformOnQueryOnly;
+    // default to rollback if not defined on the platform
+    return dbPlatformOnQueryOnly == null ? DatabasePlatform.OnQueryOnly.ROLLBACK : dbPlatformOnQueryOnly;
   }
 }

@@ -192,49 +192,8 @@ public class TransactionManager {
       return OnQueryOnly.valueOf(systemPropertyValue.trim().toUpperCase());
     }
 
-    if (OnQueryOnly.CLOSE.equals(dbPlatformOnQueryOnly)) {
-      // check for read committed isolation level
-      if (!isReadCommittedIsolation(ds)) {
-        logger.warn("Ignoring DatabasePlatform.OnQueryOnly.CLOSE as the transaction Isolation Level is not READ_COMMITTED");
-        // we will just use ROLLBACK and ignore the desired optimisation
-        return OnQueryOnly.ROLLBACK;
-      } else {
-        // will use the OnQueryOnly.CLOSE optimisation
-        return OnQueryOnly.CLOSE;
-      }
-    }
     // default to rollback if not defined on the platform
     return dbPlatformOnQueryOnly == null ? OnQueryOnly.ROLLBACK : dbPlatformOnQueryOnly;
-  }
-
-  /**
-   * Return true if the isolation level is read committed.
-   */
-  protected boolean isReadCommittedIsolation(DataSource ds) {
-
-    if (DbOffline.isSet()) {
-      return true;
-    }
-    Connection c = null;
-    try {
-      c = ds.getConnection();
-
-      int isolationLevel = c.getTransactionIsolation();
-      return (isolationLevel == Connection.TRANSACTION_READ_COMMITTED);
-
-    } catch (SQLException ex) {
-      String m = "Errored trying to determine the default Isolation Level";
-      throw new PersistenceException(m, ex);
-
-    } finally {
-      try {
-        if (c != null) {
-          c.close();
-        }
-      } catch (SQLException ex) {
-        logger.error("closing connection", ex);
-      }
-    }
   }
 
   public String getServerName() {

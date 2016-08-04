@@ -860,26 +860,14 @@ public class JdbcTransaction implements SpiTransaction {
   }
 
   /**
-   * Rollback, Commit or Close for query only transaction.
-   * <p>
-   * For a transaction that was used for queries only we can choose to either
-   * rollback or just close the connection for performance.
-   * </p>
+   * Rollback or Commit for query only transaction.
    */
   protected void connectionEndForQueryOnly() {
     try {
-      switch (onQueryOnly) {
-        case ROLLBACK:
-          performRollback();
-          break;
-        case COMMIT:
-          performCommit();
-          break;
-        case CLOSE:
-          // valid at READ COMMITTED Isolation
-          break;
-        default:
-          performRollback();
+      if (onQueryOnly == OnQueryOnly.COMMIT) {
+        performCommit();
+      } else {
+        performRollback();
       }
     } catch (SQLException e) {
       logger.error("Error when ending a query only transaction via " + onQueryOnly, e);

@@ -34,12 +34,6 @@ public class DatabasePlatform {
     ROLLBACK,
 
     /**
-     * Just close the transaction. Valid at READ_COMMITTED isolation and preferred on some Databases
-     * as a performance optimisation.
-     */
-    CLOSE,
-
-    /**
      * Commit the transaction
      */
     COMMIT
