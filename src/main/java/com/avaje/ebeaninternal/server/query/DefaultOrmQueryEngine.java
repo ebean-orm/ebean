@@ -65,7 +65,7 @@ public class DefaultOrmQueryEngine implements OrmQueryEngine {
     return queryEngine.findRowCount(request);
   }
 
-  public <T> BeanIdList findIds(OrmQueryRequest<T> request) {
+  public <A> List<A> findIds(OrmQueryRequest<?> request) {
 
     flushJdbcBatchOnQuery(request);
     return queryEngine.findIds(request);

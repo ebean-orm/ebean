@@ -304,9 +304,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements BeanQueryRe
     return queryEngine.findRowCount(this);
   }
 
-  public List<Object> findIds() {
-    BeanIdList idList = queryEngine.findIds(this);
-    return idList.getIdList();
+  public <A> List<A> findIds() {
+    return queryEngine.findIds(this);
   }
 
   public void findEach(QueryEachConsumer<T> consumer) {

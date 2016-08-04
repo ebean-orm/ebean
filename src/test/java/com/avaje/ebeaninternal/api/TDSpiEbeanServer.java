@@ -186,7 +186,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> List<Object> findIdsWithCopy(Query<T> query, Transaction t) {
+  public <A> List<A> findIdsWithCopy(Query<?> query, Transaction t) {
     return null;
   }
 
@@ -466,7 +466,7 @@ public class TDSpiEbeanServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> List<Object> findIds(Query<T> query, Transaction transaction) {
+  public <A> List<A> findIds(Query<?> query, Transaction transaction) {
     return null;
   }
 

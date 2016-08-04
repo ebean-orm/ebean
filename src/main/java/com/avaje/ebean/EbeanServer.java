@@ -757,9 +757,9 @@ public interface EbeanServer {
   /**
    * Return the Id values of the query as a List.
    *
-   * @see com.avaje.ebean.Query#findIds()
+   * @see Query#findIds()
    */
-  <T> List<Object> findIds(Query<T> query, Transaction transaction);
+  <A> List<A> findIds(Query<?> query, Transaction transaction);
 
   /**
    * Execute the query visiting the each bean one at a time.

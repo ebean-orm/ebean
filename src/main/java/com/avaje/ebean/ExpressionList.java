@@ -174,7 +174,7 @@ public interface ExpressionList<T> {
    *
    * @see Query#findIds()
    */
-  List<Object> findIds();
+  <A> List<A> findIds();
 
   /**
    * Return the count of entities this query should return.

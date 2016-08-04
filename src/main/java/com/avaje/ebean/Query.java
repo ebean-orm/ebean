@@ -542,7 +542,7 @@ public interface Query<T> {
    *
    * @see EbeanServer#findIds(Query, Transaction)
    */
-  List<Object> findIds();
+  <A> List<A> findIds();
 
   /**
    * Execute the query processing the beans one at a time.

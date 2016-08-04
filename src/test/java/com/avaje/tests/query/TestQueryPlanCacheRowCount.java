@@ -23,7 +23,7 @@ public class TestQueryPlanCacheRowCount extends BaseTestCase {
 
     int rc0 = query.findRowCount();
 
-    List<Object> ids = query.findIds();
+    List<Integer> ids = query.findIds();
     Assert.assertEquals(rc0, ids.size());
 
     List<Order> list0 = query.findList();
@@ -32,7 +32,7 @@ public class TestQueryPlanCacheRowCount extends BaseTestCase {
     int rc1 = query.findCount();
     Assert.assertEquals(rc0, rc1);
 
-    List<Object> ids1 = query.findIds();
+    List<Integer> ids1 = query.findIds();
     Assert.assertEquals(rc0, ids1.size());
 
     List<Order> list1 = query.findList();
@@ -53,7 +53,7 @@ public class TestQueryPlanCacheRowCount extends BaseTestCase {
     System.out.println("Expection Not same " + rc0 + " != " + rc2);
     Assert.assertNotSame(rc0, rc2);
 
-    List<Object> ids2 = query2.findIds();
+    List<Integer> ids2 = query2.findIds();
     Assert.assertEquals(rc2, ids2.size());
 
     List<Order> list2 = query2.findList();

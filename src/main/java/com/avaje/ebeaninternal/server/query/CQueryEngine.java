@@ -1,17 +1,16 @@
 package com.avaje.ebeaninternal.server.query;
 
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebeaninternal.server.core.QueryIterator;
 import com.avaje.ebean.ValuePair;
 import com.avaje.ebean.Version;
 import com.avaje.ebean.bean.BeanCollection;
 import com.avaje.ebean.bean.EntityBean;
 import com.avaje.ebean.bean.ObjectGraphNode;
+import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.DatabasePlatform;
-import com.avaje.ebeaninternal.api.BeanIdList;
 import com.avaje.ebeaninternal.api.SpiQuery;
 import com.avaje.ebeaninternal.server.core.DiffHelp;
 import com.avaje.ebeaninternal.server.core.OrmQueryRequest;
+import com.avaje.ebeaninternal.server.core.QueryIterator;
 import com.avaje.ebeaninternal.server.deploy.BeanDescriptor;
 import com.avaje.ebeaninternal.server.lib.util.Str;
 import com.avaje.ebeaninternal.server.persist.Binder;
@@ -94,8 +93,13 @@ public class CQueryEngine {
   public <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request) {
 
     CQueryFetchSingleAttribute rcQuery = queryBuilder.buildFetchAttributeQuery(request);
+    return findAttributeList(request, rcQuery);
+  }
+
+  @SuppressWarnings("unchecked")
+  private <A> List<A> findAttributeList(OrmQueryRequest<?> request, CQueryFetchSingleAttribute rcQuery) {
     try {
-      List list = rcQuery.findList();
+      List<A> list = (List<A>)rcQuery.findList();
       if (request.isLogSql()) {
         logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog());
       }
@@ -112,29 +116,10 @@ public class CQueryEngine {
   /**
    * Build and execute the find Id's query.
    */
-  public <T> BeanIdList findIds(OrmQueryRequest<T> request) {
+  public <A> List<A> findIds(OrmQueryRequest<?> request) {
 
-    CQueryFetchIds rcQuery = queryBuilder.buildFetchIdsQuery(request);
-    try {
-
-      BeanIdList list = rcQuery.findIds();
-      if (request.isLogSql()) {
-        logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog());
-      }
-      if (request.isLogSummary()) {
-        request.getTransaction().logSummary(rcQuery.getSummary());
-      }
-      if (request.getQuery().isFutureFetch()) {
-        // end the transaction for futureFindIds (it had it's own one)
-        logger.debug("Future findIds completed!");
-        request.getTransaction().end();
-      }
-
-      return list;
-
-    } catch (SQLException e) {
-      throw CQuery.createPersistenceException(e, request.getTransaction(), rcQuery.getBindLog(), rcQuery.getGeneratedSql());
-    }
+    CQueryFetchSingleAttribute rcQuery = queryBuilder.buildFetchIdsQuery(request);
+    return findAttributeList(request, rcQuery);
   }
 
   private <T> void logGeneratedSql(OrmQueryRequest<T> request, String sql, String bindLog) {

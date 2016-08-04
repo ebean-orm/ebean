@@ -252,21 +252,6 @@ public interface SpiQuery<T> extends Query<T> {
   List<String> getSoftDeletePredicates();
 
   /**
-   * Set the list of Id's that is being populated.
-   * <p>
-   * This is a mutating list of id's and we are setting this so that other
-   * threads have access to the id's before the id query has finished.
-   * </p>
-   */
-  void setIdList(List<Object> ids);
-
-  /**
-   * Return the list of Id's that is currently being fetched by a background
-   * thread.
-   */
-  List<Object> getIdList();
-
-  /**
    * Return a copy of the query.
    */
   SpiQuery<T> copy();

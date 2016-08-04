@@ -123,8 +123,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
    */
   private ReadEvent futureFetchAudit;
 
-  private List<Object> partialIds;
-
   private int timeout;
 
   /**
@@ -1507,16 +1505,6 @@ public class DefaultOrmQuery<T> implements SpiQuery<T> {
   @Override
   public boolean isDisableReadAudit() {
     return disableReadAudit;
-  }
-
-  @Override
-  public List<Object> getIdList() {
-    return partialIds;
-  }
-
-  @Override
-  public void setIdList(List<Object> partialIds) {
-    this.partialIds = partialIds;
   }
 
   @Override

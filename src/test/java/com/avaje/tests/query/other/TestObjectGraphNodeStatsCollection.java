@@ -95,7 +95,7 @@ public class TestObjectGraphNodeStatsCollection extends BaseTestCase {
     
     ResetBasicData.reset();
     
-    List<Object> ids = Ebean.find(Order.class).findIds();
+    List<Integer> ids = Ebean.find(Order.class).findIds();
     Assert.assertTrue(!ids.isEmpty());
     
   }

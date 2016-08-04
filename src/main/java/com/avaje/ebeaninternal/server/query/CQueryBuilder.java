@@ -189,33 +189,12 @@ public class CQueryBuilder {
   }
 
   /**
-   * Build the row count query.
+   * Build the find ids query.
    */
-  public <T> CQueryFetchIds buildFetchIdsQuery(OrmQueryRequest<T> request) {
+  public <T> CQueryFetchSingleAttribute buildFetchIdsQuery(OrmQueryRequest<T> request) {
 
-    SpiQuery<T> query = request.getQuery();
-    query.setSelectId();
-
-    CQueryPredicates predicates = new CQueryPredicates(binder, request);
-    CQueryPlan queryPlan = request.getQueryPlan();
-    if (queryPlan != null) {
-      // skip building the SqlTree and Sql string
-      predicates.prepare(false);
-      return new CQueryFetchIds(request, predicates, queryPlan.getSql());
-    }
-
-    // use RawSql or generated Sql
-    predicates.prepare(true);
-
-    SqlTree sqlTree = createSqlTree(request, predicates, getHistorySupport(query), getDraftSupport(query));
-    SqlLimitResponse s = buildSql(null, request, predicates, sqlTree);
-    String sql = s.getSql();
-
-    // cache the query plan
-    queryPlan = new CQueryPlan(request, sql, sqlTree, false, s.isIncludesRowNumberColumn(), predicates.getLogWhereSql());
-
-    request.putQueryPlan(queryPlan);
-    return new CQueryFetchIds(request, predicates, sql);
+    request.getQuery().setSelectId();
+    return buildFetchAttributeQuery(request);
   }
 
   /**

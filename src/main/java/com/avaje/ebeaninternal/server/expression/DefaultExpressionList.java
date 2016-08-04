@@ -354,7 +354,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public List<Object> findIds() {
+  public <A> List<A> findIds() {
     return query.findIds();
   }
 

@@ -44,7 +44,7 @@ public interface OrmQueryEngine {
   /**
    * Execute the find id's query.
    */
-  <T> BeanIdList findIds(OrmQueryRequest<T> request);
+  <A> List<A> findIds(OrmQueryRequest<?> request);
 
   /**
    * Execute the query as a delete statement.

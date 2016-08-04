@@ -598,7 +598,7 @@ public abstract class Model {
      * <p>
      * Equivalent to {@link Query#findIds()}
      */
-    public List<Object> findIds() {
+    public <A> List<A> findIds() {
       return query().findIds();
     }
 

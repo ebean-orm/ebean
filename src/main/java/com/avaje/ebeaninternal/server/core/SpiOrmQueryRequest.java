@@ -70,7 +70,7 @@ public interface SpiOrmQueryRequest<T> extends DocQueryRequest<T> {
   /**
    * Execute the find ids query.
    */
-  List<Object> findIds();
+  <A> List<A> findIds();
 
   /**
    * Execute the find returning a QueryIterator and visitor pattern.
